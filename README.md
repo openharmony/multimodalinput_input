@@ -1,37 +1,84 @@
-# multimodalinput_input
+# multimodalinput\_input<a name="EN-US_TOPIC_0000001147497185"></a>
 
-#### 介绍
-Providing traditional input methods, such as key, touch, keyboard, and mouse inputs | 提供传统的输入交互方式，例如按键、触控、键盘、鼠标等
+-   [Introduction](#section11660541593)
+-   [Directory Structure](#section14408467105)
+-   [Usage](#section18111235161011)
+    -   [Available APIs](#section86358081116)
+    -   [Usage Guidelines](#section789634518111)
 
-#### 软件架构
-软件架构说明
+-   [Repositories Involved](#section135327891219)
+
+## Introduction<a name="section11660541593"></a>
+
+The module of this repository is applied on the basis of standard systems to provide devices with single-touch input capabilities. This module reports touch events to the JS UI framework or application framework, which then encapsulates the events and provides APIs for apps.
+
+## Directory Structure<a name="section14408467105"></a>
+
+```
+/foundation/multimodalinput/input
+├── common                       # Common code
+├── interfaces                   # External APIs
+│   └── native                   # Native APIs
+│       └── innerkits            # Native APIs provided for internal subsystems
+├── service                      # Service framework code
+├── sa_profile                   # Service startup configuration file
+├── uinput                       # Input event injection module
+```
+
+## Usage<a name="section18111235161011"></a>
+
+### Available APIs<a name="section86358081116"></a>
+
+Available APIs of Multimodal Input are event injection ones, which are open only to system apps currently.
+
+-   The  **InJectEventHandler**  class provides methods for processing injection events.
+
+    **Table  1**  Major APIs in InJectEventHandler
+
+    <a name="t49c6a8df29a143a98ef6f66f43c7eac8"></a>
+    <table><thead align="left"><tr id="rf815506c67654ad4ac014b339ee3292d"><th class="cellrowborder" valign="top" width="15.031503150315032%" id="mcps1.2.4.1.1"><p id="a59bc0498281e498289e11d5e584eb293"><a name="a59bc0498281e498289e11d5e584eb293"></a><a name="a59bc0498281e498289e11d5e584eb293"></a>Category</p>
+    </th>
+    <th class="cellrowborder" valign="top" width="23.152315231523154%" id="mcps1.2.4.1.2"><p id="aa1226795522e4609b6b1d210255beeff"><a name="aa1226795522e4609b6b1d210255beeff"></a><a name="aa1226795522e4609b6b1d210255beeff"></a>API</p>
+    </th>
+    <th class="cellrowborder" valign="top" width="61.816181618161814%" id="mcps1.2.4.1.3"><p id="a34777ce8d3174036ba45b9fd51dc4848"><a name="a34777ce8d3174036ba45b9fd51dc4848"></a><a name="a34777ce8d3174036ba45b9fd51dc4848"></a>Description</p>
+    </th>
+    </tr>
+    </thead>
+    <tbody><tr id="ra7599f41f04548858a77e2062aad2cf5"><td class="cellrowborder" valign="top" width="15.031503150315032%" headers="mcps1.2.4.1.1 "><p id="a63ab1186072d4bcdb32d4e11b9243b57"><a name="a63ab1186072d4bcdb32d4e11b9243b57"></a><a name="a63ab1186072d4bcdb32d4e11b9243b57"></a>Event injection</p>
+    </td>
+    <td class="cellrowborder" valign="top" width="23.152315231523154%" headers="mcps1.2.4.1.2 "><p id="a3d9b89df15074475a45ed26503e22c21"><a name="a3d9b89df15074475a45ed26503e22c21"></a><a name="a3d9b89df15074475a45ed26503e22c21"></a>function injectEventSync(keyEvent: KeyEvent): number;</p>
+    </td>
+    <td class="cellrowborder" valign="top" width="61.816181618161814%" headers="mcps1.2.4.1.3 "><p id="a33c82952289f40a09773ce2fed14f6aa"><a name="a33c82952289f40a09773ce2fed14f6aa"></a><a name="a33c82952289f40a09773ce2fed14f6aa"></a>Injects events.</p>
+    </td>
+    </tr>
+    </tbody>
+    </table>
 
 
-#### 安装教程
+### Usage Guidelines<a name="section789634518111"></a>
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+Currently, only the  **BACK**  key event can be injected.
 
-#### 使用说明
+When a system app needs to return to the previous directory, you can call the API to inject the  **BACK**  key event to Multimodal Input, which then transfers this event to the system app, thereby achieving the return effect. The example code is as follows:
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+```
+// Import the required JavaScript API library.
+import input from '@ohos.injectEventHandler'
 
-#### 参与贡献
+// Call the API for injecting events.
+var res = input.injectEventSync({
+    isPressed:true,           // Action type of the key event. true indicates that the key is being pressed down, and false indicates that the key is being released.
+    code:2,                   // Keycode for the key, for example, 2 for the BACK key.
+    keyDownDuration:10,       // Duration in which the current key is pressed down before it is released, in milliseconds.
+});
+```
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+>![](figures/icon-note.gif) **NOTE:**
+>The new APIs must be compatible with the original capabilities.
 
+## Repositories Involved<a name="section135327891219"></a>
 
-#### 特技
+Multimodal input subsystem
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+**multimodalinput\_input**
+
