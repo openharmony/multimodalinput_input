@@ -1,0 +1,54 @@
+# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+config("event_include_config") {
+  include_dirs = [
+    "include",
+  ]
+}
+
+ohos_shared_library("mmi_event") {
+  sources = [
+    "src/keyboard_event.cpp",
+    "src/key_event.cpp",
+    "src/manipulation_event.cpp",
+    "src/mmi_point.cpp",
+    "src/mouse_event.cpp",
+    "src/multimodal_event.cpp",
+    "src/stylus_event.cpp",
+    "src/touch_event.cpp",
+  ]
+
+  include_dirs = [
+    "include",
+    "//utils/native/base/include",
+    "//foundation/multimodalinput/input/common/include",
+    "//drivers/peripheral/input/interfaces/include",
+  ]
+
+  public_configs = [ ":event_include_config" ]
+
+  deps = [
+    "//utils/native/base:utils",
+    "//drivers/peripheral/input/hal:hdi_input",
+  ]
+
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog"
+  ]
+
+  subsystem_name = "multimodalinput"
+  part_name = "multimodalinput_base"
+}
