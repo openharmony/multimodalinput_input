@@ -40,7 +40,7 @@ public:
 private:
     DeviceInfo *iDevInfo_ = nullptr;
     IInputInterface *inputInterface_ = nullptr;
-    InputReportEventCb callback_;
+    InputEventCb callback_;
     const uint32_t TOUCH_DEV_ID = 1;
 };
 }  // namespace MMIS
