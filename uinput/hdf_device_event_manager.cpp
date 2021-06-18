@@ -55,7 +55,7 @@ void HdfDeviceEventManager::ConnectHDFInit()
     ret = inputInterface_->iInputManager->OpenInputDevice(TOUCH_DEV_ID);
     if ((ret == INPUT_SUCCESS) && (inputInterface_->iInputReporter != nullptr)) {
         inputInterface_->iInputManager->GetInputDevice(TOUCH_DEV_ID, &iDevInfo_);
-        callback_.ReportEventPkgCallback = hdf->GetEventCallbackDispatch;
+        callback_.EventPkgCallback = hdf->GetEventCallbackDispatch;
         ret = inputInterface_->iInputReporter->RegisterReportCallback(TOUCH_DEV_ID, &callback_);
     }
 }
