@@ -125,7 +125,9 @@ bool VirtualDevice::EmitEvent(uint16_t type, uint16_t code, uint32_t value) cons
     event.type = type;
     event.code = code;
     event.value = value;
+#ifndef __MUSL__
     gettimeofday(&event.time, NULL);
+#endif
     if (write(fd_, &event, sizeof(event)) < static_cast<ssize_t>(sizeof(event))) {
         HiLog::Error(LABEL, "Event write failed %{public}s aborting", __func__);
         return false;
