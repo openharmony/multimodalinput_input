@@ -51,13 +51,13 @@ const std::vector<uint32_t> &VirtualTouchScreen::GetAbs() const
     return abs;
 }
 
-VirtualTouchScreen::VirtualTouchScreen()
+VirtualTouchScreen::VirtualTouchScreen(const uint32_t maxX, const uint32_t maxY)
     : VirtualDevice("VSoC touchscreen", 0x6006)
 {
     dev_.absmin[ABS_X] = 0;
-    dev_.absmax[ABS_X] = 480;
+    dev_.absmax[ABS_X] = maxX;
     dev_.absmin[ABS_Y] = 0;
-    dev_.absmax[ABS_Y] = 960;
+    dev_.absmax[ABS_Y] = maxY;
 
     dev_.absmin[ABS_PRESSURE] = 0;
     dev_.absmax[ABS_PRESSURE] = 100;
@@ -71,9 +71,9 @@ VirtualTouchScreen::VirtualTouchScreen()
     dev_.absmax[ABS_MT_ORIENTATION] = 90;
 
     dev_.absmin[ABS_MT_POSITION_X] = 0;
-    dev_.absmax[ABS_MT_POSITION_X] = 480;
+    dev_.absmax[ABS_MT_POSITION_X] = maxX;
     dev_.absmin[ABS_MT_POSITION_Y] = 0;
-    dev_.absmax[ABS_MT_POSITION_Y] = 960;
+    dev_.absmax[ABS_MT_POSITION_Y] = maxY;
 
     dev_.absmin[ABS_MT_BLOB_ID] = 0;
     dev_.absmax[ABS_MT_BLOB_ID] = 10;
