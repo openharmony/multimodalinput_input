@@ -24,7 +24,7 @@
 
 class VirtualTouchScreen : public VirtualDevice {
 public:
-    VirtualTouchScreen();
+    VirtualTouchScreen(const uint32_t maxX, const uint32_t maxY);
     virtual ~VirtualTouchScreen(){};
 
 protected:

@@ -29,7 +29,7 @@ namespace OHOS {
 namespace MMIS {
 class HdfDeviceEventDispatch {
 public:
-    HdfDeviceEventDispatch();
+    HdfDeviceEventDispatch(const uint32_t maxX, const uint32_t maxY);
     virtual ~HdfDeviceEventDispatch();
     static void GetEventCallbackDispatch(const EventPackage **pkgs, uint32_t count, uint32_t devIndex);
 
