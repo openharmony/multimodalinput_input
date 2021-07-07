@@ -29,9 +29,9 @@ namespace {
 std::unique_ptr<VirtualTouchScreen> g_pTouchScreen;
 InjectThread HdfDeviceEventDispatch::injectThread_;
 
-HdfDeviceEventDispatch::HdfDeviceEventDispatch()
+HdfDeviceEventDispatch::HdfDeviceEventDispatch(const uint32_t maxX, const uint32_t maxY)
 {
-    g_pTouchScreen = std::make_unique<VirtualTouchScreen>();
+    g_pTouchScreen = std::make_unique<VirtualTouchScreen>(maxX, maxY);
     g_pTouchScreen->SetUp();
 }
 
