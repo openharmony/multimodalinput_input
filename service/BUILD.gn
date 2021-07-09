@@ -50,7 +50,6 @@ ohos_shared_library("libmultimodalinput_service") {
     "src/multimodal_input_service_stub.cpp",
   ]
   deps = [
-    ":multimodalinput_service.rc",
     "$SUBSYSTEM_DIR:mmi_uinject",
     "$SUBSYSTEM_DIR/interfaces/native/innerkits/event:mmi_event",
     "$SUBSYSTEM_DIR/interfaces/native/innerkits/proxy:libmultimodalinput_proxy",
