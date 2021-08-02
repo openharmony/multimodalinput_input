@@ -22,7 +22,7 @@
         <licensefile></licensefile>
         <filefilterlist>
             <filefilter name="defaultFilter" desc="Files not to check">
-                <filteritem type="filename" name="*.gif" desc="Describe the reason for filtering scan results"/>
+                <filteritem type="filename" name="*.gif" desc="GIF file for README"/>
             </filefilter>
         </filefilterlist>
     </oatconfig>
