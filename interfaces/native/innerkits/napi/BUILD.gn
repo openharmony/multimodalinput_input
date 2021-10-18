@@ -37,7 +37,7 @@ ohos_shared_library("injecteventhandler") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_L2:samgr_proxy",
+    "samgr_standard:samgr_proxy",
   ]
   relative_install_dir = "module"
   subsystem_name = "multimodalinput"
