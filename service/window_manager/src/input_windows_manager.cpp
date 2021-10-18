@@ -71,7 +71,7 @@ void OHOS::MMI::InputWindowsManager::UpdateSeatsInfo()
 {
     std::lock_guard<std::mutex> lock(mu_);
     if (seatsInfo_ != nullptr) {
-        FreeSeatsInfo(const_cast<const SeatInfo**>(seatsInfo_));
+        FreeSeatsInfo(seatsInfo_);
     }
     seatsInfo_ = GetSeatsInfo();
     if (seatsInfo_ == nullptr) {
@@ -90,7 +90,7 @@ void OHOS::MMI::InputWindowsManager::UpdateScreensInfo()
     std::lock_guard<std::mutex> lock(mu_);
     // free the last screen info
     if (screensInfo_ != nullptr) {
-        FreeScreensInfo(const_cast<const ScreenInfo**>(screensInfo_));
+        FreeScreensInfo(screensInfo_);
     }
     screensInfo_ = GetScreensInfo();
     if (screensInfo_ == nullptr) {
