@@ -1,0 +1,8 @@
+ [
+    { 
+     "deviceName": "gamePad", 
+     "events":[
+                {"eventType": "ROCKER_1", "event":[2243, 4151, 5712, 8834, 10395, 10221, 8487, 4845]}  
+            ]
+    }
+]

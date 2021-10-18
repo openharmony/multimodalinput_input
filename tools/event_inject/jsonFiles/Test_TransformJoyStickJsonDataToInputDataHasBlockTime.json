@@ -1,0 +1,8 @@
+ [
+    { 
+     "deviceName": "joystick", 
+     "events":[
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 288, "blockTime":100}
+              ]
+    }
+]
