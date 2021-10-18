@@ -1,0 +1,58 @@
+/*
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#ifndef OHOS_NET_PACKET_H
+#define OHOS_NET_PACKET_H
+
+#include "proto.h"
+#include "stream_buffer.h"
+
+#pragma pack(1)
+using PACKHEAD = struct PackHead {
+    MmiMessageId idMsg;
+    int32_t size[1];
+};
+#pragma pack()
+
+namespace OHOS {
+namespace MMI {
+class NetPacket : public StreamBuffer {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NetPacket" };
+public:
+    explicit NetPacket(MmiMessageId idMsg);
+    NetPacket(const NetPacket& pack);
+    NetPacket& operator = (const NetPacket& pack);
+    virtual ~NetPacket();
+
+    virtual void MakeData(StreamBuffer& buf) const;
+
+    size_t GetSize() const
+    {
+        return Size();
+    }
+    const char *GetData() const
+    {
+        return Data();
+    }
+    MmiMessageId GetMsgId() const
+    {
+        return idMsg_;
+    }
+
+protected:
+    MmiMessageId idMsg_ = MmiMessageId::INVALID;
+};
+}
+}
+#endif

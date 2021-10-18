@@ -1,0 +1,16 @@
+ [
+    {
+     "deviceName": "Mouse",
+     "events":[
+                {"eventType": "KEY_EVENT_PRESS", "keyValue": 272},
+                {"eventType": "KEY_EVENT_RELESE", "keyValue": 272},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 273},
+                {"eventType": "KEY_EVENT_PRESS", "keyValue": 274, "blockTime":1000 },
+                {"eventType": "KEY_EVENT_RELESE", "keyValue": 274},
+                {"eventType": "MOUSE_EVENT_MOVE", "xPos": 10, "yPos": -20},
+                {"eventType": "MOUSE_EVENT_MOVE", "xPos": -10, "yPos": 20},
+                {"eventType": "MOUSE_EVENT_WHEEL", "direction": "down", "distance": 20},
+                {"eventType": "MOUSE_EVENT_WHEEL", "direction": "up", "distance": 10}
+            ]
+    }
+]

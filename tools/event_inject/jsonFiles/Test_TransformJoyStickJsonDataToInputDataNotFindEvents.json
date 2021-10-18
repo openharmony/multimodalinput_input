@@ -1,0 +1,19 @@
+ [
+     { 
+     "deviceName": "joystick", 
+     "event":[
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 288 ,"blockTime":100},
+                {"eventType": "KEY_EVENT_CLICK", "blockTime":100},
+                {"eventType": "THROTTLE"},
+                {"eventType": "ROCKER_1", "event":[8174, 7962, 7772, 7757, 7725, 7862, 8192]},
+                {"eventType": "DERECTION_KEY"},
+                {"eventType": "DERECTION_KEY2"}
+            ]
+    },
+    { 
+     "deviceName": "joystick", 
+     "event":[
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 288}
+            ]
+    }
+]

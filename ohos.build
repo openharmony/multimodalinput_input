@@ -1,0 +1,74 @@
+{
+  "subsystem": "multimodalinput",
+  "parts": {
+    "multimodalinput_base": {
+      "module_list": [
+        "//foundation/multimodalinput/input:multimodalinput_mmi_packages",
+        "//foundation/multimodalinput/input/sa_profile:multimodalinput_connect_sa_profile",
+        "//foundation/multimodalinput/input/patch:patch_packages",
+        "//third_party/eudev:libudev",
+        "//third_party/eudev:udevd",
+        "//third_party/eudev:udevd.rc",
+        "//third_party/eudev:udev_conf",
+        "//third_party/eudev:udev_touchscreen_rule",
+        "//third_party/eudev:udev_vk_rule",
+        "//third_party/mtdev:libmtdev",
+        "//third_party/libevdev:libevdev",
+        "//foundation/multimodalinput/input:uinput_inject",
+        "//foundation/multimodalinput/input:mmi_uinject",
+        "//foundation/multimodalinput/input:mmi_uinput.rc"
+      ],
+      "inner_kits": [
+        {
+          "header": {
+            "header_files": [
+              "common/include/struct_multimodal.h",
+              "common/include/immi_token.h",
+              "event/include/builtinkey_event.h",
+              "event/include/composite_event.h",
+              "event/include/device_event.h",
+              "event/include/key_event.h",
+              "event/include/keyboard_event.h",
+              "event/include/manipulation_event.h",
+              "event/include/mouse_event.h",
+              "event/include/multimodal_event.h",
+              "event/include/multimodal_standardized_event_manager.h",
+              "event/include/rotation_event.h",
+              "event/include/speech_event.h",
+              "event/include/stylus_event.h",
+              "event/include/touch_event.h",
+              "proxy/include/multimodal_event_handler.h"
+            ],
+            "header_base": "//foundation/multimodalinput/input/interfaces/native/innerkits"
+          },
+          "name": "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
+          "type": "so"
+        },
+        {
+          "header": {
+            "header_files": [
+              "include/mmi_interface.h"
+            ],
+            "header_base": "//foundation/multimodalinput/input/service/module_loader"
+          },
+          "name": "//foundation/multimodalinput/input/service:libmmi-server",
+          "type": "so"
+        },
+        {
+          "header": {
+            "header_files": [
+              "libinput.h"
+            ],
+            "header_base": "//${root_out_dir}/diff_libinput_mmi/export_include"
+          },
+          "name": "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
+          "type": "so"
+        }
+      ],
+      "test_list": [
+        "//foundation/multimodalinput/input:unittests",
+        "//foundation/multimodalinput/input/test/moduletest:moduletest"
+      ]
+    }
+  }
+}

@@ -1,0 +1,177 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Copyright (c) Huawei Technologies Co., Ltd. 2019-2019. All rights reserved.
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+config("virtual_device_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "include",
+    "//utils/native/base/include",
+  ]
+
+  cflags = [
+    "-DOHOS_BUILD",
+    "-Wno-unused-parameter",
+    "-Wno-implicit-int",
+    "-Wno-return-type",
+    "-Wno-unused-function",
+    "-Wno-string-conversion",
+    "-Wheader-hygiene",
+    "-Wunused-private-field",
+    "-Wsign-compare",
+    "-Wformat",
+    "-Wdeprecated-declarations",
+  ]
+
+  if (is_mmi_have_debug) {
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [ "-DOHOS_BUILD_AI" ]
+  }
+}
+
+config("virtual_device_public_config") {
+  include_dirs = [
+    "include",
+    "//utils/native/base/include",
+  ]
+}
+
+ohos_shared_library("libmmi-virtual-device") {
+  sources = [
+    "src/virtual_device.cpp",
+    "src/virtual_finger.cpp",
+    "src/virtual_gamepad.cpp",
+    "src/virtual_joystick.cpp",
+    "src/virtual_keyboard.cpp",
+    "src/virtual_keyboard_consumer_ctrl.cpp",
+    "src/virtual_keyboard_ext.cpp",
+    "src/virtual_keyboard_sys_ctrl.cpp",
+    "src/virtual_knob.cpp",
+    "src/virtual_knob_consumer_ctrl.cpp",
+    "src/virtual_knob_mouse.cpp",
+    "src/virtual_knob_sys_ctrl.cpp",
+    "src/virtual_mouse.cpp",
+    "src/virtual_remote_control.cpp",
+    "src/virtual_stylus.cpp",
+    "src/virtual_touchpad.cpp",
+    "src/virtual_touchscreen.cpp",
+    "src/virtual_trackball.cpp",
+    "src/virtual_trackpad.cpp",
+    "src/virtual_trackpad_mouse.cpp",
+    "src/virtual_trackpad_sys_ctrl.cpp",
+  ]
+
+  configs = [ ":virtual_device_config" ]
+
+  public_configs = [ ":virtual_device_public_config" ]
+
+  cflags = [ "-DOHOS_BUILD" ]
+
+  if (is_mmi_have_debug) {
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [ "-DOHOS_BUILD_AI" ]
+  }
+
+  deps = [ "//utils/native/base:utils" ]
+
+  install_enable = true
+  part_name = "multimodalinput_base"
+}
+
+module_output_path = "multimodalinput/unit_out"
+ohos_unittest("ut-virtual-device-out") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "${mmi_path}/tools/virtual_device_manager/include",
+    "//utils/native/base/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/frameworks/util/common",
+    "${mmi_path}/frameworks/util/common/include",
+    "${mmi_path}/frameworks/util/network",
+    "${mmi_path}/frameworks/util/network/include",
+    "${mmi_path}/frameworks/util/socket",
+    "${mmi_path}/frameworks/util/socket/include",
+  ]
+
+  if (is_mmi_have_libinput || is_mmi_have_hdf) {
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+  }
+
+  sources = [ "test/virtual_device_test.cpp" ]
+
+  cflags = [
+    "-DOHOS_BUILD",
+    "-DOHOS_AUTO_TEST_FRAME",
+  ]
+
+  if (is_mmi_have_debug) {
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [ "-DOHOS_BUILD_AI" ]
+  }
+
+  deps = [
+    "${mmi_path}/frameworks/util:libmmi-util",
+    "${mmi_path}/tools/virtual_device_manager:libmmi-virtual-device",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+    "//utils/native/base:utils",
+  ]
+
+  if (is_mmi_have_libinput || is_mmi_have_hdf) {
+    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
+  }
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+}
+
+group("ut-virtual-device") {
+  testonly = true
+  deps = []
+  deps += [ ":ut-virtual-device-out" ]
+}

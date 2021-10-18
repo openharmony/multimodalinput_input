@@ -1,0 +1,151 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+
+module_output_path = "multimodalinput/unit_out"
+config("libmmi_util_public_config") {
+  include_dirs = [
+    "common/include",
+    "network/include",
+    "socket/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
+    "//drivers/peripheral/input/interfaces/include",
+    "//utils/native/base/include",
+  ]
+
+  cflags = [ "-DOHOS_BUILD" ]
+
+  if (is_mmi_have_debug) {
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [ "-DOHOS_BUILD_AI" ]
+  }
+}
+
+ohos_shared_library("libmmi-util") {
+  sources = [
+    "common/include/klog.c",
+    "common/src/libmmi_util.cpp",
+    "common/src/log.cpp",
+    "common/src/safe_keeper.cpp",
+    "common/src/util.cpp",
+    "common/src/uuid.cpp",
+    "network/src/net_packet.cpp",
+    "network/src/stream_buffer.cpp",
+    "socket/src/uds_client.cpp",
+    "socket/src/uds_session.cpp",
+    "socket/src/uds_socket.cpp",
+  ]
+
+  if (is_mmi_have_debug) {
+    sources += [ "common/src/uds_command_queue.cpp" ]
+  }
+
+  public_configs = [
+    "//foundation/multimodalinput/input:multimodalinput_mmi_public_config",
+    ":libmmi_util_public_config",
+  ]
+
+  public_deps = [
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//third_party/bounds_checking_function:libsec_static",
+    "//utils/native/base:utils",
+  ]
+
+  part_name = "multimodalinput_base"
+}
+
+ohos_unittest("ut-mmi-util-out") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "//utils/native/base/include",
+    "//third_party/googletest/googletest/include",
+    "${mmi_path}/frameworks/util/common",
+    "${mmi_path}/frameworks/util/common/include",
+    "${mmi_path}/frameworks/util/network",
+    "${mmi_path}/frameworks/util/network/include",
+    "${mmi_path}/frameworks/util/socket",
+    "${mmi_path}/frameworks/util/socket/include",
+    "${mmi_path}/frameworks/proxy/event_handle",
+    "${mmi_path}/frameworks/proxy/event_handle/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+  ]
+
+  if (is_mmi_have_libinput) {
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+  }
+
+  cflags = [
+    "-DOHOS_BUILD",
+    "-DOHOS_AUTO_TEST_FRAME",
+  ]
+
+  if (is_mmi_have_debug) {
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [ "-DOHOS_BUILD_AI" ]
+  }
+
+  sources = [
+    "common/test/log_test.cpp",
+    "common/test/safe_keeper_test.cpp",
+    "common/test/util_test.cpp",
+    "network/test/net_packet_test.cpp",
+    "socket/test/stream_buffer_test.cpp",
+    "socket/test/uds_client_test.cpp",
+    "socket/test/uds_session_test.cpp",
+    "socket/test/uds_socket_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/frameworks/util:libmmi-util",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+}
+
+group("ut-mmi-util") {
+  testonly = true
+  deps = []
+  deps += [ ":ut-mmi-util-out" ]
+}
