@@ -1,8 +1,0 @@
- [
-    { 
-     "deviceName": "gamePad", 
-     "events":[
-                {"eventType": "DERECTION_KEY"}
-            ]
-    }
-]
