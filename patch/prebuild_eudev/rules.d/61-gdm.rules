@@ -1,0 +1,4 @@
+# disable Wayland on Hi1710 chipsets
+ATTR{vendor}=="0x19e5", ATTR{device}=="0x1711", RUN+="/usr/lib/gdm3/gdm-disable-wayland"
+# disable Wayland when using the proprietary nvidia driver
+DRIVER=="nvidia", RUN+="/usr/lib/gdm3/gdm-disable-wayland"

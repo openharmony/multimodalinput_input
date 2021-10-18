@@ -1,0 +1,33 @@
+ [
+    { 
+     "deviceName": "joystick", 
+     "events":[
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 288},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 291},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 292},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 293},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 294},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 295},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 296},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 297},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 298},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 299},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 300},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 301},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 302},
+                {"eventType": "KEY_EVENT_PRESS", "keyValue": 303},
+                {"eventType": "KEY_EVENT_RELEASE", "keyValue": 303},
+                {"eventType": "THROTTLE", "keyValue": 120},
+                {"eventType": "DERECTION_KEY", "direction":"up"},
+                {"eventType": "DERECTION_KEY", "direction":"down"},
+                {"eventType": "DERECTION_KEY", "direction":"left"},
+                {"eventType": "DERECTION_KEY", "direction":"right"},
+                {"eventType": "ROCKER_1", "direction":"up", "event":[8174, 7962, 7772, 7757, 7725, 7862, 8192]},
+                {"eventType": "ROCKER_1", "direction":"down", "event":[8199, 8355, 8348, 8397, 8411, 8452, 8489, 8352, 8192]},
+                {"eventType": "ROCKER_1", "direction":"left", "event":[8188, 7856, 7848, 7862, 7954, 8188]},
+                {"eventType": "ROCKER_1", "direction":"right", "event":[8376, 8427, 8515, 8263, 8376]},
+                {"eventType": "ROCKER_1", "direction":"lt", "event":[125, 143, 165, 192, 215, 185, 165,154,143,125]},
+                {"eventType": "ROCKER_1", "direction":"lt", "event":[125, 114, 109, 98, 65, 98, 109,114,119,125]}
+            ]
+    }
+]
