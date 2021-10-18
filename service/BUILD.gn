@@ -60,7 +60,7 @@ ohos_shared_library("libmultimodalinput_service") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_L2:samgr_proxy",
+    "samgr_standard:samgr_proxy",
   ]
 
   subsystem_name = "multimodalinput"
