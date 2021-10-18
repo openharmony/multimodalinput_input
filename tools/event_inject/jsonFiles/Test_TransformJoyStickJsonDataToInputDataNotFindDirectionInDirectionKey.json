@@ -1,8 +1,0 @@
- [
-    { 
-     "deviceName": "joystick", 
-     "events":[
-                {"eventType": "DERECTION_KEY"}
-            ]
-    }
-]
