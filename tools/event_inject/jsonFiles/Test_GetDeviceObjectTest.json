@@ -1,0 +1,46 @@
+ [
+     { 
+     "deviceName": "gamePad", 
+     "events":[
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 310}
+            ]
+    },
+    { 
+     "deviceName": "joystick", 
+     "events":[
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 310}
+            ]
+    },
+    {
+     "deviceName": "finger",
+     "events":[
+                [[1000, 3550]]
+              ]
+    },
+     {
+     "deviceName": "remoteControl", 
+     "events":[
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 30}
+            ]
+    },
+     {
+     "deviceName": "keyboard model1", 
+     "events":[
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 30}
+            ]
+    },
+     {
+     "deviceName": "mouse", 
+     "events":[
+                {"eventType": "KEY_EVENT_PRESS", "keyValue": 272},
+                {"eventType": "KEY_EVENT_RELEASE", "keyValue": 272}
+            ]
+    },
+         {
+     "deviceName": "knob model1", 
+     "events":[
+                {"eventType": "KEY_EVENT_PRESS", "keyValue": 272},
+                {"eventType": "KEY_EVENT_RELEASE", "keyValue": 272}
+            ]
+    }
+]

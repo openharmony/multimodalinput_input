@@ -1,0 +1,4 @@
+# Low-level USB device add trigger
+ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ENV{ID_USB_INTERFACES}=="*:0701??:*", ENV{ID_USB_INTERFACES}!="*:070104:*", TAG+="systemd", ENV{SYSTEMD_WANTS}="configure-printer@usb-$env{BUSNUM}-$env{DEVNUM}.service"
+# Low-level USB device remove trigger
+ACTION=="remove", SUBSYSTEM=="usb", ENV{INTERFACE}=="7/1/*", ENV{INTERFACE}!="7/1/4", RUN+="udev-configure-printer remove %p"

@@ -1,0 +1,215 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+ 
+import("//build/ohos.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+
+ohos_executable("hosmmi-client") {
+  include_dirs = [
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
+  ]
+  sources = [
+    "src/hosmmi_client_main.cpp",
+  ]
+  deps = [
+    "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
+    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core"
+  ]
+  cflags = [
+    "-DOHOS_BUILD",
+  ]
+
+  if (is_mmi_have_debug) {
+    cflags += [
+      "-DOHOS_BUILD_MMI_DEBUG",
+    ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [
+      "-DOHOS_BUILD_LIBINPUT",
+    ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [
+      "-DOHOS_BUILD_HDF",
+    ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [
+      "-DOHOS_BUILD_AI",
+    ]
+  }
+
+  install_enable = true
+  part_name = "multimodalinput_base"
+}
+
+ohos_executable("hosmmi-server") {
+  sources = [
+    "src/hosmmi_server_main.cpp",
+  ]
+  deps = [
+    "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
+    "//foundation/multimodalinput/input/service:libmmi-server",
+  ]
+
+  if (is_mmi_have_libinput) {
+    deps += [
+      "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
+    ]
+  }
+  
+  cflags = [
+    "-DOHOS_BUILD",
+  ]
+
+  if (is_mmi_have_debug) {
+    cflags += [
+      "-DOHOS_BUILD_MMI_DEBUG",
+    ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [
+      "-DOHOS_BUILD_LIBINPUT",
+    ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [
+      "-DOHOS_BUILD_HDF",
+    ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [
+      "-DOHOS_BUILD_AI",
+    ]
+  }
+
+  if (is_mmi_have_weston) {
+    cflags += [
+      "-DOHOS_WESTEN_MODEL",
+    ]
+  }
+
+  install_enable = true
+  part_name = "multimodalinput_base"
+}
+
+ohos_executable("hosmmi-event-injection") {
+  sources = [
+    "src/hosmmi_event_simulate_main.cpp",
+  ]
+  deps = [
+    "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
+    "//foundation/multimodalinput/input/tools/event_inject:event-injection",
+  ]
+
+  if (is_mmi_have_libinput) {
+    deps += [
+      "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
+    ]
+  }
+  cflags = [
+    "-DOHOS_BUILD",
+  ]
+
+  if (is_mmi_have_debug) {
+    cflags += [
+      "-DOHOS_BUILD_MMI_DEBUG",
+    ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [
+      "-DOHOS_BUILD_LIBINPUT",
+    ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [
+      "-DOHOS_BUILD_HDF",
+    ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [
+      "-DOHOS_BUILD_AI",
+    ]
+  }
+
+  if (is_mmi_have_weston) {
+    cflags += [
+      "-DOHOS_WESTEN_MODEL",
+    ]
+  }
+
+  install_enable = true
+  part_name = "multimodalinput_base"
+}
+
+ohos_executable("hosmmi-virtual-device-manager") {
+  sources = [
+    "src/hosmmi_virtual_device_main.cpp",
+  ]
+  deps = [
+    "//foundation/multimodalinput/input/tools/virtual_device_manager:libmmi-virtual-device",
+  ]
+
+  if (is_mmi_have_libinput) {
+    deps += [
+      "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
+    ]
+  }
+  cflags = [
+    "-DOHOS_BUILD",
+  ]
+
+  if (is_mmi_have_debug) {
+    cflags += [
+      "-DOHOS_BUILD_MMI_DEBUG",
+    ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [
+      "-DOHOS_BUILD_LIBINPUT",
+    ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [
+      "-DOHOS_BUILD_HDF",
+    ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [
+      "-DOHOS_BUILD_AI",
+    ]
+  }
+
+  if (is_mmi_have_weston) {
+    cflags += [
+      "-DOHOS_WESTEN_MODEL",
+    ]
+  }
+
+  install_enable = true
+  part_name = "multimodalinput_base"
+}
