@@ -21,7 +21,7 @@
 #include "mmi_point.h"
 #include "composite_event.h"
 
-enum MouseActionEnum {
+enum class MouseActionEnum: int32_t {
     /**
     * Indicates no mouse action.
     *

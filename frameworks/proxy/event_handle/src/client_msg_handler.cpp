@@ -715,7 +715,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisJoystickEvent(const UDSClient& client,
     int32_t abilityId = 0;
     int32_t windowId = 0;
     int32_t fd = 0;
-    int32_t mouseAction = 0;
     int32_t touchAction = 0;
     int32_t deviceEventType = 0;
     std::string nullUUid = "";
@@ -743,7 +742,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisJoystickEvent(const UDSClient& client,
     ((MMIClient*)&client)->AutoTestReplyClientPktToServer(autoTestClientJoyStickPkt);
 #endif  // OHOS_AUTO_TEST_FRAME
 
-    mouseAction = HOVER_MOVE;
+    int32_t mouseAction = static_cast<int32_t>(MouseActionEnum::HOVER_MOVE);
     (reinterpret_cast<MouseEvent*>(mousePtr.GetRefPtr()))->Initialize(windowId, mouseAction, 0, 0, mmiPoint, 
         0, 0, 0, 0, 0, nullUUid, eventJoyStickData.eventType, static_cast<int32_t>(eventJoyStickData.time), "",
         static_cast<int32_t>(eventJoyStickData.deviceId), false, eventJoyStickData.deviceType, eventJoyStickData);
@@ -764,7 +763,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client,
     int32_t fd = 0;
     uint64_t serverStartTime = 0;
     uint64_t clientEndTime = 0;
-    int32_t mouseAction = 0;
     int32_t touchAction = 0;
     int32_t deviceEventType = 0;
     MmiPoint mmiPoint;
@@ -796,7 +794,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client,
     ((MMIClient*)&client)->AutoTestReplyClientPktToServer(autoTestClientTabletPadPkt);
 #endif  // OHOS_AUTO_TEST_FRAME
 
-    mouseAction = HOVER_MOVE;
+    int32_t mouseAction = static_cast<int32_t>(MouseActionEnum::HOVER_MOVE);
     eventJoyStickAxis.abs_wheel.standardValue = static_cast<float>(tabletPad.ring.position);
     auto mouseEvent = reinterpret_cast<MouseEvent*>(mousePtr.GetRefPtr());
     mouseEvent->Initialize(windowId, mouseAction, 0, 0, mmiPoint, 0, 0, 0, 0, 0, nullUUid, tabletPad.eventType,
@@ -870,13 +868,13 @@ void OHOS::MMI::ClientMsgHandler::GetMouseActionType(int32_t eventType, int32_t 
     const int32_t EVENT_TABLET_TOOL_PROXIMITY = 601;    // LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY
     if (eventType == EVENT_TABLET_TOOL_PROXIMITY) {
         if (TABLET_TOOL_PROXIMITY_STATE_IN == proximityState) {
-            mouseAction = HOVER_ENTER;
+            mouseAction = static_cast<int32_t>(MouseActionEnum::HOVER_ENTER);
             touchAction = HOVER_POINTER_ENTER;
         } else if (TABLET_TOOL_PROXIMITY_STATE_OUT == proximityState) {
-            mouseAction = HOVER_EXIT;
+            mouseAction = static_cast<int32_t>(MouseActionEnum::HOVER_EXIT);
             touchAction = HOVER_POINTER_EXIT;
         } else {
-            mouseAction = HOVER_MOVE;
+            mouseAction = static_cast<int32_t>(MouseActionEnum::HOVER_MOVE);
             touchAction = HOVER_POINTER_MOVE;
         }
     }
@@ -887,7 +885,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisStandardTabletToolEvent(NetPacket& pkt
 {
     const int32_t MOUSE_BTN_LEFT = 0x110;       // left button
     int32_t deviceEventType = 0;
-    int32_t touchAction = MMNONE;
+    int32_t touchAction = static_cast<int32_t>(MouseActionEnum::MMNONE);
     EventJoyStickAxis eventJoyStickAxis = {};
     MmiPoint mmiPoint;
     auto mousePtr = EventFactory::CreateEvent(EVENT_MOUSE);
@@ -924,7 +922,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisStandardTabletToolEvent(NetPacket& pkt
             static_cast<int32_t>(tableTool.time), 0, 1, fingersInfos, false);
     } else {
         mmiPoint.Setxy(tableTool.axes.delta.x, tableTool.axes.delta.y);
-        int32_t mouseAction = HOVER_MOVE;
+        int32_t mouseAction = static_cast<int32_t>(MouseActionEnum::HOVER_MOVE);
         GetMouseActionType(tableTool.eventType, static_cast<int32_t>(tableTool.proximity_state),
             mouseAction, touchAction);
         mouseEvent->Initialize(windowId, mouseAction, 0, tableTool.state, mmiPoint,
@@ -1009,7 +1007,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, 
 
     const MmiPoint mmiPoint(gesture.deltaUnaccel.x, gesture.deltaUnaccel.y);
     auto mouseEvent = reinterpret_cast<MouseEvent*>(mousePtr.GetRefPtr());
-    mouseEvent->Initialize(windowId, MOVE, 0, 0, mmiPoint, 0, 0, 0, 0, 0, "", gesture.eventType,
+    mouseEvent->Initialize(windowId, static_cast<int32_t>(MouseActionEnum::MOVE), 0, 0, mmiPoint, 0, 0, 0, 0, 0, "", gesture.eventType,
                            static_cast<int32_t>(gesture.time), "", static_cast<int32_t>(gesture.deviceId),
                            false, gesture.deviceType, eventJoyStickAxis);
 
