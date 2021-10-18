@@ -242,11 +242,11 @@ void OHOS::MMI::InputWindowsManager::Clear()
 {
     std::lock_guard<std::mutex> lock(mu_);
     if (seatsInfo_) {
-        FreeSeatsInfo(const_cast<const SeatInfo**>(seatsInfo_));
+        FreeSeatsInfo(seatsInfo_);
         seatsInfo_ = nullptr;
     }
     if (screensInfo_) {
-        FreeScreensInfo(const_cast<const ScreenInfo**>(screensInfo_));
+        FreeScreensInfo(screensInfo_);
         screensInfo_ = nullptr;
     }
     focusInfoID_ = 0;
