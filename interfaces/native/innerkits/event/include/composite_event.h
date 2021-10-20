@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,12 +12,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef COMPOSITE_EVENT_H
-#define COMPOSITE_EVENT_H
+#ifndef OHOS_COMPOSITE_EVENTS_H
+#define OHOS_COMPOSITE_EVENTS_H
 
 #include "multimodal_event.h"
 
 namespace OHOS {
-class CompositeEvent : public MultimodalEvent {};
-}  // namespace OHOS
-#endif  // COMPOSITE_EVENT_H
+/**
+ * Defines composite events specific to common devices.
+ *
+ * <p>An example of input device can be the mouse. For mouse,
+ * {@link MouseEvent} falls into two types:
+ * {@link KeyEvent} and {@link ManipulationEvent}.
+ * With {@code CompositeEvent},
+ * you can combine all mouse events into a composite event,
+ * making event processing easier.
+ *
+ * @see ManipulationEvent
+ * @see MouseEvent
+ * @see KeyEvent
+ * @since 1
+ */
+class CompositeEvent : public MultimodalEvent {
+public:
+    virtual ~CompositeEvent();
+};
+}
+#endif

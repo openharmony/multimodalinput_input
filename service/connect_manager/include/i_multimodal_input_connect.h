@@ -1,0 +1,45 @@
+/*
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef OHOS_I_MULTIMODAL_INPUT_CONNECT_H
+#define OHOS_I_MULTIMODAL_INPUT_CONNECT_H
+
+#include "iremote_broker.h"
+
+namespace OHOS {
+namespace MMI {
+class IMultimodalInputConnect : public IRemoteBroker {
+public:
+    [[maybe_unused]] static constexpr int INVALID_SOCKET_FD = -1;
+    static const int MULTIMODAL_INPUT_CONNECT_SERVICE_ID = 3103;
+    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.multimodalinput.IConnectManager");
+
+    virtual int32_t AllocSocketFd(const std::string &programName, const int moduleType, int &socketFd) = 0;
+
+    enum {
+        ALLOC_SOCKET_FD = 0,
+    };
+
+    enum {
+        CONNECT_MODULE_TYPE_MMI_CLIENT = 0,
+        CONNECT_MODULE_TYPE_AI = 1,
+        CONNECT_MODULE_TYPE_SIMULATE_INJECT = 2,
+        CONNECT_MODULE_TYPE_ST_TEST = 3,
+    };
+};
+} // namespace MMI
+} // namespace OHOS
+
+#endif // OHOS_I_MULTIMODAL_INPUT_CONNECT_H

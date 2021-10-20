@@ -1,0 +1,1 @@
+ATTRS{name}=="Virtual Touchpad", ENV{ID_INPUT}="1", ENV{ID_INPUT_TABLET}="1", ENV{ID_INPUT_TABLET_PAD}="1"

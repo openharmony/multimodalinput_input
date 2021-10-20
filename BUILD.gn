@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
 ## Install mmi_uinput.rc to /system/etc/init/mmi_uinput.rc {{{
 ohos_prebuilt_etc("mmi_uinput.rc") {
@@ -20,6 +21,7 @@ ohos_prebuilt_etc("mmi_uinput.rc") {
   part_name = "multimodalinput_base"
   subsystem_name = "multimodalinput"
 }
+
 ## Install mmi_uinput.rc to /system/etc/init/mmi_uinput.rc }}}
 
 HDF_FWKS = "//drivers/framework"
@@ -29,11 +31,11 @@ ohos_executable("uinput_inject") {
   sources = [
     "uinput/hdf_device_event_dispatch.cpp",
     "uinput/hdf_device_event_manager.cpp",
-    "uinput/virtual_device.cpp",
-    "uinput/virtual_touch_screen.cpp",
-    "uinput/virtual_keyboard.cpp",
-    "uinput/keyboard_inject.cpp",
     "uinput/inject_thread.cpp",
+    "uinput/keyboard_inject.cpp",
+    "uinput/virtual_device.cpp",
+    "uinput/virtual_keyboard.cpp",
+    "uinput/virtual_touch_screen.cpp",
   ]
 
   include_dirs = [
@@ -48,7 +50,7 @@ ohos_executable("uinput_inject") {
     "$HDF_FWKS/ability/sbuf/include",
     "$HDF_FWKS/core/shared/include",
     "$HDF_FWKS/utils/include",
-    "//third_party/bounds_checking_function/include"
+    "//third_party/bounds_checking_function/include",
   ]
 
   deps = [
@@ -56,24 +58,21 @@ ohos_executable("uinput_inject") {
     "//utils/native/base:utils",
   ]
 
-  external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
-  ]
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 
   part_name = "multimodalinput_base"
   subsystem_name = "multimodalinput"
 }
 
 ohos_shared_library("mmi_uinject") {
-
   sources = [
     "uinput/hdf_device_event_dispatch.cpp",
     "uinput/hdf_device_event_manager.cpp",
-    "uinput/virtual_device.cpp",
-    "uinput/virtual_touch_screen.cpp",
-    "uinput/keyboard_inject.cpp",
-    "uinput/virtual_keyboard.cpp",
     "uinput/inject_thread.cpp",
+    "uinput/keyboard_inject.cpp",
+    "uinput/virtual_device.cpp",
+    "uinput/virtual_keyboard.cpp",
+    "uinput/virtual_touch_screen.cpp",
   ]
 
   include_dirs = [
@@ -89,7 +88,7 @@ ohos_shared_library("mmi_uinject") {
     "$HDF_FWKS/ability/sbuf/include",
     "$HDF_FWKS/core/shared/include",
     "$HDF_FWKS/utils/include",
-    "//third_party/bounds_checking_function/include"
+    "//third_party/bounds_checking_function/include",
   ]
 
   deps = [
@@ -97,17 +96,46 @@ ohos_shared_library("mmi_uinject") {
     "//utils/native/base:utils",
   ]
 
-  external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
-  ]
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 
   part_name = "multimodalinput_base"
   subsystem_name = "multimodalinput"
 }
 
-group("test_packages") {
+config("multimodalinput_mmi_public_config") {
+  include_dirs = [ "common/include/" ]
+}
+
+group("multimodalinput_mmi_packages") {
+  deps = [
+    "examples/hosmmi:hosmmi-client",
+    "examples/hosmmi:hosmmi-event-injection",
+    "examples/hosmmi:hosmmi-server",
+    "examples/hosmmi:hosmmi-virtual-device-manager",
+    "frameworks/napi:libinputeventclient",
+    "frameworks/proxy:libmmi-client",
+    "frameworks/util:libmmi-util",
+    "service:libmmi-server",
+    "tools/event_inject:event-injection",
+    "tools/virtual_device_manager:libmmi-virtual-device",
+  ]
+
+  if (is_mmi_have_libinput) {
+    deps += [
+      "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-debug-mmi",
+      "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-list-mmi",
+      "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-tablet-mmi",
+    ]
+  }
+}
+
+group("unittests") {
   testonly = true
   deps = [
-    "interfaces/native/innerkits/event/test:unittest",
+    "frameworks/proxy:ut-mmi-proxy",
+    "frameworks/util:ut-mmi-util",
+    "service:ut-mmi-service",
+    "tools/event_inject:ut-event-injection",
+    "tools/virtual_device_manager:ut-virtual-device",
   ]
 }

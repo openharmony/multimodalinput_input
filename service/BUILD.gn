@@ -12,30 +12,199 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+mmi_service_path = "${mmi_path}/service"
 
-SUBSYSTEM_DIR = "//foundation/multimodalinput/input"
-HDF_FWKS = "//drivers/framework"
-config("service_include_config") {
-  include_dirs = [ "include" ]
+config("libmmi_server_public_config") {
+  include_dirs = [
+    "senior_input_func_proc/include",
+    "application_manager/include",
+    "device_manager/include",
+    "device_scalability/include",
+    "event_dispatch/include",
+    "event_package/include",
+    "event_handle/include",
+    "event_standard/include",
+    "event_dump/include",
+    "libinput_adapter/include",
+    "message_handle/include",
+    "module_loader/include",
+    "window_manager/include",
+    "${mmi_service_path}/connect_manager/include",
+    "//third_party/libxkbcommon/",
+    "//third_party/FreeBSD/sys/dev/evdev",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/appexecfwk/standard/kits/appkit/native/app/include",
+  ]
+
+  if (is_mmi_have_hdf) {
+    include_dirs += [
+      "hdf_adapter/include",
+      "hdi_inject/include",
+      "$root_out_dir/diff_libinput_mmi/src",
+      "//third_party/eudev/export_include/",
+      "$root_out_dir/diff_libevdev_hdf/export_include",
+      "$root_out_dir/diff_libinput_mmi/include/linux",
+    ]
+  }
+
+  cflags = [ "-DOHOS_BUILD" ]
+
+  if (is_mmi_have_st_test) {
+    cflags += [ "-DOHOS_AUTO_TEST_FRAME" ]
+  }
+
+  if (is_mmi_have_debug) {
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [ "-DOHOS_BUILD_AI" ]
+  }
+
+  if (is_mmi_have_weston) {
+    include_dirs += [ "//foundation/graphic/standard/frameworks/wmserver/src" ]
+    cflags += [ "-DOHOS_WESTEN_MODEL" ]
+  }
 }
 
-ohos_prebuilt_etc("multimodalinput_service.rc") {
-  source = "multimodalinput_service.rc"
-  relative_install_dir = "init"
+ohos_shared_library("libmmi-server") {
+  sources = [
+    "application_manager/src/app_register.cpp",
+    "device_manager/src/device_register.cpp",
+    "device_scalability/src/expansibility_operation.cpp",
+    "event_dispatch/src/event_dispatch.cpp",
+    "event_dump/src/event_dump.cpp",
+    "event_handle/src/input_event_handler.cpp",
+    "event_handle/src/key_event_value_transformation.cpp",
+    "event_handle/src/register_event.cpp",
+    "event_handle/src/register_eventhandle_manager.cpp",
+    "event_handle/src/system_event_handler.cpp",
+    "event_package/src/event_package.cpp",
+    "event_standard/src/standard_event_handler.cpp",
+    "libinput_adapter/src/s_input.cpp",
+    "message_handle/src/server_msg_handler.cpp",
+    "module_loader/src/libmmi_main.cpp",
+    "module_loader/src/mmi_server.cpp",
+    "module_loader/src/uds_server.cpp",
+    "window_manager/src/input_windows_manager.cpp",
+    "window_manager/src/outer_interface.cpp",
+    "window_manager/src/window_switch.cpp",
+  ]
+
+  if (is_mmi_have_hdf) {
+    sources += [
+      "hdf_adapter/src/hdf_event_manager.cpp",
+      "hdi_inject/src/hdi_inject.cpp",
+    ]
+  }
+
+  if (is_mmi_have_ai) {
+    sources += [
+      "senior_input_func_proc/src/ai_func_proc.cpp",
+      "senior_input_func_proc/src/knuckle_func_proc.cpp",
+      "senior_input_func_proc/src/senior_input_func_proc_base.cpp",
+    ]
+  }
+
+  public_configs = [ ":libmmi_server_public_config" ]
+
+  deps = [
+    ":mmi_device_config.ini",
+    ":mmi_log.conf",
+    "//drivers/peripheral/input/hal:hdi_input",
+    "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
+    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
+    "//foundation/appexecfwk/standard/kits:appkit_native",
+    "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
+    "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
+    "//third_party/libxkbcommon:libxkbcommon",
+  ]
+
+  if (is_mmi_have_libinput || is_mmi_have_hdf) {
+    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
+  }
+
+  if (is_mmi_have_weston) {
+    deps += [ "//foundation/graphic/standard/frameworks/wmserver:wmserver" ]
+  }
+
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr_L2:samgr_proxy",
+  ]
+
+  part_name = "multimodalinput_base"
+}
+
+ohos_prebuilt_etc("mmi_log.conf") {
+  source = "mmi_log.conf"
+  relative_install_dir = "."
   subsystem_name = "multimodalinput"
   part_name = "multimodalinput_base"
 }
 
-ohos_shared_library("libmultimodalinput_service") {
+ohos_prebuilt_etc("mmi_device_config.ini") {
+  source = "mmi_device_config.ini"
+  relative_install_dir = "."
+  subsystem_name = "multimodalinput"
+  part_name = "multimodalinput_base"
+}
+
+import("//build/ohos.gni")
+import("//build/test.gni")
+module_output_path = "multimodalinput/unit_out"
+HDF_FWKS = "//drivers/framework"
+
+ohos_unittest("ut-mmi-service-out") {
+  module_out_path = module_output_path
   include_dirs = [
-    "include",
-    "//utils/native/base/include",
-    "$SUBSYSTEM_DIR/common/include",
-    "$SUBSYSTEM_DIR/uinput",
-    "$SUBSYSTEM_DIR/interfaces/native/innerkits/event/include",
-    "$HDF_FWKS/inclue",
     "//drivers/peripheral/input/interfaces/include",
     "//drivers/adapter/uhdf2/adapter/osal/include",
+    "//utils/native/base/include",
+    "//third_party/googletest/googletest/include",
+    "//third_party/wayland-ivi-extension/include",
+    "${mmi_path}/frameworks/util/common",
+    "${mmi_path}/frameworks/util/common/include",
+    "${mmi_path}/frameworks/util/network",
+    "${mmi_path}/frameworks/util/network/include",
+    "${mmi_path}/frameworks/util/socket",
+    "${mmi_path}/frameworks/util/socket/include",
+    "${mmi_path}/frameworks/proxy/event_handle",
+    "${mmi_path}/frameworks/proxy/event_handle/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/service/include",
+    "${mmi_path}/service/senior_input_func_proc/include",
+    "${mmi_path}/service/application_manager/include",
+    "${mmi_path}/service/device_manager/include",
+    "${mmi_path}/service/device_scalability/include",
+    "${mmi_path}/service/event_dispatch/include",
+    "${mmi_path}/service/event_package/include",
+    "${mmi_path}/service/event_handle/include",
+    "${mmi_path}/service/event_standard/include",
+    "${mmi_path}/service/hdi_inject/include",
+    "${mmi_path}/service/event_dump/include",
+    "${mmi_path}/service/hdf_adapter/include",
+    "${mmi_path}/service/libinput_adapter/include",
+    "${mmi_path}/service/message_handle/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/window_manager/include",
+    "${mmi_path}/uinput",
     "$HDF_FWKS/include/utils",
     "$HDF_FWKS/include/osal",
     "$HDF_FWKS/core/adapter/syscall/include",
@@ -43,30 +212,84 @@ ohos_shared_library("libmultimodalinput_service") {
     "$HDF_FWKS/ability/sbuf/include",
     "$HDF_FWKS/core/shared/include",
     "$HDF_FWKS/utils/include",
+    "$HDF_FWKS/inclue",
   ]
-  public_configs = [ ":service_include_config" ]
+
+  if (is_mmi_have_libinput || is_mmi_have_hdf) {
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+  }
+
   sources = [
-    "src/multimodal_input_service.cpp",
-    "src/multimodal_input_service_stub.cpp",
+    "application_manager/test/app_register_test.cpp",
+    "device_manager/test/device_register_test.cpp",
+    "device_scalability/test/expansibility_operation_test.cpp",
+    "event_dispatch/test/event_dispatch_test.cpp",
+    "event_handle/test/input_event_handler_test.cpp",
+    "event_handle/test/register_event_test.cpp",
+
+    #"event_handle/test/system_event_handler_test.cpp",
+    "event_standard/test/standard_event_handler_test.cpp",
+    "hdi_inject/test/hdi_inject_test.cpp",
+    "message_handle/test/input_test.cpp",
+    "message_handle/test/server_msg_handler_test.cpp",
+    "module_loader/test/libmmi_server_test.cpp",
+    "module_loader/test/uds_server_test.cpp",
+    "window_manager/test/input_windows_manager_test.cpp",
+    "window_manager/test/outer_interface_test.cpp",
+    "window_manager/test/window_switch_test.cpp",
   ]
+
+  cflags = [
+    "-DOHOS_BUILD",
+    "-DOHOS_AUTO_TEST_FRAME",
+  ]
+
+  if (is_mmi_have_debug) {
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [ "-DOHOS_BUILD_AI" ]
+  }
+
+  if (is_mmi_have_weston) {
+    cflags += [ "-DOHOS_WESTEN_MODEL" ]
+  }
+
   deps = [
-    "$SUBSYSTEM_DIR:mmi_uinject",
-    "$SUBSYSTEM_DIR/interfaces/native/innerkits/event:mmi_event",
-    "$SUBSYSTEM_DIR/interfaces/native/innerkits/proxy:libmultimodalinput_proxy",
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/frameworks/util:libmmi-util",
+    "${mmi_path}/service:libmmi-server",
+    "//drivers/peripheral/input/hal:hdi_input",
+    "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
+    "//foundation/appexecfwk/standard/kits:appkit_native",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+    "//third_party/libxkbcommon:libxkbcommon",
     "//utils/native/base:utils",
   ]
 
-  external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
-  ]
+  if (is_mmi_have_libinput || is_mmi_have_hdf) {
+    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
+  }
 
-  subsystem_name = "multimodalinput"
-  part_name = "multimodalinput_base"
+  if (is_mmi_have_weston) {
+    deps += [ "//foundation/graphic/standard/frameworks/wmserver:wmserver" ]
+  }
+
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 }
 
-group("services_target") {
-  deps = [ ":libmultimodalinput_service" ]
+group("ut-mmi-service") {
+  testonly = true
+  deps = []
+  deps += [ ":ut-mmi-service-out" ]
 }
