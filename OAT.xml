@@ -20,14 +20,9 @@
 <configuration>
     <oatconfig>
         <licensefile></licensefile>
-        <policylist>
-            <policy name="projectPolicy" desc="">
-            </policy>
-        </policylist>
         <filefilterlist>
             <filefilter name="defaultFilter" desc="Files not to check">
                 <filteritem type="filename" name="*.gif" desc="GIF file for README"/>
-                <filteritem type="filename" name="figures/icon-note.gif" desc="GIF file for README"/>
             </filefilter>
         </filefilterlist>
     </oatconfig>

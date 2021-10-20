@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,42 +12,117 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#ifndef KEYBOARD_EVENT_H
-#define KEYBOARD_EVENT_H
-
+#ifndef OHOS_KEYBOARD_EVENTS_H
+#define OHOS_KEYBOARD_EVENTS_H
 #include "key_event.h"
 
 namespace OHOS {
-struct KeyBoardProperty {
-    bool handledByIme;
-    int unicode;
-    bool isSingleNonCharacter;
-    bool isTwoNonCharacters;
-    bool isThreeNonCharacters;
-};
-
-class KeyBoardEvent :public KeyEvent {
+class KeyBoardEvent : public KeyEvent {
 public:
-    void Initialize(MultimodalProperty &multiProperty, KeyProperty &keyProperty, KeyBoardProperty &keyBoardProperty);
+    virtual ~KeyBoardEvent();
+    /**
+    * initialize the object.
+    *
+    * @return void
+    * @since 1
+    */
+    void Initialize(int32_t windowId, bool handledByIme, int32_t unicode, bool isSingleNonCharacter, bool isTwoNonCharacters,
+                    bool isThreeNonCharacters, bool isPressed, int32_t keyCode, int32_t keyDownDuration,
+                    int32_t highLevelEvent, const std::string& uuid, int32_t sourceType, uint64_t occurredTime,
+                    const std::string& deviceId, int32_t inputDeviceId,  bool isHighLevelEvent,
+                    uint16_t deviceUdevTags = 0, int32_t deviceEventType = 0);
 
+    /**
+    * initialize the object.
+    *
+    * @return void
+    * @since 1
+    */
+    void Initialize(KeyBoardEvent& keyBoardEvent);
+
+    /**
+    * Starts the input method editor (IME).
+    *
+    * @see #disableIme()
+    * @see #isHandledByIme()
+    * @since 1
+    */
     void EnableIme();
 
+    /**
+     * Closes the IME.
+     *
+     * @see #enableIme()
+     * @see #isHandledByIme()
+     * @since 1
+     */
     void DisableIme();
 
+    /**
+     * Checks whether the IME is in use.
+     *
+     * @return Returns {@code true} if the IME is in use; returns
+     * {@code false} otherwise.@see #enableIme()
+     * @see #disableIme()
+     * @since 1
+     */
     bool IsHandledByIme();
 
-    virtual bool IsNoncharacterKeyPressed(int keycodeOne);
+    /**
+     * Checks whether a single input non-character key is pressed.
+     *
+     * <p>A non-character key is any key except those with visible
+     * characters (such as A-Z, 0-9,space, comma, and period). Typical
+     * examples are the Ctrl, Alt, and Shift keys.
+     * @param keycode Indicates the keycode of the first non-character key.
+     * @return Returns {@code true} if the input non-character key mapping
+     * to the keycode is pressed; returns {@code false} otherwise.
+     * @since 1
+     */
+    virtual bool IsNoncharacterKeyPressed(int32_t keycodeOne);
 
-    virtual bool IsNoncharacterKeyPressed(int keycodeOne, int keycodeTwo);
+    /**
+     * Checks whether two input non-character keys are both pressed.
+     *
+     * <p>A non-character key is any key except those with visible characters
+     *  (such as A-Z, 0-9,space, comma, and period). Typical examples are
+     * the Ctrl, Alt, and Shift keys.
+     * @param keycode1 Indicates the keycode of the first non-character key.
+     * @param keycode2 Indicates the keycode of the second non-character key.
+     * @return Returns {@code true} if the two input non-character keys
+     * mapping to the keycodes are pressed; returns {@code false} otherwise.
+     * @since 1
+     */
+    virtual bool IsNoncharacterKeyPressed(int32_t keycodeOne, int32_t keycodeTwo);
 
-    virtual bool IsNoncharacterKeyPressed(int keycodeOne, int keycodeTwo, int keycodeThree);
+    /**
+     * Checks whether three input non-character keys are all pressed.
+     *
+     * <p>A non-character key is any key except those with visible characters
+     * (such as A-Z, 0-9,space, comma, and period). Typical examples are the
+     *  Ctrl, Alt, and Shift keys.
+     * @param keycode1 Indicates the keycode of the first non-character key.
+     * @param keycode2 Indicates the keycode of the second non-character key.
+     * @param keycode3 Indicates the keycode of the third non-character key.
+     * @return Returns {@code true} if the three input non-character keys
+     * mapping to the keycodes are pressed; returns {@code false} otherwise.
+     * @since 1
+     */
+    virtual bool IsNoncharacterKeyPressed(int32_t keycodeOne, int32_t keycodeTwo, int32_t keycodeThree);
 
-    virtual int GetUnicode();
-    bool Marshalling(Parcel &parcel) const override;
-    static KeyBoardEvent *Unmarshalling(Parcel &parcel);
-protected:
-    KeyBoardProperty keyBoardProperty_;
+    /**
+    * Obtains the Unicode mapping to a key.
+    *
+    * <p>A Unicode code is a combination of keys and non-character keys.
+    *
+    * @return Returns the Unicode mapping to the key; returns 0 if there
+    * is no matching Unicode.
+    * @since 1
+    */
+    virtual int32_t GetUnicode() const;
+private:
+    bool mHandledByIme_ = false;
+    int32_t mUnicode_ = 0;
 };
-}  // namespace OHOS
-#endif  // KEYBOARD_EVENT_H
+}
+#endif

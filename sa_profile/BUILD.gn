@@ -13,8 +13,9 @@
 
 import("//build/ohos.gni")
 
-ohos_sa_profile("multimodalinput_sa_profile") {
-  sources = [ "3101.xml" ]
+# Use for multimodalinput proxy connection multimodalinput server
+ohos_sa_profile("multimodalinput_connect_sa_profile") {
+  sources = [ "3103.xml" ]
 
   part_name = "multimodalinput_base"
 }

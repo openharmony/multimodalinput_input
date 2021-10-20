@@ -28,7 +28,7 @@
 namespace {
 using namespace OHOS::HiviewDFX;
 constexpr HiLogLabel LABEL = { LOG_CORE, 0xD002800, "VirtualDevice" };
-}
+
 bool DoIoctl(int32_t fd, int32_t request, const uint32_t value)
 {
     int32_t rc = ioctl(fd, request, value);
@@ -37,6 +37,7 @@ bool DoIoctl(int32_t fd, int32_t request, const uint32_t value)
         return false;
     }
     return true;
+}
 }
 
 VirtualDevice::VirtualDevice(const char *deviceName, uint16_t productId)
@@ -126,7 +127,7 @@ bool VirtualDevice::EmitEvent(uint16_t type, uint16_t code, uint32_t value) cons
     event.code = code;
     event.value = value;
 #ifndef __MUSL__
-    gettimeofday(&event.time, NULL);
+    gettimeofday(&event.time, nullptr);
 #endif
     if (write(fd_, &event, sizeof(event)) < static_cast<ssize_t>(sizeof(event))) {
         HiLog::Error(LABEL, "Event write failed %{public}s aborting", __func__);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,13 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef OHOS_BUILTINKEY_EVENTS_H
+#define OHOS_BUILTINKEY_EVENTS_H
 
-#ifndef BUILTINKEY_EVENT_H
-#define BUILTINKEY_EVENT_H
-
-#include "multimodal_event.h"
+#include "key_event.h"
 
 namespace OHOS {
-class BuiltinKeyEvent :public MultimodalEvent {};
-}  // namespace OHOS
-#endif  // BUILTINKEY_EVENT_H
+/**
+ * Defines the key events of internal input devices.
+ *
+ * <p>Key events of all internal input devices, such as buttons on the TV, and vehicle, and knobs,
+ * are all defined by this class. The OS manages key events of internal input devices in a unified
+ * manner. Permissions have been granted for keycodes defined in this class and its child classes.
+ * This means that access to key events requires the respective permissions.
+ *
+ * @see KeyEvent
+ * @since 1
+ */
+class BuiltinKeyEvent : public KeyEvent {
+public:
+    virtual ~BuiltinKeyEvent();
+};
+}
+#endif
