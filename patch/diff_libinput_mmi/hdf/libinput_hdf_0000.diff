@@ -2568,7 +2568,7 @@ diff -Naur old/src/evdev.c new/src/evdev.c
 +        len = read(libinput->pipes[0], event, sizeof(event));
 +        atomic_fetch_sub_explicit(&libinput->pipesbytes,len,memory_order_release);
 +        if(len > 0 && len % sizeof(struct input_event) != 0) {
-+            printf("event in pipe size less than < %d  len = %d \n", sizeof(struct input_event),len);
++            
 +            return ;
 +        }
 +        if(len < 0){
