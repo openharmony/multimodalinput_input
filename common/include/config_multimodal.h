@@ -49,7 +49,7 @@
 #define CLIENT_RECONNECT_COOLING_TIME 800   // Client reconnection cooldown
 #define SERVER_RESTART_COOLING_TIME 2000    // Server failure restart cooldown
 #define MAX_THREAD_DEATH_TIME (6*1000)      // Thread death threshold time
-#define MMISEVER_WMS_DEVICE_ADDED 1         // notifyDeviceChange@Device added 
+#define MMISEVER_WMS_DEVICE_ADDED 1         // notifyDeviceChange@Device added
 #define MMISEVER_WMS_DEVICE_REMOVE 2        // notifyDeviceChange@Device removed
 
 #endif

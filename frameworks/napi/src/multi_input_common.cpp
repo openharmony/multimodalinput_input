@@ -22,18 +22,19 @@
 #include "libmmi_util.h"
 namespace OHOS {
     namespace MMI {
-        void MultiInputCommon::InjectionIni(const std::string &iniFilePath,const std::string &fileName,const std::string &jsonEventValue)
+        void MultiInputCommon::InjectionIni(const std::string &iniFilePath, const std::string &fileName,
+                                            const std::string &jsonEventValue)
         {
             HILOG_INFO("InjectionIni: start");
             if (iniFilePath.empty()) {
                 return;
             }
-            
+
             const std::string eventsFile = iniFilePath + fileName;
             HILOG_INFO("eventsfile=%s", eventsFile.c_str());
             std::ofstream file_writer(eventsFile, std::ios_base::trunc);
             file_writer.close();
-            
+
             std::ofstream file;
             file.open(eventsFile, std::ios::app);
             if (!file.is_open()) {
@@ -42,9 +43,9 @@ namespace OHOS {
             HILOG_INFO("jsonEventValue=%s", jsonEventValue.c_str());
             file << jsonEventValue << std::endl;
             file.close();
-            HILOG_INFO("InjectionIni: end");           
+            HILOG_INFO("InjectionIni: end");
         }
-        
+
         void MultiInputCommon::SetIniFile(const std::string &fileName,const std::string &jsonEventValue)
         {
             HILOG_INFO("SetIniFile: start");

@@ -139,7 +139,7 @@ void OHOS::MMI::RegisterEventHandleManager::Dump(int32_t fd)
     std::lock_guard<std::mutex> lock(mu_);
     std::string strTmp;
     mprintf(fd, "RegsEvent: count=%d", mapRegisterManager_.size());
-    for (auto it = mapRegisterManager_.begin(); it != mapRegisterManager_.end(); 
+    for (auto it = mapRegisterManager_.begin(); it != mapRegisterManager_.end();
         it = mapRegisterManager_.upper_bound(it->first)) {
         strTmp.clear();
         auto evs = mapRegisterManager_.equal_range(it->first);

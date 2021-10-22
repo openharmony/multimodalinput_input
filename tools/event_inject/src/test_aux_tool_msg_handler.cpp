@@ -27,7 +27,7 @@ namespace {
 bool TestAuxToolMsgHandler::Init()
 {
     MsgCallback funs[] = {
-        {MmiMessageId::SENIOR_INPUT_FUNC, std::bind(&TestAuxToolMsgHandler::OnAiServerReply, 
+        {MmiMessageId::SENIOR_INPUT_FUNC, std::bind(&TestAuxToolMsgHandler::OnAiServerReply,
             this, std::placeholders::_1, std::placeholders::_2)},
         {MmiMessageId::HDI_INJECT, std::bind(&TestAuxToolMsgHandler::OnHdiServerReply,
             this, std::placeholders::_1, std::placeholders::_2)},

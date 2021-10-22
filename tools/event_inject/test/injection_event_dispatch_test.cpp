@@ -90,7 +90,7 @@ HWTEST_F(InjectionEventDispatchTest, Test_OnAisensor, TestSize.Level1)
 HWTEST_F(InjectionEventDispatchTest, Test_OnAisensorEach, TestSize.Level1)
 {
     int32_t argc = 4;
-    char argv[4][16] = {"functionName", "aisensor-each", "1103", "1"};
+    char argv[4][16] = { "functionName", "aisensor-each", "1103", "1" };
     InjectionEventDispatch injectionEventDispatch;
     std::vector<std::string> argvs;
     for (int32_t i = 0; i < argc; i++) {

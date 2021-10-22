@@ -89,7 +89,7 @@ namespace OHOS {
         uint32_t GetHandleType(uint32_t eventType)
         {
             uint32_t type = INVALID_TYPE_CODE;
-            if (eventType < INVALID_EVENT) { 
+            if (eventType < INVALID_EVENT) {
                 auto iter = g_jsEventType.find(eventTable[eventType]);
                 if (iter != g_jsEventType.end()) {
                     type =  iter->second;
@@ -148,7 +148,8 @@ namespace OHOS {
                 if (isEquals) {
                     napi_delete_reference(env, *it);
                     iter->second.erase(it);
-                    HILOG_DEBUG("DelCallback: success. callback exists. size=%{public}d", static_cast<int32_t>(iter->second.size()));
+                    HILOG_DEBUG("DelCallback: success. callback exists. size=%{public}d",
+                                static_cast<int32_t>(iter->second.size()));
                     return JS_CALLBACK_EVENT_SUCCESS;
                 }
                 it++;

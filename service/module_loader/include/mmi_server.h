@@ -41,7 +41,7 @@ class MMIServer : public UDSServer {
 public:
     MMIServer();
     virtual ~MMIServer() override;
-    int32_t Start();    
+    int32_t Start();
     void OnTimer();
     void StopAll();
 

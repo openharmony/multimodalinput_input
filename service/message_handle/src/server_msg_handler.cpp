@@ -170,7 +170,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt
     MMI_LOGI("hdfinject server access hditools info.");
     CHKR(sess, NULL_POINTER, RET_ERR);
     CHKR(udsServer_, NULL_POINTER, RET_ERR);
-    const int32_t processingCode = hdiInject->ManageHdfInject(sess, pkt); 
+    const int32_t processingCode = hdiInject->ManageHdfInject(sess, pkt);
     NetPacket newPacket(MmiMessageId::HDI_INJECT);
     newPacket << processingCode;
     if (!sess->SendMsg(newPacket)) {
@@ -192,7 +192,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterAppInfo(SessionPtr sess, NetPacke
     std::string appName;
     int32_t fd = sess->GetFd();
     pkt >> abilityId >> windowId >> bundlerName >> appName;
-    struct AppInfo appInfo = {abilityId, windowId, fd, bundlerName, appName};
+    struct AppInfo appInfo = { abilityId, windowId, fd, bundlerName, appName };
 
     AppRegs->RegisterAppInfoforServer(appInfo);
 #if !defined(OHOS_BUILD) || !defined(OHOS_WESTEN_MODEL)
@@ -232,7 +232,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterMsgHandler(SessionPtr sess, NetPa
     pkt >> eventType >> abilityId >> winId >> bundlerName >> appName;
     RegEventHM->RegisterEvent(eventType, fd);
     if (winId > 0) {
-        AppRegs->RegisterAppInfoforServer({abilityId, winId, fd, bundlerName, appName});
+        AppRegs->RegisterAppInfoforServer({ abilityId, winId, fd, bundlerName, appName });
     }
     MMI_LOGD("OnRegisterMsgHandler abilityId:%{public}d winId:%{public}d fd:%{public}d eventType:%{public}d"
              " bundlerName:%{public}s appName:%{public}s",

@@ -35,9 +35,9 @@ public:
     * @return void
     * @since 1
     */
-    void Initialize(int32_t windowId, float rotationValue, int32_t highLevelEvent, const std::string& uuid, int32_t sourceType,
-                    int32_t occurredTime, const std::string& deviceId, int32_t inputDeviceId,  bool isHighLevelEvent, 
-                    uint16_t deviceUdevTags = 0);
+    void Initialize(int32_t windowId, float rotationValue, int32_t highLevelEvent, const std::string& uuid,
+                    int32_t sourceType, int32_t occurredTime, const std::string& deviceId, int32_t inputDeviceId,
+                    bool isHighLevelEvent, uint16_t deviceUdevTags = 0);
     /**
     * initialize the object.
     *
