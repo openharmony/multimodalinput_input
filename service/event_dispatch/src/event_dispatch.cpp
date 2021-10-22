@@ -576,9 +576,8 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
                  "source=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;delta_raw.x=%{public}lf;"
                  "delta_raw.y=%{public}lf;absolute.x=%{public}lf;absolute.y=%{public}lf;discrete.x=%{public}lf;"
                  "discrete.y=%{public}lf;fd=%{public}d;abilityId=%{public}d;windowId=%{public}d;"
-                 "preHandlerTime=%{public}"
-                 PRId64
-                 ";\n**************************************************************\n",
+                 "preHandlerTime=%{public}" PRId64 ";\n************************************"
+                 "**************************\n",
                  point.time, point.deviceType, point.deviceId, point.deviceName,
                  point.devicePhys, point.eventType, point.button, point.seat_button_count, point.axes,
                  point.state, point.source, point.delta.x, point.delta.y, point.delta_raw.x,
@@ -650,9 +649,8 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
              "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
              "fingerCount=%{public}d;cancelled=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
              "deltaUnaccel.x=%{public}lf;deltaUnaccel.y=%{public}lf;fd=%{public}d;abilityId=%{public}d;"
-             "windowId=%{public}d;preHandlerTime=%{public}"
-             PRId64
-             ";\n***************************************************\n",
+             "windowId=%{public}d;preHandlerTime=%{public}" PRId64 ";\n***************************"
+             "************************\n",
              gesture.time, gesture.deviceType, gesture.deviceId, gesture.deviceName, gesture.devicePhys,
              gesture.eventType, gesture.fingerCount, gesture.cancelled, gesture.delta.x, gesture.delta.y,
              gesture.deltaUnaccel.x, gesture.deltaUnaccel.y, appInfo.fd, appInfo.abilityId, focusId, preHandlerTime);
@@ -795,9 +793,8 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
                          "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
                          "slot=%{public}d;seat_slot=%{public}d;pressure=%{public}lf;point.x=%{public}lf;"
                          "point.y=%{public}lf;fd=%{public}d;abilityId=%{public}d,windowId=%{public}d;"
-                         "preHandlerTime=%{public}"
-                         PRId64
-                         ";\n*********************************************************\n",
+                         "preHandlerTime=%{public}" PRId64 ";\n*************************************"
+                         "********************\n",
                          touchTemp.time, touchTemp.deviceType, touchTemp.deviceId, touchTemp.deviceName,
                          touchTemp.devicePhys, touchTemp.eventType, touchTemp.slot, touchTemp.seat_slot,
                          touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, appInfo.fd,
@@ -823,9 +820,8 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
                      "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
                      "slot=%{public}d;seat_slot=%{public}d;pressure=%{public}lf;point.x=%{public}lf;"
                      "point.y=%{public}lf;fd=%{public}d;abilityId=%{public}d;windowId=%{public}d;"
-                     "preHandlerTime=%{public}"
-                     PRId64
-                     ";\n****************************************************************\n",
+                     "preHandlerTime=%{public}" PRId64 ";\n***********************************************"
+                     "*****************\n",
                      touch.time, touch.deviceType, touch.deviceId, touch.deviceName,
                      touch.devicePhys, touch.eventType, touch.slot, touch.seat_slot, touch.pressure,
                      touch.point.x, touch.point.y, appInfo.fd, appInfo.abilityId, touchFocusId, preHandlerTime);
@@ -936,9 +932,9 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
     MMI_LOGT("\n4.event dispatcher of server:\neventKeyboard:time=%{public}" PRId64 ";deviceType=%{public}u;"
              "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
              "mUnicode=%{public}d;key=%{public}u;key_detail=%{public}s;seat_key_count=%{public}u;"
-             "state=%{public}d;fd=%{public}d;abilityId=%{public}d;windowId=%{public}d; preHandlerTime=%{public}"
-             PRId64
-             ";\n***********************************************************************\n",
+             "state=%{public}d;fd=%{public}d;abilityId=%{public}d;windowId=%{public}d;"
+             "preHandlerTime=%{public}" PRId64 ";\n***********************************"
+             "************************************\n",
              key.time, key.deviceType, key.deviceId, key.deviceName, key.devicePhys, key.eventType,
              key.mUnicode, key.key, trs.keyEvent.c_str(), key.seat_key_count, key.state, appInfo.fd,
              appInfo.abilityId, focusId, preHandlerTime);
