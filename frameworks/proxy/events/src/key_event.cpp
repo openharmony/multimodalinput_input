@@ -16,10 +16,10 @@
 
 namespace OHOS {
 KeyEvent::~KeyEvent() {}
-void KeyEvent::Initialize(int32_t windowId, bool isPressed, int32_t keyCode, int32_t keyDownDuration, int32_t highLevelEvent,
-                          const std::string& uuid, int32_t sourceType, uint64_t occurredTime,
-                          const std::string& deviceId, int32_t inputDeviceId, bool isHighLevelEvent,
-                          uint16_t deviceUdevTags, int32_t deviceEventType)
+void KeyEvent::Initialize(int32_t windowId, bool isPressed, int32_t keyCode, int32_t keyDownDuration,
+                          int32_t highLevelEvent, const std::string& uuid, int32_t sourceType,
+                          uint64_t occurredTime, const std::string& deviceId, int32_t inputDeviceId,
+                          bool isHighLevelEvent, uint16_t deviceUdevTags, int32_t deviceEventType)
 {
     MultimodalEvent::Initialize(windowId, highLevelEvent, uuid, sourceType, occurredTime, deviceId,
                                 inputDeviceId, isHighLevelEvent, deviceUdevTags);

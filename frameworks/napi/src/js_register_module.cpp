@@ -301,7 +301,7 @@ namespace OHOS {
             std::string virtualEventValue = GetNamedPropertyString(env, argv[ARGV_SECOND], "jsonEvent");
             HILOG_DEBUG("SetInjectFile: GetNamedPropertyString out");
             MultiInputCommon virtualInjectEvent;
-            virtualInjectEvent.SetIniFile(virtualEventFileName,virtualEventValue);
+            virtualInjectEvent.SetIniFile(virtualEventFileName, virtualEventValue);
             HILOG_INFO("SetInjectFile: success. virtualEventValue=%s", virtualEventFileName.c_str());
             HILOG_INFO("SetInjectFile: success. virtualEventValue=%s", virtualEventValue.c_str());
             if (napi_create_int32(env, SUCCESS_CODE, &result) != napi_ok) {

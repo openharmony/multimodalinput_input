@@ -147,7 +147,8 @@ namespace OHOS::MMI {
     }
 
     template <class Enum>
-    constexpr auto EnumUnderlyingValue(Enum const e) -> typename std::underlying_type<Enum>::type {
+    constexpr auto EnumUnderlyingValue(Enum const e) -> typename std::underlying_type<Enum>::type
+    {
         static_assert(std::is_enum<Enum>::value, "input value is not of enum class nor enum");
         return static_cast<typename std::underlying_type<Enum>::type>(e);
     }

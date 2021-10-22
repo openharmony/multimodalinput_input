@@ -156,9 +156,9 @@ int32_t RegisterEvent::OnEventKeyJudge(EventKeyboard& key, MmiMessageId& msgId, 
                 prevKey.eventType = key_.eventType;
                 prevKey.deviceId = key_.deviceId;
                 CHKR(EOK == memcpy_s(prevKey.deviceName, sizeof(prevKey.deviceName), key_.deviceName,
-                                     sizeof(key_.deviceName)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
+                     sizeof(key_.deviceName)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
                 CHKR(EOK == memcpy_s(prevKey.devicePhys, sizeof(prevKey.devicePhys), key_.devicePhys,
-                                     sizeof(key_.devicePhys)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
+                     sizeof(key_.devicePhys)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
             }
             if (key.key == KEY_VIDEO || key.key == KEY_SCREENRECORD) {
                 OnGetRepeatKetState(key.key, msgId);

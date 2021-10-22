@@ -121,8 +121,8 @@ int32_t SeniorInputFuncProcBase::DeviceEventProcess(const RawInputEvent& event)
             serverStartTime << uuid << occurredTime;
 #ifdef OHOS_AUTO_TEST_FRAME
         const AutoTestDispatcherPkt autoTestDispatcherPkt = {
-            "eventAi_Knuckle", static_cast<uint16_t>(event.ev_type), event.ev_code, 0, 0, 0, MmiMessageId::INVALID, 
-            appInfo.fd, appInfo.windowId, appInfo.abilityId, 0, 0, static_cast<uint16_t>(deviceType), 
+            "eventAi_Knuckle", static_cast<uint16_t>(event.ev_type), event.ev_code, 0, 0, 0, MmiMessageId::INVALID,
+            appInfo.fd, appInfo.windowId, appInfo.abilityId, 0, 0, static_cast<uint16_t>(deviceType),
             static_cast<uint32_t>(deviceId), 0, 0
         };
         auto retAutoTestDpc = eventDispatch_.SendDispatcherPktToAutoTest(*udsServerPtr_, autoTestDispatcherPkt);

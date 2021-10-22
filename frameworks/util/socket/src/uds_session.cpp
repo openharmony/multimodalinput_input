@@ -46,8 +46,9 @@ bool OHOS::MMI::UDSSession::SendMsg(const char *buf, size_t size) const
     uint64_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
     if (ret < 0) {
         const int errNoSaved = errno;
-        MMI_LOGE("UDSSession::SendMsg write return %{public}" PRId64 ", fd_: %{public}d, errNoSaved: %{public}d, %{public}s.",
-            ret, fd_, errNoSaved, strerror(errNoSaved));
+        MMI_LOGE("UDSSession::SendMsg write return %{public}" PRId64
+                 ", fd_: %{public}d, errNoSaved: %{public}d, %{public}s.",
+                 ret, fd_, errNoSaved, strerror(errNoSaved));
         return false;
     }
     return true;

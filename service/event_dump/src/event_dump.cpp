@@ -70,7 +70,7 @@ void ChkAppInfos(int32_t fd)
     auto touchFocusId = WinMgr->GetTouchFocusSurfaceId();
     auto appInfo = AppRegs->FindByWinId(focusId);
     mprintf(fd, "FocusInfo: winId=%d fd=%d abilityId=%d surfaceId=%d bundlerName=%s appName=%s",
-            focusId, appInfo.fd, appInfo.abilityId, appInfo.windowId, appInfo.bundlerName.c_str(), 
+            focusId, appInfo.fd, appInfo.abilityId, appInfo.windowId, appInfo.bundlerName.c_str(),
             appInfo.appName.c_str());
     if (focusId != touchFocusId) {
         appInfo = AppRegs->FindByWinId(touchFocusId);

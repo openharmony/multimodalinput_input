@@ -120,7 +120,7 @@ HWTEST_F(KeyboardEventTest, GetUnicode_002, TestSize.Level1)
 }
 
 HWTEST_F(KeyboardEventTest, Initialize_false, TestSize.Level1)
-{    
+{
     int32_t windowId = 1;
     bool handledByIme = false;
     int32_t uniCode = 22;

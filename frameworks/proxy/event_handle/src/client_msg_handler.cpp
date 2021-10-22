@@ -507,8 +507,7 @@ int32_t OHOS::MMI::ClientMsgHandler::PackedData(MultimodalEvent& multEvent, cons
                  idMsg, deviceId, fd, windowId, abilityId, uuid.c_str(), occurredTime);
         if (type == INPUT_DEVICE_CAP_KNUCKLE) {
             type = HOS_KNUCKLE;
-        }
-        else if (type == INPUT_DEVICE_CAP_AISENSOR) {
+        } else if (type == INPUT_DEVICE_CAP_AISENSOR) {
             type = HOS_AI_SPEECH;
         }
         multEvent.Initialize(windowId, 0, uuid, type, occurredTime, "", deviceId, 0, 0);
@@ -687,7 +686,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, Ne
     TouchEvent touchEvent;
     int32_t deviceEventType = TOUCH_EVENT;
     int32_t fingerIndex = 0;
-    if (PRIMARY_POINT_DOWN == eventAction || PRIMARY_POINT_UP == eventAction || 
+    if (PRIMARY_POINT_DOWN == eventAction || PRIMARY_POINT_UP == eventAction ||
         OTHER_POINT_DOWN == eventAction || OTHER_POINT_UP == eventAction) {
         fingerIndex = fingersInfos[0].mPointerId;
     }
@@ -730,7 +729,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisJoystickEvent(const UDSClient& client,
     PrintEventJoyStickAxisInfo(eventJoyStickData, fd, abilityId, windowId, serverStartTime);
     // multimodal ANR
     clientEndTime = GetSysClockTime();
-    ((MMIClient*)&client)->ReplyMessageToServer(pkt.GetMsgId(), eventJoyStickData.time, serverStartTime, 
+    ((MMIClient*)&client)->ReplyMessageToServer(pkt.GetMsgId(), eventJoyStickData.time, serverStartTime,
         clientEndTime, fd);
 
 #ifdef OHOS_AUTO_TEST_FRAME
@@ -743,7 +742,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisJoystickEvent(const UDSClient& client,
 #endif  // OHOS_AUTO_TEST_FRAME
 
     int32_t mouseAction = static_cast<int32_t>(MouseActionEnum::HOVER_MOVE);
-    (reinterpret_cast<MouseEvent*>(mousePtr.GetRefPtr()))->Initialize(windowId, mouseAction, 0, 0, mmiPoint, 
+    (reinterpret_cast<MouseEvent*>(mousePtr.GetRefPtr()))->Initialize(windowId, mouseAction, 0, 0, mmiPoint,
         0, 0, 0, 0, 0, nullUUid, eventJoyStickData.eventType, static_cast<int32_t>(eventJoyStickData.time), "",
         static_cast<int32_t>(eventJoyStickData.deviceId), false, eventJoyStickData.deviceType, eventJoyStickData);
 

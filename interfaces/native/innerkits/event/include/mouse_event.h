@@ -180,11 +180,11 @@ public:
     * @return void
     * @since 1
     */
-    void Initialize(int32_t windowId, int32_t action, int32_t actionButton, int32_t pressedButtons, const MmiPoint& mmiPoint,
-        float xOffset, float yOffset, float cursorDelta, float scrollingDelta,
-        int32_t highLevelEvent, const std::string& uuid, int32_t sourceType, int32_t occurredTime,
-        const std::string& deviceId, int32_t inputDeviceId,  bool isHighLevelEvent, 
-        uint16_t deviceUdevTags, const EventJoyStickAxis& eventJoyStickInfo);
+    void Initialize(int32_t windowId, int32_t action, int32_t actionButton, int32_t pressedButtons,
+                    const MmiPoint& mmiPoint, float xOffset, float yOffset, float cursorDelta, float scrollingDelta,
+                    int32_t highLevelEvent, const std::string& uuid, int32_t sourceType, int32_t occurredTime,
+                    const std::string& deviceId, int32_t inputDeviceId,  bool isHighLevelEvent,
+                    uint16_t deviceUdevTags, const EventJoyStickAxis& eventJoyStickInfo);
     /**
     * initialize the object.
     *

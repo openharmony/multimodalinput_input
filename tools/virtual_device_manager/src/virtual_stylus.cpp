@@ -95,7 +95,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualStylus::GetKeys() const
 
 const std::vector<uint32_t>& OHOS::MMI::VirtualStylus::GetAbs() const
 {
-    static const std::vector<uint32_t> abs{
+    static const std::vector<uint32_t> abs {
         ABS_X, ABS_Y, ABS_Z, ABS_WHEEL, ABS_PRESSURE, ABS_DISTANCE, ABS_TILT_X, ABS_TILT_Y, ABS_MISC
     };
     return abs;
@@ -112,7 +112,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualStylus::GetMscs() const
 
 const std::vector<uint32_t>& OHOS::MMI::VirtualStylus::GetProperties() const
 {
-    static const std::vector<uint32_t> pros{
+    static const std::vector<uint32_t> pros {
         INPUT_PROP_POINTER
     };
     return pros;

@@ -59,7 +59,8 @@ int32_t ProcessingJoystickDevice::AnalysisJoystickEvent(const Json& inputData,
             joystickEvent.blockTime = item.at("blockTime").get<int32_t>();
         }
         joystickEvent.eventType = eventType;
-        if ((eventType == "KEY_EVENT_CLICK") || (eventType == "KEY_EVENT_PRESS") || (eventType == "KEY_EVENT_RELEASE")) {
+        if ((eventType == "KEY_EVENT_CLICK") || (eventType == "KEY_EVENT_PRESS") ||
+            (eventType == "KEY_EVENT_RELEASE")) {
             if ((item.find("keyValue")) == item.end()) {
                 MMI_LOGE("function AnalysisJoystickEvent not find keyValue On Event: %{public}s.", eventType.c_str());
                 return RET_ERR;

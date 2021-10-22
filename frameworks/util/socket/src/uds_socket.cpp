@@ -132,8 +132,9 @@ int32_t OHOS::MMI::UDSSocket::EpollCtl(int32_t fd, int32_t op, epoll_event& even
     auto ret = epoll_ctl(epollFd_, op, fd, &event);
     if (ret < 0) {
         const int errnoSaved = errno;
-        MMI_LOGE("UDSSocket::EpollCtl epoll_ctl retrun %{public}d epollFd_:%{public}d, op:%{public}d fd:%{public}d errno:%{public}d error msg: %{public}s",
-            ret, epollFd_, op, fd, errnoSaved, strerror(errnoSaved));
+        MMI_LOGE("UDSSocket::EpollCtl epoll_ctl retrun %{public}d epollFd_:%{public}d,"
+                 " op:%{public}d fd:%{public}d errno:%{public}d error msg: %{public}s",
+                 ret, epollFd_, op, fd, errnoSaved, strerror(errnoSaved));
     }
     return ret;
 }
