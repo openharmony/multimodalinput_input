@@ -647,8 +647,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
              "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
              "fingerCount=%{public}d;cancelled=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
              "deltaUnaccel.x=%{public}lf;deltaUnaccel.y=%{public}lf;fd=%{public}d;abilityId=%{public}d;"
-             "windowId=%{public}d;preHandlerTime=%{public}" PRId64 ";\n***************************"
-             "************************\n",
+             "windowId=%{public}d;preHandlerTime=%{public}" PRId64 ";\n***************************************************\n",
              gesture.time, gesture.deviceType, gesture.deviceId, gesture.deviceName, gesture.devicePhys,
              gesture.eventType, gesture.fingerCount, gesture.cancelled, gesture.delta.x, gesture.delta.y,
              gesture.deltaUnaccel.x, gesture.deltaUnaccel.y, appInfo.fd, appInfo.abilityId, focusId, preHandlerTime);
@@ -657,8 +656,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
     int32_t testConnectState = 0;
     int32_t testBufferState = 0;
 #endif // DEBUG_CODE_TEST
-    if (AppRegs->IsMultimodeInputReady(gesture.time, MmiMessageId::ON_TOUCH, appInfo.fd, testConnectState,
-        testBufferState)) {
+    if (AppRegs->IsMultimodeInputReady(gesture.time, MmiMessageId::ON_TOUCH, appInfo.fd, testConnectState, testBufferState)) {
         NetPacket newPacket(MmiMessageId::ON_TOUCH);
         int32_t inputType = INPUT_DEVICE_CAP_GESTURE;
         newPacket << inputType << gesture << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
@@ -723,8 +721,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
         testBufferState = RET_ERR;
     }
 #endif // DEBUG_CODE_TEST
-    if (AppRegs->IsMultimodeInputReady(touch.time, MmiMessageId::ON_TOUCH, appInfo.fd, testConnectState,
-        testBufferState)) {
+    if (AppRegs->IsMultimodeInputReady(touch.time, MmiMessageId::ON_TOUCH, appInfo.fd, testConnectState, testBufferState)) {
         NetPacket newPacket(MmiMessageId::ON_TOUCH);
         int32_t fingerCount = MMIRegEvent->GetTouchInfoSizeByDeviceId(touch.deviceId);
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
@@ -791,8 +788,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
                          "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
                          "slot=%{public}d;seat_slot=%{public}d;pressure=%{public}lf;point.x=%{public}lf;"
                          "point.y=%{public}lf;fd=%{public}d;abilityId=%{public}d,windowId=%{public}d;"
-                         "preHandlerTime=%{public}" PRId64 ";\n*************************************"
-                         "********************\n",
+                         "preHandlerTime=%{public}" PRId64 ";\n*********************************************************\n",
                          touchTemp.time, touchTemp.deviceType, touchTemp.deviceId, touchTemp.deviceName,
                          touchTemp.devicePhys, touchTemp.eventType, touchTemp.slot, touchTemp.seat_slot,
                          touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, appInfo.fd,
@@ -818,8 +814,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
                      "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
                      "slot=%{public}d;seat_slot=%{public}d;pressure=%{public}lf;point.x=%{public}lf;"
                      "point.y=%{public}lf;fd=%{public}d;abilityId=%{public}d;windowId=%{public}d;"
-                     "preHandlerTime=%{public}" PRId64 ";\n***********************************************"
-                     "*****************\n",
+                     "preHandlerTime=%{public}" PRId64 ";\n****************************************************************\n",
                      touch.time, touch.deviceType, touch.deviceId, touch.deviceName,
                      touch.devicePhys, touch.eventType, touch.slot, touch.seat_slot, touch.pressure,
                      touch.point.x, touch.point.y, appInfo.fd, appInfo.abilityId, touchFocusId, preHandlerTime);
@@ -931,8 +926,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
              "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
              "mUnicode=%{public}d;key=%{public}u;key_detail=%{public}s;seat_key_count=%{public}u;"
              "state=%{public}d;fd=%{public}d;abilityId=%{public}d;windowId=%{public}d;"
-             "preHandlerTime=%{public}" PRId64 ";\n***********************************"
-             "************************************\n",
+             "preHandlerTime=%{public}" PRId64 ";\n***********************************************************************\n",
              key.time, key.deviceType, key.deviceId, key.deviceName, key.devicePhys, key.eventType,
              key.mUnicode, key.key, trs.keyEvent.c_str(), key.seat_key_count, key.state, appInfo.fd,
              appInfo.abilityId, focusId, preHandlerTime);
