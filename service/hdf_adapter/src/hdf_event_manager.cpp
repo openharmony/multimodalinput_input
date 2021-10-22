@@ -481,7 +481,7 @@ int OHOS::MMI::HdfEventManager::HdfDevHandle(int index, hdf_event_type cmd)
             uint32_t ret = m_globleThis->inputInterface_->iInputManager->GetInputDevice(index, &deviceinfo);
             if (ret != 0 || (deviceinfo == nullptr)) {
                 MMI_LOGE("---- %{public}s:%{public}d inputInterface_ GetInputDevice ret =%{public}d \n",
-                __func__, __LINE__, ret);
+                         __func__, __LINE__, ret);
                 return RET_ERR;
             }
             hdiuhdf->deviceinfo = (void*)deviceinfo;

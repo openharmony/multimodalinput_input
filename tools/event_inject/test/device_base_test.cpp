@@ -28,7 +28,8 @@ public:
 };
 
 class DeviceBaseDemo : public DeviceBase {
-    int32_t TransformJsonDataToInputData(const Json& fingerEventArrays, InputEventArray& inputEventArray) {
+    int32_t TransformJsonDataToInputData(const Json& fingerEventArrays, InputEventArray& inputEventArray)
+    {
         return RET_ERR;
     }
 };
