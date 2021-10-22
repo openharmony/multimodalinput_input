@@ -83,7 +83,8 @@ private:
                             int32_t &touchAction) const;
     void PrintEventTabletToolInfo(EventTabletTool tableTool, uint64_t serverStartTime,
                                   int32_t abilityId, int32_t windowId, int32_t fd) const;
-    void AnalysisStandardTabletToolEvent(NetPacket& pkt, int32_t curRventType, EventTabletTool tableTool, int32_t windowId) const;
+    void AnalysisStandardTabletToolEvent(NetPacket& pkt, int32_t curRventType, EventTabletTool tableTool,
+                                         int32_t windowId) const;
     void AnalysisTabletToolEvent(const UDSClient& client, NetPacket& pkt) const;
     void AnalysisGestureEvent(const UDSClient& client, NetPacket& pkt) const;
 

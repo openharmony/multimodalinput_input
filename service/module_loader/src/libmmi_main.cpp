@@ -132,7 +132,8 @@ void StartMmiServer(void)
     using namespace OHOS::MMI;
     uint64_t tid = OHOS::MMI::GetThisThreadIdOfLL();
     g_llStartTime = OHOS::MMI::GetMillisTime();
-    MMI_LOGI("The server starts to start tid:%" PRId64 ". The current timestamp is %" PRId64 " Ms\n", tid, g_llStartTime);
+    MMI_LOGI("The server starts to start tid:%" PRId64 ". The current timestamp is %" PRId64
+             " Ms\n", tid, g_llStartTime);
 #endif
     g_isRun = true;
     static std::thread t(&OnThread);

@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace MMI {
     namespace {
-        [[maybe_unused]] static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { 
+        [[maybe_unused]] static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
             LOG_CORE, MMI_LOG_DOMAIN, "DeviceRegister" };
     }
 DeviceRegister::DeviceRegister()

@@ -16,9 +16,9 @@
 
 namespace OHOS {    
 RotationEvent::~RotationEvent() {}
-void RotationEvent::Initialize(int32_t windowId, float rotationValue, int32_t highLevelEvent, const std::string& uuid, int32_t sourceType,
-                               int32_t occurredTime, const std::string& deviceId, int32_t inputDeviceId,
-                               bool isHighLevelEvent, uint16_t deviceUdevTags)
+void RotationEvent::Initialize(int32_t windowId, float rotationValue, int32_t highLevelEvent, const std::string& uuid,
+                               int32_t sourceType, int32_t occurredTime, const std::string& deviceId,
+                               int32_t inputDeviceId, bool isHighLevelEvent, uint16_t deviceUdevTags)
 {
     MultimodalEvent::Initialize(windowId, highLevelEvent, uuid, sourceType, occurredTime, deviceId, inputDeviceId,
                                 isHighLevelEvent, deviceUdevTags);

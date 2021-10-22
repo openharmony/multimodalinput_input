@@ -89,13 +89,13 @@ void mmi_console_log(bool withoutFileInfo, char* fileName, int lineNo, int level
                      const char* fmt, ...);
 
 #define MMI_LOG_MANAGER_OUT(fmt, ...) do { \
-    printf(fmt, ##__VA_ARGS__);\
+    printf(fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define LOGLOG(fmt, ...) do { \
-    mmi_console_log(false, (char *)__FILE__, __LINE__, OHOS::MMI::LL_INFO, OHOS::MMI::GetThreadName(),\
-    MMI_FUNC_FMT fmt "[only_console]", MMI_FUNC_INFO, ##__VA_ARGS__);\
-    OHOS::HiviewDFX::HiLog::Error(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__);\
+    mmi_console_log(false, (char *)__FILE__, __LINE__, OHOS::MMI::LL_INFO, OHOS::MMI::GetThreadName(), \
+    MMI_FUNC_FMT fmt "[only_console]", MMI_FUNC_INFO, ##__VA_ARGS__); \
+    OHOS::HiviewDFX::HiLog::Error(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while(0)
 
 static std::string ExtIgnore(const std::string& str)

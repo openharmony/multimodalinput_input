@@ -106,7 +106,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualFinger::GetSws() const
 
 const std::vector<uint32_t>& OHOS::MMI::VirtualFinger::GetProperties() const
 {
-    static const std::vector<uint32_t> pros{
+    static const std::vector<uint32_t> pros {
         INPUT_PROP_POINTER
     };
     return pros;

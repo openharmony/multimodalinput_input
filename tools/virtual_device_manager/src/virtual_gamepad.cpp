@@ -98,7 +98,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualGamePad::GetKeys() const
 const std::vector<uint32_t>& OHOS::MMI::VirtualGamePad::GetAbs() const
 {
     static const std::vector<uint32_t> abs {
-        ABS_X, ABS_Y, ABS_Z, ABS_RX, ABS_RY,ABS_RZ, ABS_GAS, ABS_BRAKE, ABS_HAT0X, ABS_HAT0Y
+        ABS_X, ABS_Y, ABS_Z, ABS_RX, ABS_RY, ABS_RZ, ABS_GAS, ABS_BRAKE, ABS_HAT0X, ABS_HAT0Y
     };
 
     return abs;

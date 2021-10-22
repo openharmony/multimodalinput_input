@@ -112,7 +112,7 @@ public:
     */
     void Initialize(int32_t windowId, int32_t action, int32_t scene, int32_t mode, const std::string& actionProperty,
                     int32_t highLevelEvent, const std::string& uuid, int32_t sourceType, int32_t occurredTime,
-                    const std::string& deviceId, int32_t inputDeviceId,  bool isHighLevelEvent, 
+                    const std::string& deviceId, int32_t inputDeviceId, bool isHighLevelEvent,
                     uint16_t deviceUdevTags = 0);
 
     /**

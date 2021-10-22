@@ -538,7 +538,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event& event,
             touch.point.y = 0;
             break;
         }
-        case LIBINPUT_EVENT_TOUCH_MOTION:{
+        case LIBINPUT_EVENT_TOUCH_MOTION: {
             touch.point.x = libinput_event_touch_get_x(data);
             touch.point.y = libinput_event_touch_get_y(data);
             auto touchSurfaceId = WinMgr->GetTouchFocusSurfaceId();
@@ -547,7 +547,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event& event,
             WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo);
             break;
         }
-        default:{
+        default: {
             break;
         }
     }

@@ -36,33 +36,33 @@ void OHOS::MMI::StandardEventHandler::StandardTouchEvent(libinput_event& event, 
     switch (eventType) {
         case libinput_event_type::LIBINPUT_EVENT_POINTER_BUTTON: {
             PointerPressedStandard(event, data);
+            break;
         }
-        break;
 
         case libinput_event_type::LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE: {
             PointerAbsoluteStandardEvent(event, data);
+            break;
         }
-        break;
 
         case libinput_event_type::LIBINPUT_EVENT_POINTER_MOTION: {
             PointerMotionStandardEvent(event, data);
+            break;
         }
-        break;
 
         case libinput_event_type::LIBINPUT_EVENT_TABLET_TOOL_TIP: {
             TipStandardEvent(event, data);
+            break;
         }
-        break;
 
         case libinput_event_type::LIBINPUT_EVENT_TABLET_TOOL_AXIS: {
             TipMotionStandardEvent(event, data);
+            break;
         }
-        break;
 
         default: {
             data.curRventType = RET_ERR;
+            break;
         }
-        break;
     }
 }
 
@@ -123,7 +123,8 @@ void OHOS::MMI::StandardEventHandler::PointerAbsoluteStandardEvent(libinput_even
     data.time = libinput_event_pointer_get_time_usec(szPoint);
     data.x = libinput_event_pointer_get_absolute_x(szPoint);
     data.y = libinput_event_pointer_get_absolute_y(szPoint);
-    MMI_LOGT("\nEvent:time=%{public}" PRId64 ";x=%{public}f;y=%{public}f;\n***********************************************\n",
+    MMI_LOGT("\nEvent:time=%{public}" PRId64
+             ";x=%{public}f;y=%{public}f;\n***********************************************\n",
              data.time, data.x, data.y);
     if (leftButtonState_ == LIBINPUT_BUTTON_STATE_PRESSED && leftButton_ == BTN_LEFT) {
         data.msgType = LIBINPUT_EVENT_TOUCH_MOTION;
@@ -152,7 +153,8 @@ void OHOS::MMI::StandardEventHandler::PointerMotionStandardEvent(libinput_event&
     double rawY = data.y;
     data.x = libinput_event_pointer_get_dx(szPoint);
     data.y = libinput_event_pointer_get_dy(szPoint);
-    MMI_LOGT("\nEvent:time=%{public}" PRId64 ";x=%{public}f;y=%{public}f;\n********************************************\n",
+    MMI_LOGT("\nEvent:time=%{public}" PRId64
+             ";x=%{public}f;y=%{public}f;\n********************************************\n",
              data.time, data.x, data.y);
     if (leftButtonState_ == LIBINPUT_BUTTON_STATE_PRESSED && leftButton_ == BTN_LEFT) {
         data.msgType = LIBINPUT_EVENT_TOUCH_MOTION;
