@@ -41,7 +41,7 @@ ohos_source_set("mmi_connect_manager_service") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_L2:samgr_proxy",
+    "samgr_standard:samgr_proxy",
   ]
 }
 
@@ -63,6 +63,6 @@ ohos_source_set("mmi_connect_manager_proxy") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_L2:samgr_proxy",
+    "samgr_standard:samgr_proxy",
   ]
 }
