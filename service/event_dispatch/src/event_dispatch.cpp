@@ -511,8 +511,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
     int32_t testConnectState = 0;
     int32_t testBufferState = 0;
 #endif // DEBUG_CODE_TEST
-    if (AppRegs->IsMultimodeInputReady(point.time, MmiMessageId::ON_TOUCH, appInfo.fd, testConnectState,
-        testBufferState)) {
+    if (AppRegs->IsMultimodeInputReady(point.time, MmiMessageId::ON_TOUCH, appInfo.fd, testConnectState, testBufferState)) {
         struct KeyEventValueTransformations temp = {};
         temp = KeyValueTransformationByInput(point.button);
         point.button = temp.keyValueOfHos;
@@ -576,8 +575,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
                  "source=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;delta_raw.x=%{public}lf;"
                  "delta_raw.y=%{public}lf;absolute.x=%{public}lf;absolute.y=%{public}lf;discrete.x=%{public}lf;"
                  "discrete.y=%{public}lf;fd=%{public}d;abilityId=%{public}d;windowId=%{public}d;"
-                 "preHandlerTime=%{public}" PRId64 ";\n************************************"
-                 "**************************\n",
+                 "preHandlerTime=%{public}" PRId64 ";\n**************************************************************\n",
                  point.time, point.deviceType, point.deviceId, point.deviceName,
                  point.devicePhys, point.eventType, point.button, point.seat_button_count, point.axes,
                  point.state, point.source, point.delta.x, point.delta.y, point.delta_raw.x,

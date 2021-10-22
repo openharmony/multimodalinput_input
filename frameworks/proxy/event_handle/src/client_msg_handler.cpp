@@ -507,7 +507,8 @@ int32_t OHOS::MMI::ClientMsgHandler::PackedData(MultimodalEvent& multEvent, cons
                  idMsg, deviceId, fd, windowId, abilityId, uuid.c_str(), occurredTime);
         if (type == INPUT_DEVICE_CAP_KNUCKLE) {
             type = HOS_KNUCKLE;
-        } else if (type == INPUT_DEVICE_CAP_AISENSOR) {
+        }
+        else if (type == INPUT_DEVICE_CAP_AISENSOR) {
             type = HOS_AI_SPEECH;
         }
         multEvent.Initialize(windowId, 0, uuid, type, occurredTime, "", deviceId, 0, 0);
