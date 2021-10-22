@@ -117,7 +117,7 @@ namespace OHOS {
             this->env_ = env;
         }
 
-        bool JSRegisterHandle::CheckRegistered(int32_t winId, uint32_t type) 
+        bool JSRegisterHandle::CheckRegistered(int32_t winId, uint32_t type)
         {
             std::string registerHandle = std::to_string(winId) + "," + std::to_string(type);
             auto iter = g_registerMap.find(registerHandle);
@@ -160,7 +160,7 @@ namespace OHOS {
             return true;
         }
 
-        StandEventPtr JSRegisterHandle::GetEventHandle(int32_t winId, uint32_t type) 
+        StandEventPtr JSRegisterHandle::GetEventHandle(int32_t winId, uint32_t type)
         {
             std::string registerHandle = std::to_string(winId) + "," + std::to_string(type);
             auto iter = g_registerMap.find(registerHandle);
@@ -201,7 +201,8 @@ namespace OHOS {
             std::string registerHandle = std::to_string(winId) + "," + std::to_string(type);
             g_registerMap.insert(std::pair<std::string, RegisterHanldeInfo>(registerHandle, registerInfo));
             HILOG_DEBUG("JSRegisterHandle::Register: registerHandle=%{public}s", registerHandle.c_str());
-            HILOG_DEBUG("JSRegisterHandle::Register: registerMap size=%{public}d", static_cast<int32_t>(g_registerMap.size()));
+            HILOG_DEBUG("JSRegisterHandle::Register: registerMap size=%{public}d",
+                        static_cast<int32_t>(g_registerMap.size()));
             HILOG_DEBUG("JSRegisterHandle::Register: success");
             return response;
         }
@@ -222,7 +223,8 @@ namespace OHOS {
                 HILOG_DEBUG("JSRegisterHandle::Unregister: registerHandle=%{public}s", registerHandle.c_str());
                 g_registerMap.erase(iter);
             }
-            HILOG_DEBUG("JSRegisterHandle::Unregister: registerMap size=%{public}d", static_cast<int32_t>(g_registerMap.size()));
+            HILOG_DEBUG("JSRegisterHandle::Unregister: registerMap size=%{public}d",
+                        static_cast<int32_t>(g_registerMap.size()));
             HILOG_DEBUG("JSRegisterHandle::Unregister: success");
             return response;
         }
@@ -242,7 +244,8 @@ namespace OHOS {
                 HILOG_DEBUG("JSRegisterHandle::UnregisterAll: registerHandle=%{public}s", iter->first.c_str());
                 g_registerMap.erase(iter);
             }
-            HILOG_DEBUG("JSRegisterHandle::UnregisterAll: registerMap size=%{public}d", static_cast<int32_t>(g_registerMap.size()));
+            HILOG_DEBUG("JSRegisterHandle::UnregisterAll: registerMap size=%{public}d",
+                        static_cast<int32_t>(g_registerMap.size()));
             HILOG_DEBUG("JSRegisterHandle::UnregisterAll: success");
             return response;
         }

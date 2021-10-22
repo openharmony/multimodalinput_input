@@ -14,13 +14,12 @@
  */
 #include "hdf_inject_init.h"
 static DrvType index2DrvType[] = {
-    MOUSE, KEYBOARD, TOUCH, PEN, PAD, INVALD, FINGER, JOYSTICK, INVALD, INVALD, KEYBOARD,
-    SWITCH5, TRACKPAD5,GAMEPAD
+    MOUSE, KEYBOARD, TOUCH, PEN, PAD, INVALD, FINGER, JOYSTICK, INVALD, INVALD, KEYBOARD, SWITCH5, TRACKPAD5, GAMEPAD
 };
 static short arrayIds[][4] = {
     {3, 24582, 24582, 1}, {3, 24582, 24582, 1}, {3, 24582, 24582, 1}, {3, 1386, 914, 272},
-    {3, 1386, 914, 272}, {3, 1386, 914, 272}, {3, 1386, 914, 272},{3, 1386, 914, 272},
-    {3, 1386, 914, 272},{3, 1386, 914, 272}
+    {3, 1386, 914, 272}, {3, 1386, 914, 272}, {3, 1386, 914, 272}, {3, 1386, 914, 272},
+    {3, 1386, 914, 272}, {3, 1386, 914, 272}
 };
 static uint32_t arrayBits[] = {
     11, 7, 31, 27, 11, 43, 31, 1179671, 23, 31
@@ -67,7 +66,7 @@ static uint32_t arraySwBits[] = {
     0, 0, 0, 0, 0, 16384, 0, 0, 0, 0
 };
 static uint32_t arrayMscBits[] = {
-    0, 0, 16, 1, 0, 0, 16, 16 ,16, 0
+    0, 0, 16, 1, 0, 0, 16, 16, 16, 0
 };
 static uint32_t arrayFfBits[][4] = {
     {0, 0, 0, 0},
@@ -701,8 +700,8 @@ static input_absinfo arrayAxisInfo[][64] = {
         {0, 0, 255, 0, 15, 0},
         {0, 0, 255, 0, 15, 0},
         {0, 0, 255, 0, 15, 0},
-        {0, -32768, 32767, 16, 128,0},
-        {0, -32768, 32767, 16, 128,0},
+        {0, -32768, 32767, 16, 128, 0},
+        {0, -32768, 32767, 16, 128, 0},
         {0, 0, 255, 0, 15, 0},
         {0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0},

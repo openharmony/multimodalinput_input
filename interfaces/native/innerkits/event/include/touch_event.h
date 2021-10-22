@@ -162,11 +162,12 @@ public:
     * @return void
     * @since 1
     */
-    void Initialize(int32_t windowId, int32_t action, int32_t index, float forcePrecision, float maxForce, float tapCount,
-            int32_t startTime, int32_t operationState, int32_t pointerCount, fingerInfos fingersInfos[],
-            int32_t highLevelEvent, const std::string& uuid, int32_t sourceType, int32_t occurredTime, 
-            const std::string& deviceId, int32_t inputDeviceId,  bool isHighLevelEvent = false, 
-            bool isStandard = false, uint16_t deviceUdevTags = 0, int32_t deviceEventType = 0);
+    void Initialize(int32_t windowId, int32_t action, int32_t index, float forcePrecision, float maxForce,
+                    float tapCount, int32_t startTime, int32_t operationState, int32_t pointerCount,
+                    fingerInfos fingersInfos[], int32_t highLevelEvent, const std::string& uuid, int32_t sourceType,
+                    int32_t occurredTime, const std::string& deviceId, int32_t inputDeviceId,
+                    bool isHighLevelEvent = false, bool isStandard = false, uint16_t deviceUdevTags = 0,
+                    int32_t deviceEventType = 0);
 
     /**
     * initialize the object.

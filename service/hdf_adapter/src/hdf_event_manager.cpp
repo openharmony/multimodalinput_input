@@ -395,7 +395,7 @@ void OHOS::MMI::HdfEventManager::GetEventCallback(const EventPackage **pkgs, uin
     input_event eventarry[MAX_EVENT_PKG_NUM];
     for (uint32_t i = 0; i < count && i < MAX_EVENT_PKG_NUM; i++) {
         eventarry[i].code = pkgs[i]->code;
-        eventarry[i].type = (pkgs[i]->type) | (uint16_t)(devIndex<<byteSize);     // 不改变livinput结构传递，对象的index参数
+        eventarry[i].type = (pkgs[i]->type) | (uint16_t)(devIndex<<byteSize); // 不改变livinput结构传递，对象的index参数
         eventarry[i].value = pkgs[i]->value;
         eventarry[i].input_event_sec = (pkgs[i]->timestamp) / (USEC_PER_SEC);
         eventarry[i].input_event_usec = (pkgs[i]->timestamp) % (USEC_PER_SEC);
@@ -480,7 +480,8 @@ int OHOS::MMI::HdfEventManager::HdfDevHandle(int index, hdf_event_type cmd)
         if (index < MAX_INPUT_DEVICE_COUNT) {
             uint32_t ret = m_globleThis->inputInterface_->iInputManager->GetInputDevice(index, &deviceinfo);
             if (ret != 0 || (deviceinfo == nullptr)) {
-                MMI_LOGE("---- %{public}s:%{public}d inputInterface_ GetInputDevice ret =%{public}d \n", __func__, __LINE__, ret);
+                MMI_LOGE("---- %{public}s:%{public}d inputInterface_ GetInputDevice ret =%{public}d \n",
+                         __func__, __LINE__, ret);
                 return RET_ERR;
             }
             hdiuhdf->deviceinfo = (void*)deviceinfo;

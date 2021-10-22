@@ -25,14 +25,14 @@ template<class T>
 class TimeCostChk {
     static inline constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TimeCostChk" };
 public:
-    TimeCostChk(const std::string& strReason, const std::string& strOutputStr, uint32_t tmChk,
-        T llParam1, int64_t llParam2 = 0):
-        beginTime_(std::chrono::high_resolution_clock::now()),
-        strOutput_(strOutputStr),
-        strReason_(strReason),
-        uiTime_(tmChk),
-        llParam1_(static_cast<int64_t>(llParam1)),
-        llParam2_(llParam2) {
+    TimeCostChk(const std::string& strReason, const std::string& strOutputStr, uint32_t tmChk, T llParam1,
+                int64_t llParam2 = 0)
+        : beginTime_(std::chrono::high_resolution_clock::now()),
+          strOutput_(strOutputStr),
+          strReason_(strReason),
+          uiTime_(tmChk),
+          llParam1_(static_cast<int64_t>(llParam1)),
+          llParam2_(llParam2) {
     }
 
     ~TimeCostChk(void)

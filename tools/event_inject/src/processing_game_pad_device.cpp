@@ -57,7 +57,8 @@ int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const Json& inputData, std
         if ((item.find("blockTime")) != item.end()) {
             padEvent.blockTime = item.at("blockTime").get<int32_t>();
         }
-        if ((eventType == "KEY_EVENT_CLICK") || (eventType == "KEY_EVENT_PRESS") || (eventType == "KEY_EVENT_RELEASE")) {
+        if ((eventType == "KEY_EVENT_CLICK") || (eventType == "KEY_EVENT_PRESS") ||
+            (eventType == "KEY_EVENT_RELEASE")) {
             if ((item.find("keyValue")) == item.end()) {
                 MMI_LOGE("function AnalysisGamePadEvent not find keyValue On Event: %{public}s.", eventType.c_str());
                 return RET_ERR;

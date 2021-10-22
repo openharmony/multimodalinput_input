@@ -80,7 +80,6 @@ bool OuterInterface::SystemEventHandler(const KeyEventValueTransformations& trs,
         default: {
             break;
         }
-        break;
     }
     return false;
 }

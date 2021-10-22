@@ -27,9 +27,9 @@ public:
     static void TearDownTestCase(void) {}
 };
 
-class DeviceBaseDemo :public DeviceBase {
-    int32_t TransformJsonDataToInputData(const Json& fingerEventArrays,
-        InputEventArray& inputEventArray) {
+class DeviceBaseDemo : public DeviceBase {
+    int32_t TransformJsonDataToInputData(const Json& fingerEventArrays, InputEventArray& inputEventArray)
+    {
         return RET_ERR;
     }
 };

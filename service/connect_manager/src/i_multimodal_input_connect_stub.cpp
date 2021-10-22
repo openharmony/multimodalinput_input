@@ -24,8 +24,9 @@
 namespace OHOS {
 namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN,
-                                                              "IMultimodalInputConnectStub" };
+        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
+            LOG_CORE, MMI_LOG_DOMAIN, "IMultimodalInputConnectStub"
+        };
     }
 int32_t IMultimodalInputConnectStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)

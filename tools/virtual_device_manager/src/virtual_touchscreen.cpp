@@ -57,7 +57,7 @@ OHOS::MMI::VirtualTouchScreen::VirtualTouchScreen()
 
 const std::vector<uint32_t>& OHOS::MMI::VirtualTouchScreen::GetEventTypes() const
 {
-    static const std::vector<uint32_t> evTypes{
+    static const std::vector<uint32_t> evTypes {
         EV_ABS, EV_KEY
     };
     return evTypes;
@@ -65,7 +65,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTouchScreen::GetEventTypes() cons
 
 const std::vector<uint32_t>& OHOS::MMI::VirtualTouchScreen::GetKeys() const
 {
-    static const std::vector<uint32_t> keys{
+    static const std::vector<uint32_t> keys {
         BTN_TOUCH
     };
     return keys;
@@ -73,7 +73,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTouchScreen::GetKeys() const
 
 const std::vector<uint32_t>& OHOS::MMI::VirtualTouchScreen::GetProperties() const
 {
-    static const std::vector<uint32_t> properties{
+    static const std::vector<uint32_t> properties {
         INPUT_PROP_DIRECT
     };
     return properties;
