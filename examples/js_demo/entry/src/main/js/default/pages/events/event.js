@@ -104,19 +104,7 @@ export default {
     for(let type in this.eventInfo) {
       let name = this.eventInfo[type];
       console.log(`inputEventClient::onEventReg: name=${name}`)
-      let ret = inputEventClient.on(this.windowId, name, this.eventHandle);
-      let braces="{}"
-      let info =`on(${this.windowId}, '${name}', (event)=>${braces})`;
-
-      if(ret == REGISTERED_EVENT_SUCCESS){
-        this.addApiList(info,'订阅成功('+ret+')');
-      } else if (ret == REGISTERED_EVENT_EXIST) {
-        this.addApiList(info, '订阅已存在('+ret+')');
-      } else if (ret == REGISTERED_EVENT_INVALID_PARAMETER) {
-        this.addApiList(info, '订阅参数错误('+ret+')');
-      } else {
-        this.addApiList(info, '订阅参失败('+ret+')');
-      }
+      inputEventClient.on(name, this.eventHandle);      
     }
   },
 
@@ -125,19 +113,7 @@ export default {
     for(let type in this.eventInfo) {
       let name = this.eventInfo[type];
       console.log(`inputEventClient::onEventUnreg: name=${name}`)
-      let ret = inputEventClient.off(this.windowId, name, this.eventHandle);
-      let braces="{}"
-      let info =`off(${this.windowId}, '${name}', (event)=>${braces})`;
-
-      if(ret == REGISTERED_EVENT_SUCCESS){
-        this.addApiList(info,'去订阅成功('+ret+')');
-      } else if (ret == REGISTERED_EVENT_NOT_EXIST) {
-        this.addApiList(info, '去订阅不存在('+ret+')');
-      } else if (ret == REGISTERED_EVENT_INVALID_PARAMETER) {
-        this.addApiList(info, '去订阅参数错误('+ret+')');
-      } else {
-        this.addApiList(info, '去订阅失败('+ret+')');
-      }
+      inputEventClient.off(name, this.eventHandle);     
     }
   },
 
