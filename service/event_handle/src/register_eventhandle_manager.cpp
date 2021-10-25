@@ -167,7 +167,7 @@ void OHOS::MMI::RegisterEventHandleManager::RegisterEventHandleByIdMsage(const M
                                                                          const int32_t fd)
 {
     const int32_t messageIdBeginTemp = static_cast<int32_t>(idMsgBegin);
-    const int32_t messageIdEndTemp = static_cast<int32_t>(idMsgBegin);
+    const int32_t messageIdEndTemp = static_cast<int32_t>(idMsgEnd);
     for (auto it = messageIdBeginTemp + 1; it < messageIdEndTemp; it++) {
         auto tempId = static_cast<MmiMessageId>(it);
         mapRegisterManager_.insert(std::pair<MmiMessageId, int32_t>(tempId, fd));
