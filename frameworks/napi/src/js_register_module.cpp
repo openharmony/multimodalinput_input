@@ -23,11 +23,10 @@
 namespace OHOS {
     namespace MMI {
         const uint32_t EVENT_NAME_LEN = 64;
-        const uint32_t ARGC_NUM = 3;
+        const uint32_t ARGC_NUM = 2;
         const uint32_t ARGC_UT_NUM = 2;
         const uint32_t ARGV_FIRST = 0;
         const uint32_t ARGV_SECOND = 1;
-        const uint32_t ARGV_THIRD = 2;
 
         template<class T>
         static StandEventPtr CreateEvent(napi_env env)
@@ -40,31 +39,24 @@ namespace OHOS {
             size_t argc = ARGC_NUM;
             napi_value argv[ARGC_NUM] = { 0 };
             napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
-            NAPI_ASSERT(env, argc == ARGC_NUM, "GetEventInfo: requires 3 parameter");
-
-            napi_valuetype eventWinIdType = {};
-            napi_typeof(env, argv[ARGV_FIRST], &eventWinIdType);
-            NAPI_ASSERT(env, eventWinIdType == napi_number, "GetEventInfo: parameter1 is not napi_number");
+            NAPI_ASSERT(env, argc == ARGC_NUM, "GetEventInfo: requires 2 parameter");
 
             napi_valuetype eventValueType = {};
-            napi_typeof(env, argv[ARGV_SECOND], &eventValueType);
-            NAPI_ASSERT(env, eventValueType == napi_string, "GetEventInfo: parameter2 is not napi_string");
+            napi_typeof(env, argv[ARGV_FIRST], &eventValueType);
+            NAPI_ASSERT(env, eventValueType == napi_string, "GetEventInfo: parameter1 is not napi_string");
 
             napi_valuetype eventHandleType = {};
-            napi_typeof(env, argv[ARGV_THIRD], &eventHandleType);
-            NAPI_ASSERT(env, eventHandleType == napi_function, "GetEventInfo: parameter3 is not napi_function");
-
-            int32_t winId = 0;
-            napi_get_value_int32(env, argv[ARGV_FIRST], &winId);
+            napi_typeof(env, argv[ARGV_SECOND], &eventHandleType);
+            NAPI_ASSERT(env, eventHandleType == napi_function, "GetEventInfo: parameter2 is not napi_function");
 
             char eventName[EVENT_NAME_LEN] = { 0 };
             size_t typeLen = 0;
-            napi_get_value_string_utf8(env, argv[ARGV_SECOND], eventName, EVENT_NAME_LEN - 1, &typeLen);
+            napi_get_value_string_utf8(env, argv[ARGV_FIRST], eventName, EVENT_NAME_LEN - 1, &typeLen);
 
-            event.handle = argv[ARGV_THIRD];
+            event.handle = argv[ARGV_SECOND];
             event.name = eventName;
             event.type = GetHandleType(event.name);
-            event.winId = winId;
+            event.winId = 0;
             HILOG_INFO("GetEventInfo: winId=%{public}d", event.winId);
             HILOG_INFO("GetEventInfo: type=%{public}d", event.type);
             HILOG_INFO("GetEventInfo: name=%{public}s", event.name.c_str());

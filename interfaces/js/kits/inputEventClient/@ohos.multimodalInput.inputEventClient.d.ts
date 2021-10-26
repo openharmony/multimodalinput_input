@@ -39,13 +39,6 @@ declare namespace inputEventClient {
     ON_MEDIA_CONTROL = 20,
   };
   
-  enum MultimodalErrorCode {
-    MMI_STANDARD_EVENT_INVALID_PARAMETER = -1,
-    MMI_STANDARD_EVENT_SUCCESS = 1,
-    MMI_STANDARD_EVENT_EXIST = 2,
-    MMI_STANDARD_EVENT_NOT_EXIST = 3,    
-  };
-  
   export interface MultimodalEvent {
     /**
      * the UUID of the event.
@@ -93,10 +86,10 @@ declare namespace inputEventClient {
     'pause' | 'mediaControl';
 
   // 注册接口
-  function on(windowId: number, type: EventType, callback: Callback<MultimodalEvent>): number;
+  function on(type: EventType, callback: Callback<MultimodalEvent>): void;
 
   //反注册接口
-  function off(windowId: number, type: EventType, callback: Callback<MultimodalEvent>): number;
+  function off(type: EventType, callback: Callback<MultimodalEvent>): void;
 }
 
 export default inputEventClient;
