@@ -96,15 +96,16 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
         return MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
     registerEvents_.erase(registerhandle);
-
+    bool isHandleExist = false;
     StandEventMMaps::iterator it = range.first;
     for (; it != range.second; ++it) {
-        if (it->second.windowId == windowId && it->second.eventCallBack == standardizedEventHandle) {
+        if (it->second.eventCallBack == standardizedEventHandle) {
             mapEvents_.erase(it);
+            isHandleExist = true;
             break;
         }
     }
-    if (it == range.second) {
+    if (!isHandleExist) {
         MMI_LOGE("Unregistration does not exist, Unregistration failed...typeId:%{public}d,windowId:%{public}d,"
                  "errCode:%{public}d", typeId, windowId, MMI_STANDARD_EVENT_NOT_EXIST);
         return MMI_STANDARD_EVENT_NOT_EXIST;
