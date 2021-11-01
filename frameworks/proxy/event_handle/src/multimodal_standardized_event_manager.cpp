@@ -99,7 +99,7 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
 
     StandEventMMaps::iterator it = range.first;
     for (; it != range.second; ++it) {
-        if (it->second.windowId == windowId && it->second.eventCallBack == standardizedEventHandle) {
+        if (it->second.eventCallBack == standardizedEventHandle) {
             mapEvents_.erase(it);
             break;
         }
