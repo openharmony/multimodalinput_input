@@ -43,6 +43,7 @@ public:
                                               int32_t windowId, StandEventPtr standardizedEventHandle);
     int32_t GetMultimodeInputInfo();
     std::vector<EventRegesterInfo>& GetAbilityInfoVec();
+    int32_t InjectEvent(const KeyEvent& keyEvent);
 
 /**
 * Default constructor used to create a {@code MultimodalEventHandler} instance.

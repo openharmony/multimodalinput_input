@@ -207,7 +207,7 @@ namespace OHOS {
 
             KeyEvent injectEvent;
             injectEvent.Initialize(0, isPressed, keyCode, keyDownDuration, 0, "", 0, 0, "", 0, false, 0);
-            int32_t response = EventManager.InjectEvent(injectEvent);
+            int32_t response = MMIEventHdl.InjectEvent(injectEvent);
             HILOG_INFO("InjectEvent: response=%{public}d", response);
 
             if (napi_create_int32(env, response, &result) != napi_ok) {
