@@ -92,6 +92,14 @@ int32_t MultimodalEventHandler::UnregisterStandardizedEventHandle(const sptr<IRe
     return EventManager.UnregisterStandardizedEventHandle(token, windowId, standardizedEventHandle);
 }
 
+int32_t MultimodalEventHandler::InjectEvent(const KeyEvent& keyEvent)
+{
+    if (!InitClient()) {
+        return MMI_SERVICE_INVALID;
+    }
+    return EventManager.InjectEvent(keyEvent);
+}
+
 int32_t MultimodalEventHandler::GetMultimodeInputInfo()
 {
     if (!InitClient()) {
