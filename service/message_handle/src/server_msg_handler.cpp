@@ -317,7 +317,7 @@ int32_t OHOS::MMI::ServerMsgHandler::CheckReplyMessageFormClient(SessionPtr sess
     MMIEventDump->InsertFormat("MsgDump: msgId=%d fd=%d inputExpendTime=%llu(us) westonExpendTime=%d(us) "
                                "serverExpendTime=%d(us) clientExpendTime=%d(us) allTime=%d(us)", idMsg, fd,
                                waitData.inputTime, westonExpendTime, serverExpendTime, clientExpendTime, allTime);
-    MMI_LOGT("CheckReplyMessageFormClient msgId=%{public}d fd=%{public}d inputExpendTime=%{public}llu(us) "
+    MMI_LOGT("CheckReplyMessageFormClient msgId=%{public}d fd=%{public}d inputExpendTime=%{public}" PRIu64 "(us) "
              "westonExpendTime=%{public}d(us) serverExpendTime=%{public}d(us) clientExpendTime=%{public}d(us) "
              "allTime=%{public}d(us)", idMsg, fd, waitData.inputTime, westonExpendTime, serverExpendTime,
              clientExpendTime, allTime);
