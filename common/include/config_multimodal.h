@@ -15,7 +15,9 @@
 #ifndef OHOS_CONFIG_MULTIMODAL_H
 #define OHOS_CONFIG_MULTIMODAL_H
 
+#ifndef DEBUG_CODE_TEST
 #define DEBUG_CODE_TEST             // Test code build switch
+#endif
 #define DEF_SEAT_ID "seat0"         // Default libinput seat
 
 #ifndef OHOS_BUILD
@@ -41,6 +43,7 @@
 #endif
 
 #define MAX_LIST_SIZE 100                   // Instantaneous maximum listening buffer size of socket
+#define MAX_SESSON_ALARM 300                // Client quantity warning value
 #define MAX_EVENT_SIZE 100                  // Epoll create maximum event size
 #define MAX_STREAM_BUF_SIZE (1024*10)       // Maximum buffer size of socket stream
 #define MAX_PACKET_BUF_SIZE 1024            // Maximum buffer size of network packets

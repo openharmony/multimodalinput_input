@@ -67,13 +67,6 @@ int32_t MultimodalStandardizedEventManager::RegisterStandardizedEventHandle(cons
     std::string bundlerName = "EmptyBundlerName";
     std::string appName = "EmptyAppName";
     auto abilityId = *reinterpret_cast<int32_t*>(token.GetRefPtr());
-    /* 三方联调代码，token中带bundlerName和appName，本注释三方代码修改后打开
-    auto mmiToken = static_cast<IMMIToken*>(token.GetRefPtr());
-    if (mmiToken) {
-        bundlerName = mmiToken->GetBundlerName();
-        appName = mmiToken->GetName();
-    }
-    */
 
     OHOS::MMI::NetPacket ck(MmiMessageId::REGISTER_MSG_HANDLER);
     ck << messageId << abilityId << windowId << bundlerName << appName;
@@ -85,14 +78,14 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
     int32_t windowId, StandEventPtr standardizedEventHandle)
 {
     CHKR((token && standardizedEventHandle), PARAM_INPUT_INVALID, MMI_STANDARD_EVENT_INVALID_PARAMETER);
-    auto typeId = standardizedEventHandle->GetType();
-    CHKR(typeId > MmiMessageId::INVALID, VAL_NOT_EXP, MMI_STANDARD_EVENT_INVALID_PARAMETER);
-    auto range = mapEvents_.equal_range(typeId);
+    auto messageId = standardizedEventHandle->GetType();
+    CHKR(messageId > MmiMessageId::INVALID, VAL_NOT_EXP, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+    auto range = mapEvents_.equal_range(messageId);
 
     std::string registerhandle;
-    if (!MakeRegisterHandle(typeId, windowId, registerhandle)) {
+    if (!MakeRegisterHandle(messageId, windowId, registerhandle)) {
         MMI_LOGE("Invalid unregistration parameter...typeId:%{public}d,windowId:%{public}d,errCode:%{public}d",
-                 typeId, windowId, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+                 messageId, windowId, MMI_STANDARD_EVENT_INVALID_PARAMETER);
         return MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
     registerEvents_.erase(registerhandle);
@@ -107,12 +100,12 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
     }
     if (!isHandleExist) {
         MMI_LOGE("Unregistration does not exist, Unregistration failed...typeId:%{public}d,windowId:%{public}d,"
-                 "errCode:%{public}d", typeId, windowId, MMI_STANDARD_EVENT_NOT_EXIST);
+                 "errCode:%{public}d", messageId, windowId, MMI_STANDARD_EVENT_NOT_EXIST);
         return MMI_STANDARD_EVENT_NOT_EXIST;
     }
-    MMI_LOGD("Unregister app event:typeId=%{public}d;;", typeId);
+    MMI_LOGD("Unregister app event:typeId=%{public}d;;", messageId);
     OHOS::MMI::NetPacket ck(MmiMessageId::UNREGISTER_MSG_HANDLER);
-    ck << typeId;
+    ck << messageId;
     SendMsg(ck);
     return OHOS::MMI_STANDARD_EVENT_SUCCESS;
 }

@@ -335,6 +335,10 @@ bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
     CHKF(fd >= 0, VAL_NOT_EXP);
     sessionsMap_[fd] = ses;
     DumpSession("AddSession");
+    if (sessionsMap_.size() > MAX_SESSON_ALARM) {
+        MMI_LOGW("Too many clients... Warning Value:%{public}d Current Value:%{public}d",
+                 MAX_SESSON_ALARM, sessionsMap_.size());
+    }
     return true;
 }
 

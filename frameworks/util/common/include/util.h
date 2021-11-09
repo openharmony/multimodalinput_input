@@ -22,6 +22,10 @@
 #include "struct_multimodal.h"
 #include "define_multimodal.h"
 
+#ifndef IdsList
+#define IdsList std::vector<int32_t>
+#endif
+
 namespace OHOS::MMI {
     const char *GetMmiErrorTypeDesc(int32_t errorCodeEnum);
     std::string GetEnv(const std::string& name);
@@ -47,6 +51,8 @@ namespace OHOS::MMI {
     std::string GetStackInfo();
     void SetThreadName(const std::string& name);
     const std::string& GetThreadName();
+    void AddId(IdsList &list, int32_t id);
+    size_t CalculateDifference(const IdsList &list1, IdsList &list2, IdsList &difList);
 }
 
 #endif
