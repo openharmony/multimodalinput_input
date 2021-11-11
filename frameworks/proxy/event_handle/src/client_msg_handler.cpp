@@ -136,6 +136,7 @@ void OHOS::MMI::ClientMsgHandler::OnMsgHandler(const OHOS::MMI::UDSClient& clien
         MMI_LOGE("CClientMsgHandler::OnMsgHandler Unknown msg id[%{public}d].", id);
         return;
     }
+    
     uint64_t clientTime = GetSysClockTime();
     auto ret = (*fun)(client, pkt);
     if (ret < 0) {
