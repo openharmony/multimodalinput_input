@@ -167,10 +167,6 @@ bool AppRegister::IsMultimodeInputReady(MmiMessageId idMsg, const int32_t findFd
         OnAnrLocked(findFd);
         return false;
     }
-    if (!CheckConnectionIsDead(findFd)) {
-        OnAnrLocked(findFd);
-        return false;
-    }
     if (!CheckWaitQueueBlock(serverTime, timeOut, findFd)) {
         OnAnrLocked(findFd);
         return false;
