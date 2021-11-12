@@ -248,39 +248,39 @@ HWTEST_F(InputEventHandlerTest, Test_OnEventTabletTool, TestSize.Level1)
     EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
-    mmi_event = {event_, nullptr}
+    mmi_event = {event_, nullptr};
     EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
-    mmi_event = {event_, nullptr}
+    mmi_event = {event_, nullptr};
     EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
-    mmi_event = {event_, nullptr}
+    mmi_event = {event_, nullptr};
     EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
-    mmi_event = {event_, nullptr}
+    mmi_event = {event_, nullptr};
     EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
-    mmi_event = {event_, nullptr}
+    mmi_event = {event_, nullptr};
     EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
-    mmi_event = {event_, nullptr}
+    mmi_event = {event_, nullptr};
     EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
-    mmi_event = {event_, nullptr}
+    mmi_event = {event_, nullptr};
     EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
-    mmi_event = {event_, nullptr}
+    mmi_event = {event_, nullptr};
     EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
-    mmi_event = {event_, nullptr}
+    mmi_event = {event_, nullptr};
     EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
 }
 
