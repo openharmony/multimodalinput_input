@@ -22,6 +22,7 @@
 #ifdef OHOS_WESTEN_MODEL
 extern "C" {
 #include <screen_info.h>
+#include <libinput-seat-export.h>
 }
 #else
 struct SurfaceInfo {
@@ -71,6 +72,18 @@ struct SeatInfo {
     int focusWindowId;
 };
 
+struct multimodal_input_pointer_data {
+    int32_t x;
+    int32_t y;
+    int32_t sx;
+    int32_t sy;
+};
+
+struct multimodal_libinput_event {
+    struct libinput_event *event;
+    void *userdata;
+};
+
 struct SeatInfo** GetSeatsInfo(void);
 struct ScreenInfo** GetScreensInfo(void);
 void FreeSurfaceInfo(struct SurfaceInfo* pSurface);
@@ -83,8 +96,8 @@ using ScreenInfoChangeListener = void (*)();
 void SetSeatListener(const SeatInfoChangeListener listener);
 void SetScreenListener(const ScreenInfoChangeListener listener);
 
-struct libinput_event;
-typedef void (*LibInputEventListener)(struct libinput_event* event);
+struct multimodal_libinput_event;
+typedef void (*LibInputEventListener)(struct multimodal_libinput_event *event);
 namespace OHOS {
 namespace MMI {
 void SetLibInputEventListener(const LibInputEventListener listener);
