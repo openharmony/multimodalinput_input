@@ -145,11 +145,11 @@ HWTEST_F(InputEventHandlerTest, Test_OnEvent, TestSize.Level1)
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     multimodal_libinput_event mmi_event = {event_, nullptr};
-    eventHandler_.OnEvent(&mmi_event);
+    eventHandler_.OnEvent((void*)&mmi_event);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr};
-    eventHandler_.OnEvent(&mmi_event);
+    eventHandler_.OnEvent((void*)&mmi_event);
 }
 
 HWTEST_F(InputEventHandlerTest, Test_OnEventKeyboard, TestSize.Level1)
@@ -157,11 +157,11 @@ HWTEST_F(InputEventHandlerTest, Test_OnEventKeyboard, TestSize.Level1)
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     multimodal_libinput_event mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventKeyboard(&mmi_event), OHOS::KEY_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventKeyboard(mmi_event), OHOS::KEY_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventKeyboard(&mmi_event), OHOS::KEY_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventKeyboard(mmi_event), OHOS::KEY_EVENT_DISP_FAIL);
 }
 
 HWTEST_F(InputEventHandlerTest, Test_OnEventPointer_LeftButton, TestSize.Level1)
@@ -169,7 +169,7 @@ HWTEST_F(InputEventHandlerTest, Test_OnEventPointer_LeftButton, TestSize.Level1)
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     multimodal_libinput_event mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventPointer(&mmi_event), OHOS::POINT_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventPointer(mmi_event), OHOS::POINT_EVENT_DISP_FAIL);
 }
 
 HWTEST_F(InputEventHandlerTest, Test_OnEventPointer_Motion, TestSize.Level1)
@@ -177,19 +177,19 @@ HWTEST_F(InputEventHandlerTest, Test_OnEventPointer_Motion, TestSize.Level1)
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     multimodal_libinput_event mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventPointer(&mmi_event), OHOS::POINT_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventPointer(mmi_event), OHOS::POINT_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventPointer(&mmi_event), OHOS::POINT_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventPointer(mmi_event), OHOS::POINT_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventPointer(&mmi_event), OHOS::POINT_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventPointer(mmi_event), OHOS::POINT_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventPointer(&mmi_event), OHOS::POINT_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventPointer(mmi_event), OHOS::POINT_EVENT_DISP_FAIL);
 }
 
 HWTEST_F(InputEventHandlerTest, Test_OnEventPointer_Axis, TestSize.Level1)
@@ -197,11 +197,11 @@ HWTEST_F(InputEventHandlerTest, Test_OnEventPointer_Axis, TestSize.Level1)
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     multimodal_libinput_event mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventPointer(&mmi_event), OHOS::POINT_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventPointer(mmi_event), OHOS::POINT_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventPointer(&mmi_event), OHOS::POINT_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventPointer(mmi_event), OHOS::POINT_EVENT_DISP_FAIL);
 }
 
 HWTEST_F(InputEventHandlerTest, Test_OnEventTouch, TestSize.Level1)
@@ -209,35 +209,35 @@ HWTEST_F(InputEventHandlerTest, Test_OnEventTouch, TestSize.Level1)
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     multimodal_libinput_event mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventTouch(&mmi_event), OHOS::TOUCH_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventTouch(mmi_event), OHOS::TOUCH_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventTouch(&mmi_event), RET_OK);
+    EXPECT_EQ(eventHandler_.OnEventTouch(mmi_event), RET_OK);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventTouch(&mmi_event), OHOS::TOUCH_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventTouch(mmi_event), OHOS::TOUCH_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventTouch(&mmi_event), RET_OK);
+    EXPECT_EQ(eventHandler_.OnEventTouch(mmi_event), RET_OK);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventTouch(&mmi_event), OHOS::TOUCH_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventTouch(mmi_event), OHOS::TOUCH_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventTouch(&mmi_event), RET_OK);
+    EXPECT_EQ(eventHandler_.OnEventTouch(mmi_event), RET_OK);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventTouch(&mmi_event), OHOS::TOUCH_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventTouch(mmi_event), OHOS::TOUCH_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventTouch(&mmi_event), RET_OK);
+    EXPECT_EQ(eventHandler_.OnEventTouch(mmi_event), RET_OK);
 }
 
 HWTEST_F(InputEventHandlerTest, Test_OnEventTabletTool, TestSize.Level1)
@@ -245,43 +245,43 @@ HWTEST_F(InputEventHandlerTest, Test_OnEventTabletTool, TestSize.Level1)
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     multimodal_libinput_event mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventTabletTool(&mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr}
-    EXPECT_EQ(eventHandler_.OnEventTabletTool(&mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr}
-    EXPECT_EQ(eventHandler_.OnEventTabletTool(&mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr}
-    EXPECT_EQ(eventHandler_.OnEventTabletTool(&mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr}
-    EXPECT_EQ(eventHandler_.OnEventTabletTool(&mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr}
-    EXPECT_EQ(eventHandler_.OnEventTabletTool(&mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr}
-    EXPECT_EQ(eventHandler_.OnEventTabletTool(&mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr}
-    EXPECT_EQ(eventHandler_.OnEventTabletTool(&mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr}
-    EXPECT_EQ(eventHandler_.OnEventTabletTool(&mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr}
-    EXPECT_EQ(eventHandler_.OnEventTabletTool(&mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventTabletTool(mmi_event), OHOS::TABLETTOOL_EVENT_DISP_FAIL);
 }
 
 HWTEST_F(InputEventHandlerTest, Test_OnEventTabletPadKey, TestSize.Level1)
@@ -289,11 +289,11 @@ HWTEST_F(InputEventHandlerTest, Test_OnEventTabletPadKey, TestSize.Level1)
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     multimodal_libinput_event mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventTabletPadKey(&mmi_event), OHOS::TABLETPAD_KEY_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventTabletPadKey(mmi_event), OHOS::TABLETPAD_KEY_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     event mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventTabletPadKey(&mmi_event), OHOS::TABLETPAD_KEY_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventTabletPadKey(mmi_event), OHOS::TABLETPAD_KEY_EVENT_DISP_FAIL);
 }
 
 HWTEST_F(InputEventHandlerTest, Test_OnEventTabletPadRing, TestSize.Level1)
@@ -301,11 +301,11 @@ HWTEST_F(InputEventHandlerTest, Test_OnEventTabletPadRing, TestSize.Level1)
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     multimodal_libinput_event mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventTabletPad(&mmi_event), OHOS::TABLETPAD_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventTabletPad(mmi_event), OHOS::TABLETPAD_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventTabletPad(&mmi_event), OHOS::TABLETPAD_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventTabletPad(mmi_event), OHOS::TABLETPAD_EVENT_DISP_FAIL);
 }
 
 HWTEST_F(InputEventHandlerTest, Test_OnEventGesture, TestSize.Level1)
@@ -313,19 +313,19 @@ HWTEST_F(InputEventHandlerTest, Test_OnEventGesture, TestSize.Level1)
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     multimodal_libinput_event mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventGesture(&mmi_event), OHOS::GESTURE_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventGesture(mmi_event), OHOS::GESTURE_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventGesture(&mmi_event), OHOS::GESTURE_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventGesture(mmi_event), OHOS::GESTURE_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventGesture(&mmi_event), OHOS::GESTURE_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventGesture(mmi_event), OHOS::GESTURE_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventGesture(&mmi_event), OHOS::GESTURE_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventGesture(mmi_event), OHOS::GESTURE_EVENT_DISP_FAIL);
 }
 
 HWTEST_F(InputEventHandlerTest, Test_OnEventJoyStickKey, TestSize.Level1)
@@ -333,11 +333,11 @@ HWTEST_F(InputEventHandlerTest, Test_OnEventJoyStickKey, TestSize.Level1)
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     multimodal_libinput_event mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventPointer(&mmi_event), OHOS::JOYSTICK_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventPointer(mmi_event), OHOS::JOYSTICK_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventPointer(&mmi_event), OHOS::JOYSTICK_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventPointer(mmi_event), OHOS::JOYSTICK_EVENT_DISP_FAIL);
 }
 
 HWTEST_F(InputEventHandlerTest, Test_OnEventJoyStickAxis, TestSize.Level1)
@@ -345,6 +345,6 @@ HWTEST_F(InputEventHandlerTest, Test_OnEventJoyStickAxis, TestSize.Level1)
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
     multimodal_libinput_event mmi_event = {event_, nullptr};
-    EXPECT_EQ(eventHandler_.OnEventPointer(&mmi_event), OHOS::JOYSTICK_EVENT_DISP_FAIL);
+    EXPECT_EQ(eventHandler_.OnEventPointer(mmi_event), OHOS::JOYSTICK_EVENT_DISP_FAIL);
 }
 } // namespace
