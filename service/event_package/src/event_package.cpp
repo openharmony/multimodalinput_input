@@ -527,14 +527,9 @@ int32_t EventPackage::PackageTouchEvent(multimodal_libinput_event &ev,
         case LIBINPUT_EVENT_TOUCH_DOWN: {
             auto uData = static_cast<multimodal_input_pointer_data *>(ev.userdata);
             CHKR(uData, NULL_POINTER, RET_ERR);
-            touch.point.x = uData->x;
-            touch.point.y = uData->y;
-            auto touchSurfaceInfo = WinMgr->GetTouchSurfaceInfo(touch.point.x, touch.point.y);
+            auto touchSurfaceInfo = WinMgr->GetTouchSurfaceInfo(uData->x, uData->y);
             CHKR(touchSurfaceInfo, NULL_POINTER, RET_ERR);
             WinMgr->SetTouchFocusSurfaceId(touchSurfaceInfo->surfaceId);
-            CHKR(EOK == memcpy_s(&rawTouch, sizeof(EventTouch), &touch, sizeof(touch)),
-                 MEMCPY_SEC_FUN_FAIL, RET_ERR);
-            //WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo, true);
             touch.point.x = uData->sx;
             touch.point.y = uData->sy;
             MMI_LOGF("TouchDown:[x=%{public}d, y=%{public}d, sx=%{public}d, sy=%{public}d]",
@@ -549,14 +544,6 @@ int32_t EventPackage::PackageTouchEvent(multimodal_libinput_event &ev,
         case LIBINPUT_EVENT_TOUCH_MOTION: {
             auto uData = static_cast<multimodal_input_pointer_data *>(ev.userdata);
             CHKR(uData, NULL_POINTER, RET_ERR);
-            touch.point.x = uData->x;
-            touch.point.y = uData->y;
-            CHKR(EOK == memcpy_s(&rawTouch, sizeof(EventTouch), &touch, sizeof(touch)),
-                 MEMCPY_SEC_FUN_FAIL, RET_ERR);
-            //auto touchSurfaceId = WinMgr->GetTouchFocusSurfaceId();
-            //auto touchSurfaceInfo = WinMgr->GetSurfaceInfo(touchSurfaceId);
-            //CHKR(touchSurfaceInfo, NULL_POINTER, RET_ERR);
-            //WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo);
             touch.point.x = uData->sx;
             touch.point.y = uData->sy;
             MMI_LOGF("TouchMotion: [x=%{public}d, y=%{public}d, sx=%{public}d, sy=%{public}d]",
