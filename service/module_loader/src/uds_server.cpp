@@ -176,6 +176,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
     sess->SetClientFd(toReturnClientFd);
 #endif // OHOS__BUILD_MMI_DEBUG
 
+    OnConnected(sess);
     if (!AddSession(sess)) {
         cleanTaskWhenError();
         MMI_LOGE("AddSession fail.");
@@ -335,6 +336,10 @@ bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
     CHKF(fd >= 0, VAL_NOT_EXP);
     sessionsMap_[fd] = ses;
     DumpSession("AddSession");
+    if (sessionsMap_.size() > MAX_SESSON_ALARM) {
+        MMI_LOGW("Too many clients... Warning Value:%{public}d Current Value:%{public}zd",
+                 MAX_SESSON_ALARM, sessionsMap_.size());
+    }
     return true;
 }
 

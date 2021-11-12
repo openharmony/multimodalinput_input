@@ -50,7 +50,7 @@ bool OHOS::MMI::MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
     EventManager.SetClientHandle(GetPtr());
     CHKF(msgHdl->Init(), MSG_HANDLER_INIT_FAIL);
     auto msgHdlImp = static_cast<ClientMsgHandler *>(msgHdl.get());
-    CHKF(msgHdlImp, MSG_HANDLER_INIT_FAIL)
+    CHKF(msgHdlImp, MSG_HANDLER_INIT_FAIL);
     auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, msgHdlImp, std::placeholders::_1, std::placeholders::_2);
     CHKF(StartClient(callback, detachMode), START_CLI_FAIL);
 
@@ -74,11 +74,10 @@ void OHOS::MMI::MMIClient::VirtualKeyIn(RawInputEvent virtualKeyEvent)
     SendMsg(ckt);
 }
 
-void OHOS::MMI::MMIClient::ReplyMessageToServer(MmiMessageId idMsg, uint64_t time, uint64_t serverStartTime,
-    uint64_t clientEndTime, int32_t fd) const
+void OHOS::MMI::MMIClient::ReplyMessageToServer(MmiMessageId idMsg, uint64_t clientTime, uint64_t endTime) const
 {
     NetPacket ckt(MmiMessageId::CHECK_REPLY_MESSAGE);
-    ckt << idMsg << time << fd << serverStartTime << clientEndTime;
+    ckt << idMsg << clientTime << endTime;
     SendMsg(ckt);
 }
 

@@ -112,29 +112,18 @@ const CLMAP<int32_t, LayerInfo>& OHOS::MMI::InputWindowsManager::GetLayerInfo() 
     return layers_;
 }
 
-const CLMAP<int32_t, TestSurfaceInfo>& OHOS::MMI::InputWindowsManager::GetSurfaceInfo() const
+const CLMAP<int32_t, MMISurfaceInfo>& OHOS::MMI::InputWindowsManager::GetSurfaceInfo() const
 {
-    return mysurfaces_;
+    return surfaces_;
 }
 
-void OHOS::MMI::InputWindowsManager::InsertSurfaceInfo(const TestSurfaceInfo& tmpSurfaceInfo)
+void OHOS::MMI::InputWindowsManager::InsertSurfaceInfo(const MMISurfaceInfo& tmpSurfaceInfo)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    mysurfaces_.insert(std::pair<int32_t, TestSurfaceInfo>(tmpSurfaceInfo.surfaceId, tmpSurfaceInfo));
+    surfaces_.insert(std::pair<int32_t, MMISurfaceInfo>(tmpSurfaceInfo.surfaceId, tmpSurfaceInfo));
     MMI_LOGW("OnWindow InsertSurfaceInfo ChangeFocusSurfaceId old:%{public}d new:%{public}d", focusInfoID_,
              tmpSurfaceInfo.surfaceId);
     focusInfoID_ = tmpSurfaceInfo.surfaceId;
-}
-
-bool OHOS::MMI::InputWindowsManager::EraseSurfaceInfo(int32_t surfaceID)
-{
-    std::lock_guard<std::mutex> lock(mu_);
-    auto it = mysurfaces_.find(surfaceID);
-    if (it != mysurfaces_.end()) {
-        mysurfaces_.erase(it);
-        return true;
-    }
-    return false;
 }
 
 void OHOS::MMI::InputWindowsManager::PrintAllNormalSurface()
@@ -202,7 +191,7 @@ void OHOS::MMI::InputWindowsManager::PrintDebugInfo()
     }
 
     MMI_LOGT("***********window info***********");
-    for (auto& m : mysurfaces_) {
+    for (auto& m : surfaces_) {
         auto appFd = AppRegs->FindByWinId(m.second.surfaceId);
         MMI_LOGT(" -surface_id: %{public}d, on_screen_id: %{public}d, on_layer_id: %{public}d, src(xywh): [%{public}d,"
                  " %{public}d, %{public}d, %{public}d] desc(xywh): [%{public}d, %{public}d, %{public}d, %{public}d], "
@@ -218,7 +207,7 @@ size_t OHOS::MMI::InputWindowsManager::GetSurfaceIdList(IdsList& ids)
 {
     const int32_t TEST_THREE_WINDOWS = 3;
     std::lock_guard<std::mutex> lock(mu_);
-    for (auto i : mysurfaces_) {
+    for (auto i : surfaces_) {
         if (i.second.surfaceId != focusInfoID_ && TEST_THREE_WINDOWS != i.second.surfaceId) {
             ids.push_back(i.second.surfaceId);
         }
@@ -252,7 +241,8 @@ void OHOS::MMI::InputWindowsManager::Clear()
     focusInfoID_ = 0;
     screenInfoVec_.clear();
     layers_.clear();
-    mysurfaces_.clear();
+    surfaces_.clear();
+    surfacesList_.clear();
 }
 
 void OHOS::MMI::InputWindowsManager::Dump(int32_t fd)
@@ -274,8 +264,8 @@ void OHOS::MMI::InputWindowsManager::Dump(int32_t fd)
                 layer_info.second.opacity, layer_info.second.visibility,
                 layer_info.second.onScreenId, layer_info.second.nSurfaces);
     }
-    mprintf(fd, "surfaceInfos count=%zu", mysurfaces_.size());
-    for (auto& mysurface_info : mysurfaces_) {
+    mprintf(fd, "surfaceInfos count=%zu", surfaces_.size());
+    for (auto& mysurface_info : surfaces_) {
         auto appFd = AppRegs->FindByWinId(mysurface_info.second.surfaceId);
         mprintf(fd, "\tsurfaceId=%d dstX=%d dstY=%d dstW=%d dstH=%d srcX=%d"
                 "srcY=%d srcW=%d srcH=%d opacity=%f visibility=%d onLayerId=%d appFd=%d bundlerName=%s appName=%s",
@@ -303,9 +293,10 @@ void OHOS::MMI::InputWindowsManager::SaveScreenInfoToMap(const ScreenInfo** scre
     // clear windows info
     screenInfoVec_.clear();
     layers_.clear();
-    mysurfaces_.clear();
+    surfaces_.clear();
 
     // save windows info
+    IdsList surfaceList;
     for (int32_t i = 0; screenInfo[i]; i++) {
         // save screen
         screenInfoVec_.push_back(*(screenInfo[i]));
@@ -318,14 +309,27 @@ void OHOS::MMI::InputWindowsManager::SaveScreenInfoToMap(const ScreenInfo** scre
             int32_t nsurfaces = pstrLayerInfo[j]->nSurfaces;
             SurfaceInfo** pstrSurface = pstrLayerInfo[j]->surfaces;
             for (int32_t k = 0; k < nsurfaces; k++) {
-                TestSurfaceInfo mySurfaceTmp = {};
+                MMISurfaceInfo mySurfaceTmp = {};
                 CHK(EOK == memcpy_s(&mySurfaceTmp, sizeof(mySurfaceTmp), pstrSurface[k], sizeof(SurfaceInfo)),
                     MEMCPY_SEC_FUN_FAIL);
                 mySurfaceTmp.screenId = screenInfo[i]->screenId;
-                mysurfaces_.insert(std::pair<int32_t, TestSurfaceInfo>(mySurfaceTmp.surfaceId, mySurfaceTmp));
+                surfaces_.insert(std::pair<int32_t, MMISurfaceInfo>(mySurfaceTmp.surfaceId, mySurfaceTmp));
+                AddId(surfaceList, mySurfaceTmp.surfaceId);
             }
         }
     }
+    // Destroyed windows
+    if (!surfacesList_.empty()) {
+        IdsList delList;
+        auto delSize = CalculateDifference(surfacesList_, surfaceList, delList);
+        if (delSize > 0) {
+            // Processing destroyed windows
+            AppRegs->SurfacesDestroyed(delList);
+            auto winIdsStr = IdsListToString(delList, ",");
+            MMI_LOGD("InputWindowsManager Some windows were destroyed... winIds:[%{public}s]", winIdsStr.c_str());
+        }
+    }
+    surfacesList_ = surfaceList;
 }
 
 bool OHOS::MMI::InputWindowsManager::FindSurfaceByCoordinate(double x, double y, const SurfaceInfo& pstrSurface)
@@ -341,11 +345,11 @@ bool OHOS::MMI::InputWindowsManager::GetTouchSurfaceId(const double x, const dou
 {
     std::lock_guard<std::mutex> lock(mu_);
     // check map empty
-    if (!mysurfaces_.empty()) {
+    if (!surfaces_.empty()) {
         int32_t newLayerId = -1;
         int32_t newSurfaceId = -1;
-        for (auto it : mysurfaces_) {
-            auto res = static_cast<TestSurfaceInfo*>(&it.second);
+        for (auto it : surfaces_) {
+            auto res = static_cast<MMISurfaceInfo*>(&it.second);
             CHKF(res, NULL_POINTER);
             // find window by coordinate
             if (FindSurfaceByCoordinate(x, y, *res)) {
@@ -388,17 +392,17 @@ const LayerInfo* OHOS::MMI::InputWindowsManager::GetLayerInfo(int32_t layerId)
     return &it->second;
 }
 
-const TestSurfaceInfo* OHOS::MMI::InputWindowsManager::GetSurfaceInfo(int32_t sufaceId)
+const MMISurfaceInfo* OHOS::MMI::InputWindowsManager::GetSurfaceInfo(int32_t sufaceId)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    auto it = mysurfaces_.find(sufaceId);
-    if (it == mysurfaces_.end()) {
+    auto it = surfaces_.find(sufaceId);
+    if (it == surfaces_.end()) {
         return nullptr;
     }
     return &it->second;
 }
 
-bool OHOS::MMI::InputWindowsManager::CheckFocusSurface(double x, double y, const TestSurfaceInfo& info) const
+bool OHOS::MMI::InputWindowsManager::CheckFocusSurface(double x, double y, const MMISurfaceInfo& info) const
 {
     if (x >= info.dstX && x <= (info.dstX + info.dstW) &&
         y >= info.dstY && y <= (info.dstY + info.dstH)) {
@@ -407,12 +411,12 @@ bool OHOS::MMI::InputWindowsManager::CheckFocusSurface(double x, double y, const
     return false;
 }
 
-const TestSurfaceInfo* OHOS::MMI::InputWindowsManager::GetTouchSurfaceInfo(double x, double y)
+const MMISurfaceInfo* OHOS::MMI::InputWindowsManager::GetTouchSurfaceInfo(double x, double y)
 {
     std::lock_guard<std::mutex> lock(mu_);
     int32_t newLayerId = -1;
-    const TestSurfaceInfo* surfacePtr = nullptr;
-    for (auto& it : mysurfaces_) {
+    const MMISurfaceInfo* surfacePtr = nullptr;
+    for (auto& it : surfaces_) {
         // find window by coordinate
         if (CheckFocusSurface(x, y, it.second) && it.second.onLayerId >= newLayerId) {
             newLayerId = it.second.onLayerId;
@@ -424,7 +428,7 @@ const TestSurfaceInfo* OHOS::MMI::InputWindowsManager::GetTouchSurfaceInfo(doubl
     return surfacePtr;
 }
 
-void OHOS::MMI::InputWindowsManager::TransfromToSurfaceCoordinate(double& x, double& y, const TestSurfaceInfo& info,
+void OHOS::MMI::InputWindowsManager::TransfromToSurfaceCoordinate(double& x, double& y, const MMISurfaceInfo& info,
                                                                   bool debug)
 {
     double oldX = x;

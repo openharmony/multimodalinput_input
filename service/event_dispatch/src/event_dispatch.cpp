@@ -158,12 +158,8 @@ int32_t OHOS::MMI::EventDispatch::RegisteredEventDispatch(const MmiMessageId& id
             MMI_LOGE("Send event to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
         }
 #endif  // OHOS_AUTO_TEST_FRAME
-#ifdef DEBUG_CODE_TEST
-        int32_t testConnectState = 0;
-        int32_t testBufferState = 0;
-#endif // DEBUG_CODE_TEST
-        if (AppRegs->IsMultimodeInputReady(registeredEvent.occurredTime,
-                                           idMsg, fd, testConnectState, testBufferState)) {
+
+        if (AppRegs->IsMultimodeInputReady(idMsg, fd, registeredEvent.occurredTime, preHandlerTime)) {
             NetPacket newPacket(idMsg);
             int32_t type = inputDeviceType;
             newPacket << type << registeredEvent << fd << appInfo.windowId << appInfo.abilityId << preHandlerTime;
@@ -284,24 +280,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, l
              tabletPad.ring.source, tabletPad.strip.number, tabletPad.strip.position, tabletPad.strip.source,
              appInfo.fd, appInfo.abilityId, focusId, preHandlerTime);
 
-#ifdef DEBUG_CODE_TEST
-    if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_NOWINDOW)) {
-        WinMgr->SetFocusSurfaceId(RET_ERR);
-    }
-#endif // DEBUG_CODE_TEST
-    int32_t testConnectState = 0;
-    int32_t testBufferState = 0;
-#ifdef DEBUG_CODE_TEST
-    if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_NOFD)) {
-        appInfo.fd = RET_ERR;
-    } else if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_CONNECTDEAD)) {
-        testConnectState = RET_ERR;
-    } else if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_BUFFERFULL)) {
-        testBufferState = RET_ERR;
-    }
-#endif // DEBUG_CODE_TEST
-    if (AppRegs->IsMultimodeInputReady(tabletPad.time, MmiMessageId::ON_TOUCH, appInfo.fd,
-        testConnectState, testBufferState)) {
+    if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, tabletPad.time, preHandlerTime)) {
         NetPacket newPacket(MmiMessageId::ON_TOUCH);
         int32_t inputType = INPUT_DEVICE_CAP_TOUCH_PAD;
         newPacket << inputType << tabletPad << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
@@ -354,12 +333,8 @@ int32_t OHOS::MMI::EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, li
         MMI_LOGE("Send event to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
     }
 #endif  // OHOS_AUTO_TEST_FRAME
-#ifdef DEBUG_CODE_TEST
-    int32_t testConnectState = 0;
-    int32_t testBufferState = 0;
-#endif // DEBUG_CODE_TEST
-    if (AppRegs->IsMultimodeInputReady(eventJoyStickAxis.time, MmiMessageId::ON_TOUCH, appInfo.fd,
-        testConnectState, testBufferState)) {
+
+    if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, eventJoyStickAxis.time, preHandlerTime)) {
         NetPacket newPacket(MmiMessageId::ON_TOUCH);
         int32_t inputType = INPUT_DEVICE_CAP_JOYSTICK;
         newPacket << inputType << eventJoyStickAxis << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
@@ -395,20 +370,8 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, 
         MMI_LOGE("Send event to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
     }
 #endif  // OHOS_AUTO_TEST_FRAME
-    int32_t testConnectState = 0;
-    int32_t testBufferState = 0;
-#ifdef DEBUG_CODE_TEST
-    if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_NOFD)) {
-        appInfo.fd = RET_ERR;
-    } else if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_CONNECTDEAD)) {
-        testConnectState = RET_ERR;
-    } else if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_BUFFERFULL)) {
-        testBufferState = RET_ERR;
-    }
-#endif // DEBUG_CODE_TEST
-
-    if (AppRegs->IsMultimodeInputReady(tableTool.time, MmiMessageId::ON_TOUCH, appInfo.fd, testConnectState,
-        testBufferState)) {
+    
+    if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, tableTool.time, preHandlerTime)) {
         NetPacket newPacket(MmiMessageId::ON_TOUCH);
         int32_t inputType = INPUT_DEVICE_CAP_TABLET_TOOL;
         newPacket << inputType << inputEvent.curRventType << tableTool << appInfo.abilityId
@@ -507,11 +470,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
     }
 #endif  // OHOS_AUTO_TEST_FRAME
 
-#ifdef DEBUG_CODE_TEST
-    int32_t testConnectState = 0;
-    int32_t testBufferState = 0;
-#endif // DEBUG_CODE_TEST
-    if (AppRegs->IsMultimodeInputReady(point.time, MmiMessageId::ON_TOUCH, appInfo.fd, testConnectState, testBufferState)) {
+    if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, point.time, preHandlerTime)) {
         struct KeyEventValueTransformations temp = {};
         temp = KeyValueTransformationByInput(point.button);
         point.button = temp.keyValueOfHos;
@@ -652,11 +611,8 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
              gesture.eventType, gesture.fingerCount, gesture.cancelled, gesture.delta.x, gesture.delta.y,
              gesture.deltaUnaccel.x, gesture.deltaUnaccel.y, appInfo.fd, appInfo.abilityId, focusId, preHandlerTime);
     PrintEventSlotedCoordsInfo(gesture.soltTouches);
-#ifdef DEBUG_CODE_TEST
-    int32_t testConnectState = 0;
-    int32_t testBufferState = 0;
-#endif // DEBUG_CODE_TEST
-    if (AppRegs->IsMultimodeInputReady(gesture.time, MmiMessageId::ON_TOUCH, appInfo.fd, testConnectState, testBufferState)) {
+
+    if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, gesture.time, preHandlerTime)) {
         NetPacket newPacket(MmiMessageId::ON_TOUCH);
         int32_t inputType = INPUT_DEVICE_CAP_GESTURE;
         newPacket << inputType << gesture << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
@@ -710,18 +666,8 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
     MMI_LOGT("\nCALL_AMS:windowId = ''\n");
     MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
 #endif
-    int32_t testConnectState = 0;
-    int32_t testBufferState = 0;
-#ifdef DEBUG_CODE_TEST
-    if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_NOFD)) {
-        appInfo.fd = RET_ERR;
-    } else if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_CONNECTDEAD)) {
-        testConnectState = RET_ERR;
-    } else if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_BUFFERFULL)) {
-        testBufferState = RET_ERR;
-    }
-#endif // DEBUG_CODE_TEST
-    if (AppRegs->IsMultimodeInputReady(touch.time, MmiMessageId::ON_TOUCH, appInfo.fd, testConnectState, testBufferState)) {
+
+    if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, touch.time, preHandlerTime)) {
         NetPacket newPacket(MmiMessageId::ON_TOUCH);
         int32_t fingerCount = MMIRegEvent->GetTouchInfoSizeByDeviceId(touch.deviceId);
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
@@ -902,11 +848,6 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
         }
     }
 
-#ifdef DEBUG_CODE_TEST
-    if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_NOWINDOW)) {
-        WinMgr->SetFocusSurfaceId(RET_ERR);
-    }
-#endif // DEBUG_CODE_TEST
     auto focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
         return RET_OK;
@@ -948,20 +889,9 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
     }
 #endif  // OHOS_AUTO_TEST_FRAME
 
-    int32_t testConnectState = 0;
-    int32_t testBufferState = 0;
-#ifdef DEBUG_CODE_TEST
-    if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_NOFD)) {
-        appInfo.fd = RET_ERR;
-    } else if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_CONNECTDEAD)) {
-        testConnectState = RET_ERR;
-    } else if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_BUFFERFULL)) {
-        testBufferState = RET_ERR;
-    }
-#endif // DEBUG_CODE_TEST
-    if (AppRegs->IsMultimodeInputReady(key.time, MmiMessageId::ON_KEY, appInfo.fd, testConnectState, testBufferState)) {
+    if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, appInfo.fd, key.time, preHandlerTime)) {
         NetPacket newPkt(MmiMessageId::ON_KEY);
-        newPkt << key << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
+        newPkt << key << appInfo.abilityId << focusId << preHandlerTime;
         if (!udsServer.SendMsg(appInfo.fd, newPkt)) {
             MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d\n", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
