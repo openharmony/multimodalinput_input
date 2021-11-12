@@ -292,7 +292,7 @@ HWTEST_F(InputEventHandlerTest, Test_OnEventTabletPadKey, TestSize.Level1)
     EXPECT_EQ(eventHandler_.OnEventTabletPadKey(mmi_event), OHOS::TABLETPAD_KEY_EVENT_DISP_FAIL);
     event_ = libinput_get_event(input_);
     EXPECT_TRUE(event_);
-    event mmi_event = {event_, nullptr};
+    mmi_event = {event_, nullptr};
     EXPECT_EQ(eventHandler_.OnEventTabletPadKey(mmi_event), OHOS::TABLETPAD_KEY_EVENT_DISP_FAIL);
 }
 
