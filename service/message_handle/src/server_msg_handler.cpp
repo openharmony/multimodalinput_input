@@ -192,29 +192,32 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterAppInfo(SessionPtr sess, NetPacke
     std::string appName;
     int32_t fd = sess->GetFd();
     pkt >> abilityId >> windowId >> bundlerName >> appName;
-    struct AppInfo appInfo = { abilityId, windowId, fd, bundlerName, appName };
-
-    AppRegs->RegisterAppInfoforServer(appInfo);
+    struct AppInfo appInfo = {abilityId, windowId, fd, bundlerName, appName};
+    if (windowId <= 0) {
+        MMI_LOGW("OnRegisterAppInfo Subscription event window ID cannot be 0 ... abilityId:%{public}d "
+                 "winId:%{public}d", abilityId, windowId);
+    } else {
+        AppRegs->RegisterAppInfoforServer(appInfo);
 #if !defined(OHOS_BUILD) || !defined(OHOS_WESTEN_MODEL)
-    WinMgr->SetFocusSurfaceId(windowId);
+        WinMgr->SetFocusSurfaceId(windowId);
 #endif
+    }
     MMI_LOGD("OnRegisterAppInfo abilityId:%{public}d winId:%{public}d fd:%{public}d bundlerName:%{public}s "
              "appName:%{public}s", abilityId, windowId, fd, bundlerName.c_str(), appName.c_str());
 
 #ifdef OHOS_AUTO_TEST_FRAME
-    if (!AppRegs->AutoTestGetAutoTestFd()) {
-        return RET_OK;
-    }
-    std::vector<AutoTestClientListPkt> clientListPkt;
-    AppRegs->AutoTestGetAllAppInfo(clientListPkt);
-    uint32_t sizeOfList = static_cast<uint32_t>(clientListPkt.size());
-    NetPacket pktAutoTest(MmiMessageId::ST_MESSAGE_CLISTPKT);
-    pktAutoTest << sizeOfList;
-    for (auto it = clientListPkt.begin(); it != clientListPkt.end(); it++) {
-        pktAutoTest << *it;
-    }
-    if (!udsServer_->SendMsg(AppRegs->AutoTestGetAutoTestFd(), pktAutoTest)) {
-        MMI_LOGE("Send ClientList massage failed to auto-test frame !\n");
+    if (AppRegs->AutoTestGetAutoTestFd()) {
+        std::vector<AutoTestClientListPkt> clientListPkt;
+        AppRegs->AutoTestGetAllAppInfo(clientListPkt);
+        uint32_t sizeOfList = static_cast<uint32_t>(clientListPkt.size());
+        NetPacket pktAutoTest(MmiMessageId::ST_MESSAGE_CLISTPKT);
+        pktAutoTest << sizeOfList;
+        for (auto it = clientListPkt.begin(); it != clientListPkt.end(); it++) {
+            pktAutoTest << *it;
+        }
+        if (!udsServer_->SendMsg(AppRegs->AutoTestGetAutoTestFd(), pktAutoTest)) {
+            MMI_LOGE("Send ClientList massage failed to auto-test frame !\n");
+        }
     }
 #endif  // OHOS_AUTO_TEST_FRAME
     return RET_OK;
@@ -246,14 +249,14 @@ int32_t OHOS::MMI::ServerMsgHandler::OnUnregisterMsgHandler(SessionPtr sess, Net
     MmiMessageId messageId = MmiMessageId::INVALID;
     int32_t fd = sess->GetFd();
     pkt >> messageId;
-    RegEventHM->UnregisterEventHandleManager(messageId, fd);
+    RegEventHM->UnregisterEvent(messageId, fd);
     return RET_OK;
 }
 
 int32_t OHOS::MMI::ServerMsgHandler::OnWindow(SessionPtr sess, NetPacket& pkt)
 {
     CHKR(udsServer_, NULL_POINTER, RET_ERR);
-    TestSurfaceInfo surfaces = {};
+    MMISurfaceInfo surfaces = {};
     TestSurfaceData mysurfaceInfo = {};
     pkt >> mysurfaceInfo;
     surfaces.opacity = mysurfaceInfo.opacity;
@@ -294,25 +297,30 @@ int32_t OHOS::MMI::ServerMsgHandler::OnDump(SessionPtr sess, NetPacket& pkt)
 
 int32_t OHOS::MMI::ServerMsgHandler::CheckReplyMessageFormClient(SessionPtr sess, NetPacket& pkt)
 {
-    uint64_t time = 0;
-    int32_t fd = 0;
     int32_t idMsg = 0;
-    uint64_t serverStartTime = 0;
-    uint64_t clientEndTime = 0;
-    pkt >> idMsg >> time >> fd >> serverStartTime >> clientEndTime;
+    uint64_t clientTime = 0;
+    uint64_t endTime = 0;
+    pkt >> idMsg >> clientTime >> endTime;
+    int32_t fd = sess->GetFd();
+    auto waitData = AppRegs->GetWaitQueueEvent(fd, idMsg);
+    if (waitData.inputTime <= 0) {
+        return RET_OK; //未使用的ANR消息不处理
+    }
+    AppRegs->DeleteEventFromWaitQueue(fd, idMsg);
 
     // add msg to dump
-    int32_t westonTime = serverStartTime - time;
-    int32_t mmiTime = clientEndTime - serverStartTime;
-    MMIEventDump->InsertFormat("MsgDump: msgId=%d fd=%d inputTime=%llu(us) westonTime=%d(us) mmiTime=%d(us)",
-                               idMsg, fd, time, westonTime, mmiTime);
-
-#ifdef DEBUG_CODE_TEST
-    if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_QUEUEBLOCK)) {
-        return RET_OK;
-    }
-#endif // DEBUG_CODE_TEST
-    AppRegs->DeleteEventFromWaitQueue(time, fd);
+    auto curTime = GetSysClockTime();
+    int32_t westonExpendTime = static_cast<int32_t>(waitData.westonTime - waitData.inputTime);
+    int32_t serverExpendTime = static_cast<int32_t>(waitData.serverTime - waitData.westonTime);
+    int32_t clientExpendTime = static_cast<int32_t>(endTime - clientTime);
+    int32_t allTime = static_cast<int32_t>(curTime - waitData.westonTime);
+    MMIEventDump->InsertFormat("MsgDump: msgId=%d fd=%d inputExpendTime=%llu(us) westonExpendTime=%d(us) "
+                               "serverExpendTime=%d(us) clientExpendTime=%d(us) allTime=%d(us)", idMsg, fd,
+                               waitData.inputTime, westonExpendTime, serverExpendTime, clientExpendTime, allTime);
+    MMI_LOGT("CheckReplyMessageFormClient msgId=%{public}d fd=%{public}d inputExpendTime=%{public}" PRIu64 "(us) "
+             "westonExpendTime=%{public}d(us) serverExpendTime=%{public}d(us) clientExpendTime=%{public}d(us) "
+             "allTime=%{public}d(us)", idMsg, fd, waitData.inputTime, westonExpendTime, serverExpendTime,
+             clientExpendTime, allTime);
     return RET_OK;
 }
 
@@ -364,11 +372,6 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
     if (key.key == HOS_KEY_HOME || key.key == HOS_KEY_VIRTUAL_MULTITASK) {
         return RET_OK;
     }
-#ifdef DEBUG_CODE_TEST
-    if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_NOWINDOW)) {
-        WinMgr->SetFocusSurfaceId(RET_ERR);
-    }
-#endif // DEBUG_CODE_TEST
     int32_t focusId = WinMgr->GetFocusSurfaceId();
     CHKR(!(focusId < 0), FOCUS_ID_OBTAIN_FAIL, FOCUS_ID_OBTAIN_FAIL);
     auto appInfo = AppRegs->FindByWinId(focusId);
@@ -383,20 +386,9 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
              appInfo.abilityId, WinMgr->GetSurfaceIdListString().c_str(), focusId);
 #endif
 
-    int32_t testConnectState = 0;
-    int32_t testBufferState = 0;
-#ifdef DEBUG_CODE_TEST
-    if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_NOFD)) {
-        appInfo.fd = RET_ERR;
-    } else if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_CONNECTDEAD)) {
-        testConnectState = RET_ERR;
-    } else if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_BUFFERFULL)) {
-        testBufferState = RET_ERR;
-    }
-#endif // DEBUG_CODE_TEST
-    if (AppRegs->IsMultimodeInputReady(key.time, MmiMessageId::ON_KEY, appInfo.fd, testConnectState, testBufferState)) {
+    if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, appInfo.fd, key.time)) {
         NetPacket pkt2(MmiMessageId::ON_KEY);
-        pkt2 << key << appInfo.abilityId << focusId << appInfo.fd;
+        pkt2 << key << appInfo.abilityId << focusId << appInfo.fd << key.time;
         if (!udsServer_->SendMsg(appInfo.fd, pkt2)) {
             MMI_LOGE("Sending structure of EventKeyboard failed!\n");
             return MSG_SEND_FAIL;

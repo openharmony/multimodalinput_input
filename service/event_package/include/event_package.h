@@ -15,6 +15,7 @@
 #ifndef OHOS_EVENT_PACKAGE_H
 #define OHOS_EVENT_PACKAGE_H
 #include "window_switch.h"
+#include "input_windows_manager.h"
 #include "uds_server.h"
 #include "util.h"
 
@@ -34,9 +35,9 @@ namespace OHOS::MMI {
         int32_t PackageDeviceManageEvent(libinput_event& event, DeviceManage& deviceManage, UDSServer& udsServer);
         int32_t PackageKeyEvent(libinput_event& event, EventKeyboard& key, UDSServer& udsServer);
         int32_t PackageGestureEvent(libinput_event& event, EventGesture& gesture, UDSServer& udsServer);
-        int32_t PackagePointerEvent(libinput_event& event, EventPointer& point,
+        int32_t PackagePointerEvent(multimodal_libinput_event &ev, EventPointer& point,
             WindowSwitch& windowSwitch, UDSServer& udsServer);
-        int32_t PackageTouchEvent(libinput_event& event, EventTouch& touch, WindowSwitch& windowSwitch,
+        int32_t PackageTouchEvent(multimodal_libinput_event &ev, EventTouch& touch, WindowSwitch& windowSwitch,
             UDSServer& udsServer);
         int32_t PackageJoyStickAxisEvent(libinput_event& event, EventJoyStickAxis& eventJoyStickAxis,
             UDSServer& udsServer);

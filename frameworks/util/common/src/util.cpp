@@ -89,7 +89,7 @@ int64_t GetMicrotime()
 uint64_t GetSysClockTime()
 {
     const int32_t conversionStep = 1000;
-    struct timespec ts = { 0, 0 };
+    struct timespec ts = {0, 0};
 
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
         MMI_LOGT("clock_gettime failed: %{public}s\n", strerror(errno));
@@ -401,5 +401,36 @@ const std::string& GetThreadName()
 
     return threadName;
 }
+
+void AddId(IdsList &list, int32_t id)
+{
+    if (id <= 0) {
+        return;
+    }
+    auto it = std::find(list.begin(), list.end(), id);
+    if (it != list.end()) {
+        return;
+    }
+    list.push_back(id);
+}
+
+size_t CalculateDifference(const IdsList &list1, IdsList &list2, IdsList &difList)
+{
+    if (list1.empty()) {
+        difList = list2;
+        return difList.size();
+    }
+    if (list2.empty()) {
+        difList = list1;
+        return difList.size();
+    }
+    IdsList l1 = list1;
+    std::sort(l1.begin(), l1.end());
+    IdsList l2 = list2;
+    std::sort(l2.begin(), l2.end());
+    std::set_difference(l1.begin(), l1.end(), l2.begin(), l2.end(), std::back_inserter(difList));
+    return difList.size();
+}
+
 }
 }

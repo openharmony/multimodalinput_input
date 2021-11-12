@@ -22,6 +22,7 @@
 #ifdef OHOS_WESTEN_MODEL
 extern "C" {
 #include <screen_info.h>
+#include <libinput-seat-export.h>
 }
 #else
 struct SurfaceInfo {
@@ -71,11 +72,23 @@ struct SeatInfo {
     int focusWindowId;
 };
 
+struct multimodal_input_pointer_data {
+    int32_t x;
+    int32_t y;
+    int32_t sx;
+    int32_t sy;
+};
+
+struct multimodal_libinput_event {
+    struct libinput_event *event;
+    void *userdata;
+};
+
 struct SeatInfo** GetSeatsInfo(void);
 struct ScreenInfo** GetScreensInfo(void);
-void FreeSurfaceInfo(const struct SurfaceInfo* pSurface);
-void FreeLayerInfo(const struct LayerInfo* pLayer);
-void FreeScreenInfo(const struct ScreenInfo* pScreen);
+void FreeSurfaceInfo(struct SurfaceInfo* pSurface);
+void FreeLayerInfo(struct LayerInfo* pLayer);
+void FreeScreenInfo(struct ScreenInfo* pScreen);
 void FreeScreensInfo(struct ScreenInfo** screens);
 void FreeSeatsInfo(struct SeatInfo** seats);
 using SeatInfoChangeListener = void (*)();
@@ -83,8 +96,8 @@ using ScreenInfoChangeListener = void (*)();
 void SetSeatListener(const SeatInfoChangeListener listener);
 void SetScreenListener(const ScreenInfoChangeListener listener);
 
-struct libinput_event;
-typedef void (*LibInputEventListener)(struct libinput_event* event);
+struct multimodal_libinput_event;
+typedef void (*LibInputEventListener)(struct multimodal_libinput_event *event);
 namespace OHOS {
 namespace MMI {
 void SetLibInputEventListener(const LibInputEventListener listener);
@@ -92,7 +105,7 @@ void SetLibInputEventListener(const LibInputEventListener listener);
 }
 #endif
 
-struct TestSurfaceInfo : public SurfaceInfo {
+struct MMISurfaceInfo : public SurfaceInfo {
     int32_t screenId;
 };
 
@@ -109,10 +122,10 @@ public:
 
     const ScreenInfo* GetScreenInfo(int32_t screenId);
     const LayerInfo* GetLayerInfo(int32_t layerId);
-    const TestSurfaceInfo* GetSurfaceInfo(int32_t sufaceId);
-    bool CheckFocusSurface(double x, double y, const TestSurfaceInfo& info) const;
-    const TestSurfaceInfo* GetTouchSurfaceInfo(double x, double y);
-    void TransfromToSurfaceCoordinate(double& x, double& y, const TestSurfaceInfo& info, bool debug = false);
+    const MMISurfaceInfo* GetSurfaceInfo(int32_t sufaceId);
+    bool CheckFocusSurface(double x, double y, const MMISurfaceInfo& info) const;
+    const MMISurfaceInfo* GetTouchSurfaceInfo(double x, double y);
+    void TransfromToSurfaceCoordinate(double& x, double& y, const MMISurfaceInfo& info, bool debug = false);
 
     bool GetTouchSurfaceId(const double x, const double y, std::vector<int32_t>& ids);
 
@@ -120,11 +133,9 @@ public:
 
     const CLMAP<int32_t, LayerInfo>& GetLayerInfo() const;
 
-    const CLMAP<int32_t, TestSurfaceInfo>& GetSurfaceInfo() const;
+    const CLMAP<int32_t, MMISurfaceInfo>& GetSurfaceInfo() const;
 
-    void InsertSurfaceInfo(const TestSurfaceInfo& tmpSurfaceInfo);
-
-    bool EraseSurfaceInfo(int32_t surfaceID);
+    void InsertSurfaceInfo(const MMISurfaceInfo& tmpSurfaceInfo);
 
     void PrintAllNormalSurface();
 
@@ -151,9 +162,10 @@ private:
     struct ScreenInfo **screensInfo_ = nullptr;
     int32_t focusInfoID_ = 0;
     int32_t touchFocusId_ = 0;
+    IdsList surfacesList_; // surfaces ids list
     std::vector<struct ScreenInfo> screenInfoVec_ = {};
     CLMAP<int32_t, struct LayerInfo> layers_ = {};
-    CLMAP<int32_t, struct TestSurfaceInfo> mysurfaces_ = {};
+    CLMAP<int32_t, struct MMISurfaceInfo> surfaces_ = {};
     UDSServer* udsServer_ = nullptr;
 };
 }

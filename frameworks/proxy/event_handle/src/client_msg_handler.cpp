@@ -136,11 +136,15 @@ void OHOS::MMI::ClientMsgHandler::OnMsgHandler(const OHOS::MMI::UDSClient& clien
         MMI_LOGE("CClientMsgHandler::OnMsgHandler Unknown msg id[%{public}d].", id);
         return;
     }
+    
+    uint64_t clientTime = GetSysClockTime();
     auto ret = (*fun)(client, pkt);
     if (ret < 0) {
         MMI_LOGE("CClientMsgHandler::OnMsgHandler Msg handling failed. id[%{public}d] ret[%{public}d]", id, ret);
         return;
     }
+    uint64_t endTime = GetSysClockTime();
+    ((MMIClient *)&client)->ReplyMessageToServer(pkt.GetMsgId(), clientTime, endTime);
 }
 
 int32_t OHOS::MMI::ClientMsgHandler::OnKey(const UDSClient& client, NetPacket& pkt)
@@ -155,9 +159,6 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKey(const UDSClient& client, NetPacket& p
              "deviceType=%{public}u;seat_key_count=%{public}u;state=%{public}d;abilityId=%{public}d;"
              "windowId=%{public}d;fd=%{public}d\n*************************************************************\n",
              key.time, key.key, key.deviceId, key.deviceType, key.seat_key_count, key.state, abilityId, windowId, fd);
-
-    uint64_t clientEndTime = GetSysClockTime();
-    ((MMIClient *)&client)->ReplyMessageToServer(pkt.GetMsgId(), key.time, serverStartTime, clientEndTime, fd);
 
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!
@@ -525,9 +526,6 @@ int32_t OHOS::MMI::ClientMsgHandler::PackedData(MultimodalEvent& multEvent, cons
                      "\n**************************************************************\n",
                      data.occurredTime, data.eventType, data.deviceId, fd, abilityId, windowId);
         }
-        uint64_t clientEndTime = GetSysClockTime();
-        ((MMIClient *)&client)->ReplyMessageToServer(pkt.GetMsgId(), data.occurredTime, serverStartTime,
-            clientEndTime, fd);
         multEvent.Initialize(windowId, 0, data.uuid, data.eventType, data.occurredTime, "", data.deviceId, 0,
             data.deviceType);
     }
@@ -604,7 +602,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, Ne
              pointData.seat_button_count, pointData.axes, pointData.state, pointData.source, pointData.delta.x,
              pointData.delta.y, pointData.delta_raw.x, pointData.delta_raw.y, pointData.absolute.x,
              pointData.absolute.y, pointData.discrete.x, pointData.discrete.y, fd, abilityId, windowId);
-    ((MMIClient*)&client)->ReplyMessageToServer(pkt.GetMsgId(), pointData.time, serverStartTime, GetSysClockTime(), fd);
 
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!
@@ -658,7 +655,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, Ne
     int32_t fingerCount = 0;
     int32_t eventAction = 0;
     uint64_t serverStartTime = 0;
-    uint64_t clientEndTime = 0;
     EventTouch touchData = {};
     MmiPoint mmiPoint;
     pkt >> fingerCount >> eventAction >> abilityId >> windowId >> fd >> serverStartTime;
@@ -695,9 +691,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, Ne
         touchData.uuid, touchData.eventType, static_cast<int32_t>(touchData.time), "",
         static_cast<int32_t>(touchData.deviceId), 0, false, touchData.deviceType, deviceEventType);
 
-    clientEndTime = GetSysClockTime();
-    ((MMIClient*)&client)->ReplyMessageToServer(pkt.GetMsgId(), touchData.time, serverStartTime, clientEndTime, fd);
-
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!
     const AutoTestClientPkt autoTestClientTouchPkt = {
@@ -719,7 +712,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisJoystickEvent(const UDSClient& client,
     int32_t deviceEventType = 0;
     std::string nullUUid = "";
     uint64_t serverStartTime = 0;
-    uint64_t clientEndTime = 0;
     MmiPoint mmiPoint;
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EVENT_MOUSE);
     CHK(mousePtr, NULL_POINTER);
@@ -728,10 +720,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisJoystickEvent(const UDSClient& client,
              "event JoyStick: fd: %{public}d, abilityId: %{public}d ,windowId: %{public}d\n",
              fd, abilityId, windowId);
     PrintEventJoyStickAxisInfo(eventJoyStickData, fd, abilityId, windowId, serverStartTime);
-    // multimodal ANR
-    clientEndTime = GetSysClockTime();
-    ((MMIClient*)&client)->ReplyMessageToServer(pkt.GetMsgId(), eventJoyStickData.time, serverStartTime,
-        clientEndTime, fd);
 
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!
@@ -762,7 +750,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client,
     int32_t windowId = 0;
     int32_t fd = 0;
     uint64_t serverStartTime = 0;
-    uint64_t clientEndTime = 0;
     int32_t touchAction = 0;
     int32_t deviceEventType = 0;
     MmiPoint mmiPoint;
@@ -780,10 +767,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client,
              tabletPad.time, tabletPad.deviceType, tabletPad.deviceId, tabletPad.deviceName, tabletPad.eventType,
              tabletPad.ring.number, tabletPad.ring.position, tabletPad.ring.source, tabletPad.strip.number,
              tabletPad.strip.position, tabletPad.strip.source, fd, abilityId, windowId, serverStartTime);
-
-    // multimodal ANR
-    clientEndTime = GetSysClockTime();
-    ((MMIClient*)&client)->ReplyMessageToServer(pkt.GetMsgId(), tabletPad.time, serverStartTime, clientEndTime, fd);
 
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!
@@ -949,10 +932,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTabletToolEvent(const UDSClient& clien
     pkt >> curRventType >> tableTool >> abilityId >> windowId >> fd >> serverStartTime;
     PrintEventTabletToolInfo(tableTool, serverStartTime, abilityId, windowId, fd);
 
-    // multimodal ANR
-    uint64_t clientEndTime = GetSysClockTime();
-    ((MMIClient*)&client)->ReplyMessageToServer(pkt.GetMsgId(), tableTool.time, serverStartTime, clientEndTime, fd);
-
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!
     const AutoTestClientPkt autoTestClientTabletToolPkt = {
@@ -985,10 +964,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, 
              gesture.time, gesture.deviceId, gesture.deviceType, gesture.deviceName, gesture.devicePhys,
              gesture.eventType, gesture.fingerCount, gesture.cancelled, gesture.delta.x, gesture.delta.y,
              gesture.deltaUnaccel.x, gesture.deltaUnaccel.y, fd, abilityId, windowId, serverStartTime);
-
-    // multimodal ANR
-    uint64_t clientEndTime = GetSysClockTime();
-    ((MMIClient*)&client)->ReplyMessageToServer(pkt.GetMsgId(), gesture.time, serverStartTime, clientEndTime, fd);
 
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!

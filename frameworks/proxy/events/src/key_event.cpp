@@ -38,6 +38,11 @@ void KeyEvent::Initialize(const KeyEvent& keyEvent)
     mKeyDownDuration_ = keyEvent.GetKeyDownDuration();
 }
 
+void KeyEvent::DeviceInitialize(MultimodalEvent &deviceEvent)
+{
+    MultimodalEvent::Initialize(deviceEvent);
+}
+
 int32_t KeyEvent::GetMaxKeyCode() const
 {
     return NOW_MAX_KEY;

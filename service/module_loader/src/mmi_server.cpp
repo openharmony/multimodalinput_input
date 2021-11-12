@@ -155,14 +155,14 @@ int32_t OHOS::MMI::MMIServer::InitLibinput()
 
 #ifdef OHOS_BUILD_HDF
     MMI_LOGD("HDF Init");
-    SetLibInputEventListener([](struct libinput_event* event) {
+    SetLibInputEventListener([](struct multimodal_libinput_event *event) {
         InputHandler->OnEvent(event);
     });
     hdfEventManager.SetupCallback();
 #else
     #ifdef OHOS_WESTEN_MODEL
         MMI_LOGD("InitLibinput WestonInit...");
-        SetLibInputEventListener([](struct libinput_event* event) {
+        SetLibInputEventListener([](struct multimodal_libinput_event *event) {
             InputHandler->OnEvent(event);
         });
     #else
@@ -266,7 +266,8 @@ void OHOS::MMI::MMIServer::OnDisconnected(SessionPtr s)
     int32_t fd = s->GetFd();
 
     auto appInfo = AppRegs->FindBySocketFd(fd);
-    WinMgr->EraseSurfaceInfo(appInfo.windowId);
+    RegEventHM->UnregisterEventHandleBySocketFd(fd);
+    AppRegs->UnregisterAppInfoBySocketFd(fd);
     AppRegs->UnregisterConnectState(fd);
 #ifdef  OHOS_BUILD_AI
     seniorInput_.DeviceDisconnect(fd);

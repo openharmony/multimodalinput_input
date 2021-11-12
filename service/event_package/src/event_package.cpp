@@ -504,33 +504,36 @@ int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event& event,
     return RET_OK;
 }
 
-int32_t EventPackage::PackageTouchEvent(libinput_event& event,
+int32_t EventPackage::PackageTouchEvent(multimodal_libinput_event &ev,
     EventTouch& touch, WindowSwitch& windowSwitch, UDSServer& udsServer)
 {
-    auto type = libinput_event_get_type(&event);
+    auto type = libinput_event_get_type(ev.event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
         return UNKNOWN_EVENT_PKG_FAIL;
     }
-    auto ret = PackageEventDeviceInfo<EventTouch>(event, touch, udsServer);
+    auto ret = PackageEventDeviceInfo<EventTouch>(*ev.event, touch, udsServer);
     if (ret != RET_OK) {
         MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
-    auto data = libinput_event_get_touch_event(&event);
+    auto data = libinput_event_get_touch_event(ev.event);
     CHKR(data, NULL_POINTER, RET_ERR);
     touch.time = libinput_event_touch_get_time_usec(data);
     touch.slot = libinput_event_touch_get_slot(data);
     touch.seat_slot = libinput_event_touch_get_seat_slot(data);
-    touch.pressure = libinput_event_get_touch_pressure(&event);
+    touch.pressure = libinput_event_get_touch_pressure(ev.event);
 
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
-            touch.point.x = libinput_event_touch_get_x(data);
-            touch.point.y = libinput_event_touch_get_y(data);
-            auto touchSurfaceInfo = WinMgr->GetTouchSurfaceInfo(touch.point.x, touch.point.y);
+            auto uData = static_cast<multimodal_input_pointer_data *>(ev.userdata);
+            CHKR(uData, NULL_POINTER, RET_ERR);
+            auto touchSurfaceInfo = WinMgr->GetTouchSurfaceInfo(uData->x, uData->y);
             CHKR(touchSurfaceInfo, NULL_POINTER, RET_ERR);
             WinMgr->SetTouchFocusSurfaceId(touchSurfaceInfo->surfaceId);
-            WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo, true);
+            touch.point.x = uData->sx;
+            touch.point.y = uData->sy;
+            MMI_LOGF("TouchDown:[x=%{public}d, y=%{public}d, sx=%{public}d, sy=%{public}d]",
+                     uData->x, uData->y, uData->sx, uData->sy);
             break;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
@@ -539,12 +542,12 @@ int32_t EventPackage::PackageTouchEvent(libinput_event& event,
             break;
         }
         case LIBINPUT_EVENT_TOUCH_MOTION: {
-            touch.point.x = libinput_event_touch_get_x(data);
-            touch.point.y = libinput_event_touch_get_y(data);
-            auto touchSurfaceId = WinMgr->GetTouchFocusSurfaceId();
-            auto touchSurfaceInfo = WinMgr->GetSurfaceInfo(touchSurfaceId);
-            CHKR(touchSurfaceInfo, NULL_POINTER, RET_ERR);
-            WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo);
+            auto uData = static_cast<multimodal_input_pointer_data *>(ev.userdata);
+            CHKR(uData, NULL_POINTER, RET_ERR);
+            touch.point.x = uData->sx;
+            touch.point.y = uData->sy;
+            MMI_LOGF("TouchMotion: [x=%{public}d, y=%{public}d, sx=%{public}d, sy=%{public}d]",
+                     uData->x, uData->y, uData->sx, uData->sy);
             break;
         }
         default: {
@@ -554,11 +557,11 @@ int32_t EventPackage::PackageTouchEvent(libinput_event& event,
     return RET_OK;
 }
 
-int32_t EventPackage::PackagePointerEvent(libinput_event& event,
+int32_t EventPackage::PackagePointerEvent(multimodal_libinput_event &ev,
     EventPointer& point, WindowSwitch& windowSwitch, UDSServer& udsServer)
 {
-    auto type = libinput_event_get_type(&event);
-    auto rDevRet = PackageEventDeviceInfo<EventPointer>(event, point, udsServer);
+    auto type = libinput_event_get_type(ev.event);
+    auto rDevRet = PackageEventDeviceInfo<EventPointer>(*ev.event, point, udsServer);
     int32_t ret = 0;
     if (rDevRet != RET_OK) {
         MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", rDevRet, DEV_PARAM_PKG_FAIL);
@@ -566,19 +569,36 @@ int32_t EventPackage::PackagePointerEvent(libinput_event& event,
     }
     switch (type) {
         case LIBINPUT_EVENT_POINTER_MOTION: {
-            PackagePointerEventByMotion(event, point, windowSwitch);
+            auto uData = static_cast<multimodal_input_pointer_data *>(ev.userdata);
+            CHKR(uData, NULL_POINTER, RET_ERR);
+            PackagePointerEventByMotion(*ev.event, point, windowSwitch);
+            point.absolute.x = uData->sx;
+            point.absolute.y = uData->sy;
+            MMI_LOGF("PointerMotion: [x=%{public}d, y=%{public}d, sx=%{public}d, sy=%{public}d]",
+                     uData->x, uData->y, uData->sx, uData->sy);
             break;
         }
         case LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE: {
-            PackagePointerEventByMotionAbs(event, point, windowSwitch);
+            PackagePointerEventByMotionAbs(*ev.event, point, windowSwitch);
             break;
         }
         case LIBINPUT_EVENT_POINTER_BUTTON: {
-            PackagePointerEventByButton(event, point, windowSwitch);
+            auto uData = static_cast<multimodal_input_pointer_data *>(ev.userdata);
+            CHKR(uData, NULL_POINTER, RET_ERR);
+            PackagePointerEventByButton(*ev.event, point, windowSwitch);
+            if (point.state == BUTTON_STATE_PRESSED) {
+                auto touchSurfaceInfo = WinMgr->GetTouchSurfaceInfo(uData->x, uData->y);
+                CHKR(touchSurfaceInfo, NULL_POINTER, RET_ERR);
+                WinMgr->SetTouchFocusSurfaceId(touchSurfaceInfo->surfaceId);
+            }
+            point.absolute.x = uData->sx;
+            point.absolute.y = uData->sy;
+            MMI_LOGF("PointerButton: [x=%{public}d, y=%{public}d, sx=%{public}d, sy=%{public}d]",
+                     uData->x, uData->y, uData->sx, uData->sy);
             break;
         }
         case LIBINPUT_EVENT_POINTER_AXIS: {
-            PackagePointerEventByAxis(event, point, windowSwitch);
+            PackagePointerEventByAxis(*ev.event, point, windowSwitch);
             break;
         }
         default: {
