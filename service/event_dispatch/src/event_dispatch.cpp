@@ -690,7 +690,6 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
                 coordinate.windowRawY = libinput_event_touch_get_y(data);
                 auto touchSurfaceInfo = WinMgr->GetTouchSurfaceInfo(coordinate.windowRawX, coordinate.windowRawY);
                 CHKR(touchSurfaceInfo, NULL_POINTER, RET_ERR);
-                WinMgr->SetTouchFocusSurfaceId(touchSurfaceInfo->surfaceId);
                 coordinate.focusWindowRawX = coordinate.windowRawX - touchSurfaceInfo->dstX;
                 coordinate.focusWindowRawY = coordinate.windowRawX - touchSurfaceInfo->dstX;
                 break;
