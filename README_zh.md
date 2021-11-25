@@ -66,7 +66,7 @@
 import inputEventClient from '@ohos.multimodalInput.inputEventClient'
 
 // 调用注入事件接口
-var res = inputEventClient.injectEventSync({
+var res = inputEventClient.injectEvent({
     isPressed:true,           // 按键事件的按键类型：true：down false：up
     code:2,                   // 按键对应的keycode, 例如back键的值为2
     keyDownDuration:10,       // 按键按下到抬起的时长，单位ms
