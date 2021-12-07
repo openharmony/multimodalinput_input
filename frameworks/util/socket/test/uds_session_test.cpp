@@ -20,6 +20,9 @@
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+namespace {
+    constexpr int32_t UID_ROOT = 0;
+}
 
 class UDSSessionTest : public testing::Test {
 public:
@@ -28,13 +31,14 @@ public:
     int fd_ = -1;
     static constexpr char programName_[] = "uds_sesion_test";
     const int moduleType_ = 3; // 3 CONNECT_MODULE_TYPE_ST_TEST
-
+    static int32_t pid_;
     void SetUp() override;
     void TearDown()  override;
 };
-
+int32_t UDSSessionTest::pid_ = 0;
 void UDSSessionTest::SetUp()
 {
+    UDSSessionTest::pid_ = getpid();
     fd_ = STDOUT_FILENO;
 }
 
@@ -45,7 +49,7 @@ void UDSSessionTest::TearDown()
 
 HWTEST_F(UDSSessionTest, Construct, TestSize.Level1)
 {
-    UDSSession udsSession(programName_, moduleType_, fd_);
+    UDSSession udsSession(programName_, moduleType_, fd_, UID_ROOT, pid_);
     udsSession.Close();
 }
 
@@ -53,9 +57,9 @@ HWTEST_F(UDSSessionTest, SendMsg_type1_001, TestSize.Level1)
 {
     const char *buf = "1234";
     size_t size = 4;
-    UDSSession sesObj(programName_, moduleType_, fd_);
+    UDSSession sesObj(programName_, moduleType_, fd_, UID_ROOT, pid_);
     bool retResult = sesObj.SendMsg(buf, size);
-    EXPECT_FALSE(retResult);
+    EXPECT_TRUE(retResult);
 }
 
 HWTEST_F(UDSSessionTest, SendMsg_type1_002, TestSize.Level1)
@@ -63,16 +67,16 @@ HWTEST_F(UDSSessionTest, SendMsg_type1_002, TestSize.Level1)
     const char *buf = nullptr;
     size_t size = 4;
 
-    UDSSession sesObj(programName_, moduleType_, fd_);
+    UDSSession sesObj(programName_, moduleType_, fd_, UID_ROOT, pid_);
     bool retResult = sesObj.SendMsg(buf, size);
-    EXPECT_FALSE(retResult);
+    EXPECT_TRUE(retResult);
 }
 
 HWTEST_F(UDSSessionTest, SendMsg_type1_003, TestSize.Level1)
 {
     const char *buf = nullptr;
     size_t size = 0;
-    UDSSession sesObj(programName_, moduleType_, fd_);
+    UDSSession sesObj(programName_, moduleType_, fd_, UID_ROOT, pid_);
     bool retResult = sesObj.SendMsg(buf, size);
     EXPECT_FALSE(retResult);
 }
@@ -82,9 +86,9 @@ HWTEST_F(UDSSessionTest, SendMsg_type1_004, TestSize.Level1)
     const char *buf = "this unit data";
     size_t size = 14;
 
-    UDSSession sesObj(programName_, moduleType_, fd_);
+    UDSSession sesObj(programName_, moduleType_, fd_, UID_ROOT, pid_);
     bool retResult = sesObj.SendMsg(buf, size);
-    EXPECT_FALSE(retResult);
+    EXPECT_TRUE(retResult);
 }
 
 HWTEST_F(UDSSessionTest, SendMsg_type1_005, TestSize.Level1)
@@ -92,7 +96,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type1_005, TestSize.Level1)
     const char *buf = "this unit data";
     size_t size = -1001;
 
-    UDSSession sesObj(programName_, moduleType_, fd_);
+    UDSSession sesObj(programName_, moduleType_, fd_, UID_ROOT, pid_);
     bool retResult = sesObj.SendMsg(buf, size);
     EXPECT_FALSE(retResult);
 }
@@ -102,7 +106,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type2_001, TestSize.Level1)
     int32_t fd = -1;
     NetPacket newPacket(MmiMessageId::INVALID);
 
-    UDSSession sesObj(programName_, moduleType_, fd);
+    UDSSession sesObj(programName_, moduleType_, fd, UID_ROOT, pid_);
     bool retResult = sesObj.SendMsg(newPacket);
     EXPECT_FALSE(retResult);
 }
@@ -111,7 +115,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type2_002, TestSize.Level1)
 {
     NetPacket newPacket(MmiMessageId::BEGIN);
 
-    UDSSession sesObj(programName_, moduleType_, fd_);
+    UDSSession sesObj(programName_, moduleType_, fd_, UID_ROOT, pid_);
     bool retResult = sesObj.SendMsg(newPacket);
     EXPECT_FALSE(retResult);
 }
@@ -121,7 +125,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type2_003, TestSize.Level1)
     int32_t fd = -65535;
     NetPacket newPacket(MmiMessageId::BEGIN);
 
-    UDSSession sesObj(programName_, moduleType_, fd);
+    UDSSession sesObj(programName_, moduleType_, fd, UID_ROOT, pid_);
     bool retResult = sesObj.SendMsg(newPacket);
     EXPECT_FALSE(retResult);
 }

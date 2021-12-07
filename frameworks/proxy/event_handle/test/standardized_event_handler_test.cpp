@@ -33,7 +33,7 @@ HWTEST_F(StandardizedEventHandlerTest, Construction, TestSize.Level1)
 
 HWTEST_F(StandardizedEventHandlerTest, OnKey, TestSize.Level1)
 {
-    KeyEvent event;
+    OHOS::KeyEvent event;
     StandardizedEventHandler standardHandler;
     bool retResult = standardHandler.OnKey(event);
     EXPECT_FALSE(retResult);
@@ -357,6 +357,6 @@ HWTEST_F(StandardizedEventHandlerTest, GetType_003, TestSize.Level1)
     StandardizedEventHandler standardHandler;
     standardHandler.SetType(static_cast<MmiMessageId>(4));
     MmiMessageId retResult = standardHandler.GetType();
-    EXPECT_NE(retResult, typeNum);
+    EXPECT_EQ(retResult, typeNum);
 }
 } // namespace

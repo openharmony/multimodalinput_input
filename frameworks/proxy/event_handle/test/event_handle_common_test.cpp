@@ -139,7 +139,7 @@ HWTEST_F(EventHandleCommonTest, RegisterStandardizedEventHandle_tmp_err001, Test
     commonHandleTmp->SetType(EnumAdd(MmiMessageId::MEDIA_EVENT_BEGIN, 1));
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
         iRemote, g_surFaceId, commonHandleTmp);
-    EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
+    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, regResult);
 }
 
 HWTEST_F(EventHandleCommonTest, RegisterStandardizedEventHandle_tmp_err002, TestSize.Level1)
@@ -168,7 +168,6 @@ HWTEST_F(EventHandleCommonTest, UnregisterStandardizedEventHandle_tmp_err001, Te
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 }
 
-// ?1?7?1?7?0?0?1?7?1?7?1?7
 HWTEST_F(EventHandleCommonTest, UnregisterStandardizedEventHandle_tmp_err002, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";

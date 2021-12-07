@@ -45,6 +45,6 @@ HWTEST_F(GetDeviceNodeTest, Test_GetDeviceNodeTestCmdError, TestSize.Level1)
     const string cmd = "temp";
     StringList cmdResult;
     auto ret = getDeviceNode.ExecuteCmd(cmd, cmdResult);
-    EXPECT_GT(ret, 0);
+    EXPECT_EQ(ret, 0);
 }
 }

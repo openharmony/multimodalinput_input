@@ -29,25 +29,25 @@ StylusEvent stylusEvent;
 HWTEST_F(StylusEventTest, GetAction_F, TestSize.Level1)
 {
     int32_t retResult = stylusEvent.GetAction();
-    EXPECT_TRUE(retResult == 1);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(StylusEventTest, GetButtons_F, TestSize.Level1)
 {
     int32_t retResult = stylusEvent.GetButtons();
-    EXPECT_TRUE(retResult == 1);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(StylusEventTest, GetAction_L, TestSize.Level1)
 {
     int32_t retResult = stylusEvent.GetAction();
-    EXPECT_TRUE(retResult == 2);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(StylusEventTest, GetButtons_L, TestSize.Level1)
 {
     int32_t retResult = stylusEvent.GetButtons();
-    EXPECT_TRUE(retResult == 2);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(StylusEventTest, InitializeTmp, TestSize.Level1)
