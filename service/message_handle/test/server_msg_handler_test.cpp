@@ -736,7 +736,7 @@ HWTEST_F(ServerMsgHandlerTest, CheckReplyMessageFormClientTest_01, TestSize.Leve
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess = nullptr;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(static_cast<MmiMessageId>(0));
     serverMsgHandlerTest.CheckReplyMessageFormClientTest(sess, newPacket);
 }
 

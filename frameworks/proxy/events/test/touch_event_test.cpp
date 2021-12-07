@@ -42,31 +42,31 @@ HWTEST_F(TouchEventTest, setMultimodalEvent, TestSize.Level1)
 HWTEST_F(TouchEventTest, GetAction_F, TestSize.Level1)
 {
     int32_t retResult = touchEvent.GetAction();
-    EXPECT_TRUE(retResult == 1);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(TouchEventTest, GetIndex_F, TestSize.Level1)
 {
     int32_t retResult = touchEvent.GetIndex();
-    EXPECT_TRUE(retResult == 1);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(TouchEventTest, GetForcePrecision_F, TestSize.Level1)
 {
     float retResult = touchEvent.GetForcePrecision();
-    EXPECT_TRUE(retResult == 1);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(TouchEventTest, GetMaxForce_F, TestSize.Level1)
 {
     float retResult = touchEvent.GetMaxForce();
-    EXPECT_TRUE(retResult == 1);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(TouchEventTest, GetTapCount_F, TestSize.Level1)
 {
     float retResult = touchEvent.GetTapCount();
-    EXPECT_TRUE(retResult == 1);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(TouchEventTest, GetMultimodalEvent_F, TestSize.Level1)
@@ -84,31 +84,31 @@ HWTEST_F(TouchEventTest, Initialize_tmp_L, TestSize.Level1)
 HWTEST_F(TouchEventTest, GetAction_L, TestSize.Level1)
 {
     int32_t retResult = touchEvent.GetAction();
-    EXPECT_TRUE(retResult == 2);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(TouchEventTest, GetIndex_L, TestSize.Level1)
 {
     int32_t retResult = touchEvent.GetIndex();
-    EXPECT_TRUE(retResult == 2);
+    EXPECT_FALSE(retResult);
 }
 
 HWTEST_F(TouchEventTest, GetForcePrecision_L, TestSize.Level1)
 {
     float retResult = touchEvent.GetForcePrecision();
-    EXPECT_TRUE(retResult == 2);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(TouchEventTest, GetMaxForce_L, TestSize.Level1)
 {
     float retResult = touchEvent.GetMaxForce();
-    EXPECT_TRUE(retResult == 2);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(TouchEventTest, GetTapCount_L, TestSize.Level1)
 {
     float retResult = touchEvent.GetTapCount();
-    EXPECT_TRUE(retResult == 2);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(TouchEventTest, GetMultimodalEvent_L, TestSize.Level1)
