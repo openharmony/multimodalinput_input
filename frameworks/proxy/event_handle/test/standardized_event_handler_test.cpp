@@ -357,6 +357,6 @@ HWTEST_F(StandardizedEventHandlerTest, GetType_003, TestSize.Level1)
     StandardizedEventHandler standardHandler;
     standardHandler.SetType(static_cast<MmiMessageId>(4));
     MmiMessageId retResult = standardHandler.GetType();
-    EXPECT_NE(retResult, typeNum);
+    EXPECT_EQ(retResult, typeNum);
 }
 } // namespace

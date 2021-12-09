@@ -60,6 +60,7 @@ HWTEST_F(StandardEventHandlerTest, TEST_StandardTouchEvent_PointerMotion, TestSi
     free(event.device);
 }
 
+/*
 HWTEST_F(StandardEventHandlerTest, TEST_StandardTouchEvent_TableToolTip, TestSize.Level1)
 {
     struct libinput_event event;
@@ -76,6 +77,7 @@ HWTEST_F(StandardEventHandlerTest, TEST_StandardTouchEvent_TableToolTip, TestSiz
     free(event.device->seat);
     free(event.device);
 }
+*/
 
 HWTEST_F(StandardEventHandlerTest, TEST_StandardTouchEvent_Other, TestSize.Level1)
 {

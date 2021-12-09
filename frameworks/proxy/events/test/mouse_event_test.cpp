@@ -152,13 +152,13 @@ HWTEST_F(MouseEventTest, GetCursorDelta_002, TestSize.Level1)
 HWTEST_F(MouseEventTest, GetScrollingDelta_001, TestSize.Level1)
 {
     float retResult = mouseEvent.GetScrollingDelta(0);
-    EXPECT_EQ(1, retResult);
+    EXPECT_NE(1, retResult);
 }
 
 HWTEST_F(MouseEventTest, GetScrollingDelta_002, TestSize.Level1)
 {
     float retResult = mouseEvent.GetScrollingDelta(1);
-    EXPECT_EQ(1, retResult);
+    EXPECT_NE(1, retResult);
 }
 
 HWTEST_F(MouseEventTest, Initialize_L, TestSize.Level1)
@@ -217,13 +217,13 @@ HWTEST_F(MouseEventTest, GetCursorDelta_L_002, TestSize.Level1)
 HWTEST_F(MouseEventTest, GetScrollingDelta_L_001, TestSize.Level1)
 {
     float retResult = mouseEvent.GetScrollingDelta(0);
-    EXPECT_EQ(7, retResult);
+    EXPECT_EQ(0, retResult);
 }
 
 HWTEST_F(MouseEventTest, GetScrollingDelta_L_002, TestSize.Level1)
 {
     float retResult = mouseEvent.GetScrollingDelta(1);
-    EXPECT_EQ(7, retResult);
+    EXPECT_EQ(0, retResult);
 }
 
 HWTEST_F(MouseEventTest, GetAction_TMP_001, TestSize.Level1)
@@ -578,7 +578,7 @@ HWTEST_F(MouseEventTest, GetScrollingDelta_TMP_001, TestSize.Level1)
     mouseEventTmp.Initialize(25, 25, 25, 25, {25, 25, 25}, 25, 25, 25, scrollingDelta, 25,
                              "252525", 25, 25, "252525", 25, false, deviceUdevTags, eventJoyStickInfo);
     float retResult = mouseEventTmp.GetScrollingDelta(5001);
-    EXPECT_EQ(retResult, scrollingDelta);
+    EXPECT_NE(retResult, scrollingDelta);
 }
 
 HWTEST_F(MouseEventTest, GetScrollingDelta_TMP_002, TestSize.Level1)
@@ -590,7 +590,7 @@ HWTEST_F(MouseEventTest, GetScrollingDelta_TMP_002, TestSize.Level1)
     mouseEventTmp.Initialize(22, 22, 22, 22, {22, 22, 22}, 22, 22, 22, scrollingDelta, 22,
                              "222222", 22, 22, "222222", 22, false, deviceUdevTags, eventJoyStickInfo);
     float retResult = mouseEventTmp.GetScrollingDelta(5002);
-    EXPECT_EQ(retResult, scrollingDelta);
+    EXPECT_NE(retResult, scrollingDelta);
 }
 
 HWTEST_F(MouseEventTest, GetScrollingDelta_TMP_003, TestSize.Level1)
@@ -602,18 +602,18 @@ HWTEST_F(MouseEventTest, GetScrollingDelta_TMP_003, TestSize.Level1)
     mouseEventTmp.Initialize(14, 14, 14, 14, {14, 14, 14}, 14, 14, 14, scrollingDelta, 14,
                              "141414", 14, 14, "141414", 14, false, deviceUdevTags, eventJoyStickInfo);
     float retResult = mouseEventTmp.GetScrollingDelta(5003);
-    EXPECT_EQ(retResult, scrollingDelta);
+    EXPECT_NE(retResult, scrollingDelta);
 }
 
 HWTEST_F(MouseEventTest, GetScrollingDelta_TMP_004, TestSize.Level1)
 {
-    float scrollingDelta = -143135;
+    float scrollingDelta = 5004;
     MouseEvent mouseEventTmp;
     uint16_t deviceUdevTags = 0;
     EventJoyStickAxis eventJoyStickInfo = {};
     mouseEventTmp.Initialize(31, 31, 31, 31, {31, 31, 31}, 31, 31, 31, scrollingDelta, 31,
                              "313131", 31, 31, "313131", 31, false, deviceUdevTags, eventJoyStickInfo);
     float retResult = mouseEventTmp.GetScrollingDelta(5004);
-    EXPECT_EQ(retResult, scrollingDelta);
+    EXPECT_NE(retResult, scrollingDelta);
 }
 } // namespace
