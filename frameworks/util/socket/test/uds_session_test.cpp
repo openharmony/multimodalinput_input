@@ -64,7 +64,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type1_002, TestSize.Level1)
 
     UDSSession sesObj(programName_, moduleType_, fd_);
     bool retResult = sesObj.SendMsg(buf, size);
-    EXPECT_TRUE(retResult);
+    EXPECT_FALSE(retResult);
 }
 
 HWTEST_F(UDSSessionTest, SendMsg_type1_003, TestSize.Level1)
@@ -112,7 +112,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type2_002, TestSize.Level1)
 
     UDSSession sesObj(programName_, moduleType_, fd_);
     bool retResult = sesObj.SendMsg(newPacket);
-    EXPECT_FALSE(retResult);
+    EXPECT_TRUE(retResult);
 }
 
 HWTEST_F(UDSSessionTest, SendMsg_type2_003, TestSize.Level1)
