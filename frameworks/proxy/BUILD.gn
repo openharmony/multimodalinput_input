@@ -30,34 +30,11 @@ config("libmmi_client_config") {
   ]
 }
 
-ohos_shared_library("libmmi-client") {
+ohos_shared_library("libmmi-common") {
   sources = [
-    "event_handle/src/client_msg_handler.cpp",
-    "event_handle/src/common_event_handler.cpp",
-    "event_handle/src/device_handler.cpp",
-    "event_handle/src/event_factory.cpp",
-    "event_handle/src/key_event_handler.cpp",
-    "event_handle/src/media_event_handler.cpp",
-    "event_handle/src/multimodal_event_handler.cpp",
-    "event_handle/src/multimodal_standardized_event_manager.cpp",
-    "event_handle/src/standardized_event_handler.cpp",
-    "event_handle/src/system_event_handler.cpp",
-    "event_handle/src/telephone_event_handler.cpp",
-    "event_handle/src/touch_event_handler.cpp",
-    "events/src/builtinkey_event.cpp",
-    "events/src/composite_event.cpp",
-    "events/src/device_event.cpp",
+    "events/src/input_event.cpp",
     "events/src/key_event.cpp",
-    "events/src/keyboard_event.cpp",
-    "events/src/manipulation_event.cpp",
-    "events/src/mmi_point.cpp",
-    "events/src/mouse_event.cpp",
-    "events/src/multimodal_event.cpp",
-    "events/src/rotation_event.cpp",
-    "events/src/speech_event.cpp",
-    "events/src/stylus_event.cpp",
-    "events/src/touch_event.cpp",
-    "module_loader/src/mmi_client.cpp",
+    "events/src/pointer_event.cpp",
   ]
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -74,8 +51,72 @@ ohos_shared_library("libmmi-client") {
 
   public_configs = [ ":libmmi_client_config" ]
 
+  part_name = "multimodalinput_base"
+}
+
+ohos_shared_library("libmmi-client") {
+  sources = [
+    "event_handle/src/client_msg_handler.cpp",
+    "event_handle/src/common_event_handler.cpp",
+    "event_handle/src/device_handler.cpp",
+    "event_handle/src/event_factory.cpp",
+    "event_handle/src/input_event_monitor_manager.cpp",
+    "event_handle/src/input_manager_impl.cpp",
+    "event_handle/src/key_event_handler.cpp",
+    "event_handle/src/media_event_handler.cpp",
+    "event_handle/src/multimodal_event_handler.cpp",
+    "event_handle/src/multimodal_standardized_event_manager.cpp",
+    "event_handle/src/standardized_event_handler.cpp",
+    "event_handle/src/system_event_handler.cpp",
+    "event_handle/src/telephone_event_handler.cpp",
+    "event_handle/src/touch_event_handler.cpp",
+    "event_handle/src/input_device_event.cpp",
+    "event_handle/src/input_monitor_manager.cpp",
+    "event_handle/src/input_handler_manager.cpp",
+    "events/src/builtinkey_event.cpp",
+    "events/src/composite_event.cpp",
+    "events/src/device_event.cpp",
+    "events/src/key_event_pre.cpp",
+    "events/src/keyboard_event.cpp",
+    "events/src/manipulation_event.cpp",
+    "events/src/mmi_point.cpp",
+    "events/src/mouse_event.cpp",
+    "events/src/multimodal_event.cpp",
+    "events/src/rotation_event.cpp",
+    "events/src/speech_event.cpp",
+    "events/src/stylus_event.cpp",
+    "events/src/touch_event.cpp",
+    "module_loader/src/mmi_client.cpp",
+    "event_handle/src/input_filter_manager.cpp",
+    "events/src/axis_event.cpp",
+    "events/src/input_manager.cpp",
+    "events/src/key_option.cpp",
+  ]
+
+  cflags = [ "-DOHOS_BUILD" ]
+
+  if (is_mmi_have_debug) {
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_st_test) {
+    cflags += [ "-DOHOS_AUTO_TEST_FRAME" ]
+  }
+
+  if (is_mmi_have_weston) {
+    cflags += [ "-DOHOS_WESTEN_MODEL" ]
+  }
+
+  configs = [ ":libmmi_client_config" ]
+
+  public_configs = [ ":libmmi_client_config" ]
+
   deps = [
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
+  ]
+
+   public_deps = [
+    ":libmmi-common",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
   ]
@@ -150,7 +191,7 @@ ohos_unittest("ut-mmi-proxy-out") {
     "event_handle/test/standardized_event_process_test.cpp",
     "event_handle/test/system_event_handler_test.cpp",
     "events/test/device_event_test.cpp",
-    "events/test/key_event_test.cpp",
+    "events/test/key_event_pre_test.cpp",
     "events/test/keyboard_event_test.cpp",
     "events/test/mani_pulation_event_test.cpp",
     "events/test/mmi_point_test.cpp",
@@ -173,8 +214,130 @@ ohos_unittest("ut-mmi-proxy-out") {
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 }
 
+ohos_unittest("MultimodalinputEventHandlerTest") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "//utils/native/base/include",
+    "//third_party/googletest/googletest/include",
+    "${mmi_path}/frameworks/util/common",
+    "${mmi_path}/frameworks/util/common/include",
+    "${mmi_path}/frameworks/util/network",
+    "${mmi_path}/frameworks/util/network/include",
+    "${mmi_path}/frameworks/util/socket",
+    "${mmi_path}/frameworks/util/socket/include",
+    "${mmi_path}/frameworks/proxy/event_handle",
+    "${mmi_path}/frameworks/proxy/event_handle/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+  ]
+
+  if (is_mmi_have_libinput) {
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+  }
+
+  cflags = [
+    "-DOHOS_BUILD",
+    "-DOHOS_AUTO_TEST_FRAME",
+  ]
+
+  if (is_mmi_have_debug) {
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [ "-DOHOS_BUILD_AI" ]
+  }
+
+  sources = [ "event_handle/test/multimodal_event_handler_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/frameworks/util:libmmi-util",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+}
+
+ohos_unittest("InputManagerTest") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "//utils/native/base/include",
+    "//third_party/googletest/googletest/include",
+    "${mmi_path}/frameworks/util/common",
+    "${mmi_path}/frameworks/util/common/include",
+    "${mmi_path}/frameworks/util/network",
+    "${mmi_path}/frameworks/util/network/include",
+    "${mmi_path}/frameworks/util/socket",
+    "${mmi_path}/frameworks/util/socket/include",
+    "${mmi_path}/frameworks/proxy/event_handle",
+    "${mmi_path}/frameworks/proxy/event_handle/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+  ]
+
+  if (is_mmi_have_libinput) {
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+  }
+
+  cflags = [
+    "-DOHOS_BUILD",
+    "-DOHOS_AUTO_TEST_FRAME",
+  ]
+
+  if (is_mmi_have_debug) {
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [ "-DOHOS_BUILD_AI" ]
+  }
+
+  sources = [ "events/test/input_manager_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/frameworks/util:libmmi-util",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+}
+
 group("ut-mmi-proxy") {
   testonly = true
   deps = []
-  deps += [ ":ut-mmi-proxy-out" ]
+  deps += [
+    ":InputManagerTest",
+    ":MultimodalinputEventHandlerTest",
+    ":ut-mmi-proxy-out",
+  ]
 }

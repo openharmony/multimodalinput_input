@@ -12,12 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "test_aux_tool_client.h"
-#include "util.h"
-#include "proto.h"
 #include "injection_event_dispatch.h"
-#include "multimodal_input_connect_manager.h"
 #include "message_send_recv_stat_mgr.h"
+#include "multimodal_input_connect_manager.h"
+#include "proto.h"
+#include "util.h"
 
 using namespace std;
 using namespace OHOS::MMI;

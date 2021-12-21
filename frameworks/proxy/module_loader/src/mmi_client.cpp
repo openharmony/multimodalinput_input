@@ -12,12 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "mmi_client.h"
-#include "util.h"
 #include "log.h"
-#include "proto.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "proto.h"
+#include "util.h"
 
 namespace OHOS::MMI {
     namespace {
@@ -50,7 +51,7 @@ bool OHOS::MMI::MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
     EventManager.SetClientHandle(GetPtr());
     CHKF(msgHdl->Init(), MSG_HANDLER_INIT_FAIL);
     auto msgHdlImp = static_cast<ClientMsgHandler *>(msgHdl.get());
-    CHKF(msgHdlImp, MSG_HANDLER_INIT_FAIL);
+    CHKF(msgHdlImp, MSG_HANDLER_INIT_FAIL)
     auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, msgHdlImp, std::placeholders::_1, std::placeholders::_2);
     CHKF(StartClient(callback, detachMode), START_CLI_FAIL);
 
@@ -74,10 +75,11 @@ void OHOS::MMI::MMIClient::VirtualKeyIn(RawInputEvent virtualKeyEvent)
     SendMsg(ckt);
 }
 
-void OHOS::MMI::MMIClient::ReplyMessageToServer(MmiMessageId idMsg, uint64_t clientTime, uint64_t endTime) const
+void OHOS::MMI::MMIClient::ReplyMessageToServer(MmiMessageId idMsg, uint64_t time, uint64_t serverStartTime,
+    uint64_t clientEndTime, int32_t fd) const
 {
     NetPacket ckt(MmiMessageId::CHECK_REPLY_MESSAGE);
-    ckt << idMsg << clientTime << endTime;
+    ckt << idMsg << time << fd << serverStartTime << clientEndTime;
     SendMsg(ckt);
 }
 

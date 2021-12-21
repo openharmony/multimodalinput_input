@@ -185,7 +185,7 @@ public:
     */
     void Initialize(int32_t windowId, MultimodalEventPtr deviceEvent, int32_t deviceEventType,
             int32_t action, int32_t index, float forcePrecision, float maxForce, float tapCount,
-            int32_t startTime, int32_t operationState, int32_t pointerCount, fingerInfos fingersInfos[], 
+            int32_t startTime, int32_t operationState, int32_t pointerCount, fingerInfos fingersInfos[],
             bool isStandard);
 
     /**
@@ -259,7 +259,7 @@ public:
     virtual const MultimodalEvent *GetMultimodalEvent() const;
 
     virtual int32_t GetPointToolType(int32_t index) const;
-    
+
     virtual int32_t GetOriginEventType () const;
 
 private:

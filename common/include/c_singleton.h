@@ -32,6 +32,7 @@ public:
     }
 protected:
     CSingleton() {};
+    ~CSingleton() {};
     CSingleton(const CSingleton&);
     CSingleton& operator = (const CSingleton&);
 private:

@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "touch_event.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
@@ -29,8 +30,8 @@ void TouchEvent::Initialize(int32_t windowId, int32_t action, int32_t index, flo
                             const std::string& deviceId, int32_t inputDeviceId, bool isHighLevelEvent, bool isStandard,
                             uint16_t deviceUdevTags, int32_t deviceEventType)
 {
-    ManipulationEvent::Initialize(windowId, startTime, operationState, pointerCount, fingersInfos, 
-                                  highLevelEvent, uuid, sourceType, occurredTime, deviceId, 
+    ManipulationEvent::Initialize(windowId, startTime, operationState, pointerCount, fingersInfos,
+                                  highLevelEvent, uuid, sourceType, occurredTime, deviceId,
                                   inputDeviceId, isHighLevelEvent, deviceUdevTags);
     mDeviceEventType_ = deviceEventType;
     mAction_ = action;
@@ -121,7 +122,7 @@ int32_t TouchEvent::GetPointToolType(int32_t index) const
     if (index < 0) {
         return 0;
     }
-    
+
     switch (mIndex_) {
         case TABLET_TOOL_TYPE_PEN: {
             tableToolType = BUTTON_TOOL_PEN;
@@ -162,7 +163,7 @@ int32_t TouchEvent::GetPointToolType(int32_t index) const
 
     return tableToolType;
 }
-    
+
 int32_t TouchEvent::GetOriginEventType() const
 {
     return mDeviceEventType_;

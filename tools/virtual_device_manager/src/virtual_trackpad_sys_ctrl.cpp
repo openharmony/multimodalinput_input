@@ -20,6 +20,8 @@ OHOS::MMI::VirtualTrackpadSysCtrl::VirtualTrackpadSysCtrl() : VirtualDevice("Vir
 {
 }
 
+OHOS::MMI::VirtualTrackpadSysCtrl::~VirtualTrackpadSysCtrl() {}
+
 const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpadSysCtrl::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {

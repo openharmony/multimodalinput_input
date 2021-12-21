@@ -1,0 +1,93 @@
+/*
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "run_shell_util.h"
+#include <thread>
+#include <vector>
+#include <gtest/gtest.h>
+#include "define_multimodal.h"
+
+namespace {
+using namespace testing::ext;
+using namespace OHOS::MMI;
+using namespace OHOS;
+
+namespace {
+    constexpr int32_t SLEEP = 1000;
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RunShellUtilTest" };
+}
+
+class RunShellUtilTest : public testing::Test {
+public:
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
+    }
+    static inline RunShellUtil runCommand;
+};
+
+HWTEST_F(RunShellUtilTest, RunShellUtilTest_RunShellCommand_001, TestSize.Level1)
+{
+    std::string command = "test runshellutil";
+    std::vector<std::string> firstLog;
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
+    ASSERT_TRUE(runCommand.RunShellCommand(command, firstLog) == RET_OK);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
+    MMI_LOGD("test runshellutilrqr2qrq2");
+    std::vector<std::string> vLog;
+    ASSERT_TRUE(runCommand.RunShellCommand(command, vLog) == RET_OK);
+    ASSERT_TRUE(vLog.size() > 0);
+    if (firstLog.size() == 0) {
+        EXPECT_TRUE(vLog.size() > firstLog.size());
+        EXPECT_TRUE(vLog.back().find(command) != vLog.back().npos);
+    } else {
+        EXPECT_TRUE(std::strcmp(vLog.back().c_str(), firstLog.back().c_str()) != 0);
+    }
+}
+
+HWTEST_F(RunShellUtilTest, RunShellUtilTest_RunShellCommand_002, TestSize.Level1)
+{
+    std::string command = "test runshellutil";
+    {
+        std::vector<std::string> firstLog;
+        ASSERT_TRUE(runCommand.RunShellCommand(command, firstLog) == RET_OK);
+        std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
+        MMI_LOGD("test runshellutilrqr2342342355qrq2");
+        std::vector<std::string> vLog;
+        ASSERT_TRUE(runCommand.RunShellCommand(command, vLog) == RET_OK);
+        ASSERT_TRUE(vLog.size() > 0);
+        if (firstLog.size() == 0) {
+            EXPECT_TRUE(vLog.size() > firstLog.size());
+            EXPECT_TRUE(vLog.back().find(command) != vLog.back().npos);
+        } else {
+            EXPECT_TRUE(std::strcmp(vLog.back().c_str(), firstLog.back().c_str()) != 0);
+        }
+    }
+    std::vector<std::string> firstLog;
+    ASSERT_TRUE(runCommand.RunShellCommand(command, firstLog) == RET_OK);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
+    MMI_LOGD("test runshellutilrqr21234www");
+    std::vector<std::string> vLog;
+    ASSERT_TRUE(runCommand.RunShellCommand(command, vLog) == RET_OK);
+    ASSERT_TRUE(vLog.size() > 0);
+    if (firstLog.size() == 0) {
+        EXPECT_TRUE(vLog.size() > firstLog.size());
+        EXPECT_TRUE(vLog.back().find(command) != vLog.back().npos);
+    } else {
+        EXPECT_TRUE(std::strcmp(vLog.back().c_str(), firstLog.back().c_str()) != 0);
+    }
+}
+}

@@ -15,17 +15,14 @@
 
 #include "hdf_event_manager.h"
 #include <cstring>
-#include <thread>
-#include <unistd.h>
-
-#include <thread>
 #include <ctime>
+#include <thread>
 #include <sys/time.h>
-
+#include <unistd.h>
+#include "hdf_inject_init.cpp"
+#include "lib_hdf.h"
 #include "libmmi_util.h"
 #include "log.h"
-#include "lib_hdf.h"
-#include "hdf_inject_init.cpp"
 #include "util.h"
 
 namespace {
@@ -44,7 +41,7 @@ int OHOS::MMI::HdfEventManager::EvdevSimIoctl(int hdindex, int pcmd, void *iobuf
     MMI_LOGD("----evdev_simioctl %{public}p,index =%{public}d,cmd = %{public}02x: size =%{public}d "
              "pcmd = %{public}04x ---",
              iobuff, hdindex, cmd, size, pcmd);
-    DrvType drvtype = index2DrvType[hdindex - MAX_INPUT_DEVICE_COUNT];
+    DrvType drvtype = g_index2DrvType[hdindex - MAX_INPUT_DEVICE_COUNT];
     MMI_LOGD("----evdev_simioctl drvtype =%{public}d", drvtype);
     if (drvtype >= INVALD) {
         return 0;
@@ -58,52 +55,52 @@ int OHOS::MMI::HdfEventManager::EvdevSimIoctl(int hdindex, int pcmd, void *iobuf
     int ret = 0;
     switch (cmd) {
         case IO_BITS: // bits
-            ret = memcpy_s(iobuff, iobuffSize, &arrayBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &g_arrayBits[drvtype], size);
             break;
         case IO_KEYBITS: // key_bits
-            ret = memcpy_s(iobuff, iobuffSize, &arrayKeyBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &g_arrayKeyBits[drvtype], size);
             break;
         case IO_RELBITS: // rel_bits
-            ret = memcpy_s(iobuff, iobuffSize, &arrayRelBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &g_arrayRelBits[drvtype], size);
             break;
         case IO_ABSBITS: // abs_bits
-            ret = memcpy_s(iobuff, iobuffSize, &arrayAbsBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &g_arrayAbsBits[drvtype], size);
             break;
         case IO_MSCBITS: // msc_bits
-            ret = memcpy_s(iobuff, iobuffSize, &arrayMscBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &g_arrayMscBits[drvtype], size);
             break;
         case IO_SWBITS: // sw_bits
-            ret = memcpy_s(iobuff, iobuffSize, &arraySwBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &g_arraySwBits[drvtype], size);
             break;
         case IO_LEDBITS: // led_bits
-            ret = memcpy_s(iobuff, iobuffSize, &arrayLedBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &g_arrayLedBits[drvtype], size);
             break;
         case IO_SNDBITS: // snd_bits
-            ret = memcpy_s(iobuff, iobuffSize, &arraySndBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &g_arraySndBits[drvtype], size);
             break;
         case IO_PROPBITS: // poops
-            ret = memcpy_s(iobuff, iobuffSize, &arrayPropsBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &g_arrayPropsBits[drvtype], size);
             break;
         case IO_KEYVALUES: // key_values
-            ret = memcpy_s(iobuff, iobuffSize, &arrayKeyValues[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &g_arrayKeyValues[drvtype], size);
             break;
         case IO_LEDVALUES: // led_values
-            ret = memcpy_s(iobuff, iobuffSize, &arrayLedValues[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &g_arrayLedValues[drvtype], size);
             break;
         case IO_SWVALUES: // sw_values
-            ret = memcpy_s(iobuff, iobuffSize, &arraySwValues[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &g_arraySwValues[drvtype], size);
             break;
         case IO_MTVABS: // mtv abs
             break;
         case IO_IDS:  // ids
-            ret = memcpy_s(iobuff, iobuffSize, &arrayIds[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &g_arrayIds[drvtype], size);
             break;
         case IO_FFBITS: // ff bits
-            ret = memcpy_s(iobuff, iobuffSize, &arrayFfBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &g_arrayFfBits[drvtype], size);
             break;
         default:
             if (cmd >= IO_ABSBEGIN && cmd < IO_ABEND) {
-                ret = memcpy_s(iobuff, iobuffSize, &arrayAxisInfo[drvtype][cmd - IO_ABSBEGIN], size);
+                ret = memcpy_s(iobuff, iobuffSize, &g_arrayAxisInfo[drvtype][cmd - IO_ABSBEGIN], size);
             }
             break;
     }

@@ -56,22 +56,10 @@
     #define CLMULTISET  std::unordered_multiset
 #endif
 
-
-#ifndef IdsList
-#define IdsList std::vector<int32_t>
-#endif
-
-#ifndef StringList
+#define IdsList     std::vector<int32_t>
 #define StringList  std::vector<std::string>
-#endif
-
-#ifndef StringSet
 #define StringSet   CLSET<std::string>
-#endif
-
-#ifndef StringMap
 #define StringMap   CLMAP<std::string, std::string>
-#endif
 
 #ifdef DEBUG_CODE_TEST
 #define CK(msg, ec) \

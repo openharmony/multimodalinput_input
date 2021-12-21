@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
+#include "ai_func_proc.h"
 #include <gtest/gtest.h>
 #include "libmmi_util.h"
-#include "ai_func_proc.h"
 #include "proto.h"
 
 namespace {
