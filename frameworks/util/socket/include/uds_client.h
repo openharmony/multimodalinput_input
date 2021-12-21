@@ -30,7 +30,6 @@ public:
     UDSClient();
     virtual ~UDSClient();
 
-    virtual int32_t Socket() = 0;
     int32_t ConnectTo();
 
     bool SendMsg(const char *buf, size_t size) const;

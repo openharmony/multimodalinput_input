@@ -12,11 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "injection_tools_help_func.h"
 #include <gtest/gtest.h>
-#include "msg_head.h"
 #include "proto.h"
+#include "injection_tools_help_func.h"
+#include "msg_head.h"
 
 namespace {
 using namespace testing::ext;

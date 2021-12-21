@@ -12,13 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include <gtest/gtest.h>
-#include "msg_head.h"
 #include "proto.h"
 #define private public
 #include "manage_inject_device.h"
 #undef private
+#include "msg_head.h"
 
 namespace {
 using namespace testing::ext;

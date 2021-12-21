@@ -13,16 +13,16 @@
  * limitations under the License.
  */
 
-#include <codecvt>
 #include <locale>
+#include <codecvt>
 #include <gtest/gtest.h>
-#include "define_multimodal.h"
-#include "mmi_token.h"
-#include "multimodal_event_handler.h"
-#include "multimodal_standardized_event_manager.h"
-#include "proto.h"
 #include "string_ex.h"
+#include "proto.h"
 #include "util_ex.h"
+#include "define_multimodal.h"
+#include "multimodal_standardized_event_manager.h"
+#include "multimodal_event_handler.h"
+#include "mmi_token.h"
 
 namespace {
 using namespace testing::ext;
@@ -49,10 +49,10 @@ public:
     }
     bool InsertMapEvent(MmiMessageId typeId, StandEventPtr standardizedEventHandle)
     {
-        struct StandEventCallBack standEventInfo  = {};
-        standEventInfo .windowId = 0;
-        standEventInfo .eventCallBack = standardizedEventHandle;
-        mapEvents_.insert(std::make_pair(typeId, standEventInfo ));
+        struct StandEventCallBack StandEventInfo = {};
+        StandEventInfo.windowId = 0;
+        StandEventInfo.eventCallBack = standardizedEventHandle;
+        mapEvents_.insert(std::make_pair(typeId, StandEventInfo));
         return true;
     }
 };
@@ -150,7 +150,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, RegisterStandardizedEventHandle_006, Test
 HWTEST_F(MultimodalSemanagerFirstTest, OnKey_001, TestSize.Level1)
 {
     MultimodalEventThirdUnitTest multimodalTest;
-    OHOS::KeyEvent event;
+    KeyEvent event;
     int32_t retResult = multimodalTest.OnKey(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
@@ -167,7 +167,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnKey_002, TestSize.Level1)
 
     MultimodalEventThirdUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
-    OHOS::KeyEvent event;
+    KeyEvent event;
     int32_t retResult = multimodalTestTmp.OnKey(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
@@ -184,7 +184,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnKey_003, TestSize.Level1)
 
     MultimodalEventThirdUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
-    OHOS::KeyEvent event;
+    KeyEvent event;
     int32_t retResult = multimodalTestTmp.OnKey(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
@@ -201,7 +201,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnKey_004, TestSize.Level1)
 
     MultimodalEventThirdUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
-    OHOS::KeyEvent event;
+    KeyEvent event;
     int32_t retResult = multimodalTestTmp.OnKey(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
@@ -218,7 +218,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnKey_005, TestSize.Level1)
 
     MultimodalEventThirdUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(MmiMessageId::KEY_EVENT_BEGIN, tmpObj);
-    OHOS::KeyEvent event;
+    KeyEvent event;
     int32_t retResult = multimodalTestTmp.OnKey(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
@@ -235,7 +235,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnKey_006, TestSize.Level1)
 
     MultimodalEventThirdUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(EnumAdd(MmiMessageId::KEY_EVENT_BEGIN, 1), tmpObj);
-    OHOS::KeyEvent event;
+    KeyEvent event;
     int32_t retResult = multimodalTestTmp.OnKey(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
@@ -252,7 +252,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnKey_007, TestSize.Level1)
 
     MultimodalEventThirdUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(MmiMessageId::KEY_EVENT_BEGIN, tmpObj);
-    OHOS::KeyEvent event;
+    KeyEvent event;
     int32_t retResult = multimodalTestTmp.OnKey(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
@@ -269,7 +269,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnKey_008, TestSize.Level1)
 
     MultimodalEventThirdUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(MmiMessageId::KEY_EVENT_BEGIN, tmpObj);
-    OHOS::KeyEvent event;
+    KeyEvent event;
     int32_t retResult = multimodalTestTmp.OnKey(event);
     EXPECT_TRUE(retResult == RET_OK);
 }

@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "key_event_handler.h"
 #include "proto.h"
 
@@ -25,7 +24,7 @@ KeyEventHandler::KeyEventHandler()
 KeyEventHandler::~KeyEventHandler()
 {
 }
-bool KeyEventHandler::OnKey(const OHOS::KeyEvent& event)
+bool KeyEventHandler::OnKey(const KeyEvent& event)
 {
     return false;
 }

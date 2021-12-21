@@ -56,8 +56,6 @@ OHOS::MMI::VirtualJoystick::VirtualJoystick() : VirtualDevice("Virtual Joystick"
     dev_.absflat[ABS_HAT0Y] = 0;
 }
 
-OHOS::MMI::VirtualJoystick::~VirtualJoystick() {}
-
 const std::vector<uint32_t>& OHOS::MMI::VirtualJoystick::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {

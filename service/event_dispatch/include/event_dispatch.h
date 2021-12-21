@@ -16,26 +16,21 @@
 #define OHOS_EVENT_DISPATCH_H
 #include "uds_server.h"
 #include "register_event.h"
-#include "key_event.h"
 #include "key_event_value_transformation.h"
 #include "standard_event_handler.h"
 #include "app_register.h"
 #include "event_package.h"
-#include "pointer_event.h"
+
 namespace OHOS::MMI {
 class EventDispatch {
 public:
     EventDispatch();
     virtual ~EventDispatch();
 
-    int32_t DispatchGestureNewEvent(UDSServer& udsServer, libinput_event& event,
-        std::shared_ptr<PointerEvent> pointer, const uint64_t preHandlerTime);
     int32_t DispatchGestureEvent(UDSServer& udsServer, libinput_event& event, EventGesture& gesture,
         const uint64_t preHandlerTime);
     int32_t DispatchKeyEvent(UDSServer& udsServer, libinput_event& event, const KeyEventValueTransformations& trs,
         EventKeyboard& key, const uint64_t preHandlerTime);
-    int32_t DispatchKeyEventByPid(UDSServer& udsServer, std::shared_ptr<OHOS::MMI::KeyEvent> key,
-        const uint64_t preHandlerTime);
     int32_t DispatchTouchEvent(UDSServer& udsServer, libinput_event& event,
         EventTouch& touch, const uint64_t preHandlerTime, WindowSwitch& windowSwitch);
     int32_t DispatchTabletPadEvent(UDSServer& udsServer, libinput_event& event,
@@ -48,11 +43,6 @@ public:
         EventPointer& point, const uint64_t preHandlerTime, WindowSwitch& windowSwitch);
     int32_t DispatchTabletToolEvent(UDSServer& udsServer, libinput_event& event,
         EventTabletTool& tableTool, const uint64_t preHandlerTime, WindowSwitch& windowSwitch);
-    int32_t DispatchTouchTransformPointEvent(UDSServer& udsServer, std::shared_ptr<PointerEvent> point);
-    int32_t handlePointerEvent(std::shared_ptr<PointerEvent> point);
-    int32_t HandleTouchScreenEvent(std::shared_ptr<PointerEvent> point);
-    int32_t HandleMouseEvent(std::shared_ptr<PointerEvent> point);
-    int32_t HandleTouchPadEvent(std::shared_ptr<PointerEvent> point);
 #ifdef OHOS_AUTO_TEST_FRAME
     int32_t SendLibPktToAutoTest(UDSServer& udsServer, const AutoTestLibinputPkt& autoTestLibinputPkt);
     int32_t SendMappingPktToAutoTest(UDSServer& udsServer, int32_t sourceType);

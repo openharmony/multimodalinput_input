@@ -12,9 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "send_message.h"
 #include <gtest/gtest.h>
+#include "send_message.h"
 
 namespace {
 using namespace testing::ext;

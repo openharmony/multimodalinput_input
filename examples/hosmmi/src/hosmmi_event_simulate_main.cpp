@@ -12,14 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "injection_event_dispatch.h"
 #include "log.h"
 
 namespace {
 [[maybe_unused]] static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
-    LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "HosMmiEventSimulateDemoMain" 
-};
+    LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "HosMmiEventSimulateDemoMain" };
 }
 
 int32_t main(int32_t argc, const char* argv[])

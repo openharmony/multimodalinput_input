@@ -25,43 +25,34 @@
 
 namespace OHOS {
 namespace MMI {
-enum EpollEventType {
-    EPOLL_EVENT_BEGIN = 0,
-    EPOLL_EVENT_INPUT = EPOLL_EVENT_BEGIN,
-    EPOLL_EVENT_SOCKET,
-
-    EPOLL_EVENT_END,
-};
-
 struct StreamBufData {
     bool isOverflow = false;
     OHOS::MMI::StreamBuffer sBuf;
 };
 using MsgServerFunCallback = std::function<void(SessionPtr, NetPacket&)>;
-class UDSServer : public UDSSocket, public IUdsServer {
+class UDSServer : public IUdsServer {
 public:
     UDSServer();
     virtual ~UDSServer();
-    void UdsStop();
+    void Stop();
     bool SendMsg(int32_t fd, NetPacket& pkt);
     void Broadcast(NetPacket& pkt);
     void Multicast(const IdsList& fdList, NetPacket& pkt);
     void Dump(int32_t fd);
-    int32_t GetFdByPid(int32_t pid);
-    int32_t GetPidByFd(int32_t fd);
-    void OnEpollEvent(epoll_event& ev, CLMAP<int32_t, StreamBufData>& bufMap);
-    void OnEpollRecv(int32_t fd, const char *buf, size_t size);
 
 public:
     virtual int32_t AddSocketPairInfo(const std::string& programName, const int moduleType, int& serverFd,
-                                      int& toReturnClientFd, const int32_t uid, const int32_t pid);
+                                      int& toReturnClientFd);
 
 protected:
     void SetRecvFun(MsgServerFunCallback fun);
 
+    int32_t EpollCreat(const int32_t size);
+    int32_t EpollCtl(const int fd, const int32_t op, epoll_event &event) const;
+    int32_t EpollWait(epoll_event &events, const int32_t maxevents, const int32_t timeout) const;
+
     virtual void OnConnected(SessionPtr s);
     virtual void OnDisconnected(SessionPtr s);
-    virtual int32_t EpollCtlAdd(EpollEventType type, int32_t fd);
 
     bool StartServer();
     void OnRecv(int32_t fd, const char *buf, size_t size);
@@ -87,6 +78,7 @@ protected:
 protected:
     std::mutex mux_;
     std::thread t_;
+    int32_t epollFd_ = -1;
     bool isRun_ = false;
     MsgServerFunCallback recvFun_ = nullptr;
     std::map<int32_t, SessionPtr> sessionsMap_ = {};

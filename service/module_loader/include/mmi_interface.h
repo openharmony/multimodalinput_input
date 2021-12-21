@@ -15,9 +15,6 @@
 #ifndef OHOS_MMI_INTERFACE_H
 #define OHOS_MMI_INTERFACE_H
 
-#include "singleton.h"
-#include "libweston.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "outer_interface.h"
 
 namespace OHOS {
@@ -20,7 +19,7 @@ namespace MMI {
     namespace {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "OuterInterface" };
     }
-const std::map<int16_t, int16_t> MAP_SYSTEM_EVENT_ATTR = {
+const std::map<int16_t, int16_t> g_mapSystemEventAttr = {
     {HOS_KEY_MUTE, MMI_SYSTEM_SERVICE_AND_APP},
     {HOS_KEY_CALL, MMI_SYSTEM_SERVICE_AND_APP},
     {HOS_KEY_MENU, MMI_SYSTEM_SERVICE_AND_APP},
@@ -137,8 +136,8 @@ int OuterInterface::notifyFocusChange(int32_t abilityId, int32_t windowId)
 
 int32_t OuterInterface::GetSystemEventAttrByHosKeyValue(const int16_t keyValueOfHos)
 {
-    auto it = MAP_SYSTEM_EVENT_ATTR.find(keyValueOfHos);
-    if (it != MAP_SYSTEM_EVENT_ATTR.end()) {
+    auto it = g_mapSystemEventAttr.find(keyValueOfHos);
+    if (it != g_mapSystemEventAttr.end()) {
         return it->second;
     } else {
         return RET_ERR;

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "speech_event.h"
 #include <gtest/gtest.h>
+#include "speech_event.h"
 
 namespace {
 using namespace testing::ext;

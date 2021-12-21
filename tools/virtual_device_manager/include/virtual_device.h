@@ -22,23 +22,23 @@ namespace OHOS {
 namespace MMI {
 class VirtualDevice {
 public:
-    VirtualDevice(const std::string &device_name, uint16_t busType, uint16_t vendorId, uint16_t product_id);
+    VirtualDevice(const String &device_name, uint16_t busType, uint16_t vendorId, uint16_t product_id);
     virtual ~VirtualDevice();
     static bool CatFload(StringList& fileList);
     static bool SyncSymbolFile();
     bool DoIoctl(int32_t fd, int32_t request, const uint32_t value);
     bool CreateKey();
-    bool SetAbsResolution(const std::string deviceName);
-    bool SetPhys(const std::string deviceName);
+    bool SetAbsResolution(const String deviceName);
+    bool SetPhys(const String deviceName);
     bool SetUp();
     static void CloseAllDevice(const StringList& fileList);
     static void StartAllDevices();
-    static void MakeFolder(const std::string &filePath);
+    static void MakeFolder(const String &filePath);
     static bool SelectDevice(StringList& fileList);
-    static bool CreateHandle(const std::string deviceArgv);
+    static bool CreateHandle(const String deviceArgv);
     static bool AddDevice(const StringList& fileList);
     static bool CloseDevice(const StringList& fileList);
-    static bool FunctionalShunt(const std::string firstArgv, StringList argvList);
+    static bool FunctionalShunt(const String firstArgv, StringList argvList);
 
 protected:
     virtual const std::vector<uint32_t>& GetEventTypes() const;
@@ -51,7 +51,7 @@ protected:
     virtual const std::vector<uint32_t>& GetMscs() const;
     virtual const std::vector<uint32_t>& GetSws() const;
     int32_t fd_ = -1;
-    std::string deviceName_;
+    String deviceName_;
     const uint16_t busTtype_;
     const uint16_t vendorId_;
     const uint16_t productId_;

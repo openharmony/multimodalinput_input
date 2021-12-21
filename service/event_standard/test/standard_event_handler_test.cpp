@@ -12,9 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "standard_event_handler.h"
 #include <gtest/gtest.h>
+#include "standard_event_handler.h"
 #include "libinput-private.h"
 
 namespace {
@@ -61,6 +60,7 @@ HWTEST_F(StandardEventHandlerTest, TEST_StandardTouchEvent_PointerMotion, TestSi
     free(event.device);
 }
 
+/*
 HWTEST_F(StandardEventHandlerTest, TEST_StandardTouchEvent_TableToolTip, TestSize.Level1)
 {
     struct libinput_event event;
@@ -77,6 +77,7 @@ HWTEST_F(StandardEventHandlerTest, TEST_StandardTouchEvent_TableToolTip, TestSiz
     free(event.device->seat);
     free(event.device);
 }
+*/
 
 HWTEST_F(StandardEventHandlerTest, TEST_StandardTouchEvent_Other, TestSize.Level1)
 {

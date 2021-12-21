@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "mouse_event.h"
 #include <gtest/gtest.h>
+#include "mouse_event.h"
 
 namespace {
 using namespace testing::ext;

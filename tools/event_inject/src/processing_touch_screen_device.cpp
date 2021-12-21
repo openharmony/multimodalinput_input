@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "processing_touch_screen_device.h"
 
 using namespace std;
@@ -64,7 +63,7 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataForSingleTouchScreen(const
         MMI_LOGE("manage touchScreen array faild, inputData is empty.");
         return RET_ERR;
     }
-
+    
     std::vector<TouchSingleEventData> touchSingleEventDatas;
     AnalysisSingleTouchScreenDate(inputData, touchSingleEventDatas);
     for (TouchSingleEventData touchSingleEventData : touchSingleEventDatas) {

@@ -12,26 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "log.h"
-#include <algorithm>
-#include <cerrno>
-#include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
-#include <iomanip>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <fcntl.h>
 #include <inttypes.h>
-#include <sys/stat.h>
+#include <cstdarg>
+#include <ctime>
+#include <string>
+#include <sstream>
+#include <iostream>
+#include <iomanip>
+#include <cerrno>
+#include <algorithm>
 #include <sys/types.h>
-#include "config_multimodal.h"
-#include "klog.h"
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "securec.h"
 #include "util.h"
+#include "klog.h"
+#include "config_multimodal.h"
 
 #ifdef OHOS_BUILD_MMI_DEBUG
 
@@ -225,7 +224,7 @@ void mmi_console_log(bool withoutFileInfo, char *fileName, int lineNo, int level
 #pragma GCC diagnostic ignored "-Wvarargs"
     va_start(args, &newFormat[0]);
 #pragma GCC diagnostic pop
-    if (vsnprintf_s(buf, LOG_MAX_BUF_LEN, LOG_MAX_BUF_LEN - 1, &newFormat[0], args) == -1) {
+    if (vsnprintf_s(buf, LOG_MAX_BUF_LEN, LOG_MAX_BUF_LEN, &newFormat[0], args) == -1) {
         printf("call vsnprintf_s error");
         va_end(args);
         return;
@@ -237,7 +236,7 @@ void mmi_console_log(bool withoutFileInfo, char *fileName, int lineNo, int level
         threadName.c_str(), LOG_LEVELSTR[level].c_str(), buf);
 
     if (withoutFileInfo) {
-        printf("%s:%d", MmiBasename(fileName), lineNo);
+        printf("%s:%d", mmi_basename(fileName), lineNo);
         printf(" [PRINT_BY_LOGLOG]");
     }
     printf("\e[0m\n");
@@ -324,7 +323,7 @@ void LogManager::WriteFile(LogDataPtr pLog)
         return;
     }
     int32_t ret = snprintf_s(longTime, sizeof(longTime), LOG_MAX_TIME_LEN, "%02d-%02d-%02d %02d:%02d:%02d.%03d",
-                             p->tm_year + AD_1900, p->tm_mon + 1, p->tm_mday, p->tm_hour, p->tm_min, p->tm_sec, pLog->precise);
+               p->tm_year + AD_1900, p->tm_mon + 1, p->tm_mday, p->tm_hour, p->tm_min, p->tm_sec, pLog->precise);
     if (ret < 0) {
         LOGLOG("*** FATAL ERROR ***: in %s, #%d, call snprintf_s fail.", __func__, __LINE__);
         return;
@@ -629,7 +628,7 @@ bool LogManager::Start(void)
     }
     SemCreate(0);
     t_ = std::thread(std::bind(&LogManager::OnThread, this, std::ref(threadPromiseHadRunning_),
-        std::ref(threadPromiseHadEnd_)));
+                     std::ref(threadPromiseHadEnd_)));
     return SemWait(TIME_OUT);
 }
 
@@ -729,7 +728,7 @@ bool LogManager::PushFormat(const int32_t level, const std::string& file, const 
 #pragma GCC diagnostic ignored "-Wvarargs"
     va_start(args, &newFormat[0]);
 #pragma GCC diagnostic pop
-    if (vsnprintf_s(buf, LOG_MAX_BUF_LEN, LOG_MAX_BUF_LEN - 1, &newFormat[0], args) == -1) {
+    if (vsnprintf_s(buf, LOG_MAX_BUF_LEN, LOG_MAX_BUF_LEN, &newFormat[0], args) == -1) {
         LOGLOG("LogManager::PushFormat vsnprintf_s error");
         va_end(args);
         return false;
