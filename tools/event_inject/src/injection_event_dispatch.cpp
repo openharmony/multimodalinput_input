@@ -12,11 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "injection_event_dispatch.h"
-#include "message_send_recv_stat_mgr.h"
-#include "proto.h"
 #include "util.h"
+#include "proto.h"
+#include "message_send_recv_stat_mgr.h"
 
 using namespace std;
 using namespace OHOS::MMI;

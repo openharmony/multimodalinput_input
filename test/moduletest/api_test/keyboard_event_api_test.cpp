@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "keyboard_event.h"
 #include <gtest/gtest.h>
+#include "keyboard_event.h"
 
 namespace {
 using namespace testing::ext;

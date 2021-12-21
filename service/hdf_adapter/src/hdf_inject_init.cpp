@@ -12,23 +12,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "hdf_inject_init.h"
-static DrvType g_index2DrvType[] = {
+static DrvType index2DrvType[] = {
     MOUSE, KEYBOARD, TOUCH, PEN, PAD, INVALD, FINGER, JOYSTICK, INVALD, INVALD, KEYBOARD, SWITCH5, TRACKPAD5, GAMEPAD
 };
-static short g_arrayIds[][4] = {
+static short arrayIds[][4] = {
     {3, 24582, 24582, 1}, {3, 24582, 24582, 1}, {3, 24582, 24582, 1}, {3, 1386, 914, 272},
     {3, 1386, 914, 272}, {3, 1386, 914, 272}, {3, 1386, 914, 272}, {3, 1386, 914, 272},
     {3, 1386, 914, 272}, {3, 1386, 914, 272}
 };
-static uint32_t g_arrayBits[] = {
-    11, 7, 31, 27, 11, 43, 31, 1179671, 23, 31s
+static uint32_t arrayBits[] = {
+    11, 7, 31, 27, 11, 43, 31, 1179671, 23, 31
 };
-static uint32_t g_arrayPropsBits[] = {
+static uint32_t arrayPropsBits[] = {
     2, 0, 0, 1, 0, 1, 0, 0, 0, 0
 };
-static uint32_t g_arrayKeyBits[][24] = {
+static uint32_t arrayKeyBits[][24] = {
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1024, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     {0, 0, 0, 0, 1073741824, 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff, 0, 0, 0, 0, 0, 0, 0, 0,
      0, 0, 0, 0, 0},
@@ -45,10 +44,10 @@ static uint32_t g_arrayKeyBits[][24] = {
      2031616, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 };
-static uint32_t g_arrayRelBits[] = {
+static uint32_t arrayRelBits[] = {
     0, 2307, 64, 0, 0, 0, 0, 323, 323, 0
 };
-static uint32_t g_arrayAbsBits[][2] = {
+static uint32_t arrayAbsBits[][2] = {
     {16777219, 124977152},
     { 0, 0},
     { 0, 1},
@@ -60,16 +59,16 @@ static uint32_t g_arrayAbsBits[][2] = {
     {0, 0},
     {198207, 0},
 };
-static uint32_t g_arrayLedBits[] = {
+static uint32_t arrayLedBits[] = {
     0, 0, 0, 0, 0, 0, 0, 7, 7, 0
 };
-static uint32_t g_arraySwBits[] = {
+static uint32_t arraySwBits[] = {
     0, 0, 0, 0, 0, 16384, 0, 0, 0, 0
 };
-static uint32_t g_arrayMscBits[] = {
+static uint32_t arrayMscBits[] = {
     0, 0, 16, 1, 0, 0, 16, 16, 16, 0
 };
-static uint32_t g_arrayFfBits[][4] = {
+static uint32_t arrayFfBits[][4] = {
     {0, 0, 0, 0},
     {0, 0, 0, 0},
     {0, 0, 0, 0},
@@ -81,16 +80,16 @@ static uint32_t g_arrayFfBits[][4] = {
     {0, 0, 0, 0},
     {0, 0, 0, 0},
 };
-static uint32_t g_arraySndBits[] = {
+static uint32_t arraySndBits[] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
-static uint32_t g_arrayLedValues[] = {
+static uint32_t arrayLedValues[] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
-static uint32_t g_arraySwValues[] = {
+static uint32_t arraySwValues[] = {
     0, 0, 0, 0, 0, 16384, 0, 0, 0, 0
 };
-static uint32_t g_arrayKeyValues[][24] = {
+static uint32_t arrayKeyValues[][24] = {
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -102,7 +101,7 @@ static uint32_t g_arrayKeyValues[][24] = {
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 };
-static input_absinfo g_arrayAxisInfo[][64] = {
+static input_absinfo arrayAxisInfo[][64] = {
     {
         {0, 0, 480, 0, 0, 0},
         {0, 0, 960, 0, 0, 0},

@@ -20,10 +20,9 @@ namespace OHOS {
 namespace MMI {
     namespace {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
-            LOG_CORE, MMI_LOG_DOMAIN, "KeyEventValueTransformations"
-        };
+            LOG_CORE, MMI_LOG_DOMAIN, "KeyEventValueTransformations" };
     }
-const std::multimap<int16_t, KeyEventValueTransformations> MAP_KEY_EVENT_VALUE_TRANSFORMATION = {
+const std::multimap<int16_t, KeyEventValueTransformations> mapKeyEventValueTransformation = {
     {11, {"KEY_0", 11, 2000, HOS_KEY_0, MMI_NO_SYSTEM_KEY}},
     {2, {"KEY_1", 2, 2001, HOS_KEY_1, MMI_NO_SYSTEM_KEY}},
     {3, {"KEY_2", 3, 2002, HOS_KEY_2, MMI_NO_SYSTEM_KEY}},
@@ -442,8 +441,8 @@ const std::multimap<int16_t, KeyEventValueTransformations> MAP_KEY_EVENT_VALUE_T
 
 KeyEventValueTransformations KeyValueTransformationByInput(int16_t keyValueOfInput)
 {
-    auto it = MAP_KEY_EVENT_VALUE_TRANSFORMATION.find(keyValueOfInput);
-    if (it != MAP_KEY_EVENT_VALUE_TRANSFORMATION.end()) {
+    auto it = mapKeyEventValueTransformation.find(keyValueOfInput);
+    if (it != mapKeyEventValueTransformation.end()) {
         return it->second;
     } else {
         KeyEventValueTransformations unknownEvent = {

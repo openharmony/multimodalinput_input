@@ -20,8 +20,6 @@ OHOS::MMI::VirtualKeyboardSysCtrl::VirtualKeyboardSysCtrl() : VirtualDevice("Vir
 {
 }
 
-OHOS::MMI::VirtualKeyboardSysCtrl::~VirtualKeyboardSysCtrl() {}
-
 const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardSysCtrl::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "touch_event.h"
 #include <gtest/gtest.h>
+#include "touch_event.h"
 
 namespace {
 using namespace testing::ext;

@@ -18,33 +18,32 @@
 #include <libudev.h>
 #include <functional>
 #include <libinput.h>
-#include <sys/epoll.h>
 
 namespace OHOS {
 namespace MMI {
+typedef std::function<void()> FunOnTimer;
 typedef std::function<void(void *event)> FunInputEvent;
 class SInput {
 public:
     SInput();
     virtual ~SInput();
-    static void Loginfo_packaging_tool(libinput_event& event);
-    bool Init(FunInputEvent funInputEvent, const std::string& seat_id = "seat0");
-    void EventDispatch(epoll_event& ev);
-    void Stop();
 
-    int32_t GetInputFd() const
-    {
-        return lfd_;
-    }
+    virtual bool Init(FunInputEvent funInputEvent, const std::string& seat_id = "seat0");
+    virtual bool Start();
+    virtual void Stop();
 
 protected:
-    void OnEventHandler();
+    virtual void OnEventHandler();
+    virtual void EventDispatch();
+    virtual void OnThread();
 
 protected:
     int32_t lfd_ = -1;
+    bool isrun_ = false;
     udev *udev_ = nullptr;
     libinput *input_ = nullptr;
 
+    std::thread t_;
     FunInputEvent funInputEvent_;
     std::string seat_id_;
 };

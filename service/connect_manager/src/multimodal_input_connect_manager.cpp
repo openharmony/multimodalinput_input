@@ -17,11 +17,11 @@
 #include <chrono>
 #include <thread>
 #include "iservice_registry.h"
-#include "log.h"
-#include "multimodal_input_connect_death_recipient.h"
-#include "multimodal_input_connect_define.h"
 #include "system_ability_definition.h"
+#include "log.h"
 #include "util.h"
+#include "multimodal_input_connect_define.h"
+#include "multimodal_input_connect_death_recipient.h"
 
 namespace OHOS {
 namespace MMI {

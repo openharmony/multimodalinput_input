@@ -12,13 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "s_input.h"
-#include <climits>
-#include <fcntl.h>
-#include <inttypes.h>
 #include <sys/epoll.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <inttypes.h>
 #include "libmmi_util.h"
 #include "safe_keeper.h"
 #include "util.h"
@@ -27,49 +25,20 @@ namespace OHOS::MMI {
     namespace {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SInput" };
     }
-
-static void HiLogFunc(struct libinput* input, enum libinput_log_priority priority, const char* fmt, va_list args)
-{
-    char buffer[256];
-    (void)vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args);
-    MMI_LOGE("PrintLog_Info:%{public}s", buffer);
-    va_end(args);
-}
-
-static void InitHiLogFunc(struct libinput* input)
-{
-    static bool initFlag = false;
-    if (initFlag) {
-        return;
-    }
-    libinput_log_set_handler(input, &OHOS::MMI::HiLogFunc);
-    initFlag = true;
-}
-}
-
-void OHOS::MMI::SInput::Loginfo_packaging_tool(libinput_event& event)
-{
-    auto context = libinput_event_get_context(&event);
-    InitHiLogFunc(context);
 }
 
 const static libinput_interface LIBINPUT_INTERFACE = {
     .open_restricted = [](const char *path, int32_t flags, void *user_data)->int32_t {
         using namespace OHOS::MMI;
         CHKR(path, OHOS::NULL_POINTER, -errno);
-        char realPath[PATH_MAX] = {};
-        if (realpath(path, realPath) == nullptr) {
-            MMI_LOGE("path is error, path = %{public}s", path);
-            return RET_ERR;
-        }
-        int32_t fd = open(realPath, flags);
+        int32_t fd = open(path, flags);
         MMI_LOGD("libinput .open_restricted path:%{public}s fd:%{public}d", path, fd);
         return fd < 0 ? -errno : fd;
     },
     .close_restricted = [](int32_t fd, void *user_data)
     {
         using namespace OHOS::MMI;
-        MMI_LOGI("libinput .close_restricted fd:%{public}d\n", fd);
+        MMI_LOGI("libinput .close_restricted fd:%d\n", fd);
         close(fd);
     },
 };
@@ -100,40 +69,32 @@ bool OHOS::MMI::SInput::Init(FunInputEvent funInputEvent, const std::string& sea
         udev_unref(udev_);
         return false;
     }
-    lfd_ = libinput_get_fd(input_);
-    if (lfd_ < 0) {
-        libinput_unref(input_);
-        udev_unref(udev_);
-        lfd_ = -1;
-        return false;
-    }
+    EventDispatch();
     return true;
 }
 
-void OHOS::MMI::SInput::EventDispatch(epoll_event& ev)
+bool OHOS::MMI::SInput::Start()
 {
-    CHK(ev.data.ptr, NULL_POINTER);
-    auto fd = *static_cast<int*>(ev.data.ptr);
-    if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGF("SInput::OnEventDispatch epoll unrecoverable error, "
-            "The service must be restarted. fd:%{public}d", fd);
-        free(ev.data.ptr);
-        ev.data.ptr = nullptr;
-        return;
-    }
-    if (libinput_dispatch(input_) != 0) {
-        MMI_LOGE("libinput: Failed to dispatch libinput");
-        return;
-    }
-    OnEventHandler();
+    lfd_ = libinput_get_fd(input_);
+    CHKF(lfd_ >= 0, VAL_NOT_EXP);
+    isrun_ = true;
+    t_ = std::thread(std::bind(&SInput::OnThread, this));
+    t_.detach();
+    return true;
 }
 
 void OHOS::MMI::SInput::Stop()
 {
+    isrun_ = false;
+
     if (lfd_ >= 0) {
         close(lfd_);
         lfd_ = -1;
     }
+    if (t_.joinable()) {
+        t_.join();
+    }
+
     libinput_unref(input_);
     udev_unref(udev_);
 }
@@ -148,3 +109,31 @@ void OHOS::MMI::SInput::OnEventHandler()
     }
 }
 
+void OHOS::MMI::SInput::EventDispatch()
+{
+    if (libinput_dispatch(input_) != 0) {
+        MMI_LOGE("libinput: Failed to dispatch libinput");
+        return;
+    }
+    OnEventHandler();
+}
+
+void OHOS::MMI::SInput::OnThread()
+{
+    OHOS::MMI::SetThreadName(std::string("s_input"));
+    uint64_t tid = GetThisThreadIdOfLL();
+    CHK(tid > 0, PARAM_INPUT_INVALID);
+    MMI_LOGI("CInput::OnThread begin... fd:%{public}d tid:%{public}" PRId64 "", lfd_, tid);
+    SafeKpr->RegisterEvent(tid, "CInput::_OnThread");
+
+    int32_t count = 0;
+    epoll_event vevt[10] = {};
+    while (isrun_) {
+        count = epoll_wait(lfd_, vevt, sizeof(vevt) / sizeof(vevt[0]), DEFINE_EPOLL_TIMEOUT);
+        for (auto i = 0; i < count; i++) {
+            EventDispatch();
+        }
+        SafeKpr->ReportHealthStatus(tid);
+    }
+    MMI_LOGI("SInput::OnThread end...\n");
+}

@@ -14,7 +14,7 @@
  */
 #ifndef OHOS_KEYBOARD_EVENTS_H
 #define OHOS_KEYBOARD_EVENTS_H
-#include "key_event_pre.h"
+#include "key_event.h"
 
 namespace OHOS {
 class KeyBoardEvent : public KeyEvent {
@@ -30,7 +30,7 @@ public:
                     bool isThreeNonCharacters, bool isPressed, int32_t keyCode, int32_t keyDownDuration,
                     int32_t highLevelEvent, const std::string& uuid, int32_t sourceType, uint64_t occurredTime,
                     const std::string& deviceId, int32_t inputDeviceId,  bool isHighLevelEvent,
-                    uint16_t deviceUdevTags = 0, int32_t deviceEventType = 0, bool isIntercepted = true);
+                    uint16_t deviceUdevTags = 0, int32_t deviceEventType = 0);
 
     /**
     * initialize the object.

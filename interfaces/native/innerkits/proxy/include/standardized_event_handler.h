@@ -17,10 +17,8 @@
 
 #include "proto.h"
 #include "key_event.h"
-#include "key_event_pre.h"
 #include "touch_event.h"
 #include "device_event.h"
-#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
@@ -34,7 +32,7 @@ public:
     template<class T>
     static StandEventPtr Create();
 
-    virtual bool OnKey(const OHOS::KeyEvent& event);
+    virtual bool OnKey(const KeyEvent& event);
     virtual bool OnTouch(const TouchEvent& event);
 
     virtual bool OnShowMenu(const MultimodalEvent& event);

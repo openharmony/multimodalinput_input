@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "rotation_event.h"
 #include <gtest/gtest.h>
+#include "rotation_event.h"
 
 namespace {
 using namespace testing::ext;

@@ -12,9 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "expansibility_operation.h"
 #include <gtest/gtest.h>
+#include "expansibility_operation.h"
 
 namespace {
 using namespace testing::ext;

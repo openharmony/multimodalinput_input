@@ -12,19 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "mmi_client.h"
 #include <codecvt>
-#include <csignal>
 #include <locale>
-#include "common_event_handler.h"
-#include "key_event_handler.h"
-#include "media_event_handler.h"
+#include <csignal>
 #include "mmi_token.h"
+#include "mmi_client.h"
+#include "key_event_handler.h"
 #include "multimodal_event_handler.h"
+#include "common_event_handler.h"
 #include "system_event_handler.h"
 #include "telephone_event_handler.h"
 #include "touch_event_handler.h"
+#include "media_event_handler.h"
 
 namespace {
 using namespace OHOS;
@@ -37,7 +36,7 @@ public:
     AppKeyEventHandle() {}
     ~AppKeyEventHandle() {}
 
-    virtual bool OnKey(const OHOS::KeyEvent& keylEvent) override
+    virtual bool OnKey(const KeyEvent& keylEvent) override
     {
         MMI_LOGT("AppKeyEventHandle::Onkey");
         return true;
@@ -395,7 +394,7 @@ int main(int argc, char* argv[])
     while (!g_clientExit) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-
+    
     MMI_LOGT("hosmmi-client exit.");
 
     return 0;

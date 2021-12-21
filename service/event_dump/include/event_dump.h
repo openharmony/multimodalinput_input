@@ -25,7 +25,7 @@ namespace MMI {
 class EventDump : public CSingleton<EventDump> {
 public:
     void Init(UDSServer& udss);
-    void Dump(int32_t fd = 0); // -1=printf, 0=hilog, (fd>0)=file
+    void Dump(int32_t fd);
     void TestDump();
     void InsertDumpInfo(const std::string& str);
     void InsertFormat(std::string str, ...);

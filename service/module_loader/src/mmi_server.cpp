@@ -12,13 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "mmi_server.h"
 #include <inttypes.h>
-#include "event_dump.h"
-#include "log.h"
-#include "multimodal_input_connect_service.h"
 #include "util.h"
+#include "log.h"
+#include "event_dump.h"
+#include "multimodal_input_connect_service.h"
 
 namespace OHOS::MMI {
     namespace {
@@ -37,7 +36,7 @@ void CheckDefineOutput(const char* fmt, Ts... args)
     int32_t ret = 0;
 
     char buf[MAX_STREAM_BUF_SIZE] = {};
-    ret = snprintf_s(buf, MAX_STREAM_BUF_SIZE, MAX_STREAM_BUF_SIZE - 1, fmt, args...);
+    ret = snprintf_s(buf, MAX_STREAM_BUF_SIZE, MAX_STREAM_BUF_SIZE, fmt, args...);
     if (ret < 0) {
         KMSG_LOGI("call snprintf_s fail.ret = %d", ret);
         return;
@@ -129,7 +128,7 @@ int32_t OHOS::MMI::MMIServer::Start()
     uint64_t curTime = OHOS::MMI::GetMillisTime();
     uint64_t consumeTime = curTime - GetMmiServerStartTime();
     MMI_LOGW("The server started successfully, the time consumed was %{public}" PRId64
-            " Ms curTime:%{public}" PRId64 "", consumeTime, curTime);
+             " Ms curTime:%{public}" PRId64 "", consumeTime, curTime);
 #endif
     return RET_OK;
 }
@@ -156,14 +155,14 @@ int32_t OHOS::MMI::MMIServer::InitLibinput()
 
 #ifdef OHOS_BUILD_HDF
     MMI_LOGD("HDF Init");
-    SetLibInputEventListener([](struct libinput_event* event) {
+    SetLibInputEventListener([](struct multimodal_libinput_event *event) {
         InputHandler->OnEvent(event);
     });
     hdfEventManager.SetupCallback();
 #else
     #ifdef OHOS_WESTEN_MODEL
         MMI_LOGD("InitLibinput WestonInit...");
-        SetLibInputEventListener([](struct libinput_event* event) {
+        SetLibInputEventListener([](struct multimodal_libinput_event *event) {
             InputHandler->OnEvent(event);
         });
     #else
@@ -178,6 +177,7 @@ int32_t OHOS::MMI::MMIServer::InitLibinput()
             return LIBINPUT_INIT_FAIL;
         }
         MMI_LOGD("libinput start");
+        CHKR(input_.Start(), LIBINPUT_START_FAIL, LIBINPUT_START_FAIL);
     #endif
 #endif
     return RET_OK;
@@ -195,7 +195,7 @@ void OHOS::MMI::MMIServer::StopAll()
     if (ret != RET_OK) {
         MMI_LOGE("call SaConnectServiceStop fail, ret = %{public}d.", ret);
     }
-    UdsStop();
+    Stop();
     RegEventHM->Clear();
     InputHandler->Clear();
 #ifndef OHOS_WESTEN_MODEL
@@ -266,7 +266,8 @@ void OHOS::MMI::MMIServer::OnDisconnected(SessionPtr s)
     int32_t fd = s->GetFd();
 
     auto appInfo = AppRegs->FindBySocketFd(fd);
-    WinMgr->EraseSurfaceInfo(appInfo.windowId);
+    RegEventHM->UnregisterEventHandleBySocketFd(fd);
+    AppRegs->UnregisterAppInfoBySocketFd(fd);
     AppRegs->UnregisterConnectState(fd);
 #ifdef  OHOS_BUILD_AI
     seniorInput_.DeviceDisconnect(fd);

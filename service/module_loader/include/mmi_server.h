@@ -63,7 +63,6 @@ protected:
     SInput input_;
 #endif
 private:
-    int32_t InitUds();
     int32_t InitExpSoLibrary();
     int32_t InitLibinput();
 };

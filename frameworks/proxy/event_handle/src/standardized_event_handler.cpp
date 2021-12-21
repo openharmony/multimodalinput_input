@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "standardized_event_handler.h"
 #include "log.h"
 
@@ -20,7 +19,7 @@ OHOS::MMI::StandardizedEventHandler::StandardizedEventHandler() : type_(MmiMessa
 
 OHOS::MMI::StandardizedEventHandler::~StandardizedEventHandler() {}
 
-bool OHOS::MMI::StandardizedEventHandler::OnKey(const OHOS::KeyEvent& event)
+bool OHOS::MMI::StandardizedEventHandler::OnKey(const KeyEvent& event)
 {
     return false;
 }

@@ -31,9 +31,9 @@ The module of this repository is applied on the basis of standard systems to pro
 
 Available APIs of Multimodal Input are event injection ones, which are open only to system apps currently.
 
--   The  **InJectEventHandler**  class provides methods for processing injection events.
+-   The  **inputEventClient**  class provides methods for processing injection events.
 
-    **Table  1**  Major APIs in InJectEventHandler
+    **Table  1**  Major APIs in inputEventClient
 
     <a name="t49c6a8df29a143a98ef6f66f43c7eac8"></a>
     <table><thead align="left"><tr id="rf815506c67654ad4ac014b339ee3292d"><th class="cellrowborder" valign="top" width="15.031503150315032%" id="mcps1.2.4.1.1"><p id="a59bc0498281e498289e11d5e584eb293"><a name="a59bc0498281e498289e11d5e584eb293"></a><a name="a59bc0498281e498289e11d5e584eb293"></a>Category</p>
@@ -46,7 +46,7 @@ Available APIs of Multimodal Input are event injection ones, which are open only
     </thead>
     <tbody><tr id="ra7599f41f04548858a77e2062aad2cf5"><td class="cellrowborder" valign="top" width="15.031503150315032%" headers="mcps1.2.4.1.1 "><p id="a63ab1186072d4bcdb32d4e11b9243b57"><a name="a63ab1186072d4bcdb32d4e11b9243b57"></a><a name="a63ab1186072d4bcdb32d4e11b9243b57"></a>Event injection</p>
     </td>
-    <td class="cellrowborder" valign="top" width="23.152315231523154%" headers="mcps1.2.4.1.2 "><p id="a3d9b89df15074475a45ed26503e22c21"><a name="a3d9b89df15074475a45ed26503e22c21"></a><a name="a3d9b89df15074475a45ed26503e22c21"></a>function injectEventSync(keyEvent: KeyEvent): number;</p>
+    <td class="cellrowborder" valign="top" width="23.152315231523154%" headers="mcps1.2.4.1.2 "><p id="a3d9b89df15074475a45ed26503e22c21"><a name="a3d9b89df15074475a45ed26503e22c21"></a><a name="a3d9b89df15074475a45ed26503e22c21"></a>function injectEvent(keyEvent: KeyEvent): number;</p>
     </td>
     <td class="cellrowborder" valign="top" width="61.816181618161814%" headers="mcps1.2.4.1.3 "><p id="a33c82952289f40a09773ce2fed14f6aa"><a name="a33c82952289f40a09773ce2fed14f6aa"></a><a name="a33c82952289f40a09773ce2fed14f6aa"></a>Injects events.</p>
     </td>
@@ -63,10 +63,10 @@ When a system app needs to return to the previous directory, you can call the AP
 
 ```
 // Import the required JavaScript API library.
-import input from '@ohos.injectEventHandler'
+import inputEventClient from '@ohos.multimodalInput.inputEventClient'
 
 // Call the API for injecting events.
-var res = input.injectEventSync({
+var res = inputEventClient.injectEvent({
     isPressed:true,           // Action type of the key event. true indicates that the key is being pressed down, and false indicates that the key is being released.
     code:2,                   // Keycode for the key, for example, 2 for the BACK key.
     keyDownDuration:10,       // Duration in which the current key is pressed down before it is released, in milliseconds.
