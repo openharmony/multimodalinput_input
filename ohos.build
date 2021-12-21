@@ -4,10 +4,12 @@
     "multimodalinput_base": {
       "module_list": [
         "//foundation/multimodalinput/input:multimodalinput_mmi_packages",
-        "//foundation/multimodalinput/input/sa_profile:multimodalinput_connect_sa_profile",
+        "//foundation/multimodalinput/input/sa_profile:multimodalinput_sa_profile",
+        "//foundation/multimodalinput/input:multimodalinput.rc",
         "//foundation/multimodalinput/input/patch:patch_packages",
         "//third_party/eudev:libudev",
         "//third_party/eudev:udevd",
+        "//third_party/eudev:udevadm",
         "//third_party/eudev:udevd.rc",
         "//third_party/eudev:udev_conf",
         "//third_party/eudev:udev_touchscreen_rule",

@@ -2107,6 +2107,100 @@ diff -Naur old/src/evdev-mt-touchpad-gestures.c new/src/evdev-mt-touchpad-gestur
  	}
  
  	return GESTURE_STATE_SWIPE;
+diff -Naur old/src/evdev-mt-touchpad-tap.c new/src/evdev-mt-touchpad-tap.c
+--- old/src/evdev-mt-touchpad-tap.c	2021-01-01 00:00:00.000000000 +0800
++++ new/src/evdev-mt-touchpad-tap.c	2021-01-01 00:00:00.000000000 +0800
+@@ -72,6 +72,7 @@
+ 	CASE_RETURN_STRING(TAP_STATE_DRAGGING_OR_TAP);
+ 	CASE_RETURN_STRING(TAP_STATE_DRAGGING_2);
+ 	CASE_RETURN_STRING(TAP_STATE_DEAD);
++	CASE_RETURN_STRING(TAP_STATE_HOLDING);
+ 	}
+ 	return NULL;
+ }
+@@ -226,6 +227,10 @@
+ 	case TAP_EVENT_TIMEOUT:
+ 		tp->tap.state = TAP_STATE_HOLD;
+ 		tp_tap_clear_timer(tp);
++		tp_tap_notify(tp,
++			      tp->tap.saved_press_time,
++			      1,
++			      LIBINPUT_BUTTON_STATE_PRESSED);
+ 		break;
+ 	case TAP_EVENT_BUTTON:
+ 		tp->tap.state = TAP_STATE_DEAD;
+@@ -262,8 +267,48 @@
+ 		tp->tap.state = TAP_STATE_IDLE;
+ 		break;
+ 	case TAP_EVENT_MOTION:
++		tp->tap.state = TAP_STATE_HOLDING;
++		break;
++	case TAP_EVENT_TIMEOUT:
++		break;
++	case TAP_EVENT_BUTTON:
++		tp->tap.state = TAP_STATE_DEAD;
++		break;
++	case TAP_EVENT_THUMB:
++		tp->tap.state = TAP_STATE_IDLE;
++		t->tap.is_thumb = true;
++		tp->tap.nfingers_down--;
++		t->tap.state = TAP_TOUCH_STATE_DEAD;
++		break;
++	case TAP_EVENT_PALM:
++		tp->tap.state = TAP_STATE_IDLE;
++		break;
++	case TAP_EVENT_PALM_UP:
++		break;
++	}
++	if ((tp->tap.state != TAP_STATE_HOLDING) && (tp->tap.state != TAP_STATE_HOLD)) {
++		tp_tap_notify(tp,
++			      tp->tap.saved_press_time,
++			      1,
++			      LIBINPUT_BUTTON_STATE_RELEASED);
++	}
++}
++
++static void
++tp_tap_holding_handle_event(struct tp_dispatch *tp,
++			    struct tp_touch *t,
++			    enum tap_event event, uint64_t time)
++{
++
++	switch (event) {
++	case TAP_EVENT_TOUCH:
+ 		tp_tap_move_to_dead(tp, t);
+ 		break;
++	case TAP_EVENT_RELEASE:
++		tp->tap.state = TAP_STATE_IDLE;
++		break;
++	case TAP_EVENT_MOTION:
++		break;
+ 	case TAP_EVENT_TIMEOUT:
+ 		break;
+ 	case TAP_EVENT_BUTTON:
+@@ -281,6 +326,12 @@
+ 	case TAP_EVENT_PALM_UP:
+ 		break;
+ 	}
++	if (tp->tap.state != TAP_STATE_HOLDING) {
++		tp_tap_notify(tp,
++			      tp->tap.saved_press_time,
++			      1,
++			      LIBINPUT_BUTTON_STATE_RELEASED);
++    }
+ }
+ 
+ static void
+@@ -796,6 +847,9 @@
+ 	case TAP_STATE_DEAD:
+ 		tp_tap_dead_handle_event(tp, t, event, time);
+ 		break;
++	case TAP_STATE_HOLDING:
++		tp_tap_holding_handle_event(tp, t, event, time);
++		break;
+ 	}
+ 
+ 	if (tp->tap.state == TAP_STATE_IDLE || tp->tap.state == TAP_STATE_DEAD)
 diff -Naur old/src/evdev-mt-touchpad.c new/src/evdev-mt-touchpad.c
 --- old/src/evdev-mt-touchpad.c	2021-01-01 00:00:00.000000000 +0800
 +++ new/src/evdev-mt-touchpad.c	2021-01-01 00:00:00.000000000 +0800
@@ -2120,6 +2214,17 @@ diff -Naur old/src/evdev-mt-touchpad.c new/src/evdev-mt-touchpad.c
  
  	switch (e->type) {
  	case EV_ABS:
+diff -Naur old/src/evdev-mt-touchpad.h new/src/evdev-mt-touchpad.h
+--- old/src/evdev-mt-touchpad.h	2021-01-01 00:00:00.000000000 +0800
++++ new/src/evdev-mt-touchpad.h	2021-01-01 00:00:00.000000000 +0800
+@@ -118,6 +118,7 @@
+ 	TAP_STATE_DRAGGING_WAIT,
+ 	TAP_STATE_DRAGGING_2,
+ 	TAP_STATE_DEAD, /**< finger count exceeded */
++	TAP_STATE_HOLDING,
+ };
+ 
+ enum tp_tap_touch_state {
 diff -Naur old/src/evdev-tablet-pad.c new/src/evdev-tablet-pad.c
 --- old/src/evdev-tablet-pad.c	2021-01-01 00:00:00.000000000 +0800
 +++ new/src/evdev-tablet-pad.c	2021-01-01 00:00:00.000000000 +0800

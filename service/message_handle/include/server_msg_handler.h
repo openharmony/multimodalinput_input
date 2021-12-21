@@ -15,6 +15,7 @@
 #ifndef OHOS_SERVER_MSG_HANDLER_H
 #define OHOS_SERVER_MSG_HANDLER_H
 #include "msg_handler.h"
+#include "event_dispatch.h"
 #include "senior_input_func_proc_base.h"
 
 namespace OHOS {
@@ -47,6 +48,21 @@ protected:
     int32_t CheckReplyMessageFormClient(SessionPtr sess, NetPacket& pkt);
     int32_t GetMultimodeInputInfo(SessionPtr sess, NetPacket& pkt);
     int32_t OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt);
+    int32_t OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt);
+    int32_t OnAddKeyEventFilter(SessionPtr sess, NetPacket& pkt);
+    int32_t OnRemoveKeyEventFilter(SessionPtr sess, NetPacket& pkt);
+    int32_t OnAddTouchEventFilter(SessionPtr sess, NetPacket& pkt);
+    int32_t OnRemoveTouchEventFilter(SessionPtr sess, NetPacket& pkt);
+    int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
+    int32_t OnAddEventInterceptor(SessionPtr sess, NetPacket& pkt);
+    int32_t OnRemoveEventInterceptor(SessionPtr sess, NetPacket& pkt);
+    int32_t OnAddInputHandler(SessionPtr sess, NetPacket& pkt);
+    int32_t OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt);
+    int32_t OnMarkConsumed(SessionPtr sess, NetPacket& pkt);
+    int32_t OnGetDeviceInfo(SessionPtr sess, NetPacket& pkt);
+    int32_t OnGetDeviceIdList(SessionPtr sess, NetPacket& pkt);
+    int32_t OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt);
+    int32_t OnRemoveInputEventMontior(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_AUTO_TEST_FRAME
     int32_t AutoTestFrameRegister(SessionPtr sess, NetPacket& pkt);
     int32_t AutoTestReceiveClientPkt(SessionPtr sess, NetPacket& pkt);
@@ -55,6 +71,8 @@ protected:
 private:
     UDSServer *udsServer_ = nullptr; // External references, do not delete
     SeniorInputFuncProcBase *seniorInput_ = nullptr;
+    EventDispatch eventDispatch_;
+    std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent;
 };
 }
 }

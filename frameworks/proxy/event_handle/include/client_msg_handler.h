@@ -33,6 +33,9 @@ public:
 
 protected:
     virtual int32_t OnKey(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t OnKeyEvent(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t OnKeyMonitor(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t OnPointerEvent(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnTouch(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnCopy(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnShowMenu(const UDSClient& client, NetPacket& pkt);
@@ -70,6 +73,13 @@ protected:
     virtual int32_t GetMultimodeInputInfo(const UDSClient& client, NetPacket& pkt);
     virtual int32_t DeviceAdd(const UDSClient& client, NetPacket& pkt);
     virtual int32_t DeviceRemove(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t KeyEventFilter(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t TouchEventFilter(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t PointerEventInterceptor(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t ReportKeyEvent(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t ReportPointerEvent(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t OnInputDevice(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t OnInputDeviceIds(const UDSClient& client, NetPacket& pkt);
 
 private:
     int32_t PackedData(MultimodalEvent& multe, const UDSClient& client, NetPacket& pkt, const std::string& funName);

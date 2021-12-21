@@ -12,9 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include "test_aux_tool_msg_handler.h"
 #include <gtest/gtest.h>
 #include "proto.h"
-#include "test_aux_tool_msg_handler.h"
 
 #if BINDER_TODO
 namespace {

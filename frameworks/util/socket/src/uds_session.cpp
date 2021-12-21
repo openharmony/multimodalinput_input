@@ -12,13 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "uds_session.h"
+#include <sstream>
+#include <fcntl.h>
+#include <inttypes.h>
 #include <sys/types.h>
 #include <sys/un.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <sstream>
-#include <inttypes.h>
 
 namespace OHOS::MMI {
     namespace {
@@ -26,10 +27,13 @@ namespace OHOS::MMI {
     }
 }
 
-OHOS::MMI::UDSSession::UDSSession(const std::string& programName, const int moduleType, const int32_t fd)
+OHOS::MMI::UDSSession::UDSSession(const std::string& programName, const int moduleType, const int32_t fd,
+                                  const int32_t uid, const int32_t pid)
     : programName_(programName),
       moduleType_(moduleType),
-      fd_(fd)
+      fd_(fd),
+      uid_(uid),
+      pid_(pid)
 {
     UpdateDescript();
 }
@@ -47,8 +51,8 @@ bool OHOS::MMI::UDSSession::SendMsg(const char *buf, size_t size) const
     if (ret < 0) {
         const int errNoSaved = errno;
         MMI_LOGE("UDSSession::SendMsg write return %{public}" PRId64
-                 ", fd_: %{public}d, errNoSaved: %{public}d, %{public}s.",
-                 ret, fd_, errNoSaved, strerror(errNoSaved));
+                ", fd_: %{public}d, errNoSaved: %{public}d, %{public}s.",
+                ret, fd_, errNoSaved, strerror(errNoSaved));
         return false;
     }
     return true;

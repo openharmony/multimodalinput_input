@@ -120,8 +120,13 @@ namespace OHOS {
         MEMSET_SEC_FUN_FAIL,                        // memset安全函数错误
         DEVICEID_PARAM_PKG_FAIL,                    // 设备号参数封装失败
         MALLOC_FAIL,                                // malloc失败
-        SEC_MEMSET_FAIL,
         SEC_STRCPY_FAIL,                            // 安全函数strcpy错误
+        SASERVICE_INIT_FAIL,                        // SA_Service初始化错误
+        SASERVICE_START_FAIL,                       // SA_Service启动错误
+        SASERVICE_STOP_FAIL,                        // SA_Service停止错误
+        INVALID_RETURN_VALUE,                       // 无效的返回值
+        EPOLL_CTL_FAIL,                             // epoll_ctl错误
+        EXP_SO_LIBY_INIT_FAIL,                      // 可扩展模块初始化错误
     };
     // Error code for util
     constexpr ErrCode UTIL_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_UTIL);
@@ -150,6 +155,8 @@ namespace OHOS {
         CONN_FAIL,                                  // 建立连接失败
         SESSION_NOT_FOUND,                          // 没有找到session
         FD_ACCEPT_FAIL,                             // 接受连接时fd无效
+        PID_OBTAIN_FAIL,                            // 获取PID失败
+        FD_OBTAIN_FAIL,                             // 获取FD失败
     };
     // Error code for virtual deviceparam
     constexpr ErrCode VIRTUAL_DEVICE_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_VIRTUAL_DEVICE);

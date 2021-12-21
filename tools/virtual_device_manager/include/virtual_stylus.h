@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef OHOS_VIRTUAL_STYLUS_H
 #define OHOS_VIRTUAL_STYLUS_H
 
@@ -23,6 +23,7 @@ namespace MMI {
 class VirtualStylus : public VirtualDevice {
 public:
     VirtualStylus();
+    ~VirtualStylus();
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
     const std::vector<uint32_t>& GetKeys() const override;

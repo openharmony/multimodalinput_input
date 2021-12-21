@@ -104,7 +104,7 @@ export default {
     for(let type in this.eventInfo) {
       let name = this.eventInfo[type];
       console.log(`inputEventClient::onEventReg: name=${name}`)
-      inputEventClient.on(name, this.eventHandle);      
+      inputEventClient.on(name, this.eventHandle);
     }
   },
 
@@ -113,7 +113,7 @@ export default {
     for(let type in this.eventInfo) {
       let name = this.eventInfo[type];
       console.log(`inputEventClient::onEventUnreg: name=${name}`)
-      inputEventClient.off(name, this.eventHandle);     
+      inputEventClient.off(name, this.eventHandle);
     }
   },
 
