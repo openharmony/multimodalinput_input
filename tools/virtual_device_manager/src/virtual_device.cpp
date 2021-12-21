@@ -45,7 +45,7 @@ bool OHOS::MMI::VirtualDevice::DoIoctl(int32_t fd, int32_t request, const uint32
     return true;
 }
 
-OHOS::MMI::VirtualDevice::VirtualDevice(const std::string &device_name, uint16_t busType,
+OHOS::MMI::VirtualDevice::VirtualDevice(const String &device_name, uint16_t busType,
                                         uint16_t vendorId, uint16_t product_id)
     : deviceName_(device_name),
       busTtype_(busType),
@@ -98,14 +98,14 @@ bool OHOS::MMI::VirtualDevice::SyncSymbolFile()
 
     for (auto it : res) {
         char temp[32] = { 0 };
-        std::string processName;
-        std::string procressPath = "/proc/" + it + "/";
+        String processName;
+        String procressPath = "/proc/" + it + "/";
         DIR* dir = opendir(procressPath.c_str());
         if (dir == nullptr) {
-            std::string removeFile = "find /data/symbol/ -name " + it + "* | xargs rm";
+            String removeFile = "find /data/symbol/ -name " + it + "* | xargs rm";
             system(removeFile.c_str());
         } else {
-            std::string catName = "cat /proc/" + it + "/cmdline";
+            String catName = "cat /proc/" + it + "/cmdline";
             FILE* cmdName = popen(catName.c_str(), "r");
             if (cmdName == nullptr) {
                 printf("popen Execution failed!\n");
@@ -116,7 +116,7 @@ bool OHOS::MMI::VirtualDevice::SyncSymbolFile()
             pclose(cmdName);
             processName.append(temp);
             if (processName.find("hosmmi-virtual-device") == processName.npos) {
-                std::string removeFile = "find /data/symbol/ -name " + it + "* | xargs rm";
+                String removeFile = "find /data/symbol/ -name " + it + "* | xargs rm";
                 system(removeFile.c_str());
             }
         }
@@ -153,7 +153,7 @@ bool OHOS::MMI::VirtualDevice::CreateKey()
     return true;
 }
 
-bool OHOS::MMI::VirtualDevice::SetAbsResolution(const std::string deviceName)
+bool OHOS::MMI::VirtualDevice::SetAbsResolution(const String deviceName)
 {
     const int ABS_RESOLUTION = 200;
     const int ABS_RESOLUTION_FINGER = 40;
@@ -180,10 +180,10 @@ bool OHOS::MMI::VirtualDevice::SetAbsResolution(const std::string deviceName)
     return true;
 }
 
-bool OHOS::MMI::VirtualDevice::SetPhys(const std::string deviceName)
+bool OHOS::MMI::VirtualDevice::SetPhys(const String deviceName)
 {
-    std::string phys;
-    std::map<std::string, std::string> typeDevice = {
+    String phys;
+    std::map<String, String> typeDevice = {
         {"Virtual Mouse",                "mouse"},
         {"Virtual keyboard",             "keyboard"},
         {"Virtual KeyboardConsumerCtrl", "keyboard"},
@@ -205,7 +205,7 @@ bool OHOS::MMI::VirtualDevice::SetPhys(const std::string deviceName)
         {"Virtual Trackball",            "trackball"},
         {"Virtual TouchScreen",          "touchscreen"},
     };
-    std::string deviceType = typeDevice.find(deviceName)->second;
+    String deviceType = typeDevice.find(deviceName)->second;
     phys.append(deviceType).append(OHOS::MMI::g_pid).append("/").append(OHOS::MMI::g_pid);
 
     if (ioctl(fd_, UI_SET_PHYS, phys.c_str()) < 0) {
@@ -311,7 +311,7 @@ void OHOS::MMI::VirtualDevice::StartAllDevices()
     virtualTouchScreen.SetUp();
 }
 
-void OHOS::MMI::VirtualDevice::MakeFolder(const std::string &filePath)
+void OHOS::MMI::VirtualDevice::MakeFolder(const String &filePath)
 {
     DIR* dir = opendir(filePath.c_str());
     bool flag = false;
@@ -343,7 +343,7 @@ bool OHOS::MMI::VirtualDevice::SelectDevice(StringList &fileList)
     }
 }
 
-bool OHOS::MMI::VirtualDevice::CreateHandle(const std::string deviceArgv)
+bool OHOS::MMI::VirtualDevice::CreateHandle(const String deviceArgv)
 {
     if (deviceArgv == "mouse") {
         static OHOS::MMI::VirtualMouse virtualMouse;
@@ -410,12 +410,12 @@ bool OHOS::MMI::VirtualDevice::AddDevice(const StringList& fileList)
         printf("Invaild Input Para, Plase Check the validity of the para!\n");
         return false;
     }
-    std::string deviceArgv = fileList.back();
+    String deviceArgv = fileList.back();
     if (!CreateHandle(deviceArgv)) {
         return false;
     }
 
-    std::string symbolFile;
+    String symbolFile;
     symbolFile.append(OHOS::MMI::g_folderpath).append(OHOS::MMI::g_pid).append("_").append(deviceArgv);
     std::ofstream flagFile;
     flagFile.open(symbolFile.c_str());
@@ -434,7 +434,7 @@ bool OHOS::MMI::VirtualDevice::CloseDevice(const StringList& fileList)
         return false;
     }
     StringList alldevice = {};
-    std::string closePid = fileList.back();
+    String closePid = fileList.back();
     closePid.append("_");
     bool result = SelectDevice(alldevice);
     if (!result) {
@@ -464,7 +464,7 @@ bool OHOS::MMI::VirtualDevice::CloseDevice(const StringList& fileList)
     }
 }
 
-bool OHOS::MMI::VirtualDevice::FunctionalShunt(const std::string firstArgv, StringList argvList)
+bool OHOS::MMI::VirtualDevice::FunctionalShunt(const String firstArgv, StringList argvList)
 {
     SyncSymbolFile();
     if (firstArgv == "start") {

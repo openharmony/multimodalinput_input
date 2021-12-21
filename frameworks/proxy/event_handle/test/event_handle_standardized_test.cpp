@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
+#include <locale>
 #include <codecvt>
 #include <gtest/gtest.h>
-#include <locale>
-#include "error_multimodal.h"
-#include "log.h"
-#include "mmi_token.h"
-#include "multimodal_event_handler.h"
 #include "string_ex.h"
+#include "log.h"
+#include "error_multimodal.h"
+#include "multimodal_event_handler.h"
+#include "mmi_token.h"
 
 namespace {
 using namespace testing::ext;

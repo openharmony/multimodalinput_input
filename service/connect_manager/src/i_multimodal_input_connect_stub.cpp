@@ -17,9 +17,9 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include "ipc_skeleton.h"
+#include "string_ex.h"
 #include "log.h"
 #include "multimodal_input_connect_define.h"
-#include "string_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -57,16 +57,6 @@ bool IMultimodalInputConnectStub::IsAuthorizedCalling() const
     int callingUid = IPCSkeleton::GetCallingUid();
     MMI_LOGIK("Calling uid: %{public}d", callingUid);
     return true;
-}
-
-int32_t IMultimodalInputConnectStub::GetCallingUid() const
-{
-    return IPCSkeleton::GetCallingUid();
-}
-
-int32_t IMultimodalInputConnectStub::GetCallingPid() const
-{
-    return IPCSkeleton::GetCallingPid();
 }
 } // namespace MMI
 } // namespace OHOS

@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "stream_buffer.h"
 #include "define_multimodal.h"
 
@@ -131,12 +130,4 @@ OHOS::MMI::StreamBuffer &OHOS::MMI::StreamBuffer::operator=(const StreamBuffer &
 OHOS::MMI::StreamBuffer::StreamBuffer(const StreamBuffer &buf)
 {
     Clone(buf);
-}
-
-bool OHOS::MMI::StreamBuffer::IsEmpty()
-{
-    if (rIdx_ == wIdx_) {
-        return true;
-    }
-    return false;
 }

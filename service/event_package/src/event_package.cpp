@@ -12,18 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "event_package.h"
 #include "mmi_server.h"
 
 namespace OHOS {
 namespace MMI {
-namespace {
-    const std::string VIRTUAL_KEYBOARD = "virtual_keyboard";
-    constexpr uint32_t SEAT_KEY_COUNT_ONE = 1;
-    constexpr uint32_t SEAT_KEY_COUNT_ZERO = 0;
-}
-
 static void FillEventJoyStickAxisAbsInfo(EventJoyStickAxisAbsInfo& l,
                                          const libinput_event_joystick_axis_abs_info& r)
 {
@@ -99,7 +92,7 @@ int32_t EventPackage::PackageEventDeviceInfo(libinput_event& event, EventType& e
     auto physWhole = libinput_device_get_phys(device);
     if (!physWhole) {
         CHKR(EOK == memcpy_s(eventData.devicePhys, sizeof(eventData.devicePhys),
-            eventData.deviceName, sizeof(eventData.deviceName)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
+             eventData.deviceName, sizeof(eventData.deviceName)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
     } else {
         std::string s(physWhole);
         std::string phys = s.substr(0, s.rfind('/'));
@@ -420,9 +413,9 @@ int32_t EventPackage::PackagePointerEventByButton(libinput_event& event,
         absPointer.deviceType = point.deviceType;
         absPointer.deviceId = point.deviceId;
         CHKR(EOK == memcpy_s(absPointer.deviceName, sizeof(absPointer.deviceName),
-            point.deviceName, sizeof(point.deviceName)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
+             point.deviceName, sizeof(point.deviceName)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
         CHKR(EOK == memcpy_s(absPointer.devicePhys, sizeof(absPointer.devicePhys),
-            point.devicePhys, sizeof(point.devicePhys)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
+             point.devicePhys, sizeof(point.devicePhys)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
     }
     windowSwitch.SetPointerByButton(absPointer);
     return RET_OK;
@@ -511,35 +504,36 @@ int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event& event,
     return RET_OK;
 }
 
-int32_t EventPackage::PackageTouchEvent(libinput_event& event,
+int32_t EventPackage::PackageTouchEvent(multimodal_libinput_event &ev,
     EventTouch& touch, WindowSwitch& windowSwitch, UDSServer& udsServer)
 {
-    auto type = libinput_event_get_type(&event);
+    auto type = libinput_event_get_type(ev.event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
         return UNKNOWN_EVENT_PKG_FAIL;
     }
-    auto ret = PackageEventDeviceInfo<EventTouch>(event, touch, udsServer);
+    auto ret = PackageEventDeviceInfo<EventTouch>(*ev.event, touch, udsServer);
     if (ret != RET_OK) {
         MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
-    auto data = libinput_event_get_touch_event(&event);
+    auto data = libinput_event_get_touch_event(ev.event);
     CHKR(data, NULL_POINTER, RET_ERR);
     touch.time = libinput_event_touch_get_time_usec(data);
     touch.slot = libinput_event_touch_get_slot(data);
     touch.seat_slot = libinput_event_touch_get_seat_slot(data);
-    touch.pressure = libinput_event_get_touch_pressure(&event);
+    touch.pressure = libinput_event_get_touch_pressure(ev.event);
 
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
-            touch.point.x = libinput_event_touch_get_x(data);
-            touch.point.y = libinput_event_touch_get_y(data);
-#ifdef OHOS_WESTEN_MODEL
-            auto touchSurfaceInfo = WinMgr->GetTouchSurfaceInfo(touch.point.x, touch.point.y);
+            auto uData = static_cast<multimodal_input_pointer_data *>(ev.userdata);
+            CHKR(uData, NULL_POINTER, RET_ERR);
+            auto touchSurfaceInfo = WinMgr->GetTouchSurfaceInfo(uData->x, uData->y);
             CHKR(touchSurfaceInfo, NULL_POINTER, RET_ERR);
             WinMgr->SetTouchFocusSurfaceId(touchSurfaceInfo->surfaceId);
-            WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo, true);
-#endif
+            touch.point.x = uData->sx;
+            touch.point.y = uData->sy;
+            MMI_LOGF("TouchDown:[x=%{public}d, y=%{public}d, sx=%{public}d, sy=%{public}d]",
+                     uData->x, uData->y, uData->sx, uData->sy);
             break;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
@@ -548,14 +542,12 @@ int32_t EventPackage::PackageTouchEvent(libinput_event& event,
             break;
         }
         case LIBINPUT_EVENT_TOUCH_MOTION: {
-            touch.point.x = libinput_event_touch_get_x(data);
-            touch.point.y = libinput_event_touch_get_y(data);
-#ifdef OHOS_WESTEN_MODEL
-            auto touchSurfaceId = WinMgr->GetTouchFocusSurfaceId();
-            auto touchSurfaceInfo = WinMgr->GetSurfaceInfo(touchSurfaceId);
-            CHKR(touchSurfaceInfo, NULL_POINTER, RET_ERR);
-            WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo);
-#endif
+            auto uData = static_cast<multimodal_input_pointer_data *>(ev.userdata);
+            CHKR(uData, NULL_POINTER, RET_ERR);
+            touch.point.x = uData->sx;
+            touch.point.y = uData->sy;
+            MMI_LOGF("TouchMotion: [x=%{public}d, y=%{public}d, sx=%{public}d, sy=%{public}d]",
+                     uData->x, uData->y, uData->sx, uData->sy);
             break;
         }
         default: {
@@ -565,11 +557,11 @@ int32_t EventPackage::PackageTouchEvent(libinput_event& event,
     return RET_OK;
 }
 
-int32_t EventPackage::PackagePointerEvent(libinput_event& event,
+int32_t EventPackage::PackagePointerEvent(multimodal_libinput_event &ev,
     EventPointer& point, WindowSwitch& windowSwitch, UDSServer& udsServer)
 {
-    auto type = libinput_event_get_type(&event);
-    auto rDevRet = PackageEventDeviceInfo<EventPointer>(event, point, udsServer);
+    auto type = libinput_event_get_type(ev.event);
+    auto rDevRet = PackageEventDeviceInfo<EventPointer>(*ev.event, point, udsServer);
     int32_t ret = 0;
     if (rDevRet != RET_OK) {
         MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", rDevRet, DEV_PARAM_PKG_FAIL);
@@ -577,19 +569,36 @@ int32_t EventPackage::PackagePointerEvent(libinput_event& event,
     }
     switch (type) {
         case LIBINPUT_EVENT_POINTER_MOTION: {
-            PackagePointerEventByMotion(event, point, windowSwitch);
+            auto uData = static_cast<multimodal_input_pointer_data *>(ev.userdata);
+            CHKR(uData, NULL_POINTER, RET_ERR);
+            PackagePointerEventByMotion(*ev.event, point, windowSwitch);
+            point.absolute.x = uData->sx;
+            point.absolute.y = uData->sy;
+            MMI_LOGF("PointerMotion: [x=%{public}d, y=%{public}d, sx=%{public}d, sy=%{public}d]",
+                     uData->x, uData->y, uData->sx, uData->sy);
             break;
         }
         case LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE: {
-            PackagePointerEventByMotionAbs(event, point, windowSwitch);
+            PackagePointerEventByMotionAbs(*ev.event, point, windowSwitch);
             break;
         }
         case LIBINPUT_EVENT_POINTER_BUTTON: {
-            PackagePointerEventByButton(event, point, windowSwitch);
+            auto uData = static_cast<multimodal_input_pointer_data *>(ev.userdata);
+            CHKR(uData, NULL_POINTER, RET_ERR);
+            PackagePointerEventByButton(*ev.event, point, windowSwitch);
+            if (point.state == BUTTON_STATE_PRESSED) {
+                auto touchSurfaceInfo = WinMgr->GetTouchSurfaceInfo(uData->x, uData->y);
+                CHKR(touchSurfaceInfo, NULL_POINTER, RET_ERR);
+                WinMgr->SetTouchFocusSurfaceId(touchSurfaceInfo->surfaceId);
+            }
+            point.absolute.x = uData->sx;
+            point.absolute.y = uData->sy;
+            MMI_LOGF("PointerButton: [x=%{public}d, y=%{public}d, sx=%{public}d, sy=%{public}d]",
+                     uData->x, uData->y, uData->sx, uData->sy);
             break;
         }
         case LIBINPUT_EVENT_POINTER_AXIS: {
-            PackagePointerEventByAxis(event, point, windowSwitch);
+            PackagePointerEventByAxis(*ev.event, point, windowSwitch);
             break;
         }
         default: {
@@ -612,23 +621,6 @@ int32_t OHOS::MMI::EventPackage::PackageGestureEvent(libinput_event& event, Even
     gesture.time = libinput_event_gesture_get_time_usec(data);
     gesture.fingerCount = libinput_event_gesture_get_finger_count(data);
     switch (type) {
-        case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN: {
-            gesture.pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN;
-            break;
-        }
-        case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE: {
-            gesture.pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE;
-            gesture.scale = libinput_event_gesture_get_scale(data);
-            gesture.angle = libinput_event_gesture_get_angle_delta(data);
-            break;
-        }
-        case LIBINPUT_EVENT_GESTURE_PINCH_END: {
-            gesture.pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END;
-            gesture.scale = libinput_event_gesture_get_scale(data);
-            gesture.angle = libinput_event_gesture_get_angle_delta(data);
-            gesture.cancelled = libinput_event_gesture_get_cancelled(data);
-            break;
-        }
         case LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE: {
             gesture.delta.x = libinput_event_gesture_get_dx(data);
             gesture.delta.y = libinput_event_gesture_get_dy(data);
@@ -685,99 +677,6 @@ int32_t EventPackage::PackageKeyEvent(libinput_event& event, EventKeyboard& key,
         return MULTIDEVICE_SAME_EVENT_FAIL;
     }
     return RET_OK;
-}
-
-int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key, UDSServer& udsServer)
-{
-    const std::string uid = GetUUid();
-    CHKR(EOK == memcpy_s(key.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size()),
-        MEMCPY_SEC_FUN_FAIL, RET_ERR);
-    CHKR(EOK == memcpy_s(key.deviceName, MAX_UUIDSIZE, VIRTUAL_KEYBOARD.c_str(),
-        VIRTUAL_KEYBOARD.size()), MEMCPY_SEC_FUN_FAIL, RET_ERR);
-    key.time = event.keyDownDuration;
-    key.key = event.keyCode;
-    key.isIntercepted = event.isIntercepted;
-    key.state = (enum KEY_STATE)event.isPressed;
-    key.eventType = LIBINPUT_EVENT_KEYBOARD_KEY;
-    key.deviceType = HOS_VIRTUAL_KEYBOARD;
-    key.mUnicode = 0;
-    if (event.isPressed) {
-        key.seat_key_count = SEAT_KEY_COUNT_ONE;
-    } else {
-        key.seat_key_count = SEAT_KEY_COUNT_ZERO;
-    }
-    return RET_OK;
-}
-
-int32_t EventPackage::KeyboardToKeyEvent(EventKeyboard& key,
-    std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr, UDSServer& udsServer)
-{
-    CHKR(keyEventPtr, NULL_POINTER, RET_ERR);
-    keyEventPtr->UpdateId();
-    OHOS::MMI::KeyEvent::KeyItem keyItem;
-    int32_t actionTime = static_cast<int64_t>(GetSysClockTime());
-    int32_t keyCode = static_cast<int32_t>(key.key);
-    int32_t keyAction = (key.state == KEY_STATE_PRESSED) ?
-        (OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) : (OHOS::MMI::KeyEvent::KEY_ACTION_UP);
-    int32_t deviceId = static_cast<int32_t>(key.deviceId);
-    int32_t actionStartTime = static_cast<int32_t>(key.time);
-
-    keyEventPtr->SetActionTime(actionTime);
-    keyEventPtr->SetAction(keyAction);
-    keyEventPtr->SetActionStartTime(actionStartTime);
-    keyEventPtr->SetDeviceId(deviceId);
-
-    keyEventPtr->SetKeyCode(keyCode);
-    keyEventPtr->SetKeyAction(keyAction);
-
-    bool isKeyPressed = (key.state == KEY_STATE_PRESSED) ? (true) : (false);
-    if (isKeyPressed) {
-        int32_t keyDownTime = actionStartTime;
-        keyItem.SetDownTime(keyDownTime);
-    }
-    keyItem.SetKeyCode(keyCode);
-    keyItem.SetDeviceId(deviceId);
-    keyItem.SetPressed(isKeyPressed);
-
-    if (keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
-        keyEventPtr->AddPressedKeyItems(keyItem);
-    } else if (keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
-        keyEventPtr->RemoveReleasedKeyItems(keyItem);
-    } else {
-        // nothing to do.
-    }
-    return RET_OK;
-}
-
-const uint16_t pointerID = 1; // mouse has only an PoingeItem, so id is 1
-
-std::shared_ptr<OHOS::MMI::PointerEvent> EventPackage::GestureToPointerEvent(EventGesture& gesture,
-                                                                             UDSServer& udsServer)
-{
-    auto pointerEvent = OHOS::MMI::PointerEvent::Create();
-    OHOS::MMI::PointerEvent::PointerItem pointer;
-    pointer.SetGlobalX(MouseState->GetMouseCoordsX());
-    pointer.SetGlobalY(MouseState->GetMouseCoordsY());
-    pointer.SetPointerId(pointerID);
-    pointer.SetPressed(MouseState->IsLiftBtnPressed());
-    pointerEvent->AddPointerItem(pointer);
-
-    std::vector<uint32_t> pressedButtons;
-    MouseState->GetPressedButtons(pressedButtons);
-    if (!pressedButtons.empty()) {
-        for (auto it = pressedButtons.begin(); it != pressedButtons.end(); it++) {
-            pointerEvent->SetButtonPressed(*it);
-        }
-    }
-
-    pointerEvent->SetTargetDisplayId(0);
-    pointerEvent->SetPointerId(pointerID);
-    pointerEvent->SetAxis(PointerEvent::AXIS_TYPE_PINCH);
-    pointerEvent->SetDeviceId(gesture.deviceId);
-    pointerEvent->SetAxisValue(gesture.scale);
-    pointerEvent->SetPointerAction(gesture.pointerEventType);
-
-    return pointerEvent;
 }
 }
 }

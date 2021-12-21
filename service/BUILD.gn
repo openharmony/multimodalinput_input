@@ -26,36 +26,16 @@ config("libmmi_server_public_config") {
     "event_handle/include",
     "event_standard/include",
     "event_dump/include",
-    "input_monitor/include",
     "libinput_adapter/include",
     "message_handle/include",
     "module_loader/include",
     "window_manager/include",
-    "touch_transform_point/include",
-    "server_input_filter_manager/include",
-    "ability_launch/include",
     "${mmi_service_path}/connect_manager/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${mmi_path}/interfaces/native/innerkits/event/include",
-    "mouse_event_handler/include",
-    "//third_party/libxkbcommon/",
+    "//third_party/libxkbcommon",
+    "//third_party/weston/libweston",
     "//third_party/FreeBSD/sys/dev/evdev",
-    "//third_party/json/include",
-    "//third_party/json/include/nlohmann",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/appexecfwk/standard/kits/appkit/native/app/include",
-    "//foundation/appexecfwk/adapter/interfaces/innerkits/libeventhandler/include",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
-    "//foundation/aafwk/standard/interfaces/innerkits/want/include",
-    "//foundation/aafwk/standard/services/abilitymgr/include",
-    "//foundation/aafwk/standard/interfaces/innerkits/base/include",
-    "//third_party/weston/include",
-    "//third_party/weston/include/libweston",
-    "//third_party/pixman/pixman",
-    "//third_party/wayland_standard/src",
-    "//third_party/weston",
-    "//out/ohos-arm-release/gen/third_party/wayland_standard/protocol",
-    "//foundation/multimodalinput/interfaces/native/innerkits/event/include",
   ]
 
   if (is_mmi_have_hdf) {
@@ -97,13 +77,6 @@ config("libmmi_server_public_config") {
   }
 }
 
-ohos_prebuilt_etc("multimodalinput_config_ability.json") {
-  source = "ability_launch/etc/ability_launch_config.json"
-  part_name = "multimodalinput_base"
-  subsystem_name = "multimodalinput"
-  relative_install_dir = "multimodalinput"
-}
-
 ohos_shared_library("libmmi-server") {
   sources = [
     "application_manager/src/app_register.cpp",
@@ -121,22 +94,11 @@ ohos_shared_library("libmmi-server") {
     "libinput_adapter/src/s_input.cpp",
     "message_handle/src/server_msg_handler.cpp",
     "module_loader/src/libmmi_main.cpp",
+    "module_loader/src/mmi_server.cpp",
     "module_loader/src/uds_server.cpp",
     "window_manager/src/input_windows_manager.cpp",
     "window_manager/src/outer_interface.cpp",
     "window_manager/src/window_switch.cpp",
-    "window_manager/src/input_windows_manager_stub.cpp",
-    "event_package/src/mouse_state_gesture.cpp",
-    "input_monitor/src/input_event_monitor_manager.cpp",
-    "input_monitor/src/input_handler_manager_global.cpp",
-    "touch_transform_point/src/touch_transform_point_manager.cpp",
-    "touch_transform_point/src/touch_transform_point_processor.cpp",
-    "server_input_filter_manager/src/server_input_filter_manager.cpp",
-    "mouse_event_handler/src/mouse_event_handler.cpp",
-    "device_manager/src/input_device_manager.cpp",
-    "device_manager/src/input_device.cpp",
-    "device_manager/src/message_post.cpp",
-    "ability_launch/src/ability_launch_manager.cpp",
   ]
 
   if (is_mmi_have_hdf) {
@@ -154,37 +116,18 @@ ohos_shared_library("libmmi-server") {
     ]
   }
 
-  if (is_mmi_have_weston) {
-    sources += [ "module_loader/src/mmi_server.cpp" ]
-  } else {
-    sources += [
-      "module_loader/src/mmi_service.cpp",
-    ]
-  }
-
   public_configs = [ ":libmmi_server_public_config" ]
 
   deps = [
     ":mmi_device_config.ini",
     ":mmi_log.conf",
-    ":multimodalinput_config_ability.json",
     "//drivers/peripheral/input/hal:hdi_input",
     "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
     "//foundation/aafwk/standard/interfaces/innerkits/want:want",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
-    "//foundation/aafwk/standard/interfaces/innerkits/base:base",
-    "//foundation/aafwk/standard/services/abilitymgr:abilityms",
     "//foundation/appexecfwk/standard/kits:appkit_native",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base:appexecfwk_base",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core:appexecfwk_core",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler:libeventhandler",
-    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
     "//third_party/libxkbcommon:libxkbcommon",
-    "//third_party/wayland_standard:libwayland_server",
-    "//third_party/weston:libweston",
-    "//utils/native/base:utils",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
@@ -199,7 +142,7 @@ ohos_shared_library("libmmi-server") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_L2:samgr_proxy",
+    "samgr_standard:samgr_proxy",
   ]
 
   part_name = "multimodalinput_base"
@@ -279,9 +222,13 @@ ohos_unittest("ut-mmi-service-out") {
 
   sources = [
     "application_manager/test/app_register_test.cpp",
+    "device_manager/test/device_register_test.cpp",
     "device_scalability/test/expansibility_operation_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
+
+    #"event_handle/test/input_event_handler_test.cpp",
     "event_handle/test/register_event_test.cpp",
+
     #"event_handle/test/system_event_handler_test.cpp",
     "event_standard/test/standard_event_handler_test.cpp",
     "hdi_inject/test/hdi_inject_test.cpp",
@@ -293,9 +240,7 @@ ohos_unittest("ut-mmi-service-out") {
     "window_manager/test/outer_interface_test.cpp",
     "window_manager/test/window_switch_test.cpp",
   ]
-  if (is_mmi_have_weston) {
-    sources += [ "event_handle/test/input_event_handler_test.cpp" ]
-  }
+
   cflags = [
     "-DOHOS_BUILD",
     "-DOHOS_AUTO_TEST_FRAME",

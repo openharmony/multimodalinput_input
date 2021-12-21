@@ -17,7 +17,7 @@
 #include "libmmi_util.h"
 
 namespace OHOS {
-enum HosKeyState {
+enum KeyState {
     /**
     * Indicates that the key is being pressed down.
     *
@@ -33,7 +33,7 @@ enum HosKeyState {
     HOS_KEY_RELEASED = 1,
 };
 
-enum HosKeyEventEnum {
+enum KeyEventEnum {
     /**
     * Keycode constant: unknown keycode
     * <p>The keycode is unknown.

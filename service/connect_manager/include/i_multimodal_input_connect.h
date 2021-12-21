@@ -23,7 +23,7 @@ namespace MMI {
 class IMultimodalInputConnect : public IRemoteBroker {
 public:
     [[maybe_unused]] static constexpr int INVALID_SOCKET_FD = -1;
-    static const int MULTIMODAL_INPUT_CONNECT_SERVICE_ID = 3101;
+    static const int MULTIMODAL_INPUT_CONNECT_SERVICE_ID = 3103;
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.multimodalinput.IConnectManager");
 
     virtual int32_t AllocSocketFd(const std::string &programName, const int moduleType, int &socketFd) = 0;

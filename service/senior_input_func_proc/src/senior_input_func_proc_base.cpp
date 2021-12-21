@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "senior_input_func_proc_base.h"
 #include "mmi_server.h"
 #include "util.h"

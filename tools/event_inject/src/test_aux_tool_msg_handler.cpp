@@ -12,12 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "test_aux_tool_msg_handler.h"
-#include "libmmi_util.h"
-#include "message_send_recv_stat_mgr.h"
-#include "proto.h"
 #include "time_cost_chk.h"
+#include "libmmi_util.h"
+#include "proto.h"
+#include "message_send_recv_stat_mgr.h"
 
 using namespace OHOS::MMI;
 

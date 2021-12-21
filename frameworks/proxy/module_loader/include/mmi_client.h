@@ -33,8 +33,8 @@ public:
     void RegisterConnectedFunction(ConnectCallback fun) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
     void VirtualKeyIn(struct RawInputEvent virtualKeyEvent);
-    void ReplyMessageToServer(MmiMessageId idMsg, uint64_t time, uint64_t serverStartTime, uint64_t clientEndTime,
-                              int32_t fd) const;
+    void ReplyMessageToServer(MmiMessageId idMsg, uint64_t clientTime, uint64_t endTime) const;
+
 #ifdef OHOS_AUTO_TEST_FRAME
     void AutoTestReplyClientPktToServer(const AutoTestClientPkt& autoTestClientPkt);
 #endif  // OHOS_AUTO_TEST_FRAME

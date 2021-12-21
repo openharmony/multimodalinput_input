@@ -12,9 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "server_msg_handler.h"
 #include <gtest/gtest.h>
+#include "server_msg_handler.h"
 
 namespace {
 using namespace testing::ext;
@@ -737,7 +736,7 @@ HWTEST_F(ServerMsgHandlerTest, CheckReplyMessageFormClientTest_01, TestSize.Leve
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess = nullptr;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(static_cast<MmiMessageId>(0));
     serverMsgHandlerTest.CheckReplyMessageFormClientTest(sess, newPacket);
 }
 

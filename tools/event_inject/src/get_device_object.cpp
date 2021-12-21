@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "get_device_object.h"
 #include <chrono>
 #include <thread>

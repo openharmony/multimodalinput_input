@@ -55,8 +55,6 @@ OHOS::MMI::VirtualTouchScreen::VirtualTouchScreen()
     dev_.absmax[ABS_MT_PRESSURE] = ABS_PRESSURE_MAX;
 }
 
-OHOS::MMI::VirtualTouchScreen::~VirtualTouchScreen() {}
-
 const std::vector<uint32_t>& OHOS::MMI::VirtualTouchScreen::GetEventTypes() const
 {
     static const std::vector<uint32_t> evTypes {

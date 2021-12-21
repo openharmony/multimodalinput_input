@@ -12,9 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "log.h"
 #include <gtest/gtest.h>
+#include "log.h"
 
 #ifdef OHOS_BUILD_MMI_DEBUG
 

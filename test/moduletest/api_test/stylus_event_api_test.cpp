@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "stylus_event.h"
 #include <gtest/gtest.h>
+#include "stylus_event.h"
 
 namespace {
 using namespace testing::ext;

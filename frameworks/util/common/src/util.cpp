@@ -12,31 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "util.h"
-#include <chrono>
-#include <cstdarg>
-#include <iomanip>
 #include <sstream>
-#include <thread>
-#include <fcntl.h>
 #include <inttypes.h>
-#include <sys/prctl.h>
-#include <sys/stat.h>
-#include <sys/syscall.h>
-#include <sys/time.h>
-#include <sys/types.h>
+#include <chrono>
+#include <thread>
+#include <cstdarg>
 #include <unistd.h>
-
+#include <sys/prctl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <fcntl.h>
+#include <iomanip>
+#include <sys/syscall.h>
 #ifndef OHOS_BUILD
 #include <execinfo.h>
 #endif // OHOS_BUILD
-#include "config_multimodal.h"
-#include "define_multimodal.h"
-#include "error_multimodal.h"
-#include "log.h"
-#include "securec.h"
 #include "uuid.h"
+#include "securec.h"
+#include "config_multimodal.h"
+#include "error_multimodal.h"
+#include "define_multimodal.h"
+#include "log.h"
 
 namespace OHOS::MMI {
     namespace {
@@ -91,7 +89,7 @@ int64_t GetMicrotime()
 uint64_t GetSysClockTime()
 {
     const int32_t conversionStep = 1000;
-    struct timespec ts = { 0, 0 };
+    struct timespec ts = {0, 0};
 
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
         MMI_LOGT("clock_gettime failed: %{public}s\n", strerror(errno));
@@ -125,21 +123,21 @@ std::string GetUUid()
 
 std::string GetThisThreadIdOfString()
 {
-    thread_local std::string threadLocalId;
-    if (threadLocalId.empty()) {
+    thread_local std::string thread_local_id;
+    if (thread_local_id.empty()) {
         long tid = syscall(SYS_gettid);
         const size_t bufSize = 10;
         char buf[bufSize] = {};
         const int ret = sprintf_s(buf, bufSize, "%06d", tid);
         if (ret < 0) {
             printf("ERR: in %s, #%d, call sprintf_s fail, ret = %d.", __func__, __LINE__, ret);
-            return threadLocalId;
+            return thread_local_id;
         }
         buf[bufSize - 1] = '\0';
-        threadLocalId = buf;
+        thread_local_id = buf;
     }
 
-    return threadLocalId;
+    return thread_local_id;
 }
 
 uint64_t GetThisThreadIdOfLL()
@@ -237,10 +235,10 @@ static void PrintEventJoyStickAxisInfo(const std::string &axisName, const EventJ
 void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
     const int32_t abilityId, const int32_t focusId, const uint64_t preHandlerTime)
 {
-    MMI_LOGT("4.event dispatcher of server: EventJoyStickAxis:devicePhys: %{public}s;"
-             "fd: %{public}d; preHandlerTime: %{public}" PRId64 "; "
+    MMI_LOGT("4.event dispatcher of server: EventJoyStickAxis:deviceId: %{public}u; devicePhys: %{public}s;"
+             "fd: %{public}d; abilityId: %{public}d; windowId: %{public}d; preHandlerTime: %{public}" PRId64 "; "
              "time: %{public}" PRId64 "; deviceType: %{public}u; eventType: %{public}d; deviceName: %{public}s\n",
-             r.devicePhys, fd, preHandlerTime, r.time, r.deviceType,
+             r.deviceId, r.devicePhys, fd, abilityId, focusId, preHandlerTime, r.time, r.deviceType,
              r.eventType, r.deviceName);
 
     PrintEventJoyStickAxisInfo(std::string("abs_throttle"), r.abs_throttle);
@@ -332,21 +330,21 @@ const char* GetProgramName()
     return programName;
 }
 
-char* MmiBasename(char* path)
+char* mmi_basename(char* path)
 {
     if (path == nullptr) {
         return nullptr;
     }
 
-    char* rightSlash = strrchr(path, '/');
-    char* pBasename = nullptr;
-    if (rightSlash != nullptr) {
-        pBasename = (rightSlash + 1);
+    char* right_slash = strrchr(path, '/');
+    char* p_basename;
+    if (right_slash != nullptr) {
+        p_basename = (right_slash + 1);
     } else {
-        pBasename = path;
+        p_basename = path;
     }
 
-    return pBasename;
+    return p_basename;
 }
 
 std::string GetStackInfo()
@@ -379,12 +377,12 @@ void SetThreadName(const std::string& name)
 }
 
 namespace {
-thread_local std::string g_threadName;
+thread_local std::string threadName;
 }
 const std::string& GetThreadName()
 {
-    if (!g_threadName.empty()) {
-        return g_threadName;
+    if (!threadName.empty()) {
+        return threadName;
     }
 
     const size_t MAX_THREAD_NAME_SIZE = 16;
@@ -394,14 +392,45 @@ const std::string& GetThreadName()
     int32_t ret = prctl(PR_GET_NAME, thisThreadName);
     if (ret == 0) {
         thisThreadName[MAX_THREAD_NAME_SIZE] = '\0';
-        g_threadName = thisThreadName;
+        threadName = thisThreadName;
     } else {
         const int errnoSaved = errno;
         printf("in GetThreadName, call prctl get name fail, errno: %d, error msg: %s.\n",
                errnoSaved, strerror(errnoSaved));
     }
 
-    return g_threadName;
+    return threadName;
 }
+
+void AddId(IdsList &list, int32_t id)
+{
+    if (id <= 0) {
+        return;
+    }
+    auto it = std::find(list.begin(), list.end(), id);
+    if (it != list.end()) {
+        return;
+    }
+    list.push_back(id);
+}
+
+size_t CalculateDifference(const IdsList &list1, IdsList &list2, IdsList &difList)
+{
+    if (list1.empty()) {
+        difList = list2;
+        return difList.size();
+    }
+    if (list2.empty()) {
+        difList = list1;
+        return difList.size();
+    }
+    IdsList l1 = list1;
+    std::sort(l1.begin(), l1.end());
+    IdsList l2 = list2;
+    std::sort(l2.begin(), l2.end());
+    std::set_difference(l1.begin(), l1.end(), l2.begin(), l2.end(), std::back_inserter(difList));
+    return difList.size();
+}
+
 }
 }

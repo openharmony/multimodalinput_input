@@ -12,9 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "device_event.h"
 #include <gtest/gtest.h>
+#include "device_event.h"
 
 namespace {
 using namespace testing::ext;

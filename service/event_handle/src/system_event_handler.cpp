@@ -12,10 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "system_event_handler.h"
-#include <cstring>
 #include "libmmi_util.h"
+#include "system_event_handler.h"
+
+#include <cstring>
 
 #ifdef OHOS_BUILD
 #include "ability_manager.h"

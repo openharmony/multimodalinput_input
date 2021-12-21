@@ -20,8 +20,6 @@ OHOS::MMI::VirtualTrackball::VirtualTrackball() : VirtualDevice("Virtual Trackba
 {
 }
 
-OHOS::MMI::VirtualTrackball::~VirtualTrackball() {}
-
 const std::vector<uint32_t>& OHOS::MMI::VirtualTrackball::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {

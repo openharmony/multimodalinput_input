@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "multimodal_event.h"
 #include <gtest/gtest.h>
+#include "multimodal_event.h"
 #include "struct_multimodal.h"
 
 namespace {
