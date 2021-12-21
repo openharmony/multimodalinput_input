@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <gtest/gtest.h>
 #include "define_multimodal.h"
 #include "multimodal_standardized_event_manager.h"
@@ -30,7 +31,7 @@ public:
 
 HWTEST_F(StandardizedEventProcessTest, OnKey, TestSize.Level1)
 {
-    KeyEvent event;
+    OHOS::KeyEvent event;
     int32_t retResult = EventManager.OnKey(event);
     EXPECT_EQ(retResult, RET_OK);
 }

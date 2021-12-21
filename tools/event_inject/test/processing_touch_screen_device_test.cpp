@@ -12,11 +12,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include <gtest/gtest.h>
-#include "proto.h"
+
 #include "processing_touch_screen_device.h"
+#include <gtest/gtest.h>
 #include "manage_inject_device.h"
 #include "msg_head.h"
+#include "proto.h"
 
 namespace {
 using namespace testing::ext;

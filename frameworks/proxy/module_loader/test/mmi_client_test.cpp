@@ -12,8 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <gtest/gtest.h>
+
 #include "mmi_client.h"
+#include <gtest/gtest.h>
 
 namespace {
 using namespace testing::ext;
@@ -58,18 +59,22 @@ HWTEST_F(MMIClientTest, VirtualKeyIn, TestSize.Level1)
 
 HWTEST_F(MMIClientTest, ReplyMessageToServer_001, TestSize.Level1)
 {
+    ssize_t time = 1;
     uint64_t serverStartTime = 1;
     uint64_t clientEndTime = 1;
+    int32_t fd = 1;
 
-    mmiClient.ReplyMessageToServer(static_cast<MmiMessageId>(4), serverStartTime, clientEndTime);
+    mmiClient.ReplyMessageToServer(static_cast<MmiMessageId>(4), time, serverStartTime, clientEndTime, fd);
 }
 
 HWTEST_F(MMIClientTest, ReplyMessageToServer_002, TestSize.Level1)
 {
+    ssize_t time = 0;
     uint64_t serverStartTime = 0;
     uint64_t clientEndTime = 0;
+    int32_t fd = 0;
 
-    mmiClient.ReplyMessageToServer(static_cast<MmiMessageId>(3), serverStartTime, clientEndTime);
+    mmiClient.ReplyMessageToServer(static_cast<MmiMessageId>(3), time, serverStartTime, clientEndTime, fd);
 }
 
 HWTEST_F(MMIClientTest, SdkGetMultimodeInputInfo, TestSize.Level1)
@@ -96,18 +101,22 @@ HWTEST_F(MMIClientTest, Re_VirtualKeyIn, TestSize.Level1)
 
 HWTEST_F(MMIClientTest, Re_ReplyMessageToServer_001, TestSize.Level1)
 {
+    ssize_t timeId = 1;
     uint64_t serverStartTime = 1;
     uint64_t clientEndTime = 1;
+    int32_t fd = 1;
 
-    mmiClientTest.ReplyMessageToServer(static_cast<MmiMessageId>(1), serverStartTime, clientEndTime);
+    mmiClientTest.ReplyMessageToServer(static_cast<MmiMessageId>(1), timeId, serverStartTime, clientEndTime, fd);
 }
 
 HWTEST_F(MMIClientTest, Re_ReplyMessageToServer_002, TestSize.Level1)
 {
+    ssize_t timeId = 0;
     uint64_t serverStartTime = 0;
     uint64_t clientEndTime = 0;
+    int32_t fileId = 0;
 
-    mmiClientTest.ReplyMessageToServer(static_cast<MmiMessageId>(2), serverStartTime, clientEndTime);
+    mmiClientTest.ReplyMessageToServer(static_cast<MmiMessageId>(2), timeId, serverStartTime, clientEndTime, fileId);
 }
 
 HWTEST_F(MMIClientTest, Re_SdkGetMultimodeInputInfo, TestSize.Level1)

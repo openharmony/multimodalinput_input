@@ -35,10 +35,11 @@ AppRegister::~AppRegister()
 
 bool AppRegister::Init(UDSServer& udsServer)
 {
+    teseArgv_ = 0;
 #ifdef OHOS_AUTO_TEST_FRAME
     autoTestFrameFd_ = 0;
 #endif  // OHOS_AUTO_TEST_FRAME
-    mapSurface_.clear();
+    mapSurface.clear();
     waitQueue_.clear();
     mapConnectState_.clear();
     if (mu_.try_lock()) {
@@ -51,8 +52,8 @@ bool AppRegister::Init(UDSServer& udsServer)
 const AppInfo& AppRegister::FindByWinId(int32_t windowId)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    auto it = mapSurface_.find(windowId);
-    if (it != mapSurface_.end()) {
+    auto it = mapSurface.find(windowId);
+    if (it != mapSurface.end()) {
         return it->second;
     }
     return AppRegister::AppInfoError_;
@@ -67,7 +68,7 @@ const AppInfo& AppRegister::FindBySocketFd(int32_t fd)
 
 const AppInfo& AppRegister::FindAppInfoBySocketFd(int32_t fd)
 {
-    for (auto iter = mapSurface_.begin(); iter != mapSurface_.end(); iter++) {
+    for (auto iter = mapSurface.begin(); iter != mapSurface.end(); iter++) {
         if (iter->second.fd == fd) {
             return iter->second;
         }
@@ -78,8 +79,33 @@ const AppInfo& AppRegister::FindAppInfoBySocketFd(int32_t fd)
 void AppRegister::RegisterAppInfoforServer(const AppInfo& appInfo)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    mapSurface_.insert(std::pair<int32_t, AppInfo>(appInfo.windowId, appInfo));
-    AddId(fds_, appInfo.fd);
+    mapSurface.insert(std::pair<int32_t, AppInfo>(appInfo.windowId, appInfo));
+}
+
+void AppRegister::UnregisterAppInfoforServer(int32_t abilityId)
+{
+    std::lock_guard<std::mutex> lock(mu_);
+    auto it = mapSurface.begin();
+    while (it != mapSurface.end()) {
+        if (it->second.abilityId == abilityId) {
+            it = mapSurface.erase(it);
+        } else {
+            it++;
+        }
+    }
+}
+
+void AppRegister::UnregisterAppInfoforServer(const AppInfo& appInfo)
+{
+    std::lock_guard<std::mutex> lock(mu_);
+    auto it = mapSurface.begin();
+    while (it != mapSurface.end()) {
+        if (it->second.abilityId == appInfo.abilityId) {
+            it = mapSurface.erase(it);
+        } else {
+            it++;
+        }
+    }
 }
 
 void AppRegister::UnregisterAppInfoBySocketFd(int32_t fd)
@@ -91,37 +117,20 @@ void AppRegister::UnregisterAppInfoBySocketFd(int32_t fd)
 
 void AppRegister::UnregisterBySocketFd(int32_t fd)
 {
-    auto it = mapSurface_.begin();
-    while (it != mapSurface_.end()) {
+    auto it = mapSurface.begin();
+    while (it != mapSurface.end()) {
         if (it->second.fd == fd) {
-            it = mapSurface_.erase(it);
+            it = mapSurface.erase(it);
         } else {
             it++;
         }
     }
 }
 
-std::map<int32_t, AppInfo>::iterator AppRegister::EraseAppInfo(const std::map<int32_t, AppInfo>::iterator &it)
-{
-    return mapSurface_.erase(it);
-}
-
-std::map<int32_t, AppInfo>::iterator AppRegister::UnregisterAppInfo(int32_t winId)
-{
-    if (winId <= 0) {
-        return mapSurface_.end();
-    }
-    auto itr = mapSurface_.find(winId);
-    if (itr == mapSurface_.end()) {
-        return mapSurface_.end();
-    }
-    return EraseAppInfo(itr);
-}
-
 void AppRegister::PrintfMap()
 {
     std::lock_guard<std::mutex> lock(mu_);
-    for (auto i : mapSurface_) {
+    for (auto i : mapSurface) {
         std::cout << "mapSurface " << i.second.abilityId << ", " << i.second.windowId <<
             ", " << i.second.fd << std::endl;
     }
@@ -130,33 +139,24 @@ void AppRegister::PrintfMap()
 void OHOS::MMI::AppRegister::Dump(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    mprintf(fd, "AppInfos: count=%d", mapSurface_.size());
-    for (auto& it : mapSurface_) {
+    mprintf(fd, "AppInfos: count=%d", mapSurface.size());
+    for (auto& it : mapSurface) {
         mprintf(fd, "\tabilityId=%d windowId=%d fd=%d bundlerName=%s appName=%s", it.second.abilityId,
                 it.second.windowId, it.second.fd, it.second.bundlerName.c_str(), it.second.appName.c_str());
-    }
-}
-
-void AppRegister::SurfacesDestroyed(const IdsList &desList)
-{
-    std::lock_guard<std::mutex> lock(mu_);
-    for (auto it : desList) {
-        UnregisterAppInfo(it);
     }
 }
 
 int32_t AppRegister::QueryMapSurfaceNum()
 {
     std::lock_guard<std::mutex> lock(mu_);
-    return static_cast<int32_t>(mapSurface_.size());
+    return static_cast<int32_t>(mapSurface.size());
 }
 
-bool AppRegister::IsMultimodeInputReady(MmiMessageId idMsg, const int32_t findFd, uint64_t inputTime,
-                                        uint64_t westonTime)
+bool AppRegister::IsMultimodeInputReady(ssize_t currentTime, MmiMessageId idMsg, const int32_t findFd,
+                                        int32_t connectState, int32_t bufferState)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    auto serverTime = GetSysClockTime();
-    WaitQueueEvent newEvent = {findFd, static_cast<int32_t>(idMsg), inputTime, westonTime, serverTime};
+    WaitQueueEvent newEvent = {findFd, currentTime, 0};
 
     ssize_t timeOut = INPUT_NUI_TIMEOUT_TIME;
     if ((idMsg == MmiMessageId::ON_KEY) || (idMsg == MmiMessageId::ON_TOUCH)) {
@@ -164,54 +164,86 @@ bool AppRegister::IsMultimodeInputReady(MmiMessageId idMsg, const int32_t findFd
     }
 
     if (!CheckFindFdError(findFd)) {
-        OnAnrLocked(findFd);
         return false;
     }
-    if (!CheckWaitQueueBlock(serverTime, timeOut, findFd)) {
-        OnAnrLocked(findFd);
+    if (!CheckConnectionIsDead(currentTime, timeOut, findFd, connectState)) {
+        return false;
+    }
+    if (!CheckBufferIsFull(currentTime, timeOut, findFd, bufferState)) {
+        return false;
+    }
+    if (!CheckWaitQueueBlock(currentTime, timeOut, findFd)) {
         return false;
     }
 
     if (waitQueue_.size() > WAIT_QUEUE_EVENTS_MAX) {
         waitQueue_.clear();
-        MMI_LOGT("IsMultimodeInputReady The Wait Queue is full! Clear it!");
+        MMI_LOGT("The Wait Queue is full! Clear it! \n");
     }
     waitQueue_.push_back(newEvent);
     return true;
 }
 
-WaitQueueEvent AppRegister::GetWaitQueueEvent(int32_t fd, int32_t idMsg)
-{
-    std::lock_guard<std::mutex> lock(mu_);
-    auto find_fun = [fd, idMsg](const WaitQueueEvent &ev) -> bool {
-        if (fd != ev.fd || idMsg != ev.event) {
-            return false;
-        }
-        return true;
-    };
-    WaitQueueEvent faultData = {};
-    auto it = std::find_if(waitQueue_.begin(), waitQueue_.end(), find_fun);
-    if (it == waitQueue_.end()) {
-        return faultData;
-    }
-    return *it;
-}
-
 bool AppRegister::CheckFindFdError(const int32_t findFd)
 {
-    if (findFd < 0) {
+    if (-1 == findFd) {
         MMI_LOGE(" IsMultimodeInputReady: Find fd error! errCode:%{public}d \n", FD_FIND_FAIL);
+        OnAnrLocked(findFd);
         return false;
     }
     return true;
 }
 
-bool AppRegister::CheckConnectionIsDead(const int32_t findFd)
+bool AppRegister::CheckConnectionIsDead(ssize_t currentTime, ssize_t timeOut,
+                                        const int32_t findFd, int32_t connectState)
 {
-    if (mapConnectState_.find(findFd) == mapConnectState_.end()) {
-        MMI_LOGE("IsMultimodeInputReady: The connection is dead! fd:%{public}d errCode:%{public}d",
-                 findFd, CONN_BREAK);
-        return false;
+    if (-1 == connectState) {
+        MMI_LOGE(" IsMultimodeInputReady: The connection is dead! errCode:%{public}d \n", CONN_BREAK);
+        auto appInfo = FindAppInfoBySocketFd(findFd);
+        for (auto iter = waitQueue_.begin(); iter != waitQueue_.end(); iter++) {
+            if (findFd != iter->fd) {
+                continue;
+            }
+            if (currentTime >= (iter->currentTime + timeOut)) {
+                waitQueue_.erase(iter);
+                WinMgr->EraseSurfaceInfo(appInfo.windowId);
+                UnregisterBySocketFd(findFd);
+                OnAnrLocked(findFd);
+                return false;
+            }
+            return false;
+        }
+        WinMgr->EraseSurfaceInfo(appInfo.windowId);
+        UnregisterBySocketFd(findFd);
+        OnAnrLocked(findFd);
+        return false; // Discard the event!
+    }
+    return true;
+}
+
+bool AppRegister::CheckBufferIsFull(ssize_t currentTime, ssize_t timeOut,
+                                    const int32_t findFd, int32_t bufferState)
+{
+    if (-1 == bufferState) {
+        MMI_LOGE(" IsMultimodeInputReady: The buffer is full! errCode:%{public}d \n", SOCKET_BUF_FULL);
+        auto appInfo = FindAppInfoBySocketFd(findFd);
+        for (auto iter = waitQueue_.begin(); iter != waitQueue_.end(); iter++) {
+            if (findFd != iter->fd) {
+                continue;
+            }
+            if (currentTime >= (iter->currentTime + timeOut)) {
+                waitQueue_.erase(iter);
+                WinMgr->EraseSurfaceInfo(appInfo.windowId);
+                UnregisterBySocketFd(findFd);
+                OnAnrLocked(findFd);
+                return false;
+            }
+            return false;
+        }
+        WinMgr->EraseSurfaceInfo(appInfo.windowId);
+        UnregisterBySocketFd(findFd);
+        OnAnrLocked(findFd);
+        return false; // Discard the event!
     }
     return true;
 }
@@ -220,23 +252,24 @@ bool AppRegister::CheckWaitQueueBlock(ssize_t currentTime, ssize_t timeOut, cons
 {
     for (auto iter = waitQueue_.begin(); iter != waitQueue_.end(); iter++) {
         if (findFd == iter->fd) {
-            if (currentTime >= (iter->serverTime + timeOut)) {
-                MMI_LOGE("IsMultimodeInputReady: The wait queue is blocked! fd:%{public}d idMsg:%{public}d "
-                         "errCode:%{public}d", findFd, iter->event, WAITING_QUEUE_FULL);
+            if (currentTime >= (iter->currentTime + timeOut)) {
+                MMI_LOGE("IsMultimodeInputReady: The wait queue is blocked! errCode:%{public}d \n",
+                         WAITING_QUEUE_FULL);
                 waitQueue_.erase(iter);
+                OnAnrLocked(findFd);
                 return false;
             }
+            return true;
         }
     }
     return true;
 }
 
-void AppRegister::DeleteEventFromWaitQueue(int32_t fd, int32_t idMsg)
+void AppRegister::DeleteEventFromWaitQueue(ssize_t time, const int32_t fd)
 {
-    std::lock_guard<std::mutex> lock(mu_);
     CHK(fd >= 0, PARAM_INPUT_INVALID);
     for (auto iter = waitQueue_.begin(); iter != waitQueue_.end(); iter++) {
-        if ((iter->event == idMsg) && (iter->fd == fd)) {
+        if ((iter->currentTime == time) && (iter->fd == fd)) {
             waitQueue_.erase(iter);
             break;
         }
@@ -253,14 +286,16 @@ bool AppRegister::OnAnrLocked(int32_t fd) const
 void AppRegister::RegisterConnectState(int32_t fd)
 {
     CHK(fd >= 0, PARAM_INPUT_INVALID);
-    std::lock_guard<std::mutex> lock(mu_);
-    mapConnectState_.insert(std::pair<int32_t, int8_t>(fd, 0));
+    ConnectStateByFd newConnectStateByFd = {0, 0};
+    mapConnectState_.insert(std::pair<int32_t, ConnectStateByFd>(fd, newConnectStateByFd));
 }
 
 void AppRegister::UnregisterConnectState(int32_t fd)
 {
     CHK(fd >= 0, PARAM_INPUT_INVALID);
-    std::lock_guard<std::mutex> lock(mu_);
+    // Unregister all by fd
+    UnregisterBySocketFd(fd);
+    RegEventHM->UnregisterEventHandleBySocketFd(fd);
 
 #ifdef OHOS_AUTO_TEST_FRAME
     if (autoTestFrameFd_ == fd) {
@@ -271,6 +306,15 @@ void AppRegister::UnregisterConnectState(int32_t fd)
     auto iter = mapConnectState_.find(fd);
     if (iter != mapConnectState_.end()) {
         mapConnectState_.erase(iter);
+    }
+}
+
+void AppRegister::ConnectStateInputBlocked(const int32_t fd)
+{
+    CHK(fd >= 0, PARAM_INPUT_INVALID);
+    auto iter = mapConnectState_.find(fd);
+    if (iter != mapConnectState_.end()) {
+        iter->second.inputBlocked = RET_ERR;
     }
 }
 
@@ -289,7 +333,7 @@ int32_t AppRegister::AutoTestGetAutoTestFd()
 void AppRegister::AutoTestGetAllAppInfo(std::vector<AutoTestClientListPkt>& clientListPkt)
 {
     AutoTestClientListPkt tempInfo;
-    for (auto i : mapSurface_) {
+    for (auto i : mapSurface) {
         tempInfo = {i.second.fd, i.second.windowId, i.second.abilityId};
         clientListPkt.push_back(tempInfo);
     }
