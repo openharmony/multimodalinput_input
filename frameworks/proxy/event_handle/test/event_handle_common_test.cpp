@@ -13,17 +13,17 @@
  * limitations under the License.
  */
 
-#include "common_event_handler.h"
-#include <codecvt>
 #include <locale>
+#include <codecvt>
 #include <gtest/gtest.h>
-#include "error_multimodal.h"
-#include "log.h"
-#include "mmi_token.h"
-#include "multimodal_event_handler.h"
-#include "proto.h"
 #include "string_ex.h"
+#include "proto.h"
 #include "util_ex.h"
+#include "log.h"
+#include "error_multimodal.h"
+#include "multimodal_event_handler.h"
+#include "common_event_handler.h"
+#include "mmi_token.h"
 
 namespace {
 using namespace testing::ext;
@@ -139,7 +139,7 @@ HWTEST_F(EventHandleCommonTest, RegisterStandardizedEventHandle_tmp_err001, Test
     commonHandleTmp->SetType(EnumAdd(MmiMessageId::MEDIA_EVENT_BEGIN, 1));
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
         iRemote, g_surFaceId, commonHandleTmp);
-    EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
+    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, regResult);
 }
 
 HWTEST_F(EventHandleCommonTest, RegisterStandardizedEventHandle_tmp_err002, TestSize.Level1)
@@ -168,7 +168,6 @@ HWTEST_F(EventHandleCommonTest, UnregisterStandardizedEventHandle_tmp_err001, Te
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 }
 
-// ?1?7?1?7?0?0?1?7?1?7?1?7
 HWTEST_F(EventHandleCommonTest, UnregisterStandardizedEventHandle_tmp_err002, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";

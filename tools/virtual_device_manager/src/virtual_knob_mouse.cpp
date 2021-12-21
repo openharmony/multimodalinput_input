@@ -20,8 +20,6 @@ OHOS::MMI::VirtualKnobMouse::VirtualKnobMouse() : VirtualDevice("Virtual KnobMou
 {
 }
 
-OHOS::MMI::VirtualKnobMouse::~VirtualKnobMouse() {}
-
 const std::vector<uint32_t>& OHOS::MMI::VirtualKnobMouse::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {

@@ -38,7 +38,7 @@ namespace OHOS::MMI {
 
         const size_t bufSize = 1024 * 10;
         char buf[bufSize] = {};
-        ret = snprintf_s(buf, bufSize, bufSize - 1, fmt, args...);
+        ret = snprintf_s(buf, bufSize, bufSize, fmt, args...);
         if (ret < 0) {
             return ret;
         }
@@ -152,7 +152,7 @@ namespace OHOS::MMI {
         static_assert(std::is_enum<Enum>::value, "input value is not of enum class nor enum");
         return static_cast<typename std::underlying_type<Enum>::type>(e);
     }
-
+    
     template <class Enum, class T>
     Enum EnumAdd(Enum const e, T val)
     {

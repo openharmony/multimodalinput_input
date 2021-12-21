@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+ 
 #include "virtual_finger.h"
 
 OHOS::MMI::VirtualFinger::VirtualFinger() : VirtualDevice("Virtual Finger",
@@ -23,54 +23,52 @@ OHOS::MMI::VirtualFinger::VirtualFinger() : VirtualDevice("Virtual Finger",
     const int ABS_MAX_MT_SLOT = 9;
     const int ABS_MAX_MT_TOUCH_MAJOR = 21;
     const int ABS_MAX_MT_TRACKING_ID = 65535;
-
+    
     dev_.absmin[ABS_X] = 0;
     dev_.absmax[ABS_X] = ABS_MAX_X;
     dev_.absfuzz[ABS_X] = 0;
     dev_.absflat[ABS_X] = 0;
-
+    
     dev_.absmin[ABS_Y] = 0;
     dev_.absmax[ABS_Y] = ABS_MAX_Y;
     dev_.absfuzz[ABS_Y] = 0;
     dev_.absflat[ABS_Y] = 0;
-
+    
     dev_.absmin[ABS_MT_SLOT] = 0;
     dev_.absmax[ABS_MT_SLOT] = ABS_MAX_MT_SLOT;
     dev_.absfuzz[ABS_MT_SLOT] = 0;
     dev_.absflat[ABS_MT_SLOT] = 0;
-
+    
     dev_.absmin[ABS_MT_TOUCH_MAJOR] = 0;
     dev_.absmax[ABS_MT_TOUCH_MAJOR] = ABS_MAX_MT_TOUCH_MAJOR;
     dev_.absfuzz[ABS_MT_TOUCH_MAJOR] = 0;
     dev_.absflat[ABS_MT_TOUCH_MAJOR] = 0;
-
+    
     dev_.absmin[ABS_MT_TOUCH_MINOR] = 0;
     dev_.absmax[ABS_MT_TOUCH_MINOR] = ABS_MAX_MT_TOUCH_MAJOR;
     dev_.absfuzz[ABS_MT_TOUCH_MINOR] = 0;
     dev_.absflat[ABS_MT_TOUCH_MINOR] = 0;
-
+    
     dev_.absmin[ABS_MT_ORIENTATION] = 0;
     dev_.absmax[ABS_MT_ORIENTATION] = 1;
     dev_.absfuzz[ABS_MT_ORIENTATION] = 0;
     dev_.absflat[ABS_MT_ORIENTATION] = 0;
-
+    
     dev_.absmin[ABS_MT_POSITION_X] = 0;
     dev_.absmax[ABS_MT_POSITION_X] = ABS_MAX_X;
     dev_.absfuzz[ABS_MT_POSITION_X] = 0;
     dev_.absflat[ABS_MT_POSITION_X] = 0;
-
+    
     dev_.absmin[ABS_MT_POSITION_Y] = 0;
     dev_.absmax[ABS_MT_POSITION_Y] = ABS_MAX_Y;
     dev_.absfuzz[ABS_MT_POSITION_Y] = 0;
     dev_.absflat[ABS_MT_POSITION_Y] = 0;
-
+    
     dev_.absmin[ABS_MT_TRACKING_ID] = 0;
     dev_.absmax[ABS_MT_TRACKING_ID] = ABS_MAX_MT_TRACKING_ID;
     dev_.absfuzz[ABS_MT_TRACKING_ID] = 0;
     dev_.absflat[ABS_MT_TRACKING_ID] = 0;
 }
-
-OHOS::MMI::VirtualFinger::~VirtualFinger() {}
 
 const std::vector<uint32_t>& OHOS::MMI::VirtualFinger::GetEventTypes() const
 {

@@ -12,12 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "send_message.h"
-#include "message_send_recv_stat_mgr.h"
 #include "proto.h"
-#include "sys/file.h"
 #include "test_aux_tool_client.h"
+#include "message_send_recv_stat_mgr.h"
+#include "sys/file.h"
 
 using namespace std;
 using namespace OHOS::MMI;

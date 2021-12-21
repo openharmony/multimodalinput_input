@@ -12,11 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "event_dump.h"
 #include <gtest/gtest.h>
 #include "mmi_server.h"
 #include "mmi_interface.h"
+#include "event_dump.h"
 
 namespace {
 using namespace testing::ext;

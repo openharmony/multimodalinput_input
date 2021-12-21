@@ -12,9 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "input_windows_manager.h"
 #include <gtest/gtest.h>
+#include "input_windows_manager.h"
 
 namespace {
 using namespace testing::ext;

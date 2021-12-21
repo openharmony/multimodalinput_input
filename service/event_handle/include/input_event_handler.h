@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace MMI {
-using EventFun = std::function<int32_t(libinput_event& event)>;
+using EventFun = std::function<int32_t(multimodal_libinput_event &ev)>;
 using NotifyDeviceChange = std::function<void(int32_t, int32_t, char *)>;
 class InputEventHandler : public MsgHandler<EventFun>, public CSingleton<InputEventHandler> {
 public:
@@ -31,24 +31,20 @@ public:
     void OnEvent(void *event);
     void OnCheckEventReport();
     void RegistnotifyDeviceChange(NotifyDeviceChange cb);
-    UDSServer *GetUDSServer();
+
 protected:
-    int32_t OnEventDeviceAdded(libinput_event& event);
-    int32_t OnEventDeviceRemoved(libinput_event& event);
-    int32_t OnEventKeyboard(libinput_event& event);
-    int32_t OnEventPointer(libinput_event& event);
-    int32_t OnEventTouch(libinput_event& event);
-    int32_t OnEventTouchSecond(libinput_event& event);
-    int32_t OnEventGesture(libinput_event& event);
-    int32_t OnGestureEvent(libinput_event& event);
-    int32_t OnEventTabletTool(libinput_event& event);
-    int32_t OnEventTabletPad(libinput_event& event);
-    int32_t OnEventSwitchToggle(libinput_event& event);
-    int32_t OnEventJoyStickKey(libinput_event& event, const uint64_t time);
-    int32_t OnEventTabletPadKey(libinput_event& event);
-    int32_t OnEventJoyStickAxis(libinput_event& event, const uint64_t time);
-    int32_t OnKeyboardEvent(libinput_event& event);
-    int32_t OnMouseEventHandler(libinput_event& event, const int32_t deviceId);
+    int32_t OnEventDeviceAdded(multimodal_libinput_event &ev);
+    int32_t OnEventDeviceRemoved(multimodal_libinput_event &ev);
+    int32_t OnEventKeyboard(multimodal_libinput_event &ev);
+    int32_t OnEventPointer(multimodal_libinput_event &ev);
+    int32_t OnEventTouch(multimodal_libinput_event &ev);
+    int32_t OnEventGesture(multimodal_libinput_event &ev);
+    int32_t OnEventTabletTool(multimodal_libinput_event &ev);
+    int32_t OnEventTabletPad(multimodal_libinput_event &ev);
+    int32_t OnEventSwitchToggle(multimodal_libinput_event &ev);
+    int32_t OnEventJoyStickKey(multimodal_libinput_event &ev, const uint64_t time);
+    int32_t OnEventTabletPadKey(multimodal_libinput_event &ev);
+    int32_t OnEventJoyStickAxis(multimodal_libinput_event &ev, const uint64_t time);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
 #ifndef OHOS_AUTO_TEST_FRAME
     bool OnSystemEvent(const KeyEventValueTransformations& temp, const enum KEY_STATE state) const;
@@ -58,7 +54,7 @@ protected:
 #endif  // OHOS_AUTO_TEST_FRAME
 
 private:
-    int32_t OnEventHandler(libinput_event& ev);
+    int32_t OnEventHandler(multimodal_libinput_event &ev);
     std::mutex mu_;
     UDSServer *udsServer_ = nullptr;
     WindowSwitch winSwitch_;
@@ -66,7 +62,6 @@ private:
     EventPackage eventPackage_;
     KeyEventValueTransformation xkbKeyboardHandlerKey_;
     NotifyDeviceChange notifyDeviceChange_;
-    std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent;
 
     uint64_t idSeed_ = 0;
     int32_t eventType_ = 0;

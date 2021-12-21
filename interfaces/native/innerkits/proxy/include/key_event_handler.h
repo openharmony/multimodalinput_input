@@ -22,7 +22,7 @@ class KeyEventHandler : public StandardizedEventHandler {
 public:
     KeyEventHandler();
     virtual ~KeyEventHandler();
-    virtual bool OnKey(const OHOS::KeyEvent& event) override;
+    virtual bool OnKey(const KeyEvent& event) override;
 };
 }
 }

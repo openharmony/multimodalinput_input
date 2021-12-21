@@ -12,9 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "mmi_point.h"
 #include <gtest/gtest.h>
+#include "mmi_point.h"
 
 namespace {
 using namespace testing::ext;

@@ -20,8 +20,6 @@ OHOS::MMI::VirtualKnobSysCtrl::VirtualKnobSysCtrl() : VirtualDevice("Virtual Kno
 {
 }
 
-OHOS::MMI::VirtualKnobSysCtrl::~VirtualKnobSysCtrl() {}
-
 const std::vector<uint32_t>& OHOS::MMI::VirtualKnobSysCtrl::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {

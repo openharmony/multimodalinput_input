@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,1481 +14,1505 @@
  */
 #ifndef OHOS_KEY_EVENTS_H
 #define OHOS_KEY_EVENTS_H
-#include <memory>
-#include <vector>
-#include "input_event.h"
+#include "multimodal_event.h"
 
 namespace OHOS {
-namespace MMI {
-class KeyEvent : public InputEvent {
-public:
-    // KEYCODE
-    static const int32_t KEYCODE_FN;
-    /* *
-     * Keycode constant: unknown keycode
-     * <p>The keycode is unknown.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_UNKNOWN;
-
-    /* *
-     * Keycode constant: Home key
-     * <p>This key is processed by the framework and will never be sent to the application.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_HOME;
-
-    /* *
-     * Keycode constant: Back key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_BACK;
-
-    /* *
-     * Keycode constant: Call key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_CALL;
-
-    /* *
-     * Keycode constant: End Call key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_ENDCALL;
-
-    /* *
-     * Keycode constant: Clear key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_CLEAR;
-
-    /* *
-     * Keycode constant: Headset Hook key
-     * <p>The key is used to end a call and stop media.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_HEADSETHOOK;
-
-    /* *
-     * Keycode constant: Camera Focus key
-     * <p>This key is used to enable focus for the camera.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_FOCUS;
-
-    /* *
-     * Keycode constant: Notification key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NOTIFICATION;
-
-    /* *
-     * Keycode constant: Search key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_SEARCH;
-
-    /* *
-     * Keycode constant: Play/Pause media key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_MEDIA_PLAY_PAUSE;
-
-    /* *
-     * Keycode constant: Stop media key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_MEDIA_STOP;
-
-    /* *
-     * Keycode constant: Play Next media key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_MEDIA_NEXT;
-
-    /* *
-     * Keycode constant: Play Previous media key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_MEDIA_PREVIOUS;
-
-    /* *
-     * Keycode constant: Rewind media key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_MEDIA_REWIND;
-
-    /* *
-     * Keycode constant: Fast Forward media key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_MEDIA_FAST_FORWARD;
-
-    /* *
-     * Turns up the volume.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_VOLUME_UP;
-
-    /* *
-     * Turns down the volume.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_VOLUME_DOWN;
-
-    /* *
-     * Presses the power button.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_POWER;
-
-    /* *
-     * Presses the camera key.
-     * <p>It is used to start the camera or take photos.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_CAMERA;
-
-    /* *
-     * Voice Assistant key
-     * <p>This key is used to wake up the voice assistant.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_VOICE_ASSISTANT;
-
-    /* *
-     * Custom key 1
-     * <p>The actions mapping to the custom keys are user-defined. Key values 521-529 are reserved for custom keys.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_CUSTOM1;
-
-    static const int32_t KEYCODE_VOLUME_MUTE;
-    static const int32_t KEYCODE_MUTE;
-
-    /* *
-     * Brightness UP key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_BRIGHTNESS_UP;
-
-    /* *
-     * Brightness Down key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_BRIGHTNESS_DOWN;
-
-    /* *
-     * Indicates general-purpose key 1 on the wearables
-     *
-     * @since 3
-     */
-    static const int32_t KEYCODE_WEAR_1;
-
-    /* *
-     * Keycode constant: '0' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_0;
-
-    /* *
-     * Keycode constant: '1' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_1;
-
-    /* *
-     * Keycode constant: '2' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_2;
-
-    /* *
-     * Keycode constant: '3' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_3;
-
-    /* *
-     * Keycode constant: '4' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_4;
-
-    /* *
-     * Keycode constant: '5' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_5;
-
-    /* *
-     * Keycode constant: '6' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_6;
-
-    /* *
-     * Keycode constant: '7' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_7;
-
-    /* *
-     * Keycode constant: '8' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_8;
-
-    /* *
-     * Keycode constant: '9' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_9;
-
-    /* *
-     * Keycode constant: '*' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_STAR;
-
-    /* *
-     * Keycode constant: '#' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_POUND;
-
-    /* *
-     * Keycode constant: Directional Pad Up key
-     * <p>The key may also be synthesized from trackball motions.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_DPAD_UP;
-
-    /* *
-     * Keycode constant: Directional Pad Down key
-     * <p>The key may also be synthesized from trackball motions.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_DPAD_DOWN;
-
-    /* *
-     * Keycode constant: Directional Pad Left key
-     * <p>The key may also be synthesized from trackball motions.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_DPAD_LEFT;
-
-    /* *
-     * Keycode constant: Directional Pad Right key
-     * <p>The key may also be synthesized from trackball motions.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_DPAD_RIGHT;
-
-    /* *
-     * Keycode constant: Directional Pad Center key
-     * <p>The key may also be synthesized from trackball motions.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_DPAD_CENTER;
-
-    /* *
-     * Keycode constant: 'A' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_A;
-
-    /* *
-     * Keycode constant: 'B' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_B;
-
-    /* *
-     * Keycode constant: 'C' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_C;
-
-    /* *
-     * Keycode constant: 'D' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_D;
-
-    /* *
-     * Keycode constant: 'E' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_E;
-
-    /* *
-     * Keycode constant: 'F' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_F;
-
-    /* *
-     * Keycode constant: 'G' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_G;
-
-    /* *
-     * Keycode constant: 'H' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_H;
-
-    /* *
-     * Keycode constant: 'I' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_I;
-
-    /* *
-     * Keycode constant: 'J' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_J;
-
-    /* *
-     * Keycode constant: 'K' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_K;
-
-    /* *
-     * Keycode constant: 'L' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_L;
-
-    /* *
-     * Keycode constant: 'M' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_M;
-
-    /* *
-     * Keycode constant: 'N' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_N;
-
-    /* *
-     * Keycode constant: 'O' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_O;
-
-    /* *
-     * Keycode constant: 'P' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_P;
-
-    /* *
-     * Keycode constant: 'Q' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_Q;
-
-    /* *
-     * Keycode constant: 'R' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_R;
-
-    /* *
-     * Keycode constant: 'S' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_S;
-
-    /* *
-     * Keycode constant: 'T' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_T;
-
-    /* *
-     * Keycode constant: 'U' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_U;
-
-    /* *
-     * Keycode constant: 'V' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_V;
-
-    /* *
-     * Keycode constant: 'W' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_W;
-
-    /* *
-     * Keycode constant: 'X' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_X;
-
-    /* *
-     * Keycode constant: 'Y' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_Y;
-
-    /* *
-     * Keycode constant: 'Z' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_Z;
-
-    /* *
-     * Keycode constant: ';' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_COMMA;
-
-    /* *
-     * Keycode constant: '.' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_PERIOD;
-
-    /* *
-     * Keycode constant: Left Alt modifier key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_ALT_LEFT;
-
-    /* *
-     * Keycode constant: Right Alt modifier key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_ALT_RIGHT;
-
-    /* *
-     * Keycode constant: Left Shift modifier key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_SHIFT_LEFT;
-
-    /* *
-     * Keycode constant: Right Shift modifier key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_SHIFT_RIGHT;
-
-    /* *
-     * Keycode constant: Tab key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_TAB;
-
-    /* *
-     * Keycode constant: Space key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_SPACE;
-
-    /* *
-     * Keycode constant: Symbol modifier key
-     * <p>The key is used to input alternate symbols.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_SYM;
-
-    /* *
-     * Keycode constant: Explorer function key
-     * <p>This key is used to launch a browser application.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_EXPLORER;
-
-    /* *
-     * Keycode constant: Email function key
-     * <p>This key is used to launch an email application.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_ENVELOPE;
-
-    /* *
-     * Keycode constant: Enter key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_ENTER;
-
-    /* *
-     * Keycode constant: Backspace key
-     * <p>Unlike {@link #static const int32_t KEYCODE_FORWARD_DEL}; this key is used to delete characters before the
-     * insertion point.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_DEL;
-
-    /* *
-     * Keycode constant: '`' key (backtick key)
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_GRAVE;
-
-    /* *
-     * Keycode constant: '-' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_MINUS;
-
-    /* *
-     * Keycode constant: '=' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_EQUALS;
-
-    /* *
-     * Keycode constant: '[' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_LEFT_BRACKET;
-
-    /* *
-     * Keycode constant: ']' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_RIGHT_BRACKET;
-
-    /* *
-     * Keycode constant: '\' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_BACKSLASH;
-
-    /* *
-     * Keycode constant: ';' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_SEMICOLON;
-
-    /* *
-     * Keycode constant: ''' key (apostrophe key)
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_APOSTROPHE;
-
-    /* *
-     * Keycode constant: '/' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_SLASH;
-
-    /* *
-     * Keycode constant: '{@literal @}' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_AT;
-
-    /* *
-     * Keycode constant: '+' key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_PLUS;
-
-    /* *
-     * Keycode constant: Menu key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_MENU;
-
-    /* *
-     * Keycode constant: Page Up key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_PAGE_UP;
-
-    /* *
-     * Keycode constant: Page Down key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_PAGE_DOWN;
-
-    /* *
-     * Keycode constant: Escape key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_ESCAPE;
-
-    /* *
-     * Keycode constant: Forward Delete key
-     * <p>Unlike {@link #static const int32_t KEYCODE_DEL}; this key is used to delete characters ahead of the insertion
-     * point.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_FORWARD_DEL;
-
-    /* *
-     * Keycode constant: Left Control modifier key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_CTRL_LEFT;
-
-    /* *
-     * Keycode constant: Right Control modifier key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_CTRL_RIGHT;
-
-    /* *
-     * Keycode constant: Caps Lock key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_CAPS_LOCK;
-
-    /* *
-     * Keycode constant: Scroll Lock key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_SCROLL_LOCK;
-
-    /* *
-     * Keycode constant: Left Meta modifier key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_META_LEFT;
-
-    /* *
-     * Keycode constant: Right Meta modifier key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_META_RIGHT;
-
-    /* *
-     * Keycode constant: Function modifier key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_FUNCTION;
-
-    /* *
-     * Keycode constant: System Request/Print Screen key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_SYSRQ;
-
-    /* *
-     * Keycode constant: Break/Pause key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_BREAK;
-
-    /* *
-     * Keycode constant: Home Movement key
-     * <p>This key is used to scroll or move the cursor around to the start of a line or to the
-     * top of a list.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_MOVE_HOME;
-
-    /* *
-     * Keycode constant: End Movement key
-     * <p>This key is used to scroll or move the cursor around to the end of a line or to the
-     * bottom of a list.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_MOVE_END;
-
-    /* *
-     * Keycode constant: Insert key
-     * <p>This key is used to toggle the insert or overwrite edit mode.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_INSERT;
-
-    /* *
-     * Keycode constant: Forward key
-     * <p>This key is used to navigate forward in the history stack. It is a complement of
-     * {@link #static const int32_t KEYCODE_BACK}.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_FORWARD;
-
-    /* *
-     * Keycode constant: Play media key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_MEDIA_PLAY;
-
-    /* *
-     * Keycode constant: Pause media key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_MEDIA_PAUSE;
-
-    /* *
-     * Keycode constant: Close media key
-     * <p>This key can be used to close a CD tray; for example.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_MEDIA_CLOSE;
-
-    /* *
-     * Keycode constant: Eject media key
-     * <p>This key can be used to eject a CD tray; for example.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_MEDIA_EJECT;
-
-    /* *
-     * Keycode constant: Record media key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_MEDIA_RECORD;
-
-    /* *
-     * Keycode constant: F1 key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_F1;
-
-    /* *
-     * Keycode constant: F2 key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_F2;
-
-    /* *
-     * Keycode constant: F3 key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_F3;
-
-    /* *
-     * Keycode constant: F4 key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_F4;
-
-    /* *
-     * Keycode constant: F5 key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_F5;
-
-    /* *
-     * Keycode constant: F6 key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_F6;
-
-    /* *
-     * Keycode constant: F7 key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_F7;
-
-    /* *
-     * Keycode constant: F8 key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_F8;
-
-    /* *
-     * Keycode constant: F9 key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_F9;
-
-    /* *
-     * Keycode constant: F10 key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_F10;
-
-    /* *
-     * Keycode constant: F11 key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_F11;
-
-    /* *
-     * Keycode constant: F12 key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_F12;
-
-    /* *
-     * Keycode constant: Num Lock key
-     * <p>This key is used to alter the behavior of other keys on the numeric keypad.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUM_LOCK;
-
-    /* *
-     * Keycode constant: '0' key on the numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_0;
-
-    /* *
-     * Keycode constant: '1' key on the numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_1;
-
-    /* *
-     * Keycode constant: '2' key on the numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_2;
-
-    /* *
-     * Keycode constant: '3' key on the numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_3;
-
-    /* *
-     * Keycode constant: '4' key on the numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_4;
-
-    /* *
-     * Keycode constant: '5' key on the numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_5;
-
-    /* *
-     * Keycode constant: '6' key on the numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_6;
-
-    /* *
-     * Keycode constant: '7' key on the numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_7;
-
-    /* *
-     * Keycode constant: '8' key on the numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_8;
-
-    /* *
-     * Keycode constant: '9' key on the numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_9;
-
-    /* *
-     * Keycode constant: '/' key (for division) on the numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_DIVIDE;
-
-    /* *
-     * Keycode constant: '*' key (for multiplication) on the numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_MULTIPLY;
-
-    /* *
-     * Keycode constant: '-' key (for subtraction) on the numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_SUBTRACT;
-
-    /* *
-     * Keycode constant: '+' key (for addition) on the numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_ADD;
-
-    /* *
-     * Key code constant: '.' key (for decimals or digit grouping) on the
-     * numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_DOT;
-
-    /* *
-     * Key code constant: ';' key (for decimals or digit grouping) on the
-     * numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_COMMA;
-
-    /* *
-     * Keycode constant: Enter key on the numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_ENTER;
-
-    /* *
-     * Keycode constant: '=' key on the numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_EQUALS;
-
-    /* *
-     * Keycode constant: '(' key on the numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_LEFT_PAREN;
-
-    /* *
-     * Keycode constant: ')' key on the numeric keypad
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_NUMPAD_RIGHT_PAREN;
-
-    /* *
-     * Key code:  The virtual multitask key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_VIRTUAL_MULTITASK;
-
-    /* *
-     * Key code:  The handle button key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_BUTTON_A;
-    static const int32_t KEYCODE_BUTTON_B;
-    static const int32_t KEYCODE_BUTTON_C;
-    static const int32_t KEYCODE_BUTTON_X;
-    static const int32_t KEYCODE_BUTTON_Y;
-    static const int32_t KEYCODE_BUTTON_Z;
-    static const int32_t KEYCODE_BUTTON_L1;
-    static const int32_t KEYCODE_BUTTON_R1;
-    static const int32_t KEYCODE_BUTTON_L2;
-    static const int32_t KEYCODE_BUTTON_R2;
-    static const int32_t KEYCODE_BUTTON_SELECT;
-    static const int32_t KEYCODE_BUTTON_START;
-    static const int32_t KEYCODE_BUTTON_MODE;
-    static const int32_t KEYCODE_BUTTON_THUMBL;
-    static const int32_t KEYCODE_BUTTON_THUMBR;
-
-    /* *
-     * Key code:  The joystick button key
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_BUTTON_TRIGGER;
-    static const int32_t KEYCODE_BUTTON_THUMB;
-    static const int32_t KEYCODE_BUTTON_THUMB2;
-    static const int32_t KEYCODE_BUTTON_TOP;
-    static const int32_t KEYCODE_BUTTON_TOP2;
-    static const int32_t KEYCODE_BUTTON_PINKIE;
-    static const int32_t KEYCODE_BUTTON_BASE1;
-    static const int32_t KEYCODE_BUTTON_BASE2;
-    static const int32_t KEYCODE_BUTTON_BASE3;
-    static const int32_t KEYCODE_BUTTON_BASE4;
-    static const int32_t KEYCODE_BUTTON_BASE5;
-    static const int32_t KEYCODE_BUTTON_BASE6;
-    static const int32_t KEYCODE_BUTTON_BASE7;
-    static const int32_t KEYCODE_BUTTON_BASE8;
-    static const int32_t KEYCODE_BUTTON_BASE9;
-    static const int32_t KEYCODE_BUTTON_DEAD;
-
-    static const int32_t KEYCODE_SLEEP;
-    static const int32_t KEYCODE_ZENKAKU_HANKAKU;
-    static const int32_t KEYCODE_102ND;
-    static const int32_t KEYCODE_RO;
-    static const int32_t KEYCODE_KATAKANA;
-    static const int32_t KEYCODE_HIRAGANA;
-    static const int32_t KEYCODE_HENKAN;
-    static const int32_t KEYCODE_KATAKANA_HIRAGANA;
-    static const int32_t KEYCODE_MUHENKAN;
-    static const int32_t KEYCODE_LINEFEED;
-    static const int32_t KEYCODE_MACRO;
-    static const int32_t KEYCODE_NUMPAD_PLUSMINUS;
-    static const int32_t KEYCODE_SCALE;
-    static const int32_t KEYCODE_HANGUEL;
-    static const int32_t KEYCODE_HANJA;
-    static const int32_t KEYCODE_YEN;
-    static const int32_t KEYCODE_STOP;
-    static const int32_t KEYCODE_AGAIN;
-    static const int32_t KEYCODE_PROPS;
-    static const int32_t KEYCODE_UNDO;
-    static const int32_t KEYCODE_COPY;
-    static const int32_t KEYCODE_OPEN;
-    static const int32_t KEYCODE_PASTE;
-    static const int32_t KEYCODE_FIND;
-    static const int32_t KEYCODE_CUT;
-    static const int32_t KEYCODE_HELP;
-    static const int32_t KEYCODE_CALC;
-    static const int32_t KEYCODE_FILE;
-    static const int32_t KEYCODE_BOOKMARKS;
-    static const int32_t KEYCODE_NEXT;
-    static const int32_t KEYCODE_PLAYPAUSE;
-    static const int32_t KEYCODE_PREVIOUS;
-    static const int32_t KEYCODE_STOPCD;
-    static const int32_t KEYCODE_CONFIG;
-    static const int32_t KEYCODE_REFRESH;
-    static const int32_t KEYCODE_EXIT;
-    static const int32_t KEYCODE_EDIT;
-    static const int32_t KEYCODE_SCROLLUP;
-    static const int32_t KEYCODE_SCROLLDOWN;
-    static const int32_t KEYCODE_NEW;
-    static const int32_t KEYCODE_REDO;
-    static const int32_t KEYCODE_CLOSE;
-    static const int32_t KEYCODE_PLAY;
-    static const int32_t KEYCODE_BASSBOOST;
-    static const int32_t KEYCODE_PRINT;
-    static const int32_t KEYCODE_CHAT;
-    static const int32_t KEYCODE_FINANCE;
-    static const int32_t KEYCODE_CANCEL;
-    static const int32_t KEYCODE_KBDILLUM_TOGGLE;
-    static const int32_t KEYCODE_KBDILLUM_DOWN;
-    static const int32_t KEYCODE_KBDILLUM_UP;
-    static const int32_t KEYCODE_SEND;
-    static const int32_t KEYCODE_REPLY;
-    static const int32_t KEYCODE_FORWARDMAIL;
-    static const int32_t KEYCODE_SAVE;
-    static const int32_t KEYCODE_DOCUMENTS;
-    static const int32_t KEYCODE_VIDEO_NEXT;
-    static const int32_t KEYCODE_VIDEO_PREV;
-    static const int32_t KEYCODE_BRIGHTNESS_CYCLE;
-    static const int32_t KEYCODE_BRIGHTNESS_ZERO;
-    static const int32_t KEYCODE_DISPLAY_OFF;
-    static const int32_t KEYCODE_BTN_MISC;
-    static const int32_t KEYCODE_GOTO;
-    static const int32_t KEYCODE_INFO;
-    static const int32_t KEYCODE_PROGRAM;
-    static const int32_t KEYCODE_PVR;
-    static const int32_t KEYCODE_SUBTITLE;
-    static const int32_t KEYCODE_FULL_SCREEN;
-    static const int32_t KEYCODE_KEYBOARD;
-    static const int32_t KEYCODE_ASPECT_RATIO;
-    static const int32_t KEYCODE_PC;
-    static const int32_t KEYCODE_TV;
-    static const int32_t KEYCODE_TV2;
-    static const int32_t KEYCODE_VCR;
-    static const int32_t KEYCODE_VCR2;
-    static const int32_t KEYCODE_SAT;
-    static const int32_t KEYCODE_CD;
-    static const int32_t KEYCODE_TAPE;
-    static const int32_t KEYCODE_TUNER;
-    static const int32_t KEYCODE_PLAYER;
-    static const int32_t KEYCODE_DVD;
-    static const int32_t KEYCODE_AUDIO;
-    static const int32_t KEYCODE_VIDEO;
-    static const int32_t KEYCODE_MEMO;
-    static const int32_t KEYCODE_CALENDAR;
-    static const int32_t KEYCODE_RED;
-    static const int32_t KEYCODE_GREEN;
-    static const int32_t KEYCODE_YELLOW;
-    static const int32_t KEYCODE_BLUE;
-    static const int32_t KEYCODE_CHANNELUP;
-    static const int32_t KEYCODE_CHANNELDOWN;
-    static const int32_t KEYCODE_LAST;
-    static const int32_t KEYCODE_RESTART;
-    static const int32_t KEYCODE_SLOW;
-    static const int32_t KEYCODE_SHUFFLE;
-    static const int32_t KEYCODE_VIDEOPHONE;
-    static const int32_t KEYCODE_GAMES;
-    static const int32_t KEYCODE_ZOOMIN;
-    static const int32_t KEYCODE_ZOOMOUT;
-    static const int32_t KEYCODE_ZOOMRESET;
-    static const int32_t KEYCODE_WORDPROCESSOR;
-    static const int32_t KEYCODE_EDITOR;
-    static const int32_t KEYCODE_SPREADSHEET;
-    static const int32_t KEYCODE_GRAPHICSEDITOR;
-    static const int32_t KEYCODE_PRESENTATION;
-    static const int32_t KEYCODE_DATABASE;
-    static const int32_t KEYCODE_NEWS;
-    static const int32_t KEYCODE_VOICEMAIL;
-    static const int32_t KEYCODE_ADDRESSBOOK;
-    static const int32_t KEYCODE_MESSENGER;
-    static const int32_t KEYCODE_BRIGHTNESS_TOGGLE;
-    static const int32_t KEYCODE_SPELLCHECK;
-    static const int32_t KEYCODE_COFFEE;
-    static const int32_t KEYCODE_MEDIA_REPEAT;
-    static const int32_t KEYCODE_IMAGES;
-    static const int32_t KEYCODE_BUTTONCONFIG;
-    static const int32_t KEYCODE_TASKMANAGER;
-    static const int32_t KEYCODE_JOURNAL;
-    static const int32_t KEYCODE_CONTROLPANEL;
-    static const int32_t KEYCODE_APPSELECT;
-    static const int32_t KEYCODE_SCREENSAVER;
-    static const int32_t KEYCODE_ASSISTANT;
-    static const int32_t KEYCODE_KBD_LAYOUT_NEXT;
-    static const int32_t KEYCODE_BRIGHTNESS_MIN;
-    static const int32_t KEYCODE_BRIGHTNESS_MAX;
-    static const int32_t KEYCODE_KBDINPUTASSIST_PREV;
-    static const int32_t KEYCODE_KBDINPUTASSIST_NEXT;
-    static const int32_t KEYCODE_KBDINPUTASSIST_PREVGROUP;
-    static const int32_t KEYCODE_KBDINPUTASSIST_NEXTGROUP;
-    static const int32_t KEYCODE_KBDINPUTASSIST_ACCEPT;
-    static const int32_t KEYCODE_KBDINPUTASSIST_CANCEL;
-
-    static const int32_t KEYCODE_FRONT;
-    static const int32_t KEYCODE_SETUP;
-    static const int32_t KEYCODE_WAKEUP;
-    static const int32_t KEYCODE_SENDFILE;
-    static const int32_t KEYCODE_DELETEFILE;
-    static const int32_t KEYCODE_XFER;
-    static const int32_t KEYCODE_PROG1;
-    static const int32_t KEYCODE_PROG2;
-    static const int32_t KEYCODE_MSDOS;
-    static const int32_t KEYCODE_SCREENLOCK;
-    static const int32_t KEYCODE_DIRECTION_ROTATE_DISPLAY;
-    static const int32_t KEYCODE_CYCLEWINDOWS;
-    static const int32_t KEYCODE_COMPUTER;
-    static const int32_t KEYCODE_EJECTCLOSECD;
-    static const int32_t KEYCODE_ISO;
-    static const int32_t KEYCODE_MOVE;
-    static const int32_t KEYCODE_F13;
-    static const int32_t KEYCODE_F14;
-    static const int32_t KEYCODE_F15;
-    static const int32_t KEYCODE_F16;
-    static const int32_t KEYCODE_F17;
-    static const int32_t KEYCODE_F18;
-    static const int32_t KEYCODE_F19;
-    static const int32_t KEYCODE_F20;
-    static const int32_t KEYCODE_F21;
-    static const int32_t KEYCODE_F22;
-    static const int32_t KEYCODE_F23;
-    static const int32_t KEYCODE_F24;
-    static const int32_t KEYCODE_PROG3;
-    static const int32_t KEYCODE_PROG4;
-    static const int32_t KEYCODE_DASHBOARD;
-    static const int32_t KEYCODE_SUSPEND;
-    static const int32_t KEYCODE_HP;
-    static const int32_t KEYCODE_SOUND;
-    static const int32_t KEYCODE_QUESTION;
-    static const int32_t KEYCODE_CONNECT;
-    static const int32_t KEYCODE_SPORT;
-    static const int32_t KEYCODE_SHOP;
-    static const int32_t KEYCODE_ALTERASE;
-    static const int32_t KEYCODE_SWITCHVIDEOMODE;
-    static const int32_t KEYCODE_BATTERY;
-    static const int32_t KEYCODE_BLUETOOTH;
-    static const int32_t KEYCODE_WLAN;
-    static const int32_t KEYCODE_UWB;
-    static const int32_t KEYCODE_WWAN_WIMAX;
-    static const int32_t KEYCODE_RFKILL;
-
-    static const int32_t KEYCODE_CHANNEL;
-    static const int32_t KEYCODE_BTN_0;
-    static const int32_t KEYCODE_BTN_1;
-    static const int32_t KEYCODE_BTN_2;
-    static const int32_t KEYCODE_BTN_3;
-    static const int32_t KEYCODE_BTN_4;
-    static const int32_t KEYCODE_BTN_5;
-    static const int32_t KEYCODE_BTN_6;
-    static const int32_t KEYCODE_BTN_7;
-    static const int32_t KEYCODE_BTN_8;
-    static const int32_t KEYCODE_BTN_9;
-
-    static const int32_t KEYCODE_BRL_DOT1;
-    static const int32_t KEYCODE_BRL_DOT2;
-    static const int32_t KEYCODE_BRL_DOT3;
-    static const int32_t KEYCODE_BRL_DOT4;
-    static const int32_t KEYCODE_BRL_DOT5;
-    static const int32_t KEYCODE_BRL_DOT6;
-    static const int32_t KEYCODE_BRL_DOT7;
-    static const int32_t KEYCODE_BRL_DOT8;
-    static const int32_t KEYCODE_BRL_DOT9;
-    static const int32_t KEYCODE_BRL_DOT10;
-
-    /* *
-     * Left Knob roll-up
-     * <p>In contrast to {@link #static const int32_t KEYCODE_LEFT_KNOB_ROLL_DOWN}; it means rolling
-     * the left knob upwards. The knob functionis scenario-specific; for example;
-     * increasing the volume or air conditioner temperature.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_LEFT_KNOB_ROLL_UP;
-    /* *
-     * Left Knob roll-down
-     * <p>In contrast to {@link #static const int32_t KEYCODE_LEFT_KNOB_ROLL_UP};
-     * it means rolling the left knob downwards. The knob function is
-     * scenario-specific; for example; reducing the volume or air
-     * conditioner temperature.
-     * @since 1
-     */
-    static const int32_t KEYCODE_LEFT_KNOB_ROLL_DOWN;
-
-    /* *
-     * Left Knob
-     * <p>Pressing the knob will activate its adjustment function.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_LEFT_KNOB;
-    /* *
-     * Right Knob roll-up
-     * <p>In contrast to {@link #static const int32_t KEYCODE_RIGHT_KNOB_ROLL_DOWN}; it means rolling
-     * the right knob upwards. The knobfunction is scenario-specific; for example;
-     * increasing the volume or air conditioner temperature.
-     *
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_RIGHT_KNOB_ROLL_UP;
-    /* *
-     * Right Knob roll-down
-     * <p>In contrast to {@link #static const int32_t KEYCODE_RIGHT_KNOB_ROLL_UP}; it means rolling
-     * the right knob downwards. The knobfunction is scenario-specific;
-     * for example; reducing the volume or air conditioner temperature.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_RIGHT_KNOB_ROLL_DOWN;
-    /* *
-     * Right Knob
-     * <p>Pressing the knob will activate its adjustment function.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_RIGHT_KNOB;
-    /* *
-     * Audio Source Switch button
-     * <p>Pressing this button will enable the audio source. Depending on the
-     * actual scenario; it may also indicate that the Bluetooth call control
-     * button is pressed.
-     * @since 1
-     */
-    static const int32_t KEYCODE_VOICE_SOURCE_SWITCH;
-    /* *
-     * Menu key
-     * <p>Pressing this key will display the launcher page.
-     *
-     * @since 1
-     */
-    static const int32_t KEYCODE_LAUNCHER_MENU;
-
-    // Unknown key action. Usually used to indicate the initial invalid value
-    static const int32_t KEY_ACTION_UNKNOWN;
-    // Indicates cancel action.
-    // When the button is pressed, and the lifting action cannot be reported normally, report the key event of this
-    // action
-    static const int32_t KEY_ACTION_CANCEL;
-
-    // Indicates key press action
-    static const int32_t KEY_ACTION_DOWN;
-    // Indicates key release action
-    static const int32_t KEY_ACTION_UP;
-
-public:
-    class KeyItem {
-    public:
-        KeyItem();
-        virtual ~KeyItem();
-
-        // Get or set the key code.
-        // The key code is the number that identifies the key
-        int32_t GetKeyCode() const;
-        void SetKeyCode(int32_t keyCode);
-
-        // Get or set the key press time
-        int32_t GetDownTime() const;
-        void SetDownTime(int32_t downTime);
-
-        // Get or set the unique identifier of the device reporting this button. i
-        // The default value is 0, which means that the non-real device reports.
-        int32_t GetDeviceId() const;
-        void SetDeviceId(int32_t deviceId);
-
-        // Gets or sets whether the key is currently pressed.
-        // The default value is true, which means it is in a pressed state.
-        bool IsPressed() const;
-        void SetPressed(bool pressed);
-
-    private:
-        bool pressed_;
-        int32_t downTime_;
-        int32_t deviceId_;
-        int32_t keyCode_;
-    };
-
-public:
-    // Try to convert the InputEvent object into a KeyEvent object.
-    // Returning an empty smart pointer object indicates that the conversion failed
-    static std::shared_ptr<KeyEvent> from(std::shared_ptr<InputEvent> inputEvent);
-
+enum KeyState {
+    /**
+    * Indicates that the key is being pressed down.
+    *
+    * @since 3
+    */
+    KEY_PRESSED = 0,
+
+    /**
+    * Indicates that the key is being released.
+    *
+    * @since 3
+    */
+    KEY_RELEASED = 1,
+};
+
+enum KeyEventEnum {
+    /**
+    * Keycode constant: unknown keycode
+    * <p>The keycode is unknown.
+    *
+    * @since 1
+    */
+    KEY_UNKNOWN = -1,
+
+    /**
+    * Keycode constant: Home key
+    * <p>This key is processed by the framework and will never be sent to the application.
+    *
+    * @since 1
+    */
+    KEY_HOME = 1,
+
+    /**
+    * Keycode constant: Back key
+    *
+    * @since 1
+    */
+    KEY_BACK = 2,
+
+    /**
+    * Keycode constant: Call key
+    *
+    * @since 1
+    */
+    KEY_CALL = 3,
+
+    /**
+    * Keycode constant: End Call key
+    *
+    * @since 1
+    */
+    KEY_ENDCALL = 4,
+
+    /**
+    * Keycode constant: Clear key
+    *
+    * @since 1
+    */
+    KEY_CLEAR = 5,
+
+    /**
+    * Keycode constant: Headset Hook key
+    * <p>The key is used to end a call and stop media.
+    *
+    * @since 1
+    */
+    KEY_HEADSETHOOK = 6,
+
+    /**
+    * Keycode constant: Camera Focus key
+    * <p>This key is used to enable focus for the camera.
+    *
+    * @since 1
+    */
+    KEY_FOCUS = 7,
+
+    /**
+    * Keycode constant: Notification key
+    *
+    * @since 1
+    */
+    KEY_NOTIFICATION = 8,
+
+    /**
+    * Keycode constant: Search key
+    *
+    * @since 1
+    */
+    KEY_SEARCH = 9,
+
+    /**
+    * Keycode constant: Play/Pause media key
+    *
+    * @since 1
+    */
+    KEY_MEDIA_PLAY_PAUSE = 10,
+
+    /**
+    * Keycode constant: Stop media key
+    *
+    * @since 1
+    */
+    KEY_MEDIA_STOP = 11,
+
+    /**
+    * Keycode constant: Play Next media key
+    *
+    * @since 1
+    */
+    KEY_MEDIA_NEXT = 12,
+
+    /**
+    * Keycode constant: Play Previous media key
+    *
+    * @since 1
+    */
+    KEY_MEDIA_PREVIOUS = 13,
+
+    /**
+    * Keycode constant: Rewind media key
+    *
+    * @since 1
+    */
+    KEY_MEDIA_REWIND = 14,
+
+    /**
+    * Keycode constant: Fast Forward media key
+    *
+    * @since 1
+    */
+    KEY_MEDIA_FAST_FORWARD = 15,
+
+    /**
+    * Turns up the volume.
+    *
+    * @since 1
+    */
+    KEY_VOLUME_UP = 16,
+
+    /**
+    * Turns down the volume.
+    *
+    * @since 1
+    */
+    KEY_VOLUME_DOWN = 17,
+
+    /**
+    * Presses the power button.
+    *
+    * @since 1
+    */
+    KEY_POWER = 18,
+
+    /**
+    * Presses the camera key.
+    * <p>It is used to start the camera or take photos.
+    *
+    * @since 1
+    */
+    KEY_CAMERA = 19,
+
+    /**
+    * Voice Assistant key
+    * <p>This key is used to wake up the voice assistant.
+    *
+    * @since 1
+    */
+    KEY_VOICE_ASSISTANT = 20,
+
+    /**
+    * Custom key 1
+    * <p>The actions mapping to the custom keys are user-defined. Key values 521-529 are reserved for custom keys.
+    *
+    * @since 1
+    */
+    KEY_CUSTOM1 = 21,
+
+    KEY_VOLUME_MUTE = 22,
+    KEY_MUTE = 23,
+
+    /**
+    * Brightness UP key
+    *
+    * @since 1
+    */
+    KEY_BRIGHTNESS_UP = 40,
+
+    /**
+    * Brightness Down key
+    *
+    * @since 1
+    */
+    KEY_BRIGHTNESS_DOWN = 41,
+
+    /**
+    * Indicates general-purpose key 1 on the wearables
+    *
+    * @since 3
+    */
+    KEY_WEAR_1 = 1001,
+
+    /**
+    * Keycode constant: '0' key
+    *
+    * @since 1
+    */
+    KEY_0 = 2000,
+
+    /**
+    * Keycode constant: '1' key
+    *
+    * @since 1
+    */
+    KEY_1 = 2001,
+
+    /**
+    * Keycode constant: '2' key
+    *
+    * @since 1
+    */
+    KEY_2 = 2002,
+
+    /**
+    * Keycode constant: '3' key
+    *
+    * @since 1
+    */
+    KEY_3 = 2003,
+
+    /**
+    * Keycode constant: '4' key
+    *
+    * @since 1
+    */
+    KEY_4 = 2004,
+
+    /**
+    * Keycode constant: '5' key
+    *
+    * @since 1
+    */
+    KEY_5 = 2005,
+
+    /**
+    * Keycode constant: '6' key
+    *
+    * @since 1
+    */
+    KEY_6 = 2006,
+
+    /**
+    * Keycode constant: '7' key
+    *
+    * @since 1
+    */
+    KEY_7 = 2007,
+
+    /**
+    * Keycode constant: '8' key
+    *
+    * @since 1
+    */
+    KEY_8 = 2008,
+
+    /**
+    * Keycode constant: '9' key
+    *
+    * @since 1
+    */
+    KEY_9 = 2009,
+
+    /**
+    * Keycode constant: '*' key
+    *
+    * @since 1
+    */
+    KEY_STAR = 2010,
+
+    /**
+    * Keycode constant: '#' key
+    *
+    * @since 1
+    */
+    KEY_POUND = 2011,
+
+    /**
+    * Keycode constant: Directional Pad Up key
+    * <p>The key may also be synthesized from trackball motions.
+    *
+    * @since 1
+    */
+    KEY_DPAD_UP = 2012,
+
+    /**
+    * Keycode constant: Directional Pad Down key
+    * <p>The key may also be synthesized from trackball motions.
+    *
+    * @since 1
+    */
+    KEY_DPAD_DOWN = 2013,
+
+    /**
+    * Keycode constant: Directional Pad Left key
+    * <p>The key may also be synthesized from trackball motions.
+    *
+    * @since 1
+    */
+    KEY_DPAD_LEFT = 2014,
+
+    /**
+    * Keycode constant: Directional Pad Right key
+    * <p>The key may also be synthesized from trackball motions.
+    *
+    * @since 1
+    */
+    KEY_DPAD_RIGHT = 2015,
+
+    /**
+    * Keycode constant: Directional Pad Center key
+    * <p>The key may also be synthesized from trackball motions.
+    *
+    * @since 1
+    */
+    KEY_DPAD_CENTER = 2016,
+
+    /**
+    * Keycode constant: 'A' key
+    *
+    * @since 1
+    */
+    KEY_A = 2017,
+
+    /**
+    * Keycode constant: 'B' key
+    *
+    * @since 1
+    */
+    KEY_B = 2018,
+
+    /**
+    * Keycode constant: 'C' key
+    *
+    * @since 1
+    */
+    KEY_C = 2019,
+
+    /**
+    * Keycode constant: 'D' key
+    *
+    * @since 1
+    */
+    KEY_D = 2020,
+
+    /**
+    * Keycode constant: 'E' key
+    *
+    * @since 1
+    */
+    KEY_E = 2021,
+
+    /**
+    * Keycode constant: 'F' key
+    *
+    * @since 1
+    */
+    KEY_F = 2022,
+
+    /**
+    * Keycode constant: 'G' key
+    *
+    * @since 1
+    */
+    KEY_G = 2023,
+
+    /**
+    * Keycode constant: 'H' key
+    *
+    * @since 1
+    */
+    KEY_H = 2024,
+
+    /**
+    * Keycode constant: 'I' key
+    *
+    * @since 1
+    */
+    KEY_I = 2025,
+
+    /**
+    * Keycode constant: 'J' key
+    *
+    * @since 1
+    */
+    KEY_J = 2026,
+
+    /**
+    * Keycode constant: 'K' key
+    *
+    * @since 1
+    */
+    KEY_K = 2027,
+
+    /**
+    * Keycode constant: 'L' key
+    *
+    * @since 1
+    */
+    KEY_L = 2028,
+
+    /**
+    * Keycode constant: 'M' key
+    *
+    * @since 1
+    */
+    KEY_M = 2029,
+
+    /**
+    * Keycode constant: 'N' key
+    *
+    * @since 1
+    */
+    KEY_N = 2030,
+
+    /**
+    * Keycode constant: 'O' key
+    *
+    * @since 1
+    */
+    KEY_O = 2031,
+
+    /**
+    * Keycode constant: 'P' key
+    *
+    * @since 1
+    */
+    KEY_P = 2032,
+
+    /**
+    * Keycode constant: 'Q' key
+    *
+    * @since 1
+    */
+    KEY_Q = 2033,
+
+    /**
+    * Keycode constant: 'R' key
+    *
+    * @since 1
+    */
+    KEY_R = 2034,
+
+    /**
+    * Keycode constant: 'S' key
+    *
+    * @since 1
+    */
+    KEY_S = 2035,
+
+    /**
+    * Keycode constant: 'T' key
+    *
+    * @since 1
+    */
+    KEY_T = 2036,
+
+    /**
+    * Keycode constant: 'U' key
+    *
+    * @since 1
+    */
+    KEY_U = 2037,
+
+    /**
+    * Keycode constant: 'V' key
+    *
+    * @since 1
+    */
+    KEY_V = 2038,
+
+    /**
+    * Keycode constant: 'W' key
+    *
+    * @since 1
+    */
+    KEY_W = 2039,
+
+    /**
+    * Keycode constant: 'X' key
+    *
+    * @since 1
+    */
+    KEY_X = 2040,
+
+    /**
+    * Keycode constant: 'Y' key
+    *
+    * @since 1
+    */
+    KEY_Y = 2041,
+
+    /**
+    * Keycode constant: 'Z' key
+    *
+    * @since 1
+    */
+    KEY_Z = 2042,
+
+    /**
+    * Keycode constant: ',' key
+    *
+    * @since 1
+    */
+    KEY_COMMA = 2043,
+
+    /**
+    * Keycode constant: '.' key
+    *
+    * @since 1
+    */
+    KEY_PERIOD = 2044,
+
+    /**
+    * Keycode constant: Left Alt modifier key
+    *
+    * @since 1
+    */
+    KEY_ALT_LEFT = 2045,
+
+    /**
+    * Keycode constant: Right Alt modifier key
+    *
+    * @since 1
+    */
+    KEY_ALT_RIGHT = 2046,
+
+    /**
+    * Keycode constant: Left Shift modifier key
+    *
+    * @since 1
+    */
+    KEY_SHIFT_LEFT = 2047,
+
+    /**
+    * Keycode constant: Right Shift modifier key
+    *
+    * @since 1
+    */
+    KEY_SHIFT_RIGHT = 2048,
+
+    /**
+    * Keycode constant: Tab key
+    *
+    * @since 1
+    */
+    KEY_TAB = 2049,
+
+    /**
+    * Keycode constant: Space key
+    *
+    * @since 1
+    */
+    KEY_SPACE = 2050,
+
+    /**
+    * Keycode constant: Symbol modifier key
+    * <p>The key is used to input alternate symbols.
+    *
+    * @since 1
+    */
+    KEY_SYM = 2051,
+
+    /**
+    * Keycode constant: Explorer function key
+    * <p>This key is used to launch a browser application.
+    *
+    * @since 1
+    */
+    KEY_EXPLORER = 2052,
+
+    /**
+    * Keycode constant: Email function key
+    * <p>This key is used to launch an email application.
+    *
+    * @since 1
+    */
+    KEY_ENVELOPE = 2053,
+
+    /**
+    * Keycode constant: Enter key
+    *
+    * @since 1
+    */
+    KEY_ENTER = 2054,
+
+    /**
+    * Keycode constant: Backspace key
+    * <p>Unlike {@link #KEY_FORWARD_DEL}, this key is used to delete characters before the
+    * insertion point.
+    *
+    * @since 1
+    */
+    KEY_DEL = 2055,
+
+    /**
+    * Keycode constant: '`' key (backtick key)
+    *
+    * @since 1
+    */
+    KEY_GRAVE = 2056,
+
+    /**
+    * Keycode constant: '-' key
+    *
+    * @since 1
+    */
+    KEY_MINUS = 2057,
+
+    /**
+    * Keycode constant: '=' key
+    *
+    * @since 1
+    */
+    KEY_EQUALS = 2058,
+
+    /**
+    * Keycode constant: '[' key
+    *
+    * @since 1
+    */
+    KEY_LEFT_BRACKET = 2059,
+
+    /**
+    * Keycode constant: ']' key
+    *
+    * @since 1
+    */
+    KEY_RIGHT_BRACKET = 2060,
+
+    /**
+    * Keycode constant: '\' key
+    *
+    * @since 1
+    */
+    KEY_BACKSLASH = 2061,
+
+    /**
+    * Keycode constant: ',' key
+    *
+    * @since 1
+    */
+    KEY_SEMICOLON = 2062,
+
+    /**
+    * Keycode constant: ''' key (apostrophe key)
+    *
+    * @since 1
+    */
+    KEY_APOSTROPHE = 2063,
+
+    /**
+    * Keycode constant: '/' key
+    *
+    * @since 1
+    */
+    KEY_SLASH = 2064,
+
+    /**
+    * Keycode constant: '{@literal @}' key
+    *
+    * @since 1
+    */
+    KEY_AT = 2065,
+
+    /**
+    * Keycode constant: '+' key
+    *
+    * @since 1
+    */
+    KEY_PLUS = 2066,
+
+    /**
+    * Keycode constant: Menu key
+    *
+    * @since 1
+    */
+    KEY_MENU = 2067,
+
+    /**
+    * Keycode constant: Page Up key
+    *
+    * @since 1
+    */
+    KEY_PAGE_UP = 2068,
+
+    /**
+    * Keycode constant: Page Down key
+    *
+    * @since 1
+    */
+    KEY_PAGE_DOWN = 2069,
+
+    /**
+    * Keycode constant: Escape key
+    *
+    * @since 1
+    */
+    KEY_ESCAPE = 2070,
+
+    /**
+    * Keycode constant: Forward Delete key
+    * <p>Unlike {@link #KEY_DEL}, this key is used to delete characters ahead of the insertion
+    * point.
+    *
+    * @since 1
+    */
+    KEY_FORWARD_DEL = 2071,
+
+    /**
+    * Keycode constant: Left Control modifier key
+    *
+    * @since 1
+    */
+    KEY_CTRL_LEFT = 2072,
+
+    /**
+    * Keycode constant: Right Control modifier key
+    *
+    * @since 1
+    */
+    KEY_CTRL_RIGHT = 2073,
+
+    /**
+    * Keycode constant: Caps Lock key
+    *
+    * @since 1
+    */
+    KEY_CAPS_LOCK = 2074,
+
+    /**
+    * Keycode constant: Scroll Lock key
+    *
+    * @since 1
+    */
+    KEY_SCROLL_LOCK = 2075,
+
+    /**
+    * Keycode constant: Left Meta modifier key
+    *
+    * @since 1
+    */
+    KEY_META_LEFT = 2076,
+
+    /**
+    * Keycode constant: Right Meta modifier key
+    *
+    * @since 1
+    */
+    KEY_META_RIGHT = 2077,
+
+    /**
+    * Keycode constant: Function modifier key
+    *
+    * @since 1
+    */
+    KEY_FUNCTION = 2078,
+
+    /**
+    * Keycode constant: System Request/Print Screen key
+    *
+    * @since 1
+    */
+    KEY_SYSRQ = 2079,
+
+    /**
+    * Keycode constant: Break/Pause key
+    *
+    * @since 1
+    */
+    KEY_BREAK = 2080,
+
+    /**
+    * Keycode constant: Home Movement key
+    * <p>This key is used to scroll or move the cursor around to the start of a line or to the
+    * top of a list.
+    *
+    * @since 1
+    */
+    KEY_MOVE_HOME = 2081,
+
+    /**
+    * Keycode constant: End Movement key
+    * <p>This key is used to scroll or move the cursor around to the end of a line or to the
+    * bottom of a list.
+    *
+    * @since 1
+    */
+    KEY_MOVE_END = 2082,
+
+    /**
+    * Keycode constant: Insert key
+    * <p>This key is used to toggle the insert or overwrite edit mode.
+    *
+    * @since 1
+    */
+    KEY_INSERT = 2083,
+
+    /**
+    * Keycode constant: Forward key
+    * <p>This key is used to navigate forward in the history stack. It is a complement of
+    * {@link #KEY_BACK}.
+    *
+    * @since 1
+    */
+    KEY_FORWARD = 2084,
+
+    /**
+    * Keycode constant: Play media key
+    *
+    * @since 1
+    */
+    KEY_MEDIA_PLAY = 2085,
+
+    /**
+    * Keycode constant: Pause media key
+    *
+    * @since 1
+    */
+    KEY_MEDIA_PAUSE = 2086,
+
+    /**
+    * Keycode constant: Close media key
+    * <p>This key can be used to close a CD tray, for example.
+    *
+    * @since 1
+    */
+    KEY_MEDIA_CLOSE = 2087,
+
+    /**
+    * Keycode constant: Eject media key
+    * <p>This key can be used to eject a CD tray, for example.
+    *
+    * @since 1
+    */
+    KEY_MEDIA_EJECT = 2088,
+
+    /**
+    * Keycode constant: Record media key
+    *
+    * @since 1
+    */
+    KEY_MEDIA_RECORD = 2089,
+
+    /**
+    * Keycode constant: F1 key
+    *
+    * @since 1
+    */
+    KEY_F1 = 2090,
+
+    /**
+    * Keycode constant: F2 key
+    *
+    * @since 1
+    */
+    KEY_F2 = 2091,
+
+    /**
+    * Keycode constant: F3 key
+    *
+    * @since 1
+    */
+    KEY_F3 = 2092,
+
+    /**
+    * Keycode constant: F4 key
+    *
+    * @since 1
+    */
+    KEY_F4 = 2093,
+
+    /**
+    * Keycode constant: F5 key
+    *
+    * @since 1
+    */
+    KEY_F5 = 2094,
+
+    /**
+    * Keycode constant: F6 key
+    *
+    * @since 1
+    */
+    KEY_F6 = 2095,
+
+    /**
+    * Keycode constant: F7 key
+    *
+    * @since 1
+    */
+    KEY_F7 = 2096,
+
+    /**
+    * Keycode constant: F8 key
+    *
+    * @since 1
+    */
+    KEY_F8 = 2097,
+
+    /**
+    * Keycode constant: F9 key
+    *
+    * @since 1
+    */
+    KEY_F9 = 2098,
+
+    /**
+    * Keycode constant: F10 key
+    *
+    * @since 1
+    */
+    KEY_F10 = 2099,
+
+    /**
+    * Keycode constant: F11 key
+    *
+    * @since 1
+    */
+    KEY_F11 = 2100,
+
+    /**
+    * Keycode constant: F12 key
+    *
+    * @since 1
+    */
+    KEY_F12 = 2101,
+
+    /**
+    * Keycode constant: Num Lock key
+    * <p>This key is used to alter the behavior of other keys on the numeric keypad.
+    *
+    * @since 1
+    */
+    KEY_NUM_LOCK = 2102,
+
+    /**
+    * Keycode constant: '0' key on the numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_0 = 2103,
+
+    /**
+    * Keycode constant: '1' key on the numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_1 = 2104,
+
+    /**
+    * Keycode constant: '2' key on the numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_2 = 2105,
+
+    /**
+    * Keycode constant: '3' key on the numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_3 = 2106,
+
+    /**
+    * Keycode constant: '4' key on the numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_4 = 2107,
+
+    /**
+    * Keycode constant: '5' key on the numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_5 = 2108,
+
+    /**
+    * Keycode constant: '6' key on the numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_6 = 2109,
+
+    /**
+    * Keycode constant: '7' key on the numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_7 = 2110,
+
+    /**
+    * Keycode constant: '8' key on the numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_8 = 2111,
+
+    /**
+    * Keycode constant: '9' key on the numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_9 = 2112,
+
+    /**
+    * Keycode constant: '/' key (for division) on the numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_DIVIDE = 2113,
+
+    /**
+    * Keycode constant: '*' key (for multiplication) on the numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_MULTIPLY = 2114,
+
+    /**
+    * Keycode constant: '-' key (for subtraction) on the numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_SUBTRACT = 2115,
+
+    /**
+    * Keycode constant: '+' key (for addition) on the numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_ADD = 2116,
+
+    /**
+    * Key code constant: '.' key (for decimals or digit grouping) on the
+    * numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_DOT = 2117,
+
+    /**
+    * Key code constant: ',' key (for decimals or digit grouping) on the
+    * numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_COMMA = 2118,
+
+    /**
+    * Keycode constant: Enter key on the numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_ENTER = 2119,
+
+    /**
+    * Keycode constant: '=' key on the numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_EQUALS = 2120,
+
+    /**
+    * Keycode constant: '(' key on the numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_LEFT_PAREN = 2121,
+
+    /**
+    * Keycode constant: ')' key on the numeric keypad
+    *
+    * @since 1
+    */
+    KEY_NUMPAD_RIGHT_PAREN = 2122,
+
+    /**
+    * Key code:  The virtual multitask key
+    *
+    * @since 1
+    */
+    KEY_VIRTUAL_MULTITASK = 2210,
+    
+    /**
+    * Key code:  The handle button key
+    *
+    * @since 1
+    */
+    KEY_BUTTON_A = 2301,
+    KEY_BUTTON_B = 2302,
+    KEY_BUTTON_C = 2303,
+    KEY_BUTTON_X = 2304,
+    KEY_BUTTON_Y = 2305,
+    KEY_BUTTON_Z = 2306,
+    KEY_BUTTON_L1 = 2307,
+    KEY_BUTTON_R1 = 2308,
+    KEY_BUTTON_L2 = 2309,
+    KEY_BUTTON_R2 = 2310,
+    KEY_BUTTON_SELECT = 2311,
+    KEY_BUTTON_START = 2312,
+    KEY_BUTTON_MODE = 2313,
+    KEY_BUTTON_THUMBL = 2314,
+    KEY_BUTTON_THUMBR = 2315,
+
+    /**
+    * Key code:  The joystick button key
+    *
+    * @since 1
+    */
+    KEY_BUTTON_TRIGGER = 2401,
+    KEY_BUTTON_THUMB = 2402,
+    KEY_BUTTON_THUMB2 = 2403,
+    KEY_BUTTON_TOP = 2404,
+    KEY_BUTTON_TOP2 = 2405,
+    KEY_BUTTON_PINKIE = 2406,
+    KEY_BUTTON_BASE1 = 2407,
+    KEY_BUTTON_BASE2 = 2408,
+    KEY_BUTTON_BASE3 = 2409,
+    KEY_BUTTON_BASE4 = 2410,
+    KEY_BUTTON_BASE5 = 2411,
+    KEY_BUTTON_BASE6 = 2412,
+    KEY_BUTTON_BASE7 = 2413,
+    KEY_BUTTON_BASE8 = 2414,
+    KEY_BUTTON_BASE9 = 2415,
+    KEY_BUTTON_DEAD = 2416,
+
+    KEY_SLEEP = 2600,
+    KEY_ZENKAKU_HANKAKU = 2601,
+    KEY_102ND = 2602,
+    KEY_RO = 2603,
+    KEY_KATAKANA = 2604,
+    KEY_HIRAGANA = 2605,
+    KEY_HENKAN = 2606,
+    KEY_KATAKANA_HIRAGANA = 2607,
+    KEY_MUHENKAN = 2608,
+    KEY_LINEFEED = 2609,
+    KEY_MACRO = 2610,
+    KEY_NUMPAD_PLUSMINUS = 2611,
+    KEY_SCALE = 2612,
+    KEY_HANGUEL = 2613,
+    KEY_HANJA = 2614,
+    KEY_YEN = 2615,
+    KEY_STOP = 2616,
+    KEY_AGAIN = 2617,
+    KEY_PROPS = 2618,
+    KEY_UNDO = 2619,
+    KEY_COPY = 2620,
+    KEY_OPEN = 2621,
+    KEY_PASTE = 2622,
+    KEY_FIND = 2623,
+    KEY_CUT = 2624,
+    KEY_HELP = 2625,
+    KEY_CALC = 2626,
+    KEY_FILE = 2627,
+    KEY_BOOKMARKS = 2628,
+    KEY_NEXT = 2629,
+    KEY_PLAYPAUSE = 2630,
+    KEY_PREVIOUS = 2631,
+    KEY_STOPCD = 2632,
+    KEY_CONFIG = 2634,
+    KEY_REFRESH = 2635,
+    KEY_EXIT = 2636,
+    KEY_EDIT = 2637,
+    KEY_SCROLLUP = 2638,
+    KEY_SCROLLDOWN = 2639,
+    KEY_NEW = 2640,
+    KEY_REDO = 2641,
+    KEY_CLOSE = 2642,
+    KEY_PLAY = 2643,
+    KEY_BASSBOOST = 2644,
+    KEY_PRINT = 2645,
+    KEY_CHAT = 2646,
+    KEY_FINANCE = 2647,
+    KEY_CANCEL = 2648,
+    KEY_KBDILLUM_TOGGLE = 2649,
+    KEY_KBDILLUM_DOWN = 2650,
+    KEY_KBDILLUM_UP = 2651,
+    KEY_SEND = 2652,
+    KEY_REPLY = 2653,
+    KEY_FORWARDMAIL = 2654,
+    KEY_SAVE = 2655,
+    KEY_DOCUMENTS = 2656,
+    KEY_VIDEO_NEXT = 2657,
+    KEY_VIDEO_PREV = 2658,
+    KEY_BRIGHTNESS_CYCLE = 2659,
+    KEY_BRIGHTNESS_ZERO = 2660,
+    KEY_DISPLAY_OFF = 2661,
+    BTN_MISC = 2662,
+    KEY_GOTO = 2663,
+    KEY_INFO = 2664,
+    KEY_PROGRAM = 2665,
+    KEY_PVR = 2666,
+    KEY_SUBTITLE = 2667,
+    KEY_FULL_SCREEN = 2668,
+    KEY_KEYBOARD = 2669,
+    KEY_ASPECT_RATIO = 2670,
+    KEY_PC = 2671,
+    KEY_TV = 2672,
+    KEY_TV2 = 2673,
+    KEY_VCR = 2674,
+    KEY_VCR2 = 2675,
+    KEY_SAT = 2676,
+    KEY_CD = 2677,
+    KEY_TAPE = 2678,
+    KEY_TUNER = 2679,
+    KEY_PLAYER = 2680,
+    KEY_DVD = 2681,
+    KEY_AUDIO = 2682,
+    KEY_VIDEO = 2683,
+    KEY_MEMO = 2684,
+    KEY_CALENDAR = 2685,
+    KEY_RED = 2686,
+    KEY_GREEN = 2687,
+    KEY_YELLOW = 2688,
+    KEY_BLUE = 2689,
+    KEY_CHANNELUP = 2690,
+    KEY_CHANNELDOWN = 2691,
+    KEY_LAST = 2692,
+    KEY_RESTART = 2693,
+    KEY_SLOW = 2694,
+    KEY_SHUFFLE = 2695,
+    KEY_VIDEOPHONE = 2696,
+    KEY_GAMES = 2697,
+    KEY_ZOOMIN = 2698,
+    KEY_ZOOMOUT = 2699,
+    KEY_ZOOMRESET = 2700,
+    KEY_WORDPROCESSOR = 2701,
+    KEY_EDITOR = 2702,
+    KEY_SPREADSHEET = 2703,
+    KEY_GRAPHICSEDITOR = 2704,
+    KEY_PRESENTATION = 2705,
+    KEY_DATABASE = 2706,
+    KEY_NEWS = 2707,
+    KEY_VOICEMAIL = 2708,
+    KEY_ADDRESSBOOK = 2709,
+    KEY_MESSENGER = 2710,
+    KEY_BRIGHTNESS_TOGGLE = 2711,
+    KEY_SPELLCHECK = 2712,
+    KEY_COFFEE = 2713,
+    KEY_MEDIA_REPEAT = 2714,
+    KEY_IMAGES = 2715,
+    KEY_BUTTONCONFIG = 2716,
+    KEY_TASKMANAGER = 2717,
+    KEY_JOURNAL = 2718,
+    KEY_CONTROLPANEL = 2719,
+    KEY_APPSELECT = 2720,
+    KEY_SCREENSAVER = 2721,
+    KEY_ASSISTANT = 2722,
+    KEY_KBD_LAYOUT_NEXT = 2723,
+    KEY_BRIGHTNESS_MIN = 2724,
+    KEY_BRIGHTNESS_MAX = 2725,
+    KEY_KBDINPUTASSIST_PREV = 2726,
+    KEY_KBDINPUTASSIST_NEXT = 2727,
+    KEY_KBDINPUTASSIST_PREVGROUP = 2728,
+    KEY_KBDINPUTASSIST_NEXTGROUP = 2729,
+    KEY_KBDINPUTASSIST_ACCEPT = 2730,
+    KEY_KBDINPUTASSIST_CANCEL = 2731,
+
+    KEY_FRONT = 2800,
+    KEY_SETUP = 2801,
+    KEY_WAKEUP = 2802,
+    KEY_SENDFILE = 2803,
+    KEY_DELETEFILE = 2804,
+    KEY_XFER = 2805,
+    KEY_PROG1 = 2806,
+    KEY_PROG2 = 2807,
+    KEY_MSDOS = 2808,
+    KEY_SCREENLOCK = 2809,
+    KEY_DIRECTION_ROTATE_DISPLAY = 2810,
+    KEY_CYCLEWINDOWS = 2811,
+    KEY_COMPUTER = 2812,
+    KEY_EJECTCLOSECD = 2813,
+    KEY_ISO = 2814,
+    KEY_MOVE = 2815,
+    KEY_F13 = 2816,
+    KEY_F14 = 2817,
+    KEY_F15 = 2818,
+    KEY_F16 = 2819,
+    KEY_F17 = 2820,
+    KEY_F18 = 2821,
+    KEY_F19 = 2822,
+    KEY_F20 = 2823,
+    KEY_F21 = 2824,
+    KEY_F22 = 2825,
+    KEY_F23 = 2826,
+    KEY_F24 = 2827,
+    KEY_PROG3 = 2828,
+    KEY_PROG4 = 2829,
+    KEY_DASHBOARD = 2830,
+    KEY_SUSPEND = 2831,
+    KEY_HP = 2832,
+    KEY_SOUND = 2833,
+    KEY_QUESTION = 2834,
+    KEY_CONNECT = 2836,
+    KEY_SPORT = 2837,
+    KEY_SHOP = 2838,
+    KEY_ALTERASE = 2839,
+    KEY_SWITCHVIDEOMODE = 2841,
+    KEY_BATTERY = 2842,
+    KEY_BLUETOOTH = 2843,
+    KEY_WLAN = 2844,
+    KEY_UWB = 2845,
+    KEY_WWAN_WIMAX = 2846,
+    KEY_RFKILL = 2847,
+
+    KEY_CHANNEL = 3001,
+    KEY_BTN_0 = 3100,
+    KEY_BTN_1 = 3101,
+    KEY_BTN_2 = 3102,
+    KEY_BTN_3 = 3103,
+    KEY_BTN_4 = 3104,
+    KEY_BTN_5 = 3105,
+    KEY_BTN_6 = 3106,
+    KEY_BTN_7 = 3107,
+    KEY_BTN_8 = 3108,
+    KEY_BTN_9 = 3109,
+
+    KEY_BRL_DOT1 = 3201,
+    KEY_BRL_DOT2 = 3202,
+    KEY_BRL_DOT3 = 3203,
+    KEY_BRL_DOT4 = 3204,
+    KEY_BRL_DOT5 = 3205,
+    KEY_BRL_DOT6 = 3206,
+    KEY_BRL_DOT7 = 3207,
+    KEY_BRL_DOT8 = 3208,
+    KEY_BRL_DOT9 = 3209,
+    KEY_BRL_DOT10 = 3210,
+
+    /**
+    * Left Knob roll-up
+    * <p>In contrast to {@link #KEY_LEFT_KNOB_ROLL_DOWN}, it means rolling
+    * the left knob upwards. The knob functionis scenario-specific, for example,
+    * increasing the volume or air conditioner temperature.
+    *
+    * @since 1
+    */
+    KEY_LEFT_KNOB_ROLL_UP = 10001,
+
+    /**
+    * Left Knob roll-down
+    * <p>In contrast to {@link #KEY_LEFT_KNOB_ROLL_UP},
+    * it means rolling the left knob downwards. The knob function is
+    * scenario-specific, for example, reducing the volume or air
+    * conditioner temperature.
+    * @since 1
+    */
+    KEY_LEFT_KNOB_ROLL_DOWN = 10002,
+
+    /**
+    * Left Knob
+    * <p>Pressing the knob will activate its adjustment function.
+    *
+    * @since 1
+    */
+    KEY_LEFT_KNOB = 10003,
+
+    /**
+    * Right Knob roll-up
+    * <p>In contrast to {@link #KEY_RIGHT_KNOB_ROLL_DOWN}, it means rolling
+    * the right knob upwards. The knobfunction is scenario-specific, for example,
+    * increasing the volume or air conditioner temperature.
+    *
+    *
+    * @since 1
+    */
+    KEY_RIGHT_KNOB_ROLL_UP = 10004,
+
+    /**
+    * Right Knob roll-down
+    * <p>In contrast to {@link #KEY_RIGHT_KNOB_ROLL_UP}, it means rolling
+    * the right knob downwards. The knobfunction is scenario-specific,
+    * for example, reducing the volume or air conditioner temperature.
+    *
+    * @since 1
+    */
+    KEY_RIGHT_KNOB_ROLL_DOWN = 10005,
+
+    /**
+    * Right Knob
+    * <p>Pressing the knob will activate its adjustment function.
+    *
+    * @since 1
+    */
+    KEY_RIGHT_KNOB = 10006,
+
+    /**
+    * Audio Source Switch button
+    * <p>Pressing this button will enable the audio source. Depending on the
+    * actual scenario, it may also indicate that the Bluetooth call control
+    * button is pressed.
+    * @since 1
+    */
+    KEY_VOICE_SOURCE_SWITCH = 10007,
+
+    /**
+    * Menu key
+    * <p>Pressing this key will display the launcher page.
+    *
+    * @since 1
+    */
+    KEY_LAUNCHER_MENU = 10008,
+
+    /**
+    * Keycode constant: max keycode
+    * <p> If a new keycode added to {@code KeyEvent} is greater than the
+    * maximum keycode, update the maximum keycode accordingly.
+    *
+    *
+    * @since 1
+    */
+    NOW_MAX_KEY = KEY_LAUNCHER_MENU
+};
+
+class KeyEvent : public MultimodalEvent {
 public:
     virtual ~KeyEvent();
-    static std::shared_ptr<KeyEvent> Create();
-    // Get or change the key code of the device.
-    // Only one key will change in an event report
-    int32_t GetKeyCode() const;
-    void SetKeyCode(int32_t keyCode);
+    /**
+    * initialize the object.
+    *
+    * @return void
+    * @since 1
+    */
+    void Initialize(int32_t windowId, bool isPressed, int32_t keyCode, int32_t keyDownDuration, int32_t highLevelEvent,
+                    const std::string& uuid, int32_t sourceType, uint64_t occurredTime, const std::string& deviceId,
+                    int32_t inputDeviceId,  bool isHighLevelEvent, uint16_t deviceUdevTags = 0,
+                    int32_t deviceEventType = 0);
+    /**
+    * initialize the object.
+    *
+    * @return void
+    * @since 1
+    */
+    void Initialize(const KeyEvent& keyEvent);
 
-    // Get or set the key action. The default value is the state of the current key code.
-    int32_t GetKeyAction() const;
-    void SetKeyAction(int32_t keyAction);
+    /**
+    * initialize the object.
+    *
+    * @return void
+    * @since 1
+    */
+    void DeviceInitialize(MultimodalEvent& deviceEvent);
 
-    // Get the list of keys currently in the pressed state
-    std::vector<int32_t> GetPressedKeys() const;
-    void AddKeyItem(const KeyItem& keyItem);
-    std::vector<KeyEvent::KeyItem> GetKeyItems();
-    void AddPressedKeyItems(const KeyItem& keyItem);
-    void RemoveReleasedKeyItems(const KeyItem& keyItem);
-protected:
-    explicit KeyEvent(int32_t eventType);
+    /**
+    * Obtains the max keycode of the current key event.
+    *
+    * @return Returns the max keycode of the current key event.
+    * @since 1
+    */
+    virtual int32_t GetMaxKeyCode() const;
+
+    /**
+     * Obtains the press-down state of the current key.
+     *
+     * @return Returns {@code true} if the current key is pressed down; returns
+     * {@code false} otherwise .
+     * @since 1
+     */
+    virtual bool IsKeyDown() const;
+
+    /**
+     * Obtains the keycode of the current key event.
+     *
+     * @return Returns the keycode of the event; returns {@link #KEY_UNKNOWN}
+     * if the keycode cannot be obtained.
+     * @see #getMaxKeyCode()
+     * @since 1
+     */
+    virtual int32_t GetKeyCode() const;
+
+    /**
+     * Obtains the duration during which the current key is pressed down
+     * before this method is called.
+     *
+     * @return Returns the duration (in ms) during which the current key
+     * is pressed down; returns{@code 0} if the current key has not been pressed down.
+     * @since 1
+     */
+    virtual int32_t GetKeyDownDuration() const;
+    virtual int32_t GetOriginEventType () const;
 
 private:
-    int32_t keyCode_;
-    std::vector<KeyItem> keys_;
-    int32_t keyAction_;
+    bool mIsPressed_ = false;
+    int32_t mKeyCode_ = 0;
+    int32_t mKeyDownDuration_ = 0;
+    int32_t mDeviceEventType_ = 0;
 };
-}
 }
 #endif

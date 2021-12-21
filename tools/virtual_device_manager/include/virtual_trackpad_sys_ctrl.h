@@ -23,7 +23,6 @@ namespace MMI {
 class VirtualTrackpadSysCtrl : public VirtualDevice {
 public:
     VirtualTrackpadSysCtrl();
-    ~VirtualTrackpadSysCtrl();
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
     const std::vector<uint32_t>& GetKeys() const override;

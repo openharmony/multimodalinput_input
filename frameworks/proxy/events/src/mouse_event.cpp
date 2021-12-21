@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "mouse_event.h"
 
 namespace OHOS {
@@ -33,7 +32,7 @@ void MouseEvent::Initialize(int32_t windowId, int32_t action, int32_t actionButt
     mYOffset_ = yOffset;
     mCursorDelta_ = cursorDelta;
     mScrollingDelta_ = scrollingDelta;
-
+    
     mapDeviceAxis_[AXIS_X] = eventJoyStickInfo.abs_x.standardValue;
     mapDeviceAxis_[AXIS_Y] = eventJoyStickInfo.abs_y.standardValue;
     mapDeviceAxis_[AXIS_Z] = eventJoyStickInfo.abs_z.standardValue;

@@ -20,7 +20,6 @@ ohos_executable("hosmmi-client") {
   deps = [
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
-    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
   ]
   cflags = [ "-DOHOS_BUILD" ]
@@ -46,32 +45,15 @@ ohos_executable("hosmmi-client") {
 }
 
 ohos_executable("hosmmi-server") {
-  sources = []
-  if (is_mmi_have_weston) {
-    sources += [ "src/hosmmi_server_main.cpp" ]
-  } else {
-    sources += [ "src/hosmmi_service_main.cpp" ]
-  }
+  sources = [ "src/hosmmi_server_main.cpp" ]
   deps = [
-    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service:libmmi-server",
   ]
 
-  if (is_mmi_have_weston) {
-    deps += [ "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service" ]
-  }
-
   if (is_mmi_have_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
-
-  external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-    "samgr_L2:samgr_proxy",
-  ]
 
   cflags = [ "-DOHOS_BUILD" ]
 

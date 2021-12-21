@@ -12,9 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "window_switch.h"
 #include <gtest/gtest.h>
+#include "window_switch.h"
 #include "error_multimodal.h"
 
 namespace {

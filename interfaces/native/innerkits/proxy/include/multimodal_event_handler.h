@@ -42,21 +42,8 @@ public:
     int32_t UnregisterStandardizedEventHandle(const sptr<IRemoteObject> token,
                                               int32_t windowId, StandEventPtr standardizedEventHandle);
     int32_t GetMultimodeInputInfo();
-    MMIClientPtr GetMMIClient();
     std::vector<EventRegesterInfo>& GetAbilityInfoVec();
-    int32_t InjectEvent(const OHOS::KeyEvent& keyEvent);
-    int32_t InjectEvent(const OHOS::MMI::KeyEvent& keyEvent);
-    int32_t AddKeyEventFIlter(int32_t id, std::string name, Authority authority);
-    int32_t RemoveKeyEventFIlter(int32_t id);
-    int32_t AddTouchEventFilter(int32_t id, std::string name, Authority authority);
-    int32_t RemoveTouchEventFilter(int32_t id);
-    int32_t AddEventInterceptor(int32_t id, std::string name, Authority authority);
-    int32_t RemoveEventInterceptor(int32_t id);
-    int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
-    int32_t GetDevice(int32_t taskId, int32_t deviceId);
-    int32_t GetDeviceIds(int32_t taskId);    
-    int32_t AddInputEventMontior(int32_t keyEventType);
-    void RemoveInputEventMontior(int32_t keyEventType);
+    int32_t InjectEvent(const KeyEvent& keyEvent);
 
 /**
 * Default constructor used to create a {@code MultimodalEventHandler} instance.

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "key_event_pre.h"
 #include <gtest/gtest.h>
+#include "key_event.h"
 
 namespace {
 using namespace testing::ext;
@@ -28,7 +28,7 @@ public:
 
 HWTEST_F(KeyEventApiTest, Api_Test_GetOriginEventType_Normal, TestSize.Level1)
 {
-    OHOS::KeyEvent keyEventTest;
+    KeyEvent keyEventTest;
     int32_t windowId = 0;
     bool isPressed = true;
     int32_t keyCode = 0;
@@ -50,7 +50,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetOriginEventType_Normal, TestSize.Level1)
 
 HWTEST_F(KeyEventApiTest, Api_Test_GetOriginEventType_Abnormal, TestSize.Level1)
 {
-    OHOS::KeyEvent keyEventTest;
+    KeyEvent keyEventTest;
     int32_t windowId = 0;
     bool isPressed = true;
     int32_t keyCode = 0;
@@ -72,7 +72,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetOriginEventType_Abnormal, TestSize.Level1)
 
 HWTEST_F(KeyEventApiTest, Api_Test_GetOriginEventType_Min, TestSize.Level1)
 {
-    OHOS::KeyEvent keyEventTest;
+    KeyEvent keyEventTest;
     int32_t windowId = 0;
     bool isPressed = true;
     int32_t keyCode = 0;
@@ -94,7 +94,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetOriginEventType_Min, TestSize.Level1)
 
 HWTEST_F(KeyEventApiTest, Api_Test_GetOriginEventType_Max, TestSize.Level1)
 {
-    OHOS::KeyEvent keyEventTest;
+    KeyEvent keyEventTest;
     int32_t windowId = 0;
     bool isPressed = true;
     int32_t keyCode = 0;
@@ -116,14 +116,14 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetOriginEventType_Max, TestSize.Level1)
 
 HWTEST_F(KeyEventApiTest, Api_Test_GetMaxKeyCode, TestSize.Level1)
 {
-    OHOS::KeyEvent keyEventTest;
+    KeyEvent keyEventTest;
     auto originEventType = keyEventTest.GetMaxKeyCode();
     EXPECT_TRUE(originEventType == NOW_MAX_KEY);
 }
 
 HWTEST_F(KeyEventApiTest, Api_Test_IsKeyDown_Normal, TestSize.Level1)
 {
-    OHOS::KeyEvent keyEventTest;
+    KeyEvent keyEventTest;
     int32_t windowId = 0;
     bool isPressed = true;
     int32_t keyCode = 0;
@@ -145,7 +145,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_IsKeyDown_Normal, TestSize.Level1)
 
 HWTEST_F(KeyEventApiTest, Api_Test_IsKeyDown_Abnormal, TestSize.Level1)
 {
-    OHOS::KeyEvent keyEventTest;
+    KeyEvent keyEventTest;
     int32_t windowId = 0;
     bool isPressed = false;
     int32_t keyCode = 0;
@@ -167,7 +167,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_IsKeyDown_Abnormal, TestSize.Level1)
 
 HWTEST_F(KeyEventApiTest, Api_Test_GetKeyCode_Normal, TestSize.Level1)
 {
-    OHOS::KeyEvent keyEventTest;
+    KeyEvent keyEventTest;
     int32_t windowId = 0;
     bool isPressed = true;
     int32_t keyCode = 10;
@@ -189,7 +189,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetKeyCode_Normal, TestSize.Level1)
 
 HWTEST_F(KeyEventApiTest, Api_Test_GetKeyCode_Min, TestSize.Level1)
 {
-    OHOS::KeyEvent keyEventTest;
+    KeyEvent keyEventTest;
     int32_t windowId = 0;
     bool isPressed = true;
     int32_t keyCode = static_cast<int32_t>(0xFFFFFFFF);
@@ -211,7 +211,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetKeyCode_Min, TestSize.Level1)
 
 HWTEST_F(KeyEventApiTest, Api_Test_GetKeyCode_Max, TestSize.Level1)
 {
-    OHOS::KeyEvent keyEventTest;
+    KeyEvent keyEventTest;
     int32_t windowId = 0;
     bool isPressed = true;
     int32_t keyCode = 0x7FFFFFFF;
@@ -233,7 +233,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetKeyCode_Max, TestSize.Level1)
 
 HWTEST_F(KeyEventApiTest, Api_Test_GetKeyCode_Abnormal, TestSize.Level1)
 {
-    OHOS::KeyEvent keyEventTest;
+    KeyEvent keyEventTest;
     int32_t windowId = 0;
     bool isPressed = true;
     int32_t keyCode = 0xFFFFFFFF;
@@ -255,7 +255,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetKeyCode_Abnormal, TestSize.Level1)
 
 HWTEST_F(KeyEventApiTest, Api_Test_GetKeyCode_MinValue, TestSize.Level1)
 {
-    OHOS::KeyEvent keyEventTest;
+    KeyEvent keyEventTest;
     int32_t windowId = 0;
     bool isPressed = true;
     int32_t keyCode = static_cast<int32_t>(0xFFFFFFFF);
@@ -277,7 +277,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetKeyCode_MinValue, TestSize.Level1)
 
 HWTEST_F(KeyEventApiTest, Api_Test_GetKeyCode_MaxValue, TestSize.Level1)
 {
-    OHOS::KeyEvent keyEventTest;
+    KeyEvent keyEventTest;
     int32_t windowId = 0;
     bool isPressed = true;
     int32_t keyCode = 0x7FFFFFFF;
@@ -299,7 +299,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetKeyCode_MaxValue, TestSize.Level1)
 
 HWTEST_F(KeyEventApiTest, Api_Test_GetKeyDownDuration_Normal, TestSize.Level1)
 {
-    OHOS::KeyEvent keyEventTest;
+    KeyEvent keyEventTest;
     int32_t windowId = 0;
     bool isPressed = true;
     int32_t keyCode = 10;
@@ -321,7 +321,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetKeyDownDuration_Normal, TestSize.Level1)
 
 HWTEST_F(KeyEventApiTest, Api_Test_GetKeyDownDuration_Abnormal, TestSize.Level1)
 {
-    OHOS::KeyEvent keyEventTest;
+    KeyEvent keyEventTest;
     int32_t windowId = 0;
     bool isPressed = true;
     int32_t keyCode = 10;
@@ -343,7 +343,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetKeyDownDuration_Abnormal, TestSize.Level1)
 
 HWTEST_F(KeyEventApiTest, Api_Test_GetKeyDownDuration_Min, TestSize.Level1)
 {
-    OHOS::KeyEvent keyEventTest;
+    KeyEvent keyEventTest;
     int32_t windowId = 0;
     bool isPressed = true;
     int32_t keyCode = 10;
@@ -365,7 +365,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetKeyDownDuration_Min, TestSize.Level1)
 
 HWTEST_F(KeyEventApiTest, Api_Test_GetKeyDownDuration_Max, TestSize.Level1)
 {
-    OHOS::KeyEvent keyEventTest;
+    KeyEvent keyEventTest;
     int32_t windowId = 0;
     bool isPressed = true;
     int32_t keyCode = 10;

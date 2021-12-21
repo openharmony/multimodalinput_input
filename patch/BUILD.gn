@@ -30,6 +30,13 @@ group("patch_packages") {
 
   if (is_mmi_have_libinput) {
     deps += [
+      "diff_libinput_mmi:libinput-analyze-mmi",
+      "diff_libinput_mmi:libinput-debug-mmi",
+      "diff_libinput_mmi:libinput-list-mmi",
+      "diff_libinput_mmi:libinput-measure-mmi",
+      "diff_libinput_mmi:libinput-quirks-mmi",
+      "diff_libinput_mmi:libinput-record-mmi",
+      "diff_libinput_mmi:libinput-tablet-mmi",
       "prebuild_libinput:prebuild_libinput",
       "//third_party/eudev:libudev",
       "//third_party/eudev:udev_conf",
