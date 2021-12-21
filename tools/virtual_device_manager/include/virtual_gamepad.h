@@ -23,6 +23,7 @@ namespace MMI {
 class VirtualGamePad : public VirtualDevice {
 public:
     VirtualGamePad();
+    ~VirtualGamePad();
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
     const std::vector<uint32_t>& GetKeys() const override;

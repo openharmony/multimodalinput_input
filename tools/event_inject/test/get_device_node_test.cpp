@@ -12,12 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <gtest/gtest.h>
+#include "msg_head.h"
 #include "proto.h"
 #define private public
 #include "get_device_node.h"
 #undef private
-#include "msg_head.h"
 
 namespace {
 using namespace testing::ext;
@@ -45,6 +46,6 @@ HWTEST_F(GetDeviceNodeTest, Test_GetDeviceNodeTestCmdError, TestSize.Level1)
     const string cmd = "temp";
     StringList cmdResult;
     auto ret = getDeviceNode.ExecuteCmd(cmd, cmdResult);
-    EXPECT_EQ(ret, 0);
+    EXPECT_GT(ret, 0);
 }
 }

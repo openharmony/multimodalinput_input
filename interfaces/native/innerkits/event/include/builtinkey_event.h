@@ -15,7 +15,7 @@
 #ifndef OHOS_BUILTINKEY_EVENTS_H
 #define OHOS_BUILTINKEY_EVENTS_H
 
-#include "key_event.h"
+#include "key_event_pre.h"
 
 namespace OHOS {
 /**

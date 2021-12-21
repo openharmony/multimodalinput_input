@@ -13,17 +13,17 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
-#include <codecvt>
-#include "mmi_token.h"
-#include "mmi_client.h"
-#include "error_multimodal.h"
 #include "multimodal_event_handler.h"
+#include <codecvt>
+#include <gtest/gtest.h>
+#include "error_multimodal.h"
 #include "key_event_handler.h"
-#include "touch_event_handler.h"
-#include "media_event_handler.h"
-#include "proto.h"
 #include "log.h"
+#include "media_event_handler.h"
+#include "mmi_client.h"
+#include "mmi_token.h"
+#include "proto.h"
+#include "touch_event_handler.h"
 
 namespace {
 using namespace testing::ext;
@@ -48,7 +48,7 @@ public:
         type_ = MmiMessageId::KEY_EVENT_BEGIN;
     }
     ~AppKeyEventHandle() {}
-    virtual bool OnKey(const KeyEvent& keylEvent) override
+    virtual bool OnKey(const OHOS::KeyEvent& keylEvent) override
     {
         return true;
     }
@@ -73,7 +73,7 @@ StandEventPtr CreateEvent()
     return StandEventPtr(new T());
 }
 
-static std::map<std::string, StandEventPtr> handerMap_;
+static std::map<std::string, StandEventPtr> g_handerMap;
 
 HWTEST_F(MultimodalEventHandlerApiTest, Api_Test_GetAbilityInfoVec, TestSize.Level1)
 {
@@ -97,17 +97,17 @@ HWTEST_F(MultimodalEventHandlerApiTest, Api_Test_RegisterStandardizedEventHandle
     std::string u8String = "\nTest!\n";
     auto wsConvert = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {};
     auto u16String = wsConvert.from_bytes(u8String);
-    auto remoteObject_ = MMIToken::Create(u16String);
-    int32_t windowId_ = getpid();
+    auto remoteObject = MMIToken::Create(u16String);
+    int32_t windowId = getpid();
 
     auto appTouch = CreateEvent<AppTouchEventHandle>();
-    MMIEventHdl.RegisterStandardizedEventHandle(remoteObject_, windowId_, appTouch);
-    handerMap_[std::string("AppTouchEventHandle")] = appTouch;
+    MMIEventHdl.RegisterStandardizedEventHandle(remoteObject, windowId, appTouch);
+    g_handerMap[std::string("AppTouchEventHandle")] = appTouch;
 
     auto appKey = CreateEvent<AppKeyEventHandle>();
-    MMIEventHdl.RegisterStandardizedEventHandle(remoteObject_, windowId_, appKey);
-    auto retRegister = MMIEventHdl.RegisterStandardizedEventHandle(remoteObject_, windowId_, appKey);
-    handerMap_[std::string("AppKeyEventHandle")] = appKey;
+    MMIEventHdl.RegisterStandardizedEventHandle(remoteObject, windowId, appKey);
+    auto retRegister = MMIEventHdl.RegisterStandardizedEventHandle(remoteObject, windowId, appKey);
+    g_handerMap[std::string("AppKeyEventHandle")] = appKey;
     EXPECT_EQ(retRegister, MMI_STANDARD_EVENT_EXIST);
 }
 
@@ -126,13 +126,13 @@ HWTEST_F(MultimodalEventHandlerApiTest, Api_Test_UnregisterStandardizedEventHand
     std::string u8String = "\nTest!\n";
     auto wsConvert = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {};
     auto u16String = wsConvert.from_bytes(u8String);
-    auto remoteObject_ = MMIToken::Create(u16String);
-    int32_t windowId_ = getpid();
+    auto remoteObject = MMIToken::Create(u16String);
+    int32_t windowId = getpid();
     int32_t retUnRegister = -10;
-    for (auto it = handerMap_.begin(); it != handerMap_.end();)
+    for (auto it = g_handerMap.begin(); it != g_handerMap.end();)
     {
-        retUnRegister = MMIEventHdl.UnregisterStandardizedEventHandle(remoteObject_, windowId_, it->second);
-        handerMap_.erase(it++);
+        retUnRegister = MMIEventHdl.UnregisterStandardizedEventHandle(remoteObject, windowId, it->second);
+        g_handerMap.erase(it++);
     }
     EXPECT_EQ(retUnRegister, MMI_STANDARD_EVENT_SUCCESS);
 }
@@ -142,18 +142,18 @@ HWTEST_F(MultimodalEventHandlerApiTest, Api_Test_UnregisterStandardizedEventHand
     std::string u8String = "\nTest!\n";
     auto wsConvert = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {};
     auto u16String = wsConvert.from_bytes(u8String);
-    auto remoteObject_ = MMIToken::Create(u16String);
-    int32_t windowId_ = getpid();
+    auto remoteObject = MMIToken::Create(u16String);
+    int32_t windowId = getpid();
     int32_t retUnRegister = -10;
     auto appKey = CreateEvent<AppKeyEventHandle>();
-    MMIEventHdl.RegisterStandardizedEventHandle(remoteObject_, windowId_, appKey);
-    handerMap_[std::string("AppKeyEventHandle0")] = appKey;
-    MMIEventHdl.RegisterStandardizedEventHandle(remoteObject_, windowId_, appKey);
-    handerMap_[std::string("AppKeyEventHandle1")] = appKey;
-    for (auto it = handerMap_.begin(); it != handerMap_.end();)
+    MMIEventHdl.RegisterStandardizedEventHandle(remoteObject, windowId, appKey);
+    g_handerMap[std::string("AppKeyEventHandle0")] = appKey;
+    MMIEventHdl.RegisterStandardizedEventHandle(remoteObject, windowId, appKey);
+    g_handerMap[std::string("AppKeyEventHandle1")] = appKey;
+    for (auto it = g_handerMap.begin(); it != g_handerMap.end();)
     {
-        retUnRegister = MMIEventHdl.UnregisterStandardizedEventHandle(remoteObject_, windowId_, it->second);
-        handerMap_.erase(it++);
+        retUnRegister = MMIEventHdl.UnregisterStandardizedEventHandle(remoteObject, windowId, it->second);
+        g_handerMap.erase(it++);
     }
     EXPECT_EQ(retUnRegister, MMI_STANDARD_EVENT_NOT_EXIST);
 }

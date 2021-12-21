@@ -12,9 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include "event_factory.h"
 #include <gtest/gtest.h>
 #include "client_msg_handler.h"
-#include "event_factory.h"
 
 namespace {
 using namespace testing::ext;
@@ -34,7 +35,7 @@ public:
  */
 HWTEST_F(EventFactoryTest, CreateEvent_multimodal, TestSize.Level1)
 {
-    EventFactory::CreateEvent(EVENT_MULTIMODAL);
+    EventFactory::CreateEvent(EventType::EVENT_MULTIMODAL);
 }
 
 /**
@@ -45,7 +46,7 @@ HWTEST_F(EventFactoryTest, CreateEvent_multimodal, TestSize.Level1)
  */
 HWTEST_F(EventFactoryTest, CreateEvent_key, TestSize.Level1)
 {
-    EventFactory::CreateEvent(EVENT_KEY);
+    EventFactory::CreateEvent(EventType::EVENT_KEY);
 }
 
 /**
@@ -56,7 +57,7 @@ HWTEST_F(EventFactoryTest, CreateEvent_key, TestSize.Level1)
  */
 HWTEST_F(EventFactoryTest, CreateEvent_keyBoard, TestSize.Level1)
 {
-    EventFactory::CreateEvent(EVENT_KEYBOARD);
+    EventFactory::CreateEvent(EventType::EVENT_KEYBOARD);
 }
 
 /**
@@ -67,7 +68,7 @@ HWTEST_F(EventFactoryTest, CreateEvent_keyBoard, TestSize.Level1)
  */
 HWTEST_F(EventFactoryTest, CreateEvent_rocker, TestSize.Level1)
 {
-    EventFactory::CreateEvent(EVENT_ROCKER);
+    EventFactory::CreateEvent(EventType::EVENT_ROCKER);
 }
 
 /**
@@ -78,7 +79,7 @@ HWTEST_F(EventFactoryTest, CreateEvent_rocker, TestSize.Level1)
  */
 HWTEST_F(EventFactoryTest, CreateEvent_remoteControl, TestSize.Level1)
 {
-    EventFactory::CreateEvent(EVENT_REMOTECONTROL);
+    EventFactory::CreateEvent(EventType::EVENT_REMOTECONTROL);
 }
 
 /**
@@ -89,7 +90,7 @@ HWTEST_F(EventFactoryTest, CreateEvent_remoteControl, TestSize.Level1)
  */
 HWTEST_F(EventFactoryTest, CreateEvent_joyStick, TestSize.Level1)
 {
-    EventFactory::CreateEvent(EVENT_JOYSTICK);
+    EventFactory::CreateEvent(EventType::EVENT_JOYSTICK);
 }
 
 /**
@@ -100,7 +101,7 @@ HWTEST_F(EventFactoryTest, CreateEvent_joyStick, TestSize.Level1)
  */
 HWTEST_F(EventFactoryTest, CreateEvent_mouse, TestSize.Level1)
 {
-    EventFactory::CreateEvent(EVENT_MOUSE);
+    EventFactory::CreateEvent(EventType::EVENT_MOUSE);
 }
 
 /**
@@ -111,7 +112,7 @@ HWTEST_F(EventFactoryTest, CreateEvent_mouse, TestSize.Level1)
  */
 HWTEST_F(EventFactoryTest, CreateEvent_trackBoll, TestSize.Level1)
 {
-    EventFactory::CreateEvent(EVENT_TRACKBOLL);
+    EventFactory::CreateEvent(EventType::EVENT_TRACKBOLL);
 }
 
 /**
@@ -122,7 +123,7 @@ HWTEST_F(EventFactoryTest, CreateEvent_trackBoll, TestSize.Level1)
  */
 HWTEST_F(EventFactoryTest, CreateEvent_manipulation, TestSize.Level1)
 {
-    EventFactory::CreateEvent(EVENT_MANIPULATION);
+    EventFactory::CreateEvent(EventType::EVENT_MANIPULATION);
 }
 
 /**
@@ -133,7 +134,7 @@ HWTEST_F(EventFactoryTest, CreateEvent_manipulation, TestSize.Level1)
  */
 HWTEST_F(EventFactoryTest, CreateEvent_touch, TestSize.Level1)
 {
-    EventFactory::CreateEvent(EVENT_TOUCH);
+    EventFactory::CreateEvent(EventType::EVENT_TOUCH);
 }
 
 /**
@@ -144,7 +145,7 @@ HWTEST_F(EventFactoryTest, CreateEvent_touch, TestSize.Level1)
  */
 HWTEST_F(EventFactoryTest, CreateEvent_touchPad, TestSize.Level1)
 {
-    EventFactory::CreateEvent(EVENT_TOUCHPAD);
+    EventFactory::CreateEvent(EventType::EVENT_TOUCHPAD);
 }
 
 /**
@@ -155,7 +156,7 @@ HWTEST_F(EventFactoryTest, CreateEvent_touchPad, TestSize.Level1)
  */
 HWTEST_F(EventFactoryTest, CreateEvent_stylus, TestSize.Level1)
 {
-    EventFactory::CreateEvent(EVENT_STYLUS);
+    EventFactory::CreateEvent(EventType::EVENT_STYLUS);
 }
 
 /**
@@ -166,7 +167,7 @@ HWTEST_F(EventFactoryTest, CreateEvent_stylus, TestSize.Level1)
  */
 HWTEST_F(EventFactoryTest, CreateEvent_rotation, TestSize.Level1)
 {
-    EventFactory::CreateEvent(EVENT_ROTATION);
+    EventFactory::CreateEvent(EventType::EVENT_ROTATION);
 }
 
 /**
@@ -177,7 +178,7 @@ HWTEST_F(EventFactoryTest, CreateEvent_rotation, TestSize.Level1)
  */
 HWTEST_F(EventFactoryTest, CreateEvent_speech, TestSize.Level1)
 {
-    EventFactory::CreateEvent(EVENT_SPEECH);
+    EventFactory::CreateEvent(EventType::EVENT_SPEECH);
 }
 
 /**
@@ -188,7 +189,7 @@ HWTEST_F(EventFactoryTest, CreateEvent_speech, TestSize.Level1)
  */
 HWTEST_F(EventFactoryTest, CreateEvent_builtInKey, TestSize.Level1)
 {
-    EventFactory::CreateEvent(EVENT_BUILTINKEY);
+    EventFactory::CreateEvent(EventType::EVENT_BUILTINKEY);
 }
 
 /**
@@ -199,6 +200,6 @@ HWTEST_F(EventFactoryTest, CreateEvent_builtInKey, TestSize.Level1)
  */
 HWTEST_F(EventFactoryTest, CreateEvent_composite, TestSize.Level1)
 {
-    EventFactory::CreateEvent(EVENT_COMPOSITE);
+    EventFactory::CreateEvent(EventType::EVENT_COMPOSITE);
 }
 } // namespace

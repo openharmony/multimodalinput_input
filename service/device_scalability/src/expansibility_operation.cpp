@@ -12,13 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "expansibility_operation.h"
 #include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <unistd.h>
 #include <dlfcn.h>
+#include <unistd.h>
 
 namespace OHOS::MMI {
     namespace {
@@ -63,6 +64,7 @@ int32_t OHOS::MMI::ExpansibilityOperation::GetNewDeviceFd(const std::string& fil
     char *errorInfo = dlerror();
     if (errorInfo != nullptr) {
         MMI_LOGE("Dlsym Error:%{public}s.", errorInfo);
+        dlclose(libmHandle);
         return -1;
     }
 
@@ -70,6 +72,7 @@ int32_t OHOS::MMI::ExpansibilityOperation::GetNewDeviceFd(const std::string& fil
     int32_t deviceEventFd = (*initDeviceInfo)();
     if (deviceEventFd > 0) {
         MMI_LOGE("get new device failed. errCode:%{public}d", ILLEGAL_DEV_ID);
+        dlclose(libmHandle);
         return -1;
     }
 

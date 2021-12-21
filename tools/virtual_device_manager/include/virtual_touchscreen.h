@@ -23,7 +23,7 @@ namespace MMI {
     class VirtualTouchScreen : public VirtualDevice {
     public:
         VirtualTouchScreen();
-
+        ~VirtualTouchScreen();
     protected:
         virtual const std::vector<uint32_t>& GetEventTypes() const override;
         virtual const std::vector<uint32_t>& GetKeys() const override;

@@ -114,7 +114,7 @@ enum HighLevel {
     */
     DEFAULT_TYPE = -1
 };
-    
+
 enum AbstractEvent {
     /**
     * Indicates the mute key.
@@ -179,7 +179,7 @@ enum DayNightMode {
     */
     NIGHT_MODE = 4
 };
-    
+
 enum MultimodalEventType {
     NONE_EVENT = 0,
     MULTIMODAL_EVENT = 1,
@@ -206,7 +206,7 @@ public:
     */
     void Initialize(int32_t windowId, int32_t highLevelEvent, const std::string& uuid, int32_t sourceType,
                     uint64_t occurredTime, const std::string& deviceId, int32_t inputDeviceId,  bool isHighLevelEvent,
-                    uint16_t deviceUdevTags = 0);
+                    uint16_t deviceUdevTags = 0, bool isIntercepted = true);
 
     /**
     * initialize the object.
@@ -309,10 +309,12 @@ public:
     uint16_t GetDeviceUdevTags() const;
 
     int32_t GetEventType() const;
-    
+
     int32_t GetWindowID() const;
 
     std::string GetUuid() const;
+
+    bool IsIntercepted() const;
     bool marshalling();
     bool unmarshalling();
 private:
@@ -329,6 +331,7 @@ private:
     bool mIsHighLevelEvent_ = false;
     uint16_t mDeviceUdevTags_ = 0;
     int32_t mEventType_ = 0;
+    bool isIntercepted_ = true;
 };
 using MultimodalEventPtr = sptr<MultimodalEvent>;
 }

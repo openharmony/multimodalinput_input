@@ -208,7 +208,7 @@ public:
      * @since 1
      */
     virtual float GetRadius(int32_t index) const;
-    
+
     /**
     * get the member of fingerInfos.
     *

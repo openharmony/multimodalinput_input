@@ -32,10 +32,12 @@ struct AppInfo {
 };
 struct WaitQueueEvent {
     int32_t fd;
+    ssize_t currentTime;
     int32_t event;
-    uint64_t inputTime;
-    uint64_t westonTime;
-    uint64_t serverTime;
+};
+struct ConnectStateByFd {
+    int32_t connectState;
+    int32_t inputBlocked;
 };
 
 class AppRegister : public CSingleton<AppRegister> {
@@ -51,22 +53,36 @@ public:
 
     void RegisterAppInfoforServer(const AppInfo& appInfo);
 
+    void UnregisterAppInfoforServer(int32_t abilityId);
+
+    void UnregisterAppInfoforServer(const AppInfo& appInfo);
+
     void UnregisterAppInfoBySocketFd(int32_t fd);
 
     void UnregisterConnectState(int32_t fd);
 
     void PrintfMap();
     void Dump(int32_t fd);
-    void SurfacesDestroyed(const IdsList &desList);
 
     int32_t QueryMapSurfaceNum();
 
-    bool IsMultimodeInputReady(MmiMessageId idMsg, const int32_t findFd, uint64_t inputTime, uint64_t westonTime = 0);
+    bool IsMultimodeInputReady(ssize_t currentTime, MmiMessageId idMsg, const int32_t findFd,
+                               int32_t connectState = 0, int32_t bufferState = 0);
 
-    WaitQueueEvent GetWaitQueueEvent(int32_t fd, int32_t idMsg);
-    void DeleteEventFromWaitQueue(int32_t fd, int32_t idMsg);
+    void DeleteEventFromWaitQueue(ssize_t time, const int32_t fd);
 
     void RegisterConnectState(int32_t fd);
+
+    void ConnectStateInputBlocked(const int32_t fd);
+
+    bool ChkTestArg(int16_t anrErr)
+    {
+        return teseArgv_ == anrErr;
+    }
+    void SetTestArg(int16_t argv)
+    {
+        teseArgv_ = argv;
+    }
 
 #ifdef OHOS_AUTO_TEST_FRAME
     void AutoTestSetAutoTestFd(int32_t fd);
@@ -77,19 +93,17 @@ public:
 private:
     bool OnAnrLocked(int32_t fd) const;
     bool CheckFindFdError(const int32_t findFd);
-    bool CheckConnectionIsDead(const int32_t findFd);
+    bool CheckConnectionIsDead(ssize_t currentTime, ssize_t timeOut, const int32_t findFd, int32_t connectState);
+    bool CheckBufferIsFull(ssize_t currentTime, ssize_t timeOut, const int32_t findFd, int32_t bufferState);
     bool CheckWaitQueueBlock(ssize_t currentTime, ssize_t timeOut, const int32_t findFd);
     const AppInfo& FindAppInfoBySocketFd(int32_t fd);
     void UnregisterBySocketFd(int32_t fd);
 
-    std::map<int32_t, AppInfo>::iterator EraseAppInfo(const std::map<int32_t, AppInfo>::iterator &it);
-    std::map<int32_t, AppInfo>::iterator UnregisterAppInfo(int32_t winId);
-
 private:
-    IdsList fds_;
-    std::map<int32_t, AppInfo> mapSurface_ = {}; // key=windowId:value=AppInfo
+    int16_t teseArgv_ = 0;
+    std::map<int32_t, AppInfo> mapSurface = {}; // key=windowId:value=AppInfo
     std::vector<WaitQueueEvent> waitQueue_ = {};
-    std::map<int32_t, int8_t> mapConnectState_ = {};
+    std::map<int32_t, ConnectStateByFd> mapConnectState_ = {};
 #ifdef OHOS_AUTO_TEST_FRAME
     int32_t autoTestFrameFd_ = 0;
 #endif  // OHOS_AUTO_TEST_FRAME

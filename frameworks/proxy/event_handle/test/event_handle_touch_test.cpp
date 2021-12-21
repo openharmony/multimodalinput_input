@@ -13,17 +13,17 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
-#include <locale>
-#include <codecvt>
-#include "string_ex.h"
-#include "proto.h"
-#include "util_ex.h"
-#include "log.h"
-#include "error_multimodal.h"
-#include "multimodal_event_handler.h"
 #include "touch_event_handler.h"
+#include <codecvt>
+#include <locale>
+#include <gtest/gtest.h>
+#include "error_multimodal.h"
+#include "log.h"
 #include "mmi_token.h"
+#include "multimodal_event_handler.h"
+#include "proto.h"
+#include "string_ex.h"
+#include "util_ex.h"
 
 using namespace testing::ext;
 using namespace OHOS;

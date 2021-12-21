@@ -30,7 +30,7 @@ public:
 
     int32_t RegisterEvent(MmiMessageId messageId, int32_t fd);
 
-    int32_t UnregisterEvent(MmiMessageId messageId, int32_t fd);
+    int32_t UnregisterEventHandleManager(MmiMessageId messageId, int32_t fd);
 
     void UnregisterEventHandleBySocketFd(int32_t fd);
 

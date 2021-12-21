@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "register_eventhandle_manager.h"
 #include <iostream>
 #include "proto.h"
@@ -56,14 +57,14 @@ int32_t OHOS::MMI::RegisterEventHandleManager::RegisterEvent(MmiMessageId messag
             RegisterEventHandleByIdMsage(MmiMessageId::TOUCH_EVENT_BEGIN, MmiMessageId::TOUCH_EVENT_END, fd);
             break;
         default:
-            MMI_LOGT("It's no this event handle! RegisterEvent msgId:%{public}d fd:%{public}d", messageId, fd);
+            MMI_LOGT("It's no this event handle! \n");
             return UNKNOWN_EVENT;
     }
     MMI_LOGT("event:%{public}d fd:%{public}d \n", messageId, fd);
     return RET_OK;
 }
 
-int32_t OHOS::MMI::RegisterEventHandleManager::UnregisterEvent(MmiMessageId messageId, int32_t fd)
+int32_t OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleManager(MmiMessageId messageId, int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
     CHKR(messageId >= MmiMessageId::INVALID, PARAM_INPUT_INVALID, UNKNOWN_EVENT);
@@ -87,7 +88,7 @@ int32_t OHOS::MMI::RegisterEventHandleManager::UnregisterEvent(MmiMessageId mess
             UnregisterEventHandleByIdMsage(MmiMessageId::TOUCH_EVENT_BEGIN, MmiMessageId::TOUCH_EVENT_END, fd);
             break;
         default:
-            MMI_LOGT("It's no this event handle! UnregisterEvent msgId:%{public}d fd:%{public}d", messageId, fd);
+            MMI_LOGT("It's no this event handle! \n");
             return UNKNOWN_EVENT;
     }
 

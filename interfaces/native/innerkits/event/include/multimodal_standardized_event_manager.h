@@ -40,14 +40,18 @@ public:
     const std::set<std::string> *GetRegisterEvent();
     void ClearAll();
     int32_t InjectionVirtual(bool isPressed, int32_t keyCode, int32_t keyDownDuration, int32_t maxKeyCode);
-    int32_t InjectEvent(const KeyEvent& keyEvent);
+    int32_t InjectEvent(const OHOS::KeyEvent& keyEvent);
+    int32_t InjectEvent(const OHOS::MMI::KeyEvent& keyEvent);
+    int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t GetDevice(int32_t taskId, int32_t deviceId);
+    int32_t GetDeviceIds(int32_t taskId);
     int32_t RegisterStandardizedEventHandle(const sptr<IRemoteObject> token,
         int32_t windowId, StandEventPtr standardizedEventHandle);
     int32_t UnregisterStandardizedEventHandle(const sptr<IRemoteObject> token,
         int32_t windowId, StandEventPtr standardizedEventHandle);
 
 public:
-    int32_t OnKey(const KeyEvent& event);
+    int32_t OnKey(const OHOS::KeyEvent& event);
     int32_t OnTouch(const TouchEvent& event);
 
     int32_t OnShowMenu(const MultimodalEvent& event);
