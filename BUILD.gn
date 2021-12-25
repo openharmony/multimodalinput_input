@@ -119,14 +119,6 @@ group("multimodalinput_mmi_packages") {
     "tools/event_inject:event-injection",
     "tools/virtual_device_manager:libmmi-virtual-device",
   ]
-
-  if (is_mmi_have_libinput) {
-    deps += [
-      "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-debug-mmi",
-      "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-list-mmi",
-      "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-tablet-mmi",
-    ]
-  }
 }
 
 group("unittests") {
