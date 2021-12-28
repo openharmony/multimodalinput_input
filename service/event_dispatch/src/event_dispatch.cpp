@@ -678,7 +678,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
         POINT_EVENT_TYPE pointEventType = EVENT_TYPE_INVALID;
         OnEventTouchGetPointEventType(touch, pointEventType, fingerCount);
         int32_t eventType = pointEventType;
-        newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime;
+        newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime << touch.seat_slot;
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
         AutoTestCoordinate coordinate = { static_cast<double>(0), static_cast<double>(0), static_cast<double>(0),
             static_cast<double>(0) };
