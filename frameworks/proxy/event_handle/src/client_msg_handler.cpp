@@ -668,7 +668,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, Ne
     */
     for (int i = 0; i < fingerCount; i++) {
         pkt >> touchData;
-        fingersInfos[i].mPointerId = touchData.seat_Slot;
+        fingersInfos[i].mPointerId = touchData.seat_slot;
         fingersInfos[i].mTouchArea = static_cast<float>(touchData.area);
         fingersInfos[i].mTouchPressure = static_cast<float>(touchData.pressure);
         fingersInfos[i].mMp.Setxy(touchData.point.x, touchData.point.y);
