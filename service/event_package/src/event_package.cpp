@@ -537,7 +537,7 @@ int32_t EventPackage::PackageTouchEvent(multimodal_libinput_event &ev,
             break;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
-            MMIRegEvent->GetTouchInfoByTouchId(touch, MAKEPAIR(touch, deviceId, touch.seat_slot));
+            MMIRegEvent->GetTouchInfoByTouchId(touch, MAKEPAIR(touch.deviceId, touch.seat_slot));
             touch.time = libinput_event_touch_get_time_usec(data);
             touch.eventType = LIBINPUT_EVENT_TOUCH_UP;
             break;
