@@ -654,10 +654,11 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, Ne
     int32_t fd = 0;
     int32_t fingerCount = 0;
     int32_t eventAction = 0;
+    int32_t seatSlot = 0;
     uint64_t serverStartTime = 0;
     EventTouch touchData = {};
     MmiPoint mmiPoint;
-    pkt >> fingerCount >> eventAction >> abilityId >> windowId >> fd >> serverStartTime;
+    pkt >> fingerCount >> eventAction >> abilityId >> windowId >> fd >> serverStartTime >> seatSlot;
 
     fingerInfos fingersInfos[FINGER_NUM] = {};
     /* 根据收到的touchData，构造TouchEvent对象
@@ -667,27 +668,21 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, Ne
     */
     for (int i = 0; i < fingerCount; i++) {
         pkt >> touchData;
-        fingersInfos[i].mPointerId = i;
+        fingersInfos[i].mPointerId = touchData.seat_slot;
         fingersInfos[i].mTouchArea = static_cast<float>(touchData.area);
         fingersInfos[i].mTouchPressure = static_cast<float>(touchData.pressure);
         fingersInfos[i].mMp.Setxy(touchData.point.x, touchData.point.y);
-    }
-
-    MMI_LOGT("\nevent dispatcher of client:\neventTouch:time=%{public}" PRId64 ";deviceId=%{public}u;"
+        MMI_LOGT("\nevent dispatcher of client:\neventTouch:time=%{public}" PRId64 ";deviceId=%{public}u;"
              "deviceType=%{public}u;eventType=%{public}d;slot=%{public}d;seat_slot=%{public}d;"
              "fd=%{public}d,abilityId=%{public}d,windowId=%{public}d"
              "\n************************************************************************\n",
         touchData.time, touchData.deviceId, touchData.deviceType, touchData.eventType, touchData.slot,
         touchData.seat_slot, fd, abilityId, windowId);
+    }
 
     TouchEvent touchEvent;
     int32_t deviceEventType = TOUCH_EVENT;
-    int32_t fingerIndex = 0;
-    if (PRIMARY_POINT_DOWN == eventAction || PRIMARY_POINT_UP == eventAction ||
-        OTHER_POINT_DOWN == eventAction || OTHER_POINT_UP == eventAction) {
-        fingerIndex = fingersInfos[0].mPointerId;
-    }
-    touchEvent.Initialize(windowId, eventAction, fingerIndex, 0, 0, 0, 0, 0, fingerCount, fingersInfos, 0,
+    touchEvent.Initialize(windowId, eventAction, seatSlot, 0, 0, 0, 0, 0, fingerCount, fingersInfos, 0,
         touchData.uuid, touchData.eventType, static_cast<int32_t>(touchData.time), "",
         static_cast<int32_t>(touchData.deviceId), 0, false, touchData.deviceType, deviceEventType);
 
