@@ -1,0 +1,59 @@
+{
+    "name": "@ohos/multimodalinput_input",
+    "version": "",
+    "description": "多模公共触摸屏输入指针类输入，包括鼠标、触控板、手写笔等有指针的输入设备按键类输入，包括键盘、内置按键语音输入手势输入车机按键输入传感器输入",
+    "homePage": "https://gitee.com/openharmony",
+    "license": "Apache V2",
+    "repository": "https://gitee.com/openharmony/multimodalinput_input",
+    "domain": "os",
+    "language": "",
+    "publishAs": "code-segment",
+    "private": false,
+    "scripts": {},
+    "tags": [
+        "foundation"
+    ],
+    "keywords": [
+        "multimodalinput",
+        "input"
+    ],
+    "envs": [],
+    "dirs": [],
+    "author": {
+        "name": "",
+        "email": "",
+        "url": ""
+    },
+    "contributors": [
+        {
+            "name": "",
+            "email": "",
+            "url": ""
+        }
+    ],
+    "segment": {
+        "destPath": "foundation/multimodalinput/input"
+    },
+    "component": {
+        "name": "multimodalinput_service",
+        "subsystem": "multimodalinput",
+        "syscap": [
+            "SystemCapability.Input.MultimodalInput"
+        ],
+        "features": [],
+        "adapted_system_type": [
+            "standard"
+        ],
+        "rom": "",
+        "ram": "",
+        "deps": {
+            "components": [],
+            "third_party": []
+        },
+        "build": {
+            "sub_component": [],
+            "inner_kits": [],
+            "test": []
+        }
+    }
+}
