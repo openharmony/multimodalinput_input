@@ -222,7 +222,6 @@ ohos_unittest("ut-mmi-service-out") {
 
   sources = [
     "application_manager/test/app_register_test.cpp",
-    "device_manager/test/device_register_test.cpp",
     "device_scalability/test/expansibility_operation_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
 
