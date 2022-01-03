@@ -13,12 +13,16 @@
  * limitations under the License.
  */
 #include "js_register_event.h"
+#include <inttypes.h>
+#include "define_multimodal.h"
 #include "js_register_util.h"
 #include "stylus_event.h"
-#include <inttypes.h>
 
 namespace OHOS {
     namespace MMI {
+    namespace {
+        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsRegisterEvent" };
+    }
         static std::map<std::string, uint32_t> g_jsEventType = {};
 
         void InitJsEvents()
@@ -211,7 +215,7 @@ namespace OHOS {
             return;
         }
 
-        static void AddMultimodalData(const napi_env& env, napi_value argv, const KeyEvent& event)
+        static void AddMultimodalData(const napi_env& env, napi_value argv, const OHOS::KeyEvent& event)
         {
             napi_valuetype valueType = napi_undefined;
             NAPI_CALL_RETURN_VOID(env, napi_typeof(env, argv, &valueType));
@@ -259,7 +263,7 @@ namespace OHOS {
                 HILOG_ERROR("AddMmiPoint: argv is not napi_object");
                 return;
             }
-            napi_value jsPoint;
+            napi_value jsPoint = nullptr;
             NAPI_CALL_RETURN_VOID(env, napi_create_object(env, &jsPoint));
             SetNamedProperty(env, jsPoint, "px", mmiPoint.GetX());
             SetNamedProperty(env, jsPoint, "py", mmiPoint.GetY());
@@ -278,7 +282,7 @@ namespace OHOS {
                 return;
             }
 
-            napi_value argvMouse;
+            napi_value argvMouse = nullptr;
             NAPI_CALL_RETURN_VOID(env, napi_create_object(env, &argvMouse));
             SetNamedProperty(env, argvMouse, "action", event.GetAction());
             SetNamedProperty(env, argvMouse, "actionButton", event.GetActionButton());
@@ -290,7 +294,7 @@ namespace OHOS {
             SetNamedProperty(env, argvMouse, "offsetY", event.GetYOffset());
             SetNamedProperty(env, argvMouse, "cursorDelta", event.GetCursorDelta(0));
 
-            napi_value axisData;
+            napi_value axisData = nullptr;
             NAPI_CALL_RETURN_VOID(env, napi_create_object(env, &axisData));
             SetNamedProperty(env, axisData, "AXIS_X", event.GetAxisValue(AXIS_X));
             SetNamedProperty(env, axisData, "AXIS_Y", event.GetAxisValue(AXIS_Y));
@@ -325,7 +329,7 @@ namespace OHOS {
                 return;
             }
 
-            napi_value argvStylus;
+            napi_value argvStylus = nullptr;
             NAPI_CALL_RETURN_VOID(env, napi_create_object(env, &argvStylus));
             SetNamedProperty(env, argvStylus, "action", event.GetAction());
             SetNamedProperty(env, argvStylus, "buttons", event.GetButtons());
@@ -342,9 +346,9 @@ namespace OHOS {
             HILOG_DEBUG("SendMultimodalEvent: event=%{public}s ", eventTable[type].c_str());
             HILOG_DEBUG("SendMultimodalEvent: CallbackMap size=%{public}d", static_cast<int32_t>(jsEvent.size()));
             size_t argc = 1;
-            napi_value argv;
-            napi_value result;
-            napi_value thisVar;
+            napi_value argv = nullptr;
+            napi_value result = nullptr;
+            napi_value thisVar = nullptr;
             bool getResult = false;
             if (napi_get_undefined(env, &thisVar) != napi_ok) {
                 HILOG_ERROR("SendEvent: call napi_get_undefined fail.");
@@ -373,7 +377,7 @@ namespace OHOS {
             }
 
             for (auto it = iter->second.begin(); it != iter->second.end(); it++) {
-                napi_value callback;
+                napi_value callback = nullptr;
                 if (napi_get_reference_value(env, *it, &callback) != napi_ok) {
                     HILOG_ERROR("SendEvent: call napi_get_reference_value fail.");
                     return getResult;
@@ -618,18 +622,18 @@ namespace OHOS {
             jsEvent[keyTable[ON_KEY]] = {};
         }
 
-        bool AppKeyEventHandle::OnKey(const KeyEvent& keyEvent)
+        bool AppKeyEventHandle::OnKey(const OHOS::KeyEvent& keyEvent)
         {
             return SendEvent(keyTable[ON_KEY], keyEvent);
         }
 
-        bool AppKeyEventHandle::SendEvent(const std::string& name, const KeyEvent& event) const
+        bool AppKeyEventHandle::SendEvent(const std::string& name, const OHOS::KeyEvent& event) const
         {
             HILOG_DEBUG("AppKeyEventHandle::SendEvent: event=%{public}s", name.c_str());
             size_t argc = 1;
-            napi_value argv;
-            napi_value result;
-            napi_value thisVar;
+            napi_value argv = nullptr;
+            napi_value result = nullptr;
+            napi_value thisVar = nullptr;
             bool getResult = false;
             if (napi_get_undefined(env, &thisVar) != napi_ok) {
                 HILOG_ERROR("SendEvent: call napi_get_undefined fail.");
@@ -662,7 +666,7 @@ namespace OHOS {
                 return true;
             }
             for (auto it = iter->second.begin(); it != iter->second.end(); it++) {
-                napi_value callback;
+                napi_value callback = nullptr;
                 if (napi_get_reference_value(env, *it, &callback) != napi_ok) {
                     HILOG_ERROR("SendEvent: call napi_get_reference_value fail.");
                     return getResult;
@@ -695,9 +699,9 @@ namespace OHOS {
         {
             HILOG_DEBUG("AppTouchEventHandle::SendEvent: event=%{public}s", name.c_str());
             size_t argc = 1;
-            napi_value argv;
-            napi_value result;
-            napi_value thisVar;
+            napi_value argv = nullptr;
+            napi_value result = nullptr;
+            napi_value thisVar = nullptr;
             bool getResult = false;
             if (napi_get_undefined(env, &thisVar) != napi_ok) {
                 HILOG_ERROR("SendEvent: call napi_get_undefined fail.");
@@ -724,7 +728,7 @@ namespace OHOS {
             }
 
             for (auto it = iter->second.begin(); it != iter->second.end(); it++) {
-                napi_value callback;
+                napi_value callback = nullptr;
                 if (napi_get_reference_value(env, *it, &callback) != napi_ok) {
                     HILOG_ERROR("SendEvent: call napi_get_reference_value fail.");
                     return getResult;
@@ -760,7 +764,7 @@ namespace OHOS {
             napi_value fingerInfos;
             NAPI_CALL_RETURN_VOID(env, napi_create_array(env, &fingerInfos));
             for (auto i = 0; i < pointerCount; i++) {
-                napi_value fingerData;
+                napi_value fingerData = nullptr;
                 NAPI_CALL_RETURN_VOID(env, napi_create_object(env, &fingerData));
                 SetNamedProperty(env, fingerData, "pointerId", event.GetPointerId(i));
                 SetNamedProperty(env, fingerData, "touchArea", event.GetForce(i));
@@ -781,6 +785,7 @@ namespace OHOS {
             } else if (deviceEventType == STYLUS_EVENT) {
                 HILOG_DEBUG("AppTouchEventHandle::SendEvent: stylusEvent");
                 StylusEvent* stylusEvent = (StylusEvent*)event.GetMultimodalEvent();
+                CHK(stylusEvent, NULL_POINTER);
                 AddStylusData(env, argv, *stylusEvent);
             }
         }
@@ -807,9 +812,9 @@ namespace OHOS {
         {
             HILOG_DEBUG("AppDeviceEventHandle::SendEvent: event=%{public}s", name.c_str());
             size_t argc = 1;
-            napi_value argv;
-            napi_value result;
-            napi_value thisVar;
+            napi_value argv = nullptr;
+            napi_value result = nullptr;
+            napi_value thisVar = nullptr;
             bool getResult = false;
             if (napi_get_undefined(env, &thisVar) != napi_ok) {
                 HILOG_ERROR("SendEvent: call napi_get_undefined fail.");
@@ -849,7 +854,7 @@ namespace OHOS {
             }
 
             for (auto it = iter->second.begin(); it != iter->second.end(); it++) {
-                napi_value callback;
+                napi_value callback = nullptr;
                 if (napi_get_reference_value(env, *it, &callback) != napi_ok) {
                     HILOG_ERROR("SendEvent: call napi_get_reference_value fail.");
                     return callback;

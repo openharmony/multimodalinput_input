@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include "manipulation_event.h"
+#include <gtest/gtest.h>
 
 namespace {
 using namespace testing::ext;
@@ -336,8 +336,8 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_SetScreenOffset_GetFingersInfos_Norm
     float offsetX = 1.1f;
     float offsetY = 1.1f;
     manipulationEventTest.SetScreenOffset(offsetX, offsetY);
-    auto FingersInfos = manipulationEventTest.GetFingersInfos();
-    auto retY = FingersInfos->mMp.GetY();
+    auto fingerInfo = manipulationEventTest.GetFingersInfos();
+    auto retY = fingerInfo->mMp.GetY();
     EXPECT_FLOAT_EQ(retY, offsetY);
 }
 
@@ -363,8 +363,8 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_SetScreenOffset_GetFingersInfos_Abno
     float offsetX = 1.1f;
     auto offsetY = static_cast<float>(0xFFFFFFFFFFFFFFFF);
     manipulationEventTest.SetScreenOffset(offsetX, offsetY);
-    auto FingersInfos = manipulationEventTest.GetFingersInfos();
-    auto retY = FingersInfos->mMp.GetY();
+    auto fingerInfo = manipulationEventTest.GetFingersInfos();
+    auto retY = fingerInfo->mMp.GetY();
     EXPECT_FLOAT_EQ(retY, offsetY);
 }
 

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "multi_input_common.h"
+#include <climits>
 #include <cstdlib>
 #include <cstdio>
 #include <iostream>
@@ -36,7 +37,12 @@ namespace OHOS {
             file_writer.close();
 
             std::ofstream file;
-            file.open(eventsFile, std::ios::app);
+            char path[PATH_MAX] = {};
+            if (realpath(eventsFile.c_str(), path) == nullptr) {
+                HILOG_INFO("path is error, eventsFile = %{public}s", eventsFile.c_str());
+                return;
+            }
+            file.open(path, std::ios::app);
             if (!file.is_open()) {
                 std::cout << "cannot open file" << std::endl;
             }

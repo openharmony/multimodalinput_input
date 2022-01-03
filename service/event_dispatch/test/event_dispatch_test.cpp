@@ -12,9 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include "event_dispatch.h"
 #include <gtest/gtest.h>
 #include "libmmi_util.h"
-#include "event_dispatch.h"
 
 namespace {
 using namespace testing::ext;

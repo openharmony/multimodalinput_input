@@ -25,12 +25,23 @@ class UDSSession;
 using SessionPtr = std::shared_ptr<UDSSession>;
 class UDSSession : public std::enable_shared_from_this<UDSSession> {
 public:
-    UDSSession(const std::string& programName, const int moduleType, const int32_t fd);
+    UDSSession(const std::string& programName, const int moduleType, const int32_t fd, const int32_t uid,
+               const int32_t pid);
     virtual ~UDSSession();
 
     bool SendMsg(const char *buf, size_t size) const;
     bool SendMsg(NetPacket& pkt) const;
     void Close();
+
+    int32_t GetUid()
+    {
+        return uid_;
+    }
+
+    int32_t GetPid()
+    {
+        return pid_;
+    }
 
     SessionPtr GetPtr()
     {
@@ -62,6 +73,8 @@ protected:
     const std::string programName_;
     const int moduleType_;
     const int32_t fd_;
+    const int32_t uid_;
+    const int32_t pid_;
 #ifdef OHOS_BUILD_MMI_DEBUG
     int clientFd_ = -1;
 #endif // OHOS_BUILD_MMI_DEBUG

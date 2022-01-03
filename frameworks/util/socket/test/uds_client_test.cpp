@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
-#include <future>
 #include "uds_client.h"
+#include <future>
+#include <gtest/gtest.h>
 
 namespace {
 using namespace testing::ext;
@@ -52,10 +52,10 @@ public:
 
     void OnThreadUnitTest()
     {
-        std::promise<bool> threadPromise_;
-        std::future<bool> threadFuture_ = threadPromise_.get_future();
-        OnThread(std::ref(threadPromise_));
-        const bool ret = threadFuture_.get();
+        std::promise<bool> threadPromise;
+        std::future<bool> threadFuture = threadPromise.get_future();
+        OnThread(std::ref(threadPromise));
+        const bool ret = threadFuture.get();
         ASSERT_EQ(ret, true);
     }
 };

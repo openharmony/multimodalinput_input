@@ -77,6 +77,8 @@ OHOS::MMI::VirtualGamePad::VirtualGamePad() : VirtualDevice("Virtual GamePad",
     dev_.absflat[ABS_HAT0Y] = 0;
 }
 
+OHOS::MMI::VirtualGamePad::~VirtualGamePad() {}
+
 const std::vector<uint32_t>& OHOS::MMI::VirtualGamePad::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {

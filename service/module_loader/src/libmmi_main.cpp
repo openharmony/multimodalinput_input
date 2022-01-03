@@ -15,11 +15,13 @@
 
 #include <sys/ioctl.h>
 #include <inttypes.h>
-#include "util.h"
-#include "safe_keeper.h"
-#include "mmi_server.h"
 #include "event_dump.h"
+#include "input_device_manager.h"
 #include "mmi_interface.h"
+#include "mmi_server.h"
+#include "safe_keeper.h"
+#include "util.h"
+#include "wayland-server-core.h"
 
 #ifdef OHOS_BUILD_MMI_DEBUG
 #include "command_helper.h"
@@ -56,6 +58,7 @@ int64_t GetMmiServerStartTime()
 #endif // DEBUG_CODE_TEST
 
 namespace {
+#ifdef OHOS_WESTEN_MODEL
 void OnThreadTermination(int32_t outTime, uint64_t tid, const std::string& remark)
 {
     using namespace OHOS::MMI;
@@ -67,6 +70,7 @@ void OnThreadTermination(int32_t outTime, uint64_t tid, const std::string& remar
     MMIEventDump->Dump(-1);
     g_bThreadTerm = true;
 }
+#endif
 
 void OnThread()
 {
@@ -75,6 +79,7 @@ void OnThread()
     while (true) {
         g_bThreadTerm = false;
         SafeKpr->ClearAll();
+#ifdef OHOS_WESTEN_MODEL
         OHOS::MMI::MMIServer mmiServer;
         SafeKpr->Init(std::bind(&OnThreadTermination, std::placeholders::_1, std::placeholders::_2,
             std::placeholders::_3));
@@ -98,6 +103,11 @@ void OnThread()
             mmiServer.OnTimer();
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
+#else
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+#endif
+
+
         if (!g_isRun) {
             break;
         }
@@ -133,7 +143,7 @@ void StartMmiServer(void)
     uint64_t tid = OHOS::MMI::GetThisThreadIdOfLL();
     g_llStartTime = OHOS::MMI::GetMillisTime();
     MMI_LOGI("The server starts to start tid:%" PRId64 ". The current timestamp is %" PRId64
-             " Ms\n", tid, g_llStartTime);
+            " Ms\n", tid, g_llStartTime);
 #endif
     g_isRun = true;
     static std::thread t(&OnThread);
@@ -141,8 +151,22 @@ void StartMmiServer(void)
 }
 
 // weston启动入口函数
-WL_EXPORT int wet_module_init([[maybe_unused]] struct weston_compositor *ec, int *argc, char *argv[])
+WL_EXPORT int wet_module_init(struct weston_compositor *ec, int *argc, char *argv[])
 {
+#ifdef OHOS_WESTEN_MODEL
+    int socketPair[2];
+    socketpair(AF_UNIX, SOCK_STREAM, 0, socketPair);
+    MMIMSGPOST.SetWestonCompositor(ec);
+
+    struct wl_event_loop* loop = nullptr;
+    uint32_t mask = 1;
+    void *data = nullptr;
+    loop = wl_display_get_event_loop(ec->wl_display);
+    wl_event_loop_add_fd(loop, socketPair[1], mask, OHOS::MMI::MessagePost::RunTaskOnWestonThread, data);
+    MMIMSGPOST.SetFd(socketPair[0]);
+
     StartMmiServer();
+#endif
     return RET_OK;
 }
+

@@ -22,6 +22,7 @@ config("libmmi_util_public_config") {
     "network/include",
     "socket/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//drivers/peripheral/input/interfaces/include",
     "//utils/native/base/include",
   ]
@@ -50,9 +51,11 @@ ohos_shared_library("libmmi-util") {
     "common/include/klog.c",
     "common/src/libmmi_util.cpp",
     "common/src/log.cpp",
+    "common/src/run_shell_util.cpp",
     "common/src/safe_keeper.cpp",
     "common/src/util.cpp",
     "common/src/uuid.cpp",
+    "network/src/input_event_data_transformation.cpp",
     "network/src/net_packet.cpp",
     "network/src/stream_buffer.cpp",
     "socket/src/uds_client.cpp",
@@ -71,6 +74,7 @@ ohos_shared_library("libmmi-util") {
 
   public_deps = [
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//third_party/bounds_checking_function:libsec_static",
     "//utils/native/base:utils",
   ]
@@ -144,8 +148,70 @@ ohos_unittest("ut-mmi-util-out") {
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 }
 
+ohos_unittest("RunShellUtilTest") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "//utils/native/base/include",
+    "//third_party/googletest/googletest/include",
+    "${mmi_path}/frameworks/util/common",
+    "${mmi_path}/frameworks/util/common/include",
+    "${mmi_path}/frameworks/util/network",
+    "${mmi_path}/frameworks/util/network/include",
+    "${mmi_path}/frameworks/util/socket",
+    "${mmi_path}/frameworks/util/socket/include",
+    "${mmi_path}/frameworks/proxy/event_handle",
+    "${mmi_path}/frameworks/proxy/event_handle/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+  ]
+
+  if (is_mmi_have_libinput) {
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+  }
+
+  cflags = [
+    "-DOHOS_BUILD",
+    "-DOHOS_AUTO_TEST_FRAME",
+  ]
+
+  if (is_mmi_have_debug) {
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [ "-DOHOS_BUILD_AI" ]
+  }
+
+  sources = [ "common/test/run_shell_util_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/frameworks/util:libmmi-util",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+}
+
 group("ut-mmi-util") {
   testonly = true
   deps = []
-  deps += [ ":ut-mmi-util-out" ]
+  deps += [
+    ":RunShellUtilTest",
+    ":ut-mmi-util-out",
+  ]
 }

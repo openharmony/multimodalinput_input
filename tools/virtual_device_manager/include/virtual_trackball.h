@@ -23,6 +23,7 @@ namespace MMI {
 class VirtualTrackball : public VirtualDevice {
 public:
     VirtualTrackball();
+    ~VirtualTrackball();
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
     const std::vector<uint32_t>& GetKeys() const override;

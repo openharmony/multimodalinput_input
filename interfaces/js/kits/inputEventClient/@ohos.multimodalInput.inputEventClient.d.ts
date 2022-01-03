@@ -90,7 +90,45 @@ declare namespace inputEventClient {
 
   //反注册接口
   function off(type: EventType, callback: Callback<MultimodalEvent>): void;
+
+
+  type SourceType = 'keyboard' | 'mouse' | 'touchpad' | 'touchscreen' | 'tablet' | 'joystick' | 'accelerometer' |
+    'tabletpad' | 'pointingstick' | 'trackball' | 'switch';
+
+    /**
+     * Defines the information about an input device.
+     *
+     * @sysCap MultimodalEvent API
+     * @param name Name of the input device.
+     * @param sources Source type supported by the input device. For example, if a keyboard is attached with a touchpad, the device has two input sources: keyboard and touchpad.
+     */
+  interface InputDeviceData {
+    name: string;
+    sources : Array<SourceType>;
+  }
+
+	  /**
+     * Obtains the IDs of all input devices.
+     *
+     * @since 8
+     * @sysCap MultimodalEvent API
+     * @devices keyboard, mouse, touchscreen, trackpad, joystick, rotation, AI, sensor, stylus, remotecontrol, trackball.
+     * @permission N/A
+     * @param callback callback function, receive reported data
+     */
+    function getDeviceIds(callback: AsyncCallback<Array<number>>): void;
+
+    /**
+     * Obtain the information about an input device.
+     *
+     * @since 8
+     * @sysCap MultimodalEvent API
+     * @devices keyboard, mouse, touchscreen, trackpad, joystick, rotation, AI, sensor, stylus, remotecontrol, trackball.
+     * @permission N/A
+     * @param deviceId ID of the input device whose information is to be obtained.
+     * @param callback callback function, receive reported data
+     */
+    function getDevice(deviceId: number, callback: AsyncCallback<InputDeviceData>): void;
 }
 
 export default inputEventClient;
-

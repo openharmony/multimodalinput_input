@@ -47,19 +47,18 @@ namespace OHOS {
 namespace MMI {
 #define CLMAP       std::map
 #define CLSET       std::set
-#define String      std::string
 #define IdsList     std::vector<int32_t>
-#define StringList  std::vector<String>
-#define StringSet   CLSET<String>
-#define Size_type   String::size_type
+#define StringList  std::vector<std::string>
+#define StringSet   CLSET<std::string>
+#define Size_type   std::string::size_type
 #define SYMBOL_FOLDER_PERMISSIONS 775
 #define MAX_PARAMETER_NUMBER 3
 #define MAX_PARAMETER_NUMBER_FOR_ADD_DEL 2
 #define IS_FILE_JUDGE 8
 #define BIN_NAME "hosmmi-virtual-device-manger"
 
-    const String g_pid = std::to_string(getpid());
-    const String g_folderpath = "/data/symbol/";
+    const std::string g_pid = std::to_string(getpid());
+    const std::string g_folderpath = "/data/symbol/";
 }
 }
 #endif

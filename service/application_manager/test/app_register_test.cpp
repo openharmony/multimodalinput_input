@@ -12,12 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <gtest/gtest.h>
+
 #include "app_register.h"
-#include "register_eventhandle_manager.h"
+#include <gtest/gtest.h>
 #include "key_event_value_transformation.h"
-#include "util.h"
 #include "proto.h"
+#include "register_eventhandle_manager.h"
+#include "util.h"
 
 namespace {
 using namespace testing::ext;

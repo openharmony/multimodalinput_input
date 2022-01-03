@@ -12,13 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include "builtinkey_event.h"
 #include "event_factory.h"
 #include "keyboard_event.h"
-#include "touch_event.h"
-#include "stylus_event.h"
 #include "rotation_event.h"
 #include "speech_event.h"
-#include "builtinkey_event.h"
+#include "stylus_event.h"
+#include "touch_event.h"
 
 namespace OHOS {
 template<class T>
@@ -27,30 +28,30 @@ MultimodalEventPtr Create()
     return MultimodalEventPtr(new T());
 }
 
-MultimodalEventPtr EventFactory::CreateEvent(int32_t eventType)
+MultimodalEventPtr EventFactory::CreateEvent(EventType eventType)
 {
     switch (eventType) {
-        case EVENT_MULTIMODAL:
+        case EventType::EVENT_MULTIMODAL:
             return Create<MultimodalEvent>();
-        case EVENT_KEY:
+        case EventType::EVENT_KEY:
             return Create<KeyEvent>();
-        case EVENT_KEYBOARD:
+        case EventType::EVENT_KEYBOARD:
             return Create<KeyBoardEvent>();
-        case EVENT_MOUSE:
+        case EventType::EVENT_MOUSE:
             return Create<MouseEvent>();
-        case EVENT_MANIPULATION:
+        case EventType::EVENT_MANIPULATION:
             return Create<ManipulationEvent>();
-        case EVENT_TOUCH:
+        case EventType::EVENT_TOUCH:
             return Create<TouchEvent>();
-        case EVENT_STYLUS:
+        case EventType::EVENT_STYLUS:
             return Create<StylusEvent>();
-        case EVENT_ROTATION:
+        case EventType::EVENT_ROTATION:
             return Create<RotationEvent>();
-        case EVENT_SPEECH:
+        case EventType::EVENT_SPEECH:
             return Create<SpeechEvent>();
-        case EVENT_BUILTINKEY:
+        case EventType::EVENT_BUILTINKEY:
             return Create<BuiltinKeyEvent>();
-        case EVENT_COMPOSITE:
+        case EventType::EVENT_COMPOSITE:
             return Create<CompositeEvent>();
         default:
             return nullptr;

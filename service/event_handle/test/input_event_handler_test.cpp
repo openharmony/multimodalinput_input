@@ -58,7 +58,7 @@ const static struct {
     const std::string unitName;
     const std::string argsName;
     const std::string jsonName;
-} nameMap[] = {
+} NAME_MAP[] = {
     {"Test_OnEvent", "keyboard", "inject_event_keyboard.json"},
     {"Test_OnEventKeyboard", "keyboard", "inject_event_keyboard.json"},
     {"Test_OnEventPointer_LeftButton", "mouse", "inject_event_mouse_left_button.json"},
@@ -81,7 +81,7 @@ public:
     {
         currentUnitName_ = testing::UnitTest::GetInstance()->current_test_info()->name();
         EXPECT_FALSE(currentUnitName_.empty());
-        for (auto& temp : nameMap) {
+        for (auto& temp : NAME_MAP) {
             if (currentUnitName_ == temp.unitName) {
                 currentJsonName_ = temp.jsonName;
                 currentArgsName_ = temp.argsName;

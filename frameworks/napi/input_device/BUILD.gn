@@ -14,12 +14,13 @@
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
 ## Build libmmi.so {{{
-config("libinputeventclient_config") {
+config("libinputdevice_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/napi/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/napi/input_device/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/ace/napi",
     "//foundation/ace/napi/interfaces/kits/napi",
     "//third_party/node/src",
@@ -27,6 +28,8 @@ config("libinputeventclient_config") {
     "//utils/native/base/include",
     "//foundation/multimodalinput/input/common/include",
     "//foundation/multimodalinput/input/tools/event_inject/include",
+    "//third_party/libuv/include/",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
   ]
 
   cflags = [
@@ -46,16 +49,10 @@ config("libinputeventclient_config") {
   }
 }
 
-ohos_shared_library("libinputeventclient") {
-  sources = [
-    "src/js_register_event.cpp",
-    "src/js_register_handle.cpp",
-    "src/js_register_module.cpp",
-    "src/js_register_util.cpp",
-    "src/multi_input_common.cpp",
-  ]
+ohos_shared_library("libinputdevice") {
+  sources = [ "src/js_register_module.cpp" ]
 
-  configs = [ ":libinputeventclient_config" ]
+  configs = [ ":libinputdevice_config" ]
 
   deps = [
     "//drivers/peripheral/input/hal:hdi_input",
@@ -64,6 +61,7 @@ ohos_shared_library("libinputeventclient") {
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/tools/event_inject:event-injection",
+    "//third_party/libuv:uv_static",
     "//third_party/libxkbcommon:libxkbcommon",
     "//third_party/wayland-ivi-extension:ivi-controller",
     "//third_party/wayland-ivi-extension:libscreen-info-module",

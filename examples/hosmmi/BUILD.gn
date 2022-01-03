@@ -20,6 +20,7 @@ ohos_executable("hosmmi-client") {
   deps = [
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
+    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
   ]
   cflags = [ "-DOHOS_BUILD" ]
@@ -38,43 +39,6 @@ ohos_executable("hosmmi-client") {
 
   if (is_mmi_have_ai) {
     cflags += [ "-DOHOS_BUILD_AI" ]
-  }
-
-  install_enable = true
-  part_name = "multimodalinput_base"
-}
-
-ohos_executable("hosmmi-server") {
-  sources = [ "src/hosmmi_server_main.cpp" ]
-  deps = [
-    "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
-    "//foundation/multimodalinput/input/service:libmmi-server",
-  ]
-
-  if (is_mmi_have_libinput) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
-
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
-
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
-
-  if (is_mmi_have_weston) {
-    cflags += [ "-DOHOS_WESTEN_MODEL" ]
   }
 
   install_enable = true

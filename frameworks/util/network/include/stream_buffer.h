@@ -44,6 +44,7 @@ public:
     bool Write(const StreamBuffer& buf);
     bool Read(char *buf, size_t size);
     bool Write(const char *buf, size_t size);
+    bool IsEmpty();
     /*
      * Method:    Size
      * FullName:  CStreamBuffer::Size
