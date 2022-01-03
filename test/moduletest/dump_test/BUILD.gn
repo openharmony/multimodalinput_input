@@ -21,6 +21,7 @@ ohos_moduletest("dump-test-out") {
   include_dirs = [
     "//foundation/multimodalinput/input/test/moduletest/include",
     "//foundation/multimodalinput/input/service/event_dump/include",
+    "$root_out_dir/gen/third_party/wayland_standard/protocol/",
   ]
 
   sources = [ "dfx_dump_test.cpp" ]
