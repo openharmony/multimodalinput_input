@@ -60,8 +60,12 @@ ohos_shared_library("libmmi-client") {
     "event_handle/src/common_event_handler.cpp",
     "event_handle/src/device_handler.cpp",
     "event_handle/src/event_factory.cpp",
+    "event_handle/src/input_device_event.cpp",
     "event_handle/src/input_event_monitor_manager.cpp",
+    "event_handle/src/input_filter_manager.cpp",
+    "event_handle/src/input_handler_manager.cpp",
     "event_handle/src/input_manager_impl.cpp",
+    "event_handle/src/input_monitor_manager.cpp",
     "event_handle/src/key_event_handler.cpp",
     "event_handle/src/media_event_handler.cpp",
     "event_handle/src/multimodal_event_handler.cpp",
@@ -70,13 +74,13 @@ ohos_shared_library("libmmi-client") {
     "event_handle/src/system_event_handler.cpp",
     "event_handle/src/telephone_event_handler.cpp",
     "event_handle/src/touch_event_handler.cpp",
-    "event_handle/src/input_device_event.cpp",
-    "event_handle/src/input_monitor_manager.cpp",
-    "event_handle/src/input_handler_manager.cpp",
+    "events/src/axis_event.cpp",
     "events/src/builtinkey_event.cpp",
     "events/src/composite_event.cpp",
     "events/src/device_event.cpp",
+    "events/src/input_manager.cpp",
     "events/src/key_event_pre.cpp",
+    "events/src/key_option.cpp",
     "events/src/keyboard_event.cpp",
     "events/src/manipulation_event.cpp",
     "events/src/mmi_point.cpp",
@@ -87,10 +91,6 @@ ohos_shared_library("libmmi-client") {
     "events/src/stylus_event.cpp",
     "events/src/touch_event.cpp",
     "module_loader/src/mmi_client.cpp",
-    "event_handle/src/input_filter_manager.cpp",
-    "events/src/axis_event.cpp",
-    "events/src/input_manager.cpp",
-    "events/src/key_option.cpp",
   ]
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -115,7 +115,7 @@ ohos_shared_library("libmmi-client") {
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
   ]
 
-   public_deps = [
+  public_deps = [
     ":libmmi-common",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
