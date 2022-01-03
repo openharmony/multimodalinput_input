@@ -120,8 +120,7 @@ group("multimodalinput_mmi_packages") {
   deps = [
     "examples/hosmmi:hosmmi-client",
     "examples/hosmmi:hosmmi-event-injection",
-
-    #"examples/hosmmi:hosmmi-server",
+    "examples/hosmmi:hosmmi-server",
     "examples/hosmmi:hosmmi-virtual-device-manager",
     "frameworks/napi/input_device:libinputdevice",
     "frameworks/napi/input_event_client:libinputeventclient",

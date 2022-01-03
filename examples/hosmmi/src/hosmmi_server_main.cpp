@@ -29,7 +29,10 @@ int32_t main(int32_t argc, const char *argv[])
     VerifyLogManagerRun();
 #endif
 
+#ifdef OHOS_WESTEN_MODEL
     StartMmiServer();
+#endif
+
 #ifdef DEBUG_CODE_TEST
     SetMmiServerWorking();
     while (IsMmiServerWorking()) {

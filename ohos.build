@@ -68,6 +68,8 @@
         }
       ],
       "test_list": [
+        "//foundation/multimodalinput/input:unittests",
+        "//foundation/multimodalinput/input/test/moduletest:moduletest"
       ]
     }
   }
