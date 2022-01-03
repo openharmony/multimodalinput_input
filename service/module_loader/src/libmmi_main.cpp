@@ -57,8 +57,8 @@ int64_t GetMmiServerStartTime()
 }
 #endif // DEBUG_CODE_TEST
 
-namespace {
 #ifdef OHOS_WESTEN_MODEL
+namespace {
 void OnThreadTermination(int32_t outTime, uint64_t tid, const std::string& remark)
 {
     using namespace OHOS::MMI;
@@ -70,7 +70,6 @@ void OnThreadTermination(int32_t outTime, uint64_t tid, const std::string& remar
     MMIEventDump->Dump(-1);
     g_bThreadTerm = true;
 }
-#endif
 
 void OnThread()
 {
@@ -118,6 +117,7 @@ void OnThread()
     MMI_LOGI("libmmi_main OnThread end...\n");
 }
 }
+#endif
 
 void Dump(int fd)
 {
@@ -132,6 +132,7 @@ int GetMultimodeInputinformation(void)
     return OHOS::MMI_SERVICE_RUNNING;
 }
 
+#ifdef OHOS_WESTEN_MODEL
 void StartMmiServer(void)
 {
 #ifdef OHOS_BUILD_MMI_DEBUG
@@ -164,9 +165,9 @@ WL_EXPORT int wet_module_init(struct weston_compositor *ec, int *argc, char *arg
     loop = wl_display_get_event_loop(ec->wl_display);
     wl_event_loop_add_fd(loop, socketPair[1], mask, OHOS::MMI::MessagePost::RunTaskOnWestonThread, data);
     MMIMSGPOST.SetFd(socketPair[0]);
-
     StartMmiServer();
 #endif
     return RET_OK;
 }
+#endif
 
