@@ -22,7 +22,9 @@
 #include "libmmi_util.h"
 #include "safe_keeper.h"
 #include "util.h"
-
+#ifndef OHOS_WESTEN_MODEL
+#include "input_windows_manager.h"
+#endif
 namespace OHOS::MMI {
     namespace {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SInput" };
@@ -141,10 +143,12 @@ void OHOS::MMI::SInput::Stop()
 void OHOS::MMI::SInput::OnEventHandler()
 {
     CHK(funInputEvent_, NULL_POINTER);
-    struct libinput_event *event = nullptr;
-    while ((event = libinput_get_event(input_))) {
-        funInputEvent_(event);
-        libinput_event_destroy(event);
+#ifndef OHOS_WESTEN_MODEL
+    struct multimodal_libinput_event ev = { nullptr, nullptr };
+    while ((ev.event = libinput_get_event(input_))) {
+        funInputEvent_(&ev);
+        libinput_event_destroy(ev.event);
     }
+#endif
 }
 

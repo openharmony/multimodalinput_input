@@ -98,7 +98,7 @@ struct ScreenInfo** GetScreensInfo()
     return screenInfo;
 }
 
-void FreeSurfaceInfo(const struct SurfaceInfo* pSurface)
+void FreeSurfaceInfo(struct SurfaceInfo* pSurface)
 {
     MMI_LOGT("FreeSurfaceInfo...");
     if (pSurface) {
@@ -106,7 +106,7 @@ void FreeSurfaceInfo(const struct SurfaceInfo* pSurface)
     }
 }
 
-void FreeLayerInfo(const struct LayerInfo* pLayer)
+void FreeLayerInfo(struct LayerInfo* pLayer)
 {
     MMI_LOGT("FreeLayerInfo...");
     if (pLayer) {
@@ -120,7 +120,7 @@ void FreeLayerInfo(const struct LayerInfo* pLayer)
     }
 }
 
-void FreeScreenInfo(const struct ScreenInfo* pScreen)
+void FreeScreenInfo(struct ScreenInfo* pScreen)
 {
     MMI_LOGT("FreeScreenInfo...");
     if (pScreen) {

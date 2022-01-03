@@ -266,7 +266,6 @@ void MMIService::OnDisconnected(SessionPtr s)
     int32_t fd = s->GetFd();
 
     auto appInfo = AppRegs->FindBySocketFd(fd);
-    WinMgr->EraseSurfaceInfo(appInfo.windowId);
     AppRegs->UnregisterConnectState(fd);
 #ifdef  OHOS_BUILD_AI
     seniorInput_.DeviceDisconnect(fd);
