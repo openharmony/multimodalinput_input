@@ -150,7 +150,7 @@ void StartMmiServer(void)
     static std::thread t(&OnThread);
     t.detach();
 }
-
+#endif
 // weston启动入口函数
 WL_EXPORT int wet_module_init(struct weston_compositor *ec, int *argc, char *argv[])
 {
@@ -169,5 +169,3 @@ WL_EXPORT int wet_module_init(struct weston_compositor *ec, int *argc, char *arg
 #endif
     return RET_OK;
 }
-#endif
-
