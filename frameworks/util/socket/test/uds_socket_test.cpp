@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include "uds_socket.h"
+#include <gtest/gtest.h>
 
 namespace {
 using namespace testing::ext;
@@ -63,15 +63,6 @@ public:
 };
 
 #if BINDER_TODO
-HWTEST_F(UDSSocketTest, Socket, TestSize.Level1)
-{
-    int domain = -1;
-    int type = -1;
-
-    UDSSocketUnitTest socObj;
-    int32_t retResult = socObj.Socket(domain, type);
-    EXPECT_EQ(-1, retResult);
-}
 
 HWTEST_F(UDSSocketTest, Close, TestSize.Level1)
 {

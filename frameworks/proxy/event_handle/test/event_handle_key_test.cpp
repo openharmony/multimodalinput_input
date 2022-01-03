@@ -46,7 +46,7 @@ public:
     KeyEventHandlerUnitTest() {}
     ~KeyEventHandlerUnitTest() {}
 
-    virtual bool OnKey(const KeyEvent& event) override
+    virtual bool OnKey(const OHOS::KeyEvent& event) override
     {
         MMI_LOGI("\nKeyEventHandle::Onkey\n");
         return true;
@@ -71,8 +71,7 @@ HWTEST_F(EventHandleKeyTest, RegisterStandardizedEventHandle_tmp_err002, TestSiz
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
     auto keyHandleTmp = StandardizedEventHandler::Create<KeyEventHandlerUnitTest>();
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId,
-                                                 keyHandleTmp);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, keyHandleTmp);
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
         iRemote, g_surFaceId, keyHandleTmp);
     EXPECT_EQ(MMI_STANDARD_EVENT_EXIST, regResult);
@@ -222,7 +221,7 @@ HWTEST_F(EventHandleKeyTest, RegisterAndUnregister_004, TestSize.Level1)
 HWTEST_F(EventHandleKeyTest, OnKey_001, TestSize.Level1)
 {
     KeyEventHandlerUnitTest keyHandleTmp;
-    KeyEvent eventObj;
+    OHOS::KeyEvent eventObj;
     bool retResult = keyHandleTmp.OnKey(eventObj);
     EXPECT_TRUE(retResult);
 }
@@ -230,7 +229,7 @@ HWTEST_F(EventHandleKeyTest, OnKey_001, TestSize.Level1)
 HWTEST_F(EventHandleKeyTest, OnKey_002, TestSize.Level1)
 {
     KeyEventHandlerUnitTest keyHandleTmp;
-    KeyEvent eventObj;
+    OHOS::KeyEvent eventObj;
     bool retResult = keyHandleTmp.OnKey(eventObj);
     EXPECT_TRUE(retResult);
 }
@@ -243,7 +242,7 @@ HWTEST_F(EventHandleKeyTest, construction, TestSize.Level1)
 HWTEST_F(EventHandleKeyTest, OnKey, TestSize.Level1)
 {
     KeyEventHandler keyEventHandler;
-    KeyEvent eventObj;
+    OHOS::KeyEvent eventObj;
     bool retResult = keyEventHandler.OnKey(eventObj);
     EXPECT_FALSE(retResult);
 }
@@ -293,8 +292,7 @@ HWTEST_F(EventHandleKeyTest, key_event_handler_004, TestSize.Level1)
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
     auto keyEventHandleTest = StandardizedEventHandler::Create<KeyEventHandlerUnitTest>();
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId,
-                                                 keyEventHandleTest);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, keyEventHandleTest);
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(
         iRemote, g_surFaceId, keyEventHandleTest);
     EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, unregResult);

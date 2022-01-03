@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "uds_socket.h"
 #include <inttypes.h>
 #include "log.h"
@@ -29,19 +30,56 @@ OHOS::MMI::UDSSocket::UDSSocket()
 OHOS::MMI::UDSSocket::~UDSSocket()
 {
     Close();
+    EpollClose();
 }
 
-int32_t OHOS::MMI::UDSSocket::Close()
+int32_t OHOS::MMI::UDSSocket::EpollCreat(int32_t size)
 {
-    int rf = RET_OK;
-    if (fd_ >= 0) {
-        rf = close(fd_);
-        if (rf > 0) {
-            MMI_LOGE("Socket close failed rf:%{public}d", rf);
-        }
+    epollFd_ = epoll_create(size);
+    if (epollFd_ < 0) {
+        MMI_LOGE("UDSSocket::EpollCreat epoll_create retrun %{public}d", epollFd_);
+    } else {
+        MMI_LOGI("UDSSocket::EpollCreat epoll_create, epollFd_ = %{public}d", epollFd_);
     }
-    fd_ = -1;
-    return rf;
+    return epollFd_;
+}
+
+int32_t OHOS::MMI::UDSSocket::EpollCtl(int32_t fd, int32_t op, epoll_event& event, int32_t epollFd)
+{
+    CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    if (epollFd < 0) {
+        epollFd = epollFd_;
+    }
+    CHKR(epollFd >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    auto ret = epoll_ctl(epollFd, op, fd, &event);
+    if (ret < 0) {
+        const int errnoSaved = errno;
+        MMI_LOGE("UDSSocket::EpollCtl epoll_ctl retrun %{public}d epollFd_:%{public}d,"
+                 " op:%{public}d fd:%{public}d errno:%{public}d error msg: %{public}s",
+                 ret, epollFd, op, fd, errnoSaved, strerror(errnoSaved));
+    }
+    return ret;
+}
+
+int32_t OHOS::MMI::UDSSocket::EpollWait(epoll_event& events, int32_t maxevents, int32_t timeout, int32_t epollFd)
+{
+    if (epollFd < 0) {
+        epollFd = epollFd_;
+    }
+    CHKR(epollFd >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    auto ret = epoll_wait(epollFd, &events, maxevents, timeout);
+    if (ret < 0) {
+        MMI_LOGE("UDSSocket::EpollWait epoll_wait retrun %{public}d", ret);
+    }
+    return ret;
+}
+
+void OHOS::MMI::UDSSocket::EpollClose()
+{
+    if (epollFd_ >= 0) {
+        close(epollFd_);
+        epollFd_ = -1;
+    }
 }
 
 size_t OHOS::MMI::UDSSocket::Read(char *buf, size_t size)
@@ -114,45 +152,13 @@ size_t OHOS::MMI::UDSSocket::Sendto(const char *buf, size_t size, uint32_t flags
     return ret;
 }
 
-int32_t OHOS::MMI::UDSSocket::EpollCreat(int32_t size)
+void OHOS::MMI::UDSSocket::Close()
 {
-    epollFd_ = epoll_create(size);
-    if (epollFd_ < 0) {
-        MMI_LOGE("UDSSocket::EpollCreat epoll_create retrun %{public}d", epollFd_);
-    } else {
-        MMI_LOGI("UDSSocket::EpollCreat epoll_create, epollFd_ = %{public}d", epollFd_);
+    if (fd_ >= 0) {
+        auto rf = close(fd_);
+        if (rf > 0) {
+            MMI_LOGE("Socket close failed rf:%{public}d", rf);
+        }
     }
-    return epollFd_;
-}
-
-int32_t OHOS::MMI::UDSSocket::EpollCtl(int32_t fd, int32_t op, epoll_event& event)
-{
-    CHKR(epollFd_ >= 0, PARAM_INPUT_INVALID, RET_ERR);
-    CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
-    auto ret = epoll_ctl(epollFd_, op, fd, &event);
-    if (ret < 0) {
-        const int errnoSaved = errno;
-        MMI_LOGE("UDSSocket::EpollCtl epoll_ctl retrun %{public}d epollFd_:%{public}d,"
-                 " op:%{public}d fd:%{public}d errno:%{public}d error msg: %{public}s",
-                 ret, epollFd_, op, fd, errnoSaved, strerror(errnoSaved));
-    }
-    return ret;
-}
-
-int32_t OHOS::MMI::UDSSocket::EpollWait(epoll_event& events, int32_t maxevents, int32_t timeout)
-{
-    CHKR(epollFd_ >= 0, PARAM_INPUT_INVALID, RET_ERR);
-    auto ret = epoll_wait(epollFd_, &events, maxevents, timeout);
-    if (ret < 0) {
-        MMI_LOGE("UDSSocket::EpollWait epoll_wait retrun %{public}d", ret);
-    }
-    return ret;
-}
-
-void OHOS::MMI::UDSSocket::EpollClose()
-{
-    if (epollFd_ >= 0) {
-        close(epollFd_);
-        epollFd_ = -1;
-    }
+    fd_ = -1;
 }

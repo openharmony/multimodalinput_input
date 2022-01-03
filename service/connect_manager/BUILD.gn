@@ -28,8 +28,12 @@ ohos_source_set("mmi_connect_manager_service") {
   sources = [
     "${mmi_connect_manager_path}/src/i_multimodal_input_connect_stub.cpp",
     "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_service.cpp",
   ]
+  if (is_mmi_have_weston) {
+    sources += [
+      "${mmi_connect_manager_path}/src/multimodal_input_connect_service.cpp",
+    ]
+  }
 
   public_configs = [ ":mmi_connect_manager_config" ]
 

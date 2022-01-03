@@ -177,10 +177,10 @@ namespace OHOS {
             ~AppKeyEventHandle() = default;
             CallbackMap jsEvent = {};
 
-            virtual bool OnKey(const KeyEvent& keyEvent);
+            virtual bool OnKey(const OHOS::KeyEvent& keyEvent);
         private:
             napi_env env = nullptr;
-            bool SendEvent(const std::string& name, const KeyEvent& event) const;
+            bool SendEvent(const std::string& name, const OHOS::KeyEvent& event) const;
         };
 
         class AppTouchEventHandle : public TouchEventHandler {

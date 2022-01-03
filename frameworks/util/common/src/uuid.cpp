@@ -14,7 +14,6 @@
  */
 
 #include "uuid.h"
-
 #include <algorithm>
 #include <climits>
 #include <iostream>
@@ -85,7 +84,7 @@ char ConvertToHex(uint8_t c)
 void Uuid::ConvertToStdString(std::string& s) const
 {
     const int uuidBufMaxSize = 37;
-    char uuidBuf[uuidBufMaxSize+1] = {0};
+    char uuidBuf[uuidBufMaxSize + 1] = {0};
     int writePos = 0;
     for (size_t i = 0; i < UUID128_BYTES_TYPE; i++) {
         const uint8_t c = uuid_[i];

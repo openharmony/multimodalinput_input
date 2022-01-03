@@ -23,6 +23,7 @@ namespace MMI {
 class VirtualKeyboardExt : public VirtualDevice {
 public:
     VirtualKeyboardExt();
+    ~VirtualKeyboardExt();
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
     const std::vector<uint32_t>& GetKeys() const override;

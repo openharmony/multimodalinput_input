@@ -20,6 +20,7 @@
 #define MAX_DEVICENAME 64
 #define MAX_UUIDSIZE 64
 #define MAX_SOLTED_COORDS_NUM 10
+#define SYSTEMUID 1000
 
 enum SENIOR_DEVICE_TYPE {
     INPUT_DEVICE_AISENSOR = 31,
@@ -38,6 +39,7 @@ enum HOS_DEVICE_TYPE {
     HOS_JOYSTICK = 7,
     HOS_TOUCHPAD = 8,
     HOS_KNUCKLE = 9,
+    HOS_VIRTUAL_KEYBOARD = 10,
 };
 
 enum BUTTON_STATE {
@@ -104,8 +106,8 @@ enum TABLET_PAD_STRIP_AXIS_SOURCE {
 
 #pragma pack(1)
 struct TagPackHead {
-	MmiMessageId idMsg;
-	int32_t sizeEvent[1];
+    MmiMessageId idMsg;
+    int32_t sizeEvent[1];
 };
 #pragma pack()
 
@@ -215,6 +217,7 @@ struct EventKeyboard {
     uint32_t seat_key_count;
     enum KEY_STATE state;
     int32_t mUnicode;
+    bool isIntercepted {true};
 };
 
 struct EventPointer {
@@ -315,6 +318,9 @@ struct EventGesture {
     struct NormalizedCoords delta;
     struct NormalizedCoords deltaUnaccel;
     struct SlotedCoordsInfo soltTouches;
+    double scale;
+    double angle;
+    int32_t pointerEventType;
 };
 
 struct RawInputEvent {
@@ -340,7 +346,7 @@ struct VirtualKey {
     bool isPressed;
     int32_t keyCode;
     int32_t keyDownDuration;
-    int32_t maxKeyCode;
+    bool isIntercepted {true};
 };
 
 struct DeviceManage {

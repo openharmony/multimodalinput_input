@@ -11,11 +11,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
+import("//build/ohos/sa_profile/sa_profile.gni")
 
 # Use for multimodalinput proxy connection multimodalinput server
-ohos_sa_profile("multimodalinput_connect_sa_profile") {
-  sources = [ "3103.xml" ]
+ohos_sa_profile("multimodalinput_sa_profile") {
+  sources = [ "3101.xml" ]
 
   part_name = "multimodalinput_base"
 }

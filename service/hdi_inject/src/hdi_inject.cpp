@@ -12,10 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "hdi_inject.h"
 #include <iostream>
-#include "libmmi_util.h"
 #include "c_singleton.h"
+#include "libmmi_util.h"
 #include "proto.h"
 #include "util.h"
 

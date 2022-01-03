@@ -12,8 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include "key_event_pre.h"
 #include <gtest/gtest.h>
-#include "key_event.h"
 
 namespace {
 using namespace testing::ext;
@@ -25,7 +26,7 @@ public:
     static void TearDownTestCase(void) {}
 };
 
-KeyEvent keyEvent;
+KeyEvent g_keyEvent;
 HWTEST_F(KeyEventTest, Initialize_001, TestSize.Level1)
 {
     int32_t windowId = 1;
@@ -40,7 +41,7 @@ HWTEST_F(KeyEventTest, Initialize_001, TestSize.Level1)
     int32_t inputDeviceId = 1;
     bool isHighLevelEvent = true;
 
-    keyEvent.Initialize(windowId, isPressed, keyCode, keyDownDuration, highLevelEvent, strUuid,
+    g_keyEvent.Initialize(windowId, isPressed, keyCode, keyDownDuration, highLevelEvent, strUuid,
                         sourceType, occurredTime, deviceId, inputDeviceId,
                         isHighLevelEvent);
 }
@@ -48,7 +49,7 @@ HWTEST_F(KeyEventTest, Initialize_001, TestSize.Level1)
 HWTEST_F(KeyEventTest, Initialize_002, TestSize.Level1)
 {
     KeyEvent keyEventII;
-    keyEventII.Initialize(keyEvent);
+    keyEventII.Initialize(g_keyEvent);
 }
 
 HWTEST_F(KeyEventTest, Initialize_003, TestSize.Level1)
@@ -119,37 +120,37 @@ HWTEST_F(KeyEventTest, Initialize_005, TestSize.Level1)
 
 HWTEST_F(KeyEventTest, GetMaxKeyCode_001, TestSize.Level1)
 {
-    int32_t retResult = keyEvent.GetMaxKeyCode();
+    int32_t retResult = g_keyEvent.GetMaxKeyCode();
     EXPECT_EQ(retResult, NOW_MAX_KEY);
 }
 
 HWTEST_F(KeyEventTest, IsKeyDown_001, TestSize.Level1)
 {
-    bool retResult = keyEvent.IsKeyDown();
+    bool retResult = g_keyEvent.IsKeyDown();
     EXPECT_TRUE(retResult);
 }
 
 HWTEST_F(KeyEventTest, GetKeyCode_001, TestSize.Level1)
 {
-    int32_t retResult = keyEvent.GetKeyCode();
+    int32_t retResult = g_keyEvent.GetKeyCode();
     EXPECT_EQ(1, retResult);
 }
 
 HWTEST_F(KeyEventTest, GetKeyCode_002, TestSize.Level1)
 {
-    int32_t retResult = keyEvent.GetKeyCode();
+    int32_t retResult = g_keyEvent.GetKeyCode();
     EXPECT_NE(retResult, 2);
 }
 
 HWTEST_F(KeyEventTest, GetKeyDownDuration_001, TestSize.Level1)
 {
-    int32_t retResult = keyEvent.GetKeyDownDuration();
+    int32_t retResult = g_keyEvent.GetKeyDownDuration();
     EXPECT_EQ(retResult, 1);
 }
 
 HWTEST_F(KeyEventTest, GetKeyDownDuration_002, TestSize.Level1)
 {
-    int32_t retResult = keyEvent.GetKeyDownDuration();
+    int32_t retResult = g_keyEvent.GetKeyDownDuration();
     EXPECT_NE(retResult, 2);
 }
 
@@ -167,44 +168,44 @@ HWTEST_F(KeyEventTest, Initialize_L, TestSize.Level1)
     int32_t inputDeviceId = 5;
     bool isHighLevelEvent = false;
 
-    keyEvent.Initialize(windowId, isPressed, keyCode, keyDownDuration, highLevelEvent, strUuid,
+    g_keyEvent.Initialize(windowId, isPressed, keyCode, keyDownDuration, highLevelEvent, strUuid,
                         sourceType, occurredTime, deviceId, inputDeviceId,
                         isHighLevelEvent);
 }
 
 HWTEST_F(KeyEventTest, GetMaxKeyCode_L_001, TestSize.Level1)
 {
-    int32_t retResult = keyEvent.GetMaxKeyCode();
+    int32_t retResult = g_keyEvent.GetMaxKeyCode();
     EXPECT_EQ(retResult, NOW_MAX_KEY);
 }
 
 HWTEST_F(KeyEventTest, IsKeyDown_L_001, TestSize.Level1)
 {
-    bool retResult = keyEvent.IsKeyDown();
+    bool retResult = g_keyEvent.IsKeyDown();
     EXPECT_FALSE(retResult);
 }
 
 HWTEST_F(KeyEventTest, GetKeyCode_L_001, TestSize.Level1)
 {
-    int32_t retResult = keyEvent.GetKeyCode();
+    int32_t retResult = g_keyEvent.GetKeyCode();
     EXPECT_EQ(5, retResult);
 }
 
 HWTEST_F(KeyEventTest, GetKeyCode_L_002, TestSize.Level1)
 {
-    int32_t retResult = keyEvent.GetKeyCode();
+    int32_t retResult = g_keyEvent.GetKeyCode();
     EXPECT_NE(retResult, 1);
 }
 
 HWTEST_F(KeyEventTest, GetKeyDownDuration_L_001, TestSize.Level1)
 {
-    int32_t retResult = keyEvent.GetKeyDownDuration();
+    int32_t retResult = g_keyEvent.GetKeyDownDuration();
     EXPECT_EQ(retResult, 5);
 }
 
 HWTEST_F(KeyEventTest, GetKeyDownDuration_L_002, TestSize.Level1)
 {
-    int32_t retResult = keyEvent.GetKeyDownDuration();
+    int32_t retResult = g_keyEvent.GetKeyDownDuration();
     EXPECT_NE(retResult, 2);
 }
 

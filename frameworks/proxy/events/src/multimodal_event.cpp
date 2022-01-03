@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "multimodal_event.h"
 #include "struct_multimodal.h"
 
@@ -19,7 +20,7 @@ namespace OHOS {
 MultimodalEvent::~MultimodalEvent() {}
 void MultimodalEvent::Initialize(int32_t windowId, int32_t highLevelEvent, const std::string& uuid, int32_t sourceType,
                                  uint64_t occurredTime, const std::string& deviceId, int32_t inputDeviceId,
-                                 bool isHighLevelEvent, uint16_t deviceUdevTags)
+                                 bool isHighLevelEvent, uint16_t deviceUdevTags, bool isIntercepted)
 {
     mWindowId_ = windowId;
     mUuid_ = uuid;
@@ -31,6 +32,7 @@ void MultimodalEvent::Initialize(int32_t windowId, int32_t highLevelEvent, const
     mIsHighLevelEvent_ = isHighLevelEvent;
     mDeviceUdevTags_ = deviceUdevTags;
     mEventType_ =  sourceType;
+    isIntercepted_ = isIntercepted;
 }
 
 void MultimodalEvent::Initialize(const MultimodalEvent& multimodalEvent)
@@ -178,6 +180,11 @@ int32_t MultimodalEvent::GetWindowID() const
     return mWindowId_;
 }
 
+bool MultimodalEvent::IsIntercepted() const
+{
+    return isIntercepted_;
+}
+
 bool MultimodalEvent::marshalling()
 {
     return false;
@@ -191,7 +198,7 @@ bool MultimodalEvent::unmarshalling()
 int32_t MultimodalEvent::DeviceTypeTransform(int32_t sourceType) const
 {
     int32_t deviceType = UNSUPPORTED_DEVICE;
-    
+
     switch (sourceType) {
         case HOS_TOUCH_PANEL: {
             deviceType = TOUCH_PANEL;
