@@ -30,8 +30,8 @@ extern "C" {
     int GetMultimodeInputinformation(void);
 #ifdef OHOS_WESTEN_MODEL
     void StartMmiServer(void);
-    int wet_module_init(struct weston_compositor* ec, int* argc, char* argv[]);
 #endif
+int wet_module_init(struct weston_compositor* ec, int* argc, char* argv[]);
 #ifdef __cplusplus
 }
 #endif
