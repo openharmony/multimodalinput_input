@@ -12,29 +12,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "util.h"
-#include <sstream>
-#include <inttypes.h>
 #include <chrono>
-#include <thread>
 #include <cstdarg>
-#include <unistd.h>
-#include <sys/prctl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <fcntl.h>
 #include <iomanip>
+#include <sstream>
+#include <thread>
+#include <fcntl.h>
+#include <inttypes.h>
+#include <sys/prctl.h>
+#include <sys/stat.h>
 #include <sys/syscall.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 #ifndef OHOS_BUILD
 #include <execinfo.h>
 #endif // OHOS_BUILD
-#include "uuid.h"
-#include "securec.h"
 #include "config_multimodal.h"
-#include "error_multimodal.h"
 #include "define_multimodal.h"
+#include "error_multimodal.h"
 #include "log.h"
+#include "securec.h"
+#include "uuid.h"
 
 namespace OHOS::MMI {
     namespace {
@@ -89,7 +91,7 @@ int64_t GetMicrotime()
 uint64_t GetSysClockTime()
 {
     const int32_t conversionStep = 1000;
-    struct timespec ts = {0, 0};
+    struct timespec ts = { 0, 0 };
 
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
         MMI_LOGT("clock_gettime failed: %{public}s\n", strerror(errno));
@@ -123,21 +125,21 @@ std::string GetUUid()
 
 std::string GetThisThreadIdOfString()
 {
-    thread_local std::string thread_local_id;
-    if (thread_local_id.empty()) {
+    thread_local std::string threadLocalId;
+    if (threadLocalId.empty()) {
         long tid = syscall(SYS_gettid);
         const size_t bufSize = 10;
         char buf[bufSize] = {};
         const int ret = sprintf_s(buf, bufSize, "%06d", tid);
         if (ret < 0) {
             printf("ERR: in %s, #%d, call sprintf_s fail, ret = %d.", __func__, __LINE__, ret);
-            return thread_local_id;
+            return threadLocalId;
         }
         buf[bufSize - 1] = '\0';
-        thread_local_id = buf;
+        threadLocalId = buf;
     }
 
-    return thread_local_id;
+    return threadLocalId;
 }
 
 uint64_t GetThisThreadIdOfLL()
@@ -330,21 +332,21 @@ const char* GetProgramName()
     return programName;
 }
 
-char* mmi_basename(char* path)
+char* MmiBasename(char* path)
 {
     if (path == nullptr) {
         return nullptr;
     }
 
-    char* right_slash = strrchr(path, '/');
-    char* p_basename;
-    if (right_slash != nullptr) {
-        p_basename = (right_slash + 1);
+    char* rightSlash = strrchr(path, '/');
+    char* pBasename = nullptr;
+    if (rightSlash != nullptr) {
+        pBasename = (rightSlash + 1);
     } else {
-        p_basename = path;
+        pBasename = path;
     }
 
-    return p_basename;
+    return pBasename;
 }
 
 std::string GetStackInfo()
@@ -377,12 +379,12 @@ void SetThreadName(const std::string& name)
 }
 
 namespace {
-thread_local std::string threadName;
+thread_local std::string g_threadName;
 }
 const std::string& GetThreadName()
 {
-    if (!threadName.empty()) {
-        return threadName;
+    if (!g_threadName.empty()) {
+        return g_threadName;
     }
 
     const size_t MAX_THREAD_NAME_SIZE = 16;
@@ -392,14 +394,14 @@ const std::string& GetThreadName()
     int32_t ret = prctl(PR_GET_NAME, thisThreadName);
     if (ret == 0) {
         thisThreadName[MAX_THREAD_NAME_SIZE] = '\0';
-        threadName = thisThreadName;
+        g_threadName = thisThreadName;
     } else {
         const int errnoSaved = errno;
         printf("in GetThreadName, call prctl get name fail, errno: %d, error msg: %s.\n",
                errnoSaved, strerror(errnoSaved));
     }
 
-    return threadName;
+    return g_threadName;
 }
 
 void AddId(IdsList &list, int32_t id)

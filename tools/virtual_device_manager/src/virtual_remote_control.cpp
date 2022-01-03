@@ -20,7 +20,9 @@ OHOS::MMI::VirtualRemoteControl::VirtualRemoteControl() : VirtualDevice("Virtual
 {
 }
 
-static std::vector<uint32_t> virtualKey = {
+OHOS::MMI::VirtualRemoteControl::~VirtualRemoteControl() {}
+
+static std::vector<uint32_t> g_virtualKey = {
     116, 408, 142, 142, 228, 139, 353, 103, 108, 105, 106, 1, 78, 74, 358, 370, 379, 212, 398, 399, 401, 400, 375,
     225, 224, 431, 592, 593, 244, 230, 229, 228, 241, 405, 28, 376, 377, 150, 389, 169, 362, 416, 417, 396, 383, 379,
     386, 174, 138, 384, 378, 381, 366, 402, 403, 380, 207, 119, 167, 208, 168, 163, 165, 166, 161, 439, 410, 499, 164,
@@ -41,7 +43,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualRemoteControl::GetEventTypes() co
 
 const std::vector<uint32_t>& OHOS::MMI::VirtualRemoteControl::GetKeys() const
 {
-    static const std::vector<uint32_t> keys(virtualKey.begin(),
-                                            virtualKey.end());
+    static const std::vector<uint32_t> keys(g_virtualKey.begin(),
+                                            g_virtualKey.end());
     return keys;
 }

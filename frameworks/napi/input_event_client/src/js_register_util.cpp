@@ -24,7 +24,7 @@ namespace OHOS {
         {
             HILOG_DEBUG("SetNamedProperty: %{public}s=%{public}d", name.c_str(), value);
             napi_status status;
-            napi_value napiValue;
+            napi_value napiValue = nullptr;
             status = napi_create_int32(env, value, &napiValue);
             if (status != napi_ok) {
                 HILOG_ERROR("SetNamedProperty %{public}s=%{public}d failed.", name.c_str(), value);
@@ -37,7 +37,7 @@ namespace OHOS {
         {
             HILOG_DEBUG("SetNamedProperty: %{public}s=%{public}u", name.c_str(), value);
             napi_status status;
-            napi_value napiValue;
+            napi_value napiValue = nullptr;
             status = napi_create_uint32(env, value, &napiValue);
             if (status != napi_ok) {
                 HILOG_ERROR("SetNamedProperty: %{public}s=%{public}u failed.", name.c_str(), value);
@@ -50,7 +50,7 @@ namespace OHOS {
         {
             HILOG_DEBUG("SetNamedProperty: %{public}s=%{public}u", name.c_str(), value);
             napi_status status;
-            napi_value napiValue;
+            napi_value napiValue = nullptr;
             status = napi_create_uint32(env, value, &napiValue);
             if (status != napi_ok) {
                 HILOG_ERROR("SetNamedProperty: %{public}s=%{public}u failed.", name.c_str(), value);
@@ -63,7 +63,7 @@ namespace OHOS {
         {
             HILOG_DEBUG("SetNamedProperty: %{public}s=%{public}d", name.c_str(), value);
             napi_status status;
-            napi_value napiValue;
+            napi_value napiValue = nullptr;
             status = napi_create_int32(env, value, &napiValue);
             if (status != napi_ok) {
                 HILOG_ERROR("SetNamedProperty: %{public}s=%{public}d failed.", name.c_str(), value);
@@ -76,7 +76,7 @@ namespace OHOS {
         {
             HILOG_DEBUG("SetNamedProperty: %{public}s=%{public}f", name.c_str(), value);
             napi_status status;
-            napi_value napiValue;
+            napi_value napiValue = nullptr;
             status = napi_create_double(env, value, &napiValue);
             if (status != napi_ok) {
                 HILOG_ERROR("SetNamedProperty: %{public}s=%{public}f failed.", name.c_str(), value);
@@ -89,7 +89,7 @@ namespace OHOS {
         {
             HILOG_DEBUG("SetNamedProperty: %{public}s=%{public}lf", name.c_str(), value);
             napi_status status;
-            napi_value napiValue;
+            napi_value napiValue = nullptr;
             status = napi_create_double(env, value, &napiValue);
             if (status != napi_ok) {
                 HILOG_ERROR("SetNamedProperty: %{public}s=%{public}lf failed.", name.c_str(), value);
@@ -102,7 +102,7 @@ namespace OHOS {
         {
             HILOG_DEBUG("SetNamedProperty: %{public}s=%{public}" PRId64 "", name.c_str(), value);
             napi_status status;
-            napi_value napiValue;
+            napi_value napiValue = nullptr;
             status = napi_create_int64(env, value, &napiValue);
             if (status != napi_ok) {
                 HILOG_ERROR("SetNamedProperty: %{public}s=%{public}" PRId64 " failed.", name.c_str(), value);
@@ -115,7 +115,7 @@ namespace OHOS {
         {
             HILOG_DEBUG("SetNamedProperty: %{public}s=%{public}s", name.c_str(), value.c_str());
             napi_status status;
-            napi_value napiValue;
+            napi_value napiValue = nullptr;
             status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &napiValue);
             if (status != napi_ok) {
                 HILOG_ERROR("SetNamedProperty: %{public}s=%{public}s failed.", name.c_str(), value.c_str());

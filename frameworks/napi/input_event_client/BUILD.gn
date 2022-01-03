@@ -19,7 +19,8 @@ config("libinputeventclient_config") {
 
   include_dirs = [
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/napi/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/napi/input_event_client/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/ace/napi",
     "//foundation/ace/napi/interfaces/kits/napi",
     "//third_party/node/src",
@@ -27,6 +28,8 @@ config("libinputeventclient_config") {
     "//utils/native/base/include",
     "//foundation/multimodalinput/input/common/include",
     "//foundation/multimodalinput/input/tools/event_inject/include",
+    "//third_party/libuv/include/",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
   ]
 
   cflags = [
@@ -68,6 +71,7 @@ ohos_shared_library("libinputeventclient") {
     "//third_party/wayland-ivi-extension:ivi-controller",
     "//third_party/wayland-ivi-extension:libscreen-info-module",
     "//utils/native/base:utils",
+    "//third_party/libuv:uv_static",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {

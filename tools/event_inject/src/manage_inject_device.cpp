@@ -60,8 +60,8 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
         }
     }
     if (devicePtr_ != nullptr) {
-        devicePtr_ = nullptr;
         delete devicePtr_;
+        devicePtr_ = nullptr;
     }
     MMI_LOGI("Leave TransformJsonData function.");
 

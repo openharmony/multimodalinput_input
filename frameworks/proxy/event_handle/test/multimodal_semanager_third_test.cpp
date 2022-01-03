@@ -13,17 +13,17 @@
  * limitations under the License.
  */
 
-#include <locale>
 #include <codecvt>
+#include <locale>
 #include <gtest/gtest.h>
-#include "string_ex.h"
-#include "proto.h"
-#include "util_ex.h"
 #include "define_multimodal.h"
-#include "net_packet.h"
-#include "multimodal_standardized_event_manager.h"
-#include "multimodal_event_handler.h"
 #include "mmi_token.h"
+#include "multimodal_event_handler.h"
+#include "multimodal_standardized_event_manager.h"
+#include "net_packet.h"
+#include "proto.h"
+#include "string_ex.h"
+#include "util_ex.h"
 
 namespace {
 using namespace testing::ext;
@@ -52,10 +52,10 @@ public:
     bool InsertMapEvent(MmiMessageId typeId, StandEventPtr standardizedEventHandle)
     {
         const int32_t windowId = 11;
-        struct StandEventCallBack StandEventInfo = {};
-        StandEventInfo.windowId = windowId;
-        StandEventInfo.eventCallBack = standardizedEventHandle;
-        mapEvents_.insert(std::make_pair(typeId, StandEventInfo));
+        struct StandEventCallBack standEventInfo = {};
+        standEventInfo.windowId = windowId;
+        standEventInfo.eventCallBack = standardizedEventHandle;
+        mapEvents_.insert(std::make_pair(typeId, standEventInfo));
         return true;
     }
 };
@@ -1333,7 +1333,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, InjectionVirtual, TestSize.Level1)
 HWTEST_F(MultimodalSemanagerThirdTest, InjectEvent, TestSize.Level1)
 {
     MultimodalEventFirstUnitTest multimodalTest;
-    KeyEvent keyEvent;
+    OHOS::KeyEvent keyEvent;
     int32_t retResult = multimodalTest.InjectEvent(keyEvent);
     EXPECT_TRUE(retResult == RET_OK);
 }

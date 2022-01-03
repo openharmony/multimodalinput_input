@@ -14,6 +14,9 @@
  */
 #ifndef OHOS_EVENT_PACKAGE_H
 #define OHOS_EVENT_PACKAGE_H
+#include "mouse_state_gesture.h"
+#include "pointer_event.h"
+#include "key_event.h"
 #include "window_switch.h"
 #include "input_windows_manager.h"
 #include "uds_server.h"
@@ -43,6 +46,11 @@ namespace OHOS::MMI {
             UDSServer& udsServer);
         int32_t PackageJoyStickKeyEvent(libinput_event& event, EventKeyboard& key, UDSServer& udsServer);
         int32_t PackageTabletPadKeyEvent(libinput_event& event, EventKeyboard& key, UDSServer& udsServer);
+        static int32_t PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key, UDSServer& udsServer);
+        static int32_t KeyboardToKeyEvent(EventKeyboard& key, std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr,
+            UDSServer& udsServer);
+        static std::shared_ptr<OHOS::MMI::PointerEvent> GestureToPointerEvent(EventGesture& gesture,
+           UDSServer& udsServer);
     private:
         uint32_t SEAT_BUTTON_OR_KEY_COUNT_ONE = 1;
         uint32_t SEAT_BUTTON_OR_KEY_COUNT_ZERO = 0;

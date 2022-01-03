@@ -12,9 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "rotation_event.h"
 
-namespace OHOS {    
+namespace OHOS {
 RotationEvent::~RotationEvent() {}
 void RotationEvent::Initialize(int32_t windowId, float rotationValue, int32_t highLevelEvent, const std::string& uuid,
                                int32_t sourceType, int32_t occurredTime, const std::string& deviceId,

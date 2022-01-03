@@ -26,7 +26,9 @@ OHOS::MMI::VirtualKnobConsumerCtrl::VirtualKnobConsumerCtrl() : VirtualDevice("V
     dev_.absflat[ABS_VOLUME] = 0;
 }
 
-static std::vector<uint32_t> virtualKey = {
+OHOS::MMI::VirtualKnobConsumerCtrl::~VirtualKnobConsumerCtrl() {}
+
+static std::vector<uint32_t> g_virtualKey = {
     1, 28, 74, 78, 103, 105, 106, 108, 113, 114, 115, 116, 119, 128, 130, 131, 133, 134, 135, 136, 137, 138, 139, 140,
     142, 144, 150, 152, 155, 156, 158, 159, 161, 163, 164, 165, 166, 167, 168, 169, 171, 172, 173, 174, 177, 178, 181,
     206, 207, 208, 209, 210, 212, 216, 217, 219, 224, 225, 228, 229, 230, 234, 235, 240, 241, 244, 256, 353, 354, 358,
@@ -45,8 +47,8 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKnobConsumerCtrl::GetEventTypes()
 
 const std::vector<uint32_t>& OHOS::MMI::VirtualKnobConsumerCtrl::GetKeys() const
 {
-    static const std::vector<uint32_t> keys(virtualKey.begin(),
-                                            virtualKey.end());
+    static const std::vector<uint32_t> keys(g_virtualKey.begin(),
+                                            g_virtualKey.end());
 
     return keys;
 }

@@ -12,8 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <gtest/gtest.h>
+
 #include "safe_keeper.h"
+#include <gtest/gtest.h>
 
 namespace {
 using namespace testing::ext;

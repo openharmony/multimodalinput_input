@@ -12,16 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "event_dump.h"
+#include <climits>
 #include <cstdarg>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include "util.h"
-#include "util_ex.h"
 #include "input_windows_manager.h"
 #include "register_event.h"
 #include "register_eventhandle_manager.h"
+#include "util.h"
+#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -115,7 +117,12 @@ void EventDump::TestDump()
     char szPath[MAX_PATH_SIZE] = {};
     CHK(sprintf_s(szPath, MAX_PATH_SIZE, "%s/mmidump-%s.txt", DEF_MMI_DATA_ROOT, Strftime("%y%m%d%H%M%S").c_str()) >= 0,
         SPRINTF_S_SEC_FUN_FAIL);
-    auto fd = open(szPath, O_WRONLY|O_CREAT|O_EXCL, S_IRUSR|S_IWUSR);
+    char path[PATH_MAX] = {};
+    if (realpath(szPath, path) == nullptr) {
+        MMI_LOGE("path is error, szPath = %{public}s", szPath);
+        return;
+    }
+    auto fd = open(path, O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
     CHK(fd >= 0, FILE_OPEN_FAIL);
     Dump(fd);
     close(fd);
@@ -139,7 +146,7 @@ void EventDump::InsertFormat(std::string str, ...)
     va_list args;
     va_start(args, str);
     char buf[MAX_STREAM_BUF_SIZE] = {};
-    if (vsnprintf_s(buf, MAX_STREAM_BUF_SIZE, MAX_STREAM_BUF_SIZE, str.c_str(), args) == -1) {
+    if (vsnprintf_s(buf, MAX_STREAM_BUF_SIZE, MAX_STREAM_BUF_SIZE - 1, str.c_str(), args) == -1) {
         MMI_LOGE("InsertDumpInfo vsnprintf_s error");
         va_end(args);
         return;

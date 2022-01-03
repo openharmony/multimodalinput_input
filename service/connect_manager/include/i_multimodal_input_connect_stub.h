@@ -34,6 +34,8 @@ public:
 
 protected:
     bool IsAuthorizedCalling() const;
+    int32_t GetCallingUid() const;
+    int32_t GetCallingPid() const;
     virtual int32_t HandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) = 0;
 
 private:

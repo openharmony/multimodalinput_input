@@ -17,11 +17,11 @@
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "string_ex.h"
 #include "log.h"
-#include "singleton.h"
-#include "system_ability.h"
 #include "multimodal_input_connect_def_parcel.h"
+#include "singleton.h"
+#include "string_ex.h"
+#include "system_ability.h"
 
 namespace OHOS {
 namespace MMI {
@@ -42,7 +42,9 @@ int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programN
     }
     toReturnClientFd = INVALID_SOCKET_FD;
     int serverFd = INVALID_SOCKET_FD;
-    const int32_t ret = udsServer_->AddSocketPairInfo(programName, moduleType, serverFd, toReturnClientFd);
+    int32_t uid = GetCallingUid();
+    int32_t pid = GetCallingPid();
+    const int32_t ret = udsServer_->AddSocketPairInfo(programName, moduleType, serverFd, toReturnClientFd, uid, pid);
     if (ret != RET_OK) {
         MMI_LOGE("call AddSocketPairInfo return %{public}d.", ret);
         return RET_ERR;
@@ -119,7 +121,7 @@ int32_t MultimodalInputConnectService::HandleAllocSocketFd(MessageParcel& data, 
         MMI_LOGE("permission denied");
         return RET_ERR;
     }
-
+    MMI_LOGT("SetUdsServer this %{public}p, IUdsServer %{public}p", this, udsServer_);
     if (udsServer_ == nullptr) {
         MMI_LOGE("udsServer_ is nullptr.");
         return RET_ERR;
@@ -149,6 +151,7 @@ int32_t MultimodalInputConnectService::HandleAllocSocketFd(MessageParcel& data, 
 void MultimodalInputConnectService::SetUdsServer(IUdsServer *server)
 {
     MMI_LOGT("enter");
+    MMI_LOGT("SetUdsServer this %{public}p, IUdsServer %{public}p", this, server);
     udsServer_ = server;
 }
 

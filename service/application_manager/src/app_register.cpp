@@ -154,6 +154,7 @@ int32_t AppRegister::QueryMapSurfaceNum()
 bool AppRegister::IsMultimodeInputReady(MmiMessageId idMsg, const int32_t findFd, uint64_t inputTime,
                                         uint64_t westonTime)
 {
+#if 0 // temp comment for test
     std::lock_guard<std::mutex> lock(mu_);
     auto serverTime = GetSysClockTime();
     WaitQueueEvent newEvent = {findFd, static_cast<int32_t>(idMsg), inputTime, westonTime, serverTime};
@@ -177,6 +178,7 @@ bool AppRegister::IsMultimodeInputReady(MmiMessageId idMsg, const int32_t findFd
         MMI_LOGT("IsMultimodeInputReady The Wait Queue is full! Clear it!");
     }
     waitQueue_.push_back(newEvent);
+#endif
     return true;
 }
 

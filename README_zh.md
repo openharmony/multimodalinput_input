@@ -31,9 +31,9 @@
 
 多模输入目前提供的接口为事件注入接口，该接口目前仅对系统应用开放。
 
--   inputEventClient是处理注入事件类。
+-   InJectEventHandler是处理注入事件类。
 
-    **表 1**  inputEventClient的主要接口
+    **表 1**  InJectEventHandler的主要接口
 
     <a name="t49c6a8df29a143a98ef6f66f43c7eac8"></a>
     <table><thead align="left"><tr id="rf815506c67654ad4ac014b339ee3292d"><th class="cellrowborder" valign="top" width="15.031503150315032%" id="mcps1.2.4.1.1"><p id="a59bc0498281e498289e11d5e584eb293"><a name="a59bc0498281e498289e11d5e584eb293"></a><a name="a59bc0498281e498289e11d5e584eb293"></a>功能分类</p>
@@ -46,7 +46,7 @@
     </thead>
     <tbody><tr id="ra7599f41f04548858a77e2062aad2cf5"><td class="cellrowborder" valign="top" width="15.031503150315032%" headers="mcps1.2.4.1.1 "><p id="a63ab1186072d4bcdb32d4e11b9243b57"><a name="a63ab1186072d4bcdb32d4e11b9243b57"></a><a name="a63ab1186072d4bcdb32d4e11b9243b57"></a>事件注入接口</p>
     </td>
-    <td class="cellrowborder" valign="top" width="23.152315231523154%" headers="mcps1.2.4.1.2 "><p id="a3d9b89df15074475a45ed26503e22c21"><a name="a3d9b89df15074475a45ed26503e22c21"></a><a name="a3d9b89df15074475a45ed26503e22c21"></a>function injectEvent(keyEvent: KeyEvent): number;</p>
+    <td class="cellrowborder" valign="top" width="23.152315231523154%" headers="mcps1.2.4.1.2 "><p id="a3d9b89df15074475a45ed26503e22c21"><a name="a3d9b89df15074475a45ed26503e22c21"></a><a name="a3d9b89df15074475a45ed26503e22c21"></a>function injectEventSync(keyEvent: KeyEvent): number;</p>
     </td>
     <td class="cellrowborder" valign="top" width="61.816181618161814%" headers="mcps1.2.4.1.3 "><p id="a33c82952289f40a09773ce2fed14f6aa"><a name="a33c82952289f40a09773ce2fed14f6aa"></a><a name="a33c82952289f40a09773ce2fed14f6aa"></a>注入按键事件的接口</p>
     </td>
@@ -63,10 +63,10 @@
 
 ```
 // 引入提供的js接口库
-import inputEventClient from '@ohos.multimodalInput.inputEventClient'
+import input from '@ohos.injectEventHandler'
 
 // 调用注入事件接口
-var res = inputEventClient.injectEvent({
+var res = input.injectEventSync({
     isPressed:true,           // 按键事件的按键类型：true：down false：up
     code:2,                   // 按键对应的keycode, 例如back键的值为2
     keyDownDuration:10,       // 按键按下到抬起的时长，单位ms
