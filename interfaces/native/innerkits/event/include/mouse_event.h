@@ -82,7 +82,7 @@ enum class MouseActionEnum: int32_t {
     */
     MMNONE_BUTTON = 7,
 };
-    
+
 enum MouseButtonEnum {
     /**
     * Indicates that the left button on the mouse is pressed.
@@ -277,7 +277,7 @@ public:
      * @since 1
      */
     virtual float GetScrollingDelta(int32_t axis) const;
-    
+
     virtual float GetAxisValue(int32_t axis) const;
 
 private:

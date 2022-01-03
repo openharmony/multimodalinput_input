@@ -47,7 +47,7 @@ namespace OHOS::MMI {
     int GetPid();
     std::string GetFileName(const std::string& strPath);
     const char* GetProgramName();
-    char* mmi_basename(char* path);
+    char* MmiBasename(char* path);
     std::string GetStackInfo();
     void SetThreadName(const std::string& name);
     const std::string& GetThreadName();

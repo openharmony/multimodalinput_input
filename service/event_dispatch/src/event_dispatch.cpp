@@ -15,10 +15,13 @@
 
 #include "event_dispatch.h"
 #include <inttypes.h>
-#include "util.h"
+#include "input_event_data_transformation.h"
+#include "input_event_monitor_manager.h"
+#include "input_handler_manager_global.h"
 #include "mmi_server.h"
-#include "system_event_handler.h"
 #include "outer_interface.h"
+#include "system_event_handler.h"
+#include "util.h"
 
 namespace OHOS::MMI {
     namespace {
@@ -427,10 +430,87 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, 
     return RET_OK;
 }
 
+int32_t OHOS::MMI::EventDispatch::handlePointerEvent(std::shared_ptr<PointerEvent> point) 
+{
+    MMI_LOGE("handlePointerEvent begin .....");
+    auto source = point->GetSourceType();
+    auto fd = WinMgr->UpdateTargetPointer(point);
+    if (fd <= 0) {
+        MMI_LOGE("the fd less than 0");
+        return RET_ERR;
+    }
+    switch (source) {
+        case PointerEvent::SOURCE_TYPE_MOUSE: {
+            HandleMouseEvent(point);
+            break;
+        }
+        case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
+            HandleTouchScreenEvent(point);
+            break;
+        }
+        case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
+            HandleTouchPadEvent(point);
+            break;
+        }
+        default: {
+            MMI_LOGD("Unknown source type!");
+            break;
+        }
+    }
+    NetPacket newPacket(MmiMessageId::ON_POINTER_EVENT);
+    InputEventDataTransformation::SerializePointerEvent(point, newPacket);
+    auto udsServer = InputHandler->GetUDSServer();
+    if (udsServer == nullptr) {
+        MMI_LOGE("udsServer is a nullptr");
+        return RET_ERR;
+    }
+    if (!udsServer->SendMsg(fd, newPacket)) {
+        MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d\n", MSG_SEND_FAIL);
+        return RET_ERR;
+    }
+    MMI_LOGE("handlePointerEvent end .....");
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::EventDispatch::HandleTouchScreenEvent(std::shared_ptr<PointerEvent> point)
+{
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::EventDispatch::HandleMouseEvent(std::shared_ptr<PointerEvent> point)
+{
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::EventDispatch::HandleTouchPadEvent(std::shared_ptr<PointerEvent> point)
+{
+    return RET_OK;
+}
+
+
+int32_t OHOS::MMI::EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
+    std::shared_ptr<PointerEvent> point)
+{
+    InputHandlerManagerGlobal::GetInstance().HandleEvent(point);
+    MMI_LOGD("call  DispatchTouchTransformPointEvent begin"); 
+    auto appInfo = AppRegs->FindByWinId(point->GetAgentWindowId()); // obtain application information
+    if (appInfo.fd == RET_ERR) {
+        MMI_LOGE("Failed to find fd... errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
+        return FOCUS_ID_OBTAIN_FAIL;
+    }
+    NetPacket newPacket(MmiMessageId::ON_POINTER_EVENT);
+    InputEventDataTransformation::SerializePointerEvent(point, newPacket);
+    if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
+        MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d\n", MSG_SEND_FAIL);
+        return MSG_SEND_FAIL;
+    }
+    MMI_LOGD("call  DispatchTouchTransformPointEvent end"); 
+    return RET_OK;
+}
+
 int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event &event,
     EventPointer &point, const uint64_t preHandlerTime, WindowSwitch& windowSwitch)
 {
-    auto type = libinput_event_get_type(&event);
     auto device = libinput_event_get_device(&event);
     CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
@@ -471,9 +551,9 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
 #endif  // OHOS_AUTO_TEST_FRAME
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, point.time, preHandlerTime)) {
-        struct KeyEventValueTransformations temp = {};
-        temp = KeyValueTransformationByInput(point.button);
-        point.button = temp.keyValueOfHos;
+        struct KeyEventValueTransformations KeyEventValue = {};
+        KeyEventValue = KeyValueTransformationByInput(point.button);
+        point.button = KeyEventValue.keyValueOfHos;
         NetPacket newPacket(MmiMessageId::ON_TOUCH);
         int32_t inputType = INPUT_DEVICE_CAP_POINTER;
         newPacket << inputType << inputEvent.curRventType << point << appInfo.abilityId
@@ -481,34 +561,31 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
         if (inputEvent.curRventType > 0) {
             newPacket << inputEvent;
         }
-        if (type != LIBINPUT_EVENT_POINTER_BUTTON) {
 #ifdef DEBUG_CODE_TEST
+    auto type = libinput_event_get_type(&event);
+    if (type != LIBINPUT_EVENT_POINTER_BUTTON) {
+        MMI_LOGT("\nMMIWMS:windowId=[%{public}s]\n", strIds.c_str());
+        if (desWindowId == -1) {
+            MMI_LOGT("\nWMS:windowId = ''\n");
+        } else {
+            MMI_LOGT("\nWMS:windowId = %{public}d\n", desWindowId);
+        }
+        MMI_LOGT("\nCALL_AMS:windowId = ''\n");
+        MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
+    } else {
+        if (size == windowCount_) {
+            MMI_LOGT("\nMMIWMS:windowId = [%{public}s]\n", strIds.c_str());
+            MMI_LOGT("\nWMS:windowId = %{public}d\n", desWindowId);
+            MMI_LOGT("\nCALL_AMS:windowId = %{public}d\n", desWindowId);
+            MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
+        } else {
             MMI_LOGT("\nMMIWMS:windowId=[%{public}s]\n", strIds.c_str());
-            if (desWindowId == -1) {
-                MMI_LOGT("\nWMS:windowId = ''\n");
-            } else {
-                MMI_LOGT("\nWMS:windowId = %{public}d\n", desWindowId);
-            }
+            MMI_LOGT("\nWMS:windowId = %{public}d\n", desWindowId);
             MMI_LOGT("\nCALL_AMS:windowId = ''\n");
             MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
-#endif
-        } else {
-            if (size == windowCount_) {
-#ifdef DEBUG_CODE_TEST
-                MMI_LOGT("\nMMIWMS:windowId = [%{public}s]\n", strIds.c_str());
-                MMI_LOGT("\nWMS:windowId = %{public}d\n", desWindowId);
-                MMI_LOGT("\nCALL_AMS:windowId = %{public}d\n", desWindowId);
-                MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
-#endif
-            } else {
-#ifdef DEBUG_CODE_TEST
-                MMI_LOGT("\nMMIWMS:windowId=[%{public}s]\n", strIds.c_str());
-                MMI_LOGT("\nWMS:windowId = %{public}d\n", desWindowId);
-                MMI_LOGT("\nCALL_AMS:windowId = ''\n");
-                MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
-#endif
-            }
         }
+    }
+#endif
 
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
         AutoTestCoordinate coordinate = { static_cast<double>(0), static_cast<double>(0), static_cast<double>(0),
@@ -569,7 +646,8 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
                 ret, REG_EVENT_DISP_FAIL);
         }
     }
-    int32_t focusId = WinMgr->GetFocusSurfaceId();
+
+    auto focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
         return RET_OK;
     }
@@ -652,7 +730,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
     int32_t touchFocusId = WinMgr->GetTouchFocusSurfaceId();
     auto appInfo = AppRegs->FindByWinId(touchFocusId); // obtain application information
     if (appInfo.fd == RET_ERR) {
-        MMI_LOGT("Failed to find fd:%{public}d... errCode:%{public}d", touchFocusId, FOCUS_ID_OBTAIN_FAIL);
+        MMI_LOGE("Failed to find fd:%{public}d... errCode:%{public}d", touchFocusId, FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
     }
     MMI_LOGD("DispatchTouchEvent focusId:%{public}d fd:%{public}d", touchFocusId, appInfo.fd);
@@ -715,7 +793,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
                 break;
             }
         }
-        auto retAutoTestMag = SendManagePktToAutoTest(udsServer, appInfo, WinMgr->GetTouchFocusSurfaceId(), {}, 
+        auto retAutoTestMag = SendManagePktToAutoTest(udsServer, appInfo, WinMgr->GetTouchFocusSurfaceId(), {},
             coordinate);
         if (retAutoTestMag != RET_OK) {
             MMI_LOGE("Send event to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
@@ -818,6 +896,57 @@ int32_t OHOS::MMI::EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer,
     return ret;
 }
 
+int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
+    std::shared_ptr<OHOS::MMI::KeyEvent> key, const uint64_t preHandlerTime)
+{
+    int32_t ret = RET_OK;
+    // int32_t ret = RET_OK;
+    // ret = KeyBoardRegisteredEventHandler(key, udsServer, event, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
+    // if (ret != RET_OK) {
+    //     MMI_LOGE("Special Registered Event dispatch failed return:%{public}d errCode:%{public}d", ret,
+    //         SPCL_REG_EVENT_DISP_FAIL);
+    // }
+    // MmiMessageId idMsg = MmiMessageId::INVALID;
+    // EventKeyboard prevKey = {};
+    // MMIRegEvent->OnEventKeyGetSign(key, idMsg, prevKey);
+
+    auto fd = WinMgr->UpdateTarget(key);
+    CHKR(fd > 0, FD_OBTAIN_FAIL, RET_ERR);
+#ifdef DEBUG_CODE_TEST
+    std::string str = WinMgr->GetSurfaceIdListString();
+    PrintWMSInfo(str, fd, 0, key->GetTargetWindowId());
+#endif
+
+    MMI_LOGT("\n4.event dispatcher of server:\nKeyEvent:,KeyCode = %{public}d,"
+             "ActionTime = %{public}d,Action = %{public}d,ActionStartTime = %{public}d,"
+             "EventType = %{public}d,Flag = %{public}d,"
+             "KeyAction = %{public}d,Fd = %{public}d,PreHandlerTime = %{public}" PRId64"\n",
+             key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
+             key->GetActionStartTime(),
+             key->GetEventType(),
+             key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
+
+    /*
+    if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, appInfo.fd, key.time)) {
+        NetPacket newPkt(MmiMessageId::ON_KEY);
+        newPkt << key << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
+        if (!udsServer.SendMsg(appInfo.fd, newPkt)) {
+            MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d\n", MSG_SEND_FAIL);
+            return MSG_SEND_FAIL;
+        }
+    }
+    */
+    IEMServiceManager.ReportKeyEvent(key);
+    NetPacket newPkt(MmiMessageId::ON_KEYEVENT);
+    InputEventDataTransformation::KeyEventToNetPacket(key, newPkt);
+    newPkt << fd << preHandlerTime;
+    if (!udsServer.SendMsg(fd, newPkt)) {
+        MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d\n", MSG_SEND_FAIL);
+        return MSG_SEND_FAIL;
+    }
+    return ret;
+}
+
 int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event& event,
     const KeyEventValueTransformations& trs, EventKeyboard& key, const uint64_t preHandlerTime)
 {
@@ -897,6 +1026,58 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
         }
     }
     return ret;
+}
+
+int32_t OHOS::MMI::EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_event& event,
+    std::shared_ptr<PointerEvent> pointerEvent, const uint64_t preHandlerTime)
+{
+    auto device = libinput_event_get_device(&event);
+    CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
+
+    auto focusId = WinMgr->GetFocusSurfaceId();
+    if (focusId < 0) {
+        return RET_OK;
+    }
+    auto appInfo = AppRegs->FindByWinId(focusId); // obtain application information
+    if (appInfo.fd == RET_ERR) {
+        MMI_LOGT("Failed to find fd... errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
+        return FOCUS_ID_OBTAIN_FAIL;
+    }
+
+    pointerEvent->SetTargetWindowId(focusId);
+
+    std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
+    MMI_LOGT("\npointer event dispatcher of server:\neventType=%{public}d,actionTime=%{public}d,"
+             "action=%{public}d,actionStartTime=%{public}d,"
+             "flag=%{public}d,pointerAction=%{public}d,"
+             "sourceType=%{public}d,Axis=%{public}d,AxisValue=%{public}.02f,"
+             "pointerCount=%{public}d",
+             pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
+             pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
+             pointerEvent->GetFlag(), pointerEvent->GetPointerAction(),
+             pointerEvent->GetSourceType(),
+             pointerEvent->GetAxis(), pointerEvent->GetAxisValue(), static_cast<int32_t>(pointerIds.size()));
+
+    for (int32_t pointerId : pointerIds) {
+        OHOS::MMI::PointerEvent::PointerItem item;
+        CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
+
+        MMI_LOGT("\n\tdownTime=%{public}d,isPressed=%{public}s,"
+                 "globalX=%{public}d,globalY=%{public}d,localX=%{public}d,localY=%{public}d,"
+                 "width=%{public}d,height=%{public}d,pressure=%{public}d",
+                 item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
+                 item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
+                 item.GetWidth(), item.GetHeight(), item.GetPressure());
+    }
+
+    NetPacket newPkt(MmiMessageId::ON_POINTER_EVENT);
+    InputEventDataTransformation::SerializePointerEvent(pointerEvent, newPkt);
+    newPkt << appInfo.fd << preHandlerTime;
+    if (!udsServer.SendMsg(appInfo.fd, newPkt)) {
+        MMI_LOGE("Sending structure of PointerEvent failed! errCode:%{public}d\n", MSG_SEND_FAIL);
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
 }
 
 // Auto-test frame code

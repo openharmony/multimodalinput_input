@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "mmi_server.h"
 #include "mmi_interface.h"
 

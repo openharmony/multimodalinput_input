@@ -12,29 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "virtual_touchpad.h"
 
 OHOS::MMI::VirtualTouchpad::VirtualTouchpad() : VirtualDevice("Virtual Touchpad",
     BUS_USB, 0x56a, 0x392)
 {
     const int ABS_MAX_WHEEL = 71;
-    
+
     dev_.absmin[ABS_X] = 0;
     dev_.absmax[ABS_X] = 1;
     dev_.absfuzz[ABS_X] = 0;
     dev_.absflat[ABS_X] = 0;
-    
+
     dev_.absmin[ABS_Y] = 0;
     dev_.absmax[ABS_Y] = 1;
     dev_.absfuzz[ABS_Y] = 0;
     dev_.absflat[ABS_Y] = 0;
-    
+
     dev_.absmin[ABS_WHEEL] = 0;
     dev_.absmax[ABS_WHEEL] = ABS_MAX_WHEEL;
     dev_.absfuzz[ABS_WHEEL] = 0;
     dev_.absflat[ABS_WHEEL] = 0;
-    
+
     dev_.absmin[ABS_MISC] = 0;
     dev_.absmax[ABS_MISC] = 0;
     dev_.absfuzz[ABS_MISC] = 0;
@@ -48,6 +48,8 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTouchpad::GetEventTypes() const
     };
     return evt_types;
 }
+
+OHOS::MMI::VirtualTouchpad::~VirtualTouchpad() {}
 
 const std::vector<uint32_t>& OHOS::MMI::VirtualTouchpad::GetKeys() const
 {

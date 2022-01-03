@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "virtual_device.h"
 
 int32_t main(int32_t argc, const char *argv[])
@@ -27,7 +28,7 @@ int32_t main(int32_t argc, const char *argv[])
     for (uint16_t i = 0; i < argc; i++) {
         argvList.push_back(argv[i]);
     }
-    String firstArgv = argvList[1];
+    std::string firstArgv = argvList[1];
 
     if (OHOS::MMI::VirtualDevice::FunctionalShunt(firstArgv, argvList)) {
         while (true) {

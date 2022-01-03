@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#include "multi_input_common.h"
-#include "js_register_util.h"
-#include "js_register_event.h"
-#include "js_register_handle.h"
 #include "js_register_module.h"
 #include <inttypes.h>
+#include "js_register_event.h"
+#include "js_register_handle.h"
+#include "js_register_util.h"
+#include "multi_input_common.h"
 
 namespace OHOS {
     namespace MMI {
@@ -98,7 +98,7 @@ namespace OHOS {
         static napi_value OnEvent(napi_env env, napi_callback_info info)
         {
             HILOG_DEBUG("OnEvent: enter");
-            napi_value result;
+            napi_value result = nullptr;
             napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result);
 
             static EventInfo event = {};
@@ -141,7 +141,7 @@ namespace OHOS {
         static napi_value OffEvent(napi_env env, napi_callback_info info)
         {
             HILOG_DEBUG("OffEvent: enter");
-            napi_value result;
+            napi_value result = nullptr;
             napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result);
 
             static EventInfo event = {};
@@ -187,7 +187,7 @@ namespace OHOS {
             size_t argc;
             napi_value argv[1] = { 0 };
             napi_valuetype tmpType = napi_undefined;
-            napi_value result;
+            napi_value result = nullptr;
             if (napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result) != napi_ok) {
                 HILOG_ERROR("UnitTest: call napi_create_int32 fail.");
                 return result;
@@ -203,10 +203,11 @@ namespace OHOS {
 
             bool isPressed = GetNamedPropertyBool(env, keyHandle, "isPressed");
             int32_t keyCode = GetNamedPropertyInt32(env, keyHandle, "keyCode");
+            bool isIntercepted = GetNamedPropertyBool(env, keyHandle, "isIntercepted");
             int32_t keyDownDuration = GetNamedPropertyInt32(env, keyHandle, "keyDownDuration");
 
-            KeyEvent injectEvent;
-            injectEvent.Initialize(0, isPressed, keyCode, keyDownDuration, 0, "", 0, 0, "", 0, false, 0);
+            OHOS::KeyEvent injectEvent;
+            injectEvent.Initialize(0, isPressed, keyCode, keyDownDuration, 0, "", 0, 0, "", 0, false, 0, isIntercepted);
             int32_t response = MMIEventHdl.InjectEvent(injectEvent);
             HILOG_INFO("InjectEvent: response=%{public}d", response);
 
@@ -224,7 +225,7 @@ namespace OHOS {
             HILOG_DEBUG("UnitTest: enter");
             size_t argc;
             napi_value argv[ARGC_UT_NUM] = { 0 };
-            napi_value result;
+            napi_value result = nullptr;
             if (napi_create_int32(env, ERROR_CODE, &result) != napi_ok) {
                 HILOG_ERROR("UnitTest: call napi_create_int32 fail.");
                 return result;
@@ -232,13 +233,13 @@ namespace OHOS {
             napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
             NAPI_ASSERT(env, argc == ARGC_UT_NUM, "UnitTest: paramater num error");
 
-            napi_valuetype eventWinIdType;
+            napi_valuetype eventWinIdType = napi_undefined;
             napi_typeof(env, argv[ARGV_FIRST], &eventWinIdType);
             NAPI_ASSERT(env, eventWinIdType == napi_number, "UnitTest: parameter1 is not napi_number");
             int32_t winId = 0;
             napi_get_value_int32(env, argv[ARGV_FIRST], &winId);
 
-            napi_valuetype eventObjType;
+            napi_valuetype eventObjType = napi_undefined;
             napi_typeof(env, argv[ARGV_SECOND], &eventObjType);
             NAPI_ASSERT(env, eventObjType == napi_object, "UnitTest: parameter2 is not napi_object");
 
@@ -271,20 +272,20 @@ namespace OHOS {
             HILOG_DEBUG("SetInjectFile: enter");
             size_t argc;
             napi_value argv[ARGC_UT_NUM] = { 0 };
-            napi_value result;
+            napi_value result = nullptr;
             if (napi_create_int32(env, ERROR_CODE, &result) != napi_ok) {
                 HILOG_ERROR("InjectCmd: call napi_create_int32 fail.");
                 return result;
             }
             napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
-            napi_valuetype eventWinIdType;
+            napi_valuetype eventWinIdType = napi_undefined;
             napi_typeof(env, argv[ARGV_FIRST], &eventWinIdType);
             NAPI_ASSERT(env, eventWinIdType == napi_number, "SetInjectFile: parameter1 is not napi_number");
             int32_t winId = 0;
             napi_get_value_int32(env, argv[ARGV_FIRST], &winId);
 
-            napi_valuetype eventObjType;
+            napi_valuetype eventObjType = napi_undefined;
             napi_typeof(env, argv[ARGV_SECOND], &eventObjType);
             NAPI_ASSERT(env, eventObjType == napi_object, "SetInjectFile: parameter2 is not napi_object");
 

@@ -23,8 +23,8 @@ config("module_test_config") {
 group("moduletest") {
   testonly = true
   deps = [
-    "api_test:api-test",
-    "dump_test:dump-test",
-    "sdk_test:sdk-test",
+    #"api_test:api-test",
+    #"dump_test:dump-test",
+    #"sdk_test:sdk-test",
   ]
 }

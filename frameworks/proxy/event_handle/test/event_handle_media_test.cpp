@@ -13,17 +13,17 @@
  * limitations under the License.
  */
 
+#include "media_event_handler.h"
 #include <locale>
 #include <codecvt>
 #include <gtest/gtest.h>
-#include "string_ex.h"
-#include "proto.h"
-#include "util_ex.h"
-#include "log.h"
 #include "error_multimodal.h"
-#include "multimodal_event_handler.h"
-#include "media_event_handler.h"
+#include "log.h"
 #include "mmi_token.h"
+#include "multimodal_event_handler.h"
+#include "proto.h"
+#include "string_ex.h"
+#include "util_ex.h"
 
 namespace {
 using namespace testing::ext;
@@ -78,9 +78,7 @@ HWTEST_F(EventHandleMediaTest, RegisterStandardizedEventHandle_tmp_err002, TestS
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
     auto mediaHandleTmp = StandardizedEventHandler::Create<MediaEventHandleUnitTest>();
-
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId,
-                                                 mediaHandleTmp);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, mediaHandleTmp);
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
         iRemote, g_surFaceId, mediaHandleTmp);
     EXPECT_EQ(MMI_STANDARD_EVENT_EXIST, regResult);

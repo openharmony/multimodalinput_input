@@ -12,12 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "mmi_client.h"
-#include "util.h"
 #include "log.h"
-#include "proto.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "proto.h"
+#include "util.h"
 
 namespace OHOS::MMI {
     namespace {

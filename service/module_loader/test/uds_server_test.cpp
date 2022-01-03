@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include "uds_server.h"
+#include <gtest/gtest.h>
 #include "proto.h"
 
 namespace {

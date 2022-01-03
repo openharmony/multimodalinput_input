@@ -12,12 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "mmi_server.h"
 #include <inttypes.h>
-#include "util.h"
-#include "log.h"
 #include "event_dump.h"
+#include "log.h"
 #include "multimodal_input_connect_service.h"
+#include "util.h"
 
 namespace OHOS::MMI {
     namespace {
@@ -36,7 +37,7 @@ void CheckDefineOutput(const char* fmt, Ts... args)
     int32_t ret = 0;
 
     char buf[MAX_STREAM_BUF_SIZE] = {};
-    ret = snprintf_s(buf, MAX_STREAM_BUF_SIZE, MAX_STREAM_BUF_SIZE, fmt, args...);
+    ret = snprintf_s(buf, MAX_STREAM_BUF_SIZE, MAX_STREAM_BUF_SIZE - 1, fmt, args...);
     if (ret < 0) {
         KMSG_LOGI("call snprintf_s fail.ret = %d", ret);
         return;
@@ -177,7 +178,6 @@ int32_t OHOS::MMI::MMIServer::InitLibinput()
             return LIBINPUT_INIT_FAIL;
         }
         MMI_LOGD("libinput start");
-        CHKR(input_.Start(), LIBINPUT_START_FAIL, LIBINPUT_START_FAIL);
     #endif
 #endif
     return RET_OK;
@@ -195,7 +195,7 @@ void OHOS::MMI::MMIServer::StopAll()
     if (ret != RET_OK) {
         MMI_LOGE("call SaConnectServiceStop fail, ret = %{public}d.", ret);
     }
-    Stop();
+    UdsStop();
     RegEventHM->Clear();
     InputHandler->Clear();
 #ifndef OHOS_WESTEN_MODEL
