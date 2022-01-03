@@ -30,12 +30,13 @@ int32_t main(int32_t argc, const char *argv[])
 #endif
     const int sleepTime = 10 * 60;
     auto service = OHOS::DelayedSingleton<MMIService>::GetInstance();
+    service->OnStart();
     while (1) {
-        service->OnStart();
         std::this_thread::sleep_for(std::chrono::seconds(sleepTime));
-        service->OnStop();
-        service->OnDump();
+        
     }
+    service->OnStop();
+    service->OnDump();
 
     MMI_LOGD("hosmmi-service stopping... argc:%{public}d, argv:%{public}s", argc, argv[0]);
     return RET_OK;
