@@ -105,8 +105,6 @@ void OnThread()
 #else
         std::this_thread::sleep_for(std::chrono::seconds(1));
 #endif
-
-
         if (!g_isRun) {
             break;
         }
