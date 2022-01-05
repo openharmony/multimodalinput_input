@@ -17,7 +17,7 @@
     <systemability>
         <name>3101</name> <!-- Declare MMIService SytemAbilityID-->
         <libpath>libmmi-server.z.so</libpath>
-        <run-on-create>false</run-on-create>
+        <run-on-create>true</run-on-create>
         <distributed>false</distributed>
         <dump-level>1</dump-level>
     </systemability>
