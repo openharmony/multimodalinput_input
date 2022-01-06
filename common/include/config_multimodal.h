@@ -46,7 +46,7 @@
 #define MAX_SESSON_ALARM 300                // Client quantity warning value
 #define MAX_EVENT_SIZE 100                  // Epoll create maximum event size
 #define MAX_STREAM_BUF_SIZE (1024*10)       // Maximum buffer size of socket stream
-#define MAX_PACKET_BUF_SIZE 1024            // Maximum buffer size of network packets
+#define MAX_PACKET_BUF_SIZE (1024*10)            // Maximum buffer size of network packets
 #define DEFINE_EPOLL_TIMEOUT 1000           // Default epoll write timeout
 
 #define CLIENT_RECONNECT_COOLING_TIME 800   // Client reconnection cooldown
