@@ -139,7 +139,7 @@ HWTEST_F(ManipulationEventTest, GetPointerCount_002, TestSize.Level1)
 HWTEST_F(ManipulationEventTest, GetPointerId_001, TestSize.Level1)
 {
     int32_t retResult = maniPulationEvent.GetPointerId(0);
-    EXPECT_EQ(retResult, 0;
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(ManipulationEventTest, GetPointerId_002, TestSize.Level1)
