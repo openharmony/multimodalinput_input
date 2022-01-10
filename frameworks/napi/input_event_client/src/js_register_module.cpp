@@ -184,7 +184,7 @@ namespace OHOS {
         static napi_value InjectEvent(napi_env env, napi_callback_info info)
         {
             HILOG_DEBUG("InjectEvent: enter");
-            size_t argc;
+            size_t argc = 1;
             napi_value argv[1] = { 0 };
             napi_valuetype tmpType = napi_undefined;
             napi_value result = nullptr;
@@ -193,7 +193,10 @@ namespace OHOS {
                 return result;
             }
 
-            napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+            if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
+                HILOG_ERROR("call napi_get_cb_info fail.");
+                return result;
+            }
             NAPI_ASSERT(env, argc == 1, "InjectEvent: paramater num error");
 
             napi_value keyHandle = nullptr;
