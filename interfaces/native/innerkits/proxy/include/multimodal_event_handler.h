@@ -57,6 +57,10 @@ public:
     int32_t GetDeviceIds(int32_t taskId);    
     int32_t AddInputEventMontior(int32_t keyEventType);
     void RemoveInputEventMontior(int32_t keyEventType);
+    int32_t AddInputEventTouchpadMontior(int32_t pointerEventType);
+    void RemoveInputEventTouchpadMontior(int32_t pointerEventType);
+    int32_t AddInterceptor(int32_t sourceType, int32_t id);
+    int32_t RemoveInterceptor(int32_t id);
 
 /**
 * Default constructor used to create a {@code MultimodalEventHandler} instance.

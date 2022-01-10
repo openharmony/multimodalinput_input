@@ -14,6 +14,7 @@
  */
 #ifndef OHOS_INPUT_EVENT_HANDLER_H
 #define OHOS_INPUT_EVENT_HANDLER_H
+#include "key_event_input_subscribe_filter.h"
 #include "msg_handler.h"
 #include "event_dispatch.h"
 #include "event_package.h"
@@ -39,7 +40,9 @@ protected:
     int32_t OnEventPointer(multimodal_libinput_event& event);
     int32_t OnEventTouch(multimodal_libinput_event& event);
     int32_t OnEventTouchSecond(libinput_event& event);
+    int32_t OnEventTouchPadSecond(libinput_event& event);
     int32_t OnEventGesture(multimodal_libinput_event& event);
+    int32_t OnEventTouchpad(multimodal_libinput_event& event);
     int32_t OnGestureEvent(libinput_event& event);
     int32_t OnEventTabletTool(multimodal_libinput_event& event);
     int32_t OnEventTabletPad(multimodal_libinput_event& event);
