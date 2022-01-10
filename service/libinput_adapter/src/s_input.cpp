@@ -171,12 +171,12 @@ bool OHOS::MMI::SInput::HandlePowerKey(struct libinput_event *event)
         return (screenState_ == 0);
     }
 
-    uint32_t KEY_POWER = 116;
+    uint32_t keyPowerCodeValue = 116;
     struct libinput_event_keyboard *keyboardEvent = libinput_event_get_keyboard_event(event);
     uint32_t keyCode = libinput_event_keyboard_get_key(keyboardEvent);
     uint32_t keyAction = libinput_event_keyboard_get_key_state(keyboardEvent);
 
-    if ((keyCode != KEY_POWER) || keyAction != LIBINPUT_KEY_STATE_RELEASED) {
+    if ((keyCode != keyPowerCodeValue) || keyAction != LIBINPUT_KEY_STATE_RELEASED) {
         return false;
     }
     MMI_LOGI("power key handle key %{public}u, %{public}u", keyCode, keyAction);
