@@ -184,19 +184,16 @@ namespace OHOS {
         static napi_value InjectEvent(napi_env env, napi_callback_info info)
         {
             HILOG_DEBUG("InjectEvent: enter");
-            size_t argc = 1;
+            size_t argc;
             napi_value argv[1] = { 0 };
             napi_valuetype tmpType = napi_undefined;
             napi_value result = nullptr;
             if (napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result) != napi_ok) {
-                HILOG_ERROR("call napi_create_int32 fail.");
+                HILOG_ERROR("UnitTest: call napi_create_int32 fail.");
                 return result;
             }
 
-            if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
-                HILOG_ERROR("call napi_get_cb_info fail.");
-                return result;
-            }
+            napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
             NAPI_ASSERT(env, argc == 1, "InjectEvent: paramater num error");
 
             napi_value keyHandle = nullptr;
