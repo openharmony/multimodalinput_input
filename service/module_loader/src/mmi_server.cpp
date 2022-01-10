@@ -129,7 +129,7 @@ int32_t OHOS::MMI::MMIServer::Start()
     uint64_t curTime = OHOS::MMI::GetMillisTime();
     uint64_t consumeTime = curTime - GetMmiServerStartTime();
     MMI_LOGW("The server started successfully, the time consumed was %{public}" PRId64
-             " Ms curTime:%{public}" PRId64 "", consumeTime, curTime);
+            " Ms curTime:%{public}" PRId64 "", consumeTime, curTime);
 #endif
     return RET_OK;
 }

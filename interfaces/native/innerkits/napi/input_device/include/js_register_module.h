@@ -19,7 +19,6 @@
 #include <list>
 #include <string.h>
 #include <iostream>
-#include "input_manager.h"
 #include "libmmi_util.h"
 #include "native_api.h"
 #include "native_node_api.h"

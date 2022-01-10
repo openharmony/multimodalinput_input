@@ -20,6 +20,7 @@
 #include "mmi_server.h"
 #include "util.h"
 #include "util_ex.h"
+#include "pointer_drawing_manager.h"
 
 namespace OHOS::MMI {
 namespace {
@@ -156,7 +157,6 @@ int32_t OHOS::MMI::InputWindowsManager::GetTouchFocusSurfaceId() const
 
 void OHOS::MMI::InputWindowsManager::SetFocusId(int32_t id)
 {
-    MMI_LOGD("SetFocusId old:%{public}d new:%{public}d", focusInfoID_, id);
     focusInfoID_ = id;
 }
 
@@ -539,8 +539,12 @@ void OHOS::MMI::InputWindowsManager::UpdateDisplayInfo(const std::vector<Physica
             windowInfos_.insert(std::pair<int32_t, WindowInfo>(myWindow.id, myWindow));
         }
     }
+    if (logicalDisplays.size() > 0) {
+#ifdef OHOS_MOUSE_READY
+        DrawWgr->TellDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
+#endif
+    }
     PrintDisplayDebugInfo();
-    MMI_LOGD("UpdateDisplayInfo.... logicalDisplays_is empty address is %{public}p", &logicalDisplays_);
     MMI_LOGD("InputWindowsManager::UpdateDisplayInfo leave");
 }
 
@@ -775,17 +779,62 @@ bool OHOS::MMI::InputWindowsManager::GetLogicalDisplayById(int32_t displayId, Lo
     return false;
 }
 
-int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTargetOld(std::shared_ptr<PointerEvent> pointerEvent) 
+void OHOS::MMI::InputWindowsManager::AdjustCoordinate(double &coordinateX, double &coordinateY)
+{
+    if (coordinateX < 0) {
+        coordinateX = 0;
+    }
+
+    if (coordinateY < 0) {
+        coordinateY = 0;
+    }
+
+    if (logicalDisplays_.size() == 0) {
+        return;
+    }
+
+    if (coordinateX > logicalDisplays_[0].width) {
+        coordinateX = logicalDisplays_[0].width;
+    }
+    if (coordinateY > logicalDisplays_[0].height) {
+        coordinateY = logicalDisplays_[0].height;
+    }
+}
+
+void OHOS::MMI::InputWindowsManager::FixCursorPosition(int32_t &globalX, int32_t &globalY, int cursorW, int cursorH)
+{
+    if (globalX < 0) {
+        globalX = 0;
+    }
+
+    if (globalY < 0) {
+        globalY = 0;
+    }
+
+    if (logicalDisplays_.size() == 0) {
+        return;
+    }
+
+    if ((globalX + cursorW) > logicalDisplays_[0].width ) {
+        globalX = logicalDisplays_[0].width - cursorW;
+    }
+
+    if ((globalY + cursorH) > logicalDisplays_[0].height ) {
+        globalY = logicalDisplays_[0].height - cursorH;
+    }
+}
+
+int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
 {
     return -1;
 }
 
-int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent) 
+int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGE("UpdateMouseTarget begin ...");
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!CheckDisplayIdIfExist(displayId)) {
-        MMI_LOGE("this displayId is not exist");
+        MMI_LOGE("this displayId:%{public}d is not exist", displayId);
         return RET_ERR;
     }
     pointerEvent->SetTargetDisplayId(displayId);
@@ -803,9 +852,10 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     }
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
-    ReviseGlobalCoordinate(globalX, globalY, logicalDisplayInfo.width, logicalDisplayInfo.height);
-    pointerItem.SetGlobalX(globalX);
-    pointerItem.SetGlobalY(globalY);
+    FixCursorPosition(globalX, globalY, IMAGE_SIZE, IMAGE_SIZE);
+#ifdef OHOS_MOUSE_READY
+    DrawWgr->DrawPointer(displayId, globalX, globalY);
+#endif
     WindowInfo *focusWindos = nullptr;
     for (auto it : logicalDisplayInfo.windowsInfo_) {
         if (isTouchWindow(globalX, globalY, it)) {
@@ -819,24 +869,18 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     }
     pointerEvent->SetTargetWindowId(focusWindos->id);
     pointerEvent->SetAgentWindowId(focusWindos->agentWindowId);
-    int32_t localX = globalX - focusWindos->topLeftX;
-    int32_t localY = globalY - focusWindos->topLeftY;
-    pointerItem.SetLocalX(localX);
-    pointerItem.SetLocalY(localY);
-    pointerEvent->RemovePointerItem(pointerId);
-    pointerEvent->AddPointerItem(pointerItem);
     auto fd = udsServer_->GetFdByPid(focusWindos->pid);
     MMI_LOGD("the pid is :%{public}d, the fd is :%{public}d, the globalX is : %{public}d, the globalY is : %{public}d,the localX is : %{public}d, the localY is : %{public}d",
-            focusWindos->pid, fd, globalX, globalY, localX, localY);
+             focusWindos->pid, fd, globalX, globalY, pointerItem.GetLocalX(), pointerItem.GetLocalY());
     return fd;
 }
 
-int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTargetOld(std::shared_ptr<PointerEvent> pointerEvent) 
+int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
 {
     return -1;
 }
 
-int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent) 
+int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!CheckDisplayIdIfExist(displayId)) {
@@ -881,7 +925,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
         MMI_LOGE("touchWindow is nullptr");
         return -1;
     }
-    
+
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
     int32_t localX = globalX - touchWindow->topLeftX;
@@ -898,19 +942,19 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
     return fd;
 }
 
-int32_t OHOS::MMI::InputWindowsManager::UpdateTouchPadTargetOld(std::shared_ptr<PointerEvent> pointerEvent) 
+int32_t OHOS::MMI::InputWindowsManager::UpdateTouchPadTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("touchPad event is dropped");
     return -1;
 }
 
-int32_t OHOS::MMI::InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent) 
+int32_t OHOS::MMI::InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("touchPad event is dropped");
     return -1;
 }
 
-int32_t OHOS::MMI::InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent) 
+int32_t OHOS::MMI::InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGE("UpdateMouseTarget begin ...");
     auto source = pointerEvent->GetSourceType();
@@ -975,58 +1019,116 @@ bool OHOS::MMI::InputWindowsManager::FindWindow(std::shared_ptr<PointerEvent> po
     return false;
 }
 
-void OHOS::MMI::InputWindowsManager::SetMouseInfo(double x, double y)
+void OHOS::MMI::InputWindowsManager::SetMouseInfo(double& x, double& y)
 {
     int32_t integerX = static_cast<int32_t>(x);
     int32_t integerY = static_cast<int32_t>(y);
+    MMI_LOGI("Mosue Input x = %{public}d, Mouse Input y = %{public}d", integerX, integerY);
     const std::vector<struct LogicalDisplayInfo> logicalDisplayInfo = GetLogicalDisplayInfo();
+    bool isOutsideOfTopLeftX = false;
+    bool isOutsideOfTopLeftY = false;
+    bool isOutsideOfTopRightX = false;
+    bool isOutsideOfTopRightY = false;
 
-    for (int32_t i = 0; i < logicalDisplayInfo.size(); i++) {
-        if (logicalDisplayInfo[i].id != 0) {
-            if (integerX < logicalDisplayInfo[i].topLeftX) {
-                mouseInfo_.globleX = logicalDisplayInfo[i].topLeftX;
-            } else if (integerX > (logicalDisplayInfo[i].topLeftX + logicalDisplayInfo[i].width)) {
-                mouseInfo_.globleX = logicalDisplayInfo[i].topLeftX + logicalDisplayInfo[i].width;
-            } else if (integerY < logicalDisplayInfo[i].topLeftY) {
-                mouseInfo_.globleY = logicalDisplayInfo[i].topLeftY;
-            } else if (integerY > (logicalDisplayInfo[i].topLeftY + logicalDisplayInfo[i].height)) {
-                mouseInfo_.globleY = logicalDisplayInfo[i].topLeftX + logicalDisplayInfo[i].height;
-            } else {
-                SetLocalInfo(integerX, integerY);
-                if ((mouseInfo_.localX == integerX) || (mouseInfo_.localY == integerY)) {
-                    break;
+    if (logicalDisplayInfo.empty()) {
+        MMI_LOGI("logicalDisplayInfo is empty!");
+    } else {
+        for (uint32_t i = 0; i < logicalDisplayInfo.size(); i++) {
+            if (logicalDisplayInfo[i].id >= 0) {
+                if (integerX < logicalDisplayInfo[i].topLeftX) {
+                    mouseInfo_.globleX = logicalDisplayInfo[i].topLeftX;
+                    mouseInfo_.localX = INVALID_LOCATION;
+                    x = logicalDisplayInfo[i].topLeftX;
+                    isOutsideOfTopLeftX = true;
                 } else {
+                    isOutsideOfTopLeftX = false;
+                }
+                if (integerX > (logicalDisplayInfo[i].topLeftX + logicalDisplayInfo[i].width)) {
+                    mouseInfo_.globleX = logicalDisplayInfo[i].topLeftX + logicalDisplayInfo[i].width;
+                    mouseInfo_.localX = INVALID_LOCATION;
+                    x = logicalDisplayInfo[i].topLeftX + logicalDisplayInfo[i].width;
+                    isOutsideOfTopRightX = true;
+                } else {
+                    isOutsideOfTopRightX = false;
+                }
+                if (integerY < logicalDisplayInfo[i].topLeftY) {
+                    mouseInfo_.globleY = logicalDisplayInfo[i].topLeftY;
+                    mouseInfo_.localY = INVALID_LOCATION;
+                    y = logicalDisplayInfo[i].topLeftY;
+                    isOutsideOfTopLeftY = true;
+                } else {
+                    isOutsideOfTopLeftY = false;
+                }
+                if (integerY > (logicalDisplayInfo[i].topLeftY + logicalDisplayInfo[i].height)) {
+                    mouseInfo_.globleY = logicalDisplayInfo[i].topLeftY + logicalDisplayInfo[i].height;
+                    mouseInfo_.localY = INVALID_LOCATION;
+                    y = logicalDisplayInfo[i].topLeftY + logicalDisplayInfo[i].height;
+                    isOutsideOfTopRightY = true;
+                } else {
+                    isOutsideOfTopRightY = false;
+                }
+                if ((isOutsideOfTopLeftX != true) && (isOutsideOfTopLeftY != true) &&
+                    (isOutsideOfTopRightX != true) && (isOutsideOfTopRightY != true)) {
                     mouseInfo_.globleX = x;
                     mouseInfo_.globleY = y;
+                    SetLocalInfo(integerX, integerY);
+                    break;
                 }
+            } else {
+                mouseInfo_.globleX = INVALID_LOCATION;
+                mouseInfo_.globleY = INVALID_LOCATION;
+                mouseInfo_.localX = INVALID_LOCATION;
+                mouseInfo_.localY = INVALID_LOCATION;
             }
-        } else {
-            mouseInfo_.globleX = INVALID_LOCATION;
-            mouseInfo_.globleY = INVALID_LOCATION;
-            mouseInfo_.localX = INVALID_LOCATION;
-            mouseInfo_.localY = INVALID_LOCATION;
         }
     }
+    MMI_LOGI("Mouse Data is : globleX = %{public}d, globleY = %{public}d, localX = %{public}d, localY = %{public}d",
+        mouseInfo_.globleX, mouseInfo_.globleY, mouseInfo_.localX, mouseInfo_.localY);
 }
 
 void OHOS::MMI::InputWindowsManager::SetLocalInfo(int32_t x, int32_t y)
 {
     const CLMAP<int32_t, struct WindowInfo> windowInfo = GetWindowInfo();
+    bool isOutsideOfTopLeftX = false;
+    bool isOutsideOfTopLeftY = false;
+    bool isOutsideOfTopRightX = false;
+    bool isOutsideOfTopRightY = false;
 
-    for (auto it = windowInfo.begin(); it != windowInfo.end(); it++) {
-        if (it->second.agentWindowId != 0) {
-            if (x > it->second.topLeftX) {
-                mouseInfo_.localX = INVALID_LOCATION;
-            } else if (x > (it->second.topLeftX + it->second.width)) {
-                mouseInfo_.localX = INVALID_LOCATION;
-            } else if (y > it->second.topLeftY) {
-                mouseInfo_.localY = INVALID_LOCATION;
-            } else if (y > (it->second.topLeftY + it->second.height)) {
-                mouseInfo_.localY = INVALID_LOCATION;
-            } else {
-                mouseInfo_.localX = x;
-                mouseInfo_.localY = y;
-                break;
+    if (windowInfo.empty()) {
+        MMI_LOGI("windowInfo is empty!");
+    } else {
+        for (auto it = windowInfo.begin(); it != windowInfo.end(); it++) {
+            if (it->second.agentWindowId >= 0) {
+                if (x < it->second.topLeftX) {
+                    mouseInfo_.localX = INVALID_LOCATION;
+                    isOutsideOfTopLeftX = true;
+                } else {
+                    isOutsideOfTopLeftX = false;
+                }
+                if (x > (it->second.topLeftX + it->second.width)) {
+                    mouseInfo_.localX = INVALID_LOCATION;
+                    isOutsideOfTopLeftY = true;
+                } else {
+                    isOutsideOfTopLeftY = false;
+                }
+                if (y < it->second.topLeftY) {
+                    mouseInfo_.localY = INVALID_LOCATION;
+                    isOutsideOfTopRightX = true;
+                } else {
+                    isOutsideOfTopRightX = false;
+                }
+                if (y > (it->second.topLeftY + it->second.height)) {
+                    mouseInfo_.localY = INVALID_LOCATION;
+                    isOutsideOfTopRightY = true;
+                } else {
+                    isOutsideOfTopRightY = false;
+                }
+                if ((isOutsideOfTopLeftX != true) && (isOutsideOfTopLeftY != true) &&
+                    (isOutsideOfTopRightX != true) && (isOutsideOfTopRightY != true)) {
+                    mouseInfo_.localX = x - it->second.topLeftX;
+                    mouseInfo_.localY = y - it->second.topLeftY;
+                    break;
+                }
             }
         }
     }

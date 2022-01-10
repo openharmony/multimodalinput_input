@@ -31,22 +31,22 @@ public:
     void OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent);
 
 public:
-    static const size_t MAX_N_HANDLERS;
     static const int32_t MIN_HANDLER_ID;
+    static const int32_t INVALID_HANDLER_ID;
 
 private:
     struct InputHandler {
-        int32_t id_;
+        int32_t handlerId_;
         InputHandlerType handlerType_;
         std::shared_ptr<IInputEventConsumer> consumer_;
     };
 
 private:
     int32_t TakeNextId();
-    void AddLocal(int32_t id, InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> monitor);
-    void AddToServer(int32_t id, InputHandlerType handlerType);
-    void RemoveLocal(int32_t id, InputHandlerType handlerType);
-    void RemoveFromServer(int32_t id, InputHandlerType handlerType);
+    int32_t AddLocal(int32_t handlerId, InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> monitor);
+    void AddToServer(int32_t handlerId, InputHandlerType handlerType);
+    int32_t RemoveLocal(int32_t handlerId, InputHandlerType handlerType);
+    void RemoveFromServer(int32_t handlerId, InputHandlerType handlerType);
 
 private:
     std::mutex lockHandlers_;

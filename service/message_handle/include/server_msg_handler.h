@@ -14,6 +14,7 @@
  */
 #ifndef OHOS_SERVER_MSG_HANDLER_H
 #define OHOS_SERVER_MSG_HANDLER_H
+#include "key_event_input_subscribe_filter.h"
 #include "msg_handler.h"
 #include "event_dispatch.h"
 #include "senior_input_func_proc_base.h"
@@ -63,6 +64,12 @@ protected:
     int32_t OnGetDeviceIdList(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveInputEventMontior(SessionPtr sess, NetPacket& pkt);
+    int32_t OnAddInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt);
+    int32_t OnRemoveInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt);
+    int32_t OnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
+    int32_t OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
+    int32_t OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
+    int32_t OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_AUTO_TEST_FRAME
     int32_t AutoTestFrameRegister(SessionPtr sess, NetPacket& pkt);
     int32_t AutoTestReceiveClientPkt(SessionPtr sess, NetPacket& pkt);

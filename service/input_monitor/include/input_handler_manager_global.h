@@ -28,7 +28,7 @@ class InputHandlerManagerGlobal : public Singleton<OHOS::MMI::InputHandlerManage
 public:
     int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
-    void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session);
+    void MarkConsumed(int32_t handlerId, SessionPtr session);
     bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
     bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent);
 
@@ -40,7 +40,10 @@ private:
         void SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const;
         bool operator<(const SessionMonitor& other) const
         {
-            return ((id_ < other.id_) && (session_ < other.session_));
+            if (id_ != other.id_) {
+                return (id_ < other.id_);
+            }
+            return (session_ < other.session_);
         }
         int32_t id_;
         SessionPtr session_;
@@ -52,17 +55,21 @@ private:
 
         int32_t AddMonitor(const SessionMonitor& mon);
         void RemoveMonitor(const SessionMonitor& mon);
-        void MarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr session);
+        void MarkConsumed(int32_t monitorId, SessionPtr session);
+
+        bool HasMonitor(int32_t monitorId, SessionPtr session);
+        void UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent);
+        void Monitor(std::shared_ptr<PointerEvent> pointerEvent);
 
         void SendToSession(SessionPtr session, int32_t handleId, std::shared_ptr<KeyEvent> keyEvent);
         void SendToSession(SessionPtr session, int32_t handleId, std::shared_ptr<PointerEvent> pointerEvent);
 
+        std::mutex lockMonitors_;
         std::set<SessionMonitor> monitors_;
         std::shared_ptr<PointerEvent> downEvent_;
-        std::shared_ptr<PointerEvent> pointerEvent_;
+        std::shared_ptr<PointerEvent> lastPointerEvent_;
 
         bool monitorConsumed_ { false };
-        const size_t MAX_N_MONITORS { 64 };
     };
 private:
     MonitorCollection monitors_;

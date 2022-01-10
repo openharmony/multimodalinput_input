@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 #include "client_msg_handler.h"
-#include <iostream>
 #include <inttypes.h>
+#include <iostream>
 #include "mmi_func_callback.h"
 #include "auto_test_multimodal.h"
 #include "event_factory.h"
@@ -25,6 +25,7 @@
 #include "input_handler_manager.h"
 #include "input_manager_impl.h"
 #include "input_monitor_manager.h"
+#include "interceptor_manager.h"
 #include "keyboard_event.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
@@ -53,9 +54,12 @@ bool OHOS::MMI::ClientMsgHandler::Init()
     MsgCallback funs[] = {
         {MmiMessageId::ON_KEY, MsgCallbackBind2(&ClientMsgHandler::OnKey, this)},
         {MmiMessageId::ON_KEYEVENT, MsgCallbackBind2(&ClientMsgHandler::OnKeyEvent, this)},
+        {MmiMessageId::ON_SUBSCRIBE_KEY, std::bind(&ClientMsgHandler::OnSubscribeKeyEventCallback,
+                                                   this, std::placeholders::_1, std::placeholders::_2)},
         {MmiMessageId::ON_KEYMONITOR, MsgCallbackBind2(&ClientMsgHandler::OnKeyMonitor, this)},
         {MmiMessageId::ON_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnPointerEvent, this)},
         {MmiMessageId::ON_TOUCH, MsgCallbackBind2(&ClientMsgHandler::OnTouch, this)},
+        {MmiMessageId::ON_TOUCHPAD_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnTouchPadMonitor, this)},
         {MmiMessageId::ON_COPY, MsgCallbackBind2(&ClientMsgHandler::OnCopy, this)},
         {MmiMessageId::ON_SHOW_MENU, MsgCallbackBind2(&ClientMsgHandler::OnShowMenu, this)},
         {MmiMessageId::ON_SEND, MsgCallbackBind2(&ClientMsgHandler::OnSend, this)},
@@ -99,6 +103,7 @@ bool OHOS::MMI::ClientMsgHandler::Init()
         {MmiMessageId::POINTER_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::PointerEventInterceptor, this)},
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
+        {MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::TouchpadEventInterceptor, this)},
     };
     // LCOV_EXCL_STOP
     for (auto& it : funs) {
@@ -184,16 +189,24 @@ int32_t OHOS::MMI::ClientMsgHandler::OnPointerEvent(const UDSClient& client, Net
     MMI_LOGD("pointer event dispatcher of client:");
     MMI_LOGD("eventType=%{public}d,actionTime=%{public}d,"
              "action=%{public}d,actionStartTime=%{public}d,"
-             "flag=%{public}d,pointerAction=%{public}d,"
-             "sourceType=%{public}d,Axis=%{public}d,AxisValue=%{public}.2f,"
+             "flag=%{public}d,pointerAction=%{public}d,sourceType=%{public}d,"
+             "VerticalAxisValue=%{public}.2f,HorizontalAxisValue=%{public}.2f,"
              "pointerCount=%{public}d",
              pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
              pointerEvent->GetFlag(), pointerEvent->GetPointerAction(),
              pointerEvent->GetSourceType(),
-             pointerEvent->GetAxis(), pointerEvent->GetAxisValue(),
+             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
+             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
              static_cast<int32_t>(pointerIds.size()));
-
+    std::vector<int32_t> pressedKeys = pointerEvent->GetPressedKeys();
+    if (pressedKeys.empty()) {
+        MMI_LOGI("Pressed keys is empty");
+    } else {
+        for (int32_t keyCode : pressedKeys) {
+            MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
+        }
+    }
     for (int32_t pointerId : pointerIds) {
         OHOS::MMI::PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
@@ -205,9 +218,46 @@ int32_t OHOS::MMI::ClientMsgHandler::OnPointerEvent(const UDSClient& client, Net
                  item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
                  item.GetWidth(), item.GetHeight(), item.GetPressure());
     }
-
+    if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
+        MMI_LOGD("Operation canceled.");
+    }
     InputManagerImpl::GetInstance()->OnPointerEvent(pointerEvent);
     return RET_OK;
+}
+
+int32_t OHOS::MMI::ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, NetPacket &pkt)
+{
+    std::shared_ptr<KeyEvent> keyEvent = OHOS::MMI::KeyEvent::Create();
+    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(keyEvent, pkt);
+    if (ret != RET_OK) {
+        MMI_LOGE("read net packet failed");
+        return RET_ERR;
+    }
+    int32_t fd = -1;
+    int32_t subscribeId = -1;
+    pkt >> fd >> subscribeId;
+    MMI_LOGD("SubscribeId=%{public}d,Fd=%{public}d,KeyEventId=%{public}d,"
+             "KeyCode=%{public}d,ActionTime=%{public}d,ActionStartTime=%{public}d,Action=%{public}d,"
+             "KeyAction=%{public}d,EventType=%{public}d,Flag=%{public}d",
+        subscribeId, fd, keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
+        keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
+        keyEvent->GetEventType(), keyEvent->GetFlag());
+    return KeyEventInputSubscribeMgr.OnSubscribeKeyEventCallback(keyEvent, subscribeId);
+}
+
+int32_t OHOS::MMI::ClientMsgHandler::OnTouchPadMonitor(const UDSClient& client, NetPacket& pkt)
+{
+    auto pointer = OHOS::MMI::PointerEvent::Create();
+    int32_t ret = InputEventDataTransformation::DeserializePointerEvent(false, pointer, pkt);
+    if (ret != RET_OK) {
+        MMI_LOGE("OnTouchPadMonitor read netPacket failed");
+        return RET_ERR;
+    }
+    int32_t pid = 0;
+    pkt >> pid;
+    MMI_LOGD("client receive the msg from server: EventType = %{public}d, pid = %{public}d",
+        pointer->GetEventType(), pid);
+    return IEMManager.OnTouchpadMonitorInputEvent(pointer);
 }
 
 int32_t OHOS::MMI::ClientMsgHandler::OnKey(const UDSClient& client, NetPacket& pkt)
@@ -218,10 +268,11 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKey(const UDSClient& client, NetPacket& p
     uint64_t serverStartTime = 0;
     EventKeyboard key = {};
     pkt >> key >> abilityId >> windowId >> fd >> serverStartTime;
-    MMI_LOGT("\nevent dispatcher of client:\neventKeyboard:time=%{public}" PRId64 ";key=%{public}u;deviceId=%{public}u;"
-             "deviceType=%{public}u;seat_key_count=%{public}u;state=%{public}d;abilityId=%{public}d;"
-             "windowId=%{public}d;fd=%{public}d\n*************************************************************\n",
-             key.time, key.key, key.deviceId, key.deviceType, key.seat_key_count, key.state, abilityId, windowId, fd);
+    MMI_LOGT("\nevent dispatcher of client:\neventKeyboard:time=%{public}" PRId64 ";key=%{public}u;"
+             "deviceType=%{public}u;seat_key_count=%{public}u;state=%{public}d;"
+             "fd=%{public}d\n*************************************************************\n",
+             key.time, key.key, key.deviceType, key.seat_key_count, key.state, fd);
+
 
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!
@@ -566,14 +617,13 @@ int32_t OHOS::MMI::ClientMsgHandler::PackedData(MultimodalEvent& multEvent, cons
     if (type == INPUT_DEVICE_CAP_AISENSOR || type == INPUT_DEVICE_CAP_KNUCKLE) {
         pkt >> idMsg >> deviceId >> fd >> windowId >> abilityId >> serverStartTime >> uuid >> occurredTime;
         MMI_LOGT("\nevent dispatcher of client: manager_aisensor\n"
-                 "idMsg=%{public}d,deviceId=%{public}d,fd=%{public}d,windowId = %{public}d,abilityId = %{public}d,"
-                 "uuid=%{public}s,occurredTime=%{public}d;\n\n"
+                 "Msg=%{public}d,fd=%{public}d,"
+                 "occurredTime=%{public}d;\n\n"
                  "************************************************************************\n",
-                 idMsg, deviceId, fd, windowId, abilityId, uuid.c_str(), occurredTime);
+                 idMsg, fd, occurredTime);
         if (type == INPUT_DEVICE_CAP_KNUCKLE) {
             type = HOS_KNUCKLE;
-        }
-        else if (type == INPUT_DEVICE_CAP_AISENSOR) {
+        } else if (type == INPUT_DEVICE_CAP_AISENSOR) {
             type = HOS_AI_SPEECH;
         }
         multEvent.Initialize(windowId, 0, uuid, type, occurredTime, "", deviceId, 0, 0);
@@ -581,14 +631,14 @@ int32_t OHOS::MMI::ClientMsgHandler::PackedData(MultimodalEvent& multEvent, cons
         pkt >> data >> fd >> windowId >> abilityId >> serverStartTime;
         if (windowId == -1) {
             MMI_LOGT("\nevent dispatcher of client:\n occurredTime=%{public}" PRId64 ";\nsourceType=%{public}d;\n"
-                     "deviceId=%{public}d;\nfd=%{public}d;\nabilityId=%{public}d;\n"
+                     "\nfd=%{public}d;\n"
                      "\n************************************************************************\n",
-                     data.occurredTime, data.eventType, data.deviceId, fd, abilityId);
+                     data.occurredTime, data.eventType, fd);
         } else {
             MMI_LOGT("\nevent dispatcher of client:\n occurredTime=%{public}" PRId64 ";\nsourceType=%{public}d;\n"
-                     "deviceId=%{public}d;\nfd=%{public}d;\nabilityId=%{public}d;\nwindowId=%{public}d;\n"
+                     "\nfd=%{public}d;"
                      "\n**************************************************************\n",
-                     data.occurredTime, data.eventType, data.deviceId, fd, abilityId, windowId);
+                     data.occurredTime, data.eventType, fd);
         }
         multEvent.Initialize(windowId, 0, data.uuid, data.eventType, data.occurredTime, "", data.deviceId, 0,
             data.deviceType);
@@ -805,6 +855,21 @@ int32_t OHOS::MMI::ClientMsgHandler::ReportPointerEvent(const UDSClient& client,
     return RET_OK;
 }
 
+int32_t OHOS::MMI::ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetPacket& pkt)
+{
+    auto pointerEvent = OHOS::MMI::PointerEvent::Create();
+    int32_t ret = InputEventDataTransformation::DeserializePointerEvent(false, pointerEvent, pkt);
+    if (ret != RET_OK) {
+        MMI_LOGE("TouchpadEventInterceptor read netPacket failed");
+        return RET_ERR;
+    }
+    int32_t pid = 0;
+    pkt >> pid;
+    MMI_LOGD("client receive the msg from server: pointId = %{public}d, pid = %{public}d\n",
+             pointerEvent->GetPointerId(), pid);
+    return INTERCEPTORMANAGER.OnPointerEvent(pointerEvent);
+}
+
 void OHOS::MMI::ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, NetPacket& pkt) const
 {
     int32_t abilityId = 0;
@@ -820,14 +885,14 @@ void OHOS::MMI::ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, Ne
     CHK(mousePtr, NULL_POINTER);
     pkt >> ret >> pointData >> abilityId >> windowId >> fd >> serverStartTime;
     MMI_LOGT("\nevent dispatcher of client: mouse_data \neventPointer:time=%{public}" PRId64 "; eventType=%{public}d;"
-             "buttonCode=%{public}u;deviceId=%{public}u;deviceType=%{public}u;seat_button_count=%{public}u;"
+             "buttonCode=%{public}u;deviceType=%{public}u;seat_button_count=%{public}u;"
              "axes=%{public}u;buttonState=%{public}d;source=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
              "delta_raw.x=%{public}lf;delta_raw.y=%{public}lf;absolute.x=%{public}lf;absolute.y=%{public}lf;"
-             "discYe.x=%{public}lf;discrete.y=%{public}lf;fd=%{public}d;abilityId=%{public}d;windowId=%{public}d.\n",
-             pointData.time, pointData.eventType, pointData.button, pointData.deviceId, pointData.deviceType,
+             "discYe.x=%{public}lf;discrete.y=%{public}lf;fd=%{public}d;\n",
+             pointData.time, pointData.eventType, pointData.button, pointData.deviceType,
              pointData.seat_button_count, pointData.axes, pointData.state, pointData.source, pointData.delta.x,
              pointData.delta.y, pointData.delta_raw.x, pointData.delta_raw.y, pointData.absolute.x,
-             pointData.absolute.y, pointData.discrete.x, pointData.discrete.y, fd, abilityId, windowId);
+             pointData.absolute.y, pointData.discrete.x, pointData.discrete.y, fd);
 
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!
@@ -898,12 +963,12 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, Ne
         fingersInfos[i].mTouchArea = static_cast<float>(touchData.area);
         fingersInfos[i].mTouchPressure = static_cast<float>(touchData.pressure);
         fingersInfos[i].mMp.Setxy(touchData.point.x, touchData.point.y);
-        MMI_LOGT("\nevent dispatcher of client:\neventTouch:time=%{public}" PRId64 ";deviceId=%{public}u;"
-             "deviceType=%{public}u;eventType=%{public}d;slot=%{public}d;seat_slot=%{public}d;"
-             "fd=%{public}d,abilityId=%{public}d,windowId=%{public}d"
-             "\n************************************************************************\n",
-        touchData.time, touchData.deviceId, touchData.deviceType, touchData.eventType, touchData.slot,
-        touchData.seat_slot, fd, abilityId, windowId);
+        MMI_LOGT("\nevent dispatcher of client:\neventTouch:time=%{public}" PRId64 ";"
+                 "deviceType=%{public}u;eventType=%{public}d;slot=%{public}d;seat_slot=%{public}d;"
+                 "fd=%{public}d;point.x=%{public}lf;point.y=%{public}lf"
+                 "\n************************************************************************\n",
+                 touchData.time, touchData.deviceType, touchData.eventType, touchData.slot,
+                 touchData.seat_slot, fd, touchData.point.x, touchData.point.y);
     }
 
     TouchEvent touchEvent;
@@ -938,8 +1003,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisJoystickEvent(const UDSClient& client,
     CHK(mousePtr, NULL_POINTER);
     pkt >> eventJoyStickData >> abilityId >> windowId >> fd >> serverStartTime;
     MMI_LOGT("\nevent dispatcher of client: "
-             "event JoyStick: fd: %{public}d, abilityId: %{public}d ,windowId: %{public}d\n",
-             fd, abilityId, windowId);
+        "event JoyStick: fd: %{public}d\n", fd);
     PrintEventJoyStickAxisInfo(eventJoyStickData, fd, abilityId, windowId, serverStartTime);
 
 #ifdef OHOS_AUTO_TEST_FRAME
@@ -980,14 +1044,16 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client,
     CHK(mousePtr, NULL_POINTER);
     pkt >> tabletPad >> abilityId >> windowId >> fd >> serverStartTime;
     MMI_LOGT("\nevent dispatcher of client: event tablet Pad :time=%{public}" PRId64 ";deviceType=%{public}u;"
-             "deviceId=%{public}d;deviceName=%{public}s;eventType=%{public}d;\n"
+             "deviceName=%{public}s;eventType=%{public}d;\n"
              "ring.number=%{public}d;ring.position=%{public}lf;ring.source=%{public}d;\n"
              "strip.number=%{public}d;strip.position=%{public}lf;strip.source=%{public}d;\n"
-             "fd=%{public}d;abilityId=%{public}d;windowId=%{public}d;preHandlerTime=%{public}" PRId64 ";\n*"
+             "fd=%{public}d;preHandlerTime=%{public}" PRId64 ";\n*"
              "***********************************************************************\n",
-             tabletPad.time, tabletPad.deviceType, tabletPad.deviceId, tabletPad.deviceName, tabletPad.eventType,
+             tabletPad.time, tabletPad.deviceType, tabletPad.deviceName, tabletPad.eventType,
              tabletPad.ring.number, tabletPad.ring.position, tabletPad.ring.source, tabletPad.strip.number,
-             tabletPad.strip.position, tabletPad.strip.source, fd, abilityId, windowId, serverStartTime);
+             tabletPad.strip.position, tabletPad.strip.source, fd, serverStartTime);
+
+    // multimodal ANR
 
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!
@@ -1016,23 +1082,23 @@ void OHOS::MMI::ClientMsgHandler::PrintEventTabletToolInfo(EventTabletTool table
                                                            int32_t abilityId, int32_t windowId, int32_t fd) const
 {
     MMI_LOGT("\nevent dispatcher of client: event tablet Tool :time=%{public}" PRId64 "; deviceType=%{public}u; "
-             "deviceId=%{public}d; deviceName=%{public}s; eventType=%{public}d; type=%{public}u;"
-             "tool_id=%{public}u; serial=%{public}u; button=%{public}d; "
+             "deviceName=%{public}s; eventType=%{public}d; type=%{public}u;"
+             "serial=%{public}u; button=%{public}d; "
              "state=%{public}d; point.x=%{public}lf; point.y=%{public}lf; tilt.x=%{public}lf;"
              "tilt.y=%{public}lf; distance=%{public}lf; pressure=%{public}lf; "
              "rotation=%{public}lf; slider=%{public}lf; wheel=%{public}lf; wheel_discrete=%{public}d;"
              "size.major=%{public}lf; size.minor=%{public}lf; "
              "proximity_state=%{public}d; tip_state=%{public}d; state=%{public}d; seat_button_count=%{public}d;"
-             "fd=%{public}d; abilityId=%{public}d; windowId=%{public}d; preHandlerTime=%{public}" PRId64 ";\n"
+             "fd=%{public}d; preHandlerTime=%{public}" PRId64 ";\n"
              "***********************************************************************\n",
-             tableTool.time, tableTool.deviceType, tableTool.deviceId, tableTool.deviceName,
-             tableTool.eventType, tableTool.tool.type, tableTool.tool.tool_id, tableTool.tool.serial,
+             tableTool.time, tableTool.deviceType, tableTool.deviceName,
+             tableTool.eventType, tableTool.tool.type, tableTool.tool.serial,
              tableTool.button, tableTool.state, tableTool.axes.point.x, tableTool.axes.point.y,
              tableTool.axes.tilt.x, tableTool.axes.tilt.y, tableTool.axes.distance, tableTool.axes.pressure,
              tableTool.axes.rotation, tableTool.axes.slider, tableTool.axes.wheel,
              tableTool.axes.wheel_discrete, tableTool.axes.size.major, tableTool.axes.size.minor,
              tableTool.proximity_state, tableTool.tip_state, tableTool.state, tableTool.seat_button_count,
-             fd, abilityId, windowId, serverStartTime);
+             fd, serverStartTime);
 }
 
 void OHOS::MMI::ClientMsgHandler::GetStandardStylusActionType(int32_t curRventType, int32_t &stylusAction,
@@ -1177,14 +1243,15 @@ void OHOS::MMI::ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, 
     fingerInfos fingersInfos[FINGER_NUM] = {};
     CHK(mousePtr, NULL_POINTER);
     pkt >> gesture >> abilityId >> windowId >> fd >> serverStartTime;
-    MMI_LOGT("\nevent dispatcher of client: event Gesture :time=%{public}" PRId64 ";deviceId=%{public}u;"
+    MMI_LOGT("\nevent dispatcher of client: event Gesture :time=%{public}" PRId64 ";"
              "deviceType=%{public}u;deviceName=%{public}s;devNode=%{public}s;eventType=%{public}d;"
              "fingerCount=%{public}d;cancelled=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
-             "deltaUnaccel.x=%{public}lf;deltaUnaccel.y=%{public}lf;fd=%{public}d;abilityId=%{public}d;"
-             "windowId=%{public}d;preHandlerTime=%{public}" PRId64 ";\n***************************************************\n",
-             gesture.time, gesture.deviceId, gesture.deviceType, gesture.deviceName, gesture.devicePhys,
+             "deltaUnaccel.x=%{public}lf;deltaUnaccel.y=%{public}lf;fd=%{public}d;"
+             "preHandlerTime=%{public}" PRId64 ";\n***************************************************\n",
+             gesture.time, gesture.deviceType, gesture.deviceName, gesture.devicePhys,
              gesture.eventType, gesture.fingerCount, gesture.cancelled, gesture.delta.x, gesture.delta.y,
-             gesture.deltaUnaccel.x, gesture.deltaUnaccel.y, fd, abilityId, windowId, serverStartTime);
+             gesture.deltaUnaccel.x, gesture.deltaUnaccel.y, fd, serverStartTime);
+
 
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!

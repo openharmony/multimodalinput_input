@@ -47,6 +47,12 @@ protected:
 
     FunInputEvent funInputEvent_;
     std::string seat_id_;
+/* remove these code when power key feature is up. start */
+private:
+    int32_t screenState_ = -1;
+    void WriteBrightness(const char *brightness);
+    bool HandlePowerKey(struct libinput_event *event);
+/* remove these code when power key feature is up. end */
 };
 }
 }

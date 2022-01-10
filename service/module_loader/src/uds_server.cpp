@@ -208,7 +208,6 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
     sess->SetClientFd(toReturnClientFd);
 #endif // OHOS__BUILD_MMI_DEBUG
 
-    OnConnected(sess);
     if (!AddSession(sess)) {
         cleanTaskWhenError();
         MMI_LOGE("AddSession fail.");

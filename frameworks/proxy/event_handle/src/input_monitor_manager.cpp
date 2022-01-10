@@ -25,5 +25,10 @@ void InputMonitorManager::RemoveMonitor(int32_t monitorId)
 {
     InputHandlerManager::GetInstance().RemoveHandler(monitorId, InputHandlerType::MONITOR);
 }
+
+void InputMonitorManager::MarkConsumed(int32_t monitorId, int32_t eventId)
+{
+    InputHandlerManager::GetInstance().MarkConsumed(monitorId, eventId);
+}
 } // namespace OHOS::MMI
 

@@ -16,6 +16,7 @@
 #ifndef OHOS_MULTIMDOALINPUT_POINTER_EVENT_H
 #define OHOS_MULTIMDOALINPUT_POINTER_EVENT_H
 
+#include <array>
 #include <vector>
 #include <memory>
 #include <map>
@@ -53,13 +54,17 @@ public:
     // Button release action on pointer input device
     static const int32_t POINTER_ACTION_BUTTON_UP = 9;
 
-    // Unknown axis type, generally used to indicate the initial value
-    static const int32_t AXIS_TYPE_UNKNOWN = 0;
-    // Scroll axis, generally used to represent the UI element where the mouse is scrolled
-    static const int32_t AXIS_TYPE_SCROLL_VERTICAL = 1;
-    static const int32_t AXIS_TYPE_SCROLL_HORIZONTAL = 2;
-    // Pinch axis, generally used to represent the UI element where the mouse is zoomed
-    static const int32_t AXIS_TYPE_PINCH = 3;
+    enum AxisType {
+        // Unknown axis type, generally used to indicate the initial value
+        AXIS_TYPE_UNKNOWN,
+        // Scroll axis, generally used to represent the UI element where the mouse is scrolled
+        AXIS_TYPE_SCROLL_VERTICAL,
+        AXIS_TYPE_SCROLL_HORIZONTAL,
+        // Pinch axis, generally used to represent the UI element where the mouse is zoomed
+        AXIS_TYPE_PINCH,
+        // This is for programing usage only, indicating the number of axis types defined.
+        AXIS_TYPE_MAX
+    };
 
     // Unknown source type.
     // Indicates the default value of the source of pointer type events
@@ -71,6 +76,7 @@ public:
     // Touchpad source type. Indicates that the source of pointer type events is a touchpad device
     static const int32_t SOURCE_TYPE_TOUCHPAD = 3;
 
+    static const int32_t BUTTON_NONE = -1;
     static const int32_t MOUSE_BUTTON_LEFT = 0;
     static const int32_t MOUSE_BUTTON_RIGHT = 1;
     static const int32_t MOUSE_BUTTON_MIDDLE = 2;
@@ -135,7 +141,7 @@ public:
         void SetDeviceId(int32_t deviceId);
 
     private:
-        int32_t pointerId_;
+        int32_t pointerId_ { 0 };
         int32_t donwTime_;
         bool pressed_;
         int32_t globalX_;
@@ -181,25 +187,41 @@ public:
     int32_t GetButtonId() const;
     void SetButtonId(int32_t buttonId);
 
-    double GetAxisValue();
-    void SetAxisValue(double axisValue);
+    double GetAxisValue(AxisType axis) const;
+    void SetAxisValue(AxisType axis, double axisValue);
+    bool HasAxis(AxisType axis) const;
+    int32_t GetAxes() const;
+	
+	void SetPressedKeys(const std::vector<int32_t> pressedKeys);
+    std::vector<int32_t> GetPressedKeys() const;
 
-    int32_t GetAxis();
-    void SetAxis(int32_t axis);
+public:
+    static bool HasAxis(int32_t axes, AxisType axis);
 
 protected:
     explicit PointerEvent(int32_t eventType);
 
 private:
-    int32_t pointerId_;
+    int32_t pointerId_ { 0 };
     std::vector<PointerItem> pointers_;
     std::set<int32_t> pressedButtons_;
-    int32_t sourceType_;
-    int32_t pointerAction_;
-    int32_t buttonId_;
-    int32_t axis_;
-    double axisValue_ { };
+    int32_t sourceType_ { 0 };
+    int32_t pointerAction_ { 0 };
+    int32_t buttonId_ { -1 };
+    int32_t axes_ { 0 };
+    std::array<double, AXIS_TYPE_MAX>   axisValues_ { };
+	std::vector<int32_t> pressedKeys_;
 };
+
+inline bool PointerEvent::HasAxis(AxisType axis) const
+{
+    return HasAxis(axes_, axis);
+}
+
+inline int32_t PointerEvent::GetAxes() const
+{
+    return axes_;
+}
 }
 } // namespace OHOS::MMI
 #endif // OHOS_MULTIMDOALINPUT_POINTER_EVENT_H

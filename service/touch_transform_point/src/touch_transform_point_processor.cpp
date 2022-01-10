@@ -23,10 +23,14 @@ namespace {
 TouchTransformPointProcessor::TouchTransformPointProcessor()
 {
     this->pointerEvent_ = PointerEvent::Create();
-    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
 }
 
 TouchTransformPointProcessor::~TouchTransformPointProcessor() {}
+
+void TouchTransformPointProcessor::setPointEventSource(int32_t sourceType)
+{
+    pointerEvent_->SetSourceType(sourceType);
+}
 
 void TouchTransformPointProcessor::onEventTouchDown(libinput_event& event)
 {

@@ -20,6 +20,7 @@
 #include "iremote_object.h"
 #include "if_mmi_client.h"
 #include "standardized_event_handler.h"
+#include "key_event_input_subscribe_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -49,6 +50,8 @@ public:
         int32_t windowId, StandEventPtr standardizedEventHandle);
     int32_t UnregisterStandardizedEventHandle(const sptr<IRemoteObject> token,
         int32_t windowId, StandEventPtr standardizedEventHandle);
+    int32_t SubscribeKeyEvent(const KeyEventInputSubscribeManager::SubscribeKeyEventInfo& subscribeInfo);
+    int32_t UnSubscribeKeyEvent(int32_t subscribeId);
 
 public:
     int32_t OnKey(const OHOS::KeyEvent& event);

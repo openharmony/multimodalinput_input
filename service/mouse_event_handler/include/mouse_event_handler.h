@@ -34,14 +34,10 @@ protected:
     explicit MouseEventHandler(int32_t eventType);
 
     void SetMouseMotion(MouseInfo info, PointerEvent::PointerItem &pointerItem);
-    void SetMouseButon(PointerEvent::PointerItem &pointerItem, struct libinput_event_pointer& pointEventData,
-                       MouseInfo info);
-    void SetMouseAxis(struct libinput_event_pointer& pointEventData, MouseInfo info,
-                      PointerEvent::PointerItem &pointerItem);
+    void SetMouseButon(PointerEvent::PointerItem &pointerItem, struct libinput_event_pointer& pointEventData);
+    void SetMouseAxis(struct libinput_event_pointer& pointEventData);
     void CalcMovedCoordinate(struct libinput_event_pointer &pointEventData);
-private:
-    double coordinateX_ = 0;
-    double coordinateY_ = 0;
+    void AdjustCoordinate(double &coordinateX, double &coordinateY);
 };
 }
 } // namespace OHOS::MMI

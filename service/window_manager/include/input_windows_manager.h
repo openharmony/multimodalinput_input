@@ -76,13 +76,6 @@ struct SeatInfo {
     int focusWindowId;
 };
 
-struct multimodal_input_pointer_data {
-    int32_t x;
-    int32_t y;
-    int32_t sx;
-    int32_t sy;
-};
-
 struct multimodal_libinput_event {
     struct libinput_event *event;
     void *userdata;
@@ -173,7 +166,7 @@ public:
     const CLMAP<int32_t, struct WindowInfo>& GetWindowInfo() const;
     bool FindWindow(std::shared_ptr<PointerEvent> pointerEvent);
     MouseInfo GetMouseInfo();
-    void SetMouseInfo(double x, double y);
+    void SetMouseInfo(double& x, double& y);
     void ReviseGlobalCoordinate(int32_t& globalX, int32_t& globalY, int32_t width, int32_t height);
     bool CheckDisplayIdIfExist(int32_t& displayId);
     bool GetLogicalDisplayById(int32_t displayId, LogicalDisplayInfo& logicalDisplayInfo);
@@ -182,6 +175,9 @@ public:
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId);
     bool TansformTouchscreePointToLogicalDisplayPoint(libinput_event_touch* touch,
     int32_t targetDisplayId, int32_t& displayX, int32_t& displayY);
+
+    void AdjustCoordinate(double &coordinateX, double &coordinateY);
+    void FixCursorPosition(int32_t &globalX, int32_t &globalY, int cursorW, int cursorH);
 
 private:
     void SetFocusId(int32_t id);

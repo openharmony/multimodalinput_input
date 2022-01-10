@@ -18,6 +18,7 @@
 #include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
 #include "input_handler_manager_global.h"
+#include "interceptor_manager_global.h"
 #include "mmi_server.h"
 #include "outer_interface.h"
 #include "system_event_handler.h"
@@ -136,8 +137,9 @@ int32_t OHOS::MMI::EventDispatch::RegisteredEventDispatch(const MmiMessageId& id
     }
 
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
-    AutoTestCoordinate coordinate = { static_cast<double>(0), static_cast<double>(0), static_cast<double>(0),
-        static_cast<double>(0) };
+    AutoTestCoordinate coordinate = {
+        static_cast<double>(0), static_cast<double>(0), static_cast<double>(0), static_cast<double>(0)
+    };
     auto retAutoTestMag = SendManagePktToAutoTest(udsServer, {}, WinMgr->GetFocusSurfaceId(), fds, coordinate);
     if (retAutoTestMag != RET_OK) {
         MMI_LOGE("Send event to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
@@ -145,12 +147,12 @@ int32_t OHOS::MMI::EventDispatch::RegisteredEventDispatch(const MmiMessageId& id
 #endif  // OHOS_AUTO_TEST_FRAME
     for (auto fd : fds) {
         auto appInfo = AppRegs->FindBySocketFd(fd);
-        MMI_LOGT("\nevent dispatcher of server:\n RegisteredEvent:deviceId=%{public}u;devicePhys=%{public}s;"
-                 "deviceType=%{public}u;eventType=%{public}u;occurredTime=%{public}" PRId64 ";uuid=%{public}s;"
-                 "conbinecode=%{public}d;fd=%{public}d;windowId=%{public}d;abilityId=%{public}d;\n*****************\n",
-                 registeredEvent.deviceId, registeredEvent.devicePhys, registeredEvent.deviceType,
-                 registeredEvent.eventType, registeredEvent.occurredTime, registeredEvent.uuid,
-                 idMsg, fd, appInfo.windowId, appInfo.abilityId);
+        MMI_LOGT("\nevent dispatcher of server:\n RegisteredEvent:devicePhys=%{public}s;"
+                 "deviceType=%{public}u;eventType=%{public}u;occurredTime=%{public}" PRId64 ";"
+                 "conbinecode=%{public}d;fd=%{public}d;\n*****************\n",
+                 registeredEvent.devicePhys, registeredEvent.deviceType,
+                 registeredEvent.eventType, registeredEvent.occurredTime,
+                 idMsg, fd);
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
         const AutoTestDispatcherPkt autoTestDispatcherPkt = {
             "MixedKey", registeredEvent.eventType, 0, 0, 0, 0, idMsg, fd, appInfo.windowId, appInfo.abilityId,
@@ -162,6 +164,7 @@ int32_t OHOS::MMI::EventDispatch::RegisteredEventDispatch(const MmiMessageId& id
         }
 #endif  // OHOS_AUTO_TEST_FRAME
 
+        
         if (AppRegs->IsMultimodeInputReady(idMsg, fd, registeredEvent.occurredTime, preHandlerTime)) {
             NetPacket newPacket(idMsg);
             int32_t type = inputDeviceType;
@@ -254,8 +257,9 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, l
     MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
 #endif
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
-    AutoTestCoordinate coordinate = { static_cast<double>(0), static_cast<double>(0), static_cast<double>(0),
-        static_cast<double>(0) };
+    AutoTestCoordinate coordinate = {
+        static_cast<double>(0), static_cast<double>(0), static_cast<double>(0), static_cast<double>(0)
+    };
     auto retAutoTestMag = SendManagePktToAutoTest(udsServer, appInfo, WinMgr->GetFocusSurfaceId(), {}, coordinate);
     if (retAutoTestMag != RET_OK) {
         MMI_LOGE("Send event to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
@@ -273,15 +277,15 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, l
 
 #endif  // OHOS_AUTO_TEST_FRAME
     MMI_LOGT("\n4.event dispatcher of server:\nEventTabletPad:time=%{public}" PRId64 ";deviceType=%{public}u;"
-             "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;\n"
+             "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;\n"
              "ring.number=%{public}d;ring.position=%{public}lf;ring.source=%{public}d;\n"
              "strip.number=%{public}d;strip.position=%{public}lf;strip.source=%{public}d;\n"
-             "fd=%{public}d;abilityId=%{public}d;windowId=%{public}d;preHandlerTime=%{public}" PRId64 ";\n*"
+             "fd=%{public}d;preHandlerTime=%{public}" PRId64 ";\n*"
              "***********************************************************************\n",
-             tabletPad.time, tabletPad.deviceType, tabletPad.deviceId, tabletPad.deviceName,
+             tabletPad.time, tabletPad.deviceType, tabletPad.deviceName,
              tabletPad.devicePhys, tabletPad.eventType, tabletPad.ring.number, tabletPad.ring.position,
              tabletPad.ring.source, tabletPad.strip.number, tabletPad.strip.position, tabletPad.strip.source,
-             appInfo.fd, appInfo.abilityId, focusId, preHandlerTime);
+             appInfo.fd, preHandlerTime);
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, tabletPad.time, preHandlerTime)) {
         NetPacket newPacket(MmiMessageId::ON_TOUCH);
@@ -315,7 +319,8 @@ int32_t OHOS::MMI::EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, li
 #endif
     PrintEventJoyStickAxisInfo(eventJoyStickAxis, appInfo.fd, appInfo.abilityId, focusId, preHandlerTime);
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
-    AutoTestCoordinate coordinate = { static_cast<double>(0), static_cast<double>(0), static_cast<double>(0),
+    AutoTestCoordinate coordinate = {
+    static_cast<double>(0), static_cast<double>(0), static_cast<double>(0),
         static_cast<double>(0) };
     auto retAutoTestMag = SendManagePktToAutoTest(udsServer, appInfo, WinMgr->GetFocusSurfaceId(), {}, coordinate);
     if (retAutoTestMag != RET_OK) {
@@ -373,7 +378,6 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, 
         MMI_LOGE("Send event to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
     }
 #endif  // OHOS_AUTO_TEST_FRAME
-    
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, tableTool.time, preHandlerTime)) {
         NetPacket newPacket(MmiMessageId::ON_TOUCH);
         int32_t inputType = INPUT_DEVICE_CAP_TABLET_TOOL;
@@ -384,8 +388,9 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, 
         }
 
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
-        AutoTestCoordinate coordinate = { static_cast<double>(0), static_cast<double>(0), static_cast<double>(0),
-            static_cast<double>(0) };
+        AutoTestCoordinate coordinate = {
+            static_cast<double>(0), static_cast<double>(0), static_cast<double>(0), static_cast<double>(0)
+        };
         auto retAutoTestMag = SendManagePktToAutoTest(udsServer, appInfo, WinMgr->GetFocusSurfaceId(), {}, coordinate);
         if (retAutoTestMag != RET_OK) {
             MMI_LOGE("Send event to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
@@ -405,23 +410,23 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, 
         std::string strIds = WinMgr->GetSurfaceIdListString();
         PrintWMSInfo(strIds, appInfo.fd, appInfo.abilityId, focusId);
 #endif
-        MMI_LOGT("\n4.event dispatcher of server:TabletTool:time=%{public}" PRId64 "; deviceId=%{public}u; "
+        MMI_LOGT("\n4.event dispatcher of server:TabletTool:time=%{public}" PRId64 ";"
                  "deviceType=%{public}u; deviceName=%{public}s; devicePhys=%{public}s; eventType=%{public}d; "
-                 "type=%{public}u; tool_id=%{public}u; serial=%{public}u; button=%{public}d; state=%{public}d; "
+                 "type=%{public}u; serial=%{public}u; button=%{public}d; state=%{public}d; "
                  "point.x=%{public}lf; point.y=%{public}lf; tilt.x=%{public}lf; tilt.y=%{public}lf; "
                  "distance=%{public}lf; pressure=%{public}lf; rotation=%{public}lf; slider=%{public}lf; "
                  "wheel=%{public}lf; wheel_discrete=%{public}d; size.major=%{public}lf; size.minor=%{public}lf; "
                  "proximity_state=%{public}d; tip_state=%{public}d; state=%{public}d; seat_button_count=%{public}d; "
-                 "preHandlerTime=%{public}" PRId64 "; fd=%{public}d;windowId=%{public}d; "
-                 "abilityId=%{public}d;\n**************************************************\n",
-                 tableTool.time, tableTool.deviceId, tableTool.deviceType, tableTool.deviceName,
-                 tableTool.devicePhys, tableTool.eventType, tableTool.tool.type, tableTool.tool.tool_id,
+                 "preHandlerTime=%{public}" PRId64 "; fd=%{public}d;"
+                 "\n**************************************************\n",
+                 tableTool.time, tableTool.deviceType, tableTool.deviceName,
+                 tableTool.devicePhys, tableTool.eventType, tableTool.tool.type,
                  tableTool.tool.serial, tableTool.button, tableTool.state, tableTool.axes.point.x,
                  tableTool.axes.point.y, tableTool.axes.tilt.x, tableTool.axes.tilt.y, tableTool.axes.distance,
                  tableTool.axes.pressure, tableTool.axes.rotation, tableTool.axes.slider, tableTool.axes.wheel,
                  tableTool.axes.wheel_discrete, tableTool.axes.size.major, tableTool.axes.size.minor,
                  tableTool.proximity_state, tableTool.tip_state, tableTool.state, tableTool.seat_button_count,
-                 preHandlerTime, appInfo.fd, focusId, appInfo.abilityId);
+                 preHandlerTime, appInfo.fd);
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
             MMI_LOGE("Sending structure of EventTabletTool failed! errCode:%{public}d\n", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
@@ -435,21 +440,24 @@ int32_t OHOS::MMI::EventDispatch::handlePointerEvent(std::shared_ptr<PointerEven
     MMI_LOGE("handlePointerEvent begin .....");
     auto source = point->GetSourceType();
     auto fd = WinMgr->UpdateTargetPointer(point);
-    if (fd <= 0) {
-        MMI_LOGE("the fd less than 0");
-        return RET_ERR;
-    }
     switch (source) {
         case PointerEvent::SOURCE_TYPE_MOUSE: {
-            HandleMouseEvent(point);
+            if (HandleMouseEvent(point)) {
+                return RET_OK;
+            }
             break;
         }
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
-            HandleTouchScreenEvent(point);
+            if (HandleTouchScreenEvent(point)) {
+                MMI_LOGD("PointerEvent consumed,will not send to client.");
+                return RET_OK;
+            }
             break;
         }
         case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
-            HandleTouchPadEvent(point);
+            if (HandleTouchPadEvent(point)) {
+                return RET_OK;
+            }
             break;
         }
         default: {
@@ -464,6 +472,10 @@ int32_t OHOS::MMI::EventDispatch::handlePointerEvent(std::shared_ptr<PointerEven
         MMI_LOGE("udsServer is a nullptr");
         return RET_ERR;
     }
+    if (fd <= 0) {
+        MMI_LOGE("the fd less than 0");
+        return RET_ERR;
+    }
     if (!udsServer->SendMsg(fd, newPacket)) {
         MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d\n", MSG_SEND_FAIL);
         return RET_ERR;
@@ -472,21 +484,26 @@ int32_t OHOS::MMI::EventDispatch::handlePointerEvent(std::shared_ptr<PointerEven
     return RET_OK;
 }
 
-int32_t OHOS::MMI::EventDispatch::HandleTouchScreenEvent(std::shared_ptr<PointerEvent> point)
+bool OHOS::MMI::EventDispatch::HandleTouchScreenEvent(std::shared_ptr<PointerEvent> point)
 {
-    return RET_OK;
+    return InputHandlerManagerGlobal::GetInstance().HandleEvent(point);
 }
 
-int32_t OHOS::MMI::EventDispatch::HandleMouseEvent(std::shared_ptr<PointerEvent> point)
+bool OHOS::MMI::EventDispatch::HandleMouseEvent(std::shared_ptr<PointerEvent> point)
 {
-    return RET_OK;
+    return false;
 }
 
-int32_t OHOS::MMI::EventDispatch::HandleTouchPadEvent(std::shared_ptr<PointerEvent> point)
+bool OHOS::MMI::EventDispatch::HandleTouchPadEvent(std::shared_ptr<PointerEvent> point)
 {
-    return RET_OK;
+    if (INTERCEPTORMANAGERGLOBAL.OnPointerEvent(point)) {
+        return true;
+    }
+    if (IEMServiceManager.ReportTouchpadEvent(point)) {
+        return true;
+    }
+    return false;
 }
-
 
 int32_t OHOS::MMI::EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
     std::shared_ptr<PointerEvent> point)
@@ -535,9 +552,9 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
         point.deviceType = temp.deviceType;
         point.deviceId = temp.deviceId;
         CHKR(EOK == memcpy_s(point.deviceName, sizeof(point.deviceName),
-             temp.deviceName, sizeof(temp.deviceName)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
+            temp.deviceName, sizeof(temp.deviceName)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
         CHKR(EOK == memcpy_s(point.devicePhys, sizeof(point.devicePhys),
-             temp.devicePhys, sizeof(temp.devicePhys)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
+            temp.devicePhys, sizeof(temp.devicePhys)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
     }
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
     const AutoTestStandardPkt autoTestStandardPkt = {
@@ -562,34 +579,35 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
             newPacket << inputEvent;
         }
 #ifdef DEBUG_CODE_TEST
-    auto type = libinput_event_get_type(&event);
-    if (type != LIBINPUT_EVENT_POINTER_BUTTON) {
-        MMI_LOGT("\nMMIWMS:windowId=[%{public}s]\n", strIds.c_str());
-        if (desWindowId == -1) {
-            MMI_LOGT("\nWMS:windowId = ''\n");
-        } else {
-            MMI_LOGT("\nWMS:windowId = %{public}d\n", desWindowId);
-        }
-        MMI_LOGT("\nCALL_AMS:windowId = ''\n");
-        MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
-    } else {
-        if (size == windowCount_) {
-            MMI_LOGT("\nMMIWMS:windowId = [%{public}s]\n", strIds.c_str());
-            MMI_LOGT("\nWMS:windowId = %{public}d\n", desWindowId);
-            MMI_LOGT("\nCALL_AMS:windowId = %{public}d\n", desWindowId);
-            MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
-        } else {
+        auto type = libinput_event_get_type(&event);
+        if (type != LIBINPUT_EVENT_POINTER_BUTTON) {
             MMI_LOGT("\nMMIWMS:windowId=[%{public}s]\n", strIds.c_str());
-            MMI_LOGT("\nWMS:windowId = %{public}d\n", desWindowId);
+            if (desWindowId == -1) {
+                MMI_LOGT("\nWMS:windowId = ''\n");
+            } else {
+                MMI_LOGT("\nWMS:windowId = %{public}d\n", desWindowId);
+            }
             MMI_LOGT("\nCALL_AMS:windowId = ''\n");
             MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
+        } else {
+            if (size == windowCount_) {
+                MMI_LOGT("\nMMIWMS:windowId = [%{public}s]\n", strIds.c_str());
+                MMI_LOGT("\nWMS:windowId = %{public}d\n", desWindowId);
+                MMI_LOGT("\nCALL_AMS:windowId = %{public}d\n", desWindowId);
+                MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
+            } else {
+                MMI_LOGT("\nMMIWMS:windowId=[%{public}s]\n", strIds.c_str());
+                MMI_LOGT("\nWMS:windowId = %{public}d\n", desWindowId);
+                MMI_LOGT("\nCALL_AMS:windowId = ''\n");
+                MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
+            }
         }
-    }
 #endif
 
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
-        AutoTestCoordinate coordinate = { static_cast<double>(0), static_cast<double>(0), static_cast<double>(0),
-            static_cast<double>(0) };
+        AutoTestCoordinate coordinate = {
+            static_cast<double>(0), static_cast<double>(0), static_cast<double>(0), static_cast<double>(0)
+        };
         auto retAutoTestMag = SendManagePktToAutoTest(udsServer, appInfo, WinMgr->GetFocusSurfaceId(), {}, coordinate);
         if (retAutoTestMag != RET_OK) {
             MMI_LOGE("Send event to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
@@ -606,17 +624,17 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
         }
 #endif  // OHOS_AUTO_TEST_FRAME
         MMI_LOGT("\n4.event dispatcher of server:\neventPointer:time=%{public}" PRId64 ";deviceType=%{public}u;"
-                 "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
-                 "buttonCode=%{public}u;seat_button_count=%{public}u;axes=%{public}u;buttonState=%{public}d;"
-                 "source=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;delta_raw.x=%{public}lf;"
-                 "delta_raw.y=%{public}lf;absolute.x=%{public}lf;absolute.y=%{public}lf;discrete.x=%{public}lf;"
-                 "discrete.y=%{public}lf;fd=%{public}d;abilityId=%{public}d;windowId=%{public}d;"
-                 "preHandlerTime=%{public}" PRId64 ";\n**************************************************************\n",
-                 point.time, point.deviceType, point.deviceId, point.deviceName,
-                 point.devicePhys, point.eventType, point.button, point.seat_button_count, point.axes,
-                 point.state, point.source, point.delta.x, point.delta.y, point.delta_raw.x,
-                 point.delta_raw.y, point.absolute.x, point.absolute.y, point.discrete.x,
-                 point.discrete.y, appInfo.fd, appInfo.abilityId, desWindowId, preHandlerTime);
+                    "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
+                    "buttonCode=%{public}u;seat_button_count=%{public}u;axes=%{public}u;buttonState=%{public}d;"
+                    "source=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;delta_raw.x=%{public}lf;"
+                    "delta_raw.y=%{public}lf;absolute.x=%{public}lf;absolute.y=%{public}lf;discrete.x=%{public}lf;"
+                    "discrete.y=%{public}lf;fd=%{public}d;"
+                    "preHandlerTime=%{public}" PRId64 ";\n**************************************************************\n",
+                    point.time, point.deviceType, point.deviceName,
+                    point.devicePhys, point.eventType, point.button, point.seat_button_count, point.axes,
+                    point.state, point.source, point.delta.x, point.delta.y, point.delta_raw.x,
+                    point.delta_raw.y, point.absolute.x, point.absolute.y, point.discrete.x,
+                    point.discrete.y, appInfo.fd, preHandlerTime);
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
             MMI_LOGE("Sending structure of EventPointer failed! errCode:%{public}d\n", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
@@ -657,8 +675,9 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
         return FOCUS_ID_OBTAIN_FAIL;
     }
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
-    AutoTestCoordinate coordinate = { static_cast<double>(0), static_cast<double>(0), static_cast<double>(0),
-        static_cast<double>(0) };
+    AutoTestCoordinate coordinate = {
+        static_cast<double>(0), static_cast<double>(0), static_cast<double>(0), static_cast<double>(0)
+    };
     auto retAutoTestMag = SendManagePktToAutoTest(udsServer, appInfo, WinMgr->GetFocusSurfaceId(), {}, coordinate);
     if (retAutoTestMag != RET_OK) {
         MMI_LOGE("Send event to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
@@ -681,13 +700,13 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
 
 #endif  // OHOS_AUTO_TEST_FRAME
     MMI_LOGT("\n4.event dispatcher of server:\nEventGesture:time=%{public}" PRId64 ";deviceType=%{public}u;"
-             "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
+             "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
              "fingerCount=%{public}d;cancelled=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
-             "deltaUnaccel.x=%{public}lf;deltaUnaccel.y=%{public}lf;fd=%{public}d;abilityId=%{public}d;"
-             "windowId=%{public}d;preHandlerTime=%{public}" PRId64 ";\n***************************************************\n",
-             gesture.time, gesture.deviceType, gesture.deviceId, gesture.deviceName, gesture.devicePhys,
+             "deltaUnaccel.x=%{public}lf;deltaUnaccel.y=%{public}lf;fd=%{public}d;"
+             "preHandlerTime=%{public}" PRId64 ";\n***************************************************\n",
+             gesture.time, gesture.deviceType, gesture.deviceName, gesture.devicePhys,
              gesture.eventType, gesture.fingerCount, gesture.cancelled, gesture.delta.x, gesture.delta.y,
-             gesture.deltaUnaccel.x, gesture.deltaUnaccel.y, appInfo.fd, appInfo.abilityId, focusId, preHandlerTime);
+             gesture.deltaUnaccel.x, gesture.deltaUnaccel.y, appInfo.fd, preHandlerTime);
     PrintEventSlotedCoordsInfo(gesture.soltTouches);
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, gesture.time, preHandlerTime)) {
@@ -758,8 +777,9 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
         int32_t eventType = pointEventType;
         newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime << touch.seat_slot;
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
-        AutoTestCoordinate coordinate = { static_cast<double>(0), static_cast<double>(0), static_cast<double>(0),
-            static_cast<double>(0) };
+        AutoTestCoordinate coordinate = {
+            static_cast<double>(0), static_cast<double>(0), static_cast<double>(0), static_cast<double>(0)
+        };
         auto type = libinput_event_get_type(&event);
         auto data = libinput_event_get_touch_event(&event);
         switch (type) {
@@ -768,6 +788,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
                 coordinate.windowRawY = libinput_event_touch_get_y(data);
                 auto touchSurfaceInfo = WinMgr->GetTouchSurfaceInfo(coordinate.windowRawX, coordinate.windowRawY);
                 CHKR(touchSurfaceInfo, NULL_POINTER, RET_ERR);
+                WinMgr->SetTouchFocusSurfaceId(touchSurfaceInfo->surfaceId);
                 coordinate.focusWindowRawX = coordinate.windowRawX - touchSurfaceInfo->dstX;
                 coordinate.focusWindowRawY = coordinate.windowRawX - touchSurfaceInfo->dstX;
                 break;
@@ -808,14 +829,14 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
                      MEMCPY_SEC_FUN_FAIL, RET_ERR);
                 MMIRegEvent->GetTouchInfoByTouchId(touchTemp, touchId);
                 MMI_LOGT("\n4.event dispatcher of server:\neventTouch:time=%{public}" PRId64 ";deviceType=%{public}u;"
-                         "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
+                         "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
                          "slot=%{public}d;seat_slot=%{public}d;pressure=%{public}lf;point.x=%{public}lf;"
-                         "point.y=%{public}lf;fd=%{public}d;abilityId=%{public}d,windowId=%{public}d;"
+                         "point.y=%{public}lf;fd=%{public}d;"
                          "preHandlerTime=%{public}" PRId64 ";\n*********************************************************\n",
-                         touchTemp.time, touchTemp.deviceType, touchTemp.deviceId, touchTemp.deviceName,
+                         touchTemp.time, touchTemp.deviceType, touchTemp.deviceName,
                          touchTemp.devicePhys, touchTemp.eventType, touchTemp.slot, touchTemp.seat_slot,
                          touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, appInfo.fd,
-                         appInfo.abilityId, touchFocusId, preHandlerTime);
+                         preHandlerTime);
                 newPacket << touchTemp;
 
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
@@ -834,13 +855,13 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
             newPacket << touch;
             MMI_LOGT("\n4.event dispatcher of server:\neventTouch:time=%{public}" PRId64 ";deviceType=%{public}u;"
-                     "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
+                     "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
                      "slot=%{public}d;seat_slot=%{public}d;pressure=%{public}lf;point.x=%{public}lf;"
-                     "point.y=%{public}lf;fd=%{public}d;abilityId=%{public}d;windowId=%{public}d;"
+                     "point.y=%{public}lf;fd=%{public}d;"
                      "preHandlerTime=%{public}" PRId64 ";\n****************************************************************\n",
-                     touch.time, touch.deviceType, touch.deviceId, touch.deviceName,
+                     touch.time, touch.deviceType, touch.deviceName,
                      touch.devicePhys, touch.eventType, touch.slot, touch.seat_slot, touch.pressure,
-                     touch.point.x, touch.point.y, appInfo.fd, appInfo.abilityId, touchFocusId, preHandlerTime);
+                     touch.point.x, touch.point.y, appInfo.fd, preHandlerTime);
 
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
             const AutoTestDispatcherPkt autoTestDispatcherPkt = {
@@ -925,9 +946,8 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
              key->GetActionStartTime(),
              key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
-
     /*
-    if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, appInfo.fd, key.time)) {
+    if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, fd, 0)) {
         NetPacket newPkt(MmiMessageId::ON_KEY);
         newPkt << key << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
         if (!udsServer.SendMsg(appInfo.fd, newPkt)) {
@@ -975,7 +995,6 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
                 ret, REG_EVENT_DISP_FAIL);
         }
     }
-
     auto focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
         return RET_OK;
@@ -992,16 +1011,17 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
 #endif
 
     MMI_LOGT("\n4.event dispatcher of server:\neventKeyboard:time=%{public}" PRId64 ";deviceType=%{public}u;"
-             "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
+             "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
              "mUnicode=%{public}d;key=%{public}u;key_detail=%{public}s;seat_key_count=%{public}u;"
-             "state=%{public}d;fd=%{public}d;abilityId=%{public}d;windowId=%{public}d;"
+             "state=%{public}d;fd=%{public}d;"
              "preHandlerTime=%{public}" PRId64 ";\n***********************************************************************\n",
-             key.time, key.deviceType, key.deviceId, key.deviceName, key.devicePhys, key.eventType,
+             key.time, key.deviceType, key.deviceName, key.devicePhys, key.eventType,
              key.mUnicode, key.key, trs.keyEvent.c_str(), key.seat_key_count, key.state, appInfo.fd,
-             appInfo.abilityId, focusId, preHandlerTime);
+             preHandlerTime);
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
-    AutoTestCoordinate coordinate = { static_cast<double>(0), static_cast<double>(0), static_cast<double>(0),
-        static_cast<double>(0) };
+    AutoTestCoordinate coordinate = {
+        static_cast<double>(0), static_cast<double>(0), static_cast<double>(0), static_cast<double>(0)
+    };
     auto retAutoTestMag = SendManagePktToAutoTest(udsServer, appInfo, WinMgr->GetFocusSurfaceId(), {}, coordinate);
     if (retAutoTestMag != RET_OK) {
         MMI_LOGE("Send event to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
@@ -1019,7 +1039,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, appInfo.fd, key.time, preHandlerTime)) {
         NetPacket newPkt(MmiMessageId::ON_KEY);
-        newPkt << key << appInfo.abilityId << focusId << preHandlerTime;
+        newPkt << key << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
         if (!udsServer.SendMsg(appInfo.fd, newPkt)) {
             MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d\n", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
@@ -1049,14 +1069,16 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, 
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
     MMI_LOGT("\npointer event dispatcher of server:\neventType=%{public}d,actionTime=%{public}d,"
              "action=%{public}d,actionStartTime=%{public}d,"
-             "flag=%{public}d,pointerAction=%{public}d,"
-             "sourceType=%{public}d,Axis=%{public}d,AxisValue=%{public}.02f,"
+             "flag=%{public}d,pointerAction=%{public}d,sourceType=%{public}d,"
+             "VerticalAxisValue=%{public}.02f,HorizontalAxisValue=%{public}.02f,"
              "pointerCount=%{public}d",
              pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
              pointerEvent->GetFlag(), pointerEvent->GetPointerAction(),
              pointerEvent->GetSourceType(),
-             pointerEvent->GetAxis(), pointerEvent->GetAxisValue(), static_cast<int32_t>(pointerIds.size()));
+             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
+             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
+             static_cast<int32_t>(pointerIds.size()));
 
     for (int32_t pointerId : pointerIds) {
         OHOS::MMI::PointerEvent::PointerItem item;
