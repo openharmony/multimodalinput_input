@@ -17,7 +17,7 @@ is_mmi_have_libinput = true
 is_mmi_have_hdf = false
 is_mmi_have_ai = true
 is_mmi_have_debug = false
-is_mmi_have_weston = true
+is_mmi_have_weston = false
 is_mmi_have_st_test = false
 is_mmi_mouse_ready = false
 
