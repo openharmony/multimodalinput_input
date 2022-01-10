@@ -33,8 +33,23 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::onLibinputTouchEvent(l
         processor = it->second;
     } else {
         processor = std::make_shared<TouchTransformPointProcessor>();
+        processor->setPointEventSource(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
         this->processors_.insert(std::pair<int32_t, std::shared_ptr<TouchTransformPointProcessor>>(ID, processor));
     }
     return processor->onLibinputTouchEvent(event);
+}
+
+std::shared_ptr<PointerEvent> TouchTransformPointManager::onLibinputTouchPadEvent(libinput_event& event) 
+{
+    std::shared_ptr<TouchPadTransformPointProcessor> processor;
+    auto it = touchpadpro_.find(ID);
+    if (it != touchpadpro_.end()) {
+        processor = it->second;
+    } else {
+        processor = std::make_shared<TouchPadTransformPointProcessor>();
+        processor->setPointEventSource(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+        this->touchpadpro_.insert(std::pair<int32_t, std::shared_ptr<TouchPadTransformPointProcessor>>(ID, processor));
+    }
+    return processor->onLibinputTouchPadEvent(event);
 }
 }

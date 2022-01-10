@@ -14,6 +14,7 @@
  */
 
 #include "input_device_manager.h"
+#include "pointer_drawing_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -140,6 +141,12 @@ void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
     inputDeviceMap_.insert(std::pair<int32_t, libinput_device*>(nextId_,
         static_cast<struct libinput_device *>(inputDevice)));
     nextId_++;
+
+    if (IsPointerDevice(static_cast<struct libinput_device *>(inputDevice))) {
+#ifdef OHOS_MOUSE_READY
+        DrawWgr->TellDeviceInfo(true);
+#endif
+    }
 }
 
 void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
@@ -153,9 +160,22 @@ void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
     for (auto it = inputDeviceMap_.begin(); it != inputDeviceMap_.end(); it++) {
         if (it->second == inputDevice) {
             inputDeviceMap_.erase(it);
+            if (IsPointerDevice(inputDevice)) {
+#ifdef OHOS_MOUSE_READY
+                DrawWgr->TellDeviceInfo(false);
+#endif
+            }
             break;
         }
     }
+}
+
+bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)
+{
+    enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
+    MMI_LOGD("udev tag is%{public}d", static_cast<int32_t>(udevTags));
+    return udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK | 
+    EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD);
 }
 }
 }

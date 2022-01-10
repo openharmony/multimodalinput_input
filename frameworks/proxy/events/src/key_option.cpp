@@ -21,13 +21,26 @@ std::vector<int32_t> KeyOption::GetPreKeys() const
 {
     return preKeys_;
 }
-void KeyOption::SetPreKeys(const std::vector<int32_t> &preKeys) {}
+void KeyOption::SetPreKeys(const std::vector<int32_t> &preKeys)
+{
+    preKeys_ = preKeys;
+    preKeySize_ = preKeys_.size();
+}
+
+uint32_t KeyOption::GetPreKeySize()
+{
+    return preKeySize_;
+}
 
 int32_t KeyOption::GetFinalKey() const
 {
     return finalKey_;
 }
-void KeyOption::SetFinalKey(int32_t finalKey) const {}
+
+void KeyOption::SetFinalKey(int32_t finalKey)
+{
+    finalKey_ = finalKey;
+}
 
 bool KeyOption::IsFinalKeyDown() const
 {

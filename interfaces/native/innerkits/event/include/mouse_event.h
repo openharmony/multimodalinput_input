@@ -89,39 +89,38 @@ enum MouseButtonEnum {
     *
     * @since 1
     */
-    LEFT_BUTTON = 1 << 0,
+    LEFT_BUTTON = 0x110,
 
     /**
     * Indicates that the right button on the mouse is pressed.
     *
     * @since 1
     */
-    RIGHT_BUTTON = 1 << 1,
+    RIGHT_BUTTON = 0x111,
 
     /**
     * Indicates that the middle button on the mouse is pressed.
     *
     * @since 1
     */
-    MIDDLE_BUTTON = 1 << 2,
-
-    /**
-    * Indicates that the back button on the mouse is pressed.
-    *
-    * @since 1
-    */
-    BACK_BUTTON = 1 << 3,
+    MIDDLE_BUTTON = 0x112,
+    SIDE_BUTTON = 0x113,
+    EXTRA_BUTTON = 0x114,
 
     /**
     * Indicates that the forward button on the mouse is pressed.
     *
     * @since 1
     */
-    FORWARD_BUTTON = 1 << 4,
+    FORWARD_BUTTON = 0x115,
 
-    SIDE_BUTTON = 1 << 5,
-    EXTRA_BUTTON = 1 << 6,
-    TASK_BUTTON = 1 << 7,
+    /**
+    * Indicates that the back button on the mouse is pressed.
+    *
+    * @since 1
+    */
+    BACK_BUTTON = 0x116,
+    TASK_BUTTON = 0x117,
 };
 
 enum AxisEnum {

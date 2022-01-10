@@ -17,6 +17,8 @@
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_event_monitor_manager.h"
+#include "input_monitor_manager.h"
+#include "interceptor_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 
@@ -192,6 +194,50 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
 void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 {
     IEMManager.RemoveInputEventMontior(monitorId);
+}
+
+int32_t InputManagerImpl::AddMonitor2(std::shared_ptr<IInputEventConsumer> consumer)
+{
+    return InputMonitorManager::GetInstance().AddMonitor(consumer);
+}
+
+void InputManagerImpl::RemoveMonitor2(int32_t monitorId)
+{
+    InputMonitorManager::GetInstance().RemoveMonitor(monitorId);
+}
+
+int32_t InputManagerImpl::AddInputEventTouchpadMontior(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
+{
+    if (monitor == nullptr) {
+        MMI_LOGE("InputManagerImpl::%{public}s param should not be null!", __func__);
+        return InputEventMonitorManager::INVALID_MONITOR_ID;
+    }
+    return IEMManager.AddInputEventTouchpadMontior(monitor);
+}
+
+void InputManagerImpl::RemoveInputEventTouchpadMontior(int32_t monitorId)
+{
+    IEMManager.RemoveInputEventTouchpadMontior(monitorId);
+}
+
+void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
+{
+    InputMonitorManager::GetInstance().MarkConsumed(monitorId, eventId);
+}
+
+int32_t InputManagerImpl::AddInterceptor(int32_t sourceType, 
+                                         std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
+{
+    if (interceptor == nullptr) {
+        MMI_LOGE("AddInterceptor::%{public}s param should not be null!", __func__);
+        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
+    }
+    return INTERCEPTORMANAGER.AddInterceptor(sourceType, interceptor);
+}
+
+void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
+{
+    INTERCEPTORMANAGER.RemoveInterceptor(interceptorId);
 }
 }
 }

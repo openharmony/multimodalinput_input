@@ -16,6 +16,7 @@
 #include "js_register_module.h"
 #include <inttypes.h>
 #include <uv.h>
+#include "input_device_event.h"
 
 
 namespace OHOS {
@@ -84,8 +85,8 @@ namespace OHOS {
             cb->handleRef_ = handlerRef;
             work->data = (void*)cb;
 
-            auto instance = InputManager::GetInstance();
-            instance->GetInputDeviceIdsAsync([work](std::vector<int32_t> ids) {
+            auto &instance = InputDeviceEvent::GetInstance();
+            instance.GetInputDeviceIdsAsync([work](std::vector<int32_t> ids) {
                 auto callbackInfo = (CallbackInfo*)work->data;
                 callbackInfo->ids_ = ids;
                 uv_queue_work(
@@ -227,8 +228,8 @@ namespace OHOS {
             cb->handleRef_ = handlerRef;
             work->data = (void*)cb;
 
-            auto instance = InputManager::GetInstance();
-            instance->GetInputDeviceAsync(id, [work](std::shared_ptr<InputDeviceEvent::InputDeviceInfo> deviceInfo) {
+            auto &instance = InputDeviceEvent::GetInstance();
+            instance.GetInputDeviceAsync(id, [work](std::shared_ptr<InputDeviceEvent::InputDeviceInfo> deviceInfo) {
                 auto callbackInfo = (CallbackInfo*)work->data;
                 callbackInfo->inputDeviceInfo_ = *deviceInfo;
                 uv_queue_work(

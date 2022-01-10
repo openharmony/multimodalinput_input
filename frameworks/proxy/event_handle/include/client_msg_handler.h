@@ -16,6 +16,7 @@
 #define OHOS_CLIENT_MSG_HANDLER_H
 
 #include "if_client_msg_handler.h"
+#include "key_event_input_subscribe_manager.h"
 #include "msg_handler.h"
 #include "uds_client.h"
 #include "multimodal_event.h"
@@ -35,7 +36,9 @@ protected:
     virtual int32_t OnKey(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnKeyEvent(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnKeyMonitor(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t OnTouchPadMonitor(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnPointerEvent(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t OnSubscribeKeyEventCallback(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnTouch(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnCopy(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnShowMenu(const UDSClient& client, NetPacket& pkt);
@@ -80,6 +83,7 @@ protected:
     virtual int32_t ReportPointerEvent(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnInputDevice(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnInputDeviceIds(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t TouchpadEventInterceptor(const UDSClient& client, NetPacket& pkt);
 
 private:
     int32_t PackedData(MultimodalEvent& multe, const UDSClient& client, NetPacket& pkt, const std::string& funName);

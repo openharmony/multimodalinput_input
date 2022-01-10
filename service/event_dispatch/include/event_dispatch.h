@@ -50,9 +50,9 @@ public:
         EventTabletTool& tableTool, const uint64_t preHandlerTime, WindowSwitch& windowSwitch);
     int32_t DispatchTouchTransformPointEvent(UDSServer& udsServer, std::shared_ptr<PointerEvent> point);
     int32_t handlePointerEvent(std::shared_ptr<PointerEvent> point);
-    int32_t HandleTouchScreenEvent(std::shared_ptr<PointerEvent> point);
-    int32_t HandleMouseEvent(std::shared_ptr<PointerEvent> point);
-    int32_t HandleTouchPadEvent(std::shared_ptr<PointerEvent> point);
+    bool HandleTouchScreenEvent(std::shared_ptr<PointerEvent> point);
+    bool HandleMouseEvent(std::shared_ptr<PointerEvent> point);
+    bool HandleTouchPadEvent(std::shared_ptr<PointerEvent> point);
 #ifdef OHOS_AUTO_TEST_FRAME
     int32_t SendLibPktToAutoTest(UDSServer& udsServer, const AutoTestLibinputPkt& autoTestLibinputPkt);
     int32_t SendMappingPktToAutoTest(UDSServer& udsServer, int32_t sourceType);

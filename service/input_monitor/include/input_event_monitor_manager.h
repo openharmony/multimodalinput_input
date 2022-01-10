@@ -21,6 +21,7 @@
 #include "singleton.h"
 #include <list>
 #include "key_event.h"
+#include "pointer_event.h"
 #include "struct_multimodal.h"
 
 namespace OHOS {
@@ -43,10 +44,17 @@ public:
     void RemoveInputEventMontior(int32_t eventType, SessionPtr session);
     void ReportKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent);
 
+    int32_t AddInputEventTouchpadMontior(int32_t eventType, SessionPtr session);
+    void RemoveInputEventTouchpadMontior(int32_t eventType, SessionPtr session);
+    bool ReportTouchpadEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
+
 private:
     std::mutex mu_;
     std::list<MonitorItem> monitors_;
+    std::list<MonitorItem> monitorsTouch_;
+
     void OnMonitorInputEvent(std::shared_ptr<KeyEvent> keyEvent);
+    void OnTouchpadMonitorInputEvent(std::shared_ptr<PointerEvent> PointerEvent);
 };
 }
 }

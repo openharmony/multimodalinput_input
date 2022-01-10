@@ -79,20 +79,19 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
     int32_t windowId, StandEventPtr standardizedEventHandle)
 {
     CHKR((token && standardizedEventHandle), PARAM_INPUT_INVALID, MMI_STANDARD_EVENT_INVALID_PARAMETER);
-    auto messageId = standardizedEventHandle->GetType();
-    CHKR(messageId > MmiMessageId::INVALID, VAL_NOT_EXP, MMI_STANDARD_EVENT_INVALID_PARAMETER);
-    auto range = mapEvents_.equal_range(messageId);
+    auto typeId = standardizedEventHandle->GetType();
+    CHKR(typeId > MmiMessageId::INVALID, VAL_NOT_EXP, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+    auto range = mapEvents_.equal_range(typeId);
 
     std::string registerhandle;
-    if (!MakeRegisterHandle(messageId, windowId, registerhandle)) {
+    if (!MakeRegisterHandle(typeId, windowId, registerhandle)) {
         MMI_LOGE("Invalid unregistration parameter...typeId:%{public}d,windowId:%{public}d,errCode:%{public}d",
-                 messageId, windowId, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+                 typeId, windowId, MMI_STANDARD_EVENT_INVALID_PARAMETER);
         return MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
     registerEvents_.erase(registerhandle);
     bool isHandleExist = false;
-    StandEventMMaps::iterator it = range.first;
-    for (; it != range.second; ++it) {
+    for (StandEventMMaps::iterator it = range.first; it != range.second; ++it) {
         if (it->second.eventCallBack == standardizedEventHandle) {
             mapEvents_.erase(it);
             isHandleExist = true;
@@ -101,14 +100,42 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
     }
     if (!isHandleExist) {
         MMI_LOGE("Unregistration does not exist, Unregistration failed...typeId:%{public}d,windowId:%{public}d,"
-                 "errCode:%{public}d", messageId, windowId, MMI_STANDARD_EVENT_NOT_EXIST);
+                 "errCode:%{public}d", typeId, windowId, MMI_STANDARD_EVENT_NOT_EXIST);
         return MMI_STANDARD_EVENT_NOT_EXIST;
     }
-    MMI_LOGD("Unregister app event:typeId=%{public}d;;", messageId);
+    MMI_LOGD("Unregister app event:typeId=%{public}d;;", typeId);
     OHOS::MMI::NetPacket ck(MmiMessageId::UNREGISTER_MSG_HANDLER);
-    ck << messageId;
+    ck << typeId;
     SendMsg(ck);
     return OHOS::MMI_STANDARD_EVENT_SUCCESS;
+}
+
+int32_t MultimodalStandardizedEventManager::SubscribeKeyEvent(
+    const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
+{
+    OHOS::MMI::NetPacket pkt(MmiMessageId::SUBSCRIBE_KEY_EVENT);
+    std::shared_ptr<OHOS::MMI::KeyOption> keyOption = subscribeInfo.GetKeyOption();
+    uint32_t preKeySize = keyOption->GetPreKeySize();
+    pkt << subscribeInfo.GetSubscribeId() << keyOption->GetFinalKey() << keyOption->IsFinalKeyDown()
+    << keyOption->GetFinalKeyDownDuration() << preKeySize;
+    std::vector<int32_t> preKeys = keyOption->GetPreKeys();
+    for (auto preKeyIter = preKeys.begin(); preKeyIter != preKeys.end(); ++preKeyIter) {
+        pkt << *preKeyIter;
+    }
+    if (SendMsg(pkt)) {
+        return RET_OK;
+    }
+    return RET_ERR;
+}
+
+int32_t MultimodalStandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
+{
+    OHOS::MMI::NetPacket pkt(MmiMessageId::UNSUBSCRIBE_KEY_EVENT);
+    pkt << subscribeId;
+    if (SendMsg(pkt)) {
+        return RET_OK;
+    }
+    return RET_ERR;
 }
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEvent& event)
@@ -629,14 +656,16 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
     MMI_LOGD("\npointer event dispatcher of client:\neventType=%{public}d,actionTime=%{public}d,"
              "action=%{public}d,actionStartTime=%{public}d,"
-             "flag=%{public}d,pointerAction=%{public}d,"
-             "sourceType=%{public}d,Axis=%{public}d,AxisValue=%{public}.2f"
+             "flag=%{public}d,pointerAction=%{public}d,sourceType=%{public}d,"
+             "VerticalAxisValue=%{public}.2f,HorizontalAxisValue=%{public}.2f,"
              "pointerCount=%{public}d",
              pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
              pointerEvent->GetFlag(), pointerEvent->GetPointerAction(),
-             pointerEvent->GetSourceType(), pointerEvent->GetAxis(),
-             pointerEvent->GetAxisValue(), static_cast<int32_t>(pointerIds.size()));
+             pointerEvent->GetSourceType(),
+             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
+             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
+             static_cast<int32_t>(pointerIds.size()));
 
     for (int32_t pointerId : pointerIds) {
         OHOS::MMI::PointerEvent::PointerItem item;
@@ -650,6 +679,14 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
                  item.GetWidth(), item.GetHeight(), item.GetPressure());
     }
 
+    std::vector<int32_t> pressedKeys = pointerEvent->GetPressedKeys();
+    if (pressedKeys.empty()) {
+        MMI_LOGI("Pressed keys is empty");
+    } else {
+        for (int32_t keyCode : pressedKeys) {
+            MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
+        }
+    }
     OHOS::MMI::NetPacket netPkt(MmiMessageId::INJECT_POINTER_EVENT);
     CHKR((RET_OK == InputEventDataTransformation::SerializePointerEvent(pointerEvent, netPkt)),
         STREAM_BUF_WRITE_FAIL, RET_ERR);

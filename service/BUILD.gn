@@ -27,6 +27,7 @@ config("libmmi_server_public_config") {
     "event_standard/include",
     "event_dump/include",
     "input_monitor/include",
+    "input_interceptor/include",
     "libinput_adapter/include",
     "message_handle/include",
     "module_loader/include",
@@ -34,11 +35,12 @@ config("libmmi_server_public_config") {
     "touch_transform_point/include",
     "server_input_filter_manager/include",
     "ability_launch/include",
+    "key_event_input_subscribe_filter/include",
     "${mmi_service_path}/connect_manager/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "mouse_event_handler/include",
-    "//third_party/libxkbcommon",
+    "//third_party/libxkbcommon/",
     "//third_party/FreeBSD/sys/dev/evdev",
     "//third_party/json/include",
     "//third_party/json/include/nlohmann",
@@ -54,8 +56,10 @@ config("libmmi_server_public_config") {
     "//third_party/pixman/pixman",
     "//third_party/wayland_standard/src",
     "//third_party/weston",
-    "//out/ohos-arm-release/gen/third_party/wayland_standard/protocol",
+    "$root_out_dir/gen/third_party/wayland_standard/protocol",
     "//foundation/multimodalinput/interfaces/native/innerkits/event/include",
+    "//foundation/graphic/standard/rosen/modules/2d_graphics/include",
+    "//foundation/graphic/standard/rosen/modules/2d_graphics/src",
   ]
 
   if (is_mmi_have_hdf) {
@@ -98,6 +102,10 @@ config("libmmi_server_public_config") {
     ]
     cflags += [ "-DOHOS_WESTEN_MODEL" ]
   }
+
+  if (is_mmi_mouse_ready) {
+    cflags += [ "-DOHOS_MOUSE_READY" ]
+  }
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
@@ -105,6 +113,13 @@ ohos_prebuilt_etc("multimodalinput_config_ability.json") {
   part_name = "multimodalinput_base"
   subsystem_name = "multimodalinput"
   relative_install_dir = "multimodalinput"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image") {
+  source = "//foundation/multimodalinput/input/common/source_icon/angle.png"
+  part_name = "multimodalinput_base"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
 }
 
 ohos_shared_library("libmmi-server") {
@@ -126,8 +141,11 @@ ohos_shared_library("libmmi-server") {
     "event_package/src/event_package.cpp",
     "event_package/src/mouse_state_gesture.cpp",
     "event_standard/src/standard_event_handler.cpp",
+    "input_interceptor/src/interceptor_manager_global.cpp",
     "input_monitor/src/input_event_monitor_manager.cpp",
     "input_monitor/src/input_handler_manager_global.cpp",
+    "key_event_input_subscribe_filter/src/key_event_input_subscribe_filter.cpp",
+    "key_event_input_subscribe_filter/src/key_option.cpp",
     "libinput_adapter/src/s_input.cpp",
     "message_handle/src/server_msg_handler.cpp",
     "module_loader/src/libmmi_main.cpp",
@@ -136,11 +154,16 @@ ohos_shared_library("libmmi-server") {
     "server_input_filter_manager/src/server_input_filter_manager.cpp",
     "touch_transform_point/src/touch_transform_point_manager.cpp",
     "touch_transform_point/src/touch_transform_point_processor.cpp",
+    "touch_transform_point/src/touchpad_transform_point_processor.cpp",
     "window_manager/src/input_windows_manager.cpp",
     "window_manager/src/input_windows_manager_stub.cpp",
     "window_manager/src/outer_interface.cpp",
     "window_manager/src/window_switch.cpp",
   ]
+
+  if (is_mmi_mouse_ready) {
+    sources += [ "window_manager/src/pointer_drawing_manager.cpp" ]
+  }
 
   if (is_mmi_have_hdf) {
     sources += [
@@ -166,6 +189,7 @@ ohos_shared_library("libmmi-server") {
   public_configs = [ ":libmmi_server_public_config" ]
 
   deps = [
+    ":drawing_pointer_image",
     ":mmi_device_config.ini",
     ":mmi_log.conf",
     ":multimodalinput_config_ability.json",
@@ -179,13 +203,20 @@ ohos_shared_library("libmmi-server") {
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core:appexecfwk_core",
     "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler:libeventhandler",
     "//foundation/appexecfwk/standard/kits:appkit_native",
+    "//foundation/multimedia/image_standard:image_framework",
+    "//foundation/multimedia/image_standard/interfaces/innerkits:image",
+    "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
+    "//foundation/windowmanager/wm:libwm",
+    "//foundation/windowmanager/wm:libwmutil",
     "//third_party/libxkbcommon:libxkbcommon",
     "//third_party/wayland_standard:libwayland_server",
     "//third_party/weston:libweston",
     "//utils/native/base:utils",
+
+    #"//foundation/graphic/standard/rosen/modules/2d_graphics:2d_graphics",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
@@ -224,6 +255,123 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 module_output_path = "multimodalinput/unit_out"
 HDF_FWKS = "//drivers/framework"
+
+ohos_unittest("PointerDrawTest") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "//drivers/peripheral/input/interfaces/include",
+    "//drivers/adapter/uhdf2/adapter/osal/include",
+    "//utils/native/base/include",
+    "//third_party/googletest/googletest/include",
+    "//third_party/wayland-ivi-extension/include",
+    "${mmi_path}/frameworks/util/common",
+    "${mmi_path}/frameworks/util/common/include",
+    "${mmi_path}/frameworks/util/network",
+    "${mmi_path}/frameworks/util/network/include",
+    "${mmi_path}/frameworks/util/socket",
+    "${mmi_path}/frameworks/util/socket/include",
+    "${mmi_path}/frameworks/proxy/event_handle",
+    "${mmi_path}/frameworks/proxy/event_handle/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/service/include",
+    "${mmi_path}/service/senior_input_func_proc/include",
+    "${mmi_path}/service/application_manager/include",
+    "${mmi_path}/service/device_manager/include",
+    "${mmi_path}/service/device_scalability/include",
+    "${mmi_path}/service/event_dispatch/include",
+    "${mmi_path}/service/event_package/include",
+    "${mmi_path}/service/event_handle/include",
+    "${mmi_path}/service/event_standard/include",
+    "${mmi_path}/service/hdi_inject/include",
+    "${mmi_path}/service/event_dump/include",
+    "${mmi_path}/service/hdf_adapter/include",
+    "${mmi_path}/service/libinput_adapter/include",
+    "${mmi_path}/service/message_handle/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/window_manager/include",
+    "${mmi_path}/uinput",
+    "$HDF_FWKS/include/utils",
+    "$HDF_FWKS/include/osal",
+    "$HDF_FWKS/core/adapter/syscall/include",
+    "$HDF_FWKS/include/core",
+    "$HDF_FWKS/ability/sbuf/include",
+    "$HDF_FWKS/core/shared/include",
+    "$HDF_FWKS/utils/include",
+    "$HDF_FWKS/inclue",
+    "//foundation/multimodalinput/interfaces/native/innerkits/event/include",
+    "//foundation/graphic/standard/rosen/modules/2d_graphics/include",
+    "//foundation/graphic/standard/rosen/modules/2d_graphics/src",
+  ]
+
+  if (is_mmi_have_libinput || is_mmi_have_hdf) {
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+  }
+  sources = [ "window_manager/test/pointer_drawing_manager_test.cpp" ]
+
+  cflags = [
+    "-DOHOS_BUILD",
+    "-DOHOS_AUTO_TEST_FRAME",
+  ]
+
+  if (is_mmi_have_debug) {
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [ "-DOHOS_BUILD_AI" ]
+  }
+
+  if (is_mmi_have_weston) {
+    cflags += [ "-DOHOS_WESTEN_MODEL" ]
+  }
+
+  if (is_mmi_mouse_ready) {
+    cflags += [ "-DOHOS_MOUSE_READY" ]
+  }
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/frameworks/util:libmmi-util",
+    "${mmi_path}/service:libmmi-server",
+    "//drivers/peripheral/input/hal:hdi_input",
+    "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
+    "//foundation/appexecfwk/standard/kits:appkit_native",
+    "//foundation/multimedia/image_standard:image_framework",
+    "//foundation/multimedia/image_standard/interfaces/innerkits:image",
+    "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
+    "//foundation/windowmanager/wm:libwm",
+    "//foundation/windowmanager/wm:libwmutil",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+    "//third_party/libxkbcommon:libxkbcommon",
+    "//utils/native/base:utils",
+
+    #"//foundation/graphic/standard/rosen/modules/2d_graphics:2d_graphics",
+  ]
+
+  if (is_mmi_have_libinput || is_mmi_have_hdf) {
+    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
+  }
+
+  if (is_mmi_have_weston) {
+    deps += [ "//foundation/graphic/standard/frameworks/wmserver:wmserver" ]
+  }
+
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+}
 
 ohos_unittest("ut-mmi-service-out") {
   module_out_path = module_output_path
@@ -279,7 +427,7 @@ ohos_unittest("ut-mmi-service-out") {
   }
 
   sources = [
-    "application_manager/test/app_register_test.cpp",
+    #"application_manager/test/app_register_test.cpp",
     "device_scalability/test/expansibility_operation_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
     "event_handle/test/register_event_test.cpp",
@@ -351,4 +499,7 @@ group("ut-mmi-service") {
   testonly = true
   deps = []
   deps += [ ":ut-mmi-service-out" ]
+  if (is_mmi_mouse_ready) {
+    deps += [ ":PointerDrawTest" ]
+  }
 }

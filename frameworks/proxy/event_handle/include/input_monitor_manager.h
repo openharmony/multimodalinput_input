@@ -23,6 +23,7 @@ class InputMonitorManager : public Singleton<InputMonitorManager> {
 public:
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor);
     void RemoveMonitor(int32_t monitorId);
+    void MarkConsumed(int32_t monitorId, int32_t eventId);
 };
 } // namespace OHOS::MMI
 #endif // OHOS_MULTIMDOALINPUT_INPUT_MONITOR_MANAGER_H
