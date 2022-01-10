@@ -208,7 +208,7 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_InjectKeyEvent_002, 
     }
 
     ASSERT_TRUE(runCommand.RunShellCommand(command2, rvLog) == RET_OK);
-    ASSERT_TRUE(rvLog.size() > 0);
+    ASSERT_FALSE(rvLog.size() > 0);
     if (rlog.size() == 0) {
         EXPECT_TRUE(rvLog.size() > rlog.size());
         EXPECT_TRUE(rvLog.back().find(command2) != rvLog.back().npos);
