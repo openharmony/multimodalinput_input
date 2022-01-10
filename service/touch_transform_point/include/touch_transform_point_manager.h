@@ -20,14 +20,17 @@
 #include <map>
 #include <memory>
 #include "touch_transform_point_processor.h"
+#include "touchpad_transform_point_processor.h"
 #include "c_singleton.h"
 namespace OHOS {
 namespace MMI {
 class TouchTransformPointManager : public CSingleton<TouchTransformPointManager> {
 public:
     std::shared_ptr<PointerEvent> onLibinputTouchEvent(libinput_event& event);
+    std::shared_ptr<PointerEvent> onLibinputTouchPadEvent(libinput_event& event);
 private:
     std::map<int32_t, std::shared_ptr<TouchTransformPointProcessor>> processors_;
+    std::map<int32_t, std::shared_ptr<TouchPadTransformPointProcessor>> touchpadpro_;
 };
 #define touchTransformPointManger OHOS::MMI::TouchTransformPointManager::GetInstance()
 }

@@ -42,6 +42,7 @@ private:
     void Init(weston_compositor *wc);
     std::vector<int32_t> GetDeviceIdListSync(weston_compositor *wc);
     std::shared_ptr<InputDevice> FindDeviceByIdSync(weston_compositor *wc, int32_t deviceId);
+    bool IsPointerDevice(struct libinput_device* device);
 
     std::map<int32_t, libinput_device*> inputDeviceMap_;
     bool initFlag_ {false};

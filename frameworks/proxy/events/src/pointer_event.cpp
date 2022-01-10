@@ -237,24 +237,40 @@ void PointerEvent::SetButtonId(int32_t buttonId)
     buttonId_ = buttonId;
 }
 
-int32_t PointerEvent::GetAxis()
+double PointerEvent::GetAxisValue(AxisType axis) const
 {
-    return axis_;
+    double axisValue {  };
+    if ((axis >= AXIS_TYPE_UNKNOWN) && (axis < AXIS_TYPE_MAX)) {
+        axisValue = axisValues_[axis];
+    }
+    return axisValue;
 }
 
-void PointerEvent::SetAxis(int32_t axis)
+void PointerEvent::SetAxisValue(AxisType axis, double axisValue)
 {
-    axis_ = axis;
+    if ((axis >= AXIS_TYPE_UNKNOWN) && (axis < AXIS_TYPE_MAX)) {
+        axisValues_[axis] = axisValue;
+        axes_ |= (1 << axis);
+    }
 }
 
-double PointerEvent::GetAxisValue()
+bool PointerEvent::HasAxis(int32_t axes, AxisType axis)
 {
-    return axisValue_;
+    bool ret { false };
+    if ((axis >= AXIS_TYPE_UNKNOWN) && (axis < AXIS_TYPE_MAX)) {
+        ret = static_cast<bool>(axes & (1 << axis));
+    }
+    return ret;
 }
 
-void PointerEvent::SetAxisValue(double axisValue)
+void PointerEvent::SetPressedKeys(const std::vector<int32_t> pressedKeys)
 {
-    axisValue_ = axisValue;
+    pressedKeys_ = pressedKeys;
+}
+
+std::vector<int32_t> PointerEvent::GetPressedKeys() const
+{
+    return pressedKeys_;
 }
 }
 } // namespace OHOS::MMI

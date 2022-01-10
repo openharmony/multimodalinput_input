@@ -57,8 +57,7 @@ void OHOS::MMI::InputEventMonitorManager::RemoveInputEventMontior(int32_t eventT
     MonitorItem monitorItem;
     monitorItem.eventType = eventType;
     monitorItem.session =  session;
-    std::list<MonitorItem>::iterator iter;
-    iter = std::find(monitors_.begin(), monitors_.end(), monitorItem);
+    auto iter = std::find(monitors_.begin(), monitors_.end(), monitorItem);
     if (iter == monitors_.end()) {
         MMI_LOGE("RemoveInputEventMontior::monitorItem does not exist");
     } else {
@@ -91,4 +90,74 @@ void OHOS::MMI::InputEventMonitorManager::ReportKeyEvent(std::shared_ptr<OHOS::M
              "deviceId=%{private}d, actionTime = %{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
              keyEvent->GetAction(), keyEvent->GetDeviceId(), keyEvent->GetActionTime());
     OnMonitorInputEvent(keyEvent);
+}
+
+int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
+{
+    MMI_LOGD("InputEventMonitorManager::AddInputEventTouchpadMontior");
+    std::lock_guard<std::mutex> lock(mu_);
+    MonitorItem monitorItemTouchpad;
+    monitorItemTouchpad.eventType = eventType;
+    monitorItemTouchpad.session = session;
+    auto iter = std::find(monitorsTouch_.begin(), monitorsTouch_.end(), monitorItemTouchpad);
+    if (iter != monitorsTouch_.end()) {
+        MMI_LOGE("SetEventTouchpadMonitor:repeate register");
+        return RET_ERR;
+    } else {
+        iter = monitorsTouch_.insert(iter, monitorItemTouchpad);
+        MMI_LOGD("eventType: %{public}d, fd: %{public}d register in server", eventType, session->GetFd());
+        MMI_LOGD("Service AddInputEventTouchpadMontior Success");
+        return RET_OK;
+    }
+}
+
+void OHOS::MMI::InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
+{
+    MMI_LOGD("InputEventMonitorManager::RemoveInputEventTouchpadMontior");
+    std::lock_guard<std::mutex> lock(mu_);
+    MonitorItem monitorItemtouchpad;
+    monitorItemtouchpad.eventType = eventType;
+    monitorItemtouchpad.session = session;
+    std::list<MonitorItem>::iterator iter;
+    iter = std::find(monitorsTouch_.begin(), monitorsTouch_.end(), monitorItemtouchpad);
+    if (iter == monitorsTouch_.end()) {
+        MMI_LOGE("RemoveInputEventTouchpadMontior::monitorItemtouchpad does not exist");
+    } else {
+        MMI_LOGD("eventType: %{public}d, fd: %{public}d remove from server", eventType, session->GetFd());
+        iter = monitorsTouch_.erase(iter);
+        MMI_LOGD("Service RemoveInputEventTouchpadMontior Success");
+    }
+}
+
+void OHOS::MMI::InputEventMonitorManager::OnTouchpadMonitorInputEvent(
+    std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
+{
+    MMI_LOGD("InputEventMonitorManager::OnTouchpadMonitorInputEvent");
+    if (monitorsTouch_.empty()) {
+        MMI_LOGE("InputEventMonitorManager::%{public}s no monitor to send msg", __func__);
+    }
+    NetPacket newPkt(MmiMessageId::ON_TOUCHPAD_MONITOR);
+    InputEventDataTransformation::SerializePointerEvent(pointerEvent, newPkt);
+    std::list<MonitorItem>::iterator iter;
+    for (iter = monitorsTouch_.begin(); iter != monitorsTouch_.end(); iter++) {
+        newPkt << iter->session->GetPid();
+        MMI_LOGD("server send the msg to client: EventType = %{public}d, pid = %{public}d",
+            pointerEvent->GetEventType(), iter->session->GetPid());
+        iter->session->SendMsg(newPkt);
+        MMI_LOGD("Service SendMsg Success");
+    }
+}
+
+bool OHOS::MMI::InputEventMonitorManager::ReportTouchpadEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
+{
+    PointerEvent::PointerItem pointer;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer);
+    MMI_LOGT("\nmonitor-service\neventTouchpad:time=%{public}d;"
+             "sourceType=%{public}d;action=%{public}d;"
+             "pointerId=%{public}d;point.x=%{public}d;point.y=%{public}d;press=%{public}d"
+             "\n*********************************************************\n",
+             pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
+             pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
+    OnTouchpadMonitorInputEvent(pointerEvent);
+    return true;
 }

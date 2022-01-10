@@ -21,6 +21,9 @@
 
 namespace OHOS {
 namespace MMI {
+#define MAX_N_INPUT_HANDLERS        16
+#define MAX_N_INPUT_MONITORS        MAX_N_INPUT_HANDLERS
+
 enum InputHandlerType : int32_t {
     NONE,
     INTERCEPTOR,

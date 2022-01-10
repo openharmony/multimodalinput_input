@@ -16,6 +16,7 @@
 #define OHOS_INPUT_EVENT_MONITOR_MANAGER_H
 
 #include "key_event.h"
+#include "pointer_event.h"
 #include "multimodal_event_handler.h"
 #include "proto.h"
 #include "singleton.h"
@@ -32,6 +33,7 @@ struct MonitorItem {
     }
     std::string name;
     std::function<void (std::shared_ptr<OHOS::MMI::KeyEvent>)> keyEventMonitor;
+    std::function<void (std::shared_ptr<OHOS::MMI::PointerEvent>)> TouchPadEventMonitor;
 };
 
 class InputEventMonitorManager {
@@ -42,6 +44,14 @@ public:
     int32_t AddInputEventMontior(std::function<void (std::shared_ptr<OHOS::MMI::KeyEvent>)> keyEventMonitor);
     void RemoveInputEventMontior(int32_t monitorId);
     int32_t OnMonitorInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent);
+
+    int32_t AddInputEventTouchpadMontior(std::function<void (std::shared_ptr<OHOS::MMI::PointerEvent>)>
+                                        TouchPadEventMonitor);
+    void RemoveInputEventTouchpadMontior(int32_t monitorId);
+    int32_t OnTouchpadMonitorInputEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
+
+public:
+    static const int32_t INVALID_MONITOR_ID { -1 };
 
 private:
     std::list<MonitorItem> monitors_;

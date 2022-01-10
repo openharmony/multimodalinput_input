@@ -24,9 +24,9 @@ class KeyOption {
 public:
     std::vector<int32_t> GetPreKeys() const;
     void SetPreKeys(const std::vector<int32_t>& preKeys);
-
+    uint32_t GetPreKeySize();
     int32_t GetFinalKey() const;
-    void SetFinalKey(int32_t finalKey) const;
+    void SetFinalKey(int32_t finalKey);
 
     bool IsFinalKeyDown() const;
     void SetFinalKeyDown(bool pressed);
@@ -36,6 +36,7 @@ public:
 
 private:
     std::vector<int32_t> preKeys_;
+    uint32_t preKeySize_;
     int32_t finalKey_;
     bool isFinalKeyDown_;
     int32_t finalKeyDownDuration_;
