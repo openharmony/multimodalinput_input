@@ -359,7 +359,7 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event& event)
 #endif  // OHOS_AUTO_TEST_FRAME
 
     auto hosKey = KeyValueTransformationByInput(key.key); // libinput key transformed into HOS key
-    key.mUnicode = 0;
+    key.unicode = 0;
 #ifndef OHOS_AUTO_TEST_FRAME
     if (hosKey.isSystemKey) { // Judging whether key is system key.
         OnSystemEvent(hosKey, key.state);
@@ -440,7 +440,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKeyboard(multimodal_libinput_event 
 #endif  // OHOS_AUTO_TEST_FRAME
 
     auto hosKey = KeyValueTransformationByInput(key.key); // libinput key transformed into HOS key
-    key.mUnicode = 0;
+    key.unicode = 0;
 #ifndef OHOS_AUTO_TEST_FRAME
     if (hosKey.isSystemKey && OnSystemEvent(hosKey, key.state)) { // Judging whether key is system key.
         return RET_OK;
@@ -886,7 +886,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventJoyStickKey(multimodal_libinput_eve
 #endif  // OHOS_AUTO_TEST_FRAME
     // libinput key transformed into HOS key
     auto hosKey = KeyValueTransformationByInput(key.key);
-    key.mUnicode = 0;
+    key.unicode = 0;
     // Judging whether key is system key.
 #ifndef OHOS_AUTO_TEST_FRAME
     if (hosKey.isSystemKey && OnSystemEvent(hosKey, key.state)) {
