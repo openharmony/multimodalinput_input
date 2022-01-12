@@ -30,7 +30,7 @@ namespace OHOS::MMI {
         EventPackage();
         virtual ~EventPackage();
         template<class EventType>
-        int32_t PackageEventDeviceInfo(libinput_event& event, EventType& eventData, UDSServer& udsServer);
+        int32_t PackageEventDeviceInfo(libinput_event& event, UDSServer& udsServer, EventType& eventData);
         template<class T>
         int32_t PackageRegisteredEvent(RegisteredEvent& registeredEvent, T& eventData);
         int32_t PackageTabletToolEvent(libinput_event& event, EventTabletTool& tableTool, UDSServer& udsServer);
