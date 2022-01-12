@@ -700,7 +700,7 @@ int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& k
     key.state = (enum KEY_STATE)event.isPressed;
     key.eventType = LIBINPUT_EVENT_KEYBOARD_KEY;
     key.deviceType = HOS_VIRTUAL_KEYBOARD;
-    key.mUnicode = 0;
+    key.unicode = 0;
     if (event.isPressed) {
         key.seat_key_count = SEAT_KEY_COUNT_ONE;
     } else {
