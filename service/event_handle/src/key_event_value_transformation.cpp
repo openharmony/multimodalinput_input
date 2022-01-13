@@ -445,7 +445,7 @@ KeyEventValueTransformations KeyValueTransformationByInput(int16_t keyValueOfInp
     auto it = MAP_KEY_EVENT_VALUE_TRANSFORMATION.find(keyValueOfInput);
     if (it == MAP_KEY_EVENT_VALUE_TRANSFORMATION.end()) {
         KeyEventValueTransformations unknownEvent = {
-                "KEY_UNKNOWN", keyValueOfInput, keyValueOfInput, HOS_KEY_UNKNOWN, 0
+            "KEY_UNKNOWN", keyValueOfInput, keyValueOfInput, HOS_KEY_UNKNOWN, 0
         };
         MMI_LOGE("KeyValueTransformationByInput Failed because of unknown linux-code=%{public}d\n", keyValueOfInput);
         return unknownEvent;
