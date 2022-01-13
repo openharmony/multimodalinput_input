@@ -13,15 +13,13 @@
  * limitations under the License.
  */
 
-
-#include "input_manager.h"
 #include <gtest/gtest.h>
 #include <sstream>
 #include "define_multimodal.h"
-#include "multimodal_standardized_event_manager.h"
+#include "input_manager.h"
 #include "key_event.h"
 #include "key_event_pre.h"
-#include "multimodal_event_handler.h"
+#include "multimodal_standardized_event_manager.h"
 #include "proto.h"
 #include "pointer_event.h"
 #include "run_shell_util.h"
@@ -78,57 +76,98 @@ std::shared_ptr<PointerEvent> PointerEventTest::createPointEvent()
     return pointerEvent;
 }
 
+/**
+ * @tc.name:PointerEventTest_keyEventAndPointerEvent_001
+ * @tc.desc:Verify ctrl(left) + point event
+ * @tc.type: FUNC
+ * @tc.require: AR000GOACS
+ * @tc.author: yangguang
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_001, TestSize.Level1)
 {
     RunShellUtil runCommand;
-    std::string log1 = "Inject pointer event ...";
-    std::string log2 = "Pressed keyCode=";
+    std::string log1 = "Pressed keyCode=";
     std::vector<std::string> beforeRunLogs;
     ASSERT_TRUE(runCommand.RunShellCommand(log1, beforeRunLogs) == RET_OK);
-    ASSERT_TRUE(runCommand.RunShellCommand(log2, beforeRunLogs) == RET_OK);
 
     std::shared_ptr<PointerEvent> pointerEvent = createPointEvent();
+    // KEYCODE_CTRL_LEFT = 2072
     std::vector<int32_t> pressedKeys { OHOS::MMI::KeyEvent::KEYCODE_CTRL_LEFT };
     pointerEvent->SetPressedKeys(pressedKeys);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-    
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
     std::vector<std::string> afterRunLogs;
     ASSERT_TRUE(runCommand.RunShellCommand(log1, afterRunLogs) == RET_OK);
-    ASSERT_TRUE(runCommand.RunShellCommand(log2, afterRunLogs) == RET_OK);
-    ASSERT_TRUE(afterRunLogs.size() > 0);
+    EXPECT_TRUE(afterRunLogs.size() > 0);
     if (beforeRunLogs.size() == 0) {
         EXPECT_TRUE(afterRunLogs.size() > beforeRunLogs.size());
         EXPECT_TRUE(afterRunLogs.back().find(log1) != afterRunLogs.back().npos);
-        EXPECT_TRUE(afterRunLogs.back().find(log2) != afterRunLogs.back().npos);
     } else {
         EXPECT_TRUE(std::strcmp(afterRunLogs.back().c_str(), beforeRunLogs.back().c_str()) != 0);
     }
 }
 
+/**
+ * @tc.name:PointerEventTest_keyEventAndPointerEvent_002
+ * @tc.desc:Verify ctrl(right) + point event
+ * @tc.type: FUNC
+ * @tc.require: AR000GOACS
+ * @tc.author: yangguang
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_002, TestSize.Level1)
 {
     RunShellUtil runCommand;
-    std::string log1 = "Inject pointer event ...";
-    std::string log2 = "Pressed keyCode=";
+    std::string log1 = "Pressed keyCode=";
     std::vector<std::string> beforeRunLogs;
     ASSERT_TRUE(runCommand.RunShellCommand(log1, beforeRunLogs) == RET_OK);
-    ASSERT_TRUE(runCommand.RunShellCommand(log2, beforeRunLogs) == RET_OK);
 
     std::shared_ptr<PointerEvent> pointerEvent = createPointEvent();
-    std::vector<int32_t> pressedKeys { OHOS::MMI::KeyEvent::KEYCODE_CTRL_LEFT, OHOS::MMI::KeyEvent::KEYCODE_ALT_LEFT };
+    // KEYCODE_CTRL_RIGHT = 2073
+    std::vector<int32_t> pressedKeys { OHOS::MMI::KeyEvent::KEYCODE_CTRL_RIGHT };
     pointerEvent->SetPressedKeys(pressedKeys);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
     std::vector<std::string> afterRunLogs;
     ASSERT_TRUE(runCommand.RunShellCommand(log1, afterRunLogs) == RET_OK);
-    ASSERT_TRUE(runCommand.RunShellCommand(log2, afterRunLogs) == RET_OK);
-    ASSERT_TRUE(afterRunLogs.size() > 0);
+    EXPECT_TRUE(afterRunLogs.size() > 0);
     if (beforeRunLogs.size() == 0) {
         EXPECT_TRUE(afterRunLogs.size() > beforeRunLogs.size());
         EXPECT_TRUE(afterRunLogs.back().find(log1) != afterRunLogs.back().npos);
-        EXPECT_TRUE(afterRunLogs.back().find(log2) != afterRunLogs.back().npos);
+    } else {
+        EXPECT_TRUE(std::strcmp(afterRunLogs.back().c_str(), beforeRunLogs.back().c_str()) != 0);
+    }
+}
+
+/**
+ * @tc.name:PointerEventTest_keyEventAndPointerEvent_003
+ * @tc.desc:Verify ctrl(left and right) + point event
+ * @tc.type: FUNC
+ * @tc.require: AR000GOACS
+ * @tc.author: yangguang
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSize.Level1)
+{
+    RunShellUtil runCommand;
+    std::string log1 = "Pressed keyCode=";
+    std::vector<std::string> beforeRunLogs;
+    ASSERT_TRUE(runCommand.RunShellCommand(log1, beforeRunLogs) == RET_OK);
+
+    std::shared_ptr<PointerEvent> pointerEvent = createPointEvent();
+    // KEYCODE_CTRL_LEFT = 2072, KEYCODE_CTRL_RIGHT = 2073
+    std::vector<int32_t> pressedKeys { OHOS::MMI::KeyEvent::KEYCODE_CTRL_LEFT,
+        OHOS::MMI::KeyEvent::KEYCODE_CTRL_RIGHT };
+    pointerEvent->SetPressedKeys(pressedKeys);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    
+    std::vector<std::string> afterRunLogs;
+    ASSERT_TRUE(runCommand.RunShellCommand(log1, afterRunLogs) == RET_OK);
+    EXPECT_TRUE(afterRunLogs.size() > 0);
+    if (beforeRunLogs.size() == 0) {
+        EXPECT_TRUE(afterRunLogs.size() > beforeRunLogs.size());
+        EXPECT_TRUE(afterRunLogs.back().find(log1) != afterRunLogs.back().npos);
     } else {
         EXPECT_TRUE(std::strcmp(afterRunLogs.back().c_str(), beforeRunLogs.back().c_str()) != 0);
     }

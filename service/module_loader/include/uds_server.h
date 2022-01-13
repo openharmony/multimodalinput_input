@@ -19,6 +19,8 @@
 #include <mutex>
 #include <thread>
 #include <functional>
+#include <list>
+
 #include "i_uds_server.h"
 #include "uds_session.h"
 #include "uds_socket.h"
@@ -52,6 +54,8 @@ public:
     void OnEpollEvent(epoll_event& ev, CLMAP<int32_t, StreamBufData>& bufMap);
     void OnEpollRecv(int32_t fd, const char *buf, size_t size);
 
+    void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
+
 public:
     virtual int32_t AddSocketPairInfo(const std::string& programName, const int moduleType, int& serverFd,
                                       int& toReturnClientFd, const int32_t uid, const int32_t pid);
@@ -84,12 +88,16 @@ protected:
     void DumpSession(const std::string& title);
     bool ClearDeadSessionInMap(const int serverFd, const int clientFd);
 
+    void NotifySessionDeleted(SessionPtr ses);
+
 protected:
     std::mutex mux_;
     std::thread t_;
     bool isRun_ = false;
     MsgServerFunCallback recvFun_ = nullptr;
     std::map<int32_t, SessionPtr> sessionsMap_ = {};
+
+    std::list<std::function<void(SessionPtr)>> callbacks_;
 };
 }
 }

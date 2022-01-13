@@ -46,6 +46,8 @@ public:
     std::vector<EventRegesterInfo>& GetAbilityInfoVec();
     int32_t InjectEvent(const OHOS::KeyEvent& keyEvent);
     int32_t InjectEvent(const OHOS::MMI::KeyEvent& keyEvent);
+    int32_t InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr);
+    
     int32_t AddKeyEventFIlter(int32_t id, std::string name, Authority authority);
     int32_t RemoveKeyEventFIlter(int32_t id);
     int32_t AddTouchEventFilter(int32_t id, std::string name, Authority authority);

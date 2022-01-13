@@ -24,6 +24,7 @@
 namespace OHOS {
 namespace MMI {
 typedef std::function<int32_t(const UDSClient&, NetPacket&)> ClientMsgFun;
+static const bool fSkipId = false;
 class ClientMsgHandler : public MsgHandler<ClientMsgFun>,
     public IfClientMsgHandler, public std::enable_shared_from_this<IfClientMsgHandler> {
 public:
@@ -84,6 +85,7 @@ protected:
     virtual int32_t OnInputDevice(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnInputDeviceIds(const UDSClient& client, NetPacket& pkt);
     virtual int32_t TouchpadEventInterceptor(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t KeyEventInterceptor(const UDSClient& client, NetPacket& pkt);
 
 private:
     int32_t PackedData(MultimodalEvent& multe, const UDSClient& client, NetPacket& pkt, const std::string& funName);

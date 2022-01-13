@@ -21,6 +21,7 @@
 #include <memory>
 #include <map>
 #include <set>
+#include "parcel.h"
 #include "input_event.h"
 namespace OHOS {
 namespace MMI {
@@ -139,6 +140,9 @@ public:
         // Get or set the device id, the default value is 0, which means non-real device
         int32_t GetDeviceId() const;
         void SetDeviceId(int32_t deviceId);
+    public:
+        bool WriteToParcel(Parcel &out) const;
+        bool ReadFromParcel(Parcel &in);
 
     private:
         int32_t pointerId_ { 0 };
@@ -197,6 +201,10 @@ public:
 
 public:
     static bool HasAxis(int32_t axes, AxisType axis);
+
+public:
+    bool WriteToParcel(Parcel &out) const;
+    bool ReadFromParcel(Parcel &in);
 
 protected:
     explicit PointerEvent(int32_t eventType);

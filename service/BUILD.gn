@@ -36,7 +36,9 @@ config("libmmi_server_public_config") {
     "server_input_filter_manager/include",
     "ability_launch/include",
     "key_event_input_subscribe_filter/include",
+    "timer_manager/include",
     "${mmi_service_path}/connect_manager/include",
+    "${mmi_service_path}/event_filter_binder/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "mouse_event_handler/include",
@@ -102,10 +104,6 @@ config("libmmi_server_public_config") {
     ]
     cflags += [ "-DOHOS_WESTEN_MODEL" ]
   }
-
-  if (is_mmi_mouse_ready) {
-    cflags += [ "-DOHOS_MOUSE_READY" ]
-  }
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
@@ -159,11 +157,9 @@ ohos_shared_library("libmmi-server") {
     "window_manager/src/input_windows_manager_stub.cpp",
     "window_manager/src/outer_interface.cpp",
     "window_manager/src/window_switch.cpp",
+    "timer_manager/src/timer_manager.cpp",
+    "window_manager/src/pointer_drawing_manager.cpp"
   ]
-
-  if (is_mmi_mouse_ready) {
-    sources += [ "window_manager/src/pointer_drawing_manager.cpp" ]
-  }
 
   if (is_mmi_have_hdf) {
     sources += [
@@ -211,12 +207,12 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
     "//foundation/windowmanager/wm:libwm",
     "//foundation/windowmanager/wm:libwmutil",
+    "//foundation/multimodalinput/input/service/event_filter_binder:mmi_event_filter_proxy",
     "//third_party/libxkbcommon:libxkbcommon",
     "//third_party/wayland_standard:libwayland_server",
     "//third_party/weston:libweston",
     "//utils/native/base:utils",
-
-    #"//foundation/graphic/standard/rosen/modules/2d_graphics:2d_graphics",
+    "//foundation/graphic/standard/rosen/modules/2d_graphics:2d_graphics",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
@@ -336,10 +332,6 @@ ohos_unittest("PointerDrawTest") {
 
   if (is_mmi_have_weston) {
     cflags += [ "-DOHOS_WESTEN_MODEL" ]
-  }
-
-  if (is_mmi_mouse_ready) {
-    cflags += [ "-DOHOS_MOUSE_READY" ]
   }
 
   deps = [
@@ -499,7 +491,5 @@ group("ut-mmi-service") {
   testonly = true
   deps = []
   deps += [ ":ut-mmi-service-out" ]
-  if (is_mmi_mouse_ready) {
-    deps += [ ":PointerDrawTest" ]
-  }
+  deps += [ ":PointerDrawTest" ]
 }

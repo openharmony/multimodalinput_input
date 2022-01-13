@@ -77,5 +77,36 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
 
     return RET_OK;
 }
+
+int32_t MultimodalInputConnectProxy::SetInputEventFilter(sptr<IEventFilter> filter)
+{
+    MMI_LOGE("enter");
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_LOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+
+    if (!data.WriteRemoteObject(filter->AsObject().GetRefPtr())) {
+        MMI_LOGE("Failed to write filter");
+        return ERR_INVALID_VALUE;
+    }
+
+    int32_t requestResult = Remote()->SendRequest(SET_EVENT_POINTER_FILTER, data, reply, option);
+    if (requestResult != NO_ERROR) {
+        MMI_LOGE("send request fail, result: %{public}d", requestResult);
+        return RET_ERR;
+    }
+
+    int32_t result = reply.ReadInt32();
+    if (result != RET_OK) {
+        MMI_LOGE("responce return error: %{public}d", result);
+    }
+
+    return result;
+}
 } // namespace MMI
 } // namespace OHOS

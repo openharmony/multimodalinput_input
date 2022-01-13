@@ -37,6 +37,8 @@ namespace OHOS::MMI {
         int32_t PackageTabletPadEvent(libinput_event& event, EventTabletPad& tabletPad, UDSServer& udsServer);
         int32_t PackageDeviceManageEvent(libinput_event& event, DeviceManage& deviceManage, UDSServer& udsServer);
         int32_t PackageKeyEvent(libinput_event& event, EventKeyboard& key, UDSServer& udsServer);
+        int32_t PackageKeyEvent(libinput_event& event, std::shared_ptr<OHOS::MMI::KeyEvent> kevnPtr, 
+            UDSServer& udsServer);
         int32_t PackageGestureEvent(libinput_event& event, EventGesture& gesture, UDSServer& udsServer);
         int32_t PackagePointerEvent(multimodal_libinput_event &ev, EventPointer& point,
             WindowSwitch& windowSwitch, UDSServer& udsServer);

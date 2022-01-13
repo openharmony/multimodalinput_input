@@ -36,6 +36,7 @@ public:
     void OnStop() override;
     void OnDump() override;
     virtual int32_t AllocSocketFd(const std::string &programName, const int moduleType, int &socketFd) override;
+    virtual int32_t SetInputEventFilter(sptr<IEventFilter> filter) override;
 
 protected:
     virtual int32_t HandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) override;

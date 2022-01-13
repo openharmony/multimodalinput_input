@@ -16,11 +16,13 @@
 #include "input_manager_impl.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+#include "event_filter_service.h"
 #include "input_event_monitor_manager.h"
 #include "input_monitor_manager.h"
 #include "interceptor_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
+#include "multimodal_input_connect_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -55,7 +57,30 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
     MMI_LOGD("InputManagerImpl::UpdateDisplayInfo leave!");
 }
 
-void InputManagerImpl::SetInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent> filter)>) {}
+void InputManagerImpl::SetInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
+{
+    if (eventFilterService_ == nullptr) {
+        eventFilterService_ = new EventFilterService();
+    }
+
+    if (eventFilterService_ == nullptr) {
+        MMI_LOGE("eventFilterService_ is nullptr");
+        return;
+    }
+
+    eventFilterService_->SetPointerEventPtr(filter);
+
+    static bool hasSendToMmiServer = false;
+    if (!hasSendToMmiServer) {
+        int32_t ret = MultimodalInputConnectManager::GetInstance()->SetInputEventFilter(eventFilterService_);
+        if (ret == RET_OK) {
+            hasSendToMmiServer = true;
+            MMI_LOGI("SetInputEventFilter has send to server success");
+        } else {
+            MMI_LOGE("SetInputEventFilter has send to server fail, ret = %{public}d", ret);
+        }        
+    }
+}
 
 void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::IInputEventConsumer> inputEventConsumer)
 {
@@ -230,14 +255,30 @@ int32_t InputManagerImpl::AddInterceptor(int32_t sourceType,
 {
     if (interceptor == nullptr) {
         MMI_LOGE("AddInterceptor::%{public}s param should not be null!", __func__);
-        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
+        return InterceptorManager::INVALID_INTERCEPTOR_ID;
     }
     return INTERCEPTORMANAGER.AddInterceptor(sourceType, interceptor);
+}
+
+int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
+{
+    if (interceptor == nullptr) {
+        MMI_LOGE("AddInterceptor::%{public}s param should not be null!", __func__);
+        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
+    }
+    return INTERCEPTORMANAGER.AddInterceptor(interceptor);
 }
 
 void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 {
     INTERCEPTORMANAGER.RemoveInterceptor(interceptorId);
+}
+
+void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+{
+    if (MMIEventHdl.InjectEvent(keyEvent) != RET_OK) {
+        MMI_LOGE("Failed to inject keyEvent!");
+    }
 }
 }
 }

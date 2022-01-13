@@ -15,20 +15,21 @@
 
 #include "server_msg_handler.h"
 #include <inttypes.h>
-#include "mmi_func_callback.h"
+#include "ability_launch_manager.h"
 #include "ai_func_proc.h"
 #include "event_dump.h"
 #include "event_package.h"
 #include "input_device_manager.h"
 #include "input_event_data_transformation.h"
+#include "input_event.h"
 #include "input_event_monitor_manager.h"
 #include "input_handler_manager_global.h"
 #include "input_windows_manager.h"
 #include "interceptor_manager_global.h"
 #include "knuckle_func_proc.h"
+#include "mmi_func_callback.h"
 #include "mmi_server.h"
 #include "server_input_filter_manager.h"
-#include "ability_launch_manager.h"
 #include "time_cost_chk.h"
 
 #ifdef OHOS_BUILD_HDF
@@ -66,6 +67,7 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::ON_LIST, MsgCallbackBind2(&ServerMsgHandler::OnListInject, this)},
         {MmiMessageId::GET_MMI_INFO_REQ, MsgCallbackBind2(&ServerMsgHandler::GetMultimodeInputInfo, this)},
         {MmiMessageId::INJECT_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectKeyEvent, this) },
+        {MmiMessageId::NEW_INJECT_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnNewInjectKeyEvent, this) },
         {MmiMessageId::INJECT_POINTER_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectPointerEvent, this) },
         {MmiMessageId::ADD_KEY_EVENT_INTERCEPTOR, MsgCallbackBind2(&ServerMsgHandler::OnAddKeyEventFilter, this)},
         {MmiMessageId::REMOVE_KEY_EVENT_INTERCEPTOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveKeyEventFilter, this)},
@@ -88,9 +90,9 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::MARK_CONSUMED, MsgCallbackBind2(&ServerMsgHandler::OnMarkConsumed, this)},
         {MmiMessageId::SUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnSubscribeKeyEvent, this)},
         {MmiMessageId::UNSUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnUnSubscribeKeyEvent, this)},
-        {MmiMessageId::ADD_TOUCHPAD_EVENT_INTERCEPTOR,
+        {MmiMessageId::ADD_EVENT_INTERCEPTOR,
             MsgCallbackBind2(&ServerMsgHandler::OnAddTouchpadEventFilter, this)},
-        {MmiMessageId::REMOVE_TOUCHPAD_EVENT_INTERCEPTOR,
+        {MmiMessageId::REMOVE_EVENT_INTERCEPTOR,
             MsgCallbackBind2(&ServerMsgHandler::OnRemoveTouchpadEventFilter, this)},
 #ifdef OHOS_BUILD_AI
         {MmiMessageId::SENIOR_INPUT_FUNC, MsgCallbackBind2(&ServerMsgHandler::OnSeniorInputFuncProc, this)},
@@ -387,6 +389,36 @@ int32_t OHOS::MMI::ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetP
     return RET_OK;
 }
 
+int32_t OHOS::MMI::ServerMsgHandler::OnNewInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
+{
+    CHKR(sess, NULL_POINTER, RET_ERR);
+    uint64_t preHandlerTime = GetSysClockTime();
+
+    std::shared_ptr<OHOS::MMI::KeyEvent> nPtr = OHOS::MMI::KeyEvent::Create();
+    bool skipId = true;
+    int32_t errCode = InputEventDataTransformation::NetPacketToKeyEvent(skipId, nPtr, pkt);
+    if (errCode != RET_OK) {
+        MMI_LOGE("Deserialization is Failed! %{public}u", errCode);
+        return RET_ERR;
+    }
+    
+    if (nPtr->HasFlag(OHOS::MMI::InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
+        if (INTERCEPTORMANAGERGLOBAL.OnKeyEvent(nPtr)) {
+            MMI_LOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d", 
+                nPtr->GetKeyCode());
+            return RET_OK;
+        }
+    }
+    
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, nPtr, preHandlerTime);
+    if (eventDispatchResult != RET_OK) {
+        MMI_LOGE("Key event dispatch failed... ret:%{public}d errCode:%{public}d",
+            eventDispatchResult, KEY_EVENT_DISP_FAIL);
+    }
+    MMI_LOGD("Inject keyCode = %{public}d,action = %{public}d", nPtr->GetKeyCode(), nPtr->GetKeyAction());
+    return RET_OK;
+}
+
 int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
     CHKR(sess, NULL_POINTER, RET_ERR);
@@ -427,14 +459,6 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
         keyEvent = OHOS::MMI::KeyEvent::Create();
     }
     EventPackage::KeyboardToKeyEvent(key, keyEvent, *udsServer_);
-    if (AbilityMgr->CheckLaunchAbility(keyEvent)) {
-        MMI_LOGD("key event start launch an ability, keyCode : %{puiblic}d", key.key);
-        return RET_OK;
-    }
-    if (KeyEventInputSubscribeFlt.FilterSubscribeKeyEvent(*udsServer_, keyEvent)) {
-        MMI_LOGD("subscribe key event filter success. keyCode=%{puiblic}d", key.key);
-        return RET_OK;
-    }
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed... ret:%{public}d errCode:%{public}d",
@@ -478,14 +502,6 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPa
     auto pointerEvent = OHOS::MMI::PointerEvent::Create();
     CHKR((RET_OK == InputEventDataTransformation::DeserializePointerEvent(false, pointerEvent, pkt)),
         STREAM_BUF_READ_FAIL, RET_ERR);
-    std::vector<int32_t> pressedKeys = pointerEvent->GetPressedKeys();
-    if (pressedKeys.empty()) {
-        MMI_LOGI("Pressed keys is empty");
-    } else {
-        for (int32_t keyCode : pressedKeys) {
-            MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
-        }
-    }
     CHKR((RET_OK == eventDispatch_.handlePointerEvent(pointerEvent)), POINT_EVENT_DISP_FAIL, RET_ERR);
     return RET_OK;
 }
@@ -669,7 +685,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPac
     bool isFinalKeyDown = true;
     int32_t finalKeyDownDuration = 0;
     pkt >> subscribeId >> finalKey >> isFinalKeyDown >> finalKeyDownDuration >> preKeySize;
-    for (int32_t i = 0; i < preKeySize; ++i) {
+    for (auto i = 0U; i < preKeySize; ++i) {
         pkt >> tmpKey;
         preKeys.push_back(tmpKey);
     }
@@ -678,7 +694,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPac
     keyOption->SetFinalKey(finalKey);
     keyOption->SetFinalKeyDown(isFinalKeyDown);
     keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
-    int32_t ret = KeyEventInputSubscribeFlt.SubscribeKeyEventForServer(sess, subscribeId, keyOption);
+    int32_t ret = KeyEventInputSubscribeFlt.SubscribeKeyEvent(sess, subscribeId, keyOption);
     return ret;
 }
 
@@ -686,7 +702,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnUnSubscribeKeyEvent(SessionPtr sess, NetP
 {
     int32_t subscribeId = -1;
     pkt >> subscribeId;
-    int32_t ret = KeyEventInputSubscribeFlt.UnSubscribeKeyEventForServer(sess, subscribeId);
+    int32_t ret = KeyEventInputSubscribeFlt.UnSubscribeKeyEvent(sess, subscribeId);
     return ret;
 }
 

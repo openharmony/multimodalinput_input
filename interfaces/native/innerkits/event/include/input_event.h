@@ -19,6 +19,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include "parcel.h"
 
 namespace OHOS {
 namespace MMI {
@@ -39,7 +40,7 @@ public:
     static const int32_t EVENT_TYPE_AXIS = 0X00030000;
 
     static const int32_t EVENT_FLAG_NONE = 0;
-    static const int32_t EVENT_FLAT_NO_INTERCEPT = 1;
+    static const int32_t EVENT_FLAG_NO_INTERCEPT = 1;
 
     static const int32_t DEFALUTID = -1;
 
@@ -136,6 +137,10 @@ public:
      */
     void SetProcessedCallback(std::function<void()> callback);
 
+public:
+    bool WriteToParcel(Parcel &out) const;
+    bool ReadFromParcel(Parcel &in);
+
 protected:
     explicit InputEvent(int32_t eventType);
 
@@ -151,7 +156,6 @@ protected:
     int32_t agentWindowId_;
     int32_t flag_;
     std::function<void()> processedCallback_;
-    std::mutex mutex_;
 };
 }
 } // namespace OHOS::MMI
