@@ -687,6 +687,57 @@ int32_t EventPackage::PackageKeyEvent(libinput_event& event, EventKeyboard& key,
     return RET_OK;
 }
 
+int32_t EventPackage::PackageKeyEvent(libinput_event& event,
+    std::shared_ptr<OHOS::MMI::KeyEvent> kevnPtr, UDSServer& udsServer)
+{
+    MMI_LOGD("PackageKeyEvent begin");
+    CHKR(kevnPtr, NULL_POINTER, RET_ERR);
+    kevnPtr->UpdateId();
+    EventKeyboard key = {};
+    OHOS::MMI::KeyEvent::KeyItem item;
+    auto ret = PackageEventDeviceInfo<EventKeyboard>(event, key, udsServer);
+    if (ret != RET_OK) {
+        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        return DEV_PARAM_PKG_FAIL;
+    }
+    auto data = libinput_event_get_keyboard_event(&event);
+    CHKR(data, NULL_POINTER, RET_ERR);
+    // libinput key transformed into HOS key
+    auto hosKey = KeyValueTransformationByInput(libinput_event_keyboard_get_key(data)); 
+
+    int32_t deviceId = static_cast<int32_t>(key.deviceId);
+    int32_t actionTime = static_cast<int64_t>(GetSysClockTime());
+    int32_t keyCode = static_cast<int32_t>(hosKey.keyValueOfHos);
+    int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
+        (OHOS::MMI::KeyEvent::KEY_ACTION_UP) : (OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    int32_t actionStartTime = static_cast<int32_t>(libinput_event_keyboard_get_time_usec(data));
+
+    kevnPtr->SetActionTime(actionTime);
+    kevnPtr->SetAction(keyAction);
+    kevnPtr->SetActionStartTime(actionStartTime);
+    kevnPtr->SetDeviceId(deviceId);
+    kevnPtr->SetKeyCode(keyCode);
+    kevnPtr->SetKeyAction(keyAction);
+
+    bool isKeyPressed = (libinput_event_keyboard_get_key_state(data) == 0) ? (false) : (true);
+    if (isKeyPressed) {
+        int32_t keyDownTime = actionStartTime;
+        item.SetDownTime(keyDownTime);
+    }
+    item.SetKeyCode(keyCode);
+    item.SetDeviceId(deviceId);
+    item.SetPressed(isKeyPressed); 
+
+    if (keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
+        kevnPtr->AddPressedKeyItems(item);
+    }
+    if (keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
+        kevnPtr->RemoveReleasedKeyItems(item);
+    }
+    MMI_LOGD("PackageKeyEvent end");
+    return RET_OK;
+}
+
 int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key, UDSServer& udsServer)
 {
     const std::string uid = GetUUid();

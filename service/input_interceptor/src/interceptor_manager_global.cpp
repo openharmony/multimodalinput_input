@@ -15,6 +15,7 @@
 #include "interceptor_manager_global.h"
 #include "input_event_data_transformation.h"
 #include "proto.h"
+#include "souceType.h"
 
 namespace OHOS::MMI {
     namespace {
@@ -80,9 +81,30 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
     InputEventDataTransformation::SerializePointerEvent(pointerEvent, newPkt);
     std::list<InterceptorItem>::iterator iter;
     for (iter = interceptor_.begin(); iter != interceptor_.end(); iter++) {
-        newPkt << iter->session->GetPid();
+        newPkt << iter->session->GetPid() <<iter->id;
         MMI_LOGD("server send the interceptor msg to client : pid = %{public}d", iter->session->GetPid());
         iter->session->SendMsg(newPkt);
     }
+    return true;
+}
+
+bool OHOS::MMI::InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    MMI_LOGD("OnKeyEvent begin");
+    if (interceptor_.empty()) {
+        MMI_LOGE("InterceptorManagerGlobal::%{public}s no interceptor to send msg", __func__);
+        return false;
+    }
+    NetPacket newPkt(MmiMessageId::KEYBOARD_EVENT_INTERCEPTOR);
+    InputEventDataTransformation::KeyEventToNetPacket(keyEvent, newPkt);
+    std::list<InterceptorItem>::iterator iter;
+    for (iter = interceptor_.begin(); iter != interceptor_.end(); iter++) {
+        if (iter->sourceType == SOURCETYPE_KEY) {
+            newPkt << iter->session->GetPid();
+            MMI_LOGD("server send the interceptor msg to client : pid = %{public}d", iter->session->GetPid());
+            iter->session->SendMsg(newPkt);
+        }
+    }
+    MMI_LOGD("OnKeyEvent end");
     return true;
 }

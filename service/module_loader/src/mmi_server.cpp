@@ -19,6 +19,7 @@
 #include "log.h"
 #include "multimodal_input_connect_service.h"
 #include "util.h"
+#include "timer_manager.h"
 
 namespace OHOS::MMI {
     namespace {
@@ -186,6 +187,7 @@ int32_t OHOS::MMI::MMIServer::InitLibinput()
 void OHOS::MMI::MMIServer::OnTimer()
 {
     InputHandler->OnCheckEventReport();
+    TimerMgr->ProcessTimers();
 }
 
 void OHOS::MMI::MMIServer::StopAll()

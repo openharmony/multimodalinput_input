@@ -15,6 +15,7 @@
 
 #include "event_dispatch.h"
 #include <inttypes.h>
+#include "ability_launch_manager.h"
 #include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
 #include "input_handler_manager_global.h"
@@ -23,6 +24,8 @@
 #include "outer_interface.h"
 #include "system_event_handler.h"
 #include "util.h"
+#include "event_filter_death_recipient.h"
+
 
 namespace OHOS::MMI {
     namespace {
@@ -435,11 +438,24 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, 
     return RET_OK;
 }
 
+bool OHOS::MMI::EventDispatch::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point)
+{
+    std::lock_guard<std::mutex> guard(lockInputEventFilter_);
+    if (filter_ != nullptr && filter_->HandlePointerEvent(point)) {
+        return true;
+    }
+    return false;
+}
+
 int32_t OHOS::MMI::EventDispatch::handlePointerEvent(std::shared_ptr<PointerEvent> point) 
 {
     MMI_LOGE("handlePointerEvent begin .....");
+
     auto source = point->GetSourceType();
     auto fd = WinMgr->UpdateTargetPointer(point);
+    if (HandlePointerEventFilter(point)) {
+        return RET_OK;
+    }
     switch (source) {
         case PointerEvent::SOURCE_TYPE_MOUSE: {
             if (HandleMouseEvent(point)) {
@@ -499,7 +515,7 @@ bool OHOS::MMI::EventDispatch::HandleTouchPadEvent(std::shared_ptr<PointerEvent>
     if (INTERCEPTORMANAGERGLOBAL.OnPointerEvent(point)) {
         return true;
     }
-    if (IEMServiceManager.ReportTouchpadEvent(point)) {
+    if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
         return true;
     }
     return false;
@@ -920,6 +936,15 @@ int32_t OHOS::MMI::EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer,
 int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
     std::shared_ptr<OHOS::MMI::KeyEvent> key, const uint64_t preHandlerTime)
 {
+    MMI_LOGD("DispatchKeyEventByPid begin");
+    if (AbilityMgr->CheckLaunchAbility(key)) {
+        MMI_LOGD("keyEvent start launch an ability, keyCode : %{puiblic}d", key->GetKeyCode());
+        return RET_OK;
+    }
+    if (KeyEventInputSubscribeFlt.FilterSubscribeKeyEvent(udsServer, key)) {
+        MMI_LOGD("subscribe keyEvent filter success. keyCode=%{puiblic}d", key->GetKeyCode());
+        return RET_OK;
+    }
     int32_t ret = RET_OK;
     // int32_t ret = RET_OK;
     // ret = KeyBoardRegisteredEventHandler(key, udsServer, event, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
@@ -964,6 +989,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
         MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d\n", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
+    MMI_LOGD("DispatchKeyEventByPid end");
     return ret;
 }
 
@@ -1046,6 +1072,29 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
         }
     }
     return ret;
+}
+
+int32_t OHOS::MMI::EventDispatch::SetInputEventFilter(sptr<IEventFilter> filter)
+{
+    std::lock_guard<std::mutex> guard(lockInputEventFilter_);
+    filter_ = filter;
+
+    if (filter_ != nullptr) {
+        std::weak_ptr<EventDispatch> weakPtr = shared_from_this();
+        auto deathCallback = [weakPtr](const wptr<IRemoteObject> &object) {
+            auto sharedPtr = weakPtr.lock();
+            if (sharedPtr) {
+                sharedPtr->SetInputEventFilter(nullptr);
+            }
+        };
+
+        eventFilterRecipient_ = new EventFilterDeathRecipient(deathCallback);
+
+        auto client = filter->AsObject().GetRefPtr();
+        client->AddDeathRecipient(eventFilterRecipient_);
+    }
+
+    return RET_OK;
 }
 
 int32_t OHOS::MMI::EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_event& event,

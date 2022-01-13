@@ -43,6 +43,7 @@ public:
     int32_t InjectionVirtual(bool isPressed, int32_t keyCode, int32_t keyDownDuration, int32_t maxKeyCode);
     int32_t InjectEvent(const OHOS::KeyEvent& keyEvent);
     int32_t InjectEvent(const OHOS::MMI::KeyEvent& keyEvent);
+    int32_t InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetDevice(int32_t taskId, int32_t deviceId);
     int32_t GetDeviceIds(int32_t taskId);

@@ -96,6 +96,7 @@ ohos_shared_library("event-injection") {
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
+    "//foundation/multimodalinput/input/service/event_filter_binder:mmi_event_filter_service",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {

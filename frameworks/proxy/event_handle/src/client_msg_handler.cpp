@@ -104,6 +104,7 @@ bool OHOS::MMI::ClientMsgHandler::Init()
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
         {MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::TouchpadEventInterceptor, this)},
+        {MmiMessageId::KEYBOARD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::KeyEventInterceptor, this)}, 
     };
     // LCOV_EXCL_STOP
     for (auto& it : funs) {
@@ -135,7 +136,7 @@ void OHOS::MMI::ClientMsgHandler::OnMsgHandler(const OHOS::MMI::UDSClient& clien
 int32_t OHOS::MMI::ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)
 {
     auto key = OHOS::MMI::KeyEvent::Create();
-    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(key, pkt);
+    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, key, pkt);
     if (ret != RET_OK) {
         MMI_LOGE("OnKeyMonitor read netPacket failed");
         return RET_ERR;
@@ -151,7 +152,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPack
     int32_t fd = 0;
     uint64_t serverStartTime = 0;
     auto key = OHOS::MMI::KeyEvent::Create();
-    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(key, pkt);
+    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, key, pkt);
     if (ret != RET_OK) {
         MMI_LOGE("read netPacket failed");
         return RET_ERR;
@@ -228,7 +229,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnPointerEvent(const UDSClient& client, Net
 int32_t OHOS::MMI::ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, NetPacket &pkt)
 {
     std::shared_ptr<KeyEvent> keyEvent = OHOS::MMI::KeyEvent::Create();
-    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(keyEvent, pkt);
+    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, keyEvent, pkt);
     if (ret != RET_OK) {
         MMI_LOGE("read net packet failed");
         return RET_ERR;
@@ -830,7 +831,7 @@ int32_t OHOS::MMI::ClientMsgHandler::ReportKeyEvent(const UDSClient& client, Net
     pkt >> handlerId >> handlerType;
 
     auto keyEvent = OHOS::MMI::KeyEvent::Create();
-    if (InputEventDataTransformation::NetPacketToKeyEvent(keyEvent, pkt) != ERR_OK) {
+    if (InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, keyEvent, pkt) != ERR_OK) {
         MMI_LOGE("Failed to deserialize key event.");
         return RET_ERR;
     }
@@ -864,10 +865,26 @@ int32_t OHOS::MMI::ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& c
         return RET_ERR;
     }
     int32_t pid = 0;
-    pkt >> pid;
+    int32_t id = 0;
+    pkt >> pid >> id;
     MMI_LOGD("client receive the msg from server: pointId = %{public}d, pid = %{public}d\n",
              pointerEvent->GetPointerId(), pid);
-    return INTERCEPTORMANAGER.OnPointerEvent(pointerEvent);
+    return INTERCEPTORMANAGER.OnPointerEvent(pointerEvent, id);
+}
+
+int32_t OHOS::MMI::ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket& pkt)
+{
+    auto keyEvent = OHOS::MMI::KeyEvent::Create();
+    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, keyEvent, pkt);
+    if (ret != RET_OK) {
+        MMI_LOGE("TouchpadEventInterceptor read netPacket failed");
+        return RET_ERR;
+    }
+    int32_t pid = 0;
+    pkt >> pid;
+    MMI_LOGD("client receive the msg from server: keyCode = %{public}d, pid = %{public}d\n",
+        keyEvent->GetKeyCode(), pid);
+    return INTERCEPTORMANAGER.OnKeyEvent(keyEvent);
 }
 
 void OHOS::MMI::ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, NetPacket& pkt) const

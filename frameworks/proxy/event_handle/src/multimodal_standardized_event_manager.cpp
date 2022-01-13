@@ -649,6 +649,26 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const OHOS::MMI::KeyEven
     return SendMsg(ckv);
 }
 
+int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr)
+{
+    MMI_LOGD("InjectEvent begin");
+    if (keyEventPtr == nullptr) {
+        MMI_LOGE("KeyEventPtr is nullptr");
+        return RET_ERR;
+    }
+    if (keyEventPtr->GetKeyCode() < 0) {
+        MMI_LOGE("keyCode is invalid %{public}u", keyEventPtr->GetKeyCode());
+        return RET_ERR;
+    }
+    OHOS::MMI::NetPacket ckv(MmiMessageId::NEW_INJECT_KEY_EVENT);
+    int32_t errCode = OHOS::MMI::InputEventDataTransformation::KeyEventToNetPacket(keyEventPtr, ckv);
+    if (errCode != RET_OK) {
+        MMI_LOGE("Serialization is Failed! %{public}u", errCode);
+        return RET_ERR;
+    }
+    return SendMsg(ckv);
+}
+
 int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Inject pointer event ...");

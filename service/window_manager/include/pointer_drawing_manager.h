@@ -21,9 +21,7 @@
 #include "struct_multimodal.h"
 #include "pixel_map.h"
 #include "window.h"
-#ifdef OHOS_MOUSE_READY
 #include "draw/canvas.h"
-#endif
 
 #define IMAGE_SIZE 64
 namespace OHOS {
@@ -32,7 +30,6 @@ namespace OHOS {
 		public:
 			MouseDrawingManager();
 			~MouseDrawingManager();
-#ifdef OHOS_MOUSE_READY
 			std::unique_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(std::string imagePath);
 			void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY);
             void TellDisplayInfo(int32_t displayId, int32_t width, int32_t height);
@@ -44,13 +41,12 @@ namespace OHOS {
             void Init();
 		
 		private:
-			sptr<OHOS::Rosen::Window> drawWindow_;
+			//sptr<OHOS::Rosen::Window> drawWindow_;
             bool hasDisplay_ { false };
             int32_t displayId_;
 			int32_t displayWidth_;
 			int32_t displayHeight_;
             bool hasPointerDevice_ { false };
-#endif
 		};
 	}
 }
