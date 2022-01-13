@@ -157,7 +157,8 @@ ohos_shared_library("libmmi-server") {
     "window_manager/src/input_windows_manager.cpp",
     "window_manager/src/input_windows_manager_stub.cpp",
     "window_manager/src/outer_interface.cpp",
-    "window_manager/src/pointer_drawing_manager.cpp",
+
+    #"window_manager/src/pointer_drawing_manager.cpp",
     "window_manager/src/window_switch.cpp",
   ]
 
