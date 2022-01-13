@@ -15,6 +15,7 @@
 #include "error_multimodal.h"
 #include "input_manager.h"
 #include "input_event_monitor_manager.h"
+#include "interceptor_manager.h"
 #include "input_manager_impl.h"
 #include "key_event_input_subscribe_manager.h"
 #include "libmmi_util.h"
@@ -127,9 +128,14 @@ int32_t InputManager::AddInterceptor(int32_t sourceType, std::function<void(std:
 {
     if (interceptor == nullptr) {
         MMI_LOGE("InputManager::%{public}s param should not be null!", __func__);
-        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
+        return InterceptorManager::INVALID_INTERCEPTOR_ID;
     }
     return InputManagerImpl::GetInstance()->AddInterceptor(sourceType, interceptor);
+}
+
+int32_t InputManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
+{
+    return InputManagerImpl::GetInstance()->AddInterceptor(interceptor);
 }
 
 void InputManager::RemoveInterceptor(int32_t interceptorId)
@@ -137,7 +143,10 @@ void InputManager::RemoveInterceptor(int32_t interceptorId)
     InputManagerImpl::GetInstance()->RemoveInterceptor(interceptorId);
 }
 
-void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent) {}
+void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent) 
+{
+    InputManagerImpl::GetInstance()->SimulateInputEvent(keyEvent);
+}
 void InputManager::SimulateInputEvent(std::list<std::shared_ptr<KeyEvent>> keyEvents) {}
 void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {

@@ -169,7 +169,6 @@ void InputEvent::MarkProcessed()
         return;
     }
 
-    std::lock_guard gard(mutex_);
     if (!processedCallback_) {
         return;
     }
@@ -177,5 +176,95 @@ void InputEvent::MarkProcessed()
     processedCallback_ = std::function<void()>();
     func();
 }
+
+bool InputEvent::WriteToParcel(Parcel &out) const
+{
+    if (!out.WriteInt32(eventType_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(id_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(actionTime_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(action_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(actionStartTime_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(deviceId_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(targetDisplayId_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(targetWindowId_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(agentWindowId_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(flag_)) {
+        return false;
+    }
+
+    return true;
 }
-} // namespace OHOS::MMI
+
+bool InputEvent::ReadFromParcel(Parcel &in)
+{
+    if (!in.ReadInt32(eventType_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(id_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(actionTime_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(action_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(actionStartTime_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(deviceId_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(targetDisplayId_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(targetWindowId_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(agentWindowId_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(flag_)) {
+        return false;
+    }
+
+    return true;
+}
+} // namespace MMI
+} // namespace OHOS

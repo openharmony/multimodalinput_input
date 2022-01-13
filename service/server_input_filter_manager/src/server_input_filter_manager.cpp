@@ -15,8 +15,8 @@
 
 #include "server_input_filter_manager.h"
 #include <cinttypes>
+#include "input_event_data_transformation.h"
 #include "mmi_server.h"
-
 namespace OHOS::MMI {
 namespace {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ServerInputFilterManager" };
@@ -103,7 +103,7 @@ bool ServerInputFilterManager::OnKeyEvent(EventKeyboard key)
         return false;
     }
     NetPacket newPkt(MmiMessageId::KEY_EVENT_INTERCEPTOR);
-    newPkt << key <<id;
+    newPkt << key << id;
     if (!temp->SendMsg(newPkt)) {
         MMI_LOGE("Sending structure of EventKeyboard failed! \n");
         return false;

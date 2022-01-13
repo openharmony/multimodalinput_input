@@ -581,4 +581,40 @@ HWTEST_F(MouseEventTest, GetScrollingDelta_TMP_001, TestSize.Level1)
     float retResult = mouseEventTmp.GetScrollingDelta(5001);
     EXPECT_EQ(retResult, scrollingDelta);
 }
+
+HWTEST_F(MouseEventTest, GetScrollingDelta_TMP_002, TestSize.Level1)
+{
+    auto scrollingDelta = static_cast<float>('i');
+    MouseEvent mouseEventTmp;
+    uint16_t deviceUdevTags = 0;
+    EventJoyStickAxis eventJoyStickInfo = {};
+    mouseEventTmp.Initialize(22, 22, 22, 22, {22, 22, 22}, 22, 22, 22, scrollingDelta, 22,
+                             "222222", 22, 22, "222222", 22, false, deviceUdevTags, eventJoyStickInfo);
+    float retResult = mouseEventTmp.GetScrollingDelta(5002);
+    EXPECT_EQ(retResult, scrollingDelta);
+}
+
+HWTEST_F(MouseEventTest, GetScrollingDelta_TMP_003, TestSize.Level1)
+{
+    auto scrollingDelta = static_cast<float>('s' + 'k');
+    MouseEvent mouseEventTmp;
+    uint16_t deviceUdevTags = 0;
+    EventJoyStickAxis eventJoyStickInfo = {};
+    mouseEventTmp.Initialize(14, 14, 14, 14, {14, 14, 14}, 14, 14, 14, scrollingDelta, 14,
+                             "141414", 14, 14, "141414", 14, false, deviceUdevTags, eventJoyStickInfo);
+    float retResult = mouseEventTmp.GetScrollingDelta(5003);
+    EXPECT_EQ(retResult, scrollingDelta);
+}
+
+HWTEST_F(MouseEventTest, GetScrollingDelta_TMP_004, TestSize.Level1)
+{
+    float scrollingDelta = -143135;
+    MouseEvent mouseEventTmp;
+    uint16_t deviceUdevTags = 0;
+    EventJoyStickAxis eventJoyStickInfo = {};
+    mouseEventTmp.Initialize(31, 31, 31, 31, {31, 31, 31}, 31, 31, 31, scrollingDelta, 31,
+                             "313131", 31, 31, "313131", 31, false, deviceUdevTags, eventJoyStickInfo);
+    float retResult = mouseEventTmp.GetScrollingDelta(5004);
+    EXPECT_EQ(retResult, scrollingDelta);
+}
 } // namespace
