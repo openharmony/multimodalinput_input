@@ -165,7 +165,7 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::CallbackMaps &callbackM
         return JS_CALLBACK_EVENT_FAILED;
     }
     HILOG_DEBUG("DelEventCallback: event=%{public}s, callbackMaps second size:%{public}d", event->eventType.c_str(),
-        iter->second.size());
+        static_cast<int32_t>(iter->second.size()));
     auto it = iter->second.begin();
     while (it != iter->second.end()) {
         bool isEquals = false;

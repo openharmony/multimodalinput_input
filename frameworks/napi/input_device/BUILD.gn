@@ -61,11 +61,11 @@ ohos_shared_library("libinputdevice") {
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/tools/event_inject:event-injection",
+    "//third_party/libuv:uv_static",
     "//third_party/libxkbcommon:libxkbcommon",
     "//third_party/wayland-ivi-extension:ivi-controller",
     "//third_party/wayland-ivi-extension:libscreen-info-module",
     "//utils/native/base:utils",
-    "//third_party/libuv:uv_static",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {

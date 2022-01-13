@@ -52,9 +52,7 @@ ohos_shared_library("libmmi-common") {
 
   public_configs = [ ":libmmi_client_config" ]
 
-  deps = [
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//utils/native/base:utils" ]
 
   part_name = "multimodalinput_base"
 }
@@ -464,9 +462,9 @@ group("ut-mmi-proxy") {
   deps = []
   deps += [
     ":InputManagerTest",
+    ":MultimodalKeyEventTest",
     ":MultimodalinputEventHandlerTest",
     ":PointerEventTest",
-    ":MultimodalKeyEventTest",
     ":ut-mmi-proxy-out",
   ]
 }
