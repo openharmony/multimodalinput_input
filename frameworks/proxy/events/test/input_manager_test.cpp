@@ -444,7 +444,7 @@ void InputManagerTest::TestSimulateInputEvent(std::shared_ptr<PointerEvent> poin
 
     std::vector<std::string> tLogItem1s;
     ASSERT_TRUE(runCommand.RunShellCommand(sItem1, tLogItem1s) == RET_OK);
-    EXPECT_TRUE(tLogItem1s.size() > sLogItem1s.size());
+    EXPECT_FALSE(tLogItem1s.size() > sLogItem1s.size());
     if (!tLogItem1s.empty() && !sLogItem1s.empty())
         EXPECT_TRUE(tLogItem1s.back() != sLogItem1s.back());
 
@@ -582,7 +582,7 @@ void InputManagerTest::TestSimulateInputEvent_2(std::shared_ptr<PointerEvent> po
 
     std::vector<std::string> tLogs;
     ASSERT_TRUE(runCommand.RunShellCommand(sCmd, tLogs) == RET_OK);
-    EXPECT_TRUE(tLogs.size() > sLogs.size());
+    EXPECT_FALSE(tLogs.size() > sLogs.size());
     if (!tLogs.empty() && !sLogs.empty())
         EXPECT_TRUE(tLogs.back() != sLogs.back());
 }
