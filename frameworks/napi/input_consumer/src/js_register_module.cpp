@@ -158,7 +158,7 @@ namespace OHOS {
                 auto &list = iter->second;
                 iter++;
                 auto infoIter = list.begin();
-                HILOG_DEBUG("list size:%{public}d", list.size());
+                HILOG_DEBUG("list size:%{public}d", static_cast<int32_t>(list.size()));
                 while(infoIter != list.end()) {
                     auto monitorInfo = *infoIter;
                     if (MatchCombinationkeys(monitorInfo, keyEvent)) {
