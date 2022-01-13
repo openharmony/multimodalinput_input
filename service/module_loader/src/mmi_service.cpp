@@ -346,11 +346,12 @@ void MMIService::OnThread()
     SafeKpr->RegisterEvent(tid, "mmi_service");
 
     int32_t count = 0;
+    constexpr int32_t timeOut = 50;
     epoll_event ev[MAX_EVENT_SIZE] = {};
     CLMAP<int32_t, StreamBufData> bufMap;
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         bufMap.clear();
-        count = EpollWait(ev[0], MAX_EVENT_SIZE, 1, mmiFd_);
+        count = EpollWait(ev[0], MAX_EVENT_SIZE, timeOut, mmiFd_);
         for (int i = 0; i < count; i++) {
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
             CHKC(mmiEd, NULL_POINTER);
