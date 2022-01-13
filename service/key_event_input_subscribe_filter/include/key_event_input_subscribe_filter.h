@@ -28,85 +28,55 @@
 
 namespace OHOS {
 namespace MMI {
+
 class KeyEventInputSubscribeFilter : public Singleton<KeyEventInputSubscribeFilter> {
-public:
-    class SubscribeKeyEventInfo {
-    public:
-        explicit SubscribeKeyEventInfo(
-            int32_t subscribeId, int32_t fd, std::shared_ptr<OHOS::MMI::KeyOption> keyOption)
-            : subscribeId_(subscribeId), fd_(fd), keyOption_(keyOption)
-        {}
-        ~SubscribeKeyEventInfo() = default;
-
-        static KeyEventInputSubscribeFilter::SubscribeKeyEventInfo InValidSubscribeKeyEventInfo()
-        {
-            return SubscribeKeyEventInfo(-1, -1, nullptr);
-        }
-
-        bool IsInValid()
-        {
-            return subscribeId_ < 0 && fd_ < 0 && !keyOption_;
-        }
-
-        int32_t GetSubscribeId() const
-        {
-            return subscribeId_;
-        }
-
-        void SetSubscribeId(int32_t subscribeId)
-        {
-            subscribeId_ = subscribeId;
-        }
-
-        int32_t GetFd() const
-        {
-            return fd_;
-        }
-
-        void SetFd(int32_t fd)
-        {
-            fd_ = fd;
-        }
-
-        std::shared_ptr<OHOS::MMI::KeyOption> GetKeyOption() const
-        {
-            return keyOption_;
-        }
-
-        void SetKeyOption(const std::shared_ptr<OHOS::MMI::KeyOption> keyOption)
-        {
-            keyOption_ = keyOption;
-        }
-
-    private:
-        int32_t subscribeId_;
-        int32_t fd_;
-        std::shared_ptr<OHOS::MMI::KeyOption> keyOption_;
-    };
 
 public:
     KeyEventInputSubscribeFilter() = default;
     ~KeyEventInputSubscribeFilter() = default;
 
-    int32_t SubscribeKeyEventForServer(
-        SessionPtr sess, int32_t subscribeId, const std::shared_ptr<OHOS::MMI::KeyOption> keyOption);
-    int32_t UnSubscribeKeyEventForServer(SessionPtr sess, int32_t subscribeId);
+    int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
+            const std::shared_ptr<OHOS::MMI::KeyOption> keyOption);
+    int32_t UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId);
     bool FilterSubscribeKeyEvent(UDSServer& udsServer, std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent);
 
 private:
-    KeyEventInputSubscribeFilter::SubscribeKeyEventInfo MatchSusbscribeKeyEvent(
-        std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent, const std::vector<int32_t>& pressedKeys);
-    bool MatchPreKeysIsPressed(
-        int32_t keyAction, const std::vector<int32_t>& preKeys, const std::vector<int32_t>& pressedKeys);
-    void DispatchKeyEventSubscriber(UDSServer& udsServer, std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent,
-        const SubscribeKeyEventInfo& subscribeInfo);
-    void DelayDispatchKeyEventSubscriber(uint32_t timeOut, UDSServer& udsServer,
-        std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent, const SubscribeKeyEventInfo& subscribeInfo);
+    struct Subscriber {
+        Subscriber(int32_t id, SessionPtr sess, std::shared_ptr<KeyOption> keyOption)
+            : id_(id), sess_(sess), keyOption_(keyOption), timerId_(-1)
+        {
+        }
+        int32_t id_;
+        SessionPtr sess_;
+        std::shared_ptr<OHOS::MMI::KeyOption> keyOption_;
+        int32_t timerId_;
+        std::shared_ptr<KeyEvent> keyEvent_;
+    };
 
 private:
-    std::mutex mtx_;
-    std::map<SessionPtr, std::list<SubscribeKeyEventInfo>> subscribeKeyEventInfoMap_;
-    static const uint8_t maxPreKeyCount_;
+    bool HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent);
+    bool HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent);
+    bool HandleKeyCanel(const std::shared_ptr<KeyEvent>& keyEvent);
+
+    bool IsPreKeysMatch(const std::vector<int32_t>& preKeys, const std::vector<int32_t>& pressedKeys) const;
+
+    void NotifySubscriber(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent,
+            const std::shared_ptr<Subscriber>& subscriber);
+
+    bool AddTimer(const std::shared_ptr<Subscriber>& subscriber, const std::shared_ptr<KeyEvent>& keyEvent);
+    void ClearTimer(const std::shared_ptr<Subscriber>& subscriber);
+    void OnTimer(const std::shared_ptr<Subscriber> subscriber);
+    void OnSessionLost(SessionPtr sess);
+    bool InitSessionDeleteCallback();
+
+    bool CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+
+    void RemoveKeyCode(std::vector<int32_t>& keyCodes, int32_t keyCode);
+
+private:
+    std::list<std::shared_ptr<Subscriber>> subscribers_;
+    bool sessionDeletedCallbackInitialized_ {false};
+    std::shared_ptr<KeyEvent> keyEvent_;
 };
 }
 }

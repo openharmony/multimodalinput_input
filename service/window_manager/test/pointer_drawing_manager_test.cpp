@@ -31,19 +31,19 @@ public:
 
 HWTEST_F(PointerDrawingManagerTest, PointerDrawManagerTest_001, TestSize.Level1)
 {
-    DrawWgr->DrawPointer(0,0,0);
-    std::this_thread::sleep_for(std::chrono::milliseconds(8));
-    DrawWgr->DrawPointer(0,10,10);
-    std::this_thread::sleep_for(std::chrono::milliseconds(8));
-    DrawWgr->DrawPointer(0,100,100);
-    std::this_thread::sleep_for(std::chrono::milliseconds(8));
-    DrawWgr->DrawPointer(0,400,400);
-    std::this_thread::sleep_for(std::chrono::milliseconds(8));
-    DrawWgr->DrawPointer(0,800,800);
-    std::this_thread::sleep_for(std::chrono::milliseconds(8));
-    DrawWgr->DrawPointer(0,1000,800);
-    std::this_thread::sleep_for(std::chrono::milliseconds(8));
-    DrawWgr->DrawPointer(0,600,600);
+    // DrawWgr->DrawPointer(0,0,0);
+    // std::this_thread::sleep_for(std::chrono::milliseconds(8));
+    // DrawWgr->DrawPointer(0,10,10);
+    // std::this_thread::sleep_for(std::chrono::milliseconds(8));
+    // DrawWgr->DrawPointer(0,100,100);
+    // std::this_thread::sleep_for(std::chrono::milliseconds(8));
+    // DrawWgr->DrawPointer(0,400,400);
+    // std::this_thread::sleep_for(std::chrono::milliseconds(8));
+    // DrawWgr->DrawPointer(0,800,800);
+    // std::this_thread::sleep_for(std::chrono::milliseconds(8));
+    // DrawWgr->DrawPointer(0,1000,800);
+    // std::this_thread::sleep_for(std::chrono::milliseconds(8));
+    // DrawWgr->DrawPointer(0,600,600);
 }
 
 } // namespace

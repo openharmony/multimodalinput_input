@@ -189,7 +189,7 @@ namespace OHOS {
             napi_valuetype tmpType = napi_undefined;
             napi_value result = nullptr;
             if (napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result) != napi_ok) {
-                HILOG_ERROR("UnitTest: call napi_create_int32 fail.");
+                HILOG_ERROR("call napi_create_int32 fail.");
                 return result;
             }
             if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {

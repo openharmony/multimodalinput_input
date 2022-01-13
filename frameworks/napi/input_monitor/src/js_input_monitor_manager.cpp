@@ -60,10 +60,10 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv, napi_value receiver)
         if ((*it)->IsMatch(jsEnv, receiver) == RET_OK) {
             (*it)->Stop();
             monitors_.erase(it);
+            MMI_LOGD("leave");
             return;
         }
     }
-    MMI_LOGD("leave");
 }
 
 void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv)
@@ -73,11 +73,11 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv)
         if ((*it)->IsMatch(jsEnv) == RET_OK) {
             (*it)->Stop();
             monitors_.erase(it++);
+            MMI_LOGD("leave");
             return;
         }
         ++it;
     }
-    MMI_LOGD("leave");
 }
 }
 }

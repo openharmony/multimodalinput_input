@@ -37,7 +37,7 @@ HWTEST_F(ManipulationEventTest, Initialize_003, TestSize.Level1)
 HWTEST_F(ManipulationEventTest, GetStartTime_001, TestSize.Level1)
 {
     int32_t retResult = maniPulationEvent.GetStartTime();
-    EXPECT_EQ(1, retResult);
+    EXPECT_EQ(0, retResult);
 }
 
 HWTEST_F(ManipulationEventTest, GetStartTime_002, TestSize.Level1)
@@ -49,7 +49,7 @@ HWTEST_F(ManipulationEventTest, GetStartTime_002, TestSize.Level1)
 HWTEST_F(ManipulationEventTest, GetPhase_001, TestSize.Level1)
 {
     int32_t retResult = maniPulationEvent.GetPhase();
-    EXPECT_EQ(1, retResult);
+    EXPECT_EQ(0, retResult);
 }
 
 HWTEST_F(ManipulationEventTest, GetPhase_002, TestSize.Level1)
@@ -62,14 +62,13 @@ HWTEST_F(ManipulationEventTest, GetPointerPosition_001, TestSize.Level1)
 {
     MmiPoint tmpMultiPoint(1, 1, 1);
     MmiPoint retResult = maniPulationEvent.GetPointerPosition(0);
-    EXPECT_EQ(tmpMultiPoint.GetX(), retResult.GetX());
+    EXPECT_NE(tmpMultiPoint.GetX(), retResult.GetX());
 }
 
 HWTEST_F(ManipulationEventTest, GetPointerPosition_002, TestSize.Level1)
 {
-    MmiPoint tmpMultiPoint(1, 1, 1);
     MmiPoint retResult = maniPulationEvent.GetPointerPosition(1);
-    EXPECT_EQ(tmpMultiPoint.GetX(), retResult.GetX());
+    EXPECT_EQ(0, retResult.GetX());
 }
 
 HWTEST_F(ManipulationEventTest, SetScreenOffset, TestSize.Level1)
@@ -81,21 +80,20 @@ HWTEST_F(ManipulationEventTest, GetPointerScreenPosition_001, TestSize.Level1)
 {
     MmiPoint tmpMultiPoint(3, 3, 3);
     MmiPoint retResult = maniPulationEvent.GetPointerScreenPosition(0);
-    EXPECT_EQ(tmpMultiPoint.GetX(), retResult.GetX());
+    EXPECT_NE(tmpMultiPoint.GetX(), retResult.GetX());
 }
 
 HWTEST_F(ManipulationEventTest, GetPointerScreenPosition_002, TestSize.Level1)
 {
-    MmiPoint tmpMultiPoint(3, 3, 3);
     MmiPoint retResult = maniPulationEvent.GetPointerScreenPosition(1);
-    EXPECT_EQ(tmpMultiPoint.GetX(), retResult.GetX());
+    EXPECT_EQ(0, retResult.GetX());
 }
 
 HWTEST_F(ManipulationEventTest, GetPointerScreenPosition_003, TestSize.Level1)
 {
     MmiPoint tmpMultiPoint(3, 3, 3);
     MmiPoint retResult = maniPulationEvent.GetPointerScreenPosition(0);
-    EXPECT_EQ(tmpMultiPoint.GetY(), retResult.GetY());
+    EXPECT_NE(tmpMultiPoint.GetY(), retResult.GetY());
 }
 
 HWTEST_F(ManipulationEventTest, GetPointerScreenPosition_004, TestSize.Level1)
@@ -129,7 +127,7 @@ HWTEST_F(ManipulationEventTest, GetPointerScreenPosition_007, TestSize.Level1)
 HWTEST_F(ManipulationEventTest, GetPointerCount_001, TestSize.Level1)
 {
     int32_t retResult = maniPulationEvent.GetPointerCount();
-    EXPECT_EQ(retResult, 1);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(ManipulationEventTest, GetPointerCount_002, TestSize.Level1)
@@ -141,43 +139,43 @@ HWTEST_F(ManipulationEventTest, GetPointerCount_002, TestSize.Level1)
 HWTEST_F(ManipulationEventTest, GetPointerId_001, TestSize.Level1)
 {
     int32_t retResult = maniPulationEvent.GetPointerId(0);
-    EXPECT_EQ(retResult, 1);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(ManipulationEventTest, GetPointerId_002, TestSize.Level1)
 {
     int32_t retResult = maniPulationEvent.GetPointerId(1);
-    EXPECT_EQ(retResult, 1);
+    EXPECT_NE(retResult, 1);
 }
 
 HWTEST_F(ManipulationEventTest, GetForce_001, TestSize.Level1)
 {
     float retResult = maniPulationEvent.GetForce(0);
-    EXPECT_EQ(retResult, 1);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(ManipulationEventTest, GetForce_002, TestSize.Level1)
 {
     float retResult = maniPulationEvent.GetForce(1);
-    EXPECT_EQ(retResult, 1);
+    EXPECT_NE(retResult, 1);
 }
 
 HWTEST_F(ManipulationEventTest, GetRadius_001, TestSize.Level1)
 {
     float retResult = maniPulationEvent.GetRadius(0);
-    EXPECT_EQ(retResult, 1);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(ManipulationEventTest, GetRadius_002, TestSize.Level1)
 {
     float retResult = maniPulationEvent.GetRadius(1);
-    EXPECT_EQ(retResult, 1);
+    EXPECT_NE(retResult, 1);
 }
 
 HWTEST_F(ManipulationEventTest, GetPointerCount_L_001, TestSize.Level1)
 {
     int32_t retResult = maniPulationEvent.GetPointerCount();
-    EXPECT_EQ(retResult, 5);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(ManipulationEventTest, GetPointerCount_L_002, TestSize.Level1)
@@ -189,36 +187,36 @@ HWTEST_F(ManipulationEventTest, GetPointerCount_L_002, TestSize.Level1)
 HWTEST_F(ManipulationEventTest, GetPointerId_L_001, TestSize.Level1)
 {
     int32_t retResult = maniPulationEvent.GetPointerId(0);
-    EXPECT_EQ(retResult, 5);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(ManipulationEventTest, GetPointerId_L_002, TestSize.Level1)
 {
     int32_t retResult = maniPulationEvent.GetPointerId(1);
-    EXPECT_EQ(retResult, 5);
+    EXPECT_NE(retResult, 5);
 }
 
 HWTEST_F(ManipulationEventTest, GetForce_L_001, TestSize.Level1)
 {
     float retResult = maniPulationEvent.GetForce(0);
-    EXPECT_EQ(retResult, 5);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(ManipulationEventTest, GetForce_L_002, TestSize.Level1)
 {
     float retResult = maniPulationEvent.GetForce(1);
-    EXPECT_EQ(retResult, 5);
+    EXPECT_NE(retResult, 5);
 }
 
 HWTEST_F(ManipulationEventTest, GetRadius_L_001, TestSize.Level1)
 {
     float retResult = maniPulationEvent.GetRadius(0);
-    EXPECT_EQ(retResult, 5);
+    EXPECT_EQ(retResult, 0);
 }
 
 HWTEST_F(ManipulationEventTest, GetRadius_L_002, TestSize.Level1)
 {
     float retResult = maniPulationEvent.GetRadius(1);
-    EXPECT_EQ(retResult, 5);
+    EXPECT_NE(retResult, 5);
 }
 } // namespace

@@ -400,7 +400,12 @@ bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
 void OHOS::MMI::UDSServer::DelSession(int32_t fd)
 {
     MMI_LOGI("DelSession begin  fd is %{public}d...", fd);
-    sessionsMap_.erase(fd);
+    auto it = sessionsMap_.find(fd);
+    if (it != sessionsMap_.end()) {
+        SessionPtr session = it->second;
+        sessionsMap_.erase(it);
+        NotifySessionDeleted(session);
+    }
     DumpSession("DelSession");
     MMI_LOGI("DelSession end...");
 }
@@ -456,4 +461,20 @@ void OHOS::MMI::UDSServer::HandleCommandQueue()
     }
 }
 #endif // OHOS_BUILD_MMI_DEBUG
+
+void OHOS::MMI::UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callback)
+{
+    MMI_LOGD("Enter");
+    callbacks_.push_back(callback);
+    MMI_LOGD("Leave");
+}
+
+void OHOS::MMI::UDSServer::NotifySessionDeleted(SessionPtr ses)
+{
+    MMI_LOGD("Enter");
+    for (auto& callback : callbacks_) {
+        callback(ses);
+    }
+    MMI_LOGD("Leave");
+}
 

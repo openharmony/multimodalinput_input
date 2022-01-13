@@ -56,6 +56,24 @@ int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programN
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectService::SetInputEventFilter(sptr<IEventFilter> filter)
+{
+    MMI_LOGI("enter");
+    if (udsServer_ == nullptr) {
+        MMI_LOGE("called, udsServer_ is nullptr.");
+        return RET_ERR;
+    }
+
+    const int32_t ret = udsServer_->SetInputEventFilter(filter);
+    if (ret != RET_OK) {
+        MMI_LOGE("call SetInputEventFilter return %{public}d.", ret);
+        return RET_ERR;
+    }
+
+    MMI_LOGI("leave, success.");
+    return RET_OK;    
+}
+
 MultimodalInputConnectService::MultimodalInputConnectService()
     : SystemAbility(MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true), state_(ServiceRunningState::STATE_NOT_START)
 {
@@ -121,7 +139,7 @@ int32_t MultimodalInputConnectService::HandleAllocSocketFd(MessageParcel& data, 
         MMI_LOGE("permission denied");
         return RET_ERR;
     }
-    MMI_LOGT("SetUdsServer this %{public}p, IUdsServer %{public}p", this, udsServer_);
+
     if (udsServer_ == nullptr) {
         MMI_LOGE("udsServer_ is nullptr.");
         return RET_ERR;
@@ -151,7 +169,6 @@ int32_t MultimodalInputConnectService::HandleAllocSocketFd(MessageParcel& data, 
 void MultimodalInputConnectService::SetUdsServer(IUdsServer *server)
 {
     MMI_LOGT("enter");
-    MMI_LOGT("SetUdsServer this %{public}p, IUdsServer %{public}p", this, server);
     udsServer_ = server;
 }
 

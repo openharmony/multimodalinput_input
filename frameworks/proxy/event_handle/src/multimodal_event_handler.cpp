@@ -117,6 +117,14 @@ int32_t MultimodalEventHandler::InjectEvent(const OHOS::MMI::KeyEvent& keyEvent)
     return EventManager.InjectEvent(keyEvent);
 }
 
+int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr)
+{
+    if (!InitClient()) {
+      return MMI_SERVICE_INVALID;
+    }
+    return EventManager.InjectEvent(keyEventPtr);
+}
+
 int32_t MultimodalEventHandler::GetMultimodeInputInfo()
 {
     if (!InitClient()) {
@@ -256,7 +264,7 @@ int32_t MultimodalEventHandler::AddInterceptor(int32_t sourceType, int32_t id)
         return MMI_SERVICE_INVALID;
     }
 
-    OHOS::MMI::NetPacket ck(MmiMessageId::ADD_TOUCHPAD_EVENT_INTERCEPTOR);
+    OHOS::MMI::NetPacket ck(MmiMessageId::ADD_EVENT_INTERCEPTOR);
     ck << sourceType << id;
     mClient_->SendMessage(ck);
     MMI_LOGD("client add a touchpad event interceptor");
@@ -270,7 +278,7 @@ int32_t MultimodalEventHandler::RemoveInterceptor(int32_t id)
         return MMI_SERVICE_INVALID;
     }
 
-    OHOS::MMI::NetPacket ckt(MmiMessageId::REMOVE_TOUCHPAD_EVENT_INTERCEPTOR);
+    OHOS::MMI::NetPacket ckt(MmiMessageId::REMOVE_EVENT_INTERCEPTOR);
     ckt << id;
     mClient_->SendMessage(ckt);
     MMI_LOGD("client remove a touchpad event interceptor");
