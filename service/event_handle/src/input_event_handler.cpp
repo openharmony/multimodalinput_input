@@ -336,9 +336,9 @@ int32_t OHOS::MMI::InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_e
 int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event& event)
 {
     uint64_t preHandlerTime = GetSysClockTime();
-    EventKeyboard key = {};
+    EventKeyboard keyBoard = {};
     CHKR(udsServer_, NULL_POINTER, RET_ERR);
-    auto packageResult = eventPackage_.PackageKeyEvent(event, key, *udsServer_);
+    auto packageResult = eventPackage_.PackageKeyEvent(event, keyBoard, *udsServer_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_FAIL) { // The multi_device_same_event should be discarded
         return RET_OK;
     }
@@ -358,11 +358,11 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event& event)
     }
 #endif  // OHOS_AUTO_TEST_FRAME
 
-    auto hosKey = KeyValueTransformationByInput(key.key); // libinput key transformed into HOS key
-    key.unicode = 0;
+    auto hosKey = KeyValueTransformationByInput(keyBoard.key); // libinput key transformed into HOS key
+    keyBoard.unicode = 0;
 #ifndef OHOS_AUTO_TEST_FRAME
     if (hosKey.isSystemKey) { // Judging whether key is system key.
-        OnSystemEvent(hosKey, key.state);
+        OnSystemEvent(hosKey, keyBoard.state);
     }
 #else
     AutoTestKeyTypePkt autoTestKeyTypePkt = {};
@@ -378,17 +378,17 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event& event)
     if (keyEvent == nullptr) {
         keyEvent = OHOS::MMI::KeyEvent::Create();
     }
-    key.key = static_cast<uint32_t>(hosKey.keyValueOfHos);
-    if (EventPackage::KeyboardToKeyEvent(key, keyEvent, *udsServer_) == RET_ERR) {
+    keyBoard.key = static_cast<uint32_t>(hosKey.keyValueOfHos);
+    if (EventPackage::KeyboardToKeyEvent(keyBoard, keyEvent, *udsServer_) == RET_ERR) {
         MMI_LOGE("on OnKeyboardEvent translate key event error!\n");
         return RET_ERR;
     }
     if (AbilityMgr->CheckLaunchAbility(keyEvent)) {
-        MMI_LOGD("key event start launch an ability, keyCode : %{puiblic}d", key.key);
+        MMI_LOGD("key event start launch an ability, keyCode : %{puiblic}d", keyBoard.key);
         return RET_OK;
     }
     if (KeyEventInputSubscribeFlt.FilterSubscribeKeyEvent(*udsServer_, keyEvent)) {
-        MMI_LOGD("subscribe key event filter success. keyCode=%{puiblic}d", key.key);
+        MMI_LOGD("subscribe key event filter success. keyCode=%{puiblic}d", keyBoard.key);
         return RET_OK;
     }
     auto device = libinput_event_get_device(&event);
