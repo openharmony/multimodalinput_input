@@ -27,9 +27,12 @@ namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
         LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorModule"
     };
+
+    const uint32_t MAX_STRING_LEN = 1024;
 }
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
+    MMI_LOGD("enter");
     size_t requireArgc = 2;
     size_t argc;
     napi_value argv[requireArgc];
@@ -37,82 +40,85 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 
     status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (status != napi_ok) {
-        napi_throw_type_error(env, nullptr, "MMI Throw Error:JsOn get cb info failed");
+        MMI_LOGE("MMI Throw Error:JsOn get cb info failed");
         return nullptr;
     }
     if (argc < requireArgc) {
-        napi_throw_type_error(env, nullptr, "MMI Throw Error:JsOn argc is not requireArgc");
+        MMI_LOGE("MMI Throw Error:JsOn argc is not requireArgc");
         return nullptr;
     }
 
     napi_valuetype valueType = napi_undefined;
-
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
-        napi_throw_type_error(env, nullptr, "MMI Throw Error:JsOn typeof failed");
+        MMI_LOGE("MMI Throw Error:JsOn typeof failed");
         return nullptr;
     }
     if (valueType != napi_string) {
-        napi_throw_type_error(env, nullptr, "MMI Throw Error:JsOn valueType is not napi_string");
-        return nullptr;
-    }
-    char typeName[32] = {0};
-    size_t len = 0;
-    status = napi_get_value_string_utf8(env, argv[0], typeName, NAPI_AUTO_LENGTH, &len);
-    if (status != napi_ok) {
-        napi_throw_type_error(env, nullptr, "MMI Throw Error:JsOn napi_get_value_string_utf8 failed");
-        return nullptr;
-    }
-    if (std::strcmp(typeName, "touch") != 0) {
-        return nullptr;
-    }
-    status = napi_typeof(env, argv[1], &valueType);
-    if (status != napi_ok) {
-        napi_throw_type_error(env, nullptr, "MMI Throw Error:JsOn typeof failed");
-        return nullptr;
-    }
-    if (valueType != napi_function) {
-        napi_throw_type_error(env, nullptr, "MMI Throw Error:JsOn is not napi_function");
+        MMI_LOGE("MMI Throw Error:JsOn valueType is not napi_string");
         return nullptr;
     }
 
+    char typeName[MAX_STRING_LEN] = {0};
+    size_t len = 0;
+    status = napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len);
+    if (status != napi_ok) {
+        MMI_LOGE("MMI Throw Error:JsOn napi_get_value_string_utf8 failed");
+        return nullptr;
+    }
+    if (std::strcmp(typeName, "touch") != 0) {
+        MMI_LOGD("not touch");
+        return nullptr;
+    }
+
+    status = napi_typeof(env, argv[1], &valueType);
+    if (status != napi_ok) {
+        MMI_LOGE("MMI Throw Error:JsOn typeof failed");
+        return nullptr;
+    }
+    if (valueType != napi_function) {
+        MMI_LOGE("MMI Throw Error:JsOn is not napi_function");
+        return nullptr;
+    }
     JSIMM.AddMonitor(env, argv[1]);
+    MMI_LOGD("leave");
     return nullptr;
 }
 
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
-    size_t requireArgc = 1;
+    MMI_LOGD("enter");
+    size_t requireArgc = 2;
     size_t argc;
     napi_value argv[requireArgc];
     napi_status status = napi_generic_failure;
 
     status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (status != napi_ok) {
-        napi_throw_type_error(env, nullptr, "MMI Throw Error:JsOff get cb info failed");
+        MMI_LOGE("MMI Throw Error:JsOff get cb info failed");
         return nullptr;
     }
     if (argc < requireArgc) {
-        napi_throw_type_error(env, nullptr, "MMI Throw Error:JsOff argc is not requireArgc");
+        MMI_LOGE("MMI Throw Error:JsOff argc is not requireArgc");
         return nullptr;
     }
 
     napi_valuetype valueType = napi_undefined;
-
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
-        napi_throw_type_error(env, nullptr, "MMI Throw Error:GetDeviceIds typeof failed");
+        MMI_LOGE("MMI Throw Error:GetDeviceIds typeof failed");
         return nullptr;
     }
     if (valueType != napi_string) {
-        napi_throw_type_error(env, nullptr, "MMI Throw Error:valueType is not napi_string");
+        MMI_LOGE("MMI Throw Error:valueType is not napi_string");
         return nullptr;
     }
-    char typeName[32] = {0};
+
+    char typeName[MAX_STRING_LEN] = {0};
     size_t len = 0;
-    status = napi_get_value_string_utf8(env, argv[0], typeName, NAPI_AUTO_LENGTH, &len);
+    status = napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len);
     if (status != napi_ok) {
-        napi_throw_type_error(env, nullptr, "MMI Throw Error:JsOff napi_get_value_string_utf8 failed");
+        MMI_LOGE("MMI Throw Error:JsOff napi_get_value_string_utf8 failed");
         return nullptr;
     }
     if (std::strcmp(typeName, "touch") != 0) {
@@ -121,29 +127,31 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     }
     status = napi_typeof(env, argv[1], &valueType);
     if (status != napi_ok) {
-        napi_throw_type_error(env, nullptr, "MMI Throw Error:JsOff typeof failed");
+        MMI_LOGE("MMI Throw Error:JsOff typeof failed");
         return nullptr;
     }
     if (valueType != napi_function) {
+        MMI_LOGD("remove all monitor begin");
         JSIMM.RemoveMonitor(env);
         MMI_LOGD("remove all monitor");
         return nullptr;
     }
 
     JSIMM.RemoveMonitor(env, argv[1]);
+    MMI_LOGD("leave");
     return nullptr;
 }
 
 EXTERN_C_START
 static napi_value MmiInputMonitorInit(napi_env env, napi_value exports)
 {
-    MMI_LOGD("enter");
+    MMI_LOGD("MmiInputMonitorInit: enter");
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
-    MMI_LOGD("success");
+    MMI_LOGD("MmiInputMonitorInit: success");
     return exports;
 }
 EXTERN_C_END

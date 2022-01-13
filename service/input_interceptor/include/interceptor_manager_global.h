@@ -19,6 +19,7 @@
 #include "pointer_event.h"
 #include "singleton.h"
 #include "uds_session.h"
+#include "key_event.h"
 
 namespace OHOS {
 namespace MMI {
@@ -29,6 +30,7 @@ public:
     void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session);
     void OnRemoveInterceptor(int32_t id);
     bool OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    bool OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent);
 private:
     struct InterceptorItem {
         int32_t sourceType;

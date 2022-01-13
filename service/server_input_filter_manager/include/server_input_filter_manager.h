@@ -23,6 +23,7 @@
 #include "register_event.h"
 #include "event_package.h"
 #include "log.h"
+#include "key_event.h"
 namespace OHOS::MMI {
 class ServerInputFilterManager : public CSingleton<ServerInputFilterManager> {
 public:

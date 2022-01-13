@@ -37,6 +37,7 @@ protected:
     int32_t GetCallingUid() const;
     int32_t GetCallingPid() const;
     virtual int32_t HandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) = 0;
+    int32_t StubSetInputEventFilter(MessageParcel& data, MessageParcel& reply);
 
 private:
     static const int SYSTEM_UID = 1000;

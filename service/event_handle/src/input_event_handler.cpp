@@ -66,6 +66,10 @@ bool OHOS::MMI::InputEventHandler::Init(UDSServer& udsServer)
             std::bind(&InputEventHandler::OnEventKeyboard, this, std::placeholders::_1)
         },
         {
+            MmiMessageId::LIBINPUT_KEY_EVENT,
+            std::bind(&InputEventHandler::OnKeyEventDispatch, this, std::placeholders::_1)
+        },
+        {
             MmiMessageId::LIBINPUT_EVENT_POINTER_MOTION,
             std::bind(&InputEventHandler::OnEventPointer, this, std::placeholders::_1)
         },
@@ -260,6 +264,11 @@ OHOS::MMI::UDSServer* OHOS::MMI::InputEventHandler::GetUDSServer()
     return udsServer_;
 }
 
+int32_t OHOS::MMI::InputEventHandler::SetInputEventFilter(sptr<IEventFilter> filter)
+{
+    return eventDispatch_.SetInputEventFilter(filter);
+}
+
 int32_t OHOS::MMI::InputEventHandler::OnEventDeviceAdded(multimodal_libinput_event &ev)
 {
     CHKR(ev.event, NULL_POINTER, NULL_POINTER);
@@ -333,6 +342,136 @@ int32_t OHOS::MMI::InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_e
     return RET_OK;
 }
 
+int32_t OHOS::MMI::InputEventHandler::OnEventKey(libinput_event& event)
+{
+    uint64_t preHandlerTime = GetSysClockTime();
+    if (keyEvent == nullptr) {
+        keyEvent = OHOS::MMI::KeyEvent::Create();
+    }
+    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent, *udsServer_);
+    if (packageResult == MULTIDEVICE_SAME_EVENT_FAIL) { // The multi_device_same_event should be discarded
+        return RET_OK;
+    }
+    if (packageResult != RET_OK) {
+        MMI_LOGE("KeyEvent package failed... ret:%{public}d errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
+        return KEY_EVENT_PKG_FAIL;
+    }
+#ifdef OHOS_AUTO_TEST_FRAME // Send event to auto-test frame
+    const AutoTestLibinputPkt autoTestLibinputPkt = {
+        "KeyEvent", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), 0, 0, 0, 0
+    };
+    auto retAutoTestLibPkt = eventDispatch_.SendLibPktToAutoTest(*udsServer_, autoTestLibinputPkt);
+    if (retAutoTestLibPkt != RET_OK) {
+        MMI_LOGE("Send KeyEvent to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
+    }
+    auto retAutoTestMapPkt = eventDispatch_.SendMappingPktToAutoTest(*udsServer_, keyEvent->GetEventType());
+    if (retAutoTestMapPkt != RET_OK) {
+        MMI_LOGE("Send KeyEvent to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
+    }
+#endif  // OHOS_AUTO_TEST_FRAME
+    int32_t kac = keyEvent->GetKeyAction();
+    KEY_STATE kacState = (kac == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
+    int16_t lowKeyCode = static_cast<int16_t>(keyEvent->GetKeyCode());
+    auto hosKey = KeyValueTransformationByInput(lowKeyCode);
+#ifndef OHOS_AUTO_TEST_FRAME
+    if (hosKey.isSystemKey) {
+        OnSystemEvent(hosKey, kacState);
+    }
+#else
+    AutoTestKeyTypePkt autoTestKeyTypePkt = {};
+    bool retSystemEvent = OnSystemEvent(hosKey, kacState, autoTestKeyTypePkt);
+    auto retAutoTestTypePktPkt = eventDispatch_.SendKeyTypePktToAutoTest(*udsServer_, autoTestKeyTypePkt);
+    if (retAutoTestTypePktPkt != RET_OK) {
+        MMI_LOGE("Send KeyEvent to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
+    }
+    if (hosKey.isSystemKey && retSystemEvent) {
+        return RET_OK;
+    }
+#endif  // OHOS_AUTO_TEST_FRAME
+    auto device = libinput_event_get_device(&event);
+    CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
+
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent, preHandlerTime);
+    if (eventDispatchResult != RET_OK) {
+        MMI_LOGE("KeyEvent dispatch failed... ret:%{public}d errCode:%{public}d",
+                 eventDispatchResult, KEY_EVENT_DISP_FAIL);
+        return KEY_EVENT_DISP_FAIL;
+    }
+    MMI_LOGD("Inject keyCode = %{public}d,action = %{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::InputEventHandler::OnKeyEventDispatch(multimodal_libinput_event& ev)
+{
+#ifdef OHOS_WESTEN_MODEL
+    uint64_t preHandlerTime = GetSysClockTime();
+#endif
+    if (keyEvent == nullptr) {
+        keyEvent = OHOS::MMI::KeyEvent::Create();
+    }
+    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    auto packageResult = eventPackage_.PackageKeyEvent(*ev.event, keyEvent, *udsServer_);
+    if (packageResult == MULTIDEVICE_SAME_EVENT_FAIL) { // The multi_device_same_event should be discarded
+        return RET_OK;
+    }
+    if (packageResult != RET_OK) {
+        MMI_LOGE("KeyEvent package failed... ret:%{public}d errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
+        return KEY_EVENT_PKG_FAIL;
+    }
+#ifndef OHOS_WESTEN_MODEL
+    if (INTERCEPTORMANAGERGLOBAL.OnKeyEvent(keyEvent)) {
+        MMI_LOGD("key event filter find a key event from Original event keyCode : %{puiblic}d",
+            keyEvent->GetKeyCode());
+        return RET_OK;
+    }
+    (void)OnEventKey(*ev.event);
+#else
+#ifdef OHOS_AUTO_TEST_FRAME // Send event to auto-test frame
+    const AutoTestLibinputPkt autoTestLibinputPkt = {
+        "KeyEvent", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), 0, 0, 0, 0
+    };
+    auto retAutoTestLibPkt = eventDispatch_.SendLibPktToAutoTest(*udsServer_, autoTestLibinputPkt);
+    if (retAutoTestLibPkt != RET_OK) {
+        MMI_LOGE("Send KeyEvent to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
+    }
+    auto retAutoTestMapPkt = eventDispatch_.SendMappingPktToAutoTest(*udsServer_, keyEvent->GetEventType());
+    if (retAutoTestMapPkt != RET_OK) {
+        MMI_LOGE("Send KeyEvent to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
+    }
+#endif  // OHOS_AUTO_TEST_FRAME
+    int32_t kac = keyEvent->GetKeyAction();
+    KEY_STATE kacState = (kac == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
+    int16_t lowKeyCode = static_cast<int16_t>(keyEvent->GetKeyCode());
+    auto hosKey = KeyValueTransformationByInput(lowKeyCode);
+#ifndef OHOS_AUTO_TEST_FRAME
+    if (hosKey.isSystemKey) { // Judging whether key is system key.
+        OnSystemEvent(hosKey, kacState);
+    }
+#else
+    AutoTestKeyTypePkt autoTestKeyTypePkt = {};
+    bool retSystemEvent = OnSystemEvent(hosKey, kacState, autoTestKeyTypePkt);
+    auto retAutoTestTypePktPkt = eventDispatch_.SendKeyTypePktToAutoTest(*udsServer_, autoTestKeyTypePkt);
+    if (retAutoTestTypePktPkt != RET_OK) {
+        MMI_LOGE("Send KeyEvent to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
+    }
+    if (hosKey.isSystemKey && retSystemEvent) {
+        return RET_OK;
+    }
+#endif  // OHOS_AUTO_TEST_FRAME
+    auto device = libinput_event_get_device(ev.event);
+    CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
+
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent, preHandlerTime);
+    if (eventDispatchResult != RET_OK) {
+        MMI_LOGE("KeyEvent dispatch failed... ret:%{public}d errCode:%{public}d", 
+            eventDispatchResult, KEY_EVENT_DISP_FAIL);
+        return KEY_EVENT_DISP_FAIL;
+    }
+#endif
+    return RET_OK;
+}
+
 int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event& event)
 {
     uint64_t preHandlerTime = GetSysClockTime();
@@ -382,14 +521,6 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event& event)
     if (EventPackage::KeyboardToKeyEvent(key, keyEvent, *udsServer_) == RET_ERR) {
         MMI_LOGE("on OnKeyboardEvent translate key event error!\n");
         return RET_ERR;
-    }
-    if (AbilityMgr->CheckLaunchAbility(keyEvent)) {
-        MMI_LOGD("key event start launch an ability, keyCode : %{puiblic}d", key.key);
-        return RET_OK;
-    }
-    if (KeyEventInputSubscribeFlt.FilterSubscribeKeyEvent(*udsServer_, keyEvent)) {
-        MMI_LOGD("subscribe key event filter success. keyCode=%{puiblic}d", key.key);
-        return RET_OK;
     }
     auto device = libinput_event_get_device(&event);
     CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
@@ -958,7 +1089,6 @@ int32_t OHOS::MMI::InputEventHandler::OnMouseEventHandler(libinput_event& event,
         mouseEvent->SetPressedKeys(pressedKeys);
     }
     mouseEvent->SetMouseData(event, deviceId);
-
     // MouseEvent Normalization Results
     MMI_LOGI("MouseEvent Normalization Results : PointerAction = %{public}d, PointerId = %{public}d,"
         "SourceType = %{public}d, ButtonId = %{public}d,"
@@ -979,6 +1109,15 @@ int32_t OHOS::MMI::InputEventHandler::OnMouseEventHandler(libinput_event& event,
     }
 
     eventDispatch_.handlePointerEvent(mouseEvent);
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::InputEventHandler::OnMouseEventTimerHanler(std::shared_ptr<OHOS::MMI::PointerEvent> mouse_event)
+{
+    if (mouse_event == nullptr) {
+        return RET_ERR;
+    }
+    eventDispatch_.handlePointerEvent(mouse_event);
     return RET_OK;
 }
 

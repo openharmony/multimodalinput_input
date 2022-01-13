@@ -27,8 +27,13 @@ public:
     InterceptorManager();
     ~InterceptorManager();
     int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
+    int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
     void RemoveInterceptor(int32_t interceptorId);
-    int32_t OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id);
+public:
+    static const int32_t INVALID_INTERCEPTOR_ID { -1 };
+    int32_t OnKeyEvent(std::shared_ptr<KeyEvent> pointerEvent);
+    
 private:
     struct InterceptorItem {
         int32_t id_;
@@ -38,6 +43,7 @@ private:
         }
         int32_t sourceType;
         std::function<void(std::shared_ptr<PointerEvent>)> callback;
+        std::function<void(std::shared_ptr<KeyEvent>)> callback_;
     };
 private:
     int32_t InterceptorItemId;

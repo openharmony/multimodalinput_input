@@ -21,15 +21,7 @@ namespace MMI {
 int32_t InputEventDataTransformation::KeyEventToNetPacket(
     const std::shared_ptr<OHOS::MMI::KeyEvent> key, NetPacket &pck)
 {
-    CHKR(pck.Write(key->GetId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(key->GetActionTime()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(key->GetAction()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(key->GetActionStartTime()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(key->GetDeviceId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(key->GetTargetDisplayId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(key->GetAgentWindowId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(key->GetTargetWindowId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(key->GetFlag()), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR((RET_OK == SerializeInputEvent(key, pck)), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pck.Write(key->GetKeyCode()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pck.Write(key->GetKeyAction()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     auto keys = key->GetKeyItems();
@@ -43,30 +35,13 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
     }
     return RET_OK;
 }
-int32_t InputEventDataTransformation::NetPacketToKeyEvent(
+int32_t InputEventDataTransformation::NetPacketToKeyEvent(bool skipId, 
     std::shared_ptr<OHOS::MMI::KeyEvent> key, NetPacket &pck)
 {
     int32_t data = 0;
     int32_t size = 0;
     bool isPressed = false;
-    CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
-    key->SetId(data);
-    CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
-    key->SetActionTime(data);
-    CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
-    key->SetAction(data);
-    CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
-    key->SetActionStartTime(data);
-    CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
-    key->SetDeviceId(data);
-    CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
-    key->SetTargetDisplayId(data);
-    CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
-    key->SetAgentWindowId(data);
-    CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
-    key->SetTargetWindowId(data);
-    CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
-    key->AddFlag(data);
+    CHKR((RET_OK == DeserializeInputEvent(skipId, key, pck)), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
     key->SetKeyCode(data);
     CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);

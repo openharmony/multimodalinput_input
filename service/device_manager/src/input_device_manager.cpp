@@ -143,9 +143,7 @@ void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
     nextId_++;
 
     if (IsPointerDevice(static_cast<struct libinput_device *>(inputDevice))) {
-#ifdef OHOS_MOUSE_READY
-        DrawWgr->TellDeviceInfo(true);
-#endif
+        //DrawWgr->TellDeviceInfo(true);
     }
 }
 
@@ -161,9 +159,7 @@ void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
         if (it->second == inputDevice) {
             inputDeviceMap_.erase(it);
             if (IsPointerDevice(inputDevice)) {
-#ifdef OHOS_MOUSE_READY
-                DrawWgr->TellDeviceInfo(false);
-#endif
+                //DrawWgr->TellDeviceInfo(false);
             }
             break;
         }

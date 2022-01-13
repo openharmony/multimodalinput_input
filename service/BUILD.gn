@@ -36,7 +36,9 @@ config("libmmi_server_public_config") {
     "server_input_filter_manager/include",
     "ability_launch/include",
     "key_event_input_subscribe_filter/include",
+    "timer_manager/include",
     "${mmi_service_path}/connect_manager/include",
+    "${mmi_service_path}/event_filter_binder/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "mouse_event_handler/include",
@@ -102,10 +104,6 @@ config("libmmi_server_public_config") {
     ]
     cflags += [ "-DOHOS_WESTEN_MODEL" ]
   }
-
-  if (is_mmi_mouse_ready) {
-    cflags += [ "-DOHOS_MOUSE_READY" ]
-  }
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
@@ -152,18 +150,17 @@ ohos_shared_library("libmmi-server") {
     "module_loader/src/uds_server.cpp",
     "mouse_event_handler/src/mouse_event_handler.cpp",
     "server_input_filter_manager/src/server_input_filter_manager.cpp",
+    "timer_manager/src/timer_manager.cpp",
     "touch_transform_point/src/touch_transform_point_manager.cpp",
     "touch_transform_point/src/touch_transform_point_processor.cpp",
     "touch_transform_point/src/touchpad_transform_point_processor.cpp",
     "window_manager/src/input_windows_manager.cpp",
     "window_manager/src/input_windows_manager_stub.cpp",
     "window_manager/src/outer_interface.cpp",
+
+    #"window_manager/src/pointer_drawing_manager.cpp",
     "window_manager/src/window_switch.cpp",
   ]
-
-  if (is_mmi_mouse_ready) {
-    sources += [ "window_manager/src/pointer_drawing_manager.cpp" ]
-  }
 
   if (is_mmi_have_hdf) {
     sources += [
@@ -203,20 +200,20 @@ ohos_shared_library("libmmi-server") {
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core:appexecfwk_core",
     "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler:libeventhandler",
     "//foundation/appexecfwk/standard/kits:appkit_native",
+    "//foundation/graphic/standard/rosen/modules/2d_graphics:2d_graphics",
     "//foundation/multimedia/image_standard:image_framework",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
+    "//foundation/multimodalinput/input/service/event_filter_binder:mmi_event_filter_proxy",
     "//foundation/windowmanager/wm:libwm",
     "//foundation/windowmanager/wm:libwmutil",
     "//third_party/libxkbcommon:libxkbcommon",
     "//third_party/wayland_standard:libwayland_server",
     "//third_party/weston:libweston",
     "//utils/native/base:utils",
-
-    #"//foundation/graphic/standard/rosen/modules/2d_graphics:2d_graphics",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
@@ -338,10 +335,6 @@ ohos_unittest("PointerDrawTest") {
     cflags += [ "-DOHOS_WESTEN_MODEL" ]
   }
 
-  if (is_mmi_mouse_ready) {
-    cflags += [ "-DOHOS_MOUSE_READY" ]
-  }
-
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",
@@ -349,6 +342,7 @@ ohos_unittest("PointerDrawTest") {
     "//drivers/peripheral/input/hal:hdi_input",
     "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
     "//foundation/appexecfwk/standard/kits:appkit_native",
+    "//foundation/graphic/standard/rosen/modules/2d_graphics:2d_graphics",
     "//foundation/multimedia/image_standard:image_framework",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
@@ -358,8 +352,6 @@ ohos_unittest("PointerDrawTest") {
     "//third_party/googletest:gtest_main",
     "//third_party/libxkbcommon:libxkbcommon",
     "//utils/native/base:utils",
-
-    #"//foundation/graphic/standard/rosen/modules/2d_graphics:2d_graphics",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
@@ -499,7 +491,5 @@ group("ut-mmi-service") {
   testonly = true
   deps = []
   deps += [ ":ut-mmi-service-out" ]
-  if (is_mmi_mouse_ready) {
-    deps += [ ":PointerDrawTest" ]
-  }
+  deps += [ ":PointerDrawTest" ]
 }
