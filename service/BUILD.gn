@@ -341,6 +341,7 @@ ohos_unittest("PointerDrawTest") {
     "//drivers/peripheral/input/hal:hdi_input",
     "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
     "//foundation/appexecfwk/standard/kits:appkit_native",
+    "//foundation/graphic/standard/rosen/modules/2d_graphics:2d_graphics",
     "//foundation/multimedia/image_standard:image_framework",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
@@ -350,8 +351,6 @@ ohos_unittest("PointerDrawTest") {
     "//third_party/googletest:gtest_main",
     "//third_party/libxkbcommon:libxkbcommon",
     "//utils/native/base:utils",
-
-    #"//foundation/graphic/standard/rosen/modules/2d_graphics:2d_graphics",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
