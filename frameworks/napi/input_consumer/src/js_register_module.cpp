@@ -80,7 +80,7 @@ namespace OHOS {
             keyOption->SetPreKeys(preKeys);
 
             std::string subKeyNames = "";
-            for (int32_t i = 0; i < static_cast<int32_t>(sortPrekeys.size()); i++){
+            for (int32_t i = 0; i < sortPrekeys.size(); i++){
                 subKeyNames += std::to_string(sortPrekeys[i]);
                 subKeyNames += ",";
                 HILOG_DEBUG("GetSubscribeEventInfo preKeys = %{public}d", preKeys[i]);
@@ -179,7 +179,7 @@ namespace OHOS {
                 return false;
             } 
             std::vector<int32_t> checkRepeat;
-            for (int32_t i = 0; i < static_cast<int32_t>(preKeys.size()); i++) {
+            for (int32_t i = 0; i < preKeys.size(); i++) {
                 if (preKeys[i] < 0) {
                     HILOG_ERROR("preKey:%{public}d is less 0, can not process", preKeys[i]);
                     return false;

@@ -165,66 +165,6 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_InjectKeyEvent_001, 
 }
 
 /**
- * @tc.name:MultimodalEventHandler_InjectKeyEvent_002
- * @tc.desc: test inject interface
- * @tc.type: FUNC
- * @tc.require: SR000GGQL7  AR000GJNL7
- * @tc.author: yirenjie
- */
-HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_InjectKeyEvent_002, TestSize.Level1)
-{
-    RunShellUtil runCommand;
-    std::string command1 = "Inject keyCode = 2,action = 1,focusPid = ";
-    std::string command2 = "Inject keyCode = 2,action = 1,revPid = ";
-    std::vector<std::string> slog;
-    std::vector<std::string> rlog;
-    ASSERT_TRUE(runCommand.RunShellCommand(command1, slog) == RET_OK);
-    ASSERT_TRUE(runCommand.RunShellCommand(command2, rlog) == RET_OK);
-    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
-    OHOS::KeyEvent injectDownEvent;
-    uint64_t downTime = static_cast<uint64_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectDownEvent.Initialize(0, ACTION_DOWN, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
-        ISINTERCEPTED_TRUE);
-    int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
-    EXPECT_TRUE(response);
-
-    OHOS::KeyEvent injectUpEvent;
-    downTime = static_cast<uint64_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectUpEvent.Initialize(0, ACTION_UP, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
-        ISINTERCEPTED_TRUE);
-    response = MMIEventHdl.InjectEvent(injectUpEvent);
-    EXPECT_TRUE(response);
-    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
-
-    std::vector<std::string> svLog;
-    std::vector<std::string> rvLog;
-    ASSERT_TRUE(runCommand.RunShellCommand(command1, svLog) == RET_OK);
-    ASSERT_TRUE(svLog.size() > 0);
-    if (slog.size() == 0) {
-        EXPECT_TRUE(svLog.size() > slog.size());
-        EXPECT_TRUE(svLog.back().find(command1) != svLog.back().npos);
-    } else {
-        EXPECT_TRUE(std::strcmp(svLog.back().c_str(), slog.back().c_str()) != 0);
-    }
-
-    ASSERT_TRUE(runCommand.RunShellCommand(command2, rvLog) == RET_OK);
-    ASSERT_TRUE(rvLog.size() > 0);
-    if (rlog.size() == 0) {
-        EXPECT_TRUE(rvLog.size() > rlog.size());
-        EXPECT_TRUE(rvLog.back().find(command2) != rvLog.back().npos);
-    } else {
-        EXPECT_TRUE(std::strcmp(rvLog.back().c_str(), rlog.back().c_str()) != 0);
-    }
-
-    std::vector<string> sPid;
-    std::vector<string> rPid;
-    RunShellUtil::StringToVectorByRegex(svLog.back(), sPid, REGEX_FIND_PID);
-    RunShellUtil::StringToVectorByRegex(rvLog.back(), rPid, REGEX_FIND_PID);
-
-    EXPECT_TRUE(std::strcmp(sPid.back().c_str(), rPid.back().c_str()) == 0);
-}
-
-/**
  * @tc.name:MultimodalEventHandler_InjectKeyEvent_003
  * @tc.desc: test inject interface
  * @tc.type: FUNC

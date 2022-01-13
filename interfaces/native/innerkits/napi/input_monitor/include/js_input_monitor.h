@@ -83,6 +83,8 @@ private:
 
     void SetReceiver(napi_value receiver);
 
+    void printfPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) const;
+
     int32_t TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
 
 private:

@@ -31,6 +31,7 @@ public:
     static std::shared_ptr<MultimodalInputConnectManager> GetInstance();
     int32_t AllocSocketPair(const int moduleType);
     int GetClientSocketFdOfAllocedSocketPair() const;
+    int32_t SetInputEventFilter(sptr<IEventFilter> filter);
 private:
     MultimodalInputConnectManager() = default;
     MultimodalInputConnectManager(const MultimodalInputConnectManager &manager) = delete;

@@ -1463,6 +1463,10 @@ public:
     // Returning an empty smart pointer object indicates that the conversion failed
     static std::shared_ptr<KeyEvent> from(std::shared_ptr<InputEvent> inputEvent);
 
+    static const char* ActionToString(int32_t action);
+    static const char* KeyCodeToString(int32_t keyCode);
+    static std::shared_ptr<KeyEvent> Clone(std::shared_ptr<KeyEvent> keyEvent);
+
 public:
     virtual ~KeyEvent();
     static std::shared_ptr<KeyEvent> Create();
@@ -1481,6 +1485,9 @@ public:
     std::vector<KeyEvent::KeyItem> GetKeyItems();
     void AddPressedKeyItems(const KeyItem& keyItem);
     void RemoveReleasedKeyItems(const KeyItem& keyItem);
+
+    const KeyItem* GetKeyItem() const;
+    const KeyItem* GetKeyItem(int32_t keyCode) const;
 protected:
     explicit KeyEvent(int32_t eventType);
 

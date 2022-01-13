@@ -16,6 +16,7 @@
 #include "i_multimodal_input_connect_stub.h"
 #include <sys/types.h>
 #include <sys/socket.h>
+#include "error_multimodal.h"
 #include "ipc_skeleton.h"
 #include "log.h"
 #include "multimodal_input_connect_define.h"
@@ -39,17 +40,15 @@ int32_t IMultimodalInputConnectStub::OnRemoteRequest(
         return ERR_INVALID_STATE;
     }
 
-    int ret = RET_OK;
     switch (code) {
         case static_cast<uint32_t>(IMultimodalInputConnect::ALLOC_SOCKET_FD):
-            MMI_LOGE("code = ALLOC_SOCKET_FD");
-            ret = HandleAllocSocketFd(data, reply);
-            break;
+            return HandleAllocSocketFd(data, reply);
+        case static_cast<uint32_t>(IMultimodalInputConnect::SET_EVENT_POINTER_FILTER):
+            return StubSetInputEventFilter(data, reply);
         default:
-            MMI_LOGE("code != ALLOC_SOCKET_FD, go switch defaut");
+            MMI_LOGE("unknown code: %{public}u, go switch defaut", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-    return ret;
 }
 
 bool IMultimodalInputConnectStub::IsAuthorizedCalling() const
@@ -67,6 +66,38 @@ int32_t IMultimodalInputConnectStub::GetCallingUid() const
 int32_t IMultimodalInputConnectStub::GetCallingPid() const
 {
     return IPCSkeleton::GetCallingPid();
+}
+
+int32_t IMultimodalInputConnectStub::StubSetInputEventFilter(MessageParcel& data, MessageParcel& reply)
+{
+    int32_t ret = RET_OK;
+
+    do {
+        if (GetCallingUid() != SYSTEM_UID) {
+            ret = SASERVICE_PERMISSION_FAIL;
+            break;
+        }
+
+        sptr<IRemoteObject> client = data.ReadRemoteObject();
+        if (client == nullptr) {
+            MMI_LOGE("the mouse client value is nullptr");
+            ret = ERR_INVALID_VALUE;
+            break;
+        }
+
+        sptr<IEventFilter> filter = iface_cast<IEventFilter>(client);
+        if (filter == nullptr) {
+            MMI_LOGE("filter is nullptr");
+            ret = NULL_POINTER;
+            break;
+        }
+
+        ret = SetInputEventFilter(filter);
+    } while (0);
+    
+    reply.WriteInt32(ret);
+
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

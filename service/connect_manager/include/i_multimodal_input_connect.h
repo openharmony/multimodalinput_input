@@ -17,6 +17,7 @@
 #define OHOS_I_MULTIMODAL_INPUT_CONNECT_H
 
 #include "iremote_broker.h"
+#include "i_event_filter.h"
 
 namespace OHOS {
 namespace MMI {
@@ -27,9 +28,11 @@ public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.multimodalinput.IConnectManager");
 
     virtual int32_t AllocSocketFd(const std::string &programName, const int moduleType, int &socketFd) = 0;
+    virtual int32_t SetInputEventFilter(sptr<IEventFilter> filter) = 0;
 
     enum {
         ALLOC_SOCKET_FD = 0,
+        SET_EVENT_POINTER_FILTER = 1,
     };
 
     enum {

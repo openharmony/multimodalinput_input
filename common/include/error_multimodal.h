@@ -127,6 +127,8 @@ namespace OHOS {
         INVALID_RETURN_VALUE,                       // 无效的返回值
         EPOLL_CTL_FAIL,                             // epoll_ctl错误
         EXP_SO_LIBY_INIT_FAIL,                      // 可扩展模块初始化错误
+        SASERVICE_PERMISSION_FAIL,                  // SA_Service权限不足
+        SASERVICE_IPC_CALL_FAIL,                    // SA_Service调用失败
     };
     // Error code for util
     constexpr ErrCode UTIL_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_UTIL);
@@ -163,6 +165,10 @@ namespace OHOS {
 
     // Error code for napi
     constexpr ErrCode NAPI_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_NAPI);
+
+    enum {
+        CALL_NAPI_API_ERR = NAPI_ERR_OFFSET
+    };
 
     enum REGISTER {
         MMI_STANDARD_EVENT_SUCCESS = 1,
