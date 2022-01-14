@@ -149,7 +149,7 @@ int32_t OHOS::MMI::EventDispatch::RegisteredEventDispatch(const MmiMessageId& id
         MMI_LOGE("Send event to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
     }
 #endif  // OHOS_AUTO_TEST_FRAME
-    for (auto fd : fds) {
+    for (const auto& fd : fds) {
         auto appInfo = AppRegs->FindBySocketFd(fd);
         MMI_LOGT("\nevent dispatcher of server:\n RegisteredEvent:devicePhys=%{public}s;"
                  "deviceType=%{public}u;eventType=%{public}u;occurredTime=%{public}" PRId64 ";"
