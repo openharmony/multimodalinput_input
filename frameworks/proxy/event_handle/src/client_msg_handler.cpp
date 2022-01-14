@@ -166,14 +166,6 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPack
              key->GetActionStartTime(), key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), fd, serverStartTime);
 
-#ifdef OHOS_AUTO_TEST_FRAME
-    // Be used by auto-test frame!
-    const AutoTestClientPkt autoTestClientKeyPkt = {
-        "eventKeyboard", 0, key->GetKeyAction(), 0, 0, "", fd, key->GetTargetWindowId(), 0,
-        0, 0, 0, key->GetDeviceId(), key->GetEventType(), 0
-    };
-    ((MMIClient*)&client)->AutoTestReplyClientPktToServer(autoTestClientKeyPkt);
-#endif  // OHOS_AUTO_TEST_FRAME
     InputManagerImpl::GetInstance()->OnKeyEvent(key);
     return RET_OK;
 }
@@ -273,16 +265,6 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKey(const UDSClient& client, NetPacket& p
              "deviceType=%{public}u;seat_key_count=%{public}u;state=%{public}d;"
              "fd=%{public}d\n*************************************************************\n",
              key.time, key.key, key.deviceType, key.seat_key_count, key.state, fd);
-
-
-#ifdef OHOS_AUTO_TEST_FRAME
-    // Be used by auto-test frame!
-    const AutoTestClientPkt autoTestClientKeyPkt = {
-        "eventKeyboard", key.key, key.state, 0, 0, "", fd, windowId, abilityId,
-        0, 0, key.deviceType, key.deviceId, key.eventType, 0
-    };
-    ((MMIClient*)&client)->AutoTestReplyClientPktToServer(autoTestClientKeyPkt);
-#endif  // OHOS_AUTO_TEST_FRAME
 
     /* 根据收到的key，构造keyBoardEvent对象，
     *  其中KeyBoardEvent对象的    handledByIme,unicode,isSingleNonCharacter,isTwoNonCharacters,isThreeNonCharacters五个字段
@@ -645,24 +627,6 @@ int32_t OHOS::MMI::ClientMsgHandler::PackedData(MultimodalEvent& multEvent, cons
             data.deviceType);
     }
 
-#ifdef OHOS_AUTO_TEST_FRAME
-    // Be used by auto-test frame!
-    std::string eventType = "";
-    if (type == INPUT_DEVICE_CAP_AISENSOR || type == INPUT_DEVICE_CAP_KNUCKLE) {
-        eventType = "AI_KNUCKLE";
-    } else {
-        eventType = "MixedKey";
-    }
-    AutoTestClientPkt autoTestClientPkt = {
-        "", 0, 0, 0, 0, "", fd, windowId, abilityId, 0, 0, data.deviceType, data.deviceId, data.eventType, 0
-    };
-    CHKR(strcpy_s(autoTestClientPkt.eventType, MAX_EVENTTYPE_NAME, eventType.c_str()) == EOK,
-        STRCPY_S_CALLBACK_FAIL, RET_ERR);
-    CHKR(strcpy_s(autoTestClientPkt.callBakeName, MAX_EVENTTYPE_NAME, funName.c_str()) == EOK,
-        STRCPY_S_CALLBACK_FAIL, RET_ERR);
-    ((MMIClient*)&client)->AutoTestReplyClientPktToServer(autoTestClientPkt);
-#endif  // OHOS_AUTO_TEST_FRAME
-
     return RET_OK;
 }
 
@@ -911,15 +875,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, Ne
              pointData.delta.y, pointData.delta_raw.x, pointData.delta_raw.y, pointData.absolute.x,
              pointData.absolute.y, pointData.discrete.x, pointData.discrete.y, fd);
 
-#ifdef OHOS_AUTO_TEST_FRAME
-    // Be used by auto-test frame!
-    const AutoTestClientPkt autoTestClientPointPkt = {
-        "eventPointer", pointData.button, pointData.state, pointData.delta_raw.x, pointData.delta_raw.y, "",
-        fd, windowId, abilityId, pointData.delta.x, pointData.delta.y, pointData.deviceType, pointData.deviceId,
-        pointData.eventType, 0
-    };
-    ((MMIClient*)&client)->AutoTestReplyClientPktToServer(autoTestClientPointPkt);
-#endif  // OHOS_AUTO_TEST_FRAME
     int32_t action = pointData.state;
     /* 根据收到的point，构造MouseEvent对象，
     *  其中MouseEvent对象的action,actionButton,cursorDelta,scrollingDelta四个字段
@@ -994,14 +949,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, Ne
         touchData.uuid, touchData.eventType, static_cast<int32_t>(touchData.time), "",
         static_cast<int32_t>(touchData.deviceId), 0, false, touchData.deviceType, deviceEventType);
 
-#ifdef OHOS_AUTO_TEST_FRAME
-    // Be used by auto-test frame!
-    const AutoTestClientPkt autoTestClientTouchPkt = {
-        "eventTouch", 0, 0, touchData.point.x, touchData.point.y, "", fd, windowId, abilityId, 0, 0,
-        touchData.deviceType, touchData.deviceId, touchData.eventType, touchData.slot
-    };
-    ((MMIClient*)&client)->AutoTestReplyClientPktToServer(autoTestClientTouchPkt);
-#endif  // OHOS_AUTO_TEST_FRAME
     EventManager.OnTouch(touchEvent);
 }
 
@@ -1022,15 +969,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisJoystickEvent(const UDSClient& client,
     MMI_LOGT("\nevent dispatcher of client: "
         "event JoyStick: fd: %{public}d\n", fd);
     PrintEventJoyStickAxisInfo(eventJoyStickData, fd, abilityId, windowId, serverStartTime);
-
-#ifdef OHOS_AUTO_TEST_FRAME
-    // Be used by auto-test frame!
-    const AutoTestClientPkt autoTestClientJoyStickPkt = {
-        "eventJoyStickAxis", 0, 0, 0, 0, "", fd, windowId, abilityId, 0, 0,
-        eventJoyStickData.deviceType, eventJoyStickData.deviceId, eventJoyStickData.eventType, 0
-    };
-    ((MMIClient*)&client)->AutoTestReplyClientPktToServer(autoTestClientJoyStickPkt);
-#endif  // OHOS_AUTO_TEST_FRAME
 
     int32_t mouseAction = static_cast<int32_t>(MouseActionEnum::HOVER_MOVE);
     (reinterpret_cast<MouseEvent*>(mousePtr.GetRefPtr()))->Initialize(windowId, mouseAction, 0, 0, mmiPoint,
@@ -1071,15 +1009,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client,
              tabletPad.strip.position, tabletPad.strip.source, fd, serverStartTime);
 
     // multimodal ANR
-
-#ifdef OHOS_AUTO_TEST_FRAME
-    // Be used by auto-test frame!
-    const AutoTestClientPkt autoTestClientTabletPadPkt = {
-        "eventTabletPad", 0, 0, 0, 0, "", fd, windowId, abilityId, 0, 0,
-        tabletPad.deviceType, tabletPad.deviceId, tabletPad.eventType, 0
-    };
-    ((MMIClient*)&client)->AutoTestReplyClientPktToServer(autoTestClientTabletPadPkt);
-#endif  // OHOS_AUTO_TEST_FRAME
 
     int32_t mouseAction = static_cast<int32_t>(MouseActionEnum::HOVER_MOVE);
     eventJoyStickAxis.abs_wheel.standardValue = static_cast<float>(tabletPad.ring.position);
@@ -1236,14 +1165,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTabletToolEvent(const UDSClient& clien
     pkt >> curRventType >> tableTool >> abilityId >> windowId >> fd >> serverStartTime;
     PrintEventTabletToolInfo(tableTool, serverStartTime, abilityId, windowId, fd);
 
-#ifdef OHOS_AUTO_TEST_FRAME
-    // Be used by auto-test frame!
-    const AutoTestClientPkt autoTestClientTabletToolPkt = {
-        "eventTabletTool", 0, 0, 0, 0, "", fd, windowId, abilityId, 0, 0,
-        tableTool.deviceType, tableTool.deviceId, tableTool.eventType, 0
-    };
-    ((MMIClient*)&client)->AutoTestReplyClientPktToServer(autoTestClientTabletToolPkt);
-#endif  // OHOS_AUTO_TEST_FRAME
 
     // 如果是标准化消息，则获取standardTouchEvent
     AnalysisStandardTabletToolEvent(pkt, curRventType, tableTool, windowId);
@@ -1268,22 +1189,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, 
              gesture.time, gesture.deviceType, gesture.deviceName, gesture.devicePhys,
              gesture.eventType, gesture.fingerCount, gesture.cancelled, gesture.delta.x, gesture.delta.y,
              gesture.deltaUnaccel.x, gesture.deltaUnaccel.y, fd, serverStartTime);
-
-
-#ifdef OHOS_AUTO_TEST_FRAME
-    // Be used by auto-test frame!
-    int32_t slot = 0;
-    for (auto size = 0; size < MAX_SOLTED_COORDS_NUM; size++) {
-        if (gesture.soltTouches.coords[size].isActive) {
-            slot = static_cast<int32_t>(size);
-        }
-    }
-    const AutoTestClientPkt autoTestClientGesturePkt = {
-        "eventGesture", 0, 0, 0, 0, "", fd, windowId, abilityId, 0, 0,
-        gesture.deviceType, gesture.deviceId, gesture.eventType, slot
-    };
-    ((MMIClient*)&client)->AutoTestReplyClientPktToServer(autoTestClientGesturePkt);
-#endif  // OHOS_AUTO_TEST_FRAME
 
     const MmiPoint mmiPoint(gesture.deltaUnaccel.x, gesture.deltaUnaccel.y);
     auto mouseEvent = reinterpret_cast<MouseEvent*>(mousePtr.GetRefPtr());

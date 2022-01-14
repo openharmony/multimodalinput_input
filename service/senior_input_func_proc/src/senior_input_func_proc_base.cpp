@@ -120,17 +120,6 @@ int32_t SeniorInputFuncProcBase::DeviceEventProcess(const RawInputEvent& event)
         const uint64_t serverStartTime = GetSysClockTime();
         newPacket << deviceType << msgId << deviceId << fd << appInfo.windowId << appInfo.abilityId <<
             serverStartTime << uuid << occurredTime;
-#ifdef OHOS_AUTO_TEST_FRAME
-        const AutoTestDispatcherPkt autoTestDispatcherPkt = {
-            "eventAi_Knuckle", static_cast<uint16_t>(event.ev_type), event.ev_code, 0, 0, 0, MmiMessageId::INVALID,
-            appInfo.fd, appInfo.windowId, appInfo.abilityId, 0, 0, static_cast<uint16_t>(deviceType),
-            static_cast<uint32_t>(deviceId), 0, 0
-        };
-        auto retAutoTestDpc = eventDispatch_.SendDispatcherPktToAutoTest(*udsServerPtr_, autoTestDispatcherPkt);
-        if (retAutoTestDpc != RET_OK) {
-            MMI_LOGE("Send event to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
-        }
-#endif  // OHOS_AUTO_TEST_FRAME
         if (!udsServerPtr_->SendMsg(fd, newPacket)) {
             MMI_LOGE("Sending structure of event failed! fd:%{public}d\n", fd);
             return RET_ERR;

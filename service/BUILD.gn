@@ -77,10 +77,6 @@ config("libmmi_server_public_config") {
 
   cflags = [ "-DOHOS_BUILD" ]
 
-  if (is_mmi_have_st_test) {
-    cflags += [ "-DOHOS_AUTO_TEST_FRAME" ]
-  }
-
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
@@ -309,10 +305,7 @@ ohos_unittest("PointerDrawTest") {
   }
   sources = [ "window_manager/test/pointer_drawing_manager_test.cpp" ]
 
-  cflags = [
-    "-DOHOS_BUILD",
-    "-DOHOS_AUTO_TEST_FRAME",
-  ]
+  cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
@@ -436,10 +429,7 @@ ohos_unittest("ut-mmi-service-out") {
   if (is_mmi_have_weston) {
     sources += [ "event_handle/test/input_event_handler_test.cpp" ]
   }
-  cflags = [
-    "-DOHOS_BUILD",
-    "-DOHOS_AUTO_TEST_FRAME",
-  ]
+  cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]

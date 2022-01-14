@@ -55,13 +55,6 @@ public:
     bool HandleTouchScreenEvent(std::shared_ptr<PointerEvent> point);
     bool HandleMouseEvent(std::shared_ptr<PointerEvent> point);
     bool HandleTouchPadEvent(std::shared_ptr<PointerEvent> point);
-#ifdef OHOS_AUTO_TEST_FRAME
-    int32_t SendLibPktToAutoTest(UDSServer& udsServer, const AutoTestLibinputPkt& autoTestLibinputPkt);
-    int32_t SendMappingPktToAutoTest(UDSServer& udsServer, int32_t sourceType);
-    int32_t SendKeyTypePktToAutoTest(UDSServer& udsServer, const AutoTestKeyTypePkt& autoTestKeyTypePkt);
-    int32_t SendDispatcherPktToAutoTest(UDSServer& udsServer, const AutoTestDispatcherPkt& autoTestDispatcherPkt) const;
-    void AutoTestSetStandardValue(EventJoyStickAxis& eventJoyStickAxis);
-#endif  // OHOS_AUTO_TEST_FRAME
 
 protected:
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);
@@ -73,11 +66,6 @@ protected:
         RegisteredEvent& eventData, int32_t inputDeviceType, uint64_t preHandlerTime);
     int32_t KeyBoardRegisteredEventHandler(EventKeyboard& key, UDSServer& udsServer,
         libinput_event& event, int32_t inputDeviceType, uint64_t preHandlerTime);
-#ifdef OHOS_AUTO_TEST_FRAME
-        int32_t SendStandardPktToAutoTest(UDSServer& udsServer, const AutoTestStandardPkt& autoTestStandardPkt);
-        int32_t SendManagePktToAutoTest(UDSServer& udsServer, const OHOS::MMI::AppInfo& appInfo,
-            const int32_t focusId, const std::vector<int32_t>& fds, AutoTestCoordinate coordinate) const;
-#endif  // OHOS_AUTO_TEST_FRAME
 
 protected:
     int32_t touchDownFocusSurfaceId_ = 0;
