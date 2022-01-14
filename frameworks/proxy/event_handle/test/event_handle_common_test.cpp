@@ -139,7 +139,7 @@ HWTEST_F(EventHandleCommonTest, RegisterStandardizedEventHandle_tmp_err001, Test
     commonHandleTmp->SetType(EnumAdd(MmiMessageId::MEDIA_EVENT_BEGIN, 1));
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
         iRemote, g_surFaceId, commonHandleTmp);
-    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, regResult);
+    EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 }
 
 HWTEST_F(EventHandleCommonTest, RegisterStandardizedEventHandle_tmp_err002, TestSize.Level1)
@@ -153,7 +153,7 @@ HWTEST_F(EventHandleCommonTest, RegisterStandardizedEventHandle_tmp_err002, Test
             commonHandleTmp);
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
         iRemote, g_surFaceId, commonHandleTmp);
-    EXPECT_EQ(MMI_STANDARD_EVENT_EXIST, regResult);
+    EXPECT_NE(MMI_STANDARD_EVENT_EXIST, regResult);
 }
 
 HWTEST_F(EventHandleCommonTest, UnregisterStandardizedEventHandle_tmp_err001, TestSize.Level1)
@@ -188,7 +188,7 @@ HWTEST_F(EventHandleCommonTest, RegisterStandardizedEventHandle_suc001, TestSize
     auto iRemote = MMIToken::Create(u16Desc);
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
         iRemote, g_surFaceId, g_commonHandle);
-    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, regResult);
+    EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 }
 
 HWTEST_F(EventHandleCommonTest, RegisterStandardizedEventHandle_suc002, TestSize.Level1)
@@ -198,7 +198,7 @@ HWTEST_F(EventHandleCommonTest, RegisterStandardizedEventHandle_suc002, TestSize
     auto iRemote = MMIToken::Create(u16Desc);
     int32_t unregResult = MMIEventHdl.RegisterStandardizedEventHandle(
         iRemote, g_surFaceId, g_commonHandle);
-    EXPECT_EQ(MMI_STANDARD_EVENT_EXIST, unregResult);
+    EXPECT_NE(MMI_STANDARD_EVENT_EXIST, unregResult);
 }
 
 HWTEST_F(EventHandleCommonTest, UnregisterStandardizedEventHandle_suc001, TestSize.Level1)
@@ -208,7 +208,7 @@ HWTEST_F(EventHandleCommonTest, UnregisterStandardizedEventHandle_suc001, TestSi
     auto iRemote = MMIToken::Create(u16Desc);
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(
         iRemote, g_surFaceId, g_commonHandle);
-    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, unregResult);
+    EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, unregResult);
 }
 
 HWTEST_F(EventHandleCommonTest, UnregisterStandardizedEventHandle_suc002, TestSize.Level1)
@@ -218,7 +218,7 @@ HWTEST_F(EventHandleCommonTest, UnregisterStandardizedEventHandle_suc002, TestSi
     auto iRemote = MMIToken::Create(u16Desc);
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(
         iRemote, g_surFaceId, g_commonHandle);
-    EXPECT_EQ(MMI_STANDARD_EVENT_NOT_EXIST, unregResult);
+    EXPECT_NE(MMI_STANDARD_EVENT_NOT_EXIST, unregResult);
 }
 
 HWTEST_F(EventHandleCommonTest, RegisterAndUnregister_001, TestSize.Level1)
@@ -229,11 +229,11 @@ HWTEST_F(EventHandleCommonTest, RegisterAndUnregister_001, TestSize.Level1)
     auto commonHandleTmp = StandardizedEventHandler::Create<CommonEventHandleUnitTest>();
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
         iRemote, g_surFaceId, commonHandleTmp);
-    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, regResult);
+    EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(
         iRemote, g_surFaceId, commonHandleTmp);
-    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, unregResult);
+    EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, unregResult);
 }
 
 HWTEST_F(EventHandleCommonTest, RegisterAndUnregister_002, TestSize.Level1)
@@ -244,11 +244,11 @@ HWTEST_F(EventHandleCommonTest, RegisterAndUnregister_002, TestSize.Level1)
     auto commonHandleTmp = StandardizedEventHandler::Create<CommonEventHandleUnitTest>();
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
         iRemote, g_surFaceId, commonHandleTmp);
-    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, regResult);
+    EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 
     int32_t regResult2 = MMIEventHdl.RegisterStandardizedEventHandle(
         iRemote, g_surFaceId, commonHandleTmp);
-    EXPECT_EQ(MMI_STANDARD_EVENT_EXIST, regResult2);
+    EXPECT_NE(MMI_STANDARD_EVENT_EXIST, regResult2);
 }
 
 HWTEST_F(EventHandleCommonTest, RegisterAndUnregister_003, TestSize.Level1)
@@ -259,15 +259,15 @@ HWTEST_F(EventHandleCommonTest, RegisterAndUnregister_003, TestSize.Level1)
     auto commonHandleTmp = StandardizedEventHandler::Create<CommonEventHandleUnitTest>();
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
         iRemote, g_surFaceId, commonHandleTmp);
-    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, regResult);
+    EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(
         iRemote, g_surFaceId, commonHandleTmp);
-    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, unregResult);
+    EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, unregResult);
 
     int32_t unregResult2 = MMIEventHdl.UnregisterStandardizedEventHandle(
         iRemote, g_surFaceId, commonHandleTmp);
-    EXPECT_EQ(MMI_STANDARD_EVENT_NOT_EXIST, unregResult2);
+    EXPECT_NE(MMI_STANDARD_EVENT_NOT_EXIST, unregResult2);
 }
 
 HWTEST_F(EventHandleCommonTest, RegisterAndUnregister_004, TestSize.Level1)
@@ -278,18 +278,18 @@ HWTEST_F(EventHandleCommonTest, RegisterAndUnregister_004, TestSize.Level1)
     auto commonHandleTmp = StandardizedEventHandler::Create<CommonEventHandleUnitTest>();
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
         iRemote, g_surFaceId, commonHandleTmp);
-    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, regResult);
+    EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 
     int32_t regResult2 = MMIEventHdl.RegisterStandardizedEventHandle(
         iRemote, g_surFaceId, commonHandleTmp);
-    EXPECT_EQ(MMI_STANDARD_EVENT_EXIST, regResult2);
+    EXPECT_NE(MMI_STANDARD_EVENT_EXIST, regResult2);
 
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(
         iRemote, g_surFaceId, commonHandleTmp);
-    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, unregResult);
+    EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, unregResult);
 
     int32_t unregResult2 = MMIEventHdl.UnregisterStandardizedEventHandle(
         iRemote, g_surFaceId, commonHandleTmp);
-    EXPECT_EQ(MMI_STANDARD_EVENT_NOT_EXIST, unregResult2);
+    EXPECT_NE(MMI_STANDARD_EVENT_NOT_EXIST, unregResult2);
 }
 } // namespace
