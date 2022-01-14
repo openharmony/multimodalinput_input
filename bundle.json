@@ -13,8 +13,8 @@
     "adapted_system_type": [
       "standard"
     ],
-    "rom": "3000KB",
-    "ram": "3000KB",
+    "rom": "4000KB",
+    "ram": "4000KB",
     "deps": {
       "components": [
         "libhilog",
