@@ -1,8 +1,52 @@
 {
-  "subsystem": "multimodalinput",
-  "parts": {
-    "multimodalinput_base": {
-      "module_list": [
+  "name": "@ohos/multimodalinput",
+  "description": "Provide input capabilities",
+  "version": "3.1",
+  "license": "Apache License 2.0",
+  "component": {
+    "name": "multimodalinput_base",
+    "subsystem": "multimodalinput",
+    "syscap": [
+      "SystemCapability.multimodalinput.multimodalinput_base"
+    ],
+    "features": [],
+    "adapted_system_type": [
+      "standard"
+    ],
+    "rom": "4000KB",
+    "ram": "4000KB",
+    "deps": {
+      "components": [
+        "libhilog",
+        "ipc_core",
+        "system_ability_fwk",
+        "samgr_proxy",
+        "utils_base",
+        "ace_napi",
+        "hdi_input",
+        "abilitykit_native",
+        "ability_manager",
+        "want",
+        "base",
+        "appexecfwk_base",
+        "appexecfwk_core",
+        "libeventhandler",
+        "appkit_native",
+        "2d_graphics",
+        "image_framework",
+        "image",
+        "image_native",
+        "libwm",
+        "libwmutil",
+        "libxkbcommon",
+        "libwayland_server",
+        "libweston",
+        "wmserver"
+      ],
+      "third_party": []
+    },
+    "build": {
+      "sub_component": [
         "//foundation/multimodalinput/input:multimodalinput_mmi_packages",
         "//foundation/multimodalinput/input/sa_profile:multimodalinput_sa_profile",
         "//foundation/multimodalinput/input:multimodalinput.rc",
@@ -22,6 +66,7 @@
       ],
       "inner_kits": [
         {
+          "name": "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
           "header": {
             "header_files": [
               "common/include/struct_multimodal.h",
@@ -43,31 +88,30 @@
             ],
             "header_base": "//foundation/multimodalinput/input/interfaces/native/innerkits"
           },
-          "name": "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
           "type": "so"
         },
         {
+          "name": "//foundation/multimodalinput/input/service:libmmi-server",
           "header": {
             "header_files": [
               "include/mmi_interface.h"
             ],
             "header_base": "//foundation/multimodalinput/input/service/module_loader"
           },
-          "name": "//foundation/multimodalinput/input/service:libmmi-server",
           "type": "so"
         },
         {
+          "name": "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
           "header": {
             "header_files": [
               "libinput.h"
             ],
             "header_base": "//${root_out_dir}/diff_libinput_mmi/export_include"
           },
-          "name": "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
           "type": "so"
         }
       ],
-      "test_list": [
+      "test": [
         "//foundation/multimodalinput/input:unittests",
         "//foundation/multimodalinput/input/test/moduletest:moduletest"
       ]
