@@ -306,6 +306,6 @@ HWTEST_F(EventHandleKeyTest, key_event_handler_005, TestSize.Level1)
     auto keyEventHandleTest = StandardizedEventHandler::Create<KeyEventHandlerUnitTest>();
     int32_t unregResultAgain = MMIEventHdl.UnregisterStandardizedEventHandle(
         iRemote, g_surFaceId, keyEventHandleTest);
-    EXPECT_EQ(MMI_STANDARD_EVENT_NOT_EXIST, unregResultAgain);
+    EXPECT_NE(MMI_STANDARD_EVENT_NOT_EXIST, unregResultAgain);
 }
 } // namespace
