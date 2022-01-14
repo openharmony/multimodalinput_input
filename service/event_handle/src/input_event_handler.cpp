@@ -540,7 +540,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKeyboard(multimodal_libinput_event 
     }
 #ifndef OHOS_WESTEN_MODEL
     if (ServerKeyFilter->OnKeyEvent(keyBoard)) {
-        MMI_LOGD("key event filter find a  key event from Original event  keyCode : %{puiblic}d", key.key);
+        MMI_LOGD("key event filter find a  key event from Original event  keyCode : %{puiblic}d", keyBoard.key);
         return RET_OK;
     }
     (void)OnKeyboardEvent(*ev.event);
@@ -551,7 +551,8 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKeyboard(multimodal_libinput_event 
         return RET_OK;
     }
 
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, *ev.event, hosKey, keyBoard, preHandlerTime);
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, *ev.event, hosKey, keyBoard,
+                                                               preHandlerTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed... ret:%{public}d errCode:%{public}d",
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
