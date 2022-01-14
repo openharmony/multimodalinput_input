@@ -135,10 +135,7 @@ ohos_unittest("ut-virtual-device-out") {
 
   sources = [ "test/virtual_device_test.cpp" ]
 
-  cflags = [
-    "-DOHOS_BUILD",
-    "-DOHOS_AUTO_TEST_FRAME",
-  ]
+  cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
