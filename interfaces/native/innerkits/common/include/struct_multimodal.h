@@ -216,7 +216,7 @@ struct EventKeyboard {
     uint32_t key;
     uint32_t seat_key_count;
     enum KEY_STATE state;
-    int32_t mUnicode;
+    int32_t unicode;
     bool isIntercepted {true};
 };
 
