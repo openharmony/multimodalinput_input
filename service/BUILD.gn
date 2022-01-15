@@ -490,5 +490,6 @@ group("ut-mmi-service") {
   testonly = true
   deps = []
   deps += [ ":ut-mmi-service-out" ]
-  deps += [ ":PointerDrawTest" ]
+
+  #deps += [ ":PointerDrawTest" ]
 }
