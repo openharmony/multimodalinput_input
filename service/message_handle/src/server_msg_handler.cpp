@@ -100,10 +100,6 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
 #ifdef OHOS_BUILD_HDF
         {MmiMessageId::HDI_INJECT, MsgCallbackBind2(&ServerMsgHandler::OnHdiInject, this)},
 #endif // OHOS_BUILD_HDF
-#ifdef OHOS_AUTO_TEST_FRAME
-        {MmiMessageId::ST_MESSAGE_BEGIN, MsgCallbackBind2(&ServerMsgHandler::AutoTestFrameRegister, this)},
-        {MmiMessageId::ST_MESSAGE_REPLYPKT, MsgCallbackBind2(&ServerMsgHandler::AutoTestReceiveClientPkt, this)},
-#endif  // OHOS_AUTO_TEST_FRAME
     };
     for (auto& it : funs) {
         CHKC(RegistrationEvent(it), EVENT_REG_FAIL);
@@ -234,23 +230,6 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterAppInfo(SessionPtr sess, NetPacke
 #endif
     MMI_LOGD("OnRegisterAppInfo fd:%{public}d bundlerName:%{public}s "
         "appName:%{public}s", fd, bundlerName.c_str(), appName.c_str());
-
-#ifdef OHOS_AUTO_TEST_FRAME
-    if (!AppRegs->AutoTestGetAutoTestFd()) {
-        return RET_OK;
-    }
-    std::vector<AutoTestClientListPkt> clientListPkt;
-    AppRegs->AutoTestGetAllAppInfo(clientListPkt);
-    uint32_t sizeOfList = static_cast<uint32_t>(clientListPkt.size());
-    NetPacket pktAutoTest(MmiMessageId::ST_MESSAGE_CLISTPKT);
-    pktAutoTest << sizeOfList;
-    for (auto it = clientListPkt.begin(); it != clientListPkt.end(); it++) {
-        pktAutoTest << *it;
-    }
-    if (!udsServer_->SendMsg(AppRegs->AutoTestGetAutoTestFd(), pktAutoTest)) {
-        MMI_LOGE("Send ClientList massage failed to auto-test frame !\n");
-    }
-#endif  // OHOS_AUTO_TEST_FRAME
     return RET_OK;
 }
 
@@ -883,52 +862,4 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveTouchpadEventFilter(SessionPtr sess
     INTERCEPTORMANAGERGLOBAL.OnRemoveInterceptor(id);
     return RET_OK;
 }
-
-#ifdef OHOS_AUTO_TEST_FRAME
-int32_t OHOS::MMI::ServerMsgHandler::AutoTestFrameRegister(SessionPtr sess, NetPacket& pkt)
-{
-    CHKR(sess, NULL_POINTER, RET_ERR);
-    int32_t fd = sess->GetFd();
-    MmiMessageId autoTestRegisterId = MmiMessageId::ST_MESSAGE_BEGIN;
-    MmiMessageId idMsg = MmiMessageId::INVALID;
-    pkt >> idMsg;
-
-    if (autoTestRegisterId == idMsg) {
-        AppRegs->AutoTestSetAutoTestFd(fd);
-        MMI_LOGI("AutoTestFrameRegister: Connected succeed! fd is:%{public}d", fd);
-
-        std::vector<AutoTestClientListPkt> clientListPkt;
-        AppRegs->AutoTestGetAllAppInfo(clientListPkt);
-        uint32_t sizeOfList = static_cast<uint32_t>(clientListPkt.size());
-        NetPacket pktAutoTest(MmiMessageId::ST_MESSAGE_CLISTPKT);
-        pktAutoTest << sizeOfList;
-        for (auto it = clientListPkt.begin(); it != clientListPkt.end(); it++) {
-            pktAutoTest << *it;
-        }
-        if (!udsServer_->SendMsg(AppRegs->AutoTestGetAutoTestFd(), pktAutoTest)) {
-            MMI_LOGE("Send ClientList massage failed to auto-test frame !\n");
-            return MSG_SEND_FAIL;
-        }
-    }
-    return RET_OK;
-}
-
-int32_t OHOS::MMI::ServerMsgHandler::AutoTestReceiveClientPkt(SessionPtr sess, NetPacket& pkt)
-{
-    if (!AppRegs->AutoTestGetAutoTestFd()) {
-        return RET_OK;
-    }
-
-    AutoTestClientPkt autoTestClientPkt;
-    pkt >> autoTestClientPkt;
-
-    NetPacket pktAutoTest(MmiMessageId::ST_MESSAGE_CLTPKT);
-    pktAutoTest << autoTestClientPkt;
-    if (!udsServer_->SendMsg(AppRegs->AutoTestGetAutoTestFd(), pktAutoTest)) {
-        MMI_LOGE("Send ClientPkt massage failed to auto-test frame !\n");
-        return MSG_SEND_FAIL;
-    }
-    return RET_OK;
-}
-#endif  // OHOS_AUTO_TEST_FRAME
 // LCOV_EXCL_STOP
