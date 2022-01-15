@@ -107,10 +107,7 @@ ohos_unittest("ut-mmi-util-out") {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
   }
 
-  cflags = [
-    "-DOHOS_BUILD",
-    "-DOHOS_AUTO_TEST_FRAME",
-  ]
+  cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
@@ -174,10 +171,7 @@ ohos_unittest("RunShellUtilTest") {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
   }
 
-  cflags = [
-    "-DOHOS_BUILD",
-    "-DOHOS_AUTO_TEST_FRAME",
-  ]
+  cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]

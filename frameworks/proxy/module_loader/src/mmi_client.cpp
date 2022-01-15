@@ -82,15 +82,6 @@ void OHOS::MMI::MMIClient::ReplyMessageToServer(MmiMessageId idMsg, uint64_t cli
     SendMsg(ckt);
 }
 
-#ifdef OHOS_AUTO_TEST_FRAME
-void OHOS::MMI::MMIClient::AutoTestReplyClientPktToServer(const AutoTestClientPkt &autoTestClientPkt)
-{
-    NetPacket ckt(MmiMessageId::ST_MESSAGE_REPLYPKT);
-    ckt << autoTestClientPkt;
-    SendMsg(ckt);
-}
-#endif  // OHOS_AUTO_TEST_FRAME
-
 void OHOS::MMI::MMIClient::SdkGetMultimodeInputInfo()
 {
     TagPackHead tagPackHead = {MmiMessageId::GET_MMI_INFO_REQ, {0}};
