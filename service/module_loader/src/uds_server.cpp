@@ -407,7 +407,7 @@ void OHOS::MMI::UDSServer::DelSession(int32_t fd)
     auto it = sessionsMap_.find(fd);
     if (it != sessionsMap_.end()) {
         NotifySessionDeleted(it->second);
-		sessionsMap_.erase(it);
+        sessionsMap_.erase(it);
     }
     DumpSession("DelSession");
     MMI_LOGI("DelSession end...");
