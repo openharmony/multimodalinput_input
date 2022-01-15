@@ -15,6 +15,7 @@
 
 #include "mmi_service.h"
 #include <cinttypes>
+#include <signal.h>
 #include "app_register.h"
 #include "device_register.h"
 #include "event_dump.h"
@@ -179,6 +180,7 @@ bool MMIService::InitExpSoLibrary()
 
 int32_t MMIService::Init()
 {
+    signal(SIGPIPE, SIG_IGN);
     CheckDefine();
     CHKR(InitExpSoLibrary(), EXP_SO_LIBY_INIT_FAIL, EXP_SO_LIBY_INIT_FAIL);
 
