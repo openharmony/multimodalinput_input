@@ -96,7 +96,7 @@ protected:
     bool isRun_ = false;
     MsgServerFunCallback recvFun_ = nullptr;
     std::map<int32_t, SessionPtr> sessionsMap_ = {};
-
+    std::map<int32_t, int32_t> idxPidMap_ = {};
     std::list<std::function<void(SessionPtr)>> callbacks_;
 };
 }
