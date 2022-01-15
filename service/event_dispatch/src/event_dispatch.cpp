@@ -136,7 +136,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, OH
     std::vector<int32_t> fds;
     RegEventHM->FindSocketFdsByEventHandle(idMsg, fds);
     if (fds.empty()) {
-        MMI_LOGW("Yet none of socketFds is found!\n")
+        MMI_LOGW("Yet none of socketFds is found!\n");
         return RET_OK;
     }
 
