@@ -362,7 +362,6 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKey(libinput_event& event)
     KEY_STATE kacState = (kac == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
     int16_t lowKeyCode = static_cast<int16_t>(keyEvent->GetKeyCode());
     auto hosKey = KeyValueTransformationByInput(lowKeyCode);
-
     if (hosKey.isSystemKey) {
         OnSystemEvent(hosKey, kacState);
     }
@@ -410,7 +409,6 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyEventDispatch(multimodal_libinput_eve
     KEY_STATE kacState = (kac == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
     int16_t lowKeyCode = static_cast<int16_t>(keyEvent->GetKeyCode());
     auto hosKey = KeyValueTransformationByInput(lowKeyCode);
-
     if (hosKey.isSystemKey) { // Judging whether key is system key.
         OnSystemEvent(hosKey, kacState);
     }
