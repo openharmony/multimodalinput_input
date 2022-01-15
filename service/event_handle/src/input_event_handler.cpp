@@ -357,38 +357,16 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKey(libinput_event& event)
         MMI_LOGE("KeyEvent package failed... ret:%{public}d errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
-#ifdef OHOS_AUTO_TEST_FRAME // Send event to auto-test frame
-    const AutoTestLibinputPkt autoTestLibinputPkt = {
-        "KeyEvent", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), 0, 0, 0, 0
-    };
-    auto retAutoTestLibPkt = eventDispatch_.SendLibPktToAutoTest(*udsServer_, autoTestLibinputPkt);
-    if (retAutoTestLibPkt != RET_OK) {
-        MMI_LOGE("Send KeyEvent to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
-    }
-    auto retAutoTestMapPkt = eventDispatch_.SendMappingPktToAutoTest(*udsServer_, keyEvent->GetEventType());
-    if (retAutoTestMapPkt != RET_OK) {
-        MMI_LOGE("Send KeyEvent to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
-    }
-#endif  // OHOS_AUTO_TEST_FRAME
+
     int32_t kac = keyEvent->GetKeyAction();
     KEY_STATE kacState = (kac == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
     int16_t lowKeyCode = static_cast<int16_t>(keyEvent->GetKeyCode());
     auto hosKey = KeyValueTransformationByInput(lowKeyCode);
-#ifndef OHOS_AUTO_TEST_FRAME
+
     if (hosKey.isSystemKey) {
         OnSystemEvent(hosKey, kacState);
     }
-#else
-    AutoTestKeyTypePkt autoTestKeyTypePkt = {};
-    bool retSystemEvent = OnSystemEvent(hosKey, kacState, autoTestKeyTypePkt);
-    auto retAutoTestTypePktPkt = eventDispatch_.SendKeyTypePktToAutoTest(*udsServer_, autoTestKeyTypePkt);
-    if (retAutoTestTypePktPkt != RET_OK) {
-        MMI_LOGE("Send KeyEvent to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
-    }
-    if (hosKey.isSystemKey && retSystemEvent) {
-        return RET_OK;
-    }
-#endif  // OHOS_AUTO_TEST_FRAME
+
     auto device = libinput_event_get_device(&event);
     CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
@@ -427,38 +405,16 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyEventDispatch(multimodal_libinput_eve
     }
     (void)OnEventKey(*ev.event);
 #else
-#ifdef OHOS_AUTO_TEST_FRAME // Send event to auto-test frame
-    const AutoTestLibinputPkt autoTestLibinputPkt = {
-        "KeyEvent", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), 0, 0, 0, 0
-    };
-    auto retAutoTestLibPkt = eventDispatch_.SendLibPktToAutoTest(*udsServer_, autoTestLibinputPkt);
-    if (retAutoTestLibPkt != RET_OK) {
-        MMI_LOGE("Send KeyEvent to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
-    }
-    auto retAutoTestMapPkt = eventDispatch_.SendMappingPktToAutoTest(*udsServer_, keyEvent->GetEventType());
-    if (retAutoTestMapPkt != RET_OK) {
-        MMI_LOGE("Send KeyEvent to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
-    }
-#endif  // OHOS_AUTO_TEST_FRAME
+
     int32_t kac = keyEvent->GetKeyAction();
     KEY_STATE kacState = (kac == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
     int16_t lowKeyCode = static_cast<int16_t>(keyEvent->GetKeyCode());
     auto hosKey = KeyValueTransformationByInput(lowKeyCode);
-#ifndef OHOS_AUTO_TEST_FRAME
+
     if (hosKey.isSystemKey) { // Judging whether key is system key.
         OnSystemEvent(hosKey, kacState);
     }
-#else
-    AutoTestKeyTypePkt autoTestKeyTypePkt = {};
-    bool retSystemEvent = OnSystemEvent(hosKey, kacState, autoTestKeyTypePkt);
-    auto retAutoTestTypePktPkt = eventDispatch_.SendKeyTypePktToAutoTest(*udsServer_, autoTestKeyTypePkt);
-    if (retAutoTestTypePktPkt != RET_OK) {
-        MMI_LOGE("Send KeyEvent to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
-    }
-    if (hosKey.isSystemKey && retSystemEvent) {
-        return RET_OK;
-    }
-#endif  // OHOS_AUTO_TEST_FRAME
+
     auto device = libinput_event_get_device(ev.event);
     CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
