@@ -136,7 +136,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, OH
     std::vector<int32_t> fds;
     RegEventHM->FindSocketFdsByEventHandle(idMsg, fds);
     if (fds.empty()) {
-        MMI_LOGW("Yet none of socketFds is found!\n")
+        MMI_LOGW("Yet none of socketFds is found!\n");
         return RET_OK;
     }
 
@@ -179,7 +179,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, OH
     return RET_OK;
 }
 
-int32_t OHOS::MMI::EventDispatch::KeyBoardRegisteredEventHandler(EventKeyboard& key, UDSServer& udsServer,
+int32_t OHOS::MMI::EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSServer& udsServer,
     libinput_event& event, int32_t inputDeviceType, uint64_t preHandlerTime)
 {
     auto ret1 = RET_OK;
@@ -953,7 +953,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
     }
     int32_t ret = RET_OK;
     // int32_t ret = RET_OK;
-    // ret = KeyBoardRegisteredEventHandler(key, udsServer, event, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
+    // ret = KeyBoardRegEveHandler(key, udsServer, event, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
     // if (ret != RET_OK) {
     //     MMI_LOGE("Special Registered Event dispatch failed return:%{public}d errCode:%{public}d", ret,
     //         SPCL_REG_EVENT_DISP_FAIL);
@@ -1006,7 +1006,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
     CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
     int32_t ret = RET_OK;
-    ret = KeyBoardRegisteredEventHandler(key, udsServer, event, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
+    ret = KeyBoardRegEveHandler(key, udsServer, event, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
     if (ret != RET_OK) {
         MMI_LOGE("Special Registered Event dispatch failed return:%{public}d errCode:%{public}d", ret,
             SPCL_REG_EVENT_DISP_FAIL);

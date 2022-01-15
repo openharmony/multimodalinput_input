@@ -71,7 +71,7 @@ protected:
         RegisteredEvent& registeredEvent, uint64_t preHandlerTime);
     int32_t DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& udsServer,
         RegisteredEvent& eventData, int32_t inputDeviceType, uint64_t preHandlerTime);
-    int32_t KeyBoardRegisteredEventHandler(EventKeyboard& key, UDSServer& udsServer,
+    int32_t KeyBoardRegEveHandler(EventKeyboard& key, UDSServer& udsServer,
         libinput_event& event, int32_t inputDeviceType, uint64_t preHandlerTime);
 #ifdef OHOS_AUTO_TEST_FRAME
         int32_t SendStandardPktToAutoTest(UDSServer& udsServer, const AutoTestStandardPkt& autoTestStandardPkt);
