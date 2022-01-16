@@ -111,7 +111,7 @@
 
 #define CHKR(cond, ec, r) \
     do { \
-        if ((cond) == nullptr) { \
+        if (!(cond)) { \
             MMI_LOGE("%{public}s, (%{public}d), CHKR(%{public}s), errCode:%{public}d",
                 __FILE__, __LINE__, #cond, ec); \
             return r; \
@@ -161,7 +161,7 @@
 
 #define CHKR(cond, ec, r) \
     do { \
-        if ((cond) == nullptr) { \
+        if (!(cond)) { \
             MMI_LOGE("CHKR(%{public}s), errCode:%{public}d", #cond, ec); \
             return r; \
         } \
