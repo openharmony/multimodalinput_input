@@ -77,7 +77,7 @@
 #define CK(cond, ec) \
     do { \
         if (!(cond)) { \
-            MMI_LOGE("%{public}s, (%{public}d), CK(%{public}s), errCode:%{public}d",
+            MMI_LOGE("%{public}s, (%{public}d), CK(%{public}s), errCode:%{public}d", \
                 __FILE__, __LINE__, #cond, ec); \
         } \
     } while (0)
@@ -85,7 +85,7 @@
 #define CHK(cond, ec) \
     do { \
         if (!(cond)) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHK(%{public}s), errCode:%{public}d",
+            MMI_LOGE("%{public}s, (%{public}d), CHK(%{public}s), errCode:%{public}d", \
                 __FILE__, __LINE__, #cond, ec); \
             return; \
         } \
@@ -94,7 +94,7 @@
 #define CHKF(cond, ec) \
     do { \
         if (!(cond)) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHKF(%{public}s), errCode:%{public}d",
+            MMI_LOGE("%{public}s, (%{public}d), CHKF(%{public}s), errCode:%{public}d", \
                 __FILE__, __LINE__, #cond, ec); \
             return 0; \
         } \
@@ -103,7 +103,7 @@
 #define CHKC(cond, ec) \
     do { \
         if (!(cond)) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHKC(%{public}s), errCode:%{public}d",
+            MMI_LOGE("%{public}s, (%{public}d), CHKC(%{public}s), errCode:%{public}d", \
                 __FILE__, __LINE__, #cond, ec); \
             continue; \
         } \
@@ -112,7 +112,7 @@
 #define CHKR(cond, ec, r) \
     do { \
         if (!(cond)) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHKR(%{public}s), errCode:%{public}d",
+            MMI_LOGE("%{public}s, (%{public}d), CHKR(%{public}s), errCode:%{public}d", \
                 __FILE__, __LINE__, #cond, ec); \
             return r; \
         } \
@@ -121,7 +121,7 @@
 #define CHKB(cond, ec, r) \
     do { \
         if (!(cond)) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHKB(%{public}s), errCode:%{public}d",
+            MMI_LOGE("%{public}s, (%{public}d), CHKB(%{public}s), errCode:%{public}d", \
                 __FILE__, __LINE__, #cond, ec); \
             return r; \
         } \
