@@ -88,3 +88,36 @@ bool OHOS::MMI::UDSSession::SendMsg(NetPacket& pkt) const
     pkt.MakeData(buf);
     return SendMsg(buf.Data(), buf.Size());
 }
+
+void OHOS::MMI::UDSSession::RecordEvent(int32_t id, uint64_t time)
+{
+    MMI_LOGI("begin");
+    EventTime eventTime = {id, time};
+    events_.push_back(eventTime);
+    MMI_LOGI("end");
+}
+
+void OHOS::MMI::UDSSession::ClearEventList(int32_t id)
+{
+    MMI_LOGI("begin");
+    int32_t count = 0;
+    for (const auto &it : events_) {
+        count++;
+        if (it.id == id) {
+            events_.erase(events_.begin(), events_.begin() + count);
+            MMI_LOGI("Delete events.");
+        }
+    }
+    MMI_LOGI("end");
+}
+
+uint64_t OHOS::MMI::UDSSession::GetFirstEventTime()
+{
+    MMI_LOGI("begin");
+    if (events_.empty()) {
+        MMI_LOGT("events_ is empty");
+        return 0;
+    }
+    MMI_LOGI("end");
+    return events_[0].eventTime;
+}
