@@ -88,7 +88,7 @@ int32_t IMultimodalInputConnectStub::StubSetInputEventFilter(MessageParcel& data
         sptr<IEventFilter> filter = iface_cast<IEventFilter>(client);
         if (filter == nullptr) {
             MMI_LOGE("filter is nullptr");
-            ret = NULL_POINTER;
+            ret = ERROR_NULL_POINTER;
             break;
         }
 
