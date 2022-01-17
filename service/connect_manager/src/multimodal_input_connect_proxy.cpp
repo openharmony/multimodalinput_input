@@ -78,7 +78,7 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SetInputEventFilter(sptr<IEventFilter> filter)
+int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filter)
 {
     MMI_LOGE("enter");
     MessageParcel data;

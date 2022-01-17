@@ -30,7 +30,7 @@ public:
     explicit MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl);
     virtual ~MultimodalInputConnectProxy() override;
     virtual int32_t AllocSocketFd(const std::string &programName, const int moduleType, int &socketFd) override;
-    virtual int32_t SetInputEventFilter(sptr<IEventFilter> filter) override;
+    virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
 };
