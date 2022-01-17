@@ -732,11 +732,11 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
 {
     MMI_LOGD("DispatchKeyEventByPid begin");
     if (AbilityMgr->CheckLaunchAbility(key)) {
-        MMI_LOGD("keyEvent start launch an ability, keyCode=%{puiblic}d", key->GetKeyCode());
+        MMI_LOGD("keyEvent start launch an ability, keyCode=%{public}d", key->GetKeyCode());
         return RET_OK;
     }
     if (KeyEventInputSubscribeFlt.FilterSubscribeKeyEvent(udsServer, key)) {
-        MMI_LOGD("subscribe keyEvent filter success. keyCode=%{puiblic}d", key->GetKeyCode());
+        MMI_LOGD("subscribe keyEvent filter success. keyCode=%{public}d", key->GetKeyCode());
         return RET_OK;
     }
     auto fd = WinMgr->UpdateTarget(key);
