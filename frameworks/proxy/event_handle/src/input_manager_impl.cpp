@@ -85,7 +85,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
         }        
     }
 
-    MMI_LOGT("leave");
+    MMI_LOGT("leave, success with hasSendToMmiServer is already true");
     return RET_OK;
 }
 
