@@ -74,7 +74,7 @@ int32_t IMultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data
     int32_t ret = RET_OK;
 
     do {
-        const int uid = GetCallingUid();
+        const int32_t uid = GetCallingUid();
         if (uid != SYSTEM_UID && uid != ROOT_UID) {
             MMI_LOGE("uid is not root or system");
             ret = SASERVICE_PERMISSION_FAIL;
@@ -105,7 +105,7 @@ int32_t IMultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
 
-    MMI_LOGT("leave");
+    MMI_LOGT("leave, ret = %{public}d", ret);
     return RET_OK;
 }
 } // namespace MMI
