@@ -86,7 +86,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::II
 {
     MMI_LOGD("enter");
     MMIEventHdl.GetMultimodeInputInfo();
-    CHK(inputEventConsumer, NULL_POINTER);
+    CHK(inputEventConsumer, ERROR_NULL_POINTER);
     consumer = inputEventConsumer;
     MMI_LOGD("leave");
 }
@@ -95,7 +95,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
     MMI_LOGD("enter");
     if (consumer != nullptr) {
-        CHK(keyEvent != nullptr, NULL_POINTER);
+        CHK(keyEvent != nullptr, ERROR_NULL_POINTER);
         consumer->OnInputEvent(keyEvent);
         MMI_LOGD("leave");
         return;
@@ -107,7 +107,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> p
 {
     MMI_LOGD("Pointer event received, processing ...");
     if (consumer != nullptr) {
-        CHK(pointerEvent != nullptr, NULL_POINTER);
+        CHK(pointerEvent != nullptr, ERROR_NULL_POINTER);
         MMI_LOGD("Passed on to consumer ...");
         consumer->OnInputEvent(pointerEvent);
         return;
