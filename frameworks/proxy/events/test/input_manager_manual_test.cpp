@@ -58,7 +58,7 @@ void InputManagerManualTest::SetUp()
 void InputManagerManualTest::AddInputEventFilter()
 {
     MMI_LOGT("enter");
-    auto callback = [](std::shared_ptr<PointerEvent> pointer) -> bool {
+    auto callback = [this](std::shared_ptr<PointerEvent> pointer) -> bool {
         MMI_LOGT("enter");
         if (pointer == nullptr) {
             MMI_LOGE("pointer is null");
@@ -72,7 +72,7 @@ void InputManagerManualTest::AddInputEventFilter()
         }
 
         const int firstPointerId = ids[0];
-        PointerItem item;
+        PointerEvent::PointerItem item;
         if (!pointer->GetPointerItem(firstPointerId, item)) {
             MMI_LOGE("GetPointerItem(%{public}d) fail", firstPointerId);
             return false;
@@ -86,7 +86,7 @@ void InputManagerManualTest::AddInputEventFilter()
             return true;
         }
 
-        MMI_LOGI("The values of X and y are not 10, which meets the expectation and callbackRet is set to 2")
+        MMI_LOGI("The values of X and y are not 10, which meets the expectation and callbackRet is set to 2");
         callbackRet = 2;
         return false;
     };
