@@ -37,7 +37,7 @@ HWTEST_F(StandardEventHandlerTest, TEST_StandardTouchEvent_PointerButton, TestSi
     StandardEventHandler mmiStandard;
 
     event.type = LIBINPUT_EVENT_POINTER_BUTTON;
-    mmiStandard.StandardTouchEvent(event, data);
+    mmiStandard.StandardTouchEvent(&event, data);
     EXPECT_EQ(data.curRventType, RET_ERR);
     free(event.device->seat->libinput);
     free(event.device->seat);
@@ -54,7 +54,7 @@ HWTEST_F(StandardEventHandlerTest, TEST_StandardTouchEvent_PointerMotion, TestSi
     StandardEventHandler mmiStandard;
 
     event.type = LIBINPUT_EVENT_POINTER_MOTION;
-    mmiStandard.StandardTouchEvent(event, data);
+    mmiStandard.StandardTouchEvent(&event, data);
     EXPECT_EQ(data.curRventType, RET_ERR);
     free(event.device->seat->libinput);
     free(event.device->seat);
@@ -71,7 +71,7 @@ HWTEST_F(StandardEventHandlerTest, TEST_StandardTouchEvent_TableToolTip, TestSiz
     StandardEventHandler mmiStandard;
 
     event.type = LIBINPUT_EVENT_TABLET_TOOL_TIP;
-    mmiStandard.StandardTouchEvent(event, data);
+    mmiStandard.StandardTouchEvent(&event, data);
     EXPECT_EQ(data.curRventType, RET_ERR);
     free(event.device->seat->libinput);
     free(event.device->seat);
@@ -88,7 +88,7 @@ HWTEST_F(StandardEventHandlerTest, TEST_StandardTouchEvent_Other, TestSize.Level
     StandardEventHandler mmiStandard;
 
     event.type = LIBINPUT_EVENT_NONE;
-    mmiStandard.StandardTouchEvent(event, data);
+    mmiStandard.StandardTouchEvent(&event, data);
     EXPECT_EQ(data.curRventType, RET_ERR);
     free(event.device->seat->libinput);
     free(event.device->seat);
