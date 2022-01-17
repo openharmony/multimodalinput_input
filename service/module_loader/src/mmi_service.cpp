@@ -329,14 +329,14 @@ int32_t MMIService::HandleAllocSocketFd(MessageParcel& data, MessageParcel& repl
     return RET_OK;
 }
 
-int32_t MMIService::SetInputEventFilter(sptr<IEventFilter> filter)
+int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
 {
     if (inputEventHdr_ == nullptr) {
         MMI_LOGE("inputEventHdr_ is nullptr");
         return NULL_POINTER;
     }
 
-    return inputEventHdr_->SetInputEventFilter(filter);
+    return inputEventHdr_->AddInputEventFilter(filter);
 }
 
 void MMIService::OnTimer()

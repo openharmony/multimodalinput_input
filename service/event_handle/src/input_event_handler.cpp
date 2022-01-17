@@ -264,9 +264,9 @@ OHOS::MMI::UDSServer* OHOS::MMI::InputEventHandler::GetUDSServer()
     return udsServer_;
 }
 
-int32_t OHOS::MMI::InputEventHandler::SetInputEventFilter(sptr<IEventFilter> filter)
+int32_t OHOS::MMI::InputEventHandler::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    return eventDispatch_.SetInputEventFilter(filter);
+    return eventDispatch_.AddInputEventFilter(filter);
 }
 
 int32_t OHOS::MMI::InputEventHandler::OnEventDeviceAdded(multimodal_libinput_event &ev)

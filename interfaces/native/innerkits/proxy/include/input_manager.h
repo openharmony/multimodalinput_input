@@ -34,7 +34,7 @@ public:
 
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
         const std::vector<LogicalDisplayInfo> &logicalDisplays);                         // 建议本地调用，可IPC
-    void SetInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent> filter)>); // 只能本地
+    void AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent> filter)>); // 只能本地
 
     void SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::IInputEventConsumer> inputEventConsumer);
 
