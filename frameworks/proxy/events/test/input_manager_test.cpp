@@ -2487,7 +2487,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
 
     auto pointerEvent = SetupPointerEvent006();
     EXPECT_TRUE(pointerEvent != nullptr);
-    MMI_LOGD("Call InputManager::SimulateInputEvent ... AddMouseMonitor004");
+    MMI_LOGD("Call InputManager::SimulateInputEvent ...");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
     std::vector<std::string> addItem;
