@@ -163,6 +163,11 @@ void InputEvent::ClearFlag()
     flag_ = 0X00000000;
 }
 
+void InputEvent::SetProcessedCallback(std::function<void()> callback)
+{
+    processedCallback_ = callback;
+}
+
 void InputEvent::MarkProcessed()
 {
     if (!processedCallback_) {

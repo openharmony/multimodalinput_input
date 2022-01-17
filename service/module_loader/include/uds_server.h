@@ -59,6 +59,14 @@ public:
 public:
     virtual int32_t AddSocketPairInfo(const std::string& programName, const int moduleType, int& serverFd,
                                       int& toReturnClientFd, const int32_t uid, const int32_t pid);
+    SessionPtr GetSession(int32_t fd) const
+    {
+        auto it = sessionsMap_.find(fd);
+        if (it == sessionsMap_.end()) {
+            return nullptr;
+        }
+        return it->second->GetPtr();
+    }
 
 protected:
     void SetRecvFun(MsgServerFunCallback fun);
@@ -75,14 +83,6 @@ protected:
     virtual void HandleCommandQueue();
 #endif // OHOS_BUILD_MMI_DEBUG
 
-    SessionPtr GetSession(int32_t fd) const
-    {
-        auto it = sessionsMap_.find(fd);
-        if (it == sessionsMap_.end()) {
-            return nullptr;
-        }
-        return it->second->GetPtr();
-    }
     bool AddSession(SessionPtr ses);
     void DelSession(int32_t fd);
     void DumpSession(const std::string& title);
