@@ -160,48 +160,42 @@ int32_t OHOS::MMI::EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSS
 {
     auto ret1 = RET_OK;
     auto ret2 = RET_OK;
-    RegisteredEvent registeredEvent = {};
-    auto result = eventPackage_.PackageRegisteredEvent<EventKeyboard>(registeredEvent, key);
+    RegisteredEvent eve= {};
+    auto result = eventPackage_.PackageRegisteredEvent<EventKeyboard>(eve, key);
     if (result != RET_OK) {
-        MMI_LOGE("Registered event package failed, ret:%{public}d errCode:%{public}d",
-            result, REG_EVENT_PKG_FAIL);
+        MMI_LOGE("Registered event package failed, ret:%{public}d errCode:%{public}d", result, REG_EVENT_PKG_FAIL);
         return RET_ERR;
     }
     if ((key.key == KEY_ENTER || key.key == KEY_KPENTER) && (key.state == KEY_STATE_PRESSED)) {
-        ret1 = DispatchRegEvent(MmiMessageId::ON_SEND, udsServer, registeredEvent,
-            INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
+        ret1 = DispatchRegEvent(MmiMessageId::ON_SEND, udsServer, eve, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret1 != RET_OK) {
             MMI_LOGW("Dispatching ON_SEND event has failed, return:%{public}d errCode:%{public}d", ret1,
                 SPCL_REG_EVENT_DISP_FAIL);
         }
-        ret2 = DispatchRegEvent(MmiMessageId::ON_ENTER, udsServer, registeredEvent,
-            INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
+        ret2 = DispatchRegEvent(MmiMessageId::ON_ENTER, udsServer, eve, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret2 != RET_OK) {
             MMI_LOGW("Dispatching ON_ENTER event has failed, return:%{public}d errCode:%{public}d", ret2,
                 SPCL_REG_EVENT_DISP_FAIL);
         }
     } else if (key.key == KEY_ESC && key.state == KEY_STATE_PRESSED) {
-        ret1 = DispatchRegEvent(MmiMessageId::ON_CANCEL, udsServer, registeredEvent,
-            INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
+        ret1 = DispatchRegEvent(MmiMessageId::ON_CANCEL, udsServer, eve, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret1 != RET_OK) {
             MMI_LOGW("Dispatching ON_CANCEL event has failed, return:%{public}d errCode:%{public}d", ret1,
                 SPCL_REG_EVENT_DISP_FAIL);
         }
-        ret2 = DispatchRegEvent(MmiMessageId::ON_BACK, udsServer, registeredEvent,
-            INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
+        ret2 = DispatchRegEvent(MmiMessageId::ON_BACK, udsServer, eve, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret2 != RET_OK) {
             MMI_LOGW("Dispatching ON_BACK event has failed, return:%{public}d errCode:%{public}d", ret2,
                 SPCL_REG_EVENT_DISP_FAIL);
         }
     } else if (key.key == KEY_BACK && key.state == KEY_STATE_PRESSED) {
-        ret1 = DispatchRegEvent(MmiMessageId::ON_CLOSE_PAGE, udsServer, registeredEvent,
-            INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
+        ret1 = DispatchRegEvent(MmiMessageId::ON_CLOSE_PAGE, udsServer,
+                                eve, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret1 != RET_OK) {
             MMI_LOGW("Dispatching ON_CLOSE_PAGE event has failed, return:%{public}d errCode:%{public}d", ret1,
                 SPCL_REG_EVENT_DISP_FAIL);
         }
-        ret2 = DispatchRegEvent(MmiMessageId::ON_BACK, udsServer, registeredEvent,
-            INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
+        ret2 = DispatchRegEvent(MmiMessageId::ON_BACK, udsServer, eve, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret2 != RET_OK) {
             MMI_LOGW("Dispatching ON_BACK event has failed, return:%{public}d errCode:%{public}d", ret2,
                 SPCL_REG_EVENT_DISP_FAIL);
