@@ -137,15 +137,16 @@ void OHOS::MMI::MouseEventHandler::SetMouseAxis(struct libinput_event_pointer& p
     }
 }
 
-void OHOS::MMI::MouseEventHandler::SetMouseData(libinput_event& event, int32_t deviceId)
+void OHOS::MMI::MouseEventHandler::SetMouseData(libinput_event *event, int32_t deviceId)
 {
+    CHK(event, PARAM_INPUT_INVALID);
     OHOS::MMI::PointerEvent::PointerItem pointerItem;
     struct libinput_event_pointer *pointEventData = nullptr;
-    pointEventData = libinput_event_get_pointer_event(&event);
+    pointEventData = libinput_event_get_pointer_event(event);
     uint64_t time = libinput_event_pointer_get_time_usec(pointEventData);
-    int32_t type = libinput_event_get_type(&event);
+    int32_t type = libinput_event_get_type(event);
 
-    enum evdev_device_udev_tags udevTags = libinput_device_get_tags(libinput_event_get_device(&event));
+    enum evdev_device_udev_tags udevTags = libinput_device_get_tags(libinput_event_get_device(event));
     if ((udevTags & EVDEV_UDEV_TAG_MOUSE) == EVDEV_UDEV_TAG_MOUSE) {
         this->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     } else if ((udevTags & EVDEV_UDEV_TAG_TOUCHPAD) == EVDEV_UDEV_TAG_TOUCHPAD) {

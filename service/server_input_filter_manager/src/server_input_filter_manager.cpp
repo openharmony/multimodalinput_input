@@ -221,9 +221,10 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
     }
 }
 
-bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event& event,
+bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event *event,
     EventTouch& touch, const uint64_t preHandlerTime, WindowSwitch& windowSwitch)
 {
+    CHKF(event, PARAM_INPUT_INVALID);
     MMI_LOGD("ServerInputFilterManager::OnTouchEvent");
     if (touchEventFilterMap_.size() == 0) {
         MMI_LOGD("touchEventFilterMap_ size is zero");
@@ -248,7 +249,7 @@ bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event
         return false;
     }
 
-    auto device = libinput_event_get_device(&event);
+    auto device = libinput_event_get_device(event);
     CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
     MmiMessageId idMsg = MmiMessageId::INVALID;

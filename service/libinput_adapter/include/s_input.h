@@ -27,7 +27,7 @@ class SInput {
 public:
     SInput();
     virtual ~SInput();
-    static void Loginfo_packaging_tool(libinput_event& event);
+    static void Loginfo_packaging_tool(libinput_event *event);
     bool Init(FunInputEvent funInputEvent, const std::string& seat_id = "seat0");
     void EventDispatch(epoll_event& ev);
     void Stop();
