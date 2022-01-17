@@ -672,7 +672,7 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<OH
 int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Inject pointer event ...");
-    CHKR(pointerEvent, NULL_POINTER, RET_ERR);
+    CHKR(pointerEvent, ERROR_NULL_POINTER, RET_ERR);
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
     MMI_LOGD("\npointer event dispatcher of client:\neventType=%{public}d,actionTime=%{public}d,"
              "action=%{public}d,actionStartTime=%{public}d,"
@@ -731,7 +731,7 @@ int32_t MultimodalStandardizedEventManager::GetDevice(int32_t taskId, int32_t de
 
 bool MultimodalStandardizedEventManager::SendMsg(NetPacket& pkt) const
 {
-    CHKF(client_, NULL_POINTER);
+    CHKF(client_, ERROR_NULL_POINTER);
     return client_->SendMessage(pkt);
 }
 

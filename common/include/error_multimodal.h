@@ -58,7 +58,7 @@ namespace OHOS {
     enum {
         MSG_SEND_FAIL = SERVER_ERR_OFFSET,          // 发送消息失败
         UNKNOWN_EVENT,                              // 未知的事件
-        NULL_POINTER,                               // 空指针
+        ERROR_NULL_POINTER,                               // 空指针
         WINDOWS_MSG_INIT_FAIL,                      // 窗口管理器初始化失败
         APP_REG_INIT_FAIL,                          // APPRegister初始化失败
         SVR_MSG_HANDLER_INIT_FAIL,                  // 服务消息处理初始化失败
@@ -105,7 +105,7 @@ namespace OHOS {
         TABLETPAD_EVENT_DISP_FAIL,                  // 触控板轴事件派发失败
         TABLETTOOL_EVENT_PKG_FAIL,                  // 触控笔事件封装失败
         TABLETTOOL_EVENT_DISP_FAIL,                 // 触控笔事件派发失败
-        MULTIDEVICE_SAME_EVENT_FAIL,                // 多设备相同事件返回标志
+        MULTIDEVICE_SAME_EVENT_MARK,                // 多设备相同事件返回标志
         GESTURE_EVENT_PKG_FAIL,                     // GESTURE_SWIPE事件封装失败
         STAT_CALL_FAIL,                             // stat函数调用失败
         REG_EVENT_PKG_FAIL,                         // 注册事件封装失败
