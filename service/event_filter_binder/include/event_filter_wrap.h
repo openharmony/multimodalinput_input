@@ -16,6 +16,7 @@
 #ifndef OHOS_EVENT_FILTER_WRAP_H
 #define OHOS_EVENT_FILTER_WRAP_H
 
+#include <mutex>
 #include "i_event_filter.h"
 #include "singleton.h"
 

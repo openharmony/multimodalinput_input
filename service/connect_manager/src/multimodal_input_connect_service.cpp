@@ -58,20 +58,8 @@ int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programN
 
 int32_t MultimodalInputConnectService::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    MMI_LOGI("enter");
-    if (udsServer_ == nullptr) {
-        MMI_LOGE("called, udsServer_ is nullptr.");
-        return RET_ERR;
-    }
-
-    const int32_t ret = udsServer_->AddInputEventFilter(filter);
-    if (ret != RET_OK) {
-        MMI_LOGE("call AddInputEventFilter return %{public}d.", ret);
-        return RET_ERR;
-    }
-
-    MMI_LOGI("leave, success.");
-    return RET_OK;    
+    MMI_LOGI("enter, this code is discarded, and it runs with Weston");
+    return RET_ERR; 
 }
 
 MultimodalInputConnectService::MultimodalInputConnectService()

@@ -74,7 +74,7 @@ int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> fi
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
         MMI_LOGE("multimodalInputConnectService_ is nullptr");
-        return false;
+        return RET_ERR;
     }
 
     return multimodalInputConnectService_->AddInputEventFilter(filter);

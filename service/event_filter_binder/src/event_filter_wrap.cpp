@@ -38,6 +38,7 @@ int32_t EventFilterWrap::AddInputEventFilter(sptr<IEventFilter> filter)
     std::lock_guard<std::mutex> guard(lockInputEventFilter_);
     filter_ = filter;
 
+    MMI_LOGT("leave");
     return RET_OK;
 }
 
