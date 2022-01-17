@@ -30,10 +30,11 @@ OHOS::MMI::StandardEventHandler::~StandardEventHandler()
 {
 }
 
-void OHOS::MMI::StandardEventHandler::StandardTouchEvent(libinput_event& event, StandardTouchStruct& data)
+void OHOS::MMI::StandardEventHandler::StandardTouchEvent(libinput_event *event, StandardTouchStruct& data)
 {
+    CHK(event, PARAM_INPUT_INVALID);
     enum libinput_event_type eventType = {};
-    eventType = libinput_event_get_type(&event);
+    eventType = libinput_event_get_type(event);
     switch (eventType) {
         case libinput_event_type::LIBINPUT_EVENT_POINTER_BUTTON: {
             PointerPressedStandard(event, data);
@@ -67,10 +68,11 @@ void OHOS::MMI::StandardEventHandler::StandardTouchEvent(libinput_event& event, 
     }
 }
 
-void OHOS::MMI::StandardEventHandler::PointerPressedStandard(libinput_event& event, StandardTouchStruct& data)
+void OHOS::MMI::StandardEventHandler::PointerPressedStandard(libinput_event *event, StandardTouchStruct& data)
 {
+    CHK(event, PARAM_INPUT_INVALID);
     struct libinput_event_pointer *szPoint = nullptr;
-    szPoint = libinput_event_get_pointer_event(&event);
+    szPoint = libinput_event_get_pointer_event(event);
     CHK(szPoint, NULL_POINTER);
     leftButton_ = libinput_event_pointer_get_button(szPoint);
     data.buttonType = leftButton_;
@@ -116,10 +118,11 @@ void OHOS::MMI::StandardEventHandler::PointerPressedStandardEvent(struct libinpu
              data.reRventType, data.curRventType, data.buttonType, data.buttonState);
 }
 
-void OHOS::MMI::StandardEventHandler::PointerAbsoluteStandardEvent(libinput_event& event, StandardTouchStruct& data)
+void OHOS::MMI::StandardEventHandler::PointerAbsoluteStandardEvent(libinput_event *event, StandardTouchStruct& data)
 {
+    CHK(event, PARAM_INPUT_INVALID);
     struct libinput_event_pointer *szPoint = nullptr;
-    szPoint = libinput_event_get_pointer_event(&event);
+    szPoint = libinput_event_get_pointer_event(event);
     CHK(szPoint, NULL_POINTER);
     data.time = libinput_event_pointer_get_time_usec(szPoint);
     data.x = libinput_event_pointer_get_absolute_x(szPoint);
@@ -142,10 +145,11 @@ void OHOS::MMI::StandardEventHandler::PointerAbsoluteStandardEvent(libinput_even
     }
 }
 
-void OHOS::MMI::StandardEventHandler::PointerMotionStandardEvent(libinput_event& event, StandardTouchStruct& data)
+void OHOS::MMI::StandardEventHandler::PointerMotionStandardEvent(libinput_event *event, StandardTouchStruct& data)
 {
+    CHK(event, PARAM_INPUT_INVALID);
     struct libinput_event_pointer *szPoint = nullptr;
-    szPoint = libinput_event_get_pointer_event(&event);
+    szPoint = libinput_event_get_pointer_event(event);
     CHK(szPoint, NULL_POINTER);
     data.time = libinput_event_pointer_get_time_usec(szPoint);
     data.x = libinput_event_pointer_get_dx_unaccelerated(szPoint);
@@ -172,10 +176,11 @@ void OHOS::MMI::StandardEventHandler::PointerMotionStandardEvent(libinput_event&
     }
 }
 
-void OHOS::MMI::StandardEventHandler::TipStandardEvent(libinput_event& event, StandardTouchStruct& data)
+void OHOS::MMI::StandardEventHandler::TipStandardEvent(libinput_event *event, StandardTouchStruct& data)
 {
+    CHK(event, PARAM_INPUT_INVALID);
     struct libinput_event_tablet_tool* szPoint = nullptr;
-    szPoint = libinput_event_get_tablet_tool_event(&event);
+    szPoint = libinput_event_get_tablet_tool_event(event);
     CHK(szPoint, NULL_POINTER);
     data.tipState = libinput_event_tablet_tool_get_tip_state(szPoint);
     if (data.tipState == LIBINPUT_TABLET_TOOL_TIP_UP) {
@@ -217,10 +222,11 @@ void OHOS::MMI::StandardEventHandler::TipDownStandardEvent(struct libinput_event
         data.reRventType, data.curRventType, data.tipState, data.x, data.y);
 }
 
-void OHOS::MMI::StandardEventHandler::TipMotionStandardEvent(libinput_event& event, StandardTouchStruct& data)
+void OHOS::MMI::StandardEventHandler::TipMotionStandardEvent(libinput_event *event, StandardTouchStruct& data)
 {
+    CHK(event, PARAM_INPUT_INVALID);
     struct libinput_event_tablet_tool* szPoint = nullptr;
-    szPoint = libinput_event_get_tablet_tool_event(&event);
+    szPoint = libinput_event_get_tablet_tool_event(event);
     CHK(szPoint, NULL_POINTER);
     data.x = libinput_event_tablet_tool_get_x(szPoint);
     data.y = libinput_event_tablet_tool_get_y(szPoint);
