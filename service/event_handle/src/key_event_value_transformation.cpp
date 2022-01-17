@@ -444,11 +444,13 @@ KeyEventValueTransformations KeyValueTransformationByInput(int16_t keyValueOfInp
 {
     auto it = MAP_KEY_EVENT_VALUE_TRANSFORMATION.find(keyValueOfInput);
     if (it == MAP_KEY_EVENT_VALUE_TRANSFORMATION.end()) {
-        KeyEventValueTransformations unknownEvent = {
-            "KEY_UNKNOWN", keyValueOfInput, keyValueOfInput, HOS_KEY_UNKNOWN, 0
+        const int16_t UNKNOWN_KEY_BASE = 10000;
+        KeyEventValueTransformations unknownKey = {
+            "UNKNOWN_KEY", keyValueOfInput, UNKNOWN_KEY_BASE + keyValueOfInput, HOS_UNKNOWN_KEY_BASE, 0
         };
-        MMI_LOGE("KeyValueTransformationByInput Failed because of unknown linux-code=%{public}d\n", keyValueOfInput);
-        return unknownEvent;
+        MMI_LOGE("KeyValueTransformationByInput Failed, unknown linux-code:%{public}d;"
+                 "UNKNOWN_KEY_BASE:%{public}d;\n", keyValueOfInput, UNKNOWN_KEY_BASE);
+        return unknownKey;
     }
     return it->second;
 }

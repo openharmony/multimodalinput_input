@@ -40,7 +40,7 @@ enum HosKeyEventEnum {
     *
     * @since 1
     */
-    HOS_KEY_UNKNOWN = -1,
+    HOS_UNKNOWN_KEY_BASE = 10000,
 
     /**
     * Keycode constant: Home key

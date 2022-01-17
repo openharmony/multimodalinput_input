@@ -143,7 +143,7 @@ void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
     nextId_++;
 
     if (IsPointerDevice(static_cast<struct libinput_device *>(inputDevice))) {
-        //DrawWgr->TellDeviceInfo(true);
+        DrawWgr->TellDeviceInfo(true);
     }
 }
 
@@ -159,7 +159,7 @@ void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
         if (it->second == inputDevice) {
             inputDeviceMap_.erase(it);
             if (IsPointerDevice(inputDevice)) {
-                //DrawWgr->TellDeviceInfo(false);
+                DrawWgr->TellDeviceInfo(false);
             }
             break;
         }
