@@ -49,9 +49,10 @@ static void InitHiLogFunc(struct libinput* input)
 }
 }
 
-void OHOS::MMI::SInput::Loginfo_packaging_tool(libinput_event& event)
+void OHOS::MMI::SInput::Loginfo_packaging_tool(libinput_event *event)
 {
-    auto context = libinput_event_get_context(&event);
+    CHK(event, PARAM_INPUT_INVALID);
+    auto context = libinput_event_get_context(event);
     InitHiLogFunc(context);
 }
 
@@ -166,6 +167,7 @@ void OHOS::MMI::SInput::WriteBrightness(const char *brightness)
 
 bool OHOS::MMI::SInput::HandlePowerKey(struct libinput_event *event)
 {
+    CHKF(event, PARAM_INPUT_INVALID);
     bool isKeyboardEvent = (libinput_event_get_type(event) == LIBINPUT_EVENT_KEYBOARD_KEY);
     if (!isKeyboardEvent) {
         return (screenState_ == 0);

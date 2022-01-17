@@ -155,8 +155,9 @@ int32_t OHOS::MMI::EventDispatch::RegisteredEventDispatch(const MmiMessageId& id
 }
 
 int32_t OHOS::MMI::EventDispatch::KeyBoardRegisteredEventHandler(EventKeyboard& key, UDSServer& udsServer,
-    libinput_event& event, int32_t inputDeviceType, uint64_t preHandlerTime)
+    libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime)
 {
+    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto ret = RET_OK;
     RegisteredEvent registeredEvent = {};
     auto packageResult = eventPackage_.PackageRegisteredEvent<EventKeyboard>(registeredEvent, key);
@@ -207,10 +208,11 @@ int32_t OHOS::MMI::EventDispatch::KeyBoardRegisteredEventHandler(EventKeyboard& 
     return ret;
 }
 
-int32_t OHOS::MMI::EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_event& event,
+int32_t OHOS::MMI::EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_event *event,
     EventTabletPad& tabletPad, const uint64_t preHandlerTime)
 {
-    auto device = libinput_event_get_device(&event);
+    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    auto device = libinput_event_get_device(event);
     CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
 #ifdef DEBUG_CODE_TEST
     std::string str = WinMgr->GetSurfaceIdListString();
@@ -259,10 +261,11 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, l
     return RET_OK;
 }
 
-int32_t OHOS::MMI::EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_event& event,
+int32_t OHOS::MMI::EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_event *event,
     EventJoyStickAxis& eventJoyStickAxis, const uint64_t preHandlerTime)
 {
-    auto device = libinput_event_get_device(&event);
+    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    auto device = libinput_event_get_device(event);
     CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
     auto focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
@@ -291,9 +294,10 @@ int32_t OHOS::MMI::EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, li
     return RET_OK;
 }
 
-int32_t OHOS::MMI::EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, libinput_event& event,
+int32_t OHOS::MMI::EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, libinput_event *event,
     EventTabletTool& tableTool, const uint64_t preHandlerTime, WindowSwitch& windowSwitch)
 {
+    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     int32_t focusId = WinMgr->GetFocusSurfaceId(); // obtaining focusId
     if (focusId < 0) {
         return RET_OK;
@@ -447,10 +451,11 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchTransformPointEvent(UDSServer& ud
     return RET_OK;
 }
 
-int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event &event,
+int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event *event,
     EventPointer &point, const uint64_t preHandlerTime, WindowSwitch& windowSwitch)
 {
-    auto device = libinput_event_get_device(&event);
+    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    auto device = libinput_event_get_device(event);
     CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
 #ifdef DEBUG_CODE_TEST
@@ -491,7 +496,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
             newPacket << inputEvent;
         }
 #ifdef DEBUG_CODE_TEST
-        auto type = libinput_event_get_type(&event);
+        auto type = libinput_event_get_type(event);
         if (type != LIBINPUT_EVENT_POINTER_BUTTON) {
             MMI_LOGT("\nMMIWMS:windowId=[%{public}s]\n", strIds.c_str());
             if (desWindowId == -1) {
@@ -536,10 +541,11 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
     return RET_OK;
 }
 
-int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event& event,
+int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event *event,
     EventGesture& gesture, const uint64_t preHandlerTime)
 {
-    auto device = libinput_event_get_device(&event);
+    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    auto device = libinput_event_get_device(event);
     CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
     MmiMessageId idMsg = MmiMessageId::INVALID;
@@ -590,10 +596,11 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
     return RET_OK;
 }
 
-int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event& event,
+int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
     EventTouch& touch, const uint64_t preHandlerTime, WindowSwitch& windowSwitch)
 {
-    auto device = libinput_event_get_device(&event);
+    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    auto device = libinput_event_get_device(event);
     CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
 #ifdef DEBUG_CODE_TEST
@@ -684,11 +691,12 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
     }
     return ret;
 }
-int32_t OHOS::MMI::EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_event& event,
+int32_t OHOS::MMI::EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_event *event,
     EventPointer& point, const uint64_t preHandlerTime)
 {
-    auto device = libinput_event_get_device(&event);
-    auto type = libinput_event_get_type(&event);
+    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    auto device = libinput_event_get_device(event);
+    auto type = libinput_event_get_type(event);
     CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
 #ifdef DEBUG_CODE_TEST
@@ -724,24 +732,13 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
 {
     MMI_LOGD("DispatchKeyEventByPid begin");
     if (AbilityMgr->CheckLaunchAbility(key)) {
-        MMI_LOGD("keyEvent start launch an ability, keyCode : %{puiblic}d", key->GetKeyCode());
+        MMI_LOGD("keyEvent start launch an ability, keyCode=%{public}d", key->GetKeyCode());
         return RET_OK;
     }
     if (KeyEventInputSubscribeFlt.FilterSubscribeKeyEvent(udsServer, key)) {
-        MMI_LOGD("subscribe keyEvent filter success. keyCode=%{puiblic}d", key->GetKeyCode());
+        MMI_LOGD("subscribe keyEvent filter success. keyCode=%{public}d", key->GetKeyCode());
         return RET_OK;
     }
-    int32_t ret = RET_OK;
-    // int32_t ret = RET_OK;
-    // ret = KeyBoardRegisteredEventHandler(key, udsServer, event, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
-    // if (ret != RET_OK) {
-    //     MMI_LOGE("Special Registered Event dispatch failed return:%{public}d errCode:%{public}d", ret,
-    //         SPCL_REG_EVENT_DISP_FAIL);
-    // }
-    // MmiMessageId idMsg = MmiMessageId::INVALID;
-    // EventKeyboard prevKey = {};
-    // MMIRegEvent->OnEventKeyGetSign(key, idMsg, prevKey);
-
     auto fd = WinMgr->UpdateTarget(key);
     CHKR(fd > 0, FD_OBTAIN_FAIL, RET_ERR);
 #ifdef DEBUG_CODE_TEST
@@ -757,16 +754,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
              key->GetActionStartTime(),
              key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
-    /*
-    if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, fd, 0)) {
-        NetPacket newPkt(MmiMessageId::ON_KEY);
-        newPkt << key << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
-        if (!udsServer.SendMsg(appInfo.fd, newPkt)) {
-            MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d\n", MSG_SEND_FAIL);
-            return MSG_SEND_FAIL;
-        }
-    }
-    */
+
     IEMServiceManager.ReportKeyEvent(key);
     NetPacket newPkt(MmiMessageId::ON_KEYEVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, newPkt);
@@ -776,13 +764,14 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
         return MSG_SEND_FAIL;
     }
     MMI_LOGD("DispatchKeyEventByPid end");
-    return ret;
+    return RET_OK;
 }
 
-int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event& event,
+int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *event,
     const KeyEventValueTransformations& trs, EventKeyboard& key, const uint64_t preHandlerTime)
 {
-    auto device = libinput_event_get_device(&event);
+    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    auto device = libinput_event_get_device(event);
     CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
     int32_t ret = RET_OK;
@@ -865,10 +854,11 @@ int32_t OHOS::MMI::EventDispatch::SetInputEventFilter(sptr<IEventFilter> filter)
     return RET_OK;
 }
 
-int32_t OHOS::MMI::EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_event& event,
+int32_t OHOS::MMI::EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_event *event,
     std::shared_ptr<PointerEvent> pointerEvent, const uint64_t preHandlerTime)
 {
-    auto device = libinput_event_get_device(&event);
+    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    auto device = libinput_event_get_device(event);
     CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
     auto focusId = WinMgr->GetFocusSurfaceId();
