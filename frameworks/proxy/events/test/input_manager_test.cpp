@@ -2381,4 +2381,122 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_005, TestSize
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 }
+
+HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1)
+{
+    RunShellUtil runCommand;
+    std::string addCmd {
+        "InputHandlerManagerGlobal: in AddMonitor, #[[:digit:]]\\{1,\\}, "
+        "Service AddMonitor Success."
+    };
+    std::vector<std::string> addLogs;
+    ASSERT_TRUE(runCommand.RunShellCommand(addCmd, addLogs) == RET_OK);
+
+    auto callBackPtr = InputEventCallback::GetPtr();
+    EXPECT_TRUE(callBackPtr != nullptr);
+    int32_t id1 = InputManager::GetInstance()->AddMonitor2(callBackPtr);
+    EXPECT_TRUE(id1 >= 1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+    std::vector<std::string> addItem;
+    ASSERT_TRUE(runCommand.RunShellCommand(addCmd, addItem) == RET_OK);
+    EXPECT_TRUE(addItem.size() > addLogs.size());
+    if (!addItem.empty() && !addLogs.empty()) {
+        EXPECT_TRUE(addItem.back() != addLogs.back());
+    }
+    InputManager::GetInstance()->RemoveMonitor2(id1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1)
+{
+    RunShellUtil runCommand;
+    auto callBackPtr = InputEventCallback::GetPtr();
+    EXPECT_TRUE(callBackPtr != nullptr);
+
+    int32_t id1 = InputManager::GetInstance()->AddMonitor2(callBackPtr);
+    EXPECT_TRUE(id1 >= 1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+    std::string removeCmd {
+        "InputHandlerManagerGlobal: in RemoveMonitor, #[[:digit:]]\\{1,\\}, "
+        "Service RemoveMonitor Success."
+    };
+    std::vector<std::string> removeLogs;
+    ASSERT_TRUE(runCommand.RunShellCommand(removeCmd, removeLogs) == RET_OK);
+
+    InputManager::GetInstance()->RemoveMonitor2(id1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+    std::vector<std::string> removeItem;
+    ASSERT_TRUE(runCommand.RunShellCommand(removeCmd, removeItem) == RET_OK);
+    EXPECT_TRUE(removeItem.size() > removeLogs.size());
+    if (!removeItem.empty() && !removeLogs.empty()) {
+        EXPECT_TRUE(removeItem.back() != removeLogs.back());
+    }
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1)
+{
+    std::string command {
+        "InputHandlerManager: in AddHandler, #[[:digit:]]\\{1,\\}, "
+        "The number of handlers exceeds the maximum."
+    };
+    std::vector<std::string> sLogs { SearchForLog(command, true) };
+
+    const std::vector<int32_t>::size_type N_TEST_CASES { MAX_N_INPUT_HANDLERS };
+    std::vector<int32_t> ids(N_TEST_CASES);
+    std::shared_ptr<InputEventCallback> cb = InputEventCallback::GetPtr();
+    EXPECT_TRUE(cb != nullptr);
+
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+        ids[i] = InputManager::GetInstance()->AddMonitor2(cb);
+        EXPECT_TRUE(ids[i] >= InputHandlerManager::MIN_HANDLER_ID);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor2(cb);
+    EXPECT_TRUE(monitorId < InputHandlerManager::MIN_HANDLER_ID);
+
+    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+        if (ids[i] >= InputHandlerManager::MIN_HANDLER_ID) {
+            InputManager::GetInstance()->RemoveMonitor2(ids[i]);
+            std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+        }
+    }
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1)
+{
+    auto callBackPtr = InputEventCallback::GetPtr();
+    EXPECT_TRUE(callBackPtr != nullptr);
+    int32_t id1 = InputManager::GetInstance()->AddMonitor2(callBackPtr);
+    EXPECT_TRUE(id1 >= 1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+    RunShellUtil runCommand;
+    std::string command {
+        "InputHandlerManagerGlobal: in AddMonitor, #[[:digit:]]\\{1,\\}, "
+        "PointerEvent received."
+    };
+    std::vector<std::string> addLogs;
+    ASSERT_TRUE(runCommand.RunShellCommand(command, addLogs) == RET_OK);
+
+    auto pointerEvent = SetupPointerEvent006();
+    EXPECT_TRUE(pointerEvent != nullptr);
+    MMI_LOGD("Call InputManager::SimulateInputEvent ...");
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+    std::vector<std::string> addItem;
+    ASSERT_TRUE(runCommand.RunShellCommand(command, addItem) == RET_OK);
+    EXPECT_TRUE(addItem.size() > addLogs.size());
+    if (!addItem.empty() && !addLogs.empty()) {
+        EXPECT_TRUE(addItem.back() != addLogs.back());
+    }
+    InputManager::GetInstance()->RemoveMonitor2(id1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+}
 }
