@@ -417,7 +417,7 @@ bool OHOS::MMI::EventDispatch::HandleTouchScreenEvent(std::shared_ptr<PointerEve
 
 bool OHOS::MMI::EventDispatch::HandleMouseEvent(std::shared_ptr<PointerEvent> point)
 {
-    return false;
+    return InputHandlerManagerGlobal::GetInstance().HandleEvent(point);
 }
 
 bool OHOS::MMI::EventDispatch::HandleTouchPadEvent(std::shared_ptr<PointerEvent> point)
