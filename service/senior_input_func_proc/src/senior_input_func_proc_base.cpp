@@ -139,7 +139,7 @@ int32_t SeniorInputFuncProcBase::GetDevType()
 
 int32_t SeniorInputFuncProcBase::ReplyMessage(SessionPtr aiSessionPtr, int32_t status)
 {
-    CHKR(aiSessionPtr, NULL_POINTER, RET_ERR);
+    CHKR(aiSessionPtr, ERROR_NULL_POINTER, RET_ERR);
     NetPacket newPacket(MmiMessageId::SENIOR_INPUT_FUNC);
     newPacket << status;
     if (!aiSessionPtr->SendMsg(newPacket)) {
