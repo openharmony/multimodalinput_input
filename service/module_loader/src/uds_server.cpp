@@ -264,7 +264,7 @@ void OHOS::MMI::UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
 {
     CHK(fd >= 0 && buf, PARAM_INPUT_INVALID);
     auto sess = GetSession(fd);
-    CHK(sess, NULL_POINTER);
+    CHK(sess, ERROR_NULL_POINTER);
     int32_t readIdx = 0;
     int32_t packSize = 0;
     const auto headSize = static_cast<int32_t>(sizeof(PackHead));
@@ -332,7 +332,7 @@ void OHOS::MMI::UDSServer::OnEpollEvent(epoll_event& ev, CLMAP<int32_t, StreamBu
 {
     const int32_t maxCount = static_cast<int32_t>(MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE) + 1;
     CHK(maxCount > 0, VAL_NOT_EXP);
-    CHK(ev.data.ptr, NULL_POINTER);
+    CHK(ev.data.ptr, ERROR_NULL_POINTER);
     auto fd = *static_cast<int32_t*>(ev.data.ptr);
     CHK(fd >= 0, INVALID_PARAM);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
@@ -380,7 +380,7 @@ void OHOS::MMI::UDSServer::DumpSession(const std::string &title)
 bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
 {
     MMI_LOGI("AddSession begin  pid is %{public}d, fd is %{public}d...", ses->GetPid(), ses->GetFd());
-    CHKF(ses, OHOS::NULL_POINTER);
+    CHKF(ses, OHOS::ERROR_NULL_POINTER);
     auto fd = ses->GetFd();
     CHKF(fd >= 0, VAL_NOT_EXP);
     auto pid = ses->GetPid();

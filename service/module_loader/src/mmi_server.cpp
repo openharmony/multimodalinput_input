@@ -252,7 +252,7 @@ int32_t OHOS::MMI::MMIServer::SaConnectServiceStop()
 
 void OHOS::MMI::MMIServer::OnConnected(SessionPtr s)
 {
-    CHK(s, NULL_POINTER);
+    CHK(s, ERROR_NULL_POINTER);
     int32_t fd = s->GetFd();
     MMI_LOGI("MMIServer::_OnConnected fd:%{public}d", fd);
     AppRegs->RegisterConnectState(fd);
@@ -260,7 +260,7 @@ void OHOS::MMI::MMIServer::OnConnected(SessionPtr s)
 
 void OHOS::MMI::MMIServer::OnDisconnected(SessionPtr s)
 {
-    CHK(s, NULL_POINTER);
+    CHK(s, ERROR_NULL_POINTER);
     MMI_LOGW("MMIServer::OnDisconnected enter, session desc:%{public}s", s->GetDescript().c_str());
     int32_t fd = s->GetFd();
 
