@@ -160,7 +160,7 @@ int32_t OHOS::MMI::EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSS
 {
     auto ret1 = RET_OK;
     auto ret2 = RET_OK;
-    RegisteredEvent eve= {};
+    RegisteredEvent eve = {};
     auto result = eventPackage_.PackageRegisteredEvent<EventKeyboard>(eve, key);
     if (result != RET_OK) {
         MMI_LOGE("Registered event package failed, ret:%{public}d errCode:%{public}d", result, REG_EVENT_PKG_FAIL);
