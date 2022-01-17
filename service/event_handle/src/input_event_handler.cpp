@@ -478,12 +478,12 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event& event)
 
 int32_t OHOS::MMI::InputEventHandler::OnEventKeyboard(multimodal_libinput_event &ev)
 {
-    CHKR(ev.event, NULL_POINTER, NULL_POINTER);
+    CHKPR(ev.event, NULL_POINTER, NULL_POINTER);
 #ifdef OHOS_WESTEN_MODEL
     uint64_t preHandlerTime = GetSysClockTime();
 #endif
     EventKeyboard keyBoard = {};
-    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    CHKPR(udsServer_, NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageKeyEvent(*ev.event, keyBoard, *udsServer_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_FAIL) { // The multi_device_same_event should be discarded
         return RET_OK;
@@ -518,12 +518,12 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKeyboard(multimodal_libinput_event 
 
 int32_t OHOS::MMI::InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
 {
-    CHKR(ev.event, NULL_POINTER, NULL_POINTER);
+    CHKPR(ev.event, NULL_POINTER, NULL_POINTER);
     uint64_t preHandlerTime = GetSysClockTime();
     auto device = libinput_event_get_device(ev.event);
     auto type = libinput_event_get_type(ev.event);
-    CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
-    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    CHKPR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(udsServer_, NULL_POINTER, RET_ERR);
     int32_t devicType = static_cast<int32_t>(libinput_device_get_tags(device));
     if (devicType & EVDEV_UDEV_TAG_JOYSTICK) {
         if (type == LIBINPUT_EVENT_POINTER_BUTTON) {
