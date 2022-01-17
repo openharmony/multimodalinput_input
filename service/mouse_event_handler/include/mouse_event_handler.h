@@ -30,7 +30,7 @@ public:
     void SetMouseData(libinput_event *event, int32_t deviceId);
     static std::shared_ptr<MouseEventHandler> Create()
     {
-        return std::shared_ptr<MouseEventHandler>(new MouseEventHandler(InputEvent::EVENT_TYPE_POINTER));
+        return std::make_shared<MouseEventHandler>(InputEvent::EVENT_TYPE_POINTER);
     }
     static int32_t SetMouseEndData(std::shared_ptr<PointerEvent> pointerEvent, int32_t deviceId);
 protected:

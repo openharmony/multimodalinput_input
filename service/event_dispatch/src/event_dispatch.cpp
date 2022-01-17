@@ -740,16 +740,6 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
         return RET_OK;
     }
     int32_t ret = RET_OK;
-    // int32_t ret = RET_OK;
-    // ret = KeyBoardRegisteredEventHandler(key, udsServer, event, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
-    // if (ret != RET_OK) {
-    //     MMI_LOGE("Special Registered Event dispatch failed return:%{public}d errCode:%{public}d", ret,
-    //         SPCL_REG_EVENT_DISP_FAIL);
-    // }
-    // MmiMessageId idMsg = MmiMessageId::INVALID;
-    // EventKeyboard prevKey = {};
-    // MMIRegEvent->OnEventKeyGetSign(key, idMsg, prevKey);
-
     auto fd = WinMgr->UpdateTarget(key);
     CHKR(fd > 0, FD_OBTAIN_FAIL, RET_ERR);
 #ifdef DEBUG_CODE_TEST
@@ -765,16 +755,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
              key->GetActionStartTime(),
              key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
-    /*
-    if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, fd, 0)) {
-        NetPacket newPkt(MmiMessageId::ON_KEY);
-        newPkt << key << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
-        if (!udsServer.SendMsg(appInfo.fd, newPkt)) {
-            MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d\n", MSG_SEND_FAIL);
-            return MSG_SEND_FAIL;
-        }
-    }
-    */
+
     IEMServiceManager.ReportKeyEvent(key);
     NetPacket newPkt(MmiMessageId::ON_KEYEVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, newPkt);
