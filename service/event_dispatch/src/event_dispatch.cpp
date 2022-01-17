@@ -732,14 +732,13 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
 {
     MMI_LOGD("DispatchKeyEventByPid begin");
     if (AbilityMgr->CheckLaunchAbility(key)) {
-        MMI_LOGD("keyEvent start launch an ability, keyCode : %{puiblic}d", key->GetKeyCode());
+        MMI_LOGD("keyEvent start launch an ability, keyCode=%{puiblic}d", key->GetKeyCode());
         return RET_OK;
     }
     if (KeyEventInputSubscribeFlt.FilterSubscribeKeyEvent(udsServer, key)) {
         MMI_LOGD("subscribe keyEvent filter success. keyCode=%{puiblic}d", key->GetKeyCode());
         return RET_OK;
     }
-    int32_t ret = RET_OK;
     auto fd = WinMgr->UpdateTarget(key);
     CHKR(fd > 0, FD_OBTAIN_FAIL, RET_ERR);
 #ifdef DEBUG_CODE_TEST
@@ -765,7 +764,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
         return MSG_SEND_FAIL;
     }
     MMI_LOGD("DispatchKeyEventByPid end");
-    return ret;
+    return RET_OK;
 }
 
 int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *event,

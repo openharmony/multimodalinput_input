@@ -686,7 +686,7 @@ int32_t OHOS::MMI::InputEventHandler::OnGestureEvent(libinput_event *event)
         MMI_LOGD("interceptor of OnGestureEvent end .....");
         return RET_OK;
     }
-    auto eventDispatchResult = eventDispatch_.DispatchGestureNewEvent(*udsServer_, event, 
+    auto eventDispatchResult = eventDispatch_.DispatchGestureNewEvent(*udsServer_, event,
         pointerEvent, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Gesture New event dispatch failed... ret:%{public}d errCode:%{public}d",
