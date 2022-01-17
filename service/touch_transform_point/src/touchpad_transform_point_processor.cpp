@@ -18,8 +18,8 @@
 
 namespace OHOS::MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL 
-                = {LOG_CORE, MMI_LOG_DOMAIN, "TouchPadTransformPointProcessor"};
+        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, 
+            "TouchPadTransformPointProcessor"};
     }
 }
 
@@ -111,8 +111,8 @@ void OHOS::MMI::TouchPadTransformPointProcessor::onEventTouchPadUp(libinput_even
     MMI_LOGD("this touch pad event is up end");
 }
 
-std::shared_ptr<OHOS::MMI::PointerEvent> 
-OHOS::MMI::TouchPadTransformPointProcessor::onLibinputTouchPadEvent(libinput_event *event)
+std::shared_ptr<OHOS::MMI::PointerEvent> OHOS::MMI::TouchPadTransformPointProcessor::onLibinputTouchPadEvent(
+    libinput_event *event)
 {
     CHKR(event, PARAM_INPUT_INVALID, nullptr);
     MMI_LOGD("call  onLibinputTouchPadEvent begin");
