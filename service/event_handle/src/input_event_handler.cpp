@@ -686,7 +686,8 @@ int32_t OHOS::MMI::InputEventHandler::OnGestureEvent(libinput_event *event)
         MMI_LOGD("interceptor of OnGestureEvent end .....");
         return RET_OK;
     }
-    auto eventDispatchResult = eventDispatch_.DispatchGestureNewEvent(*udsServer_, event, pointerEvent, preHandlerTime);
+    auto eventDispatchResult = eventDispatch_.DispatchGestureNewEvent(*udsServer_, event, 
+        pointerEvent, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Gesture New event dispatch failed... ret:%{public}d errCode:%{public}d",
             eventDispatchResult, GESTURE_EVENT_DISP_FAIL);
@@ -734,7 +735,8 @@ int32_t OHOS::MMI::InputEventHandler::OnEventTabletTool(multimodal_libinput_even
         return TABLETTOOL_EVENT_PKG_FAIL;
     }
     MMI_LOGT("\n2.mapping event:\nEvent:eventType=%{public}d;", tableTool.eventType);
-    auto retEvent = eventDispatch_.DispatchTabletToolEvent(*udsServer_, ev.event, tableTool, preHandlerTime, winSwitch_);
+    auto retEvent = eventDispatch_.DispatchTabletToolEvent(*udsServer_, ev.event, tableTool,
+        preHandlerTime, winSwitch_);
     if (retEvent != RET_OK) {
         MMI_LOGE("Tabletool event dispatch failed... ret:%{public}d errCode:%{public}d",
             retEvent, TABLETTOOL_EVENT_DISP_FAIL);

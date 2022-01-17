@@ -40,7 +40,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::onLibinputTouchEvent(l
     return processor->onLibinputTouchEvent(event);
 }
 
-std::shared_ptr<PointerEvent> TouchTransformPointManager::onLibinputTouchPadEvent(libinput_event *event) 
+std::shared_ptr<PointerEvent> TouchTransformPointManager::onLibinputTouchPadEvent(libinput_event *event)
 {
     CHKR(event, PARAM_INPUT_INVALID, nullptr);
     std::shared_ptr<TouchPadTransformPointProcessor> processor;
