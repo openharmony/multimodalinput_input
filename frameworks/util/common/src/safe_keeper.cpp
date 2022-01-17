@@ -61,7 +61,8 @@ void OHOS::MMI::SafeKeeper::ReportHealthStatus(uint64_t tid)
     std::lock_guard<std::mutex> lock(mtx_);
     auto ptr = GetEvent(tid);
     if (!ptr) {
-        MMI_LOGE("SafeKeeper report ptr = nullptr tid:[%{public}" PRId64 "] errCode:%{public}d", tid, NULL_POINTER);
+        MMI_LOGE("SafeKeeper report ptr = nullptr tid:[%{public}" PRId64 "] errCode:%{public}d",
+                 tid, ERROR_NULL_POINTER);
         return;
     }
     ptr->lastTime = GetCurMillisTime();
