@@ -20,8 +20,8 @@
 #include <mutex>
 #include <inttypes.h>
 #include "i_input_event_consumer.h"
-#include "native_api.h"
-#include "native_node_api.h"
+#include "napi/native_api.h"
+#include "napi/native_node_api.h"
 
 namespace OHOS {
 namespace MMI {

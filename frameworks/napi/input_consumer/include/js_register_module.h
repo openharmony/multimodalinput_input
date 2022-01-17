@@ -22,9 +22,9 @@
 #include "multimodal_event_handler.h"
 #include "key_event.h"
 #include "key_option.h"
-#include "native_api.h"
-#include "native_node_api.h"
 #include "libmmi_util.h"
+#include "napi/native_api.h"
+#include "napi/native_node_api.h"
 #include "utils/log.h"
 
 #define SUCCESS_CODE 0
