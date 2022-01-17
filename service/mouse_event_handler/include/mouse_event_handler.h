@@ -27,7 +27,7 @@ namespace MMI {
 class MouseEventHandler : public PointerEvent {
 public:
     virtual ~MouseEventHandler();
-    void SetMouseData(libinput_event& event, int32_t deviceId);
+    void SetMouseData(libinput_event *event, int32_t deviceId);
     static std::shared_ptr<MouseEventHandler> Create()
     {
         return std::shared_ptr<MouseEventHandler>(new MouseEventHandler(InputEvent::EVENT_TYPE_POINTER));
