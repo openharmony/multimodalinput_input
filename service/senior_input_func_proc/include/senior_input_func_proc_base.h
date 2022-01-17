@@ -16,10 +16,6 @@
 #define OHOS_SENIOR_INPUT_FUNC_PROC_BASE_H
 #include "uds_server.h"
 
-#ifdef OHOS_AUTO_TEST_FRAME
-#include "event_dispatch.h"
-#endif
-
 namespace OHOS {
 namespace MMI {
 class SeniorInputFuncProcBase : public RefBase {
@@ -48,10 +44,6 @@ public:
     int32_t sessionFd_ = 0;
     static UDSServer* udsServerPtr_;
     static std::map<int32_t, sptr<SeniorInputFuncProcBase>> deviceInfoMap_;
-#ifdef OHOS_AUTO_TEST_FRAME
-private:
-    EventDispatch eventDispatch_;
-#endif
 };
 }
 }

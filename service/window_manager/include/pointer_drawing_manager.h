@@ -41,7 +41,7 @@ namespace OHOS {
             void Init();
 		
 		private:
-			//sptr<OHOS::Rosen::Window> drawWindow_;
+			sptr<OHOS::Rosen::Window> drawWindow_;
             bool hasDisplay_ { false };
             int32_t displayId_;
 			int32_t displayWidth_;

@@ -61,12 +61,7 @@ protected:
     
     int32_t OnMouseEventHandler(libinput_event& event, const int32_t deviceId);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
-#ifndef OHOS_AUTO_TEST_FRAME
     bool OnSystemEvent(const KeyEventValueTransformations& temp, const enum KEY_STATE state) const;
-#else
-    bool OnSystemEvent(const KeyEventValueTransformations& temp, const enum KEY_STATE state,
-        AutoTestKeyTypePkt& autoTestKeyTypePkt);
-#endif  // OHOS_AUTO_TEST_FRAME
 
 private:
     int32_t OnEventHandler(multimodal_libinput_event& ev);
