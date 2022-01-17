@@ -44,7 +44,7 @@ int32_t IMultimodalInputConnectStub::OnRemoteRequest(
         case static_cast<uint32_t>(IMultimodalInputConnect::ALLOC_SOCKET_FD):
             return HandleAllocSocketFd(data, reply);
         case static_cast<uint32_t>(IMultimodalInputConnect::SET_EVENT_POINTER_FILTER):
-            return StubSetInputEventFilter(data, reply);
+            return StubAddInputEventFilter(data, reply);
         default:
             MMI_LOGE("unknown code: %{public}u, go switch defaut", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -68,12 +68,15 @@ int32_t IMultimodalInputConnectStub::GetCallingPid() const
     return IPCSkeleton::GetCallingPid();
 }
 
-int32_t IMultimodalInputConnectStub::StubSetInputEventFilter(MessageParcel& data, MessageParcel& reply)
+int32_t IMultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply)
 {
+    MMI_LOGT("enter");
     int32_t ret = RET_OK;
 
     do {
-        if (GetCallingUid() != SYSTEM_UID) {
+        const int32_t uid = GetCallingUid();
+        if (uid != SYSTEM_UID && uid != ROOT_UID) {
+            MMI_LOGE("uid is not root or system");
             ret = SASERVICE_PERMISSION_FAIL;
             break;
         }
@@ -92,11 +95,17 @@ int32_t IMultimodalInputConnectStub::StubSetInputEventFilter(MessageParcel& data
             break;
         }
 
-        ret = SetInputEventFilter(filter);
+        MMI_LOGT("filter iface_cast succeeded");
+
+        ret = AddInputEventFilter(filter);
     } while (0);
     
-    reply.WriteInt32(ret);
+    if (!reply.WriteInt32(ret)) {
+        MMI_LOGE("WriteInt32(%{public}d) fail", ret);
+        return IPC_STUB_WRITE_PARCEL_ERR;
+    }
 
+    MMI_LOGT("leave, ret = %{public}d", ret);
     return RET_OK;
 }
 } // namespace MMI

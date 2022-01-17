@@ -28,7 +28,7 @@ public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.multimodalinput.IConnectManager");
 
     virtual int32_t AllocSocketFd(const std::string &programName, const int moduleType, int &socketFd) = 0;
-    virtual int32_t SetInputEventFilter(sptr<IEventFilter> filter) = 0;
+    virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) = 0;
 
     enum {
         ALLOC_SOCKET_FD = 0,

@@ -13,24 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_POINTER_EVENT_FILTER_STUB_H
-#define OHOS_POINTER_EVENT_FILTER_STUB_H
+#ifndef OHOS_EVENT_FILTER_WRAP_H
+#define OHOS_EVENT_FILTER_WRAP_H
 
+#include <mutex>
 #include "i_event_filter.h"
-#include "log.h"
-#include "iremote_stub.h"
-#include "message_parcel.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
-class EventFilterStub : public IRemoteStub<IEventFilter> {
+class EventFilterWrap : public Singleton<EventFilterWrap> {
 public:
-    EventFilterStub() = default;
-    virtual ~EventFilterStub() = default;
-    int OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& options) override;
-protected:
-    int32_t StubHandlePointerEvent(MessageParcel& data, MessageParcel& reply);
+    EventFilterWrap();
+    ~EventFilterWrap();
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
+    bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);
+private:
+    std::mutex lockInputEventFilter_;
+    sptr<IEventFilter> filter_ {nullptr};
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // OHOS_POINTER_EVENT_FILTER_STUB_H
+#endif // OHOS_EVENT_FILTER_WRAP_H

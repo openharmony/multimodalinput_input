@@ -69,15 +69,15 @@ int MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair() const
     return socketFd_;
 }
 
-int32_t MultimodalInputConnectManager::SetInputEventFilter(sptr<IEventFilter> filter)
+int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> filter)
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
         MMI_LOGE("multimodalInputConnectService_ is nullptr");
-        return false;
+        return RET_ERR;
     }
 
-    return multimodalInputConnectService_->SetInputEventFilter(filter);
+    return multimodalInputConnectService_->AddInputEventFilter(filter);
 }
 
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()

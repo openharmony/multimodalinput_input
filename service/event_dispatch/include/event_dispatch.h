@@ -29,7 +29,7 @@ class EventDispatch : public std::enable_shared_from_this<EventDispatch> {
 public:
     EventDispatch();
     virtual ~EventDispatch();
-    virtual int32_t SetInputEventFilter(sptr<IEventFilter> filter);
+    virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     int32_t DispatchGestureNewEvent(UDSServer& udsServer, libinput_event *event,
         std::shared_ptr<PointerEvent> pointer, const uint64_t preHandlerTime);
     int32_t DispatchGestureEvent(UDSServer& udsServer, libinput_event *event, EventGesture& gesture,
@@ -71,9 +71,6 @@ protected:
     int32_t touchDownFocusSurfaceId_ = 0;
     EventPackage eventPackage_;
     StandardEventHandler standardEvent_;
-    std::mutex lockInputEventFilter_;
-    sptr<IEventFilter> filter_ {nullptr};
-    sptr<IRemoteObject::DeathRecipient> eventFilterRecipient_ {nullptr};
 #ifdef DEBUG_CODE_TEST
 private:
     const size_t windowCount_ = 2;

@@ -57,29 +57,36 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
     MMI_LOGD("InputManagerImpl::UpdateDisplayInfo leave!");
 }
 
-void InputManagerImpl::SetInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
+int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
 {
+    MMI_LOGT("enter");
     if (eventFilterService_ == nullptr) {
         eventFilterService_ = new EventFilterService();
+        MMI_LOGD("new EventFilterService");
     }
 
     if (eventFilterService_ == nullptr) {
         MMI_LOGE("eventFilterService_ is nullptr");
-        return;
+        return RET_ERR;
     }
 
     eventFilterService_->SetPointerEventPtr(filter);
 
     static bool hasSendToMmiServer = false;
     if (!hasSendToMmiServer) {
-        int32_t ret = MultimodalInputConnectManager::GetInstance()->SetInputEventFilter(eventFilterService_);
+        int32_t ret = MultimodalInputConnectManager::GetInstance()->AddInputEventFilter(eventFilterService_);
         if (ret == RET_OK) {
             hasSendToMmiServer = true;
-            MMI_LOGI("SetInputEventFilter has send to server success");
+            MMI_LOGI("AddInputEventFilter has send to server success");
+            return RET_OK;
         } else {
-            MMI_LOGE("SetInputEventFilter has send to server fail, ret = %{public}d", ret);
+            MMI_LOGE("AddInputEventFilter has send to server fail, ret = %{public}d", ret);
+            return RET_ERR;
         }        
     }
+
+    MMI_LOGT("leave, success with hasSendToMmiServer is already true");
+    return RET_OK;
 }
 
 void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::IInputEventConsumer> inputEventConsumer)
