@@ -63,6 +63,8 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::ON_WINDOW, MsgCallbackBind2(&ServerMsgHandler::OnWindow, this)},
         {MmiMessageId::ON_VIRTUAL_KEY, MsgCallbackBind2(&ServerMsgHandler::OnVirtualKeyEvent, this)},
         {MmiMessageId::CHECK_REPLY_MESSAGE, MsgCallbackBind2(&ServerMsgHandler::CheckReplyMessageFormClient, this)},
+        {MmiMessageId::NEW_CHECK_REPLY_MESSAGE,
+			MsgCallbackBind2(&ServerMsgHandler::NewCheckReplyMessageFormClient, this)},
         {MmiMessageId::ON_DUMP, MsgCallbackBind2(&ServerMsgHandler::OnDump, this)},
         {MmiMessageId::ON_LIST, MsgCallbackBind2(&ServerMsgHandler::OnListInject, this)},
         {MmiMessageId::GET_MMI_INFO_REQ, MsgCallbackBind2(&ServerMsgHandler::GetMultimodeInputInfo, this)},
@@ -331,6 +333,17 @@ int32_t OHOS::MMI::ServerMsgHandler::CheckReplyMessageFormClient(SessionPtr sess
              "westonExpendTime=%{public}d(us) serverExpendTime=%{public}d(us) clientExpendTime=%{public}d(us) "
              "allTime=%{public}d(us)", idMsg, fd, waitData.inputTime, westonExpendTime, serverExpendTime,
              clientExpendTime, allTime);
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::ServerMsgHandler::NewCheckReplyMessageFormClient(SessionPtr sess, NetPacket& pkt)
+{
+    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
+    MMI_LOGT("begin");
+    int32_t id = 0;
+    pkt >> id;
+    sess->ClearEventList(id);
+    MMI_LOGT("end");
     return RET_OK;
 }
 
