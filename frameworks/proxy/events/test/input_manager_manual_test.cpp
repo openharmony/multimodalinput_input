@@ -13,17 +13,13 @@
  * limitations under the License.
  */
 
-#include "input_manager.h"
-#include "error_multimodal.h"
-#include <bitset>
-#include <regex>
-#include <sstream>
 #include <gtest/gtest.h>
 #include "define_multimodal.h"
-#include "input_handler_manager.h"
+#include "error_multimodal.h"
 #include "input_event_monitor_manager.h"
-#include "interceptor_manager.h"
+#include "input_handler_manager.h"
 #include "input_manager.h"
+#include "interceptor_manager.h"
 #include "key_event_pre.h"
 #include "multimodal_event_handler.h"
 #include "pointer_event.h"
@@ -120,7 +116,7 @@ void InputManagerManualTest::SimulateInputEventHelper(int32_t globalX, int32_t g
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     EXPECT_EQ(callbackRet, expectVal);
-    MMI_LOGT("leave");  
+    MMI_LOGT("leave");
 }
 
 HWTEST_F(InputManagerManualTest, HandlePointerEventFilter_001, TestSize.Level1)
