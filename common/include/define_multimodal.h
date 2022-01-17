@@ -82,10 +82,27 @@
         } \
     } while (0)
 
+#define CKP(cond, ec) \
+    do { \
+        if ((cond) == nullptr) { \
+            MMI_LOGE("%{public}s, (%{public}d), CKP(%{public}s), errCode:%{public}d", \
+                __FILE__, __LINE__, #cond, ec); \
+        } \
+    } while (0)
+
 #define CHK(cond, ec) \
     do { \
         if (!(cond)) { \
             MMI_LOGE("%{public}s, (%{public}d), CHK(%{public}s), errCode:%{public}d", \
+                __FILE__, __LINE__, #cond, ec); \
+            return; \
+        } \
+    } while (0)
+
+#define CHKP(cond, ec) \
+    do { \
+        if ((cond) == nullptr) { \
+            MMI_LOGE("%{public}s, (%{public}d), CHKP(%{public}s), errCode:%{public}d", \
                 __FILE__, __LINE__, #cond, ec); \
             return; \
         } \
@@ -100,10 +117,28 @@
         } \
     } while (0)
 
+#define CHKPF(cond, ec) \
+    do { \
+        if ((cond) == nullptr) { \
+            MMI_LOGE("%{public}s, (%{public}d), CHKPF(%{public}s), errCode:%{public}d", \
+                __FILE__, __LINE__, #cond, ec); \
+            return 0; \
+        } \
+    } while (0)
+
 #define CHKC(cond, ec) \
     do { \
         if (!(cond)) { \
             MMI_LOGE("%{public}s, (%{public}d), CHKC(%{public}s), errCode:%{public}d", \
+                __FILE__, __LINE__, #cond, ec); \
+            continue; \
+        } \
+    } while (0)
+
+#define CHKPC(cond, ec) \
+    do { \
+        if ((cond) == nullptr) { \
+            MMI_LOGE("%{public}s, (%{public}d), CHKPC(%{public}s), errCode:%{public}d", \
                 __FILE__, __LINE__, #cond, ec); \
             continue; \
         } \
@@ -118,10 +153,10 @@
         } \
     } while (0)
 
-#define CHKB(cond, ec, r) \
+#define CHKPR(cond, ec, r) \
     do { \
-        if (!(cond)) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHKB(%{public}s), errCode:%{public}d", \
+        if ((cond) == nullptr) { \
+            MMI_LOGE("%{public}s, (%{public}d), CHKPR(%{public}s), errCode:%{public}d", \
                 __FILE__, __LINE__, #cond, ec); \
             return r; \
         } \
@@ -135,10 +170,25 @@
         } \
     } while (0)
 
+#define CKP(cond, ec) \
+    do { \
+        if ((cond) == nullptr) { \
+            MMI_LOGE("CKP(%{public}s), errCode:%{public}d", #cond, ec); \
+        } \
+    } while (0)
+
 #define CHK(cond, ec) \
     do { \
         if (!(cond)) { \
             MMI_LOGE("CHK(%{public}s), errCode:%{public}d", #cond, ec); \
+            return; \
+        } \
+    } while (0)
+
+#define CHKP(cond, ec) \
+    do { \
+        if ((cond) == nullptr) { \
+            MMI_LOGE("CHKP(%{public}s), errCode:%{public}d", #cond, ec); \
             return; \
         } \
     } while (0)
@@ -151,10 +201,26 @@
         } \
     } while (0)
 
+#define CHKPF(cond, ec) \
+    do { \
+        if ((cond) == nullptr) { \
+            MMI_LOGE("CHKPF(%{public}s), errCode:%{public}d", #cond, ec); \
+            return 0; \
+        } \
+    } while (0)
+
 #define CHKC(cond, ec) \
     do { \
         if (!(cond)) { \
             MMI_LOGE("CHKC(%{public}s), errCode:%{public}d", #cond, ec); \
+            continue; \
+        } \
+    } while (0)
+
+#define CHKPC(cond, ec) \
+    do { \
+        if ((cond) == nullptr) { \
+            MMI_LOGE("CHKPC(%{public}s), errCode:%{public}d", #cond, ec); \
             continue; \
         } \
     } while (0)
@@ -167,10 +233,10 @@
         } \
     } while (0)
 
-#define CHKB(cond, ec, r) \
+#define CHKPR(cond, ec, r) \
     do { \
-        if (!(cond)) { \
-            MMI_LOGE("CHKB(%{public}s), errCode:%{public}d", #cond, ec); \
+        if ((cond) == nullptr) { \
+            MMI_LOGE("CHKPR(%{public}s), errCode:%{public}d", #cond, ec); \
             return r; \
         } \
     } while (0)
