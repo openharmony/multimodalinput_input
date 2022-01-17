@@ -37,6 +37,7 @@ public:
 public:
     void GetDeviceIdListAsync(std::function<void(std::vector<int32_t>)> callback);
     void FindDeviceByIdAsync(int32_t deviceId, std::function<void(std::shared_ptr<InputDevice>)> callback);
+    int32_t FindInputDeviceId(libinput_device* inputDevice);
 
 private:
     void Init(weston_compositor *wc);
