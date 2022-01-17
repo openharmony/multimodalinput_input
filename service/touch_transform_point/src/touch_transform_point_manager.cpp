@@ -20,10 +20,11 @@ namespace OHOS::MMI {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TouchTransformPointManager" };
     }
 constexpr int32_t ID = 1;
-std::shared_ptr<PointerEvent> TouchTransformPointManager::onLibinputTouchEvent(libinput_event& event) 
+std::shared_ptr<PointerEvent> TouchTransformPointManager::onLibinputTouchEvent(libinput_event *event) 
 {
+    CHKR(event, PARAM_INPUT_INVALID, nullptr);
     std::shared_ptr<TouchTransformPointProcessor> processor;
-    auto type = libinput_event_get_type(&event);
+    auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
         MMI_LOGD("this touch event is canceled"); 
         return nullptr;
@@ -39,8 +40,9 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::onLibinputTouchEvent(l
     return processor->onLibinputTouchEvent(event);
 }
 
-std::shared_ptr<PointerEvent> TouchTransformPointManager::onLibinputTouchPadEvent(libinput_event& event) 
+std::shared_ptr<PointerEvent> TouchTransformPointManager::onLibinputTouchPadEvent(libinput_event *event)
 {
+    CHKR(event, PARAM_INPUT_INVALID, nullptr);
     std::shared_ptr<TouchPadTransformPointProcessor> processor;
     auto it = touchpadpro_.find(ID);
     if (it != touchpadpro_.end()) {
