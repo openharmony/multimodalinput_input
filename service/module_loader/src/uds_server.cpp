@@ -63,15 +63,11 @@ void OHOS::MMI::UDSServer::UdsStop()
 int32_t OHOS::MMI::UDSServer::GetFdByPid(int32_t pid)
 {
     std::lock_guard<std::mutex> lock(mux_);
-    for (auto &it : sessionsMap_) {
-        MMI_LOGE("inputpid is %{public}d, pid is %{public}d, fd000 is %{public}d", pid, it.second->GetPid(), it.first);
+    auto it = idxPidMap_.find(pid);
+    if (it == idxPidMap_.end()) {
+        return RET_ERR;
     }
-    for (auto &it : sessionsMap_) {
-        if (it.second->GetPid() == pid) {
-            return it.first;
-        }
-    }
-    return RET_ERR;
+    return it->second;
 }
 
 int32_t OHOS::MMI::UDSServer::GetPidByFd(int32_t fd)
@@ -81,7 +77,7 @@ int32_t OHOS::MMI::UDSServer::GetPidByFd(int32_t fd)
     if (it == sessionsMap_.end()) {
         return RET_ERR;
     }
-    return it->second->GetPtr()->GetPid();
+    return it->second->GetPid();
 }
 
 bool OHOS::MMI::UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
@@ -387,6 +383,9 @@ bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
     CHKF(ses, OHOS::NULL_POINTER);
     auto fd = ses->GetFd();
     CHKF(fd >= 0, VAL_NOT_EXP);
+    auto pid = ses->GetPid();
+    CHKF(pid > 0, VAL_NOT_EXP);
+    idxPidMap_[pid] = fd;
     sessionsMap_[fd] = ses;
     DumpSession("AddSession");
     if (sessionsMap_.size() > MAX_SESSON_ALARM) {
@@ -400,11 +399,15 @@ bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
 void OHOS::MMI::UDSServer::DelSession(int32_t fd)
 {
     MMI_LOGI("DelSession begin  fd is %{public}d...", fd);
+    CHK(fd >= 0, PARAM_INPUT_INVALID);
+    auto pid = GetPidByFd(fd);
+    if (pid > 0) {
+        idxPidMap_.erase(pid);
+    }
     auto it = sessionsMap_.find(fd);
     if (it != sessionsMap_.end()) {
-        SessionPtr session = it->second;
+        NotifySessionDeleted(it->second);
         sessionsMap_.erase(it);
-        NotifySessionDeleted(session);
     }
     DumpSession("DelSession");
     MMI_LOGI("DelSession end...");

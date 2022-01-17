@@ -44,22 +44,22 @@ protected:
     int32_t OnEventKeyboard(multimodal_libinput_event& event);
     int32_t OnEventPointer(multimodal_libinput_event& event);
     int32_t OnEventTouch(multimodal_libinput_event& event);
-    int32_t OnEventTouchSecond(libinput_event& event);
-    int32_t OnEventTouchPadSecond(libinput_event& event);
+    int32_t OnEventTouchSecond(libinput_event *event);
+    int32_t OnEventTouchPadSecond(libinput_event *event);
     int32_t OnEventGesture(multimodal_libinput_event& event);
     int32_t OnEventTouchpad(multimodal_libinput_event& event);
-    int32_t OnGestureEvent(libinput_event& event);
+    int32_t OnGestureEvent(libinput_event *event);
     int32_t OnEventTabletTool(multimodal_libinput_event& event);
     int32_t OnEventTabletPad(multimodal_libinput_event& event);
     int32_t OnEventSwitchToggle(multimodal_libinput_event& event);
     int32_t OnEventJoyStickKey(multimodal_libinput_event& event, const uint64_t time);
     int32_t OnEventTabletPadKey(multimodal_libinput_event& event);
     int32_t OnEventJoyStickAxis(multimodal_libinput_event& event, const uint64_t time);
-    int32_t OnKeyboardEvent(libinput_event& event);
-    int32_t OnEventKey(libinput_event& event);
+    int32_t OnKeyboardEvent(libinput_event *event);
+    int32_t OnEventKey(libinput_event *event);
     int32_t OnKeyEventDispatch(multimodal_libinput_event& event);
     
-    int32_t OnMouseEventHandler(libinput_event& event, const int32_t deviceId);
+    int32_t OnMouseEventHandler(libinput_event *event, const int32_t deviceId);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
     bool OnSystemEvent(const KeyEventValueTransformations& temp, const enum KEY_STATE state) const;
 
