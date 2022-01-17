@@ -47,6 +47,7 @@ protected:
     int32_t OnWindow(SessionPtr sess, NetPacket& pkt);
     int32_t OnDump(SessionPtr sess, NetPacket& pkt);
     int32_t CheckReplyMessageFormClient(SessionPtr sess, NetPacket& pkt);
+    int32_t NewCheckReplyMessageFormClient(SessionPtr sess, NetPacket& pkt);
     int32_t GetMultimodeInputInfo(SessionPtr sess, NetPacket& pkt);
     int32_t OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnNewInjectKeyEvent(SessionPtr sess, NetPacket& pkt);
