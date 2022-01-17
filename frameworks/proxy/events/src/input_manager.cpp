@@ -45,7 +45,7 @@ void InputManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &phy
     InputManagerImpl::GetInstance()->UpdateDisplayInfo(physicalDisplays, logicalDisplays);
 }
 
-void InputManager::SetInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent> filter)>) {}
+void InputManager::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent> filter)>) {}
 
 void InputManager::SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::IInputEventConsumer> inputEventConsumer)
 {

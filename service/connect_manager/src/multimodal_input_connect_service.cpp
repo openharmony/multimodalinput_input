@@ -56,7 +56,7 @@ int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programN
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectService::SetInputEventFilter(sptr<IEventFilter> filter)
+int32_t MultimodalInputConnectService::AddInputEventFilter(sptr<IEventFilter> filter)
 {
     MMI_LOGI("enter");
     if (udsServer_ == nullptr) {
@@ -64,9 +64,9 @@ int32_t MultimodalInputConnectService::SetInputEventFilter(sptr<IEventFilter> fi
         return RET_ERR;
     }
 
-    const int32_t ret = udsServer_->SetInputEventFilter(filter);
+    const int32_t ret = udsServer_->AddInputEventFilter(filter);
     if (ret != RET_OK) {
-        MMI_LOGE("call SetInputEventFilter return %{public}d.", ret);
+        MMI_LOGE("call AddInputEventFilter return %{public}d.", ret);
         return RET_ERR;
     }
 

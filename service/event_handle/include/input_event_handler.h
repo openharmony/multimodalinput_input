@@ -37,7 +37,7 @@ public:
     void RegistnotifyDeviceChange(NotifyDeviceChange cb);
     int32_t OnMouseEventTimerHanler(std::shared_ptr<OHOS::MMI::PointerEvent> mouse_event);
     UDSServer *GetUDSServer();
-    int32_t SetInputEventFilter(sptr<IEventFilter> filter);
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
 protected:
     int32_t OnEventDeviceAdded(multimodal_libinput_event& event);
     int32_t OnEventDeviceRemoved(multimodal_libinput_event& event);

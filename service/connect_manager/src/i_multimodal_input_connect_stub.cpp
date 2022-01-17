@@ -92,7 +92,7 @@ int32_t IMultimodalInputConnectStub::StubSetInputEventFilter(MessageParcel& data
             break;
         }
 
-        ret = SetInputEventFilter(filter);
+        ret = AddInputEventFilter(filter);
     } while (0);
     
     reply.WriteInt32(ret);
