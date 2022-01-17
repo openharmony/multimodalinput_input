@@ -29,7 +29,7 @@ public:
     virtual ~EventFilterStub() = default;
     int OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& options) override;
 protected:
-    bool StubHandlePointerEvent(MessageParcel& data, MessageParcel& reply);
+    int32_t StubHandlePointerEvent(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace MMI
 } // namespace OHOS
