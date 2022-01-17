@@ -53,7 +53,7 @@ int32_t EventFilterStub::StubHandlePointerEvent(MessageParcel& data, MessageParc
     std::shared_ptr<PointerEvent> event = PointerEvent::Create();
     if (event == nullptr) {
         MMI_LOGE("event is nullptr.");
-        return NULL_POINTER;
+        return RET_ERR;
     }
 
     if (!event->ReadFromParcel(data)) {
