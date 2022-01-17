@@ -58,8 +58,8 @@ int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programN
 
 int32_t MultimodalInputConnectService::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    MMI_LOGI("enter, this code is discarded, and it runs with Weston");
-    return RET_ERR; 
+    MMI_LOGF("enter, this code is discarded, and it runs with Weston");
+    return RET_ERR;
 }
 
 MultimodalInputConnectService::MultimodalInputConnectService()
