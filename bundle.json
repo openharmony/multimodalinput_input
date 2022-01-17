@@ -3,6 +3,9 @@
   "description": "Provide input capabilities",
   "version": "3.1",
   "license": "Apache License 2.0",
+  "segment": {
+    "destPath": "foundation/multimodalinput/input/"
+  },
   "component": {
     "name": "multimodalinput_base",
     "subsystem": "multimodalinput",
