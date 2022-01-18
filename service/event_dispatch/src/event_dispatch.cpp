@@ -15,6 +15,7 @@
 
 #include "event_dispatch.h"
 #include <inttypes.h>
+#include "input-event-codes.h"
 #include "ability_launch_manager.h"
 #include "event_filter_wrap.h"
 #include "input_event_data_transformation.h"
