@@ -374,7 +374,7 @@ int32_t OHOS::MMI::ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetP
         NetPacket pktAck(MmiMessageId::GET_MMI_INFO_ACK);
         pktAck << tagPackHeadAck;
         if (!udsServer_->SendMsg(fd, pktAck)) {
-            MMI_LOGE("Sending message failed !\n");
+            MMI_LOGE("Sending message failed ");
             return MSG_SEND_FAIL;
         }
     }
@@ -481,7 +481,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
         NetPacket pkt2(MmiMessageId::ON_KEY);
         pkt2 << key << appInfo.abilityId << focusId << appInfo.fd << key.time;
         if (!udsServer_->SendMsg(appInfo.fd, pkt2)) {
-            MMI_LOGE("Sending structure of EventKeyboard failed!\n");
+            MMI_LOGE("Sending structure of EventKeyboard failed");
             return MSG_SEND_FAIL;
         }
     }
@@ -714,7 +714,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnGetDeviceIdList(SessionPtr sess, NetPacke
             CHKR(pkt2.Write(it), STREAM_BUF_WRITE_FAIL, RET_ERR);
         }
         if (!sess->SendMsg(pkt2)) {
-            MMI_LOGE("Sending structure of OnGetDeviceInfo failed!\n");
+            MMI_LOGE("Sending structure of OnGetDeviceInfo failed");
         }
         return RET_OK;
     });
@@ -729,7 +729,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnGetDeviceIdList(SessionPtr sess, NetPacke
         CHKR(pkt2.Write(it), STREAM_BUF_WRITE_FAIL, RET_ERR);
     }
     if (!sess->SendMsg(pkt2)) {
-        MMI_LOGE("Sending structure of OnGetDeviceInfo failed!\n");
+        MMI_LOGE("Sending structure of OnGetDeviceInfo failed");
         return MSG_SEND_FAIL;
     }
 #endif
@@ -738,7 +738,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnGetDeviceIdList(SessionPtr sess, NetPacke
 
 int32_t OHOS::MMI::ServerMsgHandler::OnGetDeviceInfo(SessionPtr sess, NetPacket& pkt)
 {
-    MMI_LOGE("Sending structure of OnGetDeviceInfo enter!\n");
+    MMI_LOGE("Sending structure of OnGetDeviceInfo enter");
     int32_t taskId = 0;
     int deviceId = 0;
     CHKR(pkt.Read(taskId), STREAM_BUF_READ_FAIL, RET_ERR);
@@ -758,7 +758,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnGetDeviceInfo(SessionPtr sess, NetPacket&
             CHKR(pkt2.Write(name), STREAM_BUF_WRITE_FAIL, RET_ERR);
             CHKR(pkt2.Write(deviceType), STREAM_BUF_WRITE_FAIL, RET_ERR);
             if (!sess->SendMsg(pkt2)) {
-                MMI_LOGE("Sending structure of OnGetDeviceInfo failed!\n");
+                MMI_LOGE("Sending structure of OnGetDeviceInfo failed");
             }
             return RET_OK;
         }
@@ -772,9 +772,9 @@ int32_t OHOS::MMI::ServerMsgHandler::OnGetDeviceInfo(SessionPtr sess, NetPacket&
         CHKR(pkt2.Write(name), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt2.Write(deviceType), STREAM_BUF_WRITE_FAIL, RET_ERR);
         if (!sess->SendMsg(pkt2)) {
-            MMI_LOGE("Sending structure of OnGetDeviceInfo failed!\n");
+            MMI_LOGE("Sending structure of OnGetDeviceInfo failed");
         }
-        MMI_LOGE("Sending structure of OnGetDeviceInfo success!\n");
+        MMI_LOGE("Sending structure of OnGetDeviceInfo success");
         return RET_OK;
     });
 #else
@@ -789,7 +789,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnGetDeviceInfo(SessionPtr sess, NetPacket&
         CHKR(pkt2.Write(name), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt2.Write(deviceType), STREAM_BUF_WRITE_FAIL, RET_ERR);
         if (!sess->SendMsg(pkt2)) {
-            MMI_LOGE("Sending structure of OnGetDeviceInfo failed!\n");
+            MMI_LOGE("Sending structure of OnGetDeviceInfo failed");
             return MSG_SEND_FAIL;
         }
         return RET_OK;
@@ -802,7 +802,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnGetDeviceInfo(SessionPtr sess, NetPacket&
     CHKR(pkt2.Write(name), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pkt2.Write(deviceType), STREAM_BUF_WRITE_FAIL, RET_ERR);
     if (!sess->SendMsg(pkt2)) {
-        MMI_LOGE("Sending structure of OnGetDeviceInfo failed!\n");
+        MMI_LOGE("Sending structure of OnGetDeviceInfo failed");
         return MSG_SEND_FAIL;
     }
 #endif

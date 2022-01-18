@@ -585,7 +585,7 @@ int32_t EventPackage::PackagePointerEvent(multimodal_libinput_event &ev,
         }
         default: {
             ret = RET_ERR;
-            MMI_LOGE("Unknown event_type of pointer class has been reported!\n");
+            MMI_LOGE("Unknown event_type of pointer class has been reported");
             break;
         }
     }
