@@ -27,18 +27,18 @@ void InputDeviceManager::Init(weston_compositor* wc)
     if (initFlag_) {
         return;
     }
-    //constexpr int32_t size = 32;
-    //void* devices[size] = {0};
-    // weston_get_device_info(wc, size, devices);
-    // for (int32_t i = 0; i < size; i++) {
-    //     struct libinput_device* item = static_cast<struct libinput_device*>(devices[i]);
-    //     if (item == NULL) {
-    //         continue;
-    //     }
-    //     inputDeviceMap_.insert(std::pair<int32_t, libinput_device*>(nextId_,
-    //         static_cast<struct libinput_device*>(devices[i])));
-    //     nextId_++;
-    // }
+    constexpr int32_t size = 32;
+    void* devices[size] = {0};
+    weston_get_device_info(wc, size, devices);
+    for (int32_t i = 0; i < size; i++) {
+        struct libinput_device* item = static_cast<struct libinput_device*>(devices[i]);
+        if (item == NULL) {
+            continue;
+        }
+        inputDeviceMap_.insert(std::pair<int32_t, libinput_device*>(nextId_,
+            static_cast<struct libinput_device*>(devices[i])));
+        nextId_++;
+    }
     initFlag_ = true;
 }
 
