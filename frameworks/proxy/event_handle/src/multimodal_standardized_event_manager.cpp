@@ -140,17 +140,17 @@ int32_t MultimodalStandardizedEventManager::UnSubscribeKeyEvent(int32_t subscrib
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEvent& event)
 {
-    MMI_LOGT("\nMultimodalStandardizedEventManagerkey::OnKey\n");
+    MMI_LOGT("MultimodalStandardizedEventManagerkey::OnKey");
 #ifdef DEBUG_CODE_TEST
     if (event.GetDeviceUdevTags() == HOS_VIRTUAL_KEYBOARD) {
-        MMI_LOGT("Inject keyCode = %{public}d,action = %{public}d,revPid = %{public}d",
+        MMI_LOGT("Inject, keyCode=%{public}d, action=%{public}d, revPid=%{public}d",
             event.GetKeyCode(), event.IsKeyDown(), GetPid());
     }
 #endif
     auto range = mapEvents_.equal_range(MmiMessageId::KEY_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.windowId == event.GetWindowID() && i->second.eventCallBack->OnKey(event) == false) {
-            MMI_LOGW("\n OnKey Event consumption failed...errCode:%{public}d\n", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnKey Event consumption failed. errCode:%{public}d", EVENT_CONSUM_FAIL);
             break;
         }
     }
