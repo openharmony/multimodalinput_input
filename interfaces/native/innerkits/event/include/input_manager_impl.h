@@ -44,13 +44,9 @@ public:
     int32_t PackDisplayData(NetPacket &ckt);
 
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
+    int32_t AddMontior(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
+    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> consumer);
     void RemoveMonitor(int32_t monitorId);
-
-    int32_t AddInputEventTouchpadMontior(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
-    void RemoveInputEventTouchpadMontior(int32_t monitorId);
-
-    int32_t AddMonitor2(std::shared_ptr<IInputEventConsumer> consumer);
-    void RemoveMonitor2(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
 
     int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
