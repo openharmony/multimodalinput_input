@@ -1051,13 +1051,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_001, TestSize.Level1)
 
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
-    int32_t id1 = InputManager::GetInstance()->AddMonitor2(callBackPtr);
+    int32_t id1 = InputManager::GetInstance()->AddMonitor(callBackPtr);
     EXPECT_TRUE(id1 >= InputHandlerManager::MIN_HANDLER_ID);
 
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
-    InputManager::GetInstance()->RemoveMonitor2(id1);
+    InputManager::GetInstance()->RemoveMonitor(id1);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -1066,7 +1066,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_002, TestSize.Level1)
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
 
-    int32_t id1 = InputManager::GetInstance()->AddMonitor2(callBackPtr);
+    int32_t id1 = InputManager::GetInstance()->AddMonitor(callBackPtr);
     EXPECT_TRUE(id1 >= InputHandlerManager::MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
@@ -1076,7 +1076,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_002, TestSize.Level1)
     };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 
-    InputManager::GetInstance()->RemoveMonitor2(id1);
+    InputManager::GetInstance()->RemoveMonitor(id1);
 
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
@@ -1091,7 +1091,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
         cbs[i] = InputEventCallback::GetPtr();
         EXPECT_TRUE(cbs[i] != nullptr);
-        ids[i] = InputManager::GetInstance()->AddMonitor2(cbs[i]);
+        ids[i] = InputManager::GetInstance()->AddMonitor(cbs[i]);
         EXPECT_TRUE(ids[i] >= InputHandlerManager::MIN_HANDLER_ID);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
@@ -1120,7 +1120,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
     EXPECT_TRUE(rLogs.size() >= N_TEST_CASES);
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
-        InputManager::GetInstance()->RemoveMonitor2(ids[i]);
+        InputManager::GetInstance()->RemoveMonitor(ids[i]);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
@@ -1139,12 +1139,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_004, TestSize.Level1)
     EXPECT_TRUE(cb != nullptr);
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
-        ids[i] = InputManager::GetInstance()->AddMonitor2(cb);
+        ids[i] = InputManager::GetInstance()->AddMonitor(cb);
         EXPECT_TRUE(ids[i] >= InputHandlerManager::MIN_HANDLER_ID);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor2(cb);
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
     EXPECT_TRUE(monitorId < InputHandlerManager::MIN_HANDLER_ID);
 
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
@@ -1152,7 +1152,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_004, TestSize.Level1)
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
         if (ids[i] >= InputHandlerManager::MIN_HANDLER_ID) {
-            InputManager::GetInstance()->RemoveMonitor2(ids[i]);
+            InputManager::GetInstance()->RemoveMonitor(ids[i]);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
         }
     }
@@ -1163,7 +1163,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_005, TestSize.Level1)
     RunShellUtil runCommand;
     std::shared_ptr<InputEventCallback> cb = InputEventCallback::GetPtr();
     EXPECT_TRUE(cb != nullptr);
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor2(cb);
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
     EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
@@ -1174,7 +1174,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_005, TestSize.Level1)
     TestMarkConsumedStep5();
 
     if (monitorId >= InputHandlerManager::MIN_HANDLER_ID) {
-        InputManager::GetInstance()->RemoveMonitor2(monitorId);
+        InputManager::GetInstance()->RemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
@@ -1184,7 +1184,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_006, TestSize.Level1)
     RunShellUtil runCommand;
     std::shared_ptr<InputEventCallback> cb = InputEventCallback::GetPtr();
     EXPECT_TRUE(cb != nullptr);
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor2(cb);
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
     EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
@@ -1194,7 +1194,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_006, TestSize.Level1)
     TestMarkConsumedStep6();
 
     if (monitorId >= InputHandlerManager::MIN_HANDLER_ID) {
-        InputManager::GetInstance()->RemoveMonitor2(monitorId);
+        InputManager::GetInstance()->RemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
@@ -1996,7 +1996,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
     int32_t monitorId { };
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
-    monitorId = InputManager::GetInstance()->AddMonitor2(callBackPtr);
+    monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
     EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
@@ -2006,7 +2006,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
-    InputManager::GetInstance()->RemoveMonitor2(monitorId);
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -2033,7 +2033,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
     int32_t monitorId { };
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
-    monitorId = InputManager::GetInstance()->AddMonitor2(callBackPtr);
+    monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
     EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
@@ -2043,7 +2043,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
-    InputManager::GetInstance()->RemoveMonitor2(monitorId);
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -2070,7 +2070,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
     int32_t monitorId { };
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
-    monitorId = InputManager::GetInstance()->AddMonitor2(callBackPtr);
+    monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
     EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
@@ -2080,7 +2080,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
-    InputManager::GetInstance()->RemoveMonitor2(monitorId);
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -2107,7 +2107,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
-        ids[i] = InputManager::GetInstance()->AddMonitor2(callBackPtr);
+        ids[i] = InputManager::GetInstance()->AddMonitor(callBackPtr);
         EXPECT_TRUE(ids[i] >= InputHandlerManager::MIN_HANDLER_ID);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
@@ -2134,7 +2134,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
     EXPECT_TRUE(rLogs.size() >= N_TEST_CASES);
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
-        InputManager::GetInstance()->RemoveMonitor2(ids[i]);
+        InputManager::GetInstance()->RemoveMonitor(ids[i]);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
@@ -2165,7 +2165,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
     int32_t monitorId { };
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
-    monitorId = InputManager::GetInstance()->AddMonitor2(callBackPtr);
+    monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
     EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
@@ -2175,7 +2175,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
-    InputManager::GetInstance()->RemoveMonitor2(monitorId);
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -2183,7 +2183,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize
 {
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId { InputManager::GetInstance()->AddMonitor2(callBackPtr) };
+    int32_t monitorId { InputManager::GetInstance()->AddMonitor(callBackPtr) };
     EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
@@ -2215,7 +2215,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
-    InputManager::GetInstance()->RemoveMonitor2(monitorId);
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -2223,7 +2223,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize
 {
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId { InputManager::GetInstance()->AddMonitor2(callBackPtr) };
+    int32_t monitorId { InputManager::GetInstance()->AddMonitor(callBackPtr) };
     EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
@@ -2255,7 +2255,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
-    InputManager::GetInstance()->RemoveMonitor2(monitorId);
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -2263,7 +2263,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize
 {
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId { InputManager::GetInstance()->AddMonitor2(callBackPtr) };
+    int32_t monitorId { InputManager::GetInstance()->AddMonitor(callBackPtr) };
     EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
@@ -2295,7 +2295,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
-    InputManager::GetInstance()->RemoveMonitor2(monitorId);
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -2303,7 +2303,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
 {
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId { InputManager::GetInstance()->AddMonitor2(callBackPtr) };
+    int32_t monitorId { InputManager::GetInstance()->AddMonitor(callBackPtr) };
     EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
@@ -2351,7 +2351,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
-    InputManager::GetInstance()->RemoveMonitor2(monitorId);
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -2394,7 +2394,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1
 
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
-    int32_t id1 = InputManager::GetInstance()->AddMonitor2(callBackPtr);
+    int32_t id1 = InputManager::GetInstance()->AddMonitor(callBackPtr);
     EXPECT_TRUE(id1 >= 1);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
@@ -2404,7 +2404,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1
     if (!addItem.empty() && !addLogs.empty()) {
         EXPECT_TRUE(addItem.back() != addLogs.back());
     }
-    InputManager::GetInstance()->RemoveMonitor2(id1);
+    InputManager::GetInstance()->RemoveMonitor(id1);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -2414,7 +2414,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
 
-    int32_t id1 = InputManager::GetInstance()->AddMonitor2(callBackPtr);
+    int32_t id1 = InputManager::GetInstance()->AddMonitor(callBackPtr);
     EXPECT_TRUE(id1 >= 1);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
@@ -2425,7 +2425,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1
     std::vector<std::string> removeLogs;
     ASSERT_TRUE(runCommand.RunShellCommand(removeCmd, removeLogs) == RET_OK);
 
-    InputManager::GetInstance()->RemoveMonitor2(id1);
+    InputManager::GetInstance()->RemoveMonitor(id1);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     std::vector<std::string> removeItem;
@@ -2450,12 +2450,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1
     EXPECT_TRUE(cb != nullptr);
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
-        ids[i] = InputManager::GetInstance()->AddMonitor2(cb);
+        ids[i] = InputManager::GetInstance()->AddMonitor(cb);
         EXPECT_TRUE(ids[i] >= InputHandlerManager::MIN_HANDLER_ID);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor2(cb);
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
     EXPECT_TRUE(monitorId < InputHandlerManager::MIN_HANDLER_ID);
 
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
@@ -2463,7 +2463,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
         if (ids[i] >= InputHandlerManager::MIN_HANDLER_ID) {
-            InputManager::GetInstance()->RemoveMonitor2(ids[i]);
+            InputManager::GetInstance()->RemoveMonitor(ids[i]);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
         }
     }
@@ -2473,7 +2473,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
 {
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
-    int32_t id1 = InputManager::GetInstance()->AddMonitor2(callBackPtr);
+    int32_t id1 = InputManager::GetInstance()->AddMonitor(callBackPtr);
     EXPECT_TRUE(id1 >= 1);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
@@ -2496,7 +2496,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
     if (!addItem.empty() && !addLogs.empty()) {
         EXPECT_TRUE(addItem.back() != addLogs.back());
     }
-    InputManager::GetInstance()->RemoveMonitor2(id1);
+    InputManager::GetInstance()->RemoveMonitor(id1);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 }
