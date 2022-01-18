@@ -14,6 +14,7 @@
  */
 
 #include "uds_session.h"
+#include <algorithm>
 #include <sstream>
 #include <fcntl.h>
 #include <inttypes.h>
