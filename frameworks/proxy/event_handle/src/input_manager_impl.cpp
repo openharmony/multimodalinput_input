@@ -33,7 +33,7 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN,
 constexpr int32_t MASK_KEY = 1;
 constexpr int32_t MASK_TOUCH = 2;
 constexpr int32_t MASK_TOUCHPAD = 3;
-constexpr int32_t MASK_MOUSE = 4;
+constexpr int32_t ADD_MASK_BASE = 10;
 
 void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
     const std::vector<LogicalDisplayInfo> &logicalDisplays)
@@ -227,7 +227,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
         return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
     int32_t monitorId = IEMManager.AddInputEventMontior(monitor);
-    monitorId = monitorId * 10 + MASK_KEY;
+    monitorId = monitorId * ADD_MASK_BASE + MASK_KEY;
     return monitorId;
 }
 
@@ -238,37 +238,35 @@ int32_t InputManagerImpl::AddMontior(std::function<void(std::shared_ptr<PointerE
         return InputEventMonitorManager::INVALID_MONITOR_ID;
     }
     int32_t monitorId = IEMManager.AddInputEventTouchpadMontior(monitor);
-    monitorId = monitorId * 10 + MASK_TOUCHPAD;
+    monitorId = monitorId * ADD_MASK_BASE + MASK_TOUCHPAD;
     return monitorId;
 }
 
 int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
 {
     int32_t monitorId = InputMonitorManager::GetInstance().AddMonitor(consumer);
-    monitorId = monitorId * 10 + MASK_TOUCH;
+    monitorId = monitorId * ADD_MASK_BASE + MASK_TOUCH;
     return monitorId;
 }
 
 void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 {
-    int32_t mask = monitorId % 10;
-    monitorId /= 10;
+    int32_t mask = monitorId % ADD_MASK_BASE;
+    monitorId /= ADD_MASK_BASE;
 
-    switch (mask)
-    {
-    case MASK_KEY:
-        IEMManager.RemoveInputEventMontior(monitorId);
-        break;
-    case MASK_TOUCH:
-        InputMonitorManager::GetInstance().RemoveMonitor(monitorId);
-        break;
-    case MASK_TOUCHPAD:
-        IEMManager.RemoveInputEventTouchpadMontior(monitorId);
-        break;
-    case MASK_MOUSE:
-        break;
-    default:
-        break;
+    switch (mask) {
+        case MASK_KEY:
+            IEMManager.RemoveInputEventMontior(monitorId);
+            break;
+        case MASK_TOUCH:
+            InputMonitorManager::GetInstance().RemoveMonitor(monitorId);
+            break;
+        case MASK_TOUCHPAD:
+            IEMManager.RemoveInputEventTouchpadMontior(monitorId);
+            break;
+        default:
+        MMI_LOGE("Can't find the mask,mask%{public}d", mask);
+            break;
     }    
 }
 
