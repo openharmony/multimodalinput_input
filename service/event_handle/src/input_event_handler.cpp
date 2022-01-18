@@ -435,10 +435,11 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event *event)
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyBoard, *udsServer_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
+        MMI_LOGD("The same event occurs on multiple devices, ret:%{puiblic}d", packageResult);
         return RET_OK;
     }
     if (packageResult != RET_OK) {
-        MMI_LOGE("Key event package failed... ret:%{public}d errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
+        MMI_LOGE("Key event package failed. ret:%{public}d, errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
 
@@ -454,15 +455,15 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event *event)
     }
     keyBoard.key = static_cast<uint32_t>(hosKey.keyValueOfHos);
     if (EventPackage::KeyboardToKeyEvent(keyBoard, keyEvent, *udsServer_) == RET_ERR) {
-        MMI_LOGE("on OnKeyboardEvent translate key event error!\n");
+        MMI_LOGE("On the OnKeyboardEvent translate key event error!");
         return RET_ERR;
     }
     if (AbilityMgr->CheckLaunchAbility(keyEvent)) {
-        MMI_LOGD("key event start launch an ability, keyCode : %{puiblic}d", keyBoard.key);
+        MMI_LOGD("Key event start launch an ability, keyCode:%{puiblic}d", keyBoard.key);
         return RET_OK;
     }
     if (KeyEventInputSubscribeFlt.FilterSubscribeKeyEvent(*udsServer_, keyEvent)) {
-        MMI_LOGD("subscribe key event filter success. keyCode=%{puiblic}d", keyBoard.key);
+        MMI_LOGD("Subscribe key event filter success. keyCode=%{puiblic}d", keyBoard.key);
         return RET_OK;
     }
     auto device = libinput_event_get_device(event);
@@ -470,7 +471,7 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event *event)
 
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Key event dispatch failed... ret:%{public}d errCode:%{public}d",
+        MMI_LOGE("Key event dispatch failed. ret:%{public}d, errCode:%{public}d",
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
@@ -488,15 +489,16 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKeyboard(multimodal_libinput_event 
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageKeyEvent(ev.event, keyBoard, *udsServer_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
+        MMI_LOGD("The same event occurs on multiple devices, ret:%{puiblic}d", packageResult);
         return RET_OK;
     }
     if (packageResult != RET_OK) {
-        MMI_LOGE("Key event package failed... ret:%{public}d errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
+        MMI_LOGE("Key event package failed. ret:%{public}d, errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
 #ifndef OHOS_WESTEN_MODEL
     if (ServerKeyFilter->OnKeyEvent(keyBoard)) {
-        MMI_LOGD("key event filter find a  key event from Original event  keyCode : %{puiblic}d", keyBoard.key);
+        MMI_LOGD("Key event filter find a key event from Original event, keyCode:%{puiblic}d", keyBoard.key);
         return RET_OK;
     }
     (void)OnKeyboardEvent(ev.event);
@@ -510,7 +512,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKeyboard(multimodal_libinput_event 
     auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, hosKey, keyBoard,
                                                                preHandlerTime);
     if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Key event dispatch failed... ret:%{public}d errCode:%{public}d",
+        MMI_LOGE("Key event dispatch failed. ret:%{public}d, errCode:%{public}d",
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }

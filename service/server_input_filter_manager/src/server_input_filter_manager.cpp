@@ -79,9 +79,9 @@ void ServerInputFilterManager::KeyEventFilter::SetAuthority(Authority authority)
 
 bool ServerInputFilterManager::OnKeyEvent(EventKeyboard key)
 {
-    MMI_LOGD("key event filter on key event begin");
+    MMI_LOGD("Key event filter on key event begin");
     if (keyEventFilterMap_.size() == 0) {
-        MMI_LOGD("keyEventFilterMap_ size is zero");
+        MMI_LOGD("The keyEventFilterMap_ size is zero");
         return false;
     }
     SessionPtr temp;
@@ -95,20 +95,20 @@ bool ServerInputFilterManager::OnKeyEvent(EventKeyboard key)
         }
     }
     if (temp == nullptr) {
-        MMI_LOGD("session  is nullptr");
+        MMI_LOGD("Session is nullptr");
         return false;
     }
     if (id == 0) {
-        MMI_LOGD("send msg  id is 0");
+        MMI_LOGD("Send msg id is 0");
         return false;
     }
     NetPacket newPkt(MmiMessageId::KEY_EVENT_INTERCEPTOR);
     newPkt << key << id;
     if (!temp->SendMsg(newPkt)) {
-        MMI_LOGE("Sending structure of EventKeyboard failed! \n");
+        MMI_LOGE("Sending structure of EventKeyboard failed!");
         return false;
     }
-    MMI_LOGD("key event filter on key event end");
+    MMI_LOGD("Key event filter on key event end");
     return true;
 }
 

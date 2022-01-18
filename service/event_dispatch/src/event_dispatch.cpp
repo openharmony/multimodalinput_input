@@ -139,9 +139,9 @@ int32_t OHOS::MMI::EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, OH
 
     for (const auto& fd : fds) {
         auto appInfo = AppRegs->FindBySocketFd(fd);
-        MMI_LOGT("\nevent dispatcher of server:\n RegisteredEvent:devicePhys=%{public}s;"
-                 "deviceType=%{public}u;eventType=%{public}u;occurredTime=%{public}" PRId64 ";"
-                 "conbinecode=%{public}d;fd=%{public}d;\n",
+        MMI_LOGT("Event dispatcher of server:RegisteredEvent:devicePhys=%{public}s, "
+                 "deviceType=%{public}u, eventType=%{public}u, occurredTime=%{public}" PRId64 ", "
+                 "conbinecode=%{public}d, fd=%{public}d",
                  registeredEvent.devicePhys, registeredEvent.deviceType,
                  registeredEvent.eventType, registeredEvent.occurredTime,
                  idMsg, fd);
@@ -164,41 +164,41 @@ int32_t OHOS::MMI::EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSS
     RegisteredEvent eve = {};
     auto result = eventPackage_.PackageRegisteredEvent<EventKeyboard>(eve, key);
     if (result != RET_OK) {
-        MMI_LOGE("Registered event package failed, ret:%{public}d errCode:%{public}d", result, REG_EVENT_PKG_FAIL);
+        MMI_LOGE("Registered event package failed, ret:%{public}d, errCode:%{public}d", result, REG_EVENT_PKG_FAIL);
         return RET_ERR;
     }
     if ((key.key == KEY_ENTER || key.key == KEY_KPENTER) && (key.state == KEY_STATE_PRESSED)) {
         ret1 = DispatchRegEvent(MmiMessageId::ON_SEND, udsServer, eve, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret1 != RET_OK) {
-            MMI_LOGW("Dispatching ON_SEND event has failed, return:%{public}d errCode:%{public}d", ret1,
+            MMI_LOGW("Dispatching ON_SEND event has failed, ret:%{public}d, errCode:%{public}d", ret1,
                 SPCL_REG_EVENT_DISP_FAIL);
         }
         ret2 = DispatchRegEvent(MmiMessageId::ON_ENTER, udsServer, eve, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret2 != RET_OK) {
-            MMI_LOGW("Dispatching ON_ENTER event has failed, return:%{public}d errCode:%{public}d", ret2,
+            MMI_LOGW("Dispatching ON_ENTER event has failed, ret:%{public}d, errCode:%{public}d", ret2,
                 SPCL_REG_EVENT_DISP_FAIL);
         }
     } else if (key.key == KEY_ESC && key.state == KEY_STATE_PRESSED) {
         ret1 = DispatchRegEvent(MmiMessageId::ON_CANCEL, udsServer, eve, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret1 != RET_OK) {
-            MMI_LOGW("Dispatching ON_CANCEL event has failed, return:%{public}d errCode:%{public}d", ret1,
+            MMI_LOGW("Dispatching ON_CANCEL event has failed, ret:%{public}d, errCode:%{public}d", ret1,
                 SPCL_REG_EVENT_DISP_FAIL);
         }
         ret2 = DispatchRegEvent(MmiMessageId::ON_BACK, udsServer, eve, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret2 != RET_OK) {
-            MMI_LOGW("Dispatching ON_BACK event has failed, return:%{public}d errCode:%{public}d", ret2,
+            MMI_LOGW("Dispatching ON_BACK event has failed, ret:%{public}d, errCode:%{public}d", ret2,
                 SPCL_REG_EVENT_DISP_FAIL);
         }
     } else if (key.key == KEY_BACK && key.state == KEY_STATE_PRESSED) {
         ret1 = DispatchRegEvent(MmiMessageId::ON_CLOSE_PAGE, udsServer,
                                 eve, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret1 != RET_OK) {
-            MMI_LOGW("Dispatching ON_CLOSE_PAGE event has failed, return:%{public}d errCode:%{public}d", ret1,
+            MMI_LOGW("Dispatching ON_CLOSE_PAGE event has failed, ret:%{public}d, errCode:%{public}d", ret1,
                 SPCL_REG_EVENT_DISP_FAIL);
         }
         ret2 = DispatchRegEvent(MmiMessageId::ON_BACK, udsServer, eve, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret2 != RET_OK) {
-            MMI_LOGW("Dispatching ON_BACK event has failed, return:%{public}d errCode:%{public}d", ret2,
+            MMI_LOGW("Dispatching ON_BACK event has failed, ret:%{public}d, errCode:%{public}d", ret2,
                 SPCL_REG_EVENT_DISP_FAIL);
         }
     }
@@ -745,11 +745,11 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
 {
     MMI_LOGD("DispatchKeyEventByPid begin");
     if (AbilityMgr->CheckLaunchAbility(key)) {
-        MMI_LOGD("keyEvent start launch an ability, keyCode=%{public}d", key->GetKeyCode());
+        MMI_LOGD("The keyEvent start launch an ability, keyCode=%{public}d", key->GetKeyCode());
         return RET_OK;
     }
     if (KeyEventInputSubscribeFlt.FilterSubscribeKeyEvent(udsServer, key)) {
-        MMI_LOGD("subscribe keyEvent filter success. keyCode=%{public}d", key->GetKeyCode());
+        MMI_LOGD("Subscribe keyEvent filter success. keyCode=%{public}d", key->GetKeyCode());
         return RET_OK;
     }
     auto fd = WinMgr->UpdateTarget(key);
@@ -759,10 +759,10 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
     PrintWMSInfo(str, fd, 0, key->GetTargetWindowId());
 #endif
 
-    MMI_LOGT("\n4.event dispatcher of server:\nKeyEvent:,KeyCode = %{public}d,"
-             "ActionTime = %{public}d,Action = %{public}d,ActionStartTime = %{public}d,"
-             "EventType = %{public}d,Flag = %{public}d,"
-             "KeyAction = %{public}d,Fd = %{public}d,PreHandlerTime = %{public}" PRId64"\n",
+    MMI_LOGT("4.event dispatcher of server:KeyEvent:KeyCode=%{public}d, "
+             "ActionTime=%{public}d, Action=%{public}d, ActionStartTime=%{public}d, "
+             "EventType=%{public}d, Flag=%{public}d, "
+             "KeyAction=%{public}d, Fd=%{public}d, PreHandlerTime=%{public}" PRId64 "",
              key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
              key->GetActionStartTime(),
              key->GetEventType(),
@@ -789,7 +789,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
     InputEventDataTransformation::KeyEventToNetPacket(key, newPkt);
     newPkt << fd << preHandlerTime;
     if (!udsServer.SendMsg(fd, newPkt)) {
-        MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d\n", MSG_SEND_FAIL);
+        MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
     MMI_LOGD("DispatchKeyEventByPid end");
@@ -806,7 +806,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
     int32_t ret = RET_OK;
     ret = KeyBoardRegEveHandler(key, udsServer, event, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
     if (ret != RET_OK) {
-        MMI_LOGE("Special Registered Event dispatch failed return:%{public}d errCode:%{public}d", ret,
+        MMI_LOGE("Special Registered Event dispatch failed, ret:%{public}d, errCode:%{public}d", ret,
             SPCL_REG_EVENT_DISP_FAIL);
     }
     MmiMessageId idMsg = MmiMessageId::INVALID;
@@ -816,12 +816,12 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
         RegisteredEvent registeredEvent = {};
         auto packageResult = eventPackage_.PackageRegisteredEvent<EventKeyboard>(registeredEvent, prevKey);
         if (packageResult != RET_OK) {
-            MMI_LOGE("Registered event package failed... ret:%{public}d errCode:%{public}d",
+            MMI_LOGE("Registered event package failed. ret:%{public}d, errCode:%{public}d",
                 packageResult, REG_EVENT_PKG_FAIL);
         }
         ret = DispatchRegEvent(idMsg, udsServer, registeredEvent, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret != RET_OK) {
-            MMI_LOGE("Registered Event dispatch failed return:%{public}d errCode:%{public}d",
+            MMI_LOGE("Registered Event dispatch failed. ret:%{public}d, errCode:%{public}d",
                 ret, REG_EVENT_DISP_FAIL);
         }
     }
@@ -831,7 +831,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
     }
     auto appInfo = AppRegs->FindByWinId(focusId); // obtain application information for focusId
     if (appInfo.fd == RET_ERR) {
-        MMI_LOGT("Failed to find fd:%{public}d... errCode:%{public}d", focusId, FOCUS_ID_OBTAIN_FAIL);
+        MMI_LOGT("Failed to find, fd:%{public}d. errCode:%{public}d", focusId, FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
     }
     key.key = trs.keyValueOfHos; // struct EventKeyboard tranformed into HOS_L3
@@ -840,11 +840,10 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
     PrintWMSInfo(str, appInfo.fd, appInfo.abilityId, focusId);
 #endif
 
-    MMI_LOGT("\n4.event dispatcher of server:\neventKeyboard:time=%{public}" PRId64 ";deviceType=%{public}u;"
-             "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
-             "unicode=%{public}d;key=%{public}u;key_detail=%{public}s;seat_key_count=%{public}u;"
-             "state=%{public}d;fd=%{public}d;"
-             "preHandlerTime=%{public}" PRId64 ";\n",
+    MMI_LOGT("4.event dispatcher of server:eventKeyboard:time=%{public}" PRId64 ", deviceType=%{public}u, "
+             "deviceName=%{public}s, devicePhys=%{public}s, eventType=%{public}d, "
+             "unicode=%{public}d, key=%{public}u, key_detail=%{public}s, seat_key_count=%{public}u, "
+             "state=%{public}d, fd=%{public}d, preHandlerTime=%{public}" PRId64 "",
              key.time, key.deviceType, key.deviceName, key.devicePhys, key.eventType,
              key.unicode, key.key, trs.keyEvent.c_str(), key.seat_key_count, key.state, appInfo.fd,
              preHandlerTime);
@@ -853,7 +852,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
         NetPacket newPkt(MmiMessageId::ON_KEY);
         newPkt << key << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
         if (!udsServer.SendMsg(appInfo.fd, newPkt)) {
-            MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d\n", MSG_SEND_FAIL);
+            MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
         }
     }
