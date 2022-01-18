@@ -176,7 +176,7 @@ void OHOS::MMI::AbilityLaunchManager::PrintShortcutKey()
 bool OHOS::MMI::AbilityLaunchManager::CheckLaunchAbility(std::shared_ptr<OHOS::MMI::KeyEvent> &key)
 {
     if (CheckShortcutkeyMatch(waitTriggerKey, key)) {
-        MMI_LOGE("the same shortcutkey is waiting timeout");
+        MMI_LOGE("The same shortcutkey is waiting timeout");
         return true;
     }
     timer.Stop();
@@ -187,12 +187,12 @@ bool OHOS::MMI::AbilityLaunchManager::CheckLaunchAbility(std::shared_ptr<OHOS::M
             continue;
         }
         if (shortcutKey.triggerType == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN && shortcutKey.keyDownDuration > 0) {
-            MMI_LOGE("key event matched, start Timer, key = %{public}d, keyAction = %{public}d", key->GetKeyCode(), key->GetKeyAction());
+            MMI_LOGE("Key event matched, start Timer, key=%{public}d, keyAction=%{public}d", key->GetKeyCode(), key->GetKeyAction());
             waitTriggerKey = shortcutKey;
             timer.Start(shortcutKey.keyDownDuration,
                 std::bind(&AbilityLaunchManager::LaunchAbility, this, std::placeholders::_1), shortcutKey);
         } else {
-            MMI_LOGE("start launch ability");
+            MMI_LOGE("Start launch ability");
             LaunchAbility(shortcutKey);
         }
         return true;
@@ -267,13 +267,13 @@ void OHOS::MMI::AbilityLaunchManager::LaunchAbility(ShortcutKey key)
         wParams.SetParam(key, AAFwk::String::Box(value));
     }
     want.SetParams(wParams);
-    MMI_LOGE("start launch ability abilityName %{public}s", key.ability.abilityName.c_str());
+    MMI_LOGE("Start launch ability, abilityName:%{public}s", key.ability.abilityName.c_str());
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (err != ERR_OK) {
-        MMI_LOGE("launchAbility failed abilityName %{public}s err %{public}d", key.ability.abilityName.c_str(), err);
+        MMI_LOGE("LaunchAbility failed, abilityName:%{public}s, err:%{public}d", key.ability.abilityName.c_str(), err);
     }
     ResetWaitTriggerKey(waitTriggerKey);
-    MMI_LOGE("end launch ability abilityName %{public}s", key.ability.abilityName.c_str());
+    MMI_LOGE("End launch ability, abilityName:%{public}s", key.ability.abilityName.c_str());
 }
 
 OHOS::MMI::AbilityLaunchManager::Timer::Timer()

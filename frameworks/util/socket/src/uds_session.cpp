@@ -121,3 +121,8 @@ uint64_t OHOS::MMI::UDSSession::GetFirstEventTime()
     MMI_LOGI("end");
     return events_[0].eventTime;
 }
+
+void OHOS::MMI::UDSSession::ClearEventsVct()
+{
+    std::vector<EventTime>().swap(events_);
+}
