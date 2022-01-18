@@ -166,6 +166,13 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPack
              key->GetActionStartTime(), key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), fd, serverStartTime);
 
+    key->SetProcessedCallback([&client, &key]() {
+        NetPacket ckt(MmiMessageId::NEW_CHECK_REPLY_MESSAGE);
+        auto id = key->GetId();
+        ckt << id;
+        client.SendMsg(ckt);
+    });
+
     InputManagerImpl::GetInstance()->OnKeyEvent(key);
     return RET_OK;
 }
@@ -214,6 +221,14 @@ int32_t OHOS::MMI::ClientMsgHandler::OnPointerEvent(const UDSClient& client, Net
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_LOGD("Operation canceled.");
     }
+
+    pointerEvent->SetProcessedCallback([&client, &pointerEvent]() {
+        NetPacket ckt(MmiMessageId::NEW_CHECK_REPLY_MESSAGE);
+        auto id = pointerEvent->GetId();
+        ckt << id;
+        client.SendMsg(ckt);
+    });
+
     InputManagerImpl::GetInstance()->OnPointerEvent(pointerEvent);
     return RET_OK;
 }
@@ -863,7 +878,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, Ne
     StandardTouchStruct standardTouch = {};
     EventJoyStickAxis eventJoyStickAxis = {};
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EventType::EVENT_MOUSE);
-    CHK(mousePtr, NULL_POINTER);
+    CHK(mousePtr, ERROR_NULL_POINTER);
     pkt >> ret >> pointData >> abilityId >> windowId >> fd >> serverStartTime;
     MMI_LOGT("\nevent dispatcher of client: mouse_data \neventPointer:time=%{public}" PRId64 "; eventType=%{public}d;"
              "buttonCode=%{public}u;deviceType=%{public}u;seat_button_count=%{public}u;"
@@ -964,7 +979,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisJoystickEvent(const UDSClient& client,
     uint64_t serverStartTime = 0;
     MmiPoint mmiPoint;
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EventType::EVENT_MOUSE);
-    CHK(mousePtr, NULL_POINTER);
+    CHK(mousePtr, ERROR_NULL_POINTER);
     pkt >> eventJoyStickData >> abilityId >> windowId >> fd >> serverStartTime;
     MMI_LOGT("\nevent dispatcher of client: "
         "event JoyStick: fd: %{public}d\n", fd);
@@ -996,7 +1011,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client,
     std::string nullUUid = "";
     EventJoyStickAxis eventJoyStickAxis = {};
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EventType::EVENT_MOUSE);
-    CHK(mousePtr, NULL_POINTER);
+    CHK(mousePtr, ERROR_NULL_POINTER);
     pkt >> tabletPad >> abilityId >> windowId >> fd >> serverStartTime;
     MMI_LOGT("\nevent dispatcher of client: event tablet Pad :time=%{public}" PRId64 ";deviceType=%{public}u;"
              "deviceName=%{public}s;eventType=%{public}d;\n"
@@ -1105,10 +1120,10 @@ void OHOS::MMI::ClientMsgHandler::AnalysisStandardTabletToolEvent(NetPacket& pkt
     EventJoyStickAxis eventJoyStickAxis = {};
     MmiPoint mmiPoint;
     auto mousePtr = EventFactory::CreateEvent(EventType::EVENT_MOUSE);
-    CHK(mousePtr, NULL_POINTER);
+    CHK(mousePtr, ERROR_NULL_POINTER);
     auto mouseEvent = reinterpret_cast<MouseEvent*>(mousePtr.GetRefPtr());
     auto stylusPtr = EventFactory::CreateEvent(EventType::EVENT_STYLUS);
-    CHK(stylusPtr, NULL_POINTER);
+    CHK(stylusPtr, ERROR_NULL_POINTER);
     auto stylusEvent = reinterpret_cast<StylusEvent*>(stylusPtr.GetRefPtr());
 
     StandardTouchStruct standardTouchEvent = {};
@@ -1179,7 +1194,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, 
     EventJoyStickAxis eventJoyStickAxis = {};
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EventType::EVENT_MOUSE);
     fingerInfos fingersInfos[FINGER_NUM] = {};
-    CHK(mousePtr, NULL_POINTER);
+    CHK(mousePtr, ERROR_NULL_POINTER);
     pkt >> gesture >> abilityId >> windowId >> fd >> serverStartTime;
     MMI_LOGT("\nevent dispatcher of client: event Gesture :time=%{public}" PRId64 ";"
              "deviceType=%{public}u;deviceName=%{public}s;devNode=%{public}s;eventType=%{public}d;"

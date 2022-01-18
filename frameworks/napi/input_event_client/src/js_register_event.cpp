@@ -785,7 +785,7 @@ namespace OHOS {
             } else if (deviceEventType == STYLUS_EVENT) {
                 HILOG_DEBUG("AppTouchEventHandle::SendEvent: stylusEvent");
                 StylusEvent* stylusEvent = (StylusEvent*)event.GetMultimodalEvent();
-                CHK(stylusEvent, NULL_POINTER);
+                CHK(stylusEvent, ERROR_NULL_POINTER);
                 AddStylusData(env, argv, *stylusEvent);
             }
         }

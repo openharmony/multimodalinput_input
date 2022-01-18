@@ -52,7 +52,7 @@ int32_t OHOS::MMI::UDSClient::ConnectTo()
 
 bool OHOS::MMI::UDSClient::SendMsg(const char *buf, size_t size) const
 {
-    CHKF(buf, OHOS::NULL_POINTER);
+    CHKF(buf, OHOS::ERROR_NULL_POINTER);
     CHKF(size > 0 && size <= MAX_PACKET_BUF_SIZE, PARAM_INPUT_INVALID);
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
     uint64_t ret = write(fd_, static_cast<const void *>(buf), size);
@@ -128,7 +128,7 @@ void OHOS::MMI::UDSClient::Stop()
 
 void OHOS::MMI::UDSClient::OnRecv(const char *buf, size_t size)
 {
-    CHK(buf, NULL_POINTER);
+    CHK(buf, ERROR_NULL_POINTER);
     int32_t readIdx = 0;
     int32_t packSize = 0;
     const auto headSize = static_cast<int32_t>(sizeof(PackHead));

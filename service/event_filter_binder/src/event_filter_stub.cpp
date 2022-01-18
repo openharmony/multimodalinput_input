@@ -47,20 +47,28 @@ int32_t EventFilterStub::OnRemoteRequest(
     }
 }
 
-bool EventFilterStub::StubHandlePointerEvent(MessageParcel& data, MessageParcel& reply)
-{     
+int32_t EventFilterStub::StubHandlePointerEvent(MessageParcel& data, MessageParcel& reply)
+{
+    MMI_LOGT("enter");
     std::shared_ptr<PointerEvent> event = PointerEvent::Create();
     if (event == nullptr) {
         MMI_LOGE("event is nullptr.");
-        return false;
+        return RET_ERR;
     }
 
     if (!event->ReadFromParcel(data)) {
         MMI_LOGE("read data error.");
-        return false;
+        return RET_ERR;
     }
 
-    return HandlePointerEvent(event);
+    bool ret = HandlePointerEvent(event);
+    if (!reply.WriteBool(ret)) {
+        MMI_LOGE("WriteBool(%{public}d) fail", ret);
+        return RET_ERR;
+    }
+
+    MMI_LOGT("leave");
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

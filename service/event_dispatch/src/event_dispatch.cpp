@@ -16,6 +16,7 @@
 #include "event_dispatch.h"
 #include <inttypes.h>
 #include "ability_launch_manager.h"
+#include "event_filter_wrap.h"
 #include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
 #include "input_handler_manager_global.h"
@@ -24,10 +25,9 @@
 #include "outer_interface.h"
 #include "system_event_handler.h"
 #include "util.h"
-#include "event_filter_death_recipient.h"
-
 
 namespace OHOS::MMI {
+constexpr int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
     namespace {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
     }
@@ -214,7 +214,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, l
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
-    CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 #ifdef DEBUG_CODE_TEST
     std::string str = WinMgr->GetSurfaceIdListString();
 #endif
@@ -266,7 +266,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, li
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
-    CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
     auto focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
         return RET_OK;
@@ -349,11 +349,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, 
 
 bool OHOS::MMI::EventDispatch::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point)
 {
-    std::lock_guard<std::mutex> guard(lockInputEventFilter_);
-    if (filter_ != nullptr && filter_->HandlePointerEvent(point)) {
-        return true;
-    }
-    return false;
+    return EventFilterWrap::GetInstance().HandlePointerEventFilter(point);
 }
 
 int32_t OHOS::MMI::EventDispatch::handlePointerEvent(std::shared_ptr<PointerEvent> point) 
@@ -401,6 +397,19 @@ int32_t OHOS::MMI::EventDispatch::handlePointerEvent(std::shared_ptr<PointerEven
         MMI_LOGE("the fd less than 0");
         return RET_ERR;
     }
+
+    auto session = udsServer->GetSession(fd);
+    auto eventId = point->GetId();
+    auto currentTime = GetSysClockTime();
+    session->RecordEvent(eventId, currentTime);
+    auto firstTime = session->GetFirstEventTime();
+    if (currentTime < (firstTime + INPUT_UI_TIMEOUT_TIME)) {
+        MMI_LOGD("The pointer reports normally");
+    }
+    if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME)) {
+        MMI_LOGD("The pointer does not report normally, triggering ANR");
+    }
+
     if (!udsServer->SendMsg(fd, newPacket)) {
         MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d\n", MSG_SEND_FAIL);
         return RET_ERR;
@@ -416,7 +425,7 @@ bool OHOS::MMI::EventDispatch::HandleTouchScreenEvent(std::shared_ptr<PointerEve
 
 bool OHOS::MMI::EventDispatch::HandleMouseEvent(std::shared_ptr<PointerEvent> point)
 {
-    return false;
+    return InputHandlerManagerGlobal::GetInstance().HandleEvent(point);
 }
 
 bool OHOS::MMI::EventDispatch::HandleTouchPadEvent(std::shared_ptr<PointerEvent> point)
@@ -455,7 +464,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
-    CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
 #ifdef DEBUG_CODE_TEST
     std::string strIds = WinMgr->GetSurfaceIdListString();
@@ -535,7 +544,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
-    CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
     MmiMessageId idMsg = MmiMessageId::INVALID;
     MMIRegEvent->OnEventGestureGetSign(gesture, idMsg);
@@ -590,7 +599,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
-    CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
 #ifdef DEBUG_CODE_TEST
     std::string str = WinMgr->GetSurfaceIdListString();
@@ -686,7 +695,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer,
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
     auto type = libinput_event_get_type(event);
-    CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
 #ifdef DEBUG_CODE_TEST
     std::string str = WinMgr->GetSurfaceIdListString();
@@ -744,6 +753,18 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
              key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
 
+    auto session = udsServer.GetSession(fd);
+    auto eventId = key->GetId();
+    auto currentTime = GetSysClockTime();
+    session->RecordEvent(eventId, currentTime);
+    auto firstTime = session->GetFirstEventTime();
+    if (currentTime < (firstTime + INPUT_UI_TIMEOUT_TIME)) {
+        MMI_LOGD("The key event reports normally");
+    }
+    if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME)) {
+        MMI_LOGD("The key event does not report normally, triggering ANR");
+    }
+
     IEMServiceManager.ReportKeyEvent(key);
     NetPacket newPkt(MmiMessageId::ON_KEYEVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, newPkt);
@@ -761,7 +782,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
-    CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
     int32_t ret = RET_OK;
     ret = KeyBoardRegEveHandler(key, udsServer, event, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
@@ -820,27 +841,9 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
     return ret;
 }
 
-int32_t OHOS::MMI::EventDispatch::SetInputEventFilter(sptr<IEventFilter> filter)
+int32_t OHOS::MMI::EventDispatch::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    std::lock_guard<std::mutex> guard(lockInputEventFilter_);
-    filter_ = filter;
-
-    if (filter_ != nullptr) {
-        std::weak_ptr<EventDispatch> weakPtr = shared_from_this();
-        auto deathCallback = [weakPtr](const wptr<IRemoteObject> &object) {
-            auto sharedPtr = weakPtr.lock();
-            if (sharedPtr) {
-                sharedPtr->SetInputEventFilter(nullptr);
-            }
-        };
-
-        eventFilterRecipient_ = new EventFilterDeathRecipient(deathCallback);
-
-        auto client = filter->AsObject().GetRefPtr();
-        client->AddDeathRecipient(eventFilterRecipient_);
-    }
-
-    return RET_OK;
+    return EventFilterWrap::GetInstance().AddInputEventFilter(filter);
 }
 
 int32_t OHOS::MMI::EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_event *event,
@@ -848,7 +851,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, 
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
-    CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
     auto focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {

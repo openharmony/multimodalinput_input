@@ -71,7 +71,7 @@ void InputMonitor::SetCallback(std::function<void(std::shared_ptr<PointerEvent>)
 
 void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    CHK(pointerEvent != nullptr, NULL_POINTER);
+    CHK(pointerEvent != nullptr, ERROR_NULL_POINTER);
     std::function<void(std::shared_ptr<PointerEvent>)> callback;
     {
         std::lock_guard<std::mutex> guard(lk_);
@@ -138,7 +138,7 @@ JsInputMonitor::~JsInputMonitor()
 
 void JsInputMonitor::SetReceiver(napi_value receiver)
 {
-    CHK(receiver != nullptr, NULL_POINTER);
+    CHK(receiver != nullptr, ERROR_NULL_POINTER);
     if (receiver_ == nullptr && jsEnv_ != nullptr) {
         uint32_t refCount = 1;
         auto status = napi_create_reference(jsEnv_, receiver, refCount, &receiver_);
@@ -177,7 +177,7 @@ void JsInputMonitor::MarkConsumed(int32_t eventId)
 
 int32_t JsInputMonitor::IsMatch(napi_env jsEnv, napi_value receiver)
 {
-    CHKR(receiver != nullptr, NULL_POINTER, NAPI_ERR);
+    CHKR(receiver != nullptr, ERROR_NULL_POINTER, NAPI_ERR);
     if (jsEnv_ == jsEnv) {
         bool isEquals = false;
         napi_value handlerTemp = nullptr;
@@ -210,20 +210,20 @@ int32_t JsInputMonitor::IsMatch(napi_env jsEnv)
 
 void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHK(pointerEvent != nullptr, NULL_POINTER);
+    CHK(pointerEvent != nullptr, ERROR_NULL_POINTER);
     CallBackInfo* cb = new CallBackInfo;
-    CHK(cb != nullptr, NULL_POINTER);
+    CHK(cb != nullptr, ERROR_NULL_POINTER);
     cb->handle_ = handle_;
     cb->pointerEvent_ = pointerEvent;
     uv_work_t* work = new uv_work_t;
-    CHK(work != nullptr, NULL_POINTER);
+    CHK(work != nullptr, ERROR_NULL_POINTER);
     uv_loop_s* loop {nullptr};
     auto status = napi_get_uv_event_loop(jsEnv_, &loop);
     if (status != napi_ok) {
         MMI_LOGE("napi_get_uv_event_loop is failed");
         return;
     }
-    CHK(loop != nullptr, NULL_POINTER);
+    CHK(loop != nullptr, ERROR_NULL_POINTER);
     work->data = (void*)cb;
     uv_queue_work(loop,
                   work,
@@ -297,7 +297,7 @@ void JsInputMonitor::OnPointerEventInJsThread(std::shared_ptr<PointerEvent> poin
 
 void JsInputMonitor::printfPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    CHK(pointerEvent != nullptr, NULL_POINTER);
+    CHK(pointerEvent != nullptr, ERROR_NULL_POINTER);
     PointerEvent::PointerItem item;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
     MMI_LOGD("type:%{public}d, timestamp:%{public}d, deviceId:%{public}d,\
@@ -309,7 +309,7 @@ void JsInputMonitor::printfPointerEvent(const std::shared_ptr<PointerEvent> poin
 
 int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
-    CHKR(pointerEvent != nullptr, NULL_POINTER, RET_ERR);
+    CHKR(pointerEvent != nullptr, ERROR_NULL_POINTER, RET_ERR);
     CHKR(SetNamedProperty(jsEnv_, result, "type", pointerEvent->GetSourceType()) == napi_ok,
         CALL_NAPI_API_ERR, RET_ERR);
 
