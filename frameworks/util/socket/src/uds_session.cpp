@@ -125,5 +125,5 @@ uint64_t OHOS::MMI::UDSSession::GetFirstEventTime()
 void OHOS::MMI::UDSSession::ClearEventsVct()
 {
     events_.clear();
-    events_.swap(std::vector());
+    events_.swap(std::vector<EventTime>());
 }
