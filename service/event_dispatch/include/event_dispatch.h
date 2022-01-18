@@ -62,9 +62,9 @@ protected:
         const int32_t fingerCount);
     int32_t GestureRegisteredEventDispatch(const MmiMessageId& idMsg, OHOS::MMI::UDSServer& udsServer,
         RegisteredEvent& registeredEvent, uint64_t preHandlerTime);
-    int32_t RegisteredEventDispatch(const MmiMessageId& idMsg, UDSServer& udsServer,
+    int32_t DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& udsServer,
         RegisteredEvent& eventData, int32_t inputDeviceType, uint64_t preHandlerTime);
-    int32_t KeyBoardRegisteredEventHandler(EventKeyboard& key, UDSServer& udsServer,
+    int32_t KeyBoardRegEveHandler(EventKeyboard& key, UDSServer& udsServer,
         libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime);
 
 protected:
