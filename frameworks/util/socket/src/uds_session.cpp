@@ -44,7 +44,7 @@ OHOS::MMI::UDSSession::~UDSSession()
 
 bool OHOS::MMI::UDSSession::SendMsg(const char *buf, size_t size) const
 {
-    CHKF(buf, OHOS::NULL_POINTER);
+    CHKF(buf, OHOS::ERROR_NULL_POINTER);
     CHKF(size > 0 && size <= MAX_PACKET_BUF_SIZE, PARAM_INPUT_INVALID);
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
     uint64_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
@@ -87,4 +87,37 @@ bool OHOS::MMI::UDSSession::SendMsg(NetPacket& pkt) const
     StreamBuffer buf;
     pkt.MakeData(buf);
     return SendMsg(buf.Data(), buf.Size());
+}
+
+void OHOS::MMI::UDSSession::RecordEvent(int32_t id, uint64_t time)
+{
+    MMI_LOGI("begin");
+    EventTime eventTime = {id, time};
+    events_.push_back(eventTime);
+    MMI_LOGI("end");
+}
+
+void OHOS::MMI::UDSSession::ClearEventList(int32_t id)
+{
+    MMI_LOGI("begin");
+    int32_t count = 0;
+    for (const auto &it : events_) {
+        count++;
+        if (it.id == id) {
+            events_.erase(events_.begin(), events_.begin() + count);
+            MMI_LOGI("Delete events.");
+        }
+    }
+    MMI_LOGI("end");
+}
+
+uint64_t OHOS::MMI::UDSSession::GetFirstEventTime()
+{
+    MMI_LOGI("begin");
+    if (events_.empty()) {
+        MMI_LOGT("events_ is empty");
+        return 0;
+    }
+    MMI_LOGI("end");
+    return events_[0].eventTime;
 }

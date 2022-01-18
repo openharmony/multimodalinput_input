@@ -38,7 +38,7 @@ EventFilterProxy::~EventFilterProxy()
 
 bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> event)
 {
-    MMI_LOGE("enter");
+    MMI_LOGT("enter");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -53,7 +53,7 @@ bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> ev
         return false;
     }
 
-    if (event->WriteToParcel(data)) {
+    if (!event->WriteToParcel(data)) {
         MMI_LOGE("Failed to write event to req");
         return false;
     }
@@ -65,16 +65,16 @@ bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> ev
         return false;
     }
 
-    MMI_LOGE("have recieve message from server");
+    MMI_LOGT("have recieve message from server");
 
-    int result = reply.ReadInt32();
-    MMI_LOGE("result = %{public}d", result);
-    if (result != RET_OK) {
-        MMI_LOGE("responce return error: %{public}d", result);
+    bool result = false;
+    if (!reply.ReadBool(result)) {
+        MMI_LOGE("reply ReadBool fail");
         return false;
     }
 
-    return true;
+    MMI_LOGT("leave");
+    return result;
 }
 } // namespace MMI
 } // namespace OHOS

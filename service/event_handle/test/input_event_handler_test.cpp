@@ -42,7 +42,7 @@ static void LibinputDrainEvents(struct libinput* li)
 
 const static libinput_interface LIBINPUT_INTERFACE = {
     .open_restricted = [](const char* path, int32_t flags, void* user_data)->int32_t {
-        CHKR(path, OHOS::NULL_POINTER, -errno);
+        CHKR(path, OHOS::ERROR_NULL_POINTER, -errno);
         int32_t fd = open(path, flags);
         MMI_LOGD("libinput .open_restricted path:%{public}s fd:%{public}d", path, fd);
         return fd < 0 ? -errno : fd;

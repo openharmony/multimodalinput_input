@@ -53,7 +53,7 @@ const std::map<int32_t, std::string> ERROR_STRING_MAP = {
     {UNPROC_MSG, "Unprocessed Message"},
     {UNKNOWN_MSG_ID, "Unknown Message Id"},
     {UNKNOWN_DEV, "Unknown Device"},
-    {NULL_POINTER, "Null Pointer"},
+    {ERROR_NULL_POINTER, "Null Pointer"},
     {FILE_OPEN_FAIL, "Open File Failed"},
     {FILE_READ_FAIL, "Read File Failed"},
     {FILE_WRITE_FAIL, "Write File Failed"},
