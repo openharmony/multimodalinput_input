@@ -14,7 +14,7 @@
  */
 #ifndef OHOS_STANDARD_EVENT_HANDLER_H
 #define OHOS_STANDARD_EVENT_HANDLER_H
-#include "window_switch.h"
+
 
 namespace OHOS {
 namespace MMI {

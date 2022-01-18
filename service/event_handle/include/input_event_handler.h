@@ -67,7 +67,6 @@ private:
     int32_t OnEventHandler(multimodal_libinput_event& ev);
     std::mutex mu_;
     UDSServer *udsServer_ = nullptr;
-    WindowSwitch winSwitch_;
     EventDispatch eventDispatch_;
     EventPackage eventPackage_;
     KeyEventValueTransformation xkbKeyboardHandlerKey_;

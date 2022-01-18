@@ -20,7 +20,6 @@
 #include "uds_server.h"
 #include "display_info.h"
 #include "input_event.h"
-#include "window_switch.h"
 #include "pointer_event.h"
 
 #ifdef OHOS_WESTEN_MODEL
