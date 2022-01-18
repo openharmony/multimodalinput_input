@@ -616,7 +616,7 @@ HWTEST_F(AppRegisterTest, KeyEventValueTransformation_002, TestSize.Level1)
     const int32_t keyValueOfInput = -1;
 
     valTest = KeyValueTransformationByInput(keyValueOfInput);
-    EXPECT_TRUE(valTest.keyValueOfHos == -1);
+    EXPECT_TRUE(valTest.keyValueOfHos >= 10000);
 }
 
 HWTEST_F(AppRegisterTest, Init_001, TestSize.Level1)
