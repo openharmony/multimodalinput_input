@@ -105,7 +105,7 @@ namespace OHOS {
         TABLETPAD_EVENT_DISP_FAIL,                  // 触控板轴事件派发失败
         TABLETTOOL_EVENT_PKG_FAIL,                  // 触控笔事件封装失败
         TABLETTOOL_EVENT_DISP_FAIL,                 // 触控笔事件派发失败
-        MULTIDEVICE_SAME_EVENT_FAIL,                // 多设备相同事件返回标志
+        MULTIDEVICE_SAME_EVENT_MASK,                // 多设备相同事件返回标志
         GESTURE_EVENT_PKG_FAIL,                     // GESTURE_SWIPE事件封装失败
         STAT_CALL_FAIL,                             // stat函数调用失败
         REG_EVENT_PKG_FAIL,                         // 注册事件封装失败

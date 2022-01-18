@@ -160,7 +160,7 @@ int32_t OHOS::MMI::EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSS
 {
     auto ret1 = RET_OK;
     auto ret2 = RET_OK;
-    RegisteredEvent eve= {};
+    RegisteredEvent eve = {};
     auto result = eventPackage_.PackageRegisteredEvent<EventKeyboard>(eve, key);
     if (result != RET_OK) {
         MMI_LOGE("Registered event package failed, ret:%{public}d errCode:%{public}d", result, REG_EVENT_PKG_FAIL);
@@ -295,7 +295,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, li
 }
 
 int32_t OHOS::MMI::EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, libinput_event *event,
-    EventTabletTool& tableTool, const uint64_t preHandlerTime, WindowSwitch& windowSwitch)
+    EventTabletTool& tableTool, const uint64_t preHandlerTime)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     int32_t focusId = WinMgr->GetFocusSurfaceId(); // obtaining focusId
@@ -451,7 +451,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchTransformPointEvent(UDSServer& ud
 }
 
 int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event *event,
-    EventPointer &point, const uint64_t preHandlerTime, WindowSwitch& windowSwitch)
+    EventPointer &point, const uint64_t preHandlerTime)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
@@ -465,7 +465,6 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
     if (desWindowId < 0) {
         return RET_OK;
     }
-    auto temp = windowSwitch.GetEventPointer();
     // obtain application information for focusId
     auto appInfo = AppRegs->FindByWinId(desWindowId);
     if (appInfo.fd == RET_ERR) {
@@ -473,15 +472,6 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
     }
     StandardTouchStruct inputEvent = {}; // Standardization handler of struct EventPointer
     standardEvent_.StandardTouchEvent(event, inputEvent);
-    if (inputEvent.curRventType > 0 && (point.eventType == LIBINPUT_EVENT_POINTER_MOTION ||
-        point.eventType == LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE)) {
-        point.deviceType = temp.deviceType;
-        point.deviceId = temp.deviceId;
-        CHKR(EOK == memcpy_s(point.deviceName, sizeof(point.deviceName),
-            temp.deviceName, sizeof(temp.deviceName)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
-        CHKR(EOK == memcpy_s(point.devicePhys, sizeof(point.devicePhys),
-            temp.devicePhys, sizeof(temp.devicePhys)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
-    }
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, point.time, preHandlerTime)) {
         struct KeyEventValueTransformations KeyEventValue = {};
@@ -596,7 +586,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
 }
 
 int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
-    EventTouch& touch, const uint64_t preHandlerTime, WindowSwitch& windowSwitch)
+    EventTouch& touch, const uint64_t preHandlerTime)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
