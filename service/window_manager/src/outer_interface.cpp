@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#ifdef OHOS_WESTEN_MODEL
 #include "outer_interface.h"
 
 namespace OHOS {
@@ -146,3 +146,4 @@ int32_t OuterInterface::GetSystemEventAttrByHosKeyValue(const int16_t keyValueOf
 }
 }
 }
+#endif

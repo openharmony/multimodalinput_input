@@ -361,11 +361,14 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKey(libinput_event *event)
 
     int32_t kac = keyEvent->GetKeyAction();
     KEY_STATE kacState = (kac == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
+    
+#ifdef OHOS_WESTEN_MODEL
     int16_t lowKeyCode = static_cast<int16_t>(keyEvent->GetKeyCode());
     auto hosKey = KeyValueTransformationByInput(lowKeyCode);
     if (hosKey.isSystemKey) {
         OnSystemEvent(hosKey, kacState);
     }
+#endif
 
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
@@ -446,10 +449,11 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event *event)
     auto hosKey = KeyValueTransformationByInput(keyBoard.key); // libinput key transformed into HOS key
     keyBoard.unicode = 0;
 
+#ifdef OHOS_WESTEN_MODEL
     if (hosKey.isSystemKey) { // Judging whether key is system key.
         OnSystemEvent(hosKey, keyBoard.state);
     }
-
+#endif
     if (keyEvent == nullptr) {
         keyEvent = OHOS::MMI::KeyEvent::Create();
     }
@@ -792,10 +796,11 @@ int32_t OHOS::MMI::InputEventHandler::OnEventTabletPadKey(multimodal_libinput_ev
         return TABLETPAD_KEY_EVENT_PKG_FAIL;
     }
     auto hosKey = KeyValueTransformationByInput(key.key);           // libinput key transformed into HOS key
+#ifdef OHOS_WESTEN_MODEL
     if (hosKey.isSystemKey && OnSystemEvent(hosKey, key.state)) {   // Judging whether key is system key.
         return RET_OK;
     }
-
+#endif
     auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, hosKey, key, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed... ret:%{public}d errCode:%{public}d",
@@ -819,10 +824,12 @@ int32_t OHOS::MMI::InputEventHandler::OnEventJoyStickKey(multimodal_libinput_eve
     // libinput key transformed into HOS key
     auto hosKey = KeyValueTransformationByInput(key.key);
     key.unicode = 0;
+#ifdef OHOS_WESTEN_MODEL
     // Judging whether key is system key.
     if (hosKey.isSystemKey && OnSystemEvent(hosKey, key.state)) {
         return RET_OK;
     }
+#endif
     auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, hosKey, key, time);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("JoyStick event dispatch failed... ret:%{public}d errCode:%{public}d",
@@ -910,7 +917,7 @@ bool OHOS::MMI::InputEventHandler::SendMsg(const int32_t fd, NetPacket& pkt) con
     CHKF(udsServer_, OHOS::ERROR_NULL_POINTER);
     return udsServer_->SendMsg(fd, pkt);
 }
-
+#ifdef OHOS_WESTEN_MODEL
 bool OHOS::MMI::InputEventHandler::OnSystemEvent(const KeyEventValueTransformations& temp,
     const enum KEY_STATE state) const
 {
@@ -942,3 +949,4 @@ bool OHOS::MMI::InputEventHandler::OnSystemEvent(const KeyEventValueTransformati
     }
     return retCode;
 }
+#endif
