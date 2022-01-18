@@ -14,8 +14,8 @@
  */
 #ifndef OHOS_STANDARD_EVENT_HANDLER_H
 #define OHOS_STANDARD_EVENT_HANDLER_H
-#include "struct_multimodal.h"
 #include "libinput.h"
+#include "libmmi_util.h"
 
 namespace OHOS {
 namespace MMI {
