@@ -14,7 +14,6 @@
  */
 
 #include "uds_session.h"
-#include <algorithm>
 #include <sstream>
 #include <fcntl.h>
 #include <inttypes.h>
@@ -125,6 +124,5 @@ uint64_t OHOS::MMI::UDSSession::GetFirstEventTime()
 
 void OHOS::MMI::UDSSession::ClearEventsVct()
 {
-    events_.clear();
-    events_.swap(std::vector<EventTime>());
+    std::vector<EventTime>().swap(events_);
 }
