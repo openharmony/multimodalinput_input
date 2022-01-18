@@ -368,7 +368,7 @@ int32_t EventPackage::PackagePointerEventByMotion(libinput_event *event, EventPo
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_pointer_event(event);
-    CHKR(data, NULL_POINTER, RET_ERR);
+    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
 
     point.time = libinput_event_pointer_get_time_usec(data);
     point.delta.x = libinput_event_pointer_get_dx(data);
@@ -382,7 +382,7 @@ int32_t EventPackage::PackagePointerEventByMotionAbs(libinput_event *event, Even
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_pointer_event(event);
-    CHKR(data, NULL_POINTER, RET_ERR);
+    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
 
     point.time = libinput_event_pointer_get_time_usec(data);
     point.absolute.x = libinput_event_pointer_get_absolute_x_transformed(data,
@@ -420,7 +420,7 @@ int32_t EventPackage::PackagePointerEventByAxis(libinput_event *event, EventPoin
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_pointer_event(event);
-    CHKR(data, NULL_POINTER, RET_ERR);
+    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
 
     point.time = libinput_event_pointer_get_time_usec(data);
     switch (libinput_event_pointer_get_axis_source(data)) {
