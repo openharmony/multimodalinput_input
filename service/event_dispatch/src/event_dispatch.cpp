@@ -410,7 +410,6 @@ int32_t OHOS::MMI::EventDispatch::handlePointerEvent(std::shared_ptr<PointerEven
     if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME)) {
         MMI_LOGD("The pointer event does not report normally, triggering ANR");
     }
-
     if (currentTime >= (firstTime + (4 * INPUT_UI_TIMEOUT_TIME))) {
         session->ClearEventsVct();
         MMI_LOGD("The pointer event is cleared.");
@@ -780,7 +779,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
     if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME)) {
         MMI_LOGD("The key event does not report normally, triggering ANR");
     }
-        if (currentTime >= (firstTime + (4 * INPUT_UI_TIMEOUT_TIME))) {
+    if (currentTime >= (firstTime + (4 * INPUT_UI_TIMEOUT_TIME))) {
         session->ClearEventsVct();
         MMI_LOGD("The key event is cleared.");
     }
