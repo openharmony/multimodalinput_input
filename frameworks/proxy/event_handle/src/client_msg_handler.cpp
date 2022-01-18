@@ -276,9 +276,8 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKey(const UDSClient& client, NetPacket& p
     uint64_t serverStartTime = 0;
     EventKeyboard key = {};
     pkt >> key >> abilityId >> windowId >> fd >> serverStartTime;
-    MMI_LOGT("\nevent dispatcher of client:\neventKeyboard:time=%{public}" PRId64 ";key=%{public}u;"
-             "deviceType=%{public}u;seat_key_count=%{public}u;state=%{public}d;"
-             "fd=%{public}d\n*************************************************************\n",
+    MMI_LOGT("Event dispatcher of client:eventKeyboard:time=%{public}" PRId64 ", key=%{public}u, "
+             "deviceType=%{public}u, seat_key_count=%{public}u, state=%{public}d, fd=%{public}d",
              key.time, key.key, key.deviceType, key.seat_key_count, key.state, fd);
 
     /* 根据收到的key，构造keyBoardEvent对象，

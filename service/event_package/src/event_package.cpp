@@ -684,7 +684,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key,
     key.key = libinput_event_keyboard_get_key(data);
     auto ret = PackageEventDeviceInfo<EventKeyboard>(event, udsServer, key);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOGE("Device param package failed. ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     if (libinput_event_keyboard_get_key_state(data) == 0) {
@@ -696,9 +696,11 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key,
     key.time = libinput_event_keyboard_get_time_usec(data);
     // Ignore key events that are not seat wide state changes.
     if (key.state == KEY_STATE_PRESSED && key.seat_key_count != SEAT_BUTTON_OR_KEY_COUNT_ONE) {
+        MMI_LOGD("The same button is pressed on multiple devices, state:%{puiblic}d", key.state);
         return MULTIDEVICE_SAME_EVENT_MARK;
     }
     if (key.state == KEY_STATE_RELEASED && key.seat_key_count != SEAT_BUTTON_OR_KEY_COUNT_ZERO) {
+        MMI_LOGD("Release the same button on multiple devices, state:%{puiblic}d", key.state);
         return MULTIDEVICE_SAME_EVENT_MARK;
     }
     return RET_OK;
