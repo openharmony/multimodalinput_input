@@ -46,27 +46,29 @@ bool DeviceRegister::Init()
     return true;
 }
 
-uint32_t DeviceRegister::FindDeviceIdByDevicePhys(std::string& devicePhys)
+uint32_t DeviceRegister::FindDeviceIdByDevicePhys(const std::string& devicePhys)
 {
     std::lock_guard<std::mutex> lock(mu_);
+    const uint32_t DEFAULT_DEVICE_ID = 0;
     auto it = mapDeviceInfo_.find(devicePhys);
     if (it != mapDeviceInfo_.end()) {
         return it->second;
     }
-    return 0;
+    return DEFAULT_DEVICE_ID;
 }
 
 uint32_t DeviceRegister::AddDeviceInfo(std::string& devicePhys)
 {
     std::lock_guard<std::mutex> lock(mu_);
     const uint32_t BEGIN_NUM = 1;
-    if (!setDeviceId_.count(BEGIN_NUM)) {
+    auto it = setDeviceId_.find(BEGIN_NUM);
+    if (it == setDeviceId_.end()) {
         setDeviceId_.insert(BEGIN_NUM);
         mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(devicePhys, BEGIN_NUM));
         return BEGIN_NUM;
     } else {
-        std::set<uint32_t>::iterator previousPtr = setDeviceId_.begin();
-        std::set<uint32_t>::iterator nextPtr = (++setDeviceId_.begin());
+        auto previousPtr = setDeviceId_.begin();
+        auto nextPtr = (++setDeviceId_.begin());
         uint32_t addDeviceId = 0;
         for (; previousPtr != setDeviceId_.end() && nextPtr != setDeviceId_.end(); previousPtr++, nextPtr++) {
             if (*previousPtr + 1 != *nextPtr) {
@@ -86,7 +88,7 @@ uint32_t DeviceRegister::AddDeviceInfo(std::string& devicePhys)
     }
 }
 
-bool DeviceRegister::DeleteDeviceInfo(std::string& devicePhys)
+bool DeviceRegister::DeleteDeviceInfo(const std::string& devicePhys)
 {
     std::lock_guard<std::mutex> lock(mu_);
     auto it = mapDeviceInfo_.find(devicePhys);
@@ -95,9 +97,9 @@ bool DeviceRegister::DeleteDeviceInfo(std::string& devicePhys)
         mapDeviceInfo_.erase(it);
         setDeviceId_.erase(deviceId);
         return true;
-    } else {
-        return false;
     }
+
+    return false;
 }
 }
 }

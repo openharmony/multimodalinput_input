@@ -86,8 +86,8 @@ void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OH
 void OHOS::MMI::InputEventMonitorManager::ReportKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
     CHK(keyEvent, ERROR_NULL_POINTER);
-    MMI_LOGD("KeyEvent from libinput: keyCode = %{public}d, keyAction = %{public}d , action = %{public}d,"
-             "deviceId=%{private}d, actionTime = %{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
+    MMI_LOGD("KeyEvent from libinput:keyCode=%{public}d, keyAction=%{public}d, action=%{public}d, "
+             "deviceId=%{private}d, actionTime=%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
              keyEvent->GetAction(), keyEvent->GetDeviceId(), keyEvent->GetActionTime());
     OnMonitorInputEvent(keyEvent);
 }

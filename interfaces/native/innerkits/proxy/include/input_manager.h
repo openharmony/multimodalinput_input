@@ -58,8 +58,6 @@ public:
 
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
     int32_t AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
-    int32_t AddMonitor(std::function<bool(std::shared_ptr<KeyEvent>)> monitor);
-    void RemoveMonitor(int32_t monitorId);
 
     /**
     *@brief Adds an input event monitor. After such a monitor is added, an input event is copied and distributed to the monitor while being distributed to the original target.
@@ -67,7 +65,7 @@ public:
     *@return Returns the monitor ID, which uniquely identifies a monitor in the process. If the value is greater than or equal to <b>0</b>, the monitor is successfully added. Otherwise, the monitor fails to be added.
     *@since 8
     */
-    int32_t AddMonitor2(std::shared_ptr<IInputEventConsumer> consumer);
+    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> consumer);
 
     /**
     *@brief Removes a monitor.
@@ -75,7 +73,7 @@ public:
     *@return void
     *@since 8
     */
-    void RemoveMonitor2(int32_t monitorId);
+    void RemoveMonitor(int32_t monitorId);
 
     /**
     *@brief Marks that a monitor has consumed a touchscreen input event. After being consumed, the touchscreen input event will not be distributed to the original target.
@@ -85,11 +83,6 @@ public:
     *@since 8
     */
     void MarkConsumed(int32_t monitorId, int32_t eventId);
-
-    int32_t AddInputEventTouchpadMontior(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
-    int32_t AddInputEventTouchpadMontior(std::function<bool(std::shared_ptr<PointerEvent>)> monitor);
-    void RemoveInputEventTouchpadMontior(int32_t monitorId);
-
     
     /**
     *@brief Adds an input event interceptor. After such an interceptor is added, an input event will be distributed to the interceptor instead of the original target and monitor.
