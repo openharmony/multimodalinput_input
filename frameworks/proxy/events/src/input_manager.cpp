@@ -85,9 +85,9 @@ int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<PointerEvent
     return InputManagerImpl::GetInstance()->AddMontior(monitor);
 }
 
-int32_t InputManager::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
+int32_t InputManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor)
 {
-    return InputManagerImpl::GetInstance()->AddMonitor(consumer);
+    return InputManagerImpl::GetInstance()->AddMonitor(monitor);
 }
 
 void InputManager::RemoveMonitor(int32_t monitorId)
@@ -100,7 +100,7 @@ void InputManager::MarkConsumed(int32_t monitorId, int32_t eventId)
     InputManagerImpl::GetInstance()->MarkConsumed(monitorId, eventId);
 }
 
-int32_t InputManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptorId)
+int32_t InputManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
     return 0;
 }
@@ -128,12 +128,11 @@ void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     InputManagerImpl::GetInstance()->SimulateInputEvent(keyEvent);
 }
-void InputManager::SimulateInputEvent(std::list<std::shared_ptr<KeyEvent>> keyEvents) {}
+
 void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (MultimodalEventHandler::GetInstance().InjectPointerEvent(pointerEvent) != RET_OK)
         MMI_LOGE("Failed to inject pointer event!");
 }
-void InputManager::SimulateInputEvent(std::list<std::shared_ptr<PointerEvent>> pointerEvents) {}
 }
 }

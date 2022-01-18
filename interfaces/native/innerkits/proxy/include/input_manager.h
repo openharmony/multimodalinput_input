@@ -56,7 +56,20 @@ public:
     */
     void UnsubscribeKeyEvent(int32_t subscriberId);
 
+    /**
+    *@brief Adds an input event monitor. After such a monitor is added, an input event is copied and distributed to the monitor while being distributed to the original target.
+    *@param monitor Indicates the input event monitor. After an input event is generated, the functions of the monitor object will be called.
+    *@return Returns the monitor ID, which uniquely identifies a monitor in the process. If the value is greater than or equal to <b>0</b>, the monitor is successfully added. Otherwise, the monitor fails to be added.
+    *@since 8
+    */
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
+
+    /**
+    *@brief Adds an input event monitor. After such a monitor is added, an input event is copied and distributed to the monitor while being distributed to the original target.
+    *@param monitor Indicates the input event monitor. After an input event is generated, the functions of the monitor object will be called.
+    *@return Returns the monitor ID, which uniquely identifies a monitor in the process. If the value is greater than or equal to <b>0</b>, the monitor is successfully added. Otherwise, the monitor fails to be added.
+    *@since 8
+    */
     int32_t AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
 
     /**
@@ -65,7 +78,7 @@ public:
     *@return Returns the monitor ID, which uniquely identifies a monitor in the process. If the value is greater than or equal to <b>0</b>, the monitor is successfully added. Otherwise, the monitor fails to be added.
     *@since 8
     */
-    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> consumer);
+    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor);
 
     /**
     *@brief Removes a monitor.
@@ -90,7 +103,7 @@ public:
     *@return Returns the interceptor ID, which uniquely identifies an interceptor in the process. If the value is greater than or equal to <b>0</b>, the interceptor is successfully added. Otherwise, the interceptor fails to be added.
     *@since 8
     */
-    int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptorId);
+    int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
     int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
     int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
 
@@ -109,7 +122,6 @@ public:
     *@since 8
     */
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);
-    void SimulateInputEvent(std::list<std::shared_ptr<KeyEvent>> keyEvents);
 
     /**
     *@brief Simulates a touchpad input event, touchscreen input event, or mouse device input event. This event will be distributed and processed in the same way as the event reported by the input device.
@@ -118,7 +130,6 @@ public:
     *@since 8
     */
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
-    void SimulateInputEvent(std::list<std::shared_ptr<PointerEvent>> pointerEvents);
 
 private:
     InputManager() = default;
