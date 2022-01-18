@@ -43,8 +43,8 @@ public:
      * the <b>callback</b> specified is invoked to process the event.
      * @param keyOption Indicates the condition of the key input event.
      * @param callback Indicates the callback.
-     * @return Returns the subscription ID, which uniquely identifies a subscription in the process. 
-	 * If the value is greater than or equal to <b>0</b>, 
+     * @return Returns the subscription ID, which uniquely identifies a subscription in the process.
+	 * If the value is greater than or equal to <b>0</b>,
 	 * the subscription is successful. Otherwise, the subscription fails.
      * @since 8
      */
@@ -64,7 +64,7 @@ public:
      * an input event is copied and distributed to the monitor while being distributed to the original target.
      * @param monitor Indicates the input event monitor. After an input event is generated,
      * the functions of the monitor object will be called.
-     * @return Returns the monitor ID, which uniquely identifies a monitor in the process. 
+     * @return Returns the monitor ID, which uniquely identifies a monitor in the process.
 	 * If the value is greater than or equal to <b>0</b>, the monitor is successfully added. Otherwise,
      * the monitor fails to be added.
      * @since 8
@@ -112,11 +112,11 @@ public:
      * @since 8
      */
     void MarkConsumed(int32_t monitorId, int32_t eventId);
-    
+
     /**
      * @brief Adds an input event interceptor. After such an interceptor is added,
      * an input event will be distributed to the interceptor instead of the original target and monitor.
-     * @param interceptor Indicates the input event interceptor. After an input event is generated, 
+     * @param interceptor Indicates the input event interceptor. After an input event is generated,
 	 * the functions of the interceptor object will be called.
      * @return Returns the interceptor ID, which uniquely identifies an interceptor in the process.
      * If the value is greater than or equal to <b>0</b>,the interceptor is successfully added. Otherwise,
@@ -136,7 +136,7 @@ public:
     void RemoveInterceptor(int32_t interceptorId);
 
     /**
-     * @brief Simulates a key input event. This event will be distributed and 
+     * @brief Simulates a key input event. This event will be distributed and
 	 * processed in the same way as the event reported by the input device.
      * @param keyEvent Indicates the key input event to simulate.
      * @return void
