@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#ifdef OHOS_WESTEN_MODEL
 #ifndef OHOS_OUTER_INTERFACE_H
 #define OHOS_OUTER_INTERFACE_H
 
@@ -41,4 +41,5 @@ public:
 };
 }
 
+#endif
 #endif
