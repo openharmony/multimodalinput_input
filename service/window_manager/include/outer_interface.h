@@ -16,6 +16,7 @@
 #ifndef OHOS_OUTER_INTERFACE_H
 #define OHOS_OUTER_INTERFACE_H
 
+#ifdef OHOS_WESTEN_MODEL
 #include "key_event_value_transformation.h"
 
 namespace OHOS {
@@ -41,4 +42,5 @@ public:
 };
 }
 
+#endif
 #endif

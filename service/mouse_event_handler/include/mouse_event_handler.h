@@ -40,7 +40,6 @@ protected:
     void SetMouseButon(PointerEvent::PointerItem &pointerItem, struct libinput_event_pointer& pointEventData);
     void SetMouseAxis(struct libinput_event_pointer& pointEventData);
     void CalcMovedCoordinate(struct libinput_event_pointer &pointEventData);
-    void AdjustCoordinate(double &coordinateX, double &coordinateY);
 };
 }
 } // namespace OHOS::MMI
