@@ -134,7 +134,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, OH
     std::vector<int32_t> fds;
     RegEventHM->FindSocketFdsByEventHandle(idMsg, fds);
     if (fds.empty()) {
-        MMI_LOGW("Yet none of socketFds is found!\n");
+        MMI_LOGW("Yet none of socketFds is found");
         return RET_OK;
     }
 
@@ -206,7 +206,7 @@ int32_t OHOS::MMI::EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSS
     if (ret1 == RET_OK && ret2 == RET_OK) {
         return RET_OK;
     } else {
-        MMI_LOGE("dispatching special registered event has failed!\n");
+        MMI_LOGE("dispatching special registered event has failed");
         return RET_ERR;
     }
 }
