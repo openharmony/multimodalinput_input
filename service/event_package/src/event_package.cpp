@@ -680,7 +680,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key,
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_keyboard_event(event);
-    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER, RET_ERR);
     key.key = libinput_event_keyboard_get_key(data);
     auto ret = PackageEventDeviceInfo<EventKeyboard>(event, udsServer, key);
     if (ret != RET_OK) {
