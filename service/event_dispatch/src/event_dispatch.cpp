@@ -28,6 +28,7 @@
 
 namespace OHOS::MMI {
 constexpr int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
+constexpr int32_t INPUT_UI_TIMEOUT_TIME_MAX = 20 * 1000000;
     namespace {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
     }
@@ -404,10 +405,14 @@ int32_t OHOS::MMI::EventDispatch::handlePointerEvent(std::shared_ptr<PointerEven
     session->RecordEvent(eventId, currentTime);
     auto firstTime = session->GetFirstEventTime();
     if (currentTime < (firstTime + INPUT_UI_TIMEOUT_TIME)) {
-        MMI_LOGD("The pointer reports normally");
+        MMI_LOGD("The pointer event reports normally");
     }
     if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME)) {
-        MMI_LOGD("The pointer does not report normally, triggering ANR");
+        MMI_LOGD("The pointer event does not report normally, triggering ANR");
+    }
+    if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME_MAX)) {
+        session->ClearEventsVct();
+        MMI_LOGD("The pointer event is cleared.");
     }
 
     if (!udsServer->SendMsg(fd, newPacket)) {
@@ -773,6 +778,10 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
     }
     if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME)) {
         MMI_LOGD("The key event does not report normally, triggering ANR");
+    }
+    if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME_MAX)) {
+        session->ClearEventsVct();
+        MMI_LOGD("The key event is cleared.");
     }
 
     IEMServiceManager.ReportKeyEvent(key);
