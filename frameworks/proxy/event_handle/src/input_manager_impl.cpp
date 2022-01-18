@@ -29,6 +29,12 @@ namespace MMI {
 namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerImpl" };
 }
+
+constexpr int32_t MASK_KEY = 1;
+constexpr int32_t MASK_TOUCH = 2;
+constexpr int32_t MASK_TOUCHPAD = 3;
+constexpr int32_t ADD_MASK_BASE = 10;
+
 void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
     const std::vector<LogicalDisplayInfo> &logicalDisplays)
 {
@@ -220,36 +226,48 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
         MMI_LOGE("InputManagerImpl::%{public}s param should not be null!", __func__);
         return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
-    return IEMManager.AddInputEventMontior(monitor);
+    int32_t monitorId = IEMManager.AddInputEventMontior(monitor);
+    monitorId = monitorId * ADD_MASK_BASE + MASK_KEY;
+    return monitorId;
 }
 
-void InputManagerImpl::RemoveMonitor(int32_t monitorId)
-{
-    IEMManager.RemoveInputEventMontior(monitorId);
-}
-
-int32_t InputManagerImpl::AddMonitor2(std::shared_ptr<IInputEventConsumer> consumer)
-{
-    return InputMonitorManager::GetInstance().AddMonitor(consumer);
-}
-
-void InputManagerImpl::RemoveMonitor2(int32_t monitorId)
-{
-    InputMonitorManager::GetInstance().RemoveMonitor(monitorId);
-}
-
-int32_t InputManagerImpl::AddInputEventTouchpadMontior(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
+int32_t InputManagerImpl::AddMontior(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
     if (monitor == nullptr) {
         MMI_LOGE("InputManagerImpl::%{public}s param should not be null!", __func__);
         return InputEventMonitorManager::INVALID_MONITOR_ID;
     }
-    return IEMManager.AddInputEventTouchpadMontior(monitor);
+    int32_t monitorId = IEMManager.AddInputEventTouchpadMontior(monitor);
+    monitorId = monitorId * ADD_MASK_BASE + MASK_TOUCHPAD;
+    return monitorId;
 }
 
-void InputManagerImpl::RemoveInputEventTouchpadMontior(int32_t monitorId)
+int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
 {
-    IEMManager.RemoveInputEventTouchpadMontior(monitorId);
+    int32_t monitorId = InputMonitorManager::GetInstance().AddMonitor(consumer);
+    monitorId = monitorId * ADD_MASK_BASE + MASK_TOUCH;
+    return monitorId;
+}
+
+void InputManagerImpl::RemoveMonitor(int32_t monitorId)
+{
+    int32_t mask = monitorId % ADD_MASK_BASE;
+    monitorId /= ADD_MASK_BASE;
+
+    switch (mask) {
+        case MASK_KEY:
+            IEMManager.RemoveInputEventMontior(monitorId);
+            break;
+        case MASK_TOUCH:
+            InputMonitorManager::GetInstance().RemoveMonitor(monitorId);
+            break;
+        case MASK_TOUCHPAD:
+            IEMManager.RemoveInputEventTouchpadMontior(monitorId);
+            break;
+        default:
+        MMI_LOGE("Can't find the mask,mask%{public}d", mask);
+            break;
+    }    
 }
 
 void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)

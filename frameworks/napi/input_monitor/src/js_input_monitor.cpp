@@ -46,7 +46,7 @@ int32_t InputMonitor::Start()
 {
     std::lock_guard<std::mutex> guard(lk_);
     if (monitorId_ < 0) {
-        monitorId_ = INPUTMGR->AddMonitor2(shared_from_this());
+        monitorId_ = INPUTMGR->AddMonitor(shared_from_this());
         return monitorId_ >= 0 ? RET_OK : RET_ERR;
     }
     return RET_OK;
@@ -58,7 +58,7 @@ void InputMonitor::Stop()
     if (monitorId_ < 0) {
         return;
     }
-    INPUTMGR->RemoveMonitor2(monitorId_);
+    INPUTMGR->RemoveMonitor(monitorId_);
     monitorId_ = -1;
     return;
 }
