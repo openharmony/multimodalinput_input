@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#ifdef OHOS_WESTEN_MODEL
 #include "outer_interface.h"
 #include <gtest/gtest.h>
 
@@ -76,3 +76,4 @@ HWTEST_F(OuterInterfaceTest, GetSystemEventAttrByHosKeyValue, TestSize.Level1)
     EXPECT_TRUE((outerInterface.GetSystemEventAttrByHosKeyValue(3)) == MMI_SYSTEM_SERVICE_AND_APP);
 }
 }
+#endif

@@ -754,7 +754,7 @@ bool OHOS::MMI::InputWindowsManager::CheckDisplayIdIfExist(int32_t& displayId)
         MMI_LOGE("logicalDisplays_is empty address is %{public}p", &logicalDisplays_);
         return false;
     }
-    if (displayId <= 0) {
+    if (displayId < 0) {
         displayId = logicalDisplays_[0].id;
         return true;
     }
