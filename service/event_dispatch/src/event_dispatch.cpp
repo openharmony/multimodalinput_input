@@ -405,10 +405,15 @@ int32_t OHOS::MMI::EventDispatch::handlePointerEvent(std::shared_ptr<PointerEven
     session->RecordEvent(eventId, currentTime);
     auto firstTime = session->GetFirstEventTime();
     if (currentTime < (firstTime + INPUT_UI_TIMEOUT_TIME)) {
-        MMI_LOGD("The pointer reports normally");
+        MMI_LOGD("The pointer event reports normally");
     }
     if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME)) {
-        MMI_LOGD("The pointer does not report normally, triggering ANR");
+        MMI_LOGD("The pointer event does not report normally, triggering ANR");
+    }
+
+    if (currentTime >= (firstTime + (4 * INPUT_UI_TIMEOUT_TIME))) {
+        session->ClearEventsVct();
+        MMI_LOGD("The pointer event is cleared.");
     }
 
     if (!udsServer->SendMsg(fd, newPacket)) {
