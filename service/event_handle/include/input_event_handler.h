@@ -14,14 +14,15 @@
  */
 #ifndef OHOS_INPUT_EVENT_HANDLER_H
 #define OHOS_INPUT_EVENT_HANDLER_H
-#include "key_event_input_subscribe_filter.h"
-#include "msg_handler.h"
+
+#include <memory>
 #include "event_dispatch.h"
 #include "event_package.h"
-#include "singleton.h"
 #include "i_event_filter.h"
+#include "key_event_input_subscribe_filter.h"
 #include "mouse_event_handler.h"
-#include <memory>
+#include "msg_handler.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
