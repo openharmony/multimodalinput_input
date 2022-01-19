@@ -19,7 +19,7 @@
 #include <vector>
 #include "proto.h"
 #include "uds_server.h"
-#include "c_singleton.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
@@ -38,7 +38,7 @@ struct WaitQueueEvent {
     uint64_t serverTime;
 };
 
-class AppRegister : public CSingleton<AppRegister> {
+class AppRegister : public DelayedSingleton<AppRegister> {
 public:
     AppRegister();
     virtual ~AppRegister();

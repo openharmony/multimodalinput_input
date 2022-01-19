@@ -15,7 +15,7 @@
 
 #include "hdi_inject.h"
 #include <iostream>
-#include "c_singleton.h"
+#include "singleton.h"
 #include "libmmi_util.h"
 #include "proto.h"
 #include "util.h"

@@ -17,7 +17,7 @@
 #define OHOS_MULTIMDOALINPUT_INPUT_EVENT_MANAGER_H
 
 #include <vector>
-#include "c_singleton.h"
+#include "singleton.h"
 #include "display_info.h"
 #include "i_input_event_consumer.h"
 #include "pointer_event.h"
@@ -28,7 +28,7 @@
 
 namespace OHOS {
 namespace MMI {
-class InputManagerImpl : public CSingleton<InputManagerImpl> {
+class InputManagerImpl : public DelayedSingleton<InputManagerImpl> {
 public:
     virtual ~InputManagerImpl() = default;
     InputManagerImpl() = default;
