@@ -79,48 +79,48 @@ EventPackage::~EventPackage()
 }
 
 template<class EventType>
-int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& eventData)
+int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& data)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto type = libinput_event_get_type(event);
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
-    eventData.eventType = type;
-    eventData.deviceType = GetDeviceType(device);
+    data.eventType = type;
+    data.deviceType = GetDeviceType(device);
     auto name = libinput_device_get_name(device);
     CHKR(name, ERROR_NULL_POINTER, RET_ERR);
-    CHKR(EOK == memcpy_s(eventData.deviceName, sizeof(eventData.deviceName),
+    CHKR(EOK == memcpy_s(data.deviceName, sizeof(data.deviceName),
         name, MAX_DEVICENAME), MEMCPY_SEC_FUN_FAIL, RET_ERR);
     const std::string uuid = GetUUid();
-    CHKR(EOK == memcpy_s(eventData.uuid, MAX_UUIDSIZE, uuid.c_str(), uuid.size()), MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    CHKR(EOK == memcpy_s(data.uuid, MAX_UUIDSIZE, uuid.c_str(), uuid.size()), MEMCPY_SEC_FUN_FAIL, RET_ERR);
 #ifdef OHOS_BUILD_HDF
-    CHKR(EOK == memcpy_s(eventData.devicePhys, MAX_DEVICENAME, eventData.deviceName, MAX_DEVICENAME),
+    CHKR(EOK == memcpy_s(data.devicePhys, MAX_DEVICENAME, data.deviceName, MAX_DEVICENAME),
         MEMCPY_SEC_FUN_FAIL, RET_ERR);
 #else
     auto physWhole = libinput_device_get_phys(device);
     if (!physWhole) {
-        CHKR(EOK == memcpy_s(eventData.devicePhys, sizeof(eventData.devicePhys),
-            eventData.deviceName, sizeof(eventData.deviceName)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
+        CHKR(EOK == memcpy_s(data.devicePhys, sizeof(data.devicePhys),
+            data.deviceName, sizeof(data.deviceName)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
     } else {
         std::string s(physWhole);
         std::string phys = s.substr(0, s.rfind('/'));
         CHKR(!phys.empty(), ERROR_NULL_POINTER, RET_ERR);
-        CHKR(EOK == memcpy_s(eventData.devicePhys, sizeof(eventData.devicePhys), phys.c_str(), MAX_DEVICENAME),
+        CHKR(EOK == memcpy_s(data.devicePhys, sizeof(data.devicePhys), phys.c_str(), MAX_DEVICENAME),
              MEMCPY_SEC_FUN_FAIL, RET_ERR);
     }
 #endif
-    std::string devicePhys(eventData.devicePhys);
+    std::string devicePhys(data.devicePhys);
     if (type == LIBINPUT_EVENT_DEVICE_REMOVED) {
         DevRegister->DeleteDeviceInfo(devicePhys);
         return RET_OK;
     }
     uint32_t deviceId = DevRegister->FindDeviceIdByDevicePhys(devicePhys);
     if (deviceId) {
-        eventData.deviceId = deviceId;
+        data.deviceId = deviceId;
     } else {
         deviceId = DevRegister->AddDeviceInfo(devicePhys);
         CHKR(deviceId, ADD_DEVICE_INFO_CALL_FAIL, RET_ERR);
-        eventData.deviceId = deviceId;
+        data.deviceId = deviceId;
     }
     return RET_OK;
 }
@@ -559,13 +559,13 @@ int32_t EventPackage::PackagePointerEvent(multimodal_libinput_event &ev,
     EventPointer& point, UDSServer& udsServer)
 {
     CHKR(ev.event, PARAM_INPUT_INVALID, RET_ERR);
-    auto type = libinput_event_get_type(ev.event);
     auto rDevRet = PackageEventDeviceInfo<EventPointer>(ev.event, point);
     if (rDevRet != RET_OK) {
         MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", rDevRet, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     int32_t ret = RET_OK;
+    auto type = libinput_event_get_type(ev.event);
     switch (type) {
         case LIBINPUT_EVENT_POINTER_MOTION: {
             ret = PackagePointerEventByMotion(ev.event, point);
@@ -693,7 +693,6 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event,
     CHKR(kevnPtr, ERROR_NULL_POINTER, RET_ERR);
     kevnPtr->UpdateId();
     EventKeyboard key = {};
-    OHOS::MMI::KeyEvent::KeyItem item;
     auto ret = PackageEventDeviceInfo<EventKeyboard>(event, key);
     if (ret != RET_OK) {
         MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
@@ -718,6 +717,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event,
     kevnPtr->SetKeyCode(keyCode);
     kevnPtr->SetKeyAction(keyAction);
 
+    OHOS::MMI::KeyEvent::KeyItem item;
     bool isKeyPressed = (libinput_event_keyboard_get_key_state(data) == 0) ? (false) : (true);
     if (isKeyPressed) {
         int32_t keyDownTime = actionStartTime;

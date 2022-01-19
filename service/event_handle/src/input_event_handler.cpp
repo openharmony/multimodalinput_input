@@ -366,9 +366,9 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKey(libinput_event *event)
     
 #ifdef OHOS_WESTEN_MODEL
     int16_t lowKeyCode = static_cast<int16_t>(keyEvent->GetKeyCode());
-    auto hosKey = KeyValueTransformationByInput(lowKeyCode);
-    if (hosKey.isSystemKey) {
-        OnSystemEvent(hosKey, kacState);
+    auto oKey = KeyValueTransformationByInput(lowKeyCode);
+    if (oKey.isSystemKey) {
+        OnSystemEvent(oKey, kacState);
     }
 #endif
 
@@ -415,9 +415,9 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyEventDispatch(multimodal_libinput_eve
     int32_t kac = keyEvent->GetKeyAction();
     KEY_STATE kacState = (kac == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
     int16_t lowKeyCode = static_cast<int16_t>(keyEvent->GetKeyCode());
-    auto hosKey = KeyValueTransformationByInput(lowKeyCode);
-    if (hosKey.isSystemKey) { // Judging whether key is system key.
-        OnSystemEvent(hosKey, kacState);
+    auto oKey = KeyValueTransformationByInput(lowKeyCode);
+    if (oKey.isSystemKey) { // Judging whether key is system key.
+        OnSystemEvent(oKey, kacState);
     }
 
     auto device = libinput_event_get_device(ev.event);
@@ -437,8 +437,8 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event *event)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     uint64_t preHandlerTime = GetSysClockTime();
-    EventKeyboard keyBoard = {};
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    EventKeyboard keyBoard = {};
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyBoard, *udsServer_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
         MMI_LOGD("The same event occurs on multiple devices, ret:%{puiblic}d", packageResult);
@@ -449,18 +449,18 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event *event)
         return KEY_EVENT_PKG_FAIL;
     }
 
-    auto hosKey = KeyValueTransformationByInput(keyBoard.key); // libinput key transformed into HOS key
+    auto oKey = KeyValueTransformationByInput(keyBoard.key); // libinput key transformed into HOS key
     keyBoard.unicode = 0;
 
 #ifdef OHOS_WESTEN_MODEL
-    if (hosKey.isSystemKey) { // Judging whether key is system key.
-        OnSystemEvent(hosKey, keyBoard.state);
+    if (oKey.isSystemKey) { // Judging whether key is system key.
+        OnSystemEvent(oKey, keyBoard.state);
     }
 #endif
     if (keyEvent == nullptr) {
         keyEvent = OHOS::MMI::KeyEvent::Create();
     }
-    keyBoard.key = static_cast<uint32_t>(hosKey.keyValueOfHos);
+    keyBoard.key = static_cast<uint32_t>(oKey.keyValueOfHos);
     if (EventPackage::KeyboardToKeyEvent(keyBoard, keyEvent, *udsServer_) == RET_ERR) {
         MMI_LOGE("On the OnKeyboardEvent translate key event error!");
         return RET_ERR;
@@ -505,9 +505,9 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKeyboard(multimodal_libinput_event 
 #ifdef OHOS_WESTEN_MODEL
     uint64_t preHandlerTime = GetSysClockTime();
 #endif
-    EventKeyboard keyBoard = {};
 
     CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    EventKeyboard keyBoard = {};
     auto packageResult = eventPackage_.PackageKeyEvent(ev.event, keyBoard, *udsServer_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
         MMI_LOGD("The same event occurs on multiple devices, ret:%{puiblic}d", packageResult);
@@ -525,13 +525,13 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKeyboard(multimodal_libinput_event 
     }
     (void)OnKeyboardEvent(ev.event);
 #else
-    auto hosKey = KeyValueTransformationByInput(keyBoard.key); // libinput key transformed into HOS key
+    auto oKey = KeyValueTransformationByInput(keyBoard.key); // libinput key transformed into HOS key
     keyBoard.unicode = 0;
-    if (hosKey.isSystemKey && OnSystemEvent(hosKey, keyBoard.state)) { // Judging whether key is system key.
+    if (oKey.isSystemKey && OnSystemEvent(oKey, keyBoard.state)) { // Judging whether key is system key.
         return RET_OK;
     }
 
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, hosKey, keyBoard,
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, oKey, keyBoard,
                                                                preHandlerTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed. ret:%{public}d, errCode:%{public}d",
@@ -845,13 +845,13 @@ int32_t OHOS::MMI::InputEventHandler::OnEventTabletPadKey(multimodal_libinput_ev
             packageResult, TABLETPAD_KEY_EVENT_PKG_FAIL);
         return TABLETPAD_KEY_EVENT_PKG_FAIL;
     }
-    auto hosKey = KeyValueTransformationByInput(key.key);           // libinput key transformed into HOS key
+    auto oKey = KeyValueTransformationByInput(key.key);           // libinput key transformed into HOS key
 #ifdef OHOS_WESTEN_MODEL
-    if (hosKey.isSystemKey && OnSystemEvent(hosKey, key.state)) {   // Judging whether key is system key.
+    if (oKey.isSystemKey && OnSystemEvent(oKey, key.state)) {   // Judging whether key is system key.
         return RET_OK;
     }
 #endif
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, hosKey, key, preHandlerTime);
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, oKey, key, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed... ret:%{public}d errCode:%{public}d",
                  eventDispatchResult, TABLETPAD_KEY_EVENT_DISP_FAIL);
@@ -872,15 +872,15 @@ int32_t OHOS::MMI::InputEventHandler::OnEventJoyStickKey(multimodal_libinput_eve
         return JOYSTICK_KEY_EVENT_PKG_FAIL;
     }
     // libinput key transformed into HOS key
-    auto hosKey = KeyValueTransformationByInput(key.key);
+    auto oKey = KeyValueTransformationByInput(key.key);
     key.unicode = 0;
 #ifdef OHOS_WESTEN_MODEL
     // Judging whether key is system key.
-    if (hosKey.isSystemKey && OnSystemEvent(hosKey, key.state)) {
+    if (oKey.isSystemKey && OnSystemEvent(oKey, key.state)) {
         return RET_OK;
     }
 #endif
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, hosKey, key, time);
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, oKey, key, time);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("JoyStick event dispatch failed... ret:%{public}d errCode:%{public}d",
                  eventDispatchResult, JOYSTICK_EVENT_DISP_FAIL);
