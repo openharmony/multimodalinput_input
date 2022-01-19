@@ -154,7 +154,6 @@ ohos_shared_library("libmmi-server") {
     "window_manager/src/input_windows_manager_stub.cpp",
     "window_manager/src/outer_interface.cpp",
     "window_manager/src/pointer_drawing_manager.cpp",
-    "window_manager/src/window_switch.cpp",
   ]
 
   if (is_mmi_have_hdf) {
@@ -423,7 +422,6 @@ ohos_unittest("ut-mmi-service-out") {
     "module_loader/test/uds_server_test.cpp",
     "window_manager/test/input_windows_manager_test.cpp",
     "window_manager/test/outer_interface_test.cpp",
-    "window_manager/test/window_switch_test.cpp",
   ]
   if (is_mmi_have_weston) {
     sources += [ "event_handle/test/input_event_handler_test.cpp" ]
