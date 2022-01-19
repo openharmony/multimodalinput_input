@@ -18,13 +18,13 @@
 #include <string>
 #include "proto.h"
 #include "uds_server.h"
-#include "c_singleton.h"
+#include "singleton.h"
 #include "register_event.h"
 #include "event_package.h"
 #include "log.h"
 #include "key_event.h"
 namespace OHOS::MMI {
-class ServerInputFilterManager : public CSingleton<ServerInputFilterManager> {
+class ServerInputFilterManager : public DelayedSingleton<ServerInputFilterManager> {
 public:
     class KeyEventFilter {
     public:

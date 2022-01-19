@@ -18,12 +18,12 @@
 #include <mutex>
 #include <vector>
 #include "libmmi_util.h"
-#include "c_singleton.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
 using SafeCallbackFun = std::function<void(int32_t, uint64_t, const std::string&)>;
-class SafeKeeper : public CSingleton<SafeKeeper> {
+class SafeKeeper : public DelayedSingleton<SafeKeeper> {
 public:
     SafeKeeper();
     virtual ~SafeKeeper();

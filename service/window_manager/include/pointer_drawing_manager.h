@@ -17,7 +17,7 @@
 #define OHOS_MULTIMDOALINPUT_MOUSE_DRAW_H
 
 #include <iostream>
-#include "c_singleton.h"
+#include "singleton.h"
 #include "struct_multimodal.h"
 #include "pixel_map.h"
 #include "window.h"
@@ -26,7 +26,7 @@
 #define IMAGE_SIZE 64
 namespace OHOS {
 	namespace MMI {
-		class MouseDrawingManager : public CSingleton<MouseDrawingManager>{
+		class MouseDrawingManager : public DelayedSingleton<MouseDrawingManager>{
 		public:
 			MouseDrawingManager();
 			~MouseDrawingManager();

@@ -18,7 +18,7 @@
 #include "msg_handler.h"
 #include "event_dispatch.h"
 #include "event_package.h"
-#include "c_singleton.h"
+#include "singleton.h"
 #include "i_event_filter.h"
 #include "mouse_event_handler.h"
 #include <memory>
@@ -27,7 +27,7 @@ namespace OHOS {
 namespace MMI {
 using EventFun = std::function<int32_t(multimodal_libinput_event &ev)>;
 using NotifyDeviceChange = std::function<void(int32_t, int32_t, char *)>;
-class InputEventHandler : public MsgHandler<EventFun>, public CSingleton<InputEventHandler> {
+class InputEventHandler : public MsgHandler<EventFun>, public DelayedSingleton<InputEventHandler> {
 public:
     InputEventHandler();
     virtual ~InputEventHandler() override;
