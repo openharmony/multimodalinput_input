@@ -184,7 +184,7 @@ public:
     std::vector<int32_t> GetPointersIdList() const;
 
     // Get or set the source type of the current pointer event
-    int32_t GetSourceType();
+    int32_t GetSourceType() const;
     void SetSourceType(int32_t sourceType);
 
     // Get or set the button id of the current pointer event
@@ -198,7 +198,12 @@ public:
 	
 	void SetPressedKeys(const std::vector<int32_t> pressedKeys);
     std::vector<int32_t> GetPressedKeys() const;
-
+    
+    bool IsValidCheckMouseFunc() const;
+    bool IsValidCheckMouse() const;
+    bool IsValidCheckTouchFunc() const;
+    bool IsValidCheckTouch() const;
+    bool IsValid() const;
 public:
     static bool HasAxis(int32_t axes, AxisType axis);
 
