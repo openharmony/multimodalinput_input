@@ -74,7 +74,7 @@ private:
     SInput input_;
     UDSServer udsServer_;
     ServerMsgHandler sMsgHandler_;
-    InputEventHandler* inputEventHdr_ {nullptr};
+    std::shared_ptr<InputEventHandler> inputEventHdr_ {nullptr};
     ExpansibilityOperation expOper_;
 #ifdef  OHOS_BUILD_AI
     SeniorInputFuncProcBase seniorInput_;
