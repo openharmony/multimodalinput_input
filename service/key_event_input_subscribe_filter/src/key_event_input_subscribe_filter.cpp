@@ -14,6 +14,7 @@
  */
 
 #include "key_event_input_subscribe_filter.h"
+#include "bytrace.h"
 #include "define_multimodal.h"
 #include "input_event_data_transformation.h"
 #include "net_packet.h"
@@ -90,6 +91,11 @@ bool KeyEventInputSubscribeFilter::FilterSubscribeKeyEvent(UDSServer& udsServer,
         MMI_LOGE("Leave, no subscriber");
         return false;
     }
+    int32_t getKeyCode = keyEvent->GetKeyCode();
+    std::string keyCodestring = std::to_string(getKeyCode);
+    MMI_LOGT(" FilterSubscribeKeyEvent service trace keyId = %{public}s\n", keyCodestring.c_str());
+    int32_t EVENT_KEY = 1;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, EVENT_KEY);
 
     bool handled = false;
     int32_t keyAction = keyEvent->GetKeyAction();
