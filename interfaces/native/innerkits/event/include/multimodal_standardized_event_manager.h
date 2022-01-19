@@ -55,6 +55,8 @@ public:
     int32_t UnSubscribeKeyEvent(int32_t subscribeId);
 
 public:
+    void OnkeyTrace(const OHOS::KeyEvent& event);
+    void OnTouchTrace(const TouchEvent& event);
     int32_t OnKey(const OHOS::KeyEvent& event);
     int32_t OnTouch(const TouchEvent& event);
 

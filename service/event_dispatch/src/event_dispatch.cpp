@@ -17,6 +17,7 @@
 #include <inttypes.h>
 #include "input-event-codes.h"
 #include "ability_launch_manager.h"
+#include "bytrace.h"
 #include "event_filter_wrap.h"
 #include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
@@ -465,6 +466,19 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchTransformPointEvent(UDSServer& ud
     return RET_OK;
 }
 
+void OHOS::MMI::EventDispatch::DispatchPointerEventTrace(const EventPointer& point)
+{
+    int32_t EVENT_POINTER = 17;
+    char pointerUuid[MAX_UUIDSIZE] = {0};
+    if (EOK != memcpy_s(pointerUuid, sizeof(pointerUuid), point.uuid, sizeof(point.uuid))) {
+        MMI_LOGT("%{public}s copy data failed", __func__);
+        return;
+    }
+    MMI_LOGT(" OnEventPointer service DispatchPointerEvent pointerUuid = %{public}s\n", pointerUuid);
+    std::string pointerEvent = pointerUuid;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
+}
+
 int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event *event,
     EventPointer &point, const uint64_t preHandlerTime)
 {
@@ -537,6 +551,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
                     point.state, point.source, point.delta.x, point.delta.y, point.delta_raw.x,
                     point.delta_raw.y, point.absolute.x, point.absolute.y, point.discrete.x,
                     point.discrete.y, appInfo.fd, preHandlerTime);
+        DispatchPointerEventTrace(point);
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
             MMI_LOGE("Sending structure of EventPointer failed! errCode:%{public}d\n", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
@@ -598,6 +613,19 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
         }
     }
     return RET_OK;
+}
+
+void OHOS::MMI::EventDispatch::DispatchTouchEventTrace(const EventTouch& touch)
+{
+    int32_t EVENT_TOUCH = 9;
+    char touchUuid[MAX_UUIDSIZE] = {0};
+    if (EOK != memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid))) {
+        MMI_LOGT("%{public}s copy data failed", __func__);
+        return;
+    }
+    MMI_LOGT(" 4.event dispatcher of server: touchUuid = %{public}s\n", touchUuid);
+    std::string touchEvent = touchUuid;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
 }
 
 int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
@@ -673,6 +701,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
                          touchTemp.devicePhys, touchTemp.eventType, touchTemp.slot, touchTemp.seat_slot,
                          touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, appInfo.fd,
                          preHandlerTime);
+                DispatchTouchEventTrace(touchTemp);
                 newPacket << touchTemp;
 
             }
@@ -687,6 +716,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
                      touch.time, touch.deviceType, touch.deviceName,
                      touch.devicePhys, touch.eventType, touch.slot, touch.seat_slot, touch.pressure,
                      touch.point.x, touch.point.y, appInfo.fd, preHandlerTime);
+            DispatchTouchEventTrace(touch);
         }
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
             MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d\n", MSG_SEND_FAIL);
@@ -787,6 +817,19 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
     return RET_OK;
 }
 
+void OHOS::MMI::EventDispatch::DispatchKeyEventTrace(const EventKeyboard& key)
+{
+    int32_t EVENT_KEY = 1;
+    char keyUuid[MAX_UUIDSIZE] = {0};
+    if (EOK != memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid))) {
+        MMI_LOGT("%{public}s copy data failed", __func__);
+        return;
+    }
+    MMI_LOGT(" OnEventKeyboard service DispatchKeyEvent keyUuid = %{public}s\n", keyUuid);
+    std::string keyEvent = keyUuid;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
+}
+
 int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *event,
     const KeyEventValueTransformations& trs, EventKeyboard& key, const uint64_t preHandlerTime)
 {
@@ -838,7 +881,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
              key.time, key.deviceType, key.deviceName, key.devicePhys, key.eventType,
              key.unicode, key.key, trs.keyEvent.c_str(), key.seat_key_count, key.state, appInfo.fd,
              preHandlerTime);
-
+    DispatchKeyEventTrace(key);
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, appInfo.fd, key.time, preHandlerTime)) {
         NetPacket newPkt(MmiMessageId::ON_KEY);
         newPkt << key << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
