@@ -222,7 +222,7 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
 }
 
 bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event *event,
-    EventTouch& touch, const uint64_t preHandlerTime, WindowSwitch& windowSwitch)
+    EventTouch& touch, const uint64_t preHandlerTime)
 {
     CHKF(event, PARAM_INPUT_INVALID);
     MMI_LOGD("ServerInputFilterManager::OnTouchEvent");

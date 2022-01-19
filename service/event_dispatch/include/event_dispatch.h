@@ -39,7 +39,7 @@ public:
     int32_t DispatchKeyEventByPid(UDSServer& udsServer, std::shared_ptr<OHOS::MMI::KeyEvent> key,
         const uint64_t preHandlerTime);
     int32_t DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
-        EventTouch& touch, const uint64_t preHandlerTime, WindowSwitch& windowSwitch);
+        EventTouch& touch, const uint64_t preHandlerTime);
     int32_t DispatchTabletPadEvent(UDSServer& udsServer, libinput_event *event,
         EventTabletPad& tabletPad, const uint64_t preHandlerTime);
     int32_t DispatchJoyStickEvent(UDSServer& udsServer, libinput_event *event,
@@ -47,9 +47,9 @@ public:
     int32_t DispatchCommonPointEvent(UDSServer& udsServer, libinput_event *event,
         EventPointer& point, const uint64_t preHandlerTime);
     int32_t DispatchPointerEvent(UDSServer& udsServer, libinput_event *event,
-        EventPointer& point, const uint64_t preHandlerTime, WindowSwitch& windowSwitch);
+        EventPointer& point, const uint64_t preHandlerTime);
     int32_t DispatchTabletToolEvent(UDSServer& udsServer, libinput_event *event,
-        EventTabletTool& tableTool, const uint64_t preHandlerTime, WindowSwitch& windowSwitch);
+        EventTabletTool& tableTool, const uint64_t preHandlerTime);
     int32_t DispatchTouchTransformPointEvent(UDSServer& udsServer, std::shared_ptr<PointerEvent> point);
     int32_t handlePointerEvent(std::shared_ptr<PointerEvent> point);
     bool HandleTouchScreenEvent(std::shared_ptr<PointerEvent> point);

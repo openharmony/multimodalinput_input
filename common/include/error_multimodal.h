@@ -58,7 +58,7 @@ namespace OHOS {
     enum {
         MSG_SEND_FAIL = SERVER_ERR_OFFSET,          // 发送消息失败
         UNKNOWN_EVENT,                              // 未知的事件
-        ERROR_NULL_POINTER,                               // 空指针
+        ERROR_NULL_POINTER,                         // 空指针
         WINDOWS_MSG_INIT_FAIL,                      // 窗口管理器初始化失败
         APP_REG_INIT_FAIL,                          // APPRegister初始化失败
         SVR_MSG_HANDLER_INIT_FAIL,                  // 服务消息处理初始化失败

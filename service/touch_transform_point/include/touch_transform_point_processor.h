@@ -19,7 +19,6 @@
 #include <memory>
 #include "pointer_event.h"
 #include "input_windows_manager.h"
-#include "window_switch.h"
 namespace OHOS {
 namespace MMI {
 class TouchTransformPointProcessor {
