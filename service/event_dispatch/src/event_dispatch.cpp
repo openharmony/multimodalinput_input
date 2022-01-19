@@ -402,6 +402,7 @@ int32_t OHOS::MMI::EventDispatch::handlePointerEvent(std::shared_ptr<PointerEven
     }
 
     auto session = udsServer->GetSession(fd);
+    CHKPR(session, ERROR_NULL_POINTER, RET_ERR);
     auto eventId = point->GetId();
     auto currentTime = GetSysClockTime();
     session->RecordEvent(eventId, currentTime);
@@ -790,6 +791,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
              key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
 
     auto session = udsServer.GetSession(fd);
+    CHKPR(session, ERROR_NULL_POINTER, RET_ERR);
     auto eventId = key->GetId();
     auto currentTime = GetSysClockTime();
     session->RecordEvent(eventId, currentTime);
