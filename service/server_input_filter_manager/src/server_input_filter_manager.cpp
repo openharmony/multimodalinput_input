@@ -15,6 +15,7 @@
 
 #include "server_input_filter_manager.h"
 #include <cinttypes>
+#include "bytrace.h"
 #include "input_event_data_transformation.h"
 #include "mmi_server.h"
 namespace OHOS::MMI {
@@ -77,9 +78,23 @@ void ServerInputFilterManager::KeyEventFilter::SetAuthority(Authority authority)
     this->authority_ = authority;
 }
 
+void ServerInputFilterManager::OnKeyEventTrace(const EventKeyboard& key)
+{
+    int32_t EVENT_KEY = 1;
+    char keyUuid[MAX_UUIDSIZE] = {0};
+    if (EOK != memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid))) {
+        MMI_LOGT("%{public}s copy data failed", __func__);
+        return;
+    }
+    MMI_LOGT(" OnKeyEvent service trace keyUuid = %{public}s\n", keyUuid);
+    std::string keyEvent = keyUuid;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
+}
+
 bool ServerInputFilterManager::OnKeyEvent(EventKeyboard key)
 {
     MMI_LOGD("Key event filter on key event begin");
+    OnKeyEventTrace(key);
     if (keyEventFilterMap_.size() == 0) {
         MMI_LOGD("The keyEventFilterMap_ size is zero");
         return false;
@@ -221,11 +236,25 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
     }
 }
 
+void ServerInputFilterManager::OnTouchEventTrace(const EventTouch& touch)
+{
+    int32_t EVENT_TOUCH = 9;
+    char touchUuid[MAX_UUIDSIZE] = {0};
+    if (EOK != memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid))) {
+        MMI_LOGT("%{public}s copy data failed", __func__);
+        return;
+    }
+    MMI_LOGT(" OnTouchEvent service pointerUuid = %{public}s\n", touchUuid);
+    std::string touchEvent = touchUuid;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
+}
+
 bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event *event,
     EventTouch& touch, const uint64_t preHandlerTime)
 {
     CHKF(event, PARAM_INPUT_INVALID);
     MMI_LOGD("ServerInputFilterManager::OnTouchEvent");
+    OnTouchEventTrace(touch);
     if (touchEventFilterMap_.size() == 0) {
         MMI_LOGD("touchEventFilterMap_ size is zero");
         return false;
@@ -363,9 +392,23 @@ int32_t ServerInputFilterManager::RemoveTouchEventFilter(SessionPtr sess)
     return RET_OK;
 }
 
+void ServerInputFilterManager::OnPointerEventTrace(const EventPointer& event_pointer)
+{
+    int32_t EVENT_POINTER = 17;
+    char pointerUuid[MAX_UUIDSIZE] = {0};
+    if (EOK != memcpy_s(pointerUuid, sizeof(pointerUuid), event_pointer.uuid, sizeof(event_pointer.uuid))) {
+        MMI_LOGT("%{public}s copy data failed", __func__);
+        return;
+    }
+    MMI_LOGT(" OnPointerEvent service pointerUuid = %{public}s\n", pointerUuid);
+    std::string pointerEvent = pointerUuid;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
+}
+
 bool ServerInputFilterManager::OnPointerEvent(EventPointer event_pointer)
 {
     MMI_LOGD("pointer event filter on pointer event begin");
+    OnPointerEventTrace(event_pointer);
     if (pointerEventFilterMap_.size() == 0) {
         MMI_LOGD("pointerEventFilterMap_ size is zero");
         return false;

@@ -17,7 +17,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-
+#include "bytrace.h"
 #include "log.h"
 #include "file_ex.h"
 #include "ability_manager_client.h"
@@ -183,6 +183,11 @@ bool OHOS::MMI::AbilityLaunchManager::CheckLaunchAbility(std::shared_ptr<OHOS::M
     ResetWaitTriggerKey(waitTriggerKey);
     for (auto iter = shortcutKeysMap.begin(); iter != shortcutKeysMap.end(); ++iter) {
         ShortcutKey &shortcutKey = iter->second;
+        int32_t keyCode = key->GetKeyCode();
+        const std::string checkkeycode = std::to_string(keyCode);
+        MMI_LOGT(" CheckLaunchAbility service trace GetKeyCode = %{public}s\n", checkkeycode.c_str());
+        int32_t EVENT_KEY = 1;
+        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, checkkeycode, EVENT_KEY);
         if (!CheckShortcutkeyMatch(shortcutKey, key)) {
             continue;
         }
