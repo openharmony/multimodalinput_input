@@ -17,7 +17,7 @@
 
 #include <map>
 #include <vector>
-#include "c_singleton.h"
+#include "singleton.h"
 #include "hos_key_event.h"
 #include "libinput.h"
 #include "proto.h"
@@ -48,7 +48,7 @@ struct GestureInfo {
     bool enabled;
 };
 
-class RegisterEvent : public CSingleton<RegisterEvent> {
+class RegisterEvent : public DelayedSingleton<RegisterEvent> {
 public:
     RegisterEvent();
     ~RegisterEvent();

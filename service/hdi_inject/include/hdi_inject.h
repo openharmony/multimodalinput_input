@@ -91,6 +91,6 @@ private:
 };
 }
 }
-#define hdiInject OHOS::MMI::CSingleton<OHOS::MMI::HdiInject>::GetInstance()
+#define hdiInject OHOS::MMI::DelayedSingleton<OHOS::MMI::HdiInject>::GetInstance()
 #endif // OHOS_BUILD_HDF
 #endif // OHOS_HDI_INJECT_H

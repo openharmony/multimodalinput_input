@@ -18,11 +18,11 @@
 
 #include "libmmi_util.h"
 #include "app_register.h"
-#include "c_singleton.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
-class EventDump : public CSingleton<EventDump> {
+class EventDump : public DelayedSingleton<EventDump> {
 public:
     void Init(UDSServer& udss);
     void Dump(int32_t fd = 0); // -1=printf, 0=hilog, (fd>0)=file

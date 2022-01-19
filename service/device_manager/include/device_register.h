@@ -18,11 +18,11 @@
 #include <set>
 #include "uds_server.h"
 #include "util.h"
-#include "c_singleton.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
-class DeviceRegister : public CSingleton<DeviceRegister> {
+class DeviceRegister : public DelayedSingleton<DeviceRegister> {
 public:
     DeviceRegister();
     virtual ~DeviceRegister();

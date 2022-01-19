@@ -16,17 +16,17 @@
 #ifndef TIMER_MANAGER_H
 #define TIMER_MANAGER_H
 
-#include "c_singleton.h"
-#include "define_multimodal.h"
 #include <functional>
-#include "log.h"
 #include <list>
 #include <memory>
+#include "define_multimodal.h"
+#include "log.h"
+#include "singleton.h"
 #include "util.h"
 
 namespace OHOS {
 namespace MMI {
-class TimerManager : public CSingleton<TimerManager> {  
+class TimerManager : public DelayedSingleton<TimerManager> {
 public:
     int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
     int32_t RemoveTimer(int32_t timerId);
