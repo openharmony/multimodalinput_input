@@ -27,7 +27,7 @@
 #include <set>
 
 #include "nlohmann/json.hpp"
-#include "c_singleton.h"
+#include "singleton.h"
 #include "struct_multimodal.h"
 #include "key_event.h"
 
@@ -56,7 +56,7 @@ struct ShortcutKey {
     Ability ability;
 };
 
-class AbilityLaunchManager : public CSingleton<AbilityLaunchManager> {
+class AbilityLaunchManager : public DelayedSingleton<AbilityLaunchManager> {
 public:
     AbilityLaunchManager();
     ~AbilityLaunchManager() = default;

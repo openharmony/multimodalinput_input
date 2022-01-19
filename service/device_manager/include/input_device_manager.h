@@ -18,7 +18,7 @@
 #include <list>
 #include <string>
 #include "util.h"
-#include "c_singleton.h"
+#include "singleton.h"
 #include "msg_handler.h"
 #include "event_dispatch.h"
 #include "event_package.h"
@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace MMI {
-class InputDeviceManager : public CSingleton<InputDeviceManager> {
+class InputDeviceManager : public DelayedSingleton<InputDeviceManager> {
 public:
     void OnInputDeviceAdded(libinput_device* inputDevice);
     void OnInputDeviceRemoved(libinput_device* inputDevice);
