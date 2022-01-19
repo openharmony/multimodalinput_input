@@ -161,14 +161,14 @@ int32_t OHOS::MMI::EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, OH
 int32_t OHOS::MMI::EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSServer& udsServer,
     libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime)
 {
-    auto ret1 = RET_OK;
-    auto ret2 = RET_OK;
     RegisteredEvent eve = {};
-    auto result = eventPackage_.PackageRegisteredEvent<EventKeyboard>(eve, key);
+    auto result = eventPackage_.PackageRegisteredEvent<EventKeyboard>(key, eve);
     if (result != RET_OK) {
         MMI_LOGE("Registered event package failed, ret:%{public}d, errCode:%{public}d", result, REG_EVENT_PKG_FAIL);
         return RET_ERR;
     }
+    auto ret1 = RET_OK;
+    auto ret2 = RET_OK;
     if ((key.key == KEY_ENTER || key.key == KEY_KPENTER) && (key.state == KEY_STATE_PRESSED)) {
         ret1 = DispatchRegEvent(MmiMessageId::ON_SEND, udsServer, eve, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret1 != RET_OK) {
@@ -572,7 +572,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
     MMIRegEvent->OnEventGestureGetSign(gesture, idMsg);
     if (idMsg != MmiMessageId::INVALID) {
         RegisteredEvent registeredEvent = {};
-        auto packageResult = eventPackage_.PackageRegisteredEvent<EventGesture>(registeredEvent, gesture);
+        auto packageResult = eventPackage_.PackageRegisteredEvent<EventGesture>(gesture, registeredEvent);
         if (packageResult != RET_OK) {
             MMI_LOGE("Registered event package failed... ret:%{public}d errCode:%{public}d",
                 packageResult, REG_EVENT_PKG_FAIL);
@@ -644,7 +644,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
     MMIRegEvent->OnEventTouchGetSign(touch, idMsg);
     if (idMsg != MmiMessageId::INVALID) {
         RegisteredEvent registeredEvent = {};
-        auto packageResult = eventPackage_.PackageRegisteredEvent<EventTouch>(registeredEvent, touch);
+        auto packageResult = eventPackage_.PackageRegisteredEvent<EventTouch>(touch, registeredEvent);
         if (packageResult != RET_OK) {
             MMI_LOGE("Registered event package failed... ret:%{public}d errCode:%{public}d",
                 packageResult, REG_EVENT_PKG_FAIL);
@@ -747,7 +747,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer,
     }
     if (idMsg != MmiMessageId::INVALID) {
         RegisteredEvent registeredEvent = {};
-        auto packageResult = eventPackage_.PackageRegisteredEvent<EventPointer>(registeredEvent, point);
+        auto packageResult = eventPackage_.PackageRegisteredEvent<EventPointer>(point, registeredEvent);
         if (packageResult != RET_OK) {
             MMI_LOGE("Registered event package failed... ret:%{public}d errCode:%{public}d",
                 packageResult, REG_EVENT_PKG_FAIL);
@@ -850,7 +850,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
     MMIRegEvent->OnEventKeyGetSign(key, idMsg, prevKey);
     if (MmiMessageId::INVALID != idMsg) {
         RegisteredEvent registeredEvent = {};
-        auto packageResult = eventPackage_.PackageRegisteredEvent<EventKeyboard>(registeredEvent, prevKey);
+        auto packageResult = eventPackage_.PackageRegisteredEvent<EventKeyboard>(prevKey, registeredEvent);
         if (packageResult != RET_OK) {
             MMI_LOGE("Registered event package failed. ret:%{public}d, errCode:%{public}d",
                 packageResult, REG_EVENT_PKG_FAIL);
