@@ -17,6 +17,7 @@
 #include <inttypes.h>
 #include "input-event-codes.h"
 #include "ability_launch_manager.h"
+#include "bytrace.h"
 #include "event_filter_wrap.h"
 #include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
@@ -160,14 +161,14 @@ int32_t OHOS::MMI::EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, OH
 int32_t OHOS::MMI::EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSServer& udsServer,
     libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime)
 {
-    auto ret1 = RET_OK;
-    auto ret2 = RET_OK;
     RegisteredEvent eve = {};
-    auto result = eventPackage_.PackageRegisteredEvent<EventKeyboard>(eve, key);
+    auto result = eventPackage_.PackageRegisteredEvent<EventKeyboard>(key, eve);
     if (result != RET_OK) {
         MMI_LOGE("Registered event package failed, ret:%{public}d, errCode:%{public}d", result, REG_EVENT_PKG_FAIL);
         return RET_ERR;
     }
+    auto ret1 = RET_OK;
+    auto ret2 = RET_OK;
     if ((key.key == KEY_ENTER || key.key == KEY_KPENTER) && (key.state == KEY_STATE_PRESSED)) {
         ret1 = DispatchRegEvent(MmiMessageId::ON_SEND, udsServer, eve, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret1 != RET_OK) {
@@ -401,6 +402,7 @@ int32_t OHOS::MMI::EventDispatch::handlePointerEvent(std::shared_ptr<PointerEven
     }
 
     auto session = udsServer->GetSession(fd);
+    CHKPR(session, ERROR_NULL_POINTER, RET_ERR);
     auto eventId = point->GetId();
     auto currentTime = GetSysClockTime();
     session->RecordEvent(eventId, currentTime);
@@ -463,6 +465,19 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchTransformPointEvent(UDSServer& ud
     }
     MMI_LOGD("call  DispatchTouchTransformPointEvent end"); 
     return RET_OK;
+}
+
+void OHOS::MMI::EventDispatch::DispatchPointerEventTrace(const EventPointer& point)
+{
+    int32_t EVENT_POINTER = 17;
+    char pointerUuid[MAX_UUIDSIZE] = {0};
+    if (EOK != memcpy_s(pointerUuid, sizeof(pointerUuid), point.uuid, sizeof(point.uuid))) {
+        MMI_LOGT("%{public}s copy data failed", __func__);
+        return;
+    }
+    MMI_LOGT(" OnEventPointer service DispatchPointerEvent pointerUuid = %{public}s\n", pointerUuid);
+    std::string pointerEvent = pointerUuid;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
 }
 
 int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event *event,
@@ -537,6 +552,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
                     point.state, point.source, point.delta.x, point.delta.y, point.delta_raw.x,
                     point.delta_raw.y, point.absolute.x, point.absolute.y, point.discrete.x,
                     point.discrete.y, appInfo.fd, preHandlerTime);
+        DispatchPointerEventTrace(point);
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
             MMI_LOGE("Sending structure of EventPointer failed! errCode:%{public}d\n", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
@@ -556,7 +572,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
     MMIRegEvent->OnEventGestureGetSign(gesture, idMsg);
     if (idMsg != MmiMessageId::INVALID) {
         RegisteredEvent registeredEvent = {};
-        auto packageResult = eventPackage_.PackageRegisteredEvent<EventGesture>(registeredEvent, gesture);
+        auto packageResult = eventPackage_.PackageRegisteredEvent<EventGesture>(gesture, registeredEvent);
         if (packageResult != RET_OK) {
             MMI_LOGE("Registered event package failed... ret:%{public}d errCode:%{public}d",
                 packageResult, REG_EVENT_PKG_FAIL);
@@ -600,6 +616,19 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
     return RET_OK;
 }
 
+void OHOS::MMI::EventDispatch::DispatchTouchEventTrace(const EventTouch& touch)
+{
+    int32_t EVENT_TOUCH = 9;
+    char touchUuid[MAX_UUIDSIZE] = {0};
+    if (EOK != memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid))) {
+        MMI_LOGT("%{public}s copy data failed", __func__);
+        return;
+    }
+    MMI_LOGT(" 4.event dispatcher of server: touchUuid = %{public}s\n", touchUuid);
+    std::string touchEvent = touchUuid;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
+}
+
 int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
     EventTouch& touch, const uint64_t preHandlerTime)
 {
@@ -615,7 +644,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
     MMIRegEvent->OnEventTouchGetSign(touch, idMsg);
     if (idMsg != MmiMessageId::INVALID) {
         RegisteredEvent registeredEvent = {};
-        auto packageResult = eventPackage_.PackageRegisteredEvent<EventTouch>(registeredEvent, touch);
+        auto packageResult = eventPackage_.PackageRegisteredEvent<EventTouch>(touch, registeredEvent);
         if (packageResult != RET_OK) {
             MMI_LOGE("Registered event package failed... ret:%{public}d errCode:%{public}d",
                 packageResult, REG_EVENT_PKG_FAIL);
@@ -673,6 +702,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
                          touchTemp.devicePhys, touchTemp.eventType, touchTemp.slot, touchTemp.seat_slot,
                          touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, appInfo.fd,
                          preHandlerTime);
+                DispatchTouchEventTrace(touchTemp);
                 newPacket << touchTemp;
 
             }
@@ -687,6 +717,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
                      touch.time, touch.deviceType, touch.deviceName,
                      touch.devicePhys, touch.eventType, touch.slot, touch.seat_slot, touch.pressure,
                      touch.point.x, touch.point.y, appInfo.fd, preHandlerTime);
+            DispatchTouchEventTrace(touch);
         }
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
             MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d\n", MSG_SEND_FAIL);
@@ -716,7 +747,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer,
     }
     if (idMsg != MmiMessageId::INVALID) {
         RegisteredEvent registeredEvent = {};
-        auto packageResult = eventPackage_.PackageRegisteredEvent<EventPointer>(registeredEvent, point);
+        auto packageResult = eventPackage_.PackageRegisteredEvent<EventPointer>(point, registeredEvent);
         if (packageResult != RET_OK) {
             MMI_LOGE("Registered event package failed... ret:%{public}d errCode:%{public}d",
                 packageResult, REG_EVENT_PKG_FAIL);
@@ -760,6 +791,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
              key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
 
     auto session = udsServer.GetSession(fd);
+    CHKPR(session, ERROR_NULL_POINTER, RET_ERR);
     auto eventId = key->GetId();
     auto currentTime = GetSysClockTime();
     session->RecordEvent(eventId, currentTime);
@@ -787,6 +819,19 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
     return RET_OK;
 }
 
+void OHOS::MMI::EventDispatch::DispatchKeyEventTrace(const EventKeyboard& key)
+{
+    int32_t EVENT_KEY = 1;
+    char keyUuid[MAX_UUIDSIZE] = {0};
+    if (EOK != memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid))) {
+        MMI_LOGT("%{public}s copy data failed", __func__);
+        return;
+    }
+    MMI_LOGT(" OnEventKeyboard service DispatchKeyEvent keyUuid = %{public}s\n", keyUuid);
+    std::string keyEvent = keyUuid;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
+}
+
 int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *event,
     const KeyEventValueTransformations& trs, EventKeyboard& key, const uint64_t preHandlerTime)
 {
@@ -805,7 +850,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
     MMIRegEvent->OnEventKeyGetSign(key, idMsg, prevKey);
     if (MmiMessageId::INVALID != idMsg) {
         RegisteredEvent registeredEvent = {};
-        auto packageResult = eventPackage_.PackageRegisteredEvent<EventKeyboard>(registeredEvent, prevKey);
+        auto packageResult = eventPackage_.PackageRegisteredEvent<EventKeyboard>(prevKey, registeredEvent);
         if (packageResult != RET_OK) {
             MMI_LOGE("Registered event package failed. ret:%{public}d, errCode:%{public}d",
                 packageResult, REG_EVENT_PKG_FAIL);
@@ -838,7 +883,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
              key.time, key.deviceType, key.deviceName, key.devicePhys, key.eventType,
              key.unicode, key.key, trs.keyEvent.c_str(), key.seat_key_count, key.state, appInfo.fd,
              preHandlerTime);
-
+    DispatchKeyEventTrace(key);
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, appInfo.fd, key.time, preHandlerTime)) {
         NetPacket newPkt(MmiMessageId::ON_KEY);
         newPkt << key << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;

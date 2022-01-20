@@ -18,13 +18,13 @@
 #include <string>
 #include "proto.h"
 #include "uds_server.h"
-#include "c_singleton.h"
+#include "singleton.h"
 #include "register_event.h"
 #include "event_package.h"
 #include "log.h"
 #include "key_event.h"
 namespace OHOS::MMI {
-class ServerInputFilterManager : public CSingleton<ServerInputFilterManager> {
+class ServerInputFilterManager : public DelayedSingleton<ServerInputFilterManager> {
 public:
     class KeyEventFilter {
     public:
@@ -42,6 +42,7 @@ public:
         std::string name_;
         Authority authority_;
     };
+    void OnKeyEventTrace(const EventKeyboard& key);
     bool OnKeyEvent(EventKeyboard key);
     int32_t AddKeyEventFilter(SessionPtr sess, std::string name, int32_t id, Authority authority);
     int32_t RemoveKeyEventFilter(SessionPtr sess, int32_t id);
@@ -64,6 +65,7 @@ public:
         std::string name_;
         Authority authority_;
     };
+    void OnTouchEventTrace(const EventTouch& touch);
     bool OnTouchEvent(libinput_event *event, EventTouch& touch,
         const uint64_t preHandlerTime);
     int32_t AddTouchEventFilter(SessionPtr sess, std::string name, int32_t id, Authority authority);
@@ -87,6 +89,7 @@ public:
         std::string name_;
         Authority authority_;
     };
+    void OnPointerEventTrace(const EventPointer& event_pointer);
     bool OnPointerEvent(EventPointer event_pointer);
     int32_t RegisterEventInterceptorforServer(const SessionPtr& sess, int32_t id,
         std::string name, Authority authority);

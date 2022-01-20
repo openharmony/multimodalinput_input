@@ -55,6 +55,9 @@ public:
     bool HandleTouchScreenEvent(std::shared_ptr<PointerEvent> point);
     bool HandleMouseEvent(std::shared_ptr<PointerEvent> point);
     bool HandleTouchPadEvent(std::shared_ptr<PointerEvent> point);
+    void DispatchKeyEventTrace(const EventKeyboard& key);
+    void DispatchTouchEventTrace(const EventTouch& touch);
+    void DispatchPointerEventTrace(const EventPointer& point);
 
 protected:
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);

@@ -14,6 +14,7 @@
  */
 
 #include "input_manager_impl.h"
+#include "bytrace.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "event_filter_service.h"
@@ -107,6 +108,11 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::II
 void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
     MMI_LOGD("enter");
+    int32_t getKeyCode = keyEvent->GetKeyCode();
+    std::string keyCodestring = std::to_string(getKeyCode);
+    MMI_LOGT("\n OnKeyEvent client trace getKeyCode = %{public}s\n", keyCodestring.c_str());
+    int32_t EVENT_KEY = 1;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, EVENT_KEY);
     if (consumer != nullptr) {
         CHK(keyEvent != nullptr, ERROR_NULL_POINTER);
         consumer->OnInputEvent(keyEvent);

@@ -14,20 +14,21 @@
  */
 #ifndef OHOS_INPUT_EVENT_HANDLER_H
 #define OHOS_INPUT_EVENT_HANDLER_H
-#include "key_event_input_subscribe_filter.h"
-#include "msg_handler.h"
+
+#include <memory>
 #include "event_dispatch.h"
 #include "event_package.h"
-#include "c_singleton.h"
 #include "i_event_filter.h"
+#include "key_event_input_subscribe_filter.h"
 #include "mouse_event_handler.h"
-#include <memory>
+#include "msg_handler.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
 using EventFun = std::function<int32_t(multimodal_libinput_event &ev)>;
 using NotifyDeviceChange = std::function<void(int32_t, int32_t, char *)>;
-class InputEventHandler : public MsgHandler<EventFun>, public CSingleton<InputEventHandler> {
+class InputEventHandler : public MsgHandler<EventFun>, public DelayedSingleton<InputEventHandler> {
 public:
     InputEventHandler();
     virtual ~InputEventHandler() override;
@@ -61,6 +62,9 @@ protected:
     
     int32_t OnMouseEventHandler(libinput_event *event, const int32_t deviceId);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
+    void OnEventKeyboardTrace(const EventKeyboard& key);
+    void OnEventPointerTrace(const EventPointer& point);
+    void OnEventTouchTrace(const struct EventTouch& touch);
 #ifdef OHOS_WESTEN_MODEL
     bool OnSystemEvent(const KeyEventValueTransformations& temp, const enum KEY_STATE state) const;
 #endif
