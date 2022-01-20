@@ -54,6 +54,7 @@ public:
     void RemoveInterceptor(int32_t interceptorId);
 
     void SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent);
+    void OnConnected();
 
 private:
     int32_t PackPhysicalDisplay(NetPacket &ckt);

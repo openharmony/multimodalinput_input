@@ -311,5 +311,29 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> k
         MMI_LOGE("Failed to inject keyEvent!");
     }
 }
+
+void InputManagerImpl::OnConnected()
+{
+    MMI_LOGD("InputManagerImpl::OnConnected enter!");
+
+    PrintDisplayDebugInfo();
+    if (physicalDisplays_.size() == 0 || logicalDisplays_.size() == 0) {
+        MMI_LOGE("display info check failed! physicalDisplays_ size is %{public}d, logicalDisplays_ size is %{public}d",
+            static_cast<int32_t>(physicalDisplays_.size()), static_cast<int32_t>(logicalDisplays_.size()));
+        return;
+    }
+
+    if (MultimodalEventHandler::GetInstance().GetMMIClient()) {
+        OHOS::MMI::NetPacket ckt(MmiMessageId::DISPLAY_INFO);
+        if (PackDisplayData(ckt) == RET_ERR) {
+            MMI_LOGE("pack display info failed");
+            return;
+        }
+        MultimodalEventHandler::GetInstance().GetMMIClient()->SendMessage(ckt);
+    } else {
+        MMI_LOGE("GetMMIClient is failed");
+    }
+
+    MMI_LOGD("InputManagerImpl::OnConnected leave!");
 }
 }
