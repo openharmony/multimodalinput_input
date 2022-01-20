@@ -125,6 +125,21 @@ int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& d
     return RET_OK;
 }
 
+template<class T>
+int32_t EventPackage::PackageRegisteredEvent(RegisteredEvent& registeredEvent, T& eventData)
+{
+    const std::string uid = GetUUid();
+    CHKR(EOK == memcpy_s(registeredEvent.devicePhys, MAX_DEVICENAME, eventData.devicePhys, MAX_DEVICENAME),
+         MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    CHKR(EOK == memcpy_s(registeredEvent.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size()),
+         MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    registeredEvent.deviceId = eventData.deviceId;
+    registeredEvent.eventType = eventData.eventType;
+    registeredEvent.deviceType = eventData.deviceType;
+    registeredEvent.occurredTime = eventData.time;
+    return RET_OK;
+}
+
 int32_t EventPackage::PackageTabletToolOtherParams(libinput_event *event, EventTabletTool& tableTool)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
