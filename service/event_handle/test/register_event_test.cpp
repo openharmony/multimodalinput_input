@@ -57,7 +57,7 @@ HWTEST_F(RegisterEventTest, OnEventPointAxis_001, TestSize.Level1)
     RegisterEvent registerEvent;
     MmiMessageId msg = MmiMessageId::INVALID;
     EventPointer point = {};
-    point.axes = POINTER_AXIS_SCROLL_VERTICAL;
+    point.axis = POINTER_AXIS_SCROLL_VERTICAL;
     point.source = POINTER_AXIS_SOURCE_WHEEL;
     point.delta.y = 15;
     auto retResult = registerEvent.OnEventPointAxis(point, msg);
@@ -69,7 +69,7 @@ HWTEST_F(RegisterEventTest, OnEventPointAxis_002, TestSize.Level1)
     RegisterEvent registerEvent;
     MmiMessageId msg = MmiMessageId::INVALID;
     EventPointer point = {};
-    point.axes = POINTER_AXIS_SCROLL_VERTICAL;
+    point.axis = POINTER_AXIS_SCROLL_VERTICAL;
     point.source = POINTER_AXIS_SOURCE_WHEEL;
     point.delta.y = -15;
     auto retResult = registerEvent.OnEventPointAxis(point, msg);
@@ -146,7 +146,7 @@ HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_01, TestSize.Level1)
     EventTouch touch = {};
     int32_t seatSlot = 0;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(touch, MAKEPAIR(deviceId, seatSlot));
+    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_02, TestSize.Level1)
@@ -155,7 +155,7 @@ HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_02, TestSize.Level1)
     EventTouch touch = {};
     int32_t seatSlot = 0;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(touch, MAKEPAIR(deviceId, seatSlot));
+    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_03, TestSize.Level1)
@@ -164,7 +164,7 @@ HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_03, TestSize.Level1)
     EventTouch touch = {};
     int32_t seatSlot = 0;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(touch, MAKEPAIR(deviceId, seatSlot));
+    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_04, TestSize.Level1)
@@ -173,7 +173,7 @@ HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_04, TestSize.Level1)
     EventTouch touch = {};
     int32_t seatSlot = 0;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(touch, MAKEPAIR(deviceId, seatSlot));
+    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_05, TestSize.Level1)
@@ -182,7 +182,7 @@ HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_05, TestSize.Level1)
     EventTouch touch = {};
     int32_t seatSlot = 0;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(touch, MAKEPAIR(deviceId, seatSlot));
+    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_06, TestSize.Level1)
@@ -191,7 +191,7 @@ HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_06, TestSize.Level1)
     EventTouch touch = {};
     int32_t seatSlot = 0;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(touch, MAKEPAIR(deviceId, seatSlot));
+    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_07, TestSize.Level1)
@@ -200,7 +200,7 @@ HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_07, TestSize.Level1)
     EventTouch touch = {};
     int32_t seatSlot = 100000;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(touch, MAKEPAIR(deviceId, seatSlot));
+    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_08, TestSize.Level1)
@@ -209,7 +209,7 @@ HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_08, TestSize.Level1)
     EventTouch touch = {};
     int32_t seatSlot = 100000;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(touch, MAKEPAIR(deviceId, seatSlot));
+    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_09, TestSize.Level1)
@@ -218,7 +218,7 @@ HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_09, TestSize.Level1)
     EventTouch touch = {};
     int32_t seatSlot = -100000;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(touch, MAKEPAIR(deviceId, seatSlot));
+    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_010, TestSize.Level1)
@@ -227,7 +227,7 @@ HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_010, TestSize.Level1)
     EventTouch touch = {};
     int32_t seatSlot = -100000;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(touch, MAKEPAIR(deviceId, seatSlot));
+    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_011, TestSize.Level1)
@@ -236,7 +236,7 @@ HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_011, TestSize.Level1)
     EventTouch touch = {};
     int32_t seatSlot = -1;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(touch, MAKEPAIR(deviceId, seatSlot));
+    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_012, TestSize.Level1)
@@ -245,7 +245,7 @@ HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_012, TestSize.Level1)
     EventTouch touch = {};
     int32_t seatSlot = -1;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(touch, MAKEPAIR(deviceId, seatSlot));
+    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchIds_01, TestSize.Level1)

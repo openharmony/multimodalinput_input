@@ -14,9 +14,14 @@
  */
 
 #include "key_event.h"
+#include "hilog/log.h"
 
+using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
+namespace {
+    constexpr HiLogLabel LABEL = { LOG_CORE, 0xD002800, "KeyEvent" };
+}
 const int32_t KeyEvent::KEYCODE_FN = 0;
 const int32_t KeyEvent::KEYCODE_UNKNOWN = -1;
 const int32_t KeyEvent::KEYCODE_HOME = 1;
@@ -1365,5 +1370,81 @@ std::shared_ptr<KeyEvent> KeyEvent::Clone(std::shared_ptr<KeyEvent> keyEvent) {
     return std::shared_ptr<KeyEvent>(new KeyEvent(*keyEvent.get()));
 }
 
+bool KeyEvent::IsValidKeyItem() const
+{
+    HiLog::Debug(LABEL, "KeyEvent::IsValidKeyItem begin");
+    int32_t noPressNum = 0;
+    int32_t keyCode = GetKeyCode();
+    int32_t action = GetKeyAction();
+    
+    for (auto it = keys_.begin(); it != keys_.end(); it++) {
+        if (it->GetKeyCode() <= KEYCODE_UNKNOWN) {
+            HiLog::Error(LABEL, "Keyitems keyCode is invalid");
+            return false;
+        }
+
+        if (it->GetDownTime() <= 0) {
+            HiLog::Error(LABEL, "Keyitems downtime is invalid");
+            return false;
+        }
+        
+        if (action != KEY_ACTION_UP && it->IsPressed() == false) {
+            HiLog::Error(LABEL, "Keyitems ispressed is invalid");
+            return false;
+        }
+        
+        if (action == KEY_ACTION_UP && it->IsPressed() == false) {
+            noPressNum++;
+            if (it->GetKeyCode() != keyCode) {
+                HiLog::Error(LABEL, "Keyitems keyCode is not valid when ispressed is false");
+                return false;
+            }
+        }
+        
+        auto itemtmp = it;
+        for (++itemtmp; itemtmp != keys_.end(); itemtmp++) {
+            if (it->GetKeyCode() == itemtmp->GetKeyCode()) {
+                HiLog::Error(LABEL, "Keyitems keyCode exist same items");
+                return false;
+            }
+        }
+    }
+    
+    if (noPressNum != 1) {
+        HiLog::Error(LABEL, "Keyitems keyCode is not unique  when ispressed is false");
+        return false;
+    }
+    HiLog::Debug(LABEL, "KeyEvent::IsValidKeyItem end");
+    return true;
+}
+
+bool KeyEvent::IsValid() const
+{
+    HiLog::Debug(LABEL, "KeyEvent::IsValid begin");
+    int32_t keyCode = GetKeyCode();
+    if (keyCode <= KEYCODE_UNKNOWN) {
+        HiLog::Error(LABEL, "KeyCode_ is invalid");
+        return false;
+    }
+    
+    if (GetActionTime() <= 0) {
+        HiLog::Error(LABEL, "Actiontime is invalid");
+        return false;
+    }
+    
+    int32_t action = GetKeyAction();
+    if (action != KEY_ACTION_CANCEL && action != KEY_ACTION_UP &&
+        action != KEY_ACTION_DOWN) {
+        HiLog::Error(LABEL, "Action is invalid");
+        return false;
+    }
+    
+    if (!IsValidKeyItem()) {
+        HiLog::Error(LABEL, "IsValidKeyItem is invalid");
+        return false;
+    }
+    HiLog::Debug(LABEL, "KeyEvent::IsValid end");
+    return true;
+}
 }
 }

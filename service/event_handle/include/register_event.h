@@ -72,7 +72,7 @@ public:
     */
     void OnEventTouchGetSign(const EventTouch& touch, MmiMessageId& msgId);
     void OnEventGestureGetSign(const EventGesture& gesture, MmiMessageId& msgId);
-    int32_t GetTouchInfoByTouchId(EventTouch& touch, const PAIR<uint32_t, int32_t> key);
+    int32_t GetTouchInfoByTouchId(const PAIR<uint32_t, int32_t> key, EventTouch& touch);
     void GetTouchIds(std::vector<std::pair<uint32_t, int32_t>>& touchIds, const uint32_t deviceId);
     int32_t GetTouchInfoSizeByDeviceId(const uint32_t deviceId);
 protected:

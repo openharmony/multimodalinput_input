@@ -47,8 +47,6 @@ namespace OHOS::MMI {
         static int32_t KeyboardToKeyEvent(EventKeyboard& key, std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr);
         static std::shared_ptr<OHOS::MMI::PointerEvent> GestureToPointerEvent(EventGesture& gesture);
     private:
-        uint32_t SEAT_BUTTON_OR_KEY_COUNT_ONE = 1;
-        uint32_t SEAT_BUTTON_OR_KEY_COUNT_ZERO = 0;
         void PackageTabletPadOtherParams(libinput_event *event, EventTabletPad& tabletPad);
         int32_t PackageTabletToolOtherParams(libinput_event *event, EventTabletTool& tableTool);
         void PackageTabletToolTypeParam(libinput_event *event, EventTabletTool& tableTool);
