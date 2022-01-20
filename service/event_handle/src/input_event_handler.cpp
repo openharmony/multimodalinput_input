@@ -495,7 +495,8 @@ void OHOS::MMI::InputEventHandler::OnEventKeyboardTrace(const EventKeyboard& key
         return;
     }
     MMI_LOGT(" OnEventKeyboard service reported keyUuid = %{public}s\n", keyUuid);
-    std::string keyEvent = "OnEventKeyboard service reported keyUuid: " + keyUuid;
+    std::string keyEvent = keyUuid;
+    keyEvent = "OnEventKeyboard service reported keyUuid: " + keyEvent;
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
 }
 
@@ -551,7 +552,8 @@ void OHOS::MMI::InputEventHandler::OnEventPointerTrace(const EventPointer& point
         return;
     }
     MMI_LOGT(" OnEventPointer service reported pointerUuid = %{public}s\n", pointerUuid);
-    std::string pointerEvent = "OnEventPointer service reported pointerUuid: " + pointerUuid;
+    std::string pointerEvent = pointerUuid;
+    pointerEvent = "OnEventPointer service reported pointerUuid: " + pointerEvent;
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
 }
 
@@ -673,7 +675,8 @@ void OHOS::MMI::InputEventHandler::OnEventTouchTrace(const struct EventTouch& to
         return;
     }
     MMI_LOGT(" OnEventTouch service reported touchUuid = %{public}s\n", touchUuid);
-    std::string touchEvent = "OnEventTouch service reported touchUuid: " + touchUuid;
+    std::string touchEvent = touchUuid;
+    touchEvent = "OnEventTouch service reported touchUuid: " + touchEvent;
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
 }
 
