@@ -35,7 +35,7 @@ int32_t InputEventMonitorManager::AddInputEventMontior(
     std::function<void (std::shared_ptr<OHOS::MMI::KeyEvent>)> keyEventMonitor)
 {
     if (keyEventMonitor == nullptr) {
-        MMI_LOGE("param should not be null!");
+        MMI_LOGE("param should not be null");
         return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
     static int32_t monitorId = 0;
@@ -43,7 +43,7 @@ int32_t InputEventMonitorManager::AddInputEventMontior(
     monitorItem.keyEventMonitor = keyEventMonitor;
     monitorItem.id_ = ++monitorId;
     monitors_.push_back(monitorItem);
-    MMI_LOGD("monitorId = %{public}d", monitorId);
+    MMI_LOGD("monitorId: %{public}d", monitorId);
     MMIEventHdl.AddInputEventMontior(OHOS::MMI::InputEvent::EVENT_TYPE_KEY);
     return OHOS::MMI_STANDARD_EVENT_SUCCESS;
 }
@@ -74,7 +74,7 @@ int32_t InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OHOS::MMI:
     }
     std::list<MonitorItem>::iterator iter;
     for (iter = monitors_.begin(); iter != monitors_.end(); iter++) {
-        MMI_LOGD("send msg",);
+        MMI_LOGD("send msg");
         iter->keyEventMonitor(keyEvent);
     }
     return OHOS::MMI_STANDARD_EVENT_SUCCESS;
@@ -84,7 +84,7 @@ int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(
     std::function<void (std::shared_ptr<OHOS::MMI::PointerEvent>)> TouchPadEventMonitor)
 {
     if (TouchPadEventMonitor == nullptr) {
-        MMI_LOGE("param should not be null!");
+        MMI_LOGE("param should not be null");
         return INVALID_MONITOR_ID;
     }
     static int32_t monitorId = 0;
@@ -101,7 +101,7 @@ int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(
 void InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t monitorId)
 {
     if (monitorId <= 0) {
-        MMI_LOGE("monitorId invalid";
+        MMI_LOGE("monitorId invalid");
         return;
     }
     MonitorItem monitorItem;
@@ -121,7 +121,7 @@ int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<OH
 {
     MMI_LOGD("enter");
     if (pointerEvent == nullptr) {
-        MMI_LOGE("param should not be null!");
+        MMI_LOGE("param should not be null");
     }
     std::list<MonitorItem>::iterator iter;
     for (iter = monitors_.begin(); iter != monitors_.end(); iter++) {
