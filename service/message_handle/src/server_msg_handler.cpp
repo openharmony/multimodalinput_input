@@ -747,7 +747,8 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& p
     CHKR(pkt.Read(deviceId), STREAM_BUF_READ_FAIL, RET_ERR);
 
 #ifdef OHOS_WESTEN_MODEL
-    inputDeviceManager->FindInputDeviceByIdAsync(deviceId, [taskId, sess, this](std::shared_ptr<InputDevice> inputDevice) {
+    inputDeviceManager->FindInputDeviceByIdAsync(deviceId,
+        [taskId, sess, this](std::shared_ptr<InputDevice> inputDevice) {
         NetPacket pkt2(MmiMessageId::INPUT_DEVICE);
         if (inputDevice == nullptr) {
             MMI_LOGI("Input device not found.");
