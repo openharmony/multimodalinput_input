@@ -315,7 +315,7 @@ void InputManagerImpl::OnConnected()
     MMI_LOGD("leave");
 }
 
-void InputManagerImpl::SendDisplayInfo() 
+void InputManagerImpl::SendDisplayInfo()
 {
     if (MultimodalEventHandler::GetInstance().GetMMIClient() == nullptr) {
         MMI_LOGE("get mmi client is nullptr");
