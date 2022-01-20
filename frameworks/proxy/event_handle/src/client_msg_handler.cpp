@@ -1241,7 +1241,8 @@ void OHOS::MMI::ClientMsgHandler::TraceKeyEvent(const EventKeyboard& key) const
         return;
     }
     MMI_LOGT(" nevent dispatcher of client: keyUuid = %{public}s\n", keyUuid);
-    std::string keyEvent = " nevent dispatcher of client keyUuid: " + keyUuid;
+    std::string keyEvent = keyUuid;
+    keyEvent = " nevent dispatcher of client keyUuid: " + keyEvent;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
 }
 
@@ -1254,7 +1255,8 @@ void OHOS::MMI::ClientMsgHandler::TracePointerEvent(const EventPointer& pointDat
         return;
     }
     MMI_LOGT(" nevent dispatcher of client: pointerUuid = %{public}s\n", pointerUuid);
-    std::string pointerEvent = " nevent dispatcher of client pointerUuid: " + pointerUuid;
+    std::string pointerEvent = pointerUuid;
+    pointerEvent = " nevent dispatcher of client pointerUuid: " + pointerEvent;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
 }
 
@@ -1267,6 +1269,7 @@ void OHOS::MMI::ClientMsgHandler::TraceTouchEvent(const EventTouch& touchData) c
         return;
     }
     MMI_LOGT(" nevent dispatcher of client: touchUuid = %{public}s\n", touchUuid);
-    std::string touchEventString = " nevent dispatcher of client touchUuid: " + touchUuid;
+    std::string touchEventString = touchUuid;
+    touchEventString = " nevent dispatcher of client touchUuid: " + touchEventString;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, EVENT_TOUCH);
 }
