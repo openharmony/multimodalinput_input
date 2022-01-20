@@ -23,8 +23,8 @@ namespace {
     constexpr uint32_t SEAT_KEY_COUNT_ONE = 1;
     constexpr uint32_t SEAT_KEY_COUNT_ZERO = 0;
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventPackage" };
-    void FillEventJoyStickAxisAbsInfo(EventJoyStickAxisAbsInfo& l,
-                                            const libinput_event_joystick_axis_abs_info& r)
+
+    void FillEventJoyStickAxisAbsInfo(EventJoyStickAxisAbsInfo& l, const libinput_event_joystick_axis_abs_info& r)
     {
         l.code = r.code;
         l.value = r.value;
@@ -47,7 +47,7 @@ namespace {
         }
     }
 
-    enum HOS_DEVICE_TYPE GetDeviceType(struct libinput_device* device)
+    HOS_DEVICE_TYPE GetDeviceType(struct libinput_device* device)
     {
         CHKPR(device, ERROR_NULL_POINTER, HOS_UNKNOWN_DEVICE_TYPE);
         enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
