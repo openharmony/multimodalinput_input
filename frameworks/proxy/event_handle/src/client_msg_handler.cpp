@@ -794,11 +794,11 @@ int32_t OHOS::MMI::ClientMsgHandler::PointerEventInterceptor(const UDSClient& cl
     mmiPoint.Setxy(pointData.delta.x, pointData.delta.y);
     MMI_LOGT("WangYuan\nevent dispatcher of client: mouse_data \neventPointer:time=%{public}" PRId64 ";"
              "eventType=%{public}d;buttonCode=%{public}u;deviceType=%{public}u;"
-             "seat_button_count=%{public}u;axes=%{public}u;buttonState=%{public}d;source=%{public}d;"
+             "seat_button_count=%{public}u;axis=%{public}u;buttonState=%{public}d;source=%{public}d;"
              "delta.x=%{public}lf;delta.y=%{public}lf;delta_raw.x=%{public}lf;delta_raw.y=%{public}lf;"
              "absolute.x=%{public}lf;absolute.y=%{public}lf;discYe.x=%{public}lf;discrete.y=%{public}lf.\n",
              pointData.time, pointData.eventType, pointData.button, pointData.deviceType,
-             pointData.seat_button_count, pointData.axes, pointData.state, pointData.source, pointData.delta.x,
+             pointData.seat_button_count, pointData.axis, pointData.state, pointData.source, pointData.delta.x,
              pointData.delta.y, pointData.delta_raw.x, pointData.delta_raw.y, pointData.absolute.x,
              pointData.absolute.y, pointData.discrete.x, pointData.discrete.y);
     TracePointerEvent(pointData);
@@ -889,11 +889,11 @@ void OHOS::MMI::ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, Ne
     pkt >> ret >> pointData >> abilityId >> windowId >> fd >> serverStartTime;
     MMI_LOGT("\nevent dispatcher of client: mouse_data \neventPointer:time=%{public}" PRId64 "; eventType=%{public}d;"
              "buttonCode=%{public}u;deviceType=%{public}u;seat_button_count=%{public}u;"
-             "axes=%{public}u;buttonState=%{public}d;source=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
+             "axis=%{public}u;buttonState=%{public}d;source=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
              "delta_raw.x=%{public}lf;delta_raw.y=%{public}lf;absolute.x=%{public}lf;absolute.y=%{public}lf;"
              "discYe.x=%{public}lf;discrete.y=%{public}lf;fd=%{public}d;\n",
              pointData.time, pointData.eventType, pointData.button, pointData.deviceType,
-             pointData.seat_button_count, pointData.axes, pointData.state, pointData.source, pointData.delta.x,
+             pointData.seat_button_count, pointData.axis, pointData.state, pointData.source, pointData.delta.x,
              pointData.delta.y, pointData.delta_raw.x, pointData.delta_raw.y, pointData.absolute.x,
              pointData.absolute.y, pointData.discrete.x, pointData.discrete.y, fd);
     TracePointerEvent(pointData);

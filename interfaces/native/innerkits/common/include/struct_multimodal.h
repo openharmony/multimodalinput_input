@@ -236,7 +236,7 @@ struct EventPointer {
     uint32_t seat_button_count;
     enum BUTTON_STATE state;
     enum POINTER_AXIS_SOURCE source;
-    enum POINTER_AXIS axes;
+    enum POINTER_AXIS axis;
 };
 
 struct Pointer {

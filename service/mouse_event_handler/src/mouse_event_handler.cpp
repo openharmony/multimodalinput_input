@@ -92,8 +92,6 @@ void MouseEventHandler::SetMouseButon(PointerEvent::PointerItem& pointerItem,
 
 void MouseEventHandler::SetMouseAxis(struct libinput_event_pointer& pointEventData)
 {
-    const int32_t MouseTimeOut = 100;
-    double axisValue = 0;
     if (TimerMgr == nullptr) {
         MMI_LOGI("the TimeManager is nullptr");
         return;
@@ -106,6 +104,7 @@ void MouseEventHandler::SetMouseAxis(struct libinput_event_pointer& pointEventDa
         this->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
         MMI_LOGI("pointer axis event begin");
     }
+    const int32_t MouseTimeOut = 100;
     g_timerId = TimerMgr->AddTimer(MouseTimeOut, 1, []() {
         g_timerId = -1;
         MMI_LOGI("pointer axis event end TimerCallback run");
@@ -119,6 +118,7 @@ void MouseEventHandler::SetMouseAxis(struct libinput_event_pointer& pointEventDa
             MMI_LOGI("pointer axis event end");
         }
     });
+    double axisValue = 0;
     if (libinput_event_pointer_has_axis(&pointEventData, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
         axisValue = libinput_event_pointer_get_axis_value(&pointEventData,
                                                           LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
