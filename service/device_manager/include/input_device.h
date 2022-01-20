@@ -27,12 +27,12 @@ public:
     int32_t GetId();
     void SetName(std::string name);
     std::string GetName();
-    void SetDeviceType(int32_t deviceType);
-    int32_t GetDeviceType();
+    void SetType(int32_t deviceType);
+    int32_t GetType();
 private:
-    int32_t id = -1;
-    std::string name = "NA";
-    int32_t deviceType = 0;
+    int32_t id;
+    std::string name;
+    int32_t deviceType;
     std::vector<int32_t> deviceIdList;
 };
 }
