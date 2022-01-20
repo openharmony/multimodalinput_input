@@ -14,7 +14,6 @@
  */
 
 #include <gtest/gtest.h>
-#include <sstream>
 #include "define_multimodal.h"
 #include "input_manager.h"
 #include "key_event.h"
@@ -36,189 +35,110 @@ public:
 
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_001, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string log1 = "OnCheckKeyEvent_001";
-    std::vector<std::string> beforeRunLogs;
-    ASSERT_TRUE(runCommand.RunShellCommand(log1, beforeRunLogs) == RET_OK);
-
-	auto KeyEvent = KeyEvent::Create();
-	KeyEvent->SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
+    auto KeyEvent = KeyEvent::Create();
+    KeyEvent->SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
     ASSERT_TRUE(!KeyEvent->IsValid());
 
     KeyEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
-	KeyEvent->SetActionTime(0);
-	ASSERT_TRUE(!KeyEvent->IsValid());
+    KeyEvent->SetActionTime(0);
+    ASSERT_TRUE(!KeyEvent->IsValid());
 
-	KeyEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    KeyEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
     KeyEvent->SetActionTime(100);
-	KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UNKNOWN);
-	ASSERT_TRUE(!KeyEvent->IsValid());
-
-    std::vector<std::string> afterRunLogs;
-    ASSERT_TRUE(runCommand.RunShellCommand(log1, afterRunLogs) == RET_OK);
-    EXPECT_TRUE(afterRunLogs.size() > 0);
-    if (beforeRunLogs.size() == 0) {
-        EXPECT_TRUE(afterRunLogs.size() > beforeRunLogs.size());
-        EXPECT_TRUE(afterRunLogs.back().find(log1) != afterRunLogs.back().npos);
-    } else {
-        EXPECT_TRUE(std::strcmp(afterRunLogs.back().c_str(), beforeRunLogs.back().c_str()) != 0);
-    }
+    KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UNKNOWN);
+    ASSERT_TRUE(!KeyEvent->IsValid());
 }
 
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_002, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string log1 = "OnCheckKeyEvent_002";
-    std::vector<std::string> beforeRunLogs;
-    ASSERT_TRUE(runCommand.RunShellCommand(log1, beforeRunLogs) == RET_OK);
-
     auto KeyEvent1 = KeyEvent::Create();
     KeyEvent1->SetKeyCode(KeyEvent::KEYCODE_HOME);
     KeyEvent1->SetActionTime(100);
-	KeyEvent1->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+    KeyEvent1->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
     KeyEvent::KeyItem item;
     item.SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
     KeyEvent1->AddKeyItem(item);
-	ASSERT_TRUE(!KeyEvent1->IsValid());
+    ASSERT_TRUE(!KeyEvent1->IsValid());
 
-	auto KeyEvent2 = KeyEvent::Create();
+    auto KeyEvent2 = KeyEvent::Create();
     KeyEvent2->SetKeyCode(KeyEvent::KEYCODE_HOME);
     KeyEvent2->SetActionTime(100);
-	KeyEvent2->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+    KeyEvent2->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
     item.SetKeyCode(KeyEvent::KEYCODE_HOME);
-	item.SetDownTime(0);
+    item.SetDownTime(0);
     KeyEvent2->AddKeyItem(item);
-	ASSERT_TRUE(!KeyEvent2->IsValid());
-	
-    std::vector<std::string> afterRunLogs;
-    ASSERT_TRUE(runCommand.RunShellCommand(log1, afterRunLogs) == RET_OK);
-    EXPECT_TRUE(afterRunLogs.size() > 0);
-    if (beforeRunLogs.size() == 0) {
-        EXPECT_TRUE(afterRunLogs.size() > beforeRunLogs.size());
-        EXPECT_TRUE(afterRunLogs.back().find(log1) != afterRunLogs.back().npos);
-    } else {
-        EXPECT_TRUE(std::strcmp(afterRunLogs.back().c_str(), beforeRunLogs.back().c_str()) != 0);
-    }
+    ASSERT_TRUE(!KeyEvent2->IsValid());
 }
 
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_003, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string log1 = "OnCheckKeyEvent_003";
-    std::vector<std::string> beforeRunLogs;
-    ASSERT_TRUE(runCommand.RunShellCommand(log1, beforeRunLogs) == RET_OK);
-
     auto KeyEvent1 = KeyEvent::Create();
     KeyEvent1->SetKeyCode(KeyEvent::KEYCODE_HOME);
     KeyEvent1->SetActionTime(100);
-	KeyEvent1->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
-	KeyEvent::KeyItem item;
+    KeyEvent1->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+    KeyEvent::KeyItem item;
     item.SetKeyCode(KeyEvent::KEYCODE_HOME);
-	item.SetDownTime(100);
-	item.SetPressed(false);
+    item.SetDownTime(100);
+    item.SetPressed(false);
     KeyEvent1->AddKeyItem(item);
-	ASSERT_TRUE(!KeyEvent1->IsValid());
+    ASSERT_TRUE(!KeyEvent1->IsValid());
 
-	auto KeyEvent2 = KeyEvent::Create();
-	KeyEvent2->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    auto KeyEvent2 = KeyEvent::Create();
+    KeyEvent2->SetKeyCode(KeyEvent::KEYCODE_HOME);
     KeyEvent2->SetActionTime(100);
-	KeyEvent2->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    KeyEvent2->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     item.SetKeyCode(KeyEvent::KEYCODE_BACK);
-	item.SetDownTime(100);
-	item.SetPressed(false);
+    item.SetDownTime(100);
+    item.SetPressed(false);
     KeyEvent2->AddKeyItem(item);
-	ASSERT_TRUE(!KeyEvent2->IsValid());
-	
-    std::vector<std::string> afterRunLogs;
-    ASSERT_TRUE(runCommand.RunShellCommand(log1, afterRunLogs) == RET_OK);
-    EXPECT_TRUE(afterRunLogs.size() > 0);
-    if (beforeRunLogs.size() == 0) {
-        EXPECT_TRUE(afterRunLogs.size() > beforeRunLogs.size());
-        EXPECT_TRUE(afterRunLogs.back().find(log1) != afterRunLogs.back().npos);
-    } else {
-        EXPECT_TRUE(std::strcmp(afterRunLogs.back().c_str(), beforeRunLogs.back().c_str()) != 0);
-    }
+    ASSERT_TRUE(!KeyEvent2->IsValid());
 }
 
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_004, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string log1 = "OnCheckKeyEvent_004";
-    std::vector<std::string> beforeRunLogs;
-    ASSERT_TRUE(runCommand.RunShellCommand(log1, beforeRunLogs) == RET_OK);
-
     auto KeyEvent1 = KeyEvent::Create();
-	KeyEvent1->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    KeyEvent1->SetKeyCode(KeyEvent::KEYCODE_HOME);
     KeyEvent1->SetActionTime(100);
-	KeyEvent1->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-	KeyEvent::KeyItem item1;
+    KeyEvent1->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    KeyEvent::KeyItem item1;
     item1.SetKeyCode(KeyEvent::KEYCODE_HOME);
-	item1.SetDownTime(100);
-	item1.SetPressed(false);
+    item1.SetDownTime(100);
+    item1.SetPressed(false);
     KeyEvent1->AddKeyItem(item1);
     KeyEvent::KeyItem item2;
     item2.SetKeyCode(KeyEvent::KEYCODE_HOME);
-	item2.SetDownTime(100);
-	item2.SetPressed(false);
+    item2.SetDownTime(100);
+    item2.SetPressed(false);
     KeyEvent1->AddKeyItem(item2);
-	ASSERT_TRUE(!KeyEvent1->IsValid());
+    ASSERT_TRUE(!KeyEvent1->IsValid());
 
-	auto KeyEvent2 = KeyEvent::Create();
-	KeyEvent2->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    auto KeyEvent2 = KeyEvent::Create();
+    KeyEvent2->SetKeyCode(KeyEvent::KEYCODE_HOME);
     KeyEvent2->SetActionTime(100);
-	KeyEvent2->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    KeyEvent2->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     item1.SetKeyCode(KeyEvent::KEYCODE_HOME);
-	item1.SetDownTime(100);
-	item1.SetPressed(false);
+    item1.SetDownTime(100);
+    item1.SetPressed(true);
     KeyEvent2->AddKeyItem(item1);
-    item2.SetKeyCode(KeyEvent::KEYCODE_BACK);
-	item2.SetDownTime(100);
-	item2.SetPressed(false);
-    KeyEvent2->AddKeyItem(item2);
-	ASSERT_TRUE(!KeyEvent2->IsValid());
-	
-    std::vector<std::string> afterRunLogs;
-    ASSERT_TRUE(runCommand.RunShellCommand(log1, afterRunLogs) == RET_OK);
-    EXPECT_TRUE(afterRunLogs.size() > 0);
-    if (beforeRunLogs.size() == 0) {
-        EXPECT_TRUE(afterRunLogs.size() > beforeRunLogs.size());
-        EXPECT_TRUE(afterRunLogs.back().find(log1) != afterRunLogs.back().npos);
-    } else {
-        EXPECT_TRUE(std::strcmp(afterRunLogs.back().c_str(), beforeRunLogs.back().c_str()) != 0);
-    }
+    ASSERT_TRUE(!KeyEvent2->IsValid());
 }
 
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_005, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string log1 = "OnCheckKeyEvent_005";
-    std::vector<std::string> beforeRunLogs;
-    ASSERT_TRUE(runCommand.RunShellCommand(log1, beforeRunLogs) == RET_OK);
-	
-	auto KeyEvent = KeyEvent::Create();
-	KeyEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    auto KeyEvent = KeyEvent::Create();
+    KeyEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
     KeyEvent->SetActionTime(100);
-	KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-	KeyEvent::KeyItem item1;
+    KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    KeyEvent::KeyItem item1;
     item1.SetKeyCode(KeyEvent::KEYCODE_HOME);
-	item1.SetDownTime(100);
-	item1.SetPressed(false);
+    item1.SetDownTime(100);
+    item1.SetPressed(false);
     KeyEvent->AddKeyItem(item1);
     KeyEvent::KeyItem item2;
     item2.SetKeyCode(KeyEvent::KEYCODE_BACK);
-	item2.SetDownTime(100);
-	item2.SetPressed(true);
+    item2.SetDownTime(100);
+    item2.SetPressed(true);
     KeyEvent->AddKeyItem(item2);
-	ASSERT_TRUE(KeyEvent->IsValid());
-	
-    std::vector<std::string> afterRunLogs;
-    ASSERT_TRUE(runCommand.RunShellCommand(log1, afterRunLogs) == RET_OK);
-    EXPECT_TRUE(afterRunLogs.size() > 0);
-    if (beforeRunLogs.size() == 0) {
-        EXPECT_TRUE(afterRunLogs.size() > beforeRunLogs.size());
-        EXPECT_TRUE(afterRunLogs.back().find(log1) != afterRunLogs.back().npos);
-    } else {
-        EXPECT_TRUE(std::strcmp(afterRunLogs.back().c_str(), beforeRunLogs.back().c_str()) != 0);
-    }
+    ASSERT_TRUE(KeyEvent->IsValid());
 }
 }
