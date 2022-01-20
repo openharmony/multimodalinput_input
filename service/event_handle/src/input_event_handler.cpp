@@ -460,7 +460,7 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event *event)
     if (keyEvent == nullptr) {
         keyEvent = OHOS::MMI::KeyEvent::Create();
     }
-    keyBoard.key = static_cast<uint32_t>(hosKey.keyValueOfHos);
+    keyBoard.key = static_cast<uint32_t>(oKey.keyValueOfHos);
     if (EventPackage::KeyboardToKeyEvent(keyBoard, keyEvent) == RET_ERR) {
         MMI_LOGE("On the OnKeyboardEvent translate key event error!");
         return RET_ERR;
