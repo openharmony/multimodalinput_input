@@ -244,10 +244,10 @@ int32_t RegisterEvent::OnEventPointButton(const int32_t buttonCode, const uint64
 
 int32_t RegisterEvent::OnEventPointAxis(const EventPointer& point, MmiMessageId& msgId)
 {
-    if (point.axes == POINTER_AXIS_SCROLL_VERTICAL && point.delta.y < 0) {
+    if (point.axis == POINTER_AXIS_SCROLL_VERTICAL && point.delta.y < 0) {
         msgId = MmiMessageId::ON_PREVIOUS;
     }
-    if (point.axes == POINTER_AXIS_SCROLL_VERTICAL && point.delta.y > 0) {
+    if (point.axis == POINTER_AXIS_SCROLL_VERTICAL && point.delta.y > 0) {
         msgId = MmiMessageId::ON_NEXT;
     }
     return RET_OK;
@@ -487,7 +487,7 @@ int32_t RegisterEvent::OnEventTouchMotionGetSign(const EventTouch& touch, MmiMes
     return RET_OK;
 }
 
-int32_t RegisterEvent::GetTouchInfoByTouchId(EventTouch& touch, const PAIR<uint32_t, int32_t> key)
+int32_t RegisterEvent::GetTouchInfoByTouchId(const PAIR<uint32_t, int32_t> key, EventTouch& touch)
 {
     auto iter = touchInfos_.find(key);
     CHKF(iter != touchInfos_.end(), TOUCH_ID_NO_FIND);

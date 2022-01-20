@@ -82,9 +82,9 @@ template<class EventType>
 int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& data)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
-    auto type = libinput_event_get_type(event);
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    auto type = libinput_event_get_type(event);
     data.eventType = type;
     data.deviceType = GetDeviceType(device);
     auto name = libinput_device_get_name(device);
@@ -166,10 +166,10 @@ int32_t EventPackage::PackageTabletToolOtherParams(libinput_event *event, EventT
         }
         tableTool.seat_button_count = libinput_event_tablet_tool_get_seat_button_count(data);
         // Ignore button events that are not seat wide state changes.
-        if (tableTool.state == BUTTON_STATE_PRESSED && tableTool.seat_button_count != SEAT_BUTTON_OR_KEY_COUNT_ONE) {
+        if (tableTool.state == BUTTON_STATE_PRESSED && tableTool.seat_button_count != 1) {
             return MULTIDEVICE_SAME_EVENT_MARK;
         }
-        if (tableTool.state == BUTTON_STATE_RELEASED && tableTool.seat_button_count != SEAT_BUTTON_OR_KEY_COUNT_ZERO) {
+        if (tableTool.state == BUTTON_STATE_RELEASED && tableTool.seat_button_count != 0) {
             return MULTIDEVICE_SAME_EVENT_MARK;
         }
     }
@@ -334,10 +334,10 @@ int32_t EventPackage::PackageTabletPadKeyEvent(libinput_event *event, EventKeybo
         }
     }
     // Ignore key events that are not seat wide state changes.
-    if (key.state == KEY_STATE_PRESSED && key.seat_key_count != SEAT_BUTTON_OR_KEY_COUNT_ONE) {
+    if (key.state == KEY_STATE_PRESSED && key.seat_key_count != 1) {
         return MULTIDEVICE_SAME_EVENT_MARK;
     }
-    if (key.state == KEY_STATE_RELEASED && key.seat_key_count != SEAT_BUTTON_OR_KEY_COUNT_ZERO) {
+    if (key.state == KEY_STATE_RELEASED && key.seat_key_count != 0) {
         return MULTIDEVICE_SAME_EVENT_MARK;
     }
     return RET_OK;
@@ -401,16 +401,16 @@ int32_t EventPackage::PackagePointerEventByButton(libinput_event *event, EventPo
     point.time = libinput_event_pointer_get_time_usec(data);
     point.button = libinput_event_pointer_get_button(data);
     point.seat_button_count = libinput_event_pointer_get_seat_button_count(data);
-    if (libinput_event_pointer_get_button_state(data) == 0) {
+    if (libinput_event_pointer_get_button_state(data) == LIBINPUT_BUTTON_STATE_RELEASED) {
         point.state = BUTTON_STATE_RELEASED;
     } else {
         point.state = BUTTON_STATE_PRESSED;
     }
     // Ignore button events that are not seat wide state changes.
-    if (point.state == BUTTON_STATE_PRESSED && point.seat_button_count != SEAT_BUTTON_OR_KEY_COUNT_ONE) {
+    if (point.state == BUTTON_STATE_PRESSED && point.seat_button_count != 1) {
         return MULTIDEVICE_SAME_EVENT_MARK;
     }
-    if (point.state == BUTTON_STATE_RELEASED && point.seat_button_count != SEAT_BUTTON_OR_KEY_COUNT_ZERO) {
+    if (point.state == BUTTON_STATE_RELEASED && point.seat_button_count != 0) {
         return MULTIDEVICE_SAME_EVENT_MARK;
     }
     return RET_OK;
@@ -445,14 +445,14 @@ int32_t EventPackage::PackagePointerEventByAxis(libinput_event *event, EventPoin
         }
     }
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
-        point.axes = POINTER_AXIS_SCROLL_VERTICAL;
+        point.axis = POINTER_AXIS_SCROLL_VERTICAL;
         point.delta.y = libinput_event_pointer_get_axis_value(data,
                                                               LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
         point.discrete.y = libinput_event_pointer_get_axis_value_discrete(data,
                                                                           LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
     }
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL)) {
-        point.axes = POINTER_AXIS_SCROLL_HORIZONTAL;
+        point.axis = POINTER_AXIS_SCROLL_HORIZONTAL;
         point.delta.x = libinput_event_pointer_get_axis_value(data,
                                                               LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
         point.discrete.x = libinput_event_pointer_get_axis_value_discrete(data,
@@ -532,7 +532,7 @@ int32_t EventPackage::PackageTouchEvent(multimodal_libinput_event &ev,
             break;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
-            MMIRegEvent->GetTouchInfoByTouchId(touch, MAKEPAIR(touch.deviceId, touch.seat_slot));
+            MMIRegEvent->GetTouchInfoByTouchId(MAKEPAIR(touch.deviceId, touch.seat_slot), touch);
             touch.time = libinput_event_touch_get_time_usec(data);
             touch.eventType = LIBINPUT_EVENT_TOUCH_UP;
             break;
@@ -597,7 +597,6 @@ int32_t OHOS::MMI::EventPackage::PackageGestureEvent(libinput_event *event, Even
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_gesture_event(event);
     CHKR(data, ERROR_NULL_POINTER, RET_ERR);
-    auto type = libinput_event_get_type(event);
     auto ret = PackageEventDeviceInfo<EventGesture>(event, gesture);
     if (ret != RET_OK) {
         MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
@@ -605,6 +604,7 @@ int32_t OHOS::MMI::EventPackage::PackageGestureEvent(libinput_event *event, Even
     }
     gesture.time = libinput_event_gesture_get_time_usec(data);
     gesture.fingerCount = libinput_event_gesture_get_finger_count(data);
+    auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN: {
             gesture.pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN;
@@ -674,11 +674,11 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key,
     key.seat_key_count = libinput_event_keyboard_get_seat_key_count(data);
     key.time = libinput_event_keyboard_get_time_usec(data);
     // Ignore key events that are not seat wide state changes.
-    if (key.state == KEY_STATE_PRESSED && key.seat_key_count != SEAT_BUTTON_OR_KEY_COUNT_ONE) {
+    if (key.state == KEY_STATE_PRESSED && key.seat_key_count != 1) {
         MMI_LOGD("The same button is pressed on multiple devices, state:%{puiblic}d", key.state);
         return MULTIDEVICE_SAME_EVENT_MARK;
     }
-    if (key.state == KEY_STATE_RELEASED && key.seat_key_count != SEAT_BUTTON_OR_KEY_COUNT_ZERO) {
+    if (key.state == KEY_STATE_RELEASED && key.seat_key_count != 0) {
         MMI_LOGD("Release the same button on multiple devices, state:%{puiblic}d", key.state);
         return MULTIDEVICE_SAME_EVENT_MARK;
     }

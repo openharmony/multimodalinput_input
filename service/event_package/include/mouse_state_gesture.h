@@ -49,7 +49,7 @@ namespace OHOS::MMI {
 
     private:
         int16_t LibinputChangeToPointer(int16_t keyValue);
-        void ChangeMouseState(uint32_t &stateValue, uint32_t btnState);
+        void ChangeMouseState(uint32_t btnState, uint32_t &stateValue);
         void CheckMouseState(uint32_t &stateValue);
 
     private:
