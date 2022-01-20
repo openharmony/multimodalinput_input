@@ -50,9 +50,8 @@ ohos_shared_library("libmmi-common") {
 
   deps = [ "//utils/native/base:utils" ]
 
-  public_deps = [
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-  ]
+  public_deps =
+      [ "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog" ]
 
   part_name = "multimodalinput_base"
 }
