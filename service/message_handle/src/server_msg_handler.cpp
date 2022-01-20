@@ -436,7 +436,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
         isIntercepted:%{public}d", event.keyDownDuration, event.keyCode,
         event.isPressed, event.isIntercepted);
     struct EventKeyboard key = {};
-    auto packageResult = EventPackage::PackageVirtualKeyEvent(event, key, *udsServer_);
+    auto packageResult = EventPackage::PackageVirtualKeyEvent(event, key);
     if (packageResult == RET_ERR) {
         return RET_ERR;
     }
@@ -450,7 +450,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
     if (keyEvent == nullptr) {
         keyEvent = OHOS::MMI::KeyEvent::Create();
     }
-    EventPackage::KeyboardToKeyEvent(key, keyEvent, *udsServer_);
+    EventPackage::KeyboardToKeyEvent(key, keyEvent);
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed... ret:%{public}d errCode:%{public}d",
