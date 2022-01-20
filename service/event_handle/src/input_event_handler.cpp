@@ -274,7 +274,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventDeviceAdded(multimodal_libinput_eve
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(ev.event);
-    INPUTDEVMGR->OnInputDeviceAdded(device);
+    inputDeviceManager->OnInputDeviceAdded(device);
 
     uint64_t preHandlerTime = GetSysClockTime();
     DeviceManage deviceManage = {};
@@ -311,7 +311,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_e
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(ev.event);
-    INPUTDEVMGR->OnInputDeviceRemoved(device);
+    inputDeviceManager->OnInputDeviceRemoved(device);
 
     uint64_t preHandlerTime = GetSysClockTime();
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
