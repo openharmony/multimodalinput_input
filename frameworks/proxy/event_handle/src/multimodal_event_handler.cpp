@@ -14,6 +14,7 @@
  */
 
 #include "multimodal_event_handler.h"
+#include "input_manager_impl.h"
 #include "immi_token.h"
 #include "input_event.h"
 #include "mmi_client.h"
@@ -54,6 +55,7 @@ void OnConnected(const OHOS::MMI::IfMMIClient& client)
         }
         EventManager.RegisterStandardizedEventHandle(val.token, val.windowId, val.standardizedEventHandle);
     }
+    InputManagerImpl::GetInstance()->OnConnected();
 }
 
 MultimodalEventHandler::MultimodalEventHandler()
