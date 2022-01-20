@@ -14,9 +14,10 @@
  */
 #ifndef OHOS_INPUT_DEVICE_EVENT_H
 #define OHOS_INPUT_DEVICE_EVENT_H
-#include <vector>
+#include <functional>
 #include <map>
 #include <mutex>
+#include <vector>
 
 namespace OHOS {
 namespace MMI {
@@ -29,17 +30,16 @@ public:
     ~InputDeviceEvent();
 
     struct InputDeviceInfo {
-        int32_t id_;
-        std::string name_;
-        int32_t devcieType_;
+        int32_t id;
+        std::string name;
+        int32_t devcieType;
     };
-
-    struct Item {
-        Item(int32_t taskId, std::function<void(std::shared_ptr<InputDeviceInfo>)> callback)
-            : requestId_(taskId), callback_(callback){}
-        int32_t requestId_;
-        std::function<void(std::shared_ptr<InputDeviceInfo>)> callback_;
-    };
+    // struct Item {
+    //     Item(int32_t taskId, std::function<void(std::shared_ptr<InputDeviceInfo>)> callback)
+    //         : requestId(taskId), callback(callback){}
+    //     int32_t requestId;
+    //     std::function<void(std::shared_ptr<InputDeviceInfo>)> callback;
+    // };
 
     void GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback);
     void GetInputDeviceAsync(int32_t deviceId, std::function<void(std::shared_ptr<InputDeviceInfo>)> callback);
@@ -48,12 +48,13 @@ public:
 
 private:
     InputDeviceEvent();
-    std::map<int32_t, std::shared_ptr<Item>> inputDevciceRequests_;
-    std::map<int32_t, std::function<void(std::vector<int32_t>)>> inputDevciceIdsRequests_;
-    int32_t nextTaskInfo_ {1};
-    int32_t nextTaskIds_ {1};
+    // std::map<int32_t, std::shared_ptr<Item>> inputDevciceRequests_;
+    std::map<int32_t, std::function<void(std::shared_ptr<InputDeviceInfo>)>> inputDevciceRequests_;
+    std::map<int32_t, std::function<void(std::vector<int32_t>)>> idsRequests_;
+    int32_t inputDeviceTaskId_ {1};
+    int32_t idsTaskId_ {1};
     std::mutex lk_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif

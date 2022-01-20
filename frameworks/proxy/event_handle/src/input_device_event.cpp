@@ -34,45 +34,52 @@ InputDeviceEvent::~InputDeviceEvent(){}
 
 void InputDeviceEvent::GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback)
 {
-    MMI_LOGE("GetInputDeviceIdsAsync enter");
+    MMI_LOGI("begin");
     std::lock_guard<std::mutex> guard(lk_);
-    inputDevciceIdsRequests_.insert(std::pair<int32_t,
-        std::function<void(std::vector<int32_t>)>>(this->nextTaskIds_, callback));
-    MMIEventHdl.GetDeviceIds(this->nextTaskIds_);
-    this->nextTaskIds_++;
+    idsRequests_.insert(std::pair<int32_t,
+        std::function<void(std::vector<int32_t>)>>(idsTaskId_, callback));
+    MMIEventHdl.GetDeviceIds(idsTaskId_);
+    idsTaskId_++;
+    MMI_LOGI("end");
 }
 
 void InputDeviceEvent::GetInputDeviceAsync(int32_t deviceId,
                                            std::function<void(std::shared_ptr<InputDeviceInfo>)> callback)
 {
+    MMI_LOGI("begin");
     std::lock_guard<std::mutex> guard(lk_);
-    std::shared_ptr<Item> item = std::make_shared<Item>(this->nextTaskInfo_, callback);
-    inputDevciceRequests_.insert(std::pair<int32_t, std::shared_ptr<Item>>(this->nextTaskInfo_, item));
-    MMIEventHdl.GetDevice(this->nextTaskInfo_, deviceId);
-    this->nextTaskInfo_++;
+    // std::shared_ptr<Item> item = std::make_shared<Item>(inputDeviceTaskId_, callback);
+    inputDevciceRequests_.insert(std::pair<int32_t, std::function<void(std::shared_ptr<InputDeviceInfo>)>>(inputDeviceTaskId_, callback));
+    MMIEventHdl.GetDevice(inputDeviceTaskId_, deviceId);
+    inputDeviceTaskId_++;
+    MMI_LOGI("end");
 }
 
 void InputDeviceEvent::OnInputDevice(int32_t taskId, int32_t id, std::string name, int32_t deviceType)
 {
+    MMI_LOGI("begin");
     auto inputDeviceInfo = std::make_shared<InputDeviceInfo>();
-    inputDeviceInfo->id_ = id;
-    inputDeviceInfo->name_ = name;
-    inputDeviceInfo->devcieType_ = deviceType;
+    inputDeviceInfo->id = id;
+    inputDeviceInfo->name = name;
+    inputDeviceInfo->devcieType = deviceType;
 
     for (auto it = inputDevciceRequests_.begin(); it != inputDevciceRequests_.end(); it++) {
         if (it->first == taskId) {
-            it->second->callback_(inputDeviceInfo);
+            it->second(inputDeviceInfo);
         }
     }
+    MMI_LOGI("end");
 }
 
 void InputDeviceEvent::OnInputDeviceIds(int32_t taskId, std::vector<int32_t> ids)
 {
-    for (auto it = inputDevciceIdsRequests_.begin(); it != inputDevciceIdsRequests_.end(); it++) {
+    MMI_LOGI("begin");
+    for (auto it = idsRequests_.begin(); it != idsRequests_.end(); it++) {
         if (it->first == taskId) {
             it->second(ids);
         }
     }
+    MMI_LOGI("end");
 }
 }
 }
