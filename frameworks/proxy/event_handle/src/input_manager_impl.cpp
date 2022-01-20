@@ -39,8 +39,8 @@ constexpr int32_t ADD_MASK_BASE = 10;
 void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
     const std::vector<LogicalDisplayInfo> &logicalDisplays)
 {
-    MMI_LOGD("InputManagerImpl::UpdateDisplayInfo enter!");
-    if (physicalDisplays.size() == 0 || logicalDisplays.size() == 0) {
+    MMI_LOGD("enter");
+    if (physicalDisplays.empty() || logicalDisplays.empty()) {
         MMI_LOGE("display info check failed! physicalDisplays size is %{public}d, logicalDisplays size is %{public}d",
             static_cast<int32_t>(physicalDisplays.size()), static_cast<int32_t>(logicalDisplays.size()));
         return;
@@ -49,19 +49,8 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
     physicalDisplays_ = physicalDisplays;
     logicalDisplays_ = logicalDisplays;
     PrintDisplayDebugInfo();
-
-    if (MultimodalEventHandler::GetInstance().GetMMIClient()) {
-        OHOS::MMI::NetPacket ckt(MmiMessageId::DISPLAY_INFO);
-        if (PackDisplayData(ckt) == RET_ERR) {
-            MMI_LOGE("pack display info failed");
-            return;
-        }
-        MultimodalEventHandler::GetInstance().GetMMIClient()->SendMessage(ckt);
-    } else {
-        MMI_LOGE("GetMMIClient is failed");
-    }
-
-    MMI_LOGD("InputManagerImpl::UpdateDisplayInfo leave!");
+    SendDisplayInfo();
+    MMI_LOGD("leave");
 }
 
 int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
@@ -310,6 +299,35 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> k
     if (MMIEventHdl.InjectEvent(keyEvent) != RET_OK) {
         MMI_LOGE("Failed to inject keyEvent!");
     }
+}
+
+void InputManagerImpl::OnConnected()
+{
+    MMI_LOGD("enter");
+
+    if (physicalDisplays_.empty() || logicalDisplays_.empty()) {
+        MMI_LOGE("display info check failed! physicalDisplays_ size is %{public}d, logicalDisplays_ size is %{public}d",
+            static_cast<int32_t>(physicalDisplays_.size()), static_cast<int32_t>(logicalDisplays_.size()));
+        return;
+    }
+    PrintDisplayDebugInfo();
+    SendDisplayInfo();
+    MMI_LOGD("leave");
+}
+
+void InputManagerImpl::SendDisplayInfo()
+{
+    if (MultimodalEventHandler::GetInstance().GetMMIClient() == nullptr) {
+        MMI_LOGE("get mmi client is nullptr");
+        return;
+    }
+    
+    OHOS::MMI::NetPacket ckt(MmiMessageId::DISPLAY_INFO);
+    if (PackDisplayData(ckt) == RET_ERR) {
+        MMI_LOGE("pack display info failed");
+        return;
+    }
+    MultimodalEventHandler::GetInstance().GetMMIClient()->SendMessage(ckt);
 }
 }
 }
