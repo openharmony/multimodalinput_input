@@ -333,7 +333,7 @@ void InputManagerImpl::OnConnected()
     } else {
         MMI_LOGE("GetMMIClient is failed");
     }
-
     MMI_LOGD("InputManagerImpl::OnConnected leave!");
+}
 }
 }
