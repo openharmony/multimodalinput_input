@@ -126,7 +126,7 @@ int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& d
 }
 
 template<class T>
-int32_t EventPackage::PackageRegisteredEvent(RegisteredEvent& registeredEvent, T& eventData)
+int32_t EventPackage::PackageRegisteredEvent(T& eventData, RegisteredEvent& registeredEvent)
 {
     const std::string uid = GetUUid();
     CHKR(EOK == memcpy_s(registeredEvent.devicePhys, MAX_DEVICENAME, eventData.devicePhys, MAX_DEVICENAME),
