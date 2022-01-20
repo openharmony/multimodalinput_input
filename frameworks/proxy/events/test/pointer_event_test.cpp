@@ -261,7 +261,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_003, TestSize.L
 }
 
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_004, TestSize.Level1)
-{ 
+{
     auto pointerEvent1 = PointerEvent::Create();
     pointerEvent1->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent1->SetPointerId(0);
