@@ -17,12 +17,12 @@
 
 #include <functional>
 #include <map>
-#include "c_singleton.h"
+#include "singleton.h"
 #include "proto.h"
 #include "msg_handler.h"
 
 namespace OHOS::MMI {
-class SystemEventHandler : public CSingleton<SystemEventHandler>, public MsgHandler<std::function<void()>> {
+class SystemEventHandler : public DelayedSingleton<SystemEventHandler>, public MsgHandler<std::function<void()>> {
 public:
     SystemEventHandler();
     virtual ~SystemEventHandler();

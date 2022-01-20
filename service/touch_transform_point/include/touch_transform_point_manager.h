@@ -21,10 +21,10 @@
 #include <memory>
 #include "touch_transform_point_processor.h"
 #include "touchpad_transform_point_processor.h"
-#include "c_singleton.h"
+#include "singleton.h"
 namespace OHOS {
 namespace MMI {
-class TouchTransformPointManager : public CSingleton<TouchTransformPointManager> {
+class TouchTransformPointManager : public DelayedSingleton<TouchTransformPointManager> {
 public:
     std::shared_ptr<PointerEvent> onLibinputTouchEvent(libinput_event *event);
     std::shared_ptr<PointerEvent> onLibinputTouchPadEvent(libinput_event *event);

@@ -19,11 +19,11 @@
 #include <mutex>
 #include <map>
 #include "libmmi_util.h"
-#include "c_singleton.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
-class RegisterEventHandleManager : public CSingleton<RegisterEventHandleManager> {
+class RegisterEventHandleManager : public DelayedSingleton<RegisterEventHandleManager> {
 public:
     RegisterEventHandleManager();
     ~RegisterEventHandleManager();

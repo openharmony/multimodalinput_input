@@ -576,6 +576,53 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_005, TestSize.Level1)
     EXPECT_TRUE(!tLogs.empty());
 }
 
+HWTEST_F(InputManagerTest, InputManager_ANR_TEST_001, TestSize.Level1)
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(20000));
+    auto pointerEvent = PointerEvent::Create();
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetGlobalX(823);
+    item.SetGlobalY(723);
+    item.SetPressure(5);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(-1);
+    pointerEvent->SetPointerId(0);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    MMI_LOGD("InputManager_ANR_TEST_001 wait 2s");
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+    item.SetPointerId(1);
+    item.SetGlobalX(823);
+    item.SetGlobalY(723);
+    item.SetPressure(5);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(-1);
+    pointerEvent->SetPointerId(1);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    MMI_LOGD("InputManager_ANR_TEST_001 wait 5s");
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+
+    item.SetPointerId(2);
+    item.SetGlobalX(823);
+    item.SetGlobalY(723);
+    item.SetPressure(5);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(-1);
+    pointerEvent->SetPointerId(2);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
 void InputManagerTest::TestSimulateInputEvent_2(std::shared_ptr<PointerEvent> pointerEvent)
 {
     PointerEvent::PointerItem item;
