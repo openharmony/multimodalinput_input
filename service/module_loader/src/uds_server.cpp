@@ -175,7 +175,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
 
     if (!ClearDeadSessionInMap(serverFd, toReturnClientFd)) {
         cleanTaskWhenError();
-        MMI_LOGE("IsSocketFdNotUsed error! errCode:{public}d", CLEAR_DEAD_SESSION_FAIL);
+        MMI_LOGE("IsSocketFdNotUsed error! errCode:%{public}d", CLEAR_DEAD_SESSION_FAIL);
         return RET_ERR;
     }
 
