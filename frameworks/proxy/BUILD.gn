@@ -50,6 +50,9 @@ ohos_shared_library("libmmi-common") {
 
   deps = [ "//utils/native/base:utils" ]
 
+  public_deps =
+      [ "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog" ]
+
   part_name = "multimodalinput_base"
 }
 
@@ -256,6 +259,62 @@ ohos_unittest("MultimodalinputEventHandlerTest") {
   }
 
   sources = [ "event_handle/test/multimodal_event_handler_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/frameworks/util:libmmi-util",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+}
+
+ohos_unittest("KeyEventTest") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "//utils/native/base/include",
+    "//third_party/googletest/googletest/include",
+    "${mmi_path}/frameworks/util/common",
+    "${mmi_path}/frameworks/util/common/include",
+    "${mmi_path}/frameworks/util/network",
+    "${mmi_path}/frameworks/util/network/include",
+    "${mmi_path}/frameworks/util/socket",
+    "${mmi_path}/frameworks/util/socket/include",
+    "${mmi_path}/frameworks/proxy/event_handle",
+    "${mmi_path}/frameworks/proxy/event_handle/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+  ]
+
+  if (is_mmi_have_libinput) {
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+  }
+
+  cflags = [ "-DOHOS_BUILD" ]
+
+  if (is_mmi_have_debug) {
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [ "-DOHOS_BUILD_AI" ]
+  }
+
+  sources = [ "events/test/key_event_test.cpp" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -496,6 +555,7 @@ group("ut-mmi-proxy") {
   deps = []
   deps += [
     ":InputManagerTest",
+    ":KeyEventTest",
     ":MultimodalKeyEventTest",
     ":MultimodalinputEventHandlerTest",
     ":PointerEventTest",
