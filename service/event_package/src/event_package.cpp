@@ -22,52 +22,52 @@ namespace {
     const std::string VIRTUAL_KEYBOARD = "virtual_keyboard";
     constexpr uint32_t SEAT_KEY_COUNT_ONE = 1;
     constexpr uint32_t SEAT_KEY_COUNT_ZERO = 0;
-}
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventPackage" };
 
-static void FillEventJoyStickAxisAbsInfo(EventJoyStickAxisAbsInfo& l,
-                                         const libinput_event_joystick_axis_abs_info& r)
-{
-    l.code = r.code;
-    l.value = r.value;
-    l.minimum = r.minimum;
-    l.maximum = r.maximum;
-    l.fuzz = r.fuzz;
-    l.flat = r.flat;
-    l.resolution = r.resolution;
-    l.standardValue = r.standardValue;
-    l.isChanged = true;
-}
-
-static void FillEventSlotedCoordsInfo(SlotedCoordsInfo& l, const sloted_coords_info& r)
-{
-    l.activeCount = r.active_count;
-    for (int i = 0; i < MAX_SOLTED_COORDS_NUM; i++) {
-        l.coords[i].isActive = r.coords[i].is_active;
-        l.coords[i].x = r.coords[i].x;
-        l.coords[i].y = r.coords[i].y;
+    void FillEventJoyStickAxisAbsInfo(EventJoyStickAxisAbsInfo& l, const libinput_event_joystick_axis_abs_info& r)
+    {
+        l.code = r.code;
+        l.value = r.value;
+        l.minimum = r.minimum;
+        l.maximum = r.maximum;
+        l.fuzz = r.fuzz;
+        l.flat = r.flat;
+        l.resolution = r.resolution;
+        l.standardValue = r.standardValue;
+        l.isChanged = true;
     }
-}
 
-static enum HOS_DEVICE_TYPE GetDeviceType(struct libinput_device* device)
-{
-    enum HOS_DEVICE_TYPE deviceType = HOS_UNKNOWN_DEVICE_TYPE;
-    enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
-    if (udevTags & EVDEV_UDEV_TAG_JOYSTICK) {
-        deviceType = HOS_JOYSTICK;
-    } else if (udevTags & EVDEV_UDEV_TAG_KEYBOARD) {
-        deviceType = HOS_KEYBOARD;
-    } else if (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK)) {
-        deviceType = HOS_MOUSE;
-    } else if (udevTags & EVDEV_UDEV_TAG_TOUCHSCREEN) {
-        deviceType = HOS_TOUCH_PANEL;
-    } else if (udevTags & (EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) {
-        deviceType = HOS_TOUCHPAD;
-    } else if (udevTags & EVDEV_UDEV_TAG_TABLET) {
-        deviceType = HOS_STYLUS;
-    } else {
-        deviceType = HOS_UNKNOWN_DEVICE_TYPE;
+    void FillEventSlotedCoordsInfo(SlotedCoordsInfo& l, const sloted_coords_info& r)
+    {
+        l.activeCount = r.active_count;
+        for (int i = 0; i < MAX_SOLTED_COORDS_NUM; i++) {
+            l.coords[i].isActive = r.coords[i].is_active;
+            l.coords[i].x = r.coords[i].x;
+            l.coords[i].y = r.coords[i].y;
+        }
     }
-    return deviceType;
+
+    HOS_DEVICE_TYPE GetDeviceType(struct libinput_device* device)
+    {
+        CHKPR(device, ERROR_NULL_POINTER, HOS_UNKNOWN_DEVICE_TYPE);
+        enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
+        if (udevTags & EVDEV_UDEV_TAG_JOYSTICK) {
+            return HOS_JOYSTICK;
+        } else if (udevTags & EVDEV_UDEV_TAG_KEYBOARD) {
+            return HOS_KEYBOARD;
+        } else if (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK)) {
+            return HOS_MOUSE;
+        } else if (udevTags & EVDEV_UDEV_TAG_TOUCHSCREEN) {
+            return HOS_TOUCH_PANEL;
+        } else if (udevTags & (EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) {
+            return HOS_TOUCHPAD;
+        } else if (udevTags & EVDEV_UDEV_TAG_TABLET) {
+            return HOS_STYLUS;
+        } else {
+            MMI_LOGW("Unknown device type");
+            return HOS_UNKNOWN_DEVICE_TYPE;
+        }
+    }
 }
 
 EventPackage::EventPackage()
