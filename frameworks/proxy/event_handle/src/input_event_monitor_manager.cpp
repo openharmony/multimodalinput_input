@@ -125,7 +125,7 @@ int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<OH
     }
     std::list<MonitorItem>::iterator iter;
     for (iter = monitors_.begin(); iter != monitors_.end(); iter++) {
-        MMI_LOGD("SendMsg");
+        MMI_LOGD("send msg");
         iter->TouchPadEventMonitor(pointerEvent);
     }
     PointerEvent::PointerItem pointer;
