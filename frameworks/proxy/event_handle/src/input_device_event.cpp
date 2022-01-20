@@ -48,8 +48,8 @@ void InputDeviceEvent::GetInputDeviceAsync(int32_t deviceId,
 {
     MMI_LOGI("begin");
     std::lock_guard<std::mutex> guard(lk_);
-    // std::shared_ptr<Item> item = std::make_shared<Item>(inputDeviceTaskId_, callback);
-    inputDevciceRequests_.insert(std::pair<int32_t, std::function<void(std::shared_ptr<InputDeviceInfo>)>>(inputDeviceTaskId_, callback));
+    inputDevciceRequests_.insert(std::pair<int32_t,
+        std::function<void(std::shared_ptr<InputDeviceInfo>)>>(inputDeviceTaskId_, callback));
     MMIEventHdl.GetDevice(inputDeviceTaskId_, deviceId);
     inputDeviceTaskId_++;
     MMI_LOGI("end");

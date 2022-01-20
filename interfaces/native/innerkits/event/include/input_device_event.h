@@ -34,12 +34,6 @@ public:
         std::string name;
         int32_t devcieType;
     };
-    // struct Item {
-    //     Item(int32_t taskId, std::function<void(std::shared_ptr<InputDeviceInfo>)> callback)
-    //         : requestId(taskId), callback(callback){}
-    //     int32_t requestId;
-    //     std::function<void(std::shared_ptr<InputDeviceInfo>)> callback;
-    // };
 
     void GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback);
     void GetInputDeviceAsync(int32_t deviceId, std::function<void(std::shared_ptr<InputDeviceInfo>)> callback);
@@ -48,7 +42,6 @@ public:
 
 private:
     InputDeviceEvent();
-    // std::map<int32_t, std::shared_ptr<Item>> inputDevciceRequests_;
     std::map<int32_t, std::function<void(std::shared_ptr<InputDeviceInfo>)>> inputDevciceRequests_;
     std::map<int32_t, std::function<void(std::vector<int32_t>)>> idsRequests_;
     int32_t inputDeviceTaskId_ {1};
