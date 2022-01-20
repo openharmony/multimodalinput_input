@@ -57,19 +57,5 @@ namespace OHOS::MMI {
         int32_t PackagePointerEventByButton(libinput_event *event, EventPointer& point);
         int32_t PackagePointerEventByAxis(libinput_event *event, EventPointer& point);
     };
-    template<class T>
-    int32_t EventPackage::PackageRegisteredEvent(T& data, RegisteredEvent& event)
-    {
-        CHKR(EOK == memcpy_s(event.devicePhys, MAX_DEVICENAME, data.devicePhys, MAX_DEVICENAME),
-             MEMCPY_SEC_FUN_FAIL, RET_ERR);
-        const std::string uid = GetUUid();
-        CHKR(EOK == memcpy_s(event.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size()),
-             MEMCPY_SEC_FUN_FAIL, RET_ERR);
-        event.deviceId = data.deviceId;
-        event.eventType = data.eventType;
-        event.deviceType = data.deviceType;
-        event.occurredTime = data.time;
-        return RET_OK;
-    }
 }
 #endif
