@@ -60,6 +60,7 @@ private:
     int32_t PackPhysicalDisplay(NetPacket &ckt);
     int32_t PackLogicalDisplay(NetPacket &ckt);
     void PrintDisplayDebugInfo();
+    void SendDisplayInfo();
 
 private:
     sptr<EventFilterService> eventFilterService_ {nullptr};
