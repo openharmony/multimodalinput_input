@@ -37,12 +37,12 @@ std::string InputDevice::GetName()
     return this->name;
 }
 
-void InputDevice::SetDeviceType(int32_t deviceType)
+void InputDevice::SetType(int32_t deviceType)
 {
     this->deviceType = deviceType;
 }
 
-int32_t InputDevice::GetDeviceType()
+int32_t InputDevice::GetType()
 {
     return this->deviceType;
 }

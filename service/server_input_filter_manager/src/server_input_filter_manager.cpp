@@ -88,6 +88,7 @@ void ServerInputFilterManager::OnKeyEventTrace(const EventKeyboard& key)
     }
     MMI_LOGT(" OnKeyEvent service trace keyUuid = %{public}s\n", keyUuid);
     std::string keyEvent = keyUuid;
+    keyEvent = "OnKeyEvent service keyUuid: " + keyEvent;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
 }
 
@@ -244,8 +245,9 @@ void ServerInputFilterManager::OnTouchEventTrace(const EventTouch& touch)
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" OnTouchEvent service pointerUuid = %{public}s\n", touchUuid);
+    MMI_LOGT(" OnTouchEvent service touchUuid = %{public}s\n", touchUuid);
     std::string touchEvent = touchUuid;
+    touchEvent = "OnTouchEvent service touchUuid: " + touchEvent;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
 }
 
@@ -314,7 +316,7 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
                 struct EventTouch touchTemp = {};
                 CHKR(EOK == memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch)),
                      MEMCPY_SEC_FUN_FAIL, RET_ERR);
-                MMIRegEvent->GetTouchInfoByTouchId(touchTemp, touchId);
+                MMIRegEvent->GetTouchInfoByTouchId(touchId, touchTemp);
                 MMI_LOGT("\n4.event filter of server 1:\neventTouch:time=%{public}" PRId64 ";deviceType=%{public}u;"
                          "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
                          "slot=%{public}d;seat_slot=%{public}d;pressure=%{public}lf;point.x=%{public}lf;"
@@ -402,6 +404,7 @@ void ServerInputFilterManager::OnPointerEventTrace(const EventPointer& event_poi
     }
     MMI_LOGT(" OnPointerEvent service pointerUuid = %{public}s\n", pointerUuid);
     std::string pointerEvent = pointerUuid;
+    pointerEvent = "OnPointerEvent service pointerUuid: " + pointerEvent;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
 }
 
