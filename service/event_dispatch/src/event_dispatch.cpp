@@ -476,7 +476,7 @@ void OHOS::MMI::EventDispatch::DispatchPointerEventTrace(const EventPointer& poi
         return;
     }
     MMI_LOGT(" OnEventPointer service DispatchPointerEvent pointerUuid = %{public}s\n", pointerUuid);
-    std::string pointerEvent = pointerUuid;
+    std::string pointerEvent = " DispatchPointerEvent service pointerUuid: " + pointerUuid;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
 }
 
@@ -625,7 +625,7 @@ void OHOS::MMI::EventDispatch::DispatchTouchEventTrace(const EventTouch& touch)
         return;
     }
     MMI_LOGT(" 4.event dispatcher of server: touchUuid = %{public}s\n", touchUuid);
-    std::string touchEvent = touchUuid;
+    std::string touchEvent = "4.event dispatcher of server touchUuid: " + touchUuid;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
 }
 
@@ -828,7 +828,7 @@ void OHOS::MMI::EventDispatch::DispatchKeyEventTrace(const EventKeyboard& key)
         return;
     }
     MMI_LOGT(" OnEventKeyboard service DispatchKeyEvent keyUuid = %{public}s\n", keyUuid);
-    std::string keyEvent = keyUuid;
+    std::string keyEvent = "4.event dispatcher of server keyUuid: " + keyUuid;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
 }
 

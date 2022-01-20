@@ -87,7 +87,7 @@ void ServerInputFilterManager::OnKeyEventTrace(const EventKeyboard& key)
         return;
     }
     MMI_LOGT(" OnKeyEvent service trace keyUuid = %{public}s\n", keyUuid);
-    std::string keyEvent = keyUuid;
+    std::string keyEvent = "OnKeyEvent service keyUuid: " + keyUuid;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
 }
 
@@ -244,8 +244,8 @@ void ServerInputFilterManager::OnTouchEventTrace(const EventTouch& touch)
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" OnTouchEvent service pointerUuid = %{public}s\n", touchUuid);
-    std::string touchEvent = touchUuid;
+    MMI_LOGT(" OnTouchEvent service touchUuid = %{public}s\n", touchUuid);
+    std::string touchEvent = "OnTouchEvent service touchUuid: " + touchUuid;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
 }
 
@@ -401,7 +401,7 @@ void ServerInputFilterManager::OnPointerEventTrace(const EventPointer& event_poi
         return;
     }
     MMI_LOGT(" OnPointerEvent service pointerUuid = %{public}s\n", pointerUuid);
-    std::string pointerEvent = pointerUuid;
+    std::string pointerEvent = "OnPointerEvent service pointerUuid: " + pointerUuid;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
 }
 
