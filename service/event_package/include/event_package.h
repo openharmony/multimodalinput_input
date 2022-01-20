@@ -31,7 +31,7 @@ namespace OHOS::MMI {
         template<class EventType>
         int32_t PackageEventDeviceInfo(libinput_event *event, EventType& data);
         template<class T>
-        int32_t PackageRegisteredEvent(RegisteredEvent& registeredEvent, T& eventData);
+        int32_t PackageRegisteredEvent(T& eventData, RegisteredEvent& registeredEvent);
         int32_t PackageTabletToolEvent(libinput_event *event, EventTabletTool& tableTool);
         int32_t PackageTabletPadEvent(libinput_event *event, EventTabletPad& tabletPad);
         int32_t PackageDeviceManageEvent(libinput_event *event, DeviceManage& deviceManage);
