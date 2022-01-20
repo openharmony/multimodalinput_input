@@ -125,9 +125,9 @@ std::function<void(KeyBoardEvent)> InputFilterManager::KeyEventFilter::GetHandle
 void InputFilterManager::OnkeyEventTrace(const KeyBoardEvent& event)
 {
     int32_t EVENT_KEY = 1;
-    const std::string keyEvent = event.GetUuid();
-    char *tmpPointer = (char*)keyEvent.c_str();
-    MMI_LOGT(" OnKey keyUuid = %{public}s\n", tmpPointer);
+    std::string keyEvent = "InputFilter OnKey keyUuid: " + event.GetUuid();
+    char *tmpKey = (char*)keyEvent.c_str();
+    MMI_LOGT(" OnKey keyUuid = %{public}s\n", tmpKey);
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
 }
 
@@ -272,7 +272,7 @@ std::function<void(TouchEvent)> InputFilterManager::TouchEventFilter::GetHandler
 void InputFilterManager::OnTouchEventTrace(const TouchEvent& event)
 {
     int32_t EVENT_TOUCH = 9;
-    const std::string touchEvent = event.GetUuid();
+    std::string touchEvent = "InputFilter OnTouch touchUuid: " + event.GetUuid();
     char *tmpTouch = (char*)touchEvent.c_str();
     MMI_LOGT(" OnTouchEvent touchUuid = %{public}s\n", tmpTouch);
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
@@ -394,7 +394,7 @@ std::function<void(MouseEvent)> InputFilterManager::PointerEventInterceptor::Get
 void InputFilterManager::OnPointerEventTrace(const MouseEvent& event)
 {
     int32_t EVENT_POINTER = 17;
-    const std::string pointerEvent = event.GetUuid();
+    std::string pointerEvent = "InputFilter OnPointer pointerUuid: " + event.GetUuid();
     char *tmpPointer = (char*)pointerEvent.c_str();
     MMI_LOGT(" OnPointerEvent pointerUuid = %{public}s\n", tmpPointer);
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
