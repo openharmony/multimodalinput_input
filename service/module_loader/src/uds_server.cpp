@@ -63,7 +63,7 @@ int32_t OHOS::MMI::UDSServer::GetFdByPid(int32_t pid)
     std::lock_guard<std::mutex> lock(mux_);
     auto it = idxPidMap_.find(pid);
     if (it == idxPidMap_.end()) {
-        MMI_LOGE("find fd error, Invalid input parameter pid:%{public}d errCode:%{public}d", 
+        MMI_LOGE("find fd error, Invalid input parameter pid:%{public}d errCode:%{public}d",
             pid, SESSION_NOT_FOUND);
         return RET_ERR;
     }
@@ -75,7 +75,7 @@ int32_t OHOS::MMI::UDSServer::GetPidByFd(int32_t fd)
     std::lock_guard<std::mutex> lock(mux_);
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
-        MMI_LOGE("find pid error, Invalid input parameter fd:%{public}d errCode:%{public}d", 
+        MMI_LOGE("find pid error, Invalid input parameter fd:%{public}d errCode:%{public}d",
             fd, SESSION_NOT_FOUND);
         return RET_ERR;
     }
@@ -197,7 +197,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
     SessionPtr sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
     if (sess == nullptr) {
         cleanTaskWhenError();
-        MMI_LOGE("make_shared fail. progName:%{public}s pid:%{public}d errCode:%{public}d", 
+        MMI_LOGE("make_shared fail. progName:%{public}s pid:%{public}d errCode:%{public}d",
             programName.c_str(), pid, MAKE_SHARED_FAIL);
         return RET_ERR;
     }
@@ -298,7 +298,6 @@ void OHOS::MMI::UDSServer::OnEvent(const epoll_event& ev, CLMAP<int32_t, StreamB
     CHK(maxCount > 0, VAL_NOT_EXP);
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGD("UDSServer::OnEvent fd:%{public}d, ev.events:0x%{public}x", fd, ev.events);
         auto secPtr = GetSession(fd);
         if (secPtr) {
             OnDisconnected(secPtr);
@@ -311,7 +310,7 @@ void OHOS::MMI::UDSServer::OnEvent(const epoll_event& ev, CLMAP<int32_t, StreamB
     if (fd != IMultimodalInputConnect::INVALID_SOCKET_FD && (ev.events & EPOLLIN)) {
         auto bufData = &bufMap[fd];
         if (bufData->isOverflow) {
-            MMI_LOGE("OnEvent StreamBuffer full or write error, Data discarded errCode:%{public}d", 
+            MMI_LOGE("OnEvent StreamBuffer full or write error, Data discarded errCode:%{public}d",
                 STREAMBUFF_OVER_FLOW);
             return;
         }
@@ -340,7 +339,6 @@ void OHOS::MMI::UDSServer::OnEpollEvent(epoll_event& ev, CLMAP<int32_t, StreamBu
     auto fd = *static_cast<int32_t*>(ev.data.ptr);
     CHK(fd >= 0, INVALID_PARAM);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGD("OnEpollEvent EPOLLERR or EPOLLHUP fd:%{public}d, ev.events:0x%{public}x", fd, ev.events);
         auto secPtr = GetSession(fd);
         if (secPtr) {
             OnDisconnected(secPtr);
@@ -352,7 +350,7 @@ void OHOS::MMI::UDSServer::OnEpollEvent(epoll_event& ev, CLMAP<int32_t, StreamBu
     } else if (ev.events & EPOLLIN) {
         auto bufData = &bufMap[fd];
         if (bufData->isOverflow) {
-            MMI_LOGE("OnEpollEvent StreamBuffer full or write error, Data discarded errCode:%{public}d", 
+            MMI_LOGE("OnEpollEvent StreamBuffer full or write error, Data discarded errCode:%{public}d",
                 STREAMBUFF_OVER_FLOW);
             return;
         }
@@ -385,8 +383,8 @@ void OHOS::MMI::UDSServer::DumpSession(const std::string &title)
 
 bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
 {
-    MMI_LOGD("AddSession pid is %{public}d, fd is %{public}d", ses->GetPid(), ses->GetFd());
     CHKF(ses, OHOS::ERROR_NULL_POINTER);
+    MMI_LOGD("AddSession pid is %{public}d, fd is %{public}d", ses->GetPid(), ses->GetFd());
     auto fd = ses->GetFd();
     CHKF(fd >= 0, VAL_NOT_EXP);
     auto pid = ses->GetPid();
