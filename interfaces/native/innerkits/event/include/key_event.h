@@ -1488,6 +1488,8 @@ public:
 
     const KeyItem* GetKeyItem() const;
     const KeyItem* GetKeyItem(int32_t keyCode) const;
+    bool IsValidKeyItem() const;
+    bool IsValid() const;
 protected:
     explicit KeyEvent(int32_t eventType);
 

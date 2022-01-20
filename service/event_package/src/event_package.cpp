@@ -22,52 +22,52 @@ namespace {
     const std::string VIRTUAL_KEYBOARD = "virtual_keyboard";
     constexpr uint32_t SEAT_KEY_COUNT_ONE = 1;
     constexpr uint32_t SEAT_KEY_COUNT_ZERO = 0;
-}
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventPackage" };
 
-static void FillEventJoyStickAxisAbsInfo(EventJoyStickAxisAbsInfo& l,
-                                         const libinput_event_joystick_axis_abs_info& r)
-{
-    l.code = r.code;
-    l.value = r.value;
-    l.minimum = r.minimum;
-    l.maximum = r.maximum;
-    l.fuzz = r.fuzz;
-    l.flat = r.flat;
-    l.resolution = r.resolution;
-    l.standardValue = r.standardValue;
-    l.isChanged = true;
-}
-
-static void FillEventSlotedCoordsInfo(SlotedCoordsInfo& l, const sloted_coords_info& r)
-{
-    l.activeCount = r.active_count;
-    for (int i = 0; i < MAX_SOLTED_COORDS_NUM; i++) {
-        l.coords[i].isActive = r.coords[i].is_active;
-        l.coords[i].x = r.coords[i].x;
-        l.coords[i].y = r.coords[i].y;
+    void FillEventJoyStickAxisAbsInfo(EventJoyStickAxisAbsInfo& l, const libinput_event_joystick_axis_abs_info& r)
+    {
+        l.code = r.code;
+        l.value = r.value;
+        l.minimum = r.minimum;
+        l.maximum = r.maximum;
+        l.fuzz = r.fuzz;
+        l.flat = r.flat;
+        l.resolution = r.resolution;
+        l.standardValue = r.standardValue;
+        l.isChanged = true;
     }
-}
 
-static enum HOS_DEVICE_TYPE GetDeviceType(struct libinput_device* device)
-{
-    enum HOS_DEVICE_TYPE deviceType = HOS_UNKNOWN_DEVICE_TYPE;
-    enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
-    if (udevTags & EVDEV_UDEV_TAG_JOYSTICK) {
-        deviceType = HOS_JOYSTICK;
-    } else if (udevTags & EVDEV_UDEV_TAG_KEYBOARD) {
-        deviceType = HOS_KEYBOARD;
-    } else if (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK)) {
-        deviceType = HOS_MOUSE;
-    } else if (udevTags & EVDEV_UDEV_TAG_TOUCHSCREEN) {
-        deviceType = HOS_TOUCH_PANEL;
-    } else if (udevTags & (EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) {
-        deviceType = HOS_TOUCHPAD;
-    } else if (udevTags & EVDEV_UDEV_TAG_TABLET) {
-        deviceType = HOS_STYLUS;
-    } else {
-        deviceType = HOS_UNKNOWN_DEVICE_TYPE;
+    void FillEventSlotedCoordsInfo(SlotedCoordsInfo& l, const sloted_coords_info& r)
+    {
+        l.activeCount = r.active_count;
+        for (int i = 0; i < MAX_SOLTED_COORDS_NUM; i++) {
+            l.coords[i].isActive = r.coords[i].is_active;
+            l.coords[i].x = r.coords[i].x;
+            l.coords[i].y = r.coords[i].y;
+        }
     }
-    return deviceType;
+
+    HOS_DEVICE_TYPE GetDeviceType(struct libinput_device* device)
+    {
+        CHKPR(device, ERROR_NULL_POINTER, HOS_UNKNOWN_DEVICE_TYPE);
+        enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
+        if (udevTags & EVDEV_UDEV_TAG_JOYSTICK) {
+            return HOS_JOYSTICK;
+        } else if (udevTags & EVDEV_UDEV_TAG_KEYBOARD) {
+            return HOS_KEYBOARD;
+        } else if (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK)) {
+            return HOS_MOUSE;
+        } else if (udevTags & EVDEV_UDEV_TAG_TOUCHSCREEN) {
+            return HOS_TOUCH_PANEL;
+        } else if (udevTags & (EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) {
+            return HOS_TOUCHPAD;
+        } else if (udevTags & EVDEV_UDEV_TAG_TABLET) {
+            return HOS_STYLUS;
+        } else {
+            MMI_LOGW("Unknown device type");
+            return HOS_UNKNOWN_DEVICE_TYPE;
+        }
+    }
 }
 
 EventPackage::EventPackage()
@@ -79,48 +79,48 @@ EventPackage::~EventPackage()
 }
 
 template<class EventType>
-int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& eventData)
+int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& data)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto type = libinput_event_get_type(event);
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
-    eventData.eventType = type;
-    eventData.deviceType = GetDeviceType(device);
+    data.eventType = type;
+    data.deviceType = GetDeviceType(device);
     auto name = libinput_device_get_name(device);
     CHKR(name, ERROR_NULL_POINTER, RET_ERR);
-    CHKR(EOK == memcpy_s(eventData.deviceName, sizeof(eventData.deviceName),
+    CHKR(EOK == memcpy_s(data.deviceName, sizeof(data.deviceName),
         name, MAX_DEVICENAME), MEMCPY_SEC_FUN_FAIL, RET_ERR);
     const std::string uuid = GetUUid();
-    CHKR(EOK == memcpy_s(eventData.uuid, MAX_UUIDSIZE, uuid.c_str(), uuid.size()), MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    CHKR(EOK == memcpy_s(data.uuid, MAX_UUIDSIZE, uuid.c_str(), uuid.size()), MEMCPY_SEC_FUN_FAIL, RET_ERR);
 #ifdef OHOS_BUILD_HDF
-    CHKR(EOK == memcpy_s(eventData.devicePhys, MAX_DEVICENAME, eventData.deviceName, MAX_DEVICENAME),
+    CHKR(EOK == memcpy_s(data.devicePhys, MAX_DEVICENAME, data.deviceName, MAX_DEVICENAME),
         MEMCPY_SEC_FUN_FAIL, RET_ERR);
 #else
     auto physWhole = libinput_device_get_phys(device);
     if (!physWhole) {
-        CHKR(EOK == memcpy_s(eventData.devicePhys, sizeof(eventData.devicePhys),
-            eventData.deviceName, sizeof(eventData.deviceName)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
+        CHKR(EOK == memcpy_s(data.devicePhys, sizeof(data.devicePhys),
+            data.deviceName, sizeof(data.deviceName)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
     } else {
         std::string s(physWhole);
         std::string phys = s.substr(0, s.rfind('/'));
         CHKR(!phys.empty(), ERROR_NULL_POINTER, RET_ERR);
-        CHKR(EOK == memcpy_s(eventData.devicePhys, sizeof(eventData.devicePhys), phys.c_str(), MAX_DEVICENAME),
+        CHKR(EOK == memcpy_s(data.devicePhys, sizeof(data.devicePhys), phys.c_str(), MAX_DEVICENAME),
              MEMCPY_SEC_FUN_FAIL, RET_ERR);
     }
 #endif
-    std::string devicePhys(eventData.devicePhys);
+    std::string devicePhys(data.devicePhys);
     if (type == LIBINPUT_EVENT_DEVICE_REMOVED) {
         DevRegister->DeleteDeviceInfo(devicePhys);
         return RET_OK;
     }
     uint32_t deviceId = DevRegister->FindDeviceIdByDevicePhys(devicePhys);
     if (deviceId) {
-        eventData.deviceId = deviceId;
+        data.deviceId = deviceId;
     } else {
         deviceId = DevRegister->AddDeviceInfo(devicePhys);
         CHKR(deviceId, ADD_DEVICE_INFO_CALL_FAIL, RET_ERR);
-        eventData.deviceId = deviceId;
+        data.deviceId = deviceId;
     }
     return RET_OK;
 }
@@ -556,13 +556,13 @@ int32_t EventPackage::PackageTouchEvent(multimodal_libinput_event &ev, EventTouc
 int32_t EventPackage::PackagePointerEvent(multimodal_libinput_event &ev, EventPointer& point)
 {
     CHKR(ev.event, PARAM_INPUT_INVALID, RET_ERR);
-    auto type = libinput_event_get_type(ev.event);
     auto rDevRet = PackageEventDeviceInfo<EventPointer>(ev.event, point);
     if (rDevRet != RET_OK) {
         MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", rDevRet, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     int32_t ret = RET_OK;
+    auto type = libinput_event_get_type(ev.event);
     switch (type) {
         case LIBINPUT_EVENT_POINTER_MOTION: {
             ret = PackagePointerEventByMotion(ev.event, point);
@@ -656,7 +656,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_keyboard_event(event);
-    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER, RET_ERR);
     key.key = libinput_event_keyboard_get_key(data);
     auto ret = PackageEventDeviceInfo<EventKeyboard>(event, key);
     if (ret != RET_OK) {
@@ -689,7 +689,6 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<OHO
     CHKR(kevnPtr, ERROR_NULL_POINTER, RET_ERR);
     kevnPtr->UpdateId();
     EventKeyboard key = {};
-    OHOS::MMI::KeyEvent::KeyItem item;
     auto ret = PackageEventDeviceInfo<EventKeyboard>(event, key);
     if (ret != RET_OK) {
         MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
@@ -714,6 +713,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<OHO
     kevnPtr->SetKeyCode(keyCode);
     kevnPtr->SetKeyAction(keyAction);
 
+    OHOS::MMI::KeyEvent::KeyItem item;
     bool isKeyPressed = (libinput_event_keyboard_get_key_state(data) == 0) ? (false) : (true);
     if (isKeyPressed) {
         int32_t keyDownTime = actionStartTime;

@@ -14,9 +14,14 @@
  */
 
 #include "pointer_event.h"
+#include "hilog/log.h"
 
+using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
+namespace {
+    constexpr HiLogLabel LABEL = { LOG_CORE, 0xD002800, "PointerEvent" };
+}
 std::shared_ptr<PointerEvent> PointerEvent::from(std::shared_ptr<InputEvent> inputEvent)
 {
     return nullptr;
@@ -315,7 +320,7 @@ std::vector<int32_t> PointerEvent::GetPointersIdList() const
     return pointerIdList;
 }
 
-int32_t PointerEvent::GetSourceType()
+int32_t PointerEvent::GetSourceType() const
 {
     return sourceType_;
 }
@@ -522,6 +527,201 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         axisValues_[i] = val;
     }
 
+    return true;
+}
+
+bool PointerEvent::IsValidCheckMouseFunc() const
+{
+    HiLog::Debug(LABEL, "PointerEvent::IsValidCheckMouseFunc begin");
+    if (pointers_.size() != 1) {
+        HiLog::Error(LABEL, "Pointers_ is invalid");
+        return false;
+    }
+
+    int32_t mouseButton = 3;
+    if (pressedButtons_.size() > mouseButton) {
+        HiLog::Error(LABEL, "PressedButtons_.size is greater than three and is invalid");
+        return false;
+    }
+
+    for (const int32_t btnId : pressedButtons_) {
+        if (btnId != MOUSE_BUTTON_LEFT && btnId != MOUSE_BUTTON_RIGHT && btnId != MOUSE_BUTTON_MIDDLE) {
+            HiLog::Error(LABEL, "PressedButtons_ is invalid");
+            return false;
+        }
+    }
+
+    int32_t pointAction = GetPointerAction();
+    if (pointAction != POINTER_ACTION_CANCEL && pointAction != POINTER_ACTION_MOVE &&
+        pointAction != POINTER_ACTION_AXIS_BEGIN && pointAction != POINTER_ACTION_AXIS_UPDATE &&
+        pointAction != POINTER_ACTION_AXIS_END && pointAction != POINTER_ACTION_BUTTON_DOWN &&
+        pointAction != POINTER_ACTION_BUTTON_UP) {
+        HiLog::Error(LABEL, "PointAction is invalid");
+        return false;
+    }
+            
+    int32_t buttonId = GetButtonId();
+    if (pointAction == POINTER_ACTION_BUTTON_DOWN || pointAction == POINTER_ACTION_BUTTON_UP) {
+        if (buttonId != MOUSE_BUTTON_LEFT && buttonId != MOUSE_BUTTON_RIGHT && buttonId != MOUSE_BUTTON_MIDDLE) {
+            HiLog::Error(LABEL, "ButtonId is invalid");
+            return false;
+        }
+    } else {
+        if (buttonId != BUTTON_NONE) {
+            HiLog::Error(LABEL, "ButtonId is not BUTTON_NONE and is invalid");
+            return false;
+        }
+    }
+    HiLog::Debug(LABEL, "PointerEvent::IsValidCheckMouseFunc end");
+    return true;
+}
+
+bool PointerEvent::IsValidCheckMouse() const
+{
+    HiLog::Debug(LABEL, "PointerEvent::IsValidCheckMouse begin");
+    int32_t mousePointID = GetPointerId();
+    if (mousePointID < 0) {
+        HiLog::Error(LABEL, "MousePointID is invalid");
+        return false;
+    }
+
+    if (!IsValidCheckMouseFunc()) {
+        HiLog::Error(LABEL, "IsValidCheckMouseFunc is invalid");
+        return false;
+    }
+
+    for (auto &item : pointers_) {
+        if (item.GetPointerId() < 0) {
+            HiLog::Error(LABEL, "Item.pointerid is invalid");
+            return false;
+        }
+
+        if (item.GetPointerId() != mousePointID) {
+            HiLog::Error(LABEL, "Item.pointerid is not same to mousePointID and is invalid");
+            return false;
+        }
+
+        if (item.GetDownTime() > 0) {
+            HiLog::Error(LABEL, "Item.downtime is invalid");
+            return false;
+        }
+
+        if (item.IsPressed() != false) {
+            HiLog::Error(LABEL, "Item.ispressed is not false and is invalid");
+            return false;
+        }
+    }
+    HiLog::Debug(LABEL, "PointerEvent::IsValidCheckMouse end");
+    return true;
+}
+
+bool PointerEvent::IsValidCheckTouchFunc() const
+{
+    HiLog::Debug(LABEL, "PointerEvent::IsValidCheckTouchFunc begin");
+    int32_t touchPointID = GetPointerId();
+    if (touchPointID < 0) {
+        HiLog::Error(LABEL, "TouchPointID is invalid");
+        return false;
+    }
+
+    if (pressedButtons_.size() != 0) {
+        HiLog::Error(LABEL, "PressedButtons_.size is invalid");
+        return false;
+    }
+
+    int32_t pointAction = GetPointerAction();
+    if (pointAction != POINTER_ACTION_CANCEL && pointAction != POINTER_ACTION_MOVE &&
+        pointAction != POINTER_ACTION_DOWN && pointAction != POINTER_ACTION_UP) {
+        HiLog::Error(LABEL, "PointAction is invalid");
+        return false;
+    }
+
+    if (GetButtonId() != BUTTON_NONE) {
+        HiLog::Error(LABEL, "ButtonId is invalid");
+        return false;
+    }
+    HiLog::Debug(LABEL, "PointerEvent::IsValidCheckTouchFunc end");
+    return true;
+}
+
+bool PointerEvent::IsValidCheckTouch() const
+{
+    HiLog::Debug(LABEL, "PointerEvent::IsValidCheckTouch begin");
+    if (!IsValidCheckTouchFunc()) {
+        HiLog::Error(LABEL, "IsValidCheckTouchFunc is invalid");
+        return false;
+    }
+    bool isSameItem = false;
+    int32_t touchPointID = GetPointerId();
+    for (auto item = pointers_.begin(); item != pointers_.end(); item++) {
+        if (item->GetPointerId() < 0) {
+            HiLog::Error(LABEL, "Item.pointerid is invalid");
+            return false;
+        }
+
+        if (item->GetPointerId() == touchPointID) {
+            isSameItem = true;
+        }
+                
+        if (item->GetDownTime() <= 0) {
+            HiLog::Error(LABEL, "Item.downtime is invalid");
+            return false;
+        }
+
+        if (item->IsPressed() != false) {
+            HiLog::Error(LABEL, "Item.ispressed is not false and is invalid");
+            return false;
+        }
+
+        auto itemtmp = item;
+        for (++itemtmp; itemtmp != pointers_.end(); itemtmp++) {
+            if (item->GetPointerId() == itemtmp->GetPointerId()) {
+                HiLog::Error(LABEL, "Pointitems pointerid exist same items and is invalid");
+                return false;
+            }
+        }
+    }
+            
+    if (!isSameItem) {
+        HiLog::Error(LABEL, "Item.pointerid is not same to touchPointID and is invalid");
+        return false;
+    }
+    HiLog::Debug(LABEL, "PointerEvent::IsValidCheckTouch end");
+    return true;
+}
+
+bool PointerEvent::IsValid() const
+{
+    HiLog::Debug(LABEL, "PointerEvent::IsValid begin");
+    int32_t sourceType = GetSourceType();
+    if (sourceType != SOURCE_TYPE_MOUSE && sourceType != SOURCE_TYPE_TOUCHSCREEN &&
+        sourceType != SOURCE_TYPE_TOUCHPAD) {
+        HiLog::Error(LABEL, "SourceType is invalid");
+        return false;
+    }
+    switch (sourceType) {
+        case SOURCE_TYPE_MOUSE: {
+            if (!IsValidCheckMouse()) {
+                HiLog::Error(LABEL, "IsValidCheckMouse is invalid");
+                return false;
+            }
+            break;
+        }
+        case SOURCE_TYPE_TOUCHSCREEN:
+        case SOURCE_TYPE_TOUCHPAD: {
+            if (!IsValidCheckTouch()) {
+                HiLog::Error(LABEL, "IsValidCheckTouch is invalid");
+                return false;
+            }
+            break;
+        }
+        default: {
+            HiLog::Error(LABEL, "SourceType is invalid");
+            return false;
+            break;
+        }
+    }
+    HiLog::Debug(LABEL, "PointerEvent::IsValid end");
     return true;
 }
 }
