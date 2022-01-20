@@ -67,23 +67,15 @@ uint32_t DeviceRegister::AddDeviceInfo(std::string& devicePhys)
         mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(devicePhys, BEGIN_NUM));
         return BEGIN_NUM;
     } else {
-        auto previousPtr = setDeviceId_.begin();
-        auto nextPtr = (++setDeviceId_.begin());
-        uint32_t addDeviceId = 0;
-        for (; previousPtr != setDeviceId_.end() && nextPtr != setDeviceId_.end(); previousPtr++, nextPtr++) {
-            if (*previousPtr + 1 != *nextPtr) {
-                addDeviceId = *previousPtr + 1;
-                break;
-            }
-        }
-        if (!addDeviceId) {
-            addDeviceId = *(--setDeviceId_.end()) + 1;
-        }
-        if (setDeviceId_.count(addDeviceId)) {
+        auto max = *setDeviceId_.rbegin();
+        if ((max + 1) >= std::numeric_limits<uint32_t>::max()) {
+            MMI_LOGE("Device number exceeds max value of uint32_t type");
             return 0;
         }
+        auto addDeviceId = max + 1;
         setDeviceId_.insert(addDeviceId);
         mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(devicePhys, addDeviceId));
+        MMI_LOGT("Adding Device number succeed");
         return addDeviceId;
     }
 }
