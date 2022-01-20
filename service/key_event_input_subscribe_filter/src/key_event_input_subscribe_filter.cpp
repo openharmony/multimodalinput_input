@@ -81,8 +81,7 @@ int32_t KeyEventInputSubscribeFilter::UnSubscribeKeyEvent(SessionPtr sess, int32
     return RET_ERR;
 }
 
-bool KeyEventInputSubscribeFilter::FilterSubscribeKeyEvent(UDSServer& udsServer,
-        std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+bool KeyEventInputSubscribeFilter::FilterSubscribeKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
     MMI_LOGD("Enter");
 

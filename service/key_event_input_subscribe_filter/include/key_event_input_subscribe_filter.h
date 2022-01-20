@@ -38,7 +38,7 @@ public:
     int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
             const std::shared_ptr<OHOS::MMI::KeyOption> keyOption);
     int32_t UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId);
-    bool FilterSubscribeKeyEvent(UDSServer& udsServer, std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent);
+    bool FilterSubscribeKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent);
 
 private:
     struct Subscriber {

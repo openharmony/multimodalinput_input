@@ -221,7 +221,7 @@ void EventPackage::PackageTabletToolTypeParam(libinput_event *event, EventTablet
     }
 }
 
-int32_t EventPackage::PackageTabletToolEvent(libinput_event *event, EventTabletTool& tableTool, UDSServer& udsServer)
+int32_t EventPackage::PackageTabletToolEvent(libinput_event *event, EventTabletTool& tableTool)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     const uint32_t stylusButton1KeyCode = 331;
@@ -280,7 +280,7 @@ void EventPackage::PackageTabletPadOtherParams(libinput_event *event, EventTable
     }
 }
 
-int32_t EventPackage::PackageTabletPadEvent(libinput_event *event, EventTabletPad& tabletPad, UDSServer& udsServer)
+int32_t EventPackage::PackageTabletPadEvent(libinput_event *event, EventTabletPad& tabletPad)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_tablet_pad_event(event);
@@ -296,7 +296,7 @@ int32_t EventPackage::PackageTabletPadEvent(libinput_event *event, EventTabletPa
     return RET_OK;
 }
 
-int32_t EventPackage::PackageTabletPadKeyEvent(libinput_event *event, EventKeyboard& key, UDSServer& udsServer)
+int32_t EventPackage::PackageTabletPadKeyEvent(libinput_event *event, EventKeyboard& key)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_tablet_pad_event(event);
@@ -343,7 +343,7 @@ int32_t EventPackage::PackageTabletPadKeyEvent(libinput_event *event, EventKeybo
     return RET_OK;
 }
 
-int32_t EventPackage::PackageJoyStickKeyEvent(libinput_event *event, EventKeyboard& key, UDSServer& udsServer)
+int32_t EventPackage::PackageJoyStickKeyEvent(libinput_event *event, EventKeyboard& key)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_joystick_pointer_button_event(event);
@@ -461,8 +461,7 @@ int32_t EventPackage::PackagePointerEventByAxis(libinput_event *event, EventPoin
     return RET_OK;
 }
 
-int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event,
-    EventJoyStickAxis& eventJoyStickAxis, UDSServer& udsServer)
+int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event, EventJoyStickAxis& eventJoyStickAxis)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto joyEvent = libinput_event_get_joystick_axis_event(event);
@@ -501,8 +500,7 @@ int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event,
     return RET_OK;
 }
 
-int32_t EventPackage::PackageTouchEvent(multimodal_libinput_event &ev,
-    EventTouch& touch, UDSServer& udsServer)
+int32_t EventPackage::PackageTouchEvent(multimodal_libinput_event &ev, EventTouch& touch)
 {
     auto type = libinput_event_get_type(ev.event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
@@ -555,8 +553,7 @@ int32_t EventPackage::PackageTouchEvent(multimodal_libinput_event &ev,
     return RET_OK;
 }
 
-int32_t EventPackage::PackagePointerEvent(multimodal_libinput_event &ev,
-    EventPointer& point, UDSServer& udsServer)
+int32_t EventPackage::PackagePointerEvent(multimodal_libinput_event &ev, EventPointer& point)
 {
     CHKR(ev.event, PARAM_INPUT_INVALID, RET_ERR);
     auto type = libinput_event_get_type(ev.event);
@@ -592,7 +589,7 @@ int32_t EventPackage::PackagePointerEvent(multimodal_libinput_event &ev,
     return ret;
 }
 
-int32_t OHOS::MMI::EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& gesture, UDSServer& udsServer)
+int32_t OHOS::MMI::EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& gesture)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_gesture_event(event);
@@ -644,7 +641,7 @@ int32_t OHOS::MMI::EventPackage::PackageGestureEvent(libinput_event *event, Even
     return RET_OK;
 }
 
-int32_t EventPackage::PackageDeviceManageEvent(libinput_event *event, DeviceManage& deviceManage, UDSServer& udsServer)
+int32_t EventPackage::PackageDeviceManageEvent(libinput_event *event, DeviceManage& deviceManage)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto ret = PackageEventDeviceInfo<DeviceManage>(event, deviceManage);
@@ -655,7 +652,7 @@ int32_t EventPackage::PackageDeviceManageEvent(libinput_event *event, DeviceMana
     return RET_OK;
 }
 
-int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key, UDSServer& udsServer)
+int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_keyboard_event(event);
@@ -685,8 +682,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key,
     return RET_OK;
 }
 
-int32_t EventPackage::PackageKeyEvent(libinput_event *event,
-    std::shared_ptr<OHOS::MMI::KeyEvent> kevnPtr, UDSServer& udsServer)
+int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<OHOS::MMI::KeyEvent> kevnPtr)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("PackageKeyEvent begin");
@@ -737,7 +733,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event,
     return RET_OK;
 }
 
-int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key, UDSServer& udsServer)
+int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key)
 {
     const std::string uid = GetUUid();
     CHKR(EOK == memcpy_s(key.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size()),
@@ -759,8 +755,7 @@ int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& k
     return RET_OK;
 }
 
-int32_t EventPackage::KeyboardToKeyEvent(EventKeyboard& key,
-    std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr, UDSServer& udsServer)
+int32_t EventPackage::KeyboardToKeyEvent(EventKeyboard& key, std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr)
 {
     CHKR(keyEventPtr, ERROR_NULL_POINTER, RET_ERR);
     keyEventPtr->UpdateId();
@@ -801,8 +796,7 @@ int32_t EventPackage::KeyboardToKeyEvent(EventKeyboard& key,
 
 const uint16_t pointerID = 1; // mouse has only one PoingeItem, so id is 1
 
-std::shared_ptr<OHOS::MMI::PointerEvent> EventPackage::GestureToPointerEvent(EventGesture& gesture,
-                                                                             UDSServer& udsServer)
+std::shared_ptr<OHOS::MMI::PointerEvent> EventPackage::GestureToPointerEvent(EventGesture& gesture)
 {
     auto pointerEvent = OHOS::MMI::PointerEvent::Create();
     OHOS::MMI::PointerEvent::PointerItem pointer;
