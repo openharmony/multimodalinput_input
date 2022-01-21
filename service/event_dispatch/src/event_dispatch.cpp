@@ -851,38 +851,32 @@ int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *ev
     MMIRegEvent->OnEventKeyGetSign(key, idMsg, prevKey);
     if (MmiMessageId::INVALID != idMsg) {
         RegisteredEvent registeredEvent = {};
-        auto packageResult = eventPackage_.PackageRegisteredEvent<EventKeyboard>(prevKey, registeredEvent);
-        if (packageResult != RET_OK) {
-            MMI_LOGE("Registered event package failed. ret:%{public}d, errCode:%{public}d",
-                packageResult, REG_EVENT_PKG_FAIL);
+        auto result = eventPackage_.PackageRegisteredEvent<EventKeyboard>(prevKey, registeredEvent);
+        if (result != RET_OK) {
+            MMI_LOGE("Registered event package failed.ret:%{public}d,errCode:%{public}d", result, REG_EVENT_PKG_FAIL);
         }
         ret = DispatchRegEvent(idMsg, udsServer, registeredEvent, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret != RET_OK) {
-            MMI_LOGE("Registered Event dispatch failed. ret:%{public}d, errCode:%{public}d",
-                ret, REG_EVENT_DISP_FAIL);
+            MMI_LOGE("Registered Event dispatch failed.ret:%{public}d,errCode:%{public}d", ret, REG_EVENT_DISP_FAIL);
         }
     }
     auto focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
+        MMI_LOGE("Don't find focus window, so the event will be discarded. errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
         return RET_OK;
     }
     auto appInfo = AppRegs->FindByWinId(focusId); // obtain application information for focusId
     if (appInfo.fd == RET_ERR) {
-        MMI_LOGT("Failed to find, fd:%{public}d. errCode:%{public}d", focusId, FOCUS_ID_OBTAIN_FAIL);
+        MMI_LOGE("Failed to find, fd:%{public}d. errCode:%{public}d", focusId, FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
     }
     key.key = trs.keyValueOfHos; // struct EventKeyboard tranformed into HOS_L3
-#ifdef DEBUG_CODE_TEST
-    std::string str = WinMgr->GetSurfaceIdListString();
-    PrintWMSInfo(str, appInfo.fd, appInfo.abilityId, focusId);
-#endif
 
     MMI_LOGT("4.event dispatcher of server:eventKeyboard:time=%{public}" PRId64 ", deviceType=%{public}u, "
-             "deviceName=%{public}s, devicePhys=%{public}s, eventType=%{public}d, "
-             "unicode=%{public}d, key=%{public}u, key_detail=%{public}s, seat_key_count=%{public}u, "
-             "state=%{public}d, fd=%{public}d, preHandlerTime=%{public}" PRId64 "",
-             key.time, key.deviceType, key.deviceName, key.devicePhys, key.eventType,
-             key.unicode, key.key, trs.keyEvent.c_str(), key.seat_key_count, key.state, appInfo.fd,
+             "deviceName=%{public}s, devicePhys=%{public}s, eventType=%{public}d, unicode=%{public}d, key=%{public}u, "
+			 "key_detail=%{public}s, seat_key_count=%{public}u, state=%{public}d, fd=%{public}d, "
+			 "preHandlerTime=%{public}" PRId64 "", key.time, key.deviceType, key.deviceName, key.devicePhys,
+			 key.eventType, key.unicode, key.key, trs.keyEvent.c_str(), key.seat_key_count, key.state, appInfo.fd,
              preHandlerTime);
     DispatchKeyEventTrace(key);
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, appInfo.fd, key.time, preHandlerTime)) {
