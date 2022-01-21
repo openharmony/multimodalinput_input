@@ -31,7 +31,7 @@ namespace OHOS::MMI {
         template<class EventType>
         int32_t PackageEventDeviceInfo(libinput_event *event, EventType& data);
         template<class T>
-        int32_t PackageRegisteredEvent(T& eventData, RegisteredEvent& registeredEvent);
+        int32_t PackageRegisteredEvent(T& data, RegisteredEvent& event);
         int32_t PackageTabletToolEvent(libinput_event *event, EventTabletTool& tableTool);
         int32_t PackageTabletPadEvent(libinput_event *event, EventTabletPad& tabletPad);
         int32_t PackageDeviceManageEvent(libinput_event *event, DeviceManage& deviceManage);
@@ -55,5 +55,19 @@ namespace OHOS::MMI {
         int32_t PackagePointerEventByButton(libinput_event *event, EventPointer& point);
         int32_t PackagePointerEventByAxis(libinput_event *event, EventPointer& point);
     };
+    template<class T>
+    int32_t EventPackage::PackageRegisteredEvent(T& data, RegisteredEvent& event)
+    {
+        CHKR(EOK == memcpy_s(event.devicePhys, MAX_DEVICENAME, data.devicePhys, MAX_DEVICENAME),
+             MEMCPY_SEC_FUN_FAIL, RET_ERR);
+        const std::string uid = GetUUid();
+        CHKR(EOK == memcpy_s(event.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size()),
+             MEMCPY_SEC_FUN_FAIL, RET_ERR);
+        event.deviceId = data.deviceId;
+        event.eventType = data.eventType;
+        event.deviceType = data.deviceType;
+        event.occurredTime = data.time;
+        return RET_OK;
+    }
 }
 #endif
