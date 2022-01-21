@@ -22,43 +22,47 @@
 #include "utils/log.h"
 #include "libmmi_util.h"
 namespace OHOS {
-    namespace MMI {
-        void MultiInputCommon::InjectionIni(const std::string &iniFilePath, const std::string &fileName,
-                                            const std::string &jsonEventValue)
-        {
-            HILOG_INFO("InjectionIni: start");
-            if (iniFilePath.empty()) {
-                return;
-            }
+namespace MMI {
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultiInputCommon" };
+}
 
-            const std::string eventsFile = iniFilePath + fileName;
-            HILOG_INFO("eventsfile=%s", eventsFile.c_str());
-            std::ofstream file_writer(eventsFile, std::ios_base::trunc);
-            file_writer.close();
-
-            std::ofstream file;
-            char path[PATH_MAX] = {};
-            if (realpath(eventsFile.c_str(), path) == nullptr) {
-                HILOG_INFO("path is error, eventsFile = %{public}s", eventsFile.c_str());
-                return;
-            }
-            file.open(path, std::ios::app);
-            if (!file.is_open()) {
-                std::cout << "cannot open file" << std::endl;
-            }
-            HILOG_INFO("jsonEventValue=%s", jsonEventValue.c_str());
-            file << jsonEventValue << std::endl;
-            file.close();
-            HILOG_INFO("InjectionIni: end");
-        }
-
-        void MultiInputCommon::SetIniFile(const std::string &fileName,const std::string &jsonEventValue)
-        {
-            HILOG_INFO("SetIniFile: start");
-            const std::string iniFilePath = "/data/mmi/";
-            HILOG_INFO("jsonEventValue=%{public}s", jsonEventValue.c_str());
-            InjectionIni(iniFilePath,fileName,jsonEventValue);
-            HILOG_INFO("SetIniFile: end");
-        }
+void MultiInputCommon::InjectionIni(const std::string &iniFilePath, const std::string &fileName,
+                                    const std::string &jsonEventValue)
+{
+    MMI_LOGD("start");
+    if (iniFilePath.empty()) {
+        return;
     }
+
+    const std::string eventsFile = iniFilePath + fileName;
+    MMI_LOGD("eventsfile=%s", eventsFile.c_str());
+    std::ofstream file_writer(eventsFile, std::ios_base::trunc);
+    file_writer.close();
+
+    std::ofstream file;
+    char path[PATH_MAX] = {};
+    if (realpath(eventsFile.c_str(), path) == nullptr) {
+        MMI_LOGD("path is error, eventsFile = %{public}s", eventsFile.c_str());
+        return;
+    }
+    file.open(path, std::ios::app);
+    if (!file.is_open()) {
+        std::cout << "cannot open file" << std::endl;
+    }
+    HILOG_INFO("jsonEventValue=%s", jsonEventValue.c_str());
+    file << jsonEventValue << std::endl;
+    file.close();
+    MMI_LOGD("end");
+}
+
+void MultiInputCommon::SetIniFile(const std::string &fileName,const std::string &jsonEventValue)
+{
+    MMI_LOGD("start");
+    const std::string iniFilePath = "/data/mmi/";
+    MMI_LOGD("jsonEventValue=%{public}s", jsonEventValue.c_str());
+    InjectionIni(iniFilePath,fileName,jsonEventValue);
+    MMI_LOGD("end");
+}
+}
 }

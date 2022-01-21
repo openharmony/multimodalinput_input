@@ -17,218 +17,222 @@
 #include <inttypes.h>
 
 namespace OHOS {
-    namespace MMI {
-        const uint32_t MAX_STRING_LEN = 1024;
+namespace MMI {
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterUtil" };
+}
 
-        void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, bool value)
-        {
-            HILOG_DEBUG("SetNamedProperty: %{public}s=%{public}d", name.c_str(), value);
-            napi_status status;
-            napi_value napiValue = nullptr;
-            status = napi_create_int32(env, value, &napiValue);
-            if (status != napi_ok) {
-                HILOG_ERROR("SetNamedProperty %{public}s=%{public}d failed.", name.c_str(), value);
-                return;
-            }
-            NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
-        }
+const uint32_t MAX_STRING_LEN = 1024;
 
-        void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, uint16_t value)
-        {
-            HILOG_DEBUG("SetNamedProperty: %{public}s=%{public}u", name.c_str(), value);
-            napi_status status;
-            napi_value napiValue = nullptr;
-            status = napi_create_uint32(env, value, &napiValue);
-            if (status != napi_ok) {
-                HILOG_ERROR("SetNamedProperty: %{public}s=%{public}u failed.", name.c_str(), value);
-                return;
-            }
-            NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
-        }
-
-        void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, uint32_t value)
-        {
-            HILOG_DEBUG("SetNamedProperty: %{public}s=%{public}u", name.c_str(), value);
-            napi_status status;
-            napi_value napiValue = nullptr;
-            status = napi_create_uint32(env, value, &napiValue);
-            if (status != napi_ok) {
-                HILOG_ERROR("SetNamedProperty: %{public}s=%{public}u failed.", name.c_str(), value);
-                return;
-            }
-            NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
-        }
-
-        void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, int32_t value)
-        {
-            HILOG_DEBUG("SetNamedProperty: %{public}s=%{public}d", name.c_str(), value);
-            napi_status status;
-            napi_value napiValue = nullptr;
-            status = napi_create_int32(env, value, &napiValue);
-            if (status != napi_ok) {
-                HILOG_ERROR("SetNamedProperty: %{public}s=%{public}d failed.", name.c_str(), value);
-                return;
-            }
-            NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
-        }
-
-        void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, float value)
-        {
-            HILOG_DEBUG("SetNamedProperty: %{public}s=%{public}f", name.c_str(), value);
-            napi_status status;
-            napi_value napiValue = nullptr;
-            status = napi_create_double(env, value, &napiValue);
-            if (status != napi_ok) {
-                HILOG_ERROR("SetNamedProperty: %{public}s=%{public}f failed.", name.c_str(), value);
-                return;
-            }
-            NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
-        }
-
-        void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, double value)
-        {
-            HILOG_DEBUG("SetNamedProperty: %{public}s=%{public}lf", name.c_str(), value);
-            napi_status status;
-            napi_value napiValue = nullptr;
-            status = napi_create_double(env, value, &napiValue);
-            if (status != napi_ok) {
-                HILOG_ERROR("SetNamedProperty: %{public}s=%{public}lf failed.", name.c_str(), value);
-                return;
-            }
-            NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
-        }
-
-        void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, uint64_t value)
-        {
-            HILOG_DEBUG("SetNamedProperty: %{public}s=%{public}" PRId64 "", name.c_str(), value);
-            napi_status status;
-            napi_value napiValue = nullptr;
-            status = napi_create_int64(env, value, &napiValue);
-            if (status != napi_ok) {
-                HILOG_ERROR("SetNamedProperty: %{public}s=%{public}" PRId64 " failed.", name.c_str(), value);
-                return;
-            }
-            NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
-        }
-
-        void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, std::string value)
-        {
-            HILOG_DEBUG("SetNamedProperty: %{public}s=%{public}s", name.c_str(), value.c_str());
-            napi_status status;
-            napi_value napiValue = nullptr;
-            status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &napiValue);
-            if (status != napi_ok) {
-                HILOG_ERROR("SetNamedProperty: %{public}s=%{public}s failed.", name.c_str(), value.c_str());
-                return;
-            }
-            NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
-        }
-
-        void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, napi_value value)
-        {
-            HILOG_DEBUG("SetNamedProperty: object=%{public}s", name.c_str());
-            NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), value));
-        }
-
-        bool GetNamedPropertyBool(const napi_env& env, const napi_value& object, const std::string& name)
-        {
-            bool value = false;
-            napi_value napiValue = {};
-            napi_valuetype tmpType = napi_undefined;
-            napi_get_named_property(env, object, name.c_str(), &napiValue);
-            if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-                HILOG_ERROR("GetNamedPropertyBool: call napi_typeof fail.");
-                return false;
-            }
-            if (tmpType != napi_boolean) {
-                HILOG_ERROR("GetNamedPropertyBool: value is not bool");
-                return value;
-            }
-
-            napi_get_value_bool(env, napiValue, &value);
-            HILOG_DEBUG("GetNamedPropertyBool: %{public}s=%{public}d", name.c_str(), value);
-            return value;
-        }
-
-        std::string GetNamedPropertyString(const napi_env& env, const napi_value& object, const std::string& name)
-        {
-            std::string value = "";
-            napi_value napiValue = {};
-            napi_valuetype tmpType = napi_undefined;
-            napi_get_named_property(env, object, name.c_str(), &napiValue);
-            if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-                HILOG_ERROR("GetNamedPropertyString: call napi_typeof fail.");
-                return value;
-            }
-            if (tmpType != napi_string) {
-                HILOG_ERROR("GetNamedPropertyString: value is not bool");
-                return value;
-            }
-
-            char tmpValue[MAX_STRING_LEN] = { 0 };
-            size_t typeLen = 0;
-            napi_get_value_string_utf8(env, napiValue, tmpValue, MAX_STRING_LEN - 1, &typeLen);
-            value = tmpValue;
-            HILOG_DEBUG("GetNamedPropertyString: %{public}s=%{public}s", name.c_str(), value.c_str());
-            return value;
-        }
-
-        int32_t GetNamedPropertyInt32(const napi_env& env, const napi_value& object, const std::string& name)
-        {
-            int32_t value = 0;
-            napi_value napiValue = {};
-            napi_valuetype tmpType = napi_undefined;
-            napi_get_named_property(env, object, name.c_str(), &napiValue);
-            if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-                HILOG_ERROR("GetNamedPropertyInt32: call napi_typeof fail.");
-                return value;
-            }
-            if (tmpType != napi_number) {
-                HILOG_ERROR("GetNamedPropertyInt32: value is not number");
-                return value;
-            }
-            napi_get_value_int32(env, napiValue, &value);
-            HILOG_DEBUG("GetNamedPropertyInt32: %{public}s=%{public}d", name.c_str(), value);
-            return value;
-        }
-
-        int64_t GetNamedPropertyInt64(const napi_env& env, const napi_value& object, const std::string& name)
-        {
-            int64_t value = 0;
-            napi_value napiValue = {};
-            napi_valuetype tmpType = napi_undefined;
-            napi_get_named_property(env, object, name.c_str(), &napiValue);
-            if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-                HILOG_ERROR("GetNamedPropertyInt64: call napi_typeof fail.");
-                return value;
-            }
-            if (tmpType != napi_number) {
-                HILOG_ERROR("GetNamedPropertyInt64: value is not number");
-                return value;
-            }
-            napi_get_value_int64(env, napiValue, &value);
-            HILOG_DEBUG("GetNamedPropertyInt64: %{public}s=%{public}" PRId64 "", name.c_str(), value);
-            return value;
-        }
-
-        uint32_t GetNamedPropertyUint32(const napi_env& env, const napi_value& object, const std::string& name)
-        {
-            uint32_t value = 0;
-            napi_value napiValue = {};
-            napi_valuetype tmpType = napi_undefined;
-            napi_get_named_property(env, object, name.c_str(), &napiValue);
-            if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-                HILOG_ERROR("GetNamedPropertyUint32: call napi_typeof fail.");
-                return value;
-            }
-            if (tmpType != napi_number) {
-                HILOG_ERROR("GetNamedPropertyUint32: value is not number");
-                return value;
-            }
-            napi_get_value_uint32(env, napiValue, &value);
-            HILOG_DEBUG("GetNamedPropertyUint32: %{public}s=%{public}d", name.c_str(), value);
-            return value;
-        }
+void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, bool value)
+{
+    MMI_LOGD("%{public}s=%{public}d", name.c_str(), value);
+    napi_status status;
+    napi_value napiValue = nullptr;
+    status = napi_create_int32(env, value, &napiValue);
+    if (status != napi_ok) {
+        MMI_LOGE("%{public}s=%{public}d failed", name.c_str(), value);
+        return;
     }
+    NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
+}
+
+void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, uint16_t value)
+{
+    MMI_LOGD("%{public}s=%{public}u", name.c_str(), value);
+    napi_status status;
+    napi_value napiValue = nullptr;
+    status = napi_create_uint32(env, value, &napiValue);
+    if (status != napi_ok) {
+        MMI_LOGE("%{public}s=%{public}u failed", name.c_str(), value);
+        return;
+    }
+    NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
+}
+
+void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, uint32_t value)
+{
+    MMI_LOGD("%{public}s=%{public}u", name.c_str(), value);
+    napi_status status;
+    napi_value napiValue = nullptr;
+    status = napi_create_uint32(env, value, &napiValue);
+    if (status != napi_ok) {
+        MMI_LOGE("%{public}s=%{public}u failed", name.c_str(), value);
+        return;
+    }
+    NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
+}
+
+void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, int32_t value)
+{
+    MMI_LOGD("%{public}s=%{public}d", name.c_str(), value);
+    napi_status status;
+    napi_value napiValue = nullptr;
+    status = napi_create_int32(env, value, &napiValue);
+    if (status != napi_ok) {
+        MMI_LOGE("%{public}s=%{public}d failed", name.c_str(), value);
+        return;
+    }
+    NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
+}
+
+void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, float value)
+{
+    MMI_LOGD("%{public}s=%{public}f", name.c_str(), value);
+    napi_status status;
+    napi_value napiValue = nullptr;
+    status = napi_create_double(env, value, &napiValue);
+    if (status != napi_ok) {
+        MMI_LOGE("%{public}s=%{public}f failed", name.c_str(), value);
+        return;
+    }
+    NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
+}
+
+void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, double value)
+{
+    MMI_LOGD("%{public}s=%{public}lf", name.c_str(), value);
+    napi_status status;
+    napi_value napiValue = nullptr;
+    status = napi_create_double(env, value, &napiValue);
+    if (status != napi_ok) {
+        MMI_LOGE("%{public}s=%{public}lf failed", name.c_str(), value);
+        return;
+    }
+    NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
+}
+
+void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, uint64_t value)
+{
+    MMI_LOGD("%{public}s=%{public}" PRId64 "", name.c_str(), value);
+    napi_status status;
+    napi_value napiValue = nullptr;
+    status = napi_create_int64(env, value, &napiValue);
+    if (status != napi_ok) {
+        MMI_LOGE("%{public}s=%{public}" PRId64 " failed", name.c_str(), value);
+        return;
+    }
+    NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
+}
+
+void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, std::string value)
+{
+    MMI_LOGD("%{public}s=%{public}s", name.c_str(), value.c_str());
+    napi_status status;
+    napi_value napiValue = nullptr;
+    status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &napiValue);
+    if (status != napi_ok) {
+        MMI_LOGE("%{public}s=%{public}s failed", name.c_str(), value.c_str());
+        return;
+    }
+    NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
+}
+
+void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, napi_value value)
+{
+    MMI_LOGD("object=%{public}s", name.c_str());
+    NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), value));
+}
+
+bool GetNamedPropertyBool(const napi_env& env, const napi_value& object, const std::string& name)
+{
+    bool value = false;
+    napi_value napiValue = {};
+    napi_valuetype tmpType = napi_undefined;
+    napi_get_named_property(env, object, name.c_str(), &napiValue);
+    if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
+        MMI_LOGE("call napi_typeof fail");
+        return false;
+    }
+    if (tmpType != napi_boolean) {
+        MMI_LOGE("value is not bool");
+        return value;
+    }
+
+    napi_get_value_bool(env, napiValue, &value);
+    MMI_LOGD("%{public}s=%{public}d", name.c_str(), value);
+    return value;
+}
+
+std::string GetNamedPropertyString(const napi_env& env, const napi_value& object, const std::string& name)
+{
+    std::string value = "";
+    napi_value napiValue = {};
+    napi_valuetype tmpType = napi_undefined;
+    napi_get_named_property(env, object, name.c_str(), &napiValue);
+    if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
+        MMI_LOGE("call napi_typeof fail");
+        return value;
+    }
+    if (tmpType != napi_string) {
+        MMI_LOGE("value is not bool");
+        return value;
+    }
+
+    char tmpValue[MAX_STRING_LEN] = { 0 };
+    size_t typeLen = 0;
+    napi_get_value_string_utf8(env, napiValue, tmpValue, MAX_STRING_LEN - 1, &typeLen);
+    value = tmpValue;
+    MMI_LOGD("%{public}s=%{public}s", name.c_str(), value.c_str());
+    return value;
+}
+
+int32_t GetNamedPropertyInt32(const napi_env& env, const napi_value& object, const std::string& name)
+{
+    int32_t value = 0;
+    napi_value napiValue = {};
+    napi_valuetype tmpType = napi_undefined;
+    napi_get_named_property(env, object, name.c_str(), &napiValue);
+    if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
+        MMI_LOGE("call napi_typeof fail");
+        return value;
+    }
+    if (tmpType != napi_number) {
+        MMI_LOGE("value is not number");
+        return value;
+    }
+    napi_get_value_int32(env, napiValue, &value);
+    MMI_LOGD("%{public}s=%{public}d", name.c_str(), value);
+    return value;
+}
+
+int64_t GetNamedPropertyInt64(const napi_env& env, const napi_value& object, const std::string& name)
+{
+    int64_t value = 0;
+    napi_value napiValue = {};
+    napi_valuetype tmpType = napi_undefined;
+    napi_get_named_property(env, object, name.c_str(), &napiValue);
+    if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
+        MMI_LOGE("call napi_typeof fail");
+        return value;
+    }
+    if (tmpType != napi_number) {
+        MMI_LOGE("value is not number");
+        return value;
+    }
+    napi_get_value_int64(env, napiValue, &value);
+    MMI_LOGD("%{public}s=%{public}" PRId64 "", name.c_str(), value);
+    return value;
+}
+
+uint32_t GetNamedPropertyUint32(const napi_env& env, const napi_value& object, const std::string& name)
+{
+    uint32_t value = 0;
+    napi_value napiValue = {};
+    napi_valuetype tmpType = napi_undefined;
+    napi_get_named_property(env, object, name.c_str(), &napiValue);
+    if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
+        MMI_LOGE("call napi_typeof fail");
+        return value;
+    }
+    if (tmpType != napi_number) {
+        MMI_LOGE("value is not number");
+        return value;
+    }
+    napi_get_value_uint32(env, napiValue, &value);
+    MMI_LOGD("%{public}s=%{public}d", name.c_str(), value);
+    return value;
+}
+}
 }
 
