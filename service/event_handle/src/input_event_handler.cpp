@@ -732,13 +732,8 @@ int32_t OHOS::MMI::InputEventHandler::OnGestureEvent(libinput_event *event)
     uint64_t preHandlerTime = GetSysClockTime();
     EventGesture gesture = {};
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
-    auto packageResult = eventPackage_.PackageGestureEvent(event, gesture, *udsServer_);
-    if (packageResult != RET_OK) {
-        MMI_LOGE("Gesture swipe event package failed... ret:%{public}d errCode:%{public}d",
-            packageResult, GESTURE_EVENT_PKG_FAIL);
-        return GESTURE_EVENT_PKG_FAIL;
-    }
-    auto pointerEvent = EventPackage::GestureToPointerEvent(gesture, *udsServer_);
+    
+    auto pointerEvent = EventPackage::LibinputEventToPointerEvent(event, *udsServer_);
     if (RET_OK == eventDispatch_.handlePointerEvent(pointerEvent)) {
         MMI_LOGD("interceptor of OnGestureEvent end .....");
         return RET_OK;
@@ -756,7 +751,9 @@ int32_t OHOS::MMI::InputEventHandler::OnGestureEvent(libinput_event *event)
 int32_t OHOS::MMI::InputEventHandler::OnEventGesture(multimodal_libinput_event &ev)
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
+#ifndef OHOS_WESTEN_MODEL
     OnGestureEvent(ev.event);
+#else
     uint64_t preHandlerTime = GetSysClockTime();
     EventGesture gesture = {};
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
@@ -773,6 +770,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventGesture(multimodal_libinput_event &
             eventDispatchResult, GESTURE_EVENT_DISP_FAIL);
         return GESTURE_EVENT_DISP_FAIL;
     }
+#endif
     return RET_OK;
 }
 
