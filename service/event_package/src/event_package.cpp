@@ -501,24 +501,8 @@ int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event,
     return RET_OK;
 }
 
-int32_t EventPackage::PackageTouchEvent(multimodal_libinput_event &ev,
-    EventTouch& touch, UDSServer& udsServer)
+void EventPackage::PackageTouchEventByType(int32_t type, struct libinput_event_touch *data, EventTouch& touch)
 {
-    auto type = libinput_event_get_type(ev.event);
-    if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
-        return UNKNOWN_EVENT_PKG_FAIL;
-    }
-    auto ret = PackageEventDeviceInfo<EventTouch>(ev.event, touch);
-    if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
-        return DEV_PARAM_PKG_FAIL;
-    }
-    auto data = libinput_event_get_touch_event(ev.event);
-    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
-    touch.time = libinput_event_touch_get_time_usec(data);
-    touch.slot = libinput_event_touch_get_slot(data);
-    touch.seat_slot = libinput_event_touch_get_seat_slot(data);
-    touch.pressure = libinput_event_get_touch_pressure(ev.event);
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
             touch.point.x = libinput_event_touch_get_x(data);
@@ -532,7 +516,9 @@ int32_t EventPackage::PackageTouchEvent(multimodal_libinput_event &ev,
             break;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
+#ifdef OHOS_WESTEN_MODEL
             MMIRegEvent->GetTouchInfoByTouchId(MAKEPAIR(touch.deviceId, touch.seat_slot), touch);
+#endif
             touch.time = libinput_event_touch_get_time_usec(data);
             touch.eventType = LIBINPUT_EVENT_TOUCH_UP;
             break;
@@ -552,6 +538,64 @@ int32_t EventPackage::PackageTouchEvent(multimodal_libinput_event &ev,
             break;
         }
     }
+    return;
+}
+
+int32_t EventPackage::PackageTouchEvent(multimodal_libinput_event &ev,
+    EventTouch& touch, UDSServer& udsServer)
+{
+    auto type = libinput_event_get_type(ev.event);
+    if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
+        return UNKNOWN_EVENT_PKG_FAIL;
+    }
+    auto ret = PackageEventDeviceInfo<EventTouch>(ev.event, touch);
+    if (ret != RET_OK) {
+        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        return DEV_PARAM_PKG_FAIL;
+    }
+    auto data = libinput_event_get_touch_event(ev.event);
+    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
+    touch.time = libinput_event_touch_get_time_usec(data);
+    touch.slot = libinput_event_touch_get_slot(data);
+    touch.seat_slot = libinput_event_touch_get_seat_slot(data);
+    touch.pressure = libinput_event_get_touch_pressure(ev.event);
+    
+    PackageTouchEventByType(type, data, touch);
+    /* switch (type) {
+        case LIBINPUT_EVENT_TOUCH_DOWN: {
+            touch.point.x = libinput_event_touch_get_x(data);
+            touch.point.y = libinput_event_touch_get_y(data);
+#ifdef OHOS_WESTEN_MODEL
+            auto touchSurfaceInfo = WinMgr->GetTouchSurfaceInfo(touch.point.x, touch.point.y);
+            CHKR(touchSurfaceInfo, ERROR_NULL_POINTER, RET_ERR);
+            WinMgr->SetTouchFocusSurfaceId(touchSurfaceInfo->surfaceId);
+            WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo, true);
+#endif
+            break;
+        }
+        case LIBINPUT_EVENT_TOUCH_UP: {
+#ifdef OHOS_WESTEN_MODEL
+            MMIRegEvent->GetTouchInfoByTouchId(MAKEPAIR(touch.deviceId, touch.seat_slot), touch);
+#endif
+            touch.time = libinput_event_touch_get_time_usec(data);
+            touch.eventType = LIBINPUT_EVENT_TOUCH_UP;
+            break;
+        }
+        case LIBINPUT_EVENT_TOUCH_MOTION: {
+            touch.point.x = libinput_event_touch_get_x(data);
+            touch.point.y = libinput_event_touch_get_y(data);
+#ifdef OHOS_WESTEN_MODEL
+            auto touchSurfaceId = WinMgr->GetTouchFocusSurfaceId();
+            auto touchSurfaceInfo = WinMgr->GetSurfaceInfo(touchSurfaceId);
+            CHKR(touchSurfaceInfo, ERROR_NULL_POINTER, RET_ERR);
+            WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo);
+#endif
+            break;
+        }
+        default: {
+            break;
+        }
+    } */
     return RET_OK;
 }
 
@@ -801,31 +845,55 @@ int32_t EventPackage::KeyboardToKeyEvent(EventKeyboard& key,
 
 const uint16_t pointerID = 1; // mouse has only one PoingeItem, so id is 1
 
-std::shared_ptr<OHOS::MMI::PointerEvent> EventPackage::GestureToPointerEvent(EventGesture& gesture,
-                                                                             UDSServer& udsServer)
+std::shared_ptr<OHOS::MMI::PointerEvent> EventPackage::LibinputEventToPointerEvent(libinput_event *event,
+                                                                                   UDSServer& udsServer)
 {
+    int32_t defaultDeviceId = 0;
+    double gestureScale = 0;
+    int32_t pointerEventType = 0;
     auto pointerEvent = OHOS::MMI::PointerEvent::Create();
+    auto data = libinput_event_get_gesture_event(event);
+    auto type = libinput_event_get_type(event);
     OHOS::MMI::PointerEvent::PointerItem pointer;
     pointer.SetGlobalX(MouseState->GetMouseCoordsX());
     pointer.SetGlobalY(MouseState->GetMouseCoordsY());
     pointer.SetPointerId(pointerID);
     pointer.SetPressed(MouseState->IsLiftBtnPressed());
     pointerEvent->AddPointerItem(pointer);
-
     std::vector<uint32_t> pressedButtons;
     MouseState->GetPressedButtons(pressedButtons);
+    
     if (!pressedButtons.empty()) {
         for (auto it = pressedButtons.begin(); it != pressedButtons.end(); it++) {
             pointerEvent->SetButtonPressed(*it);
         }
     }
+    
+    switch (type) {
+        case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN: {
+            pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN;
+            break;
+        }
+        case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE: {
+            pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE;
+            gestureScale = libinput_event_gesture_get_scale(data);
+            break;
+        }
+        case LIBINPUT_EVENT_GESTURE_PINCH_END: {
+            pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END;
+            gestureScale = libinput_event_gesture_get_scale(data);
+            break;
+        }
+        default: {
+            break;
+        }
+    }
 
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(pointerID);
-    pointerEvent->SetDeviceId(gesture.deviceId);
-    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, gesture.scale);
-    pointerEvent->SetPointerAction(gesture.pointerEventType);
-
+    pointerEvent->SetDeviceId(defaultDeviceId);
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, gestureScale);
+    pointerEvent->SetPointerAction(pointerEventType);
     return pointerEvent;
 }
 }
