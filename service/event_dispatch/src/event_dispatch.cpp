@@ -586,6 +586,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
 
     auto focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
+        MMI_LOGE("Focus Id is invalid! errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
         return RET_OK;
     }
     auto appInfo = AppRegs->FindByWinId(focusId); // obtain application information
@@ -594,11 +595,11 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
         return FOCUS_ID_OBTAIN_FAIL;
     }
 
-    MMI_LOGT("\n4.event dispatcher of server:\nEventGesture:time=%{public}" PRId64 ";deviceType=%{public}u;"
+    MMI_LOGT("4.event dispatcher of server:EventGesture:time=%{public}" PRId64 ";deviceType=%{public}u;"
              "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
              "fingerCount=%{public}d;cancelled=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
              "deltaUnaccel.x=%{public}lf;deltaUnaccel.y=%{public}lf;fd=%{public}d;"
-             "preHandlerTime=%{public}" PRId64 ";\n",
+             "preHandlerTime=%{public}" PRId64 ";",
              gesture.time, gesture.deviceType, gesture.deviceName, gesture.devicePhys,
              gesture.eventType, gesture.fingerCount, gesture.cancelled, gesture.delta.x, gesture.delta.y,
              gesture.deltaUnaccel.x, gesture.deltaUnaccel.y, appInfo.fd, preHandlerTime);
@@ -609,7 +610,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
         int32_t inputType = INPUT_DEVICE_CAP_GESTURE;
         newPacket << inputType << gesture << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
-            MMI_LOGE("Sending structure of EventGesture failed! errCode:%{public}d\n", MSG_SEND_FAIL);
+            MMI_LOGE("Sending structure of EventGesture failed! errCode:%{public}d", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
         }
     }
