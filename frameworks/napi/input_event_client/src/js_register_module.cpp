@@ -14,7 +14,7 @@
  */
 
 #include "js_register_module.h"
-#include <inttypes.h>
+#include <cinttypes>
 #include "js_register_event.h"
 #include "js_register_handle.h"
 #include "js_register_util.h"
@@ -76,7 +76,7 @@ static napi_value GetEventInfo(napi_env env, napi_callback_info info, EventInfo&
     event.name = eventName;
     event.type = GetHandleType(event.name);
     event.winId = 0;
-    MMI_LOGD("winId=%{public}d, type=%{public}d, name=%{public}s", event.winId, event.type, event.name.c_str());
+    MMI_LOGD("event info:type=%{public}d, name=%{public}s", event.type, event.name.c_str());
 
     napi_value result = {};
     napi_create_int32(env, SUCCESS_CODE, &result);
@@ -114,7 +114,6 @@ static int32_t RegisterByTypeCode(napi_env env, JSRegisterHandle &registerHandle
 
 static napi_value OnEvent(napi_env env, napi_callback_info info)
 {
-    MMI_LOGD("enter");
     napi_value result = nullptr;
     napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result);
 
@@ -150,14 +149,12 @@ static napi_value OnEvent(napi_env env, napi_callback_info info)
         return result;
     }
 
-    MMI_LOGD("success");
     napi_create_int32(env, response, &result);
     return result;
 }
 
 static napi_value OffEvent(napi_env env, napi_callback_info info)
 {
-    MMI_LOGD("enter");
     napi_value result = nullptr;
     napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result);
 
@@ -194,13 +191,11 @@ static napi_value OffEvent(napi_env env, napi_callback_info info)
 
     response = registerHandle.Unregister(event.winId, event.type);
     napi_create_int32(env, response, &result);
-    MMI_LOGD("success");
     return result;
 }
 
 static napi_value InjectEvent(napi_env env, napi_callback_info info)
 {
-    MMI_LOGD("enter");
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     napi_valuetype tmpType = napi_undefined;
@@ -228,13 +223,11 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     OHOS::KeyEvent injectEvent;
     injectEvent.Initialize(0, isPressed, keyCode, keyDownDuration, 0, "", 0, 0, "", 0, false, 0, isIntercepted);
     int32_t response = MMIEventHdl.InjectEvent(injectEvent);
-    MMI_LOGD("response=%{public}d", response);
 
     if (napi_create_int32(env, response, &result) != napi_ok) {
         MMI_LOGE("call napi_create_int32 fail");
         return result;
     }
-    MMI_LOGD("success");
     return result;
 }
 
@@ -286,7 +279,6 @@ static napi_value UnitTest(napi_env env, napi_callback_info info)
 
 static napi_value SetInjectFile(napi_env env, napi_callback_info info)
 {
-    MMI_LOGD("enter");
     size_t argc;
     napi_value argv[ARGC_UT_NUM] = { 0 };
     napi_value result = nullptr;
@@ -311,21 +303,16 @@ static napi_value SetInjectFile(napi_env env, napi_callback_info info)
     
     MultiInputCommon virtualInjectEvent;
     virtualInjectEvent.SetIniFile(virtualEventFileName, virtualEventValue);
-    MMI_LOGD("virtualEventFileName:%s", virtualEventFileName.c_str());
-    MMI_LOGD("virtualEventValue:%s", virtualEventValue.c_str());
     if (napi_create_int32(env, SUCCESS_CODE, &result) != napi_ok) {
         MMI_LOGE("call napi_create_int32 fail");
         return result;
     }
-
-    MMI_LOGD("success");
     return result;
 }
 
 EXTERN_C_START
 static napi_value MmiInit(napi_env env, napi_value exports)
 {
-    MMI_LOGD("enter");
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", OnEvent),
         DECLARE_NAPI_FUNCTION("off", OffEvent),
@@ -335,7 +322,6 @@ static napi_value MmiInit(napi_env env, napi_value exports)
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     InitJsEvents();
-    MMI_LOGD("success");
     return exports;
 }
 EXTERN_C_END

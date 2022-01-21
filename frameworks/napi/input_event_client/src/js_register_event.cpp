@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include "js_register_event.h"
-#include <inttypes.h>
+#include <cinttypes>
 #include "define_multimodal.h"
 #include "js_register_util.h"
 #include "stylus_event.h"
@@ -104,13 +104,11 @@ uint32_t GetHandleType(uint32_t eventType)
 
 int32_t AddEventCallback(const napi_env& env, CallbackMap& jsEvent, const EventInfo &event)
 {
-    MMI_LOGD("enter event=%{public}s", event.name.c_str());
     auto iter = jsEvent.find(event.name);
     if (iter == jsEvent.end()) {
-        MMI_LOGE("%{public}s has no callback function", event.name.c_str());
+        MMI_LOGE("%{public}s do not have callback function", event.name.c_str());
         return JS_CALLBACK_EVENT_FAILED;
     }
-    MMI_LOGD("jsEvent size=%{public}d", static_cast<int32_t>(jsEvent.size()));
 
     auto it = iter->second.begin();
     while (it != iter->second.end()) {
@@ -119,7 +117,7 @@ int32_t AddEventCallback(const napi_env& env, CallbackMap& jsEvent, const EventI
         napi_get_reference_value(env, *it, &handlerTemp);
         napi_strict_equals(env, handlerTemp, event.handle, &isEquals);
         if (isEquals) {
-            MMI_LOGD("%{public}s callback already exists", event.name.c_str());
+            MMI_LOGD("event %{public}s callback already exists", event.name.c_str());
             return JS_CALLBACK_EVENT_EXIST;
         }
         it++;
@@ -127,16 +125,14 @@ int32_t AddEventCallback(const napi_env& env, CallbackMap& jsEvent, const EventI
     napi_ref callbackRef = nullptr;
     napi_create_reference(env, event.handle, 1, &callbackRef);
     iter->second.push_back(callbackRef);
-    MMI_LOGD("success callback size=%{public}d", static_cast<int32_t>(iter->second.size()));
     return JS_CALLBACK_EVENT_SUCCESS;
 }
 
 int32_t DelEventCallback(const napi_env& env, CallbackMap& jsEvent, const EventInfo &event)
 {
-    MMI_LOGD("enter event=%{public}s", event.name.c_str());
     auto iter = jsEvent.find(event.name);
     if (iter == jsEvent.end()) {
-        MMI_LOGE("%{public}s has no callback function", event.name.c_str());
+        MMI_LOGE("%{public}s do not have callback function", event.name.c_str());
         return JS_CALLBACK_EVENT_FAILED;
     }
 
@@ -149,13 +145,11 @@ int32_t DelEventCallback(const napi_env& env, CallbackMap& jsEvent, const EventI
         if (isEquals) {
             napi_delete_reference(env, *it);
             iter->second.erase(it);
-            MMI_LOGD("success. callback exists. size=%{public}d",
-                        static_cast<int32_t>(iter->second.size()));
+            MMI_LOGD("callback function size=%{public}d", static_cast<int32_t>(iter->second.size()));
             return JS_CALLBACK_EVENT_SUCCESS;
         }
         it++;
     }
-    MMI_LOGD("success callback size=%{public}d", static_cast<int32_t>(iter->second.size()));
     return JS_CALLBACK_EVENT_NOT_EXIST;
 }
 
@@ -167,7 +161,6 @@ uint32_t GetEventCallbackNum(const CallbackMap& jsEvent)
         callbackNum += iter->second.size();
         iter++;
     }
-    MMI_LOGD("callbackNum=%{public}d", callbackNum);
     return callbackNum;
 }
 
@@ -339,7 +332,7 @@ static void AddStylusData(const napi_env& env, napi_value argv, const StylusEven
 bool SendMultimodalEvent(const napi_env& env, const CallbackMap& jsEvent, int32_t type,
                          const MultimodalEvent& event)
 {
-    MMI_LOGD("event=%{public}s ", eventTable[type].c_str());
+    MMI_LOGD("send event=%{public}s ", eventTable[type].c_str());
     MMI_LOGD("CallbackMap size=%{public}d", static_cast<int32_t>(jsEvent.size()));
     size_t argc = 1;
     napi_value argv = nullptr;
@@ -368,7 +361,7 @@ bool SendMultimodalEvent(const napi_env& env, const CallbackMap& jsEvent, int32_
         return false;
     }
     if (iter->second.size() == 0) {
-        MMI_LOGD("%{public}s has no callback function", eventTable[type].c_str());
+        MMI_LOGD("%{public}s do not have callback function", eventTable[type].c_str());
         return true;
     }
 
@@ -383,10 +376,8 @@ bool SendMultimodalEvent(const napi_env& env, const CallbackMap& jsEvent, int32_
             MMI_LOGE("call napi_call_function failed");
             return false;
         }
-        MMI_LOGD("call napi_call_function success");
     }
 
-    MMI_LOGD("Success");
     return true;
 }
 
@@ -621,7 +612,7 @@ bool AppKeyEventHandle::OnKey(const OHOS::KeyEvent& keyEvent)
 
 bool AppKeyEventHandle::SendEvent(const std::string& name, const OHOS::KeyEvent& event) const
 {
-    MMI_LOGD("event=%{public}s", name.c_str());
+    MMI_LOGD("send event=%{public}s", name.c_str());
     size_t argc = 1;
     napi_value argv = nullptr;
     napi_value result = nullptr;
@@ -654,7 +645,7 @@ bool AppKeyEventHandle::SendEvent(const std::string& name, const OHOS::KeyEvent&
         return false;
     }
     if (iter->second.size() == 0) {
-        MMI_LOGD("%{public}s has no callback function", name.c_str());
+        MMI_LOGD("%{public}s do not have callback function", name.c_str());
         return true;
     }
     for (auto it = iter->second.begin(); it != iter->second.end(); it++) {
@@ -668,10 +659,8 @@ bool AppKeyEventHandle::SendEvent(const std::string& name, const OHOS::KeyEvent&
             MMI_LOGE("call napi_call_function failed");
             return false;
         }
-        MMI_LOGD("call napi_call_function success");
     }
 
-    MMI_LOGD("success");
     return true;
 }
 
@@ -688,7 +677,7 @@ bool AppTouchEventHandle::OnTouch(const TouchEvent& touchEvent)
 
 bool AppTouchEventHandle::SendEvent(const std::string& name, const TouchEvent& event) const
 {
-    MMI_LOGD("event=%{public}s", name.c_str());
+    MMI_LOGD("send event=%{public}s", name.c_str());
     size_t argc = 1;
     napi_value argv = nullptr;
     napi_value result = nullptr;
@@ -714,7 +703,7 @@ bool AppTouchEventHandle::SendEvent(const std::string& name, const TouchEvent& e
         return false;
     }
     if (iter->second.size() == 0) {
-        MMI_LOGD("%{public}s has no callback function", name.c_str());
+        MMI_LOGD("%{public}s do not have callback function", name.c_str());
         return true;
     }
 
@@ -729,9 +718,8 @@ bool AppTouchEventHandle::SendEvent(const std::string& name, const TouchEvent& e
             MMI_LOGE("call napi_call_function failed");
             return false;
         }
-        MMI_LOGD("call napi_call_function success");
     }
-    MMI_LOGD("success");
+    
     return true;
 }
 
@@ -768,13 +756,10 @@ void AppTouchEventHandle::PrepareData(const napi_env& env, napi_value argv,
 
     int32_t deviceEventType = event.GetOriginEventType();
     SetNamedProperty(env, argv, "deviceEventType", deviceEventType);
-    MMI_LOGD("deviceEventType=%{public}d", deviceEventType);
     if (deviceEventType == MOUSE_EVENT) {
-        MMI_LOGD("mouseEvent");
         MouseEvent* mouseEvent = (MouseEvent*)event.GetMultimodalEvent();
         AddMouseData(env, argv, *mouseEvent);
     } else if (deviceEventType == STYLUS_EVENT) {
-        MMI_LOGD("stylusEvent");
         StylusEvent* stylusEvent = (StylusEvent*)event.GetMultimodalEvent();
         CHK(stylusEvent, ERROR_NULL_POINTER);
         AddStylusData(env, argv, *stylusEvent);
@@ -800,7 +785,7 @@ bool AppDeviceEventHandle::OnDeviceRemove(const DeviceEvent& deviceEvent)
 
 bool AppDeviceEventHandle::SendEvent(const std::string& name, const DeviceEvent& event) const
 {
-    MMI_LOGD("event=%{public}s", name.c_str());
+    MMI_LOGD("send event=%{public}s", name.c_str());
     size_t argc = 1;
     napi_value argv = nullptr;
     napi_value result = nullptr;
@@ -839,7 +824,7 @@ bool AppDeviceEventHandle::SendEvent(const std::string& name, const DeviceEvent&
         return false;
     }
     if (iter->second.size() == 0) {
-        MMI_LOGD("%{public}s has no callback function", name.c_str());
+        MMI_LOGD("%{public}s do not have callback function", name.c_str());
         return true;
     }
 
@@ -855,10 +840,8 @@ bool AppDeviceEventHandle::SendEvent(const std::string& name, const DeviceEvent&
             MMI_LOGE("call napi_call_function failed");
             return false;
         }
-        MMI_LOGD("call napi_call_function success");
     }
 
-    MMI_LOGD("success ");
     return true;
 }
 }
