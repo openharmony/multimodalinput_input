@@ -501,7 +501,7 @@ int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event,
     return RET_OK;
 }
 
-void EventPackage::PackageTouchEventByType(int32_t type, EventTouch& touch)
+void EventPackage::PackageTouchEventByType(int32_t type, struct libinput_event_touch *data, EventTouch& touch)
 {
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
@@ -560,7 +560,7 @@ int32_t EventPackage::PackageTouchEvent(multimodal_libinput_event &ev,
     touch.seat_slot = libinput_event_touch_get_seat_slot(data);
     touch.pressure = libinput_event_get_touch_pressure(ev.event);
     
-    PackageTouchEventByType(type, touch);
+    PackageTouchEventByType(type, data, touch);
     /* switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
             touch.point.x = libinput_event_touch_get_x(data);
