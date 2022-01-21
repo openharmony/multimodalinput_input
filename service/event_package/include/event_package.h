@@ -58,7 +58,7 @@ namespace OHOS::MMI {
         int32_t PackagePointerEventByMotionAbs(libinput_event *event, EventPointer& point);
         int32_t PackagePointerEventByButton(libinput_event *event, EventPointer& point);
         int32_t PackagePointerEventByAxis(libinput_event *event, EventPointer& point);
-        void PackageTouchEventByType(int32_t type, EventTouch& touch);
+        void PackageTouchEventByType(int32_t type, struct libinput_event_touch *data, EventTouch& touch);
     };
     template<class T>
     int32_t EventPackage::PackageRegisteredEvent(T& data, RegisteredEvent& event)
