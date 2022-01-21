@@ -15,7 +15,7 @@
 #include "js_register_handle.h"
 #include "js_register_event.h"
 #include "mmi_token.h"
-#include <inttypes.h>
+#include <cinttypes>
 
 namespace OHOS {
 namespace MMI {
@@ -87,10 +87,8 @@ int32_t DelEvent(const napi_env& env, StandEventPtr &eventHandle, const EventInf
 
 void UnitSent(napi_env env, int32_t winId, uint32_t eventType, const MultimodalEvent& event)
 {
-    MMI_LOGD("enter");
     uint32_t type = GetHandleType(eventType);
     std::string registerHandle = std::to_string(winId) + "," + std::to_string(type);
-    MMI_LOGD("registerHandle=%{public}s", registerHandle.c_str());
     auto iter = g_registerMap.find(registerHandle);
     if (iter == g_registerMap.end()) {
         MMI_LOGE("registerHandle %s not existed", registerHandle.c_str());
@@ -111,7 +109,6 @@ void UnitSent(napi_env env, int32_t winId, uint32_t eventType, const MultimodalE
         auto mediaEventHandle = (AppMediaEventHandle*)(eventHandle.GetRefPtr());
         SendMultimodalEvent(env, mediaEventHandle->jsEvent, eventType, event);
     }
-    MMI_LOGD("success");
     return;
 }
 
@@ -202,9 +199,9 @@ int32_t JSRegisterHandle::Register(const StandEventPtr eventHandle, int32_t winI
 
     std::string registerHandle = std::to_string(winId) + "," + std::to_string(type);
     g_registerMap.insert(std::pair<std::string, RegisterHanldeInfo>(registerHandle, registerInfo));
-    MMI_LOGD("registerMap size=%{public}d", static_cast<int32_t>(g_registerMap.size()));
-    MMI_LOGD("success, registerHandle=%{public}s", registerHandle.c_str());
-     return response;
+    MMI_LOGD("register map size=%{public}d", static_cast<int32_t>(g_registerMap.size()));
+    MMI_LOGD("register handle=%{public}s", registerHandle.c_str());
+    return response;
 }
 
 int32_t JSRegisterHandle::Unregister(int32_t winId, uint32_t type)
@@ -219,11 +216,10 @@ int32_t JSRegisterHandle::Unregister(int32_t winId, uint32_t type)
             MMI_LOGE("failed, response=%{public}d", response);
             return response;
         }
-        MMI_LOGD("unregisterHandle=%{public}s", registerHandle.c_str());
+        MMI_LOGD("unregister handle=%{public}s", registerHandle.c_str());
         g_registerMap.erase(iter);
     }
-    MMI_LOGD("success, registerMap size=%{public}d",
-                static_cast<int32_t>(g_registerMap.size()));
+    MMI_LOGD("register map size=%{public}d", static_cast<int32_t>(g_registerMap.size()));
     return response;
 }
 
@@ -238,11 +234,10 @@ int32_t JSRegisterHandle::UnregisterAll()
             MMI_LOGE("failed, response=%{public}d", response);
             return response;
         }
-        MMI_LOGD("unregisterHandle=%{public}s", iter->first.c_str());
+        MMI_LOGD("unregister handle=%{public}s", iter->first.c_str());
         g_registerMap.erase(iter);
     }
-    MMI_LOGD("success, registerMap size=%{public}d",
-                static_cast<int32_t>(g_registerMap.size()));
+    MMI_LOGD("register map size=%{public}d", static_cast<int32_t>(g_registerMap.size()));
     return response;
 }
 }
