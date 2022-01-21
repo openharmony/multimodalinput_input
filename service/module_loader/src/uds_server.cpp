@@ -37,7 +37,9 @@ OHOS::MMI::UDSServer::UDSServer()
 
 OHOS::MMI::UDSServer::~UDSServer()
 {
+    MMI_LOGD("enter");
     UdsStop();
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::UDSServer::UdsStop()
@@ -132,6 +134,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
                                                 int& toReturnClientFd, const int32_t uid, const int32_t pid)
 {
     std::lock_guard<std::mutex> lock(mux_);
+    MMI_LOGT("enter.");
     const int NUMBER_TWO = 2;
     int sockFds[NUMBER_TWO] = {};
 
@@ -298,6 +301,7 @@ void OHOS::MMI::UDSServer::OnEvent(const epoll_event& ev, CLMAP<int32_t, StreamB
     CHK(maxCount > 0, VAL_NOT_EXP);
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
+        MMI_LOGD("UDSServer::OnEvent fd:%{public}d, ev.events:0x%{public}x", fd, ev.events);
         auto secPtr = GetSession(fd);
         if (secPtr) {
             OnDisconnected(secPtr);
@@ -339,6 +343,7 @@ void OHOS::MMI::UDSServer::OnEpollEvent(epoll_event& ev, CLMAP<int32_t, StreamBu
     auto fd = *static_cast<int32_t*>(ev.data.ptr);
     CHK(fd >= 0, INVALID_PARAM);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
+        MMI_LOGD("OnEpollEvent EPOLLERR or EPOLLHUP fd:%{public}d, ev.events:0x%{public}x", fd, ev.events);
         auto secPtr = GetSession(fd);
         if (secPtr) {
             OnDisconnected(secPtr);
@@ -396,6 +401,7 @@ bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
         MMI_LOGW("Too many clients. Warning Value:%{public}d Current Value:%{public}zd",
                  MAX_SESSON_ALARM, sessionsMap_.size());
     }
+    MMI_LOGI("AddSession end...");
     return true;
 }
 
@@ -413,6 +419,7 @@ void OHOS::MMI::UDSServer::DelSession(int32_t fd)
         sessionsMap_.erase(it);
     }
     DumpSession("DelSession");
+    MMI_LOGI("DelSession end...");
 }
 
 void OHOS::MMI::UDSServer::OnThread()
@@ -469,12 +476,17 @@ void OHOS::MMI::UDSServer::HandleCommandQueue()
 
 void OHOS::MMI::UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callback)
 {
+    MMI_LOGD("Enter");
     callbacks_.push_back(callback);
+    MMI_LOGD("Leave");
 }
 
 void OHOS::MMI::UDSServer::NotifySessionDeleted(SessionPtr ses)
 {
+    MMI_LOGD("Enter");
     for (auto& callback : callbacks_) {
         callback(ses);
     }
+    MMI_LOGD("Leave");
 }
+
