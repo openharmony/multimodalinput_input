@@ -31,13 +31,13 @@
 #include <stdio.h>
 #include "libmmi_util.h"
 namespace OHOS {
-    namespace MMI {
-        class MultiInputCommon {
-        public:
-            void InjectionIni(const std::string &iniFilePath, const std::string &fileName,
-                              const std::string &jsonEventValue);
-            void SetIniFile(const std::string &fileName,const std::string &jsonEventValue);
-        };
-    }
+namespace MMI {
+class MultiInputCommon {
+public:
+    void InjectionIni(const std::string &iniFilePath, const std::string &fileName,
+                      const std::string &jsonEventValue);
+    void SetIniFile(const std::string &fileName,const std::string &jsonEventValue);
+};
+}
 }
 #endif
