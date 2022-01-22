@@ -136,7 +136,7 @@ HWTEST_F(VirtualDeviceTest, Test_CreateHandle_phone, TestSize.Level1)
 HWTEST_F(VirtualDeviceTest, Test_SelectDevice_false01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    StringList fileList;
+    std::vector<std::string> fileList;
     fileList.push_back("argv1");
     fileList.push_back("argv2");
     fileList.push_back("argv3");
@@ -147,7 +147,7 @@ HWTEST_F(VirtualDeviceTest, Test_SelectDevice_false01, TestSize.Level1)
 HWTEST_F(VirtualDeviceTest, Test_AddDevice_false01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    StringList fileList;
+    std::vector<std::string> fileList;
     fileList.push_back("hosmmi-vitual-device-manger ");
     fileList.push_back("start");
     auto ret = device.AddDevice(fileList);
@@ -157,7 +157,7 @@ HWTEST_F(VirtualDeviceTest, Test_AddDevice_false01, TestSize.Level1)
 HWTEST_F(VirtualDeviceTest, Test_AddDevice_true, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    StringList fileList;
+    std::vector<std::string> fileList;
     fileList.push_back("binName ");
     fileList.push_back("start ");
     fileList.push_back("mouse");
@@ -168,7 +168,7 @@ HWTEST_F(VirtualDeviceTest, Test_AddDevice_true, TestSize.Level1)
 HWTEST_F(VirtualDeviceTest, Test_SelectDevice_true, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    StringList fileList;
+    std::vector<std::string> fileList;
     fileList.push_back("list");
     auto ret = device.SelectDevice(fileList);
     EXPECT_TRUE(ret);
@@ -177,7 +177,7 @@ HWTEST_F(VirtualDeviceTest, Test_SelectDevice_true, TestSize.Level1)
 HWTEST_F(VirtualDeviceTest, Test_AddDevice_false02, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    StringList fileList;
+    std::vector<std::string> fileList;
     fileList.push_back("binName ");
     fileList.push_back("start ");
     fileList.push_back("falseName");
@@ -188,7 +188,7 @@ HWTEST_F(VirtualDeviceTest, Test_AddDevice_false02, TestSize.Level1)
 HWTEST_F(VirtualDeviceTest, Test_CloseDevice_flase01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    StringList fileList;
+    std::vector<std::string> fileList;
     fileList.push_back("binName ");
     fileList.push_back("close ");
     auto ret = device.CloseDevice(fileList);
@@ -198,7 +198,7 @@ HWTEST_F(VirtualDeviceTest, Test_CloseDevice_flase01, TestSize.Level1)
 HWTEST_F(VirtualDeviceTest, Test_CloseDevice_flase02, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    StringList fileList;
+    std::vector<std::string> fileList;
     fileList.push_back("binName ");
     fileList.push_back("close ");
     fileList.push_back("falseArgv ");
@@ -210,7 +210,7 @@ HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_listfalse01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
     std::string firstArgv = "list";
-    StringList argvList;
+    std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("list");
     auto ret = device.FunctionalShunt(firstArgv, argvList);
@@ -221,7 +221,7 @@ HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_listfalse02, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
     std::string firstArgv = "list";
-    StringList argvList;
+    std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("list ");
     argvList.push_back("falseArgv");
@@ -233,7 +233,7 @@ HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_addFalse, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
     std::string firstArgv = "start";
-    StringList argvList;
+    std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("start ");
     argvList.push_back("falseArgv");
@@ -245,7 +245,7 @@ HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_addTrue, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
     std::string firstArgv = "start";
-    StringList argvList;
+    std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("start ");
     argvList.push_back("mouse");
@@ -257,7 +257,7 @@ HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_closeFalse01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
     std::string firstArgv = "close";
-    StringList argvList;
+    std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("close ");
     argvList.push_back("falsePid");
@@ -274,7 +274,7 @@ HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_closeTrue01, TestSize.Level1)
     flagFile.open(symbolFileTest.c_str());
 
     std::string firstArgv = "close";
-    StringList argvList;
+    std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("close ");
     argvList.push_back("1111111");
@@ -286,7 +286,7 @@ HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_mkdirFalse01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
     std::string firstArgv = "close";
-    StringList argvList;
+    std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("close ");
     argvList.push_back("falsePid");
@@ -298,7 +298,7 @@ HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_False01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
     std::string firstArgv = "falseArgv";
-    StringList argvList;
+    std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("falseArgv ");
     auto ret = device.FunctionalShunt(firstArgv, argvList);
@@ -308,7 +308,7 @@ HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_False01, TestSize.Level1)
 HWTEST_F(VirtualDeviceTest, Test_SelectDevice_false02, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    StringList fileList;
+    std::vector<std::string> fileList;
     std::string cmdStr = "rm -rf /data/symbol/*";
     system(cmdStr.c_str());
     auto ret = device.SelectDevice(fileList);
@@ -318,7 +318,7 @@ HWTEST_F(VirtualDeviceTest, Test_SelectDevice_false02, TestSize.Level1)
 HWTEST_F(VirtualDeviceTest, Test_CloseDevice_false03, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    StringList fileList;
+    std::vector<std::string> fileList;
     fileList.push_back("binName ");
     fileList.push_back("close ");
     fileList.push_back("falseArgv ");
@@ -329,7 +329,7 @@ HWTEST_F(VirtualDeviceTest, Test_CloseDevice_false03, TestSize.Level1)
 HWTEST_F(VirtualDeviceTest, Test_SelectDevice_false03, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    StringList fileList;
+    std::vector<std::string> fileList;
     std::string cmdStr = "rm -rf /data/symbol/";
     system(cmdStr.c_str());
     auto ret = device.SelectDevice(fileList);
@@ -339,7 +339,7 @@ HWTEST_F(VirtualDeviceTest, Test_SelectDevice_false03, TestSize.Level1)
 HWTEST_F(VirtualDeviceTest, Test_AddDevice_false03, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    StringList fileList;
+    std::vector<std::string> fileList;
     fileList.push_back("binName ");
     fileList.push_back("start ");
     fileList.push_back("mouse");
