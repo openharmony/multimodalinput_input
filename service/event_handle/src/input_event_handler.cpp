@@ -408,7 +408,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(multimodal_libinput_event& ev)
             keyEvent->GetKeyCode());
         return RET_OK;
     }
-    (void)OnEventKey(ev.event);
+    return OnEventKey(ev.event);
 #else
 
     int32_t kac = keyEvent->GetKeyAction();
@@ -428,8 +428,8 @@ int32_t InputEventHandler::OnKeyEventDispatch(multimodal_libinput_event& ev)
             eventDispatchResult, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
-#endif
     return RET_OK;
+#endif
 }
 
 int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
@@ -523,7 +523,7 @@ int32_t InputEventHandler::OnEventKeyboard(multimodal_libinput_event &ev)
         MMI_LOGD("Key event filter find a key event from Original event, keyCode:%{puiblic}d", keyBoard.key);
         return RET_OK;
     }
-    (void)OnKeyboardEvent(ev.event);
+    return OnKeyboardEvent(ev.event);
 #else
     auto oKey = KeyValueTransformationByInput(keyBoard.key); // libinput key transformed into HOS key
     keyBoard.unicode = 0;
@@ -538,8 +538,8 @@ int32_t InputEventHandler::OnEventKeyboard(multimodal_libinput_event &ev)
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
-#endif
     return RET_OK;
+#endif
 }
 
 void InputEventHandler::OnEventPointerTrace(const EventPointer& point)
@@ -606,7 +606,7 @@ int32_t InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
 #endif
 #ifndef OHOS_WESTEN_MODEL
     /* New */
-    (void)OnMouseEventHandler(ev.event, point.deviceId);
+    return OnMouseEventHandler(ev.event, point.deviceId);
 #else
     auto retEvent = eventDispatch_.DispatchPointerEvent(*udsServer_, ev.event, point, preHandlerTime);
     if (retEvent != RET_OK) {
@@ -614,8 +614,8 @@ int32_t InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
             retEvent, POINT_EVENT_DISP_FAIL);
         return POINT_EVENT_DISP_FAIL;
     }
-#endif
     return RET_OK;
+#endif
 }
 
 int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
