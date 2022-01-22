@@ -135,7 +135,7 @@ void MouseEventHandler::SetMouseData(libinput_event *event, int32_t deviceId)
 {
     CHK(event, PARAM_INPUT_INVALID);
     PointerEvent::PointerItem pointerItem;
-    struct libinput_event_pointer *pointEventData = nullptr;
+    libinput_event_pointer *pointEventData = nullptr;
     pointEventData = libinput_event_get_pointer_event(event);
     uint64_t time = libinput_event_pointer_get_time_usec(pointEventData);
     int32_t type = libinput_event_get_type(event);

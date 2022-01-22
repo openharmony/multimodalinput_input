@@ -728,8 +728,8 @@ const CLMAP<int32_t, struct WindowInfo>& OHOS::MMI::InputWindowsManager::GetWind
 
 bool OHOS::MMI::InputWindowsManager::isTouchWindow(int32_t x, int32_t y, const WindowInfo &info) const
 {
-    return x >= info.topLeftX && x <= (info.topLeftX + info.width) && y >= info.topLeftY &&
-        y <= (info.topLeftY + info.height);
+    return (x >= info.topLeftX) && (x <= (info.topLeftX + info.width)) && (y >= info.topLeftY) &&
+        (y <= (info.topLeftY + info.height));
 }
 
 void OHOS::MMI::InputWindowsManager::ReviseGlobalCoordinate(int32_t& globalX, int32_t& globalY, int32_t width, int32_t height)
