@@ -113,7 +113,7 @@ void OHOS::MMI::RegisterEventHandleManager::FindSocketFds(const MmiMessageId mes
 {
     std::lock_guard<std::mutex> lock(mu_);
     auto it = mapRegisterManager_.equal_range(messageId);
-    if(it.first == std::end(mapRegisterManager_)) {
+    if (it.first == std::end(mapRegisterManager_)) {
         MMI_LOGE("The message id was not found in the mapRegisterManager_, event:%{public}d", messageId);
         return;
     }
