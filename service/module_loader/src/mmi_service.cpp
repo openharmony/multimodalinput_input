@@ -17,7 +17,6 @@
 #include <signal.h>
 #include <sys/signalfd.h>
 
-#include "mmi_service.h"
 #include "app_register.h"
 #include "device_register.h"
 #include "event_dump.h"
@@ -28,6 +27,7 @@
 #include "timer_manager.h"
 #include "util.h"
 #include "log.h"
+#include "mmi_service.h"
 
 namespace OHOS {
 namespace MMI {
