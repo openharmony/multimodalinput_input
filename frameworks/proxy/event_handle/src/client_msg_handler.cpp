@@ -172,14 +172,6 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPack
     MMI_LOGT(" OnKeyEvent client trace keyCode = %{public}d\n", getKeyCode);
     int32_t eventKey = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
-    
-    key->SetProcessedCallback([&client, &key]() {
-        NetPacket ckt(MmiMessageId::NEW_CHECK_REPLY_MESSAGE);
-        auto id = key->GetId();
-        ckt << id;
-        client.SendMsg(ckt);
-    });
-
     InputManagerImpl::GetInstance()->OnKeyEvent(key);
     return RET_OK;
 }
@@ -228,14 +220,6 @@ int32_t OHOS::MMI::ClientMsgHandler::OnPointerEvent(const UDSClient& client, Net
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_LOGD("Operation canceled.");
     }
-
-    pointerEvent->SetProcessedCallback([&client, &pointerEvent]() {
-        NetPacket ckt(MmiMessageId::NEW_CHECK_REPLY_MESSAGE);
-        auto id = pointerEvent->GetId();
-        ckt << id;
-        client.SendMsg(ckt);
-    });
-
     InputManagerImpl::GetInstance()->OnPointerEvent(pointerEvent);
     return RET_OK;
 }
