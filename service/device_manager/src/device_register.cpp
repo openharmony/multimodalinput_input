@@ -46,15 +46,17 @@ bool DeviceRegister::Init()
     return true;
 }
 
-uint32_t DeviceRegister::FindDeviceIdByDevicePhys(const std::string& devicePhys)
+bool DeviceRegister::FindDeviceIdByDevicePhys(const std::string& devicePhys, uint32_t& deviceId)
 {
     std::lock_guard<std::mutex> lock(mu_);
     const uint32_t DEFAULT_DEVICE_ID = 0;
     auto it = mapDeviceInfo_.find(devicePhys);
-    if (it != mapDeviceInfo_.end()) {
-        return it->second;
+    if (it == mapDeviceInfo_.end()) {
+        deviceId = DEFAULT_DEVICE_ID;
+        return false;
     }
-    return DEFAULT_DEVICE_ID;
+    deviceId = it->second;
+    return true;
 }
 
 uint32_t DeviceRegister::AddDeviceInfo(std::string& devicePhys)
@@ -66,26 +68,25 @@ uint32_t DeviceRegister::AddDeviceInfo(std::string& devicePhys)
         setDeviceId_.insert(BEGIN_NUM);
         mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(devicePhys, BEGIN_NUM));
         return BEGIN_NUM;
-    } else {
-        auto previousPtr = setDeviceId_.begin();
-        auto nextPtr = (++setDeviceId_.begin());
-        uint32_t addDeviceId = 0;
-        for (; previousPtr != setDeviceId_.end() && nextPtr != setDeviceId_.end(); previousPtr++, nextPtr++) {
-            if (*previousPtr + 1 != *nextPtr) {
-                addDeviceId = *previousPtr + 1;
-                break;
-            }
-        }
-        if (!addDeviceId) {
-            addDeviceId = *(--setDeviceId_.end()) + 1;
-        }
-        if (setDeviceId_.count(addDeviceId)) {
-            return 0;
-        }
-        setDeviceId_.insert(addDeviceId);
-        mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(devicePhys, addDeviceId));
-        return addDeviceId;
     }
+    auto previousPtr = setDeviceId_.begin();
+    auto nextPtr = (++setDeviceId_.begin());
+    uint32_t addDeviceId = 0;
+    for (; previousPtr != setDeviceId_.end() && nextPtr != setDeviceId_.end(); previousPtr++, nextPtr++) {
+        if (*previousPtr + 1 != *nextPtr) {
+            addDeviceId = *previousPtr + 1;
+            break;
+        }
+    }
+    if (!addDeviceId) {
+        addDeviceId = *(--setDeviceId_.end()) + 1;
+    }
+    if (setDeviceId_.count(addDeviceId)) {
+        return 0;
+    }
+    setDeviceId_.insert(addDeviceId);
+    mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(devicePhys, addDeviceId));
+    return addDeviceId;
 }
 
 bool DeviceRegister::DeleteDeviceInfo(const std::string& devicePhys)

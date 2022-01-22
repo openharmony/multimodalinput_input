@@ -89,24 +89,26 @@ int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& d
     data.deviceType = GetDeviceType(device);
     auto name = libinput_device_get_name(device);
     CHKR(name, ERROR_NULL_POINTER, RET_ERR);
-    CHKR(EOK == memcpy_s(data.deviceName, sizeof(data.deviceName),
-        name, MAX_DEVICENAME), MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    int32_t ret = memcpy_s(data.deviceName, sizeof(data.deviceName), name, MAX_DEVICENAME);
+    CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
     const std::string uuid = GetUUid();
-    CHKR(EOK == memcpy_s(data.uuid, MAX_UUIDSIZE, uuid.c_str(), uuid.size()), MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    ret = memcpy_s(data.uuid, MAX_UUIDSIZE, uuid.c_str(), uuid.size());
+    CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
 #ifdef OHOS_BUILD_HDF
-    CHKR(EOK == memcpy_s(data.devicePhys, MAX_DEVICENAME, data.deviceName, MAX_DEVICENAME),
-        MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    ret = memcpy_s(data.devicePhys, MAX_DEVICENAME, data.deviceName, MAX_DEVICENAME);
+    CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
 #else
     const char* physWhole = libinput_device_get_phys(device);
     if (physWhole == nullptr) {
-        CHKR(EOK == memcpy_s(data.devicePhys, sizeof(data.devicePhys),
-            data.deviceName, sizeof(data.deviceName)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
+        ret = memcpy_s(data.devicePhys, sizeof(data.devicePhys), data.deviceName,
+                       sizeof(data.deviceName));
+        CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
     } else {
         std::string s(physWhole);
         std::string phys = s.substr(0, s.rfind('/'));
         CHKR(!phys.empty(), ERROR_NULL_POINTER, RET_ERR);
-        CHKR(EOK == memcpy_s(data.devicePhys, sizeof(data.devicePhys), phys.c_str(), MAX_DEVICENAME),
-             MEMCPY_SEC_FUN_FAIL, RET_ERR);
+        ret = memcpy_s(data.devicePhys, sizeof(data.devicePhys), phys.c_str(), MAX_DEVICENAME);
+        CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
     }
 #endif
     std::string devicePhys(data.devicePhys);
@@ -114,8 +116,8 @@ int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& d
         DevRegister->DeleteDeviceInfo(devicePhys);
         return RET_OK;
     }
-    uint32_t deviceId = DevRegister->FindDeviceIdByDevicePhys(devicePhys);
-    if (deviceId) {
+    uint32_t deviceId;
+    if (DevRegister->FindDeviceIdByDevicePhys(devicePhys, deviceId)) {
         data.deviceId = deviceId;
     } else {
         deviceId = DevRegister->AddDeviceInfo(devicePhys);
