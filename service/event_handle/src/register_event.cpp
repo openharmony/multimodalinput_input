@@ -119,8 +119,8 @@ bool RegisterEvent::OnGetRepeatKetState(const uint32_t keyCode, MmiMessageId& ms
     return true;
 }
 
-int32_t RegisterEvent::OnEventKeyJudge(EventKeyboard& key, MmiMessageId& msgId,
-                                       EventKeyboard& prevKey)
+int32_t RegisterEvent::OnEventKeyJudge(EventKeyboard& key,
+                                       MmiMessageId& msgId, EventKeyboard& prevKey)
 {
     EventHandle eventHandle[] = {
         {KEY_SEARCH, 0, MmiMessageId::ON_SEARCH}, {KEY_PAUSE, 0, MmiMessageId::ON_PAUSE},
