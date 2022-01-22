@@ -63,11 +63,11 @@ namespace OHOS::MMI {
     template<class T>
     int32_t EventPackage::PackageRegisteredEvent(T& data, RegisteredEvent& event)
     {
-        CHKR(EOK == memcpy_s(event.devicePhys, MAX_DEVICENAME, data.devicePhys, MAX_DEVICENAME),
-             MEMCPY_SEC_FUN_FAIL, RET_ERR);
+        int32_t ret = memcpy_s(event.devicePhys, MAX_DEVICENAME, data.devicePhys, MAX_DEVICENAME);
+        CHKR(ret != EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
         const std::string uid = GetUUid();
-        CHKR(EOK == memcpy_s(event.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size()),
-             MEMCPY_SEC_FUN_FAIL, RET_ERR);
+        ret = memcpy_s(event.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size());
+        CHKR(ret != EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
         event.deviceId = data.deviceId;
         event.eventType = data.eventType;
         event.deviceType = data.deviceType;
