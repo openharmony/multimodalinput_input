@@ -93,9 +93,9 @@ bool KeyEventInputSubscribeFilter::FilterSubscribeKeyEvent(UDSServer& udsServer,
     }
     int32_t getKeyCode = keyEvent->GetKeyCode();
     std::string keyCodestring = std::to_string(getKeyCode);
-    MMI_LOGT(" FilterSubscribeKeyEvent service trace keyId = %{public}s\n", keyCodestring.c_str());
-    int32_t EVENT_KEY = 1;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, EVENT_KEY);
+    MMI_LOGT(" FilterSubscribeKeyEvent service trace getKeyCode = %{public}d\n", getKeyCode);
+    int32_t eventKey = 1;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
 
     bool handled = false;
     int32_t keyAction = keyEvent->GetKeyAction();
