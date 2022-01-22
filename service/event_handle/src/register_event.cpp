@@ -119,8 +119,7 @@ bool RegisterEvent::OnGetRepeatKetState(const uint32_t keyCode, MmiMessageId& ms
     return true;
 }
 
-int32_t RegisterEvent::OnEventKeyJudge(EventKeyboard& key,
-                                       MmiMessageId& msgId, EventKeyboard& prevKey)
+int32_t RegisterEvent::OnEventKeyJudge(EventKeyboard& key, MmiMessageId& msgId, EventKeyboard& prevKey)
 {
     EventHandle eventHandle[] = {
         {KEY_SEARCH, 0, MmiMessageId::ON_SEARCH}, {KEY_PAUSE, 0, MmiMessageId::ON_PAUSE},
@@ -159,11 +158,9 @@ int32_t RegisterEvent::OnEventKeyJudge(EventKeyboard& key,
                 prevKey.deviceType = key_.deviceType;
                 prevKey.eventType = key_.eventType;
                 prevKey.deviceId = key_.deviceId;
-                int32_t ret = memcpy_s(prevKey.deviceName, sizeof(prevKey.deviceName), key_.deviceName,
-                               sizeof(key_.deviceName));
+                int32_t ret = memcpy_s(prevKey.deviceName, sizeof(prevKey.deviceName), key_.deviceName, sizeof(key_.deviceName));
                 CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
-                ret = memcpy_s(prevKey.devicePhys, sizeof(prevKey.devicePhys), key_.devicePhys,
-                               sizeof(key_.devicePhys));
+                ret = memcpy_s(prevKey.devicePhys, sizeof(prevKey.devicePhys), key_.devicePhys, sizeof(key_.devicePhys));
                 CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
             }
             if ((key.key == KEY_VIDEO) || (key.key == KEY_SCREENRECORD)) {
