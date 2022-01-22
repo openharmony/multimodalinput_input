@@ -248,7 +248,7 @@ void ServerInputFilterManager::OnTouchEventTrace(const EventTouch& touch)
     std::string touchEvent = touchUuid;
     touchEvent = "OnTouchEvent service touchUuid: " + touchEvent;
     int32_t eventTouch = 9;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
 }
 
 bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event *event,

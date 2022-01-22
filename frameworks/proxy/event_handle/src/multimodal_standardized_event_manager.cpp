@@ -121,7 +121,7 @@ int32_t MultimodalStandardizedEventManager::SubscribeKeyEvent(
     << keyOption->GetFinalKeyDownDuration() << preKeySize;
     int32_t keySubscibeId = subscribeInfo.GetSubscribeId();
     std::string keySubscribeIdstring = "SubscribeKeyEvent client subscribeKeyId: " + std::to_string(keySubscibeId);
-    MMI_LOGT(" SubscribeKeyEvent client trace subscribeKeyId = %{public}s\n", keySubscribeIdstring.c_str());
+    MMI_LOGT(" SubscribeKeyEvent client trace subscribeKeyId = %{public}d\n", keySubscibeId);
     int32_t eventKey = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keySubscribeIdstring, eventKey);
     std::vector<int32_t> preKeys = keyOption->GetPreKeys();
