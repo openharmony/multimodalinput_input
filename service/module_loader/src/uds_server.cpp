@@ -386,6 +386,18 @@ void OHOS::MMI::UDSServer::DumpSession(const std::string &title)
     }
 }
 
+OHOS::MMI::SessionPtr OHOS::MMI::UDSServer::GetSession(int32_t fd) const
+{
+    auto it = sessionsMap_.find(fd);
+    if (it == sessionsMap_.end()) {
+        return nullptr;
+    }
+    if (it->second == nullptr) {
+        return nullptr;
+    }
+    return it->second->GetPtr();
+}
+
 bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
 {
     CHKF(ses, OHOS::ERROR_NULL_POINTER);

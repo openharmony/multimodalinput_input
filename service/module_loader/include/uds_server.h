@@ -31,6 +31,7 @@ enum EpollEventType {
     EPOLL_EVENT_BEGIN = 0,
     EPOLL_EVENT_INPUT = EPOLL_EVENT_BEGIN,
     EPOLL_EVENT_SOCKET,
+    EPOLL_EVENT_SIGNAL,
 
     EPOLL_EVENT_END,
 };
@@ -59,14 +60,7 @@ public:
 public:
     virtual int32_t AddSocketPairInfo(const std::string& programName, const int moduleType, int& serverFd,
                                       int& toReturnClientFd, const int32_t uid, const int32_t pid);
-    SessionPtr GetSession(int32_t fd) const
-    {
-        auto it = sessionsMap_.find(fd);
-        if (it == sessionsMap_.end()) {
-            return nullptr;
-        }
-        return it->second->GetPtr();
-    }
+    SessionPtr GetSession(int32_t fd) const;
 
 protected:
     void SetRecvFun(MsgServerFunCallback fun);
