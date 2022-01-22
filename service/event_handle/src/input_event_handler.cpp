@@ -488,7 +488,6 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event *event)
 
 void OHOS::MMI::InputEventHandler::OnEventKeyboardTrace(const EventKeyboard& keyBoard)
 {
-    int32_t EVENT_KEY = 1;
     char keyUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(keyUuid, sizeof(keyUuid), keyBoard.uuid, sizeof(keyBoard.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
@@ -497,7 +496,8 @@ void OHOS::MMI::InputEventHandler::OnEventKeyboardTrace(const EventKeyboard& key
     MMI_LOGT(" OnEventKeyboard service reported keyUuid = %{public}s\n", keyUuid);
     std::string keyEvent = keyUuid;
     keyEvent = "OnEventKeyboard service reported keyUuid: " + keyEvent;
-    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
+    int32_t eventKey = 1;
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 }
 
 int32_t OHOS::MMI::InputEventHandler::OnEventKeyboard(multimodal_libinput_event &ev)
@@ -545,7 +545,6 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKeyboard(multimodal_libinput_event 
 
 void OHOS::MMI::InputEventHandler::OnEventPointerTrace(const EventPointer& point)
 {
-    int32_t EVENT_POINTER = 17;
     char pointerUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(pointerUuid, sizeof(pointerUuid), point.uuid, sizeof(point.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
@@ -554,7 +553,8 @@ void OHOS::MMI::InputEventHandler::OnEventPointerTrace(const EventPointer& point
     MMI_LOGT(" OnEventPointer service reported pointerUuid = %{public}s\n", pointerUuid);
     std::string pointerEvent = pointerUuid;
     pointerEvent = "OnEventPointer service reported pointerUuid: " + pointerEvent;
-    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
+    int32_t eventPointer = 17;
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
 }
 
 int32_t OHOS::MMI::InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
@@ -668,7 +668,6 @@ int32_t OHOS::MMI::InputEventHandler::OnEventTouchPadSecond(libinput_event *even
 
 void OHOS::MMI::InputEventHandler::OnEventTouchTrace(const struct EventTouch& touch)
 {
-    int32_t EVENT_TOUCH = 9;
     char touchUuid[MAX_UUIDSIZE] = {0};
     if (memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
@@ -677,7 +676,8 @@ void OHOS::MMI::InputEventHandler::OnEventTouchTrace(const struct EventTouch& to
     MMI_LOGT(" OnEventTouch service reported touchUuid = %{public}s\n", touchUuid);
     std::string touchEvent = touchUuid;
     touchEvent = "OnEventTouch service reported touchUuid: " + touchEvent;
-    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
+    int32_t eventTouch = 9;
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
 }
 
 int32_t OHOS::MMI::InputEventHandler::OnEventTouch(multimodal_libinput_event &ev)
