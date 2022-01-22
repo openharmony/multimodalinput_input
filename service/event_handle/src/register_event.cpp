@@ -119,6 +119,20 @@ bool RegisterEvent::OnGetRepeatKetState(const uint32_t keyCode, MmiMessageId& ms
     return true;
 }
 
+int32_t RegisterEvent::SetPrevKeyValue(EventKeyboard& prevKey)
+{
+    prevKey.deviceType = key_.deviceType;
+    prevKey.eventType = key_.eventType;
+    prevKey.deviceId = key_.deviceId;
+    int32_t ret = memcpy_s(prevKey.deviceName, sizeof(prevKey.deviceName), key_.deviceName,
+                   sizeof(key_.deviceName));
+    CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    ret = memcpy_s(prevKey.devicePhys, sizeof(prevKey.devicePhys), key_.devicePhys,
+                   sizeof(key_.devicePhys));
+    CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    return RET_OK;
+}
+
 int32_t RegisterEvent::OnEventKeyJudge(EventKeyboard& key, MmiMessageId& msgId, EventKeyboard& prevKey)
 {
     EventHandle eventHandle[] = {
@@ -155,13 +169,8 @@ int32_t RegisterEvent::OnEventKeyJudge(EventKeyboard& key, MmiMessageId& msgId, 
         if ((key.key == it.keyCode) && (modTask_ == it.taskCode)) {
             msgId = it.handler;
             if (it.taskCode != 0) {
-                prevKey.deviceType = key_.deviceType;
-                prevKey.eventType = key_.eventType;
-                prevKey.deviceId = key_.deviceId;
-                int32_t ret = memcpy_s(prevKey.deviceName, sizeof(prevKey.deviceName), key_.deviceName, sizeof(key_.deviceName));
-                CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
-                ret = memcpy_s(prevKey.devicePhys, sizeof(prevKey.devicePhys), key_.devicePhys, sizeof(key_.devicePhys));
-                CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
+                int32_t ret = SetPrevKeyValue(prevKey);
+                CHKR(ret == RET_ERR, MEMCPY_SEC_FUN_FAIL, RET_ERR);
             }
             if ((key.key == KEY_VIDEO) || (key.key == KEY_SCREENRECORD)) {
                 OnGetRepeatKetState(key.key, msgId);

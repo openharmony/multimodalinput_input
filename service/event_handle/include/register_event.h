@@ -85,6 +85,7 @@ protected:
     int32_t OnEventTouchMotionGetSign(const EventTouch& touch, MmiMessageId& msgId);
     int32_t OnEventTouchUpGetSign(const EventTouch& touch, MmiMessageId& msgId);
     bool OnGetRepeatKetState(const uint32_t keyCode, MmiMessageId& msgId);
+    int32_t SetPrevKeyValue(EventKeyboard& prevKey);
     int32_t OnEventKeyJudge(EventKeyboard& key, MmiMessageId& msgId, EventKeyboard& prevKey);
     /*
     * Method:    GetBitNum
