@@ -365,7 +365,7 @@ void MMIService::OnThread()
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         bufMap.clear();
         count = EpollWait(ev[0], MAX_EVENT_SIZE, timeOut, mmiFd_);
-        for (int i = 0; i < count && state == ServiceRunningState::STATE_RUNNING; i++) {
+        for (int i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
             CHKC(mmiEd, ERROR_NULL_POINTER);
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
@@ -403,7 +403,7 @@ bool MMIService::InitSignalHandler()
         return false;
     }
 
-    retCode = sigprocmask(SIG_SETMASK, &MASK, nullptr);
+    retCode = sigprocmask(SIG_SETMASK, &mask, nullptr);
     if (retCode < 0) {
         MMI_LOGE("sigprocmask failed:%{public}s", strerror(errno));
         return false;
