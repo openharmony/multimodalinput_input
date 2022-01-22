@@ -39,8 +39,8 @@ namespace OHOS::MMI {
         int32_t PackageKeyEvent(libinput_event *event, std::shared_ptr<OHOS::MMI::KeyEvent> kevnPtr,
             UDSServer& udsServer);
         int32_t PackageGestureEvent(libinput_event *event, EventGesture& gesture, UDSServer& udsServer);
-        int32_t PackagePointerEvent(multimodal_libinput_event &ev, EventPointer& point, UDSServer& udsServer);
-        int32_t PackageTouchEvent(multimodal_libinput_event &ev, EventTouch& touch, UDSServer& udsServer);
+        int32_t PackagePointerEvent(libinput_event *event, EventPointer& point, UDSServer& udsServer);
+        int32_t PackageTouchEvent(libinput_event *event, EventTouch& touch, UDSServer& udsServer);
         int32_t PackageJoyStickAxisEvent(libinput_event *event, EventJoyStickAxis& eventJoyStickAxis,
             UDSServer& udsServer);
         int32_t PackageJoyStickKeyEvent(libinput_event *event, EventKeyboard& key, UDSServer& udsServer);
