@@ -50,7 +50,7 @@ RegisterEvent::~RegisterEvent()
 
 void RegisterEvent::OnEventKeyGetSign(EventKeyboard& key, MmiMessageId& msg, EventKeyboard& prevKey)
 {
-    CHK(key.state == 0 || key.state == BIT1, PARAM_INPUT_INVALID);
+    CHK((key.state == 0) || (key.state == BIT1), PARAM_INPUT_INVALID);
     int32_t temp = modTask_;
     GetModeCode getModeCode[] = {
         {RELEASE, KEY_LEFTMETA, BIT0},
@@ -76,7 +76,7 @@ void RegisterEvent::OnEventKeyGetSign(EventKeyboard& key, MmiMessageId& msg, Eve
     };
     CHK(memcpy_s(&prevKey, sizeof(prevKey), &key, sizeof(key)) == EOK, MEMCPY_SEC_FUN_FAIL);
     for (auto it : getModeCode) {
-        if (it.keystate == key.state && it.keyCode == key.key) {
+        if ((it.keystate == key.state) && (it.keyCode == key.key)) {
             if (key.state == KEY_STATE_RELEASED) {
                 modMask_ = BitSetZero(modMask_, it.modCode);
             } else {
@@ -107,10 +107,10 @@ bool RegisterEvent::OnGetRepeatKetState(const uint32_t keyCode, MmiMessageId& ms
         {KEY_VIDEO, BIT5, MmiMessageId::ON_STOP_SCREEN_RECORD}
     };
     for (auto it : taskCode) {
-        if (it.keyCode == keyCode && (baseKey_ & GetBitNum(it.taskCode))) {
+        if ((it.keyCode == keyCode) && (baseKey_ & GetBitNum(it.taskCode))) {
             baseKey_ = BitSetZero(baseKey_, it.taskCode);
             msgId = it.handler;
-        } else if (it.keyCode == keyCode && !(baseKey_ & GetBitNum(it.taskCode))) {
+        } else if ((it.keyCode == keyCode) && (!(baseKey_ & GetBitNum(it.taskCode)))) {
             baseKey_ = BitSetOne(baseKey_, it.taskCode);
         }
     }
@@ -150,7 +150,7 @@ int32_t RegisterEvent::OnEventKeyJudge(EventKeyboard& key, MmiMessageId& msgId, 
         {KEY_NOTIFICATION, 0, MmiMessageId::ON_SHOW_NOTIFICATION},
     };
     for (auto it : eventHandle) {
-        if (key.key == it.keyCode && modTask_ == it.taskCode) {
+        if ((key.key == it.keyCode) && (modTask_ == it.taskCode)) {
             msgId = it.handler;
             if (it.taskCode != 0) {
                 prevKey.deviceType = key_.deviceType;
@@ -161,7 +161,7 @@ int32_t RegisterEvent::OnEventKeyJudge(EventKeyboard& key, MmiMessageId& msgId, 
                 CHKR(EOK == memcpy_s(prevKey.devicePhys, sizeof(prevKey.devicePhys), key_.devicePhys,
                     sizeof(key_.devicePhys)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
             }
-            if (key.key == KEY_VIDEO || key.key == KEY_SCREENRECORD) {
+            if ((key.key == KEY_VIDEO) || (key.key == KEY_SCREENRECORD)) {
                 OnGetRepeatKetState(key.key, msgId);
             }
             return RET_OK;

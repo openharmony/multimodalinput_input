@@ -24,7 +24,7 @@ namespace OHOS::MMI {
 
 InputEventMonitorManager::InputEventMonitorManager()
 {
-    MMI_LOGT("InputEventMonitorManager::InputEventMonitorManager enter");
+    MMI_LOGT("enter");
 }
 
 InputEventMonitorManager::~InputEventMonitorManager()
@@ -35,7 +35,7 @@ int32_t InputEventMonitorManager::AddInputEventMontior(
     std::function<void (std::shared_ptr<OHOS::MMI::KeyEvent>)> keyEventMonitor)
 {
     if (keyEventMonitor == nullptr) {
-        MMI_LOGE("InputEventMonitorManager::%{public}s param should not be null!", __func__);
+        MMI_LOGE("param should not be null");
         return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
     static int32_t monitorId = 0;
@@ -43,7 +43,7 @@ int32_t InputEventMonitorManager::AddInputEventMontior(
     monitorItem.keyEventMonitor = keyEventMonitor;
     monitorItem.id_ = ++monitorId;
     monitors_.push_back(monitorItem);
-    MMI_LOGD("InputEventMonitorManager::%{public}s monitorId = %{public}d", __func__, monitorId);
+    MMI_LOGD("monitorId: %{public}d", monitorId);
     MMIEventHdl.AddInputEventMontior(OHOS::MMI::InputEvent::EVENT_TYPE_KEY);
     return OHOS::MMI_STANDARD_EVENT_SUCCESS;
 }
@@ -51,7 +51,7 @@ int32_t InputEventMonitorManager::AddInputEventMontior(
 void InputEventMonitorManager::RemoveInputEventMontior(int32_t monitorId)
 {
 	if (monitorId <=0 ) {
-		MMI_LOGE("InputEventMonitorManager::%{public}s monitorId invalid", __func__);
+		MMI_LOGE("monitorId invalid");
 	    return;
 	}
     MonitorItem monitorItem;
@@ -59,22 +59,22 @@ void InputEventMonitorManager::RemoveInputEventMontior(int32_t monitorId)
     std::list<MonitorItem>::iterator iter;
     iter = std::find(monitors_.begin(), monitors_.end(), monitorItem);
     if (iter == monitors_.end()) {
-        MMI_LOGE("InputEventMonitorManager::%{public}s monitorItem does not exist", __func__);
+        MMI_LOGE("monitorItem does not exist");
     } else {
         iter = monitors_.erase(iter);
         MMIEventHdl.RemoveInputEventMontior(OHOS::MMI::InputEvent::EVENT_TYPE_KEY);
-        MMI_LOGD("InputEventMonitorManager::%{public}s monitorItem id: %{public}d removed", __func__, monitorId);
+        MMI_LOGD("monitorItem id: %{public}d removed", monitorId);
     }
 }
 
 int32_t InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
     if (keyEvent == nullptr) {
-        MMI_LOGE("InputEventMonitorManager::%{public}s param should not be null!", __func__);
+        MMI_LOGE("param should not be null!");
     }
     std::list<MonitorItem>::iterator iter;
     for (iter = monitors_.begin(); iter != monitors_.end(); iter++) {
-        MMI_LOGD("InputEventMonitorManager::%{public}s SendMsg", __func__);
+        MMI_LOGD("send msg");
         iter->keyEventMonitor(keyEvent);
     }
     return OHOS::MMI_STANDARD_EVENT_SUCCESS;
@@ -84,7 +84,7 @@ int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(
     std::function<void (std::shared_ptr<OHOS::MMI::PointerEvent>)> TouchPadEventMonitor)
 {
     if (TouchPadEventMonitor == nullptr) {
-        MMI_LOGE("InputEventMonitorManager::%{public}s param should not be null!", __func__);
+        MMI_LOGE("param should not be null");
         return INVALID_MONITOR_ID;
     }
     static int32_t monitorId = 0;
@@ -92,16 +92,16 @@ int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(
     monitorItem.TouchPadEventMonitor = TouchPadEventMonitor;
     monitorItem.id_ = ++monitorId;
     monitors_.push_back(monitorItem);
-    MMI_LOGD("InputEventMonitorManager::%{public}s monitorId = %{public}d", __func__, monitorId);
+    MMI_LOGD("monitorId: %{public}d", monitorId);
     MMIEventHdl.AddInputEventTouchpadMontior(OHOS::MMI::InputEvent::EVENT_TYPE_POINTER);
-    MMI_LOGD("Client AddInputEventTouchpadMontior");
+    MMI_LOGD("leave");
     return monitorItem.id_;
 }
 
 void InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t monitorId)
 {
     if (monitorId <= 0) {
-        MMI_LOGE("InputEventMonitorManager::%{public}s monitorId invalid", __func__);
+        MMI_LOGE("monitorId invalid");
         return;
     }
     MonitorItem monitorItem;
@@ -109,32 +109,30 @@ void InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t monitorId
     std::list<MonitorItem>::iterator iter;
     iter = std::find(monitors_.begin(), monitors_.end(), monitorItem);
     if (iter == monitors_.end()) {
-        MMI_LOGE("InputEventMonitorManager::%{public}s monitorItem does not exist", __func__);
+        MMI_LOGE("monitor item does not exist");
     } else {
         iter = monitors_.erase(iter);
         MMIEventHdl.RemoveInputEventTouchpadMontior(OHOS::MMI::InputEvent::EVENT_TYPE_POINTER);
-        MMI_LOGD("InputEventMonitorManager::%{public}s monitorItem id: %{public}d removed", __func__, monitorId);
-        MMI_LOGD("Client RemoveInputEventTouchpadMontior");
+        MMI_LOGD("monitorItem id: %{public}d removed", monitorId);
     }
 }
 
 int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
-    MMI_LOGD("InputEventMonitorManager::OnTouchpadMonitorInputEvent");
+    MMI_LOGD("enter");
     if (pointerEvent == nullptr) {
-        MMI_LOGE("InputEventMonitorManager::%{public}s param should not be null!", __func__);
+        MMI_LOGE("param should not be null");
     }
     std::list<MonitorItem>::iterator iter;
     for (iter = monitors_.begin(); iter != monitors_.end(); iter++) {
-        MMI_LOGD("InputEventMonitorManager::%{public}s SendMsg", __func__);
+        MMI_LOGD("send msg");
         iter->TouchPadEventMonitor(pointerEvent);
     }
     PointerEvent::PointerItem pointer;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer);
     MMI_LOGT("\nmonitor-client\neventTouchpad:time=%{public}d;"
              "sourceType=%{public}d;action=%{public}d;"
-             "pointerId=%{public}d;point.x=%{public}d;point.y=%{public}d;press=%{public}d"
-             "\n*********************************************************\n",
+             "pointerId=%{public}d;point.x=%{public}d;point.y=%{public}d;press=%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     return OHOS::MMI_STANDARD_EVENT_SUCCESS;

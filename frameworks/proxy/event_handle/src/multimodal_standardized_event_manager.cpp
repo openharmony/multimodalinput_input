@@ -672,6 +672,7 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<OH
         MMI_LOGE("KeyEventPtr is nullptr");
         return RET_ERR;
     }
+    keyEventPtr->UpdateId();
     if (keyEventPtr->GetKeyCode() < 0) {
         MMI_LOGE("keyCode is invalid %{public}u", keyEventPtr->GetKeyCode());
         return RET_ERR;
@@ -689,6 +690,7 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
 {
     MMI_LOGD("Inject pointer event ...");
     CHKR(pointerEvent, ERROR_NULL_POINTER, RET_ERR);
+    pointerEvent->UpdateId();
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
     MMI_LOGD("\npointer event dispatcher of client:\neventType=%{public}d,actionTime=%{public}d,"
              "action=%{public}d,actionStartTime=%{public}d,"
