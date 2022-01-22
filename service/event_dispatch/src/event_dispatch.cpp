@@ -504,7 +504,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
     standardEvent_.StandardTouchEvent(event, inputEvent);
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, point.time, preHandlerTime)) {
-        struct KeyEventValueTransformations KeyEventValue = {};
+        KeyEventValueTransformations KeyEventValue = {};
         KeyEventValue = KeyValueTransformationByInput(point.button);
         point.button = KeyEventValue.keyValueOfHos;
         NetPacket newPacket(MmiMessageId::ON_TOUCH);
@@ -691,7 +691,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
         MMIRegEvent->GetTouchIds(touchIds, touch.deviceId);
         if (!touchIds.empty()) {
             for (PAIR<uint32_t, int32_t> touchId : touchIds) {
-                struct EventTouch touchTemp = {};
+                EventTouch touchTemp = {};
                 CHKR(EOK == memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch)),
                      MEMCPY_SEC_FUN_FAIL, RET_ERR);
                 MMIRegEvent->GetTouchInfoByTouchId(touchId, touchTemp);

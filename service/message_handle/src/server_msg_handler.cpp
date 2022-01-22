@@ -223,7 +223,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterAppInfo(SessionPtr sess, NetPacke
     std::string appName;
     int32_t fd = sess->GetFd();
     pkt >> abilityId >> windowId >> bundlerName >> appName;
-    struct AppInfo appInfo = { abilityId, windowId, fd, bundlerName, appName };
+    AppInfo appInfo = { abilityId, windowId, fd, bundlerName, appName };
 
     AppRegs->RegisterAppInfoforServer(appInfo);
 #if !defined(OHOS_BUILD) || !defined(OHOS_WESTEN_MODEL)
@@ -435,7 +435,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
     MMI_LOGT("time:%{public}u,keycode:%{public}u,state:%{public}u,\
         isIntercepted:%{public}d", event.keyDownDuration, event.keyCode,
         event.isPressed, event.isIntercepted);
-    struct EventKeyboard key = {};
+    EventKeyboard key = {};
     auto packageResult = EventPackage::PackageVirtualKeyEvent(event, key, *udsServer_);
     if (packageResult == RET_ERR) {
         return RET_ERR;
