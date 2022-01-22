@@ -313,7 +313,7 @@ bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event
         MMIRegEvent->GetTouchIds(touchIds, touch.deviceId);
         if (!touchIds.empty()) {
             for (PAIR<uint32_t, int32_t> touchId : touchIds) {
-                struct EventTouch touchTemp = {};
+                EventTouch touchTemp = {};
                 CHKR(EOK == memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch)),
                      MEMCPY_SEC_FUN_FAIL, RET_ERR);
                 MMIRegEvent->GetTouchInfoByTouchId(touchId, touchTemp);

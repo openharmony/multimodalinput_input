@@ -574,7 +574,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventPointer(multimodal_libinput_event &
         }
     }
     EventPointer point = {};
-    auto packageResult = eventPackage_.PackagePointerEvent(ev, point, *udsServer_);
+    auto packageResult = eventPackage_.PackagePointerEvent(ev.event, point, *udsServer_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
         MMI_LOGD("The same event reported by multi_device should be discarded!\n");
         return RET_OK;
@@ -688,9 +688,9 @@ int32_t OHOS::MMI::InputEventHandler::OnEventTouch(multimodal_libinput_event &ev
     OnEventTouchSecond(ev.event);
 #endif
     uint64_t preHandlerTime = GetSysClockTime();
-    struct EventTouch touch = {};
+    EventTouch touch = {};
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
-    auto packageResult = eventPackage_.PackageTouchEvent(ev, touch, *udsServer_);
+    auto packageResult = eventPackage_.PackageTouchEvent(ev.event, touch, *udsServer_);
     if (packageResult == UNKNOWN_EVENT_PKG_FAIL) {
         return RET_OK;
     }
