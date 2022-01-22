@@ -468,7 +468,6 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchTransformPointEvent(UDSServer& ud
 
 void OHOS::MMI::EventDispatch::DispatchPointerEventTrace(const EventPointer& point)
 {
-    int32_t EVENT_POINTER = 17;
     char pointerUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(pointerUuid, sizeof(pointerUuid), point.uuid, sizeof(point.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
@@ -477,7 +476,8 @@ void OHOS::MMI::EventDispatch::DispatchPointerEventTrace(const EventPointer& poi
     MMI_LOGT(" OnEventPointer service DispatchPointerEvent pointerUuid = %{public}s\n", pointerUuid);
     std::string pointerEvent = pointerUuid;
     pointerEvent = "DispatchPointerEvent service pointerUuid: " + pointerEvent;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
+    int32_t eventPointer = 17;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
 }
 
 int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event *event,
@@ -619,7 +619,6 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
 
 void OHOS::MMI::EventDispatch::DispatchTouchEventTrace(const EventTouch& touch)
 {
-    int32_t EVENT_TOUCH = 9;
     char touchUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
@@ -628,7 +627,8 @@ void OHOS::MMI::EventDispatch::DispatchTouchEventTrace(const EventTouch& touch)
     MMI_LOGT(" 4.event dispatcher of server: touchUuid = %{public}s\n", touchUuid);
     std::string touchEvent = touchUuid;
     touchEvent = "4.event dispatcher of server touchUuid: " + touchEvent;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
+    int32_t eventTouch = 9;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
 }
 
 int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
@@ -823,7 +823,6 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
 
 void OHOS::MMI::EventDispatch::DispatchKeyEventTrace(const EventKeyboard& key)
 {
-    int32_t EVENT_KEY = 1;
     char keyUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
@@ -832,7 +831,8 @@ void OHOS::MMI::EventDispatch::DispatchKeyEventTrace(const EventKeyboard& key)
     MMI_LOGT(" OnEventKeyboard service DispatchKeyEvent keyUuid = %{public}s\n", keyUuid);
     std::string keyEvent = keyUuid;
     keyEvent = "4.event dispatcher of server keyUuid: " + keyEvent;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
+    int32_t eventKey = 1;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 }
 
 int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *event,

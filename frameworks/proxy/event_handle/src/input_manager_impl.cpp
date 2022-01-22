@@ -99,9 +99,9 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     MMI_LOGD("enter");
     int32_t getKeyCode = keyEvent->GetKeyCode();
     std::string keyCodestring = " OnKeyEvent client trace getKeyCode: " + std::to_string(getKeyCode);
-    MMI_LOGT(" OnKeyEvent client trace getKeyCode = %{public}s\n", keyCodestring.c_str());
-    int32_t EVENT_KEY = 1;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, EVENT_KEY);
+    MMI_LOGT(" OnKeyEvent client trace getKeyCode = %{public}d\n", getKeyCode);
+    int32_t eventKey = 1;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
     if (consumer != nullptr) {
         CHK(keyEvent != nullptr, ERROR_NULL_POINTER);
         consumer->OnInputEvent(keyEvent);

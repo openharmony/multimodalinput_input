@@ -80,7 +80,6 @@ void ServerInputFilterManager::KeyEventFilter::SetAuthority(Authority authority)
 
 void ServerInputFilterManager::OnKeyEventTrace(const EventKeyboard& key)
 {
-    int32_t EVENT_KEY = 1;
     char keyUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
@@ -89,7 +88,8 @@ void ServerInputFilterManager::OnKeyEventTrace(const EventKeyboard& key)
     MMI_LOGT(" OnKeyEvent service trace keyUuid = %{public}s\n", keyUuid);
     std::string keyEvent = keyUuid;
     keyEvent = "OnKeyEvent service keyUuid: " + keyEvent;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
+    int32_t eventKey = 1;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 }
 
 bool ServerInputFilterManager::OnKeyEvent(EventKeyboard key)
@@ -239,7 +239,6 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
 
 void ServerInputFilterManager::OnTouchEventTrace(const EventTouch& touch)
 {
-    int32_t EVENT_TOUCH = 9;
     char touchUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
@@ -248,7 +247,8 @@ void ServerInputFilterManager::OnTouchEventTrace(const EventTouch& touch)
     MMI_LOGT(" OnTouchEvent service touchUuid = %{public}s\n", touchUuid);
     std::string touchEvent = touchUuid;
     touchEvent = "OnTouchEvent service touchUuid: " + touchEvent;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
+    int32_t eventTouch = 9;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
 }
 
 bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event *event,
@@ -396,7 +396,6 @@ int32_t ServerInputFilterManager::RemoveTouchEventFilter(SessionPtr sess)
 
 void ServerInputFilterManager::OnPointerEventTrace(const EventPointer& event_pointer)
 {
-    int32_t EVENT_POINTER = 17;
     char pointerUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(pointerUuid, sizeof(pointerUuid), event_pointer.uuid, sizeof(event_pointer.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
@@ -405,7 +404,8 @@ void ServerInputFilterManager::OnPointerEventTrace(const EventPointer& event_poi
     MMI_LOGT(" OnPointerEvent service pointerUuid = %{public}s\n", pointerUuid);
     std::string pointerEvent = pointerUuid;
     pointerEvent = "OnPointerEvent service pointerUuid: " + pointerEvent;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
+    int32_t eventPointer = 17;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
 }
 
 bool ServerInputFilterManager::OnPointerEvent(EventPointer event_pointer)
