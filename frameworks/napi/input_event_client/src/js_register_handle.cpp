@@ -199,8 +199,7 @@ int32_t JSRegisterHandle::Register(const StandEventPtr eventHandle, int32_t winI
 
     std::string registerHandle = std::to_string(winId) + "," + std::to_string(type);
     g_registerMap.insert(std::pair<std::string, RegisterHanldeInfo>(registerHandle, registerInfo));
-    MMI_LOGD("register map size=%{public}d", static_cast<int32_t>(g_registerMap.size()));
-    MMI_LOGD("register handle=%{public}s", registerHandle.c_str());
+    MMI_LOGI("register success. register handle=%{public}s", registerHandle.c_str());
     return response;
 }
 
@@ -216,10 +215,9 @@ int32_t JSRegisterHandle::Unregister(int32_t winId, uint32_t type)
             MMI_LOGE("failed, response=%{public}d", response);
             return response;
         }
-        MMI_LOGD("unregister handle=%{public}s", registerHandle.c_str());
         g_registerMap.erase(iter);
     }
-    MMI_LOGD("register map size=%{public}d", static_cast<int32_t>(g_registerMap.size()));
+    MMI_LOGI("unregister success. register map size=%{public}d", static_cast<int32_t>(g_registerMap.size()));
     return response;
 }
 
@@ -237,7 +235,7 @@ int32_t JSRegisterHandle::UnregisterAll()
         MMI_LOGD("unregister handle=%{public}s", iter->first.c_str());
         g_registerMap.erase(iter);
     }
-    MMI_LOGD("register map size=%{public}d", static_cast<int32_t>(g_registerMap.size()));
+    MMI_LOGI("unregister all success. register map size=%{public}d", static_cast<int32_t>(g_registerMap.size()));
     return response;
 }
 }

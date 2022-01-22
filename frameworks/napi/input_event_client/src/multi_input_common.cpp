@@ -35,7 +35,6 @@ void MultiInputCommon::InjectionIni(const std::string &iniFilePath, const std::s
     }
 
     const std::string eventsFile = iniFilePath + fileName;
-    MMI_LOGD("events file:%s", eventsFile.c_str());
     std::ofstream file_writer(eventsFile, std::ios_base::trunc);
     file_writer.close();
 
@@ -56,7 +55,6 @@ void MultiInputCommon::InjectionIni(const std::string &iniFilePath, const std::s
 void MultiInputCommon::SetIniFile(const std::string &fileName, const std::string &jsonEventValue)
 {
     const std::string iniFilePath = "/data/mmi/";
-    MMI_LOGD("json value=%{public}s", jsonEventValue.c_str());
     InjectionIni(iniFilePath, fileName, jsonEventValue);
 }
 }

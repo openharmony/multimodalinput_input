@@ -76,7 +76,7 @@ static napi_value GetEventInfo(napi_env env, napi_callback_info info, EventInfo&
     event.name = eventName;
     event.type = GetHandleType(event.name);
     event.winId = 0;
-    MMI_LOGD("event info:type=%{public}d, name=%{public}s", event.type, event.name.c_str());
+    MMI_LOGD("event info, type=%{public}d, name=%{public}s", event.type, event.name.c_str());
 
     napi_value result = {};
     napi_create_int32(env, SUCCESS_CODE, &result);
@@ -132,7 +132,7 @@ static napi_value OnEvent(napi_env env, napi_callback_info info)
     if (!registerHandle.CheckRegistered(event.winId, event.type)) {
         response = RegisterByTypeCode(env, registerHandle, event);
         if (response != MMI_STANDARD_EVENT_SUCCESS) {
-            MMI_LOGD("RegisterByTypeCode error response=%d", response);
+            MMI_LOGD("register failed, response=%d", response);
             napi_create_int32(env, response, &result);
             return result;
         }
@@ -145,7 +145,7 @@ static napi_value OnEvent(napi_env env, napi_callback_info info)
 
     response = AddEvent(env, eventHandle, event);
     if (response == JS_CALLBACK_EVENT_FAILED) {
-        MMI_LOGD("AddEvent failed");
+        MMI_LOGD("add event failed");
         return result;
     }
 
@@ -179,7 +179,7 @@ static napi_value OffEvent(napi_env env, napi_callback_info info)
 
     int32_t response = DelEvent(env, eventHandle, event);
     if (response == JS_CALLBACK_EVENT_FAILED) {
-        MMI_LOGE("DelEvent error");
+        MMI_LOGE("del event error");
         return result;
     }
 
