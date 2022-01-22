@@ -913,7 +913,7 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("Libinput Events reported");
 
-    // ¸üĞÂ È«¾Ö Êó±êÊÂ¼ş Êı¾İ
+    // æ›´æ–° å…¨å±€ é¼ æ ‡äº‹ä»¶ æ•°æ®
     MouseEventHdr->Normalize(event);
 
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
@@ -922,7 +922,7 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
         return RET_ERR;
     }
 
-    // ´¦Àí °´¼ü + Êó±ê
+    // å¤„ç† æŒ‰é”® + é¼ æ ‡
     if (keyEvent == nullptr) {
         keyEvent = KeyEvent::Create();
     }
@@ -938,10 +938,10 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
         pointerEvent->SetPressedKeys(pressedKeys);
     }
 
-    // ÅÉ·¢
+    // æ´¾å‘
     eventDispatch_.handlePointerEvent(pointerEvent);
 
-    // ·µ»ØÖµ ´ú±íÊÇ Êó±êÊÂ¼şÓĞÃ»ÓĞ´¦Àí¹ı£¬ ²»¹ØĞÄ³É¹¦ÓëÊ§°Ü
+    // è¿”å›å€¼ ä»£è¡¨æ˜¯ é¼ æ ‡äº‹ä»¶æœ‰æ²¡æœ‰å¤„ç†è¿‡ï¼Œ ä¸å…³å¿ƒæˆåŠŸä¸å¤±è´¥
     return RET_OK;
 }
 
