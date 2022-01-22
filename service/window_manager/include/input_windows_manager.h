@@ -109,7 +109,7 @@ struct MMISurfaceInfo : public SurfaceInfo {
 namespace OHOS {
 namespace MMI {
 
-struct MouseInfo {
+struct MouseLocation {
     int32_t globleX;
     int32_t globleY;
     int32_t localX;
@@ -165,8 +165,8 @@ public:
     const std::vector<struct LogicalDisplayInfo>& GetLogicalDisplayInfo() const;
     const std::map<int32_t, struct WindowInfo>& GetWindowInfo() const;
     bool FindWindow(std::shared_ptr<PointerEvent> pointerEvent);
-    MouseInfo GetMouseInfo();
-    void SetMouseInfo(double& x, double& y);
+    MouseLocation GetMouseInfo();
+    void UpdateAndAdjustMouseLoction(double& x, double& y);
     void ReviseGlobalCoordinate(int32_t& globalX, int32_t& globalY, int32_t width, int32_t height);
     bool CheckDisplayIdIfExist(int32_t& displayId);
     bool GetLogicalDisplayById(int32_t displayId, LogicalDisplayInfo& logicalDisplayInfo);
@@ -213,7 +213,7 @@ private:
     std::vector<struct PhysicalDisplayInfo> physicalDisplays_ = {};
     std::vector<struct LogicalDisplayInfo> logicalDisplays_ = {};
     std::map<int32_t, struct WindowInfo> windowInfos_ = {};
-    MouseInfo mouseInfo_ = {};
+    MouseLocation mouseLoction_ = {};
     const int32_t INVALID_LOCATION = 0;
 };
 }

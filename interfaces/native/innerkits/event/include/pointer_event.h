@@ -175,6 +175,8 @@ public:
     // Add a PointerItem
     void AddPointerItem(PointerItem &pointerItem);
     void RemovePointerItem(int32_t pointerId);
+    void UpdatePointerItem(int32_t pointerId, PointerItem &pointerItem);
+
     // Gets or sets whether the specified button on the pointing device is pressed
     std::set<int32_t> GetPressedButtons() const;
     bool IsButtonPressed(int buttonId) const;
