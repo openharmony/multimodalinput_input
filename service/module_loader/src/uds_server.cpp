@@ -105,7 +105,7 @@ void OHOS::MMI::UDSServer::Broadcast(NetPacket& pkt)
     }
 }
 
-void OHOS::MMI::UDSServer::Multicast(const IdsList& fdList, NetPacket& pkt)
+void OHOS::MMI::UDSServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
 {
     for (auto it : fdList) {
         SendMsg(it, pkt);
@@ -295,7 +295,7 @@ void OHOS::MMI::UDSServer::OnEpollRecv(int32_t fd, const char *buf, size_t size)
     OnRecv(fd, buf, size);
 }
 
-void OHOS::MMI::UDSServer::OnEvent(const epoll_event& ev, CLMAP<int32_t, StreamBufData>& bufMap)
+void OHOS::MMI::UDSServer::OnEvent(const epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
 {
     const int32_t maxCount = static_cast<int32_t>(MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE) + 1;
     CHK(maxCount > 0, VAL_NOT_EXP);
@@ -335,7 +335,7 @@ void OHOS::MMI::UDSServer::OnEvent(const epoll_event& ev, CLMAP<int32_t, StreamB
     }
 }
 
-void OHOS::MMI::UDSServer::OnEpollEvent(epoll_event& ev, CLMAP<int32_t, StreamBufData>& bufMap)
+void OHOS::MMI::UDSServer::OnEpollEvent(epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
 {
     const int32_t maxCount = static_cast<int32_t>(MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE) + 1;
     CHK(maxCount > 0, VAL_NOT_EXP);
@@ -430,7 +430,7 @@ void OHOS::MMI::UDSServer::OnThread()
     MMI_LOGD("begin tid:%{public}" PRId64 "", tid);
     SafeKpr->RegisterEvent(tid, "UDSServer::_OnThread");
 
-    CLMAP<int32_t, StreamBufData> bufMap;
+    std::map<int32_t, StreamBufData> bufMap;
     epoll_event ev[MAX_EVENT_SIZE] = {};
     while (isRun_) {
         auto count = EpollWait(*ev, MAX_EVENT_SIZE, DEFINE_EPOLL_TIMEOUT);

@@ -606,7 +606,7 @@ int32_t MultimodalStandardizedEventManager::OnDeviceRemove(const DeviceEvent& ev
     return RET_OK;
 }
 
-const StringSet *MultimodalStandardizedEventManager::GetRegisterEvent()
+const std::set<std::string> *MultimodalStandardizedEventManager::GetRegisterEvent()
 {
     return &registerEvents_;
 }

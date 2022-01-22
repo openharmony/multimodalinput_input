@@ -135,7 +135,7 @@ void OHOS::MMI::AppRegister::Dump(int32_t fd)
     }
 }
 
-void AppRegister::SurfacesDestroyed(const IdsList &desList)
+void AppRegister::SurfacesDestroyed(const std::vector<int32_t> &desList)
 {
     std::lock_guard<std::mutex> lock(mu_);
     for (auto it : desList) {

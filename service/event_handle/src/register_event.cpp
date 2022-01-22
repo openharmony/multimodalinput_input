@@ -384,8 +384,8 @@ int32_t RegisterEvent::OnEventTouchDownGetSign(const EventTouch& touch)
     touchDownInfo.area = touch.area;
     touchDownInfo.slot = touch.slot;
     touchDownInfo.seat_slot = touch.seat_slot;
-    touchInfos_.insert(CLMAP<PAIR<uint32_t, int32_t>, TouchInfo>::value_type(MAKEPAIR(touch.deviceId, touch.seat_slot),
-        touchDownInfo));
+    touchInfos_.insert(std::map<std::pair<uint32_t, int32_t>,
+        TouchInfo>::value_type(std::make_pair(touch.deviceId, touch.seat_slot), touchDownInfo));
     if (GetTouchInfoSizeByDeviceId(touchDownInfo.deviceId) > MAXFINGER) {
         DeleteTouchInfoByDeviceId(touchDownInfo.deviceId);
         return RET_ERR;
@@ -436,7 +436,7 @@ int32_t RegisterEvent::OnEventTouchUpGetSign(const EventTouch& touch, MmiMessage
     CHKF(touch.time > 0, PARAM_INPUT_INVALID);
     CHKF(touch.seat_slot >= 0, PARAM_INPUT_INVALID);
     TouchInfo touchUpInfo = {};
-    auto iter = touchInfos_.find(MAKEPAIR(touch.deviceId, touch.seat_slot));
+    auto iter = touchInfos_.find(std::make_pair(touch.deviceId, touch.seat_slot));
     if (iter != touchInfos_.end()) {
         touchUpInfo = iter->second;
         touchInfos_.erase(iter);
@@ -457,7 +457,7 @@ int32_t RegisterEvent::OnEventTouchMotionGetSign(const EventTouch& touch, MmiMes
 {
     CHKF(touch.time > 0, PARAM_INPUT_INVALID);
     CHKF(touch.seat_slot >= 0, PARAM_INPUT_INVALID);
-    auto iter = touchInfos_.find(MAKEPAIR(touch.deviceId, touch.seat_slot));
+    auto iter = touchInfos_.find(std::make_pair(touch.deviceId, touch.seat_slot));
     if (iter != touchInfos_.end()) {
         iter->second.endX = touch.point.x;
         iter->second.endY = touch.point.y;
@@ -487,7 +487,7 @@ int32_t RegisterEvent::OnEventTouchMotionGetSign(const EventTouch& touch, MmiMes
     return RET_OK;
 }
 
-int32_t RegisterEvent::GetTouchInfoByTouchId(const PAIR<uint32_t, int32_t> key, EventTouch& touch)
+int32_t RegisterEvent::GetTouchInfoByTouchId(const std::pair<uint32_t, int32_t> key, EventTouch& touch)
 {
     auto iter = touchInfos_.find(key);
     CHKF(iter != touchInfos_.end(), TOUCH_ID_NO_FIND);
