@@ -48,7 +48,7 @@ RegisterEvent::~RegisterEvent()
 {
 }
 
-void RegisterEvent::OnEventKeyGetSign(EventKeyboard& key, MmiMessageId& msg, EventKeyboard& preKey)
+void RegisterEvent::OnEventKeyGetSign(EventKeyboard& key, MmiMessageId& msg, EventKeyboard& prevKey)
 {
     CHK((key.state == 0) || (key.state == BIT1), PARAM_INPUT_INVALID);
     int32_t temp = modTask_;
@@ -74,7 +74,7 @@ void RegisterEvent::OnEventKeyGetSign(EventKeyboard& key, MmiMessageId& msg, Eve
         {GetBitNum(BIT3) + GetBitNum(BIT4), BIT2},
         {GetBitNum(BIT6) + GetBitNum(BIT5), BIT3},
     };
-    int32_t ret = memcpy_s(&preKey, sizeof(preKey), &key, sizeof(key));
+    int32_t ret = memcpy_s(&prevKey, sizeof(prevKey), &key, sizeof(key));
     CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     for (auto it : getModeCode) {
         if ((it.keystate == key.state) && (it.keyCode == key.key)) {
@@ -98,7 +98,7 @@ void RegisterEvent::OnEventKeyGetSign(EventKeyboard& key, MmiMessageId& msg, Eve
         return;
     }
     if (key.state == KEY_STATE_PRESSED) {
-        OnEventKeyJudge(key, msg, preKey);
+        OnEventKeyJudge(key, msg, prevKey);
     }
 }
 
@@ -119,7 +119,8 @@ bool RegisterEvent::OnGetRepeatKetState(const uint32_t keyCode, MmiMessageId& ms
     return true;
 }
 
-int32_t RegisterEvent::OnEventKeyJudge(EventKeyboard& key, MmiMessageId& msgId, EventKeyboard& preKey)
+int32_t RegisterEvent::OnEventKeyJudge(EventKeyboard& key, MmiMessageId& msgId,
+                                       EventKeyboard& prevKey)
 {
     EventHandle eventHandle[] = {
         {KEY_SEARCH, 0, MmiMessageId::ON_SEARCH}, {KEY_PAUSE, 0, MmiMessageId::ON_PAUSE},
@@ -155,13 +156,13 @@ int32_t RegisterEvent::OnEventKeyJudge(EventKeyboard& key, MmiMessageId& msgId, 
         if ((key.key == it.keyCode) && (modTask_ == it.taskCode)) {
             msgId = it.handler;
             if (it.taskCode != 0) {
-                preKey.deviceType = key_.deviceType;
-                preKey.eventType = key_.eventType;
-                preKey.deviceId = key_.deviceId;
-                int32_t ret = memcpy_s(preKey.deviceName, sizeof(preKey.deviceName), key_.deviceName,
+                prevKey.deviceType = key_.deviceType;
+                prevKey.eventType = key_.eventType;
+                prevKey.deviceId = key_.deviceId;
+                int32_t ret = memcpy_s(prevKey.deviceName, sizeof(prevKey.deviceName), key_.deviceName,
                                sizeof(key_.deviceName));
                 CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
-                ret = memcpy_s(preKey.devicePhys, sizeof(preKey.devicePhys), key_.devicePhys,
+                ret = memcpy_s(prevKey.devicePhys, sizeof(prevKey.devicePhys), key_.devicePhys,
                                sizeof(key_.devicePhys));
                 CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
             }
