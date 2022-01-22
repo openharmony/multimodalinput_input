@@ -28,7 +28,7 @@ namespace {
 
 int32_t SendMessage::GetDevIndexByName(const std::string& deviceName)
 {
-    static const CLMAP<std::string, INPUT_DEVICE_INDEX> deviceTypeToIndexMap = {
+    static const std::map<std::string, INPUT_DEVICE_INDEX> deviceTypeToIndexMap = {
         {"keyboard model1", INPUT_DEVICE_KEYBOARD_INDEX},
         {"keyboard model2", INPUT_DEVICE_KEYBOARD_INDEX},
         {"keyboard model3", INPUT_DEVICE_KEYBOARD_INDEX},

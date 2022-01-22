@@ -108,12 +108,12 @@ const std::vector<ScreenInfo>& OHOS::MMI::InputWindowsManager::GetScreenInfo() c
     return screenInfoVec_;
 }
 
-const CLMAP<int32_t, LayerInfo>& OHOS::MMI::InputWindowsManager::GetLayerInfo() const
+const std::map<int32_t, LayerInfo>& OHOS::MMI::InputWindowsManager::GetLayerInfo() const
 {
     return layers_;
 }
 
-const CLMAP<int32_t, MMISurfaceInfo>& OHOS::MMI::InputWindowsManager::GetSurfaceInfo() const
+const std::map<int32_t, MMISurfaceInfo>& OHOS::MMI::InputWindowsManager::GetSurfaceInfo() const
 {
     return surfaces_;
 }
@@ -203,7 +203,7 @@ void OHOS::MMI::InputWindowsManager::PrintDebugInfo()
     }
 }
 
-size_t OHOS::MMI::InputWindowsManager::GetSurfaceIdList(IdsList& ids)
+size_t OHOS::MMI::InputWindowsManager::GetSurfaceIdList(std::vector<int32_t>& ids)
 {
     const int32_t TEST_THREE_WINDOWS = 3;
     std::lock_guard<std::mutex> lock(mu_);
@@ -218,7 +218,7 @@ size_t OHOS::MMI::InputWindowsManager::GetSurfaceIdList(IdsList& ids)
 
 std::string OHOS::MMI::InputWindowsManager::GetSurfaceIdListString()
 {
-    IdsList ids;
+    std::vector<int32_t> ids;
     std::string str;
     auto idsSize = GetSurfaceIdList(ids);
     if (idsSize > 0) {
@@ -298,7 +298,7 @@ void OHOS::MMI::InputWindowsManager::SaveScreenInfoToMap(const ScreenInfo** scre
     surfaces_.clear();
 
     // save windows info
-    IdsList surfaceList;
+    std::vector<int32_t> surfaceList;
     for (int32_t i = 0; screenInfo[i]; i++) {
         // save screen
         screenInfoVec_.push_back(*(screenInfo[i]));
@@ -322,7 +322,7 @@ void OHOS::MMI::InputWindowsManager::SaveScreenInfoToMap(const ScreenInfo** scre
     }
     // Destroyed windows
     if (!surfacesList_.empty()) {
-        IdsList delList;
+        std::vector<int32_t> delList;
         auto delSize = CalculateDifference(surfacesList_, surfaceList, delList);
         if (delSize > 0) {
             // Processing destroyed windows
@@ -721,7 +721,7 @@ const std::vector<struct LogicalDisplayInfo>& OHOS::MMI::InputWindowsManager::Ge
     return logicalDisplays_;
 }
 
-const CLMAP<int32_t, struct WindowInfo>& OHOS::MMI::InputWindowsManager::GetWindowInfo() const
+const std::map<int32_t, struct WindowInfo>& OHOS::MMI::InputWindowsManager::GetWindowInfo() const
 {
     return windowInfos_;
 }
@@ -1084,7 +1084,7 @@ void OHOS::MMI::InputWindowsManager::SetMouseInfo(double& x, double& y)
 
 void OHOS::MMI::InputWindowsManager::SetLocalInfo(int32_t x, int32_t y)
 {
-    const CLMAP<int32_t, struct WindowInfo> windowInfo = GetWindowInfo();
+    const std::map<int32_t, struct WindowInfo> windowInfo = GetWindowInfo();
     bool isOutsideOfTopLeftX = false;
     bool isOutsideOfTopLeftY = false;
     bool isOutsideOfTopRightX = false;

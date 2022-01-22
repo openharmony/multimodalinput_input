@@ -24,7 +24,7 @@ int32_t main(int32_t argc, const char *argv[])
     const std::int32_t usleepTime = 1500000;
     OHOS::MMI::VirtualDevice::MakeFolder(OHOS::MMI::g_folderpath.c_str());
 
-    StringList argvList = {};
+    std::vector<std::string> argvList = {};
     for (uint16_t i = 0; i < argc; i++) {
         argvList.push_back(argv[i]);
     }

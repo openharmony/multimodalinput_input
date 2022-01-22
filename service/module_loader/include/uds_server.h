@@ -47,11 +47,11 @@ public:
     void UdsStop();
     bool SendMsg(int32_t fd, NetPacket& pkt);
     void Broadcast(NetPacket& pkt);
-    void Multicast(const IdsList& fdList, NetPacket& pkt);
+    void Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt);
     void Dump(int32_t fd);
     int32_t GetFdByPid(int32_t pid);
     int32_t GetPidByFd(int32_t fd);
-    void OnEpollEvent(epoll_event& ev, CLMAP<int32_t, StreamBufData>& bufMap);
+    void OnEpollEvent(epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap);
     void OnEpollRecv(int32_t fd, const char *buf, size_t size);
 
     void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
@@ -77,7 +77,7 @@ protected:
 
     bool StartServer();
     void OnRecv(int32_t fd, const char *buf, size_t size);
-    void OnEvent(const epoll_event& ev, CLMAP<int32_t, StreamBufData>& bufMap);
+    void OnEvent(const epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap);
     void OnThread();
 #ifdef OHOS_BUILD_MMI_DEBUG
     virtual void HandleCommandQueue();
