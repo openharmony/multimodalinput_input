@@ -407,10 +407,10 @@ int32_t EventPackage::PackagePointerEventByButton(libinput_event *event, EventPo
         point.state = BUTTON_STATE_PRESSED;
     }
     // Ignore button events that are not seat wide state changes.
-    if (point.state == BUTTON_STATE_PRESSED && point.seat_button_count != 1) {
+    if ((point.state == BUTTON_STATE_PRESSED) && (point.seat_button_count != 1)) {
         return MULTIDEVICE_SAME_EVENT_MARK;
     }
-    if (point.state == BUTTON_STATE_RELEASED && point.seat_button_count != 0) {
+    if ((point.state == BUTTON_STATE_RELEASED) && (point.seat_button_count != 0)) {
         return MULTIDEVICE_SAME_EVENT_MARK;
     }
     return RET_OK;
