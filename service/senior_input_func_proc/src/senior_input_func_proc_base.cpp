@@ -102,7 +102,8 @@ int32_t SeniorInputFuncProcBase::DeviceEventProcess(const RawInputEvent& event)
     }
 
     std::vector<int32_t> fds;
-    if (RegEventHM->FindSocketFdsByEventHandle(msgId, fds) != RET_OK) {
+    RegEventHM->FindSocketFds(msgId, fds);
+    if (fds.empty()) {
         MMI_LOGE("can not find handle by fd: %{public}d.", msgId);
         return RET_ERR;
     }
