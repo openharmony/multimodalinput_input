@@ -133,7 +133,7 @@ HWTEST_F(UtilTest, StringSplit, TestSize.Level1)
 {
     const std::string str;
     const std::string sep;
-    StringList vecList;
+    std::vector<std::string> vecList;
     OHOS::MMI::StringSplit(str, sep, vecList);
 }
 } // namespace

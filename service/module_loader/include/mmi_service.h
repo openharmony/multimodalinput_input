@@ -79,7 +79,7 @@ private:
 #ifdef  OHOS_BUILD_AI
     SeniorInputFuncProcBase seniorInput_;
 #endif // OHOS_BUILD_AI
-    CLSET<int32_t> authFds_;
+    std::set<int32_t> authFds_;
 };
 }
 }

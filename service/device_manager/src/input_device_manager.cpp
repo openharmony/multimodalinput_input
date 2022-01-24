@@ -42,35 +42,35 @@ void InputDeviceManager::Init(weston_compositor* wc)
     initFlag_ = true;
 }
 
-void InputDeviceManager::GetDeviceIdListAsync(std::function<void(std::vector<int32_t>)> callback)
+void InputDeviceManager::GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback)
 {
     MMIMSGPOST.RunOnWestonThread([this, callback](weston_compositor* wc) {
-        auto idList = GetDeviceIdListSync(wc);
-        callback(idList);
+        auto ids = GetInputDeviceIdsSync(wc);
+        callback(ids);
     });
 }
 
-void InputDeviceManager::FindDeviceByIdAsync(int32_t deviceId,
+void InputDeviceManager::FindInputDeviceByIdAsync(int32_t deviceId,
     std::function<void(std::shared_ptr<InputDevice>)> callback)
 {
     MMIMSGPOST.RunOnWestonThread([this, deviceId, callback](weston_compositor* wc) {
-        auto device = FindDeviceByIdSync(wc, deviceId);
+        auto device = FindInputDeviceByIdSync(wc, deviceId);
         callback(device);
     });
 }
 
-std::vector<int32_t> InputDeviceManager::GetDeviceIdListSync(weston_compositor* wc)
+std::vector<int32_t> InputDeviceManager::GetInputDeviceIdsSync(weston_compositor* wc)
 {
     MMI_LOGI("GetDeviceIdList enter");
     Init(wc);
-    std::vector<int32_t> deviceIdList;
-    for (auto it : inputDeviceMap_) {
-        deviceIdList.push_back(it.first);
+    std::vector<int32_t> ids;
+    for (const auto& it : inputDeviceMap_) {
+        ids.push_back(it.first);
     }
-    return deviceIdList;
+    return ids;
 }
 
-std::shared_ptr<InputDevice> InputDeviceManager::FindDeviceByIdSync(weston_compositor* wc, int32_t deviceId)
+std::shared_ptr<InputDevice> InputDeviceManager::FindInputDeviceByIdSync(weston_compositor* wc, int32_t deviceId)
 {
     MMI_LOGI("FindDeviceByIdSync enter");
     Init(wc);
@@ -83,7 +83,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::FindDeviceByIdSync(weston_compo
     inputDevice->SetId(item->first);
     int32_t deviceType = static_cast<int32_t>(libinput_device_get_tags(
         static_cast<struct libinput_device *>(item->second)));
-    inputDevice->SetDeviceType(deviceType);
+    inputDevice->SetType(deviceType);
     std::string name = libinput_device_get_name(static_cast<struct libinput_device *>(item->second));
     inputDevice->SetName(name);
 
@@ -91,7 +91,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::FindDeviceByIdSync(weston_compo
 }
 #endif
 
-std::shared_ptr<InputDevice> InputDeviceManager::GetDevice(int32_t id)
+std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id)
 {
     MMI_LOGI("FindDeviceById enter");
     auto item = inputDeviceMap_.find(id);
@@ -108,21 +108,21 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetDevice(int32_t id)
     inputDevice->SetId(item->first);
     int32_t deviceType = static_cast<int32_t>(libinput_device_get_tags(
         static_cast<struct libinput_device *>(item->second)));
-    inputDevice->SetDeviceType(deviceType);
+    inputDevice->SetType(deviceType);
     auto libinputDevice = static_cast<struct libinput_device *>(item->second);
     std::string name = libinput_device_get_name(libinputDevice);
     inputDevice->SetName(name);
     return inputDevice;
 }
 
-std::vector<int32_t> InputDeviceManager::GetDeviceIds()
+std::vector<int32_t> InputDeviceManager::GetInputDeviceIds()
 {
     MMI_LOGI("GetDeviceIdList enter");
-    std::vector<int32_t> deviceIdList;
+    std::vector<int32_t> ids;
     for (const auto &it : inputDeviceMap_) {
-        deviceIdList.push_back(it.first);
+        ids.push_back(it.first);
     }
-    return deviceIdList;
+    return ids;
 }
 
 void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
@@ -133,7 +133,7 @@ void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
         return;
     }
 #endif
-    for (auto it : inputDeviceMap_) {
+    for (const auto& it : inputDeviceMap_) {
         if (static_cast<struct libinput_device *>(it.second) == inputDevice) {
             return;
         }
@@ -143,7 +143,9 @@ void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
     nextId_++;
 
     if (IsPointerDevice(static_cast<struct libinput_device *>(inputDevice))) {
+#ifdef OHOS_MOUSE_READY
         DrawWgr->TellDeviceInfo(true);
+#endif
     }
 }
 
@@ -159,7 +161,9 @@ void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
         if (it->second == inputDevice) {
             inputDeviceMap_.erase(it);
             if (IsPointerDevice(inputDevice)) {
+#ifdef OHOS_MOUSE_READY
                 DrawWgr->TellDeviceInfo(false);
+#endif
             }
             break;
         }
