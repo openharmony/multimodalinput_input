@@ -17,8 +17,8 @@
 #define JS_INPUT_MONITOR_MODULE_H
 
 #include <string.h>
-#include "native_api.h"
-#include "native_node_api.h"
+#include "napi/native_api.h"
+#include "napi/native_node_api.h"
 
 namespace OHOS {
 namespace MMI {
