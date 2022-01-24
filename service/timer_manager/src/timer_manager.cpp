@@ -147,7 +147,7 @@ int32_t TimerManager::CalcNextDelayInternal()
             if (delay < MIN_DELAY) {
                 delay = MIN_DELAY;
                 break;
-            } 
+            }
         }
     }
     return delay;
