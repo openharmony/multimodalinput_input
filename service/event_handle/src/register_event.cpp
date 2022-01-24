@@ -48,7 +48,7 @@ RegisterEvent::~RegisterEvent()
 {
 }
 
-void RegisterEvent::OnEventKeyGetSign(EventKeyboard& key, MmiMessageId& msg, EventKeyboard& prevKey)
+void RegisterEvent::OnEventKeyGetSign(const EventKeyboard& key, MmiMessageId& msg, EventKeyboard& prevKey)
 {
     CHK((key.state == 0) || (key.state == BIT1), PARAM_INPUT_INVALID);
     int32_t temp = modTask_;
@@ -133,7 +133,7 @@ int32_t RegisterEvent::SetPrevKeyValue(EventKeyboard& prevKey)
     return RET_OK;
 }
 
-int32_t RegisterEvent::OnEventKeyJudge(EventKeyboard& key, MmiMessageId& msgId, EventKeyboard& prevKey)
+int32_t RegisterEvent::OnEventKeyJudge(const EventKeyboard& key, MmiMessageId& msgId, EventKeyboard& prevKey)
 {
     EventHandle eventHandle[] = {
         {KEY_SEARCH, 0, MmiMessageId::ON_SEARCH}, {KEY_PAUSE, 0, MmiMessageId::ON_PAUSE},

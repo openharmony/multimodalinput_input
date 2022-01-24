@@ -59,7 +59,7 @@ public:
     * Returns:   void
     * Qualifier: 判断键盘事件是否为功能键（ctrl,alt,shift,logo）
     */
-    void OnEventKeyGetSign(EventKeyboard& key, MmiMessageId& msg, EventKeyboard& prevKey);
+    void OnEventKeyGetSign(const EventKeyboard& key, MmiMessageId& msg, EventKeyboard& prevKey);
     int32_t OnEventPointButton(const int32_t buttonCode, const uint64_t timeNow,
         const BUTTON_STATE stateValue, MmiMessageId& msgId);
     int32_t OnEventPointAxis(const EventPointer& point, MmiMessageId& msgId);
@@ -86,7 +86,7 @@ protected:
     int32_t OnEventTouchUpGetSign(const EventTouch& touch, MmiMessageId& msgId);
     bool OnGetRepeatKetState(const uint32_t keyCode, MmiMessageId& msgId);
     int32_t SetPrevKeyValue(EventKeyboard& prevKey);
-    int32_t OnEventKeyJudge(EventKeyboard& key, MmiMessageId& msgId, EventKeyboard& prevKey);
+    int32_t OnEventKeyJudge(const EventKeyboard& key, MmiMessageId& msgId, EventKeyboard& prevKey);
     /*
     * Method:    GetBitNum
     * FullName:  RegisterEvent::GetBitNum
