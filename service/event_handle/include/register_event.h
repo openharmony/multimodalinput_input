@@ -36,7 +36,7 @@ struct TouchInfo {
     uint64_t endTime;
     int32_t eventType;
     int32_t slot;
-    int32_t seat_slot;
+    int32_t seatSlot;
 };
 struct GestureInfo {
     int32_t fingerCount;
