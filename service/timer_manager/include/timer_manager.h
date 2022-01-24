@@ -36,19 +36,20 @@ public:
     void ProcessTimers();
         
 private:
-    static const int32_t MIN_DELAY = 36;
-    static const int32_t MIN_INTERVAL = 50;
-    static const int32_t MAX_INTERVAL = 4096;
-    static const int32_t MAX_TIMER_COUNT = 32;
+    static constexpr int32_t MIN_DELAY = 36;
+    static constexpr int32_t MIN_INTERVAL = 50;
+    static constexpr int32_t MAX_INTERVAL = 4096;
+    static constexpr int32_t MAX_TIMER_COUNT = 32;
+    static constexpr int32_t NONEXISTENT_ID = -1;
     
 private:
     struct TimerItem {
-        int32_t id_;
-        int32_t intervalMs_;
-        int32_t repeatCount_;
-        int32_t callbackCount_;
-        int64_t nextCallTime_;
-        std::function<void()> callback_;
+        int32_t id;
+        int32_t intervalMs;
+        int32_t repeatCount;
+        int32_t callbackCount;
+        int64_t nextCallTime;
+        std::function<void()> callback;
     };      
 private:
     int32_t TakeNextTimerId();
