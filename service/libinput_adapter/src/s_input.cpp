@@ -147,58 +147,8 @@ void OHOS::MMI::SInput::OnEventHandler()
 #ifndef OHOS_WESTEN_MODEL
     struct multimodal_libinput_event ev = { nullptr, nullptr };
     while ((ev.event = libinput_get_event(input_))) {
-        /* remove these code when power key feature is up. start */
-        HandlePowerKey(ev.event);
-        /* remove these code when power key feature is up. end */
         funInputEvent_(&ev);
         libinput_event_destroy(ev.event);
     }
 #endif
 }
-
-/* remove these code when power key feature is up. start */
-void OHOS::MMI::SInput::WriteBrightness(const char *brightness)
-{
-    int fd = open("/sys/class/leds/lcd_backlight0/brightness", O_WRONLY);
-    int ret = write(fd, brightness, strlen(brightness));
-    MMI_LOGI("power key write brightness %{public}s, %{public}d", brightness, ret);
-    close(fd);
-}
-
-bool OHOS::MMI::SInput::HandlePowerKey(struct libinput_event *event)
-{
-    CHKF(event, PARAM_INPUT_INVALID);
-    bool isKeyboardEvent = (libinput_event_get_type(event) == LIBINPUT_EVENT_KEYBOARD_KEY);
-    if (!isKeyboardEvent) {
-        return (screenState_ == 0);
-    }
-
-    uint32_t keyPowerCodeValue = 116;
-    struct libinput_event_keyboard *keyboardEvent = libinput_event_get_keyboard_event(event);
-    uint32_t keyCode = libinput_event_keyboard_get_key(keyboardEvent);
-    uint32_t keyAction = libinput_event_keyboard_get_key_state(keyboardEvent);
-
-    if ((keyCode != keyPowerCodeValue) || keyAction != LIBINPUT_KEY_STATE_RELEASED) {
-        return false;
-    }
-    MMI_LOGI("power key handle key %{public}u, %{public}u", keyCode, keyAction);
-
-    const char *brightness = "2000";
-    if (screenState_ == -1) {
-        // init brightness node
-        WriteBrightness(brightness);
-        screenState_ = 1;
-    }
-
-    if (screenState_ == 1) {
-        // screen backlight off
-        brightness = "0000";
-        screenState_ = 0;
-    } else {
-        // screen backlight on
-        screenState_ = 1;
-    }
-    WriteBrightness(brightness);
-    return false;
-}
-/* remove these code when power key feature is up. end */
