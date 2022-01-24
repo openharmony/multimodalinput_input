@@ -670,6 +670,7 @@ int32_t OHOS::MMI::EventPackage::PackageGestureEvent(libinput_event *event, Even
             gesture.cancelled = libinput_event_gesture_get_cancelled(data);
             break;
         }
+        /* Third, it refers to the use of requirements, and the code is reserved */
         case LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE: {
             gesture.delta.x = libinput_event_gesture_get_dx(data);
             gesture.delta.y = libinput_event_gesture_get_dy(data);
@@ -680,11 +681,13 @@ int32_t OHOS::MMI::EventPackage::PackageGestureEvent(libinput_event *event, Even
             FillEventSlotedCoordsInfo(gesture.soltTouches, *pSoltTouches);
             break;
         }
+        /* Third, it refers to the use of requirements, and the code is reserved */
         case LIBINPUT_EVENT_GESTURE_SWIPE_END: {
             gesture.cancelled = libinput_event_gesture_get_cancelled(data);
             break;
         }
         default: {
+            MMI_LOGE("Event gesture type:%{public}d", type);
             break;
         }
     }
