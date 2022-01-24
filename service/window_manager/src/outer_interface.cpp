@@ -138,11 +138,11 @@ int OuterInterface::notifyFocusChange(int32_t abilityId, int32_t windowId)
 int32_t OuterInterface::GetSystemEventAttrByHosKeyValue(const int16_t keyValueOfHos)
 {
     auto it = MAP_SYSTEM_EVENT_ATTR.find(keyValueOfHos);
-    if (it != MAP_SYSTEM_EVENT_ATTR.end()) {
-        return it->second;
-    } else {
+    if (it == MAP_SYSTEM_EVENT_ATTR.end()) {
+        MMI_LOGE("No key found, keyValue:%{public}d", keyValueOfHos);
         return RET_ERR;
     }
+    return it->second;
 }
 }
 }

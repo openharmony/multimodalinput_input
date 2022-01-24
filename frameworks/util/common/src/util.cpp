@@ -404,7 +404,7 @@ const std::string& GetThreadName()
     return g_threadName;
 }
 
-void AddId(IdsList &list, int32_t id)
+void AddId(std::vector<int32_t> &list, int32_t id)
 {
     if (id <= 0) {
         return;
@@ -416,7 +416,8 @@ void AddId(IdsList &list, int32_t id)
     list.push_back(id);
 }
 
-size_t CalculateDifference(const IdsList &list1, IdsList &list2, IdsList &difList)
+size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_t> &list2,
+    std::vector<int32_t> &difList)
 {
     if (list1.empty()) {
         difList = list2;
@@ -426,9 +427,9 @@ size_t CalculateDifference(const IdsList &list1, IdsList &list2, IdsList &difLis
         difList = list1;
         return difList.size();
     }
-    IdsList l1 = list1;
+    std::vector<int32_t> l1 = list1;
     std::sort(l1.begin(), l1.end());
-    IdsList l2 = list2;
+    std::vector<int32_t> l2 = list2;
     std::sort(l2.begin(), l2.end());
     std::set_difference(l1.begin(), l1.end(), l2.begin(), l2.end(), std::back_inserter(difList));
     return difList.size();

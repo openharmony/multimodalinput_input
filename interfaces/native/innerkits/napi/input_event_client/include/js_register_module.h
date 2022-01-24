@@ -62,21 +62,21 @@ enum JS_CALLBACK_EVENT {
 };
 
 namespace OHOS {
-    namespace MMI {
-        typedef struct {
-            uint32_t type;
-            StandEventPtr pevent;
-        } EventContext;
+namespace MMI {
+typedef struct {
+    uint32_t type;
+    StandEventPtr pevent;
+} EventContext;
 
-        typedef struct {
-            uint32_t type;
-            int32_t winId;
-            std::string name;
-            napi_value handle;
-        } EventInfo;
+typedef struct {
+    uint32_t type;
+    int32_t winId;
+    std::string name;
+    napi_value handle;
+} EventInfo;
 
-        typedef std::map<std::string, std::list<napi_ref>> CallbackMap;
-    }
+typedef std::map<std::string, std::list<napi_ref>> CallbackMap;
+}
 }
 
 #endif

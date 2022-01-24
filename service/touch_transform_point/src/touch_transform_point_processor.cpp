@@ -37,7 +37,6 @@ void TouchTransformPointProcessor::onEventTouchDown(libinput_event *event)
     CHK(event, PARAM_INPUT_INVALID);
     MMI_LOGD("this touch event is down");
     auto data = libinput_event_get_touch_event(event);
-    auto time = libinput_event_touch_get_time(data);
     auto seat_slot = libinput_event_touch_get_seat_slot(data);
     auto pressure = libinput_event_get_touch_pressure(event);
     int32_t id = 1;
@@ -46,6 +45,7 @@ void TouchTransformPointProcessor::onEventTouchDown(libinput_event *event)
     int32_t logicalDisplayId = -1;
     WinMgr->TpPointLogicDisplayPoint(data, logicalX, logicalY, logicalDisplayId);
     auto pointIds = pointerEvent_->GetPointersIdList();
+    auto time = libinput_event_touch_get_time(data);
     if (pointIds.size() == 0) {
         pointerEvent_->SetActionStartTime(time);
         pointerEvent_->SetTargetDisplayId(logicalDisplayId);
@@ -120,12 +120,12 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::onLibinputTouchEvent
 {
     CHKR(event, PARAM_INPUT_INVALID, nullptr);
     MMI_LOGD("call  onLibinputTouchEvent begin");
-    auto type = libinput_event_get_type(event);
     if (pointerEvent_ == nullptr) {
         MMI_LOGE("pointerEvent_ is nullptr");
         return nullptr;
     }
     pointerEvent_->UpdateId();
+    auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
             onEventTouchDown(event);

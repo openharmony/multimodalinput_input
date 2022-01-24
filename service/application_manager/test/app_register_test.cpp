@@ -343,78 +343,76 @@ HWTEST_F(AppRegisterTest, RegisterEventHandleManager_012, TestSize.Level1)
     EXPECT_TRUE(testInt == 0);
 }
 
-HWTEST_F(AppRegisterTest, FindSocketFdsByEventHandle_001, TestSize.Level1)
+HWTEST_F(AppRegisterTest, FindSocketFds_001, TestSize.Level1)
 {
     RegisterEventHandleManager registerEventManager;
 
     registerEventManager.PrintfMap();
     std::vector<int32_t> fds;
-    int32_t retResult = registerEventManager.FindSocketFdsByEventHandle(MmiMessageId::ON_ENTER, fds);
-    EXPECT_TRUE(retResult != 0);
+    registerEventManager.FindSocketFds(MmiMessageId::ON_ENTER, fds);
+    EXPECT_TRUE(fds.empty());
 }
 
-HWTEST_F(AppRegisterTest, FindSocketFdsByEventHandle_002, TestSize.Level1)
+HWTEST_F(AppRegisterTest, FindSocketFds_002, TestSize.Level1)
 {
     RegisterEventHandleManager registerEventManager;
 
     registerEventManager.PrintfMap();
     std::vector<int32_t> fds;
-    int32_t retResult = registerEventManager.FindSocketFdsByEventHandle(MmiMessageId::ON_PAUSE, fds);
-    EXPECT_TRUE(retResult != 0);
+    registerEventManager.FindSocketFds(MmiMessageId::ON_PAUSE, fds);
+    EXPECT_TRUE(fds.empty());
 }
 
-HWTEST_F(AppRegisterTest, FindSocketFdsByEventHandle_003, TestSize.Level1)
+HWTEST_F(AppRegisterTest, FindSocketFds_003, TestSize.Level1)
 {
     RegisterEventHandleManager registerEventManager;
 
     registerEventManager.PrintfMap();
     std::vector<int32_t> fds;
-    int32_t retResult = registerEventManager.FindSocketFdsByEventHandle(MmiMessageId::ON_START_SCREEN_RECORD, fds);
-    EXPECT_TRUE(retResult != 0);
+    registerEventManager.FindSocketFds(MmiMessageId::ON_START_SCREEN_RECORD, fds);
+    EXPECT_TRUE(fds.empty());
 }
 
-HWTEST_F(AppRegisterTest, FindSocketFdsByEventHandle_004, TestSize.Level1)
+HWTEST_F(AppRegisterTest, FindSocketFds_004, TestSize.Level1)
 {
     RegisterEventHandleManager registerEventManager;
 
     registerEventManager.PrintfMap();
     std::vector<int32_t> fds;
-    int32_t retResult = registerEventManager.FindSocketFdsByEventHandle(MmiMessageId::ON_STANDARD, fds);
-    EXPECT_TRUE(retResult == -1);
+    registerEventManager.FindSocketFds(MmiMessageId::ON_STANDARD, fds);
+    EXPECT_TRUE(fds.empty());
 }
 
-HWTEST_F(AppRegisterTest, FindSocketFdsByEventHandle_005, TestSize.Level1)
+HWTEST_F(AppRegisterTest, FindSocketFds_005, TestSize.Level1)
 {
     RegisterEventHandleManager registerEventManager;
     std::vector<int32_t> fds;
-    int32_t retResult = registerEventManager.FindSocketFdsByEventHandle(MmiMessageId::ON_ENTER, fds);
-    EXPECT_TRUE(retResult != 0);
+    registerEventManager.FindSocketFds(MmiMessageId::ON_ENTER, fds);
+    EXPECT_TRUE(fds.empty());
 }
 
-HWTEST_F(AppRegisterTest, FindSocketFdsByEventHandle_006, TestSize.Level1)
+HWTEST_F(AppRegisterTest, FindSocketFds_006, TestSize.Level1)
 {
     RegisterEventHandleManager registerEventManager;
     std::vector<int32_t> fds;
-    int32_t retResult = registerEventManager.FindSocketFdsByEventHandle(MmiMessageId::ON_PAUSE, fds);
-    EXPECT_TRUE(retResult != 0);
+    registerEventManager.FindSocketFds(MmiMessageId::ON_PAUSE, fds);
+    EXPECT_TRUE(fds.empty());
 }
 
-HWTEST_F(AppRegisterTest, FindSocketFdsByEventHandle_007, TestSize.Level1)
+HWTEST_F(AppRegisterTest, FindSocketFds_007, TestSize.Level1)
 {
-    int32_t testInt = -1;
     RegisterEventHandleManager registerEventManager;
     std::vector<int32_t> fds;
-    testInt = registerEventManager.FindSocketFdsByEventHandle(MmiMessageId::ON_START_SCREEN_RECORD, fds);
-    EXPECT_TRUE(testInt != 0);
+    registerEventManager.FindSocketFds(MmiMessageId::ON_START_SCREEN_RECORD, fds);
+    EXPECT_TRUE(fds.empty());
 }
 
-HWTEST_F(AppRegisterTest, FindSocketFdsByEventHandle_008, TestSize.Level1)
+HWTEST_F(AppRegisterTest, FindSocketFds_008, TestSize.Level1)
 {
-    int32_t testInt = -1;
     RegisterEventHandleManager registerEventManager;
     std::vector<int32_t> fds;
-    testInt = registerEventManager.FindSocketFdsByEventHandle(MmiMessageId::ON_CLOSE_PAGE, fds);
-    EXPECT_TRUE(testInt == -1);
+    registerEventManager.FindSocketFds(MmiMessageId::ON_CLOSE_PAGE, fds);
+    EXPECT_TRUE(fds.empty());
 }
 
 HWTEST_F(AppRegisterTest, UnregisterEventHandleManager_001, TestSize.Level1)

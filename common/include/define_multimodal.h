@@ -35,44 +35,6 @@
     #define WL_EXPORT
 #endif
 
-#define USE_CLMAP
-#define USE_CLSET
-
-#ifdef USE_CLMAP
-    #define MAKEPAIR    std::make_pair
-    #define PAIR        std::pair
-    #define CLMAP       std::map
-    #define CLMULTIMAP  std::multimap
-#else
-    #define CLMAP       std::unordered_map
-    #define CLMULTIMAP  std::unordered_multimap
-#endif
-
-#ifdef USE_CLSET
-    #define CLSET       std::set
-    #define CLMULTISET  std::multiset
-#else
-    #define CLSET       std::unordered_set
-    #define CLMULTISET  std::unordered_multiset
-#endif
-
-
-#ifndef IdsList
-#define IdsList std::vector<int32_t>
-#endif
-
-#ifndef StringList
-#define StringList  std::vector<std::string>
-#endif
-
-#ifndef StringSet
-#define StringSet   CLSET<std::string>
-#endif
-
-#ifndef StringMap
-#define StringMap   CLMAP<std::string, std::string>
-#endif
-
 #ifdef DEBUG_CODE_TEST
 #define CK(cond, ec) \
     do { \

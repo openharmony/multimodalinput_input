@@ -57,7 +57,7 @@ public:
 
     void PrintfMap();
     void Dump(int32_t fd);
-    void SurfacesDestroyed(const IdsList &desList);
+    void SurfacesDestroyed(const std::vector<int32_t> &desList);
 
     int32_t QueryMapSurfaceNum();
 
@@ -80,7 +80,7 @@ private:
     std::map<int32_t, AppInfo>::iterator UnregisterAppInfo(int32_t winId);
 
 private:
-    IdsList fds_;
+    std::vector<int32_t> fds_;
     std::map<int32_t, AppInfo> mapSurface_ = {}; // key=windowId:value=AppInfo
     std::vector<WaitQueueEvent> waitQueue_ = {};
     std::map<int32_t, int8_t> mapConnectState_ = {};
