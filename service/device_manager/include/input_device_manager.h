@@ -31,18 +31,16 @@ class InputDeviceManager : public DelayedSingleton<InputDeviceManager> {
 public:
     void OnInputDeviceAdded(libinput_device* inputDevice);
     void OnInputDeviceRemoved(libinput_device* inputDevice);
-    std::vector<int32_t> GetDeviceIds();
-    std::shared_ptr<InputDevice> GetDevice(int32_t id);
-
-public:
-    void GetDeviceIdListAsync(std::function<void(std::vector<int32_t>)> callback);
-    void FindDeviceByIdAsync(int32_t deviceId, std::function<void(std::shared_ptr<InputDevice>)> callback);
+    std::vector<int32_t> GetInputDeviceIds();
+    std::shared_ptr<InputDevice> GetInputDevice(int32_t id);
+    void GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback);
+    void FindInputDeviceByIdAsync(int32_t deviceId, std::function<void(std::shared_ptr<InputDevice>)> callback);
     int32_t FindInputDeviceId(libinput_device* inputDevice);
 
 private:
     void Init(weston_compositor *wc);
-    std::vector<int32_t> GetDeviceIdListSync(weston_compositor *wc);
-    std::shared_ptr<InputDevice> FindDeviceByIdSync(weston_compositor *wc, int32_t deviceId);
+    std::vector<int32_t> GetInputDeviceIdsSync(weston_compositor *wc);
+    std::shared_ptr<InputDevice> FindInputDeviceByIdSync(weston_compositor *wc, int32_t deviceId);
     bool IsPointerDevice(struct libinput_device* device);
 
     std::map<int32_t, libinput_device*> inputDeviceMap_;
@@ -51,5 +49,5 @@ private:
 };
 }
 }
-#define INPUTDEVMGR OHOS::MMI::InputDeviceManager::GetInstance()
+#define inputDeviceManager OHOS::MMI::InputDeviceManager::GetInstance()
 #endif

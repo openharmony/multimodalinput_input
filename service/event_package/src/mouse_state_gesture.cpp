@@ -71,7 +71,7 @@ void OHOS::MMI::MouseDeviceState::CountState(int16_t btnCode, uint32_t btnState)
     std::lock_guard<std::mutex> lock(mu_);
     std::map<int16_t, uint32_t>::iterator iter = this->mapCountState.find(btnCode);
     if (iter != this->mapCountState.end()) {
-        ChangeMouseState(iter->second, btnState);
+        ChangeMouseState(btnState, iter->second);
     } else {
         this->mapCountState.insert(std::make_pair(btnCode, ((btnState == BUTTON_STATE_PRESSED) ? 1 : 0)));
     }
@@ -86,7 +86,7 @@ int16_t OHOS::MMI::MouseDeviceState::LibinputChangeToPointer(int16_t keyValue)
     }
 }
 
-void OHOS::MMI::MouseDeviceState::ChangeMouseState(uint32_t &stateValue, uint32_t btnState)
+void OHOS::MMI::MouseDeviceState::ChangeMouseState(uint32_t btnState, uint32_t &stateValue)
 {
     if (btnState == BUTTON_STATE_PRESSED) {
         stateValue++;

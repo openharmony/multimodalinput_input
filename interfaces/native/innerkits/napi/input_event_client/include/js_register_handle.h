@@ -17,25 +17,25 @@
 #include "js_register_module.h"
 
 namespace OHOS {
-    namespace MMI {
-        int32_t AddEvent(const napi_env& env, StandEventPtr &eventHandle, const EventInfo &event);
-        int32_t DelEvent(const napi_env& env, StandEventPtr &eventHandle, const EventInfo &event);
-        void UnitSent(napi_env env, int32_t winId, uint32_t eventType, const MultimodalEvent& event);
+namespace MMI {
+int32_t AddEvent(const napi_env& env, StandEventPtr &eventHandle, const EventInfo &event);
+int32_t DelEvent(const napi_env& env, StandEventPtr &eventHandle, const EventInfo &event);
+void UnitSent(napi_env env, int32_t winId, uint32_t eventType, const MultimodalEvent& event);
 
-        class JSRegisterHandle {
-        public:
-            explicit JSRegisterHandle(const napi_env& env);
-            ~JSRegisterHandle() = default;
+class JSRegisterHandle {
+public:
+    explicit JSRegisterHandle(const napi_env& env);
+    ~JSRegisterHandle() = default;
 
-            int32_t Register(const StandEventPtr eventHandle, int32_t winId, uint32_t type);
-            int32_t Unregister(int32_t winId, uint32_t type);
-            int32_t UnregisterAll();
-            StandEventPtr GetEventHandle(int32_t winId, uint32_t type);
-            bool CheckRegistered(int32_t winId, uint32_t type);
-            bool CheckUnregistered(int32_t winId, uint32_t type);
-        private:
-            napi_env env_ = nullptr;
-        };
-    }
+    int32_t Register(const StandEventPtr eventHandle, int32_t winId, uint32_t type);
+    int32_t Unregister(int32_t winId, uint32_t type);
+    int32_t UnregisterAll();
+    StandEventPtr GetEventHandle(int32_t winId, uint32_t type);
+    bool CheckRegistered(int32_t winId, uint32_t type);
+    bool CheckUnregistered(int32_t winId, uint32_t type);
+private:
+    napi_env env_ = nullptr;
+};
+}
 }
 #endif

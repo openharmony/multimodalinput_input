@@ -38,17 +38,15 @@ namespace OHOS::MMI {
         int32_t PackageKeyEvent(libinput_event *event, EventKeyboard& key);
         int32_t PackageKeyEvent(libinput_event *event, std::shared_ptr<OHOS::MMI::KeyEvent> kevnPtr);
         int32_t PackageGestureEvent(libinput_event *event, EventGesture& gesture);
-        int32_t PackagePointerEvent(multimodal_libinput_event &ev, EventPointer& point);
-        int32_t PackageTouchEvent(multimodal_libinput_event &ev, EventTouch& touch);
+        int32_t PackagePointerEvent(libinput_event *event, EventPointer& point);
+        int32_t PackageTouchEvent(libinput_event *event, EventTouch& touch);
         int32_t PackageJoyStickAxisEvent(libinput_event *event, EventJoyStickAxis& eventJoyStickAxis);
         int32_t PackageJoyStickKeyEvent(libinput_event *event, EventKeyboard& key);
         int32_t PackageTabletPadKeyEvent(libinput_event *event, EventKeyboard& key);
         static int32_t PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key);
         static int32_t KeyboardToKeyEvent(EventKeyboard& key, std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr);
-        static std::shared_ptr<OHOS::MMI::PointerEvent> GestureToPointerEvent(EventGesture& gesture);
+        static std::shared_ptr<OHOS::MMI::PointerEvent> LibinputEventToPointerEvent(libinput_event *event);
     private:
-        uint32_t SEAT_BUTTON_OR_KEY_COUNT_ONE = 1;
-        uint32_t SEAT_BUTTON_OR_KEY_COUNT_ZERO = 0;
         void PackageTabletPadOtherParams(libinput_event *event, EventTabletPad& tabletPad);
         int32_t PackageTabletToolOtherParams(libinput_event *event, EventTabletTool& tableTool);
         void PackageTabletToolTypeParam(libinput_event *event, EventTabletTool& tableTool);
@@ -56,15 +54,16 @@ namespace OHOS::MMI {
         int32_t PackagePointerEventByMotionAbs(libinput_event *event, EventPointer& point);
         int32_t PackagePointerEventByButton(libinput_event *event, EventPointer& point);
         int32_t PackagePointerEventByAxis(libinput_event *event, EventPointer& point);
+        void PackageTouchEventByType(int32_t type, struct libinput_event_touch *data, EventTouch& touch);
     };
     template<class T>
     int32_t EventPackage::PackageRegisteredEvent(T& data, RegisteredEvent& event)
     {
-        CHKR(EOK == memcpy_s(event.devicePhys, MAX_DEVICENAME, data.devicePhys, MAX_DEVICENAME),
-             MEMCPY_SEC_FUN_FAIL, RET_ERR);
+        int32_t ret = memcpy_s(event.devicePhys, MAX_DEVICENAME, data.devicePhys, MAX_DEVICENAME);
+        CHKR(ret != EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
         const std::string uid = GetUUid();
-        CHKR(EOK == memcpy_s(event.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size()),
-             MEMCPY_SEC_FUN_FAIL, RET_ERR);
+        ret = memcpy_s(event.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size());
+        CHKR(ret != EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
         event.deviceId = data.deviceId;
         event.eventType = data.eventType;
         event.deviceType = data.deviceType;

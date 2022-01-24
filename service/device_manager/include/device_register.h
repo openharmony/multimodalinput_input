@@ -28,7 +28,7 @@ public:
     virtual ~DeviceRegister();
     bool Init();
     bool DeleteDeviceInfo(const std::string& devicePhys);
-    uint32_t FindDeviceIdByDevicePhys(const std::string& devicePhys);
+    bool FindDeviceIdByDevicePhys(const std::string& devicePhys, uint32_t& deviceId);
     uint32_t AddDeviceInfo(std::string& devicePhys);
 private:
     std::set<uint32_t> setDeviceId_ = {};

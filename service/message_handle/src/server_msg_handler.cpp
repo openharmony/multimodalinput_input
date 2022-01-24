@@ -73,8 +73,8 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::INJECT_POINTER_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectPointerEvent, this) },
         {MmiMessageId::ADD_KEY_EVENT_INTERCEPTOR, MsgCallbackBind2(&ServerMsgHandler::OnAddKeyEventFilter, this)},
         {MmiMessageId::REMOVE_KEY_EVENT_INTERCEPTOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveKeyEventFilter, this)},
-        {MmiMessageId::INPUT_DEVICE_INFO, MsgCallbackBind2(&ServerMsgHandler::OnGetDeviceInfo, this)},
-        {MmiMessageId::INPUT_DEVICE_ID_LIST, MsgCallbackBind2(&ServerMsgHandler::OnGetDeviceIdList, this)},
+        {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ServerMsgHandler::OnInputDevice, this)},
+        {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ServerMsgHandler::OnInputDeviceIds, this)},
         {MmiMessageId::ADD_TOUCH_EVENT_INTERCEPTOR, MsgCallbackBind2(&ServerMsgHandler::OnAddTouchEventFilter, this)},
         {MmiMessageId::REMOVE_TOUCH_EVENT_INTERCEPTOR,
             MsgCallbackBind2(&ServerMsgHandler::OnRemoveTouchEventFilter, this)},
@@ -223,7 +223,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterAppInfo(SessionPtr sess, NetPacke
     std::string appName;
     int32_t fd = sess->GetFd();
     pkt >> abilityId >> windowId >> bundlerName >> appName;
-    struct AppInfo appInfo = { abilityId, windowId, fd, bundlerName, appName };
+    AppInfo appInfo = { abilityId, windowId, fd, bundlerName, appName };
 
     AppRegs->RegisterAppInfoforServer(appInfo);
 #if !defined(OHOS_BUILD) || !defined(OHOS_WESTEN_MODEL)
@@ -435,7 +435,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
     MMI_LOGT("time:%{public}u,keycode:%{public}u,state:%{public}u,\
         isIntercepted:%{public}d", event.keyDownDuration, event.keyCode,
         event.isPressed, event.isIntercepted);
-    struct EventKeyboard key = {};
+    EventKeyboard key = {};
     auto packageResult = EventPackage::PackageVirtualKeyEvent(event, key);
     if (packageResult == RET_ERR) {
         return RET_ERR;
@@ -698,57 +698,60 @@ int32_t OHOS::MMI::ServerMsgHandler::OnUnSubscribeKeyEvent(SessionPtr sess, NetP
     return ret;
 }
 
-int32_t OHOS::MMI::ServerMsgHandler::OnGetDeviceIdList(SessionPtr sess, NetPacket& pkt)
+int32_t OHOS::MMI::ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket& pkt)
 {
+    MMI_LOGI("begin");
+    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
     int32_t taskId = 0;
     CHKR(pkt.Read(taskId), STREAM_BUF_READ_FAIL, RET_ERR);
 
 #ifdef OHOS_WESTEN_MODEL
-    INPUTDEVMGR->GetDeviceIdListAsync([taskId, sess, this](std::vector<int32_t> idList) {
-        CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
-        NetPacket pkt2(MmiMessageId::INPUT_DEVICE_ID_LIST);
-        int32_t num = idList.size();
+    inputDeviceManager->GetInputDeviceIdsAsync([taskId, sess, this](std::vector<int32_t> ids) {
+        NetPacket pkt2(MmiMessageId::INPUT_DEVICE_IDS);
+        int32_t num = ids.size();
         CHKR(pkt2.Write(taskId), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt2.Write(num), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        for (auto it : idList) {
+        for (auto it : ids) {
             CHKR(pkt2.Write(it), STREAM_BUF_WRITE_FAIL, RET_ERR);
         }
         if (!sess->SendMsg(pkt2)) {
-            MMI_LOGE("Sending structure of OnGetDeviceInfo failed");
+            MMI_LOGE("Sending failed!\n");
+            return MSG_SEND_FAIL;
         }
-        return RET_OK;
     });
 #else
-    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
-    std::vector<int32_t> idList = INPUTDEVMGR->GetDeviceIds();
-    NetPacket pkt2(MmiMessageId::INPUT_DEVICE_ID_LIST);
-    int32_t size = idList.size();
+    std::vector<int32_t> ids = inputDeviceManager->GetInputDeviceIds();
+    NetPacket pkt2(MmiMessageId::INPUT_DEVICE_IDS);
+    int32_t size = ids.size();
     CHKR(pkt2.Write(taskId), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pkt2.Write(size), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    for (auto it : idList) {
+    for (auto it : ids) {
         CHKR(pkt2.Write(it), STREAM_BUF_WRITE_FAIL, RET_ERR);
     }
     if (!sess->SendMsg(pkt2)) {
-        MMI_LOGE("Sending structure of OnGetDeviceInfo failed");
+        MMI_LOGE("Sending failed!\n");
         return MSG_SEND_FAIL;
     }
 #endif
+    MMI_LOGE("end");
     return RET_OK;
 }
 
-int32_t OHOS::MMI::ServerMsgHandler::OnGetDeviceInfo(SessionPtr sess, NetPacket& pkt)
+int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
 {
-    MMI_LOGE("Sending structure of OnGetDeviceInfo enter");
+    MMI_LOGI("begin");
+    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
     int32_t taskId = 0;
     int deviceId = 0;
     CHKR(pkt.Read(taskId), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(pkt.Read(deviceId), STREAM_BUF_READ_FAIL, RET_ERR);
 
 #ifdef OHOS_WESTEN_MODEL
-    INPUTDEVMGR->FindDeviceByIdAsync(deviceId, [taskId, sess, this](std::shared_ptr<InputDevice> inputDevice) {
-        CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
-        NetPacket pkt2(MmiMessageId::INPUT_DEVICE_INFO);
+    inputDeviceManager->FindInputDeviceByIdAsync(deviceId,
+        [taskId, sess, this](std::shared_ptr<InputDevice> inputDevice) {
+        NetPacket pkt2(MmiMessageId::INPUT_DEVICE);
         if (inputDevice == nullptr) {
+            MMI_LOGI("Input device not found.");
             int32_t id = -1;
             std::string name = "null";
             int32_t deviceType = -1;
@@ -758,29 +761,33 @@ int32_t OHOS::MMI::ServerMsgHandler::OnGetDeviceInfo(SessionPtr sess, NetPacket&
             CHKR(pkt2.Write(name), STREAM_BUF_WRITE_FAIL, RET_ERR);
             CHKR(pkt2.Write(deviceType), STREAM_BUF_WRITE_FAIL, RET_ERR);
             if (!sess->SendMsg(pkt2)) {
-                MMI_LOGE("Sending structure of OnGetDeviceInfo failed");
+                MMI_LOGE("Sending failed!\n");
+                return MSG_SEND_FAIL;
             }
             return RET_OK;
         }
 
         int32_t id = inputDevice->GetId();
         std::string name = inputDevice->GetName();
-        int32_t deviceType = inputDevice->GetDeviceType();
+        int32_t deviceType = inputDevice->GetType();
 
         CHKR(pkt2.Write(taskId), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt2.Write(id), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt2.Write(name), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt2.Write(deviceType), STREAM_BUF_WRITE_FAIL, RET_ERR);
         if (!sess->SendMsg(pkt2)) {
-            MMI_LOGE("Sending structure of OnGetDeviceInfo failed");
+            MMI_LOGE("Sending failed!\n");
+            return MSG_SEND_FAIL;
         }
-        MMI_LOGE("Sending structure of OnGetDeviceInfo success");
+        MMI_LOGI("end");
         return RET_OK;
     });
+
 #else
-    std::shared_ptr<InputDevice> inputDevice = INPUTDEVMGR->GetDevice(deviceId);
-    NetPacket pkt2(MmiMessageId::INPUT_DEVICE_INFO);
+    std::shared_ptr<InputDevice> inputDevice = inputDeviceManager->GetInputDevice(deviceId);
+    NetPacket pkt2(MmiMessageId::INPUT_DEVICE);
     if (inputDevice == nullptr) {
+        MMI_LOGI("Input device not found.");
         int32_t id = -1;
         std::string name = "null";
         int32_t deviceType = -1;
@@ -789,23 +796,24 @@ int32_t OHOS::MMI::ServerMsgHandler::OnGetDeviceInfo(SessionPtr sess, NetPacket&
         CHKR(pkt2.Write(name), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt2.Write(deviceType), STREAM_BUF_WRITE_FAIL, RET_ERR);
         if (!sess->SendMsg(pkt2)) {
-            MMI_LOGE("Sending structure of OnGetDeviceInfo failed");
+            MMI_LOGE("Sending failed!\n");
             return MSG_SEND_FAIL;
         }
         return RET_OK;
     }
     int32_t id = inputDevice->GetId();
     std::string name = inputDevice->GetName();
-    int32_t deviceType = inputDevice->GetDeviceType();
+    int32_t deviceType = inputDevice->GetType();
     CHKR(pkt2.Write(taskId), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pkt2.Write(id), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pkt2.Write(name), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pkt2.Write(deviceType), STREAM_BUF_WRITE_FAIL, RET_ERR);
     if (!sess->SendMsg(pkt2)) {
-        MMI_LOGE("Sending structure of OnGetDeviceInfo failed");
+        MMI_LOGE("Sending failed!\n");
         return MSG_SEND_FAIL;
     }
 #endif
+    MMI_LOGI("end");
     return RET_OK;
 }
 
