@@ -639,7 +639,7 @@ int32_t EventPackage::PackagePointerEvent(libinput_event *event,
     return ret;
 }
 
-int32_t OHOS::MMI::EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& gesture, UDSServer& udsServer)
+int32_t EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& gesture, UDSServer& udsServer)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_gesture_event(event);
@@ -654,17 +654,17 @@ int32_t OHOS::MMI::EventPackage::PackageGestureEvent(libinput_event *event, Even
     auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN: {
-            gesture.pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN;
+            gesture.pointerEventType = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
             break;
         }
         case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE: {
-            gesture.pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE;
+            gesture.pointerEventType = PointerEvent::POINTER_ACTION_AXIS_UPDATE;
             gesture.scale = libinput_event_gesture_get_scale(data);
             gesture.angle = libinput_event_gesture_get_angle_delta(data);
             break;
         }
         case LIBINPUT_EVENT_GESTURE_PINCH_END: {
-            gesture.pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END;
+            gesture.pointerEventType = PointerEvent::POINTER_ACTION_AXIS_END;
             gesture.scale = libinput_event_gesture_get_scale(data);
             gesture.angle = libinput_event_gesture_get_angle_delta(data);
             gesture.cancelled = libinput_event_gesture_get_cancelled(data);
@@ -736,7 +736,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key,
 }
 
 int32_t EventPackage::PackageKeyEvent(libinput_event *event,
-    std::shared_ptr<OHOS::MMI::KeyEvent> kevnPtr, UDSServer& udsServer)
+    std::shared_ptr<KeyEvent> kevnPtr, UDSServer& udsServer)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("PackageKeyEvent begin");
@@ -757,7 +757,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event,
     int32_t actionTime = static_cast<int64_t>(GetSysClockTime());
     int32_t keyCode = static_cast<int32_t>(hosKey.keyValueOfHos);
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
-        (OHOS::MMI::KeyEvent::KEY_ACTION_UP) : (OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+        (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
     int32_t actionStartTime = static_cast<int32_t>(libinput_event_keyboard_get_time_usec(data));
 
     kevnPtr->SetActionTime(actionTime);
@@ -767,7 +767,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event,
     kevnPtr->SetKeyCode(keyCode);
     kevnPtr->SetKeyAction(keyAction);
 
-    OHOS::MMI::KeyEvent::KeyItem item;
+    KeyEvent::KeyItem item;
     bool isKeyPressed = (libinput_event_keyboard_get_key_state(data) == 0) ? (false) : (true);
     if (isKeyPressed) {
         int32_t keyDownTime = actionStartTime;
@@ -777,10 +777,10 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event,
     item.SetDeviceId(deviceId);
     item.SetPressed(isKeyPressed); 
 
-    if (keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
+    if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         kevnPtr->AddPressedKeyItems(item);
     }
-    if (keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
+    if (keyAction == KeyEvent::KEY_ACTION_UP) {
         kevnPtr->RemoveReleasedKeyItems(item);
     }
     MMI_LOGD("PackageKeyEvent end");
@@ -810,15 +810,15 @@ int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& k
 }
 
 int32_t EventPackage::KeyboardToKeyEvent(EventKeyboard& key,
-    std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr, UDSServer& udsServer)
+    std::shared_ptr<KeyEvent> keyEventPtr, UDSServer& udsServer)
 {
     CHKR(keyEventPtr, ERROR_NULL_POINTER, RET_ERR);
     keyEventPtr->UpdateId();
-    OHOS::MMI::KeyEvent::KeyItem keyItem;
+    KeyEvent::KeyItem keyItem;
     int32_t actionTime = static_cast<int64_t>(GetSysClockTime());
     int32_t keyCode = static_cast<int32_t>(key.key);
     int32_t keyAction = (key.state == KEY_STATE_PRESSED) ?
-        (OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) : (OHOS::MMI::KeyEvent::KEY_ACTION_UP);
+        (KeyEvent::KEY_ACTION_DOWN) : (KeyEvent::KEY_ACTION_UP);
     int32_t deviceId = static_cast<int32_t>(key.deviceId);
     int32_t actionStartTime = static_cast<int32_t>(key.time);
 
@@ -839,9 +839,9 @@ int32_t EventPackage::KeyboardToKeyEvent(EventKeyboard& key,
     keyItem.SetDeviceId(deviceId);
     keyItem.SetPressed(isKeyPressed);
 
-    if (keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
+    if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         keyEventPtr->AddPressedKeyItems(keyItem);
-    } else if (keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
+    } else if (keyAction == KeyEvent::KEY_ACTION_UP) {
         keyEventPtr->RemoveReleasedKeyItems(keyItem);
     } else {
         // nothing to do.
@@ -851,16 +851,15 @@ int32_t EventPackage::KeyboardToKeyEvent(EventKeyboard& key,
 
 const uint16_t pointerID = 1; // mouse has only one PoingeItem, so id is 1
 
-std::shared_ptr<OHOS::MMI::PointerEvent> EventPackage::LibinputEventToPointerEvent(libinput_event *event,
-                                                                                   UDSServer& udsServer)
+std::shared_ptr<PointerEvent> EventPackage::LibinputEventToPointerEvent(libinput_event *event, UDSServer& udsServer)
 {
     int32_t defaultDeviceId = 0;
     double gestureScale = 0;
     int32_t pointerEventType = 0;
-    auto pointerEvent = OHOS::MMI::PointerEvent::Create();
+    auto pointerEvent = PointerEvent::Create();
     auto data = libinput_event_get_gesture_event(event);
     auto type = libinput_event_get_type(event);
-    OHOS::MMI::PointerEvent::PointerItem pointer;
+    PointerEvent::PointerItem pointer;
     pointer.SetGlobalX(MouseState->GetMouseCoordsX());
     pointer.SetGlobalY(MouseState->GetMouseCoordsY());
     pointer.SetPointerId(pointerID);
@@ -877,16 +876,16 @@ std::shared_ptr<OHOS::MMI::PointerEvent> EventPackage::LibinputEventToPointerEve
     
     switch (type) {
         case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN: {
-            pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN;
+            pointerEventType = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
             break;
         }
         case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE: {
-            pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE;
+            pointerEventType = PointerEvent::POINTER_ACTION_AXIS_UPDATE;
             gestureScale = libinput_event_gesture_get_scale(data);
             break;
         }
         case LIBINPUT_EVENT_GESTURE_PINCH_END: {
-            pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END;
+            pointerEventType = PointerEvent::POINTER_ACTION_AXIS_END;
             gestureScale = libinput_event_gesture_get_scale(data);
             break;
         }
