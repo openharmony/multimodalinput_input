@@ -35,7 +35,7 @@ HWTEST_F(GetDeviceNodeTest, Test_GetDeviceNodeTest, TestSize.Level1)
 {
     GetDeviceNode getDeviceNode;
     const string cmd = "";
-    StringList cmdResult;
+    std::vector<std::string> cmdResult;
     auto ret = getDeviceNode.ExecuteCmd(cmd, cmdResult);
     EXPECT_EQ(ret, RET_ERR);
 }
@@ -44,7 +44,7 @@ HWTEST_F(GetDeviceNodeTest, Test_GetDeviceNodeTestCmdError, TestSize.Level1)
 {
     GetDeviceNode getDeviceNode;
     const string cmd = "temp";
-    StringList cmdResult;
+    std::vector<std::string> cmdResult;
     auto ret = getDeviceNode.ExecuteCmd(cmd, cmdResult);
     EXPECT_GT(ret, 0);
 }

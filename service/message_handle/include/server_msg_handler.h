@@ -62,8 +62,8 @@ protected:
     int32_t OnAddInputHandler(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt);
     int32_t OnMarkConsumed(SessionPtr sess, NetPacket& pkt);
-    int32_t OnGetDeviceInfo(SessionPtr sess, NetPacket& pkt);
-    int32_t OnGetDeviceIdList(SessionPtr sess, NetPacket& pkt);
+    int32_t OnInputDevice(SessionPtr sess, NetPacket& pkt);
+    int32_t OnInputDeviceIds(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveInputEventMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt);

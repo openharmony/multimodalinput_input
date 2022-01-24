@@ -129,6 +129,10 @@ namespace OHOS {
         EXP_SO_LIBY_INIT_FAIL,                      // 可扩展模块初始化错误
         SASERVICE_PERMISSION_FAIL,                  // SA_Service权限不足
         SASERVICE_IPC_CALL_FAIL,                    // SA_Service调用失败
+        STREAMBUFF_OVER_FLOW,                       // 缓冲区写入错误
+        ADD_SESSION_FAIL,                           // 增加session错误
+        MAKE_SHARED_FAIL,                           // make_shared错误
+        CLEAR_DEAD_SESSION_FAIL,                    // 清理无效的session错误
     };
     // Error code for util
     constexpr ErrCode UTIL_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_UTIL);

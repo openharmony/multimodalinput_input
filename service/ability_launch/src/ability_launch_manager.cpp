@@ -184,10 +184,10 @@ bool OHOS::MMI::AbilityLaunchManager::CheckLaunchAbility(std::shared_ptr<OHOS::M
     for (auto iter = shortcutKeysMap.begin(); iter != shortcutKeysMap.end(); ++iter) {
         ShortcutKey &shortcutKey = iter->second;
         int32_t keyCode = key->GetKeyCode();
-        const std::string checkkeycode = std::to_string(keyCode);
-        MMI_LOGT(" CheckLaunchAbility service trace GetKeyCode = %{public}s\n", checkkeycode.c_str());
-        int32_t EVENT_KEY = 1;
-        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, checkkeycode, EVENT_KEY);
+        std::string checkkeycode = "CheckLaunchAbility service GetKeyCode: " + std::to_string(keyCode);
+        MMI_LOGT(" CheckLaunchAbility service trace GetKeyCode = %{public}d\n", keyCode);
+        int32_t eventKey = 1;
+        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, checkkeycode, eventKey);
         if (!CheckShortcutkeyMatch(shortcutKey, key)) {
             continue;
         }

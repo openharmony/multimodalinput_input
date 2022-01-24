@@ -24,21 +24,21 @@ class VirtualDevice {
 public:
     VirtualDevice(const std::string &device_name, uint16_t busType, uint16_t vendorId, uint16_t product_id);
     virtual ~VirtualDevice();
-    static bool CatFload(StringList& fileList);
+    static bool CatFload(std::vector<std::string>& fileList);
     static bool SyncSymbolFile();
     bool DoIoctl(int32_t fd, int32_t request, const uint32_t value);
     bool CreateKey();
     bool SetAbsResolution(const std::string deviceName);
     bool SetPhys(const std::string deviceName);
     bool SetUp();
-    static void CloseAllDevice(const StringList& fileList);
+    static void CloseAllDevice(const std::vector<std::string>& fileList);
     static void StartAllDevices();
     static void MakeFolder(const std::string &filePath);
-    static bool SelectDevice(StringList& fileList);
+    static bool SelectDevice(std::vector<std::string>& fileList);
     static bool CreateHandle(const std::string deviceArgv);
-    static bool AddDevice(const StringList& fileList);
-    static bool CloseDevice(const StringList& fileList);
-    static bool FunctionalShunt(const std::string firstArgv, StringList argvList);
+    static bool AddDevice(const std::vector<std::string>& fileList);
+    static bool CloseDevice(const std::vector<std::string>& fileList);
+    static bool FunctionalShunt(const std::string firstArgv, std::vector<std::string> argvList);
 
 protected:
     virtual const std::vector<uint32_t>& GetEventTypes() const;

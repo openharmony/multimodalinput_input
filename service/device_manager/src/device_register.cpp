@@ -46,15 +46,17 @@ bool DeviceRegister::Init()
     return true;
 }
 
-uint32_t DeviceRegister::FindDeviceIdByDevicePhys(const std::string& devicePhys)
+bool DeviceRegister::FindDeviceIdByDevicePhys(const std::string& devicePhys, uint32_t& deviceId)
 {
     std::lock_guard<std::mutex> lock(mu_);
     const uint32_t DEFAULT_DEVICE_ID = 0;
     auto it = mapDeviceInfo_.find(devicePhys);
-    if (it != mapDeviceInfo_.end()) {
-        return it->second;
+    if (it == mapDeviceInfo_.end()) {
+        deviceId = DEFAULT_DEVICE_ID;
+        return false;
     }
-    return DEFAULT_DEVICE_ID;
+    deviceId = it->second;
+    return true;
 }
 
 uint32_t DeviceRegister::AddDeviceInfo(std::string& devicePhys)

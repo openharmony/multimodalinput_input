@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include <display_type.h>
+#include <ui/rs_surface_node.h>
 #include "pointer_drawing_manager.h"
 #include "image_type.h"
 #include "image_utils.h"

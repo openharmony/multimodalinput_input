@@ -72,7 +72,7 @@ public:
     */
     void OnEventTouchGetSign(const EventTouch& touch, MmiMessageId& msgId);
     void OnEventGestureGetSign(const EventGesture& gesture, MmiMessageId& msgId);
-    int32_t GetTouchInfoByTouchId(EventTouch& touch, const PAIR<uint32_t, int32_t> key);
+    int32_t GetTouchInfoByTouchId(const std::pair<uint32_t, int32_t> key, EventTouch& touch);
     void GetTouchIds(std::vector<std::pair<uint32_t, int32_t>>& touchIds, const uint32_t deviceId);
     int32_t GetTouchInfoSizeByDeviceId(const uint32_t deviceId);
 protected:
@@ -85,6 +85,7 @@ protected:
     int32_t OnEventTouchMotionGetSign(const EventTouch& touch, MmiMessageId& msgId);
     int32_t OnEventTouchUpGetSign(const EventTouch& touch, MmiMessageId& msgId);
     bool OnGetRepeatKetState(const uint32_t keyCode, MmiMessageId& msgId);
+    int32_t SetPrevKeyValue(EventKeyboard& prevKey);
     int32_t OnEventKeyJudge(EventKeyboard& key, MmiMessageId& msgId, EventKeyboard& prevKey);
     /*
     * Method:    GetBitNum

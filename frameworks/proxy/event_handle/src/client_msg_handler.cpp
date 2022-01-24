@@ -99,8 +99,8 @@ bool OHOS::MMI::ClientMsgHandler::Init()
         {MmiMessageId::ON_DEVICE_REMOVED, MsgCallbackBind2(&ClientMsgHandler::DeviceRemove, this)},
         {MmiMessageId::KEY_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::KeyEventFilter, this)},
         {MmiMessageId::TOUCH_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::TouchEventFilter, this)},
-        {MmiMessageId::INPUT_DEVICE_INFO, MsgCallbackBind2(&ClientMsgHandler::OnInputDevice, this)},
-        {MmiMessageId::INPUT_DEVICE_ID_LIST, MsgCallbackBind2(&ClientMsgHandler::OnInputDeviceIds, this)},
+        {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ClientMsgHandler::OnInputDevice, this)},
+        {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ClientMsgHandler::OnInputDeviceIds, this)},
         {MmiMessageId::POINTER_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::PointerEventInterceptor, this)},
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
@@ -162,23 +162,16 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPack
     MMI_LOGT("\n4.event dispatcher of clien:\nKeyEvent:KeyCode = %{public}d,"
              "ActionTime = %{public}d,Action = %{public}d,ActionStartTime = %{public}d,"
              "EventType = %{public}d,Flag = %{public}d,"
-             "KeyAction = %{public}d,Fd = %{public}d,ServerStartTime = %{public}" PRId64"\n",
+             "KeyAction = %{public}d, eventNumber = %{public}d, Fd = %{public}d,"
+             "ServerStartTime = %{public}" PRId64"\n",
              key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
              key->GetActionStartTime(), key->GetEventType(),
-             key->GetFlag(), key->GetKeyAction(), fd, serverStartTime);
+             key->GetFlag(), key->GetKeyAction(), key->GetId(), fd, serverStartTime);
     int32_t getKeyCode = key->GetKeyCode();
-    std::string keyCodestring = std::to_string(getKeyCode);
-    MMI_LOGT(" OnKeyEvent client trace keyId = %{public}s\n", keyCodestring.c_str());
-    int32_t EVENT_KEY = 1;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, EVENT_KEY);
-    
-    key->SetProcessedCallback([&client, &key]() {
-        NetPacket ckt(MmiMessageId::NEW_CHECK_REPLY_MESSAGE);
-        auto id = key->GetId();
-        ckt << id;
-        client.SendMsg(ckt);
-    });
-
+    std::string keyCodestring = "event dispatcher of client GetKeyCode: " + std::to_string(getKeyCode);
+    MMI_LOGT(" OnKeyEvent client trace keyCode = %{public}d\n", getKeyCode);
+    int32_t eventKey = 1;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
     InputManagerImpl::GetInstance()->OnKeyEvent(key);
     return RET_OK;
 }
@@ -197,14 +190,14 @@ int32_t OHOS::MMI::ClientMsgHandler::OnPointerEvent(const UDSClient& client, Net
              "action=%{public}d,actionStartTime=%{public}d,"
              "flag=%{public}d,pointerAction=%{public}d,sourceType=%{public}d,"
              "VerticalAxisValue=%{public}.2f,HorizontalAxisValue=%{public}.2f,"
-             "pointerCount=%{public}d",
+             "pointerCount=%{public}d, eventNumber = %{public}d",
              pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
              pointerEvent->GetFlag(), pointerEvent->GetPointerAction(),
              pointerEvent->GetSourceType(),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
-             static_cast<int32_t>(pointerIds.size()));
+             static_cast<int32_t>(pointerIds.size()), pointerEvent->GetId());
     std::vector<int32_t> pressedKeys = pointerEvent->GetPressedKeys();
     if (pressedKeys.empty()) {
         MMI_LOGI("Pressed keys is empty");
@@ -227,14 +220,6 @@ int32_t OHOS::MMI::ClientMsgHandler::OnPointerEvent(const UDSClient& client, Net
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_LOGD("Operation canceled.");
     }
-
-    pointerEvent->SetProcessedCallback([&client, &pointerEvent]() {
-        NetPacket ckt(MmiMessageId::NEW_CHECK_REPLY_MESSAGE);
-        auto id = pointerEvent->GetId();
-        ckt << id;
-        client.SendMsg(ckt);
-    });
-
     InputManagerImpl::GetInstance()->OnPointerEvent(pointerEvent);
     return RET_OK;
 }
@@ -794,11 +779,11 @@ int32_t OHOS::MMI::ClientMsgHandler::PointerEventInterceptor(const UDSClient& cl
     mmiPoint.Setxy(pointData.delta.x, pointData.delta.y);
     MMI_LOGT("WangYuan\nevent dispatcher of client: mouse_data \neventPointer:time=%{public}" PRId64 ";"
              "eventType=%{public}d;buttonCode=%{public}u;deviceType=%{public}u;"
-             "seat_button_count=%{public}u;axes=%{public}u;buttonState=%{public}d;source=%{public}d;"
+             "seat_button_count=%{public}u;axis=%{public}u;buttonState=%{public}d;source=%{public}d;"
              "delta.x=%{public}lf;delta.y=%{public}lf;delta_raw.x=%{public}lf;delta_raw.y=%{public}lf;"
              "absolute.x=%{public}lf;absolute.y=%{public}lf;discYe.x=%{public}lf;discrete.y=%{public}lf.\n",
              pointData.time, pointData.eventType, pointData.button, pointData.deviceType,
-             pointData.seat_button_count, pointData.axes, pointData.state, pointData.source, pointData.delta.x,
+             pointData.seat_button_count, pointData.axis, pointData.state, pointData.source, pointData.delta.x,
              pointData.delta.y, pointData.delta_raw.x, pointData.delta_raw.y, pointData.absolute.x,
              pointData.absolute.y, pointData.discrete.x, pointData.discrete.y);
     TracePointerEvent(pointData);
@@ -889,11 +874,11 @@ void OHOS::MMI::ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, Ne
     pkt >> ret >> pointData >> abilityId >> windowId >> fd >> serverStartTime;
     MMI_LOGT("\nevent dispatcher of client: mouse_data \neventPointer:time=%{public}" PRId64 "; eventType=%{public}d;"
              "buttonCode=%{public}u;deviceType=%{public}u;seat_button_count=%{public}u;"
-             "axes=%{public}u;buttonState=%{public}d;source=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
+             "axis=%{public}u;buttonState=%{public}d;source=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
              "delta_raw.x=%{public}lf;delta_raw.y=%{public}lf;absolute.x=%{public}lf;absolute.y=%{public}lf;"
              "discYe.x=%{public}lf;discrete.y=%{public}lf;fd=%{public}d;\n",
              pointData.time, pointData.eventType, pointData.button, pointData.deviceType,
-             pointData.seat_button_count, pointData.axes, pointData.state, pointData.source, pointData.delta.x,
+             pointData.seat_button_count, pointData.axis, pointData.state, pointData.source, pointData.delta.x,
              pointData.delta.y, pointData.delta_raw.x, pointData.delta_raw.y, pointData.absolute.x,
              pointData.absolute.y, pointData.discrete.x, pointData.discrete.y, fd);
     TracePointerEvent(pointData);
@@ -1234,39 +1219,42 @@ void OHOS::MMI::ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, 
 
 void OHOS::MMI::ClientMsgHandler::TraceKeyEvent(const EventKeyboard& key) const
 {
-    int32_t EVENT_KEY = 1;
     char keyUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT("\n nevent dispatcher of client: keyUuid = %{public}s\n", keyUuid);
+    MMI_LOGT(" nevent dispatcher of client: keyUuid = %{public}s\n", keyUuid);
     std::string keyEvent = keyUuid;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
+    keyEvent = " nevent dispatcher of client keyUuid: " + keyEvent;
+    int32_t eventKey = 1;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 }
 
 void OHOS::MMI::ClientMsgHandler::TracePointerEvent(const EventPointer& pointData) const
 {
-    int32_t EVENT_POINTER = 17;
     char pointerUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(pointerUuid, sizeof(pointerUuid), pointData.uuid, sizeof(pointData.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT("\n nevent dispatcher of client: pointerUuid = %{public}s\n", pointerUuid);
+    MMI_LOGT(" nevent dispatcher of client: pointerUuid = %{public}s\n", pointerUuid);
     std::string pointerEvent = pointerUuid;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
+    pointerEvent = " nevent dispatcher of client pointerUuid: " + pointerEvent;
+    int32_t eventPointer = 17;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
 }
 
 void OHOS::MMI::ClientMsgHandler::TraceTouchEvent(const EventTouch& touchData) const
 {
-    int32_t EVENT_TOUCH = 9;
     char touchUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(touchUuid, sizeof(touchUuid), touchData.uuid, sizeof(touchData.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT("\n nevent dispatcher of client: touchUuid = %{public}s\n", touchUuid);
+    MMI_LOGT(" nevent dispatcher of client: touchUuid = %{public}s\n", touchUuid);
     std::string touchEventString = touchUuid;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, EVENT_TOUCH);
+    touchEventString = " nevent dispatcher of client touchUuid: " + touchEventString;
+    int32_t eventTouch = 9;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, eventTouch);
 }

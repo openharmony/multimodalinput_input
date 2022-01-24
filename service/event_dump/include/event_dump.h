@@ -32,7 +32,7 @@ public:
 
 private:
     std::mutex mu_;
-    StringList dumpInfo_;
+    std::vector<std::string> dumpInfo_;
     UDSServer* udsServer_ = nullptr;
 };
 };
