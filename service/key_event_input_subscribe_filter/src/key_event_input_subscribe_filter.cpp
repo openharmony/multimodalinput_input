@@ -82,8 +82,7 @@ int32_t KeyEventInputSubscribeFilter::UnSubscribeKeyEvent(SessionPtr sess, int32
     return RET_ERR;
 }
 
-bool KeyEventInputSubscribeFilter::FilterSubscribeKeyEvent(UDSServer& udsServer,
-        std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+bool KeyEventInputSubscribeFilter::FilterSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_LOGD("Enter");
 
@@ -289,9 +288,9 @@ bool KeyEventInputSubscribeFilter::HandleKeyDown(const std::shared_ptr<KeyEvent>
     for (auto& subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
         MMI_LOGD("SubscribeId=%{public}d, KeyOption->finalKey=%{public}d, "
-                "KeyOption->isFinalKeyDown=%{public}d, KeyOption->finalKeyDownDuriation=%{public}d",
-                subscriber->id_, keyOption->GetFinalKey(), ((keyOption->IsFinalKeyDown() == true) ? 1 : 0),
-                keyOption->GetFinalKeyDownDuration());
+                 "KeyOption->isFinalKeyDown=%{public}d, KeyOption->finalKeyDownDuriation=%{public}d",
+                 subscriber->id_, keyOption->GetFinalKey(), ((keyOption->IsFinalKeyDown() == true) ? 1 : 0),
+                 keyOption->GetFinalKeyDownDuration());
         for (auto keyCode : keyOption->GetPreKeys()) {
             MMI_LOGD("KeyOption->prekey=%{public}d", keyCode);
         }
@@ -339,9 +338,9 @@ bool KeyEventInputSubscribeFilter::HandleKeyUp(const std::shared_ptr<KeyEvent>& 
     for (auto& subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
         MMI_LOGD("SubscribeId=%{public}d, KeyOption->finalKey=%{public}d, "
-                "KeyOption->isFinalKeyDown=%{public}d, KeyOption->finalKeyDownDuriation=%{public}d",
-                subscriber->id_, keyOption->GetFinalKey(), ((keyOption->IsFinalKeyDown() == true) ? 1 : 0),
-                keyOption->GetFinalKeyDownDuration());
+                 "KeyOption->isFinalKeyDown=%{public}d, KeyOption->finalKeyDownDuriation=%{public}d",
+                 subscriber->id_, keyOption->GetFinalKey(), ((keyOption->IsFinalKeyDown() == true) ? 1 : 0),
+                 keyOption->GetFinalKeyDownDuration());
         for (auto keyCode : keyOption->GetPreKeys()) {
             MMI_LOGD("KeyOption->prekey=%{public}d", keyCode);
         }

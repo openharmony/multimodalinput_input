@@ -344,13 +344,13 @@ int32_t InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_event &ev)
 
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     uint64_t preHandlerTime = GetSysClockTime();
     if (keyEvent == nullptr) {
         keyEvent = KeyEvent::Create();
     }
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
-    auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent, *udsServer_);
+    auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
         MMI_LOGD("The same event reported by multi_device should be discarded!\n");
         return RET_OK;
@@ -393,7 +393,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(multimodal_libinput_event& ev)
         keyEvent = KeyEvent::Create();
     }
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
-    auto packageResult = eventPackage_.PackageKeyEvent(ev.event, keyEvent, *udsServer_);
+    auto packageResult = eventPackage_.PackageKeyEvent(ev.event, keyEvent);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
         MMI_LOGD("The same event reported by multi_device should be discarded!\n");
         return RET_OK;
@@ -434,11 +434,11 @@ int32_t InputEventHandler::OnKeyEventDispatch(multimodal_libinput_event& ev)
 
 int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     uint64_t preHandlerTime = GetSysClockTime();
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     EventKeyboard keyBoard = {};
-    auto packageResult = eventPackage_.PackageKeyEvent(event, keyBoard, *udsServer_);
+    auto packageResult = eventPackage_.PackageKeyEvent(event, keyBoard);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
         MMI_LOGD("The same event occurs on multiple devices, ret:%{puiblic}d", packageResult);
         return RET_OK;
@@ -460,7 +460,7 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
         keyEvent = KeyEvent::Create();
     }
     keyBoard.key = static_cast<uint32_t>(oKey.keyValueOfHos);
-    if (EventPackage::KeyboardToKeyEvent(keyBoard, keyEvent, *udsServer_) == RET_ERR) {
+    if (EventPackage::KeyboardToKeyEvent(keyBoard, keyEvent) == RET_ERR) {
         MMI_LOGE("On the OnKeyboardEvent translate key event error!");
         return RET_ERR;
     }
@@ -468,7 +468,7 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
         MMI_LOGD("Key event start launch an ability, keyCode:%{puiblic}d", keyBoard.key);
         return RET_OK;
     }
-    if (KeyEventInputSubscribeFlt.FilterSubscribeKeyEvent(*udsServer_, keyEvent)) {
+    if (KeyEventInputSubscribeFlt.FilterSubscribeKeyEvent(keyEvent)) {
         MMI_LOGD("Subscribe key event filter success. keyCode=%{puiblic}d", keyBoard.key);
         return RET_OK;
     }
@@ -508,7 +508,7 @@ int32_t InputEventHandler::OnEventKeyboard(multimodal_libinput_event &ev)
 
     CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     EventKeyboard keyBoard = {};
-    auto packageResult = eventPackage_.PackageKeyEvent(ev.event, keyBoard, *udsServer_);
+    auto packageResult = eventPackage_.PackageKeyEvent(ev.event, keyBoard);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
         MMI_LOGD("The same event occurs on multiple devices, ret:%{puiblic}d", packageResult);
         return RET_OK;
@@ -573,7 +573,7 @@ int32_t InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
         }
     }
     EventPointer point = {};
-    auto packageResult = eventPackage_.PackagePointerEvent(ev.event, point, *udsServer_);
+    auto packageResult = eventPackage_.PackagePointerEvent(ev.event, point);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
         MMI_LOGD("The same event reported by multi_device should be discarded!\n");
         return RET_OK;
@@ -620,13 +620,13 @@ int32_t InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
 
 int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("call  OnEventTouchSecond begin"); 
-    auto point = touchTransformPointManger->onLibinputTouchEvent(event);
+    auto point = touchTransformPointManger->OnLibinputTouchEvent(event);
     if (point == nullptr) {
         return RET_OK;
     }
-    eventDispatch_.handlePointerEvent(point);
+    eventDispatch_.HandlePointerEvent(point);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         point->RemovePointerItem(point->GetPointerId());
@@ -643,14 +643,14 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 
 int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("call  OnEventTouchPadSecond begin");
 
-    auto point = touchTransformPointManger->onLibinputTouchPadEvent(event);    
+    auto point = touchTransformPointManger->OnLibinputTouchPadEvent(event);
     if (point == nullptr) {
         return RET_OK;
     }
-    eventDispatch_.handlePointerEvent(point);
+    eventDispatch_.HandlePointerEvent(point);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
         point->RemovePointerItem(point->GetPointerId());
@@ -689,7 +689,7 @@ int32_t InputEventHandler::OnEventTouch(multimodal_libinput_event &ev)
     uint64_t preHandlerTime = GetSysClockTime();
     EventTouch touch = {};
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
-    auto packageResult = eventPackage_.PackageTouchEvent(ev.event, touch, *udsServer_);
+    auto packageResult = eventPackage_.PackageTouchEvent(ev.event, touch);
     if (packageResult == UNKNOWN_EVENT_PKG_FAIL) {
         return RET_OK;
     }
@@ -733,7 +733,7 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     
     auto pointerEvent = EventPackage::LibinputEventToPointerEvent(event, *udsServer_);
-    if (RET_OK == eventDispatch_.handlePointerEvent(pointerEvent)) {
+    if (RET_OK == eventDispatch_.HandlePointerEvent(pointerEvent)) {
         MMI_LOGD("interceptor of OnGestureEvent end .....");
         return RET_OK;
     }
@@ -865,7 +865,7 @@ int32_t InputEventHandler::OnEventJoyStickKey(multimodal_libinput_event &ev, con
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     EventKeyboard key = {};
-    auto packageResult = eventPackage_.PackageJoyStickKeyEvent(ev.event, key, *udsServer_);
+    auto packageResult = eventPackage_.PackageJoyStickKeyEvent(ev.event, key);
     if (packageResult != RET_OK) {
         MMI_LOGE("Joystickkey event package failed... ret:%{public}d errCode:%{public}d",
             packageResult, JOYSTICK_KEY_EVENT_PKG_FAIL);
@@ -910,7 +910,7 @@ int32_t InputEventHandler::OnEventJoyStickAxis(multimodal_libinput_event &ev, co
 
 int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event, const int32_t deviceId)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto mouseEvent = MouseEventHandler::Create();
     if (mouseEvent == nullptr) {
         return RET_ERR;
@@ -949,7 +949,7 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event, const int3
             item.GetDeviceId());
     }
 
-    eventDispatch_.handlePointerEvent(mouseEvent);
+    eventDispatch_.HandlePointerEvent(mouseEvent);
     return RET_OK;
 }
 
@@ -958,7 +958,7 @@ int32_t InputEventHandler::OnMouseEventTimerHanler(std::shared_ptr<PointerEvent>
     if (mouse_event == nullptr) {
         return RET_ERR;
     }
-    eventDispatch_.handlePointerEvent(mouse_event);
+    eventDispatch_.HandlePointerEvent(mouse_event);
     return RET_OK;
 }
 

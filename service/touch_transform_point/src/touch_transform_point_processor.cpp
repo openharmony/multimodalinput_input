@@ -27,14 +27,14 @@ TouchTransformPointProcessor::TouchTransformPointProcessor()
 
 TouchTransformPointProcessor::~TouchTransformPointProcessor() {}
 
-void TouchTransformPointProcessor::setPointEventSource(int32_t sourceType)
+void TouchTransformPointProcessor::SetPointEventSource(int32_t sourceType)
 {
     pointerEvent_->SetSourceType(sourceType);
 }
 
-void TouchTransformPointProcessor::onEventTouchDown(libinput_event *event)
+void TouchTransformPointProcessor::OnEventTouchDown(libinput_event *event)
 {
-    CHK(event, PARAM_INPUT_INVALID);
+    CHKP(event, PARAM_INPUT_INVALID);
     MMI_LOGD("this touch event is down");
     auto data = libinput_event_get_touch_event(event);
     auto seatSlot = libinput_event_touch_get_seat_slot(data);
@@ -71,9 +71,9 @@ void TouchTransformPointProcessor::onEventTouchDown(libinput_event *event)
     MMI_LOGD("this touch event is down end");
 }
 
-void TouchTransformPointProcessor::onEventTouchMotion(libinput_event *event)
+void TouchTransformPointProcessor::OnEventTouchMotion(libinput_event *event)
 {
-    CHK(event, PARAM_INPUT_INVALID);
+    CHKP(event, PARAM_INPUT_INVALID);
     MMI_LOGD("this touch event is motion begin");
     auto data = libinput_event_get_touch_event(event);
     auto time = libinput_event_touch_get_time(data);
@@ -96,9 +96,9 @@ void TouchTransformPointProcessor::onEventTouchMotion(libinput_event *event)
     MMI_LOGD("this touch event is motion end");
 }
 
-void TouchTransformPointProcessor::onEventTouchUp(libinput_event *event)
+void TouchTransformPointProcessor::OnEventTouchUp(libinput_event *event)
 {
-    CHK(event, PARAM_INPUT_INVALID);
+    CHKP(event, PARAM_INPUT_INVALID);
     MMI_LOGD("this touch event is up");
     auto data = libinput_event_get_touch_event(event);
     auto time = libinput_event_touch_get_time(data);
@@ -116,9 +116,9 @@ void TouchTransformPointProcessor::onEventTouchUp(libinput_event *event)
     MMI_LOGD("this touch event is up end");
 }
 
-std::shared_ptr<PointerEvent> TouchTransformPointProcessor::onLibinputTouchEvent(libinput_event *event)
+std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent(libinput_event *event)
 {
-    CHKR(event, PARAM_INPUT_INVALID, nullptr);
+    CHKPR(event, PARAM_INPUT_INVALID, nullptr);
     MMI_LOGD("call  onLibinputTouchEvent begin");
     if (pointerEvent_ == nullptr) {
         MMI_LOGE("pointerEvent_ is nullptr");
@@ -128,15 +128,15 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::onLibinputTouchEvent
     auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
-            onEventTouchDown(event);
+            OnEventTouchDown(event);
             break;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
-            onEventTouchUp(event);
+            OnEventTouchUp(event);
             break;
         }
         case LIBINPUT_EVENT_TOUCH_MOTION: {
-            onEventTouchMotion(event);
+            OnEventTouchMotion(event);
             break;
         }
         default: {

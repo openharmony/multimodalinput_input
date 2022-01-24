@@ -81,7 +81,7 @@ EventPackage::~EventPackage()
 template<class EventType>
 int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& data)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
     auto type = libinput_event_get_type(event);
@@ -345,9 +345,9 @@ int32_t EventPackage::PackageTabletPadKeyEvent(libinput_event *event, EventKeybo
     return RET_OK;
 }
 
-int32_t EventPackage::PackageJoyStickKeyEvent(libinput_event *event, EventKeyboard& key, UDSServer& udsServer)
+int32_t EventPackage::PackageJoyStickKeyEvent(libinput_event *event, EventKeyboard& key)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_joystick_pointer_button_event(event);
     CHKR(data, ERROR_NULL_POINTER, RET_ERR);
     key.time = libinput_event_joystick_button_time(data);
@@ -543,12 +543,12 @@ void EventPackage::PackageTouchEventByType(int32_t type, struct libinput_event_t
     return;
 }
 
-int32_t EventPackage::PackageTouchEvent(libinput_event *event,
-    EventTouch& touch, UDSServer& udsServer)
+int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
+        MMI_LOGT("This touch event is canceled type:%{public}d", type);
         return UNKNOWN_EVENT_PKG_FAIL;
     }
     auto ret = PackageEventDeviceInfo<EventTouch>(event, touch);
@@ -602,10 +602,9 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event,
     return RET_OK;
 }
 
-int32_t EventPackage::PackagePointerEvent(libinput_event *event,
-    EventPointer& point, UDSServer& udsServer)
+int32_t EventPackage::PackagePointerEvent(libinput_event *event, EventPointer& point)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto rDevRet = PackageEventDeviceInfo<EventPointer>(event, point);
     if (rDevRet != RET_OK) {
         MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", rDevRet, DEV_PARAM_PKG_FAIL);
@@ -705,9 +704,9 @@ int32_t EventPackage::PackageDeviceManageEvent(libinput_event *event, DeviceMana
     return RET_OK;
 }
 
-int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key, UDSServer& udsServer)
+int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_keyboard_event(event);
     CHKPR(data, ERROR_NULL_POINTER, RET_ERR);
     key.key = libinput_event_keyboard_get_key(data);
@@ -735,10 +734,9 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key,
     return RET_OK;
 }
 
-int32_t EventPackage::PackageKeyEvent(libinput_event *event,
-    std::shared_ptr<KeyEvent> kevnPtr, UDSServer& udsServer)
+int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<KeyEvent> kevnPtr)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("PackageKeyEvent begin");
     CHKR(kevnPtr, ERROR_NULL_POINTER, RET_ERR);
     kevnPtr->UpdateId();
@@ -809,10 +807,9 @@ int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& k
     return RET_OK;
 }
 
-int32_t EventPackage::KeyboardToKeyEvent(EventKeyboard& key,
-    std::shared_ptr<KeyEvent> keyEventPtr, UDSServer& udsServer)
+int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_ptr<KeyEvent> keyEventPtr)
 {
-    CHKR(keyEventPtr, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(keyEventPtr, ERROR_NULL_POINTER, RET_ERR);
     keyEventPtr->UpdateId();
     KeyEvent::KeyItem keyItem;
     int32_t actionTime = static_cast<int64_t>(GetSysClockTime());
