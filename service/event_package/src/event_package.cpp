@@ -848,8 +848,7 @@ int32_t EventPackage::KeyboardToKeyEvent(EventKeyboard& key,
 
 const uint16_t pointerID = 1; // mouse has only one PoingeItem, so id is 1
 
-std::shared_ptr<PointerEvent> EventPackage::LibinputEventToPointerEvent(libinput_event *event,
-                                                                                   UDSServer& udsServer)
+std::shared_ptr<PointerEvent> EventPackage::LibinputEventToPointerEvent(libinput_event *event, UDSServer& udsServer)
 {
     int32_t defaultDeviceId = 0;
     double gestureScale = 0;
