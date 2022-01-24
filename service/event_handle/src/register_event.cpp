@@ -291,7 +291,7 @@ void RegisterEvent::OnEventGestureGetSign(const EventGesture& gesture, MmiMessag
 void RegisterEvent::OnEventTouchGetSign(const EventTouch& touch, MmiMessageId& msgId)
 {
     CHK(touch.time > 0, PARAM_INPUT_INVALID);
-    CHK(touch.seat_slot >= 0, PARAM_INPUT_INVALID);
+    CHK(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
     CHK(touch.eventType >= 0, PARAM_INPUT_INVALID);
     switch (touch.eventType) {
         case LIBINPUT_EVENT_TOUCH_DOWN:
@@ -385,7 +385,7 @@ int32_t RegisterEvent::OnEventGestureEndGetSign(const EventGesture& gesture, Mmi
 int32_t RegisterEvent::OnEventTouchDownGetSign(const EventTouch& touch)
 {
     CHKF(touch.time > 0, PARAM_INPUT_INVALID);
-    CHKF(touch.seat_slot >= 0, PARAM_INPUT_INVALID);
+    CHKF(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
     TouchInfo touchDownInfo = {};
     TouchInfoBegin(touch.time, touch.point.x, touch.point.y, touchDownInfo);
     TouchInfoEnd(touch.time, touch.point.x, touch.point.y, touchDownInfo);
@@ -394,9 +394,9 @@ int32_t RegisterEvent::OnEventTouchDownGetSign(const EventTouch& touch)
     touchDownInfo.pressure = touch.pressure;
     touchDownInfo.area = touch.area;
     touchDownInfo.slot = touch.slot;
-    touchDownInfo.seat_slot = touch.seat_slot;
+    touchDownInfo.seatSlot = touch.seatSlot;
     touchInfos_.insert(std::map<std::pair<uint32_t, int32_t>,
-        TouchInfo>::value_type(std::make_pair(touch.deviceId, touch.seat_slot), touchDownInfo));
+        TouchInfo>::value_type(std::make_pair(touch.deviceId, touch.seatSlot), touchDownInfo));
     if (GetTouchInfoSizeByDeviceId(touchDownInfo.deviceId) > MAXFINGER) {
         DeleteTouchInfoByDeviceId(touchDownInfo.deviceId);
         return RET_ERR;
@@ -445,9 +445,9 @@ int32_t RegisterEvent::OnEventThreeFingerHandlerGetSign(MmiMessageId& msgId, Tou
 int32_t RegisterEvent::OnEventTouchUpGetSign(const EventTouch& touch, MmiMessageId& msgId)
 {
     CHKF(touch.time > 0, PARAM_INPUT_INVALID);
-    CHKF(touch.seat_slot >= 0, PARAM_INPUT_INVALID);
+    CHKF(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
     TouchInfo touchUpInfo = {};
-    auto iter = touchInfos_.find(std::make_pair(touch.deviceId, touch.seat_slot));
+    auto iter = touchInfos_.find(std::make_pair(touch.deviceId, touch.seatSlot));
     if (iter != touchInfos_.end()) {
         touchUpInfo = iter->second;
         touchInfos_.erase(iter);
@@ -467,8 +467,8 @@ int32_t RegisterEvent::OnEventTouchUpGetSign(const EventTouch& touch, MmiMessage
 int32_t RegisterEvent::OnEventTouchMotionGetSign(const EventTouch& touch, MmiMessageId& msgId)
 {
     CHKF(touch.time > 0, PARAM_INPUT_INVALID);
-    CHKF(touch.seat_slot >= 0, PARAM_INPUT_INVALID);
-    auto iter = touchInfos_.find(std::make_pair(touch.deviceId, touch.seat_slot));
+    CHKF(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
+    auto iter = touchInfos_.find(std::make_pair(touch.deviceId, touch.seatSlot));
     if (iter != touchInfos_.end()) {
         iter->second.endX = touch.point.x;
         iter->second.endY = touch.point.y;
@@ -476,7 +476,7 @@ int32_t RegisterEvent::OnEventTouchMotionGetSign(const EventTouch& touch, MmiMes
         iter->second.eventType = touch.eventType;
         iter->second.pressure = touch.pressure;
         iter->second.area = touch.area;
-        iter->second.seat_slot = touch.seat_slot;
+        iter->second.seatSlot = touch.seatSlot;
         iter->second.slot = touch.slot;
     } else {
         return RET_ERR;
@@ -506,7 +506,7 @@ int32_t RegisterEvent::GetTouchInfoByTouchId(const std::pair<uint32_t, int32_t> 
         touch.point.x = iter->second.endX;
         touch.point.y = iter->second.endY;
         touch.time = iter->second.endTime;
-        touch.seat_slot = iter->second.seat_slot;
+        touch.seatSlot = iter->second.seatSlot;
         touch.slot = iter->second.slot;
         touch.eventType = iter->second.eventType;
         touch.pressure = iter->second.pressure;
