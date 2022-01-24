@@ -384,7 +384,7 @@ int32_t OHOS::MMI::EventDispatch::handlePointerEvent(std::shared_ptr<PointerEven
             break;
         }
         default: {
-            MMI_LOGD("Unknown source type!");
+            MMI_LOGW("Unknown source type!");
             break;
         }
     }
