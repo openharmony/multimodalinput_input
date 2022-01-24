@@ -176,7 +176,7 @@ void TimerManager::ProcessTimersInternal()
         }
         curTimer->nextCallTime = nowTime + curTimer->intervalMs;
         const auto& timer = InsertTimerInternal(curTimer);
-        timer->callback();   
+        timer->callback();
     }
 }
 }
