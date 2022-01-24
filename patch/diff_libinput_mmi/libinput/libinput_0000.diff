@@ -2369,12 +2369,12 @@ diff -Naur old/src/evdev-mt-touchpad-tap.c new/src/evdev-mt-touchpad-tap.c
 +{
 +	struct libinput_device *base = &tp->device->base;
 +	int slot_idx = tp->slot;
-+	int seat_slot = t->seat_slot;
++	int seatSlot = t->seatSlot;
 +
 +	struct device_coords point;
 +	point = t->point;
 +
-+	touchpad_notify_touch_down(base, time, slot_idx, seat_slot, &point);
++	touchpad_notify_touch_down(base, time, slot_idx, seatSlot, &point);
 +}
 +
 +void
@@ -2384,10 +2384,10 @@ diff -Naur old/src/evdev-mt-touchpad-tap.c new/src/evdev-mt-touchpad-tap.c
 +{
 +	struct libinput_device *base = &tp->device->base;
 +	int slot_idx = tp->slot;
-+	int seat_slot = t->seat_slot;
-+	t->seat_slot = -1;
++	int seatSlot = t->seatSlot;
++	t->seatSlot = -1;
 +
-+	touchpad_notify_touch_up(base, time, slot_idx, seat_slot);
++	touchpad_notify_touch_up(base, time, slot_idx, seatSlot);
 +}
 +
 +void
@@ -2396,13 +2396,13 @@ diff -Naur old/src/evdev-mt-touchpad-tap.c new/src/evdev-mt-touchpad-tap.c
 +		    uint64_t time)
 +{
 +	struct libinput_device *base = &tp->device->base;
-+	int seat_slot = t->seat_slot;
++	int seatSlot = t->seatSlot;
 +	int slot_idx = tp->slot;
 +
 +	struct device_coords point;
 +	point = t->point;
 +
-+	touchpad_notify_touch_motion(base, time, slot_idx, seat_slot, &point);
++	touchpad_notify_touch_motion(base, time, slot_idx, seatSlot, &point);
 +}
 \ No newline at end of file
 diff -Naur old/src/evdev-mt-touchpad.c new/src/evdev-mt-touchpad.c
@@ -2412,7 +2412,7 @@ diff -Naur old/src/evdev-mt-touchpad.c new/src/evdev-mt-touchpad.c
  	t->speed.last_speed = 0;
  	t->speed.exceeded_count = 0;
  	t->hysteresis.x_motion_history = 0;
-+	t->seat_slot = -1;
++	t->seatSlot = -1;
  	tp->queued |= TOUCHPAD_EVENT_MOTION;
  }
  
@@ -2423,9 +2423,9 @@ diff -Naur old/src/evdev-mt-touchpad.c new/src/evdev-mt-touchpad.c
 +void tp_ext_post_event(struct tp_dispatch* dispatch, bool is_up, uint64_t time)
 +{
 +	struct tp_touch * t = tp_current_touch(dispatch);
-+	int seat_slot = t->seat_slot;
++	int seatSlot = t->seatSlot;
 +	if (is_up) {
-+		if (seat_slot == -1) {
++		if (seatSlot == -1) {
 +			return;
 +		}
 +
@@ -2442,8 +2442,8 @@ diff -Naur old/src/evdev-mt-touchpad.c new/src/evdev-mt-touchpad.c
 +		return;
 +	}
 +
-+	if (seat_slot == -1) {
-+		t->seat_slot = dispatch->orginal.seat_slot_id++;
++	if (seatSlot == -1) {
++		t->seatSlot = dispatch->orginal.seat_slot_id++;
 +		dispatch->orginal.active_slot_count++;
 +
 +		tp_tap_original_down(dispatch, t, time);
@@ -2554,7 +2554,7 @@ diff -Naur old/src/evdev-mt-touchpad.c new/src/evdev-mt-touchpad.c
  	t->tp = tp;
  	t->has_ended = true;
  	t->index = index;
-+	t->seat_slot = -1;
++	t->seatSlot = -1;
  }
  
  static inline void
@@ -2584,7 +2584,7 @@ diff -Naur old/src/evdev-mt-touchpad.h new/src/evdev-mt-touchpad.h
  	bool was_down; /* if distance == 0, false for pure hovering
  			  touches */
  
-+	int seat_slot;
++	int seatSlot;
 +
  	struct {
  		/* A quirk mostly used on Synaptics touchpads. In a
@@ -2850,21 +2850,21 @@ diff -Naur old/src/libinput-private.h new/src/libinput-private.h
 +touchpad_notify_touch_down(struct libinput_device *device,
 +			uint64_t time,
 +			int32_t slot,
-+			int32_t seat_slot,
++			int32_t seatSlot,
 +			const struct device_coords *point);
 +
 +void
 +touchpad_notify_touch_motion(struct libinput_device *device,
 +			  uint64_t time,
 +			  int32_t slot,
-+			  int32_t seat_slot,
++			  int32_t seatSlot,
 +			  const struct device_coords *point);
 +
 +void
 +touchpad_notify_touch_up(struct libinput_device *device,
 +		      uint64_t time,
 +		      int32_t slot,
-+		      int32_t seat_slot);
++		      int32_t seatSlot);
 +
 +void
  gesture_notify_swipe(struct libinput_device *device,
@@ -3153,7 +3153,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
 +			   LIBINPUT_EVENT_TOUCHPAD_UP,
 +			   LIBINPUT_EVENT_TOUCHPAD_MOTION);
 +
-+	return event->seat_slot;
++	return event->seatSlot;
 +}
 +
 +LIBINPUT_EXPORT double
@@ -3238,7 +3238,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
 +touchpad_notify_touch_down(struct libinput_device *device,
 +			uint64_t time,
 +			int32_t slot,
-+			int32_t seat_slot,
++			int32_t seatSlot,
 +			const struct device_coords *point)
 +{
 +	struct libinput_event_touch *touch_event;
@@ -3247,7 +3247,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
 +	*touch_event = (struct libinput_event_touch) {
 +		.time = time,
 +		.slot = slot,
-+		.seat_slot = seat_slot,
++		.seatSlot = seatSlot,
 +		.point = *point,
 +	};
 +
@@ -3260,7 +3260,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
 +touchpad_notify_touch_motion(struct libinput_device *device,
 +			  uint64_t time,
 +			  int32_t slot,
-+			  int32_t seat_slot,
++			  int32_t seatSlot,
 +			  const struct device_coords *point)
 +{
 +	struct libinput_event_touch *touch_event;
@@ -3269,7 +3269,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
 +	*touch_event = (struct libinput_event_touch) {
 +		.time = time,
 +		.slot = slot,
-+		.seat_slot = seat_slot,
++		.seatSlot = seatSlot,
 +		.point = *point,
 +	};
 +
@@ -3282,7 +3282,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
 +touchpad_notify_touch_up(struct libinput_device *device,
 +		      uint64_t time,
 +		      int32_t slot,
-+		      int32_t seat_slot)
++		      int32_t seatSlot)
 +{
 +	struct libinput_event_touch *touch_event;
 +	touch_event = zalloc(sizeof *touch_event);
@@ -3290,7 +3290,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
 +	*touch_event = (struct libinput_event_touch) {
 +		.time = time,
 +		.slot = slot,
-+		.seat_slot = seat_slot,
++		.seatSlot = seatSlot,
 +	};
 +
 +	post_device_event(device, time,

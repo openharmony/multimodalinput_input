@@ -751,7 +751,7 @@ void OHOS::MMI::InputWindowsManager::ReviseGlobalCoordinate(int32_t& globalX, in
 bool OHOS::MMI::InputWindowsManager::CheckDisplayIdIfExist(int32_t& displayId)
 {
     if (logicalDisplays_.empty()) {
-        MMI_LOGE("logicalDisplays_is empty address is %{public}p", &logicalDisplays_);
+        MMI_LOGE("logicalDisplays_is empty");
         return false;
     }
     if (displayId < 0) {
@@ -966,9 +966,11 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTargetPointer(std::shared_ptr<Poin
             return UpdateTouchPadTarget(pointerEvent);
         }
         default: {
+            MMI_LOGW("Source type is unknown, source:%{public}d", source);
             break;
         }
     }
+    MMI_LOGE("Source is not of the correct type, source:%{public}d", source);
     return -1;
 }
 

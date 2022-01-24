@@ -58,7 +58,7 @@ void OHOS::MMI::EventDispatch::OnEventTouchGetPointEventType(const EventTouch& t
 {
     CHK(fingerCount > 0, PARAM_INPUT_INVALID);
     CHK(touch.time > 0, PARAM_INPUT_INVALID);
-    CHK(touch.seat_slot >= 0, PARAM_INPUT_INVALID);
+    CHK(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
     CHK(touch.eventType >= 0, PARAM_INPUT_INVALID);
     if (fingerCount == 1) {
         switch (touch.eventType) {
@@ -686,7 +686,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
         POINT_EVENT_TYPE pointEventType = EVENT_TYPE_INVALID;
         OnEventTouchGetPointEventType(touch, pointEventType, fingerCount);
         int32_t eventType = pointEventType;
-        newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime << touch.seat_slot;
+        newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime << touch.seatSlot;
         std::vector<std::pair<uint32_t, int32_t>> touchIds;
         MMIRegEvent->GetTouchIds(touchIds, touch.deviceId);
         if (!touchIds.empty()) {
@@ -695,13 +695,12 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
                 CHKR(EOK == memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch)),
                      MEMCPY_SEC_FUN_FAIL, RET_ERR);
                 MMIRegEvent->GetTouchInfoByTouchId(touchId, touchTemp);
-                MMI_LOGT("\n4.event dispatcher of server:\neventTouch:time=%{public}" PRId64 ";deviceType=%{public}u;"
-                         "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
-                         "slot=%{public}d;seat_slot=%{public}d;pressure=%{public}lf;point.x=%{public}lf;"
-                         "point.y=%{public}lf;fd=%{public}d;"
-                         "preHandlerTime=%{public}" PRId64 ";\n",
+                MMI_LOGT("4.event dispatcher of server:eventTouch:time=%{public}" PRId64 ", deviceType=%{public}u, "
+                         "deviceName=%{public}s, devicePhys=%{public}s, eventType=%{public}d, "
+                         "slot=%{public}d, seatSlot=%{public}d, pressure=%{public}lf, point.x=%{public}lf, "
+                         "point.y=%{public}lf, fd=%{public}d, preHandlerTime=%{public}" PRId64 "",
                          touchTemp.time, touchTemp.deviceType, touchTemp.deviceName,
-                         touchTemp.devicePhys, touchTemp.eventType, touchTemp.slot, touchTemp.seat_slot,
+                         touchTemp.devicePhys, touchTemp.eventType, touchTemp.slot, touchTemp.seatSlot,
                          touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, appInfo.fd,
                          preHandlerTime);
                 DispatchTouchEventTrace(touchTemp);
@@ -711,13 +710,12 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
         }
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
             newPacket << touch;
-            MMI_LOGT("\n4.event dispatcher of server:\neventTouch:time=%{public}" PRId64 ";deviceType=%{public}u;"
-                     "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
-                     "slot=%{public}d;seat_slot=%{public}d;pressure=%{public}lf;point.x=%{public}lf;"
-                     "point.y=%{public}lf;fd=%{public}d;"
-                     "preHandlerTime=%{public}" PRId64 ";\n",
+            MMI_LOGT("4.event dispatcher of server:eventTouch:time=%{public}" PRId64 ", deviceType=%{public}u, "
+                     "deviceName=%{public}s, devicePhys=%{public}s, eventType=%{public}d, "
+                     "slot=%{public}d, seatSlot=%{public}d, pressure=%{public}lf, point.x=%{public}lf, "
+                     "point.y=%{public}lf, fd=%{public}d, preHandlerTime=%{public}" PRId64 "",
                      touch.time, touch.deviceType, touch.deviceName,
-                     touch.devicePhys, touch.eventType, touch.slot, touch.seat_slot, touch.pressure,
+                     touch.devicePhys, touch.eventType, touch.slot, touch.seatSlot, touch.pressure,
                      touch.point.x, touch.point.y, appInfo.fd, preHandlerTime);
             DispatchTouchEventTrace(touch);
         }

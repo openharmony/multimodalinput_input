@@ -519,7 +519,7 @@ void EventPackage::PackageTouchEventByType(int32_t type, struct libinput_event_t
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
 #ifdef OHOS_WESTEN_MODEL
-            MMIRegEvent->GetTouchInfoByTouchId(std::make_pair(touch.deviceId, touch.seat_slot), touch);
+            MMIRegEvent->GetTouchInfoByTouchId(std::make_pair(touch.deviceId, touch.seatSlot), touch);
 #endif
             touch.time = libinput_event_touch_get_time_usec(data);
             touch.eventType = LIBINPUT_EVENT_TOUCH_UP;
@@ -560,7 +560,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event,
     CHKR(data, ERROR_NULL_POINTER, RET_ERR);
     touch.time = libinput_event_touch_get_time_usec(data);
     touch.slot = libinput_event_touch_get_slot(data);
-    touch.seat_slot = libinput_event_touch_get_seat_slot(data);
+    touch.seatSlot = libinput_event_touch_get_seat_slot(data);
     touch.pressure = libinput_event_get_touch_pressure(event);
     
     PackageTouchEventByType(type, data, touch);
@@ -578,7 +578,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event,
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
 #ifdef OHOS_WESTEN_MODEL
-            MMIRegEvent->GetTouchInfoByTouchId(std::make_pair(touch.deviceId, touch.seat_slot), touch);
+            MMIRegEvent->GetTouchInfoByTouchId(std::make_pair(touch.deviceId, touch.seatSlot), touch);
 #endif
             touch.time = libinput_event_touch_get_time_usec(data);
             touch.eventType = LIBINPUT_EVENT_TOUCH_UP;
