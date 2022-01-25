@@ -13,19 +13,21 @@
  * limitations under the License.
  */
 
-#include "mmi_service.h"
 #include <cinttypes>
 #include <signal.h>
+#include <sys/signalfd.h>
+
 #include "app_register.h"
 #include "device_register.h"
 #include "event_dump.h"
 #include "input_windows_manager.h"
-#include "log.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "register_eventhandle_manager.h"
 #include "safe_keeper.h"
 #include "timer_manager.h"
 #include "util.h"
+#include "log.h"
+#include "mmi_service.h"
 
 namespace OHOS {
 namespace MMI {
@@ -180,7 +182,6 @@ bool MMIService::InitExpSoLibrary()
 
 int32_t MMIService::Init()
 {
-    signal(SIGPIPE, SIG_IGN);
     CheckDefine();
     CHKR(InitExpSoLibrary(), EXP_SO_LIBY_INIT_FAIL, EXP_SO_LIBY_INIT_FAIL);
 
@@ -213,6 +214,7 @@ int32_t MMIService::Init()
     CHKR(mmiFd_ >= 0, EPOLL_CREATE_FAIL, EPOLL_CREATE_FAIL);
     CHKR(InitSAService(), SASERVICE_INIT_FAIL, SASERVICE_INIT_FAIL);
     CHKR(InitLibinputService(), LIBINPUT_INIT_FAIL, LIBINPUT_INIT_FAIL);
+    CHKR(InitSignalHandler(), INIT_SIGNAL_HANDLER_FAIL, INIT_SIGNAL_HANDLER_FAIL);
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
     return RET_OK;
 }
@@ -363,14 +365,21 @@ void MMIService::OnThread()
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         bufMap.clear();
         count = EpollWait(ev[0], MAX_EVENT_SIZE, timeOut, mmiFd_);
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
             CHKC(mmiEd, ERROR_NULL_POINTER);
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 input_.EventDispatch(ev[i]);
-            } else { // EPOLL_EVENT_SOCKET
+            } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
                 OnEpollEvent(ev[i], bufMap);
+            } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {
+                OnSignalEvent(mmiEd->fd);
+            } else {
+                MMI_LOGW("unknown epoll event type:%{public}d", mmiEd->event_type);
             }
+        }
+        if (state_ != ServiceRunningState::STATE_RUNNING) {
+            break;
         }
         for (auto& it : bufMap) {
             if (it.second.isOverflow) {
@@ -382,6 +391,69 @@ void MMIService::OnThread()
         OnTimer();
     }
     MMI_LOGI("Main worker thread stop... tid:%{public}" PRId64 "", tid);
+}
+
+bool MMIService::InitSignalHandler()
+{
+    MMI_LOGD("enter");
+    sigset_t mask = {0};
+    int32_t retCode = sigfillset(&mask);
+    if (retCode < 0) {
+        MMI_LOGE("fill signal set failed:%{public}s", strerror(errno));
+        return false;
+    }
+
+    retCode = sigprocmask(SIG_SETMASK, &mask, nullptr);
+    if (retCode < 0) {
+        MMI_LOGE("sigprocmask failed:%{public}s", strerror(errno));
+        return false;
+    }
+
+    int32_t fdSignal = signalfd(-1, &mask, SFD_NONBLOCK|SFD_CLOEXEC);
+    if (fdSignal < 0) {
+        MMI_LOGE("signal fd failed:%{public}s", strerror(errno));
+        return false;
+    }
+
+    retCode = EpollCtlAdd(EPOLL_EVENT_SIGNAL, fdSignal);
+    if (retCode < 0) {
+        MMI_LOGE("EpollCtlAdd signalFd failed:%{public}d", retCode);
+        EpollClose();
+        return false;
+    }
+
+    MMI_LOGD("success");
+    return true;
+}
+
+void MMIService::OnSignalEvent(int32_t signalFd)
+{
+    MMI_LOGD("enter");
+    struct signalfd_siginfo sigInfo;
+    int32_t size = ::read(signalFd, &sigInfo, sizeof(struct signalfd_siginfo));
+    if (size != sizeof(struct signalfd_siginfo)) {
+        MMI_LOGE("read signal info faild, invalid size:%{public}d", size);
+        return;
+    }
+
+    int32_t signo = sigInfo.ssi_signo;
+    MMI_LOGD("receive signal:%{public}d", signo);
+    switch (signo) {
+        case SIGINT:
+        case SIGQUIT:
+        case SIGILL:
+        case SIGABRT:
+        case SIGBUS:
+        case SIGFPE:
+        case SIGKILL:
+        case SIGSEGV:
+        case SIGTERM:
+            state_ = ServiceRunningState::STATE_EXIT;
+            break;
+        default:
+            break;
+    }
+    MMI_LOGD("leave");
 }
 
 }
