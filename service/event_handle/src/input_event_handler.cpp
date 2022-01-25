@@ -939,7 +939,7 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
     }
 
     // 派发
-    eventDispatch_.handlePointerEvent(pointerEvent);
+    eventDispatch_.HandlePointerEvent(pointerEvent);
 
     // 返回值 代表是 鼠标事件有没有处理过， 不关心成功与失败
     return RET_OK;
