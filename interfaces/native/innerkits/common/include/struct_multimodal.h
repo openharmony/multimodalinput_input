@@ -287,7 +287,7 @@ struct EventTouch {
     int32_t eventType;
     uint64_t time;
     int32_t slot;
-    int32_t seat_slot;
+    int32_t seatSlot;
     struct DeviceCoords point;
     HOS_DEVICE_TYPE deviceType;
     double pressure;

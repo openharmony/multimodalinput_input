@@ -45,7 +45,7 @@ public:
         OnRecv(fd,  buf, size);
     }
 
-    void OnEventUnitTest(const epoll_event& ev, CLMAP<int32_t, StreamBufData>& bufMap)
+    void OnEventUnitTest(const epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
     {
         OnEvent(ev, bufMap);
     }
@@ -165,7 +165,7 @@ HWTEST_F(UDSServerTest, OnEvent, TestSize.Level1)
 {
     epoll_event ev = {};
     ev.events = 5;
-    CLMAP<int32_t, StreamBufData> bufMap;
+    std::map<int32_t, StreamBufData> bufMap;
 
     UDSServerUnitTest serObjUt;
     serObjUt.OnEventUnitTest(ev, bufMap);

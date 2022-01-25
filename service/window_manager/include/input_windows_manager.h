@@ -136,9 +136,9 @@ public:
 
     const std::vector<ScreenInfo>& GetScreenInfo() const;
 
-    const CLMAP<int32_t, LayerInfo>& GetLayerInfo() const;
+    const std::map<int32_t, LayerInfo>& GetLayerInfo() const;
 
-    const CLMAP<int32_t, MMISurfaceInfo>& GetSurfaceInfo() const;
+    const std::map<int32_t, MMISurfaceInfo>& GetSurfaceInfo() const;
 
     void InsertSurfaceInfo(const MMISurfaceInfo& tmpSurfaceInfo);
 
@@ -150,7 +150,7 @@ public:
     int32_t GetFocusSurfaceId() const;
     int32_t GetTouchFocusSurfaceId() const;
 
-    size_t GetSurfaceIdList(IdsList& ids);
+    size_t GetSurfaceIdList(std::vector<int32_t>& ids);
     std::string GetSurfaceIdListString();
     void Clear();
     void Dump(int32_t fd);
@@ -163,7 +163,7 @@ public:
     bool TpPoint2LogicDisplayPoint2(libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId);
     const std::vector<struct LogicalDisplayInfo>& GetLogicalDisplayInfo() const;
-    const CLMAP<int32_t, struct WindowInfo>& GetWindowInfo() const;
+    const std::map<int32_t, struct WindowInfo>& GetWindowInfo() const;
     bool FindWindow(std::shared_ptr<PointerEvent> pointerEvent);
     MouseInfo GetMouseInfo();
     void SetMouseInfo(double& x, double& y);
@@ -189,7 +189,7 @@ private:
     int32_t UpdateTouchPadTargetOld(std::shared_ptr<PointerEvent> pointerEvent);
 
     /*********************************新框架接口添加*************************** */
-    bool isTouchWindow(int32_t x, int32_t y, const WindowInfo &info) const;
+    bool IsTouchWindow(int32_t x, int32_t y, const WindowInfo &info) const;
     void PrintDisplayDebugInfo();
     void SetLocalInfo(int32_t x, int32_t y);
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
@@ -203,16 +203,16 @@ private:
     struct ScreenInfo **screensInfo_ = nullptr;
     int32_t focusInfoID_ = 0;
     int32_t touchFocusId_ = 0;
-    IdsList surfacesList_; // surfaces ids list
+    std::vector<int32_t> surfacesList_; // surfaces ids list
     std::vector<struct ScreenInfo> screenInfoVec_ = {};
-    CLMAP<int32_t, struct LayerInfo> layers_ = {};
-    CLMAP<int32_t, struct MMISurfaceInfo> surfaces_ = {};
+    std::map<int32_t, struct LayerInfo> layers_ = {};
+    std::map<int32_t, struct MMISurfaceInfo> surfaces_ = {};
     UDSServer* udsServer_ = nullptr;
 
     /* *********************************新框架接口添加*************************** */
     std::vector<struct PhysicalDisplayInfo> physicalDisplays_ = {};
     std::vector<struct LogicalDisplayInfo> logicalDisplays_ = {};
-    CLMAP<int32_t, struct WindowInfo> windowInfos_ = {};
+    std::map<int32_t, struct WindowInfo> windowInfos_ = {};
     MouseInfo mouseInfo_ = {};
     const int32_t INVALID_LOCATION = 0;
 };

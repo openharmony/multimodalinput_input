@@ -344,7 +344,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_event &ev)
 
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     uint64_t preHandlerTime = GetSysClockTime();
     if (keyEvent == nullptr) {
         keyEvent = KeyEvent::Create();
@@ -408,7 +408,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(multimodal_libinput_event& ev)
             keyEvent->GetKeyCode());
         return RET_OK;
     }
-    (void)OnEventKey(ev.event);
+    return OnEventKey(ev.event);
 #else
 
     int32_t kac = keyEvent->GetKeyAction();
@@ -428,13 +428,13 @@ int32_t InputEventHandler::OnKeyEventDispatch(multimodal_libinput_event& ev)
             eventDispatchResult, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
-#endif
     return RET_OK;
+#endif
 }
 
 int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     uint64_t preHandlerTime = GetSysClockTime();
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     EventKeyboard keyBoard = {};
@@ -487,7 +487,6 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
 
 void InputEventHandler::OnEventKeyboardTrace(const EventKeyboard& keyBoard)
 {
-    int32_t EVENT_KEY = 1;
     char keyUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(keyUuid, sizeof(keyUuid), keyBoard.uuid, sizeof(keyBoard.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
@@ -496,7 +495,8 @@ void InputEventHandler::OnEventKeyboardTrace(const EventKeyboard& keyBoard)
     MMI_LOGT(" OnEventKeyboard service reported keyUuid = %{public}s\n", keyUuid);
     std::string keyEvent = keyUuid;
     keyEvent = "OnEventKeyboard service reported keyUuid: " + keyEvent;
-    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
+    int32_t eventKey = 1;
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 }
 
 int32_t InputEventHandler::OnEventKeyboard(multimodal_libinput_event &ev)
@@ -523,7 +523,7 @@ int32_t InputEventHandler::OnEventKeyboard(multimodal_libinput_event &ev)
         MMI_LOGD("Key event filter find a key event from Original event, keyCode:%{puiblic}d", keyBoard.key);
         return RET_OK;
     }
-    (void)OnKeyboardEvent(ev.event);
+    return OnKeyboardEvent(ev.event);
 #else
     auto oKey = KeyValueTransformationByInput(keyBoard.key); // libinput key transformed into HOS key
     keyBoard.unicode = 0;
@@ -538,13 +538,12 @@ int32_t InputEventHandler::OnEventKeyboard(multimodal_libinput_event &ev)
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
-#endif
     return RET_OK;
+#endif
 }
 
 void InputEventHandler::OnEventPointerTrace(const EventPointer& point)
 {
-    int32_t EVENT_POINTER = 17;
     char pointerUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(pointerUuid, sizeof(pointerUuid), point.uuid, sizeof(point.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
@@ -553,7 +552,8 @@ void InputEventHandler::OnEventPointerTrace(const EventPointer& point)
     MMI_LOGT(" OnEventPointer service reported pointerUuid = %{public}s\n", pointerUuid);
     std::string pointerEvent = pointerUuid;
     pointerEvent = "OnEventPointer service reported pointerUuid: " + pointerEvent;
-    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
+    int32_t eventPointer = 17;
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
 }
 
 int32_t InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
@@ -606,7 +606,7 @@ int32_t InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
 #endif
 #ifndef OHOS_WESTEN_MODEL
     /* New */
-    (void)OnMouseEventHandler(ev.event, point.deviceId);
+    return OnMouseEventHandler(ev.event, point.deviceId);
 #else
     auto retEvent = eventDispatch_.DispatchPointerEvent(*udsServer_, ev.event, point, preHandlerTime);
     if (retEvent != RET_OK) {
@@ -614,19 +614,19 @@ int32_t InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
             retEvent, POINT_EVENT_DISP_FAIL);
         return POINT_EVENT_DISP_FAIL;
     }
-#endif
     return RET_OK;
+#endif
 }
 
 int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("call  OnEventTouchSecond begin"); 
-    auto point = touchTransformPointManger->onLibinputTouchEvent(event);
+    auto point = touchTransformPointManger->OnLibinputTouchEvent(event);
     if (point == nullptr) {
         return RET_OK;
     }
-    eventDispatch_.handlePointerEvent(point);
+    eventDispatch_.HandlePointerEvent(point);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         point->RemovePointerItem(point->GetPointerId());
@@ -643,14 +643,14 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 
 int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("call  OnEventTouchPadSecond begin");
 
-    auto point = touchTransformPointManger->onLibinputTouchPadEvent(event);    
+    auto point = touchTransformPointManger->OnLibinputTouchPadEvent(event);
     if (point == nullptr) {
         return RET_OK;
     }
-    eventDispatch_.handlePointerEvent(point);
+    eventDispatch_.HandlePointerEvent(point);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
         point->RemovePointerItem(point->GetPointerId());
@@ -667,7 +667,6 @@ int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 
 void InputEventHandler::OnEventTouchTrace(const struct EventTouch& touch)
 {
-    int32_t EVENT_TOUCH = 9;
     char touchUuid[MAX_UUIDSIZE] = {0};
     if (memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
@@ -676,7 +675,8 @@ void InputEventHandler::OnEventTouchTrace(const struct EventTouch& touch)
     MMI_LOGT(" OnEventTouch service reported touchUuid = %{public}s\n", touchUuid);
     std::string touchEvent = touchUuid;
     touchEvent = "OnEventTouch service reported touchUuid: " + touchEvent;
-    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
+    int32_t eventTouch = 9;
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
 }
 
 int32_t InputEventHandler::OnEventTouch(multimodal_libinput_event &ev)
@@ -910,7 +910,7 @@ int32_t InputEventHandler::OnEventJoyStickAxis(multimodal_libinput_event &ev, co
 
 int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event, const int32_t deviceId)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto mouseEvent = MouseEventHandler::Create();
     if (mouseEvent == nullptr) {
         return RET_ERR;
@@ -949,7 +949,7 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event, const int3
             item.GetDeviceId());
     }
 
-    eventDispatch_.handlePointerEvent(mouseEvent);
+    eventDispatch_.HandlePointerEvent(mouseEvent);
     return RET_OK;
 }
 
@@ -958,7 +958,7 @@ int32_t InputEventHandler::OnMouseEventTimerHanler(std::shared_ptr<PointerEvent>
     if (mouse_event == nullptr) {
         return RET_ERR;
     }
-    eventDispatch_.handlePointerEvent(mouse_event);
+    eventDispatch_.HandlePointerEvent(mouse_event);
     return RET_OK;
 }
 

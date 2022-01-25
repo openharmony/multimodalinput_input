@@ -27,17 +27,17 @@ TouchTransformPointProcessor::TouchTransformPointProcessor()
 
 TouchTransformPointProcessor::~TouchTransformPointProcessor() {}
 
-void TouchTransformPointProcessor::setPointEventSource(int32_t sourceType)
+void TouchTransformPointProcessor::SetPointEventSource(int32_t sourceType)
 {
     pointerEvent_->SetSourceType(sourceType);
 }
 
-void TouchTransformPointProcessor::onEventTouchDown(libinput_event *event)
+void TouchTransformPointProcessor::OnEventTouchDown(libinput_event *event)
 {
-    CHK(event, PARAM_INPUT_INVALID);
+    CHKP(event, PARAM_INPUT_INVALID);
     MMI_LOGD("this touch event is down");
     auto data = libinput_event_get_touch_event(event);
-    auto seat_slot = libinput_event_touch_get_seat_slot(data);
+    auto seatSlot = libinput_event_touch_get_seat_slot(data);
     auto pressure = libinput_event_get_touch_pressure(event);
     int32_t id = 1;
     int32_t logicalY = -1;
@@ -53,7 +53,7 @@ void TouchTransformPointProcessor::onEventTouchDown(libinput_event *event)
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     PointerEvent::PointerItem pointer;
-    pointer.SetPointerId(seat_slot);
+    pointer.SetPointerId(seatSlot);
     pointer.SetDownTime(time);
     pointer.SetPressed(true);
     pointer.SetGlobalX(logicalX);
@@ -66,18 +66,18 @@ void TouchTransformPointProcessor::onEventTouchDown(libinput_event *event)
     pointer.SetDeviceId(id);
     pointerEvent_->SetDeviceId(id);
     pointerEvent_->AddPointerItem(pointer);
-    pointerEvent_->SetPointerId(seat_slot);
+    pointerEvent_->SetPointerId(seatSlot);
     MMI_LOGD("logicalX is %{public}d, logicalY is %{public}d, logicalDisplayId is %{public}d", logicalX, logicalY, logicalDisplayId);
     MMI_LOGD("this touch event is down end");
 }
 
-void TouchTransformPointProcessor::onEventTouchMotion(libinput_event *event)
+void TouchTransformPointProcessor::OnEventTouchMotion(libinput_event *event)
 {
-    CHK(event, PARAM_INPUT_INVALID);
+    CHKP(event, PARAM_INPUT_INVALID);
     MMI_LOGD("this touch event is motion begin");
     auto data = libinput_event_get_touch_event(event);
     auto time = libinput_event_touch_get_time(data);
-    auto seat_slot = libinput_event_touch_get_seat_slot(data);
+    auto seatSlot = libinput_event_touch_get_seat_slot(data);
     auto pressure = libinput_event_get_touch_pressure(event);
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -86,39 +86,39 @@ void TouchTransformPointProcessor::onEventTouchMotion(libinput_event *event)
     int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
     WinMgr->TansformTouchscreePointToLogicalDisplayPoint(data, logicalDisplayId, logicalX, logicalY);
     PointerEvent::PointerItem pointer;
-    pointerEvent_->GetPointerItem(seat_slot, pointer);
+    pointerEvent_->GetPointerItem(seatSlot, pointer);
     pointer.SetPressure(pressure);
     pointer.SetGlobalX(logicalX);
     pointer.SetGlobalY(logicalY);
-    pointerEvent_->RemovePointerItem(seat_slot);
+    pointerEvent_->RemovePointerItem(seatSlot);
     pointerEvent_->AddPointerItem(pointer);
-    pointerEvent_->SetPointerId(seat_slot);
+    pointerEvent_->SetPointerId(seatSlot);
     MMI_LOGD("this touch event is motion end");
 }
 
-void TouchTransformPointProcessor::onEventTouchUp(libinput_event *event)
+void TouchTransformPointProcessor::OnEventTouchUp(libinput_event *event)
 {
-    CHK(event, PARAM_INPUT_INVALID);
+    CHKP(event, PARAM_INPUT_INVALID);
     MMI_LOGD("this touch event is up");
     auto data = libinput_event_get_touch_event(event);
     auto time = libinput_event_touch_get_time(data);
-    auto seat_slot = libinput_event_touch_get_seat_slot(data);
+    auto seatSlot = libinput_event_touch_get_seat_slot(data);
 
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
 
     PointerEvent::PointerItem pointer;
-    pointerEvent_->GetPointerItem(seat_slot, pointer);
-    pointerEvent_->RemovePointerItem(seat_slot);
+    pointerEvent_->GetPointerItem(seatSlot, pointer);
+    pointerEvent_->RemovePointerItem(seatSlot);
     pointerEvent_->AddPointerItem(pointer);
     pointer.SetPressed(false);
-    pointerEvent_->SetPointerId(seat_slot);
+    pointerEvent_->SetPointerId(seatSlot);
     MMI_LOGD("this touch event is up end");
 }
 
-std::shared_ptr<PointerEvent> TouchTransformPointProcessor::onLibinputTouchEvent(libinput_event *event)
+std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent(libinput_event *event)
 {
-    CHKR(event, PARAM_INPUT_INVALID, nullptr);
+    CHKPR(event, PARAM_INPUT_INVALID, nullptr);
     MMI_LOGD("call  onLibinputTouchEvent begin");
     if (pointerEvent_ == nullptr) {
         MMI_LOGE("pointerEvent_ is nullptr");
@@ -128,15 +128,15 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::onLibinputTouchEvent
     auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
-            onEventTouchDown(event);
+            OnEventTouchDown(event);
             break;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
-            onEventTouchUp(event);
+            OnEventTouchUp(event);
             break;
         }
         case LIBINPUT_EVENT_TOUCH_MOTION: {
-            onEventTouchMotion(event);
+            OnEventTouchMotion(event);
             break;
         }
         default: {

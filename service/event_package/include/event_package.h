@@ -36,7 +36,7 @@ namespace OHOS::MMI {
         int32_t PackageTabletPadEvent(libinput_event *event, EventTabletPad& tabletPad);
         int32_t PackageDeviceManageEvent(libinput_event *event, DeviceManage& deviceManage);
         int32_t PackageKeyEvent(libinput_event *event, EventKeyboard& key);
-        int32_t PackageKeyEvent(libinput_event *event, std::shared_ptr<OHOS::MMI::KeyEvent> kevnPtr);
+        int32_t PackageKeyEvent(libinput_event *event, std::shared_ptr<KeyEvent> kevnPtr);
         int32_t PackageGestureEvent(libinput_event *event, EventGesture& gesture);
         int32_t PackagePointerEvent(libinput_event *event, EventPointer& point);
         int32_t PackageTouchEvent(libinput_event *event, EventTouch& touch);
@@ -44,7 +44,7 @@ namespace OHOS::MMI {
         int32_t PackageJoyStickKeyEvent(libinput_event *event, EventKeyboard& key);
         int32_t PackageTabletPadKeyEvent(libinput_event *event, EventKeyboard& key);
         static int32_t PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key);
-        static int32_t KeyboardToKeyEvent(EventKeyboard& key, std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr);
+        static int32_t KeyboardToKeyEvent(const EventKeyboard& key, std::shared_ptr<KeyEvent> keyEventPtr);
         static std::shared_ptr<OHOS::MMI::PointerEvent> LibinputEventToPointerEvent(libinput_event *event);
     private:
         void PackageTabletPadOtherParams(libinput_event *event, EventTabletPad& tabletPad);
@@ -59,11 +59,11 @@ namespace OHOS::MMI {
     template<class T>
     int32_t EventPackage::PackageRegisteredEvent(T& data, RegisteredEvent& event)
     {
-        CHKR(EOK == memcpy_s(event.devicePhys, MAX_DEVICENAME, data.devicePhys, MAX_DEVICENAME),
-             MEMCPY_SEC_FUN_FAIL, RET_ERR);
+        int32_t ret = memcpy_s(event.devicePhys, MAX_DEVICENAME, data.devicePhys, MAX_DEVICENAME);
+        CHKR(ret != EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
         const std::string uid = GetUUid();
-        CHKR(EOK == memcpy_s(event.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size()),
-             MEMCPY_SEC_FUN_FAIL, RET_ERR);
+        ret = memcpy_s(event.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size());
+        CHKR(ret != EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
         event.deviceId = data.deviceId;
         event.eventType = data.eventType;
         event.deviceType = data.deviceType;
