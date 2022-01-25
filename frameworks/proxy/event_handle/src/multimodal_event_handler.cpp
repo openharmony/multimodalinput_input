@@ -182,7 +182,8 @@ int32_t MultimodalEventHandler::GetDevice(int32_t taskId, int32_t deviceId)
     return EventManager.GetDevice(taskId, deviceId);
 }
 
-int32_t MultimodalEventHandler::SubscribeKeyEvent(const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
+int32_t MultimodalEventHandler::SubscribeKeyEvent(
+    const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
 {
     if (!InitClient()) {
         return MMI_SERVICE_INVALID;
