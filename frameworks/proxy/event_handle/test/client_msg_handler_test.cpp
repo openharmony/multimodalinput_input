@@ -1394,7 +1394,7 @@ HWTEST_F(ClientMsgHandlerTest, OnTouch2, TestSize.Level1)
     touchData.eventType = 500;
     touchData.time = 500;
     touchData.slot = 500;
-    touchData.seat_slot = 500;
+    touchData.seatSlot = 500;
     touchData.deviceType = static_cast<HOS_DEVICE_TYPE>(0);
 
     netPacket << typeNum;

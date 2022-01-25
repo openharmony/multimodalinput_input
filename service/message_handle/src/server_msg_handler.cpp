@@ -450,7 +450,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
     if (keyEvent == nullptr) {
         keyEvent = OHOS::MMI::KeyEvent::Create();
     }
-    EventPackage::KeyboardToKeyEvent(key, keyEvent, *udsServer_);
+    EventPackage::KeyboardToKeyEvent(key, keyEvent);
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed... ret:%{public}d errCode:%{public}d",
@@ -494,7 +494,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPa
     auto pointerEvent = OHOS::MMI::PointerEvent::Create();
     CHKR((RET_OK == InputEventDataTransformation::DeserializePointerEvent(false, pointerEvent, pkt)),
         STREAM_BUF_READ_FAIL, RET_ERR);
-    CHKR((RET_OK == eventDispatch_.handlePointerEvent(pointerEvent)), POINT_EVENT_DISP_FAIL, RET_ERR);
+    CHKR((RET_OK == eventDispatch_.HandlePointerEvent(pointerEvent)), POINT_EVENT_DISP_FAIL, RET_ERR);
     return RET_OK;
 }
 

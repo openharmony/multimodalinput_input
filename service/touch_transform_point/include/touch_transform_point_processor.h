@@ -25,12 +25,12 @@ class TouchTransformPointProcessor {
 public:
     TouchTransformPointProcessor();
     ~TouchTransformPointProcessor();
-    std::shared_ptr<PointerEvent> onLibinputTouchEvent(libinput_event *event);
-    void setPointEventSource(int32_t sourceType);
+    std::shared_ptr<PointerEvent> OnLibinputTouchEvent(libinput_event *event);
+    void SetPointEventSource(int32_t sourceType);
 private:
-    void onEventTouchDown(libinput_event *event);
-    void onEventTouchMotion(libinput_event *event);
-    void onEventTouchUp(libinput_event *event);
+    void OnEventTouchDown(libinput_event *event);
+    void OnEventTouchMotion(libinput_event *event);
+    void OnEventTouchUp(libinput_event *event);
     std::shared_ptr<PointerEvent> pointerEvent_;
 };
 }
