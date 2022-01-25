@@ -967,7 +967,7 @@ int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEv
         item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
         item.GetDeviceId());
 
-    eventDispatch_.handlePointerEvent(pointerEvent);
+    eventDispatch_.HandlePointerEvent(pointerEvent);
     return RET_OK;
 }
 
