@@ -208,7 +208,7 @@ private:
     std::map<int32_t, struct LayerInfo> layers_ = {};
     std::map<int32_t, struct MMISurfaceInfo> surfaces_ = {};
     UDSServer* udsServer_ = nullptr;
-
+    WindowInfo* windowBtnLeft_ = nullptr;
     /* *********************************新框架接口添加*************************** */
     std::vector<struct PhysicalDisplayInfo> physicalDisplays_ = {};
     std::vector<struct LogicalDisplayInfo> logicalDisplays_ = {};
