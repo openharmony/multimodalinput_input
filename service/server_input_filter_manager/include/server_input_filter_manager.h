@@ -66,7 +66,7 @@ public:
         Authority authority_;
     };
     void OnTouchEventTrace(const EventTouch& touch);
-    bool OnTouchEvent(UDSServer& udsServer, libinput_event *event, EventTouch& touch,
+    bool OnTouchEvent(libinput_event *event, EventTouch& touch,
         const uint64_t preHandlerTime);
     int32_t AddTouchEventFilter(SessionPtr sess, std::string name, int32_t id, Authority authority);
     int32_t RemoveTouchEventFilter(SessionPtr sess, int32_t id);
