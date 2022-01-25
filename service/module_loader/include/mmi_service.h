@@ -36,7 +36,7 @@
 namespace OHOS {
 namespace MMI {
 
-enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING };
+enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class MMIService : public UDSServer, public SystemAbility, public IMultimodalInputConnectStub {
     DECLARE_DELAYED_SINGLETON(MMIService);
     DECLEAR_SYSTEM_ABILITY(MMIService);
@@ -60,10 +60,12 @@ protected:
 
     bool InitLibinputService();
     bool InitSAService();
+    bool InitSignalHandler();
     int32_t Init();
 
     void OnTimer();
     void OnThread();
+    void OnSignalEvent(int32_t signalFd);
 
 private:
     ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
