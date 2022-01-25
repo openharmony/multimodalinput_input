@@ -870,7 +870,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     if (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN && buttonId == PointerEvent::MOUSE_BUTTON_LEFT) {
         windowBtnLeft_ = focusWindow;
     }
-    if (((pointerEvent->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT) &&
+    if (((pointerEvent->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT)) &&
         (action == PointerEvent::POINTER_ACTION_MOVE)) || ((action == PointerEvent::POINTER_ACTION_BUTTON_UP) &&
         (buttonId == PointerEvent::MOUSE_BUTTON_LEFT))) {
         focusWindow = windowBtnLeft_;
