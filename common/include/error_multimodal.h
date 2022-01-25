@@ -133,6 +133,7 @@ namespace OHOS {
         ADD_SESSION_FAIL,                           // 增加session错误
         MAKE_SHARED_FAIL,                           // make_shared错误
         CLEAR_DEAD_SESSION_FAIL,                    // 清理无效的session错误
+        INIT_SIGNAL_HANDLER_FAIL,                   // 初始化全局信号处理器失败
     };
     // Error code for util
     constexpr ErrCode UTIL_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_UTIL);
