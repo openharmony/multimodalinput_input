@@ -251,7 +251,7 @@ void ServerInputFilterManager::OnTouchEventTrace(const EventTouch& touch)
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
 }
 
-bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event *event,
+bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
     EventTouch& touch, const uint64_t preHandlerTime)
 {
     CHKF(event, PARAM_INPUT_INVALID);

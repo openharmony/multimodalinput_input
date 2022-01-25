@@ -34,7 +34,6 @@ constexpr int32_t INPUT_UI_TIMEOUT_TIME_MAX = 20 * 1000000;
     namespace {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
     }
-}
 
 static void PrintEventSlotedCoordsInfo(const SlotedCoordsInfo& r)
 {
@@ -45,15 +44,15 @@ static void PrintEventSlotedCoordsInfo(const SlotedCoordsInfo& r)
     }
 }
 
-OHOS::MMI::EventDispatch::EventDispatch()
+EventDispatch::EventDispatch()
 {
 }
 
-OHOS::MMI::EventDispatch::~EventDispatch()
+EventDispatch::~EventDispatch()
 {
 }
 
-void OHOS::MMI::EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
+void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
     POINT_EVENT_TYPE& pointEventType, const int32_t fingerCount)
 {
     CHK(fingerCount > 0, PARAM_INPUT_INVALID);
@@ -99,10 +98,10 @@ void OHOS::MMI::EventDispatch::OnEventTouchGetPointEventType(const EventTouch& t
     }
 }
 
-int32_t OHOS::MMI::EventDispatch::GestureRegisteredEventDispatch(const MmiMessageId& idMsg,
-                                                                 UDSServer& udsServer,
-                                                                 RegisteredEvent& registeredEvent,
-                                                                 uint64_t preHandlerTime)
+int32_t EventDispatch::GestureRegisteredEventDispatch(const MmiMessageId& idMsg,
+                                                      UDSServer& udsServer,
+                                                      RegisteredEvent& registeredEvent,
+                                                      uint64_t preHandlerTime)
 {
     auto ret = RET_OK;
     if (idMsg == MmiMessageId::ON_PREVIOUS) {
@@ -128,14 +127,14 @@ int32_t OHOS::MMI::EventDispatch::GestureRegisteredEventDispatch(const MmiMessag
     return ret;
 }
 
-int32_t OHOS::MMI::EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& udsServer,
+int32_t EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& udsServer,
     const RegisteredEvent& registeredEvent, int32_t inputDeviceType, uint64_t preHandlerTime)
 {
     CHKR(idMsg > MmiMessageId::INVALID, PARAM_INPUT_INVALID, PARAM_INPUT_INVALID);
     std::vector<int32_t> fds;
     RegEventHM->FindSocketFds(idMsg, fds);
     if (fds.empty()) {
-        MMI_LOGW("Yet none of socketFds is found!\n");
+        MMI_LOGW("Yet none of socketFds is found");
         return RET_OK;
     }
 
@@ -158,7 +157,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, UD
     return RET_OK;
 }
 
-int32_t OHOS::MMI::EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSServer& udsServer,
+int32_t EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSServer& udsServer,
     libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime)
 {
     CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
@@ -208,12 +207,12 @@ int32_t OHOS::MMI::EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSS
     if ((ret1 == RET_OK) && (ret2 == RET_OK)) {
         return RET_OK;
     } else {
-        MMI_LOGE("dispatching special registered event has failed!\n");
+        MMI_LOGE("dispatching special registered event has failed");
         return RET_ERR;
     }
 }
 
-int32_t OHOS::MMI::EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_event *event,
+int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_event *event,
     const EventTabletPad& tabletPad, const uint64_t preHandlerTime)
 {
     CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
@@ -265,7 +264,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, l
     return RET_OK;
 }
 
-int32_t OHOS::MMI::EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_event *event,
+int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_event *event,
     const EventJoyStickAxis& eventJoyStickAxis, const uint64_t preHandlerTime)
 {
     CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
@@ -298,7 +297,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, li
     return RET_OK;
 }
 
-int32_t OHOS::MMI::EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, libinput_event *event,
+int32_t EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, libinput_event *event,
     const EventTabletTool& tableTool, const uint64_t preHandlerTime)
 {
     CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
@@ -351,12 +350,12 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, 
     return RET_OK;
 }
 
-bool OHOS::MMI::EventDispatch::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point)
+bool EventDispatch::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point)
 {
     return EventFilterWrap::GetInstance().HandlePointerEventFilter(point);
 }
 
-int32_t OHOS::MMI::EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
+int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point) 
 {
     MMI_LOGE("handlePointerEvent begin .....");
     CHKPR(point, PARAM_INPUT_INVALID, RET_ERR);
@@ -427,17 +426,17 @@ int32_t OHOS::MMI::EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEven
     return RET_OK;
 }
 
-bool OHOS::MMI::EventDispatch::HandleTouchScreenEvent(std::shared_ptr<PointerEvent> point)
+bool EventDispatch::HandleTouchScreenEvent(std::shared_ptr<PointerEvent> point)
 {
     return InputHandlerManagerGlobal::GetInstance().HandleEvent(point);
 }
 
-bool OHOS::MMI::EventDispatch::HandleMouseEvent(std::shared_ptr<PointerEvent> point)
+bool EventDispatch::HandleMouseEvent(std::shared_ptr<PointerEvent> point)
 {
     return InputHandlerManagerGlobal::GetInstance().HandleEvent(point);
 }
 
-bool OHOS::MMI::EventDispatch::HandleTouchPadEvent(std::shared_ptr<PointerEvent> point)
+bool EventDispatch::HandleTouchPadEvent(std::shared_ptr<PointerEvent> point)
 {
     if (INTERCEPTORMANAGERGLOBAL.OnPointerEvent(point)) {
         return true;
@@ -448,7 +447,7 @@ bool OHOS::MMI::EventDispatch::HandleTouchPadEvent(std::shared_ptr<PointerEvent>
     return false;
 }
 
-int32_t OHOS::MMI::EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
+int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
     std::shared_ptr<PointerEvent> point)
 {
     CHKPR(point, PARAM_INPUT_INVALID, RET_ERR);
@@ -469,7 +468,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchTransformPointEvent(UDSServer& ud
     return RET_OK;
 }
 
-void OHOS::MMI::EventDispatch::DispatchPointerEventTrace(const EventPointer& point)
+void EventDispatch::DispatchPointerEventTrace(const EventPointer& point)
 {
     char pointerUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(pointerUuid, sizeof(pointerUuid), point.uuid, sizeof(point.uuid))) {
@@ -483,7 +482,7 @@ void OHOS::MMI::EventDispatch::DispatchPointerEventTrace(const EventPointer& poi
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
 }
 
-int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event *event,
+int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event *event,
     EventPointer &point, const uint64_t preHandlerTime)
 {
     CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
@@ -564,7 +563,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
     return RET_OK;
 }
 
-int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event *event,
+int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event *event,
     EventGesture& gesture, const uint64_t preHandlerTime)
 {
     CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
@@ -620,7 +619,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
     return RET_OK;
 }
 
-void OHOS::MMI::EventDispatch::DispatchTouchEventTrace(const EventTouch& touch)
+void EventDispatch::DispatchTouchEventTrace(const EventTouch& touch)
 {
     char touchUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid))) {
@@ -634,7 +633,7 @@ void OHOS::MMI::EventDispatch::DispatchTouchEventTrace(const EventTouch& touch)
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
 }
 
-int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
+int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
     EventTouch& touch, const uint64_t preHandlerTime)
 {
     CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
@@ -729,8 +728,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
     }
     return ret;
 }
-
-int32_t OHOS::MMI::EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_event *event,
+int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_event *event,
     EventPointer& point, const uint64_t preHandlerTime)
 {
     CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
@@ -766,7 +764,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer,
     return ret;
 }
 
-int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
+int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
     std::shared_ptr<KeyEvent> key, const uint64_t preHandlerTime)
 {
     CHKPR(key, PARAM_INPUT_INVALID, RET_ERR);
@@ -824,7 +822,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
     return RET_OK;
 }
 
-void OHOS::MMI::EventDispatch::DispatchKeyEventTrace(const EventKeyboard& key)
+void EventDispatch::DispatchKeyEventTrace(const EventKeyboard& key)
 {
     char keyUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid))) {
@@ -838,7 +836,7 @@ void OHOS::MMI::EventDispatch::DispatchKeyEventTrace(const EventKeyboard& key)
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 }
 
-int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *event,
+int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *event,
     const KeyEventValueTransformations& trs, EventKeyboard& key, const uint64_t preHandlerTime)
 {
     CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
@@ -856,38 +854,32 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
     MMIRegEvent->OnEventKeyGetSign(key, idMsg, prevKey);
     if (MmiMessageId::INVALID != idMsg) {
         RegisteredEvent registeredEvent = {};
-        auto packageResult = eventPackage_.PackageRegisteredEvent<EventKeyboard>(prevKey, registeredEvent);
-        if (packageResult != RET_OK) {
-            MMI_LOGE("Registered event package failed. ret:%{public}d, errCode:%{public}d",
-                packageResult, REG_EVENT_PKG_FAIL);
+        auto result = eventPackage_.PackageRegisteredEvent<EventKeyboard>(prevKey, registeredEvent);
+        if (result != RET_OK) {
+            MMI_LOGE("Registered event package failed.ret:%{public}d,errCode:%{public}d", result, REG_EVENT_PKG_FAIL);
         }
         ret = DispatchRegEvent(idMsg, udsServer, registeredEvent, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret != RET_OK) {
-            MMI_LOGE("Registered Event dispatch failed. ret:%{public}d, errCode:%{public}d",
-                ret, REG_EVENT_DISP_FAIL);
+            MMI_LOGE("Registered Event dispatch failed.ret:%{public}d,errCode:%{public}d", ret, REG_EVENT_DISP_FAIL);
         }
     }
     auto focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
+        MMI_LOGE("Don't find focus window, so the event will be discarded. errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
         return RET_OK;
     }
     auto appInfo = AppRegs->FindByWinId(focusId); // obtain application information for focusId
     if (appInfo.fd == RET_ERR) {
-        MMI_LOGT("Failed to find, fd:%{public}d. errCode:%{public}d", focusId, FOCUS_ID_OBTAIN_FAIL);
+        MMI_LOGE("Failed to find, fd:%{public}d. errCode:%{public}d", focusId, FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
     }
     key.key = trs.keyValueOfHos; // struct EventKeyboard tranformed into HOS_L3
-#ifdef DEBUG_CODE_TEST
-    std::string str = WinMgr->GetSurfaceIdListString();
-    PrintWMSInfo(str, appInfo.fd, appInfo.abilityId, focusId);
-#endif
 
     MMI_LOGT("4.event dispatcher of server:eventKeyboard:time=%{public}" PRId64 ", deviceType=%{public}u, "
-             "deviceName=%{public}s, devicePhys=%{public}s, eventType=%{public}d, "
-             "unicode=%{public}d, key=%{public}u, key_detail=%{public}s, seat_key_count=%{public}u, "
-             "state=%{public}d, fd=%{public}d, preHandlerTime=%{public}" PRId64 "",
-             key.time, key.deviceType, key.deviceName, key.devicePhys, key.eventType,
-             key.unicode, key.key, trs.keyEvent.c_str(), key.seat_key_count, key.state, appInfo.fd,
+             "deviceName=%{public}s, devicePhys=%{public}s, eventType=%{public}d, unicode=%{public}d, key=%{public}u, "
+			 "key_detail=%{public}s, seat_key_count=%{public}u, state=%{public}d, fd=%{public}d, "
+			 "preHandlerTime=%{public}" PRId64 "", key.time, key.deviceType, key.deviceName, key.devicePhys,
+			 key.eventType, key.unicode, key.key, trs.keyEvent.c_str(), key.seat_key_count, key.state, appInfo.fd,
              preHandlerTime);
     DispatchKeyEventTrace(key);
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, appInfo.fd, key.time, preHandlerTime)) {
@@ -901,12 +893,12 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
     return ret;
 }
 
-int32_t OHOS::MMI::EventDispatch::AddInputEventFilter(sptr<IEventFilter> filter)
+int32_t EventDispatch::AddInputEventFilter(sptr<IEventFilter> filter)
 {
     return EventFilterWrap::GetInstance().AddInputEventFilter(filter);
 }
 
-int32_t OHOS::MMI::EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_event *event,
+int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_event *event,
     std::shared_ptr<PointerEvent> pointerEvent, const uint64_t preHandlerTime)
 {
     CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
@@ -959,4 +951,5 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, 
         return MSG_SEND_FAIL;
     }
     return RET_OK;
+}
 }

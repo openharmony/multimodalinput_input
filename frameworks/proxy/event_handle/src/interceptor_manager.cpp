@@ -83,7 +83,7 @@ void OHOS::MMI::InterceptorManager::RemoveInterceptor(int32_t interceptorId)
     } else {
         iter = interceptor_.erase(iter);
         MMIEventHdl.RemoveInterceptor(interceptorItem.id_);
-        MMI_LOGD("InterceptorManager::%{public}s InterceptorItem id: %{public}d removed success!\n",
+        MMI_LOGD("InterceptorManager::%{public}s InterceptorItem id: %{public}d removed success",
                  __func__, interceptorId);
     }
 }

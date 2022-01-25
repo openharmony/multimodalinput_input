@@ -374,7 +374,7 @@ int32_t OHOS::MMI::ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetP
         NetPacket pktAck(MmiMessageId::GET_MMI_INFO_ACK);
         pktAck << tagPackHeadAck;
         if (!udsServer_->SendMsg(fd, pktAck)) {
-            MMI_LOGE("Sending message failed !\n");
+            MMI_LOGE("Sending message failed ");
             return MSG_SEND_FAIL;
         }
     }
@@ -436,7 +436,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
         isIntercepted:%{public}d", event.keyDownDuration, event.keyCode,
         event.isPressed, event.isIntercepted);
     EventKeyboard key = {};
-    auto packageResult = EventPackage::PackageVirtualKeyEvent(event, key, *udsServer_);
+    auto packageResult = EventPackage::PackageVirtualKeyEvent(event, key);
     if (packageResult == RET_ERR) {
         return RET_ERR;
     }
@@ -481,7 +481,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
         NetPacket pkt2(MmiMessageId::ON_KEY);
         pkt2 << key << appInfo.abilityId << focusId << appInfo.fd << key.time;
         if (!udsServer_->SendMsg(appInfo.fd, pkt2)) {
-            MMI_LOGE("Sending structure of EventKeyboard failed!\n");
+            MMI_LOGE("Sending structure of EventKeyboard failed");
             return MSG_SEND_FAIL;
         }
     }
