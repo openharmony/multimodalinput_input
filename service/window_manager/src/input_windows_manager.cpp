@@ -863,6 +863,11 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
         MMI_LOGE("find foucusWindow failed");
         return RET_ERR;
     }
+    int32_t action = pointerEvent->GetPointerAction();
+    int32_t buttonId = pointerEvent->GetButtonId();
+    if (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN && buttonId == PointerEvent::MOUSE_BUTTON_LEFT) {
+        windowBtnLeft_ = focusWindow;
+    }
     pointerEvent->SetTargetWindowId(focusWindow->id);
     pointerEvent->SetAgentWindowId(focusWindow->agentWindowId);
     auto fd = udsServer_->GetFdByPid(focusWindow->pid);
