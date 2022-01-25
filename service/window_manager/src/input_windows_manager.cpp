@@ -1018,7 +1018,7 @@ bool OHOS::MMI::InputWindowsManager::FindWindow(std::shared_ptr<PointerEvent> po
     return false;
 }
 
-void OHOS::MMI::InputWindowsManager::SetMouseInfo(double& x, double& y)
+void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, double& y)
 {
     int32_t integerX = static_cast<int32_t>(x);
     int32_t integerY = static_cast<int32_t>(y);
@@ -1030,59 +1030,61 @@ void OHOS::MMI::InputWindowsManager::SetMouseInfo(double& x, double& y)
     bool isOutsideOfTopRightY = false;
 
     if (logicalDisplayInfo.empty()) {
-        MMI_LOGI("logicalDisplayInfo is empty!");
-    } else {
-        for (uint32_t i = 0; i < logicalDisplayInfo.size(); i++) {
-            if (logicalDisplayInfo[i].id >= 0) {
-                if (integerX < logicalDisplayInfo[i].topLeftX) {
-                    mouseInfo_.globleX = logicalDisplayInfo[i].topLeftX;
-                    mouseInfo_.localX = INVALID_LOCATION;
-                    x = logicalDisplayInfo[i].topLeftX;
-                    isOutsideOfTopLeftX = true;
-                } else {
-                    isOutsideOfTopLeftX = false;
-                }
-                if (integerX > (logicalDisplayInfo[i].topLeftX + logicalDisplayInfo[i].width)) {
-                    mouseInfo_.globleX = logicalDisplayInfo[i].topLeftX + logicalDisplayInfo[i].width;
-                    mouseInfo_.localX = INVALID_LOCATION;
-                    x = logicalDisplayInfo[i].topLeftX + logicalDisplayInfo[i].width;
-                    isOutsideOfTopRightX = true;
-                } else {
-                    isOutsideOfTopRightX = false;
-                }
-                if (integerY < logicalDisplayInfo[i].topLeftY) {
-                    mouseInfo_.globleY = logicalDisplayInfo[i].topLeftY;
-                    mouseInfo_.localY = INVALID_LOCATION;
-                    y = logicalDisplayInfo[i].topLeftY;
-                    isOutsideOfTopLeftY = true;
-                } else {
-                    isOutsideOfTopLeftY = false;
-                }
-                if (integerY > (logicalDisplayInfo[i].topLeftY + logicalDisplayInfo[i].height)) {
-                    mouseInfo_.globleY = logicalDisplayInfo[i].topLeftY + logicalDisplayInfo[i].height;
-                    mouseInfo_.localY = INVALID_LOCATION;
-                    y = logicalDisplayInfo[i].topLeftY + logicalDisplayInfo[i].height;
-                    isOutsideOfTopRightY = true;
-                } else {
-                    isOutsideOfTopRightY = false;
-                }
-                if ((isOutsideOfTopLeftX != true) && (isOutsideOfTopLeftY != true) &&
-                    (isOutsideOfTopRightX != true) && (isOutsideOfTopRightY != true)) {
-                    mouseInfo_.globleX = x;
-                    mouseInfo_.globleY = y;
-                    SetLocalInfo(integerX, integerY);
-                    break;
-                }
+        MMI_LOGE("logicalDisplayInfo is empty");
+        return;
+    }
+
+    for (uint32_t i = 0; i < logicalDisplayInfo.size(); i++) {
+        if (logicalDisplayInfo[i].id >= 0) {
+            if (integerX < logicalDisplayInfo[i].topLeftX) {
+                mouseLoction_.globleX = logicalDisplayInfo[i].topLeftX;
+                mouseLoction_.localX = INVALID_LOCATION;
+                x = logicalDisplayInfo[i].topLeftX;
+                isOutsideOfTopLeftX = true;
             } else {
-                mouseInfo_.globleX = INVALID_LOCATION;
-                mouseInfo_.globleY = INVALID_LOCATION;
-                mouseInfo_.localX = INVALID_LOCATION;
-                mouseInfo_.localY = INVALID_LOCATION;
+                isOutsideOfTopLeftX = false;
             }
+            if (integerX > (logicalDisplayInfo[i].topLeftX + logicalDisplayInfo[i].width)) {
+                mouseLoction_.globleX = logicalDisplayInfo[i].topLeftX + logicalDisplayInfo[i].width;
+                mouseLoction_.localX = INVALID_LOCATION;
+                x = logicalDisplayInfo[i].topLeftX + logicalDisplayInfo[i].width;
+                isOutsideOfTopRightX = true;
+            } else {
+                isOutsideOfTopRightX = false;
+            }
+            if (integerY < logicalDisplayInfo[i].topLeftY) {
+                mouseLoction_.globleY = logicalDisplayInfo[i].topLeftY;
+                mouseLoction_.localY = INVALID_LOCATION;
+                y = logicalDisplayInfo[i].topLeftY;
+                isOutsideOfTopLeftY = true;
+            } else {
+                isOutsideOfTopLeftY = false;
+            }
+            if (integerY > (logicalDisplayInfo[i].topLeftY + logicalDisplayInfo[i].height)) {
+                mouseLoction_.globleY = logicalDisplayInfo[i].topLeftY + logicalDisplayInfo[i].height;
+                mouseLoction_.localY = INVALID_LOCATION;
+                y = logicalDisplayInfo[i].topLeftY + logicalDisplayInfo[i].height;
+                isOutsideOfTopRightY = true;
+            } else {
+                isOutsideOfTopRightY = false;
+            }
+            if ((isOutsideOfTopLeftX != true) && (isOutsideOfTopLeftY != true) &&
+                (isOutsideOfTopRightX != true) && (isOutsideOfTopRightY != true)) {
+                mouseLoction_.globleX = x;
+                mouseLoction_.globleY = y;
+                SetLocalInfo(integerX, integerY);
+                break;
+            }
+        } else {
+            mouseLoction_.globleX = INVALID_LOCATION;
+            mouseLoction_.globleY = INVALID_LOCATION;
+            mouseLoction_.localX = INVALID_LOCATION;
+            mouseLoction_.localY = INVALID_LOCATION;
         }
     }
+
     MMI_LOGI("Mouse Data is : globleX = %{public}d, globleY = %{public}d, localX = %{public}d, localY = %{public}d",
-        mouseInfo_.globleX, mouseInfo_.globleY, mouseInfo_.localX, mouseInfo_.localY);
+        mouseLoction_.globleX, mouseLoction_.globleY, mouseLoction_.localX, mouseLoction_.localY);
 }
 
 void OHOS::MMI::InputWindowsManager::SetLocalInfo(int32_t x, int32_t y)
@@ -1094,46 +1096,47 @@ void OHOS::MMI::InputWindowsManager::SetLocalInfo(int32_t x, int32_t y)
     bool isOutsideOfTopRightY = false;
 
     if (windowInfo.empty()) {
-        MMI_LOGI("windowInfo is empty!");
-    } else {
-        for (auto it = windowInfo.begin(); it != windowInfo.end(); it++) {
-            if (it->second.agentWindowId >= 0) {
-                if (x < it->second.topLeftX) {
-                    mouseInfo_.localX = INVALID_LOCATION;
-                    isOutsideOfTopLeftX = true;
-                } else {
-                    isOutsideOfTopLeftX = false;
-                }
-                if (x > (it->second.topLeftX + it->second.width)) {
-                    mouseInfo_.localX = INVALID_LOCATION;
-                    isOutsideOfTopLeftY = true;
-                } else {
-                    isOutsideOfTopLeftY = false;
-                }
-                if (y < it->second.topLeftY) {
-                    mouseInfo_.localY = INVALID_LOCATION;
-                    isOutsideOfTopRightX = true;
-                } else {
-                    isOutsideOfTopRightX = false;
-                }
-                if (y > (it->second.topLeftY + it->second.height)) {
-                    mouseInfo_.localY = INVALID_LOCATION;
-                    isOutsideOfTopRightY = true;
-                } else {
-                    isOutsideOfTopRightY = false;
-                }
-                if ((isOutsideOfTopLeftX != true) && (isOutsideOfTopLeftY != true) &&
-                    (isOutsideOfTopRightX != true) && (isOutsideOfTopRightY != true)) {
-                    mouseInfo_.localX = x - it->second.topLeftX;
-                    mouseInfo_.localY = y - it->second.topLeftY;
-                    break;
-                }
+        MMI_LOGE("windowInfo is empty");
+        return;
+    }
+
+    for (auto it = windowInfo.begin(); it != windowInfo.end(); it++) {
+        if (it->second.agentWindowId >= 0) {
+            if (x < it->second.topLeftX) {
+                mouseLoction_.localX = INVALID_LOCATION;
+                isOutsideOfTopLeftX = true;
+            } else {
+                isOutsideOfTopLeftX = false;
+            }
+            if (x > (it->second.topLeftX + it->second.width)) {
+                mouseLoction_.localX = INVALID_LOCATION;
+                isOutsideOfTopLeftY = true;
+            } else {
+                isOutsideOfTopLeftY = false;
+            }
+            if (y < it->second.topLeftY) {
+                mouseLoction_.localY = INVALID_LOCATION;
+                isOutsideOfTopRightX = true;
+            } else {
+                isOutsideOfTopRightX = false;
+            }
+            if (y > (it->second.topLeftY + it->second.height)) {
+                mouseLoction_.localY = INVALID_LOCATION;
+                isOutsideOfTopRightY = true;
+            } else {
+                isOutsideOfTopRightY = false;
+            }
+            if ((isOutsideOfTopLeftX != true) && (isOutsideOfTopLeftY != true) &&
+                (isOutsideOfTopRightX != true) && (isOutsideOfTopRightY != true)) {
+                mouseLoction_.localX = x - it->second.topLeftX;
+                mouseLoction_.localY = y - it->second.topLeftY;
+                break;
             }
         }
     }
 }
 
-MouseInfo OHOS::MMI::InputWindowsManager::GetMouseInfo()
+MouseLocation OHOS::MMI::InputWindowsManager::GetMouseInfo()
 {
-    return mouseInfo_;
+    return mouseLoction_;
 }

@@ -606,7 +606,7 @@ int32_t InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
 #endif
 #ifndef OHOS_WESTEN_MODEL
     /* New */
-    return OnMouseEventHandler(ev.event, point.deviceId);
+    return OnMouseEventHandler(ev.event);
 #else
     auto retEvent = eventDispatch_.DispatchPointerEvent(*udsServer_, ev.event, point, preHandlerTime);
     if (retEvent != RET_OK) {
@@ -908,13 +908,21 @@ int32_t InputEventHandler::OnEventJoyStickAxis(multimodal_libinput_event &ev, co
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event, const int32_t deviceId)
+int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
 {
-    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
-    auto mouseEvent = MouseEventHandler::Create();
-    if (mouseEvent == nullptr) {
+    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    MMI_LOGD("Libinput Events reported");
+
+    // 更新 全局 鼠标事件 数据
+    MouseEventHdr->Normalize(event);
+
+    auto pointerEvent = MouseEventHdr->GetPointerEvent();
+    if (pointerEvent == nullptr) {
+        MMI_LOGE("MouseEvent is NULL");
         return RET_ERR;
     }
+
+    // 处理 按键 + 鼠标
     if (keyEvent == nullptr) {
         keyEvent = KeyEvent::Create();
     }
@@ -927,38 +935,39 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event, const int3
                 MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
             }
         }
-        mouseEvent->SetPressedKeys(pressedKeys);
-    }
-    mouseEvent->SetMouseData(event, deviceId);
-    // MouseEvent Normalization Results
-    MMI_LOGI("MouseEvent Normalization Results : PointerAction = %{public}d, PointerId = %{public}d,"
-        "SourceType = %{public}d, ButtonId = %{public}d,"
-        "VerticalAxisValue = %{public}lf, HorizontalAxisValue = %{public}lf",
-        mouseEvent->GetPointerAction(), mouseEvent->GetPointerId(), mouseEvent->GetSourceType(),
-        mouseEvent->GetButtonId(), mouseEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
-        mouseEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
-    std::vector<int32_t> pointerIds { mouseEvent->GetPointersIdList() };
-    for (int32_t pointerId : pointerIds) {
-        PointerEvent::PointerItem item;
-        mouseEvent->GetPointerItem(pointerId, item);
-        MMI_LOGI("MouseEvent Item Normalization Results : DownTime = %{public}d, IsPressed = %{public}d,"
-            "GlobalX = %{public}d, GlobalY = %{public}d, LocalX = %{public}d, LocalY = %{public}d, Width = %{public}d,"
-            "Height = %{public}d, Pressure = %{public}d, DeviceId = %{public}d",
-            item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
-            item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
-            item.GetDeviceId());
+        pointerEvent->SetPressedKeys(pressedKeys);
     }
 
-    eventDispatch_.HandlePointerEvent(mouseEvent);
+    // 派发
+    eventDispatch_.HandlePointerEvent(pointerEvent);
+
+    // 返回值 代表是 鼠标事件有没有处理过， 不关心成功与失败
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnMouseEventTimerHanler(std::shared_ptr<PointerEvent> mouse_event)
+int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    if (mouse_event == nullptr) {
+    if (pointerEvent == nullptr) {
+        MMI_LOGE("pointerEvent is nullptr");
         return RET_ERR;
     }
-    eventDispatch_.HandlePointerEvent(mouse_event);
+    // Mouse Axis Data
+    MMI_LOGI("MouseEvent Normalization Results : PointerAction = %{public}d, PointerId = %{public}d,"
+        "SourceType = %{public}d, ButtonId = %{public}d,"
+        "VerticalAxisValue = %{public}lf, HorizontalAxisValue = %{public}lf",
+        pointerEvent->GetPointerAction(), pointerEvent->GetPointerId(), pointerEvent->GetSourceType(),
+        pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
+        pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
+    PointerEvent::PointerItem item;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
+    MMI_LOGI("MouseEvent Item Normalization Results : DownTime = %{public}d, IsPressed = %{public}d,"
+        "GlobalX = %{public}d, GlobalY = %{public}d, LocalX = %{public}d, LocalY = %{public}d, Width = %{public}d,"
+        "Height = %{public}d, Pressure = %{public}d, DeviceId = %{public}d",
+        item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
+        item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
+        item.GetDeviceId());
+
+    eventDispatch_.HandlePointerEvent(pointerEvent);
     return RET_OK;
 }
 
