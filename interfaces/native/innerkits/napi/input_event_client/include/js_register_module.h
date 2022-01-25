@@ -19,11 +19,11 @@
 #include <list>
 #include <string.h>
 #include <iostream>
-#include "native_api.h"
-#include "native_node_api.h"
 #include "libmmi_util.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_event.h"
+#include "napi/native_api.h"
+#include "napi/native_node_api.h"
 #include "standardized_event_handler.h"
 #include "common_event_handler.h"
 #include "system_event_handler.h"
@@ -62,21 +62,21 @@ enum JS_CALLBACK_EVENT {
 };
 
 namespace OHOS {
-    namespace MMI {
-        typedef struct {
-            uint32_t type;
-            StandEventPtr pevent;
-        } EventContext;
+namespace MMI {
+typedef struct {
+    uint32_t type;
+    StandEventPtr pevent;
+} EventContext;
 
-        typedef struct {
-            uint32_t type;
-            int32_t winId;
-            std::string name;
-            napi_value handle;
-        } EventInfo;
+typedef struct {
+    uint32_t type;
+    int32_t winId;
+    std::string name;
+    napi_value handle;
+} EventInfo;
 
-        typedef std::map<std::string, std::list<napi_ref>> CallbackMap;
-    }
+typedef std::map<std::string, std::list<napi_ref>> CallbackMap;
+}
 }
 
 #endif

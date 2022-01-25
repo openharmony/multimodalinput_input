@@ -34,7 +34,7 @@ public:
 
     void UnregisterEventHandleBySocketFd(int32_t fd);
 
-    int32_t FindSocketFdsByEventHandle(const MmiMessageId messageId, std::vector<int32_t>& fds);
+    void FindSocketFds(const MmiMessageId messageId, std::vector<int32_t>& fds);
 
     void PrintfMap();
     void Dump(int32_t fd);

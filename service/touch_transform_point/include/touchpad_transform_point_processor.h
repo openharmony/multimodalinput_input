@@ -26,12 +26,12 @@ class TouchPadTransformPointProcessor {
 public:
     TouchPadTransformPointProcessor();
     ~TouchPadTransformPointProcessor();
-    std::shared_ptr<PointerEvent> onLibinputTouchPadEvent(libinput_event *event);
-    void setPointEventSource(int32_t sourceType);
+    std::shared_ptr<PointerEvent> OnLibinputTouchPadEvent(libinput_event *event);
+    void SetPointEventSource(int32_t sourceType);
 private:
-    void onEventTouchPadDown(libinput_event *event);
-    void onEventTouchPadMotion(libinput_event *event);
-    void onEventTouchPadUp(libinput_event *event);
+    void OnEventTouchPadDown(libinput_event *event);
+    void OnEventTouchPadMotion(libinput_event *event);
+    void OnEventTouchPadUp(libinput_event *event);
     std::shared_ptr<PointerEvent> pointerEvent_;
 };
 }

@@ -57,7 +57,7 @@ void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
 {
     CHK(fingerCount > 0, PARAM_INPUT_INVALID);
     CHK(touch.time > 0, PARAM_INPUT_INVALID);
-    CHK(touch.seat_slot >= 0, PARAM_INPUT_INVALID);
+    CHK(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
     CHK(touch.eventType >= 0, PARAM_INPUT_INVALID);
     if (fingerCount == 1) {
         switch (touch.eventType) {
@@ -132,7 +132,7 @@ int32_t EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, OHOS::MMI::UD
 {
     CHKR(idMsg > MmiMessageId::INVALID, PARAM_INPUT_INVALID, PARAM_INPUT_INVALID);
     std::vector<int32_t> fds;
-    RegEventHM->FindSocketFdsByEventHandle(idMsg, fds);
+    RegEventHM->FindSocketFds(idMsg, fds);
     if (fds.empty()) {
         MMI_LOGW("Yet none of socketFds is found");
         return RET_OK;
@@ -160,6 +160,7 @@ int32_t EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, OHOS::MMI::UD
 int32_t EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSServer& udsServer,
     libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime)
 {
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     RegisteredEvent eve = {};
     auto result = eventPackage_.PackageRegisteredEvent<EventKeyboard>(key, eve);
     if (result != RET_OK) {
@@ -212,9 +213,9 @@ int32_t EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSServer& udsS
 }
 
 int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_event *event,
-    EventTabletPad& tabletPad, const uint64_t preHandlerTime)
+    const EventTabletPad& tabletPad, const uint64_t preHandlerTime)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 #ifdef DEBUG_CODE_TEST
@@ -264,9 +265,9 @@ int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_eve
 }
 
 int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_event *event,
-    EventJoyStickAxis& eventJoyStickAxis, const uint64_t preHandlerTime)
+    const EventJoyStickAxis& eventJoyStickAxis, const uint64_t preHandlerTime)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
     auto focusId = WinMgr->GetFocusSurfaceId();
@@ -297,9 +298,9 @@ int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_even
 }
 
 int32_t EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, libinput_event *event,
-    EventTabletTool& tableTool, const uint64_t preHandlerTime)
+    const EventTabletTool& tableTool, const uint64_t preHandlerTime)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     int32_t focusId = WinMgr->GetFocusSurfaceId(); // obtaining focusId
     if (focusId < 0) {
         return RET_OK;
@@ -357,6 +358,7 @@ bool EventDispatch::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point
 int32_t EventDispatch::handlePointerEvent(std::shared_ptr<PointerEvent> point) 
 {
     MMI_LOGE("handlePointerEvent begin .....");
+    CHKPR(point, PARAM_INPUT_INVALID, RET_ERR);
     auto fd = WinMgr->UpdateTargetPointer(point);
     if (HandlePointerEventFilter(point)) {
         return RET_OK;
@@ -383,7 +385,7 @@ int32_t EventDispatch::handlePointerEvent(std::shared_ptr<PointerEvent> point)
             break;
         }
         default: {
-            MMI_LOGD("Unknown source type!");
+            MMI_LOGW("Unknown source type!");
             break;
         }
     }
@@ -448,6 +450,7 @@ bool EventDispatch::HandleTouchPadEvent(std::shared_ptr<PointerEvent> point)
 int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
     std::shared_ptr<PointerEvent> point)
 {
+    CHKPR(point, PARAM_INPUT_INVALID, RET_ERR);
     InputHandlerManagerGlobal::GetInstance().HandleEvent(point);
     MMI_LOGD("call  DispatchTouchTransformPointEvent begin"); 
     auto appInfo = AppRegs->FindByWinId(point->GetAgentWindowId()); // obtain application information
@@ -467,7 +470,6 @@ int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
 
 void EventDispatch::DispatchPointerEventTrace(const EventPointer& point)
 {
-    int32_t EVENT_POINTER = 17;
     char pointerUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(pointerUuid, sizeof(pointerUuid), point.uuid, sizeof(point.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
@@ -476,13 +478,14 @@ void EventDispatch::DispatchPointerEventTrace(const EventPointer& point)
     MMI_LOGT(" OnEventPointer service DispatchPointerEvent pointerUuid = %{public}s\n", pointerUuid);
     std::string pointerEvent = pointerUuid;
     pointerEvent = "DispatchPointerEvent service pointerUuid: " + pointerEvent;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
+    int32_t eventPointer = 17;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
 }
 
 int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event *event,
     EventPointer &point, const uint64_t preHandlerTime)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
@@ -563,7 +566,7 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event
 int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event *event,
     EventGesture& gesture, const uint64_t preHandlerTime)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
@@ -618,7 +621,6 @@ int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event
 
 void EventDispatch::DispatchTouchEventTrace(const EventTouch& touch)
 {
-    int32_t EVENT_TOUCH = 9;
     char touchUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
@@ -627,13 +629,14 @@ void EventDispatch::DispatchTouchEventTrace(const EventTouch& touch)
     MMI_LOGT(" 4.event dispatcher of server: touchUuid = %{public}s\n", touchUuid);
     std::string touchEvent = touchUuid;
     touchEvent = "4.event dispatcher of server touchUuid: " + touchEvent;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
+    int32_t eventTouch = 9;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
 }
 
 int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
     EventTouch& touch, const uint64_t preHandlerTime)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
@@ -685,22 +688,21 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
         POINT_EVENT_TYPE pointEventType = EVENT_TYPE_INVALID;
         OnEventTouchGetPointEventType(touch, pointEventType, fingerCount);
         int32_t eventType = pointEventType;
-        newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime << touch.seat_slot;
-        std::vector<PAIR<uint32_t, int32_t>> touchIds;
+        newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime << touch.seatSlot;
+        std::vector<std::pair<uint32_t, int32_t>> touchIds;
         MMIRegEvent->GetTouchIds(touchIds, touch.deviceId);
         if (!touchIds.empty()) {
-            for (PAIR<uint32_t, int32_t> touchId : touchIds) {
+            for (std::pair<uint32_t, int32_t> touchId : touchIds) {
                 EventTouch touchTemp = {};
                 CHKR(EOK == memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch)),
                      MEMCPY_SEC_FUN_FAIL, RET_ERR);
                 MMIRegEvent->GetTouchInfoByTouchId(touchId, touchTemp);
-                MMI_LOGT("\n4.event dispatcher of server:\neventTouch:time=%{public}" PRId64 ";deviceType=%{public}u;"
-                         "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
-                         "slot=%{public}d;seat_slot=%{public}d;pressure=%{public}lf;point.x=%{public}lf;"
-                         "point.y=%{public}lf;fd=%{public}d;"
-                         "preHandlerTime=%{public}" PRId64 ";\n",
+                MMI_LOGT("4.event dispatcher of server:eventTouch:time=%{public}" PRId64 ", deviceType=%{public}u, "
+                         "deviceName=%{public}s, devicePhys=%{public}s, eventType=%{public}d, "
+                         "slot=%{public}d, seatSlot=%{public}d, pressure=%{public}lf, point.x=%{public}lf, "
+                         "point.y=%{public}lf, fd=%{public}d, preHandlerTime=%{public}" PRId64 "",
                          touchTemp.time, touchTemp.deviceType, touchTemp.deviceName,
-                         touchTemp.devicePhys, touchTemp.eventType, touchTemp.slot, touchTemp.seat_slot,
+                         touchTemp.devicePhys, touchTemp.eventType, touchTemp.slot, touchTemp.seatSlot,
                          touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, appInfo.fd,
                          preHandlerTime);
                 DispatchTouchEventTrace(touchTemp);
@@ -710,13 +712,12 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
         }
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
             newPacket << touch;
-            MMI_LOGT("\n4.event dispatcher of server:\neventTouch:time=%{public}" PRId64 ";deviceType=%{public}u;"
-                     "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
-                     "slot=%{public}d;seat_slot=%{public}d;pressure=%{public}lf;point.x=%{public}lf;"
-                     "point.y=%{public}lf;fd=%{public}d;"
-                     "preHandlerTime=%{public}" PRId64 ";\n",
+            MMI_LOGT("4.event dispatcher of server:eventTouch:time=%{public}" PRId64 ", deviceType=%{public}u, "
+                     "deviceName=%{public}s, devicePhys=%{public}s, eventType=%{public}d, "
+                     "slot=%{public}d, seatSlot=%{public}d, pressure=%{public}lf, point.x=%{public}lf, "
+                     "point.y=%{public}lf, fd=%{public}d, preHandlerTime=%{public}" PRId64 "",
                      touch.time, touch.deviceType, touch.deviceName,
-                     touch.devicePhys, touch.eventType, touch.slot, touch.seat_slot, touch.pressure,
+                     touch.devicePhys, touch.eventType, touch.slot, touch.seatSlot, touch.pressure,
                      touch.point.x, touch.point.y, appInfo.fd, preHandlerTime);
             DispatchTouchEventTrace(touch);
         }
@@ -730,7 +731,7 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
 int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_event *event,
     EventPointer& point, const uint64_t preHandlerTime)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
     auto type = libinput_event_get_type(event);
     CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
@@ -764,8 +765,9 @@ int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_e
 }
 
 int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
-    std::shared_ptr<OHOS::MMI::KeyEvent> key, const uint64_t preHandlerTime)
+    std::shared_ptr<KeyEvent> key, const uint64_t preHandlerTime)
 {
+    CHKPR(key, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("DispatchKeyEventByPid begin");
     if (AbilityMgr->CheckLaunchAbility(key)) {
         MMI_LOGD("The keyEvent start launch an ability, keyCode=%{public}d", key->GetKeyCode());
@@ -822,7 +824,6 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
 
 void EventDispatch::DispatchKeyEventTrace(const EventKeyboard& key)
 {
-    int32_t EVENT_KEY = 1;
     char keyUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
@@ -831,13 +832,14 @@ void EventDispatch::DispatchKeyEventTrace(const EventKeyboard& key)
     MMI_LOGT(" OnEventKeyboard service DispatchKeyEvent keyUuid = %{public}s\n", keyUuid);
     std::string keyEvent = keyUuid;
     keyEvent = "4.event dispatcher of server keyUuid: " + keyEvent;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
+    int32_t eventKey = 1;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 }
 
 int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *event,
     const KeyEventValueTransformations& trs, EventKeyboard& key, const uint64_t preHandlerTime)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
@@ -899,7 +901,7 @@ int32_t EventDispatch::AddInputEventFilter(sptr<IEventFilter> filter)
 int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_event *event,
     std::shared_ptr<PointerEvent> pointerEvent, const uint64_t preHandlerTime)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
