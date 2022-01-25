@@ -127,8 +127,8 @@ int32_t EventDispatch::GestureRegisteredEventDispatch(const MmiMessageId& idMsg,
     return ret;
 }
 
-int32_t EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, OHOS::MMI::UDSServer& udsServer,
-    RegisteredEvent& registeredEvent, int32_t inputDeviceType, uint64_t preHandlerTime)
+int32_t EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& udsServer,
+    const RegisteredEvent& registeredEvent, int32_t inputDeviceType, uint64_t preHandlerTime)
 {
     CHKR(idMsg > MmiMessageId::INVALID, PARAM_INPUT_INVALID, PARAM_INPUT_INVALID);
     std::vector<int32_t> fds;
@@ -355,7 +355,7 @@ bool EventDispatch::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point
     return EventFilterWrap::GetInstance().HandlePointerEventFilter(point);
 }
 
-int32_t EventDispatch::handlePointerEvent(std::shared_ptr<PointerEvent> point) 
+int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point) 
 {
     MMI_LOGE("handlePointerEvent begin .....");
     CHKPR(point, PARAM_INPUT_INVALID, RET_ERR);
