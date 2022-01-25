@@ -14,8 +14,8 @@
  */
 #ifndef OHOS_JS_INPUT_MONITOR_UTIL_H
 #define OHOS_JS_INPUT_MONITOR_UTIL_H
-#include "native_api.h"
-#include "native_node_api.h"
+#include "napi/native_api.h"
+#include "napi/native_node_api.h"
 namespace OHOS {
     namespace MMI {
         napi_status SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, bool value);

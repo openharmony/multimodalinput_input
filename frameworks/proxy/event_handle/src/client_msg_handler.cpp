@@ -744,12 +744,9 @@ int32_t OHOS::MMI::ClientMsgHandler::TouchEventFilter(const UDSClient& client, N
         fingersInfos[i].mMp.Setxy(touchData.point.x, touchData.point.y);
     }
 
-    MMI_LOGT("\nevent filter of client:\neventTouch:time=%{public}" PRId64 ";"
-             "deviceType=%{public}u;eventType=%{public}d;slot=%{public}d;seat_slot=%{public}d;"
-             "fd=%{public}d"
-             "\n************************************************************************\n",
-        touchData.time, touchData.deviceType, touchData.eventType, touchData.slot,
-        touchData.seat_slot, fd);
+    MMI_LOGT("Event filter of client:eventTouch:time=%{public}" PRId64 ", "
+             "deviceType=%{public}u, eventType=%{public}d, slot=%{public}d, seatSlot=%{public}d, fd=%{public}d",
+             touchData.time, touchData.deviceType, touchData.eventType, touchData.slot, touchData.seatSlot, fd);
     TraceTouchEvent(touchData);
 
     TouchEvent event;
@@ -938,16 +935,15 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, Ne
     */
     for (int i = 0; i < fingerCount; i++) {
         pkt >> touchData;
-        fingersInfos[i].mPointerId = touchData.seat_slot;
+        fingersInfos[i].mPointerId = touchData.seatSlot;
         fingersInfos[i].mTouchArea = static_cast<float>(touchData.area);
         fingersInfos[i].mTouchPressure = static_cast<float>(touchData.pressure);
         fingersInfos[i].mMp.Setxy(touchData.point.x, touchData.point.y);
-        MMI_LOGT("\nevent dispatcher of client:\neventTouch:time=%{public}" PRId64 ";"
-                 "deviceType=%{public}u;eventType=%{public}d;slot=%{public}d;seat_slot=%{public}d;"
-                 "fd=%{public}d;point.x=%{public}lf;point.y=%{public}lf"
-                 "\n************************************************************************\n",
+        MMI_LOGT("Event dispatcher of client:eventTouch:time=%{public}" PRId64 ", "
+                 "deviceType=%{public}u, eventType=%{public}d, slot=%{public}d, seatSlot=%{public}d, "
+                 "fd=%{public}d, point.x=%{public}lf, point.y=%{public}lf",
                  touchData.time, touchData.deviceType, touchData.eventType, touchData.slot,
-                 touchData.seat_slot, fd, touchData.point.x, touchData.point.y);
+                 touchData.seatSlot, fd, touchData.point.x, touchData.point.y);
     }
     TraceTouchEvent(touchData);
     TouchEvent touchEvent;
