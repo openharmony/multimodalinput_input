@@ -396,7 +396,7 @@ void MMIService::OnThread()
 bool MMIService::InitSignalHandler()
 {
     MMI_LOGD("enter");
-    sigset_t mask = 0;
+    sigset_t mask = {0};
     int32_t retCode = sigfillset(&mask);
     if (retCode < 0) {
         MMI_LOGE("fill signal set failed:%{public}s", strerror(errno));
