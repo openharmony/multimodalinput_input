@@ -196,7 +196,7 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
 {
     CHK(fingerCount > 0, PARAM_INPUT_INVALID);
     CHK(touch.time > 0, PARAM_INPUT_INVALID);
-    CHK(touch.seat_slot >= 0, PARAM_INPUT_INVALID);
+    CHK(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
     CHK(touch.eventType >= 0, PARAM_INPUT_INVALID);
     if (fingerCount == 1) {
         switch (touch.eventType) {
@@ -317,13 +317,12 @@ bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event
                 CHKR(EOK == memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch)),
                      MEMCPY_SEC_FUN_FAIL, RET_ERR);
                 MMIRegEvent->GetTouchInfoByTouchId(touchId, touchTemp);
-                MMI_LOGT("\n4.event filter of server 1:\neventTouch:time=%{public}" PRId64 ";deviceType=%{public}u;"
-                         "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
-                         "slot=%{public}d;seat_slot=%{public}d;pressure=%{public}lf;point.x=%{public}lf;"
-                         "point.y=%{public}lf;fd=%{public}d;"
-                         "preHandlerTime=%{public}" PRId64";\n**************************************************\n",
+                MMI_LOGT("4.event filter of server 1:eventTouch:time=%{public}" PRId64 ", deviceType=%{public}u, "
+                         "deviceName=%{public}s, devicePhys=%{public}s, eventType=%{public}d, "
+                         "slot=%{public}d, seatSlot=%{public}d, pressure=%{public}lf, point.x=%{public}lf, "
+                         "point.y=%{public}lf, fd=%{public}d, preHandlerTime=%{public}" PRId64"",
                          touchTemp.time, touchTemp.deviceType, touchTemp.deviceName,
-                         touchTemp.devicePhys, touchTemp.eventType, touchTemp.slot, touchTemp.seat_slot,
+                         touchTemp.devicePhys, touchTemp.eventType, touchTemp.slot, touchTemp.seatSlot,
                          touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, appInfo.fd,
                          preHandlerTime);
                 newPacket << touchTemp;
@@ -331,13 +330,12 @@ bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event
         }
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
             newPacket << touch;
-            MMI_LOGT("\n4.event filter of server 2:\neventTouch:time=%{public}" PRId64 ";deviceType=%{public}u;"
-                     "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
-                     "slot=%{public}d;seat_slot=%{public}d;pressure=%{public}lf;point.x=%{public}lf;"
-                     "point.y=%{public}lf;fd=%{public}d;"
-                     "preHandlerTime=%{public}" PRId64";\n*******************************************************\n",
+            MMI_LOGT("4.event filter of server 2:eventTouch:time=%{public}" PRId64 ", deviceType=%{public}u, "
+                     "deviceName=%{public}s, devicePhys=%{public}s, eventType=%{public}d, "
+                     "slot=%{public}d, seatSlot=%{public}d, pressure=%{public}lf, point.x=%{public}lf, "
+                     "point.y=%{public}lf, fd=%{public}d, preHandlerTime=%{public}" PRId64"",
                      touch.time, touch.deviceType, touch.deviceName,
-                     touch.devicePhys, touch.eventType, touch.slot, touch.seat_slot, touch.pressure,
+                     touch.devicePhys, touch.eventType, touch.slot, touch.seatSlot, touch.pressure,
                      touch.point.x, touch.point.y, appInfo.fd, preHandlerTime);
         }
         newPacket << id;
