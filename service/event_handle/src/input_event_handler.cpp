@@ -733,7 +733,7 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
 
     auto pointerEvent = EventPackage::LibinputEventToPointerEvent(event);
-    if (RET_OK == eventDispatch_.handlePointerEvent(pointerEvent)) {
+    if (RET_OK == eventDispatch_.HandlePointerEvent(pointerEvent)) {
         MMI_LOGD("interceptor of OnGestureEvent end .....");
         return RET_OK;
     }
