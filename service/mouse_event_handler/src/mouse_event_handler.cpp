@@ -133,7 +133,7 @@ void MouseEventHandler::SetMouseAxis(struct libinput_event_pointer& pointEventDa
 
 void MouseEventHandler::SetMouseData(libinput_event *event, int32_t deviceId)
 {
-    CHK(event, PARAM_INPUT_INVALID);
+    CHKP(event, PARAM_INPUT_INVALID);
     PointerEvent::PointerItem pointerItem;
     libinput_event_pointer *pointEventData = nullptr;
     pointEventData = libinput_event_get_pointer_event(event);
