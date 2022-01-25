@@ -344,7 +344,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_event &ev)
 
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     uint64_t preHandlerTime = GetSysClockTime();
     if (keyEvent == nullptr) {
         keyEvent = KeyEvent::Create();
@@ -434,7 +434,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(multimodal_libinput_event& ev)
 
 int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     uint64_t preHandlerTime = GetSysClockTime();
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     EventKeyboard keyBoard = {};
@@ -620,13 +620,13 @@ int32_t InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
 
 int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("call  OnEventTouchSecond begin"); 
-    auto point = touchTransformPointManger->onLibinputTouchEvent(event);
+    auto point = touchTransformPointManger->OnLibinputTouchEvent(event);
     if (point == nullptr) {
         return RET_OK;
     }
-    eventDispatch_.handlePointerEvent(point);
+    eventDispatch_.HandlePointerEvent(point);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         point->RemovePointerItem(point->GetPointerId());
@@ -643,14 +643,14 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 
 int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("call  OnEventTouchPadSecond begin");
 
-    auto point = touchTransformPointManger->onLibinputTouchPadEvent(event);    
+    auto point = touchTransformPointManger->OnLibinputTouchPadEvent(event);
     if (point == nullptr) {
         return RET_OK;
     }
-    eventDispatch_.handlePointerEvent(point);
+    eventDispatch_.HandlePointerEvent(point);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
         point->RemovePointerItem(point->GetPointerId());
@@ -910,7 +910,7 @@ int32_t InputEventHandler::OnEventJoyStickAxis(multimodal_libinput_event &ev, co
 
 int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event, const int32_t deviceId)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto mouseEvent = MouseEventHandler::Create();
     if (mouseEvent == nullptr) {
         return RET_ERR;
@@ -949,7 +949,7 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event, const int3
             item.GetDeviceId());
     }
 
-    eventDispatch_.handlePointerEvent(mouseEvent);
+    eventDispatch_.HandlePointerEvent(mouseEvent);
     return RET_OK;
 }
 
@@ -958,7 +958,7 @@ int32_t InputEventHandler::OnMouseEventTimerHanler(std::shared_ptr<PointerEvent>
     if (mouse_event == nullptr) {
         return RET_ERR;
     }
-    eventDispatch_.handlePointerEvent(mouse_event);
+    eventDispatch_.HandlePointerEvent(mouse_event);
     return RET_OK;
 }
 

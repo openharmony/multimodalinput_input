@@ -189,7 +189,7 @@ private:
     int32_t UpdateTouchPadTargetOld(std::shared_ptr<PointerEvent> pointerEvent);
 
     /*********************************新框架接口添加*************************** */
-    bool isTouchWindow(int32_t x, int32_t y, const WindowInfo &info) const;
+    bool IsTouchWindow(int32_t x, int32_t y, const WindowInfo &info) const;
     void PrintDisplayDebugInfo();
     void SetLocalInfo(int32_t x, int32_t y);
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);

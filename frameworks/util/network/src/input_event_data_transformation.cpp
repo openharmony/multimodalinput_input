@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace MMI {
 int32_t InputEventDataTransformation::KeyEventToNetPacket(
-    const std::shared_ptr<OHOS::MMI::KeyEvent> key, NetPacket &pck)
+    const std::shared_ptr<KeyEvent> key, NetPacket &pck)
 {
     CHKR((RET_OK == SerializeInputEvent(key, pck)), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pck.Write(key->GetKeyCode()), STREAM_BUF_WRITE_FAIL, RET_ERR);
@@ -36,7 +36,7 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
     return RET_OK;
 }
 int32_t InputEventDataTransformation::NetPacketToKeyEvent(bool skipId, 
-    std::shared_ptr<OHOS::MMI::KeyEvent> key, NetPacket &pck)
+    std::shared_ptr<KeyEvent> key, NetPacket &pck)
 {
     int32_t data = 0;
     int32_t size = 0;
@@ -48,7 +48,7 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(bool skipId,
     key->SetKeyAction(data);
     CHKR(pck.Read(size), STREAM_BUF_READ_FAIL, RET_ERR);
     for (int32_t i = 0; i < size; i++) {
-        OHOS::MMI::KeyEvent::KeyItem keyItem;
+        KeyEvent::KeyItem keyItem;
         CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
         keyItem.SetKeyCode(data);
         CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);

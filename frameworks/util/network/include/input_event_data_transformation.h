@@ -25,8 +25,8 @@ namespace MMI {
 class InputEventDataTransformation {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventDataTransformation" };
 public:
-    static int32_t KeyEventToNetPacket(const std::shared_ptr<OHOS::MMI::KeyEvent> key, NetPacket &pck);
-    static int32_t NetPacketToKeyEvent(bool skipId, std::shared_ptr<OHOS::MMI::KeyEvent> key, NetPacket &pck);
+    static int32_t KeyEventToNetPacket(const std::shared_ptr<KeyEvent> key, NetPacket &pck);
+    static int32_t NetPacketToKeyEvent(bool skipId, std::shared_ptr<KeyEvent> key, NetPacket &pck);
     static int32_t SerializeInputEvent(std::shared_ptr<InputEvent> pointerE, NetPacket &pck);
     static int32_t DeserializeInputEvent(bool skipId, std::shared_ptr<InputEvent> pointerE, NetPacket &pck);
     static int32_t SerializePointerEvent(std::shared_ptr<PointerEvent> pointerE, NetPacket &pck);
