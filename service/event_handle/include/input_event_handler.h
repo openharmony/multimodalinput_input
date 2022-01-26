@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace MMI {
-using EventFun = std::function<int32_t(multimodal_libinput_event &ev)>;
+using EventFun = std::function<int32_t(const multimodal_libinput_event& ev)>;
 using NotifyDeviceChange = std::function<void(int32_t, int32_t, char *)>;
 class InputEventHandler : public MsgHandler<EventFun>, public DelayedSingleton<InputEventHandler> {
 public:
@@ -40,25 +40,25 @@ public:
     UDSServer *GetUDSServer();
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
 protected:
-    int32_t OnEventDeviceAdded(multimodal_libinput_event& event);
-    int32_t OnEventDeviceRemoved(multimodal_libinput_event& event);
-    int32_t OnEventKeyboard(multimodal_libinput_event& event);
-    int32_t OnEventPointer(multimodal_libinput_event& event);
-    int32_t OnEventTouch(multimodal_libinput_event& event);
+    int32_t OnEventDeviceAdded(const multimodal_libinput_event& event);
+    int32_t OnEventDeviceRemoved(const multimodal_libinput_event& event);
+    int32_t OnEventKeyboard(const multimodal_libinput_event& event);
+    int32_t OnEventPointer(const multimodal_libinput_event& event);
+    int32_t OnEventTouch(const multimodal_libinput_event& event);
     int32_t OnEventTouchSecond(libinput_event *event);
     int32_t OnEventTouchPadSecond(libinput_event *event);
-    int32_t OnEventGesture(multimodal_libinput_event& event);
-    int32_t OnEventTouchpad(multimodal_libinput_event& event);
+    int32_t OnEventGesture(const multimodal_libinput_event& event);
+    int32_t OnEventTouchpad(const multimodal_libinput_event& event);
     int32_t OnGestureEvent(libinput_event *event);
-    int32_t OnEventTabletTool(multimodal_libinput_event& event);
-    int32_t OnEventTabletPad(multimodal_libinput_event& event);
-    int32_t OnEventSwitchToggle(multimodal_libinput_event& event);
-    int32_t OnEventJoyStickKey(multimodal_libinput_event& event, const uint64_t time);
-    int32_t OnEventTabletPadKey(multimodal_libinput_event& event);
-    int32_t OnEventJoyStickAxis(multimodal_libinput_event& event, const uint64_t time);
+    int32_t OnEventTabletTool(const multimodal_libinput_event& event);
+    int32_t OnEventTabletPad(const multimodal_libinput_event& event);
+    int32_t OnEventSwitchToggle(const multimodal_libinput_event& event);
+    int32_t OnEventJoyStickKey(const multimodal_libinput_event& event, const uint64_t time);
+    int32_t OnEventTabletPadKey(const multimodal_libinput_event& event);
+    int32_t OnEventJoyStickAxis(const multimodal_libinput_event& event, const uint64_t time);
     int32_t OnKeyboardEvent(libinput_event *event);
     int32_t OnEventKey(libinput_event *event);
-    int32_t OnKeyEventDispatch(multimodal_libinput_event& event);
+    int32_t OnKeyEventDispatch(const multimodal_libinput_event& event);
     
     int32_t OnMouseEventHandler(libinput_event *event);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
@@ -70,7 +70,7 @@ protected:
 #endif
 
 private:
-    int32_t OnEventHandler(multimodal_libinput_event& ev);
+    int32_t OnEventHandler(const multimodal_libinput_event& ev);
     std::mutex mu_;
     UDSServer *udsServer_ = nullptr;
     EventDispatch eventDispatch_;
