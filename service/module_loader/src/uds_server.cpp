@@ -378,10 +378,10 @@ void OHOS::MMI::UDSServer::OnEpollEvent(epoll_event& ev, std::map<int32_t, Strea
 
 void OHOS::MMI::UDSServer::DumpSession(const std::string &title)
 {
-    MMI_LOGI("in %s: %s\n", __func__, title.c_str());
+    MMI_LOGI("in %s: %s", __func__, title.c_str());
     int i = 0;
     for (auto& r : sessionsMap_) {
-        MMI_LOGI("%d, %s\n", i, r.second->GetDescript().c_str());
+        MMI_LOGI("%d, %s", i, r.second->GetDescript().c_str());
         i++;
     }
 }
