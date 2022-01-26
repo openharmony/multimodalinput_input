@@ -695,7 +695,7 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
                 EventTouch touchTemp = {};
                 CHKR(EOK == memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch)),
                      MEMCPY_SEC_FUN_FAIL, RET_ERR);
-                MMIRegEvent->GetTouchInfoByTouchId(touchId, touchTemp);
+                MMIRegEvent->GetTouchInfo(touchId, touchTemp);
                 MMI_LOGT("4.event dispatcher of server, eventTouch:time=%{public}" PRId64 ", deviceType=%{public}u, "
                          "deviceName=%{public}s, physical=%{public}s, eventType=%{public}d, "
                          "slot=%{public}d, seatSlot=%{public}d, pressure=%{public}lf, point.x=%{public}lf, "

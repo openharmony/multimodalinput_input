@@ -498,7 +498,7 @@ int32_t RegisterEvent::OnEventTouchMotionGetSign(const EventTouch& touch, MmiMes
     return RET_OK;
 }
 
-int32_t RegisterEvent::GetTouchInfoByTouchId(const std::pair<uint32_t, int32_t> key, EventTouch& touch)
+int32_t RegisterEvent::GetTouchInfo(const std::pair<uint32_t, int32_t> key, EventTouch& touch)
 {
     auto iter = touchInfos_.find(key);
     CHKF(iter != touchInfos_.end(), TOUCH_ID_NO_FIND);
