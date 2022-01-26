@@ -156,8 +156,8 @@ void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
     inputDevice_[nextId_] = inputDevice;
     ++nextId_;
 
-    if (IsPointerDevice(inputDevice)) {
-        DrawWgr->TellDeviceInfo(true);
+    if (IsPointerDevice(static_cast<struct libinput_device *>(inputDevice))) {
+        Notify(true);
     }
     MMI_LOGD("end");
 }
@@ -175,7 +175,7 @@ void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
         if (it->second == inputDevice) {
             inputDevice_.erase(it);
             if (IsPointerDevice(inputDevice)) {
-                DrawWgr->TellDeviceInfo(false);
+                Notify(false);
             }
             break;
         }
@@ -191,6 +191,23 @@ bool InputDeviceManager::IsPointerDevice(libinput_device* device)
     MMI_LOGD("leave");
     return udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK | 
     EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD);
+}
+
+void InputDeviceManager::Attach(Observer* observer)
+{
+    observers.push_back(observer);
+}
+
+void InputDeviceManager::Detach(Observer* observer)
+{
+    observers.remove(observer);
+}
+
+void InputDeviceManager::Notify(bool hasPointerDevice)
+{
+    for (auto observer = observers.begin(); observer != observers.end(); observer++) {
+        (*observer)->Update(hasPointerDevice);
+    }
 }
 
 int32_t InputDeviceManager::FindInputDeviceId(libinput_device* inputDevice)
