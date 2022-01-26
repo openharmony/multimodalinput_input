@@ -25,7 +25,7 @@ namespace OHOS {
  * @see MultimodalEvent
  * @since 1
  */
-class RotationEvent : public MultimodalEvent {
+class RotationEvent : public MMI::MultimodalEvent {
 public:
     virtual ~RotationEvent();
 

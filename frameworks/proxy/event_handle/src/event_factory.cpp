@@ -22,6 +22,7 @@
 #include "touch_event.h"
 
 namespace OHOS {
+namespace MMI{
 template<class T>
 MultimodalEventPtr Create()
 {
@@ -58,4 +59,5 @@ MultimodalEventPtr EventFactory::CreateEvent(EventType eventType)
     }
     return nullptr;
 }
-}
+}//namespace MMI
+}//namespace OHOS

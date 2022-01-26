@@ -17,7 +17,7 @@
 #include "multimodal_event.h"
 
 namespace OHOS {
-class DeviceEvent : public MultimodalEvent {
+class DeviceEvent : public MMI::MultimodalEvent {
 public:
     virtual ~DeviceEvent();
     void Initialize(const std::string& name, const std::string& sysName, int32_t inputDeviceId);
