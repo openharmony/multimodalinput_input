@@ -140,10 +140,10 @@ int32_t EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& ud
 
     for (const auto& fd : fds) {
         auto appInfo = AppRegs->FindBySocketFd(fd);
-        MMI_LOGT("Event dispatcher of server:RegisteredEvent:devicePhys=%{public}s, "
+        MMI_LOGT("Event dispatcher of server, RegisteredEvent:physical=%{public}s, "
                  "deviceType=%{public}u, eventType=%{public}u, occurredTime=%{public}" PRId64 ", "
                  "conbinecode=%{public}d, fd=%{public}d",
-                 registeredEvent.devicePhys, registeredEvent.deviceType,
+                 registeredEvent.physical, registeredEvent.deviceType,
                  registeredEvent.eventType, registeredEvent.occurredTime,
                  idMsg, fd);
 
@@ -242,13 +242,13 @@ int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_eve
     MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
 #endif
 
-    MMI_LOGT("\n4.event dispatcher of server:\nEventTabletPad:time=%{public}" PRId64 ";deviceType=%{public}u;"
-             "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;\n"
-             "ring.number=%{public}d;ring.position=%{public}lf;ring.source=%{public}d;\n"
-             "strip.number=%{public}d;strip.position=%{public}lf;strip.source=%{public}d;\n"
-             "fd=%{public}d;preHandlerTime=%{public}" PRId64 ";\n",
+    MMI_LOGT("4.event dispatcher of server, EventTabletPad:time=%{public}" PRId64 ", deviceType=%{public}u, "
+             "deviceName=%{public}s, physical=%{public}s, eventType=%{public}d, "
+             "ring.number=%{public}d, ring.position=%{public}lf, ring.source=%{public}d, "
+             "strip.number=%{public}d, strip.position=%{public}lf, strip.source=%{public}d, "
+             "fd=%{public}d, preHandlerTime=%{public}" PRId64,
              tabletPad.time, tabletPad.deviceType, tabletPad.deviceName,
-             tabletPad.devicePhys, tabletPad.eventType, tabletPad.ring.number, tabletPad.ring.position,
+             tabletPad.physical, tabletPad.eventType, tabletPad.ring.number, tabletPad.ring.position,
              tabletPad.ring.source, tabletPad.strip.number, tabletPad.strip.position, tabletPad.strip.source,
              appInfo.fd, preHandlerTime);
 
@@ -326,16 +326,16 @@ int32_t EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, libinput_ev
         std::string strIds = WinMgr->GetSurfaceIdListString();
         PrintWMSInfo(strIds, appInfo.fd, appInfo.abilityId, focusId);
 #endif
-        MMI_LOGT("\n4.event dispatcher of server:TabletTool:time=%{public}" PRId64 ";"
-                 "deviceType=%{public}u; deviceName=%{public}s; devicePhys=%{public}s; eventType=%{public}d; "
-                 "type=%{public}u; serial=%{public}u; button=%{public}d; state=%{public}d; "
-                 "point.x=%{public}lf; point.y=%{public}lf; tilt.x=%{public}lf; tilt.y=%{public}lf; "
-                 "distance=%{public}lf; pressure=%{public}lf; rotation=%{public}lf; slider=%{public}lf; "
-                 "wheel=%{public}lf; wheel_discrete=%{public}d; size.major=%{public}lf; size.minor=%{public}lf; "
-                 "proximity_state=%{public}d; tip_state=%{public}d; state=%{public}d; seat_button_count=%{public}d; "
-                 "preHandlerTime=%{public}" PRId64 "; fd=%{public}d;",
+        MMI_LOGT("4.event dispatcher of server, TabletTool:time=%{public}" PRId64 ", "
+                 "deviceType=%{public}u, deviceName=%{public}s, physical=%{public}s, eventType=%{public}d, "
+                 "type=%{public}u, serial=%{public}u, button=%{public}d, state=%{public}d, "
+                 "point.x=%{public}lf, point.y=%{public}lf, tilt.x=%{public}lf, tilt.y=%{public}lf, "
+                 "distance=%{public}lf, pressure=%{public}lf, rotation=%{public}lf, slider=%{public}lf, "
+                 "wheel=%{public}lf, wheel_discrete=%{public}d, size.major=%{public}lf, size.minor=%{public}lf, "
+                 "proximity_state=%{public}d, tip_state=%{public}d, state=%{public}d, seat_button_count=%{public}d, "
+                 "preHandlerTime=%{public}" PRId64 ", fd=%{public}d",
                  tableTool.time, tableTool.deviceType, tableTool.deviceName,
-                 tableTool.devicePhys, tableTool.eventType, tableTool.tool.type,
+                 tableTool.physical, tableTool.eventType, tableTool.tool.type,
                  tableTool.tool.serial, tableTool.button, tableTool.state, tableTool.axes.point.x,
                  tableTool.axes.point.y, tableTool.axes.tilt.x, tableTool.axes.tilt.y, tableTool.axes.distance,
                  tableTool.axes.pressure, tableTool.axes.rotation, tableTool.axes.slider, tableTool.axes.wheel,
@@ -542,18 +542,17 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event
         }
 #endif
 
-        MMI_LOGT("\n4.event dispatcher of server:\neventPointer:time=%{public}" PRId64 ";deviceType=%{public}u;"
-                    "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
-                    "buttonCode=%{public}u;seat_button_count=%{public}u;axis=%{public}u;buttonState=%{public}d;"
-                    "source=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;delta_raw.x=%{public}lf;"
-                    "delta_raw.y=%{public}lf;absolute.x=%{public}lf;absolute.y=%{public}lf;discrete.x=%{public}lf;"
-                    "discrete.y=%{public}lf;fd=%{public}d;"
-                    "preHandlerTime=%{public}" PRId64 ";\n",
-                    point.time, point.deviceType, point.deviceName,
-                    point.devicePhys, point.eventType, point.button, point.seat_button_count, point.axis,
-                    point.state, point.source, point.delta.x, point.delta.y, point.delta_raw.x,
-                    point.delta_raw.y, point.absolute.x, point.absolute.y, point.discrete.x,
-                    point.discrete.y, appInfo.fd, preHandlerTime);
+        MMI_LOGT("4.event dispatcher of server, eventPointer:time=%{public}" PRId64 ", deviceType=%{public}u, "
+                 "deviceName=%{public}s, physical=%{public}s, eventType=%{public}d, "
+                 "buttonCode=%{public}u, seat_button_count=%{public}u, axis=%{public}u, buttonState=%{public}d, "
+                 "source=%{public}d, delta.x=%{public}lf, delta.y=%{public}lf, delta_raw.x=%{public}lf, "
+                 "delta_raw.y=%{public}lf, absolute.x=%{public}lf, absolute.y=%{public}lf, discrete.x=%{public}lf, "
+                 "discrete.y=%{public}lf, fd=%{public}d, preHandlerTime=%{public}" PRId64,
+                 point.time, point.deviceType, point.deviceName,
+                 point.physical, point.eventType, point.button, point.seat_button_count, point.axis,
+                 point.state, point.source, point.delta.x, point.delta.y, point.delta_raw.x,
+                 point.delta_raw.y, point.absolute.x, point.absolute.y, point.discrete.x,
+                 point.discrete.y, appInfo.fd, preHandlerTime);
         DispatchPointerEventTrace(point);
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
             MMI_LOGE("Sending structure of EventPointer failed! errCode:%{public}d\n", MSG_SEND_FAIL);
@@ -597,12 +596,12 @@ int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event
         return FOCUS_ID_OBTAIN_FAIL;
     }
 
-    MMI_LOGT("4.event dispatcher of server:EventGesture:time=%{public}" PRId64 ";deviceType=%{public}u;"
-             "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
-             "fingerCount=%{public}d;cancelled=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
-             "deltaUnaccel.x=%{public}lf;deltaUnaccel.y=%{public}lf;fd=%{public}d;"
-             "preHandlerTime=%{public}" PRId64 ";",
-             gesture.time, gesture.deviceType, gesture.deviceName, gesture.devicePhys,
+    MMI_LOGT("4.event dispatcher of server, EventGesture:time=%{public}" PRId64 ", deviceType=%{public}u, "
+             "deviceName=%{public}s, physical=%{public}s, eventType=%{public}d, "
+             "fingerCount=%{public}d, cancelled=%{public}d, delta.x=%{public}lf, delta.y=%{public}lf, "
+             "deltaUnaccel.x=%{public}lf, deltaUnaccel.y=%{public}lf, fd=%{public}d, "
+             "preHandlerTime=%{public}" PRId64,
+             gesture.time, gesture.deviceType, gesture.deviceName, gesture.physical,
              gesture.eventType, gesture.fingerCount, gesture.cancelled, gesture.delta.x, gesture.delta.y,
              gesture.deltaUnaccel.x, gesture.deltaUnaccel.y, appInfo.fd, preHandlerTime);
     PrintEventSlotedCoordsInfo(gesture.soltTouches);
@@ -697,12 +696,12 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
                 CHKR(EOK == memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch)),
                      MEMCPY_SEC_FUN_FAIL, RET_ERR);
                 MMIRegEvent->GetTouchInfoByTouchId(touchId, touchTemp);
-                MMI_LOGT("4.event dispatcher of server:eventTouch:time=%{public}" PRId64 ", deviceType=%{public}u, "
-                         "deviceName=%{public}s, devicePhys=%{public}s, eventType=%{public}d, "
+                MMI_LOGT("4.event dispatcher of server, eventTouch:time=%{public}" PRId64 ", deviceType=%{public}u, "
+                         "deviceName=%{public}s, physical=%{public}s, eventType=%{public}d, "
                          "slot=%{public}d, seatSlot=%{public}d, pressure=%{public}lf, point.x=%{public}lf, "
-                         "point.y=%{public}lf, fd=%{public}d, preHandlerTime=%{public}" PRId64 "",
+                         "point.y=%{public}lf, fd=%{public}d, preHandlerTime=%{public}" PRId64,
                          touchTemp.time, touchTemp.deviceType, touchTemp.deviceName,
-                         touchTemp.devicePhys, touchTemp.eventType, touchTemp.slot, touchTemp.seatSlot,
+                         touchTemp.physical, touchTemp.eventType, touchTemp.slot, touchTemp.seatSlot,
                          touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, appInfo.fd,
                          preHandlerTime);
                 DispatchTouchEventTrace(touchTemp);
@@ -712,12 +711,12 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
         }
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
             newPacket << touch;
-            MMI_LOGT("4.event dispatcher of server:eventTouch:time=%{public}" PRId64 ", deviceType=%{public}u, "
-                     "deviceName=%{public}s, devicePhys=%{public}s, eventType=%{public}d, "
+            MMI_LOGT("4.event dispatcher of server, eventTouch:time=%{public}" PRId64 ", deviceType=%{public}u, "
+                     "deviceName=%{public}s, physical=%{public}s, eventType=%{public}d, "
                      "slot=%{public}d, seatSlot=%{public}d, pressure=%{public}lf, point.x=%{public}lf, "
-                     "point.y=%{public}lf, fd=%{public}d, preHandlerTime=%{public}" PRId64 "",
+                     "point.y=%{public}lf, fd=%{public}d, preHandlerTime=%{public}" PRId64,
                      touch.time, touch.deviceType, touch.deviceName,
-                     touch.devicePhys, touch.eventType, touch.slot, touch.seatSlot, touch.pressure,
+                     touch.physical, touch.eventType, touch.slot, touch.seatSlot, touch.pressure,
                      touch.point.x, touch.point.y, appInfo.fd, preHandlerTime);
             DispatchTouchEventTrace(touch);
         }
@@ -875,11 +874,11 @@ int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *ev
     }
     key.key = trs.keyValueOfHos; // struct EventKeyboard tranformed into HOS_L3
 
-    MMI_LOGT("4.event dispatcher of server:eventKeyboard:time=%{public}" PRId64 ", deviceType=%{public}u, "
-             "deviceName=%{public}s, devicePhys=%{public}s, eventType=%{public}d, unicode=%{public}d, key=%{public}u, "
-			 "key_detail=%{public}s, seat_key_count=%{public}u, state=%{public}d, fd=%{public}d, "
-			 "preHandlerTime=%{public}" PRId64 "", key.time, key.deviceType, key.deviceName, key.devicePhys,
-			 key.eventType, key.unicode, key.key, trs.keyEvent.c_str(), key.seat_key_count, key.state, appInfo.fd,
+    MMI_LOGT("4.event dispatcher of server, eventKeyboard:time=%{public}" PRId64 ", deviceType=%{public}u, "
+             "deviceName=%{public}s, physical=%{public}s, eventType=%{public}d, unicode=%{public}d, key=%{public}u, "
+             "key_detail=%{public}s, seat_key_count=%{public}u, state=%{public}d, fd=%{public}d, "
+             "preHandlerTime=%{public}" PRId64, key.time, key.deviceType, key.deviceName, key.physical,
+             key.eventType, key.unicode, key.key, trs.keyEvent.c_str(), key.seat_key_count, key.state, appInfo.fd,
              preHandlerTime);
     DispatchKeyEventTrace(key);
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, appInfo.fd, key.time, preHandlerTime)) {

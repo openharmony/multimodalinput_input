@@ -201,43 +201,43 @@ int32_t MultimodalEvent::DeviceTypeTransform(int32_t sourceType) const
     int32_t deviceType = UNSUPPORTED_DEVICE;
 
     switch (sourceType) {
-        case HOS_TOUCH_PANEL: {
+        case DEVICE_TYPE_TOUCH_PANEL: {
             deviceType = TOUCH_PANEL;
             break;
         }
-        case HOS_KEYBOARD: {
+        case DEVICE_TYPE_KEYBOARD: {
             deviceType = KEYBOARD;
             break;
         }
-        case HOS_MOUSE: {
+        case DEVICE_TYPE_MOUSE: {
             deviceType = MOUSE;
             break;
         }
-        case HOS_STYLUS: {
+        case DEVICE_TYPE_STYLUS: {
             deviceType = STYLUS;
             break;
         }
-        case HOS_BUILTIN_KEY: {
+        case DEVICE_TYPE_BUILTIN_KEY: {
             deviceType = BUILTIN_KEY;
             break;
         }
-        case HOS_ROTATION: {
+        case DEVICE_TYPE_ROTATION: {
             deviceType = ROTATION;
             break;
         }
-        case HOS_AI_SPEECH: {
+        case DEVICE_TYPE_AI_SPEECH: {
             deviceType = SPEECH;
             break;
         }
-        case HOS_JOYSTICK: {
+        case DEVICE_TYPE_JOYSTICK: {
             deviceType = JOYSTICK;
             break;
         }
-        case HOS_TOUCHPAD: {
+        case DEVICE_TYPE_TOUCHPAD: {
             deviceType = TOUCH_PAD;
             break;
         }
-        case HOS_KNUCKLE: {
+        case DEVICE_TYPE_KNUCKLE: {
             deviceType = KNUCKLE;
             break;
         }
