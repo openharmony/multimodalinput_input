@@ -48,7 +48,7 @@ namespace OHOS::MMI {
         } else if (fd == 0) {
             MMI_LOGF("%{public}s", buf);
         } else {
-            ret = dprintf(fd, "%s", buf);
+            ret = dprintf(fd, "%s\n", buf);
         }
         return ret;
     }
