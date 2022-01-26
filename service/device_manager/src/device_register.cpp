@@ -75,7 +75,7 @@ uint32_t DeviceRegister::AddDeviceInfo(std::string& physical)
             return 0;
         }
         setDeviceId_.insert(addDeviceId);
-        mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(devicePhys, addDeviceId));
+        mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(physical, addDeviceId));
         MMI_LOGT("Adding Device number succeed");
         return addDeviceId;
     }
