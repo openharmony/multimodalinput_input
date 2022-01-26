@@ -47,25 +47,25 @@ namespace {
         }
     }
 
-    HOS_DEVICE_TYPE GetDeviceType(struct libinput_device* device)
+    DEVICE_TYPE GetDeviceType(struct libinput_device* device)
     {
-        CHKPR(device, ERROR_NULL_POINTER, HOS_UNKNOWN_DEVICE_TYPE);
+        CHKPR(device, ERROR_NULL_POINTER, DEVICE_TYPE_UNKNOWN);
         enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
         if (udevTags & EVDEV_UDEV_TAG_JOYSTICK) {
-            return HOS_JOYSTICK;
+            return DEVICE_TYPE_JOYSTICK;
         } else if (udevTags & EVDEV_UDEV_TAG_KEYBOARD) {
-            return HOS_KEYBOARD;
+            return DEVICE_TYPE_KEYBOARD;
         } else if (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK)) {
-            return HOS_MOUSE;
+            return DEVICE_TYPE_MOUSE;
         } else if (udevTags & EVDEV_UDEV_TAG_TOUCHSCREEN) {
-            return HOS_TOUCH_PANEL;
+            return DEVICE_TYPE_TOUCH_PANEL;
         } else if (udevTags & (EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) {
-            return HOS_TOUCHPAD;
+            return DEVICE_TYPE_TOUCHPAD;
         } else if (udevTags & EVDEV_UDEV_TAG_TABLET) {
-            return HOS_STYLUS;
+            return DEVICE_TYPE_STYLUS;
         } else {
             MMI_LOGW("Unknown device type");
-            return HOS_UNKNOWN_DEVICE_TYPE;
+            return DEVICE_TYPE_UNKNOWN;
         }
     }
 }
@@ -95,32 +95,32 @@ int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& d
     ret = memcpy_s(data.uuid, MAX_UUIDSIZE, uuid.c_str(), uuid.size());
     CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
 #ifdef OHOS_BUILD_HDF
-    ret = memcpy_s(data.devicePhys, MAX_DEVICENAME, data.deviceName, MAX_DEVICENAME);
+    ret = memcpy_s(data.physical, MAX_DEVICENAME, data.deviceName, MAX_DEVICENAME);
     CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
 #else
     const char* physWhole = libinput_device_get_phys(device);
     if (physWhole == nullptr) {
-        ret = memcpy_s(data.devicePhys, sizeof(data.devicePhys), data.deviceName,
+        ret = memcpy_s(data.physical, sizeof(data.physical), data.deviceName,
                        sizeof(data.deviceName));
         CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
     } else {
         std::string s(physWhole);
         std::string phys = s.substr(0, s.rfind('/'));
         CHKR(!phys.empty(), ERROR_NULL_POINTER, RET_ERR);
-        ret = memcpy_s(data.devicePhys, sizeof(data.devicePhys), phys.c_str(), MAX_DEVICENAME);
+        ret = memcpy_s(data.physical, sizeof(data.physical), phys.c_str(), MAX_DEVICENAME);
         CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
     }
 #endif
-    std::string devicePhys(data.devicePhys);
+    std::string physical(data.physical);
     if (type == LIBINPUT_EVENT_DEVICE_REMOVED) {
-        DevRegister->DeleteDeviceInfo(devicePhys);
+        DevRegister->DeleteDeviceInfo(physical);
         return RET_OK;
     }
     uint32_t deviceId;
-    if (DevRegister->FindDeviceIdByDevicePhys(devicePhys, deviceId)) {
+    if (DevRegister->FindDeviceId(physical, deviceId)) {
         data.deviceId = deviceId;
     } else {
-        deviceId = DevRegister->AddDeviceInfo(devicePhys);
+        deviceId = DevRegister->AddDeviceInfo(physical);
         CHKR(deviceId, ADD_DEVICE_INFO_CALL_FAIL, RET_ERR);
         data.deviceId = deviceId;
     }
@@ -796,7 +796,7 @@ int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& k
     key.isIntercepted = event.isIntercepted;
     key.state = (enum KEY_STATE)event.isPressed;
     key.eventType = LIBINPUT_EVENT_KEYBOARD_KEY;
-    key.deviceType = HOS_VIRTUAL_KEYBOARD;
+    key.deviceType = DEVICE_TYPE_VIRTUAL_KEYBOARD;
     key.unicode = 0;
     if (event.isPressed) {
         key.seat_key_count = SEAT_KEY_COUNT_ONE;
