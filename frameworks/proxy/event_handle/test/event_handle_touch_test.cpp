@@ -51,7 +51,7 @@ public:
 
     virtual bool OnTouch(const TouchEvent& event)
     {
-        MMI_LOGI("\nTouchEventHandle::OnTouch\n");
+        MMI_LOGI("TouchEventHandle::OnTouch");
         return true;
     }
 protected:

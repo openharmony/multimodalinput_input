@@ -48,7 +48,7 @@ public:
 
     virtual bool OnKey(const OHOS::KeyEvent& event) override
     {
-        MMI_LOGI("\nKeyEventHandle::Onkey\n");
+        MMI_LOGI("KeyEventHandle::Onkey");
         return true;
     }
 };

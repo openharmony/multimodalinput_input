@@ -200,7 +200,7 @@ WaitQueueEvent AppRegister::GetWaitQueueEvent(int32_t fd, int32_t idMsg)
 bool AppRegister::CheckFindFdError(const int32_t findFd)
 {
     if (findFd < 0) {
-        MMI_LOGE(" IsMultimodeInputReady: Find fd error! errCode:%{public}d \n", FD_FIND_FAIL);
+        MMI_LOGE(" IsMultimodeInputReady: Find fd error! errCode:%{public}d ", FD_FIND_FAIL);
         return false;
     }
     return true;
@@ -245,7 +245,7 @@ void AppRegister::DeleteEventFromWaitQueue(int32_t fd, int32_t idMsg)
 
 bool AppRegister::OnAnrLocked(int32_t fd) const
 {
-    MMI_LOGE("Dispatch Timeout! The Application Not Responding !!! The fd is %{public}d. errCode:%{public}d \n",
+    MMI_LOGE("Dispatch Timeout! The Application Not Responding !!! The fd is %{public}d. errCode:%{public}d ",
              fd, APP_NOT_RESP);
     return true;
 }

@@ -85,7 +85,7 @@ void ServerInputFilterManager::OnKeyEventTrace(const EventKeyboard& key)
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" OnKeyEvent service trace keyUuid = %{public}s\n", keyUuid);
+    MMI_LOGT(" OnKeyEvent service trace keyUuid = %{public}s", keyUuid);
     std::string keyEvent = keyUuid;
     keyEvent = "OnKeyEvent service keyUuid: " + keyEvent;
     int32_t eventKey = 1;
@@ -244,7 +244,7 @@ void ServerInputFilterManager::OnTouchEventTrace(const EventTouch& touch)
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" OnTouchEvent service touchUuid = %{public}s\n", touchUuid);
+    MMI_LOGT(" OnTouchEvent service touchUuid = %{public}s", touchUuid);
     std::string touchEvent = touchUuid;
     touchEvent = "OnTouchEvent service touchUuid: " + touchEvent;
     int32_t eventTouch = 9;
@@ -340,7 +340,7 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
         }
         newPacket << id;
         if (!temp->SendMsg(newPacket)) {
-            MMI_LOGE("Sending Interceptor EventTouch failed!: session.fd = %{public}d \n", temp->GetFd());
+            MMI_LOGE("Sending Interceptor EventTouch failed!: session.fd = %{public}d ", temp->GetFd());
             return false;
         }
     }
@@ -399,7 +399,7 @@ void ServerInputFilterManager::OnPointerEventTrace(const EventPointer& event_poi
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" OnPointerEvent service pointerUuid = %{public}s\n", pointerUuid);
+    MMI_LOGT(" OnPointerEvent service pointerUuid = %{public}s", pointerUuid);
     std::string pointerEvent = pointerUuid;
     pointerEvent = "OnPointerEvent service pointerUuid: " + pointerEvent;
     int32_t eventPointer = 17;
@@ -435,7 +435,7 @@ bool ServerInputFilterManager::OnPointerEvent(EventPointer event_pointer)
     NetPacket newPkt(MmiMessageId::POINTER_EVENT_INTERCEPTOR);
     newPkt << event_pointer << id;
     if (!ptr->SendMsg(newPkt)) {
-        MMI_LOGE("Sending structure of pointer failed! \n");
+        MMI_LOGE("Sending structure of pointer failed! ");
         return false;
     }
     MMI_LOGD("pointer event interceptor on pointer event end");
