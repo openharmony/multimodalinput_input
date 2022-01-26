@@ -25,7 +25,7 @@ namespace OHOS::MMI {
 
 OHOS::MMI::TouchPadTransformPointProcessor::TouchPadTransformPointProcessor()
 {
-    this->pointerEvent_ = PointerEvent::Create();
+    pointerEvent_ = PointerEvent::Create();
 }
 
 OHOS::MMI::TouchPadTransformPointProcessor::~TouchPadTransformPointProcessor() {}
@@ -135,5 +135,5 @@ std::shared_ptr<OHOS::MMI::PointerEvent> OHOS::MMI::TouchPadTransformPointProces
         }
     }
     MMI_LOGD("call  onLibinputTouchPadEvent end");
-    return this->pointerEvent_;
+    return pointerEvent_;
 }
