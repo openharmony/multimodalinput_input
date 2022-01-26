@@ -38,7 +38,7 @@ constexpr int32_t INPUT_UI_TIMEOUT_TIME_MAX = 20 * 1000000;
 static void PrintEventSlotedCoordsInfo(const SlotedCoordsInfo& r)
 {
     using namespace OHOS::MMI;
-    for (int32_t i = 0; i < MAX_SOLTED_COORDS_NUM; i++) {
+    for (int32_t i = 0; i < MAX_SOLTED_COORDS_NUMS; i++) {
         MMI_LOGT("[%{public}d] isActive: %{public}d, x = %{public}f, y = %{public}f\n",
             i, r.coords[i].isActive, r.coords[i].x, r.coords[i].y);
     }
