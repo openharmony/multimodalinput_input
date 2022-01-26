@@ -21,6 +21,7 @@
 #include "device_register.h"
 #include "event_dump.h"
 #include "input_windows_manager.h"
+#include "pointer_drawing_manager.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "register_eventhandle_manager.h"
 #include "safe_keeper.h"
@@ -205,6 +206,9 @@ int32_t MMIService::Init()
 
     MMI_LOGD("DeviceRegister Init");
     CHKR(DevRegister->Init(), DEV_REG_INIT_FAIL, DEV_REG_INIT_FAIL);
+
+    MMI_LOGD("MouseDrawingManager Init");
+    CHKR(MouseDrawingManager::GetInstance()->Init(), DEV_REG_INIT_FAIL, POINTER_DRAW_MANAGER_FAIL);
 
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
     CHKR(mmiFd_ >= 0, EPOLL_CREATE_FAIL, EPOLL_CREATE_FAIL);
