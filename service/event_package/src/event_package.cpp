@@ -577,7 +577,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
 #ifdef OHOS_WESTEN_MODEL
-            MMIRegEvent->GetTouchInfoByTouchId(std::make_pair(touch.deviceId, touch.seatSlot), touch);
+            MMIRegEvent->GetTouchInfo(std::make_pair(touch.deviceId, touch.seatSlot), touch);
 #endif
             touch.time = libinput_event_touch_get_time_usec(data);
             touch.eventType = LIBINPUT_EVENT_TOUCH_UP;
