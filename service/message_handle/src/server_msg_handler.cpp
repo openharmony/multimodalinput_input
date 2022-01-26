@@ -470,9 +470,9 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
     }
 #endif
 #ifdef DEBUG_CODE_TEST
-    MMI_LOGT("\n4.event dispatcher of server:\neventKeyboard:time=%{public}" PRId64 ";sourceType=%{public}d;key=%{public}u;"
+    MMI_LOGT("4.event dispatcher of server:eventKeyboard:time=%{public}" PRId64 ";sourceType=%{public}d;key=%{public}u;"
              "seat_key_count=%{public}u;state=%{public}d;fd=%{public}d;abilityId=%{public}d;"
-             "windowId=%{public}s(%{public}d).\n*******************************************************\n",
+             "windowId=%{public}s(%{public}d).*******************************************************",
              key.time, LIBINPUT_EVENT_KEYBOARD_KEY, key.key, key.seat_key_count, key.state, appInfo.fd,
              appInfo.abilityId, WinMgr->GetSurfaceIdListString().c_str(), focusId);
 #endif
@@ -715,7 +715,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket
             CHKR(pkt2.Write(it), STREAM_BUF_WRITE_FAIL, RET_ERR);
         }
         if (!sess->SendMsg(pkt2)) {
-            MMI_LOGE("Sending failed!\n");
+            MMI_LOGE("Sending failed!");
             return MSG_SEND_FAIL;
         }
     });
@@ -729,7 +729,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket
         CHKR(pkt2.Write(it), STREAM_BUF_WRITE_FAIL, RET_ERR);
     }
     if (!sess->SendMsg(pkt2)) {
-        MMI_LOGE("Sending failed!\n");
+        MMI_LOGE("Sending failed!");
         return MSG_SEND_FAIL;
     }
 #endif
@@ -761,7 +761,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& p
             CHKR(pkt2.Write(name), STREAM_BUF_WRITE_FAIL, RET_ERR);
             CHKR(pkt2.Write(deviceType), STREAM_BUF_WRITE_FAIL, RET_ERR);
             if (!sess->SendMsg(pkt2)) {
-                MMI_LOGE("Sending failed!\n");
+                MMI_LOGE("Sending failed!");
                 return MSG_SEND_FAIL;
             }
             return RET_OK;
@@ -776,7 +776,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& p
         CHKR(pkt2.Write(name), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt2.Write(deviceType), STREAM_BUF_WRITE_FAIL, RET_ERR);
         if (!sess->SendMsg(pkt2)) {
-            MMI_LOGE("Sending failed!\n");
+            MMI_LOGE("Sending failed!");
             return MSG_SEND_FAIL;
         }
         MMI_LOGI("end");
@@ -796,7 +796,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& p
         CHKR(pkt2.Write(name), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt2.Write(deviceType), STREAM_BUF_WRITE_FAIL, RET_ERR);
         if (!sess->SendMsg(pkt2)) {
-            MMI_LOGE("Sending failed!\n");
+            MMI_LOGE("Sending failed!");
             return MSG_SEND_FAIL;
         }
         return RET_OK;
@@ -809,7 +809,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& p
     CHKR(pkt2.Write(name), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pkt2.Write(deviceType), STREAM_BUF_WRITE_FAIL, RET_ERR);
     if (!sess->SendMsg(pkt2)) {
-        MMI_LOGE("Sending failed!\n");
+        MMI_LOGE("Sending failed!");
         return MSG_SEND_FAIL;
     }
 #endif

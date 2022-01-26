@@ -159,17 +159,17 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPack
         return RET_ERR;
     }
     pkt >> fd >> serverStartTime;
-    MMI_LOGT("\n4.event dispatcher of clien:\nKeyEvent:KeyCode = %{public}d,"
+    MMI_LOGT("4.event dispatcher of clien:KeyEvent:KeyCode = %{public}d,"
              "ActionTime = %{public}d,Action = %{public}d,ActionStartTime = %{public}d,"
              "EventType = %{public}d,Flag = %{public}d,"
              "KeyAction = %{public}d, eventNumber = %{public}d, Fd = %{public}d,"
-             "ServerStartTime = %{public}" PRId64"\n",
+             "ServerStartTime = %{public}" PRId64"",
              key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
              key->GetActionStartTime(), key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), key->GetId(), fd, serverStartTime);
     int32_t getKeyCode = key->GetKeyCode();
     std::string keyCodestring = "event dispatcher of client GetKeyCode: " + std::to_string(getKeyCode);
-    MMI_LOGT(" OnKeyEvent client trace keyCode = %{public}d\n", getKeyCode);
+    MMI_LOGT(" OnKeyEvent client trace keyCode = %{public}d", getKeyCode);
     int32_t eventKey = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
     InputManagerImpl::GetInstance()->OnKeyEvent(key);
@@ -323,7 +323,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnTouch(const UDSClient& client, NetPacket&
 
 int32_t OHOS::MMI::ClientMsgHandler::OnCopy(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnCopy\n");
+    MMI_LOGT("ClientMsgHandler::OnCopy");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnCopy(multEvent);
@@ -331,7 +331,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnCopy(const UDSClient& client, NetPacket& 
 
 int32_t OHOS::MMI::ClientMsgHandler::OnShowMenu(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnShowMenu\n");
+    MMI_LOGT("ClientMsgHandler::OnShowMenu");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnShowMenu(multEvent);
@@ -339,7 +339,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnShowMenu(const UDSClient& client, NetPack
 
 int32_t OHOS::MMI::ClientMsgHandler::OnSend(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnSend\n");
+    MMI_LOGT("ClientMsgHandler::OnSend");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnSend(multEvent);
@@ -347,7 +347,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnSend(const UDSClient& client, NetPacket& 
 
 int32_t OHOS::MMI::ClientMsgHandler::OnPaste(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnPaste\n");
+    MMI_LOGT("ClientMsgHandler::OnPaste");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnPaste(multEvent);
@@ -355,7 +355,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnPaste(const UDSClient& client, NetPacket&
 
 int32_t OHOS::MMI::ClientMsgHandler::OnCut(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnCut\n");
+    MMI_LOGT("ClientMsgHandler::OnCut");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnCut(multEvent);
@@ -363,7 +363,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnCut(const UDSClient& client, NetPacket& p
 
 int32_t OHOS::MMI::ClientMsgHandler::OnUndo(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnUndo\n");
+    MMI_LOGT("ClientMsgHandler::OnUndo");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnUndo(multEvent);
@@ -371,7 +371,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnUndo(const UDSClient& client, NetPacket& 
 
 int32_t OHOS::MMI::ClientMsgHandler::OnRefresh(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnRefresh\n");
+    MMI_LOGT("ClientMsgHandler::OnRefresh");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnRefresh(multEvent);
@@ -379,7 +379,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnRefresh(const UDSClient& client, NetPacke
 
 int32_t OHOS::MMI::ClientMsgHandler::OnStartDrag(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnStartDrag\n");
+    MMI_LOGT("ClientMsgHandler::OnStartDrag");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnStartDrag(multEvent);
@@ -387,7 +387,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnStartDrag(const UDSClient& client, NetPac
 
 int32_t OHOS::MMI::ClientMsgHandler::OnCancel(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnCancel\n");
+    MMI_LOGT("ClientMsgHandler::OnCancel");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnCancel(multEvent);
@@ -395,7 +395,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnCancel(const UDSClient& client, NetPacket
 
 int32_t OHOS::MMI::ClientMsgHandler::OnEnter(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnEnter\n");
+    MMI_LOGT("ClientMsgHandler::OnEnter");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnEnter(multEvent);
@@ -403,7 +403,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnEnter(const UDSClient& client, NetPacket&
 
 int32_t OHOS::MMI::ClientMsgHandler::OnPrevious(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnPrevious\n");
+    MMI_LOGT("ClientMsgHandler::OnPrevious");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnPrevious(multEvent);
@@ -411,7 +411,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnPrevious(const UDSClient& client, NetPack
 
 int32_t OHOS::MMI::ClientMsgHandler::OnNext(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnNext\n");
+    MMI_LOGT("ClientMsgHandler::OnNext");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnNext(multEvent);
@@ -419,7 +419,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnNext(const UDSClient& client, NetPacket& 
 
 int32_t OHOS::MMI::ClientMsgHandler::OnBack(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnBack\n");
+    MMI_LOGT("ClientMsgHandler::OnBack");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnBack(multEvent);
@@ -427,7 +427,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnBack(const UDSClient& client, NetPacket& 
 
 int32_t OHOS::MMI::ClientMsgHandler::OnPrint(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnPrint\n");
+    MMI_LOGT("ClientMsgHandler::OnPrint");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnPrint(multEvent);
@@ -435,7 +435,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnPrint(const UDSClient& client, NetPacket&
 
 int32_t OHOS::MMI::ClientMsgHandler::OnPlay(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnPlay\n");
+    MMI_LOGT("ClientMsgHandler::OnPlay");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnPlay(multEvent);
@@ -443,7 +443,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnPlay(const UDSClient& client, NetPacket& 
 
 int32_t OHOS::MMI::ClientMsgHandler::OnPause(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnPause\n");
+    MMI_LOGT("ClientMsgHandler::OnPause");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnPause(multEvent);
@@ -451,7 +451,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnPause(const UDSClient& client, NetPacket&
 
 int32_t OHOS::MMI::ClientMsgHandler::OnMediaControl(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnMediaControl\n");
+    MMI_LOGT("ClientMsgHandler::OnMediaControl");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnMediaControl(multEvent);
@@ -459,7 +459,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnMediaControl(const UDSClient& client, Net
 
 int32_t OHOS::MMI::ClientMsgHandler::OnScreenShot(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnScreenShot\n");
+    MMI_LOGT("ClientMsgHandler::OnScreenShot");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnScreenShot(multEvent);
@@ -467,7 +467,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnScreenShot(const UDSClient& client, NetPa
 
 int32_t OHOS::MMI::ClientMsgHandler::OnScreenSplit(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnScreenSplit\n");
+    MMI_LOGT("ClientMsgHandler::OnScreenSplit");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnScreenSplit(multEvent);
@@ -475,7 +475,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnScreenSplit(const UDSClient& client, NetP
 
 int32_t OHOS::MMI::ClientMsgHandler::OnStartScreenRecord(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnStartScreenRecord\n");
+    MMI_LOGT("ClientMsgHandler::OnStartScreenRecord");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnStartScreenRecord(multEvent);
@@ -483,7 +483,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnStartScreenRecord(const UDSClient& client
 
 int32_t OHOS::MMI::ClientMsgHandler::OnStopScreenRecord(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnStopScreenRecord\n");
+    MMI_LOGT("ClientMsgHandler::OnStopScreenRecord");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnStopScreenRecord(multEvent);
@@ -491,7 +491,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnStopScreenRecord(const UDSClient& client,
 
 int32_t OHOS::MMI::ClientMsgHandler::OnGotoDesktop(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnGotoDesktop\n");
+    MMI_LOGT("ClientMsgHandler::OnGotoDesktop");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnGotoDesktop(multEvent);
@@ -499,7 +499,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnGotoDesktop(const UDSClient& client, NetP
 
 int32_t OHOS::MMI::ClientMsgHandler::OnRecent(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnRecent\n");
+    MMI_LOGT("ClientMsgHandler::OnRecent");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnRecent(multEvent);
@@ -507,7 +507,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnRecent(const UDSClient& client, NetPacket
 
 int32_t OHOS::MMI::ClientMsgHandler::OnShowNotification(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnShowNotification\n");
+    MMI_LOGT("ClientMsgHandler::OnShowNotification");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnShowNotification(multEvent);
@@ -515,7 +515,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnShowNotification(const UDSClient& client,
 
 int32_t OHOS::MMI::ClientMsgHandler::OnLockScreen(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnLockScreen\n");
+    MMI_LOGT("ClientMsgHandler::OnLockScreen");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnLockScreen(multEvent);
@@ -523,7 +523,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnLockScreen(const UDSClient& client, NetPa
 
 int32_t OHOS::MMI::ClientMsgHandler::OnSearch(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnSearch\n");
+    MMI_LOGT("ClientMsgHandler::OnSearch");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnSearch(multEvent);
@@ -531,7 +531,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnSearch(const UDSClient& client, NetPacket
 
 int32_t OHOS::MMI::ClientMsgHandler::OnClosePage(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnClosePage\n");
+    MMI_LOGT("ClientMsgHandler::OnClosePage");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnClosePage(multEvent);
@@ -539,7 +539,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnClosePage(const UDSClient& client, NetPac
 
 int32_t OHOS::MMI::ClientMsgHandler::OnLaunchVoiceAssistant(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnLaunchVoiceAssistant\n");
+    MMI_LOGT("ClientMsgHandler::OnLaunchVoiceAssistant");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnLaunchVoiceAssistant(multEvent);
@@ -547,7 +547,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnLaunchVoiceAssistant(const UDSClient& cli
 
 int32_t OHOS::MMI::ClientMsgHandler::OnMute(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnMute\n");
+    MMI_LOGT("ClientMsgHandler::OnMute");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnMute(multEvent);
@@ -555,7 +555,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnMute(const UDSClient& client, NetPacket& 
 
 int32_t OHOS::MMI::ClientMsgHandler::OnAnswer(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnAnswer\n");
+    MMI_LOGT("ClientMsgHandler::OnAnswer");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnAnswer(multEvent);
@@ -563,7 +563,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnAnswer(const UDSClient& client, NetPacket
 
 int32_t OHOS::MMI::ClientMsgHandler::OnRefuse(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnRefuse\n");
+    MMI_LOGT("ClientMsgHandler::OnRefuse");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnRefuse(multEvent);
@@ -571,7 +571,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnRefuse(const UDSClient& client, NetPacket
 
 int32_t OHOS::MMI::ClientMsgHandler::OnHangup(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnHangup\n");
+    MMI_LOGT("ClientMsgHandler::OnHangup");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnHangup(multEvent);
@@ -579,7 +579,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnHangup(const UDSClient& client, NetPacket
 
 int32_t OHOS::MMI::ClientMsgHandler::OnTelephoneControl(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::OnTelephoneControl\n");
+    MMI_LOGT("ClientMsgHandler::OnTelephoneControl");
     MultimodalEvent multEvent;
     PackedData(multEvent, client, pkt, __func__);
     return EventManager.OnTelephoneControl(multEvent);
@@ -604,10 +604,10 @@ int32_t OHOS::MMI::ClientMsgHandler::PackedData(MultimodalEvent& multEvent, cons
     pkt >> type;
     if (type == INPUT_DEVICE_CAP_AISENSOR || type == INPUT_DEVICE_CAP_KNUCKLE) {
         pkt >> idMsg >> deviceId >> fd >> windowId >> abilityId >> serverStartTime >> uuid >> occurredTime;
-        MMI_LOGT("\nevent dispatcher of client: manager_aisensor\n"
+        MMI_LOGT("event dispatcher of client: manager_aisensor"
                  "Msg=%{public}d,fd=%{public}d,"
-                 "occurredTime=%{public}d;\n\n"
-                 "************************************************************************\n",
+                 "occurredTime=%{public}d;"
+                 "************************************************************************",
                  idMsg, fd, occurredTime);
         if (type == INPUT_DEVICE_CAP_KNUCKLE) {
             type = DEVICE_TYPE_KNUCKLE;
@@ -618,14 +618,14 @@ int32_t OHOS::MMI::ClientMsgHandler::PackedData(MultimodalEvent& multEvent, cons
     } else {
         pkt >> data >> fd >> windowId >> abilityId >> serverStartTime;
         if (windowId == -1) {
-            MMI_LOGT("\nevent dispatcher of client:\n occurredTime=%{public}" PRId64 ";\nsourceType=%{public}d;\n"
-                     "\nfd=%{public}d;\n"
-                     "\n************************************************************************\n",
+            MMI_LOGT("event dispatcher of client: occurredTime=%{public}" PRId64 ";sourceType=%{public}d;"
+                     "fd=%{public}d;"
+                     "************************************************************************",
                      data.occurredTime, data.eventType, fd);
         } else {
-            MMI_LOGT("\nevent dispatcher of client:\n occurredTime=%{public}" PRId64 ";\nsourceType=%{public}d;\n"
-                     "\nfd=%{public}d;"
-                     "\n**************************************************************\n",
+            MMI_LOGT("event dispatcher of client: occurredTime=%{public}" PRId64 ";sourceType=%{public}d;"
+                     "fd=%{public}d;"
+                     "**************************************************************",
                      data.occurredTime, data.eventType, fd);
         }
         multEvent.Initialize(windowId, 0, data.uuid, data.eventType, data.occurredTime, "", data.deviceId, 0,
@@ -645,7 +645,7 @@ int32_t OHOS::MMI::ClientMsgHandler::GetMultimodeInputInfo(const UDSClient& clie
 
 int32_t OHOS::MMI::ClientMsgHandler::DeviceAdd(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::DeviceAdd\n");
+    MMI_LOGT("ClientMsgHandler::DeviceAdd");
     DeviceManage data = {};
     pkt >> data;
     DeviceEvent eventData = {};
@@ -655,7 +655,7 @@ int32_t OHOS::MMI::ClientMsgHandler::DeviceAdd(const UDSClient& client, NetPacke
 
 int32_t OHOS::MMI::ClientMsgHandler::DeviceRemove(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGT("ClientMsgHandler::DeviceRemove\n");
+    MMI_LOGT("ClientMsgHandler::DeviceRemove");
     DeviceManage data = {};
     pkt >> data;
     DeviceEvent eventData = {};
@@ -704,9 +704,9 @@ int32_t OHOS::MMI::ClientMsgHandler::KeyEventFilter(const UDSClient& client, Net
     int32_t windowId = 0;
     int32_t id = 0;
     pkt >> key >>id;
-    MMI_LOGT("\nkey event filter : event dispatcher of client:\neventKeyboard:time=%{public}" PRId64
+    MMI_LOGT("key event filter : event dispatcher of client:eventKeyboard:time=%{public}" PRId64
         ";key=%{public}u;deviceId=%{private}u;"
-        "deviceType=%{public}u;seat_key_count=%{public}u;state=%{public}d;\n",
+        "deviceType=%{public}u;seat_key_count=%{public}u;state=%{public}d;",
         key.time, key.key, key.deviceId, key.deviceType, key.seat_key_count, key.state);
     TraceKeyEvent(key);
     KeyBoardEvent event;
@@ -774,11 +774,11 @@ int32_t OHOS::MMI::ClientMsgHandler::PointerEventInterceptor(const UDSClient& cl
     int32_t action = pointData.state;
     MmiPoint mmiPoint;
     mmiPoint.Setxy(pointData.delta.x, pointData.delta.y);
-    MMI_LOGT("WangYuan\nevent dispatcher of client: mouse_data \neventPointer:time=%{public}" PRId64 ";"
+    MMI_LOGT("WangYuanevent dispatcher of client: mouse_data eventPointer:time=%{public}" PRId64 ";"
              "eventType=%{public}d;buttonCode=%{public}u;deviceType=%{public}u;"
              "seat_button_count=%{public}u;axis=%{public}u;buttonState=%{public}d;source=%{public}d;"
              "delta.x=%{public}lf;delta.y=%{public}lf;delta_raw.x=%{public}lf;delta_raw.y=%{public}lf;"
-             "absolute.x=%{public}lf;absolute.y=%{public}lf;discYe.x=%{public}lf;discrete.y=%{public}lf.\n",
+             "absolute.x=%{public}lf;absolute.y=%{public}lf;discYe.x=%{public}lf;discrete.y=%{public}lf.",
              pointData.time, pointData.eventType, pointData.button, pointData.deviceType,
              pointData.seat_button_count, pointData.axis, pointData.state, pointData.source, pointData.delta.x,
              pointData.delta.y, pointData.delta_raw.x, pointData.delta_raw.y, pointData.absolute.x,
@@ -835,7 +835,7 @@ int32_t OHOS::MMI::ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& c
     int32_t pid = 0;
     int32_t id = 0;
     pkt >> pid >> id;
-    MMI_LOGD("client receive the msg from server: pointId = %{public}d, pid = %{public}d\n",
+    MMI_LOGD("client receive the msg from server: pointId = %{public}d, pid = %{public}d",
              pointerEvent->GetPointerId(), pid);
     return INTERCEPTORMANAGER.OnPointerEvent(pointerEvent, id);
 }
@@ -850,7 +850,7 @@ int32_t OHOS::MMI::ClientMsgHandler::KeyEventInterceptor(const UDSClient& client
     }
     int32_t pid = 0;
     pkt >> pid;
-    MMI_LOGD("client receive the msg from server: keyCode = %{public}d, pid = %{public}d\n",
+    MMI_LOGD("client receive the msg from server: keyCode = %{public}d, pid = %{public}d",
         keyEvent->GetKeyCode(), pid);
     return INTERCEPTORMANAGER.OnKeyEvent(keyEvent);
 }
@@ -869,11 +869,11 @@ void OHOS::MMI::ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, Ne
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EventType::EVENT_MOUSE);
     CHK(mousePtr, ERROR_NULL_POINTER);
     pkt >> ret >> pointData >> abilityId >> windowId >> fd >> serverStartTime;
-    MMI_LOGT("\nevent dispatcher of client: mouse_data \neventPointer:time=%{public}" PRId64 "; eventType=%{public}d;"
+    MMI_LOGT("event dispatcher of client: mouse_data eventPointer:time=%{public}" PRId64 "; eventType=%{public}d;"
              "buttonCode=%{public}u;deviceType=%{public}u;seat_button_count=%{public}u;"
              "axis=%{public}u;buttonState=%{public}d;source=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
              "delta_raw.x=%{public}lf;delta_raw.y=%{public}lf;absolute.x=%{public}lf;absolute.y=%{public}lf;"
-             "discYe.x=%{public}lf;discrete.y=%{public}lf;fd=%{public}d;\n",
+             "discYe.x=%{public}lf;discrete.y=%{public}lf;fd=%{public}d;",
              pointData.time, pointData.eventType, pointData.button, pointData.deviceType,
              pointData.seat_button_count, pointData.axis, pointData.state, pointData.source, pointData.delta.x,
              pointData.delta.y, pointData.delta_raw.x, pointData.delta_raw.y, pointData.absolute.x,
@@ -969,8 +969,8 @@ void OHOS::MMI::ClientMsgHandler::AnalysisJoystickEvent(const UDSClient& client,
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EventType::EVENT_MOUSE);
     CHK(mousePtr, ERROR_NULL_POINTER);
     pkt >> eventJoyStickData >> abilityId >> windowId >> fd >> serverStartTime;
-    MMI_LOGT("\nevent dispatcher of client: "
-        "event JoyStick: fd: %{public}d\n", fd);
+    MMI_LOGT("event dispatcher of client: "
+        "event JoyStick: fd: %{public}d", fd);
     PrintEventJoyStickAxisInfo(eventJoyStickData, fd, abilityId, windowId, serverStartTime);
 
     int32_t mouseAction = static_cast<int32_t>(MouseActionEnum::HOVER_MOVE);
@@ -1001,12 +1001,12 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client,
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EventType::EVENT_MOUSE);
     CHK(mousePtr, ERROR_NULL_POINTER);
     pkt >> tabletPad >> abilityId >> windowId >> fd >> serverStartTime;
-    MMI_LOGT("\nevent dispatcher of client: event tablet Pad :time=%{public}" PRId64 ";deviceType=%{public}u;"
-             "deviceName=%{public}s;eventType=%{public}d;\n"
-             "ring.number=%{public}d;ring.position=%{public}lf;ring.source=%{public}d;\n"
-             "strip.number=%{public}d;strip.position=%{public}lf;strip.source=%{public}d;\n"
-             "fd=%{public}d;preHandlerTime=%{public}" PRId64 ";\n*"
-             "***********************************************************************\n",
+    MMI_LOGT("event dispatcher of client: event tablet Pad :time=%{public}" PRId64 ";deviceType=%{public}u;"
+             "deviceName=%{public}s;eventType=%{public}d;"
+             "ring.number=%{public}d;ring.position=%{public}lf;ring.source=%{public}d;"
+             "strip.number=%{public}d;strip.position=%{public}lf;strip.source=%{public}d;"
+             "fd=%{public}d;preHandlerTime=%{public}" PRId64 ";*"
+             "***********************************************************************",
              tabletPad.time, tabletPad.deviceType, tabletPad.deviceName, tabletPad.eventType,
              tabletPad.ring.number, tabletPad.ring.position, tabletPad.ring.source, tabletPad.strip.number,
              tabletPad.strip.position, tabletPad.strip.source, fd, serverStartTime);
@@ -1030,7 +1030,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client,
 void OHOS::MMI::ClientMsgHandler::PrintEventTabletToolInfo(EventTabletTool tableTool, uint64_t serverStartTime,
                                                            int32_t abilityId, int32_t windowId, int32_t fd) const
 {
-    MMI_LOGT("\nevent dispatcher of client: event tablet Tool :time=%{public}" PRId64 "; deviceType=%{public}u; "
+    MMI_LOGT("event dispatcher of client: event tablet Tool :time=%{public}" PRId64 "; deviceType=%{public}u; "
              "deviceName=%{public}s; eventType=%{public}d; type=%{public}u;"
              "serial=%{public}u; button=%{public}d; "
              "state=%{public}d; point.x=%{public}lf; point.y=%{public}lf; tilt.x=%{public}lf;"
@@ -1038,8 +1038,8 @@ void OHOS::MMI::ClientMsgHandler::PrintEventTabletToolInfo(EventTabletTool table
              "rotation=%{public}lf; slider=%{public}lf; wheel=%{public}lf; wheel_discrete=%{public}d;"
              "size.major=%{public}lf; size.minor=%{public}lf; "
              "proximity_state=%{public}d; tip_state=%{public}d; state=%{public}d; seat_button_count=%{public}d;"
-             "fd=%{public}d; preHandlerTime=%{public}" PRId64 ";\n"
-             "***********************************************************************\n",
+             "fd=%{public}d; preHandlerTime=%{public}" PRId64 ";"
+             "***********************************************************************",
              tableTool.time, tableTool.deviceType, tableTool.deviceName,
              tableTool.eventType, tableTool.tool.type, tableTool.tool.serial,
              tableTool.button, tableTool.state, tableTool.axes.point.x, tableTool.axes.point.y,
@@ -1184,11 +1184,11 @@ void OHOS::MMI::ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, 
     fingerInfos fingersInfos[FINGER_NUM] = {};
     CHK(mousePtr, ERROR_NULL_POINTER);
     pkt >> gesture >> abilityId >> windowId >> fd >> serverStartTime;
-    MMI_LOGT("\nevent dispatcher of client: event Gesture :time=%{public}" PRId64 ";"
+    MMI_LOGT("event dispatcher of client: event Gesture :time=%{public}" PRId64 ";"
              "deviceType=%{public}u;deviceName=%{public}s;devNode=%{public}s;eventType=%{public}d;"
              "fingerCount=%{public}d;cancelled=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
              "deltaUnaccel.x=%{public}lf;deltaUnaccel.y=%{public}lf;fd=%{public}d;"
-             "preHandlerTime=%{public}" PRId64 ";\n***************************************************\n",
+             "preHandlerTime=%{public}" PRId64 ";***************************************************",
              gesture.time, gesture.deviceType, gesture.deviceName, gesture.physical,
              gesture.eventType, gesture.fingerCount, gesture.cancelled, gesture.delta.x, gesture.delta.y,
              gesture.deltaUnaccel.x, gesture.deltaUnaccel.y, fd, serverStartTime);
@@ -1220,7 +1220,7 @@ void OHOS::MMI::ClientMsgHandler::TraceKeyEvent(const EventKeyboard& key) const
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" nevent dispatcher of client: keyUuid = %{public}s\n", keyUuid);
+    MMI_LOGT(" nevent dispatcher of client: keyUuid = %{public}s", keyUuid);
     std::string keyEvent = keyUuid;
     keyEvent = " nevent dispatcher of client keyUuid: " + keyEvent;
     int32_t eventKey = 1;
@@ -1234,7 +1234,7 @@ void OHOS::MMI::ClientMsgHandler::TracePointerEvent(const EventPointer& pointDat
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" nevent dispatcher of client: pointerUuid = %{public}s\n", pointerUuid);
+    MMI_LOGT(" nevent dispatcher of client: pointerUuid = %{public}s", pointerUuid);
     std::string pointerEvent = pointerUuid;
     pointerEvent = " nevent dispatcher of client pointerUuid: " + pointerEvent;
     int32_t eventPointer = 17;
@@ -1248,7 +1248,7 @@ void OHOS::MMI::ClientMsgHandler::TraceTouchEvent(const EventTouch& touchData) c
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" nevent dispatcher of client: touchUuid = %{public}s\n", touchUuid);
+    MMI_LOGT(" nevent dispatcher of client: touchUuid = %{public}s", touchUuid);
     std::string touchEventString = touchUuid;
     touchEventString = " nevent dispatcher of client touchUuid: " + touchEventString;
     int32_t eventTouch = 9;

@@ -205,7 +205,7 @@ int32_t InjectionEventDispatch::ExecuteFunction(string funId)
 
 int32_t InjectionEventDispatch::OnAisensor()
 {
-    MMI_LOGI("into function: OnAisensor()\n");
+    MMI_LOGI("into function: OnAisensor()");
     int32_t exRet = RET_ERR;
 
     if (argvNum_ < AI_SENDOR_MIN_ARGV_NUMS) {
@@ -410,7 +410,7 @@ int32_t InjectionEventDispatch::OnHdi()
 
 int32_t InjectionEventDispatch::OnHdiStatus()
 {
-    MMI_LOGI("into function: OnHdiStatus()\n");
+    MMI_LOGI("into function: OnHdiStatus()");
     if (injectArgvs_.size() != HDI_STATUS_COUNTS) {
         MMI_LOGE("Wrong number of input parameters! errCode:%{public}d", PARAM_INPUT_FAIL);
         return RET_ERR;
@@ -442,7 +442,7 @@ int32_t InjectionEventDispatch::OnHdiHot()
 
     string deviceNameText = injectArgvs_.at(HDI_DEVICE_NAME_INDEX);
     int32_t index = GetDeviceIndex(deviceNameText);
-    MMI_LOGI("OnHdiHot index  = %d\n", index);
+    MMI_LOGI("OnHdiHot index  = %d", index);
     if (index == RET_ERR) {
         MMI_LOGE("OnHdiHot index error ,index:%{public}d", index);
         return RET_ERR;
@@ -457,7 +457,7 @@ int32_t InjectionEventDispatch::OnHdiHot()
         MMI_LOGE("hdi hot plug to server error.");
         return RET_OK;
     }
-    MMI_LOGI("On hdi hot SendMsg......\n");
+    MMI_LOGI("On hdi hot SendMsg......");
     return RET_OK;
 }
 
