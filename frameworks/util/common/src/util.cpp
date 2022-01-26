@@ -237,10 +237,10 @@ static void PrintEventJoyStickAxisInfo(const std::string &axisName, const EventJ
 void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
     const int32_t abilityId, const int32_t focusId, const uint64_t preHandlerTime)
 {
-    MMI_LOGT("4.event dispatcher of server: EventJoyStickAxis:devicePhys: %{public}s;"
-             "fd: %{public}d; preHandlerTime: %{public}" PRId64 "; "
-             "time: %{public}" PRId64 "; deviceType: %{public}u; eventType: %{public}d; deviceName: %{public}s\n",
-             r.devicePhys, fd, preHandlerTime, r.time, r.deviceType,
+    MMI_LOGT("4.event dispatcher of server, EventJoyStickAxis:physical:%{public}s, "
+             "fd:%{public}d, preHandlerTime:%{public}" PRId64 ", "
+             "time:%{public}" PRId64 ", deviceType:%{public}u, eventType:%{public}d, deviceName:%{public}s",
+             r.physical, fd, preHandlerTime, r.time, r.deviceType,
              r.eventType, r.deviceName);
 
     PrintEventJoyStickAxisInfo(std::string("abs_throttle"), r.abs_throttle);

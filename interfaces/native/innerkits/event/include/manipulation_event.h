@@ -66,7 +66,7 @@ struct fingerInfos {
     MmiPoint mMp;
 };
 
-class ManipulationEvent : public MultimodalEvent {
+class ManipulationEvent : public MMI::MultimodalEvent {
 public:
     virtual ~ManipulationEvent();
     /**

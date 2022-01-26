@@ -280,7 +280,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONKEY_002, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 7;
     uint64_t serverStartTime = 0;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "key_board" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "key_board" };
     netPacket >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId >> serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -299,7 +299,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONKEY_003, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 7;
     uint64_t serverStartTime = 0;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "key_board" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "key_board" };
     netPacket >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId << serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -336,7 +336,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONKEY_005, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 33;
     uint64_t serverStartTime = 44;
-    RegisteredEvent mixData = {1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "key_board"};
+    RegisteredEvent mixData = {1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "key_board"};
     netPacket >> typeNum >> mixData >> fileData >> windowId >> abilityId >> serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -366,7 +366,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONTOUCH_002, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 7;
     uint64_t serverStartTime = 0;
-    RegisteredEvent mixData = { 1, "abc123@34", 500, 10000, static_cast<HOS_DEVICE_TYPE>(0), "touchscreen" };
+    RegisteredEvent mixData = { 1, "abc123@34", 500, 10000, static_cast<DEVICE_TYPE>(0), "touchscreen" };
     netPacket >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId >> serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -386,7 +386,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONTOUCH_003, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 7;
     uint64_t serverStartTime = 0;
-    RegisteredEvent mixData = { 1, "abc123@34", 500, 10000, static_cast<HOS_DEVICE_TYPE>(0), "touchscreen" };
+    RegisteredEvent mixData = { 1, "abc123@34", 500, 10000, static_cast<DEVICE_TYPE>(0), "touchscreen" };
     netPacket >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId << serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -423,7 +423,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONTOUCH_005, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 33;
     uint64_t serverStartTime = 44;
-    RegisteredEvent mixData = { 1, "abc123@34", 500, 10000, static_cast<HOS_DEVICE_TYPE>(0), "touchscreen" };
+    RegisteredEvent mixData = { 1, "abc123@34", 500, 10000, static_cast<DEVICE_TYPE>(0), "touchscreen" };
     netPacket >> typeNum >> mixData >> fileData >> windowId >> abilityId >> serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -453,7 +453,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONCOPY_002, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 7;
     uint64_t serverStartTime = 0;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "keyboard" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     netPacket >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId >> serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -473,7 +473,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONCOPY_003, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 7;
     uint64_t serverStartTime = 0;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "keyboard" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     netPacket >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId << serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -510,7 +510,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONCOPY_005, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 33;
     uint64_t serverStartTime = 44;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "keyboard" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     netPacket >> typeNum >> mixData >> fileData >> windowId >> abilityId >> serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -540,7 +540,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONSHOWMENU_002, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 7;
     uint64_t serverStartTime = 0;
-    RegisteredEvent mixData = { 1, "abc123@34", 402, 10000, static_cast<HOS_DEVICE_TYPE>(2), "mouse" };
+    RegisteredEvent mixData = { 1, "abc123@34", 402, 10000, static_cast<DEVICE_TYPE>(2), "mouse" };
     netPacket >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId >> serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -560,7 +560,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONSHOWMENU_003, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 7;
     uint64_t serverStartTime = 0;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "keyboard" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     netPacket >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId << serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -597,7 +597,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONSHOWMENU_005, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 33;
     uint64_t serverStartTime = 44;
-    RegisteredEvent mixData = { 1, "abc123@34", 402, 10000, static_cast<HOS_DEVICE_TYPE>(2), "mouse" };
+    RegisteredEvent mixData = { 1, "abc123@34", 402, 10000, static_cast<DEVICE_TYPE>(2), "mouse" };
     netPacket >> typeNum >> mixData >> fileData >> windowId >> abilityId >> serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -627,7 +627,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONSEND_002, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 7;
     uint64_t serverStartTime = 0;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "keyboard" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     netPacket >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId >> serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -647,7 +647,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONSEND_003, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 7;
     uint64_t serverStartTime = 0;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "keyboard" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     netPacket >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId << serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -684,7 +684,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONSEND_005, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 33;
     uint64_t serverStartTime = 44;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "keyboard" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     netPacket >> typeNum >> mixData >> fileData >> windowId >> abilityId >> serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -714,7 +714,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONPASTE_002, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 7;
     uint64_t serverStartTime = 0;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "keyboard" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     netPacket >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId >> serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -734,7 +734,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONPASTE_003, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 7;
     uint64_t serverStartTime = 0;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "keyboard" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     netPacket >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId << serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -771,7 +771,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONPASTE_005, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 33;
     uint64_t serverStartTime = 44;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "keyboard" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     netPacket >> typeNum >> mixData >> fileData >> windowId >> abilityId >> serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -801,7 +801,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONCUT_002, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 7;
     uint64_t serverStartTime = 0;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "keyboard" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     netPacket >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId >> serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -821,7 +821,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONCUT_003, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 7;
     uint64_t serverStartTime = 0;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "keyboard" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     netPacket >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId << serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -858,7 +858,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONCUT_005, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 33;
     uint64_t serverStartTime = 44;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "keyboard" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     netPacket >> typeNum >> mixData >> fileData >> windowId >> abilityId >> serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -888,7 +888,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONUNDO_002, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 7;
     uint64_t serverStartTime = 0;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "keyboard" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     netPacket >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId >> serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -908,7 +908,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONUNDO_003, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 7;
     uint64_t serverStartTime = 0;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "keyboard" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     netPacket >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId << serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -945,7 +945,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONUNDO_005, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 33;
     uint64_t serverStartTime = 44;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "keyboard" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     netPacket >> typeNum >> mixData >> fileData >> windowId >> abilityId >> serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -1387,7 +1387,7 @@ HWTEST_F(ClientMsgHandlerTest, OnTouch2, TestSize.Level1)
     EventTouch touchData = {};
     CHK(EOK == memcpy_s(touchData.deviceName, MAX_DEVICENAME, "name", MAX_DEVICENAME),
         MEMCPY_SEC_FUN_FAIL);
-    CHK(EOK == memcpy_s(touchData.devicePhys, MAX_DEVICENAME, "HOS_TouchScreen", MAX_DEVICENAME),
+    CHK(EOK == memcpy_s(touchData.physical, MAX_DEVICENAME, "HOS_TouchScreen", MAX_DEVICENAME),
         MEMCPY_SEC_FUN_FAIL);
     CHK(EOK == memcpy_s(touchData.uuid, MAX_DEVICENAME, "12345", MAX_DEVICENAME),
         MEMCPY_SEC_FUN_FAIL);
@@ -1395,7 +1395,7 @@ HWTEST_F(ClientMsgHandlerTest, OnTouch2, TestSize.Level1)
     touchData.time = 500;
     touchData.slot = 500;
     touchData.seatSlot = 500;
-    touchData.deviceType = static_cast<HOS_DEVICE_TYPE>(0);
+    touchData.deviceType = static_cast<DEVICE_TYPE>(0);
 
     netPacket << typeNum;
     netPacket << dataSize << abilityId << screenId << fileData << serverStartTime;
@@ -1451,7 +1451,7 @@ HWTEST_F(ClientMsgHandlerTest, OnCopy_002, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 7;
     uint64_t serverStartTime = 0;
-    RegisteredEvent mixData = { 1, "abc123@34", 403, 10000, static_cast<HOS_DEVICE_TYPE>(7), "JOYSTICK" };
+    RegisteredEvent mixData = { 1, "abc123@34", 403, 10000, static_cast<DEVICE_TYPE>(7), "JOYSTICK" };
 
     netPacket << mixData;
     netPacket << typeNum;
@@ -1474,7 +1474,7 @@ HWTEST_F(ClientMsgHandlerTest, OnCopy_003, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 7;
     uint64_t serverStartTime = 0;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(9), "aisensor" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(9), "aisensor" };
 
     netPacket << mixData;
     netPacket << typeNum;
@@ -1516,7 +1516,7 @@ HWTEST_F(ClientMsgHandlerTest, OnCopy_005, TestSize.Level1)
     int32_t windowId = -1;
     int32_t abilityId = 33;
     uint64_t serverStartTime = 44;
-    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<HOS_DEVICE_TYPE>(1), "keyboard" };
+    RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     netPacket >> typeNum;
     netPacket >> mixData >> fileData >> windowId >> abilityId >> serverStartTime;
 
