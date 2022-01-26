@@ -22,7 +22,7 @@ namespace {
 }
 TouchTransformPointProcessor::TouchTransformPointProcessor()
 {
-    this->pointerEvent_ = PointerEvent::Create();
+    pointerEvent_ = PointerEvent::Create();
 }
 
 TouchTransformPointProcessor::~TouchTransformPointProcessor() {}
@@ -144,7 +144,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent
         }
     }
     MMI_LOGD("call  onLibinputTouchEvent end");
-    return this->pointerEvent_;
+    return pointerEvent_;
 }
 }
 
