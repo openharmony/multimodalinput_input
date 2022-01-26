@@ -92,7 +92,7 @@ void ServerInputFilterManager::OnKeyEventTrace(const EventKeyboard& key)
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 }
 
-bool ServerInputFilterManager::OnKeyEvent(EventKeyboard key)
+bool ServerInputFilterManager::OnKeyEvent(const EventKeyboard& key)
 {
     MMI_LOGD("Key event filter on key event begin");
     OnKeyEventTrace(key);

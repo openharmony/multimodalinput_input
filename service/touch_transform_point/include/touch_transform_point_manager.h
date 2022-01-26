@@ -32,7 +32,7 @@ private:
     std::map<int32_t, std::shared_ptr<TouchTransformPointProcessor>> processors_;
     std::map<int32_t, std::shared_ptr<TouchPadTransformPointProcessor>> touchpadpro_;
 };
-#define touchTransformPointManger OHOS::MMI::TouchTransformPointManager::GetInstance()
+#define TouchTransformPointManger OHOS::MMI::TouchTransformPointManager::GetInstance()
 }
 }
 #endif

@@ -59,7 +59,7 @@ bool DeviceRegister::FindDeviceId(const std::string& physical, uint32_t& deviceI
     return true;
 }
 
-uint32_t DeviceRegister::AddDeviceInfo(std::string& physical)
+uint32_t DeviceRegister::AddDeviceInfo(const std::string& physical)
 {
     std::lock_guard<std::mutex> lock(mu_);
     const uint32_t BEGIN_NUM = 1;
