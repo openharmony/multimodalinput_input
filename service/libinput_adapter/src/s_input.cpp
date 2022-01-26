@@ -72,7 +72,7 @@ const static libinput_interface LIBINPUT_INTERFACE = {
     .close_restricted = [](int32_t fd, void *user_data)
     {
         using namespace OHOS::MMI;
-        MMI_LOGI("libinput .close_restricted fd:%{public}d\n", fd);
+        MMI_LOGI("libinput .close_restricted fd:%{public}d", fd);
         close(fd);
     },
 };

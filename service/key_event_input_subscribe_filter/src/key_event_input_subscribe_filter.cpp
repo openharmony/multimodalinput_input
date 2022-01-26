@@ -92,7 +92,7 @@ bool KeyEventInputSubscribeFilter::FilterSubscribeKeyEvent(std::shared_ptr<KeyEv
     }
     int32_t getKeyCode = keyEvent->GetKeyCode();
     std::string keyCodestring = std::to_string(getKeyCode);
-    MMI_LOGT(" FilterSubscribeKeyEvent service trace getKeyCode = %{public}d\n", getKeyCode);
+    MMI_LOGT(" FilterSubscribeKeyEvent service trace getKeyCode = %{public}d", getKeyCode);
     int32_t eventKey = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
 

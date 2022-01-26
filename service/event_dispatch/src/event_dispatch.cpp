@@ -39,7 +39,7 @@ static void PrintEventSlotedCoordsInfo(const SlotedCoordsInfo& r)
 {
     using namespace OHOS::MMI;
     for (int32_t i = 0; i < MAX_SOLTED_COORDS_NUMS; i++) {
-        MMI_LOGT("[%{public}d] isActive: %{public}d, x = %{public}f, y = %{public}f\n",
+        MMI_LOGT("[%{public}d] isActive: %{public}d, x = %{public}f, y = %{public}f",
             i, r.coords[i].isActive, r.coords[i].x, r.coords[i].y);
     }
 }
@@ -232,14 +232,14 @@ int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_eve
         return FOCUS_ID_OBTAIN_FAIL;
     }
 #ifdef DEBUG_CODE_TEST
-    MMI_LOGT("\nMMIWMS:windowId=[%{public}s]\n", str.c_str());
+    MMI_LOGT("MMIWMS:windowId=[%{public}s]", str.c_str());
     if (focusId == -1) {
-        MMI_LOGT("\nWMS:windowId = ''\n");
+        MMI_LOGT("WMS:windowId = ''");
     } else {
-        MMI_LOGT("\nWMS:windowId = %{public}d\n", focusId);
+        MMI_LOGT("WMS:windowId = %{public}d", focusId);
     }
-    MMI_LOGT("\nCALL_AMS:windowId = ''\n");
-    MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
+    MMI_LOGT("CALL_AMS:windowId = ''");
+    MMI_LOGT("MMIAPPM:fd =%{public}d,abilityID = %{public}d", appInfo.fd, appInfo.abilityId);
 #endif
 
     MMI_LOGT("4.event dispatcher of server, EventTabletPad:time=%{public}" PRId64 ", deviceType=%{public}u, "
@@ -257,7 +257,7 @@ int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_eve
         int32_t inputType = INPUT_DEVICE_CAP_TOUCH_PAD;
         newPacket << inputType << tabletPad << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
-            MMI_LOGE("Sending structure of EventTabletPad failed! errCode:%{public}d\n", MSG_SEND_FAIL);
+            MMI_LOGE("Sending structure of EventTabletPad failed! errCode:%{public}d", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
         }
     }
@@ -290,7 +290,7 @@ int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_even
         int32_t inputType = INPUT_DEVICE_CAP_JOYSTICK;
         newPacket << inputType << eventJoyStickAxis << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
-            MMI_LOGE("Sending structure of EventJoyStickAxis failed! errCode:%{public}d\n", MSG_SEND_FAIL);
+            MMI_LOGE("Sending structure of EventJoyStickAxis failed! errCode:%{public}d", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
         }
     }
@@ -343,7 +343,7 @@ int32_t EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, libinput_ev
                  tableTool.proximity_state, tableTool.tip_state, tableTool.state, tableTool.seat_button_count,
                  preHandlerTime, appInfo.fd);
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
-            MMI_LOGE("Sending structure of EventTabletTool failed! errCode:%{public}d\n", MSG_SEND_FAIL);
+            MMI_LOGE("Sending structure of EventTabletTool failed! errCode:%{public}d", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
         }
     }
@@ -419,7 +419,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     }
 
     if (!udsServer->SendMsg(fd, newPacket)) {
-        MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d\n", MSG_SEND_FAIL);
+        MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
     MMI_LOGE("handlePointerEvent end .....");
@@ -461,7 +461,7 @@ int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
     NetPacket newPacket(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::SerializePointerEvent(point, newPacket);
     if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
-        MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d\n", MSG_SEND_FAIL);
+        MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
     MMI_LOGD("call  DispatchTouchTransformPointEvent end"); 
@@ -475,7 +475,7 @@ void EventDispatch::DispatchPointerEventTrace(const EventPointer& point)
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" OnEventPointer service DispatchPointerEvent pointerUuid = %{public}s\n", pointerUuid);
+    MMI_LOGT(" OnEventPointer service DispatchPointerEvent pointerUuid = %{public}s", pointerUuid);
     std::string pointerEvent = pointerUuid;
     pointerEvent = "DispatchPointerEvent service pointerUuid: " + pointerEvent;
     int32_t eventPointer = 17;
@@ -519,25 +519,25 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event
 #ifdef DEBUG_CODE_TEST
         auto type = libinput_event_get_type(event);
         if (type != LIBINPUT_EVENT_POINTER_BUTTON) {
-            MMI_LOGT("\nMMIWMS:windowId=[%{public}s]\n", strIds.c_str());
+            MMI_LOGT("MMIWMS:windowId=[%{public}s]", strIds.c_str());
             if (desWindowId == -1) {
-                MMI_LOGT("\nWMS:windowId = ''\n");
+                MMI_LOGT("WMS:windowId = ''");
             } else {
-                MMI_LOGT("\nWMS:windowId = %{public}d\n", desWindowId);
+                MMI_LOGT("WMS:windowId = %{public}d", desWindowId);
             }
-            MMI_LOGT("\nCALL_AMS:windowId = ''\n");
-            MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
+            MMI_LOGT("CALL_AMS:windowId = ''");
+            MMI_LOGT("MMIAPPM:fd =%{public}d,abilityID = %{public}d", appInfo.fd, appInfo.abilityId);
         } else {
             if (size == windowCount_) {
-                MMI_LOGT("\nMMIWMS:windowId = [%{public}s]\n", strIds.c_str());
-                MMI_LOGT("\nWMS:windowId = %{public}d\n", desWindowId);
-                MMI_LOGT("\nCALL_AMS:windowId = %{public}d\n", desWindowId);
-                MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
+                MMI_LOGT("MMIWMS:windowId = [%{public}s]", strIds.c_str());
+                MMI_LOGT("WMS:windowId = %{public}d", desWindowId);
+                MMI_LOGT("CALL_AMS:windowId = %{public}d", desWindowId);
+                MMI_LOGT("MMIAPPM:fd =%{public}d,abilityID = %{public}d", appInfo.fd, appInfo.abilityId);
             } else {
-                MMI_LOGT("\nMMIWMS:windowId=[%{public}s]\n", strIds.c_str());
-                MMI_LOGT("\nWMS:windowId = %{public}d\n", desWindowId);
-                MMI_LOGT("\nCALL_AMS:windowId = ''\n");
-                MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
+                MMI_LOGT("MMIWMS:windowId=[%{public}s]", strIds.c_str());
+                MMI_LOGT("WMS:windowId = %{public}d", desWindowId);
+                MMI_LOGT("CALL_AMS:windowId = ''");
+                MMI_LOGT("MMIAPPM:fd =%{public}d,abilityID = %{public}d", appInfo.fd, appInfo.abilityId);
             }
         }
 #endif
@@ -555,7 +555,7 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event
                  point.discrete.y, appInfo.fd, preHandlerTime);
         DispatchPointerEventTrace(point);
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
-            MMI_LOGE("Sending structure of EventPointer failed! errCode:%{public}d\n", MSG_SEND_FAIL);
+            MMI_LOGE("Sending structure of EventPointer failed! errCode:%{public}d", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
         }
     }
@@ -625,7 +625,7 @@ void EventDispatch::DispatchTouchEventTrace(const EventTouch& touch)
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" 4.event dispatcher of server: touchUuid = %{public}s\n", touchUuid);
+    MMI_LOGT(" 4.event dispatcher of server: touchUuid = %{public}s", touchUuid);
     std::string touchEvent = touchUuid;
     touchEvent = "4.event dispatcher of server touchUuid: " + touchEvent;
     int32_t eventTouch = 9;
@@ -666,14 +666,14 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
     }
     MMI_LOGD("DispatchTouchEvent focusId:%{public}d fd:%{public}d", touchFocusId, appInfo.fd);
 #ifdef DEBUG_CODE_TEST
-    MMI_LOGT("\nMMIWMS:windowId=[%{public}s]\n", str.c_str());
+    MMI_LOGT("MMIWMS:windowId=[%{public}s]", str.c_str());
     if (touchFocusId == -1) {
-        MMI_LOGT("\nWMS:windowId = ''\n");
+        MMI_LOGT("WMS:windowId = ''");
     } else {
-        MMI_LOGT("\nWMS:windowId = %{public}d\n", touchFocusId);
+        MMI_LOGT("WMS:windowId = %{public}d", touchFocusId);
     }
-    MMI_LOGT("\nCALL_AMS:windowId = ''\n");
-    MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
+    MMI_LOGT("CALL_AMS:windowId = ''");
+    MMI_LOGT("MMIAPPM:fd =%{public}d,abilityID = %{public}d", appInfo.fd, appInfo.abilityId);
 #endif
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, touch.time, preHandlerTime)) {
@@ -721,7 +721,7 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
             DispatchTouchEventTrace(touch);
         }
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
-            MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d\n", MSG_SEND_FAIL);
+            MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
         }
     }
@@ -828,7 +828,7 @@ void EventDispatch::DispatchKeyEventTrace(const EventKeyboard& key)
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" OnEventKeyboard service DispatchKeyEvent keyUuid = %{public}s\n", keyUuid);
+    MMI_LOGT(" OnEventKeyboard service DispatchKeyEvent keyUuid = %{public}s", keyUuid);
     std::string keyEvent = keyUuid;
     keyEvent = "4.event dispatcher of server keyUuid: " + keyEvent;
     int32_t eventKey = 1;
@@ -917,7 +917,7 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
     pointerEvent->SetTargetWindowId(focusId);
 
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
-    MMI_LOGT("\npointer event dispatcher of server:\neventType=%{public}d,actionTime=%{public}d,"
+    MMI_LOGT("pointer event dispatcher of server:eventType=%{public}d,actionTime=%{public}d,"
              "action=%{public}d,actionStartTime=%{public}d,"
              "flag=%{public}d,pointerAction=%{public}d,sourceType=%{public}d,"
              "VerticalAxisValue=%{public}.02f,HorizontalAxisValue=%{public}.02f,"
@@ -934,7 +934,7 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
         OHOS::MMI::PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
 
-        MMI_LOGT("\n\tdownTime=%{public}d,isPressed=%{public}s,"
+        MMI_LOGT("\tdownTime=%{public}d,isPressed=%{public}s,"
                  "globalX=%{public}d,globalY=%{public}d,localX=%{public}d,localY=%{public}d,"
                  "width=%{public}d,height=%{public}d,pressure=%{public}d",
                  item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
@@ -946,7 +946,7 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
     InputEventDataTransformation::SerializePointerEvent(pointerEvent, newPkt);
     newPkt << appInfo.fd << preHandlerTime;
     if (!udsServer.SendMsg(appInfo.fd, newPkt)) {
-        MMI_LOGE("Sending structure of PointerEvent failed! errCode:%{public}d\n", MSG_SEND_FAIL);
+        MMI_LOGE("Sending structure of PointerEvent failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
     return RET_OK;
