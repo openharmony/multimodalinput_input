@@ -285,7 +285,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(multimodal_libinput_event &ev)
                  packageResult, DEV_ADD_EVENT_PKG_FAIL);
         return DEV_ADD_EVENT_PKG_FAIL;
     }
-    MMI_LOGT("4.event dispatcher of server:DeviceManage:physical=%{public}s, "
+    MMI_LOGT("4.event dispatcher of server, DeviceManage:physical=%{public}s, "
              "deviceName=%{public}s, deviceType=%{public}u",
              deviceManage.physical, deviceManage.deviceName, deviceManage.deviceType);
 
@@ -321,7 +321,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_event &ev)
                  packageResult, DEV_REMOVE_EVENT_PKG_FAIL);
         return DEV_REMOVE_EVENT_PKG_FAIL;
     }
-    MMI_LOGT("4.event dispatcher of server:DeviceManage:physical=%{public}s, "
+    MMI_LOGT("4.event dispatcher of server, DeviceManage:physical=%{public}s, "
              "deviceName=%{public}s, deviceType=%{public}u",
              deviceManage.physical, deviceManage.deviceName, deviceManage.deviceType);
 
