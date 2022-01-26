@@ -610,9 +610,9 @@ int32_t OHOS::MMI::ClientMsgHandler::PackedData(MultimodalEvent& multEvent, cons
                  "************************************************************************\n",
                  idMsg, fd, occurredTime);
         if (type == INPUT_DEVICE_CAP_KNUCKLE) {
-            type = HOS_KNUCKLE;
+            type = DEVICE_TYPE_KNUCKLE;
         } else if (type == INPUT_DEVICE_CAP_AISENSOR) {
-            type = HOS_AI_SPEECH;
+            type = DEVICE_TYPE_AI_SPEECH;
         }
         multEvent.Initialize(windowId, 0, uuid, type, occurredTime, "", deviceId, 0, 0);
     } else {
@@ -649,7 +649,7 @@ int32_t OHOS::MMI::ClientMsgHandler::DeviceAdd(const UDSClient& client, NetPacke
     DeviceManage data = {};
     pkt >> data;
     DeviceEvent eventData = {};
-    eventData.Initialize(data.deviceName, data.devicePhys, data.deviceId);
+    eventData.Initialize(data.deviceName, data.physical, data.deviceId);
     return EventManager.OnDeviceAdd(eventData);
 }
 
@@ -659,7 +659,7 @@ int32_t OHOS::MMI::ClientMsgHandler::DeviceRemove(const UDSClient& client, NetPa
     DeviceManage data = {};
     pkt >> data;
     DeviceEvent eventData = {};
-    eventData.Initialize(data.deviceName, data.devicePhys, data.deviceId);
+    eventData.Initialize(data.deviceName, data.physical, data.deviceId);
     return EventManager.OnDeviceRemove(eventData);
 }
 
@@ -1189,7 +1189,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, 
              "fingerCount=%{public}d;cancelled=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
              "deltaUnaccel.x=%{public}lf;deltaUnaccel.y=%{public}lf;fd=%{public}d;"
              "preHandlerTime=%{public}" PRId64 ";\n***************************************************\n",
-             gesture.time, gesture.deviceType, gesture.deviceName, gesture.devicePhys,
+             gesture.time, gesture.deviceType, gesture.deviceName, gesture.physical,
              gesture.eventType, gesture.fingerCount, gesture.cancelled, gesture.delta.x, gesture.delta.y,
              gesture.deltaUnaccel.x, gesture.deltaUnaccel.y, fd, serverStartTime);
 

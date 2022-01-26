@@ -180,7 +180,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetSourceDevice_Normal, TestSize.Level
     int32_t windowId = 0;
     int32_t highLevelEvent = 10;
     const std::string uuid = "aEvent";
-    int32_t sourceType = HOS_KEYBOARD;
+    int32_t sourceType = DEVICE_TYPE_KEYBOARD;
     uint64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
@@ -257,7 +257,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetDeviceId_Normal, TestSize.Level1)
     const std::string deviceId = "bDevice";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
-    uint16_t deviceUdevTags = HOS_UNKNOWN_DEVICE_TYPE;
+    uint16_t deviceUdevTags = DEVICE_TYPE_UNKNOWN;
     multimodalEventTest.Initialize(windowId, highLevelEvent, uuid, sourceType, occurredTime, deviceId,
         inputDeviceId, isHighLevelEvent, deviceUdevTags);
     auto retDeviceId = multimodalEventTest.GetDeviceId();
@@ -275,7 +275,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetDeviceId_Abnormal, TestSize.Level1)
     const std::string deviceId = "error";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
-    uint16_t deviceUdevTags = HOS_UNKNOWN_DEVICE_TYPE;
+    uint16_t deviceUdevTags = DEVICE_TYPE_UNKNOWN;
     multimodalEventTest.Initialize(windowId, highLevelEvent, uuid, sourceType, occurredTime, deviceId,
         inputDeviceId, isHighLevelEvent, deviceUdevTags);
     auto retDeviceId = multimodalEventTest.GetDeviceId();
@@ -293,7 +293,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetDeviceId_NULL, TestSize.Level1)
     const std::string deviceId = "";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
-    uint16_t deviceUdevTags = HOS_UNKNOWN_DEVICE_TYPE;
+    uint16_t deviceUdevTags = DEVICE_TYPE_UNKNOWN;
     multimodalEventTest.Initialize(windowId, highLevelEvent, uuid, sourceType, occurredTime, deviceId,
         inputDeviceId, isHighLevelEvent, deviceUdevTags);
     auto retDeviceId = multimodalEventTest.GetDeviceId();
@@ -311,7 +311,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetDeviceId_ERROR, TestSize.Level1)
     const std::string deviceId = "ERROR";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
-    uint16_t deviceUdevTags = HOS_UNKNOWN_DEVICE_TYPE;
+    uint16_t deviceUdevTags = DEVICE_TYPE_UNKNOWN;
     multimodalEventTest.Initialize(windowId, highLevelEvent, uuid, sourceType, occurredTime, deviceId,
         inputDeviceId, isHighLevelEvent, deviceUdevTags);
     auto retDeviceId = multimodalEventTest.GetDeviceId();
@@ -329,7 +329,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetInputDeviceId_Normal, TestSize.Leve
     const std::string deviceId = "bDevice";
     int32_t inputDeviceId = 10;
     bool isHighLevelEvent = true;
-    uint16_t deviceUdevTags = HOS_UNKNOWN_DEVICE_TYPE;
+    uint16_t deviceUdevTags = DEVICE_TYPE_UNKNOWN;
     multimodalEventTest.Initialize(windowId, highLevelEvent, uuid, sourceType, occurredTime, deviceId,
         inputDeviceId, isHighLevelEvent, deviceUdevTags);
     auto retDeviceId = multimodalEventTest.GetInputDeviceId();
@@ -347,7 +347,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetInputDeviceId_Abnormal, TestSize.Le
     const std::string deviceId = "bDevice";
     int32_t inputDeviceId = 0xFFFFFFFF;
     bool isHighLevelEvent = true;
-    uint16_t deviceUdevTags = HOS_UNKNOWN_DEVICE_TYPE;
+    uint16_t deviceUdevTags = DEVICE_TYPE_UNKNOWN;
     multimodalEventTest.Initialize(windowId, highLevelEvent, uuid, sourceType, occurredTime, deviceId,
         inputDeviceId, isHighLevelEvent, deviceUdevTags);
     auto retDeviceId = multimodalEventTest.GetInputDeviceId();
@@ -365,7 +365,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetInputDeviceId_Min, TestSize.Level1)
     const std::string deviceId = "bDevice";
     int32_t inputDeviceId = static_cast<int32_t>(0xFFFFFFFF);
     bool isHighLevelEvent = true;
-    uint16_t deviceUdevTags = HOS_UNKNOWN_DEVICE_TYPE;
+    uint16_t deviceUdevTags = DEVICE_TYPE_UNKNOWN;
     multimodalEventTest.Initialize(windowId, highLevelEvent, uuid, sourceType, occurredTime, deviceId,
         inputDeviceId, isHighLevelEvent, deviceUdevTags);
     auto retDeviceId = multimodalEventTest.GetInputDeviceId();
@@ -383,7 +383,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetInputDeviceId_Max, TestSize.Level1)
     const std::string deviceId = "bDevice";
     int32_t inputDeviceId = 0x7FFFFFFF;
     bool isHighLevelEvent = true;
-    uint16_t deviceUdevTags = HOS_UNKNOWN_DEVICE_TYPE;
+    uint16_t deviceUdevTags = DEVICE_TYPE_UNKNOWN;
     multimodalEventTest.Initialize(windowId, highLevelEvent, uuid, sourceType, occurredTime, deviceId,
         inputDeviceId, isHighLevelEvent, deviceUdevTags);
     auto retDeviceId = multimodalEventTest.GetInputDeviceId();
@@ -401,7 +401,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetOccurredTime_Normal, TestSize.Level
     const std::string deviceId = "bDevice";
     int32_t inputDeviceId = 10;
     bool isHighLevelEvent = true;
-    uint16_t deviceUdevTags = HOS_UNKNOWN_DEVICE_TYPE;
+    uint16_t deviceUdevTags = DEVICE_TYPE_UNKNOWN;
     multimodalEventTest.Initialize(windowId, highLevelEvent, uuid, sourceType, occurredTime, deviceId,
         inputDeviceId, isHighLevelEvent, deviceUdevTags);
     auto retOccurredTime = multimodalEventTest.GetOccurredTime();
@@ -419,7 +419,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetOccurredTime_Abnormal, TestSize.Lev
     const std::string deviceId = "bDevice";
     int32_t inputDeviceId = 10;
     bool isHighLevelEvent = true;
-    uint16_t deviceUdevTags = HOS_UNKNOWN_DEVICE_TYPE;
+    uint16_t deviceUdevTags = DEVICE_TYPE_UNKNOWN;
     multimodalEventTest.Initialize(windowId, highLevelEvent, uuid, sourceType, occurredTime, deviceId,
         inputDeviceId, isHighLevelEvent, deviceUdevTags);
     auto retOccurredTime = multimodalEventTest.GetOccurredTime();
@@ -437,7 +437,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetOccurredTime_Min, TestSize.Level1)
     const std::string deviceId = "bDevice";
     int32_t inputDeviceId = 10;
     bool isHighLevelEvent = true;
-    uint16_t deviceUdevTags = HOS_UNKNOWN_DEVICE_TYPE;
+    uint16_t deviceUdevTags = DEVICE_TYPE_UNKNOWN;
     multimodalEventTest.Initialize(windowId, highLevelEvent, uuid, sourceType, occurredTime, deviceId,
         inputDeviceId, isHighLevelEvent, deviceUdevTags);
     auto retOccurredTime = multimodalEventTest.GetOccurredTime();

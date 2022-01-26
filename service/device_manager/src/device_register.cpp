@@ -40,17 +40,17 @@ bool DeviceRegister::Init()
     SeniorDeviceInfo sensor = { "hos_input_device_aisensor", INPUT_DEVICE_AISENSOR };
     SeniorDeviceInfo knuckle = { "hos_input_device_knuckle", INPUT_DEVICE_KNUCKLE };
     setDeviceId_.insert(sensor.seniorDeviceType);
-    mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(sensor.devicePhys, sensor.seniorDeviceType));
+    mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(sensor.physical, sensor.seniorDeviceType));
     setDeviceId_.insert(knuckle.seniorDeviceType);
-    mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(knuckle.devicePhys, knuckle.seniorDeviceType));
+    mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(knuckle.physical, knuckle.seniorDeviceType));
     return true;
 }
 
-bool DeviceRegister::FindDeviceIdByDevicePhys(const std::string& devicePhys, uint32_t& deviceId)
+bool DeviceRegister::FindDeviceId(const std::string& physical, uint32_t& deviceId)
 {
     std::lock_guard<std::mutex> lock(mu_);
     const uint32_t DEFAULT_DEVICE_ID = 0;
-    auto it = mapDeviceInfo_.find(devicePhys);
+    auto it = mapDeviceInfo_.find(physical);
     if (it == mapDeviceInfo_.end()) {
         deviceId = DEFAULT_DEVICE_ID;
         return false;
@@ -59,14 +59,14 @@ bool DeviceRegister::FindDeviceIdByDevicePhys(const std::string& devicePhys, uin
     return true;
 }
 
-uint32_t DeviceRegister::AddDeviceInfo(std::string& devicePhys)
+uint32_t DeviceRegister::AddDeviceInfo(std::string& physical)
 {
     std::lock_guard<std::mutex> lock(mu_);
     const uint32_t BEGIN_NUM = 1;
     auto it = setDeviceId_.find(BEGIN_NUM);
     if (it == setDeviceId_.end()) {
         setDeviceId_.insert(BEGIN_NUM);
-        mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(devicePhys, BEGIN_NUM));
+        mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(physical, BEGIN_NUM));
         return BEGIN_NUM;
     }
     auto previousPtr = setDeviceId_.begin();
@@ -85,14 +85,14 @@ uint32_t DeviceRegister::AddDeviceInfo(std::string& devicePhys)
         return 0;
     }
     setDeviceId_.insert(addDeviceId);
-    mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(devicePhys, addDeviceId));
+    mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(physical, addDeviceId));
     return addDeviceId;
 }
 
-bool DeviceRegister::DeleteDeviceInfo(const std::string& devicePhys)
+bool DeviceRegister::DeleteDeviceInfo(const std::string& physical)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    auto it = mapDeviceInfo_.find(devicePhys);
+    auto it = mapDeviceInfo_.find(physical);
     if (it != mapDeviceInfo_.end()) {
         uint32_t deviceId = it->second;
         mapDeviceInfo_.erase(it);
