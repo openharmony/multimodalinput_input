@@ -17,11 +17,14 @@
 
 #include "proto.h"
 
-#define MAX_DEVICENAME 64
-#define MAX_UUIDSIZE 64
-#define MAX_SOLTED_COORDS_NUM 10
-#define SYSTEMUID 1000
-
+namespace OHOS {
+namespace MMI {
+namespace {
+    constexpr int MAX_DEVICENAME = 64;
+    constexpr int MAX_UUIDSIZE = 64;
+    constexpr int SYSTEMUID = 1000;
+    constexpr int MAX_SOLTED_COORDS_NUMS = 10;
+}
 enum SENIOR_DEVICE_TYPE {
     INPUT_DEVICE_AISENSOR = 31,
     INPUT_DEVICE_KNUCKLE = 41
@@ -301,7 +304,7 @@ struct SlotedCoords {
 };
 
 struct SlotedCoordsInfo {
-    struct SlotedCoords coords[MAX_SOLTED_COORDS_NUM];
+    struct SlotedCoords coords[MAX_SOLTED_COORDS_NUMS];
     uint32_t activeCount;
 };
 
@@ -386,5 +389,7 @@ struct EventTabletPad {
         int number;
     } strip;
 };
+}
+}
 
 #endif

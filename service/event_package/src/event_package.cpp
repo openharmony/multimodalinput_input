@@ -40,7 +40,7 @@ namespace {
     void FillEventSlotedCoordsInfo(SlotedCoordsInfo& l, const sloted_coords_info& r)
     {
         l.activeCount = r.active_count;
-        for (int i = 0; i < MAX_SOLTED_COORDS_NUM; i++) {
+        for (int i = 0; i < MAX_SOLTED_COORDS_NUMS; i++) {
             l.coords[i].isActive = r.coords[i].is_active;
             l.coords[i].x = r.coords[i].x;
             l.coords[i].y = r.coords[i].y;

@@ -21,6 +21,7 @@ namespace {
 using namespace testing::ext;
 using namespace std;
 using namespace OHOS;
+using namespace OHOS::MMI;
 
 class MouseEventTest : public testing::Test {
 public:
