@@ -95,6 +95,7 @@ int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
     }
     auto fun = GetFun(idMsg);
     if (!fun) {
+        MMI_LOGE("Non system event return");
         return UNKNOWN_MSG_ID; // non-system event return
     }
     (*fun)();

@@ -213,6 +213,7 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
                 break;
             }
             default: {
+                MMI_LOGW("Unknown event type of pointer, TouchPointType:%{public}d", touch.eventType);
                 break;
             }
         }
@@ -231,6 +232,7 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
                 break;
             }
             default: {
+                MMI_LOGW("Unknown event type of pointer, TouchPointType:%{public}d", touch.eventType);
                 break;
             }
         }
@@ -289,7 +291,7 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
     int32_t touchFocusId = WinMgr->GetTouchFocusSurfaceId();
     auto appInfo = AppRegs->FindByWinId(touchFocusId); // obtain application information
     if (appInfo.fd == RET_ERR) {
-        MMI_LOGT("Failed to find fd:%{public}d... errCode:%{public}d", touchFocusId, FOCUS_ID_OBTAIN_FAIL);
+        MMI_LOGE("Failed to find fd:%{public}d, errCode:%{public}d", touchFocusId, FOCUS_ID_OBTAIN_FAIL);
         return false;
     }
     MMI_LOGD("DispatchTouchEvent focusId:%{public}d fd:%{public}d", touchFocusId, appInfo.fd);

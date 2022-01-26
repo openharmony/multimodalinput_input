@@ -304,6 +304,7 @@ void RegisterEvent::OnEventTouchGetSign(const EventTouch& touch, MmiMessageId& m
             OnEventTouchMotionGetSign(touch, msgId);
             break;
         default:
+            MMI_LOGW("Unknown event type of touch, TouchGetSign:%{public}d", touch.eventType);
             break;
     }
     SysEveHdl->OnSystemEventHandler(msgId);
