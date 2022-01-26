@@ -17,6 +17,7 @@
 #include "struct_multimodal.h"
 
 namespace OHOS {
+namespace MMI {
 MultimodalEvent::~MultimodalEvent() {}
 void MultimodalEvent::Initialize(int32_t windowId, int32_t highLevelEvent, const std::string& uuid, int32_t sourceType,
                                  uint64_t occurredTime, const std::string& deviceId, int32_t inputDeviceId,
@@ -246,5 +247,6 @@ int32_t MultimodalEvent::DeviceTypeTransform(int32_t sourceType) const
         }
     }
     return deviceType;
+}
 }
 }

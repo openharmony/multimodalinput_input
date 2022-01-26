@@ -183,7 +183,7 @@ public:
     * @return void
     * @since 1
     */
-    void Initialize(int32_t windowId, MultimodalEventPtr deviceEvent, int32_t deviceEventType,
+    void Initialize(int32_t windowId, MMI::MultimodalEventPtr deviceEvent, int32_t deviceEventType,
             int32_t action, int32_t index, float forcePrecision, float maxForce, float tapCount,
             int32_t startTime, int32_t operationState, int32_t pointerCount, fingerInfos fingersInfos[],
             bool isStandard);
@@ -194,7 +194,7 @@ public:
     * @return void
     * @since 1
     */
-    void setMultimodalEvent(MultimodalEventPtr deviceEvent);
+    void setMultimodalEvent(MMI::MultimodalEventPtr deviceEvent);
 
     /**
      * Obtains the current pointer action status.
@@ -256,7 +256,7 @@ public:
      */
     virtual bool GetIsStandard() const;
 
-    virtual const MultimodalEvent *GetMultimodalEvent() const;
+    virtual const MMI::MultimodalEvent *GetMultimodalEvent() const;
 
     virtual int32_t GetPointToolType(int32_t index) const;
 
@@ -270,7 +270,7 @@ private:
     float mTapCount_ = 0.f;
     bool mIsStandard_ = false;
     int32_t mDeviceEventType_ = 0;
-    MultimodalEventPtr mDeviceEvent_ = nullptr;
+    MMI::MultimodalEventPtr mDeviceEvent_ = nullptr;
 };
 }
 #endif

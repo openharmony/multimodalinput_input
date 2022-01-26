@@ -18,6 +18,7 @@
 #include "multimodal_event.h"
 
 namespace OHOS {
+namespace MMI {
 enum class EventType {
     EVENT_MULTIMODAL = 0,    // 多模消息基类
     EVENT_KEY = 1,           // 按键消息
@@ -42,5 +43,6 @@ class EventFactory {
 public:
     static MultimodalEventPtr CreateEvent(EventType eventType);
 };
+}
 }
 #endif
