@@ -1387,7 +1387,7 @@ HWTEST_F(ClientMsgHandlerTest, OnTouch2, TestSize.Level1)
     EventTouch touchData = {};
     CHK(EOK == memcpy_s(touchData.deviceName, MAX_DEVICENAME, "name", MAX_DEVICENAME),
         MEMCPY_SEC_FUN_FAIL);
-    CHK(EOK == memcpy_s(touchData.devicePhys, MAX_DEVICENAME, "HOS_TouchScreen", MAX_DEVICENAME),
+    CHK(EOK == memcpy_s(touchData.physical, MAX_DEVICENAME, "HOS_TouchScreen", MAX_DEVICENAME),
         MEMCPY_SEC_FUN_FAIL);
     CHK(EOK == memcpy_s(touchData.uuid, MAX_DEVICENAME, "12345", MAX_DEVICENAME),
         MEMCPY_SEC_FUN_FAIL);

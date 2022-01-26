@@ -320,7 +320,7 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
                 MMI_LOGT("4.event filter of server 1:eventTouch:time=%{public}" PRId64 ", deviceType=%{public}u, "
                          "deviceName=%{public}s, physical=%{public}s, eventType=%{public}d, "
                          "slot=%{public}d, seatSlot=%{public}d, pressure=%{public}lf, point.x=%{public}lf, "
-                         "point.y=%{public}lf, fd=%{public}d, preHandlerTime=%{public}" PRId64 "",
+                         "point.y=%{public}lf, fd=%{public}d, preHandlerTime=%{public}" PRId64,
                          touchTemp.time, touchTemp.deviceType, touchTemp.deviceName,
                          touchTemp.physical, touchTemp.eventType, touchTemp.slot, touchTemp.seatSlot,
                          touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, appInfo.fd,
@@ -333,7 +333,7 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
             MMI_LOGT("4.event filter of server 2:eventTouch:time=%{public}" PRId64 ", deviceType=%{public}u, "
                      "deviceName=%{public}s, physical=%{public}s, eventType=%{public}d, "
                      "slot=%{public}d, seatSlot=%{public}d, pressure=%{public}lf, point.x=%{public}lf, "
-                     "point.y=%{public}lf, fd=%{public}d, preHandlerTime=%{public}" PRId64 "",
+                     "point.y=%{public}lf, fd=%{public}d, preHandlerTime=%{public}" PRId64,
                      touch.time, touch.deviceType, touch.deviceName,
                      touch.physical, touch.eventType, touch.slot, touch.seatSlot, touch.pressure,
                      touch.point.x, touch.point.y, appInfo.fd, preHandlerTime);
