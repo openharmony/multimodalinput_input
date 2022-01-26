@@ -60,11 +60,6 @@ const AppInfo& AppRegister::FindBySocketFd(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
     CHKR(fd >= 0, PARAM_INPUT_INVALID, AppInfoError_);
-    return FindAppInfoBySocketFd(fd);
-}
-
-const AppInfo& AppRegister::FindAppInfoBySocketFd(int32_t fd)
-{
     for (auto iter = mapSurface_.begin(); iter != mapSurface_.end(); iter++) {
         if (iter->second.fd == fd) {
             return iter->second;

@@ -31,7 +31,7 @@ namespace OHOS::MMI {
         template<class EventType>
         int32_t PackageEventDeviceInfo(libinput_event *event, EventType& data);
         template<class T>
-        int32_t PackageRegisteredEvent(T& data, RegisteredEvent& event);
+        int32_t PackageRegisteredEvent(const T& data, RegisteredEvent& event);
         int32_t PackageTabletToolEvent(libinput_event *event, EventTabletTool& tableTool);
         int32_t PackageTabletPadEvent(libinput_event *event, EventTabletPad& tabletPad);
         int32_t PackageDeviceManageEvent(libinput_event *event, DeviceManage& deviceManage);
@@ -57,7 +57,7 @@ namespace OHOS::MMI {
         void PackageTouchEventByType(int32_t type, struct libinput_event_touch *data, EventTouch& touch);
     };
     template<class T>
-    int32_t EventPackage::PackageRegisteredEvent(T& data, RegisteredEvent& event)
+    int32_t EventPackage::PackageRegisteredEvent(const T& data, RegisteredEvent& event)
     {
         int32_t ret = memcpy_s(event.physical, MAX_DEVICENAME, data.physical, MAX_DEVICENAME);
         CHKR(ret != EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);

@@ -216,7 +216,7 @@ void InputEventHandler::OnEvent(void *event)
              idSeed_, lastSysClock_, lostTime);
 }
 
-int32_t InputEventHandler::OnEventHandler(multimodal_libinput_event &ev)
+int32_t InputEventHandler::OnEventHandler(const multimodal_libinput_event& ev)
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(ev.event);
@@ -269,7 +269,7 @@ int32_t InputEventHandler::AddInputEventFilter(sptr<IEventFilter> filter)
     return eventDispatch_.AddInputEventFilter(filter);
 }
 
-int32_t InputEventHandler::OnEventDeviceAdded(multimodal_libinput_event &ev)
+int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& ev)
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(ev.event);
@@ -306,7 +306,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(multimodal_libinput_event &ev)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_event &ev)
+int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event& ev)
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(ev.event);
@@ -384,7 +384,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnKeyEventDispatch(multimodal_libinput_event& ev)
+int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& ev)
 {
 #ifdef OHOS_WESTEN_MODEL
     uint64_t preHandlerTime = GetSysClockTime();
@@ -499,7 +499,7 @@ void InputEventHandler::OnEventKeyboardTrace(const EventKeyboard& keyBoard)
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 }
 
-int32_t InputEventHandler::OnEventKeyboard(multimodal_libinput_event &ev)
+int32_t InputEventHandler::OnEventKeyboard(const multimodal_libinput_event& ev)
 {
     CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
 #ifdef OHOS_WESTEN_MODEL
@@ -556,7 +556,7 @@ void InputEventHandler::OnEventPointerTrace(const EventPointer& point)
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
 }
 
-int32_t InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
+int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
 {
     CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     uint64_t preHandlerTime = GetSysClockTime();
@@ -622,7 +622,7 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 {
     CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("call  OnEventTouchSecond begin"); 
-    auto point = touchTransformPointManger->OnLibinputTouchEvent(event);
+    auto point = TouchTransformPointManger->OnLibinputTouchEvent(event);
     if (point == nullptr) {
         return RET_OK;
     }
@@ -646,7 +646,7 @@ int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
     CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("call  OnEventTouchPadSecond begin");
 
-    auto point = touchTransformPointManger->OnLibinputTouchPadEvent(event);
+    auto point = TouchTransformPointManger->OnLibinputTouchPadEvent(event);
     if (point == nullptr) {
         return RET_OK;
     }
@@ -679,7 +679,7 @@ void InputEventHandler::OnEventTouchTrace(const struct EventTouch& touch)
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
 }
 
-int32_t InputEventHandler::OnEventTouch(multimodal_libinput_event &ev)
+int32_t InputEventHandler::OnEventTouch(const multimodal_libinput_event& ev)
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     SInput::Loginfo_packaging_tool(ev.event);
@@ -715,7 +715,7 @@ int32_t InputEventHandler::OnEventTouch(multimodal_libinput_event &ev)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventTouchpad(multimodal_libinput_event& ev)
+int32_t InputEventHandler::OnEventTouchpad(const multimodal_libinput_event& ev)
 {
 #ifndef OHOS_WESTEN_MODEL
     OnEventTouchPadSecond(ev.event);
@@ -747,7 +747,7 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventGesture(multimodal_libinput_event &ev)
+int32_t InputEventHandler::OnEventGesture(const multimodal_libinput_event& ev)
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
 #ifndef OHOS_WESTEN_MODEL
@@ -773,7 +773,7 @@ int32_t InputEventHandler::OnEventGesture(multimodal_libinput_event &ev)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventTabletTool(multimodal_libinput_event &ev)
+int32_t InputEventHandler::OnEventTabletTool(const multimodal_libinput_event& ev)
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     uint64_t preHandlerTime = GetSysClockTime();
@@ -800,7 +800,7 @@ int32_t InputEventHandler::OnEventTabletTool(multimodal_libinput_event &ev)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventTabletPad(multimodal_libinput_event &ev)
+int32_t InputEventHandler::OnEventTabletPad(const multimodal_libinput_event& ev)
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     uint64_t preHandlerTime = GetSysClockTime();
@@ -821,7 +821,7 @@ int32_t InputEventHandler::OnEventTabletPad(multimodal_libinput_event &ev)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventSwitchToggle(multimodal_libinput_event &ev)
+int32_t InputEventHandler::OnEventSwitchToggle(const multimodal_libinput_event& ev)
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(ev.event);
@@ -829,7 +829,7 @@ int32_t InputEventHandler::OnEventSwitchToggle(multimodal_libinput_event &ev)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventTabletPadKey(multimodal_libinput_event &ev)
+int32_t InputEventHandler::OnEventTabletPadKey(const multimodal_libinput_event& ev)
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     uint64_t preHandlerTime = GetSysClockTime();
@@ -860,7 +860,7 @@ int32_t InputEventHandler::OnEventTabletPadKey(multimodal_libinput_event &ev)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventJoyStickKey(multimodal_libinput_event &ev, const uint64_t time)
+int32_t InputEventHandler::OnEventJoyStickKey(const multimodal_libinput_event& ev, const uint64_t time)
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
@@ -889,7 +889,7 @@ int32_t InputEventHandler::OnEventJoyStickKey(multimodal_libinput_event &ev, con
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventJoyStickAxis(multimodal_libinput_event &ev, const uint64_t time)
+int32_t InputEventHandler::OnEventJoyStickAxis(const multimodal_libinput_event& ev, const uint64_t time)
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
