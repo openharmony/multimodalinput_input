@@ -66,7 +66,7 @@ protected:
     int32_t GestureRegisteredEventDispatch(const MmiMessageId& idMsg, UDSServer& udsServer,
         RegisteredEvent& registeredEvent, uint64_t preHandlerTime);
     int32_t DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& udsServer,
-        const RegisteredEvent& eventData, int32_t inputDeviceType, uint64_t preHandlerTime);
+        const RegisteredEvent& data, int32_t inputDeviceType, uint64_t preHandlerTime);
     int32_t KeyBoardRegEveHandler(EventKeyboard& key, UDSServer& udsServer,
         libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime);
 
