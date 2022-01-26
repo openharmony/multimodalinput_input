@@ -75,7 +75,7 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEv
         pointerItem.SetPressed(false);
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-        pointerEvent_->SetButtonPressed(state);
+        pointerEvent_->SetButtonPressed(button);
         pointerItem.SetPressed(true);
     } else {
         MMI_LOGW("unknown state, state: %{public}u", state);
@@ -148,6 +148,7 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerItem.SetPressure(0);
     pointerItem.SetDeviceId(deviceId);
 
+    pointerEvent_->UpdateId();
     pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent_->SetActionTime(static_cast<int32_t>(GetSysClockTime()));
