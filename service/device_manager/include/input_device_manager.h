@@ -52,7 +52,7 @@ private:
     std::map<int32_t, libinput_device*> inputDevice_;
     bool initFlag_ {false};
     int32_t nextId_ {0};
-    list<Observer*> observers;
+    std::list<Observer*> observers;
 };
 } // namespace MMI
 } // namespace OHOS
