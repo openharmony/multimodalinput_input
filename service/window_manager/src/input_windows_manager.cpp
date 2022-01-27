@@ -864,16 +864,14 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
         MMI_LOGE("find foucusWindow failed");
         return RET_ERR;
     }
-
     int32_t action = pointerEvent->GetPointerAction();
-    int32_t buttonId = pointerEvent->GetButtonId();
-    if (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN && buttonId == PointerEvent::MOUSE_BUTTON_LEFT) {
-        windowBtnLeft_ = focusWindow;
-    }
-    if (((pointerEvent->IsButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT)) &&
-        (action == PointerEvent::POINTER_ACTION_MOVE)) || ((action == PointerEvent::POINTER_ACTION_BUTTON_UP) &&
-        (buttonId == PointerEvent::MOUSE_BUTTON_LEFT))) {
-        focusWindow = windowBtnLeft_;
+    if (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN && firstBtnDownWindow_ == nullptr) {
+        firstBtnDownWindow_ = focusWindow;
+    } else if (!(pointerEvent->GetPressedButtons().empty())) {
+        focusWindow = firstBtnDownWindow_ ;
+    } else if ((pointerEvent->GetPressedButtons().empty()) && (action == PointerEvent::POINTER_ACTION_BUTTON_UP)) {
+        focusWindow = firstBtnDownWindow_ ;
+        firstBtnDownWindow_ = nullptr;
     }
     pointerEvent->SetTargetWindowId(focusWindow->id);
     pointerEvent->SetAgentWindowId(focusWindow->agentWindowId);
