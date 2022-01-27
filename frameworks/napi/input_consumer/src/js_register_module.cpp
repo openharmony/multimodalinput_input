@@ -22,6 +22,10 @@
 
 namespace OHOS {
     namespace MMI {
+        namespace {
+            static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
+        }
+
         const uint32_t EVENT_NAME_LEN = 64;
         const uint32_t ARGC_SYSTEM_NUM = 3;
         const uint32_t ARGV_FIRST = 0;

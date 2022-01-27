@@ -17,6 +17,10 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterUtil" };
+}
+
 void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, int32_t value)
 {
     MMI_LOGD("%{public}s=%{public}d", name.c_str(), value);
