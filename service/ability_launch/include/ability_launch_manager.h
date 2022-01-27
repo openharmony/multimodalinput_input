@@ -46,13 +46,11 @@ struct Ability {
 };
 
 struct ShortcutKey {
-    int32_t preKey1 { 0 };
-    int32_t preKey2 { 0 };
-    int32_t preKey3 { 0 };
-    int32_t preKey4 { 0 };
-    int32_t finalKey { 0 };
+    std::set<int32_t> preKeys;
+    int32_t finalKey { -1 };
     int32_t keyDownDuration { 0 };
-    int32_t triggerType { OHOS::MMI::KeyEvent::KEY_ACTION_DOWN };
+    int32_t triggerType { KeyEvent::KEY_ACTION_DOWN };
+    int32_t timerId { -1 };
     Ability ability;
 };
 
@@ -60,39 +58,22 @@ class AbilityLaunchManager : public DelayedSingleton<AbilityLaunchManager> {
 public:
     AbilityLaunchManager();
     ~AbilityLaunchManager() = default;
-    bool CheckLaunchAbility(std::shared_ptr<OHOS::MMI::KeyEvent> &key);
-
+    bool CheckLaunchAbility(const std::shared_ptr<KeyEvent> &event);
 private:
-    class Timer {
-    public:
-        Timer();
-        ~Timer();
-        void Start(unsigned long millsTime, std::function<void(ShortcutKey)> callback, ShortcutKey key);
-        void Stop();
-
-    private:
-        void CountingTime();
-        std::mutex lock;
-        std::condition_variable condition;
-        std::thread checkThread;
-        bool stopFlag;
-        std::function<void(ShortcutKey)> callback_;
-        unsigned long time;
-        ShortcutKey shortcutKey;
-    };
     void ResolveConfig(std::string configFile);
-    bool ConvertJson(ShortcutKey &shortcutKey, json &jsonData);
-    std::string GetAbilityFilePath();
+    bool ConvertToShortcutKey(const json &jsonData, ShortcutKey &shortcutKey);
+    std::string GetConfigFilePath();
     void LaunchAbility(ShortcutKey key);
-    std::string ConvertKey(ShortcutKey key);
-    bool UnwrapAbility(Ability &ability, json &jsonStr);
-    void PrintShortcutKey();
-    bool CheckKeyPressed(int32_t preKey, std::vector<OHOS::MMI::KeyEvent::KeyItem> &pressedKeys, size_t &count);
-    void ResetWaitTriggerKey(ShortcutKey &shortcutKey);
-    bool CheckShortcutkeyMatch(ShortcutKey &shortcutKey, std::shared_ptr<OHOS::MMI::KeyEvent> &key);
-    Timer timer;
-    ShortcutKey waitTriggerKey;
-    std::map<std::string, ShortcutKey> shortcutKeysMap;
+    std::string GenerateKey(const ShortcutKey& key);
+    bool PackageAbility(const json &jsonStr, Ability &ability);
+    void Print();
+    bool Match(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key);
+    bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey);
+    bool HandleKeyDown(ShortcutKey &shortcutKey);
+    bool HandleKeyCancel(ShortcutKey &shortcutKey);
+    void ResetLastMatchedKey();
+    ShortcutKey lastMatchedKey_;
+    std::map<std::string, ShortcutKey> shortcutKeys_;
 };
 }
 }
