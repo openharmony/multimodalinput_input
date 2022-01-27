@@ -464,14 +464,6 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
         MMI_LOGE("On the OnKeyboardEvent translate key event error!");
         return RET_ERR;
     }
-    if (AbilityMgr->CheckLaunchAbility(keyEvent)) {
-        MMI_LOGD("Key event start launch an ability, keyCode:%{puiblic}d", keyBoard.key);
-        return RET_OK;
-    }
-    if (KeyEventInputSubscribeFlt.FilterSubscribeKeyEvent(keyEvent)) {
-        MMI_LOGD("Subscribe key event filter success. keyCode=%{puiblic}d", keyBoard.key);
-        return RET_OK;
-    }
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
