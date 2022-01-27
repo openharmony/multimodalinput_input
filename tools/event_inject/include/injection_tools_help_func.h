@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_INJECTION_TOOLS_HELP_FUNC_H
-#define OHOS_INJECTION_TOOLS_HELP_FUNC_H
+#ifndef INJECTION_TOOLS_HELP_FUNC_H
+#define INJECTION_TOOLS_HELP_FUNC_H
 
 #include <string.h>
 #include "util.h"
@@ -26,4 +26,4 @@ namespace OHOS {
         };
     }
 }
-#endif // OHOS_INJECTION_TOOLS_HELP_FUNC_H
+#endif // INJECTION_TOOLS_HELP_FUNC_H

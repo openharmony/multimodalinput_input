@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_DEVICE_BASE_H
-#define OHOS_DEVICE_BASE_H
+#ifndef DEVICE_BASE_H
+#define DEVICE_BASE_H
 
 #include "msg_head.h"
 
@@ -80,4 +80,4 @@ namespace OHOS {
         };
     }
 }
-#endif
+#endif // DEVICE_BASE_H

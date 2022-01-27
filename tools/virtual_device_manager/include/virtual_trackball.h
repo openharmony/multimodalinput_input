@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_VIRTUAL_TRACKBALL_H
-#define OHOS_VIRTUAL_TRACKBALL_H
+#ifndef VIRTUAL_TRACKBALL_H
+#define VIRTUAL_TRACKBALL_H
 
 #include "virtual_device.h"
 
@@ -32,4 +32,4 @@ protected:
 };
 }
 }
-#endif
+#endif // VIRTUAL_TRACKBALL_H
