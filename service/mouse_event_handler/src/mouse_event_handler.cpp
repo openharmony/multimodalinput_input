@@ -72,6 +72,7 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEv
     auto state = libinput_event_pointer_get_button_state(data);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+        pointerEvent_->DeleteReleaseButton(button);
         pointerItem.SetPressed(false);
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
