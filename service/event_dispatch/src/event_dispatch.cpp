@@ -357,10 +357,11 @@ bool EventDispatch::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point
 
 int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point) 
 {
-    MMI_LOGE("handlePointerEvent begin .....");
+    MMI_LOGD("HandlePointerEvent begin");
     CHKPR(point, PARAM_INPUT_INVALID, RET_ERR);
     auto fd = WinMgr->UpdateTargetPointer(point);
     if (HandlePointerEventFilter(point)) {
+        MMI_LOGI("Pointer event interception succeeded");
         return RET_OK;
     }
     auto source = point->GetSourceType();
@@ -373,7 +374,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         }
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
             if (HandleTouchScreenEvent(point)) {
-                MMI_LOGD("PointerEvent consumed,will not send to client.");
+                MMI_LOGI("PointerEvent consumed, will not send to client");
                 return RET_OK;
             }
             break;
@@ -415,14 +416,14 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     }
     if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME_MAX)) {
         session->ClearEventsVct();
-        MMI_LOGD("The pointer event is cleared.");
+        MMI_LOGD("The pointer event is cleared");
     }
 
     if (!udsServer->SendMsg(fd, newPacket)) {
         MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
-    MMI_LOGE("handlePointerEvent end .....");
+    MMI_LOGD("HandlePointerEvent end");
     return RET_OK;
 }
 
@@ -495,11 +496,13 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event
 #endif
     int32_t desWindowId = WinMgr->GetFocusSurfaceId(); // obtaining focusId
     if (desWindowId < 0) {
+        MMI_LOGW("Failed to get focus surface, desWindow:%{public}d", desWindowId);
         return RET_OK;
     }
     // obtain application information for focusId
     auto appInfo = AppRegs->FindByWinId(desWindowId);
     if (appInfo.fd == RET_ERR) {
+        MMI_LOGE("Failed to find focus");
         return FOCUS_ID_OBTAIN_FAIL;
     }
     StandardTouchStruct inputEvent = {}; // Standardization handler of struct EventPointer
@@ -649,7 +652,7 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
         RegisteredEvent registeredEvent = {};
         auto packageResult = eventPackage_.PackageRegisteredEvent<EventTouch>(touch, registeredEvent);
         if (packageResult != RET_OK) {
-            MMI_LOGE("Registered event package failed... ret:%{public}d errCode:%{public}d",
+            MMI_LOGE("Registered event package failed, ret:%{public}d, errCode:%{public}d",
                 packageResult, REG_EVENT_PKG_FAIL);
         }
         ret = DispatchRegEvent(idMsg, udsServer, registeredEvent, INPUT_DEVICE_CAP_TOUCH, preHandlerTime);
@@ -906,11 +909,12 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
 
     auto focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
+        MMI_LOGW("Failed to get focus surface, focus:%{public}d", focusId);
         return RET_OK;
     }
     auto appInfo = AppRegs->FindByWinId(focusId); // obtain application information
     if (appInfo.fd == RET_ERR) {
-        MMI_LOGT("Failed to find fd... errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
+        MMI_LOGE("Failed to find fd, errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
     }
 
