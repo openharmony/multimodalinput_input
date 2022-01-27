@@ -35,46 +35,46 @@ namespace OHOS {
         static napi_value GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
             std::shared_ptr<KeyOption> keyOption)
         {
-            HILOG_DEBUG("GetSubscribeEventInfo enter");
+            MMI_LOGD("enter");
             size_t argc = ARGC_SYSTEM_NUM;
             napi_value argv[ARGC_SYSTEM_NUM] = { 0 };
             if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
-                HILOG_ERROR("GetSubscribeEventInfo napi_get_cb_info failed");
+                MMI_LOGE("napi_get_cb_info failed");
                 return nullptr;
             }
-            NAPI_ASSERT(env, argc == ARGC_SYSTEM_NUM, "GetSubscribeEventInfo requires 3 parameter");
+            NAPI_ASSERT(env, argc == ARGC_SYSTEM_NUM, "requires 3 parameter");
             napi_valuetype napi_valuetype1 = {};
             if (napi_typeof(env, argv[ARGV_FIRST], &napi_valuetype1) != napi_ok) {
-                HILOG_ERROR("GetSubscribeEventInfo napi_typeof failed");
+                MMI_LOGE("napi_typeof failed");
                 return nullptr;
             }
-            NAPI_ASSERT(env, napi_valuetype1 == napi_string, "GetSubscribeEventInfo parameter1 is not napi_string");
+            NAPI_ASSERT(env, napi_valuetype1 == napi_string, "parameter1 is not napi_string");
             napi_valuetype napi_valuetype2 = {};
             if (napi_typeof(env, argv[ARGV_SECOND], &napi_valuetype2) != napi_ok) {
-                HILOG_ERROR("GetSubscribeEventInfo napi_typeof failed");
+                MMI_LOGE("napi_typeof failed");
                 return nullptr;
             }
-            NAPI_ASSERT(env, napi_valuetype2 == napi_object, "GetSubscribeEventInfo parameter2 is not napi_object");
+            NAPI_ASSERT(env, napi_valuetype2 == napi_object, "parameter2 is not napi_object");
             napi_valuetype eventHandleType = {};
             if (napi_typeof(env, argv[ARGV_THIRD], &eventHandleType) != napi_ok) {
-                HILOG_ERROR("GetSubscribeEventInfo napi_typeof failed");
+                MMI_LOGE("napi_typeof failed");
                 return nullptr;
             }
-            NAPI_ASSERT(env, eventHandleType == napi_function, "GetSubscribeEventInfo parameter2 is not napi_function");
+            NAPI_ASSERT(env, eventHandleType == napi_function, "parameter2 is not napi_function");
             char eventName[EVENT_NAME_LEN] = { 0 };
             size_t typeLen = 0;
             if (napi_get_value_string_utf8(env, argv[ARGV_FIRST], eventName, EVENT_NAME_LEN - 1, &typeLen) != napi_ok) {
-                HILOG_ERROR("GetSubscribeEventInfo napi_get_value_string_utf8 failed");
+                MMI_LOGE("napi_get_value_string_utf8 failed");
                 return nullptr;
             }
             event->name = eventName;
             napi_value receiceValue;
             if (napi_get_named_property(env, argv[ARGV_SECOND], "preKeys", &receiceValue) != napi_ok) {
-                HILOG_ERROR("GetSubscribeEventInfo napi_get_named_property failed");
+                MMI_LOGE("napi_get_named_property failed");
                 return nullptr;
             }
             std::vector<int32_t> preKeys = GetCppArrayInt(receiceValue, env);
-            HILOG_DEBUG("preKeys size:%{public}d", (int32_t)preKeys.size());
+            MMI_LOGD("preKeys size:%{public}d", (int32_t)preKeys.size());
             std::vector<int32_t> sortPrekeys = preKeys;
             sort(sortPrekeys.begin(), sortPrekeys.end());
             keyOption->SetPreKeys(preKeys);
@@ -83,47 +83,47 @@ namespace OHOS {
             for (int32_t i = 0; i < sortPrekeys.size(); i++){
                 subKeyNames += std::to_string(sortPrekeys[i]);
                 subKeyNames += ",";
-                HILOG_DEBUG("GetSubscribeEventInfo preKeys = %{public}d", preKeys[i]);
+                MMI_LOGD("preKeys = %{public}d", preKeys[i]);
             }
 
             int32_t finalKey = GetNamedPropertyInt32(env, argv[ARGV_SECOND], "finalKey");
             subKeyNames += std::to_string(finalKey);
             subKeyNames += ",";
             keyOption->SetFinalKey(finalKey);
-            HILOG_DEBUG("GetSubscribeEventInfo finalKey = %{public}d", finalKey);
+            MMI_LOGD("finalKey = %{public}d", finalKey);
 
             bool isFinalKeyDown = GetNamedPropertyBool(env, argv[ARGV_SECOND], "isFinalKeyDown");
             subKeyNames += std::to_string(isFinalKeyDown);
             keyOption->SetFinalKeyDown(isFinalKeyDown);
             event->eventType = subKeyNames;
-            HILOG_DEBUG("GetSubscribeEventInfo isFinalKeyDown = %{public}d", (isFinalKeyDown == true?1:0));
-            HILOG_DEBUG("GetSubscribeEventInfo map_key = %{public}s", subKeyNames.c_str());
+            MMI_LOGD("isFinalKeyDown = %{public}d", (isFinalKeyDown == true?1:0));
+            MMI_LOGD("map_key = %{public}s", subKeyNames.c_str());
 
             int32_t finalKeyDownDuriation = GetNamedPropertyInt32(env, argv[ARGV_SECOND], "finalKeyDownDuration");
             napi_get_value_int32(env, receiceValue, &finalKeyDownDuriation);
             keyOption->SetFinalKeyDownDuration(finalKeyDownDuriation);
-            HILOG_DEBUG("GetSubscribeEventInfo finalKeyDownDuriation = %{public}d", finalKeyDownDuriation);
+            MMI_LOGD("finalKeyDownDuriation = %{public}d", finalKeyDownDuriation);
 
             if (napi_create_reference(env, argv[ARGV_THIRD], 1, &event->callback[0]) != napi_ok) {
-                HILOG_ERROR("GetUnsubscribeEventInfo napi_create_reference failed");
+                MMI_LOGE("napi_create_reference failed");
                 return nullptr;
             }
             napi_value result = {};
             napi_create_int32(env, SUCCESS_CODE, &result);
-            HILOG_DEBUG("GetSystemEventInfo end");
+            MMI_LOGD("end");
             return result;
         }
    
         static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent){
-            HILOG_DEBUG("enter");
+            MMI_LOGD("enter");
             auto keyOption = monitorInfo->keyOption;
             std::vector<int32_t> infoPreKeys = keyOption->GetPreKeys();
             std::vector<KeyEvent::KeyItem> keyEventKeyItems = keyEvent->GetKeyItems();
             int32_t infoFinalKey = keyOption->GetFinalKey();
             int32_t keyEventFinalKey = keyEvent->GetKeyCode();
-            HILOG_DEBUG("infoFinalKey:%{public}d, keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
+            MMI_LOGD("infoFinalKey:%{public}d, keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
             if (infoFinalKey != keyEventFinalKey || keyEventKeyItems.size() > 4) {
-                HILOG_DEBUG("MatchCombinationkeys %{public}d", __LINE__);
+                MMI_LOGD("%{public}d", __LINE__);
                 return false;
             }
             int infoSize = 0;
@@ -141,24 +141,24 @@ namespace OHOS {
                 }
                 auto iter = find(infoPreKeys.begin(), infoPreKeys.end(), it->GetKeyCode());
                 if (iter == infoPreKeys.end()) {
-                    HILOG_DEBUG("MatchCombinationkeys %{public}d", __LINE__);
+                    MMI_LOGD("%{public}d", __LINE__);
                     return false;
                 }
                 kevEventSize++;
             }
-            HILOG_DEBUG("kevEventSize:%{public}d, infoSize:%{public}d", kevEventSize, infoSize);
+            MMI_LOGD("kevEventSize:%{public}d, infoSize:%{public}d", kevEventSize, infoSize);
             return kevEventSize == infoSize;
         }
 
         static void SubKeyEventCallback(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
         {
-            HILOG_DEBUG("%{public}s in", __func__);
+            MMI_LOGD("%{public}s in", __func__);
             auto iter = callbackMaps.begin();
             while (iter != callbackMaps.end()) {
                 auto &list = iter->second;
                 iter++;
                 auto infoIter = list.begin();
-                HILOG_DEBUG("list size:%{public}d", static_cast<int32_t>(list.size()));
+                MMI_LOGD("list size:%{public}d", static_cast<int32_t>(list.size()));
                 while(infoIter != list.end()) {
                     auto monitorInfo = *infoIter;
                     if (MatchCombinationkeys(monitorInfo, keyEvent)) {
@@ -175,17 +175,17 @@ namespace OHOS {
         {
             std::vector<int32_t> preKeys = keyOption->GetPreKeys();
             if (preKeys.size() > PRE_KEYS_SIZE) {
-                HILOG_ERROR("preKeys size is bigger than 4, can not process");
+                MMI_LOGE("preKeys size is bigger than 4, can not process");
                 return false;
             } 
             std::vector<int32_t> checkRepeat;
             for (int32_t i = 0; i < preKeys.size(); i++) {
                 if (preKeys[i] < 0) {
-                    HILOG_ERROR("preKey:%{public}d is less 0, can not process", preKeys[i]);
+                    MMI_LOGE("preKey:%{public}d is less 0, can not process", preKeys[i]);
                     return false;
                 }
                 if (std::find(checkRepeat.begin(), checkRepeat.end(), preKeys[i]) != checkRepeat.end()){
-                    HILOG_ERROR("preKey is repeat, can not process");
+                    MMI_LOGE("preKey is repeat, can not process");
                     return false;
                 }
                 checkRepeat.push_back(preKeys[i]);
@@ -195,10 +195,10 @@ namespace OHOS {
 
         static napi_value SubscribeKeyEventMonitor(napi_env env, napi_callback_info info)
         {
-            HILOG_DEBUG("%{public}s enter", __func__);
+            MMI_LOGD("%{public}s enter", __func__);
             napi_value result;
             if (napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result) != napi_ok) {
-                HILOG_ERROR("UnsubscribeKeyEventMonitor napi_create_int32 failed");
+                MMI_LOGE("napi_create_int32 failed");
                 return nullptr;
             }
 
@@ -211,7 +211,7 @@ namespace OHOS {
             if (GetEventInfo(env, info, event, keyOption) == nullptr || !CheckPara(keyOption)) {
                 delete event;
                 event = nullptr;
-                HILOG_ERROR("SubscribeKeyEventMonitor: GetEventInfo failed");
+                MMI_LOGE("GetEventInfo failed");
                 return nullptr;
             }
 
@@ -220,41 +220,41 @@ namespace OHOS {
             if (AddEventCallback(env, callbackMaps, event, preSubscribeId) < 0 ) {
                 delete event;
                 event = nullptr;
-                HILOG_ERROR("SubscribeKeyEventMonitor: AddEventCallback failed");
+                MMI_LOGE("AddEventCallback failed");
                 return nullptr;
             }
 
             if (preSubscribeId <= 0) {
-                HILOG_DEBUG("SubscribeKeyEventMonitor eventType = %{public}s", event->eventType.c_str());
-                HILOG_DEBUG("SubscribeKeyEventMonitor eventName = %{public}s", event->name.c_str());
+                MMI_LOGD("eventType = %{public}s", event->eventType.c_str());
+                MMI_LOGD("eventName = %{public}s", event->name.c_str());
                 int32_t subscribeId = -1;
                 subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubKeyEventCallback);
                 if (subscribeId < 0) {
-                    HILOG_DEBUG("SubscribeSystemKeyEventMonitor subscribeId invalid = %{public}d", subscribeId);
+                    MMI_LOGD("subscribeId invalid = %{public}d", subscribeId);
                     event->status = -1;
                     EmitAsyncCallbackWork(event);
                     return nullptr;
                 }
-                HILOG_DEBUG("SubscribeSystemKeyEventMonitor subscribeId = %{public}d", subscribeId);
+                MMI_LOGD("subscribeId = %{public}d", subscribeId);
                 event->subscribeId = subscribeId;
             } else {
                 event->subscribeId = preSubscribeId;
             }
             int32_t response = MMI_STANDARD_EVENT_SUCCESS;
             if (napi_create_int32(env, response, &result) != napi_ok) {
-                HILOG_ERROR("UnsubscribeKeyEventMonitor napi_create_int32 fail");
+                MMI_LOGE("napi_create_int32 fail");
                 return nullptr;
             }
-            HILOG_DEBUG("%{public}s leave", __func__);
+            MMI_LOGD("%{public}s leave", __func__);
             return result;
         }
 
         static napi_value UnsubscribeKeyEventMonitor(napi_env env, napi_callback_info info)
         {
-            HILOG_DEBUG("%{public}s enter", __func__);
+            MMI_LOGD("%{public}s enter", __func__);
             napi_value result;
             if (napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result) != napi_ok) {
-                HILOG_ERROR("UnsubscribeKeyEventMonitor napi_create_int32 failed");
+                MMI_LOGE("napi_create_int32 failed");
                 return nullptr;
             }
 
@@ -265,42 +265,42 @@ namespace OHOS {
             };
             auto keyOption = std::shared_ptr<KeyOption>(new KeyOption());
             if (GetEventInfo(env, info, event, keyOption) == nullptr) {
-                HILOG_ERROR("UnsubscribeKeyEventMonitor GetEventInfo failed");
+                MMI_LOGE("GetEventInfo failed");
                 return result;
             }
             int32_t subscribeId = -1;
             if (DelEventCallback(env, callbackMaps, event, subscribeId) < 0) {
                 delete event;
                 event = nullptr;
-                HILOG_ERROR("UnsubscribeKeyEventMonitor DelEventCallback failed");
+                MMI_LOGE("DelEventCallback failed");
                 return result;
             }
 
             int32_t response = MMI_STANDARD_EVENT_INVALID_PARAMETER;
-            HILOG_DEBUG("UnsubscribeKeyEventMonitor in for remove subscribeId = %{public}d", subscribeId);
+            MMI_LOGD("in for remove subscribeId = %{public}d", subscribeId);
             if (subscribeId > 0) {
                 InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
             }
             event->status = 0;
             EmitAsyncCallbackWork(event);
             if (napi_create_int32(env, response, &result) != napi_ok) {
-                HILOG_ERROR("UnsubscribeKeyEventMonitor napi_create_int32 fail");
+                MMI_LOGE("napi_create_int32 fail");
                 return nullptr;
             }
-            HILOG_DEBUG("%{public}s end", __func__);
+            MMI_LOGD("%{public}s end", __func__);
             return result;
         }
 
         EXTERN_C_START
         static napi_value MmiInit(napi_env env, napi_value exports)
         {
-            HILOG_INFO("MmiInit: enter");
+            MMI_LOGD("enter");
             napi_property_descriptor desc[] = {
                 DECLARE_NAPI_FUNCTION("on", SubscribeKeyEventMonitor),
                 DECLARE_NAPI_FUNCTION("off", UnsubscribeKeyEventMonitor),
             };
             NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
-            HILOG_INFO("MmiInit: success");
+            MMI_LOGD("success");
             return exports;
         }
         EXTERN_C_END
