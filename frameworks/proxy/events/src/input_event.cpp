@@ -30,7 +30,7 @@ InputEvent::InputEvent(int32_t eventType) : eventType_(eventType)
     Init();
 }
 
-InputEvent::~InputEvent() 
+InputEvent::~InputEvent()
 {
 }
 
