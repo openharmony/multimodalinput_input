@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MULTIMDOALINPUT_INPUT_HANDLER_MANAGER_H
-#define OHOS_MULTIMDOALINPUT_INPUT_HANDLER_MANAGER_H
+#ifndef INPUT_HANDLER_MANAGER_H
+#define INPUT_HANDLER_MANAGER_H
 
 #include <map>
 #include <mutex>
@@ -55,4 +55,4 @@ private:
 };
 } // namespace OHOS::MMI
 
-#endif // OHOS_MULTIMDOALINPUT_INPUT_HANDLER_MANAGER_H
+#endif // INPUT_HANDLER_MANAGER_H

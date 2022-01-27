@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_EVENTS_FACTORY_H
-#define OHOS_EVENTS_FACTORY_H
+#ifndef EVENT_FACTORY_H
+#define EVENT_FACTORY_H
 #include "multimodal_event.h"
 
 namespace OHOS {
@@ -45,4 +45,4 @@ public:
 };
 }
 }
-#endif
+#endif // EVENT_FACTORY_H
