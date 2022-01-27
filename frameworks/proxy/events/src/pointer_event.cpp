@@ -321,6 +321,13 @@ void PointerEvent::SetButtonPressed(int buttonId)
     pressedButtons_.insert(buttonId);
 }
 
+void PointerEvent::DeleteReleaseButton(int buttonId)
+{
+    if (pressedButtons_.find(buttonId) != pressedButtons_.end()) {
+        pressedButtons_.erase(buttonId);
+    }
+}
+
 std::vector<int32_t> PointerEvent::GetPointersIdList() const
 {
     std::vector<int32_t> pointerIdList;
