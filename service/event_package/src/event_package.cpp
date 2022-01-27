@@ -863,13 +863,13 @@ std::shared_ptr<PointerEvent> EventPackage::LibinputEventToPointerEvent(libinput
     pointerEvent->AddPointerItem(pointer);
     std::vector<uint32_t> pressedButtons;
     MouseState->GetPressedButtons(pressedButtons);
-    
+
     if (!pressedButtons.empty()) {
         for (auto it = pressedButtons.begin(); it != pressedButtons.end(); it++) {
             pointerEvent->SetButtonPressed(*it);
         }
     }
-    
+
     switch (type) {
         case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN: {
             pointerEventType = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
