@@ -91,7 +91,7 @@ bool DeviceRegister::DeleteDeviceInfo(const std::string& physical)
         setDeviceId_.erase(deviceId);
         return true;
     }
-
+    MMI_LOGE("Failed to delete device info");
     return false;
 }
 }
