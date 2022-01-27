@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_INPUT_MONITOR_MANAGER_H
-#define OHOS_MULTIMDOALINPUT_INPUT_MONITOR_MANAGER_H
+#ifndef INPUT_MONITOR_MANAGER_H
+#define INPUT_MONITOR_MANAGER_H
 #include "i_input_event_consumer.h"
 #include "singleton.h"
 
@@ -26,4 +26,4 @@ public:
     void MarkConsumed(int32_t monitorId, int32_t eventId);
 };
 } // namespace OHOS::MMI
-#endif // OHOS_MULTIMDOALINPUT_INPUT_MONITOR_MANAGER_H
+#endif // INPUT_MONITOR_MANAGER_H

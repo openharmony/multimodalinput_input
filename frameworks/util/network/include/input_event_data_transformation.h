@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_INPUT_EVENT_DATA_TRANSFORMATION_H
-#define OHOS_INPUT_EVENT_DATA_TRANSFORMATION_H
+#ifndef INPUT_EVENT_DATA_TRANSFORMATION_H
+#define INPUT_EVENT_DATA_TRANSFORMATION_H
 
 #include "key_event.h"
 #include "net_packet.h"
@@ -35,4 +35,4 @@ public:
 };
 }
 }
-#endif
+#endif // INPUT_EVENT_DATA_TRANSFORMATION_H

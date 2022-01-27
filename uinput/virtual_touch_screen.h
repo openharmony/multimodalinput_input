@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef VIRTUALTOUCHSCREEN_H
-#define VIRTUALTOUCHSCREEN_H
+#ifndef VIRTUAL_TOUCH_SCREEN_H
+#define VIRTUAL_TOUCH_SCREEN_H
 
 #include <cstdint>
 
@@ -35,4 +35,4 @@ protected:
 };
 
 
-#endif  // VIRTUALTOUCHSCREEN_H
+#endif // VIRTUAL_TOUCH_SCREEN_H
