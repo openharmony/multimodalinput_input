@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_INJECTION_EVENT_DISPATCH_H
-#define OHOS_INJECTION_EVENT_DISPATCH_H
+#ifndef INJECTION_EVENT_DISPATCH_H
+#define INJECTION_EVENT_DISPATCH_H
 #include "test_aux_tool_client.h"
 #include "manage_inject_device.h"
 #include "injection_tools_help_func.h"
@@ -147,4 +147,4 @@ private:
 };
 };
 }
-#endif
+#endif // INJECTION_EVENT_DISPATCH_H

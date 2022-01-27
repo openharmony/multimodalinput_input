@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_PROCESSING_TOUCH_SCREEN_DEVICE_H
-#define OHOS_PROCESSING_TOUCH_SCREEN_DEVICE_H
+#ifndef PROCESSING_TOUCH_SCREEN_DEVICE_H
+#define PROCESSING_TOUCH_SCREEN_DEVICE_H
 
 #include "msg_head.h"
 #include "device_base.h"
@@ -70,4 +70,4 @@ private:
 };
 }
 }
-#endif
+#endif // PROCESSING_TOUCH_SCREEN_DEVICE_H
