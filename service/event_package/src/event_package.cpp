@@ -824,20 +824,29 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
         (KeyEvent::KEY_ACTION_DOWN) : (KeyEvent::KEY_ACTION_UP);
     int32_t deviceId = static_cast<int32_t>(key.deviceId);
     int32_t actionStartTime = static_cast<int32_t>(key.time);
+    auto preAction = keyEventPtr->GetAction();
+    if (preAction == KeyEvent::KEY_ACTION_UP) {
+        auto preUpKeyItem = keyEventPtr->GetKeyItem();
+        if (preUpKeyItem != nullptr) {
+            keyEventPtr->RemoveReleasedKeyItems(*preUpKeyItem);
+        } else {
+            MMI_LOGE("preUpKeyItem is null");
+        }
+    }
 
-    keyEventPtr->SetActionTime(actionTime);
+    keyEventPtr->SetActionTime(actionStartTime);
     keyEventPtr->SetAction(keyAction);
-    keyEventPtr->SetActionStartTime(actionStartTime);
     keyEventPtr->SetDeviceId(deviceId);
 
     keyEventPtr->SetKeyCode(keyCode);
     keyEventPtr->SetKeyAction(keyAction);
 
-    bool isKeyPressed = (key.state == KEY_STATE_PRESSED) ? (true) : (false);
-    if (isKeyPressed) {
-        int32_t keyDownTime = actionStartTime;
-        keyItem.SetDownTime(keyDownTime);
+    if (keyEventPtr->GetPressedKeys().empty()) {
+        keyEventPtr->SetActionStartTime(actionStartTime);
     }
+
+    bool isKeyPressed = (key.state == KEY_STATE_PRESSED) ? (true) : (false);
+    keyItem.SetDownTime(actionStartTime);
     keyItem.SetKeyCode(keyCode);
     keyItem.SetDeviceId(deviceId);
     keyItem.SetPressed(isKeyPressed);
@@ -845,7 +854,14 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         keyEventPtr->AddPressedKeyItems(keyItem);
     } else if (keyAction == KeyEvent::KEY_ACTION_UP) {
+        auto pressedKeyItem = keyEventPtr->GetKeyItem(keyCode);
+        if (pressedKeyItem != nullptr) {
+            keyItem.SetDownTime(pressedKeyItem->GetDownTime());
+        } else {
+            MMI_LOGE("find pressed key failed, keyCode: %{public}d", keyCode);
+        }
         keyEventPtr->RemoveReleasedKeyItems(keyItem);
+        keyEventPtr->AddPressedKeyItems(keyItem);
     } else {
         // nothing to do.
     }

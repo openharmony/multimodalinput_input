@@ -529,13 +529,7 @@ void KeyEvent::AddPressedKeyItems(const KeyItem& keyItem)
 
 void KeyEvent::RemoveReleasedKeyItems(const KeyItem& keyItem)
 {
-    std::vector<int32_t> pressedkeys = GetPressedKeys();
     std::vector<KeyItem> tempKeyItems = keys_;
-    std::vector<int32_t>::iterator result = std::find(pressedkeys.begin(),
-        pressedkeys.end(), keyItem.GetKeyCode());
-    if (result == pressedkeys.end()) {
-        return;
-    }
     keys_.clear();
     for (KeyItem &item : tempKeyItems) {
         if (item.GetKeyCode() != keyItem.GetKeyCode()) {
