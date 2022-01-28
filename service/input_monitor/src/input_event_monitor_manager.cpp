@@ -33,7 +33,7 @@ OHOS::MMI::InputEventMonitorManager::~InputEventMonitorManager()
 
 int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventMontior(int32_t eventType, SessionPtr session)
 {
-    CHKR(session, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(session, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> lock(mu_);
     MonitorItem monitorItem;
     monitorItem.eventType = eventType;
@@ -52,7 +52,7 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventMontior(int32_t eventT
 
 void OHOS::MMI::InputEventMonitorManager::RemoveInputEventMontior(int32_t eventType, SessionPtr session)
 {
-    CHK(session, ERROR_NULL_POINTER);
+    CHKP(session, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> lock(mu_);
     MonitorItem monitorItem;
     monitorItem.eventType = eventType;
@@ -68,7 +68,7 @@ void OHOS::MMI::InputEventMonitorManager::RemoveInputEventMontior(int32_t eventT
 
 void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
-    CHK(keyEvent, ERROR_NULL_POINTER);
+    CHKP(keyEvent, ERROR_NULL_POINTER);
     if (monitors_.empty()) {
         MMI_LOGE("InputEventMonitorManager::%{public}s no monitor to send msg", __func__);
     }
@@ -85,7 +85,7 @@ void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OH
 
 void OHOS::MMI::InputEventMonitorManager::ReportKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
-    CHK(keyEvent, ERROR_NULL_POINTER);
+    CHKP(keyEvent, ERROR_NULL_POINTER);
     MMI_LOGD("KeyEvent from libinput:keyCode=%{public}d, keyAction=%{public}d, action=%{public}d, "
              "deviceId=%{private}d, actionTime=%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
              keyEvent->GetAction(), keyEvent->GetDeviceId(), keyEvent->GetActionTime());
