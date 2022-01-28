@@ -62,12 +62,12 @@ OHOS::MMI::VirtualDevice::~VirtualDevice()
     }
 }
 
-bool OHOS::MMI::VirtualDevice::CatFload(StringList& fileList)
+bool OHOS::MMI::VirtualDevice::CatFload(std::vector<std::string>& fileList)
 {
     struct dirent* ptr = nullptr;
     DIR* dir = opendir(OHOS::MMI::g_folderpath.c_str());
     if (dir == nullptr) {
-        printf("Failed to open folder!\n");
+        printf("Failed to open folder");
         return false;
     }
 
@@ -85,14 +85,14 @@ bool OHOS::MMI::VirtualDevice::CatFload(StringList& fileList)
 
 bool OHOS::MMI::VirtualDevice::SyncSymbolFile()
 {
-    StringList tempList;
-    StringList res;
+    std::vector<std::string> tempList;
+    std::vector<std::string> res;
 
     if (!CatFload(tempList)) {
         return false;
     }
     for (auto it : tempList) {
-        Size_type pos = it.find("_");
+        std::string::size_type pos = it.find("_");
         res.push_back(it.substr(0, pos));
     }
 
@@ -108,7 +108,7 @@ bool OHOS::MMI::VirtualDevice::SyncSymbolFile()
             std::string catName = "cat /proc/" + it + "/cmdline";
             FILE* cmdName = popen(catName.c_str(), "r");
             if (cmdName == nullptr) {
-                printf("popen Execution failed!\n");
+                printf("popen Execution failed");
                 closedir(dir);
                 return false;
             }
@@ -253,7 +253,7 @@ bool OHOS::MMI::VirtualDevice::SetUp()
     return true;
 }
 
-void OHOS::MMI::VirtualDevice::CloseAllDevice(const StringList& fileList)
+void OHOS::MMI::VirtualDevice::CloseAllDevice(const std::vector<std::string>& fileList)
 {
     for (auto it : fileList) {
         kill(atoi(it.c_str()), SIGKILL);
@@ -324,10 +324,10 @@ void OHOS::MMI::VirtualDevice::MakeFolder(const std::string &filePath)
     }
 }
 
-bool OHOS::MMI::VirtualDevice::SelectDevice(StringList &fileList)
+bool OHOS::MMI::VirtualDevice::SelectDevice(std::vector<std::string> &fileList)
 {
     if (fileList.size() == MAX_PARAMETER_NUMBER) {
-        printf("Invaild Input Para, Plase Check the validity of the para!\n");
+        printf("Invaild Input Para, Plase Check the validity of the para");
         return false;
     }
 
@@ -338,7 +338,7 @@ bool OHOS::MMI::VirtualDevice::SelectDevice(StringList &fileList)
     if (fileList.size()) {
         return true;
     } else {
-        printf("No device is currently on!\n");
+        printf("No device is currently on");
         return false;
     }
 }
@@ -398,16 +398,16 @@ bool OHOS::MMI::VirtualDevice::CreateHandle(const std::string deviceArgv)
     } else if (deviceArgv == "all") {
         StartAllDevices();
     } else {
-        printf("Please enter the device type correctly!\n");
+        printf("Please enter the device type correctly");
         return false;
     }
     return true;
 }
 
-bool OHOS::MMI::VirtualDevice::AddDevice(const StringList& fileList)
+bool OHOS::MMI::VirtualDevice::AddDevice(const std::vector<std::string>& fileList)
 {
     if (fileList.size() == MAX_PARAMETER_NUMBER_FOR_ADD_DEL) {
-        printf("Invaild Input Para, Plase Check the validity of the para!\n");
+        printf("Invaild Input Para, Plase Check the validity of the para");
         return false;
     }
     std::string deviceArgv = fileList.back();
@@ -420,20 +420,20 @@ bool OHOS::MMI::VirtualDevice::AddDevice(const StringList& fileList)
     std::ofstream flagFile;
     flagFile.open(symbolFile.c_str());
     if (!flagFile.is_open()) {
-        printf("Failed to create file!\n");
+        printf("Failed to create file");
         return false;
     } else {
         return true;
     }
 }
 
-bool OHOS::MMI::VirtualDevice::CloseDevice(const StringList& fileList)
+bool OHOS::MMI::VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
 {
     if (fileList.size() == MAX_PARAMETER_NUMBER_FOR_ADD_DEL) {
-        printf("Invaild Input Para, Plase Check the validity of the para!\n");
+        printf("Invaild Input Para, Plase Check the validity of the para");
         return false;
     }
-    StringList alldevice = {};
+    std::vector<std::string> alldevice = {};
     std::string closePid = fileList.back();
     closePid.append("_");
     bool result = SelectDevice(alldevice);
@@ -459,12 +459,12 @@ bool OHOS::MMI::VirtualDevice::CloseDevice(const StringList& fileList)
                 continue;
             }
         }
-        printf("Device shutdown failed! The PID format is incorrect!\n");
+        printf("Device shutdown failed! The PID format is incorrect");
         return false;
     }
 }
 
-bool OHOS::MMI::VirtualDevice::FunctionalShunt(const std::string firstArgv, StringList argvList)
+bool OHOS::MMI::VirtualDevice::FunctionalShunt(const std::string firstArgv, std::vector<std::string> argvList)
 {
     SyncSymbolFile();
     if (firstArgv == "start") {
@@ -479,7 +479,7 @@ bool OHOS::MMI::VirtualDevice::FunctionalShunt(const std::string firstArgv, Stri
         if (!result) {
             return false;
         } else {
-            Size_type pos;
+            std::string::size_type pos;
             printf("PID\tDEVICE\n");
 
             for (auto it : argvList) {
@@ -493,11 +493,11 @@ bool OHOS::MMI::VirtualDevice::FunctionalShunt(const std::string firstArgv, Stri
         if (!result) {
             return false;
         } else {
-            printf("device closed successfully!\n");
+            printf("device closed successfully");
             return false;
         }
     } else {
-        printf("The command line format is incorrect!\n");
+        printf("The command line format is incorrect");
         return false;
     }
 }

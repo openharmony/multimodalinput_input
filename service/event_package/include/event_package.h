@@ -31,25 +31,21 @@ namespace OHOS::MMI {
         template<class EventType>
         int32_t PackageEventDeviceInfo(libinput_event *event, EventType& data);
         template<class T>
-        int32_t PackageRegisteredEvent(T& data, RegisteredEvent& event);
-        int32_t PackageTabletToolEvent(libinput_event *event, EventTabletTool& tableTool, UDSServer& udsServer);
-        int32_t PackageTabletPadEvent(libinput_event *event, EventTabletPad& tabletPad, UDSServer& udsServer);
-        int32_t PackageDeviceManageEvent(libinput_event *event, DeviceManage& deviceManage, UDSServer& udsServer);
-        int32_t PackageKeyEvent(libinput_event *event, EventKeyboard& key, UDSServer& udsServer);
-        int32_t PackageKeyEvent(libinput_event *event, std::shared_ptr<OHOS::MMI::KeyEvent> kevnPtr,
-            UDSServer& udsServer);
-        int32_t PackageGestureEvent(libinput_event *event, EventGesture& gesture, UDSServer& udsServer);
-        int32_t PackagePointerEvent(libinput_event *event, EventPointer& point, UDSServer& udsServer);
-        int32_t PackageTouchEvent(libinput_event *event, EventTouch& touch, UDSServer& udsServer);
-        int32_t PackageJoyStickAxisEvent(libinput_event *event, EventJoyStickAxis& eventJoyStickAxis,
-            UDSServer& udsServer);
-        int32_t PackageJoyStickKeyEvent(libinput_event *event, EventKeyboard& key, UDSServer& udsServer);
-        int32_t PackageTabletPadKeyEvent(libinput_event *event, EventKeyboard& key, UDSServer& udsServer);
-        static int32_t PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key, UDSServer& udsServer);
-        static int32_t KeyboardToKeyEvent(EventKeyboard& key, std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr,
-            UDSServer& udsServer);
-        static std::shared_ptr<OHOS::MMI::PointerEvent> LibinputEventToPointerEvent(libinput_event *event,
-            UDSServer& udsServer);
+        int32_t PackageRegisteredEvent(const T& data, RegisteredEvent& event);
+        int32_t PackageTabletToolEvent(libinput_event *event, EventTabletTool& tableTool);
+        int32_t PackageTabletPadEvent(libinput_event *event, EventTabletPad& tabletPad);
+        int32_t PackageDeviceManageEvent(libinput_event *event, DeviceManage& deviceManage);
+        int32_t PackageKeyEvent(libinput_event *event, EventKeyboard& key);
+        int32_t PackageKeyEvent(libinput_event *event, std::shared_ptr<KeyEvent> kevnPtr);
+        int32_t PackageGestureEvent(libinput_event *event, EventGesture& gesture);
+        int32_t PackagePointerEvent(libinput_event *event, EventPointer& point);
+        int32_t PackageTouchEvent(libinput_event *event, EventTouch& touch);
+        int32_t PackageJoyStickAxisEvent(libinput_event *event, EventJoyStickAxis& eventJoyStickAxis);
+        int32_t PackageJoyStickKeyEvent(libinput_event *event, EventKeyboard& key);
+        int32_t PackageTabletPadKeyEvent(libinput_event *event, EventKeyboard& key);
+        static int32_t PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key);
+        static int32_t KeyboardToKeyEvent(const EventKeyboard& key, std::shared_ptr<KeyEvent> keyEventPtr);
+        static std::shared_ptr<OHOS::MMI::PointerEvent> LibinputEventToPointerEvent(libinput_event *event);
     private:
         void PackageTabletPadOtherParams(libinput_event *event, EventTabletPad& tabletPad);
         int32_t PackageTabletToolOtherParams(libinput_event *event, EventTabletTool& tableTool);
@@ -61,13 +57,13 @@ namespace OHOS::MMI {
         void PackageTouchEventByType(int32_t type, struct libinput_event_touch *data, EventTouch& touch);
     };
     template<class T>
-    int32_t EventPackage::PackageRegisteredEvent(T& data, RegisteredEvent& event)
+    int32_t EventPackage::PackageRegisteredEvent(const T& data, RegisteredEvent& event)
     {
-        CHKR(EOK == memcpy_s(event.devicePhys, MAX_DEVICENAME, data.devicePhys, MAX_DEVICENAME),
-             MEMCPY_SEC_FUN_FAIL, RET_ERR);
+        int32_t ret = memcpy_s(event.physical, MAX_DEVICENAME, data.physical, MAX_DEVICENAME);
+        CHKR(ret != EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
         const std::string uid = GetUUid();
-        CHKR(EOK == memcpy_s(event.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size()),
-             MEMCPY_SEC_FUN_FAIL, RET_ERR);
+        ret = memcpy_s(event.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size());
+        CHKR(ret != EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
         event.deviceId = data.deviceId;
         event.eventType = data.eventType;
         event.deviceType = data.deviceType;

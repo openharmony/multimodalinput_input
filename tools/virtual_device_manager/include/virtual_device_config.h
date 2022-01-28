@@ -45,12 +45,6 @@
 
 namespace OHOS {
 namespace MMI {
-#define CLMAP       std::map
-#define CLSET       std::set
-#define IdsList     std::vector<int32_t>
-#define StringList  std::vector<std::string>
-#define StringSet   CLSET<std::string>
-#define Size_type   std::string::size_type
 #define SYMBOL_FOLDER_PERMISSIONS 775
 #define MAX_PARAMETER_NUMBER 3
 #define MAX_PARAMETER_NUMBER_FOR_ADD_DEL 2

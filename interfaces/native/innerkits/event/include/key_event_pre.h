@@ -1443,7 +1443,7 @@ enum KeyEventEnum {
     NOW_MAX_KEY = KEY_LAUNCHER_MENU
 };
 
-class KeyEvent : public MultimodalEvent {
+class KeyEvent : public MMI::MultimodalEvent {
 public:
     virtual ~KeyEvent();
     /* *

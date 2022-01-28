@@ -57,10 +57,10 @@ int32_t OHOS::MMI::RegisterEventHandleManager::RegisterEvent(MmiMessageId messag
             RegisterEventHandleByIdMsage(MmiMessageId::TOUCH_EVENT_BEGIN, MmiMessageId::TOUCH_EVENT_END, fd);
             break;
         default:
-            MMI_LOGT("It's no this event handle! \n");
+            MMI_LOGT("It's no this event handle! ");
             return UNKNOWN_EVENT;
     }
-    MMI_LOGT("event:%{public}d fd:%{public}d \n", messageId, fd);
+    MMI_LOGT("event:%{public}d fd:%{public}d ", messageId, fd);
     return RET_OK;
 }
 
@@ -88,7 +88,7 @@ int32_t OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleManager(MmiM
             UnregisterEventHandleByIdMsage(MmiMessageId::TOUCH_EVENT_BEGIN, MmiMessageId::TOUCH_EVENT_END, fd);
             break;
         default:
-            MMI_LOGT("It's no this event handle! \n");
+            MMI_LOGT("It's no this event handle! ");
             return UNKNOWN_EVENT;
     }
 
@@ -109,19 +109,16 @@ void OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleBySocketFd(int3
     }
 }
 
-int32_t OHOS::MMI::RegisterEventHandleManager::FindSocketFdsByEventHandle(const MmiMessageId messageId,
-                                                                          std::vector<int32_t>& fds)
+void OHOS::MMI::RegisterEventHandleManager::FindSocketFds(const MmiMessageId messageId, std::vector<int32_t>& fds)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    CHKR(messageId >= MmiMessageId::INVALID, PARAM_INPUT_INVALID, UNKNOWN_EVENT);
-    auto it = mapRegisterManager_.find(messageId);
-    if (it != mapRegisterManager_.end()) {
-        for (size_t k = 0; k < mapRegisterManager_.count(messageId); k++, it++) {
-            fds.push_back(it->second);
-        }
-        return RET_OK;
-    } else {
-        return RET_ERR;
+    auto it = mapRegisterManager_.equal_range(messageId);
+    if (it.first == std::end(mapRegisterManager_)) {
+        MMI_LOGE("The message id was not found in the mapRegisterManager_, event:%{public}d", messageId);
+        return;
+    }
+    for (auto iter = it.first; iter != it.second; ++iter) {
+        fds.push_back(iter->second);
     }
 }
 

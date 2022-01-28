@@ -140,229 +140,229 @@ HWTEST_F(RegisterEventTest, OnEventPointButton_003, TestSize.Level1)
     registerEvent.OnEventPointButton(BTN_MIDDLE, 11, BUTTON_STATE_RELEASED, msg);
 }
 
-HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_01, TestSize.Level1)
+HWTEST_F(RegisterEventTest, GetTouchInfo_01, TestSize.Level1)
 {
     RegisterEvent registerEvent;
     EventTouch touch = {};
     int32_t seatSlot = 0;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
+    registerEvent.GetTouchInfo(std::make_pair(deviceId, seatSlot), touch);
 }
 
-HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_02, TestSize.Level1)
+HWTEST_F(RegisterEventTest, GetTouchInfo_02, TestSize.Level1)
 {
     RegisterEvent registerEvent;
     EventTouch touch = {};
     int32_t seatSlot = 0;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
+    registerEvent.GetTouchInfo(std::make_pair(deviceId, seatSlot), touch);
 }
 
-HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_03, TestSize.Level1)
+HWTEST_F(RegisterEventTest, GetTouchInfo_03, TestSize.Level1)
 {
     RegisterEvent registerEvent;
     EventTouch touch = {};
     int32_t seatSlot = 0;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
+    registerEvent.GetTouchInfo(std::make_pair(deviceId, seatSlot), touch);
 }
 
-HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_04, TestSize.Level1)
+HWTEST_F(RegisterEventTest, GetTouchInfo_04, TestSize.Level1)
 {
     RegisterEvent registerEvent;
     EventTouch touch = {};
     int32_t seatSlot = 0;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
+    registerEvent.GetTouchInfo(std::make_pair(deviceId, seatSlot), touch);
 }
 
-HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_05, TestSize.Level1)
+HWTEST_F(RegisterEventTest, GetTouchInfo_05, TestSize.Level1)
 {
     RegisterEvent registerEvent;
     EventTouch touch = {};
     int32_t seatSlot = 0;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
+    registerEvent.GetTouchInfo(std::make_pair(deviceId, seatSlot), touch);
 }
 
-HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_06, TestSize.Level1)
+HWTEST_F(RegisterEventTest, GetTouchInfo_06, TestSize.Level1)
 {
     RegisterEvent registerEvent;
     EventTouch touch = {};
     int32_t seatSlot = 0;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
+    registerEvent.GetTouchInfo(std::make_pair(deviceId, seatSlot), touch);
 }
 
-HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_07, TestSize.Level1)
+HWTEST_F(RegisterEventTest, GetTouchInfo_07, TestSize.Level1)
 {
     RegisterEvent registerEvent;
     EventTouch touch = {};
     int32_t seatSlot = 100000;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
+    registerEvent.GetTouchInfo(std::make_pair(deviceId, seatSlot), touch);
 }
 
-HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_08, TestSize.Level1)
+HWTEST_F(RegisterEventTest, GetTouchInfo_08, TestSize.Level1)
 {
     RegisterEvent registerEvent;
     EventTouch touch = {};
     int32_t seatSlot = 100000;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
+    registerEvent.GetTouchInfo(std::make_pair(deviceId, seatSlot), touch);
 }
 
-HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_09, TestSize.Level1)
+HWTEST_F(RegisterEventTest, GetTouchInfo_09, TestSize.Level1)
 {
     RegisterEvent registerEvent;
     EventTouch touch = {};
     int32_t seatSlot = -100000;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
+    registerEvent.GetTouchInfo(std::make_pair(deviceId, seatSlot), touch);
 }
 
-HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_010, TestSize.Level1)
+HWTEST_F(RegisterEventTest, GetTouchInfo_010, TestSize.Level1)
 {
     RegisterEvent registerEvent;
     EventTouch touch = {};
     int32_t seatSlot = -100000;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
+    registerEvent.GetTouchInfo(std::make_pair(deviceId, seatSlot), touch);
 }
 
-HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_011, TestSize.Level1)
+HWTEST_F(RegisterEventTest, GetTouchInfo_011, TestSize.Level1)
 {
     RegisterEvent registerEvent;
     EventTouch touch = {};
     int32_t seatSlot = -1;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
+    registerEvent.GetTouchInfo(std::make_pair(deviceId, seatSlot), touch);
 }
 
-HWTEST_F(RegisterEventTest, GetTouchInfoByTouchId_012, TestSize.Level1)
+HWTEST_F(RegisterEventTest, GetTouchInfo_012, TestSize.Level1)
 {
     RegisterEvent registerEvent;
     EventTouch touch = {};
     int32_t seatSlot = -1;
     uint32_t deviceId = 1;
-    registerEvent.GetTouchInfoByTouchId(MAKEPAIR(deviceId, seatSlot), touch);
+    registerEvent.GetTouchInfo(std::make_pair(deviceId, seatSlot), touch);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchIds_01, TestSize.Level1)
 {
     RegisterEvent registerEvent;
-    std::vector<PAIR<uint32_t, int32_t>> touchIds;
+    std::vector<std::pair<uint32_t, int32_t>> touchIds;
     registerEvent.GetTouchIds(touchIds, 1);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchIds_02, TestSize.Level1)
 {
     RegisterEvent registerEvent;
-    PAIR<uint32_t, int32_t> element1(1, 0);
-    PAIR<uint32_t, int32_t> element2(1, 0);
-    PAIR<uint32_t, int32_t> element3(1, 0);
-    std::vector<PAIR<uint32_t, int32_t>> touchIds = {element1, element2, element3};
+    std::pair<uint32_t, int32_t> element1(1, 0);
+    std::pair<uint32_t, int32_t> element2(1, 0);
+    std::pair<uint32_t, int32_t> element3(1, 0);
+    std::vector<std::pair<uint32_t, int32_t>> touchIds = {element1, element2, element3};
     registerEvent.GetTouchIds(touchIds, 1);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchIds_03, TestSize.Level1)
 {
     RegisterEvent registerEvent;
-    PAIR<uint32_t, int32_t> element1(1, -1);
-    PAIR<uint32_t, int32_t> element2(1, -1);
-    PAIR<uint32_t, int32_t> element3(1, -1);
-    std::vector<PAIR<uint32_t, int32_t>> touchIds = { element1, element2, element3 };
+    std::pair<uint32_t, int32_t> element1(1, -1);
+    std::pair<uint32_t, int32_t> element2(1, -1);
+    std::pair<uint32_t, int32_t> element3(1, -1);
+    std::vector<std::pair<uint32_t, int32_t>> touchIds = { element1, element2, element3 };
     registerEvent.GetTouchIds(touchIds, 1);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchIds_04, TestSize.Level1)
 {
     RegisterEvent registerEvent;
-    PAIR<uint32_t, int32_t> element1(1, -1);
-    PAIR<uint32_t, int32_t> element2(1, 0);
-    PAIR<uint32_t, int32_t> element3(1, -1);
-    std::vector<PAIR<uint32_t, int32_t>> touchIds = {element1, element2, element3};
+    std::pair<uint32_t, int32_t> element1(1, -1);
+    std::pair<uint32_t, int32_t> element2(1, 0);
+    std::pair<uint32_t, int32_t> element3(1, -1);
+    std::vector<std::pair<uint32_t, int32_t>> touchIds = {element1, element2, element3};
     registerEvent.GetTouchIds(touchIds, 1);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchIds_05, TestSize.Level1)
 {
     RegisterEvent registerEvent;
-    PAIR<uint32_t, int32_t> element1(1, -1);
-    PAIR<uint32_t, int32_t> element2(1, 0);
-    PAIR<uint32_t, int32_t> element3(1, 0);
-    std::vector<PAIR<uint32_t, int32_t>> touchIds = { element1, element2, element3 };
+    std::pair<uint32_t, int32_t> element1(1, -1);
+    std::pair<uint32_t, int32_t> element2(1, 0);
+    std::pair<uint32_t, int32_t> element3(1, 0);
+    std::vector<std::pair<uint32_t, int32_t>> touchIds = { element1, element2, element3 };
     registerEvent.GetTouchIds(touchIds, 1);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchIds_06, TestSize.Level1)
 {
     RegisterEvent registerEvent;
-    PAIR<uint32_t, int32_t> element1(1, 0);
-    PAIR<uint32_t, int32_t> element2(1, -1);
-    PAIR<uint32_t, int32_t> element3(1, 0);
-    std::vector<PAIR<uint32_t, int32_t>> touchIds = { element1, element2, element3 };
+    std::pair<uint32_t, int32_t> element1(1, 0);
+    std::pair<uint32_t, int32_t> element2(1, -1);
+    std::pair<uint32_t, int32_t> element3(1, 0);
+    std::vector<std::pair<uint32_t, int32_t>> touchIds = { element1, element2, element3 };
     registerEvent.GetTouchIds(touchIds, 1);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchIds_07, TestSize.Level1)
 {
     RegisterEvent registerEvent;
-    PAIR<uint32_t, int32_t> element1(1, 0);
-    PAIR<uint32_t, int32_t> element2(1, 0);
-    PAIR<uint32_t, int32_t> element3(1, -1);
-    std::vector<PAIR<uint32_t, int32_t>> touchIds = { element1, element2, element3 };
+    std::pair<uint32_t, int32_t> element1(1, 0);
+    std::pair<uint32_t, int32_t> element2(1, 0);
+    std::pair<uint32_t, int32_t> element3(1, -1);
+    std::vector<std::pair<uint32_t, int32_t>> touchIds = { element1, element2, element3 };
     registerEvent.GetTouchIds(touchIds, 1);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchIds_08, TestSize.Level1)
 {
     RegisterEvent registerEvent;
-    PAIR<uint32_t, int32_t> element1(1, 0);
-    PAIR<uint32_t, int32_t> element2(1, 0);
-    PAIR<uint32_t, int32_t> element3(1, -100000);
-    std::vector<PAIR<uint32_t, int32_t>> touchIds = { element1, element2, element3 };
+    std::pair<uint32_t, int32_t> element1(1, 0);
+    std::pair<uint32_t, int32_t> element2(1, 0);
+    std::pair<uint32_t, int32_t> element3(1, -100000);
+    std::vector<std::pair<uint32_t, int32_t>> touchIds = { element1, element2, element3 };
     registerEvent.GetTouchIds(touchIds, 1);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchIds_09, TestSize.Level1)
 {
     RegisterEvent registerEvent;
-    PAIR<uint32_t, int32_t> element1(1, 0);
-    PAIR<uint32_t, int32_t> element2(1, 0);
-    PAIR<uint32_t, int32_t> element3(1, 100000);
-    std::vector<PAIR<uint32_t, int32_t>> touchIds = { element1, element2, element3 };
+    std::pair<uint32_t, int32_t> element1(1, 0);
+    std::pair<uint32_t, int32_t> element2(1, 0);
+    std::pair<uint32_t, int32_t> element3(1, 100000);
+    std::vector<std::pair<uint32_t, int32_t>> touchIds = { element1, element2, element3 };
     registerEvent.GetTouchIds(touchIds, 1);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchIds_010, TestSize.Level1)
 {
     RegisterEvent registerEvent;
-    PAIR<uint32_t, int32_t> element1(1, -100000);
-    PAIR<uint32_t, int32_t> element2(1, -100000);
-    PAIR<uint32_t, int32_t> element3(1, -100000);
-    std::vector<PAIR<uint32_t, int32_t>> touchIds = { element1, element2, element3 };
+    std::pair<uint32_t, int32_t> element1(1, -100000);
+    std::pair<uint32_t, int32_t> element2(1, -100000);
+    std::pair<uint32_t, int32_t> element3(1, -100000);
+    std::vector<std::pair<uint32_t, int32_t>> touchIds = { element1, element2, element3 };
     registerEvent.GetTouchIds(touchIds, 1);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchIds_011, TestSize.Level1)
 {
     RegisterEvent registerEvent;
-    PAIR<uint32_t, int32_t> element1(1, 100000);
-    PAIR<uint32_t, int32_t> element2(1, 100000);
-    PAIR<uint32_t, int32_t> element3(1, 100000);
-    std::vector<PAIR<uint32_t, int32_t>> touchIds = { element1, element2, element3 };
+    std::pair<uint32_t, int32_t> element1(1, 100000);
+    std::pair<uint32_t, int32_t> element2(1, 100000);
+    std::pair<uint32_t, int32_t> element3(1, 100000);
+    std::vector<std::pair<uint32_t, int32_t>> touchIds = { element1, element2, element3 };
     registerEvent.GetTouchIds(touchIds, 1);
 }
 
 HWTEST_F(RegisterEventTest, GetTouchIds_012, TestSize.Level1)
 {
     RegisterEvent registerEvent;
-    PAIR<uint32_t, int32_t> element1(1, 0);
-    PAIR<uint32_t, int32_t> element2(1, 0);
-    PAIR<uint32_t, int32_t> element3(1, 0);
-    PAIR<uint32_t, int32_t> element4(1, 0);
-    std::vector<PAIR<uint32_t, int32_t>> touchIds = { element1, element2, element3, element4 };
+    std::pair<uint32_t, int32_t> element1(1, 0);
+    std::pair<uint32_t, int32_t> element2(1, 0);
+    std::pair<uint32_t, int32_t> element3(1, 0);
+    std::pair<uint32_t, int32_t> element4(1, 0);
+    std::vector<std::pair<uint32_t, int32_t>> touchIds = { element1, element2, element3, element4 };
     registerEvent.GetTouchIds(touchIds, 1);
 }
 } // namespace

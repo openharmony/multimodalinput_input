@@ -57,7 +57,7 @@ public:
 
     void PrintfMap();
     void Dump(int32_t fd);
-    void SurfacesDestroyed(const IdsList &desList);
+    void SurfacesDestroyed(const std::vector<int32_t> &desList);
 
     int32_t QueryMapSurfaceNum();
 
@@ -73,14 +73,13 @@ private:
     bool CheckFindFdError(const int32_t findFd);
     bool CheckConnectionIsDead(const int32_t findFd);
     bool CheckWaitQueueBlock(ssize_t currentTime, ssize_t timeOut, const int32_t findFd);
-    const AppInfo& FindAppInfoBySocketFd(int32_t fd);
     void UnregisterBySocketFd(int32_t fd);
 
     std::map<int32_t, AppInfo>::iterator EraseAppInfo(const std::map<int32_t, AppInfo>::iterator &it);
     std::map<int32_t, AppInfo>::iterator UnregisterAppInfo(int32_t winId);
 
 private:
-    IdsList fds_;
+    std::vector<int32_t> fds_;
     std::map<int32_t, AppInfo> mapSurface_ = {}; // key=windowId:value=AppInfo
     std::vector<WaitQueueEvent> waitQueue_ = {};
     std::map<int32_t, int8_t> mapConnectState_ = {};

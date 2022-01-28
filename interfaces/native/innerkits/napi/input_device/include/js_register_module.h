@@ -21,8 +21,8 @@
 #include <string.h>
 #include <iostream>
 #include "libmmi_util.h"
-#include "native_api.h"
-#include "native_node_api.h"
+#include "napi/native_api.h"
+#include "napi/native_node_api.h"
 #include "utils/log.h"
 
 namespace OHOS {

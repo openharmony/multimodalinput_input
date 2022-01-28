@@ -102,7 +102,8 @@ int32_t SeniorInputFuncProcBase::DeviceEventProcess(const RawInputEvent& event)
     }
 
     std::vector<int32_t> fds;
-    if (RegEventHM->FindSocketFdsByEventHandle(msgId, fds) != RET_OK) {
+    RegEventHM->FindSocketFds(msgId, fds);
+    if (fds.empty()) {
         MMI_LOGE("can not find handle by fd: %{public}d.", msgId);
         return RET_ERR;
     }
@@ -121,7 +122,7 @@ int32_t SeniorInputFuncProcBase::DeviceEventProcess(const RawInputEvent& event)
         newPacket << deviceType << msgId << deviceId << fd << appInfo.windowId << appInfo.abilityId <<
             serverStartTime << uuid << occurredTime;
         if (!udsServerPtr_->SendMsg(fd, newPacket)) {
-            MMI_LOGE("Sending structure of event failed! fd:%{public}d\n", fd);
+            MMI_LOGE("Sending structure of event failed! fd:%{public}d", fd);
             return RET_ERR;
         }
         MMI_LOGI("senior input func process server: fd = %{public}d,windowId = %{public}d,abilityId = %{public}d,"
