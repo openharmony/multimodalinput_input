@@ -78,7 +78,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
         } else {
             MMI_LOGE("AddInputEventFilter has send to server fail, ret = %{public}d", ret);
             return RET_ERR;
-        }        
+        }
     }
 
     MMI_LOGT("leave, success with hasSendToMmiServer is already true");
@@ -90,7 +90,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::II
     MMI_LOGD("enter");
     MMIEventHdl.GetMultimodeInputInfo();
     CHK(inputEventConsumer, ERROR_NULL_POINTER);
-    consumer = inputEventConsumer;
+    consumer_ = inputEventConsumer;
     MMI_LOGD("leave");
 }
 
@@ -102,9 +102,9 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     MMI_LOGT(" OnKeyEvent client trace getKeyCode = %{public}d", getKeyCode);
     int32_t eventKey = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
-    if (consumer != nullptr) {
+    if (consumer_ != nullptr) {
         CHK(keyEvent != nullptr, ERROR_NULL_POINTER);
-        consumer->OnInputEvent(keyEvent);
+        consumer_->OnInputEvent(keyEvent);
         MMI_LOGD("leave");
         return;
     }
@@ -114,10 +114,10 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
     MMI_LOGD("Pointer event received, processing ...");
-    if (consumer != nullptr) {
+    if (consumer_ != nullptr) {
         CHK(pointerEvent != nullptr, ERROR_NULL_POINTER);
         MMI_LOGD("Passed on to consumer ...");
-        consumer->OnInputEvent(pointerEvent);
+        consumer_->OnInputEvent(pointerEvent);
         return;
     }
 
@@ -262,7 +262,7 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
         default:
         MMI_LOGE("Can't find the mask,mask%{public}d", mask);
             break;
-    }    
+    }
 }
 
 void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
@@ -270,7 +270,7 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
     InputMonitorManager::GetInstance().MarkConsumed(monitorId, eventId);
 }
 
-int32_t InputManagerImpl::AddInterceptor(int32_t sourceType, 
+int32_t InputManagerImpl::AddInterceptor(int32_t sourceType,
                                          std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
 {
     if (interceptor == nullptr) {
@@ -321,7 +321,7 @@ void InputManagerImpl::SendDisplayInfo()
         MMI_LOGE("get mmi client is nullptr");
         return;
     }
-    
+
     OHOS::MMI::NetPacket ckt(MmiMessageId::DISPLAY_INFO);
     if (PackDisplayData(ckt) == RET_ERR) {
         MMI_LOGE("pack display info failed");

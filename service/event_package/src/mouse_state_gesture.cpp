@@ -17,31 +17,31 @@
 
 OHOS::MMI::MouseDeviceState::MouseDeviceState()
 {
-    mouseCoords = {0, 0};
+    mouseCoords_ = {0, 0};
 }
 
 OHOS::MMI::MouseDeviceState::~MouseDeviceState() { }
 
 double OHOS::MMI::MouseDeviceState::GetMouseCoordsX()
 {
-    return this->mouseCoords.x;
+    return this->mouseCoords_.x;
 }
 double OHOS::MMI::MouseDeviceState::GetMouseCoordsY()
 {
-    return this->mouseCoords.y;
+    return this->mouseCoords_.y;
 }
 
 void OHOS::MMI::MouseDeviceState::SetMouseCoords(const double x, const double y)
 {
-    this->mouseCoords.x = x;
-    this->mouseCoords.y = y;
+    this->mouseCoords_.x = x;
+    this->mouseCoords_.y = y;
 }
 
 bool OHOS::MMI::MouseDeviceState::IsLiftBtnPressed()
 {
     std::lock_guard<std::mutex> lock(mu_);
-    auto iter = this->mapCountState.find(LIBINPUT_LEFT_BUTTON_CODE);
-    if (iter != this->mapCountState.end()) {
+    auto iter = this->mapCountState_.find(LIBINPUT_LEFT_BUTTON_CODE);
+    if (iter != this->mapCountState_.end()) {
         if (iter->second > 0) {
             return true;
         }
@@ -52,8 +52,8 @@ bool OHOS::MMI::MouseDeviceState::IsLiftBtnPressed()
 void OHOS::MMI::MouseDeviceState::GetPressedButtons(std::vector<uint32_t>& pressedButtons)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    if (!this->mapCountState.empty()) {
-        for (auto iter : this->mapCountState) {
+    if (!this->mapCountState_.empty()) {
+        for (auto iter : this->mapCountState_) {
             if (iter.second > 0) {
                 pressedButtons.push_back(LibinputChangeToPointer(iter.first));
             }
@@ -63,17 +63,17 @@ void OHOS::MMI::MouseDeviceState::GetPressedButtons(std::vector<uint32_t>& press
 
 std::map<int16_t, uint32_t> OHOS::MMI::MouseDeviceState::GetCountState()
 {
-    return this->mapCountState;
+    return this->mapCountState_;
 }
 
 void OHOS::MMI::MouseDeviceState::CountState(int16_t btnCode, uint32_t btnState)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    std::map<int16_t, uint32_t>::iterator iter = this->mapCountState.find(btnCode);
-    if (iter != this->mapCountState.end()) {
+    std::map<int16_t, uint32_t>::iterator iter = this->mapCountState_.find(btnCode);
+    if (iter != this->mapCountState_.end()) {
         ChangeMouseState(btnState, iter->second);
     } else {
-        this->mapCountState.insert(std::make_pair(btnCode, ((btnState == BUTTON_STATE_PRESSED) ? 1 : 0)));
+        this->mapCountState_.insert(std::make_pair(btnCode, ((btnState == BUTTON_STATE_PRESSED) ? 1 : 0)));
     }
 }
 int16_t OHOS::MMI::MouseDeviceState::LibinputChangeToPointer(int16_t keyValue)

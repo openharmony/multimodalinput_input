@@ -117,8 +117,8 @@ int OHOS::MMI::HdfEventManager::EvdevIoctl(int hdiindex, int pcmd, void *iobuff)
     DeviceInfo *deviceinfo = nullptr;
     MMI_LOGD("evdev_ioctl index: %{public}d cmd: %{public}02x size: %{public}d "
         "pcmd: %{public}04x", hdiindex, cmd, size, pcmd);
-    for (std::list<uhdf*>::iterator it = m_globleThis->hdflist_.begin();
-        it != m_globleThis->hdflist_.end(); ++it) {
+    for (std::list<uhdf*>::iterator it = globleThis_->hdflist_.begin();
+        it != globleThis_->hdflist_.end(); ++it) {
         hdiuhdf = *it;
         if (hdiuhdf->index == hdiindex) {
             deviceinfo = (DeviceInfo*)hdiuhdf->deviceinfo;
@@ -188,7 +188,7 @@ int OHOS::MMI::HdfEventManager::EvdevIoctl(int hdiindex, int pcmd, void *iobuff)
 
 OHOS::MMI::HdfEventManager::HdfEventManager()
 {
-    m_globleThis = this;
+    globleThis_ = this;
     hdiinput_ = nullptr;
 }
 OHOS::MMI::HdfEventManager::~HdfEventManager()
@@ -278,10 +278,10 @@ void OHOS::MMI::HdfEventManager::SetupCallback()
         MMI_LOGD("---- %{public}s:%{public}d injectInterface_ init fail! ----", __func__, __LINE__);
     }
 
-    eventcallback.EventPkgCallback = m_globleThis->GetEventCallback;
-    hostplugcallback.HotPlugCallback = m_globleThis->HotPlugCallback;
+    eventCallBack_.EventPkgCallback = globleThis_->GetEventCallback;
+    hostPlugCallBack_.HotPlugCallback = globleThis_->HotPlugCallback;
     if (inputInterface_) {
-        ret = inputInterface_->iInputReporter->RegisterHotPlugCallback(&hostplugcallback);
+        ret = inputInterface_->iInputReporter->RegisterHotPlugCallback(&hostPlugCallBack_);
         if (ret == INPUT_SUCCESS) {
             MMI_LOGI("---- %{public}s:%{public}d RegisterHotPlugCallback INPUT_SUCCESS  ", __func__, __LINE__);
         } else {
@@ -290,7 +290,7 @@ void OHOS::MMI::HdfEventManager::SetupCallback()
     }
 
     if (injectInterface_) {
-        ret = injectInterface_->iInputReporter->RegisterHotPlugCallback(&hostplugcallback);
+        ret = injectInterface_->iInputReporter->RegisterHotPlugCallback(&hostPlugCallBack_);
         if (ret == INPUT_SUCCESS) {
             MMI_LOGI("---- %{public}s:%{public}d injectInterface_ RegisterHotPlugCallback INPUT_SUCCESS  ",
                 __func__, __LINE__);
@@ -311,7 +311,7 @@ void OHOS::MMI::HdfEventManager::AddDevice(uint32_t devIndex, uint32_t devType)
 {
     uint32_t ret = 0;
     if (devIndex >= MAX_INPUT_DEVICE_COUNT) {
-        ret = injectInterface_->iInputReporter->RegisterReportCallback(devIndex, &eventcallback);
+        ret = injectInterface_->iInputReporter->RegisterReportCallback(devIndex, &eventCallBack_);
         return;
     }
     if (!OpenHdfDevice(devIndex, true)) {
@@ -376,7 +376,7 @@ int OHOS::MMI::HdfEventManager::DeviceRemoveHandle(uint32_t devIndex, uint32_t d
                 __func__, __LINE__, devIndex, devType);
         }
     }
-    m_globleThis->OpenHdfDevice(devIndex, false);
+    globleThis_->OpenHdfDevice(devIndex, false);
     return RET_OK;
 }
 
@@ -396,29 +396,29 @@ void OHOS::MMI::HdfEventManager::GetEventCallback(const EventPackage **pkgs, uin
         eventarry[i].input_event_sec = (pkgs[i]->timestamp) / (USEC_PER_SEC);
         eventarry[i].input_event_usec = (pkgs[i]->timestamp) % (USEC_PER_SEC);
     }
-    if (!m_globleThis->devStatus[devIndex]) {
+    if (!globleThis_->devStatus[devIndex]) {
         return;
     }
-    libinput_pipe_write(m_globleThis->hdiinput_, devIndex, eventarry, count * sizeof(input_event));
+    libinput_pipe_write(globleThis_->hdiinput_, devIndex, eventarry, count * sizeof(input_event));
 }
 int OHOS::MMI::HdfEventManager::DeviceAddHandle(uint32_t devIndex, uint32_t devType)
 {
     MMI_LOGD("---- %{public}s:%{public}d DeviceAddHandle devindex=%{public}u--  devType=%{public}u-- ",
         __func__, __LINE__, devIndex, devType);
-    m_globleThis->devStatus[devIndex] = false;
+    globleThis_->devStatus[devIndex] = false;
     uhdf *hdiuhdf = nullptr;
     hdiuhdf = new(uhdf);
     hdiuhdf->index = devIndex;
-    hdiuhdf->type = m_globleThis->HdfdevtypeMapLibinputType(devIndex, devType);
+    hdiuhdf->type = globleThis_->HdfdevtypeMapLibinputType(devIndex, devType);
     hdiuhdf->nproperties = 0;
     hdiuhdf->quirkpop = nullptr;
     hdiuhdf->modeltype = 0;
     hdiuhdf->fn = (hdiuhdf->index >= MAX_INPUT_DEV_NUM) ? EvdevSimIoctl : EvdevIoctl;
-    m_globleThis->hdflist_.push_back(hdiuhdf);
+    globleThis_->hdflist_.push_back(hdiuhdf);
     Devcmd cmd;
     cmd.index = devIndex;
     cmd.cmd = (int)HDF_ADD_DEVICE;
-    libinput_devpipe_write(m_globleThis->hdiinput_, &cmd, sizeof(Devcmd));
+    libinput_devpipe_write(globleThis_->hdiinput_, &cmd, sizeof(Devcmd));
     return RET_OK;
 }
 const struct libinput_interface _hdfinterface = {
@@ -434,23 +434,23 @@ const struct libinput_interface _hdfinterface = {
 };
 libinput *OHOS::MMI::HdfEventManager::HdfLibinputInit()
 {
-    if (m_globleThis->hdiinput_ == nullptr) {
-        m_globleThis->hdiinput_ = libinput_hdf_create_context(&_hdfinterface, nullptr);
+    if (globleThis_->hdiinput_ == nullptr) {
+        globleThis_->hdiinput_ = libinput_hdf_create_context(&_hdfinterface, nullptr);
     }
     MMI_LOGD("HdfLibinputInit function end");
-    return m_globleThis->hdiinput_;
+    return globleThis_->hdiinput_;
 }
 int OHOS::MMI::HdfEventManager::HdfDevHandle(int index, hdf_event_type cmd)
 {
     if (cmd != HDF_ADD_DEVICE) {
         MMI_LOGD("HdfRmv function start");
         uhdf *hdiuhdf = nullptr;
-        for (std::list<uhdf*>::iterator it = m_globleThis->hdflist_.begin();
-             it != m_globleThis->hdflist_.end(); ++it) {
+        for (std::list<uhdf*>::iterator it = globleThis_->hdflist_.begin();
+             it != globleThis_->hdflist_.end(); ++it) {
             uhdf *hdiuhdfit = *it;
             if (hdiuhdfit->index == (int)index) {
                 hdiuhdf = *it;
-                m_globleThis->hdflist_.remove(*it);
+                globleThis_->hdflist_.remove(*it);
                 break;
             }
         }
@@ -463,8 +463,8 @@ int OHOS::MMI::HdfEventManager::HdfDevHandle(int index, hdf_event_type cmd)
     }
 
     uhdf *hdiuhdf = nullptr;
-    for (std::list<uhdf*>::iterator it = m_globleThis->hdflist_.begin();
-        it != m_globleThis->hdflist_.end(); ++it) {
+    for (std::list<uhdf*>::iterator it = globleThis_->hdflist_.begin();
+        it != globleThis_->hdflist_.end(); ++it) {
         uhdf *hdiuhdfit = *it;
         if (hdiuhdfit->index != (int)index) {
             continue;
@@ -472,9 +472,9 @@ int OHOS::MMI::HdfEventManager::HdfDevHandle(int index, hdf_event_type cmd)
 
         hdiuhdf = *it;
         DeviceInfo *deviceinfo = nullptr;
-        m_globleThis->AddDevice(index, hdiuhdf->type);
+        globleThis_->AddDevice(index, hdiuhdf->type);
         if (index < MAX_INPUT_DEVICE_COUNT) {
-            uint32_t ret = m_globleThis->inputInterface_->iInputManager->GetInputDevice(index, &deviceinfo);
+            uint32_t ret = globleThis_->inputInterface_->iInputManager->GetInputDevice(index, &deviceinfo);
             if (ret != 0 || (deviceinfo == nullptr)) {
                 MMI_LOGE("---- %{public}s:%{public}d inputInterface_ GetInputDevice ret =%{public}d ",
                          __func__, __LINE__, ret);
@@ -482,8 +482,8 @@ int OHOS::MMI::HdfEventManager::HdfDevHandle(int index, hdf_event_type cmd)
             }
             hdiuhdf->deviceinfo = (void*)deviceinfo;
         }
-        uhdfdevice_added(m_globleThis->hdiinput_, hdiuhdf, "default");
-        m_globleThis->devStatus[index] = true;
+        uhdfdevice_added(globleThis_->hdiinput_, hdiuhdf, "default");
+        globleThis_->devStatus[index] = true;
         return RET_OK;
     }
     return RET_OK;
