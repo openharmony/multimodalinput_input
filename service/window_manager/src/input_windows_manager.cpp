@@ -815,11 +815,11 @@ void OHOS::MMI::InputWindowsManager::FixCursorPosition(int32_t &globalX, int32_t
 
     int size = 16;
     int fcursorW = cursorW / size;
-    if ((globalX + fcursorW) > logicalDisplays_[0].width ) {
+    if ((globalX + fcursorW) > logicalDisplays_[0].width) {
         globalX = logicalDisplays_[0].width - fcursorW;
     }
     int fcursorH = cursorH / size;
-    if ((globalY + fcursorH) > logicalDisplays_[0].height ) {
+    if ((globalY + fcursorH) > logicalDisplays_[0].height) {
         globalY = logicalDisplays_[0].height - fcursorH;
     }
 }
