@@ -30,7 +30,7 @@ struct MonitorItem {
     std::function<void (std::shared_ptr<OHOS::MMI::KeyEvent>)> keyEventMonitor;
     bool operator == (const MonitorItem& item) const
     {
-        return id == item.id && keyEventMonitor == item.keyEventMonitor;
+        return id == item.id;
     }
     std::string name;
     std::function<void (std::shared_ptr<OHOS::MMI::PointerEvent>)> TouchPadEventMonitor;
