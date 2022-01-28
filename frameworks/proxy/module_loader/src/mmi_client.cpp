@@ -54,7 +54,6 @@ bool OHOS::MMI::MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
     CHKF(msgHdlImp, MSG_HANDLER_INIT_FAIL);
     auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, msgHdlImp, std::placeholders::_1, std::placeholders::_2);
     CHKF(StartClient(callback, detachMode), START_CLI_FAIL);
-
     return true;
 }
 
