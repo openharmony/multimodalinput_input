@@ -55,7 +55,7 @@ void InputEventMonitorManager::RemoveInputEventMontior(int32_t monitorId)
 	if (monitorId < 0) {
         MMI_LOGE("MonitorId invalid");
 	    return;
-	}
+    }
     MMI_LOGD("RemoveInputEventMontior enter");
     MonitorItem item;
     item.id = monitorId;
@@ -107,8 +107,7 @@ void InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t monitorId
     }
     MonitorItem monitorItem;
     monitorItem.id = monitorId;
-    std::list<MonitorItem>::iterator iter;
-    iter = std::find(monitors_.begin(), monitors_.end(), monitorItem);
+    auto iter = std::find(monitors_.begin(), monitors_.end(), monitorItem);
     if (iter == monitors_.end()) {
         MMI_LOGE("MonitorId does not exist");
     } else {
