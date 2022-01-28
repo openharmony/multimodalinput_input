@@ -42,7 +42,7 @@ private:
     };
 
 private:
-    int32_t TakeNextId();
+    int32_t GetNextId();
     int32_t AddLocal(int32_t handlerId, InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> monitor);
     void AddToServer(int32_t handlerId, InputHandlerType handlerType);
     int32_t RemoveLocal(int32_t handlerId, InputHandlerType handlerType);
