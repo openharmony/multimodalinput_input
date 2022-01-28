@@ -36,7 +36,7 @@ struct TouchInfo {
     uint64_t endTime;
     int32_t eventType;
     int32_t slot;
-    int32_t seat_slot;
+    int32_t seatSlot;
 };
 struct GestureInfo {
     int32_t fingerCount;
@@ -59,7 +59,7 @@ public:
     * Returns:   void
     * Qualifier: 判断键盘事件是否为功能键（ctrl,alt,shift,logo）
     */
-    void OnEventKeyGetSign(EventKeyboard& key, MmiMessageId& msg, EventKeyboard& prevKey);
+    void OnEventKeyGetSign(const EventKeyboard& key, MmiMessageId& msg, EventKeyboard& prevKey);
     int32_t OnEventPointButton(const int32_t buttonCode, const uint64_t timeNow,
         const BUTTON_STATE stateValue, MmiMessageId& msgId);
     int32_t OnEventPointAxis(const EventPointer& point, MmiMessageId& msgId);
@@ -72,7 +72,7 @@ public:
     */
     void OnEventTouchGetSign(const EventTouch& touch, MmiMessageId& msgId);
     void OnEventGestureGetSign(const EventGesture& gesture, MmiMessageId& msgId);
-    int32_t GetTouchInfoByTouchId(const PAIR<uint32_t, int32_t> key, EventTouch& touch);
+    void GetTouchInfo(const std::pair<uint32_t, int32_t> key, EventTouch& touch);
     void GetTouchIds(std::vector<std::pair<uint32_t, int32_t>>& touchIds, const uint32_t deviceId);
     int32_t GetTouchInfoSizeByDeviceId(const uint32_t deviceId);
 protected:
@@ -85,7 +85,8 @@ protected:
     int32_t OnEventTouchMotionGetSign(const EventTouch& touch, MmiMessageId& msgId);
     int32_t OnEventTouchUpGetSign(const EventTouch& touch, MmiMessageId& msgId);
     bool OnGetRepeatKetState(const uint32_t keyCode, MmiMessageId& msgId);
-    int32_t OnEventKeyJudge(EventKeyboard& key, MmiMessageId& msgId, EventKeyboard& prevKey);
+    int32_t SetPrevKeyValue(EventKeyboard& prevKey);
+    int32_t OnEventKeyJudge(const EventKeyboard& key, MmiMessageId& msgId, EventKeyboard& prevKey);
     /*
     * Method:    GetBitNum
     * FullName:  RegisterEvent::GetBitNum

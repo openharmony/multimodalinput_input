@@ -98,9 +98,9 @@ private:
     int32_t argvNum_ = 0;
     ManageInjectDevice manageInjectDevice_;
     std::vector<std::string> injectArgvs_;
-    CLMAP<std::string, InjectFunction> mapFuns_;
-    CLMAP<std::string, bool> mapNeedStartSocket_;
-    CLMAP<std::string, int32_t> mapSendEventType_;
+    std::map<std::string, InjectFunction> mapFuns_;
+    std::map<std::string, bool> mapNeedStartSocket_;
+    std::map<std::string, int32_t> mapSendEventType_;
     std::vector<DeviceInformation> allDevices = {};
 private:
     static constexpr uint32_t SEND_EVENT_ARGV_COUNTS = 5;

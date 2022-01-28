@@ -40,32 +40,32 @@ namespace {
     void FillEventSlotedCoordsInfo(SlotedCoordsInfo& l, const sloted_coords_info& r)
     {
         l.activeCount = r.active_count;
-        for (int i = 0; i < MAX_SOLTED_COORDS_NUM; i++) {
+        for (int i = 0; i < MAX_SOLTED_COORDS_NUMS; i++) {
             l.coords[i].isActive = r.coords[i].is_active;
             l.coords[i].x = r.coords[i].x;
             l.coords[i].y = r.coords[i].y;
         }
     }
 
-    HOS_DEVICE_TYPE GetDeviceType(struct libinput_device* device)
+    DEVICE_TYPE GetDeviceType(struct libinput_device* device)
     {
-        CHKPR(device, ERROR_NULL_POINTER, HOS_UNKNOWN_DEVICE_TYPE);
+        CHKPR(device, ERROR_NULL_POINTER, DEVICE_TYPE_UNKNOWN);
         enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
         if (udevTags & EVDEV_UDEV_TAG_JOYSTICK) {
-            return HOS_JOYSTICK;
+            return DEVICE_TYPE_JOYSTICK;
         } else if (udevTags & EVDEV_UDEV_TAG_KEYBOARD) {
-            return HOS_KEYBOARD;
+            return DEVICE_TYPE_KEYBOARD;
         } else if (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK)) {
-            return HOS_MOUSE;
+            return DEVICE_TYPE_MOUSE;
         } else if (udevTags & EVDEV_UDEV_TAG_TOUCHSCREEN) {
-            return HOS_TOUCH_PANEL;
+            return DEVICE_TYPE_TOUCH_PANEL;
         } else if (udevTags & (EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) {
-            return HOS_TOUCHPAD;
+            return DEVICE_TYPE_TOUCHPAD;
         } else if (udevTags & EVDEV_UDEV_TAG_TABLET) {
-            return HOS_STYLUS;
+            return DEVICE_TYPE_STYLUS;
         } else {
             MMI_LOGW("Unknown device type");
-            return HOS_UNKNOWN_DEVICE_TYPE;
+            return DEVICE_TYPE_UNKNOWN;
         }
     }
 }
@@ -81,7 +81,7 @@ EventPackage::~EventPackage()
 template<class EventType>
 int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& data)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
     auto type = libinput_event_get_type(event);
@@ -89,36 +89,39 @@ int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& d
     data.deviceType = GetDeviceType(device);
     auto name = libinput_device_get_name(device);
     CHKR(name, ERROR_NULL_POINTER, RET_ERR);
-    CHKR(EOK == memcpy_s(data.deviceName, sizeof(data.deviceName),
-        name, MAX_DEVICENAME), MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    int32_t ret = memcpy_s(data.deviceName, sizeof(data.deviceName), name, MAX_DEVICENAME);
+    CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
     const std::string uuid = GetUUid();
-    CHKR(EOK == memcpy_s(data.uuid, MAX_UUIDSIZE, uuid.c_str(), uuid.size()), MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    ret = memcpy_s(data.uuid, MAX_UUIDSIZE, uuid.c_str(), uuid.size());
+    CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
 #ifdef OHOS_BUILD_HDF
-    CHKR(EOK == memcpy_s(data.devicePhys, MAX_DEVICENAME, data.deviceName, MAX_DEVICENAME),
-        MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    ret = memcpy_s(data.physical, MAX_DEVICENAME, data.deviceName, MAX_DEVICENAME);
+    CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
 #else
     const char* physWhole = libinput_device_get_phys(device);
     if (physWhole == nullptr) {
-        CHKR(EOK == memcpy_s(data.devicePhys, sizeof(data.devicePhys),
-            data.deviceName, sizeof(data.deviceName)), MEMCPY_SEC_FUN_FAIL, RET_ERR);
+        ret = memcpy_s(data.physical, sizeof(data.physical), data.deviceName,
+                       sizeof(data.deviceName));
+        CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
     } else {
         std::string s(physWhole);
         std::string phys = s.substr(0, s.rfind('/'));
         CHKR(!phys.empty(), ERROR_NULL_POINTER, RET_ERR);
-        CHKR(EOK == memcpy_s(data.devicePhys, sizeof(data.devicePhys), phys.c_str(), MAX_DEVICENAME),
-             MEMCPY_SEC_FUN_FAIL, RET_ERR);
+        ret = memcpy_s(data.physical, sizeof(data.physical), phys.c_str(), MAX_DEVICENAME);
+        CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
     }
 #endif
-    std::string devicePhys(data.devicePhys);
+    std::string physical(data.physical);
     if (type == LIBINPUT_EVENT_DEVICE_REMOVED) {
-        DevRegister->DeleteDeviceInfo(devicePhys);
+        DevRegister->DeleteDeviceInfo(physical);
+        MMI_LOGI("The libinput event device is removed, EventType:%{public}d", type);
         return RET_OK;
     }
-    uint32_t deviceId = DevRegister->FindDeviceIdByDevicePhys(devicePhys);
-    if (deviceId) {
+    uint32_t deviceId;
+    if (DevRegister->FindDeviceId(physical, deviceId)) {
         data.deviceId = deviceId;
     } else {
-        deviceId = DevRegister->AddDeviceInfo(devicePhys);
+        deviceId = DevRegister->AddDeviceInfo(physical);
         CHKR(deviceId, ADD_DEVICE_INFO_CALL_FAIL, RET_ERR);
         data.deviceId = deviceId;
     }
@@ -221,7 +224,7 @@ void EventPackage::PackageTabletToolTypeParam(libinput_event *event, EventTablet
     }
 }
 
-int32_t EventPackage::PackageTabletToolEvent(libinput_event *event, EventTabletTool& tableTool, UDSServer& udsServer)
+int32_t EventPackage::PackageTabletToolEvent(libinput_event *event, EventTabletTool& tableTool)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     const uint32_t stylusButton1KeyCode = 331;
@@ -280,7 +283,7 @@ void EventPackage::PackageTabletPadOtherParams(libinput_event *event, EventTable
     }
 }
 
-int32_t EventPackage::PackageTabletPadEvent(libinput_event *event, EventTabletPad& tabletPad, UDSServer& udsServer)
+int32_t EventPackage::PackageTabletPadEvent(libinput_event *event, EventTabletPad& tabletPad)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_tablet_pad_event(event);
@@ -296,7 +299,7 @@ int32_t EventPackage::PackageTabletPadEvent(libinput_event *event, EventTabletPa
     return RET_OK;
 }
 
-int32_t EventPackage::PackageTabletPadKeyEvent(libinput_event *event, EventKeyboard& key, UDSServer& udsServer)
+int32_t EventPackage::PackageTabletPadKeyEvent(libinput_event *event, EventKeyboard& key)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_tablet_pad_event(event);
@@ -343,9 +346,9 @@ int32_t EventPackage::PackageTabletPadKeyEvent(libinput_event *event, EventKeybo
     return RET_OK;
 }
 
-int32_t EventPackage::PackageJoyStickKeyEvent(libinput_event *event, EventKeyboard& key, UDSServer& udsServer)
+int32_t EventPackage::PackageJoyStickKeyEvent(libinput_event *event, EventKeyboard& key)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_joystick_pointer_button_event(event);
     CHKR(data, ERROR_NULL_POINTER, RET_ERR);
     key.time = libinput_event_joystick_button_time(data);
@@ -423,7 +426,8 @@ int32_t EventPackage::PackagePointerEventByAxis(libinput_event *event, EventPoin
     CHKR(data, ERROR_NULL_POINTER, RET_ERR);
 
     point.time = libinput_event_pointer_get_time_usec(data);
-    switch (libinput_event_pointer_get_axis_source(data)) {
+    auto axisSource = libinput_event_pointer_get_axis_source(data);
+    switch (axisSource) {
         case LIBINPUT_POINTER_AXIS_SOURCE_WHEEL: {
             point.source = POINTER_AXIS_SOURCE_WHEEL;
             break;
@@ -441,6 +445,8 @@ int32_t EventPackage::PackagePointerEventByAxis(libinput_event *event, EventPoin
             break;
         }
         default: {
+            MMI_LOGW("Unknown event source of pointer, PointerAxisSource:%{puiblic}d",
+                     axisSource);
             break;
         }
     }
@@ -461,8 +467,7 @@ int32_t EventPackage::PackagePointerEventByAxis(libinput_event *event, EventPoin
     return RET_OK;
 }
 
-int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event,
-    EventJoyStickAxis& eventJoyStickAxis, UDSServer& udsServer)
+int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event, EventJoyStickAxis& eventJoyStickAxis)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto joyEvent = libinput_event_get_joystick_axis_event(event);
@@ -517,7 +522,7 @@ void EventPackage::PackageTouchEventByType(int32_t type, struct libinput_event_t
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
 #ifdef OHOS_WESTEN_MODEL
-            MMIRegEvent->GetTouchInfoByTouchId(MAKEPAIR(touch.deviceId, touch.seat_slot), touch);
+            MMIRegEvent->GetTouchInfoByTouchId(std::make_pair(touch.deviceId, touch.seatSlot), touch);
 #endif
             touch.time = libinput_event_touch_get_time_usec(data);
             touch.eventType = LIBINPUT_EVENT_TOUCH_UP;
@@ -535,30 +540,31 @@ void EventPackage::PackageTouchEventByType(int32_t type, struct libinput_event_t
             break;
         }
         default: {
+            MMI_LOGW("Unknown event type of touch, touchType:%{public}d", type);
             break;
         }
     }
     return;
 }
 
-int32_t EventPackage::PackageTouchEvent(libinput_event *event,
-    EventTouch& touch, UDSServer& udsServer)
+int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
+        MMI_LOGT("This touch event is canceled type:%{public}d", type);
         return UNKNOWN_EVENT_PKG_FAIL;
     }
     auto ret = PackageEventDeviceInfo<EventTouch>(event, touch);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOGE("Device param package failed, ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     auto data = libinput_event_get_touch_event(event);
     CHKR(data, ERROR_NULL_POINTER, RET_ERR);
     touch.time = libinput_event_touch_get_time_usec(data);
     touch.slot = libinput_event_touch_get_slot(data);
-    touch.seat_slot = libinput_event_touch_get_seat_slot(data);
+    touch.seatSlot = libinput_event_touch_get_seat_slot(data);
     touch.pressure = libinput_event_get_touch_pressure(event);
     
     PackageTouchEventByType(type, data, touch);
@@ -576,7 +582,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event,
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
 #ifdef OHOS_WESTEN_MODEL
-            MMIRegEvent->GetTouchInfoByTouchId(MAKEPAIR(touch.deviceId, touch.seat_slot), touch);
+            MMIRegEvent->GetTouchInfo(std::make_pair(touch.deviceId, touch.seatSlot), touch);
 #endif
             touch.time = libinput_event_touch_get_time_usec(data);
             touch.eventType = LIBINPUT_EVENT_TOUCH_UP;
@@ -600,10 +606,9 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event,
     return RET_OK;
 }
 
-int32_t EventPackage::PackagePointerEvent(libinput_event *event,
-    EventPointer& point, UDSServer& udsServer)
+int32_t EventPackage::PackagePointerEvent(libinput_event *event, EventPointer& point)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto rDevRet = PackageEventDeviceInfo<EventPointer>(event, point);
     if (rDevRet != RET_OK) {
         MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", rDevRet, DEV_PARAM_PKG_FAIL);
@@ -630,21 +635,21 @@ int32_t EventPackage::PackagePointerEvent(libinput_event *event,
         }
         default: {
             ret = RET_ERR;
-            MMI_LOGE("Unknown event_type of pointer class has been reported!\n");
+            MMI_LOGW("Unknown event type of pointer, PointerEventType:%{public}d", type);
             break;
         }
     }
     return ret;
 }
 
-int32_t OHOS::MMI::EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& gesture, UDSServer& udsServer)
+int32_t EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& gesture)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_gesture_event(event);
     CHKR(data, ERROR_NULL_POINTER, RET_ERR);
     auto ret = PackageEventDeviceInfo<EventGesture>(event, gesture);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOGE("Device param package failed, ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     gesture.time = libinput_event_gesture_get_time_usec(data);
@@ -652,23 +657,25 @@ int32_t OHOS::MMI::EventPackage::PackageGestureEvent(libinput_event *event, Even
     auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN: {
-            gesture.pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN;
+            gesture.pointerEventType = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
             break;
         }
         case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE: {
-            gesture.pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE;
+            gesture.pointerEventType = PointerEvent::POINTER_ACTION_AXIS_UPDATE;
             gesture.scale = libinput_event_gesture_get_scale(data);
             gesture.angle = libinput_event_gesture_get_angle_delta(data);
             break;
         }
         case LIBINPUT_EVENT_GESTURE_PINCH_END: {
-            gesture.pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END;
+            gesture.pointerEventType = PointerEvent::POINTER_ACTION_AXIS_END;
             gesture.scale = libinput_event_gesture_get_scale(data);
             gesture.angle = libinput_event_gesture_get_angle_delta(data);
             gesture.cancelled = libinput_event_gesture_get_cancelled(data);
             break;
         }
+        /* Third, it refers to the use of requirements, and the code is reserved */
         case LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE: {
+            MMI_LOGI("Three finger slide event update");
             gesture.delta.x = libinput_event_gesture_get_dx(data);
             gesture.delta.y = libinput_event_gesture_get_dy(data);
             gesture.deltaUnaccel.x = libinput_event_gesture_get_dx_unaccelerated(data);
@@ -678,18 +685,21 @@ int32_t OHOS::MMI::EventPackage::PackageGestureEvent(libinput_event *event, Even
             FillEventSlotedCoordsInfo(gesture.soltTouches, *pSoltTouches);
             break;
         }
+        /* Third, it refers to the use of requirements, and the code is reserved */
         case LIBINPUT_EVENT_GESTURE_SWIPE_END: {
+            MMI_LOGI("Three finger slide event end");
             gesture.cancelled = libinput_event_gesture_get_cancelled(data);
             break;
         }
         default: {
+            MMI_LOGE("Event gesture type:%{public}d", type);
             break;
         }
     }
     return RET_OK;
 }
 
-int32_t EventPackage::PackageDeviceManageEvent(libinput_event *event, DeviceManage& deviceManage, UDSServer& udsServer)
+int32_t EventPackage::PackageDeviceManageEvent(libinput_event *event, DeviceManage& deviceManage)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto ret = PackageEventDeviceInfo<DeviceManage>(event, deviceManage);
@@ -700,9 +710,9 @@ int32_t EventPackage::PackageDeviceManageEvent(libinput_event *event, DeviceMana
     return RET_OK;
 }
 
-int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key, UDSServer& udsServer)
+int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_keyboard_event(event);
     CHKPR(data, ERROR_NULL_POINTER, RET_ERR);
     key.key = libinput_event_keyboard_get_key(data);
@@ -730,10 +740,9 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key,
     return RET_OK;
 }
 
-int32_t EventPackage::PackageKeyEvent(libinput_event *event,
-    std::shared_ptr<OHOS::MMI::KeyEvent> kevnPtr, UDSServer& udsServer)
+int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<KeyEvent> kevnPtr)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("PackageKeyEvent begin");
     CHKR(kevnPtr, ERROR_NULL_POINTER, RET_ERR);
     kevnPtr->UpdateId();
@@ -752,7 +761,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event,
     int32_t actionTime = static_cast<int64_t>(GetSysClockTime());
     int32_t keyCode = static_cast<int32_t>(hosKey.keyValueOfHos);
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
-        (OHOS::MMI::KeyEvent::KEY_ACTION_UP) : (OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+        (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
     int32_t actionStartTime = static_cast<int32_t>(libinput_event_keyboard_get_time_usec(data));
 
     kevnPtr->SetActionTime(actionTime);
@@ -762,7 +771,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event,
     kevnPtr->SetKeyCode(keyCode);
     kevnPtr->SetKeyAction(keyAction);
 
-    OHOS::MMI::KeyEvent::KeyItem item;
+    KeyEvent::KeyItem item;
     bool isKeyPressed = (libinput_event_keyboard_get_key_state(data) == 0) ? (false) : (true);
     if (isKeyPressed) {
         int32_t keyDownTime = actionStartTime;
@@ -772,17 +781,17 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event,
     item.SetDeviceId(deviceId);
     item.SetPressed(isKeyPressed); 
 
-    if (keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
+    if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         kevnPtr->AddPressedKeyItems(item);
     }
-    if (keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
+    if (keyAction == KeyEvent::KEY_ACTION_UP) {
         kevnPtr->RemoveReleasedKeyItems(item);
     }
     MMI_LOGD("PackageKeyEvent end");
     return RET_OK;
 }
 
-int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key, UDSServer& udsServer)
+int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key)
 {
     const std::string uid = GetUUid();
     CHKR(EOK == memcpy_s(key.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size()),
@@ -794,7 +803,7 @@ int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& k
     key.isIntercepted = event.isIntercepted;
     key.state = (enum KEY_STATE)event.isPressed;
     key.eventType = LIBINPUT_EVENT_KEYBOARD_KEY;
-    key.deviceType = HOS_VIRTUAL_KEYBOARD;
+    key.deviceType = DEVICE_TYPE_VIRTUAL_KEYBOARD;
     key.unicode = 0;
     if (event.isPressed) {
         key.seat_key_count = SEAT_KEY_COUNT_ONE;
@@ -804,16 +813,15 @@ int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& k
     return RET_OK;
 }
 
-int32_t EventPackage::KeyboardToKeyEvent(EventKeyboard& key,
-    std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr, UDSServer& udsServer)
+int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_ptr<KeyEvent> keyEventPtr)
 {
-    CHKR(keyEventPtr, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(keyEventPtr, ERROR_NULL_POINTER, RET_ERR);
     keyEventPtr->UpdateId();
-    OHOS::MMI::KeyEvent::KeyItem keyItem;
+    KeyEvent::KeyItem keyItem;
     int32_t actionTime = static_cast<int64_t>(GetSysClockTime());
     int32_t keyCode = static_cast<int32_t>(key.key);
     int32_t keyAction = (key.state == KEY_STATE_PRESSED) ?
-        (OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) : (OHOS::MMI::KeyEvent::KEY_ACTION_UP);
+        (KeyEvent::KEY_ACTION_DOWN) : (KeyEvent::KEY_ACTION_UP);
     int32_t deviceId = static_cast<int32_t>(key.deviceId);
     int32_t actionStartTime = static_cast<int32_t>(key.time);
 
@@ -834,9 +842,9 @@ int32_t EventPackage::KeyboardToKeyEvent(EventKeyboard& key,
     keyItem.SetDeviceId(deviceId);
     keyItem.SetPressed(isKeyPressed);
 
-    if (keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
+    if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         keyEventPtr->AddPressedKeyItems(keyItem);
-    } else if (keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
+    } else if (keyAction == KeyEvent::KEY_ACTION_UP) {
         keyEventPtr->RemoveReleasedKeyItems(keyItem);
     } else {
         // nothing to do.
@@ -846,16 +854,15 @@ int32_t EventPackage::KeyboardToKeyEvent(EventKeyboard& key,
 
 const uint16_t pointerID = 1; // mouse has only one PoingeItem, so id is 1
 
-std::shared_ptr<OHOS::MMI::PointerEvent> EventPackage::LibinputEventToPointerEvent(libinput_event *event,
-                                                                                   UDSServer& udsServer)
+std::shared_ptr<PointerEvent> EventPackage::LibinputEventToPointerEvent(libinput_event *event)
 {
     int32_t defaultDeviceId = 0;
     double gestureScale = 0;
     int32_t pointerEventType = 0;
-    auto pointerEvent = OHOS::MMI::PointerEvent::Create();
+    auto pointerEvent = PointerEvent::Create();
     auto data = libinput_event_get_gesture_event(event);
     auto type = libinput_event_get_type(event);
-    OHOS::MMI::PointerEvent::PointerItem pointer;
+    PointerEvent::PointerItem pointer;
     pointer.SetGlobalX(MouseState->GetMouseCoordsX());
     pointer.SetGlobalY(MouseState->GetMouseCoordsY());
     pointer.SetPointerId(pointerID);
@@ -863,29 +870,30 @@ std::shared_ptr<OHOS::MMI::PointerEvent> EventPackage::LibinputEventToPointerEve
     pointerEvent->AddPointerItem(pointer);
     std::vector<uint32_t> pressedButtons;
     MouseState->GetPressedButtons(pressedButtons);
-    
+
     if (!pressedButtons.empty()) {
         for (auto it = pressedButtons.begin(); it != pressedButtons.end(); it++) {
             pointerEvent->SetButtonPressed(*it);
         }
     }
-    
+
     switch (type) {
         case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN: {
-            pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN;
+            pointerEventType = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
             break;
         }
         case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE: {
-            pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE;
+            pointerEventType = PointerEvent::POINTER_ACTION_AXIS_UPDATE;
             gestureScale = libinput_event_gesture_get_scale(data);
             break;
         }
         case LIBINPUT_EVENT_GESTURE_PINCH_END: {
-            pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END;
+            pointerEventType = PointerEvent::POINTER_ACTION_AXIS_END;
             gestureScale = libinput_event_gesture_get_scale(data);
             break;
         }
         default: {
+            MMI_LOGW("Unknown event type of gesture, gestureType:%{public}d", type);
             break;
         }
     }

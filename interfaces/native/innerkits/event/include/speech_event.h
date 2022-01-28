@@ -101,7 +101,7 @@ enum SpeechEnum {
  * @see MultimodalEvent
  * @since 3
  */
-class SpeechEvent : public MultimodalEvent {
+class SpeechEvent : public MMI::MultimodalEvent {
 public:
     virtual ~SpeechEvent();
     /**

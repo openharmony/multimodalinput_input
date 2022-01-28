@@ -31,6 +31,7 @@ enum EpollEventType {
     EPOLL_EVENT_BEGIN = 0,
     EPOLL_EVENT_INPUT = EPOLL_EVENT_BEGIN,
     EPOLL_EVENT_SOCKET,
+    EPOLL_EVENT_SIGNAL,
 
     EPOLL_EVENT_END,
 };
@@ -47,11 +48,11 @@ public:
     void UdsStop();
     bool SendMsg(int32_t fd, NetPacket& pkt);
     void Broadcast(NetPacket& pkt);
-    void Multicast(const IdsList& fdList, NetPacket& pkt);
+    void Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt);
     void Dump(int32_t fd);
     int32_t GetFdByPid(int32_t pid);
     int32_t GetPidByFd(int32_t fd);
-    void OnEpollEvent(epoll_event& ev, CLMAP<int32_t, StreamBufData>& bufMap);
+    void OnEpollEvent(epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap);
     void OnEpollRecv(int32_t fd, const char *buf, size_t size);
 
     void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
@@ -59,14 +60,7 @@ public:
 public:
     virtual int32_t AddSocketPairInfo(const std::string& programName, const int moduleType, int& serverFd,
                                       int& toReturnClientFd, const int32_t uid, const int32_t pid);
-    SessionPtr GetSession(int32_t fd) const
-    {
-        auto it = sessionsMap_.find(fd);
-        if (it == sessionsMap_.end()) {
-            return nullptr;
-        }
-        return it->second->GetPtr();
-    }
+    SessionPtr GetSession(int32_t fd) const;
 
 protected:
     void SetRecvFun(MsgServerFunCallback fun);
@@ -77,7 +71,7 @@ protected:
 
     bool StartServer();
     void OnRecv(int32_t fd, const char *buf, size_t size);
-    void OnEvent(const epoll_event& ev, CLMAP<int32_t, StreamBufData>& bufMap);
+    void OnEvent(const epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap);
     void OnThread();
 #ifdef OHOS_BUILD_MMI_DEBUG
     virtual void HandleCommandQueue();

@@ -94,7 +94,7 @@ uint64_t GetSysClockTime()
     struct timespec ts = { 0, 0 };
 
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
-        MMI_LOGT("clock_gettime failed: %{public}s\n", strerror(errno));
+        MMI_LOGT("clock_gettime failed: %{public}s", strerror(errno));
         return 0;
     }
 
@@ -229,7 +229,7 @@ static void PrintEventJoyStickAxisInfo(const std::string &axisName, const EventJ
 {
     MMI_LOGT("%{public}s: {code: %{public}d; value: %{public}d; min: %{public}d; max: %{public}d, "
              "fuzz: %{public}d, flat: %{public}d, resolution: %{public}d,"
-             "standardValue: %{public}lf, isChanged: %{public}d}, \n",
+             "standardValue: %{public}lf, isChanged: %{public}d}, ",
              axisName.c_str(), r.code, r.value, r.minimum, r.maximum, r.fuzz, r.flat, r.resolution,
              r.standardValue, r.isChanged);
 }
@@ -237,10 +237,10 @@ static void PrintEventJoyStickAxisInfo(const std::string &axisName, const EventJ
 void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
     const int32_t abilityId, const int32_t focusId, const uint64_t preHandlerTime)
 {
-    MMI_LOGT("4.event dispatcher of server: EventJoyStickAxis:devicePhys: %{public}s;"
-             "fd: %{public}d; preHandlerTime: %{public}" PRId64 "; "
-             "time: %{public}" PRId64 "; deviceType: %{public}u; eventType: %{public}d; deviceName: %{public}s\n",
-             r.devicePhys, fd, preHandlerTime, r.time, r.deviceType,
+    MMI_LOGT("4.event dispatcher of server, EventJoyStickAxis:physical:%{public}s, "
+             "fd:%{public}d, preHandlerTime:%{public}" PRId64 ", "
+             "time:%{public}" PRId64 ", deviceType:%{public}u, eventType:%{public}d, deviceName:%{public}s",
+             r.physical, fd, preHandlerTime, r.time, r.deviceType,
              r.eventType, r.deviceName);
 
     PrintEventJoyStickAxisInfo(std::string("abs_throttle"), r.abs_throttle);
@@ -256,14 +256,14 @@ void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
 
 void PrintWMSInfo(const std::string& str, const int32_t fd, const int32_t abilityId, const int32_t focusId)
 {
-    MMI_LOGT("\nMMIWMS:windowId=[%{public}s]\n", str.c_str());
+    MMI_LOGT("MMIWMS:windowId=[%{public}s]", str.c_str());
     if (focusId == -1) {
-        MMI_LOGT("\nWMS:windowId = ''\n");
+        MMI_LOGT("WMS:windowId = ''");
     } else {
-        MMI_LOGT("\nWMS:windowId = %{public}d\n", focusId);
+        MMI_LOGT("WMS:windowId = %{public}d", focusId);
     }
-    MMI_LOGT("\nCALL_AMS:windowId = ''\n");
-    MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", fd, abilityId);
+    MMI_LOGT("CALL_AMS:windowId = ''");
+    MMI_LOGT("MMIAPPM:fd =%{public}d,abilityID = %{public}d", fd, abilityId);
 }
 
 int GetPid()
@@ -404,7 +404,7 @@ const std::string& GetThreadName()
     return g_threadName;
 }
 
-void AddId(IdsList &list, int32_t id)
+void AddId(std::vector<int32_t> &list, int32_t id)
 {
     if (id <= 0) {
         return;
@@ -416,7 +416,8 @@ void AddId(IdsList &list, int32_t id)
     list.push_back(id);
 }
 
-size_t CalculateDifference(const IdsList &list1, IdsList &list2, IdsList &difList)
+size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_t> &list2,
+    std::vector<int32_t> &difList)
 {
     if (list1.empty()) {
         difList = list2;
@@ -426,9 +427,9 @@ size_t CalculateDifference(const IdsList &list1, IdsList &list2, IdsList &difLis
         difList = list1;
         return difList.size();
     }
-    IdsList l1 = list1;
+    std::vector<int32_t> l1 = list1;
     std::sort(l1.begin(), l1.end());
-    IdsList l2 = list2;
+    std::vector<int32_t> l2 = list2;
     std::sort(l2.begin(), l2.end());
     std::set_difference(l1.begin(), l1.end(), l2.begin(), l2.end(), std::back_inserter(difList));
     return difList.size();

@@ -20,6 +20,7 @@
 #include "refbase.h"
 
 namespace OHOS {
+namespace MMI {
 enum SourceDevice {
     /**
     * Indicates that there is no input device. It is usually used as the default value.
@@ -334,5 +335,6 @@ private:
     bool isIntercepted_ = true;
 };
 using MultimodalEventPtr = sptr<MultimodalEvent>;
+}
 }
 #endif

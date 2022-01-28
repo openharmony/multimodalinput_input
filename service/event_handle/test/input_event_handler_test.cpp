@@ -49,7 +49,7 @@ const static libinput_interface LIBINPUT_INTERFACE = {
     },
     .close_restricted = [](int32_t fd, void* user_data)
     {
-        MMI_LOGI("libinput .close_restricted fd:%d\n", fd);
+        MMI_LOGI("libinput .close_restricted fd:%d", fd);
         close(fd);
     },
 };

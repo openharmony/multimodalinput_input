@@ -30,7 +30,7 @@ GetDeviceNode::GetDeviceNode()
 int32_t GetDeviceNode::GetDeviceNodeByName(const string &targetName, string &deviceNode, uint16_t devIndex)
 {
     string cmd = "cat /proc/bus/input/devices";
-    StringList cmdResult;
+    std::vector<std::string> cmdResult;
     string deviceName = deviceMap_[targetName];
     ExecuteCmd(cmd, cmdResult);
     DeviceMapData deviceMapData;
@@ -74,7 +74,7 @@ void GetDeviceNode::InitDeviceInfo()
     deviceMap_["trackpad model2"] = "Virtual Trackpad";
 }
 
-int32_t GetDeviceNode::ExecuteCmd(const string cmd, StringList &cmdResult)
+int32_t GetDeviceNode::ExecuteCmd(const string cmd, std::vector<std::string> &cmdResult)
 {
     if (cmd.empty()) {
         return RET_ERR;
@@ -93,7 +93,7 @@ int32_t GetDeviceNode::ExecuteCmd(const string cmd, StringList &cmdResult)
     return pclose(pin);
 }
 
-void GetDeviceNode::GetDeviceInfoByCmdResult(const StringList& cmdResult, DeviceMapData& deviceMapData)
+void GetDeviceNode::GetDeviceInfoByCmdResult(const std::vector<std::string>& cmdResult, DeviceMapData& deviceMapData)
 {
     string name;
     string target;

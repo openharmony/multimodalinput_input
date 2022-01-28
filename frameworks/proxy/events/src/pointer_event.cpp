@@ -294,6 +294,18 @@ void PointerEvent::AddPointerItem(PointerItem &pointerItem)
     pointers_.push_back(pointerItem);
 }
 
+void PointerEvent::UpdatePointerItem(int32_t pointerId, PointerItem &pointerItem)
+{
+    for (auto &item : pointers_) {
+        if (item.GetPointerId() == pointerId) {
+            item = pointerItem; // update
+            return;
+        }
+    }
+
+    pointers_.push_back(pointerItem); // insert
+}
+
 std::set<int32_t> PointerEvent::GetPressedButtons() const
 {
     return pressedButtons_;
