@@ -65,10 +65,7 @@ void InputEventMonitorManager::RemoveInputEventMontior(int32_t monitorId)
         return;
     }
     monitors_.erase(it);
-    int32_t ret = MMIEventHdl.RemoveInputEventMontior(OHOS::MMI::InputEvent::EVENT_TYPE_KEY);
-    if (ret != RET_OK) {
-        MMI_LOGE("MultimodalEventHandler send msg failed");
-    }
+    MMIEventHdl.RemoveInputEventMontior(OHOS::MMI::InputEvent::EVENT_TYPE_KEY);
     MMI_LOGD("MonitorId: %{public}d removed", monitorId);
 }
 
