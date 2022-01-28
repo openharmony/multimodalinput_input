@@ -866,8 +866,8 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     pointerEvent->SetTargetWindowId(focusWindow->id);
     pointerEvent->SetAgentWindowId(focusWindow->agentWindowId);
     auto fd = udsServer_->GetFdByPid(focusWindow->pid);
-    auto size = pointerEvent_->GetPressedButtons();
-    MMI_LOGD("pressedButtons_ size is: %{pubilc}d, pid is:%{public}d, fd is:%{public}d,"
+    auto size = pointerEvent->GetPressedButtons();
+    MMI_LOGD("pressedButtons size is: %{pubilc}d, pid is:%{public}d, fd is:%{public}d,"
              "globalX is:%{public}d, globalY is:%{public}d, localX is:%{public}d, localY is:%{public}d",
              static_cast<int32_t>(size.size()), focusWindow->pid, fd,
              globalX, globalY, pointerItem.GetLocalX(), pointerItem.GetLocalY());
