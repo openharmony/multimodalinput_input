@@ -134,6 +134,7 @@ namespace OHOS {
         MAKE_SHARED_FAIL,                           // make_shared错误
         CLEAR_DEAD_SESSION_FAIL,                    // 清理无效的session错误
         INIT_SIGNAL_HANDLER_FAIL,                   // 初始化全局信号处理器失败
+        INVALID_STREAM_BUFFER_DATA_TYPE,            // StreamBuffer不支持的数据类型
     };
     // Error code for util
     constexpr ErrCode UTIL_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_UTIL);

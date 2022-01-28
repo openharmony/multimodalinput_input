@@ -16,13 +16,14 @@
 #define OHOS_UTIL_H
 
 #include <map>
-#include <vector>
 #include <string>
 #include <time.h>
+#include <vector>
 #include "struct_multimodal.h"
 #include "define_multimodal.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     const char *GetMmiErrorTypeDesc(int32_t errorCodeEnum);
     std::string GetEnv(const std::string& name);
     std::string UuIdGenerate();
@@ -52,5 +53,5 @@ namespace OHOS::MMI {
         std::vector<int32_t> &difList);
     std::string StringFmt(const char* str, ...);
 }
-
+}
 #endif
