@@ -106,6 +106,7 @@ int32_t InputEventDataTransformation::DeserializeInputEvent(bool skipId,
 
 int32_t InputEventDataTransformation::SerializePointerEvent(std::shared_ptr<PointerEvent> event, NetPacket &packet)
 {
+    CHKPR(event, ERROR_NULL_POINTER, RET_ERR);
     CHKR((RET_OK == SerializeInputEvent(event, packet)), STREAM_BUF_WRITE_FAIL, RET_ERR);
 
     CHKR(packet.Write(event->GetPointerAction()), STREAM_BUF_WRITE_FAIL, RET_ERR);
