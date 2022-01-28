@@ -26,24 +26,38 @@
 
 namespace OHOS {
 namespace MMI {
+template<typename T>
+std::string GetTypeName()
+{
+    int32_t status = 0;
+    std::string tName = typeid(T).name();
+    auto demName = abi::__cxa_demangle(tName.c_str(), nullptr, nullptr, &status);
+    if (status == 0) {
+        tName = demName;
+        std::free(demName);
+    }
+    return std::move(tName);
+}
+#define TNAME(e) GetTypeName<decltype(e)>().c_str()
 #define VNAME(name) (#name)
+
 class StreamBuffer {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "StreamBuffer"};
 public:
-    explicit StreamBuffer();
+    explicit StreamBuffer() {}
     StreamBuffer(const StreamBuffer& buf);
     virtual ~StreamBuffer() {}
-    virtual StreamBuffer& operator= (const StreamBuffer& other);
-
-    void ResetBuf();
+    virtual StreamBuffer& operator=(const StreamBuffer& other);
 
     void Clean();
     bool SetReadIdx(uint32_t idx);
 
     bool Read(std::string& buf);
     bool Write(const std::string& buf);
+
     bool Read(StreamBuffer& buf);
     bool Write(const StreamBuffer& buf);
+
     bool Read(char *buf, size_t size);
     bool Write(const char *buf, size_t size);
     bool IsEmpty();
@@ -65,15 +79,8 @@ public:
      */
     size_t UnreadSize() const;
 
-    template<typename T>
-    bool Read(T& data);
-
-    template<typename T>
-    bool Write(const T& data);
-
     bool ChkError() const;
-    const char* GetErrorString() const;
-    void ResetError();
+    std::string GetErrorStatusRemark() const;
 
     /*
     * Method:    Data
@@ -85,7 +92,13 @@ public:
     const char *Data() const;
 
     template<typename T>
-    const char* GetTypeName();
+    bool IsInvalidType(const T& val) const;
+
+    template<typename T>
+    bool Read(T& data);
+
+    template<typename T>
+    bool Write(const T& data);
 
     template<typename T>
     StreamBuffer& operator >> (T& data);
@@ -120,8 +133,9 @@ protected:
         ES_READ,
         ES_WRITE,
     };
-    std::string rwErrStr_;
-    ErrorStatus rwError_ = ErrorStatus::ES_OK;
+    ErrorStatus rwErrorStatus_ = ErrorStatus::ES_OK;
+    int16_t rCount_ = 0;
+    int16_t wCount_ = 0;
 
     uint32_t rIdx_ = 0;
     uint32_t wIdx_ = 0;
@@ -129,47 +143,67 @@ protected:
 };
 
 template<typename T>
-const char* StreamBuffer::GetTypeName()
+bool StreamBuffer::IsInvalidType(const T& val) const
 {
-    int status = 0;
-    std::string tname = typeid(T).name();
-    auto demName = abi::__cxa_demangle(tname.c_str(), nullptr, nullptr, &status);
-    if (status == 0) {
-        tname = demName;
-        std::free(demName);
+    static const std::vector<std::string> keys = {
+        "*", "std::vector", "std::set", "std::map", "std::list",
+        "std::queue", "std::deque", "std::stack", "std::unordered_map", 
+        "std::unordered_set", "std::heap", "std::multiset", "std::multimap"
+    };
+    std::string typeName = TNAME(val);
+    for (const auto& it : keys) {
+        if (typeName.find(it) != std::string::npos) {
+            return true;
+        }
     }
-    return tname.c_str();
-}
-
-template<typename T>
-bool StreamBuffer::Write(const T &data)
-{
-    return Write(reinterpret_cast<char *>(const_cast<T *>(&data)), sizeof(data));
-}
-
-template<typename T>
-StreamBuffer &StreamBuffer::operator<<(const T &data)
-{
-    //CK(Write(data), STREAM_BUF_WRITE_FAIL);
-    if (!Write(data)) {
-
-    }
-    return *this;
+    return false;
 }
 
 template<typename T>
 bool StreamBuffer::Read(T &data)
 {
-    return Read(reinterpret_cast<char *>(&data), sizeof(data));
+    if (IsInvalidType(data)) {
+        rwErrorStatus_ = ErrorStatus::ES_READ;
+        MMI_LOGE("[%{public}s] Invalid type.type:%{public}s,size:%{public}d,count:%{public}d,errCode:%{public}d",
+            GetErrorStartRemark().c_str(), TNAME(data), sizeof(data), wCount_, INVALID_STREAM_BUFFER_DATA_TYPE);
+        return false;
+    }
+    if (!Read(reinterpret_cast<char *>(&data), sizeof(data))) {
+        MMI_LOGE("[%{public}s] type:%{public}s size:%{public}d count:%{public}d,errCode:%{public}d",
+            GetErrorStartRemark().c_str(), TNAME(data), sizeof(data), rCount_+1, STREAM_BUF_READ_FAIL);
+        return false;
+    }
+    return true;
+}
+
+template<typename T>
+bool StreamBuffer::Write(const T &data)
+{
+    if (IsInvalidType(data)) {
+        rwErrorStatus_ = ErrorStatus::ES_WRITE;
+        MMI_LOGE("[%{public}s] Invalid type. type:%{public}s size:%{public}d count:%{public}d,errCode:%{public}d", 
+            GetErrorStartRemark().c_str(), TNAME(data), sizeof(data), wCount_, INVALID_STREAM_BUFFER_DATA_TYPE);
+        return false;
+    }
+    if (!Write(reinterpret_cast<char *>(const_cast<T *>(&data)), sizeof(data))) {
+        MMI_LOGE("[%{public}s] type:%{public}s,size:%{public}d,count:%{public}d,errCode:%{public}d", 
+            GetErrorStartRemark().c_str(), TNAME(data), sizeof(data), wCount_+1, STREAM_BUF_WRITE_FAIL);
+        return false;
+    }
+    return true;
 }
 
 template<typename T>
 StreamBuffer &StreamBuffer::operator>>(T &data)
 {
-    //CK(Read(data), STREAM_BUF_READ_FAIL);
-    if (!Read(data)) {
+    CK(Read(data), STREAM_BUF_READ_FAIL);
+    return *this;
+}
 
-    }
+template<typename T>
+StreamBuffer &StreamBuffer::operator<<(const T &data)
+{
+    CK(Write(data), STREAM_BUF_WRITE_FAIL);
     return *this;
 }
 }

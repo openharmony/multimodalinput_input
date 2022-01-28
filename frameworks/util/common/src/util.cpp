@@ -38,14 +38,12 @@
 #include "securec.h"
 #include "uuid.h"
 
-namespace OHOS::MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Util"};
-    }
-}
-
 namespace OHOS {
 namespace MMI {
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Util"};
+}
+
 const std::map<int32_t, std::string> ERROR_STRING_MAP = {
     {MSG_SEND_FAIL, "Send Message Failed"},
     {NON_STD_EVENT, "Non-Standardized Event"},
