@@ -434,5 +434,20 @@ size_t CalculateDifference(const IdsList &list1, IdsList &list2, IdsList &difLis
     return difList.size();
 }
 
+std::string StringFmt(const char* str, ...)
+{
+    CHKR(str != nullptr, PARAM_INPUT_INVALID, "");
+    va_list args;
+    va_start(args, str);
+    char buf[MAX_PACKET_BUF_SIZE] = {};
+    if (vsnprintf_s(buf, sizeof(buf), sizeof(buf) - 1, str, args) == -1) {
+        MMI_LOGE("vsnprintf_s error");
+        va_end(args);
+        return "";
+    }
+    va_end(args);
+    return buf;
+}
+
 }
 }
