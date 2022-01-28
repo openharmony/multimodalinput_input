@@ -16,23 +16,27 @@
 #include "net_packet.h"
 #include "log.h"
 
-OHOS::MMI::NetPacket::NetPacket(MmiMessageId idMsg) : idMsg_(idMsg)
+namespace OHOS {
+namespace MMI {
+NetPacket::NetPacket(MmiMessageId idMsg) : idMsg_(idMsg)
 {
 }
 
-OHOS::MMI::NetPacket::NetPacket(const NetPacket& pack) : NetPacket(pack.GetMsgId())
+NetPacket::NetPacket(const NetPacket& pack) : NetPacket(pack.GetMsgId())
 {
     Clone(pack);
 }
-OHOS::MMI::NetPacket::~NetPacket()
+NetPacket::~NetPacket()
 {
 }
 
-void OHOS::MMI::NetPacket::MakeData(StreamBuffer& buf) const
+void NetPacket::MakeData(StreamBuffer& buf) const
 {
     PACKHEAD head = {idMsg_, {static_cast<int32_t>(wIdx_)}};
     buf << head;
     if (wIdx_ > 0) {
         CHK(buf.Write(&szBuff_[0], wIdx_), STREAM_BUF_WRITE_FAIL);
     }
+}
+}
 }
