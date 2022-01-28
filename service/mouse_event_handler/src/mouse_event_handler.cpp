@@ -211,7 +211,7 @@ void MouseEventHandler::DumpInner()
         pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
 
     auto size = pointerEvent_->GetPressedButtons();
-    MMI_LOGD("pressedButtons_.size():%{pubilc}d", size.size());
+    MMI_LOGD("pressedButtons_.size():%{pubilc}ld", size.size());
 
     PointerEvent::PointerItem item;
     pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item);
