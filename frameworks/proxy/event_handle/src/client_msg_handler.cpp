@@ -144,8 +144,8 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPa
     }
     int32_t pid = 0;
     pkt >> pid;
-    MMI_LOGD("client receive the msg from server: keyCode = %{public}d, pid = %{public}d", key->GetKeyCode(), pid);
-    return IEMManager.OnMonitorInputEvent(key);
+    MMI_LOGD("Client receive the msg from server, keyCode: %{public}d, pid: %{public}d", key->GetKeyCode(), pid);
+    return InputMonitorMgr.OnMonitorInputEvent(key);
 }
 
 int32_t OHOS::MMI::ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
@@ -256,7 +256,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnTouchPadMonitor(const UDSClient& client, 
     pkt >> pid;
     MMI_LOGD("client receive the msg from server: EventType = %{public}d, pid = %{public}d",
         pointer->GetEventType(), pid);
-    return IEMManager.OnTouchpadMonitorInputEvent(pointer);
+    return InputMonitorMgr.OnTouchpadMonitorInputEvent(pointer);
 }
 
 int32_t OHOS::MMI::ClientMsgHandler::OnKey(const UDSClient& client, NetPacket& pkt)

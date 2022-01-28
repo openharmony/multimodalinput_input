@@ -812,7 +812,7 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
         MMI_LOGD("The key event is cleared.");
     }
 
-    IEMServiceManager.ReportKeyEvent(key);
+    InputMonitorServiceMgr.ReportKeyEvent(key);
     NetPacket newPkt(MmiMessageId::ON_KEYEVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, newPkt);
     newPkt << fd << preHandlerTime;
