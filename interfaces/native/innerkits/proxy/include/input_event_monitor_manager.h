@@ -27,12 +27,12 @@ namespace OHOS {
 namespace MMI {
 struct MonitorItem {
     int32_t id;
+    std::function<void (std::shared_ptr<OHOS::MMI::KeyEvent>)> keyEventMonitor;
     bool operator == (const MonitorItem& item) const
     {
         return id == item.id && keyEventMonitor == item.keyEventMonitor;
     }
     std::string name;
-    std::function<void (std::shared_ptr<OHOS::MMI::KeyEvent>)> keyEventMonitor;
     std::function<void (std::shared_ptr<OHOS::MMI::PointerEvent>)> TouchPadEventMonitor;
 };
 
