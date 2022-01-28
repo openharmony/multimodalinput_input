@@ -86,7 +86,7 @@ private:
 
     std::mutex mu_;
     UDSServer *udsServer_ = nullptr;
-    const AppInfo AppInfoError_ = {-1, -1, -1, "", ""};
+    const AppInfo appInfoError_ = {-1, -1, -1, "", ""};
 };
 };
 }

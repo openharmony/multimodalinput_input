@@ -36,7 +36,7 @@ public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 protected:
-    const unsigned int g_surFaceId = 10;
+    const unsigned int surFaceId_ = 10;
 };
 
 class TelephoneEventHandleUnitTest : public TelephoneEventHandler {
@@ -73,7 +73,7 @@ HWTEST_F(EventHandleTelephoneTest, RegisterStandardizedEventHandle_tmp_err001, T
     auto telephoneHandleTmp = StandardizedEventHandler::Create<TelephoneEventHandleUnitTest>();
     telephoneHandleTmp->SetType(EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1));
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, g_surFaceId, telephoneHandleTmp);
+        iRemote, surFaceId_, telephoneHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 }
 
@@ -85,9 +85,9 @@ HWTEST_F(EventHandleTelephoneTest, RegisterStandardizedEventHandle_tmp_err002, T
     auto telephoneHandleTmp = StandardizedEventHandler::Create<TelephoneEventHandleUnitTest>();
 
     MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, g_surFaceId, telephoneHandleTmp);
+        iRemote, surFaceId_, telephoneHandleTmp);
     int32_t regResultII = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, g_surFaceId, telephoneHandleTmp);
+        iRemote, surFaceId_, telephoneHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_EXIST, regResultII);
 }
 
@@ -99,7 +99,7 @@ HWTEST_F(EventHandleTelephoneTest, UnregisterStandardizedEventHandle_tmp_err001,
     auto telephoneHandleTmp = StandardizedEventHandler::Create<TelephoneEventHandleUnitTest>();
     telephoneHandleTmp->SetType(EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1));
     int32_t regResult = MMIEventHdl.UnregisterStandardizedEventHandle(
-        iRemote, g_surFaceId, telephoneHandleTmp);
+        iRemote, surFaceId_, telephoneHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 }
 
@@ -110,7 +110,7 @@ HWTEST_F(EventHandleTelephoneTest, UnregisterStandardizedEventHandle_tmp_err002,
     auto iRemote = MMIToken::Create(u16Desc);
     auto telephoneHandleTmp = StandardizedEventHandler::Create<TelephoneEventHandleUnitTest>();
     int32_t regResult = MMIEventHdl.UnregisterStandardizedEventHandle(
-        iRemote, g_surFaceId, telephoneHandleTmp);
+        iRemote, surFaceId_, telephoneHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 }
 
@@ -121,7 +121,7 @@ HWTEST_F(EventHandleTelephoneTest, RegisterStandardizedEventHandle_sec001, TestS
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
     int32_t unregResult = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, g_surFaceId, g_telephoneHandle);
+        iRemote, surFaceId_, g_telephoneHandle);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, unregResult);
 }
 
@@ -131,7 +131,7 @@ HWTEST_F(EventHandleTelephoneTest, RegisterStandardizedEventHandle_sec002, TestS
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
     int32_t unregResult = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, g_surFaceId, g_telephoneHandle);
+        iRemote, surFaceId_, g_telephoneHandle);
     EXPECT_NE(MMI_STANDARD_EVENT_EXIST, unregResult);
 }
 
@@ -141,7 +141,7 @@ HWTEST_F(EventHandleTelephoneTest, UnregisterStandardizedEventHandle_sec001, Tes
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(
-        iRemote, g_surFaceId, g_telephoneHandle);
+        iRemote, surFaceId_, g_telephoneHandle);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, unregResult);
 }
 
@@ -151,7 +151,7 @@ HWTEST_F(EventHandleTelephoneTest, UnregisterStandardizedEventHandle_sec002, Tes
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(
-        iRemote, g_surFaceId, g_telephoneHandle);
+        iRemote, surFaceId_, g_telephoneHandle);
     EXPECT_NE(MMI_STANDARD_EVENT_NOT_EXIST, unregResult);
 }
 
@@ -162,11 +162,11 @@ HWTEST_F(EventHandleTelephoneTest, RegisterAndUnregister_001, TestSize.Level1)
     auto iRemote = MMIToken::Create(u16Desc);
     auto telephoneHandleTmp = StandardizedEventHandler::Create<TelephoneEventHandleUnitTest>();
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, g_surFaceId, telephoneHandleTmp);
+        iRemote, surFaceId_, telephoneHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(
-        iRemote, g_surFaceId, telephoneHandleTmp);
+        iRemote, surFaceId_, telephoneHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, unregResult);
 }
 
@@ -177,11 +177,11 @@ HWTEST_F(EventHandleTelephoneTest, RegisterAndUnregister_002, TestSize.Level1)
     auto iRemote = MMIToken::Create(u16Desc);
     auto telephoneHandleTmp = StandardizedEventHandler::Create<TelephoneEventHandleUnitTest>();
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, g_surFaceId, telephoneHandleTmp);
+        iRemote, surFaceId_, telephoneHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 
     int32_t regResult2 = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, g_surFaceId, telephoneHandleTmp);
+        iRemote, surFaceId_, telephoneHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_EXIST, regResult2);
 }
 
@@ -192,16 +192,16 @@ HWTEST_F(EventHandleTelephoneTest, RegisterAndUnregister_003, TestSize.Level1)
     auto iRemote = MMIToken::Create(u16Desc);
     auto telephoneHandleTmp = StandardizedEventHandler::Create<TelephoneEventHandleUnitTest>();
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, g_surFaceId, telephoneHandleTmp);
+        iRemote, surFaceId_, telephoneHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(
-        iRemote, g_surFaceId,
+        iRemote, surFaceId_,
         telephoneHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, unregResult);
 
     int32_t unregResult2 = MMIEventHdl.UnregisterStandardizedEventHandle(
-        iRemote, g_surFaceId, telephoneHandleTmp);
+        iRemote, surFaceId_, telephoneHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_NOT_EXIST, unregResult2);
 }
 
@@ -212,19 +212,19 @@ HWTEST_F(EventHandleTelephoneTest, RegisterAndUnregister_004, TestSize.Level1)
     auto iRemote = MMIToken::Create(u16Desc);
     auto telephoneHandleTmp = StandardizedEventHandler::Create<TelephoneEventHandleUnitTest>();
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, g_surFaceId, telephoneHandleTmp);
+        iRemote, surFaceId_, telephoneHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 
     int32_t regResult2 = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, g_surFaceId, telephoneHandleTmp);
+        iRemote, surFaceId_, telephoneHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_EXIST, regResult2);
 
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(
-        iRemote, g_surFaceId, telephoneHandleTmp);
+        iRemote, surFaceId_, telephoneHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, unregResult);
 
     int32_t unregResult2 = MMIEventHdl.UnregisterStandardizedEventHandle(
-        iRemote, g_surFaceId, telephoneHandleTmp);
+        iRemote, surFaceId_, telephoneHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_NOT_EXIST, unregResult2);
 }
 

@@ -467,7 +467,7 @@ int32_t InjectionEventDispatch::GetDeviceIndex(const string& deviceNameText)
         return RET_ERR;
     }
     vector<DeviceInformation>::iterator iter;
-    for (iter = allDevices.begin(); iter != allDevices.end(); iter++) {
+    for (iter = allDevices_.begin(); iter != allDevices_.end(); iter++) {
         if (deviceNameText == iter->chipName) {
             return iter->devIndex;
         }
@@ -546,13 +546,13 @@ void InjectionEventDispatch::InitDeviceInfo()
     };
 
     int32_t counts = sizeof(deviceInfoArray) / sizeof(DeviceInformation);
-    allDevices.insert(allDevices.begin(), deviceInfoArray, deviceInfoArray + counts);
+    allDevices_.insert(allDevices_.begin(), deviceInfoArray, deviceInfoArray + counts);
 }
 
 int32_t InjectionEventDispatch::GetDevTypeByIndex(int32_t devIndex)
 {
     vector<DeviceInformation>::iterator iter;
-    for (iter = allDevices.begin(); iter != allDevices.end(); iter++) {
+    for (iter = allDevices_.begin(); iter != allDevices_.end(); iter++) {
         if (devIndex == iter->devIndex) {
             return iter->devType;
         }
@@ -564,7 +564,7 @@ int32_t InjectionEventDispatch::GetDevTypeByIndex(int32_t devIndex)
 int32_t InjectionEventDispatch::GetDevIndexByType(int32_t devType)
 {
     vector<DeviceInformation>::iterator iter;
-    for (iter = allDevices.begin(); iter != allDevices.end(); iter++) {
+    for (iter = allDevices_.begin(); iter != allDevices_.end(); iter++) {
         if (devType == iter->devType) {
             return iter->devIndex;
         }
