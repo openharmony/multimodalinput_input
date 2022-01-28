@@ -678,7 +678,7 @@ int32_t InputEventHandler::OnEventTouch(const multimodal_libinput_event& ev)
 #else
     CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     uint64_t sysStartProcessTime = GetSysClockTime();
-    EventTouch touch = {};    
+    EventTouch touch = {};
     auto packageResult = eventPackage_.PackageTouchEvent(ev.event, touch);
     if (packageResult == UNKNOWN_EVENT_PKG_FAIL) {
         return RET_OK;
