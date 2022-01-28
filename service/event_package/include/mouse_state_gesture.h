@@ -54,8 +54,8 @@ namespace OHOS::MMI {
 
     private:
         std::mutex mu_;
-        DeviceCoords mouseCoords;
-        std::map<int16_t, uint32_t> mapCountState;
+        DeviceCoords mouseCoords_;
+        std::map<int16_t, uint32_t> mapCountState_;
     };
 }
 
