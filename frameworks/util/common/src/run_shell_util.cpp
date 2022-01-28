@@ -25,7 +25,7 @@ namespace {
     static inline constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RUNSHELLUTILL" };
 }
 
-RunShellUtil::RunShellUtil(): logMaxSize(100) {}
+RunShellUtil::RunShellUtil(): logMaxSize_(100) {}
 
 RunShellUtil::~RunShellUtil() {}
 
@@ -36,20 +36,20 @@ int32_t RunShellUtil::RunShellCommand(const std::string &command, std::vector<st
     std::string retLog = "";
     const std::string command_ = HILOG_GREP + "'" + command + "'";
 
-    if ((fp = popen(command_.c_str(), "r")) == nullptr) {
+    if ((fp_ = popen(command_.c_str(), "r")) == nullptr) {
         MMI_LOGE("open fail");
-        pclose(fp);
-        fp = nullptr;
+        pclose(fp_);
+        fp_ = nullptr;
         return RET_ERR;
     }
     int i = 0;
-    while (logMaxSize > i) {
+    while (logMaxSize_ > i) {
         char buf[MAXSIZE] = {0};
-        if (fgets(buf, sizeof(buf), fp) == nullptr) {
+        if (fgets(buf, sizeof(buf), fp_) == nullptr) {
             MMI_LOGE("read fp end");
             retLog.append(std::string(buf));
-            pclose(fp);
-            fp = nullptr;
+            pclose(fp_);
+            fp_ = nullptr;
             break;
         }
         retLog.append(std::string(buf));
@@ -68,7 +68,7 @@ int32_t RunShellUtil::SetLogMaxSize(int32_t logSize)
     if (logSize <= 0) {
         return RET_ERR;
     }
-    logMaxSize = logSize;
+    logMaxSize_ = logSize;
     return RET_OK;
 }
 

@@ -53,19 +53,19 @@ const AppInfo& AppRegister::FindByWinId(int32_t windowId)
     if (it != mapSurface_.end()) {
         return it->second;
     }
-    return AppRegister::AppInfoError_;
+    return AppRegister::appInfoError_;
 }
 
 const AppInfo& AppRegister::FindBySocketFd(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    CHKR(fd >= 0, PARAM_INPUT_INVALID, AppInfoError_);
+    CHKR(fd >= 0, PARAM_INPUT_INVALID, appInfoError_);
     for (auto iter = mapSurface_.begin(); iter != mapSurface_.end(); iter++) {
         if (iter->second.fd == fd) {
             return iter->second;
         }
     }
-    return AppRegister::AppInfoError_;
+    return AppRegister::appInfoError_;
 }
 
 void AppRegister::RegisterAppInfoforServer(const AppInfo& appInfo)
