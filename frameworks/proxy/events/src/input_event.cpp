@@ -27,14 +27,14 @@ const int32_t InputEvent::EVENT_TYPE_POINTER;
 
 InputEvent::InputEvent(int32_t eventType) : eventType_(eventType)
 {
-    Init();
+    Reset();
 }
 
 InputEvent::~InputEvent()
 {
 }
 
-void InputEvent::Init()
+void InputEvent::Reset()
 {
     int32_t conversionStep = 1000000;
     struct timespec ts = { 0, 0 };
