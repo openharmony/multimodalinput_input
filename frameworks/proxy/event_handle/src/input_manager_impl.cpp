@@ -217,11 +217,7 @@ void InputManagerImpl::PrintDisplayDebugInfo()
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
-    if (monitor == nullptr) {
-        MMI_LOGE("InputManagerImpl::%{public}s param should not be null!", __func__);
-        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
-    }
-    int32_t monitorId = IEMManager.AddInputEventMontior(monitor);
+    int32_t monitorId = InputMonitorMgr.AddInputEventMontior(monitor);
     monitorId = monitorId * ADD_MASK_BASE + MASK_KEY;
     return monitorId;
 }
@@ -232,7 +228,7 @@ int32_t InputManagerImpl::AddMontior(std::function<void(std::shared_ptr<PointerE
         MMI_LOGE("InputManagerImpl::%{public}s param should not be null!", __func__);
         return InputEventMonitorManager::INVALID_MONITOR_ID;
     }
-    int32_t monitorId = IEMManager.AddInputEventTouchpadMontior(monitor);
+    int32_t monitorId = InputMonitorMgr.AddInputEventTouchpadMontior(monitor);
     monitorId = monitorId * ADD_MASK_BASE + MASK_TOUCHPAD;
     return monitorId;
 }
@@ -251,13 +247,13 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 
     switch (mask) {
         case MASK_KEY:
-            IEMManager.RemoveInputEventMontior(monitorId);
+            InputMonitorMgr.RemoveInputEventMontior(monitorId);
             break;
         case MASK_TOUCH:
             InputMonitorManager::GetInstance().RemoveMonitor(monitorId);
             break;
         case MASK_TOUCHPAD:
-            IEMManager.RemoveInputEventTouchpadMontior(monitorId);
+            InputMonitorMgr.RemoveInputEventTouchpadMontior(monitorId);
             break;
         default:
         MMI_LOGE("Can't find the mask,mask%{public}d", mask);
