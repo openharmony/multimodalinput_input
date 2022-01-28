@@ -623,7 +623,7 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
         MMI_LOGD("this touch event is up  remove this finger"); 
         if (point->GetPointersIdList().empty()) {
             MMI_LOGD("this touch event is final finger up  remove this finger");
-            point->Init();
+            point->Reset();
         }
         return RET_OK;
     }
@@ -647,7 +647,7 @@ int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
         MMI_LOGD("this touch pad event is up  remove this finger");
         if (point->GetPointersIdList().empty()) {
             MMI_LOGD("this touch pad event is final finger up  remove this finger");
-            point->Init();
+            point->Reset();
         }
         return RET_OK;
     }
