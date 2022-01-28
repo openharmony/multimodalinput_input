@@ -54,7 +54,7 @@ void InputEventMonitorManager::RemoveInputEventMontior(int32_t monitorId)
 {
 	if (monitorId < 0) {
         MMI_LOGE("MonitorId invalid");
-	    return;
+        return;
     }
     MMI_LOGD("RemoveInputEventMontior enter");
     MonitorItem item;
