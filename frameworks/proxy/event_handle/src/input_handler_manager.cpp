@@ -37,7 +37,7 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
         return INVALID_HANDLER_ID;
     }
     int32_t handlerId = GetNextId();
-    if (RET_ERR == handlerId) {
+    if (handlerId == RET_ERR) {
         MMI_LOGE("Exceeded limit of 32-bit maximum number of integers");
         return INVALID_HANDLER_ID;
     }
@@ -84,7 +84,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
     };
     auto ret = inputHandlers_.emplace(handler.handlerId_, handler);
     if (!ret.second) {
-        MMI_LOGE("Duplicate handler:%{public}d", handlerId);
+        MMI_LOGE("Duplicate handler:%{public}d", handler.handlerId_);
         return RET_ERR;
     }
     return RET_OK;
@@ -107,11 +107,11 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
     std::lock_guard<std::mutex> guard(lockHandlers_);
     auto tItr = inputHandlers_.find(handlerId);
     if (inputHandlers_.end() == tItr) {
-        MMI_LOGW("No handler with specified ID");
+        MMI_LOGE("No handler with specified ID");
         return RET_ERR;
     }
     if (tItr->second.handlerType_ != handlerType) {
-        MMI_LOGW("Unmatched handler type");
+        MMI_LOGE("Unmatched handler type");
         return RET_ERR;
     }
     inputHandlers_.erase(tItr);
