@@ -83,7 +83,7 @@ int32_t UDSSocket::SetBlockMode(int32_t fd, bool isBlock)
             fd, flags, strerror(errno), FCNTL_FAIL);
         return flags;
     }
-    MMI_LOGT("F_GETFL fd:%{public}d, flags:{public}d", fd, flags);
+    MMI_LOGT("F_GETFL fd:%{public}d, flags:%{public}d", fd, flags);
     flags |= O_NONBLOCK; // 非阻塞模式
     if (isBlock) {
         flags &= ~O_NONBLOCK; // 阻塞模式
@@ -94,7 +94,7 @@ int32_t UDSSocket::SetBlockMode(int32_t fd, bool isBlock)
             fd, flags, strerror(errno), FCNTL_FAIL);
         return flags;
     }
-    MMI_LOGT("F_SETFL fd:%{public}d, flags:{public}d", fd, flags);
+    MMI_LOGT("F_SETFL fd:%{public}d, flags:%{public}d", fd, flags);
     return flags;
 }
 
