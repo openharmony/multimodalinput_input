@@ -53,6 +53,7 @@ namespace OHOS::MMI {
     const std::string& GetThreadName();
     void AddId(IdsList &list, int32_t id);
     size_t CalculateDifference(const IdsList &list1, IdsList &list2, IdsList &difList);
+    std::string StringFmt(const char* str, ...);
 }
 
 #endif

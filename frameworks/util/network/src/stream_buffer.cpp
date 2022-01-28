@@ -16,31 +16,69 @@
 #include "stream_buffer.h"
 #include "define_multimodal.h"
 
-OHOS::MMI::StreamBuffer::StreamBuffer()
+namespace OHOS {
+namespace MMI {
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "StreamBuffer" };
+}
+
+template<typename T>
+const char* GetTypeName()
+{
+    int status = 0;
+    std::string tname = typeid(T).name();
+    auto demName = abi::__cxa_demangle(tname.c_str(), nullptr, nullptr, &status);
+    if (status == 0) {
+        tname = demName;
+        std::free(demName);
+    }
+    return tname.c_str();
+}
+#define TNAME(val) GetTypeName<decltype(val)>()
+#define VNAME(name) (#name)
+
+StreamBuffer::StreamBuffer()
 {
     ResetBuf();
 }
 
-void OHOS::MMI::StreamBuffer::ResetBuf()
+void StreamBuffer::ResetBuf()
 {
     CHK(EOK == memset_sp(&szBuff_, sizeof(szBuff_), 0, sizeof(szBuff_)), MEMCPY_SEC_FUN_FAIL);
 }
 
-void OHOS::MMI::StreamBuffer::Clean()
+void StreamBuffer::Clean()
 {
     rIdx_ = 0;
     wIdx_ = 0;
     ResetBuf();
+    ResetError();
 }
 
-bool OHOS::MMI::StreamBuffer::SetReadIdx(uint32_t idx)
+bool StreamBuffer::ChkError() const
+{
+    return (rwError_ != ErrorStatus::ES_OK);
+}
+
+const char* StreamBuffer::GetErrorString() const
+{
+    return rwErrStr_.c_str();
+}
+
+void StreamBuffer::ResetError()
+{
+    rwError_ = ErrorStatus::ES_OK
+    rwErrStr_.clear();
+}
+
+bool StreamBuffer::SetReadIdx(uint32_t idx)
 {
     CHKF(idx <= wIdx_, PARAM_INPUT_INVALID);
     rIdx_ = idx;
     return true;
 }
 
-bool OHOS::MMI::StreamBuffer::Read(std::string &buf)
+bool StreamBuffer::Read(std::string &buf)
 {
     if (rIdx_ == wIdx_) {
         MMI_LOGE("Not enough memory to read... errCode:%{public}d", MEM_NOT_ENOUGH);
@@ -51,92 +89,128 @@ bool OHOS::MMI::StreamBuffer::Read(std::string &buf)
     return (buf.size() > 0);
 }
 
-bool OHOS::MMI::StreamBuffer::Read(char *buf, size_t size)
+bool StreamBuffer::Read(char *buf, size_t size)
 {
-    CHKF(buf && size > 0, PARAM_INPUT_INVALID);
-    if (rIdx_ + size > wIdx_) {
-        MMI_LOGE("Memory out of bounds on read... errCode:%{public}d", MEM_OUT_OF_BOUNDS);
+    if (ChkError()) {
+        return false; // No need to print log here, only the first error needs to be printed
+    }
+    if (buf == nullptr) {
+        MMI_LOGE("Invalid input parameter buf=nullptr errCode:%{public}d", ERROR_NULL_POINTER);
+        rwError_ = ErrorStatus::ES_READ;
         return false;
     }
-    CHKF(EOK == memcpy_sp(buf, size, ReadBuf(), size), MEMCPY_SEC_FUN_FAIL);
+    if (size <= 0) {
+        MMI_LOGE("Invalid input parameter size=%{public}d errCode:%{public}d", size, PARAM_INPUT_INVALID);
+        rwError_ = ErrorStatus::ES_READ;
+        return false;
+    }
+    if (rIdx_ + size > wIdx_) {
+        MMI_LOGE("Memory out of bounds on read... errCode:%{public}d", MEM_OUT_OF_BOUNDS);
+        rwError = ErrorStatus::ES_READ;
+        return false;
+    }
+    if (EOK != memcpy_sp(buf, size, ReadBuf(), size)) {
+        MMI_LOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+        rwError_ = ErrorStatus::ES_READ;
+        return false;
+    }
     rIdx_ += static_cast<uint32_t>(size);
     return true;
 }
 
-bool OHOS::MMI::StreamBuffer::Write(const StreamBuffer &buf)
+bool StreamBuffer::Write(const StreamBuffer &buf)
 {
     return Write(buf.Data(), buf.Size());
 }
 
-const char *OHOS::MMI::StreamBuffer::Data() const
+const char *StreamBuffer::Data() const
 {
     return &szBuff_[0];
 }
 
-const char *OHOS::MMI::StreamBuffer::ReadBuf() const
+const char *StreamBuffer::ReadBuf() const
 {
     return &szBuff_[rIdx_];
 }
 
-const char *OHOS::MMI::StreamBuffer::WriteBuf() const
+const char *StreamBuffer::WriteBuf() const
 {
     return &szBuff_[wIdx_];
 }
 
-bool OHOS::MMI::StreamBuffer::Clone(const StreamBuffer &buf)
+bool StreamBuffer::Clone(const StreamBuffer &buf)
 {
     Clean();
     return Write(buf.Data(), buf.Size());
 }
 
-size_t OHOS::MMI::StreamBuffer::Size() const
+size_t StreamBuffer::Size() const
 {
     return wIdx_;
 }
 
-size_t OHOS::MMI::StreamBuffer::UnreadSize() const
+size_t StreamBuffer::UnreadSize() const
 {
     CHKR(wIdx_ >= rIdx_, VAL_NOT_EXP, 0);
     return (wIdx_ - rIdx_);
 }
 
-bool OHOS::MMI::StreamBuffer::Write(const char *buf, size_t size)
+bool StreamBuffer::Write(const char *buf, size_t size)
 {
-    CHKF(buf && size > 0, PARAM_INPUT_INVALID);
-    if (wIdx_ + size >= MAX_STREAM_BUF_SIZE) {
-        MMI_LOGE("Memory out of bounds on write... errCode:%{public}d", MEM_OUT_OF_BOUNDS);
+    if (ChkError()) {
+        return false; // No need to print log here, only the first error needs to be printed
+    }
+    if (buf == nullptr) {
+        MMI_LOGE("Invalid input parameter buf=nullptr errCode:%{public}d", ERROR_NULL_POINTER);
+        rwError_ = ErrorStatus::ES_WRITE;
         return false;
     }
-    CHKF(EOK == memcpy_sp(&szBuff_[wIdx_], (MAX_STREAM_BUF_SIZE - wIdx_), buf, size), MEMCPY_SEC_FUN_FAIL);
+    if (size <= 0) {
+        MMI_LOGE("Invalid input parameter size=%{public}d errCode:%{public}d", size, PARAM_INPUT_INVALID);
+        rwError_ = ErrorStatus::ES_WRITE;
+        return false;
+    }
+    if (wIdx_ + size >= MAX_STREAM_BUF_SIZE) {
+        MMI_LOGE("The write length exceeds buffer. errCode:%{public}d", MEM_OUT_OF_BOUNDS);
+        rwError_ = ErrorStatus::ES_WRITE;
+        return false;
+    }
+    if (EOK != memcpy_sp(&szBuff_[wIdx_], (MAX_STREAM_BUF_SIZE - wIdx_), buf, size)) {
+        MMI_LOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+        rwError_ = ErrorStatus::ES_WRITE;
+        return false;
+    }
     wIdx_ += static_cast<uint32_t>(size);
     return true;
 }
 
-bool OHOS::MMI::StreamBuffer::Read(StreamBuffer &buf)
+bool StreamBuffer::Read(StreamBuffer &buf)
 {
     return buf.Write(Data(), Size());
 }
 
-bool OHOS::MMI::StreamBuffer::Write(const std::string &buf)
+bool StreamBuffer::Write(const std::string &buf)
 {
     return Write(buf.c_str(), buf.size() + 1);
 }
 
-OHOS::MMI::StreamBuffer &OHOS::MMI::StreamBuffer::operator=(const StreamBuffer &other)
+StreamBuffer &StreamBuffer::operator=(const StreamBuffer &other)
 {
     Clone(other);
     return *this;
 }
 
-OHOS::MMI::StreamBuffer::StreamBuffer(const StreamBuffer &buf)
+StreamBuffer::StreamBuffer(const StreamBuffer &buf)
 {
     Clone(buf);
 }
 
-bool OHOS::MMI::StreamBuffer::IsEmpty()
+bool StreamBuffer::IsEmpty()
 {
     if (rIdx_ == wIdx_) {
         return true;
     }
     return false;
+}
+}
 }

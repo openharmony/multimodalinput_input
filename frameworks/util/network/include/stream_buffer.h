@@ -15,6 +15,7 @@
 #ifndef OHOS_STREAM_BUFFER_H
 #define OHOS_STREAM_BUFFER_H
 
+#include <cxxabi.h>
 #include <stdint.h>
 #include <string>
 #include "securec.h"
@@ -25,6 +26,7 @@
 
 namespace OHOS {
 namespace MMI {
+#define VNAME(name) (#name)
 class StreamBuffer {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "StreamBuffer"};
 public:
@@ -69,6 +71,10 @@ public:
     template<typename T>
     bool Write(const T& data);
 
+    bool ChkError() const;
+    const char* GetErrorString() const;
+    void ResetError();
+
     /*
     * Method:    Data
     * FullName:  CStreamBuffer::Data
@@ -77,6 +83,9 @@ public:
     * Qualifier: const buf pointer
     */
     const char *Data() const;
+
+    template<typename T>
+    const char* GetTypeName();
 
     template<typename T>
     StreamBuffer& operator >> (T& data);
@@ -106,34 +115,61 @@ protected:
     bool Clone(const StreamBuffer& buf);
 
 protected:
+    enum class ErrorStatus : int8_t {
+        ES_OK,
+        ES_READ,
+        ES_WRITE,
+    };
+    std::string rwErrStr_;
+    ErrorStatus rwError_ = ErrorStatus::ES_OK;
+
     uint32_t rIdx_ = 0;
     uint32_t wIdx_ = 0;
     char szBuff_[MAX_STREAM_BUF_SIZE] = {};
 };
 
 template<typename T>
-bool OHOS::MMI::StreamBuffer::Write(const T &data)
+const char* StreamBuffer::GetTypeName()
+{
+    int status = 0;
+    std::string tname = typeid(T).name();
+    auto demName = abi::__cxa_demangle(tname.c_str(), nullptr, nullptr, &status);
+    if (status == 0) {
+        tname = demName;
+        std::free(demName);
+    }
+    return tname.c_str();
+}
+
+template<typename T>
+bool StreamBuffer::Write(const T &data)
 {
     return Write(reinterpret_cast<char *>(const_cast<T *>(&data)), sizeof(data));
 }
 
 template<typename T>
-StreamBuffer &OHOS::MMI::StreamBuffer::operator<<(const T &data)
+StreamBuffer &StreamBuffer::operator<<(const T &data)
 {
-    CK(Write(data), STREAM_BUF_WRITE_FAIL);
+    //CK(Write(data), STREAM_BUF_WRITE_FAIL);
+    if (!Write(data)) {
+
+    }
     return *this;
 }
 
 template<typename T>
-bool OHOS::MMI::StreamBuffer::Read(T &data)
+bool StreamBuffer::Read(T &data)
 {
     return Read(reinterpret_cast<char *>(&data), sizeof(data));
 }
 
 template<typename T>
-StreamBuffer &OHOS::MMI::StreamBuffer::operator>>(T &data)
+StreamBuffer &StreamBuffer::operator>>(T &data)
 {
-    CK(Read(data), STREAM_BUF_READ_FAIL);
+    //CK(Read(data), STREAM_BUF_READ_FAIL);
+    if (!Read(data)) {
+
+    }
     return *this;
 }
 }
