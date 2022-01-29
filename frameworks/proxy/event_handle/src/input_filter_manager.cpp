@@ -39,10 +39,10 @@ int32_t InputFilterManager::FilterKeyEvent(std::string name, Authority authority
     }
     KeyEventFilter keyEventFilter(name, authority, handler);
     keyEventFilterList_.push_back(keyEventFilter);
-    if (authority > HighestAuthority_) {
+    if (authority > highestAuthority_) {
         MMI_LOGD("add filter is  the highest Authority");
-        HighestId_ = keyEventFilter.GetId();
-        HighestAuthority_ = authority;
+        highestId_ = keyEventFilter.GetId();
+        highestAuthority_ = authority;
         MMIEventHdl.AddKeyEventFIlter(keyEventFilter.GetId(), name, authority);
     }
     return RET_OK;
@@ -58,10 +58,10 @@ int32_t InputFilterManager::UnFilterKeyEvent(int32_t id)
     for (auto it = keyEventFilterList_.begin(); it != keyEventFilterList_.end(); it++) {
         if (it->GetId() == id) {
             keyEventFilterList_.erase(it);
-            if (id == HighestId_) {
+            if (id == highestId_) {
                 MMIEventHdl.RemoveKeyEventFIlter(id);
-                HighestAuthority_ = NO_AUTHORITY;
-                HighestId_ = 0;
+                highestAuthority_ = NO_AUTHORITY;
+                highestId_ = 0;
                 break;
             }
             MMI_LOGD("remove filter isn't  the highest Authority");
@@ -78,13 +78,13 @@ int32_t InputFilterManager::UnFilterKeyEvent(int32_t id)
     }
     auto item = keyEventFilterList_.begin();
     for (auto it = keyEventFilterList_.begin(); it != keyEventFilterList_.end(); it++) {
-        if (it->GetAuthority() > HighestAuthority_) {
-            HighestAuthority_ = it->GetAuthority();
-            HighestId_ = it->GetId();
+        if (it->GetAuthority() > highestAuthority_) {
+            highestAuthority_ = it->GetAuthority();
+            highestId_ = it->GetId();
             item = it;
         }
     }
-    if (HighestId_ != 0) {
+    if (highestId_ != 0) {
         MMI_LOGD("after remove the highest filter, add a next highest filter ");
         MMIEventHdl.AddKeyEventFIlter(item->GetId(), item->GetName(), item->GetAuthority());
     }
@@ -95,31 +95,31 @@ InputFilterManager::KeyEventFilter::KeyEventFilter(std::string name, Authority a
     std::function<void(KeyBoardEvent)> handler) : name_(name), authority_(authority), handler_(handler)
 {
     idManager_++;
-    this->id_ = idManager_;
+    id_ = idManager_;
 }
 
 void InputFilterManager::KeyEventFilter::SetId(int32_t id)
 {
-    this->id_ = id;
+    id_ = id;
 }
 
 int32_t InputFilterManager::KeyEventFilter::GetId()
 {
-    return this->id_;
+    return id_;
 }
 
 std::string InputFilterManager::KeyEventFilter::GetName()
 {
-    return this->name_;
+    return name_;
 }
 Authority InputFilterManager::KeyEventFilter::GetAuthority()
 {
-    return this->authority_;
+    return authority_;
 }
 
 std::function<void(KeyBoardEvent)> InputFilterManager::KeyEventFilter::GetHandler()
 {
-    return this->handler_;
+    return handler_;
 }
 
 void InputFilterManager::OnkeyEventTrace(const KeyBoardEvent& event)
@@ -242,31 +242,31 @@ InputFilterManager::TouchEventFilter::TouchEventFilter(std::string name, Authori
     std::function<void(TouchEvent)> handler) : name_(name), authority_(authority), handler_(handler)
 {
     idManager_++;
-    this->id_ = idManager_;
+    id_ = idManager_;
 }
 
 void InputFilterManager::TouchEventFilter::SetId(int32_t id)
 {
-    this->id_ = id;
+    id_ = id;
 }
 
 int32_t InputFilterManager::TouchEventFilter::GetId()
 {
-    return this->id_;
+    return id_;
 }
 
 std::string InputFilterManager::TouchEventFilter::GetName()
 {
-    return this->name_;
+    return name_;
 }
 Authority InputFilterManager::TouchEventFilter::GetAuthority()
 {
-    return this->authority_;
+    return authority_;
 }
 
 std::function<void(TouchEvent)> InputFilterManager::TouchEventFilter::GetHandler()
 {
-    return this->handler_;
+    return handler_;
 }
 
 void InputFilterManager::OnTouchEventTrace(const TouchEvent& event)
@@ -363,32 +363,32 @@ InputFilterManager::PointerEventInterceptor::PointerEventInterceptor(std::string
     std::function<void(MouseEvent)> handler) : name_(name), authority_(authority), handler_(handler)
 {
     idManager_++;
-    this->id_ = idManager_;
+    id_ = idManager_;
 }
 
 int32_t InputFilterManager::PointerEventInterceptor::GetId()
 {
-    return this->id_;
+    return id_;
 }
 
 void InputFilterManager::PointerEventInterceptor::SetId(int32_t id)
 {
-    this->id_ = id;
+    id_ = id;
 }
 
 std::string InputFilterManager::PointerEventInterceptor::GetName()
 {
-    return this->name_;
+    return name_;
 }
 
 Authority InputFilterManager::PointerEventInterceptor::GetAuthority()
 {
-    return this->authority_;
+    return authority_;
 }
 
 std::function<void(MouseEvent)> InputFilterManager::PointerEventInterceptor::GetHandler()
 {
-    return this->handler_;
+    return handler_;
 }
 
 void InputFilterManager::OnPointerEventTrace(const MouseEvent& event)

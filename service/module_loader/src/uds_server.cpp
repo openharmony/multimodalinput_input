@@ -157,6 +157,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
     setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
+    SetBlockMode(serverFd); // 设置非阻塞模式
 
     MMI_LOGD("alloc socketpair, serverFd = %{public}d, clientFd = %{public}d(%{public}d).",
              serverFd, toReturnClientFd, sockFds[1]);

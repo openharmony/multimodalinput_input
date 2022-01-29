@@ -114,7 +114,7 @@ void UnitSent(napi_env env, int32_t winId, uint32_t eventType, const MultimodalE
 
 JSRegisterHandle::JSRegisterHandle(const napi_env& env)
 {
-    this->env_ = env;
+    env_ = env;
 }
 
 bool JSRegisterHandle::CheckRegistered(int32_t winId, uint32_t type)

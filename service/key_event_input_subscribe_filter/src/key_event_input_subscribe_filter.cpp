@@ -375,7 +375,7 @@ bool KeyEventInputSubscribeFilter::HandleKeyUp(const std::shared_ptr<KeyEvent>& 
 
         auto upTime = keyEvent->GetActionTime();
         auto downTime = keyItem->GetDownTime();
-        if (upTime - downTime >= duration) {
+        if (upTime - downTime >= (duration * 1000)) {
             MMI_LOGE("Skip, upTime - downTime >= duration");
             continue;
         }

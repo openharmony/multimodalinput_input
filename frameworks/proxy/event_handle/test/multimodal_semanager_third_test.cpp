@@ -35,7 +35,7 @@ public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 protected:
-    const unsigned int g_surFaceId = 10;
+    const unsigned int surFaceId_ = 10;
 };
 
 class MultimodalEventFirstUnitTest : public MultimodalStandardizedEventManager {
@@ -75,7 +75,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnSearch_002, TestSize.Level1)
     MmiMessageId typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -92,7 +92,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnSearch_003, TestSize.Level1)
     MmiMessageId typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -109,7 +109,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnSearch_004, TestSize.Level1)
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -126,7 +126,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnSearch_005, TestSize.Level1)
     MmiMessageId typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -143,7 +143,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnSearch_006, TestSize.Level1)
     MmiMessageId typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -160,7 +160,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnSearch_007, TestSize.Level1)
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -176,7 +176,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnSearch_008, TestSize.Level1)
     auto typeNum = static_cast<MmiMessageId>('A');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -201,7 +201,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnClosePage_002, TestSize.Level1)
     MmiMessageId typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -218,7 +218,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnClosePage_003, TestSize.Level1)
     MmiMessageId typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -235,7 +235,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnClosePage_004, TestSize.Level1)
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -252,7 +252,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnClosePage_005, TestSize.Level1)
     MmiMessageId typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -269,7 +269,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnClosePage_006, TestSize.Level1)
     MmiMessageId typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -286,7 +286,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnClosePage_007, TestSize.Level1)
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -302,7 +302,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnClosePage_008, TestSize.Level1)
     auto typeNum = static_cast<MmiMessageId>('A');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -326,7 +326,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnLaunchVoiceAssistant_002, TestSize.Leve
     MmiMessageId typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -343,7 +343,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnLaunchVoiceAssistant_003, TestSize.Leve
     MmiMessageId typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -359,7 +359,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnLaunchVoiceAssistant_004, TestSize.Leve
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -376,7 +376,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnLaunchVoiceAssistant_005, TestSize.Leve
     MmiMessageId typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -393,7 +393,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnLaunchVoiceAssistant_006, TestSize.Leve
     MmiMessageId typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -410,7 +410,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnLaunchVoiceAssistant_007, TestSize.Leve
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -427,7 +427,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnLaunchVoiceAssistant_008, TestSize.Leve
     auto typeNum = static_cast<MmiMessageId>('B');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -451,7 +451,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnMute_002, TestSize.Level1)
     MmiMessageId typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -467,7 +467,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnMute_003, TestSize.Level1)
     MmiMessageId typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -484,7 +484,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnMute_004, TestSize.Level1)
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -501,7 +501,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnMute_005, TestSize.Level1)
     MmiMessageId typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -518,7 +518,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnMute_006, TestSize.Level1)
     MmiMessageId typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -535,7 +535,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnMute_007, TestSize.Level1)
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -551,7 +551,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnMute_008, TestSize.Level1)
     auto typeNum = static_cast<MmiMessageId>('B');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -576,7 +576,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnAnswer_002, TestSize.Level1)
     MmiMessageId typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -593,7 +593,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnAnswer_003, TestSize.Level1)
     MmiMessageId typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -610,7 +610,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnAnswer_004, TestSize.Level1)
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -627,7 +627,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnAnswer_005, TestSize.Level1)
     MmiMessageId typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -644,7 +644,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnAnswer_006, TestSize.Level1)
     MmiMessageId typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -661,7 +661,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnAnswer_007, TestSize.Level1)
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -677,7 +677,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnAnswer_008, TestSize.Level1)
     auto typeNum = static_cast<MmiMessageId>('C');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -702,7 +702,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnRefuse_002, TestSize.Level1)
     MmiMessageId typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -719,7 +719,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnRefuse_003, TestSize.Level1)
     MmiMessageId typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -736,7 +736,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnRefuse_004, TestSize.Level1)
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -753,7 +753,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnRefuse_005, TestSize.Level1)
     MmiMessageId typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -770,7 +770,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnRefuse_006, TestSize.Level1)
     MmiMessageId typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -787,7 +787,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnRefuse_007, TestSize.Level1)
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -803,7 +803,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnRefuse_008, TestSize.Level1)
     auto typeNum = static_cast<MmiMessageId>('D');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -827,7 +827,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_002, TestSize.Level1)
     MmiMessageId typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -843,7 +843,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_003, TestSize.Level1)
     MmiMessageId typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -860,7 +860,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_004, TestSize.Level1)
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -877,7 +877,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_005, TestSize.Level1)
     MmiMessageId typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -894,7 +894,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_006, TestSize.Level1)
     MmiMessageId typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -910,7 +910,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_007, TestSize.Level1)
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -926,7 +926,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_008, TestSize.Level1)
     auto typeNum = static_cast<MmiMessageId>('D');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -950,7 +950,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnTelephoneControl_002, TestSize.Level1)
     MmiMessageId typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -967,7 +967,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnTelephoneControl_003, TestSize.Level1)
     MmiMessageId typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -984,7 +984,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnTelephoneControl_004, TestSize.Level1)
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -1001,7 +1001,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnTelephoneControl_005, TestSize.Level1)
     MmiMessageId typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -1018,7 +1018,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnTelephoneControl_006, TestSize.Level1)
     MmiMessageId typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -1035,7 +1035,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnTelephoneControl_007, TestSize.Level1)
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -1051,7 +1051,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnTelephoneControl_008, TestSize.Level1)
     auto typeNum = static_cast<MmiMessageId>('E');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -1075,7 +1075,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceAdd_002, TestSize.Level1)
     MmiMessageId typeNum = MmiMessageId::DEVICE_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -1092,7 +1092,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceAdd_003, TestSize.Level1)
     MmiMessageId typeNum = EnumAdd(MmiMessageId::DEVICE_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -1109,7 +1109,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceAdd_004, TestSize.Level1)
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -1126,7 +1126,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceAdd_005, TestSize.Level1)
     MmiMessageId typeNum = MmiMessageId::DEVICE_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -1143,7 +1143,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceAdd_006, TestSize.Level1)
     MmiMessageId typeNum = EnumAdd(MmiMessageId::DEVICE_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -1160,7 +1160,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceAdd_007, TestSize.Level1)
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -1176,7 +1176,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceAdd_008, TestSize.Level1)
     auto typeNum = static_cast<MmiMessageId>('F');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -1200,7 +1200,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceRemove_002, TestSize.Level1)
     MmiMessageId typeNum = MmiMessageId::DEVICE_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -1217,7 +1217,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceRemove_003, TestSize.Level1)
     MmiMessageId typeNum = EnumAdd(MmiMessageId::DEVICE_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -1234,7 +1234,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceRemove_004, TestSize.Level1)
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -1251,7 +1251,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceRemove_005, TestSize.Level1)
     MmiMessageId typeNum = MmiMessageId::DEVICE_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -1268,7 +1268,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceRemove_006, TestSize.Level1)
     MmiMessageId typeNum = EnumAdd(MmiMessageId::DEVICE_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -1285,7 +1285,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceRemove_007, TestSize.Level1)
     MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);
@@ -1302,7 +1302,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceRemove_008, TestSize.Level1)
     auto typeNum = static_cast<MmiMessageId>('G');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
-    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
+    MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_, tmpObj);
 
     MultimodalEventFirstUnitTest multimodalTestTmp;
     multimodalTestTmp.InsertMapEvent(typeNum, tmpObj);

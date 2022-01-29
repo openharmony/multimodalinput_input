@@ -68,12 +68,7 @@ void InputManager::UnsubscribeKeyEvent(int32_t subscriberId)
 
 int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
-    if (monitor == nullptr) {
-        MMI_LOGE("InputManager::%{public}s param should not be null!", __func__);
-        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
-    }
-    InputManagerImpl::GetInstance()->AddMonitor(monitor);
-    return MMI_STANDARD_EVENT_SUCCESS;
+    return InputManagerImpl::GetInstance()->AddMonitor(monitor);
 }
 
 int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
