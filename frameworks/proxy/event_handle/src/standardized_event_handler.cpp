@@ -16,191 +16,194 @@
 #include "standardized_event_handler.h"
 #include "log.h"
 
-OHOS::MMI::StandardizedEventHandler::StandardizedEventHandler() : type_(MmiMessageId::INVALID) {}
+namespace OHOS {
+namespace MMI {
+StandardizedEventHandler::StandardizedEventHandler() : type_(MmiMessageId::INVALID) {}
+StandardizedEventHandler::~StandardizedEventHandler() {}
 
-OHOS::MMI::StandardizedEventHandler::~StandardizedEventHandler() {}
-
-bool OHOS::MMI::StandardizedEventHandler::OnKey(const OHOS::KeyEvent& event)
+bool StandardizedEventHandler::OnKey(const OHOS::KeyEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnTouch(const TouchEvent& event)
+bool StandardizedEventHandler::OnTouch(const TouchEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnShowMenu(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnShowMenu(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnSend(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnSend(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnCopy(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnCopy(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnPaste(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnPaste(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnCut(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnCut(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnUndo(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnUndo(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnRefresh(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnRefresh(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnStartDrag(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnStartDrag(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnCancel(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnCancel(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnEnter(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnEnter(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnPrevious(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnPrevious(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnNext(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnNext(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnBack(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnBack(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnPrint(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnPrint(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnPlay(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnPlay(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnPause(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnPause(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnMediaControl(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnMediaControl(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnScreenShot(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnScreenShot(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnScreenSplit(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnScreenSplit(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnStartScreenRecord(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnStartScreenRecord(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnStopScreenRecord(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnStopScreenRecord(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnGotoDesktop(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnGotoDesktop(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnRecent(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnRecent(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnShowNotification(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnShowNotification(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnLockScreen(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnLockScreen(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnSearch(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnSearch(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnClosePage(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnClosePage(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnLaunchVoiceAssistant(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnLaunchVoiceAssistant(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnMute(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnMute(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnAnswer(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnAnswer(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnRefuse(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnRefuse(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnHangup(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnHangup(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnTelephoneControl(const MultimodalEvent& event)
+bool StandardizedEventHandler::OnTelephoneControl(const MultimodalEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnDeviceAdd(const DeviceEvent& event)
+bool StandardizedEventHandler::OnDeviceAdd(const DeviceEvent& event)
 {
     return false;
 }
 
-bool OHOS::MMI::StandardizedEventHandler::OnDeviceRemove(const DeviceEvent& event)
+bool StandardizedEventHandler::OnDeviceRemove(const DeviceEvent& event)
 {
     return false;
+}
+}
 }

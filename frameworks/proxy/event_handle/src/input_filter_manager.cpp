@@ -95,31 +95,31 @@ InputFilterManager::KeyEventFilter::KeyEventFilter(std::string name, Authority a
     std::function<void(KeyBoardEvent)> handler) : name_(name), authority_(authority), handler_(handler)
 {
     idManager_++;
-    this->id_ = idManager_;
+    id_ = idManager_;
 }
 
 void InputFilterManager::KeyEventFilter::SetId(int32_t id)
 {
-    this->id_ = id;
+    id_ = id;
 }
 
 int32_t InputFilterManager::KeyEventFilter::GetId()
 {
-    return this->id_;
+    return id_;
 }
 
 std::string InputFilterManager::KeyEventFilter::GetName()
 {
-    return this->name_;
+    return name_;
 }
 Authority InputFilterManager::KeyEventFilter::GetAuthority()
 {
-    return this->authority_;
+    return authority_;
 }
 
 std::function<void(KeyBoardEvent)> InputFilterManager::KeyEventFilter::GetHandler()
 {
-    return this->handler_;
+    return handler_;
 }
 
 void InputFilterManager::OnkeyEventTrace(const KeyBoardEvent& event)
@@ -242,31 +242,31 @@ InputFilterManager::TouchEventFilter::TouchEventFilter(std::string name, Authori
     std::function<void(TouchEvent)> handler) : name_(name), authority_(authority), handler_(handler)
 {
     idManager_++;
-    this->id_ = idManager_;
+    id_ = idManager_;
 }
 
 void InputFilterManager::TouchEventFilter::SetId(int32_t id)
 {
-    this->id_ = id;
+    id_ = id;
 }
 
 int32_t InputFilterManager::TouchEventFilter::GetId()
 {
-    return this->id_;
+    return id_;
 }
 
 std::string InputFilterManager::TouchEventFilter::GetName()
 {
-    return this->name_;
+    return name_;
 }
 Authority InputFilterManager::TouchEventFilter::GetAuthority()
 {
-    return this->authority_;
+    return authority_;
 }
 
 std::function<void(TouchEvent)> InputFilterManager::TouchEventFilter::GetHandler()
 {
-    return this->handler_;
+    return handler_;
 }
 
 void InputFilterManager::OnTouchEventTrace(const TouchEvent& event)
@@ -363,32 +363,32 @@ InputFilterManager::PointerEventInterceptor::PointerEventInterceptor(std::string
     std::function<void(MouseEvent)> handler) : name_(name), authority_(authority), handler_(handler)
 {
     idManager_++;
-    this->id_ = idManager_;
+    id_ = idManager_;
 }
 
 int32_t InputFilterManager::PointerEventInterceptor::GetId()
 {
-    return this->id_;
+    return id_;
 }
 
 void InputFilterManager::PointerEventInterceptor::SetId(int32_t id)
 {
-    this->id_ = id;
+    id_ = id;
 }
 
 std::string InputFilterManager::PointerEventInterceptor::GetName()
 {
-    return this->name_;
+    return name_;
 }
 
 Authority InputFilterManager::PointerEventInterceptor::GetAuthority()
 {
-    return this->authority_;
+    return authority_;
 }
 
 std::function<void(MouseEvent)> InputFilterManager::PointerEventInterceptor::GetHandler()
 {
-    return this->handler_;
+    return handler_;
 }
 
 void InputFilterManager::OnPointerEventTrace(const MouseEvent& event)

@@ -557,7 +557,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
     }
     auto ret = PackageEventDeviceInfo<EventTouch>(event, touch);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed, ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOGE("Device param package failed, ret:%{public}d,errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     auto data = libinput_event_get_touch_event(event);

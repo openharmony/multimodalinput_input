@@ -15,20 +15,22 @@
 
 #include "uds_command_queue.h"
 
-OHOS::MMI::UdsCommandQueue::UdsCommandQueue()
+namespace OHOS {
+namespace MMI {
+UdsCommandQueue::UdsCommandQueue()
 {
 }
 
-OHOS::MMI::UdsCommandQueue::~UdsCommandQueue()
+UdsCommandQueue::~UdsCommandQueue()
 {
 }
 
-size_t OHOS::MMI::UdsCommandQueue::GetSize() const
+size_t UdsCommandQueue::GetSize() const
 {
     return commandQueue_.size();
 }
 
-std::string OHOS::MMI::UdsCommandQueue::PopCommand()
+std::string UdsCommandQueue::PopCommand()
 {
     std::lock_guard<std::mutex> lockGuard(mux_);
     if (commandQueue_.size() > 0) {
@@ -40,8 +42,10 @@ std::string OHOS::MMI::UdsCommandQueue::PopCommand()
     return "";
 }
 
-void OHOS::MMI::UdsCommandQueue::AddCommand(const std::string& command)
+void UdsCommandQueue::AddCommand(const std::string& command)
 {
     std::lock_guard<std::mutex> lockGuard(mux_);
     commandQueue_.push_back(command);
+}
+}
 }

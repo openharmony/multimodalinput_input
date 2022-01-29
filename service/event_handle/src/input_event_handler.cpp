@@ -611,7 +611,7 @@ int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
 int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 {
     CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
-    MMI_LOGD("call  OnEventTouchSecond begin"); 
+    MMI_LOGD("Enter"); 
     auto point = TouchTransformPointManger->OnLibinputTouchEvent(event);
     if (point == nullptr) {
         return RET_OK;
@@ -620,21 +620,21 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         point->RemovePointerItem(point->GetPointerId());
-        MMI_LOGD("this touch event is up  remove this finger"); 
+        MMI_LOGD("This touch event is up remove this finger"); 
         if (point->GetPointersIdList().empty()) {
-            MMI_LOGD("this touch event is final finger up  remove this finger");
+            MMI_LOGD("This touch event is final finger up remove this finger");
             point->Reset();
         }
         return RET_OK;
     }
-    MMI_LOGD("call  OnEventTouchSecond end"); 
+    MMI_LOGD("Leave"); 
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 {
     CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
-    MMI_LOGD("call  OnEventTouchPadSecond begin");
+    MMI_LOGD("Enter");
 
     auto point = TouchTransformPointManger->OnLibinputTouchPadEvent(event);
     if (point == nullptr) {
@@ -644,61 +644,57 @@ int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
         point->RemovePointerItem(point->GetPointerId());
-        MMI_LOGD("this touch pad event is up  remove this finger");
+        MMI_LOGD("This touch pad event is up remove this finger");
         if (point->GetPointersIdList().empty()) {
-            MMI_LOGD("this touch pad event is final finger up  remove this finger");
+            MMI_LOGD("This touch pad event is final finger up remove this finger");
             point->Reset();
         }
         return RET_OK;
     }
-    MMI_LOGD("call  OnEventTouchPadSecond end");
+    MMI_LOGD("Leave");
     return RET_OK;
 }
 
-void InputEventHandler::OnEventTouchTrace(const struct EventTouch& touch)
+void InputEventHandler::OnEventTouchTrace(const EventTouch& touch)
 {
     char touchUuid[MAX_UUIDSIZE] = {0};
     if (memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" OnEventTouch service reported touchUuid = %{public}s", touchUuid);
+    MMI_LOGT("OnEventTouch service reported touchUuid:%{public}s", touchUuid);
     std::string touchEvent = touchUuid;
-    touchEvent = "OnEventTouch service reported touchUuid: " + touchEvent;
+    touchEvent = "OnEventTouch service reported touchUuid:" + touchEvent;
     int32_t eventTouch = 9;
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
 }
 
 int32_t InputEventHandler::OnEventTouch(const multimodal_libinput_event& ev)
 {
-    CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
+    CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     SInput::Loginfo_packaging_tool(ev.event);
 #ifndef OHOS_WESTEN_MODEL
     OnEventTouchSecond(ev.event);
-#endif
+#else
+    CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     uint64_t sysStartProcessTime = GetSysClockTime();
     EventTouch touch = {};
-    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageTouchEvent(ev.event, touch);
     if (packageResult == UNKNOWN_EVENT_PKG_FAIL) {
         return RET_OK;
     }
     if (packageResult != RET_OK) {
-        MMI_LOGE("Touch event package failed, ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Touch event package failed, ret:%{public}d,errCode:%{public}d",
                  packageResult, TOUCH_EVENT_PKG_FAIL);
         return TOUCH_EVENT_PKG_FAIL;
     }
     OnEventTouchTrace(touch);
-#ifndef OHOS_WESTEN_MODEL
     if (ServerKeyFilter->OnTouchEvent(ev.event, touch, sysStartProcessTime)) {
         return RET_OK;
     }
-#endif
-#ifdef OHOS_WESTEN_MODEL
-
     auto ret = eventDispatch_.DispatchTouchEvent(*udsServer_, ev.event, touch, sysStartProcessTime);
     if (ret != RET_OK) {
-        MMI_LOGE("Touch event dispatch failed... ret:%{public}d errCode:%{public}d", ret, TOUCH_EVENT_DISP_FAIL);
+        MMI_LOGE("Touch event dispatch failed ret:%{public}d,errCode:%{public}d", ret, TOUCH_EVENT_DISP_FAIL);
         return TOUCH_EVENT_DISP_FAIL;
     }
 #endif
