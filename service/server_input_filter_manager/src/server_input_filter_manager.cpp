@@ -65,17 +65,17 @@ Authority ServerInputFilterManager::KeyEventFilter::GetAuthority()
 
 void ServerInputFilterManager::KeyEventFilter::SetName(std::string name)
 {
-    this->name_ = name;
+    name_ = name;
 }
 
 void ServerInputFilterManager::KeyEventFilter::SetId(int32_t id)
 {
-    this->id_ = id;
+    id_ = id;
 }
 
 void ServerInputFilterManager::KeyEventFilter::SetAuthority(Authority authority)
 {
-    this->authority_ = authority;
+    authority_ = authority;
 }
 
 void ServerInputFilterManager::OnKeyEventTrace(const EventKeyboard& key)
@@ -178,17 +178,17 @@ Authority ServerInputFilterManager::TouchEventFilter::GetAuthority()
 
 void ServerInputFilterManager::TouchEventFilter::SetName(std::string name)
 {
-    this->name_ = name;
+    name_ = name;
 }
 
 void ServerInputFilterManager::TouchEventFilter::SetId(int32_t id)
 {
-    this->id_ = id;
+    id_ = id;
 }
 
 void ServerInputFilterManager::TouchEventFilter::SetAuthority(Authority authority)
 {
-    this->authority_ = authority;
+    authority_ = authority;
 }
 
 void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& touch,
@@ -490,31 +490,31 @@ void ServerInputFilterManager::DeleteInterceptorFormSess(const SessionPtr& sess)
 
 int32_t ServerInputFilterManager::PointerEventFilter::GetId()
 {
-    return this->id_;
+    return id_;
 }
 
 std::string ServerInputFilterManager::PointerEventFilter::GetName()
 {
-    return this->name_;
+    return name_;
 }
 
 Authority ServerInputFilterManager::PointerEventFilter::GetAuthority()
 {
-    return this->authority_;
+    return authority_;
 }
 
 void ServerInputFilterManager::PointerEventFilter::SetName(std::string name)
 {
-    this->name_ = name;
+    name_ = name;
 }
 
 void ServerInputFilterManager::PointerEventFilter::SetId(int32_t id)
 {
-    this->id_ = id;
+    id_ = id;
 }
 
 void ServerInputFilterManager::PointerEventFilter::SetAuthority(Authority authority)
 {
-    this->authority_ = authority;
+    authority_ = authority;
 }
 }

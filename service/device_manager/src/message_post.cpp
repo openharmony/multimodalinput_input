@@ -20,7 +20,7 @@ namespace OHOS {
 namespace MMI {
 void MessagePost::SetFd(int fd)
 {
-    this->fd_ = fd;
+    fd_ = fd;
 }
 
 void MessagePost::RunOnWestonThread(std::function<void(weston_compositor *)> taskItem)
@@ -67,7 +67,7 @@ int MessagePost::RunTaskOnWestonThread(int fd, uint32_t mask, void *data)
 
 void MessagePost::SetWestonCompositor(weston_compositor *ec)
 {
-    this->ec_ = ec;
+    ec_ = ec;
 }
 }
 }

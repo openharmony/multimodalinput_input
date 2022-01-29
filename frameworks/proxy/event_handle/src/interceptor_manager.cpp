@@ -25,7 +25,7 @@ namespace OHOS::MMI {
 
 OHOS::MMI::InterceptorManager::InterceptorManager()
 {
-    this->InterceptorItemId = 0;
+    InterceptorItemId = 0;
 }
 
 OHOS::MMI::InterceptorManager::~InterceptorManager()
@@ -41,7 +41,7 @@ int32_t OHOS::MMI::InterceptorManager::AddInterceptor(int32_t sourceType,
     }
 
     InterceptorItem interceptorItem;
-    interceptorItem.id_ = ++this->InterceptorItemId;
+    interceptorItem.id_ = ++InterceptorItemId;
     interceptorItem.sourceType = sourceType;
     interceptorItem.callback = interceptor;
     interceptor_.push_back(interceptorItem);
@@ -58,7 +58,7 @@ int32_t OHOS::MMI::InterceptorManager::AddInterceptor(std::function<void(std::sh
     }
 
     InterceptorItem interceptorItem;
-    interceptorItem.id_ = ++this->InterceptorItemId;
+    interceptorItem.id_ = ++InterceptorItemId;
     interceptorItem.sourceType = SOURCETYPE_KEY;
     interceptorItem.callback_ = interceptor;
     interceptor_.push_back(interceptorItem);
