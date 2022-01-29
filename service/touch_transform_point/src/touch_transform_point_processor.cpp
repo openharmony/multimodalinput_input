@@ -20,7 +20,8 @@ namespace OHOS::MMI {
 namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "TouchTransformPointProcessor"};
 }
-TouchTransformPointProcessor::TouchTransformPointProcessor()
+
+TouchTransformPointProcessor::TouchTransformPointProcessor(int32_t deviceId) : deviceId_(deviceId)
 {
     pointerEvent_ = PointerEvent::Create();
 }
@@ -37,15 +38,14 @@ void TouchTransformPointProcessor::OnEventTouchDown(libinput_event *event)
     MMI_LOGD("Enter onEventTouchDown");
     CHKP(event, PARAM_INPUT_INVALID);
     auto data = libinput_event_get_touch_event(event);
+    auto time = libinput_event_touch_get_time(data);
     auto seatSlot = libinput_event_touch_get_seat_slot(data);
     auto pressure = libinput_event_get_touch_pressure(event);
-    int32_t id = 1;
     int32_t logicalY = -1;
     int32_t logicalX = -1;
     int32_t logicalDisplayId = -1;
     WinMgr->TpPointLogicDisplayPoint(data, logicalX, logicalY, logicalDisplayId);
     auto pointIds = pointerEvent_->GetPointersIdList();
-    auto time = libinput_event_touch_get_time(data);
     if (pointIds.size() == 0) {
         pointerEvent_->SetActionStartTime(time);
         pointerEvent_->SetTargetDisplayId(logicalDisplayId);
@@ -63,8 +63,8 @@ void TouchTransformPointProcessor::OnEventTouchDown(libinput_event *event)
     pointer.SetWidth(1);
     pointer.SetHeight(1);
     pointer.SetPressure(pressure);
-    pointer.SetDeviceId(id);
-    pointerEvent_->SetDeviceId(id);
+    pointer.SetDeviceId(deviceId_);
+    pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(pointer);
     pointerEvent_->SetPointerId(seatSlot);
     MMI_LOGD("logicalX:%{public}d, logicalY:%{public}d, logicalDisplayId:%{public}d",
@@ -91,8 +91,7 @@ void TouchTransformPointProcessor::OnEventTouchMotion(libinput_event *event)
     pointer.SetPressure(pressure);
     pointer.SetGlobalX(logicalX);
     pointer.SetGlobalY(logicalY);
-    pointerEvent_->RemovePointerItem(seatSlot);
-    pointerEvent_->AddPointerItem(pointer);
+    pointerEvent_->UpdatePointerItem(seatSlot, pointer);
     pointerEvent_->SetPointerId(seatSlot);
     MMI_LOGD("Leave onEventTouchMotion");
 }
@@ -110,9 +109,8 @@ void TouchTransformPointProcessor::OnEventTouchUp(libinput_event *event)
 
     PointerEvent::PointerItem pointer;
     pointerEvent_->GetPointerItem(seatSlot, pointer);
-    pointerEvent_->RemovePointerItem(seatSlot);
-    pointerEvent_->AddPointerItem(pointer);
     pointer.SetPressed(false);
+    pointerEvent_->UpdatePointerItem(seatSlot, pointer);
     pointerEvent_->SetPointerId(seatSlot);
     MMI_LOGD("Leave onEventTouchUp");
 }

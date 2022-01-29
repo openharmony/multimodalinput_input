@@ -35,6 +35,7 @@ public:
     virtual int32_t EpollCreat(int32_t size);
     virtual int32_t EpollCtl(int32_t fd, int32_t op, epoll_event& event, int32_t epollFd = -1);
     virtual int32_t EpollWait(epoll_event& events, int32_t maxevents, int32_t timeout, int32_t epollFd = -1);
+    virtual int32_t SetBlockMode(int32_t fd, bool isBlock = false); 
     virtual void EpollClose();
     virtual void Close();
 

@@ -30,10 +30,10 @@ public:
     void SetType(int32_t deviceType);
     int32_t GetType();
 private:
-    int32_t id;
-    std::string name;
-    int32_t deviceType;
-    std::vector<int32_t> deviceIdList;
+    int32_t id_;
+    std::string name_;
+    int32_t deviceType_;
+    std::vector<int32_t> deviceIdList_;
 };
 }
 }

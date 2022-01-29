@@ -31,7 +31,7 @@ struct MonitorItem {
     SessionPtr session;
     bool operator == (const struct MonitorItem& item)
     {
-        return this->eventType == item.eventType && this->session == item.session;
+        return eventType == item.eventType && session == item.session;
     }
 };
 
@@ -58,5 +58,5 @@ private:
 };
 }
 }
-#define IEMServiceManager OHOS::Singleton<OHOS::MMI::InputEventMonitorManager>::GetInstance()
+#define InputMonitorServiceMgr OHOS::Singleton<OHOS::MMI::InputEventMonitorManager>::GetInstance()
 #endif

@@ -72,7 +72,7 @@ void TouchEvent::Initialize(int32_t windowId, MultimodalEventPtr deviceEvent, in
     mMaxForce_ = maxForce;
     mTapCount_ = tapCount;
     mIsStandard_ = isStandard;
-    this->setMultimodalEvent(deviceEvent);
+    setMultimodalEvent(deviceEvent);
 }
 
 void TouchEvent::setMultimodalEvent(MultimodalEventPtr deviceEvent)
