@@ -53,24 +53,19 @@ const AppInfo& AppRegister::FindByWinId(int32_t windowId)
     if (it != mapSurface_.end()) {
         return it->second;
     }
-    return AppRegister::AppInfoError_;
+    return AppRegister::appInfoError_;
 }
 
 const AppInfo& AppRegister::FindBySocketFd(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    CHKR(fd >= 0, PARAM_INPUT_INVALID, AppInfoError_);
-    return FindAppInfoBySocketFd(fd);
-}
-
-const AppInfo& AppRegister::FindAppInfoBySocketFd(int32_t fd)
-{
+    CHKR(fd >= 0, PARAM_INPUT_INVALID, appInfoError_);
     for (auto iter = mapSurface_.begin(); iter != mapSurface_.end(); iter++) {
         if (iter->second.fd == fd) {
             return iter->second;
         }
     }
-    return AppRegister::AppInfoError_;
+    return AppRegister::appInfoError_;
 }
 
 void AppRegister::RegisterAppInfoforServer(const AppInfo& appInfo)
@@ -200,7 +195,7 @@ WaitQueueEvent AppRegister::GetWaitQueueEvent(int32_t fd, int32_t idMsg)
 bool AppRegister::CheckFindFdError(const int32_t findFd)
 {
     if (findFd < 0) {
-        MMI_LOGE(" IsMultimodeInputReady: Find fd error! errCode:%{public}d \n", FD_FIND_FAIL);
+        MMI_LOGE(" IsMultimodeInputReady: Find fd error! errCode:%{public}d ", FD_FIND_FAIL);
         return false;
     }
     return true;
@@ -245,7 +240,7 @@ void AppRegister::DeleteEventFromWaitQueue(int32_t fd, int32_t idMsg)
 
 bool AppRegister::OnAnrLocked(int32_t fd) const
 {
-    MMI_LOGE("Dispatch Timeout! The Application Not Responding !!! The fd is %{public}d. errCode:%{public}d \n",
+    MMI_LOGE("Dispatch Timeout! The Application Not Responding !!! The fd is %{public}d. errCode:%{public}d ",
              fd, APP_NOT_RESP);
     return true;
 }

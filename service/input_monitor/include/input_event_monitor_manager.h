@@ -58,5 +58,5 @@ private:
 };
 }
 }
-#define IEMServiceManager OHOS::Singleton<OHOS::MMI::InputEventMonitorManager>::GetInstance()
+#define InputMonitorServiceMgr OHOS::Singleton<OHOS::MMI::InputEventMonitorManager>::GetInstance()
 #endif

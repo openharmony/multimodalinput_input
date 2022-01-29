@@ -16,7 +16,7 @@
 #include "key_event_input_subscribe_manager.h"
 #include "bytrace.h"
 #include "define_multimodal.h"
-#include "multimodal_standardized_event_manager.h"
+#include "multimodal_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -95,10 +95,10 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<OHOS::M
         keyOption->GetFinalKeyDownDuration());
     int32_t keySubscibeId = subscribeInfo.GetSubscribeId();
     std::string keySubscribeIdstring = "SubscribeKeyEvent client subscribeKeyId: " + std::to_string(keySubscibeId);
-    MMI_LOGT(" SubscribeKeyEvent client trace subscribeKeyId = %{public}d\n", keySubscibeId);
+    MMI_LOGT(" SubscribeKeyEvent client trace subscribeKeyId = %{public}d", keySubscibeId);
     int32_t eventKey = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keySubscribeIdstring, eventKey);
-    if (RET_OK == EventManager.SubscribeKeyEvent(subscribeInfo)) {
+    if (RET_OK == MMIEventHdl.SubscribeKeyEvent(subscribeInfo)) {
         subscribeKeyEventInfoList_.push_back(subscribeInfo);
         return subscribeInfo.GetSubscribeId();
     }
@@ -120,7 +120,7 @@ int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
     auto it = subscribeKeyEventInfoList_.begin();
     for (; it != subscribeKeyEventInfoList_.end(); ++it) {
         if (it->GetSubscribeId() == subscribeId) {
-            if (RET_OK == EventManager.UnSubscribeKeyEvent(subscribeId)) {
+            if (RET_OK == MMIEventHdl.UnSubscribeKeyEvent(subscribeId)) {
                 subscribeKeyEventInfoList_.erase(it);
                 return RET_OK;
             }

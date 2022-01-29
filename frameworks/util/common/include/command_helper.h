@@ -25,10 +25,10 @@ namespace OHOS::MMI {
     public:
         CommandHelper(const std::string& command) : command_(command)
         {
-            SplitStr(command_, strSep, splitParameters_);
+            SplitStr(command_, strSep_, splitParameters_);
             for (auto& i : splitParameters_) {
                 std::string s = TrimStr(i, '\n');
-                MMI_LOGI("\n##%s##\n", s.c_str());
+                MMI_LOGI("##%s##", s.c_str());
             }
         }
         ~CommandHelper() = default;
@@ -49,7 +49,7 @@ namespace OHOS::MMI {
     private:
         std::string command_;
         std::vector<std::string> splitParameters_;
-        std::string strSep = " ";
+        std::string strSep_ = " ";
     };
 } // namespace OHOS::MMI
 

@@ -33,7 +33,7 @@ namespace OHOS {
  * @see KeyEvent
  * @since 1
  */
-class CompositeEvent : public MultimodalEvent {
+class CompositeEvent : public MMI::MultimodalEvent {
 public:
     virtual ~CompositeEvent();
 };

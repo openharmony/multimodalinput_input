@@ -17,29 +17,32 @@
 
 #include "proto.h"
 
-#define MAX_DEVICENAME 64
-#define MAX_UUIDSIZE 64
-#define MAX_SOLTED_COORDS_NUM 10
-#define SYSTEMUID 1000
-
+namespace OHOS {
+namespace MMI {
+namespace {
+    constexpr int MAX_DEVICENAME = 64;
+    constexpr int MAX_UUIDSIZE = 64;
+    constexpr int SYSTEMUID = 1000;
+    constexpr int MAX_SOLTED_COORDS_NUMS = 10;
+}
 enum SENIOR_DEVICE_TYPE {
     INPUT_DEVICE_AISENSOR = 31,
     INPUT_DEVICE_KNUCKLE = 41
 };
 
-enum HOS_DEVICE_TYPE {
-    HOS_UNKNOWN_DEVICE_TYPE = -1,
-    HOS_TOUCH_PANEL = 0,
-    HOS_KEYBOARD = 1,
-    HOS_MOUSE = 2,
-    HOS_STYLUS = 3,
-    HOS_BUILTIN_KEY = 4,
-    HOS_ROTATION = 5,
-    HOS_AI_SPEECH = 6,
-    HOS_JOYSTICK = 7,
-    HOS_TOUCHPAD = 8,
-    HOS_KNUCKLE = 9,
-    HOS_VIRTUAL_KEYBOARD = 10,
+enum DEVICE_TYPE {
+    DEVICE_TYPE_UNKNOWN = -1,
+    DEVICE_TYPE_TOUCH_PANEL = 0,
+    DEVICE_TYPE_KEYBOARD = 1,
+    DEVICE_TYPE_MOUSE = 2,
+    DEVICE_TYPE_STYLUS = 3,
+    DEVICE_TYPE_BUILTIN_KEY = 4,
+    DEVICE_TYPE_ROTATION = 5,
+    DEVICE_TYPE_AI_SPEECH = 6,
+    DEVICE_TYPE_JOYSTICK = 7,
+    DEVICE_TYPE_TOUCHPAD = 8,
+    DEVICE_TYPE_KNUCKLE = 9,
+    DEVICE_TYPE_VIRTUAL_KEYBOARD = 10,
 };
 
 enum BUTTON_STATE {
@@ -112,7 +115,7 @@ struct TagPackHead {
 #pragma pack()
 
 struct SeniorDeviceInfo {
-    char devicePhys[MAX_DEVICENAME];
+    char physical[MAX_DEVICENAME];
     enum SENIOR_DEVICE_TYPE seniorDeviceType;
 };
 
@@ -130,9 +133,9 @@ struct EventJoyStickAxisAbsInfo {
 
 struct EventJoyStickAxis {
     uint32_t deviceId;
-    char devicePhys[MAX_DEVICENAME];
+    char physical[MAX_DEVICENAME];
     char deviceName[MAX_DEVICENAME];
-    HOS_DEVICE_TYPE deviceType;
+    DEVICE_TYPE deviceType;
     int32_t eventType;
     char uuid[MAX_UUIDSIZE];
     uint64_t time;
@@ -188,8 +191,8 @@ struct RegisteredEvent {
     char uuid[MAX_UUIDSIZE];
     int32_t eventType;
     uint64_t occurredTime;
-    HOS_DEVICE_TYPE deviceType;
-    char devicePhys[MAX_DEVICENAME];
+    DEVICE_TYPE deviceType;
+    char physical[MAX_DEVICENAME];
 };
 
 struct StandardTouchStruct {
@@ -207,9 +210,9 @@ struct StandardTouchStruct {
 
 struct EventKeyboard {
     uint32_t deviceId;
-    char devicePhys[MAX_DEVICENAME];
+    char physical[MAX_DEVICENAME];
     char deviceName[MAX_DEVICENAME];
-    HOS_DEVICE_TYPE deviceType;
+    DEVICE_TYPE deviceType;
     int32_t eventType;
     char uuid[MAX_UUIDSIZE];
     uint64_t time;
@@ -222,9 +225,9 @@ struct EventKeyboard {
 
 struct EventPointer {
     uint32_t deviceId;
-    char devicePhys[MAX_DEVICENAME];
+    char physical[MAX_DEVICENAME];
     char deviceName[MAX_DEVICENAME];
-    HOS_DEVICE_TYPE deviceType;
+    DEVICE_TYPE deviceType;
     int32_t eventType;
     char uuid[MAX_UUIDSIZE];
     uint64_t time;
@@ -264,9 +267,9 @@ struct TabletTool {
 
 struct EventTabletTool {
     uint32_t deviceId;
-    char devicePhys[MAX_DEVICENAME];
+    char physical[MAX_DEVICENAME];
     char deviceName[MAX_DEVICENAME];
-    HOS_DEVICE_TYPE deviceType;
+    DEVICE_TYPE deviceType;
     int32_t eventType;
     char uuid[MAX_UUIDSIZE];
     uint32_t button;
@@ -281,7 +284,7 @@ struct EventTabletTool {
 
 struct EventTouch {
     uint32_t deviceId;
-    char devicePhys[MAX_DEVICENAME];
+    char physical[MAX_DEVICENAME];
     char deviceName[MAX_DEVICENAME];
     char uuid[MAX_UUIDSIZE];
     int32_t eventType;
@@ -289,7 +292,7 @@ struct EventTouch {
     int32_t slot;
     int32_t seatSlot;
     struct DeviceCoords point;
-    HOS_DEVICE_TYPE deviceType;
+    DEVICE_TYPE deviceType;
     double pressure;
     double area;
 };
@@ -301,15 +304,15 @@ struct SlotedCoords {
 };
 
 struct SlotedCoordsInfo {
-    struct SlotedCoords coords[MAX_SOLTED_COORDS_NUM];
+    struct SlotedCoords coords[MAX_SOLTED_COORDS_NUMS];
     uint32_t activeCount;
 };
 
 struct EventGesture {
     uint32_t deviceId;
-    char devicePhys[MAX_DEVICENAME];
+    char physical[MAX_DEVICENAME];
     char deviceName[MAX_DEVICENAME];
-    HOS_DEVICE_TYPE deviceType;
+    DEVICE_TYPE deviceType;
     int32_t eventType;
     char uuid[MAX_UUIDSIZE];
     uint64_t time;
@@ -351,18 +354,18 @@ struct VirtualKey {
 
 struct DeviceManage {
     uint32_t deviceId;
-    char devicePhys[MAX_DEVICENAME];
+    char physical[MAX_DEVICENAME];
     char deviceName[MAX_DEVICENAME];
-    HOS_DEVICE_TYPE deviceType;
+    DEVICE_TYPE deviceType;
     int32_t eventType;
     char uuid[MAX_UUIDSIZE];
 };
 
 struct EventTabletPad {
     uint32_t deviceId;
-    char devicePhys[MAX_DEVICENAME];
+    char physical[MAX_DEVICENAME];
     char deviceName[MAX_DEVICENAME];
-    HOS_DEVICE_TYPE deviceType;
+    DEVICE_TYPE deviceType;
     int32_t eventType;
     char uuid[MAX_UUIDSIZE];
     uint64_t time;
@@ -386,5 +389,7 @@ struct EventTabletPad {
         int number;
     } strip;
 };
+}
+}
 
 #endif

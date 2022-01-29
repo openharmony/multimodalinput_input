@@ -183,7 +183,7 @@ public:
                     const MmiPoint& mmiPoint, float xOffset, float yOffset, float cursorDelta, float scrollingDelta,
                     int32_t highLevelEvent, const std::string& uuid, int32_t sourceType, int32_t occurredTime,
                     const std::string& deviceId, int32_t inputDeviceId,  bool isHighLevelEvent,
-                    uint16_t deviceUdevTags, const EventJoyStickAxis& eventJoyStickInfo);
+                    uint16_t deviceUdevTags, const MMI::EventJoyStickAxis& eventJoyStickInfo);
     /**
     * initialize the object.
     *

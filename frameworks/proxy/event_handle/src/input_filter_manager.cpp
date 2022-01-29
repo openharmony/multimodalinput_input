@@ -39,10 +39,10 @@ int32_t InputFilterManager::FilterKeyEvent(std::string name, Authority authority
     }
     KeyEventFilter keyEventFilter(name, authority, handler);
     keyEventFilterList_.push_back(keyEventFilter);
-    if (authority > HighestAuthority_) {
+    if (authority > highestAuthority_) {
         MMI_LOGD("add filter is  the highest Authority");
-        HighestId_ = keyEventFilter.GetId();
-        HighestAuthority_ = authority;
+        highestId_ = keyEventFilter.GetId();
+        highestAuthority_ = authority;
         MMIEventHdl.AddKeyEventFIlter(keyEventFilter.GetId(), name, authority);
     }
     return RET_OK;
@@ -58,10 +58,10 @@ int32_t InputFilterManager::UnFilterKeyEvent(int32_t id)
     for (auto it = keyEventFilterList_.begin(); it != keyEventFilterList_.end(); it++) {
         if (it->GetId() == id) {
             keyEventFilterList_.erase(it);
-            if (id == HighestId_) {
+            if (id == highestId_) {
                 MMIEventHdl.RemoveKeyEventFIlter(id);
-                HighestAuthority_ = NO_AUTHORITY;
-                HighestId_ = 0;
+                highestAuthority_ = NO_AUTHORITY;
+                highestId_ = 0;
                 break;
             }
             MMI_LOGD("remove filter isn't  the highest Authority");
@@ -78,13 +78,13 @@ int32_t InputFilterManager::UnFilterKeyEvent(int32_t id)
     }
     auto item = keyEventFilterList_.begin();
     for (auto it = keyEventFilterList_.begin(); it != keyEventFilterList_.end(); it++) {
-        if (it->GetAuthority() > HighestAuthority_) {
-            HighestAuthority_ = it->GetAuthority();
-            HighestId_ = it->GetId();
+        if (it->GetAuthority() > highestAuthority_) {
+            highestAuthority_ = it->GetAuthority();
+            highestId_ = it->GetId();
             item = it;
         }
     }
-    if (HighestId_ != 0) {
+    if (highestId_ != 0) {
         MMI_LOGD("after remove the highest filter, add a next highest filter ");
         MMIEventHdl.AddKeyEventFIlter(item->GetId(), item->GetName(), item->GetAuthority());
     }
@@ -126,7 +126,7 @@ void InputFilterManager::OnkeyEventTrace(const KeyBoardEvent& event)
 {
     std::string keyEvent = "InputFilter OnKey keyUuid: " + event.GetUuid();
     char *tmpKey = (char*)keyEvent.c_str();
-    MMI_LOGT(" OnKey keyUuid = %{public}s\n", tmpKey);
+    MMI_LOGT(" OnKey keyUuid = %{public}s", tmpKey);
     int32_t eventKey = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 }
@@ -273,7 +273,7 @@ void InputFilterManager::OnTouchEventTrace(const TouchEvent& event)
 {
     std::string touchEvent = "InputFilter OnTouch touchUuid: " + event.GetUuid();
     char *tmpTouch = (char*)touchEvent.c_str();
-    MMI_LOGT(" OnTouchEvent touchUuid = %{public}s\n", tmpTouch);
+    MMI_LOGT(" OnTouchEvent touchUuid = %{public}s", tmpTouch);
     int32_t eventTouch = 9;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
 }
@@ -395,7 +395,7 @@ void InputFilterManager::OnPointerEventTrace(const MouseEvent& event)
 {
     std::string pointerEvent = "InputFilter OnPointer pointerUuid: " + event.GetUuid();
     char *tmpPointer = (char*)pointerEvent.c_str();
-    MMI_LOGT(" OnPointerEvent pointerUuid = %{public}s\n", tmpPointer);
+    MMI_LOGT(" OnPointerEvent pointerUuid = %{public}s", tmpPointer);
     int32_t eventPointer = 17;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
 }
