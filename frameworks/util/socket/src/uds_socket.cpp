@@ -17,10 +17,11 @@
 #include <inttypes.h>
 #include "log.h"
 
-namespace OHOS::MMI {
-namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSocket" };
-}
+namespace OHOS {
+namespace MMI {
+    namespace {
+        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSocket" };
+    }
 
 UDSSocket::UDSSocket()
 {
@@ -71,6 +72,30 @@ int32_t UDSSocket::EpollWait(epoll_event& events, int32_t maxevents, int32_t tim
         MMI_LOGE("UDSSocket::EpollWait epoll_wait retrun %{public}d", ret);
     }
     return ret;
+}
+
+int32_t UDSSocket::SetBlockMode(int32_t fd, bool isBlock)
+{
+    CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    int32_t flags = fcntl(fd, F_GETFL);
+    if (flags < 0) {
+        MMI_LOGE("fcntl F_GETFL fail. fd:%{public}d,flags:%{public}d,msg:%{public}s,errCode:%{public}d", 
+            fd, flags, strerror(errno), FCNTL_FAIL);
+        return flags;
+    }
+    MMI_LOGT("F_GETFL fd:%{public}d, flags:%{public}d", fd, flags);
+    flags |= O_NONBLOCK; // 非阻塞模式
+    if (isBlock) {
+        flags &= ~O_NONBLOCK; // 阻塞模式
+    }
+    flags = fcntl(fd, F_SETFL, flags);
+    if (flags < 0) {
+        MMI_LOGE("fcntl F_SETFL fail. fd:%{public}d,flags:%{public}d,msg:%{public}s,errCode:%{public}d", 
+            fd, flags, strerror(errno), FCNTL_FAIL);
+        return flags;
+    }
+    MMI_LOGT("F_SETFL fd:%{public}d, flags:%{public}d", fd, flags);
+    return flags;
 }
 
 void UDSSocket::EpollClose()
@@ -160,5 +185,6 @@ void UDSSocket::Close()
         }
     }
     fd_ = -1;
+}
 }
 }
