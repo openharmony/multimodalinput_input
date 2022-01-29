@@ -129,7 +129,7 @@ bool StreamBuffer::Read(T &data)
 {
     if (!Read(reinterpret_cast<char *>(&data), sizeof(data))) {
         MMI_LOGE("[%{public}s] size:%{public}d count:%{public}d,errCode:%{public}d",
-            GetErrorStatusRemark().c_str(), sizeof(data), rCount_+1, STREAM_BUF_READ_FAIL);
+            GetErrorStatusRemark().c_str(), static_cast<int32_t>(sizeof(data)), rCount_+1, STREAM_BUF_READ_FAIL);
         return false;
     }
     return true;
@@ -140,7 +140,7 @@ bool StreamBuffer::Write(const T &data)
 {
     if (!Write(reinterpret_cast<char *>(const_cast<T *>(&data)), sizeof(data))) {
         MMI_LOGE("[%{public}s] size:%{public}d,count:%{public}d,errCode:%{public}d", 
-            GetErrorStatusRemark().c_str(), sizeof(data), wCount_+1, STREAM_BUF_WRITE_FAIL);
+            GetErrorStatusRemark().c_str(), static_cast<int32_t>(sizeof(data)), wCount_+1, STREAM_BUF_WRITE_FAIL);
         return false;
     }
     return true;
