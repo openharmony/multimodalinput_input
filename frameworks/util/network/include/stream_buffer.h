@@ -26,21 +26,6 @@
 
 namespace OHOS {
 namespace MMI {
-template<typename T>
-std::string GetTypeName()
-{
-    int32_t status = 0;
-    std::string tName = typeid(T).name();
-    auto demName = abi::__cxa_demangle(tName.c_str(), nullptr, nullptr, &status);
-    if (status == 0) {
-        tName = demName;
-        std::free(demName);
-    }
-    return std::move(tName);
-}
-#define TNAME(e) GetTypeName<decltype(e)>().c_str()
-#define VNAME(name) (#name)
-
 class StreamBuffer {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "StreamBuffer"};
 public:
@@ -80,7 +65,7 @@ public:
     size_t UnreadSize() const;
 
     bool ChkError() const;
-    std::string GetErrorStatusRemark() const;
+    const std::string& GetErrorStatusRemark() const;
 
     /*
     * Method:    Data
@@ -90,9 +75,6 @@ public:
     * Qualifier: const buf pointer
     */
     const char *Data() const;
-
-    template<typename T>
-    bool IsInvalidType(const T& val) const;
 
     template<typename T>
     bool Read(T& data);
@@ -143,34 +125,11 @@ protected:
 };
 
 template<typename T>
-bool StreamBuffer::IsInvalidType(const T& val) const
-{
-    static const std::vector<std::string> keys = {
-        "*", "std::vector", "std::set", "std::map", "std::list",
-        "std::queue", "std::deque", "std::stack", "std::unordered_map", 
-        "std::unordered_set", "std::heap", "std::multiset", "std::multimap"
-    };
-    std::string typeName = TNAME(val);
-    for (const auto& it : keys) {
-        if (typeName.find(it) != std::string::npos) {
-            return true;
-        }
-    }
-    return false;
-}
-
-template<typename T>
 bool StreamBuffer::Read(T &data)
 {
-    if (IsInvalidType(data)) {
-        rwErrorStatus_ = ErrorStatus::ES_READ;
-        MMI_LOGE("[%{public}s] Invalid type.type:%{public}s,size:%{public}d,count:%{public}d,errCode:%{public}d",
-            GetErrorStartRemark().c_str(), TNAME(data), sizeof(data), wCount_, INVALID_STREAM_BUFFER_DATA_TYPE);
-        return false;
-    }
     if (!Read(reinterpret_cast<char *>(&data), sizeof(data))) {
-        MMI_LOGE("[%{public}s] type:%{public}s size:%{public}d count:%{public}d,errCode:%{public}d",
-            GetErrorStartRemark().c_str(), TNAME(data), sizeof(data), rCount_+1, STREAM_BUF_READ_FAIL);
+        MMI_LOGE("[%{public}s] size:%{public}d count:%{public}d,errCode:%{public}d",
+            GetErrorStatusRemark().c_str(), sizeof(data), rCount_+1, STREAM_BUF_READ_FAIL);
         return false;
     }
     return true;
@@ -179,15 +138,9 @@ bool StreamBuffer::Read(T &data)
 template<typename T>
 bool StreamBuffer::Write(const T &data)
 {
-    if (IsInvalidType(data)) {
-        rwErrorStatus_ = ErrorStatus::ES_WRITE;
-        MMI_LOGE("[%{public}s] Invalid type. type:%{public}s size:%{public}d count:%{public}d,errCode:%{public}d", 
-            GetErrorStartRemark().c_str(), TNAME(data), sizeof(data), wCount_, INVALID_STREAM_BUFFER_DATA_TYPE);
-        return false;
-    }
     if (!Write(reinterpret_cast<char *>(const_cast<T *>(&data)), sizeof(data))) {
-        MMI_LOGE("[%{public}s] type:%{public}s,size:%{public}d,count:%{public}d,errCode:%{public}d", 
-            GetErrorStartRemark().c_str(), TNAME(data), sizeof(data), wCount_+1, STREAM_BUF_WRITE_FAIL);
+        MMI_LOGE("[%{public}s] size:%{public}d,count:%{public}d,errCode:%{public}d", 
+            GetErrorStatusRemark().c_str(), sizeof(data), wCount_+1, STREAM_BUF_WRITE_FAIL);
         return false;
     }
     return true;

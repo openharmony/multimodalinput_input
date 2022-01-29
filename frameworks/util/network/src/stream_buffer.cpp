@@ -18,10 +18,6 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "StreamBuffer" };
-}
-
 StreamBuffer::StreamBuffer(const StreamBuffer &buf)
 {
     Clone(buf);
@@ -94,7 +90,7 @@ bool StreamBuffer::Read(char *buf, size_t size)
     }
     if (rIdx_ + size > wIdx_) {
         MMI_LOGE("Memory out of bounds on read... errCode:%{public}d", MEM_OUT_OF_BOUNDS);
-        rwError = ErrorStatus::ES_READ;
+        rwErrorStatus_ = ErrorStatus::ES_READ;
         return false;
     }
     if (EOK != memcpy_sp(buf, size, ReadBuf(), size)) {
@@ -161,21 +157,19 @@ bool StreamBuffer::ChkError() const
     return (rwErrorStatus_ != ErrorStatus::ES_OK);
 }
 
-std::string StreamBuffer::GetErrorStartRemark() const
+const std::string& StreamBuffer::GetErrorStatusRemark() const
 {
     static const std::vector<std::pair<ErrorStatus, std::string>> remark {
         {ErrorStatus::ES_OK, "OK"},
         {ErrorStatus::ES_READ, "READ_ERROR"},
         {ErrorStatus::ES_WRITE, "WRITE_ERROR"},
     };
-    std::string str = "UNKNOWN";
     for (const auto& it : remark) {
         if ( it.first == rwErrorStatus_) {
-            str = it.second;
-            break;
+            return it.second;
         }
     }
-    return std::move(str);
+    return "UNKNOWN";
 }
 
 const char *StreamBuffer::Data() const
