@@ -40,32 +40,32 @@ namespace {
     void FillEventSlotedCoordsInfo(SlotedCoordsInfo& l, const sloted_coords_info& r)
     {
         l.activeCount = r.active_count;
-        for (int i = 0; i < MAX_SOLTED_COORDS_NUM; i++) {
+        for (int i = 0; i < MAX_SOLTED_COORDS_NUMS; i++) {
             l.coords[i].isActive = r.coords[i].is_active;
             l.coords[i].x = r.coords[i].x;
             l.coords[i].y = r.coords[i].y;
         }
     }
 
-    HOS_DEVICE_TYPE GetDeviceType(struct libinput_device* device)
+    DEVICE_TYPE GetDeviceType(struct libinput_device* device)
     {
-        CHKPR(device, ERROR_NULL_POINTER, HOS_UNKNOWN_DEVICE_TYPE);
+        CHKPR(device, ERROR_NULL_POINTER, DEVICE_TYPE_UNKNOWN);
         enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
         if (udevTags & EVDEV_UDEV_TAG_JOYSTICK) {
-            return HOS_JOYSTICK;
+            return DEVICE_TYPE_JOYSTICK;
         } else if (udevTags & EVDEV_UDEV_TAG_KEYBOARD) {
-            return HOS_KEYBOARD;
+            return DEVICE_TYPE_KEYBOARD;
         } else if (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK)) {
-            return HOS_MOUSE;
+            return DEVICE_TYPE_MOUSE;
         } else if (udevTags & EVDEV_UDEV_TAG_TOUCHSCREEN) {
-            return HOS_TOUCH_PANEL;
+            return DEVICE_TYPE_TOUCH_PANEL;
         } else if (udevTags & (EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) {
-            return HOS_TOUCHPAD;
+            return DEVICE_TYPE_TOUCHPAD;
         } else if (udevTags & EVDEV_UDEV_TAG_TABLET) {
-            return HOS_STYLUS;
+            return DEVICE_TYPE_STYLUS;
         } else {
             MMI_LOGW("Unknown device type");
-            return HOS_UNKNOWN_DEVICE_TYPE;
+            return DEVICE_TYPE_UNKNOWN;
         }
     }
 }
@@ -95,32 +95,33 @@ int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& d
     ret = memcpy_s(data.uuid, MAX_UUIDSIZE, uuid.c_str(), uuid.size());
     CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
 #ifdef OHOS_BUILD_HDF
-    ret = memcpy_s(data.devicePhys, MAX_DEVICENAME, data.deviceName, MAX_DEVICENAME);
+    ret = memcpy_s(data.physical, MAX_DEVICENAME, data.deviceName, MAX_DEVICENAME);
     CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
 #else
     const char* physWhole = libinput_device_get_phys(device);
     if (physWhole == nullptr) {
-        ret = memcpy_s(data.devicePhys, sizeof(data.devicePhys), data.deviceName,
+        ret = memcpy_s(data.physical, sizeof(data.physical), data.deviceName,
                        sizeof(data.deviceName));
         CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
     } else {
         std::string s(physWhole);
         std::string phys = s.substr(0, s.rfind('/'));
         CHKR(!phys.empty(), ERROR_NULL_POINTER, RET_ERR);
-        ret = memcpy_s(data.devicePhys, sizeof(data.devicePhys), phys.c_str(), MAX_DEVICENAME);
+        ret = memcpy_s(data.physical, sizeof(data.physical), phys.c_str(), MAX_DEVICENAME);
         CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
     }
 #endif
-    std::string devicePhys(data.devicePhys);
+    std::string physical(data.physical);
     if (type == LIBINPUT_EVENT_DEVICE_REMOVED) {
-        DevRegister->DeleteDeviceInfo(devicePhys);
+        DevRegister->DeleteDeviceInfo(physical);
+        MMI_LOGI("The libinput event device is removed, EventType:%{public}d", type);
         return RET_OK;
     }
     uint32_t deviceId;
-    if (DevRegister->FindDeviceIdByDevicePhys(devicePhys, deviceId)) {
+    if (DevRegister->FindDeviceId(physical, deviceId)) {
         data.deviceId = deviceId;
     } else {
-        deviceId = DevRegister->AddDeviceInfo(devicePhys);
+        deviceId = DevRegister->AddDeviceInfo(physical);
         CHKR(deviceId, ADD_DEVICE_INFO_CALL_FAIL, RET_ERR);
         data.deviceId = deviceId;
     }
@@ -425,7 +426,8 @@ int32_t EventPackage::PackagePointerEventByAxis(libinput_event *event, EventPoin
     CHKR(data, ERROR_NULL_POINTER, RET_ERR);
 
     point.time = libinput_event_pointer_get_time_usec(data);
-    switch (libinput_event_pointer_get_axis_source(data)) {
+    auto axisSource = libinput_event_pointer_get_axis_source(data);
+    switch (axisSource) {
         case LIBINPUT_POINTER_AXIS_SOURCE_WHEEL: {
             point.source = POINTER_AXIS_SOURCE_WHEEL;
             break;
@@ -443,6 +445,8 @@ int32_t EventPackage::PackagePointerEventByAxis(libinput_event *event, EventPoin
             break;
         }
         default: {
+            MMI_LOGW("Unknown event source of pointer, PointerAxisSource:%{puiblic}d",
+                     axisSource);
             break;
         }
     }
@@ -536,6 +540,7 @@ void EventPackage::PackageTouchEventByType(int32_t type, struct libinput_event_t
             break;
         }
         default: {
+            MMI_LOGW("Unknown event type of touch, touchType:%{public}d", type);
             break;
         }
     }
@@ -552,7 +557,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
     }
     auto ret = PackageEventDeviceInfo<EventTouch>(event, touch);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOGE("Device param package failed, ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     auto data = libinput_event_get_touch_event(event);
@@ -577,7 +582,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
 #ifdef OHOS_WESTEN_MODEL
-            MMIRegEvent->GetTouchInfoByTouchId(std::make_pair(touch.deviceId, touch.seatSlot), touch);
+            MMIRegEvent->GetTouchInfo(std::make_pair(touch.deviceId, touch.seatSlot), touch);
 #endif
             touch.time = libinput_event_touch_get_time_usec(data);
             touch.eventType = LIBINPUT_EVENT_TOUCH_UP;
@@ -630,7 +635,7 @@ int32_t EventPackage::PackagePointerEvent(libinput_event *event, EventPointer& p
         }
         default: {
             ret = RET_ERR;
-            MMI_LOGE("Unknown event_type of pointer class has been reported");
+            MMI_LOGW("Unknown event type of pointer, PointerEventType:%{public}d", type);
             break;
         }
     }
@@ -644,7 +649,7 @@ int32_t EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& g
     CHKR(data, ERROR_NULL_POINTER, RET_ERR);
     auto ret = PackageEventDeviceInfo<EventGesture>(event, gesture);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOGE("Device param package failed, ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     gesture.time = libinput_event_gesture_get_time_usec(data);
@@ -670,6 +675,7 @@ int32_t EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& g
         }
         /* Third, it refers to the use of requirements, and the code is reserved */
         case LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE: {
+            MMI_LOGI("Three finger slide event update");
             gesture.delta.x = libinput_event_gesture_get_dx(data);
             gesture.delta.y = libinput_event_gesture_get_dy(data);
             gesture.deltaUnaccel.x = libinput_event_gesture_get_dx_unaccelerated(data);
@@ -681,6 +687,7 @@ int32_t EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& g
         }
         /* Third, it refers to the use of requirements, and the code is reserved */
         case LIBINPUT_EVENT_GESTURE_SWIPE_END: {
+            MMI_LOGI("Three finger slide event end");
             gesture.cancelled = libinput_event_gesture_get_cancelled(data);
             break;
         }
@@ -796,7 +803,7 @@ int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& k
     key.isIntercepted = event.isIntercepted;
     key.state = (enum KEY_STATE)event.isPressed;
     key.eventType = LIBINPUT_EVENT_KEYBOARD_KEY;
-    key.deviceType = HOS_VIRTUAL_KEYBOARD;
+    key.deviceType = DEVICE_TYPE_VIRTUAL_KEYBOARD;
     key.unicode = 0;
     if (event.isPressed) {
         key.seat_key_count = SEAT_KEY_COUNT_ONE;
@@ -817,20 +824,29 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
         (KeyEvent::KEY_ACTION_DOWN) : (KeyEvent::KEY_ACTION_UP);
     int32_t deviceId = static_cast<int32_t>(key.deviceId);
     int32_t actionStartTime = static_cast<int32_t>(key.time);
+    auto preAction = keyEventPtr->GetAction();
+    if (preAction == KeyEvent::KEY_ACTION_UP) {
+        auto preUpKeyItem = keyEventPtr->GetKeyItem();
+        if (preUpKeyItem != nullptr) {
+            keyEventPtr->RemoveReleasedKeyItems(*preUpKeyItem);
+        } else {
+            MMI_LOGE("preUpKeyItem is null");
+        }
+    }
 
-    keyEventPtr->SetActionTime(actionTime);
+    keyEventPtr->SetActionTime(actionStartTime);
     keyEventPtr->SetAction(keyAction);
-    keyEventPtr->SetActionStartTime(actionStartTime);
     keyEventPtr->SetDeviceId(deviceId);
 
     keyEventPtr->SetKeyCode(keyCode);
     keyEventPtr->SetKeyAction(keyAction);
 
-    bool isKeyPressed = (key.state == KEY_STATE_PRESSED) ? (true) : (false);
-    if (isKeyPressed) {
-        int32_t keyDownTime = actionStartTime;
-        keyItem.SetDownTime(keyDownTime);
+    if (keyEventPtr->GetPressedKeys().empty()) {
+        keyEventPtr->SetActionStartTime(actionStartTime);
     }
+
+    bool isKeyPressed = (key.state == KEY_STATE_PRESSED) ? (true) : (false);
+    keyItem.SetDownTime(actionStartTime);
     keyItem.SetKeyCode(keyCode);
     keyItem.SetDeviceId(deviceId);
     keyItem.SetPressed(isKeyPressed);
@@ -838,7 +854,14 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         keyEventPtr->AddPressedKeyItems(keyItem);
     } else if (keyAction == KeyEvent::KEY_ACTION_UP) {
+        auto pressedKeyItem = keyEventPtr->GetKeyItem(keyCode);
+        if (pressedKeyItem != nullptr) {
+            keyItem.SetDownTime(pressedKeyItem->GetDownTime());
+        } else {
+            MMI_LOGE("find pressed key failed, keyCode: %{public}d", keyCode);
+        }
         keyEventPtr->RemoveReleasedKeyItems(keyItem);
+        keyEventPtr->AddPressedKeyItems(keyItem);
     } else {
         // nothing to do.
     }
@@ -863,13 +886,13 @@ std::shared_ptr<PointerEvent> EventPackage::LibinputEventToPointerEvent(libinput
     pointerEvent->AddPointerItem(pointer);
     std::vector<uint32_t> pressedButtons;
     MouseState->GetPressedButtons(pressedButtons);
-    
+
     if (!pressedButtons.empty()) {
         for (auto it = pressedButtons.begin(); it != pressedButtons.end(); it++) {
             pointerEvent->SetButtonPressed(*it);
         }
     }
-    
+
     switch (type) {
         case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN: {
             pointerEventType = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
@@ -886,6 +909,7 @@ std::shared_ptr<PointerEvent> EventPackage::LibinputEventToPointerEvent(libinput
             break;
         }
         default: {
+            MMI_LOGW("Unknown event type of gesture, gestureType:%{public}d", type);
             break;
         }
     }

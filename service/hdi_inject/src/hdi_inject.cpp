@@ -138,7 +138,7 @@ void HdiInject::OnInitHdiServerStatus()
 void HdiInject::ShowAllDeviceInfo()
 {
     for (auto item : deviceArray_) {
-        MMI_LOGI("deviceName = %{public}s, devIndex = %{public}d, status = %{public}d, devType = %{public}d\n",
+        MMI_LOGI("deviceName = %{public}s, devIndex = %{public}d, status = %{public}d, devType = %{public}d",
             item.chipName, item.devIndex, item.status, item.devType);
     }
 }

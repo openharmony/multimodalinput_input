@@ -20,6 +20,7 @@
 namespace {
 using namespace testing::ext;
 using namespace OHOS;
+using namespace OHOS::MMI;
 
 class TouchEventTest : public testing::Test {
 public:

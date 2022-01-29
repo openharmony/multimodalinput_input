@@ -31,7 +31,7 @@ int32_t main(int32_t argc, const char* argv[])
     do {
         OHOS::MMI::SetThreadName("main");
         if (argc < OHOS::MMI::ARGV_VALID) {
-            MMI_LOGI("Invaild Input Para, Plase Check the validity of the para! errCode:%d\n", OHOS::PARAM_INPUT_FAIL);
+            MMI_LOGI("Invaild Input Para, Plase Check the validity of the para! errCode:%d", OHOS::PARAM_INPUT_FAIL);
             break;
         }
         std::vector<std::string> argvs;
@@ -41,7 +41,7 @@ int32_t main(int32_t argc, const char* argv[])
         OHOS::MMI::InjectionEventDispatch injection;
         injection.Init();
         if (!(injection.VirifyArgvs(argc, argvs))) {
-            MMI_LOGI("Invaild Input Para, Plase Check the validity of the para! errCode:%d\n", OHOS::PARAM_INPUT_FAIL);
+            MMI_LOGI("Invaild Input Para, Plase Check the validity of the para! errCode:%d", OHOS::PARAM_INPUT_FAIL);
             break;
         }
         injection.Run();

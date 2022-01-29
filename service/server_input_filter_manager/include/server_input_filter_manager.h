@@ -43,7 +43,7 @@ public:
         Authority authority_;
     };
     void OnKeyEventTrace(const EventKeyboard& key);
-    bool OnKeyEvent(EventKeyboard key);
+    bool OnKeyEvent(const EventKeyboard& key);
     int32_t AddKeyEventFilter(SessionPtr sess, std::string name, int32_t id, Authority authority);
     int32_t RemoveKeyEventFilter(SessionPtr sess, int32_t id);
     void DeleteFilterFromSess(SessionPtr sess);
@@ -66,8 +66,7 @@ public:
         Authority authority_;
     };
     void OnTouchEventTrace(const EventTouch& touch);
-    bool OnTouchEvent(libinput_event *event, EventTouch& touch,
-        const uint64_t preHandlerTime);
+    bool OnTouchEvent(libinput_event *event, EventTouch& touch, const uint64_t preHandlerTime);
     int32_t AddTouchEventFilter(SessionPtr sess, std::string name, int32_t id, Authority authority);
     int32_t RemoveTouchEventFilter(SessionPtr sess, int32_t id);
     int32_t RemoveTouchEventFilter(SessionPtr sess);

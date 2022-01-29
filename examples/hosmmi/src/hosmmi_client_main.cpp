@@ -298,9 +298,9 @@ public:
     }
     ~MMIClientDemo()
     {
-        MMI_LOGI("in %s enter.\n", __func__);
+        MMI_LOGI("in %s enter", __func__);
         UnregisterStandardizedEventHandle();
-        MMI_LOGI("in %s leave.\n", __func__);
+        MMI_LOGI("in %s leave", __func__);
     }
 
     void RegisterStandardizedEventHandle()
@@ -374,7 +374,7 @@ void RunClient()
 
 void ClientStopHandler(int signalNo)
 {
-    MMI_LOGI("client will exit! %d\n", signalNo);
+    MMI_LOGI("client will exit! %d", signalNo);
     g_clientExit = true;
 }
 }

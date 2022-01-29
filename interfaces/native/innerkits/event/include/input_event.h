@@ -49,7 +49,7 @@ public:
     static std::shared_ptr<InputEvent> Create();
 
 public:
-    void Init();
+    void Reset();
     /*
      * Get or set the unique identifier of the input event,
      * which is globally unique after being processed by the input service
