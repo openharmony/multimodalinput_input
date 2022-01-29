@@ -181,6 +181,7 @@ public:
     std::set<int32_t> GetPressedButtons() const;
     bool IsButtonPressed(int buttonId) const;
     void SetButtonPressed(int buttonId);
+    void DeleteReleaseButton(int buttonId);
 
     // Get all Pointers in the current pointer event
     std::vector<int32_t> GetPointersIdList() const;
