@@ -14,7 +14,6 @@
  */
 #ifndef OHOS_SERVER_MSG_HANDLER_H
 #define OHOS_SERVER_MSG_HANDLER_H
-#include "key_event_input_subscribe_filter.h"
 #include "msg_handler.h"
 #include "event_dispatch.h"
 #include "senior_input_func_proc_base.h"
