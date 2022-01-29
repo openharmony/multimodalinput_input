@@ -862,16 +862,16 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
         for (auto it : logicalDisplayInfo.windowsInfo_) {
             if (IsTouchWindow(globalX, globalY, it)) {
                 focusWindow = &it;
-                if (focusWindow == nullptr) {
-                    MMI_LOGE("Find foucusWindow failed");
-                    return RET_ERR;
-                }
                 firstBtnDownWindow_ = focusWindow;
                 break;
             }
         }     
     } else {
         focusWindow = firstBtnDownWindow_;
+    }
+    if (focusWindow == nullptr) {
+        MMI_LOGE("Find foucusWindow failed");
+        return RET_ERR;
     }
     pointerEvent->SetTargetWindowId(focusWindow->id);
     pointerEvent->SetAgentWindowId(focusWindow->agentWindowId);
