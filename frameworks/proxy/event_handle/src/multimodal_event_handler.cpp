@@ -182,23 +182,6 @@ int32_t MultimodalEventHandler::GetDevice(int32_t taskId, int32_t deviceId)
     return EventManager.GetDevice(taskId, deviceId);
 }
 
-int32_t MultimodalEventHandler::SubscribeKeyEvent(
-    const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
-{
-    if (!InitClient()) {
-        return MMI_SERVICE_INVALID;
-    }
-    return EventManager.SubscribeKeyEvent(subscribeInfo);
-}
-
-int32_t MultimodalEventHandler::UnSubscribeKeyEvent(int32_t subscribeId)
-{
-    if (!InitClient()) {
-        return MMI_SERVICE_INVALID;
-    }
-    return EventManager.UnSubscribeKeyEvent(subscribeId);
-}
-
 int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (!InitClient()) {
