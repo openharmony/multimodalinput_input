@@ -856,27 +856,22 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     DrawWgr->DrawPointer(displayId, globalX, globalY);
 
     WindowInfo *focusWindow = nullptr;
-    for (auto it : logicalDisplayInfo.windowsInfo_) {
-        if (IsTouchWindow(globalX, globalY, it)) {
-            focusWindow = &it;
-            break;
-        }
-    }
-    if (focusWindow == nullptr) {
-        MMI_LOGE("Find foucusWindow failed");
-        return RET_ERR;
-    }
     int32_t action = pointerEvent->GetPointerAction();
-    if (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN && firstBtnDownWindow_ == nullptr) {
-        MMI_LOGT("The first button is being pressed now!");
-        firstBtnDownWindow_ = focusWindow;
-    } else if (!(pointerEvent->GetPressedButtons().empty())) {
-        MMI_LOGT("There is still one pressed button.");
-        focusWindow = firstBtnDownWindow_ ;
-    } else if ((pointerEvent->GetPressedButtons().empty()) && (action == PointerEvent::POINTER_ACTION_BUTTON_UP)) {
-        MMI_LOGT("The last button is being lifted now!");
-        focusWindow = firstBtnDownWindow_ ;
-        firstBtnDownWindow_ = nullptr;
+    if ((action == PointerEvent::POINTER_ACTION_BUTTON_DOWN && pointerEvent->GetPressedButtons().size() == 1)
+        || (action == PointerEvent::POINTER_ACTION_MOVE && pointerEvent->GetPressedButtons().empty())) {
+        for (auto it : logicalDisplayInfo.windowsInfo_) {
+            if (IsTouchWindow(globalX, globalY, it)) {
+                focusWindow = &it;
+                if (focusWindow == nullptr) {
+                    MMI_LOGE("Find foucusWindow failed");
+                    return RET_ERR;
+                }
+                firstBtnDownWindow_ = focusWindow;
+                break;
+            }
+        }     
+    } else {
+        focusWindow = firstBtnDownWindow_;
     }
     pointerEvent->SetTargetWindowId(focusWindow->id);
     pointerEvent->SetAgentWindowId(focusWindow->agentWindowId);
