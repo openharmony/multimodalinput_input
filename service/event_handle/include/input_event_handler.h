@@ -64,7 +64,7 @@ protected:
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
     void OnEventKeyboardTrace(const EventKeyboard& key);
     void OnEventPointerTrace(const EventPointer& point);
-    void OnEventTouchTrace(const struct EventTouch& touch);
+    void OnEventTouchTrace(const EventTouch& touch);
 #ifdef OHOS_WESTEN_MODEL
     bool OnSystemEvent(const KeyEventValueTransformations& temp, const enum KEY_STATE state) const;
 #endif
