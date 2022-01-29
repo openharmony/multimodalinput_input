@@ -39,7 +39,7 @@ private:
         int32_t id_;
         bool operator == (struct InterceptorItem item) const
         {
-            return this->id_ == item.id_;
+            return id_ == item.id_;
         }
         int32_t sourceType;
         std::function<void(std::shared_ptr<PointerEvent>)> callback;
