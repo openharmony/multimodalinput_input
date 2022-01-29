@@ -18,24 +18,23 @@
 #include "util.h"
 
 namespace OHOS::MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSClient" };
-    }
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSClient" };
 }
 
-OHOS::MMI::UDSClient::UDSClient()
+UDSClient::UDSClient()
 {
     MMI_LOGT("enter");
 }
 
-OHOS::MMI::UDSClient::~UDSClient()
+UDSClient::~UDSClient()
 {
     MMI_LOGT("enter");
     Stop();
     MMI_LOGT("leave");
 }
 
-int32_t OHOS::MMI::UDSClient::ConnectTo()
+int32_t UDSClient::ConnectTo()
 {
     CHKR(Socket() >= 0, SOCKET_CREATE_FAIL, RET_ERR);
     if (epollFd_ < 0) {
@@ -50,7 +49,7 @@ int32_t OHOS::MMI::UDSClient::ConnectTo()
     return RET_OK;
 }
 
-bool OHOS::MMI::UDSClient::SendMsg(const char *buf, size_t size) const
+bool UDSClient::SendMsg(const char *buf, size_t size) const
 {
     CHKF(buf, OHOS::ERROR_NULL_POINTER);
     CHKF(size > 0 && size <= MAX_PACKET_BUF_SIZE, PARAM_INPUT_INVALID);
@@ -63,14 +62,14 @@ bool OHOS::MMI::UDSClient::SendMsg(const char *buf, size_t size) const
     return true;
 }
 
-bool OHOS::MMI::UDSClient::SendMsg(const NetPacket& pkt) const
+bool UDSClient::SendMsg(const NetPacket& pkt) const
 {
     StreamBuffer buf;
     pkt.MakeData(buf);
     return SendMsg(buf.Data(), buf.Size());
 }
 
-bool OHOS::MMI::UDSClient::ThreadIsEnd()
+bool UDSClient::ThreadIsEnd()
 {
     if (!isThreadHadRun_) {
         MMI_LOGI("thread is not run. this: %p, isThreadHadRun_: %p, isThreadHadRun_: %d",
@@ -84,7 +83,7 @@ bool OHOS::MMI::UDSClient::ThreadIsEnd()
     return true;
 }
 
-bool OHOS::MMI::UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
+bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
 {
     MMI_LOGT("enter detachMode = %d", detachMode);
     recvFun_ = fun;
@@ -104,12 +103,11 @@ bool OHOS::MMI::UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode
         t_.detach();
     } else {
         MMI_LOGW("uds client thread join..");
-        // t_.join();
     }
     return true;
 }
 
-void OHOS::MMI::UDSClient::Stop()
+void UDSClient::Stop()
 {
     MMI_LOGT("enter");
     Close();
@@ -126,7 +124,7 @@ void OHOS::MMI::UDSClient::Stop()
     MMI_LOGT("leave");
 }
 
-void OHOS::MMI::UDSClient::OnRecv(const char *buf, size_t size)
+void UDSClient::OnRecv(const char *buf, size_t size)
 {
     CHK(buf, ERROR_NULL_POINTER);
     int32_t readIdx = 0;
@@ -149,7 +147,7 @@ void OHOS::MMI::UDSClient::OnRecv(const char *buf, size_t size)
     }
 }
 
-void OHOS::MMI::UDSClient::OnEvent(const epoll_event& ev, StreamBuffer& buf)
+void UDSClient::OnEvent(const epoll_event& ev, StreamBuffer& buf)
 {
     auto isoverflow = false;
     auto fd = ev.data.fd;
@@ -187,9 +185,9 @@ void OHOS::MMI::UDSClient::OnEvent(const epoll_event& ev, StreamBuffer& buf)
     }
 }
 
-void OHOS::MMI::UDSClient::OnThread(std::promise<bool>& threadPromise)
+void UDSClient::OnThread(std::promise<bool>& threadPromise)
 {
-    OHOS::MMI::SetThreadName(std::string("uds_client"));
+    SetThreadName(std::string("uds_client"));
     MMI_LOGD("UDSClient::OnThread begin");
     isThreadHadRun_ = true;
     StreamBuffer streamBuf;
@@ -224,7 +222,8 @@ void OHOS::MMI::UDSClient::OnThread(std::promise<bool>& threadPromise)
     MMI_LOGD("UDSClient::OnThread end...");
 }
 
-void OHOS::MMI::UDSClient::SetToExit()
+void UDSClient::SetToExit()
 {
     isToExit_ = true;
+}
 }
