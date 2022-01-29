@@ -62,7 +62,11 @@ bool KeyEventInputSubscribeManager::CheckRepeatSubscribeKeyEevent(std::shared_pt
             }
             ++subPreKeyCount;
         }
-        if (preKeyCount == subPreKeyCount && subscribeKeyOption->IsFinalKeyDown() == keyOption->IsFinalKeyDown()) {
+        auto preDurtionTime = subscribeKeyOption->GetFinalKeyDownDuration();
+        auto curDurtionTime = keyOption->GetFinalKeyDownDuration();
+        if (preKeyCount == subPreKeyCount &&
+            subscribeKeyOption->IsFinalKeyDown() == keyOption->IsFinalKeyDown() &&
+            preDurtionTime == curDurtionTime) {
             return true;
         }
     }
