@@ -16,12 +16,12 @@
 #ifndef TOUCH_TRANSFORM_POINT_MANAGER_H
 #define TOUCH_TRANSFORM_POINT_MANAGER_H
 
-
 #include <map>
 #include <memory>
 #include "touch_transform_point_processor.h"
 #include "touchpad_transform_point_processor.h"
 #include "singleton.h"
+
 namespace OHOS {
 namespace MMI {
 class TouchTransformPointManager : public DelayedSingleton<TouchTransformPointManager> {
@@ -29,8 +29,8 @@ public:
     std::shared_ptr<PointerEvent> OnLibinputTouchEvent(libinput_event *event);
     std::shared_ptr<PointerEvent> OnLibinputTouchPadEvent(libinput_event *event);
 private:
-    std::map<int32_t, std::shared_ptr<TouchTransformPointProcessor>> processors_;
-    std::map<int32_t, std::shared_ptr<TouchPadTransformPointProcessor>> touchpadpro_;
+    std::map<int32_t, std::shared_ptr<TouchTransformPointProcessor>> touchPro_;
+    std::map<int32_t, std::shared_ptr<TouchPadTransformPointProcessor>> touchpadPro_;
 };
 #define TouchTransformPointManger OHOS::MMI::TouchTransformPointManager::GetInstance()
 }

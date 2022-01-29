@@ -78,7 +78,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
         } else {
             MMI_LOGE("AddInputEventFilter has send to server fail, ret = %{public}d", ret);
             return RET_ERR;
-        }        
+        }
     }
 
     MMI_LOGT("leave, success with hasSendToMmiServer is already true");
@@ -90,7 +90,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::II
     MMI_LOGD("enter");
     MMIEventHdl.GetMultimodeInputInfo();
     CHK(inputEventConsumer, ERROR_NULL_POINTER);
-    consumer = inputEventConsumer;
+    consumer_ = inputEventConsumer;
     MMI_LOGD("leave");
 }
 
@@ -102,9 +102,9 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     MMI_LOGT(" OnKeyEvent client trace getKeyCode = %{public}d", getKeyCode);
     int32_t eventKey = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
-    if (consumer != nullptr) {
+    if (consumer_ != nullptr) {
         CHK(keyEvent != nullptr, ERROR_NULL_POINTER);
-        consumer->OnInputEvent(keyEvent);
+        consumer_->OnInputEvent(keyEvent);
         MMI_LOGD("leave");
         return;
     }
@@ -114,10 +114,10 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
     MMI_LOGD("Pointer event received, processing ...");
-    if (consumer != nullptr) {
+    if (consumer_ != nullptr) {
         CHK(pointerEvent != nullptr, ERROR_NULL_POINTER);
         MMI_LOGD("Passed on to consumer ...");
-        consumer->OnInputEvent(pointerEvent);
+        consumer_->OnInputEvent(pointerEvent);
         return;
     }
 
@@ -205,7 +205,7 @@ void InputManagerImpl::PrintDisplayDebugInfo()
 
         for (int32_t j = 0; j < static_cast<int32_t>(logicalDisplays_[i].windowsInfo_.size()); j++) {
             MMI_LOGD("windowid:%{public}d, pid:%{public}d,uid:%{public}d,topLeftX:%{public}d,"
-                "topLeftY:%{public}d,width:%{public}d,height:%{public}d,displayId:%{public}d,agentWindowId:%{public}d,",
+                "topLeftY:%{public}d,width:%{public}d,height:%{public}d,display:%{public}d,agentWindowId:%{public}d,",
                 logicalDisplays_[i].windowsInfo_[j].id, logicalDisplays_[i].windowsInfo_[j].pid,
                 logicalDisplays_[i].windowsInfo_[j].uid, logicalDisplays_[i].windowsInfo_[j].topLeftX,
                 logicalDisplays_[i].windowsInfo_[j].topLeftY, logicalDisplays_[i].windowsInfo_[j].width,
@@ -217,11 +217,7 @@ void InputManagerImpl::PrintDisplayDebugInfo()
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
-    if (monitor == nullptr) {
-        MMI_LOGE("InputManagerImpl::%{public}s param should not be null!", __func__);
-        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
-    }
-    int32_t monitorId = IEMManager.AddInputEventMontior(monitor);
+    int32_t monitorId = InputMonitorMgr.AddInputEventMontior(monitor);
     monitorId = monitorId * ADD_MASK_BASE + MASK_KEY;
     return monitorId;
 }
@@ -232,7 +228,7 @@ int32_t InputManagerImpl::AddMontior(std::function<void(std::shared_ptr<PointerE
         MMI_LOGE("InputManagerImpl::%{public}s param should not be null!", __func__);
         return InputEventMonitorManager::INVALID_MONITOR_ID;
     }
-    int32_t monitorId = IEMManager.AddInputEventTouchpadMontior(monitor);
+    int32_t monitorId = InputMonitorMgr.AddInputEventTouchpadMontior(monitor);
     monitorId = monitorId * ADD_MASK_BASE + MASK_TOUCHPAD;
     return monitorId;
 }
@@ -251,18 +247,18 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 
     switch (mask) {
         case MASK_KEY:
-            IEMManager.RemoveInputEventMontior(monitorId);
+            InputMonitorMgr.RemoveInputEventMontior(monitorId);
             break;
         case MASK_TOUCH:
             InputMonitorManager::GetInstance().RemoveMonitor(monitorId);
             break;
         case MASK_TOUCHPAD:
-            IEMManager.RemoveInputEventTouchpadMontior(monitorId);
+            InputMonitorMgr.RemoveInputEventTouchpadMontior(monitorId);
             break;
         default:
         MMI_LOGE("Can't find the mask,mask%{public}d", mask);
             break;
-    }    
+    }
 }
 
 void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
@@ -270,7 +266,7 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
     InputMonitorManager::GetInstance().MarkConsumed(monitorId, eventId);
 }
 
-int32_t InputManagerImpl::AddInterceptor(int32_t sourceType, 
+int32_t InputManagerImpl::AddInterceptor(int32_t sourceType,
                                          std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
 {
     if (interceptor == nullptr) {
@@ -321,7 +317,7 @@ void InputManagerImpl::SendDisplayInfo()
         MMI_LOGE("get mmi client is nullptr");
         return;
     }
-    
+
     OHOS::MMI::NetPacket ckt(MmiMessageId::DISPLAY_INFO);
     if (PackDisplayData(ckt) == RET_ERR) {
         MMI_LOGE("pack display info failed");

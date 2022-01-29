@@ -309,9 +309,10 @@ int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
     if (!InitClient()) {
         return MMI_SERVICE_INVALID;
     }
-    NetPacket ck(MmiMessageId::ADD_INPUT_EVENT_MONITOR);
-    ck << OHOS::MMI::InputEvent::EVENT_TYPE_KEY;
-    mClient_->SendMessage(ck);
+    MMI_LOGD("AddInputEventMontior enter");
+    NetPacket pkt(MmiMessageId::ADD_INPUT_EVENT_MONITOR);
+    pkt << keyEventType;
+    mClient_->SendMessage(pkt);
     return RET_OK;
 }
 
@@ -320,9 +321,10 @@ void MultimodalEventHandler::RemoveInputEventMontior(int32_t keyEventType)
     if (!InitClient()) {
         return;
     }
-    NetPacket ck(MmiMessageId::REMOVE_INPUT_EVENT_MONITOR);
-    ck << OHOS::MMI::InputEvent::EVENT_TYPE_KEY;
-    mClient_->SendMessage(ck);
+    MMI_LOGD("RemoveInputEventMontior enter");
+    NetPacket pkt(MmiMessageId::REMOVE_INPUT_EVENT_MONITOR);
+    pkt << keyEventType;
+    mClient_->SendMessage(pkt);
 }
 
 void MultimodalEventHandler::RemoveInputEventTouchpadMontior(int32_t pointerEventType)

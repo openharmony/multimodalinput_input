@@ -393,15 +393,15 @@ int32_t OHOS::MMI::ServerMsgHandler::OnNewInjectKeyEvent(SessionPtr sess, NetPac
         MMI_LOGE("Deserialization is Failed! %{public}u", errCode);
         return RET_ERR;
     }
-    
+
     if (nPtr->HasFlag(OHOS::MMI::InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         if (INTERCEPTORMANAGERGLOBAL.OnKeyEvent(nPtr)) {
-            MMI_LOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d", 
+            MMI_LOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
                 nPtr->GetKeyCode());
             return RET_OK;
         }
     }
-    
+
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, nPtr, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed... ret:%{public}d errCode:%{public}d",
@@ -447,11 +447,11 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
             return RET_OK;
         }
     }
-    if (keyEvent == nullptr) {
-        keyEvent = OHOS::MMI::KeyEvent::Create();
+    if (keyEvent_ == nullptr) {
+        keyEvent_ = OHOS::MMI::KeyEvent::Create();
     }
-    EventPackage::KeyboardToKeyEvent(key, keyEvent);
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent, preHandlerTime);
+    EventPackage::KeyboardToKeyEvent(key, keyEvent_);
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent_, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed... ret:%{public}d errCode:%{public}d",
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
@@ -825,7 +825,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnAddInputEventMontior(SessionPtr sess, Net
     if (eventType != OHOS::MMI::InputEvent::EVENT_TYPE_KEY) {
         return RET_ERR;
     }
-    IEMServiceManager.AddInputEventMontior(eventType, sess);
+    InputMonitorServiceMgr.AddInputEventMontior(eventType, sess);
     return RET_OK;
 }
 
@@ -838,7 +838,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnAddInputEventTouchpadMontior(SessionPtr s
     if (eventType != OHOS::MMI::InputEvent::EVENT_TYPE_POINTER) {
         return RET_ERR;
     }
-    IEMServiceManager.AddInputEventTouchpadMontior(eventType, sess);
+    InputMonitorServiceMgr.AddInputEventTouchpadMontior(eventType, sess);
     return RET_OK;
 }
 
@@ -850,7 +850,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveInputEventMontior(SessionPtr sess, 
     if (eventType != OHOS::MMI::InputEvent::EVENT_TYPE_KEY) {
         return RET_ERR;
     }
-    IEMServiceManager.RemoveInputEventMontior(eventType, sess);
+    InputMonitorServiceMgr.RemoveInputEventMontior(eventType, sess);
     return RET_OK;
 }
 
@@ -862,7 +862,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveInputEventTouchpadMontior(SessionPt
     if (eventType != OHOS::MMI::InputEvent::EVENT_TYPE_POINTER) {
         return RET_ERR;
     }
-    IEMServiceManager.RemoveInputEventMontior(eventType, sess);
+    InputMonitorServiceMgr.RemoveInputEventMontior(eventType, sess);
     return RET_OK;
 }
 int32_t OHOS::MMI::ServerMsgHandler::OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt)

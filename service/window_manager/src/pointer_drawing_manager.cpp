@@ -60,7 +60,7 @@ std::unique_ptr<OHOS::Media::PixelMap> OHOS::MMI::MouseDrawingManager::DecodeIma
 void OHOS::MMI::MouseDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY)
 {
     MMI_LOGD("enter");
-    MMI_LOGD("displayId:%{public}d, globalX:%{public}d, globalY:%{public}d", displayId, globalX, globalY);
+    MMI_LOGD("display:%{public}d, globalX:%{public}d, globalY:%{public}d", displayId, globalX, globalY);
     if (drawWindow_ == nullptr) {
         std::string windowName = "pointer window";
         sptr<OHOS::Rosen::WindowOption> option = new OHOS::Rosen::WindowOption();
@@ -176,7 +176,7 @@ void OHOS::MMI::MouseDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &
     OHOS::Rosen::Drawing::Pen pen;
     pen.SetAntiAlias(true);
     pen.SetColor(OHOS::Rosen::Drawing::Color::COLOR_BLUE);
-    pen.SetWidth(10);
+    pen.SetWidth(1);
     canvas.AttachPen(pen);
     MMI_LOGD("DrawBitmap");
     canvas.DrawBitmap(*pixelmap, 0, 0);

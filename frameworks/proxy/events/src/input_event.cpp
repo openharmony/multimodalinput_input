@@ -27,31 +27,31 @@ const int32_t InputEvent::EVENT_TYPE_POINTER;
 
 InputEvent::InputEvent(int32_t eventType) : eventType_(eventType)
 {
-    Init();
+    Reset();
 }
 
 InputEvent::~InputEvent()
 {
 }
 
-void InputEvent::Init()
+void InputEvent::Reset()
 {
     int32_t conversionStep = 1000000;
     struct timespec ts = { 0, 0 };
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
-        this->actionTime_ = 0;
+        actionTime_ = 0;
     }
     id_ = DEFALUTID;
     uint64_t nowTime = (ts.tv_sec * static_cast<uint64_t>(1e3)) + (ts.tv_nsec / conversionStep);
     int32_t actionTime = static_cast<int32_t>(nowTime);
-    this->actionTime_ = actionTime;
-    this->action_ = ACTION_UNKNOWN;
-    this->actionStartTime_ = actionTime_;
-    this->deviceId_ = DEFALUTID;
-    this->targetDisplayId_ = DEFALUTID;
-    this->targetWindowId_ = DEFALUTID;
-    this->agentWindowId_ = DEFALUTID;
-    this->flag_ = 0;
+    actionTime_ = actionTime;
+    action_ = ACTION_UNKNOWN;
+    actionStartTime_ = actionTime_;
+    deviceId_ = DEFALUTID;
+    targetDisplayId_ = DEFALUTID;
+    targetWindowId_ = DEFALUTID;
+    agentWindowId_ = DEFALUTID;
+    flag_ = 0;
 }
 
 std::shared_ptr<InputEvent> InputEvent::Create()

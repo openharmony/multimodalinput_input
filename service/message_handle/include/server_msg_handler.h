@@ -77,7 +77,7 @@ private:
     UDSServer *udsServer_ = nullptr; // External references, do not delete
     SeniorInputFuncProcBase *seniorInput_ = nullptr;
     EventDispatch eventDispatch_;
-    std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent;
+    std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent_;
 };
 }
 }
