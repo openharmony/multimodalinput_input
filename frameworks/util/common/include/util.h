@@ -41,7 +41,7 @@ namespace MMI {
     void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
         const int32_t abilityId, const int32_t focusId, const uint64_t preHandlerTime);
     void PrintWMSInfo(const std::string& str, const int32_t fd, const int32_t abilityId, const int32_t focusId);
-    int GetPid();
+    int32_t GetPid();
     std::string GetFileName(const std::string& strPath);
     const char* GetProgramName();
     char* MmiBasename(char* path);

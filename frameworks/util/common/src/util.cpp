@@ -264,9 +264,9 @@ void PrintWMSInfo(const std::string& str, const int32_t fd, const int32_t abilit
     MMI_LOGT("MMIAPPM:fd =%{public}d,abilityID = %{public}d", fd, abilityId);
 }
 
-int GetPid()
+int32_t GetPid()
 {
-    return (int)getpid();
+    return static_cast<int32_t>(getpid());
 }
 
 std::string GetFileName(const std::string& strPath)
