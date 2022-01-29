@@ -24,7 +24,7 @@ namespace {
 
 InterceptorManager::InterceptorManager()
 {
-    this->InterceptorItemId = 0;
+    InterceptorItemId = 0;
 }
 
 InterceptorManager::~InterceptorManager()
@@ -40,7 +40,7 @@ int32_t InterceptorManager::AddInterceptor(int32_t sourceType,
     }
 
     InterceptorItem interceptorItem;
-    interceptorItem.id_ = ++this->InterceptorItemId;
+    interceptorItem.id_ = ++InterceptorItemId;
     interceptorItem.sourceType = sourceType;
     interceptorItem.callback = interceptor;
     interceptor_.push_back(interceptorItem);
@@ -57,7 +57,7 @@ int32_t InterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<Ke
     }
 
     InterceptorItem interceptorItem;
-    interceptorItem.id_ = ++this->InterceptorItemId;
+    interceptorItem.id_ = ++InterceptorItemId;
     interceptorItem.sourceType = SOURCETYPE_KEY;
     interceptorItem.callback_ = interceptor;
     interceptor_.push_back(interceptorItem);
