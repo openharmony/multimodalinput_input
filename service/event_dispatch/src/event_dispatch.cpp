@@ -23,6 +23,7 @@
 #include "input_event_monitor_manager.h"
 #include "input_handler_manager_global.h"
 #include "interceptor_manager_global.h"
+#include "key_event_subscriber.h"
 #include "mmi_server.h"
 #include "outer_interface.h"
 #include "system_event_handler.h"
@@ -773,7 +774,7 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
         MMI_LOGD("The keyEvent start launch an ability, keyCode=%{public}d", key->GetKeyCode());
         return RET_OK;
     }
-    if (KeyEventInputSubscribeFlt.FilterSubscribeKeyEvent(key)) {
+    if (KeyEventSubscriber_.FilterSubscribeKeyEvent(key)) {
         MMI_LOGD("Subscribe keyEvent filter success. keyCode=%{public}d", key->GetKeyCode());
         return RET_OK;
     }
