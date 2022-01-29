@@ -17,7 +17,6 @@
 
 #include "singleton.h"
 #include "if_client_msg_handler.h"
-#include "key_event_input_subscribe_manager.h"
 #include "multimodal_standardized_event_manager.h"
 
 namespace OHOS {
@@ -64,8 +63,6 @@ public:
     void RemoveInputEventTouchpadMontior(int32_t pointerEventType);
     int32_t AddInterceptor(int32_t sourceType, int32_t id);
     int32_t RemoveInterceptor(int32_t id);
-    int32_t SubscribeKeyEvent(const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo);
-    int32_t UnSubscribeKeyEvent(int32_t subscribeId);
 
 /**
 * Default constructor used to create a {@code MultimodalEventHandler} instance.
