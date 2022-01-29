@@ -20,6 +20,7 @@
 #include "image_source.h"
 #include "pixel_map.h"
 #include "log.h"
+#include "define_multimodal.h"
 #include "image/bitmap.h"
 
 namespace OHOS::MMI {
