@@ -165,7 +165,7 @@ const std::string& StreamBuffer::GetErrorStatusRemark() const
         {ErrorStatus::ES_WRITE, "WRITE_ERROR"},
     };
     for (const auto& it : remark) {
-        if ( it.first == rwErrorStatus_) {
+        if (it.first == rwErrorStatus_) {
             return it.second;
         }
     }
