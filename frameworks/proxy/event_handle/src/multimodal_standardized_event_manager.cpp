@@ -19,6 +19,7 @@
 #include "error_multimodal.h"
 #include "immi_token.h"
 #include "input_event_data_transformation.h"
+#include "multimodal_event_handler.h"
 #include "net_packet.h"
 #include "proto.h"
 
@@ -114,34 +115,48 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
 int32_t MultimodalStandardizedEventManager::SubscribeKeyEvent(
     const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
 {
+    MMI_LOGT("Enter");
     OHOS::MMI::NetPacket pkt(MmiMessageId::SUBSCRIBE_KEY_EVENT);
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = subscribeInfo.GetKeyOption();
-    uint32_t preKeySize = keyOption->GetPreKeySize();
+    uint32_t preKeySize = keyOption->GetPreKeys().size();
     pkt << subscribeInfo.GetSubscribeId() << keyOption->GetFinalKey() << keyOption->IsFinalKeyDown()
     << keyOption->GetFinalKeyDownDuration() << preKeySize;
     int32_t keySubscibeId = subscribeInfo.GetSubscribeId();
+
     std::string keySubscribeIdstring = "SubscribeKeyEvent client subscribeKeyId: " + std::to_string(keySubscibeId);
     MMI_LOGT(" SubscribeKeyEvent client trace subscribeKeyId = %{public}d", keySubscibeId);
     int32_t eventKey = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keySubscribeIdstring, eventKey);
+
     std::vector<int32_t> preKeys = keyOption->GetPreKeys();
     for (auto preKeyIter = preKeys.begin(); preKeyIter != preKeys.end(); ++preKeyIter) {
         pkt << *preKeyIter;
     }
-    if (SendMsg(pkt)) {
+    if (MMIEventHdl.GetMMIClient() == nullptr) {
+        MMI_LOGE("client init failed");
+        return RET_ERR;
+    } else {
+        if (!SendMsg(pkt)) {
+            return RET_ERR;
+        }
         return RET_OK;
     }
-    return RET_ERR;
 }
 
 int32_t MultimodalStandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
 {
+    MMI_LOGT("Enter");
     OHOS::MMI::NetPacket pkt(MmiMessageId::UNSUBSCRIBE_KEY_EVENT);
     pkt << subscribeId;
-    if (SendMsg(pkt)) {
+    if (MMIEventHdl.GetMMIClient() == nullptr) {
+        MMI_LOGE("client init failed");
+        return RET_ERR;
+    } else {
+        if (!SendMsg(pkt)) {
+            return RET_ERR;
+        }
         return RET_OK;
     }
-    return RET_ERR;
 }
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEvent& event)

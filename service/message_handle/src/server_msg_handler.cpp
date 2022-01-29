@@ -26,6 +26,7 @@
 #include "input_handler_manager_global.h"
 #include "input_windows_manager.h"
 #include "interceptor_manager_global.h"
+#include "key_event_subscriber.h"
 #include "knuckle_func_proc.h"
 #include "mmi_func_callback.h"
 #include "mmi_server.h"
@@ -671,22 +672,22 @@ int32_t OHOS::MMI::ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPac
 {
     int32_t subscribeId = -1;
     uint32_t preKeySize = 0;
-    std::vector<int32_t> preKeys;
-    int32_t tmpKey = -1;
     int32_t finalKey = -1;
     bool isFinalKeyDown = true;
     int32_t finalKeyDownDuration = 0;
     pkt >> subscribeId >> finalKey >> isFinalKeyDown >> finalKeyDownDuration >> preKeySize;
-    for (auto i = 0U; i < preKeySize; ++i) {
+    std::vector<int32_t> preKeys;
+    for (int32_t i = 0; i < preKeySize; ++i) {
+        int32_t tmpKey = -1;
         pkt >> tmpKey;
         preKeys.push_back(tmpKey);
     }
-    std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
+    auto keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     keyOption->SetPreKeys(preKeys);
     keyOption->SetFinalKey(finalKey);
     keyOption->SetFinalKeyDown(isFinalKeyDown);
     keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
-    int32_t ret = KeyEventInputSubscribeFlt.SubscribeKeyEvent(sess, subscribeId, keyOption);
+    int32_t ret = KeyEventSubscriber_.SubscribeKeyEvent(sess, subscribeId, keyOption);
     return ret;
 }
 
@@ -694,7 +695,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnUnSubscribeKeyEvent(SessionPtr sess, NetP
 {
     int32_t subscribeId = -1;
     pkt >> subscribeId;
-    int32_t ret = KeyEventInputSubscribeFlt.UnSubscribeKeyEvent(sess, subscribeId);
+    int32_t ret = KeyEventSubscriber_.UnSubscribeKeyEvent(sess, subscribeId);
     return ret;
 }
 

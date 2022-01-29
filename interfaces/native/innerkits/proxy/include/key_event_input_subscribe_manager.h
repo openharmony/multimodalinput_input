@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef KEY_EVENT_INPUT_SUBSCRIBE_MANAGER_H_
-#define KEY_EVENT_INPUT_SUBSCRIBE_MANAGER_H_
+#ifndef KEY_EVENT_INPUT_SUBSCRIBE_MANAGER_H
+#define KEY_EVENT_INPUT_SUBSCRIBE_MANAGER_H
 
 #include <functional>
 #include <list>
@@ -30,12 +30,7 @@ public:
     class SubscribeKeyEventInfo {
     public:
         explicit SubscribeKeyEventInfo(std::shared_ptr<OHOS::MMI::KeyOption> keyOption,
-            std::function<void(std::shared_ptr<OHOS::MMI::KeyEvent>)> callback)
-            : keyOption_(keyOption), callback_(callback)
-        {
-            ++KeyEventInputSubscribeManager::subscribeIdManager_;
-            subscribeId_ = KeyEventInputSubscribeManager::subscribeIdManager_;
-        }
+            std::function<void(std::shared_ptr<OHOS::MMI::KeyEvent>)> callback);
         ~SubscribeKeyEventInfo() = default;
 
         int32_t GetSubscribeId() const
@@ -54,16 +49,15 @@ public:
         }
 
     private:
-        int32_t subscribeId_;
-        std::shared_ptr<OHOS::MMI::KeyOption> keyOption_;
-        std::function<void(std::shared_ptr<OHOS::MMI::KeyEvent>)> callback_;
+        int32_t subscribeId_ { -1 };
+        std::shared_ptr<OHOS::MMI::KeyOption> keyOption_ { nullptr };
+        std::function<void(std::shared_ptr<OHOS::MMI::KeyEvent>)> callback_ { nullptr };
     };
 
 public:
     KeyEventInputSubscribeManager() = default;
     ~KeyEventInputSubscribeManager() = default;
 
-    bool CheckRepeatSubscribeKeyEevent(std::shared_ptr<OHOS::MMI::KeyOption> keyOption);
     int32_t SubscribeKeyEvent(std::shared_ptr<OHOS::MMI::KeyOption> keyOption,
         std::function<void(std::shared_ptr<OHOS::MMI::KeyEvent>)> callback);
     int32_t UnSubscribeKeyEvent(int32_t subscribeId);
@@ -71,7 +65,7 @@ public:
     int32_t OnSubscribeKeyEventCallback(std::shared_ptr<OHOS::MMI::KeyEvent> event, int32_t subscribeId);
 
 private:
-    std::list<SubscribeKeyEventInfo> subscribeKeyEventInfoList_;
+    std::list<SubscribeKeyEventInfo> subscribeInfos_;
     static int32_t subscribeIdManager_;
 };
 }  // namespace MMI
