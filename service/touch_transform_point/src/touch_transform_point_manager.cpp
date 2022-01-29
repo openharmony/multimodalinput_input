@@ -14,28 +14,32 @@
  */
 
 #include "touch_transform_point_manager.h"
+#include "input_device_manager.h"
 
 namespace OHOS::MMI {
     namespace {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TouchTransformPointManager" };
     }
-constexpr int32_t ID = 1;
-std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(libinput_event *event) 
+
+std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(libinput_event *event)
 {
     CHKR(event, PARAM_INPUT_INVALID, nullptr);
-    std::shared_ptr<TouchTransformPointProcessor> processor;
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
         MMI_LOGT("This touch event is canceled type:%{public}d", type); 
         return nullptr;
     }
-    auto it = processors_.find(ID);
-    if (it != processors_.end()) {
+    auto device = libinput_event_get_device(event);
+    CHKR(device, ERROR_NULL_POINTER, nullptr);
+    std::shared_ptr<TouchTransformPointProcessor> processor;
+    auto deviceId = inputDeviceManager->FindInputDeviceId(device);
+    auto it = touchPro_.find(deviceId);
+    if (it != touchPro_.end()) {
         processor = it->second;
     } else {
-        processor = std::make_shared<TouchTransformPointProcessor>();
+        processor = std::make_shared<TouchTransformPointProcessor>(deviceId);
         processor->SetPointEventSource(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-        this->processors_.insert(std::pair<int32_t, std::shared_ptr<TouchTransformPointProcessor>>(ID, processor));
+        touchPro_.insert(std::pair<int32_t, std::shared_ptr<TouchTransformPointProcessor>>(deviceId, processor));
     }
     return processor->OnLibinputTouchEvent(event);
 }
@@ -43,14 +47,17 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(l
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEvent(libinput_event *event)
 {
     CHKR(event, PARAM_INPUT_INVALID, nullptr);
+    auto device = libinput_event_get_device(event);
+    CHKR(device, ERROR_NULL_POINTER, nullptr);
     std::shared_ptr<TouchPadTransformPointProcessor> processor;
-    auto it = touchpadpro_.find(ID);
-    if (it != touchpadpro_.end()) {
+    auto deviceId = inputDeviceManager->FindInputDeviceId(device);
+    auto it = touchpadPro_.find(deviceId);
+    if (it != touchpadPro_.end()) {
         processor = it->second;
     } else {
-        processor = std::make_shared<TouchPadTransformPointProcessor>();
+        processor = std::make_shared<TouchPadTransformPointProcessor>(deviceId);
         processor->SetPointEventSource(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-        this->touchpadpro_.insert(std::pair<int32_t, std::shared_ptr<TouchPadTransformPointProcessor>>(ID, processor));
+        touchpadPro_.insert(std::pair<int32_t, std::shared_ptr<TouchPadTransformPointProcessor>>(deviceId, processor));
     }
     return processor->OnLibinputTouchPadEvent(event);
 }

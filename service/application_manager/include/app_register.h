@@ -73,7 +73,6 @@ private:
     bool CheckFindFdError(const int32_t findFd);
     bool CheckConnectionIsDead(const int32_t findFd);
     bool CheckWaitQueueBlock(ssize_t currentTime, ssize_t timeOut, const int32_t findFd);
-    const AppInfo& FindAppInfoBySocketFd(int32_t fd);
     void UnregisterBySocketFd(int32_t fd);
 
     std::map<int32_t, AppInfo>::iterator EraseAppInfo(const std::map<int32_t, AppInfo>::iterator &it);
@@ -87,7 +86,7 @@ private:
 
     std::mutex mu_;
     UDSServer *udsServer_ = nullptr;
-    const AppInfo AppInfoError_ = {-1, -1, -1, "", ""};
+    const AppInfo appInfoError_ = {-1, -1, -1, "", ""};
 };
 };
 }

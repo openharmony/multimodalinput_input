@@ -64,7 +64,7 @@ private:
 
 private:
     sptr<EventFilterService> eventFilterService_ {nullptr};
-    std::shared_ptr<OHOS::MMI::IInputEventConsumer> consumer;
+    std::shared_ptr<OHOS::MMI::IInputEventConsumer> consumer_;
     std::vector<PhysicalDisplayInfo> physicalDisplays_;
     std::vector<LogicalDisplayInfo> logicalDisplays_;
 };

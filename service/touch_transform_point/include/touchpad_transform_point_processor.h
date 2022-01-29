@@ -24,7 +24,7 @@ namespace OHOS {
 namespace MMI {
 class TouchPadTransformPointProcessor {
 public:
-    TouchPadTransformPointProcessor();
+    TouchPadTransformPointProcessor(int32_t deviceId);
     ~TouchPadTransformPointProcessor();
     std::shared_ptr<PointerEvent> OnLibinputTouchPadEvent(libinput_event *event);
     void SetPointEventSource(int32_t sourceType);
@@ -32,6 +32,8 @@ private:
     void OnEventTouchPadDown(libinput_event *event);
     void OnEventTouchPadMotion(libinput_event *event);
     void OnEventTouchPadUp(libinput_event *event);
+private:
+    int32_t deviceId_;
     std::shared_ptr<PointerEvent> pointerEvent_;
 };
 }

@@ -101,7 +101,7 @@ private:
     std::map<std::string, InjectFunction> mapFuns_;
     std::map<std::string, bool> mapNeedStartSocket_;
     std::map<std::string, int32_t> mapSendEventType_;
-    std::vector<DeviceInformation> allDevices = {};
+    std::vector<DeviceInformation> allDevices_ = {};
 private:
     static constexpr uint32_t SEND_EVENT_ARGV_COUNTS = 5;
     static constexpr uint32_t SEND_EVENT_DEV_NODE_INDEX = 1;
