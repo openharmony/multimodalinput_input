@@ -84,7 +84,7 @@ bool StreamBuffer::Read(char *buf, size_t size)
         return false;
     }
     if (size <= 0) {
-        MMI_LOGE("Invalid input parameter size=%{public}d errCode:%{public}d", size, PARAM_INPUT_INVALID);
+        MMI_LOGE("Invalid input parameter size=%{public}zu errCode:%{public}d", size, PARAM_INPUT_INVALID);
         rwErrorStatus_ = ErrorStatus::ES_READ;
         return false;
     }
@@ -114,7 +114,7 @@ bool StreamBuffer::Write(const char *buf, size_t size)
         return false;
     }
     if (size <= 0) {
-        MMI_LOGE("Invalid input parameter size=%{public}d errCode:%{public}d", size, PARAM_INPUT_INVALID);
+        MMI_LOGE("Invalid input parameter size=%{public}zu errCode:%{public}d", size, PARAM_INPUT_INVALID);
         rwErrorStatus_ = ErrorStatus::ES_WRITE;
         return false;
     }
@@ -159,6 +159,7 @@ bool StreamBuffer::ChkError() const
 
 const std::string& StreamBuffer::GetErrorStatusRemark() const
 {
+    static const std::string invalidStatus = "UNKNOWN";
     static const std::vector<std::pair<ErrorStatus, std::string>> remark {
         {ErrorStatus::ES_OK, "OK"},
         {ErrorStatus::ES_READ, "READ_ERROR"},
@@ -169,7 +170,7 @@ const std::string& StreamBuffer::GetErrorStatusRemark() const
             return it.second;
         }
     }
-    return "UNKNOWN";
+    return invalidStatus;
 }
 
 const char *StreamBuffer::Data() const
