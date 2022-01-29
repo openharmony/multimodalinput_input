@@ -15,10 +15,10 @@
 
 #include "js_input_monitor.h"
 #include <cinttypes>
-#include <uv.h>
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_manager.h"
+#include "js_input_monitor_manager.h"
 #include "js_input_monitor_util.h"
 
 #define INPUTMGR OHOS::MMI::InputManager::GetInstance()
@@ -26,55 +26,52 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
-        LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitor"
-    };
-
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitor" };
     constexpr int32_t NAPI_ERR = 3;
-    template<class MemberFunType, class ClassType>
-    auto CallbackBind2(MemberFunType func, ClassType* obj)
-    {
-        return std::bind(func, obj, std::placeholders::_1);
-    }
-
-    struct CallBackInfo {
-        std::shared_ptr<PointerEvent> pointerEvent_ {nullptr};
-        std::function<void(std::shared_ptr<PointerEvent>)> handle_ {nullptr};
-    };
 }
-int32_t InputMonitor::Start()
+
+bool InputMonitor::Start()
 {
-    std::lock_guard<std::mutex> guard(lk_);
+    MMI_LOGD("Enter");
+    std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
         monitorId_ = INPUTMGR->AddMonitor(shared_from_this());
-        return monitorId_ >= 0 ? RET_OK : RET_ERR;
+        return monitorId_ >= 0;
     }
-    return RET_OK;
+    MMI_LOGD("Leave");
+    return true;
 }
 
 void InputMonitor::Stop()
 {
-    std::lock_guard<std::mutex> guard(lk_);
+    MMI_LOGD("Enter");
+    std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
         return;
     }
     INPUTMGR->RemoveMonitor(monitorId_);
     monitorId_ = -1;
+    MMI_LOGD("Leave");
     return;
 }
 
 void InputMonitor::SetCallback(std::function<void(std::shared_ptr<PointerEvent>)> callback)
 {
-    std::lock_guard<std::mutex> guard(lk_);
+    std::lock_guard<std::mutex> guard(mutex_);
     callback_ = callback;
 }
 
 void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    CHK(pointerEvent != nullptr, ERROR_NULL_POINTER);
+    MMI_LOGD("Enter");
+    //CHKF(pointerEvent != nullptr, ERROR_NULL_POINTER);
+    if (!JSIMM.GetMonitor(id_)) {
+        MMI_LOGE("failed to process pointer event, id:%{public}d", id_);
+        return;
+    }
     std::function<void(std::shared_ptr<PointerEvent>)> callback;
     {
-        std::lock_guard<std::mutex> guard(lk_);
+        std::lock_guard<std::mutex> guard(mutex_);
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
             if (pointerEvent->GetPointersIdList().size() == 1) {
                 if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
@@ -89,6 +86,11 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
         return;
     }
     callback(pointerEvent);
+    MMI_LOGD("Leave");
+}
+
+void InputMonitor::SetId(int32_t id) {
+    id_ = id;
 }
 
 void InputMonitor::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const {}
@@ -97,7 +99,7 @@ void InputMonitor::OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const {}
 
 void InputMonitor::MarkConsumed(int32_t eventId)
 {
-    std::lock_guard<std::mutex> guard(lk_);
+    std::lock_guard<std::mutex> guard(mutex_);
     if (consumed_) {
         MMI_LOGD("consumed_ is true");
         return;
@@ -109,29 +111,26 @@ void InputMonitor::MarkConsumed(int32_t eventId)
     consumed_ = true;
 }
 
-JsInputMonitor::JsInputMonitor(napi_env jsEnv, napi_value receiver)
+JsInputMonitor::JsInputMonitor(napi_env jsEnv, napi_value receiver, int32_t id)
     : monitor_(std::make_shared<InputMonitor>()),
-      jsEnv_(jsEnv)
+      jsEnv_(jsEnv),
+      id_(id)
 {
     SetReceiver(receiver);
     if (monitor_ != nullptr) {
-        monitor_->SetCallback([this](std::shared_ptr<PointerEvent> pointerEvent) {
-            OnPointerEvent(pointerEvent);
+        monitor_->SetCallback([jsId=id](std::shared_ptr<PointerEvent> pointerEvent) {
+            auto jsMonitor = JSIMM.GetMonitor(jsId);
+            if (jsMonitor != nullptr) {
+                MMI_LOGE("failed to get js monitor");
+                return;
+            }
+           jsMonitor->OnPointerEvent(pointerEvent);
         });
+        monitor_->SetId(id_);
     }
-    handle_ = CallbackBind2(&JsInputMonitor::OnPointerEventInJsThread, this);
-}
-
-JsInputMonitor::~JsInputMonitor()
-{
-    if (monitor_ != nullptr) {
-        monitor_->Stop();
-        monitor_.reset();
-    }
-    uint32_t refCount = 0;
-    auto status = napi_reference_unref(jsEnv_, receiver_, &refCount);
+    auto status = napi_get_uv_event_loop(jsEnv_,&loop_);
     if (status != napi_ok) {
-        MMI_LOGE("napi_reference_unref is failed");
+        MMI_LOGE("napi_get_uv_event_loop is failed");
         return;
     }
 }
@@ -149,30 +148,13 @@ void JsInputMonitor::SetReceiver(napi_value receiver)
     }
 }
 
-void JsInputMonitor::Start()
-{
-    if (monitor_ != nullptr) {
-        monitor_->Start();
-        return;
-    }
-    MMI_LOGE("monitor_ is null");
-}
-
-void JsInputMonitor::Stop()
-{
-    if (monitor_ != nullptr) {
-        monitor_->Stop();
-        return;
-    }
-    MMI_LOGE("monitor_ is null");
-}
-
 void JsInputMonitor::MarkConsumed(int32_t eventId)
 {
-    if (monitor_ != nullptr) {
-        monitor_->MarkConsumed(eventId);
+    if (monitor_ == nullptr) {
+        MMI_LOGE("monitor_ is null");
+        return;
     }
-    MMI_LOGE("monitor_ is null");
+    monitor_->MarkConsumed(eventId);
 }
 
 int32_t JsInputMonitor::IsMatch(napi_env jsEnv, napi_value receiver)
@@ -208,93 +190,6 @@ int32_t JsInputMonitor::IsMatch(napi_env jsEnv)
     return RET_ERR;
 }
 
-void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CHK(pointerEvent != nullptr, ERROR_NULL_POINTER);
-    CallBackInfo* cb = new CallBackInfo;
-    CHK(cb != nullptr, ERROR_NULL_POINTER);
-    cb->handle_ = handle_;
-    cb->pointerEvent_ = pointerEvent;
-    uv_work_t* work = new uv_work_t;
-    CHK(work != nullptr, ERROR_NULL_POINTER);
-    uv_loop_s* loop {nullptr};
-    auto status = napi_get_uv_event_loop(jsEnv_, &loop);
-    if (status != napi_ok) {
-        MMI_LOGE("napi_get_uv_event_loop is failed");
-        return;
-    }
-    CHK(loop != nullptr, ERROR_NULL_POINTER);
-    work->data = (void*)cb;
-    uv_queue_work(loop,
-                  work,
-                  [](uv_work_t *work) {},
-                  [](uv_work_t *work, int32_t status) {
-                      MMI_LOGD("uv_queue_work enter");
-                      struct CallBackInfo* cbInfo = (struct CallBackInfo*)work->data;
-                      if (cbInfo->handle_ != nullptr && cbInfo->pointerEvent_ != nullptr) {
-                          cbInfo->handle_(cbInfo->pointerEvent_);
-                          MMI_LOGD("run handle_");
-                      }
-                      delete cbInfo;
-                      delete work;
-                      cbInfo = nullptr;
-                      work = nullptr;
-                      MMI_LOGD("uv_queue_work leave");
-                  });
-}
-
-void JsInputMonitor::OnPointerEventInJsThread(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    MMI_LOGD("enter");
-    if (jsEnv_ == nullptr && receiver_ == nullptr && pointerEvent == nullptr) {
-        MMI_LOGE("null pointer");
-        return;
-    }
-    auto eventId = pointerEvent->GetId();
-    napi_value callBack = nullptr;
-    napi_value result = nullptr;
-    napi_value touch = nullptr;
-    auto status = napi_create_object(jsEnv_, &touch);
-    if (status != napi_ok) {
-        MMI_LOGE("napi_create_object is failed");
-        return;
-    }
-    auto ret = TransformPointerEvent(pointerEvent, touch);
-    printfPointerEvent(pointerEvent);
-    if (ret != RET_OK) {
-        return;
-    }
-    if (touch == nullptr) {
-        MMI_LOGE("touch is null");
-        return;
-    }
-
-    status = napi_get_reference_value(jsEnv_, receiver_, &callBack);
-    if (status != napi_ok) {
-        MMI_LOGE("napi_get_reference_value is failed");
-        return;
-    }
-
-    status = napi_call_function(jsEnv_, nullptr, callBack, 1, &touch, &result);
-    if (status != napi_ok) {
-        MMI_LOGE("napi_call_function is failed");
-        return;
-    }
-
-    bool retValue = false;
-    status = napi_get_value_bool(jsEnv_, result, &retValue);
-    if (status != napi_ok) {
-        MMI_LOGE("napi_get_value_bool is failed");
-        return;
-    }
-    if (retValue) {
-        MMI_LOGE("MarkConsumed enter");
-        MarkConsumed(eventId);
-        MMI_LOGE("MarkConsumed leave");
-    }
-    MMI_LOGD("leave");
-}
-
 void JsInputMonitor::printfPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) const
 {
     CHK(pointerEvent != nullptr, ERROR_NULL_POINTER);
@@ -310,7 +205,7 @@ void JsInputMonitor::printfPointerEvent(const std::shared_ptr<PointerEvent> poin
 int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
     CHKR(pointerEvent != nullptr, ERROR_NULL_POINTER, RET_ERR);
-    CHKR(SetNamedProperty(jsEnv_, result, "type", pointerEvent->GetSourceType()) == napi_ok,
+    CHKR(SetNameProperty(jsEnv_, result, "type", pointerEvent->GetSourceType()) == napi_ok,
         CALL_NAPI_API_ERR, RET_ERR);
 
     napi_value pointers = nullptr;
@@ -343,36 +238,36 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
                 MMI_LOGE("napi_create_object is failed");
                 return RET_ERR;
             }
-            CHKR(SetNamedProperty(jsEnv_, currentPointer, "globalX", it.GetGlobalX()) == napi_ok,
+            CHKR(SetNameProperty(jsEnv_, currentPointer, "globalX", it.GetGlobalX()) == napi_ok,
                 CALL_NAPI_API_ERR, RET_ERR);
-            CHKR(SetNamedProperty(jsEnv_, currentPointer, "globalY", it.GetGlobalY()) == napi_ok,
+            CHKR(SetNameProperty(jsEnv_, currentPointer, "globalY", it.GetGlobalY()) == napi_ok,
                 CALL_NAPI_API_ERR, RET_ERR);
-            CHKR(SetNamedProperty(jsEnv_, currentPointer, "localX", 0) == napi_ok,
+            CHKR(SetNameProperty(jsEnv_, currentPointer, "localX", 0) == napi_ok,
                 CALL_NAPI_API_ERR, RET_ERR);
-            CHKR(SetNamedProperty(jsEnv_, currentPointer, "localY", 0) == napi_ok,
+            CHKR(SetNameProperty(jsEnv_, currentPointer, "localY", 0) == napi_ok,
                 CALL_NAPI_API_ERR, RET_ERR);
             touchArea = (it.GetWidth() + it.GetHeight()) / 2;
-            CHKR(SetNamedProperty(jsEnv_, currentPointer, "size", touchArea) == napi_ok,
+            CHKR(SetNameProperty(jsEnv_, currentPointer, "size", touchArea) == napi_ok,
                 CALL_NAPI_API_ERR, RET_ERR);
-            CHKR(SetNamedProperty(jsEnv_, currentPointer, "force", it.GetPressure()) == napi_ok,
+            CHKR(SetNameProperty(jsEnv_, currentPointer, "force", it.GetPressure()) == napi_ok,
                 CALL_NAPI_API_ERR, RET_ERR);
-            CHKR(SetNamedProperty(jsEnv_, result, "timestamp", it.GetDownTime()) == napi_ok,
+            CHKR(SetNameProperty(jsEnv_, result, "timestamp", it.GetDownTime()) == napi_ok,
                 CALL_NAPI_API_ERR, RET_ERR);
-            CHKR(SetNamedProperty(jsEnv_, result, "deviceId", it.GetDeviceId()) == napi_ok,
+            CHKR(SetNameProperty(jsEnv_, result, "deviceId", it.GetDeviceId()) == napi_ok,
                 CALL_NAPI_API_ERR, RET_ERR);
         }
-        CHKR(SetNamedProperty(jsEnv_, item, "globalX", it.GetGlobalX()) == napi_ok,
+        CHKR(SetNameProperty(jsEnv_, item, "globalX", it.GetGlobalX()) == napi_ok,
             CALL_NAPI_API_ERR, RET_ERR);
-        CHKR(SetNamedProperty(jsEnv_, item, "globalY", it.GetGlobalY()) == napi_ok,
+        CHKR(SetNameProperty(jsEnv_, item, "globalY", it.GetGlobalY()) == napi_ok,
             CALL_NAPI_API_ERR, RET_ERR);
-        CHKR(SetNamedProperty(jsEnv_, item, "localX", 0) == napi_ok,
+        CHKR(SetNameProperty(jsEnv_, item, "localX", 0) == napi_ok,
             CALL_NAPI_API_ERR, RET_ERR);
-        CHKR(SetNamedProperty(jsEnv_, item, "localY", 0) == napi_ok,
+        CHKR(SetNameProperty(jsEnv_, item, "localY", 0) == napi_ok,
             CALL_NAPI_API_ERR, RET_ERR);
         touchArea = (it.GetWidth() + it.GetHeight()) / 2;
-        CHKR(SetNamedProperty(jsEnv_, item, "size", touchArea) == napi_ok,
+        CHKR(SetNameProperty(jsEnv_, item, "size", touchArea) == napi_ok,
             CALL_NAPI_API_ERR, RET_ERR);
-        CHKR(SetNamedProperty(jsEnv_, item, "force", it.GetPressure()) == napi_ok,
+        CHKR(SetNameProperty(jsEnv_, item, "force", it.GetPressure()) == napi_ok,
             CALL_NAPI_API_ERR, RET_ERR);
         status = napi_set_element(jsEnv_, pointers, index, item);
         if (status != napi_ok) {
@@ -381,11 +276,177 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
         }
         index++;
     }
-    CHKR(SetNamedProperty(jsEnv_, result, "touches", pointers) == napi_ok,
+    CHKR(SetNameProperty(jsEnv_, result, "touches", pointers) == napi_ok,
         CALL_NAPI_API_ERR, RET_ERR);
-    CHKR(SetNamedProperty(jsEnv_, result, "changedTouches", currentPointer) == napi_ok,
+    CHKR(SetNameProperty(jsEnv_, result, "changedTouches", currentPointer) == napi_ok,
         CALL_NAPI_API_ERR, RET_ERR);
     return RET_OK;
 }
+
+bool JsInputMonitor::Start() {
+    MMI_LOGD("Enter");
+    //CHKPF(monitor_, "register monitor failed");
+    if (isMonitoring_) {
+        MMI_LOGW("js is monitoring");
+        return true;
+    }
+    if (monitor_->Start()) {
+        isMonitoring_ = true;
+        return true;
+    }
+    MMI_LOGD("Leave");
+    return false;
 }
+
+JsInputMonitor::~JsInputMonitor()
+{
+    MMI_LOGD("Enter");
+    if (isMonitoring_) {
+        isMonitoring_ = false;
+        if (monitor_ != nullptr) {
+            monitor_->Stop();
+        }
+    }
+    uint32_t refCount = 0;
+    auto status = napi_reference_unref(jsEnv_, receiver_, &refCount);
+    if (status != napi_ok) {
+        MMI_LOGE("napi_reference_unref is failed");
+        return;
+    }
+    MMI_LOGD("Leave");
 }
+
+void JsInputMonitor::Stop() {
+    MMI_LOGD("Enter");
+    //CHKPF(monitor_, "register monitor failed");
+    if (isMonitoring_) {
+        isMonitoring_ = false;
+        if (monitor_ != nullptr) {
+            monitor_->Stop();
+        }
+    }
+    MMI_LOGD("Leave");
+}
+
+int32_t JsInputMonitor::GetId() {
+    return id_;
+}
+
+void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent) {
+    MMI_LOGD("Enter");
+    //CHK(monitor_, "register monitor failed");
+    int32_t num = 0;
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        evQueue_.push(pointerEvent);
+        num = jsThreadNum_;
+    }
+    if (num < 1) {
+        int32_t *id = &id_;
+        uv_work_t *work = new uv_work_t;
+        work->data = id;
+        uv_queue_work(loop_, work, [](uv_work_t *work){}, &JsInputMonitor::JsCallback);
+        std::lock_guard<std::mutex> guard(mutex_);
+        jsThreadNum_++;
+    }
+    MMI_LOGD("Leave");
+}
+
+void JsInputMonitor::JsCallback(uv_work_t *work, int32_t status) {
+    MMI_LOGD("Enter");
+    int32_t *id = static_cast<int32_t *>(work->data);
+    delete work;
+    work = nullptr;
+    auto jsMonitor = JSIMM.GetMonitor(*id);
+    if (jsMonitor == nullptr) {
+        id = nullptr;
+        return;
+    }
+    jsMonitor->OnPointerEventInJsThread();
+    id = nullptr;
+    MMI_LOGD("Leave");
+}
+
+/*
+void JsInputMonitor::ResetEnv() {
+    std::lock_guard<std::mutex> guard(mutex_);
+    jsEnv_ = nullptr;
+    receiver_ = nullptr;
+}*/
+
+void JsInputMonitor::OnPointerEventInJsThread() {
+    MMI_LOGD("Enter");
+    if (!isMonitoring_) {
+        MMI_LOGE("js monitor stop");
+        return;
+    }
+    if (jsEnv_ == nullptr || receiver_ == nullptr) {
+        MMI_LOGE("jsEnv_ or receiver_ is null");
+        return;
+    }
+    std::lock_guard<std::mutex> guard(mutex_);
+    napi_handle_scope scope = nullptr;
+    while (!evQueue_.empty()) {
+        if (!isMonitoring_) {
+            MMI_LOGE("js monitor stop handle callback");
+            break;
+        }
+        auto pointerEvent = evQueue_.front();
+        evQueue_.pop();
+        if (pointerEvent == nullptr) {
+            continue;
+        }
+        auto status = napi_open_handle_scope(jsEnv_, &scope);
+        if (status != napi_ok) {
+            break;
+        }
+        napi_value touch = nullptr;
+        status = napi_create_object(jsEnv_, &touch);
+        if (status != napi_ok) {
+            napi_close_handle_scope(jsEnv_, scope);
+            break;
+        }
+        auto ret = TransformPointerEvent(pointerEvent, touch);
+        if (ret != napi_ok) {
+            napi_close_handle_scope(jsEnv_, scope);
+            break;
+        }
+        if (touch == nullptr) {
+            napi_close_handle_scope(jsEnv_, scope);
+            break;
+        }
+        napi_value callback = nullptr;
+        status = napi_get_reference_value(jsEnv_, receiver_, &callback);
+        if (status != napi_ok) {
+            napi_close_handle_scope(jsEnv_, scope);
+            break;
+        }
+        napi_value global = nullptr;
+        status = napi_get_global(jsEnv_, &global);
+        if (status != napi_ok) {
+            napi_close_handle_scope(jsEnv_, scope);
+            break;
+        } 
+        napi_value result = nullptr;
+        status = napi_call_function(jsEnv_, global, callback, 1, &touch, &result);
+        if (status != napi_ok) {
+            napi_close_handle_scope(jsEnv_, scope);
+            break;
+        }
+        bool retValue = false;
+        status = napi_get_value_bool(jsEnv_, result, &retValue);
+        if (status != napi_ok) {
+            napi_close_handle_scope(jsEnv_, scope);
+            return;
+        }
+        if (retValue) {
+            auto eventId = pointerEvent->GetId();
+            MarkConsumed(eventId);
+        }
+        napi_close_handle_scope(jsEnv_, scope);
+    }
+    --jsThreadNum_;
+     MMI_LOGD("Leave");
+}
+} // namespace MMI
+} // namespace OHOS
