@@ -155,9 +155,7 @@ void OHOS::MMI::MouseDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint3
     constexpr uint32_t stride = 4;
     int32_t addrSize = width * height * stride;
     auto ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
-    if (ret != EOK) {
-        MMI_LOGE("memcpy_s failed");
-    }
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     MMI_LOGD("leave");
 }
 
