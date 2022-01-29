@@ -66,13 +66,13 @@ public:
 private:
     libinput *hdiinput_ = nullptr;
     std::list<uhdf *> hdflist_;
-    static OHOS::MMI::HdfEventManager *m_globleThis;
+    static OHOS::MMI::HdfEventManager *globleThis_;
     bool devStatus[TOTAL_INPUT_DEVICE_STATUS_COUNT];
     DevDesc mountDevIndex_[TOTAL_INPUT_DEVICE_COUNT];
     IInputInterface *inputInterface_;
     IInputInterface *injectInterface_;
-    InputEventCb eventcallback;
-    InputHostCb  hostplugcallback;
+    InputEventCb eventCallBack_;
+    InputHostCb  hostPlugCallBack_;
 };
 }
 }

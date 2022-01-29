@@ -57,10 +57,10 @@ int32_t OHOS::MMI::RegisterEventHandleManager::RegisterEvent(MmiMessageId messag
             RegisterEventHandleByIdMsage(MmiMessageId::TOUCH_EVENT_BEGIN, MmiMessageId::TOUCH_EVENT_END, fd);
             break;
         default:
-            MMI_LOGT("It's no this event handle! \n");
+            MMI_LOGT("It's no this event handle! ");
             return UNKNOWN_EVENT;
     }
-    MMI_LOGT("event:%{public}d fd:%{public}d \n", messageId, fd);
+    MMI_LOGT("event:%{public}d fd:%{public}d ", messageId, fd);
     return RET_OK;
 }
 
@@ -88,7 +88,7 @@ int32_t OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleManager(MmiM
             UnregisterEventHandleByIdMsage(MmiMessageId::TOUCH_EVENT_BEGIN, MmiMessageId::TOUCH_EVENT_END, fd);
             break;
         default:
-            MMI_LOGT("It's no this event handle! \n");
+            MMI_LOGT("It's no this event handle! ");
             return UNKNOWN_EVENT;
     }
 

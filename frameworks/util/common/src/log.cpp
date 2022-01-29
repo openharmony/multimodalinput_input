@@ -866,11 +866,11 @@ bool VerifyLogManagerRun()
     KMSG_LOGI("in VerifyLogManagerRun, log config: %s.", log.c_str());
     // start log
     if (!OHOS::MMI::LogManager::GetInstance().Init(log.c_str())) {
-        MMI_LOGE("Failed to get log instance initialization string\n");
+        MMI_LOGE("Failed to get log instance initialization string");
         return false;
     }
     if (!OHOS::MMI::LogManager::GetInstance().Start()) {
-        MMI_LOGE("Failed to start log instance\n");
+        MMI_LOGE("Failed to start log instance");
         return false;
     }
     return true;

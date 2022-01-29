@@ -127,8 +127,8 @@ int32_t RegisterEvent::SetPrevKeyValue(EventKeyboard& prevKey)
     int32_t ret = memcpy_s(prevKey.deviceName, sizeof(prevKey.deviceName), key_.deviceName,
                    sizeof(key_.deviceName));
     CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
-    ret = memcpy_s(prevKey.devicePhys, sizeof(prevKey.devicePhys), key_.devicePhys,
-                   sizeof(key_.devicePhys));
+    ret = memcpy_s(prevKey.physical, sizeof(prevKey.physical), key_.physical,
+                   sizeof(key_.physical));
     CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
     return RET_OK;
 }
@@ -304,6 +304,7 @@ void RegisterEvent::OnEventTouchGetSign(const EventTouch& touch, MmiMessageId& m
             OnEventTouchMotionGetSign(touch, msgId);
             break;
         default:
+            MMI_LOGW("Unknown event type of touch, TouchGetSign:%{public}d", touch.eventType);
             break;
     }
     SysEveHdl->OnSystemEventHandler(msgId);
@@ -498,24 +499,22 @@ int32_t RegisterEvent::OnEventTouchMotionGetSign(const EventTouch& touch, MmiMes
     return RET_OK;
 }
 
-int32_t RegisterEvent::GetTouchInfoByTouchId(const std::pair<uint32_t, int32_t> key, EventTouch& touch)
+void RegisterEvent::GetTouchInfo(const std::pair<uint32_t, int32_t> key, EventTouch& touch)
 {
     auto iter = touchInfos_.find(key);
-    CHKF(iter != touchInfos_.end(), TOUCH_ID_NO_FIND);
-    if (iter != touchInfos_.end()) {
-        touch.point.x = iter->second.endX;
-        touch.point.y = iter->second.endY;
-        touch.time = iter->second.endTime;
-        touch.seatSlot = iter->second.seatSlot;
-        touch.slot = iter->second.slot;
-        touch.eventType = iter->second.eventType;
-        touch.pressure = iter->second.pressure;
-        touch.area = iter->second.area;
-        touch.deviceId = iter->second.deviceId;
-        return RET_OK;
-    } else {
-        return RET_ERR;
+    if (iter == touchInfos_.end()) {
+        MMI_LOGE("Touch event not found");
+        return;
     }
+    touch.point.x = iter->second.endX;
+    touch.point.y = iter->second.endY;
+    touch.time = iter->second.endTime;
+    touch.seatSlot = iter->second.seatSlot;
+    touch.slot = iter->second.slot;
+    touch.eventType = iter->second.eventType;
+    touch.pressure = iter->second.pressure;
+    touch.area = iter->second.area;
+    touch.deviceId = iter->second.deviceId;
 }
 
 void RegisterEvent::GetTouchIds(std::vector<std::pair<uint32_t, int32_t>>& touchIds, const uint32_t deviceId)

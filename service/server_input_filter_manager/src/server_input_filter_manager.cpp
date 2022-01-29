@@ -85,14 +85,14 @@ void ServerInputFilterManager::OnKeyEventTrace(const EventKeyboard& key)
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" OnKeyEvent service trace keyUuid = %{public}s\n", keyUuid);
+    MMI_LOGT(" OnKeyEvent service trace keyUuid = %{public}s", keyUuid);
     std::string keyEvent = keyUuid;
     keyEvent = "OnKeyEvent service keyUuid: " + keyEvent;
     int32_t eventKey = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 }
 
-bool ServerInputFilterManager::OnKeyEvent(EventKeyboard key)
+bool ServerInputFilterManager::OnKeyEvent(const EventKeyboard& key)
 {
     MMI_LOGD("Key event filter on key event begin");
     OnKeyEventTrace(key);
@@ -213,6 +213,7 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
                 break;
             }
             default: {
+                MMI_LOGW("Unknown event type of pointer, TouchPointType:%{public}d", touch.eventType);
                 break;
             }
         }
@@ -231,6 +232,7 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
                 break;
             }
             default: {
+                MMI_LOGW("Unknown event type of pointer, TouchPointType:%{public}d", touch.eventType);
                 break;
             }
         }
@@ -244,7 +246,7 @@ void ServerInputFilterManager::OnTouchEventTrace(const EventTouch& touch)
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" OnTouchEvent service touchUuid = %{public}s\n", touchUuid);
+    MMI_LOGT(" OnTouchEvent service touchUuid = %{public}s", touchUuid);
     std::string touchEvent = touchUuid;
     touchEvent = "OnTouchEvent service touchUuid: " + touchEvent;
     int32_t eventTouch = 9;
@@ -289,7 +291,7 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
     int32_t touchFocusId = WinMgr->GetTouchFocusSurfaceId();
     auto appInfo = AppRegs->FindByWinId(touchFocusId); // obtain application information
     if (appInfo.fd == RET_ERR) {
-        MMI_LOGT("Failed to find fd:%{public}d... errCode:%{public}d", touchFocusId, FOCUS_ID_OBTAIN_FAIL);
+        MMI_LOGE("Failed to find fd:%{public}d, errCode:%{public}d", touchFocusId, FOCUS_ID_OBTAIN_FAIL);
         return false;
     }
     MMI_LOGD("DispatchTouchEvent focusId:%{public}d fd:%{public}d", touchFocusId, appInfo.fd);
@@ -316,13 +318,13 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
                 EventTouch touchTemp = {};
                 CHKR(EOK == memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch)),
                      MEMCPY_SEC_FUN_FAIL, RET_ERR);
-                MMIRegEvent->GetTouchInfoByTouchId(touchId, touchTemp);
+                MMIRegEvent->GetTouchInfo(touchId, touchTemp);
                 MMI_LOGT("4.event filter of server 1:eventTouch:time=%{public}" PRId64 ", deviceType=%{public}u, "
-                         "deviceName=%{public}s, devicePhys=%{public}s, eventType=%{public}d, "
+                         "deviceName=%{public}s, physical=%{public}s, eventType=%{public}d, "
                          "slot=%{public}d, seatSlot=%{public}d, pressure=%{public}lf, point.x=%{public}lf, "
-                         "point.y=%{public}lf, fd=%{public}d, preHandlerTime=%{public}" PRId64"",
+                         "point.y=%{public}lf, fd=%{public}d, preHandlerTime=%{public}" PRId64,
                          touchTemp.time, touchTemp.deviceType, touchTemp.deviceName,
-                         touchTemp.devicePhys, touchTemp.eventType, touchTemp.slot, touchTemp.seatSlot,
+                         touchTemp.physical, touchTemp.eventType, touchTemp.slot, touchTemp.seatSlot,
                          touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, appInfo.fd,
                          preHandlerTime);
                 newPacket << touchTemp;
@@ -331,16 +333,16 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
             newPacket << touch;
             MMI_LOGT("4.event filter of server 2:eventTouch:time=%{public}" PRId64 ", deviceType=%{public}u, "
-                     "deviceName=%{public}s, devicePhys=%{public}s, eventType=%{public}d, "
+                     "deviceName=%{public}s, physical=%{public}s, eventType=%{public}d, "
                      "slot=%{public}d, seatSlot=%{public}d, pressure=%{public}lf, point.x=%{public}lf, "
-                     "point.y=%{public}lf, fd=%{public}d, preHandlerTime=%{public}" PRId64"",
+                     "point.y=%{public}lf, fd=%{public}d, preHandlerTime=%{public}" PRId64,
                      touch.time, touch.deviceType, touch.deviceName,
-                     touch.devicePhys, touch.eventType, touch.slot, touch.seatSlot, touch.pressure,
+                     touch.physical, touch.eventType, touch.slot, touch.seatSlot, touch.pressure,
                      touch.point.x, touch.point.y, appInfo.fd, preHandlerTime);
         }
         newPacket << id;
         if (!temp->SendMsg(newPacket)) {
-            MMI_LOGE("Sending Interceptor EventTouch failed!: session.fd = %{public}d \n", temp->GetFd());
+            MMI_LOGE("Sending Interceptor EventTouch failed!: session.fd = %{public}d ", temp->GetFd());
             return false;
         }
     }
@@ -399,7 +401,7 @@ void ServerInputFilterManager::OnPointerEventTrace(const EventPointer& event_poi
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" OnPointerEvent service pointerUuid = %{public}s\n", pointerUuid);
+    MMI_LOGT(" OnPointerEvent service pointerUuid = %{public}s", pointerUuid);
     std::string pointerEvent = pointerUuid;
     pointerEvent = "OnPointerEvent service pointerUuid: " + pointerEvent;
     int32_t eventPointer = 17;
@@ -435,7 +437,7 @@ bool ServerInputFilterManager::OnPointerEvent(EventPointer event_pointer)
     NetPacket newPkt(MmiMessageId::POINTER_EVENT_INTERCEPTOR);
     newPkt << event_pointer << id;
     if (!ptr->SendMsg(newPkt)) {
-        MMI_LOGE("Sending structure of pointer failed! \n");
+        MMI_LOGE("Sending structure of pointer failed! ");
         return false;
     }
     MMI_LOGD("pointer event interceptor on pointer event end");
