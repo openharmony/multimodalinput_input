@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef _KEY_EVENT_INPUT_SUBSCRIBE_FILTER_H_
-#define _KEY_EVENT_INPUT_SUBSCRIBE_FILTER_H_
+#ifndef KEY_EVENT_SUBSCRIBER_H
+#define KEY_EVENT_SUBSCRIBER_H
 
 #include <algorithm>
 #include <list>
@@ -28,12 +28,10 @@
 
 namespace OHOS {
 namespace MMI {
-
-class KeyEventInputSubscribeFilter : public Singleton<KeyEventInputSubscribeFilter> {
-
+class KeyEventSubscriber : public Singleton<KeyEventSubscriber> {
 public:
-    KeyEventInputSubscribeFilter() = default;
-    ~KeyEventInputSubscribeFilter() = default;
+    KeyEventSubscriber() = default;
+    ~KeyEventSubscriber() = default;
 
     int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
             const std::shared_ptr<OHOS::MMI::KeyOption> keyOption);
@@ -46,11 +44,11 @@ private:
             : id_(id), sess_(sess), keyOption_(keyOption), timerId_(-1)
         {
         }
-        int32_t id_;
-        SessionPtr sess_;
-        std::shared_ptr<OHOS::MMI::KeyOption> keyOption_;
-        int32_t timerId_;
-        std::shared_ptr<KeyEvent> keyEvent_;
+        int32_t id_ { -1 };
+        SessionPtr sess_ { nullptr };
+        std::shared_ptr<OHOS::MMI::KeyOption> keyOption_ { nullptr };
+        int32_t timerId_ { -1 };
+        std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
     };
 
 private:
@@ -66,7 +64,7 @@ private:
     bool AddTimer(const std::shared_ptr<Subscriber>& subscriber, const std::shared_ptr<KeyEvent>& keyEvent);
     void ClearTimer(const std::shared_ptr<Subscriber>& subscriber);
     void OnTimer(const std::shared_ptr<Subscriber> subscriber);
-    void OnSessionLost(SessionPtr sess);
+    void OnSessionDelete(SessionPtr sess);
     bool InitSessionDeleteCallback();
 
     bool CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
@@ -74,11 +72,11 @@ private:
     void RemoveKeyCode(std::vector<int32_t>& keyCodes, int32_t keyCode);
 
 private:
-    std::list<std::shared_ptr<Subscriber>> subscribers_;
-    bool sessionDeletedCallbackInitialized_ {false};
-    std::shared_ptr<KeyEvent> keyEvent_;
+    std::list<std::shared_ptr<Subscriber>> subscribers_ {};
+    bool callbackInitialized_ { false };
+    std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
 };
 }
 }
-#define KeyEventInputSubscribeFlt OHOS::MMI::KeyEventInputSubscribeFilter::GetInstance()
-#endif  // _KEY_EVENT_INPUT_SUBSCRIBE_FILTER_H_
+#define KeyEventSubscriber_ OHOS::MMI::KeyEventSubscriber::GetInstance()
+#endif  // KEY_EVENT_SUBSCRIBER_H

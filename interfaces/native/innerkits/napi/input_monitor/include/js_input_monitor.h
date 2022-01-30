@@ -16,9 +16,10 @@
 #ifndef JS_INPUT_MONITOR_H
 #define JS_INPUT_MONITOR_H
 
-#include <list>
+#include <cinttypes>
 #include <mutex>
-#include <inttypes.h>
+#include <queue>
+#include <uv.h>
 #include "i_input_event_consumer.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -31,13 +32,15 @@ public:
     InputMonitor() = default;
     virtual ~InputMonitor() = default;
 
-    int32_t Start();
+    bool Start();
 
     void Stop();
 
     void MarkConsumed(int32_t eventId);
 
     void SetCallback(std::function<void(std::shared_ptr<PointerEvent>)> callback);
+
+    void SetId(int32_t id);
 
     virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override;
 
@@ -53,7 +56,8 @@ private:
     InputMonitor& operator=(const InputMonitor&) = delete;
 
 private:
-    mutable std::mutex lk_;
+    int32_t id_ {-1};
+    mutable std::mutex mutex_;
     int32_t monitorId_ {-1};
     std::function<void(std::shared_ptr<PointerEvent>)> callback_;
     mutable bool consumed_ {false};
@@ -62,11 +66,11 @@ private:
 
 class JsInputMonitor {
 public:
-    JsInputMonitor(napi_env jsEnv, napi_value receiver);
+    JsInputMonitor(napi_env jsEnv, napi_value receiver, int32_t id);
 
     ~JsInputMonitor();
 
-    void Start();
+    bool Start();
 
     void Stop();
 
@@ -76,8 +80,13 @@ public:
 
     int32_t IsMatch(napi_env jsEnv);
 
-    void OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t GetId();
 
+    void OnPointerEventInJsThread();
+
+    void OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    
+    static void JsCallback(uv_work_t *work, int32_t status);
 private:
     void OnPointerEventInJsThread(std::shared_ptr<PointerEvent> pointerEvent);
 
@@ -91,7 +100,12 @@ private:
     std::shared_ptr<InputMonitor> monitor_ {nullptr};
     napi_ref receiver_ {nullptr};
     napi_env jsEnv_ {nullptr};
-    std::function<void(std::shared_ptr<PointerEvent>)> handle_ {nullptr};
+    uv_loop_s *loop_ = nullptr;
+    int32_t id_ = 0;
+    bool isMonitoring_ = false;
+    std::queue<std::shared_ptr<PointerEvent>> evQueue_;
+    std::mutex mutex_;
+    int32_t jsThreadNum_ = 0;
 };
 }
 }
