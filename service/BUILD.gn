@@ -147,6 +147,7 @@ ohos_shared_library("libmmi-server") {
     "subscriber/src/key_event_subscriber.cpp",
     "subscriber/src/key_option.cpp",
     "timer_manager/src/timer_manager.cpp",
+    "touch_transform_point/src/gesture_transform_point_processor.cpp",
     "touch_transform_point/src/touch_transform_point_manager.cpp",
     "touch_transform_point/src/touch_transform_point_processor.cpp",
     "touch_transform_point/src/touchpad_transform_point_processor.cpp",
