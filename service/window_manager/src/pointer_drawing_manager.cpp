@@ -15,12 +15,12 @@
 #include <display_type.h>
 #include <ui/rs_surface_node.h>
 #include "pointer_drawing_manager.h"
+#include "libmmi_util.h"
 #include "image_type.h"
 #include "image_utils.h"
 #include "image_source.h"
 #include "pixel_map.h"
 #include "log.h"
-#include "define_multimodal.h"
 #include "image/bitmap.h"
 
 namespace OHOS::MMI {
@@ -156,7 +156,7 @@ void OHOS::MMI::MouseDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint3
     constexpr uint32_t stride = 4;
     int32_t addrSize = width * height * stride;
     auto ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
-    CHK(ret == EOK, OHOS::MMI::MEMCPY_SEC_FUN_FAIL);
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     MMI_LOGD("leave");
 }
 
