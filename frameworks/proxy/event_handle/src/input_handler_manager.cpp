@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManager" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManager" };
 }
 
 const int32_t InputHandlerManager::MIN_HANDLER_ID = 1;
@@ -153,15 +153,21 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("OnInputEvent handlerId:%{public}d", handlerId);
-    std::lock_guard<std::mutex> guard(lockHandlers_);
-    auto tItr = inputHandlers_.find(handlerId);
-    if (tItr != inputHandlers_.end()) {
+    MMI_LOGD("Enter handlerId:%{public}d", handlerId);
+    std::map<int32_t, InputHandler>::iterator tItr;
+    std::map<int32_t, InputHandler>::iterator tItrEnd;
+    {
+        std::lock_guard<std::mutex> guard(lockHandlers_);
+        tItr = inputHandlers_.find(handlerId);
+        tItrEnd = inputHandlers_.end();
+    }
+    if (tItr != tItrEnd) {
         if (tItr->second.consumer_ != nullptr) {
             tItr->second.consumer_->OnInputEvent(pointerEvent);
         }
     }
+    MMI_LOGD("Leave");
 }
-}
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 
