@@ -142,7 +142,7 @@ std::vector<EventRegesterInfo>& MultimodalEventHandler::GetAbilityInfoVec()
 
 bool MultimodalEventHandler::InitClient()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     if (mClient_) {
         return true;
     }
@@ -154,7 +154,7 @@ bool MultimodalEventHandler::InitClient()
     if (!(mClient_->Start(mcMsgHandler_, true))) {
         return false;
     }
-    MMI_LOGT("init client success!");
+    MMI_LOGD("init client success!");
     return true;
 }
 
