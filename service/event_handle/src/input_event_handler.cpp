@@ -714,20 +714,32 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGT("InputEventHandler::OnGestureEvent");
-    uint64_t sysStartProcessTime = GetSysClockTime();
-    EventGesture gesture = {};
-    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
-
-    auto pointerEvent = EventPackage::LibinputEventToPointerEvent(event);
-    if (RET_OK == eventDispatch_.HandlePointerEvent(pointerEvent)) {
-        MMI_LOGD("interceptor of OnGestureEvent end");
-        return RET_OK;
+    auto pointer = TouchTransformPointManger->OnTouchPadGestrueEvent(event);
+    if (pointer == nullptr) {
+        MMI_LOGE("Gesture event package failed, errCode:%{public}d", GESTURE_EVENT_PKG_FAIL);
+        return GESTURE_EVENT_PKG_FAIL;
     }
-    auto eventDispatchResult = eventDispatch_.DispatchGestureNewEvent(*udsServer_, event,
-                                                                      pointerEvent, sysStartProcessTime);
-    if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Gesture New event dispatch failed, ret:%{public}d, errCode:%{public}d",
-            eventDispatchResult, GESTURE_EVENT_DISP_FAIL);
+    MMI_LOGT("GestrueEvent package:eventType=%{public}d, actionTime=%{public}d, "
+             "action=%{public}d, actionStartTime=%{public}d, "
+             "pointerAction=%{public}d, sourceType=%{public}d, "
+             "PinchAxisValue=%{public}.2f",
+             pointer->GetEventType(), pointer->GetActionTime(),
+             pointer->GetAction(), pointer->GetActionStartTime(),
+             pointer->GetPointerAction(), pointer->GetSourceType(),
+             pointer->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH));
+
+    PointerEvent::PointerItem item;
+    pointer->GetPointerItem(pointer->GetPointerId(), item);
+    MMI_LOGT("item:DownTime=%{public}d, IsPressed=%{public}s, "
+             "GlobalX=%{public}d, GlobalY=%{public}d, LocalX=%{public}d, LocalY=%{public}d "
+             "Width=%{public}d, Height=%{public}d, DeviceId=%{public}d",
+             item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
+             item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
+             item.GetWidth(), item.GetHeight(), item.GetDeviceId());
+
+    int32_t ret = eventDispatch_.HandlePointerEvent(pointer);
+    if (ret != RET_OK) {
+        MMI_LOGE("Gesture event dispatch failed, errCode:%{public}d", GESTURE_EVENT_DISP_FAIL);
         return GESTURE_EVENT_DISP_FAIL;
     }
     return RET_OK;
