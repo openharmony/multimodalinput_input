@@ -882,9 +882,9 @@ std::shared_ptr<PointerEvent> EventPackage::LibinputEventToPointerEvent(libinput
     pointer.SetGlobalX(MouseState->GetMouseCoordsX());
     pointer.SetGlobalY(MouseState->GetMouseCoordsY());
     pointer.SetPointerId(pointerID);
-    pointer.SetPressed(MouseState->IsLiftBtnPressed());
+    pointer.SetPressed(MouseState->IsLeftBtnPressed());
     pointerEvent->AddPointerItem(pointer);
-    std::vector<uint32_t> pressedButtons;
+    std::vector<int32_t> pressedButtons;
     MouseState->GetPressedButtons(pressedButtons);
 
     if (!pressedButtons.empty()) {
