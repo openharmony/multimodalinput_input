@@ -863,12 +863,12 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
         for (auto it : logicalDisplayInfo.windowsInfo_) {
             if (IsTouchWindow(globalX, globalY, it)) {
                 focusWindow = &it;       
-                firstBtnDownWindow_ = focusWindow;    
+                firstBtnDownWindow_ = *focusWindow;    
                 break;
             }
         }   
     } else {
-        focusWindow = firstBtnDownWindow_ ;
+        focusWindow = &firstBtnDownWindow_ ;
     }
     if (focusWindow == nullptr) {
         MMI_LOGE("Find foucusWindow failed");
