@@ -31,7 +31,7 @@ struct MonitorItem {
     SessionPtr session;
     bool operator == (const struct MonitorItem& item)
     {
-        return this->eventType == item.eventType && this->session == item.session;
+        return eventType == item.eventType && session == item.session;
     }
 };
 

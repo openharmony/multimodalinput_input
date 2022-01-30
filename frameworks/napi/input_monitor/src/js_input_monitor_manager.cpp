@@ -20,14 +20,12 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
-        LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorManager"
-    };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorManager" };
 }
 
 JsInputMonitorManager::~JsInputMonitorManager()
 {
-    for (auto &it : monitors_) {
+    for (const auto &it : monitors_) {
         it->Stop();
     }
     monitors_.clear();
@@ -41,43 +39,74 @@ JsInputMonitorManager& JsInputMonitorManager::GetInstance()
 
 void JsInputMonitorManager::AddMonitor(napi_env jsEnv, napi_value receiver)
 {
-    MMI_LOGD("enter");
+    MMI_LOGD("Enter");
+    std::lock_guard<std::mutex> guard(mutex_);
     for (auto& monitor : monitors_) {
         if (monitor->IsMatch(jsEnv, receiver) != RET_ERR) {
             return;
         }
     }
-    std::unique_ptr<JsInputMonitor> monitor = std::make_unique<JsInputMonitor>(jsEnv, receiver);
-    monitor->Start();
-    monitors_.push_back(std::move(monitor));
-    MMI_LOGD("leave");
+    std::shared_ptr<JsInputMonitor> monitor = std::make_shared<JsInputMonitor>(jsEnv, receiver, nextId_++);
+    monitors_.push_back(monitor);
+    if (!monitor->Start()) {
+        monitors_.pop_back();
+    }
+    MMI_LOGD("Leave");
 }
 
 void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv, napi_value receiver)
 {
-    MMI_LOGD("enter");
-    for (auto it = monitors_.begin(); it != monitors_.end(); ++it) {
-        if ((*it)->IsMatch(jsEnv, receiver) == RET_OK) {
-            (*it)->Stop();
-            monitors_.erase(it);
-            MMI_LOGD("leave");
-            return;
+    MMI_LOGD("Enter");
+    std::shared_ptr<JsInputMonitor> monitor;
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        for (auto it = monitors_.begin(); it != monitors_.end(); ++it) {
+            if ((*it)->IsMatch(jsEnv, receiver) == RET_OK) {
+                monitor = *it;
+                monitors_.erase(it);
+                MMI_LOGD("leave");
+                break;
+            }
         }
     }
+    if (monitor != nullptr) {
+        monitor->Stop();
+    }
+    MMI_LOGD("Leave");    
 }
 
 void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv)
 {
     MMI_LOGD("enter");
-    for (auto it = monitors_.begin(); it != monitors_.end();) {
-        if ((*it)->IsMatch(jsEnv) == RET_OK) {
-            (*it)->Stop();
-            monitors_.erase(it++);
-            MMI_LOGD("leave");
-            return;
+    std::list<std::shared_ptr<JsInputMonitor>> monitors;
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        for (auto it = monitors_.begin(); it != monitors_.end();) {
+            if ((*it)->IsMatch(jsEnv) == RET_OK) {
+                monitors.push_back(*it);
+                monitors_.erase(it++);
+                continue;
+            }
+            ++it;
         }
-        ++it;
     }
+    for (auto &monitor : monitors) {
+        monitor->Stop();
+    }
+    MMI_LOGD("Leave");
 }
+
+std::shared_ptr<JsInputMonitor> JsInputMonitorManager::GetMonitor(int32_t id) {
+    MMI_LOGD("enter");
+    std::lock_guard<std::mutex> guard(mutex_);
+    for (auto &monitor : monitors_) {
+        if (monitor->GetId() == id) {
+            MMI_LOGD("Leave");
+            return monitor;
+        }
+    } 
+    MMI_LOGD("no monitor found");
+    return nullptr;
 }
-}
+} // namespace MMI
+} // namespace OHOS

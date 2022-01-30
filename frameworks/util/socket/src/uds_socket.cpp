@@ -17,23 +17,23 @@
 #include <inttypes.h>
 #include "log.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSocket" };
     }
-}
 
-OHOS::MMI::UDSSocket::UDSSocket()
+UDSSocket::UDSSocket()
 {
 }
 
-OHOS::MMI::UDSSocket::~UDSSocket()
+UDSSocket::~UDSSocket()
 {
     Close();
     EpollClose();
 }
 
-int32_t OHOS::MMI::UDSSocket::EpollCreat(int32_t size)
+int32_t UDSSocket::EpollCreat(int32_t size)
 {
     epollFd_ = epoll_create(size);
     if (epollFd_ < 0) {
@@ -44,7 +44,7 @@ int32_t OHOS::MMI::UDSSocket::EpollCreat(int32_t size)
     return epollFd_;
 }
 
-int32_t OHOS::MMI::UDSSocket::EpollCtl(int32_t fd, int32_t op, epoll_event& event, int32_t epollFd)
+int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, epoll_event& event, int32_t epollFd)
 {
     CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
     if (epollFd < 0) {
@@ -61,7 +61,7 @@ int32_t OHOS::MMI::UDSSocket::EpollCtl(int32_t fd, int32_t op, epoll_event& even
     return ret;
 }
 
-int32_t OHOS::MMI::UDSSocket::EpollWait(epoll_event& events, int32_t maxevents, int32_t timeout, int32_t epollFd)
+int32_t UDSSocket::EpollWait(epoll_event& events, int32_t maxevents, int32_t timeout, int32_t epollFd)
 {
     if (epollFd < 0) {
         epollFd = epollFd_;
@@ -74,7 +74,31 @@ int32_t OHOS::MMI::UDSSocket::EpollWait(epoll_event& events, int32_t maxevents, 
     return ret;
 }
 
-void OHOS::MMI::UDSSocket::EpollClose()
+int32_t UDSSocket::SetBlockMode(int32_t fd, bool isBlock)
+{
+    CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    int32_t flags = fcntl(fd, F_GETFL);
+    if (flags < 0) {
+        MMI_LOGE("fcntl F_GETFL fail. fd:%{public}d,flags:%{public}d,msg:%{public}s,errCode:%{public}d", 
+            fd, flags, strerror(errno), FCNTL_FAIL);
+        return flags;
+    }
+    MMI_LOGT("F_GETFL fd:%{public}d, flags:%{public}d", fd, flags);
+    flags |= O_NONBLOCK; // 非阻塞模式
+    if (isBlock) {
+        flags &= ~O_NONBLOCK; // 阻塞模式
+    }
+    flags = fcntl(fd, F_SETFL, flags);
+    if (flags < 0) {
+        MMI_LOGE("fcntl F_SETFL fail. fd:%{public}d,flags:%{public}d,msg:%{public}s,errCode:%{public}d", 
+            fd, flags, strerror(errno), FCNTL_FAIL);
+        return flags;
+    }
+    MMI_LOGT("F_SETFL fd:%{public}d, flags:%{public}d", fd, flags);
+    return flags;
+}
+
+void UDSSocket::EpollClose()
 {
     if (epollFd_ >= 0) {
         close(epollFd_);
@@ -82,7 +106,7 @@ void OHOS::MMI::UDSSocket::EpollClose()
     }
 }
 
-size_t OHOS::MMI::UDSSocket::Read(char *buf, size_t size)
+size_t UDSSocket::Read(char *buf, size_t size)
 {
     CHKR(buf, ERROR_NULL_POINTER, -1);
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
@@ -94,7 +118,7 @@ size_t OHOS::MMI::UDSSocket::Read(char *buf, size_t size)
     return ret;
 }
 
-size_t OHOS::MMI::UDSSocket::Write(const char *buf, size_t size)
+size_t UDSSocket::Write(const char *buf, size_t size)
 {
     CHKR(buf, ERROR_NULL_POINTER, -1);
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
@@ -106,7 +130,7 @@ size_t OHOS::MMI::UDSSocket::Write(const char *buf, size_t size)
     return ret;
 }
 
-size_t OHOS::MMI::UDSSocket::Send(const char *buf, size_t size, int32_t flags)
+size_t UDSSocket::Send(const char *buf, size_t size, int32_t flags)
 {
     CHKR(buf, ERROR_NULL_POINTER, -1);
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
@@ -117,7 +141,7 @@ size_t OHOS::MMI::UDSSocket::Send(const char *buf, size_t size, int32_t flags)
     return ret;
 }
 
-size_t OHOS::MMI::UDSSocket::Recv(char *buf, size_t size, int32_t flags)
+size_t UDSSocket::Recv(char *buf, size_t size, int32_t flags)
 {
     CHKR(buf, ERROR_NULL_POINTER, -1);
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
@@ -128,7 +152,7 @@ size_t OHOS::MMI::UDSSocket::Recv(char *buf, size_t size, int32_t flags)
     return ret;
 }
 
-size_t OHOS::MMI::UDSSocket::Recvfrom(char *buf, size_t size, uint32_t flags, sockaddr *addr, size_t *addrlen)
+size_t UDSSocket::Recvfrom(char *buf, size_t size, uint32_t flags, sockaddr *addr, size_t *addrlen)
 {
     CHKR(buf, ERROR_NULL_POINTER, -1);
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
@@ -140,7 +164,7 @@ size_t OHOS::MMI::UDSSocket::Recvfrom(char *buf, size_t size, uint32_t flags, so
     return ret;
 }
 
-size_t OHOS::MMI::UDSSocket::Sendto(const char *buf, size_t size, uint32_t flags, sockaddr *addr, size_t addrlen)
+size_t UDSSocket::Sendto(const char *buf, size_t size, uint32_t flags, sockaddr *addr, size_t addrlen)
 {
     CHKR(buf, ERROR_NULL_POINTER, -1);
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
@@ -152,7 +176,7 @@ size_t OHOS::MMI::UDSSocket::Sendto(const char *buf, size_t size, uint32_t flags
     return ret;
 }
 
-void OHOS::MMI::UDSSocket::Close()
+void UDSSocket::Close()
 {
     if (fd_ >= 0) {
         auto rf = close(fd_);
@@ -161,4 +185,6 @@ void OHOS::MMI::UDSSocket::Close()
         }
     }
     fd_ = -1;
+}
+}
 }
