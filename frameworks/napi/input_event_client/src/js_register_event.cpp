@@ -383,7 +383,7 @@ bool SendMultimodalEvent(const napi_env& env, const CallbackMap& jsEvent, int32_
 
 AppSystemEventHandle::AppSystemEventHandle(const napi_env& env)
 {
-    this->env_ = env;
+    env_ = env;
     jsEvent[eventTable[ON_SCREEN_SHOT]] = {};
     jsEvent[eventTable[ON_SCREEN_SPLIT]] = {};
     jsEvent[eventTable[ON_START_SCREEN_RECORD]] = {};
@@ -460,7 +460,7 @@ bool AppSystemEventHandle::OnMute(const MultimodalEvent& multimodalEvent)
 
 AppCommonEventHandle::AppCommonEventHandle(const napi_env& env)
 {
-    this->env_ = env;
+    env_ = env;
     jsEvent[eventTable[ON_SHOW_MENU]] = {};
     jsEvent[eventTable[ON_SEND]] = {};
     jsEvent[eventTable[ON_COPY]] = {};
@@ -549,7 +549,7 @@ bool AppCommonEventHandle::OnPrint(const MultimodalEvent& multimodalEvent)
 
 AppTelephoneEventHandle::AppTelephoneEventHandle(const napi_env& env)
 {
-    this->env_ = env;
+    env_ = env;
     jsEvent[eventTable[ON_ANSWER]] = {};
     jsEvent[eventTable[ON_REFUSE]] = {};
     jsEvent[eventTable[ON_HANGUP]] = {};
@@ -578,7 +578,7 @@ bool AppTelephoneEventHandle::OnTelephoneControl(const MultimodalEvent& multimod
 
 AppMediaEventHandle::AppMediaEventHandle(const napi_env& env)
 {
-    this->env_ = env;
+    env_ = env;
     jsEvent[eventTable[ON_PLAY]] = {};
     jsEvent[eventTable[ON_PAUSE]] = {};
     jsEvent[eventTable[ON_MEDIA_CONTROL]] = {};
@@ -601,7 +601,7 @@ bool AppMediaEventHandle::OnMediaControl(const MultimodalEvent& multimodalEvent)
 
 AppKeyEventHandle::AppKeyEventHandle(const napi_env& env)
 {
-    this->env_ = env;
+    env_ = env;
     jsEvent[keyTable[ON_KEY]] = {};
 }
 
@@ -666,7 +666,7 @@ bool AppKeyEventHandle::SendEvent(const std::string& name, const OHOS::KeyEvent&
 
 AppTouchEventHandle::AppTouchEventHandle(const napi_env& env)
 {
-    this->env_ = env;
+    env_ = env;
     jsEvent[touchTable[ON_TOUCH]] = {};
 }
 
@@ -768,7 +768,7 @@ void AppTouchEventHandle::PrepareData(const napi_env& env, napi_value argv,
 
 AppDeviceEventHandle::AppDeviceEventHandle(const napi_env& env)
 {
-    this->env_ = env;
+    env_ = env;
     jsEvent[deviceTable[ON_DEVICE_ADD]] = {};
     jsEvent[deviceTable[ON_DEVICE_REMOVE]] = {};
 }
