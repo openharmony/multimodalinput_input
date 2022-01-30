@@ -285,7 +285,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
 
 bool JsInputMonitor::Start() {
     MMI_LOGD("Enter");
-    CHKPF(monitor_);
+    CHKPF(monitor_, "start monitor failed");
     if (isMonitoring_) {
         MMI_LOGW("js is monitoring");
         return true;
