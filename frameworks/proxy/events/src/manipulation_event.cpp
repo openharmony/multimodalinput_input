@@ -42,7 +42,8 @@ void ManipulationEvent::Initialize(int32_t windowId, int32_t startTime, int32_t 
     if (fingersInfos != nullptr) {
         int32_t ret = memset_s(mfingersInfos_, sizeof(fingerInfos) * FINGER_NUM, 0, sizeof(fingerInfos) * FINGER_NUM);
         CHK(ret == EOK, MEMSET_SEC_FUN_FAIL);
-        ret = memcpy_s(mfingersInfos_, sizeof(fingerInfos) * FINGER_NUM, fingersInfos, sizeof(fingerInfos) * pointerCount);
+        ret = memcpy_s(mfingersInfos_, sizeof(fingerInfos) * FINGER_NUM, fingersInfos,
+                       sizeof(fingerInfos) * pointerCount);
         CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     }
 }
