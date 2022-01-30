@@ -24,11 +24,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
-        LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorModule"
-    };
-
-    const uint32_t MAX_STRING_LEN = 1024;
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorModule" };
+    constexpr uint32_t MAX_STRING_LEN = 1024;
 }
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
