@@ -14,7 +14,7 @@
  */
 #ifndef OHOS_EVENT_PACKAGE_H
 #define OHOS_EVENT_PACKAGE_H
-#include "mouse_state_gesture.h"
+#include "mouse_device_state.h"
 #include "pointer_event.h"
 #include "key_event.h"
 #include "input_windows_manager.h"
