@@ -857,7 +857,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
 
     WindowInfo *focusWindow = nullptr;
     int32_t action = pointerEvent->GetPointerAction();
-    if ((firstBtnDownWindow_ == nullptr)
+    if ((firstBtnDownWindow_.pid == 0)
         || (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN && pointerEvent->GetPressedButtons().size() == 1)
         || (action == PointerEvent::POINTER_ACTION_MOVE && pointerEvent->GetPressedButtons().empty())) {
         for (auto it : logicalDisplayInfo.windowsInfo_) {
