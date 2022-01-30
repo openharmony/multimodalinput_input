@@ -867,59 +867,5 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
     }
     return RET_OK;
 }
-
-const uint16_t pointerID = 1; // mouse has only one PoingeItem, so id is 1
-
-std::shared_ptr<PointerEvent> EventPackage::LibinputEventToPointerEvent(libinput_event *event)
-{
-    int32_t defaultDeviceId = 0;
-    double gestureScale = 0;
-    int32_t pointerEventType = 0;
-    auto pointerEvent = PointerEvent::Create();
-    auto data = libinput_event_get_gesture_event(event);
-    auto type = libinput_event_get_type(event);
-    PointerEvent::PointerItem pointer;
-    pointer.SetGlobalX(MouseState->GetMouseCoordsX());
-    pointer.SetGlobalY(MouseState->GetMouseCoordsY());
-    pointer.SetPointerId(pointerID);
-    pointer.SetPressed(MouseState->IsLeftBtnPressed());
-    pointerEvent->AddPointerItem(pointer);
-    std::vector<int32_t> pressedButtons;
-    MouseState->GetPressedButtons(pressedButtons);
-
-    if (!pressedButtons.empty()) {
-        for (auto it = pressedButtons.begin(); it != pressedButtons.end(); it++) {
-            pointerEvent->SetButtonPressed(*it);
-        }
-    }
-
-    switch (type) {
-        case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN: {
-            pointerEventType = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
-            break;
-        }
-        case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE: {
-            pointerEventType = PointerEvent::POINTER_ACTION_AXIS_UPDATE;
-            gestureScale = libinput_event_gesture_get_scale(data);
-            break;
-        }
-        case LIBINPUT_EVENT_GESTURE_PINCH_END: {
-            pointerEventType = PointerEvent::POINTER_ACTION_AXIS_END;
-            gestureScale = libinput_event_gesture_get_scale(data);
-            break;
-        }
-        default: {
-            MMI_LOGW("Unknown event type of gesture, gestureType:%{public}d", type);
-            break;
-        }
-    }
-
-    pointerEvent->SetTargetDisplayId(0);
-    pointerEvent->SetPointerId(pointerID);
-    pointerEvent->SetDeviceId(defaultDeviceId);
-    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, gestureScale);
-    pointerEvent->SetPointerAction(pointerEventType);
-    return pointerEvent;
-}
 }
 }
