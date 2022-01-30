@@ -38,7 +38,7 @@ private:
         SessionPtr session;
         bool operator == (const struct InterceptorItem& item)
         {
-            return this->id == item.id;
+            return id == item.id;
         }
     };
 private:

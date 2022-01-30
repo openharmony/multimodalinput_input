@@ -19,32 +19,32 @@ namespace OHOS {
 namespace MMI {
 void InputDevice::SetId(int32_t deviceId)
 {
-    this->id_ = deviceId;
+    id_ = deviceId;
 }
 
 int32_t InputDevice::GetId()
 {
-    return this->id_;
+    return id_;
 }
 
 void InputDevice::SetName(std::string name)
 {
-    this->name_ = name;
+    name_ = name;
 }
 
 std::string InputDevice::GetName()
 {
-    return this->name_;
+    return name_;
 }
 
 void InputDevice::SetType(int32_t deviceType)
 {
-    this->deviceType_ = deviceType;
+    deviceType_ = deviceType;
 }
 
 int32_t InputDevice::GetType()
 {
-    return this->deviceType_;
+    return deviceType_;
 }
 }
 }

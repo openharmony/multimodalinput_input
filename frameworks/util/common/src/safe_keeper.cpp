@@ -19,25 +19,24 @@
 #include "util.h"
 
 namespace OHOS::MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SafeKeeper" };
-    }
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SafeKeeper" };
 }
 
-OHOS::MMI::SafeKeeper::SafeKeeper()
+SafeKeeper::SafeKeeper()
 {
 }
 
-OHOS::MMI::SafeKeeper::~SafeKeeper()
+SafeKeeper::~SafeKeeper()
 {
 }
 
-void OHOS::MMI::SafeKeeper::Init(SafeCallbackFun fun)
+void SafeKeeper::Init(SafeCallbackFun fun)
 {
     cbFun_ = fun;
 }
 
-bool OHOS::MMI::SafeKeeper::RegisterEvent(uint64_t tid, const std::string& remark)
+bool SafeKeeper::RegisterEvent(uint64_t tid, const std::string& remark)
 {
     CHKF(!IsExist(tid), PARAM_INPUT_INVALID);
     CHKF(!remark.empty(), PARAM_INPUT_INVALID);
@@ -48,14 +47,14 @@ bool OHOS::MMI::SafeKeeper::RegisterEvent(uint64_t tid, const std::string& remar
     return true;
 }
 
-void OHOS::MMI::SafeKeeper::ClearAll()
+void SafeKeeper::ClearAll()
 {
     std::lock_guard<std::mutex> lock(mtx_);
     dList_.clear();
     cbFun_ = nullptr;
 }
 
-void OHOS::MMI::SafeKeeper::ReportHealthStatus(uint64_t tid)
+void SafeKeeper::ReportHealthStatus(uint64_t tid)
 {
     CHK(tid > 0, PARAM_INPUT_INVALID);
     std::lock_guard<std::mutex> lock(mtx_);
@@ -68,7 +67,7 @@ void OHOS::MMI::SafeKeeper::ReportHealthStatus(uint64_t tid)
     ptr->lastTime = GetCurMillisTime();
 }
 
-void OHOS::MMI::SafeKeeper::ProcessEvents()
+void SafeKeeper::ProcessEvents()
 {
     if (dList_.empty()) {
         return;
@@ -84,4 +83,5 @@ void OHOS::MMI::SafeKeeper::ProcessEvents()
             return;
         }
     }
+}
 }

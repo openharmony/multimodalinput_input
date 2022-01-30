@@ -18,21 +18,20 @@
 #include "souceType.h"
 
 namespace OHOS::MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManager" };
-    }
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManager" };
 }
 
-OHOS::MMI::InterceptorManager::InterceptorManager()
+InterceptorManager::InterceptorManager()
 {
-    this->InterceptorItemId = 0;
+    InterceptorItemId = 0;
 }
 
-OHOS::MMI::InterceptorManager::~InterceptorManager()
+InterceptorManager::~InterceptorManager()
 {
 }
 
-int32_t OHOS::MMI::InterceptorManager::AddInterceptor(int32_t sourceType, 
+int32_t InterceptorManager::AddInterceptor(int32_t sourceType,
     std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
 {
     if (interceptor == nullptr) {
@@ -41,7 +40,7 @@ int32_t OHOS::MMI::InterceptorManager::AddInterceptor(int32_t sourceType,
     }
 
     InterceptorItem interceptorItem;
-    interceptorItem.id_ = ++this->InterceptorItemId;
+    interceptorItem.id_ = ++InterceptorItemId;
     interceptorItem.sourceType = sourceType;
     interceptorItem.callback = interceptor;
     interceptor_.push_back(interceptorItem);
@@ -50,7 +49,7 @@ int32_t OHOS::MMI::InterceptorManager::AddInterceptor(int32_t sourceType,
     return interceptorItem.id_;
 }
 
-int32_t OHOS::MMI::InterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
+int32_t InterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
     if (interceptor == nullptr) {
         MMI_LOGE("InterceptorManager::%{public}s param should not be null!", __func__);
@@ -58,7 +57,7 @@ int32_t OHOS::MMI::InterceptorManager::AddInterceptor(std::function<void(std::sh
     }
 
     InterceptorItem interceptorItem;
-    interceptorItem.id_ = ++this->InterceptorItemId;
+    interceptorItem.id_ = ++InterceptorItemId;
     interceptorItem.sourceType = SOURCETYPE_KEY;
     interceptorItem.callback_ = interceptor;
     interceptor_.push_back(interceptorItem);
@@ -69,7 +68,7 @@ int32_t OHOS::MMI::InterceptorManager::AddInterceptor(std::function<void(std::sh
     return MMI_STANDARD_EVENT_INVALID_PARAMETER;
 }
 
-void OHOS::MMI::InterceptorManager::RemoveInterceptor(int32_t interceptorId)
+void InterceptorManager::RemoveInterceptor(int32_t interceptorId)
 {
     if (interceptorId <= 0) {
         MMI_LOGE("InterceptorManager::%{public}s interceptorId invalid", __func__);
@@ -88,7 +87,7 @@ void OHOS::MMI::InterceptorManager::RemoveInterceptor(int32_t interceptorId)
     }
 }
 
-int32_t OHOS::MMI::InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id)
+int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id)
 {
     if (pointerEvent == nullptr) {
         MMI_LOGE("InterceptorManager::%{public}s param should not be null!", __func__);
@@ -117,7 +116,7 @@ int32_t OHOS::MMI::InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEve
     return MMI_STANDARD_EVENT_SUCCESS;
 }
 
-int32_t OHOS::MMI::InterceptorManager::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+int32_t InterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     if (keyEvent == nullptr) {
         MMI_LOGE("InterceptorManager::%{public}s param should not be null!", __func__);
@@ -130,4 +129,5 @@ int32_t OHOS::MMI::InterceptorManager::OnKeyEvent(std::shared_ptr<OHOS::MMI::Key
         }     
     }
     return MMI_STANDARD_EVENT_SUCCESS;
+}
 }
