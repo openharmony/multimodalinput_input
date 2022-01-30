@@ -59,12 +59,7 @@ std::unique_ptr<OHOS::Media::PixelMap> OHOS::MMI::MouseDrawingManager::DecodeIma
 
 void OHOS::MMI::MouseDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY)
 {
-<<<<<<< HEAD
     MMI_LOGD("enter, displayId:%{public}d, globalX:%{public}d, globalY:%{public}d", displayId, globalX, globalY);
-=======
-    MMI_LOGD("enter");
-    MMI_LOGD("display:%{public}d, globalX:%{public}d, globalY:%{public}d", displayId, globalX, globalY);
->>>>>>> 7f04a8f1273ab0d4136b1f8745b04be96fa069d1
     if (drawWindow_ == nullptr) {
         std::string windowName = "pointer window";
         sptr<OHOS::Rosen::WindowOption> option = new OHOS::Rosen::WindowOption();
