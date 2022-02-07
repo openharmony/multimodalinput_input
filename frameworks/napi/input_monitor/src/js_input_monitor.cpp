@@ -285,7 +285,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
 
 bool JsInputMonitor::Start() {
     MMI_LOGD("Enter");
-    //CHKPF(monitor_, "register monitor failed");
+    CHKPF(monitor_, OHOS::ERROR_NULL_POINTER);
     if (isMonitoring_) {
         MMI_LOGW("js is monitoring");
         return true;
@@ -318,7 +318,7 @@ JsInputMonitor::~JsInputMonitor()
 
 void JsInputMonitor::Stop() {
     MMI_LOGD("Enter");
-    //CHKPF(monitor_, "register monitor failed");
+    CHKP(monitor_);
     if (isMonitoring_) {
         isMonitoring_ = false;
         if (monitor_ != nullptr) {
@@ -328,13 +328,15 @@ void JsInputMonitor::Stop() {
     MMI_LOGD("Leave");
 }
 
-int32_t JsInputMonitor::GetId() {
+int32_t JsInputMonitor::GetId()
+{
     return id_;
 }
 
-void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent) {
+void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
     MMI_LOGD("Enter");
-    //CHK(monitor_, "register monitor failed");
+    CHKP(monitor_);
     int32_t num = 0;
     {
         std::lock_guard<std::mutex> guard(mutex_);
@@ -352,7 +354,8 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent) 
     MMI_LOGD("Leave");
 }
 
-void JsInputMonitor::JsCallback(uv_work_t *work, int32_t status) {
+void JsInputMonitor::JsCallback(uv_work_t *work, int32_t status)
+{
     MMI_LOGD("Enter");
     int32_t *id = static_cast<int32_t *>(work->data);
     delete work;
@@ -374,7 +377,8 @@ void JsInputMonitor::ResetEnv() {
     receiver_ = nullptr;
 }*/
 
-void JsInputMonitor::OnPointerEventInJsThread() {
+void JsInputMonitor::OnPointerEventInJsThread()
+{
     MMI_LOGD("Enter");
     if (!isMonitoring_) {
         MMI_LOGE("js monitor stop");
