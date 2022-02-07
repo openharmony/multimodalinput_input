@@ -1259,7 +1259,8 @@ void ClientMsgHandler::TraceTouchEvent(const EventTouch& touchData) const
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, eventTouch);
 }
 
-void ClientMsgHandler::OnEventProcessed(int32_t eventId) {
+void ClientMsgHandler::OnEventProcessed(int32_t eventId)
+{
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     if (client == nullptr) {
         MMI_LOGE("Get MMIClint false");
