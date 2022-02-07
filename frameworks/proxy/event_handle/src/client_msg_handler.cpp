@@ -797,10 +797,8 @@ int32_t ClientMsgHandler::PointerEventInterceptor(const UDSClient& client, NetPa
 
 int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt)
 {
-    int32_t handlerId { };
-    InputHandlerType handlerType { };
-    pkt >> handlerId >> handlerType;
-
+    int32_t handlerId;
+    CHKR(pkt.Read(handlerId), STREAM_BUF_READ_FAIL, RET_ERR);
     auto keyEvent = KeyEvent::Create();
     if (InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, keyEvent, pkt) != ERR_OK) {
         MMI_LOGE("Failed to deserialize key event.");
@@ -813,9 +811,10 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
 int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("Client ReportPointerEventd in");
-    int32_t handlerId { };
-    InputHandlerType handlerType { };
-    pkt >> handlerId >> handlerType;
+    int32_t handlerId;
+    InputHandlerType handlerType;
+    CHKR(pkt.Read(handlerId), STREAM_BUF_READ_FAIL, RET_ERR);
+    CHKR(pkt.Read(handlerType), STREAM_BUF_READ_FAIL, RET_ERR);
     MMI_LOGD("Client handlerId : %{public}d handlerType : %{public}d", handlerId, handlerType); 
 
     auto pointerEvent { PointerEvent::Create() };
