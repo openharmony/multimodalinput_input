@@ -20,6 +20,7 @@
 #include "event_filter_service.h"
 #include "input_event_monitor_manager.h"
 #include "input_monitor_manager.h"
+#include "input_interceptor_manager.h"
 #include "interceptor_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
@@ -205,7 +206,7 @@ void InputManagerImpl::PrintDisplayDebugInfo()
 
         for (int32_t j = 0; j < static_cast<int32_t>(logicalDisplays_[i].windowsInfo_.size()); j++) {
             MMI_LOGD("windowid:%{public}d, pid:%{public}d,uid:%{public}d,topLeftX:%{public}d,"
-                "topLeftY:%{public}d,width:%{public}d,height:%{public}d,display:%{public}d,agentWindowId:%{public}d,",
+                "topLeftY:%{public}d,width:%{public}d,height:%{public}d,displayId:%{public}d,agentWindowId:%{public}d,",
                 logicalDisplays_[i].windowsInfo_[j].id, logicalDisplays_[i].windowsInfo_[j].pid,
                 logicalDisplays_[i].windowsInfo_[j].uid, logicalDisplays_[i].windowsInfo_[j].topLeftX,
                 logicalDisplays_[i].windowsInfo_[j].topLeftY, logicalDisplays_[i].windowsInfo_[j].width,
@@ -266,14 +267,19 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
     InputMonitorManager::GetInstance().MarkConsumed(monitorId, eventId);
 }
 
+int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
+{
+    int32_t interceptorId = InputInterceptorManager::GetInstance().AddInterceptor(interceptor);
+    if (interceptorId >= 0) {
+        interceptorId = interceptorId * ADD_MASK_BASE + MASK_TOUCH;
+    }
+    return interceptorId;
+}
+
 int32_t InputManagerImpl::AddInterceptor(int32_t sourceType,
                                          std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
 {
-    if (interceptor == nullptr) {
-        MMI_LOGE("AddInterceptor::%{public}s param should not be null!", __func__);
-        return InterceptorManager::INVALID_INTERCEPTOR_ID;
-    }
-    return INTERCEPTORMANAGER.AddInterceptor(sourceType, interceptor);
+    return -1;
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
@@ -282,12 +288,32 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
         MMI_LOGE("AddInterceptor::%{public}s param should not be null!", __func__);
         return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
-    return INTERCEPTORMANAGER.AddInterceptor(interceptor);
+    int32_t interceptorId = INTERCEPTORMANAGER.AddInterceptor(interceptor);
+    if (interceptorId >= 0) {
+        interceptorId = interceptorId * ADD_MASK_BASE + MASK_KEY;
+    }
+    return interceptorId;
 }
 
 void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 {
-    INTERCEPTORMANAGER.RemoveInterceptor(interceptorId);
+    if (interceptorId < 0) {
+        MMI_LOGE("Specified interceptor does not exist.");
+        return;
+    }
+    int32_t mask = interceptorId % ADD_MASK_BASE;
+    interceptorId /= ADD_MASK_BASE;
+    switch (mask) {
+        case MASK_TOUCH:
+            InputInterceptorManager::GetInstance().RemoveInterceptor(interceptorId);
+            break;
+        case MASK_KEY:
+            INTERCEPTORMANAGER.RemoveInterceptor(interceptorId);
+            break;
+        default:
+            MMI_LOGE("Can't find the mask,mask%{public}d", mask);
+            break;
+    }
 }
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
@@ -295,6 +321,12 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> k
     if (MMIEventHdl.InjectEvent(keyEvent) != RET_OK) {
         MMI_LOGE("Failed to inject keyEvent!");
     }
+}
+
+void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
+{
+    if (MultimodalEventHandler::GetInstance().InjectPointerEvent(pointerEvent) != RET_OK)
+        MMI_LOGE("Failed to inject pointer event!");
 }
 
 void InputManagerImpl::OnConnected()
