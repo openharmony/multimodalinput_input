@@ -55,7 +55,7 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
 
 int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     if (eventFilterService_ == nullptr) {
         eventFilterService_ = new EventFilterService();
         MMI_LOGD("new EventFilterService");
@@ -81,7 +81,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
         }
     }
 
-    MMI_LOGT("leave, success with hasSendToMmiServer is already true");
+    MMI_LOGD("leave, success with hasSendToMmiServer is already true");
     return RET_OK;
 }
 
@@ -99,7 +99,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     MMI_LOGD("enter");
     int32_t getKeyCode = keyEvent->GetKeyCode();
     std::string keyCodestring = " OnKeyEvent client trace getKeyCode: " + std::to_string(getKeyCode);
-    MMI_LOGT(" OnKeyEvent client trace getKeyCode = %{public}d", getKeyCode);
+    MMI_LOGD(" OnKeyEvent client trace getKeyCode = %{public}d", getKeyCode);
     int32_t eventKey = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
     if (consumer_ != nullptr) {
