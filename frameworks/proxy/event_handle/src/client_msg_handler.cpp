@@ -42,10 +42,12 @@ namespace {
 
 ClientMsgHandler::ClientMsgHandler()
 {
+    eventProcessedCallback_ = std::bind(&ClientMsgHandler::OnEventProcessed, std::placeholders::_1);
 }
 
 ClientMsgHandler::~ClientMsgHandler()
 {
+    eventProcessedCallback_ = std::function<void(int32_t)>();
 }
 
 bool ClientMsgHandler::Init()
@@ -171,6 +173,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     MMI_LOGD(" OnKeyEvent client trace keyCode = %{public}d", getKeyCode);
     int32_t eventKey = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
+    key->SetProcessedCallback(eventProcessedCallback_);
     InputManagerImpl::GetInstance()->OnKeyEvent(key);
     return RET_OK;
 }
@@ -219,6 +222,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_LOGD("Operation canceled.");
     }
+    pointerEvent->SetProcessedCallback(eventProcessedCallback_);
     InputManagerImpl::GetInstance()->OnPointerEvent(pointerEvent);
     return RET_OK;
 }
@@ -1253,5 +1257,17 @@ void ClientMsgHandler::TraceTouchEvent(const EventTouch& touchData) const
     touchEventString = " nevent dispatcher of client touchUuid: " + touchEventString;
     int32_t eventTouch = 9;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, eventTouch);
+}
+
+void ClientMsgHandler::OnEventProcessed(int32_t eventId)
+{
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
+    if (client == nullptr) {
+        MMI_LOGE("Get MMIClint false");
+        return;
+    }
+    NetPacket pkt(MmiMessageId::NEW_CHECK_REPLY_MESSAGE);
+    pkt << eventId;
+    CHK(client->SendMessage(pkt), MSG_SEND_FAIL);
 }
 }
