@@ -105,8 +105,8 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventTouchpadMontior(int32_
         return RET_ERR;
     } else {
         iter = monitorsTouch_.insert(iter, monitorItemTouchpad);
-        MMI_LOGD("eventType: %{public}d, fd: %{public}d register in server", eventType, session->GetFd());
-        MMI_LOGD("Service AddInputEventTouchpadMontior Success");
+        MMI_LOGD("AddInputEventTouchpadMontior, Success, eventType: %{public}d, fd: %{public}d register in server",
+            eventType, session->GetFd());
         return RET_OK;
     }
 }

@@ -94,7 +94,6 @@ void MultimodalEventHandlerTest::TearDownTestCase()
 void MultimodalEventHandlerTest::RegisterStandardizedEventHandle()
 {
     MMI_LOGI("MMIClientDemo RegisterStandardizedEventHandle enter.");
-    MMI_LOGT("Register key event.");
     using namespace OHOS::MMI;
     auto appKey = CreateEvent<AppKeyEventHandle>();
     handerMap_[std::string("AppKeyEventHandle")] = appKey;

@@ -75,7 +75,6 @@ bool UDSClient::ThreadIsEnd()
     if (!isThreadHadRun_) {
         MMI_LOGI("thread is not run. this: %p, isThreadHadRun_: %p, isThreadHadRun_: %d",
                  this, &isThreadHadRun_, isThreadHadRun_);
-        MMI_LOGI("thread is not run.");
         return false;
     }
 
