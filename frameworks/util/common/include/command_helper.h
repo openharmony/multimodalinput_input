@@ -26,8 +26,8 @@ namespace OHOS::MMI {
         CommandHelper(const std::string& command) : command_(command)
         {
             SplitStr(command_, strSep_, splitParameters_);
-            for (auto& i : splitParameters_) {
-                std::string s = TrimStr(i, '\n');
+            for (auto &item : splitParameters_) {
+                std::string s = TrimStr(item, '\n');
                 MMI_LOGI("##%s##", s.c_str());
             }
         }

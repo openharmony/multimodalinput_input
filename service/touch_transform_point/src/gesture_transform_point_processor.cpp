@@ -59,8 +59,8 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_ge
     pointerEvent_->ClearButtonPressed();
     std::vector<int32_t> pressedButtons;
     MouseState->GetPressedButtons(pressedButtons);
-    for (auto it = pressedButtons.begin(); it != pressedButtons.end(); ++it) {
-        pointerEvent_->SetButtonPressed(*it);
+    for (const auto &item : pressedButtons) {
+        pointerEvent_->SetButtonPressed(item);
     }
 
     pointerEvent_->SetDeviceId(deviceId_);
@@ -88,8 +88,8 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchUpdate(libinput_event_g
     pointerEvent_->ClearButtonPressed();
     std::vector<int32_t> pressedButtons;
     MouseState->GetPressedButtons(pressedButtons);
-    for (auto it = pressedButtons.begin(); it != pressedButtons.end(); ++it) {
-        pointerEvent_->SetButtonPressed(*it);
+    for (const auto &item : pressedButtons) {
+        pointerEvent_->SetButtonPressed(item);
     }
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
 }
@@ -113,8 +113,8 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gest
     pointerEvent_->ClearButtonPressed();
     std::vector<int32_t> pressedButtons;
     MouseState->GetPressedButtons(pressedButtons);
-    for (auto it = pressedButtons.begin(); it != pressedButtons.end(); ++it) {
-        pointerEvent_->SetButtonPressed(*it);
+    for (const auto &item : pressedButtons) {
+        pointerEvent_->SetButtonPressed(item);
     }
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
 }

@@ -129,8 +129,8 @@ int32_t MultimodalStandardizedEventManager::SubscribeKeyEvent(
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keySubscribeIdstring, eventKey);
 
     std::vector<int32_t> preKeys = keyOption->GetPreKeys();
-    for (auto preKeyIter = preKeys.begin(); preKeyIter != preKeys.end(); ++preKeyIter) {
-        pkt << *preKeyIter;
+    for (const auto &item : preKeys) {
+        pkt << item;
     }
     if (MMIEventHdl.GetMMIClient() == nullptr) {
         MMI_LOGE("client init failed");
@@ -720,7 +720,7 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
              static_cast<int32_t>(pointerIds.size()));
 
-    for (int32_t pointerId : pointerIds) {
+    for (const auto &pointerId : pointerIds) {
         OHOS::MMI::PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
 
@@ -736,7 +736,7 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
     if (pressedKeys.empty()) {
         MMI_LOGI("Pressed keys is empty");
     } else {
-        for (int32_t keyCode : pressedKeys) {
+        for (auto &keyCode : pressedKeys) {
             MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
         }
     }

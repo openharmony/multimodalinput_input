@@ -135,7 +135,7 @@ int32_t InputFilterManager::OnKeyEvent(KeyBoardEvent event, int32_t id)
 {
     MMI_LOGD("client on key event call function handler ");
     OnkeyEventTrace(event);
-    for (auto item : keyEventFilterList_) {
+    for (auto &item : keyEventFilterList_) {
         if (id == item.GetId()) {
             item.GetHandler()(event);
             MMI_LOGD("client on key event call function handler success");
@@ -149,10 +149,10 @@ int32_t InputFilterManager::GetHighAuthorityFilterId()
 {
     Authority authority = NO_AUTHORITY;
     int32_t id = 0;
-    for (auto it = touchEventFilterList_.begin(); it != touchEventFilterList_.end(); it++) {
-        if (it->GetAuthority() > authority) {
-            authority = it->GetAuthority();
-            id = it->GetId();
+    for (auto &item : touchEventFilterList_) {
+        if (item.GetAuthority() > authority) {
+            authority = item.GetAuthority();
+            id = item.GetId();
             if (authority == HIGH_AUTHORITY) {
                 break;
             }
@@ -163,9 +163,9 @@ int32_t InputFilterManager::GetHighAuthorityFilterId()
 
 InputFilterManager::TouchEventFilter InputFilterManager::GetTouchEventFilter(int32_t id)
 {
-    for (auto it = touchEventFilterList_.begin(); it != touchEventFilterList_.end(); it++) {
-        if (it->GetId() == id) {
-            return *it;
+    for (auto &item : touchEventFilterList_) {
+        if (item.GetId() == id) {
+            return item;
         }
     }
     InputFilterManager::TouchEventFilter touchEventFilter;
@@ -289,7 +289,7 @@ int32_t InputFilterManager::OnTouchEvent(TouchEvent event, int32_t id)
             break;
         }
     }
-    return 0;
+    return RET_OK;
 }
 
 int32_t InputFilterManager::RegisterPointerEventInterceptor(std::string name_, Authority authority_,
@@ -404,7 +404,7 @@ int32_t InputFilterManager::OnPointerEvent(MouseEvent event, int32_t id_)
 {
     MMI_LOGD("client on point event call function handler ");
     OnPointerEventTrace(event);
-    for (auto item : PointerEventInterceptorList_)
+    for (auto &item : PointerEventInterceptorList_)
     {
         if (id_ == item.GetId()) {
             item.GetHandler()(event);

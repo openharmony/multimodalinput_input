@@ -58,9 +58,9 @@ bool MouseDeviceState::IsLeftBtnPressed()
 void MouseDeviceState::GetPressedButtons(std::vector<int32_t>& pressedButtons)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    for (const auto iter : mouseBtnState_) {
-        if (iter.second > 0) {
-            pressedButtons.push_back(LibinputChangeToPointer(iter.first));
+    for (const auto &item : mouseBtnState_) {
+        if (item.second > 0) {
+            pressedButtons.push_back(LibinputChangeToPointer(item.first));
         }
     }
 }

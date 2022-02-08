@@ -80,10 +80,10 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
     NetPacket newPkt(MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR);
     InputEventDataTransformation::SerializePointerEvent(pointerEvent, newPkt);
     std::list<InterceptorItem>::iterator iter;
-    for (iter = interceptor_.begin(); iter != interceptor_.end(); iter++) {
-        newPkt << iter->session->GetPid() <<iter->id;
-        MMI_LOGD("server send the interceptor msg to client : pid = %{public}d", iter->session->GetPid());
-        iter->session->SendMsg(newPkt);
+    for (const auto &item : interceptor_) {
+        newPkt << item.session->GetPid() <<iter->id;
+        MMI_LOGD("server send the interceptor msg to client : pid = %{public}d", item.session->GetPid());
+        item.session->SendMsg(newPkt);
     }
     return true;
 }
@@ -97,12 +97,11 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> k
     }
     NetPacket newPkt(MmiMessageId::KEYBOARD_EVENT_INTERCEPTOR);
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, newPkt);
-    std::list<InterceptorItem>::iterator iter;
-    for (iter = interceptor_.begin(); iter != interceptor_.end(); iter++) {
-        if (iter->sourceType == SOURCETYPE_KEY) {
-            newPkt << iter->session->GetPid();
-            MMI_LOGD("server send the interceptor msg to client : pid = %{public}d", iter->session->GetPid());
-            iter->session->SendMsg(newPkt);
+    for (const auto &item : interceptor_) {
+        if (item.sourceType == SOURCETYPE_KEY) {
+            newPkt << item.session->GetPid();
+            MMI_LOGD("server send the interceptor msg to client : pid = %{public}d", item.session->GetPid());
+            item.session->SendMsg(newPkt);
         }
     }
     MMI_LOGD("OnKeyEvent end");
