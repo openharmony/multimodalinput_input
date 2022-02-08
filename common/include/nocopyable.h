@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef NOCOPYABLE_H
-#define NOCOPYABLE_H
+#ifndef UTILS_BASE_NOCOPYABLE_H
+#define UTILS_BASE_NOCOPYABLE_H
 
 namespace OHOS {
 
@@ -42,4 +42,4 @@ private:
 
 }
 
-#endif // NOCOPYABLE_H
+#endif
