@@ -1220,11 +1220,9 @@ void ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, NetPacket& 
 void ClientMsgHandler::TraceKeyEvent(const EventKeyboard& key) const
 {
     char keyUuid[MAX_UUIDSIZE] = {0};
-    if (EOK != memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid))) {
-        MMI_LOGD("%{public}s copy data failed", __func__);
-        return;
-    }
-    MMI_LOGD(" nevent dispatcher of client: keyUuid = %{public}s", keyUuid);
+    int32_t ret = memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid));
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
+    MMI_LOGT(" nevent dispatcher of client: keyUuid = %{public}s", keyUuid);
     std::string keyEvent = keyUuid;
     keyEvent = " nevent dispatcher of client keyUuid: " + keyEvent;
     int32_t eventKey = 1;
@@ -1234,11 +1232,9 @@ void ClientMsgHandler::TraceKeyEvent(const EventKeyboard& key) const
 void ClientMsgHandler::TracePointerEvent(const EventPointer& pointData) const
 {
     char pointerUuid[MAX_UUIDSIZE] = {0};
-    if (EOK != memcpy_s(pointerUuid, sizeof(pointerUuid), pointData.uuid, sizeof(pointData.uuid))) {
-        MMI_LOGE("%{public}s copy data failed", __func__);
-        return;
-    }
-    MMI_LOGD(" nevent dispatcher of client: pointerUuid = %{public}s", pointerUuid);
+    int32_t ret = memcpy_s(pointerUuid, sizeof(pointerUuid), pointData.uuid, sizeof(pointData.uuid));
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
+    MMI_LOGT(" nevent dispatcher of client: pointerUuid = %{public}s", pointerUuid);
     std::string pointerEvent = pointerUuid;
     pointerEvent = " nevent dispatcher of client pointerUuid: " + pointerEvent;
     int32_t eventPointer = 17;
@@ -1248,11 +1244,9 @@ void ClientMsgHandler::TracePointerEvent(const EventPointer& pointData) const
 void ClientMsgHandler::TraceTouchEvent(const EventTouch& touchData) const
 {
     char touchUuid[MAX_UUIDSIZE] = {0};
-    if (EOK != memcpy_s(touchUuid, sizeof(touchUuid), touchData.uuid, sizeof(touchData.uuid))) {
-        MMI_LOGE("%{public}s copy data failed", __func__);
-        return;
-    }
-    MMI_LOGD(" nevent dispatcher of client: touchUuid = %{public}s", touchUuid);
+    int32_t ret = memcpy_s(touchUuid, sizeof(touchUuid), touchData.uuid, sizeof(touchData.uuid));
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
+    MMI_LOGT(" nevent dispatcher of client: touchUuid = %{public}s", touchUuid);
     std::string touchEventString = touchUuid;
     touchEventString = " nevent dispatcher of client touchUuid: " + touchEventString;
     int32_t eventTouch = 9;

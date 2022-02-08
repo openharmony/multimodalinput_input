@@ -312,8 +312,8 @@ void OHOS::MMI::InputWindowsManager::SaveScreenInfoToMap(const ScreenInfo** scre
             SurfaceInfo** pstrSurface = pstrLayerInfo[j]->surfaces;
             for (int32_t k = 0; k < nsurfaces; k++) {
                 MMISurfaceInfo mySurfaceTmp = {};
-                CHK(EOK == memcpy_s(&mySurfaceTmp, sizeof(mySurfaceTmp), pstrSurface[k], sizeof(SurfaceInfo)),
-                    MEMCPY_SEC_FUN_FAIL);
+                int32_t ret = memcpy_s(&mySurfaceTmp, sizeof(mySurfaceTmp), pstrSurface[k], sizeof(SurfaceInfo));
+                CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
                 mySurfaceTmp.screenId = screenInfo[i]->screenId;
                 surfaces_.insert(std::pair<int32_t, MMISurfaceInfo>(mySurfaceTmp.surfaceId, mySurfaceTmp));
                 AddId(surfaceList, mySurfaceTmp.surfaceId);
