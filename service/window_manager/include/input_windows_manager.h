@@ -160,7 +160,7 @@ public:
     int32_t UpdateTarget(std::shared_ptr<InputEvent> inputEvent);
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
         const std::vector<LogicalDisplayInfo> &logicalDisplays);
-    bool TpPoint2LogicDisplayPoint2(libinput_event_touch* touch,
+    bool TouchPadPointToDisplayPoint_2(libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId);
     const std::vector<struct LogicalDisplayInfo>& GetLogicalDisplayInfo() const;
     const std::map<int32_t, struct WindowInfo>& GetWindowInfo() const;
@@ -171,9 +171,9 @@ public:
     bool IsCheckDisplayIdIfExist(int32_t& displayId);
     bool GetLogicalDisplayById(int32_t displayId, LogicalDisplayInfo& logicalDisplayInfo);
     int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
-    bool TpPointLogicDisplayPoint(libinput_event_touch* touch,
+    bool TouchPadPointToDisplayPoint(libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId);
-    bool TansformTouchscreePointToLogicalDisplayPoint(libinput_event_touch* touch,
+    bool TransformTouchPointToDisplayPoint(libinput_event_touch* touch,
     int32_t targetDisplayId, int32_t& displayX, int32_t& displayY);
 
     void AdjustCoordinate(double &coordinateX, double &coordinateY);
