@@ -222,13 +222,14 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
 void OHOS::MMI::UDSServer::Dump(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mux_);
+    std::string strTmp = "fds:[";
     if (sessionsMap_.empty()) {
-        MMI_LOGW("sessionsMap_ is empty");
+        strTmp = "fds:[]";
+        mprintf(fd, "\t%s", strTmp.c_str());
         return;
     }
     mprintf(fd, "Sessions: count=%d", sessionsMap_.size());
-    std::string strTmp = "fds:[";
-    for (auto& it : sessionsMap_) {
+    for (const auto& it : sessionsMap_) {
         strTmp += std::to_string(it.second->GetFd()) + ",";
     }
     strTmp.resize(strTmp.size() - 1);
