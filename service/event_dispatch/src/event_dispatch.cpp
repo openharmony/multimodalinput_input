@@ -428,10 +428,8 @@ int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
 void EventDispatch::DispatchPointerEventTrace(const EventPointer& point)
 {
     char pointerUuid[MAX_UUIDSIZE] = {0};
-    if (EOK != memcpy_s(pointerUuid, sizeof(pointerUuid), point.uuid, sizeof(point.uuid))) {
-        MMI_LOGT("%{public}s copy data failed", __func__);
-        return;
-    }
+    int32_t ret = memcpy_s(pointerUuid, sizeof(pointerUuid), point.uuid, sizeof(point.uuid));
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     MMI_LOGT(" OnEventPointer service DispatchPointerEvent pointerUuid = %{public}s", pointerUuid);
     std::string pointerEvent = pointerUuid;
     pointerEvent = "DispatchPointerEvent service pointerUuid: " + pointerEvent;
@@ -577,10 +575,8 @@ int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event
 void EventDispatch::DispatchTouchEventTrace(const EventTouch& touch)
 {
     char touchUuid[MAX_UUIDSIZE] = {0};
-    if (EOK != memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid))) {
-        MMI_LOGT("%{public}s copy data failed", __func__);
-        return;
-    }
+    int32_t ret = memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid));
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     MMI_LOGT(" 4.event dispatcher of server: touchUuid = %{public}s", touchUuid);
     std::string touchEvent = touchUuid;
     touchEvent = "4.event dispatcher of server touchUuid: " + touchEvent;
@@ -648,7 +644,7 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
             for (std::pair<uint32_t, int32_t> touchId : touchIds) {
                 EventTouch touchTemp = {};
                 errno_t retErr = memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch));
-                CHKR(EOK == retErr, MEMCPY_SEC_FUN_FAIL, RET_ERR);
+                CHKR(retErr == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
                 MMIRegEvent->GetTouchInfo(touchId, touchTemp);
                 MMI_LOGT("4.event dispatcher of server, eventTouch:time=%{public}" PRId64 ",deviceType=%{public}u,"
                          "deviceName=%{public}s,physical=%{public}s,eventType=%{public}d,"
@@ -777,10 +773,8 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
 void EventDispatch::DispatchKeyEventTrace(const EventKeyboard& key)
 {
     char keyUuid[MAX_UUIDSIZE] = {0};
-    if (EOK != memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid))) {
-        MMI_LOGT("%{public}s copy data failed", __func__);
-        return;
-    }
+    int32_t ret = memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid));
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     MMI_LOGT(" OnEventKeyboard service DispatchKeyEvent keyUuid = %{public}s", keyUuid);
     std::string keyEvent = keyUuid;
     keyEvent = "4.event dispatcher of server keyUuid: " + keyEvent;
