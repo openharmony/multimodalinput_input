@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 #include "input_handler_manager.h"
-#include <limits>
 #include "input_handler_type.h"
 #include "log.h"
 #include "multimodal_event_handler.h"
@@ -26,9 +25,6 @@ namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManager" };
 }
 
-const int32_t InputHandlerManager::MIN_HANDLER_ID = 1;
-const int32_t InputHandlerManager::INVALID_HANDLER_ID = -1;
-
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
     std::shared_ptr<IInputEventConsumer> consumer)
 {
@@ -37,7 +33,7 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
         return INVALID_HANDLER_ID;
     }
     int32_t handlerId = GetNextId();
-    if (handlerId == RET_ERR) {
+    if (handlerId == INVALID_HANDLER_ID) {
         MMI_LOGE("Exceeded limit of 32-bit maximum number of integers");
         return INVALID_HANDLER_ID;
     }
@@ -69,7 +65,8 @@ void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
         return;
     }
     NetPacket pkt(MmiMessageId::MARK_CONSUMED);
-    pkt << monitorId << eventId;
+    CHK(pkt.Write(monitorId), STREAM_BUF_WRITE_FAIL);
+    CHK(pkt.Write(eventId), STREAM_BUF_WRITE_FAIL);
     CHK(client->SendMessage(pkt), MSG_SEND_FAIL);
 }
 
@@ -98,7 +95,8 @@ void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handle
         return;
     }
     NetPacket pkt(MmiMessageId::ADD_INPUT_HANDLER);
-    pkt << handlerId << handlerType;
+    CHK(pkt.Write(handlerId), STREAM_BUF_WRITE_FAIL);
+    CHK(pkt.Write(handlerType), STREAM_BUF_WRITE_FAIL);
     CHK(client->SendMessage(pkt), MSG_SEND_FAIL);
 }
 
@@ -106,7 +104,7 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
 {
     std::lock_guard<std::mutex> guard(lockHandlers_);
     auto tItr = inputHandlers_.find(handlerId);
-    if (inputHandlers_.end() == tItr) {
+    if (tItr == inputHandlers_.end()) {
         MMI_LOGE("No handler with specified ID");
         return RET_ERR;
     }
@@ -127,7 +125,8 @@ void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType h
         return;
     }
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_HANDLER);
-    pkt << handlerId << handlerType;
+    CHK(pkt.Write(handlerId), STREAM_BUF_WRITE_FAIL);
+    CHK(pkt.Write(handlerType), STREAM_BUF_WRITE_FAIL);
     CHK(client->SendMessage(pkt), MSG_SEND_FAIL);
 }
 
@@ -135,7 +134,7 @@ int32_t InputHandlerManager::GetNextId()
 {
     if (nextId_ == std::numeric_limits<int32_t>::max()) {
         MMI_LOGE("Exceeded limit of 32-bit maximum number of integers");
-        return RET_ERR;
+        return INVALID_HANDLER_ID;
     }
     return nextId_++;
 }
@@ -145,7 +144,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
     std::lock_guard<std::mutex> guard(lockHandlers_);
     auto tItr = inputHandlers_.find(handlerId);
     if (tItr != inputHandlers_.end()) {
-        if (tItr->second.consumer_ == nullptr) {
+        if (tItr->second.consumer_ != nullptr) {
             tItr->second.consumer_->OnInputEvent(keyEvent);
         }
     }

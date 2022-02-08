@@ -364,31 +364,8 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_LOGI("Pointer event interception succeeded");
         return RET_OK;
     }
-    auto source = point->GetSourceType();
-    switch (source) {
-        case PointerEvent::SOURCE_TYPE_MOUSE: {
-            if (HandleMouseEvent(point)) {
-                return RET_OK;
-            }
-            break;
-        }
-        case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
-            if (HandleTouchScreenEvent(point)) {
-                MMI_LOGI("PointerEvent consumed, will not send to client");
-                return RET_OK;
-            }
-            break;
-        }
-        case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
-            if (HandleTouchPadEvent(point)) {
-                return RET_OK;
-            }
-            break;
-        }
-        default: {
-            MMI_LOGW("Unknown source type!");
-            break;
-        }
+    if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
+        return RET_OK;
     }
     NetPacket newPacket(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::SerializePointerEvent(point, newPacket);
@@ -425,27 +402,6 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     }
     MMI_LOGD("Leave");
     return RET_OK;
-}
-
-bool EventDispatch::HandleTouchScreenEvent(std::shared_ptr<PointerEvent> point)
-{
-    return InputHandlerManagerGlobal::GetInstance().HandleEvent(point);
-}
-
-bool EventDispatch::HandleMouseEvent(std::shared_ptr<PointerEvent> point)
-{
-    return InputHandlerManagerGlobal::GetInstance().HandleEvent(point);
-}
-
-bool EventDispatch::HandleTouchPadEvent(std::shared_ptr<PointerEvent> point)
-{
-    if (INTERCEPTORMANAGERGLOBAL.OnPointerEvent(point)) {
-        return true;
-    }
-    if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
-        return true;
-    }
-    return false;
 }
 
 int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,

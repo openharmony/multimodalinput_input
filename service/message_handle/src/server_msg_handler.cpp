@@ -642,29 +642,31 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveEventInterceptor(SessionPtr sess, N
 
 int32_t OHOS::MMI::ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
 {
-    int32_t handlerId { };
-    InputHandlerType handlerType { };
-    pkt >> handlerId >> handlerType;
-    MMI_LOGD("OnAddInputHandler handlerId : %{public}d handlerType : %{public}d", handlerId, handlerType);
-    InputHandlerManagerGlobal::GetInstance().AddInputHandler(handlerId, handlerType, sess);
-    return RET_OK;
+    int32_t handlerId;
+    InputHandlerType handlerType;
+    CHKR(pkt.Read(handlerId), STREAM_BUF_READ_FAIL, RET_ERR);
+    CHKR(pkt.Read(handlerType), STREAM_BUF_READ_FAIL, RET_ERR);
+    MMI_LOGD("OnAddInputHandler handler=%{public}d, handlerType=%{public}d.", handlerId, handlerType);
+    return InputHandlerManagerGlobal::GetInstance().AddInputHandler(handlerId, handlerType, sess);
 }
 
 int32_t OHOS::MMI::ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
 {
-    int32_t handlerId { };
-    InputHandlerType handlerType { };
-    pkt >> handlerId >> handlerType;
-    MMI_LOGD("OnRemoveInputHandler handlerId : %{public}d handlerType : %{public}d", handlerId, handlerType);
+    int32_t handlerId;
+    InputHandlerType handlerType;
+    CHKR(pkt.Read(handlerId), STREAM_BUF_READ_FAIL, RET_ERR);
+    CHKR(pkt.Read(handlerType), STREAM_BUF_READ_FAIL, RET_ERR);
+    MMI_LOGD("OnRemoveInputHandler handler=%{public}d, handlerType=%{public}d.", handlerId, handlerType);
     InputHandlerManagerGlobal::GetInstance().RemoveInputHandler(handlerId, handlerType, sess);
     return RET_OK;
 }
 
 int32_t OHOS::MMI::ServerMsgHandler::OnMarkConsumed(SessionPtr sess, NetPacket& pkt)
 {
-    int32_t monitorId { }, eventId { };
-    pkt >> monitorId >> eventId;
-    InputHandlerManagerGlobal::GetInstance().MarkConsumed(monitorId, sess);
+    int32_t monitorId, eventId;
+    CHKR(pkt.Read(monitorId), STREAM_BUF_READ_FAIL, RET_ERR);
+    CHKR(pkt.Read(eventId), STREAM_BUF_READ_FAIL, RET_ERR);
+    InputHandlerManagerGlobal::GetInstance().MarkConsumed(monitorId, eventId, sess);
     return RET_OK;
 }
 

@@ -14,7 +14,7 @@
  */
 #ifndef OHOS_MULTIMDOALINPUT_INPUT_HANDLER_MANAGER_H
 #define OHOS_MULTIMDOALINPUT_INPUT_HANDLER_MANAGER_H
-
+#include <limits>
 #include <map>
 #include <mutex>
 #include "input_handler_type.h"
@@ -29,10 +29,6 @@ public:
     void MarkConsumed(int32_t monitorId, int32_t eventId);
     void OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent);
     void OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent);
-
-public:
-    static const int32_t MIN_HANDLER_ID;
-    static const int32_t INVALID_HANDLER_ID;
 
 private:
     struct InputHandler {
