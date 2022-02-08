@@ -40,10 +40,11 @@ void ManipulationEvent::Initialize(int32_t windowId, int32_t startTime, int32_t 
     mOperationState_ = operationState;
     mPointerCount_ = pointerCount;
     if (fingersInfos != nullptr) {
-        CHK(EOK == memset_s(mfingersInfos_, sizeof(fingerInfos) * FINGER_NUM, 0,
-            sizeof(fingerInfos) * FINGER_NUM), MEMSET_SEC_FUN_FAIL);
-        CHK(EOK == memcpy_s(mfingersInfos_, sizeof(fingerInfos) * FINGER_NUM, fingersInfos,
-            sizeof(fingerInfos) * pointerCount), MEMCPY_SEC_FUN_FAIL);
+        int32_t ret = memset_s(mfingersInfos_, sizeof(fingerInfos) * FINGER_NUM, 0, sizeof(fingerInfos) * FINGER_NUM);
+        CHK(ret == EOK, MEMSET_SEC_FUN_FAIL);
+        ret = memcpy_s(mfingersInfos_, sizeof(fingerInfos) * FINGER_NUM, fingersInfos,
+                       sizeof(fingerInfos) * pointerCount);
+        CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     }
 }
 
@@ -54,8 +55,9 @@ void ManipulationEvent::Initialize(ManipulationEvent& maniPulationEvent)
     mStartTime_ = maniPulationEvent.GetStartTime();
     mOperationState_ = maniPulationEvent.GetPhase();
     mPointerCount_ = maniPulationEvent.GetPointerCount();
-    CHK(EOK == memcpy_s(mfingersInfos_, sizeof(mfingersInfos_) * FINGER_NUM, maniPulationEvent.GetFingersInfos(),
-        sizeof(fingerInfos)*FINGER_NUM), MEMCPY_SEC_FUN_FAIL);
+    int32_t ret = memcpy_s(mfingersInfos_, sizeof(mfingersInfos_) * FINGER_NUM, maniPulationEvent.GetFingersInfos(),
+                           sizeof(fingerInfos)*FINGER_NUM);
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
 }
 
 int32_t ManipulationEvent::GetStartTime() const
