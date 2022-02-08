@@ -46,7 +46,7 @@ void TouchTransformPointProcessor::OnEventTouchDown(libinput_event *event)
     int32_t logicalDisplayId = -1;
     WinMgr->TpPointLogicDisplayPoint(data, logicalX, logicalY, logicalDisplayId);
     auto pointIds = pointerEvent_->GetPointersIdList();
-    if (pointIds.size() == 0) {
+    if (pointIds.empty()) {
         pointerEvent_->SetActionStartTime(time);
         pointerEvent_->SetTargetDisplayId(logicalDisplayId);
     }
