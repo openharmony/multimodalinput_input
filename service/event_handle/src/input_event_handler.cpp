@@ -178,8 +178,8 @@ bool InputEventHandler::Init(UDSServer& udsServer)
             std::bind(&InputEventHandler::OnEventSwitchToggle, this, std::placeholders::_1)
         },
     };
-    for (auto& it : funs) {
-        CHKC(RegistrationEvent(it), EVENT_REG_FAIL);
+    for (auto &item : funs) {
+        CHKC(RegistrationEvent(item), EVENT_REG_FAIL);
     }
     return true;
 }

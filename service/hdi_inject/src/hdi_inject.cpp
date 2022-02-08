@@ -137,7 +137,7 @@ void HdiInject::OnInitHdiServerStatus()
 
 void HdiInject::ShowAllDeviceInfo()
 {
-    for (auto item : deviceArray_) {
+    for (const auto &item : deviceArray_) {
         MMI_LOGI("deviceName = %{public}s, devIndex = %{public}d, status = %{public}d, devType = %{public}d",
             item.chipName, item.devIndex, item.status, item.devType);
     }
@@ -150,8 +150,7 @@ int32_t HdiInject::GetDeviceCount()
 
 bool HdiInject::SetDeviceHotStatus(int32_t devIndex, int32_t status)
 {
-    vector<DeviceInformation>::iterator iter;
-    for (iter = deviceArray_.begin(); iter != deviceArray_.end(); ++iter) {
+    for (auto iter = deviceArray_.begin(); iter != deviceArray_.end(); ++iter) {
         if (iter->devIndex == devIndex) {
             if (iter->status != status) {
                 iter->status = ~status + 1;
@@ -169,13 +168,16 @@ bool HdiInject::SyncDeviceHotStatus()
 {
     const uint16_t count = static_cast<uint16_t>(deviceArray_.size());
     event_ = (HotPlugEvent**)malloc(count * sizeof(HotPlugEvent));
+    if (event_ == nullptr) {
+        MMI_LOGE("alloc buffer failed");
+        return false;
+    }
     for (int32_t i = 0; i < count; i++) {
         event_[i]->devIndex = deviceArray_[i].devIndex;
         event_[i]->devType = deviceArray_[i].devType;
         event_[i]->status = deviceArray_[i].status;
         hdiInject->hotPlugcallback_.HotPlugCallback((const HotPlugEvent*)&event_[i]);
     }
-
     return true;
 }
 
@@ -209,25 +211,22 @@ bool HdiInject::ReportHotPlugEvent(uint32_t devIndex, uint32_t status)
 
 int32_t HdiInject::GetDevTypeByIndex(int32_t devIndex)
 {
-    vector<DeviceInformation>::iterator iter;
-    for (iter = deviceArray_.begin(); iter != deviceArray_.end(); ++iter) {
-        if (devIndex == iter->devIndex) {
-            return iter->devType;
+    for (const auto &item : deviceArray_) {
+        if (devIndex == item.devIndex) {
+            return item.devType;
         }
     }
-
     return RET_ERR;
 }
 
 int32_t HdiInject::GetDevIndexByType(int32_t devType)
 {
     vector<DeviceInformation>::iterator iter;
-    for (iter = deviceArray_.begin(); iter != deviceArray_.end(); ++iter) {
-        if (devType == iter->devType) {
-            return iter->devIndex;
+    for (const auto &item : deviceArray_) {
+        if (devType == item.devType) {
+            return item.devIndex;
         }
     }
-
     return RET_ERR;
 }
 

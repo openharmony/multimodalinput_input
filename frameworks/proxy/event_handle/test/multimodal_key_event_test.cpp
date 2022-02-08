@@ -95,12 +95,11 @@ std::vector<std::string> MultimodalKeyEventTest::SearchForLog(const std::string 
         std::vector<std::string> logs;
         (void)g_runCommand.RunShellCommand(command, logs);
         MMI_LOGD("logs.size() = %{public}d.", logs.size());
-        for (std::vector<std::string>::const_iterator cItr = logs.cbegin();
-            cItr != logs.cend(); ++cItr) {
-            MMI_LOGD("[log]: %{public}s.", cItr->c_str());
-            if (FindCommand(*cItr, command) &&
-                (std::find(excludes.cbegin(), excludes.cend(), *cItr) == excludes.cend())) {
-                results.push_back(*cItr);
+        for (auto &item : logs) {
+            MMI_LOGD("[log]: %{public}s.", item.c_str());
+            if (FindCommand(item, command) &&
+                (std::find(excludes.cbegin(), excludes.cend(), item) == excludes.cend())) {
+                results.push_back(item);
             }
         }
         if (noWait || !results.empty() || (--nTries <= 0)) {

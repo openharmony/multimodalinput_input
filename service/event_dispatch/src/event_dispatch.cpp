@@ -645,7 +645,7 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
         std::vector<std::pair<uint32_t, int32_t>> touchIds;
         MMIRegEvent->GetTouchIds(touchIds, touch.deviceId);
         if (!touchIds.empty()) {
-            for (std::pair<uint32_t, int32_t> touchId : touchIds) {
+            for (auto &touchId : touchIds) {
                 EventTouch touchTemp = {};
                 errno_t retErr = memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch));
                 CHKR(EOK == retErr, MEMCPY_SEC_FUN_FAIL, RET_ERR);
@@ -884,7 +884,7 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
              static_cast<int32_t>(pointerIds.size()));
 
-    for (int32_t pointerId : pointerIds) {
+    for (const auto &pointerId : pointerIds) {
         OHOS::MMI::PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
 

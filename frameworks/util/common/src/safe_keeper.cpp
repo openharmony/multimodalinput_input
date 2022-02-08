@@ -74,12 +74,11 @@ void SafeKeeper::ProcessEvents()
     }
     int32_t pastTime = 0;
     auto curTime = GetCurMillisTime();
-
     std::lock_guard<std::mutex> lock(mtx_);
-    for (auto& it : dList_) {
-        pastTime = static_cast<int32_t>(curTime - it.lastTime);
+    for (const auto &item : dList_) {
+        pastTime = static_cast<int32_t>(curTime - item.lastTime);
         if (pastTime > MAX_THREAD_DEATH_TIME) {
-            cbFun_(pastTime, it.tid, it.remark);
+            cbFun_(pastTime, item.tid, item.remark);
             return;
         }
     }

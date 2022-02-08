@@ -91,7 +91,7 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv)
             ++it;
         }
     }
-    for (auto &item : monitors) {
+    for (const auto &item : monitors) {
         item->Stop();
     }
     MMI_LOGD("Leave");
