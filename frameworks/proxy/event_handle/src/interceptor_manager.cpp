@@ -45,7 +45,7 @@ int32_t InterceptorManager::AddInterceptor(int32_t sourceType,
     interceptorItem.callback = interceptor;
     interceptor_.push_back(interceptorItem);
     MMIEventHdl.AddInterceptor(interceptorItem.sourceType, interceptorItem.id_);
-    MMI_LOGT("Add sourceType = %{public}d Touchpad to InterceptorManager success!", sourceType);
+    MMI_LOGD("Add sourceType = %{public}d Touchpad to InterceptorManager success!", sourceType);
     return interceptorItem.id_;
 }
 
@@ -62,7 +62,7 @@ int32_t InterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<Ke
     interceptorItem.callback_ = interceptor;
     interceptor_.push_back(interceptorItem);
     if (RET_OK == MMIEventHdl.AddInterceptor(interceptorItem.sourceType, interceptorItem.id_)) {
-        MMI_LOGT("Add AddInterceptor KeyEvent to InterceptorManager success!");
+        MMI_LOGD("Add AddInterceptor KeyEvent to InterceptorManager success!");
         return MMI_STANDARD_EVENT_SUCCESS;
     }
     return MMI_STANDARD_EVENT_INVALID_PARAMETER;
@@ -94,7 +94,7 @@ int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointer
     }
     PointerEvent::PointerItem pointer;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer);
-    MMI_LOGT("interceptor-clienteventTouchpad:actionTime=%{public}d;"
+    MMI_LOGD("interceptor-clienteventTouchpad:actionTime=%{public}d;"
              "sourceType=%{public}d;pointerAction=%{public}d;"
              "pointerId=%{public}d;point.x=%{public}d;point.y=%{public}d;press=%{public}d"
              "*********************************************************",
@@ -106,11 +106,11 @@ int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointer
     if (iter == interceptor_.end()) {
         MMI_LOGE("InterceptorManager::%{public}s InterceptorItem does not exist", __func__);
     } else {
-        MMI_LOGE("InterceptorManager::%{public}s SendMsg", __func__);
+        MMI_LOGD("InterceptorManager::%{public}s SendMsg", __func__);
         if (iter->callback) {
             iter->callback(pointerEvent);
         } else {
-        MMI_LOGE("InterceptorManager::callback is null");
+            MMI_LOGE("InterceptorManager::callback is null");
         }
     }
     return MMI_STANDARD_EVENT_SUCCESS;

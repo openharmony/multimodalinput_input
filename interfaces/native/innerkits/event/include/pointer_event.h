@@ -17,6 +17,7 @@
 #define OHOS_MULTIMDOALINPUT_POINTER_EVENT_H
 
 #include <array>
+#include <list>
 #include <vector>
 #include <memory>
 #include <map>
@@ -182,6 +183,7 @@ public:
     bool IsButtonPressed(int buttonId) const;
     void SetButtonPressed(int buttonId);
     void DeleteReleaseButton(int buttonId);
+    void ClearButtonPressed();
 
     // Get all Pointers in the current pointer event
     std::vector<int32_t> GetPointersIdList() const;
@@ -219,7 +221,7 @@ protected:
 
 private:
     int32_t pointerId_ { 0 };
-    std::vector<PointerItem> pointers_;
+    std::list<PointerItem> pointers_;
     std::set<int32_t> pressedButtons_;
     int32_t sourceType_ { 0 };
     int32_t pointerAction_ { 0 };
