@@ -22,13 +22,12 @@
 #include <unistd.h>
 
 namespace OHOS::MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
-    }
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
 }
 
-OHOS::MMI::UDSSession::UDSSession(const std::string& programName, const int moduleType, const int32_t fd,
-                                  const int32_t uid, const int32_t pid)
+UDSSession::UDSSession(const std::string& programName, const int moduleType, const int32_t fd,
+    const int32_t uid, const int32_t pid)
     : programName_(programName),
       moduleType_(moduleType),
       fd_(fd),
@@ -38,11 +37,11 @@ OHOS::MMI::UDSSession::UDSSession(const std::string& programName, const int modu
     UpdateDescript();
 }
 
-OHOS::MMI::UDSSession::~UDSSession()
+UDSSession::~UDSSession()
 {
 }
 
-bool OHOS::MMI::UDSSession::SendMsg(const char *buf, size_t size) const
+bool UDSSession::SendMsg(const char *buf, size_t size) const
 {
     CHKF(buf, OHOS::ERROR_NULL_POINTER);
     CHKF(size > 0 && size <= MAX_PACKET_BUF_SIZE, PARAM_INPUT_INVALID);
@@ -58,7 +57,7 @@ bool OHOS::MMI::UDSSession::SendMsg(const char *buf, size_t size) const
     return true;
 }
 
-void OHOS::MMI::UDSSession::Close()
+void UDSSession::Close()
 {
     MMI_LOGT("enter fd_ = %{public}d, bHasClosed_ = %d.", fd_, bHasClosed_);
     if (!bHasClosed_ && fd_ != -1) {
@@ -68,7 +67,7 @@ void OHOS::MMI::UDSSession::Close()
     }
 }
 
-void OHOS::MMI::UDSSession::UpdateDescript()
+void UDSSession::UpdateDescript()
 {
     std::ostringstream oss;
     oss << "fd = " << fd_
@@ -82,14 +81,14 @@ void OHOS::MMI::UDSSession::UpdateDescript()
     descript_ = oss.str().c_str();
 }
 
-bool OHOS::MMI::UDSSession::SendMsg(NetPacket& pkt) const
+bool UDSSession::SendMsg(NetPacket& pkt) const
 {
     StreamBuffer buf;
     pkt.MakeData(buf);
     return SendMsg(buf.Data(), buf.Size());
 }
 
-void OHOS::MMI::UDSSession::RecordEvent(int32_t id, uint64_t time)
+void UDSSession::RecordEvent(int32_t id, uint64_t time)
 {
     MMI_LOGI("begin");
     EventTime eventTime = {id, time};
@@ -97,7 +96,7 @@ void OHOS::MMI::UDSSession::RecordEvent(int32_t id, uint64_t time)
     MMI_LOGI("end");
 }
 
-void OHOS::MMI::UDSSession::ClearEventList(int32_t id)
+void UDSSession::ClearEventList(int32_t id)
 {
     MMI_LOGI("begin");
     int32_t count = 0;
@@ -111,7 +110,7 @@ void OHOS::MMI::UDSSession::ClearEventList(int32_t id)
     MMI_LOGI("end");
 }
 
-uint64_t OHOS::MMI::UDSSession::GetFirstEventTime()
+uint64_t UDSSession::GetFirstEventTime()
 {
     MMI_LOGI("begin");
     if (events_.empty()) {
@@ -122,7 +121,8 @@ uint64_t OHOS::MMI::UDSSession::GetFirstEventTime()
     return events_[0].eventTime;
 }
 
-void OHOS::MMI::UDSSession::ClearEventsVct()
+void UDSSession::ClearEventsVct()
 {
     std::vector<EventTime>().swap(events_);
+}
 }

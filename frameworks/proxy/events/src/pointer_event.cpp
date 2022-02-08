@@ -43,12 +43,12 @@ void PointerEvent::PointerItem::SetPointerId(int32_t pointerId)
 
 int32_t PointerEvent::PointerItem::GetDownTime() const
 {
-    return donwTime_;
+    return downTime_;
 }
 
 void PointerEvent::PointerItem::SetDownTime(int32_t downTime)
 {
-    donwTime_ = downTime;
+    downTime_ = downTime;
 }
 
 bool PointerEvent::PointerItem::IsPressed() const
@@ -147,7 +147,7 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    if (!out.WriteInt32(donwTime_)) {
+    if (!out.WriteInt32(downTime_)) {
         return false;
     }
 
@@ -186,7 +186,7 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
     if (!out.WriteInt32(deviceId_)) {
         return false;
     }
-    
+
     return true;
 }
 
@@ -196,7 +196,7 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    if (!in.ReadInt32(donwTime_)) {
+    if (!in.ReadInt32(downTime_)) {
         return false;
     }
 
@@ -235,7 +235,7 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
     if (!in.ReadInt32(deviceId_)) {
         return false;
     }
-    
+
     return true;
 }
 
@@ -319,6 +319,18 @@ bool PointerEvent::IsButtonPressed(int buttonId) const
 void PointerEvent::SetButtonPressed(int buttonId)
 {
     pressedButtons_.insert(buttonId);
+}
+
+void PointerEvent::DeleteReleaseButton(int buttonId)
+{
+    if (pressedButtons_.find(buttonId) != pressedButtons_.end()) {
+        pressedButtons_.erase(buttonId);
+    }
+}
+
+void PointerEvent::ClearButtonPressed()
+{
+    pressedButtons_.clear();
 }
 
 std::vector<int32_t> PointerEvent::GetPointersIdList() const
@@ -476,13 +488,13 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     if (!in.ReadInt32(pointerId_)) {
         return false;
     }
-    
+
     // vector
     const int32_t pointersSize = in.ReadInt32();
     if (pointersSize < 0) {
         return false;
     }
-    
+
     for (int32_t i = 0; i < pointersSize; ++i) {
         PointerItem val = {};
         if (!val.ReadFromParcel(in)) {
@@ -496,7 +508,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     if (pressedButtonsSize < 0) {
         return false;
     }
-    
+
     for (int32_t i = 0; i < pressedButtonsSize; ++i) {
         int32_t val = 0;
         if (!in.ReadInt32(val)) {
@@ -530,7 +542,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     if (axisValueSize > AXIS_TYPE_MAX) {
         return false;
     }
-    
+
     for (int32_t i = 0; i < axisValueSize; ++i) {
         double val = {};
         if (!in.ReadDouble(val)) {
@@ -571,7 +583,7 @@ bool PointerEvent::IsValidCheckMouseFunc() const
         HiLog::Error(LABEL, "PointAction is invalid");
         return false;
     }
-            
+
     int32_t buttonId = GetButtonId();
     if (pointAction == POINTER_ACTION_BUTTON_DOWN || pointAction == POINTER_ACTION_BUTTON_UP) {
         if (buttonId != MOUSE_BUTTON_LEFT && buttonId != MOUSE_BUTTON_RIGHT && buttonId != MOUSE_BUTTON_MIDDLE) {
@@ -636,7 +648,7 @@ bool PointerEvent::IsValidCheckTouchFunc() const
         return false;
     }
 
-    if (pressedButtons_.size() != 0) {
+    if (!pressedButtons_.empty()) {
         HiLog::Error(LABEL, "PressedButtons_.size is invalid");
         return false;
     }
@@ -674,7 +686,7 @@ bool PointerEvent::IsValidCheckTouch() const
         if (item->GetPointerId() == touchPointID) {
             isSameItem = true;
         }
-                
+
         if (item->GetDownTime() <= 0) {
             HiLog::Error(LABEL, "Item.downtime is invalid");
             return false;
@@ -693,7 +705,7 @@ bool PointerEvent::IsValidCheckTouch() const
             }
         }
     }
-            
+
     if (!isSameItem) {
         HiLog::Error(LABEL, "Item.pointerid is not same to touchPointID and is invalid");
         return false;

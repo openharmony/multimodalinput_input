@@ -17,131 +17,142 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 #include "bytrace.h"
 #include "log.h"
 #include "file_ex.h"
 #include "ability_manager_client.h"
 #include "ohos/aafwk/base/string_wrapper.h"
+#include "timer_manager.h"
 
-namespace OHOS::MMI {
-namespace {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AbilityLaunchManager" };
-using namespace std;
-}
-}
+namespace OHOS {
+namespace MMI {
+    namespace {
+        constexpr int32_t MAX_PREKEYS_NUM = 4;
+        constexpr int32_t INVALID_VALUE = -1;
+        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AbilityLaunchManager" };
+    }
 
-OHOS::MMI::AbilityLaunchManager::AbilityLaunchManager()
+AbilityLaunchManager::AbilityLaunchManager()
 {
-    ResolveConfig(GetAbilityFilePath());
-    PrintShortcutKey();
+    const std::string configFile = GetConfigFilePath();
+    ResolveConfig(configFile);
+    Print();
 }
 
-std::string OHOS::MMI::AbilityLaunchManager::ConvertKey(ShortcutKey key)
+std::string AbilityLaunchManager::GenerateKey(const ShortcutKey& key)
 {
+    std::set<int32_t> preKeys = key.preKeys;
     std::stringstream oss;
-    oss << key.preKey1 << ",";
-    oss << key.preKey2 << ",";
-    oss << key.preKey3 << ",";
-    oss << key.preKey4 << ",";
+    for(const auto preKey: preKeys) {
+        oss << preKey << ",";
+    }
     oss << key.finalKey << ",";
     oss << key.triggerType;
     return std::string(oss.str());
 }
 
-std::string OHOS::MMI::AbilityLaunchManager::GetAbilityFilePath()
+std::string AbilityLaunchManager::GetConfigFilePath()
 {
-    std::string abilityFilePath = "/product/multimodalinput/ability_launch_config.json";
-    return FileExists(abilityFilePath) ? abilityFilePath : "/system/etc/multimodalinput/ability_launch_config.json";
+    std::string defaultConfig = "/product/multimodalinput/ability_launch_config.json";
+    return FileExists(defaultConfig) ? defaultConfig : "/system/etc/multimodalinput/ability_launch_config.json";
 }
 
-void OHOS::MMI::AbilityLaunchManager::ResolveConfig(std::string configFile)
+void AbilityLaunchManager::ResolveConfig(const std::string configFile)
 {
     if (!FileExists(configFile)) {
-        MMI_LOGE("ability config file %{public}s not exist!", configFile.c_str());
+        MMI_LOGE("config file %{public}s not exist", configFile.c_str());
         return;
     }
-    MMI_LOGE("ability config file path %{public}s", configFile.c_str());
+    MMI_LOGD("config file path %{public}s", configFile.c_str());
     std::ifstream reader(configFile);
     if (!reader.is_open()) {
-        MMI_LOGE("json file can not open!");
+        MMI_LOGE("config file open failed");
         return;
     }
     json configJson;
     reader >> configJson;
     reader.close();
     if (configJson.empty()) {
-        MMI_LOGE("json file is empty!");
+        MMI_LOGE("config file is empty");
         return;
     }
-    json abilityArray = configJson["Shortkeys"];
-    if (!abilityArray.is_array() || abilityArray.empty()) {
-        MMI_LOGE("shortkeys array is empty!");
+    json shortkeys = configJson["Shortkeys"];
+    if (!shortkeys.is_array() || shortkeys.empty()) {
+        MMI_LOGE("shortkeys in config file is empty");
         return;
     }
-    shortcutKeysMap.clear();
-    for (int32_t i = 0; i < static_cast<int32_t>(abilityArray.size()); i++) {
+    for (int32_t i = 0; i < static_cast<int32_t>(shortkeys.size()); i++) {
         ShortcutKey shortcutKey;
-        if (ConvertJson(shortcutKey, abilityArray[i])) {
-            std::string key = ConvertKey(shortcutKey);
-            auto result = shortcutKeysMap.find(key);
-            if (result == shortcutKeysMap.end()) {
-                shortcutKeysMap.emplace(key, shortcutKey);
-            }
+        if (!ConvertToShortcutKey(shortkeys[i], shortcutKey)) {
+            continue;
+        }
+        std::string key = GenerateKey(shortcutKey);
+        auto res = shortcutKeys_.find(key);
+        if (res == shortcutKeys_.end()) {
+            shortcutKeys_.emplace(key, shortcutKey);
         }
     }
 }
 
-bool OHOS::MMI::AbilityLaunchManager::ConvertJson(ShortcutKey &shortcutKey, json &jsonData)
+bool AbilityLaunchManager::ConvertToShortcutKey(const json &jsonData, ShortcutKey &shortcutKey)
 {
     json preKey = jsonData["preKey"];
-    if (!preKey.is_array() || preKey.size() != 4) {
-        MMI_LOGE("preKey array length must be four!");
+    if (!preKey.is_array() || preKey.size() > MAX_PREKEYS_NUM) {
+        MMI_LOGE("preKey number must less and equal four");
         return false;
     }
 
-    if (!preKey[0].is_number() || !preKey[1].is_number() || !preKey[2].is_number() || !preKey[3].is_number()) {
-        MMI_LOGE("preKey type must be number!");
-        return false;
+    for (int32_t i = 0; i < static_cast<int32_t>(preKey.size()); i++) {
+        if (!preKey[i].is_number() || preKey[i] < 0) {
+            MMI_LOGE("preKey must be number and bigger and equal 0");
+            return false;
+        }
+        auto ret = shortcutKey.preKeys.emplace(preKey[i]);
+        if (!ret.second) {
+            MMI_LOGE("preKey must be unique");
+            return false;
+        }
     }
-    shortcutKey.preKey1 = preKey[0];
-    shortcutKey.preKey2 = preKey[1];
-    shortcutKey.preKey3 = preKey[2];
-    shortcutKey.preKey4 = preKey[3];
     if (!jsonData["finalKey"].is_number()) {
-        MMI_LOGE("finalKey type must be number!");
+        MMI_LOGE("finalKey must be number");
         return false;
     }
     shortcutKey.finalKey = jsonData["finalKey"];
-    if (!jsonData["trigger"].is_string() ||
+    if ((!jsonData["trigger"].is_string()) ||
         (jsonData["trigger"].get<std::string>() != "key_up" && jsonData["trigger"].get<std::string>() != "key_down")) {
-        MMI_LOGE("trigger must be one of [key_up,key_down]!");
+        MMI_LOGE("trigger must be one of [key_up, key_down]");
         return false;
     }
     if (jsonData["trigger"].get<std::string>() == "key_up") {
-        shortcutKey.triggerType = OHOS::MMI::KeyEvent::KEY_ACTION_UP;
+        shortcutKey.triggerType = KeyEvent::KEY_ACTION_UP;
     } else {
-        shortcutKey.triggerType = OHOS::MMI::KeyEvent::KEY_ACTION_DOWN;
+        shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
     }
-    if (!jsonData["keyDownDuration"].is_number() || jsonData["keyDownDuration"] < 0) {
-        MMI_LOGE("keyDownDuration type must be number and greater than or equal to zero!");
-        return false;
-    }
-    if (shortcutKey.triggerType == OHOS::MMI::KeyEvent::KEY_ACTION_UP && jsonData["keyDownDuration"] != 0) {
-        MMI_LOGE("triggerType is key_up, keyDownDuration must equal to zero!");
+    if ((!jsonData["keyDownDuration"].is_number()) || (jsonData["keyDownDuration"] < 0)) {
+        MMI_LOGE("keyDownDuration must be number and bigger and equal zero");
         return false;
     }
     shortcutKey.keyDownDuration = jsonData["keyDownDuration"];
-    if (!UnwrapAbility(shortcutKey.ability, jsonData["ability"])) {
-        MMI_LOGE("ability resolve failed!");
+    if (!PackageAbility(jsonData["ability"], shortcutKey.ability)) {
+        MMI_LOGE("package ability failed!");
         return false;
     }
     return true;
 }
 
-bool OHOS::MMI::AbilityLaunchManager::UnwrapAbility(Ability &ability, json &jsonAbility)
+bool AbilityLaunchManager::PackageAbility(const json &jsonAbility, Ability &ability)
 {
-    if (!jsonAbility.is_object() || !jsonAbility["entities"].is_array()) {
-        MMI_LOGE("ability type must be object!");
+    if (!jsonAbility.is_object()) {
+        MMI_LOGE("ability must be object");
+        return false;
+    }
+    if (!jsonAbility["entities"].is_array()) {
+        MMI_LOGE("entities must be array!");
+        return false;
+    }
+    if (!jsonAbility["params"].is_array()) {
+        MMI_LOGE("params must be array!");
         return false;
     }
     ability.bundleName = jsonAbility["bundleName"];
@@ -153,117 +164,159 @@ bool OHOS::MMI::AbilityLaunchManager::UnwrapAbility(Ability &ability, json &json
     for (int32_t i = 0; i < static_cast<int32_t>(jsonAbility["entities"].size()); i++) {
         ability.entities.push_back(jsonAbility["entities"][i]);
     }
-    for (int32_t i = 0; i < static_cast<int32_t>(jsonAbility["params"].size()); i++) {
-        ability.params.emplace(jsonAbility["params"][i]["key"], jsonAbility["params"][i]["value"]);
+    json params = jsonAbility["params"];
+    for (int32_t i = 0; i < static_cast<int32_t>(params.size()); i++) {
+        if (!params[i].is_object()) {
+            MMI_LOGE("param must be object");
+            return false;
+        }
+        ability.params.emplace(params[i]["key"], params[i]["value"]);
     }
     return true;
 }
 
-void OHOS::MMI::AbilityLaunchManager::PrintShortcutKey()
+void AbilityLaunchManager::Print()
 {
-    int32_t count = shortcutKeysMap.size();
-    MMI_LOGE("shortcutKeysMap size %{public}d", count);
-    for (auto it = shortcutKeysMap.begin(); it != shortcutKeysMap.end(); ++it) {
+    int32_t count = shortcutKeys_.size();
+    MMI_LOGD("shortcutKey count %{public}d", count);
+    for (auto it = shortcutKeys_.begin(); it != shortcutKeys_.end(); ++it) {
         auto &shortcutKey = it->second;
-        MMI_LOGE("preKey1 = %{public}d preKey2 = %{public}d preKey3 = %{public}d preKey4 = %{public}d finalKey = %{public}d "
-            "keyDownDuration = %{public}d triggerType = %{public}d bundleName = %{public}s  abilityName = %{public}s",
-            shortcutKey.preKey1, shortcutKey.preKey2, shortcutKey.preKey3, shortcutKey.preKey4, shortcutKey.finalKey,
-            shortcutKey.keyDownDuration, shortcutKey.triggerType, shortcutKey.ability.bundleName.c_str(),
-            shortcutKey.ability.abilityName.c_str());
+        for (auto prekey: shortcutKey.preKeys) {
+            MMI_LOGD("preKey: %{public}d", prekey);
+        }
+        MMI_LOGD("finalKey: %{public}d keyDownDuration: %{public}d triggerType: %{public}d"
+            " bundleName: %{public}s abilityName: %{public}s", shortcutKey.finalKey,
+            shortcutKey.keyDownDuration, shortcutKey.triggerType,
+            shortcutKey.ability.bundleName.c_str(), shortcutKey.ability.abilityName.c_str());
     }
 }
 
-bool OHOS::MMI::AbilityLaunchManager::CheckLaunchAbility(std::shared_ptr<OHOS::MMI::KeyEvent> &key)
+bool AbilityLaunchManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> &key)
 {
-    if (CheckShortcutkeyMatch(waitTriggerKey, key)) {
-        MMI_LOGE("The same shortcutkey is waiting timeout");
+    MMI_LOGD("enter");
+    if (Match(lastMatchedKey_, key)) {
+        MMI_LOGE("The same key is waiting timeout, skip");
         return true;
     }
-    timer.Stop();
-    ResetWaitTriggerKey(waitTriggerKey);
-    for (auto iter = shortcutKeysMap.begin(); iter != shortcutKeysMap.end(); ++iter) {
+    if (lastMatchedKey_.timerId >= 0) {
+        MMI_LOGE("remove timer timeid: %{public}d", lastMatchedKey_.timerId);
+        TimerMgr->RemoveTimer(lastMatchedKey_.timerId);
+    }
+    ResetLastMatchedKey();
+    for (auto iter = shortcutKeys_.begin(); iter != shortcutKeys_.end(); ++iter) {
         ShortcutKey &shortcutKey = iter->second;
         int32_t keyCode = key->GetKeyCode();
-        std::string checkkeycode = "CheckLaunchAbility service GetKeyCode: " + std::to_string(keyCode);
-        MMI_LOGT(" CheckLaunchAbility service trace GetKeyCode = %{public}d", keyCode);
+        const std::string checkkeycode = std::to_string(keyCode);
+        MMI_LOGT(" CheckLaunchAbility service trace GetKeyCode: %{public}d\n", key->GetKeyCode());
         int32_t eventKey = 1;
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, checkkeycode, eventKey);
-        if (!CheckShortcutkeyMatch(shortcutKey, key)) {
+        if (!Match(shortcutKey, key)) {
+            MMI_LOGD("not matched, next");
             continue;
         }
-        if (shortcutKey.triggerType == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN && shortcutKey.keyDownDuration > 0) {
-            MMI_LOGE("Key event matched, start Timer, key=%{public}d, keyAction=%{public}d", key->GetKeyCode(), key->GetKeyAction());
-            waitTriggerKey = shortcutKey;
-            timer.Start(shortcutKey.keyDownDuration,
-                std::bind(&AbilityLaunchManager::LaunchAbility, this, std::placeholders::_1), shortcutKey);
-        } else {
-            MMI_LOGE("Start launch ability");
-            LaunchAbility(shortcutKey);
+        for (auto prekey: shortcutKey.preKeys) {
+            MMI_LOGD("eventkey matched, preKey: %{public}d", prekey);
         }
-        return true;
+        MMI_LOGD("eventkey matched, finalKey: %{public}d bundleName: %{public}s",
+            shortcutKey.finalKey, shortcutKey.ability.bundleName.c_str());
+        if(shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN) {
+            return HandleKeyDown(shortcutKey);
+        } else if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_UP) {
+            return HandleKeyUp(key, shortcutKey);
+        } else {
+            return HandleKeyCancel(shortcutKey);
+        }
     }
+    MMI_LOGD("end");
     return false;
 }
 
-void OHOS::MMI::AbilityLaunchManager::ResetWaitTriggerKey(ShortcutKey &shortcutKey) {
-    shortcutKey.preKey1 = 0;
-    shortcutKey.preKey2 = 0;
-    shortcutKey.preKey3 = 0;
-    shortcutKey.preKey4 = 0;
-    shortcutKey.finalKey = 0;
-}
-
-bool OHOS::MMI::AbilityLaunchManager::CheckShortcutkeyMatch(ShortcutKey &shortcutKey, std::shared_ptr<OHOS::MMI::KeyEvent> &key) {
+bool AbilityLaunchManager::Match(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key) {
     if (key->GetKeyCode() != shortcutKey.finalKey || shortcutKey.triggerType != key->GetKeyAction()) {
         return false;
     }
-    size_t validCount = 0;
-    if (key->GetKeyAction() == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
-        validCount++;
-    }
-    std::vector<OHOS::MMI::KeyEvent::KeyItem> pressedKeys = key->GetKeyItems();
-    if (!CheckKeyPressed(shortcutKey.preKey1, pressedKeys, validCount)) {
+    if ((shortcutKey.preKeys.size()) != (key->GetKeyItems().size() - 1)) {  // KeyItems contain finalkey, so decrease 1
         return false;
     }
-    if (!CheckKeyPressed(shortcutKey.preKey2, pressedKeys, validCount)) {
-        return false;
+    for (auto item: key->GetKeyItems()) {
+        int32_t keyCode = item.GetKeyCode();
+        if (keyCode == key->GetKeyCode()) { //finalkey not check
+            continue;
+        }
+        auto res = shortcutKey.preKeys.find(keyCode);
+        if (res == shortcutKey.preKeys.end()) {
+            return false;
+        }
     }
-    if (!CheckKeyPressed(shortcutKey.preKey3, pressedKeys, validCount)) {
-        return false;
-    }
-    if (!CheckKeyPressed(shortcutKey.preKey4, pressedKeys, validCount)) {
-        return false;
-    }
-    if (validCount != pressedKeys.size()) {
-        return false;
+    MMI_LOGD("matched...");
+    return true;
+}
+
+bool AbilityLaunchManager::HandleKeyDown(ShortcutKey &shortcutKey){
+    if (shortcutKey.keyDownDuration == 0) {
+        MMI_LOGD("Start launch ability immediately");
+        LaunchAbility(shortcutKey);
+    } else {
+        shortcutKey.timerId = TimerMgr->AddTimer(shortcutKey.keyDownDuration, 1, [this, shortcutKey] () {
+            MMI_LOGD("Timer callback");
+            LaunchAbility(shortcutKey);
+        });
+        if (shortcutKey.timerId < 0) {
+            MMI_LOGE("Timer add failed");
+            return false;
+        }
+        MMI_LOGD("add timer success, timeid: %{public}d", shortcutKey.timerId);
+        lastMatchedKey_ = shortcutKey;
     }
     return true;
 }
 
-bool OHOS::MMI::AbilityLaunchManager::CheckKeyPressed(int32_t waitCheckedKey,
-    std::vector<OHOS::MMI::KeyEvent::KeyItem> &pressedKeys, size_t &count)
-{
-    if (waitCheckedKey <= 0) {
+bool AbilityLaunchManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey){
+    if (shortcutKey.keyDownDuration == 0) {
+        MMI_LOGD("Start launch ability immediately");
+        LaunchAbility(shortcutKey);
+        return true;
+    } else {
+        const KeyEvent::KeyItem* keyItem = keyEvent->GetKeyItem();
+        if (keyItem == nullptr) {
+            MMI_LOGE("Skip, null keyItem");
+            return false;
+        }
+
+        auto upTime = keyEvent->GetActionTime();
+        auto downTime = keyItem->GetDownTime();
+        MMI_LOGD("upTime %{public}d downTime %{public}d keyDownDuration %{public}d",
+            upTime, downTime, shortcutKey.keyDownDuration);
+        if (upTime - downTime >= (shortcutKey.keyDownDuration * 1000)) {
+            MMI_LOGD("Skip, upTime - downTime >= duration");
+            return false;
+        }
+        MMI_LOGD("Start launch ability immediately");
+        LaunchAbility(shortcutKey);
         return true;
     }
-    for (auto iter = pressedKeys.begin(); iter != pressedKeys.end(); ++iter) {
-        if (iter->GetKeyCode() == waitCheckedKey) {
-            count++;
-            return true;
-        }
+}
+
+bool AbilityLaunchManager::HandleKeyCancel(ShortcutKey &shortcutKey){
+    if (shortcutKey.timerId < 0) {
+       MMI_LOGE("Skip, timerid < 0"); 
     }
+    auto timerId = shortcutKey.timerId;
+    shortcutKey.timerId = -1;
+    TimerMgr->RemoveTimer(timerId);
+    MMI_LOGD("Leave, timerId: %{public}d", timerId);
     return false;
 }
 
-void OHOS::MMI::AbilityLaunchManager::LaunchAbility(ShortcutKey key)
+void AbilityLaunchManager::LaunchAbility(ShortcutKey key)
 {
     AAFwk::Want want;
     want.SetElementName(key.ability.deviceId, key.ability.bundleName, key.ability.abilityName);
     want.SetAction(key.ability.action);
     want.SetUri(key.ability.uri);
     want.SetType(key.ability.uri);
-    for (size_t i = 0; i < key.ability.entities.size(); i++) {
-        want.AddEntity(key.ability.entities[i]);
+    for (auto entity: key.ability.entities) {
+        want.AddEntity(entity);
     }
     AAFwk::WantParams wParams;
     for (auto it = key.ability.params.begin(); it != key.ability.params.end(); it++) {
@@ -272,62 +325,20 @@ void OHOS::MMI::AbilityLaunchManager::LaunchAbility(ShortcutKey key)
         wParams.SetParam(key, AAFwk::String::Box(value));
     }
     want.SetParams(wParams);
-    MMI_LOGE("Start launch ability, abilityName:%{public}s", key.ability.abilityName.c_str());
+    MMI_LOGD("Start launch ability, bundleName: %{public}s", key.ability.bundleName.c_str());
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (err != ERR_OK) {
-        MMI_LOGE("LaunchAbility failed, abilityName:%{public}s, err:%{public}d", key.ability.abilityName.c_str(), err);
+        MMI_LOGE("LaunchAbility failed, bundleName: %{public}s err:%{public}d", key.ability.bundleName.c_str(), err);
     }
-    ResetWaitTriggerKey(waitTriggerKey);
-    MMI_LOGE("End launch ability, abilityName:%{public}s", key.ability.abilityName.c_str());
+    ResetLastMatchedKey();
+    MMI_LOGD("End launch ability, bundleName:%{public}s", key.ability.bundleName.c_str());
 }
 
-OHOS::MMI::AbilityLaunchManager::Timer::Timer()
+void AbilityLaunchManager::ResetLastMatchedKey()
 {
-    stopFlag = false;
-    time = 0;
-    checkThread = std::thread(&Timer::CountingTime, this);
+    lastMatchedKey_.preKeys.clear();
+    lastMatchedKey_.finalKey = INVALID_VALUE;
+    lastMatchedKey_.timerId = INVALID_VALUE;
 }
-
-OHOS::MMI::AbilityLaunchManager::Timer::~Timer()
-{
-    std::lock_guard<std::mutex> lockGuard(lock);
-    stopFlag = true;
-    condition.notify_all();
-    if (checkThread.joinable()) {
-        checkThread.join();
-    }
-}
-
-void OHOS::MMI::AbilityLaunchManager::Timer::Start(unsigned long millsTime,
-    std::function<void(ShortcutKey)> callback, ShortcutKey key)
-{
-    std::lock_guard<std::mutex> lockGuard(lock);
-    time = millsTime;
-    callback_ = callback;
-    shortcutKey = key;
-    condition.notify_all();
-}
-
-void OHOS::MMI::AbilityLaunchManager::Timer::Stop()
-{
-    std::lock_guard<std::mutex> lockGuard(lock);
-    condition.notify_all();
-}
-
-void OHOS::MMI::AbilityLaunchManager::Timer::CountingTime()
-{
-    std::unique_lock<std::mutex> lk(lock);
-    while (!stopFlag) {
-        if (time == 0) {
-            condition.wait(lk);
-        } else {
-            if (condition.wait_for(lk, std::chrono::milliseconds(time)) == std::cv_status::timeout) {
-                if (callback_ != nullptr) {
-                    MMI_LOGE("timeout, start launch ability abilityName %{public}s", shortcutKey.ability.abilityName.c_str());
-                    callback_(shortcutKey);
-                }
-            }
-            time = 0;
-        }
-    }
-}
+} // namespace MMI
+} // namespace OHOS

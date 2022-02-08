@@ -14,7 +14,6 @@
  */
 #ifndef OHOS_SERVER_MSG_HANDLER_H
 #define OHOS_SERVER_MSG_HANDLER_H
-#include "key_event_input_subscribe_filter.h"
 #include "msg_handler.h"
 #include "event_dispatch.h"
 #include "senior_input_func_proc_base.h"
@@ -77,7 +76,7 @@ private:
     UDSServer *udsServer_ = nullptr; // External references, do not delete
     SeniorInputFuncProcBase *seniorInput_ = nullptr;
     EventDispatch eventDispatch_;
-    std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent;
+    std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent_;
 };
 }
 }

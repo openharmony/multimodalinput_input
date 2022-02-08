@@ -31,8 +31,8 @@ public:
     static int32_t StringToVectorByRegex(const std::string &log, std::vector<std::string> &vLog, const std::regex &r);
 
 private:
-    FILE *fp {nullptr};
-    int32_t logMaxSize;
+    FILE *fp_ {nullptr};
+    int32_t logMaxSize_;
 };
 }
 #endif // RUN_SHELL_UTIL_H

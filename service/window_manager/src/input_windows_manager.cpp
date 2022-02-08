@@ -482,8 +482,8 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent>
 int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<InputEvent> inputEvent)
 {
     MMI_LOGD("enter");
-    if (logicalDisplays_.size() <= 0) {
-        MMI_LOGE("logicalDisplays_ size is 0");
+    if (logicalDisplays_.empty()) {
+        MMI_LOGE("logicalDisplays_ is empty");
         return RET_ERR;
     }
 
@@ -505,7 +505,7 @@ int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<Input
         if (logicalDisplays_[i].id != inputEvent->GetTargetDisplayId()) {
             continue;
         }
-        MMI_LOGD("target display id is %{public}d", inputEvent->GetTargetDisplayId());
+        MMI_LOGD("target display id :%{public}d", inputEvent->GetTargetDisplayId());
         inputEvent->SetTargetWindowId(logicalDisplays_[i].focusWindowId);
         auto it = windowInfos_.find(logicalDisplays_[i].focusWindowId);
         if (it == windowInfos_.end()) {
@@ -539,7 +539,7 @@ void OHOS::MMI::InputWindowsManager::UpdateDisplayInfo(const std::vector<Physica
             windowInfos_.insert(std::pair<int32_t, WindowInfo>(myWindow.id, myWindow));
         }
     }
-    if (logicalDisplays.size() > 0) {
+    if (!logicalDisplays.empty()) {
         DrawWgr->TellDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
     }
     PrintDisplayDebugInfo();
@@ -549,7 +549,7 @@ void OHOS::MMI::InputWindowsManager::UpdateDisplayInfo(const std::vector<Physica
 void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
 {
     MMI_LOGD("physicalDisplays,num:%{public}d", static_cast<int32_t>(physicalDisplays_.size()));
-    for (int32_t i = 0; i < static_cast<int32_t>(physicalDisplays_.size()); i++) {
+    for (size_t i = 0; i < physicalDisplays_.size(); i++) {
         MMI_LOGD("PhysicalDisplays, id:%{public}d, leftDisplay:%{public}d, upDisplay:%{public}d, "
             "topLeftX:%{public}d, topLeftY:%{public}d, width:%{public}d, height:%{public}d, name:%{public}s, "
             "seatId:%{public}s, seatName:%{public}s, logicWidth:%{public}d, logicHeight:%{public}d, "
@@ -562,7 +562,7 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
     }
 
     MMI_LOGD("logicalDisplays,num:%{public}d", static_cast<int32_t>(logicalDisplays_.size()));
-    for (int32_t i = 0; i < static_cast<int32_t>(logicalDisplays_.size()); i++) {
+    for (size_t i = 0; i < logicalDisplays_.size(); i++) {
         MMI_LOGD("logicalDisplays, id:%{public}d,topLeftX:%{public}d, topLeftY:%{public}d, "
             "width:%{public}d,height:%{public}d,name:%{public}s,"
             "seatId:%{public}s, seatName:%{public}s,focusWindowId:%{public}d,window num:%{public}d",
@@ -581,7 +581,7 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
     }
 }
 
-bool OHOS::MMI::InputWindowsManager::TpPoint2LogicDisplayPoint2(libinput_event_touch* touch,
+bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint_2(libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
 {
     if (screensInfo_ != nullptr) {
@@ -614,7 +614,7 @@ OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::FindMatchedPhysi
     return nullptr;
 }
 
-bool OHOS::MMI::InputWindowsManager::TansformTouchscreePointToLogicalDisplayPoint(libinput_event_touch* touch,
+bool OHOS::MMI::InputWindowsManager::TransformTouchPointToDisplayPoint(libinput_event_touch* touch,
     int32_t targetDisplayId, int32_t& displayX, int32_t& displayY)
 {
 
@@ -662,7 +662,7 @@ bool OHOS::MMI::InputWindowsManager::TansformTouchscreePointToLogicalDisplayPoin
     return false;
 }
 
-bool OHOS::MMI::InputWindowsManager::TpPointLogicDisplayPoint(libinput_event_touch* touch,
+bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint(libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
 {
 
@@ -732,7 +732,7 @@ bool OHOS::MMI::InputWindowsManager::IsTouchWindow(int32_t x, int32_t y, const W
         (y <= (info.topLeftY + info.height));
 }
 
-void OHOS::MMI::InputWindowsManager::ReviseGlobalCoordinate(int32_t& globalX, int32_t& globalY, int32_t width, int32_t height)
+void OHOS::MMI::InputWindowsManager::AdjustGlobalCoordinate(int32_t& globalX, int32_t& globalY, int32_t width, int32_t height)
 {
     if (globalX <= 0) {
         globalX = 0;
@@ -748,7 +748,7 @@ void OHOS::MMI::InputWindowsManager::ReviseGlobalCoordinate(int32_t& globalX, in
     }
 }
 
-bool OHOS::MMI::InputWindowsManager::CheckDisplayIdIfExist(int32_t& displayId)
+bool OHOS::MMI::InputWindowsManager::IsCheckDisplayIdIfExist(int32_t& displayId)
 {
     if (logicalDisplays_.empty()) {
         MMI_LOGE("logicalDisplays_is empty");
@@ -787,7 +787,7 @@ void OHOS::MMI::InputWindowsManager::AdjustCoordinate(double &coordinateX, doubl
         coordinateY = 0;
     }
 
-    if (logicalDisplays_.size() == 0) {
+    if (logicalDisplays_.empty()) {
         return;
     }
 
@@ -809,29 +809,31 @@ void OHOS::MMI::InputWindowsManager::FixCursorPosition(int32_t &globalX, int32_t
         globalY = 0;
     }
 
-    if (logicalDisplays_.size() == 0) {
+    if (logicalDisplays_.empty()) {
         return;
     }
 
-    if ((globalX + cursorW) > logicalDisplays_[0].width ) {
-        globalX = logicalDisplays_[0].width - cursorW;
+    int size = 16;
+    int fcursorW = cursorW / size;
+    if ((globalX + fcursorW) > logicalDisplays_[0].width) {
+        globalX = logicalDisplays_[0].width - fcursorW;
     }
-
-    if ((globalY + cursorH) > logicalDisplays_[0].height ) {
-        globalY = logicalDisplays_[0].height - cursorH;
+    int fcursorH = cursorH / size;
+    if ((globalY + fcursorH) > logicalDisplays_[0].height) {
+        globalY = logicalDisplays_[0].height - fcursorH;
     }
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    return -1;
+    return RET_ERR;
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("UpdateMouseTarget begin");
     auto displayId = pointerEvent->GetTargetDisplayId();
-    if (!CheckDisplayIdIfExist(displayId)) {
+    if (!IsCheckDisplayIdIfExist(displayId)) {
         MMI_LOGE("This display:%{public}d is not exist", displayId);
         return RET_ERR;
     }
@@ -866,23 +868,25 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     pointerEvent->SetTargetWindowId(focusWindow->id);
     pointerEvent->SetAgentWindowId(focusWindow->agentWindowId);
     auto fd = udsServer_->GetFdByPid(focusWindow->pid);
-    MMI_LOGD("The pid is:%{public}d, the fd is:%{public}d, the globalX is:%{public}d, the globalY is:%{public}d, "
-             "the localX is:%{public}d, the localY is:%{public}d",
-             focusWindow->pid, fd, globalX, globalY, pointerItem.GetLocalX(), pointerItem.GetLocalY());
+    auto size = pointerEvent->GetPressedButtons();
+    MMI_LOGD("pressedButtons size : %{public}d, pid :%{public}d, fd :%{public}d,"
+             "globalX is:%{public}d, globalY :%{public}d, localX :%{public}d, localY :%{public}d",
+             static_cast<int32_t>(size.size()), focusWindow->pid, fd,
+             globalX, globalY, pointerItem.GetLocalX(), pointerItem.GetLocalY());
     return fd;
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    return -1;
+    return RET_ERR;
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     auto displayId = pointerEvent->GetTargetDisplayId();
-    if (!CheckDisplayIdIfExist(displayId)) {
-        MMI_LOGE("This displayId is not exist");
-        return -1;
+    if (!IsCheckDisplayIdIfExist(displayId)) {
+        MMI_LOGE("This display is not exist");
+        return RET_ERR;
     }
     pointerEvent->SetTargetDisplayId(displayId);
 
@@ -890,28 +894,28 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
         MMI_LOGE("Can't find pointer item, pointer:%{public}d", pointerId);
-        return -1;
+        return RET_ERR;
     }
     MMI_LOGD("UpdateTouchScreenTarget, display:%{public}d", displayId);
     LogicalDisplayInfo logicalDisplayInfo;
     if (!GetLogicalDisplayById(displayId, logicalDisplayInfo)) {
-        MMI_LOGE("DisplayIdGetLogicalDisplay failed");
+        MMI_LOGE("DisplayGetLogicalDisplay failed");
         return RET_ERR;
     }
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
     MMI_LOGD("UpdateTouchScreenTarget, globalX:%{public}d, globalY:%{public}d", globalX, globalY);
-    ReviseGlobalCoordinate(globalX, globalY, logicalDisplayInfo.width, logicalDisplayInfo.height);
+    AdjustGlobalCoordinate(globalX, globalY, logicalDisplayInfo.width, logicalDisplayInfo.height);
     auto targetWindowId = pointerEvent->GetTargetWindowId();
     MMI_LOGD("UpdateTouchScreenTarget, targetWindow:%{public}d", targetWindowId);
     WindowInfo *touchWindow = nullptr;
     for (auto it : logicalDisplayInfo.windowsInfo_) {
-        if (targetWindowId <= 0) {
+        if (targetWindowId < 0) {
             if (IsTouchWindow(globalX, globalY, it)) {
                 touchWindow = &it;
                 break;
             }
-        } else {
+        } else if (targetWindowId >= 0) {
             if (targetWindowId == it.id) {
                 touchWindow = &it;
                 break;
@@ -920,7 +924,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
     }
     if (touchWindow == nullptr) {
         MMI_LOGE("touchWindow is nullptr");
-        return -1;
+        return RET_ERR;
     }
 
     pointerEvent->SetTargetWindowId(touchWindow->id);
@@ -932,9 +936,9 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
     pointerEvent->RemovePointerItem(pointerId);
     pointerEvent->AddPointerItem(pointerItem);
     auto fd = udsServer_->GetFdByPid(touchWindow->pid);
-    MMI_LOGD("the pid is :%{public}d, the fd is :%{public}d, the globalX01 is : %{public}d, "
-             "the globalY01 is : %{public}d, the localX is : %{public}d, the localY is : %{public}d,"
-             "the TargetWindowId is : %{public}d, the AgentWindowId is : %{public}d",
+    MMI_LOGD("the pid :%{public}d, the fd :%{public}d, the globalX01 : %{public}d, "
+             "the globalY01 : %{public}d, the localX : %{public}d, the localY : %{public}d,"
+             "the TargetWindowId : %{public}d, the AgentWindowId : %{public}d",
             touchWindow->pid, fd, globalX, globalY, localX, localY, pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
     return fd;
 }
@@ -942,13 +946,13 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
 int32_t OHOS::MMI::InputWindowsManager::UpdateTouchPadTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("touchPad event is dropped");
-    return -1;
+    return RET_ERR;
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("touchPad event is dropped");
-    return -1;
+    return RET_ERR;
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent)
@@ -972,7 +976,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTargetPointer(std::shared_ptr<Poin
         }
     }
     MMI_LOGE("Source is not of the correct type, source:%{public}d", source);
-    return -1;
+    return RET_ERR;
 }
 
 bool OHOS::MMI::InputWindowsManager::FindWindow(std::shared_ptr<PointerEvent> pointerEvent)
@@ -1010,7 +1014,6 @@ bool OHOS::MMI::InputWindowsManager::FindWindow(std::shared_ptr<PointerEvent> po
                 pointerEvent->AddPointerItem(pointerItem);
 
                 MMI_LOGD("localX:%{public}d,localY:%{public}d", localX, localY);
-                MMI_LOGD("leave");
                 return true;
             }
         }
@@ -1084,7 +1087,7 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
         }
     }
 
-    MMI_LOGI("Mouse Data is : globleX = %{public}d, globleY = %{public}d, localX = %{public}d, localY = %{public}d",
+    MMI_LOGI("Mouse Data : globleX = %{public}d, globleY = %{public}d, localX = %{public}d, localY = %{public}d",
         mouseLoction_.globleX, mouseLoction_.globleY, mouseLoction_.localX, mouseLoction_.localY);
 }
 

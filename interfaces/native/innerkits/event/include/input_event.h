@@ -49,7 +49,7 @@ public:
     static std::shared_ptr<InputEvent> Create();
 
 public:
-    void Init();
+    void Reset();
     /*
      * Get or set the unique identifier of the input event,
      * which is globally unique after being processed by the input service
@@ -135,7 +135,7 @@ public:
      * Set the callback function when the input event is processed.
      * External users should not call this interface
      */
-    void SetProcessedCallback(std::function<void()> callback);
+    void SetProcessedCallback(std::function<void(int32_t)> callback);
 
 public:
     bool WriteToParcel(Parcel &out) const;
@@ -155,7 +155,7 @@ protected:
     int32_t targetWindowId_;
     int32_t agentWindowId_;
     int32_t flag_;
-    std::function<void()> processedCallback_;
+    std::function<void(int32_t)> processedCallback_;
 };
 }
 } // namespace OHOS::MMI

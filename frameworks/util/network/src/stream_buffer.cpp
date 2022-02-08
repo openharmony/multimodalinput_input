@@ -16,31 +16,33 @@
 #include "stream_buffer.h"
 #include "define_multimodal.h"
 
-OHOS::MMI::StreamBuffer::StreamBuffer()
+namespace OHOS {
+namespace MMI {
+StreamBuffer::StreamBuffer()
 {
     ResetBuf();
 }
 
-void OHOS::MMI::StreamBuffer::ResetBuf()
+void StreamBuffer::ResetBuf()
 {
     CHK(EOK == memset_sp(&szBuff_, sizeof(szBuff_), 0, sizeof(szBuff_)), MEMCPY_SEC_FUN_FAIL);
 }
 
-void OHOS::MMI::StreamBuffer::Clean()
+void StreamBuffer::Clean()
 {
     rIdx_ = 0;
     wIdx_ = 0;
     ResetBuf();
 }
 
-bool OHOS::MMI::StreamBuffer::SetReadIdx(uint32_t idx)
+bool StreamBuffer::SetReadIdx(uint32_t idx)
 {
     CHKF(idx <= wIdx_, PARAM_INPUT_INVALID);
     rIdx_ = idx;
     return true;
 }
 
-bool OHOS::MMI::StreamBuffer::Read(std::string &buf)
+bool StreamBuffer::Read(std::string &buf)
 {
     if (rIdx_ == wIdx_) {
         MMI_LOGE("Not enough memory to read... errCode:%{public}d", MEM_NOT_ENOUGH);
@@ -51,7 +53,7 @@ bool OHOS::MMI::StreamBuffer::Read(std::string &buf)
     return (buf.size() > 0);
 }
 
-bool OHOS::MMI::StreamBuffer::Read(char *buf, size_t size)
+bool StreamBuffer::Read(char *buf, size_t size)
 {
     CHKF(buf && size > 0, PARAM_INPUT_INVALID);
     if (rIdx_ + size > wIdx_) {
@@ -63,44 +65,44 @@ bool OHOS::MMI::StreamBuffer::Read(char *buf, size_t size)
     return true;
 }
 
-bool OHOS::MMI::StreamBuffer::Write(const StreamBuffer &buf)
+bool StreamBuffer::Write(const StreamBuffer &buf)
 {
     return Write(buf.Data(), buf.Size());
 }
 
-const char *OHOS::MMI::StreamBuffer::Data() const
+const char *StreamBuffer::Data() const
 {
     return &szBuff_[0];
 }
 
-const char *OHOS::MMI::StreamBuffer::ReadBuf() const
+const char *StreamBuffer::ReadBuf() const
 {
     return &szBuff_[rIdx_];
 }
 
-const char *OHOS::MMI::StreamBuffer::WriteBuf() const
+const char *StreamBuffer::WriteBuf() const
 {
     return &szBuff_[wIdx_];
 }
 
-bool OHOS::MMI::StreamBuffer::Clone(const StreamBuffer &buf)
+bool StreamBuffer::Clone(const StreamBuffer &buf)
 {
     Clean();
     return Write(buf.Data(), buf.Size());
 }
 
-size_t OHOS::MMI::StreamBuffer::Size() const
+size_t StreamBuffer::Size() const
 {
     return wIdx_;
 }
 
-size_t OHOS::MMI::StreamBuffer::UnreadSize() const
+size_t StreamBuffer::UnreadSize() const
 {
     CHKR(wIdx_ >= rIdx_, VAL_NOT_EXP, 0);
     return (wIdx_ - rIdx_);
 }
 
-bool OHOS::MMI::StreamBuffer::Write(const char *buf, size_t size)
+bool StreamBuffer::Write(const char *buf, size_t size)
 {
     CHKF(buf && size > 0, PARAM_INPUT_INVALID);
     if (wIdx_ + size >= MAX_STREAM_BUF_SIZE) {
@@ -112,31 +114,33 @@ bool OHOS::MMI::StreamBuffer::Write(const char *buf, size_t size)
     return true;
 }
 
-bool OHOS::MMI::StreamBuffer::Read(StreamBuffer &buf)
+bool StreamBuffer::Read(StreamBuffer &buf)
 {
     return buf.Write(Data(), Size());
 }
 
-bool OHOS::MMI::StreamBuffer::Write(const std::string &buf)
+bool StreamBuffer::Write(const std::string &buf)
 {
     return Write(buf.c_str(), buf.size() + 1);
 }
 
-OHOS::MMI::StreamBuffer &OHOS::MMI::StreamBuffer::operator=(const StreamBuffer &other)
+StreamBuffer &StreamBuffer::operator=(const StreamBuffer &other)
 {
     Clone(other);
     return *this;
 }
 
-OHOS::MMI::StreamBuffer::StreamBuffer(const StreamBuffer &buf)
+StreamBuffer::StreamBuffer(const StreamBuffer &buf)
 {
     Clone(buf);
 }
 
-bool OHOS::MMI::StreamBuffer::IsEmpty()
+bool StreamBuffer::IsEmpty()
 {
     if (rIdx_ == wIdx_) {
         return true;
     }
     return false;
+}
+}
 }

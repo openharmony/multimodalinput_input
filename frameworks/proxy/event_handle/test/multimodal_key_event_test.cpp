@@ -73,8 +73,7 @@ bool MultimodalKeyEventTest::FindCommand(const std::string &log, const std::stri
             spos = command.size();
         }
     }
-    MMI_LOGD("[log]: %{public}s", log.c_str());
-    MMI_LOGD("[command]: %{public}s", command.c_str());
+    MMI_LOGD("[log]: %{public}s [command]: %{public}s", log.c_str(), command.c_str());
     std::regex pattern(sCmd.str());
     return std::regex_search(log, pattern);
 }
@@ -201,8 +200,7 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_004, Test
     injectDownEvent->AddPressedKeyItems(kitDown);
     MMI_LOGD("MMIEventHdl.InjectEvent begin!");
     int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
-    MMI_LOGD("MMIEventHdl.InjectEvent end!");
-    MMI_LOGD("InjectKeyEvent_005 response is %{public}u", response);
+    MMI_LOGD("MMIEventHdl.InjectEvent end, response is %{public}u", response);
     EXPECT_TRUE(response < 0);
 }
 

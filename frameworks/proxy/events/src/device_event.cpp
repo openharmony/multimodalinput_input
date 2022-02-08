@@ -20,9 +20,9 @@ OHOS::DeviceEvent::~DeviceEvent()
 }
 void OHOS::DeviceEvent::Initialize(const std::string& name, const std::string& sysName, int32_t inputDeviceId)
 {
-    this->name_ = name;
-    this->sysName_ = sysName;
-    this->inputDeviceId_ = inputDeviceId;
+    name_ = name;
+    sysName_ = sysName;
+    inputDeviceId_ = inputDeviceId;
 }
 
 std::string OHOS::DeviceEvent::GetName() const

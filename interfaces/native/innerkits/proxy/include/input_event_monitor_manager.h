@@ -26,13 +26,13 @@
 namespace OHOS {
 namespace MMI {
 struct MonitorItem {
-    int32_t id_;
-    bool operator == (struct MonitorItem item) const
+    int32_t id;
+    std::function<void (std::shared_ptr<OHOS::MMI::KeyEvent>)> keyEventMonitor;
+    bool operator == (const MonitorItem& item) const
     {
-        return this->id_ == item.id_;
+        return id == item.id;
     }
     std::string name;
-    std::function<void (std::shared_ptr<OHOS::MMI::KeyEvent>)> keyEventMonitor;
     std::function<void (std::shared_ptr<OHOS::MMI::PointerEvent>)> TouchPadEventMonitor;
 };
 
@@ -58,5 +58,5 @@ private:
 };
 }
 }
-#define IEMManager OHOS::Singleton<OHOS::MMI::InputEventMonitorManager>::GetInstance()
+#define InputMonitorMgr OHOS::Singleton<OHOS::MMI::InputEventMonitorManager>::GetInstance()
 #endif

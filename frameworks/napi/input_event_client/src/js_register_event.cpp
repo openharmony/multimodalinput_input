@@ -332,8 +332,8 @@ static void AddStylusData(const napi_env& env, napi_value argv, const StylusEven
 bool SendMultimodalEvent(const napi_env& env, const CallbackMap& jsEvent, int32_t type,
                          const MultimodalEvent& event)
 {
-    MMI_LOGD("send event=%{public}s ", eventTable[type].c_str());
-    MMI_LOGD("CallbackMap size=%{public}d", static_cast<int32_t>(jsEvent.size()));
+    MMI_LOGD("send event: %{public}s, CallbackMap size: %{public}d",
+        eventTable[type].c_str(), static_cast<int32_t>(jsEvent.size()));
     size_t argc = 1;
     napi_value argv = nullptr;
     napi_value result = nullptr;
@@ -360,7 +360,7 @@ bool SendMultimodalEvent(const napi_env& env, const CallbackMap& jsEvent, int32_
         MMI_LOGE("invalid event=%{public}s", eventTable[type].c_str());
         return false;
     }
-    if (iter->second.size() == 0) {
+    if (iter->second.empty()) {
         MMI_LOGD("%{public}s do not have callback function", eventTable[type].c_str());
         return true;
     }
@@ -383,7 +383,7 @@ bool SendMultimodalEvent(const napi_env& env, const CallbackMap& jsEvent, int32_
 
 AppSystemEventHandle::AppSystemEventHandle(const napi_env& env)
 {
-    this->env = env;
+    env_ = env;
     jsEvent[eventTable[ON_SCREEN_SHOT]] = {};
     jsEvent[eventTable[ON_SCREEN_SPLIT]] = {};
     jsEvent[eventTable[ON_START_SCREEN_RECORD]] = {};
@@ -400,67 +400,67 @@ AppSystemEventHandle::AppSystemEventHandle(const napi_env& env)
 
 bool AppSystemEventHandle::OnScreenShot(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_SCREEN_SHOT, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_SCREEN_SHOT, multimodalEvent);
 }
 
 bool AppSystemEventHandle::OnScreenSplit(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_SCREEN_SPLIT, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_SCREEN_SPLIT, multimodalEvent);
 }
 
 bool AppSystemEventHandle::OnStartScreenRecord(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_START_SCREEN_RECORD, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_START_SCREEN_RECORD, multimodalEvent);
 }
 
 bool AppSystemEventHandle::OnStopScreenRecord(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_STOP_SCREEN_RECORD, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_STOP_SCREEN_RECORD, multimodalEvent);
 }
 
 bool AppSystemEventHandle::OnGotoDesktop(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_GOTO_DESKTOP, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_GOTO_DESKTOP, multimodalEvent);
 }
 
 bool AppSystemEventHandle::OnRecent(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_RECENT, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_RECENT, multimodalEvent);
 }
 
 bool AppSystemEventHandle::OnShowNotification(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_SHOW_NOTIFICATION, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_SHOW_NOTIFICATION, multimodalEvent);
 }
 
 bool AppSystemEventHandle::OnLockScreen(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_LOCK_SCREEN, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_LOCK_SCREEN, multimodalEvent);
 }
 
 bool AppSystemEventHandle::OnSearch(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_SEARCH, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_SEARCH, multimodalEvent);
 }
 
 bool AppSystemEventHandle::OnClosePage(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_CLOSE_PAGE, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_CLOSE_PAGE, multimodalEvent);
 }
 
 bool AppSystemEventHandle::OnLaunchVoiceAssistant(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_LAUNCH_VOICE_ASSISTANT, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_LAUNCH_VOICE_ASSISTANT, multimodalEvent);
 }
 
 bool AppSystemEventHandle::OnMute(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_MUTE, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_MUTE, multimodalEvent);
 }
 
 AppCommonEventHandle::AppCommonEventHandle(const napi_env& env)
 {
-    this->env = env;
+    env_ = env;
     jsEvent[eventTable[ON_SHOW_MENU]] = {};
     jsEvent[eventTable[ON_SEND]] = {};
     jsEvent[eventTable[ON_COPY]] = {};
@@ -479,77 +479,77 @@ AppCommonEventHandle::AppCommonEventHandle(const napi_env& env)
 
 bool AppCommonEventHandle::OnShowMenu(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_SHOW_MENU, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_SHOW_MENU, multimodalEvent);
 }
 
 bool AppCommonEventHandle::OnSend(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_SEND, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_SEND, multimodalEvent);
 }
 
 bool AppCommonEventHandle::OnCopy(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_COPY, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_COPY, multimodalEvent);
 }
 
 bool AppCommonEventHandle::OnPaste(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_PASTE, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_PASTE, multimodalEvent);
 }
 
 bool AppCommonEventHandle::OnCut(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_CUT, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_CUT, multimodalEvent);
 }
 
 bool AppCommonEventHandle::OnUndo(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_UNDO, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_UNDO, multimodalEvent);
 }
 
 bool AppCommonEventHandle::OnRefresh(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_REFRESH, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_REFRESH, multimodalEvent);
 }
 
 bool AppCommonEventHandle::OnStartDrag(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_START_DRAG, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_START_DRAG, multimodalEvent);
 }
 
 bool AppCommonEventHandle::OnCancel(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_CANCEL, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_CANCEL, multimodalEvent);
 }
 
 bool AppCommonEventHandle::OnEnter(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_ENTER, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_ENTER, multimodalEvent);
 }
 
 bool AppCommonEventHandle::OnPrevious(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_PREVIOUS, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_PREVIOUS, multimodalEvent);
 }
 
 bool AppCommonEventHandle::OnNext(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_NEXT, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_NEXT, multimodalEvent);
 }
 
 bool AppCommonEventHandle::OnBack(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_BACK, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_BACK, multimodalEvent);
 }
 
 bool AppCommonEventHandle::OnPrint(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_PRINT, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_PRINT, multimodalEvent);
 }
 
 AppTelephoneEventHandle::AppTelephoneEventHandle(const napi_env& env)
 {
-    this->env = env;
+    env_ = env;
     jsEvent[eventTable[ON_ANSWER]] = {};
     jsEvent[eventTable[ON_REFUSE]] = {};
     jsEvent[eventTable[ON_HANGUP]] = {};
@@ -558,27 +558,27 @@ AppTelephoneEventHandle::AppTelephoneEventHandle(const napi_env& env)
 
 bool AppTelephoneEventHandle::OnAnswer(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_ANSWER, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_ANSWER, multimodalEvent);
 }
 
 bool AppTelephoneEventHandle::OnRefuse(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_REFUSE, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_REFUSE, multimodalEvent);
 }
 
 bool AppTelephoneEventHandle::OnHangup(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_HANGUP, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_HANGUP, multimodalEvent);
 }
 
 bool AppTelephoneEventHandle::OnTelephoneControl(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_TELEPHONE_CONTROL, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_TELEPHONE_CONTROL, multimodalEvent);
 }
 
 AppMediaEventHandle::AppMediaEventHandle(const napi_env& env)
 {
-    this->env = env;
+    env_ = env;
     jsEvent[eventTable[ON_PLAY]] = {};
     jsEvent[eventTable[ON_PAUSE]] = {};
     jsEvent[eventTable[ON_MEDIA_CONTROL]] = {};
@@ -586,22 +586,22 @@ AppMediaEventHandle::AppMediaEventHandle(const napi_env& env)
 
 bool AppMediaEventHandle::OnPlay(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_PLAY, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_PLAY, multimodalEvent);
 }
 
 bool AppMediaEventHandle::OnPause(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_PAUSE, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_PAUSE, multimodalEvent);
 }
 
 bool AppMediaEventHandle::OnMediaControl(const MultimodalEvent& multimodalEvent)
 {
-    return SendMultimodalEvent(env, jsEvent, ON_MEDIA_CONTROL, multimodalEvent);
+    return SendMultimodalEvent(env_, jsEvent, ON_MEDIA_CONTROL, multimodalEvent);
 }
 
 AppKeyEventHandle::AppKeyEventHandle(const napi_env& env)
 {
-    this->env = env;
+    env_ = env;
     jsEvent[keyTable[ON_KEY]] = {};
 }
 
@@ -618,43 +618,43 @@ bool AppKeyEventHandle::SendEvent(const std::string& name, const OHOS::KeyEvent&
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     bool getResult = false;
-    if (napi_get_undefined(env, &thisVar) != napi_ok) {
+    if (napi_get_undefined(env_, &thisVar) != napi_ok) {
         MMI_LOGE("call napi_get_undefined fail");
         return getResult;
     }
-    if (napi_create_object(env, &result) != napi_ok) {
+    if (napi_create_object(env_, &result) != napi_ok) {
         MMI_LOGE("call napi_create_object fail");
         return getResult;
     }
-    if (napi_create_object(env, &argv) != napi_ok) {
+    if (napi_create_object(env_, &argv) != napi_ok) {
         MMI_LOGE("call napi_create_object fail");
         return getResult;
     }
 
     // KeyEvent
-    SetNamedProperty(env, argv, "isPressed", event.IsKeyDown());
-    SetNamedProperty(env, argv, "keyCode", event.GetKeyCode());
-    SetNamedProperty(env, argv, "keyDownDuration", event.GetKeyDownDuration());
+    SetNamedProperty(env_, argv, "isPressed", event.IsKeyDown());
+    SetNamedProperty(env_, argv, "keyCode", event.GetKeyCode());
+    SetNamedProperty(env_, argv, "keyDownDuration", event.GetKeyDownDuration());
 
     // MultimodalEvent
-    AddMultimodalData(env, argv, event);
+    AddMultimodalData(env_, argv, event);
 
     auto iter = jsEvent.find(name);
     if (iter == jsEvent.end()) {
         MMI_LOGE("invalid event=%{public}s", name.c_str());
         return false;
     }
-    if (iter->second.size() == 0) {
+    if (iter->second.empty()) {
         MMI_LOGD("%{public}s do not have callback function", name.c_str());
         return true;
     }
     for (auto it = iter->second.begin(); it != iter->second.end(); it++) {
         napi_value callback = nullptr;
-        if (napi_get_reference_value(env, *it, &callback) != napi_ok) {
+        if (napi_get_reference_value(env_, *it, &callback) != napi_ok) {
             MMI_LOGE("call napi_get_reference_value fail");
             return getResult;
         }
-        napi_status status = napi_call_function(env, thisVar, callback, argc, &argv, &result);
+        napi_status status = napi_call_function(env_, thisVar, callback, argc, &argv, &result);
         if (status != napi_ok) {
             MMI_LOGE("call napi_call_function failed");
             return false;
@@ -666,7 +666,7 @@ bool AppKeyEventHandle::SendEvent(const std::string& name, const OHOS::KeyEvent&
 
 AppTouchEventHandle::AppTouchEventHandle(const napi_env& env)
 {
-    this->env = env;
+    env_ = env;
     jsEvent[touchTable[ON_TOUCH]] = {};
 }
 
@@ -683,43 +683,43 @@ bool AppTouchEventHandle::SendEvent(const std::string& name, const TouchEvent& e
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     bool getResult = false;
-    if (napi_get_undefined(env, &thisVar) != napi_ok) {
+    if (napi_get_undefined(env_, &thisVar) != napi_ok) {
         MMI_LOGE("call napi_get_undefined fail");
         return getResult;
     }
-    if (napi_create_object(env, &result) != napi_ok) {
+    if (napi_create_object(env_, &result) != napi_ok) {
         MMI_LOGE("call napi_create_object fail");
         return getResult;
     }
-    if (napi_create_object(env, &argv) != napi_ok) {
+    if (napi_create_object(env_, &argv) != napi_ok) {
         MMI_LOGE("call napi_create_object fail");
         return getResult;
     }
-    PrepareData(env, argv, event);
+    PrepareData(env_, argv, event);
 
     auto iter = jsEvent.find(name);
     if (iter == jsEvent.end()) {
         MMI_LOGE("invalid event=%{public}s", name.c_str());
         return false;
     }
-    if (iter->second.size() == 0) {
+    if (iter->second.empty()) {
         MMI_LOGD("%{public}s do not have callback function", name.c_str());
         return true;
     }
 
     for (auto it = iter->second.begin(); it != iter->second.end(); it++) {
         napi_value callback = nullptr;
-        if (napi_get_reference_value(env, *it, &callback) != napi_ok) {
+        if (napi_get_reference_value(env_, *it, &callback) != napi_ok) {
             MMI_LOGE("call napi_get_reference_value fail");
             return getResult;
         }
-        napi_status status = napi_call_function(env, thisVar, callback, argc, &argv, &result);
+        napi_status status = napi_call_function(env_, thisVar, callback, argc, &argv, &result);
         if (status != napi_ok) {
             MMI_LOGE("call napi_call_function failed");
             return false;
         }
     }
-    
+
     return true;
 }
 
@@ -768,7 +768,7 @@ void AppTouchEventHandle::PrepareData(const napi_env& env, napi_value argv,
 
 AppDeviceEventHandle::AppDeviceEventHandle(const napi_env& env)
 {
-    this->env = env;
+    env_ = env;
     jsEvent[deviceTable[ON_DEVICE_ADD]] = {};
     jsEvent[deviceTable[ON_DEVICE_REMOVE]] = {};
 }
@@ -791,51 +791,51 @@ bool AppDeviceEventHandle::SendEvent(const std::string& name, const DeviceEvent&
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     bool getResult = false;
-    if (napi_get_undefined(env, &thisVar) != napi_ok) {
+    if (napi_get_undefined(env_, &thisVar) != napi_ok) {
         MMI_LOGE("call napi_get_undefined fail");
         return getResult;
     }
-    if (napi_create_object(env, &result) != napi_ok) {
+    if (napi_create_object(env_, &result) != napi_ok) {
         MMI_LOGE("call napi_create_object fail");
         return getResult;
     }
-    if (napi_create_object(env, &argv) != napi_ok) {
+    if (napi_create_object(env_, &argv) != napi_ok) {
         MMI_LOGE("call napi_create_object fail");
         return getResult;
     }
     // DeviceEvent
-    SetNamedProperty(env, argv, "name", event.GetName());
-    SetNamedProperty(env, argv, "sysName", event.GetSysName());
-    SetNamedProperty(env, argv, "inputDeviceId", event.GetInputDeviceId());
+    SetNamedProperty(env_, argv, "name", event.GetName());
+    SetNamedProperty(env_, argv, "sysName", event.GetSysName());
+    SetNamedProperty(env_, argv, "inputDeviceId", event.GetInputDeviceId());
 
     // MultimodalEvent
-    SetNamedProperty(env, argv, "uuid", event.GetUuid());
-    SetNamedProperty(env, argv, "occurredTime", event.GetOccurredTime());
-    SetNamedProperty(env, argv, "sourceDevice", event.GetSourceDevice());
-    SetNamedProperty(env, argv, "eventType", event.GetEventType());
-    SetNamedProperty(env, argv, "highLevelEvent", event.GetHighLevelEvent());
-    SetNamedProperty(env, argv, "deviceId", event.GetDeviceId());
-    SetNamedProperty(env, argv, "inputDeviceId", event.GetInputDeviceId());
-    SetNamedProperty(env, argv, "isHighLevelEvent", event.IsHighLevelInput());
+    SetNamedProperty(env_, argv, "uuid", event.GetUuid());
+    SetNamedProperty(env_, argv, "occurredTime", event.GetOccurredTime());
+    SetNamedProperty(env_, argv, "sourceDevice", event.GetSourceDevice());
+    SetNamedProperty(env_, argv, "eventType", event.GetEventType());
+    SetNamedProperty(env_, argv, "highLevelEvent", event.GetHighLevelEvent());
+    SetNamedProperty(env_, argv, "deviceId", event.GetDeviceId());
+    SetNamedProperty(env_, argv, "inputDeviceId", event.GetInputDeviceId());
+    SetNamedProperty(env_, argv, "isHighLevelEvent", event.IsHighLevelInput());
 
     auto iter = jsEvent.find(name);
     if (iter == jsEvent.end()) {
         MMI_LOGE("invalid event=%{public}s", name.c_str());
         return false;
     }
-    if (iter->second.size() == 0) {
+    if (iter->second.empty()) {
         MMI_LOGD("%{public}s do not have callback function", name.c_str());
         return true;
     }
 
     for (auto it = iter->second.begin(); it != iter->second.end(); it++) {
         napi_value callback = nullptr;
-        if (napi_get_reference_value(env, *it, &callback) != napi_ok) {
+        if (napi_get_reference_value(env_, *it, &callback) != napi_ok) {
             MMI_LOGE("call napi_get_reference_value fail");
             return callback;
         }
-        napi_create_int32(env, SUCCESS_CODE, &result);
-        napi_status status = napi_call_function(env, thisVar, callback, argc, &argv, &result);
+        napi_create_int32(env_, SUCCESS_CODE, &result);
+        napi_status status = napi_call_function(env_, thisVar, callback, argc, &argv, &result);
         if (status != napi_ok) {
             MMI_LOGE("call napi_call_function failed");
             return false;

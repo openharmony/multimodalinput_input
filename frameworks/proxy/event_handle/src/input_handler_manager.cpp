@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 #include "input_handler_manager.h"
-#include <limits>
 #include "input_handler_type.h"
 #include "log.h"
 #include "multimodal_event_handler.h"
@@ -23,23 +22,24 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManager" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManager" };
 }
-
-const int32_t InputHandlerManager::MIN_HANDLER_ID { 1 };
-const int32_t InputHandlerManager::INVALID_HANDLER_ID { -1 };
 
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
     std::shared_ptr<IInputEventConsumer> consumer)
 {
     if (inputHandlers_.size() >= MAX_N_INPUT_HANDLERS) {
-        MMI_LOGE("The number of handlers exceeds the maximum.");
+        MMI_LOGE("The number of handlers exceeds the maximum");
         return INVALID_HANDLER_ID;
     }
-    int32_t handlerId { TakeNextId() };
-    MMI_LOGD("Register new handler(%{public}d).", handlerId);
+    int32_t handlerId = GetNextId();
+    if (handlerId == INVALID_HANDLER_ID) {
+        MMI_LOGE("Exceeded limit of 32-bit maximum number of integers");
+        return INVALID_HANDLER_ID;
+    }
+    MMI_LOGD("Register new handler:%{public}d", handlerId);
     if (RET_OK == AddLocal(handlerId, handlerType, consumer)) {
-        MMI_LOGD("New handler successfully registered, report to server ...");
+        MMI_LOGD("New handler successfully registered, report to server");
         AddToServer(handlerId, handlerType);
     } else {
         handlerId = INVALID_HANDLER_ID;
@@ -49,23 +49,24 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
 
 void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType handlerType)
 {
-    MMI_LOGD("Unregister handler(%{public}d) with type(%{public}d).", handlerId, handlerType);
+    MMI_LOGD("Unregister handler:%{public}d with type:%{public}d", handlerId, handlerType);
     if (RET_OK == RemoveLocal(handlerId, handlerType)) {
-        MMI_LOGD("Handler(%{public}d) unregistered, report to server ...", handlerId);
+        MMI_LOGD("Handler:%{public}d unregistered, report to server", handlerId);
         RemoveFromServer(handlerId, handlerType);
     }
 }
 
 void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
-    MMI_LOGD("Mark consumed state: monitorId=%{public}d, eventId=%{public}d.", monitorId, eventId);
+    MMI_LOGD("Mark consumed state:monitorId=%{public}d, eventId=%{public}d", monitorId, eventId);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    if (!client) {
-        MMI_LOGE("Get MMIClint false...");
+    if (client == nullptr) {
+        MMI_LOGE("Get MMIClint false");
         return;
     }
     NetPacket pkt(MmiMessageId::MARK_CONSUMED);
-    pkt << monitorId << eventId;
+    CHK(pkt.Write(monitorId), STREAM_BUF_WRITE_FAIL);
+    CHK(pkt.Write(eventId), STREAM_BUF_WRITE_FAIL);
     CHK(client->SendMessage(pkt), MSG_SEND_FAIL);
 }
 
@@ -80,7 +81,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
     };
     auto ret = inputHandlers_.emplace(handler.handlerId_, handler);
     if (!ret.second) {
-        MMI_LOGE("Duplicate handler ID.");
+        MMI_LOGE("Duplicate handler:%{public}d", handler.handlerId_);
         return RET_ERR;
     }
     return RET_OK;
@@ -89,12 +90,13 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
 void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handlerType)
 {
     MMIClientPtr client { MMIEventHdl.GetMMIClient() };
-    if (!client) {
-        MMI_LOGE("AddToServer Get MMIClint false...");
+    if (client == nullptr) {
+        MMI_LOGE("AddToServer Get MMIClint false");
         return;
     }
     NetPacket pkt(MmiMessageId::ADD_INPUT_HANDLER);
-    pkt << handlerId << handlerType;
+    CHK(pkt.Write(handlerId), STREAM_BUF_WRITE_FAIL);
+    CHK(pkt.Write(handlerType), STREAM_BUF_WRITE_FAIL);
     CHK(client->SendMessage(pkt), MSG_SEND_FAIL);
 }
 
@@ -102,12 +104,12 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
 {
     std::lock_guard<std::mutex> guard(lockHandlers_);
     auto tItr = inputHandlers_.find(handlerId);
-    if (inputHandlers_.end() == tItr) {
-        MMI_LOGW("No handler with specified ID.");
+    if (tItr == inputHandlers_.end()) {
+        MMI_LOGE("No handler with specified ID");
         return RET_ERR;
     }
     if (tItr->second.handlerType_ != handlerType) {
-        MMI_LOGW("Unmatched handler type.");
+        MMI_LOGE("Unmatched handler type");
         return RET_ERR;
     }
     inputHandlers_.erase(tItr);
@@ -116,27 +118,25 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
 
 void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType handlerType)
 {
-    MMI_LOGD("Remove handler(%{public}d) from server.", handlerId);
+    MMI_LOGD("Remove handler:%{public}d from server", handlerId);
     MMIClientPtr client { MMIEventHdl.GetMMIClient() };
-    if (!client) {
-        MMI_LOGE("RemoveFromServer Get MMIClint false...");
+    if (client == nullptr) {
+        MMI_LOGE("RemoveFromServer Get MMIClint false");
         return;
     }
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_HANDLER);
-    pkt << handlerId << handlerType;
+    CHK(pkt.Write(handlerId), STREAM_BUF_WRITE_FAIL);
+    CHK(pkt.Write(handlerType), STREAM_BUF_WRITE_FAIL);
     CHK(client->SendMessage(pkt), MSG_SEND_FAIL);
 }
 
-int32_t InputHandlerManager::TakeNextId()
+int32_t InputHandlerManager::GetNextId()
 {
-    if (nextId_ >= std::numeric_limits<int32_t>::max()) {
-        nextId_ = MIN_HANDLER_ID;
+    if (nextId_ == std::numeric_limits<int32_t>::max()) {
+        MMI_LOGE("Exceeded limit of 32-bit maximum number of integers");
+        return INVALID_HANDLER_ID;
     }
-    int32_t retId { nextId_++ };
-    while (inputHandlers_.find(retId) != inputHandlers_.end()) {
-        retId = nextId_++;
-    }
-    return retId;
+    return nextId_++;
 }
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent)
@@ -144,7 +144,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
     std::lock_guard<std::mutex> guard(lockHandlers_);
     auto tItr = inputHandlers_.find(handlerId);
     if (tItr != inputHandlers_.end()) {
-        if (!tItr->second.consumer_) {
+        if (tItr->second.consumer_ != nullptr) {
             tItr->second.consumer_->OnInputEvent(keyEvent);
         }
     }
@@ -152,15 +152,21 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("OnInputEvent handlerId : %{public}d", handlerId);
-    std::lock_guard<std::mutex> guard(lockHandlers_);
-    auto tItr = inputHandlers_.find(handlerId);
-    if (tItr != inputHandlers_.end()) {
-        if (tItr->second.consumer_) {
+    MMI_LOGD("Enter handlerId:%{public}d", handlerId);
+    std::map<int32_t, InputHandler>::iterator tItr;
+    std::map<int32_t, InputHandler>::iterator tItrEnd;
+    {
+        std::lock_guard<std::mutex> guard(lockHandlers_);
+        tItr = inputHandlers_.find(handlerId);
+        tItrEnd = inputHandlers_.end();
+    }
+    if (tItr != tItrEnd) {
+        if (tItr->second.consumer_ != nullptr) {
             tItr->second.consumer_->OnInputEvent(pointerEvent);
         }
     }
+    MMI_LOGD("Leave");
 }
-}
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 

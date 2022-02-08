@@ -20,7 +20,7 @@
 #include <sstream>
 #include <gtest/gtest.h>
 #include "define_multimodal.h"
-#include "input_handler_manager.h"
+#include "input_handler_type.h"
 #include "input_event_monitor_manager.h"
 #include "interceptor_manager.h"
 #include "input_manager.h"
@@ -74,13 +74,16 @@ public:
     static std::shared_ptr<PointerEvent> SetupPointerEvent012();
     static void TestSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     static void TestSimulateInputEvent_2(std::shared_ptr<PointerEvent> pointerEvent);
+    static std::string DumpPointerItem2(const PointerEvent::PointerItem &item);
+    static std::string DumpPointerEvent2(const std::shared_ptr<PointerEvent> &pointE);
+    static void TestInputEventInterceptor(std::shared_ptr<PointerEvent> pointerEvent);
+    static void TestInputEventInterceptor2(std::shared_ptr<PointerEvent> pointerEvent);
     std::shared_ptr<PointerEvent> TestMarkConsumedStep1();
     std::shared_ptr<PointerEvent> TestMarkConsumedStep2();
     void TestMarkConsumedStep3(int32_t monitorId, int32_t eventId);
     void TestMarkConsumedStep4();
     void TestMarkConsumedStep5();
     void TestMarkConsumedStep6();
-    static void InterceptorManagerCallBack(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
     static void KeyMonitorCallBack(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent);
     static void TouchPadMonitorCallBack(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
 
@@ -155,11 +158,10 @@ std::vector<std::string> InputManagerTest::SearchForLog(const std::string &comma
     while (true) {
         std::vector<std::string> logs;
         (void)runCommand_.RunShellCommand(command, logs);
-        for (std::vector<std::string>::const_iterator cItr = logs.cbegin();
-            cItr != logs.cend(); ++cItr) {
-            if (FindCommand(*cItr, command) &&
-                (std::find(excludes.cbegin(), excludes.cend(), *cItr) == excludes.cend())) {
-                results.push_back(*cItr);
+        for (const std::string& s : logs) {
+            if (FindCommand(s, command) &&
+                (std::find(excludes.cbegin(), excludes.cend(), s) == excludes.cend())) {
+                results.push_back(s);
             }
         }
         if (noWait || !results.empty() || (--nTries <= 0)) {
@@ -538,7 +540,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_004, TestSize.Level1)
 
     std::string command {
         "InputWindowsManager: in UpdateTouchScreenTarget, #[[:digit:]]\\{1,\\}, "
-        "FindWindow failed, can.t find pointer item, pointerId:"
+        "Can.t find pointer item, pointer:"
     };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 
@@ -564,7 +566,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_005, TestSize.Level1)
     pointerEvent->SetPointerId(0);
 
     std::string command {
-        "EventDispatch: in handlePointerEvent, #[[:digit:]]\\{1,\\}, "
+        "EventDispatch: in HandlePointerEvent, #[[:digit:]]\\{1,\\}, "
         "Unknown source type!"
     };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
@@ -817,7 +819,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_009, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_010, TestSize.Level1)
 {
     std::string command {
-        "EventDispatch: in handlePointerEvent, #[[:digit:]]\\{1,\\}, "
+        "EventDispatch: in HandlePointerEvent, #[[:digit:]]\\{1,\\}, "
         "Unknown source type!"
     };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
@@ -1015,6 +1017,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_015, TestSize.Level1)
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 }
+
 void InputManagerTest::KeyMonitorCallBack(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
     MMI_LOGD("KeyMonitorCallBack: keyCode = %{public}d, keyAction = %{public}d , action = %{public}d,"
@@ -1099,13 +1102,15 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_001, TestSize.Level1)
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     int32_t id1 = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(id1 >= InputHandlerManager::MIN_HANDLER_ID);
+    EXPECT_TRUE(IsValidHandlerId(id1));
 
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
-    InputManager::GetInstance()->RemoveMonitor(id1);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    if (IsValidHandlerId(id1)) {
+        InputManager::GetInstance()->RemoveMonitor(id1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
 }
 
 HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_002, TestSize.Level1)
@@ -1114,7 +1119,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_002, TestSize.Level1)
     EXPECT_TRUE(callBackPtr != nullptr);
 
     int32_t id1 = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(id1 >= InputHandlerManager::MIN_HANDLER_ID);
+    EXPECT_TRUE(IsValidHandlerId(id1));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     std::string command {
@@ -1123,8 +1128,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_002, TestSize.Level1)
     };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 
-    InputManager::GetInstance()->RemoveMonitor(id1);
-
+    if (IsValidHandlerId(id1)) {
+        InputManager::GetInstance()->RemoveMonitor(id1);
+    }
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 }
@@ -1139,7 +1145,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
         cbs[i] = InputEventCallback::GetPtr();
         EXPECT_TRUE(cbs[i] != nullptr);
         ids[i] = InputManager::GetInstance()->AddMonitor(cbs[i]);
-        EXPECT_TRUE(ids[i] >= InputHandlerManager::MIN_HANDLER_ID);
+        EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
@@ -1150,14 +1156,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 
     auto pointerEvent = SetupPointerEvent001();
-    MMI_LOGD("Call InputManager::SimulatePointerEvent ...");
+    MMI_LOGD("Call InputManager::SimulatePointerEvent.");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     int32_t nTries { N_TRIES_FOR_LOG };
-    std::set<std::string> rLogs;
+    std::vector<std::string> rLogs;
 
     while (true) {
         std::vector<std::string> tLogs { SearchForLog(command, sLogs, true) };
-        rLogs.insert(tLogs.begin(), tLogs.end());
+        rLogs.insert(rLogs.end(), tLogs.begin(), tLogs.end());
         if ((rLogs.size() >= N_TEST_CASES) || (--nTries <= 0)) {
             break;
         }
@@ -1167,8 +1173,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
     EXPECT_TRUE(rLogs.size() >= N_TEST_CASES);
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
-        InputManager::GetInstance()->RemoveMonitor(ids[i]);
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+        if (IsValidHandlerId(ids[i])) {
+            InputManager::GetInstance()->RemoveMonitor(ids[i]);
+            std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+        }
     }
 }
 
@@ -1187,18 +1195,18 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_004, TestSize.Level1)
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
         ids[i] = InputManager::GetInstance()->AddMonitor(cb);
-        EXPECT_TRUE(ids[i] >= InputHandlerManager::MIN_HANDLER_ID);
+        EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
-    EXPECT_TRUE(monitorId < InputHandlerManager::MIN_HANDLER_ID);
+    EXPECT_TRUE(!IsValidHandlerId(monitorId));
 
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
-        if (ids[i] >= InputHandlerManager::MIN_HANDLER_ID) {
+        if (IsValidHandlerId(ids[i])) {
             InputManager::GetInstance()->RemoveMonitor(ids[i]);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
         }
@@ -1211,7 +1219,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_005, TestSize.Level1)
     std::shared_ptr<InputEventCallback> cb = InputEventCallback::GetPtr();
     EXPECT_TRUE(cb != nullptr);
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
-    EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
+    EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     TestMarkConsumedStep1();
@@ -1220,7 +1228,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_005, TestSize.Level1)
     TestMarkConsumedStep4();
     TestMarkConsumedStep5();
 
-    if (monitorId >= InputHandlerManager::MIN_HANDLER_ID) {
+    if (IsValidHandlerId(monitorId)) {
         InputManager::GetInstance()->RemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
@@ -1232,7 +1240,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_006, TestSize.Level1)
     std::shared_ptr<InputEventCallback> cb = InputEventCallback::GetPtr();
     EXPECT_TRUE(cb != nullptr);
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
-    EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
+    EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     auto pointerEvent = TestMarkConsumedStep1();
@@ -1240,7 +1248,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_006, TestSize.Level1)
     TestMarkConsumedStep4();
     TestMarkConsumedStep6();
 
-    if (monitorId >= InputHandlerManager::MIN_HANDLER_ID) {
+    if (IsValidHandlerId(monitorId)) {
         InputManager::GetInstance()->RemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
@@ -1255,11 +1263,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_006, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
     int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
@@ -1296,7 +1299,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Leve
     MMIEventHdl.InjectEvent(injectUpEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    InputManager::GetInstance()->UnsubscribeKeyEvent(1);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(response);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -1309,12 +1312,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
     int32_t response = -1;
+    int32_t response2 = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     keyOption->SetPreKeys(preKeys);
@@ -1334,7 +1333,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
     });
     EXPECT_TRUE(response > 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
+    response2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     {
         MMI_LOGD("KeyEventId=%{public}d,KeyCode=%{public}d,ActionTime=%{public}d,"
@@ -1345,7 +1344,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("subscribe key event trigger callback");
     });
-    EXPECT_TRUE(response < 0);
+    EXPECT_TRUE(response2 < 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::KeyEvent injectDownEvent;
@@ -1363,7 +1362,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
     MMIEventHdl.InjectEvent(injectUpEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    InputManager::GetInstance()->UnsubscribeKeyEvent(2);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(response);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -1376,11 +1375,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_003, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
     int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
@@ -1417,7 +1411,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_003, TestSize.Leve
     MMIEventHdl.InjectEvent(injectUpEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    InputManager::GetInstance()->UnsubscribeKeyEvent(3);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(response);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -1430,11 +1424,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_003, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_004, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
     int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
@@ -1471,7 +1460,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_004, TestSize.Leve
     MMIEventHdl.InjectEvent(injectUpEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    InputManager::GetInstance()->UnsubscribeKeyEvent(4);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(response);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -1484,11 +1473,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_004, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_005, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
     int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
@@ -1524,7 +1508,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_005, TestSize.Leve
     MMIEventHdl.InjectEvent(injectUpEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    InputManager::GetInstance()->UnsubscribeKeyEvent(5);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(response);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -1537,11 +1521,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_005, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_006, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
     int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
@@ -1592,7 +1571,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_006, TestSize.Leve
     MMIEventHdl.InjectEvent(injectUpEvent2);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    InputManager::GetInstance()->UnsubscribeKeyEvent(6);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(response);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -1605,11 +1584,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_006, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_007, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
     int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
@@ -1645,7 +1619,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_007, TestSize.Leve
     MMIEventHdl.InjectEvent(injectUpEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    InputManager::GetInstance()->UnsubscribeKeyEvent(7);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(response);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -1658,11 +1632,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_007, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_008, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
     int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
@@ -1684,11 +1653,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_008, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_009, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
     int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
@@ -1725,7 +1689,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_009, TestSize.Leve
     MMIEventHdl.InjectEvent(injectUpEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    InputManager::GetInstance()->UnsubscribeKeyEvent(8);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(response);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -1878,21 +1842,146 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_011, TestSize.Leve
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
-void InputManagerTest::InterceptorManagerCallBack(std::shared_ptr<PointerEvent> pointerEvent)
+class InputEventInterceptor : public OHOS::MMI::IInputEventConsumer {
+public:
+    virtual void OnInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) const override { }
+    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override;
+    virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {}
+    static std::shared_ptr<OHOS::MMI::IInputEventConsumer> GetPtr();
+};
+
+void InputEventInterceptor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    int32_t pointerId = pointerEvent->GetPointerId();
-    OHOS::MMI::PointerEvent::PointerItem pointerItem;
-    pointerEvent->GetPointerItem(pointerId, pointerItem);
-    MMI_LOGD("InterceptorManagerCallBack: pointerAction=%{public}d, pointerId=%{public}d,x=%{public}d,y=%{public}d",
-             pointerEvent->GetPointerAction(), pointerEvent->GetPointerId(),
-             pointerItem.GetGlobalX(), pointerItem.GetGlobalY());
+    std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
+    MMI_LOGD("Pointer event intercepted:");
+    MMI_LOGD("eventType=%{public}d,actionTime=%{public}d,"
+             "action=%{public}d,actionStartTime=%{public}d,"
+             "flag=%{public}d,pointerAction=%{public}d,sourceType=%{public}d,"
+             "VerticalAxisValue=%{public}.2f,HorizontalAxisValue=%{public}.2f,"
+             "pointerCount=%{public}d",
+             pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
+             pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
+             pointerEvent->GetFlag(), pointerEvent->GetPointerAction(),
+             pointerEvent->GetSourceType(),
+             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
+             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
+             static_cast<int32_t>(pointerIds.size()));
+    for (int32_t pointerId : pointerIds) {
+        OHOS::MMI::PointerEvent::PointerItem item;
+        CHK(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL);
+
+        MMI_LOGD("downTime=%{public}d,isPressed=%{public}s,"
+                 "globalX=%{public}d,globalY=%{public}d,pressure=%{public}d",
+                 item.GetDownTime(),
+                 item.IsPressed() ? "true" : "false",
+                 item.GetGlobalX(),
+                 item.GetGlobalY(),
+                 item.GetPressure());
+    }
 }
 
-HWTEST_F(InputManagerTest, InterceptorManagerTest_OnAddInterceptor_001, TestSize.Level1)
+std::shared_ptr<OHOS::MMI::IInputEventConsumer> InputEventInterceptor::GetPtr()
+{
+    return std::make_shared<InputEventInterceptor>();
+}
+
+std::string InputManagerTest::DumpPointerItem2(const PointerEvent::PointerItem &item)
+{
+    std::ostringstream strm;
+    strm << "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, downTime=" << item.GetDownTime()
+         << ",isPressed=" << std::boolalpha << item.IsPressed() << ",globalX=" << item.GetGlobalX()
+         << ",globalY=" << item.GetGlobalY() << ",pressure=" << item.GetPressure();
+    return strm.str();
+}
+
+std::string InputManagerTest::DumpPointerEvent2(const std::shared_ptr<PointerEvent> &pointerEvent)
+{
+    const int precision = 2;
+    std::ostringstream strm;
+    strm << "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, eventType="
+         << pointerEvent->GetEventType()
+         << ",actionTime=" << pointerEvent->GetActionTime()
+         << ",action=" << pointerEvent->GetAction()
+         << ",actionStartTime=" << pointerEvent->GetActionStartTime()
+         << ",flag=" << pointerEvent->GetFlag()
+         << ",pointerAction=" << pointerEvent->GetPointerAction()
+         << ",sourceType=" << pointerEvent->GetSourceType()
+         << ",VerticalAxisValue=" << std::fixed << std::setprecision(precision)
+         << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)
+         << ",HorizontalAxisValue=" << std::fixed << std::setprecision(precision)
+         << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL);
+    return strm.str();
+}
+
+void InputManagerTest::TestInputEventInterceptor(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    std::string sCmd {
+        "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
+        "Pointer event intercepted:"
+    };
+    std::vector<std::string> sLogs { SearchForLog(sCmd, true) };
+
+    PointerEvent::PointerItem item;
+    EXPECT_TRUE(pointerEvent->GetPointerItem(DEFAULT_POINTER_ID, item));
+    std::string sItem1 { DumpPointerItem2(item) };
+    std::vector<std::string> sLogItem1s { SearchForLog(sItem1, true) };
+    MMI_LOGD("sItem1 = %{public}s", sItem1.c_str());
+
+    std::string sPointeE { DumpPointerEvent2(pointerEvent) };
+    std::vector<std::string> sLogPointerEs { SearchForLog(sPointeE, true) };
+    MMI_LOGD("sPointerE = %{public}s", sPointeE.c_str());
+
+    MMI_LOGD("Call InputManager::SimulateInputEvent ...");
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    int32_t nTries { N_TRIES_FOR_LOG };
+    // 这里主要测试以下两方面：
+    //   (1) 拦截器可以成功接收到事件；
+    //   (2) 拦截器接收到的事件结构的各个字段与初始设置的值一致；
+    // 为此，这里有三项测试：
+    //   (1) 拦截器成功接收到PointerEvent事件；
+    //   (2) PointerEvent记录的按下手指的数据的各字段与设置的值是一致的；
+    //   (3) PointerEvent结构各字段的值与设置的值是一致的；
+    // 这三项测试各自成功与否依次由states[0]、states[1]和states[2]标识；
+    std::bitset<3> states { };
+
+    while (true) {
+        if (!states.test(0)) {
+            // 搜索标识拦截器成功接收到事件的关键性日志；
+            std::vector<std::string> tLogs { SearchForLog(sCmd, sLogs, true) };
+            if (!tLogs.empty()) {
+                states.set(0);
+            }
+        }
+        if (!states.test(1)) {
+            // 搜索日志，匹配按下手指的数据；
+            std::vector<std::string> tLogItem1s { SearchForLog(sItem1, sLogItem1s, true) };
+            if (!tLogItem1s.empty()) {
+                states.set(1);
+            }
+        }
+        if (!states.test(2)) {
+            // 搜索日志，匹配PointerEvent事件结构的数据；
+            std::vector<std::string> tLogPointerEs { SearchForLog(sPointeE, sLogPointerEs, true) };
+            if (!tLogPointerEs.empty()) {
+                states.set(2);
+            }
+        }
+        if (states.all() || (--nTries <= 0)) {
+            break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
+    }
+    EXPECT_TRUE(states.all());
+    EXPECT_TRUE(states.test(0));
+    EXPECT_TRUE(states.test(1));
+    EXPECT_TRUE(states.test(2));
+}
+
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_001, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
     PointerEvent::PointerItem item;
-    item.SetPointerId(0);
+    item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(10010);
     item.SetPressed(true);
     item.SetGlobalX(823);
@@ -1901,74 +1990,21 @@ HWTEST_F(InputManagerTest, InterceptorManagerTest_OnAddInterceptor_001, TestSize
     pointerEvent->AddPointerItem(item);
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetPointerId(0);
+    pointerEvent->SetPointerId(DEFAULT_POINTER_ID);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    MMI_LOGD("Call InterceptorManager ...");
 
-    std::string command {
-        "InputManagerTest: in InterceptorManagerCallBack, #[[:digit:]]\\{1,\\}, "
-        "InterceptorManagerCallBack: pointerAction"
-    };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
-
-    int32_t interceptorId { };
-    interceptorId = InputManager::GetInstance()->AddInterceptor(PointerEvent::SOURCE_TYPE_TOUCHPAD,
-                                                InterceptorManagerCallBack);
-    EXPECT_TRUE(interceptorId != InterceptorManager::INVALID_INTERCEPTOR_ID);
+    std::shared_ptr<OHOS::MMI::IInputEventConsumer> interceptor { InputEventInterceptor::GetPtr() };
+    int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor) };
+    EXPECT_TRUE(IsValidHandlerId(interceptorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-
-    int32_t response = 0;
-    response = MMIEventHdl.InjectPointerEvent(pointerEvent);
-    EXPECT_EQ(RET_OK, response);
-
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
-    EXPECT_TRUE(!tLogs.empty());
-
-    InputManager::GetInstance()->RemoveInterceptor(interceptorId);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    TestInputEventInterceptor(pointerEvent);
+    if (IsValidHandlerId(interceptorId)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
 }
 
-HWTEST_F(InputManagerTest, InterceptorManagerTest_OnAddInterceptor_002, TestSize.Level1)
-{
-    auto pointerEvent = PointerEvent::Create();
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDownTime(10010);
-    item.SetPressed(true);
-    item.SetGlobalX(823);
-    item.SetGlobalY(723);
-    item.SetDeviceId(1);
-    pointerEvent->AddPointerItem(item);
-
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    MMI_LOGD("Call InterceptorManager ...");
-
-    std::string command {
-        "InputManagerTest: in InterceptorManagerCallBack, #[[:digit:]]\\{1,\\}, "
-        "InterceptorManagerCallBack: pointerAction"
-    };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
-
-    int32_t interceptorId { };
-    interceptorId = InputManager::GetInstance()->AddInterceptor(PointerEvent::SOURCE_TYPE_TOUCHPAD,
-                                                InterceptorManagerCallBack);
-    EXPECT_TRUE(interceptorId != InterceptorManager::INVALID_INTERCEPTOR_ID);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-
-    int32_t response = 0;
-    response = MMIEventHdl.InjectPointerEvent(pointerEvent);
-    EXPECT_EQ(RET_OK, response);
-
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
-    EXPECT_TRUE(!tLogs.empty());
-
-    InputManager::GetInstance()->RemoveInterceptor(interceptorId);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-}
-
-HWTEST_F(InputManagerTest, InterceptorManagerTest_OnAddInterceptor_003, TestSize.Level1)
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_002, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
     PointerEvent::PointerItem item;
@@ -1985,69 +2021,29 @@ HWTEST_F(InputManagerTest, InterceptorManagerTest_OnAddInterceptor_003, TestSize
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     MMI_LOGD("Call InterceptorManager ...");
 
-    std::string command {
-        "InputManagerTest: in InterceptorManagerCallBack, #[[:digit:]]\\{1,\\}, "
-        "InterceptorManagerCallBack: pointerAction"
-    };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
-
-    int32_t interceptorId { };
-    interceptorId = InputManager::GetInstance()->AddInterceptor(PointerEvent::SOURCE_TYPE_TOUCHPAD,
-                                                InterceptorManagerCallBack);
-    EXPECT_TRUE(interceptorId != InterceptorManager::INVALID_INTERCEPTOR_ID);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-
-    int32_t response = 0;
-    response = MMIEventHdl.InjectPointerEvent(pointerEvent);
-    EXPECT_EQ(RET_OK, response);
-
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
-    EXPECT_TRUE(!tLogs.empty());
-
-    InputManager::GetInstance()->RemoveInterceptor(interceptorId);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-}
-
-HWTEST_F(InputManagerTest, InterceptorManagerTest_OnAddInterceptor_004, TestSize.Level1)
-{
-    auto pointerEvent = PointerEvent::Create();
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDownTime(10010);
-    item.SetPressed(true);
-    item.SetGlobalX(823);
-    item.SetGlobalY(723);
-    item.SetDeviceId(1);
-    pointerEvent->AddPointerItem(item);
-
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    MMI_LOGD("Call InterceptorManager ......");
-
     const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
     std::vector<int32_t> ids(N_TEST_CASES);
+    std::shared_ptr<OHOS::MMI::IInputEventConsumer> interceptor { InputEventInterceptor::GetPtr() };
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
-        ids[i] = InputManager::GetInstance()->AddInterceptor(PointerEvent::SOURCE_TYPE_TOUCHPAD,
-                                                InterceptorManagerCallBack);
-        EXPECT_TRUE(ids[i] >= 1);
+        ids[i] = InputManager::GetInstance()->AddInterceptor(interceptor);
+        EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
     std::string command {
-        "InputManagerTest: in InterceptorManagerCallBack, #[[:digit:]]\\{1,\\}, "
-        "InterceptorManagerCallBack: pointerAction"
+        "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
+        "Pointer event intercepted:"
     };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     int32_t nTries { N_TRIES_FOR_LOG };
-    std::set<std::string> rLogs;
+    std::vector<std::string> rLogs;
 
     while (true) {
         std::vector<std::string> tLogs { SearchForLog(command, sLogs, true) };
-        rLogs.insert(tLogs.begin(), tLogs.end());
+        rLogs.insert(rLogs.end(), tLogs.begin(), tLogs.end());
         if ((rLogs.size() >= N_TEST_CASES) || (--nTries <= 0)) {
             break;
         }
@@ -2057,48 +2053,185 @@ HWTEST_F(InputManagerTest, InterceptorManagerTest_OnAddInterceptor_004, TestSize
     EXPECT_TRUE(rLogs.size() >= N_TEST_CASES);
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
-        InputManager::GetInstance()->RemoveInterceptor(ids[i]);
+        if (IsValidHandlerId(ids[i])) {
+            InputManager::GetInstance()->RemoveInterceptor(ids[i]);
+            std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+        }
+    }
+}
+
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_003, TestSize.Level1)
+{
+    const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
+    std::vector<int32_t> ids(N_TEST_CASES);
+    std::shared_ptr<OHOS::MMI::IInputEventConsumer> interceptor { InputEventInterceptor::GetPtr() };
+
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+        ids[i] = InputManager::GetInstance()->AddInterceptor(interceptor);
+        EXPECT_TRUE(IsValidHandlerId(ids[i]));
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+
+    std::string command {
+        "InputHandlerManagerGlobal: in RemoveInterceptor, #[[:digit:]]\\{1,\\}, "
+        "Unregister interceptor successfully."
+    };
+    std::vector<std::string> sLogs { SearchForLog(command, true) };
+
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+        if (IsValidHandlerId(ids[i])) {
+            InputManager::GetInstance()->RemoveInterceptor(ids[i]);
+            std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+        }
+    }
+
+    int32_t nTries { N_TRIES_FOR_LOG };
+    std::vector<std::string> rLogs;
+
+    while (true) {
+        std::vector<std::string> tLogs { SearchForLog(command, sLogs, true) };
+        rLogs.insert(rLogs.end(), tLogs.begin(), tLogs.end());
+        if ((rLogs.size() >= N_TEST_CASES) || (--nTries <= 0)) {
+            break;
+        }
+        sLogs.insert(sLogs.end(), tLogs.begin(), tLogs.end());
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
+    }
+    EXPECT_TRUE(rLogs.size() >= N_TEST_CASES);
+}
+
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
+{
+    std::string command {
+        "InputInterceptorManager: in AddInterceptor, #[[:digit:]]\\{1,\\}, "
+        "No interceptor was specified."
+    };
+    std::vector<std::string> sLogs { SearchForLog(command, true) };
+
+    std::shared_ptr<OHOS::MMI::IInputEventConsumer> interceptor;
+    int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor) };
+    EXPECT_TRUE(!IsValidHandlerId(interceptorId));
+
+    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+}
+
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_005, TestSize.Level1)
+{
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+    pointerEvent->SetPointerId(DEFAULT_POINTER_ID);
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(DEFAULT_POINTER_ID);
+    item.SetDownTime(static_cast<int64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND));
+    item.SetPressed(true);
+    item.SetGlobalX(200);
+    item.SetGlobalY(300);
+    pointerEvent->AddPointerItem(item);
+
+    std::shared_ptr<OHOS::MMI::IInputEventConsumer> interceptor { InputEventInterceptor::GetPtr() };
+    int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor) };
+    EXPECT_TRUE(IsValidHandlerId(interceptorId));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    TestInputEventInterceptor(pointerEvent);
+    if (IsValidHandlerId(interceptorId)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
 
-HWTEST_F(InputManagerTest, InterceptorManagerTest_OnAddInterceptor_005, TestSize.Level1)
+void InputManagerTest::TestInputEventInterceptor2(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    std::string sCmd {
+        "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
+        "Pointer event intercepted:"
+    };
+    std::vector<std::string> sLogs { SearchForLog(sCmd, true) };
+
+    PointerEvent::PointerItem item;
+    pointerEvent->GetPointerItem(0, item);
+    std::string sItem1 { DumpPointerItem2(item) };
+    std::vector<std::string> sLogItem1s { SearchForLog(sItem1, true) };
+
+    pointerEvent->GetPointerItem(1, item);
+    std::string sItem2 { DumpPointerItem2(item) };
+    std::vector<std::string> sLogItem2s { SearchForLog(sItem2, true) };
+
+    std::string sPointeE { DumpPointerEvent2(pointerEvent) };
+    std::vector<std::string> sLogPointerEs { SearchForLog(sPointeE, true) };
+
+    MMI_LOGD("Call InputManager::SimulateInputEvent ...");
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    int32_t nTries { N_TRIES_FOR_LOG };
+    std::bitset<4> states { };
+
+    while (true) {
+        if (!states.test(0)) {
+            std::vector<std::string> tLogs { SearchForLog(sCmd, sLogs, true) };
+            if (!tLogs.empty()) {
+                states.set(0);
+            }
+        }
+        if (!states.test(1)) {
+            std::vector<std::string> tLogItem1s { SearchForLog(sItem1, sLogItem1s, true) };
+            if (!tLogItem1s.empty()) {
+                states.set(1);
+            }
+        }
+        if (!states.test(2)) {
+            std::vector<std::string> tLogItem2s { SearchForLog(sItem2, sLogItem2s, true) };
+            if (!tLogItem2s.empty()) {
+                states.set(2);
+            }
+        }
+        if (!states.test(3)) {
+            std::vector<std::string> tLogPointerEs { SearchForLog(sPointeE, sLogPointerEs, true) };
+            if (!tLogPointerEs.empty()) {
+                states.set(3);
+            }
+        }
+        if (states.all() || (--nTries <= 0)) {
+            break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
+    }
+    EXPECT_TRUE(states.all());
+}
+
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_006, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
     PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDownTime(10010);
-    item.SetPressed(true);
-    item.SetGlobalX(823);
-    item.SetGlobalY(723);
-    item.SetDeviceId(1);
+    item.SetPointerId(0);   // test code，set the PointerId = 0
+    item.SetGlobalX(823);   // test code，set the GlobalX = 823
+    item.SetGlobalY(723);   // test code，set the GlobalY = 723
+    item.SetPressure(5);    // test code，set the Pressure = 5
+    item.SetDeviceId(1);    // test code，set the DeviceId = 1
+    pointerEvent->AddPointerItem(item);
+
+    item.SetPointerId(1);   // test code，set the PointerId = 1
+    item.SetGlobalX(1010);   // test code，set the GlobalX = 1010
+    item.SetGlobalY(910);   // test code，set the GlobalY = 910
+    item.SetPressure(7);    // test code，set the Pressure = 7
+    item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->SetSourceType(-1);
-    MMI_LOGD("Call InterceptorManager ...");
+    pointerEvent->SetPointerId(1);  // test code，set the PointerId = 1
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
 
-    std::string command {
-        "EventDispatch: in handlePointerEvent, #[[:digit:]]\\{1,\\}, "
-        "Unknown source type!"
-    };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
-
-    int32_t interceptorId { };
-    interceptorId = InputManager::GetInstance()->AddInterceptor(PointerEvent::SOURCE_TYPE_TOUCHPAD,
-                                                InterceptorManagerCallBack);
-    EXPECT_TRUE(interceptorId != InterceptorManager::INVALID_INTERCEPTOR_ID);
+    std::shared_ptr<OHOS::MMI::IInputEventConsumer> interceptor { InputEventInterceptor::GetPtr() };
+    int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor) };
+    EXPECT_TRUE(IsValidHandlerId(interceptorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    int32_t response = 0;
-    response = MMIEventHdl.InjectPointerEvent(pointerEvent);
-    EXPECT_EQ(RET_OK, response);
-
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
-    EXPECT_TRUE(!tLogs.empty());
-
-    InputManager::GetInstance()->RemoveInterceptor(interceptorId);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    TestInputEventInterceptor2(pointerEvent);
+    if (IsValidHandlerId(interceptorId)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
 }
 
 void InputManagerTest::TouchPadMonitorCallBack(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
@@ -2135,7 +2268,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
+    EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
@@ -2172,7 +2305,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
+    EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
@@ -2209,7 +2342,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
+    EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
@@ -2246,7 +2379,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
     EXPECT_TRUE(callBackPtr != nullptr);
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
         ids[i] = InputManager::GetInstance()->AddMonitor(callBackPtr);
-        EXPECT_TRUE(ids[i] >= InputHandlerManager::MIN_HANDLER_ID);
+        EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
@@ -2258,11 +2391,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
 
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     int32_t nTries { N_TRIES_FOR_LOG };
-    std::set<std::string> rLogs;
+    std::vector<std::string> rLogs;
 
     while (true) {
         std::vector<std::string> tLogs { SearchForLog(command, sLogs, true) };
-        rLogs.insert(tLogs.begin(), tLogs.end());
+        rLogs.insert(rLogs.end(), tLogs.begin(), tLogs.end());
         if ((rLogs.size() >= N_TEST_CASES) || (--nTries <= 0)) {
             break;
         }
@@ -2304,7 +2437,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
+    EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
@@ -2322,7 +2455,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     int32_t monitorId { InputManager::GetInstance()->AddMonitor(callBackPtr) };
-    EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
+    EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int32_t actionTime { static_cast<int32_t>(GetSysClockTime()) };
@@ -2362,7 +2495,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     int32_t monitorId { InputManager::GetInstance()->AddMonitor(callBackPtr) };
-    EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
+    EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int32_t actionTime { static_cast<int32_t>(GetSysClockTime()) };
@@ -2402,7 +2535,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     int32_t monitorId { InputManager::GetInstance()->AddMonitor(callBackPtr) };
-    EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
+    EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int32_t actionTime { static_cast<int32_t>(GetSysClockTime()) };
@@ -2442,7 +2575,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     int32_t monitorId { InputManager::GetInstance()->AddMonitor(callBackPtr) };
-    EXPECT_TRUE(monitorId >= InputHandlerManager::MIN_HANDLER_ID);
+    EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int32_t actionTime { static_cast<int32_t>(GetSysClockTime()) };
@@ -2589,18 +2722,18 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
         ids[i] = InputManager::GetInstance()->AddMonitor(cb);
-        EXPECT_TRUE(ids[i] >= InputHandlerManager::MIN_HANDLER_ID);
+        EXPECT_TRUE(ids[i] >= MIN_HANDLER_ID);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
-    EXPECT_TRUE(monitorId < InputHandlerManager::MIN_HANDLER_ID);
+    EXPECT_TRUE(monitorId < MIN_HANDLER_ID);
 
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
-        if (ids[i] >= InputHandlerManager::MIN_HANDLER_ID) {
+        if (ids[i] >= MIN_HANDLER_ID) {
             InputManager::GetInstance()->RemoveMonitor(ids[i]);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
         }

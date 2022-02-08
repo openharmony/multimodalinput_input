@@ -142,7 +142,7 @@ std::vector<EventRegesterInfo>& MultimodalEventHandler::GetAbilityInfoVec()
 
 bool MultimodalEventHandler::InitClient()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     if (mClient_) {
         return true;
     }
@@ -154,7 +154,7 @@ bool MultimodalEventHandler::InitClient()
     if (!(mClient_->Start(mcMsgHandler_, true))) {
         return false;
     }
-    MMI_LOGT("init client success!");
+    MMI_LOGD("init client success!");
     return true;
 }
 
@@ -180,23 +180,6 @@ int32_t MultimodalEventHandler::GetDevice(int32_t taskId, int32_t deviceId)
         return MMI_SERVICE_INVALID;
     }
     return EventManager.GetDevice(taskId, deviceId);
-}
-
-int32_t MultimodalEventHandler::SubscribeKeyEvent(
-    const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
-{
-    if (!InitClient()) {
-        return MMI_SERVICE_INVALID;
-    }
-    return EventManager.SubscribeKeyEvent(subscribeInfo);
-}
-
-int32_t MultimodalEventHandler::UnSubscribeKeyEvent(int32_t subscribeId)
-{
-    if (!InitClient()) {
-        return MMI_SERVICE_INVALID;
-    }
-    return EventManager.UnSubscribeKeyEvent(subscribeId);
 }
 
 int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
@@ -309,9 +292,10 @@ int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
     if (!InitClient()) {
         return MMI_SERVICE_INVALID;
     }
-    NetPacket ck(MmiMessageId::ADD_INPUT_EVENT_MONITOR);
-    ck << OHOS::MMI::InputEvent::EVENT_TYPE_KEY;
-    mClient_->SendMessage(ck);
+    MMI_LOGD("AddInputEventMontior enter");
+    NetPacket pkt(MmiMessageId::ADD_INPUT_EVENT_MONITOR);
+    pkt << keyEventType;
+    mClient_->SendMessage(pkt);
     return RET_OK;
 }
 
@@ -320,9 +304,10 @@ void MultimodalEventHandler::RemoveInputEventMontior(int32_t keyEventType)
     if (!InitClient()) {
         return;
     }
-    NetPacket ck(MmiMessageId::REMOVE_INPUT_EVENT_MONITOR);
-    ck << OHOS::MMI::InputEvent::EVENT_TYPE_KEY;
-    mClient_->SendMessage(ck);
+    MMI_LOGD("RemoveInputEventMontior enter");
+    NetPacket pkt(MmiMessageId::REMOVE_INPUT_EVENT_MONITOR);
+    pkt << keyEventType;
+    mClient_->SendMessage(pkt);
 }
 
 void MultimodalEventHandler::RemoveInputEventTouchpadMontior(int32_t pointerEventType)

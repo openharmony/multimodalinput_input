@@ -22,6 +22,6 @@
 
 namespace OHOS {
 namespace MMI {
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif
