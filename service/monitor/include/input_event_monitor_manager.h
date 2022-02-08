@@ -29,7 +29,7 @@ namespace MMI {
 struct MonitorItem {
     int32_t eventType;
     SessionPtr session;
-    bool operator == (const struct MonitorItem& item)
+    bool operator == (const MonitorItem& item)
     {
         return eventType == item.eventType && session == item.session;
     }
@@ -40,9 +40,9 @@ public:
     InputEventMonitorManager();
     virtual ~InputEventMonitorManager();
 
-    int32_t AddInputEventMontior(int32_t eventType, SessionPtr session);
-    void RemoveInputEventMontior(int32_t eventType, SessionPtr session);
-    void ReportKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent);
+    int32_t AddInputEventMontior(SessionPtr session, int32_t eventType);
+    void RemoveInputEventMontior(SessionPtr session, int32_t eventType);
+    void OnMonitorInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent);
 
     int32_t AddInputEventTouchpadMontior(int32_t eventType, SessionPtr session);
     void RemoveInputEventTouchpadMontior(int32_t eventType, SessionPtr session);
@@ -53,7 +53,6 @@ private:
     std::list<MonitorItem> monitors_;
     std::list<MonitorItem> monitorsTouch_;
 
-    void OnMonitorInputEvent(std::shared_ptr<KeyEvent> keyEvent);
     void OnTouchpadMonitorInputEvent(std::shared_ptr<PointerEvent> PointerEvent);
 };
 }
