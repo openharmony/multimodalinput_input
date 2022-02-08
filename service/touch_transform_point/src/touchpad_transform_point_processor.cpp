@@ -45,7 +45,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(libinput_event *event)
     auto logicalY = libinput_event_touchpad_get_y(data);
 
     auto pointIds = pointerEvent_->GetPointersIdList();
-    if (pointIds.size() == 0) {
+    if (pointIds.empty()) {
         pointerEvent_->SetActionStartTime(time);
     }
     pointerEvent_->SetActionTime(time);
