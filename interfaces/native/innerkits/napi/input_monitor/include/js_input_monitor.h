@@ -55,6 +55,8 @@ private:
 
     InputMonitor& operator=(const InputMonitor&) = delete;
 
+    std::string GetAction(int32_t action);
+
 private:
     int32_t id_ {-1};
     mutable std::mutex mutex_;
