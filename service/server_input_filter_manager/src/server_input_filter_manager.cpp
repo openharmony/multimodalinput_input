@@ -96,8 +96,8 @@ bool ServerInputFilterManager::OnKeyEvent(const EventKeyboard& key)
 {
     MMI_LOGT("Enter");
     OnKeyEventTrace(key);
-    if (keyEventFilterMap_.size() == 0) {
-        MMI_LOGT("The keyEventFilterMap_ size is zero");
+    if (keyEventFilterMap_.empty()) {
+        MMI_LOGT("keyEventFilterMap_ is empty");
         return false;
     }
     SessionPtr temp;
@@ -259,8 +259,8 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
     CHKF(event, PARAM_INPUT_INVALID);
     MMI_LOGT("Enter");
     OnTouchEventTrace(touch);
-    if (touchEventFilterMap_.size() == 0) {
-        MMI_LOGE("TouchEventFilterMap_ size is zero");
+    if (touchEventFilterMap_.empty()) {
+        MMI_LOGE("touchEventFilterMap_ is empty");
         return false;
     }
     SessionPtr temp;
@@ -416,8 +416,8 @@ bool ServerInputFilterManager::OnPointerEvent(EventPointer event_pointer)
 {
     MMI_LOGT("Enter");
     OnPointerEventTrace(event_pointer);
-    if (pointerEventFilterMap_.size() == 0) {
-        MMI_LOGT("PointerEventFilterMap_ size is zero");
+    if (pointerEventFilterMap_.empty()) {
+        MMI_LOGT("pointerEventFilterMap_ is empty");
         return false;
     }
     SessionPtr ptr;

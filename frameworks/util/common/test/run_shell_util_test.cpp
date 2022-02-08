@@ -49,8 +49,8 @@ HWTEST_F(RunShellUtilTest, RunShellUtilTest_RunShellCommand_001, TestSize.Level1
     MMI_LOGD("test runshellutilrqr2qrq2");
     std::vector<std::string> vLog;
     ASSERT_TRUE(runCommand.RunShellCommand(command, vLog) == RET_OK);
-    ASSERT_TRUE(vLog.size() > 0);
-    if (firstLog.size() == 0) {
+    ASSERT_FALSE(vLog.empty());
+    if (firstLog.empty()) {
         EXPECT_TRUE(vLog.size() > firstLog.size());
         EXPECT_TRUE(vLog.back().find(command) != vLog.back().npos);
     } else {
@@ -68,8 +68,8 @@ HWTEST_F(RunShellUtilTest, RunShellUtilTest_RunShellCommand_002, TestSize.Level1
         MMI_LOGD("test runshellutilrqr2342342355qrq2");
         std::vector<std::string> vLog;
         ASSERT_TRUE(runCommand.RunShellCommand(command, vLog) == RET_OK);
-        ASSERT_TRUE(vLog.size() > 0);
-        if (firstLog.size() == 0) {
+        ASSERT_FALSE(vLog.empty());
+        if (firstLog.empty()) {
             EXPECT_TRUE(vLog.size() > firstLog.size());
             EXPECT_TRUE(vLog.back().find(command) != vLog.back().npos);
         } else {
@@ -82,8 +82,8 @@ HWTEST_F(RunShellUtilTest, RunShellUtilTest_RunShellCommand_002, TestSize.Level1
     MMI_LOGD("test runshellutilrqr21234www");
     std::vector<std::string> vLog;
     ASSERT_TRUE(runCommand.RunShellCommand(command, vLog) == RET_OK);
-    ASSERT_TRUE(vLog.size() > 0);
-    if (firstLog.size() == 0) {
+    ASSERT_FALSE(vLog.empty());
+    if (firstLog.empty()) {
         EXPECT_TRUE(vLog.size() > firstLog.size());
         EXPECT_TRUE(vLog.back().find(command) != vLog.back().npos);
     } else {

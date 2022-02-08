@@ -72,7 +72,7 @@ int32_t InputFilterManager::UnFilterKeyEvent(int32_t id)
         MMI_LOGD("can't find this id");
         return RET_ERR;
     }
-    if (keyEventFilterList_.size() == 0) {
+    if (keyEventFilterList_.empty()) {
         MMI_LOGD("remove filter is the last filter");
         return RET_OK;
     }

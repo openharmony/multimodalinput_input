@@ -648,7 +648,7 @@ bool PointerEvent::IsValidCheckTouchFunc() const
         return false;
     }
 
-    if (pressedButtons_.size() != 0) {
+    if (!pressedButtons_.empty()) {
         HiLog::Error(LABEL, "PressedButtons_.size is invalid");
         return false;
     }
