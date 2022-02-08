@@ -15,6 +15,8 @@
 
 #ifndef OHOS_MULTIMDOALINPUT_INPUT_MONITOR_MANAGER_H
 #define OHOS_MULTIMDOALINPUT_INPUT_MONITOR_MANAGER_H
+#include <memory>
+#include "input_handler_type.h"
 #include "i_input_event_consumer.h"
 #include "singleton.h"
 
@@ -24,6 +26,14 @@ public:
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor);
     void RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
+
+public:
+    static bool IsValidMonitorId(int32_t monitorId);
 };
+
+inline bool InputMonitorManager::IsValidMonitorId(int32_t monitorId)
+{
+    return IsValidHandlerId(monitorId);
+}
 } // namespace OHOS::MMI
 #endif // OHOS_MULTIMDOALINPUT_INPUT_MONITOR_MANAGER_H

@@ -77,6 +77,10 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         MMI_LOGE("MMI Throw Error:JsOn is not napi_function");
         return nullptr;
     }
+    if (!JSIMM.AddEnv(env, info)) {
+        MMI_LOGE("AddEnv failed, register js monitor failed");
+        return nullptr;
+    }
     JSIMM.AddMonitor(env, argv[1]);
     MMI_LOGD("leave");
     return nullptr;
