@@ -55,8 +55,6 @@ private:
 
     InputMonitor& operator=(const InputMonitor&) = delete;
 
-    std::string GetAction(int32_t action);
-
 private:
     int32_t id_ {-1};
     mutable std::mutex mutex_;
@@ -97,6 +95,8 @@ private:
     void printfPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) const;
 
     int32_t TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
+
+    std::string GetAction(int32_t action);
 
 private:
     std::shared_ptr<InputMonitor> monitor_ {nullptr};
