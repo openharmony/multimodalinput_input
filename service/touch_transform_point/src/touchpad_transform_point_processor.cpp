@@ -37,13 +37,14 @@ void TouchPadTransformPointProcessor::SetPointEventSource(int32_t sourceType)
 void TouchPadTransformPointProcessor::OnEventTouchPadDown(libinput_event *event)
 {
     CHKP(event, PARAM_INPUT_INVALID);
-    MMI_LOGD("this touch pad event is down begin");
+    MMI_LOGT("Enter OnEventTouchPadDown");
     auto data = libinput_event_get_touchpad_event(event);
-    auto time = libinput_event_touchpad_get_time(data);
+    CHKP(data, ERROR_NULL_POINTER);
     auto seatSlot = libinput_event_touchpad_get_seat_slot(data);
     auto logicalX = libinput_event_touchpad_get_x(data);
     auto logicalY = libinput_event_touchpad_get_y(data);
 
+    auto time = libinput_event_touchpad_get_time(data);
     auto pointIds = pointerEvent_->GetPointersIdList();
     if (pointIds.empty()) {
         pointerEvent_->SetActionStartTime(time);
@@ -60,19 +61,20 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(libinput_event *event)
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(pointer);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_LOGD("this touch pad event is down end");
+    MMI_LOGT("End OnEventTouchPadDown");
 }
 
 void TouchPadTransformPointProcessor::OnEventTouchPadMotion(libinput_event *event)
 {
     CHKP(event, PARAM_INPUT_INVALID);
-    MMI_LOGD("this touch pad event is motion begin");
+    MMI_LOGT("Enter OnEventTouchPadMotion");
     auto data = libinput_event_get_touchpad_event(event);
-    auto time = libinput_event_touchpad_get_time(data);
+    CHKP(data, ERROR_NULL_POINTER);
     auto seatSlot = libinput_event_touchpad_get_seat_slot(data);
     auto logicalX = libinput_event_touchpad_get_x(data);
     auto logicalY = libinput_event_touchpad_get_y(data);
 
+    auto time = libinput_event_touchpad_get_time(data);
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     PointerEvent::PointerItem pointer;
@@ -81,19 +83,20 @@ void TouchPadTransformPointProcessor::OnEventTouchPadMotion(libinput_event *even
     pointer.SetGlobalY((int32_t)logicalY);
     pointerEvent_->UpdatePointerItem(seatSlot, pointer);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_LOGD("this touch pad event is motion end");
+    MMI_LOGT("End OnEventTouchPadMotion");
 }
 
 void TouchPadTransformPointProcessor::OnEventTouchPadUp(libinput_event *event)
 {
     CHKP(event, PARAM_INPUT_INVALID);
-    MMI_LOGD("this touch pad event is up begin");
+    MMI_LOGT("Enter OnEventTouchPadUp");
     auto data = libinput_event_get_touchpad_event(event);
-    auto time = libinput_event_touchpad_get_time(data);
+    CHKP(data, ERROR_NULL_POINTER);
     auto seatSlot = libinput_event_touchpad_get_seat_slot(data);
     auto logicalX = libinput_event_touchpad_get_x(data);
     auto logicalY = libinput_event_touchpad_get_y(data);
 
+    auto time = libinput_event_touchpad_get_time(data);
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
 
@@ -104,14 +107,14 @@ void TouchPadTransformPointProcessor::OnEventTouchPadUp(libinput_event *event)
     pointer.SetGlobalY((int32_t)logicalY);
     pointerEvent_->UpdatePointerItem(seatSlot, pointer);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_LOGD("this touch pad event is up end");
+    MMI_LOGT("End OnEventTouchPadUp");
 }
 
 std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPadEvent(
     libinput_event *event)
 {
     CHKPR(event, PARAM_INPUT_INVALID, nullptr);
-    MMI_LOGD("call  onLibinputTouchPadEvent begin");
+    MMI_LOGT("call onLibinputTouchPadEvent begin");
     auto type = libinput_event_get_type(event);
     pointerEvent_->UpdateId();
     switch (type) {
@@ -131,7 +134,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
             return nullptr;
         }
     }
-    MMI_LOGD("call  onLibinputTouchPadEvent end");
+    MMI_LOGT("call onLibinputTouchPadEvent end");
     return pointerEvent_;
 }
 }
