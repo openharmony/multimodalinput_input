@@ -12,9 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef INPUT_HANDLER_MANAGER_H
 #define INPUT_HANDLER_MANAGER_H
 
+#include <limits>
 #include <map>
 #include <mutex>
 #include "input_handler_type.h"
@@ -30,10 +32,6 @@ public:
     void OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent);
     void OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent);
 
-public:
-    static const int32_t MIN_HANDLER_ID;
-    static const int32_t INVALID_HANDLER_ID;
-
 private:
     struct InputHandler {
         int32_t handlerId_;
@@ -42,7 +40,7 @@ private:
     };
 
 private:
-    int32_t TakeNextId();
+    int32_t GetNextId();
     int32_t AddLocal(int32_t handlerId, InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> monitor);
     void AddToServer(int32_t handlerId, InputHandlerType handlerType);
     int32_t RemoveLocal(int32_t handlerId, InputHandlerType handlerType);

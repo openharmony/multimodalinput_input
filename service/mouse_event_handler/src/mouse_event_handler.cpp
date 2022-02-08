@@ -20,7 +20,7 @@
 #include "input_windows_manager.h"
 #include "input_event_handler.h"
 #include "timer_manager.h"
-#include "mouse_state_gesture.h"
+#include "mouse_device_state.h"
 #include "input_device_manager.h"
 
 namespace OHOS {
@@ -71,17 +71,18 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEv
 
     auto state = libinput_event_pointer_get_button_state(data);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
+        MouseState->MouseBtnStateCounts(button, BUTTON_STATE_RELEASED);
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+        pointerEvent_->DeleteReleaseButton(button);
         pointerItem.SetPressed(false);
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
+        MouseState->MouseBtnStateCounts(button, BUTTON_STATE_PRESSED);
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-        pointerEvent_->SetButtonPressed(state);
+        pointerEvent_->SetButtonPressed(button);
         pointerItem.SetPressed(true);
     } else {
         MMI_LOGW("unknown state, state: %{public}u", state);
     }
-
-    MouseState->CountState(button, state);
 }
 
 void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
@@ -148,6 +149,7 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerItem.SetPressure(0);
     pointerItem.SetDeviceId(deviceId);
 
+    pointerEvent_->UpdateId();
     pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent_->SetActionTime(static_cast<int32_t>(GetSysClockTime()));
@@ -209,7 +211,7 @@ void MouseEventHandler::DumpInner()
         pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
 
     PointerEvent::PointerItem item;
-    pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item);
+    CHK(pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item), PARAM_INPUT_FAIL);
     MMI_LOGD("item: DownTime: %{public}d, IsPressed: %{public}s,"
         "GlobalX: %{public}d, GlobalY: %{public}d, LocalX: %{public}d, LocalY: %{public}d, Width: %{public}d,"
         "Height: %{public}d, Pressure: %{public}d, DeviceId: %{public}d",

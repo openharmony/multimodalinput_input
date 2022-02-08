@@ -61,14 +61,16 @@
         } \
     } while (0)
 
-#define CHKP(cond, ec) \
+#define CHKP(cond, ...) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHKP(%{public}s), errCode:%{public}d", \
-                __FILE__, __LINE__, #cond, ec); \
+            MMI_LOGE("%{public}s, (%{public}d), %{public}s is null", \
+                __FILE__, __LINE__, #cond); \
             return; \
         } \
     } while (0)
+
+
 
 #define CHKF(cond, ec) \
     do { \
@@ -147,10 +149,10 @@
         } \
     } while (0)
 
-#define CHKP(cond, ec) \
+#define CHKP(cond, ...) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("CHKP(%{public}s), errCode:%{public}d", #cond, ec); \
+            MMI_LOGE("%{public}s is null", #cond); \
             return; \
         } \
     } while (0)

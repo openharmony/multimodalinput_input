@@ -106,9 +106,11 @@ private:
     void TraceKeyEvent(const EventKeyboard& key) const;
     void TracePointerEvent(const EventPointer& pointData) const;
     void TraceTouchEvent(const EventTouch& touchData) const;
+    static void OnEventProcessed(int32_t eventId);
 
 private:
     bool isServerReqireStMessage_ = true;
+    std::function<void(int32_t)> eventProcessedCallback_;
 };
 }
 }

@@ -38,7 +38,7 @@ public:
 
 class MMIClientDemo {
 public:
-    bool isTestCase = true;
+    bool isTestCase_ = true;
 };
 
 class AppKeyEventHandle : public KeyEventHandler {

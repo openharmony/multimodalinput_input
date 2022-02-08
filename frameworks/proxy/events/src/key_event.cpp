@@ -509,7 +509,7 @@ std::vector<KeyEvent::KeyItem> KeyEvent::GetKeyItems()
 std::vector<int32_t> KeyEvent::GetPressedKeys() const
 {
     std::vector<int32_t> result;
-    for (auto &item : keys_) {
+    for (const auto &item : keys_) {
         if (item.IsPressed()) {
             result.push_back(item.GetKeyCode());
         }
@@ -529,15 +529,9 @@ void KeyEvent::AddPressedKeyItems(const KeyItem& keyItem)
 
 void KeyEvent::RemoveReleasedKeyItems(const KeyItem& keyItem)
 {
-    std::vector<int32_t> pressedkeys = GetPressedKeys();
     std::vector<KeyItem> tempKeyItems = keys_;
-    std::vector<int32_t>::iterator result = std::find(pressedkeys.begin(),
-        pressedkeys.end(), keyItem.GetKeyCode());
-    if (result == pressedkeys.end()) {
-        return;
-    }
     keys_.clear();
-    for (KeyItem &item : tempKeyItems) {
+    for (const auto &item : tempKeyItems) {
         if (item.GetKeyCode() != keyItem.GetKeyCode()) {
             keys_.push_back(item);
         }
@@ -551,7 +545,7 @@ const KeyEvent::KeyItem* KeyEvent::GetKeyItem() const
 
 const KeyEvent::KeyItem* KeyEvent::GetKeyItem(int32_t keyCode) const
 {
-    for (const KeyItem &item : keys_) {
+    for (const auto &item : keys_) {
         if (item.GetKeyCode() == keyCode) {
             return &item;
         }
@@ -1379,31 +1373,28 @@ bool KeyEvent::IsValidKeyItem() const
     
     for (auto it = keys_.begin(); it != keys_.end(); it++) {
         if (it->GetKeyCode() <= KEYCODE_UNKNOWN) {
-            HiLog::Error(LABEL, "Keyitems keyCode is invalid");
+            HiLog::Error(LABEL, "keyCode is invalid");
             return false;
         }
-
         if (it->GetDownTime() <= 0) {
-            HiLog::Error(LABEL, "Keyitems downtime is invalid");
+            HiLog::Error(LABEL, "downtime is invalid");
             return false;
         }
-        
         if (action != KEY_ACTION_UP && it->IsPressed() == false) {
-            HiLog::Error(LABEL, "Keyitems ispressed is invalid");
+            HiLog::Error(LABEL, "isPressed is invalid");
             return false;
         }
-        
         if (action == KEY_ACTION_UP && it->IsPressed() == false) {
             noPressNum++;
             if (it->GetKeyCode() != keyCode) {
-                HiLog::Error(LABEL, "Keyitems keyCode is not valid when ispressed is false");
+                HiLog::Error(LABEL, "keyCode is invalid when isPressed is false");
                 return false;
             }
         }
         
-        auto itemtmp = it;
-        for (++itemtmp; itemtmp != keys_.end(); itemtmp++) {
-            if (it->GetKeyCode() == itemtmp->GetKeyCode()) {
+        auto item = it;
+        for (++item; item != keys_.end(); item++) {
+            if (it->GetKeyCode() == item->GetKeyCode()) {
                 HiLog::Error(LABEL, "Keyitems keyCode exist same items");
                 return false;
             }
@@ -1411,7 +1402,7 @@ bool KeyEvent::IsValidKeyItem() const
     }
     
     if (noPressNum != 1) {
-        HiLog::Error(LABEL, "Keyitems keyCode is not unique  when ispressed is false");
+        HiLog::Error(LABEL, "keyCode is not unique when isPressed is false");
         return false;
     }
     HiLog::Debug(LABEL, "KeyEvent::IsValidKeyItem end");

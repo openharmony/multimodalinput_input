@@ -19,34 +19,39 @@
 
 namespace OHOS {
 namespace MMI {
-static int32_t g_nextEventId = 1;
+namespace {
+    static int64_t g_nextEventId = 1;
+}
 const int32_t InputEvent::EVENT_TYPE_KEY;
 const int32_t InputEvent::EVENT_TYPE_POINTER;
+
 InputEvent::InputEvent(int32_t eventType) : eventType_(eventType)
 {
-    Init();
+    Reset();
 }
 
-InputEvent::~InputEvent() {}
+InputEvent::~InputEvent()
+{
+}
 
-void InputEvent::Init()
+void InputEvent::Reset()
 {
     int32_t conversionStep = 1000000;
     struct timespec ts = { 0, 0 };
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
-        this->actionTime_ = 0;
+        actionTime_ = 0;
     }
     id_ = DEFALUTID;
     uint64_t nowTime = (ts.tv_sec * static_cast<uint64_t>(1e3)) + (ts.tv_nsec / conversionStep);
     int32_t actionTime = static_cast<int32_t>(nowTime);
-    this->actionTime_ = actionTime;
-    this->action_ = ACTION_UNKNOWN;
-    this->actionStartTime_ = actionTime_;
-    this->deviceId_ = DEFALUTID;
-    this->targetDisplayId_ = DEFALUTID;
-    this->targetWindowId_ = DEFALUTID;
-    this->agentWindowId_ = DEFALUTID;
-    this->flag_ = 0;
+    actionTime_ = actionTime;
+    action_ = ACTION_UNKNOWN;
+    actionStartTime_ = actionTime_;
+    deviceId_ = DEFALUTID;
+    targetDisplayId_ = DEFALUTID;
+    targetWindowId_ = DEFALUTID;
+    agentWindowId_ = DEFALUTID;
+    flag_ = 0;
 }
 
 std::shared_ptr<InputEvent> InputEvent::Create()
@@ -164,7 +169,7 @@ void InputEvent::ClearFlag()
     flag_ = 0X00000000;
 }
 
-void InputEvent::SetProcessedCallback(std::function<void()> callback)
+void InputEvent::SetProcessedCallback(std::function<void(int32_t)> callback)
 {
     processedCallback_ = callback;
 }
@@ -174,13 +179,9 @@ void InputEvent::MarkProcessed()
     if (!processedCallback_) {
         return;
     }
-
-    if (!processedCallback_) {
-        return;
-    }
     auto func = processedCallback_;
-    processedCallback_ = std::function<void()>();
-    func();
+    processedCallback_ = std::function<void(int32_t)>();
+    func(id_);
 }
 
 bool InputEvent::WriteToParcel(Parcel &out) const

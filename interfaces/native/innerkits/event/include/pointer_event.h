@@ -17,6 +17,7 @@
 #define OHOS_MULTIMDOALINPUT_POINTER_EVENT_H
 
 #include <array>
+#include <list>
 #include <vector>
 #include <memory>
 #include <map>
@@ -98,7 +99,7 @@ public:
 
         // Get or set the time when the Pointer is pressed
         int32_t GetDownTime() const;
-        void SetDownTime(int32_t donwTime);
+        void SetDownTime(int32_t downTime);
 
         // Get or set whether the Pointer is pressed
         bool IsPressed() const;
@@ -146,16 +147,16 @@ public:
 
     private:
         int32_t pointerId_ { 0 };
-        int32_t donwTime_;
-        bool pressed_;
-        int32_t globalX_;
-        int32_t globalY_;
-        int32_t localX_;
-        int32_t localY_;
-        int32_t width_;
-        int32_t height_;
-        int32_t pressure_;
-        int32_t deviceId_;
+        int32_t downTime_ { 0 };
+        bool pressed_ { false };
+        int32_t globalX_ { 0 };
+        int32_t globalY_ { 0 };
+        int32_t localX_ { 0 };
+        int32_t localY_ { 0 };
+        int32_t width_ { 0 };
+        int32_t height_ { 0 };
+        int32_t pressure_ { 0 };
+        int32_t deviceId_ { 0 };
     };
 
 public:
@@ -181,6 +182,8 @@ public:
     std::set<int32_t> GetPressedButtons() const;
     bool IsButtonPressed(int buttonId) const;
     void SetButtonPressed(int buttonId);
+    void DeleteReleaseButton(int buttonId);
+    void ClearButtonPressed();
 
     // Get all Pointers in the current pointer event
     std::vector<int32_t> GetPointersIdList() const;
@@ -218,7 +221,7 @@ protected:
 
 private:
     int32_t pointerId_ { 0 };
-    std::vector<PointerItem> pointers_;
+    std::list<PointerItem> pointers_;
     std::set<int32_t> pressedButtons_;
     int32_t sourceType_ { 0 };
     int32_t pointerAction_ { 0 };

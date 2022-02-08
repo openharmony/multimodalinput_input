@@ -557,7 +557,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
     }
     auto ret = PackageEventDeviceInfo<EventTouch>(event, touch);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed, ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOGE("Device param package failed, ret:%{public}d,errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     auto data = libinput_event_get_touch_event(event);
@@ -824,20 +824,29 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
         (KeyEvent::KEY_ACTION_DOWN) : (KeyEvent::KEY_ACTION_UP);
     int32_t deviceId = static_cast<int32_t>(key.deviceId);
     int32_t actionStartTime = static_cast<int32_t>(key.time);
+    auto preAction = keyEventPtr->GetAction();
+    if (preAction == KeyEvent::KEY_ACTION_UP) {
+        auto preUpKeyItem = keyEventPtr->GetKeyItem();
+        if (preUpKeyItem != nullptr) {
+            keyEventPtr->RemoveReleasedKeyItems(*preUpKeyItem);
+        } else {
+            MMI_LOGE("preUpKeyItem is null");
+        }
+    }
 
-    keyEventPtr->SetActionTime(actionTime);
+    keyEventPtr->SetActionTime(actionStartTime);
     keyEventPtr->SetAction(keyAction);
-    keyEventPtr->SetActionStartTime(actionStartTime);
     keyEventPtr->SetDeviceId(deviceId);
 
     keyEventPtr->SetKeyCode(keyCode);
     keyEventPtr->SetKeyAction(keyAction);
 
-    bool isKeyPressed = (key.state == KEY_STATE_PRESSED) ? (true) : (false);
-    if (isKeyPressed) {
-        int32_t keyDownTime = actionStartTime;
-        keyItem.SetDownTime(keyDownTime);
+    if (keyEventPtr->GetPressedKeys().empty()) {
+        keyEventPtr->SetActionStartTime(actionStartTime);
     }
+
+    bool isKeyPressed = (key.state == KEY_STATE_PRESSED) ? (true) : (false);
+    keyItem.SetDownTime(actionStartTime);
     keyItem.SetKeyCode(keyCode);
     keyItem.SetDeviceId(deviceId);
     keyItem.SetPressed(isKeyPressed);
@@ -845,65 +854,18 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         keyEventPtr->AddPressedKeyItems(keyItem);
     } else if (keyAction == KeyEvent::KEY_ACTION_UP) {
+        auto pressedKeyItem = keyEventPtr->GetKeyItem(keyCode);
+        if (pressedKeyItem != nullptr) {
+            keyItem.SetDownTime(pressedKeyItem->GetDownTime());
+        } else {
+            MMI_LOGE("find pressed key failed, keyCode: %{public}d", keyCode);
+        }
         keyEventPtr->RemoveReleasedKeyItems(keyItem);
+        keyEventPtr->AddPressedKeyItems(keyItem);
     } else {
         // nothing to do.
     }
     return RET_OK;
-}
-
-const uint16_t pointerID = 1; // mouse has only one PoingeItem, so id is 1
-
-std::shared_ptr<PointerEvent> EventPackage::LibinputEventToPointerEvent(libinput_event *event)
-{
-    int32_t defaultDeviceId = 0;
-    double gestureScale = 0;
-    int32_t pointerEventType = 0;
-    auto pointerEvent = PointerEvent::Create();
-    auto data = libinput_event_get_gesture_event(event);
-    auto type = libinput_event_get_type(event);
-    PointerEvent::PointerItem pointer;
-    pointer.SetGlobalX(MouseState->GetMouseCoordsX());
-    pointer.SetGlobalY(MouseState->GetMouseCoordsY());
-    pointer.SetPointerId(pointerID);
-    pointer.SetPressed(MouseState->IsLiftBtnPressed());
-    pointerEvent->AddPointerItem(pointer);
-    std::vector<uint32_t> pressedButtons;
-    MouseState->GetPressedButtons(pressedButtons);
-
-    if (!pressedButtons.empty()) {
-        for (auto it = pressedButtons.begin(); it != pressedButtons.end(); it++) {
-            pointerEvent->SetButtonPressed(*it);
-        }
-    }
-
-    switch (type) {
-        case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN: {
-            pointerEventType = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
-            break;
-        }
-        case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE: {
-            pointerEventType = PointerEvent::POINTER_ACTION_AXIS_UPDATE;
-            gestureScale = libinput_event_gesture_get_scale(data);
-            break;
-        }
-        case LIBINPUT_EVENT_GESTURE_PINCH_END: {
-            pointerEventType = PointerEvent::POINTER_ACTION_AXIS_END;
-            gestureScale = libinput_event_gesture_get_scale(data);
-            break;
-        }
-        default: {
-            MMI_LOGW("Unknown event type of gesture, gestureType:%{public}d", type);
-            break;
-        }
-    }
-
-    pointerEvent->SetTargetDisplayId(0);
-    pointerEvent->SetPointerId(pointerID);
-    pointerEvent->SetDeviceId(defaultDeviceId);
-    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, gestureScale);
-    pointerEvent->SetPointerAction(pointerEventType);
-    return pointerEvent;
 }
 }
 }

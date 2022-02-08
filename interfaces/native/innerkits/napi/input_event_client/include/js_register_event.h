@@ -117,7 +117,7 @@ public:
     virtual bool OnLaunchVoiceAssistant(const MultimodalEvent& multimodalEvent);
     virtual bool OnMute(const MultimodalEvent& multimodalEvent);
 private:
-    napi_env env = nullptr;
+    napi_env env_ = nullptr;
 };
 
 class AppCommonEventHandle : public CommonEventHandler {
@@ -141,7 +141,7 @@ public:
     virtual bool OnBack(const MultimodalEvent& multimodalEvent);
     virtual bool OnPrint(const MultimodalEvent& multimodalEvent);
 private:
-    napi_env env = nullptr;
+    napi_env env_ = nullptr;
 };
 
 class AppTelephoneEventHandle : public TelephoneEventHandler {
@@ -155,7 +155,7 @@ public:
     virtual bool OnHangup(const MultimodalEvent& multimodalEvent);
     virtual bool OnTelephoneControl(const MultimodalEvent& multimodalEvent);
 private:
-    napi_env env = nullptr;
+    napi_env env_ = nullptr;
 };
 
 class AppMediaEventHandle : public MediaEventHandler {
@@ -168,7 +168,7 @@ public:
     virtual bool OnPause(const MultimodalEvent& multimodalEvent);
     virtual bool OnMediaControl(const MultimodalEvent& multimodalEvent);
 private:
-    napi_env env = nullptr;
+    napi_env env_ = nullptr;
 };
 
 class AppKeyEventHandle : public KeyEventHandler {
@@ -179,7 +179,7 @@ public:
 
     virtual bool OnKey(const OHOS::KeyEvent& keyEvent);
 private:
-    napi_env env = nullptr;
+    napi_env env_ = nullptr;
     bool SendEvent(const std::string& name, const OHOS::KeyEvent& event) const;
 };
 
@@ -191,7 +191,7 @@ public:
 
     virtual bool OnTouch(const TouchEvent& touchEvent);
 private:
-    napi_env env = nullptr;
+    napi_env env_ = nullptr;
     bool SendEvent(const std::string& name, const TouchEvent& event) const;
     void PrepareData(const napi_env &env, napi_value argv, const TouchEvent& event) const;
 };
@@ -205,7 +205,7 @@ public:
     virtual bool OnDeviceAdd(const DeviceEvent& deviceEvent) override;
     virtual bool OnDeviceRemove(const DeviceEvent& deviceEvent) override;
 private:
-    napi_env env = nullptr;
+    napi_env env_ = nullptr;
     bool SendEvent(const std::string& name, const DeviceEvent& event) const;
 };
 }

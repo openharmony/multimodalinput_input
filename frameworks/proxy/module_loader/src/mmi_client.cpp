@@ -21,31 +21,30 @@
 #include "util.h"
 
 namespace OHOS::MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIClient" };
-    }
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIClient" };
 }
 
-OHOS::MMI::MMIClient::MMIClient()
+MMIClient::MMIClient()
 {
 }
 
-OHOS::MMI::MMIClient::~MMIClient()
+MMIClient::~MMIClient()
 {
     MMI_LOGD("enter");
 }
 
-bool OHOS::MMI::MMIClient::SendMessage(const NetPacket &pkt) const
+bool MMIClient::SendMessage(const NetPacket &pkt) const
 {
     return SendMsg(pkt);
 }
 
-bool OHOS::MMI::MMIClient::GetCurrentConnectedStatus() const
+bool MMIClient::GetCurrentConnectedStatus() const
 {
     return GetConnectedStatus();
 }
 
-bool OHOS::MMI::MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
+bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
 {
     MMI_LOGT("enter");
     EventManager.SetClientHandle(GetPtr());
@@ -54,35 +53,34 @@ bool OHOS::MMI::MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
     CHKF(msgHdlImp, MSG_HANDLER_INIT_FAIL);
     auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, msgHdlImp, std::placeholders::_1, std::placeholders::_2);
     CHKF(StartClient(callback, detachMode), START_CLI_FAIL);
-
     return true;
 }
 
-void OHOS::MMI::MMIClient::RegisterConnectedFunction(ConnectCallback fun)
+void MMIClient::RegisterConnectedFunction(ConnectCallback fun)
 {
     funConnected_ = fun;
 }
 
-void OHOS::MMI::MMIClient::RegisterDisconnectedFunction(ConnectCallback fun)
+void MMIClient::RegisterDisconnectedFunction(ConnectCallback fun)
 {
     funDisconnected_ = fun;
 }
 
-void OHOS::MMI::MMIClient::VirtualKeyIn(RawInputEvent virtualKeyEvent)
+void MMIClient::VirtualKeyIn(RawInputEvent virtualKeyEvent)
 {
     NetPacket ckt(MmiMessageId::ON_VIRTUAL_KEY);
     ckt << virtualKeyEvent;
     SendMsg(ckt);
 }
 
-void OHOS::MMI::MMIClient::ReplyMessageToServer(MmiMessageId idMsg, uint64_t clientTime, uint64_t endTime) const
+void MMIClient::ReplyMessageToServer(MmiMessageId idMsg, uint64_t clientTime, uint64_t endTime) const
 {
     NetPacket ckt(MmiMessageId::CHECK_REPLY_MESSAGE);
     ckt << idMsg << clientTime << endTime;
     SendMsg(ckt);
 }
 
-void OHOS::MMI::MMIClient::SdkGetMultimodeInputInfo()
+void MMIClient::SdkGetMultimodeInputInfo()
 {
     TagPackHead tagPackHead = {MmiMessageId::GET_MMI_INFO_REQ, {0}};
     NetPacket ckt(MmiMessageId::GET_MMI_INFO_REQ);
@@ -90,7 +88,7 @@ void OHOS::MMI::MMIClient::SdkGetMultimodeInputInfo()
     SendMsg(ckt);
 }
 
-void OHOS::MMI::MMIClient::OnDisconnected()
+void MMIClient::OnDisconnected()
 {
     MMI_LOGD("Disconnected from server... fd:%{public}d", GetFd());
     if (funDisconnected_) {
@@ -100,7 +98,7 @@ void OHOS::MMI::MMIClient::OnDisconnected()
     EventManager.ClearAll();
 }
 
-void OHOS::MMI::MMIClient::OnConnected()
+void MMIClient::OnConnected()
 {
     MMI_LOGD("Connection to server succeeded... fd:%{public}d", GetFd());
     if (funConnected_) {
@@ -109,7 +107,7 @@ void OHOS::MMI::MMIClient::OnConnected()
     isConnected_ = true;
 }
 
-int32_t OHOS::MMI::MMIClient::Socket()
+int32_t MMIClient::Socket()
 {
     MMI_LOGT("enter");
     const int32_t ret = MultimodalInputConnectManager::GetInstance()->
@@ -127,5 +125,6 @@ int32_t OHOS::MMI::MMIClient::Socket()
     }
 
     return fd_;
+}
 }
 

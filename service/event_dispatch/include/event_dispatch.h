@@ -52,9 +52,6 @@ public:
         const EventTabletTool& tableTool, const uint64_t preHandlerTime);
     int32_t DispatchTouchTransformPointEvent(UDSServer& udsServer, std::shared_ptr<PointerEvent> point);
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> point);
-    bool HandleTouchScreenEvent(std::shared_ptr<PointerEvent> point);
-    bool HandleMouseEvent(std::shared_ptr<PointerEvent> point);
-    bool HandleTouchPadEvent(std::shared_ptr<PointerEvent> point);
     void DispatchKeyEventTrace(const EventKeyboard& key);
     void DispatchTouchEventTrace(const EventTouch& touch);
     void DispatchPointerEventTrace(const EventPointer& point);

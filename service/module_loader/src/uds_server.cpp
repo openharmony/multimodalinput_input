@@ -157,6 +157,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
     setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
+    SetBlockMode(serverFd); // 设置非阻塞模式
 
     MMI_LOGD("alloc socketpair, serverFd = %{public}d, clientFd = %{public}d(%{public}d).",
              serverFd, toReturnClientFd, sockFds[1]);
@@ -221,18 +222,18 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
 void OHOS::MMI::UDSServer::Dump(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mux_);
-    mprintf(fd, "Sessions: count=%d", sessionsMap_.size());
-    std::string strTmp;
-    if (sessionsMap_.size() > 0) {
-        strTmp = "fds:[";
+    std::string strTmp = "fds:[";
+    if (sessionsMap_.empty()) {
+        strTmp = "fds:[]";
+        mprintf(fd, "\t%s", strTmp.c_str());
+        return;
     }
-    for (auto& it : sessionsMap_) {
+    mprintf(fd, "Sessions: count=%d", sessionsMap_.size());
+    for (const auto& it : sessionsMap_) {
         strTmp += std::to_string(it.second->GetFd()) + ",";
     }
-    if (sessionsMap_.size() > 0) {
-        strTmp.resize(strTmp.size() - 1);
-        strTmp += "]";
-    }
+    strTmp.resize(strTmp.size() - 1);
+    strTmp += "]";
     mprintf(fd, "\t%s", strTmp.c_str());
 }
 
