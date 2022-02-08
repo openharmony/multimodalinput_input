@@ -60,13 +60,11 @@ void InputEventMonitorManager::RemoveInputEventMontior(int32_t monitorId)
     MonitorItem item;
     item.id = monitorId;
     auto it = std::find(monitors_.begin(), monitors_.end(), item);
-    if (it == monitors_.end()) {
-        MMI_LOGW("MonitorId: %{public}d does not exist", item.id);
-        return;
+    if (it != monitors_.end()) {
+        monitors_.erase(it);
+        MMIEventHdl.RemoveInputEventMontior(OHOS::MMI::InputEvent::EVENT_TYPE_KEY);
+        MMI_LOGD("MonitorId: %{public}d removed", monitorId);
     }
-    monitors_.erase(it);
-    MMIEventHdl.RemoveInputEventMontior(OHOS::MMI::InputEvent::EVENT_TYPE_KEY);
-    MMI_LOGD("MonitorId: %{public}d removed", monitorId);
 }
 
 int32_t InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
