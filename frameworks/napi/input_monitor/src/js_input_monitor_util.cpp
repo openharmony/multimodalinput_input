@@ -25,7 +25,6 @@ namespace {
 
 napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, bool value)
 {
-    MMI_LOGD("SetNameProperty: %{public}s=%{public}d", name.c_str(), value);
     napi_status status;
     napi_value napiValue = nullptr;
     status = napi_create_int32(env, value, &napiValue);
@@ -39,7 +38,6 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
 
 napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, uint16_t value)
 {
-    MMI_LOGD("SetNameProperty: %{public}s=%{public}u", name.c_str(), value);
     napi_status status;
     napi_value napiValue = nullptr;
     status = napi_create_uint32(env, value, &napiValue);
@@ -53,7 +51,6 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
 
 napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, uint32_t value)
 {
-    MMI_LOGD("SetNameProperty: %{public}s=%{public}u", name.c_str(), value);
     napi_status status;
     napi_value napiValue = nullptr;
     status = napi_create_uint32(env, value, &napiValue);
@@ -67,7 +64,6 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
 
 napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, int32_t value)
 {
-    MMI_LOGD("SetNameProperty: %{public}s=%{public}d", name.c_str(), value);
     napi_status status;
     napi_value napiValue = nullptr;
     status = napi_create_int32(env, value, &napiValue);
@@ -81,7 +77,6 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
 
 napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, float value)
 {
-    MMI_LOGD("SetNameProperty: %{public}s=%{public}f", name.c_str(), value);
     napi_status status;
     napi_value napiValue = nullptr;
     status = napi_create_double(env, value, &napiValue);
@@ -95,7 +90,6 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
 
 napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, double value)
 {
-    MMI_LOGD("SetNameProperty: %{public}s=%{public}lf", name.c_str(), value);
     napi_status status;
     napi_value napiValue = nullptr;
     status = napi_create_double(env, value, &napiValue);
@@ -109,7 +103,6 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
 
 napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, uint64_t value)
 {
-    MMI_LOGD("SetNameProperty: %{public}s=%{public}" PRId64 "", name.c_str(), value);
     napi_status status;
     napi_value napiValue = nullptr;
     status = napi_create_int64(env, value, &napiValue);
@@ -123,7 +116,6 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
 
 napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, std::string value)
 {
-    MMI_LOGD("SetNameProperty: %{public}s=%{public}s", name.c_str(), value.c_str());
     napi_status status;
     napi_value napiValue = nullptr;
     status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &napiValue);
@@ -137,7 +129,6 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
 
 napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, napi_value value)
 {
-    MMI_LOGD("SetNameProperty: object=%{public}s", name.c_str());
     auto status = napi_set_named_property(env, object, name.c_str(), value);
     return status;
 }
@@ -158,7 +149,6 @@ bool GetNamePropertyBool(const napi_env& env, const napi_value& object, const st
     }
 
     napi_get_value_bool(env, napiValue, &value);
-    MMI_LOGD("GetNamePropertyBool: %{public}s=%{public}d", name.c_str(), value);
     return value;
 }
 
@@ -181,7 +171,6 @@ std::string GetNamePropertyString(const napi_env& env, const napi_value& object,
     size_t typeLen = 0;
     napi_get_value_string_utf8(env, napiValue, tmpValue, MAX_STRING_LEN - 1, &typeLen);
     value = tmpValue;
-    MMI_LOGD("GetNamePropertyString: %{public}s=%{public}s", name.c_str(), value.c_str());
     return value;
 }
 
@@ -200,7 +189,6 @@ int32_t GetNamePropertyInt32(const napi_env& env, const napi_value& object, cons
         return value;
     }
     napi_get_value_int32(env, napiValue, &value);
-    MMI_LOGD("GetNamePropertyInt32: %{public}s=%{public}d", name.c_str(), value);
     return value;
 }
 
@@ -219,7 +207,6 @@ int64_t GetNamePropertyInt64(const napi_env& env, const napi_value& object, cons
         return value;
     }
     napi_get_value_int64(env, napiValue, &value);
-    MMI_LOGD("GetNamePropertyInt64: %{public}s=%{public}" PRId64 "", name.c_str(), value);
     return value;
 }
 
@@ -238,7 +225,6 @@ uint32_t GetNamePropertyUint32(const napi_env& env, const napi_value& object, co
         return value;
     }
     napi_get_value_uint32(env, napiValue, &value);
-    MMI_LOGD("GetNamePropertyUint32: %{public}s=%{public}d", name.c_str(), value);
     return value;
 }
 } // namespace MMI

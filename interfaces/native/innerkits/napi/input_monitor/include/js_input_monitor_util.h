@@ -17,7 +17,7 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 namespace OHOS {
-    namespace MMI {
+namespace MMI {
         napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, bool value);
         napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, uint16_t value);
         napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, int32_t value);
@@ -33,8 +33,7 @@ namespace OHOS {
         int32_t GetNamePropertyInt32(const napi_env& env, const napi_value& object, const std::string& name);
         int64_t GetNamePropertyInt64(const napi_env& env, const napi_value& object, const std::string& name);
         uint32_t GetNamePropertyUint32(const napi_env& env, const napi_value& object, const std::string& name);
-    }
-}
-
+} // namespace MMI
+} // namespace OHOS
 #endif
 
