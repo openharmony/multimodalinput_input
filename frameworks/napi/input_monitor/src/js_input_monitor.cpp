@@ -120,7 +120,7 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, napi_value receiver, int32_t id)
     if (monitor_ != nullptr) {
         monitor_->SetCallback([jsId=id](std::shared_ptr<PointerEvent> pointerEvent) {
             auto jsMonitor = JSIMM.GetMonitor(jsId);
-            if (jsMonitor != nullptr) {
+            if (jsMonitor == nullptr) {
                 MMI_LOGE("failed to get js monitor");
                 return;
             }
@@ -202,10 +202,26 @@ void JsInputMonitor::printfPointerEvent(const std::shared_ptr<PointerEvent> poin
         item.GetLocalY(), item.GetWidth()+item.GetHeight()/2, item.GetPressure());
 }
 
+std::string JsInputMonitor::GetAction(int32_t action)
+{
+    switch (action) {
+        case PointerEvent::POINTER_ACTION_CANCEL:
+            return "cancel";
+        case PointerEvent::POINTER_ACTION_DOWN:
+            return "down";
+        case PointerEvent::POINTER_ACTION_MOVE:
+            return "move";
+        case PointerEvent::POINTER_ACTION_UP:
+            return "up";
+        default:
+            return "";
+    }
+}
+
 int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
     CHKR(pointerEvent != nullptr, ERROR_NULL_POINTER, RET_ERR);
-    CHKR(SetNameProperty(jsEnv_, result, "type", pointerEvent->GetSourceType()) == napi_ok,
+    CHKR(SetNameProperty(jsEnv_, result, "type", GetAction(pointerEvent->GetPointerAction())) == napi_ok,
         CALL_NAPI_API_ERR, RET_ERR);
 
     napi_value pointers = nullptr;
