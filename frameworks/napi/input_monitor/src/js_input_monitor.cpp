@@ -370,13 +370,6 @@ void JsInputMonitor::JsCallback(uv_work_t *work, int32_t status)
     MMI_LOGD("Leave");
 }
 
-/*
-void JsInputMonitor::ResetEnv() {
-    std::lock_guard<std::mutex> guard(mutex_);
-    jsEnv_ = nullptr;
-    receiver_ = nullptr;
-}*/
-
 void JsInputMonitor::OnPointerEventInJsThread()
 {
     MMI_LOGD("Enter");
