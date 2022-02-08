@@ -141,7 +141,7 @@ void OHOS::MMI::InputEventMonitorManager::OnTouchpadMonitorInputEvent(
 bool OHOS::MMI::InputEventMonitorManager::ReportTouchpadEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
     PointerEvent::PointerItem pointer;
-    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer);
+    CHKF(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL);
     MMI_LOGT("monitor-serviceeventTouchpad:time=%{public}d;"
              "sourceType=%{public}d;action=%{public}d;"
              "pointerId=%{public}d;point.x=%{public}d;point.y=%{public}d;press=%{public}d"

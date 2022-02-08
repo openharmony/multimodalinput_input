@@ -194,7 +194,7 @@ void JsInputMonitor::printfPointerEvent(const std::shared_ptr<PointerEvent> poin
 {
     CHK(pointerEvent != nullptr, ERROR_NULL_POINTER);
     PointerEvent::PointerItem item;
-    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
+    CHK(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item), PARAM_INPUT_FAIL);
     MMI_LOGD("type:%{public}d, timestamp:%{public}d, deviceId:%{public}d,\
         globalX:%{public}d, globalY:%{public}d, localX:%{public}d, localY:%{public}d, \
         size:%{public}d, force:%{public}d", pointerEvent->GetSourceType(), item.GetDownTime(),
@@ -235,7 +235,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
     std::vector<PointerEvent::PointerItem> pointerItems;
     for (auto &it : pointerEvent->GetPointersIdList()) {
         PointerEvent::PointerItem pointerItem;
-        pointerEvent->GetPointerItem(it, pointerItem);
+        CHKR(pointerEvent->GetPointerItem(it, pointerItem), PARAM_INPUT_FAIL, RET_ERR);
         pointerItems.push_back(pointerItem);
     }
     uint32_t index = 0;
