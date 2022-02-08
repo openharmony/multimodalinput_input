@@ -35,6 +35,5 @@ namespace MMI {
         uint32_t GetNamePropertyUint32(const napi_env& env, const napi_value& object, const std::string& name);
 } // namespace MMI
 } // namespace OHOS
-
 #endif
 
