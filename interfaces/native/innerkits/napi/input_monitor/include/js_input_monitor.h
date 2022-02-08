@@ -109,6 +109,6 @@ private:
     std::mutex mutex_;
     int32_t jsThreadNum_ = 0;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif

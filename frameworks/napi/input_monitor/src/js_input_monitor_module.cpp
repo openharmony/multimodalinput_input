@@ -156,6 +156,7 @@ static napi_value MmiInputMonitorInit(napi_env env, napi_value exports)
     return exports;
 }
 EXTERN_C_END
+
 static napi_module mmiInputMonitorModule = {
     .nm_version = 1,
     .nm_flags = 0,
@@ -165,9 +166,10 @@ static napi_module mmiInputMonitorModule = {
     .nm_priv = ((void*)0),
     .reserved = { 0 },
 };
+
 extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
     napi_module_register(&mmiInputMonitorModule);
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
