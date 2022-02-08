@@ -13,21 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef OBSERVER_H
-#define OBSERVER_H
+#ifndef DEVICE_OBSERVER_H
+#define DEVICE_OBSERVER_H
 
 namespace OHOS {
 namespace MMI {
-class Observer {
+class DeviceObserver {
 public:
-    virtual void Update(bool) = 0;
+    virtual void UpdatePointerDevice(bool) = 0;
 };
 
 class Subject {
 public:
-    virtual void Attach(Observer* observer) = 0; 
-    virtual void Detach(Observer* observer) = 0;
-    virtual void Notify(bool) = 0;
+    virtual void Attach(std::shared_ptr<DeviceObserver> observer) = 0;
+    virtual void Detach(std::shared_ptr<DeviceObserver> observer) = 0;
+    virtual void NotifyPointerDevice(bool) = 0;
 };
 }
 }
