@@ -49,5 +49,5 @@ private:
 };
 }
 }
-#define inputDeviceManager OHOS::MMI::InputDeviceManager::GetInstance()
+#define InputDevMgr OHOS::MMI::InputDeviceManager::GetInstance()
 #endif
