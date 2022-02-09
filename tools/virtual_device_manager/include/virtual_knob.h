@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_VIRTUAL_KNOB_H
-#define OHOS_VIRTUAL_KNOB_H
+#ifndef VIRTUAL_KNOB_H
+#define VIRTUAL_KNOB_H
 
 #include "virtual_device.h"
 
@@ -33,4 +33,4 @@ protected:
 };
 }
 }
-#endif
+#endif // VIRTUAL_KNOB_H

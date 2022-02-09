@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_GET_DEVICE_NODE_H
-#define OHOS_GET_DEVICE_NODE_H
+#ifndef GET_DEVICE_NODE_H
+#define GET_DEVICE_NODE_H
 
 #include "msg_head.h"
 
@@ -38,4 +38,4 @@ private:
 };
 }
 }
-#endif
+#endif // GET_DEVICE_NODE_H
