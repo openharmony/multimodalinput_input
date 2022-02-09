@@ -91,21 +91,21 @@ bool OHOS::MMI::VirtualDevice::SyncSymbolFile()
     if (!CatFload(tempList)) {
         return false;
     }
-    for (auto it : tempList) {
-        std::string::size_type pos = it.find("_");
-        res.push_back(it.substr(0, pos));
+    for (const auto &item : tempList) {
+        std::string::size_type pos = item.find("_");
+        res.push_back(item.substr(0, pos));
     }
 
-    for (auto it : res) {
+    for (const auto &item : res) {
         char temp[32] = { 0 };
         std::string processName;
-        std::string procressPath = "/proc/" + it + "/";
+        std::string procressPath = "/proc/" + item + "/";
         DIR* dir = opendir(procressPath.c_str());
         if (dir == nullptr) {
-            std::string removeFile = "find /data/symbol/ -name " + it + "* | xargs rm";
+            std::string removeFile = "find /data/symbol/ -name " + item + "* | xargs rm";
             system(removeFile.c_str());
         } else {
-            std::string catName = "cat /proc/" + it + "/cmdline";
+            std::string catName = "cat /proc/" + item + "/cmdline";
             FILE* cmdName = popen(catName.c_str(), "r");
             if (cmdName == nullptr) {
                 printf("popen Execution failed");
@@ -116,7 +116,7 @@ bool OHOS::MMI::VirtualDevice::SyncSymbolFile()
             pclose(cmdName);
             processName.append(temp);
             if (processName.find("hosmmi-virtual-device") == processName.npos) {
-                std::string removeFile = "find /data/symbol/ -name " + it + "* | xargs rm";
+                std::string removeFile = "find /data/symbol/ -name " + item + "* | xargs rm";
                 system(removeFile.c_str());
             }
         }
@@ -127,15 +127,14 @@ bool OHOS::MMI::VirtualDevice::SyncSymbolFile()
 bool OHOS::MMI::VirtualDevice::CreateKey()
 {
     auto fun = [&](int32_t uiSet, const std::vector<uint32_t>& list) ->bool {
-        for (uint32_t evt_type : list) {
-            if (!DoIoctl(fd_, uiSet, evt_type)) {
-                printf("%s Error setting event type: %u", __func__, evt_type);
+        for (const auto &item : list) {
+            if (!DoIoctl(fd_, uiSet, item)) {
+                printf("%s Error setting event type: %u", __func__, item);
                 return false;
             }
         }
         return true;
     };
-
     std::map<int32_t, std::vector<uint32_t>> evt_type;
     evt_type[UI_SET_EVBIT] = GetEventTypes();
     evt_type[UI_SET_KEYBIT] = GetKeys();
@@ -146,10 +145,9 @@ bool OHOS::MMI::VirtualDevice::CreateKey()
     evt_type[UI_SET_LEDBIT] = GetLeds();
     evt_type[UI_SET_SWBIT] = GetSws();
     evt_type[UI_SET_PHYS] = GetReps();
-    for (auto &it : evt_type) {
-        fun(it.first, it.second);
+    for (auto &item : evt_type) {
+        fun(item.first, item.second);
     }
-
     return true;
 }
 
@@ -174,8 +172,8 @@ bool OHOS::MMI::VirtualDevice::SetAbsResolution(const std::string deviceName)
     } else {
         return false;
     }
-    for (auto it : absInit_) {
-        ioctl(fd_, UI_ABS_SETUP, &it);
+    for (const auto &item : absInit_) {
+        ioctl(fd_, UI_ABS_SETUP, &item);
     }
     return true;
 }
@@ -482,9 +480,9 @@ bool OHOS::MMI::VirtualDevice::FunctionalShunt(const std::string firstArgv, std:
             std::string::size_type pos;
             printf("PID\tDEVICE\n");
 
-            for (auto it : argvList) {
-                pos = it.find("_");
-                printf("%s\t%s\n", it.substr(0, pos).c_str(), it.substr(pos + 1, it.size() - pos - 1).c_str());
+            for (const auto &item : argvList) {
+                pos = item.find("_");
+                printf("%s\t%s\n", item.substr(0, pos).c_str(), item.substr(pos + 1, item.size() - pos - 1).c_str());
             }
             return false;
         }

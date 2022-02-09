@@ -101,7 +101,7 @@ void GetDeviceNode::GetDeviceInfoByCmdResult(const std::vector<std::string>& cmd
     uint64_t endPos = 0;
     uint64_t startPos = 0;
     uint64_t eventLength = CMD_EVENT_LENGTH;
-    for (auto item : cmdResult) {
+    for (const auto &item : cmdResult) {
         temp = item.substr(0, 1);
         if (temp == "N") {
             startPos = item.find("=") + strlen("N:");

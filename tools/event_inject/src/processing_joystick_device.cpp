@@ -52,10 +52,9 @@ int32_t ProcessingJoystickDevice::AnalysisJoystickEvent(const Json& inputData,
                                                         std::vector<JoystickEvent>& JoystickEventArray)
 {
     JoystickEvent joystickEvent = {};
-    string eventType;
-    for (auto item : inputData) {
+    for (const auto &item : inputData) {
         joystickEvent = {};
-        eventType = item.at("eventType").get<std::string>();
+        string eventType = item.at("eventType").get<std::string>();
         if ((item.find("blockTime")) != item.end()) {
             joystickEvent.blockTime = item.at("blockTime").get<int32_t>();
         }
@@ -102,21 +101,19 @@ int32_t ProcessingJoystickDevice::AnalysisJoystickEvent(const Json& inputData,
 void ProcessingJoystickDevice::TransformPadEventToInputEvent(const std::vector<JoystickEvent>& JoystickEventArray,
                                                              InputEventArray& inputEventArray)
 {
-    for (JoystickEvent joystickEvent : JoystickEventArray) {
-        if (joystickEvent.eventType == "KEY_EVENT_PRESS") {
-            TransformKeyPressEvent(joystickEvent, inputEventArray);
-        } else if (joystickEvent.eventType == "KEY_EVENT_RELEASE") {
-            TransformKeyReleaseEvent(joystickEvent, inputEventArray);
-        } else if (joystickEvent.eventType == "KEY_EVENT_CLICK") {
-            TransformKeyClickEvent(joystickEvent, inputEventArray);
-        } else if (joystickEvent.eventType == "DERECTION_KEY") {
-            TransformDerectionKeyEvent(joystickEvent, inputEventArray);
-        } else if (joystickEvent.eventType == "ROCKER_1") {
-            TransformRocker1Event(joystickEvent, inputEventArray);
-        } else if (joystickEvent.eventType == "THROTTLE") {
-            TransformThrottle1Event(joystickEvent, inputEventArray);
-        } else {
-            // nothing to do.
+    for (const auto &item : JoystickEventArray) {
+        if (item.eventType == "KEY_EVENT_PRESS") {
+            TransformKeyPressEvent(item, inputEventArray);
+        } else if (item.eventType == "KEY_EVENT_RELEASE") {
+            TransformKeyReleaseEvent(item, inputEventArray);
+        } else if (item.eventType == "KEY_EVENT_CLICK") {
+            TransformKeyClickEvent(item, inputEventArray);
+        } else if (item.eventType == "DERECTION_KEY") {
+            TransformDerectionKeyEvent(item, inputEventArray);
+        } else if (item.eventType == "ROCKER_1") {
+            TransformRocker1Event(item, inputEventArray);
+        } else if (item.eventType == "THROTTLE") {
+            TransformThrottle1Event(item, inputEventArray);
         }
     }
 }
@@ -151,15 +148,13 @@ void ProcessingJoystickDevice::TransformRocker1Event(const JoystickEvent& joysti
                                                      InputEventArray& inputEventArray)
 {
     string direction = joystickEvent.direction;
-    for (int32_t item : joystickEvent.gameEvents) {
+    for (const auto &item : joystickEvent.gameEvents) {
         if ((direction == "left")||(direction == "right")) {
             SetEvAbsX(inputEventArray, 0, item);
         } else if ((direction == "up") || (direction == "down")) {
             SetEvAbsY(inputEventArray, 0, item);
         } else if (direction == "lt") {
             SetEvAbsRz(inputEventArray, 0, item);
-        } else {
-            // nothint to do.
         }
         SetSynReport(inputEventArray);
     }

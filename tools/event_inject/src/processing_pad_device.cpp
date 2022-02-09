@@ -47,17 +47,15 @@ int32_t ProcessingPadDevice::TransformJsonDataToInputData(const Json& fingerEven
 void ProcessingPadDevice::TransformPadEventToInputEvent(const std::vector<PadEvent>& padEventArray,
                                                         InputEventArray& inputEventArray)
 {
-    for (PadEvent padEvent : padEventArray) {
-        if (padEvent.eventType == "KEY_EVENT_PRESS") {
-            TransformKeyPressEvent(padEvent, inputEventArray);
-        } else if (padEvent.eventType == "KEY_EVENT_RELEASE") {
-            TransformKeyReleaseEvent(padEvent, inputEventArray);
-        } else if (padEvent.eventType == "KEY_EVENT_CLICK") {
-            TransformKeyClickEvent(padEvent, inputEventArray);
-        } else if (padEvent.eventType == "RING_EVENT") {
-            TransformRingEvent(padEvent, inputEventArray);
-        } else {
-            // nothing to do.
+    for (const auto &item : padEventArray) {
+        if (item.eventType == "KEY_EVENT_PRESS") {
+            TransformKeyPressEvent(item, inputEventArray);
+        } else if (item.eventType == "KEY_EVENT_RELEASE") {
+            TransformKeyReleaseEvent(item, inputEventArray);
+        } else if (item.eventType == "KEY_EVENT_CLICK") {
+            TransformKeyClickEvent(item, inputEventArray);
+        } else if (item.eventType == "RING_EVENT") {
+            TransformRingEvent(item, inputEventArray);
         }
     }
 }
@@ -65,7 +63,7 @@ void ProcessingPadDevice::TransformPadEventToInputEvent(const std::vector<PadEve
 int32_t ProcessingPadDevice::AnalysisPadEvent(const Json& inputData, std::vector<PadEvent>& padEventArray)
 {
     PadEvent padEvent = {};
-    for (auto item : inputData) {
+    for (const auto &item : inputData) {
         padEvent.eventType = item.at("eventType").get<std::string>();
         if ((item.find("keyValue")) != item.end()) {
             padEvent.keyValue = item.at("keyValue").get<int32_t>();
