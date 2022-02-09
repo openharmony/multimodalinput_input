@@ -40,12 +40,13 @@ int32_t UDSClient::ConnectTo()
     if (epollFd_ < 0) {
         CHKR(EpollCreat(MAX_EVENT_SIZE) >= 0, EPOLL_CREATE_FAIL, RET_ERR);
     }
+    SetBlockMode(fd_); // 设置非阻塞模式
+
     epoll_event ev;
     ev.events = EPOLLIN;
     ev.data.fd = fd_;
     CHKR(EpollCtl(fd_, EPOLL_CTL_ADD, ev) >= 0, EPOLL_CREATE_FAIL, RET_ERR);
     OnConnected();
-
     return RET_OK;
 }
 
@@ -74,7 +75,6 @@ bool UDSClient::ThreadIsEnd()
     if (!isThreadHadRun_) {
         MMI_LOGI("thread is not run. this: %p, isThreadHadRun_: %p, isThreadHadRun_: %d",
                  this, &isThreadHadRun_, isThreadHadRun_);
-        MMI_LOGI("thread is not run.");
         return false;
     }
 

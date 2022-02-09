@@ -18,6 +18,7 @@
 
 #include <map>
 #include <memory>
+#include "gesture_transform_point_processor.h"
 #include "touch_transform_point_processor.h"
 #include "touchpad_transform_point_processor.h"
 #include "singleton.h"
@@ -28,9 +29,11 @@ class TouchTransformPointManager : public DelayedSingleton<TouchTransformPointMa
 public:
     std::shared_ptr<PointerEvent> OnLibinputTouchEvent(libinput_event *event);
     std::shared_ptr<PointerEvent> OnLibinputTouchPadEvent(libinput_event *event);
+    std::shared_ptr<PointerEvent> OnTouchPadGestrueEvent(libinput_event *event);
 private:
     std::map<int32_t, std::shared_ptr<TouchTransformPointProcessor>> touchPro_;
     std::map<int32_t, std::shared_ptr<TouchPadTransformPointProcessor>> touchpadPro_;
+    std::map<int32_t, std::shared_ptr<GestureTransformPointProcessor>> gesturePro_;
 };
 #define TouchTransformPointManger OHOS::MMI::TouchTransformPointManager::GetInstance()
 }

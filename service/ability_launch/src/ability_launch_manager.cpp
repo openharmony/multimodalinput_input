@@ -64,7 +64,7 @@ void AbilityLaunchManager::ResolveConfig(const std::string configFile)
         MMI_LOGE("config file %{public}s not exist", configFile.c_str());
         return;
     }
-    MMI_LOGE("config file path %{public}s", configFile.c_str());
+    MMI_LOGD("config file path %{public}s", configFile.c_str());
     std::ifstream reader(configFile);
     if (!reader.is_open()) {
         MMI_LOGE("config file open failed");
@@ -184,11 +184,10 @@ void AbilityLaunchManager::Print()
         for (auto prekey: shortcutKey.preKeys) {
             MMI_LOGD("preKey: %{public}d", prekey);
         }
-        MMI_LOGD("finalKey: %{public}d", shortcutKey.finalKey);
-        MMI_LOGD("keyDownDuration: %{public}d", shortcutKey.keyDownDuration);
-        MMI_LOGD("triggerType: %{public}d", shortcutKey.triggerType);
-        MMI_LOGD("bundleName: %{public}s", shortcutKey.ability.bundleName.c_str());
-        MMI_LOGD("abilityName: %{public}s", shortcutKey.ability.abilityName.c_str());
+        MMI_LOGD("finalKey: %{public}d keyDownDuration: %{public}d triggerType: %{public}d"
+            " bundleName: %{public}s abilityName: %{public}s", shortcutKey.finalKey,
+            shortcutKey.keyDownDuration, shortcutKey.triggerType,
+            shortcutKey.ability.bundleName.c_str(), shortcutKey.ability.abilityName.c_str());
     }
 }
 
@@ -212,14 +211,14 @@ bool AbilityLaunchManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> &k
         int32_t eventKey = 1;
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, checkkeycode, eventKey);
         if (!Match(shortcutKey, key)) {
-            MMI_LOGD("continue");
+            MMI_LOGD("not matched, next");
             continue;
         }
         for (auto prekey: shortcutKey.preKeys) {
             MMI_LOGD("eventkey matched, preKey: %{public}d", prekey);
         }
-        MMI_LOGD("eventkey matched, finalKey: %{public}d", shortcutKey.finalKey);
-        MMI_LOGD("eventkey matched, bundleName: %{public}s", shortcutKey.ability.bundleName.c_str());
+        MMI_LOGD("eventkey matched, finalKey: %{public}d bundleName: %{public}s",
+            shortcutKey.finalKey, shortcutKey.ability.bundleName.c_str());
         if(shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN) {
             return HandleKeyDown(shortcutKey);
         } else if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_UP) {
@@ -263,7 +262,7 @@ bool AbilityLaunchManager::HandleKeyDown(ShortcutKey &shortcutKey){
             LaunchAbility(shortcutKey);
         });
         if (shortcutKey.timerId < 0) {
-            MMI_LOGD("Timer add failed");
+            MMI_LOGE("Timer add failed");
             return false;
         }
         MMI_LOGD("add timer success, timeid: %{public}d", shortcutKey.timerId);
@@ -286,11 +285,10 @@ bool AbilityLaunchManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
 
         auto upTime = keyEvent->GetActionTime();
         auto downTime = keyItem->GetDownTime();
-        MMI_LOGE("upTime %{public}d", upTime);
-        MMI_LOGE("downTime %{public}d", downTime);
-        MMI_LOGE("keyDownDuration %{public}d", shortcutKey.keyDownDuration);
+        MMI_LOGD("upTime %{public}d downTime %{public}d keyDownDuration %{public}d",
+            upTime, downTime, shortcutKey.keyDownDuration);
         if (upTime - downTime >= (shortcutKey.keyDownDuration * 1000)) {
-            MMI_LOGE("Skip, upTime - downTime >= duration");
+            MMI_LOGD("Skip, upTime - downTime >= duration");
             return false;
         }
         MMI_LOGD("Start launch ability immediately");

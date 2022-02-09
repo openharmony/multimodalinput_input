@@ -39,7 +39,7 @@ public:
 
     virtual bool OnKey(const OHOS::KeyEvent& keylEvent) override
     {
-        MMI_LOGT("AppKeyEventHandle::Onkey");
+        MMI_LOGD("AppKeyEventHandle::Onkey");
         return true;
     }
 };
@@ -51,7 +51,7 @@ public:
 
     virtual bool OnTouch(const TouchEvent& touchEvent) override
     {
-        MMI_LOGT("AppTouchEventHandle::OnTouch");
+        MMI_LOGD("AppTouchEventHandle::OnTouch");
         return true;
     }
 };
@@ -63,85 +63,85 @@ public:
 
     virtual bool OnShowMenu(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppCommonEventHandle::OnShowMenu");
+        MMI_LOGD("AppCommonEventHandle::OnShowMenu");
         return true;
     }
 
     virtual bool OnSend(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppCommonEventHandle::OnSend");
+        MMI_LOGD("AppCommonEventHandle::OnSend");
         return true;
     }
 
     virtual bool OnCopy(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppCommonEventHandle::OnCopy");
+        MMI_LOGD("AppCommonEventHandle::OnCopy");
         return true;
     }
 
     virtual bool OnPaste(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppCommonEventHandle::OnPaste");
+        MMI_LOGD("AppCommonEventHandle::OnPaste");
         return true;
     }
 
     virtual bool OnCut(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppCommonEventHandle::OnCut");
+        MMI_LOGD("AppCommonEventHandle::OnCut");
         return true;
     }
 
     virtual bool OnUndo(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppCommonEventHandle::OnUndo");
+        MMI_LOGD("AppCommonEventHandle::OnUndo");
         return true;
     }
 
     virtual bool OnRefresh(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppCommonEventHandle::OnRefresh");
+        MMI_LOGD("AppCommonEventHandle::OnRefresh");
         return true;
     }
 
     virtual bool OnStartDrag(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppCommonEventHandle::OnStartDrag");
+        MMI_LOGD("AppCommonEventHandle::OnStartDrag");
         return true;
     }
 
     virtual bool OnCancel(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppCommonEventHandle::OnCancel");
+        MMI_LOGD("AppCommonEventHandle::OnCancel");
         return true;
     }
 
     virtual bool OnEnter(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppCommonEventHandle::OnEnter");
+        MMI_LOGD("AppCommonEventHandle::OnEnter");
         return true;
     }
 
     virtual bool OnPrevious(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppCommonEventHandle::OnPrevious");
+        MMI_LOGD("AppCommonEventHandle::OnPrevious");
         return true;
     }
 
     virtual bool OnNext(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppCommonEventHandle::OnNext");
+        MMI_LOGD("AppCommonEventHandle::OnNext");
         return true;
     }
 
     virtual bool OnBack(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppCommonEventHandle::OnBack");
+        MMI_LOGD("AppCommonEventHandle::OnBack");
         return true;
     }
 
     virtual bool OnPrint(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppCommonEventHandle::OnPrint");
+        MMI_LOGD("AppCommonEventHandle::OnPrint");
         return true;
     }
 };
@@ -153,19 +153,19 @@ public:
 
     virtual bool OnPlay(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppMediaEventHandle::OnPlay");
+        MMI_LOGD("AppMediaEventHandle::OnPlay");
         return true;
     }
 
     virtual bool OnPause(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppMediaEventHandle::OnPause");
+        MMI_LOGD("AppMediaEventHandle::OnPause");
         return true;
     }
 
     virtual bool OnMediaControl(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppMediaEventHandle::OnMediaControl");
+        MMI_LOGD("AppMediaEventHandle::OnMediaControl");
         return true;
     }
 };
@@ -177,73 +177,73 @@ public:
 
     virtual bool OnClosePage(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppSystemEventHandle::OnClosePage");
+        MMI_LOGD("AppSystemEventHandle::OnClosePage");
         return true;
     }
 
     virtual bool OnLaunchVoiceAssistant(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppSystemEventHandle::OnLaunchVoiceAssistant");
+        MMI_LOGD("AppSystemEventHandle::OnLaunchVoiceAssistant");
         return true;
     }
 
     virtual bool OnMute(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppSystemEventHandle::OnMute");
+        MMI_LOGD("AppSystemEventHandle::OnMute");
         return true;
     }
 
     virtual bool OnScreenShot(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppSystemEventHandle::OnScreenShot");
+        MMI_LOGD("AppSystemEventHandle::OnScreenShot");
         return true;
     }
 
     virtual bool OnScreenSplit(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppSystemEventHandle::OnScreenSplit");
+        MMI_LOGD("AppSystemEventHandle::OnScreenSplit");
         return true;
     }
 
     virtual bool OnStartScreenRecord(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppSystemEventHandle::OnStartScreenRecord");
+        MMI_LOGD("AppSystemEventHandle::OnStartScreenRecord");
         return true;
     }
 
     virtual bool OnStopScreenRecord(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppSystemEventHandle::OnStopScreenRecord");
+        MMI_LOGD("AppSystemEventHandle::OnStopScreenRecord");
         return true;
     }
 
     virtual bool OnGotoDesktop(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppSystemEventHandle::OnGotoDesktop");
+        MMI_LOGD("AppSystemEventHandle::OnGotoDesktop");
         return true;
     }
 
     virtual bool OnRecent(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppSystemEventHandle::OnRecent");
+        MMI_LOGD("AppSystemEventHandle::OnRecent");
         return true;
     }
 
     virtual bool OnShowNotification(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppSystemEventHandle::OnShowNotification");
+        MMI_LOGD("AppSystemEventHandle::OnShowNotification");
         return true;
     }
 
     virtual bool OnLockScreen(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppSystemEventHandle::OnLockScreen");
+        MMI_LOGD("AppSystemEventHandle::OnLockScreen");
         return true;
     }
 
     virtual bool OnSearch(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppSystemEventHandle::OnSearch");
+        MMI_LOGD("AppSystemEventHandle::OnSearch");
         return true;
     }
 };
@@ -255,25 +255,25 @@ public:
 
     virtual bool OnAnswer(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppTelephoneEventHandle::OnAnswer");
+        MMI_LOGD("AppTelephoneEventHandle::OnAnswer");
         return true;
     }
 
     virtual bool OnRefuse(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppTelephoneEventHandle::OnRefuse");
+        MMI_LOGD("AppTelephoneEventHandle::OnRefuse");
         return true;
     }
 
     virtual bool OnHangup(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppTelephoneEventHandle::OnHangup");
+        MMI_LOGD("AppTelephoneEventHandle::OnHangup");
         return true;
     }
 
     virtual bool OnTelephoneControl(const MultimodalEvent& event) override
     {
-        MMI_LOGT("AppTelephoneEventHandle::OnTelephoneControl");
+        MMI_LOGD("AppTelephoneEventHandle::OnTelephoneControl");
         return true;
     }
 };
@@ -307,7 +307,7 @@ public:
     {
         MMI_LOGI("MMIClientDemo RegisterStandardizedEventHandle enter.");
 
-        MMI_LOGT("Register key event.");
+        MMI_LOGD("Register key event.");
 
         using namespace OHOS::MMI;
 
@@ -315,27 +315,27 @@ public:
         handerMap_[std::string("AppKeyEventHandle")] = appKey;
         MMIEventHdl.RegisterStandardizedEventHandle(remoteObject_, windowId_, appKey);
 
-        MMI_LOGT("Register touch event.");
+        MMI_LOGD("Register touch event.");
         auto appTouch = CreateEvent<AppTouchEventHandle>();
         handerMap_[std::string("AppTouchEventHandle")] = appTouch;
         MMIEventHdl.RegisterStandardizedEventHandle(remoteObject_, windowId_, appTouch);
 
-        MMI_LOGT("Register Common event.");
+        MMI_LOGD("Register Common event.");
         auto appCommon = CreateEvent<AppCommonEventHandle>();
         handerMap_[std::string("AppCommonEventHandle")] = appCommon;
         MMIEventHdl.RegisterStandardizedEventHandle(remoteObject_, windowId_, appCommon);
 
-        MMI_LOGT("Register Media event.");
+        MMI_LOGD("Register Media event.");
         auto appMedia = CreateEvent<AppMediaEventHandle>();
         handerMap_[std::string("AppMediaEventHandle")] = appMedia;
         MMIEventHdl.RegisterStandardizedEventHandle(remoteObject_, windowId_, appMedia);
 
-        MMI_LOGT("Register System event.");
+        MMI_LOGD("Register System event.");
         auto appSystem = CreateEvent<AppSystemEventHandle>();
         handerMap_[std::string("AppSystemEventHandle")] = appSystem;
         MMIEventHdl.RegisterStandardizedEventHandle(remoteObject_, windowId_, appSystem);
 
-        MMI_LOGT("Register Telephone event.");
+        MMI_LOGD("Register Telephone event.");
         auto appTelephone = CreateEvent<AppTelephoneEventHandle>();
         handerMap_[std::string("AppTelephoneEventHandle")] = appTelephone;
         MMIEventHdl.RegisterStandardizedEventHandle(remoteObject_, windowId_, appTelephone);
@@ -345,7 +345,7 @@ public:
     {
         MMI_LOGI("MMIClientDemo::UnregisterStandardizedEventHandle enter.");
         for (auto it = handerMap_.begin(); it != handerMap_.end();) {
-            MMI_LOGT("UnregisterStandardizedEventHandle %{public}s", it->first.c_str());
+            MMI_LOGD("UnregisterStandardizedEventHandle %{public}s", it->first.c_str());
             MMIEventHdl.UnregisterStandardizedEventHandle(remoteObject_, windowId_, it->second);
             handerMap_.erase(it++);
         }
@@ -367,9 +367,9 @@ void RunClient()
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
-    MMI_LOGT("UnRegisterStandardizedEventHandle begin....");
+    MMI_LOGD("UnRegisterStandardizedEventHandle begin....");
     client.UnregisterStandardizedEventHandle();
-    MMI_LOGT("UnRegisterStandardizedEventHandle end, wait 3000ms exit.");
+    MMI_LOGD("UnRegisterStandardizedEventHandle end, wait 3000ms exit.");
 }
 
 void ClientStopHandler(int signalNo)
@@ -386,7 +386,7 @@ int main(int argc, char* argv[])
 #endif
     const sighandler_t ret = signal(SIGTERM, ClientStopHandler);
     if (ret == SIG_ERR) {
-        MMI_LOGT("signal ret SIG_ERR.");
+        MMI_LOGD("signal ret SIG_ERR.");
         return RET_ERR;
     }
 
@@ -396,7 +396,7 @@ int main(int argc, char* argv[])
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
-    MMI_LOGT("hosmmi-client exit.");
+    MMI_LOGD("hosmmi-client exit.");
 
     return 0;
 }

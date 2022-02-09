@@ -66,6 +66,7 @@ ohos_shared_library("libmmi-client") {
     "event_handle/src/input_event_monitor_manager.cpp",
     "event_handle/src/input_filter_manager.cpp",
     "event_handle/src/input_handler_manager.cpp",
+    "event_handle/src/input_interceptor_manager.cpp",
     "event_handle/src/input_manager_impl.cpp",
     "event_handle/src/input_monitor_manager.cpp",
     "event_handle/src/interceptor_manager.cpp",

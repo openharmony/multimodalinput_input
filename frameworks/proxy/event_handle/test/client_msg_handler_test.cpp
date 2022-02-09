@@ -1385,12 +1385,12 @@ HWTEST_F(ClientMsgHandlerTest, OnTouch2, TestSize.Level1)
     int32_t fileData = 6;
     uint64_t serverStartTime = 7;
     EventTouch touchData = {};
-    CHK(EOK == memcpy_s(touchData.deviceName, MAX_DEVICENAME, "name", MAX_DEVICENAME),
-        MEMCPY_SEC_FUN_FAIL);
-    CHK(EOK == memcpy_s(touchData.physical, MAX_DEVICENAME, "HOS_TouchScreen", MAX_DEVICENAME),
-        MEMCPY_SEC_FUN_FAIL);
-    CHK(EOK == memcpy_s(touchData.uuid, MAX_DEVICENAME, "12345", MAX_DEVICENAME),
-        MEMCPY_SEC_FUN_FAIL);
+    int32_t ret = memcpy_s(touchData.deviceName, MAX_DEVICENAME, "name", MAX_DEVICENAME);
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
+    ret = memcpy_s(touchData.physical, MAX_DEVICENAME, "HOS_TouchScreen", MAX_DEVICENAME);
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
+    ret = memcpy_s(touchData.uuid, MAX_DEVICENAME, "12345", MAX_DEVICENAME);
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     touchData.eventType = 500;
     touchData.time = 500;
     touchData.slot = 500;

@@ -100,8 +100,7 @@ int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& d
 #else
     const char* physWhole = libinput_device_get_phys(device);
     if (physWhole == nullptr) {
-        ret = memcpy_s(data.physical, sizeof(data.physical), data.deviceName,
-                       sizeof(data.deviceName));
+        ret = memcpy_s(data.physical, sizeof(data.physical), data.deviceName, sizeof(data.deviceName));
         CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
     } else {
         std::string s(physWhole);
@@ -794,10 +793,10 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<Key
 int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key)
 {
     const std::string uid = GetUUid();
-    CHKR(EOK == memcpy_s(key.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size()),
-        MEMCPY_SEC_FUN_FAIL, RET_ERR);
-    CHKR(EOK == memcpy_s(key.deviceName, MAX_UUIDSIZE, VIRTUAL_KEYBOARD.c_str(),
-        VIRTUAL_KEYBOARD.size()), MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    int32_t ret = memcpy_s(key.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size());
+    CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    ret = memcpy_s(key.deviceName, MAX_UUIDSIZE, VIRTUAL_KEYBOARD.c_str(), VIRTUAL_KEYBOARD.size());
+    CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
     key.time = event.keyDownDuration;
     key.key = event.keyCode;
     key.isIntercepted = event.isIntercepted;
@@ -866,60 +865,6 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
         // nothing to do.
     }
     return RET_OK;
-}
-
-const uint16_t pointerID = 1; // mouse has only one PoingeItem, so id is 1
-
-std::shared_ptr<PointerEvent> EventPackage::LibinputEventToPointerEvent(libinput_event *event)
-{
-    int32_t defaultDeviceId = 0;
-    double gestureScale = 0;
-    int32_t pointerEventType = 0;
-    auto pointerEvent = PointerEvent::Create();
-    auto data = libinput_event_get_gesture_event(event);
-    auto type = libinput_event_get_type(event);
-    PointerEvent::PointerItem pointer;
-    pointer.SetGlobalX(MouseState->GetMouseCoordsX());
-    pointer.SetGlobalY(MouseState->GetMouseCoordsY());
-    pointer.SetPointerId(pointerID);
-    pointer.SetPressed(MouseState->IsLiftBtnPressed());
-    pointerEvent->AddPointerItem(pointer);
-    std::vector<uint32_t> pressedButtons;
-    MouseState->GetPressedButtons(pressedButtons);
-
-    if (!pressedButtons.empty()) {
-        for (auto it = pressedButtons.begin(); it != pressedButtons.end(); it++) {
-            pointerEvent->SetButtonPressed(*it);
-        }
-    }
-
-    switch (type) {
-        case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN: {
-            pointerEventType = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
-            break;
-        }
-        case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE: {
-            pointerEventType = PointerEvent::POINTER_ACTION_AXIS_UPDATE;
-            gestureScale = libinput_event_gesture_get_scale(data);
-            break;
-        }
-        case LIBINPUT_EVENT_GESTURE_PINCH_END: {
-            pointerEventType = PointerEvent::POINTER_ACTION_AXIS_END;
-            gestureScale = libinput_event_gesture_get_scale(data);
-            break;
-        }
-        default: {
-            MMI_LOGW("Unknown event type of gesture, gestureType:%{public}d", type);
-            break;
-        }
-    }
-
-    pointerEvent->SetTargetDisplayId(0);
-    pointerEvent->SetPointerId(pointerID);
-    pointerEvent->SetDeviceId(defaultDeviceId);
-    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, gestureScale);
-    pointerEvent->SetPointerAction(pointerEventType);
-    return pointerEvent;
 }
 }
 }
