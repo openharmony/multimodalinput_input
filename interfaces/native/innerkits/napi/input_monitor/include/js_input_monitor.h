@@ -96,6 +96,8 @@ private:
 
     int32_t TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
 
+    std::string GetAction(int32_t action);
+
 private:
     std::shared_ptr<InputMonitor> monitor_ {nullptr};
     napi_ref receiver_ {nullptr};
@@ -107,6 +109,6 @@ private:
     std::mutex mutex_;
     int32_t jsThreadNum_ = 0;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif

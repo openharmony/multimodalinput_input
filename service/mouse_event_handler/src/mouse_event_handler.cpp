@@ -211,7 +211,7 @@ void MouseEventHandler::DumpInner()
         pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
 
     PointerEvent::PointerItem item;
-    pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item);
+    CHK(pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item), PARAM_INPUT_FAIL);
     MMI_LOGD("item: DownTime: %{public}d, IsPressed: %{public}s,"
         "GlobalX: %{public}d, GlobalY: %{public}d, LocalX: %{public}d, LocalY: %{public}d, Width: %{public}d,"
         "Height: %{public}d, Pressure: %{public}d, DeviceId: %{public}d",

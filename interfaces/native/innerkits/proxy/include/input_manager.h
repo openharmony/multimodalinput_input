@@ -29,13 +29,41 @@ namespace OHOS {
 namespace MMI {
 class InputManager {
 public:
+    /**
+     * @brief Obtains an <b>InputManager</b> instance.
+     * @return Returns the pointer to the <b>InputManager</b> instance.
+     * @since 8
+     */
     static InputManager *GetInstance();
     virtual ~InputManager() = default;
 
+    /**
+     * @brief Updates the screen and window information.
+     * @param physicalDisplays Indicates the physical screen information.
+     * @param logicalDisplays Indicates the logical screen information, which includes the window information.
+     * @since 8
+     */
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
-        const std::vector<LogicalDisplayInfo> &logicalDisplays);                         // 建议本地调用，可IPC
+        const std::vector<LogicalDisplayInfo> &logicalDisplays);
+        
+    /**
+     * @brief Sets a globally unique input event filter.
+     * @param filter Indicates the input event filter to set. When an input event occurs, this filter is
+     * called and returns a value indicating whether to continue processing the input event.If the filter
+     * returns <b>true</b>, the processing of the input event ends. If the filter returns <b>false</b>,
+     * the processing of the input event continues.
+     * @return return Returns a value greater than or equal to <b>0</b> if the input event filter is added
+     * successfully; returns a value less than <b>0</b> otherwise.
+     * @since 8
+     */
     int32_t AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter);
 
+    /**
+     * @brief Sets a consumer for the window input event of the current process.
+     * @param inputEventConsumer Indicates the consumer to set. The window input event of the current process
+     * will be called back to the consumer object for processing.
+     * @since 8
+     */
     void SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::IInputEventConsumer> inputEventConsumer);
 
     /**
