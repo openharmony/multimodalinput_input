@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_UDS_COMMAND_QUEUE_H
-#define OHOS_UDS_COMMAND_QUEUE_H
+#ifndef UDS_COMMAND_QUEUE_H
+#define UDS_COMMAND_QUEUE_H
 
 #include <mutex>
 #include <list>
@@ -33,4 +33,4 @@ protected:
 };
 }
 }
-#endif // OHOS_UDS_COMMAND_QUEUE_H
+#endif // UDS_COMMAND_QUEUE_H

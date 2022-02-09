@@ -44,7 +44,8 @@ struct SeatInfo** GetSeatsInfo()
     CHKF(setInfo[0], OHOS::MALLOC_FAIL);
     setInfo[0]->seatName = (char*)malloc(TEST_SEATNAME_SIZE);
     CHKF(setInfo[0]->seatName, OHOS::MALLOC_FAIL);
-    CHKF(strcpy_s(setInfo[0]->seatName, TEST_SEATNAME_SIZE, "seat0") == EOK, OHOS::SEC_STRCPY_FAIL);
+    int32_t ret = strcpy_s(setInfo[0]->seatName, TEST_SEATNAME_SIZE, "seat0");
+    CHKF(ret == EOK, OHOS::SEC_STRCPY_FAIL);
     setInfo[0]->deviceFlags = -1;
     setInfo[0]->focusWindowId = 0;
     setInfo[1] = nullptr;
@@ -65,7 +66,8 @@ struct ScreenInfo** GetScreensInfo()
     CHKF(screenInfo, OHOS::MALLOC_FAIL);
     screenInfo[0] = static_cast<ScreenInfo*>(malloc(sizeof(ScreenInfo)));
     CHKF(screenInfo[0], OHOS::MALLOC_FAIL);
-    CHKF(memset_s(screenInfo[0], sizeof(ScreenInfo), 0, sizeof(ScreenInfo)) == EOK, OHOS::MEMSET_SEC_FUN_FAIL);
+    int32_t ret = memset_s(screenInfo[0], sizeof(ScreenInfo), 0, sizeof(ScreenInfo));
+    CHKF(ret == EOK, OHOS::MEMSET_SEC_FUN_FAIL);
     *screenInfo[0] = {.screenId = 1, .connectorName = nullptr, .width = TEST_WIDTH, .height = TEST_HEIGHT,
         .nLayers = 1, .layers = static_cast<LayerInfo**>(malloc(sizeof(struct LayerInfo*)))
     };
@@ -74,7 +76,8 @@ struct ScreenInfo** GetScreensInfo()
     LayerInfo** layerInfo = screenInfo[0]->layers;
     layerInfo[0] = static_cast<LayerInfo*>(malloc(sizeof(LayerInfo)));
     CHKF(layerInfo[0], OHOS::MALLOC_FAIL);
-    CHKF(memset_s(layerInfo[0], sizeof(LayerInfo), 0, sizeof(LayerInfo)) == EOK, OHOS::MEMSET_SEC_FUN_FAIL);
+    ret = memset_s(layerInfo[0], sizeof(LayerInfo), 0, sizeof(LayerInfo));
+    CHKF(ret == EOK, OHOS::MEMSET_SEC_FUN_FAIL);
     layerInfo[0]->layerId = TEST_LAYER_ID;
     layerInfo[0]->onScreenId = 1;
     layerInfo[0]->nSurfaces = 1;
@@ -88,7 +91,8 @@ struct ScreenInfo** GetScreensInfo()
     SurfaceInfo** surfaceInfo = layerInfo[0]->surfaces;
     surfaceInfo[0] = static_cast<SurfaceInfo*>(malloc(sizeof(SurfaceInfo)));
     CHKF(surfaceInfo[0], OHOS::MALLOC_FAIL);
-    CHKF(memset_s(surfaceInfo[0], sizeof(SurfaceInfo), 0, sizeof(SurfaceInfo)) == EOK, OHOS::MEMSET_SEC_FUN_FAIL);
+    ret = memset_s(surfaceInfo[0], sizeof(SurfaceInfo), 0, sizeof(SurfaceInfo));
+    CHKF(ret == EOK, OHOS::MEMSET_SEC_FUN_FAIL);
     surfaceInfo[0]->surfaceId = TEST_SURFACE_ID;
     surfaceInfo[0]->onLayerId = TEST_ON_LAYER_ID;
     surfaceInfo[0]->srcW = TEST_WIDTH;

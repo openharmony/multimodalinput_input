@@ -60,13 +60,11 @@ void InputEventMonitorManager::RemoveInputEventMontior(int32_t monitorId)
     MonitorItem item;
     item.id = monitorId;
     auto it = std::find(monitors_.begin(), monitors_.end(), item);
-    if (it == monitors_.end()) {
-        MMI_LOGW("MonitorId: %{public}d does not exist", item.id);
-        return;
+    if (it != monitors_.end()) {
+        monitors_.erase(it);
+        MMIEventHdl.RemoveInputEventMontior(OHOS::MMI::InputEvent::EVENT_TYPE_KEY);
+        MMI_LOGD("MonitorId: %{public}d removed", monitorId);
     }
-    monitors_.erase(it);
-    MMIEventHdl.RemoveInputEventMontior(OHOS::MMI::InputEvent::EVENT_TYPE_KEY);
-    MMI_LOGD("MonitorId: %{public}d removed", monitorId);
 }
 
 int32_t InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
@@ -121,13 +119,13 @@ int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<OH
         MMI_LOGE("param should not be null");
     }
     std::list<MonitorItem>::iterator iter;
-    for (iter = monitors_.begin(); iter != monitors_.end(); iter++) {
+    for (const auto &item : monitors_) {
         MMI_LOGD("send msg");
-        iter->TouchPadEventMonitor(pointerEvent);
+        item.TouchPadEventMonitor(pointerEvent);
     }
     PointerEvent::PointerItem pointer;
-    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer);
-    MMI_LOGT("monitor-clienteventTouchpad:time=%{public}d;"
+    CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL, RET_ERR);
+    MMI_LOGD("monitor-clienteventTouchpad:time=%{public}d;"
              "sourceType=%{public}d;action=%{public}d;"
              "pointerId=%{public}d;point.x=%{public}d;point.y=%{public}d;press=%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),

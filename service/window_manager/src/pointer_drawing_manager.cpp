@@ -15,6 +15,7 @@
 #include <display_type.h>
 #include <ui/rs_surface_node.h>
 #include "pointer_drawing_manager.h"
+#include "libmmi_util.h"
 #include "image_type.h"
 #include "image_utils.h"
 #include "image_source.h"
@@ -59,8 +60,7 @@ std::unique_ptr<OHOS::Media::PixelMap> OHOS::MMI::MouseDrawingManager::DecodeIma
 
 void OHOS::MMI::MouseDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY)
 {
-    MMI_LOGD("enter");
-    MMI_LOGD("display:%{public}d, globalX:%{public}d, globalY:%{public}d", displayId, globalX, globalY);
+    MMI_LOGD("enter, displayId:%{public}d, globalX:%{public}d, globalY:%{public}d", displayId, globalX, globalY);
     if (drawWindow_ == nullptr) {
         std::string windowName = "pointer window";
         sptr<OHOS::Rosen::WindowOption> option = new OHOS::Rosen::WindowOption();
@@ -155,9 +155,7 @@ void OHOS::MMI::MouseDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint3
     constexpr uint32_t stride = 4;
     int32_t addrSize = width * height * stride;
     auto ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
-    if (ret != EOK) {
-        MMI_LOGE("memcpy_s failed");
-    }
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     MMI_LOGD("leave");
 }
 

@@ -20,6 +20,7 @@
 #include "event_filter_service.h"
 #include "input_event_monitor_manager.h"
 #include "input_monitor_manager.h"
+#include "input_interceptor_manager.h"
 #include "interceptor_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
@@ -55,7 +56,7 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
 
 int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     if (eventFilterService_ == nullptr) {
         eventFilterService_ = new EventFilterService();
         MMI_LOGD("new EventFilterService");
@@ -81,7 +82,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
         }
     }
 
-    MMI_LOGT("leave, success with hasSendToMmiServer is already true");
+    MMI_LOGD("leave, success with hasSendToMmiServer is already true");
     return RET_OK;
 }
 
@@ -99,7 +100,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     MMI_LOGD("enter");
     int32_t getKeyCode = keyEvent->GetKeyCode();
     std::string keyCodestring = " OnKeyEvent client trace getKeyCode: " + std::to_string(getKeyCode);
-    MMI_LOGT(" OnKeyEvent client trace getKeyCode = %{public}d", getKeyCode);
+    MMI_LOGD(" OnKeyEvent client trace getKeyCode = %{public}d", getKeyCode);
     int32_t eventKey = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
     if (consumer_ != nullptr) {
@@ -181,36 +182,36 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &ckt)
 void InputManagerImpl::PrintDisplayDebugInfo()
 {
     MMI_LOGD("physicalDisplays,num:%{public}d", static_cast<int32_t>(physicalDisplays_.size()));
-    for (int32_t i = 0; i < static_cast<int32_t>(physicalDisplays_.size()); i++) {
+    for (const auto &item : physicalDisplays_) {
         MMI_LOGD("physicalDisplays,id:%{public}d, leftDisplayId:%{public}d, upDisplayId:%{public}d, "
             "topLeftX:%{public}d, topLeftY:%{public}d, width:%{public}d,height:%{public}d,name:%{public}s,"
             "seatId:%{public}s, seatName:%{public}s, logicWidth:%{public}d, logicHeight:%{public}d, "
             "direction:%{public}d",
-            physicalDisplays_[i].id, physicalDisplays_[i].leftDisplayId, physicalDisplays_[i].upDisplayId,
-            physicalDisplays_[i].topLeftX, physicalDisplays_[i].topLeftY, physicalDisplays_[i].width,
-            physicalDisplays_[i].height, physicalDisplays_[i].name.c_str(), physicalDisplays_[i].seatId.c_str(),
-            physicalDisplays_[i].seatName.c_str(), physicalDisplays_[i].logicWidth, physicalDisplays_[i].logicHeight,
-            physicalDisplays_[i].direction);
+            item.id, item.leftDisplayId, item.upDisplayId,
+            item.topLeftX, item.topLeftY, item.width,
+            item.height, item.name.c_str(), item.seatId.c_str(),
+            item.seatName.c_str(), item.logicWidth, item.logicHeight,
+            item.direction);
     }
 
     MMI_LOGD("logicalDisplays,num:%{public}d", static_cast<int32_t>(logicalDisplays_.size()));
-    for (int32_t i = 0; i < static_cast<int32_t>(logicalDisplays_.size()); i++) {
+    for (const auto &item : logicalDisplays_) {
         MMI_LOGD("logicalDisplays, id:%{public}d,topLeftX:%{public}d, topLeftY:%{public}d, "
             "width:%{public}d,height:%{public}d,name:%{public}s,"
             "seatId:%{public}s, seatName:%{public}s,focusWindowId:%{public}d,window num:%{public}d",
-            logicalDisplays_[i].id, logicalDisplays_[i].topLeftX, logicalDisplays_[i].topLeftY,
-            logicalDisplays_[i].width, logicalDisplays_[i].height, logicalDisplays_[i].name.c_str(),
-            logicalDisplays_[i].seatId.c_str(), logicalDisplays_[i].seatName.c_str(),
-            logicalDisplays_[i].focusWindowId, static_cast<int32_t>(logicalDisplays_[i].windowsInfo_.size()));
+            item.id, item.topLeftX, item.topLeftY,
+            item.width, item.height, item.name.c_str(),
+            item.seatId.c_str(), item.seatName.c_str(),
+            item.focusWindowId, static_cast<int32_t>(item.windowsInfo_.size()));
 
-        for (int32_t j = 0; j < static_cast<int32_t>(logicalDisplays_[i].windowsInfo_.size()); j++) {
+        for (const auto &win : item.windowsInfo_) {
             MMI_LOGD("windowid:%{public}d, pid:%{public}d,uid:%{public}d,topLeftX:%{public}d,"
-                "topLeftY:%{public}d,width:%{public}d,height:%{public}d,display:%{public}d,agentWindowId:%{public}d,",
-                logicalDisplays_[i].windowsInfo_[j].id, logicalDisplays_[i].windowsInfo_[j].pid,
-                logicalDisplays_[i].windowsInfo_[j].uid, logicalDisplays_[i].windowsInfo_[j].topLeftX,
-                logicalDisplays_[i].windowsInfo_[j].topLeftY, logicalDisplays_[i].windowsInfo_[j].width,
-                logicalDisplays_[i].windowsInfo_[j].height, logicalDisplays_[i].windowsInfo_[j].displayId,
-                logicalDisplays_[i].windowsInfo_[j].agentWindowId);
+                "topLeftY:%{public}d,width:%{public}d,height:%{public}d,displayId:%{public}d,agentWindowId:%{public}d,",
+                win.id, win.pid,
+                win.uid, win.topLeftX,
+                win.topLeftY, win.width,
+                win.height, win.displayId,
+                win.agentWindowId);
         }
     }
 }
@@ -266,14 +267,19 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
     InputMonitorManager::GetInstance().MarkConsumed(monitorId, eventId);
 }
 
+int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
+{
+    int32_t interceptorId = InputInterceptorManager::GetInstance().AddInterceptor(interceptor);
+    if (interceptorId >= 0) {
+        interceptorId = interceptorId * ADD_MASK_BASE + MASK_TOUCH;
+    }
+    return interceptorId;
+}
+
 int32_t InputManagerImpl::AddInterceptor(int32_t sourceType,
                                          std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
 {
-    if (interceptor == nullptr) {
-        MMI_LOGE("AddInterceptor::%{public}s param should not be null!", __func__);
-        return InterceptorManager::INVALID_INTERCEPTOR_ID;
-    }
-    return INTERCEPTORMANAGER.AddInterceptor(sourceType, interceptor);
+    return -1;
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
@@ -282,12 +288,32 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
         MMI_LOGE("AddInterceptor::%{public}s param should not be null!", __func__);
         return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
-    return INTERCEPTORMANAGER.AddInterceptor(interceptor);
+    int32_t interceptorId = InterceptorMgr.AddInterceptor(interceptor);
+    if (interceptorId >= 0) {
+        interceptorId = interceptorId * ADD_MASK_BASE + MASK_KEY;
+    }
+    return interceptorId;
 }
 
 void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 {
-    INTERCEPTORMANAGER.RemoveInterceptor(interceptorId);
+    if (interceptorId < 0) {
+        MMI_LOGE("Specified interceptor does not exist.");
+        return;
+    }
+    int32_t mask = interceptorId % ADD_MASK_BASE;
+    interceptorId /= ADD_MASK_BASE;
+    switch (mask) {
+        case MASK_TOUCH:
+            InputInterceptorManager::GetInstance().RemoveInterceptor(interceptorId);
+            break;
+        case MASK_KEY:
+            InterceptorMgr.RemoveInterceptor(interceptorId);
+            break;
+        default:
+            MMI_LOGE("Can't find the mask,mask%{public}d", mask);
+            break;
+    }
 }
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
@@ -295,6 +321,12 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> k
     if (MMIEventHdl.InjectEvent(keyEvent) != RET_OK) {
         MMI_LOGE("Failed to inject keyEvent!");
     }
+}
+
+void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
+{
+    if (MultimodalEventHandler::GetInstance().InjectPointerEvent(pointerEvent) != RET_OK)
+        MMI_LOGE("Failed to inject pointer event!");
 }
 
 void InputManagerImpl::OnConnected()

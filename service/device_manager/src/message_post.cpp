@@ -61,7 +61,7 @@ int MessagePost::RunTaskOnWestonThread(int fd, uint32_t mask, void *data)
 {
     int32_t value = 0;
     read(fd, &value, sizeof(value));
-    MMIMSGPOST.RunTasks();
+    MMIMsgPost.RunTasks();
     return 0;
 }
 

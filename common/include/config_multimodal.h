@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_CONFIG_MULTIMODAL_H
-#define OHOS_CONFIG_MULTIMODAL_H
+#ifndef CONFIG_MULTIMODAL_H
+#define CONFIG_MULTIMODAL_H
 
 #ifndef DEBUG_CODE_TEST
 #define DEBUG_CODE_TEST             // Test code build switch
@@ -55,4 +55,4 @@
 #define MMISEVER_WMS_DEVICE_ADDED 1         // notifyDeviceChange@Device added
 #define MMISEVER_WMS_DEVICE_REMOVE 2        // notifyDeviceChange@Device removed
 
-#endif
+#endif // CONFIG_MULTIMODAL_H

@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_JS_REGISTER_UTIL_H
-#define OHOS_JS_REGISTER_UTIL_H
+#ifndef JS_REGISTER_UTIL_H
+#define JS_REGISTER_UTIL_H
 #include "js_register_module.h"
 #include "key_event.h"
 #include <array>
@@ -34,4 +34,4 @@ void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *event);
 }
 }
 
-#endif
+#endif // JS_REGISTER_UTIL_H

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef VIRTUALKEYBOARD_H
-#define VIRTUALKEYBOARD_H
+#ifndef VIRTUAL_KEYBOARD_H
+#define VIRTUAL_KEYBOARD_H
 
 #include "virtual_device.h"
 
@@ -29,4 +29,4 @@ protected:
     const std::vector<uint32_t> &GetKeys() const override;
 };
 
-#endif  // VIRTUALKEYBOARD_H
+#endif // VIRTUAL_KEYBOARD_H

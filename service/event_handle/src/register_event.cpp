@@ -76,22 +76,22 @@ void RegisterEvent::OnEventKeyGetSign(const EventKeyboard& key, MmiMessageId& ms
     };
     int32_t ret = memcpy_s(&prevKey, sizeof(prevKey), &key, sizeof(key));
     CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
-    for (auto it : getModeCode) {
-        if ((it.keystate == key.state) && (it.keyCode == key.key)) {
+    for (const auto &item : getModeCode) {
+        if ((item.keystate == key.state) && (item.keyCode == key.key)) {
             if (key.state == KEY_STATE_RELEASED) {
-                modMask_ = BitSetZero(modMask_, it.modCode);
+                modMask_ = BitSetZero(modMask_, item.modCode);
             } else {
-                modMask_ = BitSetOne(modMask_, it.modCode);
+                modMask_ = BitSetOne(modMask_, item.modCode);
                 ret = memcpy_s(&key_, sizeof(key_), &key, sizeof(key));
                 CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
             }
         }
     }
-    for (auto it : taskCode) {
-        if (modMask_ & it.signCode) {
-            modTask_ = BitSetOne(modTask_, it.bitCode);
+    for (const auto &item : taskCode) {
+        if (modMask_ & item.signCode) {
+            modTask_ = BitSetOne(modTask_, item.bitCode);
         } else {
-            modTask_ = BitSetZero(modTask_, it.bitCode);
+            modTask_ = BitSetZero(modTask_, item.bitCode);
         }
     }
     if (temp != modTask_) {
@@ -108,12 +108,12 @@ bool RegisterEvent::OnGetRepeatKetState(const uint32_t keyCode, MmiMessageId& ms
         {KEY_SCREENRECORD, BIT4, MmiMessageId::ON_STOP_SCREEN_RECORD},
         {KEY_VIDEO, BIT5, MmiMessageId::ON_STOP_SCREEN_RECORD}
     };
-    for (auto it : taskCode) {
-        if ((it.keyCode == keyCode) && (baseKey_ & GetBitNum(it.taskCode))) {
-            baseKey_ = BitSetZero(baseKey_, it.taskCode);
-            msgId = it.handler;
-        } else if ((it.keyCode == keyCode) && (!(baseKey_ & GetBitNum(it.taskCode)))) {
-            baseKey_ = BitSetOne(baseKey_, it.taskCode);
+    for (const auto &item : taskCode) {
+        if ((item.keyCode == keyCode) && (baseKey_ & GetBitNum(item.taskCode))) {
+            baseKey_ = BitSetZero(baseKey_, item.taskCode);
+            msgId = item.handler;
+        } else if ((item.keyCode == keyCode) && (!(baseKey_ & GetBitNum(item.taskCode)))) {
+            baseKey_ = BitSetOne(baseKey_, item.taskCode);
         }
     }
     return true;
@@ -124,11 +124,9 @@ int32_t RegisterEvent::SetPrevKeyValue(EventKeyboard& prevKey)
     prevKey.deviceType = key_.deviceType;
     prevKey.eventType = key_.eventType;
     prevKey.deviceId = key_.deviceId;
-    int32_t ret = memcpy_s(prevKey.deviceName, sizeof(prevKey.deviceName), key_.deviceName,
-                   sizeof(key_.deviceName));
+    int32_t ret = memcpy_s(prevKey.deviceName, sizeof(prevKey.deviceName), key_.deviceName, sizeof(key_.deviceName));
     CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
-    ret = memcpy_s(prevKey.physical, sizeof(prevKey.physical), key_.physical,
-                   sizeof(key_.physical));
+    ret = memcpy_s(prevKey.physical, sizeof(prevKey.physical), key_.physical, sizeof(key_.physical));
     CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
     return RET_OK;
 }
@@ -165,10 +163,10 @@ int32_t RegisterEvent::OnEventKeyJudge(const EventKeyboard& key, MmiMessageId& m
         {KEY_SCREENRECORD, 0, MmiMessageId::ON_STOP_SCREEN_RECORD}, {KEY_RECENT, 0, MmiMessageId::ON_RECENT},
         {KEY_NOTIFICATION, 0, MmiMessageId::ON_SHOW_NOTIFICATION},
     };
-    for (auto it : eventHandle) {
-        if ((key.key == it.keyCode) && (modTask_ == it.taskCode)) {
-            msgId = it.handler;
-            if (it.taskCode != 0) {
+    for (const auto &item : eventHandle) {
+        if ((key.key == item.keyCode) && (modTask_ == item.taskCode)) {
+            msgId = item.handler;
+            if (item.taskCode != 0) {
                 int32_t ret = SetPrevKeyValue(prevKey);
                 CHKR(ret == RET_ERR, MEMCPY_SEC_FUN_FAIL, RET_ERR);
             }
@@ -427,9 +425,9 @@ int32_t RegisterEvent::OnEventOneFingerHandlerGetSign(MmiMessageId& msgId, Touch
 int32_t RegisterEvent::OnEventThreeFingerHandlerGetSign(MmiMessageId& msgId, TouchInfo& touchUpInfo)
 {
     int32_t touchState = 1;
-    for (auto temp : touchInfos_) {
-        if ((temp.second.deviceId == touchUpInfo.deviceId) &&
-            ((temp.second.endY - temp.second.beginY < MOVEDISTANCE) || (temp.second.beginY == MINY))) {
+    for (const auto &item : touchInfos_) {
+        if ((item.second.deviceId == touchUpInfo.deviceId) &&
+            ((item.second.endY - item.second.beginY < MOVEDISTANCE) || (item.second.beginY == MINY))) {
             touchState = RELEASE;
             break;
         }
@@ -531,8 +529,8 @@ void RegisterEvent::GetTouchIds(std::vector<std::pair<uint32_t, int32_t>>& touch
 int32_t RegisterEvent::GetTouchInfoSizeByDeviceId(uint32_t deviceId)
 {
     int32_t count = 0;
-    for (auto iter = touchInfos_.begin(); iter != touchInfos_.end(); iter++) {
-        if (iter->second.deviceId == deviceId) {
+    for (const auto &item : touchInfos_) {
+        if (item.second.deviceId == deviceId) {
             count++;
         }
     }

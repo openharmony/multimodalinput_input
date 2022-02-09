@@ -41,5 +41,5 @@ private:
 };
 }
 }
-#define MMIMSGPOST OHOS::MMI::MessagePost::GetInstance()
+#define MMIMsgPost OHOS::MMI::MessagePost::GetInstance()
 #endif
