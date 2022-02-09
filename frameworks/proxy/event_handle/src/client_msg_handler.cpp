@@ -181,7 +181,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
 
 int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
-    auto pointerEvent { OHOS::MMI::PointerEvent::Create() };
+    auto pointerEvent { PointerEvent::Create() };
     if (InputEventDataTransformation::Unmarshalling(pointerEvent, pkt) != ERR_OK) {
         MMI_LOGE("Failed to deserialize pointer event.");
         return RET_ERR;
@@ -250,7 +250,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
 
 int32_t ClientMsgHandler::OnTouchPadMonitor(const UDSClient& client, NetPacket& pkt)
 {
-    auto pointer = OHOS::MMI::PointerEvent::Create();
+    auto pointer = PointerEvent::Create();
     int32_t ret = InputEventDataTransformation::Unmarshalling(pointer, pkt);
     if (ret != RET_OK) {
         MMI_LOGE("OnTouchPadMonitor read netPacket failed");
@@ -818,7 +818,7 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
     CHKR(pkt.Read(handlerType), STREAM_BUF_READ_FAIL, RET_ERR);
     MMI_LOGD("Client handlerId : %{public}d handlerType : %{public}d", handlerId, handlerType); 
 
-    auto pointerEvent { OHOS::MMI::PointerEvent::Create() };
+    auto pointerEvent { PointerEvent::Create() };
     if (InputEventDataTransformation::Unmarshalling(pointerEvent, pkt) != ERR_OK) {
         MMI_LOGE("Failed to deserialize pointer event...");
         return RET_ERR;
@@ -829,7 +829,7 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 
 int32_t ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetPacket& pkt)
 {
-    auto pointerEvent = OHOS::MMI::PointerEvent::Create();
+    auto pointerEvent = PointerEvent::Create();
     int32_t ret = InputEventDataTransformation::Unmarshalling(pointerEvent, pkt);
     if (ret != RET_OK) {
         MMI_LOGE("TouchpadEventInterceptor read netPacket failed");
