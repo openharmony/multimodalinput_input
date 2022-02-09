@@ -36,7 +36,7 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
     string sendType;
     string deviceNode;
     GetDeviceObject getDeviceObject;
-    for (auto item : configData) {
+    for (const auto &item : configData) {
         deviceName = item.at("deviceName").get<std::string>();
         InputEventArray inputEventArray = {};
         inputEventArray.deviceName = deviceName;
@@ -96,9 +96,9 @@ int32_t ManageInjectDevice::SendEventToDeviveNode(const InputEventArray& inputEv
         MMI_LOGE("open device node:%{public}s faild.", deviceNode.c_str());
         return RET_ERR;
     }
-    for (InjectEvent injectEvent : inputEventArray.events) {
-        write(fd, &injectEvent.event, sizeof(injectEvent.event));
-        int32_t blockTime = (injectEvent.blockTime == 0) ? INJECT_SLEEP_TIMES : injectEvent.blockTime;
+    for (const auto &item : inputEventArray.events) {
+        write(fd, &item.event, sizeof(item.event));
+        int32_t blockTime = (item.blockTime == 0) ? INJECT_SLEEP_TIMES : item.blockTime;
         std::this_thread::sleep_for(std::chrono::milliseconds(blockTime));
     }
     if (fd > 0) {

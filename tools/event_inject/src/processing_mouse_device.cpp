@@ -47,21 +47,19 @@ int32_t ProcessingMouseDevice::TransformJsonDataToInputData(const Json& fingerEv
 void ProcessingMouseDevice::TransformMouseEventToInputEvent(const std::vector<MouseEvent>& mouseEventArray,
                                                             InputEventArray& inputEventArray)
 {
-    for (MouseEvent mouseEvent : mouseEventArray) {
-        if (mouseEvent.eventType == "KEY_EVENT_PRESS") {
-            TransformKeyPressEvent(mouseEvent, inputEventArray);
-        } else if (mouseEvent.eventType == "KEY_EVENT_RELEASE") {
-            TransformKeyReleaseEvent(mouseEvent, inputEventArray);
-        } else if (mouseEvent.eventType == "KEY_EVENT_CLICK") {
-            TransformKeyClickEvent(mouseEvent, inputEventArray);
-        } else if (mouseEvent.eventType == "MOUSE_EVENT_MOVE") {
-            TransformMouseMoveEvent(mouseEvent, inputEventArray);
-        } else if (mouseEvent.eventType == "MOUSE_EVENT_WHEEL") {
-            TransformMouseWheelEvent(mouseEvent, inputEventArray);
-        } else if (mouseEvent.eventType == "MOUSE_EVENT_HWHEEL") {
-            TransformMouseHwheelEvent(mouseEvent, inputEventArray);
-        } else {
-            // nothing to do.
+    for (const auto &item : mouseEventArray) {
+        if (item.eventType == "KEY_EVENT_PRESS") {
+            TransformKeyPressEvent(item, inputEventArray);
+        } else if (item.eventType == "KEY_EVENT_RELEASE") {
+            TransformKeyReleaseEvent(item, inputEventArray);
+        } else if (item.eventType == "KEY_EVENT_CLICK") {
+            TransformKeyClickEvent(item, inputEventArray);
+        } else if (item.eventType == "MOUSE_EVENT_MOVE") {
+            TransformMouseMoveEvent(item, inputEventArray);
+        } else if (item.eventType == "MOUSE_EVENT_WHEEL") {
+            TransformMouseWheelEvent(item, inputEventArray);
+        } else if (item.eventType == "MOUSE_EVENT_HWHEEL") {
+            TransformMouseHwheelEvent(item, inputEventArray);
         }
     }
 }
@@ -70,7 +68,7 @@ int32_t ProcessingMouseDevice::AnalysisMouseEvent(const Json& inputData,
     std::vector<MouseEvent>& mouseEventArray)
 {
     MouseEvent mouseEvent = {};
-    for (auto item : inputData) {
+    for (const auto &item : inputData) {
         mouseEvent = {};
         mouseEvent.eventType = item.at("eventType").get<std::string>();
         if ((item.find("keyValue")) != item.end()) {
@@ -93,7 +91,6 @@ int32_t ProcessingMouseDevice::AnalysisMouseEvent(const Json& inputData,
         }
         mouseEventArray.push_back(mouseEvent);
     }
-
     return RET_OK;
 }
 

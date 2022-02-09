@@ -235,7 +235,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
     std::vector<PointerEvent::PointerItem> pointerItems;
     for (auto &item : pointerEvent->GetPointersIdList()) {
         PointerEvent::PointerItem pointerItem;
-        pointerEvent->GetPointerItem(item, pointerItem);
+        CHKR(pointerEvent->GetPointerItem(item, pointerItem), PARAM_INPUT_FAIL, RET_ERR);
         pointerItems.push_back(pointerItem);
     }
     uint32_t index = 0;
