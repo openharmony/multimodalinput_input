@@ -694,12 +694,13 @@ int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_e
 void EventDispatch::OnKeyboardEventTrace(std::shared_ptr<KeyEvent> &key, int32_t number)
 {
     int32_t checkLaunchAbility = 1;
-    int32_t keyCode = keyEvent->GetKeyCode();
+    int32_t keyCode = key->GetKeyCode();
+	std::string checkKeyCode;
     if (checkLaunchAbility == number) {
-        std::string checkKeyCode = "CheckLaunchAbility service GetKeyCode = " + std::to_string(keyCode);
+        checkKeyCode = "CheckLaunchAbility service GetKeyCode = " + std::to_string(keyCode);
         MMI_LOGT("CheckLaunchAbility service trace GetKeyCode=%{public}d", keyCode);
     } else {
-        std::string checkKeyCode = "FilterSubscribeKeyEvent service GetKeyCode = " + std::to_string(keyCode);
+        checkKeyCode = "FilterSubscribeKeyEvent service GetKeyCode = " + std::to_string(keyCode);
         MMI_LOGT("FilterSubscribeKeyEvent service trace GetKeyCode=%{public}d", keyCode);
     }
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, checkKeyCode);
