@@ -766,15 +766,14 @@ bool OHOS::MMI::InputWindowsManager::IsCheckDisplayIdIfExist(int32_t& displayId)
     return false;
 }
 
-bool OHOS::MMI::InputWindowsManager::GetLogicalDisplayById(int32_t displayId, LogicalDisplayInfo& logicalDisplayInfo)
+LogicalDisplayInfo* OHOS::MMI::InputWindowsManager::GetLogicalDisplayById(int32_t displayId)
 {
-    for (auto it : logicalDisplays_) {
+    for (auto &it : logicalDisplays_) {
         if (it.id == displayId) {
-            logicalDisplayInfo = it;
-            return true;
+            return &it;
         }
     }
-    return false;
+    return nullptr;
 }
 
 void OHOS::MMI::InputWindowsManager::AdjustCoordinate(double &coordinateX, double &coordinateY)
@@ -845,8 +844,8 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
         MMI_LOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return RET_ERR;
     }
-    LogicalDisplayInfo logicalDisplayInfo;
-    if (!GetLogicalDisplayById(displayId, logicalDisplayInfo)) {
+    LogicalDisplayInfo *logicalDisplayInfo = GetLogicalDisplayById(displayId);
+    if (logicalDisplayInfo == nullptr) {
         MMI_LOGE("GetLogicalDisplayById failed");
         return RET_ERR;
     }
@@ -855,7 +854,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     FixCursorPosition(globalX, globalY, IMAGE_SIZE, IMAGE_SIZE);
     DrawWgr->DrawPointer(displayId, globalX, globalY);
     WindowInfo *focusWindow = nullptr;
-    for (auto it : logicalDisplayInfo.windowsInfo_) {
+    for (auto it : logicalDisplayInfo->windowsInfo_) {
         if (IsTouchWindow(globalX, globalY, it)) {
             focusWindow = &it;
             break;
@@ -897,19 +896,19 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
         return RET_ERR;
     }
     MMI_LOGD("UpdateTouchScreenTarget, display:%{public}d", displayId);
-    LogicalDisplayInfo logicalDisplayInfo;
-    if (!GetLogicalDisplayById(displayId, logicalDisplayInfo)) {
+    LogicalDisplayInfo *logicalDisplayInfo = GetLogicalDisplayById(displayId);
+    if (logicalDisplayInfo == nullptr) {
         MMI_LOGE("DisplayGetLogicalDisplay failed");
         return RET_ERR;
     }
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
     MMI_LOGD("UpdateTouchScreenTarget, globalX:%{public}d, globalY:%{public}d", globalX, globalY);
-    AdjustGlobalCoordinate(globalX, globalY, logicalDisplayInfo.width, logicalDisplayInfo.height);
+    AdjustGlobalCoordinate(globalX, globalY, logicalDisplayInfo->width, logicalDisplayInfo->height);
     auto targetWindowId = pointerEvent->GetTargetWindowId();
     MMI_LOGD("UpdateTouchScreenTarget, targetWindow:%{public}d", targetWindowId);
     WindowInfo *touchWindow = nullptr;
-    for (auto it : logicalDisplayInfo.windowsInfo_) {
+    for (auto it : logicalDisplayInfo->windowsInfo_) {
         if (targetWindowId < 0) {
             if (IsTouchWindow(globalX, globalY, it)) {
                 touchWindow = &it;

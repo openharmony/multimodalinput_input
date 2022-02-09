@@ -169,7 +169,7 @@ public:
     void UpdateAndAdjustMouseLoction(double& x, double& y);
     void AdjustGlobalCoordinate(int32_t& globalX, int32_t& globalY, int32_t width, int32_t height);
     bool IsCheckDisplayIdIfExist(int32_t& displayId);
-    bool GetLogicalDisplayById(int32_t displayId, LogicalDisplayInfo& logicalDisplayInfo);
+    LogicalDisplayInfo* GetLogicalDisplayById(int32_t displayId);
     int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
     bool TouchPadPointToDisplayPoint(libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId);
