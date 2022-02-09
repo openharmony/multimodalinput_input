@@ -74,7 +74,7 @@ int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, con
     napi_valuetype tmpType = napi_undefined;
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_LOGE("call napi_typeof fail.");
+        napi_throw_error(env, nullptr, "call napi_typeof fail.");
         return value;
     }
     if (tmpType != napi_number) {
@@ -86,89 +86,94 @@ int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, con
     return value;
 }
 
-std::vector<int32_t> GetCppArrayInt(napi_value value, napi_env env)
+std::vector<int32_t> GetIntArray(const napi_env &env, const napi_value &value)
 {
     MMI_LOGD("enter");
     uint32_t arrayLength = 0;
     if (napi_get_array_length(env, value, &arrayLength) != napi_ok) {
-        MMI_LOGE("call napi_get_array_length fail.");
-        return std::vector<int32_t>();
+        MMI_LOGE("Get array length failed");
+        return {};
     }
-    if (arrayLength <= 0) {
-        MMI_LOGE("%{public}s The array is empty.", __func__);
-        return std::vector<int32_t>();
-    }
-
     std::vector<int32_t> paramArrays;
     for (size_t i = 0; i < arrayLength; i++) {
         napi_value napiElement;
         if (napi_get_element(env, value, i, &napiElement) != napi_ok) {
-            MMI_LOGE("call napi_get_element fail.");
-            return std::vector<int32_t>();
+            MMI_LOGE("Get element failed");
+            return {};
         }
 
-        napi_valuetype valuetype0;
-        if (napi_typeof(env, napiElement, &valuetype0) != napi_ok) {
-            MMI_LOGE("call napi_typeof fail.");
-            return std::vector<int32_t>();
+        napi_valuetype valuetype;
+        if (napi_typeof(env, napiElement, &valuetype) != napi_ok) {
+            MMI_LOGE("Call typeof napiElement failed");
+            return {};
         }
-        if (valuetype0 != napi_number) {
-            MMI_LOGE("%{public}s Wrong argument type,Numbers expected.", __func__);
-            return std::vector<int32_t>();
+        if (valuetype != napi_number) {
+            MMI_LOGE("Wrong argument type, Numbers expected");
+            return {};
         }
-        int32_t value0 = 0;
-        if (napi_get_value_int32(env, napiElement, &value0) != napi_ok) {
-            MMI_LOGE("call napi_get_value_int32 fail.");
-            return std::vector<int32_t>();
+        int32_t value = 0;
+        if (napi_get_value_int32(env, napiElement, &value) != napi_ok) {
+            MMI_LOGE("NapiElement get int32 value failed");
+            return {};
         }
-        MMI_LOGD("get int array in number: %{public}d", value0);
-        paramArrays.push_back(value0);
+        MMI_LOGD("Get int array number: %{public}d", value);
+        paramArrays.push_back(value);
     }
     MMI_LOGD("leave");
     return paramArrays;
 }
 
-int32_t AddEventCallback(const napi_env &env, OHOS::MMI::CallbackMaps &callbackMaps,
+int32_t AddEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
     OHOS::MMI::KeyEventMonitorInfo *event, int32_t &preSubscribeId)
 {
-    MMI_LOGD("%{public}s begin", __func__);
-    if (callbackMaps.find(event->eventType) == callbackMaps.end()) {
-        MMI_LOGD("%{public}s has no callback function..", event->eventType.c_str());
-        callbackMaps[event->eventType] = {};
+    MMI_LOGD("enter");
+    if (callbacks.find(event->eventType) == callbacks.end()) {
+        MMI_LOGD("No callback in %{public}s", event->eventType.c_str());
+        callbacks[event->eventType] = {};
     }
-    auto iter = callbackMaps.find(event->eventType);
-    auto it = iter->second.begin();
-    while (it != iter->second.end()) {
-        bool isEquals = false;
-        napi_value handlerTemp = nullptr;
-        napi_get_reference_value(env, (*it)->callback[0], &handlerTemp);
-        napi_value handlerParam = nullptr;
-        napi_get_reference_value(env, event->callback[0], &handlerParam);
-        napi_strict_equals(env, handlerTemp, handlerParam, &isEquals);
-        if (isEquals) {
-            MMI_LOGD("%{public}s callback already exists.", event->eventType.c_str());
-            return JS_CALLBACK_EVENT_EXIST;
+    auto it = callbacks[event->eventType];
+    napi_value handler1 = nullptr;
+    napi_status status = napi_get_reference_value(env, event->callback[0], &handler1);
+    if (status != napi_ok) {
+        napi_throw_error(env, nullptr, "Handler1 get reference value failed");
+        return JS_CALLBACK_EVENT_FAILED;
+    }
+    for (const auto &iter : it) {
+        napi_value handler2 = nullptr;
+        status = napi_get_reference_value(env, (*iter).callback[0], &handler2);
+        if (status != napi_ok) {
+            napi_throw_error(env, nullptr, "Handler2 get reference value failed");
+            return JS_CALLBACK_EVENT_FAILED;
         }
-        it++;
+        bool isEqual = false;
+        status = napi_strict_equals(env, handler1, handler2, &isEqual);
+        if (status != napi_ok) {
+            napi_throw_error(env, nullptr, "Compare two handler failed");
+            return JS_CALLBACK_EVENT_FAILED;
+        }
+        if (isEqual) {
+            napi_throw_error(env, nullptr, "Callback already exists in %{public}s");
+            return JS_CALLBACK_EVENT_FAILED;
+        }
     }
-    if (!iter->second.empty()) {
-        preSubscribeId = iter->second.front()->subscribeId;
+    if (!it.empty()) {
+        CHKPR(it.front(), ERROR_NULL_POINTER, JS_CALLBACK_EVENT_FAILED);
+        preSubscribeId = it.front()->subscribeId;
     }
-    iter->second.push_back(event);
-    MMI_LOGD("%{public}s end", __func__);
+    it.push_back(event);
     return JS_CALLBACK_EVENT_SUCCESS;
 }
 
-int32_t DelEventCallback(const napi_env &env, OHOS::MMI::CallbackMaps &callbackMaps,
+int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
     OHOS::MMI::KeyEventMonitorInfo *event, int32_t &subscribeId)
 {
     MMI_LOGD("enter");
-    auto iter = callbackMaps.find(event->eventType);
-    if (iter == callbackMaps.end()) {
-        MMI_LOGD("%{public}s has no callback function.", event->eventType.c_str());
+    auto iter = callbacks.find(event->eventType);
+    if (iter == callbacks.end()) {
+        MMI_LOGD("No callback in %{public}s", event->eventType.c_str());
         return JS_CALLBACK_EVENT_FAILED;
     }
-    MMI_LOGD("event=%{public}s, callbackMaps second size:%{public}d", event->eventType.c_str(),
+    MMI_LOGD("EventType: %{public}s, keyEventMonitorInfos: %{public}d", event->eventType.c_str(),
         static_cast<int32_t>(iter->second.size()));
     auto it = iter->second.begin();
     while (it != iter->second.end()) {
@@ -187,7 +192,7 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::CallbackMaps &callbackM
             }
             delete monitorInfo;
             monitorInfo = nullptr;
-            MMI_LOGD("success. callback exists. size=%{public}d",
+            MMI_LOGD("Callback already exists, size: %{public}d",
                 static_cast<int32_t>(iter->second.size()));
             return JS_CALLBACK_EVENT_SUCCESS;
         }
@@ -199,31 +204,28 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::CallbackMaps &callbackM
 
 void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
 {
-    MMI_LOGD("%{public}s begin", __func__);
-    if (reportEvent == nullptr) {
-        MMI_LOGE("%{public}s event is null!", __func__);
-        return;
-    }
-
+    MMI_LOGD("enter");
+    CHKP(reportEvent, ERROR_NULL_POINTER);
     napi_value resourceName;
-    if (napi_create_string_utf8(reportEvent->env, "AsyncCallback", NAPI_AUTO_LENGTH, &resourceName) != napi_ok) {
-        MMI_LOGE("%{public}s create string utf8 failed", __func__);
+    napi_status status = napi_create_string_utf8(reportEvent->env, "AsyncCallback", NAPI_AUTO_LENGTH, &resourceName);
+    if (status != napi_ok) {
+        MMI_LOGE("Create string about resourceName failed");
         return;
     }
     napi_create_async_work(
         reportEvent->env, nullptr, resourceName, [](napi_env env, void *data) {},
         [](napi_env env, napi_status status, void *data) {
-            MMI_LOGD("%{public}s napi_create_async_work in", __func__);
+            MMI_LOGD("Napi async work enter");
             OHOS::MMI::KeyEventMonitorInfo *event = (OHOS::MMI::KeyEventMonitorInfo *)data;
             napi_value callback = nullptr;
             if (napi_get_reference_value(env, event->callback[0], &callback) != napi_ok) {
-                MMI_LOGE("%{public}s call napi_get_reference_value fail", __func__);
+                MMI_LOGE("Event get reference value failed");
                 return;
             }
             napi_value callResult = nullptr;
             napi_value result[2] = { 0 };
             if (event->status < 0) {
-                MMI_LOGD("%{public}s status < 0 in", __func__);
+                MMI_LOGD("Status < 0 enter");
                 napi_value code = nullptr;
                 napi_value message = nullptr;
                 napi_create_string_utf8(env, "-1", NAPI_AUTO_LENGTH, &code);
@@ -231,16 +233,15 @@ void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
                 napi_create_error(env, code, message, &result[0]);
                 napi_get_undefined(env, &result[1]);
             } else if (event->status == 0) {
-                MMI_LOGD("%{public}s status = 0 in", __func__);
+                MMI_LOGD("Status = 0 enter");
                 napi_get_undefined(env, &result[0]);
                 napi_get_undefined(env, &result[1]);
             } else {
-                MMI_LOGD("%{public}s status > 0 in", __func__);
+                MMI_LOGD("Status > 0 enter");
                 if (napi_create_object(env, &result[1]) != napi_ok) {
-                    MMI_LOGE("%{public}s call napi_create_object fail", __func__);
+                    MMI_LOGE("Result1 create object failed");
                     return;
                 }
-
                 napi_value arr;
                 napi_value value;
                 napi_create_array(env, &arr);
@@ -257,15 +258,14 @@ void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
                 MMI::SetNamedProperty(env, result[1], "finalKeyDownDuration",
                     event->keyOption->GetFinalKeyDownDuration());
                 if (napi_get_undefined(env, &result[0]) != napi_ok) {
-                    MMI_LOGE("%{public}s call napi_get_undefined fail", __func__);
+                    MMI_LOGE("Result0 get undefined failed");
                     return;
                 }
             }
-
             auto callFunResult = napi_call_function(env, nullptr, callback, 2, result, &callResult);
-            MMI_LOGD("call result:%{public}d", static_cast<int32_t>(callFunResult));
+            MMI_LOGD("CallFunResult: %{public}d", static_cast<int32_t>(callFunResult));
             if (callFunResult != napi_ok) {
-                MMI_LOGE("%{public}s call napi_call_function fail, call result:%{public}d", __func__, callFunResult);
+                MMI_LOGE("Call function fail, callFunResult: %{public}d", callFunResult);
                 return;
             }
             if (event->status <= 0) {
@@ -274,11 +274,11 @@ void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
                 delete event;
                 event = nullptr;
             }
-            MMI_LOGD("%{public}s napi_create_async_work left", __func__);
+            MMI_LOGD("Napi async work left");
         },
         reportEvent, &reportEvent->asyncWork);
     napi_queue_async_work(reportEvent->env, reportEvent->asyncWork);
-    MMI_LOGD("%{public}s end", __func__);
+    MMI_LOGD("EmitAsyncCallbackWork left");
 }
 }
 }
