@@ -119,9 +119,9 @@ int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<OH
         MMI_LOGE("param should not be null");
     }
     std::list<MonitorItem>::iterator iter;
-    for (iter = monitors_.begin(); iter != monitors_.end(); iter++) {
+    for (const auto &item : monitors_) {
         MMI_LOGD("send msg");
-        iter->TouchPadEventMonitor(pointerEvent);
+        item.TouchPadEventMonitor(pointerEvent);
     }
     PointerEvent::PointerItem pointer;
     CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL, RET_ERR);

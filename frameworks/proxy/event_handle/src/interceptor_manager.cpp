@@ -17,9 +17,10 @@
 #include "error_multimodal.h"
 #include "souceType.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManager" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManager" };
 }
 
 InterceptorManager::InterceptorManager()
@@ -35,7 +36,7 @@ int32_t InterceptorManager::AddInterceptor(int32_t sourceType,
     std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
 {
     if (interceptor == nullptr) {
-        MMI_LOGE("InterceptorManager::%{public}s param should not be null!", __func__);
+        MMI_LOGE("interceptor is null");
         return INVALID_INTERCEPTOR_ID;
     }
 
@@ -45,14 +46,14 @@ int32_t InterceptorManager::AddInterceptor(int32_t sourceType,
     interceptorItem.callback = interceptor;
     interceptor_.push_back(interceptorItem);
     MMIEventHdl.AddInterceptor(interceptorItem.sourceType, interceptorItem.id_);
-    MMI_LOGD("Add sourceType = %{public}d Touchpad to InterceptorManager success!", sourceType);
+    MMI_LOGD("Add sourceType = %{public}d Touchpad to InterceptorManager success", sourceType);
     return interceptorItem.id_;
 }
 
 int32_t InterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
     if (interceptor == nullptr) {
-        MMI_LOGE("InterceptorManager::%{public}s param should not be null!", __func__);
+        MMI_LOGE("interceptor is null");
         return RET_ERR;
     }
 
@@ -71,47 +72,40 @@ int32_t InterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<Ke
 void InterceptorManager::RemoveInterceptor(int32_t interceptorId)
 {
     if (interceptorId <= 0) {
-        MMI_LOGE("InterceptorManager::%{public}s interceptorId invalid", __func__);
+        MMI_LOGE("interceptorId invalid");
         return;
     }
     InterceptorItem interceptorItem;
     interceptorItem.id_ = interceptorId;
     auto iter = std::find(interceptor_.begin(), interceptor_.end(), interceptorItem);
     if (iter == interceptor_.end()) {
-        MMI_LOGE("InterceptorManager::%{public}s InterceptorItem does not exist", __func__);
+        MMI_LOGE("InterceptorItem does not exist");
     } else {
         iter = interceptor_.erase(iter);
         MMIEventHdl.RemoveInterceptor(interceptorItem.id_);
-        MMI_LOGD("InterceptorManager::%{public}s InterceptorItem id: %{public}d removed success",
-                 __func__, interceptorId);
+        MMI_LOGD("InterceptorItem id: %{public}d removed success", interceptorId);
     }
 }
 
 int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id)
 {
     if (pointerEvent == nullptr) {
-        MMI_LOGE("InterceptorManager::%{public}s param should not be null!", __func__);
+        MMI_LOGE("pointerEvent is null");
+        return ERROR_NULL_POINTER;
     }
     PointerEvent::PointerItem pointer;
     CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL, RET_ERR);
     MMI_LOGD("interceptor-clienteventTouchpad:actionTime=%{public}d;"
              "sourceType=%{public}d;pointerAction=%{public}d;"
-             "pointerId=%{public}d;point.x=%{public}d;point.y=%{public}d;press=%{public}d"
-             "*********************************************************",
+             "pointerId=%{public}d;point.x=%{public}d;point.y=%{public}d;press=%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     InterceptorItem interceptorItem;
     interceptorItem.id_ = id;
     auto iter = std::find(interceptor_.begin(), interceptor_.end(), interceptorItem);
-    if (iter == interceptor_.end()) {
-        MMI_LOGE("InterceptorManager::%{public}s InterceptorItem does not exist", __func__);
-    } else {
-        MMI_LOGD("InterceptorManager::%{public}s SendMsg", __func__);
-        if (iter->callback) {
-            iter->callback(pointerEvent);
-        } else {
-            MMI_LOGE("InterceptorManager::callback is null");
-        }
+    if (iter != interceptor_.end() && iter->callback != nullptr) {
+        MMI_LOGD("interceptor callback execute");
+        iter->callback(pointerEvent);
     }
     return MMI_STANDARD_EVENT_SUCCESS;
 }
@@ -119,15 +113,16 @@ int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointer
 int32_t InterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     if (keyEvent == nullptr) {
-        MMI_LOGE("InterceptorManager::%{public}s param should not be null!", __func__);
+        MMI_LOGE("keyEvent is null");
+        return ERROR_NULL_POINTER;
     }
-    std::list<InterceptorItem>::iterator iter;
-    for (iter = interceptor_.begin(); iter != interceptor_.end(); iter++) {
-        if (iter->sourceType == SOURCETYPE_KEY) {
-            MMI_LOGD("InterceptorManager::%{public}s SendMsg", __func__);
-            iter->callback_(keyEvent);
-        }     
+    for (auto &item : interceptor_) {
+        if (item.sourceType == SOURCETYPE_KEY) {
+            MMI_LOGD("interceptor callback execute");
+            item.callback_(keyEvent);
+        }
     }
     return MMI_STANDARD_EVENT_SUCCESS;
 }
-}
+} // namespace MMI
+} // namespace OHOS

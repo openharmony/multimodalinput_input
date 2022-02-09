@@ -182,36 +182,36 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &ckt)
 void InputManagerImpl::PrintDisplayDebugInfo()
 {
     MMI_LOGD("physicalDisplays,num:%{public}d", static_cast<int32_t>(physicalDisplays_.size()));
-    for (int32_t i = 0; i < static_cast<int32_t>(physicalDisplays_.size()); i++) {
+    for (const auto &item : physicalDisplays_) {
         MMI_LOGD("physicalDisplays,id:%{public}d, leftDisplayId:%{public}d, upDisplayId:%{public}d, "
             "topLeftX:%{public}d, topLeftY:%{public}d, width:%{public}d,height:%{public}d,name:%{public}s,"
             "seatId:%{public}s, seatName:%{public}s, logicWidth:%{public}d, logicHeight:%{public}d, "
             "direction:%{public}d",
-            physicalDisplays_[i].id, physicalDisplays_[i].leftDisplayId, physicalDisplays_[i].upDisplayId,
-            physicalDisplays_[i].topLeftX, physicalDisplays_[i].topLeftY, physicalDisplays_[i].width,
-            physicalDisplays_[i].height, physicalDisplays_[i].name.c_str(), physicalDisplays_[i].seatId.c_str(),
-            physicalDisplays_[i].seatName.c_str(), physicalDisplays_[i].logicWidth, physicalDisplays_[i].logicHeight,
-            physicalDisplays_[i].direction);
+            item.id, item.leftDisplayId, item.upDisplayId,
+            item.topLeftX, item.topLeftY, item.width,
+            item.height, item.name.c_str(), item.seatId.c_str(),
+            item.seatName.c_str(), item.logicWidth, item.logicHeight,
+            item.direction);
     }
 
     MMI_LOGD("logicalDisplays,num:%{public}d", static_cast<int32_t>(logicalDisplays_.size()));
-    for (int32_t i = 0; i < static_cast<int32_t>(logicalDisplays_.size()); i++) {
+    for (const auto &item : logicalDisplays_) {
         MMI_LOGD("logicalDisplays, id:%{public}d,topLeftX:%{public}d, topLeftY:%{public}d, "
             "width:%{public}d,height:%{public}d,name:%{public}s,"
             "seatId:%{public}s, seatName:%{public}s,focusWindowId:%{public}d,window num:%{public}d",
-            logicalDisplays_[i].id, logicalDisplays_[i].topLeftX, logicalDisplays_[i].topLeftY,
-            logicalDisplays_[i].width, logicalDisplays_[i].height, logicalDisplays_[i].name.c_str(),
-            logicalDisplays_[i].seatId.c_str(), logicalDisplays_[i].seatName.c_str(),
-            logicalDisplays_[i].focusWindowId, static_cast<int32_t>(logicalDisplays_[i].windowsInfo_.size()));
+            item.id, item.topLeftX, item.topLeftY,
+            item.width, item.height, item.name.c_str(),
+            item.seatId.c_str(), item.seatName.c_str(),
+            item.focusWindowId, static_cast<int32_t>(item.windowsInfo_.size()));
 
-        for (int32_t j = 0; j < static_cast<int32_t>(logicalDisplays_[i].windowsInfo_.size()); j++) {
+        for (const auto &win : item.windowsInfo_) {
             MMI_LOGD("windowid:%{public}d, pid:%{public}d,uid:%{public}d,topLeftX:%{public}d,"
                 "topLeftY:%{public}d,width:%{public}d,height:%{public}d,displayId:%{public}d,agentWindowId:%{public}d,",
-                logicalDisplays_[i].windowsInfo_[j].id, logicalDisplays_[i].windowsInfo_[j].pid,
-                logicalDisplays_[i].windowsInfo_[j].uid, logicalDisplays_[i].windowsInfo_[j].topLeftX,
-                logicalDisplays_[i].windowsInfo_[j].topLeftY, logicalDisplays_[i].windowsInfo_[j].width,
-                logicalDisplays_[i].windowsInfo_[j].height, logicalDisplays_[i].windowsInfo_[j].displayId,
-                logicalDisplays_[i].windowsInfo_[j].agentWindowId);
+                win.id, win.pid,
+                win.uid, win.topLeftX,
+                win.topLeftY, win.width,
+                win.height, win.displayId,
+                win.agentWindowId);
         }
     }
 }
@@ -288,7 +288,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
         MMI_LOGE("AddInterceptor::%{public}s param should not be null!", __func__);
         return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
-    int32_t interceptorId = INTERCEPTORMANAGER.AddInterceptor(interceptor);
+    int32_t interceptorId = InterceptorMgr.AddInterceptor(interceptor);
     if (interceptorId >= 0) {
         interceptorId = interceptorId * ADD_MASK_BASE + MASK_KEY;
     }
@@ -308,7 +308,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
             InputInterceptorManager::GetInstance().RemoveInterceptor(interceptorId);
             break;
         case MASK_KEY:
-            INTERCEPTORMANAGER.RemoveInterceptor(interceptorId);
+            InterceptorMgr.RemoveInterceptor(interceptorId);
             break;
         default:
             MMI_LOGE("Can't find the mask,mask%{public}d", mask);

@@ -84,10 +84,10 @@ static napi_value GetEventInfo(napi_env env, napi_callback_info info, KeyEventMo
     keyOption->SetPreKeys(preKeys);
 
     std::string subKeyNames = "";
-    for (size_t i = 0; i < sortPrekeys.size(); i++){
-        subKeyNames += std::to_string(sortPrekeys[i]);
+    for (const auto &item : sortPrekeys){
+        subKeyNames += std::to_string(item);
         subKeyNames += ",";
-        MMI_LOGD("preKeys = %{public}d", preKeys[i]);
+        MMI_LOGD("preKeys = %{public}d", item);
     }
 
     int32_t finalKey = GetNamedPropertyInt32(env, argv[ARGV_SECOND], "finalKey");
@@ -124,15 +124,15 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     MMI_LOGD("enter");
     auto keyOption = monitorInfo->keyOption;
     std::vector<int32_t> infoPreKeys = keyOption->GetPreKeys();
-    std::vector<KeyEvent::KeyItem> keyEventKeyItems = keyEvent->GetKeyItems();
+    std::vector<KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
     int32_t infoFinalKey = keyOption->GetFinalKey();
     int32_t keyEventFinalKey = keyEvent->GetKeyCode();
     MMI_LOGD("infoFinalKey:%{public}d, keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
-    if (infoFinalKey != keyEventFinalKey || keyEventKeyItems.size() > 4) {
+    if (infoFinalKey != keyEventFinalKey || items.size() > 4) {
         MMI_LOGD("%{public}d", __LINE__);
         return false;
     }
-    int infoSize = 0;
+    int32_t infoSize = 0;
     auto it = infoPreKeys.begin();
     while(it != infoPreKeys.end()) {
         if (*it >= 0) {
@@ -140,19 +140,18 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
         }
         it++;
     }
-    int kevEventSize = 0;
-    for (auto it = keyEventKeyItems.begin(); it != keyEventKeyItems.end(); it++) {
-        if (it->GetKeyCode() == keyEventFinalKey) {
+    int32_t count = 0;
+    for (const auto &item : items) {
+        if (item.GetKeyCode() == keyEventFinalKey) {
             continue;
         }
-        auto iter = find(infoPreKeys.begin(), infoPreKeys.end(), it->GetKeyCode());
+        auto iter = find(infoPreKeys.begin(), infoPreKeys.end(), item.GetKeyCode());
         if (iter == infoPreKeys.end()) {
-            MMI_LOGD("%{public}d", __LINE__);
             return false;
         }
-        kevEventSize++;
+        count++;
     }
-    MMI_LOGD("kevEventSize:%{public}d, infoSize:%{public}d", kevEventSize, infoSize);
+    MMI_LOGD("kevEventSize:%{public}d, infoSize:%{public}d", count, infoSize);
     const KeyEvent::KeyItem* keyItem = keyEvent->GetKeyItem();
     if (keyItem == nullptr) {
         MMI_LOGE("Skip, null keyItem");
@@ -166,7 +165,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
         MMI_LOGE("Skip, upTime - downTime >= duration");
         return false;
     }
-    return kevEventSize == infoSize;
+    return count == infoSize;
 }
 
 static void SubKeyEventCallback(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
@@ -198,16 +197,16 @@ bool CheckPara(std::shared_ptr<KeyOption> keyOption)
         return false;
     } 
     std::vector<int32_t> checkRepeat;
-    for (size_t i = 0; i < preKeys.size(); i++) {
-        if (preKeys[i] < 0) {
-            MMI_LOGE("preKey:%{public}d is less 0, can not process", preKeys[i]);
+    for (const auto &item : preKeys) {
+        if (item < 0) {
+            MMI_LOGE("preKey:%{public}d is less 0, can not process", item);
             return false;
         }
-        if (std::find(checkRepeat.begin(), checkRepeat.end(), preKeys[i]) != checkRepeat.end()){
+        if (std::find(checkRepeat.begin(), checkRepeat.end(), item) != checkRepeat.end()){
             MMI_LOGE("preKey is repeat, can not process");
             return false;
         }
-        checkRepeat.push_back(preKeys[i]);
+        checkRepeat.push_back(item);
     }
     return true;
 }

@@ -63,9 +63,9 @@ void InputDeviceEvent::OnInputDevice(int32_t taskId, int32_t id, std::string nam
     inputDeviceInfo->name = name;
     inputDeviceInfo->devcieType = deviceType;
 
-    for (auto it = inputDevciceRequests_.begin(); it != inputDevciceRequests_.end(); it++) {
-        if (it->first == taskId) {
-            it->second(inputDeviceInfo);
+    for (const auto &item : inputDevciceRequests_) {
+        if (item.first == taskId) {
+            item.second(inputDeviceInfo);
         }
     }
     MMI_LOGI("end");
@@ -74,9 +74,9 @@ void InputDeviceEvent::OnInputDevice(int32_t taskId, int32_t id, std::string nam
 void InputDeviceEvent::OnInputDeviceIds(int32_t taskId, std::vector<int32_t> ids)
 {
     MMI_LOGI("begin");
-    for (auto it = idsRequests_.begin(); it != idsRequests_.end(); it++) {
-        if (it->first == taskId) {
-            it->second(ids);
+    for (const auto &item : idsRequests_) {
+        if (item.first == taskId) {
+            item.second(ids);
         }
     }
     MMI_LOGI("end");

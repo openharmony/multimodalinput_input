@@ -365,9 +365,9 @@ bool SendMultimodalEvent(const napi_env& env, const CallbackMap& jsEvent, int32_
         return true;
     }
 
-    for (auto it = iter->second.begin(); it != iter->second.end(); it++) {
+    for (const auto &item : iter->second) {
         napi_value callback = nullptr;
-        if (napi_get_reference_value(env, *it, &callback) != napi_ok) {
+        if (napi_get_reference_value(env, item, &callback) != napi_ok) {
             MMI_LOGE("call napi_get_reference_value fail");
             return getResult;
         }
@@ -648,9 +648,9 @@ bool AppKeyEventHandle::SendEvent(const std::string& name, const OHOS::KeyEvent&
         MMI_LOGD("%{public}s do not have callback function", name.c_str());
         return true;
     }
-    for (auto it = iter->second.begin(); it != iter->second.end(); it++) {
+    for (const auto &item : iter->second) {
         napi_value callback = nullptr;
-        if (napi_get_reference_value(env_, *it, &callback) != napi_ok) {
+        if (napi_get_reference_value(env_, item, &callback) != napi_ok) {
             MMI_LOGE("call napi_get_reference_value fail");
             return getResult;
         }
@@ -707,9 +707,9 @@ bool AppTouchEventHandle::SendEvent(const std::string& name, const TouchEvent& e
         return true;
     }
 
-    for (auto it = iter->second.begin(); it != iter->second.end(); it++) {
+    for (const auto &item : iter->second) {
         napi_value callback = nullptr;
-        if (napi_get_reference_value(env_, *it, &callback) != napi_ok) {
+        if (napi_get_reference_value(env_, item, &callback) != napi_ok) {
             MMI_LOGE("call napi_get_reference_value fail");
             return getResult;
         }
@@ -828,9 +828,9 @@ bool AppDeviceEventHandle::SendEvent(const std::string& name, const DeviceEvent&
         return true;
     }
 
-    for (auto it = iter->second.begin(); it != iter->second.end(); it++) {
+    for (const auto &item : iter->second) {
         napi_value callback = nullptr;
-        if (napi_get_reference_value(env_, *it, &callback) != napi_ok) {
+        if (napi_get_reference_value(env_, item, &callback) != napi_ok) {
             MMI_LOGE("call napi_get_reference_value fail");
             return callback;
         }
