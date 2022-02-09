@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_INPUT_MONITOR_MANAGER_H
-#define OHOS_MULTIMDOALINPUT_INPUT_MONITOR_MANAGER_H
+#ifndef INPUT_MONITOR_MANAGER_H
+#define INPUT_MONITOR_MANAGER_H
 #include <memory>
 #include "input_handler_type.h"
 #include "i_input_event_consumer.h"
@@ -36,4 +36,4 @@ inline bool InputMonitorManager::IsValidMonitorId(int32_t monitorId)
     return IsValidHandlerId(monitorId);
 }
 } // namespace OHOS::MMI
-#endif // OHOS_MULTIMDOALINPUT_INPUT_MONITOR_MANAGER_H
+#endif // INPUT_MONITOR_MANAGER_H

@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_UDS_SESSION_H
-#define OHOS_UDS_SESSION_H
+#ifndef UDS_SESSION_H
+#define UDS_SESSION_H
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <memory>
@@ -90,4 +90,4 @@ protected:
 };
 }
 }
-#endif // HOS_UDS_SESSION_H
+#endif // UDS_SESSION_H

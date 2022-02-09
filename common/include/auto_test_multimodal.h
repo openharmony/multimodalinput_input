@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_LIBMMI_AUTOTEST_H
-#define OHOS_LIBMMI_AUTOTEST_H
+#ifndef AUTO_TEST_MULTIMODAL_H
+#define AUTO_TEST_MULTIMODAL_H
 
 #include "proto.h"
 
@@ -119,4 +119,4 @@ struct AutoTestClientListPkt {
     int32_t abilityId;                       // 应用Id
 };
 
-#endif
+#endif // AUTO_TEST_MULTIMODAL_H

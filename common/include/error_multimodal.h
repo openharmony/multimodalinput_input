@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_ERROR_MULTIMODAL_H
-#define OHOS_ERROR_MULTIMODAL_H
+#ifndef ERROR_MULTIMODAL_H
+#define ERROR_MULTIMODAL_H
 #include <errors.h>
 
 namespace OHOS {
@@ -192,4 +192,4 @@ namespace OHOS {
         MMI_SERVICE_RUNNING,     // 多模服务运行正常
     };
 }
-#endif
+#endif // ERROR_MULTIMODAL_H
