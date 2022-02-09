@@ -205,11 +205,6 @@ bool AbilityLaunchManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> &k
     ResetLastMatchedKey();
     for (auto iter = shortcutKeys_.begin(); iter != shortcutKeys_.end(); ++iter) {
         ShortcutKey &shortcutKey = iter->second;
-        int32_t keyCode = key->GetKeyCode();
-        const std::string checkkeycode = std::to_string(keyCode);
-        MMI_LOGT(" CheckLaunchAbility service trace GetKeyCode: %{public}d\n", key->GetKeyCode());
-        int32_t eventKey = 1;
-        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, checkkeycode, eventKey);
         if (!Match(shortcutKey, key)) {
             MMI_LOGD("not matched, next");
             continue;

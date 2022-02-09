@@ -81,13 +81,6 @@ bool KeyEventSubscriber::FilterSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEv
 {
     MMI_LOGT("Enter");
     CHKPF(keyEvent, ERROR_NULL_POINTER);
-
-    int32_t getKeyCode = keyEvent->GetKeyCode();
-    std::string keyCodestring = std::to_string(getKeyCode);
-    MMI_LOGT("FilterSubscribeKeyEvent service trace getKeyCode = %{public}d\n", getKeyCode);
-    int32_t eventKey = 1;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
-
     int32_t keyAction = keyEvent->GetKeyAction();
     MMI_LOGD("keyCode:%{public}d, keyAction:%{public}s", keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
     for (const auto &keyCode : keyEvent->GetPressedKeys()) {

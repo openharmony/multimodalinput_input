@@ -105,7 +105,6 @@ private:
     void AnalysisGestureEvent(const UDSClient& client, NetPacket& pkt) const;
     void TraceKeyEvent(const EventKeyboard& key) const;
     void TracePointerEvent(const EventPointer& pointData) const;
-    void TraceTouchEvent(const EventTouch& touchData) const;
     static void OnEventProcessed(int32_t eventId);
 
 private:

@@ -153,6 +153,9 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Enter handlerId:%{public}d", handlerId);
+    int32_t eventTouch = 9;
+    std::string touchEvent = "TouchEventFilterAsync";
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
     std::map<int32_t, InputHandler>::iterator tItr;
     std::map<int32_t, InputHandler>::iterator tItrEnd;
     {

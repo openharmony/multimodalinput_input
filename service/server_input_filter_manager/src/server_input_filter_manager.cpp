@@ -78,22 +78,9 @@ void ServerInputFilterManager::KeyEventFilter::SetAuthority(Authority authority)
     authority_ = authority;
 }
 
-void ServerInputFilterManager::OnKeyEventTrace(const EventKeyboard& key)
-{
-    char keyUuid[MAX_UUIDSIZE] = {0};
-    int32_t ret = memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid));
-    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
-    MMI_LOGT("OnKeyEvent service trace keyUuid = %{public}s", keyUuid);
-    std::string keyEvent = keyUuid;
-    keyEvent = "OnKeyEvent service keyUuid:" + keyEvent;
-    int32_t eventKey = 1;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
-}
-
 bool ServerInputFilterManager::OnKeyEvent(const EventKeyboard& key)
 {
     MMI_LOGT("Enter");
-    OnKeyEventTrace(key);
     if (keyEventFilterMap_.empty()) {
         MMI_LOGT("keyEventFilterMap_ is empty");
         return false;
@@ -237,24 +224,11 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
     }
 }
 
-void ServerInputFilterManager::OnTouchEventTrace(const EventTouch& touch)
-{
-    char touchUuid[MAX_UUIDSIZE] = {0};
-    int32_t ret = memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid));
-    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
-    MMI_LOGT("OnTouchEvent service touchUuid = %{public}s", touchUuid);
-    std::string touchEvent = touchUuid;
-    touchEvent = "OnTouchEvent service touchUuid:" + touchEvent;
-    int32_t eventTouch = 9;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
-}
-
 bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
     EventTouch& touch, const uint64_t preHandlerTime)
 {
     CHKF(event, PARAM_INPUT_INVALID);
     MMI_LOGT("Enter");
-    OnTouchEventTrace(touch);
     if (touchEventFilterMap_.empty()) {
         MMI_LOGE("touchEventFilterMap_ is empty");
         return false;
@@ -394,22 +368,9 @@ int32_t ServerInputFilterManager::RemoveTouchEventFilter(SessionPtr sess)
     return RET_OK;
 }
 
-void ServerInputFilterManager::OnPointerEventTrace(const EventPointer& event_pointer)
-{
-    char pointerUuid[MAX_UUIDSIZE] = {0};
-    int32_t ret = memcpy_s(pointerUuid, sizeof(pointerUuid), event_pointer.uuid, sizeof(event_pointer.uuid));
-    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
-    MMI_LOGT("OnPointerEvent service pointerUuid=%{public}s", pointerUuid);
-    std::string pointerEvent = pointerUuid;
-    pointerEvent = "OnPointerEvent service pointerUuid:" + pointerEvent;
-    int32_t eventPointer = 17;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
-}
-
 bool ServerInputFilterManager::OnPointerEvent(EventPointer event_pointer)
 {
     MMI_LOGT("Enter");
-    OnPointerEventTrace(event_pointer);
     if (pointerEventFilterMap_.empty()) {
         MMI_LOGT("pointerEventFilterMap_ is empty");
         return false;
