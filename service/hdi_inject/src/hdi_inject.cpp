@@ -212,7 +212,7 @@ bool HdiInject::ReportHotPlugEvent(uint32_t devIndex, uint32_t status)
 int32_t HdiInject::GetDevTypeByIndex(int32_t devIndex)
 {
     for (const auto &item : deviceArray_) {
-        if (item.devIndex ==devIndex) {
+        if (item.devIndex == devIndex) {
             return item.devType;
         }
     }
