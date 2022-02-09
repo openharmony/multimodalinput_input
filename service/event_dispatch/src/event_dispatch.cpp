@@ -695,7 +695,7 @@ void EventDispatch::OnKeyboardEventTrace(std::shared_ptr<KeyEvent> &key, int32_t
 {
     int32_t checkLaunchAbility = 1;
     int32_t keyCode = key->GetKeyCode();
-	std::string checkKeyCode;
+    std::string checkKeyCode;
     if (checkLaunchAbility == number) {
         checkKeyCode = "CheckLaunchAbility service GetKeyCode = " + std::to_string(keyCode);
         MMI_LOGT("CheckLaunchAbility service trace GetKeyCode=%{public}d", keyCode);
