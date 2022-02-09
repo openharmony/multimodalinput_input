@@ -50,10 +50,9 @@ int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const Json& origin
 
 int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const Json& inputData, std::vector<GamePadEvent>& padEventArray)
 {
-    string eventType;
-    for (auto item : inputData) {
+    for (const auto &item : inputData) {
         GamePadEvent padEvent = {};
-        eventType = item.at("eventType").get<std::string>();
+        string eventType = item.at("eventType").get<std::string>();
         padEvent.eventType = eventType;
         if ((item.find("blockTime")) != item.end()) {
             padEvent.blockTime = item.at("blockTime").get<int32_t>();
@@ -94,22 +93,20 @@ int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const Json& inputData, std
 void ProcessingGamePadDevice::TransformPadEventToInputEvent(const std::vector<GamePadEvent>& padEventArray,
                                                             InputEventArray& inputEventArray)
 {
-    for (GamePadEvent padEvent : padEventArray) {
-        if (padEvent.eventType == "KEY_EVENT_PRESS") {
-            TransformKeyPressEvent(padEvent, inputEventArray);
-        } else if (padEvent.eventType == "KEY_EVENT_RELEASE") {
-            TransformKeyReleaseEvent(padEvent, inputEventArray);
-        } else if (padEvent.eventType == "KEY_EVENT_CLICK") {
-            TransformKeyClickEvent(padEvent, inputEventArray);
-        } else if (padEvent.eventType == "DERECTION_KEY") {
-            TransformDerectionKeyEvent(padEvent, inputEventArray);
-        } else if (padEvent.eventType == "ROCKER_1") {
-            TransformRocker1Event(padEvent, inputEventArray);
-        } else if (padEvent.eventType == "ROCKER_2") {
-            TransformRocker2Event(padEvent, inputEventArray);
-        } else {
-            // nothing to do.
-        }
+    for (const auto &item : padEventArray) {
+        if (item.eventType == "KEY_EVENT_PRESS") {
+            TransformKeyPressEvent(item, inputEventArray);
+        } else if (item.eventType == "KEY_EVENT_RELEASE") {
+            TransformKeyReleaseEvent(item, inputEventArray);
+        } else if (item.eventType == "KEY_EVENT_CLICK") {
+            TransformKeyClickEvent(item, inputEventArray);
+        } else if (item.eventType == "DERECTION_KEY") {
+            TransformDerectionKeyEvent(item, inputEventArray);
+        } else if (item.eventType == "ROCKER_1") {
+            TransformRocker1Event(item, inputEventArray);
+        } else if (item.eventType == "ROCKER_2") {
+            TransformRocker2Event(item, inputEventArray);
+        } 
     }
 }
 
@@ -139,8 +136,8 @@ void ProcessingGamePadDevice::TransformKeyClickEvent(const GamePadEvent& padEven
 void ProcessingGamePadDevice::TransformRocker1Event(const GamePadEvent& padEvent, InputEventArray& inputEventArray)
 {
     string direction = padEvent.direction;
-    int32_t value = 0;
-    for (int32_t item : padEvent.gameEvents) {
+    for (const auto &item : padEvent.gameEvents) {
+        int32_t value;
         if (direction == "left") {
             value = ~item + 1;
             SetEvAbsX(inputEventArray, 0, value);
@@ -156,8 +153,6 @@ void ProcessingGamePadDevice::TransformRocker1Event(const GamePadEvent& padEvent
         } else if (direction == "lt") {
             value = item;
             SetEvAbsZ(inputEventArray, 0, value);
-        } else {
-            // nothint to do.
         }
         SetSynReport(inputEventArray);
     }
@@ -181,8 +176,8 @@ void ProcessingGamePadDevice::TransformRocker1Event(const GamePadEvent& padEvent
 void ProcessingGamePadDevice::TransformRocker2Event(const GamePadEvent& padEvent, InputEventArray& inputEventArray)
 {
     string direction = padEvent.direction;
-    int32_t value = 0;
     for (int32_t item : padEvent.gameEvents) {
+        int32_t value;
         if (direction == "left") {
             value = ~item + 1;
             SetEvAbsRx(inputEventArray, 0, value);
@@ -198,8 +193,6 @@ void ProcessingGamePadDevice::TransformRocker2Event(const GamePadEvent& padEvent
         } else if (direction == "rt") {
             value = item;
             SetEvAbsRz(inputEventArray, 0, value);
-        } else {
-            // nothint to do.
         }
         SetSynReport(inputEventArray);
     }
