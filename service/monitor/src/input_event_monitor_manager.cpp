@@ -135,7 +135,7 @@ void OHOS::MMI::InputEventMonitorManager::OnTouchpadMonitorInputEvent(
         MMI_LOGE("InputEventMonitorManager::%{public}s no monitor to send msg", __func__);
     }
     NetPacket newPkt(MmiMessageId::ON_TOUCHPAD_MONITOR);
-    InputEventDataTransformation::SerializePointerEvent(pointerEvent, newPkt);
+    InputEventDataTransformation::Marshalling(pointerEvent, newPkt);
     std::list<MonitorItem>::iterator iter;
     for (const auto &item :  monitorsTouch_) {
         newPkt << item.session->GetPid();
