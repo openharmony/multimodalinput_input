@@ -769,7 +769,7 @@ LogicalDisplayInfo* OHOS::MMI::InputWindowsManager::GetLogicalDisplayById(int32_
 {
     for (auto &it : logicalDisplays_) {
         if (it.id == displayId) {
-            return &it;;
+            return &it;
         }
     }
     return nullptr;

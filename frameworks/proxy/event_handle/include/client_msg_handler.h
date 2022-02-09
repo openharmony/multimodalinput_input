@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_CLIENT_MSG_HANDLER_H
-#define OHOS_CLIENT_MSG_HANDLER_H
+#ifndef CLIENT_MSG_HANDLER_H
+#define CLIENT_MSG_HANDLER_H
 
 #include "if_client_msg_handler.h"
 #include "key_event_input_subscribe_manager.h"
@@ -114,4 +114,4 @@ private:
 };
 }
 }
-#endif
+#endif // CLIENT_MSG_HANDLER_H

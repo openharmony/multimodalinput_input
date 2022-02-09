@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_UDS_CLIENT_H
-#define OHOS_UDS_CLIENT_H
+#ifndef UDS_CLIENT_H
+#define UDS_CLIENT_H
 
 #include <thread>
 #include <future>
@@ -75,4 +75,4 @@ protected:
 }
 }
 
-#endif
+#endif // UDS_CLIENT_H
