@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_JS_REGISTER_MODULE_H
-#define OHOS_JS_REGISTER_MODULE_H
+#ifndef JS_REGISTER_MODULE_H
+#define JS_REGISTER_MODULE_H
 #include <stdio.h>
 #include <map>
 #include <list>
@@ -73,4 +73,4 @@ typedef std::map<std::string, std::list<KeyEventMonitorInfo *>> CallbackMaps;
 }
 }
 
-#endif
+#endif // JS_REGISTER_MODULE_H

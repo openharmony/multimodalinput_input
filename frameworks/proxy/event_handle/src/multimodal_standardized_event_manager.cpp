@@ -37,7 +37,7 @@ MultimodalStandardizedEventManager::~MultimodalStandardizedEventManager() {}
 
 void MultimodalStandardizedEventManager::SetClientHandle(MMIClientPtr client)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     client_ = client;
 }
 
@@ -55,7 +55,7 @@ int32_t MultimodalStandardizedEventManager::RegisterStandardizedEventHandle(cons
             return OHOS::MMI_STANDARD_EVENT_EXIST;
         }
     }
-    MMI_LOGT("Register app event:typeId=%{public}d;", messageId);
+    MMI_LOGD("Register app event:typeId=%{public}d;", messageId);
     std::string registerhandle;
     if (!MakeRegisterHandle(messageId, windowId, registerhandle)) {
         MMI_LOGE("Invalid registration parameter...errCode:%{public}d", MMI_STANDARD_EVENT_INVALID_PARAMETER);
@@ -124,13 +124,13 @@ int32_t MultimodalStandardizedEventManager::SubscribeKeyEvent(
     int32_t keySubscibeId = subscribeInfo.GetSubscribeId();
 
     std::string keySubscribeIdstring = "SubscribeKeyEvent client subscribeKeyId: " + std::to_string(keySubscibeId);
-    MMI_LOGT(" SubscribeKeyEvent client trace subscribeKeyId = %{public}d", keySubscibeId);
+    MMI_LOGD(" SubscribeKeyEvent client trace subscribeKeyId = %{public}d", keySubscibeId);
     int32_t eventKey = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keySubscribeIdstring, eventKey);
 
     std::vector<int32_t> preKeys = keyOption->GetPreKeys();
-    for (auto preKeyIter = preKeys.begin(); preKeyIter != preKeys.end(); ++preKeyIter) {
-        pkt << *preKeyIter;
+    for (const auto &item : preKeys) {
+        pkt << item;
     }
     if (MMIEventHdl.GetMMIClient() == nullptr) {
         MMI_LOGE("client init failed");
@@ -161,10 +161,10 @@ int32_t MultimodalStandardizedEventManager::UnSubscribeKeyEvent(int32_t subscrib
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEvent& event)
 {
-    MMI_LOGT("MultimodalStandardizedEventManagerkey::OnKey");
+    MMI_LOGD("MultimodalStandardizedEventManagerkey::OnKey");
 #ifdef DEBUG_CODE_TEST
     if (event.GetDeviceUdevTags() == DEVICE_TYPE_VIRTUAL_KEYBOARD) {
-        MMI_LOGT("Inject, keyCode=%{public}d, action=%{public}d, revPid=%{public}d",
+        MMI_LOGD("Inject, keyCode=%{public}d, action=%{public}d, revPid=%{public}d",
             event.GetKeyCode(), event.IsKeyDown(), GetPid());
     }
 #endif
@@ -720,7 +720,7 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
              static_cast<int32_t>(pointerIds.size()));
 
-    for (int32_t pointerId : pointerIds) {
+    for (const auto &pointerId : pointerIds) {
         OHOS::MMI::PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
 
@@ -736,7 +736,7 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
     if (pressedKeys.empty()) {
         MMI_LOGI("Pressed keys is empty");
     } else {
-        for (int32_t keyCode : pressedKeys) {
+        for (auto &keyCode : pressedKeys) {
             MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
         }
     }

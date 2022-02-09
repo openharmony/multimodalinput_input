@@ -27,7 +27,7 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
     auto keys = key->GetKeyItems();
     int32_t size = keys.size();
     CHKR(packet.Write(size), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    for (auto &item : keys) {
+    for (const auto &item : keys) {
         CHKR(packet.Write(item.GetKeyCode()), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(packet.Write(item.GetDownTime()), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(packet.Write(item.GetDeviceId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
@@ -64,6 +64,7 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(bool skipId,
 
 int32_t InputEventDataTransformation::SerializeInputEvent(std::shared_ptr<InputEvent> event, NetPacket &packet)
 {
+    CHKPR(event, ERROR_NULL_POINTER, RET_ERR);
     CHKR(packet.Write(event->GetEventType()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(packet.Write(event->GetId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(packet.Write(event->GetActionTime()), STREAM_BUF_WRITE_FAIL, RET_ERR);
@@ -80,6 +81,7 @@ int32_t InputEventDataTransformation::SerializeInputEvent(std::shared_ptr<InputE
 int32_t InputEventDataTransformation::DeserializeInputEvent(bool skipId,
     std::shared_ptr<InputEvent> event, NetPacket &packet)
 {
+    CHKPR(event, ERROR_NULL_POINTER, RET_ERR);
     int32_t tField {  };
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
@@ -106,7 +108,6 @@ int32_t InputEventDataTransformation::DeserializeInputEvent(bool skipId,
 
 int32_t InputEventDataTransformation::SerializePointerEvent(std::shared_ptr<PointerEvent> event, NetPacket &packet)
 {
-    CHKPR(event, ERROR_NULL_POINTER, RET_ERR);
     CHKR((RET_OK == SerializeInputEvent(event, packet)), STREAM_BUF_WRITE_FAIL, RET_ERR);
 
     CHKR(packet.Write(event->GetPointerAction()), STREAM_BUF_WRITE_FAIL, RET_ERR);
@@ -136,7 +137,7 @@ int32_t InputEventDataTransformation::SerializePointerEvent(std::shared_ptr<Poin
     std::vector<int32_t> pointerIds { event->GetPointersIdList() };
     CHKR(packet.Write(pointerIds.size()), STREAM_BUF_WRITE_FAIL, RET_ERR);
 
-    for (int32_t pointerId : pointerIds) {
+    for (const auto &pointerId : pointerIds) {
         PointerEvent::PointerItem item;
         CHKR(event->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
 
@@ -155,7 +156,7 @@ int32_t InputEventDataTransformation::SerializePointerEvent(std::shared_ptr<Poin
 
     std::vector<int32_t> pressedKeys = event->GetPressedKeys();
     CHKR(packet.Write(pressedKeys.size()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    for (int32_t keyCode : pressedKeys) {
+    for (const auto &keyCode : pressedKeys) {
         CHKR(packet.Write(keyCode), STREAM_BUF_WRITE_FAIL, RET_ERR);
     }
     return RET_OK;

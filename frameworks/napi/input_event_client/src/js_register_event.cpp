@@ -332,8 +332,8 @@ static void AddStylusData(const napi_env& env, napi_value argv, const StylusEven
 bool SendMultimodalEvent(const napi_env& env, const CallbackMap& jsEvent, int32_t type,
                          const MultimodalEvent& event)
 {
-    MMI_LOGD("send event=%{public}s ", eventTable[type].c_str());
-    MMI_LOGD("CallbackMap size=%{public}d", static_cast<int32_t>(jsEvent.size()));
+    MMI_LOGD("send event: %{public}s, CallbackMap size: %{public}d",
+        eventTable[type].c_str(), static_cast<int32_t>(jsEvent.size()));
     size_t argc = 1;
     napi_value argv = nullptr;
     napi_value result = nullptr;
@@ -360,14 +360,14 @@ bool SendMultimodalEvent(const napi_env& env, const CallbackMap& jsEvent, int32_
         MMI_LOGE("invalid event=%{public}s", eventTable[type].c_str());
         return false;
     }
-    if (iter->second.size() == 0) {
+    if (iter->second.empty()) {
         MMI_LOGD("%{public}s do not have callback function", eventTable[type].c_str());
         return true;
     }
 
-    for (auto it = iter->second.begin(); it != iter->second.end(); it++) {
+    for (const auto &item : iter->second) {
         napi_value callback = nullptr;
-        if (napi_get_reference_value(env, *it, &callback) != napi_ok) {
+        if (napi_get_reference_value(env, item, &callback) != napi_ok) {
             MMI_LOGE("call napi_get_reference_value fail");
             return getResult;
         }
@@ -644,13 +644,13 @@ bool AppKeyEventHandle::SendEvent(const std::string& name, const OHOS::KeyEvent&
         MMI_LOGE("invalid event=%{public}s", name.c_str());
         return false;
     }
-    if (iter->second.size() == 0) {
+    if (iter->second.empty()) {
         MMI_LOGD("%{public}s do not have callback function", name.c_str());
         return true;
     }
-    for (auto it = iter->second.begin(); it != iter->second.end(); it++) {
+    for (const auto &item : iter->second) {
         napi_value callback = nullptr;
-        if (napi_get_reference_value(env_, *it, &callback) != napi_ok) {
+        if (napi_get_reference_value(env_, item, &callback) != napi_ok) {
             MMI_LOGE("call napi_get_reference_value fail");
             return getResult;
         }
@@ -702,14 +702,14 @@ bool AppTouchEventHandle::SendEvent(const std::string& name, const TouchEvent& e
         MMI_LOGE("invalid event=%{public}s", name.c_str());
         return false;
     }
-    if (iter->second.size() == 0) {
+    if (iter->second.empty()) {
         MMI_LOGD("%{public}s do not have callback function", name.c_str());
         return true;
     }
 
-    for (auto it = iter->second.begin(); it != iter->second.end(); it++) {
+    for (const auto &item : iter->second) {
         napi_value callback = nullptr;
-        if (napi_get_reference_value(env_, *it, &callback) != napi_ok) {
+        if (napi_get_reference_value(env_, item, &callback) != napi_ok) {
             MMI_LOGE("call napi_get_reference_value fail");
             return getResult;
         }
@@ -823,14 +823,14 @@ bool AppDeviceEventHandle::SendEvent(const std::string& name, const DeviceEvent&
         MMI_LOGE("invalid event=%{public}s", name.c_str());
         return false;
     }
-    if (iter->second.size() == 0) {
+    if (iter->second.empty()) {
         MMI_LOGD("%{public}s do not have callback function", name.c_str());
         return true;
     }
 
-    for (auto it = iter->second.begin(); it != iter->second.end(); it++) {
+    for (const auto &item : iter->second) {
         napi_value callback = nullptr;
-        if (napi_get_reference_value(env_, *it, &callback) != napi_ok) {
+        if (napi_get_reference_value(env_, item, &callback) != napi_ok) {
             MMI_LOGE("call napi_get_reference_value fail");
             return callback;
         }

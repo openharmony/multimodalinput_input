@@ -77,7 +77,7 @@ int32_t HdiInject::OnSetEventInject(const RawInputEvent& allEvent, int32_t devIn
     pack[0]->code = (uint32_t)allEvent.ev_code;
     pack[0]->value = (int32_t)allEvent.ev_value;
     pack[0]->timestamp = GetSysClockTime();
-    hdiInject->eventcallback_.EventPkgCallback((const EventPackage**)pack, 1, devIndex);
+    MMIHdiInject->eventcallback_.EventPkgCallback((const EventPackage**)pack, 1, devIndex);
     free(pack[0]);
     MMI_LOGI("Leave funtion OnSetEventInject");
 
@@ -137,7 +137,7 @@ void HdiInject::OnInitHdiServerStatus()
 
 void HdiInject::ShowAllDeviceInfo()
 {
-    for (auto item : deviceArray_) {
+    for (const auto &item : deviceArray_) {
         MMI_LOGI("deviceName = %{public}s, devIndex = %{public}d, status = %{public}d, devType = %{public}d",
             item.chipName, item.devIndex, item.status, item.devType);
     }
@@ -150,8 +150,7 @@ int32_t HdiInject::GetDeviceCount()
 
 bool HdiInject::SetDeviceHotStatus(int32_t devIndex, int32_t status)
 {
-    vector<DeviceInformation>::iterator iter;
-    for (iter = deviceArray_.begin(); iter != deviceArray_.end(); ++iter) {
+    for (auto iter = deviceArray_.begin(); iter != deviceArray_.end(); ++iter) {
         if (iter->devIndex == devIndex) {
             if (iter->status != status) {
                 iter->status = ~status + 1;
@@ -169,20 +168,23 @@ bool HdiInject::SyncDeviceHotStatus()
 {
     const uint16_t count = static_cast<uint16_t>(deviceArray_.size());
     event_ = (HotPlugEvent**)malloc(count * sizeof(HotPlugEvent));
+    if (event_ == nullptr) {
+        MMI_LOGE("alloc buffer failed");
+        return false;
+    }
     for (int32_t i = 0; i < count; i++) {
         event_[i]->devIndex = deviceArray_[i].devIndex;
         event_[i]->devType = deviceArray_[i].devType;
         event_[i]->status = deviceArray_[i].status;
-        hdiInject->hotPlugcallback_.HotPlugCallback((const HotPlugEvent*)&event_[i]);
+        MMIHdiInject->hotPlugcallback_.HotPlugCallback((const HotPlugEvent*)&event_[i]);
     }
-
     return true;
 }
 
 bool HdiInject::ReportHotPlugEvent()
 {
     SyncDeviceHotStatus();
-    hdiInject->hotPlugcallback_.HotPlugCallback(*event_);
+    MMIHdiInject->hotPlugcallback_.HotPlugCallback(*event_);
 
     return true;
 }
@@ -202,32 +204,29 @@ bool HdiInject::ReportHotPlugEvent(uint32_t devIndex, uint32_t status)
         static_cast<uint32_t>(devType),
         static_cast<uint32_t>(status)
     };
-    hdiInject->hotPlugcallback_.HotPlugCallback(&event);
+    MMIHdiInject->hotPlugcallback_.HotPlugCallback(&event);
 
     return true;
 }
 
 int32_t HdiInject::GetDevTypeByIndex(int32_t devIndex)
 {
-    vector<DeviceInformation>::iterator iter;
-    for (iter = deviceArray_.begin(); iter != deviceArray_.end(); ++iter) {
-        if (devIndex == iter->devIndex) {
-            return iter->devType;
+    for (const auto &item : deviceArray_) {
+        if (devIndex == item.devIndex) {
+            return item.devType;
         }
     }
-
     return RET_ERR;
 }
 
 int32_t HdiInject::GetDevIndexByType(int32_t devType)
 {
     vector<DeviceInformation>::iterator iter;
-    for (iter = deviceArray_.begin(); iter != deviceArray_.end(); ++iter) {
-        if (devType == iter->devType) {
-            return iter->devIndex;
+    for (const auto &item : deviceArray_) {
+        if (devType == item.devType) {
+            return item.devIndex;
         }
     }
-
     return RET_ERR;
 }
 
@@ -249,7 +248,7 @@ int32_t HdiInject::ScanInputDevice(DevDesc *staArr, uint32_t arrLen)
 
 static int32_t ScanInputDevice(DevDesc *staArr, uint32_t arrLen)
 {
-    return hdiInject->ScanInputDevice(staArr, arrLen);
+    return MMIHdiInject->ScanInputDevice(staArr, arrLen);
 }
 
 static int32_t OpenInputDevice(uint32_t devIndex)
@@ -320,7 +319,7 @@ static int32_t RunExtraCommand(uint32_t devIndex, InputExtraCmd *cmd)
 
 static int32_t RegisterReportCallback(uint32_t devIndex, InputEventCb *callback)
 {
-    hdiInject->eventcallback_.EventPkgCallback = callback->EventPkgCallback;
+    MMIHdiInject->eventcallback_.EventPkgCallback = callback->EventPkgCallback;
 
     return 0;
 }
@@ -332,7 +331,7 @@ static int32_t UnregisterReportCallback(uint32_t devIndex)
 
 static int32_t RegisterHotPlugCallback(InputHostCb *callback)
 {
-    hdiInject->hotPlugcallback_.HotPlugCallback = callback->HotPlugCallback;
+    MMIHdiInject->hotPlugcallback_.HotPlugCallback = callback->HotPlugCallback;
 
     return 0;
 }
@@ -371,7 +370,7 @@ static InputReporter interfaceReport = {
 
 int32_t GetInputInterfaceFromInject(IInputInterface **interface)
 {
-    hdiInject->InitDeviceInfo();
+    MMIHdiInject->InitDeviceInfo();
     int32_t ret = 0;
     IInputInterface* injectInterface = new(IInputInterface);
     *interface = injectInterface;

@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_CLIENT_MSG_HANDLER_H
-#define OHOS_CLIENT_MSG_HANDLER_H
+#ifndef CLIENT_MSG_HANDLER_H
+#define CLIENT_MSG_HANDLER_H
 
 #include "if_client_msg_handler.h"
 #include "key_event_input_subscribe_manager.h"
@@ -106,10 +106,12 @@ private:
     void TraceKeyEvent(const EventKeyboard& key) const;
     void TracePointerEvent(const EventPointer& pointData) const;
     void TraceTouchEvent(const EventTouch& touchData) const;
+    static void OnEventProcessed(int32_t eventId);
 
 private:
     bool isServerReqireStMessage_ = true;
+    std::function<void(int32_t)> eventProcessedCallback_;
 };
 }
 }
-#endif
+#endif // CLIENT_MSG_HANDLER_H

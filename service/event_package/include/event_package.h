@@ -14,7 +14,6 @@
  */
 #ifndef OHOS_EVENT_PACKAGE_H
 #define OHOS_EVENT_PACKAGE_H
-#include "mouse_state_gesture.h"
 #include "pointer_event.h"
 #include "key_event.h"
 #include "input_windows_manager.h"
@@ -45,7 +44,6 @@ namespace OHOS::MMI {
         int32_t PackageTabletPadKeyEvent(libinput_event *event, EventKeyboard& key);
         static int32_t PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key);
         static int32_t KeyboardToKeyEvent(const EventKeyboard& key, std::shared_ptr<KeyEvent> keyEventPtr);
-        static std::shared_ptr<OHOS::MMI::PointerEvent> LibinputEventToPointerEvent(libinput_event *event);
     private:
         void PackageTabletPadOtherParams(libinput_event *event, EventTabletPad& tabletPad);
         int32_t PackageTabletToolOtherParams(libinput_event *event, EventTabletTool& tableTool);
@@ -60,10 +58,10 @@ namespace OHOS::MMI {
     int32_t EventPackage::PackageRegisteredEvent(const T& data, RegisteredEvent& event)
     {
         int32_t ret = memcpy_s(event.physical, MAX_DEVICENAME, data.physical, MAX_DEVICENAME);
-        CHKR(ret != EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
+        CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
         const std::string uid = GetUUid();
         ret = memcpy_s(event.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size());
-        CHKR(ret != EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
+        CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
         event.deviceId = data.deviceId;
         event.eventType = data.eventType;
         event.deviceType = data.deviceType;

@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_UTIL_H
-#define OHOS_UTIL_H
+#ifndef UTIL_H
+#define UTIL_H
 
 #include <map>
 #include <string>
@@ -54,4 +54,5 @@ namespace MMI {
     std::string StringFmt(const char* str, ...);
 }
 }
-#endif
+
+#endif // UTIL_H
