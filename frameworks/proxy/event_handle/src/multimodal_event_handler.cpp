@@ -28,6 +28,7 @@ namespace MMI {
 
 void OnConnected(const OHOS::MMI::IfMMIClient& client)
 {
+#ifdef OHOS_WESTEN_MODEL
     int32_t winId = 0;
     int32_t abilityId = 0;
     std::string bundlerName = "EmptyBundlerName";
@@ -55,7 +56,9 @@ void OnConnected(const OHOS::MMI::IfMMIClient& client)
         }
         EventManager.RegisterStandardizedEventHandle(val.token, val.windowId, val.standardizedEventHandle);
     }
+#else
     InputManagerImpl::GetInstance()->OnConnected();
+#endif
 }
 
 MultimodalEventHandler::MultimodalEventHandler()
