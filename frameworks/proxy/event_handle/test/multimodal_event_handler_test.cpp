@@ -94,7 +94,6 @@ void MultimodalEventHandlerTest::TearDownTestCase()
 void MultimodalEventHandlerTest::RegisterStandardizedEventHandle()
 {
     MMI_LOGI("MMIClientDemo RegisterStandardizedEventHandle enter.");
-    MMI_LOGT("Register key event.");
     using namespace OHOS::MMI;
     auto appKey = CreateEvent<AppKeyEventHandle>();
     handerMap_[std::string("AppKeyEventHandle")] = appKey;
@@ -156,7 +155,7 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_InjectKeyEvent_001, 
     std::vector<std::string> vLog;
     ASSERT_TRUE(runCommand.RunShellCommand(command, vLog) == RET_OK);
     ASSERT_TRUE(vLog.size() > 0);
-    if (log.size() == 0) {
+    if (log.empty()) {
         EXPECT_TRUE(vLog.size() > log.size());
         EXPECT_TRUE(vLog.back().find(command) != vLog.back().npos);
     } else {

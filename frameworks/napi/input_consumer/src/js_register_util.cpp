@@ -151,7 +151,7 @@ int32_t AddEventCallback(const napi_env &env, OHOS::MMI::CallbackMaps &callbackM
         }
         it++;
     }
-    if (iter->second.size() > 0) {
+    if (!iter->second.empty()) {
         preSubscribeId = iter->second.front()->subscribeId;
     }
     iter->second.push_back(event);
@@ -182,7 +182,7 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::CallbackMaps &callbackM
             napi_delete_reference(env, (*it)->callback[0]);
             KeyEventMonitorInfo *monitorInfo = *it;
             iter->second.erase(it);
-            if (iter->second.size() <= 0) {
+            if (iter->second.empty()) {
                 subscribeId = monitorInfo->subscribeId;
             }
             delete monitorInfo;

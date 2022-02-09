@@ -81,10 +81,8 @@ void ServerInputFilterManager::KeyEventFilter::SetAuthority(Authority authority)
 void ServerInputFilterManager::OnKeyEventTrace(const EventKeyboard& key)
 {
     char keyUuid[MAX_UUIDSIZE] = {0};
-    if (EOK != memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid))) {
-        MMI_LOGT("%{public}s copy data failed", __func__);
-        return;
-    }
+    int32_t ret = memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid));
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     MMI_LOGT("OnKeyEvent service trace keyUuid = %{public}s", keyUuid);
     std::string keyEvent = keyUuid;
     keyEvent = "OnKeyEvent service keyUuid:" + keyEvent;
@@ -96,8 +94,8 @@ bool ServerInputFilterManager::OnKeyEvent(const EventKeyboard& key)
 {
     MMI_LOGT("Enter");
     OnKeyEventTrace(key);
-    if (keyEventFilterMap_.size() == 0) {
-        MMI_LOGT("The keyEventFilterMap_ size is zero");
+    if (keyEventFilterMap_.empty()) {
+        MMI_LOGT("keyEventFilterMap_ is empty");
         return false;
     }
     SessionPtr temp;
@@ -242,10 +240,8 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
 void ServerInputFilterManager::OnTouchEventTrace(const EventTouch& touch)
 {
     char touchUuid[MAX_UUIDSIZE] = {0};
-    if (EOK != memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid))) {
-        MMI_LOGT("%{public}s copy data failed", __func__);
-        return;
-    }
+    int32_t ret = memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid));
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     MMI_LOGT("OnTouchEvent service touchUuid = %{public}s", touchUuid);
     std::string touchEvent = touchUuid;
     touchEvent = "OnTouchEvent service touchUuid:" + touchEvent;
@@ -259,8 +255,8 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
     CHKF(event, PARAM_INPUT_INVALID);
     MMI_LOGT("Enter");
     OnTouchEventTrace(touch);
-    if (touchEventFilterMap_.size() == 0) {
-        MMI_LOGE("TouchEventFilterMap_ size is zero");
+    if (touchEventFilterMap_.empty()) {
+        MMI_LOGE("touchEventFilterMap_ is empty");
         return false;
     }
     SessionPtr temp;
@@ -317,7 +313,7 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
             for (std::pair<uint32_t, int32_t> touchId : touchIds) {
                 EventTouch touchTemp = {};
                 errno_t retErr = memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch));
-                CHKF(EOK == retErr, MEMCPY_SEC_FUN_FAIL);
+                CHKF(retErr == EOK, MEMCPY_SEC_FUN_FAIL);
                 MMIRegEvent->GetTouchInfo(touchId, touchTemp);
                 MMI_LOGT("4.event filter of server 1:eventTouch:time=%{public}" PRId64 ",deviceType=%{public}u,"
                          "deviceName=%{public}s,physical=%{public}s,eventType=%{public}d,"
@@ -401,10 +397,8 @@ int32_t ServerInputFilterManager::RemoveTouchEventFilter(SessionPtr sess)
 void ServerInputFilterManager::OnPointerEventTrace(const EventPointer& event_pointer)
 {
     char pointerUuid[MAX_UUIDSIZE] = {0};
-    if (EOK != memcpy_s(pointerUuid, sizeof(pointerUuid), event_pointer.uuid, sizeof(event_pointer.uuid))) {
-        MMI_LOGT("%{public}s copy data failed", __func__);
-        return;
-    }
+    int32_t ret = memcpy_s(pointerUuid, sizeof(pointerUuid), event_pointer.uuid, sizeof(event_pointer.uuid));
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     MMI_LOGT("OnPointerEvent service pointerUuid=%{public}s", pointerUuid);
     std::string pointerEvent = pointerUuid;
     pointerEvent = "OnPointerEvent service pointerUuid:" + pointerEvent;
@@ -416,8 +410,8 @@ bool ServerInputFilterManager::OnPointerEvent(EventPointer event_pointer)
 {
     MMI_LOGT("Enter");
     OnPointerEventTrace(event_pointer);
-    if (pointerEventFilterMap_.size() == 0) {
-        MMI_LOGT("PointerEventFilterMap_ size is zero");
+    if (pointerEventFilterMap_.empty()) {
+        MMI_LOGT("pointerEventFilterMap_ is empty");
         return false;
     }
     SessionPtr ptr;

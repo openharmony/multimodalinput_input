@@ -312,8 +312,8 @@ void OHOS::MMI::InputWindowsManager::SaveScreenInfoToMap(const ScreenInfo** scre
             SurfaceInfo** pstrSurface = pstrLayerInfo[j]->surfaces;
             for (int32_t k = 0; k < nsurfaces; k++) {
                 MMISurfaceInfo mySurfaceTmp = {};
-                CHK(EOK == memcpy_s(&mySurfaceTmp, sizeof(mySurfaceTmp), pstrSurface[k], sizeof(SurfaceInfo)),
-                    MEMCPY_SEC_FUN_FAIL);
+                int32_t ret = memcpy_s(&mySurfaceTmp, sizeof(mySurfaceTmp), pstrSurface[k], sizeof(SurfaceInfo));
+                CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
                 mySurfaceTmp.screenId = screenInfo[i]->screenId;
                 surfaces_.insert(std::pair<int32_t, MMISurfaceInfo>(mySurfaceTmp.surfaceId, mySurfaceTmp));
                 AddId(surfaceList, mySurfaceTmp.surfaceId);
@@ -482,8 +482,8 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent>
 int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<InputEvent> inputEvent)
 {
     MMI_LOGD("enter");
-    if (logicalDisplays_.size() <= 0) {
-        MMI_LOGE("logicalDisplays_ size is 0");
+    if (logicalDisplays_.empty()) {
+        MMI_LOGE("logicalDisplays_ is empty");
         return RET_ERR;
     }
 
@@ -539,7 +539,7 @@ void OHOS::MMI::InputWindowsManager::UpdateDisplayInfo(const std::vector<Physica
             windowInfos_.insert(std::pair<int32_t, WindowInfo>(myWindow.id, myWindow));
         }
     }
-    if (logicalDisplays.size() > 0) {
+    if (!logicalDisplays.empty()) {
         DrawWgr->TellDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
     }
     PrintDisplayDebugInfo();
@@ -549,7 +549,7 @@ void OHOS::MMI::InputWindowsManager::UpdateDisplayInfo(const std::vector<Physica
 void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
 {
     MMI_LOGD("physicalDisplays,num:%{public}d", static_cast<int32_t>(physicalDisplays_.size()));
-    for (int32_t i = 0; i < static_cast<int32_t>(physicalDisplays_.size()); i++) {
+    for (size_t i = 0; i < physicalDisplays_.size(); i++) {
         MMI_LOGD("PhysicalDisplays, id:%{public}d, leftDisplay:%{public}d, upDisplay:%{public}d, "
             "topLeftX:%{public}d, topLeftY:%{public}d, width:%{public}d, height:%{public}d, name:%{public}s, "
             "seatId:%{public}s, seatName:%{public}s, logicWidth:%{public}d, logicHeight:%{public}d, "
@@ -562,7 +562,7 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
     }
 
     MMI_LOGD("logicalDisplays,num:%{public}d", static_cast<int32_t>(logicalDisplays_.size()));
-    for (int32_t i = 0; i < static_cast<int32_t>(logicalDisplays_.size()); i++) {
+    for (size_t i = 0; i < logicalDisplays_.size(); i++) {
         MMI_LOGD("logicalDisplays, id:%{public}d,topLeftX:%{public}d, topLeftY:%{public}d, "
             "width:%{public}d,height:%{public}d,name:%{public}s,"
             "seatId:%{public}s, seatName:%{public}s,focusWindowId:%{public}d,window num:%{public}d",
@@ -581,7 +581,7 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
     }
 }
 
-bool OHOS::MMI::InputWindowsManager::TpPoint2LogicDisplayPoint2(libinput_event_touch* touch,
+bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint_2(libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
 {
     if (screensInfo_ != nullptr) {
@@ -614,7 +614,7 @@ OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::FindMatchedPhysi
     return nullptr;
 }
 
-bool OHOS::MMI::InputWindowsManager::TansformTouchscreePointToLogicalDisplayPoint(libinput_event_touch* touch,
+bool OHOS::MMI::InputWindowsManager::TransformTouchPointToDisplayPoint(libinput_event_touch* touch,
     int32_t targetDisplayId, int32_t& displayX, int32_t& displayY)
 {
 
@@ -662,7 +662,7 @@ bool OHOS::MMI::InputWindowsManager::TansformTouchscreePointToLogicalDisplayPoin
     return false;
 }
 
-bool OHOS::MMI::InputWindowsManager::TpPointLogicDisplayPoint(libinput_event_touch* touch,
+bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint(libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
 {
 
@@ -787,7 +787,7 @@ void OHOS::MMI::InputWindowsManager::AdjustCoordinate(double &coordinateX, doubl
         coordinateY = 0;
     }
 
-    if (logicalDisplays_.size() == 0) {
+    if (logicalDisplays_.empty()) {
         return;
     }
 
@@ -809,7 +809,7 @@ void OHOS::MMI::InputWindowsManager::FixCursorPosition(int32_t &globalX, int32_t
         globalY = 0;
     }
 
-    if (logicalDisplays_.size() == 0) {
+    if (logicalDisplays_.empty()) {
         return;
     }
 
@@ -854,7 +854,6 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     int32_t globalY = pointerItem.GetGlobalY();
     FixCursorPosition(globalX, globalY, IMAGE_SIZE, IMAGE_SIZE);
     DrawWgr->DrawPointer(displayId, globalX, globalY);
-
     WindowInfo *focusWindow = nullptr;
     int32_t action = pointerEvent->GetPointerAction();
     if ((firstBtnDownWindow_.pid == 0)
@@ -1022,7 +1021,6 @@ bool OHOS::MMI::InputWindowsManager::FindWindow(std::shared_ptr<PointerEvent> po
                 pointerEvent->AddPointerItem(pointerItem);
 
                 MMI_LOGD("localX:%{public}d,localY:%{public}d", localX, localY);
-                MMI_LOGD("leave");
                 return true;
             }
         }

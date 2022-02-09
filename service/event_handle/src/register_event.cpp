@@ -124,11 +124,9 @@ int32_t RegisterEvent::SetPrevKeyValue(EventKeyboard& prevKey)
     prevKey.deviceType = key_.deviceType;
     prevKey.eventType = key_.eventType;
     prevKey.deviceId = key_.deviceId;
-    int32_t ret = memcpy_s(prevKey.deviceName, sizeof(prevKey.deviceName), key_.deviceName,
-                   sizeof(key_.deviceName));
+    int32_t ret = memcpy_s(prevKey.deviceName, sizeof(prevKey.deviceName), key_.deviceName, sizeof(key_.deviceName));
     CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
-    ret = memcpy_s(prevKey.physical, sizeof(prevKey.physical), key_.physical,
-                   sizeof(key_.physical));
+    ret = memcpy_s(prevKey.physical, sizeof(prevKey.physical), key_.physical, sizeof(key_.physical));
     CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
     return RET_OK;
 }

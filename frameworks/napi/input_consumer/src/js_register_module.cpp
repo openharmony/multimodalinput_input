@@ -100,8 +100,8 @@ static napi_value GetEventInfo(napi_env env, napi_callback_info info, KeyEventMo
     subKeyNames += ",";
     keyOption->SetFinalKeyDown(isFinalKeyDown);
 
-    MMI_LOGD("isFinalKeyDown = %{public}d", (isFinalKeyDown == true?1:0));
-    MMI_LOGD("map_key = %{public}s", subKeyNames.c_str());
+    MMI_LOGD("isFinalKeyDown: %{public}d, map_key: %{public}s",
+        (isFinalKeyDown == true?1:0), subKeyNames.c_str());
 
     int32_t finalKeyDownDuriation = GetNamedPropertyInt32(env, argv[ARGV_SECOND], "finalKeyDownDuration");
     napi_get_value_int32(env, receiceValue, &finalKeyDownDuriation);
@@ -244,8 +244,7 @@ static napi_value SubscribeKeyEventMonitor(napi_env env, napi_callback_info info
     }
 
     if (preSubscribeId <= 0) {
-        MMI_LOGD("eventType = %{public}s", event->eventType.c_str());
-        MMI_LOGD("eventName = %{public}s", event->name.c_str());
+        MMI_LOGD("eventType: %{public}s, eventName: %{public}s", event->eventType.c_str(),  event->name.c_str());
         int32_t subscribeId = -1;
         subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubKeyEventCallback);
         if (subscribeId < 0) {

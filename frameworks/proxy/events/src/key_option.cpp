@@ -24,12 +24,6 @@ std::vector<int32_t> KeyOption::GetPreKeys() const
 void KeyOption::SetPreKeys(const std::vector<int32_t> &preKeys)
 {
     preKeys_ = preKeys;
-    preKeySize_ = preKeys_.size();
-}
-
-uint32_t KeyOption::GetPreKeySize()
-{
-    return preKeySize_;
 }
 
 int32_t KeyOption::GetFinalKey() const

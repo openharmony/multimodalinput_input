@@ -480,10 +480,8 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
 void InputEventHandler::OnEventKeyboardTrace(const EventKeyboard& keyBoard)
 {
     char keyUuid[MAX_UUIDSIZE] = {0};
-    if (EOK != memcpy_s(keyUuid, sizeof(keyUuid), keyBoard.uuid, sizeof(keyBoard.uuid))) {
-        MMI_LOGT("%{public}s copy data failed", __func__);
-        return;
-    }
+    int32_t ret = memcpy_s(keyUuid, sizeof(keyUuid), keyBoard.uuid, sizeof(keyBoard.uuid));
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     MMI_LOGT(" OnEventKeyboard service reported keyUuid = %{public}s", keyUuid);
     std::string keyEvent = keyUuid;
     keyEvent = "OnEventKeyboard service reported keyUuid: " + keyEvent;
@@ -537,10 +535,8 @@ int32_t InputEventHandler::OnEventKeyboard(const multimodal_libinput_event& ev)
 void InputEventHandler::OnEventPointerTrace(const EventPointer& point)
 {
     char pointerUuid[MAX_UUIDSIZE] = {0};
-    if (EOK != memcpy_s(pointerUuid, sizeof(pointerUuid), point.uuid, sizeof(point.uuid))) {
-        MMI_LOGT("%{public}s copy data failed", __func__);
-        return;
-    }
+    int32_t ret = memcpy_s(pointerUuid, sizeof(pointerUuid), point.uuid, sizeof(point.uuid));
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     MMI_LOGT(" OnEventPointer service reported pointerUuid = %{public}s", pointerUuid);
     std::string pointerEvent = pointerUuid;
     pointerEvent = "OnEventPointer service reported pointerUuid: " + pointerEvent;
@@ -658,10 +654,8 @@ int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 void InputEventHandler::OnEventTouchTrace(const EventTouch& touch)
 {
     char touchUuid[MAX_UUIDSIZE] = {0};
-    if (memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid))) {
-        MMI_LOGT("%{public}s copy data failed", __func__);
-        return;
-    }
+    int32_t ret = memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid));
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     MMI_LOGT("OnEventTouch service reported touchUuid:%{public}s", touchUuid);
     std::string touchEvent = touchUuid;
     touchEvent = "OnEventTouch service reported touchUuid:" + touchEvent;
@@ -714,20 +708,32 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGT("InputEventHandler::OnGestureEvent");
-    uint64_t sysStartProcessTime = GetSysClockTime();
-    EventGesture gesture = {};
-    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
-
-    auto pointerEvent = EventPackage::LibinputEventToPointerEvent(event);
-    if (RET_OK == eventDispatch_.HandlePointerEvent(pointerEvent)) {
-        MMI_LOGD("interceptor of OnGestureEvent end");
-        return RET_OK;
+    auto pointer = TouchTransformPointManger->OnTouchPadGestrueEvent(event);
+    if (pointer == nullptr) {
+        MMI_LOGE("Gesture event package failed, errCode:%{public}d", GESTURE_EVENT_PKG_FAIL);
+        return GESTURE_EVENT_PKG_FAIL;
     }
-    auto eventDispatchResult = eventDispatch_.DispatchGestureNewEvent(*udsServer_, event,
-                                                                      pointerEvent, sysStartProcessTime);
-    if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Gesture New event dispatch failed, ret:%{public}d, errCode:%{public}d",
-            eventDispatchResult, GESTURE_EVENT_DISP_FAIL);
+    MMI_LOGT("GestrueEvent package:eventType=%{public}d, actionTime=%{public}d, "
+             "action=%{public}d, actionStartTime=%{public}d, "
+             "pointerAction=%{public}d, sourceType=%{public}d, "
+             "PinchAxisValue=%{public}.2f",
+             pointer->GetEventType(), pointer->GetActionTime(),
+             pointer->GetAction(), pointer->GetActionStartTime(),
+             pointer->GetPointerAction(), pointer->GetSourceType(),
+             pointer->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH));
+
+    PointerEvent::PointerItem item;
+    pointer->GetPointerItem(pointer->GetPointerId(), item);
+    MMI_LOGT("item:DownTime=%{public}d, IsPressed=%{public}s, "
+             "GlobalX=%{public}d, GlobalY=%{public}d, LocalX=%{public}d, LocalY=%{public}d "
+             "Width=%{public}d, Height=%{public}d, DeviceId=%{public}d",
+             item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
+             item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
+             item.GetWidth(), item.GetHeight(), item.GetDeviceId());
+
+    int32_t ret = eventDispatch_.HandlePointerEvent(pointer);
+    if (ret != RET_OK) {
+        MMI_LOGE("Gesture event dispatch failed, errCode:%{public}d", GESTURE_EVENT_DISP_FAIL);
         return GESTURE_EVENT_DISP_FAIL;
     }
     return RET_OK;
@@ -945,7 +951,7 @@ int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEv
         pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
         pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
     PointerEvent::PointerItem item;
-    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
+    CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item), PARAM_INPUT_FAIL, RET_ERR);
     MMI_LOGI("MouseEvent Item Normalization Results : DownTime = %{public}d, IsPressed = %{public}d,"
         "GlobalX = %{public}d, GlobalY = %{public}d, LocalX = %{public}d, LocalY = %{public}d, Width = %{public}d,"
         "Height = %{public}d, Pressure = %{public}d, DeviceId = %{public}d",

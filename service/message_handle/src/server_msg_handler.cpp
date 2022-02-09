@@ -26,6 +26,7 @@
 #include "input_handler_manager_global.h"
 #include "input_windows_manager.h"
 #include "interceptor_manager_global.h"
+#include "key_event_subscriber.h"
 #include "knuckle_func_proc.h"
 #include "mmi_func_callback.h"
 #include "mmi_server.h"
@@ -641,29 +642,31 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveEventInterceptor(SessionPtr sess, N
 
 int32_t OHOS::MMI::ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
 {
-    int32_t handlerId { };
-    InputHandlerType handlerType { };
-    pkt >> handlerId >> handlerType;
-    MMI_LOGD("OnAddInputHandler handlerId : %{public}d handlerType : %{public}d", handlerId, handlerType);
-    InputHandlerManagerGlobal::GetInstance().AddInputHandler(handlerId, handlerType, sess);
-    return RET_OK;
+    int32_t handlerId;
+    InputHandlerType handlerType;
+    CHKR(pkt.Read(handlerId), STREAM_BUF_READ_FAIL, RET_ERR);
+    CHKR(pkt.Read(handlerType), STREAM_BUF_READ_FAIL, RET_ERR);
+    MMI_LOGD("OnAddInputHandler handler=%{public}d, handlerType=%{public}d.", handlerId, handlerType);
+    return InputHandlerManagerGlobal::GetInstance().AddInputHandler(handlerId, handlerType, sess);
 }
 
 int32_t OHOS::MMI::ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
 {
-    int32_t handlerId { };
-    InputHandlerType handlerType { };
-    pkt >> handlerId >> handlerType;
-    MMI_LOGD("OnRemoveInputHandler handlerId : %{public}d handlerType : %{public}d", handlerId, handlerType);
+    int32_t handlerId;
+    InputHandlerType handlerType;
+    CHKR(pkt.Read(handlerId), STREAM_BUF_READ_FAIL, RET_ERR);
+    CHKR(pkt.Read(handlerType), STREAM_BUF_READ_FAIL, RET_ERR);
+    MMI_LOGD("OnRemoveInputHandler handler=%{public}d, handlerType=%{public}d.", handlerId, handlerType);
     InputHandlerManagerGlobal::GetInstance().RemoveInputHandler(handlerId, handlerType, sess);
     return RET_OK;
 }
 
 int32_t OHOS::MMI::ServerMsgHandler::OnMarkConsumed(SessionPtr sess, NetPacket& pkt)
 {
-    int32_t monitorId { }, eventId { };
-    pkt >> monitorId >> eventId;
-    InputHandlerManagerGlobal::GetInstance().MarkConsumed(monitorId, sess);
+    int32_t monitorId, eventId;
+    CHKR(pkt.Read(monitorId), STREAM_BUF_READ_FAIL, RET_ERR);
+    CHKR(pkt.Read(eventId), STREAM_BUF_READ_FAIL, RET_ERR);
+    InputHandlerManagerGlobal::GetInstance().MarkConsumed(monitorId, eventId, sess);
     return RET_OK;
 }
 
@@ -671,22 +674,22 @@ int32_t OHOS::MMI::ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPac
 {
     int32_t subscribeId = -1;
     uint32_t preKeySize = 0;
-    std::vector<int32_t> preKeys;
-    int32_t tmpKey = -1;
     int32_t finalKey = -1;
     bool isFinalKeyDown = true;
     int32_t finalKeyDownDuration = 0;
     pkt >> subscribeId >> finalKey >> isFinalKeyDown >> finalKeyDownDuration >> preKeySize;
-    for (auto i = 0U; i < preKeySize; ++i) {
+    std::vector<int32_t> preKeys;
+    for (int32_t i = 0; i < preKeySize; ++i) {
+        int32_t tmpKey = -1;
         pkt >> tmpKey;
         preKeys.push_back(tmpKey);
     }
-    std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
+    auto keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     keyOption->SetPreKeys(preKeys);
     keyOption->SetFinalKey(finalKey);
     keyOption->SetFinalKeyDown(isFinalKeyDown);
     keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
-    int32_t ret = KeyEventInputSubscribeFlt.SubscribeKeyEvent(sess, subscribeId, keyOption);
+    int32_t ret = KeyEventSubscriber_.SubscribeKeyEvent(sess, subscribeId, keyOption);
     return ret;
 }
 
@@ -694,7 +697,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnUnSubscribeKeyEvent(SessionPtr sess, NetP
 {
     int32_t subscribeId = -1;
     pkt >> subscribeId;
-    int32_t ret = KeyEventInputSubscribeFlt.UnSubscribeKeyEvent(sess, subscribeId);
+    int32_t ret = KeyEventSubscriber_.UnSubscribeKeyEvent(sess, subscribeId);
     return ret;
 }
 
@@ -825,7 +828,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnAddInputEventMontior(SessionPtr sess, Net
     if (eventType != OHOS::MMI::InputEvent::EVENT_TYPE_KEY) {
         return RET_ERR;
     }
-    InputMonitorServiceMgr.AddInputEventMontior(eventType, sess);
+    InputMonitorServiceMgr.AddInputEventMontior(sess, eventType);
     return RET_OK;
 }
 
@@ -850,7 +853,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveInputEventMontior(SessionPtr sess, 
     if (eventType != OHOS::MMI::InputEvent::EVENT_TYPE_KEY) {
         return RET_ERR;
     }
-    InputMonitorServiceMgr.RemoveInputEventMontior(eventType, sess);
+    InputMonitorServiceMgr.RemoveInputEventMontior(sess, eventType);
     return RET_OK;
 }
 
@@ -862,7 +865,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveInputEventTouchpadMontior(SessionPt
     if (eventType != OHOS::MMI::InputEvent::EVENT_TYPE_POINTER) {
         return RET_ERR;
     }
-    InputMonitorServiceMgr.RemoveInputEventMontior(eventType, sess);
+    InputMonitorServiceMgr.RemoveInputEventMontior(sess, eventType);
     return RET_OK;
 }
 int32_t OHOS::MMI::ServerMsgHandler::OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt)
