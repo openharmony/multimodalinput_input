@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_TIME_COST_CHK_H
-#define OHOS_TIME_COST_CHK_H
+#ifndef TIME_COST_CHK_H
+#define TIME_COST_CHK_H
 #include <inttypes.h>
 
 #define MAX_INPUT_EVENT_TIME (1000)
@@ -68,4 +68,4 @@ private:
     const int64_t llParam2_ = 0;
 };
 }
-#endif
+#endif // TIME_COST_CHK_H

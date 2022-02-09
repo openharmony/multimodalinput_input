@@ -25,4 +25,4 @@ auto MsgCallbackBind2(MemberFunType func, ClassType* obj)
 }
 }
 }
-#endif
+#endif // MMI_FUNC_CALLBACK_H
