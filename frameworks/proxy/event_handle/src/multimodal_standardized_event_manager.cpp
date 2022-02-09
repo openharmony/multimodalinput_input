@@ -741,7 +741,7 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
         }
     }
     OHOS::MMI::NetPacket netPkt(MmiMessageId::INJECT_POINTER_EVENT);
-    CHKR((RET_OK == InputEventDataTransformation::SerializePointerEvent(pointerEvent, netPkt)),
+    CHKR((RET_OK == InputEventDataTransformation::Marshalling(pointerEvent, netPkt)),
         STREAM_BUF_WRITE_FAIL, RET_ERR);
     MMI_LOGD("Pointer event packaged, send to server!");
     CHKR(SendMsg(netPkt), MSG_SEND_FAIL, RET_ERR);
