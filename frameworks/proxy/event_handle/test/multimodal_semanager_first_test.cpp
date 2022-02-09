@@ -509,6 +509,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnShowMenu_007, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnShowMenu(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnShowMenu_008, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -601,6 +602,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnSend_005, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnSend(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnSend_006, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -634,6 +636,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnSend_007, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnSend(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnSend_008, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -650,6 +653,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnSend_008, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnSend(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnCopy_001, TestSize.Level1)
 {
     MultimodalEventThirdUnitTest multimodalTest;
@@ -759,6 +763,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnCopy_007, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnCopy(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnCopy_008, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -775,6 +780,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnCopy_008, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnCopy(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnPaste_001, TestSize.Level1)
 {
     MultimodalEventThirdUnitTest multimodalTest;
@@ -850,6 +856,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnPaste_005, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnPaste(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnPaste_006, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -883,6 +890,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnPaste_007, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnPaste(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnPaste_008, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -899,6 +907,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnPaste_008, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnPaste(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnCut_001, TestSize.Level1)
 {
     MultimodalEventThirdUnitTest multimodalTest;
@@ -1008,6 +1017,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnCut_007, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnCut(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnCut_008, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -1049,6 +1059,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnUndo_002, TestSize.Level1)
     int32_t retResult = multimodalTest.OnUndo(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnUndo_003, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -1133,6 +1144,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnUndo_007, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnUndo(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnUndo_008, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -1149,6 +1161,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnUndo_008, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnUndo(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnRefresh_001, TestSize.Level1)
 {
     MultimodalEventThirdUnitTest multimodalTest;
@@ -1224,6 +1237,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnRefresh_005, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnRefresh(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnRefresh_006, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -1240,6 +1254,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnRefresh_006, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnRefresh(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnRefresh_007, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -1256,6 +1271,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnRefresh_007, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnRefresh(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnRefresh_008, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -1272,6 +1288,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnRefresh_008, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnRefresh(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnStartDrag_001, TestSize.Level1)
 {
     MultimodalEventThirdUnitTest multimodalTest;
@@ -1347,6 +1364,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnStartDrag_005, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnStartDrag(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnStartDrag_006, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -1422,6 +1440,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnCancel_002, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnCancel(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnCancel_003, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -1506,6 +1525,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnCancel_007, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnCancel(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnCancel_008, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -1632,6 +1652,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnEnter_007, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnEnter(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnEnter_008, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -1724,6 +1745,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnPrevious_005, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnPrevious(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnPrevious_006, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -1757,6 +1779,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, OnPrevious_007, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnPrevious(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerFirstTest, OnPrevious_008, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
