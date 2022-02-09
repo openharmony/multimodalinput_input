@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_NET_PACKET_H
-#define OHOS_NET_PACKET_H
+#ifndef NET_PACKET_H
+#define NET_PACKET_H
 
 #include "proto.h"
 #include "stream_buffer.h"
@@ -55,4 +55,4 @@ protected:
 };
 }
 }
-#endif
+#endif // NET_PACKET_H

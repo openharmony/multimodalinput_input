@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_UDS_SOCKET_H
-#define OHOS_UDS_SOCKET_H
+#ifndef UDS_SOCKET_H
+#define UDS_SOCKET_H
 
 #include <sys/epoll.h>
 #include <sys/socket.h>
@@ -62,4 +62,4 @@ protected:
 };
 }
 }
-#endif
+#endif // UDS_SOCKET_H

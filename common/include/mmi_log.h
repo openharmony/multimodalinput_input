@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MMI_LOG_H
-#define OHOS_MMI_LOG_H
+#ifndef MMI_LOG_H
+#define MMI_LOG_H
 
 #include <string>
 #include "hilog/log.h"
@@ -55,4 +55,4 @@ const std::string DOUBLE_COLON = "::";
 #endif
 }  // namespace OHOS
 
-#endif  // OHOS_MMI_LOG_H
+#endif  // MMI_LOG_H

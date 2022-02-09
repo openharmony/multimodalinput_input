@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_STREAM_BUFFER_H
-#define OHOS_STREAM_BUFFER_H
+#ifndef STREAM_BUFFER_H
+#define STREAM_BUFFER_H
 
 #include <stdint.h>
 #include <string>
@@ -138,4 +138,4 @@ StreamBuffer &OHOS::MMI::StreamBuffer::operator>>(T &data)
 }
 }
 }
-#endif
+#endif // STREAM_BUFFER_H
