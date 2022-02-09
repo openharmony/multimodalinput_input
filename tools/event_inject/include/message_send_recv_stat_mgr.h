@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MESSAGE_SEND_RECV_STAT_MGR_H
-#define OHOS_MESSAGE_SEND_RECV_STAT_MGR_H
+#ifndef MESSAGE_SEND_RECV_STAT_MGR_H
+#define MESSAGE_SEND_RECV_STAT_MGR_H
 
 #include "singleton.h"
 
@@ -32,4 +32,4 @@ protected:
 };
 }
 
-#endif // OHOS_MESSAGE_SEND_RECV_STAT_MGR_H
+#endif // MESSAGE_SEND_RECV_STAT_MGR_H

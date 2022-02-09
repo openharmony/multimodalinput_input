@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_VIRTUAL_DEVICE_H
-#define OHOS_VIRTUAL_DEVICE_H
+#ifndef VIRTUAL_DEVICE_H
+#define VIRTUAL_DEVICE_H
 
 #include "virtual_device_config.h"
 
@@ -62,4 +62,4 @@ protected:
 };
 }
 }
-#endif  // OHOS_VIRTUAL_DEVICE_H
+#endif  // VIRTUAL_DEVICE_H

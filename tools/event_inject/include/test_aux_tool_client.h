@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_TEST_AUX_TOOL_CLIENT_H
-#define OHOS_TEST_AUX_TOOL_CLIENT_H
+#ifndef TEST_AUX_TOOL_CLIENT_H
+#define TEST_AUX_TOOL_CLIENT_H
 #include "test_aux_tool_msg_handler.h"
 #include "singleton.h"
 #include "msg_head.h"
@@ -53,4 +53,4 @@ protected:
 };
 }
 
-#endif
+#endif // TEST_AUX_TOOL_CLIENT_H

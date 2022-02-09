@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_SEND_MESSAGE_H
-#define OHOS_SEND_MESSAGE_H
+#ifndef SEND_MESSAGE_H
+#define SEND_MESSAGE_H
 #include "msg_head.h"
 #include "net_packet.h"
 
@@ -34,4 +34,4 @@ private:
 };
 }
 }
-#endif
+#endif // SEND_MESSAGE_H
