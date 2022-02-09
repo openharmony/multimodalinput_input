@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MANAGE_INJECT_DEVICE_H
-#define OHOS_MANAGE_INJECT_DEVICE_H
+#ifndef MANAGE_INJECT_DEVICE_H
+#define MANAGE_INJECT_DEVICE_H
 
 #include "get_device_node.h"
 #include "get_device_object.h"
@@ -38,4 +38,4 @@ private:
 };
 }
 }
-#endif
+#endif // MANAGE_INJECT_DEVICE_H

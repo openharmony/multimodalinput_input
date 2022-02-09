@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_ERROR_MULTIMODAL_H
-#define OHOS_ERROR_MULTIMODAL_H
+#ifndef ERROR_MULTIMODAL_H
+#define ERROR_MULTIMODAL_H
 #include <errors.h>
 
 namespace OHOS {
@@ -165,6 +165,7 @@ namespace OHOS {
         FD_ACCEPT_FAIL,                             // 接受连接时fd无效
         PID_OBTAIN_FAIL,                            // 获取PID失败
         FD_OBTAIN_FAIL,                             // 获取FD失败
+        INVALID_MONITOR_MON                         // 监听增加失败
     };
     // Error code for virtual deviceparam
     constexpr ErrCode VIRTUAL_DEVICE_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_VIRTUAL_DEVICE);
@@ -192,4 +193,4 @@ namespace OHOS {
         MMI_SERVICE_RUNNING,     // 多模服务运行正常
     };
 }
-#endif
+#endif // ERROR_MULTIMODAL_H

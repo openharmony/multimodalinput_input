@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_TEST_AUX_TOOL_MSG_HANDLER_H
-#define OHOS_TEST_AUX_TOOL_MSG_HANDLER_H
+#ifndef TEST_AUX_TOOL_MSG_HANDLER_H
+#define TEST_AUX_TOOL_MSG_HANDLER_H
 #include "msg_handler.h"
 #include "uds_client.h"
 
@@ -33,4 +33,4 @@ namespace MMI {
     };
 }
 }
-#endif
+#endif // TEST_AUX_TOOL_MSG_HANDLER_H

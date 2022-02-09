@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MSG_HANDLER_H
-#define OHOS_MSG_HANDLER_H
+#ifndef MSG_HANDLER_H
+#define MSG_HANDLER_H
 
 #include <map>
 #include <functional>
@@ -58,4 +58,4 @@ protected:
 };
 }
 }
-#endif
+#endif // MSG_HANDLER_H

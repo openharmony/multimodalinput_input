@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_COMMAND_HELPER_H
-#define OHOS_COMMAND_HELPER_H
+#ifndef COMMAND_HELPER_H
+#define COMMAND_HELPER_H
 
 #include "string_ex.h"
 #include "log.h"
@@ -53,4 +53,4 @@ namespace OHOS::MMI {
     };
 } // namespace OHOS::MMI
 
-#endif // OHOS_COMMAND_HELPER_H
+#endif // COMMAND_HELPER_H

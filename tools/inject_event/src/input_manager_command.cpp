@@ -314,7 +314,7 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                             }
                             keyEventI->keyboardCombination[0] = keyID;
                             downKey.push_back(keyID);
-                            for (int32_t i = 0; i<downKey.size(); i++) {
+                            for (size_t i = 0; i < downKey.size(); i++) {
                                 if (keyID != downKey[i]) {
                                     std::cout << "downKey value is" << downKey[i] << std::endl;
                                 }
@@ -355,7 +355,7 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                         }
                     }
                 }
-                for (int32_t i = 0; i < downKey.size(); i++) {
+                for (size_t i = 0; i < downKey.size(); i++) {
                     std::cout << "you have a key " << downKey[i]<<" not release"<< std::endl;
                 }
                 break;

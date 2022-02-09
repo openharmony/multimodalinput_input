@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_INPUT_EVENT_DATA_TRANSFORMATION_H
-#define OHOS_INPUT_EVENT_DATA_TRANSFORMATION_H
+#ifndef INPUT_EVENT_DATA_TRANSFORMATION_H
+#define INPUT_EVENT_DATA_TRANSFORMATION_H
 
 #include "key_event.h"
 #include "net_packet.h"
@@ -28,11 +28,11 @@ public:
     static int32_t KeyEventToNetPacket(const std::shared_ptr<KeyEvent> key, NetPacket &packet);
     static int32_t NetPacketToKeyEvent(bool skipId, std::shared_ptr<KeyEvent> key, NetPacket &packet);
     static int32_t SerializeInputEvent(std::shared_ptr<InputEvent> event, NetPacket &packet);
-    static int32_t DeserializeInputEvent(bool skipId, std::shared_ptr<InputEvent> event, NetPacket &packet);
-    static int32_t SerializePointerEvent(std::shared_ptr<PointerEvent> event, NetPacket &packet);
-    static int32_t DeserializePointerEvent(bool skipId, std::shared_ptr<PointerEvent> event, NetPacket &packet);
+    static int32_t DeserializeInputEvent(std::shared_ptr<InputEvent> event, NetPacket &packet);
+    static int32_t Marshalling(std::shared_ptr<PointerEvent> event, NetPacket &packet);
+    static int32_t Unmarshalling(std::shared_ptr<PointerEvent> event, NetPacket &packet);
     static int32_t DeserializePointerItem(PointerEvent::PointerItem &item, NetPacket &packet);
 };
 }
 }
-#endif
+#endif // INPUT_EVENT_DATA_TRANSFORMATION_H

@@ -41,7 +41,7 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(bool skipId,
     int32_t data = 0;
     int32_t size = 0;
     bool isPressed = false;
-    CHKR((RET_OK == DeserializeInputEvent(skipId, key, packet)), STREAM_BUF_READ_FAIL, RET_ERR);
+    CHKR((RET_OK == DeserializeInputEvent(key, packet)), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(packet.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
     key->SetKeyCode(data);
     CHKR(packet.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
@@ -78,15 +78,12 @@ int32_t InputEventDataTransformation::SerializeInputEvent(std::shared_ptr<InputE
     return RET_OK;
 }
 
-int32_t InputEventDataTransformation::DeserializeInputEvent(bool skipId,
-    std::shared_ptr<InputEvent> event, NetPacket &packet)
+int32_t InputEventDataTransformation::DeserializeInputEvent(std::shared_ptr<InputEvent> event, NetPacket &packet)
 {
     CHKPR(event, ERROR_NULL_POINTER, RET_ERR);
     int32_t tField {  };
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
-    if (!skipId)
-        event->SetId(tField);
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
     event->SetActionTime(tField);
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
@@ -106,8 +103,9 @@ int32_t InputEventDataTransformation::DeserializeInputEvent(bool skipId,
     return RET_OK;
 }
 
-int32_t InputEventDataTransformation::SerializePointerEvent(std::shared_ptr<PointerEvent> event, NetPacket &packet)
+int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> event, NetPacket &packet)
 {
+    CHKPR(event, ERROR_NULL_POINTER, RET_ERR);
     CHKR((RET_OK == SerializeInputEvent(event, packet)), STREAM_BUF_WRITE_FAIL, RET_ERR);
 
     CHKR(packet.Write(event->GetPointerAction()), STREAM_BUF_WRITE_FAIL, RET_ERR);
@@ -162,10 +160,9 @@ int32_t InputEventDataTransformation::SerializePointerEvent(std::shared_ptr<Poin
     return RET_OK;
 }
 
-int32_t InputEventDataTransformation::DeserializePointerEvent(bool skipId,
-    std::shared_ptr<PointerEvent> event, NetPacket &packet)
+int32_t InputEventDataTransformation::Unmarshalling(std::shared_ptr<PointerEvent> event, NetPacket &packet)
 {
-    CHKR((RET_OK == DeserializeInputEvent(skipId, event, packet)),
+    CHKR((RET_OK == DeserializeInputEvent(event, packet)),
         STREAM_BUF_READ_FAIL, RET_ERR);
 
     int32_t tField {  };
