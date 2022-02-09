@@ -858,7 +858,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     if ((firstBtnDownWindow_.pid == 0)
         || (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN && pointerEvent->GetPressedButtons().size() == 1)
         || (action == PointerEvent::POINTER_ACTION_MOVE && pointerEvent->GetPressedButtons().empty())) {
-        for (auto it : logicalDisplayInfo.windowsInfo_) {
+        for (auto it : logicalDisplayInfo->windowsInfo_) {
             if (IsTouchWindow(globalX, globalY, it)) {
                 focusWindow = &it;
                 firstBtnDownWindow_ = *focusWindow;
