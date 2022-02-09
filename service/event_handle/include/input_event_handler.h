@@ -65,9 +65,6 @@ protected:
     void OnEventKeyboardTrace(const EventKeyboard& keyBoard);
     void OnEventPointerTrace(const EventPointer& point);
     void OnPointerFilterEventTrace(const EventPointer& event_pointer);
-    /*
-    void OnEventTouchTrace(const EventTouch& touch);
-    */
 #ifdef OHOS_WESTEN_MODEL
     bool OnSystemEvent(const KeyEventValueTransformations& temp, const enum KEY_STATE state) const;
 #endif

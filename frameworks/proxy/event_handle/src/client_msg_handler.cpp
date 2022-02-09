@@ -227,7 +227,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     pointerEvent->SetProcessedCallback(eventProcessedCallback_);
     int32_t eventPointer = 17;
     std::string pointerCodestring = "PointerEventDispatchAsync";
-    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerCodestring, eventpointer);
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerCodestring, eventPointer);
     InputManagerImpl::GetInstance()->OnPointerEvent(pointerEvent);
     return RET_OK;
 }
@@ -887,7 +887,6 @@ void ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, NetPacket& pk
              pointData.seat_button_count, pointData.axis, pointData.state, pointData.source, pointData.delta.x,
              pointData.delta.y, pointData.delta_raw.x, pointData.delta_raw.y, pointData.absolute.x,
              pointData.absolute.y, pointData.discrete.x, pointData.discrete.y, fd);
-    //TracePointerEvent(pointData);
     int32_t action = pointData.state;
     /* 根据收到的point，构造MouseEvent对象，
     *  其中MouseEvent对象的action,actionButton,cursorDelta,scrollingDelta四个字段
