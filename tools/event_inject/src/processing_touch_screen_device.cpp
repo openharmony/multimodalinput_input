@@ -19,13 +19,13 @@ using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingTouchScreenDevice" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingTouchScreenDevice" };
 }
 
 int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const Json& touchScreenEventArrays,
                                                                   InputEventArray& inputEventArray)
 {
-    MMI_LOGI("Enter TransformJsonDataForTouchScreen function.");
+    MMI_LOGD("Enter");
     if (touchScreenEventArrays.empty()) {
         return RET_ERR;
     }
@@ -48,14 +48,14 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const Json& to
     TouchScreenInputEvent releaseEvents = touchScreenInputEvents.eventArray[releaseEventIndex];
     AnalysisTouchScreenReleaseData(inputEventArray, releaseEvents);
 
-    MMI_LOGI("Leave TransformJsonDataForTouchScreen function.");
+    MMI_LOGD("Leave");
     return RET_OK;
 }
 
 int32_t ProcessingTouchScreenDevice::TransformJsonDataForSingleTouchScreen(const Json& touchScreenEventArrays,
     InputEventArray& inputEventArray)
 {
-    MMI_LOGI("Enter TransformJsonDataForSingleTouchScreen function.");
+    MMI_LOGD("Enter");
     if (touchScreenEventArrays.empty()) {
         return RET_ERR;
     }
@@ -67,10 +67,10 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataForSingleTouchScreen(const
 
     std::vector<TouchSingleEventData> touchSingleEventDatas;
     AnalysisSingleTouchScreenDate(inputData, touchSingleEventDatas);
-    for (TouchSingleEventData touchSingleEventData : touchSingleEventDatas) {
-        AnalysisTouchScreenToInputData(inputEventArray, touchSingleEventData);
+    for (const auto &item : touchSingleEventDatas) {
+        AnalysisTouchScreenToInputData(inputEventArray, item);
     }
-    MMI_LOGI("Leave TransformJsonDataForSingleTouchScreen function.");
+    MMI_LOGD("Leave");
     return RET_OK;
 }
 
@@ -169,8 +169,6 @@ void ProcessingTouchScreenDevice::AnalysisTouchScreenToInputData(InputEventArray
         AnalysisTouchScreenMoveData(inputEventArray, touchSingleEventData);
     } else if (touchSingleEventData.eventType == "release") {
         AnalysisTouchScreenReleaseData(inputEventArray, touchSingleEventData);
-    } else {
-        // nothing to do.
     }
 }
 
@@ -186,8 +184,6 @@ void ProcessingTouchScreenDevice::AnalysisTouchScreenPressData(InputEventArray& 
     } else if (touchSingleEventData.reportType == "synReport") {
         SetSynMtReport(inputEventArray, 0);
         SetSynReport(inputEventArray, touchSingleEventData.blockTime);
-    } else {
-        // nothing to do.
     }
 }
 
@@ -202,8 +198,6 @@ void ProcessingTouchScreenDevice::AnalysisTouchScreenMoveData(InputEventArray& i
     } else if (touchSingleEventData.reportType == "synReport") {
         SetSynMtReport(inputEventArray, 0);
         SetSynReport(inputEventArray, touchSingleEventData.blockTime);
-    } else {
-        // nothing to do.
     }
 }
 
@@ -219,7 +213,5 @@ void ProcessingTouchScreenDevice::AnalysisTouchScreenReleaseData(InputEventArray
         SetSynReport(inputEventArray);
         SetSynMtReport(inputEventArray, 0);
         SetSynReport(inputEventArray, touchSingleEventData.blockTime);
-    } else {
-        // nothing to do.
     }
 }

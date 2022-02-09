@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_VIRTUAL_TRACKPAD_MOUSE_H
-#define OHOS_VIRTUAL_TRACKPAD_MOUSE_H
+#ifndef VIRTUAL_TRACKPAD_MOUSE_H
+#define VIRTUAL_TRACKPAD_MOUSE_H
 
 #include "virtual_device.h"
 
@@ -32,4 +32,4 @@ protected:
 };
 }
 }
-#endif
+#endif // VIRTUAL_TRACKPAD_MOUSE_H

@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_DEFINE_MULTIMODAL_H
-#define OHOS_DEFINE_MULTIMODAL_H
+#ifndef DEFINE_MULTIMODAL_H
+#define DEFINE_MULTIMODAL_H
 
 #include "log.h"
 
@@ -206,4 +206,4 @@
     } while (0)
 
 #endif
-#endif
+#endif // DEFINE_MULTIMODAL_H

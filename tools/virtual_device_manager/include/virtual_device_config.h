@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_VIRTUAL_DEVICE_CONFIG_H
-#define OHOS_VIRTUAL_DEVICE_CONFIG_H
+#ifndef VIRTUAL_DEVICE_CONFIG_H
+#define VIRTUAL_DEVICE_CONFIG_H
 
 #include <cstdint>
 #include <functional>
@@ -55,5 +55,4 @@ namespace MMI {
     const std::string g_folderpath = "/data/symbol/";
 }
 }
-#endif
-
+#endif // VIRTUAL_DEVICE_CONFIG_H

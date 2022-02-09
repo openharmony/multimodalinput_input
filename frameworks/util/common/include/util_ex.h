@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_UTIL_EX_H
-#define OHOS_UTIL_EX_H
+#ifndef UTIL_EX_H
+#define UTIL_EX_H
 
 #include <map>
 #include <vector>
@@ -162,4 +162,4 @@ namespace OHOS::MMI {
     }
 }
 
-#endif
+#endif // UTIL_EX_H

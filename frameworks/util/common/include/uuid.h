@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_UUID_H
-#define OHOS_UUID_H
+#ifndef UUID_H
+#define UUID_H
 
 #include <array>
 #include <stdint.h>
@@ -131,4 +131,4 @@ protected:
 }  // namespace MMI
 }  // namespace OHOS
 
-#endif // OHOS_UUID_H
+#endif // UUID_H
