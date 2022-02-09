@@ -51,7 +51,7 @@ void InjectionEventDispatch::InitManageFunction()
 #endif
     };
 
-    for (auto& it : funs) {
+    for (auto &it : funs) {
         CHKC(RegistInjectEvent(it), EVENT_REG_FAIL);
     }
 }
@@ -119,9 +119,9 @@ bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const vector<strin
     }
 
     bool result = false;
-    for (auto it : mapFuns_) {
+    for (const auto &item : mapFuns_) {
         string temp(argv.at(ARGVS_TARGET_INDEX));
-        if (temp == it.first) {
+        if (temp == item.first) {
             funId_ = temp;
             result = true;
             break;
@@ -464,31 +464,28 @@ int32_t InjectionEventDispatch::OnHdiHot()
 int32_t InjectionEventDispatch::GetDeviceIndex(const string& deviceNameText)
 {
     if (deviceNameText.empty()) {
+        MMI_LOGE("Get device index failed");
         return RET_ERR;
     }
-    vector<DeviceInformation>::iterator iter;
-    for (iter = allDevices_.begin(); iter != allDevices_.end(); iter++) {
-        if (deviceNameText == iter->chipName) {
-            return iter->devIndex;
+    for (const auto &item : allDevices_) {
+        if (deviceNameText == item.chipName) {
+            return item.devIndex;
         }
     }
-
     return RET_ERR;
 }
 
 int32_t InjectionEventDispatch::GetDeviceStatus(const string &deviceStatusText)
 {
     if (deviceStatusText.empty()) {
+        MMI_LOGE("Get device status failed");
         return RET_ERR;
     }
     if (deviceStatusText == "add") {
         return HDI_ADD;
     } else if (deviceStatusText == "remove") {
         return HDI_REMOVE;
-    } else {
-        return RET_ERR;
     }
-
     return RET_ERR;
 }
 
@@ -496,7 +493,7 @@ int32_t InjectionEventDispatch::GetDeviceStatus(const string &deviceStatusText)
 int32_t InjectionEventDispatch::OnSendEvent()
 {
     if (injectArgvs_.size() != SEND_EVENT_ARGV_COUNTS) {
-        MMI_LOGE("Wrong number of input parameters! errCode:%d", PARAM_INPUT_FAIL);
+        MMI_LOGE("Wrong number of input parameters, errCode:%d", PARAM_INPUT_FAIL);
         return RET_ERR;
     }
 
@@ -551,25 +548,21 @@ void InjectionEventDispatch::InitDeviceInfo()
 
 int32_t InjectionEventDispatch::GetDevTypeByIndex(int32_t devIndex)
 {
-    vector<DeviceInformation>::iterator iter;
-    for (iter = allDevices_.begin(); iter != allDevices_.end(); iter++) {
-        if (devIndex == iter->devIndex) {
-            return iter->devType;
+    for (const auto &item : allDevices_) {
+        if (devIndex == item.devIndex) {
+            return item.devType;
         }
     }
-
     return RET_ERR;
 }
 
 int32_t InjectionEventDispatch::GetDevIndexByType(int32_t devType)
 {
-    vector<DeviceInformation>::iterator iter;
-    for (iter = allDevices_.begin(); iter != allDevices_.end(); iter++) {
-        if (devType == iter->devType) {
-            return iter->devIndex;
+    for (const auto &item : allDevices_) {
+        if (item.devType == devType) {
+            return item.devIndex;
         }
     }
-
     return RET_ERR;
 }
 
