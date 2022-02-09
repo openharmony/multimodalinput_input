@@ -101,7 +101,7 @@ bool ServerInputFilterManager::OnKeyEvent(const EventKeyboard& key)
     SessionPtr temp;
     int32_t id = 0;
     Authority authorityTemp = NO_AUTHORITY;
-    for (auto item : keyEventFilterMap_) {
+    for (auto &item : keyEventFilterMap_) {
         if (item.second.GetAuthority() > authorityTemp) {
             authorityTemp = item.second.GetAuthority();
             temp = item.first;
@@ -262,7 +262,7 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
     SessionPtr temp;
     int32_t id = 0;
     Authority authorityTemp = NO_AUTHORITY;
-    for (auto item : touchEventFilterMap_) {
+    for (auto &item : touchEventFilterMap_) {
         if (item.second.GetAuthority() > authorityTemp) {
             authorityTemp = item.second.GetAuthority();
             temp = item.first;
@@ -417,7 +417,7 @@ bool ServerInputFilterManager::OnPointerEvent(EventPointer event_pointer)
     SessionPtr ptr;
     int32_t id;
     Authority authority = NO_AUTHORITY;
-    for (auto item : pointerEventFilterMap_) {
+    for (auto &item : pointerEventFilterMap_) {
         if (item.second.GetAuthority() > authority) {
             ptr = item.first;
             id = item.second.GetId();

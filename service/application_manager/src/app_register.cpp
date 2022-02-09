@@ -60,9 +60,9 @@ const AppInfo& AppRegister::FindBySocketFd(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
     CHKR(fd >= 0, PARAM_INPUT_INVALID, appInfoError_);
-    for (auto iter = mapSurface_.begin(); iter != mapSurface_.end(); iter++) {
-        if (iter->second.fd == fd) {
-            return iter->second;
+    for (const auto &item : mapSurface_) {
+        if (item.second.fd == fd) {
+            return item.second;
         }
     }
     return AppRegister::appInfoError_;
@@ -114,9 +114,9 @@ std::map<int32_t, AppInfo>::iterator AppRegister::UnregisterAppInfo(int32_t winI
 void AppRegister::PrintfMap()
 {
     std::lock_guard<std::mutex> lock(mu_);
-    for (auto i : mapSurface_) {
-        std::cout << "mapSurface " << i.second.abilityId << ", " << i.second.windowId <<
-            ", " << i.second.fd << std::endl;
+    for (const auto &item : mapSurface_) {
+        std::cout << "mapSurface " << item.second.abilityId << ", " << item.second.windowId <<
+            ", " << item.second.fd << std::endl;
     }
 }
 
@@ -124,17 +124,17 @@ void OHOS::MMI::AppRegister::Dump(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
     mprintf(fd, "AppInfos: count=%d", mapSurface_.size());
-    for (auto& it : mapSurface_) {
-        mprintf(fd, "\tabilityId=%d windowId=%d fd=%d bundlerName=%s appName=%s", it.second.abilityId,
-                it.second.windowId, it.second.fd, it.second.bundlerName.c_str(), it.second.appName.c_str());
+    for (const auto &item : mapSurface_) {
+        mprintf(fd, "\tabilityId=%d windowId=%d fd=%d bundlerName=%s appName=%s", item.second.abilityId,
+                item.second.windowId, item.second.fd, item.second.bundlerName.c_str(), item.second.appName.c_str());
     }
 }
 
 void AppRegister::SurfacesDestroyed(const std::vector<int32_t> &desList)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    for (auto it : desList) {
-        UnregisterAppInfo(it);
+    for (const auto &item : desList) {
+        UnregisterAppInfo(item);
     }
 }
 

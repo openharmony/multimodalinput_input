@@ -175,13 +175,13 @@ void OHOS::MMI::InputWindowsManager::PrintDebugInfo()
     }
 
     MMI_LOGT("***********screen info***********");
-    for (auto& j : screenInfoVec_) {
+    for (const auto &j : screenInfoVec_) {
         MMI_LOGT(" -screenId: %{public}d, connectorName: %{public}s, screenWidth: %{public}d, screenHeight: "
                  "%{public}d, screenNlayers: %{public}d", j.screenId, j.connectorName, j.width, j.height, j.nLayers);
     }
 
     MMI_LOGT("***********layer info***********");
-    for (auto& k : layers_) {
+    for (const auto &k : layers_) {
         MMI_LOGT(" -layer_id: %{public}d, on_screen_id: %{public}d, nSurfaces: %{public}d src(xywh): [%{public}d, "
                  "%{public}d, %{public}d, %{public}d], dest(xywh): [%{public}d, %{public}d, %{public}d, %{public}d] "
                  "visibility: %{public}d, opacity: %{public}lf",
@@ -191,7 +191,7 @@ void OHOS::MMI::InputWindowsManager::PrintDebugInfo()
     }
 
     MMI_LOGT("***********window info***********");
-    for (auto& m : surfaces_) {
+    for (const auto &m : surfaces_) {
         auto appFd = AppRegs->FindByWinId(m.second.surfaceId);
         MMI_LOGT(" -surface_id: %{public}d, on_screen_id: %{public}d, on_layer_id: %{public}d, src(xywh): [%{public}d,"
                  " %{public}d, %{public}d, %{public}d] desc(xywh): [%{public}d, %{public}d, %{public}d, %{public}d], "
@@ -207,9 +207,9 @@ size_t OHOS::MMI::InputWindowsManager::GetSurfaceIdList(std::vector<int32_t>& id
 {
     const int32_t TEST_THREE_WINDOWS = 3;
     std::lock_guard<std::mutex> lock(mu_);
-    for (auto i : surfaces_) {
-        if (i.second.surfaceId != focusInfoID_ && TEST_THREE_WINDOWS != i.second.surfaceId) {
-            ids.push_back(i.second.surfaceId);
+    for (const auto &item : surfaces_) {
+        if (item.second.surfaceId != focusInfoID_ && TEST_THREE_WINDOWS != item.second.surfaceId) {
+            ids.push_back(item.second.surfaceId);
         }
     }
     ids.push_back(focusInfoID_);
@@ -251,31 +251,31 @@ void OHOS::MMI::InputWindowsManager::Dump(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
     mprintf(fd, "screenInfos count=%zu", screenInfoVec_.size());
-    for (auto& screen_info : screenInfoVec_) {
+    for (const auto &item : screenInfoVec_) {
         mprintf(fd, "\tscreenId=%d connectorName=%s screenWidth= %d screenHeight=%d screenNlayers=%d",
-                screen_info.screenId, screen_info.connectorName, screen_info.width, screen_info.height,
-                screen_info.nLayers);
+                item.screenId, item.connectorName, item.width, item.height,
+                item.nLayers);
     }
     mprintf(fd, "layerInfos count=%zu", layers_.size());
-    for (auto& layer_info : layers_) {
+    for (const auto &item : layers_) {
         mprintf(fd, "\tlayerId=%d dstX=%d dstY=%d dstW=%d dstH=%d srcX=%d"
                 "srcY=%d srcW=%d srcH=%d opacity=%f visibility=%d onScreenId=%d nsurfaces=%d",
-                layer_info.second.layerId, layer_info.second.dstX, layer_info.second.dstY,
-                layer_info.second.dstW, layer_info.second.dstH, layer_info.second.srcX,
-                layer_info.second.srcY, layer_info.second.srcW, layer_info.second.srcH,
-                layer_info.second.opacity, layer_info.second.visibility,
-                layer_info.second.onScreenId, layer_info.second.nSurfaces);
+                item.second.layerId, item.second.dstX, item.second.dstY,
+                item.second.dstW, item.second.dstH, item.second.srcX,
+                item.second.srcY, item.second.srcW, item.second.srcH,
+                item.second.opacity, item.second.visibility,
+                item.second.onScreenId, item.second.nSurfaces);
     }
     mprintf(fd, "surfaceInfos count=%zu", surfaces_.size());
-    for (auto& mysurface_info : surfaces_) {
-        auto appFd = AppRegs->FindByWinId(mysurface_info.second.surfaceId);
+    for (auto& item : surfaces_) {
+        auto appFd = AppRegs->FindByWinId(item.second.surfaceId);
         mprintf(fd, "\tsurfaceId=%d dstX=%d dstY=%d dstW=%d dstH=%d srcX=%d"
                 "srcY=%d srcW=%d srcH=%d opacity=%f visibility=%d onLayerId=%d appFd=%d bundlerName=%s appName=%s",
-                mysurface_info.second.surfaceId, mysurface_info.second.dstX,
-                mysurface_info.second.dstY, mysurface_info.second.dstW, mysurface_info.second.dstH,
-                mysurface_info.second.srcX, mysurface_info.second.srcY, mysurface_info.second.srcW,
-                mysurface_info.second.srcH, mysurface_info.second.opacity, mysurface_info.second.visibility,
-                mysurface_info.second.onLayerId, appFd.fd, appFd.bundlerName.c_str(), appFd.appName.c_str());
+                item.second.surfaceId, item.second.dstX,
+                item.second.dstY, item.second.dstW, item.second.dstH,
+                item.second.srcX, item.second.srcY, item.second.srcW,
+                item.second.srcH, item.second.opacity, item.second.visibility,
+                item.second.onLayerId, appFd.fd, appFd.bundlerName.c_str(), appFd.appName.c_str());
     }
 }
 
