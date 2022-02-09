@@ -100,8 +100,7 @@ int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& d
 #else
     const char* physWhole = libinput_device_get_phys(device);
     if (physWhole == nullptr) {
-        ret = memcpy_s(data.physical, sizeof(data.physical), data.deviceName,
-                       sizeof(data.deviceName));
+        ret = memcpy_s(data.physical, sizeof(data.physical), data.deviceName, sizeof(data.deviceName));
         CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
     } else {
         std::string s(physWhole);
@@ -794,10 +793,10 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<Key
 int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key)
 {
     const std::string uid = GetUUid();
-    CHKR(EOK == memcpy_s(key.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size()),
-        MEMCPY_SEC_FUN_FAIL, RET_ERR);
-    CHKR(EOK == memcpy_s(key.deviceName, MAX_UUIDSIZE, VIRTUAL_KEYBOARD.c_str(),
-        VIRTUAL_KEYBOARD.size()), MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    int32_t ret = memcpy_s(key.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size());
+    CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    ret = memcpy_s(key.deviceName, MAX_UUIDSIZE, VIRTUAL_KEYBOARD.c_str(), VIRTUAL_KEYBOARD.size());
+    CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
     key.time = event.keyDownDuration;
     key.key = event.keyCode;
     key.isIntercepted = event.isIntercepted;

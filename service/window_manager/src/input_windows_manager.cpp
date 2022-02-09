@@ -312,8 +312,8 @@ void OHOS::MMI::InputWindowsManager::SaveScreenInfoToMap(const ScreenInfo** scre
             SurfaceInfo** pstrSurface = pstrLayerInfo[j]->surfaces;
             for (int32_t k = 0; k < nsurfaces; k++) {
                 MMISurfaceInfo mySurfaceTmp = {};
-                CHK(EOK == memcpy_s(&mySurfaceTmp, sizeof(mySurfaceTmp), pstrSurface[k], sizeof(SurfaceInfo)),
-                    MEMCPY_SEC_FUN_FAIL);
+                int32_t ret = memcpy_s(&mySurfaceTmp, sizeof(mySurfaceTmp), pstrSurface[k], sizeof(SurfaceInfo));
+                CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
                 mySurfaceTmp.screenId = screenInfo[i]->screenId;
                 surfaces_.insert(std::pair<int32_t, MMISurfaceInfo>(mySurfaceTmp.surfaceId, mySurfaceTmp));
                 AddId(surfaceList, mySurfaceTmp.surfaceId);
@@ -581,7 +581,7 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
     }
 }
 
-bool OHOS::MMI::InputWindowsManager::TpPoint2LogicDisplayPoint2(libinput_event_touch* touch,
+bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint_2(libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
 {
     if (screensInfo_ != nullptr) {
@@ -614,7 +614,7 @@ OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::FindMatchedPhysi
     return nullptr;
 }
 
-bool OHOS::MMI::InputWindowsManager::TansformTouchscreePointToLogicalDisplayPoint(libinput_event_touch* touch,
+bool OHOS::MMI::InputWindowsManager::TransformTouchPointToDisplayPoint(libinput_event_touch* touch,
     int32_t targetDisplayId, int32_t& displayX, int32_t& displayY)
 {
 
@@ -662,7 +662,7 @@ bool OHOS::MMI::InputWindowsManager::TansformTouchscreePointToLogicalDisplayPoin
     return false;
 }
 
-bool OHOS::MMI::InputWindowsManager::TpPointLogicDisplayPoint(libinput_event_touch* touch,
+bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint(libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
 {
 
