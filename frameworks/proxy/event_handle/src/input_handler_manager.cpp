@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "input_handler_manager.h"
+#include "bytrace.h"
 #include "input_handler_type.h"
 #include "log.h"
 #include "multimodal_event_handler.h"
