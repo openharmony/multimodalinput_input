@@ -233,17 +233,17 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
 
     int32_t currentPointerId = pointerEvent->GetPointerId();
     std::vector<PointerEvent::PointerItem> pointerItems;
-    for (auto &it : pointerEvent->GetPointersIdList()) {
+    for (auto &item : pointerEvent->GetPointersIdList()) {
         PointerEvent::PointerItem pointerItem;
-        CHKR(pointerEvent->GetPointerItem(it, pointerItem), PARAM_INPUT_FAIL, RET_ERR);
+        pointerEvent->GetPointerItem(item, pointerItem);
         pointerItems.push_back(pointerItem);
     }
     uint32_t index = 0;
     int32_t touchArea = 0;
     napi_value currentPointer = nullptr;
     for (auto &it : pointerItems) {
-        napi_value item = nullptr;
-        status = napi_create_object(jsEnv_, &item);
+        napi_value element = nullptr;
+        status = napi_create_object(jsEnv_, &element);
         if (status != napi_ok) {
             MMI_LOGE("napi_create_object is failed");
             return RET_ERR;
@@ -272,20 +272,20 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
             CHKR(SetNameProperty(jsEnv_, result, "deviceId", it.GetDeviceId()) == napi_ok,
                 CALL_NAPI_API_ERR, RET_ERR);
         }
-        CHKR(SetNameProperty(jsEnv_, item, "globalX", it.GetGlobalX()) == napi_ok,
+        CHKR(SetNameProperty(jsEnv_, element, "globalX", it.GetGlobalX()) == napi_ok,
             CALL_NAPI_API_ERR, RET_ERR);
-        CHKR(SetNameProperty(jsEnv_, item, "globalY", it.GetGlobalY()) == napi_ok,
+        CHKR(SetNameProperty(jsEnv_, element, "globalY", it.GetGlobalY()) == napi_ok,
             CALL_NAPI_API_ERR, RET_ERR);
-        CHKR(SetNameProperty(jsEnv_, item, "localX", 0) == napi_ok,
+        CHKR(SetNameProperty(jsEnv_, element, "localX", 0) == napi_ok,
             CALL_NAPI_API_ERR, RET_ERR);
-        CHKR(SetNameProperty(jsEnv_, item, "localY", 0) == napi_ok,
+        CHKR(SetNameProperty(jsEnv_, element, "localY", 0) == napi_ok,
             CALL_NAPI_API_ERR, RET_ERR);
         touchArea = (it.GetWidth() + it.GetHeight()) / 2;
-        CHKR(SetNameProperty(jsEnv_, item, "size", touchArea) == napi_ok,
+        CHKR(SetNameProperty(jsEnv_, element, "size", touchArea) == napi_ok,
             CALL_NAPI_API_ERR, RET_ERR);
-        CHKR(SetNameProperty(jsEnv_, item, "force", it.GetPressure()) == napi_ok,
+        CHKR(SetNameProperty(jsEnv_, element, "force", it.GetPressure()) == napi_ok,
             CALL_NAPI_API_ERR, RET_ERR);
-        status = napi_set_element(jsEnv_, pointers, index, item);
+        status = napi_set_element(jsEnv_, pointers, index, element);
         if (status != napi_ok) {
             MMI_LOGE("napi_set_element is failed");
             return RET_ERR;

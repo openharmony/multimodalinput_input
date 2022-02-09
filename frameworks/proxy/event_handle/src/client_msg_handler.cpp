@@ -205,11 +205,11 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     if (pressedKeys.empty()) {
         MMI_LOGI("Pressed keys is empty");
     } else {
-        for (int32_t keyCode : pressedKeys) {
-            MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
+        for (auto &item : pressedKeys) {
+            MMI_LOGI("Pressed keyCode=%{public}d", item);
         }
     }
-    for (int32_t pointerId : pointerIds) {
+    for (auto &pointerId : pointerIds) {
         PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
 

@@ -198,7 +198,7 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::GetPriority() const
 bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     std::lock_guard<std::mutex> guard(lockMonitors_);
-    for (const SessionHandler& mon : monitors_) {
+    for (const auto &mon : monitors_) {
         mon.SendToClient(keyEvent);
     }
     return false;
@@ -247,7 +247,7 @@ void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<Point
 {
     std::lock_guard<std::mutex> guard(lockMonitors_);
     MMI_LOGD("There are currently %{public}d monitors.", static_cast<int32_t>(monitors_.size()));
-    for (const SessionHandler& monitor : monitors_) {
+    for (const auto &monitor : monitors_) {
         monitor.SendToClient(pointerEvent);
     }
 }
@@ -278,7 +278,7 @@ bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_p
     }
     MMI_LOGD("There are currently %{public}d interceptors.",
         static_cast<int32_t>(interceptors_.size()));
-    for (const SessionHandler& interceptor : interceptors_) {
+    for (const auto &interceptor : interceptors_) {
         interceptor.SendToClient(keyEvent);
     }
     return true;
@@ -292,7 +292,7 @@ bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_p
     }
     MMI_LOGD("There are currently %{public}d interceptors.",
         static_cast<int32_t>(interceptors_.size()));
-    for (const SessionHandler& interceptor : interceptors_) {
+    for (const auto &interceptor : interceptors_) {
         interceptor.SendToClient(pointerEvent);
     }
     return true;

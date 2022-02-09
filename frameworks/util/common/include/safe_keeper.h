@@ -44,8 +44,8 @@ protected:
 
     bool IsExist(uint64_t tid) const
     {
-        for (auto it : dList_) {
-            if (it.tid == tid)
+        for (const auto &item : dList_) {
+            if (item.tid == tid)
                 return true;
         }
         return false;

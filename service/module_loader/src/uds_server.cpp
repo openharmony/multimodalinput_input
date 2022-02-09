@@ -51,8 +51,8 @@ void OHOS::MMI::UDSServer::UdsStop()
         epollFd_ = -1;
     }
 
-    for (auto it : sessionsMap_) {
-        it.second->Close();
+    for (const auto &item : sessionsMap_) {
+        item.second->Close();
     }
     sessionsMap_.clear();
     if (t_.joinable()) {
@@ -100,15 +100,15 @@ bool OHOS::MMI::UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
 void OHOS::MMI::UDSServer::Broadcast(NetPacket& pkt)
 {
     std::lock_guard<std::mutex> lock(mux_);
-    for (auto it : sessionsMap_) {
-        it.second->SendMsg(pkt);
+    for (const auto &item : sessionsMap_) {
+        item.second->SendMsg(pkt);
     }
 }
 
 void OHOS::MMI::UDSServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
 {
-    for (auto it : fdList) {
-        SendMsg(it, pkt);
+    for (const auto &item : fdList) {
+        SendMsg(item, pkt);
     }
 }
 
@@ -170,8 +170,8 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
 
     std::list<std::function<void()> > cleanTaskList;
     auto cleanTaskWhenError = [cleanTaskList] {
-        for (auto i : cleanTaskList) {
-            i();
+        for (const auto &item : cleanTaskList) {
+            item();
         }
     };
 
@@ -222,15 +222,15 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
 void OHOS::MMI::UDSServer::Dump(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mux_);
+    mprintf(fd, "Sessions: count=%d", sessionsMap_.size());
     std::string strTmp = "fds:[";
     if (sessionsMap_.empty()) {
         strTmp = "fds:[]";
         mprintf(fd, "\t%s", strTmp.c_str());
         return;
     }
-    mprintf(fd, "Sessions: count=%d", sessionsMap_.size());
-    for (const auto& it : sessionsMap_) {
-        strTmp += std::to_string(it.second->GetFd()) + ",";
+    for (const auto& item : sessionsMap_) {
+        strTmp += std::to_string(item.second->GetFd()) + ",";
     }
     strTmp.resize(strTmp.size() - 1);
     strTmp += "]";
@@ -452,11 +452,11 @@ void OHOS::MMI::UDSServer::OnThread()
             for (auto i = 0; i < count; i++) {
                 OnEvent(ev[i], bufMap);
             }
-            for (auto& it : bufMap) {
-                if (it.second.isOverflow) {
+            for (const auto &item : bufMap) {
+                if (item.second.isOverflow) {
                     continue;
                 }
-                OnRecv(it.first, it.second.sBuf.Data(), it.second.sBuf.Size());
+                OnRecv(item.first, item.second.sBuf.Data(), item.second.sBuf.Size());
             }
         }
 #ifdef OHOS_BUILD_MMI_DEBUG
@@ -497,7 +497,7 @@ void OHOS::MMI::UDSServer::AddSessionDeletedCallback(std::function<void(SessionP
 void OHOS::MMI::UDSServer::NotifySessionDeleted(SessionPtr ses)
 {
     MMI_LOGD("Enter");
-    for (auto& callback : callbacks_) {
+    for (const auto& callback : callbacks_) {
         callback(ses);
     }
     MMI_LOGD("Leave");

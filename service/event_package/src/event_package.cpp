@@ -492,14 +492,14 @@ int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event, EventJoySt
         {"ABS_HAT0X", JOYSTICK_AXIS_SOURCE_ABS_HAT0X, eventJoyStickAxis.abs_hat0x},
         {"ABS_HAT0Y", JOYSTICK_AXIS_SOURCE_ABS_HAT0Y, eventJoyStickAxis.abs_hat0y},
     };
-    for (auto& temp : supportAxisInfos) {
-        libinput_joystick_axis_source axis = static_cast<libinput_joystick_axis_source>(temp.axis);
+    for (const auto &item : supportAxisInfos) {
+        libinput_joystick_axis_source axis = static_cast<libinput_joystick_axis_source>(item.axis);
         if (!libinput_event_get_joystick_axis_value_is_changed(joyEvent, axis)) {
             continue;
         }
         auto pAbsInfo = libinput_event_get_joystick_axis_abs_info(joyEvent, axis);
         if (pAbsInfo != nullptr) {
-            FillEventJoyStickAxisAbsInfo(temp.absInfo, *pAbsInfo);
+            FillEventJoyStickAxisAbsInfo(item.absInfo, *pAbsInfo);
         }
     }
     return RET_OK;

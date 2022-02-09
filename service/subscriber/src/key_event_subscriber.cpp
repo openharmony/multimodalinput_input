@@ -43,7 +43,7 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
         return RET_ERR;
     }
 
-    for (auto keyCode : keyOption->GetPreKeys()) {
+    for (const auto &keyCode : keyOption->GetPreKeys()) {
         MMI_LOGD("keyOption->prekey=%{public}d", keyCode);
     }
 
@@ -90,7 +90,7 @@ bool KeyEventSubscriber::FilterSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEv
 
     int32_t keyAction = keyEvent->GetKeyAction();
     MMI_LOGD("keyCode:%{public}d, keyAction:%{public}s", keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
-    for (const auto& keyCode : keyEvent->GetPressedKeys()) {
+    for (const auto &keyCode : keyEvent->GetPressedKeys()) {
         MMI_LOGD("pressed KeyCode:%{public}d", keyCode);
     }
     bool handled = false;
@@ -129,7 +129,7 @@ bool KeyEventSubscriber::IsPreKeysMatch(const std::vector<int32_t>& preKeys,
         return false;
     }
 
-    for (auto pressedKey : pressedKeys) {
+    for (const auto &pressedKey : pressedKeys) {
         auto it = std::find(preKeys.begin(), preKeys.end(), pressedKey);
         if (it == preKeys.end()) {
             return false;
@@ -269,13 +269,13 @@ bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent
     auto keyCode = keyEvent->GetKeyCode();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     RemoveKeyCode(pressedKeys, keyCode);
-    for (auto& subscriber : subscribers_) {
+    for (const auto &subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
         MMI_LOGD("subscribeId=%{public}d, keyOption->finalKey=%{public}d, "
             "keyOption->isFinalKeyDown=%{public}s, keyOption->finalKeyDownDuriation=%{public}d",
             subscriber->id_, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
             keyOption->GetFinalKeyDownDuration());
-        for (auto keyCode : keyOption->GetPreKeys()) {
+        for (const auto &keyCode : keyOption->GetPreKeys()) {
             MMI_LOGD("keyOption->prekey=%{public}d", keyCode);
         }
 
@@ -319,7 +319,7 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
     auto keyCode = keyEvent->GetKeyCode();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     RemoveKeyCode(pressedKeys, keyCode);
-    for (auto& subscriber : subscribers_) {
+    for (const auto &subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
         MMI_LOGD("subscribeId=%{public}d, keyOption->finalKey=%{public}d, "
             "keyOption->isFinalKeyDown=%{public}s, keyOption->finalKeyDownDuriation=%{public}d",
@@ -378,7 +378,7 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
 bool KeyEventSubscriber::HandleKeyCanel(const std::shared_ptr<KeyEvent>& keyEvent)
 {
     MMI_LOGT("Enter");
-    for (auto& subscriber : subscribers_) {
+    for (const auto &subscriber : subscribers_) {
         ClearTimer(subscriber);
     }
     MMI_LOGT("Leave");
