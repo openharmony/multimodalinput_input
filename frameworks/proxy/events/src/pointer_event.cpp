@@ -419,8 +419,8 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    for (const auto &v : pointers_) {
-        if (!v.WriteToParcel(out)) {
+    for (const auto &item : pointers_) {
+        if (!item.WriteToParcel(out)) {
             return false;
         }
     }
@@ -434,8 +434,8 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    for (const auto &v : pressedButtons_) {
-        if (!out.WriteInt32(v)) {
+    for (const auto &item : pressedButtons_) {
+        if (!out.WriteInt32(item)) {
             return false;
         }
     }
@@ -470,8 +470,8 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    for (const auto &v : axisValues_) {
-        if (!out.WriteDouble(v)) {
+    for (const auto &item : axisValues_) {
+        if (!out.WriteDouble(item)) {
             return false;
         }
     }
@@ -568,8 +568,8 @@ bool PointerEvent::IsValidCheckMouseFunc() const
         return false;
     }
 
-    for (const int32_t btnId : pressedButtons_) {
-        if (btnId != MOUSE_BUTTON_LEFT && btnId != MOUSE_BUTTON_RIGHT && btnId != MOUSE_BUTTON_MIDDLE) {
+    for (const auto &item : pressedButtons_) {
+        if (item != MOUSE_BUTTON_LEFT && item != MOUSE_BUTTON_RIGHT && item != MOUSE_BUTTON_MIDDLE) {
             HiLog::Error(LABEL, "PressedButtons_ is invalid");
             return false;
         }
@@ -614,7 +614,7 @@ bool PointerEvent::IsValidCheckMouse() const
         return false;
     }
 
-    for (auto &item : pointers_) {
+    for (const auto &item : pointers_) {
         if (item.GetPointerId() < 0) {
             HiLog::Error(LABEL, "Item.pointerid is invalid");
             return false;

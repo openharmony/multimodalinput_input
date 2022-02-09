@@ -33,7 +33,6 @@ namespace {
 OHOS::MMI::HdfEventManager *OHOS::MMI::HdfEventManager::m_globleThis;
 int OHOS::MMI::HdfEventManager::EvdevSimIoctl(int hdindex, int pcmd, void *iobuff)
 {
-    uhdf *hdiuhdf = nullptr;
     const int size = (pcmd >> IOCTL_CMD_SHIFT) & IOCTL_CMD_MASK;
     const int iobuffSize = size;
     int cmd = pcmd & 0xff;
@@ -45,9 +44,8 @@ int OHOS::MMI::HdfEventManager::EvdevSimIoctl(int hdindex, int pcmd, void *iobuf
     if (drvtype >= INVALD) {
         return 0;
     }
-    for (std::list<uhdf*>::iterator it = m_globleThis->hdflist_.begin(); it != m_globleThis->hdflist_.end(); ++it) {
-        hdiuhdf = *it;
-        if (hdiuhdf->index == hdindex) {
+    for (const auto &item : m_globleThis->hdflist_) {
+        if (item.index == hdindex) {
             break;
         }
     }
@@ -110,18 +108,15 @@ int OHOS::MMI::HdfEventManager::EvdevSimIoctl(int hdindex, int pcmd, void *iobuf
 }
 int OHOS::MMI::HdfEventManager::EvdevIoctl(int hdiindex, int pcmd, void *iobuff)
 {
-    uhdf *hdiuhdf = nullptr;
     int size = (pcmd >> IOCTL_CMD_SHIFT) & IOCTL_CMD_MASK;
     const int iobuffSize = size;
     int cmd = pcmd & 0xff;
     DeviceInfo *deviceinfo = nullptr;
     MMI_LOGD("evdev_ioctl index: %{public}d cmd: %{public}02x size: %{public}d "
         "pcmd: %{public}04x", hdiindex, cmd, size, pcmd);
-    for (std::list<uhdf*>::iterator it = globleThis_->hdflist_.begin();
-        it != globleThis_->hdflist_.end(); ++it) {
-        hdiuhdf = *it;
+    for (auto &item : globleThis_->hdflist_){
         if (hdiuhdf->index == hdiindex) {
-            deviceinfo = (DeviceInfo*)hdiuhdf->deviceinfo;
+            deviceinfo = static_cast<DeviceInfo*>(item->deviceinfo);
             break;
         }
     }
@@ -448,7 +443,7 @@ int OHOS::MMI::HdfEventManager::HdfDevHandle(int index, hdf_event_type cmd)
         for (std::list<uhdf*>::iterator it = globleThis_->hdflist_.begin();
              it != globleThis_->hdflist_.end(); ++it) {
             uhdf *hdiuhdfit = *it;
-            if (hdiuhdfit->index == (int)index) {
+            if (hdiuhdfit->index == static_cast<int32_t>(index)) {
                 hdiuhdf = *it;
                 globleThis_->hdflist_.remove(*it);
                 break;
@@ -466,7 +461,7 @@ int OHOS::MMI::HdfEventManager::HdfDevHandle(int index, hdf_event_type cmd)
     for (std::list<uhdf*>::iterator it = globleThis_->hdflist_.begin();
         it != globleThis_->hdflist_.end(); ++it) {
         uhdf *hdiuhdfit = *it;
-        if (hdiuhdfit->index != (int)index) {
+        if (hdiuhdfit->index != static_cast<int32_t>(index)) {
             continue;
         }
 

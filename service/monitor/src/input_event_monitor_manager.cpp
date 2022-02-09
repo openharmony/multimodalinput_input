@@ -74,12 +74,12 @@ void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OH
     }
     NetPacket newPkt(MmiMessageId::ON_KEYMONITOR);
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, newPkt);
-    for (const auto &monitor : monitors_) {
-        CHKP(monitor.session, ERROR_NULL_POINTER);
-        newPkt << monitor.session->GetPid();
-        MMI_LOGD("Server send the msg to client, keyCode: %{public}d, pid: %{public}d", keyEvent->GetKeyCode(),
-            monitor.session->GetPid());
-        monitor.session->SendMsg(newPkt);
+    std::list<MonitorItem>::iterator iter;
+    for (const auto &item : monitors_) {
+        newPkt << item.session->GetPid();
+        MMI_LOGD("server send the msg to client: keyCode = %{public}d, pid = %{public}d", keyEvent->GetKeyCode(),
+            item.session->GetPid());
+        item.session->SendMsg(newPkt);
     }
 }
 
@@ -129,11 +129,11 @@ void OHOS::MMI::InputEventMonitorManager::OnTouchpadMonitorInputEvent(
     NetPacket newPkt(MmiMessageId::ON_TOUCHPAD_MONITOR);
     InputEventDataTransformation::SerializePointerEvent(pointerEvent, newPkt);
     std::list<MonitorItem>::iterator iter;
-    for (iter = monitorsTouch_.begin(); iter != monitorsTouch_.end(); iter++) {
-        newPkt << iter->session->GetPid();
+    for (const auto &item :  monitorsTouch_) {
+        newPkt << item.session->GetPid();
         MMI_LOGD("server send the msg to client: EventType = %{public}d, pid = %{public}d",
-            pointerEvent->GetEventType(), iter->session->GetPid());
-        iter->session->SendMsg(newPkt);
+            pointerEvent->GetEventType(), item.session->GetPid());
+        item.session->SendMsg(newPkt);
         MMI_LOGD("Service SendMsg Success");
     }
 }
