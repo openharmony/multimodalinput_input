@@ -273,7 +273,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(ev.event);
-    inputDeviceManager->OnInputDeviceAdded(device);
+    InputDevMgr->OnInputDeviceAdded(device);
 
     uint64_t sysStartProcessTime = GetSysClockTime();
     DeviceManage deviceManage = {};
@@ -310,7 +310,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(ev.event);
-    inputDeviceManager->OnInputDeviceRemoved(device);
+    InputDevMgr->OnInputDeviceRemoved(device);
 
     uint64_t sysStartProcessTime = GetSysClockTime();
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
@@ -403,7 +403,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
         return KEY_EVENT_PKG_FAIL;
     }
 #ifndef OHOS_WESTEN_MODEL
-    if (INTERCEPTORMANAGERGLOBAL.OnKeyEvent(keyEvent_)) {
+    if (InterceptorMgrGbl.OnKeyEvent(keyEvent_)) {
         MMI_LOGD("key event filter find a key event from Original event keyCode : %{puiblic}d",
             keyEvent_->GetKeyCode());
         return RET_OK;

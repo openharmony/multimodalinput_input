@@ -717,7 +717,7 @@ int32_t ClientMsgHandler::KeyEventFilter(const UDSClient& client, NetPacket& pkt
     int32_t deviceEventType = KEY_EVENT;
     event.Initialize(windowId, 0, 0, 0, 0, 0, key.state, key.key, 0, 0, key.uuid, key.eventType,
                      key.time, "", static_cast<int32_t>(key.deviceId), 0, key.deviceType, deviceEventType);
-    return inputFilterManager.OnKeyEvent(event, id);
+    return InputFilterMgr.OnKeyEvent(event, id);
 }
 
 int32_t ClientMsgHandler::TouchEventFilter(const UDSClient& client, NetPacket& pkt)
@@ -765,7 +765,7 @@ int32_t ClientMsgHandler::TouchEventFilter(const UDSClient& client, NetPacket& p
         static_cast<int32_t>(touchData.deviceId), 0, false, touchData.deviceType, deviceEventType);
 
     pkt >> id;
-    return inputFilterManager.OnTouchEvent(event, id);
+    return InputFilterMgr.OnTouchEvent(event, id);
 }
 
 int32_t ClientMsgHandler::PointerEventInterceptor(const UDSClient& client, NetPacket& pkt)
@@ -793,7 +793,7 @@ int32_t ClientMsgHandler::PointerEventInterceptor(const UDSClient& client, NetPa
         static_cast<float>(pointData.discrete.x), static_cast<float>(pointData.discrete.y),
         0, 0, 0, pointData.uuid, pointData.eventType, static_cast<int32_t>(pointData.time),
         "", static_cast<int32_t>(pointData.deviceId), 0, pointData.deviceType, eventJoyStickAxis);
-    return (inputFilterManager.OnPointerEvent(mouse_event, id));
+    return (InputFilterMgr.OnPointerEvent(mouse_event, id));
 }
 
 int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt)
@@ -840,7 +840,7 @@ int32_t ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetP
     pkt >> pid >> id;
     MMI_LOGD("client receive the msg from server: pointId = %{public}d, pid = %{public}d",
              pointerEvent->GetPointerId(), pid);
-    return INTERCEPTORMANAGER.OnPointerEvent(pointerEvent, id);
+    return InterceptorMgr.OnPointerEvent(pointerEvent, id);
 }
 
 int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket& pkt)
@@ -855,7 +855,7 @@ int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket
     pkt >> pid;
     MMI_LOGD("client receive the msg from server: keyCode = %{public}d, pid = %{public}d",
         keyEvent->GetKeyCode(), pid);
-    return INTERCEPTORMANAGER.OnKeyEvent(keyEvent);
+    return InterceptorMgr.OnKeyEvent(keyEvent);
 }
 
 void ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, NetPacket& pkt) const

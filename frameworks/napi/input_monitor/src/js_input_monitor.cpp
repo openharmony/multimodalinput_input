@@ -21,7 +21,7 @@
 #include "js_input_monitor_manager.h"
 #include "js_input_monitor_util.h"
 
-#define INPUTMGR OHOS::MMI::InputManager::GetInstance()
+#define InputMgr OHOS::MMI::InputManager::GetInstance()
 
 namespace OHOS {
 namespace MMI {
@@ -35,7 +35,7 @@ bool InputMonitor::Start()
     MMI_LOGD("Enter");
     std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
-        monitorId_ = INPUTMGR->AddMonitor(shared_from_this());
+        monitorId_ = InputMgr->AddMonitor(shared_from_this());
         return monitorId_ >= 0;
     }
     MMI_LOGD("Leave");
@@ -49,7 +49,7 @@ void InputMonitor::Stop()
     if (monitorId_ < 0) {
         return;
     }
-    INPUTMGR->RemoveMonitor(monitorId_);
+    InputMgr->RemoveMonitor(monitorId_);
     monitorId_ = -1;
     MMI_LOGD("Leave");
     return;
@@ -107,7 +107,7 @@ void InputMonitor::MarkConsumed(int32_t eventId)
     if (monitorId_ < 0) {
         return;
     }
-    INPUTMGR->MarkConsumed(monitorId_, eventId);
+    InputMgr->MarkConsumed(monitorId_, eventId);
     consumed_ = true;
 }
 

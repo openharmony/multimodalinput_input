@@ -288,7 +288,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
         MMI_LOGE("AddInterceptor::%{public}s param should not be null!", __func__);
         return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
-    int32_t interceptorId = INTERCEPTORMANAGER.AddInterceptor(interceptor);
+    int32_t interceptorId = InterceptorMgr.AddInterceptor(interceptor);
     if (interceptorId >= 0) {
         interceptorId = interceptorId * ADD_MASK_BASE + MASK_KEY;
     }
@@ -308,7 +308,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
             InputInterceptorManager::GetInstance().RemoveInterceptor(interceptorId);
             break;
         case MASK_KEY:
-            INTERCEPTORMANAGER.RemoveInterceptor(interceptorId);
+            InterceptorMgr.RemoveInterceptor(interceptorId);
             break;
         default:
             MMI_LOGE("Can't find the mask,mask%{public}d", mask);

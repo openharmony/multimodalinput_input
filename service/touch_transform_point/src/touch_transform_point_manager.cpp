@@ -32,7 +32,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(l
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, nullptr);
     std::shared_ptr<TouchTransformPointProcessor> processor;
-    auto deviceId = inputDeviceManager->FindInputDeviceId(device);
+    auto deviceId = InputDevMgr->FindInputDeviceId(device);
     auto it = touchPro_.find(deviceId);
     if (it != touchPro_.end()) {
         processor = it->second;
@@ -50,7 +50,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEven
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, nullptr);
     std::shared_ptr<TouchPadTransformPointProcessor> processor;
-    auto deviceId = inputDeviceManager->FindInputDeviceId(device);
+    auto deviceId = InputDevMgr->FindInputDeviceId(device);
     auto it = touchpadPro_.find(deviceId);
     if (it != touchpadPro_.end()) {
         processor = it->second;
@@ -68,7 +68,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestrueEvent
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, nullptr);
     std::shared_ptr<GestureTransformPointProcessor> processor;
-    auto deviceId = inputDeviceManager->FindInputDeviceId(device);
+    auto deviceId = InputDevMgr->FindInputDeviceId(device);
     auto it = gesturePro_.find(deviceId);
     if (it != gesturePro_.end()) {
         processor = it->second;
