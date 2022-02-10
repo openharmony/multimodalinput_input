@@ -45,6 +45,7 @@ void MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 {
     MMI_LOGT("enter");
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent_->SetButtonId(buttionId_);
 
     absolutionX_ += libinput_event_pointer_get_dx(data);
     absolutionY_ += libinput_event_pointer_get_dy(data);
@@ -75,11 +76,13 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEv
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
         pointerEvent_->DeleteReleaseButton(button);
         pointerItem.SetPressed(false);
+        buttionId_ = PointerEvent::BUTTON_NONE;
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_PRESSED);
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
         pointerEvent_->SetButtonPressed(button);
         pointerItem.SetPressed(true);
+        buttionId_ = pointerEvent_->GetButtonId();
     } else {
         MMI_LOGW("unknown state, state: %{public}u", state);
     }
