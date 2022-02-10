@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_KNUCKLE_FUNC_PROC_H
-#define OHOS_KNUCKLE_FUNC_PROC_H
+#ifndef KNUCKLE_FUNC_PROC_H
+#define KNUCKLE_FUNC_PROC_H
 #include "senior_input_func_proc_base.h"
 
 namespace OHOS {
@@ -26,4 +26,4 @@ public:
 };
 }
 }
-#endif
+#endif // KNUCKLE_FUNC_PROC_H

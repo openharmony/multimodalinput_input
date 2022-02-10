@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMODAL_INPUT_CONNECT_STUB_H
-#define OHOS_MULTIMODAL_INPUT_CONNECT_STUB_H
+#ifndef I_MULTIMODAL_INPUT_CONNECT_STUB_H
+#define I_MULTIMODAL_INPUT_CONNECT_STUB_H
 
 #include "i_multimodal_input_connect.h"
 #include "log.h"
@@ -45,4 +45,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // OHOS_MULTIMODAL_INPUT_CONNECT_STUB_H
+#endif // I_MULTIMODAL_INPUT_CONNECT_STUB_H

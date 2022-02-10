@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_EVENT_PACKAGE_H
-#define OHOS_EVENT_PACKAGE_H
+#ifndef EVENT_PACKAGE_H
+#define EVENT_PACKAGE_H
 #include "pointer_event.h"
 #include "key_event.h"
 #include "input_windows_manager.h"
@@ -69,4 +69,4 @@ namespace OHOS::MMI {
         return RET_OK;
     }
 }
-#endif
+#endif // EVENT_PACKAGE_H

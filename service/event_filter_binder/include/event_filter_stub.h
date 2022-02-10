@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_POINTER_EVENT_FILTER_STUB_H
-#define OHOS_POINTER_EVENT_FILTER_STUB_H
+#ifndef EVENT_FILTER_STUB_H
+#define EVENT_FILTER_STUB_H
 
 #include "i_event_filter.h"
 #include "log.h"
@@ -33,4 +33,4 @@ protected:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // OHOS_POINTER_EVENT_FILTER_STUB_H
+#endif // EVENT_FILTER_STUB_H
