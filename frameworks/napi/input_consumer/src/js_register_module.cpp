@@ -161,12 +161,8 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
         count++;
     }
     MMI_LOGD("kevEventSize:%{public}d, infoSize:%{public}d", count, infoSize);
-    const KeyEvent::KeyItem* keyItem = keyEvent->GetKeyItem();
-    if (keyItem == nullptr) {
-        MMI_LOGE("Skip, null keyItem");
-        return false;
-    }
-
+    auto keyItem = keyEvent->GetKeyItem();
+    CHKPF(keyItem);
     auto upTime = keyEvent->GetActionTime();
     auto downTime = keyItem->GetDownTime();
     auto curDurtionTime = keyOption->GetFinalKeyDownDuration();

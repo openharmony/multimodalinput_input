@@ -106,11 +106,11 @@ int OHOS::MMI::HdfEventManager::EvdevSimIoctl(int hdindex, int pcmd, void *iobuf
     }
     return RET_OK;
 }
-int OHOS::MMI::HdfEventManager::EvdevIoctl(int hdiindex, int pcmd, void *iobuff)
+int32_t OHOS::MMI::HdfEventManager::EvdevIoctl(int hdiindex, int pcmd, void *iobuff)
 {
-    int size = (pcmd >> IOCTL_CMD_SHIFT) & IOCTL_CMD_MASK;
-    const int iobuffSize = size;
-    int cmd = pcmd & 0xff;
+    int32_t size = (pcmd >> IOCTL_CMD_SHIFT) & IOCTL_CMD_MASK;
+    const int32_t iobuffSize = size;
+    int32_t cmd = pcmd & 0xff;
     DeviceInfo *deviceinfo = nullptr;
     MMI_LOGD("evdev_ioctl index: %{public}d cmd: %{public}02x size: %{public}d "
         "pcmd: %{public}04x", hdiindex, cmd, size, pcmd);
@@ -123,7 +123,7 @@ int OHOS::MMI::HdfEventManager::EvdevIoctl(int hdiindex, int pcmd, void *iobuff)
     if (deviceinfo == nullptr) {
         return 0;
     }
-    int ret = 0;
+    int32_t ret = 0;
     switch (cmd) {
         case IO_BITS:
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.eventType, size);
@@ -379,10 +379,7 @@ int OHOS::MMI::HdfEventManager::DeviceRemoveHandle(uint32_t devIndex, uint32_t d
 void OHOS::MMI::HdfEventManager::GetEventCallback(const EventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
     const uint16_t byteSize = 8;
-    if (pkgs == nullptr) {
-        MMI_LOGE("---- %{public}s:%{public}d Error:pkgs is nullptr.----", __func__, __LINE__);
-        return;
-    }
+    CHKP(pkgs);
     input_event eventarry[MAX_EVENT_PKG_NUM];
     for (uint32_t i = 0; i < count && i < MAX_EVENT_PKG_NUM; i++) {
         eventarry[i].code = pkgs[i]->code;

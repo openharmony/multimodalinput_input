@@ -32,11 +32,11 @@ using namespace OHOS::MMI;
 
 static void SeatsInfoDebugPrint(const struct SeatInfo** seats)
 {
-    MMI_LOGT("Seats:");
+    MMI_LOGD("Seats:");
     for (int i = 0; seats[i]; i++) {
-        MMI_LOGT(" -Seat%{public}02d seatName:%{public}s, deviceFlags:%{public}d, focusWindowId:%{public}d", i + 1,
+        MMI_LOGD(" -Seat%{public}02d seatName:%{public}s, deviceFlags:%{public}d, focusWindowId:%{public}d", i + 1,
                  seats[i]->seatName, seats[i]->deviceFlags, seats[i]->focusWindowId);
-        MMI_LOGT(".");
+        MMI_LOGD(".");
     }
 }
 
@@ -75,10 +75,7 @@ void OHOS::MMI::InputWindowsManager::UpdateSeatsInfo()
         FreeSeatsInfo(seatsInfo_);
     }
     seatsInfo_ = GetSeatsInfo();
-    if (seatsInfo_ == nullptr) {
-        MMI_LOGE("InputWindowsManager::UpdateSeatsInfo seatsInfo = nullptr");
-        return;
-    }
+    CHKP(seatsInfo_);
     if (seatsInfo_[0] && seatsInfo_[0]->focusWindowId > 0) {
         SetFocusId(seatsInfo_[0]->focusWindowId);
     }
@@ -89,16 +86,11 @@ void OHOS::MMI::InputWindowsManager::UpdateSeatsInfo()
 void OHOS::MMI::InputWindowsManager::UpdateScreensInfo()
 {
     std::lock_guard<std::mutex> lock(mu_);
-    // free the last screen info
     if (screensInfo_ != nullptr) {
         FreeScreensInfo(screensInfo_);
     }
     screensInfo_ = GetScreensInfo();
-    if (screensInfo_ == nullptr) {
-        MMI_LOGE("InputWindowsManager::UpdateScreensInfo screensInfo_ = nullptr");
-        return;
-    }
-    // save windows info
+    CHKP(screensInfo_);
     SaveScreenInfoToMap(const_cast<const ScreenInfo**>(screensInfo_));
     PrintDebugInfo();
 }
@@ -162,27 +154,24 @@ void OHOS::MMI::InputWindowsManager::SetFocusId(int32_t id)
 
 void OHOS::MMI::InputWindowsManager::PrintDebugInfo()
 {
-    MMI_LOGT("***********seats info***********");
-    if (seatsInfo_ == nullptr) {
-        MMI_LOGT("seatsInfo_ is nullptr");
-        return;
-    }
+    MMI_LOGD("***********seats info***********");
+    CHKP(seatsInfo_);
     int32_t idx = 0;
     for (int i = 0; seatsInfo_[i]; i++) {
         idx = i + 1;
-        MMI_LOGT(" -Seat%{public}02d: seatName: %{public}s, deviceFlags: %{public}d, focusWindowId: %{public}d", idx,
+        MMI_LOGD(" -Seat%{public}02d: seatName: %{public}s, deviceFlags: %{public}d, focusWindowId: %{public}d", idx,
                  seatsInfo_[i]->seatName, seatsInfo_[i]->deviceFlags, seatsInfo_[i]->focusWindowId);
     }
 
-    MMI_LOGT("***********screen info***********");
+    MMI_LOGD("***********screen info***********");
     for (const auto &j : screenInfoVec_) {
-        MMI_LOGT(" -screenId: %{public}d, connectorName: %{public}s, screenWidth: %{public}d, screenHeight: "
+        MMI_LOGD(" -screenId: %{public}d, connectorName: %{public}s, screenWidth: %{public}d, screenHeight: "
                  "%{public}d, screenNlayers: %{public}d", j.screenId, j.connectorName, j.width, j.height, j.nLayers);
     }
 
-    MMI_LOGT("***********layer info***********");
+    MMI_LOGD("***********layer info***********");
     for (const auto &k : layers_) {
-        MMI_LOGT(" -layer_id: %{public}d, on_screen_id: %{public}d, nSurfaces: %{public}d src(xywh): [%{public}d, "
+        MMI_LOGD(" -layer_id: %{public}d, on_screen_id: %{public}d, nSurfaces: %{public}d src(xywh): [%{public}d, "
                  "%{public}d, %{public}d, %{public}d], dest(xywh): [%{public}d, %{public}d, %{public}d, %{public}d] "
                  "visibility: %{public}d, opacity: %{public}lf",
                  k.second.layerId, k.second.onScreenId, k.second.nSurfaces, k.second.srcX, k.second.srcY,
@@ -190,10 +179,10 @@ void OHOS::MMI::InputWindowsManager::PrintDebugInfo()
                  k.second.visibility, k.second.opacity);
     }
 
-    MMI_LOGT("***********window info***********");
+    MMI_LOGD("***********window info***********");
     for (const auto &m : surfaces_) {
         auto appFd = AppRegs->FindByWinId(m.second.surfaceId);
-        MMI_LOGT(" -surface_id: %{public}d, on_screen_id: %{public}d, on_layer_id: %{public}d, src(xywh): [%{public}d,"
+        MMI_LOGD(" -surface_id: %{public}d, on_screen_id: %{public}d, on_layer_id: %{public}d, src(xywh): [%{public}d,"
                  " %{public}d, %{public}d, %{public}d] desc(xywh): [%{public}d, %{public}d, %{public}d, %{public}d], "
                  "visibility: %{public}d, opacity: %{public}lf, appFd: %{public}d bundlerName: %{public}s appName: "
                  "%{public}s",
@@ -618,10 +607,7 @@ bool OHOS::MMI::InputWindowsManager::TransformTouchPointToDisplayPoint(libinput_
 {
 
     auto info = FindMatchedPhysicalDisplayInfo("seat0","default0");
-    if (info == nullptr) {
-        MMI_LOGD("info is a nullptr, find display seat0:default0  failed by Physical");
-        return false;
-    }
+    CHKPF(info);
     if (info->width <= 0) {
         return false;
     }
@@ -666,10 +652,7 @@ bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint(libinput_event_
 {
 
     auto info = FindMatchedPhysicalDisplayInfo("seat0","default0");
-    if (info == nullptr) {
-        MMI_LOGD("info is a nullptr, find display seat0:default0  failed by Physical");
-        return false;
-    }
+    CHKPF(info);
     if (info->width <= 0) {
         return false;
     }
