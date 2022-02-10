@@ -42,12 +42,7 @@ bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> ev
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-
-    if (event == nullptr) {
-        MMI_LOGE("event is nullptr");
-        return false;
-    }
-
+    CHKPF(event);
     if (!data.WriteInterfaceToken(EventFilterProxy::GetDescriptor())) {
         MMI_LOGE("Failed to write descriptor");
         return false;

@@ -204,8 +204,8 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
 
 void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
 {
-    MMI_LOGD("enter");
-    CHKP(reportEvent, ERROR_NULL_POINTER);
+    MMI_LOGD("%{public}s begin", __func__);
+    CHKP(reportEvent);
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(reportEvent->env, "AsyncCallback", NAPI_AUTO_LENGTH, &resourceName);
     if (status != napi_ok) {

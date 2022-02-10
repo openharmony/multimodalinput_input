@@ -1251,10 +1251,7 @@ void ClientMsgHandler::TracePointerEvent(const EventPointer& pointData) const
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    if (client == nullptr) {
-        MMI_LOGE("Get MMIClint false");
-        return;
-    }
+    CHKP(client);
     NetPacket pkt(MmiMessageId::NEW_CHECK_REPLY_MESSAGE);
     pkt << eventId;
     CHK(client->SendMessage(pkt), MSG_SEND_FAIL);

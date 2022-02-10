@@ -31,9 +31,7 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, 
 MouseEventHandler::MouseEventHandler()
 {
     pointerEvent_ = PointerEvent::Create();
-    if (pointerEvent_ == nullptr) {
-        MMI_LOGF("pointerEvent_ create fail");
-    }
+    CKP(pointerEvent_);
 }
 
 std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent()
@@ -100,20 +98,12 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
         timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
             MMI_LOGT("enter");
             auto sharedPtr = weakPtr.lock();
-            if (sharedPtr == nullptr) {
-                MMI_LOGW("sharedPtr is nullptr");
-                return;
-            }
+            CHKP(sharedPtr);
             MMI_LOGD("timer: %{public}d", sharedPtr->timerId_);
             sharedPtr->timerId_ = -1;
-
             auto pointerEvent = sharedPtr->GetPointerEvent();
-            if (pointerEvent == nullptr) {
-                MMI_LOGE("pointerEvent is nullptr");
-                return;
-            }
+            CHKP(pointerEvent);
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
-
             InputHandler->OnMouseEventEndTimerHandler(pointerEvent);
             MMI_LOGD("leave, axis end");
         });
