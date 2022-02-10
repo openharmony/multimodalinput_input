@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MMI_TOKEN_H
-#define OHOS_MMI_TOKEN_H
+#ifndef MMI_TOKEN_H
+#define MMI_TOKEN_H
 
 #include "immi_token.h"
 
@@ -74,4 +74,4 @@ private:
 };
 }
 }
-#endif // OHOS_MMI_TOKEN_H
+#endif // MMI_TOKEN_H

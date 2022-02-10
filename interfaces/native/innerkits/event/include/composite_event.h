@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_COMPOSITE_EVENTS_H
-#define OHOS_COMPOSITE_EVENTS_H
+#ifndef COMPOSITE_EVENT_H
+#define COMPOSITE_EVENT_H
 
 #include "multimodal_event.h"
 
@@ -38,4 +38,4 @@ public:
     virtual ~CompositeEvent();
 };
 }
-#endif
+#endif // COMPOSITE_EVENT_H

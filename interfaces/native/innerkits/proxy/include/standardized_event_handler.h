@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_STANDARDIZED_EVENTS_HANDLER_H
-#define OHOS_STANDARDIZED_EVENTS_HANDLER_H
+#ifndef STANDARDIZED_EVENT_HANDLER_H
+#define STANDARDIZED_EVENT_HANDLER_H
 
 #include "proto.h"
 #include "key_event.h"
@@ -96,4 +96,4 @@ StandEventPtr OHOS::MMI::StandardizedEventHandler::Create()
 }
 }
 }
-#endif
+#endif // STANDARDIZED_EVENT_HANDLER_H

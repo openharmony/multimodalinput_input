@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_DISPLAY_INFO_H
-#define OHOS_MULTIMDOALINPUT_DISPLAY_INFO_H
+#ifndef DISPLAY_INFO_H
+#define DISPLAY_INFO_H
 
 #include <vector>
 #include <string>
@@ -137,4 +137,4 @@ struct LogicalDisplayInfo {
 }
 } // namespace OHOS::MMI
 
-#endif // OHOS_MULTIMDOALINPUT_DISPLAY_INFO_H
+#endif // DISPLAY_INFO_H
