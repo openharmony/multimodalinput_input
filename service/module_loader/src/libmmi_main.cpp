@@ -24,7 +24,6 @@
 #include "wayland-server-core.h"
 
 #ifdef OHOS_BUILD_MMI_DEBUG
-#include "command_helper.h"
 #include "uds_command_queue.h"
 #endif // OHOS_BUILD_MMI_DEBUG
 
