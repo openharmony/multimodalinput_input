@@ -67,6 +67,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnSearch_001, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnSearch(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerThirdTest, OnSearch_002, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -168,6 +169,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnSearch_007, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnSearch(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerThirdTest, OnSearch_008, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -294,6 +296,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnClosePage_007, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnClosePage(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerThirdTest, OnClosePage_008, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -318,6 +321,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnLaunchVoiceAssistant_001, TestSize.Leve
     int32_t retResult = multimodalTest.OnLaunchVoiceAssistant(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerThirdTest, OnLaunchVoiceAssistant_002, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -351,6 +355,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnLaunchVoiceAssistant_003, TestSize.Leve
     int32_t retResult = multimodalTestTmp.OnLaunchVoiceAssistant(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerThirdTest, OnLaunchVoiceAssistant_004, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -443,6 +448,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnMute_001, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnMute(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerThirdTest, OnMute_002, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -459,6 +465,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnMute_002, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnMute(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerThirdTest, OnMute_003, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -543,6 +550,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnMute_007, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnMute(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerThirdTest, OnMute_008, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -669,6 +677,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnAnswer_007, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnAnswer(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerThirdTest, OnAnswer_008, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -795,6 +804,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnRefuse_007, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnRefuse(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerThirdTest, OnRefuse_008, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -811,6 +821,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnRefuse_008, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnRefuse(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_001, TestSize.Level1)
 {
     MultimodalEventFirstUnitTest multimodalTestTmp;
@@ -835,6 +846,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_002, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnHangup(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_003, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -902,6 +914,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_006, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnHangup(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_007, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -918,6 +931,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_007, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnHangup(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_008, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -934,6 +948,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_008, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnHangup(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerThirdTest, OnTelephoneControl_001, TestSize.Level1)
 {
     MultimodalEventFirstUnitTest multimodalTestTmp;
@@ -1043,6 +1058,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnTelephoneControl_007, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnTelephoneControl(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerThirdTest, OnTelephoneControl_008, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -1059,6 +1075,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnTelephoneControl_008, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnTelephoneControl(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceAdd_001, TestSize.Level1)
 {
     MultimodalEventFirstUnitTest multimodalTestTmp;
@@ -1168,6 +1185,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceAdd_007, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnDeviceAdd(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceAdd_008, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
@@ -1192,6 +1210,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceRemove_001, TestSize.Level1)
     int32_t retResult = multimodalTestTmp.OnDeviceRemove(event);
     EXPECT_TRUE(retResult == RET_OK);
 }
+
 HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceRemove_002, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
