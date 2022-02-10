@@ -67,4 +67,4 @@ private:
 }
 } // namespace OHOS::MMI
 #define TimerMgr OHOS::MMI::TimerManager::GetInstance()
-#endif // timer
+#endif // TIMER_MANAGER_H

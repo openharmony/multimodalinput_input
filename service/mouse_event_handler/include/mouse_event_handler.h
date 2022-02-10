@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_MOUSE_EVENT_HANDLER_H
-#define OHOS_MULTIMDOALINPUT_MOUSE_EVENT_HANDLER_H
+#ifndef MOUSE_EVENT_HANDLER_H
+#define MOUSE_EVENT_HANDLER_H
 
 #include <memory>
 #include "libinput.h"
@@ -48,4 +48,4 @@ private:
 } // namespace OHOS
 #define MouseEventHdr OHOS::MMI::MouseEventHandler::GetInstance()
 
-#endif // OHOS_MULTIMDOALINPUT_POINTER_EVENT_H
+#endif // MOUSE_EVENT_HANDLER_H

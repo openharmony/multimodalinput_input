@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MMI_MESSAGE_POST_H
-#define OHOS_MMI_MESSAGE_POST_H
+#ifndef MESSAGE_POST_H
+#define MESSAGE_POST_H
 
 #include <map>
 #include <string>
@@ -42,4 +42,4 @@ private:
 }
 }
 #define MMIMsgPost OHOS::MMI::MessagePost::GetInstance()
-#endif
+#endif // MESSAGE_POST_H
