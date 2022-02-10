@@ -720,7 +720,7 @@ const std::vector<struct LogicalDisplayInfo>& OHOS::MMI::InputWindowsManager::Ge
     return logicalDisplays_;
 }
 
-const std::map<int32_t, struct WindowInfo>& OHOS::MMI::InputWindowsManager::GetWindowInfo() const
+const std::map<int32_t, WindowInfo>& OHOS::MMI::InputWindowsManager::GetWindowInfo() const
 {
     return windowInfos_;
 }
@@ -1096,7 +1096,7 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
 
 void OHOS::MMI::InputWindowsManager::SetLocalInfo(int32_t x, int32_t y)
 {
-    const std::map<int32_t, struct WindowInfo> windowInfo = GetWindowInfo();
+    const std::map<int32_t, WindowInfo> windowInfo = GetWindowInfo();
     bool isOutsideOfTopLeftX = false;
     bool isOutsideOfTopLeftY = false;
     bool isOutsideOfTopRightX = false;

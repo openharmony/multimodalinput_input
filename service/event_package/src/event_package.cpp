@@ -505,7 +505,7 @@ int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event, EventJoySt
     return RET_OK;
 }
 
-void EventPackage::PackageTouchEventByType(int32_t type, struct libinput_event_touch *data, EventTouch& touch)
+void EventPackage::PackageTouchEventByType(int32_t type, libinput_event_touch *data, EventTouch& touch)
 {
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
