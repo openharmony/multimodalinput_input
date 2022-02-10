@@ -111,4 +111,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif
+#endif // JS_INPUT_MONITOR_H

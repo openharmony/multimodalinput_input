@@ -16,6 +16,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef SOUCETYPE_H
+#define SOUCETYPE_H
 
 namespace OHOS {
 namespace MMI {
@@ -30,3 +32,5 @@ static const int32_t SOURCETYPE_TOUCHPAD = 3;
 static const int32_t SOURCETYPE_KEY = 4;
 } // MMI
 } // OHOS
+
+#endif // SOUCETYPE_H

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MOUSE_EVENTS_H
-#define OHOS_MOUSE_EVENTS_H
+#ifndef MOUSE_EVENT_H
+#define MOUSE_EVENT_H
 
 #include <map>
 #include "struct_multimodal.h"
@@ -291,4 +291,4 @@ private:
     std::map<int32_t, float> mapDeviceAxis_ = {};
 };
 }
-#endif
+#endif // MOUSE_EVENT_H

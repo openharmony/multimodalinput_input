@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_IF_CLIENT_MSG_HANDLER_H
-#define OHOS_IF_CLIENT_MSG_HANDLER_H
+#ifndef IF_CLIENT_MSG_HANDLER_H
+#define IF_CLIENT_MSG_HANDLER_H
 
 #include <memory>
 
@@ -30,4 +30,4 @@ public:
 using IClientMsgHandlerPtr = std::shared_ptr<IfClientMsgHandler>;
 }
 }
-#endif
+#endif // IF_CLIENT_MSG_HANDLER_H

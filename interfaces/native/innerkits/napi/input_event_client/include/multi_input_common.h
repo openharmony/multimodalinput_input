@@ -21,8 +21,8 @@
  * @since 1.0
  * @version 1.0
  */
-#ifndef OHOS_MULTI_INPUT_COMMON_H
-#define OHOS_MULTI_INPUT_COMMON_H
+#ifndef MULTI_INPUT_COMMON_H
+#define MULTI_INPUT_COMMON_H
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -40,4 +40,4 @@ public:
 };
 }
 }
-#endif
+#endif // MULTI_INPUT_COMMON_H

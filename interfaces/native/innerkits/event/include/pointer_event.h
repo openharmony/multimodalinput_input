@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_POINTER_EVENT_H
-#define OHOS_MULTIMDOALINPUT_POINTER_EVENT_H
+#ifndef POINTER_EVENT_H
+#define POINTER_EVENT_H
 
 #include <array>
 #include <list>
@@ -242,4 +242,4 @@ inline int32_t PointerEvent::GetAxes() const
 }
 }
 } // namespace OHOS::MMI
-#endif // OHOS_MULTIMDOALINPUT_POINTER_EVENT_H
+#endif // POINTER_EVENT_H

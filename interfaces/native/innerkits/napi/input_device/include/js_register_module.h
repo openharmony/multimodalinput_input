@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_JS_INPUT_DEVICE_REGISTER_MODULE_H
-#define OHOS_JS_INPUT_DEVICE_REGISTER_MODULE_H
+#ifndef JS_REGISTER_MODULE_H
+#define JS_REGISTER_MODULE_H
 
 #include <stdio.h>
 #include <map>
@@ -46,4 +46,4 @@ namespace MMI {
 } // namespace MMI
 } // namespace OHOS
 
-#endif
+#endif // JS_REGISTER_MODULE_H

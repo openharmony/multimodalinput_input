@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MULTIMODAL_STANDARDIZED_EVENTS_MANAGER_H
-#define OHOS_MULTIMODAL_STANDARDIZED_EVENTS_MANAGER_H
+#ifndef MULTIMODAL_STANDARDIZED_EVENT_MANAGER_H
+#define MULTIMODAL_STANDARDIZED_EVENT_MANAGER_H
 
 #include <set>
 #include "singleton.h"
@@ -110,4 +110,4 @@ protected:
 }
 }
 #define EventManager OHOS::Singleton<OHOS::MMI::MultimodalStandardizedEventManager>::GetInstance()
-#endif
+#endif // MULTIMODAL_STANDARDIZED_EVENT_MANAGER_H
