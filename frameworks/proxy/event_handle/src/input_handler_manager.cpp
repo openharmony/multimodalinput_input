@@ -61,10 +61,7 @@ void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
     MMI_LOGD("Mark consumed state:monitorId=%{public}d, eventId=%{public}d", monitorId, eventId);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    if (client == nullptr) {
-        MMI_LOGE("Get MMIClint false");
-        return;
-    }
+    CHKP(client);
     NetPacket pkt(MmiMessageId::MARK_CONSUMED);
     CHK(pkt.Write(monitorId), STREAM_BUF_WRITE_FAIL);
     CHK(pkt.Write(eventId), STREAM_BUF_WRITE_FAIL);
@@ -91,10 +88,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
 void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handlerType)
 {
     MMIClientPtr client { MMIEventHdl.GetMMIClient() };
-    if (client == nullptr) {
-        MMI_LOGE("AddToServer Get MMIClint false");
-        return;
-    }
+    CHKP(client);
     NetPacket pkt(MmiMessageId::ADD_INPUT_HANDLER);
     CHK(pkt.Write(handlerId), STREAM_BUF_WRITE_FAIL);
     CHK(pkt.Write(handlerType), STREAM_BUF_WRITE_FAIL);
@@ -121,10 +115,7 @@ void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType h
 {
     MMI_LOGD("Remove handler:%{public}d from server", handlerId);
     MMIClientPtr client { MMIEventHdl.GetMMIClient() };
-    if (client == nullptr) {
-        MMI_LOGE("RemoveFromServer Get MMIClint false");
-        return;
-    }
+    CHKP(client);
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_HANDLER);
     CHK(pkt.Write(handlerId), STREAM_BUF_WRITE_FAIL);
     CHK(pkt.Write(handlerType), STREAM_BUF_WRITE_FAIL);

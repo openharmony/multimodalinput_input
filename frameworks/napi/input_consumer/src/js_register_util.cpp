@@ -200,11 +200,7 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::CallbackMaps &callbackM
 void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
 {
     MMI_LOGD("%{public}s begin", __func__);
-    if (reportEvent == nullptr) {
-        MMI_LOGE("%{public}s event is null!", __func__);
-        return;
-    }
-
+    CHKP(reportEvent);
     napi_value resourceName;
     if (napi_create_string_utf8(reportEvent->env, "AsyncCallback", NAPI_AUTO_LENGTH, &resourceName) != napi_ok) {
         MMI_LOGE("%{public}s create string utf8 failed", __func__);

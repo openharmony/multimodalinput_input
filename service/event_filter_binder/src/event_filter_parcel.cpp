@@ -14,19 +14,19 @@
  */
 
 #include "event_filter_parcel.h"
+#include "define_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
+namespace {
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerEventParcel" };
+}
 bool PointerEventParcel::Marshalling(Parcel& out) const
 {
     if (data_ == nullptr) {
         data_ = PointerEvent::Create();
     }
-
-    if (data_ == nullptr) {
-        return false;
-    }
-
+    CHKPF(data_);
     if (!data_->WriteToParcel(out)) {
         data_ = nullptr;
         return false;
