@@ -23,12 +23,6 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
-        LOG_CORE, MMI_LOG_DOMAIN, "InputManager"
-    };
-}
-
 InputManager *InputManager::mInstance_ = nullptr;
 
 InputManager *InputManager::GetInstance()
@@ -73,10 +67,6 @@ int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> 
 
 int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
-    if (monitor == nullptr) {
-        MMI_LOGE("InputManager::%{public}s param should not be null!", __func__);
-        return InputEventMonitorManager::INVALID_MONITOR_ID;
-    }
     return InputManagerImpl::GetInstance()->AddMontior(monitor);
 }
 
