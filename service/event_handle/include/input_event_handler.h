@@ -61,9 +61,10 @@ protected:
     
     int32_t OnMouseEventHandler(libinput_event *event);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
-    void OnEventKeyboardTrace(const EventKeyboard& key);
+    void OnKeyEventFilterTrace(const EventKeyboard& keyBoard);
+    void OnEventKeyboardTrace(const EventKeyboard& keyBoard);
     void OnEventPointerTrace(const EventPointer& point);
-    void OnEventTouchTrace(const EventTouch& touch);
+    void OnPointerFilterEventTrace(const EventPointer& event_pointer);
 #ifdef OHOS_WESTEN_MODEL
     bool OnSystemEvent(const KeyEventValueTransformations& temp, const enum KEY_STATE state) const;
 #endif

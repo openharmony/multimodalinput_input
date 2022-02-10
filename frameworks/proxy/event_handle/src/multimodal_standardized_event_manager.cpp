@@ -121,12 +121,6 @@ int32_t MultimodalStandardizedEventManager::SubscribeKeyEvent(
     uint32_t preKeySize = keyOption->GetPreKeys().size();
     pkt << subscribeInfo.GetSubscribeId() << keyOption->GetFinalKey() << keyOption->IsFinalKeyDown()
     << keyOption->GetFinalKeyDownDuration() << preKeySize;
-    int32_t keySubscibeId = subscribeInfo.GetSubscribeId();
-
-    std::string keySubscribeIdstring = "SubscribeKeyEvent client subscribeKeyId: " + std::to_string(keySubscibeId);
-    MMI_LOGD(" SubscribeKeyEvent client trace subscribeKeyId = %{public}d", keySubscibeId);
-    int32_t eventKey = 1;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keySubscribeIdstring, eventKey);
 
     std::vector<int32_t> preKeys = keyOption->GetPreKeys();
     for (const auto &item : preKeys) {
@@ -178,19 +172,9 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEven
     return RET_OK;
 }
 
-void OHOS::MMI::MultimodalStandardizedEventManager::OnTouchTrace(const TouchEvent& event)
-{
-    std::string touchEvent = "OnTouch touchUuid: " + event.GetUuid();
-    char *tmpTouch = (char*)touchEvent.c_str();
-    MMI_LOGT("OnTouch touchUuid = %{public}s", tmpTouch);
-    int32_t eventTouch = 9;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
-}
-
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnTouch(const TouchEvent& event)
 {
     MMI_LOGT("MultimodalStandardizedEventManagertouch::OnTouch");
-    OnTouchTrace(event);
     auto range = mapEvents_.equal_range(MmiMessageId::TOUCH_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.windowId == event.GetWindowID() && i->second.eventCallBack->OnTouch(event) == false) {

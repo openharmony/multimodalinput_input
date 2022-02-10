@@ -169,11 +169,12 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
              key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
              key->GetActionStartTime(), key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), key->GetId(), fd, serverStartTime);
-    int32_t getKeyCode = key->GetKeyCode();
-    std::string keyCodestring = "event dispatcher of client GetKeyCode: " + std::to_string(getKeyCode);
-    MMI_LOGD(" OnKeyEvent client trace keyCode = %{public}d", getKeyCode);
     int32_t eventKey = 1;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
+    std::string keyCodestring = "KeyEventDispatchAsync";
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
+    int32_t getKeyCode = key->GetKeyCode();
+    keyCodestring = "client dispatchKeyCode = " + std::to_string(getKeyCode);
+    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring);
     key->SetProcessedCallback(eventProcessedCallback_);
     InputManagerImpl::GetInstance()->OnKeyEvent(key);
     return RET_OK;
@@ -224,6 +225,9 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         MMI_LOGD("Operation canceled.");
     }
     pointerEvent->SetProcessedCallback(eventProcessedCallback_);
+    int32_t eventPointer = 17;
+    std::string pointerCodestring = "PointerEventDispatchAsync";
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerCodestring, eventPointer);
     InputManagerImpl::GetInstance()->OnPointerEvent(pointerEvent);
     return RET_OK;
 }
@@ -751,7 +755,6 @@ int32_t ClientMsgHandler::TouchEventFilter(const UDSClient& client, NetPacket& p
     MMI_LOGD("Event filter of client:eventTouch:time=%{public}" PRId64 ", "
              "deviceType=%{public}u, eventType=%{public}d, slot=%{public}d, seatSlot=%{public}d, fd=%{public}d",
              touchData.time, touchData.deviceType, touchData.eventType, touchData.slot, touchData.seatSlot, fd);
-    TraceTouchEvent(touchData);
 
     TouchEvent event;
     int32_t deviceEventType = TOUCH_EVENT;
@@ -823,7 +826,10 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
         MMI_LOGE("Failed to deserialize pointer event...");
         return RET_ERR;
     }
-    InputHandlerManager::GetInstance().OnInputEvent(handlerId, pointerEvent); 
+    int32_t eventTouch = 9;
+    std::string touchEvent = "TouchEventFilterAsync";
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
+    InputHandlerManager::GetInstance().OnInputEvent(handlerId, pointerEvent);
     return RET_OK;
 }
 
@@ -881,7 +887,6 @@ void ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, NetPacket& pk
              pointData.seat_button_count, pointData.axis, pointData.state, pointData.source, pointData.delta.x,
              pointData.delta.y, pointData.delta_raw.x, pointData.delta_raw.y, pointData.absolute.x,
              pointData.absolute.y, pointData.discrete.x, pointData.discrete.y, fd);
-    TracePointerEvent(pointData);
     int32_t action = pointData.state;
     /* 根据收到的point，构造MouseEvent对象，
     *  其中MouseEvent对象的action,actionButton,cursorDelta,scrollingDelta四个字段
@@ -948,7 +953,6 @@ void ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, NetPacket& pk
                  touchData.time, touchData.deviceType, touchData.eventType, touchData.slot,
                  touchData.seatSlot, fd, touchData.point.x, touchData.point.y);
     }
-    TraceTouchEvent(touchData);
     TouchEvent touchEvent;
     int32_t deviceEventType = TOUCH_EVENT;
     touchEvent.Initialize(windowId, eventAction, seatSlot, 0, 0, 0, 0, 0, fingerCount, fingersInfos, 0,
@@ -1219,38 +1223,30 @@ void ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, NetPacket& 
 
 void ClientMsgHandler::TraceKeyEvent(const EventKeyboard& key) const
 {
+    int32_t eventKey = 1;
+    std::string keyEvent = "keyEventFilterAsync";
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
     char keyUuid[MAX_UUIDSIZE] = {0};
     int32_t ret = memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid));
     CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
-    MMI_LOGT(" nevent dispatcher of client: keyUuid = %{public}s", keyUuid);
-    std::string keyEvent = keyUuid;
-    keyEvent = " nevent dispatcher of client keyUuid: " + keyEvent;
-    int32_t eventKey = 1;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
+    MMI_LOGT(" nevent filter of client: keyUuid = %{public}s", keyUuid);
+    keyEvent = keyUuid;
+    keyEvent = "client keyUuid = " + keyEvent;
+    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEvent);
 }
 
 void ClientMsgHandler::TracePointerEvent(const EventPointer& pointData) const
 {
+    int32_t eventPointer = 17;
+    std::string pointerEvent = "PointerEventFilterAsync";
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
     char pointerUuid[MAX_UUIDSIZE] = {0};
     int32_t ret = memcpy_s(pointerUuid, sizeof(pointerUuid), pointData.uuid, sizeof(pointData.uuid));
     CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
-    MMI_LOGT(" nevent dispatcher of client: pointerUuid = %{public}s", pointerUuid);
-    std::string pointerEvent = pointerUuid;
-    pointerEvent = " nevent dispatcher of client pointerUuid: " + pointerEvent;
-    int32_t eventPointer = 17;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
-}
-
-void ClientMsgHandler::TraceTouchEvent(const EventTouch& touchData) const
-{
-    char touchUuid[MAX_UUIDSIZE] = {0};
-    int32_t ret = memcpy_s(touchUuid, sizeof(touchUuid), touchData.uuid, sizeof(touchData.uuid));
-    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
-    MMI_LOGT(" nevent dispatcher of client: touchUuid = %{public}s", touchUuid);
-    std::string touchEventString = touchUuid;
-    touchEventString = " nevent dispatcher of client touchUuid: " + touchEventString;
-    int32_t eventTouch = 9;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, eventTouch);
+    MMI_LOGT(" nevent filter of client: pointerUuid=%{public}s", pointerUuid);
+    pointerEvent = pointerUuid;
+    pointerEvent = "client pointerUuid = " + pointerEvent;
+    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent);
 }
 
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)
