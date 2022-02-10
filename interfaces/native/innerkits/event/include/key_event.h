@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_KEY_EVENTS_H
-#define OHOS_KEY_EVENTS_H
+#ifndef KEY_EVENT_H
+#define KEY_EVENT_H
 #include <memory>
 #include <vector>
 #include "input_event.h"
@@ -1500,4 +1500,4 @@ private:
 };
 }
 }
-#endif
+#endif // KEY_EVENT_H

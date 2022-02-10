@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MULTIMODAL_EVENTS_HANDLER_H
-#define OHOS_MULTIMODAL_EVENTS_HANDLER_H
+#ifndef MULTIMODAL_EVENT_HANDLER_H
+#define MULTIMODAL_EVENT_HANDLER_H
 
 #include "singleton.h"
 #include "if_client_msg_handler.h"
@@ -80,4 +80,4 @@ private:
 }
 #define MMIEventHdl OHOS::MMI::MultimodalEventHandler::GetInstance()
 
-#endif
+#endif // MULTIMODAL_EVENT_HANDLER_H

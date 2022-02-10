@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_DEVICE_EVENTS_H
-#define OHOS_DEVICE_EVENTS_H
+#ifndef DEVICE_EVENT_H
+#define DEVICE_EVENT_H
 #include "multimodal_event.h"
 
 namespace OHOS {
@@ -30,4 +30,4 @@ private:
     int32_t inputDeviceId_ = 0;
 };
 }
-#endif
+#endif // DEVICE_EVENT_H

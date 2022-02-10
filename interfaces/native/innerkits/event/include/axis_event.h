@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_AXIS_EVENT_H
-#define OHOS_MULTIMDOALINPUT_AXIS_EVENT_H
+#ifndef AXIS_EVENT_H
+#define AXIS_EVENT_H
 
 #include "input_event.h"
 
@@ -52,4 +52,4 @@ protected:
 };
 }
 } // namespace OHOS::MMI
-#endif // OHOS_MULTIMDOALINPUT_AXIS_EVENT_H
+#endif // AXIS_EVENT_H

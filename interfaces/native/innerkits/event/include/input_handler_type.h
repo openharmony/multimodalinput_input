@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_HANDLER_TYPE_H
-#define OHOS_MULTIMDOALINPUT_HANDLER_TYPE_H
+#ifndef INPUT_HANDLER_TYPE_H
+#define INPUT_HANDLER_TYPE_H
 #include <limits>
 
 namespace OHOS {
@@ -45,4 +45,4 @@ inline bool IsValidHandlerId(int32_t handlerId)
 }
 }
 } // namespace OHOS::MMI
-#endif // OHOS_MULTIMDOALINPUT_HANDLER_TYPE_H
+#endif // INPUT_HANDLER_TYPE_H

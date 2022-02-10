@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_INPUT_EVENT_MONITOR_MANAGER_H
-#define OHOS_INPUT_EVENT_MONITOR_MANAGER_H
+#ifndef INPUT_EVENT_MONITOR_MANAGER_H
+#define INPUT_EVENT_MONITOR_MANAGER_H
 
 #include "key_event.h"
 #include "pointer_event.h"
@@ -59,4 +59,4 @@ private:
 }
 }
 #define InputMonitorMgr OHOS::Singleton<OHOS::MMI::InputEventMonitorManager>::GetInstance()
-#endif
+#endif // INPUT_EVENT_MONITOR_MANAGER_H
