@@ -276,7 +276,6 @@ int32_t ClientMsgHandler::OnKey(const UDSClient& client, NetPacket& pkt)
     EventKeyboard key = {};
     pkt >> key >> abilityId >> windowId >> fd >> serverStartTime;
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-    MMI_LOGT("Event dispatcher of client:eventKeyboard:time=%{public}" PRId64 ", key=%{public}u, "
     MMI_LOGD("Event dispatcher of client:eventKeyboard:time=%{public}" PRId64 ", key=%{public}u, "
              "deviceType=%{public}u, seat_key_count=%{public}u, state=%{public}d, fd=%{public}d",
              key.time, key.key, key.deviceType, key.seat_key_count, key.state, fd);
