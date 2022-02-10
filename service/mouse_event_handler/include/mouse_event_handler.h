@@ -42,6 +42,7 @@ private:
     int32_t timerId_ = -1;
     double absolutionX_ = 0;
     double absolutionY_ = 0;
+    int32_t buttionId_ = -1;
 };
 } // namespace MMI
 } // namespace OHOS
