@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_STYLUS_EVENTS_H
-#define OHOS_STYLUS_EVENTS_H
+#ifndef STYLUS_EVENT_H
+#define STYLUS_EVENT_H
 
 #include "manipulation_event.h"
 
@@ -152,4 +152,4 @@ private:
     int32_t mActionButtons_ = 0;
 };
 }
-#endif
+#endif // STYLUS_EVENT_H

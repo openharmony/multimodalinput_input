@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_KEYBOARD_EVENTS_H
-#define OHOS_KEYBOARD_EVENTS_H
+#ifndef KEYBOARD_EVENT_H
+#define KEYBOARD_EVENT_H
 #include "key_event_pre.h"
 
 namespace OHOS {
@@ -125,4 +125,4 @@ private:
     int32_t mUnicode_ = 0;
 };
 }
-#endif
+#endif // KEYBOARD_EVENT_H

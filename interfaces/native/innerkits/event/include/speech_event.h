@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_SPEECH_EVENTS_H
-#define OHOS_SPEECH_EVENTS_H
+#ifndef SPEECH_EVENT_H
+#define SPEECH_EVENT_H
 
 #include "multimodal_event.h"
 
@@ -167,4 +167,4 @@ private:
     std::string mActionProperty_ = "";
 };
 }
-#endif
+#endif // SPEECH_EVENT_H

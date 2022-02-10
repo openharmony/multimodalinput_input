@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMODAL_EVENTS_H
-#define OHOS_MULTIMODAL_EVENTS_H
+#ifndef MULTIMODAL_EVENT_H
+#define MULTIMODAL_EVENT_H
 
 #include <string>
 #include "refbase.h"
@@ -337,4 +337,4 @@ private:
 using MultimodalEventPtr = sptr<MultimodalEvent>;
 }
 }
-#endif
+#endif // MULTIMODAL_EVENT_H

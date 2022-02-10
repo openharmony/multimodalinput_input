@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_DEVICE_HANDLER_H
-#define OHOS_DEVICE_HANDLER_H
+#ifndef DEVICE_HANDLER_H
+#define DEVICE_HANDLER_H
 #include "standardized_event_handler.h"
 
 namespace OHOS {
@@ -27,4 +27,4 @@ public:
 };
 }
 }
-#endif
+#endif // DEVICE_HANDLER_H
