@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_AI_FUNC_PROC_H
-#define OHOS_AI_FUNC_PROC_H
+#ifndef AI_FUNC_PROC_H
+#define AI_FUNC_PROC_H
 #include "senior_input_func_proc_base.h"
 
 /*
@@ -32,4 +32,4 @@ namespace MMI {
     };
 }
 }
-#endif
+#endif // AI_FUNC_PROC_H

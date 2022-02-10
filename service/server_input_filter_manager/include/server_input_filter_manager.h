@@ -107,4 +107,4 @@ private:
 #define ServerKeyFilter OHOS::MMI::ServerInputFilterManager::GetInstance()
 }
 
-#endif
+#endif // SERVER_INPUT_FILTER_MANAGER_H

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_EVENTDUMP_H
-#define OHOS_EVENTDUMP_H
+#ifndef EVENT_DUMP_H
+#define EVENT_DUMP_H
 
 #include "libmmi_util.h"
 #include "app_register.h"
@@ -38,4 +38,4 @@ private:
 };
 }
 #define MMIEventDump OHOS::MMI::EventDump::GetInstance()
-#endif
+#endif // EVENT_DUMP_H

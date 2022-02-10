@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_EXPANSIBILITY_OPERATION_H
-#define OHOS_EXPANSIBILITY_OPERATION_H
+#ifndef EXPANSIBILITY_OPERATION_H
+#define EXPANSIBILITY_OPERATION_H
 #include "libmmi_util.h"
 
 namespace OHOS {
@@ -35,4 +35,4 @@ protected:
 };
 }
 }
-#endif
+#endif // EXPANSIBILITY_OPERATION_H

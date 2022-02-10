@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_REGISTER_EVENT_H
-#define OHOS_REGISTER_EVENT_H
+#ifndef REGISTER_EVENT_H
+#define REGISTER_EVENT_H
 
 #include <map>
 #include <vector>
@@ -155,4 +155,4 @@ protected:
 }
 }
 #define MMIRegEvent OHOS::MMI::RegisterEvent::GetInstance()
-#endif
+#endif // REGISTER_EVENT_H
