@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_UDS_SERVER_H
-#define OHOS_UDS_SERVER_H
+#ifndef UDS_SERVER_H
+#define UDS_SERVER_H
 
 #include <map>
 #include <mutex>
@@ -95,4 +95,4 @@ protected:
 };
 }
 }
-#endif
+#endif // UDS_SERVER_H

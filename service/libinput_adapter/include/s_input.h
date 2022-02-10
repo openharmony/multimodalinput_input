@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_S_INPUT_H
-#define OHOS_S_INPUT_H
+#ifndef S_INPUT_H
+#define S_INPUT_H
 #include <thread>
 #include <libudev.h>
 #include <functional>
@@ -50,4 +50,4 @@ protected:
 };
 }
 }
-#endif
+#endif // S_INPUT_H

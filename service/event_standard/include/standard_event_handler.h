@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_STANDARD_EVENT_HANDLER_H
-#define OHOS_STANDARD_EVENT_HANDLER_H
+#ifndef STANDARD_EVENT_HANDLER_H
+#define STANDARD_EVENT_HANDLER_H
 #include "libinput.h"
 #include "input-event-codes.h"
 #include "libmmi_util.h"
@@ -40,4 +40,4 @@ private:
 };
 }
 }
-#endif
+#endif // STANDARD_EVENT_HANDLER_H
