@@ -74,6 +74,7 @@ void SafeKeeper::ProcessEvents()
     }
     int32_t pastTime = 0;
     auto curTime = GetCurMillisTime();
+
     std::lock_guard<std::mutex> lock(mtx_);
     for (const auto &item : dList_) {
         pastTime = static_cast<int32_t>(curTime - item.lastTime);
