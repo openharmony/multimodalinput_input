@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_KEY_EVENT_VALUE_TRANSFORMATION_H
-#define OHOS_KEY_EVENT_VALUE_TRANSFORMATION_H
+#ifndef KEY_EVENT_VALUE_TRANSFORMATION_H
+#define KEY_EVENT_VALUE_TRANSFORMATION_H
 
 #include <string>
 #include <map>
@@ -53,4 +53,4 @@ private:
 }
 }
 
-#endif
+#endif // KEY_EVENT_VALUE_TRANSFORMATION_H

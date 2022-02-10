@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_KEY_EVENTS_PRE_H
-#define OHOS_KEY_EVENTS_PRE_H
+#ifndef KEY_EVENT_PRE_H
+#define KEY_EVENT_PRE_H
 #include <memory>
 #include <vector>
 #include "multimodal_event.h"
@@ -1517,4 +1517,4 @@ private:
     int32_t mDeviceEventType_ = 0;
 };
 }
-#endif
+#endif // KEY_EVENT_PRE_H

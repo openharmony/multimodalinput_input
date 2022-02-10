@@ -69,7 +69,7 @@ struct ScreenInfo** GetScreensInfo()
     int32_t ret = memset_s(screenInfo[0], sizeof(ScreenInfo), 0, sizeof(ScreenInfo));
     CHKF(ret == EOK, OHOS::MEMSET_SEC_FUN_FAIL);
     *screenInfo[0] = {.screenId = 1, .connectorName = nullptr, .width = TEST_WIDTH, .height = TEST_HEIGHT,
-        .nLayers = 1, .layers = static_cast<LayerInfo**>(malloc(sizeof(struct LayerInfo*)))
+        .nLayers = 1, .layers = static_cast<LayerInfo**>(malloc(sizeof(LayerInfo*)))
     };
     screenInfo[1] = nullptr;
 

@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_IF_MMI_CLIENT_H
-#define OHOS_IF_MMI_CLIENT_H
+#ifndef IF_MMI_CLIENT_H
+#define IF_MMI_CLIENT_H
 #include <memory>
 #include <functional>
 #include "if_client_msg_handler.h"
@@ -32,4 +32,4 @@ public:
 };
 using MMIClientPtr = std::shared_ptr<IfMMIClient>;
 }
-#endif // OHOS_IF_MMI_CLIENT_H
+#endif // IF_MMI_CLIENT_H

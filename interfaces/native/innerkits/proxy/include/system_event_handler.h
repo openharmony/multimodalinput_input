@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_SYSTEM_EVENTS_HANDLER_H
-#define OHOS_SYSTEM_EVENTS_HANDLER_H
+#ifndef SYSTEM_EVENT_HANDLER_H
+#define SYSTEM_EVENT_HANDLER_H
 
 #include "multimodal_event.h"
 #include "standardized_event_handler.h"
@@ -39,4 +39,4 @@ public:
 };
 }
 }
-#endif
+#endif // SYSTEM_EVENT_HANDLER_H

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_ROTATION_EVENTS_H
-#define OHOS_ROTATION_EVENTS_H
+#ifndef ROTATION_EVENT_H
+#define ROTATION_EVENT_H
 
 #include "multimodal_event.h"
 
@@ -62,4 +62,4 @@ private:
     float mRotationValue_ = 0;
 };
 }
-#endif
+#endif // ROTATION_EVENT_H

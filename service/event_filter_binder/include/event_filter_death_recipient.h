@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_POINTER_EVENT_FILTER_DEATH_RECIPIENT_H
-#define OHOS_POINTER_EVENT_FILTER_DEATH_RECIPIENT_H
+#ifndef EVENT_FILTER_DEATH_RECIPIENT_H
+#define EVENT_FILTER_DEATH_RECIPIENT_H
 
 #include "iremote_broker.h"
 
@@ -33,4 +33,4 @@ private:
 } // namespace MMI
 } // namespace OHOS
 
-#endif // OHOS_POINTER_EVENT_FILTER_DEATH_RECIPIENT_H
+#endif // EVENT_FILTER_DEATH_RECIPIENT_H
