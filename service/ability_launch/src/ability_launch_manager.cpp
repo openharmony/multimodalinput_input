@@ -273,11 +273,7 @@ bool AbilityLaunchManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
         return true;
     } else {
         const KeyEvent::KeyItem* keyItem = keyEvent->GetKeyItem();
-        if (keyItem == nullptr) {
-            MMI_LOGE("Skip, null keyItem");
-            return false;
-        }
-
+        CHKPF(keyItem);
         auto upTime = keyEvent->GetActionTime();
         auto downTime = keyItem->GetDownTime();
         MMI_LOGD("upTime %{public}d downTime %{public}d keyDownDuration %{public}d",

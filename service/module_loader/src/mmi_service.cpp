@@ -47,12 +47,8 @@ template<class ...Ts>
 void CheckDefineOutput(const char* fmt, Ts... args)
 {
     using namespace OHOS::MMI;
-    if (fmt == nullptr) {
-        KMSG_LOGE("in ChkConfigOutput, fmt is nullptr");
-        return;
-    }
+    CHKP(fmt);
     int32_t ret = 0;
-
     char buf[MAX_STREAM_BUF_SIZE] = {};
     ret = snprintf_s(buf, MAX_STREAM_BUF_SIZE, MAX_STREAM_BUF_SIZE - 1, fmt, args...);
     if (ret < 0) {
@@ -303,7 +299,6 @@ int32_t MMIService::HandleAllocSocketFd(MessageParcel& data, MessageParcel& repl
         MMI_LOGE("read data error.");
         return RET_ERR;
     }
-
     MMI_LOGIK("clientName = %{public}s, moduleId = %{public}d", req->data.clientName.c_str(), req->data.moduleId);
     if (!IsAuthorizedCalling()) {
         MMI_LOGE("permission denied");
@@ -337,7 +332,6 @@ int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
         MMI_LOGE("inputEventHdr_ is nullptr");
         return ERROR_NULL_POINTER;
     }
-
     return inputEventHdr_->AddInputEventFilter(filter);
 }
 
@@ -346,7 +340,6 @@ void MMIService::OnTimer()
     if (inputEventHdr_ != nullptr) {
         inputEventHdr_->OnCheckEventReport();
     }
-
     TimerMgr->ProcessTimers();
 }
 
