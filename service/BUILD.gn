@@ -220,7 +220,6 @@ ohos_shared_library("libmmi-server") {
   }
 
   external_deps = [
-    "ability_runtime:app_manager",
     "bytrace_standard:bytrace_core",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
