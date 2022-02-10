@@ -16,7 +16,6 @@
 #include <inttypes.h>
 #include <iostream>
 #include "mmi_func_callback.h"
-#include "auto_test_multimodal.h"
 #include "bytrace.h"
 #include "event_factory.h"
 #include "input_device_event.h"

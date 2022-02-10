@@ -17,7 +17,6 @@
 
 #include "client_msg_handler.h"
 #include "if_mmi_client.h"
-#include "auto_test_multimodal.h"
 
 namespace OHOS::MMI {
 class MMIClient : public UDSClient, public IfMMIClient, public std::enable_shared_from_this<IfMMIClient> {
