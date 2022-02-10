@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_ABILITY_LAUNCH_MANAGER_H
-#define OHOS_ABILITY_LAUNCH_MANAGER_H
+#ifndef ABILITY_LAUNCH_MANAGER_H
+#define ABILITY_LAUNCH_MANAGER_H
 
 #include <fstream>
 #include <map>
@@ -78,4 +78,4 @@ private:
 }
 }
 #define AbilityMgr OHOS::MMI::AbilityLaunchManager::GetInstance()
-#endif
+#endif // ABILITY_LAUNCH_MANAGER_H

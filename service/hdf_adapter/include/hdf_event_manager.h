@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_HDF_EVENT_MANAGER_H
-#define OHOS_HDF_EVENT_MANAGER_H
+#ifndef HDF_EVENT_MANAGER_H
+#define HDF_EVENT_MANAGER_H
 
 #include <iostream>
 #include <functional>
@@ -77,4 +77,4 @@ private:
 }
 }
 extern OHOS::MMI::HdfEventManager  hdfEventManager;
-#endif // OHOS_HDF_EVENT_MANAGER_H
+#endif // HDF_EVENT_MANAGER_H

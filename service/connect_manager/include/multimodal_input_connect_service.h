@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMODAL_INPUT_CONNECT_SERVICE_H
-#define OHOS_MULTIMODAL_INPUT_CONNECT_SERVICE_H
+#ifndef MULTIMODAL_INPUT_CONNECT_SERVICE_H
+#define MULTIMODAL_INPUT_CONNECT_SERVICE_H
 
 #include "singleton.h"
 #include "iremote_object.h"
@@ -52,4 +52,4 @@ int32_t MultimodalInputConnectServiceStart();
 int32_t MultimodalInputConnectServiceStop();
 } // namespace MMI
 } // namespace OHOS
-#endif // OHOS_MULTIMODAL_INPUT_CONNECT_SERVICE_H
+#endif // MULTIMODAL_INPUT_CONNECT_SERVICE_H

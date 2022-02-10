@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_JS_REGISTER_UTIL_H
-#define OHOS_JS_REGISTER_UTIL_H
+#ifndef JS_REGISTER_UTIL_H
+#define JS_REGISTER_UTIL_H
 #include "js_register_module.h"
 namespace OHOS {
 namespace MMI {
@@ -35,5 +35,4 @@ uint32_t GetNamedPropertyUint32(const napi_env& env, const napi_value& object, c
 }
 }
 
-#endif
-
+#endif // JS_REGISTER_UTIL_H

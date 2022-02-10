@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_MOUSE_DRAW_H
-#define OHOS_MULTIMDOALINPUT_MOUSE_DRAW_H
+#ifndef POINTER_DRAWING_MANAGER_H
+#define POINTER_DRAWING_MANAGER_H
 
 #include <iostream>
 #include "singleton.h"
@@ -51,4 +51,4 @@ private:
 }
 }
 #define DrawWgr OHOS::MMI::MouseDrawingManager::GetInstance()
-#endif
+#endif // POINTER_DRAWING_MANAGER_H

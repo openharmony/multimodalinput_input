@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_EVENT_DISPATCH_H
-#define OHOS_EVENT_DISPATCH_H
+#ifndef EVENT_DISPATCH_H
+#define EVENT_DISPATCH_H
 #include "uds_server.h"
 #include "register_event.h"
 #include "key_event.h"
@@ -75,4 +75,4 @@ private:
 #endif
     };
 }
-#endif
+#endif // EVENT_DISPATCH_H

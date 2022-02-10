@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_INPUT_EVENT_CONSUMER_H
-#define OHOS_MULTIMDOALINPUT_INPUT_EVENT_CONSUMER_H
+#ifndef I_INPUT_EVENT_CONSUMER_H
+#define I_INPUT_EVENT_CONSUMER_H
 
 #include <memory>
 
@@ -36,4 +36,4 @@ public:
 }
 } // namespace OHOS::MMI
 
-#endif // OHOS_MULTIMDOALINPUT_INPUT_EVENT_CONSUMER_H
+#endif // I_INPUT_EVENT_CONSUMER_H

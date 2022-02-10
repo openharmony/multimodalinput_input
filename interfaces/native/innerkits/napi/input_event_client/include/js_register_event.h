@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_JS_REGISTER_EVENTS_H
-#define OHOS_JS_REGISTER_EVENTS_H
+#ifndef JS_REGISTER_EVENT_H
+#define JS_REGISTER_EVENT_H
 
 #include <array>
 #include "event_factory.h"
@@ -210,4 +210,4 @@ private:
 };
 }
 }
-#endif
+#endif // JS_REGISTER_EVENT_H

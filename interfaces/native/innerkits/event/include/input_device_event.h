@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_INPUT_DEVICE_EVENT_H
-#define OHOS_INPUT_DEVICE_EVENT_H
+#ifndef INPUT_DEVICE_EVENT_H
+#define INPUT_DEVICE_EVENT_H
 #include <functional>
 #include <map>
 #include <mutex>
@@ -50,4 +50,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif
+#endif // INPUT_DEVICE_EVENT_H

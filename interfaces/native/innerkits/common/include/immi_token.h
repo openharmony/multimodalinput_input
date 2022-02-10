@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_IMMI_TOKEN_H
-#define OHOS_IMMI_TOKEN_H
+#ifndef IMMI_TOKEN_H
+#define IMMI_TOKEN_H
 
 #include "iremote_object.h"
 
@@ -32,4 +32,4 @@ public:
 };
 }
 }
-#endif // OHOS_IMMI_TOKEN_H
+#endif // IMMI_TOKEN_H

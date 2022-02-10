@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MULTIMODAL_POINT_H
-#define OHOS_MULTIMODAL_POINT_H
+#ifndef MMI_POINT_H
+#define MMI_POINT_H
 
 #include <string>
 
@@ -92,4 +92,4 @@ private:
     float pz_ = 0.f;
 };
 }
-#endif
+#endif // MMI_POINT_H
