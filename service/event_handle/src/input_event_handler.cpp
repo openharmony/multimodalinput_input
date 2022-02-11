@@ -663,7 +663,7 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
     std::string touchEvent = "OnEventTouchAsync";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
     eventDispatch_.HandlePointerEvent(point);
-    eventTouch = 10;
+    ++eventTouch;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {

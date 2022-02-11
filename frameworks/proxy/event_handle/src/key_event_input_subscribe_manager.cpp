@@ -67,7 +67,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<OHOS::M
         subscribeInfos_.push_back(subscribeInfo);
         MMI_LOGT("Leave");
         FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
-        eventKey = 4;
+        ++eventKey;
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
         return subscribeInfo.GetSubscribeId();
     } else {
