@@ -129,7 +129,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     std::string keyCodestring = "client dispatchKeyCode = " + std::to_string(getKeyCode);
     MMI_LOGT(" OnKeyEvent client trace getKeyCode:%{public}d", getKeyCode);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring);
-    int32_t eventKey = 1;
+    int32_t eventKey = 4;
     keyCodestring = "KeyEventDispatchAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
     if (consumer_ != nullptr) {
@@ -144,7 +144,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
     MMI_LOGD("Pointer event received, processing ...");
-    int32_t eventPointer = 17;
+    int32_t eventPointer = 20;
     std::string pointerCodestring = "PointerEventDispatchAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerCodestring, eventPointer);
     if (consumer_ != nullptr) {
