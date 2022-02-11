@@ -732,18 +732,18 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
     return RET_OK;
 }
 
-int32_t MultimodalStandardizedEventManager::GetDeviceIds(int32_t taskId)
+int32_t MultimodalStandardizedEventManager::GetDeviceIds(int32_t userData)
 {
-    OHOS::MMI::NetPacket ckv(MmiMessageId::INPUT_DEVICE_IDS);
-    ckv << taskId;
-    return SendMsg(ckv);
+    OHOS::MMI::NetPacket pkt(MmiMessageId::INPUT_DEVICE_IDS);
+    pkt << userData;
+    return SendMsg(pkt);
 }
 
-int32_t MultimodalStandardizedEventManager::GetDevice(int32_t taskId, int32_t deviceId)
+int32_t MultimodalStandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId)
 {
-    OHOS::MMI::NetPacket ckv(MmiMessageId::INPUT_DEVICE);
-    ckv << taskId << deviceId;
-    return SendMsg(ckv);
+    OHOS::MMI::NetPacket pkt(MmiMessageId::INPUT_DEVICE);
+    pkt << userData << deviceId;
+    return SendMsg(pkt);
 }
 
 bool MultimodalStandardizedEventManager::SendMsg(NetPacket& pkt) const
