@@ -89,7 +89,7 @@ static napi_value GetDeviceIds(napi_env env, napi_callback_info info)
             [](uv_work_t *work) {},
             [](uv_work_t *work, int32_t status) {
                 HILOG_INFO("uv_queue_work begin");
-                struct CallbackInfo* cbInfo = (struct CallbackInfo*)work->data;
+                CallbackInfo* cbInfo = (CallbackInfo*)work->data;
                 napi_env env = cbInfo->env;
                 napi_ref handleRef = cbInfo->handleRef;
                 std::vector<int32_t> ids = cbInfo->ids_;
@@ -202,7 +202,7 @@ static napi_value GetDevice(napi_env env, napi_callback_info info)
             [](uv_work_t *work) {},
             [](uv_work_t *work, int32_t status) {
                 HILOG_INFO("uv_queue_work begin");
-                struct CallbackInfo* cbInfo = (struct CallbackInfo*)work->data;
+                CallbackInfo* cbInfo = (CallbackInfo*)work->data;
                 napi_env env = cbInfo->env;
                 napi_ref handleRef = cbInfo->handleRef;
                 auto inputDevice = cbInfo->inputDeviceInfo;
