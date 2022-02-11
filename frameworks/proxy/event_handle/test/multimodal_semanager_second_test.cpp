@@ -51,7 +51,7 @@ public:
     bool InsertMapEvent(MmiMessageId typeId, StandEventPtr standardizedEventHandle)
     {
         const int32_t windowId = 22;
-        struct StandEventCallBack standEventInfo = {};
+        StandEventCallBack standEventInfo = {};
         standEventInfo.windowId = windowId;
         standEventInfo.eventCallBack = standardizedEventHandle;
         mapEvents_.insert(std::make_pair(typeId, standEventInfo));

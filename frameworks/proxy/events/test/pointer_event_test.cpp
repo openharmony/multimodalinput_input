@@ -43,7 +43,7 @@ public:
 
 int64_t PointerEventTest::GetMillisTime()
 {
-    struct timespec time = { 0 };
+    timespec time = { 0 };
     clock_gettime(CLOCK_MONOTONIC, &time);
     return ((static_cast<uint64_t>(time.tv_sec) * 1000000000 + time.tv_nsec) / 1000000);
 }
