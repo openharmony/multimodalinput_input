@@ -59,7 +59,7 @@ void TouchEvent::Initialize(int32_t windowId, MultimodalEventPtr deviceEvent, in
                             int32_t index, float forcePrecision, float maxForce, float tapCount, int32_t startTime,
                             int32_t operationState, int32_t pointerCount, fingerInfos fingersInfos[], bool isStandard)
 {
-    CHK(deviceEvent, ERROR_NULL_POINTER);
+    CHKP(deviceEvent);
     ManipulationEvent::Initialize(windowId, startTime, operationState, pointerCount, fingersInfos,
                                   deviceEvent->GetHighLevelEvent(), deviceEvent->GetUuid(),
                                   deviceEvent->GetEventType(), deviceEvent->GetOccurredTime(),

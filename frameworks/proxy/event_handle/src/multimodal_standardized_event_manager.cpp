@@ -748,7 +748,7 @@ int32_t MultimodalStandardizedEventManager::GetDevice(int32_t userData, int32_t 
 
 bool MultimodalStandardizedEventManager::SendMsg(NetPacket& pkt) const
 {
-    CHKF(client_, ERROR_NULL_POINTER);
+    CHKPF(client_);
     return client_->SendMessage(pkt);
 }
 
