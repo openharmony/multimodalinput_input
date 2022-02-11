@@ -62,7 +62,7 @@ int32_t MultimodalStandardizedEventManager::RegisterStandardizedEventHandle(cons
         return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
     registerEvents_.insert(registerhandle);
-    struct StandEventCallBack StandEventInfo = {};
+    StandEventCallBack StandEventInfo = {};
     StandEventInfo.windowId = windowId;
     StandEventInfo.eventCallBack = standardizedEventHandle;
     mapEvents_.insert(std::make_pair(messageId, StandEventInfo));
