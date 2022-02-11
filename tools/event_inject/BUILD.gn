@@ -154,7 +154,7 @@ ohos_unittest("ut-event-injection-out") {
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
   sources = [
