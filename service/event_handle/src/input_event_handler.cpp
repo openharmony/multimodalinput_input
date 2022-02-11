@@ -705,7 +705,7 @@ int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 int32_t InputEventHandler::OnEventTouch(const multimodal_libinput_event& ev)
 {
     CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
-    SInput::Loginfo_packaging_tool(ev.event);
+    SInput::LoginfoPackagingTool(ev.event);
 #ifndef OHOS_WESTEN_MODEL
     OnEventTouchSecond(ev.event);
 #else

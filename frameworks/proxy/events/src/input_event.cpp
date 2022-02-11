@@ -37,7 +37,7 @@ InputEvent::~InputEvent()
 void InputEvent::Reset()
 {
     int32_t conversionStep = 1000000;
-    struct timespec ts = { 0, 0 };
+    timespec ts = { 0, 0 };
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
         actionTime_ = 0;
     }
