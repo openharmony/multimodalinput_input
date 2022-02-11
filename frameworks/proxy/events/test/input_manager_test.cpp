@@ -28,6 +28,9 @@
 #include "multimodal_event_handler.h"
 #include "pointer_event.h"
 #include "proto.h"
+#include "key_event_handler.h"
+#include "mmi_client.h"
+#include "mmi_token.h"
 #include "run_shell_util.h"
 
 namespace {
@@ -50,6 +53,13 @@ constexpr int32_t INDEX_FIRST = 1;
 constexpr int32_t INDEX_SECOND = 2;
 constexpr int32_t INDEX_THIRD = 3;
 constexpr int32_t INDEX_INVALID = -1;
+
+constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
+constexpr int32_t SEC_TO_NANOSEC = 1000000000;
+constexpr int32_t TIME_WAIT_FOR_LOG = 50;
+constexpr int32_t N_TRIES_FOR_LOG = 20;
+const std::regex REGEX_FIND_PID(" ");
+static RunShellUtil g_runCommand;
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest" };
 }
 
@@ -316,6 +326,120 @@ void InputManagerTest::TestMarkConsumedStep6()
 
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
+}
+
+HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.Level1)
+{
+    RunShellUtil runCommand;
+    std::string command = "Inject keyCode = 2,action = 2";
+    std::vector<std::string> slogs {SearchForLog(command, true)};
+    int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create(); 
+    OHOS::MMI::KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    injectDownEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+
+    std::shared_ptr<OHOS::MMI::KeyEvent> injectUpEvent = OHOS::MMI::KeyEvent::Create();
+    downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    OHOS::MMI::KeyEvent::KeyItem kitUp;
+    kitUp.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    kitUp.SetPressed(false);
+    kitUp.SetDownTime(downTime);
+    injectUpEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    injectUpEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
+    injectUpEvent->RemoveReleasedKeyItems(kitUp);
+    InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
+    std::vector<std::string> tlogs {SearchForLog(command, slogs)};
+    EXPECT_TRUE(!tlogs.empty());
+}
+
+HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_002, TestSize.Level1)
+{
+    std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create(); 
+    int32_t downTime = -1;
+    OHOS::MMI::KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_HOME);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_HOME);
+    injectDownEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+}
+
+HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.Level1)
+{
+    std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create(); 
+    int32_t downTime = 0;
+    OHOS::MMI::KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    injectDownEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+
+    std::shared_ptr<OHOS::MMI::KeyEvent> injectUpEvent = OHOS::MMI::KeyEvent::Create();
+    OHOS::MMI::KeyEvent::KeyItem kitUp;
+    kitUp.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    kitUp.SetPressed(false);
+    kitUp.SetDownTime(downTime);
+    injectUpEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    injectUpEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
+    injectUpEvent->RemoveReleasedKeyItems(kitUp);
+    InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
+}
+
+HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_004, TestSize.Level1)
+{
+    std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create(); 
+    int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    OHOS::MMI::KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_UNKNOWN);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_UNKNOWN);
+    injectDownEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    MMI_LOGD("MMIEventHdl.InjectEvent begin");
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    MMI_LOGD("MMIEventHdl.InjectEvent end");
+}
+
+HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.Level1)
+{
+    std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create(); 
+    int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    OHOS::MMI::KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_FN);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_FN);
+    injectDownEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    if (injectDownEvent == nullptr) {
+        MMI_LOGD("injectDownEvent is nullptr!");
+    }
+    MMI_LOGD("MMIEventHdl.InjectEvent begin!");
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    MMI_LOGD("MMIEventHdl.InjectEvent end!");
+
+    std::shared_ptr<OHOS::MMI::KeyEvent> injectUpEvent = OHOS::MMI::KeyEvent::Create();
+    downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    OHOS::MMI::KeyEvent::KeyItem kitUp;
+    kitUp.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_FN);
+    kitUp.SetPressed(false);
+    kitUp.SetDownTime(downTime);
+    injectUpEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_FN);
+    injectUpEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
+    injectUpEvent->RemoveReleasedKeyItems(kitUp);
+    InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
 }
 
 HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, TestSize.Level1)
