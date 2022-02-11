@@ -33,7 +33,6 @@ namespace {
 OHOS::MMI::HdfEventManager *OHOS::MMI::HdfEventManager::m_globleThis;
 int OHOS::MMI::HdfEventManager::EvdevSimIoctl(int hdindex, int pcmd, void *iobuff)
 {
-    uhdf *hdiuhdf = nullptr;
     const int size = (pcmd >> IOCTL_CMD_SHIFT) & IOCTL_CMD_MASK;
     const int iobuffSize = size;
     int cmd = pcmd & 0xff;
@@ -45,56 +44,55 @@ int OHOS::MMI::HdfEventManager::EvdevSimIoctl(int hdindex, int pcmd, void *iobuf
     if (drvtype >= INVALD) {
         return 0;
     }
-    for (std::list<uhdf*>::iterator it = m_globleThis->hdflist_.begin(); it != m_globleThis->hdflist_.end(); ++it) {
-        hdiuhdf = *it;
-        if (hdiuhdf->index == hdindex) {
+    for (const auto &item : m_globleThis->hdflist_) {
+        if (item.index == hdindex) {
             break;
         }
     }
     int ret = 0;
     switch (cmd) {
-        case IO_BITS: // bits
+        case IO_BITS:
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayBits[drvtype], size);
             break;
-        case IO_KEYBITS: // key_bits
+        case IO_KEYBITS:
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayKeyBits[drvtype], size);
             break;
-        case IO_RELBITS: // rel_bits
+        case IO_RELBITS:
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayRelBits[drvtype], size);
             break;
-        case IO_ABSBITS: // abs_bits
+        case IO_ABSBITS:
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayAbsBits[drvtype], size);
             break;
-        case IO_MSCBITS: // msc_bits
+        case IO_MSCBITS:
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayMscBits[drvtype], size);
             break;
-        case IO_SWBITS: // sw_bits
+        case IO_SWBITS:
             ret = memcpy_s(iobuff, iobuffSize, &g_arraySwBits[drvtype], size);
             break;
-        case IO_LEDBITS: // led_bits
+        case IO_LEDBITS:
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayLedBits[drvtype], size);
             break;
-        case IO_SNDBITS: // snd_bits
+        case IO_SNDBITS:
             ret = memcpy_s(iobuff, iobuffSize, &g_arraySndBits[drvtype], size);
             break;
-        case IO_PROPBITS: // poops
+        case IO_PROPBITS:
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayPropsBits[drvtype], size);
             break;
-        case IO_KEYVALUES: // key_values
+        case IO_KEYVALUES:
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayKeyValues[drvtype], size);
             break;
-        case IO_LEDVALUES: // led_values
+        case IO_LEDVALUES:
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayLedValues[drvtype], size);
             break;
-        case IO_SWVALUES: // sw_values
+        case IO_SWVALUES:
             ret = memcpy_s(iobuff, iobuffSize, &g_arraySwValues[drvtype], size);
             break;
-        case IO_MTVABS: // mtv abs
+        case IO_MTVABS:
             break;
-        case IO_IDS:  // ids
+        case IO_IDS:
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayIds[drvtype], size);
             break;
-        case IO_FFBITS: // ff bits
+        case IO_FFBITS:
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayFfBits[drvtype], size);
             break;
         default:
@@ -106,72 +104,69 @@ int OHOS::MMI::HdfEventManager::EvdevSimIoctl(int hdindex, int pcmd, void *iobuf
     if (ret != EOK) {
         MMI_LOGE("call memcpy_s fail, cmd = %d, ret = %d", cmd, ret);
     }
-    return 0;
+    return RET_OK;
 }
-int OHOS::MMI::HdfEventManager::EvdevIoctl(int hdiindex, int pcmd, void *iobuff)
+int32_t OHOS::MMI::HdfEventManager::EvdevIoctl(int hdiindex, int pcmd, void *iobuff)
 {
-    uhdf *hdiuhdf = nullptr;
-    int size = (pcmd >> IOCTL_CMD_SHIFT) & IOCTL_CMD_MASK;
-    const int iobuffSize = size;
-    int cmd = pcmd & 0xff;
+    int32_t size = (pcmd >> IOCTL_CMD_SHIFT) & IOCTL_CMD_MASK;
+    const int32_t iobuffSize = size;
+    int32_t cmd = pcmd & 0xff;
     DeviceInfo *deviceinfo = nullptr;
     MMI_LOGD("evdev_ioctl index: %{public}d cmd: %{public}02x size: %{public}d "
         "pcmd: %{public}04x", hdiindex, cmd, size, pcmd);
-    for (std::list<uhdf*>::iterator it = globleThis_->hdflist_.begin();
-        it != globleThis_->hdflist_.end(); ++it) {
-        hdiuhdf = *it;
-        if (hdiuhdf->index == hdiindex) {
-            deviceinfo = (DeviceInfo*)hdiuhdf->deviceinfo;
+    for (auto &item : globleThis_->hdflist_){
+        if (item.index == hdiindex) {
+            deviceinfo = static_cast<DeviceInfo*>(item->deviceinfo);
             break;
         }
     }
     if (deviceinfo == nullptr) {
         return 0;
     }
-    int ret = 0;
+    int32_t ret = 0;
     switch (cmd) {
-        case IO_BITS: // bits
+        case IO_BITS:
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.eventType, size);
             break;
-        case IO_KEYBITS: // key_bits
+        case IO_KEYBITS:
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.keyCode, size);
             break;
-        case IO_RELBITS: // rel_bits
+        case IO_RELBITS:
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.relCode, size);
             break;
-        case IO_ABSBITS: // abs_bits
+        case IO_ABSBITS:
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.absCode, size);
             break;
-        case IO_MSCBITS: // msc_bits
+        case IO_MSCBITS:
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.miscCode, size);
             break;
-        case IO_SWBITS: // sw_bits
+        case IO_SWBITS:
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.switchCode, size);
             break;
-        case IO_LEDBITS: // led_bits
+        case IO_LEDBITS:
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.ledCode, size);
             break;
-        case IO_SNDBITS: // snd_bits
+        case IO_SNDBITS:
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.forceCode, size);
             break;
-        case IO_PROPBITS: // poops
+        case IO_PROPBITS:
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.devProp, size);
             break;
-        case IO_KEYVALUES: // key_values
+        case IO_KEYVALUES:
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.keyType, size);
             break;
-        case IO_LEDVALUES: // led_values
+        case IO_LEDVALUES:
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.ledType, size);
             break;
-        case IO_SWVALUES: // sw_values
+        case IO_SWVALUES:
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.switchType, size);
             break;
-        case IO_MTVABS: // mtv abs
+        case IO_MTVABS:
             break;
-        case IO_IDS:  // ids
+        case IO_IDS:
             ret = memcpy_s(iobuff, iobuffSize, &deviceinfo->attrSet.id, size);
             break;
-        case IO_FFBITS: // ff bits
+        case IO_FFBITS:
             ret = memcpy_s(iobuff, iobuffSize, &deviceinfo->abilitySet.forceCode, size);
             break;
         default:
@@ -384,10 +379,7 @@ int OHOS::MMI::HdfEventManager::DeviceRemoveHandle(uint32_t devIndex, uint32_t d
 void OHOS::MMI::HdfEventManager::GetEventCallback(const EventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
     const uint16_t byteSize = 8;
-    if (pkgs == nullptr) {
-        MMI_LOGE("---- %{public}s:%{public}d Error:pkgs is nullptr.----", __func__, __LINE__);
-        return;
-    }
+    CHKP(pkgs);
     input_event eventarry[MAX_EVENT_PKG_NUM];
     for (uint32_t i = 0; i < count && i < MAX_EVENT_PKG_NUM; i++) {
         eventarry[i].code = pkgs[i]->code;
@@ -448,7 +440,7 @@ int OHOS::MMI::HdfEventManager::HdfDevHandle(int index, hdf_event_type cmd)
         for (std::list<uhdf*>::iterator it = globleThis_->hdflist_.begin();
              it != globleThis_->hdflist_.end(); ++it) {
             uhdf *hdiuhdfit = *it;
-            if (hdiuhdfit->index == (int)index) {
+            if (hdiuhdfit->index == static_cast<int32_t>(index)) {
                 hdiuhdf = *it;
                 globleThis_->hdflist_.remove(*it);
                 break;
@@ -466,7 +458,7 @@ int OHOS::MMI::HdfEventManager::HdfDevHandle(int index, hdf_event_type cmd)
     for (std::list<uhdf*>::iterator it = globleThis_->hdflist_.begin();
         it != globleThis_->hdflist_.end(); ++it) {
         uhdf *hdiuhdfit = *it;
-        if (hdiuhdfit->index != (int)index) {
+        if (hdiuhdfit->index != static_cast<int32_t>(index)) {
             continue;
         }
 

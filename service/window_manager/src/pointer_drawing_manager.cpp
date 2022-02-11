@@ -161,22 +161,15 @@ void OHOS::MMI::MouseDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint3
 
 void OHOS::MMI::MouseDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas)
 {
-    OHOS::MMI::MouseDrawingManager mdm;
-
     MMI_LOGD("enter");
+    OHOS::MMI::MouseDrawingManager mdm;
     std::unique_ptr<OHOS::Media::PixelMap> pixelmap = mdm.DecodeImageToPixelMap(IMAGE_POINTER_JPEG_PATH);
-    if (pixelmap == nullptr) {
-        MMI_LOGE("pixelmap is nullptr");
-        return;
-    }
-    MMI_LOGD("pixelmap is not nullptr");
-
+    CHKP(pixelmap);
     OHOS::Rosen::Drawing::Pen pen;
     pen.SetAntiAlias(true);
     pen.SetColor(OHOS::Rosen::Drawing::Color::COLOR_BLUE);
     pen.SetWidth(1);
     canvas.AttachPen(pen);
-    MMI_LOGD("DrawBitmap");
     canvas.DrawBitmap(*pixelmap, 0, 0);
     MMI_LOGD("leave");
 }

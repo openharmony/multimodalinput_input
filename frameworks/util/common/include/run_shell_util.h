@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_RUN_SHELL_UTIL_H
-#define OHOS_RUN_SHELL_UTIL_H
+#ifndef RUN_SHELL_UTIL_H
+#define RUN_SHELL_UTIL_H
 
 #include <regex>
 #include <string>
@@ -35,4 +35,4 @@ private:
     int32_t logMaxSize_;
 };
 }
-#endif
+#endif // RUN_SHELL_UTIL_H

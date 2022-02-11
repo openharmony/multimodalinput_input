@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_BUILTINKEY_EVENTS_H
-#define OHOS_BUILTINKEY_EVENTS_H
+#ifndef BUILTINKEY_EVENT_H
+#define BUILTINKEY_EVENT_H
 
 #include "key_event_pre.h"
 
@@ -34,4 +34,4 @@ public:
     virtual ~BuiltinKeyEvent();
 };
 }
-#endif
+#endif // BUILTINKEY_EVENT_H

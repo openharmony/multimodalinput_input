@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_SYSTEM_EVENT_HANDLER_H
-#define OHOS_SYSTEM_EVENT_HANDLER_H
+#ifndef SYSTEM_EVENT_HANDLER_H
+#define SYSTEM_EVENT_HANDLER_H
 
 #include <functional>
 #include <map>
@@ -47,4 +47,4 @@ protected:
 }
 #define SysEveHdl OHOS::MMI::SystemEventHandler::GetInstance()
 
-#endif
+#endif // SYSTEM_EVENT_HANDLER_H

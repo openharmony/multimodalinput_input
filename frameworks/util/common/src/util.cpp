@@ -157,8 +157,8 @@ size_t StringToken(std::string &str, const std::string &sep, std::string &token)
     }
     size_t pos = str.npos;
     size_t tmp = 0;
-    for (auto it : sep) {
-        tmp = str.find(it);
+    for (auto &item : sep) {
+        tmp = str.find(item);
         if (str.npos != tmp) {
             pos = (std::min)(pos, tmp);
         }
@@ -192,7 +192,7 @@ size_t StringSplit(const std::string &str, const std::string &sep, std::vector<s
 std::string IdsListToString(const std::vector<int32_t> &list, const std::string &sep)
 {
     std::string str;
-    for (auto &it : list) {
+    for (const auto &it : list) {
         str += std::to_string(it) + sep;
     }
     if (str.size() > 0) {

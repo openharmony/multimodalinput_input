@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_LIBMMI_STRUCT_H
-#define OHOS_LIBMMI_STRUCT_H
+#ifndef STRUCT_MULTIMODAL_H
+#define STRUCT_MULTIMODAL_H
 
 #include "proto.h"
 
@@ -392,4 +392,4 @@ struct EventTabletPad {
 }
 }
 
-#endif
+#endif // STRUCT_MULTIMODAL_H

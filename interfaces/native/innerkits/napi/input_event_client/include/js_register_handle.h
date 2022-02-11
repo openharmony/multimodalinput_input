@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_JS_REGISTER_H
-#define OHOS_JS_REGISTER_H
+#ifndef JS_REGISTER_HANDLE_H
+#define JS_REGISTER_HANDLE_H
 #include "js_register_module.h"
 
 namespace OHOS {
@@ -38,4 +38,4 @@ private:
 };
 }
 }
-#endif
+#endif // JS_REGISTER_HANDLE_H

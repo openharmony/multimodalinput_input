@@ -160,14 +160,14 @@ WL_EXPORT int wet_module_init(struct weston_compositor *ec, int *argc, char *arg
 #ifdef OHOS_WESTEN_MODEL
     int socketPair[2];
     socketpair(AF_UNIX, SOCK_STREAM, 0, socketPair);
-    MMIMSGPOST.SetWestonCompositor(ec);
+    MMIMsgPost.SetWestonCompositor(ec);
 
     struct wl_event_loop* loop = nullptr;
     uint32_t mask = 1;
     void *data = nullptr;
     loop = wl_display_get_event_loop(ec->wl_display);
     wl_event_loop_add_fd(loop, socketPair[1], mask, OHOS::MMI::MessagePost::RunTaskOnWestonThread, data);
-    MMIMSGPOST.SetFd(socketPair[0]);
+    MMIMsgPost.SetFd(socketPair[0]);
     StartMmiServer();
 #endif
     return RET_OK;

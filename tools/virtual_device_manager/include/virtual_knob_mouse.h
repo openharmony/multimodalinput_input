@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_VIRTUAL_KNOB_MOUSE_H
-#define OHOS_VIRTUAL_KNOB_MOUSE_H
+#ifndef VIRTUAL_KNOB_MOUSE_H
+#define VIRTUAL_KNOB_MOUSE_H
 
 #include "virtual_device.h"
 
@@ -32,4 +32,4 @@ protected:
 };
 }
 }
-#endif
+#endif // VIRTUAL_KNOB_MOUSE_H

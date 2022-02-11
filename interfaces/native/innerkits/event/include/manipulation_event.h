@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MANIPULATION_EVENTS_H
-#define OHOS_MANIPULATION_EVENTS_H
+#ifndef MANIPULATION_EVENT_H
+#define MANIPULATION_EVENT_H
 
 #include "mmi_point.h"
 #include "multimodal_event.h"
@@ -223,4 +223,4 @@ private:
     fingerInfos mfingersInfos_[FINGER_NUM] = {};
 };
 }
-#endif
+#endif // MANIPULATION_EVENT_H

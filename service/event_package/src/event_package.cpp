@@ -83,12 +83,12 @@ int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& d
 {
     CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
-    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
     auto type = libinput_event_get_type(event);
     data.eventType = type;
     data.deviceType = GetDeviceType(device);
     auto name = libinput_device_get_name(device);
-    CHKR(name, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(name, ERROR_NULL_POINTER, RET_ERR);
     int32_t ret = memcpy_s(data.deviceName, sizeof(data.deviceName), name, MAX_DEVICENAME);
     CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
     const std::string uuid = GetUUid();
@@ -129,12 +129,12 @@ int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& d
 
 int32_t EventPackage::PackageTabletToolOtherParams(libinput_event *event, EventTabletTool& tableTool)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto type = libinput_event_get_type(event);
     auto data = libinput_event_get_tablet_tool_event(event);
-    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER, RET_ERR);
     auto tool = libinput_event_tablet_tool_get_tool(data);
-    CHKR(tool, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(tool, ERROR_NULL_POINTER, RET_ERR);
     tableTool.tool.tool_id = libinput_tablet_tool_get_tool_id(tool);
     tableTool.tool.serial = libinput_tablet_tool_get_serial(tool);
     tableTool.axes.point.x = libinput_event_tablet_tool_get_dx(data);
@@ -179,7 +179,7 @@ int32_t EventPackage::PackageTabletToolOtherParams(libinput_event *event, EventT
 }
 void EventPackage::PackageTabletToolTypeParam(libinput_event *event, EventTabletTool& tableTool)
 {
-    CHK(event, PARAM_INPUT_INVALID);
+    CHKP(event, PARAM_INPUT_INVALID);
     auto data = libinput_event_get_tablet_tool_event(event);
     CHK(data != nullptr, ERROR_NULL_POINTER);
     auto tool = libinput_event_tablet_tool_get_tool(data);
@@ -225,18 +225,18 @@ void EventPackage::PackageTabletToolTypeParam(libinput_event *event, EventTablet
 
 int32_t EventPackage::PackageTabletToolEvent(libinput_event *event, EventTabletTool& tableTool)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     const uint32_t stylusButton1KeyCode = 331;
     const uint32_t stylusButton2KeyCode = 332;
     const uint32_t stylusButton1Value = 1;
     const uint32_t stylusButton2Value = 2;
     auto data = libinput_event_get_tablet_tool_event(event);
-    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER, RET_ERR);
     auto tool = libinput_event_tablet_tool_get_tool(data);
-    CHKR(tool, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(tool, ERROR_NULL_POINTER, RET_ERR);
     auto rDevRet = PackageEventDeviceInfo<EventTabletTool>(event, tableTool);
     if (rDevRet != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", rDevRet, DEV_PARAM_PKG_FAIL);
+        MMI_LOGE("Device param package failed. ret:%{public}d, errCode:%{public}d", rDevRet, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     tableTool.time = libinput_event_tablet_tool_get_time(data);
@@ -251,7 +251,7 @@ int32_t EventPackage::PackageTabletToolEvent(libinput_event *event, EventTabletT
 }
 void EventPackage::PackageTabletPadOtherParams(libinput_event *event, EventTabletPad& tabletPad)
 {
-    CHK(event, PARAM_INPUT_INVALID);
+    CHKP(event, PARAM_INPUT_INVALID);
     auto data = libinput_event_get_tablet_pad_event(event);
     CHK(data != nullptr, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(event);
@@ -284,14 +284,14 @@ void EventPackage::PackageTabletPadOtherParams(libinput_event *event, EventTable
 
 int32_t EventPackage::PackageTabletPadEvent(libinput_event *event, EventTabletPad& tabletPad)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_tablet_pad_event(event);
-    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER, RET_ERR);
     tabletPad.mode = libinput_event_tablet_pad_get_mode(data);
     tabletPad.time = libinput_event_tablet_pad_get_time_usec(data);
     auto ret = PackageEventDeviceInfo<EventTabletPad>(event, tabletPad);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOGE("Device param package failed. ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     PackageTabletPadOtherParams(event, tabletPad);
@@ -300,14 +300,14 @@ int32_t EventPackage::PackageTabletPadEvent(libinput_event *event, EventTabletPa
 
 int32_t EventPackage::PackageTabletPadKeyEvent(libinput_event *event, EventKeyboard& key)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_tablet_pad_event(event);
-    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER, RET_ERR);
     auto type = libinput_event_get_type(event);
     key.time = libinput_event_tablet_pad_get_time_usec(data);
     auto ret = PackageEventDeviceInfo<EventKeyboard>(event, key);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOGE("Device param package failed. ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     switch (type) {
@@ -349,12 +349,12 @@ int32_t EventPackage::PackageJoyStickKeyEvent(libinput_event *event, EventKeyboa
 {
     CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_joystick_pointer_button_event(event);
-    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER, RET_ERR);
     key.time = libinput_event_joystick_button_time(data);
     key.key = libinput_event_joystick_button_get_key(data);
     auto ret = PackageEventDeviceInfo<EventKeyboard>(event, key);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOGE("Device param package failed. ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     key.seat_key_count = libinput_event_joystick_button_get_seat_key_count(data);
@@ -368,9 +368,9 @@ int32_t EventPackage::PackageJoyStickKeyEvent(libinput_event *event, EventKeyboa
 
 int32_t EventPackage::PackagePointerEventByMotion(libinput_event *event, EventPointer& point)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_pointer_event(event);
-    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER, RET_ERR);
 
     point.time = libinput_event_pointer_get_time_usec(data);
     point.delta.x = libinput_event_pointer_get_dx(data);
@@ -382,9 +382,9 @@ int32_t EventPackage::PackagePointerEventByMotion(libinput_event *event, EventPo
 
 int32_t EventPackage::PackagePointerEventByMotionAbs(libinput_event *event, EventPointer& point)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_pointer_event(event);
-    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER, RET_ERR);
 
     point.time = libinput_event_pointer_get_time_usec(data);
     point.absolute.x = libinput_event_pointer_get_absolute_x_transformed(data,
@@ -396,9 +396,9 @@ int32_t EventPackage::PackagePointerEventByMotionAbs(libinput_event *event, Even
 
 int32_t EventPackage::PackagePointerEventByButton(libinput_event *event, EventPointer& point)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_pointer_event(event);
-    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER, RET_ERR);
 
     point.time = libinput_event_pointer_get_time_usec(data);
     point.button = libinput_event_pointer_get_button(data);
@@ -420,9 +420,9 @@ int32_t EventPackage::PackagePointerEventByButton(libinput_event *event, EventPo
 
 int32_t EventPackage::PackagePointerEventByAxis(libinput_event *event, EventPointer& point)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_pointer_event(event);
-    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER, RET_ERR);
 
     point.time = libinput_event_pointer_get_time_usec(data);
     auto axisSource = libinput_event_pointer_get_axis_source(data);
@@ -468,12 +468,12 @@ int32_t EventPackage::PackagePointerEventByAxis(libinput_event *event, EventPoin
 
 int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event, EventJoyStickAxis& eventJoyStickAxis)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto joyEvent = libinput_event_get_joystick_axis_event(event);
-    CHKR(joyEvent, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(joyEvent, ERROR_NULL_POINTER, RET_ERR);
     auto ret = PackageEventDeviceInfo<EventJoyStickAxis>(event, eventJoyStickAxis);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOGE("Device param package failed. ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     eventJoyStickAxis.time = libinput_event_get_joystick_axis_time(joyEvent);
@@ -492,20 +492,20 @@ int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event, EventJoySt
         {"ABS_HAT0X", JOYSTICK_AXIS_SOURCE_ABS_HAT0X, eventJoyStickAxis.abs_hat0x},
         {"ABS_HAT0Y", JOYSTICK_AXIS_SOURCE_ABS_HAT0Y, eventJoyStickAxis.abs_hat0y},
     };
-    for (auto& temp : supportAxisInfos) {
-        libinput_joystick_axis_source axis = static_cast<libinput_joystick_axis_source>(temp.axis);
+    for (const auto &item : supportAxisInfos) {
+        libinput_joystick_axis_source axis = static_cast<libinput_joystick_axis_source>(item.axis);
         if (!libinput_event_get_joystick_axis_value_is_changed(joyEvent, axis)) {
             continue;
         }
         auto pAbsInfo = libinput_event_get_joystick_axis_abs_info(joyEvent, axis);
         if (pAbsInfo != nullptr) {
-            FillEventJoyStickAxisAbsInfo(temp.absInfo, *pAbsInfo);
+            FillEventJoyStickAxisAbsInfo(item.absInfo, *pAbsInfo);
         }
     }
     return RET_OK;
 }
 
-void EventPackage::PackageTouchEventByType(int32_t type, struct libinput_event_touch *data, EventTouch& touch)
+void EventPackage::PackageTouchEventByType(int32_t type, libinput_event_touch *data, EventTouch& touch)
 {
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
@@ -513,7 +513,7 @@ void EventPackage::PackageTouchEventByType(int32_t type, struct libinput_event_t
             touch.point.y = libinput_event_touch_get_y(data);
 #ifdef OHOS_WESTEN_MODEL
             auto touchSurfaceInfo = WinMgr->GetTouchSurfaceInfo(touch.point.x, touch.point.y);
-            CHKR(touchSurfaceInfo, ERROR_NULL_POINTER, RET_ERR);
+            CHKPR(touchSurfaceInfo, ERROR_NULL_POINTER, RET_ERR);
             WinMgr->SetTouchFocusSurfaceId(touchSurfaceInfo->surfaceId);
             WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo, true);
 #endif
@@ -533,7 +533,7 @@ void EventPackage::PackageTouchEventByType(int32_t type, struct libinput_event_t
 #ifdef OHOS_WESTEN_MODEL
             auto touchSurfaceId = WinMgr->GetTouchFocusSurfaceId();
             auto touchSurfaceInfo = WinMgr->GetSurfaceInfo(touchSurfaceId);
-            CHKR(touchSurfaceInfo, ERROR_NULL_POINTER, RET_ERR);
+            CHKPR(touchSurfaceInfo, ERROR_NULL_POINTER, RET_ERR);
             WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo);
 #endif
             break;
@@ -556,11 +556,11 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
     }
     auto ret = PackageEventDeviceInfo<EventTouch>(event, touch);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed, ret:%{public}d,errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOGE("Device param package failed, ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     auto data = libinput_event_get_touch_event(event);
-    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER, RET_ERR);
     touch.time = libinput_event_touch_get_time_usec(data);
     touch.slot = libinput_event_touch_get_slot(data);
     touch.seatSlot = libinput_event_touch_get_seat_slot(data);
@@ -573,7 +573,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
             touch.point.y = libinput_event_touch_get_y(data);
 #ifdef OHOS_WESTEN_MODEL
             auto touchSurfaceInfo = WinMgr->GetTouchSurfaceInfo(touch.point.x, touch.point.y);
-            CHKR(touchSurfaceInfo, ERROR_NULL_POINTER, RET_ERR);
+            CHKPR(touchSurfaceInfo, ERROR_NULL_POINTER, RET_ERR);
             WinMgr->SetTouchFocusSurfaceId(touchSurfaceInfo->surfaceId);
             WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo, true);
 #endif
@@ -593,7 +593,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
 #ifdef OHOS_WESTEN_MODEL
             auto touchSurfaceId = WinMgr->GetTouchFocusSurfaceId();
             auto touchSurfaceInfo = WinMgr->GetSurfaceInfo(touchSurfaceId);
-            CHKR(touchSurfaceInfo, ERROR_NULL_POINTER, RET_ERR);
+            CHKPR(touchSurfaceInfo, ERROR_NULL_POINTER, RET_ERR);
             WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo);
 #endif
             break;
@@ -610,7 +610,7 @@ int32_t EventPackage::PackagePointerEvent(libinput_event *event, EventPointer& p
     CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto rDevRet = PackageEventDeviceInfo<EventPointer>(event, point);
     if (rDevRet != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", rDevRet, DEV_PARAM_PKG_FAIL);
+        MMI_LOGE("Device param package failed. ret:%{public}d, errCode:%{public}d", rDevRet, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     int32_t ret = RET_OK;
@@ -643,9 +643,9 @@ int32_t EventPackage::PackagePointerEvent(libinput_event *event, EventPointer& p
 
 int32_t EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& gesture)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto data = libinput_event_get_gesture_event(event);
-    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER, RET_ERR);
     auto ret = PackageEventDeviceInfo<EventGesture>(event, gesture);
     if (ret != RET_OK) {
         MMI_LOGE("Device param package failed, ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
@@ -680,7 +680,7 @@ int32_t EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& g
             gesture.deltaUnaccel.x = libinput_event_gesture_get_dx_unaccelerated(data);
             gesture.deltaUnaccel.y = libinput_event_gesture_get_dy_unaccelerated(data);
             sloted_coords_info* pSoltTouches = libinput_event_gesture_get_solt_touches(data);
-            CHKR(pSoltTouches, ERROR_NULL_POINTER, RET_ERR);
+            CHKPR(pSoltTouches, ERROR_NULL_POINTER, RET_ERR);
             FillEventSlotedCoordsInfo(gesture.soltTouches, *pSoltTouches);
             break;
         }
@@ -700,10 +700,10 @@ int32_t EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& g
 
 int32_t EventPackage::PackageDeviceManageEvent(libinput_event *event, DeviceManage& deviceManage)
 {
-    CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto ret = PackageEventDeviceInfo<DeviceManage>(event, deviceManage);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOGE("Device param package failed. ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     return RET_OK;
@@ -743,16 +743,16 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<Key
 {
     CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("PackageKeyEvent begin");
-    CHKR(kevnPtr, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(kevnPtr, ERROR_NULL_POINTER, RET_ERR);
     kevnPtr->UpdateId();
     EventKeyboard key = {};
     auto ret = PackageEventDeviceInfo<EventKeyboard>(event, key);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOGE("Device param package failed. ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     auto data = libinput_event_get_keyboard_event(event);
-    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER, RET_ERR);
     // libinput key transformed into HOS key
     auto hosKey = KeyValueTransformationByInput(libinput_event_keyboard_get_key(data)); 
 
@@ -857,7 +857,7 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
         if (pressedKeyItem != nullptr) {
             keyItem.SetDownTime(pressedKeyItem->GetDownTime());
         } else {
-            MMI_LOGE("find pressed key failed, keyCode: %{public}d", keyCode);
+            MMI_LOGE("Find pressed key failed, keyCode:%{public}d", keyCode);
         }
         keyEventPtr->RemoveReleasedKeyItems(keyItem);
         keyEventPtr->AddPressedKeyItems(keyItem);

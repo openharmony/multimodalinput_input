@@ -38,4 +38,4 @@ private:
 #define TouchTransformPointManger OHOS::MMI::TouchTransformPointManager::GetInstance()
 }
 }
-#endif
+#endif // TOUCH_TRANSFORM_POINT_MANAGER_H

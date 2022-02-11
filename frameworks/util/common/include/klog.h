@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_KLOG_H
-#define OHOS_KLOG_H
+#ifndef KLOG_H
+#define KLOG_H
 
 #include <string.h>
 
@@ -37,4 +37,4 @@ void kMsgLog(const char *fileName, int line, const char *kLevel, const char *fmt
 }
 #endif
 
-#endif // OHOS_KLOG_H
+#endif // KLOG_H

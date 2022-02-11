@@ -101,8 +101,8 @@ void EventDump::Dump(int32_t fd)
 
     // msgDumps
     mprintf(fd, "MMI_MSGDumps:");
-    for (auto& it : dumpInfo_) {
-        mprintf(fd, "\t%s", it.c_str());
+    for (const auto &item : dumpInfo_) {
+        mprintf(fd, "\t%s", item.c_str());
     }
     strCurTime = Strftime();
     mprintf(fd, "MMIDumpsEnd: %s", strCurTime.c_str());

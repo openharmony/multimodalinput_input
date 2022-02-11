@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_SENIOR_INPUT_FUNC_PROC_BASE_H
-#define OHOS_SENIOR_INPUT_FUNC_PROC_BASE_H
+#ifndef SENIOR_INPUT_FUNC_PROC_BASE_H
+#define SENIOR_INPUT_FUNC_PROC_BASE_H
 #include "uds_server.h"
 
 namespace OHOS {
@@ -47,4 +47,4 @@ public:
 };
 }
 }
-#endif
+#endif // SENIOR_INPUT_FUNC_PROC_BASE_H

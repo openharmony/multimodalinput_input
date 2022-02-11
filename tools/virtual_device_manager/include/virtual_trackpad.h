@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_VIRTUAL_TRACKPAD_H
-#define OHOS_VIRTUAL_TRACKPAD_H
+#ifndef VIRTUAL_TRACKPAD_H
+#define VIRTUAL_TRACKPAD_H
 
 #include "virtual_device.h"
 
@@ -33,4 +33,4 @@ protected:
 };
 }
 }
-#endif
+#endif // VIRTUAL_TRACKPAD_H

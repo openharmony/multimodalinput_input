@@ -33,6 +33,7 @@ OHOS::MMI::InputEventMonitorManager::~InputEventMonitorManager()
 
 int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventMontior(SessionPtr session, int32_t eventType)
 {
+    MMI_LOGD("Enter");
     CHKPR(session, ERROR_NULL_POINTER, RET_ERR);
     std::lock_guard<std::mutex> lock(mu_);
     MonitorItem monitorItem;
@@ -47,10 +48,12 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventMontior(SessionPtr ses
         MMI_LOGD("eventType: %{public}d, fd: %{public}d register in server", eventType, session->GetFd());
         return RET_OK;
     }
+    MMI_LOGD("Leave");
 }
 
 void OHOS::MMI::InputEventMonitorManager::RemoveInputEventMontior(SessionPtr session, int32_t eventType)
 {
+    MMI_LOGD("Enter");
     CHKP(session, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> lock(mu_);
     MonitorItem monitorItem;
@@ -61,6 +64,7 @@ void OHOS::MMI::InputEventMonitorManager::RemoveInputEventMontior(SessionPtr ses
         monitors_.erase(it);
         MMI_LOGW("EventType: %{public}d, fd: %{public}d remove from server", eventType, session->GetFd());
     }
+    MMI_LOGD("Leave");
 }
 
 void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
@@ -71,21 +75,23 @@ void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OH
              keyEvent->GetAction(), keyEvent->GetDeviceId(), keyEvent->GetActionTime());
     if (monitors_.empty()) {
         MMI_LOGE("No monitor to send msg");
+        return;
     }
     NetPacket newPkt(MmiMessageId::ON_KEYMONITOR);
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, newPkt);
-    for (const auto &monitor : monitors_) {
-        CHKP(monitor.session, ERROR_NULL_POINTER);
-        newPkt << monitor.session->GetPid();
-        MMI_LOGD("Server send the msg to client, keyCode: %{public}d, pid: %{public}d", keyEvent->GetKeyCode(),
-            monitor.session->GetPid());
-        monitor.session->SendMsg(newPkt);
+    std::list<MonitorItem>::iterator iter;
+    for (const auto &item : monitors_) {
+        CHKP(item.session);
+        newPkt << item.session->GetPid();
+        MMI_LOGD("server send the msg to client: keyCode = %{public}d, pid = %{public}d", keyEvent->GetKeyCode(),
+            item.session->GetPid());
+        item.session->SendMsg(newPkt);
     }
 }
 
 int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
 {
-    MMI_LOGD("InputEventMonitorManager::AddInputEventTouchpadMontior");
+    MMI_LOGD("Enter");
     std::lock_guard<std::mutex> lock(mu_);
     MonitorItem monitorItemTouchpad;
     monitorItemTouchpad.eventType = eventType;
@@ -100,11 +106,12 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventTouchpadMontior(int32_
             eventType, session->GetFd());
         return RET_OK;
     }
+    MMI_LOGD("Leave");
 }
 
 void OHOS::MMI::InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
 {
-    MMI_LOGD("InputEventMonitorManager::RemoveInputEventTouchpadMontior");
+    MMI_LOGD("Enter");
     std::lock_guard<std::mutex> lock(mu_);
     MonitorItem monitorItemtouchpad;
     monitorItemtouchpad.eventType = eventType;
@@ -117,35 +124,36 @@ void OHOS::MMI::InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_
         iter = monitorsTouch_.erase(iter);
         MMI_LOGD("Service RemoveInputEventTouchpadMontior Success");
     }
+    MMI_LOGD("Leave");
 }
 
 void OHOS::MMI::InputEventMonitorManager::OnTouchpadMonitorInputEvent(
     std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
-    MMI_LOGD("InputEventMonitorManager::OnTouchpadMonitorInputEvent");
+    MMI_LOGD("Enter");
     if (monitorsTouch_.empty()) {
         MMI_LOGE("InputEventMonitorManager::%{public}s no monitor to send msg", __func__);
     }
     NetPacket newPkt(MmiMessageId::ON_TOUCHPAD_MONITOR);
-    InputEventDataTransformation::SerializePointerEvent(pointerEvent, newPkt);
+    InputEventDataTransformation::Marshalling(pointerEvent, newPkt);
     std::list<MonitorItem>::iterator iter;
-    for (iter = monitorsTouch_.begin(); iter != monitorsTouch_.end(); iter++) {
-        newPkt << iter->session->GetPid();
+    for (const auto &item :  monitorsTouch_) {
+        newPkt << item.session->GetPid();
         MMI_LOGD("server send the msg to client: EventType = %{public}d, pid = %{public}d",
-            pointerEvent->GetEventType(), iter->session->GetPid());
-        iter->session->SendMsg(newPkt);
+            pointerEvent->GetEventType(), item.session->GetPid());
+        item.session->SendMsg(newPkt);
         MMI_LOGD("Service SendMsg Success");
     }
+    MMI_LOGD("Leave");
 }
 
 bool OHOS::MMI::InputEventMonitorManager::ReportTouchpadEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
     PointerEvent::PointerItem pointer;
     CHKF(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL);
-    MMI_LOGT("monitor-serviceeventTouchpad:time=%{public}d;"
+    MMI_LOGD("monitor-serviceeventTouchpad:time=%{public}d;"
              "sourceType=%{public}d;action=%{public}d;"
-             "pointerId=%{public}d;point.x=%{public}d;point.y=%{public}d;press=%{public}d"
-             "*********************************************************",
+             "pointerId=%{public}d;point.x=%{public}d;point.y=%{public}d;press=%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     OnTouchpadMonitorInputEvent(pointerEvent);

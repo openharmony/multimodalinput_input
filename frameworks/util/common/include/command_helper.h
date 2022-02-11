@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_COMMAND_HELPER_H
-#define OHOS_COMMAND_HELPER_H
+#ifndef COMMAND_HELPER_H
+#define COMMAND_HELPER_H
 
 #include "string_ex.h"
 #include "log.h"
@@ -26,8 +26,8 @@ namespace OHOS::MMI {
         CommandHelper(const std::string& command) : command_(command)
         {
             SplitStr(command_, strSep_, splitParameters_);
-            for (auto& i : splitParameters_) {
-                std::string s = TrimStr(i, '\n');
+            for (auto &item : splitParameters_) {
+                std::string s = TrimStr(item, '\n');
                 MMI_LOGI("##%s##", s.c_str());
             }
         }
@@ -53,4 +53,4 @@ namespace OHOS::MMI {
     };
 } // namespace OHOS::MMI
 
-#endif // OHOS_COMMAND_HELPER_H
+#endif // COMMAND_HELPER_H

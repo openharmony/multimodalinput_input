@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MMI_SERVER_H
-#define OHOS_MMI_SERVER_H
+#ifndef MMI_SERVER_H
+#define MMI_SERVER_H
 #include "app_register.h"
 #include "device_register.h"
 #include "expansibility_operation.h"
@@ -69,4 +69,4 @@ private:
 };
 }
 }
-#endif
+#endif // MMI_SERVER_H

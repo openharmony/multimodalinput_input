@@ -47,17 +47,15 @@ int32_t ProcessingKeyboardDevice::TransformJsonDataToInputData(const Json& finge
 void ProcessingKeyboardDevice::TransformKeyBoardEventToInputEvent(const std::vector<KeyBoardEvent>& keyBoardEventArray,
                                                                   InputEventArray& inputEventArray)
 {
-    for (KeyBoardEvent keyBoardEvent : keyBoardEventArray) {
-        if (keyBoardEvent.eventType == "KEY_EVENT_PRESS") {
-            TransformKeyPressEvent(keyBoardEvent, inputEventArray);
-        } else if (keyBoardEvent.eventType == "KEY_EVENT_RELEASE") {
-            TransformKeyReleaseEvent(keyBoardEvent, inputEventArray);
-        } else if (keyBoardEvent.eventType == "KEY_EVENT_CLICK") {
-            TransformKeyClickEvent(keyBoardEvent, inputEventArray);
-        } else if (keyBoardEvent.eventType == "KEY_EVENT_LONG_PRESS") {
-            TransformKeyLongPressEvent(keyBoardEvent, inputEventArray);
-        } else {
-            // nothing to do.
+    for (const auto &item : keyBoardEventArray) {
+        if (item.eventType == "KEY_EVENT_PRESS") {
+            TransformKeyPressEvent(item, inputEventArray);
+        } else if (item.eventType == "KEY_EVENT_RELEASE") {
+            TransformKeyReleaseEvent(item, inputEventArray);
+        } else if (item.eventType == "KEY_EVENT_CLICK") {
+            TransformKeyClickEvent(item, inputEventArray);
+        } else if (item.eventType == "KEY_EVENT_LONG_PRESS") {
+            TransformKeyLongPressEvent(item, inputEventArray);
         }
     }
 }
@@ -66,7 +64,7 @@ int32_t ProcessingKeyboardDevice::AnalysisKeyBoardEvent(const Json& inputData,
                                                         std::vector<KeyBoardEvent>& keyBoardEventArray)
 {
     KeyBoardEvent keyBoardEvent = {};
-    for (auto item : inputData) {
+    for (const auto &item : inputData) {
         keyBoardEvent = {};
         keyBoardEvent.eventType = item.at("eventType").get<std::string>();
         if ((item.find("keyValue")) != item.end()) {

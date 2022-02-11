@@ -48,5 +48,5 @@ private:
 }
 }
 
-#define INTERCEPTORMANAGERGLOBAL OHOS::Singleton<OHOS::MMI::InterceptorManagerGlobal>::GetInstance()
-#endif
+#define InterceptorMgrGbl OHOS::Singleton<OHOS::MMI::InterceptorManagerGlobal>::GetInstance()
+#endif // INTERCEPTOR_MANAGER_GLOBAL_H

@@ -124,10 +124,12 @@ std::function<void(KeyBoardEvent)> InputFilterManager::KeyEventFilter::GetHandle
 
 void InputFilterManager::OnkeyEventTrace(const KeyBoardEvent& event)
 {
-    std::string keyEvent = "InputFilter OnKey keyUuid: " + event.GetUuid();
+    std::string keyEvent = "client keyUuid = " + event.GetUuid();
     char *tmpKey = (char*)keyEvent.c_str();
     MMI_LOGT(" OnKey keyUuid = %{public}s", tmpKey);
+    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEvent);
     int32_t eventKey = 1;
+    keyEvent = "keyEventFilterAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 }
 
@@ -135,7 +137,7 @@ int32_t InputFilterManager::OnKeyEvent(KeyBoardEvent event, int32_t id)
 {
     MMI_LOGD("client on key event call function handler ");
     OnkeyEventTrace(event);
-    for (auto item : keyEventFilterList_) {
+    for (auto &item : keyEventFilterList_) {
         if (id == item.GetId()) {
             item.GetHandler()(event);
             MMI_LOGD("client on key event call function handler success");
@@ -149,10 +151,10 @@ int32_t InputFilterManager::GetHighAuthorityFilterId()
 {
     Authority authority = NO_AUTHORITY;
     int32_t id = 0;
-    for (auto it = touchEventFilterList_.begin(); it != touchEventFilterList_.end(); it++) {
-        if (it->GetAuthority() > authority) {
-            authority = it->GetAuthority();
-            id = it->GetId();
+    for (auto &item : touchEventFilterList_) {
+        if (item.GetAuthority() > authority) {
+            authority = item.GetAuthority();
+            id = item.GetId();
             if (authority == HIGH_AUTHORITY) {
                 break;
             }
@@ -163,9 +165,9 @@ int32_t InputFilterManager::GetHighAuthorityFilterId()
 
 InputFilterManager::TouchEventFilter InputFilterManager::GetTouchEventFilter(int32_t id)
 {
-    for (auto it = touchEventFilterList_.begin(); it != touchEventFilterList_.end(); it++) {
-        if (it->GetId() == id) {
-            return *it;
+    for (auto &item : touchEventFilterList_) {
+        if (item.GetId() == id) {
+            return item;
         }
     }
     InputFilterManager::TouchEventFilter touchEventFilter;
@@ -269,19 +271,9 @@ std::function<void(TouchEvent)> InputFilterManager::TouchEventFilter::GetHandler
     return handler_;
 }
 
-void InputFilterManager::OnTouchEventTrace(const TouchEvent& event)
-{
-    std::string touchEvent = "InputFilter OnTouch touchUuid: " + event.GetUuid();
-    char *tmpTouch = (char*)touchEvent.c_str();
-    MMI_LOGT(" OnTouchEvent touchUuid = %{public}s", tmpTouch);
-    int32_t eventTouch = 9;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
-}
-
 int32_t InputFilterManager::OnTouchEvent(TouchEvent event, int32_t id)
 {
     MMI_LOGE("client on touch event call function handler, id=%{public}d", id);
-    OnTouchEventTrace(event);
     for (auto iter : touchEventFilterList_) {
         if (id == iter.GetId()) {
             iter.GetHandler()(event);
@@ -289,7 +281,7 @@ int32_t InputFilterManager::OnTouchEvent(TouchEvent event, int32_t id)
             break;
         }
     }
-    return 0;
+    return RET_OK;
 }
 
 int32_t InputFilterManager::RegisterPointerEventInterceptor(std::string name_, Authority authority_,
@@ -393,10 +385,12 @@ std::function<void(MouseEvent)> InputFilterManager::PointerEventInterceptor::Get
 
 void InputFilterManager::OnPointerEventTrace(const MouseEvent& event)
 {
-    std::string pointerEvent = "InputFilter OnPointer pointerUuid: " + event.GetUuid();
+    std::string pointerEvent = "client pointUuid = " + event.GetUuid();
     char *tmpPointer = (char*)pointerEvent.c_str();
     MMI_LOGT(" OnPointerEvent pointerUuid = %{public}s", tmpPointer);
+    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent);
     int32_t eventPointer = 17;
+    pointerEvent = "PointerEventFilterAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
 }
 
@@ -404,7 +398,7 @@ int32_t InputFilterManager::OnPointerEvent(MouseEvent event, int32_t id_)
 {
     MMI_LOGD("client on point event call function handler ");
     OnPointerEventTrace(event);
-    for (auto item : PointerEventInterceptorList_)
+    for (auto &item : PointerEventInterceptorList_)
     {
         if (id_ == item.GetId()) {
             item.GetHandler()(event);

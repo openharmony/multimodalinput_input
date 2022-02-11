@@ -52,8 +52,8 @@ void ProcessingPenDevice::TransformPenEventToInputEvent(const std::vector<PenEve
                                                         InputEventArray& inputEventArray)
 {
     SetPenApproachPadEvent(penEventArray[0], inputEventArray);
-    for (uint32_t i = 1; i < penEventArray.size(); i++) {
-        SetPenSlidePadEvent(penEventArray[i], inputEventArray);
+    for (const auto &item : penEventArray) {
+        SetPenSlidePadEvent(item, inputEventArray);
     }
     uint64_t lastEventIndex = penEventArray.size() - 1;
     SetPenLeavePadEvent(penEventArray[lastEventIndex], inputEventArray);
