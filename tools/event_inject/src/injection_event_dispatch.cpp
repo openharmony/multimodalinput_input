@@ -96,15 +96,15 @@ void InjectionEventDispatch::HandleInjectCommandItems()
     string id = GetFunId();
     auto fun = GetFun(id);
     if (!fun) {
-        MMI_LOGE("event injection Unknown fuction id[%{public}s]", id.c_str());
+        MMI_LOGE("event injection Unknown fuction id:%{public}s", id.c_str());
         return;
     }
 
     auto ret = (*fun)();
     if (ret == RET_OK) {
-        MMI_LOGI("injecte function success id=[%{public}s]", id.c_str());
+        MMI_LOGI("injecte function success id:%{public}s", id.c_str());
     } else {
-        MMI_LOGE("injecte function faild id=[%{public}s]", id.c_str());
+        MMI_LOGE("injecte function faild id:%{public}s", id.c_str());
     }
 
     return;
@@ -160,7 +160,7 @@ void InjectionEventDispatch::Run()
     string id = GetFunId();
     auto fun = GetFun(id);
     if (!fun) {
-        MMI_LOGE("event injection Unknown fuction id[%{public}s]", id.c_str());
+        MMI_LOGE("event injection Unknown fuction id:%{public}s", id.c_str());
         return;
     }
     bool needStartSocket = GetStartSocketPermission(id);
@@ -174,9 +174,9 @@ void InjectionEventDispatch::Run()
     } else {
         ret = (*fun)();
         if (ret == RET_OK) {
-            MMI_LOGI("injecte function success id=[%{public}s]", id.c_str());
+            MMI_LOGI("injecte function success id:%{public}s", id.c_str());
         } else {
-            MMI_LOGE("injecte function faild id=[%{public}s]", id.c_str());
+            MMI_LOGE("injecte function faild id:%{public}s", id.c_str());
         }
     }
 }
@@ -188,16 +188,16 @@ int32_t InjectionEventDispatch::ExecuteFunction(string funId)
     }
     auto fun = GetFun(funId);
     if (!fun) {
-        MMI_LOGE("event injection Unknown fuction id[%{public}s]", funId.c_str());
+        MMI_LOGE("event injection Unknown fuction id:%{public}s", funId.c_str());
         return false;
     }
     int32_t ret = RET_ERR;
-    MMI_LOGI("Inject tools into function: [%{public}s]", funId.c_str());
+    MMI_LOGI("Inject tools into function:%{public}s", funId.c_str());
     ret = (*fun)();
     if (ret == RET_OK) {
-        MMI_LOGI("injecte function success id=[%{public}s]", funId.c_str());
+        MMI_LOGI("injecte function success id:%{public}s", funId.c_str());
     } else {
-        MMI_LOGE("injecte function faild id=[%{public}s]", funId.c_str());
+        MMI_LOGE("injecte function faild id:%{public}s", funId.c_str());
     }
 
     return ret;

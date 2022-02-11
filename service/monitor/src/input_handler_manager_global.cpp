@@ -42,7 +42,7 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
         MMI_LOGW("Invalid handler type");
         return RET_ERR;
     }
-    MMI_LOGD("Register interceptor(%{public}d).", handlerId);
+    MMI_LOGD("Register interceptor:%{public}d", handlerId);
     SessionHandler interceptor { handlerId, handlerType, session };
     return interceptors_.AddInterceptor(interceptor);
 }
@@ -54,7 +54,7 @@ void InputHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
         MMI_LOGE("RemoveInputHandler InputHandlerType Not MONITOR:%{public}d", handlerType);
         return;
     }
-    MMI_LOGD("Unregister monitor(%{public}d).", handlerId);
+    MMI_LOGD("Unregister monitor:%{public}d", handlerId);
     SessionHandler monitor { handlerId, handlerType, session };
     monitors_.RemoveMonitor(monitor);
     if (InputHandlerType::INTERCEPTOR != handlerType) {
@@ -132,7 +132,7 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Key
 void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
 {
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
-    MMI_LOGD("Service SendToClient id:%{public}d,InputHandlerType:%{public}d", id_, handlerType_);
+    MMI_LOGD("Service SendToClient id:%{public}d, InputHandlerType:%{public}d", id_, handlerType_);
     CHK(pkt.Write(id_), STREAM_BUF_WRITE_FAIL);
     CHK(pkt.Write(handlerType_), STREAM_BUF_WRITE_FAIL);
     CHK((OHOS::MMI::InputEventDataTransformation::Marshalling(pointerEvent, pkt) == RET_OK),
@@ -144,7 +144,7 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionHa
 {
     std::lock_guard<std::mutex> guard(lockMonitors_);
     if (monitors_.size() >= MAX_N_INPUT_MONITORS) {
-        MMI_LOGE("The number of monitors exceeds the maximum:%{public}d monitors, errCode:%{public}d",
+        MMI_LOGE("The number of monitors exceeds the maximum:%{public}d, monitors, errCode:%{public}d",
                  static_cast<int32_t>(monitors_.size()), INVALID_MONITOR_MON);
         return RET_ERR;
     }
