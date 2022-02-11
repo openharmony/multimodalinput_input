@@ -367,7 +367,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
         int touchFilter = 2;
         if (touchFilter == point->GetSourceType()) {
-            int32_t eventTouch = 9;
+            int32_t eventTouch = 10;
             std::string touchEvent = "OnEventTouchAsync";
             FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
         }
@@ -704,7 +704,7 @@ void EventDispatch::OnKeyboardEventTrace(std::shared_ptr<KeyEvent> &key, int32_t
         MMI_LOGT("FilterSubscribeKeyEvent service trace GetKeyCode=%{public}d", keyCode);
     }
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, checkKeyCode);
-    int32_t eventKey = 1;
+    int32_t eventKey = 2;
     std::string keyEvent = "OnEventKeyboardAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 }
