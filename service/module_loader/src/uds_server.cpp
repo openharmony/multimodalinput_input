@@ -401,7 +401,7 @@ OHOS::MMI::SessionPtr OHOS::MMI::UDSServer::GetSession(int32_t fd) const
 
 bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
 {
-    CHKF(ses, OHOS::ERROR_NULL_POINTER);
+    CHKPF(ses);
     MMI_LOGD("AddSession pid is %{public}d, fd is %{public}d", ses->GetPid(), ses->GetFd());
     auto fd = ses->GetFd();
     CHKF(fd >= 0, VAL_NOT_EXP);
