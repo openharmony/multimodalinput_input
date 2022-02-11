@@ -168,7 +168,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
              key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
              key->GetActionStartTime(), key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), key->GetId(), fd, serverStartTime);
-    int32_t eventKey = 1;
+    int32_t eventKey = 3;
     std::string keyCodestring = "KeyEventDispatchAsync";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
     int32_t getKeyCode = key->GetKeyCode();
@@ -224,7 +224,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         MMI_LOGD("Operation canceled.");
     }
     pointerEvent->SetProcessedCallback(eventProcessedCallback_);
-    int32_t eventPointer = 17;
+    int32_t eventPointer = 19;
     std::string pointerCodestring = "PointerEventDispatchAsync";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerCodestring, eventPointer);
     InputManagerImpl::GetInstance()->OnPointerEvent(pointerEvent);
@@ -825,7 +825,7 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
         MMI_LOGE("Failed to deserialize pointer event...");
         return RET_ERR;
     }
-    int32_t eventTouch = 9;
+    int32_t eventTouch = 11;
     std::string touchEvent = "TouchEventFilterAsync";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
     InputHandlerManager::GetInstance().OnInputEvent(handlerId, pointerEvent);
@@ -1222,7 +1222,7 @@ void ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, NetPacket& 
 
 void ClientMsgHandler::TraceKeyEvent(const EventKeyboard& key) const
 {
-    int32_t eventKey = 1;
+    int32_t eventKey = 3;
     std::string keyEvent = "keyEventFilterAsync";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
     char keyUuid[MAX_UUIDSIZE] = {0};
@@ -1236,7 +1236,7 @@ void ClientMsgHandler::TraceKeyEvent(const EventKeyboard& key) const
 
 void ClientMsgHandler::TracePointerEvent(const EventPointer& pointData) const
 {
-    int32_t eventPointer = 17;
+    int32_t eventPointer = 19;
     std::string pointerEvent = "PointerEventFilterAsync";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
     char pointerUuid[MAX_UUIDSIZE] = {0};
