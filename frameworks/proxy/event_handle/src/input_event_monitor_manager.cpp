@@ -34,7 +34,7 @@ InputEventMonitorManager::~InputEventMonitorManager()
 int32_t InputEventMonitorManager::AddInputEventMontior(
     std::function<void (std::shared_ptr<OHOS::MMI::KeyEvent>)> keyEventMonitor)
 {
-    CHKPR(keyEventMonitor, ERROR_NULL_POINTER, INVALID_MONITOR_ID);
+    CHKPR(keyEventMonitor, INVALID_MONITOR_ID);
     MMI_LOGD("AddInputEventMontior enter");
     int32_t ret = MMIEventHdl.AddInputEventMontior(OHOS::MMI::InputEvent::EVENT_TYPE_KEY);
     if (ret != RET_OK) {
@@ -69,7 +69,7 @@ void InputEventMonitorManager::RemoveInputEventMontior(int32_t monitorId)
 
 int32_t InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
-    CHKPR(keyEvent, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
     for (const auto &monitor : monitors_) {
         monitor.keyEventMonitor(keyEvent);
     }
