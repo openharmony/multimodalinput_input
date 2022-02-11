@@ -53,11 +53,6 @@ constexpr int32_t INDEX_FIRST = 1;
 constexpr int32_t INDEX_SECOND = 2;
 constexpr int32_t INDEX_THIRD = 3;
 constexpr int32_t INDEX_INVALID = -1;
-
-constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
-constexpr int32_t SEC_TO_NANOSEC = 1000000000;
-constexpr int32_t TIME_WAIT_FOR_LOG = 50;
-constexpr int32_t N_TRIES_FOR_LOG = 20;
 const std::regex REGEX_FIND_PID(" ");
 static RunShellUtil g_runCommand;
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest" };
@@ -328,7 +323,7 @@ void InputManagerTest::TestMarkConsumedStep6()
     EXPECT_TRUE(!tLogs.empty());
 }
 
-HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.Level1)
 {
     RunShellUtil runCommand;
     std::string command = "Inject keyCode = 2,action = 2";
@@ -358,7 +353,7 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_001, Test
     EXPECT_TRUE(!tlogs.empty());
 }
 
-HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_002, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_002, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create(); 
     int32_t downTime = -1;
@@ -372,7 +367,7 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_002, Test
     InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
 }
 
-HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create(); 
     int32_t downTime = 0;
@@ -396,7 +391,7 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_003, Test
     InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
 }
 
-HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_004, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_004, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create(); 
     int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
@@ -412,7 +407,7 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_004, Test
     MMI_LOGD("MMIEventHdl.InjectEvent end");
 }
 
-HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create(); 
     int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
