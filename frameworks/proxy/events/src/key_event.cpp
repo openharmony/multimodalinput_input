@@ -462,6 +462,43 @@ void KeyEvent::KeyItem::SetPressed(bool pressed)
     pressed_ = pressed;
 }
 
+
+bool KeyEvent::KeyItem::WriteToParcel(Parcel &out) const
+{
+    if (!out.WriteBool(pressed_)) {
+        return false;
+    }
+    if (!out.WriteInt32(downTime_)) {
+        return false;
+    }
+    if (!out.WriteInt32(deviceId_)) {
+        return false;
+    }
+    if (!out.WriteInt32(keyCode_)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool KeyEvent::KeyItem::ReadFromParcel(Parcel &in)
+{
+    if (!in.ReadBool(pressed_)) {
+        return false;
+    }
+    if (!in.ReadInt32(downTime_)) {
+        return false;
+    }
+    if (!in.ReadInt32(deviceId_)) {
+        return false;
+    }
+    if (!in.ReadInt32(keyCode_)) {
+        return false;
+    }
+
+    return true;
+}
+
 std::shared_ptr<KeyEvent> KeyEvent::from(std::shared_ptr<InputEvent> inputEvent)
 {
     return nullptr;
@@ -1435,6 +1472,59 @@ bool KeyEvent::IsValid() const
         return false;
     }
     HiLog::Debug(LABEL, "KeyEvent::IsValid end");
+    return true;
+}
+
+
+bool KeyEvent::WriteToParcel(Parcel &out) const
+{
+    if (!InputEvent::WriteToParcel(out)) {
+        return false;
+    }
+    if (!out.WriteInt32(keyCode_)) {
+        return false;
+    }
+    if (keys_.size() > INT_MAX) {
+        return false;
+    }
+    if (!out.WriteInt32(static_cast<int32_t>(keys_.size()))) {
+        return false;
+    }
+    for (const auto &item : keys_) {
+        if (!item.WriteToParcel(out)) {
+            return false;
+        }
+    }
+    if (!out.WriteInt32(keyAction_)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool KeyEvent::ReadFromParcel(Parcel &in)
+{
+    if (!InputEvent::ReadFromParcel(in)) {
+        return false;
+    }
+    if (!in.ReadInt32(keyCode_)) {
+        return false;
+    }
+    const int32_t keysSize = in.ReadInt32();
+    if (keysSize < 0) {
+        return false;
+    }
+    for (int32_t i = 0; i < keysSize; ++i) {
+        KeyItem val = {};
+        if (!val.ReadFromParcel(in)) {
+            return false;
+        }
+        keys_.push_back(val);
+    }
+    if (!in.ReadInt32(keyAction_)) {
+        return false;
+    }
+
     return true;
 }
 }
