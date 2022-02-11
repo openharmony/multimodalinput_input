@@ -45,8 +45,8 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<OHOS::M
     std::function<void(std::shared_ptr<OHOS::MMI::KeyEvent>)> callback)
 {
     MMI_LOGT("Enter");
-    CHKPR(keyOption, ERROR_NULL_POINTER, INVALID_SUBSCRIBE_ID);
-    CHKPR(callback, ERROR_NULL_POINTER, INVALID_SUBSCRIBE_ID);
+    CHKPR(keyOption, INVALID_SUBSCRIBE_ID);
+    CHKPR(callback, INVALID_SUBSCRIBE_ID);
     for (auto preKey : keyOption->GetPreKeys()) {
         MMI_LOGD("keyOption->prekey=%{public}d", preKey);
     }
