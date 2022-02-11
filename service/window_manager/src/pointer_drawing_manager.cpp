@@ -44,16 +44,16 @@ std::unique_ptr<OHOS::Media::PixelMap> OHOS::MMI::MouseDrawingManager::DecodeIma
     SourceOptions opts;
     opts.formatHint = "image/png";
     std::unique_ptr<ImageSource> imageSource = ImageSource::CreateImageSource(imagePath, opts, errorCode);
-    MMI_LOGE("CreateImageSource errorCode is %{public}u.", errorCode);
+    MMI_LOGE("CreateImageSource errorCode:%{public}u.", errorCode);
 
     std::set<std::string> formats;
     uint32_t ret = imageSource->GetSupportedFormats(formats);
-    MMI_LOGE("get the image decode %{public}u", ret);
+    MMI_LOGE("get the image decode:%{public}u", ret);
 
     DecodeOptions decodeOpts;
     std::unique_ptr<PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, errorCode);
     if (pixelMap == nullptr) {
-        MMI_LOGE("pixelMap is nullptr: %{public}u .", errorCode);
+        MMI_LOGE("pixelMap is nullptr:%{public}u .", errorCode);
     }
     return pixelMap;
 }
@@ -103,7 +103,7 @@ void OHOS::MMI::MouseDrawingManager::DrawPointer(int32_t displayId, int32_t glob
         };
 
         OHOS::SurfaceError ret = surface->RequestBuffer(buffer, releaseFence, config);
-        MMI_LOGD("request buffer ret is: %{public}s", SurfaceErrorStr(ret).c_str());
+        MMI_LOGD("request buffer ret:%{public}s", SurfaceErrorStr(ret).c_str());
 
         if (buffer == nullptr) {
             MMI_LOGE("request buffer failed: buffer is nullptr");
@@ -130,7 +130,7 @@ void OHOS::MMI::MouseDrawingManager::DrawPointer(int32_t displayId, int32_t glob
         },
         };
         ret = surface->FlushBuffer(buffer, -1, flushConfig);
-        MMI_LOGD("draw pointer FlushBuffer ret is: %{public}s", SurfaceErrorStr(ret).c_str());
+        MMI_LOGD("draw pointer FlushBuffer ret:%{public}s", SurfaceErrorStr(ret).c_str());
     } else {
         drawWindow_->MoveTo(globalX, globalY);
     }
