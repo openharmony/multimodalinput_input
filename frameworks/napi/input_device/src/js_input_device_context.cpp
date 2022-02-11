@@ -42,7 +42,7 @@ JsInputDeviceContext::~JsInputDeviceContext()
 napi_value JsInputDeviceContext::CreateInstance(napi_env env)
 {
     MMI_LOGD("MMMMM begin");
-    CHKPR(env, ERROR_NULL_POINTER, nullptr);
+    CHKPRP(env, nullptr);
 
     napi_value global = nullptr;
     napi_status status = napi_get_global(env, &global);
