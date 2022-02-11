@@ -76,7 +76,7 @@ void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> id
 {
     MMI_LOGD("begin");
     auto iter = inputDevciceIds_.find(userData);
-    if (iter == inputDevcices_.end()) {
+    if (iter == inputDevciceIds_.end()) {
         MMI_LOGE("failed to find the callback function");
         return;
     }
