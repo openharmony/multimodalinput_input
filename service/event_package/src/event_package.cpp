@@ -181,9 +181,9 @@ void EventPackage::PackageTabletToolTypeParam(libinput_event *event, EventTablet
 {
     CHKP(event, PARAM_INPUT_INVALID);
     auto data = libinput_event_get_tablet_tool_event(event);
-    CHK(data != nullptr, ERROR_NULL_POINTER);
+    CHKP(data);
     auto tool = libinput_event_tablet_tool_get_tool(data);
-    CHK(tool != nullptr, ERROR_NULL_POINTER);
+    CHKP(tool);
     switch (libinput_tablet_tool_get_type(tool)) {
         case LIBINPUT_TABLET_TOOL_TYPE_PEN: {
             tableTool.tool.type = TABLET_TOOL_TYPE_PEN;
@@ -253,7 +253,7 @@ void EventPackage::PackageTabletPadOtherParams(libinput_event *event, EventTable
 {
     CHKP(event, PARAM_INPUT_INVALID);
     auto data = libinput_event_get_tablet_pad_event(event);
-    CHK(data != nullptr, ERROR_NULL_POINTER);
+    CHKP(data);
     auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_TABLET_PAD_RING: {
