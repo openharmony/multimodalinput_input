@@ -64,7 +64,7 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(bool skipId,
 
 int32_t InputEventDataTransformation::SerializeInputEvent(std::shared_ptr<InputEvent> event, NetPacket &packet)
 {
-    CHKPR(event, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(event, ERROR_NULL_POINTER);
     CHKR(packet.Write(event->GetEventType()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(packet.Write(event->GetId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(packet.Write(event->GetActionTime()), STREAM_BUF_WRITE_FAIL, RET_ERR);
@@ -80,7 +80,7 @@ int32_t InputEventDataTransformation::SerializeInputEvent(std::shared_ptr<InputE
 
 int32_t InputEventDataTransformation::DeserializeInputEvent(std::shared_ptr<InputEvent> event, NetPacket &packet)
 {
-    CHKPR(event, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(event, ERROR_NULL_POINTER);
     int32_t tField {  };
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
@@ -105,7 +105,7 @@ int32_t InputEventDataTransformation::DeserializeInputEvent(std::shared_ptr<Inpu
 
 int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> event, NetPacket &packet)
 {
-    CHKPR(event, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(event, ERROR_NULL_POINTER);
     CHKR((RET_OK == SerializeInputEvent(event, packet)), STREAM_BUF_WRITE_FAIL, RET_ERR);
 
     CHKR(packet.Write(event->GetPointerAction()), STREAM_BUF_WRITE_FAIL, RET_ERR);
