@@ -238,12 +238,14 @@ void InputManagerImpl::PrintDisplayDebugInfo()
 
         for (const auto &win : item.windowsInfo_) {
             MMI_LOGD("windowid:%{public}d, pid:%{public}d,uid:%{public}d,topLeftX:%{public}d,"
-                "topLeftY:%{public}d,width:%{public}d,height:%{public}d,displayId:%{public}d,agentWindowId:%{public}d,",
+                "topLeftY:%{public}d,width:%{public}d,height:%{public}d,displayId:%{public}d,agentWindowId:%{public}d,"
+                "winTopLeftX:%{public}d, winTopLeftY:%{public}d",
                 win.id, win.pid,
                 win.uid, win.topLeftX,
                 win.topLeftY, win.width,
                 win.height, win.displayId,
-                win.agentWindowId);
+                win.agentWindowId,
+                win.winTopLeftX, win.winTopLeftY);
         }
     }
 }

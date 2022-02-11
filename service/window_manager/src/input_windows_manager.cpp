@@ -563,9 +563,11 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
     MMI_LOGD("window info,num:%{public}d", static_cast<int32_t>(windowInfos_.size()));
     for (const auto &item : windowInfos_) {
         MMI_LOGD("windowId:%{public}d, id:%{public}d, pid:%{public}d, uid:%{public}d, topLeftX:%{public}d, "
-            "topLeftY:%{public}d, width:%{public}d, height:%{public}d, display:%{public}d, agentWindowId:%{public}d",
+            "topLeftY:%{public}d, width:%{public}d, height:%{public}d, display:%{public}d, agentWindowId:%{public}d"
+            "winTopLeftX:%{public}d, winTopLeftY:%{public}d",
             item.first, item.second.id, item.second.pid, item.second.uid, item.second.topLeftX, item.second.topLeftY,
-            item.second.width, item.second.height, item.second.displayId, item.second.agentWindowId);
+            item.second.width, item.second.height, item.second.displayId, item.second.agentWindowId,
+            item.second.winTopLeftX, item.second.winTopLeftY);
     }
 }
 
@@ -918,8 +920,8 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
 
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
-    int32_t localX = globalX - touchWindow->topLeftX;
-    int32_t localY = globalY - touchWindow->topLeftY;
+    int32_t localX = globalX - touchWindow->winTopLeftX;
+    int32_t localY = globalY - touchWindow->winTopLeftY;
     pointerItem.SetLocalX(localX);
     pointerItem.SetLocalY(localY);
     pointerEvent->RemovePointerItem(pointerId);
@@ -1118,8 +1120,8 @@ void OHOS::MMI::InputWindowsManager::SetLocalInfo(int32_t x, int32_t y)
             }
             if ((isOutsideOfTopLeftX != true) && (isOutsideOfTopLeftY != true) &&
                 (isOutsideOfTopRightX != true) && (isOutsideOfTopRightY != true)) {
-                mouseLoction_.localX = x - item.second.topLeftX;
-                mouseLoction_.localY = y - item.second.topLeftY;
+                mouseLoction_.localX = x - item.second.winTopLeftX;
+                mouseLoction_.localY = y - item.second.winTopLeftY;
                 break;
             }
         }
