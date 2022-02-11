@@ -36,6 +36,7 @@ napi_async_work JsEventTarget::asyncWork_ = nullptr;
 void JsEventTarget::CallIdsAsyncWork(napi_env env, napi_status status, void* data)
 {
     MMI_LOGD("begin");
+    CHKP(env_);
     napi_handle_scope scope = nullptr;
     napi_status status_ = napi_open_handle_scope(env, &scope);
     if (status_ != napi_ok) {
@@ -141,6 +142,7 @@ void JsEventTarget::EmitJsIdsAsync(std::vector<int32_t> ids)
 void JsEventTarget::CallDevAsyncWork(napi_env env, napi_status status, void* data)
 {
     MMI_LOGD("begin");
+    CHKP(env_);
     napi_handle_scope scope = nullptr;
     napi_status status_ = napi_open_handle_scope(env, &scope);
     if (status_ != napi_ok) {
