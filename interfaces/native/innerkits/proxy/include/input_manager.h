@@ -23,7 +23,6 @@
 #include "i_input_event_consumer.h"
 #include "error_multimodal.h"
 #include "key_option.h"
-#include "input_device_event.h"
 
 namespace OHOS {
 namespace MMI {

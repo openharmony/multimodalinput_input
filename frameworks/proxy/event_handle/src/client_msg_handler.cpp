@@ -18,7 +18,7 @@
 #include "mmi_func_callback.h"
 #include "bytrace.h"
 #include "event_factory.h"
-#include "input_device_event.h"
+#include "input_device_impl.h"
 #include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
 #include "input_filter_manager.h"
@@ -673,35 +673,33 @@ int32_t ClientMsgHandler::DeviceRemove(const UDSClient& client, NetPacket& pkt)
 int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnInputDeviceIds enter");
-    int32_t taskId;
-    int32_t size = 0;
+    int32_t userData;
+    int32_t size;
     std::vector<int32_t> inputDeviceIds;
-    CHKR(pkt.Read(taskId), STREAM_BUF_READ_FAIL, RET_ERR);
+    CHKR(pkt.Read(userData), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(pkt.Read(size), STREAM_BUF_READ_FAIL, RET_ERR);
     for (int32_t i = 0; i < size; i++) {
         int32_t deviceId = 0;
         CHKR(pkt.Read(deviceId), STREAM_BUF_READ_FAIL, RET_ERR);
         inputDeviceIds.push_back(deviceId);
     }
-    auto& instance = InputDeviceEvent::GetInstance();
-    instance.OnInputDeviceIds(taskId, inputDeviceIds);
+    InputDeviceImpl::GetInstance().OnInputDeviceIds(userData, inputDeviceIds);
     return RET_OK;
 }
 
 int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnInputDevice enter");
-    int32_t taskId;
+    int32_t userData;
     int32_t id;
     std::string name;
     int32_t deviceType;
-    CHKR(pkt.Read(taskId), STREAM_BUF_READ_FAIL, RET_ERR);
+    CHKR(pkt.Read(userData), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(pkt.Read(id), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(pkt.Read(name), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(pkt.Read(deviceType), STREAM_BUF_READ_FAIL, RET_ERR);
 
-    auto& instance = InputDeviceEvent::GetInstance();
-    instance.OnInputDevice(taskId, id, name, deviceType);
+    InputDeviceImpl::GetInstance().OnInputDevice(userData, id, name, deviceType);
     return RET_OK;
 }
 
