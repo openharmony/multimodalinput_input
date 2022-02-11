@@ -1502,7 +1502,7 @@ bool KeyEvent::WriteToParcel(Parcel &out) const
     return true;
 }
 
-bool PointerEvent::ReadFromParcel(Parcel &in)
+bool KeyEvent::ReadFromParcel(Parcel &in)
 {
     if (!InputEvent::ReadFromParcel(in)) {
         return false;
