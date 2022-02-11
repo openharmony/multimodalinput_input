@@ -204,10 +204,6 @@ public:
     void SetPressedKeys(const std::vector<int32_t> pressedKeys);
     std::vector<int32_t> GetPressedKeys() const;
     
-    bool IsValidCheckMouseFunc() const;
-    bool IsValidCheckMouse() const;
-    bool IsValidCheckTouchFunc() const;
-    bool IsValidCheckTouch() const;
     bool IsValid() const;
 public:
     static bool HasAxis(int32_t axes, AxisType axis);
@@ -218,6 +214,12 @@ public:
 
 protected:
     explicit PointerEvent(int32_t eventType);
+
+private:
+    bool IsValidCheckMouseFunc() const;
+    bool IsValidCheckMouse() const;
+    bool IsValidCheckTouchFunc() const;
+    bool IsValidCheckTouch() const;
 
 private:
     int32_t pointerId_ { 0 };
