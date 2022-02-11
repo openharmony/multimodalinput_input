@@ -49,7 +49,7 @@ static void InitHiLogFunc(struct libinput* input)
 }
 }
 
-void OHOS::MMI::SInput::Loginfo_packaging_tool(libinput_event *event)
+void OHOS::MMI::SInput::LoginfoPackagingTool(libinput_event *event)
 {
     CHK(event, PARAM_INPUT_INVALID);
     auto context = libinput_event_get_context(event);
