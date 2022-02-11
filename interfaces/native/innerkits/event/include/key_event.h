@@ -16,6 +16,7 @@
 #define KEY_EVENT_H
 #include <memory>
 #include <vector>
+#include "parcel.h"
 #include "input_event.h"
 
 namespace OHOS {
@@ -1450,6 +1451,9 @@ public:
         // The default value is true, which means it is in a pressed state.
         bool IsPressed() const;
         void SetPressed(bool pressed);
+    public:
+        bool WriteToParcel(Parcel &out) const;
+        bool ReadFromParcel(Parcel &in);
 
     private:
         bool pressed_;
@@ -1490,6 +1494,10 @@ public:
     const KeyItem* GetKeyItem(int32_t keyCode) const;
     bool IsValidKeyItem() const;
     bool IsValid() const;
+public:
+    bool WriteToParcel(Parcel &out) const;
+    bool ReadFromParcel(Parcel &in);
+
 protected:
     explicit KeyEvent(int32_t eventType);
 
