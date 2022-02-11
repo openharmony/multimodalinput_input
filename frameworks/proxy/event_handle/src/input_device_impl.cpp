@@ -63,18 +63,24 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, std::string na
 {
     MMI_LOGD("begin");
     auto inputDeviceInfo = std::make_shared<InputDeviceInfo>(id, name, deviceType);
-    auto item = inputDevcices_.find(userData);
-    CHKP(item);
-    item->second(inputDeviceInfo);
+    auto iter = inputDevcices_.find(userData);
+    if (iter == inputDevcices_.end()) {
+        MMI_LOGE("failed to find the callback function");
+        return;
+    }
+    iter->second(inputDeviceInfo);
     MMI_LOGD("end");
 }
 
 void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> ids)
 {
     MMI_LOGD("begin");
-    auto item = inputDevciceIds_.find(userData);
-    CHKP(item);
-    item->second(ids);
+    auto iter = inputDevciceIds_.find(userData);
+    if (iter == inputDevcices_.end()) {
+        MMI_LOGE("failed to find the callback function");
+        return;
+    }
+    iter->second(ids);
     MMI_LOGD("end");
 }
 } // namespace MMI
