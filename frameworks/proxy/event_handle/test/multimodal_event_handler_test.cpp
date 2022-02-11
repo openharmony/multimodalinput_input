@@ -112,7 +112,7 @@ void MultimodalEventHandlerTest::UnregisterStandardizedEventHandle()
 
 int64_t MultimodalEventHandlerTest::GetNanoTime()
 {
-    struct timespec time = { 0 };
+    timespec time = { 0 };
     clock_gettime(CLOCK_MONOTONIC, &time);
     return static_cast<uint64_t>(time.tv_sec) * SEC_TO_NANOSEC + time.tv_nsec;
 }
