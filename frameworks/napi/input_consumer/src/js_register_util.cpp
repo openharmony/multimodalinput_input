@@ -157,7 +157,7 @@ int32_t AddEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
         }
     }
     if (!it.empty()) {
-        CHKPR(it.front(), ERROR_NULL_POINTER, JS_CALLBACK_EVENT_FAILED);
+        CHKPR(it.front(), ERROR_NULL_POINTER);
         preSubscribeId = it.front()->subscribeId;
     }
     it.push_back(event);

@@ -123,9 +123,9 @@ std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestrueE
     libinput_event *event)
 {
     MMI_LOGT("call OnTouchPadGestrueEvent begin");
-    CHKPR(event, PARAM_INPUT_INVALID, nullptr);
+    CHKPRP(event, nullptr);
     auto data = libinput_event_get_gesture_event(event);
-    CHKPR(data, ERROR_NULL_POINTER, nullptr);
+    CHKPRP(data, nullptr);
     pointerEvent_->UpdateId();
     auto type = libinput_event_get_type(event);
     switch (type) {
