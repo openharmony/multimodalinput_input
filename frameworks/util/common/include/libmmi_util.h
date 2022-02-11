@@ -12,14 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_LIBMMI_UTIL_H
-#define OHOS_LIBMMI_UTIL_H
+#ifndef LIBMMI_UTIL_H
+#define LIBMMI_UTIL_H
 
 #include "config_multimodal.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "struct_multimodal.h"
-#include "auto_test_multimodal.h"
 #include "refbase.h"
 #include "securec.h"
-#endif
+#endif // LIBMMI_UTIL_H

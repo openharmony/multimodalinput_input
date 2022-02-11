@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_VIRTUAL_GAMEPAD_H
-#define OHOS_VIRTUAL_GAMEPAD_H
+#ifndef VIRTUAL_GAMEPAD_H
+#define VIRTUAL_GAMEPAD_H
 
 #include "virtual_device.h"
 
@@ -32,4 +32,4 @@ protected:
 };
 }
 }
-#endif
+#endif // VIRTUAL_GAMEPAD_H

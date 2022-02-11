@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_SAFE_KEEPER_H
-#define OHOS_SAFE_KEEPER_H
+#ifndef SAFE_KEEPER_H
+#define SAFE_KEEPER_H
 
 #include <mutex>
 #include <vector>
@@ -44,8 +44,8 @@ protected:
 
     bool IsExist(uint64_t tid) const
     {
-        for (auto it : dList_) {
-            if (it.tid == tid)
+        for (const auto &item : dList_) {
+            if (item.tid == tid)
                 return true;
         }
         return false;
@@ -72,4 +72,4 @@ protected:
 }
 }
 #define SafeKpr OHOS::MMI::SafeKeeper::GetInstance()
-#endif
+#endif // SAFE_KEEPER_H

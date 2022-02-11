@@ -12,12 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_LIBMMI_CLIENT_H
-#define OHOS_LIBMMI_CLIENT_H
+#ifndef MMI_CLIENT_H
+#define MMI_CLIENT_H
 
 #include "client_msg_handler.h"
 #include "if_mmi_client.h"
-#include "auto_test_multimodal.h"
 
 namespace OHOS::MMI {
 class MMIClient : public UDSClient, public IfMMIClient, public std::enable_shared_from_this<IfMMIClient> {
@@ -50,4 +49,4 @@ protected:
     ConnectCallback funDisconnected_;
 };
 }
-#endif
+#endif // MMI_CLIENT_H

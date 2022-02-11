@@ -31,10 +31,7 @@ template<class ...Ts>
 void CheckDefineOutput(const char* fmt, Ts... args)
 {
     using namespace OHOS::MMI;
-    if (fmt == nullptr) {
-        KMSG_LOGE("in ChkConfigOutput, fmt is nullptr");
-        return;
-    }
+    CHKP(fmt);
     int32_t ret = 0;
 
     char buf[MAX_STREAM_BUF_SIZE] = {};

@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_PROCESSING_KEYBOARD_DEVICE_H
-#define OHOS_PROCESSING_KEYBOARD_DEVICE_H
+#ifndef PROCESSING_KEYBOARD_DEVICE_H
+#define PROCESSING_KEYBOARD_DEVICE_H
 
 #include "msg_head.h"
 #include "device_base.h"
@@ -45,4 +45,4 @@ namespace OHOS {
         };
     }
 }
-#endif
+#endif // PROCESSING_KEYBOARD_DEVICE_H

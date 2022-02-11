@@ -121,16 +121,10 @@ int32_t MultimodalStandardizedEventManager::SubscribeKeyEvent(
     uint32_t preKeySize = keyOption->GetPreKeys().size();
     pkt << subscribeInfo.GetSubscribeId() << keyOption->GetFinalKey() << keyOption->IsFinalKeyDown()
     << keyOption->GetFinalKeyDownDuration() << preKeySize;
-    int32_t keySubscibeId = subscribeInfo.GetSubscribeId();
-
-    std::string keySubscribeIdstring = "SubscribeKeyEvent client subscribeKeyId: " + std::to_string(keySubscibeId);
-    MMI_LOGD(" SubscribeKeyEvent client trace subscribeKeyId = %{public}d", keySubscibeId);
-    int32_t eventKey = 1;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keySubscribeIdstring, eventKey);
 
     std::vector<int32_t> preKeys = keyOption->GetPreKeys();
-    for (auto preKeyIter = preKeys.begin(); preKeyIter != preKeys.end(); ++preKeyIter) {
-        pkt << *preKeyIter;
+    for (const auto &item : preKeys) {
+        pkt << item;
     }
     if (MMIEventHdl.GetMMIClient() == nullptr) {
         MMI_LOGE("client init failed");
@@ -178,19 +172,9 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEven
     return RET_OK;
 }
 
-void OHOS::MMI::MultimodalStandardizedEventManager::OnTouchTrace(const TouchEvent& event)
-{
-    std::string touchEvent = "OnTouch touchUuid: " + event.GetUuid();
-    char *tmpTouch = (char*)touchEvent.c_str();
-    MMI_LOGT("OnTouch touchUuid = %{public}s", tmpTouch);
-    int32_t eventTouch = 9;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
-}
-
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnTouch(const TouchEvent& event)
 {
     MMI_LOGT("MultimodalStandardizedEventManagertouch::OnTouch");
-    OnTouchTrace(event);
     auto range = mapEvents_.equal_range(MmiMessageId::TOUCH_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.windowId == event.GetWindowID() && i->second.eventCallBack->OnTouch(event) == false) {
@@ -720,7 +704,7 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
              static_cast<int32_t>(pointerIds.size()));
 
-    for (int32_t pointerId : pointerIds) {
+    for (const auto &pointerId : pointerIds) {
         OHOS::MMI::PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
 
@@ -736,12 +720,12 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
     if (pressedKeys.empty()) {
         MMI_LOGI("Pressed keys is empty");
     } else {
-        for (int32_t keyCode : pressedKeys) {
+        for (auto &keyCode : pressedKeys) {
             MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
         }
     }
     OHOS::MMI::NetPacket netPkt(MmiMessageId::INJECT_POINTER_EVENT);
-    CHKR((RET_OK == InputEventDataTransformation::SerializePointerEvent(pointerEvent, netPkt)),
+    CHKR((RET_OK == InputEventDataTransformation::Marshalling(pointerEvent, netPkt)),
         STREAM_BUF_WRITE_FAIL, RET_ERR);
     MMI_LOGD("Pointer event packaged, send to server!");
     CHKR(SendMsg(netPkt), MSG_SEND_FAIL, RET_ERR);

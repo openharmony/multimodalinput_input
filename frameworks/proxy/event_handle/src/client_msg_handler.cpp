@@ -16,7 +16,6 @@
 #include <inttypes.h>
 #include <iostream>
 #include "mmi_func_callback.h"
-#include "auto_test_multimodal.h"
 #include "bytrace.h"
 #include "event_factory.h"
 #include "input_device_event.h"
@@ -169,11 +168,12 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
              key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
              key->GetActionStartTime(), key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), key->GetId(), fd, serverStartTime);
-    int32_t getKeyCode = key->GetKeyCode();
-    std::string keyCodestring = "event dispatcher of client GetKeyCode: " + std::to_string(getKeyCode);
-    MMI_LOGD(" OnKeyEvent client trace keyCode = %{public}d", getKeyCode);
     int32_t eventKey = 1;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
+    std::string keyCodestring = "KeyEventDispatchAsync";
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
+    int32_t getKeyCode = key->GetKeyCode();
+    keyCodestring = "client dispatchKeyCode = " + std::to_string(getKeyCode);
+    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring);
     key->SetProcessedCallback(eventProcessedCallback_);
     InputManagerImpl::GetInstance()->OnKeyEvent(key);
     return RET_OK;
@@ -182,7 +182,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
 int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
     auto pointerEvent { PointerEvent::Create() };
-    if (InputEventDataTransformation::DeserializePointerEvent(false, pointerEvent, pkt) != ERR_OK) {
+    if (InputEventDataTransformation::Unmarshalling(pointerEvent, pkt) != ERR_OK) {
         MMI_LOGE("Failed to deserialize pointer event.");
         return RET_ERR;
     }
@@ -205,11 +205,11 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     if (pressedKeys.empty()) {
         MMI_LOGI("Pressed keys is empty");
     } else {
-        for (int32_t keyCode : pressedKeys) {
-            MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
+        for (auto &item : pressedKeys) {
+            MMI_LOGI("Pressed keyCode=%{public}d", item);
         }
     }
-    for (int32_t pointerId : pointerIds) {
+    for (auto &pointerId : pointerIds) {
         PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
 
@@ -224,6 +224,9 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         MMI_LOGD("Operation canceled.");
     }
     pointerEvent->SetProcessedCallback(eventProcessedCallback_);
+    int32_t eventPointer = 17;
+    std::string pointerCodestring = "PointerEventDispatchAsync";
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerCodestring, eventPointer);
     InputManagerImpl::GetInstance()->OnPointerEvent(pointerEvent);
     return RET_OK;
 }
@@ -251,7 +254,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
 int32_t ClientMsgHandler::OnTouchPadMonitor(const UDSClient& client, NetPacket& pkt)
 {
     auto pointer = PointerEvent::Create();
-    int32_t ret = InputEventDataTransformation::DeserializePointerEvent(false, pointer, pkt);
+    int32_t ret = InputEventDataTransformation::Unmarshalling(pointer, pkt);
     if (ret != RET_OK) {
         MMI_LOGE("OnTouchPadMonitor read netPacket failed");
         return RET_ERR;
@@ -717,7 +720,7 @@ int32_t ClientMsgHandler::KeyEventFilter(const UDSClient& client, NetPacket& pkt
     int32_t deviceEventType = KEY_EVENT;
     event.Initialize(windowId, 0, 0, 0, 0, 0, key.state, key.key, 0, 0, key.uuid, key.eventType,
                      key.time, "", static_cast<int32_t>(key.deviceId), 0, key.deviceType, deviceEventType);
-    return inputFilterManager.OnKeyEvent(event, id);
+    return InputFilterMgr.OnKeyEvent(event, id);
 }
 
 int32_t ClientMsgHandler::TouchEventFilter(const UDSClient& client, NetPacket& pkt)
@@ -751,7 +754,6 @@ int32_t ClientMsgHandler::TouchEventFilter(const UDSClient& client, NetPacket& p
     MMI_LOGD("Event filter of client:eventTouch:time=%{public}" PRId64 ", "
              "deviceType=%{public}u, eventType=%{public}d, slot=%{public}d, seatSlot=%{public}d, fd=%{public}d",
              touchData.time, touchData.deviceType, touchData.eventType, touchData.slot, touchData.seatSlot, fd);
-    TraceTouchEvent(touchData);
 
     TouchEvent event;
     int32_t deviceEventType = TOUCH_EVENT;
@@ -765,7 +767,7 @@ int32_t ClientMsgHandler::TouchEventFilter(const UDSClient& client, NetPacket& p
         static_cast<int32_t>(touchData.deviceId), 0, false, touchData.deviceType, deviceEventType);
 
     pkt >> id;
-    return inputFilterManager.OnTouchEvent(event, id);
+    return InputFilterMgr.OnTouchEvent(event, id);
 }
 
 int32_t ClientMsgHandler::PointerEventInterceptor(const UDSClient& client, NetPacket& pkt)
@@ -793,7 +795,7 @@ int32_t ClientMsgHandler::PointerEventInterceptor(const UDSClient& client, NetPa
         static_cast<float>(pointData.discrete.x), static_cast<float>(pointData.discrete.y),
         0, 0, 0, pointData.uuid, pointData.eventType, static_cast<int32_t>(pointData.time),
         "", static_cast<int32_t>(pointData.deviceId), 0, pointData.deviceType, eventJoyStickAxis);
-    return (inputFilterManager.OnPointerEvent(mouse_event, id));
+    return (InputFilterMgr.OnPointerEvent(mouse_event, id));
 }
 
 int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt)
@@ -819,18 +821,21 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
     MMI_LOGD("Client handlerId : %{public}d handlerType : %{public}d", handlerId, handlerType); 
 
     auto pointerEvent { PointerEvent::Create() };
-    if (InputEventDataTransformation::DeserializePointerEvent(false, pointerEvent, pkt) != ERR_OK) {
+    if (InputEventDataTransformation::Unmarshalling(pointerEvent, pkt) != ERR_OK) {
         MMI_LOGE("Failed to deserialize pointer event...");
         return RET_ERR;
     }
-    InputHandlerManager::GetInstance().OnInputEvent(handlerId, pointerEvent); 
+    int32_t eventTouch = 9;
+    std::string touchEvent = "TouchEventFilterAsync";
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
+    InputHandlerManager::GetInstance().OnInputEvent(handlerId, pointerEvent);
     return RET_OK;
 }
 
 int32_t ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetPacket& pkt)
 {
     auto pointerEvent = PointerEvent::Create();
-    int32_t ret = InputEventDataTransformation::DeserializePointerEvent(false, pointerEvent, pkt);
+    int32_t ret = InputEventDataTransformation::Unmarshalling(pointerEvent, pkt);
     if (ret != RET_OK) {
         MMI_LOGE("TouchpadEventInterceptor read netPacket failed");
         return RET_ERR;
@@ -840,7 +845,7 @@ int32_t ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetP
     pkt >> pid >> id;
     MMI_LOGD("client receive the msg from server: pointId = %{public}d, pid = %{public}d",
              pointerEvent->GetPointerId(), pid);
-    return INTERCEPTORMANAGER.OnPointerEvent(pointerEvent, id);
+    return InterceptorMgr.OnPointerEvent(pointerEvent, id);
 }
 
 int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket& pkt)
@@ -855,7 +860,7 @@ int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket
     pkt >> pid;
     MMI_LOGD("client receive the msg from server: keyCode = %{public}d, pid = %{public}d",
         keyEvent->GetKeyCode(), pid);
-    return INTERCEPTORMANAGER.OnKeyEvent(keyEvent);
+    return InterceptorMgr.OnKeyEvent(keyEvent);
 }
 
 void ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, NetPacket& pkt) const
@@ -881,7 +886,6 @@ void ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, NetPacket& pk
              pointData.seat_button_count, pointData.axis, pointData.state, pointData.source, pointData.delta.x,
              pointData.delta.y, pointData.delta_raw.x, pointData.delta_raw.y, pointData.absolute.x,
              pointData.absolute.y, pointData.discrete.x, pointData.discrete.y, fd);
-    TracePointerEvent(pointData);
     int32_t action = pointData.state;
     /* 根据收到的point，构造MouseEvent对象，
     *  其中MouseEvent对象的action,actionButton,cursorDelta,scrollingDelta四个字段
@@ -948,7 +952,6 @@ void ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, NetPacket& pk
                  touchData.time, touchData.deviceType, touchData.eventType, touchData.slot,
                  touchData.seatSlot, fd, touchData.point.x, touchData.point.y);
     }
-    TraceTouchEvent(touchData);
     TouchEvent touchEvent;
     int32_t deviceEventType = TOUCH_EVENT;
     touchEvent.Initialize(windowId, eventAction, seatSlot, 0, 0, 0, 0, 0, fingerCount, fingersInfos, 0,
@@ -1219,47 +1222,36 @@ void ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, NetPacket& 
 
 void ClientMsgHandler::TraceKeyEvent(const EventKeyboard& key) const
 {
+    int32_t eventKey = 1;
+    std::string keyEvent = "keyEventFilterAsync";
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
     char keyUuid[MAX_UUIDSIZE] = {0};
     int32_t ret = memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid));
     CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
-    MMI_LOGT(" nevent dispatcher of client: keyUuid = %{public}s", keyUuid);
-    std::string keyEvent = keyUuid;
-    keyEvent = " nevent dispatcher of client keyUuid: " + keyEvent;
-    int32_t eventKey = 1;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
+    MMI_LOGT(" nevent filter of client: keyUuid = %{public}s", keyUuid);
+    keyEvent = keyUuid;
+    keyEvent = "client keyUuid = " + keyEvent;
+    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEvent);
 }
 
 void ClientMsgHandler::TracePointerEvent(const EventPointer& pointData) const
 {
+    int32_t eventPointer = 17;
+    std::string pointerEvent = "PointerEventFilterAsync";
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
     char pointerUuid[MAX_UUIDSIZE] = {0};
     int32_t ret = memcpy_s(pointerUuid, sizeof(pointerUuid), pointData.uuid, sizeof(pointData.uuid));
     CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
-    MMI_LOGT(" nevent dispatcher of client: pointerUuid = %{public}s", pointerUuid);
-    std::string pointerEvent = pointerUuid;
-    pointerEvent = " nevent dispatcher of client pointerUuid: " + pointerEvent;
-    int32_t eventPointer = 17;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
-}
-
-void ClientMsgHandler::TraceTouchEvent(const EventTouch& touchData) const
-{
-    char touchUuid[MAX_UUIDSIZE] = {0};
-    int32_t ret = memcpy_s(touchUuid, sizeof(touchUuid), touchData.uuid, sizeof(touchData.uuid));
-    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
-    MMI_LOGT(" nevent dispatcher of client: touchUuid = %{public}s", touchUuid);
-    std::string touchEventString = touchUuid;
-    touchEventString = " nevent dispatcher of client touchUuid: " + touchEventString;
-    int32_t eventTouch = 9;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, eventTouch);
+    MMI_LOGT(" nevent filter of client: pointerUuid=%{public}s", pointerUuid);
+    pointerEvent = pointerUuid;
+    pointerEvent = "client pointerUuid = " + pointerEvent;
+    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent);
 }
 
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    if (client == nullptr) {
-        MMI_LOGE("Get MMIClint false");
-        return;
-    }
+    CHKP(client);
     NetPacket pkt(MmiMessageId::NEW_CHECK_REPLY_MESSAGE);
     pkt << eventId;
     CHK(client->SendMessage(pkt), MSG_SEND_FAIL);

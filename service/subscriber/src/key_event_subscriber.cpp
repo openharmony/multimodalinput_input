@@ -43,7 +43,7 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
         return RET_ERR;
     }
 
-    for (auto keyCode : keyOption->GetPreKeys()) {
+    for (const auto &keyCode : keyOption->GetPreKeys()) {
         MMI_LOGD("keyOption->prekey=%{public}d", keyCode);
     }
 
@@ -81,16 +81,9 @@ bool KeyEventSubscriber::FilterSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEv
 {
     MMI_LOGT("Enter");
     CHKPF(keyEvent, ERROR_NULL_POINTER);
-
-    int32_t getKeyCode = keyEvent->GetKeyCode();
-    std::string keyCodestring = std::to_string(getKeyCode);
-    MMI_LOGT("FilterSubscribeKeyEvent service trace getKeyCode = %{public}d\n", getKeyCode);
-    int32_t eventKey = 1;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
-
     int32_t keyAction = keyEvent->GetKeyAction();
     MMI_LOGD("keyCode:%{public}d, keyAction:%{public}s", keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
-    for (const auto& keyCode : keyEvent->GetPressedKeys()) {
+    for (const auto &keyCode : keyEvent->GetPressedKeys()) {
         MMI_LOGD("pressed KeyCode:%{public}d", keyCode);
     }
     bool handled = false;
@@ -129,7 +122,7 @@ bool KeyEventSubscriber::IsPreKeysMatch(const std::vector<int32_t>& preKeys,
         return false;
     }
 
-    for (auto pressedKey : pressedKeys) {
+    for (const auto &pressedKey : pressedKeys) {
         auto it = std::find(preKeys.begin(), preKeys.end(), pressedKey);
         if (it == preKeys.end()) {
             return false;
@@ -143,13 +136,8 @@ void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<OHOS::MMI::KeyEvent> k
         const std::shared_ptr<Subscriber>& subscriber)
 {
     MMI_LOGT("Enter");
-
     auto udsServerPtr = InputHandler->GetUDSServer();
-    if (udsServerPtr == nullptr) {
-        MMI_LOGE("Leave, udsServerPtr is nullptr");
-        return;
-    }
-
+    CHKP(udsServerPtr);
     OHOS::MMI::NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_KEY);
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
     int32_t fd = subscriber->sess_->GetFd();
@@ -158,7 +146,6 @@ void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<OHOS::MMI::KeyEvent> k
         MMI_LOGE("Leave, server disaptch subscriber failed");
         return;
     }
-
     MMI_LOGT("Leave");
 }
 
@@ -188,10 +175,7 @@ bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
     subscriber->timerId_ = TimerMgr->AddTimer(keyOption->GetFinalKeyDownDuration(), 1, [this, weakSubscriber] () {
         MMI_LOGD("timer callback");
         auto subscriber = weakSubscriber.lock();
-        if (subscriber == nullptr) {
-            MMI_LOGE("Leave, subscriber is nullptr in the timer callback");
-            return;
-        }
+        CHKP(subscriber);
         OnTimer(subscriber);
     });
 
@@ -246,13 +230,8 @@ bool KeyEventSubscriber::InitSessionDeleteCallback()
         MMI_LOGD("session delete callback has already been initialized");
         return true;
     }
-
     auto udsServerPtr = InputHandler->GetUDSServer();
-    if (udsServerPtr == nullptr) {
-        MMI_LOGE("udsServerPtr is nullptr");
-        return false;
-    }
-
+    CHKPF(udsServerPtr);
     std::function<void(SessionPtr)> callback = std::bind(&KeyEventSubscriber::OnSessionDelete,
             this, std::placeholders::_1);
     udsServerPtr->AddSessionDeletedCallback(callback);
@@ -269,13 +248,13 @@ bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent
     auto keyCode = keyEvent->GetKeyCode();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     RemoveKeyCode(pressedKeys, keyCode);
-    for (auto& subscriber : subscribers_) {
+    for (const auto &subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
         MMI_LOGD("subscribeId=%{public}d, keyOption->finalKey=%{public}d, "
             "keyOption->isFinalKeyDown=%{public}s, keyOption->finalKeyDownDuriation=%{public}d",
             subscriber->id_, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
             keyOption->GetFinalKeyDownDuration());
-        for (auto keyCode : keyOption->GetPreKeys()) {
+        for (const auto &keyCode : keyOption->GetPreKeys()) {
             MMI_LOGD("keyOption->prekey=%{public}d", keyCode);
         }
 
@@ -319,7 +298,7 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
     auto keyCode = keyEvent->GetKeyCode();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     RemoveKeyCode(pressedKeys, keyCode);
-    for (auto& subscriber : subscribers_) {
+    for (const auto &subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
         MMI_LOGD("subscribeId=%{public}d, keyOption->finalKey=%{public}d, "
             "keyOption->isFinalKeyDown=%{public}s, keyOption->finalKeyDownDuriation=%{public}d",
@@ -354,11 +333,7 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
         }
 
         const KeyEvent::KeyItem* keyItem = keyEvent->GetKeyItem();
-        if (keyItem == nullptr) {
-            MMI_LOGE("null keyItem");
-            continue;
-        }
-
+        CHKPF(keyItem);
         auto upTime = keyEvent->GetActionTime();
         auto downTime = keyItem->GetDownTime();
         if (upTime - downTime >= (duration * 1000)) {
@@ -378,7 +353,7 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
 bool KeyEventSubscriber::HandleKeyCanel(const std::shared_ptr<KeyEvent>& keyEvent)
 {
     MMI_LOGT("Enter");
-    for (auto& subscriber : subscribers_) {
+    for (const auto &subscriber : subscribers_) {
         ClearTimer(subscriber);
     }
     MMI_LOGT("Leave");
@@ -388,15 +363,11 @@ bool KeyEventSubscriber::HandleKeyCanel(const std::shared_ptr<KeyEvent>& keyEven
 bool KeyEventSubscriber::CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent, ERROR_NULL_POINTER);
-
     if (keyEvent_ == nullptr) {
-        MMI_LOGE("keyEvent_ is nullptr");
+        MMI_LOGW("keyEvent_ is nullptr");
         keyEvent_ = KeyEvent::Clone(keyEvent);
     }
-    if (keyEvent_ == nullptr) {
-        MMI_LOGE("clone keyEvent failed");
-        return false;
-    }
+    CHKPF(keyEvent_);
     return true;
 }
 

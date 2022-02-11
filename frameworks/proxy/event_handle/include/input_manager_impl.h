@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_INPUT_EVENT_MANAGER_H
-#define OHOS_MULTIMDOALINPUT_INPUT_EVENT_MANAGER_H
+#ifndef INPUT_MANAGER_IMPL_H
+#define INPUT_MANAGER_IMPL_H
 
 #include <vector>
 #include "singleton.h"
@@ -72,4 +72,4 @@ private:
 };
 }
 } // namespace OHOS::MMI
-#endif // OHOS_MULTIMDOALINPUT_INPUT_MANAGER_H
+#endif // INPUT_MANAGER_IMPL_H

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef VIRTUALDEVICE_H
-#define VIRTUALDEVICE_H
+#ifndef VIRTUAL_DEVICE_H
+#define VIRTUAL_DEVICE_H
 
 #include <cstdint>
 #include <functional>
@@ -46,4 +46,4 @@ protected:
     struct uinput_user_dev dev_ {};
     static constexpr uint32_t MAX_NAME_LENGTH = 80;
 };
-#endif  // VIRTUALDEVICE_H
+#endif // VIRTUAL_DEVICE_H

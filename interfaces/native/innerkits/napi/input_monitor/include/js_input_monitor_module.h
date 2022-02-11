@@ -24,4 +24,4 @@ namespace OHOS {
 namespace MMI {
 } // namespace MMI
 } // namespace OHOS
-#endif
+#endif // JS_INPUT_MONITOR_MODULE_H

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef INJECT_EVENT_COMMAND_H
-#define INJECT_EVENT_COMMAND_H
+#ifndef INPUT_MANAGER_COMMAND_H
+#define INPUT_MANAGER_COMMAND_H
 
 #include <string>
 #include <vector>
@@ -30,5 +30,4 @@ private:
 };
 } // namespace OHOS
 
-#endif // INJECT_EVENT_COMMAND_H
-
+#endif // INPUT_MANAGER_COMMAND_H

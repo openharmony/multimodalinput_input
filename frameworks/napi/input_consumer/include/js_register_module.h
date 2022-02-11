@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_JS_REGISTER_MODULE_H
-#define OHOS_JS_REGISTER_MODULE_H
+#ifndef JS_REGISTER_MODULE_H
+#define JS_REGISTER_MODULE_H
 #include <stdio.h>
 #include <map>
 #include <list>
@@ -40,7 +40,6 @@
 #define EVENT_TYPE_CODE 4
 #define TOUCH_TYPE_CODE 5
 #define DEVICE_TYPE_CODE 6
-#define EVENT_MONITOR_TYPE_CODE 7 // wuzhihui
 #define INVALID_TYPE_CODE 255
 #define DEFAULT_EVENT_TYPE 10
 
@@ -69,8 +68,8 @@ typedef struct {
     std::shared_ptr<KeyOption> keyOption;
 } KeyEventMonitorInfo;
 
-typedef std::map<std::string, std::list<KeyEventMonitorInfo *>> CallbackMaps;
+typedef std::map<std::string, std::list<KeyEventMonitorInfo *>> Callbacks;
 }
 }
 
-#endif
+#endif // JS_REGISTER_MODULE_H

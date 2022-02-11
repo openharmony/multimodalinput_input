@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_I_UDS_SERVER_H
-#define OHOS_I_UDS_SERVER_H
+#ifndef I_UDS_SERVER_H
+#define I_UDS_SERVER_H
 
 #include "iremote_broker.h"
 
@@ -29,4 +29,4 @@ public:
 } // namespace MMI
 } // namespace OHOS
 
-#endif // OHOS_I_UDS_SERVER_H
+#endif // I_UDS_SERVER_H

@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_EVENT_DISPATCH_H
-#define OHOS_EVENT_DISPATCH_H
+#ifndef EVENT_DISPATCH_H
+#define EVENT_DISPATCH_H
 #include "uds_server.h"
 #include "register_event.h"
 #include "key_event.h"
@@ -52,9 +52,7 @@ public:
         const EventTabletTool& tableTool, const uint64_t preHandlerTime);
     int32_t DispatchTouchTransformPointEvent(UDSServer& udsServer, std::shared_ptr<PointerEvent> point);
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> point);
-    void DispatchKeyEventTrace(const EventKeyboard& key);
-    void DispatchTouchEventTrace(const EventTouch& touch);
-    void DispatchPointerEventTrace(const EventPointer& point);
+    void OnKeyboardEventTrace(std::shared_ptr<KeyEvent> &key, int32_t number);
 
 protected:
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);
@@ -77,4 +75,4 @@ private:
 #endif
     };
 }
-#endif
+#endif // EVENT_DISPATCH_H

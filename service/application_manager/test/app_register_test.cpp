@@ -424,6 +424,7 @@ HWTEST_F(AppRegisterTest, UnregisterEventHandleManager_001, TestSize.Level1)
     int32_t retResult = registerEventManager.UnregisterEvent(MmiMessageId::SYSTEM_EVENT_BEGIN, 4);
     EXPECT_TRUE(retResult == 0);
 }
+
 HWTEST_F(AppRegisterTest, UnregisterEventHandleManager_002, TestSize.Level1)
 {
     RegisterEventHandleManager registerEventManager;
@@ -564,6 +565,7 @@ HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_005, TestSize.Level1)
     }
     appRegister.UnregisterAppInfoBySocketFd(fd);
 }
+
 HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_006, TestSize.Level1)
 {
     AppRegister appRegister;

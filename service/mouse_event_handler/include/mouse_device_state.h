@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MOUSE_DEVICE_STATE_H
-#define OHOS_MOUSE_DEVICE_STATE_H
+#ifndef MOUSE_DEVICE_STATE_H
+#define MOUSE_DEVICE_STATE_H
 
 #include <map>
 #include <mutex>
@@ -70,4 +70,4 @@ private:
 }
 
 #define MouseState OHOS::MMI::MouseDeviceState::GetInstance()
-#endif
+#endif // MOUSE_DEVICE_STATE_H

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_INPUT_DEVICE_MANAGER_H
-#define OHOS_INPUT_DEVICE_MANAGER_H
+#ifndef INPUT_DEVICE_MANAGER_H
+#define INPUT_DEVICE_MANAGER_H
 #include <list>
 #include <string>
 #include "util.h"
@@ -49,5 +49,5 @@ private:
 };
 }
 }
-#define inputDeviceManager OHOS::MMI::InputDeviceManager::GetInstance()
-#endif
+#define InputDevMgr OHOS::MMI::InputDeviceManager::GetInstance()
+#endif // INPUT_DEVICE_MANAGER_H

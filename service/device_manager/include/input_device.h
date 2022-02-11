@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_INPUT_DEVICE_H
-#define OHOS_INPUT_DEVICE_H
+#ifndef INPUT_DEVICE_H
+#define INPUT_DEVICE_H
 
 #include <string>
 #include <vector>
@@ -37,4 +37,4 @@ private:
 };
 }
 }
-#endif
+#endif // INPUT_DEVICE_H

@@ -100,9 +100,9 @@ void UDSSession::ClearEventList(int32_t id)
 {
     MMI_LOGI("begin");
     int32_t count = 0;
-    for (const auto &it : events_) {
+    for (auto &item : events_) {
         count++;
-        if (it.id == id) {
+        if (item.id == id) {
             events_.erase(events_.begin(), events_.begin() + count);
             MMI_LOGI("Delete events.");
         }

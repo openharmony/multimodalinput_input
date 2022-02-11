@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_EVENT_PACKAGE_H
-#define OHOS_EVENT_PACKAGE_H
+#ifndef EVENT_PACKAGE_H
+#define EVENT_PACKAGE_H
 #include "pointer_event.h"
 #include "key_event.h"
 #include "input_windows_manager.h"
@@ -52,7 +52,7 @@ namespace OHOS::MMI {
         int32_t PackagePointerEventByMotionAbs(libinput_event *event, EventPointer& point);
         int32_t PackagePointerEventByButton(libinput_event *event, EventPointer& point);
         int32_t PackagePointerEventByAxis(libinput_event *event, EventPointer& point);
-        void PackageTouchEventByType(int32_t type, struct libinput_event_touch *data, EventTouch& touch);
+        void PackageTouchEventByType(int32_t type, libinput_event_touch *data, EventTouch& touch);
     };
     template<class T>
     int32_t EventPackage::PackageRegisteredEvent(const T& data, RegisteredEvent& event)
@@ -69,4 +69,4 @@ namespace OHOS::MMI {
         return RET_OK;
     }
 }
-#endif
+#endif // EVENT_PACKAGE_H

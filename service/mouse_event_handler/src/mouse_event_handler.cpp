@@ -31,9 +31,7 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, 
 MouseEventHandler::MouseEventHandler()
 {
     pointerEvent_ = PointerEvent::Create();
-    if (pointerEvent_ == nullptr) {
-        MMI_LOGF("pointerEvent_ create fail");
-    }
+    CKP(pointerEvent_);
 }
 
 std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent()
@@ -45,6 +43,7 @@ void MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 {
     MMI_LOGT("enter");
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent_->SetButtonId(buttionId_);
 
     absolutionX_ += libinput_event_pointer_get_dx(data);
     absolutionY_ += libinput_event_pointer_get_dy(data);
@@ -75,11 +74,13 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEv
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
         pointerEvent_->DeleteReleaseButton(button);
         pointerItem.SetPressed(false);
+        buttionId_ = PointerEvent::BUTTON_NONE;
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_PRESSED);
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
         pointerEvent_->SetButtonPressed(button);
         pointerItem.SetPressed(true);
+        buttionId_ = pointerEvent_->GetButtonId();
     } else {
         MMI_LOGW("unknown state, state: %{public}u", state);
     }
@@ -97,20 +98,12 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
         timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
             MMI_LOGT("enter");
             auto sharedPtr = weakPtr.lock();
-            if (sharedPtr == nullptr) {
-                MMI_LOGW("sharedPtr is nullptr");
-                return;
-            }
+            CHKP(sharedPtr);
             MMI_LOGD("timer: %{public}d", sharedPtr->timerId_);
             sharedPtr->timerId_ = -1;
-
             auto pointerEvent = sharedPtr->GetPointerEvent();
-            if (pointerEvent == nullptr) {
-                MMI_LOGE("pointerEvent is nullptr");
-                return;
-            }
+            CHKP(pointerEvent);
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
-
             InputHandler->OnMouseEventEndTimerHandler(pointerEvent);
             MMI_LOGD("leave, axis end");
         });
@@ -193,7 +186,7 @@ void MouseEventHandler::Normalize(libinput_event *event)
         }
     }
 
-    int32_t deviceId = inputDeviceManager->FindInputDeviceId(libinput_event_get_device(event));
+    int32_t deviceId = InputDevMgr->FindInputDeviceId(libinput_event_get_device(event));
     HandlePostInner(data, deviceId, pointerItem);
 
     // 调试 信息输出

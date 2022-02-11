@@ -42,4 +42,4 @@ private:
 }  // namespace MMIS
 }  // namespace OHOS
 
-#endif  // KEYBOARDINJECT_H
+#endif // KEYBOARD_INJECT_H

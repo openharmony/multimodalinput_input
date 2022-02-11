@@ -125,10 +125,10 @@ void OHOS::MMI::RegisterEventHandleManager::FindSocketFds(const MmiMessageId mes
 void OHOS::MMI::RegisterEventHandleManager::PrintfMap()
 {
     std::lock_guard<std::mutex> lock(mu_);
-    for (auto i : mapRegisterManager_) {
+    for (const auto &item : mapRegisterManager_) {
         std::cout << "event handle is "
-            << static_cast<int32_t>(i.first)
-            << ", fd is " << i.second << std::endl;
+            << static_cast<int32_t>(item.first)
+            << ", fd is " << item.second << std::endl;
     }
 }
 
