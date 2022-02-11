@@ -477,7 +477,7 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
     std::string checkKeyCode = "dispatchKeyEventByPid service GetKeyCode = " + std::to_string(keyCode);
     MMI_LOGT("dispatchKeyEventByPid service trace GetKeyCode=%{public}d", keyCode);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, checkKeyCode);
-    int32_t eventKey = 1;
+    int32_t eventKey = 2;
     std::string keyEvent = "OnEventKeyboardAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 
@@ -509,7 +509,7 @@ void InputEventHandler::OnKeyEventFilterTrace(const EventKeyboard& keyBoard)
     std::string filterKey = keyUuid;
     filterKey = "service filter keyUuid = " + filterKey;
     MiddleTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, filterKey);
-    int32_t eventKey = 1;
+    int32_t eventKey = 2;
     keyEvent = "OnEventKeyboardAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
     FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
@@ -584,7 +584,7 @@ void InputEventHandler::OnPointerFilterEventTrace(const EventPointer& point)
     std::string filterpointer = pointerUuid;
     filterpointer = "service filter pointerUuid = " + filterpointer;
     MiddleTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, filterpointer);
-    int32_t eventPointer = 17;
+    int32_t eventPointer = 18;
     pointerEvent = "OnEventPointerAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
     FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
@@ -663,6 +663,7 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
     std::string touchEvent = "OnEventTouchAsync";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
     eventDispatch_.HandlePointerEvent(point);
+    ++eventTouch;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
@@ -970,7 +971,7 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
 
     // 派发
     eventDispatch_.HandlePointerEvent(pointerEvent);
-    int32_t eventPointer = 17;
+    int32_t eventPointer = 18;
     std::string pointerEventstring = "OnEventPointerAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, eventPointer);
     // 返回值 代表是 鼠标事件有没有处理过， 不关心成功与失败
