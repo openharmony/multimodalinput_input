@@ -15,8 +15,8 @@
 
 #ifndef MESSAGE_POST_H
 #define MESSAGE_POST_H
-
 #ifdef OHOS_WESTEN_MODEL
+
 #include <map>
 #include <string>
 #include <list>
@@ -41,8 +41,9 @@ private:
     int fd_;
     weston_compositor *ec_ {nullptr};
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define MMIMsgPost OHOS::MMI::MessagePost::GetInstance()
-#endif
+
+#endif // OHOS_WESTEN_MODEL
 #endif // MESSAGE_POST_H
