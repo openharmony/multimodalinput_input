@@ -81,10 +81,7 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
         }
         callback = callback_;
     }
-    if (!callback) {
-        MMI_LOGE("callback is null");
-        return;
-    }
+    CHKP(callback);
     callback(pointerEvent);
     MMI_LOGD("Leave");
 }
@@ -152,7 +149,7 @@ void JsInputMonitor::MarkConsumed(int32_t eventId)
 
 int32_t JsInputMonitor::IsMatch(napi_env jsEnv, napi_value receiver)
 {
-    CHKR(receiver != nullptr, ERROR_NULL_POINTER, NAPI_ERR);
+    CHKPR(receiver, ERROR_NULL_POINTER);
     if (jsEnv_ == jsEnv) {
         bool isEquals = false;
         napi_value handlerTemp = nullptr;
@@ -213,7 +210,7 @@ std::string JsInputMonitor::GetAction(int32_t action)
 
 int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
-    CHKR(pointerEvent != nullptr, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     CHKR(SetNameProperty(jsEnv_, result, "type", GetAction(pointerEvent->GetPointerAction())) == napi_ok,
         CALL_NAPI_API_ERR, RET_ERR);
 

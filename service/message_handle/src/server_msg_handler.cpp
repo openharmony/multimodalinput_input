@@ -136,8 +136,8 @@ void OHOS::MMI::ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
 #ifdef  OHOS_BUILD_AI
 int32_t OHOS::MMI::ServerMsgHandler::OnSeniorInputFuncProc(SessionPtr SessionPtr, NetPacket& pkt)
 {
-    CHKR(SessionPtr, ERROR_NULL_POINTER, RET_ERR);
-    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(SessionPtr, ERROR_NULL_POINTER);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     const int32_t fd = SessionPtr->GetFd();
     seniorInput_->SetSessionFd(fd);
 
@@ -200,8 +200,8 @@ int32_t OHOS::MMI::ServerMsgHandler::OnSeniorInputFuncProc(SessionPtr SessionPtr
 int32_t OHOS::MMI::ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
 {
     MMI_LOGI("hdfinject server access hditools info.");
-    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
-    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     const int32_t processingCode = MMIHdiInject->ManageHdfInject(sess, pkt);
     NetPacket newPacket(MmiMessageId::HDI_INJECT);
     newPacket << processingCode;
@@ -215,8 +215,8 @@ int32_t OHOS::MMI::ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt
 
 int32_t OHOS::MMI::ServerMsgHandler::OnRegisterAppInfo(SessionPtr sess, NetPacket& pkt)
 {
-    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
-    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
 
     int32_t abilityId = 0;
     int32_t windowId = 0;
@@ -238,7 +238,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterAppInfo(SessionPtr sess, NetPacke
 
 int32_t OHOS::MMI::ServerMsgHandler::OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt)
 {
-    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
     MmiMessageId eventType = MmiMessageId::INVALID;
     int32_t abilityId = 0;
     int32_t winId = 0;
@@ -258,7 +258,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterMsgHandler(SessionPtr sess, NetPa
 
 int32_t OHOS::MMI::ServerMsgHandler::OnUnregisterMsgHandler(SessionPtr sess, NetPacket& pkt)
 {
-    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
     MmiMessageId messageId = MmiMessageId::INVALID;
     int32_t fd = sess->GetFd();
     pkt >> messageId;
@@ -268,7 +268,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnUnregisterMsgHandler(SessionPtr sess, Net
 
 int32_t OHOS::MMI::ServerMsgHandler::OnWindow(SessionPtr sess, NetPacket& pkt)
 {
-    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     MMISurfaceInfo surfaces = {};
     TestSurfaceData mysurfaceInfo = {};
     pkt >> mysurfaceInfo;
@@ -301,7 +301,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnVirtualKeyEvent(SessionPtr sess, NetPacke
 
 int32_t OHOS::MMI::ServerMsgHandler::OnDump(SessionPtr sess, NetPacket& pkt)
 {
-    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     int fd = -1;
     pkt >> fd;
     MMIEventDump->Dump(fd);
@@ -339,7 +339,7 @@ int32_t OHOS::MMI::ServerMsgHandler::CheckReplyMessageFormClient(SessionPtr sess
 
 int32_t OHOS::MMI::ServerMsgHandler::NewCheckReplyMessageFormClient(SessionPtr sess, NetPacket& pkt)
 {
-    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
     MMI_LOGT("begin");
     int32_t id = 0;
     pkt >> id;
@@ -350,7 +350,7 @@ int32_t OHOS::MMI::ServerMsgHandler::NewCheckReplyMessageFormClient(SessionPtr s
 
 int32_t OHOS::MMI::ServerMsgHandler::OnListInject(SessionPtr sess, NetPacket& pkt)
 {
-    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
     int32_t ret = RET_ERR;
     RawInputEvent list = {};
     pkt >> list;
@@ -364,8 +364,8 @@ int32_t OHOS::MMI::ServerMsgHandler::OnListInject(SessionPtr sess, NetPacket& pk
 
 int32_t OHOS::MMI::ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetPacket& pkt)
 {
-    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
-    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     TagPackHead tagPackHead;
     int32_t fd = sess->GetFd();
     pkt >> tagPackHead;
@@ -384,7 +384,7 @@ int32_t OHOS::MMI::ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetP
 
 int32_t OHOS::MMI::ServerMsgHandler::OnNewInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
-    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
     uint64_t preHandlerTime = GetSysClockTime();
 
     std::shared_ptr<OHOS::MMI::KeyEvent> nPtr = OHOS::MMI::KeyEvent::Create();
@@ -414,7 +414,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnNewInjectKeyEvent(SessionPtr sess, NetPac
 
 int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
-    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
     uint64_t preHandlerTime = GetSysClockTime();
     VirtualKey event;
     if (!pkt.Read(event)) {
@@ -557,7 +557,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveTouchEventFilter(SessionPtr sess, N
 
 int32_t OHOS::MMI::ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 {
-    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
     MMI_LOGD("ServerMsgHandler::OnDisplayInfo enter");
 
     std::vector<PhysicalDisplayInfo> physicalDisplays;
@@ -704,7 +704,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnUnSubscribeKeyEvent(SessionPtr sess, NetP
 int32_t OHOS::MMI::ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket& pkt)
 {
     MMI_LOGI("begin");
-    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
     int32_t taskId = 0;
     CHKR(pkt.Read(taskId), STREAM_BUF_READ_FAIL, RET_ERR);
 
@@ -743,7 +743,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket
 int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
 {
     MMI_LOGI("begin");
-    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData = 0;
     int32_t deviceId = 0;
     CHKR(pkt.Read(userData), STREAM_BUF_READ_FAIL, RET_ERR);
@@ -822,7 +822,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& p
 
 int32_t OHOS::MMI::ServerMsgHandler::OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt)
 {
-    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
     int32_t eventType = 0;
     pkt >> eventType;
     if (eventType != OHOS::MMI::InputEvent::EVENT_TYPE_KEY) {
@@ -835,7 +835,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnAddInputEventMontior(SessionPtr sess, Net
 int32_t OHOS::MMI::ServerMsgHandler::OnAddInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt)
 {
     MMI_LOGD("ServerMsgHandler::OnAddInputEventTouchpadMontior");
-    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
     int32_t eventType = 0;
     pkt >> eventType;
     if (eventType != OHOS::MMI::InputEvent::EVENT_TYPE_POINTER) {
@@ -847,7 +847,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnAddInputEventTouchpadMontior(SessionPtr s
 
 int32_t OHOS::MMI::ServerMsgHandler::OnRemoveInputEventMontior(SessionPtr sess, NetPacket& pkt)
 {
-    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
     int32_t eventType = 0;
     pkt >> eventType;
     if (eventType != OHOS::MMI::InputEvent::EVENT_TYPE_KEY) {
@@ -859,7 +859,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveInputEventMontior(SessionPtr sess, 
 
 int32_t OHOS::MMI::ServerMsgHandler::OnRemoveInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt)
 {
-    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
     int32_t eventType = 0;
     pkt >> eventType;
     if (eventType != OHOS::MMI::InputEvent::EVENT_TYPE_POINTER) {
@@ -870,7 +870,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveInputEventTouchpadMontior(SessionPt
 }
 int32_t OHOS::MMI::ServerMsgHandler::OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt)
 {
-    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
     int32_t sourceType = 0;
     int32_t id = 0;
     pkt >> sourceType >> id;
@@ -880,7 +880,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnAddTouchpadEventFilter(SessionPtr sess, N
 
 int32_t OHOS::MMI::ServerMsgHandler::OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket& pkt)
 {
-    CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
     int32_t id = 0;
     pkt  >> id;
     InterceptorMgrGbl.OnRemoveInterceptor(id);
