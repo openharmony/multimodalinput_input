@@ -177,10 +177,7 @@ int32_t JSRegisterHandle::Register(const StandEventPtr eventHandle, int32_t winI
     auto wsConvert = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {};
     auto u16String = wsConvert.from_bytes(u8String);
     auto remoteObj = MMIToken::Create(u16String);
-    if (remoteObj == nullptr) {
-        MMI_LOGE("remoteObj is nullptr");
-        return ERROR_CODE;
-    }
+    CHKPR(remoteObj, ERROR_NULL_POINTER);
     remoteObj->SetName("TestJsHapName");
     remoteObj->SetBundlerName("TestJsBundlerName");
     response = MMIEventHdl.RegisterStandardizedEventHandle(remoteObj, winId, eventHandle);
