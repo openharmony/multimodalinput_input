@@ -179,7 +179,7 @@ int32_t EventPackage::PackageTabletToolOtherParams(libinput_event *event, EventT
 }
 void EventPackage::PackageTabletToolTypeParam(libinput_event *event, EventTabletTool& tableTool)
 {
-    CHKP(event, PARAM_INPUT_INVALID);
+    CHKP(event);
     auto data = libinput_event_get_tablet_tool_event(event);
     CHKP(data);
     auto tool = libinput_event_tablet_tool_get_tool(data);
@@ -251,7 +251,7 @@ int32_t EventPackage::PackageTabletToolEvent(libinput_event *event, EventTabletT
 }
 void EventPackage::PackageTabletPadOtherParams(libinput_event *event, EventTabletPad& tabletPad)
 {
-    CHKP(event, PARAM_INPUT_INVALID);
+    CHKP(event);
     auto data = libinput_event_get_tablet_pad_event(event);
     CHKP(data);
     auto type = libinput_event_get_type(event);

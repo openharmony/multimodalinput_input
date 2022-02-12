@@ -35,10 +35,10 @@ void TouchTransformPointProcessor::SetPointEventSource(int32_t sourceType)
 
 void TouchTransformPointProcessor::OnEventTouchDown(libinput_event *event)
 {
-    MMI_LOGT("Enter onEventTouchDown");
-    CHKP(event, PARAM_INPUT_INVALID);
+    MMI_LOGT("Enter");
+    CHKP(event);
     auto data = libinput_event_get_touch_event(event);
-    CHKP(data, ERROR_NULL_POINTER);
+    CHKP(data);
     auto seatSlot = libinput_event_touch_get_seat_slot(data);
     auto pressure = libinput_event_get_touch_pressure(event);
     int32_t logicalY = -1;
@@ -72,10 +72,10 @@ void TouchTransformPointProcessor::OnEventTouchDown(libinput_event *event)
 
 void TouchTransformPointProcessor::OnEventTouchMotion(libinput_event *event)
 {
-    MMI_LOGT("Enter onEventTouchMotion");
-    CHKP(event, PARAM_INPUT_INVALID);
+    MMI_LOGT("Enter");
+    CHKP(event);
     auto data = libinput_event_get_touch_event(event);
-    CHKP(data, ERROR_NULL_POINTER);
+    CHKP(data);
     auto seatSlot = libinput_event_touch_get_seat_slot(data);
     auto pressure = libinput_event_get_touch_pressure(event);
     auto time = libinput_event_touch_get_time(data);
@@ -98,9 +98,9 @@ void TouchTransformPointProcessor::OnEventTouchMotion(libinput_event *event)
 void TouchTransformPointProcessor::OnEventTouchUp(libinput_event *event)
 {
     MMI_LOGT("Enter onEventTouchUp");
-    CHKP(event, PARAM_INPUT_INVALID);
+    CHKP(event);
     auto data = libinput_event_get_touch_event(event);
-    CHKP(data, ERROR_NULL_POINTER);
+    CHKP(data);
     auto seatSlot = libinput_event_touch_get_seat_slot(data);
     auto time = libinput_event_touch_get_time(data);
     pointerEvent_->SetActionTime(time);

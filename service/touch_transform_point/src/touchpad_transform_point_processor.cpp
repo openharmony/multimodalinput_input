@@ -36,10 +36,10 @@ void TouchPadTransformPointProcessor::SetPointEventSource(int32_t sourceType)
 
 void TouchPadTransformPointProcessor::OnEventTouchPadDown(libinput_event *event)
 {
-    CHKP(event, PARAM_INPUT_INVALID);
+    CHKP(event);
     MMI_LOGT("Enter OnEventTouchPadDown");
     auto data = libinput_event_get_touchpad_event(event);
-    CHKP(data, ERROR_NULL_POINTER);
+    CHKP(data);
     auto seatSlot = libinput_event_touchpad_get_seat_slot(data);
     auto logicalX = libinput_event_touchpad_get_x(data);
     auto logicalY = libinput_event_touchpad_get_y(data);
@@ -66,10 +66,10 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(libinput_event *event)
 
 void TouchPadTransformPointProcessor::OnEventTouchPadMotion(libinput_event *event)
 {
-    CHKP(event, PARAM_INPUT_INVALID);
-    MMI_LOGT("Enter OnEventTouchPadMotion");
+    MMI_LOGD("Enter");
+    CHKP(event);
     auto data = libinput_event_get_touchpad_event(event);
-    CHKP(data, ERROR_NULL_POINTER);
+    CHKP(data);
     auto seatSlot = libinput_event_touchpad_get_seat_slot(data);
     auto logicalX = libinput_event_touchpad_get_x(data);
     auto logicalY = libinput_event_touchpad_get_y(data);
@@ -83,15 +83,15 @@ void TouchPadTransformPointProcessor::OnEventTouchPadMotion(libinput_event *even
     pointer.SetGlobalY((int32_t)logicalY);
     pointerEvent_->UpdatePointerItem(seatSlot, pointer);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_LOGT("End OnEventTouchPadMotion");
+    MMI_LOGD("End");
 }
 
 void TouchPadTransformPointProcessor::OnEventTouchPadUp(libinput_event *event)
 {
-    CHKP(event, PARAM_INPUT_INVALID);
-    MMI_LOGT("Enter OnEventTouchPadUp");
+    MMI_LOGD("Enter");
+    CHKP(event);
     auto data = libinput_event_get_touchpad_event(event);
-    CHKP(data, ERROR_NULL_POINTER);
+    CHKP(data);
     auto seatSlot = libinput_event_touchpad_get_seat_slot(data);
     auto logicalX = libinput_event_touchpad_get_x(data);
     auto logicalY = libinput_event_touchpad_get_y(data);
@@ -107,7 +107,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadUp(libinput_event *event)
     pointer.SetGlobalY((int32_t)logicalY);
     pointerEvent_->UpdatePointerItem(seatSlot, pointer);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_LOGT("End OnEventTouchPadUp");
+    MMI_LOGD("End");
 }
 
 std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPadEvent(
