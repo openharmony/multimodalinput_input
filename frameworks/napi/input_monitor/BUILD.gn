@@ -14,7 +14,7 @@
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
 ## Build libmmi.so {{{
-config("libinputeventclient_config") {
+config("libinputmonitor_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
@@ -57,7 +57,7 @@ ohos_shared_library("inputmonitor") {
     "src/js_input_monitor_util.cpp",
   ]
 
-  configs = [ ":libinputeventclient_config" ]
+  configs = [ ":libinputmonitor_config" ]
 
   deps = [
     "//drivers/peripheral/input/hal:hdi_input",
