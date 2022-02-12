@@ -18,7 +18,6 @@ config("libinputdevice_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/napi/input_device/include",
     "//foundation/multimodalinput/input/frameworks/napi/input_device/include",
     "//foundation/ace/napi",
     "//foundation/ace/napi/interfaces/kits/napi",
