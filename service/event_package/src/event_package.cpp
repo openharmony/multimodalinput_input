@@ -47,7 +47,7 @@ namespace {
         }
     }
 
-    DEVICE_TYPE GetDeviceType(libinput_device* device)
+    DEVICE_TYPE GetDeviceType(struct libinput_device* device)
     {
         CHKPR(device, DEVICE_TYPE_UNKNOWN);
         enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
@@ -480,7 +480,7 @@ int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event, EventJoySt
     struct {
         const std::string name;
         JOYSTICK_AXIS_SOURCE axis;
-        EventJoyStickAxisAbsInfo& absInfo;
+        struct EventJoyStickAxisAbsInfo& absInfo;
     } supportAxisInfos[] = {
         {"ABS_X", JOYSTICK_AXIS_SOURCE_ABS_X, eventJoyStickAxis.abs_x},
         {"ABS_Y", JOYSTICK_AXIS_SOURCE_ABS_Y, eventJoyStickAxis.abs_y},

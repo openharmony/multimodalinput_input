@@ -64,7 +64,7 @@ OHOS::MMI::VirtualDevice::~VirtualDevice()
 
 bool OHOS::MMI::VirtualDevice::CatFload(std::vector<std::string>& fileList)
 {
-    dirent* ptr = nullptr;
+    struct dirent* ptr = nullptr;
     DIR* dir = opendir(OHOS::MMI::g_folderpath.c_str());
     if (dir == nullptr) {
         printf("Failed to open folder");

@@ -139,16 +139,16 @@ struct EventJoyStickAxis {
     int32_t eventType;
     char uuid[MAX_UUIDSIZE];
     uint64_t time;
-    EventJoyStickAxisAbsInfo abs_throttle;
-    EventJoyStickAxisAbsInfo abs_hat0x;
-    EventJoyStickAxisAbsInfo abs_hat0y;
-    EventJoyStickAxisAbsInfo abs_x;
-    EventJoyStickAxisAbsInfo abs_y;
-    EventJoyStickAxisAbsInfo abs_z;
-    EventJoyStickAxisAbsInfo abs_rx;
-    EventJoyStickAxisAbsInfo abs_ry;
-    EventJoyStickAxisAbsInfo abs_rz;
-    EventJoyStickAxisAbsInfo abs_wheel;
+    struct EventJoyStickAxisAbsInfo abs_throttle;
+    struct EventJoyStickAxisAbsInfo abs_hat0x;
+    struct EventJoyStickAxisAbsInfo abs_hat0y;
+    struct EventJoyStickAxisAbsInfo abs_x;
+    struct EventJoyStickAxisAbsInfo abs_y;
+    struct EventJoyStickAxisAbsInfo abs_z;
+    struct EventJoyStickAxisAbsInfo abs_rx;
+    struct EventJoyStickAxisAbsInfo abs_ry;
+    struct EventJoyStickAxisAbsInfo abs_rz;
+    struct EventJoyStickAxisAbsInfo abs_wheel;
 };
 
 struct NormalizedCoords {
@@ -231,10 +231,10 @@ struct EventPointer {
     int32_t eventType;
     char uuid[MAX_UUIDSIZE];
     uint64_t time;
-    NormalizedCoords delta;
-    DeviceFloatCoords delta_raw;
-    DeviceCoords absolute;
-    DiscreteCoords discrete;
+    struct NormalizedCoords delta;
+    struct DeviceFloatCoords delta_raw;
+    struct DeviceCoords absolute;
+    struct DiscreteCoords discrete;
     uint32_t button;
     uint32_t seat_button_count;
     enum BUTTON_STATE state;
@@ -243,20 +243,20 @@ struct EventPointer {
 };
 
 struct Pointer {
-    DeviceCoords absolute;
+    struct DeviceCoords absolute;
 };
 
 struct TabletAxes {
-    DeviceCoords point;
-    NormalizedCoords delta;
+    struct DeviceCoords point;
+    struct NormalizedCoords delta;
     double distance;
     double pressure;
-    TiltDegrees tilt;
+    struct TiltDegrees tilt;
     double rotation;
     double slider;
     double wheel;
     int wheel_discrete;
-    PhysEllipsis size;
+    struct PhysEllipsis size;
 };
 
 struct TabletTool {
@@ -276,8 +276,8 @@ struct EventTabletTool {
     enum BUTTON_STATE state;
     uint32_t seat_button_count;
     uint64_t time;
-    TabletAxes axes;
-    TabletTool tool;
+    struct TabletAxes axes;
+    struct TabletTool tool;
     enum TABLE_TOOL_PROXIMITY_STATE proximity_state;
     enum TABLE_TOOL_TIP_STATE tip_state;
 };
@@ -291,7 +291,7 @@ struct EventTouch {
     uint64_t time;
     int32_t slot;
     int32_t seatSlot;
-    DeviceCoords point;
+    struct DeviceCoords point;
     DEVICE_TYPE deviceType;
     double pressure;
     double area;
@@ -304,7 +304,7 @@ struct SlotedCoords {
 };
 
 struct SlotedCoordsInfo {
-    SlotedCoords coords[MAX_SOLTED_COORDS_NUMS];
+    struct SlotedCoords coords[MAX_SOLTED_COORDS_NUMS];
     uint32_t activeCount;
 };
 
@@ -318,9 +318,9 @@ struct EventGesture {
     uint64_t time;
     int32_t fingerCount;
     int32_t cancelled;
-    NormalizedCoords delta;
-    NormalizedCoords deltaUnaccel;
-    SlotedCoordsInfo soltTouches;
+    struct NormalizedCoords delta;
+    struct NormalizedCoords deltaUnaccel;
+    struct SlotedCoordsInfo soltTouches;
     double scale;
     double angle;
     int32_t pointerEventType;

@@ -41,8 +41,8 @@ struct TouchInfo {
 struct GestureInfo {
     int32_t fingerCount;
     int32_t cancelled;
-    NormalizedCoords delta;
-    NormalizedCoords deltaUnaccel;
+    struct NormalizedCoords delta;
+    struct NormalizedCoords deltaUnaccel;
     uint64_t beginTime;
     uint64_t endTime;
     bool enabled;

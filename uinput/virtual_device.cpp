@@ -118,7 +118,7 @@ bool VirtualDevice::SetUp()
 
 bool VirtualDevice::EmitEvent(uint16_t type, uint16_t code, uint32_t value) const
 {
-    input_event event {};
+    struct input_event event {};
     event.type = type;
     event.code = code;
     event.value = value;

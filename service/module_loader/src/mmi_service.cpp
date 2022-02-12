@@ -422,9 +422,9 @@ bool MMIService::InitSignalHandler()
 void MMIService::OnSignalEvent(int32_t signalFd)
 {
     MMI_LOGD("enter");
-    signalfd_siginfo sigInfo;
+    struct signalfd_siginfo sigInfo;
     int32_t size = ::read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
-    if (size != sizeof(signalfd_siginfo)) {
+    if (size != sizeof(struct signalfd_siginfo)) {
         MMI_LOGE("read signal info faild, invalid size:%{public}d", size);
         return;
     }
