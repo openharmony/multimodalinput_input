@@ -25,7 +25,7 @@ group("moduletest") {
   deps = [
     "api_test:api-test",
     "dump_test:dump-test",
-    "sdk_test:sdk-test",
     "performance_test:unittest",
+    "sdk_test:sdk-test",
   ]
 }
