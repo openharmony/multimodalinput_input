@@ -390,5 +390,5 @@ void InputManagerImpl::SendDisplayInfo()
     }
     MultimodalEventHandler::GetInstance().GetMMIClient()->SendMessage(ckt);
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
