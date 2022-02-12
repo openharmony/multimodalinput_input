@@ -20,6 +20,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceManager"};
+    constexpr int32_t INVALID_DEVICE_ID {-1};
 }
 #ifdef OHOS_WESTEN_MODEL
 void InputDeviceManager::Init(weston_compositor* wc)
@@ -79,6 +80,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::FindInputDeviceByIdSync(weston_
     Init(wc);
     auto item = inputDevice_.find(deviceId);
     if (item == inputDevice_.end()) {
+        MMI_LOGE("failed to search for the device");
         return nullptr;
     }
 
@@ -99,7 +101,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id)
     MMI_LOGD("begin");
     auto item = inputDevice_.find(id);
     if (item == inputDevice_.end()) {
-        MMI_LOGE("find device by id failed");
+        MMI_LOGE("failed to search for the device");
         return nullptr;
     }
 
@@ -143,7 +145,8 @@ void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
             return;
         }
     }
-    if (nextId_ > INT_MAX) {
+    if (nextId_ == INT_MAX) {
+        MMI_LOGI("the nextId_ exceeded the upper limit");
         nextId_ = 0;
     }
     inputDevice_[nextId_] = inputDevice;
@@ -187,7 +190,7 @@ bool InputDeviceManager::IsPointerDevice(libinput_device* device)
 int32_t InputDeviceManager::FindInputDeviceId(libinput_device* inputDevice)
 {
     MMI_LOGD("begin");
-    CHKPR(inputDevice, -1);
+    CHKPR(inputDevice, INVALID_DEVICE_ID);
     for (const auto& item : inputDevice_) {
         if (item.second == inputDevice) {
             MMI_LOGI("find input device id success");
@@ -196,7 +199,7 @@ int32_t InputDeviceManager::FindInputDeviceId(libinput_device* inputDevice)
     }
     MMI_LOGI("find input device id failed");
     MMI_LOGD("end");
-    return -1;
+    return INVALID_DEVICE_ID;
 }
 }
 }
