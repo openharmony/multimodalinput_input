@@ -128,7 +128,7 @@ void InputFilterManager::OnkeyEventTrace(const KeyBoardEvent& event)
     char *tmpKey = (char*)keyEvent.c_str();
     MMI_LOGT(" OnKey keyUuid = %{public}s", tmpKey);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEvent);
-    int32_t eventKey = 1;
+    int32_t eventKey = 4;
     keyEvent = "keyEventFilterAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 }
@@ -389,7 +389,7 @@ void InputFilterManager::OnPointerEventTrace(const MouseEvent& event)
     char *tmpPointer = (char*)pointerEvent.c_str();
     MMI_LOGT(" OnPointerEvent pointerUuid = %{public}s", tmpPointer);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent);
-    int32_t eventPointer = 17;
+    int32_t eventPointer = 20;
     pointerEvent = "PointerEventFilterAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
 }

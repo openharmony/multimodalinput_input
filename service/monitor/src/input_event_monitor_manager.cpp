@@ -34,7 +34,7 @@ OHOS::MMI::InputEventMonitorManager::~InputEventMonitorManager()
 int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventMontior(SessionPtr session, int32_t eventType)
 {
     MMI_LOGD("Enter");
-    CHKPR(session, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(session, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> lock(mu_);
     MonitorItem monitorItem;
     monitorItem.eventType = eventType;

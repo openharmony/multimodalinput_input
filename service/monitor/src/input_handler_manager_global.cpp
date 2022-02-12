@@ -30,7 +30,7 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
 {
     InitSessionLostCallback();
     CHKR(IsValidHandlerId(handlerId), PARAM_INPUT_INVALID, RET_ERR);
-    CHKPR(session, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(session, ERROR_NULL_POINTER);
     if (InputHandlerType::MONITOR != handlerType) {
         MMI_LOGE("AddInputHandler InputHandlerType Not MONITOR:%{public}d", handlerType);
         return RET_ERR;
@@ -74,7 +74,7 @@ void InputHandlerManagerGlobal::MarkConsumed(int32_t handlerId, int32_t eventId,
 bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_LOGD("Handle KeyEvent");
-    CHKPR(keyEvent, ERROR_NULL_POINTER, false);
+    CHKPF(keyEvent);
     if (interceptors_.HandleEvent(keyEvent)) {
         MMI_LOGD("Key event was intercepted");
         return true;
@@ -89,7 +89,7 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Handle PointerEvent");
-    CHKPR(pointerEvent, ERROR_NULL_POINTER, false);
+    CHKPF(pointerEvent);
     if (interceptors_.HandleEvent(pointerEvent)) {
         MMI_LOGD("Pointer event was intercepted");
         return true;

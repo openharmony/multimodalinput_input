@@ -119,7 +119,7 @@ void OHOS::MMI::ServerMsgHandler::SetSeniorInputHandle(SeniorInputFuncProcBase& 
 
 void OHOS::MMI::ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
 {
-    CHK(sess, ERROR_NULL_POINTER);
+    CHKP(sess);
     auto id = pkt.GetMsgId();
     OHOS::MMI::TimeCostChk chk("ServerMsgHandler::OnMsgHandler", "overtime 300(us)", MAX_OVER_TIME, id);
     auto fun = GetFun(id);
@@ -744,14 +744,14 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& p
 {
     MMI_LOGI("begin");
     CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
-    int32_t taskId = 0;
-    int deviceId = 0;
-    CHKR(pkt.Read(taskId), STREAM_BUF_READ_FAIL, RET_ERR);
+    int32_t userData = 0;
+    int32_t deviceId = 0;
+    CHKR(pkt.Read(userData), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(pkt.Read(deviceId), STREAM_BUF_READ_FAIL, RET_ERR);
 
 #ifdef OHOS_WESTEN_MODEL
     InputDevMgr->FindInputDeviceByIdAsync(deviceId,
-        [taskId, sess, this](std::shared_ptr<InputDevice> inputDevice) {
+        [userData, sess, this](std::shared_ptr<InputDevice> inputDevice) {
         NetPacket pkt2(MmiMessageId::INPUT_DEVICE);
         if (inputDevice == nullptr) {
             MMI_LOGI("Input device not found.");
@@ -759,7 +759,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& p
             std::string name = "null";
             int32_t deviceType = -1;
 
-            CHKR(pkt2.Write(taskId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+            CHKR(pkt2.Write(userData), STREAM_BUF_WRITE_FAIL, RET_ERR);
             CHKR(pkt2.Write(id), STREAM_BUF_WRITE_FAIL, RET_ERR);
             CHKR(pkt2.Write(name), STREAM_BUF_WRITE_FAIL, RET_ERR);
             CHKR(pkt2.Write(deviceType), STREAM_BUF_WRITE_FAIL, RET_ERR);
@@ -774,7 +774,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& p
         std::string name = inputDevice->GetName();
         int32_t deviceType = inputDevice->GetType();
 
-        CHKR(pkt2.Write(taskId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt2.Write(userData), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt2.Write(id), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt2.Write(name), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt2.Write(deviceType), STREAM_BUF_WRITE_FAIL, RET_ERR);
@@ -794,7 +794,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& p
         int32_t id = -1;
         std::string name = "null";
         int32_t deviceType = -1;
-        CHKR(pkt2.Write(taskId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt2.Write(userData), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt2.Write(id), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt2.Write(name), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt2.Write(deviceType), STREAM_BUF_WRITE_FAIL, RET_ERR);
@@ -807,7 +807,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& p
     int32_t id = inputDevice->GetId();
     std::string name = inputDevice->GetName();
     int32_t deviceType = inputDevice->GetType();
-    CHKR(pkt2.Write(taskId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt2.Write(userData), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pkt2.Write(id), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pkt2.Write(name), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pkt2.Write(deviceType), STREAM_BUF_WRITE_FAIL, RET_ERR);
