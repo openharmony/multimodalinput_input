@@ -26,9 +26,11 @@ public:
     InputDeviceImpl(const InputDeviceImpl &) = delete;
     InputDeviceImpl &operator=(const InputDeviceImpl &) = delete;
     InputDeviceImpl(InputDeviceImpl &&) = delete;
-    ~InputDeviceImpl();
+    ~InputDeviceImpl() = default;
 
     struct InputDeviceInfo {
+        InputDeviceInfo(int32_t id, std::string name, int32_t devcieType) : id(id),
+            name(name), devcieType(devcieType) {}
         int32_t id;
         std::string name;
         int32_t devcieType;
@@ -40,7 +42,7 @@ public:
     void OnInputDeviceIds(int32_t userData, std::vector<int32_t> ids);
 
 private:
-    InputDeviceImpl();
+    InputDeviceImpl() = default;
     std::map<int32_t, std::function<void(std::shared_ptr<InputDeviceInfo>)>> inputDevcices_;
     std::map<int32_t, std::function<void(std::vector<int32_t>)>> inputDevciceIds_;
     int32_t inputDeviceUD_ {0};
@@ -49,4 +51,5 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif
+
+#endif // OHOS_INPUT_DEVICE_EVENT_H

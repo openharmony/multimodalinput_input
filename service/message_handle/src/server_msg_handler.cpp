@@ -745,7 +745,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& p
     MMI_LOGI("begin");
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData = 0;
-    int deviceId = 0;
+    int32_t deviceId = 0;
     CHKR(pkt.Read(userData), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(pkt.Read(deviceId), STREAM_BUF_READ_FAIL, RET_ERR);
 
