@@ -864,7 +864,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     auto size = pointerEvent->GetPressedButtons();
 
     MMI_LOGD("fd:%{public}d, pid:%{public}d, id:%{public}d, agentWindowId:%{public}d, "
-             "globalX:%{public}d, globalY:%{public}dpressedButtons size:%{public}d",
+             "globalX:%{public}d, globalY:%{public}d, pressedButtons size:%{public}d",
              fd, focusWindow->pid, focusWindow->id, focusWindow->agentWindowId,
              globalX, globalY, static_cast<int32_t>(size.size()));
     return fd;
