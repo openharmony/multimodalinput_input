@@ -26,13 +26,13 @@ public:
     virtual ~StandardEventHandler();
     void StandardTouchEvent(libinput_event *event, StandardTouchStruct& data);
     void PointerPressedStandard(libinput_event *event, StandardTouchStruct& data);
-    void PointerPressedStandardEvent(struct libinput_event_pointer& szPoint, StandardTouchStruct& data);
-    void PointerReleasedStandardEvent(struct libinput_event_pointer& szPoint, StandardTouchStruct& data);
+    void PointerPressedStandardEvent(libinput_event_pointer& szPoint, StandardTouchStruct& data);
+    void PointerReleasedStandardEvent(libinput_event_pointer& szPoint, StandardTouchStruct& data);
     void PointerAbsoluteStandardEvent(libinput_event *event, StandardTouchStruct& data);
     void PointerMotionStandardEvent(libinput_event *event, StandardTouchStruct& data);
     void TipStandardEvent(libinput_event *event, StandardTouchStruct& data);
-    void TipUpStandardEvent(struct libinput_event_tablet_tool& szPoint, StandardTouchStruct& data);
-    void TipDownStandardEvent(struct libinput_event_tablet_tool& szPoint, StandardTouchStruct& data);
+    void TipUpStandardEvent(libinput_event_tablet_tool& szPoint, StandardTouchStruct& data);
+    void TipDownStandardEvent(libinput_event_tablet_tool& szPoint, StandardTouchStruct& data);
     void TipMotionStandardEvent(libinput_event *event, StandardTouchStruct& data);
 private:
     libinput_button_state leftButtonState_ = {};

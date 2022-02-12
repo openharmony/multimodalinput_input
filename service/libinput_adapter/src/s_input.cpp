@@ -145,7 +145,7 @@ void OHOS::MMI::SInput::OnEventHandler()
 {
     CHKP(funInputEvent_);
 #ifndef OHOS_WESTEN_MODEL
-    struct multimodal_libinput_event ev = { nullptr, nullptr };
+    multimodal_libinput_event ev = { nullptr, nullptr };
     while ((ev.event = libinput_get_event(input_))) {
         funInputEvent_(&ev);
         libinput_event_destroy(ev.event);
