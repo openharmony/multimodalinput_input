@@ -79,13 +79,10 @@ int32_t InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OHOS::MMI:
 int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(
     std::function<void (std::shared_ptr<OHOS::MMI::PointerEvent>)> TouchPadEventMonitor)
 {
-    if (TouchPadEventMonitor == nullptr) {
-        MMI_LOGE("param should not be null");
-        return INVALID_MONITOR_ID;
-    }
-    static int32_t monitorId = 0;
+    CHKPR(TouchPadEventMonitor, ERROR_NULL_POINTER);
     MonitorItem monitorItem;
     monitorItem.TouchPadEventMonitor = TouchPadEventMonitor;
+    static int32_t monitorId = 0;
     monitorItem.id = ++monitorId;
     monitors_.push_back(monitorItem);
     MMI_LOGD("monitorId: %{public}d", monitorId);
@@ -115,9 +112,7 @@ void InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t monitorId
 int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
     MMI_LOGD("enter");
-    if (pointerEvent == nullptr) {
-        MMI_LOGE("param should not be null");
-    }
+    CKP(pointerEvent);
     std::list<MonitorItem>::iterator iter;
     for (const auto &item : monitors_) {
         MMI_LOGD("send msg");

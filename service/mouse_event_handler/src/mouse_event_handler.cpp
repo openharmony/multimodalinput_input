@@ -158,12 +158,10 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
 
 void MouseEventHandler::Normalize(libinput_event *event)
 {
-    CHK(event, PARAM_INPUT_INVALID);
-
-    MMI_LOGD("enter");
+    MMI_LOGD("Enter");
+    CHKP(event);
     auto data = libinput_event_get_pointer_event(event);
-    CHKP(data, ERROR_NULL_POINTER);
-
+    CHKP(data);
     PointerEvent::PointerItem pointerItem;
     const int32_t type = libinput_event_get_type(event);
     switch (type) {
@@ -181,18 +179,14 @@ void MouseEventHandler::Normalize(libinput_event *event)
             break;
         }
         default: {
-            MMI_LOGW("unknow type: %{public}d", type);
+            MMI_LOGW("unknow type:%{public}d", type);
             break;
         }
     }
-
     int32_t deviceId = InputDevMgr->FindInputDeviceId(libinput_event_get_device(event));
     HandlePostInner(data, deviceId, pointerItem);
-
-    // 调试 信息输出
     DumpInner();
-
-    MMI_LOGD("leave");
+    MMI_LOGD("Leave");
 }
 
 void MouseEventHandler::DumpInner()

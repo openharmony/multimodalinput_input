@@ -107,7 +107,7 @@ void InputHandlerManagerGlobal::InitSessionLostCallback()
         return;
     }
     auto udsServerPtr = InputHandler->GetUDSServer();
-    CHKP(udsServerPtr, ERROR_NULL_POINTER);
+    CHKP(udsServerPtr);
     udsServerPtr->AddSessionDeletedCallback(std::bind(
         &InputHandlerManagerGlobal::OnSessionLost, this, std::placeholders::_1));
     sessionLostCallbackInitialized_ = true;
@@ -230,7 +230,7 @@ bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId,
 void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Update consumption state");
-    CHKP(pointerEvent, PARAM_INPUT_INVALID);
+    CHKP(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         MMI_LOGE("This is not a touch-screen event");
         return;
