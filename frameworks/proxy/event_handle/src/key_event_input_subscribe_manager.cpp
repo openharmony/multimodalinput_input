@@ -65,7 +65,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<OHOS::M
 
     if (EventManager.SubscribeKeyEvent(subscribeInfo) != RET_OK) {
         MMI_LOGE("Leave, subscribe key event failed");
-        return INVALID_SUBSCRIBE_ID; 
+        return INVALID_SUBSCRIBE_ID;
     }
     subscribeInfos_.push_back(subscribeInfo);
     MMI_LOGT("Leave");
