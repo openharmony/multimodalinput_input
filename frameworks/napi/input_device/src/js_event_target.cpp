@@ -284,7 +284,8 @@ void JsEventTarget::EmitJsDevAsync(std::shared_ptr<InputDeviceImpl::InputDeviceI
 {
     MMI_LOGD("begin");
     CHKP(env_);
-    DevCallbackInfo *cb = new DevCallbackInfo;
+    DevCallbackInfo *cb = new (std::nothrow) DevCallbackInfo;
+    CHKP(cb);
     cb->deviceTemp = device;
     napi_value resourceName = nullptr;
     napi_status status = napi_create_string_latin1(env_, "InputDeviceAsync", NAPI_AUTO_LENGTH, &resourceName);
