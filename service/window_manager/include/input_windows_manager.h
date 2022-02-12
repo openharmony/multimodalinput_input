@@ -211,11 +211,11 @@ private:
     std::vector<LogicalDisplayInfo> logicalDisplays_ = {};
     std::map<int32_t, WindowInfo> windowInfos_ = {};
     MouseLocation mouseLoction_ = {};
-    constexpr uint8_t TOP_LEFT_X  = 0;
-    constexpr uint8_t TOP_LEFT_Y  = 1;
-    constexpr uint8_t TOP_RIGHT_X = 2;
-    constexpr uint8_t TOP_RIGHT_Y = 3;
-    constexpr uint8_t CORNER = 4;
+    const uint8_t TOP_LEFT_X  = 0;
+    const uint8_t TOP_LEFT_Y  = 1;
+    const uint8_t TOP_RIGHT_X = 2;
+    const uint8_t TOP_RIGHT_Y = 3;
+    const uint8_t CORNER = 4;
 };
 }
 }
