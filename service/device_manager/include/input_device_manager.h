@@ -45,11 +45,11 @@ private:
 #endif
     bool IsPointerDevice(libinput_device* device);
 
-    std::map<int32_t, libinput_device*> inputDeviceMap_;
+    std::map<int32_t, libinput_device*> inputDevice_;
     bool initFlag_ {false};
     int32_t nextId_ {0};
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define InputDevMgr OHOS::MMI::InputDeviceManager::GetInstance()
 #endif // INPUT_DEVICE_MANAGER_H
