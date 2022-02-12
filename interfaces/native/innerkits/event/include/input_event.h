@@ -45,10 +45,13 @@ public:
     static const int32_t DEFALUTID = -1;
 
 public:
+    InputEvent(const InputEvent& other);
+    InputEvent(InputEvent&& other) = delete;
     virtual ~InputEvent();
+    virtual InputEvent& operator=(const InputEvent& other) = delete;
+    virtual InputEvent& operator=(InputEvent&& other) = delete;
     static std::shared_ptr<InputEvent> Create();
 
-public:
     void Reset();
     /*
      * Get or set the unique identifier of the input event,
@@ -114,6 +117,7 @@ public:
      * Valid values are EVENT_TYPE_BASE, EVENT_TYPE_KEY, EVENT_TYPE_POINTER, EVENT_TYPE_AXIS
      */
     int32_t GetEventType() const;
+    const char* DumpEventType() const;
 
     int32_t GetFlag() const;
 

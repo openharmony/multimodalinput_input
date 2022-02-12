@@ -684,19 +684,18 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<OH
 
 int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Inject pointer event ...");
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    pointerEvent->UpdateId();
+    MMI_LOGD("Inject pointer event.");
+    CHKPR(pointerEvent, RET_ERR);
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
-    MMI_LOGD("pointer event dispatcher of client:eventType=%{public}d,actionTime=%{public}d,"
+    MMI_LOGD("pointer event dispatcher of client:eventType=%{public}s,actionTime=%{public}d,"
              "action=%{public}d,actionStartTime=%{public}d,"
-             "flag=%{public}d,pointerAction=%{public}d,sourceType=%{public}d,"
-             "VerticalAxisValue=%{public}.2f,HorizontalAxisValue=%{public}.2f,"
+             "flag=%{public}d,pointerAction=%{public}s,sourceType=%{public}s,"
+             "VerticalAxisValue=%{public}f,HorizontalAxisValue=%{public}f,"
              "pointerCount=%{public}d",
-             pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
+             pointerEvent->DumpEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
-             pointerEvent->GetFlag(), pointerEvent->GetPointerAction(),
-             pointerEvent->GetSourceType(),
+             pointerEvent->GetFlag(), pointerEvent->DumpPointerAction(),
+             pointerEvent->DumpSourceType(),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
              static_cast<int32_t>(pointerIds.size()));
@@ -712,14 +711,9 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
                  item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
                  item.GetWidth(), item.GetHeight(), item.GetPressure());
     }
-
     std::vector<int32_t> pressedKeys = pointerEvent->GetPressedKeys();
-    if (pressedKeys.empty()) {
-        MMI_LOGI("Pressed keys is empty");
-    } else {
-        for (auto &keyCode : pressedKeys) {
-            MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
-        }
+    for (auto &keyCode : pressedKeys) {
+        MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
     }
     OHOS::MMI::NetPacket netPkt(MmiMessageId::INJECT_POINTER_EVENT);
     CHKR((RET_OK == InputEventDataTransformation::Marshalling(pointerEvent, netPkt)),
