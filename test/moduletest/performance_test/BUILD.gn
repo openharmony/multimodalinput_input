@@ -20,7 +20,6 @@ ohos_js_unittest("GetApiPerformanceJsTest") {
 
   hap_profile = "./config.json"
   certificate_profile = "//test/developertest/signature/openharmony_sx.p7b"
-  
 }
 
 group("unittest") {
