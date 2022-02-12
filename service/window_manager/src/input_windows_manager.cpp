@@ -560,7 +560,7 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
     MMI_LOGD("window info,num:%{public}d", static_cast<int32_t>(windowInfos_.size()));
     for (const auto &item : windowInfos_) {
         MMI_LOGD("windowId:%{public}d, id:%{public}d, pid:%{public}d, uid:%{public}d, topLeftX:%{public}d, "
-            "topLeftY:%{public}d, width:%{public}d, height:%{public}d, display:%{public}d, agentWindowId:%{public}d"
+            "topLeftY:%{public}d, width:%{public}d, height:%{public}d, display:%{public}d, agentWindowId:%{public}d, "
             "winTopLeftX:%{public}d, winTopLeftY:%{public}d",
             item.first, item.second.id, item.second.pid, item.second.uid, item.second.topLeftX, item.second.topLeftY,
             item.second.width, item.second.height, item.second.displayId, item.second.agentWindowId,
@@ -855,12 +855,18 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     }
     pointerEvent->SetTargetWindowId(focusWindow->id);
     pointerEvent->SetAgentWindowId(focusWindow->agentWindowId);
+    int32_t localX = globalX - focusWindow->winTopLeftX;
+    int32_t localY = globalY - focusWindow->winTopLeftY;
+    pointerItem.SetLocalX(localX);
+    pointerItem.SetLocalY(localY);
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     auto fd = udsServer_->GetFdByPid(focusWindow->pid);
     auto size = pointerEvent->GetPressedButtons();
-    MMI_LOGD("pressedButtons size:%{public}d, id:%{public}d, agentWindowId:%{public}d, pid:%{public}d, "
-             "fd:%{public}d, globalX:%{public}d, globalY:%{public}d, localX is:%{public}d, localY is:%{public}d",
-             static_cast<int32_t>(size.size()), focusWindow->id, focusWindow->agentWindowId, focusWindow->pid,
-             fd, globalX, globalY, pointerItem.GetLocalX(), pointerItem.GetLocalY());
+
+    MMI_LOGD("fd:%{public}d, pid:%{public}d, id:%{public}d, agentWindowId:%{public}d, "
+             "globalX:%{public}d, globalY:%{public}dpressedButtons size:%{public}d",
+             fd, focusWindow->pid, focusWindow->id, focusWindow->agentWindowId,
+             globalX, globalY, static_cast<int32_t>(size.size()));
     return fd;
 }
 
@@ -1014,7 +1020,6 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
 {
     int32_t integerX = static_cast<int32_t>(x);
     int32_t integerY = static_cast<int32_t>(y);
-    MMI_LOGD("Mosue Input x = %{public}d, Mouse Input y = %{public}d", integerX, integerY);
     const std::vector<struct LogicalDisplayInfo> logicalDisplayInfo = GetLogicalDisplayInfo();
     if (logicalDisplayInfo.empty()) {
         MMI_LOGE("logicalDisplayInfo is empty");
@@ -1028,7 +1033,6 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
         if (item.id >= 0) {
             if (integerX < item.topLeftX) {
                 mouseLoction_.globleX = item.topLeftX;
-                mouseLoction_.localX = INVALID_LOCATION;
                 x = item.topLeftX;
                 isOutsideOfTopLeftX = true;
             } else {
@@ -1036,7 +1040,6 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
             }
             if (integerX > (item.topLeftX + item.width)) {
                 mouseLoction_.globleX = item.topLeftX + item.width;
-                mouseLoction_.localX = INVALID_LOCATION;
                 x = item.topLeftX + item.width;
                 isOutsideOfTopRightX = true;
             } else {
@@ -1044,7 +1047,6 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
             }
             if (integerY < item.topLeftY) {
                 mouseLoction_.globleY = item.topLeftY;
-                mouseLoction_.localY = INVALID_LOCATION;
                 y = item.topLeftY;
                 isOutsideOfTopLeftY = true;
             } else {
@@ -1052,7 +1054,6 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
             }
             if (integerY > (item.topLeftY + item.height)) {
                 mouseLoction_.globleY = item.topLeftY + item.height;
-                mouseLoction_.localY = INVALID_LOCATION;
                 y = item.topLeftY + item.height;
                 isOutsideOfTopRightY = true;
             } else {
@@ -1062,67 +1063,14 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
                 (isOutsideOfTopRightX != true) && (isOutsideOfTopRightY != true)) {
                 mouseLoction_.globleX = x;
                 mouseLoction_.globleY = y;
-                SetLocalInfo(integerX, integerY);
                 break;
             }
         } else {
             mouseLoction_.globleX = INVALID_LOCATION;
             mouseLoction_.globleY = INVALID_LOCATION;
-            mouseLoction_.localX = INVALID_LOCATION;
-            mouseLoction_.localY = INVALID_LOCATION;
         }
     }
-    MMI_LOGI("Mouse Data : globleX = %{public}d, globleY = %{public}d, localX = %{public}d, localY = %{public}d",
-        mouseLoction_.globleX, mouseLoction_.globleY, mouseLoction_.localX, mouseLoction_.localY);
-}
-
-void OHOS::MMI::InputWindowsManager::SetLocalInfo(int32_t x, int32_t y)
-{
-    const std::map<int32_t, WindowInfo> windowInfo = GetWindowInfo();
-    bool isOutsideOfTopLeftX = false;
-    bool isOutsideOfTopLeftY = false;
-    bool isOutsideOfTopRightX = false;
-    bool isOutsideOfTopRightY = false;
-
-    if (windowInfo.empty()) {
-        MMI_LOGE("windowInfo is empty");
-        return;
-    }
-
-    for (const auto &item : windowInfo) {
-        if (item.second.agentWindowId >= 0) {
-            if (x < item.second.topLeftX) {
-                mouseLoction_.localX = INVALID_LOCATION;
-                isOutsideOfTopLeftX = true;
-            } else {
-                isOutsideOfTopLeftX = false;
-            }
-            if (x > (item.second.topLeftX + item.second.width)) {
-                mouseLoction_.localX = INVALID_LOCATION;
-                isOutsideOfTopLeftY = true;
-            } else {
-                isOutsideOfTopLeftY = false;
-            }
-            if (y < item.second.topLeftY) {
-                mouseLoction_.localY = INVALID_LOCATION;
-                isOutsideOfTopRightX = true;
-            } else {
-                isOutsideOfTopRightX = false;
-            }
-            if (y > (item.second.topLeftY + item.second.height)) {
-                mouseLoction_.localY = INVALID_LOCATION;
-                isOutsideOfTopRightY = true;
-            } else {
-                isOutsideOfTopRightY = false;
-            }
-            if ((isOutsideOfTopLeftX != true) && (isOutsideOfTopLeftY != true) &&
-                (isOutsideOfTopRightX != true) && (isOutsideOfTopRightY != true)) {
-                mouseLoction_.localX = x - item.second.winTopLeftX;
-                mouseLoction_.localY = y - item.second.winTopLeftY;
-                break;
-            }
-        }
-    }
+    MMI_LOGI("Mouse Data: globleX = %{public}d, globleY = %{public}d", mouseLoction_.globleX, mouseLoction_.globleY);
 }
 
 MouseLocation OHOS::MMI::InputWindowsManager::GetMouseInfo()
