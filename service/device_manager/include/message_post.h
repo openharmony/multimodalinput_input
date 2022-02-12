@@ -37,7 +37,7 @@ private:
     std::mutex lk_;
     std::list<std::function<void(weston_compositor *)>> asyncTasks_;
     int fd_;
-    weston_compositor *ec_ {nullptr};
+    struct weston_compositor *ec_ {nullptr};
 };
 }
 }

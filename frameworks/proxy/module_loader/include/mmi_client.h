@@ -31,7 +31,7 @@ public:
     bool Start(IClientMsgHandlerPtr msgHdl, bool detachMode) override;
     void RegisterConnectedFunction(ConnectCallback fun) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
-    void VirtualKeyIn(RawInputEvent virtualKeyEvent);
+    void VirtualKeyIn(struct RawInputEvent virtualKeyEvent);
     void ReplyMessageToServer(MmiMessageId idMsg, uint64_t clientTime, uint64_t endTime) const;
 
     void SdkGetMultimodeInputInfo();

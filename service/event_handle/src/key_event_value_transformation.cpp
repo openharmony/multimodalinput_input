@@ -467,8 +467,8 @@ KeyEventValueTransformation::~KeyEventValueTransformation()
 
 bool KeyEventValueTransformation::Init()
 {
-    xkb_context* context = nullptr;
-    xkb_keymap* keyMap = nullptr;
+    struct xkb_context* context = nullptr;
+    struct xkb_keymap* keyMap = nullptr;
     int32_t ctxFlags = XKB_CONTEXT_NO_DEFAULT_INCLUDES;
 
     ctxFlags = ctxFlags | XKB_CONTEXT_NO_ENVIRONMENT_NAMES;

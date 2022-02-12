@@ -53,7 +53,7 @@ void JsEventTarget::CallIdsAsyncWork(napi_env env, napi_status status, void* dat
     }
     uint32_t index = 0;
     napi_value value = nullptr;
-    IdsCallbackInfo *cb = (IdsCallbackInfo*)data;
+    struct IdsCallbackInfo *cb = (struct IdsCallbackInfo*)data;
     for (const auto &item : cb->idsTemp) {
         status_ = napi_create_int64(env, item, &value);
         if (status_ != napi_ok) {
@@ -150,7 +150,7 @@ void JsEventTarget::CallDevAsyncWork(napi_env env, napi_status status, void* dat
         MMI_LOGE("failed to open scope");
         return;
     }
-    DevCallbackInfo *cb = (DevCallbackInfo*)data;
+    struct DevCallbackInfo *cb = (struct DevCallbackInfo*)data;
     auto device = cb->deviceTemp;
     delete cb;
     cb = nullptr;

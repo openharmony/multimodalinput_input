@@ -83,7 +83,7 @@ std::string GetEnv(const std::string &name)
 
 int64_t GetMicrotime()
 {
-    timeval currentTime = {};
+    struct timeval currentTime = {};
     gettimeofday(&currentTime, nullptr);
     return currentTime.tv_sec * static_cast<int32_t>(1e6) + currentTime.tv_usec;
 }
@@ -91,7 +91,7 @@ int64_t GetMicrotime()
 uint64_t GetSysClockTime()
 {
     const int32_t conversionStep = 1000;
-    timespec ts = { 0, 0 };
+    struct timespec ts = { 0, 0 };
 
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
         MMI_LOGT("clock_gettime failed: %{public}s", strerror(errno));
@@ -201,7 +201,7 @@ std::string IdsListToString(const std::vector<int32_t> &list, const std::string 
     return str;
 }
 
-void LocalTime(tm &t, time_t curTime)
+void LocalTime(struct tm &t, time_t curTime)
 {
     time_t curTimeTemp = curTime;
     if (curTimeTemp == 0) {

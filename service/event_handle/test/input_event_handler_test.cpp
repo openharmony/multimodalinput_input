@@ -30,9 +30,9 @@ namespace {
     using namespace OHOS::MMI;
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventHandlerTest" };
 
-static void LibinputDrainEvents(libinput* li)
+static void LibinputDrainEvents(struct libinput* li)
 {
-    libinput_event* event;
+    struct libinput_event* event;
     libinput_dispatch(li);
     while ((event = libinput_get_event(li))) {
         libinput_event_destroy(event);
