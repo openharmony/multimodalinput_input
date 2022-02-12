@@ -47,7 +47,7 @@ private:
     bool initFlag_ {false};
     int32_t nextId_ {0};
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define InputDevMgr OHOS::MMI::InputDeviceManager::GetInstance()
 #endif // INPUT_DEVICE_MANAGER_H

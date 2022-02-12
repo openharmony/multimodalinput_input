@@ -201,5 +201,5 @@ int32_t InputDeviceManager::FindInputDeviceId(libinput_device* inputDevice)
     MMI_LOGD("end");
     return INVALID_DEVICE_ID;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
