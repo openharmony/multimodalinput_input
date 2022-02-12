@@ -15,11 +15,13 @@
 
 #include "js_input_device_context.h"
 
+namespace OHOS {
+namespace MMI {
 static napi_module mmiInputDeviceModule = {
     .nm_version = 1,
     .nm_flags = 0,
     .nm_filename = nullptr,
-    .nm_register_func = OHOS::MMI::JsInputDeviceContext::Export,
+    .nm_register_func = JsInputDeviceContext::Export,
     .nm_modname = "inputDevice",
     .nm_priv = ((void*)0),
     .reserved = { 0 },
@@ -29,3 +31,5 @@ extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
     napi_module_register(&mmiInputDeviceModule);
 }
+} // namespace MMI
+} // namespace OHOS

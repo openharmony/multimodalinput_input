@@ -28,13 +28,9 @@ InputDeviceImpl& InputDeviceImpl::GetInstance()
     return instance;
 }
 
-InputDeviceImpl::InputDeviceImpl() {}
-
-InputDeviceImpl::~InputDeviceImpl() {}
-
 void InputDeviceImpl::GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback)
 {
-    MMI_LOGI("begin");
+    MMI_LOGD("begin");
     std::lock_guard<std::mutex> guard(mtx_);
     inputDevciceIds_[idsUD_] = callback;
     MMIEventHdl.GetDeviceIds(idsUD_);
@@ -44,13 +40,13 @@ void InputDeviceImpl::GetInputDeviceIdsAsync(std::function<void(std::vector<int3
         return;
     }
     idsUD_++;
-    MMI_LOGI("end");
+    MMI_LOGD("end");
 }
 
 void InputDeviceImpl::GetInputDeviceAsync(int32_t deviceId,
     std::function<void(std::shared_ptr<InputDeviceInfo>)> callback)
 {
-    MMI_LOGI("begin");
+    MMI_LOGD("begin");
     std::lock_guard<std::mutex> guard(mtx_);
     inputDevcices_[inputDeviceUD_] = callback;
     MMIEventHdl.GetDevice(inputDeviceUD_, deviceId);
@@ -60,34 +56,32 @@ void InputDeviceImpl::GetInputDeviceAsync(int32_t deviceId,
         return;
     }
     inputDeviceUD_++;
-    MMI_LOGI("end");
+    MMI_LOGD("end");
 }
 
 void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, std::string name, int32_t deviceType)
 {
-    MMI_LOGI("begin");
-    auto inputDeviceInfo = std::make_shared<InputDeviceInfo>();
-    inputDeviceInfo->id = id;
-    inputDeviceInfo->name = name;
-    inputDeviceInfo->devcieType = deviceType;
-
-    for (auto it = inputDevcices_.begin(); it != inputDevcices_.end(); it++) {
-        if (it->first == userData) {
-            it->second(inputDeviceInfo);
-        }
+    MMI_LOGD("begin");
+    auto inputDeviceInfo = std::make_shared<InputDeviceInfo>(id, name, deviceType);
+    auto iter = inputDevcices_.find(userData);
+    if (iter == inputDevcices_.end()) {
+        MMI_LOGE("failed to find the callback function");
+        return;
     }
-    MMI_LOGI("end");
+    iter->second(inputDeviceInfo);
+    MMI_LOGD("end");
 }
 
 void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> ids)
 {
-    MMI_LOGI("begin");
-    for (auto it = inputDevciceIds_.begin(); it != inputDevciceIds_.end(); it++) {
-        if (it->first == userData) {
-            it->second(ids);
-        }
+    MMI_LOGD("begin");
+    auto iter = inputDevciceIds_.find(userData);
+    if (iter == inputDevciceIds_.end()) {
+        MMI_LOGE("failed to find the callback function");
+        return;
     }
-    MMI_LOGI("end");
+    iter->second(ids);
+    MMI_LOGD("end");
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
