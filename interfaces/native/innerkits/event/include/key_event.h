@@ -1492,7 +1492,6 @@ public:
 
     const KeyItem* GetKeyItem() const;
     const KeyItem* GetKeyItem(int32_t keyCode) const;
-    bool IsValidKeyItem() const;
     bool IsValid() const;
 public:
     bool WriteToParcel(Parcel &out) const;
@@ -1500,6 +1499,9 @@ public:
 
 protected:
     explicit KeyEvent(int32_t eventType);
+
+private:
+    bool IsValidKeyItem() const;
 
 private:
     int32_t keyCode_;

@@ -29,7 +29,7 @@ namespace {
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
     std::shared_ptr<IInputEventConsumer> consumer)
 {
-    CHKPR(consumer, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(consumer, ERROR_NULL_POINTER);
     if (inputHandlers_.size() >= MAX_N_INPUT_HANDLERS) {
         MMI_LOGE("The number of handlers exceeds the maximum");
         return INVALID_HANDLER_ID;
@@ -147,7 +147,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Enter handler:%{public}d", handlerId);
-    int32_t eventTouch = 9;
+    int32_t eventTouch = 12;
     std::string touchEvent = "TouchEventFilterAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
     std::map<int32_t, InputHandler>::iterator tItr;

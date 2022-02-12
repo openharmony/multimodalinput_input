@@ -218,7 +218,7 @@ void InputEventHandler::OnEvent(void *event)
 
 int32_t InputEventHandler::OnEventHandler(const multimodal_libinput_event& ev)
 {
-    CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
+    CHKPR(ev.event, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(ev.event);
     TimeCostChk chk("InputEventHandler::OnEventHandler", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
     auto fun = GetFun(static_cast<MmiMessageId>(type));
@@ -271,14 +271,14 @@ int32_t InputEventHandler::AddInputEventFilter(sptr<IEventFilter> filter)
 
 int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& ev)
 {
-    CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
+    CHKPR(ev.event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(ev.event);
     InputDevMgr->OnInputDeviceAdded(device);
 
     uint64_t sysStartProcessTime = GetSysClockTime();
     DeviceManage deviceManage = {};
 
-    CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto packageResult = eventPackage_.PackageDeviceManageEvent(ev.event, deviceManage);
     if (packageResult != RET_OK) {
         MMI_LOGE("Deviceadded event package failed. ret:%{public}d, errCode:%{public}d",
@@ -308,12 +308,12 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
 
 int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event& ev)
 {
-    CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
+    CHKPR(ev.event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(ev.event);
     InputDevMgr->OnInputDeviceRemoved(device);
 
     uint64_t sysStartProcessTime = GetSysClockTime();
-    CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     DeviceManage deviceManage = {};
     auto packageResult = eventPackage_.PackageDeviceManageEvent(ev.event, deviceManage);
     if (packageResult != RET_OK) {
@@ -344,12 +344,12 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
 
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
 {
-    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID);
     uint64_t sysStartProcessTime = GetSysClockTime();
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
-    CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
         MMI_LOGD("The same event reported by multi_device should be discarded");
@@ -372,7 +372,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
 #endif
 
     auto device = libinput_event_get_device(event);
-    CHKPR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, ERROR_NULL_POINTER);
 
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent_, sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
@@ -392,7 +392,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
-    CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto packageResult = eventPackage_.PackageKeyEvent(ev.event, keyEvent_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
         MMI_LOGD("The same event reported by multi_device should be discarded");
@@ -420,7 +420,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
     }
 
     auto device = libinput_event_get_device(ev.event);
-    CHKPR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, ERROR_NULL_POINTER);
 
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent_, sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
@@ -434,9 +434,9 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
 
 int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
 {
-    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
-    CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     EventKeyboard keyBoard = {};
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyBoard);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
@@ -465,7 +465,7 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
         return RET_ERR;
     }
     auto device = libinput_event_get_device(event);
-    CHKPR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, LIBINPUT_DEV_EMPTY);
 
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent_, sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
@@ -477,7 +477,7 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
     std::string checkKeyCode = "dispatchKeyEventByPid service GetKeyCode = " + std::to_string(keyCode);
     MMI_LOGT("dispatchKeyEventByPid service trace GetKeyCode=%{public}d", keyCode);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, checkKeyCode);
-    int32_t eventKey = 1;
+    int32_t eventKey = 2;
     std::string keyEvent = "OnEventKeyboardAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 
@@ -509,7 +509,7 @@ void InputEventHandler::OnKeyEventFilterTrace(const EventKeyboard& keyBoard)
     std::string filterKey = keyUuid;
     filterKey = "service filter keyUuid = " + filterKey;
     MiddleTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, filterKey);
-    int32_t eventKey = 1;
+    int32_t eventKey = 2;
     keyEvent = "OnEventKeyboardAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
     FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
@@ -517,12 +517,12 @@ void InputEventHandler::OnKeyEventFilterTrace(const EventKeyboard& keyBoard)
 
 int32_t InputEventHandler::OnEventKeyboard(const multimodal_libinput_event& ev)
 {
-    CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
+    CHKPR(ev.event, ERROR_NULL_POINTER);
 #ifdef OHOS_WESTEN_MODEL
     uint64_t sysStartProcessTime = GetSysClockTime();
 #endif
 
-    CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     EventKeyboard keyBoard = {};
     auto packageResult = eventPackage_.PackageKeyEvent(ev.event, keyBoard);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
@@ -584,7 +584,7 @@ void InputEventHandler::OnPointerFilterEventTrace(const EventPointer& point)
     std::string filterpointer = pointerUuid;
     filterpointer = "service filter pointerUuid = " + filterpointer;
     MiddleTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, filterpointer);
-    int32_t eventPointer = 17;
+    int32_t eventPointer = 18;
     pointerEvent = "OnEventPointerAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
     FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
@@ -592,11 +592,11 @@ void InputEventHandler::OnPointerFilterEventTrace(const EventPointer& point)
 
 int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
 {
-    CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
-    CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
+    CHKPR(ev.event, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
     auto device = libinput_event_get_device(ev.event);
-    CHKPR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, LIBINPUT_DEV_EMPTY);
     int32_t devicType = static_cast<int32_t>(libinput_device_get_tags(device));
     if (devicType & EVDEV_UDEV_TAG_JOYSTICK) {
         auto type = libinput_event_get_type(ev.event);
@@ -653,16 +653,15 @@ int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
 
 int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 {
-    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, ERROR_NULL_POINTER);
     MMI_LOGD("Enter");
     auto point = TouchTransformPointManger->OnLibinputTouchEvent(event);
-    if (point == nullptr) {
-        return RET_OK;
-    }
+    CKP(point);
     int32_t eventTouch = 9;
     std::string touchEvent = "OnEventTouchAsync";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
     eventDispatch_.HandlePointerEvent(point);
+    ++eventTouch;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
@@ -680,7 +679,7 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 
 int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 {
-    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, ERROR_NULL_POINTER);
     MMI_LOGD("Enter");
 
     auto point = TouchTransformPointManger->OnLibinputTouchPadEvent(event);
@@ -704,12 +703,12 @@ int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 
 int32_t InputEventHandler::OnEventTouch(const multimodal_libinput_event& ev)
 {
-    CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
+    CHKPR(ev.event, ERROR_NULL_POINTER);
     SInput::LoginfoPackagingTool(ev.event);
 #ifndef OHOS_WESTEN_MODEL
     OnEventTouchSecond(ev.event);
 #else
-    CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
     EventTouch touch = {};
     auto packageResult = eventPackage_.PackageTouchEvent(ev.event, touch);
@@ -744,7 +743,7 @@ int32_t InputEventHandler::OnEventTouchpad(const multimodal_libinput_event& ev)
 
 int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 {
-    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, ERROR_NULL_POINTER);
     MMI_LOGT("InputEventHandler::OnGestureEvent");
     auto pointer = TouchTransformPointManger->OnTouchPadGestrueEvent(event);
     if (pointer == nullptr) {
@@ -779,13 +778,13 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 
 int32_t InputEventHandler::OnEventGesture(const multimodal_libinput_event& ev)
 {
-    CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
+    CHKPR(ev.event, ERROR_NULL_POINTER);
 #ifndef OHOS_WESTEN_MODEL
     OnGestureEvent(ev.event);
 #else
     uint64_t sysStartProcessTime = GetSysClockTime();
     EventGesture gesture = {};
-    CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto packageResult = eventPackage_.PackageGestureEvent(ev.event, gesture);
     if (packageResult != RET_OK) {
         MMI_LOGE("Gesture swipe event package failed, ret:%{public}d, errCode:%{public}d",
@@ -806,10 +805,10 @@ int32_t InputEventHandler::OnEventGesture(const multimodal_libinput_event& ev)
 
 int32_t InputEventHandler::OnEventTabletTool(const multimodal_libinput_event& ev)
 {
-    CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
+    CHKPR(ev.event, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
     EventTabletTool tableTool = {};
-    CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto packageResult = eventPackage_.PackageTabletToolEvent(ev.event, tableTool);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
         MMI_LOGD("The same event reported by multi_device should be discarded");
@@ -832,9 +831,9 @@ int32_t InputEventHandler::OnEventTabletTool(const multimodal_libinput_event& ev
 
 int32_t InputEventHandler::OnEventTabletPad(const multimodal_libinput_event& ev)
 {
-    CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
+    CHKPR(ev.event, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
-    CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     EventTabletPad tabletPad = {};
     auto packageResult = eventPackage_.PackageTabletPadEvent(ev.event, tabletPad);
     if (packageResult != RET_OK) {
@@ -853,7 +852,7 @@ int32_t InputEventHandler::OnEventTabletPad(const multimodal_libinput_event& ev)
 
 int32_t InputEventHandler::OnEventSwitchToggle(const multimodal_libinput_event& ev)
 {
-    CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
+    CHKPR(ev.event, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(ev.event);
     MMI_LOGT("Function is OnEventSwitchToggle, sourceType is LIBINPUT_EVENT_SWITCH_TOGGLE:%{public}d", type);
     return RET_OK;
@@ -861,9 +860,9 @@ int32_t InputEventHandler::OnEventSwitchToggle(const multimodal_libinput_event& 
 
 int32_t InputEventHandler::OnEventTabletPadKey(const multimodal_libinput_event& ev)
 {
-    CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
+    CHKPR(ev.event, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
-    CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     EventKeyboard key = {};
     auto packageResult = eventPackage_.PackageTabletPadKeyEvent(ev.event, key);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
@@ -892,8 +891,8 @@ int32_t InputEventHandler::OnEventTabletPadKey(const multimodal_libinput_event& 
 
 int32_t InputEventHandler::OnEventJoyStickKey(const multimodal_libinput_event& ev, const uint64_t time)
 {
-    CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
-    CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(ev.event, ERROR_NULL_POINTER);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     EventKeyboard key = {};
     auto packageResult = eventPackage_.PackageJoyStickKeyEvent(ev.event, key);
     if (packageResult != RET_OK) {
@@ -921,8 +920,8 @@ int32_t InputEventHandler::OnEventJoyStickKey(const multimodal_libinput_event& e
 
 int32_t InputEventHandler::OnEventJoyStickAxis(const multimodal_libinput_event& ev, const uint64_t time)
 {
-    CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
-    CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(ev.event, ERROR_NULL_POINTER);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     EventJoyStickAxis eventJoyStickAxis = {};
     auto packageResult = eventPackage_.PackageJoyStickAxisEvent(ev.event, eventJoyStickAxis);
     if (packageResult != RET_OK) {
@@ -940,7 +939,7 @@ int32_t InputEventHandler::OnEventJoyStickAxis(const multimodal_libinput_event& 
 
 int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
 {
-    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, ERROR_NULL_POINTER);
     MMI_LOGD("Libinput Events reported");
 
     // 更新 全局 鼠标事件 数据
@@ -970,7 +969,7 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
 
     // 派发
     eventDispatch_.HandlePointerEvent(pointerEvent);
-    int32_t eventPointer = 17;
+    int32_t eventPointer = 18;
     std::string pointerEventstring = "OnEventPointerAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, eventPointer);
     // 返回值 代表是 鼠标事件有没有处理过， 不关心成功与失败

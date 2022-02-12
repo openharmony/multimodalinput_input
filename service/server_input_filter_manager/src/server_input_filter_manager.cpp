@@ -221,7 +221,7 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
 bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
     EventTouch& touch, const uint64_t preHandlerTime)
 {
-    CHKF(event, PARAM_INPUT_INVALID);
+    CHKPF(event);
     MMI_LOGD("Enter");
     if (touchEventFilterMap_.empty()) {
         MMI_LOGE("touchEventFilterMap_ is empty");
@@ -244,7 +244,7 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
     }
 
     auto device = libinput_event_get_device(event);
-    CHKF(device, ERROR_NULL_POINTER);
+    CHKPF(device);
 
     MmiMessageId idMsg = MmiMessageId::INVALID;
     MMIRegEvent->OnEventTouchGetSign(touch, idMsg);

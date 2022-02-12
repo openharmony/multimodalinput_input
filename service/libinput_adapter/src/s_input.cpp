@@ -51,7 +51,7 @@ static void InitHiLogFunc(struct libinput* input)
 
 void OHOS::MMI::SInput::LoginfoPackagingTool(libinput_event *event)
 {
-    CHK(event, PARAM_INPUT_INVALID);
+    CHKP(event);
     auto context = libinput_event_get_context(event);
     InitHiLogFunc(context);
 }
@@ -87,16 +87,16 @@ OHOS::MMI::SInput::~SInput()
 
 bool OHOS::MMI::SInput::Init(FunInputEvent funInputEvent, const std::string& seat_id)
 {
-    CHKF(funInputEvent, OHOS::ERROR_NULL_POINTER);
+    CHKPF(funInputEvent);
     funInputEvent_ = funInputEvent;
     seat_id_ = seat_id;
     if (seat_id_.empty()) {
         seat_id_ = DEF_SEAT_ID;
     }
     udev_ = udev_new();
-    CHKF(udev_, OHOS::ERROR_NULL_POINTER);
+    CHKPF(udev_);
     input_ = libinput_udev_create_context(&LIBINPUT_INTERFACE, nullptr, udev_);
-    CHKF(input_, OHOS::ERROR_NULL_POINTER);
+    CHKPF(input_);
     auto rt = libinput_udev_assign_seat(input_, seat_id_.c_str());
     if (rt != 0) {
         libinput_unref(input_);
@@ -115,7 +115,7 @@ bool OHOS::MMI::SInput::Init(FunInputEvent funInputEvent, const std::string& sea
 
 void OHOS::MMI::SInput::EventDispatch(epoll_event& ev)
 {
-    CHK(ev.data.ptr, ERROR_NULL_POINTER);
+    CHKP(ev.data.ptr);
     auto fd = *static_cast<int*>(ev.data.ptr);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
         MMI_LOGF("SInput::OnEventDispatch epoll unrecoverable error, "
@@ -143,7 +143,7 @@ void OHOS::MMI::SInput::Stop()
 
 void OHOS::MMI::SInput::OnEventHandler()
 {
-    CHK(funInputEvent_, ERROR_NULL_POINTER);
+    CHKP(funInputEvent_);
 #ifndef OHOS_WESTEN_MODEL
     struct multimodal_libinput_event ev = { nullptr, nullptr };
     while ((ev.event = libinput_get_event(input_))) {

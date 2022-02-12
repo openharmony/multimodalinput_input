@@ -117,7 +117,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::II
 {
     MMI_LOGD("enter");
     MMIEventHdl.GetMultimodeInputInfo();
-    CHK(inputEventConsumer, ERROR_NULL_POINTER);
+    CHKP(inputEventConsumer);
     consumer_ = inputEventConsumer;
     MMI_LOGD("leave");
 }
@@ -129,11 +129,11 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     std::string keyCodestring = "client dispatchKeyCode = " + std::to_string(getKeyCode);
     MMI_LOGT(" OnKeyEvent client trace getKeyCode:%{public}d", getKeyCode);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring);
-    int32_t eventKey = 1;
+    int32_t eventKey = 4;
     keyCodestring = "KeyEventDispatchAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
     if (consumer_ != nullptr) {
-        CHK(keyEvent != nullptr, ERROR_NULL_POINTER);
+        CHKP(keyEvent);
         consumer_->OnInputEvent(keyEvent);
         MMI_LOGD("leave");
         return;
@@ -144,11 +144,11 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
     MMI_LOGD("Pointer event received, processing ...");
-    int32_t eventPointer = 17;
+    int32_t eventPointer = 20;
     std::string pointerCodestring = "PointerEventDispatchAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerCodestring, eventPointer);
     if (consumer_ != nullptr) {
-        CHK(pointerEvent != nullptr, ERROR_NULL_POINTER);
+        CHKP(pointerEvent);
         MMI_LOGD("Passed on to consumer ...");
         consumer_->OnInputEvent(pointerEvent);
         return;
@@ -238,12 +238,14 @@ void InputManagerImpl::PrintDisplayDebugInfo()
 
         for (const auto &win : item.windowsInfo_) {
             MMI_LOGD("windowid:%{public}d, pid:%{public}d,uid:%{public}d,topLeftX:%{public}d,"
-                "topLeftY:%{public}d,width:%{public}d,height:%{public}d,displayId:%{public}d,agentWindowId:%{public}d,",
+                "topLeftY:%{public}d,width:%{public}d,height:%{public}d,displayId:%{public}d,agentWindowId:%{public}d,"
+                "winTopLeftX:%{public}d, winTopLeftY:%{public}d",
                 win.id, win.pid,
                 win.uid, win.topLeftX,
                 win.topLeftY, win.width,
                 win.height, win.displayId,
-                win.agentWindowId);
+                win.agentWindowId,
+                win.winTopLeftX, win.winTopLeftY);
         }
     }
 }

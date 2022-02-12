@@ -55,7 +55,7 @@ bool StreamBuffer::Read(std::string &buf)
 
 bool StreamBuffer::Read(char *buf, size_t size)
 {
-    CHKF(buf && size > 0, PARAM_INPUT_INVALID);
+    CHKPF(buf);
     if (rIdx_ + size > wIdx_) {
         MMI_LOGE("Memory out of bounds on read... errCode:%{public}d", MEM_OUT_OF_BOUNDS);
         return false;
@@ -104,7 +104,7 @@ size_t StreamBuffer::UnreadSize() const
 
 bool StreamBuffer::Write(const char *buf, size_t size)
 {
-    CHKF(buf && size > 0, PARAM_INPUT_INVALID);
+    CHKPF(buf);
     if (wIdx_ + size >= MAX_STREAM_BUF_SIZE) {
         MMI_LOGE("Memory out of bounds on write... errCode:%{public}d", MEM_OUT_OF_BOUNDS);
         return false;

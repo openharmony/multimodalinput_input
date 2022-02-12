@@ -43,7 +43,7 @@ UDSSession::~UDSSession()
 
 bool UDSSession::SendMsg(const char *buf, size_t size) const
 {
-    CHKF(buf, OHOS::ERROR_NULL_POINTER);
+    CHKPF(buf);
     CHKF(size > 0 && size <= MAX_PACKET_BUF_SIZE, PARAM_INPUT_INVALID);
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
     uint64_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);

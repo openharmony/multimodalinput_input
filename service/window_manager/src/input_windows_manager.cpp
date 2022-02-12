@@ -335,14 +335,12 @@ bool OHOS::MMI::InputWindowsManager::FindSurfaceByCoordinate(double x, double y,
 bool OHOS::MMI::InputWindowsManager::GetTouchSurfaceId(const double x, const double y, std::vector<int32_t>& ids)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    // check map empty
     if (!surfaces_.empty()) {
         int32_t newLayerId = -1;
         int32_t newSurfaceId = -1;
         for (auto it : surfaces_) {
             auto res = static_cast<MMISurfaceInfo*>(&it.second);
-            CHKF(res, ERROR_NULL_POINTER);
-            // find window by coordinate
+            CHKPF(res);
             if (FindSurfaceByCoordinate(x, y, *res)) {
                 if (res->onLayerId > newLayerId) {
                     newLayerId = res->onLayerId;
@@ -350,7 +348,6 @@ bool OHOS::MMI::InputWindowsManager::GetTouchSurfaceId(const double x, const dou
                 }
             }
         }
-        // push id
         if ((newSurfaceId != -1) && (newSurfaceId != focusInfoID_)) {
             ids.push_back(focusInfoID_);
             ids.push_back(newSurfaceId);
@@ -563,9 +560,11 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
     MMI_LOGD("window info,num:%{public}d", static_cast<int32_t>(windowInfos_.size()));
     for (const auto &item : windowInfos_) {
         MMI_LOGD("windowId:%{public}d, id:%{public}d, pid:%{public}d, uid:%{public}d, topLeftX:%{public}d, "
-            "topLeftY:%{public}d, width:%{public}d, height:%{public}d, display:%{public}d, agentWindowId:%{public}d",
+            "topLeftY:%{public}d, width:%{public}d, height:%{public}d, display:%{public}d, agentWindowId:%{public}d"
+            "winTopLeftX:%{public}d, winTopLeftY:%{public}d",
             item.first, item.second.id, item.second.pid, item.second.uid, item.second.topLeftX, item.second.topLeftY,
-            item.second.width, item.second.height, item.second.displayId, item.second.agentWindowId);
+            item.second.width, item.second.height, item.second.displayId, item.second.agentWindowId,
+            item.second.winTopLeftX, item.second.winTopLeftY);
     }
 }
 
@@ -918,8 +917,8 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
 
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
-    int32_t localX = globalX - touchWindow->topLeftX;
-    int32_t localY = globalY - touchWindow->topLeftY;
+    int32_t localX = globalX - touchWindow->winTopLeftX;
+    int32_t localY = globalY - touchWindow->winTopLeftY;
     pointerItem.SetLocalX(localX);
     pointerItem.SetLocalY(localY);
     pointerEvent->RemovePointerItem(pointerId);
@@ -947,7 +946,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<Poi
 int32_t OHOS::MMI::InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("UpdateTargetPointer begin");
-    CHKPR(pointerEvent, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto source = pointerEvent->GetSourceType();
     switch (source) {
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
@@ -1118,8 +1117,8 @@ void OHOS::MMI::InputWindowsManager::SetLocalInfo(int32_t x, int32_t y)
             }
             if ((isOutsideOfTopLeftX != true) && (isOutsideOfTopLeftY != true) &&
                 (isOutsideOfTopRightX != true) && (isOutsideOfTopRightY != true)) {
-                mouseLoction_.localX = x - item.second.topLeftX;
-                mouseLoction_.localY = y - item.second.topLeftY;
+                mouseLoction_.localX = x - item.second.winTopLeftX;
+                mouseLoction_.localY = y - item.second.winTopLeftY;
                 break;
             }
         }
