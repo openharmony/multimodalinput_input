@@ -704,13 +704,13 @@ int32_t OHOS::MMI::ServerMsgHandler::OnUnSubscribeKeyEvent(SessionPtr sess, NetP
 int32_t OHOS::MMI::ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket& pkt)
 {
     MMI_LOGD("begin");
-    CHKPR(sess, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData = 0;
     CHKR(pkt.Read(userData), STREAM_BUF_READ_FAIL, RET_ERR);
 
 #ifdef OHOS_WESTEN_MODEL
     InputDevMgr->GetInputDeviceIdsAsync([userData, sess, this](std::vector<int32_t> ids) {
-        CHKPR(sess, RET_ERR);
+        CHKPR(sess, ERROR_NULL_POINTER);
         NetPacket pkt1(MmiMessageId::INPUT_DEVICE_IDS);
         int32_t num = static_cast<int32_t>(ids.size());
         CHKR(pkt1.Write(userData), STREAM_BUF_WRITE_FAIL, RET_ERR);
@@ -744,7 +744,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket
 int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
 {
     MMI_LOGD("begin");
-    CHKPR(sess, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData = 0;
     int32_t deviceId = 0;
     CHKR(pkt.Read(userData), STREAM_BUF_READ_FAIL, RET_ERR);
@@ -753,7 +753,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& p
 #ifdef OHOS_WESTEN_MODEL
     InputDevMgr->FindInputDeviceByIdAsync(deviceId,
         [userData, sess, this](std::shared_ptr<InputDevice> inputDevice) {
-        CHKPR(sess, RET_ERR);
+        CHKPR(sess, ERROR_NULL_POINTER);
         NetPacket pkt2(MmiMessageId::INPUT_DEVICE);
         if (inputDevice == nullptr) {
             MMI_LOGI("Input device not found");
