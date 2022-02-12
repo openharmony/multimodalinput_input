@@ -145,7 +145,7 @@ void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
             return;
         }
     }
-    if (nextId_ == INT_MAX) {
+    if (nextId_ == INT32_MAX) {
         MMI_LOGE("the nextId_ exceeded the upper limit");
         return;
     }
