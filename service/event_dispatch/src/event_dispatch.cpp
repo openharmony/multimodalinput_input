@@ -364,7 +364,8 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_LOGI("Pointer event interception succeeded");
         return RET_OK;
     }
-    if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
+    if (!point->NeedSkipInspection() &&
+        InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
         int touchFilter = 2;
         if (touchFilter == point->GetSourceType()) {
             int32_t eventTouch = 10;

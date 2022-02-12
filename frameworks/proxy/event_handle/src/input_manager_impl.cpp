@@ -39,27 +39,23 @@ constexpr int32_t ADD_MASK_BASE = 10;
 
 struct PublicIInputEventConsumer : public IInputEventConsumer {
 public:
-    PublicIInputEventConsumer(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
+    explicit PublicIInputEventConsumer(const std::function<void(std::shared_ptr<PointerEvent>)>& monitor)
     {
         if (monitor != nullptr) {
             monitor_ = monitor;
         }
     }
 
-    virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
-    {
-        return;
-    }
+    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const { }
     void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
     {
         if (monitor_ != nullptr) {
             monitor_(pointerEvent);
         }
     }
-    virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const
-    {
-        return;
-    }
+
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const { }
+
 private:
     std::function<void(std::shared_ptr<PointerEvent>)> monitor_;
 };
@@ -358,8 +354,9 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> k
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
-    if (MultimodalEventHandler::GetInstance().InjectPointerEvent(pointerEvent) != RET_OK)
-        MMI_LOGE("Failed to inject pointer event");
+    if (MultimodalEventHandler::GetInstance().InjectPointerEvent(pointerEvent) != RET_OK) {
+        MMI_LOGE("Failed to inject pointer event!");
+    }
 }
 
 void InputManagerImpl::OnConnected()
