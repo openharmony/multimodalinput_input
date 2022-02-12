@@ -47,7 +47,7 @@ config("libinputeventclient_config") {
   }
 }
 
-ohos_shared_library("libinputconsumer") {
+ohos_shared_library("inputconsumer") {
   sources = [
     "src/js_register_module.cpp",
     "src/js_register_util.cpp",
