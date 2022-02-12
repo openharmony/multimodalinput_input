@@ -826,10 +826,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
         return RET_ERR;
     }
     LogicalDisplayInfo *logicalDisplayInfo = GetLogicalDisplayById(displayId);
-    if (logicalDisplayInfo == nullptr) {
-        MMI_LOGE("logicalDisplayInfo is null");
-        return RET_ERR;
-    }
+    CHKPR(logicalDisplayInfo, ERROR_NULL_POINTER);
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
     FixCursorPosition(globalX, globalY, IMAGE_SIZE, IMAGE_SIZE);
@@ -886,10 +883,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
     }
     MMI_LOGD("UpdateTouchScreenTarget, display:%{public}d", displayId);
     LogicalDisplayInfo *logicalDisplayInfo = GetLogicalDisplayById(displayId);
-      if (logicalDisplayInfo == nullptr) {
-        MMI_LOGE("logicalDisplayInfo is null");
-        return RET_ERR;
-    }
+    CHKPR(logicalDisplayInfo, ERROR_NULL_POINTER);
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
     MMI_LOGD("UpdateTouchScreenTarget, globalX:%{public}d, globalY:%{public}d", globalX, globalY);
