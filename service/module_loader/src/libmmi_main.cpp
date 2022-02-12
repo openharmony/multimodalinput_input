@@ -154,14 +154,14 @@ void StartMmiServer(void)
 }
 #endif
 // weston启动入口函数
-WL_EXPORT int wet_module_init(struct weston_compositor *ec, int *argc, char *argv[])
+WL_EXPORT int wet_module_init(weston_compositor *ec, int *argc, char *argv[])
 {
 #ifdef OHOS_WESTEN_MODEL
     int socketPair[2];
     socketpair(AF_UNIX, SOCK_STREAM, 0, socketPair);
     MMIMsgPost.SetWestonCompositor(ec);
 
-    struct wl_event_loop* loop = nullptr;
+    wl_event_loop* loop = nullptr;
     uint32_t mask = 1;
     void *data = nullptr;
     loop = wl_display_get_event_loop(ec->wl_display);
