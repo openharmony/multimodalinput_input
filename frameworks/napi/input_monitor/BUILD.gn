@@ -73,10 +73,6 @@ ohos_shared_library("libinputmonitor") {
     "//utils/native/base:utils",
   ]
 
-  if (is_mmi_have_libinput || is_mmi_have_hdf) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
-
   relative_install_dir = "module/multimodalinput"
 
   part_name = "multimodalinput_base"
