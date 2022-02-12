@@ -1026,7 +1026,7 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
         return;
     }
     for (const auto &item : logicalDisplayInfo) {
-        bool isOutside[TOP_LEFT_X] = {false, false, false, false};   
+        bool isOutside[CORNER] = {false, false, false, false};   
         if (item.id >= 0) {
             if (integerX < item.topLeftX) {
                 mouseLoction_.globleX = item.topLeftX;
