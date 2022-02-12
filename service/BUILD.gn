@@ -68,7 +68,7 @@ config("libmmi_server_public_config") {
     include_dirs += [
       "hdf_adapter/include",
       "hdi_inject/include",
-      "$root_out_dir/diff_libinput_mmi/src",
+      "$root_out_dir/diff_libinput_mmi/export_include",
       "//third_party/eudev/export_include/",
       "$root_out_dir/diff_libevdev_hdf/export_include",
       "$root_out_dir/diff_libinput_mmi/include/linux",
@@ -299,7 +299,7 @@ ohos_unittest("ut-mmi-service-out") {
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
   sources = [
