@@ -215,7 +215,7 @@ private:
     constexpr uint8_t TOP_LEFT_Y  = 1;
     constexpr uint8_t TOP_RIGHT_X = 2;
     constexpr uint8_t TOP_RIGHT_Y = 3;
-    constexpr uint8_t CORNER_= 4;
+    constexpr uint8_t CORNER = 4;
 };
 }
 }
