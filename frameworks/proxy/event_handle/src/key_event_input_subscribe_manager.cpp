@@ -63,17 +63,16 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<OHOS::M
     std::string keySubscribeIdstring = "client subscribeKeyId = " + std::to_string(keySubscibeId);
     StartTrace(BYTRACE_TAG_MULTIMODALINPUT, keySubscribeIdstring, eventKey);
 
-    if (EventManager.SubscribeKeyEvent(subscribeInfo) == RET_OK) {
-        subscribeInfos_.push_back(subscribeInfo);
-        MMI_LOGT("Leave");
-        FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
-        ++eventKey;
-        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
-        return subscribeInfo.GetSubscribeId();
-    } else {
+    if (EventManager.SubscribeKeyEvent(subscribeInfo) != RET_OK) {
         MMI_LOGE("Leave, subscribe key event failed");
         return INVALID_SUBSCRIBE_ID;
     }
+    subscribeInfos_.push_back(subscribeInfo);
+    MMI_LOGT("Leave");
+    FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
+    ++eventKey;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
+    return subscribeInfo.GetSubscribeId();
 }
 
 int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)

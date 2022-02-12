@@ -99,14 +99,13 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
     static bool hasSendToMmiServer = false;
     if (!hasSendToMmiServer) {
         int32_t ret = MultimodalInputConnectManager::GetInstance()->AddInputEventFilter(eventFilterService_);
-        if (ret == RET_OK) {
-            hasSendToMmiServer = true;
-            MMI_LOGI("AddInputEventFilter has send to server success");
-            return RET_OK;
-        } else {
+        if (ret != RET_OK) {
             MMI_LOGE("AddInputEventFilter has send to server fail, ret = %{public}d", ret);
             return RET_ERR;
         }
+        hasSendToMmiServer = true;
+        MMI_LOGI("AddInputEventFilter has send to server success");
+        return RET_OK;
     }
 
     MMI_LOGD("leave, success with hasSendToMmiServer is already true");
@@ -391,5 +390,5 @@ void InputManagerImpl::SendDisplayInfo()
     }
     MultimodalEventHandler::GetInstance().GetMMIClient()->SendMessage(ckt);
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
