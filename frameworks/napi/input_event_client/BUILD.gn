@@ -46,7 +46,7 @@ config("libinputeventclient_config") {
   }
 }
 
-ohos_shared_library("libinputeventclient") {
+ohos_shared_library("inputeventclient") {
   sources = [
     "src/js_register_event.cpp",
     "src/js_register_handle.cpp",

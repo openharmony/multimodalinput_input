@@ -49,7 +49,7 @@ config("libinputeventclient_config") {
   }
 }
 
-ohos_shared_library("libinputmonitor") {
+ohos_shared_library("inputmonitor") {
   sources = [
     "src/js_input_monitor.cpp",
     "src/js_input_monitor_manager.cpp",
