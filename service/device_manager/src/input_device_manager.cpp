@@ -150,7 +150,7 @@ void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
         return;
     }
     inputDevice_[nextId_] = inputDevice;
-    nextId_++;
+    ++nextId_;
 
     if (IsPointerDevice(inputDevice)) {
         DrawWgr->TellDeviceInfo(true);
