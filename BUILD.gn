@@ -24,15 +24,12 @@ ohos_prebuilt_etc("mmi_uinput.rc") {
 
 ## Install mmi_uinput.rc to /system/etc/init/mmi_uinput.rc }}}
 
-## Install multimodalinput.rc to /system/etc/init/multimodalinput.rc {{{
 ohos_prebuilt_etc("multimodalinput.rc") {
   source = "multimodalinput.cfg"
   relative_install_dir = "init"
   part_name = "multimodalinput_base"
   subsystem_name = "multimodalinput"
 }
-
-## Install multimodalinput.rc to /system/etc/init/multimodalinput.rc }}}
 
 HDF_FWKS = "//drivers/framework"
 ohos_executable("uinput_inject") {
