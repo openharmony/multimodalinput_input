@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#ifdef OHOS_WESTEN_MODEL
 #include "message_post.h"
 #include "uds_socket.h"
 
@@ -71,3 +71,4 @@ void MessagePost::SetWestonCompositor(weston_compositor *ec)
 }
 }
 }
+#endif
