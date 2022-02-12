@@ -17,7 +17,6 @@
 #ifndef MESSAGE_POST_H
 #define MESSAGE_POST_H
 
-#ifdef OHOS_WESTEN_MODEL
 #include <map>
 #include <string>
 #include <list>
