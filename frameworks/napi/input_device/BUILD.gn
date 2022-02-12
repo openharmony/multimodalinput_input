@@ -42,7 +42,7 @@ config("libinputdevice_config") {
   }
 }
 
-ohos_shared_library("libinputdevice") {
+ohos_shared_library("inputdevice") {
   sources = [
     "src/js_event_target.cpp",
     "src/js_input_device_context.cpp",

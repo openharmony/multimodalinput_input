@@ -43,7 +43,7 @@ protected:
     const uint16_t vendorId_;
     const uint16_t productId_;
     const uint16_t version_;
-    struct uinput_user_dev dev_ {};
+    uinput_user_dev dev_ {};
     static constexpr uint32_t MAX_NAME_LENGTH = 80;
 };
 #endif // VIRTUAL_DEVICE_H

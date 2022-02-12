@@ -19,7 +19,7 @@ config("libinputeventclient_config") {
 
   include_dirs = [
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/napi/input_monitor/include",
+    "//foundation/multimodalinput/input/frameworks/napi/input_monitor/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/ace/napi",
     "//foundation/ace/napi/interfaces/kits/napi",
@@ -49,7 +49,7 @@ config("libinputeventclient_config") {
   }
 }
 
-ohos_shared_library("libinputmonitor") {
+ohos_shared_library("inputmonitor") {
   sources = [
     "src/js_input_monitor.cpp",
     "src/js_input_monitor_manager.cpp",
