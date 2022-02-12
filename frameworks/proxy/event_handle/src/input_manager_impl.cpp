@@ -124,7 +124,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::II
 
 void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
-    MMI_LOGD("enter");
+    MMI_LOGD("Enter");
     int32_t getKeyCode = keyEvent->GetKeyCode();
     std::string keyCodestring = "client dispatchKeyCode = " + std::to_string(getKeyCode);
     MMI_LOGT(" OnKeyEvent client trace getKeyCode:%{public}d", getKeyCode);
@@ -138,7 +138,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
         MMI_LOGD("leave");
         return;
     }
-    MMI_LOGD("consumer is null");
+    MMI_LOGD("Leave");
 }
 
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)

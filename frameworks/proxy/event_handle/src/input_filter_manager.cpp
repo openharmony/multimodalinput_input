@@ -178,11 +178,7 @@ InputFilterManager::TouchEventFilter InputFilterManager::GetTouchEventFilter(int
 int32_t InputFilterManager::FilterTouchEvent(std::string name, Authority authority,
     std::function<void(TouchEvent)> handler)
 {
-    if (handler == nullptr) {
-        MMI_LOGE("the input name or handle is nullptr");
-        return RET_ERR;
-    }
-
+    CHKPR(handler,ERROR_NULL_POINTER);
     if (authority < NO_AUTHORITY || authority > HIGH_AUTHORITY) {
         MMI_LOGE("the input authority is incorrect");
         return RET_ERR;

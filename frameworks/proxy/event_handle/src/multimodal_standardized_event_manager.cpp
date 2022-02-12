@@ -667,10 +667,7 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const OHOS::MMI::KeyEven
 int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr)
 {
     MMI_LOGD("InjectEvent begin");
-    if (keyEventPtr == nullptr) {
-        MMI_LOGE("KeyEventPtr is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(keyEventPtr, ERROR_NULL_POINTER);
     keyEventPtr->UpdateId();
     if (keyEventPtr->GetKeyCode() < 0) {
         MMI_LOGE("keyCode is invalid %{public}u", keyEventPtr->GetKeyCode());
@@ -688,7 +685,7 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<OH
 int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Inject pointer event ...");
-    CHKR(pointerEvent, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     pointerEvent->UpdateId();
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
     MMI_LOGD("pointer event dispatcher of client:eventType=%{public}d,actionTime=%{public}d,"

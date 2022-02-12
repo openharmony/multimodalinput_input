@@ -23,14 +23,14 @@ namespace OHOS::MMI {
 
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(libinput_event *event)
 {
-    CHKR(event, PARAM_INPUT_INVALID, nullptr);
+    CHKPRP(event, nullptr);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
         MMI_LOGT("This touch event is canceled type:%{public}d", type); 
         return nullptr;
     }
     auto device = libinput_event_get_device(event);
-    CHKR(device, ERROR_NULL_POINTER, nullptr);
+    CHKPRP(device, nullptr);
     std::shared_ptr<TouchTransformPointProcessor> processor;
     auto deviceId = InputDevMgr->FindInputDeviceId(device);
     auto it = touchPro_.find(deviceId);
@@ -46,9 +46,9 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(l
 
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEvent(libinput_event *event)
 {
-    CHKR(event, PARAM_INPUT_INVALID, nullptr);
+    CHKPRP(event, nullptr);
     auto device = libinput_event_get_device(event);
-    CHKR(device, ERROR_NULL_POINTER, nullptr);
+    CHKPRP(device, nullptr);
     std::shared_ptr<TouchPadTransformPointProcessor> processor;
     auto deviceId = InputDevMgr->FindInputDeviceId(device);
     auto it = touchpadPro_.find(deviceId);
@@ -64,9 +64,9 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEven
 
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestrueEvent(libinput_event *event)
 {
-    CHKR(event, PARAM_INPUT_INVALID, nullptr);
+    CHKPRP(event, nullptr);
     auto device = libinput_event_get_device(event);
-    CHKR(device, ERROR_NULL_POINTER, nullptr);
+    CHKPRP(device, nullptr);
     std::shared_ptr<GestureTransformPointProcessor> processor;
     auto deviceId = InputDevMgr->FindInputDeviceId(device);
     auto it = gesturePro_.find(deviceId);
