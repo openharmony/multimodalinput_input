@@ -42,8 +42,6 @@ ohos_source_set("mmi_event_filter_service") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-
-    #"samgr_standard:samgr_proxy",
   ]
 }
 
@@ -65,7 +63,5 @@ ohos_source_set("mmi_event_filter_proxy") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-
-    #"samgr_standard:samgr_proxy",
   ]
 }

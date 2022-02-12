@@ -553,8 +553,7 @@ ohos_unittest("PointerEventTest") {
 
 group("ut-mmi-proxy") {
   testonly = true
-  deps = []
-  deps += [
+  deps = [
     ":InputManagerTest",
     ":KeyEventTest",
     ":MultimodalKeyEventTest",
