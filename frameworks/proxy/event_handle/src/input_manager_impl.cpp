@@ -101,7 +101,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
         int32_t ret = MultimodalInputConnectManager::GetInstance()->AddInputEventFilter(eventFilterService_);
         if (ret != RET_OK) {
             MMI_LOGE("AddInputEventFilter has send to server fail, ret = %{public}d", ret);
-            return RET_ERR; 
+            return RET_ERR;
         }
         hasSendToMmiServer = true;
         MMI_LOGI("AddInputEventFilter has send to server success");
