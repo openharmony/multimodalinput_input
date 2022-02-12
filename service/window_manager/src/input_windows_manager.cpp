@@ -30,7 +30,7 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, 
 
 using namespace OHOS::MMI;
 
-static void SeatsInfoDebugPrint(const struct SeatInfo** seats)
+static void SeatsInfoDebugPrint(const SeatInfo** seats)
 {
     MMI_LOGD("Seats:");
     for (int i = 0; seats[i]; i++) {
@@ -697,7 +697,7 @@ bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint(libinput_event_
 
     return false;
 }
-const std::vector<struct LogicalDisplayInfo>& OHOS::MMI::InputWindowsManager::GetLogicalDisplayInfo() const
+const std::vector<LogicalDisplayInfo>& OHOS::MMI::InputWindowsManager::GetLogicalDisplayInfo() const
 {
     return logicalDisplays_;
 }
@@ -1015,7 +1015,7 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
     int32_t integerX = static_cast<int32_t>(x);
     int32_t integerY = static_cast<int32_t>(y);
     MMI_LOGD("Mosue Input x = %{public}d, Mouse Input y = %{public}d", integerX, integerY);
-    const std::vector<struct LogicalDisplayInfo> logicalDisplayInfo = GetLogicalDisplayInfo();
+    const std::vector<LogicalDisplayInfo> logicalDisplayInfo = GetLogicalDisplayInfo();
     if (logicalDisplayInfo.empty()) {
         MMI_LOGE("logicalDisplayInfo is empty");
         return;
