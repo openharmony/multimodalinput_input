@@ -32,7 +32,7 @@ void InputDeviceManager::Init(weston_compositor* wc)
     void* devices[size] = {0};
     weston_get_device_info(wc, size, devices);
     for (int32_t i = 0; i < size; i++) {
-        struct libinput_device* item = static_cast<struct libinput_device*>(devices[i]);
+        libinput_device* item = static_cast<libinput_device*>(devices[i]);
         if (item == NULL) {
             continue;
         }
@@ -85,9 +85,9 @@ std::shared_ptr<InputDevice> InputDeviceManager::FindInputDeviceByIdSync(weston_
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
     inputDevice->SetId(item->first);
     int32_t deviceType = static_cast<int32_t>(libinput_device_get_tags(
-        static_cast<struct libinput_device *>(item->second)));
+        static_cast<libinput_device *>(item->second)));
     inputDevice->SetType(deviceType);
-    std::string name = libinput_device_get_name(static_cast<struct libinput_device *>(item->second));
+    std::string name = libinput_device_get_name(static_cast<libinput_device *>(item->second));
     inputDevice->SetName(name);
     MMI_LOGD("end");
     return inputDevice;
@@ -176,7 +176,7 @@ void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
     MMI_LOGD("end");
 }
 
-bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)
+bool InputDeviceManager::IsPointerDevice(libinput_device* device)
 {
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
     MMI_LOGD("udev tag is%{public}d", static_cast<int32_t>(udevTags));
