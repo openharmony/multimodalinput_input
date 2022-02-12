@@ -112,8 +112,6 @@ namespace MMI {
 struct MouseLocation {
     int32_t globleX;
     int32_t globleY;
-    int32_t localX;
-    int32_t localY;
 };
 
 class InputWindowsManager : public DelayedSingleton<InputWindowsManager> {
@@ -191,7 +189,6 @@ private:
     /*********************************新框架接口添加*************************** */
     bool IsTouchWindow(int32_t x, int32_t y, const WindowInfo &info) const;
     void PrintDisplayDebugInfo();
-    void SetLocalInfo(int32_t x, int32_t y);
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent);
@@ -214,7 +211,6 @@ private:
     std::vector<LogicalDisplayInfo> logicalDisplays_ = {};
     std::map<int32_t, WindowInfo> windowInfos_ = {};
     MouseLocation mouseLoction_ = {};
-    const int32_t INVALID_LOCATION = 0;
 };
 }
 }
