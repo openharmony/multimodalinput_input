@@ -131,8 +131,8 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     MouseState->SetMouseCoords(mouseInfo.globleX, mouseInfo.globleY);
     pointerItem.SetGlobalX(mouseInfo.globleX);
     pointerItem.SetGlobalY(mouseInfo.globleY);
-    pointerItem.SetLocalX(mouseInfo.localX);
-    pointerItem.SetLocalY(mouseInfo.localY);
+    pointerItem.SetLocalX(0);
+    pointerItem.SetLocalY(0);
     pointerItem.SetPointerId(0);
 
     uint64_t time = libinput_event_pointer_get_time_usec(data);
@@ -199,12 +199,10 @@ void MouseEventHandler::DumpInner()
 
     PointerEvent::PointerItem item;
     CHK(pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item), PARAM_INPUT_FAIL);
-    MMI_LOGD("item: DownTime: %{public}d, IsPressed: %{public}s,"
-        "GlobalX: %{public}d, GlobalY: %{public}d, LocalX: %{public}d, LocalY: %{public}d, Width: %{public}d,"
-        "Height: %{public}d, Pressure: %{public}d, DeviceId: %{public}d",
+    MMI_LOGD("item: DownTime: %{public}d, IsPressed: %{public}s,GlobalX: %{public}d, GlobalY: %{public}d, "
+        "Width: %{public}d, Height: %{public}d, Pressure: %{public}d, DeviceId: %{public}d",
         item.GetDownTime(), (item.IsPressed() ? "true" : "false"), item.GetGlobalX(), item.GetGlobalY(),
-        item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
-        item.GetDeviceId());
+        item.GetWidth(), item.GetHeight(), item.GetPressure(), item.GetDeviceId());
 }
 } // namespace MMI
 } // namespace OHOS
