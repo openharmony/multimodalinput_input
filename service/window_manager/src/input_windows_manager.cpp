@@ -1026,7 +1026,7 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
         return;
     }
     for (const auto &item : logicalDisplayInfo) {
-        bool isOutside[CORNER] = {false, false, false, false};   
+        bool isOutside[CORNER] = { false, false, false, false };   
         if (item.id >= 0) {
             if (integerX < item.topLeftX) {
                 mouseLoction_.globleX = item.topLeftX;
@@ -1064,7 +1064,7 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
             }
         }
     }
-	MMI_LOGI("Mouse Data: globleX = %{public}d, globleY = %{public}d", mouseLoction_.globleX, mouseLoction_.globleY);
+    MMI_LOGI("Mouse Data: globleX = %{public}d, globleY = %{public}d", mouseLoction_.globleX, mouseLoction_.globleY);
 }
 
 MouseLocation OHOS::MMI::InputWindowsManager::GetMouseInfo()
