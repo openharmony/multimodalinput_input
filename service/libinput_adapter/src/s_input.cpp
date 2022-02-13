@@ -59,7 +59,7 @@ void OHOS::MMI::SInput::LoginfoPackagingTool(libinput_event *event)
 const static libinput_interface LIBINPUT_INTERFACE = {
     .open_restricted = [](const char *path, int32_t flags, void *user_data)->int32_t {
         using namespace OHOS::MMI;
-        CHKR(path, OHOS::ERROR_NULL_POINTER, -errno);
+        CHKPR(path, errno);
         char realPath[PATH_MAX] = {};
         if (realpath(path, realPath) == nullptr) {
             MMI_LOGE("path is error, path:%{public}s", path);
@@ -145,7 +145,7 @@ void OHOS::MMI::SInput::OnEventHandler()
 {
     CHKP(funInputEvent_);
 #ifndef OHOS_WESTEN_MODEL
-    struct multimodal_libinput_event ev = { nullptr, nullptr };
+    multimodal_libinput_event ev = { nullptr, nullptr };
     while ((ev.event = libinput_get_event(input_))) {
         funInputEvent_(&ev);
         libinput_event_destroy(ev.event);

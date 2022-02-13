@@ -13,28 +13,15 @@
  * limitations under the License.
  */
 
-#ifndef INPUT_DEVICE_H
-#define INPUT_DEVICE_H
+#ifndef JS_INPUT_MONITOR_MODULE_H
+#define JS_INPUT_MONITOR_MODULE_H
 
-#include <string>
-#include <vector>
+#include <string.h>
+#include "napi/native_api.h"
+#include "napi/native_node_api.h"
 
 namespace OHOS {
 namespace MMI {
-class InputDevice {
-public:
-    void SetId(int32_t deviceId);
-    int32_t GetId();
-    void SetName(std::string name);
-    std::string GetName();
-    void SetType(int32_t deviceType);
-    int32_t GetType();
-private:
-    int32_t id_;
-    std::string name_;
-    int32_t deviceType_;
-    std::vector<int32_t> deviceIdList_;
-};
 } // namespace MMI
 } // namespace OHOS
-#endif // INPUT_DEVICE_H
+#endif // JS_INPUT_MONITOR_MODULE_H

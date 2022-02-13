@@ -761,7 +761,7 @@ void AppTouchEventHandle::PrepareData(const napi_env& env, napi_value argv,
         AddMouseData(env, argv, *mouseEvent);
     } else if (deviceEventType == STYLUS_EVENT) {
         StylusEvent* stylusEvent = (StylusEvent*)event.GetMultimodalEvent();
-        CHK(stylusEvent, ERROR_NULL_POINTER);
+        CHKP(stylusEvent);
         AddStylusData(env, argv, *stylusEvent);
     }
 }

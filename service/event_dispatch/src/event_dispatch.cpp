@@ -218,7 +218,7 @@ int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_eve
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
-    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, ERROR_NULL_POINTER);
 #ifdef DEBUG_CODE_TEST
     std::string str = WinMgr->GetSurfaceIdListString();
 #endif
@@ -269,7 +269,7 @@ int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_even
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
-    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, ERROR_NULL_POINTER);
     auto focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
         return RET_OK;
@@ -364,7 +364,8 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_LOGI("Pointer event interception succeeded");
         return RET_OK;
     }
-    if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
+    if (!point->NeedSkipInspection() &&
+        InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
         int touchFilter = 2;
         if (touchFilter == point->GetSourceType()) {
             int32_t eventTouch = 10;
@@ -436,7 +437,7 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
-    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, ERROR_NULL_POINTER);
 
 #ifdef DEBUG_CODE_TEST
     std::string strIds = WinMgr->GetSurfaceIdListString();
@@ -514,7 +515,7 @@ int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
-    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, ERROR_NULL_POINTER);
 
     MmiMessageId idMsg = MmiMessageId::INVALID;
     MMIRegEvent->OnEventGestureGetSign(gesture, idMsg);
@@ -661,7 +662,7 @@ int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_e
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     auto type = libinput_event_get_type(event);
-    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, ERROR_NULL_POINTER);
 
 #ifdef DEBUG_CODE_TEST
     std::string str = WinMgr->GetSurfaceIdListString();
@@ -776,7 +777,7 @@ int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *ev
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
-    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, ERROR_NULL_POINTER);
 
     int32_t ret = RET_OK;
     ret = KeyBoardRegEveHandler(key, udsServer, event, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
@@ -837,7 +838,7 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
-    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, ERROR_NULL_POINTER);
 
     auto focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {

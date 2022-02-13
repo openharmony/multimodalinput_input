@@ -53,7 +53,7 @@ void JsEventTarget::CallIdsAsyncWork(napi_env env, napi_status status, void* dat
     }
     uint32_t index = 0;
     napi_value value = nullptr;
-    struct IdsCallbackInfo *cb = (struct IdsCallbackInfo*)data;
+    struct IdsCallbackInfo *cb = static_cast<struct IdsCallbackInfo*>(data);
     for (const auto &item : cb->idsTemp) {
         status_ = napi_create_int64(env, item, &value);
         if (status_ != napi_ok) {
@@ -114,7 +114,8 @@ void JsEventTarget::EmitJsIdsAsync(std::vector<int32_t> ids)
 {
     MMI_LOGD("begin");
     CHKP(env_);
-    IdsCallbackInfo *cb = new IdsCallbackInfo;
+    IdsCallbackInfo *cb = new (std::nothrow) IdsCallbackInfo;
+    CHKP(cb);
     cb->idsTemp = ids;
     napi_value resourceName = nullptr;
     napi_status status = napi_create_string_latin1(env_, "InputDeviceIdsAsync", NAPI_AUTO_LENGTH, &resourceName);
@@ -150,7 +151,7 @@ void JsEventTarget::CallDevAsyncWork(napi_env env, napi_status status, void* dat
         MMI_LOGE("failed to open scope");
         return;
     }
-    struct DevCallbackInfo *cb = (struct DevCallbackInfo*)data;
+    struct DevCallbackInfo *cb = static_cast<struct DevCallbackInfo*>(data);
     auto device = cb->deviceTemp;
     delete cb;
     cb = nullptr;
@@ -283,7 +284,8 @@ void JsEventTarget::EmitJsDevAsync(std::shared_ptr<InputDeviceImpl::InputDeviceI
 {
     MMI_LOGD("begin");
     CHKP(env_);
-    DevCallbackInfo *cb = new DevCallbackInfo;
+    DevCallbackInfo *cb = new (std::nothrow) DevCallbackInfo;
+    CHKP(cb);
     cb->deviceTemp = device;
     napi_value resourceName = nullptr;
     napi_status status = napi_create_string_latin1(env_, "InputDeviceAsync", NAPI_AUTO_LENGTH, &resourceName);

@@ -39,27 +39,23 @@ constexpr int32_t ADD_MASK_BASE = 10;
 
 struct PublicIInputEventConsumer : public IInputEventConsumer {
 public:
-    PublicIInputEventConsumer(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
+    explicit PublicIInputEventConsumer(const std::function<void(std::shared_ptr<PointerEvent>)>& monitor)
     {
         if (monitor != nullptr) {
             monitor_ = monitor;
         }
     }
 
-    virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
-    {
-        return;
-    }
+    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const { }
     void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
     {
         if (monitor_ != nullptr) {
             monitor_(pointerEvent);
         }
     }
-    virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const
-    {
-        return;
-    }
+
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const { }
+
 private:
     std::function<void(std::shared_ptr<PointerEvent>)> monitor_;
 };
@@ -99,14 +95,13 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
     static bool hasSendToMmiServer = false;
     if (!hasSendToMmiServer) {
         int32_t ret = MultimodalInputConnectManager::GetInstance()->AddInputEventFilter(eventFilterService_);
-        if (ret == RET_OK) {
-            hasSendToMmiServer = true;
-            MMI_LOGI("AddInputEventFilter has send to server success");
-            return RET_OK;
-        } else {
+        if (ret != RET_OK) {
             MMI_LOGE("AddInputEventFilter has send to server fail, ret = %{public}d", ret);
             return RET_ERR;
         }
+        hasSendToMmiServer = true;
+        MMI_LOGI("AddInputEventFilter has send to server success");
+        return RET_OK;
     }
 
     MMI_LOGD("leave, success with hasSendToMmiServer is already true");
@@ -124,7 +119,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::II
 
 void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
-    MMI_LOGD("enter");
+    MMI_LOGD("Enter");
     int32_t getKeyCode = keyEvent->GetKeyCode();
     std::string keyCodestring = "client dispatchKeyCode = " + std::to_string(getKeyCode);
     MMI_LOGT(" OnKeyEvent client trace getKeyCode:%{public}d", getKeyCode);
@@ -138,7 +133,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
         MMI_LOGD("leave");
         return;
     }
-    MMI_LOGD("consumer is null");
+    MMI_LOGD("Leave");
 }
 
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
@@ -359,8 +354,9 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> k
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
-    if (MultimodalEventHandler::GetInstance().InjectPointerEvent(pointerEvent) != RET_OK)
-        MMI_LOGE("Failed to inject pointer event");
+    if (MultimodalEventHandler::GetInstance().InjectPointerEvent(pointerEvent) != RET_OK) {
+        MMI_LOGE("Failed to inject pointer event!");
+    }
 }
 
 void InputManagerImpl::OnConnected()
@@ -391,5 +387,5 @@ void InputManagerImpl::SendDisplayInfo()
     }
     MultimodalEventHandler::GetInstance().GetMMIClient()->SendMessage(ckt);
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

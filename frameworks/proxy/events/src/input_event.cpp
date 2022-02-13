@@ -30,9 +30,15 @@ InputEvent::InputEvent(int32_t eventType) : eventType_(eventType)
     Reset();
 }
 
-InputEvent::~InputEvent()
-{
-}
+InputEvent::InputEvent(const InputEvent& other)
+    : eventType_(other.eventType_), id_(other.id_), actionTime_(other.actionTime_),
+    action_(other.action_), actionStartTime_(other.actionStartTime_),
+    deviceId_(other.deviceId_), targetDisplayId_(other.targetDisplayId_),
+    targetWindowId_(other.targetWindowId_), agentWindowId_(other.agentWindowId_),
+    flag_(other.flag_), processedCallback_(other.processedCallback_)
+{}
+
+InputEvent::~InputEvent() {}
 
 void InputEvent::Reset()
 {
@@ -147,6 +153,23 @@ void InputEvent::SetTargetWindowId(int32_t windowId)
 int32_t InputEvent::GetEventType() const
 {
     return eventType_;
+}
+
+const char* InputEvent::DumpEventType() const
+{
+    switch (eventType_) {
+        case InputEvent::EVENT_TYPE_BASE:
+            return "base";
+        case InputEvent::EVENT_TYPE_KEY:
+            return "key";
+        case InputEvent::EVENT_TYPE_POINTER:
+            return "pointer";
+        case InputEvent::EVENT_TYPE_AXIS:
+            return "axis";
+        default:
+            break;
+    }
+    return "unknown";
 }
 
 int32_t InputEvent::GetFlag() const
