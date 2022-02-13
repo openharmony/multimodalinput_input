@@ -62,6 +62,12 @@ struct WindowInfo {
 
     // The input events sent to this window will be sent to the agentwindowid window for processing
     int32_t agentWindowId;
+
+    // The x coordinate of the upper left corner of the window in the logical display
+    int32_t winTopLeftX;
+
+    // The y coordinate of the upper left corner of the window in the logical display
+    int32_t winTopLeftY;
 };
 
 struct PhysicalDisplayInfo {

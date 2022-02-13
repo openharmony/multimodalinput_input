@@ -168,10 +168,7 @@ bool HdiInject::SyncDeviceHotStatus()
 {
     const uint16_t count = static_cast<uint16_t>(deviceArray_.size());
     event_ = (HotPlugEvent**)malloc(count * sizeof(HotPlugEvent));
-    if (event_ == nullptr) {
-        MMI_LOGE("alloc buffer failed");
-        return false;
-    }
+    CHKPF(event_);
     for (int32_t i = 0; i < count; i++) {
         event_[i]->devIndex = deviceArray_[i].devIndex;
         event_[i]->devType = deviceArray_[i].devType;

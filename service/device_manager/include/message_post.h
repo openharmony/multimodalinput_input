@@ -12,8 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef MESSAGE_POST_H
 #define MESSAGE_POST_H
+#ifdef OHOS_WESTEN_MODEL
 
 #include <map>
 #include <string>
@@ -37,9 +39,11 @@ private:
     std::mutex lk_;
     std::list<std::function<void(weston_compositor *)>> asyncTasks_;
     int fd_;
-    struct weston_compositor *ec_ {nullptr};
+    weston_compositor *ec_ {nullptr};
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define MMIMsgPost OHOS::MMI::MessagePost::GetInstance()
+
+#endif // OHOS_WESTEN_MODEL
 #endif // MESSAGE_POST_H

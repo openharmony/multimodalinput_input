@@ -48,7 +48,7 @@ public:
     uint32_t KeyboardHandleKeySym(uint32_t keyboardKey);
 
 private:
-    struct xkb_state *state_ = nullptr;
+    xkb_state *state_ = nullptr;
 };
 }
 }

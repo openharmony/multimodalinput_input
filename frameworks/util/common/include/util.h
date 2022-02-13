@@ -35,7 +35,7 @@ namespace OHOS::MMI {
     size_t StringToken(std::string& str, const std::string& sep, std::string& token);
     size_t StringSplit(const std::string& str, const std::string& sep, std::vector<std::string>& vecList);
     std::string IdsListToString(const std::vector<int32_t>& list, const std::string& sep);
-    void LocalTime(struct tm& t, time_t curTime = 0);
+    void LocalTime(tm& t, time_t curTime = 0);
     std::string Strftime(const std::string& format = "%F %T", time_t curTime = 0);
     void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
         const int32_t abilityId, const int32_t focusId, const uint64_t preHandlerTime);

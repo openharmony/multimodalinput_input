@@ -35,6 +35,6 @@ private:
     int32_t deviceType_;
     std::vector<int32_t> deviceIdList_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // INPUT_DEVICE_H

@@ -29,7 +29,7 @@ namespace {
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
     std::shared_ptr<IInputEventConsumer> consumer)
 {
-    CHKPR(consumer, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(consumer, INVALID_HANDLER_ID);
     if (inputHandlers_.size() >= MAX_N_INPUT_HANDLERS) {
         MMI_LOGE("The number of handlers exceeds the maximum");
         return INVALID_HANDLER_ID;
@@ -62,10 +62,7 @@ void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
     MMI_LOGD("Mark consumed state, monitor:%{public}d, event:%{public}d", monitorId, eventId);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    if (client == nullptr) {
-        MMI_LOGE("Get MMIClint false");
-        return;
-    }
+    CHKP(client);
     NetPacket pkt(MmiMessageId::MARK_CONSUMED);
     CHK(pkt.Write(monitorId), STREAM_BUF_WRITE_FAIL);
     CHK(pkt.Write(eventId), STREAM_BUF_WRITE_FAIL);
@@ -92,10 +89,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
 void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handlerType)
 {
     MMIClientPtr client { MMIEventHdl.GetMMIClient() };
-    if (client == nullptr) {
-        MMI_LOGE("AddToServer Get MMIClint false");
-        return;
-    }
+    CHKP(client);
     NetPacket pkt(MmiMessageId::ADD_INPUT_HANDLER);
     CHK(pkt.Write(handlerId), STREAM_BUF_WRITE_FAIL);
     CHK(pkt.Write(handlerType), STREAM_BUF_WRITE_FAIL);
@@ -122,11 +116,8 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
 void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType handlerType)
 {
     MMI_LOGD("Remove handler:%{public}d from server", handlerId);
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    if (client == nullptr) {
-        MMI_LOGE("RemoveFromServer Get MMIClint false");
-        return;
-    }
+    MMIClientPtr client { MMIEventHdl.GetMMIClient() };
+    CHKP(client);
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_HANDLER);
     CHK(pkt.Write(handlerId), STREAM_BUF_WRITE_FAIL);
     CHK(pkt.Write(handlerType), STREAM_BUF_WRITE_FAIL);
@@ -156,7 +147,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Enter handler:%{public}d", handlerId);
-    int32_t eventTouch = 9;
+    int32_t eventTouch = 12;
     std::string touchEvent = "TouchEventFilterAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
     std::map<int32_t, InputHandler>::iterator tItr;

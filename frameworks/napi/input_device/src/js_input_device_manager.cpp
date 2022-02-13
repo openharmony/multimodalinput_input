@@ -13,15 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef JS_INPUT_MONITOR_MODULE_H
-#define JS_INPUT_MONITOR_MODULE_H
-
-#include <string.h>
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
+#include "js_input_device_manager.h"
 
 namespace OHOS {
 namespace MMI {
+void JsInputDeviceManager::GetDeviceIdsAsync(napi_env env, napi_value handle)
+{
+    SetContext(env, handle);
+    auto &instance = InputDeviceImpl::GetInstance();
+    instance.GetInputDeviceIdsAsync(EmitJsIdsAsync);
+}
+
+void JsInputDeviceManager::GetDeviceAsync(int32_t id, napi_env env, napi_value handle)
+{
+    SetContext(env, handle);
+    auto &instance = InputDeviceImpl::GetInstance();
+    instance.GetInputDeviceAsync(id, EmitJsDevAsync);
+}
+
+void JsInputDeviceManager::ResetEnv()
+{
+    JsEventTarget::ResetEnv();
+}
 } // namespace MMI
 } // namespace OHOS
-#endif // JS_INPUT_MONITOR_MODULE_H
