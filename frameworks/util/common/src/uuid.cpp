@@ -24,9 +24,9 @@ namespace OHOS {
 namespace MMI {
 Uuid::Uuid()
 {
-    struct timeval tv;
+    timeval tv;
     struct timezone tz;
-    struct tm randomTime;
+    tm randomTime;
     unsigned int randNum = 0;
     unsigned long int tvUsec = 0;
 

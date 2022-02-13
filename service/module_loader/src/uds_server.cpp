@@ -268,7 +268,8 @@ bool OHOS::MMI::UDSServer::StartServer()
 
 void OHOS::MMI::UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
 {
-    CHK(fd >= 0 && buf, PARAM_INPUT_INVALID);
+    CHKP(buf);
+    CHK(fd >= 0, PARAM_INPUT_INVALID);
     auto sess = GetSession(fd);
     CHK(sess, ERROR_NULL_POINTER);
     int32_t readIdx = 0;
@@ -459,33 +460,10 @@ void OHOS::MMI::UDSServer::OnThread()
                 OnRecv(item.first, item.second.sBuf.Data(), item.second.sBuf.Size());
             }
         }
-#ifdef OHOS_BUILD_MMI_DEBUG
-        // HandleCommandQueue();
-#endif // OHOS_BUILD_MMI_DEBUG
         SafeKpr->ReportHealthStatus(tid);
     }
     MMI_LOGI("end");
 }
-
-#ifdef OHOS_BUILD_MMI_DEBUG
-void OHOS::MMI::UDSServer::HandleCommandQueue()
-{
-    UdsCommandQueue &commandQueue = Singleton<UdsCommandQueue>::GetInstance();
-    if (commandQueue.GetSize() == 0) {
-        return;
-    }
-    const int maxProcessTenCommandPerOneTime = 10;
-    for (int i = 0; i < maxProcessTenCommandPerOneTime; ++i) {
-        std::string command = commandQueue.PopCommand();
-        if (command.empty()) {
-            continue;
-        }
-        if (command == "dump session") {
-            DumpSession("** dump sesion**\n");
-        }
-    }
-}
-#endif // OHOS_BUILD_MMI_DEBUG
 
 void OHOS::MMI::UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callback)
 {

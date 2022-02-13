@@ -19,7 +19,7 @@ config("libinputeventclient_config") {
 
   include_dirs = [
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/napi/input_event_client/include",
+    "//foundation/multimodalinput/input/frameworks/napi/input_event_client/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/ace/napi",
     "//foundation/ace/napi/interfaces/kits/napi",
@@ -46,7 +46,7 @@ config("libinputeventclient_config") {
   }
 }
 
-ohos_shared_library("libinputeventclient") {
+ohos_shared_library("inputeventclient") {
   sources = [
     "src/js_register_event.cpp",
     "src/js_register_handle.cpp",

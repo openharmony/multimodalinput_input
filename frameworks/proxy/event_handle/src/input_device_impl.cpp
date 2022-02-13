@@ -34,12 +34,11 @@ void InputDeviceImpl::GetInputDeviceIdsAsync(std::function<void(std::vector<int3
     std::lock_guard<std::mutex> guard(mtx_);
     inputDevciceIds_[idsUD_] = callback;
     MMIEventHdl.GetDeviceIds(idsUD_);
-    if (idsUD_ > INT_MAX) {
+    if (idsUD_ == INT32_MAX) {
         MMI_LOGE("the idsUD_ exceeded the upper limit");
-        idsUD_ = 0;
         return;
     }
-    idsUD_++;
+    ++idsUD_;
     MMI_LOGD("end");
 }
 
@@ -50,12 +49,11 @@ void InputDeviceImpl::GetInputDeviceAsync(int32_t deviceId,
     std::lock_guard<std::mutex> guard(mtx_);
     inputDevcices_[inputDeviceUD_] = callback;
     MMIEventHdl.GetDevice(inputDeviceUD_, deviceId);
-    if (inputDeviceUD_ > INT_MAX) {
+    if (inputDeviceUD_ == INT32_MAX) {
         MMI_LOGE("the inputDeviceUD_ exceeded the upper limit");
-        inputDeviceUD_ = 0;
         return;
     }
-    inputDeviceUD_++;
+    ++inputDeviceUD_;
     MMI_LOGD("end");
 }
 

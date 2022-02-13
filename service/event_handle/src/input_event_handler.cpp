@@ -186,12 +186,12 @@ bool InputEventHandler::Init(UDSServer& udsServer)
 
 void InputEventHandler::OnEvent(void *event)
 {
-    CHKP(event, ERROR_NULL_POINTER);
+    CHKP(event);
     std::lock_guard<std::mutex> lock(mu_);
     auto *lpMmiEvent = static_cast<multimodal_libinput_event *>(event);
-    CHKP(lpMmiEvent, ERROR_NULL_POINTER);
+    CHKP(lpMmiEvent);
     auto *lpEvent = lpMmiEvent->event;
-    CHKP(lpEvent, ERROR_NULL_POINTER);
+    CHKP(lpEvent);
     if (initSysClock_ != 0 && lastSysClock_ == 0) {
         MMI_LOGE("Event not handled. id:%{public}" PRId64 ", eventType:%{public}d, initSysClock:%{public}" PRId64,
                  idSeed_, eventType_, initSysClock_);
