@@ -31,9 +31,7 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, 
 MouseEventHandler::MouseEventHandler()
 {
     pointerEvent_ = PointerEvent::Create();
-    if (pointerEvent_ == nullptr) {
-        MMI_LOGF("pointerEvent_ create fail");
-    }
+    CKP(pointerEvent_);
 }
 
 std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent()
@@ -100,20 +98,12 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
         timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
             MMI_LOGT("enter");
             auto sharedPtr = weakPtr.lock();
-            if (sharedPtr == nullptr) {
-                MMI_LOGW("sharedPtr is nullptr");
-                return;
-            }
+            CHKP(sharedPtr);
             MMI_LOGD("timer: %{public}d", sharedPtr->timerId_);
             sharedPtr->timerId_ = -1;
-
             auto pointerEvent = sharedPtr->GetPointerEvent();
-            if (pointerEvent == nullptr) {
-                MMI_LOGE("pointerEvent is nullptr");
-                return;
-            }
+            CHKP(pointerEvent);
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
-
             InputHandler->OnMouseEventEndTimerHandler(pointerEvent);
             MMI_LOGD("leave, axis end");
         });
@@ -141,8 +131,8 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     MouseState->SetMouseCoords(mouseInfo.globleX, mouseInfo.globleY);
     pointerItem.SetGlobalX(mouseInfo.globleX);
     pointerItem.SetGlobalY(mouseInfo.globleY);
-    pointerItem.SetLocalX(mouseInfo.localX);
-    pointerItem.SetLocalY(mouseInfo.localY);
+    pointerItem.SetLocalX(0);
+    pointerItem.SetLocalY(0);
     pointerItem.SetPointerId(0);
 
     uint64_t time = libinput_event_pointer_get_time_usec(data);
@@ -168,12 +158,10 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
 
 void MouseEventHandler::Normalize(libinput_event *event)
 {
-    CHK(event, PARAM_INPUT_INVALID);
-
-    MMI_LOGD("enter");
+    MMI_LOGD("Enter");
+    CHKP(event);
     auto data = libinput_event_get_pointer_event(event);
-    CHKP(data, ERROR_NULL_POINTER);
-
+    CHKP(data);
     PointerEvent::PointerItem pointerItem;
     const int32_t type = libinput_event_get_type(event);
     switch (type) {
@@ -191,18 +179,14 @@ void MouseEventHandler::Normalize(libinput_event *event)
             break;
         }
         default: {
-            MMI_LOGW("unknow type: %{public}d", type);
+            MMI_LOGW("unknow type:%{public}d", type);
             break;
         }
     }
-
     int32_t deviceId = InputDevMgr->FindInputDeviceId(libinput_event_get_device(event));
     HandlePostInner(data, deviceId, pointerItem);
-
-    // 调试 信息输出
     DumpInner();
-
-    MMI_LOGD("leave");
+    MMI_LOGD("Leave");
 }
 
 void MouseEventHandler::DumpInner()
@@ -215,12 +199,10 @@ void MouseEventHandler::DumpInner()
 
     PointerEvent::PointerItem item;
     CHK(pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item), PARAM_INPUT_FAIL);
-    MMI_LOGD("item: DownTime: %{public}d, IsPressed: %{public}s,"
-        "GlobalX: %{public}d, GlobalY: %{public}d, LocalX: %{public}d, LocalY: %{public}d, Width: %{public}d,"
-        "Height: %{public}d, Pressure: %{public}d, DeviceId: %{public}d",
+    MMI_LOGD("item: DownTime: %{public}d, IsPressed: %{public}s,GlobalX: %{public}d, GlobalY: %{public}d, "
+        "Width: %{public}d, Height: %{public}d, Pressure: %{public}d, DeviceId: %{public}d",
         item.GetDownTime(), (item.IsPressed() ? "true" : "false"), item.GetGlobalX(), item.GetGlobalY(),
-        item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
-        item.GetDeviceId());
+        item.GetWidth(), item.GetHeight(), item.GetPressure(), item.GetDeviceId());
 }
 } // namespace MMI
 } // namespace OHOS

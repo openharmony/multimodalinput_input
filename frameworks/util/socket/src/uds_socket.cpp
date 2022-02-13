@@ -108,7 +108,7 @@ void UDSSocket::EpollClose()
 
 size_t UDSSocket::Read(char *buf, size_t size)
 {
-    CHKR(buf, ERROR_NULL_POINTER, -1);
+    CHKPR(buf, -1);
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
     CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
     uint64_t ret = read(fd_, static_cast<void *>(buf), size);
@@ -120,7 +120,7 @@ size_t UDSSocket::Read(char *buf, size_t size)
 
 size_t UDSSocket::Write(const char *buf, size_t size)
 {
-    CHKR(buf, ERROR_NULL_POINTER, -1);
+    CHKPR(buf, -1);
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
     CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
     uint64_t ret = write(fd_, buf, size);
@@ -132,7 +132,7 @@ size_t UDSSocket::Write(const char *buf, size_t size)
 
 size_t UDSSocket::Send(const char *buf, size_t size, int32_t flags)
 {
-    CHKR(buf, ERROR_NULL_POINTER, -1);
+    CHKPR(buf, -1);
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
     uint64_t ret = send(fd_, buf, size, flags);
     if (ret < 0) {
@@ -143,7 +143,7 @@ size_t UDSSocket::Send(const char *buf, size_t size, int32_t flags)
 
 size_t UDSSocket::Recv(char *buf, size_t size, int32_t flags)
 {
-    CHKR(buf, ERROR_NULL_POINTER, -1);
+    CHKPR(buf, -1);
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
     uint64_t ret = recv(fd_, static_cast<void *>(buf), size, flags);
     if (ret < 0) {
@@ -154,7 +154,7 @@ size_t UDSSocket::Recv(char *buf, size_t size, int32_t flags)
 
 size_t UDSSocket::Recvfrom(char *buf, size_t size, uint32_t flags, sockaddr *addr, size_t *addrlen)
 {
-    CHKR(buf, ERROR_NULL_POINTER, -1);
+    CHKPR(buf, -1);
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
     CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
     uint64_t ret = recvfrom(fd_, static_cast<void *>(buf), size, flags, addr, reinterpret_cast<socklen_t *>(addrlen));
@@ -166,7 +166,7 @@ size_t UDSSocket::Recvfrom(char *buf, size_t size, uint32_t flags, sockaddr *add
 
 size_t UDSSocket::Sendto(const char *buf, size_t size, uint32_t flags, sockaddr *addr, size_t addrlen)
 {
-    CHKR(buf, ERROR_NULL_POINTER, -1);
+    CHKPR(buf, -1);
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
     CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
     uint64_t ret = sendto(fd_, static_cast<const void *>(buf), size, flags, addr, static_cast<socklen_t>(addrlen));

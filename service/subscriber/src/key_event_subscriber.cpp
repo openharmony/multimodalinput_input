@@ -35,8 +35,8 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
 {
     MMI_LOGT("Enter");
     CHKR(subscribeId >= 0, PARAM_INPUT_INVALID, RET_ERR);
-    CHKPR(sess, ERROR_NULL_POINTER, RET_ERR);
-    CHKPR(keyOption, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    CHKPR(keyOption, ERROR_NULL_POINTER);
     int32_t preKeySize = keyOption->GetPreKeys().size();
     if (preKeySize > MAX_PRE_KEY_COUNT) {
         MMI_LOGE("Leave, pre key size %{public}d more than %{public}d", preKeySize, MAX_PRE_KEY_COUNT);
@@ -136,13 +136,8 @@ void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<OHOS::MMI::KeyEvent> k
         const std::shared_ptr<Subscriber>& subscriber)
 {
     MMI_LOGT("Enter");
-
     auto udsServerPtr = InputHandler->GetUDSServer();
-    if (udsServerPtr == nullptr) {
-        MMI_LOGE("Leave, udsServerPtr is nullptr");
-        return;
-    }
-
+    CHKP(udsServerPtr);
     OHOS::MMI::NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_KEY);
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
     int32_t fd = subscriber->sess_->GetFd();
@@ -151,7 +146,6 @@ void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<OHOS::MMI::KeyEvent> k
         MMI_LOGE("Leave, server disaptch subscriber failed");
         return;
     }
-
     MMI_LOGT("Leave");
 }
 
@@ -181,10 +175,7 @@ bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
     subscriber->timerId_ = TimerMgr->AddTimer(keyOption->GetFinalKeyDownDuration(), 1, [this, weakSubscriber] () {
         MMI_LOGD("timer callback");
         auto subscriber = weakSubscriber.lock();
-        if (subscriber == nullptr) {
-            MMI_LOGE("Leave, subscriber is nullptr in the timer callback");
-            return;
-        }
+        CHKP(subscriber);
         OnTimer(subscriber);
     });
 
@@ -202,7 +193,7 @@ bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
 void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscriber)
 {
     MMI_LOGT("Enter");
-    CHKP(subscriber, ERROR_NULL_POINTER);
+    CHKP(subscriber);
 
     if (subscriber->timerId_ < 0) {
         MMI_LOGE("Leave, subscribeId:%{public}d, null timerId < 0", subscriber->id_);
@@ -219,7 +210,7 @@ void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscribe
 void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
 {
     MMI_LOGT("Enter");
-    CHKP(subscriber, ERROR_NULL_POINTER);
+    CHKP(subscriber);
 
     subscriber->timerId_ = -1;
     if (subscriber->keyEvent_ == nullptr) {
@@ -239,13 +230,8 @@ bool KeyEventSubscriber::InitSessionDeleteCallback()
         MMI_LOGD("session delete callback has already been initialized");
         return true;
     }
-
     auto udsServerPtr = InputHandler->GetUDSServer();
-    if (udsServerPtr == nullptr) {
-        MMI_LOGE("udsServerPtr is nullptr");
-        return false;
-    }
-
+    CHKPF(udsServerPtr);
     std::function<void(SessionPtr)> callback = std::bind(&KeyEventSubscriber::OnSessionDelete,
             this, std::placeholders::_1);
     udsServerPtr->AddSessionDeletedCallback(callback);
@@ -347,11 +333,7 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
         }
 
         const KeyEvent::KeyItem* keyItem = keyEvent->GetKeyItem();
-        if (keyItem == nullptr) {
-            MMI_LOGE("null keyItem");
-            continue;
-        }
-
+        CHKPF(keyItem);
         auto upTime = keyEvent->GetActionTime();
         auto downTime = keyItem->GetDownTime();
         if (upTime - downTime >= (duration * 1000)) {
@@ -381,15 +363,11 @@ bool KeyEventSubscriber::HandleKeyCanel(const std::shared_ptr<KeyEvent>& keyEven
 bool KeyEventSubscriber::CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent, ERROR_NULL_POINTER);
-
     if (keyEvent_ == nullptr) {
-        MMI_LOGE("keyEvent_ is nullptr");
+        MMI_LOGW("keyEvent_ is nullptr");
         keyEvent_ = KeyEvent::Clone(keyEvent);
     }
-    if (keyEvent_ == nullptr) {
-        MMI_LOGE("clone keyEvent failed");
-        return false;
-    }
+    CHKPF(keyEvent_);
     return true;
 }
 

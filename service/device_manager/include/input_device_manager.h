@@ -38,16 +38,18 @@ public:
     int32_t FindInputDeviceId(libinput_device* inputDevice);
 
 private:
+#ifdef OHOS_WESTEN_MODEL
     void Init(weston_compositor *wc);
     std::vector<int32_t> GetInputDeviceIdsSync(weston_compositor *wc);
     std::shared_ptr<InputDevice> FindInputDeviceByIdSync(weston_compositor *wc, int32_t deviceId);
-    bool IsPointerDevice(struct libinput_device* device);
+#endif
+    bool IsPointerDevice(libinput_device* device);
 
-    std::map<int32_t, libinput_device*> inputDeviceMap_;
+    std::map<int32_t, libinput_device*> inputDevice_;
     bool initFlag_ {false};
     int32_t nextId_ {0};
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define InputDevMgr OHOS::MMI::InputDeviceManager::GetInstance()
 #endif // INPUT_DEVICE_MANAGER_H

@@ -20,10 +20,12 @@ namespace OHOS {
 namespace MMI {
 namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceManager"};
+    constexpr int32_t INVALID_DEVICE_ID {-1};
 }
 #ifdef OHOS_WESTEN_MODEL
 void InputDeviceManager::Init(weston_compositor* wc)
 {
+    MMI_LOGD("begin");
     if (initFlag_) {
         return;
     }
@@ -31,15 +33,16 @@ void InputDeviceManager::Init(weston_compositor* wc)
     void* devices[size] = {0};
     weston_get_device_info(wc, size, devices);
     for (int32_t i = 0; i < size; i++) {
-        struct libinput_device* item = static_cast<struct libinput_device*>(devices[i]);
+        libinput_device* item = static_cast<libinput_device*>(devices[i]);
         if (item == NULL) {
             continue;
         }
-        inputDeviceMap_.insert(std::pair<int32_t, libinput_device*>(nextId_,
+        inputDevice_.insert(std::pair<int32_t, libinput_device*>(nextId_,
             static_cast<struct libinput_device*>(devices[i])));
         nextId_++;
     }
     initFlag_ = true;
+    MMI_LOGD("end");
 }
 
 void InputDeviceManager::GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback)
@@ -61,42 +64,44 @@ void InputDeviceManager::FindInputDeviceByIdAsync(int32_t deviceId,
 
 std::vector<int32_t> InputDeviceManager::GetInputDeviceIdsSync(weston_compositor* wc)
 {
-    MMI_LOGI("GetDeviceIdList enter");
+    MMI_LOGD("begin");
     Init(wc);
     std::vector<int32_t> ids;
-    for (const auto& it : inputDeviceMap_) {
-        ids.push_back(it.first);
+    for (const auto& item : inputDevice_) {
+        ids.push_back(item.first);
     }
+    MMI_LOGD("end");
     return ids;
 }
 
 std::shared_ptr<InputDevice> InputDeviceManager::FindInputDeviceByIdSync(weston_compositor* wc, int32_t deviceId)
 {
-    MMI_LOGI("FindDeviceByIdSync enter");
+    MMI_LOGD("begin");
     Init(wc);
-    auto item = inputDeviceMap_.find(deviceId);
-    if (item == inputDeviceMap_.end()) {
+    auto item = inputDevice_.find(deviceId);
+    if (item == inputDevice_.end()) {
+        MMI_LOGE("failed to search for the device");
         return nullptr;
     }
 
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
     inputDevice->SetId(item->first);
     int32_t deviceType = static_cast<int32_t>(libinput_device_get_tags(
-        static_cast<struct libinput_device *>(item->second)));
+        static_cast<libinput_device *>(item->second)));
     inputDevice->SetType(deviceType);
-    std::string name = libinput_device_get_name(static_cast<struct libinput_device *>(item->second));
+    std::string name = libinput_device_get_name(static_cast<libinput_device *>(item->second));
     inputDevice->SetName(name);
-
+    MMI_LOGD("end");
     return inputDevice;
 }
 #endif
 
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id)
 {
-    MMI_LOGI("FindDeviceById enter");
-    auto item = inputDeviceMap_.find(id);
-    if (item == inputDeviceMap_.end()) {
-        MMI_LOGE("find device by id failed");
+    MMI_LOGD("begin");
+    auto item = inputDevice_.find(id);
+    if (item == inputDevice_.end()) {
+        MMI_LOGE("failed to search for the device");
         return nullptr;
     }
 
@@ -106,67 +111,75 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id)
         return nullptr;
     }
     inputDevice->SetId(item->first);
-    int32_t deviceType = static_cast<int32_t>(libinput_device_get_tags(
-        static_cast<struct libinput_device *>(item->second)));
+    int32_t deviceType = static_cast<int32_t>(libinput_device_get_tags(item->second));
     inputDevice->SetType(deviceType);
-    auto libinputDevice = static_cast<struct libinput_device *>(item->second);
-    std::string name = libinput_device_get_name(libinputDevice);
+    std::string name = libinput_device_get_name(item->second);
     inputDevice->SetName(name);
+    MMI_LOGD("end");
     return inputDevice;
 }
 
 std::vector<int32_t> InputDeviceManager::GetInputDeviceIds()
 {
-    MMI_LOGI("GetDeviceIdList enter");
+    MMI_LOGD("begin");
     std::vector<int32_t> ids;
-    for (const auto &it : inputDeviceMap_) {
-        ids.push_back(it.first);
+    for (const auto &item : inputDevice_) {
+        ids.push_back(item.first);
     }
+    MMI_LOGD("end");
     return ids;
 }
 
 void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
 {
-    MMI_LOGI("OnInputDeviceAdded enter");
+    MMI_LOGD("begin");
+    CHKP(inputDevice);
 #ifdef OHOS_WESTEN_MODEL
     if (initFlag_) {
         return;
     }
 #endif
-    for (const auto& it : inputDeviceMap_) {
-        if (static_cast<struct libinput_device *>(it.second) == inputDevice) {
+    for (const auto& item : inputDevice_) {
+        if (item.second == inputDevice) {
+            MMI_LOGI("the device already exists");
             return;
         }
     }
-    inputDeviceMap_.insert(std::pair<int32_t, libinput_device*>(nextId_,
-        static_cast<struct libinput_device *>(inputDevice)));
-    nextId_++;
+    if (nextId_ == INT32_MAX) {
+        MMI_LOGE("the nextId_ exceeded the upper limit");
+        return;
+    }
+    inputDevice_[nextId_] = inputDevice;
+    ++nextId_;
 
-    if (IsPointerDevice(static_cast<struct libinput_device *>(inputDevice))) {
+    if (IsPointerDevice(inputDevice)) {
         DrawWgr->TellDeviceInfo(true);
     }
+    MMI_LOGD("end");
 }
 
 void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
 {
-    MMI_LOGI("OnInputDeviceRemoved enter");
+    MMI_LOGD("begin");
+    CHKP(inputDevice);
 #ifdef OHOS_WESTEN_MODEL
     if (initFlag_) {
         return;
     }
 #endif
-    for (auto it = inputDeviceMap_.begin(); it != inputDeviceMap_.end(); it++) {
+    for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second == inputDevice) {
-            inputDeviceMap_.erase(it);
+            inputDevice_.erase(it);
             if (IsPointerDevice(inputDevice)) {
                 DrawWgr->TellDeviceInfo(false);
             }
             break;
         }
     }
+    MMI_LOGD("end");
 }
 
-bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)
+bool InputDeviceManager::IsPointerDevice(libinput_device* device)
 {
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
     MMI_LOGD("udev tag is%{public}d", static_cast<int32_t>(udevTags));
@@ -176,19 +189,17 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)
 
 int32_t InputDeviceManager::FindInputDeviceId(libinput_device* inputDevice)
 {
-    MMI_LOGI("begin");
-    if (inputDevice == nullptr) {
-        MMI_LOGI("Libinput_device is nullptr");
-        return -1;
-    }
-    for (const auto& it : inputDeviceMap_) {
-        if (static_cast<struct libinput_device *>(it.second) == inputDevice) {
-            MMI_LOGI("Find input device id success");
-            return it.first;
+    MMI_LOGD("begin");
+    CHKPR(inputDevice, INVALID_DEVICE_ID);
+    for (const auto& item : inputDevice_) {
+        if (item.second == inputDevice) {
+            MMI_LOGI("find input device id success");
+            return item.first;
         }
     }
-    MMI_LOGI("Find input device id failed");
-    return -1;
+    MMI_LOGI("find input device id failed");
+    MMI_LOGD("end");
+    return INVALID_DEVICE_ID;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

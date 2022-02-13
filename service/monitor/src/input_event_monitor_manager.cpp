@@ -34,7 +34,7 @@ OHOS::MMI::InputEventMonitorManager::~InputEventMonitorManager()
 int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventMontior(SessionPtr session, int32_t eventType)
 {
     MMI_LOGD("Enter");
-    CHKPR(session, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(session, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> lock(mu_);
     MonitorItem monitorItem;
     monitorItem.eventType = eventType;
@@ -54,7 +54,7 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventMontior(SessionPtr ses
 void OHOS::MMI::InputEventMonitorManager::RemoveInputEventMontior(SessionPtr session, int32_t eventType)
 {
     MMI_LOGD("Enter");
-    CHKP(session, ERROR_NULL_POINTER);
+    CHKP(session);
     std::lock_guard<std::mutex> lock(mu_);
     MonitorItem monitorItem;
     monitorItem.eventType = eventType;
@@ -69,7 +69,7 @@ void OHOS::MMI::InputEventMonitorManager::RemoveInputEventMontior(SessionPtr ses
 
 void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
-    CHKP(keyEvent, ERROR_NULL_POINTER);
+    CHKP(keyEvent);
     MMI_LOGD("KeyEvent from libinput, keyCode: %{public}d, keyAction: %{public}d, action: %{public}d, "
              "deviceId: %{private}d, actionTime: %{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
              keyEvent->GetAction(), keyEvent->GetDeviceId(), keyEvent->GetActionTime());

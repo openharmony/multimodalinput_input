@@ -15,6 +15,7 @@
 #include "input_handler_manager_global.h"
 #include "input_event_handler.h"
 #include "define_multimodal.h"
+#include "event_dispatch.h"
 #include "input_event_data_transformation.h"
 #include "log.h"
 #include "net_packet.h"
@@ -30,39 +31,33 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
 {
     InitSessionLostCallback();
     CHKR(IsValidHandlerId(handlerId), PARAM_INPUT_INVALID, RET_ERR);
-    CHKPR(session, ERROR_NULL_POINTER, RET_ERR);
-    if (InputHandlerType::MONITOR != handlerType) {
-        MMI_LOGE("AddInputHandler InputHandlerType Not MONITOR:%{public}d", handlerType);
-        return RET_ERR;
+    CHKPR(session, RET_ERR);
+    if (handlerType == InputHandlerType::MONITOR) {
+        MMI_LOGD("Register monitor:%{public}d", handlerId);
+        SessionHandler mon { handlerId, handlerType, session };
+        return monitors_.AddMonitor(mon);
     }
-    MMI_LOGD("Register monitor:%{public}d", handlerId);
-    SessionHandler mon { handlerId, handlerType, session };
-    return monitors_.AddMonitor(mon);
-    if (InputHandlerType::INTERCEPTOR != handlerType) {
-        MMI_LOGW("Invalid handler type");
-        return RET_ERR;
+    if (handlerType == InputHandlerType::INTERCEPTOR) {
+        MMI_LOGD("Register interceptor(%{public}d).", handlerId);
+        SessionHandler interceptor { handlerId, handlerType, session };
+        return interceptors_.AddInterceptor(interceptor);
     }
-    MMI_LOGD("Register interceptor(%{public}d).", handlerId);
-    SessionHandler interceptor { handlerId, handlerType, session };
-    return interceptors_.AddInterceptor(interceptor);
+    MMI_LOGW("Invalid handler type");
+    return RET_ERR;
 }
 
 void InputHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
-    if (InputHandlerType::MONITOR != handlerType) {
-        MMI_LOGE("RemoveInputHandler InputHandlerType Not MONITOR:%{public}d", handlerType);
-        return;
+    if (handlerType == InputHandlerType::MONITOR) {
+        MMI_LOGD("Unregister monitor(%{public}d).", handlerId);
+        SessionHandler monitor { handlerId, handlerType, session };
+        monitors_.RemoveMonitor(monitor);
+    } else if (handlerType == InputHandlerType::INTERCEPTOR) {
+        MMI_LOGD("Unregister interceptor:%{public}d", handlerId);
+        SessionHandler interceptor { handlerId, handlerType, session };
+        interceptors_.RemoveInterceptor(interceptor);
     }
-    MMI_LOGD("Unregister monitor(%{public}d).", handlerId);
-    SessionHandler monitor { handlerId, handlerType, session };
-    monitors_.RemoveMonitor(monitor);
-    if (InputHandlerType::INTERCEPTOR != handlerType) {
-        MMI_LOGW("Invalid handler type");
-    }
-    MMI_LOGD("Unregister interceptor:%{public}d", handlerId);
-    SessionHandler interceptor { handlerId, handlerType, session };
-    interceptors_.RemoveInterceptor(interceptor);
 }
 
 void InputHandlerManagerGlobal::MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session)
@@ -74,7 +69,7 @@ void InputHandlerManagerGlobal::MarkConsumed(int32_t handlerId, int32_t eventId,
 bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_LOGD("Handle KeyEvent");
-    CHKPR(keyEvent, ERROR_NULL_POINTER, false);
+    CHKPF(keyEvent);
     if (interceptors_.HandleEvent(keyEvent)) {
         MMI_LOGD("Key event was intercepted");
         return true;
@@ -89,7 +84,7 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Handle PointerEvent");
-    CHKPR(pointerEvent, ERROR_NULL_POINTER, false);
+    CHKPF(pointerEvent);
     if (interceptors_.HandleEvent(pointerEvent)) {
         MMI_LOGD("Pointer event was intercepted");
         return true;
@@ -107,7 +102,7 @@ void InputHandlerManagerGlobal::InitSessionLostCallback()
         return;
     }
     auto udsServerPtr = InputHandler->GetUDSServer();
-    CHKP(udsServerPtr, ERROR_NULL_POINTER);
+    CHKP(udsServerPtr);
     udsServerPtr->AddSessionDeletedCallback(std::bind(
         &InputHandlerManagerGlobal::OnSessionLost, this, std::placeholders::_1));
     sessionLostCallbackInitialized_ = true;
@@ -148,10 +143,6 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionHa
                  static_cast<int32_t>(monitors_.size()), INVALID_MONITOR_MON);
         return RET_ERR;
     }
-    auto iter = monitors_.find(monitor);
-    if (iter != monitors_.end()) {
-        MMI_LOGW("Repeate register, errCode:%{public}d", INVALID_MONITOR_MON);
-    }
     auto ret = monitors_.insert(monitor);
     if (ret.second) {
         MMI_LOGD("Service AddMonitor Success");
@@ -186,17 +177,17 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
         return;
     }
     if (downEventId_ > eventId) {
-        MMI_LOGW("A new process has began.");
+        MMI_LOGW("A new process has began (%{public}d,%{public}d).", downEventId_, eventId);
         return;
     }
     monitorConsumed_ = true;
-    lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-    lastPointerEvent_->SetActionTime(time(nullptr));
-
-    NetPacket rPkt(MmiMessageId::ON_POINTER_EVENT);
-    CHK((InputEventDataTransformation::Marshalling(lastPointerEvent_, rPkt) == RET_OK),
-        STREAM_BUF_WRITE_FAIL);
-    CHK(session->SendMsg(rPkt), MSG_SEND_FAIL);
+    MMI_LOGD("Cancel operation");
+    std::shared_ptr<PointerEvent> pointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    pointerEvent->SetActionTime(static_cast<int32_t>(GetSysClockTime()));
+    pointerEvent->SetSkipInspection(true);
+    EventDispatch eDispatch;
+    eDispatch.HandlePointerEvent(pointerEvent);
 }
 
 int32_t InputHandlerManagerGlobal::MonitorCollection::GetPriority() const
@@ -230,7 +221,7 @@ bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId,
 void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Update consumption state");
-    CHKP(pointerEvent, PARAM_INPUT_INVALID);
+    CHKP(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         MMI_LOGE("This is not a touch-screen event");
         return;

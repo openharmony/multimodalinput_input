@@ -45,8 +45,8 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<OHOS::M
     std::function<void(std::shared_ptr<OHOS::MMI::KeyEvent>)> callback)
 {
     MMI_LOGT("Enter");
-    CHKPR(keyOption, ERROR_NULL_POINTER, INVALID_SUBSCRIBE_ID);
-    CHKPR(callback, ERROR_NULL_POINTER, INVALID_SUBSCRIBE_ID);
+    CHKPR(keyOption, INVALID_SUBSCRIBE_ID);
+    CHKPR(callback, INVALID_SUBSCRIBE_ID);
     for (auto preKey : keyOption->GetPreKeys()) {
         MMI_LOGD("keyOption->prekey=%{public}d", preKey);
     }
@@ -56,23 +56,23 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<OHOS::M
         subscribeInfo.GetSubscribeId(), keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
 
-    int32_t eventKey = 1;
+    int32_t eventKey = 3;
     std::string keyEvent = "SubscribeKeyEventAsync";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
     int32_t keySubscibeId = subscribeInfo.GetSubscribeId();
     std::string keySubscribeIdstring = "client subscribeKeyId = " + std::to_string(keySubscibeId);
     StartTrace(BYTRACE_TAG_MULTIMODALINPUT, keySubscribeIdstring, eventKey);
 
-    if (EventManager.SubscribeKeyEvent(subscribeInfo) == RET_OK) {
-        subscribeInfos_.push_back(subscribeInfo);
-        MMI_LOGT("Leave");
-        FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
-        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
-        return subscribeInfo.GetSubscribeId();
-    } else {
+    if (EventManager.SubscribeKeyEvent(subscribeInfo) != RET_OK) {
         MMI_LOGE("Leave, subscribe key event failed");
         return INVALID_SUBSCRIBE_ID;
     }
+    subscribeInfos_.push_back(subscribeInfo);
+    MMI_LOGT("Leave");
+    FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
+    ++eventKey;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
+    return subscribeInfo.GetSubscribeId();
 }
 
 int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)

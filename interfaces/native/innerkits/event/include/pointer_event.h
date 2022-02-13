@@ -160,11 +160,20 @@ public:
     };
 
 public:
+    PointerEvent(const PointerEvent& other);
+    PointerEvent(PointerEvent&& other) = delete;
     virtual ~PointerEvent();
+    virtual PointerEvent& operator=(const PointerEvent& other) = delete;
+    virtual PointerEvent& operator=(PointerEvent&& other) = delete;
+
     static std::shared_ptr<PointerEvent> Create();
     // Get or set the action of pointer type input event
     int32_t GetPointerAction() const;
     void SetPointerAction(int32_t pointerAction);
+    const char* DumpPointerAction() const;
+
+    void SetSkipInspection(bool skipInspection);
+    bool NeedSkipInspection();
 
     // Get or set the current Pointer of the pointer type input event
     int32_t GetPointerId() const;
@@ -191,6 +200,7 @@ public:
     // Get or set the source type of the current pointer event
     int32_t GetSourceType() const;
     void SetSourceType(int32_t sourceType);
+    const char* DumpSourceType() const;
 
     // Get or set the button id of the current pointer event
     int32_t GetButtonId() const;
@@ -200,14 +210,10 @@ public:
     void SetAxisValue(AxisType axis, double axisValue);
     bool HasAxis(AxisType axis) const;
     int32_t GetAxes() const;
-    
+
     void SetPressedKeys(const std::vector<int32_t> pressedKeys);
     std::vector<int32_t> GetPressedKeys() const;
     
-    bool IsValidCheckMouseFunc() const;
-    bool IsValidCheckMouse() const;
-    bool IsValidCheckTouchFunc() const;
-    bool IsValidCheckTouch() const;
     bool IsValid() const;
 public:
     static bool HasAxis(int32_t axes, AxisType axis);
@@ -220,6 +226,13 @@ protected:
     explicit PointerEvent(int32_t eventType);
 
 private:
+    bool IsValidCheckMouseFunc() const;
+    bool IsValidCheckMouse() const;
+    bool IsValidCheckTouchFunc() const;
+    bool IsValidCheckTouch() const;
+
+private:
+    bool skipInspection_ { false };
     int32_t pointerId_ { 0 };
     std::list<PointerItem> pointers_;
     std::set<int32_t> pressedButtons_;
