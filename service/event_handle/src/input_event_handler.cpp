@@ -534,14 +534,15 @@ int32_t InputEventHandler::OnEventKeyboard(const multimodal_libinput_event& ev)
         return KEY_EVENT_PKG_FAIL;
     }
     OnEventKeyboardTrace(keyBoard);
+    
 #ifndef OHOS_WESTEN_MODEL
+    return OnKeyboardEvent(ev.event);
+#else
     if (ServerKeyFilter->OnKeyEvent(keyBoard)) {
         MMI_LOGD("Key event filter find a key event from Original event, keyCode:%{puiblic}d", keyBoard.key);
         OnKeyEventFilterTrace(keyBoard);
         return RET_OK;
     }
-    return OnKeyboardEvent(ev.event);
-#else
     auto oKey = KeyValueTransformationByInput(keyBoard.key); // libinput key transformed into HOS key
     keyBoard.unicode = 0;
     if (oKey.isSystemKey && OnSystemEvent(oKey, keyBoard.state)) { // Judging whether key is system key.
@@ -620,7 +621,7 @@ int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
         return POINT_EVENT_PKG_FAIL;
     }
     OnEventPointerTrace(point);
-#ifndef OHOS_WESTEN_MODEL
+#ifdef OHOS_WESTEN_MODEL
     if (ServerKeyFilter->OnPointerEvent(point)) {
         MMI_LOGD("Pointer event interceptor find a pointer event pointer button:%{puiblic}d", point.button);
         OnPointerFilterEventTrace(point);
@@ -706,7 +707,7 @@ int32_t InputEventHandler::OnEventTouch(const multimodal_libinput_event& ev)
     CHKPR(ev.event, ERROR_NULL_POINTER);
     SInput::LoginfoPackagingTool(ev.event);
 #ifndef OHOS_WESTEN_MODEL
-    OnEventTouchSecond(ev.event);
+    return OnEventTouchSecond(ev.event);
 #else
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
