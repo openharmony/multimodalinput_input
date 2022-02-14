@@ -564,12 +564,12 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
 
     MMI_LOGD("window info,num:%{public}d", static_cast<int32_t>(windowInfos_.size()));
     for (const auto &item : windowInfos_) {
-        MMI_LOGD("windowId:%{public}d, id:%{public}d, pid:%{public}d, uid:%{public}d, topLeftX:%{public}d, "
-            "topLeftY:%{public}d, width:%{public}d, height:%{public}d, display:%{public}d, agentWindowId:%{public}d, "
-            "winTopLeftX:%{public}d, winTopLeftY:%{public}d",
-            item.first, item.second.id, item.second.pid, item.second.uid, item.second.topLeftX, item.second.topLeftY,
-            item.second.width, item.second.height, item.second.displayId, item.second.agentWindowId,
-            item.second.winTopLeftX, item.second.winTopLeftY);
+        MMI_LOGD("windowId:%{public}d, id:%{public}d, pid:%{public}d, uid:%{public}d, hotZoneTopLeftX:%{public}d, "
+            "hotZoneTopLeftY:%{public}d, hotZoneWidth:%{public}d, hotZoneHeight:%{public}d, display:%{public}d, "
+            "agentWindowId:%{public}d, winTopLeftX:%{public}d, winTopLeftY:%{public}d",
+            item.first, item.second.id, item.second.pid, item.second.uid, item.second.hotZoneTopLeftX,
+            item.second.hotZoneTopLeftY, item.second.hotZoneWidth, item.second.hotZoneHeight,
+            item.second.displayId, item.second.agentWindowId, item.second.winTopLeftX, item.second.winTopLeftY);
     }
 }
 
@@ -714,8 +714,8 @@ const std::map<int32_t, WindowInfo>& OHOS::MMI::InputWindowsManager::GetWindowIn
 
 bool OHOS::MMI::InputWindowsManager::IsTouchWindow(int32_t x, int32_t y, const WindowInfo &info) const
 {
-    return (x >= info.topLeftX) && (x <= (info.topLeftX + info.width)) && (y >= info.topLeftY) &&
-        (y <= (info.topLeftY + info.height));
+    return (x >= info.hotZoneTopLeftX) && (x <= (info.hotZoneTopLeftX + info.hotZoneWidth)) && (y >= info.hotZoneTopLeftY) &&
+        (y <= (info.hotZoneTopLeftY + info.hotZoneHeight));
 }
 
 void OHOS::MMI::InputWindowsManager::AdjustGlobalCoordinate(int32_t& globalX, int32_t& globalY, int32_t width, int32_t height)
@@ -970,49 +970,6 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTargetPointer(std::shared_ptr<Poin
     }
     MMI_LOGE("Source is not of the correct type, source:%{public}d", source);
     return RET_ERR;
-}
-
-bool OHOS::MMI::InputWindowsManager::FindWindow(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    MMI_LOGD("enter");
-    int32_t pointerId = pointerEvent->GetPointerId();
-    PointerEvent::PointerItem pointerItem;
-    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-        MMI_LOGE("FindWindow failed, can't find pointer item, pointerId:%{public}d", pointerId);
-        return false;
-    }
-
-    int32_t targetDisplayId = pointerEvent->GetTargetDisplayId();
-    int32_t globalX = pointerItem.GetGlobalX();
-    int32_t globalY = pointerItem.GetGlobalY();
-
-    MMI_LOGD("globalX:%{public}d, globalY:%{public}d", globalX, globalY);
-
-    WindowInfo touchWindow;
-    for (size_t i = 0; i < logicalDisplays_.size(); i++) {
-        if (logicalDisplays_[i].id != targetDisplayId) {
-            continue;
-        }
-        for (size_t j = 0; j < logicalDisplays_[i].windowsInfo_.size(); j++) {
-            if (IsTouchWindow(globalX, globalY, logicalDisplays_[i].windowsInfo_[j])) {
-                touchWindow = logicalDisplays_[i].windowsInfo_[j];
-
-                pointerEvent->SetTargetWindowId(touchWindow.id);
-                pointerEvent->SetAgentWindowId(touchWindow.agentWindowId);
-                int32_t localX = globalX - touchWindow.topLeftX;
-                int32_t localY = globalY - touchWindow.topLeftY;
-                pointerItem.SetLocalX(localX);
-                pointerItem.SetLocalY(localY);
-                pointerEvent->RemovePointerItem(pointerId);
-                pointerEvent->AddPointerItem(pointerItem);
-
-                MMI_LOGD("localX:%{public}d, localY:%{public}d", localX, localY);
-                return true;
-            }
-        }
-    }
-    MMI_LOGD("touchWindow not found");
-    return false;
 }
 
 void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, double& y)

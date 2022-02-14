@@ -232,13 +232,13 @@ void InputManagerImpl::PrintDisplayDebugInfo()
             item.focusWindowId, static_cast<int32_t>(item.windowsInfo_.size()));
 
         for (const auto &win : item.windowsInfo_) {
-            MMI_LOGD("windowid:%{public}d, pid:%{public}d,uid:%{public}d,topLeftX:%{public}d,"
-                "topLeftY:%{public}d,width:%{public}d,height:%{public}d,displayId:%{public}d,agentWindowId:%{public}d,"
-                "winTopLeftX:%{public}d, winTopLeftY:%{public}d",
+            MMI_LOGD("windowid:%{public}d, pid:%{public}d,uid:%{public}d,hotZoneTopLeftX:%{public}d,"
+                "hotZoneTopLeftY:%{public}d,hotZoneWidth:%{public}d,hotZoneHeight:%{public}d,displayId:%{public}d, "
+                "agentWindowId:%{public}d, winTopLeftX:%{public}d, winTopLeftY:%{public}d",
                 win.id, win.pid,
-                win.uid, win.topLeftX,
-                win.topLeftY, win.width,
-                win.height, win.displayId,
+                win.uid, win.hotZoneTopLeftX,
+                win.hotZoneTopLeftY, win.hotZoneWidth,
+                win.hotZoneHeight, win.displayId,
                 win.agentWindowId,
                 win.winTopLeftX, win.winTopLeftY);
         }
