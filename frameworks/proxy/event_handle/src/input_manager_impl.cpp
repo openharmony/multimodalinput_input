@@ -65,7 +65,7 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
 {
     MMI_LOGD("enter");
     if (physicalDisplays.empty() || logicalDisplays.empty()) {
-        MMI_LOGE("display info check failed! physicalDisplays size is %{public}d, logicalDisplays size is %{public}d",
+        MMI_LOGE("display info check failed! physicalDisplays size:%{public}d, logicalDisplays size:%{public}d",
             static_cast<int32_t>(physicalDisplays.size()), static_cast<int32_t>(logicalDisplays.size()));
         return;
     }
@@ -96,7 +96,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
     if (!hasSendToMmiServer) {
         int32_t ret = MultimodalInputConnectManager::GetInstance()->AddInputEventFilter(eventFilterService_);
         if (ret != RET_OK) {
-            MMI_LOGE("AddInputEventFilter has send to server fail, ret = %{public}d", ret);
+            MMI_LOGE("AddInputEventFilter has send to server fail, ret:%{public}d", ret);
             return RET_ERR;
         }
         hasSendToMmiServer = true;
@@ -138,13 +138,13 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Pointer event received, processing ...");
+    MMI_LOGD("Pointer event received, processing");
     int32_t eventPointer = 20;
     std::string pointerCodestring = "PointerEventDispatchAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerCodestring, eventPointer);
     if (consumer_ != nullptr) {
         CHKP(pointerEvent);
-        MMI_LOGD("Passed on to consumer ...");
+        MMI_LOGD("Passed on to consumer");
         consumer_->OnInputEvent(pointerEvent);
         return;
     }
@@ -211,7 +211,7 @@ void InputManagerImpl::PrintDisplayDebugInfo()
     MMI_LOGD("physicalDisplays,num:%{public}d", static_cast<int32_t>(physicalDisplays_.size()));
     for (const auto &item : physicalDisplays_) {
         MMI_LOGD("physicalDisplays,id:%{public}d, leftDisplayId:%{public}d, upDisplayId:%{public}d, "
-            "topLeftX:%{public}d, topLeftY:%{public}d, width:%{public}d,height:%{public}d,name:%{public}s,"
+            "topLeftX:%{public}d, topLeftY:%{public}d, width:%{public}d, height:%{public}d, name:%{public}s, "
             "seatId:%{public}s, seatName:%{public}s, logicWidth:%{public}d, logicHeight:%{public}d, "
             "direction:%{public}d",
             item.id, item.leftDisplayId, item.upDisplayId,
@@ -223,17 +223,17 @@ void InputManagerImpl::PrintDisplayDebugInfo()
 
     MMI_LOGD("logicalDisplays,num:%{public}d", static_cast<int32_t>(logicalDisplays_.size()));
     for (const auto &item : logicalDisplays_) {
-        MMI_LOGD("logicalDisplays, id:%{public}d,topLeftX:%{public}d, topLeftY:%{public}d, "
-            "width:%{public}d,height:%{public}d,name:%{public}s,"
-            "seatId:%{public}s, seatName:%{public}s,focusWindowId:%{public}d,window num:%{public}d",
+        MMI_LOGD("logicalDisplays, id:%{public}d, topLeftX:%{public}d, topLeftY:%{public}d, "
+            "width:%{public}d, height:%{public}d, name:%{public}s, "
+            "seatId:%{public}s, seatName:%{public}s, focusWindowId:%{public}d, window num:%{public}d",
             item.id, item.topLeftX, item.topLeftY,
             item.width, item.height, item.name.c_str(),
             item.seatId.c_str(), item.seatName.c_str(),
             item.focusWindowId, static_cast<int32_t>(item.windowsInfo_.size()));
 
         for (const auto &win : item.windowsInfo_) {
-            MMI_LOGD("windowid:%{public}d, pid:%{public}d,uid:%{public}d,topLeftX:%{public}d,"
-                "topLeftY:%{public}d,width:%{public}d,height:%{public}d,displayId:%{public}d,agentWindowId:%{public}d,"
+            MMI_LOGD("windowid:%{public}d, pid:%{public}d, uid:%{public}d, topLeftX:%{public}d, "
+                "topLeftY:%{public}d, width:%{public}d, height:%{public}d, displayId:%{public}d, agentWindowId:%{public}d, "
                 "winTopLeftX:%{public}d, winTopLeftY:%{public}d",
                 win.id, win.pid,
                 win.uid, win.topLeftX,
@@ -339,7 +339,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
             InterceptorMgr.RemoveInterceptor(interceptorId);
             break;
         default:
-            MMI_LOGE("Can't find the mask,mask:%{public}d", mask);
+            MMI_LOGE("Can't find the mask, mask:%{public}d", mask);
             break;
     }
 }
@@ -363,7 +363,7 @@ void InputManagerImpl::OnConnected()
     MMI_LOGD("enter");
 
     if (physicalDisplays_.empty() || logicalDisplays_.empty()) {
-        MMI_LOGE("display info check failed! physicalDisplays_ size is %{public}d, logicalDisplays_ size is %{public}d",
+        MMI_LOGE("display info check failed! physicalDisplays_ size:%{public}d, logicalDisplays_ size:%{public}d",
             static_cast<int32_t>(physicalDisplays_.size()), static_cast<int32_t>(logicalDisplays_.size()));
         return;
     }

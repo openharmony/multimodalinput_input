@@ -42,7 +42,7 @@ int32_t InterceptorManager::AddInterceptor(int32_t sourceType,
     interceptorItem.callback = interceptor;
     interceptor_.push_back(interceptorItem);
     MMIEventHdl.AddInterceptor(interceptorItem.sourceType, interceptorItem.id_);
-    MMI_LOGD("Add sourceType = %{public}d Touchpad to InterceptorManager success", sourceType);
+    MMI_LOGD("Add sourceType:%{public}d Touchpad to InterceptorManager success", sourceType);
     return interceptorItem.id_;
 }
 
@@ -75,7 +75,7 @@ void InterceptorManager::RemoveInterceptor(int32_t interceptorId)
     } else {
         iter = interceptor_.erase(iter);
         MMIEventHdl.RemoveInterceptor(interceptorItem.id_);
-        MMI_LOGD("InterceptorItem id: %{public}d removed success", interceptorId);
+        MMI_LOGD("InterceptorItem id:%{public}d removed success", interceptorId);
     }
 }
 
@@ -84,9 +84,9 @@ int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointer
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     PointerEvent::PointerItem pointer;
     CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL, RET_ERR);
-    MMI_LOGD("interceptor-clienteventTouchpad:actionTime=%{public}d;"
-             "sourceType=%{public}d;pointerAction=%{public}d;"
-             "pointerId=%{public}d;point.x=%{public}d;point.y=%{public}d;press=%{public}d",
+    MMI_LOGD("interceptor-clienteventTouchpad:actionTime:%{public}d, "
+             "sourceType:%{public}d, pointerAction:%{public}d, "
+             "pointerId:%{public}d, point.x:%{public}d, point.y:%{public}d, press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     InterceptorItem interceptorItem;
