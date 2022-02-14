@@ -41,14 +41,12 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventMontior(SessionPtr ses
     monitorItem.session =  session;
     auto iter = std::find(monitors_.begin(), monitors_.end(), monitorItem);
     if (iter != monitors_.end()) {
-        MMI_LOGE("SetEventKeyMonitor: repeate register");
+        MMI_LOGE("Key register repeat.");
         return RET_ERR;
-    } else {
-        iter = monitors_.insert(iter, monitorItem);
-        MMI_LOGD("eventType:%{public}d, fd:%{public}d register in server", eventType, session->GetFd());
-        return RET_OK;
     }
-    MMI_LOGD("Leave");
+    iter = monitors_.insert(iter, monitorItem);
+    MMI_LOGD("eventType:%{public}d, fd:%{public}d register in server", eventType, session->GetFd());
+    return RET_OK;
 }
 
 void OHOS::MMI::InputEventMonitorManager::RemoveInputEventMontior(SessionPtr session, int32_t eventType)
@@ -98,15 +96,13 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventTouchpadMontior(int32_
     monitorItemTouchpad.session = session;
     auto iter = std::find(monitorsTouch_.begin(), monitorsTouch_.end(), monitorItemTouchpad);
     if (iter != monitorsTouch_.end()) {
-        MMI_LOGE("SetEventTouchpadMonitor:repeate register");
+        MMI_LOGE("Touchpad register repeat.");
         return RET_ERR;
-    } else {
-        iter = monitorsTouch_.insert(iter, monitorItemTouchpad);
-        MMI_LOGD("AddInputEventTouchpadMontior, Success, eventType:%{public}d, fd:%{public}d register in server",
-            eventType, session->GetFd());
-        return RET_OK;
     }
-    MMI_LOGD("Leave");
+    iter = monitorsTouch_.insert(iter, monitorItemTouchpad);
+    MMI_LOGD("AddInputEventTouchpadMontior, Success, eventType:%{public}d, fd:%{public}d register in server",
+        eventType, session->GetFd());
+    return RET_OK;
 }
 
 void OHOS::MMI::InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
@@ -118,7 +114,7 @@ void OHOS::MMI::InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_
     monitorItemtouchpad.session = session;
     auto iter = std::find(monitorsTouch_.begin(), monitorsTouch_.end(), monitorItemtouchpad);
     if (iter == monitorsTouch_.end()) {
-        MMI_LOGE("RemoveInputEventTouchpadMontior::monitorItemtouchpad does not exist");
+        MMI_LOGE("monitorItemtouchpad does not exist.");
     } else {
         MMI_LOGD("eventType:%{public}d, fd:%{public}d remove from server", eventType, session->GetFd());
         iter = monitorsTouch_.erase(iter);

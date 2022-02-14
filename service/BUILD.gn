@@ -182,7 +182,6 @@ ohos_shared_library("libmmi-server") {
   deps = [
     ":drawing_pointer_image",
     ":mmi_device_config.ini",
-    ":mmi_log.conf",
     ":multimodalinput_config_ability.json",
     "//drivers/peripheral/input/hal:hdi_input",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",

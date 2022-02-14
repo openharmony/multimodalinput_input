@@ -54,7 +54,8 @@ EventDispatch::~EventDispatch()
 }
 
 void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
-    POINT_EVENT_TYPE& pointEventType, const int32_t fingerCount)
+                                                  const int32_t fingerCount,
+                                                  POINT_EVENT_TYPE& pointEventType)
 {
     CHK(fingerCount > 0, PARAM_INPUT_INVALID);
     CHK(touch.time > 0, PARAM_INPUT_INVALID);
@@ -355,7 +356,7 @@ bool EventDispatch::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point
     return EventFilterWrap::GetInstance().HandlePointerEventFilter(point);
 }
 
-int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point) 
+int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 {
     MMI_LOGD("Enter");
     CHKPR(point, ERROR_NULL_POINTER);
@@ -366,11 +367,17 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     }
     if (!point->NeedSkipInspection() &&
         InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
-        int touchFilter = 2;
+        int32_t pointerFilter = 1;
+        int32_t touchFilter = 2;
+        if (pointerFilter == point->GetSourceType()) {
+            int32_t pointerId = point->GetId();
+            std::string pointerEvent = "OnEventPointer";
+            FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, pointerId);
+        }
         if (touchFilter == point->GetSourceType()) {
-            int32_t eventTouch = 10;
-            std::string touchEvent = "OnEventTouchAsync";
-            FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
+            int32_t touchId = point->GetId();
+            std::string touchEvent = "OnEventTouch";
+            FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, touchId);
         }
         return RET_OK;
     }
@@ -416,7 +423,7 @@ int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
 {
     CHKPR(point, ERROR_NULL_POINTER);
     InputHandlerManagerGlobal::GetInstance().HandleEvent(point);
-    MMI_LOGD("call  DispatchTouchTransformPointEvent begin"); 
+    MMI_LOGD("call  DispatchTouchTransformPointEvent begin");
     auto appInfo = AppRegs->FindByWinId(point->GetAgentWindowId()); // obtain application information
     if (appInfo.fd == RET_ERR) {
         MMI_LOGE("Failed to find fd... errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
@@ -428,7 +435,7 @@ int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
         MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
-    MMI_LOGD("call  DispatchTouchTransformPointEvent end"); 
+    MMI_LOGD("call  DispatchTouchTransformPointEvent end");
     return RET_OK;
 }
 
@@ -617,7 +624,7 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
         int32_t inputType = INPUT_DEVICE_CAP_TOUCH;
         newPacket << inputType << fingerCount;
         POINT_EVENT_TYPE pointEventType = EVENT_TYPE_INVALID;
-        OnEventTouchGetPointEventType(touch, pointEventType, fingerCount);
+        OnEventTouchGetPointEventType(touch, fingerCount, pointEventType);
         int32_t eventType = pointEventType;
         newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime << touch.seatSlot;
         std::vector<std::pair<uint32_t, int32_t>> touchIds;
@@ -705,9 +712,9 @@ void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, i
         MMI_LOGT("FilterSubscribeKeyEvent service trace GetKeyCode=%{public}d", keyCode);
     }
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, checkKeyCode);
-    int32_t eventKey = 2;
-    std::string keyEvent = "OnEventKeyboardAsync";
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
+    int32_t keyId = key->GetId();
+    std::string keyEventString = "OnKeyEvent";
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
 }
 
 int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
