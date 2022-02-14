@@ -126,11 +126,11 @@ HWTEST_F(NetPacketTest, ReadAndWrite, TestSize.Level1)
     NetPacket pkt(MmiMessageId::REGISTER_APP_INFO);
     pkt << p1 << p2;
 
-    int32_t r1;
+    int32_t r1 = 0;
     std::string r2;
     pkt >> r1 >> r2;
-    EXPECT_STREQ(p1, r1);
-    EXPECT_STREQ(p2, r2);
+    EXPECT_EQ(p1, r1);
+    EXPECT_EQ(p2, r2);
 }
 
 HWTEST_F(NetPacketTest, WriteError, TestSize.Level1)
@@ -157,12 +157,12 @@ HWTEST_F(NetPacketTest, ReadError, TestSize.Level1)
     pkt << p1 << p2;
     EXPECT_FALSE(pkt.ChkError());
     
-    int32_t r1;
+    int32_t r1 = 0;
     std::string r2;
     pkt >> r1 >> r2;
     EXPECT_FALSE(pkt.ChkError());
-    EXPECT_STREQ(p1, r1);
-    EXPECT_STREQ(p2, r2);
+    EXPECT_EQ(p1, r1);
+    EXPECT_EQ(p2, r2);
     int32_t r3;
     pkt >> r3;
     EXPECT_TRUE(pkt.ChkError());
