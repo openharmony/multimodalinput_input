@@ -16,10 +16,12 @@
 #include "mmi_server.h"
 #include "mmi_interface.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "HosMmiServerDemo" };
     }
+}
 }
 
 int32_t main(int32_t argc, const char *argv[])

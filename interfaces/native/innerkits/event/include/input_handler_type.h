@@ -43,6 +43,6 @@ inline bool IsValidHandlerId(int32_t handlerId)
 {
     return ((handlerId >= MIN_HANDLER_ID) && (handlerId < std::numeric_limits<int32_t>::max()));
 }
-}
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 #endif // INPUT_HANDLER_TYPE_H

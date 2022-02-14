@@ -33,7 +33,7 @@ public:
     virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const;
     virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const;
 };
-}
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 
 #endif // I_INPUT_EVENT_CONSUMER_H

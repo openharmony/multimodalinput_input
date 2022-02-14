@@ -111,7 +111,7 @@ bool MultimodalInputConnectService::Initialize() const
     return true;
 }
 
-int32_t MultimodalInputConnectService::HandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
 {
     MMI_LOGT("enter");
     int32_t ret;

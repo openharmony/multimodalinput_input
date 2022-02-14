@@ -52,7 +52,7 @@ namespace MMI {
     size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_t> &list2,
         std::vector<int32_t> &difList);
     std::string StringFmt(const char* str, ...);
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif // UTIL_H

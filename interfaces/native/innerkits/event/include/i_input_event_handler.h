@@ -30,6 +30,6 @@ struct IInputEventHandler {
     virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) = 0;
     virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) = 0;
 };
-}
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 #endif // I_INPUT_EVENT_HANDLER_H

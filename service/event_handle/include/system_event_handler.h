@@ -21,7 +21,8 @@
 #include "proto.h"
 #include "msg_handler.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 class SystemEventHandler : public DelayedSingleton<SystemEventHandler>, public MsgHandler<std::function<void()>> {
 public:
     SystemEventHandler();
@@ -44,7 +45,8 @@ protected:
     void OnMute();
     void OnBack();
 };
-}
+} // namespace MMI
+} // namespace OHOS
 #define SysEveHdl OHOS::MMI::SystemEventHandler::GetInstance()
 
 #endif // SYSTEM_EVENT_HANDLER_H
