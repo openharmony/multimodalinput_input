@@ -58,7 +58,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
     uint64_t ret = write(fd_, static_cast<const void *>(buf), size);
     if (ret < 0) {
-        MMI_LOGE("SendMsg write errCode:%{public}d return %{public}" PRId64 "", MSG_SEND_FAIL, ret);
+        MMI_LOGE("SendMsg write errCode:%{public}d, return %{public}" PRId64 "", MSG_SEND_FAIL, ret);
         return false;
     }
     return true;
@@ -91,7 +91,7 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
     isRun_ = true;
     isConnected_ = true;
     if (ConnectTo() < 0) {
-        MMI_LOGW("Client connection failed...Try again later...");
+        MMI_LOGW("Client connection failed, Try again later");
         isConnected_ = false;
 
         if (IsFirstConnectFailExit()) {
@@ -100,10 +100,10 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
     }
     t_ = std::thread(std::bind(&UDSClient::OnThread, this, std::ref(threadPromiseHadEnd_)));
     if (detachMode) {
-        MMI_LOGW("uds client thread detach...");
+        MMI_LOGW("uds client thread detach");
         t_.detach();
     } else {
-        MMI_LOGW("uds client thread join..");
+        MMI_LOGW("uds client thread join");
     }
     return true;
 }
@@ -153,7 +153,7 @@ void UDSClient::OnEvent(const epoll_event& ev, StreamBuffer& buf)
     auto isoverflow = false;
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGI("fd:%{public}d, ev.events = 0x%{public}x", fd, ev.events);
+        MMI_LOGI("fd:%{public}d, ev.events:0x%{public}x", fd, ev.events);
         OnDisconnected();
         epoll_event event = {};
         EpollCtl(fd, EPOLL_CTL_DEL, event);
@@ -203,7 +203,7 @@ void UDSClient::OnThread(std::promise<bool>& threadPromise)
             }
         } else {
             if (ConnectTo() < 0) {
-                MMI_LOGW("Client reconnection failed...Try again after %{public}d ms!!!",
+                MMI_LOGW("Client reconnection failed, Try again after %{public}d ms",
                          CLIENT_RECONNECT_COOLING_TIME);
                 std::this_thread::sleep_for(std::chrono::milliseconds(CLIENT_RECONNECT_COOLING_TIME));
                 continue;
@@ -220,7 +220,7 @@ void UDSClient::OnThread(std::promise<bool>& threadPromise)
         }
     }
     threadPromise.set_value(true);
-    MMI_LOGD("UDSClient::OnThread end...");
+    MMI_LOGD("UDSClient::OnThread end");
 }
 
 void UDSClient::SetToExit()
