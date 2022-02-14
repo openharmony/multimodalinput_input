@@ -161,6 +161,6 @@ protected:
     int32_t flag_;
     std::function<void(int32_t)> processedCallback_;
 };
-}
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 #endif // INPUT_EVENT_H
