@@ -211,9 +211,9 @@ void InputManagerImpl::PrintDisplayDebugInfo()
     MMI_LOGD("physicalDisplays,num:%{public}d", static_cast<int32_t>(physicalDisplays_.size()));
     for (const auto &item : physicalDisplays_) {
         MMI_LOGD("physicalDisplays,id:%{public}d, leftDisplayId:%{public}d, upDisplayId:%{public}d, "
-            "topLeftX:%{public}d, topLeftY:%{public}d, width:%{public}d, height:%{public}d, name:%{public}s, "
-            "seatId:%{public}s, seatName:%{public}s, logicWidth:%{public}d, logicHeight:%{public}d, "
-            "direction:%{public}d",
+            "topLeftX:%{public}d, topLeftY:%{public}d, width:%{public}d, height:%{public}d, "
+            "name:%{public}s, seatId:%{public}s, seatName:%{public}s, logicWidth:%{public}d, "
+            "logicHeight:%{public}d, direction:%{public}d",
             item.id, item.leftDisplayId, item.upDisplayId,
             item.topLeftX, item.topLeftY, item.width,
             item.height, item.name.c_str(), item.seatId.c_str(),
@@ -233,8 +233,8 @@ void InputManagerImpl::PrintDisplayDebugInfo()
 
         for (const auto &win : item.windowsInfo_) {
             MMI_LOGD("windowid:%{public}d, pid:%{public}d, uid:%{public}d, topLeftX:%{public}d, "
-                "topLeftY:%{public}d, width:%{public}d, height:%{public}d, displayId:%{public}d, agentWindowId:%{public}d, "
-                "winTopLeftX:%{public}d, winTopLeftY:%{public}d",
+                "topLeftY:%{public}d, width:%{public}d, height:%{public}d, displayId:%{public}d, "
+                "agentWindowId:%{public}d, winTopLeftX:%{public}d, winTopLeftY:%{public}d",
                 win.id, win.pid,
                 win.uid, win.topLeftX,
                 win.topLeftY, win.width,
