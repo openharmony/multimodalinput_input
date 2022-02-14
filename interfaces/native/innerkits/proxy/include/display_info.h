@@ -45,17 +45,17 @@ struct WindowInfo {
     // The uid of the process where the window is located
     int32_t uid;
 
-    // The x coordinate of the upper left corner of the window in the logical display
-    int32_t topLeftX;
+    // The x coordinate of the upper left corner of the hot zone window in the logical display
+    int32_t hotZoneTopLeftX;
 
-    // The y coordinate of the upper left corner of the window in the logical display
-    int32_t topLeftY;
+    // The y coordinate of the upper left corner of the hot zone window in the logical display
+    int32_t hotZoneTopLeftY;
 
-    // Logical width of the window
-    int32_t width;
+    // Logical width of the hot zone window
+    int32_t hotZoneWidth;
 
-    // Logical height of the window
-    int32_t height;
+    // Logical height of the hot zone window
+    int32_t hotZoneHeight;
 
     // The logical display id to which the window belongs
     int32_t displayId;
