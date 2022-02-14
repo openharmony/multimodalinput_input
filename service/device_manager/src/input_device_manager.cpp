@@ -182,7 +182,7 @@ void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
 bool InputDeviceManager::IsPointerDevice(libinput_device* device)
 {
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
-    MMI_LOGD("udev tag is%{public}d", static_cast<int32_t>(udevTags));
+    MMI_LOGD("udev tag:%{public}d", static_cast<int32_t>(udevTags));
     return udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK | 
     EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD);
 }
