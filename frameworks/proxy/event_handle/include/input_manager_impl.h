@@ -74,6 +74,6 @@ private:
     InputMonitorManager monitorManager_;
     InputInterceptorManager interceptorManager_;
 };
-}
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 #endif // INPUT_MANAGER_IMPL_H
