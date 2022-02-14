@@ -21,7 +21,7 @@
 #include "iremote_object.h"
 #include "system_ability.h"
 #include "nocopyable.h"
-#include "i_multimodal_input_connect_stub.h"
+#include "multimodal_input_connect_stub.h"
 
 #include "s_input.h"
 #include "uds_server.h"
@@ -37,7 +37,7 @@ namespace OHOS {
 namespace MMI {
 
 enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
-class MMIService : public UDSServer, public SystemAbility, public IMultimodalInputConnectStub {
+class MMIService : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_DELAYED_SINGLETON(MMIService);
     DECLEAR_SYSTEM_ABILITY(MMIService);
 
@@ -53,7 +53,7 @@ public:
 protected:
     virtual void OnConnected(SessionPtr s) override;
     virtual void OnDisconnected(SessionPtr s) override;
-    virtual int32_t HandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) override;
+    virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) override;
 
     virtual int32_t EpollCtlAdd(EpollEventType type, int32_t fd) override;
     bool ChkAuthFd(int32_t fd) const;
