@@ -403,7 +403,7 @@ int32_t RegisterEvent::OnEventTouchDownGetSign(const EventTouch& touch)
     return RET_OK;
 }
 
-int32_t RegisterEvent::OnEventOneFingerHandlerGetSign(TouchInfo& touchUpInfo, MmiMessageId& msgId)
+int32_t RegisterEvent::OnEventOneFingerHandlerGetSign(const TouchInfo& touchUpInfo, MmiMessageId& msgId)
 {
     if (((touchUpInfo.beginX >= MINX) && (touchUpInfo.beginX < MINX + REGION) &&
         (touchUpInfo.endX - touchUpInfo.beginX > MOVEXDISTANCE)) ||
@@ -422,7 +422,7 @@ int32_t RegisterEvent::OnEventOneFingerHandlerGetSign(TouchInfo& touchUpInfo, Mm
     return RET_OK;
 }
 
-int32_t RegisterEvent::OnEventThreeFingerHandlerGetSign(MmiMessageId& msgId, TouchInfo& touchUpInfo)
+int32_t RegisterEvent::OnEventThreeFingerHandlerGetSign(const TouchInfo& touchUpInfo, MmiMessageId& msgId)
 {
     int32_t touchState = 1;
     for (const auto &item : touchInfos_) {
@@ -455,7 +455,7 @@ int32_t RegisterEvent::OnEventTouchUpGetSign(const EventTouch& touch, MmiMessage
     }
 
     if ((GetTouchInfoSizeByDeviceId(touchUpInfo.deviceId) + 1) == THREEFINGER) {
-        return OnEventThreeFingerHandlerGetSign(msgId, touchUpInfo);
+        return OnEventThreeFingerHandlerGetSign(touchUpInfo, msgId);
     }
     if ((GetTouchInfoSizeByDeviceId(touchUpInfo.deviceId) + 1) == ONEFINGER) {
         return OnEventOneFingerHandlerGetSign(touchUpInfo, msgId);
