@@ -16,7 +16,8 @@
 #include "input_handler_manager.h"
 #include "util.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputMonitorManager" };
 }
@@ -39,5 +40,6 @@ void InputMonitorManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
     InputHandlerManager::GetInstance().MarkConsumed(monitorId, eventId);
 }
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 

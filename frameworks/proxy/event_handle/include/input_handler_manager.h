@@ -23,7 +23,8 @@
 #include "i_input_event_consumer.h"
 #include "singleton.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 class InputHandlerManager : public Singleton<OHOS::MMI::InputHandlerManager> {
 public:
     int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer);
@@ -51,6 +52,7 @@ private:
     std::map<int32_t, InputHandler> inputHandlers_;
     int32_t nextId_ { 1 };
 };
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 
 #endif // INPUT_HANDLER_MANAGER_H
