@@ -25,10 +25,10 @@
 
 namespace OHOS {
 namespace MMI {
-class IMultimodalInputConnectStub : public IRemoteStub<IMultimodalInputConnect> {
+class MultimodalInputConnectStub : public IRemoteStub<IMultimodalInputConnect> {
 public:
-    IMultimodalInputConnectStub() = default;
-    ~IMultimodalInputConnectStub() = default;
+    MultimodalInputConnectStub() = default;
+    ~MultimodalInputConnectStub() = default;
 
     int OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& options) override;
 
