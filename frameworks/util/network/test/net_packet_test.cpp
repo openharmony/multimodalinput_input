@@ -143,7 +143,7 @@ HWTEST_F(NetPacketTest, WriteError, TestSize.Level1)
         int32_t xx;
         char szTest[MAX_STREAM_BUF_SIZE];
     };
-    TestData data{333, "test111."};
+    TestData data {333, "test111."};
     NetPacket pkt(MmiMessageId::REGISTER_APP_INFO);
     pkt << p1 << p2;
     EXPECT_FALSE(pkt.ChkError());
