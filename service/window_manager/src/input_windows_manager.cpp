@@ -431,7 +431,7 @@ void OHOS::MMI::InputWindowsManager::TransfromToSurfaceCoordinate(double& x, dou
     if (debug) {
         auto appFd = AppRegs->FindByWinId(info.surfaceId);
         MMI_LOGD("Transfrom touch coordinate. src:[%{public}lf, %{public}lf] focusSurface:%{public}d "
-                 "surface:[%{public}d, %{public}d, %{public}d, %{public}d] dest:[%{public}lf, %{public}lf] "
+                 "info:[%{public}d, %{public}d, %{public}d, %{public}d] dest:[%{public}lf, %{public}lf] "
                  "fd:%{public}d bundler:%{public}s appName:%{public}s",
                  oldX, oldY, info.surfaceId, info.dstX, info.dstY, info.dstW, info.dstH, x, y, appFd.fd,
                  appFd.bundlerName.c_str(), appFd.appName.c_str());
