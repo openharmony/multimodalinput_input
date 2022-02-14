@@ -28,7 +28,7 @@ namespace MMI {
 class IMultimodalInputConnectStub : public IRemoteStub<IMultimodalInputConnect> {
 public:
     IMultimodalInputConnectStub() = default;
-    virtual ~IMultimodalInputConnectStub() = default;
+    ~IMultimodalInputConnectStub() = default;
 
     int OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& options) override;
 
@@ -36,7 +36,7 @@ protected:
     bool IsAuthorizedCalling() const;
     int32_t GetCallingUid() const;
     int32_t GetCallingPid() const;
-    virtual int32_t HandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) = 0;
+    virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) = 0;
     int32_t StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
 
 private:

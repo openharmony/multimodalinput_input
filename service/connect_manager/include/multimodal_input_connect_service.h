@@ -20,7 +20,7 @@
 #include "iremote_object.h"
 #include "system_ability.h"
 #include "nocopyable.h"
-#include "i_multimodal_input_connect_stub.h"
+#include "multimodal_input_connect_stub.h"
 #include "i_uds_server.h"
 
 namespace OHOS {
@@ -39,7 +39,7 @@ public:
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
 
 protected:
-    virtual int32_t HandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) override;
+    virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) override;
 
 private:
     bool Initialize() const;
