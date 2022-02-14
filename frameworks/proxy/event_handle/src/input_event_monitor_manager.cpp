@@ -85,7 +85,7 @@ int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(
     static int32_t monitorId = 0;
     monitorItem.id = ++monitorId;
     monitors_.push_back(monitorItem);
-    MMI_LOGD("monitorId: %{public}d", monitorId);
+    MMI_LOGD("monitorId:%{public}d", monitorId);
     MMIEventHdl.AddInputEventTouchpadMontior(OHOS::MMI::InputEvent::EVENT_TYPE_POINTER);
     MMI_LOGD("leave");
     return monitorItem.id;
@@ -105,7 +105,7 @@ void InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t monitorId
     } else {
         iter = monitors_.erase(iter);
         MMIEventHdl.RemoveInputEventTouchpadMontior(OHOS::MMI::InputEvent::EVENT_TYPE_POINTER);
-        MMI_LOGD("monitorItem id: %{public}d removed", monitorId);
+        MMI_LOGD("monitorItem id:%{public}d removed", monitorId);
     }
 }
 
@@ -120,9 +120,9 @@ int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<OH
     }
     PointerEvent::PointerItem pointer;
     CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL, RET_ERR);
-    MMI_LOGD("monitor-clienteventTouchpad:time=%{public}d;"
-             "sourceType=%{public}d;action=%{public}d;"
-             "pointerId=%{public}d;point.x=%{public}d;point.y=%{public}d;press=%{public}d",
+    MMI_LOGD("monitor-clienteventTouchpad:time::%{public}d, "
+             "sourceType::%{public}d, action::%{public}d, "
+             "pointerId::%{public}d, point.x::%{public}d, point.y::%{public}d, press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     return OHOS::MMI_STANDARD_EVENT_SUCCESS;
