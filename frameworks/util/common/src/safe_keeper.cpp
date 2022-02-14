@@ -18,7 +18,8 @@
 #include "log.h"
 #include "util.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SafeKeeper" };
 }
@@ -84,4 +85,5 @@ void SafeKeeper::ProcessEvents()
         }
     }
 }
-}
+} // namespace MMI
+} // namespace OHOS

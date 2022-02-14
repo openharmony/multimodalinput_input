@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef I_MULTIMODAL_INPUT_CONNECT_STUB_H
-#define I_MULTIMODAL_INPUT_CONNECT_STUB_H
+#ifndef MULTIMODAL_INPUT_CONNECT_STUB_H
+#define MULTIMODAL_INPUT_CONNECT_STUB_H
 
 #include "i_multimodal_input_connect.h"
 #include "log.h"
@@ -25,10 +25,10 @@
 
 namespace OHOS {
 namespace MMI {
-class IMultimodalInputConnectStub : public IRemoteStub<IMultimodalInputConnect> {
+class MultimodalInputConnectStub : public IRemoteStub<IMultimodalInputConnect> {
 public:
-    IMultimodalInputConnectStub() = default;
-    virtual ~IMultimodalInputConnectStub() = default;
+    MultimodalInputConnectStub() = default;
+    ~MultimodalInputConnectStub() = default;
 
     int OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& options) override;
 
@@ -36,7 +36,7 @@ protected:
     bool IsAuthorizedCalling() const;
     int32_t GetCallingUid() const;
     int32_t GetCallingPid() const;
-    virtual int32_t HandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) = 0;
+    virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) = 0;
     int32_t StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
 
 private:
@@ -45,4 +45,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_MULTIMODAL_INPUT_CONNECT_STUB_H
+#endif // MULTIMODAL_INPUT_CONNECT_STUB_H

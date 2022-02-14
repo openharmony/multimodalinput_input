@@ -19,8 +19,6 @@
 #include "error_multimodal.h"
 #include "event_filter_service.h"
 #include "input_event_monitor_manager.h"
-#include "input_monitor_manager.h"
-#include "input_interceptor_manager.h"
 #include "interceptor_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
@@ -124,9 +122,9 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     std::string keyCodestring = "client dispatchKeyCode = " + std::to_string(getKeyCode);
     MMI_LOGT(" OnKeyEvent client trace getKeyCode:%{public}d", getKeyCode);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring);
-    int32_t eventKey = 4;
-    keyCodestring = "KeyEventDispatchAsync";
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
+    int32_t keyId = keyEvent->GetId();
+    keyCodestring = "KeyEventDispatch";
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, keyId);
     if (consumer_ != nullptr) {
         CHKP(keyEvent);
         consumer_->OnInputEvent(keyEvent);
@@ -139,9 +137,18 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
     MMI_LOGD("Pointer event received, processing ...");
-    int32_t eventPointer = 20;
-    std::string pointerCodestring = "PointerEventDispatchAsync";
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerCodestring, eventPointer);
+    int32_t pointerDispatch = 1;
+    int32_t touchDispatch = 2;
+    if (pointerDispatch == pointerEvent->GetSourceType()) {
+        int32_t pointerId = pointerEvent->GetId();
+        std::string pointerEventstring = "PointerEventDispatch";
+        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, pointerId);
+    }
+    if (touchDispatch == pointerEvent->GetSourceType()) {
+        int32_t touchId = pointerEvent->GetId();
+        std::string touchEvent = "touchEventDispatch";
+        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, touchId);
+    }
     if (consumer_ != nullptr) {
         CHKP(pointerEvent);
         MMI_LOGD("Passed on to consumer ...");
@@ -232,13 +239,13 @@ void InputManagerImpl::PrintDisplayDebugInfo()
             item.focusWindowId, static_cast<int32_t>(item.windowsInfo_.size()));
 
         for (const auto &win : item.windowsInfo_) {
-            MMI_LOGD("windowid:%{public}d, pid:%{public}d,uid:%{public}d,topLeftX:%{public}d,"
-                "topLeftY:%{public}d,width:%{public}d,height:%{public}d,displayId:%{public}d,agentWindowId:%{public}d,"
-                "winTopLeftX:%{public}d, winTopLeftY:%{public}d",
+            MMI_LOGD("windowid:%{public}d, pid:%{public}d,uid:%{public}d,hotZoneTopLeftX:%{public}d,"
+                "hotZoneTopLeftY:%{public}d,hotZoneWidth:%{public}d,hotZoneHeight:%{public}d,displayId:%{public}d, "
+                "agentWindowId:%{public}d, winTopLeftX:%{public}d, winTopLeftY:%{public}d",
                 win.id, win.pid,
-                win.uid, win.topLeftX,
-                win.topLeftY, win.width,
-                win.height, win.displayId,
+                win.uid, win.hotZoneTopLeftX,
+                win.hotZoneTopLeftY, win.hotZoneWidth,
+                win.hotZoneHeight, win.displayId,
                 win.agentWindowId,
                 win.winTopLeftX, win.winTopLeftY);
         }
@@ -264,7 +271,7 @@ int32_t InputManagerImpl::AddMontior(std::function<void(std::shared_ptr<PointerE
 int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
 {
     CHKPR(consumer, ERROR_NULL_POINTER);
-    int32_t monitorId = InputMonitorManager::GetInstance().AddMonitor(consumer);
+    int32_t monitorId = monitorManager_.AddMonitor(consumer);
     monitorId = monitorId * ADD_MASK_BASE + MASK_TOUCH;
     return monitorId;
 }
@@ -279,7 +286,7 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
             InputMonitorMgr.RemoveInputEventMontior(monitorId);
             break;
         case MASK_TOUCH:
-            InputMonitorManager::GetInstance().RemoveMonitor(monitorId);
+            monitorManager_.RemoveMonitor(monitorId);
             break;
         case MASK_TOUCHPAD:
             InputMonitorMgr.RemoveInputEventTouchpadMontior(monitorId);
@@ -292,12 +299,12 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 
 void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
-    InputMonitorManager::GetInstance().MarkConsumed(monitorId, eventId);
+    monitorManager_.MarkConsumed(monitorId, eventId);
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
-    int32_t interceptorId = InputInterceptorManager::GetInstance().AddInterceptor(interceptor);
+    int32_t interceptorId = interceptorManager_.AddInterceptor(interceptor);
     if (interceptorId >= 0) {
         interceptorId = interceptorId * ADD_MASK_BASE + MASK_TOUCH;
     }
@@ -333,7 +340,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
     interceptorId /= ADD_MASK_BASE;
     switch (mask) {
         case MASK_TOUCH:
-            InputInterceptorManager::GetInstance().RemoveInterceptor(interceptorId);
+            interceptorManager_.RemoveInterceptor(interceptorId);
             break;
         case MASK_KEY:
             InterceptorMgr.RemoveInterceptor(interceptorId);
