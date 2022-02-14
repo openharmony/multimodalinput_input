@@ -199,13 +199,10 @@ const std::string& GetThreadId()
 void mmi_console_log(bool withoutFileInfo, char *fileName, int lineNo, int level, const std::string &threadName,
                      const char* fmt, ...)
 {
-    struct timeval tv;
+    timeval tv;
     gettimeofday(&tv, nullptr);
-    struct tm* p = localtime(&tv.tv_sec);
-    if (p == nullptr) {
-        printf("call localtime fail. in %s, #%d\n", __func__, __LINE__);
-        return;
-    }
+    tm* p = localtime(&tv.tv_sec);
+    CHKP(p);
     const uint32_t precise = uint32_t(tv.tv_usec / SECONDE_UNIT); // 毫秒
 
     int32_t ret;
@@ -267,7 +264,7 @@ bool LogManager::SemWait(int32_t timeout)
     if (timeout <= 0) {
         return (sem_wait(&semId_) == 0);
     } else {
-        struct timespec ts;
+        timespec ts;
         if (clock_gettime(CLOCK_REALTIME, &ts) == -1) {
             LOGLOG("LogManager::SemWait clock_gettime");
         }
@@ -318,11 +315,8 @@ void LogManager::WriteFile(LogDataPtr pLog)
     }
     // 时间
     char longTime[LOG_MAX_TIME_LEN] = {};
-    struct tm* p = localtime(&pLog->curTime);
-    if (p == nullptr) {
-        LOGLOG("p is nullptr.");
-        return;
-    }
+    tm* p = localtime(&pLog->curTime);
+    CHKP(p);
     int32_t ret = snprintf_s(longTime, sizeof(longTime), LOG_MAX_TIME_LEN, "%02d-%02d-%02d %02d:%02d:%02d.%03d",
                              p->tm_year + AD_1900, p->tm_mon + 1, p->tm_mday, p->tm_hour, p->tm_min, p->tm_sec, pLog->precise);
     if (ret < 0) {
@@ -445,10 +439,10 @@ bool LogManager::OpenFileHandle()
 
 bool LogManager::CreateFile()
 {
-    struct timeval tv;
+    timeval tv;
     gettimeofday(&tv, nullptr);
     fileCreateTime_ = tv.tv_sec;
-    struct tm* p = nullptr;
+    tm* p = nullptr;
     p = localtime(&fileCreateTime_);
     char logFileTime[LOG_MAX_TIME_LEN] = {0};
     int32_t ret = -1;
@@ -673,11 +667,9 @@ bool LogManager::PushLog(LogDataPtr pLog)
 bool LogManager::PushString(const int32_t level, const std::string& file, const int32_t line, const std::string& buf)
 {
     if (buf.empty() || file.empty()) {
-        LOGLOG("LogManager::PushString buf == nullptr or file == nullptr");
+        LOGLOG("LogManager::PushString buf is empty or file is empty");
         return false;
     }
-
-    // 日志限流
     int32_t count = static_cast<int32_t>(logs_.size());
     if (count > LOG_QUEUE_LIMIT_SIZE) {
         int32_t rate = (count - LOG_QUEUE_LIMIT_SIZE) * PERCENT / LOG_QUEUE_LIMIT_SIZE;
@@ -696,7 +688,7 @@ bool LogManager::PushString(const int32_t level, const std::string& file, const 
         return false;
     }
 
-    struct timeval tv;
+    timeval tv;
     gettimeofday(&tv, nullptr);
 
     pLog->curTime = tv.tv_sec;

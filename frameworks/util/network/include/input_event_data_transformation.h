@@ -28,9 +28,9 @@ public:
     static int32_t KeyEventToNetPacket(const std::shared_ptr<KeyEvent> key, NetPacket &packet);
     static int32_t NetPacketToKeyEvent(bool skipId, std::shared_ptr<KeyEvent> key, NetPacket &packet);
     static int32_t SerializeInputEvent(std::shared_ptr<InputEvent> event, NetPacket &packet);
-    static int32_t DeserializeInputEvent(bool skipId, std::shared_ptr<InputEvent> event, NetPacket &packet);
-    static int32_t SerializePointerEvent(std::shared_ptr<PointerEvent> event, NetPacket &packet);
-    static int32_t DeserializePointerEvent(bool skipId, std::shared_ptr<PointerEvent> event, NetPacket &packet);
+    static int32_t DeserializeInputEvent(std::shared_ptr<InputEvent> event, NetPacket &packet);
+    static int32_t Marshalling(std::shared_ptr<PointerEvent> event, NetPacket &packet);
+    static int32_t Unmarshalling(std::shared_ptr<PointerEvent> event, NetPacket &packet);
     static int32_t DeserializePointerItem(PointerEvent::PointerItem &item, NetPacket &packet);
 };
 }

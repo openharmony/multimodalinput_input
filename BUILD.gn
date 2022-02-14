@@ -24,15 +24,12 @@ ohos_prebuilt_etc("mmi_uinput.rc") {
 
 ## Install mmi_uinput.rc to /system/etc/init/mmi_uinput.rc }}}
 
-## Install multimodalinput.rc to /system/etc/init/multimodalinput.rc {{{
 ohos_prebuilt_etc("multimodalinput.rc") {
   source = "multimodalinput.cfg"
   relative_install_dir = "init"
   part_name = "multimodalinput_base"
   subsystem_name = "multimodalinput"
 }
-
-## Install multimodalinput.rc to /system/etc/init/multimodalinput.rc }}}
 
 HDF_FWKS = "//drivers/framework"
 ohos_executable("uinput_inject") {
@@ -122,10 +119,10 @@ group("multimodalinput_mmi_packages") {
     "examples/hosmmi:hosmmi-event-injection",
     "examples/hosmmi:hosmmi-server",
     "examples/hosmmi:hosmmi-virtual-device-manager",
-    "frameworks/napi/input_consumer:libinputconsumer",
-    "frameworks/napi/input_device:libinputdevice",
-    "frameworks/napi/input_event_client:libinputeventclient",
-    "frameworks/napi/input_monitor:libinputmonitor",
+    "frameworks/napi/input_consumer:inputconsumer",
+    "frameworks/napi/input_device:inputdevice",
+    "frameworks/napi/input_event_client:inputeventclient",
+    "frameworks/napi/input_monitor:inputmonitor",
     "frameworks/proxy:libmmi-client",
     "frameworks/util:libmmi-util",
     "service:libmmi-server",

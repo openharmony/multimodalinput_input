@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_GET_DEVICE_OBJECT_H
-#define OHOS_GET_DEVICE_OBJECT_H
+#ifndef GET_DEVICE_OBJECT_H
+#define GET_DEVICE_OBJECT_H
 
 #include "device_base.h"
 #include "processing_finger_device.h"
@@ -35,4 +35,4 @@ public:
 };
 }
 }
-#endif
+#endif // GET_DEVICE_OBJECT_H

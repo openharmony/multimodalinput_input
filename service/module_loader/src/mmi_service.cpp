@@ -47,12 +47,8 @@ template<class ...Ts>
 void CheckDefineOutput(const char* fmt, Ts... args)
 {
     using namespace OHOS::MMI;
-    if (fmt == nullptr) {
-        KMSG_LOGE("in ChkConfigOutput, fmt is nullptr");
-        return;
-    }
+    CHKP(fmt);
     int32_t ret = 0;
-
     char buf[MAX_STREAM_BUF_SIZE] = {};
     ret = snprintf_s(buf, MAX_STREAM_BUF_SIZE, MAX_STREAM_BUF_SIZE - 1, fmt, args...);
     if (ret < 0) {
@@ -255,7 +251,7 @@ void MMIService::OnDump()
 
 void MMIService::OnConnected(SessionPtr s)
 {
-    CHK(s, ERROR_NULL_POINTER);
+    CHKP(s);
     int32_t fd = s->GetFd();
     MMI_LOGI("MMIService::_OnConnected fd:%{public}d", fd);
     AppRegs->RegisterConnectState(fd);
@@ -263,7 +259,7 @@ void MMIService::OnConnected(SessionPtr s)
 
 void MMIService::OnDisconnected(SessionPtr s)
 {
-    CHK(s, ERROR_NULL_POINTER);
+    CHKP(s);
     MMI_LOGW("MMIService::OnDisconnected enter, session desc:%{public}s", s->GetDescript().c_str());
     int32_t fd = s->GetFd();
 
@@ -303,7 +299,6 @@ int32_t MMIService::HandleAllocSocketFd(MessageParcel& data, MessageParcel& repl
         MMI_LOGE("read data error.");
         return RET_ERR;
     }
-
     MMI_LOGIK("clientName = %{public}s, moduleId = %{public}d", req->data.clientName.c_str(), req->data.moduleId);
     if (!IsAuthorizedCalling()) {
         MMI_LOGE("permission denied");
@@ -337,7 +332,6 @@ int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
         MMI_LOGE("inputEventHdr_ is nullptr");
         return ERROR_NULL_POINTER;
     }
-
     return inputEventHdr_->AddInputEventFilter(filter);
 }
 
@@ -346,7 +340,6 @@ void MMIService::OnTimer()
     if (inputEventHdr_ != nullptr) {
         inputEventHdr_->OnCheckEventReport();
     }
-
     TimerMgr->ProcessTimers();
 }
 
@@ -367,7 +360,7 @@ void MMIService::OnThread()
         count = EpollWait(ev[0], MAX_EVENT_SIZE, timeOut, mmiFd_);
         for (int i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
-            CHKC(mmiEd, ERROR_NULL_POINTER);
+            CHKPC(mmiEd, ERROR_NULL_POINTER);
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 input_.EventDispatch(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
@@ -429,9 +422,9 @@ bool MMIService::InitSignalHandler()
 void MMIService::OnSignalEvent(int32_t signalFd)
 {
     MMI_LOGD("enter");
-    struct signalfd_siginfo sigInfo;
-    int32_t size = ::read(signalFd, &sigInfo, sizeof(struct signalfd_siginfo));
-    if (size != sizeof(struct signalfd_siginfo)) {
+    signalfd_siginfo sigInfo;
+    int32_t size = ::read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
+    if (size != sizeof(signalfd_siginfo)) {
         MMI_LOGE("read signal info faild, invalid size:%{public}d", size);
         return;
     }

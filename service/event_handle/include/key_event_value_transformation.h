@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_KEY_EVENT_VALUE_TRANSFORMATION_H
-#define OHOS_KEY_EVENT_VALUE_TRANSFORMATION_H
+#ifndef KEY_EVENT_VALUE_TRANSFORMATION_H
+#define KEY_EVENT_VALUE_TRANSFORMATION_H
 
 #include <string>
 #include <map>
@@ -48,9 +48,9 @@ public:
     uint32_t KeyboardHandleKeySym(uint32_t keyboardKey);
 
 private:
-    struct xkb_state *state_ = nullptr;
+    xkb_state *state_ = nullptr;
 };
 }
 }
 
-#endif
+#endif // KEY_EVENT_VALUE_TRANSFORMATION_H

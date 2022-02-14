@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_INPUT_MANAGER_H
-#define OHOS_MULTIMDOALINPUT_INPUT_MANAGER_H
+#ifndef INPUT_MANAGER_H
+#define INPUT_MANAGER_H
 
 #include <memory>
 #include <list>
@@ -23,7 +23,6 @@
 #include "i_input_event_consumer.h"
 #include "error_multimodal.h"
 #include "key_option.h"
-#include "input_device_event.h"
 
 namespace OHOS {
 namespace MMI {
@@ -188,4 +187,4 @@ private:
 };
 }
 } // namespace OHOS::MMI
-#endif // OHOS_MULTIMDOALINPUT_INPUT_MANAGER_H
+#endif // INPUT_MANAGER_H

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MSG_HEAD_H
-#define OHOS_MSG_HEAD_H
+#ifndef MSG_HEAD_H
+#define MSG_HEAD_H
 
 #include <ctime>
 #include <sys/types.h>
@@ -94,4 +94,4 @@ struct InputEventArray {
 
 typedef std::function<void(void)> HandleInjectCommandItemsFuncType;
 typedef std::function<int32_t (const InputEvent& inputEvent)> WriteDeviceFun;
-#endif
+#endif // MSG_HEAD_H

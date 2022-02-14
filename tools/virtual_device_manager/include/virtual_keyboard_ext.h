@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_VIRTUAL_KEYBOARD_EXT_H
-#define OHOS_VIRTUAL_KEYBOARD_EXT_H
+#ifndef VIRTUAL_KEYBOARD_EXT_H
+#define VIRTUAL_KEYBOARD_EXT_H
 
 #include "virtual_device.h"
 
@@ -32,4 +32,4 @@ protected:
 };
 }
 }
-#endif
+#endif // VIRTUAL_KEYBOARD_EXT_H

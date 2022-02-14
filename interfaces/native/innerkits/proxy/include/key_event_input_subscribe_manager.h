@@ -73,4 +73,4 @@ private:
 
 #define KeyEventInputSubscribeMgr OHOS::MMI::KeyEventInputSubscribeManager::GetInstance()
 
-#endif  // KEY_EVENT_INPUT_SUBSCRIBE_MANAGER_H_
+#endif  // KEY_EVENT_INPUT_SUBSCRIBE_MANAGER_H

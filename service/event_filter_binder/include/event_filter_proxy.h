@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_POINTER_EVENT_FILTER_PROXY_H
-#define OHOS_POINTER_EVENT_FILTER_PROXY_H
+#ifndef EVENT_FILTER_PROXY_H
+#define EVENT_FILTER_PROXY_H
 
 #include "i_event_filter.h"
 #include "iremote_proxy.h"
@@ -32,4 +32,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // OHOS_POINTER_EVENT_FILTER_PROXY_H
+#endif // EVENT_FILTER_PROXY_H

@@ -64,7 +64,7 @@ void InputMonitor::SetCallback(std::function<void(std::shared_ptr<PointerEvent>)
 void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
     MMI_LOGD("Enter");
-    //CHKF(pointerEvent != nullptr, ERROR_NULL_POINTER);
+    CHKP(pointerEvent);
     if (!JSIMM.GetMonitor(id_)) {
         MMI_LOGE("failed to process pointer event, id:%{public}d", id_);
         return;
@@ -81,10 +81,7 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
         }
         callback = callback_;
     }
-    if (!callback) {
-        MMI_LOGE("callback is null");
-        return;
-    }
+    CHKP(callback);
     callback(pointerEvent);
     MMI_LOGD("Leave");
 }
@@ -120,10 +117,7 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, napi_value receiver, int32_t id)
     if (monitor_ != nullptr) {
         monitor_->SetCallback([jsId=id](std::shared_ptr<PointerEvent> pointerEvent) {
             auto jsMonitor = JSIMM.GetMonitor(jsId);
-            if (jsMonitor == nullptr) {
-                MMI_LOGE("failed to get js monitor");
-                return;
-            }
+            CHKP(jsMonitor);
            jsMonitor->OnPointerEvent(pointerEvent);
         });
         monitor_->SetId(id_);
@@ -137,7 +131,6 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, napi_value receiver, int32_t id)
 
 void JsInputMonitor::SetReceiver(napi_value receiver)
 {
-    CHK(receiver != nullptr, ERROR_NULL_POINTER);
     if (receiver_ == nullptr && jsEnv_ != nullptr) {
         uint32_t refCount = 1;
         auto status = napi_create_reference(jsEnv_, receiver, refCount, &receiver_);
@@ -150,16 +143,13 @@ void JsInputMonitor::SetReceiver(napi_value receiver)
 
 void JsInputMonitor::MarkConsumed(int32_t eventId)
 {
-    if (monitor_ == nullptr) {
-        MMI_LOGE("monitor_ is null");
-        return;
-    }
+    CHKP(monitor_);
     monitor_->MarkConsumed(eventId);
 }
 
 int32_t JsInputMonitor::IsMatch(napi_env jsEnv, napi_value receiver)
 {
-    CHKR(receiver != nullptr, ERROR_NULL_POINTER, NAPI_ERR);
+    CHKPR(receiver, ERROR_NULL_POINTER);
     if (jsEnv_ == jsEnv) {
         bool isEquals = false;
         napi_value handlerTemp = nullptr;
@@ -192,7 +182,7 @@ int32_t JsInputMonitor::IsMatch(napi_env jsEnv)
 
 void JsInputMonitor::printfPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    CHK(pointerEvent != nullptr, ERROR_NULL_POINTER);
+    CHKP(pointerEvent);
     PointerEvent::PointerItem item;
     CHK(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item), PARAM_INPUT_FAIL);
     MMI_LOGD("type:%{public}d, timestamp:%{public}d, deviceId:%{public}d,\
@@ -220,7 +210,7 @@ std::string JsInputMonitor::GetAction(int32_t action)
 
 int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
-    CHKR(pointerEvent != nullptr, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     CHKR(SetNameProperty(jsEnv_, result, "type", GetAction(pointerEvent->GetPointerAction())) == napi_ok,
         CALL_NAPI_API_ERR, RET_ERR);
 
@@ -235,7 +225,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
     std::vector<PointerEvent::PointerItem> pointerItems;
     for (auto &item : pointerEvent->GetPointersIdList()) {
         PointerEvent::PointerItem pointerItem;
-        pointerEvent->GetPointerItem(item, pointerItem);
+        CHKR(pointerEvent->GetPointerItem(item, pointerItem), PARAM_INPUT_FAIL, RET_ERR);
         pointerItems.push_back(pointerItem);
     }
     uint32_t index = 0;
@@ -301,7 +291,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
 
 bool JsInputMonitor::Start() {
     MMI_LOGD("Enter");
-    CHKPF(monitor_, OHOS::ERROR_NULL_POINTER);
+    CHKPF(monitor_);
     if (isMonitoring_) {
         MMI_LOGW("js is monitoring");
         return true;
@@ -377,10 +367,7 @@ void JsInputMonitor::JsCallback(uv_work_t *work, int32_t status)
     delete work;
     work = nullptr;
     auto jsMonitor = JSIMM.GetMonitor(*id);
-    if (jsMonitor == nullptr) {
-        id = nullptr;
-        return;
-    }
+    CHKP(jsMonitor);
     jsMonitor->OnPointerEventInJsThread();
     id = nullptr;
     MMI_LOGD("Leave");
@@ -393,10 +380,8 @@ void JsInputMonitor::OnPointerEventInJsThread()
         MMI_LOGE("js monitor stop");
         return;
     }
-    if (jsEnv_ == nullptr || receiver_ == nullptr) {
-        MMI_LOGE("jsEnv_ or receiver_ is null");
-        return;
-    }
+    CHKP(jsEnv_);
+    CHKP(receiver_);
     std::lock_guard<std::mutex> guard(mutex_);
     napi_handle_scope scope = nullptr;
     while (!evQueue_.empty()) {
@@ -406,9 +391,7 @@ void JsInputMonitor::OnPointerEventInJsThread()
         }
         auto pointerEvent = evQueue_.front();
         evQueue_.pop();
-        if (pointerEvent == nullptr) {
-            continue;
-        }
+        CHKPC(pointerEvent);
         auto status = napi_open_handle_scope(jsEnv_, &scope);
         if (status != napi_ok) {
             break;

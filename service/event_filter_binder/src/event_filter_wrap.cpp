@@ -37,7 +37,6 @@ int32_t EventFilterWrap::AddInputEventFilter(sptr<IEventFilter> filter)
     MMI_LOGT("enter");
     std::lock_guard<std::mutex> guard(lockInputEventFilter_);
     filter_ = filter;
-
     MMI_LOGT("leave");
     return RET_OK;
 }
@@ -46,16 +45,11 @@ bool EventFilterWrap::HandlePointerEventFilter(std::shared_ptr<PointerEvent> poi
 {
     MMI_LOGT("enter");
     std::lock_guard<std::mutex> guard(lockInputEventFilter_);
-    if (filter_ == nullptr) {
-        MMI_LOGD("filter_ is nullptr");
-        return false;
-    }
-
+    CHKPF(filter_);
     if (filter_->HandlePointerEvent(point)) {
         MMI_LOGD("call HandlePointerEvent return true");
         return true;
     }
-    
     MMI_LOGT("leave");
     return false;
 }

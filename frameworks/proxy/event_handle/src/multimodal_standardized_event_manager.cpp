@@ -62,7 +62,7 @@ int32_t MultimodalStandardizedEventManager::RegisterStandardizedEventHandle(cons
         return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
     registerEvents_.insert(registerhandle);
-    struct StandEventCallBack StandEventInfo = {};
+    StandEventCallBack StandEventInfo = {};
     StandEventInfo.windowId = windowId;
     StandEventInfo.eventCallBack = standardizedEventHandle;
     mapEvents_.insert(std::make_pair(messageId, StandEventInfo));
@@ -121,12 +121,6 @@ int32_t MultimodalStandardizedEventManager::SubscribeKeyEvent(
     uint32_t preKeySize = keyOption->GetPreKeys().size();
     pkt << subscribeInfo.GetSubscribeId() << keyOption->GetFinalKey() << keyOption->IsFinalKeyDown()
     << keyOption->GetFinalKeyDownDuration() << preKeySize;
-    int32_t keySubscibeId = subscribeInfo.GetSubscribeId();
-
-    std::string keySubscribeIdstring = "SubscribeKeyEvent client subscribeKeyId: " + std::to_string(keySubscibeId);
-    MMI_LOGD(" SubscribeKeyEvent client trace subscribeKeyId = %{public}d", keySubscibeId);
-    int32_t eventKey = 1;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keySubscribeIdstring, eventKey);
 
     std::vector<int32_t> preKeys = keyOption->GetPreKeys();
     for (const auto &item : preKeys) {
@@ -178,19 +172,9 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEven
     return RET_OK;
 }
 
-void OHOS::MMI::MultimodalStandardizedEventManager::OnTouchTrace(const TouchEvent& event)
-{
-    std::string touchEvent = "OnTouch touchUuid: " + event.GetUuid();
-    char *tmpTouch = (char*)touchEvent.c_str();
-    MMI_LOGT("OnTouch touchUuid = %{public}s", tmpTouch);
-    int32_t eventTouch = 9;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
-}
-
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnTouch(const TouchEvent& event)
 {
     MMI_LOGT("MultimodalStandardizedEventManagertouch::OnTouch");
-    OnTouchTrace(event);
     auto range = mapEvents_.equal_range(MmiMessageId::TOUCH_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.windowId == event.GetWindowID() && i->second.eventCallBack->OnTouch(event) == false) {
@@ -683,10 +667,7 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const OHOS::MMI::KeyEven
 int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr)
 {
     MMI_LOGD("InjectEvent begin");
-    if (keyEventPtr == nullptr) {
-        MMI_LOGE("KeyEventPtr is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(keyEventPtr, ERROR_NULL_POINTER);
     keyEventPtr->UpdateId();
     if (keyEventPtr->GetKeyCode() < 0) {
         MMI_LOGE("keyCode is invalid %{public}u", keyEventPtr->GetKeyCode());
@@ -703,19 +684,18 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<OH
 
 int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Inject pointer event ...");
-    CHKR(pointerEvent, ERROR_NULL_POINTER, RET_ERR);
-    pointerEvent->UpdateId();
+    MMI_LOGD("Inject pointer event.");
+    CHKPR(pointerEvent, RET_ERR);
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
-    MMI_LOGD("pointer event dispatcher of client:eventType=%{public}d,actionTime=%{public}d,"
+    MMI_LOGD("pointer event dispatcher of client:eventType=%{public}s,actionTime=%{public}d,"
              "action=%{public}d,actionStartTime=%{public}d,"
-             "flag=%{public}d,pointerAction=%{public}d,sourceType=%{public}d,"
-             "VerticalAxisValue=%{public}.2f,HorizontalAxisValue=%{public}.2f,"
+             "flag=%{public}d,pointerAction=%{public}s,sourceType=%{public}s,"
+             "VerticalAxisValue=%{public}f,HorizontalAxisValue=%{public}f,"
              "pointerCount=%{public}d",
-             pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
+             pointerEvent->DumpEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
-             pointerEvent->GetFlag(), pointerEvent->GetPointerAction(),
-             pointerEvent->GetSourceType(),
+             pointerEvent->GetFlag(), pointerEvent->DumpPointerAction(),
+             pointerEvent->DumpSourceType(),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
              static_cast<int32_t>(pointerIds.size()));
@@ -731,40 +711,35 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
                  item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
                  item.GetWidth(), item.GetHeight(), item.GetPressure());
     }
-
     std::vector<int32_t> pressedKeys = pointerEvent->GetPressedKeys();
-    if (pressedKeys.empty()) {
-        MMI_LOGI("Pressed keys is empty");
-    } else {
-        for (auto &keyCode : pressedKeys) {
-            MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
-        }
+    for (auto &keyCode : pressedKeys) {
+        MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
     }
     OHOS::MMI::NetPacket netPkt(MmiMessageId::INJECT_POINTER_EVENT);
-    CHKR((RET_OK == InputEventDataTransformation::SerializePointerEvent(pointerEvent, netPkt)),
+    CHKR((RET_OK == InputEventDataTransformation::Marshalling(pointerEvent, netPkt)),
         STREAM_BUF_WRITE_FAIL, RET_ERR);
     MMI_LOGD("Pointer event packaged, send to server!");
     CHKR(SendMsg(netPkt), MSG_SEND_FAIL, RET_ERR);
     return RET_OK;
 }
 
-int32_t MultimodalStandardizedEventManager::GetDeviceIds(int32_t taskId)
+int32_t MultimodalStandardizedEventManager::GetDeviceIds(int32_t userData)
 {
-    OHOS::MMI::NetPacket ckv(MmiMessageId::INPUT_DEVICE_IDS);
-    ckv << taskId;
-    return SendMsg(ckv);
+    OHOS::MMI::NetPacket pkt(MmiMessageId::INPUT_DEVICE_IDS);
+    pkt << userData;
+    return SendMsg(pkt);
 }
 
-int32_t MultimodalStandardizedEventManager::GetDevice(int32_t taskId, int32_t deviceId)
+int32_t MultimodalStandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId)
 {
-    OHOS::MMI::NetPacket ckv(MmiMessageId::INPUT_DEVICE);
-    ckv << taskId << deviceId;
-    return SendMsg(ckv);
+    OHOS::MMI::NetPacket pkt(MmiMessageId::INPUT_DEVICE);
+    pkt << userData << deviceId;
+    return SendMsg(pkt);
 }
 
 bool MultimodalStandardizedEventManager::SendMsg(NetPacket& pkt) const
 {
-    CHKF(client_, ERROR_NULL_POINTER);
+    CHKPF(client_);
     return client_->SendMessage(pkt);
 }
 

@@ -63,13 +63,12 @@ int32_t SendMessage::SendToHdi(const InputEventArray& inputEventArray)
         return RET_ERR;
     }
     RawInputEvent speechEvent = {};
-    for (InjectEvent event : inputEventArray.events) {
-        TransitionHdiEvent(event.event, speechEvent);
+    for (const auto &item : inputEventArray.events) {
+        TransitionHdiEvent(item.event, speechEvent);
         SendToHdi(devIndex, speechEvent);
-        int32_t blockTime = (event.blockTime == 0) ? INJECT_SLEEP_TIMES : event.blockTime;
+        int32_t blockTime = (item.blockTime == 0) ? INJECT_SLEEP_TIMES : item.blockTime;
         std::this_thread::sleep_for(std::chrono::milliseconds(blockTime));
     }
-
     return RET_OK;
 }
 

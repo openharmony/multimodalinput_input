@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_EVENT_FILTER_WRAP_H
-#define OHOS_EVENT_FILTER_WRAP_H
+#ifndef EVENT_FILTER_WRAP_H
+#define EVENT_FILTER_WRAP_H
 
 #include <mutex>
 #include "i_event_filter.h"
@@ -34,4 +34,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // OHOS_EVENT_FILTER_WRAP_H
+#endif // EVENT_FILTER_WRAP_H

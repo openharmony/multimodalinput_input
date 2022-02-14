@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_HOS_KEY_EVENT_H
-#define OHOS_HOS_KEY_EVENT_H
+#ifndef HOS_KEY_EVENT_H
+#define HOS_KEY_EVENT_H
 #include "libmmi_util.h"
 
 namespace OHOS {
@@ -1677,4 +1677,4 @@ enum TouchEnum {
     HOS_BUTTON_TOOL_QUINTTAP = 2515,
 };
 }
-#endif
+#endif // HOS_KEY_EVENT_H

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_VIRTUAL_DEVICE_H
-#define OHOS_VIRTUAL_DEVICE_H
+#ifndef VIRTUAL_DEVICE_H
+#define VIRTUAL_DEVICE_H
 
 #include "virtual_device_config.h"
 
@@ -56,10 +56,10 @@ protected:
     const uint16_t vendorId_;
     const uint16_t productId_;
     const uint16_t version_;
-    struct uinput_user_dev dev_ {};
-    struct uinput_abs_setup absTemp_ = {};
+    uinput_user_dev dev_ {};
+    uinput_abs_setup absTemp_ = {};
     std::vector<uinput_abs_setup> absInit_;
 };
 }
 }
-#endif  // OHOS_VIRTUAL_DEVICE_H
+#endif  // VIRTUAL_DEVICE_H

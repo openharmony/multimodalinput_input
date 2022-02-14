@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_KEY_EVENTS_HANDLER_H
-#define OHOS_KEY_EVENTS_HANDLER_H
+#ifndef KEY_EVENT_HANDLER_H
+#define KEY_EVENT_HANDLER_H
 #include "standardized_event_handler.h"
 
 namespace OHOS {
@@ -26,4 +26,4 @@ public:
 };
 }
 }
-#endif
+#endif // KEY_EVENT_HANDLER_H

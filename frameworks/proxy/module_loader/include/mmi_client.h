@@ -17,7 +17,6 @@
 
 #include "client_msg_handler.h"
 #include "if_mmi_client.h"
-#include "auto_test_multimodal.h"
 
 namespace OHOS::MMI {
 class MMIClient : public UDSClient, public IfMMIClient, public std::enable_shared_from_this<IfMMIClient> {
@@ -32,7 +31,7 @@ public:
     bool Start(IClientMsgHandlerPtr msgHdl, bool detachMode) override;
     void RegisterConnectedFunction(ConnectCallback fun) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
-    void VirtualKeyIn(struct RawInputEvent virtualKeyEvent);
+    void VirtualKeyIn(RawInputEvent virtualKeyEvent);
     void ReplyMessageToServer(MmiMessageId idMsg, uint64_t clientTime, uint64_t endTime) const;
 
     void SdkGetMultimodeInputInfo();
