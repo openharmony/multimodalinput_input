@@ -324,7 +324,6 @@ void InputManagerTest::TestMarkConsumedStep6()
 
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.Level1)
 {
-    RunShellUtil runCommand;
     std::string command = "Inject keyCode = 2,action = 2";
     std::vector<std::string> slogs {SearchForLog(command, true)};
     int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
@@ -368,6 +367,8 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_002, TestSize.L
 
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.Level1)
 {
+    std::string command = "Inject keyCode:2, action:2";
+    std::vector<std::string> slogs {SearchForLog(command, true)};
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create(); 
     int32_t downTime = 0;
     OHOS::MMI::KeyEvent::KeyItem kitDown;
@@ -388,6 +389,8 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.L
     injectUpEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
     InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
+    std::vector<std::string> tlogs {SearchForLog(command, slogs)};
+    EXPECT_TRUE(!tlogs.empty());
 }
 
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_004, TestSize.Level1)
@@ -408,6 +411,8 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_004, TestSize.L
 
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.Level1)
 {
+    std::string command = "Inject keyCode:0, action:2";
+    std::vector<std::string> slogs {SearchForLog(command, true)};
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create(); 
     int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
     OHOS::MMI::KeyEvent::KeyItem kitDown;
@@ -434,6 +439,8 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.L
     injectUpEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
     InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
+    std::vector<std::string> tlogs {SearchForLog(command, slogs)};
+    EXPECT_TRUE(!tlogs.empty());
 }
 
 HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, TestSize.Level1)
