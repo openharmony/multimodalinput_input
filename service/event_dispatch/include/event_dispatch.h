@@ -24,7 +24,8 @@
 #include "pointer_event.h"
 #include "i_event_filter.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 class EventDispatch : public std::enable_shared_from_this<EventDispatch> {
 public:
     EventDispatch();
@@ -74,5 +75,6 @@ private:
     const size_t windowCount_ = 2;
 #endif
     };
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // EVENT_DISPATCH_H

@@ -140,7 +140,7 @@ struct LogicalDisplayInfo {
     // List of window information arranged in Z order, with the top window at the top
     std::vector<WindowInfo> windowsInfo_;
 };
-}
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 
 #endif // DISPLAY_INFO_H

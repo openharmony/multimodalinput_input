@@ -18,7 +18,8 @@
 #include <functional>
 #include "if_client_msg_handler.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 class NetPacket;
 class IfMMIClient;
 typedef std::function<void(const IfMMIClient&)> ConnectCallback;
@@ -31,5 +32,6 @@ public:
     virtual void RegisterDisconnectedFunction(ConnectCallback fun) = 0;
 };
 using MMIClientPtr = std::shared_ptr<IfMMIClient>;
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // IF_MMI_CLIENT_H
