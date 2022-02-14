@@ -79,8 +79,8 @@ protected:
     int32_t OnEventGestureEndGetSign(const EventGesture& gesture, MmiMessageId& msgId);
     int32_t OnEventGestureUpdateGetSign(const EventGesture& gesture, MmiMessageId& msgId);
     int32_t OnEventGestureBeginGetSign(const EventGesture& gesture);
-    int32_t OnEventOneFingerHandlerGetSign(MmiMessageId& msgId, TouchInfo& touchUpInfo);
-    int32_t OnEventThreeFingerHandlerGetSign(MmiMessageId& msgId, TouchInfo& touchUpInfo);
+    int32_t OnEventOneFingerHandlerGetSign(const TouchInfo& touchUpInfo, MmiMessageId& msgId);
+    int32_t OnEventThreeFingerHandlerGetSign(const TouchInfo& touchUpInfo, MmiMessageId& msgId);
     int32_t OnEventTouchDownGetSign(const EventTouch& touch);
     int32_t OnEventTouchMotionGetSign(const EventTouch& touch, MmiMessageId& msgId);
     int32_t OnEventTouchUpGetSign(const EventTouch& touch, MmiMessageId& msgId);

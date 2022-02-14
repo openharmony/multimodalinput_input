@@ -21,7 +21,8 @@
 #include <sys/un.h>
 #include <unistd.h>
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
 }
@@ -125,4 +126,5 @@ void UDSSession::ClearEventsVct()
 {
     std::vector<EventTime>().swap(events_);
 }
-}
+} // namespace MMI
+} // namespace OHOS

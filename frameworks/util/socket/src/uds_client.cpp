@@ -17,7 +17,8 @@
 #include <inttypes.h>
 #include "util.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSClient" };
 }
@@ -226,4 +227,5 @@ void UDSClient::SetToExit()
 {
     isToExit_ = true;
 }
-}
+} // namespace MMI
+} // namespace OHOS

@@ -55,23 +55,12 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<OHOS::M
         "keyOption->isFinalKeyDown=%{public}s,keyOption->finalKeyDownDuriation=%{public}d",
         subscribeInfo.GetSubscribeId(), keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
-
-    int32_t eventKey = 3;
-    std::string keyEvent = "SubscribeKeyEventAsync";
-    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
-    int32_t keySubscibeId = subscribeInfo.GetSubscribeId();
-    std::string keySubscribeIdstring = "client subscribeKeyId = " + std::to_string(keySubscibeId);
-    StartTrace(BYTRACE_TAG_MULTIMODALINPUT, keySubscribeIdstring, eventKey);
-
     if (EventManager.SubscribeKeyEvent(subscribeInfo) != RET_OK) {
         MMI_LOGE("Leave, subscribe key event failed");
         return INVALID_SUBSCRIBE_ID;
     }
     subscribeInfos_.push_back(subscribeInfo);
     MMI_LOGT("Leave");
-    FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
-    ++eventKey;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
     return subscribeInfo.GetSubscribeId();
 }
 
@@ -106,6 +95,9 @@ int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
 int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_ptr<KeyEvent> event, int32_t subscribeId)
 {
     MMI_LOGT("Enter");
+    int32_t keyId = event->GetId();
+    std::string keyEventString = "keyEventSubscribe";
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
     if (subscribeId < 0) {
         MMI_LOGE("Leave, the subscribe id is less than 0");
         return RET_ERR;

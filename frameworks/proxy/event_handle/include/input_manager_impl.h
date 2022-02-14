@@ -25,6 +25,8 @@
 #include "net_packet.h"
 #include "if_client_msg_handler.h"
 #include "event_filter_service.h"
+#include "input_monitor_manager.h"
+#include "input_interceptor_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -69,6 +71,8 @@ private:
     std::shared_ptr<OHOS::MMI::IInputEventConsumer> consumer_;
     std::vector<PhysicalDisplayInfo> physicalDisplays_;
     std::vector<LogicalDisplayInfo> logicalDisplays_;
+    InputMonitorManager monitorManager_;
+    InputInterceptorManager interceptorManager_;
 };
 } // namespace MMI
 } // namespace OHOS

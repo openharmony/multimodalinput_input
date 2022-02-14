@@ -185,6 +185,6 @@ private:
     InputManager() = default;
     static InputManager *mInstance_;
 };
-}
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 #endif // INPUT_MANAGER_H

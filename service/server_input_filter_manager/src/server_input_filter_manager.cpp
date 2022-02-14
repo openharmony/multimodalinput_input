@@ -15,7 +15,6 @@
 
 #include "server_input_filter_manager.h"
 #include <cinttypes>
-#include "bytrace.h"
 #include "input_event_data_transformation.h"
 #include "mmi_server.h"
 namespace OHOS::MMI {
@@ -171,7 +170,8 @@ void ServerInputFilterManager::TouchEventFilter::SetAuthority(Authority authorit
 }
 
 void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& touch,
-    POINT_EVENT_TYPE& pointEventType, const int32_t fingerCount)
+                                                             const int32_t fingerCount,
+                                                             POINT_EVENT_TYPE& pointEventType)
 {
     CHK(fingerCount > 0, PARAM_INPUT_INVALID);
     CHK(touch.time > 0, PARAM_INPUT_INVALID);
@@ -219,7 +219,7 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
 }
 
 bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
-    EventTouch& touch, const uint64_t preHandlerTime)
+    const EventTouch& touch, const uint64_t preHandlerTime)
 {
     CHKPF(event);
     MMI_LOGD("Enter");
@@ -268,7 +268,7 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
         }
         newPacket << fingerCount;
         POINT_EVENT_TYPE pointEventType = EVENT_TYPE_INVALID;
-        OnEventTouchGetPointEventType(touch, pointEventType, fingerCount);
+        OnEventTouchGetPointEventType(touch, fingerCount, pointEventType);
         int32_t eventType = pointEventType;
         newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime;
 

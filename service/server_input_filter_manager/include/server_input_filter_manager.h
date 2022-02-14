@@ -64,7 +64,7 @@ public:
         std::string name_;
         Authority authority_;
     };
-    bool OnTouchEvent(libinput_event *event, EventTouch& touch, const uint64_t preHandlerTime);
+    bool OnTouchEvent(libinput_event *event, const EventTouch& touch, const uint64_t preHandlerTime);
     int32_t AddTouchEventFilter(SessionPtr sess, std::string name, int32_t id, Authority authority);
     int32_t RemoveTouchEventFilter(SessionPtr sess, int32_t id);
     int32_t RemoveTouchEventFilter(SessionPtr sess);
@@ -93,8 +93,8 @@ public:
     void DeleteInterceptorFormSess(const SessionPtr& sess);
 
 protected:
-    void OnEventTouchGetPointEventType(const EventTouch& touch, POINT_EVENT_TYPE& pointEventType,
-        const int32_t fingerCount);
+    void OnEventTouchGetPointEventType(const EventTouch& touch, const int32_t fingerCount,
+        POINT_EVENT_TYPE& pointEventType);
 
 protected:
     EventPackage eventPackage_;

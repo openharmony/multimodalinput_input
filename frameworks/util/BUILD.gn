@@ -50,7 +50,6 @@ ohos_shared_library("libmmi-util") {
   sources = [
     "common/include/klog.c",
     "common/src/libmmi_util.cpp",
-    "common/src/log.cpp",
     "common/src/run_shell_util.cpp",
     "common/src/safe_keeper.cpp",
     "common/src/util.cpp",
