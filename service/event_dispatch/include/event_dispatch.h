@@ -32,27 +32,27 @@ public:
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     int32_t DispatchGestureNewEvent(UDSServer& udsServer, libinput_event *event,
         std::shared_ptr<PointerEvent> pointer, const uint64_t preHandlerTime);
-    int32_t DispatchGestureEvent(UDSServer& udsServer, libinput_event *event, EventGesture& gesture,
+    int32_t DispatchGestureEvent(UDSServer& udsServer, libinput_event *event, const EventGesture& gesture,
         const uint64_t preHandlerTime);
     int32_t DispatchKeyEvent(UDSServer& udsServer, libinput_event *event, const KeyEventValueTransformations& trs,
         EventKeyboard& key, const uint64_t preHandlerTime);
     int32_t DispatchKeyEventByPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key,
         const uint64_t preHandlerTime);
     int32_t DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
-        EventTouch& touch, const uint64_t preHandlerTime);
+        const EventTouch& touch, const uint64_t preHandlerTime);
     int32_t DispatchTabletPadEvent(UDSServer& udsServer, libinput_event *event,
         const EventTabletPad& tabletPad, const uint64_t preHandlerTime);
     int32_t DispatchJoyStickEvent(UDSServer& udsServer, libinput_event *event,
         const EventJoyStickAxis& eventJoyStickAxis, const uint64_t preHandlerTime);
     int32_t DispatchCommonPointEvent(UDSServer& udsServer, libinput_event *event,
-        EventPointer& point, const uint64_t preHandlerTime);
+        const EventPointer& point, const uint64_t preHandlerTime);
     int32_t DispatchPointerEvent(UDSServer& udsServer, libinput_event *event,
         EventPointer& point, const uint64_t preHandlerTime);
     int32_t DispatchTabletToolEvent(UDSServer& udsServer, libinput_event *event,
         const EventTabletTool& tableTool, const uint64_t preHandlerTime);
     int32_t DispatchTouchTransformPointEvent(UDSServer& udsServer, std::shared_ptr<PointerEvent> point);
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> point);
-    void OnKeyboardEventTrace(std::shared_ptr<KeyEvent> &key, int32_t number);
+    void OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, int32_t number);
 
 protected:
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);
@@ -62,7 +62,7 @@ protected:
         RegisteredEvent& registeredEvent, uint64_t preHandlerTime);
     int32_t DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& udsServer,
         const RegisteredEvent& data, int32_t inputDeviceType, uint64_t preHandlerTime);
-    int32_t KeyBoardRegEveHandler(EventKeyboard& key, UDSServer& udsServer,
+    int32_t KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer& udsServer,
         libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime);
 
 protected:
