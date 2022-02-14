@@ -366,11 +366,17 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     }
     if (!point->NeedSkipInspection() &&
         InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
-        int touchFilter = 2;
+        int32_t pointerFilter = 1;
+        int32_t touchFilter = 2;
+        if (pointerFilter == point->GetSourceType()) {
+            int32_t pointerId = point->GetId();
+            std::string pointerEvent = "OnEventPointer";
+            FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, pointerId);
+        }
         if (touchFilter == point->GetSourceType()) {
-            int32_t eventTouch = 10;
-            std::string touchEvent = "OnEventTouchAsync";
-            FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
+            int32_t touchId = point->GetId();
+            std::string touchEvent = "OnEventTouch";
+            FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, touchId);
         }
         return RET_OK;
     }
@@ -705,9 +711,9 @@ void EventDispatch::OnKeyboardEventTrace(std::shared_ptr<KeyEvent> &key, int32_t
         MMI_LOGT("FilterSubscribeKeyEvent service trace GetKeyCode=%{public}d", keyCode);
     }
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, checkKeyCode);
-    int32_t eventKey = 2;
-    std::string keyEvent = "OnEventKeyboardAsync";
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
+    int32_t keyId = keyEvent_->GetId();
+    std::string KeyEventString = "OnKeyEvent";
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, KeyEventString, keyId);
 }
 
 int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,

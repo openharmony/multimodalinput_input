@@ -102,6 +102,9 @@ int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointer
 int32_t InterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
+    int32_t keyId = keyEvent->GetId();
+    std::string keyEventString = "keyEventFilter";
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, KeyEventString, keyId);
     for (auto &item : interceptor_) {
         if (item.sourceType == SOURCETYPE_KEY) {
             MMI_LOGD("interceptor callback execute");

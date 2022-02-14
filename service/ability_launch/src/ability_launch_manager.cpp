@@ -18,7 +18,6 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>
-#include "bytrace.h"
 #include "log.h"
 #include "file_ex.h"
 #include "ability_manager_client.h"

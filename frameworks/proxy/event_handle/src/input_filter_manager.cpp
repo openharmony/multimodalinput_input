@@ -14,7 +14,6 @@
  */
 
 #include "input_filter_manager.h"
-#include "bytrace.h"
 #include "log.h"
 #include "mmi_client.h"
 
@@ -122,21 +121,9 @@ std::function<void(KeyBoardEvent)> InputFilterManager::KeyEventFilter::GetHandle
     return handler_;
 }
 
-void InputFilterManager::OnkeyEventTrace(const KeyBoardEvent& event)
-{
-    std::string keyEvent = "client keyUuid = " + event.GetUuid();
-    char *tmpKey = (char*)keyEvent.c_str();
-    MMI_LOGT(" OnKey keyUuid = %{public}s", tmpKey);
-    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEvent);
-    int32_t eventKey = 4;
-    keyEvent = "keyEventFilterAsync";
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
-}
-
 int32_t InputFilterManager::OnKeyEvent(KeyBoardEvent event, int32_t id)
 {
     MMI_LOGD("client on key event call function handler ");
-    OnkeyEventTrace(event);
     for (auto &item : keyEventFilterList_) {
         if (id == item.GetId()) {
             item.GetHandler()(event);
@@ -379,21 +366,9 @@ std::function<void(MouseEvent)> InputFilterManager::PointerEventInterceptor::Get
     return handler_;
 }
 
-void InputFilterManager::OnPointerEventTrace(const MouseEvent& event)
-{
-    std::string pointerEvent = "client pointUuid = " + event.GetUuid();
-    char *tmpPointer = (char*)pointerEvent.c_str();
-    MMI_LOGT(" OnPointerEvent pointerUuid = %{public}s", tmpPointer);
-    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent);
-    int32_t eventPointer = 20;
-    pointerEvent = "PointerEventFilterAsync";
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
-}
-
 int32_t InputFilterManager::OnPointerEvent(MouseEvent event, int32_t id_)
 {
     MMI_LOGD("client on point event call function handler ");
-    OnPointerEventTrace(event);
     for (auto &item : PointerEventInterceptorList_)
     {
         if (id_ == item.GetId()) {

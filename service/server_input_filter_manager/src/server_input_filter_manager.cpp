@@ -15,7 +15,6 @@
 
 #include "server_input_filter_manager.h"
 #include <cinttypes>
-#include "bytrace.h"
 #include "input_event_data_transformation.h"
 #include "mmi_server.h"
 namespace OHOS::MMI {
