@@ -65,7 +65,7 @@ int32_t OHOS::MMI::UDSServer::GetFdByPid(int32_t pid)
     std::lock_guard<std::mutex> lock(mux_);
     auto it = idxPidMap_.find(pid);
     if (it == idxPidMap_.end()) {
-        MMI_LOGE("find fd error, Invalid input parameter pid:%{public}d errCode:%{public}d",
+        MMI_LOGE("find fd error, Invalid input parameter pid:%{public}d, errCode:%{public}d",
             pid, SESSION_NOT_FOUND);
         return RET_ERR;
     }
@@ -77,7 +77,7 @@ int32_t OHOS::MMI::UDSServer::GetPidByFd(int32_t fd)
     std::lock_guard<std::mutex> lock(mux_);
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
-        MMI_LOGE("find pid error, Invalid input parameter fd:%{public}d errCode:%{public}d",
+        MMI_LOGE("find pid error, Invalid input parameter fd:%{public}d, errCode:%{public}d",
             fd, SESSION_NOT_FOUND);
         return RET_ERR;
     }
@@ -194,14 +194,14 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
 #endif
     if (ret != RET_OK) {
         cleanTaskWhenError();
-        MMI_LOGE("epoll_ctl EPOLL_CTL_ADD return %{public}d errCode:%{public}d", ret, EPOLL_MODIFY_FAIL);
+        MMI_LOGE("epoll_ctl EPOLL_CTL_ADD return %{public}d, errCode:%{public}d", ret, EPOLL_MODIFY_FAIL);
         return ret;
     }
 
     SessionPtr sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
     if (sess == nullptr) {
         cleanTaskWhenError();
-        MMI_LOGE("make_shared fail. progName:%{public}s pid:%{public}d errCode:%{public}d",
+        MMI_LOGE("make_shared fail. progName:%{public}s, pid:%{public}d, errCode:%{public}d",
             programName.c_str(), pid, MAKE_SHARED_FAIL);
         return RET_ERR;
     }
@@ -403,7 +403,7 @@ OHOS::MMI::SessionPtr OHOS::MMI::UDSServer::GetSession(int32_t fd) const
 bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
 {
     CHKPF(ses);
-    MMI_LOGD("AddSession pid is %{public}d, fd is %{public}d", ses->GetPid(), ses->GetFd());
+    MMI_LOGD("AddSession pid:%{public}d, fd:%{public}d", ses->GetPid(), ses->GetFd());
     auto fd = ses->GetFd();
     CHKF(fd >= 0, VAL_NOT_EXP);
     auto pid = ses->GetPid();
@@ -412,16 +412,16 @@ bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
     sessionsMap_[fd] = ses;
     DumpSession("AddSession");
     if (sessionsMap_.size() > MAX_SESSON_ALARM) {
-        MMI_LOGW("Too many clients. Warning Value:%{public}d Current Value:%{public}zd",
+        MMI_LOGW("Too many clients. Warning Value:%{public}d, Current Value:%{public}zd",
                  MAX_SESSON_ALARM, sessionsMap_.size());
     }
-    MMI_LOGI("AddSession end...");
+    MMI_LOGI("AddSession end");
     return true;
 }
 
 void OHOS::MMI::UDSServer::DelSession(int32_t fd)
 {
-    MMI_LOGD("DelSession begin fd is %{public}d", fd);
+    MMI_LOGD("DelSession begin fd:%{public}d", fd);
     CHK(fd >= 0, PARAM_INPUT_INVALID);
     auto pid = GetPidByFd(fd);
     if (pid > 0) {
@@ -433,7 +433,7 @@ void OHOS::MMI::UDSServer::DelSession(int32_t fd)
         sessionsMap_.erase(it);
     }
     DumpSession("DelSession");
-    MMI_LOGI("DelSession end...");
+    MMI_LOGI("DelSession end");
 }
 
 void OHOS::MMI::UDSServer::OnThread()

@@ -123,7 +123,7 @@ int32_t OHOS::MMI::MMIServer::Start()
 #ifdef DEBUG_CODE_TEST
     uint64_t curTime = OHOS::MMI::GetMillisTime();
     uint64_t consumeTime = curTime - GetMmiServerStartTime();
-    MMI_LOGW("The server started successfully, the time consumed was %{public}" PRId64
+    MMI_LOGW("The server started successfully, time consumed:%{public}" PRId64
             " Ms curTime:%{public}" PRId64 "", consumeTime, curTime);
 #endif
     return RET_OK;
@@ -189,7 +189,7 @@ void OHOS::MMI::MMIServer::StopAll()
     MMI_LOGD("enter");
     int32_t ret = SaConnectServiceStop();
     if (ret != RET_OK) {
-        MMI_LOGE("call SaConnectServiceStop fail, ret = %{public}d.", ret);
+        MMI_LOGE("call SaConnectServiceStop fail, ret:%{public}d.", ret);
     }
     UdsStop();
     RegEventHM->Clear();
@@ -208,7 +208,7 @@ int32_t OHOS::MMI::MMIServer::SaConnectServiceRegister()
 
     ret = MultimodalInputConnectServiceSetUdsServer(this);
     if (ret != RET_OK) {
-        MMI_LOGE("MultimodalInputConnectServiceSetUdsServer fail, ret = %{public}d.", ret);
+        MMI_LOGE("MultimodalInputConnectServiceSetUdsServer fail, ret:%{public}d.", ret);
         return RET_ERR;
     }
 
@@ -227,7 +227,7 @@ int32_t OHOS::MMI::MMIServer::SaConnectServiceStart()
 
     int32_t ret = MultimodalInputConnectServiceStart();
     if (ret != RET_OK) {
-        MMI_LOGE("call MultimodalInputConnectServiceStart fail, ret = %{public}d.", ret);
+        MMI_LOGE("call MultimodalInputConnectServiceStart fail, ret:%{public}d.", ret);
         return RET_ERR;
     }
 
@@ -240,7 +240,7 @@ int32_t OHOS::MMI::MMIServer::SaConnectServiceStop()
 
     int32_t ret = MultimodalInputConnectServiceStop();
     if (ret != RET_OK) {
-        MMI_LOGE("call MultimodalInputConnectServiceStop fail, ret = %{public}d.", ret);
+        MMI_LOGE("call MultimodalInputConnectServiceStop fail, ret:%{public}d.", ret);
         return RET_ERR;
     }
 

@@ -62,11 +62,11 @@ const static libinput_interface LIBINPUT_INTERFACE = {
         CHKPR(path, errno);
         char realPath[PATH_MAX] = {};
         if (realpath(path, realPath) == nullptr) {
-            MMI_LOGE("path is error, path = %{public}s", path);
+            MMI_LOGE("path is error, path:%{public}s", path);
             return RET_ERR;
         }
         int32_t fd = open(realPath, flags);
-        MMI_LOGD("libinput .open_restricted path:%{public}s fd:%{public}d", path, fd);
+        MMI_LOGD("libinput .open_restricted path:%{public}s, fd:%{public}d", path, fd);
         return fd < 0 ? -errno : fd;
     },
     .close_restricted = [](int32_t fd, void *user_data)
