@@ -284,7 +284,6 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                             }
                             std::vector<int32_t>::iterator iter = std::find(downKey.begin(), downKey.end(), keyCode);
                             if (iter != downKey.end()) {
-                                keyEventI->keyboardOperate = keyCode;
                                 std::cout << "You raised the key " << keyCode << std::endl;
                                 auto KeyEvent = MMI::KeyEvent::Create();
                                 KeyEvent->SetKeyCode(keyCode);
