@@ -90,7 +90,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     MMI_LOGD("Enter");
     size_t argc = 2;
-    napi_value argv[requireArgc];
+    napi_value argv[argc];
     argv[0] = nullptr;
     argv[1] = nullptr;
     napi_status status = napi_generic_failure;
