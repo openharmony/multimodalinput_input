@@ -234,7 +234,6 @@ void MMIService::OnStop()
     MMI_LOGD("SA_OnStop Thread tid:%{public}" PRId64 "", tid);
 
     UdsStop();
-    RegEventHM->Clear();
     if (inputEventHdr_ != nullptr) {
         inputEventHdr_->Clear();
     }
@@ -291,7 +290,7 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int modu
     return RET_OK;
 }
 
-int32_t MMIService::HandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
+int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
 {
     int32_t ret = RET_OK;
     sptr<ConnectDefReqParcel> req = data.ReadParcelable<ConnectDefReqParcel>();

@@ -51,5 +51,5 @@ int32_t AxisEvent::GetAxisValue() const
 }
 
 void AxisEvent::SetAxisValue(int32_t axisValue) {}
-}
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
