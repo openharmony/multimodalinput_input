@@ -79,14 +79,14 @@ void OHOS::MMI::MouseDrawingManager::DrawPointer(int32_t displayId, int32_t glob
 
         std::shared_ptr<OHOS::Rosen::RSSurfaceNode> surfaceNode = drawWindow_->GetSurfaceNode();
         if (surfaceNode == nullptr) {
-            MMI_LOGE("draw pointer is faild, get surface node is nullptr");
+            MMI_LOGE("draw pointer is faild, get node is nullptr");
             drawWindow_->Destroy();
             drawWindow_ = nullptr; 
             return;
         }
-        sptr<OHOS::Surface> surface = surfaceNode->GetSurface();
-        if (surface == nullptr) {
-            MMI_LOGE("draw pointer is faild, get surface node is nullptr");
+        sptr<OHOS::Surface> layer = surfaceNode->GetSurface();
+        if (layer == nullptr) {
+            MMI_LOGE("draw pointer is faild, get layer is nullptr");
             drawWindow_->Destroy();
             drawWindow_ = nullptr; 
             return;
@@ -102,7 +102,7 @@ void OHOS::MMI::MouseDrawingManager::DrawPointer(int32_t displayId, int32_t glob
             .usage = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA,
         };
 
-        OHOS::SurfaceError ret = surface->RequestBuffer(buffer, releaseFence, config);
+        OHOS::SurfaceError ret = layer->RequestBuffer(buffer, releaseFence, config);
         MMI_LOGD("request buffer ret:%{public}s", SurfaceErrorStr(ret).c_str());
 
         if (buffer == nullptr) {
@@ -129,7 +129,7 @@ void OHOS::MMI::MouseDrawingManager::DrawPointer(int32_t displayId, int32_t glob
                 .h = buffer->GetHeight(),
         },
         };
-        ret = surface->FlushBuffer(buffer, -1, flushConfig);
+        ret = layer->FlushBuffer(buffer, -1, flushConfig);
         MMI_LOGD("draw pointer FlushBuffer ret:%{public}s", SurfaceErrorStr(ret).c_str());
     } else {
         drawWindow_->MoveTo(globalX, globalY);
