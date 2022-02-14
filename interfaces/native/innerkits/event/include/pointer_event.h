@@ -253,6 +253,6 @@ inline int32_t PointerEvent::GetAxes() const
 {
     return axes_;
 }
-}
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 #endif // POINTER_EVENT_H

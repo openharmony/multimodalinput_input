@@ -20,7 +20,8 @@
 #include <string>
 #include <vector>
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 class RunShellUtil {
 public:
     RunShellUtil();
@@ -34,5 +35,6 @@ private:
     FILE *fp_ {nullptr};
     int32_t logMaxSize_;
 };
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // RUN_SHELL_UTIL_H
