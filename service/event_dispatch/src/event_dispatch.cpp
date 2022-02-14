@@ -158,7 +158,7 @@ int32_t EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& ud
     return RET_OK;
 }
 
-int32_t EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSServer& udsServer,
+int32_t EventDispatch::KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer& udsServer,
     libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime)
 {
     CHKPR(event, ERROR_NULL_POINTER);
@@ -511,7 +511,7 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event
 }
 
 int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event *event,
-    EventGesture& gesture, const uint64_t preHandlerTime)
+    const EventGesture& gesture, const uint64_t preHandlerTime)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
@@ -567,7 +567,7 @@ int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event
 }
 
 int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
-    EventTouch& touch, const uint64_t preHandlerTime)
+    const EventTouch& touch, const uint64_t preHandlerTime)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
@@ -657,7 +657,7 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
     return ret;
 }
 int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_event *event,
-    EventPointer& point, const uint64_t preHandlerTime)
+    const EventPointer& point, const uint64_t preHandlerTime)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
@@ -692,7 +692,7 @@ int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_e
     return ret;
 }
 
-void EventDispatch::OnKeyboardEventTrace(std::shared_ptr<KeyEvent> &key, int32_t number)
+void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, int32_t number)
 {
     int32_t checkLaunchAbility = 1;
     int32_t keyCode = key->GetKeyCode();
