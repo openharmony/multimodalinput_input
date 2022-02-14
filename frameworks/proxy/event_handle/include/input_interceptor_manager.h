@@ -20,7 +20,8 @@
 #include "i_input_event_consumer.h"
 #include "singleton.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 class InputInterceptorManager : public Singleton<InputInterceptorManager> {
 public:
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
@@ -34,5 +35,6 @@ inline bool InputInterceptorManager::IsValidInterceptorId(int32_t interceptorId)
 {
     return IsValidHandlerId(interceptorId);
 }
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 #endif // OHOS_MULTIMDOALINPUT_INPUT_INTERCEPTOR_MANAGER_H
