@@ -403,7 +403,7 @@ int32_t RegisterEvent::OnEventTouchDownGetSign(const EventTouch& touch)
     return RET_OK;
 }
 
-int32_t RegisterEvent::OnEventOneFingerHandlerGetSign(MmiMessageId& msgId, TouchInfo& touchUpInfo)
+int32_t RegisterEvent::OnEventOneFingerHandlerGetSign(TouchInfo& touchUpInfo, MmiMessageId& msgId)
 {
     if (((touchUpInfo.beginX >= MINX) && (touchUpInfo.beginX < MINX + REGION) &&
         (touchUpInfo.endX - touchUpInfo.beginX > MOVEXDISTANCE)) ||
@@ -458,7 +458,7 @@ int32_t RegisterEvent::OnEventTouchUpGetSign(const EventTouch& touch, MmiMessage
         return OnEventThreeFingerHandlerGetSign(msgId, touchUpInfo);
     }
     if ((GetTouchInfoSizeByDeviceId(touchUpInfo.deviceId) + 1) == ONEFINGER) {
-        return OnEventOneFingerHandlerGetSign(msgId, touchUpInfo);
+        return OnEventOneFingerHandlerGetSign(touchUpInfo, msgId);
     }
     return RET_OK;
 }

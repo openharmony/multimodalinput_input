@@ -93,8 +93,8 @@ public:
     void DeleteInterceptorFormSess(const SessionPtr& sess);
 
 protected:
-    void OnEventTouchGetPointEventType(const EventTouch& touch, POINT_EVENT_TYPE& pointEventType,
-        const int32_t fingerCount);
+    void OnEventTouchGetPointEventType(const EventTouch& touch, const int32_t fingerCount,
+        POINT_EVENT_TYPE& pointEventType);
 
 protected:
     EventPackage eventPackage_;
