@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "i_multimodal_input_connect_stub.h"
+#include "multimodal_input_connect_stub.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include "error_multimodal.h"
@@ -42,7 +42,7 @@ int32_t IMultimodalInputConnectStub::OnRemoteRequest(
 
     switch (code) {
         case static_cast<uint32_t>(IMultimodalInputConnect::ALLOC_SOCKET_FD):
-            return HandleAllocSocketFd(data, reply);
+            return StubHandleAllocSocketFd(data, reply);
         case static_cast<uint32_t>(IMultimodalInputConnect::SET_EVENT_POINTER_FILTER):
             return StubAddInputEventFilter(data, reply);
         default:
