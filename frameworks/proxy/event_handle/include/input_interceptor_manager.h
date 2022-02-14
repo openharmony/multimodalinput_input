@@ -21,7 +21,7 @@
 #include "singleton.h"
 
 namespace OHOS::MMI {
-class InputInterceptorManager : public Singleton<InputInterceptorManager> {
+class InputInterceptorManager {
 public:
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
     void RemoveInterceptor(int32_t interceptorId);
