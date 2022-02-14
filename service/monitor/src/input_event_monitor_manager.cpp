@@ -46,7 +46,6 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventMontior(SessionPtr ses
     }
     iter = monitors_.insert(iter, monitorItem);
     MMI_LOGD("eventType:%{public}d, fd:%{public}d register in server", eventType, session->GetFd());
-    MMI_LOGD("Leave");
     return RET_OK;
 }
 
@@ -103,7 +102,6 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventTouchpadMontior(int32_
     iter = monitorsTouch_.insert(iter, monitorItemTouchpad);
     MMI_LOGD("AddInputEventTouchpadMontior, Success, eventType:%{public}d, fd:%{public}d register in server",
         eventType, session->GetFd());
-    MMI_LOGD("Leave");
     return RET_OK;
 }
 
