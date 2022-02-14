@@ -15,12 +15,12 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
-#include "multimodal_input_connect_stub.h"
 #include "error_multimodal.h"
 #include "ipc_skeleton.h"
 #include "log.h"
 #include "multimodal_input_connect_define.h"
 #include "string_ex.h"
+#include "multimodal_input_connect_stub.h"
 
 namespace OHOS {
 namespace MMI {
