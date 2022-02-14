@@ -711,9 +711,9 @@ void EventDispatch::OnKeyboardEventTrace(std::shared_ptr<KeyEvent> &key, int32_t
         MMI_LOGT("FilterSubscribeKeyEvent service trace GetKeyCode=%{public}d", keyCode);
     }
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, checkKeyCode);
-    int32_t keyId = keyEvent_->GetId();
-    std::string KeyEventString = "OnKeyEvent";
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, KeyEventString, keyId);
+    int32_t keyId = key->GetId();
+    std::string keyEventString = "OnKeyEvent";
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
 }
 
 int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
