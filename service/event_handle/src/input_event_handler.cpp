@@ -223,7 +223,7 @@ int32_t InputEventHandler::OnEventHandler(const multimodal_libinput_event& ev)
     TimeCostChk chk("InputEventHandler::OnEventHandler", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
     auto fun = GetFun(static_cast<MmiMessageId>(type));
     if (!fun) {
-        MMI_LOGE("Unknown event type:%{public}d. errCode:%{public}d", type, UNKNOWN_EVENT);
+        MMI_LOGE("Unknown event type:%{public}d, errCode:%{public}d", type, UNKNOWN_EVENT);
         return UNKNOWN_EVENT;
     }
     auto ret = (*fun)(ev);
@@ -285,8 +285,8 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
                  packageResult, DEV_ADD_EVENT_PKG_FAIL);
         return DEV_ADD_EVENT_PKG_FAIL;
     }
-    MMI_LOGT("4.event dispatcher of server, DeviceManage:physical=%{public}s, "
-             "deviceName=%{public}s, deviceType=%{public}u",
+    MMI_LOGT("4.event dispatcher of server, DeviceManage:physical:%{public}s, "
+             "deviceName:%{public}s, deviceType:%{public}u",
              deviceManage.physical, deviceManage.deviceName, deviceManage.deviceType);
 
     int32_t focusId = WinMgr->GetFocusSurfaceId();
@@ -321,8 +321,8 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
                  packageResult, DEV_REMOVE_EVENT_PKG_FAIL);
         return DEV_REMOVE_EVENT_PKG_FAIL;
     }
-    MMI_LOGT("4.event dispatcher of server, DeviceManage:physical=%{public}s, "
-             "deviceName=%{public}s, deviceType=%{public}u",
+    MMI_LOGT("4.event dispatcher of server, DeviceManage:physical:%{public}s, "
+             "deviceName:%{public}s, deviceType:%{public}u",
              deviceManage.physical, deviceManage.deviceName, deviceManage.deviceType);
 
     int32_t focusId = WinMgr->GetFocusSurfaceId();
@@ -570,7 +570,7 @@ int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
         return RET_OK;
     }
 #else
-    MMI_LOGT("2.mapping event, Event:eventType=%{public}d;", point.eventType);
+    MMI_LOGT("2.mapping event, Event:eventType:%{public}d;", point.eventType);
     /*
     auto retEvent = eventDispatch_.DispatchCommonPointEvent(*udsServer_, *ev.event, point, preHandlerTime);
     if (retEvent != RET_OK) {
@@ -692,10 +692,10 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
         MMI_LOGE("Gesture event package failed, errCode:%{public}d", GESTURE_EVENT_PKG_FAIL);
         return GESTURE_EVENT_PKG_FAIL;
     }
-    MMI_LOGT("GestrueEvent package, eventType=%{public}d, actionTime=%{public}d, "
-             "action=%{public}d, actionStartTime=%{public}d, "
-             "pointerAction=%{public}d, sourceType=%{public}d, "
-             "PinchAxisValue=%{public}.2f",
+    MMI_LOGT("GestrueEvent package, eventType:%{public}d, actionTime:%{public}d, "
+             "action:%{public}d, actionStartTime:%{public}d, "
+             "pointerAction:%{public}d, sourceType:%{public}d, "
+             "PinchAxisValue:%{public}.2f",
              pointer->GetEventType(), pointer->GetActionTime(),
              pointer->GetAction(), pointer->GetActionStartTime(),
              pointer->GetPointerAction(), pointer->GetSourceType(),
@@ -703,9 +703,9 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 
     PointerEvent::PointerItem item;
     pointer->GetPointerItem(pointer->GetPointerId(), item);
-    MMI_LOGT("item:DownTime=%{public}d, IsPressed=%{public}s, "
-             "GlobalX=%{public}d, GlobalY=%{public}d, LocalX=%{public}d, LocalY=%{public}d, "
-             "Width=%{public}d, Height=%{public}d, DeviceId=%{public}d",
+    MMI_LOGT("item:DownTime:%{public}d, IsPressed:%{public}s, "
+             "GlobalX:%{public}d, GlobalY:%{public}d, LocalX:%{public}d, LocalY:%{public}d, "
+             "Width:%{public}d, Height:%{public}d, DeviceId:%{public}d",
              item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
              item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
              item.GetWidth(), item.GetHeight(), item.GetDeviceId());
@@ -761,7 +761,7 @@ int32_t InputEventHandler::OnEventTabletTool(const multimodal_libinput_event& ev
                  packageResult, TABLETTOOL_EVENT_PKG_FAIL);
         return TABLETTOOL_EVENT_PKG_FAIL;
     }
-    MMI_LOGT("2.mapping event, Event:eventType=%{public}d;", tableTool.eventType);
+    MMI_LOGT("2.mapping event, Event:eventType:%{public}d;", tableTool.eventType);
     auto retEvent = eventDispatch_.DispatchTabletToolEvent(*udsServer_, ev.event, tableTool, sysStartProcessTime);
     if (retEvent != RET_OK) {
         MMI_LOGE("Tabletool event dispatch failed. ret:%{public}d, errCode:%{public}d",
@@ -903,7 +903,7 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
             MMI_LOGI("Pressed keys is empty");
         } else {
             for (int32_t keyCode : pressedKeys) {
-                MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
+                MMI_LOGI("Pressed keyCode:%{public}d", keyCode);
             }
         }
         pointerEvent->SetPressedKeys(pressedKeys);
@@ -925,17 +925,17 @@ int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEv
         return RET_ERR;
     }
     // Mouse Axis Data
-    MMI_LOGI("MouseEvent Normalization Results, PointerAction=%{public}d, PointerId=%{public}d, "
-             "SourceType=%{public}d, ButtonId=%{public}d, "
-             "VerticalAxisValue=%{public}lf, HorizontalAxisValue=%{public}lf",
+    MMI_LOGI("MouseEvent Normalization Results, PointerAction:%{public}d, PointerId:%{public}d, "
+             "SourceType:%{public}d, ButtonId:%{public}d, "
+             "VerticalAxisValue:%{public}lf, HorizontalAxisValue:%{public}lf",
              pointerEvent->GetPointerAction(), pointerEvent->GetPointerId(), pointerEvent->GetSourceType(),
              pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
     PointerEvent::PointerItem item;
     CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item), PARAM_INPUT_FAIL, RET_ERR);
-    MMI_LOGI("MouseEvent Item Normalization Results, DownTime=%{public}d, IsPressed=%{public}d, "
-             "GlobalX=%{public}d, GlobalY=%{public}d, LocalX=%{public}d, LocalY=%{public}d, Width=%{public}d, "
-             "Height=%{public}d, Pressure=%{public}d, DeviceId=%{public}d",
+    MMI_LOGI("MouseEvent Item Normalization Results, DownTime:%{public}d, IsPressed:%{public}d, "
+             "GlobalX:%{public}d, GlobalY:%{public}d, LocalX:%{public}d, LocalY:%{public}d, "
+             "Width:%{public}d, Height:%{public}d, Pressure:%{public}d, DeviceId:%{public}d",
              item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
              item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
              item.GetDeviceId());

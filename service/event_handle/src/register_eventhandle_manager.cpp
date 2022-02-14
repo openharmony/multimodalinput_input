@@ -60,7 +60,7 @@ int32_t OHOS::MMI::RegisterEventHandleManager::RegisterEvent(MmiMessageId messag
             MMI_LOGT("It's no this event handle! ");
             return UNKNOWN_EVENT;
     }
-    MMI_LOGT("event:%{public}d fd:%{public}d ", messageId, fd);
+    MMI_LOGT("event:%{public}d, fd:%{public}d ", messageId, fd);
     return RET_OK;
 }
 

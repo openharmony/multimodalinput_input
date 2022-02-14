@@ -45,7 +45,7 @@ bool StreamBuffer::SetReadIdx(uint32_t idx)
 bool StreamBuffer::Read(std::string &buf)
 {
     if (rIdx_ == wIdx_) {
-        MMI_LOGE("Not enough memory to read... errCode:%{public}d", MEM_NOT_ENOUGH);
+        MMI_LOGE("Not enough memory to read, errCode:%{public}d", MEM_NOT_ENOUGH);
         return false;
     }
     buf = ReadBuf();
@@ -57,7 +57,7 @@ bool StreamBuffer::Read(char *buf, size_t size)
 {
     CHKPF(buf);
     if (rIdx_ + size > wIdx_) {
-        MMI_LOGE("Memory out of bounds on read... errCode:%{public}d", MEM_OUT_OF_BOUNDS);
+        MMI_LOGE("Memory out of bounds on read, errCode:%{public}d", MEM_OUT_OF_BOUNDS);
         return false;
     }
     CHKF(EOK == memcpy_sp(buf, size, ReadBuf(), size), MEMCPY_SEC_FUN_FAIL);
@@ -106,7 +106,7 @@ bool StreamBuffer::Write(const char *buf, size_t size)
 {
     CHKPF(buf);
     if (wIdx_ + size >= MAX_STREAM_BUF_SIZE) {
-        MMI_LOGE("Memory out of bounds on write... errCode:%{public}d", MEM_OUT_OF_BOUNDS);
+        MMI_LOGE("Memory out of bounds on write, errCode:%{public}d", MEM_OUT_OF_BOUNDS);
         return false;
     }
     CHKF(EOK == memcpy_sp(&szBuff_[wIdx_], (MAX_STREAM_BUF_SIZE - wIdx_), buf, size), MEMCPY_SEC_FUN_FAIL);
