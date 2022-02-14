@@ -171,7 +171,8 @@ void ServerInputFilterManager::TouchEventFilter::SetAuthority(Authority authorit
 }
 
 void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& touch,
-    POINT_EVENT_TYPE& pointEventType, const int32_t fingerCount)
+                                                             const int32_t fingerCount,
+                                                             POINT_EVENT_TYPE& pointEventType)
 {
     CHK(fingerCount > 0, PARAM_INPUT_INVALID);
     CHK(touch.time > 0, PARAM_INPUT_INVALID);
@@ -268,7 +269,7 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
         }
         newPacket << fingerCount;
         POINT_EVENT_TYPE pointEventType = EVENT_TYPE_INVALID;
-        OnEventTouchGetPointEventType(touch, pointEventType, fingerCount);
+        OnEventTouchGetPointEventType(touch, fingerCount, pointEventType);
         int32_t eventType = pointEventType;
         newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime;
 
