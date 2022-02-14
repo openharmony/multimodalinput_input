@@ -808,5 +808,5 @@ bool PointerEvent::IsValid() const
     HiLog::Debug(LABEL, "PointerEvent::IsValid end");
     return true;
 }
-}
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
