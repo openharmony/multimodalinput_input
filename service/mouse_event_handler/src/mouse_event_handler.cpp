@@ -55,7 +55,7 @@ void MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 
 void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem)
 {
-    MMI_LOGT("enter, current action: %{public}d", pointerEvent_->GetPointerAction());
+    MMI_LOGT("enter, current action:%{public}d", pointerEvent_->GetPointerAction());
 
     auto button = libinput_event_pointer_get_button(data);
     if (button == BTN_LEFT) {
@@ -65,7 +65,7 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEv
     } else if (button == BTN_MIDDLE) {
         pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_MIDDLE);
     } else {
-        MMI_LOGW("unknown btn, btn: %{public}u", button);
+        MMI_LOGW("unknown btn, btn:%{public}u", button);
     }
 
     auto state = libinput_event_pointer_get_button_state(data);
@@ -82,7 +82,7 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEv
         pointerItem.SetPressed(true);
         buttionId_ = pointerEvent_->GetButtonId();
     } else {
-        MMI_LOGW("unknown state, state: %{public}u", state);
+        MMI_LOGW("unknown state, state:%{public}u", state);
     }
 }
 
@@ -99,7 +99,7 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
             MMI_LOGT("enter");
             auto sharedPtr = weakPtr.lock();
             CHKP(sharedPtr);
-            MMI_LOGD("timer: %{public}d", sharedPtr->timerId_);
+            MMI_LOGD("timer:%{public}d", sharedPtr->timerId_);
             sharedPtr->timerId_ = -1;
             auto pointerEvent = sharedPtr->GetPointerEvent();
             CHKP(pointerEvent);
@@ -191,16 +191,16 @@ void MouseEventHandler::Normalize(libinput_event *event)
 
 void MouseEventHandler::DumpInner()
 {
-    MMI_LOGD("PointerAction: %{public}d, PointerId: %{public}d, SourceType: %{public}d,"
-        "ButtonId: %{public}d, VerticalAxisValue: %{public}lf, HorizontalAxisValue: %{public}lf",
+    MMI_LOGD("PointerAction:%{public}d, PointerId:%{public}d, SourceType:%{public}d,"
+        "ButtonId:%{public}d, VerticalAxisValue:%{public}lf, HorizontalAxisValue:%{public}lf",
         pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId(), pointerEvent_->GetSourceType(),
         pointerEvent_->GetButtonId(), pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
         pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
 
     PointerEvent::PointerItem item;
     CHK(pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item), PARAM_INPUT_FAIL);
-    MMI_LOGD("item: DownTime: %{public}d, IsPressed: %{public}s,GlobalX: %{public}d, GlobalY: %{public}d, "
-        "Width: %{public}d, Height: %{public}d, Pressure: %{public}d, DeviceId: %{public}d",
+    MMI_LOGD("item: DownTime:%{public}d, IsPressed:%{public}s, GlobalX:%{public}d, GlobalY:%{public}d, "
+        "Width:%{public}d, Height:%{public}d, Pressure:%{public}d, DeviceId:%{public}d",
         item.GetDownTime(), (item.IsPressed() ? "true" : "false"), item.GetGlobalX(), item.GetGlobalY(),
         item.GetWidth(), item.GetHeight(), item.GetPressure(), item.GetDeviceId());
 }

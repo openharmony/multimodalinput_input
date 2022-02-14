@@ -64,7 +64,7 @@ namespace {
 void OnThreadTermination(int32_t outTime, uint64_t tid, const std::string& remark)
 {
     using namespace OHOS::MMI;
-    MMI_LOGE("OnThreadTermination tid:%{public}" PRId64 " %{public}s %{public}d/%{public}d",
+    MMI_LOGE("OnThreadTermination tid:%{public}" PRId64 ", %{public}s, %{public}d/%{public}d",
         tid, remark.c_str(), outTime, MAX_THREAD_DEATH_TIME);
     MMIEventDump->InsertFormat("OnThreadTermination tid=%llu, remark=%s %d/%d",
         tid, remark.c_str(), outTime, MAX_THREAD_DEATH_TIME);
