@@ -46,34 +46,13 @@ public:
     bool Read(char *buf, size_t size);
     bool Write(const char *buf, size_t size);
     bool IsEmpty();
-    /*
-     * Method:    Size
-     * FullName:  CStreamBuffer::Size
-     * Access:    public
-     * Returns:   size_t
-     * Qualifier: const valid size
-     */
     size_t Size() const;
 
-    /*
-     * Method:    UnreadSize
-     * FullName:  CStreamBuffer::UnreadSize
-     * Access:    public
-     * Returns:   size_t
-     * Qualifier: const unread buf size
-     */
     size_t UnreadSize() const;
 
     bool ChkError() const;
     const std::string& GetErrorStatusRemark() const;
 
-    /*
-    * Method:    Data
-    * FullName:  CStreamBuffer::Data
-    * Access:    public
-    * Returns:   const char*
-    * Qualifier: const buf pointer
-    */
     const char *Data() const;
 
     template<typename T>
@@ -89,22 +68,8 @@ public:
     StreamBuffer& operator << (const T& data);
 
 protected:
-    /*
-     * Method:    ReadBuf
-     * FullName:  CStreamBuffer::ReadBuf
-     * Access:    public
-     * Returns:   const char*
-     * Qualifier: const read position
-     */
     const char *ReadBuf() const;
 
-    /*
-     * Method:    WriteBuf
-     * FullName:  CStreamBuffer::WriteBuf
-     * Access:    public
-     * Returns:   const char*
-     * Qualifier: const write position
-     */
     const char *WriteBuf() const;
 
     bool Clone(const StreamBuffer& buf);

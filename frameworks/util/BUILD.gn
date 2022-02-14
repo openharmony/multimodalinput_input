@@ -104,7 +104,7 @@ ohos_unittest("ut-mmi-util-out") {
   ]
 
   if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -168,7 +168,7 @@ ohos_unittest("RunShellUtilTest") {
   ]
 
   if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
   cflags = [ "-DOHOS_BUILD" ]

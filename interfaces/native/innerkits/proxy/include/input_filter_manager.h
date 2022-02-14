@@ -67,7 +67,6 @@ public:
     int32_t FilterTouchEvent(std::string name, Authority authority, std::function<void(TouchEvent)> handler);
     int32_t UnFilterTouchEvent(int32_t id);
     int32_t OnTouchEvent(TouchEvent event, int32_t id);
-    void OnTouchEventTrace(const TouchEvent& event);
 
 public:
     class PointerEventInterceptor {

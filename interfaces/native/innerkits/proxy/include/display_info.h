@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_DISPLAY_INFO_H
-#define OHOS_MULTIMDOALINPUT_DISPLAY_INFO_H
+#ifndef DISPLAY_INFO_H
+#define DISPLAY_INFO_H
 
 #include <vector>
 #include <string>
@@ -62,6 +62,12 @@ struct WindowInfo {
 
     // The input events sent to this window will be sent to the agentwindowid window for processing
     int32_t agentWindowId;
+
+    // The x coordinate of the upper left corner of the window in the logical display
+    int32_t winTopLeftX;
+
+    // The y coordinate of the upper left corner of the window in the logical display
+    int32_t winTopLeftY;
 };
 
 struct PhysicalDisplayInfo {
@@ -137,4 +143,4 @@ struct LogicalDisplayInfo {
 }
 } // namespace OHOS::MMI
 
-#endif // OHOS_MULTIMDOALINPUT_DISPLAY_INFO_H
+#endif // DISPLAY_INFO_H

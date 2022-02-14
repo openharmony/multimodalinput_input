@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MMI_SERVICE_H
-#define OHOS_MMI_SERVICE_H
+#ifndef MMI_SERVICE_H
+#define MMI_SERVICE_H
 #include <mutex>
 #include <thread>
 #include "singleton.h"
@@ -85,4 +85,4 @@ private:
 };
 }
 }
-#endif //  OHOS_MMI_SERVICE_H
+#endif // MMI_SERVICE_H

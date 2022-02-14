@@ -29,9 +29,8 @@ namespace {
 
 int32_t TestAuxToolClient::ExecuteAllCommand()
 {
-    struct timeval time;
+    timeval time;
     RawInputEvent rawEvent = {};
-
     for (uint32_t item = 0; item < AI_CODE_MAX; item++) {
         gettimeofday(&time, 0);
         rawEvent.stamp = static_cast<uint32_t>(time.tv_usec);

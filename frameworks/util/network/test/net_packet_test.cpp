@@ -51,6 +51,7 @@ HWTEST_F(NetPacketTest, GetSize_001, TestSize.Level1)
     size_t retResult = pack.GetSize();
     EXPECT_TRUE(retResult == 0);
 }
+
 HWTEST_F(NetPacketTest, GetSize_002, TestSize.Level1)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(-1001);
@@ -58,6 +59,7 @@ HWTEST_F(NetPacketTest, GetSize_002, TestSize.Level1)
     size_t retResult = pack.GetSize();
     EXPECT_TRUE(retResult == 0);
 }
+
 HWTEST_F(NetPacketTest, GetSize_003, TestSize.Level1)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(65535);

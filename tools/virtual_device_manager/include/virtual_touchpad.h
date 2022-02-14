@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_VIRTUAL_TOUCHPAD_H
-#define OHOS_VIRTUAL_TOUCHPAD_H
+#ifndef VIRTUAL_TOUCHPAD_H
+#define VIRTUAL_TOUCHPAD_H
 
 #include "virtual_device.h"
 
@@ -31,4 +31,4 @@ protected:
 };
 }
 }
-#endif
+#endif // VIRTUAL_TOUCHPAD_H

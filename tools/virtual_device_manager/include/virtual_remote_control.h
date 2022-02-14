@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_VIRTUAL_REMOTE_CONTROL_H
-#define OHOS_VIRTUAL_REMOTE_CONTROL_H
+#ifndef VIRTUAL_REMOTE_CONTROL_H
+#define VIRTUAL_REMOTE_CONTROL_H
 
 #include "virtual_device.h"
 
@@ -30,4 +30,4 @@ protected:
 };
 }
 }
-#endif
+#endif // VIRTUAL_REMOTE_CONTROL_H

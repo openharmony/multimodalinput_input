@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_POINTER_EVENT_FILTER_DEF_PARCEL_H
-#define OHOS_POINTER_EVENT_FILTER_DEF_PARCEL_H
+#ifndef EVENT_FILTER_PARCEL_H
+#define EVENT_FILTER_PARCEL_H
 
 #include "parcel.h"
 #include "pointer_event.h"
@@ -32,4 +32,4 @@ struct PointerEventParcel final : public Parcelable {
 } // namespace MMI
 } // namespace OHOS
 
-#endif // OHOS_POINTER_EVENT_FILTER_DEF_PARCEL_H
+#endif // EVENT_FILTER_PARCEL_H

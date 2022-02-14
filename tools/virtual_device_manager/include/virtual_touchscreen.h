@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_VIRTUAL_TOUCHSCREEN_H
-#define OHOS_VIRTUAL_TOUCHSCREEN_H
+#ifndef VIRTUAL_TOUCHSCREEN_H
+#define VIRTUAL_TOUCHSCREEN_H
 
 #include "virtual_device.h"
 
@@ -32,4 +32,4 @@ namespace MMI {
     };
 }
 }
-#endif  // OHOS_VIRTUAL_TOUCHSCREEN_H
+#endif  // VIRTUAL_TOUCHSCREEN_H

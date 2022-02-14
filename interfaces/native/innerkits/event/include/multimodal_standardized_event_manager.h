@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MULTIMODAL_STANDARDIZED_EVENTS_MANAGER_H
-#define OHOS_MULTIMODAL_STANDARDIZED_EVENTS_MANAGER_H
+#ifndef MULTIMODAL_STANDARDIZED_EVENT_MANAGER_H
+#define MULTIMODAL_STANDARDIZED_EVENT_MANAGER_H
 
 #include <set>
 #include "singleton.h"
@@ -45,8 +45,8 @@ public:
     int32_t InjectEvent(const OHOS::MMI::KeyEvent& keyEvent);
     int32_t InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
-    int32_t GetDevice(int32_t taskId, int32_t deviceId);
-    int32_t GetDeviceIds(int32_t taskId);
+    int32_t GetDevice(int32_t userData, int32_t deviceId);
+    int32_t GetDeviceIds(int32_t userData);
     int32_t RegisterStandardizedEventHandle(const sptr<IRemoteObject> token,
         int32_t windowId, StandEventPtr standardizedEventHandle);
     int32_t UnregisterStandardizedEventHandle(const sptr<IRemoteObject> token,
@@ -55,8 +55,6 @@ public:
     int32_t UnSubscribeKeyEvent(int32_t subscribeId);
 
 public:
-    void OnkeyTrace(const OHOS::KeyEvent& event);
-    void OnTouchTrace(const TouchEvent& event);
     int32_t OnKey(const OHOS::KeyEvent& event);
     int32_t OnTouch(const TouchEvent& event);
 
@@ -112,4 +110,4 @@ protected:
 }
 }
 #define EventManager OHOS::Singleton<OHOS::MMI::MultimodalStandardizedEventManager>::GetInstance()
-#endif
+#endif // MULTIMODAL_STANDARDIZED_EVENT_MANAGER_H

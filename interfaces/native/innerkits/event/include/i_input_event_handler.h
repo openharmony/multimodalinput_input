@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_I_INPUT_EVENT_HANDLER_H
-#define OHOS_MULTIMDOALINPUT_I_INPUT_EVENT_HANDLER_H
+#ifndef I_INPUT_EVENT_HANDLER_H
+#define I_INPUT_EVENT_HANDLER_H
 
 #include <mutex>
 #include "key_event.h"
@@ -32,4 +32,4 @@ struct IInputEventHandler {
 };
 }
 } // namespace OHOS::MMI
-#endif // OHOS_MULTIMDOALINPUT_I_INPUT_EVENT_HANDLER_H
+#endif // I_INPUT_EVENT_HANDLER_H

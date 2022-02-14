@@ -330,6 +330,7 @@ HWTEST_F(MultimodalEventTest, IsSameEvent_TMP_001, TestSize.Level1)
     bool retResult = multiModalEventTmp.IsSameEvent(strUuid);
     EXPECT_TRUE(retResult);
 }
+
 HWTEST_F(MultimodalEventTest, IsSameEvent_TMP_002, TestSize.Level1)
 {
     int32_t windowId = 1;

@@ -161,7 +161,7 @@ int32_t EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& ud
 int32_t EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSServer& udsServer,
     libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime)
 {
-    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, ERROR_NULL_POINTER);
     RegisteredEvent eve = {};
     auto result = eventPackage_.PackageRegisteredEvent<EventKeyboard>(key, eve);
     if (result != RET_OK) {
@@ -216,9 +216,9 @@ int32_t EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSServer& udsS
 int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_event *event,
     const EventTabletPad& tabletPad, const uint64_t preHandlerTime)
 {
-    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
-    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, ERROR_NULL_POINTER);
 #ifdef DEBUG_CODE_TEST
     std::string str = WinMgr->GetSurfaceIdListString();
 #endif
@@ -267,9 +267,9 @@ int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_eve
 int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_event *event,
     const EventJoyStickAxis& eventJoyStickAxis, const uint64_t preHandlerTime)
 {
-    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
-    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, ERROR_NULL_POINTER);
     auto focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
         return RET_OK;
@@ -300,7 +300,7 @@ int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_even
 int32_t EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, libinput_event *event,
     const EventTabletTool& tableTool, const uint64_t preHandlerTime)
 {
-    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, ERROR_NULL_POINTER);
     int32_t focusId = WinMgr->GetFocusSurfaceId(); // obtaining focusId
     if (focusId < 0) {
         return RET_OK;
@@ -358,17 +358,24 @@ bool EventDispatch::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point
 int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point) 
 {
     MMI_LOGD("Enter");
-    CHKPR(point, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(point, ERROR_NULL_POINTER);
     auto fd = WinMgr->UpdateTargetPointer(point);
     if (HandlePointerEventFilter(point)) {
         MMI_LOGI("Pointer event interception succeeded");
         return RET_OK;
     }
-    if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
+    if (!point->NeedSkipInspection() &&
+        InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
+        int touchFilter = 2;
+        if (touchFilter == point->GetSourceType()) {
+            int32_t eventTouch = 10;
+            std::string touchEvent = "OnEventTouchAsync";
+            FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
+        }
         return RET_OK;
     }
     NetPacket newPacket(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::SerializePointerEvent(point, newPacket);
+    InputEventDataTransformation::Marshalling(point, newPacket);
     auto udsServer = InputHandler->GetUDSServer();
     if (udsServer == nullptr) {
         MMI_LOGE("UdsServer is a nullptr");
@@ -380,7 +387,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     }
 
     auto session = udsServer->GetSession(fd);
-    CHKPR(session, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(session, ERROR_NULL_POINTER);
     auto eventId = point->GetId();
     auto currentTime = GetSysClockTime();
     session->RecordEvent(eventId, currentTime);
@@ -407,7 +414,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
     std::shared_ptr<PointerEvent> point)
 {
-    CHKPR(point, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(point, ERROR_NULL_POINTER);
     InputHandlerManagerGlobal::GetInstance().HandleEvent(point);
     MMI_LOGD("call  DispatchTouchTransformPointEvent begin"); 
     auto appInfo = AppRegs->FindByWinId(point->GetAgentWindowId()); // obtain application information
@@ -416,7 +423,7 @@ int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
         return FOCUS_ID_OBTAIN_FAIL;
     }
     NetPacket newPacket(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::SerializePointerEvent(point, newPacket);
+    InputEventDataTransformation::Marshalling(point, newPacket);
     if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
         MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
@@ -425,24 +432,12 @@ int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
     return RET_OK;
 }
 
-void EventDispatch::DispatchPointerEventTrace(const EventPointer& point)
-{
-    char pointerUuid[MAX_UUIDSIZE] = {0};
-    int32_t ret = memcpy_s(pointerUuid, sizeof(pointerUuid), point.uuid, sizeof(point.uuid));
-    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
-    MMI_LOGT(" OnEventPointer service DispatchPointerEvent pointerUuid = %{public}s", pointerUuid);
-    std::string pointerEvent = pointerUuid;
-    pointerEvent = "DispatchPointerEvent service pointerUuid: " + pointerEvent;
-    int32_t eventPointer = 17;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
-}
-
 int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event *event,
     EventPointer &point, const uint64_t preHandlerTime)
 {
-    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
-    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, ERROR_NULL_POINTER);
 
 #ifdef DEBUG_CODE_TEST
     std::string strIds = WinMgr->GetSurfaceIdListString();
@@ -507,7 +502,6 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event
                  point.state, point.source, point.delta.x, point.delta.y, point.delta_raw.x,
                  point.delta_raw.y, point.absolute.x, point.absolute.y, point.discrete.x,
                  point.discrete.y, appInfo.fd, preHandlerTime);
-        DispatchPointerEventTrace(point);
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
             MMI_LOGE("Sending structure of EventPointer failed! errCode:%{public}d", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
@@ -519,9 +513,9 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event
 int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event *event,
     EventGesture& gesture, const uint64_t preHandlerTime)
 {
-    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
-    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, ERROR_NULL_POINTER);
 
     MmiMessageId idMsg = MmiMessageId::INVALID;
     MMIRegEvent->OnEventGestureGetSign(gesture, idMsg);
@@ -572,24 +566,12 @@ int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event
     return RET_OK;
 }
 
-void EventDispatch::DispatchTouchEventTrace(const EventTouch& touch)
-{
-    char touchUuid[MAX_UUIDSIZE] = {0};
-    int32_t ret = memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid));
-    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
-    MMI_LOGT(" 4.event dispatcher of server: touchUuid = %{public}s", touchUuid);
-    std::string touchEvent = touchUuid;
-    touchEvent = "4.event dispatcher of server touchUuid: " + touchEvent;
-    int32_t eventTouch = 9;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
-}
-
 int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
     EventTouch& touch, const uint64_t preHandlerTime)
 {
-    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
-    CHKPR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, ERROR_NULL_POINTER);
 #ifdef DEBUG_CODE_TEST
     std::string str = WinMgr->GetSurfaceIdListString();
 #endif
@@ -654,7 +636,6 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
                          touchTemp.physical, touchTemp.eventType, touchTemp.slot, touchTemp.seatSlot,
                          touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, appInfo.fd,
                          preHandlerTime);
-                DispatchTouchEventTrace(touchTemp);
                 newPacket << touchTemp;
             }
         }
@@ -667,7 +648,6 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
                      touch.time, touch.deviceType, touch.deviceName,
                      touch.physical, touch.eventType, touch.slot, touch.seatSlot, touch.pressure,
                      touch.point.x, touch.point.y, appInfo.fd, preHandlerTime);
-            DispatchTouchEventTrace(touch);
         }
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
             MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
@@ -679,10 +659,10 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
 int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_event *event,
     EventPointer& point, const uint64_t preHandlerTime)
 {
-    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     auto type = libinput_event_get_type(event);
-    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, ERROR_NULL_POINTER);
 
 #ifdef DEBUG_CODE_TEST
     std::string str = WinMgr->GetSurfaceIdListString();
@@ -712,17 +692,39 @@ int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_e
     return ret;
 }
 
+void EventDispatch::OnKeyboardEventTrace(std::shared_ptr<KeyEvent> &key, int32_t number)
+{
+    int32_t checkLaunchAbility = 1;
+    int32_t keyCode = key->GetKeyCode();
+    std::string checkKeyCode;
+    if (checkLaunchAbility == number) {
+        checkKeyCode = "CheckLaunchAbility service GetKeyCode = " + std::to_string(keyCode);
+        MMI_LOGT("CheckLaunchAbility service trace GetKeyCode=%{public}d", keyCode);
+    } else {
+        checkKeyCode = "FilterSubscribeKeyEvent service GetKeyCode = " + std::to_string(keyCode);
+        MMI_LOGT("FilterSubscribeKeyEvent service trace GetKeyCode=%{public}d", keyCode);
+    }
+    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, checkKeyCode);
+    int32_t eventKey = 2;
+    std::string keyEvent = "OnEventKeyboardAsync";
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
+}
+
 int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
     std::shared_ptr<KeyEvent> key, const uint64_t preHandlerTime)
 {
-    CHKPR(key, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(key, PARAM_INPUT_INVALID);
     MMI_LOGD("DispatchKeyEventByPid begin");
     if (AbilityMgr->CheckLaunchAbility(key)) {
         MMI_LOGD("The keyEvent start launch an ability, keyCode=%{public}d", key->GetKeyCode());
+        int32_t checkLaunchAbility = 1;
+        OnKeyboardEventTrace(key, checkLaunchAbility);
         return RET_OK;
     }
     if (KeyEventSubscriber_.FilterSubscribeKeyEvent(key)) {
         MMI_LOGD("Subscribe keyEvent filter success. keyCode=%{public}d", key->GetKeyCode());
+        int32_t filterSubscribeKeyEvent = 2;
+        OnKeyboardEventTrace(key, filterSubscribeKeyEvent);
         return RET_OK;
     }
     auto fd = WinMgr->UpdateTarget(key);
@@ -742,7 +744,7 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
              key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
 
     auto session = udsServer.GetSession(fd);
-    CHKPR(session, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(session, ERROR_NULL_POINTER);
     auto eventId = key->GetId();
     auto currentTime = GetSysClockTime();
     session->RecordEvent(eventId, currentTime);
@@ -770,24 +772,12 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
     return RET_OK;
 }
 
-void EventDispatch::DispatchKeyEventTrace(const EventKeyboard& key)
-{
-    char keyUuid[MAX_UUIDSIZE] = {0};
-    int32_t ret = memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid));
-    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
-    MMI_LOGT(" OnEventKeyboard service DispatchKeyEvent keyUuid = %{public}s", keyUuid);
-    std::string keyEvent = keyUuid;
-    keyEvent = "4.event dispatcher of server keyUuid: " + keyEvent;
-    int32_t eventKey = 1;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
-}
-
 int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *event,
     const KeyEventValueTransformations& trs, EventKeyboard& key, const uint64_t preHandlerTime)
 {
-    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
-    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, ERROR_NULL_POINTER);
 
     int32_t ret = RET_OK;
     ret = KeyBoardRegEveHandler(key, udsServer, event, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
@@ -827,7 +817,6 @@ int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *ev
              "preHandlerTime=%{public}" PRId64, key.time, key.deviceType, key.deviceName, key.physical,
              key.eventType, key.unicode, key.key, trs.keyEvent.c_str(), key.seat_key_count, key.state, appInfo.fd,
              preHandlerTime);
-    DispatchKeyEventTrace(key);
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, appInfo.fd, key.time, preHandlerTime)) {
         NetPacket newPkt(MmiMessageId::ON_KEY);
         newPkt << key << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
@@ -847,9 +836,9 @@ int32_t EventDispatch::AddInputEventFilter(sptr<IEventFilter> filter)
 int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_event *event,
     std::shared_ptr<PointerEvent> pointerEvent, const uint64_t preHandlerTime)
 {
-    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
+    CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
-    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKPR(device, ERROR_NULL_POINTER);
 
     auto focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
@@ -891,7 +880,7 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
     }
 
     NetPacket newPkt(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::SerializePointerEvent(pointerEvent, newPkt);
+    InputEventDataTransformation::Marshalling(pointerEvent, newPkt);
     newPkt << appInfo.fd << preHandlerTime;
     if (!udsServer.SendMsg(appInfo.fd, newPkt)) {
         MMI_LOGE("Sending structure of PointerEvent failed! errCode:%{public}d", MSG_SEND_FAIL);

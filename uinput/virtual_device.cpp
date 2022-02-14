@@ -74,37 +74,33 @@ bool VirtualDevice::SetUp()
     dev_.id.vendor = vendorId_;
     dev_.id.product = productId_;
     dev_.id.version = version_;
-    for (uint32_t evt_type : GetEventTypes()) {
-        if (!DoIoctl(fd_, UI_SET_EVBIT, evt_type)) {
-            HiLog::Error(LABEL, "%{public}s Error setting event type: %{public}u", __func__, evt_type);
+    for (const auto &item : GetEventTypes()) {
+        if (!DoIoctl(fd_, UI_SET_EVBIT, item)) {
+            HiLog::Error(LABEL, "%{public}s Error setting event type: %{public}u", __func__, item);
             return false;
         }
     }
-
-    for (uint32_t key : GetKeys()) {
-        if (!DoIoctl(fd_, UI_SET_KEYBIT, key)) {
-            HiLog::Error(LABEL, "%{public}s Error setting key: %{public}u", __func__, key);
+    for (const auto &item : GetKeys()) {
+        if (!DoIoctl(fd_, UI_SET_KEYBIT, item)) {
+            HiLog::Error(LABEL, "%{public}s Error setting key: %{public}u", __func__, item);
             return false;
         }
     }
-
-    for (uint32_t property : GetProperties()) {
-        if (!DoIoctl(fd_, UI_SET_PROPBIT, property)) {
-            HiLog::Error(LABEL, "%{public}s Error setting property: %{public}u", __func__, property);
+    for (const auto &item :  GetProperties()) {
+        if (!DoIoctl(fd_, UI_SET_PROPBIT, item)) {
+            HiLog::Error(LABEL, "%{public}s Error setting property: %{public}u", __func__, item);
             return false;
         }
     }
-
-    for (uint32_t abs : GetAbs()) {
-        if (!DoIoctl(fd_, UI_SET_ABSBIT, abs)) {
-            HiLog::Error(LABEL, "%{public}s Error setting property: %{public}u", __func__, abs);
+    for (const auto &item : GetAbs()) {
+        if (!DoIoctl(fd_, UI_SET_ABSBIT, item)) {
+            HiLog::Error(LABEL, "%{public}s Error setting property: %{public}u", __func__, item);
             return false;
         }
     }
-
-    for (uint32_t rel : GetRelBits()) {
-        if (!DoIoctl(fd_, UI_SET_RELBIT, rel)) {
-            HiLog::Error(LABEL, "%{public}s Error setting rel: %{public}u", __func__, rel);
+    for (const auto &item : GetRelBits()) {
+        if (!DoIoctl(fd_, UI_SET_RELBIT, item)) {
+            HiLog::Error(LABEL, "%{public}s Error setting rel: %{public}u", __func__, item);
             return false;
         }
     }
@@ -122,7 +118,7 @@ bool VirtualDevice::SetUp()
 
 bool VirtualDevice::EmitEvent(uint16_t type, uint16_t code, uint32_t value) const
 {
-    struct input_event event {};
+    input_event event {};
     event.type = type;
     event.code = code;
     event.value = value;

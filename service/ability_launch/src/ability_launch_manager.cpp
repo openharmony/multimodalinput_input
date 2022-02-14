@@ -205,11 +205,6 @@ bool AbilityLaunchManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> &k
     ResetLastMatchedKey();
     for (auto iter = shortcutKeys_.begin(); iter != shortcutKeys_.end(); ++iter) {
         ShortcutKey &shortcutKey = iter->second;
-        int32_t keyCode = key->GetKeyCode();
-        const std::string checkkeycode = std::to_string(keyCode);
-        MMI_LOGT(" CheckLaunchAbility service trace GetKeyCode: %{public}d\n", key->GetKeyCode());
-        int32_t eventKey = 1;
-        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, checkkeycode, eventKey);
         if (!Match(shortcutKey, key)) {
             MMI_LOGD("not matched, next");
             continue;
@@ -278,11 +273,7 @@ bool AbilityLaunchManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
         return true;
     } else {
         const KeyEvent::KeyItem* keyItem = keyEvent->GetKeyItem();
-        if (keyItem == nullptr) {
-            MMI_LOGE("Skip, null keyItem");
-            return false;
-        }
-
+        CHKPF(keyItem);
         auto upTime = keyEvent->GetActionTime();
         auto downTime = keyItem->GetDownTime();
         MMI_LOGD("upTime %{public}d downTime %{public}d keyDownDuration %{public}d",

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_APP_REGISTER_H
-#define OHOS_APP_REGISTER_H
+#ifndef APP_REGISTER_H
+#define APP_REGISTER_H
 #include <set>
 #include <vector>
 #include "proto.h"
@@ -91,4 +91,4 @@ private:
 };
 }
 #define AppRegs OHOS::MMI::AppRegister::GetInstance()
-#endif
+#endif // APP_REGISTER_H
