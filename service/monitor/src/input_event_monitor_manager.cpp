@@ -43,12 +43,11 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventMontior(SessionPtr ses
     if (iter != monitors_.end()) {
         MMI_LOGE("SetEventKeyMonitor: repeate register");
         return RET_ERR;
-    } else {
-        iter = monitors_.insert(iter, monitorItem);
-        MMI_LOGD("eventType:%{public}d, fd:%{public}d register in server", eventType, session->GetFd());
-        return RET_OK;
     }
+    iter = monitors_.insert(iter, monitorItem);
+    MMI_LOGD("eventType:%{public}d, fd:%{public}d register in server", eventType, session->GetFd());
     MMI_LOGD("Leave");
+    return RET_OK;
 }
 
 void OHOS::MMI::InputEventMonitorManager::RemoveInputEventMontior(SessionPtr session, int32_t eventType)
@@ -100,13 +99,12 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventTouchpadMontior(int32_
     if (iter != monitorsTouch_.end()) {
         MMI_LOGE("SetEventTouchpadMonitor:repeate register");
         return RET_ERR;
-    } else {
-        iter = monitorsTouch_.insert(iter, monitorItemTouchpad);
-        MMI_LOGD("AddInputEventTouchpadMontior, Success, eventType:%{public}d, fd:%{public}d register in server",
-            eventType, session->GetFd());
-        return RET_OK;
     }
+    iter = monitorsTouch_.insert(iter, monitorItemTouchpad);
+    MMI_LOGD("AddInputEventTouchpadMontior, Success, eventType:%{public}d, fd:%{public}d register in server",
+        eventType, session->GetFd());
     MMI_LOGD("Leave");
+    return RET_OK;
 }
 
 void OHOS::MMI::InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
