@@ -120,7 +120,7 @@ ohos_shared_library("libmmi-client") {
     ":libmmi-common",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
-    "//foundation/multimodalinput/input/service/event_filter_binder:mmi_event_filter_service",
+    "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
   ]
 
   part_name = "multimodalinput_base"

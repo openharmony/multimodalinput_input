@@ -18,7 +18,7 @@
 #include <cstring>
 #include <functional>
 #include <vector>
-#include <inttypes.h>
+#include <cinttypes>
 #include <sys/stat.h>
 #include <unistd.h>
 #include "bytrace.h"
@@ -424,8 +424,8 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
 
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent_, sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d, errCode:%{public}d", 
-            eventDispatchResult, KEY_EVENT_DISP_FAIL);
+        MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d, errCode:%{public}d",
+                 eventDispatchResult, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
     return RET_OK;
@@ -667,14 +667,14 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         point->RemovePointerItem(point->GetPointerId());
-        MMI_LOGD("This touch event is up remove this finger"); 
+        MMI_LOGD("This touch event is up remove this finger");
         if (point->GetPointersIdList().empty()) {
             MMI_LOGD("This touch event is final finger up remove this finger");
             point->Reset();
         }
         return RET_OK;
     }
-    MMI_LOGD("Leave"); 
+    MMI_LOGD("Leave");
     return RET_OK;
 }
 
