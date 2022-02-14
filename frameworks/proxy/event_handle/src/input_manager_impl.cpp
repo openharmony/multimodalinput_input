@@ -278,7 +278,7 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
             InputMonitorMgr.RemoveInputEventMontior(monitorId);
             break;
         case MASK_TOUCH:
-            InputMonitorManager::GetInstance().RemoveMonitor(monitorId);
+            monitorManager_.RemoveMonitor(monitorId);
             break;
         case MASK_TOUCHPAD:
             InputMonitorMgr.RemoveInputEventTouchpadMontior(monitorId);
@@ -291,7 +291,7 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 
 void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
-    InputMonitorManager::GetInstance().MarkConsumed(monitorId, eventId);
+    monitorManager_.MarkConsumed(monitorId, eventId);
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
@@ -332,7 +332,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
     interceptorId /= ADD_MASK_BASE;
     switch (mask) {
         case MASK_TOUCH:
-            InputInterceptorManager::GetInstance().RemoveInterceptor(interceptorId);
+            interceptorManager_.RemoveInterceptor(interceptorId);
             break;
         case MASK_KEY:
             InterceptorMgr.RemoveInterceptor(interceptorId);
