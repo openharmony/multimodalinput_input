@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace MMI {
 enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING };
-class MultimodalInputConnectService final : public SystemAbility, public IMultimodalInputConnectStub {
+class MultimodalInputConnectService final : public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_DELAYED_SINGLETON(MultimodalInputConnectService);
     DECLEAR_SYSTEM_ABILITY(MultimodalInputConnectService);
 
