@@ -226,13 +226,6 @@ ohos_shared_library("libmmi-server") {
   part_name = "multimodalinput_base"
 }
 
-ohos_prebuilt_etc("mmi_log.conf") {
-  source = "mmi_log.conf"
-  relative_install_dir = "."
-  subsystem_name = "multimodalinput"
-  part_name = "multimodalinput_base"
-}
-
 ohos_prebuilt_etc("mmi_device_config.ini") {
   source = "mmi_device_config.ini"
   relative_install_dir = "."
