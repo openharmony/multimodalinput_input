@@ -50,7 +50,7 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
             break;
         case SET_EVENT_INJECT:
             pkt >> devIndex >> speechEvent;
-            MMI_LOGI("hdi server recv massage: devIndex = %{public}d.", devIndex);
+            MMI_LOGI("hdi server recv massage: devIndex:%{public}d.", devIndex);
             OnSetEventInject(speechEvent, devIndex);
             break;
         case SHOW_DEVICE_INFO:
@@ -58,7 +58,7 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
             break;
         case SET_HOT_PLUGS:
             pkt >> devIndex >> devSatatus;
-            MMI_LOGI("recv inject tool hot data, devIndex = %{public}d, status = %{public}d.", devIndex, devSatatus);
+            MMI_LOGI("recv inject tool hot data, devIndex:%{public}d, status:%{public}d.", devIndex, devSatatus);
             OnSetHotPlugs(devIndex, devSatatus);
             break;
         default:
@@ -138,7 +138,7 @@ void HdiInject::OnInitHdiServerStatus()
 void HdiInject::ShowAllDeviceInfo()
 {
     for (const auto &item : deviceArray_) {
-        MMI_LOGI("deviceName = %{public}s, devIndex = %{public}d, status = %{public}d, devType = %{public}d",
+        MMI_LOGI("deviceName:%{public}s, devIndex:%{public}d, status:%{public}d, devType:%{public}d",
             item.chipName, item.devIndex, item.status, item.devType);
     }
 }
@@ -152,12 +152,12 @@ bool HdiInject::SetDeviceHotStatus(int32_t devIndex, int32_t status)
 {
     for (auto iter = deviceArray_.begin(); iter != deviceArray_.end(); ++iter) {
         if (iter->devIndex == devIndex) {
-            if (iter->status != status) {
-                iter->status = ~status + 1;
-                return true;
-            } else {
+            if (iter->status == status) {
+                MMI_LOGE("Failed to find status.");
                 return false;
             }
+            iter->status = ~status + 1;
+            return true;
         }
     }
 
@@ -189,7 +189,7 @@ bool HdiInject::ReportHotPlugEvent()
 bool HdiInject::ReportHotPlugEvent(uint32_t devIndex, uint32_t status)
 {
     if (!(SetDeviceHotStatus(devIndex, status))) {
-        MMI_LOGE("SetDeviceHotStatus error devIndex = %{public}d, status = %{public}d.", devIndex, status);
+        MMI_LOGE("SetDeviceHotStatus error devIndex:%{public}d, status:%{public}d.", devIndex, status);
         return false;
     }
     int32_t devType = GetDevTypeByIndex(devIndex);

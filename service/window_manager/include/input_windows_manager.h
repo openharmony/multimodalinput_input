@@ -162,7 +162,6 @@ public:
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId);
     const std::vector<LogicalDisplayInfo>& GetLogicalDisplayInfo() const;
     const std::map<int32_t, WindowInfo>& GetWindowInfo() const;
-    bool FindWindow(std::shared_ptr<PointerEvent> pointerEvent);
     MouseLocation GetMouseInfo();
     void UpdateAndAdjustMouseLoction(double& x, double& y);
     void AdjustGlobalCoordinate(int32_t& globalX, int32_t& globalY, int32_t width, int32_t height);

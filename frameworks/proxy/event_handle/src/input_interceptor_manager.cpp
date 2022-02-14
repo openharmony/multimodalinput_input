@@ -16,7 +16,8 @@
 #include "input_handler_manager.h"
 #include "util.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputInterceptorManager" };
 }
@@ -34,5 +35,6 @@ void InputInterceptorManager::RemoveInterceptor(int32_t interceptorId)
 {
     InputHandlerManager::GetInstance().RemoveHandler(interceptorId, InputHandlerType::INTERCEPTOR);
 }
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 

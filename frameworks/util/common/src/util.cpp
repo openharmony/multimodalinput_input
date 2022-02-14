@@ -447,5 +447,5 @@ std::string StringFmt(const char* str, ...)
     return buf;
 }
 
-}
-}
+} // namespace MMI
+} // namespace OHOS
