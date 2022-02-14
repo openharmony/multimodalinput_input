@@ -381,11 +381,11 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         return KEY_EVENT_DISP_FAIL;
     }
     int32_t keyCode = keyEvent_->GetKeyCode();
-    std::string KeyEventString = "service dispatch keyCode=" + std::to_string(keyCode);
-    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, KeyEventString);
+    std::string keyEventString = "service dispatch keyCode=" + std::to_string(keyCode);
+    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
     int32_t keyId = keyEvent_->GetId();
-    KeyEventString = "OnKeyEvent";
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, KeyEventString, keyId);
+    keyEventString = "OnKeyEvent";
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
     MMI_LOGD("Inject keyCode=%{public}d, action=%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
     return RET_OK;
 }
@@ -409,18 +409,18 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
         return KEY_EVENT_PKG_FAIL;
     }
     int32_t keyId = keyEvent_->GetId();
-    std::string KeyEventString = "OnKeyEvent";
-    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, KeyEventString, keyId);
-    KeyEventString = "service report keyId=" +  std::to_string(keyId);
-    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, KeyEventString);
+    std::string keyEventString = "OnKeyEvent";
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
+    keyEventString = "service report keyId=" +  std::to_string(keyId);
+    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
 #ifndef OHOS_WESTEN_MODEL
     if (InterceptorMgrGbl.OnKeyEvent(keyEvent_)) {
         MMI_LOGD("key event filter find a key event from Original event keyCode:%{puiblic}d",
                  keyEvent_->GetKeyCode());
         int32_t keyCode = keyEvent_->GetKeyCode();
-        KeyEventString = "service filter keyCode=" + std::to_string(keyCode);
-        BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, KeyEventString);
-        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, KeyEventString, keyId);
+        keyEventString = "service filter keyCode=" + std::to_string(keyCode);
+        BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
+        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
         return RET_OK;
     }
     return OnEventKey(ev.event);
