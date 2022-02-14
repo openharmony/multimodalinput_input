@@ -116,7 +116,7 @@ std::vector<int32_t> GetIntArray(const napi_env &env, const napi_value &value)
             MMI_LOGE("NapiElement get int32 value failed");
             return {};
         }
-        MMI_LOGD("Get int array number: %{public}d", value);
+        MMI_LOGD("Get int array number:%{public}d", value);
         paramArrays.push_back(value);
     }
     MMI_LOGD("leave");
@@ -173,7 +173,7 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
         MMI_LOGD("No callback in %{public}s", event->eventType.c_str());
         return JS_CALLBACK_EVENT_FAILED;
     }
-    MMI_LOGD("EventType: %{public}s, keyEventMonitorInfos: %{public}d", event->eventType.c_str(),
+    MMI_LOGD("EventType:%{public}s, keyEventMonitorInfos:%{public}d", event->eventType.c_str(),
         static_cast<int32_t>(iter->second.size()));
     auto it = iter->second.begin();
     while (it != iter->second.end()) {
@@ -192,13 +192,13 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
             }
             delete monitorInfo;
             monitorInfo = nullptr;
-            MMI_LOGD("Callback already exists, size: %{public}d",
+            MMI_LOGD("Callback already exists, size:%{public}d",
                 static_cast<int32_t>(iter->second.size()));
             return JS_CALLBACK_EVENT_SUCCESS;
         }
         it++;
     }
-    MMI_LOGD("callback size=%{public}d", static_cast<int32_t>(iter->second.size()));
+    MMI_LOGD("callback size:%{public}d", static_cast<int32_t>(iter->second.size()));
     return JS_CALLBACK_EVENT_NOT_EXIST;
 }
 
@@ -263,7 +263,7 @@ void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
                 }
             }
             auto callFunResult = napi_call_function(env, nullptr, callback, 2, result, &callResult);
-            MMI_LOGD("CallFunResult: %{public}d", static_cast<int32_t>(callFunResult));
+            MMI_LOGD("CallFunResult:%{public}d", static_cast<int32_t>(callFunResult));
             if (callFunResult != napi_ok) {
                 MMI_LOGE("Call function fail, callFunResult: %{public}d", callFunResult);
                 return;
