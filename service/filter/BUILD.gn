@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
-event_filter_path = "${mmi_path}/service/event_filter_binder"
+event_filter_path = "${mmi_path}/service/filter"
 
 config("mmi_event_filter_config") {
   include_dirs = [

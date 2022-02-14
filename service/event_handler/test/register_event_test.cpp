@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "register_event.h"
 #include <gtest/gtest.h>
+#include "register_event.h"
 #include "input-event-codes.h"
 
 namespace {
