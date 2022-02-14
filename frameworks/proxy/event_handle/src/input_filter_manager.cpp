@@ -31,7 +31,7 @@ int32_t InputFilterManager::FilterKeyEvent(std::string name, Authority authority
         MMI_LOGD("the input name or handle is nullptr");
         return RET_ERR;
     }
-    MMI_LOGD("******************* the authority is %{public}d", authority);
+    MMI_LOGD("the authority:%{public}d", authority);
     if (authority < NO_AUTHORITY || authority > HIGH_AUTHORITY) {
         MMI_LOGD("the input authority is incorrect");
         return RET_ERR;
@@ -51,7 +51,7 @@ int32_t InputFilterManager::UnFilterKeyEvent(int32_t id)
 {
     auto len = keyEventFilterList_.size();
     if (len == 0) {
-        MMI_LOGD("  keyEventFilterList_ size is zero ");
+        MMI_LOGD("keyEventFilterList_ size is zero ");
         return RET_ERR;
     }
     for (auto it = keyEventFilterList_.begin(); it != keyEventFilterList_.end(); it++) {
@@ -176,7 +176,7 @@ int32_t InputFilterManager::FilterTouchEvent(std::string name, Authority authori
 
     int32_t highAuthorityFilterId = GetHighAuthorityFilterId();
     if (highAuthorityFilterId != 0 && highAuthorityFilterId == touchEventFilter.GetId()) {
-        MMI_LOGE("add filter is  the highest Authority");
+        MMI_LOGE("add filter is the highest Authority");
         MMIEventHdl.AddTouchEventFilter(touchEventFilter.GetId(), name, authority);
     }
 
@@ -187,7 +187,7 @@ int32_t InputFilterManager::UnFilterTouchEvent(int32_t id)
 {
     auto len = touchEventFilterList_.size();
     if (len == 0) {
-        MMI_LOGE(" touchEventFilterList_ size is zero ");
+        MMI_LOGE("touchEventFilterList_ size is zero ");
         return RET_ERR;
     }
 
@@ -256,7 +256,7 @@ std::function<void(TouchEvent)> InputFilterManager::TouchEventFilter::GetHandler
 
 int32_t InputFilterManager::OnTouchEvent(TouchEvent event, int32_t id)
 {
-    MMI_LOGE("client on touch event call function handler, id=%{public}d", id);
+    MMI_LOGE("client on touch event call function handler, id:%{public}d", id);
     for (auto iter : touchEventFilterList_) {
         if (id == iter.GetId()) {
             iter.GetHandler()(event);
@@ -274,7 +274,7 @@ int32_t InputFilterManager::RegisterPointerEventInterceptor(std::string name_, A
         MMI_LOGD("the input name or handle is nullptr");
         return RET_ERR;
     }
-    MMI_LOGD("******************* the authority is %{public}d", authority_);
+    MMI_LOGD("the authority:%{public}d", authority_);
     if (authority_ < NO_AUTHORITY || authority_ > HIGH_AUTHORITY) {
         MMI_LOGD("the input authority is incorrect");
         return RET_ERR;
