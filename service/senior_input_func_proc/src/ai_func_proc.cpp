@@ -77,11 +77,11 @@ int32_t OHOS::MMI::AIFuncProc::CheckEventCode(const RawInputEvent& event)
     };
 
     auto findNum = static_cast<MmiMessageId>(event.ev_code);
-    if (g_aiSensorAllowProcCodes.find(findNum) != g_aiSensorAllowProcCodes.end()) {
-        return RET_OK;
-    } else {
+    if (g_aiSensorAllowProcCodes.find(findNum) == g_aiSensorAllowProcCodes.end()) {
+        MMI_LOGE("Failed to find ev_code");
         return RET_ERR;
     }
+    return RET_OK;
 }
 
 int32_t OHOS::MMI::AIFuncProc::GetDevType()
