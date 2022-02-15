@@ -231,7 +231,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterAppInfo(SessionPtr sess, NetPacke
     WinMgr->SetFocusSurfaceId(windowId);
     WinMgr->SetTouchFocusSurfaceId(windowId);
 #endif
-    MMI_LOGD("OnRegisterAppInfo fd:%{public}d bundlerName:%{public}s "
+    MMI_LOGD("OnRegisterAppInfo fd:%{public}d, bundlerName:%{public}s "
         "appName:%{public}s", fd, bundlerName.c_str(), appName.c_str());
     return RET_OK;
 }
@@ -248,10 +248,10 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterMsgHandler(SessionPtr sess, NetPa
     pkt >> eventType >> abilityId >> winId >> bundlerName >> appName;
     RegEventHM->RegisterEvent(eventType, fd);
     if (winId > 0) {
-        AppRegs->RegisterAppInfoforServer({abilityId, winId, fd, bundlerName, appName});
+        AppRegs->RegisterAppInfoforServer({ abilityId, winId, fd, bundlerName, appName });
     }
-    MMI_LOGD("OnRegisterMsgHandler fd:%{public}d eventType:%{public}d"
-             " bundlerName:%{public}s appName:%{public}s",
+    MMI_LOGD("OnRegisterMsgHandler fd:%{public}d, eventType:%{public}d"
+             " bundlerName:%{public}s, appName:%{public}s",
              fd, eventType, bundlerName.c_str(), appName.c_str());
     return RET_OK;
 }
