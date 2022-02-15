@@ -74,7 +74,7 @@ int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, con
     napi_valuetype tmpType = napi_undefined;
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        napi_throw_error(env, nullptr, "call napi_typeof fail.");
+        napi_throw_error(env, nullptr, "call napi_typeof fail");
         return value;
     }
     if (tmpType != napi_number) {
