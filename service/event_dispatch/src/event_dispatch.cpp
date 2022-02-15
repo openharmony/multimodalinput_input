@@ -628,7 +628,7 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
         int32_t eventType = pointEventType;
         newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime << touch.seatSlot;
         std::vector<std::pair<uint32_t, int32_t>> touchIds;
-        MMIRegEvent->GetTouchIds(touchIds, touch.deviceId);
+        MMIRegEvent->GetTouchIds(touch.deviceId, touchIds);
         if (!touchIds.empty()) {
             for (auto &touchId : touchIds) {
                 EventTouch touchTemp = {};
