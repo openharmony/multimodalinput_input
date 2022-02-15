@@ -165,7 +165,7 @@ InputFilterManager::TouchEventFilter InputFilterManager::GetTouchEventFilter(int
 int32_t InputFilterManager::FilterTouchEvent(std::string name, Authority authority,
     std::function<void(TouchEvent)> handler)
 {
-    CHKPR(handler,ERROR_NULL_POINTER);
+    CHKPR(handler, ERROR_NULL_POINTER);
     if (authority < NO_AUTHORITY || authority > HIGH_AUTHORITY) {
         MMI_LOGE("the input authority is incorrect");
         return RET_ERR;
@@ -369,8 +369,7 @@ std::function<void(MouseEvent)> InputFilterManager::PointerEventInterceptor::Get
 int32_t InputFilterManager::OnPointerEvent(MouseEvent event, int32_t id_)
 {
     MMI_LOGD("client on point event call function handler ");
-    for (auto &item : PointerEventInterceptorList_)
-    {
+    for (auto &item : PointerEventInterceptorList_) {
         if (id_ == item.GetId()) {
             item.GetHandler()(event);
             MMI_LOGD("client on point event call function handler success");
@@ -379,7 +378,6 @@ int32_t InputFilterManager::OnPointerEvent(MouseEvent event, int32_t id_)
     }
     return 0;
 }
-
 }
 }
 

@@ -14,7 +14,6 @@
  */
 
 #include "register_eventhandle_manager.h"
-#include <iostream>
 #include "proto.h"
 #include "util.h"
 #include "util_ex.h"

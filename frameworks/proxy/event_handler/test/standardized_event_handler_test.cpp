@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "standardized_event_handler.h"
 #include <gtest/gtest.h>
+#include "standardized_event_handler.h"
 
 namespace {
 using namespace testing::ext;

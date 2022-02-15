@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "event_factory.h"
 #include <gtest/gtest.h>
+#include "event_factory.h"
 #include "client_msg_handler.h"
 
 namespace {
