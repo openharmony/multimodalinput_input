@@ -38,11 +38,13 @@ constexpr int32_t INPUT_UI_TIMEOUT_TIME_MAX = 20 * 1000000;
 
 static void PrintEventSlotedCoordsInfo(const SlotedCoordsInfo& r)
 {
+    MMI_LOGD("enter");
     using namespace OHOS::MMI;
     for (int32_t i = 0; i < MAX_SOLTED_COORDS_NUMS; i++) {
         MMI_LOGT("[%{public}d] isActive: %{public}d, x:%{public}f, y:%{public}f",
             i, r.coords[i].isActive, r.coords[i].x, r.coords[i].y);
     }
+    MMI_LOGD("leave");
 }
 
 EventDispatch::EventDispatch()
@@ -57,6 +59,7 @@ void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
                                                   const int32_t fingerCount,
                                                   POINT_EVENT_TYPE& pointEventType)
 {
+    MMI_LOGD("enter");
     CHK(fingerCount > 0, PARAM_INPUT_INVALID);
     CHK(touch.time > 0, PARAM_INPUT_INVALID);
     CHK(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
@@ -98,6 +101,7 @@ void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
             }
         }
     }
+    MMI_LOGD("leave");
 }
 
 int32_t EventDispatch::GestureRegisteredEventDispatch(const MmiMessageId& idMsg,
@@ -105,6 +109,7 @@ int32_t EventDispatch::GestureRegisteredEventDispatch(const MmiMessageId& idMsg,
                                                       RegisteredEvent& registeredEvent,
                                                       uint64_t preHandlerTime)
 {
+    MMI_LOGD("enter");
     auto ret = RET_OK;
     if (idMsg == MmiMessageId::ON_PREVIOUS) {
         ret = DispatchRegEvent(MmiMessageId::ON_PREVIOUS, udsServer, registeredEvent,
@@ -126,12 +131,14 @@ int32_t EventDispatch::GestureRegisteredEventDispatch(const MmiMessageId& idMsg,
         ret = DispatchRegEvent(idMsg, udsServer, registeredEvent,
             INPUT_DEVICE_CAP_GESTURE, preHandlerTime);
     }
+    MMI_LOGD("leave");
     return ret;
 }
 
 int32_t EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& udsServer,
     const RegisteredEvent& registeredEvent, int32_t inputDeviceType, uint64_t preHandlerTime)
 {
+    MMI_LOGD("enter");
     CHKR(idMsg > MmiMessageId::INVALID, PARAM_INPUT_INVALID, PARAM_INPUT_INVALID);
     std::vector<int32_t> fds;
     RegEventHM->FindSocketFds(idMsg, fds);
@@ -142,7 +149,7 @@ int32_t EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& ud
 
     for (const auto& fd : fds) {
         auto appInfo = AppRegs->FindBySocketFd(fd);
-        MMI_LOGT("Event dispatcher of server, RegisteredEvent:physical:%{public}s, "
+        MMI_LOGD("Event dispatcher of server, RegisteredEvent:physical:%{public}s, "
                  "deviceType:%{public}u, eventType:%{public}u, occurredTime:%{public}" PRId64 ", "
                  "conbinecode:%{public}d, fd:%{public}d",
                  registeredEvent.physical, registeredEvent.deviceType,
@@ -156,12 +163,14 @@ int32_t EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& ud
             CHKR(udsServer.SendMsg(fd, newPacket), MSG_SEND_FAIL, MSG_SEND_FAIL);
         }
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventDispatch::KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer& udsServer,
     libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime)
 {
+    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     RegisteredEvent eve = {};
     auto result = eventPackage_.PackageRegisteredEvent<EventKeyboard>(key, eve);
@@ -207,6 +216,7 @@ int32_t EventDispatch::KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer
         }
     }
     if ((ret1 == RET_OK) && (ret2 == RET_OK)) {
+        MMI_LOGD("leave");
         return RET_OK;
     } else {
         MMI_LOGE("dispatching special registered event has failed");
@@ -217,6 +227,7 @@ int32_t EventDispatch::KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer
 int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_event *event,
     const EventTabletPad& tabletPad, const uint64_t preHandlerTime)
 {
+    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
@@ -262,12 +273,14 @@ int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_eve
             return MSG_SEND_FAIL;
         }
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_event *event,
     const EventJoyStickAxis& eventJoyStickAxis, const uint64_t preHandlerTime)
 {
+    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
@@ -295,12 +308,14 @@ int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_even
             return MSG_SEND_FAIL;
         }
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, libinput_event *event,
     const EventTabletTool& tableTool, const uint64_t preHandlerTime)
 {
+    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     int32_t focusId = WinMgr->GetFocusSurfaceId(); // obtaining focusId
     if (focusId < 0) {
@@ -348,11 +363,14 @@ int32_t EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, libinput_ev
             return MSG_SEND_FAIL;
         }
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 bool EventDispatch::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point)
 {
+    MMI_LOGD("enter");
+    MMI_LOGD("leave");
     return EventFilterWrap::GetInstance().HandlePointerEventFilter(point);
 }
 
@@ -421,6 +439,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
     std::shared_ptr<PointerEvent> point)
 {
+    MMI_LOGD("enter");
     CHKPR(point, ERROR_NULL_POINTER);
     InputHandlerManagerGlobal::GetInstance().HandleEvent(point);
     MMI_LOGD("call  DispatchTouchTransformPointEvent begin");
@@ -435,13 +454,14 @@ int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
         MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
-    MMI_LOGD("call  DispatchTouchTransformPointEvent end");
+    MMI_LOGD("call  DispatchTouchTransformPointEvent leave");
     return RET_OK;
 }
 
 int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event *event,
     EventPointer &point, const uint64_t preHandlerTime)
 {
+    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
@@ -514,12 +534,14 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event
             return MSG_SEND_FAIL;
         }
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event *event,
     const EventGesture& gesture, const uint64_t preHandlerTime)
 {
+    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
@@ -570,12 +592,14 @@ int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event
             return MSG_SEND_FAIL;
         }
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
     const EventTouch& touch, const uint64_t preHandlerTime)
 {
+    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
@@ -661,11 +685,13 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
             return MSG_SEND_FAIL;
         }
     }
+    MMI_LOGD("leave");
     return ret;
 }
 int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_event *event,
     const EventPointer& point, const uint64_t preHandlerTime)
 {
+    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     auto type = libinput_event_get_type(event);
@@ -696,11 +722,13 @@ int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_e
                 ret, REG_EVENT_DISP_FAIL);
         }
     }
+    MMI_LOGD("leave");
     return ret;
 }
 
 void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, int32_t number)
 {
+    MMI_LOGD("enter");
     int32_t checkLaunchAbility = 1;
     int32_t keyCode = key->GetKeyCode();
     std::string checkKeyCode;
@@ -776,12 +804,14 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
         return MSG_SEND_FAIL;
     }
     MMI_LOGD("DispatchKeyEventByPid end");
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *event,
     const KeyEventValueTransformations& trs, EventKeyboard& key, const uint64_t preHandlerTime)
 {
+    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
@@ -832,17 +862,21 @@ int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *ev
             return MSG_SEND_FAIL;
         }
     }
+    MMI_LOGD("leave");
     return ret;
 }
 
 int32_t EventDispatch::AddInputEventFilter(sptr<IEventFilter> filter)
 {
+    MMI_LOGD("enter");
+    MMI_LOGD("leave");
     return EventFilterWrap::GetInstance().AddInputEventFilter(filter);
 }
 
 int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_event *event,
     std::shared_ptr<PointerEvent> pointerEvent, const uint64_t preHandlerTime)
 {
+    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
@@ -893,6 +927,7 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
         MMI_LOGE("Sending structure of PointerEvent failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }
 }

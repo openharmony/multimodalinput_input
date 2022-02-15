@@ -33,6 +33,7 @@ namespace MMI {
 
 void ChkConfig(int32_t fd)
 {
+    MMI_LOGD("enter");
     mprintf(fd, "ChkMMIConfig: ");
 #ifdef OHOS_BUILD
     mprintf(fd, "\tOHOS_BUILD");
@@ -61,10 +62,12 @@ void ChkConfig(int32_t fd)
     mprintf(fd, "\tEXP_CONFIG: %s\n", DEF_EXP_CONFIG);
     mprintf(fd, "\tEXP_SOPATH: %s\n", DEF_EXP_SOPATH);
     mprintf(fd, "\tXKB_CONFIG_PATH: %s\n", DEF_XKB_CONFIG);
+    MMI_LOGD("leave");
 }
 
 void ChkAppInfos(int32_t fd)
 {
+    MMI_LOGD("enter");
     auto focusId = WinMgr->GetFocusSurfaceId();
     auto touchFocusId = WinMgr->GetTouchFocusSurfaceId();
     auto appInfo = AppRegs->FindByWinId(focusId);
@@ -78,15 +81,19 @@ void ChkAppInfos(int32_t fd)
                 appInfo.appName.c_str());
     }
     AppRegs->Dump(fd);
+    MMI_LOGD("leave");
 }
 
 void EventDump::Init(UDSServer& udss)
 {
+    MMI_LOGD("enter");
     udsServer_ = &udss;
+    MMI_LOGD("leave");
 }
 
 void EventDump::Dump(int32_t fd)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
 
     auto strCurTime = Strftime();
@@ -106,10 +113,12 @@ void EventDump::Dump(int32_t fd)
     }
     strCurTime = Strftime();
     mprintf(fd, "MMIDumpsEnd: %s", strCurTime.c_str());
+    MMI_LOGD("leave");
 }
 
 void EventDump::TestDump()
 {
+    MMI_LOGD("enter");
     constexpr int32_t MAX_PATH_SIZE = 128;
     char szPath[MAX_PATH_SIZE] = {};
     CHK(sprintf_s(szPath, MAX_PATH_SIZE, "%s/mmidump-%s.txt", DEF_MMI_DATA_ROOT, Strftime("%y%m%d%H%M%S").c_str()) >= 0,
@@ -123,10 +132,12 @@ void EventDump::TestDump()
     CHK(fd >= 0, FILE_OPEN_FAIL);
     Dump(fd);
     close(fd);
+    MMI_LOGD("leave");
 }
 
 void EventDump::InsertDumpInfo(const std::string& str)
 {
+    MMI_LOGD("enter");
     CHK(!str.empty(), PARAM_INPUT_INVALID);
     std::lock_guard<std::mutex> lock(mu_);
 
@@ -135,10 +146,12 @@ void EventDump::InsertDumpInfo(const std::string& str)
         dumpInfo_.erase(dumpInfo_.begin());
     }
     dumpInfo_.push_back(str);
+    MMI_LOGD("leave");
 }
 
 void EventDump::InsertFormat(std::string str, ...)
 {
+    MMI_LOGD("enter");
     CHK(!str.empty(), INVALID_PARAM);
     va_list args;
     va_start(args, str);
@@ -150,6 +163,7 @@ void EventDump::InsertFormat(std::string str, ...)
     }
     va_end(args);
     InsertDumpInfo(buf);
+    MMI_LOGD("leave");
 }
 }
 }
