@@ -50,7 +50,7 @@ void MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 
     WinMgr->UpdateAndAdjustMouseLoction(absolutionX_, absolutionY_);
 
-    MMI_LOGD("Change Coordinate : x:%{public}lf, y:%{public}lf",  absolutionX_, absolutionY_);
+    MMI_LOGD("Change Coordinate : x:%{public}lf,y:%{public}lf",  absolutionX_, absolutionY_);
 }
 
 void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem)
@@ -191,16 +191,16 @@ void MouseEventHandler::Normalize(libinput_event *event)
 
 void MouseEventHandler::DumpInner()
 {
-    MMI_LOGD("PointerAction:%{public}d, PointerId:%{public}d, SourceType:%{public}d,"
-        "ButtonId:%{public}d, VerticalAxisValue:%{public}lf, HorizontalAxisValue:%{public}lf",
+    MMI_LOGD("PointerAction:%{public}d,PointerId:%{public}d,SourceType:%{public}d,"
+        "ButtonId:%{public}d,VerticalAxisValue:%{public}lf,HorizontalAxisValue:%{public}lf",
         pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId(), pointerEvent_->GetSourceType(),
         pointerEvent_->GetButtonId(), pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
         pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
 
     PointerEvent::PointerItem item;
     CHK(pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item), PARAM_INPUT_FAIL);
-    MMI_LOGD("item: DownTime:%{public}d, IsPressed:%{public}s, GlobalX:%{public}d, GlobalY:%{public}d, "
-        "Width:%{public}d, Height:%{public}d, Pressure:%{public}d, DeviceId:%{public}d",
+    MMI_LOGD("item: DownTime:%{public}d,IsPressed:%{public}s,GlobalX:%{public}d,GlobalY:%{public}d,"
+        "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,DeviceId:%{public}d",
         item.GetDownTime(), (item.IsPressed() ? "true" : "false"), item.GetGlobalX(), item.GetGlobalY(),
         item.GetWidth(), item.GetHeight(), item.GetPressure(), item.GetDeviceId());
 }

@@ -46,7 +46,7 @@ void OHOS::MMI::InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, i
         return;
     } else {
         iter = interceptor_.insert(iter, interceptorItem);
-        MMI_LOGD("sourceType:%{public}d, fd:%{public}d register in server", sourceType, session->GetFd());
+        MMI_LOGD("sourceType:%{public}d,fd:%{public}d register in server", sourceType, session->GetFd());
     }
 }
 
@@ -59,7 +59,7 @@ void OHOS::MMI::InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
     if (iter == interceptor_.end()) {
         MMI_LOGE("OnRemoveInterceptor::interceptorItem does not exist");
     } else {
-        MMI_LOGD("sourceType:%{public}d, fd:%{public}d remove from server", iter->sourceType,
+        MMI_LOGD("sourceType:%{public}d,fd:%{public}d remove from server", iter->sourceType,
                  iter->session->GetFd());
         interceptor_.erase(iter);
     }
@@ -73,9 +73,9 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
     }
     PointerEvent::PointerItem pointer;
     CHKF(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL);
-    MMI_LOGT("interceptor-servereventTouchpad:actionTime:%{public}d, "
-             "sourceType:%{public}d, pointerAction:%{public}d, "
-             "pointerId:%{public}d, point.x:%{public}d, point.y:%{public}d, press:%{public}d",
+    MMI_LOGT("interceptor-servereventTouchpad:actionTime:%{public}d,"
+             "sourceType:%{public}d,pointerAction:%{public}d,"
+             "pointerId:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     NetPacket newPkt(MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR);
