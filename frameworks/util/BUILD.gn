@@ -50,7 +50,6 @@ ohos_shared_library("libmmi-util") {
   sources = [
     "common/include/klog.c",
     "common/src/libmmi_util.cpp",
-    "common/src/log.cpp",
     "common/src/run_shell_util.cpp",
     "common/src/safe_keeper.cpp",
     "common/src/util.cpp",
@@ -104,7 +103,7 @@ ohos_unittest("ut-mmi-util-out") {
   ]
 
   if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -168,7 +167,7 @@ ohos_unittest("RunShellUtilTest") {
   ]
 
   if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
   cflags = [ "-DOHOS_BUILD" ]

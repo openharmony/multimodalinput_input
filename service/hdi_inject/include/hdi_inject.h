@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_HDI_INJECT_H
-#define OHOS_HDI_INJECT_H
+#ifndef HDI_INJECT_H
+#define HDI_INJECT_H
 #ifdef OHOS_BUILD_HDF
 
 #include <vector>
@@ -93,4 +93,4 @@ private:
 }
 #define MMIHdiInject OHOS::MMI::DelayedSingleton<OHOS::MMI::HdiInject>::GetInstance()
 #endif // OHOS_BUILD_HDF
-#endif // OHOS_HDI_INJECT_H
+#endif // HDI_INJECT_H

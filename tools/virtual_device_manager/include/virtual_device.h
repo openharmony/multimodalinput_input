@@ -56,8 +56,8 @@ protected:
     const uint16_t vendorId_;
     const uint16_t productId_;
     const uint16_t version_;
-    struct uinput_user_dev dev_ {};
-    struct uinput_abs_setup absTemp_ = {};
+    uinput_user_dev dev_ {};
+    uinput_abs_setup absTemp_ = {};
     std::vector<uinput_abs_setup> absInit_;
 };
 }

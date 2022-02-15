@@ -59,12 +59,8 @@ void InputManagerManualTest::AddInputEventFilter()
 {
     MMI_LOGT("enter");
     auto callback = [this](std::shared_ptr<PointerEvent> pointer) -> bool {
-        MMI_LOGT("enter");
-        if (pointer == nullptr) {
-            MMI_LOGE("pointer is null");
-            return false;
-        }
-
+        MMI_LOGT("callback enter");
+        CHKPF(pointer);
         const std::vector<int32_t> ids = pointer->GetPointersIdList();
         if (ids.empty()) {
             MMI_LOGE("ids is empty");
@@ -74,7 +70,7 @@ void InputManagerManualTest::AddInputEventFilter()
         const int firstPointerId = ids[0];
         PointerEvent::PointerItem item;
         if (!pointer->GetPointerItem(firstPointerId, item)) {
-            MMI_LOGE("GetPointerItem(%{public}d) fail", firstPointerId);
+            MMI_LOGE("GetPointerItem:%{public}d fail", firstPointerId);
             return false;
         }
 

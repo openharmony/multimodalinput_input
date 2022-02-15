@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_SYSTEM_EVENT_HANDLER_H
-#define OHOS_SYSTEM_EVENT_HANDLER_H
+#ifndef SYSTEM_EVENT_HANDLER_H
+#define SYSTEM_EVENT_HANDLER_H
 
 #include <functional>
 #include <map>
@@ -21,7 +21,8 @@
 #include "proto.h"
 #include "msg_handler.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 class SystemEventHandler : public DelayedSingleton<SystemEventHandler>, public MsgHandler<std::function<void()>> {
 public:
     SystemEventHandler();
@@ -44,7 +45,8 @@ protected:
     void OnMute();
     void OnBack();
 };
-}
+} // namespace MMI
+} // namespace OHOS
 #define SysEveHdl OHOS::MMI::SystemEventHandler::GetInstance()
 
-#endif
+#endif // SYSTEM_EVENT_HANDLER_H

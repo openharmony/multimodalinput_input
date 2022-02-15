@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_LIB_HDF_H
-#define OHOS_LIB_HDF_H
+#ifndef LIB_HDF_H
+#define LIB_HDF_H
 extern int32_t GetInputInterfaceFromInject(IInputInterface** interface);
 #define hdfbit(y_) (1UL << (y_))
 
@@ -53,4 +53,4 @@ enum io_ctl_cmd {
     IO_ABSBEGIN     = 0x40,
     IO_ABEND        = 0x80,
 };
-#endif
+#endif // LIB_HDF_H

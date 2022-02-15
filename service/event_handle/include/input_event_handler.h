@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_INPUT_EVENT_HANDLER_H
-#define OHOS_INPUT_EVENT_HANDLER_H
+#ifndef INPUT_EVENT_HANDLER_H
+#define INPUT_EVENT_HANDLER_H
 
 #include <memory>
 #include "event_dispatch.h"
@@ -60,10 +60,6 @@ protected:
     
     int32_t OnMouseEventHandler(libinput_event *event);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
-    void OnKeyEventFilterTrace(const EventKeyboard& keyBoard);
-    void OnEventKeyboardTrace(const EventKeyboard& keyBoard);
-    void OnEventPointerTrace(const EventPointer& point);
-    void OnPointerFilterEventTrace(const EventPointer& event_pointer);
 #ifdef OHOS_WESTEN_MODEL
     bool OnSystemEvent(const KeyEventValueTransformations& temp, const enum KEY_STATE state) const;
 #endif
@@ -87,4 +83,4 @@ private:
 }
 }
 #define InputHandler OHOS::MMI::InputEventHandler::GetInstance()
-#endif
+#endif // INPUT_EVENT_HANDLER_H

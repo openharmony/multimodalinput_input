@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_INJECT_HDF_H
-#define OHOS_INJECT_HDF_H
+#ifndef HDF_INJECT_INIT_H
+#define HDF_INJECT_INIT_H
 enum  DrvType {
     TOUCH = 0,
     MOUSE,
@@ -28,4 +28,4 @@ enum  DrvType {
     TRACKBALL,
     INVALD = 100,
 };
-#endif
+#endif // HDF_INJECT_INIT_H

@@ -20,7 +20,8 @@
 #include "proto.h"
 #include "util.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIClient" };
 }
@@ -50,7 +51,7 @@ bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
     EventManager.SetClientHandle(GetPtr());
     CHKF(msgHdl->Init(), MSG_HANDLER_INIT_FAIL);
     auto msgHdlImp = static_cast<ClientMsgHandler *>(msgHdl.get());
-    CHKF(msgHdlImp, MSG_HANDLER_INIT_FAIL);
+    CHKPF(msgHdlImp, ERROR_NULL_POINTER);
     auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, msgHdlImp, std::placeholders::_1, std::placeholders::_2);
     CHKF(StartClient(callback, detachMode), START_CLI_FAIL);
     return true;
@@ -90,7 +91,7 @@ void MMIClient::SdkGetMultimodeInputInfo()
 
 void MMIClient::OnDisconnected()
 {
-    MMI_LOGD("Disconnected from server... fd:%{public}d", GetFd());
+    MMI_LOGD("Disconnected from server, fd:%{public}d", GetFd());
     if (funDisconnected_) {
         funDisconnected_(*this);
     }
@@ -100,7 +101,7 @@ void MMIClient::OnDisconnected()
 
 void MMIClient::OnConnected()
 {
-    MMI_LOGD("Connection to server succeeded... fd:%{public}d", GetFd());
+    MMI_LOGD("Connection to server succeeded, fd:%{public}d", GetFd());
     if (funConnected_) {
         funConnected_(*this);
     }
@@ -121,10 +122,11 @@ int32_t MMIClient::Socket()
                  " return invalid fd.");
     } else {
         MMI_LOGT("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
-                 " return fd = %{public}d.", fd_);
+                 " return fd:%{public}d.", fd_);
     }
 
     return fd_;
 }
-}
+} // namespace MMI
+} // namespace OHOS
 

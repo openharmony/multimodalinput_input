@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMODAL_INPUT_CONNECT_DEFINE_H
-#define OHOS_MULTIMODAL_INPUT_CONNECT_DEFINE_H
+#ifndef MULTIMODAL_INPUT_CONNECT_DEFINE_H
+#define MULTIMODAL_INPUT_CONNECT_DEFINE_H
 
 #include "parcel.h"
 
@@ -57,4 +57,4 @@ struct ConnectDefResp {
 } // namespace MMI
 } // namespace OHOS
 
-#endif // OHOS_MULTIMODAL_INPUT_CONNECT_DEFINE_H
+#endif // MULTIMODAL_INPUT_CONNECT_DEFINE_H

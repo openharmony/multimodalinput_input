@@ -54,6 +54,7 @@ HWTEST_F(AuxToolMsgHandlerTest, OnMsgHandler_002, TestSize.Level1)
     TestAuxToolMsgHandler auxObj;
     auxObj.OnMsgHandler(client, newPacket);
 }
+
 HWTEST_F(AuxToolMsgHandlerTest, OnMsgHandler_003, TestSize.Level1)
 {
     MmiMessageId idMsg = MmiMessageId::REGISTER_MSG_HANDLER;
@@ -74,6 +75,7 @@ HWTEST_F(AuxToolMsgHandlerTest, OnAiServerReply_001, TestSize.Level1)
     int32_t retResult = auxObj.OnAiServerReply(client, newPacket);
     EXPECT_EQ(RET_OK, retResult);
 }
+
 HWTEST_F(AuxToolMsgHandlerTest, OnAiServerReply_002, TestSize.Level1)
 {
     MmiMessageId idMsg = MmiMessageId::INVALID;

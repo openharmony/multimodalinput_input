@@ -21,10 +21,12 @@
 #include <dlfcn.h>
 #include <unistd.h>
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ExpansibilityOperation" };
     }
+}
 }
 
 OHOS::MMI::ExpansibilityOperation::ExpansibilityOperation()
@@ -88,7 +90,7 @@ void OHOS::MMI::ExpansibilityOperation::LoadExteralLibrary(const std::string& cf
     libPath_ = libPath;
     std::ifstream labels(cfg.c_str());
     if (!labels.is_open()) {
-        MMI_LOGE("Can't open the label file![%{public}s] errCode:%{public}d", cfg.c_str(), FILE_OPEN_FAIL);
+        MMI_LOGE("Can't open the label file![%{public}s], errCode:%{public}d", cfg.c_str(), FILE_OPEN_FAIL);
         return;
     }
 
@@ -103,7 +105,7 @@ void OHOS::MMI::ExpansibilityOperation::LoadExteralLibrary(const std::string& cf
         int32_t deviceEventFd = GetNewDeviceFd(fileName);
         // regist new fd
         if (!RegistDeviceEventFd(deviceEventFd)) {
-            MMI_LOGE("regist new device failed. file name:%{public}s errCode:%{public}d",
+            MMI_LOGE("regist new device failed. file name:%{public}s, errCode:%{public}d",
                      fileName.c_str(), DEV_REG_FAIL);
             return;
         }
@@ -113,7 +115,7 @@ void OHOS::MMI::ExpansibilityOperation::LoadExteralLibrary(const std::string& cf
 
 bool OHOS::MMI::ExpansibilityOperation::RegistDeviceEventFd(int32_t deviceEventFd)
 {
-    MMI_LOGD("The New Device fd:[%{public}d]", deviceEventFd);
+    MMI_LOGD("The New Device fd:%{public}d", deviceEventFd);
     return true;
 }
 

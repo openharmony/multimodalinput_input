@@ -42,12 +42,7 @@ bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> ev
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-
-    if (event == nullptr) {
-        MMI_LOGE("event is nullptr");
-        return false;
-    }
-
+    CHKPF(event);
     if (!data.WriteInterfaceToken(EventFilterProxy::GetDescriptor())) {
         MMI_LOGE("Failed to write descriptor");
         return false;
@@ -61,7 +56,7 @@ bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> ev
     const uint32_t code = static_cast<uint32_t>(OPERATOR_TYPE::HANDLE_POINTER_EVENT);
     int requestResult = Remote()->SendRequest(code, data, reply, option);
     if (requestResult != NO_ERROR) {
-        MMI_LOGE("send request fail, result: %{public}d", requestResult);
+        MMI_LOGE("send request fail, result:%{public}d", requestResult);
         return false;
     }
 

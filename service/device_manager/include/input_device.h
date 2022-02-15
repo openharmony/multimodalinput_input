@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_INPUT_DEVICE_H
-#define OHOS_INPUT_DEVICE_H
+#ifndef INPUT_DEVICE_H
+#define INPUT_DEVICE_H
 
 #include <string>
 #include <vector>
@@ -35,6 +35,6 @@ private:
     int32_t deviceType_;
     std::vector<int32_t> deviceIdList_;
 };
-}
-}
-#endif
+} // namespace MMI
+} // namespace OHOS
+#endif // INPUT_DEVICE_H

@@ -177,15 +177,12 @@ int32_t JSRegisterHandle::Register(const StandEventPtr eventHandle, int32_t winI
     auto wsConvert = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {};
     auto u16String = wsConvert.from_bytes(u8String);
     auto remoteObj = MMIToken::Create(u16String);
-    if (remoteObj == nullptr) {
-        MMI_LOGE("remoteObj is nullptr");
-        return ERROR_CODE;
-    }
+    CHKPR(remoteObj, ERROR_NULL_POINTER);
     remoteObj->SetName("TestJsHapName");
     remoteObj->SetBundlerName("TestJsBundlerName");
     response = MMIEventHdl.RegisterStandardizedEventHandle(remoteObj, winId, eventHandle);
     if (response != MMI_STANDARD_EVENT_SUCCESS) {
-        MMI_LOGE("failed, response=%{public}d", response);
+        MMI_LOGE("failed, response:%{public}d", response);
         return ERROR_CODE;
     }
 
@@ -199,7 +196,7 @@ int32_t JSRegisterHandle::Register(const StandEventPtr eventHandle, int32_t winI
 
     std::string registerHandle = std::to_string(winId) + "," + std::to_string(type);
     g_registerMap.insert(std::pair<std::string, RegisterHanldeInfo>(registerHandle, registerInfo));
-    MMI_LOGI("register success. register handle=%{public}s", registerHandle.c_str());
+    MMI_LOGI("register success. register handle:%{public}s", registerHandle.c_str());
     return response;
 }
 
@@ -212,12 +209,12 @@ int32_t JSRegisterHandle::Unregister(int32_t winId, uint32_t type)
         response = MMIEventHdl.UnregisterStandardizedEventHandle(iter->second.remoteObj,
             iter->second.winId, iter->second.context->pevent);
         if (response != MMI_STANDARD_EVENT_SUCCESS) {
-            MMI_LOGE("failed, response=%{public}d", response);
+            MMI_LOGE("failed, response:%{public}d", response);
             return response;
         }
         g_registerMap.erase(iter);
     }
-    MMI_LOGI("unregister success. register map size=%{public}d", static_cast<int32_t>(g_registerMap.size()));
+    MMI_LOGI("unregister success. register map size:%{public}d", static_cast<int32_t>(g_registerMap.size()));
     return response;
 }
 
@@ -229,13 +226,13 @@ int32_t JSRegisterHandle::UnregisterAll()
         response = MMIEventHdl.UnregisterStandardizedEventHandle(iter->second.remoteObj,
             iter->second.winId, iter->second.context->pevent);
         if (response != MMI_STANDARD_EVENT_SUCCESS) {
-            MMI_LOGE("failed, response=%{public}d", response);
+            MMI_LOGE("failed, response:%{public}d", response);
             return response;
         }
-        MMI_LOGD("unregister handle=%{public}s", iter->first.c_str());
+        MMI_LOGD("unregister handle:%{public}s", iter->first.c_str());
         g_registerMap.erase(iter);
     }
-    MMI_LOGI("unregister all success. register map size=%{public}d", static_cast<int32_t>(g_registerMap.size()));
+    MMI_LOGI("unregister all success. register map size:%{public}d", static_cast<int32_t>(g_registerMap.size()));
     return response;
 }
 }
