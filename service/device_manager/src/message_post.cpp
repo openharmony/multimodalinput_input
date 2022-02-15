@@ -49,7 +49,7 @@ void MessagePost::NotifyWestonThread()
     }
     int32_t value = 0;
     write(fd_, &value, sizeof(value));
-	MMI_LOGD("leave");
+    MMI_LOGD("leave");
 }
 
 void MessagePost::RunTasks()
