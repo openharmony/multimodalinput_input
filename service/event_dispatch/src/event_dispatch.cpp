@@ -388,7 +388,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_LOGE("UdsServer is a nullptr");
         return RET_ERR;
     }
-    if (fd <= 0) {
+    if (fd < 0) {
         MMI_LOGE("The fd less than 0");
         return RET_ERR;
     }
