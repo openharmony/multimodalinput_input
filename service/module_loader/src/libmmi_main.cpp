@@ -27,15 +27,16 @@
 #include "uds_command_queue.h"
 #endif // OHOS_BUILD_MMI_DEBUG
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
 #ifdef OHOS_WESTEN_MODEL
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "libmmi_main" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "libmmi_main" };
         static bool g_bThreadTerm = false;
 #endif
     }
 }
-
+}
 
 static std::atomic_bool g_isRun(false);
 
