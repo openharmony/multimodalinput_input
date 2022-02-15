@@ -196,14 +196,13 @@ static napi_value OffEvent(napi_env env, napi_callback_info info)
 
 static napi_value InjectEvent(napi_env env, napi_callback_info info)
 {
-    size_t argc = 1;
-    napi_value argv[1] = { 0 };
-    napi_valuetype tmpType = napi_undefined;
     napi_value result = nullptr;
     if (napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result) != napi_ok) {
         MMI_LOGE("call napi_create_int32 fail");
         return result;
     }
+    size_t argc = 1;
+    napi_value argv[1] = { 0 };
     if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
         MMI_LOGE("call napi_get_cb_info fail");
         return result;
@@ -212,6 +211,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
 
     napi_value keyHandle = nullptr;
     napi_get_named_property(env, argv[0], "KeyEvent", &keyHandle);
+    napi_valuetype tmpType = napi_undefined;
     napi_typeof(env, keyHandle, &tmpType);
     NAPI_ASSERT(env, tmpType == napi_object, "parameter1 is not napi_object");
 
@@ -234,13 +234,13 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
 // only support common/telephone/media/system event
 static napi_value UnitTest(napi_env env, napi_callback_info info)
 {
-    size_t argc;
-    napi_value argv[ARGC_UT_NUM] = { 0 };
     napi_value result = nullptr;
     if (napi_create_int32(env, ERROR_CODE, &result) != napi_ok) {
         MMI_LOGE("call napi_create_int32 fail");
         return result;
     }
+    size_t argc;
+    napi_value argv[ARGC_UT_NUM] = { 0 };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     NAPI_ASSERT(env, argc == ARGC_UT_NUM, "paramater num error");
 
@@ -279,13 +279,13 @@ static napi_value UnitTest(napi_env env, napi_callback_info info)
 
 static napi_value SetInjectFile(napi_env env, napi_callback_info info)
 {
-    size_t argc;
-    napi_value argv[ARGC_UT_NUM] = { 0 };
     napi_value result = nullptr;
     if (napi_create_int32(env, ERROR_CODE, &result) != napi_ok) {
         MMI_LOGE("call napi_create_int32 fail");
         return result;
     }
+    size_t argc;
+    napi_value argv[ARGC_UT_NUM] = { 0 };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
     napi_valuetype eventWinIdType = napi_undefined;
