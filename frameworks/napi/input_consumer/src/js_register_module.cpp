@@ -16,8 +16,8 @@
 #include <algorithm>
 #include <inttypes.h>
 #include "input_manager.h"
-#include "js_register_util.h"
 #include "js_register_module.h"
+#include "js_register_util.h"
 #include "key_event_pre.h"
 
 namespace OHOS {
@@ -128,10 +128,10 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
     return SUCCESS_CODE;
 }
 
-static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent){
+static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+{
     MMI_LOGD("enter");
     auto keyOption = monitorInfo->keyOption;
-    std::vector<int32_t> infoPreKeys = keyOption->GetPreKeys();
     std::vector<KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
     int32_t infoFinalKey = keyOption->GetFinalKey();
     int32_t keyEventFinalKey = keyEvent->GetKeyCode();
@@ -140,9 +140,10 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
         MMI_LOGD("%{public}d", __LINE__);
         return false;
     }
+    std::vector<int32_t> infoPreKeys = keyOption->GetPreKeys();
     int32_t infoSize = 0;
     auto it = infoPreKeys.begin();
-    while(it != infoPreKeys.end()) {
+    while (it != infoPreKeys.end()) {
         if (*it >= 0) {
             infoSize++;
         }
@@ -180,9 +181,9 @@ static void SubKeyEventCallback(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     while (iter != callbacks.end()) {
         auto &list = iter->second;
         iter++;
-        auto infoIter = list.begin();
         MMI_LOGD("list size:%{public}d", static_cast<int32_t>(list.size()));
-        while(infoIter != list.end()) {
+        auto infoIter = list.begin();
+        while (infoIter != list.end()) {
             auto monitorInfo = *infoIter;
             if (MatchCombinationkeys(monitorInfo, keyEvent)) {
                 monitorInfo->keyEvent = keyEvent;
@@ -200,7 +201,7 @@ bool CheckPara(const std::shared_ptr<KeyOption> keyOption)
     if (preKeys.size() > PRE_KEYS_SIZE) {
         MMI_LOGE("preKeys size is bigger than 4, can not process");
         return false;
-    } 
+    }
     std::vector<int32_t> checkRepeat;
     for (const auto &item : preKeys) {
         if (item < 0) {
@@ -261,8 +262,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     MMI_LOGD("enter");
-    KeyEventMonitorInfo *event = new KeyEventMonitorInfo
-    {
+    KeyEventMonitorInfo *event = new KeyEventMonitorInfo {
         .env = env,
         .asyncWork = nullptr,
     };

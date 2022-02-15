@@ -51,8 +51,8 @@ bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const s
 {
     bool value = false;
     napi_value napiValue = {};
-    napi_valuetype tmpType = napi_undefined;
     napi_get_named_property(env, object, name.c_str(), &napiValue);
+    napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_LOGE("call napi_typeof fail.");
         return false;
@@ -71,8 +71,8 @@ int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, con
 {
     int32_t value = 0;
     napi_value napiValue = {};
-    napi_valuetype tmpType = napi_undefined;
     napi_get_named_property(env, object, name.c_str(), &napiValue);
+    napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         napi_throw_error(env, nullptr, "call napi_typeof fail.");
         return value;
@@ -131,13 +131,13 @@ int32_t AddEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
         MMI_LOGD("No callback in %{public}s", event->eventType.c_str());
         callbacks[event->eventType] = {};
     }
-    auto it = callbacks[event->eventType];
     napi_value handler1 = nullptr;
     napi_status status = napi_get_reference_value(env, event->callback[0], &handler1);
     if (status != napi_ok) {
         napi_throw_error(env, nullptr, "Handler1 get reference value failed");
         return JS_CALLBACK_EVENT_FAILED;
     }
+    auto it = callbacks[event->eventType];
     for (const auto &iter : it) {
         napi_value handler2 = nullptr;
         status = napi_get_reference_value(env, (*iter).callback[0], &handler2);
@@ -177,11 +177,11 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
         static_cast<int32_t>(iter->second.size()));
     auto it = iter->second.begin();
     while (it != iter->second.end()) {
-        bool isEquals = false;
         napi_value handlerTemp = nullptr;
         napi_get_reference_value(env, (*it)->callback[0], &handlerTemp);
         napi_value handlerParam = nullptr;
         napi_get_reference_value(env, event->callback[0], &handlerParam);
+        bool isEquals = false;
         napi_strict_equals(env, handlerTemp, handlerParam, &isEquals);
         if (isEquals) {
             napi_delete_reference(env, (*it)->callback[0]);
@@ -222,13 +222,12 @@ void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
                 MMI_LOGE("Event get reference value failed");
                 return;
             }
-            napi_value callResult = nullptr;
             napi_value result[2] = { 0 };
             if (event->status < 0) {
                 MMI_LOGD("Status < 0 enter");
                 napi_value code = nullptr;
-                napi_value message = nullptr;
                 napi_create_string_utf8(env, "-1", NAPI_AUTO_LENGTH, &code);
+                napi_value message = nullptr;
                 napi_create_string_utf8(env, "failed", NAPI_AUTO_LENGTH, &message);
                 napi_create_error(env, code, message, &result[0]);
                 napi_get_undefined(env, &result[1]);
@@ -262,6 +261,7 @@ void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
                     return;
                 }
             }
+            napi_value callResult = nullptr;
             auto callFunResult = napi_call_function(env, nullptr, callback, 2, result, &callResult);
             MMI_LOGD("CallFunResult:%{public}d", static_cast<int32_t>(callFunResult));
             if (callFunResult != napi_ok) {
