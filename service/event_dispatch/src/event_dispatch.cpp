@@ -33,6 +33,8 @@
 namespace OHOS::MMI {
 constexpr int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 constexpr int32_t INPUT_UI_TIMEOUT_TIME_MAX = 20 * 1000000;
+constexpr int32_t TRIGGER_ANR = 0;
+constexpr int32_t NOT_TRIGGER_ANR = 1;
     namespace {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
     }
@@ -394,7 +396,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         return RET_ERR;
     }
 
-    if (IsANRProcess(udsServer, fd, point->GetId())) {
+    if (IsANRProcess(udsServer, fd, point->GetId()) == TRIGGER_ANR) {
         MMI_LOGE("the pointer event does not report normally, triggering ANR");
     }
 
@@ -738,7 +740,7 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
              key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
 
-    if (IsANRProcess(&udsServer, fd, key->GetId())) {
+    if (IsANRProcess(&udsServer, fd, key->GetId()) == TRIGGER_ANR) {
         MMI_LOGE("the key event does not report normally, triggering ANR");
     }
 
@@ -871,18 +873,18 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
     return RET_OK;
 }
 
-bool EventDispatch::IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id)
+int32_t EventDispatch::IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id)
 {
     MMI_LOGD("begin");
     auto session = udsServer->GetSession(fd);
-    CHKPR(session, ERROR_NULL_POINTER);
+    CHKPR(session, SESSION_NOT_FOUND);
     auto currentTime = GetSysClockTime();
     session->AddEvent(id, currentTime);
 
     auto firstTime = session->GetFirstEventTime();
     if (currentTime < (firstTime + INPUT_UI_TIMEOUT_TIME)) {
         MMI_LOGI("the event reports normally");
-        return false;
+        return NOT_TRIGGER_ANR;
     }
     if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME_MAX)) {
         session->ClearEventsVct();
@@ -894,10 +896,10 @@ bool EventDispatch::IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id)
         OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
     if (ret < 0) {
         MMI_LOGE("failed to notify HiSysEvent");
-        return true;
+        return TRIGGER_ANR;
     }
 
     MMI_LOGD("end");
-    return true;
+    return TRIGGER_ANR;
 }
 }
