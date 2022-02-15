@@ -17,10 +17,12 @@
 #include <set>
 #include "proto.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KnuckleFuncProc" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KnuckleFuncProc" };
     }
+}
 }
 
 using namespace std;
@@ -48,11 +50,11 @@ int32_t OHOS::MMI::KnuckleFuncProc::CheckEventCode(const RawInputEvent& event)
     };
 
     auto findNum = static_cast<MmiMessageId>(event.ev_code);
-    if (g_knuckleAllowProcCodes.find(findNum) != g_knuckleAllowProcCodes.end()) {
-        return RET_OK;
-    } else {
+    if (g_knuckleAllowProcCodes.find(findNum) == g_knuckleAllowProcCodes.end()) {
+        MMI_LOGE("Failed to find ev_code");
         return RET_ERR;
     }
+    return RET_OK;
 }
 
 int32_t OHOS::MMI::KnuckleFuncProc::GetDevType()
