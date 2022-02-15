@@ -400,10 +400,10 @@ public:
 
 public:
     PointerEvent(const PointerEvent& other);
-    PointerEvent(PointerEvent&& other) = delete;
+    PointerEvent(PointerEvent&& other) = default;
     virtual ~PointerEvent();
-    virtual PointerEvent& operator=(const PointerEvent& other) = delete;
-    virtual PointerEvent& operator=(PointerEvent&& other) = delete;
+    virtual PointerEvent& operator=(const PointerEvent& other) = default;
+    virtual PointerEvent& operator=(PointerEvent&& other) = default;
 
     static std::shared_ptr<PointerEvent> Create();
 
