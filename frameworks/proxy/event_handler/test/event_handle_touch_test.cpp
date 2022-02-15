@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "touch_event_handler.h"
 #include <codecvt>
 #include <locale>
 #include <gtest/gtest.h>
@@ -24,6 +23,7 @@
 #include "proto.h"
 #include "string_ex.h"
 #include "util_ex.h"
+#include "touch_event_handler.h"
 
 using namespace testing::ext;
 using namespace OHOS;

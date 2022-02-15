@@ -50,9 +50,9 @@ public:
     bool InsertMapEvent(MmiMessageId typeId, StandEventPtr standardizedEventHandle)
     {
         StandEventCallBack standEventInfo  = {};
-        standEventInfo .windowId = 0;
-        standEventInfo .eventCallBack = standardizedEventHandle;
-        mapEvents_.insert(std::make_pair(typeId, standEventInfo ));
+        standEventInfo.windowId= 0;
+        standEventInfo.eventCallBack = standardizedEventHandle;
+        mapEvents_.insert(std::make_pair(typeId, standEventInfo));
         return true;
     }
 };

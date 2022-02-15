@@ -117,7 +117,7 @@ int32_t MultimodalEventHandler::InjectEvent(const OHOS::KeyEvent& keyEvent)
 int32_t MultimodalEventHandler::InjectEvent(const OHOS::MMI::KeyEvent& keyEvent)
 {
     if (!InitClient()) {
-      return MMI_SERVICE_INVALID;
+        return MMI_SERVICE_INVALID;
     }
     return EventManager.InjectEvent(keyEvent);
 }
@@ -125,7 +125,7 @@ int32_t MultimodalEventHandler::InjectEvent(const OHOS::MMI::KeyEvent& keyEvent)
 int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr)
 {
     if (!InitClient()) {
-      return MMI_SERVICE_INVALID;
+        return MMI_SERVICE_INVALID;
     }
     return EventManager.InjectEvent(keyEventPtr);
 }

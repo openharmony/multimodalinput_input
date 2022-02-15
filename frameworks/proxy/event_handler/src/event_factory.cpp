@@ -14,12 +14,12 @@
  */
 
 #include "builtinkey_event.h"
-#include "event_factory.h"
 #include "keyboard_event.h"
 #include "rotation_event.h"
 #include "speech_event.h"
 #include "stylus_event.h"
 #include "touch_event.h"
+#include "event_factory.h"
 
 namespace OHOS {
 namespace MMI {

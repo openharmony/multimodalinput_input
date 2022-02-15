@@ -52,7 +52,7 @@ int32_t InputEventMonitorManager::AddInputEventMontior(
 
 void InputEventMonitorManager::RemoveInputEventMontior(int32_t monitorId)
 {
-	if (monitorId < 0) {
+    if (monitorId < 0) {
         MMI_LOGE("MonitorId invalid");
         return;
     }

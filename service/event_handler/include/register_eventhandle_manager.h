@@ -18,6 +18,7 @@
 
 #include <mutex>
 #include <map>
+#include <iostream>
 #include "libmmi_util.h"
 #include "singleton.h"
 

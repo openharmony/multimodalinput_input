@@ -14,8 +14,8 @@
  */
 
 #include <gtest/gtest.h>
-#include "system_event_handler.h"
 #include "libmmi_util.h"
+#include "system_event_handler.h"
 
 namespace {
 using namespace testing::ext;
