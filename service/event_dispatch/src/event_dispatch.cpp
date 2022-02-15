@@ -397,7 +397,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 
     if (IsANRProcess(udsServer, fd, point->GetId())) {
         MMI_LOGE("the pointer event does not report normally, triggering ANR");
-        return RET_ERR;
+        // return RET_ERR;
     }
 
     if (!udsServer->SendMsg(fd, newPacket)) {
