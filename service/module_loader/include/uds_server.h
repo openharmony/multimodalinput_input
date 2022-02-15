@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_UDS_SERVER_H
-#define OHOS_UDS_SERVER_H
+#ifndef UDS_SERVER_H
+#define UDS_SERVER_H
 
 #include <map>
 #include <mutex>
@@ -73,9 +73,6 @@ protected:
     void OnRecv(int32_t fd, const char *buf, size_t size);
     void OnEvent(const epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap);
     void OnThread();
-#ifdef OHOS_BUILD_MMI_DEBUG
-    virtual void HandleCommandQueue();
-#endif // OHOS_BUILD_MMI_DEBUG
 
     bool AddSession(SessionPtr ses);
     void DelSession(int32_t fd);
@@ -95,4 +92,4 @@ protected:
 };
 }
 }
-#endif
+#endif // UDS_SERVER_H

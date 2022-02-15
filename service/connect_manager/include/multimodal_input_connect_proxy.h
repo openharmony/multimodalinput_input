@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMODAL_INPUT_CONNECT_PROXY_H
-#define OHOS_MULTIMODAL_INPUT_CONNECT_PROXY_H
+#ifndef MULTIMODAL_INPUT_CONNECT_PROXY_H
+#define MULTIMODAL_INPUT_CONNECT_PROXY_H
 
 #include "i_multimodal_input_connect.h"
 #include "iremote_proxy.h"
@@ -36,4 +36,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // OHOS_MULTIMODAL_INPUT_CONNECT_PROXY_H
+#endif // MULTIMODAL_INPUT_CONNECT_PROXY_H

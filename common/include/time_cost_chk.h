@@ -20,7 +20,8 @@
 #define MAX_INPUT_EVENT_TIME (1000)
 #define MAX_OVER_TIME (300)
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 template<class T>
 class TimeCostChk {
     static inline constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TimeCostChk" };
@@ -37,7 +38,7 @@ public:
 
     ~TimeCostChk(void)
     {
-        auto ullCost = GetElapsed_micro(); // microsecond
+        auto ullCost = GetElapsed_micro();
         if ((ullCost > uiTime_) && strReason_.size() > 0 && strOutput_.size() > 0) {
             if (llParam1_ != 0 || llParam2_ != 0) {
                 MMI_LOGW("Time cost overtime (%{public}" PRId64 "(us)>%{public}u(us)) when Reason:%{public}s chk:%{public}s "
@@ -50,7 +51,6 @@ public:
         }
     }
 
-    // microseconds
     uint64_t GetElapsed_micro() const
     {
         auto tm64Cost = std::chrono::duration_cast<std::chrono::microseconds>(
@@ -61,11 +61,12 @@ public:
 
 private:
     const std::chrono::time_point<std::chrono::high_resolution_clock> beginTime_;
-    const std::string strOutput_ = ""; // output string
-    const std::string strReason_ = ""; // reason string
+    const std::string strOutput_ = "";
+    const std::string strReason_ = "";
     const uint32_t uiTime_ = 0;
     const int64_t llParam1_ = 0;
     const int64_t llParam2_ = 0;
 };
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // TIME_COST_CHK_H

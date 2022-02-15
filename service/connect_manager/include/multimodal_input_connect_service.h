@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMODAL_INPUT_CONNECT_SERVICE_H
-#define OHOS_MULTIMODAL_INPUT_CONNECT_SERVICE_H
+#ifndef MULTIMODAL_INPUT_CONNECT_SERVICE_H
+#define MULTIMODAL_INPUT_CONNECT_SERVICE_H
 
 #include "singleton.h"
 #include "iremote_object.h"
 #include "system_ability.h"
 #include "nocopyable.h"
-#include "i_multimodal_input_connect_stub.h"
+#include "multimodal_input_connect_stub.h"
 #include "i_uds_server.h"
 
 namespace OHOS {
 namespace MMI {
 enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING };
-class MultimodalInputConnectService final : public SystemAbility, public IMultimodalInputConnectStub {
+class MultimodalInputConnectService final : public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_DELAYED_SINGLETON(MultimodalInputConnectService);
     DECLEAR_SYSTEM_ABILITY(MultimodalInputConnectService);
 
@@ -39,7 +39,7 @@ public:
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
 
 protected:
-    virtual int32_t HandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) override;
+    virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) override;
 
 private:
     bool Initialize() const;
@@ -52,4 +52,4 @@ int32_t MultimodalInputConnectServiceStart();
 int32_t MultimodalInputConnectServiceStop();
 } // namespace MMI
 } // namespace OHOS
-#endif // OHOS_MULTIMODAL_INPUT_CONNECT_SERVICE_H
+#endif // MULTIMODAL_INPUT_CONNECT_SERVICE_H

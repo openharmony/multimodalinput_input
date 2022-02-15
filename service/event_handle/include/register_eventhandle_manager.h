@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_REGISTER_EVENTHANDLE_MANAGER_H
-#define OHOS_REGISTER_EVENTHANDLE_MANAGER_H
+#ifndef REGISTER_EVENTHANDLE_MANAGER_H
+#define REGISTER_EVENTHANDLE_MANAGER_H
 
 #include <mutex>
 #include <map>
@@ -51,4 +51,4 @@ private:
 }
 }
 #define RegEventHM OHOS::MMI::RegisterEventHandleManager::GetInstance()
-#endif
+#endif // REGISTER_EVENTHANDLE_MANAGER_H

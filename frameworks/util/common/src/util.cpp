@@ -38,14 +38,12 @@
 #include "securec.h"
 #include "uuid.h"
 
-namespace OHOS::MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Util"};
-    }
-}
-
 namespace OHOS {
 namespace MMI {
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Util"};
+}
+
 const std::map<int32_t, std::string> ERROR_STRING_MAP = {
     {MSG_SEND_FAIL, "Send Message Failed"},
     {NON_STD_EVENT, "Non-Standardized Event"},
@@ -83,7 +81,7 @@ std::string GetEnv(const std::string &name)
 
 int64_t GetMicrotime()
 {
-    struct timeval currentTime = {};
+    timeval currentTime = {};
     gettimeofday(&currentTime, nullptr);
     return currentTime.tv_sec * static_cast<int32_t>(1e6) + currentTime.tv_usec;
 }
@@ -91,10 +89,10 @@ int64_t GetMicrotime()
 uint64_t GetSysClockTime()
 {
     const int32_t conversionStep = 1000;
-    struct timespec ts = { 0, 0 };
+    timespec ts = { 0, 0 };
 
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
-        MMI_LOGT("clock_gettime failed: %{public}s", strerror(errno));
+        MMI_LOGT("clock_gettime failed:%{public}s", strerror(errno));
         return 0;
     }
 
@@ -201,7 +199,7 @@ std::string IdsListToString(const std::vector<int32_t> &list, const std::string 
     return str;
 }
 
-void LocalTime(struct tm &t, time_t curTime)
+void LocalTime(tm &t, time_t curTime)
 {
     time_t curTimeTemp = curTime;
     if (curTimeTemp == 0) {
@@ -227,9 +225,9 @@ std::string Strftime(const std::string &format, time_t curTime)
 
 static void PrintEventJoyStickAxisInfo(const std::string &axisName, const EventJoyStickAxisAbsInfo &r)
 {
-    MMI_LOGT("%{public}s: {code: %{public}d; value: %{public}d; min: %{public}d; max: %{public}d, "
-             "fuzz: %{public}d, flat: %{public}d, resolution: %{public}d,"
-             "standardValue: %{public}lf, isChanged: %{public}d}, ",
+    MMI_LOGT("%{public}s: {code:%{public}d, value:%{public}d, min:%{public}d, max:%{public}d, "
+             "fuzz:%{public}d, flat:%{public}d, resolution:%{public}d,"
+             "standardValue:%{public}lf, isChanged:%{public}d}, ",
              axisName.c_str(), r.code, r.value, r.minimum, r.maximum, r.fuzz, r.flat, r.resolution,
              r.standardValue, r.isChanged);
 }
@@ -260,9 +258,9 @@ void PrintWMSInfo(const std::string& str, const int32_t fd, const int32_t abilit
     if (focusId == -1) {
         MMI_LOGT("WMS:windowId = ''");
     } else {
-        MMI_LOGT("WMS:windowId = %{public}d", focusId);
+        MMI_LOGT("WMS:windowId:%{public}d", focusId);
     }
-    MMI_LOGT("CALL_AMS, fd: %{public}d abilityID: %{public}d", fd, abilityId);
+    MMI_LOGT("CALL_AMS, fd:%{public}d, abilityID:%{public}d", fd, abilityId);
 }
 
 int GetPid()
@@ -434,5 +432,5 @@ size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_
     return difList.size();
 }
 
-}
-}
+} // namespace MMI
+} // namespace OHOS

@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MEDIA_EVENTS_HANDLER_H
-#define OHOS_MEDIA_EVENTS_HANDLER_H
+#ifndef MEDIA_EVENT_HANDLER_H
+#define MEDIA_EVENT_HANDLER_H
 
 #include "standardized_event_handler.h"
 #include "multimodal_event.h"
@@ -30,4 +30,4 @@ public:
 };
 }
 }
-#endif
+#endif // MEDIA_EVENT_HANDLER_H

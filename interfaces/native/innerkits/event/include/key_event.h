@@ -12,10 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_KEY_EVENTS_H
-#define OHOS_KEY_EVENTS_H
+#ifndef KEY_EVENT_H
+#define KEY_EVENT_H
 #include <memory>
 #include <vector>
+#include "parcel.h"
 #include "input_event.h"
 
 namespace OHOS {
@@ -1450,6 +1451,9 @@ public:
         // The default value is true, which means it is in a pressed state.
         bool IsPressed() const;
         void SetPressed(bool pressed);
+    public:
+        bool WriteToParcel(Parcel &out) const;
+        bool ReadFromParcel(Parcel &in);
 
     private:
         bool pressed_;
@@ -1488,10 +1492,16 @@ public:
 
     const KeyItem* GetKeyItem() const;
     const KeyItem* GetKeyItem(int32_t keyCode) const;
-    bool IsValidKeyItem() const;
     bool IsValid() const;
+public:
+    bool WriteToParcel(Parcel &out) const;
+    bool ReadFromParcel(Parcel &in);
+
 protected:
     explicit KeyEvent(int32_t eventType);
+
+private:
+    bool IsValidKeyItem() const;
 
 private:
     int32_t keyCode_;
@@ -1500,4 +1510,4 @@ private:
 };
 }
 }
-#endif
+#endif // KEY_EVENT_H

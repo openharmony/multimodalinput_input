@@ -43,11 +43,8 @@ void EventFilterService::SetPointerEventPtr(std::function<bool(std::shared_ptr<P
 
 bool EventFilterService::HandlePointerEvent(const std::shared_ptr<PointerEvent> event)
 {
-    if (pointerFilter_ == nullptr) {
-        MMI_LOGE("pointerFilter_ is nullptr");
-        return false;
-    }
+    CHKPF(pointerFilter_);
     return pointerFilter_(event);
 }
-} // namespace Security
+} // namespace MMI
 } // namespace OHOS

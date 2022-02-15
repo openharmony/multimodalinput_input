@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DEVICE_REGISTER_H
-#define OHOS_DEVICE_REGISTER_H
+#ifndef DEVICE_REGISTER_H
+#define DEVICE_REGISTER_H
 #include <set>
 #include "uds_server.h"
 #include "util.h"
@@ -38,4 +38,4 @@ private:
 };
 }
 #define DevRegister OHOS::MMI::DeviceRegister::GetInstance()
-#endif
+#endif // DEVICE_REGISTER_H

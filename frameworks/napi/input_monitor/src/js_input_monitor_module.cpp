@@ -31,7 +31,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     MMI_LOGD("Enter");
     size_t requireArgc = 2;
-    size_t argc;
+    size_t argc = 2;
     napi_value argv[requireArgc];
     napi_status status = napi_generic_failure;
 
@@ -89,9 +89,11 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     MMI_LOGD("Enter");
-    size_t requireArgc = 2;
-    size_t argc;
-    napi_value argv[requireArgc];
+    size_t minArgc = 1;
+    size_t argc = 2;
+    napi_value argv[argc];
+    argv[0] = nullptr;
+    argv[1] = nullptr;
     napi_status status = napi_generic_failure;
 
     status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
@@ -99,11 +101,14 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         MMI_LOGE("Unregister js monitor failed, get cb info failed");
         return nullptr;
     }
-    if (argc < requireArgc) {
+    if (argc < minArgc) {
         MMI_LOGE("Unregister js monitor failed, the number of parameter is error");
         return nullptr;
     }
-
+    if (argv[0] == nullptr) {
+        MMI_LOGE("Unregister js monitor failed, the first parameter is null");
+        return nullptr;
+    }
     napi_valuetype valueType = napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
@@ -126,15 +131,20 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         MMI_LOGE("Unregister js monitor failed, the first parameter is error");
         return nullptr;
     }
+    if (argv[1] == nullptr) {
+        JSIMM.RemoveMonitor(env);
+        MMI_LOGD("remove all monitor");
+        return nullptr;
+    }
+
     status = napi_typeof(env, argv[1], &valueType);
     if (status != napi_ok) {
         MMI_LOGE("Unregister js monitor failed, typeof failed");
         return nullptr;
     }
     if (valueType != napi_function) {
-        MMI_LOGD("remove all monitor begin");
         JSIMM.RemoveMonitor(env);
-        MMI_LOGD("remove all monitor end");
+        MMI_LOGD("remove all monitor");
         return nullptr;
     }
 

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#ifdef OHOS_WESTEN_MODEL
 #include "message_post.h"
 #include "uds_socket.h"
 
@@ -69,5 +70,7 @@ void MessagePost::SetWestonCompositor(weston_compositor *ec)
 {
     ec_ = ec;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
+
+#endif // OHOS_WESTEN_MODEL

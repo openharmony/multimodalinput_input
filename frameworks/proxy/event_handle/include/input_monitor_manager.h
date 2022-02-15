@@ -20,8 +20,9 @@
 #include "i_input_event_consumer.h"
 #include "singleton.h"
 
-namespace OHOS::MMI {
-class InputMonitorManager : public Singleton<InputMonitorManager> {
+namespace OHOS {
+namespace MMI {
+class InputMonitorManager {
 public:
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor);
     void RemoveMonitor(int32_t monitorId);
@@ -35,5 +36,6 @@ inline bool InputMonitorManager::IsValidMonitorId(int32_t monitorId)
 {
     return IsValidHandlerId(monitorId);
 }
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 #endif // INPUT_MONITOR_MANAGER_H

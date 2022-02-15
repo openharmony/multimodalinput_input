@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_POINTER_EVENT_FILTER_SERVICE_H
-#define OHOS_POINTER_EVENT_FILTER_SERVICE_H
+#ifndef EVENT_FILTER_SERVICE_H
+#define EVENT_FILTER_SERVICE_H
 
 #include "iremote_object.h"
 #include "event_filter_stub.h"
@@ -34,4 +34,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // OHOS_POINTER_EVENT_FILTER_SERVICE_H
+#endif // EVENT_FILTER_SERVICE_H

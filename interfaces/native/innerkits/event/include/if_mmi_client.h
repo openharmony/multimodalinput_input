@@ -12,13 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_IF_MMI_CLIENT_H
-#define OHOS_IF_MMI_CLIENT_H
+#ifndef IF_MMI_CLIENT_H
+#define IF_MMI_CLIENT_H
 #include <memory>
 #include <functional>
 #include "if_client_msg_handler.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 class NetPacket;
 class IfMMIClient;
 typedef std::function<void(const IfMMIClient&)> ConnectCallback;
@@ -31,5 +32,6 @@ public:
     virtual void RegisterDisconnectedFunction(ConnectCallback fun) = 0;
 };
 using MMIClientPtr = std::shared_ptr<IfMMIClient>;
-}
-#endif // OHOS_IF_MMI_CLIENT_H
+} // namespace MMI
+} // namespace OHOS
+#endif // IF_MMI_CLIENT_H
