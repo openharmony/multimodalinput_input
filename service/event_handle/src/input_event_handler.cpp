@@ -412,7 +412,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
     int32_t keyId = keyEvent_->GetId();
     std::string keyEventString = "OnKeyEvent";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
-    keyEventString = "service report keyId=" +  std::to_string(keyId);
+    keyEventString = "service report keyId=" + std::to_string(keyId);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
 #ifndef OHOS_WESTEN_MODEL
     if (InterceptorMgrGbl.OnKeyEvent(keyEvent_)) {
