@@ -15,10 +15,12 @@
 
 #include "event_dispatch.h"
 #include <inttypes.h>
+#include "ability_manager_client.h"
 #include "input-event-codes.h"
 #include "ability_launch_manager.h"
 #include "bytrace.h"
 #include "event_filter_wrap.h"
+#include "hisysevent.h"
 #include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
 #include "input_handler_manager_global.h"
@@ -393,21 +395,9 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         return RET_ERR;
     }
 
-    auto session = udsServer->GetSession(fd);
-    CHKPR(session, ERROR_NULL_POINTER);
-    auto eventId = point->GetId();
-    auto currentTime = GetSysClockTime();
-    session->RecordEvent(eventId, currentTime);
-    auto firstTime = session->GetFirstEventTime();
-    if (currentTime < (firstTime + INPUT_UI_TIMEOUT_TIME)) {
-        MMI_LOGD("The pointer event reports normally");
-    }
-    if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME)) {
-        MMI_LOGD("The pointer event does not report normally, triggering ANR");
-    }
-    if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME_MAX)) {
-        session->ClearEventsVct();
-        MMI_LOGD("The pointer event is cleared");
+    if (IsANRProcess(udsServer, fd, point->GetId())) {
+        MMI_LOGE("the pointer event does not report normally, triggering ANR");
+        return RET_ERR;
     }
 
     if (!udsServer->SendMsg(fd, newPacket)) {
@@ -750,21 +740,9 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
              key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
 
-    auto session = udsServer.GetSession(fd);
-    CHKPR(session, ERROR_NULL_POINTER);
-    auto eventId = key->GetId();
-    auto currentTime = GetSysClockTime();
-    session->RecordEvent(eventId, currentTime);
-    auto firstTime = session->GetFirstEventTime();
-    if (currentTime < (firstTime + INPUT_UI_TIMEOUT_TIME)) {
-        MMI_LOGD("The key event reports normally");
-    }
-    if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME)) {
-        MMI_LOGD("The key event does not report normally, triggering ANR");
-    }
-    if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME_MAX)) {
-        session->ClearEventsVct();
-        MMI_LOGD("The key event is cleared.");
+    if (IsANRProcess(&udsServer, fd, key->GetId())) {
+        MMI_LOGE("the key event does not report normally, triggering ANR");
+        // return RET_ERR;
     }
 
     InputMonitorServiceMgr.OnMonitorInputEvent(key);
@@ -894,5 +872,36 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
         return MSG_SEND_FAIL;
     }
     return RET_OK;
+}
+
+bool EventDispatch::IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id)
+{
+    MMI_LOGD("begin");
+    auto session = udsServer->GetSession(fd);
+    CHKPR(session, ERROR_NULL_POINTER);
+    auto currentTime = GetSysClockTime();
+    session->AddEvent(id, currentTime);
+
+    auto firstTime = session->GetFirstEventTime();
+    if (currentTime < (firstTime + INPUT_UI_TIMEOUT_TIME)) {
+        MMI_LOGI("the event reports normally");
+        return false;
+    }
+    if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME_MAX)) {
+        session->ClearEventsVct();
+        MMI_LOGI("event is cleared");
+    }
+
+    // int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+    //     "APPLICATION_BLOCK_INPUT",
+    //     OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+    // if (ret < 0) {
+    //     MMI_LOGE("failed to notify HiSysEvent");
+    //     return true;
+    // }
+    // bool result = OHOS::AAFwk::AbilityManagerClient::GetInstance()->SendANRProcessID(session->GetPid());
+    // CHKR(result, INVALID_RETURN_VALUE, true);
+    MMI_LOGD("end");
+    return true;
 }
 }
