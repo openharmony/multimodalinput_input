@@ -565,7 +565,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
     touch.slot = libinput_event_touch_get_slot(data);
     touch.seatSlot = libinput_event_touch_get_seat_slot(data);
     touch.pressure = libinput_event_get_touch_pressure(event);
-    
+
     PackageTouchEventByType(type, data, touch);
     /* switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
@@ -754,11 +754,11 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<Key
     auto data = libinput_event_get_keyboard_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
     // libinput key transformed into HOS key
-    auto hosKey = KeyValueTransformationByInput(libinput_event_keyboard_get_key(data)); 
+    auto oKey = KeyValueTransformationByInput(libinput_event_keyboard_get_key(data));
 
     int32_t deviceId = static_cast<int32_t>(key.deviceId);
     int32_t actionTime = static_cast<int64_t>(GetSysClockTime());
-    int32_t keyCode = static_cast<int32_t>(hosKey.keyValueOfHos);
+    int32_t keyCode = static_cast<int32_t>(oKey.keyValueOfHos);
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
     int32_t actionStartTime = static_cast<int32_t>(libinput_event_keyboard_get_time_usec(data));
@@ -778,7 +778,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<Key
     }
     item.SetKeyCode(keyCode);
     item.SetDeviceId(deviceId);
-    item.SetPressed(isKeyPressed); 
+    item.SetPressed(isKeyPressed);
 
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         kevnPtr->AddPressedKeyItems(item);
