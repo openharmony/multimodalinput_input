@@ -15,7 +15,6 @@
 #ifndef STREAM_BUFFER_H
 #define STREAM_BUFFER_H
 
-#include <cxxabi.h>
 #include <stdint.h>
 #include <string>
 #include "securec.h"
@@ -45,33 +44,28 @@ public:
 
     bool Read(char *buf, size_t size);
     bool Write(const char *buf, size_t size);
+
     bool IsEmpty();
     size_t Size() const;
-
     size_t UnreadSize() const;
 
     bool ChkError() const;
     const std::string& GetErrorStatusRemark() const;
-
     const char *Data() const;
 
     template<typename T>
     bool Read(T& data);
-
     template<typename T>
     bool Write(const T& data);
 
     template<typename T>
     StreamBuffer& operator >> (T& data);
-
     template<typename T>
     StreamBuffer& operator << (const T& data);
 
 protected:
     const char *ReadBuf() const;
-
     const char *WriteBuf() const;
-
     bool Clone(const StreamBuffer& buf);
 
 protected:
@@ -124,6 +118,6 @@ StreamBuffer &StreamBuffer::operator<<(const T &data)
     CK(Write(data), STREAM_BUF_WRITE_FAIL);
     return *this;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // STREAM_BUFFER_H
