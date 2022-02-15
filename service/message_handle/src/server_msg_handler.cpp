@@ -143,6 +143,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnSeniorInputFuncProc(SessionPtr SessionPtr
 
     MSG_TYPE msgType;
     pkt >> msgType;
+    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
 
     bool processResult = false;
     do {
@@ -150,6 +151,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnSeniorInputFuncProc(SessionPtr SessionPtr
             int32_t devIndex;
             int32_t devType;
             pkt >> devIndex >> devType;
+            CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
             sptr<SeniorInputFuncProcBase> ptr;
             if (devType == INPUT_DEVICE_CAP_AISENSOR) {
                 ptr = SeniorInputFuncProcBase::Create<AIFuncProc>();
@@ -169,6 +171,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnSeniorInputFuncProc(SessionPtr SessionPtr
         } else if (msgType == MSG_TYPE_DEVICE_INFO) {
             RawInputEvent seniorInputEvent = {};
             pkt >> seniorInputEvent;
+            CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
             MMI_LOGD("recived data: type:%{public}d,code:%{public}d,value:%{public}d.",
                      seniorInputEvent.ev_type, seniorInputEvent.ev_code, seniorInputEvent.ev_value);
             processResult = seniorInput_->DeviceEventDispatch(fd, seniorInputEvent);

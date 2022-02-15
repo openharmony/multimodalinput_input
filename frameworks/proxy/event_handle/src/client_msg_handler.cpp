@@ -628,6 +628,7 @@ int32_t ClientMsgHandler::PackedData(MultimodalEvent& multEvent, const UDSClient
     pkt >> type;
     if (type == INPUT_DEVICE_CAP_AISENSOR || type == INPUT_DEVICE_CAP_KNUCKLE) {
         pkt >> idMsg >> deviceId >> fd >> windowId >> abilityId >> serverStartTime >> uuid >> occurredTime;
+        CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
         MMI_LOGD("event dispatcher of client: manager_aisensor"
                  "Msg:%{public}d, fd:%{public}d, "
                  "occurredTime:%{public}d",
@@ -640,6 +641,7 @@ int32_t ClientMsgHandler::PackedData(MultimodalEvent& multEvent, const UDSClient
         multEvent.Initialize(windowId, 0, uuid, type, occurredTime, "", deviceId, 0, 0);
     } else {
         pkt >> data >> fd >> windowId >> abilityId >> serverStartTime;
+        CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
         if (windowId == -1) {
             MMI_LOGD("event dispatcher of client: occurredTime:%{public}" PRId64 ", sourceType:%{public}d, "
                      "fd:%{public}d",
@@ -652,7 +654,6 @@ int32_t ClientMsgHandler::PackedData(MultimodalEvent& multEvent, const UDSClient
         multEvent.Initialize(windowId, 0, data.uuid, data.eventType, data.occurredTime, "", data.deviceId, 0,
             data.deviceType);
     }
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     return RET_OK;
 }
 
@@ -784,6 +785,7 @@ int32_t ClientMsgHandler::TouchEventFilter(const UDSClient& client, NetPacket& p
         static_cast<int32_t>(touchData.deviceId), 0, false, touchData.deviceType, deviceEventType);
 
     pkt >> id;
+    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     return InputFilterMgr.OnTouchEvent(event, id);
 }
 
@@ -1057,7 +1059,6 @@ void ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client, NetPacket&
              tabletPad.strip.position, tabletPad.strip.source, fd, serverStartTime);
 
     // multimodal ANR
-
     int32_t mouseAction = static_cast<int32_t>(MouseActionEnum::HOVER_MOVE);
     eventJoyStickAxis.abs_wheel.standardValue = static_cast<float>(tabletPad.ring.position);
     auto mouseEvent = reinterpret_cast<MouseEvent*>(mousePtr.GetRefPtr());
@@ -1116,7 +1117,6 @@ void ClientMsgHandler::GetStandardStylusActionType(int32_t curRventType, int32_t
 int32_t ClientMsgHandler::GetNonStandardStylusActionType(int32_t tableToolState) const
 {
     int32_t stylusAction = tableToolState;
-
     if (stylusAction == BUTTON_STATE_PRESSED) {
         stylusAction = BUTTON_PRESS;
     } else {
@@ -1163,6 +1163,7 @@ void ClientMsgHandler::AnalysisStandardTabletToolEvent(NetPacket& pkt, int32_t c
     fingerInfos fingersInfos[FINGER_NUM] = {};
     if (curRventType > 0) {
         pkt >> standardTouchEvent;
+        CHK(!pkt.ChkError(), PACKET_READ_FAIL);
         fingersInfos[0].mMp.Setxy(standardTouchEvent.x, standardTouchEvent.y);
         int32_t stylusAction = POINT_MOVE;
         deviceEventType = STYLUS_EVENT;
