@@ -57,7 +57,7 @@ void InputDeviceManager::FindInputDeviceByIdAsync(int32_t deviceId,
     std::function<void(std::shared_ptr<InputDevice>)> callback)
 {
     MMIMsgPost.RunOnWestonThread([this, deviceId, callback](weston_compositor* wc) {
-        auto device = FindInputDeviceByIdSync(wc, deviceId);
+        auto device = FindInputDeviceByIdSync(deviceId, wc);
         callback(device);
     });
 }
@@ -74,7 +74,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIdsSync(weston_compositor
     return ids;
 }
 
-std::shared_ptr<InputDevice> InputDeviceManager::FindInputDeviceByIdSync(weston_compositor* wc, int32_t deviceId)
+std::shared_ptr<InputDevice> InputDeviceManager::FindInputDeviceByIdSync(int32_t deviceId, weston_compositor* wc)
 {
     MMI_LOGD("begin");
     Init(wc);
@@ -183,7 +183,7 @@ bool InputDeviceManager::IsPointerDevice(libinput_device* device)
 {
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
     MMI_LOGD("udev tag:%{public}d", static_cast<int32_t>(udevTags));
-    return udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK | 
+    return udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK |
     EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD);
 }
 

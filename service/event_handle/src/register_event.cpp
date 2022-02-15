@@ -515,7 +515,7 @@ void RegisterEvent::GetTouchInfo(const std::pair<uint32_t, int32_t> key, EventTo
     touch.deviceId = iter->second.deviceId;
 }
 
-void RegisterEvent::GetTouchIds(std::vector<std::pair<uint32_t, int32_t>>& touchIds, const uint32_t deviceId)
+void RegisterEvent::GetTouchIds(const uint32_t deviceId, std::vector<std::pair<uint32_t, int32_t>>& touchIds)
 {
     auto iter = touchInfos_.begin();
     while (iter != touchInfos_.end()) {
