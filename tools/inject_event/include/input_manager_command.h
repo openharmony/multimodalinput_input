@@ -20,6 +20,7 @@
 #include <vector>
 
 namespace OHOS {
+namespace MMI {
 class InputManagerCommand {
 public:
     int32_t ParseCommand(int argc, char *argv[]);
@@ -28,6 +29,7 @@ public:
 private:
     void InitializeMouseDeathStub();
 };
+}
 } // namespace OHOS
 
 #endif // INPUT_MANAGER_COMMAND_H
