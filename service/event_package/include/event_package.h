@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace MMI {
     class EventPackage {
-        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventPackage" };
+        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventPackage" };
         static constexpr uint32_t TabletPadButtonNumberPrefix = 0x100;
     public:
         EventPackage();
