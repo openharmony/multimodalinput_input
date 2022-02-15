@@ -448,7 +448,7 @@ int32_t RegisterEvent::OnEventTouchUpGetSign(const EventTouch& touch, MmiMessage
     TouchInfo touchUpInfo = {};
     auto iter = touchInfos_.find(std::make_pair(touch.deviceId, touch.seatSlot));
     if (iter == touchInfos_.end()) {
-        MMI_LOGE("Failed to find touch event.");
+        MMI_LOGE("Failed to find touch event");
         return RET_ERR;
     }
     touchUpInfo = iter->second;
