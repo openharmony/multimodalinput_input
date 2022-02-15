@@ -32,11 +32,11 @@ namespace MMI {
 int32_t MultimodalInputConnectStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
-    MMI_LOGT("enter, code: %{public}d", code);
+    MMI_LOGT("enter, code:%{public}d", code);
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IMultimodalInputConnect::GetDescriptor()) {
-        MMI_LOGE("get unexpect descriptor: %{public}s", Str16ToStr8(descriptor).c_str());
+        MMI_LOGE("get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
 
@@ -46,7 +46,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         case static_cast<uint32_t>(IMultimodalInputConnect::SET_EVENT_POINTER_FILTER):
             return StubAddInputEventFilter(data, reply);
         default:
-            MMI_LOGE("unknown code: %{public}u, go switch defaut", code);
+            MMI_LOGE("unknown code:%{public}u, go switch defaut", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
 }
@@ -54,7 +54,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
 bool MultimodalInputConnectStub::IsAuthorizedCalling() const
 {
     int callingUid = IPCSkeleton::GetCallingUid();
-    MMI_LOGIK("Calling uid: %{public}d", callingUid);
+    MMI_LOGIK("Calling uid:%{public}d", callingUid);
     return true;
 }
 
@@ -101,11 +101,11 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
     } while (0);
     
     if (!reply.WriteInt32(ret)) {
-        MMI_LOGE("WriteInt32(%{public}d) fail", ret);
+        MMI_LOGE("WriteInt32:%{public}d fail", ret);
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
 
-    MMI_LOGT("leave, ret = %{public}d", ret);
+    MMI_LOGT("leave, ret:%{public}d", ret);
     return RET_OK;
 }
 } // namespace MMI
