@@ -576,6 +576,7 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
 bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint_2(libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
 {
+    CHKPF(touch);
     if (screensInfo_ != nullptr) {
         if ((*screensInfo_) != nullptr)
         logicalDisplayId = (*screensInfo_)->screenId;
@@ -661,7 +662,6 @@ bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(libinput_eve
     int32_t globalLogicalY;
     auto isTransform = TransformOfDisplayPoint(touch, globalLogicalX, globalLogicalY);
     if (!isTransform) {
-        MMI_LOGE("point is transformation fail");
         return isTransform;
     }
 
@@ -684,7 +684,6 @@ bool OHOS::MMI::InputWindowsManager::TouchDownPointToDisplayPoint(libinput_event
     int32_t globalLogicalY;
     auto isTransform = TransformOfDisplayPoint(touch, globalLogicalX, globalLogicalY);
     if (!isTransform) {
-        MMI_LOGE("transformation fail");
         return isTransform;
     }
 
