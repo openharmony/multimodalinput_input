@@ -742,11 +742,11 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key)
 int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<KeyEvent> kevn)
 {
     MMI_LOGD("begin");
-    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
-    CHKPR(kevn, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID);
+    CHKPR(kevn, ERROR_NULL_POINTER);
     kevn->UpdateId();
     auto data = libinput_event_get_keyboard_event(event);
-    CHKPR(data, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER);
     auto hosKey = KeyValueTransformationByInput(libinput_event_keyboard_get_key(data));
 
     auto device = libinput_event_get_device(event);
