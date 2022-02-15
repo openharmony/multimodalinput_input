@@ -231,7 +231,6 @@ void RegisterEvent::TouchInfoEnd(const uint64_t time, const double x, const doub
     touchinfo.endX = x;
     touchinfo.endY = y;
     MMI_LOGD("leave");
-
 }
 
 int32_t RegisterEvent::OnEventPointButton(const int32_t buttonCode, const uint64_t timeNow,
