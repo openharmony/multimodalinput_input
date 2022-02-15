@@ -193,6 +193,5 @@ bool StreamBuffer::Clone(const StreamBuffer &buf)
     Clean();
     return Write(buf.Data(), buf.Size());
 }
-
 } // namespace MMI
 } // namespace OHOS
