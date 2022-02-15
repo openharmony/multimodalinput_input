@@ -20,7 +20,8 @@
 #include "uds_server.h"
 #include "util.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     class EventPackage {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventPackage" };
         static constexpr uint32_t TabletPadButtonNumberPrefix = 0x100;
@@ -68,5 +69,6 @@ namespace OHOS::MMI {
         event.occurredTime = data.time;
         return RET_OK;
     }
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // EVENT_PACKAGE_H

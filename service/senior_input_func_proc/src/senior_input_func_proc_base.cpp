@@ -17,10 +17,12 @@
 #include "mmi_server.h"
 #include "util.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SeniorInputFuncProcBase" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SeniorInputFuncProcBase" };
     }
+}
 }
 
 using namespace std;
@@ -72,12 +74,12 @@ int32_t SeniorInputFuncProcBase::DeviceEventDispatchProcess(const RawInputEvent 
 bool SeniorInputFuncProcBase::DeviceEventDispatch(int32_t fd, RawInputEvent event)
 {
     auto it = deviceInfoMap_.find(fd);
-    if (it != deviceInfoMap_.end()) {
-        it->second->DeviceEventDispatchProcess(event);
-        return true;
-    } else {
+    if (it == deviceInfoMap_.end()) {
+        MMI_LOGE("Failed to find fd");
         return false;
     }
+    it->second->DeviceEventDispatchProcess(event);
+    return true;
 }
 
 bool SeniorInputFuncProcBase::DeviceInit(int32_t sessionId, sptr<SeniorInputFuncProcBase> ptr)
@@ -97,7 +99,7 @@ int32_t SeniorInputFuncProcBase::DeviceEventProcess(const RawInputEvent& event)
     const std::string uuid = GetUUid();
 
     if (msgId == MmiMessageId::INVALID) {
-        MMI_LOGE("msgId is invalid.");
+        MMI_LOGE("msgId is invalid");
         return RET_ERR;
     }
 

@@ -21,7 +21,8 @@
 #include "net_packet.h"
 #include "proto.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManagerGlobal" };
 }
@@ -337,5 +338,6 @@ void InputHandlerManagerGlobal::InterceptorCollection::OnSessionLost(SessionPtr 
         }
     }
 }
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 

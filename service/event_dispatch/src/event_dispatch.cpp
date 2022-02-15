@@ -19,6 +19,7 @@
 #include "ability_launch_manager.h"
 #include "bytrace.h"
 #include "event_filter_wrap.h"
+#include "hisysevent.h"
 #include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
 #include "input_handler_manager_global.h"
@@ -32,6 +33,8 @@
 namespace OHOS::MMI {
 constexpr int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 constexpr int32_t INPUT_UI_TIMEOUT_TIME_MAX = 20 * 1000000;
+constexpr int32_t TRIGGER_ANR = 0;
+constexpr int32_t NOT_TRIGGER_ANR = 1;
     namespace {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
     }
@@ -388,26 +391,13 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_LOGE("UdsServer is a nullptr");
         return RET_ERR;
     }
-    if (fd <= 0) {
+    if (fd < 0) {
         MMI_LOGE("The fd less than 0");
         return RET_ERR;
     }
 
-    auto session = udsServer->GetSession(fd);
-    CHKPR(session, ERROR_NULL_POINTER);
-    auto eventId = point->GetId();
-    auto currentTime = GetSysClockTime();
-    session->RecordEvent(eventId, currentTime);
-    auto firstTime = session->GetFirstEventTime();
-    if (currentTime < (firstTime + INPUT_UI_TIMEOUT_TIME)) {
-        MMI_LOGD("The pointer event reports normally");
-    }
-    if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME)) {
-        MMI_LOGD("The pointer event does not report normally, triggering ANR");
-    }
-    if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME_MAX)) {
-        session->ClearEventsVct();
-        MMI_LOGD("The pointer event is cleared");
+    if (IsANRProcess(udsServer, fd, point->GetId()) == TRIGGER_ANR) {
+        MMI_LOGE("the pointer event does not report normally, triggering ANR");
     }
 
     if (!udsServer->SendMsg(fd, newPacket)) {
@@ -628,7 +618,7 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
         int32_t eventType = pointEventType;
         newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime << touch.seatSlot;
         std::vector<std::pair<uint32_t, int32_t>> touchIds;
-        MMIRegEvent->GetTouchIds(touchIds, touch.deviceId);
+        MMIRegEvent->GetTouchIds(touch.deviceId, touchIds);
         if (!touchIds.empty()) {
             for (auto &touchId : touchIds) {
                 EventTouch touchTemp = {};
@@ -750,21 +740,8 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
              key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
 
-    auto session = udsServer.GetSession(fd);
-    CHKPR(session, ERROR_NULL_POINTER);
-    auto eventId = key->GetId();
-    auto currentTime = GetSysClockTime();
-    session->RecordEvent(eventId, currentTime);
-    auto firstTime = session->GetFirstEventTime();
-    if (currentTime < (firstTime + INPUT_UI_TIMEOUT_TIME)) {
-        MMI_LOGD("The key event reports normally");
-    }
-    if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME)) {
-        MMI_LOGD("The key event does not report normally, triggering ANR");
-    }
-    if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME_MAX)) {
-        session->ClearEventsVct();
-        MMI_LOGD("The key event is cleared.");
+    if (IsANRProcess(&udsServer, fd, key->GetId()) == TRIGGER_ANR) {
+        MMI_LOGE("the key event does not report normally, triggering ANR");
     }
 
     InputMonitorServiceMgr.OnMonitorInputEvent(key);
@@ -894,5 +871,35 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
         return MSG_SEND_FAIL;
     }
     return RET_OK;
+}
+
+int32_t EventDispatch::IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id)
+{
+    MMI_LOGD("begin");
+    auto session = udsServer->GetSession(fd);
+    CHKPR(session, SESSION_NOT_FOUND);
+    auto currentTime = GetSysClockTime();
+    session->AddEvent(id, currentTime);
+
+    auto firstTime = session->GetFirstEventTime();
+    if (currentTime < (firstTime + INPUT_UI_TIMEOUT_TIME)) {
+        MMI_LOGI("the event reports normally");
+        return NOT_TRIGGER_ANR;
+    }
+    if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME_MAX)) {
+        session->ClearEventsVct();
+        MMI_LOGI("event is cleared");
+    }
+
+    int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "APPLICATION_BLOCK_INPUT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+    if (ret < 0) {
+        MMI_LOGE("failed to notify HiSysEvent");
+        return TRIGGER_ANR;
+    }
+
+    MMI_LOGD("end");
+    return TRIGGER_ANR;
 }
 }

@@ -17,6 +17,6 @@
 
 int main(int argc, char** argv)
 {
-    OHOS::InputManagerCommand command;
+    OHOS::MMI::InputManagerCommand command;
     return command.ParseCommand(argc, argv);
 }

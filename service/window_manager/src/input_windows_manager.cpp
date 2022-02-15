@@ -22,14 +22,16 @@
 #include "util_ex.h"
 #include "pointer_drawing_manager.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManager"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManager"};
 static constexpr uint8_t TOP_LEFT_X  = 0;
 static constexpr uint8_t TOP_LEFT_Y  = 1;
 static constexpr uint8_t TOP_RIGHT_X = 2;
 static constexpr uint8_t TOP_RIGHT_Y = 3;
 static constexpr uint8_t CORNER = 4;
+}
 }
 }
 
