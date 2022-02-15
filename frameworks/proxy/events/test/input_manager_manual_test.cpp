@@ -70,7 +70,7 @@ void InputManagerManualTest::AddInputEventFilter()
         const int firstPointerId = ids[0];
         PointerEvent::PointerItem item;
         if (!pointer->GetPointerItem(firstPointerId, item)) {
-            MMI_LOGE("GetPointerItem(%{public}d) fail", firstPointerId);
+            MMI_LOGE("GetPointerItem:%{public}d fail", firstPointerId);
             return false;
         }
 

@@ -49,7 +49,7 @@ bool StreamBuffer::SetReadIdx(uint32_t idx)
 bool StreamBuffer::Read(std::string &buf)
 {
     if (rIdx_ == wIdx_) {
-        MMI_LOGE("Not enough memory to read... errCode:%{public}d", MEM_NOT_ENOUGH);
+        MMI_LOGE("Not enough memory to read, errCode:%{public}d", MEM_NOT_ENOUGH);
         rwErrorStatus_ = ErrorStatus::ES_READ;
         return false;
     }

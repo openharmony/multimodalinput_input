@@ -14,7 +14,6 @@
  */
 
 #include "multimodal_standardized_event_manager.h"
-#include "bytrace.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "immi_token.h"
@@ -50,15 +49,15 @@ int32_t MultimodalStandardizedEventManager::RegisterStandardizedEventHandle(cons
     auto range = mapEvents_.equal_range(messageId);
     for (auto it = range.first; it != range.second; ++it) {
         if (it->second.eventCallBack == standardizedEventHandle) {
-            MMI_LOGE("Duplicate registration information, registration failed...errCode:%{public}d",
+            MMI_LOGE("Duplicate registration information, registration failed. errCode:%{public}d",
                      MMI_STANDARD_EVENT_EXIST);
             return OHOS::MMI_STANDARD_EVENT_EXIST;
         }
     }
-    MMI_LOGD("Register app event:typeId=%{public}d;", messageId);
+    MMI_LOGD("Register app event:typeId:%{public}d;", messageId);
     std::string registerhandle;
     if (!MakeRegisterHandle(messageId, windowId, registerhandle)) {
-        MMI_LOGE("Invalid registration parameter...errCode:%{public}d", MMI_STANDARD_EVENT_INVALID_PARAMETER);
+        MMI_LOGE("Invalid registration parameter, errCode:%{public}d", MMI_STANDARD_EVENT_INVALID_PARAMETER);
         return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
     registerEvents_.insert(registerhandle);
@@ -87,7 +86,7 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
 
     std::string registerhandle;
     if (!MakeRegisterHandle(typeId, windowId, registerhandle)) {
-        MMI_LOGE("Invalid unregistration parameter...typeId:%{public}d,windowId:%{public}d,errCode:%{public}d",
+        MMI_LOGE("Invalid unregistration parameter, typeId:%{public}d, windowId:%{public}d, errCode:%{public}d",
                  typeId, windowId, MMI_STANDARD_EVENT_INVALID_PARAMETER);
         return MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
@@ -101,11 +100,11 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
         }
     }
     if (!isHandleExist) {
-        MMI_LOGE("Unregistration does not exist, Unregistration failed...typeId:%{public}d,windowId:%{public}d,"
+        MMI_LOGE("Unregistration does not exist, Unregistration failed, typeId:%{public}d, windowId:%{public}d,"
                  "errCode:%{public}d", typeId, windowId, MMI_STANDARD_EVENT_NOT_EXIST);
         return MMI_STANDARD_EVENT_NOT_EXIST;
     }
-    MMI_LOGD("Unregister app event:typeId=%{public}d;;", typeId);
+    MMI_LOGD("Unregister app event:typeId:%{public}d", typeId);
     OHOS::MMI::NetPacket ck(MmiMessageId::UNREGISTER_MSG_HANDLER);
     ck << typeId;
     SendMsg(ck);
@@ -158,7 +157,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEven
     MMI_LOGD("MultimodalStandardizedEventManagerkey::OnKey");
 #ifdef DEBUG_CODE_TEST
     if (event.GetDeviceUdevTags() == DEVICE_TYPE_VIRTUAL_KEYBOARD) {
-        MMI_LOGD("Inject, keyCode=%{public}d, action=%{public}d, revPid=%{public}d",
+        MMI_LOGD("Inject, keyCode:%{public}d, action:%{public}d, revPid:%{public}d",
             event.GetKeyCode(), event.IsKeyDown(), GetPid());
     }
 #endif
@@ -178,7 +177,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnTouch(const TouchEvent&
     auto range = mapEvents_.equal_range(MmiMessageId::TOUCH_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.windowId == event.GetWindowID() && i->second.eventCallBack->OnTouch(event) == false) {
-            MMI_LOGW(" OnTouch Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnTouch Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
             break;
         }
     }
@@ -191,7 +190,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnShowMenu(const Multimod
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnShowMenu(event) == false) {
-            MMI_LOGW(" OnShowMenu Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnShowMenu Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -203,7 +202,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnSend(const MultimodalEv
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnSend(event) == false) {
-            MMI_LOGW(" OnSend Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnSend Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -215,7 +214,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnCopy(const MultimodalEv
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnCopy(event) == false) {
-            MMI_LOGW(" OnCopy Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnCopy Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -227,7 +226,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnPaste(const MultimodalE
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnPaste(event) == false) {
-            MMI_LOGW(" OnPaste Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnPaste Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -239,7 +238,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnCut(const MultimodalEve
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnCut(event) == false) {
-            MMI_LOGW(" OnCut Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnCut Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -251,7 +250,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnUndo(const MultimodalEv
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnUndo(event) == false) {
-            MMI_LOGW(" OnUndo Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnUndo Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -263,7 +262,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnRefresh(const Multimoda
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnRefresh(event) == false) {
-            MMI_LOGW(" OnRefresh Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnRefresh Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -275,7 +274,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnStartDrag(const Multimo
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnStartDrag(event) == false) {
-            MMI_LOGW(" OnStartDrag Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnStartDrag Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -287,7 +286,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnCancel(const Multimodal
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnCancel(event) == false) {
-            MMI_LOGW(" OnCancel Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnCancel Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -299,7 +298,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnEnter(const MultimodalE
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnEnter(event) == false) {
-            MMI_LOGW(" OnEnter Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnEnter Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -311,7 +310,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnPrevious(const Multimod
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnPrevious(event) == false) {
-            MMI_LOGW(" OnPrevious Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnPrevious Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -323,7 +322,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnNext(const MultimodalEv
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnNext(event) == false) {
-            MMI_LOGW(" OnNext Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnNext Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -335,7 +334,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnBack(const MultimodalEv
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnBack(event) == false) {
-            MMI_LOGW(" OnBack Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnBack Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -347,7 +346,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnPrint(const MultimodalE
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnPrint(event) == false) {
-            MMI_LOGW(" OnPrint Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnPrint Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -359,7 +358,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnPlay(const MultimodalEv
     auto range = mapEvents_.equal_range(MmiMessageId::MEDIA_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnPlay(event) == false) {
-            MMI_LOGW(" OnPlay Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnPlay Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -371,7 +370,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnPause(const MultimodalE
     auto range = mapEvents_.equal_range(MmiMessageId::MEDIA_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnPause(event) == false) {
-            MMI_LOGW(" OnPause Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnPause Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -383,7 +382,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnMediaControl(const Mult
     auto range = mapEvents_.equal_range(MmiMessageId::MEDIA_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnMediaControl(event) == false) {
-            MMI_LOGW(" OnMediaControl Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnMediaControl Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -395,7 +394,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnScreenShot(const Multim
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnScreenShot(event) == false) {
-            MMI_LOGW(" OnScreenShot Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnScreenShot Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -407,7 +406,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnScreenSplit(const Multi
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnScreenSplit(event) == false) {
-            MMI_LOGW(" OnScreenSplit Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnScreenSplit Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -419,7 +418,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnStartScreenRecord(const
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnStartScreenRecord(event) == false) {
-            MMI_LOGW(" OnStartScreenRecord Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnStartScreenRecord Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -431,7 +430,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnStopScreenRecord(const 
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnStopScreenRecord(event) == false) {
-            MMI_LOGW(" OnStopScreenRecord Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnStopScreenRecord Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -443,7 +442,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnGotoDesktop(const Multi
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnGotoDesktop(event) == false) {
-            MMI_LOGW(" OnGotoDesktop Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnGotoDesktop Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -455,7 +454,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnRecent(const Multimodal
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnRecent(event) == false) {
-            MMI_LOGW(" OnRecent Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnRecent Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -467,7 +466,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnShowNotification(const 
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnShowNotification(event) == false) {
-            MMI_LOGW(" OnShowNotification Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnShowNotification Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -479,7 +478,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnLockScreen(const Multim
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnLockScreen(event) == false) {
-            MMI_LOGW(" OnLockScreen Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnLockScreen Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -491,7 +490,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnSearch(const Multimodal
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnSearch(event) == false) {
-            MMI_LOGW(" OnSearch Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnSearch Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -503,7 +502,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnClosePage(const Multimo
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnClosePage(event) == false) {
-            MMI_LOGW(" OnClosePage Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnClosePage Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -515,7 +514,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnLaunchVoiceAssistant(co
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnLaunchVoiceAssistant(event) == false) {
-            MMI_LOGW(" OnLaunchVoiceAssistant Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnLaunchVoiceAssistant Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -527,7 +526,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnMute(const MultimodalEv
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnMute(event) == false) {
-            MMI_LOGW(" OnMute Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnMute Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -539,7 +538,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnAnswer(const Multimodal
     auto range = mapEvents_.equal_range(MmiMessageId::TELEPHONE_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnAnswer(event) == false) {
-            MMI_LOGW(" OnAnswer Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnAnswer Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -551,7 +550,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnRefuse(const Multimodal
     auto range = mapEvents_.equal_range(MmiMessageId::TELEPHONE_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnRefuse(event) == false) {
-            MMI_LOGW(" OnRefuse Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnRefuse Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -563,7 +562,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnHangup(const Multimodal
     auto range = mapEvents_.equal_range(MmiMessageId::TELEPHONE_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnHangup(event) == false) {
-            MMI_LOGW(" OnHangup Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnHangup Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -575,7 +574,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnTelephoneControl(const 
     auto range = mapEvents_.equal_range(MmiMessageId::TELEPHONE_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnTelephoneControl(event) == false) {
-            MMI_LOGW(" OnTelephoneControl Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnTelephoneControl Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -587,7 +586,7 @@ int32_t MultimodalStandardizedEventManager::OnDeviceAdd(const DeviceEvent& event
     auto range = mapEvents_.equal_range(MmiMessageId::DEVICE_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnDeviceAdd(event) == false) {
-            MMI_LOGW(" OnDeviceAdd Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnDeviceAdd Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -599,7 +598,7 @@ int32_t MultimodalStandardizedEventManager::OnDeviceRemove(const DeviceEvent& ev
     auto range = mapEvents_.equal_range(MmiMessageId::DEVICE_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnDeviceRemove(event) == false) {
-            MMI_LOGW(" OnDeviceRemove Event consumption failed...errCode:%{public}d", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnDeviceRemove Event consumption failed, errCode:%{public}d", EVENT_CONSUM_FAIL);
         }
     }
     return RET_OK;
@@ -687,11 +686,11 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
     MMI_LOGD("Inject pointer event.");
     CHKPR(pointerEvent, RET_ERR);
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
-    MMI_LOGD("pointer event dispatcher of client:eventType=%{public}s,actionTime=%{public}d,"
-             "action=%{public}d,actionStartTime=%{public}d,"
-             "flag=%{public}d,pointerAction=%{public}s,sourceType=%{public}s,"
-             "VerticalAxisValue=%{public}f,HorizontalAxisValue=%{public}f,"
-             "pointerCount=%{public}d",
+    MMI_LOGD("pointer event dispatcher of client:eventType:%{public}s, actionTime:%{public}d,"
+             "action:%{public}d, actionStartTime:%{public}d, "
+             "flag:%{public}d, pointerAction:%{public}s, sourceType:%{public}s, "
+             "VerticalAxisValue:%{public}f, HorizontalAxisValue:%{public}f, "
+             "pointerCount:%{public}d",
              pointerEvent->DumpEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
              pointerEvent->GetFlag(), pointerEvent->DumpPointerAction(),
@@ -704,16 +703,16 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
         OHOS::MMI::PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
 
-        MMI_LOGD("downTime=%{public}d,isPressed=%{public}s,"
-                "globalX=%{public}d,globalY=%{public}d,localX=%{public}d,localY=%{public}d,"
-                "width=%{public}d,height=%{public}d,pressure=%{public}d",
+        MMI_LOGD("downTime:%{public}d,isPressed:%{public}s, "
+                "globalX:%{public}d, globalY:%{public}d, localX:%{public}d, localY:%{public}d,"
+                "width:%{public}d, height:%{public}d, pressure:%{public}d",
                  item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
                  item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
                  item.GetWidth(), item.GetHeight(), item.GetPressure());
     }
     std::vector<int32_t> pressedKeys = pointerEvent->GetPressedKeys();
     for (auto &keyCode : pressedKeys) {
-        MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
+        MMI_LOGI("Pressed keyCode:%{public}d", keyCode);
     }
     OHOS::MMI::NetPacket netPkt(MmiMessageId::INJECT_POINTER_EVENT);
     CHKR((RET_OK == InputEventDataTransformation::Marshalling(pointerEvent, netPkt)),
