@@ -344,8 +344,8 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
 
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
 {
-    CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
-    CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(event, PARAM_INPUT_INVALID);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
