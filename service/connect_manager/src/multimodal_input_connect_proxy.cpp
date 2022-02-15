@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectProxy" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectProxy" };
 }
 
 // 获取其他设备注册的SA的Proxy
@@ -40,7 +40,7 @@ MultimodalInputConnectProxy::~MultimodalInputConnectProxy()
 
 int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programName, const int moduleType, int &socketFd)
 {
-    MMI_LOGE("enter");
+    MMI_LOGD("enter");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option; // (MessageOption::TF_ASYNC);
@@ -74,13 +74,13 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
     }
     socketFd = reply.ReadFileDescriptor();
     MMI_LOGE("socketFd:%{public}d", socketFd);
-
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    MMI_LOGE("enter");
+    MMI_LOGD("enter");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -105,7 +105,7 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
     if (result != RET_OK) {
         MMI_LOGE("responce return error:%{public}d", result);
     }
-
+    MMI_LOGD("leave");
     return result;
 }
 } // namespace MMI
