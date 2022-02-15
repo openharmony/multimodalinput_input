@@ -258,7 +258,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
     std::string keyEventString = "keyEventSubscribe";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
     int32_t keyCode = keyEvent->GetKeyCode();
-    keyEventString = "client filter keyCode=" + std::to_string(keyCode);
+    keyEventString = "client subscribe keyCode=" + std::to_string(keyCode);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
     return KeyEventInputSubscribeMgr.OnSubscribeKeyEventCallback(keyEvent, subscribeId);
 }
