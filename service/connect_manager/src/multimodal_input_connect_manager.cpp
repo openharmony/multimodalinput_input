@@ -158,7 +158,7 @@ void MultimodalInputConnectManager::NotifyDeath()
             MMI_LOGD("connect multimodal input connect service successful");
             return;
         }
-    } while (--retryCount > 0); 
+    } while (--retryCount > 0);
     
     MMI_LOGI("leave,connectmultimodal input connect service failed");
 }
