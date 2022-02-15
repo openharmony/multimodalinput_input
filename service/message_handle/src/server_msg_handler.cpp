@@ -345,7 +345,7 @@ int32_t OHOS::MMI::ServerMsgHandler::NewCheckReplyMessageFormClient(SessionPtr s
     MMI_LOGT("begin");
     int32_t id = 0;
     pkt >> id;
-    sess->ClearEventList(id);
+    sess->DelEvents(id);
     MMI_LOGT("end");
     return RET_OK;
 }
