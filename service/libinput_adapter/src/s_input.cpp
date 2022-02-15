@@ -25,9 +25,10 @@
 #ifndef OHOS_WESTEN_MODEL
 #include "input_windows_manager.h"
 #endif
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SInput" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SInput" };
     }
 
 static void HiLogFunc(struct libinput* input, enum libinput_log_priority priority, const char* fmt, va_list args)
@@ -46,6 +47,7 @@ static void InitHiLogFunc(struct libinput* input)
     }
     libinput_log_set_handler(input, &OHOS::MMI::HiLogFunc);
     initFlag = true;
+}
 }
 }
 

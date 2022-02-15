@@ -17,10 +17,12 @@
 #include "proto.h"
 #include "souceType.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManagerGlobal" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManagerGlobal" };
     }
+}
 }
 
 OHOS::MMI::InterceptorManagerGlobal::InterceptorManagerGlobal()

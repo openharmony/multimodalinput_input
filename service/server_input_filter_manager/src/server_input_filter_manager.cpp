@@ -17,9 +17,10 @@
 #include <cinttypes>
 #include "input_event_data_transformation.h"
 #include "mmi_server.h"
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ServerInputFilterManager" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ServerInputFilterManager" };
 }
 
 ServerInputFilterManager::KeyEventFilter::KeyEventFilter(int32_t id, std::string name,
@@ -461,4 +462,5 @@ void ServerInputFilterManager::PointerEventFilter::SetAuthority(Authority author
 {
     authority_ = authority;
 }
-}
+} // namespace MMI
+} // namespace OHOS
