@@ -600,7 +600,7 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
     CHKPR(event, ERROR_NULL_POINTER);
     MMI_LOGD("Enter");
     auto point = TouchTransformPointManger->OnLibinputTouchEvent(event);
-    CKP(point);
+    CHKPR(point, ERROR_NULL_POINTER);
     int32_t pointerId = point->GetId();
     std::string touchEvent = "OnEventTouch";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, pointerId);
