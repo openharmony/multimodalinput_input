@@ -295,7 +295,6 @@ ohos_unittest("ut-mmi-service-out") {
     "device_scalability/test/expansibility_operation_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
     "event_handle/test/register_event_test.cpp",
-
     "event_standard/test/standard_event_handler_test.cpp",
     "hdi_inject/test/hdi_inject_test.cpp",
     "message_handle/test/input_test.cpp",
