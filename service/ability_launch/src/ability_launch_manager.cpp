@@ -192,8 +192,8 @@ void AbilityLaunchManager::Print()
         for (auto prekey: shortcutKey.preKeys) {
             MMI_LOGD("preKey:%{public}d", prekey);
         }
-        MMI_LOGD("finalKey:%{public}d, keyDownDuration:%{public}d, triggerType:%{public}d,"
-            " bundleName:%{public}s, abilityName:%{public}s", shortcutKey.finalKey,
+        MMI_LOGD("finalKey:%{public}d,keyDownDuration:%{public}d,triggerType:%{public}d,"
+            " bundleName:%{public}s,abilityName:%{public}s", shortcutKey.finalKey,
             shortcutKey.keyDownDuration, shortcutKey.triggerType,
             shortcutKey.ability.bundleName.c_str(), shortcutKey.ability.abilityName.c_str());
     }
@@ -221,7 +221,7 @@ bool AbilityLaunchManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> &k
         for (const auto &prekey: shortcutKey.preKeys) {
             MMI_LOGD("eventkey matched, preKey:%{public}d", prekey);
         }
-        MMI_LOGD("eventkey matched, finalKey:%{public}d, bundleName:%{public}s",
+        MMI_LOGD("eventkey matched, finalKey:%{public}d,bundleName:%{public}s",
             shortcutKey.finalKey, shortcutKey.ability.bundleName.c_str());
         if(shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN) {
             return HandleKeyDown(shortcutKey);
@@ -291,7 +291,7 @@ bool AbilityLaunchManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
         CHKPF(keyItem);
         auto upTime = keyEvent->GetActionTime();
         auto downTime = keyItem->GetDownTime();
-        MMI_LOGD("upTime:%{public}d, downTime:%{public}d, keyDownDuration:%{public}d",
+        MMI_LOGD("upTime:%{public}d,downTime:%{public}d,keyDownDuration:%{public}d",
             upTime, downTime, shortcutKey.keyDownDuration);
         if (upTime - downTime >= (shortcutKey.keyDownDuration * 1000)) {
             MMI_LOGD("Skip, upTime - downTime >= duration");
@@ -335,7 +335,7 @@ void AbilityLaunchManager::LaunchAbility(ShortcutKey key)
     MMI_LOGD("Start launch ability, bundleName:%{public}s", key.ability.bundleName.c_str());
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (err != ERR_OK) {
-        MMI_LOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", key.ability.bundleName.c_str(), err);
+        MMI_LOGE("LaunchAbility failed, bundleName:%{public}s,err:%{public}d", key.ability.bundleName.c_str(), err);
     }
     ResetLastMatchedKey();
     MMI_LOGD("End launch ability, bundleName:%{public}s", key.ability.bundleName.c_str());

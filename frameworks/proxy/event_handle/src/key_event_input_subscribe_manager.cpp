@@ -51,8 +51,8 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<OHOS::M
         MMI_LOGD("keyOption->prekey:%{public}d", preKey);
     }
     SubscribeKeyEventInfo subscribeInfo(keyOption, callback);
-    MMI_LOGD("subscribeId:%{public}d, keyOption->finalKey:%{public}d, "
-        "keyOption->isFinalKeyDown:%{public}s, keyOption->finalKeyDownDuriation:%{public}d",
+    MMI_LOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
+        "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuriation:%{public}d",
         subscribeInfo.GetSubscribeId(), keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
     if (EventManager.SubscribeKeyEvent(subscribeInfo) != RET_OK) {
