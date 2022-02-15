@@ -15,7 +15,6 @@
 
 #include "event_dispatch.h"
 #include <inttypes.h>
-#include "ability_manager_client.h"
 #include "input-event-codes.h"
 #include "ability_launch_manager.h"
 #include "bytrace.h"
@@ -892,15 +891,14 @@ bool EventDispatch::IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id)
         MMI_LOGI("event is cleared");
     }
 
-    // int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-    //     "APPLICATION_BLOCK_INPUT",
-    //     OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
-    // if (ret < 0) {
-    //     MMI_LOGE("failed to notify HiSysEvent");
-    //     return true;
-    // }
-    // bool result = OHOS::AAFwk::AbilityManagerClient::GetInstance()->SendANRProcessID(session->GetPid());
-    // CHKR(result, INVALID_RETURN_VALUE, true);
+    int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "APPLICATION_BLOCK_INPUT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+    if (ret < 0) {
+        MMI_LOGE("failed to notify HiSysEvent");
+        return true;
+    }
+
     MMI_LOGD("end");
     return true;
 }

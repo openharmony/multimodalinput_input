@@ -218,12 +218,11 @@ ohos_shared_library("libmmi-server") {
 
   external_deps = [
     "bytrace_standard:bytrace_core",
+    "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "hisysevent_native:libhisysevent",
-    "ability_runtime:ability_manager",
   ]
 
   part_name = "multimodalinput_base"
