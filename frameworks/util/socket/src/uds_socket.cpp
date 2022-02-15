@@ -39,7 +39,7 @@ int32_t UDSSocket::EpollCreat(int32_t size)
     if (epollFd_ < 0) {
         MMI_LOGE("UDSSocket::EpollCreat epoll_create retrun %{public}d", epollFd_);
     } else {
-        MMI_LOGI("UDSSocket::EpollCreat epoll_create, epollFd_ = %{public}d", epollFd_);
+        MMI_LOGI("UDSSocket::EpollCreat epoll_create, epollFd_:%{public}d", epollFd_);
     }
     return epollFd_;
 }
@@ -54,8 +54,8 @@ int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, epoll_event& event, int32_t 
     auto ret = epoll_ctl(epollFd, op, fd, &event);
     if (ret < 0) {
         const int errnoSaved = errno;
-        MMI_LOGE("UDSSocket::EpollCtl epoll_ctl retrun %{public}d epollFd_:%{public}d,"
-                 " op:%{public}d fd:%{public}d errno:%{public}d error msg: %{public}s",
+        MMI_LOGE("UDSSocket::EpollCtl epoll_ctl retrun %{public}d, epollFd_:%{public}d,"
+                 " op:%{public}d, fd:%{public}d, errno:%{public}d, error msg: %{public}s",
                  ret, epollFd, op, fd, errnoSaved, strerror(errnoSaved));
     }
     return ret;
@@ -79,7 +79,7 @@ int32_t UDSSocket::SetBlockMode(int32_t fd, bool isBlock)
     CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
     int32_t flags = fcntl(fd, F_GETFL);
     if (flags < 0) {
-        MMI_LOGE("fcntl F_GETFL fail. fd:%{public}d,flags:%{public}d,msg:%{public}s,errCode:%{public}d", 
+        MMI_LOGE("fcntl F_GETFL fail. fd:%{public}d, flags:%{public}d, msg:%{public}s, errCode:%{public}d", 
             fd, flags, strerror(errno), FCNTL_FAIL);
         return flags;
     }
@@ -90,7 +90,7 @@ int32_t UDSSocket::SetBlockMode(int32_t fd, bool isBlock)
     }
     flags = fcntl(fd, F_SETFL, flags);
     if (flags < 0) {
-        MMI_LOGE("fcntl F_SETFL fail. fd:%{public}d,flags:%{public}d,msg:%{public}s,errCode:%{public}d", 
+        MMI_LOGE("fcntl F_SETFL fail. fd:%{public}d, flags:%{public}d, msg:%{public}s, errCode:%{public}d", 
             fd, flags, strerror(errno), FCNTL_FAIL);
         return flags;
     }

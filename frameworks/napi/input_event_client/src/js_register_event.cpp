@@ -145,7 +145,7 @@ int32_t DelEventCallback(const napi_env& env, CallbackMap& jsEvent, const EventI
         if (isEquals) {
             napi_delete_reference(env, *it);
             iter->second.erase(it);
-            MMI_LOGD("callback function size=%{public}d", static_cast<int32_t>(iter->second.size()));
+            MMI_LOGD("callback function size:%{public}d", static_cast<int32_t>(iter->second.size()));
             return JS_CALLBACK_EVENT_SUCCESS;
         }
         it++;
@@ -332,7 +332,7 @@ static void AddStylusData(const napi_env& env, napi_value argv, const StylusEven
 bool SendMultimodalEvent(const napi_env& env, const CallbackMap& jsEvent, int32_t type,
                          const MultimodalEvent& event)
 {
-    MMI_LOGD("send event: %{public}s, CallbackMap size: %{public}d",
+    MMI_LOGD("send event:%{public}s, CallbackMap size:%{public}d",
         eventTable[type].c_str(), static_cast<int32_t>(jsEvent.size()));
     size_t argc = 1;
     napi_value argv = nullptr;
@@ -357,7 +357,7 @@ bool SendMultimodalEvent(const napi_env& env, const CallbackMap& jsEvent, int32_
 
     auto iter = jsEvent.find(eventTable[type]);
     if (iter == jsEvent.end()) {
-        MMI_LOGE("invalid event=%{public}s", eventTable[type].c_str());
+        MMI_LOGE("invalid event:%{public}s", eventTable[type].c_str());
         return false;
     }
     if (iter->second.empty()) {
@@ -612,7 +612,7 @@ bool AppKeyEventHandle::OnKey(const OHOS::KeyEvent& keyEvent)
 
 bool AppKeyEventHandle::SendEvent(const std::string& name, const OHOS::KeyEvent& event) const
 {
-    MMI_LOGD("send event=%{public}s", name.c_str());
+    MMI_LOGD("send event:%{public}s", name.c_str());
     size_t argc = 1;
     napi_value argv = nullptr;
     napi_value result = nullptr;
@@ -641,7 +641,7 @@ bool AppKeyEventHandle::SendEvent(const std::string& name, const OHOS::KeyEvent&
 
     auto iter = jsEvent.find(name);
     if (iter == jsEvent.end()) {
-        MMI_LOGE("invalid event=%{public}s", name.c_str());
+        MMI_LOGE("invalid event:%{public}s", name.c_str());
         return false;
     }
     if (iter->second.empty()) {
@@ -677,7 +677,7 @@ bool AppTouchEventHandle::OnTouch(const TouchEvent& touchEvent)
 
 bool AppTouchEventHandle::SendEvent(const std::string& name, const TouchEvent& event) const
 {
-    MMI_LOGD("send event=%{public}s", name.c_str());
+    MMI_LOGD("send event:%{public}s", name.c_str());
     size_t argc = 1;
     napi_value argv = nullptr;
     napi_value result = nullptr;
@@ -699,7 +699,7 @@ bool AppTouchEventHandle::SendEvent(const std::string& name, const TouchEvent& e
 
     auto iter = jsEvent.find(name);
     if (iter == jsEvent.end()) {
-        MMI_LOGE("invalid event=%{public}s", name.c_str());
+        MMI_LOGE("invalid event:%{public}s", name.c_str());
         return false;
     }
     if (iter->second.empty()) {
@@ -785,7 +785,7 @@ bool AppDeviceEventHandle::OnDeviceRemove(const DeviceEvent& deviceEvent)
 
 bool AppDeviceEventHandle::SendEvent(const std::string& name, const DeviceEvent& event) const
 {
-    MMI_LOGD("send event=%{public}s", name.c_str());
+    MMI_LOGD("send event:%{public}s", name.c_str());
     size_t argc = 1;
     napi_value argv = nullptr;
     napi_value result = nullptr;
@@ -820,7 +820,7 @@ bool AppDeviceEventHandle::SendEvent(const std::string& name, const DeviceEvent&
 
     auto iter = jsEvent.find(name);
     if (iter == jsEvent.end()) {
-        MMI_LOGE("invalid event=%{public}s", name.c_str());
+        MMI_LOGE("invalid event:%{public}s", name.c_str());
         return false;
     }
     if (iter->second.empty()) {

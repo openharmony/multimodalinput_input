@@ -76,7 +76,7 @@ static napi_value GetEventInfo(napi_env env, napi_callback_info info, EventInfo&
     event.name = eventName;
     event.type = GetHandleType(event.name);
     event.winId = 0;
-    MMI_LOGD("event info, type=%{public}d, name=%{public}s", event.type, event.name.c_str());
+    MMI_LOGD("event info, type:%{public}d, name:%{public}s", event.type, event.name.c_str());
 
     napi_value result = {};
     napi_create_int32(env, SUCCESS_CODE, &result);
@@ -123,7 +123,7 @@ static napi_value OnEvent(napi_env env, napi_callback_info info)
         return result;
     }
     if (event.type == INVALID_TYPE_CODE) {
-        MMI_LOGE("invalid registerHandle type=%{public}d", event.type);
+        MMI_LOGE("invalid registerHandle type:%{public}d", event.type);
         return result;
     }
 
