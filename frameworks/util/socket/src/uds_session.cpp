@@ -21,7 +21,8 @@
 #include <sys/un.h>
 #include <unistd.h>
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
 }
@@ -43,14 +44,14 @@ UDSSession::~UDSSession()
 
 bool UDSSession::SendMsg(const char *buf, size_t size) const
 {
-    CHKF(buf, OHOS::ERROR_NULL_POINTER);
+    CHKPF(buf);
     CHKF(size > 0 && size <= MAX_PACKET_BUF_SIZE, PARAM_INPUT_INVALID);
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
     uint64_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
     if (ret < 0) {
         const int errNoSaved = errno;
         MMI_LOGE("UDSSession::SendMsg write return %{public}" PRId64
-                ", fd_: %{public}d, errNoSaved: %{public}d, %{public}s.",
+                ", fd_:%{public}d, errNoSaved:%{public}d, strerror:%{public}s",
                 ret, fd_, errNoSaved, strerror(errNoSaved));
         return false;
     }
@@ -59,7 +60,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 
 void UDSSession::Close()
 {
-    MMI_LOGT("enter fd_ = %{public}d, bHasClosed_ = %d.", fd_, bHasClosed_);
+    MMI_LOGT("enter fd_:%{public}d, bHasClosed_ = %d.", fd_, bHasClosed_);
     if (!bHasClosed_ && fd_ != -1) {
         close(fd_);
         bHasClosed_ = true;
@@ -125,4 +126,5 @@ void UDSSession::ClearEventsVct()
 {
     std::vector<EventTime>().swap(events_);
 }
-}
+} // namespace MMI
+} // namespace OHOS

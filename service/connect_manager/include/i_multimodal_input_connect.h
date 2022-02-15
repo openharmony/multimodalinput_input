@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_I_MULTIMODAL_INPUT_CONNECT_H
-#define OHOS_I_MULTIMODAL_INPUT_CONNECT_H
+#ifndef I_MULTIMODAL_INPUT_CONNECT_H
+#define I_MULTIMODAL_INPUT_CONNECT_H
 
 #include "iremote_broker.h"
 #include "i_event_filter.h"
@@ -39,10 +39,9 @@ public:
         CONNECT_MODULE_TYPE_MMI_CLIENT = 0,
         CONNECT_MODULE_TYPE_AI = 1,
         CONNECT_MODULE_TYPE_SIMULATE_INJECT = 2,
-        CONNECT_MODULE_TYPE_ST_TEST = 3,
     };
 };
 } // namespace MMI
 } // namespace OHOS
 
-#endif // OHOS_I_MULTIMODAL_INPUT_CONNECT_H
+#endif // I_MULTIMODAL_INPUT_CONNECT_H

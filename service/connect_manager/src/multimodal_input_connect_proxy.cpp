@@ -60,20 +60,20 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
 
     int requestResult = Remote()->SendRequest(ALLOC_SOCKET_FD, data, reply, option);
     if (requestResult != NO_ERROR) {
-        MMI_LOGE("send request fail, result: %{public}d", requestResult);
+        MMI_LOGE("send request fail, result:%{public}d", requestResult);
         return RET_ERR;
     }
 
     MMI_LOGE("have recieve message from server");
 
     int result = reply.ReadInt32();
-    MMI_LOGE("result = %{public}d", result);
+    MMI_LOGE("result:%{public}d", result);
     if (result != RET_OK) {
-        MMI_LOGE("responce return error: %{public}d", result);
+        MMI_LOGE("responce return error:%{public}d", result);
         return RET_ERR;
     }
     socketFd = reply.ReadFileDescriptor();
-    MMI_LOGE("socketFd = %{public}d", socketFd);
+    MMI_LOGE("socketFd:%{public}d", socketFd);
 
     return RET_OK;
 }
@@ -97,13 +97,13 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
 
     int32_t requestResult = Remote()->SendRequest(SET_EVENT_POINTER_FILTER, data, reply, option);
     if (requestResult != NO_ERROR) {
-        MMI_LOGE("send request fail, result: %{public}d", requestResult);
+        MMI_LOGE("send request fail, result:%{public}d", requestResult);
         return RET_ERR;
     }
 
     int32_t result = reply.ReadInt32();
     if (result != RET_OK) {
-        MMI_LOGE("responce return error: %{public}d", result);
+        MMI_LOGE("responce return error:%{public}d", result);
     }
 
     return result;

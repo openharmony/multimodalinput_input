@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_TOUCH_EVENTS_H
-#define OHOS_TOUCH_EVENTS_H
+#ifndef TOUCH_EVENT_H
+#define TOUCH_EVENT_H
 #include "manipulation_event.h"
 #include "mouse_event.h"
 
@@ -273,4 +273,4 @@ private:
     MMI::MultimodalEventPtr mDeviceEvent_ = nullptr;
 };
 }
-#endif
+#endif // TOUCH_EVENT_H

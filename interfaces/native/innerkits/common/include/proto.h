@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_PROTO_H
-#define OHOS_PROTO_H
+#ifndef PROTO_H
+#define PROTO_H
 
 #include <sys/types.h>
 
@@ -249,4 +249,4 @@ enum Authority {
     MIDDLE_AUTHORITY,
     HIGH_AUTHORITY,
 };
-#endif
+#endif // PROTO_H

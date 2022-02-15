@@ -45,7 +45,6 @@ public:
     int32_t FilterKeyEvent(std::string name, Authority authority, std::function<void(KeyBoardEvent)> handler);
     int32_t UnFilterKeyEvent(int32_t id);
     int32_t OnKeyEvent(KeyBoardEvent event, int32_t id);
-    void OnkeyEventTrace(const KeyBoardEvent& event);
 
 public:
     class TouchEventFilter {
@@ -90,7 +89,6 @@ public:
                                             std::function<void(MouseEvent)> handler_);
     int32_t UnRegisterPointerEventInterceptor(int32_t id_);
     int32_t OnPointerEvent(MouseEvent event, int32_t id_);
-    void OnPointerEventTrace(const MouseEvent& event);
 
 private:
     int32_t GetHighAuthorityFilterId();

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_OUTER_INTERFACE_H
-#define OHOS_OUTER_INTERFACE_H
+#ifndef OUTER_INTERFACE_H
+#define OUTER_INTERFACE_H
 
 #ifdef OHOS_WESTEN_MODEL
 #include "key_event_value_transformation.h"
@@ -43,4 +43,4 @@ public:
 }
 
 #endif
-#endif
+#endif // OUTER_INTERFACE_H

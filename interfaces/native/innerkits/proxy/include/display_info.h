@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_DISPLAY_INFO_H
-#define OHOS_MULTIMDOALINPUT_DISPLAY_INFO_H
+#ifndef DISPLAY_INFO_H
+#define DISPLAY_INFO_H
 
 #include <vector>
 #include <string>
@@ -45,23 +45,29 @@ struct WindowInfo {
     // The uid of the process where the window is located
     int32_t uid;
 
-    // The x coordinate of the upper left corner of the window in the logical display
-    int32_t topLeftX;
+    // The x coordinate of the upper left corner of the hot zone window in the logical display
+    int32_t hotZoneTopLeftX;
 
-    // The y coordinate of the upper left corner of the window in the logical display
-    int32_t topLeftY;
+    // The y coordinate of the upper left corner of the hot zone window in the logical display
+    int32_t hotZoneTopLeftY;
 
-    // Logical width of the window
-    int32_t width;
+    // Logical width of the hot zone window
+    int32_t hotZoneWidth;
 
-    // Logical height of the window
-    int32_t height;
+    // Logical height of the hot zone window
+    int32_t hotZoneHeight;
 
     // The logical display id to which the window belongs
     int32_t displayId;
 
     // The input events sent to this window will be sent to the agentwindowid window for processing
     int32_t agentWindowId;
+
+    // The x coordinate of the upper left corner of the window in the logical display
+    int32_t winTopLeftX;
+
+    // The y coordinate of the upper left corner of the window in the logical display
+    int32_t winTopLeftY;
 };
 
 struct PhysicalDisplayInfo {
@@ -134,7 +140,7 @@ struct LogicalDisplayInfo {
     // List of window information arranged in Z order, with the top window at the top
     std::vector<WindowInfo> windowsInfo_;
 };
-}
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 
-#endif // OHOS_MULTIMDOALINPUT_DISPLAY_INFO_H
+#endif // DISPLAY_INFO_H

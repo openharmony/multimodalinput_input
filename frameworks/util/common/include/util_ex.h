@@ -26,7 +26,8 @@
 #include "log.h"
 #include "util.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     template<class ...Ts>
     int32_t mprintf(int32_t fd, const char* fmt, Ts... args)
     {
@@ -160,6 +161,7 @@ namespace OHOS::MMI {
         auto a = EnumUnderlyingValue(e);
         return static_cast<Enum>(a + val);
     }
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif // UTIL_EX_H

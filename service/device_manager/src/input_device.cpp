@@ -46,5 +46,5 @@ int32_t InputDevice::GetType()
 {
     return deviceType_;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

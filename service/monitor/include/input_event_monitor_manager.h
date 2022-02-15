@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_INPUT_MONITOR_H
-#define OHOS_INPUT_MONITOR_H
+#ifndef INPUT_EVENT_MONITOR_H
+#define INPUT_EVENT_MONITOR_H
 #include <map>
 #include <vector>
 #include <algorithm>
@@ -58,4 +58,4 @@ private:
 }
 }
 #define InputMonitorServiceMgr OHOS::Singleton<OHOS::MMI::InputEventMonitorManager>::GetInstance()
-#endif
+#endif // INPUT_EVENT_MONITOR_H

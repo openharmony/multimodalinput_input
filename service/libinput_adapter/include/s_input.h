@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_S_INPUT_H
-#define OHOS_S_INPUT_H
+#ifndef S_INPUT_H
+#define S_INPUT_H
 #include <thread>
 #include <libudev.h>
 #include <functional>
@@ -27,7 +27,7 @@ class SInput {
 public:
     SInput();
     virtual ~SInput();
-    static void Loginfo_packaging_tool(libinput_event *event);
+    static void LoginfoPackagingTool(libinput_event *event);
     bool Init(FunInputEvent funInputEvent, const std::string& seat_id = "seat0");
     void EventDispatch(epoll_event& ev);
     void Stop();
@@ -50,4 +50,4 @@ protected:
 };
 }
 }
-#endif
+#endif // S_INPUT_H

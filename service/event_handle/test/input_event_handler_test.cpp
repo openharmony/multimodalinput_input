@@ -30,9 +30,9 @@ namespace {
     using namespace OHOS::MMI;
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventHandlerTest" };
 
-static void LibinputDrainEvents(struct libinput* li)
+static void LibinputDrainEvents(libinput* li)
 {
-    struct libinput_event* event;
+    libinput_event* event;
     libinput_dispatch(li);
     while ((event = libinput_get_event(li))) {
         libinput_event_destroy(event);
@@ -44,7 +44,7 @@ const static libinput_interface LIBINPUT_INTERFACE = {
     .open_restricted = [](const char* path, int32_t flags, void* user_data)->int32_t {
         CHKR(path, OHOS::ERROR_NULL_POINTER, -errno);
         int32_t fd = open(path, flags);
-        MMI_LOGD("libinput .open_restricted path:%{public}s fd:%{public}d", path, fd);
+        MMI_LOGD("libinput .open_restricted path:%{public}s, fd:%{public}d", path, fd);
         return fd < 0 ? -errno : fd;
     },
     .close_restricted = [](int32_t fd, void* user_data)

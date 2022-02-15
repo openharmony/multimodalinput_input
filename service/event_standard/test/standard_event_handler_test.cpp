@@ -29,11 +29,11 @@ public:
 
 HWTEST_F(StandardEventHandlerTest, TEST_StandardTouchEvent_PointerButton, TestSize.Level1)
 {
-    struct libinput_event event;
-    struct StandardTouchStruct data;
-    event.device = (struct libinput_device*)zalloc(sizeof(struct libinput_device*));
-    event.device->seat = (struct libinput_seat*)zalloc(sizeof(struct libinput_seat*));
-    event.device->seat->libinput = (struct libinput*)zalloc(sizeof(struct libinput*));
+    libinput_event event;
+    StandardTouchStruct data;
+    event.device = (libinput_device*)zalloc(sizeof(libinput_device*));
+    event.device->seat = (libinput_seat*)zalloc(sizeof(libinput_seat*));
+    event.device->seat->libinput = (libinput*)zalloc(sizeof(libinput*));
     StandardEventHandler mmiStandard;
 
     event.type = LIBINPUT_EVENT_POINTER_BUTTON;
@@ -46,11 +46,11 @@ HWTEST_F(StandardEventHandlerTest, TEST_StandardTouchEvent_PointerButton, TestSi
 
 HWTEST_F(StandardEventHandlerTest, TEST_StandardTouchEvent_PointerMotion, TestSize.Level1)
 {
-    struct libinput_event event;
-    struct StandardTouchStruct data;
-    event.device = (struct libinput_device*)zalloc(sizeof(struct libinput_device*));
-    event.device->seat = (struct libinput_seat*)zalloc(sizeof(struct libinput_seat*));
-    event.device->seat->libinput = (struct libinput*)zalloc(sizeof(struct libinput*));
+    libinput_event event;
+    StandardTouchStruct data;
+    event.device = (libinput_device*)zalloc(sizeof(libinput_device*));
+    event.device->seat = (libinput_seat*)zalloc(sizeof(libinput_seat*));
+    event.device->seat->libinput = (libinput*)zalloc(sizeof(libinput*));
     StandardEventHandler mmiStandard;
 
     event.type = LIBINPUT_EVENT_POINTER_MOTION;
@@ -63,11 +63,11 @@ HWTEST_F(StandardEventHandlerTest, TEST_StandardTouchEvent_PointerMotion, TestSi
 
 HWTEST_F(StandardEventHandlerTest, TEST_StandardTouchEvent_TableToolTip, TestSize.Level1)
 {
-    struct libinput_event event;
-    struct StandardTouchStruct data;
-    event.device = (struct libinput_device*)zalloc(sizeof(struct libinput_device*));
-    event.device->seat = (struct libinput_seat*)zalloc(sizeof(struct libinput_seat*));
-    event.device->seat->libinput = (struct libinput*)zalloc(sizeof(struct libinput*));
+    libinput_event event;
+    StandardTouchStruct data;
+    event.device = (libinput_device*)zalloc(sizeof(libinput_device*));
+    event.device->seat = (libinput_seat*)zalloc(sizeof(libinput_seat*));
+    event.device->seat->libinput = (libinput*)zalloc(sizeof(libinput*));
     StandardEventHandler mmiStandard;
 
     event.type = LIBINPUT_EVENT_TABLET_TOOL_TIP;
@@ -80,11 +80,11 @@ HWTEST_F(StandardEventHandlerTest, TEST_StandardTouchEvent_TableToolTip, TestSiz
 
 HWTEST_F(StandardEventHandlerTest, TEST_StandardTouchEvent_Other, TestSize.Level1)
 {
-    struct libinput_event event;
-    struct StandardTouchStruct data;
-    event.device = (struct libinput_device*)zalloc(sizeof(struct libinput_device*));
-    event.device->seat = (struct libinput_seat*)zalloc(sizeof(struct libinput_seat*));
-    event.device->seat->libinput = (struct libinput*)zalloc(sizeof(struct libinput*));
+    libinput_event event;
+    StandardTouchStruct data;
+    event.device = (libinput_device*)zalloc(sizeof(libinput_device*));
+    event.device->seat = (libinput_seat*)zalloc(sizeof(libinput_seat*));
+    event.device->seat->libinput = (libinput*)zalloc(sizeof(libinput*));
     StandardEventHandler mmiStandard;
 
     event.type = LIBINPUT_EVENT_NONE;

@@ -13,17 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_INPUT_MANAGER_H
-#define OHOS_MULTIMDOALINPUT_INPUT_MANAGER_H
+#ifndef INPUT_MANAGER_H
+#define INPUT_MANAGER_H
 
 #include <memory>
 #include <list>
 
 #include "display_info.h"
-#include "i_input_event_consumer.h"
 #include "error_multimodal.h"
+#include "i_input_event_consumer.h"
 #include "key_option.h"
-#include "input_device_event.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -184,8 +184,9 @@ public:
 
 private:
     InputManager() = default;
+    DISALLOW_COPY_AND_MOVE(InputManager);
     static InputManager *mInstance_;
 };
-}
-} // namespace OHOS::MMI
-#endif // OHOS_MULTIMDOALINPUT_INPUT_MANAGER_H
+} // namespace MMI
+} // namespace OHOS
+#endif // INPUT_MANAGER_H

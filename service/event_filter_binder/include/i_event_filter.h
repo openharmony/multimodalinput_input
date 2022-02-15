@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_I_POINTER_EVENT_FILTER_H
-#define OHOS_I_POINTER_EVENT_FILTER_H
+#ifndef I_EVENT_FILTER_H
+#define I_EVENT_FILTER_H
 
 #include "iremote_broker.h"
 #include "pointer_event.h"
@@ -33,4 +33,4 @@ public:
 } // namespace MMI
 } // namespace OHOS
 
-#endif // OHOS_I_POINTER_EVENT_FILTER_H
+#endif // I_EVENT_FILTER_H
