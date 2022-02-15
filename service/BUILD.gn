@@ -61,6 +61,7 @@ config("libmmi_server_public_config") {
     "//foundation/multimodalinput/interfaces/native/innerkits/event/include",
     "//foundation/graphic/standard/rosen/modules/2d_graphics/include",
     "//foundation/graphic/standard/rosen/modules/2d_graphics/src",
+    "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
   ]
 
   if (is_mmi_have_hdf) {
@@ -221,6 +222,8 @@ ohos_shared_library("libmmi-server") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
+    "hisysevent_native:libhisysevent",
+    "ability_runtime:ability_manager",
   ]
 
   part_name = "multimodalinput_base"
