@@ -467,18 +467,13 @@ KeyEventValueTransformation::~KeyEventValueTransformation()
 
 bool KeyEventValueTransformation::Init()
 {
-    struct xkb_context* context = nullptr;
-    struct xkb_keymap* keyMap = nullptr;
+    xkb_context* context = nullptr;
+    xkb_keymap* keyMap = nullptr;
     int32_t ctxFlags = XKB_CONTEXT_NO_DEFAULT_INCLUDES;
 
     ctxFlags = ctxFlags | XKB_CONTEXT_NO_ENVIRONMENT_NAMES;
     context = xkb_context_new(static_cast<xkb_context_flags>(ctxFlags));
-    if (context == nullptr) {
-        MMI_LOGE("XkbKeyboardHandlerKey::Init: Failed to allocate context! errCode:%{public}d ",
-                 XKB_ALLOC_CONTEXT_FAIL);
-        return false;
-    }
-
+    CHKPF(context);
     auto strPath = GetEnv("top_srcdir");
     if (strPath.empty()) {
         strPath = DEF_XKB_CONFIG;

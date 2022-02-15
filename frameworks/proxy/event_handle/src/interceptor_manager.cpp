@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "interceptor_manager.h"
+#include "bytrace.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "souceType.h"
@@ -35,34 +36,26 @@ InterceptorManager::~InterceptorManager()
 int32_t InterceptorManager::AddInterceptor(int32_t sourceType,
     std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
 {
-    if (interceptor == nullptr) {
-        MMI_LOGE("interceptor is null");
-        return INVALID_INTERCEPTOR_ID;
-    }
-
+    CHKPR(interceptor, INVALID_INTERCEPTOR_ID);
     InterceptorItem interceptorItem;
     interceptorItem.id_ = ++InterceptorItemId;
     interceptorItem.sourceType = sourceType;
     interceptorItem.callback = interceptor;
     interceptor_.push_back(interceptorItem);
     MMIEventHdl.AddInterceptor(interceptorItem.sourceType, interceptorItem.id_);
-    MMI_LOGD("Add sourceType = %{public}d Touchpad to InterceptorManager success", sourceType);
+    MMI_LOGD("Add sourceType:%{public}d Touchpad to InterceptorManager success", sourceType);
     return interceptorItem.id_;
 }
 
 int32_t InterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
-    if (interceptor == nullptr) {
-        MMI_LOGE("interceptor is null");
-        return RET_ERR;
-    }
-
+    CHKPR(interceptor, ERROR_NULL_POINTER);
     InterceptorItem interceptorItem;
     interceptorItem.id_ = ++InterceptorItemId;
     interceptorItem.sourceType = SOURCETYPE_KEY;
     interceptorItem.callback_ = interceptor;
     interceptor_.push_back(interceptorItem);
-    if (RET_OK == MMIEventHdl.AddInterceptor(interceptorItem.sourceType, interceptorItem.id_)) {
+    if (MMIEventHdl.AddInterceptor(interceptorItem.sourceType, interceptorItem.id_) == RET_OK) {
         MMI_LOGD("Add AddInterceptor KeyEvent to InterceptorManager success!");
         return MMI_STANDARD_EVENT_SUCCESS;
     }
@@ -83,21 +76,18 @@ void InterceptorManager::RemoveInterceptor(int32_t interceptorId)
     } else {
         iter = interceptor_.erase(iter);
         MMIEventHdl.RemoveInterceptor(interceptorItem.id_);
-        MMI_LOGD("InterceptorItem id: %{public}d removed success", interceptorId);
+        MMI_LOGD("InterceptorItem id:%{public}d removed success", interceptorId);
     }
 }
 
 int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id)
 {
-    if (pointerEvent == nullptr) {
-        MMI_LOGE("pointerEvent is null");
-        return ERROR_NULL_POINTER;
-    }
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     PointerEvent::PointerItem pointer;
     CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL, RET_ERR);
-    MMI_LOGD("interceptor-clienteventTouchpad:actionTime=%{public}d;"
-             "sourceType=%{public}d;pointerAction=%{public}d;"
-             "pointerId=%{public}d;point.x=%{public}d;point.y=%{public}d;press=%{public}d",
+    MMI_LOGD("interceptor-clienteventTouchpad:actionTime:%{public}d, "
+             "sourceType:%{public}d, pointerAction:%{public}d, "
+             "pointerId:%{public}d, point.x:%{public}d, point.y:%{public}d, press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     InterceptorItem interceptorItem;
@@ -112,10 +102,10 @@ int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointer
 
 int32_t InterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    if (keyEvent == nullptr) {
-        MMI_LOGE("keyEvent is null");
-        return ERROR_NULL_POINTER;
-    }
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    int32_t keyId = keyEvent->GetId();
+    std::string keyEventString = "keyEventFilter";
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
     for (auto &item : interceptor_) {
         if (item.sourceType == SOURCETYPE_KEY) {
             MMI_LOGD("interceptor callback execute");

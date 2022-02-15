@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_COMMON_EVENTS_HANDLER_H
-#define OHOS_COMMON_EVENTS_HANDLER_H
+#ifndef COMMON_EVENT_HANDLER_H
+#define COMMON_EVENT_HANDLER_H
 
 #include "standardized_event_handler.h"
 #include "multimodal_event.h"
@@ -41,4 +41,4 @@ public:
 };
 }
 }
-#endif
+#endif // COMMON_EVENT_HANDLER_H

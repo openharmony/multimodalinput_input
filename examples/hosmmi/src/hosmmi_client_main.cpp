@@ -345,7 +345,7 @@ public:
     {
         MMI_LOGI("MMIClientDemo::UnregisterStandardizedEventHandle enter.");
         for (auto it = handerMap_.begin(); it != handerMap_.end();) {
-            MMI_LOGD("UnregisterStandardizedEventHandle %{public}s", it->first.c_str());
+            MMI_LOGD("UnregisterStandardizedEventHandle:%{public}s", it->first.c_str());
             MMIEventHdl.UnregisterStandardizedEventHandle(remoteObject_, windowId_, it->second);
             handerMap_.erase(it++);
         }
@@ -367,7 +367,7 @@ void RunClient()
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
-    MMI_LOGD("UnRegisterStandardizedEventHandle begin....");
+    MMI_LOGD("UnRegisterStandardizedEventHandle begin");
     client.UnregisterStandardizedEventHandle();
     MMI_LOGD("UnRegisterStandardizedEventHandle end, wait 3000ms exit.");
 }

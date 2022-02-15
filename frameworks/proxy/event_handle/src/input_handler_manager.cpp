@@ -29,6 +29,7 @@ namespace {
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
     std::shared_ptr<IInputEventConsumer> consumer)
 {
+    CHKPR(consumer, INVALID_HANDLER_ID);
     if (inputHandlers_.size() >= MAX_N_INPUT_HANDLERS) {
         MMI_LOGE("The number of handlers exceeds the maximum");
         return INVALID_HANDLER_ID;
@@ -59,12 +60,9 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
 
 void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
-    MMI_LOGD("Mark consumed state:monitorId=%{public}d, eventId=%{public}d", monitorId, eventId);
+    MMI_LOGD("Mark consumed state, monitor:%{public}d, event:%{public}d", monitorId, eventId);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    if (client == nullptr) {
-        MMI_LOGE("Get MMIClint false");
-        return;
-    }
+    CHKP(client);
     NetPacket pkt(MmiMessageId::MARK_CONSUMED);
     CHK(pkt.Write(monitorId), STREAM_BUF_WRITE_FAIL);
     CHK(pkt.Write(eventId), STREAM_BUF_WRITE_FAIL);
@@ -91,10 +89,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
 void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handlerType)
 {
     MMIClientPtr client { MMIEventHdl.GetMMIClient() };
-    if (client == nullptr) {
-        MMI_LOGE("AddToServer Get MMIClint false");
-        return;
-    }
+    CHKP(client);
     NetPacket pkt(MmiMessageId::ADD_INPUT_HANDLER);
     CHK(pkt.Write(handlerId), STREAM_BUF_WRITE_FAIL);
     CHK(pkt.Write(handlerType), STREAM_BUF_WRITE_FAIL);
@@ -106,11 +101,12 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
     std::lock_guard<std::mutex> guard(lockHandlers_);
     auto tItr = inputHandlers_.find(handlerId);
     if (tItr == inputHandlers_.end()) {
-        MMI_LOGE("No handler with specified ID");
+        MMI_LOGE("No handler with specified");
         return RET_ERR;
     }
-    if (tItr->second.handlerType_ != handlerType) {
-        MMI_LOGE("Unmatched handler type");
+    if (handlerType != tItr->second.handlerType_) {
+        MMI_LOGE("Unmatched handler type, InputHandlerType:%{public}d, FindHandlerType:%{public}d",
+                 handlerType, tItr->second.handlerType_);
         return RET_ERR;
     }
     inputHandlers_.erase(tItr);
@@ -121,10 +117,7 @@ void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType h
 {
     MMI_LOGD("Remove handler:%{public}d from server", handlerId);
     MMIClientPtr client { MMIEventHdl.GetMMIClient() };
-    if (client == nullptr) {
-        MMI_LOGE("RemoveFromServer Get MMIClint false");
-        return;
-    }
+    CHKP(client);
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_HANDLER);
     CHK(pkt.Write(handlerId), STREAM_BUF_WRITE_FAIL);
     CHK(pkt.Write(handlerType), STREAM_BUF_WRITE_FAIL);
@@ -153,10 +146,19 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Enter handlerId:%{public}d", handlerId);
-    int32_t eventTouch = 9;
-    std::string touchEvent = "TouchEventFilterAsync";
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
+    MMI_LOGD("Enter handler:%{public}d", handlerId);
+    int32_t pointerFilter = 1;
+    int32_t touchFilter = 2;
+    if (pointerFilter == pointerEvent->GetSourceType()) {
+        int32_t pointerId = pointerEvent->GetId();
+        std::string pointerEventString = "pointerEventFilter";
+        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventString, pointerId);
+    }
+    if (touchFilter == pointerEvent->GetSourceType()) {
+        int32_t touchId = pointerEvent->GetId();
+        std::string touchEventString = "touchEventFilter";
+        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, touchId);
+    }
     std::map<int32_t, InputHandler>::iterator tItr;
     std::map<int32_t, InputHandler>::iterator tItrEnd;
     {

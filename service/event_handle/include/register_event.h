@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_REGISTER_EVENT_H
-#define OHOS_REGISTER_EVENT_H
+#ifndef REGISTER_EVENT_H
+#define REGISTER_EVENT_H
 
 #include <map>
 #include <vector>
@@ -41,8 +41,8 @@ struct TouchInfo {
 struct GestureInfo {
     int32_t fingerCount;
     int32_t cancelled;
-    struct NormalizedCoords delta;
-    struct NormalizedCoords deltaUnaccel;
+    NormalizedCoords delta;
+    NormalizedCoords deltaUnaccel;
     uint64_t beginTime;
     uint64_t endTime;
     bool enabled;
@@ -79,8 +79,8 @@ protected:
     int32_t OnEventGestureEndGetSign(const EventGesture& gesture, MmiMessageId& msgId);
     int32_t OnEventGestureUpdateGetSign(const EventGesture& gesture, MmiMessageId& msgId);
     int32_t OnEventGestureBeginGetSign(const EventGesture& gesture);
-    int32_t OnEventOneFingerHandlerGetSign(MmiMessageId& msgId, TouchInfo& touchUpInfo);
-    int32_t OnEventThreeFingerHandlerGetSign(MmiMessageId& msgId, TouchInfo& touchUpInfo);
+    int32_t OnEventOneFingerHandlerGetSign(const TouchInfo& touchUpInfo, MmiMessageId& msgId);
+    int32_t OnEventThreeFingerHandlerGetSign(const TouchInfo& touchUpInfo, MmiMessageId& msgId);
     int32_t OnEventTouchDownGetSign(const EventTouch& touch);
     int32_t OnEventTouchMotionGetSign(const EventTouch& touch, MmiMessageId& msgId);
     int32_t OnEventTouchUpGetSign(const EventTouch& touch, MmiMessageId& msgId);
@@ -155,4 +155,4 @@ protected:
 }
 }
 #define MMIRegEvent OHOS::MMI::RegisterEvent::GetInstance()
-#endif
+#endif // REGISTER_EVENT_H

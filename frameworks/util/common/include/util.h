@@ -22,7 +22,8 @@
 #include "struct_multimodal.h"
 #include "define_multimodal.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     const char *GetMmiErrorTypeDesc(int32_t errorCodeEnum);
     std::string GetEnv(const std::string& name);
     std::string UuIdGenerate();
@@ -35,7 +36,7 @@ namespace OHOS::MMI {
     size_t StringToken(std::string& str, const std::string& sep, std::string& token);
     size_t StringSplit(const std::string& str, const std::string& sep, std::vector<std::string>& vecList);
     std::string IdsListToString(const std::vector<int32_t>& list, const std::string& sep);
-    void LocalTime(struct tm& t, time_t curTime = 0);
+    void LocalTime(tm& t, time_t curTime = 0);
     std::string Strftime(const std::string& format = "%F %T", time_t curTime = 0);
     void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
         const int32_t abilityId, const int32_t focusId, const uint64_t preHandlerTime);
@@ -50,6 +51,7 @@ namespace OHOS::MMI {
     void AddId(std::vector<int32_t> &list, int32_t id);
     size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_t> &list2,
         std::vector<int32_t> &difList);
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif // UTIL_H

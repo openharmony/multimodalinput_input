@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MMI_INTERFACE_H
-#define OHOS_MMI_INTERFACE_H
+#ifndef MMI_INTERFACE_H
+#define MMI_INTERFACE_H
 
 #include "singleton.h"
 #ifdef OHOS_WESTEN_MODEL
@@ -35,4 +35,4 @@ int wet_module_init(struct weston_compositor* ec, int* argc, char* argv[]);
 #ifdef __cplusplus
 }
 #endif
-#endif
+#endif // MMI_INTERFACE_H

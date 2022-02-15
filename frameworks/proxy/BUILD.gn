@@ -62,7 +62,7 @@ ohos_shared_library("libmmi-client") {
     "event_handle/src/common_event_handler.cpp",
     "event_handle/src/device_handler.cpp",
     "event_handle/src/event_factory.cpp",
-    "event_handle/src/input_device_event.cpp",
+    "event_handle/src/input_device_impl.cpp",
     "event_handle/src/input_event_monitor_manager.cpp",
     "event_handle/src/input_filter_manager.cpp",
     "event_handle/src/input_handler_manager.cpp",
@@ -150,7 +150,7 @@ ohos_unittest("ut-mmi-proxy-out") {
   ]
 
   if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -238,7 +238,7 @@ ohos_unittest("MultimodalinputEventHandlerTest") {
   ]
 
   if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -294,7 +294,7 @@ ohos_unittest("KeyEventTest") {
   ]
 
   if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -350,7 +350,7 @@ ohos_unittest("MultimodalKeyEventTest") {
   ]
 
   if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -406,7 +406,7 @@ ohos_unittest("InputManagerTest") {
   ]
 
   if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -462,7 +462,7 @@ ohos_unittest("InputManagerManualTest") {
   ]
 
   if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -518,7 +518,7 @@ ohos_unittest("PointerEventTest") {
   ]
 
   if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
   cflags = [ "-DOHOS_BUILD" ]

@@ -40,4 +40,4 @@ private:
 }
 }
 
-#endif
+#endif // GESTURE_TRANSFORM_POINT_PROCESSOR_H
