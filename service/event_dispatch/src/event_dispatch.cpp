@@ -396,7 +396,6 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 
     if (IsANRProcess(udsServer, fd, point->GetId())) {
         MMI_LOGE("the pointer event does not report normally, triggering ANR");
-        // return RET_ERR;
     }
 
     if (!udsServer->SendMsg(fd, newPacket)) {
@@ -741,7 +740,6 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
 
     if (IsANRProcess(&udsServer, fd, key->GetId())) {
         MMI_LOGE("the key event does not report normally, triggering ANR");
-        // return RET_ERR;
     }
 
     InputMonitorServiceMgr.OnMonitorInputEvent(key);
