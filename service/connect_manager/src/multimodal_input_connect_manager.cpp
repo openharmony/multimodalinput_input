@@ -93,12 +93,12 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
         return true;
     }
     auto sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (sm != nullptr) {
+    if (sm == nullptr) {
         MMI_LOGE("get registry fail.");
         return false;
     }
     auto sa = sm->GetSystemAbility(IMultimodalInputConnect::MULTIMODAL_INPUT_CONNECT_SERVICE_ID);
-    if (sa != nullptr) {
+    if (sa == nullptr) {
         MMI_LOGE("get sa fail.");
         return false;
     }
