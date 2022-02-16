@@ -58,7 +58,6 @@ void ChkConfig(int32_t fd)
 #endif // OHOS_BUILD_MMI_DEBUG
 
     mprintf(fd, "\tDEF_MMI_DATA_ROOT: %s\n", DEF_MMI_DATA_ROOT);
-    mprintf(fd, "\tLOG_CONFIG: %s\n", DEF_LOG_CONFIG);
     mprintf(fd, "\tEXP_CONFIG: %s\n", DEF_EXP_CONFIG);
     mprintf(fd, "\tEXP_SOPATH: %s\n", DEF_EXP_SOPATH);
     mprintf(fd, "\tXKB_CONFIG_PATH: %s\n", DEF_XKB_CONFIG);
