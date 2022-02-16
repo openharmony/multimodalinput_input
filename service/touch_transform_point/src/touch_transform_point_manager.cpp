@@ -24,6 +24,7 @@ namespace MMI {
 
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(libinput_event *event)
 {
+    MMI_LOGD("enter");
     CHKPRP(event, nullptr);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
@@ -42,11 +43,13 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(l
         processor->SetPointEventSource(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
         touchPro_.insert(std::pair<int32_t, std::shared_ptr<TouchTransformPointProcessor>>(deviceId, processor));
     }
+    MMI_LOGD("leave");
     return processor->OnLibinputTouchEvent(event);
 }
 
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEvent(libinput_event *event)
 {
+    MMI_LOGD("enter");
     CHKPRP(event, nullptr);
     auto device = libinput_event_get_device(event);
     CHKPRP(device, nullptr);
@@ -60,11 +63,13 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEven
         processor->SetPointEventSource(PointerEvent::SOURCE_TYPE_TOUCHPAD);
         touchpadPro_.insert(std::pair<int32_t, std::shared_ptr<TouchPadTransformPointProcessor>>(deviceId, processor));
     }
+    MMI_LOGD("leave");
     return processor->OnLibinputTouchPadEvent(event);
 }
 
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestrueEvent(libinput_event *event)
 {
+    MMI_LOGD("enter");
     CHKPRP(event, nullptr);
     auto device = libinput_event_get_device(event);
     CHKPRP(device, nullptr);
@@ -78,6 +83,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestrueEvent
         processor->SetPointEventSource(PointerEvent::SOURCE_TYPE_MOUSE);
         gesturePro_.insert(std::pair<int32_t, std::shared_ptr<GestureTransformPointProcessor>>(deviceId, processor));
     }
+    MMI_LOGD("leave");
     return processor->OnTouchPadGestrueEvent(event);
 }
 } // namespace MMI

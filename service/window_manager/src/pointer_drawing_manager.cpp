@@ -42,6 +42,7 @@ OHOS::MMI::MouseDrawingManager::~MouseDrawingManager() {}
 
 std::unique_ptr<OHOS::Media::PixelMap> OHOS::MMI::MouseDrawingManager::DecodeImageToPixelMap(std::string imagePath)
 {
+    MMI_LOGD("enter");
     using namespace OHOS::MMI;
     uint32_t errorCode = 0;
     SourceOptions opts;
@@ -58,6 +59,7 @@ std::unique_ptr<OHOS::Media::PixelMap> OHOS::MMI::MouseDrawingManager::DecodeIma
     if (pixelMap == nullptr) {
         MMI_LOGE("pixelMap is nullptr, errorCode:%{public}u", errorCode);
     }
+    MMI_LOGD("leave");
     return pixelMap;
 }
 
@@ -185,6 +187,7 @@ void OHOS::MMI::MouseDrawingManager::TellDisplayInfo(int32_t displayId, int32_t 
     displayWidth_ = width;
     displayHeight_ = height;
     DrawManager();
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::MouseDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
@@ -192,10 +195,12 @@ void OHOS::MMI::MouseDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
     MMI_LOGD("enter");
     hasPointerDevice_ = hasPointerDevice;
     DrawManager();
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::MouseDrawingManager::DrawManager()
 {
+    MMI_LOGD("enter");
     if (hasDisplay_ && hasPointerDevice_ && drawWindow_ == nullptr) {
         MMI_LOGD("draw pointer begin");
         DrawPointer(displayId_, displayWidth_/2, displayHeight_/2);
@@ -207,11 +212,13 @@ void OHOS::MMI::MouseDrawingManager::DrawManager()
         drawWindow_->Destroy();
         drawWindow_ = nullptr; 
     }
+    MMI_LOGD("leave");
 }
 
 bool OHOS::MMI::MouseDrawingManager::Init()
 {
     MMI_LOGD("enter");
     InputDevMgr->Attach(GetInstance());
+    MMI_LOGD("leave");
     return true;
 }
