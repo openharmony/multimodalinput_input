@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace MMI {
-class JsInputDeviceManager : public JsEventTarget{
+class JsInputDeviceManager : public JsEventTarget {
 public:
     void ResetEnv();
     void GetDeviceIds(napi_env env, napi_value handle = nullptr);
