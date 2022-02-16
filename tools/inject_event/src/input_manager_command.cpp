@@ -30,7 +30,7 @@
 
 class InputManagerCommand {
 public:
-    int32_t ParseCommand(int argc, char *argv[]);
+    int32_t ParseCommand(int32_t argc, char *argv[]);
     int32_t ConnectService();
     void ShowUsage();
 private:
@@ -45,7 +45,7 @@ constexpr int32_t TWO_MORE_COMMAND = 3;
 constexpr int32_t THREE_MORE_COMMAND = 3;
 }
 
-int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
+int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 {
     struct option headOptions[] = {
         {"mouse", no_argument, NULL, 'M'},
