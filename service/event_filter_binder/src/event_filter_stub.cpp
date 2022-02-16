@@ -30,7 +30,7 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN,
 int32_t EventFilterStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
-    MMI_LOGT("enter, code:%{public}d", code);
+    MMI_LOGD("enter, code: %{public}d", code);
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IEventFilter::GetDescriptor()) {
@@ -49,7 +49,7 @@ int32_t EventFilterStub::OnRemoteRequest(
 
 int32_t EventFilterStub::StubHandlePointerEvent(MessageParcel& data, MessageParcel& reply)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     std::shared_ptr<PointerEvent> event = PointerEvent::Create();
     if (event == nullptr) {
         MMI_LOGE("event is nullptr");
@@ -67,7 +67,7 @@ int32_t EventFilterStub::StubHandlePointerEvent(MessageParcel& data, MessageParc
         return RET_ERR;
     }
 
-    MMI_LOGT("leave");
+    MMI_LOGD("leave");
     return RET_OK;
 }
 } // namespace MMI
