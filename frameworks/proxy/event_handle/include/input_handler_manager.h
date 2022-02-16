@@ -34,7 +34,7 @@ public:
     void OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
-    struct InputHandler {
+    struct Handler {
         int32_t handlerId_;
         InputHandlerType handlerType_;
         std::shared_ptr<IInputEventConsumer> consumer_;
@@ -49,7 +49,7 @@ private:
 
 private:
     std::mutex lockHandlers_;
-    std::map<int32_t, InputHandler> inputHandlers_;
+    std::map<int32_t, Handler> inputHandlers_;
     int32_t nextId_ { 1 };
 };
 } // namespace MMI
