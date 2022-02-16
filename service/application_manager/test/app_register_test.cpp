@@ -25,7 +25,7 @@ using namespace testing::ext;
 using namespace OHOS::MMI;
 using namespace OHOS;
 
-const int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
+constexpr int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 
 class AppRegisterTest : public testing::Test {
 public:
@@ -121,7 +121,7 @@ HWTEST_F(AppRegisterTest, IsMultimodeInputReady_004, TestSize.Level1)
 
 HWTEST_F(AppRegisterTest, IsMultimodeInputReady_005, TestSize.Level1)
 {
-    const int32_t WAIT_QUEUE_EVENTS_MAX = 128;
+    constexpr int32_t WAIT_QUEUE_EVENTS_MAX = 128;
     ssize_t time = GetMicrotime();
     UDSServer udsServer;
 
@@ -604,7 +604,7 @@ HWTEST_F(AppRegisterTest, FindSurfaceIdBySocketFd_003, TestSize.Level1)
 HWTEST_F(AppRegisterTest, KeyEventValueTransformation_001, TestSize.Level1)
 {
     KeyEventValueTransformations valTest = {};
-    const int32_t keyValueOfInput = 30;
+    constexpr int32_t keyValueOfInput = 30;
 
     valTest = KeyValueTransformationByInput(keyValueOfInput);
     EXPECT_TRUE(valTest.keyValueOfHos == 2017);
@@ -613,7 +613,7 @@ HWTEST_F(AppRegisterTest, KeyEventValueTransformation_001, TestSize.Level1)
 HWTEST_F(AppRegisterTest, KeyEventValueTransformation_002, TestSize.Level1)
 {
     KeyEventValueTransformations valTest = {};
-    const int32_t keyValueOfInput = -1;
+    constexpr int32_t keyValueOfInput = -1;
 
     valTest = KeyValueTransformationByInput(keyValueOfInput);
     EXPECT_TRUE(valTest.keyValueOfHos >= 10000);
@@ -623,7 +623,7 @@ HWTEST_F(AppRegisterTest, Init_001, TestSize.Level1)
 {
     AppRegister appRegister;
     OHOS::MMI::UDSServer udsServer;
-    appRegister.Init(udsServer);
+    appRegister.Init(udsServer)
 }
 
 HWTEST_F(AppRegisterTest, DeleteEventFromWaitQueue_001, TestSize.Level1)

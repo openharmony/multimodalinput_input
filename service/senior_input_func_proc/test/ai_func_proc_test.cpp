@@ -31,7 +31,7 @@ using namespace OHOS::MMI;
     HWTEST_F(AiFuncProcTest, Test_DeviceEventDispatchProcess_001, TestSize.Level1)
     {
         AIFuncProc aiServer;
-        const RawInputEvent event = { 0, 0, 0, 0 };
+        constexpr RawInputEvent event = { 0, 0, 0, 0 };
         int32_t retResult = aiServer.DeviceEventDispatchProcess(event);
         EXPECT_TRUE(retResult == RET_ERR);
     }
