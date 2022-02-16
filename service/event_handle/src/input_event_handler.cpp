@@ -597,8 +597,8 @@ int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
 
 int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 {
-    CHKPR(event, ERROR_NULL_POINTER);
     MMI_LOGD("Enter");
+    CHKPR(event, ERROR_NULL_POINTER);
     auto point = TouchTransformPointManger->OnLibinputTouchEvent(event);
     CHKPR(point, ERROR_NULL_POINTER);
     int32_t pointerId = point->GetId();
@@ -622,8 +622,8 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 
 int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 {
-    CHKPR(event, ERROR_NULL_POINTER);
     MMI_LOGD("Enter");
+    CHKPR(event, ERROR_NULL_POINTER);
 
     auto point = TouchTransformPointManger->OnLibinputTouchPadEvent(event);
     if (point == nullptr) {
@@ -686,8 +686,8 @@ int32_t InputEventHandler::OnEventTouchpad(const multimodal_libinput_event& ev)
 
 int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 {
+    MMI_LOGT("enter");
     CHKPR(event, ERROR_NULL_POINTER);
-    MMI_LOGT("InputEventHandler::OnGestureEvent");
     auto pointer = TouchTransformPointManger->OnTouchPadGestrueEvent(event);
     if (pointer == nullptr) {
         MMI_LOGE("Gesture event package failed, errCode:%{public}d", GESTURE_EVENT_PKG_FAIL);
@@ -882,8 +882,8 @@ int32_t InputEventHandler::OnEventJoyStickAxis(const multimodal_libinput_event& 
 
 int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
 {
+    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
-    MMI_LOGD("Libinput Events reported");
 
     // 更新 全局 鼠标事件 数据
     MouseEventHdr->Normalize(event);
