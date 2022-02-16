@@ -66,7 +66,6 @@ private:
     const uint32_t uiTime_ = 0;
     const int64_t llParam1_ = 0;
     const int64_t llParam2_ = 0;
-    const int64_t test = 0; // test增加
 };
 } // namespace MMI
 } // namespace OHOS

@@ -30,7 +30,7 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
     std::shared_ptr<IInputEventConsumer> consumer)
 {
     CHKPR(consumer, INVALID_HANDLER_ID);
-    if (inputHandlers_.size() >= MAX_N_INPUT_HANDLERS) {
+    if (handler_.size() >= MAX_N_INPUT_HANDLERS) {
         MMI_LOGE("The number of handlers exceeds the maximum");
         return INVALID_HANDLER_ID;
     }
@@ -78,7 +78,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
         .handlerType_ = handlerType,
         .consumer_ = monitor
     };
-    auto ret = inputHandlers_.emplace(handler.handlerId_, handler);
+    auto ret = handler_.emplace(handler.handlerId_, handler);
     if (!ret.second) {
         MMI_LOGE("Duplicate handler:%{public}d", handler.handlerId_);
         return RET_ERR;
@@ -99,8 +99,8 @@ void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handle
 int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType handlerType)
 {
     std::lock_guard<std::mutex> guard(lockHandlers_);
-    auto tItr = inputHandlers_.find(handlerId);
-    if (tItr == inputHandlers_.end()) {
+    auto tItr = handler_.find(handlerId);
+    if (tItr == handler_.end()) {
         MMI_LOGE("No handler with specified");
         return RET_ERR;
     }
@@ -109,7 +109,7 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
                  handlerType, tItr->second.handlerType_);
         return RET_ERR;
     }
-    inputHandlers_.erase(tItr);
+    handler_.erase(tItr);
     return RET_OK;
 }
 
@@ -136,8 +136,8 @@ int32_t InputHandlerManager::GetNextId()
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent)
 {
     std::lock_guard<std::mutex> guard(lockHandlers_);
-    auto tItr = inputHandlers_.find(handlerId);
-    if (tItr != inputHandlers_.end()) {
+    auto tItr = handler_.find(handlerId);
+    if (tItr != handler_.end()) {
         if (tItr->second.consumer_ != nullptr) {
             tItr->second.consumer_->OnInputEvent(keyEvent);
         }
@@ -163,8 +163,8 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
     std::map<int32_t, InputHandler>::iterator tItrEnd;
     {
         std::lock_guard<std::mutex> guard(lockHandlers_);
-        tItr = inputHandlers_.find(handlerId);
-        tItrEnd = inputHandlers_.end();
+        tItr = handler_.find(handlerId);
+        tItrEnd = handler_.end();
     }
     if (tItr != tItrEnd) {
         if (tItr->second.consumer_ != nullptr) {
