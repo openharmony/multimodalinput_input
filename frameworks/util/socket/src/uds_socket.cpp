@@ -54,8 +54,8 @@ int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, epoll_event& event, int32_t 
     auto ret = epoll_ctl(epollFd, op, fd, &event);
     if (ret < 0) {
         const int errnoSaved = errno;
-        MMI_LOGE("UDSSocket::EpollCtl epoll_ctl retrun %{public}d, epollFd_:%{public}d,"
-                 " op:%{public}d, fd:%{public}d, errno:%{public}d, error msg: %{public}s",
+        MMI_LOGE("UDSSocket::EpollCtl epoll_ctl retrun %{public}d,epollFd_:%{public}d,"
+                 "op:%{public}d,fd:%{public}d,errno:%{public}d,error msg: %{public}s",
                  ret, epollFd, op, fd, errnoSaved, strerror(errnoSaved));
     }
     return ret;
@@ -79,22 +79,22 @@ int32_t UDSSocket::SetBlockMode(int32_t fd, bool isBlock)
     CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
     int32_t flags = fcntl(fd, F_GETFL);
     if (flags < 0) {
-        MMI_LOGE("fcntl F_GETFL fail. fd:%{public}d, flags:%{public}d, msg:%{public}s, errCode:%{public}d", 
+        MMI_LOGE("fcntl F_GETFL fail. fd:%{public}d,flags:%{public}d,msg:%{public}s,errCode:%{public}d", 
             fd, flags, strerror(errno), FCNTL_FAIL);
         return flags;
     }
-    MMI_LOGT("F_GETFL fd:%{public}d, flags:%{public}d", fd, flags);
+    MMI_LOGT("F_GETFL fd:%{public}d,flags:%{public}d", fd, flags);
     flags |= O_NONBLOCK; // 非阻塞模式
     if (isBlock) {
         flags &= ~O_NONBLOCK; // 阻塞模式
     }
     flags = fcntl(fd, F_SETFL, flags);
     if (flags < 0) {
-        MMI_LOGE("fcntl F_SETFL fail. fd:%{public}d, flags:%{public}d, msg:%{public}s, errCode:%{public}d", 
+        MMI_LOGE("fcntl F_SETFL fail. fd:%{public}d,flags:%{public}d,msg:%{public}s,errCode:%{public}d", 
             fd, flags, strerror(errno), FCNTL_FAIL);
         return flags;
     }
-    MMI_LOGT("F_SETFL fd:%{public}d, flags:%{public}d", fd, flags);
+    MMI_LOGT("F_SETFL fd:%{public}d,flags:%{public}d", fd, flags);
     return flags;
 }
 
