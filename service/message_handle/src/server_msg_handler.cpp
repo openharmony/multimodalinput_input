@@ -389,7 +389,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnNewInjectKeyEvent(SessionPtr sess, NetPac
     CHKPR(sess, ERROR_NULL_POINTER);
     uint64_t preHandlerTime = GetSysClockTime();
     auto creKey = OHOS::MMI::KeyEvent::Create();
-    int32_t errCode = InputEventDataTransformation::NetPacketToKeyEvent(true, creKey, pkt);
+    int32_t errCode = InputEventDataTransformation::NetPacketToKeyEvent(true, pkt, creKey);
     if (errCode != RET_OK) {
         MMI_LOGE("Deserialization is Failed, errCode:%{public}u", errCode);
         return RET_ERR;
@@ -485,7 +485,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPa
 {
     MMI_LOGD("Inject-pointer-event received, processing");
     auto pointerEvent = OHOS::MMI::PointerEvent::Create();
-    CHKR((RET_OK == InputEventDataTransformation::Unmarshalling(pointerEvent, pkt)),
+    CHKR((RET_OK == InputEventDataTransformation::Unmarshalling(pkt, pointerEvent)),
         STREAM_BUF_READ_FAIL, RET_ERR);
     pointerEvent->UpdateId();
     CHKR((RET_OK == eventDispatch_.HandlePointerEvent(pointerEvent)), POINT_EVENT_DISP_FAIL, RET_ERR);
