@@ -37,6 +37,6 @@ public:
     virtual bool OnLaunchVoiceAssistant(const MultimodalEvent& event) override;
     virtual bool OnMute(const MultimodalEvent& event) override;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // SYSTEM_EVENT_HANDLER_H
