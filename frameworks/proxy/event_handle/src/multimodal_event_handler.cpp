@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MultimodalEventHandler"};
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MultimodalEventHandler"};
     }
 
 void OnConnected(const OHOS::MMI::IfMMIClient& client)
@@ -338,5 +338,5 @@ int32_t MultimodalEventHandler::AddInputEventTouchpadMontior(int32_t pointerEven
         MMI_LOGD("sendAdd msg Success");
     return RET_OK;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

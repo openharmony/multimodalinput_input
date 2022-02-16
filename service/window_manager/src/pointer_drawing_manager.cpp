@@ -23,10 +23,12 @@
 #include "log.h"
 #include "image/bitmap.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     static const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_icon/angle.png";
 namespace {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MouseDrawingManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MouseDrawingManager" };
+}
 }
 }
 

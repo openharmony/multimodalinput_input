@@ -274,7 +274,7 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
         newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime;
 
         std::vector<std::pair<uint32_t, int32_t>> touchIds;
-        MMIRegEvent->GetTouchIds(touchIds, touch.deviceId);
+        MMIRegEvent->GetTouchIds(touch.deviceId, touchIds);
         if (!touchIds.empty()) {
             for (std::pair<uint32_t, int32_t> touchId : touchIds) {
                 EventTouch touchTemp = {};

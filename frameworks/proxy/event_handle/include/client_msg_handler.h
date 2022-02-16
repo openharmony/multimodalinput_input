@@ -109,6 +109,6 @@ private:
     bool isServerReqireStMessage_ = true;
     std::function<void(int32_t)> eventProcessedCallback_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // CLIENT_MSG_HANDLER_H

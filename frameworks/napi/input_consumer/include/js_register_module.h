@@ -69,7 +69,7 @@ typedef struct {
 } KeyEventMonitorInfo;
 
 typedef std::map<std::string, std::list<KeyEventMonitorInfo *>> Callbacks;
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif // JS_REGISTER_MODULE_H
