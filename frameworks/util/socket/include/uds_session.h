@@ -58,8 +58,8 @@ public:
     }
 
     void UpdateDescript();
-    void RecordEvent(int32_t id, uint64_t time);
-    void ClearEventList(int32_t id);
+    void AddEvent(int32_t id, uint64_t time);
+    void DelEvents(int32_t id);
     uint64_t GetFirstEventTime();
     void ClearEventsVct();
 

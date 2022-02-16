@@ -15,7 +15,7 @@
 
 #include "event_package.h"
 #include "mmi_server.h"
-
+#include "input_device_manager.h"
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -24,7 +24,7 @@ namespace {
     constexpr uint32_t SEAT_KEY_COUNT_ZERO = 0;
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventPackage" };
 
-    void FillEventJoyStickAxisAbsInfo(EventJoyStickAxisAbsInfo& l, const libinput_event_joystick_axis_abs_info& r)
+    void FillEventJoyStickAxisAbsInfo(const libinput_event_joystick_axis_abs_info& r, EventJoyStickAxisAbsInfo& l)
     {
         MMI_LOGD("enter");
         l.code = r.code;
@@ -39,7 +39,7 @@ namespace {
         MMI_LOGD("leave");
     }
 
-    void FillEventSlotedCoordsInfo(SlotedCoordsInfo& l, const sloted_coords_info& r)
+    void FillEventSlotedCoordsInfo(const sloted_coords_info& r, SlotedCoordsInfo& l)
     {
         MMI_LOGD("enter");
         l.activeCount = r.active_count;
@@ -529,7 +529,7 @@ int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event, EventJoySt
         }
         auto pAbsInfo = libinput_event_get_joystick_axis_abs_info(joyEvent, axis);
         if (pAbsInfo != nullptr) {
-            FillEventJoyStickAxisAbsInfo(item.absInfo, *pAbsInfo);
+            FillEventJoyStickAxisAbsInfo(*pAbsInfo, item.absInfo);
         }
     }
     MMI_LOGD("leave");
@@ -599,7 +599,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
     touch.slot = libinput_event_touch_get_slot(data);
     touch.seatSlot = libinput_event_touch_get_seat_slot(data);
     touch.pressure = libinput_event_get_touch_pressure(event);
-    
+
     PackageTouchEventByType(type, data, touch);
     /* switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
@@ -719,7 +719,7 @@ int32_t EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& g
             gesture.deltaUnaccel.y = libinput_event_gesture_get_dy_unaccelerated(data);
             sloted_coords_info* pSoltTouches = libinput_event_gesture_get_solt_touches(data);
             CHKPR(pSoltTouches, ERROR_NULL_POINTER);
-            FillEventSlotedCoordsInfo(gesture.soltTouches, *pSoltTouches);
+            FillEventSlotedCoordsInfo(*pSoltTouches, gesture.soltTouches);
             break;
         }
         /* Third, it refers to the use of requirements, and the code is reserved */
@@ -782,55 +782,45 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key)
     return RET_OK;
 }
 
-int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<KeyEvent> kevnPtr)
+int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<KeyEvent> kevn)
 {
     MMI_LOGD("enter");
-    CHKPR(event, ERROR_NULL_POINTER);
-    MMI_LOGD("PackageKeyEvent begin");
-    CHKPR(kevnPtr, ERROR_NULL_POINTER);
-    kevnPtr->UpdateId();
-    EventKeyboard key = {};
-    auto ret = PackageEventDeviceInfo<EventKeyboard>(event, key);
-    if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed. ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
-        return DEV_PARAM_PKG_FAIL;
-    }
+    CHKPR(event, PARAM_INPUT_INVALID);
+    CHKPR(kevn, ERROR_NULL_POINTER);
+    kevn->UpdateId();
     auto data = libinput_event_get_keyboard_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
-    // libinput key transformed into HOS key
-    auto hosKey = KeyValueTransformationByInput(libinput_event_keyboard_get_key(data)); 
+    auto hosKey = KeyValueTransformationByInput(libinput_event_keyboard_get_key(data));
 
-    int32_t deviceId = static_cast<int32_t>(key.deviceId);
-    int32_t actionTime = static_cast<int64_t>(GetSysClockTime());
+    auto device = libinput_event_get_device(event);
+    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
     int32_t keyCode = static_cast<int32_t>(hosKey.keyValueOfHos);
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
     int32_t actionStartTime = static_cast<int32_t>(libinput_event_keyboard_get_time_usec(data));
 
-    kevnPtr->SetActionTime(actionTime);
-    kevnPtr->SetAction(keyAction);
-    kevnPtr->SetActionStartTime(actionStartTime);
-    kevnPtr->SetDeviceId(deviceId);
-    kevnPtr->SetKeyCode(keyCode);
-    kevnPtr->SetKeyAction(keyAction);
+    kevn->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
+    kevn->SetAction(keyAction);
+    kevn->SetActionStartTime(actionStartTime);
+    kevn->SetDeviceId(deviceId);
+    kevn->SetKeyCode(keyCode);
+    kevn->SetKeyAction(keyAction);
 
     KeyEvent::KeyItem item;
-    bool isKeyPressed = (libinput_event_keyboard_get_key_state(data) == 0) ? (false) : (true);
+    bool isKeyPressed = (libinput_event_keyboard_get_key_state(data) != KEYSTATUS);
     if (isKeyPressed) {
         int32_t keyDownTime = actionStartTime;
         item.SetDownTime(keyDownTime);
     }
     item.SetKeyCode(keyCode);
     item.SetDeviceId(deviceId);
-    item.SetPressed(isKeyPressed); 
+    item.SetPressed(isKeyPressed);
 
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
-        kevnPtr->AddPressedKeyItems(item);
+        kevn->AddPressedKeyItems(item);
+    } else {
+        kevn->RemoveReleasedKeyItems(item);
     }
-    if (keyAction == KeyEvent::KEY_ACTION_UP) {
-        kevnPtr->RemoveReleasedKeyItems(item);
-    }
-    MMI_LOGD("PackageKeyEvent end");
     MMI_LOGD("leave");
     return RET_OK;
 }

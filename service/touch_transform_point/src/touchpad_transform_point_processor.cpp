@@ -16,9 +16,10 @@
 #include "touchpad_transform_point_processor.h"
 #include "log.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN,
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN,
             "TouchPadTransformPointProcessor"};
     }
 
@@ -137,4 +138,5 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
     MMI_LOGD("call onLibinputTouchPadEvent end");
     return pointerEvent_;
 }
-}
+} // namespace MMI
+} // namespace OHOS
