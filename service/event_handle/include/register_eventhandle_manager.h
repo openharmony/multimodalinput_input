@@ -48,7 +48,7 @@ private:
     std::mutex mu_;
     std::multimap<MmiMessageId, int32_t> mapRegisterManager_ = {}; // key=enum MmiMessageId : value=fd
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define RegEventHM OHOS::MMI::RegisterEventHandleManager::GetInstance()
 #endif // REGISTER_EVENTHANDLE_MANAGER_H

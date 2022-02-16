@@ -36,6 +36,6 @@ private:
     std::map<int32_t, std::shared_ptr<GestureTransformPointProcessor>> gesturePro_;
 };
 #define TouchTransformPointManger OHOS::MMI::TouchTransformPointManager::GetInstance()
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // TOUCH_TRANSFORM_POINT_MANAGER_H

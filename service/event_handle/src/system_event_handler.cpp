@@ -62,8 +62,8 @@ namespace MMI {
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SystemEventHandler" };
     }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 using namespace OHOS::AAFwk;
 using namespace OHOS::AppExecFwk;

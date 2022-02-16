@@ -83,6 +83,6 @@ private:
 #endif // OHOS_BUILD_AI
     std::set<int32_t> authFds_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // MMI_SERVICE_H

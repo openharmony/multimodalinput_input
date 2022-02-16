@@ -905,5 +905,5 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
     MMI_LOGD("leave");
     return RET_OK;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

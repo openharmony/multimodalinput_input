@@ -1676,5 +1676,5 @@ enum TouchEnum {
     HOS_BUTTON_TOOL_QUADTAP = 2514,
     HOS_BUTTON_TOOL_QUINTTAP = 2515,
 };
-}
+} // namespace OHOS
 #endif // HOS_KEY_EVENT_H

@@ -30,8 +30,8 @@ namespace MMI {
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "UDSServer"};
     }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 OHOS::MMI::UDSServer::UDSServer()
 {

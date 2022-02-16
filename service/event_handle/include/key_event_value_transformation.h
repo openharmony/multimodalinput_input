@@ -50,7 +50,7 @@ public:
 private:
     xkb_state *state_ = nullptr;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif // KEY_EVENT_VALUE_TRANSFORMATION_H

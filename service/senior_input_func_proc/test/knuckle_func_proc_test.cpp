@@ -59,4 +59,4 @@ using namespace OHOS::MMI;
         int32_t retResult = knuckleServer.CheckEventCode(event);
         EXPECT_TRUE(retResult == RET_ERR);
     }
-}
+} // namespace

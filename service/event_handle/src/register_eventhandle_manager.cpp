@@ -24,18 +24,15 @@ namespace MMI {
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RegisterEventHandleManager" };
     }
-}
-}
-
-OHOS::MMI::RegisterEventHandleManager::RegisterEventHandleManager()
+RegisterEventHandleManager::RegisterEventHandleManager()
 {
 }
 
-OHOS::MMI::RegisterEventHandleManager::~RegisterEventHandleManager()
+RegisterEventHandleManager::~RegisterEventHandleManager()
 {
 }
 
-int32_t OHOS::MMI::RegisterEventHandleManager::RegisterEvent(MmiMessageId messageId, int32_t fd)
+int32_t RegisterEventHandleManager::RegisterEvent(MmiMessageId messageId, int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
     CHKR(messageId >= MmiMessageId::INVALID, PARAM_INPUT_INVALID, UNKNOWN_EVENT);
@@ -66,7 +63,7 @@ int32_t OHOS::MMI::RegisterEventHandleManager::RegisterEvent(MmiMessageId messag
     return RET_OK;
 }
 
-int32_t OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleManager(MmiMessageId messageId, int32_t fd)
+int32_t RegisterEventHandleManager::UnregisterEventHandleManager(MmiMessageId messageId, int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
     CHKR(messageId >= MmiMessageId::INVALID, PARAM_INPUT_INVALID, UNKNOWN_EVENT);
@@ -97,7 +94,7 @@ int32_t OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleManager(MmiM
     return RET_OK;
 }
 
-void OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleBySocketFd(int32_t fd)
+void RegisterEventHandleManager::UnregisterEventHandleBySocketFd(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
     CHK(fd >= 0, PARAM_INPUT_INVALID);
@@ -111,7 +108,7 @@ void OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleBySocketFd(int3
     }
 }
 
-void OHOS::MMI::RegisterEventHandleManager::FindSocketFds(const MmiMessageId messageId, std::vector<int32_t>& fds)
+void RegisterEventHandleManager::FindSocketFds(const MmiMessageId messageId, std::vector<int32_t>& fds)
 {
     std::lock_guard<std::mutex> lock(mu_);
     auto it = mapRegisterManager_.equal_range(messageId);
@@ -124,7 +121,7 @@ void OHOS::MMI::RegisterEventHandleManager::FindSocketFds(const MmiMessageId mes
     }
 }
 
-void OHOS::MMI::RegisterEventHandleManager::PrintfMap()
+void RegisterEventHandleManager::PrintfMap()
 {
     std::lock_guard<std::mutex> lock(mu_);
     for (const auto &item : mapRegisterManager_) {
@@ -134,7 +131,7 @@ void OHOS::MMI::RegisterEventHandleManager::PrintfMap()
     }
 }
 
-void OHOS::MMI::RegisterEventHandleManager::Dump(int32_t fd)
+void RegisterEventHandleManager::Dump(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
     std::string strTmp;
@@ -154,7 +151,7 @@ void OHOS::MMI::RegisterEventHandleManager::Dump(int32_t fd)
     }
 }
 
-void OHOS::MMI::RegisterEventHandleManager::Clear()
+void RegisterEventHandleManager::Clear()
 {
     if (mu_.try_lock()) {
         mu_.unlock();
@@ -162,7 +159,7 @@ void OHOS::MMI::RegisterEventHandleManager::Clear()
     mapRegisterManager_.clear();
 }
 
-void OHOS::MMI::RegisterEventHandleManager::RegisterEventHandleByIdMsage(const MmiMessageId idMsgBegin,
+void RegisterEventHandleManager::RegisterEventHandleByIdMsage(const MmiMessageId idMsgBegin,
                                                                          const MmiMessageId idMsgEnd,
                                                                          const int32_t fd)
 {
@@ -174,7 +171,7 @@ void OHOS::MMI::RegisterEventHandleManager::RegisterEventHandleByIdMsage(const M
     }
 }
 
-void OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleByIdMsage(const MmiMessageId idMsgBegin,
+void RegisterEventHandleManager::UnregisterEventHandleByIdMsage(const MmiMessageId idMsgBegin,
                                                                            const MmiMessageId idMsgEnd,
                                                                            const int32_t fd)
 {
@@ -188,3 +185,5 @@ void OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleByIdMsage(const
         }
     }
 }
+} // namespace MMI
+} // namespace OHOS
