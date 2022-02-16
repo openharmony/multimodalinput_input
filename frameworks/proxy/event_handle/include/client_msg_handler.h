@@ -88,7 +88,7 @@ protected:
     virtual int32_t KeyEventInterceptor(const UDSClient& client, NetPacket& pkt);
 
 private:
-    int32_t PackedData(MultimodalEvent& multe, const UDSClient& client, NetPacket& pkt, const std::string& funName);
+    int32_t PackedData(const UDSClient& client, NetPacket& pkt, const std::string& funName, MultimodalEvent& multe);
     void AnalysisPointEvent(const UDSClient& client, NetPacket& pkt) const;
     void AnalysisTouchEvent(const UDSClient& client, NetPacket& pkt) const;
     void AnalysisJoystickEvent(const UDSClient& client, NetPacket& pkt) const;
@@ -109,6 +109,6 @@ private:
     bool isServerReqireStMessage_ = true;
     std::function<void(int32_t)> eventProcessedCallback_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // CLIENT_MSG_HANDLER_H

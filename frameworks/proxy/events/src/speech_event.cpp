@@ -58,4 +58,4 @@ int32_t SpeechEvent::GetMatchMode() const
 {
     return mMode_;
 }
-}
+} // namespace OHOS

@@ -29,6 +29,6 @@ public:
     virtual bool OnHangup(const MultimodalEvent& event) override;
     virtual bool OnTelephoneControl(const MultimodalEvent& event) override;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // TELEPHONE_EVENT_HANDLER_H

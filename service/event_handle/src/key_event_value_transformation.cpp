@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
             LOG_CORE, MMI_LOG_DOMAIN, "KeyEventValueTransformations"
         };
     }
@@ -442,16 +442,18 @@ const std::multimap<int16_t, KeyEventValueTransformations> MAP_KEY_EVENT_VALUE_T
 
 KeyEventValueTransformations KeyValueTransformationByInput(int16_t keyValueOfInput)
 {
+    MMI_LOGD("enter");
     auto it = MAP_KEY_EVENT_VALUE_TRANSFORMATION.find(keyValueOfInput);
     if (it == MAP_KEY_EVENT_VALUE_TRANSFORMATION.end()) {
         const int16_t UNKNOWN_KEY_BASE = 10000;
         KeyEventValueTransformations unknownKey = {
             "UNKNOWN_KEY", keyValueOfInput, UNKNOWN_KEY_BASE + keyValueOfInput, HOS_UNKNOWN_KEY_BASE, 0
         };
-        MMI_LOGE("KeyValueTransformationByInput Failed, unknown linux-code:%{public}d, "
+        MMI_LOGE("KeyValueTransformationByInput Failed, unknown linux-code:%{public}d,"
                  "UNKNOWN_KEY_BASE:%{public}d", keyValueOfInput, UNKNOWN_KEY_BASE);
         return unknownKey;
     }
+    MMI_LOGD("leave");
     return it->second;
 }
 
@@ -467,6 +469,7 @@ KeyEventValueTransformation::~KeyEventValueTransformation()
 
 bool KeyEventValueTransformation::Init()
 {
+    MMI_LOGD("enter");
     xkb_context* context = nullptr;
     xkb_keymap* keyMap = nullptr;
     int32_t ctxFlags = XKB_CONTEXT_NO_DEFAULT_INCLUDES;
@@ -481,14 +484,14 @@ bool KeyEventValueTransformation::Init()
 
     if (!xkb_context_include_path_append(context, strPath.c_str())) {
         xkb_context_unref(context);
-        MMI_LOGE("XkbKeyboardHandlerKey::Init: Include path failed! errCode:%{public}d ", XKB_INCL_PATH_FAIL);
+        MMI_LOGE("XkbKeyboardHandlerKey::Init: Include path failed! errCode:%{public}d", XKB_INCL_PATH_FAIL);
         return false;
     }
 
     keyMap = xkb_keymap_new_from_names(context, nullptr, XKB_KEYMAP_COMPILE_NO_FLAGS);
     if (keyMap == nullptr) {
         xkb_context_unref(context);
-        MMI_LOGE("XkbKeyboardHandlerKey::Init: Failed to compile RMLVO! errCode:%{public}d ",
+        MMI_LOGE("XkbKeyboardHandlerKey::Init: Failed to compile RMLVO! errCode:%{public}d",
                  XKB_COMPILE_KEYMAP_FAIL);
         return false;
     }
@@ -496,18 +499,19 @@ bool KeyEventValueTransformation::Init()
     if (!state_) {
         xkb_context_unref(context);
         xkb_keymap_unref(keyMap);
-        MMI_LOGE("XkbKeyboardHandlerKey::Init: Failed to allocate state! errCode:%{public}d ", XKB_ALLOC_STATE_FAIL);
+        MMI_LOGE("XkbKeyboardHandlerKey::Init: Failed to allocate state! errCode:%{public}d", XKB_ALLOC_STATE_FAIL);
         return false;
     }
 
     xkb_context_unref(context);
     xkb_keymap_unref(keyMap);
-
+    MMI_LOGD("leave");
     return true;
 }
 
 uint32_t KeyEventValueTransformation::KeyboardHandleKeySym(uint32_t keyboardKey)
 {
+    MMI_LOGD("enter");
     const uint32_t XKB_EVDEV_OFFSET = 8;
     uint32_t code = keyboardKey + XKB_EVDEV_OFFSET;
     xkb_keysym_t syms = XKB_KEY_NoSymbol;
@@ -518,7 +522,8 @@ uint32_t KeyEventValueTransformation::KeyboardHandleKeySym(uint32_t keyboardKey)
     if (numSyms == 1) {
         sym = pSyms[0];
     }
+    MMI_LOGD("leave");
     return sym;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

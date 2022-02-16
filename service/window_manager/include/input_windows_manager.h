@@ -29,51 +29,54 @@ extern "C" {
 #include <libinput-seat-export.h>
 }
 #else
+namespace OHOS {
+namespace MMI {
+
 struct SurfaceInfo {
-    int surfaceId;
-    int dstX;
-    int dstY;
-    int dstW;
-    int dstH;
-    int srcX;
-    int srcY;
-    int srcW;
-    int srcH;
+    int32_t surfaceId;
+    int32_t dstX;
+    int32_t dstY;
+    int32_t dstW;
+    int32_t dstH;
+    int32_t srcX;
+    int32_t srcY;
+    int32_t srcW;
+    int32_t srcH;
     double opacity;
-    int visibility; // 0 or 1
-    int onLayerId;
+    int32_t visibility; // 0 or 1
+    int32_t onLayerId;
 };
 
 struct LayerInfo {
-    int layerId;
-    int dstX;
-    int dstY;
-    int dstW;
-    int dstH;
-    int srcX;
-    int srcY;
-    int srcW;
-    int srcH;
+    int32_t layerId;
+    int32_t dstX;
+    int32_t dstY;
+    int32_t dstW;
+    int32_t dstH;
+    int32_t srcX;
+    int32_t srcY;
+    int32_t srcW;
+    int32_t srcH;
     double opacity;
-    int visibility; // 0 or 1
-    int onScreenId;
-    int nSurfaces;
+    int32_t visibility; // 0 or 1
+    int32_t onScreenId;
+    int32_t nSurfaces;
     SurfaceInfo** surfaces;
 };
 
 struct ScreenInfo {
-    int screenId;
+    int32_t screenId;
     char* connectorName;
-    int width;
-    int height;
-    int nLayers;
+    int32_t width;
+    int32_t height;
+    int32_t nLayers;
     LayerInfo** layers;
 };
 
 struct SeatInfo {
     char* seatName;
-    int deviceFlags;
-    int focusWindowId;
+    int32_t deviceFlags;
+    int32_t focusWindowId;
 };
 
 struct multimodal_libinput_event {
@@ -95,20 +98,12 @@ void SetScreenListener(const ScreenInfoChangeListener listener);
 
 struct multimodal_libinput_event;
 typedef void (*LibInputEventListener)(multimodal_libinput_event *event);
-namespace OHOS {
-namespace MMI {
 void SetLibInputEventListener(const LibInputEventListener listener);
-}
-}
 #endif
 
 struct MMISurfaceInfo : public SurfaceInfo {
     int32_t screenId;
 };
-
-namespace OHOS {
-namespace MMI {
-
 struct MouseLocation {
     int32_t globleX;
     int32_t globleY;
@@ -128,7 +123,7 @@ public:
     const MMISurfaceInfo* GetSurfaceInfo(int32_t sufaceId);
     bool CheckFocusSurface(double x, double y, const MMISurfaceInfo& info) const;
     const MMISurfaceInfo* GetTouchSurfaceInfo(double x, double y);
-    void TransfromToSurfaceCoordinate(double& x, double& y, const MMISurfaceInfo& info, bool debug = false);
+    void TransfromToSurfaceCoordinate(const MMISurfaceInfo& info, double& x, double& y, bool debug = false);
 
     bool GetTouchSurfaceId(const double x, const double y, std::vector<int32_t>& ids);
 
@@ -175,7 +170,7 @@ public:
     bool TransformOfDisplayPoint(libinput_event_touch* touch, int32_t &globalLogicalX, int32_t &globalLogicalY);
 
     void AdjustCoordinate(double &coordinateX, double &coordinateY);
-    void FixCursorPosition(int32_t &globalX, int32_t &globalY, int cursorW, int cursorH);
+    void FixCursorPosition(int32_t &globalX, int32_t &globalY, int32_t cursorW, int32_t cursorH);
 
 private:
     void SetFocusId(int32_t id);
@@ -212,8 +207,8 @@ private:
     std::map<int32_t, WindowInfo> windowInfos_ = {};
     MouseLocation mouseLoction_ = {};
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 #define WinMgr OHOS::MMI::InputWindowsManager::GetInstance()
 #endif // INPUT_WINDOWS_MANAGER_H
