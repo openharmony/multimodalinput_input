@@ -82,7 +82,7 @@ void OHOS::MMI::InputWindowsManager::UpdateSeatsInfo()
         FreeSeatsInfo(seatsInfo_);
     }
     seatsInfo_ = GetSeatsInfo();
-    CHKP(seatsInfo_);
+    CHKPV(seatsInfo_);
     if (seatsInfo_[0] && seatsInfo_[0]->focusWindowId > 0) {
         SetFocusId(seatsInfo_[0]->focusWindowId);
     }
@@ -97,7 +97,7 @@ void OHOS::MMI::InputWindowsManager::UpdateScreensInfo()
         FreeScreensInfo(screensInfo_);
     }
     screensInfo_ = GetScreensInfo();
-    CHKP(screensInfo_);
+    CHKPV(screensInfo_);
     SaveScreenInfoToMap(const_cast<const ScreenInfo**>(screensInfo_));
     PrintDebugInfo();
 }
@@ -162,7 +162,7 @@ void OHOS::MMI::InputWindowsManager::SetFocusId(int32_t id)
 void OHOS::MMI::InputWindowsManager::PrintDebugInfo()
 {
     MMI_LOGD("seats info");
-    CHKP(seatsInfo_);
+    CHKPV(seatsInfo_);
     int32_t idx = 0;
     for (int32_t i = 0; seatsInfo_[i]; i++) {
         idx = i + 1;

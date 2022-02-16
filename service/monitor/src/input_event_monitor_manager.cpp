@@ -54,7 +54,7 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventMontior(SessionPtr ses
 void OHOS::MMI::InputEventMonitorManager::RemoveInputEventMontior(SessionPtr session, int32_t eventType)
 {
     MMI_LOGD("Enter");
-    CHKP(session);
+    CHKPV(session);
     std::lock_guard<std::mutex> lock(mu_);
     MonitorItem monitorItem;
     monitorItem.eventType = eventType;
@@ -69,9 +69,9 @@ void OHOS::MMI::InputEventMonitorManager::RemoveInputEventMontior(SessionPtr ses
 
 void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
-    CHKP(keyEvent);
-    MMI_LOGD("KeyEvent from libinput,keyCode:%{public}d,keyAction:%{public}d,action:%{public}d,"
-             "deviceId:%{private}d,actionTime:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
+    CHKPV(keyEvent);
+    MMI_LOGD("KeyEvent from libinput, keyCode:%{public}d, keyAction:%{public}d, action:%{public}d, "
+             "deviceId:%{private}d, actionTime:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
              keyEvent->GetAction(), keyEvent->GetDeviceId(), keyEvent->GetActionTime());
     if (monitors_.empty()) {
         MMI_LOGE("No monitor to send msg");
@@ -81,7 +81,7 @@ void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OH
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, newPkt);
     std::list<MonitorItem>::iterator iter;
     for (const auto &item : monitors_) {
-        CHKP(item.session);
+        CHKPV(item.session);
         newPkt << item.session->GetPid();
         MMI_LOGD("server send the msg to client: keyCode:%{public}d,pid:%{public}d", keyEvent->GetKeyCode(),
             item.session->GetPid());
