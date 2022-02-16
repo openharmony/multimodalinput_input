@@ -23,9 +23,9 @@ namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
 
-    const unsigned int DEVICE_FD_INDEX_1 = 1;
-    const unsigned int DEVICE_FD_INDEX_2 = 2;
-    const int DEVICE_FD_ERROR = -1;
+    const uint32_t DEVICE_FD_INDEX_1 = 1;
+    const uint32_t DEVICE_FD_INDEX_2 = 2;
+    const int32_t DEVICE_FD_ERROR = -1;
     class SeniorInputFuncProcBaseTest : public testing::Test {
     public:
         static void SetUpTestCase(void) {}

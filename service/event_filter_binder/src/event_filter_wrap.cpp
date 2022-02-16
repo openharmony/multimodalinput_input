@@ -24,33 +24,33 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN,
 
 EventFilterWrap::EventFilterWrap()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
 }
 
 EventFilterWrap::~EventFilterWrap()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
 }
 
 int32_t EventFilterWrap::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> guard(lockInputEventFilter_);
     filter_ = filter;
-    MMI_LOGT("leave");
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 bool EventFilterWrap::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> guard(lockInputEventFilter_);
     CHKPF(filter_);
     if (filter_->HandlePointerEvent(point)) {
         MMI_LOGD("call HandlePointerEvent return true");
         return true;
     }
-    MMI_LOGT("leave");
+    MMI_LOGD("leave");
     return false;
 }
 } // namespace MMI
