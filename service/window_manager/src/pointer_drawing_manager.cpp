@@ -28,40 +28,39 @@ namespace OHOS {
 namespace MMI {
     const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_icon/angle.png";
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MouseDrawingManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerDrawingManager" };
 }
 } // namespace MMI
 } // namespace OHOS
 
-using namespace OHOS::Media;
+namespace OHOS {
+namespace MMI {
+OHOS::MMI::PointerDrawingManager::PointerDrawingManager() {}
 
+OHOS::MMI::PointerDrawingManager::~PointerDrawingManager() {}
 
-OHOS::MMI::MouseDrawingManager::MouseDrawingManager() {}
-
-OHOS::MMI::MouseDrawingManager::~MouseDrawingManager() {}
-
-std::unique_ptr<OHOS::Media::PixelMap> OHOS::MMI::MouseDrawingManager::DecodeImageToPixelMap(std::string imagePath)
+std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixelMap(std::string imagePath)
 {
-    using namespace OHOS::MMI;
     uint32_t errorCode = 0;
-    SourceOptions opts;
+    OHOS::Media::SourceOptions opts;
     opts.formatHint = "image/png";
-    std::unique_ptr<ImageSource> imageSource = ImageSource::CreateImageSource(imagePath, opts, errorCode);
-    MMI_LOGE("CreateImageSource errorCode:%{public}u", errorCode);
+    std::unique_ptr<OHOS::Media::ImageSource> imageSource =
+    OHOS::Media::ImageSource::CreateImageSource(imagePath, opts, errorCode);
 
+    MMI_LOGD("CreateImageSource errorCode:%{public}u", errorCode);
     std::set<std::string> formats;
     uint32_t ret = imageSource->GetSupportedFormats(formats);
-    MMI_LOGE("get the image decode:%{public}u", ret);
+    MMI_LOGD("get the image decode:%{public}u", ret);
 
-    DecodeOptions decodeOpts;
-    std::unique_ptr<PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, errorCode);
+    OHOS::Media::DecodeOptions decodeOpts;
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, errorCode);
     if (pixelMap == nullptr) {
         MMI_LOGE("pixelMap is nullptr, errorCode:%{public}u", errorCode);
     }
     return pixelMap;
 }
 
-void OHOS::MMI::MouseDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY)
+void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY)
 {
     MMI_LOGD("enter, displayId:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
     if (drawWindow_ == nullptr) {
@@ -141,7 +140,7 @@ void OHOS::MMI::MouseDrawingManager::DrawPointer(int32_t displayId, int32_t glob
     MMI_LOGD("leave");
 }
 
-void OHOS::MMI::MouseDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t height)
+void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t height)
 {
     MMI_LOGD("enter");
     OHOS::Rosen::Drawing::Bitmap bitmap;
@@ -162,10 +161,10 @@ void OHOS::MMI::MouseDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint3
     MMI_LOGD("leave");
 }
 
-void OHOS::MMI::MouseDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas)
+void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas)
 {
     MMI_LOGD("enter");
-    OHOS::MMI::MouseDrawingManager mdm;
+    PointerDrawingManager mdm;
     std::unique_ptr<OHOS::Media::PixelMap> pixelmap = mdm.DecodeImageToPixelMap(IMAGE_POINTER_JPEG_PATH);
     CHKP(pixelmap);
     OHOS::Rosen::Drawing::Pen pen;
@@ -177,7 +176,7 @@ void OHOS::MMI::MouseDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &
     MMI_LOGD("leave");
 }
 
-void OHOS::MMI::MouseDrawingManager::TellDisplayInfo(int32_t displayId, int32_t width, int32_t height) 
+void PointerDrawingManager::TellDisplayInfo(int32_t displayId, int32_t width, int32_t height) 
 {
     MMI_LOGD("enter");
     hasDisplay_ = true;
@@ -187,14 +186,14 @@ void OHOS::MMI::MouseDrawingManager::TellDisplayInfo(int32_t displayId, int32_t 
     DrawManager();
 }
 
-void OHOS::MMI::MouseDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
+void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
 {
     MMI_LOGD("enter");
     hasPointerDevice_ = hasPointerDevice;
     DrawManager();
 }
 
-void OHOS::MMI::MouseDrawingManager::DrawManager()
+void PointerDrawingManager::DrawManager()
 {
     if (hasDisplay_ && hasPointerDevice_ && drawWindow_ == nullptr) {
         MMI_LOGD("draw pointer begin");
@@ -209,9 +208,11 @@ void OHOS::MMI::MouseDrawingManager::DrawManager()
     }
 }
 
-bool OHOS::MMI::MouseDrawingManager::Init()
+bool PointerDrawingManager::Init()
 {
     MMI_LOGD("enter");
     InputDevMgr->Attach(GetInstance());
     return true;
 }
+} // namespace MMI
+} // namespace OHOS
