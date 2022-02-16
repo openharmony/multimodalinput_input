@@ -40,7 +40,7 @@ using namespace OHOS::MMI;
 static void SeatsInfoDebugPrint(const SeatInfo** seats)
 {
     MMI_LOGD("Seats:");
-    for (int i = 0; seats[i]; i++) {
+    for (int32_t i = 0; seats[i]; i++) {
         MMI_LOGD("-Seat%{public}02d,seatName:%{public}s,deviceFlags:%{public}d,focusWindowId:%{public}d", i + 1,
                  seats[i]->seatName, seats[i]->deviceFlags, seats[i]->focusWindowId);
         MMI_LOGD(".");
@@ -164,7 +164,7 @@ void OHOS::MMI::InputWindowsManager::PrintDebugInfo()
     MMI_LOGD("seats info");
     CHKP(seatsInfo_);
     int32_t idx = 0;
-    for (int i = 0; seatsInfo_[i]; i++) {
+    for (int32_t i = 0; seatsInfo_[i]; i++) {
         idx = i + 1;
         MMI_LOGD("-Seat%{public}02d,seatName:%{public}s,deviceFlags:%{public}d,focusWindowId:%{public}d", idx,
                  seatsInfo_[i]->seatName, seatsInfo_[i]->deviceFlags, seatsInfo_[i]->focusWindowId);
@@ -790,7 +790,8 @@ void OHOS::MMI::InputWindowsManager::AdjustCoordinate(double &coordinateX, doubl
     }
 }
 
-void OHOS::MMI::InputWindowsManager::FixCursorPosition(int32_t &globalX, int32_t &globalY, int cursorW, int cursorH)
+void OHOS::MMI::InputWindowsManager::FixCursorPosition(int32_t &globalX, int32_t &globalY,
+                                                       int32_t cursorW, int32_t cursorH)
 {
     if (globalX < 0) {
         globalX = 0;
@@ -804,12 +805,12 @@ void OHOS::MMI::InputWindowsManager::FixCursorPosition(int32_t &globalX, int32_t
         return;
     }
 
-    int size = 16;
-    int fcursorW = cursorW / size;
+    int32_t size = 16;
+    int32_t fcursorW = cursorW / size;
     if ((globalX + fcursorW) > logicalDisplays_[0].width) {
         globalX = logicalDisplays_[0].width - fcursorW;
     }
-    int fcursorH = cursorH / size;
+    int32_t fcursorH = cursorH / size;
     if ((globalY + fcursorH) > logicalDisplays_[0].height) {
         globalY = logicalDisplays_[0].height - fcursorH;
     }

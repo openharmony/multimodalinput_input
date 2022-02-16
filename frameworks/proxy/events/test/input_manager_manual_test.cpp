@@ -67,7 +67,7 @@ void InputManagerManualTest::AddInputEventFilter()
             return false;
         }
 
-        const int firstPointerId = ids[0];
+        const int32_t firstPointerId = ids[0];
         PointerEvent::PointerItem item;
         if (!pointer->GetPointerItem(firstPointerId, item)) {
             MMI_LOGE("GetPointerItem:%{public}d fail", firstPointerId);
@@ -87,7 +87,7 @@ void InputManagerManualTest::AddInputEventFilter()
         return false;
     };
 
-    int ret = InputManager::GetInstance()->AddInputEventFilter(callback);
+    int32_t ret = InputManager::GetInstance()->AddInputEventFilter(callback);
     ASSERT_EQ(ret, RET_OK);
     MMI_LOGT("leave");
 }

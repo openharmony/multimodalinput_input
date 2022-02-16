@@ -22,6 +22,7 @@
 #include "pixel_map.h"
 #include "log.h"
 #include "image/bitmap.h"
+#include "input_device_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -183,20 +184,20 @@ void OHOS::MMI::MouseDrawingManager::TellDisplayInfo(int32_t displayId, int32_t 
     displayId_ = displayId;
     displayWidth_ = width;
     displayHeight_ = height;
-    Init();
+    DrawManager();
 }
 
-void OHOS::MMI::MouseDrawingManager::TellDeviceInfo(bool hasPointerDevice) 
+void OHOS::MMI::MouseDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
 {
     MMI_LOGD("enter");
     hasPointerDevice_ = hasPointerDevice;
-    Init();
+    DrawManager();
 }
 
-void OHOS::MMI::MouseDrawingManager::Init() 
+void OHOS::MMI::MouseDrawingManager::DrawManager()
 {
     if (hasDisplay_ && hasPointerDevice_ && drawWindow_ == nullptr) {
-        MMI_LOGD("init draw pointer");
+        MMI_LOGD("draw pointer begin");
         DrawPointer(displayId_, displayWidth_/2, displayHeight_/2);
         return;
     }
@@ -206,4 +207,11 @@ void OHOS::MMI::MouseDrawingManager::Init()
         drawWindow_->Destroy();
         drawWindow_ = nullptr; 
     }
+}
+
+bool OHOS::MMI::MouseDrawingManager::Init()
+{
+    MMI_LOGD("enter");
+    InputDevMgr->Attach(GetInstance());
+    return true;
 }

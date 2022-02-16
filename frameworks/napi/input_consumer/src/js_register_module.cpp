@@ -132,7 +132,6 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
 {
     MMI_LOGD("enter");
     auto keyOption = monitorInfo->keyOption;
-    std::vector<int32_t> infoPreKeys = keyOption->GetPreKeys();
     std::vector<KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
     int32_t infoFinalKey = keyOption->GetFinalKey();
     int32_t keyEventFinalKey = keyEvent->GetKeyCode();
@@ -141,6 +140,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
         MMI_LOGD("%{public}d", __LINE__);
         return false;
     }
+    std::vector<int32_t> infoPreKeys = keyOption->GetPreKeys();
     int32_t infoSize = 0;
     auto it = infoPreKeys.begin();
     while (it != infoPreKeys.end()) {
@@ -181,8 +181,8 @@ static void SubKeyEventCallback(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     while (iter != callbacks.end()) {
         auto &list = iter->second;
         iter++;
-        auto infoIter = list.begin();
         MMI_LOGD("list size:%{public}d", static_cast<int32_t>(list.size()));
+        auto infoIter = list.begin();
         while (infoIter != list.end()) {
             auto monitorInfo = *infoIter;
             if (MatchCombinationkeys(monitorInfo, keyEvent)) {
