@@ -58,8 +58,8 @@ public:
     void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
 
 public:
-    virtual int32_t AddSocketPairInfo(const std::string& programName, const int moduleType, int& serverFd,
-                                      const int32_t uid, const int32_t pid, int& toReturnClientFd);
+    virtual int32_t AddSocketPairInfo(const std::string& programName, const int moduleType, const int32_t uid,
+                                      const int32_t pid, int& serverFd, int& toReturnClientFd);
     SessionPtr GetSession(int32_t fd) const;
 
 protected:
