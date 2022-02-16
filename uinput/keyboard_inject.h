@@ -34,10 +34,10 @@ public:
 
 private:
     static std::unique_ptr<InjectThread> injectThread_;
-    std::map<int, int> keyCodeMap_ = {};
+    std::map<int32_t, int32_t> keyCodeMap_ = {};
     static std::mutex mutex_;
-    static constexpr int INPUT_KEY_BACK = 2;
-    static constexpr int LINUX_KEY_BACK = 158;
+    static constexpr int32_t INPUT_KEY_BACK = 2;
+    static constexpr int32_t LINUX_KEY_BACK = 158;
 };
 }  // namespace MMIS
 }  // namespace OHOS

@@ -16,9 +16,9 @@
 #include "keyboard_event.h"
 #include <gtest/gtest.h>
 
-static unsigned int g_keyCodeOne = 1;
-static unsigned int g_keyCodeTwo = 1;
-static unsigned int g_keyCodeThree = 1;
+static uint32_t g_keyCodeOne = 1;
+static uint32_t g_keyCodeTwo = 1;
+static uint32_t g_keyCodeThree = 1;
 namespace {
 using namespace testing::ext;
 using namespace OHOS;

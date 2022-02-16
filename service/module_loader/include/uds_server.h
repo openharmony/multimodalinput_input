@@ -58,8 +58,8 @@ public:
     void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
 
 public:
-    virtual int32_t AddSocketPairInfo(const std::string& programName, const int moduleType, int& serverFd,
-                                      const int32_t uid, const int32_t pid, int& toReturnClientFd);
+    virtual int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, int32_t& serverFd,
+                                      const int32_t uid, const int32_t pid, int32_t& toReturnClientFd);
     SessionPtr GetSession(int32_t fd) const;
 
 protected:
@@ -77,7 +77,7 @@ protected:
     bool AddSession(SessionPtr ses);
     void DelSession(int32_t fd);
     void DumpSession(const std::string& title);
-    bool ClearDeadSessionInMap(const int serverFd, const int clientFd);
+    bool ClearDeadSessionInMap(const int32_t serverFd, const int32_t clientFd);
 
     void NotifySessionDeleted(SessionPtr ses);
 
