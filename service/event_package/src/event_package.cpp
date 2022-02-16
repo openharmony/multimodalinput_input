@@ -515,7 +515,7 @@ void EventPackage::PackageTouchEventByType(int32_t type, libinput_event_touch *d
             auto touchSurfaceInfo = WinMgr->GetTouchSurfaceInfo(touch.point.x, touch.point.y);
             CHKPR(touchSurfaceInfo, ERROR_NULL_POINTER);
             WinMgr->SetTouchFocusSurfaceId(touchSurfaceInfo->surfaceId);
-            WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo, true);
+            WinMgr->TransfromToSurfaceCoordinate(*touchSurfaceInfo, touch.point.x, touch.point.y, true);
 #endif
             break;
         }
@@ -534,7 +534,7 @@ void EventPackage::PackageTouchEventByType(int32_t type, libinput_event_touch *d
             auto touchSurfaceId = WinMgr->GetTouchFocusSurfaceId();
             auto touchSurfaceInfo = WinMgr->GetSurfaceInfo(touchSurfaceId);
             CHKPR(touchSurfaceInfo, ERROR_NULL_POINTER);
-            WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo);
+            WinMgr->TransfromToSurfaceCoordinate(*touchSurfaceInfo, touch.point.x, touch.point.y);
 #endif
             break;
         }
@@ -575,7 +575,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
             auto touchSurfaceInfo = WinMgr->GetTouchSurfaceInfo(touch.point.x, touch.point.y);
             CHKPR(touchSurfaceInfo, ERROR_NULL_POINTER, RET_ERR);
             WinMgr->SetTouchFocusSurfaceId(touchSurfaceInfo->surfaceId);
-            WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo, true);
+            WinMgr->TransfromToSurfaceCoordinate(*touchSurfaceInfo, touch.point.x, touch.point.y, true);
 #endif
             break;
         }
@@ -594,7 +594,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
             auto touchSurfaceId = WinMgr->GetTouchFocusSurfaceId();
             auto touchSurfaceInfo = WinMgr->GetSurfaceInfo(touchSurfaceId);
             CHKPR(touchSurfaceInfo, ERROR_NULL_POINTER, RET_ERR);
-            WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo);
+            WinMgr->TransfromToSurfaceCoordinate(*touchSurfaceInfo, touch.point.x, touch.point.y);
 #endif
             break;
         }

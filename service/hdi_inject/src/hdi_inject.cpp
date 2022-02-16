@@ -227,7 +227,7 @@ int32_t HdiInject::GetDevIndexByType(int32_t devType)
     return RET_ERR;
 }
 
-int32_t HdiInject::ScanInputDevice(DevDesc *staArr, uint32_t arrLen)
+int32_t HdiInject::ScanInputDevice(uint32_t arrLen, DevDesc *staArr)
 {
     uint16_t count = static_cast<uint16_t>(deviceArray_.size());
     int32_t index = 0;
@@ -243,9 +243,9 @@ int32_t HdiInject::ScanInputDevice(DevDesc *staArr, uint32_t arrLen)
     return 0;
 }
 
-static int32_t ScanInputDevice(DevDesc *staArr, uint32_t arrLen)
+static int32_t ScanInputDevice(uint32_t arrLen, DevDesc *staArr)
 {
-    return MMIHdiInject->ScanInputDevice(staArr, arrLen);
+    return MMIHdiInject->ScanInputDevice(arrLen, staArr);
 }
 
 static int32_t OpenInputDevice(uint32_t devIndex)
