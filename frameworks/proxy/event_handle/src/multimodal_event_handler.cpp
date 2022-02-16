@@ -22,10 +22,9 @@
 
 namespace OHOS {
 namespace MMI {
-    namespace {
-        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MultimodalEventHandler"};
-    }
-
+namespace {
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MultimodalEventHandler"};
+}
 void OnConnected(const OHOS::MMI::IfMMIClient& client)
 {
 #ifdef OHOS_WESTEN_MODEL
@@ -37,13 +36,6 @@ void OnConnected(const OHOS::MMI::IfMMIClient& client)
     if (!abilityInfoVec.empty()) {
         winId = abilityInfoVec[0].windowId;
         abilityId = *reinterpret_cast<int32_t*>(abilityInfoVec[0].token.GetRefPtr());
-        /* 三方联调代码，token中带bundlerName和appName，本注释三方代码修改后打开
-        auto token = static_cast<IMMIToken*>(abilityInfoVec[0].token.GetRefPtr());
-        if (token) {
-            bundlerName = token->GetBundlerName();
-            appName = token->GetName();
-        }
-        */
     }
     OHOS::MMI::NetPacket ckt(MmiMessageId::REGISTER_APP_INFO);
     ckt << abilityId << winId << bundlerName << appName;
