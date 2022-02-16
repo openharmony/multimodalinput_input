@@ -49,6 +49,7 @@ void TimerManager::ProcessTimers()
 
 int32_t TimerManager::TakeNextTimerId()
 {
+    MMI_LOGD("enter");
     uint64_t timerSlot = 0;
     uint64_t one = 1;
     
@@ -61,11 +62,13 @@ int32_t TimerManager::TakeNextTimerId()
             return i;
         }
     }
+    MMI_LOGD("leave");
     return NONEXISTENT_ID;
 }
 
 int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
 {
+    MMI_LOGD("enter");
     if (intervalMs < MIN_INTERVAL) {
         intervalMs = MIN_INTERVAL;
     } else if (intervalMs > MAX_INTERVAL) {
@@ -86,22 +89,26 @@ int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, 
     timer->nextCallTime = GetMillisTime() + intervalMs;
     timer->callback = callback;
     InsertTimerInternal(timer);
+    MMI_LOGD("leave");
     return timerId;
 }
 
 int32_t TimerManager::RemoveTimerInternal(int32_t timerId)
 {
+    MMI_LOGD("enter");
     for (auto it = timers_.begin(); it != timers_.end(); ++it) {
         if ((*it)->id == timerId) {
             timers_.erase(it);
             return RET_OK;
         }
     }
+    MMI_LOGD("leave");
     return RET_ERR;
 }
 
 int32_t TimerManager::ResetTimerInternal(int32_t timerId)
 {
+    MMI_LOGD("enter");
     for (auto it = timers_.begin(); it != timers_.end(); ++it) {
         if ((*it)->id == timerId) {
             auto timer = std::move(*it);
@@ -113,32 +120,38 @@ int32_t TimerManager::ResetTimerInternal(int32_t timerId)
             return RET_OK;
         }
     }
+    MMI_LOGD("leave");
     return RET_ERR;
 }
 
 bool TimerManager::IsExistInternal(int32_t timerId)
 {
+    MMI_LOGD("enter");
     for (auto it = timers_.begin(); it != timers_.end(); ++it) {
         if ((*it)->id == timerId) {
             return true;
         }
     }
+    MMI_LOGD("leave");
     return false;
 }
 
 std::unique_ptr<TimerManager::TimerItem>& TimerManager::InsertTimerInternal(std::unique_ptr<TimerItem>& timer)
 {
+    MMI_LOGD("enter");
     for (auto it = timers_.begin(); it != timers_.end(); ++it) {
         if ((*it)->nextCallTime > timer->nextCallTime) {
             return *(timers_.insert(it, std::move(timer)));
         }
     }
     timers_.push_back(std::move(timer));
+    MMI_LOGD("leave");
     return *timers_.rbegin();
 }
 
 int32_t TimerManager::CalcNextDelayInternal()
 {
+    MMI_LOGD("enter");
     auto delay = MIN_DELAY;
     auto nowTime = GetMillisTime();
     for (const auto& timer : timers_) {
@@ -150,11 +163,13 @@ int32_t TimerManager::CalcNextDelayInternal()
             }
         }
     }
+    MMI_LOGD("leave");
     return delay;
 }
 
 void TimerManager::ProcessTimersInternal()
 {
+    MMI_LOGD("enter");
     if (timers_.empty()) {
         return;
     }
@@ -178,6 +193,7 @@ void TimerManager::ProcessTimersInternal()
         const auto& timer = InsertTimerInternal(curTimer);
         timer->callback();
     }
+    MMI_LOGD("leave");
 }
 }
 }

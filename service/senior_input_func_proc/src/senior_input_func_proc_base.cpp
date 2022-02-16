@@ -40,60 +40,73 @@ OHOS::MMI::SeniorInputFuncProcBase::~SeniorInputFuncProcBase()
 
 bool SeniorInputFuncProcBase::Init(UDSServer& sess)
 {
+    MMI_LOGD("enter");
     udsServerPtr_ = &sess;
+    MMI_LOGD("leave");
     return true;
 }
 
 void SeniorInputFuncProcBase::SetSessionFd(int32_t fd)
 {
+    MMI_LOGD("enter");
     sessionFd_ = fd;
 }
 
 int32_t OHOS::MMI::SeniorInputFuncProcBase::GetSessionFd()
 {
+    MMI_LOGD("enter");
     if (sessionFd_ < 0) {
         return RET_ERR;
     }
+    MMI_LOGD("leave");
     return sessionFd_;
 }
 
 void OHOS::MMI::SeniorInputFuncProcBase::DeviceDisconnect(const int32_t sessionId)
 {
+    MMI_LOGD("enter");
     auto it = deviceInfoMap_.find(sessionId);
     if (it != deviceInfoMap_.end()) {
         deviceInfoMap_.erase(it);
         return;
     }
+    MMI_LOGD("leave");
 }
 
 int32_t SeniorInputFuncProcBase::DeviceEventDispatchProcess(const RawInputEvent &event)
 {
+    MMI_LOGD("enter");
     return 0;
 }
 
 bool SeniorInputFuncProcBase::DeviceEventDispatch(int32_t fd, RawInputEvent event)
 {
+    MMI_LOGD("enter");
     auto it = deviceInfoMap_.find(fd);
     if (it == deviceInfoMap_.end()) {
         MMI_LOGE("Failed to find fd");
         return false;
     }
     it->second->DeviceEventDispatchProcess(event);
+    MMI_LOGD("leave");
     return true;
 }
 
 bool SeniorInputFuncProcBase::DeviceInit(int32_t sessionId, sptr<SeniorInputFuncProcBase> ptr)
 {
+    MMI_LOGD("enter");
     auto it = deviceInfoMap_.find(sessionId);
     if (it != deviceInfoMap_.end()) {
         return false;
     }
     deviceInfoMap_[sessionId] = ptr;
+    MMI_LOGD("leave");
     return true;
 }
 
 int32_t SeniorInputFuncProcBase::DeviceEventProcess(const RawInputEvent& event)
 {
+    MMI_LOGD("enter");
     const MmiMessageId msgId = static_cast<MmiMessageId>(event.ev_code);
     const uint32_t occurredTime = static_cast<uint32_t>(event.stamp);
     const std::string uuid = GetUUid();
@@ -132,6 +145,7 @@ int32_t SeniorInputFuncProcBase::DeviceEventProcess(const RawInputEvent& event)
                  fd, appInfo.windowId, appInfo.abilityId, event.ev_code);
     }
     MMI_LOGI("successed send to client event,%{public}d to Application management", event.ev_code);
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
@@ -142,11 +156,13 @@ int32_t SeniorInputFuncProcBase::GetDevType()
 
 int32_t SeniorInputFuncProcBase::ReplyMessage(SessionPtr aiSessionPtr, int32_t status)
 {
+    MMI_LOGD("enter");
     CHKPR(aiSessionPtr, ERROR_NULL_POINTER);
     NetPacket newPacket(MmiMessageId::SENIOR_INPUT_FUNC);
     newPacket << status;
     if (!aiSessionPtr->SendMsg(newPacket)) {
         return RET_ERR;
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }

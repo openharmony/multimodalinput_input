@@ -39,12 +39,14 @@ using namespace OHOS::MMI;
 
 static void SeatsInfoDebugPrint(const SeatInfo** seats)
 {
+    MMI_LOGD("enter");
     MMI_LOGD("Seats:");
     for (int32_t i = 0; seats[i]; i++) {
         MMI_LOGD("-Seat%{public}02d,seatName:%{public}s,deviceFlags:%{public}d,focusWindowId:%{public}d", i + 1,
                  seats[i]->seatName, seats[i]->deviceFlags, seats[i]->focusWindowId);
         MMI_LOGD(".");
     }
+    MMI_LOGD("leave");
 }
 
 OHOS::MMI::InputWindowsManager::InputWindowsManager()
@@ -62,6 +64,7 @@ OHOS::MMI::InputWindowsManager::~InputWindowsManager()
  */
 bool OHOS::MMI::InputWindowsManager::Init(UDSServer& udsServer)
 {
+    MMI_LOGD("enter");
     // save server handle
     udsServer_ = &udsServer;
     SetSeatListener([]() {
@@ -72,11 +75,13 @@ bool OHOS::MMI::InputWindowsManager::Init(UDSServer& udsServer)
     });
     UpdateSeatsInfo();
     UpdateScreensInfo();
+    MMI_LOGD("leave");
     return true;
 }
 
 void OHOS::MMI::InputWindowsManager::UpdateSeatsInfo()
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     if (seatsInfo_ != nullptr) {
         FreeSeatsInfo(seatsInfo_);
@@ -87,11 +92,13 @@ void OHOS::MMI::InputWindowsManager::UpdateSeatsInfo()
         SetFocusId(seatsInfo_[0]->focusWindowId);
     }
     SeatsInfoDebugPrint(const_cast<const SeatInfo**>(seatsInfo_));
+    MMI_LOGD("leave");
 }
 
 // LCOV_EXCL_STOP
 void OHOS::MMI::InputWindowsManager::UpdateScreensInfo()
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     if (screensInfo_ != nullptr) {
         FreeScreensInfo(screensInfo_);
@@ -100,67 +107,83 @@ void OHOS::MMI::InputWindowsManager::UpdateScreensInfo()
     CHKP(screensInfo_);
     SaveScreenInfoToMap(const_cast<const ScreenInfo**>(screensInfo_));
     PrintDebugInfo();
+    MMI_LOGD("leave");
 }
 
 const std::vector<ScreenInfo>& OHOS::MMI::InputWindowsManager::GetScreenInfo() const
 {
+    MMI_LOGD("enter");
     return screenInfoVec_;
 }
 
 const std::map<int32_t, LayerInfo>& OHOS::MMI::InputWindowsManager::GetLayerInfo() const
 {
+    MMI_LOGD("enter");
     return layers_;
 }
 
 const std::map<int32_t, MMISurfaceInfo>& OHOS::MMI::InputWindowsManager::GetSurfaceInfo() const
 {
+    MMI_LOGD("enter");
     return surfaces_;
 }
 
 void OHOS::MMI::InputWindowsManager::InsertSurfaceInfo(const MMISurfaceInfo& tmpSurfaceInfo)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     surfaces_.insert(std::pair<int32_t, MMISurfaceInfo>(tmpSurfaceInfo.surfaceId, tmpSurfaceInfo));
     MMI_LOGW("OnWindow InsertSurfaceInfo ChangeFocusSurfaceId old:%{public}d,new:%{public}d", focusInfoID_,
              tmpSurfaceInfo.surfaceId);
     focusInfoID_ = tmpSurfaceInfo.surfaceId;
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::InputWindowsManager::PrintAllNormalSurface()
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     PrintDebugInfo();
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::InputWindowsManager::SetFocusSurfaceId(int32_t id)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     SetFocusId(id);
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::InputWindowsManager::SetTouchFocusSurfaceId(int32_t id)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     touchFocusId_ = id;
+    MMI_LOGD("leave");
 }
 
 int32_t OHOS::MMI::InputWindowsManager::GetFocusSurfaceId() const
 {
+    MMI_LOGD("enter");
     return focusInfoID_;
 }
 
 int32_t OHOS::MMI::InputWindowsManager::GetTouchFocusSurfaceId() const
 {
+    MMI_LOGD("enter");
     return touchFocusId_;
 }
 
 void OHOS::MMI::InputWindowsManager::SetFocusId(int32_t id)
 {
+    MMI_LOGD("enter");
     focusInfoID_ = id;
 }
 
 void OHOS::MMI::InputWindowsManager::PrintDebugInfo()
 {
+    MMI_LOGD("enter");
     MMI_LOGD("seats info");
     CHKP(seatsInfo_);
     int32_t idx = 0;
@@ -197,10 +220,12 @@ void OHOS::MMI::InputWindowsManager::PrintDebugInfo()
                  m.second.srcW, m.second.srcH, m.second.dstX, m.second.dstY, m.second.dstW, m.second.dstH,
                  m.second.visibility, m.second.opacity, appFd.fd, appFd.bundlerName.c_str(), appFd.appName.c_str());
     }
+    MMI_LOGD("leave");
 }
 
 size_t OHOS::MMI::InputWindowsManager::GetSurfaceIdList(std::vector<int32_t>& ids)
 {
+    MMI_LOGD("enter");
     const int32_t TEST_THREE_WINDOWS = 3;
     std::lock_guard<std::mutex> lock(mu_);
     for (const auto &item : surfaces_) {
@@ -209,23 +234,26 @@ size_t OHOS::MMI::InputWindowsManager::GetSurfaceIdList(std::vector<int32_t>& id
         }
     }
     ids.push_back(focusInfoID_);
+    MMI_LOGD("leave");
     return ids.size();
 }
 
 std::string OHOS::MMI::InputWindowsManager::GetSurfaceIdListString()
 {
+    MMI_LOGD("enter");
     std::vector<int32_t> ids;
     std::string str;
     auto idsSize = GetSurfaceIdList(ids);
     if (idsSize > 0) {
         str = IdsListToString(ids, ",");
     }
+    MMI_LOGD("leave");
     return str;
 }
 
 void OHOS::MMI::InputWindowsManager::Clear()
 {
-    MMI_LOGD("InputWindowsManager destructor begin");
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     if (seatsInfo_) {
         FreeSeatsInfo(seatsInfo_);
@@ -240,11 +268,12 @@ void OHOS::MMI::InputWindowsManager::Clear()
     layers_.clear();
     surfaces_.clear();
     surfacesList_.clear();
-    MMI_LOGD("InputWindowsManager destructor end");
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::InputWindowsManager::Dump(int32_t fd)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     mprintf(fd, "screenInfos count=%zu", screenInfoVec_.size());
     for (const auto &item : screenInfoVec_) {
@@ -273,6 +302,7 @@ void OHOS::MMI::InputWindowsManager::Dump(int32_t fd)
                 item.second.srcH, item.second.opacity, item.second.visibility,
                 item.second.onLayerId, appFd.fd, appFd.bundlerName.c_str(), appFd.appName.c_str());
     }
+    MMI_LOGD("leave");
 }
 
 /*
@@ -283,6 +313,7 @@ void OHOS::MMI::InputWindowsManager::Dump(int32_t fd)
  */
 void OHOS::MMI::InputWindowsManager::SaveScreenInfoToMap(const ScreenInfo** screenInfo)
 {
+    MMI_LOGD("enter");
     // check param
     CHK(udsServer_, ERROR_NULL_POINTER);
     CHK(screenInfo, ERROR_NULL_POINTER);
@@ -328,19 +359,23 @@ void OHOS::MMI::InputWindowsManager::SaveScreenInfoToMap(const ScreenInfo** scre
         }
     }
     surfacesList_ = surfaceList;
+    MMI_LOGD("leave");
 }
 
 bool OHOS::MMI::InputWindowsManager::FindSurfaceByCoordinate(double x, double y, const SurfaceInfo& pstrSurface)
 {
+    MMI_LOGD("enter");
     if (x >= pstrSurface.srcX && x <= (pstrSurface.srcX + pstrSurface.srcW) &&
         y >= pstrSurface.srcY && y <= (pstrSurface.srcY + pstrSurface.srcH)) {
         return true;
     }
+    MMI_LOGD("leave");
     return false;
 }
 
 bool OHOS::MMI::InputWindowsManager::GetTouchSurfaceId(const double x, const double y, std::vector<int32_t>& ids)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     if (!surfaces_.empty()) {
         int32_t newLayerId = -1;
@@ -363,51 +398,61 @@ bool OHOS::MMI::InputWindowsManager::GetTouchSurfaceId(const double x, const dou
         }
         return true;
     }
+    MMI_LOGD("leave");
     return false;
 }
 
 const ScreenInfo* OHOS::MMI::InputWindowsManager::GetScreenInfo(int32_t screenId)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     for (auto& it : screenInfoVec_) {
         if (it.screenId == screenId) {
             return &it;
         }
     }
+    MMI_LOGD("leave");
     return nullptr;
 }
 
 const LayerInfo* OHOS::MMI::InputWindowsManager::GetLayerInfo(int32_t layerId)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     auto it = layers_.find(layerId);
     if (it == layers_.end()) {
         return nullptr;
     }
+    MMI_LOGD("leave");
     return &it->second;
 }
 
 const MMISurfaceInfo* OHOS::MMI::InputWindowsManager::GetSurfaceInfo(int32_t sufaceId)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     auto it = surfaces_.find(sufaceId);
     if (it == surfaces_.end()) {
         return nullptr;
     }
+    MMI_LOGD("leave");
     return &it->second;
 }
 
 bool OHOS::MMI::InputWindowsManager::CheckFocusSurface(double x, double y, const MMISurfaceInfo& info) const
 {
+    MMI_LOGD("enter");
     if (x >= info.dstX && x <= (info.dstX + info.dstW) &&
         y >= info.dstY && y <= (info.dstY + info.dstH)) {
         return true;
     }
+    MMI_LOGD("leave");
     return false;
 }
 
 const MMISurfaceInfo* OHOS::MMI::InputWindowsManager::GetTouchSurfaceInfo(double x, double y)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     int32_t newLayerId = -1;
     const MMISurfaceInfo* surfacePtr = nullptr;
@@ -420,12 +465,14 @@ const MMISurfaceInfo* OHOS::MMI::InputWindowsManager::GetTouchSurfaceInfo(double
             }
         }
     }
+    MMI_LOGD("leave");
     return surfacePtr;
 }
 
 void OHOS::MMI::InputWindowsManager::TransfromToSurfaceCoordinate(const MMISurfaceInfo& info,
                                                                   double& x, double& y, bool debug)
 {
+    MMI_LOGD("enter");
     double oldX = x;
     double oldY = y;
     x = x - info.dstX;
@@ -438,6 +485,7 @@ void OHOS::MMI::InputWindowsManager::TransfromToSurfaceCoordinate(const MMISurfa
                  oldX, oldY, info.surfaceId, info.dstX, info.dstY, info.dstW, info.dstH, x, y, appFd.fd,
                  appFd.bundlerName.c_str(), appFd.appName.c_str());
     }
+    MMI_LOGD("leave");
 }
 
 /*********************************新框架接口添加****************************/
@@ -517,7 +565,7 @@ int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<Input
 void OHOS::MMI::InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
     const std::vector<LogicalDisplayInfo> &logicalDisplays)
 {
-    MMI_LOGD("InputWindowsManager::UpdateDisplayInfo enter");
+    MMI_LOGD("Ienter");
     physicalDisplays_.clear();
     logicalDisplays_.clear();
     windowInfos_.clear();
@@ -536,11 +584,12 @@ void OHOS::MMI::InputWindowsManager::UpdateDisplayInfo(const std::vector<Physica
         DrawWgr->TellDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
     }
     PrintDisplayDebugInfo();
-    MMI_LOGD("InputWindowsManager::UpdateDisplayInfo leave");
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
 {
+    MMI_LOGD("enter");
     MMI_LOGD("physicalDisplays,num:%{public}d", static_cast<int32_t>(physicalDisplays_.size()));
     for (const auto &item : physicalDisplays_) {
         MMI_LOGD("PhysicalDisplays,id:%{public}d,leftDisplay:%{public}d,upDisplay:%{public}d,"
@@ -573,11 +622,13 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
             item.second.hotZoneTopLeftY, item.second.hotZoneWidth, item.second.hotZoneHeight,
             item.second.displayId, item.second.agentWindowId, item.second.winTopLeftX, item.second.winTopLeftY);
     }
+    MMI_LOGD("leave");
 }
 
 bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint_2(libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
 {
+    MMI_LOGD("enter");
     CHKPF(touch);
     if (screensInfo_ != nullptr) {
         if ((*screensInfo_) != nullptr)
@@ -586,11 +637,13 @@ bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint_2(libinput_even
         logicalY = static_cast<int32_t>(libinput_event_touch_get_y_transformed(touch, (*screensInfo_)->height));
         return true;
     }
+    MMI_LOGD("leave");
     return false;
 }
 
 OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::GetPhysicalDisplay(int32_t id)
 {
+    MMI_LOGD("enter");
     for (auto &it : physicalDisplays_) {
         if (it.id == id) {
             return &it;
@@ -602,6 +655,7 @@ OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::GetPhysicalDispl
 OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::FindPhysicalDisplayInfo(const std::string seatId,
     const std::string seatName)
 {
+    MMI_LOGD("enter");
     for (auto &it : physicalDisplays_) {
         if (it.seatId == seatId && it.seatName == seatName) {
             return &it;
@@ -613,6 +667,7 @@ OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::FindPhysicalDisp
 bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(libinput_event_touch* touch,
     int32_t &globalLogicalX, int32_t &globalLogicalY)
 {
+    MMI_LOGD("enter");
     CHKPF(touch);
     auto info = FindPhysicalDisplayInfo("seat0", "default0");
     CHKPF(info);
@@ -652,13 +707,14 @@ bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(libinput_event_touc
         upper = GetPhysicalDisplay(upper->upDisplayId)) {
         globalLogicalY += upper->logicHeight;
     }
-
+    MMI_LOGD("leave");
     return true;
 }
 
 bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(libinput_event_touch* touch,
     int32_t targetDisplayId, int32_t& displayX, int32_t& displayY)
 {
+    MMI_LOGD("enter");
     CHKPF(touch);
     int32_t globalLogicalX;
     int32_t globalLogicalY;
@@ -674,13 +730,14 @@ bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(libinput_eve
         }
         return true;
     }
-
+    MMI_LOGD("leave");
     return false;
 }
 
 bool OHOS::MMI::InputWindowsManager::TouchDownPointToDisplayPoint(libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
 {
+    MMI_LOGD("enter");
     CHKPF(touch);
     int32_t globalLogicalX;
     int32_t globalLogicalY;
@@ -703,22 +760,25 @@ bool OHOS::MMI::InputWindowsManager::TouchDownPointToDisplayPoint(libinput_event
         logicalY = globalLogicalY - display.topLeftY;
         return true;
     }
-
+    MMI_LOGD("leave");
     return false;
 }
 
 const std::vector<LogicalDisplayInfo>& OHOS::MMI::InputWindowsManager::GetLogicalDisplayInfo() const
 {
+    MMI_LOGD("enter");
     return logicalDisplays_;
 }
 
 const std::map<int32_t, WindowInfo>& OHOS::MMI::InputWindowsManager::GetWindowInfo() const
 {
+    MMI_LOGD("enter");
     return windowInfos_;
 }
 
 bool OHOS::MMI::InputWindowsManager::IsTouchWindow(int32_t x, int32_t y, const WindowInfo &info) const
 {
+    MMI_LOGD("enter");
     return (x >= info.hotZoneTopLeftX) && (x <= (info.hotZoneTopLeftX + info.hotZoneWidth)) &&
         (y >= info.hotZoneTopLeftY) && (y <= (info.hotZoneTopLeftY + info.hotZoneHeight));
 }
@@ -726,6 +786,7 @@ bool OHOS::MMI::InputWindowsManager::IsTouchWindow(int32_t x, int32_t y, const W
 void OHOS::MMI::InputWindowsManager::AdjustGlobalCoordinate(int32_t& globalX, int32_t& globalY,
     int32_t width, int32_t height)
 {
+    MMI_LOGD("enter");
     if (globalX <= 0) {
         globalX = 0;
     }
@@ -738,10 +799,12 @@ void OHOS::MMI::InputWindowsManager::AdjustGlobalCoordinate(int32_t& globalX, in
     if (globalY >= height) {
         globalY = height;
     }
+    MMI_LOGD("leave");
 }
 
 bool OHOS::MMI::InputWindowsManager::IsCheckDisplayIdIfExist(int32_t& displayId)
 {
+    MMI_LOGD("enter");
     if (logicalDisplays_.empty()) {
         MMI_LOGE("logicalDisplays_is empty");
         return false;
@@ -755,11 +818,13 @@ bool OHOS::MMI::InputWindowsManager::IsCheckDisplayIdIfExist(int32_t& displayId)
             return true;
         }
     }
+    MMI_LOGD("enter");
     return false;
 }
 
 LogicalDisplayInfo* OHOS::MMI::InputWindowsManager::GetLogicalDisplayById(int32_t displayId)
 {
+    MMI_LOGD("enter");
     for (auto &it : logicalDisplays_) {
         if (it.id == displayId) {
             return &it;
@@ -770,6 +835,7 @@ LogicalDisplayInfo* OHOS::MMI::InputWindowsManager::GetLogicalDisplayById(int32_
 
 void OHOS::MMI::InputWindowsManager::AdjustCoordinate(double &coordinateX, double &coordinateY)
 {
+    MMI_LOGD("enter");
     if (coordinateX < 0) {
         coordinateX = 0;
     }
@@ -788,11 +854,13 @@ void OHOS::MMI::InputWindowsManager::AdjustCoordinate(double &coordinateX, doubl
     if (coordinateY > logicalDisplays_[0].height) {
         coordinateY = logicalDisplays_[0].height;
     }
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::InputWindowsManager::FixCursorPosition(int32_t &globalX, int32_t &globalY,
                                                        int32_t cursorW, int32_t cursorH)
 {
+    MMI_LOGD("enter");
     if (globalX < 0) {
         globalX = 0;
     }
@@ -814,16 +882,18 @@ void OHOS::MMI::InputWindowsManager::FixCursorPosition(int32_t &globalX, int32_t
     if ((globalY + fcursorH) > logicalDisplays_[0].height) {
         globalY = logicalDisplays_[0].height - fcursorH;
     }
+    MMI_LOGD("enter");
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    MMI_LOGD("enter");
     return RET_ERR;
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("UpdateMouseTarget begin");
+    MMI_LOGD("enter");
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!IsCheckDisplayIdIfExist(displayId)) {
         MMI_LOGE("This display:%{public}d is not exist", displayId);
@@ -876,16 +946,19 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
              "globalX:%{public}d,globalY:%{public}d,pressedButtons size:%{public}d",
              fd, focusWindow->pid, focusWindow->id, focusWindow->agentWindowId,
              globalX, globalY, static_cast<int32_t>(size.size()));
+    MMI_LOGD("leave");
     return fd;
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    MMI_LOGD("enter");
     return RET_ERR;
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    MMI_LOGD("enter");
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!IsCheckDisplayIdIfExist(displayId)) {
         MMI_LOGE("This display is not exist");
@@ -941,24 +1014,27 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
              "TargetWindowId:%{public}d,AgentWindowId:%{public}d",
              touchWindow->pid, fd, globalX, globalY, localX, localY,
              pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
+    MMI_LOGD("leave");
     return fd;
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTouchPadTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    MMI_LOGD("enter");
     MMI_LOGD("touchPad event is dropped");
     return RET_ERR;
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    MMI_LOGD("enter");
     MMI_LOGD("touchPad event is dropped");
     return RET_ERR;
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("UpdateTargetPointer begin");
+    MMI_LOGD("enter");
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto source = pointerEvent->GetSourceType();
     switch (source) {
@@ -977,11 +1053,13 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTargetPointer(std::shared_ptr<Poin
         }
     }
     MMI_LOGE("Source is not of the correct type, source:%{public}d", source);
+    MMI_LOGD("leave");
     return RET_ERR;
 }
 
 void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, double& y)
 {
+    MMI_LOGD("enter");
     int32_t integerX = static_cast<int32_t>(x);
     int32_t integerY = static_cast<int32_t>(y);
     const std::vector<struct LogicalDisplayInfo> logicalDisplayInfo = GetLogicalDisplayInfo();
@@ -1029,9 +1107,11 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
         }
     }
     MMI_LOGI("Mouse Data: globleX:%{public}d,globleY:%{public}d", mouseLoction_.globleX, mouseLoction_.globleY);
+    MMI_LOGD("leave");
 }
 
 MouseLocation OHOS::MMI::InputWindowsManager::GetMouseInfo()
 {
+    MMI_LOGD("enter");
     return mouseLoction_;
 }

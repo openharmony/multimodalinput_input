@@ -29,6 +29,7 @@ using namespace std;
 using namespace OHOS::MMI;
 int32_t OHOS::MMI::AIFuncProc::DeviceEventDispatchProcess(const RawInputEvent &event)
 {
+    MMI_LOGD("enter");
     if (CheckEventCode(event) == RET_ERR) {
         MMI_LOGE("aisensor event.code error. event.code:%{public}d", event.ev_code);
         return RET_ERR;
@@ -37,11 +38,13 @@ int32_t OHOS::MMI::AIFuncProc::DeviceEventDispatchProcess(const RawInputEvent &e
         MMI_LOGE("aisensor device event process fail");
         return RET_ERR;
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t OHOS::MMI::AIFuncProc::CheckEventCode(const RawInputEvent& event)
 {
+    MMI_LOGD("enter");
     static const std::set<MmiMessageId> g_aiSensorAllowProcCodes = {
         MmiMessageId::ON_SHOW_MENU,
         MmiMessageId::ON_SEND,
@@ -83,10 +86,12 @@ int32_t OHOS::MMI::AIFuncProc::CheckEventCode(const RawInputEvent& event)
         MMI_LOGE("Failed to find ev_code");
         return RET_ERR;
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t OHOS::MMI::AIFuncProc::GetDevType()
 {
+    MMI_LOGD("enter");
     return static_cast<int32_t>(INPUT_DEVICE_CAP_AISENSOR);
 }
