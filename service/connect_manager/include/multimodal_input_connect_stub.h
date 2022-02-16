@@ -17,11 +17,12 @@
 #define MULTIMODAL_INPUT_CONNECT_STUB_H
 
 #include "i_multimodal_input_connect.h"
-#include "log.h"
+#include "ipc_skeleton.h"
 #include "iremote_stub.h"
+#include "log.h"
 #include "message_parcel.h"
-#include "nocopyable.h"
 #include "multimodal_input_connect_define.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -33,9 +34,6 @@ public:
     int OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& options) override;
 
 protected:
-    bool IsAuthorizedCalling() const;
-    int32_t GetCallingUid() const;
-    int32_t GetCallingPid() const;
     virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) = 0;
     int32_t StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
 
