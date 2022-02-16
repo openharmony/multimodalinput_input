@@ -128,10 +128,10 @@ int32_t OHOS::MMI::TestAuxToolClient::Socket()
     fd_ = MultimodalInputConnectManager::GetInstance()->GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
         MMI_LOGE("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
-                 " return invalid fd.");
+                 " return invalid fd");
     } else {
         MMI_LOGD("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
-                 " return fd:%{public}d.", fd_);
+                 " return fd:%{public}d", fd_);
     }
 
     return fd_;

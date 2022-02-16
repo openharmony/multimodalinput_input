@@ -76,41 +76,41 @@ bool VirtualDevice::SetUp()
     dev_.id.version = version_;
     for (const auto &item : GetEventTypes()) {
         if (!DoIoctl(fd_, UI_SET_EVBIT, item)) {
-            HiLog::Error(LABEL, "%{public}s Error setting event type: %{public}u", __func__, item);
+            HiLog::Error(LABEL, "%{public}s Error setting event type:%{public}u", __func__, item);
             return false;
         }
     }
     for (const auto &item : GetKeys()) {
         if (!DoIoctl(fd_, UI_SET_KEYBIT, item)) {
-            HiLog::Error(LABEL, "%{public}s Error setting key: %{public}u", __func__, item);
+            HiLog::Error(LABEL, "%{public}s Error setting key:%{public}u", __func__, item);
             return false;
         }
     }
     for (const auto &item :  GetProperties()) {
         if (!DoIoctl(fd_, UI_SET_PROPBIT, item)) {
-            HiLog::Error(LABEL, "%{public}s Error setting property: %{public}u", __func__, item);
+            HiLog::Error(LABEL, "%{public}s Error setting property:%{public}u", __func__, item);
             return false;
         }
     }
     for (const auto &item : GetAbs()) {
         if (!DoIoctl(fd_, UI_SET_ABSBIT, item)) {
-            HiLog::Error(LABEL, "%{public}s Error setting property: %{public}u", __func__, item);
+            HiLog::Error(LABEL, "%{public}s Error setting property:%{public}u", __func__, item);
             return false;
         }
     }
     for (const auto &item : GetRelBits()) {
         if (!DoIoctl(fd_, UI_SET_RELBIT, item)) {
-            HiLog::Error(LABEL, "%{public}s Error setting rel: %{public}u", __func__, item);
+            HiLog::Error(LABEL, "%{public}s Error setting rel:%{public}u", __func__, item);
             return false;
         }
     }
 
     if (write(fd_, &dev_, sizeof(dev_)) < 0) {
-        HiLog::Error(LABEL, "Unable to set input device info: %{public}s", __func__);
+        HiLog::Error(LABEL, "Unable to set input device info:%{public}s", __func__);
         return false;
     }
     if (ioctl(fd_, UI_DEV_CREATE) < 0) {
-        HiLog::Error(LABEL, "Unable to create input device : %{public}s", __func__);
+        HiLog::Error(LABEL, "Unable to create input device:%{public}s", __func__);
         return false;
     }
     return true;

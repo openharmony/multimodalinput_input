@@ -54,7 +54,7 @@ int32_t MultimodalStandardizedEventManager::RegisterStandardizedEventHandle(cons
             return OHOS::MMI_STANDARD_EVENT_EXIST;
         }
     }
-    MMI_LOGD("Register app event:typeId:%{public}d;", messageId);
+    MMI_LOGD("Register app event:typeId:%{public}d", messageId);
     std::string registerhandle;
     if (!MakeRegisterHandle(messageId, windowId, registerhandle)) {
         MMI_LOGE("Invalid registration parameter, errCode:%{public}d", MMI_STANDARD_EVENT_INVALID_PARAMETER);
@@ -86,7 +86,7 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
 
     std::string registerhandle;
     if (!MakeRegisterHandle(typeId, windowId, registerhandle)) {
-        MMI_LOGE("Invalid unregistration parameter, typeId:%{public}d, windowId:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Invalid unregistration parameter, typeId:%{public}d,windowId:%{public}d,errCode:%{public}d",
                  typeId, windowId, MMI_STANDARD_EVENT_INVALID_PARAMETER);
         return MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
@@ -100,7 +100,7 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
         }
     }
     if (!isHandleExist) {
-        MMI_LOGE("Unregistration does not exist, Unregistration failed, typeId:%{public}d, windowId:%{public}d,"
+        MMI_LOGE("Unregistration does not exist, Unregistration failed, typeId:%{public}d,windowId:%{public}d,"
                  "errCode:%{public}d", typeId, windowId, MMI_STANDARD_EVENT_NOT_EXIST);
         return MMI_STANDARD_EVENT_NOT_EXIST;
     }
@@ -157,7 +157,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEven
     MMI_LOGD("MultimodalStandardizedEventManagerkey::OnKey");
 #ifdef DEBUG_CODE_TEST
     if (event.GetDeviceUdevTags() == DEVICE_TYPE_VIRTUAL_KEYBOARD) {
-        MMI_LOGD("Inject, keyCode:%{public}d, action:%{public}d, revPid:%{public}d",
+        MMI_LOGD("Inject, keyCode:%{public}d,action:%{public}d,revPid:%{public}d",
             event.GetKeyCode(), event.IsKeyDown(), GetPid());
     }
 #endif
@@ -686,10 +686,9 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
     MMI_LOGD("Inject pointer event.");
     CHKPR(pointerEvent, RET_ERR);
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
-    MMI_LOGD("pointer event dispatcher of client:eventType:%{public}s, actionTime:%{public}d,"
-             "action:%{public}d, actionStartTime:%{public}d, "
-             "flag:%{public}d, pointerAction:%{public}s, sourceType:%{public}s, "
-             "VerticalAxisValue:%{public}f, HorizontalAxisValue:%{public}f, "
+    MMI_LOGD("pointer event dispatcher of client:eventType:%{public}s,actionTime:%{public}d,"
+             "action:%{public}d,actionStartTime:%{public}d,flag:%{public}d,pointerAction:%{public}s,"
+             "sourceType:%{public}s,VerticalAxisValue:%{public}f,HorizontalAxisValue:%{public}f,"
              "pointerCount:%{public}d",
              pointerEvent->DumpEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
@@ -703,9 +702,9 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
         OHOS::MMI::PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
 
-        MMI_LOGD("downTime:%{public}d,isPressed:%{public}s, "
-                "globalX:%{public}d, globalY:%{public}d, localX:%{public}d, localY:%{public}d,"
-                "width:%{public}d, height:%{public}d, pressure:%{public}d",
+        MMI_LOGD("downTime:%{public}d,isPressed:%{public}s,"
+                "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
+                "width:%{public}d,height:%{public}d,pressure:%{public}d",
                  item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
                  item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
                  item.GetWidth(), item.GetHeight(), item.GetPressure());
@@ -717,7 +716,7 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
     OHOS::MMI::NetPacket netPkt(MmiMessageId::INJECT_POINTER_EVENT);
     CHKR((RET_OK == InputEventDataTransformation::Marshalling(pointerEvent, netPkt)),
         STREAM_BUF_WRITE_FAIL, RET_ERR);
-    MMI_LOGD("Pointer event packaged, send to server!");
+    MMI_LOGD("Pointer event packaged, send to server");
     CHKR(SendMsg(netPkt), MSG_SEND_FAIL, RET_ERR);
     return RET_OK;
 }

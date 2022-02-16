@@ -153,8 +153,8 @@ bool OHOS::MMI::VirtualDevice::CreateKey()
 
 bool OHOS::MMI::VirtualDevice::SetAbsResolution(const std::string deviceName)
 {
-    const int ABS_RESOLUTION = 200;
-    const int ABS_RESOLUTION_FINGER = 40;
+    const int32_t ABS_RESOLUTION = 200;
+    const int32_t ABS_RESOLUTION_FINGER = 40;
     if (deviceName == "Virtual Stylus" || deviceName == "Virtual Touchpad") {
         absTemp_.code = 0x00;
         absTemp_.absinfo.resolution = ABS_RESOLUTION;
@@ -256,9 +256,9 @@ void OHOS::MMI::VirtualDevice::CloseAllDevice(const std::vector<std::string>& fi
     for (auto it : fileList) {
         kill(atoi(it.c_str()), SIGKILL);
         it.insert(0, OHOS::MMI::g_folderpath.c_str());
-        const int ret = remove(it.c_str());
+        const int32_t ret = remove(it.c_str());
         if (ret == -1) {
-            const int errnoSaved = errno;
+            const int32_t errnoSaved = errno;
             printf("remove file fail. file name: %s, errno: %d, error message: %s\n",
                 it.c_str(), errnoSaved, strerror(errnoSaved));
         }
@@ -444,9 +444,9 @@ bool OHOS::MMI::VirtualDevice::CloseDevice(const std::vector<std::string>& fileL
             if (it.find(closePid) == 0) {
                 kill(atoi(it.c_str()), SIGKILL);
                 it.insert(0, OHOS::MMI::g_folderpath.c_str());
-                const int ret = remove(it.c_str());
+                const int32_t ret = remove(it.c_str());
                 if (ret == -1) {
-                    const int errnoSaved = errno;
+                    const int32_t errnoSaved = errno;
                     printf("remove file fail. file name: %s, errno: %d, error message: %s\n",
                         it.c_str(), errnoSaved, strerror(errnoSaved));
                 }
