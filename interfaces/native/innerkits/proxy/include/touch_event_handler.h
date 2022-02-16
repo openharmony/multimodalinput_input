@@ -26,6 +26,6 @@ public:
     virtual ~TouchEventHandler();
     virtual bool OnTouch(const TouchEvent& event) override;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // TOUCH_EVENT_HANDLER_H
