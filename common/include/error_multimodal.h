@@ -137,6 +137,7 @@ namespace OHOS {
         FCNTL_FAIL,                                 // fcntl 函数调用错误
         PACKET_WRITE_FAIL,                          // 写入数据错误
         PACKET_READ_FAIL,                           // 读取数据错误
+        POINTER_DRAW_INIT_FAIL,                     // 初始化画鼠标失败
     };
     // Error code for util
     constexpr ErrCode UTIL_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_UTIL);

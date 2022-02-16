@@ -248,5 +248,5 @@ int32_t MultimodalEvent::DeviceTypeTransform(int32_t sourceType) const
     }
     return deviceType;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

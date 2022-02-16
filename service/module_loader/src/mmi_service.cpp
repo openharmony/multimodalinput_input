@@ -22,6 +22,7 @@
 #include "event_dump.h"
 #include "input_windows_manager.h"
 #include "multimodal_input_connect_def_parcel.h"
+#include "pointer_drawing_manager.h"
 #include "register_eventhandle_manager.h"
 #include "safe_keeper.h"
 #include "timer_manager.h"
@@ -103,7 +104,7 @@ int32_t MMIService::EpollCtlAdd(EpollEventType type, int32_t fd)
     CHKR(ed, MALLOC_FAIL, RET_ERR);
     ed->fd = fd;
     ed->event_type = type;
-    MMI_LOGD("MMIService::EpollCtlAdd userdata:[fd:%{public}d, type:%{public}d]", ed->fd, ed->event_type);
+    MMI_LOGD("MMIService::EpollCtlAdd userdata:[fd:%{public}d,type:%{public}d]", ed->fd, ed->event_type);
 
     epoll_event ev = {};
     ev.events = EPOLLIN;
@@ -142,7 +143,7 @@ bool MMIService::InitLibinputService()
         EpollClose();
         return false;
     }
-    MMI_LOGD("MMIService::InitLibinputService EpollCtlAdd, epollfd:%{public}d, fd:%{public}d", mmiFd_, inputFd);
+    MMI_LOGD("MMIService::InitLibinputService EpollCtlAdd, epollfd:%{public}d,fd:%{public}d", mmiFd_, inputFd);
     return true;
 }
 
@@ -157,7 +158,7 @@ bool MMIService::InitSAService()
         EpollClose();
         return false;
     }
-    MMI_LOGD("MMIService::InitLibinputService EpollCtlAdd, epollfd:%{public}d, fd:%{public}d", mmiFd_, epollFd_);
+    MMI_LOGD("MMIService::InitLibinputService EpollCtlAdd, epollfd:%{public}d,fd:%{public}d", mmiFd_, epollFd_);
     return true;
 }
 
@@ -206,6 +207,9 @@ int32_t MMIService::Init()
     MMI_LOGD("DeviceRegister Init");
     CHKR(DevRegister->Init(), DEV_REG_INIT_FAIL, DEV_REG_INIT_FAIL);
 
+    MMI_LOGD("PointerDrawingManager Init");
+    CHKR(MouseDrawingManager::GetInstance()->Init(), POINTER_DRAW_INIT_FAIL, POINTER_DRAW_INIT_FAIL);
+
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
     CHKR(mmiFd_ >= 0, EPOLL_CREATE_FAIL, EPOLL_CREATE_FAIL);
     CHKR(InitSAService(), SASERVICE_INIT_FAIL, SASERVICE_INIT_FAIL);
@@ -223,7 +227,7 @@ void MMIService::OnStart()
     int32_t ret = 0;
     CHK((RET_OK == (ret = Init())), ret);
     state_ = ServiceRunningState::STATE_RUNNING;
-    MMI_LOGD("MMIService Started successfully...");
+    MMI_LOGD("MMIService Started successfully");
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
     t_.detach();
 }
@@ -269,22 +273,22 @@ void MMIService::OnDisconnected(SessionPtr s)
 #endif // OHOS_BUILD_AI
 }
 
-int32_t MMIService::AllocSocketFd(const std::string &programName, const int moduleType, int &toReturnClientFd)
+int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)
 {
-    MMI_LOGI("MMIService::AllocSocketFd enter, programName:%{public}s, moduleType:%{public}d",
+    MMI_LOGI("MMIService::AllocSocketFd enter, programName:%{public}s,moduleType:%{public}d",
              programName.c_str(), moduleType);
 
     toReturnClientFd = INVALID_SOCKET_FD;
-    int serverFd = INVALID_SOCKET_FD;
-    int32_t uid = GetCallingUid();
-    int32_t pid = GetCallingPid();
-    const int32_t ret = AddSocketPairInfo(programName, moduleType, serverFd, toReturnClientFd, uid, pid);
+    int32_t serverFd = INVALID_SOCKET_FD;
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    int32_t pid = IPCSkeleton::GetCallingPid();
+    const int32_t ret = AddSocketPairInfo(programName, moduleType, serverFd, uid, pid, toReturnClientFd);
     if (ret != RET_OK) {
-        MMI_LOGE("call AddSocketPairInfo return %{public}d.", ret);
+        MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
         return RET_ERR;
     }
 
-    MMI_LOGIK("leave, programName:%{public}s, moduleType:%{public}d, alloc success.",
+    MMI_LOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
         programName.c_str(), moduleType);
 
     return RET_OK;
@@ -298,30 +302,23 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
         MMI_LOGE("read data error.");
         return RET_ERR;
     }
-    MMI_LOGIK("clientName:%{public}s, moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
-    if (!IsAuthorizedCalling()) {
-        MMI_LOGE("permission denied");
-        return RET_ERR;
-    }
+    MMI_LOGIK("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
 
-    int clientFd = INVALID_SOCKET_FD;
+    int32_t clientFd = INVALID_SOCKET_FD;
     ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
     if (ret != RET_OK) {
-        MMI_LOGE("call AddSocketPairInfo return %{public}d.", ret);
+        MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
         reply.WriteInt32(RET_ERR);
         return RET_ERR;
     }
 
-    MMI_LOGI("call AllocSocketFd success.");
+    MMI_LOGI("call AllocSocketFd success");
 
     reply.WriteInt32(RET_OK);
     reply.WriteFileDescriptor(clientFd);
 
     MMI_LOGI("send clientFd to client, clientFd = %d", clientFd);
     close(clientFd);
-    clientFd = -1;
-    MMI_LOGI(" clientFd = %d, has closed in server", clientFd);
-
     return RET_OK;
 }
 
@@ -357,13 +354,13 @@ void MMIService::OnThread()
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         bufMap.clear();
         count = EpollWait(ev[0], MAX_EVENT_SIZE, timeOut, mmiFd_);
-        for (int i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
+        for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
             CHKPC(mmiEd, ERROR_NULL_POINTER);
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 input_.EventDispatch(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
-                OnEpollEvent(ev[i], bufMap);
+                OnEpollEvent(bufMap, ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {
                 OnSignalEvent(mmiEd->fd);
             } else {
@@ -410,7 +407,7 @@ bool MMIService::InitSignalHandler()
     retCode = EpollCtlAdd(EPOLL_EVENT_SIGNAL, fdSignal);
     if (retCode < 0) {
         MMI_LOGE("EpollCtlAdd signalFd failed:%{public}d", retCode);
-        EpollClose();
+        close(fdSignal);
         return false;
     }
 

@@ -44,7 +44,7 @@ describe("apiPerformanceTest", function () {
     * @tc.name:MulJsTest001
     * @tc.desc:JS API performance
     * @tc.type: FUNC
-    * @tc.require:AR000GJO2L
+    * @tc.require:SR000GJO2D
     */
     it("MulJsTest001", 0, function () {
         console.info('----------------------MulJsTest001 start----------------------------');

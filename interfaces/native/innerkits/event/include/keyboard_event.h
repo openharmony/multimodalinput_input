@@ -124,5 +124,5 @@ private:
     bool mHandledByIme_ = false;
     int32_t mUnicode_ = 0;
 };
-}
+} // namespace OHOS
 #endif // KEYBOARD_EVENT_H

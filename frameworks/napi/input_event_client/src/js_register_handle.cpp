@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterHandle" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterHandle" };
 }
 struct RegisterHanldeInfo {
     sptr<MMIToken> remoteObj;
@@ -172,7 +172,6 @@ StandEventPtr JSRegisterHandle::GetEventHandle(int32_t winId, uint32_t type)
 
 int32_t JSRegisterHandle::Register(const StandEventPtr eventHandle, int32_t winId, uint32_t type)
 {
-    int32_t response = ERROR_CODE;
     std::string u8String = "hello world!";
     auto wsConvert = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {};
     auto u16String = wsConvert.from_bytes(u8String);
@@ -180,6 +179,7 @@ int32_t JSRegisterHandle::Register(const StandEventPtr eventHandle, int32_t winI
     CHKPR(remoteObj, ERROR_NULL_POINTER);
     remoteObj->SetName("TestJsHapName");
     remoteObj->SetBundlerName("TestJsBundlerName");
+    int32_t response = ERROR_CODE;
     response = MMIEventHdl.RegisterStandardizedEventHandle(remoteObj, winId, eventHandle);
     if (response != MMI_STANDARD_EVENT_SUCCESS) {
         MMI_LOGE("failed, response:%{public}d", response);
@@ -235,5 +235,5 @@ int32_t JSRegisterHandle::UnregisterAll()
     MMI_LOGI("unregister all success. register map size:%{public}d", static_cast<int32_t>(g_registerMap.size()));
     return response;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

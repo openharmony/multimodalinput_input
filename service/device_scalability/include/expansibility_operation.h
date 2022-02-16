@@ -33,6 +33,6 @@ protected:
 protected:
     std::string libPath_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // EXPANSIBILITY_OPERATION_H
