@@ -87,5 +87,5 @@ bool SystemEventHandler::OnSearch(const MultimodalEvent& event)
 {
     return false;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

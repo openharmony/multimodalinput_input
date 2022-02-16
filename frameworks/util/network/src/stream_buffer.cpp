@@ -142,5 +142,5 @@ bool StreamBuffer::IsEmpty()
     }
     return false;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

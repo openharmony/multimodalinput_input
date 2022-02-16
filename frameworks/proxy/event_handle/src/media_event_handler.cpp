@@ -39,5 +39,5 @@ bool MediaEventHandler::OnMediaControl(const MultimodalEvent& event)
 {
     return false;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
