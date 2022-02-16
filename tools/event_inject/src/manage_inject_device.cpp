@@ -101,7 +101,7 @@ int32_t ManageInjectDevice::SendEventToDeviveNode(const InputEventArray& inputEv
         int32_t blockTime = (item.blockTime == 0) ? INJECT_SLEEP_TIMES : item.blockTime;
         std::this_thread::sleep_for(std::chrono::milliseconds(blockTime));
     }
-    if (fd > 0) {
+    if (fd >= 0) {
         close(fd);
     }
     MMI_LOGI("Leave sendEventToDeviveNode function");
