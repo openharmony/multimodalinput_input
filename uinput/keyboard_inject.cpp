@@ -41,7 +41,7 @@ KeyboardInject::KeyboardInject()
     auto it = keyCodeMap_.find(INPUT_KEY_BACK);
     if (it == keyCodeMap_.end()) {
         auto ret = keyCodeMap_.insert(std::make_pair(INPUT_KEY_BACK, LINUX_KEY_BACK));
-        HiLog::Debug(LABEL, "%{public}s ret.second: %{public}d", __func__, ret.second);
+        HiLog::Debug(LABEL, "%{public}s ret.second:%{public}d", __func__, ret.second);
     }
     injectThread_ = std::make_unique<InjectThread>();
     if (injectThread_ == nullptr) {

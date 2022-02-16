@@ -28,6 +28,6 @@ public:
 };
 
 using IClientMsgHandlerPtr = std::shared_ptr<IfClientMsgHandler>;
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // IF_CLIENT_MSG_HANDLER_H

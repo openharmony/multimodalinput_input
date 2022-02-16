@@ -59,7 +59,7 @@ int32_t SendMessage::SendToHdi(const InputEventArray& inputEventArray)
 {
     int32_t devIndex = GetDevIndexByName(inputEventArray.deviceName);
     if (devIndex == RET_ERR) {
-        MMI_LOGE("Get devIndex error by name:%{public}s.", inputEventArray.deviceName.c_str());
+        MMI_LOGE("Get devIndex error by name:%{public}s", inputEventArray.deviceName.c_str());
         return RET_ERR;
     }
     RawInputEvent speechEvent = {};

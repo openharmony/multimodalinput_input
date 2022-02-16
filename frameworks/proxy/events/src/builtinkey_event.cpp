@@ -19,4 +19,4 @@ namespace OHOS {
 BuiltinKeyEvent::~BuiltinKeyEvent()
 {
 }
-}
+} // namespace OHOS

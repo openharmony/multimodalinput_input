@@ -105,7 +105,7 @@ private:
     int32_t pHighestId_ {0};
     Authority pHighestAuthority_ {NO_AUTHORITY};
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define InputFilterMgr OHOS::MMI::InputFilterManager::GetInstance()
 #endif // INPUT_FILTER_MANAGER_H

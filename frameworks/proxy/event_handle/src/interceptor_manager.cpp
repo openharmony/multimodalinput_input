@@ -56,7 +56,7 @@ int32_t InterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<Ke
     interceptorItem.callback_ = interceptor;
     interceptor_.push_back(interceptorItem);
     if (MMIEventHdl.AddInterceptor(interceptorItem.sourceType, interceptorItem.id_) == RET_OK) {
-        MMI_LOGD("Add AddInterceptor KeyEvent to InterceptorManager success!");
+        MMI_LOGD("Add AddInterceptor KeyEvent to InterceptorManager success");
         return MMI_STANDARD_EVENT_SUCCESS;
     }
     return MMI_STANDARD_EVENT_INVALID_PARAMETER;
@@ -85,9 +85,9 @@ int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointer
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     PointerEvent::PointerItem pointer;
     CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL, RET_ERR);
-    MMI_LOGD("interceptor-clienteventTouchpad:actionTime:%{public}d, "
-             "sourceType:%{public}d, pointerAction:%{public}d, "
-             "pointerId:%{public}d, point.x:%{public}d, point.y:%{public}d, press:%{public}d",
+    MMI_LOGD("interceptor-clienteventTouchpad:actionTime:%{public}d,"
+             "sourceType:%{public}d,pointerAction:%{public}d,"
+             "pointerId:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     InterceptorItem interceptorItem;

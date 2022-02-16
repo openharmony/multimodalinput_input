@@ -76,7 +76,7 @@ typedef struct {
 } EventInfo;
 
 typedef std::map<std::string, std::list<napi_ref>> CallbackMap;
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif // JS_REGISTER_MODULE_H

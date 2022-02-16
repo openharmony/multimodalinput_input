@@ -37,5 +37,5 @@ bool DeviceHandler::OnDeviceRemove(const DeviceEvent& multimodalEvent)
 {
     return false;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

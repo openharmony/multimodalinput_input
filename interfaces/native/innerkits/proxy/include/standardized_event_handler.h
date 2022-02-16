@@ -94,6 +94,6 @@ StandEventPtr OHOS::MMI::StandardizedEventHandler::Create()
 {
     return StandEventPtr(new T());
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // STANDARDIZED_EVENT_HANDLER_H

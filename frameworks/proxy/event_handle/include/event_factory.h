@@ -43,6 +43,6 @@ class EventFactory {
 public:
     static MultimodalEventPtr CreateEvent(EventType eventType);
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // EVENT_FACTORY_H
