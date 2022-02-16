@@ -96,7 +96,7 @@ private:
     MonitorCollection monitors_;
     InterceptorCollection interceptors_;
 };
-}
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 
 #endif // INPUT_HANDLER_MANAGER_GLOBAL_H
