@@ -19,6 +19,8 @@ config("libinputeventclient_config") {
 
   include_dirs = [
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
+
+    #"//foundation/multimodalinput/input/interfaces/native/innerkits/napi/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/ace/napi",
     "//foundation/ace/napi/interfaces/kits/napi",
