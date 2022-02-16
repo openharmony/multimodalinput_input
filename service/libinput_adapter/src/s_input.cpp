@@ -68,7 +68,7 @@ const static libinput_interface LIBINPUT_INTERFACE = {
             return RET_ERR;
         }
         int32_t fd = open(realPath, flags);
-        MMI_LOGD("libinput .open_restricted path:%{public}s, fd:%{public}d", path, fd);
+        MMI_LOGD("libinput .open_restricted path:%{public}s,fd:%{public}d", path, fd);
         return fd < 0 ? -errno : fd;
     },
     .close_restricted = [](int32_t fd, void *user_data)
@@ -120,7 +120,7 @@ void OHOS::MMI::SInput::EventDispatch(epoll_event& ev)
     CHKP(ev.data.ptr);
     auto fd = *static_cast<int*>(ev.data.ptr);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGF("SInput::OnEventDispatch epoll unrecoverable error, "
+        MMI_LOGF("SInput::OnEventDispatch epoll unrecoverable error,"
             "The service must be restarted. fd:%{public}d", fd);
         free(ev.data.ptr);
         ev.data.ptr = nullptr;

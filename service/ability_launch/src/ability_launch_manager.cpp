@@ -29,7 +29,7 @@ namespace MMI {
     namespace {
         constexpr int32_t MAX_PREKEYS_NUM = 4;
         constexpr int32_t INVALID_VALUE = -1;
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AbilityLaunchManager" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AbilityLaunchManager" };
     }
 
 AbilityLaunchManager::AbilityLaunchManager()
