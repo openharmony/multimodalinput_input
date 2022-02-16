@@ -185,9 +185,9 @@ void JsInputMonitor::printfPointerEvent(const std::shared_ptr<PointerEvent> poin
     CHKP(pointerEvent);
     PointerEvent::PointerItem item;
     CHK(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item), PARAM_INPUT_FAIL);
-    MMI_LOGD("type:%{public}d, timestamp:%{public}d, deviceId:%{public}d, "
-        "globalX:%{public}d, globalY:%{public}d, localX:%{public}d, localY:%{public}d, "
-        "size:%{public}d, force:%{public}d", pointerEvent->GetSourceType(), item.GetDownTime(),
+    MMI_LOGD("type:%{public}d,timestamp:%{public}d,deviceId:%{public}d,"
+        "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
+        "size:%{public}d,force:%{public}d", pointerEvent->GetSourceType(), item.GetDownTime(),
         item.GetDeviceId(), item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(),
         item.GetLocalY(), item.GetWidth()+item.GetHeight()/2, item.GetPressure());
 }

@@ -50,18 +50,18 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int moduleType)
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_LOGE("client has not connect server.");
+        MMI_LOGE("client has not connect server");
         return RET_ERR;
     }
 
     const std::string programName(OHOS::MMI::GetProgramName());
     int32_t result = multimodalInputConnectService_->AllocSocketFd(programName, moduleType, socketFd_);
     if (result != RET_OK) {
-        MMI_LOGE("AllocSocketFd has error:%{public}d.", result);
+        MMI_LOGE("AllocSocketFd has error:%{public}d", result);
         return RET_ERR;
     }
 
-    MMI_LOGI("AllocSocketPair success. socketFd_:%{public}d.", socketFd_);
+    MMI_LOGI("AllocSocketPair success. socketFd_:%{public}d", socketFd_);
     MMI_LOGD("leave");
     return RET_OK;
 }
@@ -94,12 +94,12 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
     }
     auto sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sm == nullptr) {
-        MMI_LOGE("get registry fail.");
+        MMI_LOGE("get registry fail");
         return false;
     }
     auto sa = sm->GetSystemAbility(IMultimodalInputConnect::MULTIMODAL_INPUT_CONNECT_SERVICE_ID);
     if (sa == nullptr) {
-        MMI_LOGE("get sa fail.");
+        MMI_LOGE("get sa fail");
         return false;
     }
 
@@ -115,10 +115,10 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
     sa->AddDeathRecipient(multimodalInputConnectRecipient_);
     multimodalInputConnectService_ = iface_cast<IMultimodalInputConnect>(sa);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_LOGE("get multimodal input connect service fail.");
+        MMI_LOGE("get multimodal input connect service fail");
         return false;
     }
-    MMI_LOGI("get multimodal input connect service successful.");
+    MMI_LOGI("get multimodal input connect service successful");
     MMI_LOGD("leave");
     return true;
 }
