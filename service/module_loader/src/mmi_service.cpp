@@ -410,7 +410,7 @@ bool MMIService::InitSignalHandler()
     retCode = EpollCtlAdd(EPOLL_EVENT_SIGNAL, fdSignal);
     if (retCode < 0) {
         MMI_LOGE("EpollCtlAdd signalFd failed:%{public}d", retCode);
-        EpollClose();
+        close(fdSignal);
         return false;
     }
 

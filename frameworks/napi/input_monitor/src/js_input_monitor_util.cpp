@@ -29,7 +29,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     napi_value napiValue = nullptr;
     status = napi_create_int32(env, value, &napiValue);
     if (status != napi_ok) {
-        MMI_LOGD("SetNameProperty %{public}s=%{public}d failed", name.c_str(), value);
+        MMI_LOGD("SetNameProperty:%{public}s=%{public}d failed", name.c_str(), value);
         return status;
     }
     status = napi_set_named_property(env, object, name.c_str(), napiValue);
@@ -42,7 +42,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     napi_value napiValue = nullptr;
     status = napi_create_uint32(env, value, &napiValue);
     if (status != napi_ok) {
-        MMI_LOGD("SetNameProperty: %{public}s=%{public}u failed", name.c_str(), value);
+        MMI_LOGD("SetNameProperty:%{public}s=%{public}u failed", name.c_str(), value);
         return status;
     }
     status = napi_set_named_property(env, object, name.c_str(), napiValue);
@@ -55,7 +55,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     napi_value napiValue = nullptr;
     status = napi_create_uint32(env, value, &napiValue);
     if (status != napi_ok) {
-        MMI_LOGD("SetNameProperty: %{public}s=%{public}u failed", name.c_str(), value);
+        MMI_LOGD("SetNameProperty:%{public}s=%{public}u failed", name.c_str(), value);
         return status;
     }
     status = napi_set_named_property(env, object, name.c_str(), napiValue);
@@ -68,7 +68,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     napi_value napiValue = nullptr;
     status = napi_create_int32(env, value, &napiValue);
     if (status != napi_ok) {
-        MMI_LOGD("SetNameProperty: %{public}s=%{public}d failed", name.c_str(), value);
+        MMI_LOGD("SetNameProperty:%{public}s=%{public}d failed", name.c_str(), value);
         return status;
     }
     status = napi_set_named_property(env, object, name.c_str(), napiValue);
@@ -81,7 +81,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     napi_value napiValue = nullptr;
     status = napi_create_double(env, value, &napiValue);
     if (status != napi_ok) {
-        MMI_LOGD("SetNameProperty: %{public}s=%{public}f failed", name.c_str(), value);
+        MMI_LOGD("SetNameProperty:%{public}s=%{public}f failed", name.c_str(), value);
         return status;
     }
     status = napi_set_named_property(env, object, name.c_str(), napiValue);
@@ -94,7 +94,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     napi_value napiValue = nullptr;
     status = napi_create_double(env, value, &napiValue);
     if (status != napi_ok) {
-        MMI_LOGD("SetNameProperty: %{public}s=%{public}lf failed", name.c_str(), value);
+        MMI_LOGD("SetNameProperty:%{public}s=%{public}lf failed", name.c_str(), value);
         return status;
     }
     status = napi_set_named_property(env, object, name.c_str(), napiValue);
@@ -107,7 +107,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     napi_value napiValue = nullptr;
     status = napi_create_int64(env, value, &napiValue);
     if (status != napi_ok) {
-        MMI_LOGD("SetNameProperty: %{public}s=%{public}" PRId64 " failed", name.c_str(), value);
+        MMI_LOGD("SetNameProperty:%{public}s=%{public}" PRId64 " failed", name.c_str(), value);
         return status;
     }
     status = napi_set_named_property(env, object, name.c_str(), napiValue);

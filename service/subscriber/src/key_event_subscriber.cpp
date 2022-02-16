@@ -246,7 +246,7 @@ bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent
     bool handled = false;
     auto keyCode = keyEvent->GetKeyCode();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
-    RemoveKeyCode(pressedKeys, keyCode);
+    RemoveKeyCode(keyCode, pressedKeys);
     for (const auto &subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
         MMI_LOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
@@ -296,7 +296,7 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
     bool handled = false;
     auto keyCode = keyEvent->GetKeyCode();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
-    RemoveKeyCode(pressedKeys, keyCode);
+    RemoveKeyCode(keyCode, pressedKeys);
     for (const auto &subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
         MMI_LOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
@@ -370,7 +370,7 @@ bool KeyEventSubscriber::CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     return true;
 }
 
-void KeyEventSubscriber::RemoveKeyCode(std::vector<int32_t>& keyCodes, int32_t keyCode)
+void KeyEventSubscriber::RemoveKeyCode(int32_t keyCode, std::vector<int32_t>& keyCodes)
 {
     for (auto it = keyCodes.begin(); it != keyCodes.end(); ++it) {
         if (*it == keyCode) {

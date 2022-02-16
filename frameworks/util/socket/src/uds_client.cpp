@@ -58,7 +58,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
     ssize_t ret = write(fd_, static_cast<const void *>(buf), size);
     if (ret < 0) {
-        MMI_LOGE("SendMsg write errCode:%{public}d, return %{public}zd", MSG_SEND_FAIL, ret);
+        MMI_LOGE("SendMsg write errCode:%{public}d,return %{public}zd", MSG_SEND_FAIL, ret);
         return false;
     }
     return true;
@@ -153,7 +153,7 @@ void UDSClient::OnEvent(const epoll_event& ev, StreamBuffer& buf)
     auto isoverflow = false;
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGI("fd:%{public}d, ev.events:0x%{public}x", fd, ev.events);
+        MMI_LOGI("fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
         OnDisconnected();
         epoll_event event = {};
         EpollCtl(fd, EPOLL_CTL_DEL, event);

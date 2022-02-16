@@ -222,5 +222,5 @@ private:
     int32_t mPointerCount_ = 0;
     fingerInfos mfingersInfos_[FINGER_NUM] = {};
 };
-}
+} // namespace OHOS
 #endif // MANIPULATION_EVENT_H
