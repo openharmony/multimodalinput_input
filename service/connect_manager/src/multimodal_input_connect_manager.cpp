@@ -27,8 +27,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
     std::shared_ptr<MultimodalInputConnectManager> g_instance;
-    constexpr uint32_t CONNECT_SERVICE_WAIT_TIME = 1000; // ms
-    constexpr uint32_t CONNECT_MAX_TRY_COUNT = 50;
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectManager" };
 }
 
@@ -94,13 +92,13 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
     if (multimodalInputConnectService_ != nullptr) {
         return true;
     }
-    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (!sm) {
+    auto sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (sm == nullptr) {
         MMI_LOGE("get registry fail.");
         return false;
     }
     auto sa = sm->GetSystemAbility(IMultimodalInputConnect::MULTIMODAL_INPUT_CONNECT_SERVICE_ID);
-    if (!sa) {
+    if (sa == nullptr) {
         MMI_LOGE("get sa fail.");
         return false;
     }
@@ -108,7 +106,7 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
     std::weak_ptr<MultimodalInputConnectManager> weakPtr = shared_from_this();
     auto deathCallback = [weakPtr](const wptr<IRemoteObject> &object) {
         auto sharedPtr = weakPtr.lock();
-        if (sharedPtr) {
+        if (sharedPtr != nullptr) {
             sharedPtr->OnDeath();
         }
     };
@@ -137,12 +135,12 @@ void MultimodalInputConnectManager::Clean()
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> guard(lock_);
-    if (multimodalInputConnectService_) {
+    if (multimodalInputConnectService_ != nullptr) {
         multimodalInputConnectService_.clear();
         multimodalInputConnectService_ = nullptr;
     }
 
-    if (multimodalInputConnectRecipient_) {
+    if (multimodalInputConnectRecipient_ != nullptr) {
         multimodalInputConnectRecipient_.clear();
         multimodalInputConnectRecipient_ = nullptr;
     }
@@ -151,18 +149,18 @@ void MultimodalInputConnectManager::Clean()
 
 void MultimodalInputConnectManager::NotifyDeath()
 {
-    MMI_LOGD("enter");
-    MMI_LOGD("multimodal input connect service is dead, connect again");
-    for (uint32_t i = 0; i < CONNECT_MAX_TRY_COUNT; i++) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(CONNECT_SERVICE_WAIT_TIME));
-        bool result = ConnectMultimodalInputService();
-        if (result) {
+    MMI_LOGD("enter,multimodal input connect service is dead, connect again");
+
+    int32_t retryCount = 50;
+    do {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        if (ConnectMultimodalInputService()) {
             MMI_LOGD("connect multimodal input connect service successful");
             return;
         }
-    }
-    MMI_LOGI("connectmultimodal input connect service failed");
-    MMI_LOGD("leave");
+    } while (--retryCount > 0);
+    
+    MMI_LOGI("leave,connectmultimodal input connect service failed");
 }
 } // namespace MMI
 } // namespace OHOS
