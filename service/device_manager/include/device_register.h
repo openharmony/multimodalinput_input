@@ -31,8 +31,8 @@ public:
     bool FindDeviceId(const std::string& physical, uint32_t& deviceId);
     uint32_t AddDeviceInfo(const std::string& physical);
 private:
-    std::set<uint32_t> setDeviceId_ = {};
-    std::map<std::string, uint32_t> mapDeviceInfo_ = {};
+    std::set<uint32_t> deviceId_ = {};
+    std::map<std::string, uint32_t> deviceInfo_ = {};
     std::mutex mu_;
 };
 } // namespace MMI

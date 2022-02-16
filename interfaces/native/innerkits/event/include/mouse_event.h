@@ -280,15 +280,15 @@ public:
     virtual float GetAxisValue(int32_t axis) const;
 
 private:
-    int32_t mAction_ = 0;
-    int32_t mActionButton_ = 0;
-    int32_t mPressedButtons_ = 0;
-    MmiPoint mMmiPoint_;
-    float mXOffset_ = 0.f;
-    float mYOffset_ = 0.f;
-    float mCursorDelta_ = 0.f;
-    float mScrollingDelta_ = 0.f;
-    std::map<int32_t, float> mapDeviceAxis_ = {};
+    int32_t action_ = 0;
+    int32_t actionButton_ = 0;
+    int32_t pressedButtons_ = 0;
+    MmiPoint mmiPoint_;
+    float xOffset_ = 0.f;
+    float yOffset_ = 0.f;
+    float cursorDelta_ = 0.f;
+    float scrollingDelta_ = 0.f;
+    std::map<int32_t, float> deviceAxis_ = {};
 };
 }
 #endif // MOUSE_EVENT_H
