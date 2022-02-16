@@ -110,7 +110,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::II
 {
     MMI_LOGD("enter");
     MMIEventHdl.GetMultimodeInputInfo();
-    CHKP(inputEventConsumer);
+    CHKPV(inputEventConsumer);
     consumer_ = inputEventConsumer;
     MMI_LOGD("leave");
 }
@@ -126,7 +126,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     keyCodestring = "KeyEventDispatch";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, keyId);
     if (consumer_ != nullptr) {
-        CHKP(keyEvent);
+        CHKPV(keyEvent);
         consumer_->OnInputEvent(keyEvent);
         MMI_LOGD("leave");
         return;
@@ -150,7 +150,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> p
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, touchId);
     }
     if (consumer_ != nullptr) {
-        CHKP(pointerEvent);
+        CHKPV(pointerEvent);
         MMI_LOGD("Passed on to consumer");
         consumer_->OnInputEvent(pointerEvent);
         return;

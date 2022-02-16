@@ -137,7 +137,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds()
 void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
 {
     MMI_LOGD("begin");
-    CHKP(inputDevice);
+    CHKPV(inputDevice);
 #ifdef OHOS_WESTEN_MODEL
     if (initFlag_) {
         return;
@@ -165,7 +165,7 @@ void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
 void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
 {
     MMI_LOGD("begin");
-    CHKP(inputDevice);
+    CHKPV(inputDevice);
 #ifdef OHOS_WESTEN_MODEL
     if (initFlag_) {
         return;

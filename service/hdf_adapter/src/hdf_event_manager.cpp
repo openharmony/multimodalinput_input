@@ -379,7 +379,7 @@ int OHOS::MMI::HdfEventManager::DeviceRemoveHandle(uint32_t devIndex, uint32_t d
 void OHOS::MMI::HdfEventManager::GetEventCallback(const EventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
     const uint16_t byteSize = 8;
-    CHKP(pkgs);
+    CHKPV(pkgs);
     input_event eventarry[MAX_EVENT_PKG_NUM];
     for (uint32_t i = 0; i < count && i < MAX_EVENT_PKG_NUM; i++) {
         eventarry[i].code = pkgs[i]->code;

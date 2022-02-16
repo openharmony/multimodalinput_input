@@ -24,7 +24,7 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN,
 JsInputDeviceContext::JsInputDeviceContext()
 {
     jsInputDeviceMgr_ = std::make_shared<JsInputDeviceManager>();
-    CKP(jsInputDeviceMgr_);
+    CHKPL(jsInputDeviceMgr_);
 }
 
 JsInputDeviceContext::~JsInputDeviceContext()
@@ -87,7 +87,7 @@ napi_value JsInputDeviceContext::CreateInstance(napi_env env)
         MMI_LOGE("failed to get jsContext");
         return nullptr;
     }
-    CKP(jsContext);
+    CHKPP(jsContext, nullptr);
     status = napi_create_reference(env, jsInstance, 1, &(jsContext->contextRef_));
     if (status != napi_ok) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to create contextRef_");
