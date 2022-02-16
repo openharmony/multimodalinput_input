@@ -72,6 +72,6 @@ private:
     std::string bundlerName_ = "DefaultBundlerName";
     std::string name_ = "DefaultName";
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // MMI_TOKEN_H

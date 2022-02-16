@@ -33,5 +33,5 @@ class BuiltinKeyEvent : public KeyEvent {
 public:
     virtual ~BuiltinKeyEvent();
 };
-}
+} // namespace OHOS
 #endif // BUILTINKEY_EVENT_H

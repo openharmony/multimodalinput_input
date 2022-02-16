@@ -128,7 +128,7 @@ public:
     const MMISurfaceInfo* GetSurfaceInfo(int32_t sufaceId);
     bool CheckFocusSurface(double x, double y, const MMISurfaceInfo& info) const;
     const MMISurfaceInfo* GetTouchSurfaceInfo(double x, double y);
-    void TransfromToSurfaceCoordinate(double& x, double& y, const MMISurfaceInfo& info, bool debug = false);
+    void TransfromToSurfaceCoordinate(const MMISurfaceInfo& info, double& x, double& y, bool debug = false);
 
     bool GetTouchSurfaceId(const double x, const double y, std::vector<int32_t>& ids);
 
