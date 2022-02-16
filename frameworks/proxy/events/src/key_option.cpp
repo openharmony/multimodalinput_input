@@ -53,5 +53,5 @@ void KeyOption::SetFinalKeyDownDuration(int32_t duration)
 {
     finalKeyDownDuration_ = duration;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

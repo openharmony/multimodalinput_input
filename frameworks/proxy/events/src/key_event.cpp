@@ -1527,5 +1527,5 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
 
     return true;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

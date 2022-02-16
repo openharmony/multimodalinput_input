@@ -64,16 +64,16 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
         return RET_ERR;
     }
 
-    MMI_LOGE("have recieve message from server");
+    MMI_LOGD("have recieve message from server");
 
     int result = reply.ReadInt32();
-    MMI_LOGE("result:%{public}d", result);
+    MMI_LOGD("result:%{public}d", result);
     if (result != RET_OK) {
         MMI_LOGE("responce return error:%{public}d", result);
         return RET_ERR;
     }
     socketFd = reply.ReadFileDescriptor();
-    MMI_LOGE("socketFd:%{public}d", socketFd);
+    MMI_LOGD("socketFd:%{public}d", socketFd);
     MMI_LOGD("leave");
     return RET_OK;
 }

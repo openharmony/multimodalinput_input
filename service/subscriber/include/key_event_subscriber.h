@@ -69,7 +69,7 @@ private:
 
     bool CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 
-    void RemoveKeyCode(std::vector<int32_t>& keyCodes, int32_t keyCode);
+    void RemoveKeyCode(int32_t keyCode, std::vector<int32_t>& keyCodes);
 
 private:
     std::list<std::shared_ptr<Subscriber>> subscribers_ {};

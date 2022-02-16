@@ -151,5 +151,5 @@ private:
     int32_t mButtons_ = 0;
     int32_t mActionButtons_ = 0;
 };
-}
+} // namespace OHOS
 #endif // STYLUS_EVENT_H
