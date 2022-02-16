@@ -29,5 +29,5 @@ private:
     std::string sysName_;
     int32_t inputDeviceId_ = 0;
 };
-}
+} // namespace OHOS
 #endif // DEVICE_EVENT_H

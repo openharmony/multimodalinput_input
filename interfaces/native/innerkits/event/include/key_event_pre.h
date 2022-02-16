@@ -1516,5 +1516,5 @@ private:
     int32_t mKeyDownDuration_ = 0;
     int32_t mDeviceEventType_ = 0;
 };
-}
+} // namespace OHOS
 #endif // KEY_EVENT_PRE_H

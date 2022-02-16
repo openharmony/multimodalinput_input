@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterUtil" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterUtil" };
 }
 
 const uint32_t MAX_STRING_LEN = 1024;
@@ -219,6 +219,6 @@ uint32_t GetNamedPropertyUint32(const napi_env& env, const napi_value& object, c
     napi_get_value_uint32(env, napiValue, &value);
     return value;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 

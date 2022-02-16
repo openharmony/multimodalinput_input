@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace MMI {
     namespace {
-        [[maybe_unused]] static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
+        [[maybe_unused]] constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
             LOG_CORE, MMI_LOG_DOMAIN, "DeviceRegister"
         };
     }
@@ -102,5 +102,5 @@ bool DeviceRegister::DeleteDeviceInfo(const std::string& physical)
     MMI_LOGD("leave");
     return false;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
