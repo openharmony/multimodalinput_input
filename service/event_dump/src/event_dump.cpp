@@ -116,7 +116,7 @@ void EventDump::TestDump()
         SPRINTF_S_SEC_FUN_FAIL);
     char path[PATH_MAX] = {};
     if (realpath(szPath, path) == nullptr) {
-        MMI_LOGE("path is error, szPath = %{public}s", szPath);
+        MMI_LOGE("path is error, szPath:%{public}s", szPath);
         return;
     }
     auto fd = open(path, O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);

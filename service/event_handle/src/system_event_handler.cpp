@@ -30,7 +30,7 @@ public:
     ~Want() = default;
     Want& AddEntity(const std::string& entity)
     {
-        MMI_LOGW("Want::AddEntity(%{public}s)", entity.c_str());
+        MMI_LOGW("Want::AddEntity:%{public}s", entity.c_str());
         return *this;
     }
 };
@@ -57,10 +57,12 @@ public:
 
 #endif
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SystemEventHandler" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SystemEventHandler" };
     }
+}
 }
 
 using namespace OHOS::AAFwk;

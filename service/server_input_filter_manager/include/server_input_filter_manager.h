@@ -23,7 +23,8 @@
 #include "event_package.h"
 #include "log.h"
 #include "key_event.h"
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 class ServerInputFilterManager : public DelayedSingleton<ServerInputFilterManager> {
 public:
     class KeyEventFilter {
@@ -93,8 +94,8 @@ public:
     void DeleteInterceptorFormSess(const SessionPtr& sess);
 
 protected:
-    void OnEventTouchGetPointEventType(const EventTouch& touch, POINT_EVENT_TYPE& pointEventType,
-        const int32_t fingerCount);
+    void OnEventTouchGetPointEventType(const EventTouch& touch, const int32_t fingerCount,
+        POINT_EVENT_TYPE& pointEventType);
 
 protected:
     EventPackage eventPackage_;
@@ -105,6 +106,7 @@ private:
     std::map<SessionPtr, PointerEventFilter> pointerEventFilterMap_;
 };
 #define ServerKeyFilter OHOS::MMI::ServerInputFilterManager::GetInstance()
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif // SERVER_INPUT_FILTER_MANAGER_H

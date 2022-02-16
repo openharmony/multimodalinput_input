@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "i_multimodal_input_connect_stub.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include "error_multimodal.h"
@@ -21,54 +20,55 @@
 #include "log.h"
 #include "multimodal_input_connect_define.h"
 #include "string_ex.h"
+#include "multimodal_input_connect_stub.h"
 
 namespace OHOS {
 namespace MMI {
     namespace {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
-            LOG_CORE, MMI_LOG_DOMAIN, "IMultimodalInputConnectStub"
+            LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectStub"
         };
     }
-int32_t IMultimodalInputConnectStub::OnRemoteRequest(
+int32_t MultimodalInputConnectStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
-    MMI_LOGT("enter, code: %{public}d", code);
+    MMI_LOGT("enter, code:%{public}d", code);
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IMultimodalInputConnect::GetDescriptor()) {
-        MMI_LOGE("get unexpect descriptor: %{public}s", Str16ToStr8(descriptor).c_str());
+        MMI_LOGE("get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
 
     switch (code) {
         case static_cast<uint32_t>(IMultimodalInputConnect::ALLOC_SOCKET_FD):
-            return HandleAllocSocketFd(data, reply);
+            return StubHandleAllocSocketFd(data, reply);
         case static_cast<uint32_t>(IMultimodalInputConnect::SET_EVENT_POINTER_FILTER):
             return StubAddInputEventFilter(data, reply);
         default:
-            MMI_LOGE("unknown code: %{public}u, go switch defaut", code);
+            MMI_LOGE("unknown code:%{public}u, go switch defaut", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
 }
 
-bool IMultimodalInputConnectStub::IsAuthorizedCalling() const
+bool MultimodalInputConnectStub::IsAuthorizedCalling() const
 {
     int callingUid = IPCSkeleton::GetCallingUid();
-    MMI_LOGIK("Calling uid: %{public}d", callingUid);
+    MMI_LOGIK("Calling uid:%{public}d", callingUid);
     return true;
 }
 
-int32_t IMultimodalInputConnectStub::GetCallingUid() const
+int32_t MultimodalInputConnectStub::GetCallingUid() const
 {
     return IPCSkeleton::GetCallingUid();
 }
 
-int32_t IMultimodalInputConnectStub::GetCallingPid() const
+int32_t MultimodalInputConnectStub::GetCallingPid() const
 {
     return IPCSkeleton::GetCallingPid();
 }
 
-int32_t IMultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply)
 {
     MMI_LOGT("enter");
     int32_t ret = RET_OK;
@@ -101,11 +101,11 @@ int32_t IMultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data
     } while (0);
     
     if (!reply.WriteInt32(ret)) {
-        MMI_LOGE("WriteInt32(%{public}d) fail", ret);
+        MMI_LOGE("WriteInt32:%{public}d fail", ret);
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
 
-    MMI_LOGT("leave, ret = %{public}d", ret);
+    MMI_LOGT("leave, ret:%{public}d", ret);
     return RET_OK;
 }
 } // namespace MMI

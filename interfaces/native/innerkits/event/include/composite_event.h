@@ -37,5 +37,5 @@ class CompositeEvent : public MMI::MultimodalEvent {
 public:
     virtual ~CompositeEvent();
 };
-}
+} // namespace OHOS
 #endif // COMPOSITE_EVENT_H

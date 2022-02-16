@@ -103,14 +103,12 @@ private:
                                          int32_t windowId) const;
     void AnalysisTabletToolEvent(const UDSClient& client, NetPacket& pkt) const;
     void AnalysisGestureEvent(const UDSClient& client, NetPacket& pkt) const;
-    void TraceKeyEvent(const EventKeyboard& key) const;
-    void TracePointerEvent(const EventPointer& pointData) const;
     static void OnEventProcessed(int32_t eventId);
 
 private:
     bool isServerReqireStMessage_ = true;
     std::function<void(int32_t)> eventProcessedCallback_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // CLIENT_MSG_HANDLER_H

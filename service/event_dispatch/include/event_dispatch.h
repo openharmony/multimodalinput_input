@@ -24,7 +24,8 @@
 #include "pointer_event.h"
 #include "i_event_filter.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 class EventDispatch : public std::enable_shared_from_this<EventDispatch> {
 public:
     EventDispatch();
@@ -56,14 +57,15 @@ public:
 
 protected:
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);
-    void OnEventTouchGetPointEventType(const EventTouch& touch, POINT_EVENT_TYPE& pointEventType,
-        const int32_t fingerCount);
+    void OnEventTouchGetPointEventType(const EventTouch& touch, const int32_t fingerCount,
+        POINT_EVENT_TYPE& pointEventType);
     int32_t GestureRegisteredEventDispatch(const MmiMessageId& idMsg, UDSServer& udsServer,
         RegisteredEvent& registeredEvent, uint64_t preHandlerTime);
     int32_t DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& udsServer,
         const RegisteredEvent& data, int32_t inputDeviceType, uint64_t preHandlerTime);
     int32_t KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer& udsServer,
         libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime);
+    int32_t IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id);
 
 protected:
     int32_t touchDownFocusSurfaceId_ = 0;
@@ -74,5 +76,6 @@ private:
     const size_t windowCount_ = 2;
 #endif
     };
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // EVENT_DISPATCH_H

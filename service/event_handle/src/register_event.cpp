@@ -447,12 +447,12 @@ int32_t RegisterEvent::OnEventTouchUpGetSign(const EventTouch& touch, MmiMessage
     CHKF(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
     TouchInfo touchUpInfo = {};
     auto iter = touchInfos_.find(std::make_pair(touch.deviceId, touch.seatSlot));
-    if (iter != touchInfos_.end()) {
-        touchUpInfo = iter->second;
-        touchInfos_.erase(iter);
-    } else {
+    if (iter == touchInfos_.end()) {
+        MMI_LOGE("Failed to find touch event");
         return RET_ERR;
     }
+    touchUpInfo = iter->second;
+    touchInfos_.erase(iter);
 
     if ((GetTouchInfoSizeByDeviceId(touchUpInfo.deviceId) + 1) == THREEFINGER) {
         return OnEventThreeFingerHandlerGetSign(touchUpInfo, msgId);
@@ -515,7 +515,7 @@ void RegisterEvent::GetTouchInfo(const std::pair<uint32_t, int32_t> key, EventTo
     touch.deviceId = iter->second.deviceId;
 }
 
-void RegisterEvent::GetTouchIds(std::vector<std::pair<uint32_t, int32_t>>& touchIds, const uint32_t deviceId)
+void RegisterEvent::GetTouchIds(const uint32_t deviceId, std::vector<std::pair<uint32_t, int32_t>>& touchIds)
 {
     auto iter = touchInfos_.begin();
     while (iter != touchInfos_.end()) {
@@ -548,5 +548,5 @@ void RegisterEvent::DeleteTouchInfoByDeviceId(uint32_t deviceId)
         }
     }
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

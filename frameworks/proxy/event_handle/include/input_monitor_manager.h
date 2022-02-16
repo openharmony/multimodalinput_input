@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace MMI {
-class InputMonitorManager : public Singleton<InputMonitorManager> {
+class InputMonitorManager {
 public:
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor);
     void RemoveMonitor(int32_t monitorId);
