@@ -333,12 +333,11 @@ bool OHOS::MMI::VirtualDevice::SelectDevice(std::vector<std::string> &fileList)
         return false;
     }
 
-    if (fileList.size()) {
-        return true;
-    } else {
+    if (fileList.size() == 0) {
         printf("No device is currently on");
         return false;
     }
+    return true;
 }
 
 bool OHOS::MMI::VirtualDevice::CreateHandle(const std::string deviceArgv)
@@ -420,9 +419,8 @@ bool OHOS::MMI::VirtualDevice::AddDevice(const std::vector<std::string>& fileLis
     if (!flagFile.is_open()) {
         printf("Failed to create file");
         return false;
-    } else {
-        return true;
     }
+    return true;
 }
 
 bool OHOS::MMI::VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
@@ -468,10 +466,10 @@ bool OHOS::MMI::VirtualDevice::FunctionalShunt(const std::string firstArgv, std:
     if (firstArgv == "start") {
         bool result = AddDevice(argvList);
         if (!result) {
+            printf("Failed to create device");
             return false;
-        } else {
-            return true;
         }
+        return true;
     } else if (firstArgv == "list") {
         bool result = SelectDevice(argvList);
         if (!result) {

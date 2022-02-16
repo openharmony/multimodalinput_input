@@ -30,6 +30,6 @@ public:
     virtual const std::string& GetBundlerName() const = 0;
     virtual const std::string& GetName() const = 0;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // IMMI_TOKEN_H
