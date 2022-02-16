@@ -423,8 +423,8 @@ const MMISurfaceInfo* OHOS::MMI::InputWindowsManager::GetTouchSurfaceInfo(double
     return surfacePtr;
 }
 
-void OHOS::MMI::InputWindowsManager::TransfromToSurfaceCoordinate(double& x, double& y, const MMISurfaceInfo& info,
-                                                                  bool debug)
+void OHOS::MMI::InputWindowsManager::TransfromToSurfaceCoordinate(const MMISurfaceInfo& info,
+                                                                  double& x, double& y, bool debug)
 {
     double oldX = x;
     double oldY = y;
