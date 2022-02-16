@@ -52,12 +52,12 @@ int32_t EventFilterStub::StubHandlePointerEvent(MessageParcel& data, MessageParc
     MMI_LOGT("enter");
     std::shared_ptr<PointerEvent> event = PointerEvent::Create();
     if (event == nullptr) {
-        MMI_LOGE("event is nullptr.");
+        MMI_LOGE("event is nullptr");
         return RET_ERR;
     }
 
     if (!event->ReadFromParcel(data)) {
-        MMI_LOGE("read data error.");
+        MMI_LOGE("read data error");
         return RET_ERR;
     }
 

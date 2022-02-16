@@ -205,5 +205,5 @@ bool StandardizedEventHandler::OnDeviceRemove(const DeviceEvent& event)
 {
     return false;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

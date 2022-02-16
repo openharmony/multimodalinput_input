@@ -33,6 +33,6 @@ public:
     static int32_t Unmarshalling(std::shared_ptr<PointerEvent> event, NetPacket &packet);
     static int32_t DeserializePointerItem(PointerEvent::PointerItem &item, NetPacket &packet);
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // INPUT_EVENT_DATA_TRANSFORMATION_H
