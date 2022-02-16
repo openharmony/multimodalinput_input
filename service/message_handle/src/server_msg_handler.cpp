@@ -42,8 +42,8 @@ namespace MMI {
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ServerMsgHandler" };
     }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 OHOS::MMI::ServerMsgHandler::ServerMsgHandler()
 {
