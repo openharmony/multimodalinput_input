@@ -124,6 +124,7 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
         MMI_LOGE("CClientMsgHandler::OnMsgHandler Unknown msg id:%{public}d", id);
         return;
     }
+
 #ifdef OHOS_WESTEN_MODEL   
     uint64_t clientTime = GetSysClockTime();
 #endif
