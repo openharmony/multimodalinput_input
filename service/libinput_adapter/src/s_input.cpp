@@ -25,9 +25,10 @@
 #ifndef OHOS_WESTEN_MODEL
 #include "input_windows_manager.h"
 #endif
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SInput" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SInput" };
     }
 
 static void HiLogFunc(struct libinput* input, enum libinput_log_priority priority, const char* fmt, va_list args)
@@ -48,6 +49,7 @@ static void InitHiLogFunc(struct libinput* input)
     initFlag = true;
 }
 }
+}
 
 void OHOS::MMI::SInput::LoginfoPackagingTool(libinput_event *event)
 {
@@ -66,7 +68,7 @@ const static libinput_interface LIBINPUT_INTERFACE = {
             return RET_ERR;
         }
         int32_t fd = open(realPath, flags);
-        MMI_LOGD("libinput .open_restricted path:%{public}s, fd:%{public}d", path, fd);
+        MMI_LOGD("libinput .open_restricted path:%{public}s,fd:%{public}d", path, fd);
         return fd < 0 ? -errno : fd;
     },
     .close_restricted = [](int32_t fd, void *user_data)
@@ -118,7 +120,7 @@ void OHOS::MMI::SInput::EventDispatch(epoll_event& ev)
     CHKP(ev.data.ptr);
     auto fd = *static_cast<int*>(ev.data.ptr);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGF("SInput::OnEventDispatch epoll unrecoverable error, "
+        MMI_LOGF("SInput::OnEventDispatch epoll unrecoverable error,"
             "The service must be restarted. fd:%{public}d", fd);
         free(ev.data.ptr);
         ev.data.ptr = nullptr;

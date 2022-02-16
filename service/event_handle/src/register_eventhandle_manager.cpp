@@ -19,10 +19,12 @@
 #include "util.h"
 #include "util_ex.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RegisterEventHandleManager" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RegisterEventHandleManager" };
     }
+}
 }
 
 OHOS::MMI::RegisterEventHandleManager::RegisterEventHandleManager()
@@ -58,10 +60,10 @@ int32_t OHOS::MMI::RegisterEventHandleManager::RegisterEvent(MmiMessageId messag
             RegisterEventHandleByIdMsage(MmiMessageId::TOUCH_EVENT_BEGIN, MmiMessageId::TOUCH_EVENT_END, fd);
             break;
         default:
-            MMI_LOGD("It's no this event handle! ");
+            MMI_LOGT("It's no this event handle");
             return UNKNOWN_EVENT;
     }
-    MMI_LOGD("event:%{public}d, fd:%{public}d ", messageId, fd);
+    MMI_LOGT("event:%{public}d,fd:%{public}d ", messageId, fd);
     MMI_LOGD("leave");
     return RET_OK;
 }
