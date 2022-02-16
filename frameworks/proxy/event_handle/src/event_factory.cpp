@@ -59,5 +59,5 @@ MultimodalEventPtr EventFactory::CreateEvent(EventType eventType)
     }
     return nullptr;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

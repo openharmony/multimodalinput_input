@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultiInputCommon" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultiInputCommon" };
 }
 
 void MultiInputCommon::InjectionIni(const std::string &iniFilePath, const std::string &fileName,
@@ -57,5 +57,5 @@ void MultiInputCommon::SetIniFile(const std::string &fileName, const std::string
     const std::string iniFilePath = "/data/mmi/";
     InjectionIni(iniFilePath, fileName, jsonEventValue);
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

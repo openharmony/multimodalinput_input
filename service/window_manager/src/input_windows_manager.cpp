@@ -41,7 +41,7 @@ static void SeatsInfoDebugPrint(const SeatInfo** seats)
 {
     MMI_LOGD("Seats:");
     for (int i = 0; seats[i]; i++) {
-        MMI_LOGD(" -Seat%{public}02d seatName:%{public}s, deviceFlags:%{public}d, focusWindowId:%{public}d", i + 1,
+        MMI_LOGD("-Seat%{public}02d,seatName:%{public}s,deviceFlags:%{public}d,focusWindowId:%{public}d", i + 1,
                  seats[i]->seatName, seats[i]->deviceFlags, seats[i]->focusWindowId);
         MMI_LOGD(".");
     }
@@ -121,7 +121,7 @@ void OHOS::MMI::InputWindowsManager::InsertSurfaceInfo(const MMISurfaceInfo& tmp
 {
     std::lock_guard<std::mutex> lock(mu_);
     surfaces_.insert(std::pair<int32_t, MMISurfaceInfo>(tmpSurfaceInfo.surfaceId, tmpSurfaceInfo));
-    MMI_LOGW("OnWindow InsertSurfaceInfo ChangeFocusSurfaceId old:%{public}d, new:%{public}d", focusInfoID_,
+    MMI_LOGW("OnWindow InsertSurfaceInfo ChangeFocusSurfaceId old:%{public}d,new:%{public}d", focusInfoID_,
              tmpSurfaceInfo.surfaceId);
     focusInfoID_ = tmpSurfaceInfo.surfaceId;
 }
@@ -166,21 +166,21 @@ void OHOS::MMI::InputWindowsManager::PrintDebugInfo()
     int32_t idx = 0;
     for (int i = 0; seatsInfo_[i]; i++) {
         idx = i + 1;
-        MMI_LOGD(" -Seat%{public}02d: seatName:%{public}s, deviceFlags:%{public}d, focusWindowId:%{public}d", idx,
+        MMI_LOGD("-Seat%{public}02d,seatName:%{public}s,deviceFlags:%{public}d,focusWindowId:%{public}d", idx,
                  seatsInfo_[i]->seatName, seatsInfo_[i]->deviceFlags, seatsInfo_[i]->focusWindowId);
     }
 
     MMI_LOGD("screen info");
     for (const auto &j : screenInfoVec_) {
-        MMI_LOGD(" -screenId:%{public}d, connectorName:%{public}s, screenWidth:%{public}d, screenHeight: "
-                 "%{public}d, screenNlayers:%{public}d", j.screenId, j.connectorName, j.width, j.height, j.nLayers);
+        MMI_LOGD("-screenId:%{public}d,connectorName:%{public}s,screenWidth:%{public}d,screenHeight:"
+                 "%{public}d,screenNlayers:%{public}d", j.screenId, j.connectorName, j.width, j.height, j.nLayers);
     }
 
     MMI_LOGD("layer info");
     for (const auto &k : layers_) {
-        MMI_LOGD(" -layer_id:%{public}d, on_screen_id:%{public}d, nSurfaces:%{public}d src(xywh):[%{public}d, "
-                 "%{public}d, %{public}d, %{public}d], dest(xywh):[%{public}d, %{public}d, %{public}d, %{public}d] "
-                 "visibility:%{public}d, opacity:%{public}lf",
+        MMI_LOGD("-layer_id:%{public}d,on_screen_id:%{public}d,nSurfaces:%{public}d src(xywh):[%{public}d,"
+                 "%{public}d,%{public}d,%{public}d],dest(xywh):[%{public}d,%{public}d,%{public}d,%{public}d]"
+                 "visibility:%{public}d,opacity:%{public}lf",
                  k.second.layerId, k.second.onScreenId, k.second.nSurfaces, k.second.srcX, k.second.srcY,
                  k.second.srcW, k.second.srcH, k.second.dstX, k.second.dstY, k.second.dstW, k.second.dstH,
                  k.second.visibility, k.second.opacity);
@@ -189,9 +189,9 @@ void OHOS::MMI::InputWindowsManager::PrintDebugInfo()
     MMI_LOGD("window info");
     for (const auto &m : surfaces_) {
         auto appFd = AppRegs->FindByWinId(m.second.surfaceId);
-        MMI_LOGD(" -surface_id:%{public}d, on_screen_id:%{public}d, on_layer_id:%{public}d, src(xywh):[%{public}d,"
-                 " %{public}d, %{public}d, %{public}d] desc(xywh): [%{public}d, %{public}d, %{public}d, %{public}d], "
-                 "visibility:%{public}d, opacity:%{public}lf, appFd:%{public}d bundlerName:%{public}s appName: "
+        MMI_LOGD("-surface_id:%{public}d,on_screen_id:%{public}d,on_layer_id:%{public}d,src(xywh):[%{public}d,"
+                 "%{public}d,%{public}d,%{public}d] desc(xywh):[%{public}d,%{public}d,%{public}d,%{public}d],"
+                 "visibility:%{public}d,opacity:%{public}lf, appFd:%{public}d bundlerName:%{public}s appName:"
                  "%{public}s",
                  m.second.surfaceId, m.second.screenId, m.second.onLayerId, m.second.srcX, m.second.srcY,
                  m.second.srcW, m.second.srcH, m.second.dstX, m.second.dstY, m.second.dstW, m.second.dstH,
@@ -432,9 +432,9 @@ void OHOS::MMI::InputWindowsManager::TransfromToSurfaceCoordinate(double& x, dou
     y = y - info.dstY;
     if (debug) {
         auto appFd = AppRegs->FindByWinId(info.surfaceId);
-        MMI_LOGD("Transfrom touch coordinate. src:[%{public}lf, %{public}lf] focusSurface:%{public}d "
-                 "info:[%{public}d, %{public}d, %{public}d, %{public}d] dest:[%{public}lf, %{public}lf] "
-                 "fd:%{public}d bundler:%{public}s appName:%{public}s",
+        MMI_LOGD("Transfrom touch coordinate. src:[%{public}lf,%{public}lf],focusSurface:%{public}d,"
+                 "info:[%{public}d,%{public}d,%{public}d,%{public}d],dest:[%{public}lf,%{public}lf],"
+                 "fd:%{public}d,bundler:%{public}s,appName:%{public}s",
                  oldX, oldY, info.surfaceId, info.dstX, info.dstY, info.dstW, info.dstH, x, y, appFd.fd,
                  appFd.bundlerName.c_str(), appFd.appName.c_str());
     }
@@ -543,9 +543,9 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
 {
     MMI_LOGD("physicalDisplays,num:%{public}d", static_cast<int32_t>(physicalDisplays_.size()));
     for (const auto &item : physicalDisplays_) {
-        MMI_LOGD("PhysicalDisplays, id:%{public}d, leftDisplay:%{public}d, upDisplay:%{public}d, "
-            "topLeftX:%{public}d, topLeftY:%{public}d, width:%{public}d, height:%{public}d, name:%{public}s, "
-            "seatId:%{public}s, seatName:%{public}s, logicWidth:%{public}d, logicHeight:%{public}d, "
+        MMI_LOGD("PhysicalDisplays,id:%{public}d,leftDisplay:%{public}d,upDisplay:%{public}d,"
+            "topLeftX:%{public}d,topLeftY:%{public}d,width:%{public}d,height:%{public}d,name:%{public}s,"
+            "seatId:%{public}s,seatName:%{public}s,logicWidth:%{public}d,logicHeight:%{public}d,"
             "direction:%{public}d",
             item.id, item.leftDisplayId, item.upDisplayId,
             item.topLeftX, item.topLeftY, item.width,
@@ -555,9 +555,9 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
 
     MMI_LOGD("logicalDisplays,num:%{public}d", static_cast<int32_t>(logicalDisplays_.size()));
     for (const auto &item : logicalDisplays_) {
-        MMI_LOGD("logicalDisplays, id:%{public}d, topLeftX:%{public}d, topLeftY:%{public}d, "
-            "width:%{public}d, height:%{public}d, name:%{public}s,"
-            "seatId:%{public}s, seatName:%{public}s, focusWindowId:%{public}d, window num:%{public}d",
+        MMI_LOGD("logicalDisplays, id:%{public}d,topLeftX:%{public}d,topLeftY:%{public}d,"
+            "width:%{public}d,height:%{public}d,name:%{public}s,"
+            "seatId:%{public}s,seatName:%{public}s,focusWindowId:%{public}d,window num:%{public}d",
             item.id, item.topLeftX, item.topLeftY,
             item.width, item.height, item.name.c_str(),
             item.seatId.c_str(), item.seatName.c_str(), item.focusWindowId,
@@ -566,9 +566,9 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
 
     MMI_LOGD("window info,num:%{public}d", static_cast<int32_t>(windowInfos_.size()));
     for (const auto &item : windowInfos_) {
-        MMI_LOGD("windowId:%{public}d, id:%{public}d, pid:%{public}d, uid:%{public}d, hotZoneTopLeftX:%{public}d, "
-            "hotZoneTopLeftY:%{public}d, hotZoneWidth:%{public}d, hotZoneHeight:%{public}d, display:%{public}d, "
-            "agentWindowId:%{public}d, winTopLeftX:%{public}d, winTopLeftY:%{public}d",
+        MMI_LOGD("windowId:%{public}d,id:%{public}d,pid:%{public}d,uid:%{public}d,hotZoneTopLeftX:%{public}d,"
+            "hotZoneTopLeftY:%{public}d,hotZoneWidth:%{public}d,hotZoneHeight:%{public}d,display:%{public}d,"
+            "agentWindowId:%{public}d,winTopLeftX:%{public}d,winTopLeftY:%{public}d",
             item.first, item.second.id, item.second.pid, item.second.uid, item.second.hotZoneTopLeftX,
             item.second.hotZoneTopLeftY, item.second.hotZoneWidth, item.second.hotZoneHeight,
             item.second.displayId, item.second.agentWindowId, item.second.winTopLeftX, item.second.winTopLeftY);
@@ -871,8 +871,8 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     auto fd = udsServer_->GetFdByPid(focusWindow->pid);
     auto size = pointerEvent->GetPressedButtons();
 
-    MMI_LOGD("fd:%{public}d, pid:%{public}d, id:%{public}d, agentWindowId:%{public}d, "
-             "globalX:%{public}d, globalY:%{public}d, pressedButtons size:%{public}d",
+    MMI_LOGD("fd:%{public}d,pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
+             "globalX:%{public}d,globalY:%{public}d,pressedButtons size:%{public}d",
              fd, focusWindow->pid, focusWindow->id, focusWindow->agentWindowId,
              globalX, globalY, static_cast<int32_t>(size.size()));
     return fd;
@@ -903,7 +903,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
     CHKPR(logicalDisplayInfo, ERROR_NULL_POINTER);
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
-    MMI_LOGD("UpdateTouchScreenTarget, globalX:%{public}d, globalY:%{public}d", globalX, globalY);
+    MMI_LOGD("UpdateTouchScreenTarget, globalX:%{public}d,globalY:%{public}d", globalX, globalY);
     AdjustGlobalCoordinate(globalX, globalY, logicalDisplayInfo->width, logicalDisplayInfo->height);
     auto targetWindowId = pointerEvent->GetTargetWindowId();
     MMI_LOGD("UpdateTouchScreenTarget, targetWindow:%{public}d", targetWindowId);
@@ -935,9 +935,9 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
     pointerEvent->RemovePointerItem(pointerId);
     pointerEvent->AddPointerItem(pointerItem);
     auto fd = udsServer_->GetFdByPid(touchWindow->pid);
-    MMI_LOGD("the pid:%{public}d, the fd:%{public}d, the globalX01:%{public}d, "
-             "the globalY01:%{public}d, the localX:%{public}d, the localY:%{public}d,"
-             "the TargetWindowId:%{public}d, the AgentWindowId:%{public}d",
+    MMI_LOGD("pid:%{public}d,fd:%{public}d,globalX01:%{public}d,"
+             "globalY01:%{public}d,localX:%{public}d,localY:%{public}d,"
+             "TargetWindowId:%{public}d,AgentWindowId:%{public}d",
              touchWindow->pid, fd, globalX, globalY, localX, localY,
              pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
     return fd;
@@ -1027,7 +1027,7 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
             }
         }
     }
-    MMI_LOGI("Mouse Data: globleX = %{public}d, globleY = %{public}d", mouseLoction_.globleX, mouseLoction_.globleY);
+    MMI_LOGI("Mouse Data: globleX:%{public}d,globleY:%{public}d", mouseLoction_.globleX, mouseLoction_.globleY);
 }
 
 MouseLocation OHOS::MMI::InputWindowsManager::GetMouseInfo()

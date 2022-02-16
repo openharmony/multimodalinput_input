@@ -23,10 +23,12 @@
 #include "log.h"
 #include "image/bitmap.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     static const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_icon/angle.png";
 namespace {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MouseDrawingManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MouseDrawingManager" };
+}
 }
 }
 
@@ -44,7 +46,7 @@ std::unique_ptr<OHOS::Media::PixelMap> OHOS::MMI::MouseDrawingManager::DecodeIma
     SourceOptions opts;
     opts.formatHint = "image/png";
     std::unique_ptr<ImageSource> imageSource = ImageSource::CreateImageSource(imagePath, opts, errorCode);
-    MMI_LOGE("CreateImageSource errorCode:%{public}u.", errorCode);
+    MMI_LOGE("CreateImageSource errorCode:%{public}u", errorCode);
 
     std::set<std::string> formats;
     uint32_t ret = imageSource->GetSupportedFormats(formats);
@@ -53,14 +55,14 @@ std::unique_ptr<OHOS::Media::PixelMap> OHOS::MMI::MouseDrawingManager::DecodeIma
     DecodeOptions decodeOpts;
     std::unique_ptr<PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, errorCode);
     if (pixelMap == nullptr) {
-        MMI_LOGE("pixelMap is nullptr:%{public}u .", errorCode);
+        MMI_LOGE("pixelMap is nullptr, errorCode:%{public}u", errorCode);
     }
     return pixelMap;
 }
 
 void OHOS::MMI::MouseDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY)
 {
-    MMI_LOGD("enter, displayId:%{public}d, globalX:%{public}d, globalY:%{public}d", displayId, globalX, globalY);
+    MMI_LOGD("enter, displayId:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
     if (drawWindow_ == nullptr) {
         std::string windowName = "pointer window";
         sptr<OHOS::Rosen::WindowOption> option = new OHOS::Rosen::WindowOption();
@@ -119,7 +121,7 @@ void OHOS::MMI::MouseDrawingManager::DrawPointer(int32_t displayId, int32_t glob
         }
 
         auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
-        MMI_LOGD("buffer width:%{public}d, height:%{public}d", buffer->GetWidth(), buffer->GetHeight());
+        MMI_LOGD("buffer width:%{public}d,height:%{public}d", buffer->GetWidth(), buffer->GetHeight());
 
         DoDraw(addr, buffer->GetWidth(), buffer->GetHeight());
         MMI_LOGD("DoDraw end");
