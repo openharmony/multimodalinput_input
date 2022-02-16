@@ -115,7 +115,7 @@ void FreeLayerInfo(struct LayerInfo* pLayer)
     MMI_LOGT("FreeLayerInfo...");
     if (pLayer) {
         if (pLayer->surfaces) {
-            for (int i = 0; i < pLayer->nSurfaces; i++) {
+            for (int32_t i = 0; i < pLayer->nSurfaces; i++) {
                 FreeSurfaceInfo(const_cast<SurfaceInfo*>(pLayer->surfaces[i]));
             }
             free(pLayer->surfaces);
@@ -129,7 +129,7 @@ void FreeScreenInfo(struct ScreenInfo* pScreen)
     MMI_LOGT("FreeScreenInfo...");
     if (pScreen) {
         if (pScreen->layers) {
-            for (int i = 0; i < pScreen->nLayers; i++) {
+            for (int32_t i = 0; i < pScreen->nLayers; i++) {
                 FreeLayerInfo(const_cast<LayerInfo*>(pScreen->layers[i]));
             }
             free(pScreen->layers);
@@ -148,7 +148,7 @@ void FreeScreensInfo(struct ScreenInfo** screens)
         MMI_LOGE("screens is null.");
         return;
     }
-    for (int i = 0; screens[i]; i++) {
+    for (int32_t i = 0; screens[i]; i++) {
         FreeScreenInfo(screens[i]);
     }
     free(screens);
@@ -161,7 +161,7 @@ void FreeSeatsInfo(struct SeatInfo** seats)
         MMI_LOGE("seats is null.");
         return;
     }
-    for (int i = 0; seats[i]; i++) {
+    for (int32_t i = 0; seats[i]; i++) {
         if (seats[i]->seatName) {
             free(seats[i]->seatName);
         }

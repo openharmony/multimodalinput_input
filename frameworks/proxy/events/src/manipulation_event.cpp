@@ -75,7 +75,7 @@ MmiPoint ManipulationEvent::GetPointerPosition(int32_t index) const
     if (index < 0 || index >= FINGER_NUM) {
         return MmiPoint(0, 0, 0);
     }
-    for (int i = 0; i < mPointerCount_; i++) {
+    for (int32_t i = 0; i < mPointerCount_; i++) {
         if (mfingersInfos_[i].mPointerId == index) {
             return mfingersInfos_[i].mMp;
         }

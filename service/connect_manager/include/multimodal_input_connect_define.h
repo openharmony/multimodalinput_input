@@ -46,13 +46,13 @@ enum {
 // 返回socket
 
 struct ConnectDefReq {
-    int moduleId;
+    int32_t moduleId;
     std::string clientName;
 };
 
 struct ConnectDefResp {
-    int returnCode;
-    int allocedSocketId;
+    int32_t returnCode;
+    int32_t allocedSocketId;
 };
 } // namespace MMI
 } // namespace OHOS
