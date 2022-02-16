@@ -279,9 +279,9 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
             return nullptr;
         }
         jsInputDeviceMgr->GetDevice(id, env);
-		MMI_LOGD("promise end");
+        MMI_LOGD("promise end");
         return JsEventTarget::promise_;
-    } 
+    }
     status = napi_typeof(env, argv[1], &valueType);
     if (status != napi_ok) {
         MMI_LOGE("failed to get the second parameter type");
