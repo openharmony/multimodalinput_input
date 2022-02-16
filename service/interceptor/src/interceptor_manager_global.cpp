@@ -35,6 +35,7 @@ OHOS::MMI::InterceptorManagerGlobal::~InterceptorManagerGlobal()
 
 void OHOS::MMI::InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     InterceptorItem interceptorItem {};
     interceptorItem.sourceType = sourceType;
@@ -48,10 +49,12 @@ void OHOS::MMI::InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, i
         iter = interceptor_.insert(iter, interceptorItem);
         MMI_LOGD("sourceType:%{public}d,fd:%{public}d register in server", sourceType, session->GetFd());
     }
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     InterceptorItem interceptorItem {};
     interceptorItem.id = id;
@@ -63,10 +66,12 @@ void OHOS::MMI::InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
                  iter->session->GetFd());
         interceptor_.erase(iter);
     }
+    MMI_LOGD("leave");
 }
 
 bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    MMI_LOGD("enter");
     if (interceptor_.empty()) {
         MMI_LOGE("InterceptorManagerGlobal::%{public}s no interceptor to send msg", __func__);
         return false;
@@ -86,12 +91,13 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
         MMI_LOGD("server send the interceptor msg to client, pid:%{public}d", item.session->GetPid());
         item.session->SendMsg(newPkt);
     }
+    MMI_LOGD("leave");
     return true;
 }
 
 bool OHOS::MMI::InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    MMI_LOGD("OnKeyEvent begin");
+    MMI_LOGD("enter");
     if (interceptor_.empty()) {
         MMI_LOGE("InterceptorManagerGlobal::%{public}s no interceptor to send msg", __func__);
         return false;
@@ -105,6 +111,6 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> k
             item.session->SendMsg(newPkt);
         }
     }
-    MMI_LOGD("OnKeyEvent end");
+    MMI_LOGD("enter");
     return true;
 }
