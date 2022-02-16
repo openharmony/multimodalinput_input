@@ -39,6 +39,6 @@ public:
     virtual bool OnBack(const MultimodalEvent& event) override;
     virtual bool OnPrint(const MultimodalEvent& event) override;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // COMMON_EVENT_HANDLER_H
