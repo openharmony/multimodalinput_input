@@ -26,12 +26,12 @@
 
 namespace OHOS {
 namespace MMI {
-    static const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_icon/angle.png";
+    const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_icon/angle.png";
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MouseDrawingManager" };
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 using namespace OHOS::Media;
 

@@ -22,8 +22,8 @@ namespace MMI {
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManagerGlobal" };
     }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 OHOS::MMI::InterceptorManagerGlobal::InterceptorManagerGlobal()
 {

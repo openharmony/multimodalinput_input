@@ -48,8 +48,8 @@ static void InitHiLogFunc(struct libinput* input)
     libinput_log_set_handler(input, &OHOS::MMI::HiLogFunc);
     initFlag = true;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 void OHOS::MMI::SInput::LoginfoPackagingTool(libinput_event *event)
 {

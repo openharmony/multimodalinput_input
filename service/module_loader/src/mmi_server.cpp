@@ -26,8 +26,8 @@ namespace MMI {
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIServer" };
     }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 template<class ...Ts>
 void CheckDefineOutput(const char* fmt, Ts... args)

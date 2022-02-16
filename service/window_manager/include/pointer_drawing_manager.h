@@ -50,7 +50,7 @@ private:
     int32_t displayHeight_;
     bool hasPointerDevice_ { false };
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define DrawWgr OHOS::MMI::MouseDrawingManager::GetInstance()
 #endif // POINTER_DRAWING_MANAGER_H
