@@ -49,7 +49,7 @@ private:
 
 private:
     std::mutex lockHandlers_;
-    std::map<int32_t, InputHandler> inputHandlers_;
+    std::map<int32_t, Handler> inputHandlers_;
     int32_t nextId_ { 1 };
 };
 } // namespace MMI

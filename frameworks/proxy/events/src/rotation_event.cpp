@@ -23,17 +23,17 @@ void RotationEvent::Initialize(int32_t windowId, float rotationValue, int32_t hi
 {
     MultimodalEvent::Initialize(windowId, highLevelEvent, uuid, sourceType, occurredTime, deviceId, inputDeviceId,
                                 isHighLevelEvent, deviceUdevTags);
-    mRotationValue_ = rotationValue;
+    rotationValue_ = rotationValue;
 }
 
 void RotationEvent::Initialize(RotationEvent& rotationEvent)
 {
     MultimodalEvent::Initialize(rotationEvent);
-    mRotationValue_ = rotationEvent.GetRotationValue();
+    rotationValue_ = rotationEvent.GetRotationValue();
 }
 
 float RotationEvent::GetRotationValue() const
 {
-    return mRotationValue_;
+    return rotationValue_;
 }
 } // namespace OHOS

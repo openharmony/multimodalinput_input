@@ -263,14 +263,14 @@ public:
     virtual int32_t GetOriginEventType () const;
 
 private:
-    int32_t mAction_ = 0;
-    int32_t mIndex_ = 0;
-    float mForcePrecision_ = 0.f;
-    float mMaxForce_ = 0.f;
-    float mTapCount_ = 0.f;
-    bool mIsStandard_ = false;
-    int32_t mDeviceEventType_ = 0;
-    MMI::MultimodalEventPtr mDeviceEvent_ = nullptr;
+    int32_t action_ = 0;
+    int32_t index_ = 0;
+    float forcePrecision_ = 0.f;
+    float maxForce_ = 0.f;
+    float tapCount_ = 0.f;
+    bool isStandard_ = false;
+    int32_t deviceEventType_ = 0;
+    MMI::MultimodalEventPtr deviceEvent_ = nullptr;
 };
 } // namespace OHOS
 #endif // TOUCH_EVENT_H
