@@ -38,7 +38,7 @@ EventFilterProxy::~EventFilterProxy()
 
 bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> event)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -54,7 +54,7 @@ bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> ev
     }
 
     const uint32_t code = static_cast<uint32_t>(OPERATOR_TYPE::HANDLE_POINTER_EVENT);
-    int requestResult = Remote()->SendRequest(code, data, reply, option);
+    int32_t requestResult = Remote()->SendRequest(code, data, reply, option);
     if (requestResult != NO_ERROR) {
         MMI_LOGE("send request fail, result:%{public}d", requestResult);
         return false;
@@ -68,7 +68,7 @@ bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> ev
         return false;
     }
 
-    MMI_LOGT("leave");
+    MMI_LOGD("leave");
     return result;
 }
 } // namespace MMI

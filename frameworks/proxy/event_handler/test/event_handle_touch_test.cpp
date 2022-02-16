@@ -43,7 +43,7 @@ public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 protected:
-    const unsigned int surFaceId_ = 10;
+    const uint32_t surFaceId_ = 10;
 };
 
 class TouchEventHandleUnitTest : public TouchEventHandler {
@@ -57,7 +57,7 @@ public:
         return true;
     }
 protected:
-    const unsigned int surFaceId_ = 10;
+    const uint32_t surFaceId_ = 10;
 };
 
 HWTEST_F(EventHandleTouchTest, RegisterStandardizedEventHandle_tmp_err001, TestSize.Level1)

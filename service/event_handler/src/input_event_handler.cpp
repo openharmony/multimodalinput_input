@@ -52,6 +52,7 @@ InputEventHandler::~InputEventHandler()
 
 bool InputEventHandler::Init(UDSServer& udsServer)
 {
+    MMI_LOGD("enter");
     udsServer_ = &udsServer;
     MsgCallback funs[] = {
         {
@@ -182,11 +183,13 @@ bool InputEventHandler::Init(UDSServer& udsServer)
     for (auto &item : funs) {
         CHKC(RegistrationEvent(item), EVENT_REG_FAIL);
     }
+    MMI_LOGD("leave");
     return true;
 }
 
 void InputEventHandler::OnEvent(void *event)
 {
+    MMI_LOGD("enter");
     CHKP(event);
     std::lock_guard<std::mutex> lock(mu_);
     auto *lpMmiEvent = static_cast<multimodal_libinput_event *>(event);
@@ -194,7 +197,7 @@ void InputEventHandler::OnEvent(void *event)
     auto *lpEvent = lpMmiEvent->event;
     CHKP(lpEvent);
     if (initSysClock_ != 0 && lastSysClock_ == 0) {
-        MMI_LOGE("Event not handled. id:%{public}" PRId64 ", eventType:%{public}d, initSysClock:%{public}" PRId64,
+        MMI_LOGE("Event not handled. id:%{public}" PRId64 ",eventType:%{public}d,initSysClock:%{public}" PRId64,
                  idSeed_, eventType_, initSysClock_);
     }
 
@@ -207,36 +210,40 @@ void InputEventHandler::OnEvent(void *event)
     if (idSeed_ >= maxUInt64) {
         idSeed_ = 1;
     }
-    MMI_LOGT("Event reporting. id:%{public}" PRId64 ", tid:%{public}" PRId64 ", eventType:%{public}d, "
+    MMI_LOGT("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
              "initSysClock:%{public}" PRId64, idSeed_, tid, eventType_, initSysClock_);
 
     OnEventHandler(*lpMmiEvent);
     lastSysClock_ = GetSysClockTime();
     uint64_t lostTime = lastSysClock_ - initSysClock_;
-    MMI_LOGT("Event handling completed. id:%{public}" PRId64 ", lastSynClock:%{public}" PRId64
-             ", lostTime:%{public}" PRId64, idSeed_, lastSysClock_, lostTime);
+    MMI_LOGT("Event handling completed. id:%{public}" PRId64 ",lastSynClock:%{public}" PRId64
+             ",lostTime:%{public}" PRId64, idSeed_, lastSysClock_, lostTime);
+    MMI_LOGD("leave");
 }
 
 int32_t InputEventHandler::OnEventHandler(const multimodal_libinput_event& ev)
 {
+    MMI_LOGD("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(ev.event);
     TimeCostChk chk("InputEventHandler::OnEventHandler", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
     auto fun = GetFun(static_cast<MmiMessageId>(type));
     if (!fun) {
-        MMI_LOGE("Unknown event type:%{public}d, errCode:%{public}d", type, UNKNOWN_EVENT);
+        MMI_LOGE("Unknown event type:%{public}d,errCode:%{public}d", type, UNKNOWN_EVENT);
         return UNKNOWN_EVENT;
     }
     auto ret = (*fun)(ev);
     if (ret != 0) {
-        MMI_LOGE("Event handling failed. type:%{public}d, ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Event handling failed. type:%{public}d,ret:%{public}d,errCode:%{public}d",
                  type, ret, EVENT_CONSUM_FAIL);
     }
+    MMI_LOGD("leave");
     return ret;
 }
 
 void InputEventHandler::OnCheckEventReport()
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     if (initSysClock_ == 0) {
         return;
@@ -251,27 +258,35 @@ void InputEventHandler::OnCheckEventReport()
     if (lostTime < MAX_DID_TIME) {
         return;
     }
-    MMI_LOGE("Event not responding. id:%{public}" PRId64 ", eventType:%{public}d, initSysClock:%{public}" PRId64 ", "
+    MMI_LOGE("Event not responding. id:%{public}" PRId64 ",eventType:%{public}d,initSysClock:%{public}" PRId64 ","
              "lostTime:%{public}" PRId64, idSeed_, eventType_, initSysClock_, lostTime);
+    MMI_LOGD("leave");
 }
 
 void InputEventHandler::RegistnotifyDeviceChange(NotifyDeviceChange cb)
 {
+    MMI_LOGD("enter");
     notifyDeviceChange_ = cb;
+    MMI_LOGD("leave");
 }
 
 UDSServer* InputEventHandler::GetUDSServer()
 {
+    MMI_LOGD("enter");
+    MMI_LOGD("leave");
     return udsServer_;
 }
 
 int32_t InputEventHandler::AddInputEventFilter(sptr<IEventFilter> filter)
 {
+    MMI_LOGD("enter");
+    MMI_LOGD("leave");
     return eventDispatch_.AddInputEventFilter(filter);
 }
 
 int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& ev)
 {
+    MMI_LOGD("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(ev.event);
     InputDevMgr->OnInputDeviceAdded(device);
@@ -282,12 +297,12 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto packageResult = eventPackage_.PackageDeviceManageEvent(ev.event, deviceManage);
     if (packageResult != RET_OK) {
-        MMI_LOGE("Deviceadded event package failed. ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Deviceadded event package failed. ret:%{public}d,errCode:%{public}d",
                  packageResult, DEV_ADD_EVENT_PKG_FAIL);
         return DEV_ADD_EVENT_PKG_FAIL;
     }
-    MMI_LOGT("4.event dispatcher of server, DeviceManage:physical:%{public}s, "
-             "deviceName:%{public}s, deviceType:%{public}u",
+    MMI_LOGT("4.event dispatcher of server, DeviceManage:physical:%{public}s,"
+             "deviceName:%{public}s,deviceType:%{public}u",
              deviceManage.physical, deviceManage.deviceName, deviceManage.deviceType);
 
     int32_t focusId = WinMgr->GetFocusSurfaceId();
@@ -304,11 +319,13 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
         MMI_LOGE("Sending structure of DeviceManage failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event& ev)
 {
+    MMI_LOGD("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(ev.event);
     InputDevMgr->OnInputDeviceRemoved(device);
@@ -318,12 +335,12 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
     DeviceManage deviceManage = {};
     auto packageResult = eventPackage_.PackageDeviceManageEvent(ev.event, deviceManage);
     if (packageResult != RET_OK) {
-        MMI_LOGE("Deviceremoved event package failed. ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Deviceremoved event package failed. ret:%{public}d,errCode:%{public}d",
                  packageResult, DEV_REMOVE_EVENT_PKG_FAIL);
         return DEV_REMOVE_EVENT_PKG_FAIL;
     }
-    MMI_LOGT("4.event dispatcher of server, DeviceManage:physical:%{public}s, "
-             "deviceName:%{public}s, deviceType:%{public}u",
+    MMI_LOGT("4.event dispatcher of server, DeviceManage:physical:%{public}s,"
+             "deviceName:%{public}s,deviceType:%{public}u",
              deviceManage.physical, deviceManage.deviceName, deviceManage.deviceType);
 
     int32_t focusId = WinMgr->GetFocusSurfaceId();
@@ -337,14 +354,16 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
     NetPacket newPacket(MmiMessageId::ON_DEVICE_REMOVED);
     newPacket << deviceManage << appInfo.abilityId << focusId << appInfo.fd << sysStartProcessTime;
     if (!SendMsg(appInfo.fd, newPacket)) {
-        MMI_LOGE("Sending structure of DeviceManage failed! errCode:%{public}d", MSG_SEND_FAIL);
+        MMI_LOGE("Sending structure of DeviceManage failed, errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
 {
+    MMI_LOGD("enter");
     CHKPR(event, PARAM_INPUT_INVALID);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
@@ -357,7 +376,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         return RET_OK;
     }
     if (packageResult != RET_OK) {
-        MMI_LOGE("KeyEvent package failed. ret:%{public}d, errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
+        MMI_LOGE("KeyEvent package failed. ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
 
@@ -377,7 +396,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
 
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent_, sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d",
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
@@ -388,11 +407,13 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
     keyEventString = "OnKeyEvent";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
     MMI_LOGD("Inject keyCode=%{public}d, action=%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& ev)
 {
+    MMI_LOGD("enter");
 #ifdef OHOS_WESTEN_MODEL
     uint64_t sysStartProcessTime = GetSysClockTime();
 #endif
@@ -406,7 +427,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
         return RET_OK;
     }
     if (packageResult != RET_OK) {
-        MMI_LOGE("KeyEvent package failed. ret:%{public}d, errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
+        MMI_LOGE("KeyEvent package failed. ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
     int32_t keyId = keyEvent_->GetId();
@@ -424,6 +445,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
         return RET_OK;
     }
+    MMI_LOGD("leave");
     return OnEventKey(ev.event);
 #else
 
@@ -450,6 +472,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
 
 int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
 {
+    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
     CHKPR(udsServer_, ERROR_NULL_POINTER);
@@ -460,7 +483,7 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
         return RET_OK;
     }
     if (packageResult != RET_OK) {
-        MMI_LOGE("Key event package failed. ret:%{public}d, errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
+        MMI_LOGE("Key event package failed. ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
 
@@ -485,16 +508,18 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
 
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent_, sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Key event dispatch failed. ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d",
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
 
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventKeyboard(const multimodal_libinput_event& ev)
 {
+    MMI_LOGD("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
 #ifdef OHOS_WESTEN_MODEL
     uint64_t sysStartProcessTime = GetSysClockTime();
@@ -508,7 +533,7 @@ int32_t InputEventHandler::OnEventKeyboard(const multimodal_libinput_event& ev)
         return RET_OK;
     }
     if (packageResult != RET_OK) {
-        MMI_LOGE("Key event package failed. ret:%{public}d, errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
+        MMI_LOGE("Key event package failed. ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
     
@@ -528,7 +553,7 @@ int32_t InputEventHandler::OnEventKeyboard(const multimodal_libinput_event& ev)
     auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, oKey, keyBoard,
                                                                sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Key event dispatch failed. ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d",
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
@@ -538,6 +563,7 @@ int32_t InputEventHandler::OnEventKeyboard(const multimodal_libinput_event& ev)
 
 int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
 {
+    MMI_LOGD("enter");
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     CHKPR(ev.event, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
@@ -561,7 +587,7 @@ int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
         return RET_OK;
     }
     if (packageResult != RET_OK) {
-        MMI_LOGE("Pointer event package failed. ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Pointer event package failed. ret:%{public}d,errCode:%{public}d",
                  packageResult, POINT_EVENT_PKG_FAIL);
         return POINT_EVENT_PKG_FAIL;
     }
@@ -571,11 +597,11 @@ int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
         return RET_OK;
     }
 #else
-    MMI_LOGT("2.mapping event, Event:eventType:%{public}d;", point.eventType);
+    MMI_LOGT("2.mapping event, Event:eventType:%{public}d", point.eventType);
     /*
     auto retEvent = eventDispatch_.DispatchCommonPointEvent(*udsServer_, *ev.event, point, preHandlerTime);
     if (retEvent != RET_OK) {
-        MMI_LOGE("common_point event dispatch failed. ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("common_point event dispatch failed. ret:%{public}d,errCode:%{public}d",
             retEvent, POINT_REG_EVENT_DISP_FAIL);
         return POINT_REG_EVENT_DISP_FAIL;
     }
@@ -587,7 +613,7 @@ int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
 #else
     auto retEvent = eventDispatch_.DispatchPointerEvent(*udsServer_, ev.event, point, sysStartProcessTime);
     if (retEvent != RET_OK) {
-        MMI_LOGE("Pointer event dispatch failed. ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Pointer event dispatch failed. ret:%{public}d,errCode:%{public}d",
             retEvent, POINT_EVENT_DISP_FAIL);
         return POINT_EVENT_DISP_FAIL;
     }
@@ -597,8 +623,8 @@ int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
 
 int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 {
+    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
-    MMI_LOGD("Enter");
     auto point = TouchTransformPointManger->OnLibinputTouchEvent(event);
     CHKPR(point, ERROR_NULL_POINTER);
     int32_t pointerId = point->GetId();
@@ -622,8 +648,8 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 
 int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 {
+    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
-    MMI_LOGD("Enter");
 
     auto point = TouchTransformPointManger->OnLibinputTouchPadEvent(event);
     if (point == nullptr) {
@@ -646,6 +672,7 @@ int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 
 int32_t InputEventHandler::OnEventTouch(const multimodal_libinput_event& ev)
 {
+    MMI_LOGD("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     SInput::LoginfoPackagingTool(ev.event);
 #ifndef OHOS_WESTEN_MODEL
@@ -659,7 +686,7 @@ int32_t InputEventHandler::OnEventTouch(const multimodal_libinput_event& ev)
         return RET_OK;
     }
     if (packageResult != RET_OK) {
-        MMI_LOGE("Touch event package failed, ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Touch event package failed, ret:%{public}d,errCode:%{public}d",
                  packageResult, TOUCH_EVENT_PKG_FAIL);
         return TOUCH_EVENT_PKG_FAIL;
     }
@@ -668,34 +695,37 @@ int32_t InputEventHandler::OnEventTouch(const multimodal_libinput_event& ev)
     }
     auto ret = eventDispatch_.DispatchTouchEvent(*udsServer_, ev.event, touch, sysStartProcessTime);
     if (ret != RET_OK) {
-        MMI_LOGE("Touch event dispatch failed. ret:%{public}d, errCode:%{public}d", ret, TOUCH_EVENT_DISP_FAIL);
+        MMI_LOGE("Touch event dispatch failed. ret:%{public}d,errCode:%{public}d", ret, TOUCH_EVENT_DISP_FAIL);
         return TOUCH_EVENT_DISP_FAIL;
     }
 #endif
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventTouchpad(const multimodal_libinput_event& ev)
 {
+    MMI_LOGD("enter");
 #ifndef OHOS_WESTEN_MODEL
     OnEventTouchPadSecond(ev.event);
 #endif
-
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 {
+    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
-    MMI_LOGT("InputEventHandler::OnGestureEvent");
+    MMI_LOGD("InputEventHandler::OnGestureEvent");
     auto pointer = TouchTransformPointManger->OnTouchPadGestrueEvent(event);
     if (pointer == nullptr) {
         MMI_LOGE("Gesture event package failed, errCode:%{public}d", GESTURE_EVENT_PKG_FAIL);
         return GESTURE_EVENT_PKG_FAIL;
     }
-    MMI_LOGT("GestrueEvent package, eventType:%{public}d, actionTime:%{public}d, "
-             "action:%{public}d, actionStartTime:%{public}d, "
-             "pointerAction:%{public}d, sourceType:%{public}d, "
+    MMI_LOGT("GestrueEvent package, eventType:%{public}d,actionTime:%{public}d,"
+             "action:%{public}d,actionStartTime:%{public}d,"
+             "pointerAction:%{public}d,sourceType:%{public}d,"
              "PinchAxisValue:%{public}.2f",
              pointer->GetEventType(), pointer->GetActionTime(),
              pointer->GetAction(), pointer->GetActionStartTime(),
@@ -704,9 +734,9 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 
     PointerEvent::PointerItem item;
     pointer->GetPointerItem(pointer->GetPointerId(), item);
-    MMI_LOGT("item:DownTime:%{public}d, IsPressed:%{public}s, "
-             "GlobalX:%{public}d, GlobalY:%{public}d, LocalX:%{public}d, LocalY:%{public}d, "
-             "Width:%{public}d, Height:%{public}d, DeviceId:%{public}d",
+    MMI_LOGT("item:DownTime:%{public}d,IsPressed:%{public}s,"
+             "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
+             "Width:%{public}d,Height:%{public}d,DeviceId:%{public}d",
              item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
              item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
              item.GetWidth(), item.GetHeight(), item.GetDeviceId());
@@ -716,11 +746,13 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
         MMI_LOGE("Gesture event dispatch failed, errCode:%{public}d", GESTURE_EVENT_DISP_FAIL);
         return GESTURE_EVENT_DISP_FAIL;
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventGesture(const multimodal_libinput_event& ev)
 {
+    MMI_LOGD("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
 #ifndef OHOS_WESTEN_MODEL
     OnGestureEvent(ev.event);
@@ -730,7 +762,7 @@ int32_t InputEventHandler::OnEventGesture(const multimodal_libinput_event& ev)
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto packageResult = eventPackage_.PackageGestureEvent(ev.event, gesture);
     if (packageResult != RET_OK) {
-        MMI_LOGE("Gesture swipe event package failed, ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Gesture swipe event package failed, ret:%{public}d,errCode:%{public}d",
                  packageResult, GESTURE_EVENT_PKG_FAIL);
         return GESTURE_EVENT_PKG_FAIL;
     }
@@ -738,16 +770,18 @@ int32_t InputEventHandler::OnEventGesture(const multimodal_libinput_event& ev)
     auto eventDispatchResult = eventDispatch_.DispatchGestureEvent(*udsServer_, ev.event, gesture,
                                                                    sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Gesture event dispatch failed, ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Gesture event dispatch failed, ret:%{public}d,errCode:%{public}d",
                  eventDispatchResult, GESTURE_EVENT_DISP_FAIL);
         return GESTURE_EVENT_DISP_FAIL;
     }
 #endif
+MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventTabletTool(const multimodal_libinput_event& ev)
 {
+    MMI_LOGD("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
     EventTabletTool tableTool = {};
@@ -758,51 +792,57 @@ int32_t InputEventHandler::OnEventTabletTool(const multimodal_libinput_event& ev
         return RET_OK;
     }
     if (packageResult != RET_OK) {
-        MMI_LOGE("Tablettool event package failed. ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Tablettool event package failed. ret:%{public}d,errCode:%{public}d",
                  packageResult, TABLETTOOL_EVENT_PKG_FAIL);
         return TABLETTOOL_EVENT_PKG_FAIL;
     }
     MMI_LOGT("2.mapping event, Event:eventType:%{public}d;", tableTool.eventType);
     auto retEvent = eventDispatch_.DispatchTabletToolEvent(*udsServer_, ev.event, tableTool, sysStartProcessTime);
     if (retEvent != RET_OK) {
-        MMI_LOGE("Tabletool event dispatch failed. ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Tabletool event dispatch failed. ret:%{public}d,errCode:%{public}d",
                  retEvent, TABLETTOOL_EVENT_DISP_FAIL);
         return TABLETTOOL_EVENT_DISP_FAIL;
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventTabletPad(const multimodal_libinput_event& ev)
 {
+    MMI_LOGD("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     EventTabletPad tabletPad = {};
     auto packageResult = eventPackage_.PackageTabletPadEvent(ev.event, tabletPad);
     if (packageResult != RET_OK) {
-        MMI_LOGE("Tabletpad event package failed. ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Tabletpad event package failed. ret:%{public}d,errCode:%{public}d",
                  packageResult, TABLETPAD_EVENT_PKG_FAIL);
         return TABLETPAD_EVENT_PKG_FAIL;
     }
     auto ret = eventDispatch_.DispatchTabletPadEvent(*udsServer_, ev.event, tabletPad, sysStartProcessTime);
     if (ret != RET_OK) {
-        MMI_LOGE("Tabletpad event dispatch failed. ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Tabletpad event dispatch failed. ret:%{public}d,errCode:%{public}d",
                  ret, TABLETPAD_EVENT_DISP_FAIL);
         return TABLETPAD_EVENT_DISP_FAIL;
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventSwitchToggle(const multimodal_libinput_event& ev)
 {
+    MMI_LOGD("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(ev.event);
     MMI_LOGT("Function is OnEventSwitchToggle, sourceType is LIBINPUT_EVENT_SWITCH_TOGGLE:%{public}d", type);
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventTabletPadKey(const multimodal_libinput_event& ev)
 {
+    MMI_LOGD("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
     CHKPR(udsServer_, ERROR_NULL_POINTER);
@@ -813,7 +853,7 @@ int32_t InputEventHandler::OnEventTabletPadKey(const multimodal_libinput_event& 
         return RET_OK;
     }
     if (packageResult != RET_OK) {
-        MMI_LOGE("Tabletpadkey event package failed. ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Tabletpadkey event package failed. ret:%{public}d,errCode:%{public}d",
                  packageResult, TABLETPAD_KEY_EVENT_PKG_FAIL);
         return TABLETPAD_KEY_EVENT_PKG_FAIL;
     }
@@ -825,21 +865,23 @@ int32_t InputEventHandler::OnEventTabletPadKey(const multimodal_libinput_event& 
 #endif
     auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, oKey, key, sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Key event dispatch failed. ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d",
                  eventDispatchResult, TABLETPAD_KEY_EVENT_DISP_FAIL);
         return TABLETPAD_KEY_EVENT_DISP_FAIL;
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventJoyStickKey(const multimodal_libinput_event& ev, const uint64_t time)
 {
+    MMI_LOGD("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     EventKeyboard key = {};
     auto packageResult = eventPackage_.PackageJoyStickKeyEvent(ev.event, key);
     if (packageResult != RET_OK) {
-        MMI_LOGE("Joystickkey event package failed. ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Joystickkey event package failed. ret:%{public}d,errCode:%{public}d",
                  packageResult, JOYSTICK_KEY_EVENT_PKG_FAIL);
         return JOYSTICK_KEY_EVENT_PKG_FAIL;
     }
@@ -854,34 +896,38 @@ int32_t InputEventHandler::OnEventJoyStickKey(const multimodal_libinput_event& e
 #endif
     auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, oKey, key, time);
     if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("JoyStick event dispatch failed. ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("JoyStick event dispatch failed. ret:%{public}d,errCode:%{public}d",
                  eventDispatchResult, JOYSTICK_EVENT_DISP_FAIL);
         return JOYSTICK_EVENT_DISP_FAIL;
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventJoyStickAxis(const multimodal_libinput_event& ev, const uint64_t time)
 {
+    MMI_LOGD("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     EventJoyStickAxis eventJoyStickAxis = {};
     auto packageResult = eventPackage_.PackageJoyStickAxisEvent(ev.event, eventJoyStickAxis);
     if (packageResult != RET_OK) {
-        MMI_LOGE("Joystickaxis event package failed. ret:%{public}d, errCode:%{public}d",
+        MMI_LOGE("Joystickaxis event package failed. ret:%{public}d,errCode:%{public}d",
                  packageResult, JOYSTICK_AXIS_EVENT_PKG_FAIL);
         return JOYSTICK_AXIS_EVENT_PKG_FAIL;
     }
     auto ret = eventDispatch_.DispatchJoyStickEvent(*udsServer_, ev.event, eventJoyStickAxis, time);
     if (ret != RET_OK) {
-        MMI_LOGE("Joystick event dispatch failed. ret:%{public}d, errCode:%{public}d", ret, JOYSTICK_EVENT_DISP_FAIL);
+        MMI_LOGE("Joystick event dispatch failed. ret:%{public}d,errCode:%{public}d", ret, JOYSTICK_EVENT_DISP_FAIL);
         return JOYSTICK_EVENT_DISP_FAIL;
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
 {
+    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     MMI_LOGD("Libinput Events reported");
 
@@ -916,44 +962,47 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
     eventDispatch_.HandlePointerEvent(pointerEvent);
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, pointerId);
     // 返回值 代表是 鼠标事件有没有处理过， 不关心成功与失败
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    if (pointerEvent == nullptr) {
-        MMI_LOGE("PointerEvent is nullptr");
-        return RET_ERR;
-    }
+    MMI_LOGD("enter");
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     // Mouse Axis Data
-    MMI_LOGI("MouseEvent Normalization Results, PointerAction:%{public}d, PointerId:%{public}d, "
-             "SourceType:%{public}d, ButtonId:%{public}d, "
-             "VerticalAxisValue:%{public}lf, HorizontalAxisValue:%{public}lf",
+    MMI_LOGI("MouseEvent Normalization Results, PointerAction:%{public}d,PointerId:%{public}d,"
+             "SourceType:%{public}d,ButtonId:%{public}d,"
+             "VerticalAxisValue:%{public}lf,HorizontalAxisValue:%{public}lf",
              pointerEvent->GetPointerAction(), pointerEvent->GetPointerId(), pointerEvent->GetSourceType(),
              pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
     PointerEvent::PointerItem item;
     CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item), PARAM_INPUT_FAIL, RET_ERR);
-    MMI_LOGI("MouseEvent Item Normalization Results, DownTime:%{public}d, IsPressed:%{public}d, "
-             "GlobalX:%{public}d, GlobalY:%{public}d, LocalX:%{public}d, LocalY:%{public}d, "
-             "Width:%{public}d, Height:%{public}d, Pressure:%{public}d, DeviceId:%{public}d",
+    MMI_LOGI("MouseEvent Item Normalization Results, DownTime:%{public}d,IsPressed:%{public}d,"
+             "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
+             "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,DeviceId:%{public}d",
              item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
              item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
              item.GetDeviceId());
 
     eventDispatch_.HandlePointerEvent(pointerEvent);
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 bool InputEventHandler::SendMsg(const int32_t fd, NetPacket& pkt) const
 {
+    MMI_LOGD("enter");
     CHKPF(udsServer_, OHOS::ERROR_NULL_POINTER);
+    MMI_LOGD("leave");
     return udsServer_->SendMsg(fd, pkt);
 }
 #ifdef OHOS_WESTEN_MODEL
 bool InputEventHandler::OnSystemEvent(const KeyEventValueTransformations& temp,
     const enum KEY_STATE state) const
 {
+    MMI_LOGD("enter");
     const int32_t systemEventAttr = OuterInterface::GetSystemEventAttrByHosKeyValue(temp.keyValueOfHos);
     uint16_t retCode = 0;
     switch (systemEventAttr) {
@@ -980,6 +1029,7 @@ bool InputEventHandler::OnSystemEvent(const KeyEventValueTransformations& temp,
             break;
         }
     }
+    MMI_LOGD("leave");
     return retCode;
 }
 #endif

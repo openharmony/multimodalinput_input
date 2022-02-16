@@ -14,7 +14,6 @@
  */
 
 #include "input_device_manager.h"
-#include "pointer_drawing_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -156,8 +155,8 @@ void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
     inputDevice_[nextId_] = inputDevice;
     ++nextId_;
 
-    if (IsPointerDevice(inputDevice)) {
-        DrawWgr->TellDeviceInfo(true);
+    if (IsPointerDevice(static_cast<struct libinput_device *>(inputDevice))) {
+        NotifyPointerDevice(true);
     }
     MMI_LOGD("end");
 }
@@ -175,7 +174,7 @@ void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
         if (it->second == inputDevice) {
             inputDevice_.erase(it);
             if (IsPointerDevice(inputDevice)) {
-                DrawWgr->TellDeviceInfo(false);
+                NotifyPointerDevice(false);
             }
             break;
         }
@@ -191,6 +190,26 @@ bool InputDeviceManager::IsPointerDevice(libinput_device* device)
     MMI_LOGD("leave");
     return udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK | 
     EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD);
+}
+
+void InputDeviceManager::Attach(std::shared_ptr<DeviceObserver> observer)
+{
+    MMI_LOGI("begin");
+    observers_.push_back(observer);
+}
+
+void InputDeviceManager::Detach(std::shared_ptr<DeviceObserver> observer)
+{
+    MMI_LOGI("begin");
+    observers_.remove(observer);
+}
+
+void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice)
+{
+    MMI_LOGI("observers_ size:%{public}d", static_cast<int32_t>(observers_.size()));
+    for (auto observer = observers_.begin(); observer != observers_.end(); observer++) {
+        (*observer)->UpdatePointerDevice(hasPointerDevice);
+    }
 }
 
 int32_t InputDeviceManager::FindInputDeviceId(libinput_device* inputDevice)

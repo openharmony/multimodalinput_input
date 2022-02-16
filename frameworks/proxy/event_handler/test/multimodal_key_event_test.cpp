@@ -74,7 +74,7 @@ bool MultimodalKeyEventTest::FindCommand(const std::string &log, const std::stri
             spos = command.size();
         }
     }
-    MMI_LOGD("[log]:%{public}s, [command]:%{public}s", log.c_str(), command.c_str());
+    MMI_LOGD("[log]:%{public}s,[command]:%{public}s", log.c_str(), command.c_str());
     std::regex pattern(sCmd.str());
     return std::regex_search(log, pattern);
 }
@@ -88,16 +88,16 @@ std::vector<std::string> MultimodalKeyEventTest::SearchForLog(const std::string 
 std::vector<std::string> MultimodalKeyEventTest::SearchForLog(const std::string &command,
     const std::vector<std::string> &excludes, bool noWait)
 {
-    MMI_LOGD("excludes.size():%{public}d.", excludes.size());
+    MMI_LOGD("excludes.size():%{public}d", excludes.size());
     int32_t nTries { N_TRIES_FOR_LOG };
     std::vector<std::string> results;
 
     while (true) {
         std::vector<std::string> logs;
         (void)g_runCommand.RunShellCommand(command, logs);
-        MMI_LOGD("logs.size():%{public}d.", logs.size());
+        MMI_LOGD("logs.size():%{public}d", logs.size());
         for (auto &item : logs) {
-            MMI_LOGD("[log]:%{public}s.", item.c_str());
+            MMI_LOGD("[log]:%{public}s", item.c_str());
             if (FindCommand(item, command) &&
                 (std::find(excludes.cbegin(), excludes.cend(), item) == excludes.cend())) {
                 results.push_back(item);
@@ -108,7 +108,7 @@ std::vector<std::string> MultimodalKeyEventTest::SearchForLog(const std::string 
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
     }
-    MMI_LOGD("results.size():%{public}d.", results.size());
+    MMI_LOGD("results.size():%{public}d", results.size());
     return results;
 }
 
@@ -140,7 +140,7 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_001, Test
     injectUpEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
-    MMI_LOGD("response:%{public}u ", response);
+    MMI_LOGD("response:%{public}u", response);
     std::vector<std::string> tlogs {SearchForLog(command, slogs)};
     EXPECT_TRUE(!tlogs.empty());
 }
@@ -198,9 +198,9 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_004, Test
     injectDownEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_UNKNOWN);
     injectDownEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
-    MMI_LOGD("MMIEventHdl.InjectEvent begin!");
+    MMI_LOGD("begin");
     int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
-    MMI_LOGD("MMIEventHdl.InjectEvent end, response:%{public}u", response);
+    MMI_LOGD("end, response:%{public}u", response);
     EXPECT_TRUE(response < 0);
 }
 
@@ -216,11 +216,11 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_005, Test
     injectDownEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
     if (injectDownEvent == nullptr) {
-        MMI_LOGD("injectDownEvent is nullptr!");
+        MMI_LOGD("injectDownEvent is nullptr");
     }
-    MMI_LOGD("MMIEventHdl.InjectEvent begin!");
+    MMI_LOGD("MMIEventHdl.InjectEvent begin");
     int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
-    MMI_LOGD("MMIEventHdl.InjectEvent end!");
+    MMI_LOGD("MMIEventHdl.InjectEvent end");
     EXPECT_TRUE(response);
 
     std::shared_ptr<OHOS::MMI::KeyEvent> injectUpEvent = OHOS::MMI::KeyEvent::Create();
