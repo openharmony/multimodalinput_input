@@ -101,5 +101,5 @@ void Uuid::ConvertToStdString(std::string& s) const
     uuidBuf[uuidBufMaxSize - 1] = '\0';
     s = uuidBuf;
 }
-}  // namespace MMI
-}  // namespace OHOS
+} // namespace MMI
+} // namespace OHOS

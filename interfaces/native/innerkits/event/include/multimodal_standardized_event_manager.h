@@ -107,7 +107,7 @@ protected:
     StandEventMMaps mapEvents_;
     std::set<std::string> registerEvents_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define EventManager OHOS::Singleton<OHOS::MMI::MultimodalStandardizedEventManager>::GetInstance()
 #endif // MULTIMODAL_STANDARDIZED_EVENT_MANAGER_H

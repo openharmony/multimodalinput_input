@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterHandle" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterHandle" };
 }
 struct RegisterHanldeInfo {
     sptr<MMIToken> remoteObj;
@@ -235,5 +235,5 @@ int32_t JSRegisterHandle::UnregisterAll()
     MMI_LOGI("unregister all success. register map size:%{public}d", static_cast<int32_t>(g_registerMap.size()));
     return response;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

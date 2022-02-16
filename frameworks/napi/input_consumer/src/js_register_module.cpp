@@ -109,7 +109,7 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
     subKeyNames += ",";
     keyOption->SetFinalKeyDown(isFinalKeyDown);
 
-    MMI_LOGD("IsFinalKeyDown:%{public}d, map_key:%{public}s",
+    MMI_LOGD("IsFinalKeyDown:%{public}d,map_key:%{public}s",
         (isFinalKeyDown == true?1:0), subKeyNames.c_str());
 
     int32_t finalKeyDownDuriation = GetNamedPropertyInt32(env, argv[ARGV_SECOND], "finalKeyDownDuration");
@@ -135,7 +135,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     std::vector<KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
     int32_t infoFinalKey = keyOption->GetFinalKey();
     int32_t keyEventFinalKey = keyEvent->GetKeyCode();
-    MMI_LOGD("infoFinalKey:%{public}d, keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
+    MMI_LOGD("infoFinalKey:%{public}d,keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
     if (infoFinalKey != keyEventFinalKey || items.size() > 4) {
         MMI_LOGD("%{public}d", __LINE__);
         return false;
@@ -161,7 +161,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
         }
         count++;
     }
-    MMI_LOGD("kevEventSize:%{public}d, infoSize:%{public}d", count, infoSize);
+    MMI_LOGD("kevEventSize:%{public}d,infoSize:%{public}d", count, infoSize);
     auto keyItem = keyEvent->GetKeyItem();
     CHKPF(keyItem);
     auto upTime = keyEvent->GetActionTime();
@@ -242,7 +242,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     }
 
     if (preSubscribeId < 0) {
-        MMI_LOGD("eventType:%{public}s, eventName:%{public}s", event->eventType.c_str(),  event->name.c_str());
+        MMI_LOGD("eventType:%{public}s,eventName:%{public}s", event->eventType.c_str(),  event->name.c_str());
         int32_t subscribeId = -1;
         subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubKeyEventCallback);
         if (subscribeId < 0) {

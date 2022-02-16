@@ -37,17 +37,17 @@ int32_t GetDeviceNode::GetDeviceNodeByName(const string &targetName, string &dev
     GetDeviceInfoByCmdResult(cmdResult, deviceMapData);
     auto iter = deviceMapData.find(deviceName);
     if (iter == deviceMapData.end()) {
-        MMI_LOGE("GetDeviceNodeByName faild for find deviceName:%{public}s.", deviceName.c_str());
+        MMI_LOGE("GetDeviceNodeByName faild for find deviceName:%{public}s", deviceName.c_str());
         return RET_ERR;
     }
     int32_t targetSize = static_cast<int32_t>(iter->second.size());
     if (devIndex > targetSize) {
-        MMI_LOGE("GetDeviceNodeByName faild for devIndex:%{public}d > targetSize:%{public}d.", devIndex, targetSize);
+        MMI_LOGE("GetDeviceNodeByName faild for devIndex:%{public}d > targetSize:%{public}d", devIndex, targetSize);
         return RET_ERR;
     }
     string nodeRootPath = "/dev/input/";
     deviceNode = nodeRootPath + iter->second[devIndex];
-    MMI_LOGI("GetDeviceNodeByName:%{public}s[%{public}d] --> %{public}s.", targetName.c_str(), devIndex,
+    MMI_LOGI("GetDeviceNodeByName:%{public}s[%{public}d] --> %{public}s", targetName.c_str(), devIndex,
              deviceNode.c_str());
 
     return RET_OK;

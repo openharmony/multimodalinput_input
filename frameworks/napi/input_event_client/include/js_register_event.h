@@ -208,6 +208,6 @@ private:
     napi_env env_ = nullptr;
     bool SendEvent(const std::string& name, const DeviceEvent& event) const;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // JS_REGISTER_EVENT_H

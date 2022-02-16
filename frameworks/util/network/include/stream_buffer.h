@@ -101,6 +101,6 @@ StreamBuffer &OHOS::MMI::StreamBuffer::operator>>(T &data)
     CK(Read(data), STREAM_BUF_READ_FAIL);
     return *this;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // STREAM_BUFFER_H
