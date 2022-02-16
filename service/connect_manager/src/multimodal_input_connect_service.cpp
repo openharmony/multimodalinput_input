@@ -35,10 +35,10 @@ int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programN
                                                      int &toReturnClientFd)
 {
     MMI_LOGD("enter");
-    MMI_LOGI("MultimodalInputConnectService::AllocSocketFd enter, programName: %{public}s, moduleType: %{public}d",
+    MMI_LOGI("MultimodalInputConnectService::AllocSocketFd enter, programName:%{public}s,moduleType:%{public}d",
              programName.c_str(), moduleType);
     if (udsServer_ == nullptr) {
-        MMI_LOGE("called, udsServer_ is nullptr.");
+        MMI_LOGE("called, udsServer_ is nullptr");
         return RET_ERR;
     }
     toReturnClientFd = INVALID_SOCKET_FD;
@@ -47,11 +47,11 @@ int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programN
     int32_t pid = GetCallingPid();
     const int32_t ret = udsServer_->AddSocketPairInfo(programName, moduleType, serverFd, uid, pid, toReturnClientFd);
     if (ret != RET_OK) {
-        MMI_LOGE("call AddSocketPairInfo return %{public}d.", ret);
+        MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
         return RET_ERR;
     }
 
-    MMI_LOGIK("leave, programName:%{public}s, moduleType:%{public}d, alloc success.",
+    MMI_LOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
         programName.c_str(), moduleType);
 
     return RET_OK;
@@ -78,7 +78,7 @@ void MultimodalInputConnectService::OnStart()
 {
     MMI_LOGD("enter");
     if (state_ == ServiceRunningState::STATE_RUNNING) {
-        MMI_LOGI("MultimodalInputConnectService has already started!");
+        MMI_LOGI("MultimodalInputConnectService has already started");
         return;
     }
     MMI_LOGI("MultimodalInputConnectService is starting");
@@ -88,11 +88,11 @@ void MultimodalInputConnectService::OnStart()
     }
     bool ret = Publish(DelayedSingleton<MultimodalInputConnectService>::GetInstance().get());
     if (!ret) {
-        MMI_LOGE("Failed to publish service!");
+        MMI_LOGE("Failed to publish service");
         return;
     }
     state_ = ServiceRunningState::STATE_RUNNING;
-    MMI_LOGIK("Congratulations, MultimodalInputConnectService start successfully!");
+    MMI_LOGIK("Congratulations, MultimodalInputConnectService start successfully");
     MMI_LOGD("leave");
 }
 
@@ -127,26 +127,26 @@ int32_t MultimodalInputConnectService::StubHandleAllocSocketFd(MessageParcel& da
         return RET_ERR;
     }
 
-    MMI_LOGIK("clientName = %{public}s, moduleId = %{public}d", req->data.clientName.c_str(), req->data.moduleId);
+    MMI_LOGIK("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
     if (!IsAuthorizedCalling()) {
         MMI_LOGE("permission denied");
         return RET_ERR;
     }
 
     if (udsServer_ == nullptr) {
-        MMI_LOGE("udsServer_ is nullptr.");
+        MMI_LOGE("udsServer_ is nullptr");
         return RET_ERR;
     }
 
     int clientFd = INVALID_SOCKET_FD;
     ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
     if (ret != RET_OK) {
-        MMI_LOGE("call AddSocketPairInfo return %{public}d.", ret);
+        MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
         reply.WriteInt32(RET_ERR);
         return RET_ERR;
     }
 
-    MMI_LOGI("call AllocSocketFd success.");
+    MMI_LOGI("call AllocSocketFd success");
 
     reply.WriteInt32(RET_OK);
     reply.WriteFileDescriptor(clientFd);
@@ -171,7 +171,7 @@ int32_t MultimodalInputConnectServiceSetUdsServer(IUdsServer* server)
     MMI_LOGD("enter");
     auto s = DelayedSingleton<MultimodalInputConnectService>::GetInstance();
     if (s == nullptr) {
-        MMI_LOGE("MultimodalInputConnectService not initialize.");
+        MMI_LOGE("MultimodalInputConnectService not initialize");
         return RET_ERR;
     }
 
@@ -185,7 +185,7 @@ int32_t MultimodalInputConnectServiceStart()
     MMI_LOGD("enter");
     auto s = DelayedSingleton<MultimodalInputConnectService>::GetInstance();
     if (s == nullptr) {
-        MMI_LOGE("MultimodalInputConnectService not initialize.");
+        MMI_LOGE("MultimodalInputConnectService not initialize");
         return RET_ERR;
     }
 
@@ -199,7 +199,7 @@ int32_t MultimodalInputConnectServiceStop()
     MMI_LOGD("enter");
     auto s = DelayedSingleton<MultimodalInputConnectService>::GetInstance();
     if (s == nullptr) {
-        MMI_LOGE("MultimodalInputConnectService not initialize.");
+        MMI_LOGE("MultimodalInputConnectService not initialize");
         return RET_ERR;
     }
 
