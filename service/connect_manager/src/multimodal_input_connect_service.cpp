@@ -207,5 +207,5 @@ int32_t MultimodalInputConnectServiceStop()
     MMI_LOGD("leave");
     return RET_OK;
 }
-} // namespace Security
+} // namespace MMI
 } // namespace OHOS
