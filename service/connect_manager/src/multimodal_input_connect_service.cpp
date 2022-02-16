@@ -43,8 +43,8 @@ int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programN
     }
     toReturnClientFd = INVALID_SOCKET_FD;
     int32_t serverFd = INVALID_SOCKET_FD;
-    int32_t uid = GetCallingUid();
-    int32_t pid = GetCallingPid();
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    int32_t pid = IPCSkeleton::GetCallingPi
     const int32_t ret = udsServer_->AddSocketPairInfo(programName, moduleType, serverFd, uid, pid, toReturnClientFd);
     if (ret != RET_OK) {
         MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
@@ -119,27 +119,20 @@ bool MultimodalInputConnectService::Initialize() const
 int32_t MultimodalInputConnectService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
 {
     MMI_LOGD("enter");
-    int32_t ret;
-
     sptr<ConnectDefReqParcel> req = data.ReadParcelable<ConnectDefReqParcel>();
     if (req == nullptr) {
         MMI_LOGE("read data error.");
         return RET_ERR;
     }
-
     MMI_LOGIK("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
-    if (!IsAuthorizedCalling()) {
-        MMI_LOGE("permission denied");
-        return RET_ERR;
-    }
-
+    
     if (udsServer_ == nullptr) {
         MMI_LOGE("udsServer_ is nullptr");
         return RET_ERR;
     }
 
     int32_t clientFd = INVALID_SOCKET_FD;
-    ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
+    int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
     if (ret != RET_OK) {
         MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
         reply.WriteInt32(RET_ERR);
@@ -153,8 +146,6 @@ int32_t MultimodalInputConnectService::StubHandleAllocSocketFd(MessageParcel& da
 
     MMI_LOGI("send clientFd to client, clientFd = %d", clientFd);
     close(clientFd);
-    clientFd = -1;
-    MMI_LOGI(" clientFd = %d, has closed in server", clientFd);
     MMI_LOGD("leave");
     return RET_OK;
 }
