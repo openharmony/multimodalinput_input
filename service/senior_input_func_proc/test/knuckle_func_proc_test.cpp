@@ -31,7 +31,7 @@ using namespace OHOS::MMI;
     HWTEST_F(KnuckleFuncProcTest, Test_DeviceEventDispatchProcess_001, TestSize.Level1)
     {
         KnuckleFuncProc knuckleServer;
-        constexpr RawInputEvent event = { 0, 0, 0, 0 };
+        const RawInputEvent event = { 0, 0, 0, 0 };
         int32_t retResult = knuckleServer.DeviceEventDispatchProcess(event);
         EXPECT_TRUE(retResult == RET_ERR);
     }
@@ -55,7 +55,7 @@ using namespace OHOS::MMI;
     HWTEST_F(KnuckleFuncProcTest, Test_CheckEventCode_002, TestSize.Level1)
     {
         KnuckleFuncProc knuckleServer;
-        constexpr RawInputEvent event = { 0, 0, 0, 0 };
+        const RawInputEvent event = { 0, 0, 0, 0 };
         int32_t retResult = knuckleServer.CheckEventCode(event);
         EXPECT_TRUE(retResult == RET_ERR);
     }
