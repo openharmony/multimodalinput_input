@@ -533,7 +533,7 @@ void OHOS::MMI::InputWindowsManager::UpdateDisplayInfo(const std::vector<Physica
         }
     }
     if (!logicalDisplays.empty()) {
-        DrawWgr->TellDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
+        PointerDrawMgr->TellDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
     }
     PrintDisplayDebugInfo();
     MMI_LOGD("InputWindowsManager::UpdateDisplayInfo leave");
@@ -842,7 +842,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
     FixCursorPosition(globalX, globalY, IMAGE_SIZE, IMAGE_SIZE);
-    DrawWgr->DrawPointer(displayId, globalX, globalY);
+    PointerDrawMgr->DrawPointer(displayId, globalX, globalY);
     WindowInfo *focusWindow = nullptr;
     int32_t action = pointerEvent->GetPointerAction();
     if ((firstBtnDownWindow_.pid == 0)
