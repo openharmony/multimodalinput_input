@@ -73,7 +73,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
     std::shared_ptr<IInputEventConsumer> monitor)
 {
     std::lock_guard<std::mutex> guard(lockHandlers_);
-    InputHandlerManager::InputHandler handler {
+    InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,
         .handlerType_ = handlerType,
         .consumer_ = monitor
@@ -159,8 +159,8 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
         std::string touchEventString = "touchEventFilter";
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, touchId);
     }
-    std::map<int32_t, InputHandler>::iterator tItr;
-    std::map<int32_t, InputHandler>::iterator tItrEnd;
+    std::map<int32_t, Handler>::iterator tItr;
+    std::map<int32_t, Handler>::iterator tItrEnd;
     {
         std::lock_guard<std::mutex> guard(lockHandlers_);
         tItr = inputHandlers_.find(handlerId);
