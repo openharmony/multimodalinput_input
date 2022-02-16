@@ -29,6 +29,9 @@ extern "C" {
 #include <libinput-seat-export.h>
 }
 #else
+namespace OHOS {
+namespace MMI {
+
 struct SurfaceInfo {
     int surfaceId;
     int dstX;
@@ -95,20 +98,12 @@ void SetScreenListener(const ScreenInfoChangeListener listener);
 
 struct multimodal_libinput_event;
 typedef void (*LibInputEventListener)(multimodal_libinput_event *event);
-namespace OHOS {
-namespace MMI {
 void SetLibInputEventListener(const LibInputEventListener listener);
-}
-}
 #endif
 
 struct MMISurfaceInfo : public SurfaceInfo {
     int32_t screenId;
 };
-
-namespace OHOS {
-namespace MMI {
-
 struct MouseLocation {
     int32_t globleX;
     int32_t globleY;
