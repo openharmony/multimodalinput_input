@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
             LOG_CORE, MMI_LOG_DOMAIN, "MultimodalStandardizedEventManager"
         };
     }
@@ -773,5 +773,5 @@ bool MultimodalStandardizedEventManager::MakeRegisterHandle(MmiMessageId typeId,
     }
     return true;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
