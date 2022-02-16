@@ -101,4 +101,4 @@ std::string MmiPoint::ToString() const
         + ", py = " + std::to_string(py_)
         + ", pz = " + std::to_string(pz_) + "}";
 }
-}
+} // namespace OHOS

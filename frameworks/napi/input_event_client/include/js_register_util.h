@@ -32,7 +32,7 @@ std::string GetNamedPropertyString(const napi_env& env, const napi_value& object
 int32_t GetNamedPropertyInt32(const napi_env& env, const napi_value& object, const std::string& name);
 int64_t GetNamedPropertyInt64(const napi_env& env, const napi_value& object, const std::string& name);
 uint32_t GetNamedPropertyUint32(const napi_env& env, const napi_value& object, const std::string& name);
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif // JS_REGISTER_UTIL_H
