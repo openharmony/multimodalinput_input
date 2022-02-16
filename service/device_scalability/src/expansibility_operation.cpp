@@ -37,23 +37,26 @@ ExpansibilityOperation::~ExpansibilityOperation()
 
 std::string ExpansibilityOperation::GetFileName(const std::string& line)
 {
+    MMI_LOGD("enter");
     std::istringstream stream(line);
     std::string deviceName;
     std::string fileName;
     stream >> deviceName;
     stream >> fileName;
 
+    MMI_LOGD("leave");
     return fileName;
 }
 
 int32_t ExpansibilityOperation::GetNewDeviceFd(const std::string& fileName)
 {
     // load dyn file
+    MMI_LOGD("enter");
     std::string filePath;
     filePath.append(libPath_).append(fileName);
     void *libmHandle = dlopen(filePath.c_str(), RTLD_LAZY);
     if (libmHandle == nullptr) {
-        MMI_LOGE("Open Error:%{public}s.", dlerror());
+        MMI_LOGE("Open Error:%{public}s", dlerror());
         return -1;
     }
 
@@ -62,7 +65,7 @@ int32_t ExpansibilityOperation::GetNewDeviceFd(const std::string& fileName)
     initDeviceInfo = reinterpret_cast<int32_t(*)()>(dlsym(libmHandle, "initDeviceInfo"));
     char *errorInfo = dlerror();
     if (errorInfo != nullptr) {
-        MMI_LOGE("Dlsym Error:%{public}s.", errorInfo);
+        MMI_LOGE("Dlsym Error:%{public}s", errorInfo);
         dlclose(libmHandle);
         return -1;
     }
@@ -77,17 +80,19 @@ int32_t ExpansibilityOperation::GetNewDeviceFd(const std::string& fileName)
 
     // close file
     dlclose(libmHandle);
+    MMI_LOGD("leave");
     return deviceEventFd;
 }
 
 void ExpansibilityOperation::LoadExteralLibrary(const std::string& cfg, const std::string& libPath)
 {
+    MMI_LOGD("enter");
     CHK(cfg.length() > 1, PARAM_INPUT_INVALID);
     CHK(libPath.length() > 1, PARAM_INPUT_INVALID);
     libPath_ = libPath;
     std::ifstream labels(cfg.c_str());
     if (!labels.is_open()) {
-        MMI_LOGE("Can't open the label file![%{public}s], errCode:%{public}d", cfg.c_str(), FILE_OPEN_FAIL);
+        MMI_LOGE("Can't open the label file. cfg.c_str():%{public}s,errCode:%{public}d", cfg.c_str(), FILE_OPEN_FAIL);
         return;
     }
 
@@ -102,17 +107,20 @@ void ExpansibilityOperation::LoadExteralLibrary(const std::string& cfg, const st
         int32_t deviceEventFd = GetNewDeviceFd(fileName);
         // regist new fd
         if (!RegistDeviceEventFd(deviceEventFd)) {
-            MMI_LOGE("regist new device failed. file name:%{public}s, errCode:%{public}d",
+            MMI_LOGE("regist new device failed. file name:%{public}s,errCode:%{public}d",
                      fileName.c_str(), DEV_REG_FAIL);
             return;
         }
     }
+    MMI_LOGD("leave");
     return;
 }
 
 bool ExpansibilityOperation::RegistDeviceEventFd(int32_t deviceEventFd)
 {
-    MMI_LOGD("The New Device fd:%{public}d", deviceEventFd);
+    MMI_LOGD("enter");
+    MMI_LOGD("The New Device fd:[%{public}d]", deviceEventFd);
+    MMI_LOGD("leave");
     return true;
 }
 

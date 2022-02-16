@@ -46,7 +46,7 @@ public:
         TestMMIClient clientObj;
         NetPacket netPacket(MmiMessageId::ON_TOUCH);
         netPacket << msgId;
-        const unsigned int bitLength = 2;
+        const uint32_t bitLength = 2;
 
         if (msgId == INPUT_DEVICE_CAP_POINTER) {
             netPacket << bitLength;
@@ -58,7 +58,7 @@ public:
         TestMMIClient clientObj;
         NetPacket netPacket(MmiMessageId::ON_TOUCH);
         netPacket << msgId << curReventType;
-        const unsigned int bitLength = 2;
+        const uint32_t bitLength = 2;
 
         if (msgId == INPUT_DEVICE_CAP_POINTER) {
             netPacket << bitLength;

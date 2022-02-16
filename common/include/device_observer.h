@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,19 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef I_UDS_SERVER_H
-#define I_UDS_SERVER_H
-
-#include "iremote_broker.h"
+#ifndef DEVICE_OBSERVER_H
+#define DEVICE_OBSERVER_H
 
 namespace OHOS {
 namespace MMI {
-class IUdsServer : public RefBase {
+class DeviceObserver {
 public:
-    virtual int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, int32_t& serverFd,
-                                      const int32_t uid, const int32_t pid, int32_t& toReturnClientFd) = 0;
+    virtual void UpdatePointerDevice(bool) = 0;
 };
-} // namespace MMI
-} // namespace OHOS
 
-#endif // I_UDS_SERVER_H
+class Subject {
+public:
+    virtual void Attach(std::shared_ptr<DeviceObserver> observer) = 0;
+    virtual void Detach(std::shared_ptr<DeviceObserver> observer) = 0;
+    virtual void NotifyPointerDevice(bool) = 0;
+};
+}
+}
+#endif
