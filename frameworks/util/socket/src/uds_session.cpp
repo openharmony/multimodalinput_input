@@ -50,8 +50,8 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
     ssize_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
     if (ret < 0) {
         const int errNoSaved = errno;
-        MMI_LOGE("UDSSession::SendMsg write return %{public}zd, "
-                 "fd_:%{public}d, errNoSaved:%{public}d, strerror:%{public}s",
+        MMI_LOGE("UDSSession::SendMsg write return %{public}zd,"
+                 "fd_:%{public}d,errNoSaved:%{public}d,strerror:%{public}s",
                  ret, fd_, errNoSaved, strerror(errNoSaved));
         return false;
     }
@@ -60,7 +60,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 
 void UDSSession::Close()
 {
-    MMI_LOGT("enter fd_:%{public}d, bHasClosed_ = %d.", fd_, bHasClosed_);
+    MMI_LOGT("enter fd_:%{public}d,bHasClosed_ = %d.", fd_, bHasClosed_);
     if (!bHasClosed_ && fd_ != -1) {
         close(fd_);
         bHasClosed_ = true;
@@ -105,7 +105,7 @@ void UDSSession::DelEvents(int32_t id)
         ++count;
         if (item.id == id) {
             events_.erase(events_.begin(), events_.begin() + count);
-            MMI_LOGI("Delete events.");
+            MMI_LOGI("Delete events");
         }
     }
     MMI_LOGI("end");
