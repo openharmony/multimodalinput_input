@@ -151,13 +151,13 @@ int32_t JsInputMonitor::IsMatch(napi_env jsEnv, napi_value receiver)
 {
     CHKPR(receiver, ERROR_NULL_POINTER);
     if (jsEnv_ == jsEnv) {
-        bool isEquals = false;
         napi_value handlerTemp = nullptr;
         auto status = napi_get_reference_value(jsEnv_, receiver_, &handlerTemp);
         if (status != napi_ok) {
             MMI_LOGE("napi_get_reference_value is failed");
             return NAPI_ERR;
         }
+        bool isEquals = false;
         status = napi_strict_equals(jsEnv_, handlerTemp, receiver, &isEquals);
         if (status != napi_ok) {
             MMI_LOGE("napi_strict_equals is failed");
@@ -221,7 +221,6 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
         return RET_ERR;
     }
 
-    int32_t currentPointerId = pointerEvent->GetPointerId();
     std::vector<PointerEvent::PointerItem> pointerItems;
     for (auto &item : pointerEvent->GetPointersIdList()) {
         PointerEvent::PointerItem pointerItem;
@@ -231,6 +230,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
     uint32_t index = 0;
     int32_t touchArea = 0;
     napi_value currentPointer = nullptr;
+    int32_t currentPointerId = pointerEvent->GetPointerId();
     for (auto &it : pointerItems) {
         napi_value element = nullptr;
         status = napi_create_object(jsEnv_, &element);
@@ -390,8 +390,8 @@ void JsInputMonitor::OnPointerEventInJsThread()
             break;
         }
         auto pointerEvent = evQueue_.front();
-        evQueue_.pop();
         CHKPC(pointerEvent);
+        evQueue_.pop();
         auto status = napi_open_handle_scope(jsEnv_, &scope);
         if (status != napi_ok) {
             break;

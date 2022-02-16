@@ -32,7 +32,7 @@ const uint32_t ARGV_FIRST = 0;
 const uint32_t ARGV_SECOND = 1;
 const uint32_t ARGV_THIRD = 2;
 const uint32_t PRE_KEYS_SIZE = 4;
-Callbacks callbacks = {};
+static Callbacks callbacks = {};
 
 int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
     std::shared_ptr<KeyOption> keyOption)
@@ -113,10 +113,6 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
         (isFinalKeyDown == true?1:0), subKeyNames.c_str());
 
     int32_t finalKeyDownDuriation = GetNamedPropertyInt32(env, argv[ARGV_SECOND], "finalKeyDownDuration");
-    if (napi_get_value_int32(env, receiceValue, &finalKeyDownDuriation) != napi_ok) {
-        napi_throw_error(env, nullptr, "FinalKeyDownDuriation get value failed");
-        return ERROR_CODE;
-    }
     subKeyNames += std::to_string(finalKeyDownDuriation);
     keyOption->SetFinalKeyDownDuration(finalKeyDownDuriation);
     event->eventType = subKeyNames;
@@ -220,7 +216,7 @@ bool CheckPara(const std::shared_ptr<KeyOption> keyOption)
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     MMI_LOGD("enter");
-    KeyEventMonitorInfo *event = new KeyEventMonitorInfo {
+    KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
         .env = env,
         .asyncWork = nullptr,
     };
@@ -240,7 +236,6 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         MMI_LOGE("AddEventCallback failed");
         return nullptr;
     }
-
     if (preSubscribeId < 0) {
         MMI_LOGD("eventType:%{public}s,eventName:%{public}s", event->eventType.c_str(),  event->name.c_str());
         int32_t subscribeId = -1;
@@ -262,11 +257,11 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     MMI_LOGD("enter");
-    KeyEventMonitorInfo *event = new KeyEventMonitorInfo {
+    KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
         .env = env,
         .asyncWork = nullptr,
     };
-    auto keyOption = std::shared_ptr<KeyOption>(new KeyOption());
+    auto keyOption = std::make_shared<KeyOption>();
     if (GetEventInfo(env, info, event, keyOption) < 0) {
         MMI_LOGE("GetEventInfo failed");
         return nullptr;
@@ -279,7 +274,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         return nullptr;
     }
     MMI_LOGD("SubscribeId:%{public}d", subscribeId);
-    if (subscribeId > 0) {
+    if (subscribeId >= 0) {
         InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
     }
     event->status = 0;

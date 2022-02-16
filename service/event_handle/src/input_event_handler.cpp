@@ -288,9 +288,10 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
 {
     MMI_LOGD("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
+#ifndef OHOS_WESTEN_MODEL
     auto device = libinput_event_get_device(ev.event);
     InputDevMgr->OnInputDeviceAdded(device);
-
+#else
     uint64_t sysStartProcessTime = GetSysClockTime();
     DeviceManage deviceManage = {};
 
@@ -319,6 +320,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
         MMI_LOGE("Sending structure of DeviceManage failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
+#endif
     MMI_LOGD("leave");
     return RET_OK;
 }
@@ -327,9 +329,10 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
 {
     MMI_LOGD("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
+#ifndef OHOS_WESTEN_MODEL
     auto device = libinput_event_get_device(ev.event);
     InputDevMgr->OnInputDeviceRemoved(device);
-
+#else
     uint64_t sysStartProcessTime = GetSysClockTime();
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     DeviceManage deviceManage = {};
@@ -357,6 +360,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
         MMI_LOGE("Sending structure of DeviceManage failed, errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
+#endif
     MMI_LOGD("leave");
     return RET_OK;
 }
