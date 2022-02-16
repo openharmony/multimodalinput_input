@@ -131,8 +131,10 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
         MMI_LOGE("CClientMsgHandler::OnMsgHandler Msg handling failed. id:%{public}d,  ret:%{public}d", id, ret);
         return;
     }
+#ifdef OHOS_WESTEN_MODEL
     uint64_t endTime = GetSysClockTime();
     ((MMIClient *)&client)->ReplyMessageToServer(pkt.GetMsgId(), clientTime, endTime);
+#endif
 }
 
 int32_t ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)
