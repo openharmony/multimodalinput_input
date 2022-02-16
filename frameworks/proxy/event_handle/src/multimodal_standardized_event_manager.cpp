@@ -627,55 +627,55 @@ int32_t MultimodalStandardizedEventManager::InjectionVirtual(bool isPressed, int
     return SendMsg(ckv);
 }
 
-int32_t MultimodalStandardizedEventManager::InjectEvent(const OHOS::KeyEvent& keyEvent)
+int32_t MultimodalStandardizedEventManager::InjectEvent(const OHOS::KeyEvent& key)
 {
     VirtualKey virtualevent;
-    if (keyEvent.GetKeyDownDuration() < 0) {
+    if (key.GetKeyDownDuration() < 0) {
         MMI_LOGE("keyDownDuration is invalid");
         return false;
     }
-    if (keyEvent.GetKeyCode() < 0) {
+    if (key.GetKeyCode() < 0) {
         MMI_LOGE("keyCode is invalid");
         return false;
     }
-    virtualevent.isPressed = keyEvent.IsKeyDown();
-    virtualevent.keyCode = keyEvent.GetKeyCode();
-    virtualevent.keyDownDuration = keyEvent.GetKeyDownDuration();
-    virtualevent.isIntercepted = keyEvent.IsIntercepted();
-    OHOS::MMI::NetPacket ckv(MmiMessageId::INJECT_KEY_EVENT);
+    virtualevent.isPressed = key.IsKeyDown();
+    virtualevent.keyCode = key.GetKeyCode();
+    virtualevent.keyDownDuration = key.GetKeyDownDuration();
+    virtualevent.isIntercepted = key.IsIntercepted();
+    NetPacket ckv(MmiMessageId::INJECT_KEY_EVENT);
     ckv << virtualevent;
     return SendMsg(ckv);
 }
 
-int32_t MultimodalStandardizedEventManager::InjectEvent(const OHOS::MMI::KeyEvent& keyEvent)
+int32_t MultimodalStandardizedEventManager::InjectEvent(const KeyEvent& key)
 {
     VirtualKey virtualevent;
-    if (keyEvent.GetKeyCode() < 0) {
+    if (key.GetKeyCode() < 0) {
         MMI_LOGE("keyCode is invalid");
             return false;
     }
-    virtualevent.isPressed = (keyEvent.GetKeyAction() == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
-    virtualevent.keyCode = keyEvent.GetKeyCode();
+    virtualevent.isPressed = (key.GetKeyAction() == KeyEvent::KEY_ACTION_DOWN);
+    virtualevent.keyCode = key.GetKeyCode();
     virtualevent.keyDownDuration = 0;
     virtualevent.isIntercepted = false;
-    OHOS::MMI::NetPacket ckv(MmiMessageId::INJECT_KEY_EVENT);
+    NetPacket ckv(MmiMessageId::INJECT_KEY_EVENT);
     ckv << virtualevent;
     return SendMsg(ckv);
 }
 
-int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr)
+int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> key)
 {
     MMI_LOGD("InjectEvent begin");
-    CHKPR(keyEventPtr, ERROR_NULL_POINTER);
-    keyEventPtr->UpdateId();
-    if (keyEventPtr->GetKeyCode() < 0) {
-        MMI_LOGE("keyCode is invalid %{public}u", keyEventPtr->GetKeyCode());
+    CHKR(key, ERROR_NULL_POINTER, RET_ERR);
+    key->UpdateId();
+    if (key->GetKeyCode() < 0) {
+        MMI_LOGE("keyCode is invalid:%{public}u", key->GetKeyCode());
         return RET_ERR;
     }
-    OHOS::MMI::NetPacket ckv(MmiMessageId::NEW_INJECT_KEY_EVENT);
-    int32_t errCode = OHOS::MMI::InputEventDataTransformation::KeyEventToNetPacket(keyEventPtr, ckv);
+    NetPacket ckv(MmiMessageId::NEW_INJECT_KEY_EVENT);
+    int32_t errCode = InputEventDataTransformation::KeyEventToNetPacket(key, ckv);
     if (errCode != RET_OK) {
-        MMI_LOGE("Serialization is Failed! %{public}u", errCode);
+        MMI_LOGE("Serialization is Failed，errCode:%{public}u", errCode);
         return RET_ERR;
     }
     return SendMsg(ckv);

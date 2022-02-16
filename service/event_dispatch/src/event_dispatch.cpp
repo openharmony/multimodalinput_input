@@ -712,6 +712,13 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
 {
     CHKPR(key, PARAM_INPUT_INVALID);
     MMI_LOGD("DispatchKeyEventByPid begin");
+    if (key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
+        if (InterceptorMgrGbl.OnKeyEvent(key)) {
+            MMI_LOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
+                key->GetKeyCode());
+            return RET_OK;
+        }
+    }
     if (AbilityMgr->CheckLaunchAbility(key)) {
         MMI_LOGD("The keyEvent start launch an ability, keyCode:%{public}d", key->GetKeyCode());
         int32_t checkLaunchAbility = 1;
