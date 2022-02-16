@@ -299,9 +299,7 @@ int32_t InjectionEventDispatch::OnAisensorEach()
     rawEvent.stamp = static_cast<uint32_t>(time.tv_usec);
     NetPacket cktAi(MmiMessageId::SENIOR_INPUT_FUNC);
     cktAi << msgType << rawEvent;
-    if (SendMsg(cktAi)) {
-        return RET_OK;
-    } else {
+    if (!SendMsg(cktAi)) {
         MMI_LOGE("Send AI Msg fail! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
@@ -342,9 +340,7 @@ int32_t InjectionEventDispatch::OnKnuckleEach()
     rawEvent.stamp = static_cast<uint32_t>(time.tv_usec);
     NetPacket cktKnuckle(MmiMessageId::SENIOR_INPUT_FUNC);
     cktKnuckle << msgType << rawEvent;
-    if (SendMsg(cktKnuckle)) {
-        return RET_OK;
-    } else {
+    if (!SendMsg(cktKnuckle)) {
         MMI_LOGE("Send AI Msg fail! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
