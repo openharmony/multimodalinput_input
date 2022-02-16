@@ -53,7 +53,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
 
 bool MultimodalInputConnectStub::IsAuthorizedCalling() const
 {
-    int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
     MMI_LOGIK("Calling uid:%{public}d", callingUid);
     return true;
 }
