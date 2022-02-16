@@ -226,7 +226,7 @@ int OHOS::MMI::HdfEventManager::GetDeviceCount()
         MMI_LOGE("call memset_s fail. ret = %d", ret);
     }
     if (inputInterface_ != nullptr || inputInterface_->iInputManager != nullptr) {
-        int32_t ret = inputInterface_->iInputManager->ScanInputDevice(mountDevIndex_, MAX_INPUT_DEVICE_COUNT);
+        int32_t ret = inputInterface_->iInputManager->ScanInputDevice(MAX_INPUT_DEVICE_COUNT, mountDevIndex_);
         if (ret) {
             MMI_LOGE("%{public}s:%{public}d Error:ScanInputDevice failed", __func__, __LINE__);
             return 0;
@@ -240,8 +240,8 @@ int OHOS::MMI::HdfEventManager::GetDeviceCount()
     }
     int jectcount = 0;
     if (injectInterface_ != nullptr || injectInterface_->iInputManager != nullptr) {
-        int32_t ret = injectInterface_->iInputManager->ScanInputDevice(&mountDevIndex_[devcount],
-                                                                       MAX_INPUT_DEVICE_COUNT);
+        int32_t ret = injectInterface_->iInputManager->ScanInputDevice(MAX_INPUT_DEVICE_COUNT,
+                                                                       &mountDevIndex_[devcount]);
         if (ret) {
             MMI_LOGE("%{public}s:%{public}d Error:injectInterface_ ScanInputDevice failed",
                 __func__, __LINE__);
