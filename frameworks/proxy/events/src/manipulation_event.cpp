@@ -21,7 +21,7 @@
 namespace OHOS {
     namespace {
         using namespace OHOS::MMI;
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ManipulationEvent" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ManipulationEvent" };
     }
 
 ManipulationEvent::~ManipulationEvent() {};
@@ -133,4 +133,4 @@ const fingerInfos* ManipulationEvent::GetFingersInfos() const
 {
     return mfingersInfos_;
 }
-}
+} // namespace OHOS

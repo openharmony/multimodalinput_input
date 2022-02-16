@@ -36,4 +36,4 @@ float RotationEvent::GetRotationValue() const
 {
     return mRotationValue_;
 }
-}
+} // namespace OHOS
