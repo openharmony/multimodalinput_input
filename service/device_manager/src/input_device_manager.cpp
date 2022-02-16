@@ -60,7 +60,7 @@ void InputDeviceManager::FindInputDeviceByIdAsync(int32_t deviceId,
 {
     MMI_LOGD("enter");
     MMIMsgPost.RunOnWestonThread([this, deviceId, callback](weston_compositor* wc) {
-        auto device = FindInputDeviceByIdSync(wc, deviceId);
+        auto device = FindInputDeviceByIdSync(deviceId, wc);
         callback(device);
     });
     MMI_LOGD("leave");
@@ -78,7 +78,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIdsSync(weston_compositor
     return ids;
 }
 
-std::shared_ptr<InputDevice> InputDeviceManager::FindInputDeviceByIdSync(weston_compositor* wc, int32_t deviceId)
+std::shared_ptr<InputDevice> InputDeviceManager::FindInputDeviceByIdSync(int32_t deviceId, weston_compositor* wc)
 {
     MMI_LOGD("begin");
     Init(wc);

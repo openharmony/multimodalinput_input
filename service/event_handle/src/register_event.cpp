@@ -487,7 +487,7 @@ int32_t RegisterEvent::OnEventTouchUpGetSign(const EventTouch& touch, MmiMessage
     TouchInfo touchUpInfo = {};
     auto iter = touchInfos_.find(std::make_pair(touch.deviceId, touch.seatSlot));
     if (iter == touchInfos_.end()) {
-        MMI_LOGE("Failed to find touch event.");
+        MMI_LOGE("Failed to find touch event");
         return RET_ERR;
     }
     touchUpInfo = iter->second;
@@ -559,7 +559,7 @@ void RegisterEvent::GetTouchInfo(const std::pair<uint32_t, int32_t> key, EventTo
     MMI_LOGD("leave");
 }
 
-void RegisterEvent::GetTouchIds(std::vector<std::pair<uint32_t, int32_t>>& touchIds, const uint32_t deviceId)
+void RegisterEvent::GetTouchIds(const uint32_t deviceId, std::vector<std::pair<uint32_t, int32_t>>& touchIds)
 {
     MMI_LOGD("enter");
     auto iter = touchInfos_.begin();

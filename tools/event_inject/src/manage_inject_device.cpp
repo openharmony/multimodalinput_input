@@ -26,9 +26,9 @@ namespace {
 
 int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
 {
-    MMI_LOGI("Enter TransformJsonData function.");
+    MMI_LOGI("Enter TransformJsonData function");
     if (configData.empty()) {
-        MMI_LOGE("input data from json file is empty.");
+        MMI_LOGE("input data from json file is empty");
         return RET_ERR;
     }
     int ret = RET_ERR;
@@ -63,7 +63,7 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
         delete devicePtr_;
         devicePtr_ = nullptr;
     }
-    MMI_LOGI("Leave TransformJsonData function.");
+    MMI_LOGI("Leave TransformJsonData function");
 
     return ret;
 }
@@ -85,15 +85,15 @@ int32_t ManageInjectDevice::SendEventToHdi(const InputEventArray& inputEventArra
 
 int32_t ManageInjectDevice::SendEventToDeviveNode(const InputEventArray& inputEventArray)
 {
-    MMI_LOGI("Enter sendEventToDeviveNode function.");
+    MMI_LOGI("Enter sendEventToDeviveNode function");
     string deviceNode = inputEventArray.target;
     if (deviceNode.empty()) {
-        MMI_LOGE("device node:%{public}s is not exit.", deviceNode.c_str());
+        MMI_LOGE("device node:%{public}s is not exit", deviceNode.c_str());
         return RET_ERR;
     }
     int32_t fd = open(deviceNode.c_str(), O_RDWR);
     if (fd < 0) {
-        MMI_LOGE("open device node:%{public}s faild.", deviceNode.c_str());
+        MMI_LOGE("open device node:%{public}s faild", deviceNode.c_str());
         return RET_ERR;
     }
     for (const auto &item : inputEventArray.events) {
@@ -104,6 +104,6 @@ int32_t ManageInjectDevice::SendEventToDeviveNode(const InputEventArray& inputEv
     if (fd > 0) {
         close(fd);
     }
-    MMI_LOGI("Leave sendEventToDeviveNode function.");
+    MMI_LOGI("Leave sendEventToDeviveNode function");
     return RET_OK;
 }

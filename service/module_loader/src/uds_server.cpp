@@ -25,10 +25,12 @@
 #include "util.h"
 #include "util_ex.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "UDSServer"};
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "UDSServer"};
     }
+}
 }
 
 OHOS::MMI::UDSServer::UDSServer()
@@ -65,7 +67,7 @@ int32_t OHOS::MMI::UDSServer::GetFdByPid(int32_t pid)
     std::lock_guard<std::mutex> lock(mux_);
     auto it = idxPidMap_.find(pid);
     if (it == idxPidMap_.end()) {
-        MMI_LOGE("find fd error, Invalid input parameter pid:%{public}d, errCode:%{public}d",
+        MMI_LOGE("find fd error, Invalid input parameter pid:%{public}d,errCode:%{public}d",
             pid, SESSION_NOT_FOUND);
         return RET_ERR;
     }
@@ -77,7 +79,7 @@ int32_t OHOS::MMI::UDSServer::GetPidByFd(int32_t fd)
     std::lock_guard<std::mutex> lock(mux_);
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
-        MMI_LOGE("find pid error, Invalid input parameter fd:%{public}d, errCode:%{public}d",
+        MMI_LOGE("find pid error, Invalid input parameter fd:%{public}d,errCode:%{public}d",
             fd, SESSION_NOT_FOUND);
         return RET_ERR;
     }
@@ -90,7 +92,7 @@ bool OHOS::MMI::UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
     CHKF(fd >= 0, PARAM_INPUT_INVALID);
     auto ses = GetSession(fd);
     if (!ses) {
-        MMI_LOGE("SendMsg fd:%{public}d not found, The message was discarded! errCode:%{public}d",
+        MMI_LOGE("SendMsg fd:%{public}d not found, The message was discarded. errCode:%{public}d",
                  fd, SESSION_NOT_FOUND);
         return false;
     }
@@ -116,14 +118,14 @@ bool  OHOS::MMI::UDSServer::ClearDeadSessionInMap(const int serverFd, const int 
 {
     auto it = sessionsMap_.find(serverFd);
     if (it != sessionsMap_.end()) {
-        MMI_LOGE("The session(fd1: %{public}d) on the server side will be closed because it had in map."
+        MMI_LOGE("The session(fd1:%{public}d) on the server side will be closed because it had in map"
             "errCode:%{public}d", serverFd, SESSION_NOT_FOUND);
         DelSession(serverFd);
     }
 
     it = sessionsMap_.find(clientFd);
     if (it != sessionsMap_.end()) {
-        MMI_LOGE("The session(fd2:%{public}d) on the server side will be closed because it had in map."
+        MMI_LOGE("The session(fd2:%{public}d) on the server side will be closed because it had in map"
             "errCode:%{public}d", clientFd, SESSION_NOT_FOUND);
         DelSession(clientFd);
     }
@@ -131,7 +133,7 @@ bool  OHOS::MMI::UDSServer::ClearDeadSessionInMap(const int serverFd, const int 
 }
 
 int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, const int moduleType, int& serverFd,
-                                                int& toReturnClientFd, const int32_t uid, const int32_t pid)
+                                                const int32_t uid, const int32_t pid, int& toReturnClientFd)
 {
     std::lock_guard<std::mutex> lock(mux_);
     MMI_LOGT("enter.");
@@ -140,7 +142,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
 
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockFds) != 0) {
         const int savedErrNo = errno;
-        MMI_LOGE("call socketpair fail, errno: %{public}d, msg: %{public}s!", savedErrNo, strerror(savedErrNo));
+        MMI_LOGE("call socketpair fail, errno:%{public}d,msg:%{public}s", savedErrNo, strerror(savedErrNo));
         return RET_ERR;
     }
 
@@ -148,7 +150,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
     toReturnClientFd = sockFds[1]; // fcntl(sockFds[1], F_DUPFD_CLOEXEC, 0);
     if (toReturnClientFd < 0) {
         const int savedErrNo = errno;
-        MMI_LOGE("call fcntl fail, errno: %{public}d, msg: %{public}s!", savedErrNo, strerror(savedErrNo));
+        MMI_LOGE("call fcntl fail, errno:%{public}d,msg:%{public}s", savedErrNo, strerror(savedErrNo));
         return RET_ERR;
     }
 
@@ -159,7 +161,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
     setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
     SetBlockMode(serverFd); // 设置非阻塞模式
 
-    MMI_LOGD("alloc socketpair, serverFd = %{public}d, clientFd = %{public}d(%{public}d).",
+    MMI_LOGD("alloc socketpair, serverFd:%{public}d,clientFd:%{public}d(%{public}d)",
              serverFd, toReturnClientFd, sockFds[1]);
     auto closeSocketFdWhenError = [&serverFd, &toReturnClientFd] {
         close(serverFd);
@@ -179,7 +181,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
 
     if (!ClearDeadSessionInMap(serverFd, toReturnClientFd)) {
         cleanTaskWhenError();
-        MMI_LOGE("IsSocketFdNotUsed error! errCode:%{public}d", CLEAR_DEAD_SESSION_FAIL);
+        MMI_LOGE("IsSocketFdNotUsed error, errCode:%{public}d", CLEAR_DEAD_SESSION_FAIL);
         return RET_ERR;
     }
 
@@ -194,14 +196,14 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
 #endif
     if (ret != RET_OK) {
         cleanTaskWhenError();
-        MMI_LOGE("epoll_ctl EPOLL_CTL_ADD return %{public}d, errCode:%{public}d", ret, EPOLL_MODIFY_FAIL);
+        MMI_LOGE("epoll_ctl EPOLL_CTL_ADD return %{public}d,errCode:%{public}d", ret, EPOLL_MODIFY_FAIL);
         return ret;
     }
 
     SessionPtr sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
     if (sess == nullptr) {
         cleanTaskWhenError();
-        MMI_LOGE("make_shared fail. progName:%{public}s, pid:%{public}d, errCode:%{public}d",
+        MMI_LOGE("make_shared fail. progName:%{public}s,pid:%{public}d,errCode:%{public}d",
             programName.c_str(), pid, MAKE_SHARED_FAIL);
         return RET_ERR;
     }
@@ -303,7 +305,7 @@ void OHOS::MMI::UDSServer::OnEvent(const epoll_event& ev, std::map<int32_t, Stre
     CHK(maxCount > 0, VAL_NOT_EXP);
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGD("UDSServer::OnEvent fd:%{public}d, ev.events:0x%{public}x", fd, ev.events);
+        MMI_LOGD("UDSServer::OnEvent fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
         auto secPtr = GetSession(fd);
         if (secPtr) {
             OnDisconnected(secPtr);
@@ -337,7 +339,7 @@ void OHOS::MMI::UDSServer::OnEvent(const epoll_event& ev, std::map<int32_t, Stre
     }
 }
 
-void OHOS::MMI::UDSServer::OnEpollEvent(epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
+void OHOS::MMI::UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, epoll_event& ev)
 {
     const int32_t maxCount = static_cast<int32_t>(MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE) + 1;
     CHK(maxCount > 0, VAL_NOT_EXP);
@@ -345,7 +347,7 @@ void OHOS::MMI::UDSServer::OnEpollEvent(epoll_event& ev, std::map<int32_t, Strea
     auto fd = *static_cast<int32_t*>(ev.data.ptr);
     CHK(fd >= 0, INVALID_PARAM);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGD("OnEpollEvent EPOLLERR or EPOLLHUP fd:%{public}d, ev.events:0x%{public}x", fd, ev.events);
+        MMI_LOGD("OnEpollEvent EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
         auto secPtr = GetSession(fd);
         if (secPtr) {
             OnDisconnected(secPtr);
@@ -403,7 +405,7 @@ OHOS::MMI::SessionPtr OHOS::MMI::UDSServer::GetSession(int32_t fd) const
 bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
 {
     CHKPF(ses);
-    MMI_LOGD("AddSession pid:%{public}d, fd:%{public}d", ses->GetPid(), ses->GetFd());
+    MMI_LOGD("AddSession pid:%{public}d,fd:%{public}d", ses->GetPid(), ses->GetFd());
     auto fd = ses->GetFd();
     CHKF(fd >= 0, VAL_NOT_EXP);
     auto pid = ses->GetPid();
@@ -412,7 +414,7 @@ bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
     sessionsMap_[fd] = ses;
     DumpSession("AddSession");
     if (sessionsMap_.size() > MAX_SESSON_ALARM) {
-        MMI_LOGW("Too many clients. Warning Value:%{public}d, Current Value:%{public}zd",
+        MMI_LOGW("Too many clients. Warning Value:%{public}d,Current Value:%{public}zd",
                  MAX_SESSON_ALARM, sessionsMap_.size());
     }
     MMI_LOGI("AddSession end");
