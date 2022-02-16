@@ -25,6 +25,6 @@ public:
     virtual bool OnDeviceAdd(const DeviceEvent& event) override;
     virtual bool OnDeviceRemove(const DeviceEvent& event) override;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // DEVICE_HANDLER_H

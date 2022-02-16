@@ -18,7 +18,8 @@
 #include "singleton.h"
 #include "msg_head.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     constexpr int32_t AI_CODE_MAX = 33;
     constexpr uint32_t AUTO_ERGODIC_CODE = 1;
     constexpr uint32_t MANUAL_INPUT_CODE = 2;
@@ -51,6 +52,7 @@ protected:
     bool isRun_ = false;
     TestAuxToolMsgHandler cMsgHandler_;
 };
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif // TEST_AUX_TOOL_CLIENT_H

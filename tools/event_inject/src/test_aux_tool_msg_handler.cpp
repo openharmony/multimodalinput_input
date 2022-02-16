@@ -45,13 +45,13 @@ void TestAuxToolMsgHandler::OnMsgHandler(const UDSClient &client, NetPacket &pkt
     OHOS::MMI::TimeCostChk chk("TestAuxToolMsgHandler::OnMsgHandler", "overtime 200(us)", CHECK_TIME, id);
     auto fun = GetFun(id);
     if (!fun) {
-        MMI_LOGE("TestAuxToolMsgHandler::OnMsgHandler Unknown msg id:%{public}d, errCode:%{public}d",
+        MMI_LOGE("TestAuxToolMsgHandler::OnMsgHandler Unknown msg id:%{public}d,errCode:%{public}d",
                  id, UNKNOWN_MSG_ID);
         return;
     }
     auto ret = (*fun)(client, pkt);
     if (ret < 0) {
-        MMI_LOGE("TestAuxToolMsgHandler::OnMsgHandler Msg handling failed. id:%{public}d, errCode:%{public}d",
+        MMI_LOGE("TestAuxToolMsgHandler::OnMsgHandler Msg handling failed. id:%{public}d,errCode:%{public}d",
                  id, ret);
     }
 }
@@ -75,9 +75,9 @@ int32_t OHOS::MMI::TestAuxToolMsgHandler::OnHdiServerReply([[maybe_unused]] cons
     pkt >> replyCode;
     MessageSendRecvStatMgr::GetInstance().Decrease();
     if (replyCode == RET_ERR) {
-        MMI_LOGE("hdi inject faild.");
+        MMI_LOGE("hdi inject faild");
         return RET_ERR;
     }
-    MMI_LOGI("hdi inject successed.");
+    MMI_LOGI("hdi inject successed");
     return RET_OK;
 }
