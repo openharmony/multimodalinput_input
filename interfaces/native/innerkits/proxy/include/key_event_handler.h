@@ -24,6 +24,6 @@ public:
     virtual ~KeyEventHandler();
     virtual bool OnKey(const OHOS::KeyEvent& event) override;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // KEY_EVENT_HANDLER_H
