@@ -190,7 +190,7 @@ bool InputEventHandler::Init(UDSServer& udsServer)
 void InputEventHandler::OnEvent(void *event)
 {
     MMI_LOGD("enter");
-    CHKP(event);
+    CHKPV(event);
     std::lock_guard<std::mutex> lock(mu_);
     auto *lpMmiEvent = static_cast<multimodal_libinput_event *>(event);
     CHKPV(lpMmiEvent);
