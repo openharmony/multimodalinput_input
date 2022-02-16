@@ -128,12 +128,12 @@ int32_t MultimodalStandardizedEventManager::SubscribeKeyEvent(
     if (MMIEventHdl.GetMMIClient() == nullptr) {
         MMI_LOGE("client init failed");
         return RET_ERR;
-    } else {
-        if (!SendMsg(pkt)) {
-            return RET_ERR;
-        }
-        return RET_OK;
     }
+    if (!SendMsg(pkt)) {
+        MMI_LOGE("Client failed to send message");
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
 int32_t MultimodalStandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
@@ -144,12 +144,12 @@ int32_t MultimodalStandardizedEventManager::UnSubscribeKeyEvent(int32_t subscrib
     if (MMIEventHdl.GetMMIClient() == nullptr) {
         MMI_LOGE("client init failed");
         return RET_ERR;
-    } else {
-        if (!SendMsg(pkt)) {
-            return RET_ERR;
-        }
-        return RET_OK;
     }
+    if (!SendMsg(pkt)) {
+        MMI_LOGE("Client failed to send message");
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEvent& event)
