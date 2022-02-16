@@ -36,6 +36,6 @@ public:
 private:
     napi_env env_ = nullptr;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // JS_REGISTER_HANDLE_H

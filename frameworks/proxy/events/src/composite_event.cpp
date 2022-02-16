@@ -19,4 +19,4 @@ namespace OHOS {
 CompositeEvent::~CompositeEvent()
 {
 }
-}
+} // namespace OHOS

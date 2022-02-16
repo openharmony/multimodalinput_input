@@ -29,5 +29,5 @@ bool KeyEventHandler::OnKey(const OHOS::KeyEvent& event)
 {
     return false;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
