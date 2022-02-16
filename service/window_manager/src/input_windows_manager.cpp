@@ -410,7 +410,7 @@ const MMISurfaceInfo* OHOS::MMI::InputWindowsManager::GetTouchSurfaceInfo(double
 {
     std::lock_guard<std::mutex> lock(mu_);
     int32_t newLayerId = -1;
-    constexpr MMISurfaceInfo* surfacePtr = nullptr;
+    const MMISurfaceInfo* surfacePtr = nullptr;
     for (auto& it : surfaces_) {
         // find window by coordinate
         if (CheckFocusSurface(x, y, it.second) && it.second.onLayerId >= newLayerId) {
