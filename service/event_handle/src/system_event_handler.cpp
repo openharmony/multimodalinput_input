@@ -92,6 +92,7 @@ OHOS::MMI::SystemEventHandler::~SystemEventHandler()
 
 int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
 {
+    MMI_LOGD("enter");
     if (idMsg == MmiMessageId::INVALID) {
         return PARAM_INPUT_INVALID;
     }
@@ -101,15 +102,17 @@ int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
         return UNKNOWN_MSG_ID; // non-system event return
     }
     (*fun)();
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 void OHOS::MMI::SystemEventHandler::OnGotoDesktop()
 {
-    MMI_LOGI("SystemEventHandler::OnGotoDesktop");
+    MMI_LOGD("enter");
     Want want;
     want.AddEntity(Want::FLAG_HOME_INTENT_FROM_SYSTEM);
     AbilityManager::GetInstance().StartAbility(want, 0);
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::SystemEventHandler::OnScreenShot()
