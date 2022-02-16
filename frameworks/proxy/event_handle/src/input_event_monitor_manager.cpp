@@ -112,7 +112,7 @@ void InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t monitorId
 int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
     MMI_LOGD("enter");
-    CKP(pointerEvent);
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     std::list<MonitorItem>::iterator iter;
     for (const auto &item : monitors_) {
         MMI_LOGD("send msg");

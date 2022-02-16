@@ -164,7 +164,7 @@ void OHOS::MMI::MouseDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &
     MMI_LOGD("enter");
     OHOS::MMI::MouseDrawingManager mdm;
     std::unique_ptr<OHOS::Media::PixelMap> pixelmap = mdm.DecodeImageToPixelMap(IMAGE_POINTER_JPEG_PATH);
-    CHKP(pixelmap);
+    CHKPV(pixelmap);
     OHOS::Rosen::Drawing::Pen pen;
     pen.SetAntiAlias(true);
     pen.SetColor(OHOS::Rosen::Drawing::Color::COLOR_BLUE);

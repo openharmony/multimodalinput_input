@@ -22,9 +22,9 @@
 
 namespace OHOS {
 namespace MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MultimodalEventHandler"};
-    }
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MultimodalEventHandler"};
+}
 
 void OnConnected(const OHOS::MMI::IfMMIClient& client)
 {
