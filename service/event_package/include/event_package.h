@@ -19,6 +19,7 @@
 #include "input_windows_manager.h"
 #include "uds_server.h"
 #include "util.h"
+#define KEYSTATUS 0
 
 namespace OHOS {
 namespace MMI {

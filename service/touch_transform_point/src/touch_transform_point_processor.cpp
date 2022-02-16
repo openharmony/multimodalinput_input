@@ -45,7 +45,7 @@ void TouchTransformPointProcessor::OnEventTouchDown(libinput_event *event)
     int32_t logicalY = -1;
     int32_t logicalX = -1;
     int32_t logicalDisplayId = -1;
-    WinMgr->TouchPadPointToDisplayPoint(data, logicalX, logicalY, logicalDisplayId);
+    WinMgr->TouchDownPointToDisplayPoint(data, logicalX, logicalY, logicalDisplayId);
     auto pointIds = pointerEvent_->GetPointersIdList();
     auto time = libinput_event_touch_get_time(data);
     if (pointIds.empty()) {
@@ -85,7 +85,7 @@ void TouchTransformPointProcessor::OnEventTouchMotion(libinput_event *event)
     int32_t logicalY = -1;
     int32_t logicalX = -1;
     int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
-    WinMgr->TransformTouchPointToDisplayPoint(data, logicalDisplayId, logicalX, logicalY);
+    WinMgr->TouchMotionPointToDisplayPoint(data, logicalDisplayId, logicalX, logicalY);
     PointerEvent::PointerItem pointer;
     CHK(pointerEvent_->GetPointerItem(seatSlot, pointer), PARAM_INPUT_FAIL);
     pointer.SetPressure(pressure);

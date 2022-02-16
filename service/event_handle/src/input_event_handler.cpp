@@ -346,13 +346,13 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
 {
     CHKPR(event, PARAM_INPUT_INVALID);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent_);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
+    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_LOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
     }
@@ -361,8 +361,8 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         return KEY_EVENT_PKG_FAIL;
     }
 
-    int32_t kac = keyEvent_->GetKeyAction();
-    KEY_STATE kacState = (kac == KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
+    int32_t action = keyEvent_->GetKeyAction();
+    KEY_STATE kacState = (action == KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
 
 #ifdef OHOS_WESTEN_MODEL
     int16_t lowKeyCode = static_cast<int16_t>(keyEvent_->GetKeyCode());
@@ -401,7 +401,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
     }
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto packageResult = eventPackage_.PackageKeyEvent(ev.event, keyEvent_);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
+    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_LOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
     }
@@ -427,11 +427,11 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
     return OnEventKey(ev.event);
 #else
 
-    int32_t kac = keyEvent_->GetKeyAction();
-    KEY_STATE kacState = (kac == KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
+    int32_t action = keyEvent_->GetKeyAction();
+    KEY_STATE kacState = (action == KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
     int16_t lowKeyCode = static_cast<int16_t>(keyEvent_->GetKeyCode());
     auto oKey = KeyValueTransformationByInput(lowKeyCode);
-    if (oKey.isSystemKey) { // Judging whether key is system key.
+    if (oKey.isSystemKey) {
         OnSystemEvent(oKey, kacState);
     }
 
