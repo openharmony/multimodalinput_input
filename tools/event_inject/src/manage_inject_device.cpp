@@ -31,7 +31,7 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
         MMI_LOGE("input data from json file is empty");
         return RET_ERR;
     }
-    int ret = RET_ERR;
+    int32_t ret = RET_ERR;
     string deviceName;
     string sendType;
     string deviceNode;

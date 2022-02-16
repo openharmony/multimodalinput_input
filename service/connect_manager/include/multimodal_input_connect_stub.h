@@ -30,7 +30,7 @@ public:
     MultimodalInputConnectStub() = default;
     ~MultimodalInputConnectStub() = default;
 
-    int OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& options) override;
+    int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& options) override;
 
 protected:
     bool IsAuthorizedCalling() const;
@@ -40,8 +40,8 @@ protected:
     int32_t StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
 
 private:
-    static const int SYSTEM_UID = 1000;
-    static const int ROOT_UID = 0;
+    static const int32_t SYSTEM_UID = 1000;
+    static const int32_t ROOT_UID = 0;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -356,17 +356,17 @@ std::set<int32_t> PointerEvent::GetPressedButtons() const
     return pressedButtons_;
 }
 
-bool PointerEvent::IsButtonPressed(int buttonId) const
+bool PointerEvent::IsButtonPressed(int32_t buttonId) const
 {
     return (pressedButtons_.find(buttonId) != pressedButtons_.end());
 }
 
-void PointerEvent::SetButtonPressed(int buttonId)
+void PointerEvent::SetButtonPressed(int32_t buttonId)
 {
     pressedButtons_.insert(buttonId);
 }
 
-void PointerEvent::DeleteReleaseButton(int buttonId)
+void PointerEvent::DeleteReleaseButton(int32_t buttonId)
 {
     if (pressedButtons_.find(buttonId) != pressedButtons_.end()) {
         pressedButtons_.erase(buttonId);

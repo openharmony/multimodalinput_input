@@ -13,23 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef INPUT_MANAGER_COMMAND_H
-#define INPUT_MANAGER_COMMAND_H
-
-#include <string>
-#include <vector>
+#ifndef DEVICE_OBSERVER_H
+#define DEVICE_OBSERVER_H
 
 namespace OHOS {
 namespace MMI {
-class InputManagerCommand {
+class DeviceObserver {
 public:
-    int32_t ParseCommand(int32_t argc, char *argv[]);
-    int32_t ConnectService();
-    void ShowUsage();
-private:
-    void InitializeMouseDeathStub();
+    virtual void UpdatePointerDevice(bool) = 0;
+};
+
+class Subject {
+public:
+    virtual void Attach(std::shared_ptr<DeviceObserver> observer) = 0;
+    virtual void Detach(std::shared_ptr<DeviceObserver> observer) = 0;
+    virtual void NotifyPointerDevice(bool) = 0;
 };
 }
-} // namespace OHOS
-
-#endif // INPUT_MANAGER_COMMAND_H
+}
+#endif
