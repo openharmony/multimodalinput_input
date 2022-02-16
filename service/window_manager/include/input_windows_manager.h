@@ -128,7 +128,7 @@ public:
     const MMISurfaceInfo* GetSurfaceInfo(int32_t sufaceId);
     bool CheckFocusSurface(double x, double y, const MMISurfaceInfo& info) const;
     const MMISurfaceInfo* GetTouchSurfaceInfo(double x, double y);
-    void TransfromToSurfaceCoordinate(double& x, double& y, const MMISurfaceInfo& info, bool debug = false);
+    void TransfromToSurfaceCoordinate(const MMISurfaceInfo& info, double& x, double& y, bool debug = false);
 
     bool GetTouchSurfaceId(const double x, const double y, std::vector<int32_t>& ids);
 
@@ -168,10 +168,11 @@ public:
     bool IsCheckDisplayIdIfExist(int32_t& displayId);
     LogicalDisplayInfo* GetLogicalDisplayById(int32_t displayId);
     int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
-    bool TouchPadPointToDisplayPoint(libinput_event_touch* touch,
+    bool TouchDownPointToDisplayPoint(libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId);
-    bool TransformTouchPointToDisplayPoint(libinput_event_touch* touch,
+    bool TouchMotionPointToDisplayPoint(libinput_event_touch* touch,
     int32_t targetDisplayId, int32_t& displayX, int32_t& displayY);
+    bool TransformOfDisplayPoint(libinput_event_touch* touch, int32_t &globalLogicalX, int32_t &globalLogicalY);
 
     void AdjustCoordinate(double &coordinateX, double &coordinateY);
     void FixCursorPosition(int32_t &globalX, int32_t &globalY, int cursorW, int cursorH);
@@ -191,8 +192,8 @@ private:
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent);
-    PhysicalDisplayInfo* GetPhysicalDisplayById(int32_t id);
-    PhysicalDisplayInfo* FindMatchedPhysicalDisplayInfo(const std::string seatId, const std::string seatName);
+    PhysicalDisplayInfo* GetPhysicalDisplay(int32_t id);
+    PhysicalDisplayInfo* FindPhysicalDisplayInfo(const std::string seatId, const std::string seatName);
 private:
     std::mutex mu_;
     SeatInfo** seatsInfo_ = nullptr;

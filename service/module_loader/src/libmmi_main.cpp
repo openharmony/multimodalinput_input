@@ -27,15 +27,16 @@
 #include "uds_command_queue.h"
 #endif // OHOS_BUILD_MMI_DEBUG
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
 #ifdef OHOS_WESTEN_MODEL
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "libmmi_main" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "libmmi_main" };
         static bool g_bThreadTerm = false;
 #endif
     }
 }
-
+}
 
 static std::atomic_bool g_isRun(false);
 
@@ -64,7 +65,7 @@ namespace {
 void OnThreadTermination(int32_t outTime, uint64_t tid, const std::string& remark)
 {
     using namespace OHOS::MMI;
-    MMI_LOGE("OnThreadTermination tid:%{public}" PRId64 ", %{public}s, %{public}d/%{public}d",
+    MMI_LOGE("OnThreadTermination tid:%{public}" PRId64 ",%{public}s,%{public}d/%{public}d",
         tid, remark.c_str(), outTime, MAX_THREAD_DEATH_TIME);
     MMIEventDump->InsertFormat("OnThreadTermination tid=%llu, remark=%s %d/%d",
         tid, remark.c_str(), outTime, MAX_THREAD_DEATH_TIME);
@@ -145,8 +146,7 @@ void StartMmiServer(void)
     using namespace OHOS::MMI;
     uint64_t tid = OHOS::MMI::GetThisThreadIdOfLL();
     g_llStartTime = OHOS::MMI::GetMillisTime();
-    MMI_LOGI("The server starts to start tid:%" PRId64 ". The current timestamp is %" PRId64
-            " Ms", tid, g_llStartTime);
+    MMI_LOGI("start tid:%" PRId64 ",current timestamp:%" PRId64" Ms", tid, g_llStartTime);
 #endif
     g_isRun = true;
     static std::thread t(&OnThread);

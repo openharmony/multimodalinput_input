@@ -52,14 +52,14 @@ public:
     void Dump(int32_t fd);
     int32_t GetFdByPid(int32_t pid);
     int32_t GetPidByFd(int32_t fd);
-    void OnEpollEvent(epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap);
+    void OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, epoll_event& ev);
     void OnEpollRecv(int32_t fd, const char *buf, size_t size);
 
     void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
 
 public:
     virtual int32_t AddSocketPairInfo(const std::string& programName, const int moduleType, int& serverFd,
-                                      int& toReturnClientFd, const int32_t uid, const int32_t pid);
+                                      const int32_t uid, const int32_t pid, int& toReturnClientFd);
     SessionPtr GetSession(int32_t fd) const;
 
 protected:

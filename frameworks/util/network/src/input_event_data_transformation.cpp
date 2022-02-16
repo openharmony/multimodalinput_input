@@ -243,5 +243,5 @@ int32_t InputEventDataTransformation::DeserializePointerItem(PointerEvent::Point
     item.SetDeviceId(tField);
     return RET_OK;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

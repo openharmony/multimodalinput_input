@@ -17,10 +17,12 @@
 #include "mmi_server.h"
 #include "util.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SeniorInputFuncProcBase" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SeniorInputFuncProcBase" };
     }
+}
 }
 
 using namespace std;
@@ -72,12 +74,12 @@ int32_t SeniorInputFuncProcBase::DeviceEventDispatchProcess(const RawInputEvent 
 bool SeniorInputFuncProcBase::DeviceEventDispatch(int32_t fd, RawInputEvent event)
 {
     auto it = deviceInfoMap_.find(fd);
-    if (it != deviceInfoMap_.end()) {
-        it->second->DeviceEventDispatchProcess(event);
-        return true;
-    } else {
+    if (it == deviceInfoMap_.end()) {
+        MMI_LOGE("Failed to find fd");
         return false;
     }
+    it->second->DeviceEventDispatchProcess(event);
+    return true;
 }
 
 bool SeniorInputFuncProcBase::DeviceInit(int32_t sessionId, sptr<SeniorInputFuncProcBase> ptr)
@@ -97,14 +99,14 @@ int32_t SeniorInputFuncProcBase::DeviceEventProcess(const RawInputEvent& event)
     const std::string uuid = GetUUid();
 
     if (msgId == MmiMessageId::INVALID) {
-        MMI_LOGE("msgId is invalid.");
+        MMI_LOGE("msgId is invalid");
         return RET_ERR;
     }
 
     std::vector<int32_t> fds;
     RegEventHM->FindSocketFds(msgId, fds);
     if (fds.empty()) {
-        MMI_LOGE("can not find handle by fd:%{public}d.", msgId);
+        MMI_LOGE("can not find handle by fd:%{public}d", msgId);
         return RET_ERR;
     }
 
@@ -122,14 +124,14 @@ int32_t SeniorInputFuncProcBase::DeviceEventProcess(const RawInputEvent& event)
         newPacket << deviceType << msgId << deviceId << fd << appInfo.windowId << appInfo.abilityId <<
             serverStartTime << uuid << occurredTime;
         if (!udsServerPtr_->SendMsg(fd, newPacket)) {
-            MMI_LOGE("Sending structure of event failed! fd:%{public}d", fd);
+            MMI_LOGE("Sending structure of event failed. fd:%{public}d", fd);
             return RET_ERR;
         }
-        MMI_LOGI("senior input func process server: fd:%{public}d, windowId:%{public}d, abilityId:%{public}d, "
+        MMI_LOGI("senior input func process server: fd:%{public}d,windowId:%{public}d,abilityId:%{public}d,"
                  "conbinecode:%{public}d",
                  fd, appInfo.windowId, appInfo.abilityId, event.ev_code);
     }
-    MMI_LOGI("successed send to client event[%{public}d] to Application management", event.ev_code);
+    MMI_LOGI("successed send to client event,%{public}d to Application management", event.ev_code);
     return RET_OK;
 }
 

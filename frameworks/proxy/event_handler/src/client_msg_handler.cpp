@@ -121,7 +121,7 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
     TimeCostChk chk("ClientMsgHandler::OnMsgHandler", "overtime 300(us)", MAX_OVER_TIME, id);
     auto fun = GetFun(id);
     if (!fun) {
-        MMI_LOGE("CClientMsgHandler::OnMsgHandler Unknown msg id:%{public}d.", id);
+        MMI_LOGE("CClientMsgHandler::OnMsgHandler Unknown msg id:%{public}d", id);
         return;
     }
     
@@ -255,7 +255,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
     std::string keyEventString = "keyEventSubscribe";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
     int32_t keyCode = keyEvent->GetKeyCode();
-    keyEventString = "client filter keyCode=" + std::to_string(keyCode);
+    keyEventString = "client subscribe keyCode=" + std::to_string(keyCode);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
     return KeyEventInputSubscribeMgr.OnSubscribeKeyEventCallback(keyEvent, subscribeId);
 }
