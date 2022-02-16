@@ -222,8 +222,8 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
 bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
     const EventTouch& touch, const uint64_t preHandlerTime)
 {
-    CHKPF(event);
     MMI_LOGD("Enter");
+    CHKPF(event);
     if (touchEventFilterMap_.empty()) {
         MMI_LOGE("touchEventFilterMap_ is empty");
         return false;
