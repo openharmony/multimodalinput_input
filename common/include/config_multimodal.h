@@ -24,7 +24,6 @@
     #define DEF_MMI_EVENT_INJECTION "/root/projects/build/bin/hosmmi-event-injection"
     #define DEF_MMI_VIRTUAL_DEVICE_MANAGER "/root/projects/build/bin/hosmmi-virtual-device-manager"
     #define DEF_MMI_DATA_ROOT       "/root/projects/run_root/"
-    #define DEF_LOG_CONFIG          "/root/projects/run_root/etc/mmi_log.conf"         // Default log config file
     #define DEF_EXP_CONFIG          "/root/projects/run_root/etc/mmi_device_config.ini" // Default device config file
     #define DEF_EXP_SOPATH          "/root/projects/run_root/lib"                 // Default device so path
     #define DEF_XKB_CONFIG          "/root/projects/run_root/etc/xkb"        // Default xkb config
@@ -34,7 +33,6 @@
     #define DEF_MMI_EVENT_INJECTION "/system/bin/hosmmi-event-injection"
     #define DEF_MMI_VIRTUAL_DEVICE_MANAGER "/system/bin/hosmmi-virtual-device-manager"
     #define DEF_MMI_DATA_ROOT "/data/mmi/"
-    #define DEF_LOG_CONFIG "/system/etc/mmi_log.conf"
     #define DEF_EXP_CONFIG "/system/etc/mmi_device_config.ini"
     #define DEF_EXP_SOPATH "/system/lib/"
     #define DEF_XKB_CONFIG "/system/etc/xkb"
