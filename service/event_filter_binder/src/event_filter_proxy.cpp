@@ -38,7 +38,7 @@ EventFilterProxy::~EventFilterProxy()
 
 bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> event)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -68,7 +68,7 @@ bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> ev
         return false;
     }
 
-    MMI_LOGT("leave");
+    MMI_LOGD("leave");
     return result;
 }
 } // namespace MMI
