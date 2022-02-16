@@ -448,5 +448,5 @@ void MMIService::OnSignalEvent(int32_t signalFd)
     MMI_LOGD("leave");
 }
 
-}
-}
+} // namespace MMI
+} // namespace OHOS

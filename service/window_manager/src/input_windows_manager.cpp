@@ -32,8 +32,8 @@ static constexpr uint8_t TOP_RIGHT_X = 2;
 static constexpr uint8_t TOP_RIGHT_Y = 3;
 static constexpr uint8_t CORNER = 4;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 using namespace OHOS::MMI;
 

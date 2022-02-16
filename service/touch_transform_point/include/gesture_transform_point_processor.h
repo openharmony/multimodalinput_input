@@ -37,7 +37,7 @@ private:
     int32_t deviceId_;
     std::shared_ptr<PointerEvent> pointerEvent_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif // GESTURE_TRANSFORM_POINT_PROCESSOR_H

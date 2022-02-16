@@ -89,8 +89,8 @@ private:
     MMI::UDSServer* udsServerPtr_ = nullptr;
     std::vector<DeviceInformation> deviceArray_ = {};
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define MMIHdiInject OHOS::MMI::DelayedSingleton<OHOS::MMI::HdiInject>::GetInstance()
 #endif // OHOS_BUILD_HDF
 #endif // HDI_INJECT_H
