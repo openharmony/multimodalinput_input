@@ -17,9 +17,10 @@
 #include <cinttypes>
 #include "input_event_data_transformation.h"
 #include "mmi_server.h"
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ServerInputFilterManager" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ServerInputFilterManager" };
 }
 
 ServerInputFilterManager::KeyEventFilter::KeyEventFilter(int32_t id, std::string name,
@@ -273,7 +274,7 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
         newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime;
 
         std::vector<std::pair<uint32_t, int32_t>> touchIds;
-        MMIRegEvent->GetTouchIds(touchIds, touch.deviceId);
+        MMIRegEvent->GetTouchIds(touch.deviceId, touchIds);
         if (!touchIds.empty()) {
             for (std::pair<uint32_t, int32_t> touchId : touchIds) {
                 EventTouch touchTemp = {};
@@ -461,4 +462,5 @@ void ServerInputFilterManager::PointerEventFilter::SetAuthority(Authority author
 {
     authority_ = authority;
 }
-}
+} // namespace MMI
+} // namespace OHOS

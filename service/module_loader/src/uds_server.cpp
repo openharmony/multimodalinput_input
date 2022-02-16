@@ -25,10 +25,12 @@
 #include "util.h"
 #include "util_ex.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "UDSServer"};
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "UDSServer"};
     }
+}
 }
 
 OHOS::MMI::UDSServer::UDSServer()
@@ -131,7 +133,7 @@ bool  OHOS::MMI::UDSServer::ClearDeadSessionInMap(const int serverFd, const int 
 }
 
 int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, const int moduleType, int& serverFd,
-                                                int& toReturnClientFd, const int32_t uid, const int32_t pid)
+                                                const int32_t uid, const int32_t pid, int& toReturnClientFd)
 {
     std::lock_guard<std::mutex> lock(mux_);
     MMI_LOGT("enter.");
@@ -337,7 +339,7 @@ void OHOS::MMI::UDSServer::OnEvent(const epoll_event& ev, std::map<int32_t, Stre
     }
 }
 
-void OHOS::MMI::UDSServer::OnEpollEvent(epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
+void OHOS::MMI::UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, epoll_event& ev)
 {
     const int32_t maxCount = static_cast<int32_t>(MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE) + 1;
     CHK(maxCount > 0, VAL_NOT_EXP);
