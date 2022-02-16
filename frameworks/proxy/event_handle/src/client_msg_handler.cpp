@@ -139,7 +139,7 @@ int32_t ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)
 {
     auto key = KeyEvent::Create();
     CHKPR(key, ERROR_NULL_POINTER);
-    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, key, pkt);
+    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, pkt, key);
     if (ret != RET_OK) {
         MMI_LOGE("OnKeyMonitor read netPacket failed");
         return RET_ERR;
@@ -155,7 +155,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     int32_t fd = 0;
     uint64_t serverStartTime = 0;
     auto key = KeyEvent::Create();
-    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, key, pkt);
+    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, pkt, key);
     if (ret != RET_OK) {
         MMI_LOGE("read netPacket failed");
         return RET_ERR;
@@ -183,7 +183,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
 int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
     auto pointerEvent { PointerEvent::Create() };
-    if (InputEventDataTransformation::Unmarshalling(pointerEvent, pkt) != ERR_OK) {
+    if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
         MMI_LOGE("Failed to deserialize pointer event.");
         return RET_ERR;
     }
@@ -240,7 +240,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
 int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, NetPacket &pkt)
 {
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, keyEvent, pkt);
+    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, pkt, keyEvent);
     if (ret != RET_OK) {
         MMI_LOGE("read net packet failed");
         return RET_ERR;
@@ -266,7 +266,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
 int32_t ClientMsgHandler::OnTouchPadMonitor(const UDSClient& client, NetPacket& pkt)
 {
     auto pointer = PointerEvent::Create();
-    int32_t ret = InputEventDataTransformation::Unmarshalling(pointer, pkt);
+    int32_t ret = InputEventDataTransformation::Unmarshalling(pkt, pointer);
     if (ret != RET_OK) {
         MMI_LOGE("OnTouchPadMonitor read netPacket failed");
         return RET_ERR;
@@ -344,7 +344,7 @@ int32_t ClientMsgHandler::OnCopy(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnCopy");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnCopy(multEvent);
 }
 
@@ -352,7 +352,7 @@ int32_t ClientMsgHandler::OnShowMenu(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnShowMenu");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnShowMenu(multEvent);
 }
 
@@ -360,7 +360,7 @@ int32_t ClientMsgHandler::OnSend(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnSend");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnSend(multEvent);
 }
 
@@ -368,7 +368,7 @@ int32_t ClientMsgHandler::OnPaste(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnPaste");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnPaste(multEvent);
 }
 
@@ -376,7 +376,7 @@ int32_t ClientMsgHandler::OnCut(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnCut");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnCut(multEvent);
 }
 
@@ -384,7 +384,7 @@ int32_t ClientMsgHandler::OnUndo(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnUndo");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnUndo(multEvent);
 }
 
@@ -392,7 +392,7 @@ int32_t ClientMsgHandler::OnRefresh(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnRefresh");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnRefresh(multEvent);
 }
 
@@ -400,7 +400,7 @@ int32_t ClientMsgHandler::OnStartDrag(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnStartDrag");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnStartDrag(multEvent);
 }
 
@@ -408,7 +408,7 @@ int32_t ClientMsgHandler::OnCancel(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnCancel");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnCancel(multEvent);
 }
 
@@ -416,7 +416,7 @@ int32_t ClientMsgHandler::OnEnter(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnEnter");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnEnter(multEvent);
 }
 
@@ -424,7 +424,7 @@ int32_t ClientMsgHandler::OnPrevious(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnPrevious");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnPrevious(multEvent);
 }
 
@@ -432,7 +432,7 @@ int32_t ClientMsgHandler::OnNext(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnNext");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnNext(multEvent);
 }
 
@@ -440,7 +440,7 @@ int32_t ClientMsgHandler::OnBack(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnBack");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnBack(multEvent);
 }
 
@@ -448,7 +448,7 @@ int32_t ClientMsgHandler::OnPrint(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnPrint");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnPrint(multEvent);
 }
 
@@ -456,7 +456,7 @@ int32_t ClientMsgHandler::OnPlay(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnPlay");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnPlay(multEvent);
 }
 
@@ -464,7 +464,7 @@ int32_t ClientMsgHandler::OnPause(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnPause");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnPause(multEvent);
 }
 
@@ -472,7 +472,7 @@ int32_t ClientMsgHandler::OnMediaControl(const UDSClient& client, NetPacket& pkt
 {
     MMI_LOGD("ClientMsgHandler::OnMediaControl");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnMediaControl(multEvent);
 }
 
@@ -480,7 +480,7 @@ int32_t ClientMsgHandler::OnScreenShot(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnScreenShot");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnScreenShot(multEvent);
 }
 
@@ -488,7 +488,7 @@ int32_t ClientMsgHandler::OnScreenSplit(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnScreenSplit");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnScreenSplit(multEvent);
 }
 
@@ -496,7 +496,7 @@ int32_t ClientMsgHandler::OnStartScreenRecord(const UDSClient& client, NetPacket
 {
     MMI_LOGD("ClientMsgHandler::OnStartScreenRecord");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnStartScreenRecord(multEvent);
 }
 
@@ -504,7 +504,7 @@ int32_t ClientMsgHandler::OnStopScreenRecord(const UDSClient& client, NetPacket&
 {
     MMI_LOGD("ClientMsgHandler::OnStopScreenRecord");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnStopScreenRecord(multEvent);
 }
 
@@ -512,7 +512,7 @@ int32_t ClientMsgHandler::OnGotoDesktop(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnGotoDesktop");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnGotoDesktop(multEvent);
 }
 
@@ -520,7 +520,7 @@ int32_t ClientMsgHandler::OnRecent(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnRecent");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnRecent(multEvent);
 }
 
@@ -528,7 +528,7 @@ int32_t ClientMsgHandler::OnShowNotification(const UDSClient& client, NetPacket&
 {
     MMI_LOGD("ClientMsgHandler::OnShowNotification");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnShowNotification(multEvent);
 }
 
@@ -536,7 +536,7 @@ int32_t ClientMsgHandler::OnLockScreen(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnLockScreen");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnLockScreen(multEvent);
 }
 
@@ -544,7 +544,7 @@ int32_t ClientMsgHandler::OnSearch(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnSearch");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnSearch(multEvent);
 }
 
@@ -552,7 +552,7 @@ int32_t ClientMsgHandler::OnClosePage(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnClosePage");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnClosePage(multEvent);
 }
 
@@ -560,7 +560,7 @@ int32_t ClientMsgHandler::OnLaunchVoiceAssistant(const UDSClient& client, NetPac
 {
     MMI_LOGD("ClientMsgHandler::OnLaunchVoiceAssistant");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnLaunchVoiceAssistant(multEvent);
 }
 
@@ -568,7 +568,7 @@ int32_t ClientMsgHandler::OnMute(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnMute");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnMute(multEvent);
 }
 
@@ -576,7 +576,7 @@ int32_t ClientMsgHandler::OnAnswer(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnAnswer");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnAnswer(multEvent);
 }
 
@@ -584,7 +584,7 @@ int32_t ClientMsgHandler::OnRefuse(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnRefuse");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnRefuse(multEvent);
 }
 
@@ -592,7 +592,7 @@ int32_t ClientMsgHandler::OnHangup(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnHangup");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnHangup(multEvent);
 }
 
@@ -600,12 +600,12 @@ int32_t ClientMsgHandler::OnTelephoneControl(const UDSClient& client, NetPacket&
 {
     MMI_LOGD("ClientMsgHandler::OnTelephoneControl");
     MultimodalEvent multEvent;
-    PackedData(multEvent, client, pkt, __func__);
+    PackedData(client, pkt, __func__, multEvent);
     return EventManager.OnTelephoneControl(multEvent);
 }
 
-int32_t ClientMsgHandler::PackedData(MultimodalEvent& multEvent, const UDSClient& client,
-                                     NetPacket& pkt, const std::string& funName)
+int32_t ClientMsgHandler::PackedData(const UDSClient& client, NetPacket& pkt,
+                                     const std::string& funName, MultimodalEvent& multEvent)
 {
     if (isServerReqireStMessage_) {
         return RET_OK;
@@ -807,8 +807,8 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
     int32_t handlerId;
     CHKR(pkt.Read(handlerId), STREAM_BUF_READ_FAIL, RET_ERR);
     auto keyEvent = KeyEvent::Create();
-    if (InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, keyEvent, pkt) != ERR_OK) {
-        MMI_LOGE("Failed to deserialize key event");
+    if (InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, pkt, keyEvent) != ERR_OK) {
+        MMI_LOGE("Failed to deserialize key event.");
         return RET_ERR;
     }
     InputHandlerManager::GetInstance().OnInputEvent(handlerId, keyEvent);
@@ -824,7 +824,7 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
     CHKR(pkt.Read(handlerType), STREAM_BUF_READ_FAIL, RET_ERR);
     MMI_LOGD("Client handlerId:%{public}d,handlerType:%{public}d", handlerId, handlerType);
     auto pointerEvent { PointerEvent::Create() };
-    if (InputEventDataTransformation::Unmarshalling(pointerEvent, pkt) != ERR_OK) {
+    if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
         MMI_LOGE("Failed to deserialize pointer event");
         return RET_ERR;
     }
@@ -847,7 +847,7 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 int32_t ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetPacket& pkt)
 {
     auto pointerEvent = PointerEvent::Create();
-    int32_t ret = InputEventDataTransformation::Unmarshalling(pointerEvent, pkt);
+    int32_t ret = InputEventDataTransformation::Unmarshalling(pkt, pointerEvent);
     if (ret != RET_OK) {
         MMI_LOGE("TouchpadEventInterceptor read netPacket failed");
         return RET_ERR;
@@ -863,7 +863,7 @@ int32_t ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetP
 int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket& pkt)
 {
     auto keyEvent = KeyEvent::Create();
-    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, keyEvent, pkt);
+    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, pkt, keyEvent);
     if (ret != RET_OK) {
         MMI_LOGE("TouchpadEventInterceptor read netPacket failed");
         return RET_ERR;
