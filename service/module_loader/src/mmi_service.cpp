@@ -276,8 +276,8 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int modu
 
     toReturnClientFd = INVALID_SOCKET_FD;
     int serverFd = INVALID_SOCKET_FD;
-    int32_t uid = GetCallingUid();
-    int32_t pid = GetCallingPid();
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    int32_t pid = IPCSkeleton::GetCallingPid();
     const int32_t ret = AddSocketPairInfo(programName, moduleType, serverFd, uid, pid, toReturnClientFd);
     if (ret != RET_OK) {
         MMI_LOGE("call AddSocketPairInfo return %{public}d.", ret);
@@ -299,11 +299,6 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
         return RET_ERR;
     }
     MMI_LOGIK("clientName:%{public}s, moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
-    if (!IsAuthorizedCalling()) {
-        MMI_LOGE("permission denied");
-        return RET_ERR;
-    }
-
     int clientFd = INVALID_SOCKET_FD;
     ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
     if (ret != RET_OK) {
@@ -319,9 +314,6 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
 
     MMI_LOGI("send clientFd to client, clientFd = %d", clientFd);
     close(clientFd);
-    clientFd = -1;
-    MMI_LOGI(" clientFd = %d, has closed in server", clientFd);
-
     return RET_OK;
 }
 
