@@ -40,7 +40,7 @@ public:
 
     bool GetRunStatus() const
     {
-        return isRun_;
+        return isRunning_;
     }
     bool GetConnectedStatus() const
     {
@@ -66,7 +66,7 @@ protected:
     std::thread t_;
     bool isThreadHadRun_ = false;
     bool isToExit_ = false;
-    bool isRun_ = false;
+    bool isRunning_ = false;
     bool isConnected_ = false;
     MsgClientFunCallback recvFun_;
     std::promise<bool> threadPromiseHadEnd_;
