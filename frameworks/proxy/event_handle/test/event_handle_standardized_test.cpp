@@ -33,7 +33,7 @@ public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 protected:
-    const unsigned int surFaceId_ = 10;
+    const uint32_t surFaceId_ = 10;
 };
 
 HWTEST_F(EventHandleStandardizedTest, RegisterStandardizedEventHandle_NORMAL_001, TestSize.Level1)

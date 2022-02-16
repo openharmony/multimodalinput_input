@@ -48,7 +48,7 @@ public:
         static AbilityManager ttt;
         return ttt;
     }
-    void StartAbility(const AAFwk::Want& want, int requestCode = 0) const
+    void StartAbility(const AAFwk::Want& want, int32_t requestCode = 0) const
     {
         MMI_LOGW("AbilityManager::StartAbility");
     }
