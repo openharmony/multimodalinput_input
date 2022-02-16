@@ -38,5 +38,5 @@ void NetPacket::MakeData(StreamBuffer& buf) const
         CHK(buf.Write(&szBuff_[0], wIdx_), STREAM_BUF_WRITE_FAIL);
     }
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

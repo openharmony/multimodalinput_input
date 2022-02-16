@@ -22,9 +22,11 @@
 #include "util.h"
 
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
-[[maybe_unused]]static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManagerStub"};
+[[maybe_unused]]constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManagerStub"};
+}
 }
 }
 

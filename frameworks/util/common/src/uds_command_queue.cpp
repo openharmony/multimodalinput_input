@@ -47,5 +47,5 @@ void UdsCommandQueue::AddCommand(const std::string& command)
     std::lock_guard<std::mutex> lockGuard(mux_);
     commandQueue_.push_back(command);
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
