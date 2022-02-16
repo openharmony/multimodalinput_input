@@ -19,6 +19,7 @@
 #include <string>
 #include "util.h"
 #include "singleton.h"
+#include "../../../common/include/device_observer.h"
 #include "msg_handler.h"
 #include "event_dispatch.h"
 #include "event_package.h"
@@ -27,7 +28,7 @@
 
 namespace OHOS {
 namespace MMI {
-class InputDeviceManager : public DelayedSingleton<InputDeviceManager> {
+class InputDeviceManager : public DelayedSingleton<InputDeviceManager>, public Subject {
 public:
     void OnInputDeviceAdded(libinput_device* inputDevice);
     void OnInputDeviceRemoved(libinput_device* inputDevice);
@@ -36,6 +37,9 @@ public:
     void GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback);
     void FindInputDeviceByIdAsync(int32_t deviceId, std::function<void(std::shared_ptr<InputDevice>)> callback);
     int32_t FindInputDeviceId(libinput_device* inputDevice);
+    void Attach(std::shared_ptr<DeviceObserver> observer);
+    void Detach(std::shared_ptr<DeviceObserver> observer);
+    void NotifyPointerDevice(bool hasPointerDevice);
 
 private:
 #ifdef OHOS_WESTEN_MODEL
@@ -48,6 +52,7 @@ private:
     std::map<int32_t, libinput_device*> inputDevice_;
     bool initFlag_ {false};
     int32_t nextId_ {0};
+    std::list<std::shared_ptr<DeviceObserver>> observers_;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -31,8 +31,8 @@ namespace {
 const bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MultimodalInputConnectService>::GetInstance().get());
 
-int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programName, const int moduleType,
-                                                     int &toReturnClientFd)
+int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programName, const int32_t moduleType,
+                                                     int32_t &toReturnClientFd)
 {
     MMI_LOGD("enter");
     MMI_LOGI("MultimodalInputConnectService::AllocSocketFd enter, programName:%{public}s,moduleType:%{public}d",
@@ -42,9 +42,9 @@ int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programN
         return RET_ERR;
     }
     toReturnClientFd = INVALID_SOCKET_FD;
-    int serverFd = INVALID_SOCKET_FD;
+    int32_t serverFd = INVALID_SOCKET_FD;
     int32_t uid = IPCSkeleton::GetCallingUid();
-    int32_t pid = IPCSkeleton::GetCallingPid();
+    int32_t pid = IPCSkeleton::GetCallingPi
     const int32_t ret = udsServer_->AddSocketPairInfo(programName, moduleType, serverFd, uid, pid, toReturnClientFd);
     if (ret != RET_OK) {
         MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
@@ -131,7 +131,7 @@ int32_t MultimodalInputConnectService::StubHandleAllocSocketFd(MessageParcel& da
         return RET_ERR;
     }
 
-    int clientFd = INVALID_SOCKET_FD;
+    int32_t clientFd = INVALID_SOCKET_FD;
     int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
     if (ret != RET_OK) {
         MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
