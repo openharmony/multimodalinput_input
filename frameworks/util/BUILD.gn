@@ -125,7 +125,6 @@ ohos_unittest("ut-mmi-util-out") {
   }
 
   sources = [
-    "common/test/log_test.cpp",
     "common/test/safe_keeper_test.cpp",
     "common/test/util_test.cpp",
     "network/test/net_packet_test.cpp",
