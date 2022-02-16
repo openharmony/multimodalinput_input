@@ -152,7 +152,7 @@ bool MultimodalEventHandler::InitClient()
     mClient_ = std::make_shared<MMIClient>();
     CHKPF(mClient_);
     mcMsgHandler_ = std::make_shared<ClientMsgHandler>();
-    CHK(mcMsgHandler_ != nullptr, ERROR_NULL_POINTER);
+    CHKPF(mcMsgHandler_);
     EventManager.SetClientHandle(mClient_);
     mClient_->RegisterConnectedFunction(&OnConnected);
     if (!(mClient_->Start(mcMsgHandler_, true))) {
