@@ -114,5 +114,5 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
 {
     InputManagerImpl::GetInstance()->SimulateInputEvent(pointerEvent);
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
