@@ -197,7 +197,6 @@ int32_t MMIService::Init()
     MMI_LOGD("EventDump Init");
     MMIEventDump->Init(*this);
 
-#ifdef OHOS_WESTEN_MODEL
     MMI_LOGD("WindowsManager Init");
     CHKR(WinMgr->Init(*this), WINDOWS_MSG_INIT_FAIL, WINDOWS_MSG_INIT_FAIL);
 
@@ -206,7 +205,6 @@ int32_t MMIService::Init()
 
     MMI_LOGD("DeviceRegister Init");
     CHKR(DevRegister->Init(), DEV_REG_INIT_FAIL, DEV_REG_INIT_FAIL);
-#endif
 
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
     CHKR(mmiFd_ >= 0, EPOLL_CREATE_FAIL, EPOLL_CREATE_FAIL);
