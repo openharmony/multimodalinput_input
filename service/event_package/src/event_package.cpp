@@ -15,7 +15,7 @@
 
 #include "event_package.h"
 #include "mmi_server.h"
-
+#include "input_device_manager.h"
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -739,39 +739,32 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key)
     return RET_OK;
 }
 
-int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<KeyEvent> kevnPtr)
+int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<KeyEvent> kevn)
 {
-    CHKPR(event, ERROR_NULL_POINTER);
-    MMI_LOGD("PackageKeyEvent begin");
-    CHKPR(kevnPtr, ERROR_NULL_POINTER);
-    kevnPtr->UpdateId();
-    EventKeyboard key = {};
-    auto ret = PackageEventDeviceInfo<EventKeyboard>(event, key);
-    if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed. ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
-        return DEV_PARAM_PKG_FAIL;
-    }
+    MMI_LOGD("begin");
+    CHKPR(event, PARAM_INPUT_INVALID);
+    CHKPR(kevn, ERROR_NULL_POINTER);
+    kevn->UpdateId();
     auto data = libinput_event_get_keyboard_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
-    // libinput key transformed into HOS key
-    auto oKey = KeyValueTransformationByInput(libinput_event_keyboard_get_key(data));
+    auto hosKey = KeyValueTransformationByInput(libinput_event_keyboard_get_key(data));
 
-    int32_t deviceId = static_cast<int32_t>(key.deviceId);
-    int32_t actionTime = static_cast<int64_t>(GetSysClockTime());
-    int32_t keyCode = static_cast<int32_t>(oKey.keyValueOfHos);
+    auto device = libinput_event_get_device(event);
+    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
+    int32_t keyCode = static_cast<int32_t>(hosKey.keyValueOfHos);
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
     int32_t actionStartTime = static_cast<int32_t>(libinput_event_keyboard_get_time_usec(data));
 
-    kevnPtr->SetActionTime(actionTime);
-    kevnPtr->SetAction(keyAction);
-    kevnPtr->SetActionStartTime(actionStartTime);
-    kevnPtr->SetDeviceId(deviceId);
-    kevnPtr->SetKeyCode(keyCode);
-    kevnPtr->SetKeyAction(keyAction);
+    kevn->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
+    kevn->SetAction(keyAction);
+    kevn->SetActionStartTime(actionStartTime);
+    kevn->SetDeviceId(deviceId);
+    kevn->SetKeyCode(keyCode);
+    kevn->SetKeyAction(keyAction);
 
     KeyEvent::KeyItem item;
-    bool isKeyPressed = (libinput_event_keyboard_get_key_state(data) == 0) ? (false) : (true);
+    bool isKeyPressed = (libinput_event_keyboard_get_key_state(data) != KEYSTATUS);
     if (isKeyPressed) {
         int32_t keyDownTime = actionStartTime;
         item.SetDownTime(keyDownTime);
@@ -781,12 +774,11 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<Key
     item.SetPressed(isKeyPressed);
 
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
-        kevnPtr->AddPressedKeyItems(item);
+        kevn->AddPressedKeyItems(item);
+    } else {
+        kevn->RemoveReleasedKeyItems(item);
     }
-    if (keyAction == KeyEvent::KEY_ACTION_UP) {
-        kevnPtr->RemoveReleasedKeyItems(item);
-    }
-    MMI_LOGD("PackageKeyEvent end");
+    MMI_LOGD("end");
     return RET_OK;
 }
 
