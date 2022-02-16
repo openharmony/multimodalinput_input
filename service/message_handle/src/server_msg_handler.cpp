@@ -250,7 +250,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterMsgHandler(SessionPtr sess, NetPa
     pkt >> eventType >> abilityId >> winId >> bundlerName >> appName;
     RegEventHM->RegisterEvent(eventType, fd);
     if (winId > 0) {
-        AppRegs->RegisterAppInfoforServer({abilityId, winId, fd, bundlerName, appName});
+        AppRegs->RegisterAppInfoforServer({ abilityId, winId, fd, bundlerName, appName });
     }
     MMI_LOGD("OnRegisterMsgHandler fd:%{public}d, eventType:%{public}d,"
              " bundlerName:%{public}s, appName:%{public}s",
@@ -388,29 +388,19 @@ int32_t OHOS::MMI::ServerMsgHandler::OnNewInjectKeyEvent(SessionPtr sess, NetPac
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     uint64_t preHandlerTime = GetSysClockTime();
-
-    std::shared_ptr<OHOS::MMI::KeyEvent> nPtr = OHOS::MMI::KeyEvent::Create();
-    bool skipId = true;
-    int32_t errCode = InputEventDataTransformation::NetPacketToKeyEvent(skipId, nPtr, pkt);
+    auto creKey = OHOS::MMI::KeyEvent::Create();
+    int32_t errCode = InputEventDataTransformation::NetPacketToKeyEvent(true, creKey, pkt);
     if (errCode != RET_OK) {
         MMI_LOGE("Deserialization is Failed, errCode:%{public}u", errCode);
         return RET_ERR;
     }
 
-    if (nPtr->HasFlag(OHOS::MMI::InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
-        if (InterceptorMgrGbl.OnKeyEvent(nPtr)) {
-            MMI_LOGD("keyEvent filter find a keyEvent from Original event keyCode:%{puiblic}d",
-                nPtr->GetKeyCode());
-            return RET_OK;
-        }
-    }
-
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, nPtr, preHandlerTime);
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, creKey, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed. ret:%{public}d, errCode:%{public}d",
             eventDispatchResult, KEY_EVENT_DISP_FAIL);
     }
-    MMI_LOGD("Inject keyCode:%{public}d, action:%{public}d", nPtr->GetKeyCode(), nPtr->GetKeyAction());
+    MMI_LOGD("Inject keyCode:%{public}d, action:%{public}d", creKey->GetKeyCode(), creKey->GetKeyAction());
     return RET_OK;
 }
 
