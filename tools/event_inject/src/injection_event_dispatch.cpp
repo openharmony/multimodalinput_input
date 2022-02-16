@@ -76,8 +76,8 @@ int32_t InjectionEventDispatch::OnJson()
 
 bool InjectionEventDispatch::GetStartSocketPermission(string id)
 {
-    auto it = mapNeedStartSocket_.find(id);
-    if (it == mapNeedStartSocket_.end()) {
+    auto it = needStartSocket_.find(id);
+    if (it == needStartSocket_.end()) {
         return false;
     }
 
@@ -119,7 +119,7 @@ bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const vector<strin
     }
 
     bool result = false;
-    for (const auto &item : mapFuns_) {
+    for (const auto &item : injectFuns_) {
         string temp(argv.at(ARGVS_TARGET_INDEX));
         if (temp == item.first) {
             funId_ = temp;
