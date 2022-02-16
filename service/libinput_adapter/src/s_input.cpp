@@ -141,6 +141,8 @@ void OHOS::MMI::SInput::Stop()
     }
     libinput_unref(input_);
     udev_unref(udev_);
+    funInputEvent_ = nullptr;
+    seat_id_ = "";
 }
 
 void OHOS::MMI::SInput::OnEventHandler()

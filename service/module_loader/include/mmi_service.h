@@ -56,7 +56,9 @@ protected:
     virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) override;
 
     virtual int32_t EpollCtlAdd(EpollEventType type, int32_t fd) override;
+    int32_t DelEpoll(EpollEventType type, int32_t fd);
     bool ChkAuthFd(int32_t fd) const;
+    int32_t ChkDeviceNode();
 
     bool InitLibinputService();
     bool InitSAService();
