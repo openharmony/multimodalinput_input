@@ -24,7 +24,7 @@ namespace {
     constexpr uint32_t SEAT_KEY_COUNT_ZERO = 0;
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventPackage" };
 
-    void FillEventJoyStickAxisAbsInfo(EventJoyStickAxisAbsInfo& l, const libinput_event_joystick_axis_abs_info& r)
+    void FillEventJoyStickAxisAbsInfo(const libinput_event_joystick_axis_abs_info& r, EventJoyStickAxisAbsInfo& l)
     {
         l.code = r.code;
         l.value = r.value;
@@ -37,7 +37,7 @@ namespace {
         l.isChanged = true;
     }
 
-    void FillEventSlotedCoordsInfo(SlotedCoordsInfo& l, const sloted_coords_info& r)
+    void FillEventSlotedCoordsInfo(const sloted_coords_info& r, SlotedCoordsInfo& l)
     {
         l.activeCount = r.active_count;
         for (int i = 0; i < MAX_SOLTED_COORDS_NUMS; i++) {
@@ -499,7 +499,7 @@ int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event, EventJoySt
         }
         auto pAbsInfo = libinput_event_get_joystick_axis_abs_info(joyEvent, axis);
         if (pAbsInfo != nullptr) {
-            FillEventJoyStickAxisAbsInfo(item.absInfo, *pAbsInfo);
+            FillEventJoyStickAxisAbsInfo(*pAbsInfo, item.absInfo);
         }
     }
     return RET_OK;
@@ -565,7 +565,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
     touch.slot = libinput_event_touch_get_slot(data);
     touch.seatSlot = libinput_event_touch_get_seat_slot(data);
     touch.pressure = libinput_event_get_touch_pressure(event);
-    
+
     PackageTouchEventByType(type, data, touch);
     /* switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
@@ -681,7 +681,7 @@ int32_t EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& g
             gesture.deltaUnaccel.y = libinput_event_gesture_get_dy_unaccelerated(data);
             sloted_coords_info* pSoltTouches = libinput_event_gesture_get_solt_touches(data);
             CHKPR(pSoltTouches, ERROR_NULL_POINTER);
-            FillEventSlotedCoordsInfo(gesture.soltTouches, *pSoltTouches);
+            FillEventSlotedCoordsInfo(*pSoltTouches, gesture.soltTouches);
             break;
         }
         /* Third, it refers to the use of requirements, and the code is reserved */
@@ -754,11 +754,11 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<Key
     auto data = libinput_event_get_keyboard_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
     // libinput key transformed into HOS key
-    auto hosKey = KeyValueTransformationByInput(libinput_event_keyboard_get_key(data)); 
+    auto oKey = KeyValueTransformationByInput(libinput_event_keyboard_get_key(data));
 
     int32_t deviceId = static_cast<int32_t>(key.deviceId);
     int32_t actionTime = static_cast<int64_t>(GetSysClockTime());
-    int32_t keyCode = static_cast<int32_t>(hosKey.keyValueOfHos);
+    int32_t keyCode = static_cast<int32_t>(oKey.keyValueOfHos);
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
     int32_t actionStartTime = static_cast<int32_t>(libinput_event_keyboard_get_time_usec(data));
@@ -778,7 +778,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<Key
     }
     item.SetKeyCode(keyCode);
     item.SetDeviceId(deviceId);
-    item.SetPressed(isKeyPressed); 
+    item.SetPressed(isKeyPressed);
 
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         kevnPtr->AddPressedKeyItems(item);
