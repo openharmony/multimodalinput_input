@@ -146,12 +146,13 @@ std::vector<EventRegesterInfo>& MultimodalEventHandler::GetAbilityInfoVec()
 bool MultimodalEventHandler::InitClient()
 {
     MMI_LOGD("enter");
-    if (mClient_) {
+    if (mClient_ != nullptr) {
         return true;
     }
     mClient_ = std::make_shared<MMIClient>();
     CHKPF(mClient_);
     mcMsgHandler_ = std::make_shared<ClientMsgHandler>();
+    CHK(mcMsgHandler_ != nullptr, ERROR_NULL_POINTER);
     EventManager.SetClientHandle(mClient_);
     mClient_->RegisterConnectedFunction(&OnConnected);
     if (!(mClient_->Start(mcMsgHandler_, true))) {

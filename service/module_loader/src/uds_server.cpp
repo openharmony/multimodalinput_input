@@ -137,8 +137,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
 {
     std::lock_guard<std::mutex> lock(mux_);
     MMI_LOGT("enter.");
-    const int NUMBER_TWO = 2;
-    int sockFds[NUMBER_TWO] = {};
+    int sockFds[2] = {};
 
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockFds) != 0) {
         const int savedErrNo = errno;
@@ -283,7 +282,8 @@ void OHOS::MMI::UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
         auto head = (PackHead*)&buf[readIdx];
         CHK(head->size[0] < static_cast<int32_t>(size), VAL_NOT_EXP);
         packSize = headSize + head->size[0];
-
+        CHK(size >= packSize, VAL_NOT_EXP);
+        
         NetPacket pkt(head->idMsg);
         if (head->size[0] > 0) {
             CHK(pkt.Write(&buf[readIdx + headSize], head->size[0]), STREAM_BUF_WRITE_FAIL);
@@ -349,7 +349,7 @@ void OHOS::MMI::UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
         MMI_LOGD("OnEpollEvent EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
         auto secPtr = GetSession(fd);
-        if (secPtr) {
+        if (secPtr != nullptr) {
             OnDisconnected(secPtr);
             DelSession(fd);
         }
