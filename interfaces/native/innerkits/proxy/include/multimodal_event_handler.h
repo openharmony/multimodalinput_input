@@ -76,8 +76,8 @@ private:
     std::vector<EventRegesterInfo> mAbilityInfoVec_;
     StandEventPtr mStandardizedEventHandle_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define MMIEventHdl OHOS::MMI::MultimodalEventHandler::GetInstance()
 
 #endif // MULTIMODAL_EVENT_HANDLER_H
