@@ -219,13 +219,11 @@ int32_t EventDispatch::KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer
                 SPCL_REG_EVENT_DISP_FAIL);
         }
     }
-    if ((ret1 == RET_OK) && (ret2 == RET_OK)) {
-        MMI_LOGD("leave");
-        return RET_OK;
-    } else {
+    if ((ret1 != RET_OK) || (ret2 != RET_OK)) {
         MMI_LOGE("dispatching special registered event has failed");
         return RET_ERR;
     }
+    return RET_OK;
 }
 
 int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_event *event,

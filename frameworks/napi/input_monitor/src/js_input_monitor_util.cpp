@@ -135,14 +135,14 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
 
 bool GetNamePropertyBool(const napi_env& env, const napi_value& object, const std::string& name)
 {
-    bool value = false;
     napi_value napiValue = {};
-    napi_valuetype tmpType = napi_undefined;
     napi_get_named_property(env, object, name.c_str(), &napiValue);
+    napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_LOGD("GetNamePropertyBool: call napi_typeof fail");
         return false;
     }
+    bool value = false;
     if (tmpType != napi_boolean) {
         MMI_LOGD("GetNamePropertyBool: value is not bool");
         return value;
@@ -156,8 +156,8 @@ std::string GetNamePropertyString(const napi_env& env, const napi_value& object,
 {
     std::string value = "";
     napi_value napiValue = {};
-    napi_valuetype tmpType = napi_undefined;
     napi_get_named_property(env, object, name.c_str(), &napiValue);
+    napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_LOGD("GetNamePropertyString: call napi_typeof fail");
         return value;
@@ -178,8 +178,8 @@ int32_t GetNamePropertyInt32(const napi_env& env, const napi_value& object, cons
 {
     int32_t value = 0;
     napi_value napiValue = {};
-    napi_valuetype tmpType = napi_undefined;
     napi_get_named_property(env, object, name.c_str(), &napiValue);
+    napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_LOGD("GetNamePropertyInt32: call napi_typeof fail");
         return value;
@@ -196,8 +196,8 @@ int64_t GetNamePropertyInt64(const napi_env& env, const napi_value& object, cons
 {
     int64_t value = 0;
     napi_value napiValue = {};
-    napi_valuetype tmpType = napi_undefined;
     napi_get_named_property(env, object, name.c_str(), &napiValue);
+    napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_LOGD("GetNamePropertyInt64: call napi_typeof fail");
         return value;
@@ -214,8 +214,8 @@ uint32_t GetNamePropertyUint32(const napi_env& env, const napi_value& object, co
 {
     uint32_t value = 0;
     napi_value napiValue = {};
-    napi_valuetype tmpType = napi_undefined;
     napi_get_named_property(env, object, name.c_str(), &napiValue);
+    napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_LOGD("GetNamePropertyUint32: call napi_typeof fail");
         return value;
