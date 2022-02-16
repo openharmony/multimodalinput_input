@@ -272,5 +272,5 @@ private:
     int32_t mDeviceEventType_ = 0;
     MMI::MultimodalEventPtr mDeviceEvent_ = nullptr;
 };
-}
+} // namespace OHOS
 #endif // TOUCH_EVENT_H

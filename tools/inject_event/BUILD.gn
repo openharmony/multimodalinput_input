@@ -17,7 +17,7 @@ import("//build/test.gni")
 SUBSYSTEM_DIR = "//foundation/multimodalinput"
 SUBSYSTEM_FRAMEWORKS_DIR = "//foundation/multimodalinput/input/frameworks"
 
-ohos_executable("inject_event_zhu") {
+ohos_executable("input") {
   sources = [
     "src/input_manager_command.cpp",
     "src/main.cpp",
@@ -26,7 +26,7 @@ ohos_executable("inject_event_zhu") {
   include_dirs = [
     "include",
     "$SUBSYSTEM_FRAMEWORKS_DIR/test/tools/inject_event/include",
-    "out\ohos-arm-release\innerkits\ohos-arm\utils_base\utils\include\include\string_ex.h",
+    "out/ohos-arm-release/innerkits/ohos-arm/utils_base/utils/include/include/string_ex.h",
     "$SUBSYSTEM_DIR/interfaces/native/innerkits/multimodalinput_proxy/include",
   ]
 

@@ -121,4 +121,4 @@ float MouseEvent::GetAxisValue(int32_t axis) const
 
     return 0.0F;
 }
-}
+} // namespace OHOS

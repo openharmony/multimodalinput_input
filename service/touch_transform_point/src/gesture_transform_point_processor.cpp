@@ -16,9 +16,10 @@
 #include "mouse_device_state.h"
 #include "gesture_transform_point_processor.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN,
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN,
             "GestureTransformPointProcessor"};
     }
 
@@ -158,4 +159,5 @@ std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestrueE
     MMI_LOGT("call OnTouchPadGestrueEvent end");
     return pointerEvent_;
 }
-}
+} // namespace MMI
+} // namespace OHOS
