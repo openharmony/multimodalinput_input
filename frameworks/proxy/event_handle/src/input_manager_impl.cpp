@@ -332,7 +332,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
 
 void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 {
-    if (interceptorId < 0) {
+    if (interceptorId <= 0) {
         MMI_LOGE("Specified interceptor does not exist");
         return;
     }
