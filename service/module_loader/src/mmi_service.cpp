@@ -22,6 +22,7 @@
 #include "event_dump.h"
 #include "input_windows_manager.h"
 #include "multimodal_input_connect_def_parcel.h"
+#include "pointer_drawing_manager.h"
 #include "register_eventhandle_manager.h"
 #include "safe_keeper.h"
 #include "timer_manager.h"
@@ -206,6 +207,9 @@ int32_t MMIService::Init()
     MMI_LOGD("DeviceRegister Init");
     CHKR(DevRegister->Init(), DEV_REG_INIT_FAIL, DEV_REG_INIT_FAIL);
 
+    MMI_LOGD("PointerDrawingManager Init");
+    CHKR(MouseDrawingManager::GetInstance()->Init(), POINTER_DRAW_INIT_FAIL, POINTER_DRAW_INIT_FAIL);
+
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
     CHKR(mmiFd_ >= 0, EPOLL_CREATE_FAIL, EPOLL_CREATE_FAIL);
     CHKR(InitSAService(), SASERVICE_INIT_FAIL, SASERVICE_INIT_FAIL);
@@ -269,13 +273,13 @@ void MMIService::OnDisconnected(SessionPtr s)
 #endif // OHOS_BUILD_AI
 }
 
-int32_t MMIService::AllocSocketFd(const std::string &programName, const int moduleType, int &toReturnClientFd)
+int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)
 {
     MMI_LOGI("MMIService::AllocSocketFd enter, programName:%{public}s,moduleType:%{public}d",
              programName.c_str(), moduleType);
 
     toReturnClientFd = INVALID_SOCKET_FD;
-    int serverFd = INVALID_SOCKET_FD;
+    int32_t serverFd = INVALID_SOCKET_FD;
     int32_t uid = GetCallingUid();
     int32_t pid = GetCallingPid();
     const int32_t ret = AddSocketPairInfo(programName, moduleType, serverFd, uid, pid, toReturnClientFd);
@@ -304,7 +308,7 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
         return RET_ERR;
     }
 
-    int clientFd = INVALID_SOCKET_FD;
+    int32_t clientFd = INVALID_SOCKET_FD;
     ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
     if (ret != RET_OK) {
         MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
@@ -357,7 +361,7 @@ void MMIService::OnThread()
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         bufMap.clear();
         count = EpollWait(ev[0], MAX_EVENT_SIZE, timeOut, mmiFd_);
-        for (int i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
+        for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
             CHKPC(mmiEd, ERROR_NULL_POINTER);
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {

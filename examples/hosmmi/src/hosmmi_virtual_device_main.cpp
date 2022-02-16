@@ -21,7 +21,6 @@ int32_t main(int32_t argc, const char *argv[])
         printf("Invaild Input Para, Plase Check the validity of the para!\n");
         return 0;
     }
-    const std::int32_t usleepTime = 1500000;
     OHOS::MMI::VirtualDevice::MakeFolder(OHOS::MMI::g_folderpath.c_str());
 
     std::vector<std::string> argvList = {};
@@ -30,6 +29,7 @@ int32_t main(int32_t argc, const char *argv[])
     }
     std::string firstArgv = argvList[1];
 
+    const std::int32_t usleepTime = 1500000;
     if (OHOS::MMI::VirtualDevice::FunctionalShunt(firstArgv, argvList)) {
         while (true) {
             usleep(usleepTime);
