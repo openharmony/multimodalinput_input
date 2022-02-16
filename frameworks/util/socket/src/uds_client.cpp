@@ -56,9 +56,9 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
     CHKPF(buf);
     CHKF(size > 0 && size <= MAX_PACKET_BUF_SIZE, PARAM_INPUT_INVALID);
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
-    uint64_t ret = write(fd_, static_cast<const void *>(buf), size);
+    ssize_t ret = write(fd_, static_cast<const void *>(buf), size);
     if (ret < 0) {
-        MMI_LOGE("SendMsg write errCode:%{public}d, return %{public}" PRId64 "", MSG_SEND_FAIL, ret);
+        MMI_LOGE("SendMsg write errCode:%{public}d,return %{public}zd", MSG_SEND_FAIL, ret);
         return false;
     }
     return true;
@@ -88,13 +88,14 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
 {
     MMI_LOGT("enter detachMode = %d", detachMode);
     recvFun_ = fun;
-    isRun_ = true;
+    isRunning_ = true;
     isConnected_ = true;
     if (ConnectTo() < 0) {
         MMI_LOGW("Client connection failed, Try again later");
         isConnected_ = false;
 
         if (IsFirstConnectFailExit()) {
+            MMI_LOGE("first connection faild");
             return false;
         }
     }
@@ -112,7 +113,7 @@ void UDSClient::Stop()
 {
     MMI_LOGT("enter");
     Close();
-    isRun_ = false;
+    isRunning_ = false;
     epoll_event ev = {};
     if (fd_ >= 0) {
         EpollCtl(fd_, EPOLL_CTL_DEL, ev);
@@ -153,7 +154,7 @@ void UDSClient::OnEvent(const epoll_event& ev, StreamBuffer& buf)
     auto isoverflow = false;
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGI("fd:%{public}d, ev.events:0x%{public}x", fd, ev.events);
+        MMI_LOGI("ev.events:0x%{public}x,fd:%{public}d same as fd_:%{public}d", ev.events, fd, fd_);
         OnDisconnected();
         epoll_event event = {};
         EpollCtl(fd, EPOLL_CTL_DEL, event);
@@ -188,13 +189,13 @@ void UDSClient::OnEvent(const epoll_event& ev, StreamBuffer& buf)
 
 void UDSClient::OnThread(std::promise<bool>& threadPromise)
 {
-    SetThreadName(std::string("uds_client"));
+    SetThreadName("uds_client");
     MMI_LOGD("UDSClient::OnThread begin");
     isThreadHadRun_ = true;
     StreamBuffer streamBuf;
     epoll_event events[MAX_EVENT_SIZE] = {};
 
-    while (isRun_) {
+    while (isRunning_) {
         if (isConnected_) {
             streamBuf.Clean();
             auto count = EpollWait(*events, MAX_EVENT_SIZE, DEFINE_EPOLL_TIMEOUT);
@@ -214,7 +215,7 @@ void UDSClient::OnThread(std::promise<bool>& threadPromise)
         OnThreadLoop();
 
         if (isToExit_) {
-            isRun_ = false;
+            isRunning_ = false;
             MMI_LOGW("Client thread exit");
             break;
         }

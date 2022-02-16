@@ -38,7 +38,8 @@ MultimodalInputConnectProxy::~MultimodalInputConnectProxy()
     MMI_LOGI("~MultimodalInputConnectProxy()");
 }
 
-int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programName, const int moduleType, int &socketFd)
+int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programName,
+    const int32_t moduleType, int32_t &socketFd)
 {
     MMI_LOGD("enter");
     MessageParcel data;
@@ -58,22 +59,22 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
         return ERR_INVALID_VALUE;
     }
 
-    int requestResult = Remote()->SendRequest(ALLOC_SOCKET_FD, data, reply, option);
+    int32_t requestResult = Remote()->SendRequest(ALLOC_SOCKET_FD, data, reply, option);
     if (requestResult != NO_ERROR) {
         MMI_LOGE("send request fail, result:%{public}d", requestResult);
         return RET_ERR;
     }
 
-    MMI_LOGE("have recieve message from server");
+    MMI_LOGD("have recieve message from server");
 
-    int result = reply.ReadInt32();
-    MMI_LOGE("result:%{public}d", result);
+    int32_t result = reply.ReadInt32();
+    MMI_LOGD("result:%{public}d", result);
     if (result != RET_OK) {
         MMI_LOGE("responce return error:%{public}d", result);
         return RET_ERR;
     }
     socketFd = reply.ReadFileDescriptor();
-    MMI_LOGE("socketFd:%{public}d", socketFd);
+    MMI_LOGD("socketFd:%{public}d", socketFd);
     MMI_LOGD("leave");
     return RET_OK;
 }

@@ -23,6 +23,7 @@ namespace {
 }
 bool PointerEventParcel::Marshalling(Parcel& out) const
 {
+    MMI_LOGD("enter");
     if (data_ == nullptr) {
         data_ = PointerEvent::Create();
     }
@@ -31,11 +32,13 @@ bool PointerEventParcel::Marshalling(Parcel& out) const
         data_ = nullptr;
         return false;
     }
+    MMI_LOGD("leave");
     return true;
 }
 
 PointerEventParcel *PointerEventParcel::Unmarshalling(Parcel& in)
 {
+    MMI_LOGD("enter");
     auto* request = new (std::nothrow) PointerEventParcel();
     if (request == nullptr) {
         return nullptr;
@@ -55,7 +58,7 @@ PointerEventParcel *PointerEventParcel::Unmarshalling(Parcel& in)
         request = nullptr;
         return nullptr;
     }
-
+    MMI_LOGD("leave");
     return request;
 }
 } // namespace MMI

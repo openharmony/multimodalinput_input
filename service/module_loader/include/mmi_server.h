@@ -67,6 +67,6 @@ private:
     int32_t InitExpSoLibrary();
     int32_t InitLibinput();
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // MMI_SERVER_H

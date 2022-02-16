@@ -22,8 +22,8 @@ namespace MMI {
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventMonitorManager" };
     }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 OHOS::MMI::InputEventMonitorManager::InputEventMonitorManager()
 {
@@ -47,7 +47,7 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventMontior(SessionPtr ses
         return RET_ERR;
     }
     iter = monitors_.insert(iter, monitorItem);
-    MMI_LOGD("eventType:%{public}d, fd:%{public}d register in server", eventType, session->GetFd());
+    MMI_LOGD("eventType:%{public}d,fd:%{public}d register in server", eventType, session->GetFd());
     return RET_OK;
 }
 
@@ -62,7 +62,7 @@ void OHOS::MMI::InputEventMonitorManager::RemoveInputEventMontior(SessionPtr ses
     auto it = std::find(monitors_.begin(), monitors_.end(), monitorItem);
     if (it != monitors_.end()) {
         monitors_.erase(it);
-        MMI_LOGW("EventType:%{public}d, fd:%{public}d remove from server", eventType, session->GetFd());
+        MMI_LOGW("EventType:%{public}d,fd:%{public}d remove from server", eventType, session->GetFd());
     }
     MMI_LOGD("Leave");
 }
@@ -83,7 +83,7 @@ void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OH
     for (const auto &item : monitors_) {
         CHKPV(item.session);
         newPkt << item.session->GetPid();
-        MMI_LOGD("server send the msg to client: keyCode:%{public}d, pid:%{public}d", keyEvent->GetKeyCode(),
+        MMI_LOGD("server send the msg to client: keyCode:%{public}d,pid:%{public}d", keyEvent->GetKeyCode(),
             item.session->GetPid());
         item.session->SendMsg(newPkt);
     }
@@ -102,7 +102,7 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventTouchpadMontior(int32_
         return RET_ERR;
     }
     iter = monitorsTouch_.insert(iter, monitorItemTouchpad);
-    MMI_LOGD("AddInputEventTouchpadMontior, Success, eventType:%{public}d, fd:%{public}d register in server",
+    MMI_LOGD("AddInputEventTouchpadMontior, Success, eventType:%{public}d,fd:%{public}d register in server",
         eventType, session->GetFd());
     return RET_OK;
 }
@@ -118,7 +118,7 @@ void OHOS::MMI::InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_
     if (iter == monitorsTouch_.end()) {
         MMI_LOGE("monitorItemtouchpad does not exist");
     } else {
-        MMI_LOGD("eventType:%{public}d, fd:%{public}d remove from server", eventType, session->GetFd());
+        MMI_LOGD("eventType:%{public}d,fd:%{public}d remove from server", eventType, session->GetFd());
         iter = monitorsTouch_.erase(iter);
         MMI_LOGD("Service RemoveInputEventTouchpadMontior Success");
     }
@@ -137,7 +137,7 @@ void OHOS::MMI::InputEventMonitorManager::OnTouchpadMonitorInputEvent(
     std::list<MonitorItem>::iterator iter;
     for (const auto &item :  monitorsTouch_) {
         newPkt << item.session->GetPid();
-        MMI_LOGD("server send the msg to client: EventType:%{public}d, pid:%{public}d",
+        MMI_LOGD("server send the msg to client: EventType:%{public}d,pid:%{public}d",
             pointerEvent->GetEventType(), item.session->GetPid());
         item.session->SendMsg(newPkt);
         MMI_LOGD("Service SendMsg Success");
@@ -149,9 +149,9 @@ bool OHOS::MMI::InputEventMonitorManager::ReportTouchpadEvent(std::shared_ptr<OH
 {
     PointerEvent::PointerItem pointer;
     CHKF(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL);
-    MMI_LOGD("monitor-serviceeventTouchpad:time:%{public}d, "
-             "sourceType:%{public}d, action:%{public}d, "
-             "pointerId:%{public}d, point.x:%{public}d, point.y:%{public}d, press:%{public}d",
+    MMI_LOGD("monitor-serviceeventTouchpad:time:%{public}d,"
+             "sourceType:%{public}d,action:%{public}d,"
+             "pointerId:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     OnTouchpadMonitorInputEvent(pointerEvent);

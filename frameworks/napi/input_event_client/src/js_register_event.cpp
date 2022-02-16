@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsRegisterEvent" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsRegisterEvent" };
 }
 static std::map<std::string, uint32_t> g_jsEventType = {};
 
@@ -112,9 +112,9 @@ int32_t AddEventCallback(const napi_env& env, CallbackMap& jsEvent, const EventI
 
     auto it = iter->second.begin();
     while (it != iter->second.end()) {
-        bool isEquals = false;
         napi_value handlerTemp = nullptr;
         napi_get_reference_value(env, *it, &handlerTemp);
+        bool isEquals = false;
         napi_strict_equals(env, handlerTemp, event.handle, &isEquals);
         if (isEquals) {
             MMI_LOGD("event %{public}s callback already exists", event.name.c_str());
@@ -138,9 +138,9 @@ int32_t DelEventCallback(const napi_env& env, CallbackMap& jsEvent, const EventI
 
     auto it = iter->second.begin();
     while (it != iter->second.end()) {
-        bool isEquals = false;
         napi_value handlerTemp = nullptr;
         napi_get_reference_value(env, *it, &handlerTemp);
+        bool isEquals = false;
         napi_strict_equals(env, handlerTemp, event.handle, &isEquals);
         if (isEquals) {
             napi_delete_reference(env, *it);
@@ -334,19 +334,18 @@ bool SendMultimodalEvent(const napi_env& env, const CallbackMap& jsEvent, int32_
 {
     MMI_LOGD("send event:%{public}s, CallbackMap size:%{public}d",
         eventTable[type].c_str(), static_cast<int32_t>(jsEvent.size()));
-    size_t argc = 1;
-    napi_value argv = nullptr;
-    napi_value result = nullptr;
     napi_value thisVar = nullptr;
     bool getResult = false;
     if (napi_get_undefined(env, &thisVar) != napi_ok) {
         MMI_LOGE("call napi_get_undefined fail");
         return getResult;
     }
+    napi_value result = nullptr;
     if (napi_create_object(env, &result) != napi_ok) {
         MMI_LOGE("call napi_create_object fail");
         return getResult;
     }
+    napi_value argv = nullptr;
     if (napi_create_object(env, &argv) != napi_ok) {
         MMI_LOGE("call napi_create_object fail");
         return getResult;
@@ -365,6 +364,7 @@ bool SendMultimodalEvent(const napi_env& env, const CallbackMap& jsEvent, int32_
         return true;
     }
 
+    size_t argc = 1;
     for (const auto &item : iter->second) {
         napi_value callback = nullptr;
         if (napi_get_reference_value(env, item, &callback) != napi_ok) {
@@ -613,19 +613,18 @@ bool AppKeyEventHandle::OnKey(const OHOS::KeyEvent& keyEvent)
 bool AppKeyEventHandle::SendEvent(const std::string& name, const OHOS::KeyEvent& event) const
 {
     MMI_LOGD("send event:%{public}s", name.c_str());
-    size_t argc = 1;
-    napi_value argv = nullptr;
-    napi_value result = nullptr;
     napi_value thisVar = nullptr;
     bool getResult = false;
     if (napi_get_undefined(env_, &thisVar) != napi_ok) {
         MMI_LOGE("call napi_get_undefined fail");
         return getResult;
     }
+    napi_value result = nullptr;
     if (napi_create_object(env_, &result) != napi_ok) {
         MMI_LOGE("call napi_create_object fail");
         return getResult;
     }
+    napi_value argv = nullptr;
     if (napi_create_object(env_, &argv) != napi_ok) {
         MMI_LOGE("call napi_create_object fail");
         return getResult;
@@ -648,6 +647,7 @@ bool AppKeyEventHandle::SendEvent(const std::string& name, const OHOS::KeyEvent&
         MMI_LOGD("%{public}s do not have callback function", name.c_str());
         return true;
     }
+    size_t argc = 1;
     for (const auto &item : iter->second) {
         napi_value callback = nullptr;
         if (napi_get_reference_value(env_, item, &callback) != napi_ok) {
@@ -678,19 +678,18 @@ bool AppTouchEventHandle::OnTouch(const TouchEvent& touchEvent)
 bool AppTouchEventHandle::SendEvent(const std::string& name, const TouchEvent& event) const
 {
     MMI_LOGD("send event:%{public}s", name.c_str());
-    size_t argc = 1;
-    napi_value argv = nullptr;
-    napi_value result = nullptr;
     napi_value thisVar = nullptr;
     bool getResult = false;
     if (napi_get_undefined(env_, &thisVar) != napi_ok) {
         MMI_LOGE("call napi_get_undefined fail");
         return getResult;
     }
+    napi_value result = nullptr;
     if (napi_create_object(env_, &result) != napi_ok) {
         MMI_LOGE("call napi_create_object fail");
         return getResult;
     }
+    napi_value argv = nullptr;
     if (napi_create_object(env_, &argv) != napi_ok) {
         MMI_LOGE("call napi_create_object fail");
         return getResult;
@@ -707,6 +706,7 @@ bool AppTouchEventHandle::SendEvent(const std::string& name, const TouchEvent& e
         return true;
     }
 
+    size_t argc = 1;
     for (const auto &item : iter->second) {
         napi_value callback = nullptr;
         if (napi_get_reference_value(env_, item, &callback) != napi_ok) {
@@ -786,19 +786,18 @@ bool AppDeviceEventHandle::OnDeviceRemove(const DeviceEvent& deviceEvent)
 bool AppDeviceEventHandle::SendEvent(const std::string& name, const DeviceEvent& event) const
 {
     MMI_LOGD("send event:%{public}s", name.c_str());
-    size_t argc = 1;
-    napi_value argv = nullptr;
-    napi_value result = nullptr;
     napi_value thisVar = nullptr;
     bool getResult = false;
     if (napi_get_undefined(env_, &thisVar) != napi_ok) {
         MMI_LOGE("call napi_get_undefined fail");
         return getResult;
     }
+    napi_value result = nullptr;
     if (napi_create_object(env_, &result) != napi_ok) {
         MMI_LOGE("call napi_create_object fail");
         return getResult;
     }
+    napi_value argv = nullptr;
     if (napi_create_object(env_, &argv) != napi_ok) {
         MMI_LOGE("call napi_create_object fail");
         return getResult;
@@ -828,6 +827,7 @@ bool AppDeviceEventHandle::SendEvent(const std::string& name, const DeviceEvent&
         return true;
     }
 
+    size_t argc = 1;
     for (const auto &item : iter->second) {
         napi_value callback = nullptr;
         if (napi_get_reference_value(env_, item, &callback) != napi_ok) {
@@ -844,5 +844,5 @@ bool AppDeviceEventHandle::SendEvent(const std::string& name, const DeviceEvent&
 
     return true;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

@@ -61,5 +61,5 @@ public:
 private:
     float mRotationValue_ = 0;
 };
-}
+} // namespace OHOS
 #endif // ROTATION_EVENT_H

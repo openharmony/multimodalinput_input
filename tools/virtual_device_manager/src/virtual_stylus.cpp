@@ -18,17 +18,17 @@
 OHOS::MMI::VirtualStylus::VirtualStylus() : VirtualDevice("Virtual Stylus",
     BUS_USB, 0x56a, 0x392)
 {
-    const int ABS_MAX_X = 31920;
-    const int ABS_MAX_Y = 19950;
-    const int ABS_MIN_Z = -900;
-    const int ABS_MAX_Z = 899;
-    const int ABS_MAX_WHEEL = 2047;
-    const int ABS_MAX_PRESSURE = 8191;
-    const int ABS_MIN_TILT_XY = -64;
-    const int ABS_MAX_TILT_XY_DISTANCE = 63;
-    const int ABS_MIN_MISC = -2147483648;
-    const int ABS_MAX_MISC = 2147483647;
-    const int ABS_FUZZ_XY = 4;
+    const int32_t ABS_MAX_X = 31920;
+    const int32_t ABS_MAX_Y = 19950;
+    const int32_t ABS_MIN_Z = -900;
+    const int32_t ABS_MAX_Z = 899;
+    const int32_t ABS_MAX_WHEEL = 2047;
+    const int32_t ABS_MAX_PRESSURE = 8191;
+    const int32_t ABS_MIN_TILT_XY = -64;
+    const int32_t ABS_MAX_TILT_XY_DISTANCE = 63;
+    const int32_t ABS_MIN_MISC = -2147483648;
+    const int32_t ABS_MAX_MISC = 2147483647;
+    const int32_t ABS_FUZZ_XY = 4;
 
     dev_.absmin[ABS_X] = 0;
     dev_.absmax[ABS_X] = ABS_MAX_X;

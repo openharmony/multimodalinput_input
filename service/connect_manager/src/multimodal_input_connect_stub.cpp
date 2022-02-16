@@ -16,7 +16,6 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include "error_multimodal.h"
-#include "ipc_skeleton.h"
 #include "log.h"
 #include "multimodal_input_connect_define.h"
 #include "string_ex.h"
@@ -24,11 +23,10 @@
 
 namespace OHOS {
 namespace MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
-            LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectStub"
-        };
-    }
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectStub" };
+}
+
 int32_t MultimodalInputConnectStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
@@ -51,30 +49,13 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
     }
 }
 
-bool MultimodalInputConnectStub::IsAuthorizedCalling() const
-{
-    int callingUid = IPCSkeleton::GetCallingUid();
-    MMI_LOGIK("Calling uid:%{public}d", callingUid);
-    return true;
-}
-
-int32_t MultimodalInputConnectStub::GetCallingUid() const
-{
-    return IPCSkeleton::GetCallingUid();
-}
-
-int32_t MultimodalInputConnectStub::GetCallingPid() const
-{
-    return IPCSkeleton::GetCallingPid();
-}
-
 int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply)
 {
     MMI_LOGT("enter");
     int32_t ret = RET_OK;
 
     do {
-        const int32_t uid = GetCallingUid();
+        const int32_t uid = IPCSkeleton::GetCallingUid();
         if (uid != SYSTEM_UID && uid != ROOT_UID) {
             MMI_LOGE("uid is not root or system");
             ret = SASERVICE_PERMISSION_FAIL;

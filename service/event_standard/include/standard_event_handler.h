@@ -38,6 +38,6 @@ private:
     libinput_button_state leftButtonState_ = {};
     uint32_t leftButton_ = 0;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // STANDARD_EVENT_HANDLER_H

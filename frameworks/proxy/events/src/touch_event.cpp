@@ -20,7 +20,7 @@
 namespace OHOS {
     namespace {
         using namespace OHOS::MMI;
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "TouchEvent"};
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "TouchEvent"};
     }
 
 TouchEvent::~TouchEvent() {}
@@ -168,4 +168,4 @@ int32_t TouchEvent::GetOriginEventType() const
 {
     return mDeviceEventType_;
 }
-}
+} // namespace OHOS

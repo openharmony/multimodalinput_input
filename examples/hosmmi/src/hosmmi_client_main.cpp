@@ -305,9 +305,9 @@ public:
 
     void RegisterStandardizedEventHandle()
     {
-        MMI_LOGI("MMIClientDemo RegisterStandardizedEventHandle enter.");
+        MMI_LOGI("MMIClientDemo RegisterStandardizedEventHandle enter");
 
-        MMI_LOGD("Register key event.");
+        MMI_LOGD("Register key event");
 
         using namespace OHOS::MMI;
 
@@ -315,27 +315,27 @@ public:
         handerMap_[std::string("AppKeyEventHandle")] = appKey;
         MMIEventHdl.RegisterStandardizedEventHandle(remoteObject_, windowId_, appKey);
 
-        MMI_LOGD("Register touch event.");
+        MMI_LOGD("Register touch event");
         auto appTouch = CreateEvent<AppTouchEventHandle>();
         handerMap_[std::string("AppTouchEventHandle")] = appTouch;
         MMIEventHdl.RegisterStandardizedEventHandle(remoteObject_, windowId_, appTouch);
 
-        MMI_LOGD("Register Common event.");
+        MMI_LOGD("Register Common event");
         auto appCommon = CreateEvent<AppCommonEventHandle>();
         handerMap_[std::string("AppCommonEventHandle")] = appCommon;
         MMIEventHdl.RegisterStandardizedEventHandle(remoteObject_, windowId_, appCommon);
 
-        MMI_LOGD("Register Media event.");
+        MMI_LOGD("Register Media event");
         auto appMedia = CreateEvent<AppMediaEventHandle>();
         handerMap_[std::string("AppMediaEventHandle")] = appMedia;
         MMIEventHdl.RegisterStandardizedEventHandle(remoteObject_, windowId_, appMedia);
 
-        MMI_LOGD("Register System event.");
+        MMI_LOGD("Register System event");
         auto appSystem = CreateEvent<AppSystemEventHandle>();
         handerMap_[std::string("AppSystemEventHandle")] = appSystem;
         MMIEventHdl.RegisterStandardizedEventHandle(remoteObject_, windowId_, appSystem);
 
-        MMI_LOGD("Register Telephone event.");
+        MMI_LOGD("Register Telephone event");
         auto appTelephone = CreateEvent<AppTelephoneEventHandle>();
         handerMap_[std::string("AppTelephoneEventHandle")] = appTelephone;
         MMIEventHdl.RegisterStandardizedEventHandle(remoteObject_, windowId_, appTelephone);
@@ -343,7 +343,7 @@ public:
 
     void UnregisterStandardizedEventHandle()
     {
-        MMI_LOGI("MMIClientDemo::UnregisterStandardizedEventHandle enter.");
+        MMI_LOGI("MMIClientDemo::UnregisterStandardizedEventHandle enter");
         for (auto it = handerMap_.begin(); it != handerMap_.end();) {
             MMI_LOGD("UnregisterStandardizedEventHandle:%{public}s", it->first.c_str());
             MMIEventHdl.UnregisterStandardizedEventHandle(remoteObject_, windowId_, it->second);
@@ -369,7 +369,7 @@ void RunClient()
 
     MMI_LOGD("UnRegisterStandardizedEventHandle begin");
     client.UnregisterStandardizedEventHandle();
-    MMI_LOGD("UnRegisterStandardizedEventHandle end, wait 3000ms exit.");
+    MMI_LOGD("UnRegisterStandardizedEventHandle end, wait 3000ms exit");
 }
 
 void ClientStopHandler(int signalNo)
@@ -386,7 +386,7 @@ int main(int argc, char* argv[])
 #endif
     const sighandler_t ret = signal(SIGTERM, ClientStopHandler);
     if (ret == SIG_ERR) {
-        MMI_LOGD("signal ret SIG_ERR.");
+        MMI_LOGD("signal ret SIG_ERR");
         return RET_ERR;
     }
 
@@ -396,7 +396,7 @@ int main(int argc, char* argv[])
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
-    MMI_LOGD("hosmmi-client exit.");
+    MMI_LOGD("hosmmi-client exit");
 
     return 0;
 }

@@ -30,8 +30,8 @@ namespace {
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     MMI_LOGD("Enter");
-    size_t requireArgc = 2;
     size_t argc = 2;
+    size_t requireArgc = 2;
     napi_value argv[requireArgc];
     napi_status status = napi_generic_failure;
 
@@ -89,7 +89,6 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     MMI_LOGD("Enter");
-    size_t minArgc = 1;
     size_t argc = 2;
     napi_value argv[argc];
     argv[0] = nullptr;
@@ -101,6 +100,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         MMI_LOGE("Unregister js monitor failed, get cb info failed");
         return nullptr;
     }
+    size_t minArgc = 1;
     if (argc < minArgc) {
         MMI_LOGE("Unregister js monitor failed, the number of parameter is error");
         return nullptr;

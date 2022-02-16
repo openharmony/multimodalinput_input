@@ -48,6 +48,6 @@ protected:
     FunInputEvent funInputEvent_;
     std::string seat_id_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // S_INPUT_H
