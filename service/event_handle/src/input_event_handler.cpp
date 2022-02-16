@@ -34,9 +34,10 @@
 #include "ability_launch_manager.h"
 #include "util.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventHandler" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventHandler" };
     }
 
 InputEventHandler::InputEventHandler()
@@ -411,7 +412,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
     int32_t keyId = keyEvent_->GetId();
     std::string keyEventString = "OnKeyEvent";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
-    keyEventString = "service report keyId=" +  std::to_string(keyId);
+    keyEventString = "service report keyId=" + std::to_string(keyId);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
 #ifndef OHOS_WESTEN_MODEL
     if (InterceptorMgrGbl.OnKeyEvent(keyEvent_)) {
@@ -599,7 +600,7 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
     CHKPR(event, ERROR_NULL_POINTER);
     MMI_LOGD("Enter");
     auto point = TouchTransformPointManger->OnLibinputTouchEvent(event);
-    CKP(point);
+    CHKPR(point, ERROR_NULL_POINTER);
     int32_t pointerId = point->GetId();
     std::string touchEvent = "OnEventTouch";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, pointerId);
@@ -982,4 +983,5 @@ bool InputEventHandler::OnSystemEvent(const KeyEventValueTransformations& temp,
     return retCode;
 }
 #endif
-}
+} // namespace MMI
+} // namespace OHOS

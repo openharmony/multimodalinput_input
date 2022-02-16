@@ -37,10 +37,12 @@
 #include "hdi_inject.h"
 #endif
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ServerMsgHandler" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ServerMsgHandler" };
     }
+}
 }
 
 OHOS::MMI::ServerMsgHandler::ServerMsgHandler()
@@ -343,7 +345,7 @@ int32_t OHOS::MMI::ServerMsgHandler::NewCheckReplyMessageFormClient(SessionPtr s
     MMI_LOGT("begin");
     int32_t id = 0;
     pkt >> id;
-    sess->ClearEventList(id);
+    sess->DelEvents(id);
     MMI_LOGT("end");
     return RET_OK;
 }
