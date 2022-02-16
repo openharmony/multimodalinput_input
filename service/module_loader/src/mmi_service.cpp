@@ -103,7 +103,7 @@ int32_t MMIService::EpollCtlAdd(EpollEventType type, int32_t fd)
     CHKR(ed, MALLOC_FAIL, RET_ERR);
     ed->fd = fd;
     ed->event_type = type;
-    MMI_LOGD("MMIService::EpollCtlAdd userdata:[fd:%{public}d, type:%{public}d]", ed->fd, ed->event_type);
+    MMI_LOGD("MMIService::EpollCtlAdd userdata:[fd:%{public}d,type:%{public}d]", ed->fd, ed->event_type);
 
     epoll_event ev = {};
     ev.events = EPOLLIN;
@@ -142,7 +142,7 @@ bool MMIService::InitLibinputService()
         EpollClose();
         return false;
     }
-    MMI_LOGD("MMIService::InitLibinputService EpollCtlAdd, epollfd:%{public}d, fd:%{public}d", mmiFd_, inputFd);
+    MMI_LOGD("MMIService::InitLibinputService EpollCtlAdd, epollfd:%{public}d,fd:%{public}d", mmiFd_, inputFd);
     return true;
 }
 
@@ -157,7 +157,7 @@ bool MMIService::InitSAService()
         EpollClose();
         return false;
     }
-    MMI_LOGD("MMIService::InitLibinputService EpollCtlAdd, epollfd:%{public}d, fd:%{public}d", mmiFd_, epollFd_);
+    MMI_LOGD("MMIService::InitLibinputService EpollCtlAdd, epollfd:%{public}d,fd:%{public}d", mmiFd_, epollFd_);
     return true;
 }
 
@@ -223,7 +223,7 @@ void MMIService::OnStart()
     int32_t ret = 0;
     CHK((RET_OK == (ret = Init())), ret);
     state_ = ServiceRunningState::STATE_RUNNING;
-    MMI_LOGD("MMIService Started successfully...");
+    MMI_LOGD("MMIService Started successfully");
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
     t_.detach();
 }
@@ -271,7 +271,7 @@ void MMIService::OnDisconnected(SessionPtr s)
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int moduleType, int &toReturnClientFd)
 {
-    MMI_LOGI("MMIService::AllocSocketFd enter, programName:%{public}s, moduleType:%{public}d",
+    MMI_LOGI("MMIService::AllocSocketFd enter, programName:%{public}s,moduleType:%{public}d",
              programName.c_str(), moduleType);
 
     toReturnClientFd = INVALID_SOCKET_FD;
@@ -280,11 +280,11 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int modu
     int32_t pid = GetCallingPid();
     const int32_t ret = AddSocketPairInfo(programName, moduleType, serverFd, uid, pid, toReturnClientFd);
     if (ret != RET_OK) {
-        MMI_LOGE("call AddSocketPairInfo return %{public}d.", ret);
+        MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
         return RET_ERR;
     }
 
-    MMI_LOGIK("leave, programName:%{public}s, moduleType:%{public}d, alloc success.",
+    MMI_LOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
         programName.c_str(), moduleType);
 
     return RET_OK;
@@ -298,7 +298,7 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
         MMI_LOGE("read data error.");
         return RET_ERR;
     }
-    MMI_LOGIK("clientName:%{public}s, moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
+    MMI_LOGIK("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
     if (!IsAuthorizedCalling()) {
         MMI_LOGE("permission denied");
         return RET_ERR;
@@ -307,12 +307,12 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
     int clientFd = INVALID_SOCKET_FD;
     ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
     if (ret != RET_OK) {
-        MMI_LOGE("call AddSocketPairInfo return %{public}d.", ret);
+        MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
         reply.WriteInt32(RET_ERR);
         return RET_ERR;
     }
 
-    MMI_LOGI("call AllocSocketFd success.");
+    MMI_LOGI("call AllocSocketFd success");
 
     reply.WriteInt32(RET_OK);
     reply.WriteFileDescriptor(clientFd);

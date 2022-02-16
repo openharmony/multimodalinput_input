@@ -120,7 +120,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     MMI_LOGD("Enter");
     int32_t getKeyCode = keyEvent->GetKeyCode();
     std::string keyCodestring = "client dispatchKeyCode = " + std::to_string(getKeyCode);
-    MMI_LOGT(" OnKeyEvent client trace getKeyCode:%{public}d", getKeyCode);
+    MMI_LOGD(" OnKeyEvent client trace getKeyCode:%{public}d", getKeyCode);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring);
     int32_t keyId = keyEvent->GetId();
     keyCodestring = "KeyEventDispatch";

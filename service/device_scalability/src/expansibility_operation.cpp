@@ -24,21 +24,18 @@
 namespace OHOS {
 namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ExpansibilityOperation" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ExpansibilityOperation" };
     }
-}
-}
-
-OHOS::MMI::ExpansibilityOperation::ExpansibilityOperation()
+ExpansibilityOperation::ExpansibilityOperation()
 {
     libPath_ = ' ';
 }
 
-OHOS::MMI::ExpansibilityOperation::~ExpansibilityOperation()
+ExpansibilityOperation::~ExpansibilityOperation()
 {
 }
 
-std::string OHOS::MMI::ExpansibilityOperation::GetFileName(const std::string& line)
+std::string ExpansibilityOperation::GetFileName(const std::string& line)
 {
     std::istringstream stream(line);
     std::string deviceName;
@@ -49,7 +46,7 @@ std::string OHOS::MMI::ExpansibilityOperation::GetFileName(const std::string& li
     return fileName;
 }
 
-int32_t OHOS::MMI::ExpansibilityOperation::GetNewDeviceFd(const std::string& fileName)
+int32_t ExpansibilityOperation::GetNewDeviceFd(const std::string& fileName)
 {
     // load dyn file
     std::string filePath;
@@ -83,7 +80,7 @@ int32_t OHOS::MMI::ExpansibilityOperation::GetNewDeviceFd(const std::string& fil
     return deviceEventFd;
 }
 
-void OHOS::MMI::ExpansibilityOperation::LoadExteralLibrary(const std::string& cfg, const std::string& libPath)
+void ExpansibilityOperation::LoadExteralLibrary(const std::string& cfg, const std::string& libPath)
 {
     CHK(cfg.length() > 1, PARAM_INPUT_INVALID);
     CHK(libPath.length() > 1, PARAM_INPUT_INVALID);
@@ -113,13 +110,15 @@ void OHOS::MMI::ExpansibilityOperation::LoadExteralLibrary(const std::string& cf
     return;
 }
 
-bool OHOS::MMI::ExpansibilityOperation::RegistDeviceEventFd(int32_t deviceEventFd)
+bool ExpansibilityOperation::RegistDeviceEventFd(int32_t deviceEventFd)
 {
     MMI_LOGD("The New Device fd:%{public}d", deviceEventFd);
     return true;
 }
 
-bool OHOS::MMI::ExpansibilityOperation::UnRegistDeviceEventFd(int32_t deviceEventFd)
+bool ExpansibilityOperation::UnRegistDeviceEventFd(int32_t deviceEventFd)
 {
     return true;
 }
+} // namespace MMI
+} // namespace OHOS

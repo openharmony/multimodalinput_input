@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AppRegister" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AppRegister" };
     }
 #if 0
 const int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
@@ -301,5 +301,5 @@ void AppRegister::UnregisterConnectState(int32_t fd)
     }
     MMI_LOGD("leave");
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
