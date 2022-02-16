@@ -160,8 +160,8 @@ void RegisterEventHandleManager::Clear()
 }
 
 void RegisterEventHandleManager::RegisterEventHandleByIdMsage(const MmiMessageId idMsgBegin,
-                                                                         const MmiMessageId idMsgEnd,
-                                                                         const int32_t fd)
+                                                              const MmiMessageId idMsgEnd,
+                                                              const int32_t fd)
 {
     const int32_t messageIdBeginTemp = static_cast<int32_t>(idMsgBegin);
     const int32_t messageIdEndTemp = static_cast<int32_t>(idMsgEnd);
@@ -172,8 +172,8 @@ void RegisterEventHandleManager::RegisterEventHandleByIdMsage(const MmiMessageId
 }
 
 void RegisterEventHandleManager::UnregisterEventHandleByIdMsage(const MmiMessageId idMsgBegin,
-                                                                           const MmiMessageId idMsgEnd,
-                                                                           const int32_t fd)
+                                                                const MmiMessageId idMsgEnd,
+                                                                const int32_t fd)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(static_cast<int32_t>(idMsgBegin) + 1);
     auto it = mapRegisterManager_.find(idMsg);
