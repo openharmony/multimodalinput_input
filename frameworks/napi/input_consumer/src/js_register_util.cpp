@@ -137,8 +137,8 @@ int32_t AddEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
         napi_throw_error(env, nullptr, "Handler1 get reference value failed");
         return JS_CALLBACK_EVENT_FAILED;
     }
-    auto it = callbacks[event->eventType];
-    for (const auto &iter : it) {
+    auto it = callbacks.find(event->eventType);
+    for (const auto &iter : it->second) {
         napi_value handler2 = nullptr;
         status = napi_get_reference_value(env, (*iter).callback[0], &handler2);
         if (status != napi_ok) {
@@ -152,15 +152,15 @@ int32_t AddEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
             return JS_CALLBACK_EVENT_FAILED;
         }
         if (isEqual) {
-            napi_throw_error(env, nullptr, "Callback already exists in %{public}s");
+            napi_throw_error(env, nullptr, "Callback already exist");
             return JS_CALLBACK_EVENT_FAILED;
         }
     }
-    if (!it.empty()) {
-        CHKPR(it.front(), ERROR_NULL_POINTER);
-        preSubscribeId = it.front()->subscribeId;
+    if (!it->second.empty()) {
+        CHKPR(it->second.front(), ERROR_NULL_POINTER);
+        preSubscribeId = it->second.front()->subscribeId;
     }
-    it.push_back(event);
+    it->second.push_back(event);
     return JS_CALLBACK_EVENT_SUCCESS;
 }
 
@@ -168,43 +168,58 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
     OHOS::MMI::KeyEventMonitorInfo *event, int32_t &subscribeId)
 {
     MMI_LOGD("enter");
-    auto iter = callbacks.find(event->eventType);
-    if (iter == callbacks.end()) {
-        MMI_LOGD("No callback in %{public}s", event->eventType.c_str());
+    if (callbacks.count(event->eventType) <= 0) {
+        MMI_LOGE("Callback doesn't exists");
         return JS_CALLBACK_EVENT_FAILED;
     }
-    MMI_LOGD("EventType:%{public}s, keyEventMonitorInfos:%{public}d", event->eventType.c_str(),
-        static_cast<int32_t>(iter->second.size()));
-    auto it = iter->second.begin();
-    while (it != iter->second.end()) {
-        napi_value handlerTemp = nullptr;
-        napi_get_reference_value(env, (*it)->callback[0], &handlerTemp);
-        napi_value handlerParam = nullptr;
-        napi_get_reference_value(env, event->callback[0], &handlerParam);
+    auto it = callbacks[event->eventType];
+    MMI_LOGD("EventType: %{public}s, keyEventMonitorInfos: %{public}d", event->eventType.c_str(),
+        static_cast<int32_t>(it.size()));
+    napi_value handler1 = nullptr;
+    napi_status status = napi_get_reference_value(env, event->callback[0], &handler1);
+    if (status != napi_ok) {
+        napi_throw_error(env, nullptr, "Handler1 get reference value failed");
+        return JS_CALLBACK_EVENT_FAILED;
+    }
+    for (auto iter = it.begin(); iter != it.end();) {
+        napi_value handler2 = nullptr;
+        status = napi_get_reference_value(env, (*iter)->callback[0], &handler2);
+        if (status != napi_ok) {
+            napi_throw_error(env, nullptr, "Handler2 get reference value failed");
+            return JS_CALLBACK_EVENT_FAILED;
+        }
         bool isEquals = false;
-        napi_strict_equals(env, handlerTemp, handlerParam, &isEquals);
+        status = napi_strict_equals(env, handler1, handler2, &isEquals);
+        if (status != napi_ok) {
+            napi_throw_error(env, nullptr, "Compare two handler failed");
+            return JS_CALLBACK_EVENT_FAILED;
+        }
         if (isEquals) {
-            napi_delete_reference(env, (*it)->callback[0]);
-            KeyEventMonitorInfo *monitorInfo = *it;
-            iter->second.erase(it);
-            if (iter->second.empty()) {
+            status = napi_delete_reference(env, (*iter)->callback[0]);
+            if (status != napi_ok) {
+                napi_throw_error(env, nullptr, "Delete reference failed");
+                return JS_CALLBACK_EVENT_FAILED;
+            }
+            KeyEventMonitorInfo *monitorInfo = *iter;
+            it.erase(iter++);
+            if (it.empty()) {
                 subscribeId = monitorInfo->subscribeId;
             }
             delete monitorInfo;
             monitorInfo = nullptr;
-            MMI_LOGD("Callback already exists, size:%{public}d",
-                static_cast<int32_t>(iter->second.size()));
+            MMI_LOGD("Callback has deleted, size: %{public}d",
+                static_cast<int32_t>(it.size()));
             return JS_CALLBACK_EVENT_SUCCESS;
         }
-        it++;
+        iter++;
     }
-    MMI_LOGD("callback size:%{public}d", static_cast<int32_t>(iter->second.size()));
+    MMI_LOGD("Callback size: %{public}d", static_cast<int32_t>(it.size()));
     return JS_CALLBACK_EVENT_NOT_EXIST;
 }
 
 void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
 {
-    MMI_LOGD("%{public}s begin", __func__);
+    MMI_LOGD("enter");
     CHKP(reportEvent);
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(reportEvent->env, "AsyncCallback", NAPI_AUTO_LENGTH, &resourceName);
