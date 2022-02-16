@@ -51,7 +51,7 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
 
 void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType handlerType)
 {
-    MMI_LOGD("Unregister handler:%{public}d with type:%{public}d", handlerId, handlerType);
+    MMI_LOGD("Unregister handler:%{public}d,type:%{public}d", handlerId, handlerType);
     if (RET_OK == RemoveLocal(handlerId, handlerType)) {
         MMI_LOGD("Handler:%{public}d unregistered, report to server", handlerId);
         RemoveFromServer(handlerId, handlerType);
@@ -60,7 +60,7 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
 
 void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
-    MMI_LOGD("Mark consumed state, monitor:%{public}d, event:%{public}d", monitorId, eventId);
+    MMI_LOGD("Mark consumed state, monitor:%{public}d,event:%{public}d", monitorId, eventId);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKP(client);
     NetPacket pkt(MmiMessageId::MARK_CONSUMED);
@@ -105,7 +105,7 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
         return RET_ERR;
     }
     if (handlerType != tItr->second.handlerType_) {
-        MMI_LOGE("Unmatched handler type, InputHandlerType:%{public}d, FindHandlerType:%{public}d",
+        MMI_LOGE("Unmatched handler type, InputHandlerType:%{public}d,FindHandlerType:%{public}d",
                  handlerType, tItr->second.handlerType_);
         return RET_ERR;
     }

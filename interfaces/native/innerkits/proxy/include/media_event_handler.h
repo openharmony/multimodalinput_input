@@ -28,6 +28,6 @@ public:
     virtual bool OnPause(const MultimodalEvent& event) override;
     virtual bool OnMediaControl(const MultimodalEvent& event) override;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // MEDIA_EVENT_HANDLER_H

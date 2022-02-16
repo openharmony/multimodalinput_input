@@ -69,4 +69,4 @@ int32_t KeyEvent::GetOriginEventType() const
 {
     return mDeviceEventType_;
 }
-}
+} // namespace OHOS

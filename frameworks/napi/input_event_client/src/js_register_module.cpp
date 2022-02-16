@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
 }
 
 const uint32_t EVENT_NAME_LEN = 64;
@@ -76,7 +76,7 @@ static napi_value GetEventInfo(napi_env env, napi_callback_info info, EventInfo&
     event.name = eventName;
     event.type = GetHandleType(event.name);
     event.winId = 0;
-    MMI_LOGD("event info, type:%{public}d, name:%{public}s", event.type, event.name.c_str());
+    MMI_LOGD("event info, type:%{public}d,name:%{public}s", event.type, event.name.c_str());
 
     napi_value result = {};
     napi_create_int32(env, SUCCESS_CODE, &result);
@@ -340,6 +340,6 @@ extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
     napi_module_register(&mmiModule);
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 

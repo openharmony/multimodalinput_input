@@ -253,10 +253,10 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
     int32_t touchFocusId = WinMgr->GetTouchFocusSurfaceId();
     auto appInfo = AppRegs->FindByWinId(touchFocusId); // obtain application information
     if (appInfo.fd == RET_ERR) {
-        MMI_LOGE("Failed to find fd:%{public}d, errCode:%{public}d", touchFocusId, FOCUS_ID_OBTAIN_FAIL);
+        MMI_LOGE("Failed to find fd:%{public}d,errCode:%{public}d", touchFocusId, FOCUS_ID_OBTAIN_FAIL);
         return false;
     }
-    MMI_LOGD("DispatchTouchEvent focusId:%{public}d, fd:%{public}d", touchFocusId, appInfo.fd);
+    MMI_LOGD("DispatchTouchEvent focusId:%{public}d,fd:%{public}d", touchFocusId, appInfo.fd);
 
     int32_t testConnectState = 0;
     int32_t testBufferState = 0;
@@ -281,10 +281,10 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
                 errno_t retErr = memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch));
                 CHKF(retErr == EOK, MEMCPY_SEC_FUN_FAIL);
                 MMIRegEvent->GetTouchInfo(touchId, touchTemp);
-                MMI_LOGD("4.event filter of server 1:eventTouch:time:%{public}" PRId64 ", deviceType:%{public}u, "
-                         "deviceName:%{public}s, physical:%{public}s, eventType:%{public}d, "
-                         "slot:%{public}d, seatSlot:%{public}d, pressure:%{public}lf, point.x:%{public}lf, "
-                         "point.y:%{public}lf, fd:%{public}d, preHandlerTime:%{public}" PRId64,
+                MMI_LOGD("4.event filter of server 1:eventTouch:time:%{public}" PRId64 ",deviceType:%{public}u,"
+                         "deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,"
+                         "slot:%{public}d,seatSlot:%{public}d,pressure:%{public}lf,point.x:%{public}lf,"
+                         "point.y:%{public}lf,fd:%{public}d,preHandlerTime:%{public}" PRId64,
                          touchTemp.time, touchTemp.deviceType, touchTemp.deviceName,
                          touchTemp.physical, touchTemp.eventType, touchTemp.slot, touchTemp.seatSlot,
                          touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, appInfo.fd,
@@ -294,10 +294,10 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
         }
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
             newPacket << touch;
-            MMI_LOGD("4.event filter of server 2:eventTouch:time:%{public}" PRId64 ", deviceType:%{public}u, "
-                     "deviceName:%{public}s, physical:%{public}s, eventType:%{public}d, "
-                     "slot:%{public}d, seatSlot:%{public}d, pressure:%{public}lf, point.x:%{public}lf, "
-                     "point.y:%{public}lf, fd:%{public}d, preHandlerTime:%{public}" PRId64,
+            MMI_LOGD("4.event filter of server 2:eventTouch:time:%{public}" PRId64 ", deviceType:%{public}u,"
+                     "deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,"
+                     "slot:%{public}d,seatSlot:%{public}d,pressure:%{public}lf,point.x:%{public}lf,"
+                     "point.y:%{public}lf,fd:%{public}d,preHandlerTime:%{public}" PRId64,
                      touch.time, touch.deviceType, touch.deviceName,
                      touch.physical, touch.eventType, touch.slot, touch.seatSlot, touch.pressure,
                      touch.point.x, touch.point.y, appInfo.fd, preHandlerTime);

@@ -37,7 +37,7 @@ void HdfDeviceEventManager::ConnectHDFInit()
 {
     uint32_t ret = GetInputInterface(&inputInterface_);
     if (ret != 0) {
-        HiLog::Error(LABEL, "Initialize:%{public}s fail! ret:%{public}u", __func__, ret);
+        HiLog::Error(LABEL, "Initialize:%{public}s fail. ret:%{public}u", __func__, ret);
         return;
     }
 
@@ -70,7 +70,7 @@ void HdfDeviceEventManager::ConnectHDFInit()
 int32_t main()
 {
     static std::int32_t usleepTime = 1500000;
-    HiLog::Info(OHOS::MMIS::LABEL, "%{public}s running !", __func__);
+    HiLog::Info(OHOS::MMIS::LABEL, "%{public}s running", __func__);
     OHOS::MMIS::HdfDeviceEventManager iHdfDeviceEventManager;
     iHdfDeviceEventManager.ConnectHDFInit();
     while (true) {

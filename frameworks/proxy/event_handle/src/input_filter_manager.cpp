@@ -84,7 +84,7 @@ int32_t InputFilterManager::UnFilterKeyEvent(int32_t id)
         }
     }
     if (highestId_ != 0) {
-        MMI_LOGD("after remove the highest filter, add a next highest filter ");
+        MMI_LOGD("after remove the highest filter, add a next highest filter");
         MMIEventHdl.AddKeyEventFIlter(item->GetId(), item->GetName(), item->GetAuthority());
     }
     return RET_OK;
@@ -123,7 +123,7 @@ std::function<void(KeyBoardEvent)> InputFilterManager::KeyEventFilter::GetHandle
 
 int32_t InputFilterManager::OnKeyEvent(KeyBoardEvent event, int32_t id)
 {
-    MMI_LOGD("client on key event call function handler ");
+    MMI_LOGD("client on key event call function handler");
     for (auto &item : keyEventFilterList_) {
         if (id == item.GetId()) {
             item.GetHandler()(event);
@@ -187,7 +187,7 @@ int32_t InputFilterManager::UnFilterTouchEvent(int32_t id)
 {
     auto len = touchEventFilterList_.size();
     if (len == 0) {
-        MMI_LOGE("touchEventFilterList_ size is zero ");
+        MMI_LOGE("touchEventFilterList_ size is zero");
         return RET_ERR;
     }
 
@@ -368,7 +368,7 @@ std::function<void(MouseEvent)> InputFilterManager::PointerEventInterceptor::Get
 
 int32_t InputFilterManager::OnPointerEvent(MouseEvent event, int32_t id_)
 {
-    MMI_LOGD("client on point event call function handler ");
+    MMI_LOGD("client on point event call function handler");
     for (auto &item : PointerEventInterceptorList_)
     {
         if (id_ == item.GetId()) {
@@ -380,6 +380,6 @@ int32_t InputFilterManager::OnPointerEvent(MouseEvent event, int32_t id_)
     return 0;
 }
 
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
