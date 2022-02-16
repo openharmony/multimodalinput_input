@@ -40,6 +40,6 @@ int32_t main(int32_t argc, const char *argv[])
     service->OnStop();
     service->OnDump();
 
-    MMI_LOGD("hosmmi-service stopping... argc:%{public}d, argv:%{public}s", argc, argv[0]);
+    MMI_LOGD("hosmmi-service stopping. argc:%{public}d, argv:%{public}s", argc, argv[0]);
     return RET_OK;
 }

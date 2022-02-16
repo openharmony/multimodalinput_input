@@ -95,21 +95,21 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
     for (const auto &item : sortPrekeys){
         subKeyNames += std::to_string(item);
         subKeyNames += ",";
-        MMI_LOGD("preKeys = %{public}d", item);
+        MMI_LOGD("preKeys:%{public}d", item);
     }
 
     int32_t finalKey = GetNamedPropertyInt32(env, argv[ARGV_SECOND], "finalKey");
     subKeyNames += std::to_string(finalKey);
     subKeyNames += ",";
     keyOption->SetFinalKey(finalKey);
-    MMI_LOGD("FinalKey = %{public}d", finalKey);
+    MMI_LOGD("FinalKey:%{public}d", finalKey);
 
     bool isFinalKeyDown = GetNamedPropertyBool(env, argv[ARGV_SECOND], "isFinalKeyDown");
     subKeyNames += std::to_string(isFinalKeyDown);
     subKeyNames += ",";
     keyOption->SetFinalKeyDown(isFinalKeyDown);
 
-    MMI_LOGD("IsFinalKeyDown: %{public}d, map_key: %{public}s",
+    MMI_LOGD("IsFinalKeyDown:%{public}d,map_key:%{public}s",
         (isFinalKeyDown == true?1:0), subKeyNames.c_str());
 
     int32_t finalKeyDownDuriation = GetNamedPropertyInt32(env, argv[ARGV_SECOND], "finalKeyDownDuration");
@@ -120,7 +120,7 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
     subKeyNames += std::to_string(finalKeyDownDuriation);
     keyOption->SetFinalKeyDownDuration(finalKeyDownDuriation);
     event->eventType = subKeyNames;
-    MMI_LOGD("FinalKeyDownDuriation: %{public}d", finalKeyDownDuriation);
+    MMI_LOGD("FinalKeyDownDuriation:%{public}d", finalKeyDownDuriation);
     if (napi_create_reference(env, argv[ARGV_THIRD], 1, &event->callback[0]) != napi_ok) {
         napi_throw_error(env, nullptr, "Event create reference failed");
         return ERROR_CODE;
@@ -128,21 +128,22 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
     return SUCCESS_CODE;
 }
 
-static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent){
+static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+{
     MMI_LOGD("enter");
     auto keyOption = monitorInfo->keyOption;
     std::vector<int32_t> infoPreKeys = keyOption->GetPreKeys();
     std::vector<KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
     int32_t infoFinalKey = keyOption->GetFinalKey();
     int32_t keyEventFinalKey = keyEvent->GetKeyCode();
-    MMI_LOGD("infoFinalKey:%{public}d, keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
+    MMI_LOGD("infoFinalKey:%{public}d,keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
     if (infoFinalKey != keyEventFinalKey || items.size() > 4) {
         MMI_LOGD("%{public}d", __LINE__);
         return false;
     }
     int32_t infoSize = 0;
     auto it = infoPreKeys.begin();
-    while(it != infoPreKeys.end()) {
+    while (it != infoPreKeys.end()) {
         if (*it >= 0) {
             infoSize++;
         }
@@ -160,7 +161,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
         }
         count++;
     }
-    MMI_LOGD("kevEventSize:%{public}d, infoSize:%{public}d", count, infoSize);
+    MMI_LOGD("kevEventSize:%{public}d,infoSize:%{public}d", count, infoSize);
     auto keyItem = keyEvent->GetKeyItem();
     CHKPF(keyItem);
     auto upTime = keyEvent->GetActionTime();
@@ -182,7 +183,7 @@ static void SubKeyEventCallback(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
         iter++;
         auto infoIter = list.begin();
         MMI_LOGD("list size:%{public}d", static_cast<int32_t>(list.size()));
-        while(infoIter != list.end()) {
+        while (infoIter != list.end()) {
             auto monitorInfo = *infoIter;
             if (MatchCombinationkeys(monitorInfo, keyEvent)) {
                 monitorInfo->keyEvent = keyEvent;
@@ -200,7 +201,7 @@ bool CheckPara(const std::shared_ptr<KeyOption> keyOption)
     if (preKeys.size() > PRE_KEYS_SIZE) {
         MMI_LOGE("preKeys size is bigger than 4, can not process");
         return false;
-    } 
+    }
     std::vector<int32_t> checkRepeat;
     for (const auto &item : preKeys) {
         if (item < 0) {
@@ -241,16 +242,16 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     }
 
     if (preSubscribeId < 0) {
-        MMI_LOGD("eventType: %{public}s, eventName: %{public}s", event->eventType.c_str(),  event->name.c_str());
+        MMI_LOGD("eventType:%{public}s,eventName:%{public}s", event->eventType.c_str(),  event->name.c_str());
         int32_t subscribeId = -1;
         subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubKeyEventCallback);
         if (subscribeId < 0) {
-            MMI_LOGD("subscribeId invalid: %{public}d", subscribeId);
+            MMI_LOGD("subscribeId invalid:%{public}d", subscribeId);
             event->status = -1;
             EmitAsyncCallbackWork(event);
             return nullptr;
         }
-        MMI_LOGD("SubscribeId: %{public}d", subscribeId);
+        MMI_LOGD("SubscribeId:%{public}d", subscribeId);
         event->subscribeId = subscribeId;
     } else {
         event->subscribeId = preSubscribeId;
@@ -261,8 +262,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     MMI_LOGD("enter");
-    KeyEventMonitorInfo *event = new KeyEventMonitorInfo
-    {
+    KeyEventMonitorInfo *event = new KeyEventMonitorInfo {
         .env = env,
         .asyncWork = nullptr,
     };
@@ -278,7 +278,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         MMI_LOGE("DelEventCallback failed");
         return nullptr;
     }
-    MMI_LOGD("SubscribeId: %{public}d", subscribeId);
+    MMI_LOGD("SubscribeId:%{public}d", subscribeId);
     if (subscribeId > 0) {
         InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
     }

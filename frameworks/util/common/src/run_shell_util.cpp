@@ -17,7 +17,8 @@
 #include <cstdio>
 #include "define_multimodal.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
     const std::string HILOG_GREP = "hilog -x | grep ";
     constexpr int32_t MAXSIZE = 1000;
@@ -79,4 +80,5 @@ int32_t RunShellUtil::StringToVectorByRegex(const std::string &log, std::vector<
     vLog = v;
     return RET_OK;
 }
-}
+} // namespace MMI
+} // namespace OHOS

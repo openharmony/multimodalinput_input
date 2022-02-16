@@ -91,5 +91,5 @@ private:
     float py_ = 0.f;
     float pz_ = 0.f;
 };
-}
+} // namespace OHOS
 #endif // MMI_POINT_H

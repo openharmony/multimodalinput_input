@@ -56,21 +56,17 @@ protected:
     int32_t OnEventTabletPadKey(const multimodal_libinput_event& event);
     int32_t OnEventJoyStickAxis(const multimodal_libinput_event& event, const uint64_t time);
     int32_t OnKeyboardEvent(libinput_event *event);
-    int32_t OnEventKey(libinput_event *event);
     int32_t OnKeyEventDispatch(const multimodal_libinput_event& event);
     
     int32_t OnMouseEventHandler(libinput_event *event);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
-    void OnKeyEventFilterTrace(const EventKeyboard& keyBoard);
-    void OnEventKeyboardTrace(const EventKeyboard& keyBoard);
-    void OnEventPointerTrace(const EventPointer& point);
-    void OnPointerFilterEventTrace(const EventPointer& event_pointer);
 #ifdef OHOS_WESTEN_MODEL
     bool OnSystemEvent(const KeyEventValueTransformations& temp, const enum KEY_STATE state) const;
 #endif
 
 private:
     int32_t OnEventHandler(const multimodal_libinput_event& ev);
+    int32_t OnEventKey(libinput_event *event);
     std::mutex mu_;
     UDSServer *udsServer_ = nullptr;
     EventDispatch eventDispatch_;

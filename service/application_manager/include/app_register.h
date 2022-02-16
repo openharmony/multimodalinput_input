@@ -88,7 +88,7 @@ private:
     UDSServer *udsServer_ = nullptr;
     const AppInfo appInfoError_ = {-1, -1, -1, "", ""};
 };
-};
-}
+} // namespace MMI
+} // namespace OHOS
 #define AppRegs OHOS::MMI::AppRegister::GetInstance()
 #endif // APP_REGISTER_H

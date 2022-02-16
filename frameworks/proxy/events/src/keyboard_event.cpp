@@ -75,4 +75,4 @@ int32_t KeyBoardEvent::GetUnicode() const
 {
     return mUnicode_;
 }
-}
+} // namespace OHOS

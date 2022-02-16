@@ -335,6 +335,6 @@ private:
     bool isIntercepted_ = true;
 };
 using MultimodalEventPtr = sptr<MultimodalEvent>;
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // MULTIMODAL_EVENT_H

@@ -16,9 +16,10 @@
 #include "touchpad_transform_point_processor.h"
 #include "log.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN,
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN,
             "TouchPadTransformPointProcessor"};
     }
 
@@ -37,7 +38,7 @@ void TouchPadTransformPointProcessor::SetPointEventSource(int32_t sourceType)
 void TouchPadTransformPointProcessor::OnEventTouchPadDown(libinput_event *event)
 {
     CHKP(event);
-    MMI_LOGT("Enter OnEventTouchPadDown");
+    MMI_LOGD("Enter");
     auto data = libinput_event_get_touchpad_event(event);
     CHKP(data);
     auto seatSlot = libinput_event_touchpad_get_seat_slot(data);
@@ -61,7 +62,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(libinput_event *event)
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(pointer);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_LOGT("End OnEventTouchPadDown");
+    MMI_LOGD("End");
 }
 
 void TouchPadTransformPointProcessor::OnEventTouchPadMotion(libinput_event *event)
@@ -114,7 +115,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
     libinput_event *event)
 {
     CHKPRP(event, nullptr);
-    MMI_LOGT("call onLibinputTouchPadEvent begin");
+    MMI_LOGD("call onLibinputTouchPadEvent begin");
     auto type = libinput_event_get_type(event);
     pointerEvent_->UpdateId();
     switch (type) {
@@ -134,7 +135,8 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
             return nullptr;
         }
     }
-    MMI_LOGT("call onLibinputTouchPadEvent end");
+    MMI_LOGD("call onLibinputTouchPadEvent end");
     return pointerEvent_;
 }
-}
+} // namespace MMI
+} // namespace OHOS

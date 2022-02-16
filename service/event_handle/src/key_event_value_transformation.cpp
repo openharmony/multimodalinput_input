@@ -448,7 +448,7 @@ KeyEventValueTransformations KeyValueTransformationByInput(int16_t keyValueOfInp
         KeyEventValueTransformations unknownKey = {
             "UNKNOWN_KEY", keyValueOfInput, UNKNOWN_KEY_BASE + keyValueOfInput, HOS_UNKNOWN_KEY_BASE, 0
         };
-        MMI_LOGE("KeyValueTransformationByInput Failed, unknown linux-code:%{public}d, "
+        MMI_LOGE("KeyValueTransformationByInput Failed, unknown linux-code:%{public}d,"
                  "UNKNOWN_KEY_BASE:%{public}d", keyValueOfInput, UNKNOWN_KEY_BASE);
         return unknownKey;
     }
@@ -481,14 +481,14 @@ bool KeyEventValueTransformation::Init()
 
     if (!xkb_context_include_path_append(context, strPath.c_str())) {
         xkb_context_unref(context);
-        MMI_LOGE("XkbKeyboardHandlerKey::Init: Include path failed! errCode:%{public}d ", XKB_INCL_PATH_FAIL);
+        MMI_LOGE("XkbKeyboardHandlerKey::Init: Include path failed! errCode:%{public}d", XKB_INCL_PATH_FAIL);
         return false;
     }
 
     keyMap = xkb_keymap_new_from_names(context, nullptr, XKB_KEYMAP_COMPILE_NO_FLAGS);
     if (keyMap == nullptr) {
         xkb_context_unref(context);
-        MMI_LOGE("XkbKeyboardHandlerKey::Init: Failed to compile RMLVO! errCode:%{public}d ",
+        MMI_LOGE("XkbKeyboardHandlerKey::Init: Failed to compile RMLVO! errCode:%{public}d",
                  XKB_COMPILE_KEYMAP_FAIL);
         return false;
     }
@@ -496,7 +496,7 @@ bool KeyEventValueTransformation::Init()
     if (!state_) {
         xkb_context_unref(context);
         xkb_keymap_unref(keyMap);
-        MMI_LOGE("XkbKeyboardHandlerKey::Init: Failed to allocate state! errCode:%{public}d ", XKB_ALLOC_STATE_FAIL);
+        MMI_LOGE("XkbKeyboardHandlerKey::Init: Failed to allocate state! errCode:%{public}d", XKB_ALLOC_STATE_FAIL);
         return false;
     }
 
