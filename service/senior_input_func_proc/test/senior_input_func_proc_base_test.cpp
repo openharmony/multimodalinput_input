@@ -23,9 +23,9 @@ namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
 
-    const unsigned int DEVICE_FD_INDEX_1 = 1;
-    const unsigned int DEVICE_FD_INDEX_2 = 2;
-    const int DEVICE_FD_ERROR = -1;
+    constexpr unsigned int DEVICE_FD_INDEX_1 = 1;
+    constexpr unsigned int DEVICE_FD_INDEX_2 = 2;
+    constexpr int DEVICE_FD_ERROR = -1;
     class SeniorInputFuncProcBaseTest : public testing::Test {
     public:
         static void SetUpTestCase(void) {}
@@ -112,7 +112,7 @@ using namespace OHOS::MMI;
     HWTEST_F(SeniorInputFuncProcBaseTest, Test_DeviceEventDispatchProcess_001, TestSize.Level1)
     {
         SeniorInputFuncProcBase seniorInputFunc;
-        const RawInputEvent event = { 0 };
+        constexpr RawInputEvent event = { 0 };
         seniorInputFunc.DeviceEventDispatchProcess(event);
     }
 }

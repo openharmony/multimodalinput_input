@@ -49,7 +49,7 @@ bool DeviceRegister::Init()
 bool DeviceRegister::FindDeviceId(const std::string& physical, uint32_t& deviceId)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    const uint32_t DEFAULT_DEVICE_ID = 0;
+    constexpr uint32_t DEFAULT_DEVICE_ID = 0;
     auto it = mapDeviceInfo_.find(physical);
     if (it == mapDeviceInfo_.end()) {
         deviceId = DEFAULT_DEVICE_ID;
@@ -62,7 +62,7 @@ bool DeviceRegister::FindDeviceId(const std::string& physical, uint32_t& deviceI
 uint32_t DeviceRegister::AddDeviceInfo(const std::string& physical)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    const uint32_t BEGIN_NUM = 1;
+    constexpr uint32_t BEGIN_NUM = 1;
     auto it = setDeviceId_.find(BEGIN_NUM);
     if (it == setDeviceId_.end()) {
         setDeviceId_.insert(BEGIN_NUM);

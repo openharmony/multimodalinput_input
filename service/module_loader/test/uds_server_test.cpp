@@ -154,7 +154,7 @@ HWTEST_F(UDSServerTest, OnAccept, TestSize.Level1)
 HWTEST_F(UDSServerTest, OnRecv, TestSize.Level1)
 {
     int32_t fd = 1;
-    const char *buf = "333";
+    constexpr char *buf = "333";
     size_t size = 3;
 
     UDSServerUnitTest serObjUt;

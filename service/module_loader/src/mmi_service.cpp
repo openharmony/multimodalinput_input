@@ -35,7 +35,7 @@ namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIService" };
 static const std::string DEF_INPUT_SEAT = "seat0";
 }
-const bool REGISTER_RESULT =
+constexpr bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
 
 struct mmi_epoll_event {
