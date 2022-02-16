@@ -189,7 +189,7 @@ int32_t EventPackage::PackageTabletToolOtherParams(libinput_event *event, EventT
 void EventPackage::PackageTabletToolTypeParam(libinput_event *event, EventTabletTool& tableTool)
 {
     MMI_LOGD("enter");
-    CHKP(event);
+    CHKPV(event);
     auto data = libinput_event_get_tablet_tool_event(event);
     CHKPV(data);
     auto tool = libinput_event_tablet_tool_get_tool(data);
@@ -265,7 +265,7 @@ int32_t EventPackage::PackageTabletToolEvent(libinput_event *event, EventTabletT
 void EventPackage::PackageTabletPadOtherParams(libinput_event *event, EventTabletPad& tabletPad)
 {
     MMI_LOGD("enter");
-    CHKP(event);
+    CHKPV(event);
     auto data = libinput_event_get_tablet_pad_event(event);
     CHKPV(data);
     auto type = libinput_event_get_type(event);
