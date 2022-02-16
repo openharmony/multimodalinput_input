@@ -14,8 +14,13 @@
  */
 
 #include <cinttypes>
+#include <dirent.h>
+#include <fstream>
 #include <signal.h>
+#include <sys/stat.h>
 #include <sys/signalfd.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "app_register.h"
 #include "device_register.h"
@@ -34,6 +39,60 @@ namespace MMI {
 namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIService" };
 static const std::string DEF_INPUT_SEAT = "seat0";
+
+void GetDevInputDirs(std::set<std::string> & dirs)
+{
+    DIR *dir_p;
+    struct  dirent *direntp;
+    const char *dirname = "/dev/input/";
+
+    if  ((dir_p = opendir(dirname)) == NULL) {
+        MMI_LOGE("opendir fail, dirname: %{public}s", dirname);
+        return;
+    } else {
+        while  ((direntp = readdir (dir_p)) != NULL)
+        {
+            dirs.insert(std::string(direntp->d_name));
+        }
+        closedir(dir_p);
+    }
+}
+
+void GetProcBusInputDevicesInfo(std::set<int> &deviceEventXs)
+{
+    std::ifstream in("/proc/bus/input/devices"); 
+    if (!in) {
+        MMI_LOGE("can not open device file");
+        return;
+    }
+
+    const std::string strHandlerFlag = "H: Handlers=";
+    const size_t strHandlerFlagSize = strHandlerFlag.size();
+
+    const std::string strEventFlag = "event";
+    const size_t strEventFlagSize = strEventFlag.size();
+
+    std::string line;  
+    while (getline(in, line)) {
+        size_t pos = line.find(strHandlerFlag);
+        if (pos == std::string::npos) {
+            continue;
+        }
+
+        pos = line.rfind(strEventFlag);
+        if (pos == std::string::npos) {
+            continue;
+        }
+
+        std::string strEventId = line.substr(pos + strEventFlagSize);
+        const int eventId = std::atoi(strEventId.c_str());
+        if (eventId < 0) {
+            continue;
+        }
+
+        deviceEventXs.insert(eventId);
+    }
+}
 }
 const bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
@@ -119,6 +178,35 @@ int32_t MMIService::EpollCtlAdd(EpollEventType type, int32_t fd)
     return RET_OK;
 }
 
+int32_t MMIService::DelEpoll(EpollEventType type, int32_t fd)
+{
+    CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    CHKR(mmiFd_ >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    auto ed = static_cast<mmi_epoll_event*>(malloc(sizeof(mmi_epoll_event)));
+    CHKR(ed, MALLOC_FAIL, RET_ERR);
+    ed->fd = fd;
+    ed->event_type = type;
+    MMI_LOGD("MMIService::EpollCtlAdd userdata:[fd:%{public}d, type:%{public}d]", ed->fd, ed->event_type);
+
+    epoll_event ev = {};
+    ev.events = EPOLLIN;
+    ev.data.ptr = ed;
+    auto ret = EpollCtl(fd, EPOLL_CTL_DEL, ev, mmiFd_);
+    if (ret < 0) {
+        free(ed);
+        ed = nullptr;
+        ev.data.ptr = nullptr;
+        return ret;
+    }
+
+    auto it = authFds_.find(fd);
+    if (it != authFds_.end()) {
+        authFds_.erase(it);
+    }
+
+    return RET_OK;
+}
+
 bool MMIService::ChkAuthFd(int32_t fd) const
 {
     if (authFds_.find(fd) == authFds_.end()) {
@@ -144,6 +232,72 @@ bool MMIService::InitLibinputService()
     }
     MMI_LOGD("MMIService::InitLibinputService EpollCtlAdd, epollfd:%{public}d, fd:%{public}d", mmiFd_, inputFd);
     return true;
+}
+
+int32_t MMIService::ChkDeviceNode()
+{
+    const uint64_t timeInterval = 3L * 1000000L;
+
+    const uint64_t currentTimeMs = GetSysClockTime();
+    static uint64_t timeoutTimeMs = currentTimeMs + timeInterval;
+    
+    bool isTimeout = (currentTimeMs > timeoutTimeMs);
+
+    if (!isTimeout) {
+        return RET_OK;
+    }
+
+    timeoutTimeMs = currentTimeMs + timeInterval;
+
+    std::set<std::string> dirs;
+    GetDevInputDirs(dirs);
+
+    std::set<int> deviceEventXs;
+    GetProcBusInputDevicesInfo(deviceEventXs);
+
+    bool hasCreatedNewNode = false;
+    static constexpr int32_t NODE_PERM = 0777;
+
+    for (auto eventId : deviceEventXs) {
+        std::string eventNode = std::string("event") + std::to_string(eventId);
+        if (dirs.find(eventNode) != dirs.end()) {
+            continue;
+        }
+
+        std::string nodePath = std::string("/dev/input/") + eventNode;
+        dev_t dev = makedev(13, 64 + eventId);
+        if (mknod(nodePath.c_str(), NODE_PERM | S_IFCHR, dev) < 0) {
+            auto errnoSave = errno;
+            MMI_LOGE("mknode fail, nodePath: %{public}s, errno: %{public}d", nodePath.c_str(), errnoSave);
+            continue;
+        }
+
+        if ((chown(nodePath.c_str(), 0, 0) < 0) || (chmod(nodePath.c_str(), NODE_PERM) < 0)) {
+            auto errnoSave = errno;
+            MMI_LOGE("chown or chmod fail, nodePath: %{public}s, errno: %{public}d", nodePath.c_str(), errnoSave);
+            continue;
+        }
+
+        MMI_LOGWK("mknode(%s) sucdess", nodePath.c_str());
+
+        hasCreatedNewNode = true;
+    }
+
+    if (hasCreatedNewNode) {
+        auto inputFd = input_.GetInputFd();
+        auto ret = DelEpoll(EPOLL_EVENT_INPUT, inputFd);
+        if (ret <  0) {
+            MMI_LOGE("DelEpoll error ret = %{public}d", ret);
+            return RET_ERR;
+        }
+        input_.Stop();
+        MMI_LOGD("input_.Stop success success, fd:%{public}d", inputFd);
+
+        CHKR(InitLibinputService(), LIBINPUT_INIT_FAIL, LIBINPUT_INIT_FAIL);
+        MMI_LOGD("add libinput success");
+    }
+
+    return RET_OK;
 }
 
 bool MMIService::InitSAService()
@@ -340,6 +494,8 @@ void MMIService::OnTimer()
         inputEventHdr_->OnCheckEventReport();
     }
     TimerMgr->ProcessTimers();
+
+    (void)ChkDeviceNode();
 }
 
 void MMIService::OnThread()
