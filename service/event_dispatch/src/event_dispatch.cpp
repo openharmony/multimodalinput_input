@@ -30,13 +30,14 @@
 #include "system_event_handler.h"
 #include "util.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 constexpr int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 constexpr int32_t INPUT_UI_TIMEOUT_TIME_MAX = 20 * 1000000;
 constexpr int32_t TRIGGER_ANR = 0;
 constexpr int32_t NOT_TRIGGER_ANR = 1;
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
     }
 
 static void PrintEventSlotedCoordsInfo(const SlotedCoordsInfo& r)
@@ -712,6 +713,13 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
 {
     CHKPR(key, PARAM_INPUT_INVALID);
     MMI_LOGD("DispatchKeyEventByPid begin");
+    if (key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
+        if (InterceptorMgrGbl.OnKeyEvent(key)) {
+            MMI_LOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
+                key->GetKeyCode());
+            return RET_OK;
+        }
+    }
     if (AbilityMgr->CheckLaunchAbility(key)) {
         MMI_LOGD("The keyEvent start launch an ability, keyCode:%{public}d", key->GetKeyCode());
         int32_t checkLaunchAbility = 1;
@@ -902,4 +910,5 @@ int32_t EventDispatch::IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id
     MMI_LOGD("end");
     return TRIGGER_ANR;
 }
-}
+} // namespace MMI
+} // namespace OHOS

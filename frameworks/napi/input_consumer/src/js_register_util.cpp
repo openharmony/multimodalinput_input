@@ -28,7 +28,7 @@ void SetNamedProperty(const napi_env &env, napi_value &object, const std::string
     napi_value napiValue;
     status = napi_create_int32(env, value, &napiValue);
     if (status != napi_ok) {
-        MMI_LOGE("%{public}s=%{public}d failed.", name.c_str(), value);
+        MMI_LOGE("%{public}s=%{public}d failed", name.c_str(), value);
         return;
     }
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
@@ -41,7 +41,7 @@ void SetNamedProperty(const napi_env &env, napi_value &object, const std::string
     napi_value napiValue;
     status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &napiValue);
     if (status != napi_ok) {
-        MMI_LOGE("%{public}s=%{public}s failed.", name.c_str(), value.c_str());
+        MMI_LOGE("%{public}s=%{public}s failed", name.c_str(), value.c_str());
         return;
     }
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
@@ -54,7 +54,7 @@ bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const s
     napi_valuetype tmpType = napi_undefined;
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_LOGE("call napi_typeof fail.");
+        MMI_LOGE("call napi_typeof fail");
         return false;
     }
     if (tmpType != napi_boolean) {
@@ -74,7 +74,7 @@ int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, con
     napi_valuetype tmpType = napi_undefined;
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        napi_throw_error(env, nullptr, "call napi_typeof fail.");
+        napi_throw_error(env, nullptr, "call napi_typeof fail");
         return value;
     }
     if (tmpType != napi_number) {
@@ -265,7 +265,7 @@ void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
             auto callFunResult = napi_call_function(env, nullptr, callback, 2, result, &callResult);
             MMI_LOGD("CallFunResult:%{public}d", static_cast<int32_t>(callFunResult));
             if (callFunResult != napi_ok) {
-                MMI_LOGE("Call function fail, callFunResult: %{public}d", callFunResult);
+                MMI_LOGE("Call function fail, callFunResult:%{public}d", callFunResult);
                 return;
             }
             if (event->status <= 0) {
