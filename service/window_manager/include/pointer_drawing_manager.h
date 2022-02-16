@@ -27,10 +27,10 @@
 #define IMAGE_SIZE 64
 namespace OHOS {
 namespace MMI {
-class MouseDrawingManager : public DelayedSingleton<MouseDrawingManager>, public DeviceObserver {
+class PointerDrawingManager : public DelayedSingleton<PointerDrawingManager>, public DeviceObserver {
 public:
-    MouseDrawingManager();
-    ~MouseDrawingManager();
+    PointerDrawingManager();
+    ~PointerDrawingManager();
     std::unique_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(std::string imagePath);
     void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY);
     void TellDisplayInfo(int32_t displayId, int32_t width, int32_t height);
@@ -52,5 +52,5 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#define DrawWgr OHOS::MMI::MouseDrawingManager::GetInstance()
+#define PointerDrawMgr OHOS::MMI::PointerDrawingManager::GetInstance()
 #endif // POINTER_DRAWING_MANAGER_H
