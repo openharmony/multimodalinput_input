@@ -749,7 +749,7 @@ int32_t ClientMsgHandler::TouchEventFilter(const UDSClient& client, NetPacket& p
     *  和ManipulationEvent对象的startTime,operationState,pointerCount,pointerId，  touchArea，touchPressure六个字段，
     *  和MultimodalEvent对象的highLevelEvent, deviceId, isHighLevelEvent三个字段缺失，暂时填0
     */
-    for (int i = 0; i < fingerCount; i++) {
+    for (int32_t i = 0; i < fingerCount; i++) {
         pkt >> touchData;
         fingersInfos[i].mPointerId = i;
         fingersInfos[i].mTouchArea = static_cast<float>(touchData.area);
@@ -959,7 +959,7 @@ void ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, NetPacket& pk
     *  和ManipulationEvent对象的startTime,operationState,pointerCount,pointerId，  touchArea，touchPressure六个字段，
     *  和MultimodalEvent对象的highLevelEvent, deviceId, isHighLevelEvent三个字段缺失，暂时填0
     */
-    for (int i = 0; i < fingerCount; i++) {
+    for (int32_t i = 0; i < fingerCount; i++) {
         pkt >> touchData;
         fingersInfos[i].mPointerId = touchData.seatSlot;
         fingersInfos[i].mTouchArea = static_cast<float>(touchData.area);
@@ -1223,8 +1223,8 @@ void ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, NetPacket& 
                            static_cast<int32_t>(gesture.time), "", static_cast<int32_t>(gesture.deviceId),
                            false, gesture.deviceType, eventJoyStickAxis);
 
-    int j = 0;
-    for (int i = 0; i < FINGER_NUM; i++) {
+    int32_t j = 0;
+    for (int32_t i = 0; i < FINGER_NUM; i++) {
         if (gesture.soltTouches.coords[i].isActive == true) {
             fingersInfos[j].mPointerId = i;
             fingersInfos[j].mMp.Setxy(gesture.soltTouches.coords[i].x, gesture.soltTouches.coords[i].y);

@@ -114,7 +114,7 @@ void OHOS::MMI::UDSServer::Multicast(const std::vector<int32_t>& fdList, NetPack
     }
 }
 
-bool  OHOS::MMI::UDSServer::ClearDeadSessionInMap(const int serverFd, const int clientFd)
+bool  OHOS::MMI::UDSServer::ClearDeadSessionInMap(const int32_t serverFd, const int32_t clientFd)
 {
     auto it = sessionsMap_.find(serverFd);
     if (it != sessionsMap_.end()) {
@@ -132,13 +132,14 @@ bool  OHOS::MMI::UDSServer::ClearDeadSessionInMap(const int serverFd, const int 
     return true;
 }
 
-int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, const int moduleType, int& serverFd,
-                                                const int32_t uid, const int32_t pid, int& toReturnClientFd)
+int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName,
+    const int32_t moduleType, int32_t& serverFd, const int32_t uid,
+    const int32_t pid, int32_t& toReturnClientFd)
 {
     std::lock_guard<std::mutex> lock(mux_);
     MMI_LOGT("enter.");
-    const int NUMBER_TWO = 2;
-    int sockFds[NUMBER_TWO] = {};
+    const int32_t NUMBER_TWO = 2;
+    int32_t sockFds[NUMBER_TWO] = {};
 
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockFds) != 0) {
         const int savedErrNo = errno;
@@ -383,7 +384,7 @@ void OHOS::MMI::UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap
 void OHOS::MMI::UDSServer::DumpSession(const std::string &title)
 {
     MMI_LOGI("in %s: %s", __func__, title.c_str());
-    int i = 0;
+    int32_t i = 0;
     for (auto& r : sessionsMap_) {
         MMI_LOGI("%d, %s", i, r.second->GetDescript().c_str());
         i++;

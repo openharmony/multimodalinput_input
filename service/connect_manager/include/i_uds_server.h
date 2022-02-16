@@ -22,8 +22,8 @@ namespace OHOS {
 namespace MMI {
 class IUdsServer : public RefBase {
 public:
-    virtual int32_t AddSocketPairInfo(const std::string& programName, const int moduleType, int& serverFd,
-                                      const int32_t uid, const int32_t pid, int& toReturnClientFd) = 0;
+    virtual int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, int32_t& serverFd,
+                                      const int32_t uid, const int32_t pid, int32_t& toReturnClientFd) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

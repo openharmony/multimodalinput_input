@@ -37,7 +37,7 @@ public:
         std::function<void(KeyBoardEvent)> GetHandler();
         ~KeyEventFilter(){}
     private:
-        int id_;
+        int32_t id_;
         std::string name_;
         Authority authority_;
         std::function<void(KeyBoardEvent)> handler_;
@@ -58,7 +58,7 @@ public:
         std::function<void(TouchEvent)> GetHandler();
         ~TouchEventFilter(){}
     private:
-        int id_;
+        int32_t id_;
         std::string name_;
         Authority authority_;
         std::function<void(TouchEvent)> handler_;

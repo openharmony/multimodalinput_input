@@ -29,10 +29,10 @@ extern std::unique_ptr<VirtualTouchScreen> g_pTouchScreen;
 extern std::unique_ptr<VirtualKeyboard> g_pKeyboard;
 
 struct InjectInputEvent {
-    int deviceId;
-    int type;
-    int code;
-    int value;
+    int32_t deviceId;
+    int32_t type;
+    int32_t code;
+    int32_t value;
 };
 
 class InjectThread {
@@ -41,8 +41,8 @@ public:
     virtual ~InjectThread() = default;
     void InjectFunc() const;
     void WaitFunc(InjectInputEvent injectInputEvent) const;
-    static constexpr int TOUCH_SCREEN_DEVICE_ID = 1;
-    static constexpr int KEYBOARD_DEVICE_ID = 2;
+    static constexpr int32_t TOUCH_SCREEN_DEVICE_ID = 1;
+    static constexpr int32_t KEYBOARD_DEVICE_ID = 2;
 
 private:
     static std::mutex mutex_;

@@ -304,7 +304,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnVirtualKeyEvent(SessionPtr sess, NetPacke
 int32_t OHOS::MMI::ServerMsgHandler::OnDump(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(udsServer_, ERROR_NULL_POINTER);
-    int fd = -1;
+    int32_t fd = -1;
     pkt >> fd;
     MMIEventDump->Dump(fd);
     return RET_OK;
@@ -498,7 +498,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnAddKeyEventFilter(SessionPtr sess, NetPac
         MMI_LOGD("Insufficient permissions");
         return RET_ERR;
     }
-    int id = 0;
+    int32_t id = 0;
     MMI_LOGD("server add a key event filter");
     std::string name;
     Authority authority;
@@ -513,7 +513,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveKeyEventFilter(SessionPtr sess, Net
         MMI_LOGD("Insufficient permissions");
         return RET_ERR;
     }
-    int id = 0;
+    int32_t id = 0;
     MMI_LOGD("server remove a key event filter");
     pkt>>id;
     ServerKeyFilter->RemoveKeyEventFilter(sess, id);
