@@ -79,7 +79,7 @@ void OHOS::MMI::StandardEventHandler::PointerPressedStandard(libinput_event *eve
     data.buttonType = leftButton_;
     leftButtonState_ = libinput_event_pointer_get_button_state(szPoint);
     data.buttonState = leftButtonState_;
-    MMI_LOGT("Event:buttonCode:%{public}d, buttonState:%{public}d",
+    MMI_LOGT("Event:buttonCode:%{public}d,buttonState:%{public}d",
              data.buttonType, data.buttonState);
     if (data.buttonType == BTN_LEFT && data.buttonState == LIBINPUT_BUTTON_STATE_RELEASED) {
         PointerReleasedStandardEvent(*szPoint, data);
@@ -99,8 +99,8 @@ void OHOS::MMI::StandardEventHandler::PointerReleasedStandardEvent(struct libinp
     data.buttonType = BTN_LEFT;
     data.buttonState = LIBINPUT_BUTTON_STATE_RELEASED;
     data.time = libinput_event_pointer_get_time_usec(&szPoint);
-    MMI_LOGT("3.standard event:pointLeftLiftEvent:reRventType:%{public}d, curRventType:%{public}d, "
-             "buttonCode:%{public}d, buttonState:%{public}d",
+    MMI_LOGT("3.standard event:pointLeftLiftEvent:reRventType:%{public}d,curRventType:%{public}d,"
+             "buttonCode:%{public}d,buttonState:%{public}d",
              data.reRventType, data.curRventType, data.buttonType, data.buttonState);
 }
 
@@ -113,8 +113,8 @@ void OHOS::MMI::StandardEventHandler::PointerPressedStandardEvent(struct libinpu
     data.buttonType = BTN_LEFT;
     data.buttonState = LIBINPUT_BUTTON_STATE_PRESSED;
     data.time = libinput_event_pointer_get_time_usec(&szPoint);
-    MMI_LOGT("3.standard event:pointLeftPressEvent:reRventType:%{public}d, curRventType:%{public}d, "
-             "buttonCode:%{public}d, buttonState:%{public}d",
+    MMI_LOGT("3.standard event:pointLeftPressEvent:reRventType:%{public}d,curRventType:%{public}d,"
+             "buttonCode:%{public}d,buttonState:%{public}d",
              data.reRventType, data.curRventType, data.buttonType, data.buttonState);
 }
 
@@ -135,8 +135,8 @@ void OHOS::MMI::StandardEventHandler::PointerAbsoluteStandardEvent(libinput_even
         data.reRventType = LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE;
         data.buttonType = BTN_LEFT;
         data.buttonState = LIBINPUT_BUTTON_STATE_PRESSED;
-        MMI_LOGT("3.standard event:pointAbsLeftMoveEvent:reRventType:%{public}d, curRventType:%{public}d, "
-                 "buttonCode:%{public}d, buttonState:%{public}d, x:%{public}f, y:%{public}f",
+        MMI_LOGT("3.standard event:pointAbsLeftMoveEvent:reRventType:%{public}d,curRventType:%{public}d,"
+                 "buttonCode:%{public}d,buttonState:%{public}d,x:%{public}f,y:%{public}f",
                  data.reRventType, data.curRventType, data.buttonType, data.buttonState, data.x, data.y);
     } else {
         data.curRventType = RET_ERR;
@@ -156,7 +156,7 @@ void OHOS::MMI::StandardEventHandler::PointerMotionStandardEvent(libinput_event 
     data.x = libinput_event_pointer_get_dx(szPoint);
     data.y = libinput_event_pointer_get_dy(szPoint);
     MMI_LOGT("Event:time:%{public}" PRId64
-            ", x:%{public}f, y:%{public}f",
+            ", x:%{public}f,y:%{public}f",
             data.time, data.x, data.y);
     if (leftButtonState_ == LIBINPUT_BUTTON_STATE_PRESSED && leftButton_ == BTN_LEFT) {
         data.msgType = LIBINPUT_EVENT_TOUCH_MOTION;
@@ -164,8 +164,8 @@ void OHOS::MMI::StandardEventHandler::PointerMotionStandardEvent(libinput_event 
         data.reRventType = LIBINPUT_EVENT_POINTER_MOTION;
         data.buttonType = BTN_LEFT;
         data.buttonState = LIBINPUT_BUTTON_STATE_PRESSED;
-        MMI_LOGT("3.standard event:pointLeftMoveEvent:reRventType:%{public}d, curRventType:%{public}d, "
-                 "buttonCode:%{public}d, buttonState:%{public}d, x:%{public}f, y:%{public}f, rawX:%{public}f, "
+        MMI_LOGT("3.standard event:pointLeftMoveEvent:reRventType:%{public}d,curRventType:%{public}d,"
+                 "buttonCode:%{public}d,buttonState:%{public}d,x:%{public}f,y:%{public}f,rawX:%{public}f,"
                  "rawY:%{public}f",
                  data.reRventType, data.curRventType, data.buttonType, data.buttonState, data.x, data.y, rawX, rawY);
     } else {
@@ -197,8 +197,8 @@ void OHOS::MMI::StandardEventHandler::TipUpStandardEvent(struct libinput_event_t
     data.time = libinput_event_tablet_tool_get_time_usec(&szPoint);
     data.x = libinput_event_tablet_tool_get_x(&szPoint);
     data.y = libinput_event_tablet_tool_get_y(&szPoint);
-    MMI_LOGT("3.standard event:TipUpStandarEvent:reRventType:%{public}d, curRventType:%{public}d, "
-             "tipState:%{public}d, x:%{public}f, y:%{public}f",
+    MMI_LOGT("3.standard event:TipUpStandarEvent:reRventType:%{public}d,curRventType:%{public}d,"
+             "tipState:%{public}d,x:%{public}f,y:%{public}f",
              data.reRventType, data.curRventType, data.tipState, data.x, data.y);
 }
 
@@ -211,8 +211,8 @@ void OHOS::MMI::StandardEventHandler::TipDownStandardEvent(struct libinput_event
     data.msgType = LIBINPUT_EVENT_TOUCH_DOWN;
     data.reRventType = LIBINPUT_EVENT_TABLET_TOOL_TIP;
     data.curRventType = LIBINPUT_EVENT_TOUCH_DOWN;
-    MMI_LOGT("3.standard event:TipDownStandarEvent:reRventType:%{public}d, curRventType:%{public}d, "
-        "tipState:%{public}d, x:%{public}f, y:%{public}f",
+    MMI_LOGT("3.standard event:TipDownStandarEvent:reRventType:%{public}d,curRventType:%{public}d,"
+        "tipState:%{public}d,x:%{public}f,y:%{public}f",
         data.reRventType, data.curRventType, data.tipState, data.x, data.y);
 }
 
@@ -228,8 +228,8 @@ void OHOS::MMI::StandardEventHandler::TipMotionStandardEvent(libinput_event *eve
         data.msgType = LIBINPUT_EVENT_TABLET_TOOL_AXIS;
         data.reRventType = LIBINPUT_EVENT_TABLET_TOOL_AXIS;
         data.curRventType = LIBINPUT_EVENT_TOUCH_MOTION;
-        MMI_LOGT("3.standard event:TipMotionStandarEvent:reRventType:%{public}d, curRventType:%{public}d, "
-            "tipState:%{public}d, x:%{public}f, y:%{public}f",
+        MMI_LOGT("3.standard event:TipMotionStandarEvent:reRventType:%{public}d,curRventType:%{public}d,"
+            "tipState:%{public}d,x:%{public}f,y:%{public}f",
             data.reRventType, data.curRventType, data.tipState, data.x, data.y);
     } else {
         data.curRventType = RET_ERR;
