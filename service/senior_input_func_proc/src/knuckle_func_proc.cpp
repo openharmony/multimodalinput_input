@@ -29,7 +29,6 @@ using namespace std;
 using namespace OHOS::MMI;
 int32_t OHOS::MMI::KnuckleFuncProc::DeviceEventDispatchProcess(const RawInputEvent &event)
 {
-    MMI_LOGD("enter");
     if (CheckEventCode(event) == RET_ERR) {
         MMI_LOGE("knuckle event.code error. event.code:%{public}d", event.ev_code);
         return RET_ERR;
@@ -38,13 +37,11 @@ int32_t OHOS::MMI::KnuckleFuncProc::DeviceEventDispatchProcess(const RawInputEve
         MMI_LOGE("knuckle device event process fail");
         return RET_ERR;
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t OHOS::MMI::KnuckleFuncProc::CheckEventCode(const RawInputEvent& event)
 {
-    MMI_LOGD("enter");
     static const std::set<MmiMessageId> g_knuckleAllowProcCodes = {
         MmiMessageId::ON_SCREEN_SHOT,
         MmiMessageId::ON_SCREEN_SPLIT,
@@ -57,12 +54,10 @@ int32_t OHOS::MMI::KnuckleFuncProc::CheckEventCode(const RawInputEvent& event)
         MMI_LOGE("Failed to find ev_code");
         return RET_ERR;
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t OHOS::MMI::KnuckleFuncProc::GetDevType()
 {
-    MMI_LOGD("enter");
     return static_cast<int32_t>(INPUT_DEVICE_CAP_KNUCKLE);
 }

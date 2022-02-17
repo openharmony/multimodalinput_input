@@ -59,7 +59,6 @@ OuterInterface::~OuterInterface()
 bool OuterInterface::SystemEventHandler(const KeyEventValueTransformations& trs,
                                         const enum KEY_STATE state, const int16_t systemEventAttr)
 {
-    MMI_LOGD("enter");
     switch (systemEventAttr) {
         case MMI_SYSTEM_SERVICE: {
             MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
@@ -83,14 +82,12 @@ bool OuterInterface::SystemEventHandler(const KeyEventValueTransformations& trs,
             break;
         }
     }
-    MMI_LOGD("leave");
     return false;
 }
 
 bool OuterInterface::DistributedEventHandler(const KeyEventValueTransformations& trs,
                                              const enum KEY_STATE state, const int16_t systemEventAttr)
 {
-    MMI_LOGD("enter");
     switch (systemEventAttr) {
         case MMI_SYSTEM_SERVICE: {
             MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
@@ -115,7 +112,6 @@ bool OuterInterface::DistributedEventHandler(const KeyEventValueTransformations&
         }
         break;
     }
-    MMI_LOGD("leave");
     return false;
 }
 
@@ -126,7 +122,6 @@ bool OuterInterface::DistributedEventHandler(const KeyEventValueTransformations&
 */
 int OuterInterface::IsFocusChange(int32_t srcSurfaceId, int32_t desSurfaceId)
 {
-    MMI_LOGD("enter");
     return desSurfaceId;
 }
 
@@ -137,19 +132,16 @@ int OuterInterface::IsFocusChange(int32_t srcSurfaceId, int32_t desSurfaceId)
 */
 int OuterInterface::notifyFocusChange(int32_t abilityId, int32_t windowId)
 {
-    MMI_LOGD("enter");
     return RET_ERR;
 }
 
 int32_t OuterInterface::GetSystemEventAttrByHosKeyValue(const int16_t keyValueOfHos)
 {
-    MMI_LOGD("enter");
     auto it = MAP_SYSTEM_EVENT_ATTR.find(keyValueOfHos);
     if (it == MAP_SYSTEM_EVENT_ATTR.end()) {
         MMI_LOGE("No key found, keyValue:%{public}d", keyValueOfHos);
         return RET_ERR;
     }
-    MMI_LOGD("leave");
     return it->second;
 }
 }

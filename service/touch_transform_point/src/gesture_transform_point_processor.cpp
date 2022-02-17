@@ -39,7 +39,6 @@ void GestureTransformPointProcessor::SetPointEventSource(int32_t sourceType)
 
 void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_gesture *data)
 {
-    MMI_LOGD("enter");
     MMI_LOGD("Touchpad begin event");
     CHKP(data);
     auto time = libinput_event_gesture_get_time(data);
@@ -69,12 +68,10 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_ge
     pointerEvent_->SetTargetDisplayId(0);
     pointerEvent_->SetPointerId(defaultPointerId);
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
-    MMI_LOGD("leave");
 }
 
 void GestureTransformPointProcessor::OnEventTouchPadPinchUpdate(libinput_event_gesture *data)
 {
-    MMI_LOGD("enter");
     MMI_LOGD("Touchpad update event");
     CHKP(data);
     auto time = libinput_event_gesture_get_time(data);
@@ -96,12 +93,10 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchUpdate(libinput_event_g
         pointerEvent_->SetButtonPressed(item);
     }
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
-    MMI_LOGD("leave");
 }
 
 void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gesture *data)
 {
-    MMI_LOGD("enter");
     MMI_LOGD("Touchpad end event");
     CHKP(data);
     auto time = libinput_event_gesture_get_time(data);
@@ -123,13 +118,11 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gest
         pointerEvent_->SetButtonPressed(item);
     }
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
-    MMI_LOGD("leave");
 }
 
 std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestrueEvent(
     libinput_event *event)
 {
-    MMI_LOGD("enter");
     MMI_LOGD("call OnTouchPadGestrueEvent begin");
     CHKPRP(event, nullptr);
     auto data = libinput_event_get_gesture_event(event);
@@ -164,7 +157,6 @@ std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestrueE
         }
     }
     MMI_LOGD("call OnTouchPadGestrueEvent end");
-    MMI_LOGD("leave");
     return pointerEvent_;
 }
 } // namespace MMI
