@@ -16,8 +16,6 @@
 #ifndef UUID_H
 #define UUID_H
 
-#include <array>
-#include <cstdint>
 #include <string>
 #include <cstring>
 
