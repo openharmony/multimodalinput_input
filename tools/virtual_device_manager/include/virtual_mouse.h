@@ -30,6 +30,6 @@ protected:
     const std::vector<uint32_t>& GetRelBits() const override;
     const std::vector<uint32_t>& GetMscs() const override;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif  // VIRTUAL_MOUSE_H

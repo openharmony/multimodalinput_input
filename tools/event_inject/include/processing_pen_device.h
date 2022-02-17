@@ -49,6 +49,6 @@ private:
     static constexpr int32_t EV_ABS_Z_DEFAULT_VALUE = 450;
     static constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE = 2114;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // PROCESSING_PEN_DEVICE_H

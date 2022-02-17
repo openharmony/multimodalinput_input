@@ -31,6 +31,6 @@ namespace MMI {
         int32_t OnAiServerReply(const UDSClient& client, NetPacket& pkt);
         int32_t OnHdiServerReply(const UDSClient& client, NetPacket& pkt);
     };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // TEST_AUX_TOOL_MSG_HANDLER_H
