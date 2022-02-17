@@ -65,7 +65,7 @@ public:
     static bool FindCommand(const std::string &log, const std::string &command);
     static std::vector<std::string> SearchForLog(const std::string &command, bool noWait = false);
     static std::vector<std::string> SearchForLog(const std::string &command,
-        const std::vector<std::string> &excludes, bool noWait = false);
+    const std::vector<std::string> &excludes, bool noWait = false);
     static std::string DumpPointerItem(const PointerEvent::PointerItem &item);
     static std::string DumpPointerEvent(const std::shared_ptr<PointerEvent> &pointE);
     static std::shared_ptr<PointerEvent> SetupPointerEvent001();
@@ -1289,13 +1289,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_006, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Level1)
 {
-    int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     keyOption->SetPreKeys(preKeys);
     keyOption->SetFinalKey(OHOS::MMI::KeyEvent::KEYCODE_MENU);
     keyOption->SetFinalKeyDown(true);
     keyOption->SetFinalKeyDownDuration(0);
+    int32_t response = -1;
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [=](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     {
@@ -1338,14 +1338,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Level1)
 {
-    int32_t response = -1;
-    int32_t response2 = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     keyOption->SetPreKeys(preKeys);
     keyOption->SetFinalKey(OHOS::MMI::KeyEvent::KEYCODE_POWER);
     keyOption->SetFinalKeyDown(true);
     keyOption->SetFinalKeyDownDuration(0);
+    int32_t response = -1;
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     {
@@ -1359,6 +1358,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
     });
     EXPECT_TRUE(response > 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    int32_t response2 = -1;
     response2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     {
@@ -1401,13 +1401,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_003, TestSize.Level1)
 {
-    int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     keyOption->SetPreKeys(preKeys);
     keyOption->SetFinalKey(OHOS::MMI::KeyEvent::KEYCODE_HOME);
     keyOption->SetFinalKeyDown(true);
     keyOption->SetFinalKeyDownDuration(0);
+    int32_t response = -1;
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     {
@@ -1450,13 +1450,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_003, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_004, TestSize.Level1)
 {
-    int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     keyOption->SetPreKeys(preKeys);
     keyOption->SetFinalKey(OHOS::MMI::KeyEvent::KEYCODE_BACK);
     keyOption->SetFinalKeyDown(true);
     keyOption->SetFinalKeyDownDuration(0);
+    int32_t response = -1;
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     {
@@ -1499,13 +1499,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_004, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_005, TestSize.Level1)
 {
-    int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     keyOption->SetPreKeys(preKeys);
     keyOption->SetFinalKey(OHOS::MMI::KeyEvent::KEYCODE_CALL);
     keyOption->SetFinalKeyDown(true);
     keyOption->SetFinalKeyDownDuration(2000);
+    int32_t response = -1;
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"
@@ -1547,13 +1547,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_005, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_006, TestSize.Level1)
 {
-    int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     keyOption->SetPreKeys(preKeys);
     keyOption->SetFinalKey(OHOS::MMI::KeyEvent::KEYCODE_ENDCALL);
     keyOption->SetFinalKeyDown(true);
     keyOption->SetFinalKeyDownDuration(2000);
+    int32_t response = -1;
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"
@@ -1610,13 +1610,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_006, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_007, TestSize.Level1)
 {
-    int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     keyOption->SetPreKeys(preKeys);
     keyOption->SetFinalKey(OHOS::MMI::KeyEvent::KEYCODE_VOLUME_DOWN);
     keyOption->SetFinalKeyDown(false);
     keyOption->SetFinalKeyDownDuration(0);
+    int32_t response = -1;
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"
@@ -1658,13 +1658,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_007, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_008, TestSize.Level1)
 {
-    int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     keyOption->SetPreKeys(preKeys);
     keyOption->SetFinalKey(OHOS::MMI::KeyEvent::KEYCODE_VOLUME_MUTE);
     keyOption->SetFinalKeyDown(true);
     keyOption->SetFinalKeyDownDuration(0);
+    int32_t response = -1;
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, nullptr);
     EXPECT_TRUE(response < 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -1679,7 +1679,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_008, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_009, TestSize.Level1)
 {
-    int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     keyOption->SetPreKeys(preKeys);
@@ -1687,6 +1686,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_009, TestSize.Leve
     keyOption->SetFinalKeyDown(true);
     keyOption->SetFinalKeyDownDuration(0);
     // KEYCODE_MUTE, KEYCODE_HEADSETHOOK, MEDIA_PLAY, MEDIA_PAUSE, MEDIA_PLAY_PAUSE
+    int32_t response = -1;
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"
@@ -1735,11 +1735,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
     // 电源键长按按下订阅
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
-    int32_t subscribeId1 = -1;
     keyOption->SetPreKeys(preKeys);
     keyOption->SetFinalKey(OHOS::MMI::KeyEvent::KEYCODE_POWER);
     keyOption->SetFinalKeyDown(true);
     keyOption->SetFinalKeyDownDuration(2000);
+    int32_t subscribeId1 = -1;
     subscribeId1 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"
@@ -1754,11 +1754,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
 
     // 电源键抬起订阅
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption2 = std::make_shared<OHOS::MMI::KeyOption>();
-    int32_t subscribeId2 = -1;
     keyOption2->SetPreKeys(preKeys);
     keyOption2->SetFinalKey(OHOS::MMI::KeyEvent::KEYCODE_POWER);
     keyOption2->SetFinalKeyDown(false);
     keyOption2->SetFinalKeyDownDuration(0);
+    int32_t subscribeId2 = -1;
     subscribeId2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption2,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"
@@ -1791,13 +1791,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_011, TestSize.Leve
         return;
     }
     
-    int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     keyOption->SetPreKeys(preKeys);
     keyOption->SetFinalKey(OHOS::MMI::KeyEvent::KEYCODE_F1);
     keyOption->SetFinalKeyDown(true);
     keyOption->SetFinalKeyDownDuration(0);
+    int32_t response = -1;
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [=](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     {
@@ -1812,11 +1812,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_011, TestSize.Leve
     EXPECT_TRUE(response > 0);
 
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption2 = std::make_shared<OHOS::MMI::KeyOption>();
-    int32_t subscribeId2 = -1;
     keyOption2->SetPreKeys(preKeys);
     keyOption2->SetFinalKey(OHOS::MMI::KeyEvent::KEYCODE_F1);
     keyOption2->SetFinalKeyDown(false);
     keyOption2->SetFinalKeyDownDuration(0);
+    int32_t subscribeId2 = -1;
     subscribeId2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption2,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"

@@ -42,12 +42,12 @@ InputEvent::~InputEvent() {}
 
 void InputEvent::Reset()
 {
-    int32_t conversionStep = 1000000;
     timespec ts = { 0, 0 };
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
         actionTime_ = 0;
     }
     id_ = DEFALUTID;
+    int32_t conversionStep = 1000000;
     uint64_t nowTime = (ts.tv_sec * static_cast<uint64_t>(1e3)) + (ts.tv_nsec / conversionStep);
     int32_t actionTime = static_cast<int32_t>(nowTime);
     actionTime_ = actionTime;
