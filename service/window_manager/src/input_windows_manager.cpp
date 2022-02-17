@@ -653,7 +653,6 @@ bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(libinput_event_touc
 
     auto physicalX = libinput_event_touch_get_x_transformed(touch, info->width) + info->topLeftX;
     auto physicalY = libinput_event_touch_get_y_transformed(touch, info->height) + info->topLeftY;
-
     if ((physicalX >= INT32_MAX) || (physicalY >= INT32_MAX)) {
         MMI_LOGE("Physical display coordinates are out of range");
         return false;
@@ -712,7 +711,8 @@ bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(libinput_eve
 
     for (const auto &display : logicalDisplays_) {
         if (targetDisplayId == display.id ) {
-            MMI_LOGD("targetDisplayId is %{public}d, displayX is %{public}d, displayY is %{public}d ", targetDisplayId, displayX, displayY);
+            MMI_LOGD("targetDisplayId is %{public}d, displayX is %{public}d, displayY is %{public}d ",
+                targetDisplayId, displayX, displayY);
             displayX = globalLogicalX - display.topLeftX;
             displayY = globalLogicalY - display.topLeftY;
         }
@@ -745,7 +745,8 @@ bool OHOS::MMI::InputWindowsManager::TouchDownPointToDisplayPoint(libinput_event
         logicalDisplayId = display.id;
         logicalX = globalLogicalX - display.topLeftX;
         logicalY = globalLogicalY - display.topLeftY;
-        MMI_LOGD("targetDisplayId is %{public}d, displayX is %{public}d, displayY is %{public}d ", logicalDisplayId, logicalX, logicalY);
+        MMI_LOGD("targetDisplayId is %{public}d, displayX is %{public}d, displayY is %{public}d ",
+            logicalDisplayId, logicalX, logicalY);
         return true;
     }
 
