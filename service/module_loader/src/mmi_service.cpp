@@ -14,7 +14,7 @@
  */
 
 #include <cinttypes>
-#include <signal.h>
+#include <csignal>
 #include <sys/signalfd.h>
 
 #include "app_register.h"

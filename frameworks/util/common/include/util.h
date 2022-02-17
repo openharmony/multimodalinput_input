@@ -18,7 +18,7 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <time.h>
+#include <ctime>
 #include "struct_multimodal.h"
 #include "define_multimodal.h"
 
