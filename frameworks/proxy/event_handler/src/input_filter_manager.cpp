@@ -25,7 +25,7 @@ namespace {
 
 int32_t InputFilterManager::idManager_ = 0;
 int32_t InputFilterManager::FilterKeyEvent(std::string name, Authority authority,
-    std::function<void(KeyBoardEvent)> handler)
+    std::function<void(const KeyBoardEvent&)> handler)
 {
     if (handler == nullptr) {
         MMI_LOGD("the input name or handle is nullptr");
@@ -91,7 +91,7 @@ int32_t InputFilterManager::UnFilterKeyEvent(int32_t id)
 }
 
 InputFilterManager::KeyEventFilter::KeyEventFilter(std::string name, Authority authority,
-    std::function<void(KeyBoardEvent)> handler) : name_(name), authority_(authority), handler_(handler)
+    std::function<void(const KeyBoardEvent&)> handler) : name_(name), authority_(authority), handler_(handler)
 {
     idManager_++;
     id_ = idManager_;
@@ -116,12 +116,12 @@ Authority InputFilterManager::KeyEventFilter::GetAuthority()
     return authority_;
 }
 
-std::function<void(KeyBoardEvent)> InputFilterManager::KeyEventFilter::GetHandler()
+std::function<void(const KeyBoardEvent&)> InputFilterManager::KeyEventFilter::GetHandler()
 {
     return handler_;
 }
 
-int32_t InputFilterManager::OnKeyEvent(KeyBoardEvent event, int32_t id)
+int32_t InputFilterManager::OnKeyEvent(const KeyBoardEvent& event, int32_t id)
 {
     MMI_LOGD("client on key event call function handler");
     for (auto &item : keyEventFilterList_) {
@@ -163,7 +163,7 @@ InputFilterManager::TouchEventFilter InputFilterManager::GetTouchEventFilter(int
 }
 
 int32_t InputFilterManager::FilterTouchEvent(std::string name, Authority authority,
-    std::function<void(TouchEvent)> handler)
+    std::function<void(const TouchEvent&)> handler)
 {
     CHKPR(handler, ERROR_NULL_POINTER);
     if (authority < NO_AUTHORITY || authority > HIGH_AUTHORITY) {
@@ -224,7 +224,7 @@ int32_t InputFilterManager::UnFilterTouchEvent(int32_t id)
 }
 
 InputFilterManager::TouchEventFilter::TouchEventFilter(std::string name, Authority authority,
-    std::function<void(TouchEvent)> handler) : name_(name), authority_(authority), handler_(handler)
+    std::function<void(const TouchEvent&)> handler) : name_(name), authority_(authority), handler_(handler)
 {
     idManager_++;
     id_ = idManager_;
@@ -244,17 +244,18 @@ std::string InputFilterManager::TouchEventFilter::GetName()
 {
     return name_;
 }
+
 Authority InputFilterManager::TouchEventFilter::GetAuthority()
 {
     return authority_;
 }
 
-std::function<void(TouchEvent)> InputFilterManager::TouchEventFilter::GetHandler()
+std::function<void(const TouchEvent&)> InputFilterManager::TouchEventFilter::GetHandler()
 {
     return handler_;
 }
 
-int32_t InputFilterManager::OnTouchEvent(TouchEvent event, int32_t id)
+int32_t InputFilterManager::OnTouchEvent(const TouchEvent& event, int32_t id)
 {
     MMI_LOGE("client on touch event call function handler, id:%{public}d", id);
     for (auto iter : touchEventFilterList_) {
@@ -268,7 +269,7 @@ int32_t InputFilterManager::OnTouchEvent(TouchEvent event, int32_t id)
 }
 
 int32_t InputFilterManager::RegisterPointerEventInterceptor(std::string name_, Authority authority_,
-                                                            std::function<void(MouseEvent)> handler_)
+                                                            std::function<void(const MouseEvent&)> handler_)
 {
     if (handler_ == nullptr) {
         MMI_LOGD("the input name or handle is nullptr");
@@ -335,7 +336,7 @@ int32_t InputFilterManager::UnRegisterPointerEventInterceptor(int32_t id_)
 }
 
 InputFilterManager::PointerEventInterceptor::PointerEventInterceptor(std::string name, Authority authority,
-    std::function<void(MouseEvent)> handler) : name_(name), authority_(authority), handler_(handler)
+    std::function<void(const MouseEvent&)> handler) : name_(name), authority_(authority), handler_(handler)
 {
     idManager_++;
     id_ = idManager_;
@@ -361,12 +362,12 @@ Authority InputFilterManager::PointerEventInterceptor::GetAuthority()
     return authority_;
 }
 
-std::function<void(MouseEvent)> InputFilterManager::PointerEventInterceptor::GetHandler()
+std::function<void(const MouseEvent&)> InputFilterManager::PointerEventInterceptor::GetHandler()
 {
     return handler_;
 }
 
-int32_t InputFilterManager::OnPointerEvent(MouseEvent event, int32_t id_)
+int32_t InputFilterManager::OnPointerEvent(const MouseEvent& event, int32_t id_)
 {
     MMI_LOGD("client on point event call function handler");
     for (auto &item : PointerEventInterceptorList_) {

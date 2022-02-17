@@ -17,6 +17,7 @@
 #define ROTATION_EVENT_H
 
 #include "multimodal_event.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 /**
@@ -27,6 +28,8 @@ namespace OHOS {
  */
 class RotationEvent : public MMI::MultimodalEvent {
 public:
+    RotationEvent() = default;
+    DISALLOW_COPY_AND_MOVE(RotationEvent);
     virtual ~RotationEvent();
 
     /**

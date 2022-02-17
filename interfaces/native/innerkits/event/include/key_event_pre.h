@@ -17,6 +17,7 @@
 #include <memory>
 #include <vector>
 #include "multimodal_event.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 enum KeyState {
@@ -1445,6 +1446,8 @@ enum KeyEventEnum {
 
 class KeyEvent : public MMI::MultimodalEvent {
 public:
+    KeyEvent() = default;
+    DISALLOW_COPY_AND_MOVE(KeyEvent);
     virtual ~KeyEvent();
     /* *
      * initialize the object.

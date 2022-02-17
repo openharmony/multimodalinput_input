@@ -42,7 +42,6 @@ void TouchEvent::Initialize(int32_t windowId, int32_t action, int32_t index, flo
     mIsStandard_ = isStandard;
 }
 
-
 void TouchEvent::Initialize(TouchEvent& touchEvent)
 {
     ManipulationEvent::Initialize(touchEvent);
