@@ -257,7 +257,7 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_InjectKeyEvent_006, 
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddKeyBoardFilter_001, TestSize.Level1)
 {
     std::string name = "KeyBoardFilter";
-    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](KeyBoardEvent event) {
+    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](const KeyBoardEvent& event) {
         EXPECT_TRUE(event.GetKeyCode() == HOS_KEY_BACK);
         MMI_LOGD("filter 1 receive keycode:%{public}d", event.GetKeyCode());
     });
@@ -288,11 +288,11 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddKeyBoardFilter_00
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddKeyBoardFilter_002, TestSize.Level1)
 {
     std::string name = "KeyBoardFilter";
-    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](KeyBoardEvent event) {
+    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](const KeyBoardEvent& event) {
         EXPECT_TRUE(event.GetKeyCode() == HOS_KEY_BACK);
         MMI_LOGD("filter 1 receive keycode:%{public}d", event.GetKeyCode());
     });
-    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](KeyBoardEvent event) {
+    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](const KeyBoardEvent& event) {
         EXPECT_TRUE(false);
         MMI_LOGD("filter 2 receive keycode:%{public}d", event.GetKeyCode());
     });
@@ -324,11 +324,11 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddKeyBoardFilter_00
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddKeyBoardFilter_003, TestSize.Level1)
 {
     std::string name = "KeyBoardFilter";
-    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](KeyBoardEvent event) {
+    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](const KeyBoardEvent& event) {
         EXPECT_TRUE(false);
         MMI_LOGD("filter 1 receive keycode:%{public}d", event.GetKeyCode());
     });
-    InputFilterMgr.FilterKeyEvent(name, MIDDLE_AUTHORITY, [](KeyBoardEvent event) {
+    InputFilterMgr.FilterKeyEvent(name, MIDDLE_AUTHORITY, [](const KeyBoardEvent& event) {
         EXPECT_TRUE(event.GetKeyCode() == HOS_KEY_BACK);
         MMI_LOGD("filter 2 receive keycode:%{public}d", event.GetKeyCode());
     });
@@ -360,7 +360,7 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddKeyBoardFilter_00
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemoveKeyBoardFilter_001, TestSize.Level1)
 {
     std::string name = "KeyBoardFilter";
-    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](KeyBoardEvent event) {
+    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](const KeyBoardEvent& event) {
         EXPECT_TRUE(false);
         MMI_LOGD("filter 1 receive keycode:%{public}d", event.GetKeyCode());
     });
@@ -391,11 +391,11 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemoveKeyBoardFilter
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemoveKeyBoardFilter_002, TestSize.Level1)
 {
     std::string name = "KeyBoardFilter";
-    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](KeyBoardEvent event) {
+    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](const KeyBoardEvent& event) {
         EXPECT_TRUE(event.GetKeyCode() == HOS_KEY_BACK);
         MMI_LOGD("filter 1 receive keycode:%{public}d", event.GetKeyCode());
     });
-    InputFilterMgr.FilterKeyEvent(name, MIDDLE_AUTHORITY, [](KeyBoardEvent event) {
+    InputFilterMgr.FilterKeyEvent(name, MIDDLE_AUTHORITY, [](const KeyBoardEvent& event) {
         EXPECT_TRUE(false);
         MMI_LOGD("filter 2 receive keycode:%{public}d", event.GetKeyCode());
     });
@@ -428,15 +428,15 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemoveKeyBoardFilter
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemoveKeyBoardFilter_003, TestSize.Level1)
 {
     std::string name = "KeyBoardFilter";
-    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](KeyBoardEvent event) {
+    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](const KeyBoardEvent& event) {
         EXPECT_TRUE(false);
         MMI_LOGD("filter 1 receive keycode:%{public}d", event.GetKeyCode());
     });
-    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](KeyBoardEvent event) {
+    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](const KeyBoardEvent& event) {
         EXPECT_TRUE(event.GetKeyCode() == HOS_KEY_BACK);
         MMI_LOGD("filter 2 receive keycode:%{public}d", event.GetKeyCode());
     });
-    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](KeyBoardEvent event) {
+    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](const KeyBoardEvent& event) {
         EXPECT_TRUE(false);
         MMI_LOGD("filter 3 receive keycode:%{public}d", event.GetKeyCode());
     });
@@ -472,10 +472,10 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_filterAbnormal_001, 
     EXPECT_TRUE(InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, nullptr) == RET_ERR);
     EXPECT_TRUE(InputFilterMgr.UnFilterKeyEvent(1) == RET_ERR);
 
-    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](KeyBoardEvent event) {
+    InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](const KeyBoardEvent& event) {
         MMI_LOGD("filter 1 receive keycode:%{public}d", event.GetKeyCode());
     });
-    InputFilterMgr.FilterKeyEvent(name, MIDDLE_AUTHORITY, [](KeyBoardEvent event) {
+    InputFilterMgr.FilterKeyEvent(name, MIDDLE_AUTHORITY, [](const KeyBoardEvent& event) {
         MMI_LOGD("filter 2 receive keycode:%{public}d", event.GetKeyCode());
     });
     EXPECT_TRUE(InputFilterMgr.UnFilterKeyEvent(20) == RET_ERR);
@@ -508,7 +508,7 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_filterAbnormal_001, 
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddPointerFilter_001, TestSize.Level1)
 {
     std::string name = "PointerFilter";
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](const MouseEvent& event) {
         MMI_LOGD("filter 1 receive pointercode:%{public}d", event.GetActionButton());
     });
     sleep(20);
@@ -525,10 +525,10 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddPointerFilter_001
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddPointerFilter_002, TestSize.Level1)
 {
     std::string name = "PointerFilter";
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](const MouseEvent& event) {
         MMI_LOGD("filter 1 receive pointercode:%{public}d", event.GetActionButton());
     });
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](const MouseEvent& event) {
         EXPECT_TRUE(false);
         MMI_LOGD("filter 2 receive pointercode:%{public}d", event.GetActionButton());
     });
@@ -547,11 +547,11 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddPointerFilter_002
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddPointerFilter_003, TestSize.Level1)
 {
     std::string name = "PointerFilter";
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](const MouseEvent& event) {
         EXPECT_TRUE(false);
         MMI_LOGD("filter 1 receive pointercode:%{public}d", event.GetActionButton());
     });
-    InputFilterMgr.RegisterPointerEventInterceptor(name, MIDDLE_AUTHORITY, [](MouseEvent event) {
+    InputFilterMgr.RegisterPointerEventInterceptor(name, MIDDLE_AUTHORITY, [](const MouseEvent& event) {
         MMI_LOGD("filter 2 receive pointercode:%{public}d", event.GetActionButton());
     });
     sleep(20);
@@ -569,7 +569,7 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddPointerFilter_003
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemovePointerFilter_001, TestSize.Level1)
 {
     std::string name = "PointerFilter";
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](const MouseEvent& event) {
         EXPECT_TRUE(false);
         MMI_LOGD("filter 1 receive pointercode:%{public}d", event.GetActionButton());
     });
@@ -587,10 +587,10 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemovePointerFilter_
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemovePointerFilter_002, TestSize.Level1)
 {
     std::string name = "PointerFilter";
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](const MouseEvent& event) {
         MMI_LOGD("filter 1 receive pointercode:%{public}d", event.GetActionButton());
     });
-    InputFilterMgr.RegisterPointerEventInterceptor(name, MIDDLE_AUTHORITY, [](MouseEvent event) {
+    InputFilterMgr.RegisterPointerEventInterceptor(name, MIDDLE_AUTHORITY, [](const MouseEvent& event) {
         EXPECT_TRUE(false);
         MMI_LOGD("filter 2 receive pointercode:%{public}d", event.GetActionButton());
     });
@@ -609,14 +609,14 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemovePointerFilter_
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemovePointerFilter_003, TestSize.Level1)
 {
     std::string name = "PointerFilter";
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](const MouseEvent& event) {
         EXPECT_TRUE(false);
         MMI_LOGD("filter 1 receive pointercode:%{public}d", event.GetActionButton());
     });
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](const MouseEvent& event) {
         MMI_LOGD("filter 2 receive pointercode:%{public}d", event.GetActionButton());
     });
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](const MouseEvent& event) {
         EXPECT_TRUE(false);
         MMI_LOGD("filter 3 receive pointercode:%{public}d", event.GetActionButton());
     });
@@ -638,10 +638,10 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_PointerInterceptorAb
     std::string name = "PointerFilter";
     EXPECT_TRUE(InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, nullptr) == RET_ERR);
 
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](const MouseEvent& event) {
         MMI_LOGD("filter 1 receive pointercode:%{public}d", event.GetActionButton());
     });
-    InputFilterMgr.RegisterPointerEventInterceptor(name, MIDDLE_AUTHORITY, [](MouseEvent event) {
+    InputFilterMgr.RegisterPointerEventInterceptor(name, MIDDLE_AUTHORITY, [](const MouseEvent& event) {
         MMI_LOGD("filter 2 receive pointercode:%{public}d", event.GetActionButton());
     });
     EXPECT_TRUE(InputFilterMgr.UnRegisterPointerEventInterceptor(40) == RET_ERR);
@@ -661,7 +661,7 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddTouchFilter_001, 
 {
     std::string name1 = "TouchFilter";
     bool isFilter = false;
-    int32_t filterId = InputFilterMgr.FilterTouchEvent(name1, LOW_AUTHORITY, [&isFilter](TouchEvent event) {
+    int32_t filterId = InputFilterMgr.FilterTouchEvent(name1, LOW_AUTHORITY, [&isFilter](const TouchEvent& event) {
         isFilter = true;
         MMI_LOGD("filter receive action:%{public}d", event.GetAction());
     });
@@ -680,12 +680,12 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddTouchFilter_002, 
 {
     std::string name1 = "TouchFilter1";
     bool isFilter = false;
-    int32_t filterId1 = InputFilterMgr.FilterTouchEvent(name1, LOW_AUTHORITY, [&isFilter](TouchEvent event) {
+    int32_t filterId1 = InputFilterMgr.FilterTouchEvent(name1, LOW_AUTHORITY, [&isFilter](const TouchEvent& event) {
         isFilter = true;
         MMI_LOGD("filter 1 receive action:%{public}d", event.GetAction());
     });
     std::string name2 = "TouchFilter2";
-    int32_t filterId2 = InputFilterMgr.FilterTouchEvent(name2, LOW_AUTHORITY, [&isFilter](TouchEvent event) {
+    int32_t filterId2 = InputFilterMgr.FilterTouchEvent(name2, LOW_AUTHORITY, [&isFilter](const TouchEvent& event) {
         isFilter = false;
         MMI_LOGD("filter 2 receive action:%{public}d", event.GetAction());
     });
@@ -705,12 +705,12 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddTouchFilter_003, 
 {
     std::string name1 = "TouchFilter1";
     bool isFilter = false;
-    int32_t filterId1 = InputFilterMgr.FilterTouchEvent(name1, LOW_AUTHORITY, [&isFilter](TouchEvent event) {
+    int32_t filterId1 = InputFilterMgr.FilterTouchEvent(name1, LOW_AUTHORITY, [&isFilter](const TouchEvent& event) {
         isFilter = false;
         MMI_LOGD("filter 1 receive action:%{public}d", event.GetAction());
     });
     std::string name2 = "TouchFilter2";
-    int32_t filterId2 = InputFilterMgr.FilterTouchEvent(name2, MIDDLE_AUTHORITY, [&isFilter](TouchEvent event) {
+    int32_t filterId2 = InputFilterMgr.FilterTouchEvent(name2, MIDDLE_AUTHORITY, [&isFilter](const TouchEvent& event) {
         isFilter = true;
         MMI_LOGD("filter 2 receive action:%{public}d", event.GetAction());
     });
@@ -729,7 +729,7 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddTouchFilter_003, 
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemoveTouchFilter_001, TestSize.Level1)
 {
     std::string name = "TouchFilter";
-    int32_t filterId = InputFilterMgr.FilterTouchEvent(name, LOW_AUTHORITY, [](TouchEvent event) {
+    int32_t filterId = InputFilterMgr.FilterTouchEvent(name, LOW_AUTHORITY, [](const TouchEvent& event) {
         EXPECT_TRUE(false);
         MMI_LOGD("filter 1 receive action:%{public}d", event.GetAction());
     });
@@ -748,12 +748,12 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemoveTouchFilter_00
 {
     std::string name1 = "TouchFilter1";
     bool isFilter = false;
-    int32_t filterId1 = InputFilterMgr.FilterTouchEvent(name1, LOW_AUTHORITY, [&isFilter](TouchEvent event) {
+    int32_t filterId1 = InputFilterMgr.FilterTouchEvent(name1, LOW_AUTHORITY, [&isFilter](const TouchEvent& event) {
         isFilter = true;
         MMI_LOGD("filter 1 receive action:%{public}d", event.GetAction());
     });
     std::string name2 = "TouchFilter2";
-    int32_t filterId2 = InputFilterMgr.FilterTouchEvent(name2, MIDDLE_AUTHORITY, [&isFilter](TouchEvent event) {
+    int32_t filterId2 = InputFilterMgr.FilterTouchEvent(name2, MIDDLE_AUTHORITY, [&isFilter](const TouchEvent& event) {
         isFilter = false;
         MMI_LOGD("filter 2 receive action:%{public}d", event.GetAction());
     });
@@ -773,17 +773,17 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemoveTouchFilter_00
 {
     std::string name1 = "TouchFilter1";
     bool isFilter = false;
-    int32_t filterId1 = InputFilterMgr.FilterTouchEvent(name1, LOW_AUTHORITY, [&isFilter](TouchEvent event) {
+    int32_t filterId1 = InputFilterMgr.FilterTouchEvent(name1, LOW_AUTHORITY, [&isFilter](const TouchEvent& event) {
         isFilter = false;
         MMI_LOGD("filter 1 receive action:%{public}d", event.GetAction());
     });
     std::string name2 = "TouchFilter2";
-    int32_t filterId2 = InputFilterMgr.FilterTouchEvent(name2, LOW_AUTHORITY, [&isFilter](TouchEvent event) {
+    int32_t filterId2 = InputFilterMgr.FilterTouchEvent(name2, LOW_AUTHORITY, [&isFilter](const TouchEvent& event) {
         isFilter = true;
         MMI_LOGD("filter 2 receive action:%{public}d", event.GetAction());
     });
     std::string name3 = "TouchFilter3";
-    int32_t filterId3 = InputFilterMgr.FilterTouchEvent(name3, LOW_AUTHORITY, [&isFilter](TouchEvent event) {
+    int32_t filterId3 = InputFilterMgr.FilterTouchEvent(name3, LOW_AUTHORITY, [&isFilter](const TouchEvent& event) {
         isFilter = false;
         MMI_LOGD("filter 3 receive action:%{public}d", event.GetAction());
     });
@@ -808,12 +808,12 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_TouchFilterAbnormal_
     EXPECT_TRUE(InputFilterMgr.UnFilterTouchEvent(1) == RET_ERR);
 
     std::string name2 = "TouchFilter2";
-    int32_t filterId2 = InputFilterMgr.FilterTouchEvent(name2, LOW_AUTHORITY, [&isFilter](TouchEvent event) {
+    int32_t filterId2 = InputFilterMgr.FilterTouchEvent(name2, LOW_AUTHORITY, [&isFilter](const TouchEvent& event) {
         isFilter = false;
         MMI_LOGD("filter 2 receive action:%{public}d", event.GetAction());
     });
     std::string name3 = "TouchFilter3";
-    int32_t filterId3 = InputFilterMgr.FilterTouchEvent(name3, MIDDLE_AUTHORITY, [&isFilter](TouchEvent event) {
+    int32_t filterId3 = InputFilterMgr.FilterTouchEvent(name3, MIDDLE_AUTHORITY, [&isFilter](const TouchEvent& event) {
         isFilter = true;
         MMI_LOGD("filter 3 receive action:%{public}d", event.GetAction());
     });

@@ -142,7 +142,7 @@ void EventDump::InsertDumpInfo(const std::string& str)
     CHK(!str.empty(), PARAM_INPUT_INVALID);
     std::lock_guard<std::mutex> lock(mu_);
 
-    const int32_t VECMAXSIZE = 300;
+    constexpr int32_t VECMAXSIZE = 300;
     while (dumpInfo_.size() > VECMAXSIZE) {
         dumpInfo_.erase(dumpInfo_.begin());
     }

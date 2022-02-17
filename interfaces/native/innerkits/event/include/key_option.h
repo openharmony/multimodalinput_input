@@ -17,10 +17,15 @@
 #define KEY_OPTION_H
 
 #include <vector>
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class KeyOption {
+public:
+    KeyOption() = default;
+    DISALLOW_COPY_AND_MOVE(KeyOption);
+
 public:
     std::vector<int32_t> GetPreKeys() const;
     void SetPreKeys(const std::vector<int32_t>& preKeys);
@@ -36,8 +41,8 @@ public:
 private:
     std::vector<int32_t> preKeys_ {};
     int32_t finalKey_ { -1 };
-    bool isFinalKeyDown_;
-    int32_t finalKeyDownDuration_;
+    bool isFinalKeyDown_ { false };
+    int32_t finalKeyDownDuration_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

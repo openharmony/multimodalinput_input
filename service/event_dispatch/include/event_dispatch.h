@@ -21,6 +21,7 @@
 #include "standard_event_handler.h"
 #include "app_register.h"
 #include "event_package.h"
+#include "nocopyable.h"
 #include "pointer_event.h"
 #include "i_event_filter.h"
 
@@ -29,6 +30,7 @@ namespace MMI {
 class EventDispatch : public std::enable_shared_from_this<EventDispatch> {
 public:
     EventDispatch();
+    DISALLOW_COPY_AND_MOVE(EventDispatch);
     virtual ~EventDispatch();
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     int32_t DispatchGestureNewEvent(UDSServer& udsServer, libinput_event *event,

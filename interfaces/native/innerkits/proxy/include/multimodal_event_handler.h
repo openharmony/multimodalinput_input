@@ -71,10 +71,10 @@ private:
     bool InitClient();
 
 private:
-    MMIClientPtr mClient_;
-    IClientMsgHandlerPtr mcMsgHandler_;
-    std::vector<EventRegesterInfo> mAbilityInfoVec_;
-    StandEventPtr mStandardizedEventHandle_;
+    MMIClientPtr client_;
+    IClientMsgHandlerPtr cMsgHandler_;
+    std::vector<EventRegesterInfo> abilityInfoVec_;
+    StandEventPtr standardizedEventHandle_;
 };
 } // namespace MMI
 } // namespace OHOS

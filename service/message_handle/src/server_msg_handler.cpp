@@ -14,7 +14,7 @@
  */
 
 #include "server_msg_handler.h"
-#include <inttypes.h>
+#include <cinttypes>
 #include "ability_launch_manager.h"
 #include "ai_func_proc.h"
 #include "event_dump.h"
@@ -566,8 +566,8 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveTouchEventFilter(SessionPtr sess, N
 
 int32_t OHOS::MMI::ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 {
+    MMI_LOGD("enter");
     CHKPR(sess, ERROR_NULL_POINTER);
-    MMI_LOGD("ServerMsgHandler::OnDisplayInfo enter");
 
     std::vector<PhysicalDisplayInfo> physicalDisplays;
     int32_t num = 0;

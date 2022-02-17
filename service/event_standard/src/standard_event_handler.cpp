@@ -14,7 +14,7 @@
  */
 
 #include "standard_event_handler.h"
-#include <inttypes.h>
+#include <cinttypes>
 
 namespace OHOS {
 namespace MMI {

@@ -228,7 +228,7 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
         return;
     }
     lastPointerEvent_ = pointerEvent;
-    const size_t nPtrsIndNewProc = 1;
+    constexpr size_t nPtrsIndNewProc = 1;
 
     if (pointerEvent->GetPointersIdList().size() != nPtrsIndNewProc) {
         MMI_LOGD("First press and last lift intermediate process");
