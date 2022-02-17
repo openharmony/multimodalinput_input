@@ -80,7 +80,7 @@ private:
 
 private:
     std::vector<int32_t> fds_;
-    std::map<int32_t, AppInfo> surface_ = {}; // key=windowId:value=AppInfo
+    std::map<int32_t, AppInfo> surfaceInfo_ = {}; // key=windowId:value=AppInfo
     std::vector<WaitQueueEvent> waitQueue_ = {};
     std::map<int32_t, int8_t> connectState_ = {};
 

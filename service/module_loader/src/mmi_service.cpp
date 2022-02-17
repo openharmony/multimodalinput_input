@@ -48,7 +48,7 @@ template<class ...Ts>
 void CheckDefineOutput(const char* fmt, Ts... args)
 {
     using namespace OHOS::MMI;
-    CHKP(fmt);
+    CHKPV(fmt);
     int32_t ret = 0;
     char buf[MAX_STREAM_BUF_SIZE] = {};
     ret = snprintf_s(buf, MAX_STREAM_BUF_SIZE, MAX_STREAM_BUF_SIZE - 1, fmt, args...);
@@ -208,7 +208,7 @@ int32_t MMIService::Init()
     CHKR(DevRegister->Init(), DEV_REG_INIT_FAIL, DEV_REG_INIT_FAIL);
 
     MMI_LOGD("PointerDrawingManager Init");
-    CHKR(MouseDrawingManager::GetInstance()->Init(), POINTER_DRAW_INIT_FAIL, POINTER_DRAW_INIT_FAIL);
+    CHKR(PointerDrawingManager::GetInstance()->Init(), POINTER_DRAW_INIT_FAIL, POINTER_DRAW_INIT_FAIL);
 
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
     CHKR(mmiFd_ >= 0, EPOLL_CREATE_FAIL, EPOLL_CREATE_FAIL);
@@ -254,7 +254,7 @@ void MMIService::OnDump()
 
 void MMIService::OnConnected(SessionPtr s)
 {
-    CHKP(s);
+    CHKPV(s);
     int32_t fd = s->GetFd();
     MMI_LOGI("MMIService::_OnConnected fd:%{public}d", fd);
     AppRegs->RegisterConnectState(fd);
@@ -262,7 +262,7 @@ void MMIService::OnConnected(SessionPtr s)
 
 void MMIService::OnDisconnected(SessionPtr s)
 {
-    CHKP(s);
+    CHKPV(s);
     MMI_LOGW("MMIService::OnDisconnected enter, session desc:%{public}s", s->GetDescript().c_str());
     int32_t fd = s->GetFd();
 

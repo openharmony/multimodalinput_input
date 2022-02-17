@@ -37,7 +37,7 @@ AppRegister::~AppRegister()
 bool AppRegister::Init(UDSServer& udsServer)
 {
     MMI_LOGD("enter");
-    surface_.clear();
+    surfaceInfo_.clear();
     waitQueue_.clear();
     connectState_.clear();
     if (mu_.try_lock()) {
@@ -52,8 +52,8 @@ const AppInfo& AppRegister::FindByWinId(int32_t windowId)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
-    auto it = surface_.find(windowId);
-    if (it != surface_.end()) {
+    auto it = surfaceInfo_.find(windowId);
+    if (it != surfaceInfo_.end()) {
         return it->second;
     }
     MMI_LOGD("leave");
@@ -65,7 +65,7 @@ const AppInfo& AppRegister::FindBySocketFd(int32_t fd)
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     CHKR(fd >= 0, PARAM_INPUT_INVALID, appInfoError_);
-    for (const auto &item : surface_) {
+    for (const auto &item : surfaceInfo_) {
         if (item.second.fd == fd) {
             return item.second;
         }
@@ -78,7 +78,7 @@ void AppRegister::RegisterAppInfoforServer(const AppInfo& appInfo)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
-    surface_.insert(std::pair<int32_t, AppInfo>(appInfo.windowId, appInfo));
+    surfaceInfo_.insert(std::pair<int32_t, AppInfo>(appInfo.windowId, appInfo));
     AddId(fds_, appInfo.fd);
     MMI_LOGD("leave");
 }
@@ -95,10 +95,10 @@ void AppRegister::UnregisterAppInfoBySocketFd(int32_t fd)
 void AppRegister::UnregisterBySocketFd(int32_t fd)
 {
     MMI_LOGD("enter");
-    auto it = surface_.begin();
-    while (it != surface_.end()) {
+    auto it = surfaceInfo_.begin();
+    while (it != surfaceInfo_.end()) {
         if (it->second.fd == fd) {
-            it = surface_.erase(it);
+            it = surfaceInfo_.erase(it);
         } else {
             it++;
         }
@@ -109,18 +109,18 @@ void AppRegister::UnregisterBySocketFd(int32_t fd)
 std::map<int32_t, AppInfo>::iterator AppRegister::EraseAppInfo(const std::map<int32_t, AppInfo>::iterator &it)
 {
     MMI_LOGD("enter");
-    return surface_.erase(it);
+    return surfaceInfo_.erase(it);
 }
 
 std::map<int32_t, AppInfo>::iterator AppRegister::UnregisterAppInfo(int32_t winId)
 {
     MMI_LOGD("enter");
     if (winId <= 0) {
-        return surface_.end();
+        return surfaceInfo_.end();
     }
-    auto itr = surface_.find(winId);
-    if (itr == surface_.end()) {
-        return surface_.end();
+    auto itr = surfaceInfo_.find(winId);
+    if (itr == surfaceInfo_.end()) {
+        return surfaceInfo_.end();
     }
     MMI_LOGD("leave");
     return EraseAppInfo(itr);
@@ -130,7 +130,7 @@ void AppRegister::PrintfMap()
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
-    for (const auto &item : surface_) {
+    for (const auto &item : surfaceInfo_) {
         std::cout << "mapSurface " << item.second.abilityId << ", " << item.second.windowId <<
             ", " << item.second.fd << std::endl;
     }
@@ -141,8 +141,8 @@ void OHOS::MMI::AppRegister::Dump(int32_t fd)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
-    mprintf(fd, "AppInfos: count=%d", surface_.size());
-    for (const auto &item : surface_) {
+    mprintf(fd, "AppInfos: count=%d", surfaceInfo_.size());
+    for (const auto &item : surfaceInfo_) {
         mprintf(fd, "\tabilityId=%d windowId=%d fd=%d bundlerName=%s appName=%s", item.second.abilityId,
                 item.second.windowId, item.second.fd, item.second.bundlerName.c_str(), item.second.appName.c_str());
     }
@@ -164,7 +164,7 @@ int32_t AppRegister::QueryMapSurfaceNum()
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     MMI_LOGD("leave");
-    return static_cast<int32_t>(surface_.size());
+    return static_cast<int32_t>(surfaceInfo_.size());
 }
 
 bool AppRegister::IsMultimodeInputReady(MmiMessageId idMsg, const int32_t findFd, uint64_t inputTime,

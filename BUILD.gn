@@ -14,15 +14,12 @@
 import("//build/ohos.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-## Install mmi_uinput.rc to /system/etc/init/mmi_uinput.rc {{{
 ohos_prebuilt_etc("mmi_uinput.rc") {
   source = "mmi_uinput.rc"
   relative_install_dir = "init"
   part_name = "multimodalinput_base"
   subsystem_name = "multimodalinput"
 }
-
-## Install mmi_uinput.rc to /system/etc/init/mmi_uinput.rc }}}
 
 ohos_prebuilt_etc("multimodalinput.rc") {
   source = "multimodalinput.cfg"

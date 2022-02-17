@@ -82,7 +82,7 @@ void OHOS::MMI::InputWindowsManager::UpdateSeatsInfo()
         FreeSeatsInfo(seatsInfo_);
     }
     seatsInfo_ = GetSeatsInfo();
-    CHKP(seatsInfo_);
+    CHKPV(seatsInfo_);
     if (seatsInfo_[0] && seatsInfo_[0]->focusWindowId > 0) {
         SetFocusId(seatsInfo_[0]->focusWindowId);
     }
@@ -97,7 +97,7 @@ void OHOS::MMI::InputWindowsManager::UpdateScreensInfo()
         FreeScreensInfo(screensInfo_);
     }
     screensInfo_ = GetScreensInfo();
-    CHKP(screensInfo_);
+    CHKPV(screensInfo_);
     SaveScreenInfoToMap(const_cast<const ScreenInfo**>(screensInfo_));
     PrintDebugInfo();
 }
@@ -162,7 +162,7 @@ void OHOS::MMI::InputWindowsManager::SetFocusId(int32_t id)
 void OHOS::MMI::InputWindowsManager::PrintDebugInfo()
 {
     MMI_LOGD("seats info");
-    CHKP(seatsInfo_);
+    CHKPV(seatsInfo_);
     int32_t idx = 0;
     for (int32_t i = 0; seatsInfo_[i]; i++) {
         idx = i + 1;
@@ -533,7 +533,7 @@ void OHOS::MMI::InputWindowsManager::UpdateDisplayInfo(const std::vector<Physica
         }
     }
     if (!logicalDisplays.empty()) {
-        DrawWgr->TellDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
+        PointerDrawMgr->TellDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
     }
     PrintDisplayDebugInfo();
     MMI_LOGD("InputWindowsManager::UpdateDisplayInfo leave");
@@ -842,7 +842,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
     FixCursorPosition(globalX, globalY, IMAGE_SIZE, IMAGE_SIZE);
-    DrawWgr->DrawPointer(displayId, globalX, globalY);
+    PointerDrawMgr->DrawPointer(displayId, globalX, globalY);
     WindowInfo *focusWindow = nullptr;
     int32_t action = pointerEvent->GetPointerAction();
     if ((firstBtnDownWindow_.pid == 0)
