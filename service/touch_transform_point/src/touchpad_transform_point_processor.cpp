@@ -38,7 +38,7 @@ void TouchPadTransformPointProcessor::SetPointEventSource(int32_t sourceType)
 void TouchPadTransformPointProcessor::OnEventTouchPadDown(libinput_event *event)
 {
     MMI_LOGD("Enter");
-    CHKP(event);
+    CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
     CHKPV(data);
     auto seatSlot = libinput_event_touchpad_get_seat_slot(data);
