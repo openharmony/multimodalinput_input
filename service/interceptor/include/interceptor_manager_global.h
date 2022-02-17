@@ -20,12 +20,14 @@
 #include "singleton.h"
 #include "uds_session.h"
 #include "key_event.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class InterceptorManagerGlobal {
 public:
     InterceptorManagerGlobal();
+    DISALLOW_COPY_AND_MOVE(InterceptorManagerGlobal);
     ~InterceptorManagerGlobal();
     void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session);
     void OnRemoveInterceptor(int32_t id);

@@ -17,6 +17,7 @@
 #define SPEECH_EVENT_H
 
 #include "multimodal_event.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 enum SpeechEnum {
@@ -103,6 +104,8 @@ enum SpeechEnum {
  */
 class SpeechEvent : public MMI::MultimodalEvent {
 public:
+    SpeechEvent() = default;
+    DISALLOW_COPY_AND_MOVE(SpeechEvent);
     virtual ~SpeechEvent();
     /**
     * initialize the object.

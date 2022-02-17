@@ -119,7 +119,7 @@ bool MultimodalInputConnectService::Initialize() const
 int32_t MultimodalInputConnectService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
 {
     MMI_LOGD("enter");
-    sptr<ConnectDefReqParcel> req = data.ReadParcelable<ConnectDefReqParcel>();
+    sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
     if (req == nullptr) {
         MMI_LOGE("read data error.");
         return RET_ERR;

@@ -42,4 +42,4 @@ HWTEST_F(MessageSendRecvStatMgrTest, Test_IsNoWaitMessage, TestSize.Level1)
 {
     messageSendRecvStatMgr.IsNoWaitMessage();
 }
-}
+} // namespace

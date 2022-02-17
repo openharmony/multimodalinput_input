@@ -33,6 +33,7 @@ public:
     explicit NetPacket(MmiMessageId idMsg);
     NetPacket(const NetPacket& pack);
     NetPacket& operator = (const NetPacket& pack);
+    DISALLOW_MOVE(NetPacket);
     virtual ~NetPacket();
 
     virtual void MakeData(StreamBuffer& buf) const;

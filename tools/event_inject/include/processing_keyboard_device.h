@@ -19,30 +19,30 @@
 #include "device_base.h"
 
 namespace OHOS {
-    namespace MMI {
-        class ProcessingKeyboardDevice : public DeviceBase {
-            struct KeyBoardEvent {
-                std::string eventType;
-                int32_t keyValue;
-                int32_t blockTime;
-            };
-        public:
-            ProcessingKeyboardDevice() = default;
-            ~ProcessingKeyboardDevice() = default;
-            int32_t TransformJsonDataToInputData(const Json& inputEventArrays, InputEventArray& inputEventArray);
-        private:
-            int32_t AnalysisKeyBoardEvent(const Json& inputData, std::vector<KeyBoardEvent>& keyBoardEvent);
-            void TransformKeyBoardEventToInputEvent(const std::vector<KeyBoardEvent>& keyBoardEventArray,
-                                                    InputEventArray& inputEventArray);
-            void TransformKeyPressEvent(const KeyBoardEvent& keyBoardEvent, InputEventArray& inputEventArray);
-            void TransformKeyLongPressEvent(const KeyBoardEvent& keyBoardEvent, InputEventArray& inputEventArray);
-            void TransformKeyReleaseEvent(const KeyBoardEvent& keyBoardEvent, InputEventArray& inputEventArray);
-            void TransformKeyClickEvent(const KeyBoardEvent& keyBoardEvent, InputEventArray& inputEventArray);
-        private:
-            static constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE = 15;
-            static constexpr int32_t EVENT_REPROT_COUNTS = 50;
-            static constexpr int32_t EVENT_REPROT_TIMES = 20;
-        };
-    }
-}
+namespace MMI {
+class ProcessingKeyboardDevice : public DeviceBase {
+    struct KeyBoardEvent {
+        std::string eventType;
+        int32_t keyValue;
+        int32_t blockTime;
+    };
+public:
+    ProcessingKeyboardDevice() = default;
+    ~ProcessingKeyboardDevice() = default;
+    int32_t TransformJsonDataToInputData(const Json& inputEventArrays, InputEventArray& inputEventArray);
+private:
+    int32_t AnalysisKeyBoardEvent(const Json& inputData, std::vector<KeyBoardEvent>& keyBoardEvent);
+    void TransformKeyBoardEventToInputEvent(const std::vector<KeyBoardEvent>& keyBoardEventArray,
+                                            InputEventArray& inputEventArray);
+    void TransformKeyPressEvent(const KeyBoardEvent& keyBoardEvent, InputEventArray& inputEventArray);
+    void TransformKeyLongPressEvent(const KeyBoardEvent& keyBoardEvent, InputEventArray& inputEventArray);
+    void TransformKeyReleaseEvent(const KeyBoardEvent& keyBoardEvent, InputEventArray& inputEventArray);
+    void TransformKeyClickEvent(const KeyBoardEvent& keyBoardEvent, InputEventArray& inputEventArray);
+private:
+    static constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE = 15;
+    static constexpr int32_t EVENT_REPROT_COUNTS = 50;
+    static constexpr int32_t EVENT_REPROT_TIMES = 20;
+};
+} // namespace MMI
+} // namespace OHOS
 #endif // PROCESSING_KEYBOARD_DEVICE_H

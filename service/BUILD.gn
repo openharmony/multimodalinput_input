@@ -299,11 +299,8 @@ ohos_unittest("ut-mmi-service-out") {
   }
 
   sources = [
-    #"application_manager/test/app_register_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
     "event_handler/test/register_event_test.cpp",
-
-    #"event_handler/test/system_event_handler_test.cpp",
     "event_standard/test/standard_event_handler_test.cpp",
     "hdi_inject/test/hdi_inject_test.cpp",
     "message_handle/test/input_test.cpp",
@@ -314,7 +311,11 @@ ohos_unittest("ut-mmi-service-out") {
     "window_manager/test/outer_interface_test.cpp",
   ]
   if (is_mmi_have_weston) {
-    sources += [ "event_handler/test/input_event_handler_test.cpp" ]
+    sources += [
+      "application_manager/test/app_register_test.cpp",
+      "event_handler/test/input_event_handler_test.cpp",
+      "event_handler/test/system_event_handler_test.cpp",
+    ]
   }
   cflags = [ "-DOHOS_BUILD" ]
 

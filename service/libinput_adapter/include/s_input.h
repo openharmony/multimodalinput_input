@@ -19,6 +19,7 @@
 #include <functional>
 #include <libinput.h>
 #include <sys/epoll.h>
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -26,6 +27,7 @@ typedef std::function<void(void *event)> FunInputEvent;
 class SInput {
 public:
     SInput();
+    DISALLOW_COPY_AND_MOVE(SInput);
     virtual ~SInput();
     static void LoginfoPackagingTool(libinput_event *event);
     bool Init(FunInputEvent funInputEvent, const std::string& seat_id = "seat0");

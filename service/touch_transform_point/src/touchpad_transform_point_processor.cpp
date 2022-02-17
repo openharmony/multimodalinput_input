@@ -37,8 +37,8 @@ void TouchPadTransformPointProcessor::SetPointEventSource(int32_t sourceType)
 
 void TouchPadTransformPointProcessor::OnEventTouchPadDown(libinput_event *event)
 {
-    CHKPV(event);
     MMI_LOGD("Enter");
+    CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
     CHKPV(data);
     auto seatSlot = libinput_event_touchpad_get_seat_slot(data);
@@ -114,8 +114,8 @@ void TouchPadTransformPointProcessor::OnEventTouchPadUp(libinput_event *event)
 std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPadEvent(
     libinput_event *event)
 {
+    MMI_LOGD("begin");
     CHKPP(event, nullptr);
-    MMI_LOGD("call onLibinputTouchPadEvent begin");
     auto type = libinput_event_get_type(event);
     pointerEvent_->UpdateId();
     switch (type) {
@@ -135,7 +135,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
             return nullptr;
         }
     }
-    MMI_LOGD("call onLibinputTouchPadEvent end");
+    MMI_LOGD("end");
     return pointerEvent_;
 }
 } // namespace MMI

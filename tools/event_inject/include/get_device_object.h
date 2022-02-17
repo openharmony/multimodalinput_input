@@ -33,6 +33,6 @@ public:
     ~GetDeviceObject() = default;
     DeviceBase* CreateDeviceObject(const std::string deviceName);
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // GET_DEVICE_OBJECT_H

@@ -15,8 +15,8 @@
 
 #ifndef STYLUS_EVENT_H
 #define STYLUS_EVENT_H
-
 #include "manipulation_event.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 enum StylusEnum {
@@ -93,6 +93,8 @@ enum StylusButton {
  */
 class StylusEvent : public ManipulationEvent {
 public:
+    StylusEvent() = default;
+    DISALLOW_COPY_AND_MOVE(StylusEvent);
     virtual ~StylusEvent();
     /**
     * initialize the object.

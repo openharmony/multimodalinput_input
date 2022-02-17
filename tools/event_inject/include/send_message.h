@@ -32,6 +32,6 @@ public:
 private:
     static constexpr int32_t INJECT_SLEEP_TIMES = 10;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // SEND_MESSAGE_H

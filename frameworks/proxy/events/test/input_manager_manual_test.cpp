@@ -57,7 +57,7 @@ void InputManagerManualTest::SetUp()
 
 void InputManagerManualTest::AddInputEventFilter()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     auto callback = [this](std::shared_ptr<PointerEvent> pointer) -> bool {
         MMI_LOGT("callback enter");
         CHKPF(pointer);
@@ -89,12 +89,12 @@ void InputManagerManualTest::AddInputEventFilter()
 
     int32_t ret = InputManager::GetInstance()->AddInputEventFilter(callback);
     ASSERT_EQ(ret, RET_OK);
-    MMI_LOGT("leave");
+    MMI_LOGD("leave");
 }
 
 void InputManagerManualTest::SimulateInputEventHelper(int32_t globalX, int32_t globalY, int32_t expectVal)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     const int32_t pointerId = 0;
     PointerEvent::PointerItem item;
     item.SetPointerId(pointerId);
@@ -112,12 +112,12 @@ void InputManagerManualTest::SimulateInputEventHelper(int32_t globalX, int32_t g
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     EXPECT_EQ(callbackRet, expectVal);
-    MMI_LOGT("leave");
+    MMI_LOGD("leave");
 }
 
 HWTEST_F(InputManagerManualTest, HandlePointerEventFilter_001, TestSize.Level1)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     AddInputEventFilter();
     SimulateInputEventHelper(10, 10, 1); // set global x and global y are 10, will expect value is 1
     SimulateInputEventHelper(0, 0, 2); // set global x and global y are not 10, will expect value is 2

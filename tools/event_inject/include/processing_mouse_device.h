@@ -19,32 +19,32 @@
 #include "device_base.h"
 
 namespace OHOS {
-    namespace MMI {
-        class ProcessingMouseDevice : public DeviceBase {
-            struct MouseEvent {
-                int32_t xPos;
-                int32_t yPos;
-                int32_t keyValue;
-                int32_t distance;
-                int32_t blockTime;
-                std::string eventType;
-                std::string direction;
-            };
-        public:
-            ProcessingMouseDevice() = default;
-            ~ProcessingMouseDevice() = default;
-            int32_t TransformJsonDataToInputData(const Json& inputEventArrays, InputEventArray& inputEventArray);
-        private:
-            int32_t AnalysisMouseEvent(const Json& inputData, std::vector<MouseEvent>& mouseEventArray);
-            void TransformMouseEventToInputEvent(const std::vector<MouseEvent>& mouseEventArray,
-                                                 InputEventArray& inputEventArray);
-            void TransformKeyPressEvent(const MouseEvent& mouseEvent, InputEventArray& inputEventArray);
-            void TransformKeyReleaseEvent(const MouseEvent& mouseEvent, InputEventArray& inputEventArray);
-            void TransformKeyClickEvent(const MouseEvent& mouseEvent, InputEventArray& inputEventArray);
-            void TransformMouseMoveEvent(const MouseEvent& mouseEvent, InputEventArray& inputEventArray);
-            void TransformMouseWheelEvent(const MouseEvent& mouseEvent, InputEventArray& inputEventArray);
-            void TransformMouseHwheelEvent(const MouseEvent& mouseEvent, InputEventArray& inputEventArray);
-        };
-    }
-}
+namespace MMI {
+class ProcessingMouseDevice : public DeviceBase {
+    struct MouseEvent {
+        int32_t xPos;
+        int32_t yPos;
+        int32_t keyValue;
+        int32_t distance;
+        int32_t blockTime;
+        std::string eventType;
+        std::string direction;
+    };
+public:
+    ProcessingMouseDevice() = default;
+    ~ProcessingMouseDevice() = default;
+    int32_t TransformJsonDataToInputData(const Json& inputEventArrays, InputEventArray& inputEventArray);
+private:
+    int32_t AnalysisMouseEvent(const Json& inputData, std::vector<MouseEvent>& mouseEventArray);
+    void TransformMouseEventToInputEvent(const std::vector<MouseEvent>& mouseEventArray,
+                                         InputEventArray& inputEventArray);
+    void TransformKeyPressEvent(const MouseEvent& mouseEvent, InputEventArray& inputEventArray);
+    void TransformKeyReleaseEvent(const MouseEvent& mouseEvent, InputEventArray& inputEventArray);
+    void TransformKeyClickEvent(const MouseEvent& mouseEvent, InputEventArray& inputEventArray);
+    void TransformMouseMoveEvent(const MouseEvent& mouseEvent, InputEventArray& inputEventArray);
+    void TransformMouseWheelEvent(const MouseEvent& mouseEvent, InputEventArray& inputEventArray);
+    void TransformMouseHwheelEvent(const MouseEvent& mouseEvent, InputEventArray& inputEventArray);
+};
+} // namespace MMI
+} // namespace OHOS
 #endif // PROCESSING_MOUSE_DEVICE_H

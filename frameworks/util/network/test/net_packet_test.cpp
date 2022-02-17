@@ -120,4 +120,53 @@ HWTEST_F(NetPacketTest, GetMsgId_003, TestSize.Level1)
     const MmiMessageId retResult = pack.GetMsgId();
     EXPECT_TRUE(retResult == idMsg);
 }
+
+HWTEST_F(NetPacketTest, ReadAndWrite, TestSize.Level1)
+{
+    int32_t p1 = 112;
+    std::string p2 = "test111";
+    NetPacket pkt(MmiMessageId::REGISTER_APP_INFO);
+    pkt << p1 << p2;
+
+    int32_t r1 = 0;
+    std::string r2;
+    pkt >> r1 >> r2;
+    EXPECT_EQ(p1, r1);
+    EXPECT_EQ(p2, r2);
+}
+
+HWTEST_F(NetPacketTest, WriteError, TestSize.Level1)
+{
+    int32_t p1 = 112;
+    std::string p2 = "test111";
+    struct TestData {
+        int32_t xx;
+        char szTest[MAX_STREAM_BUF_SIZE];
+    };
+    TestData data = {333, "test111"};
+    NetPacket pkt(MmiMessageId::REGISTER_APP_INFO);
+    pkt << p1 << p2;
+    EXPECT_FALSE(pkt.ChkError());
+    pkt << data;
+    EXPECT_TRUE(pkt.ChkError());
+}
+
+HWTEST_F(NetPacketTest, ReadError, TestSize.Level1)
+{
+    int32_t p1 = 112;
+    std::string p2 = "test111";
+    NetPacket pkt(MmiMessageId::REGISTER_APP_INFO);
+    pkt << p1 << p2;
+    EXPECT_FALSE(pkt.ChkError());
+    
+    int32_t r1 = 0;
+    std::string r2;
+    pkt >> r1 >> r2;
+    EXPECT_FALSE(pkt.ChkError());
+    EXPECT_EQ(p1, r1);
+    EXPECT_EQ(p2, r2);
+    int32_t r3;
+    pkt >> r3;
+    EXPECT_TRUE(pkt.ChkError());
+}
 } // namespace
