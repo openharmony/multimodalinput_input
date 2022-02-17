@@ -15,7 +15,7 @@
 #ifndef INJECTION_TOOLS_HELP_FUNC_H
 #define INJECTION_TOOLS_HELP_FUNC_H
 
-#include <string.h>
+#include <cstring>
 #include "util.h"
 
 namespace OHOS {

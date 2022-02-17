@@ -17,9 +17,9 @@
 #define UUID_H
 
 #include <array>
-#include <stdint.h>
+#include <cstdint>
 #include <string>
-#include <string.h>
+#include <cstring>
 
 /**
  * @brief The OHOS subsystem.

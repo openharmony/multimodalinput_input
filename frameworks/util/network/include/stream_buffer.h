@@ -15,7 +15,7 @@
 #ifndef STREAM_BUFFER_H
 #define STREAM_BUFFER_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 #include "securec.h"
 #include "log.h"
