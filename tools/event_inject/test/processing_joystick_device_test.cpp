@@ -270,4 +270,4 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(ret, RET_OK);
 }
-}
+} // namespace

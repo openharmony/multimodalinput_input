@@ -61,5 +61,5 @@ void HdfDeviceEventDispatch::GetEventCallbackDispatch(
         injectThread_.WaitFunc(injectInputEvent);
     }
 }
-}  // namespace MMIS
-}  // namespace OHOS
+} // namespace MMIS
+} // namespace OHOS

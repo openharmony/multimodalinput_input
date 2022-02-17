@@ -76,4 +76,4 @@ HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputData
     std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(ret, RET_ERR);
 }
-}
+} // namespace

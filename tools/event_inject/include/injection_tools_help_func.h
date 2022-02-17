@@ -19,11 +19,11 @@
 #include "util.h"
 
 namespace OHOS {
-    namespace MMI {
-        class InjectionToolsHelpFunc {
-        public:
-            std::string GetHelpText();
-        };
-    }
-}
+namespace MMI {
+class InjectionToolsHelpFunc {
+public:
+    std::string GetHelpText();
+};
+} // namespace MMI
+} // namespace OHOS
 #endif // INJECTION_TOOLS_HELP_FUNC_H

@@ -220,4 +220,4 @@ namespace {
         system(closeDeviceCmd.c_str());
         EXPECT_EQ(ret, RET_ERR);
     }
-}
+} // namespace

@@ -29,7 +29,7 @@ public:
 private:
     void InitializeMouseDeathStub();
 };
-}
+} // namespace MMI
 } // namespace OHOS
 
 #endif // INPUT_MANAGER_COMMAND_H

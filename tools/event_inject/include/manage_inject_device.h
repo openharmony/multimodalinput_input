@@ -36,6 +36,6 @@ private:
 private:
     static constexpr int32_t INJECT_SLEEP_TIMES = 10;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // MANAGE_INJECT_DEVICE_H

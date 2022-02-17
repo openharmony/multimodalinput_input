@@ -360,4 +360,4 @@ HWTEST_F(VirtualDeviceTest, Test_SetUp_01, TestSize.Level1)
     auto ret = device.SetUp();
     EXPECT_TRUE(ret);
 }
-}
+} // namespace

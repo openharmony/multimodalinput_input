@@ -49,7 +49,7 @@ private:
     static std::condition_variable conditionVariable_;
     static std::vector<InjectInputEvent> injectQueue_;
 };
-}  // namespace MMIS
-}  // namespace OHOS
+} // namespace MMIS
+} // namespace OHOS
 
 #endif  // INJECT_THREAD_H

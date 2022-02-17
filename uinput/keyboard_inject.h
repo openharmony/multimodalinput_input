@@ -39,7 +39,7 @@ private:
     static constexpr int32_t INPUT_KEY_BACK = 2;
     static constexpr int32_t LINUX_KEY_BACK = 158;
 };
-}  // namespace MMIS
-}  // namespace OHOS
+} // namespace MMIS
+} // namespace OHOS
 
 #endif // KEYBOARD_INJECT_H
