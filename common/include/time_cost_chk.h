@@ -15,7 +15,7 @@
 
 #ifndef TIME_COST_CHK_H
 #define TIME_COST_CHK_H
-#include <inttypes.h>
+#include <cinttypes>
 
 #define MAX_INPUT_EVENT_TIME (1000)
 #define MAX_OVER_TIME (300)

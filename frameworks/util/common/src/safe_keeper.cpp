@@ -14,7 +14,7 @@
  */
 
 #include "safe_keeper.h"
-#include <inttypes.h>
+#include <cinttypes>
 #include "log.h"
 #include "util.h"
 
