@@ -823,7 +823,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTargetOld(std::shared_ptr<Poi
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("enter");
+    MMI_LOGD("UpdateMouseTarget begin");
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!IsCheckDisplayIdIfExist(displayId)) {
         MMI_LOGE("This display:%{public}d is not exist", displayId);
@@ -876,7 +876,6 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
              "globalX:%{public}d,globalY:%{public}d,pressedButtons size:%{public}d",
              fd, focusWindow->pid, focusWindow->id, focusWindow->agentWindowId,
              globalX, globalY, static_cast<int32_t>(size.size()));
-    MMI_LOGD("leave");
     return fd;
 }
 
