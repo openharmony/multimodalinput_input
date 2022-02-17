@@ -17,6 +17,7 @@
 #define AXIS_EVENT_H
 
 #include "input_event.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -36,6 +37,7 @@ public:
     static std::shared_ptr<AxisEvent> Create();
 
 public:
+    DISALLOW_COPY_AND_MOVE(AxisEvent);
     virtual ~AxisEvent();
 
     int32_t GetAxisAction();

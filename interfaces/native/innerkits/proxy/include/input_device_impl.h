@@ -17,15 +17,14 @@
 #include <functional>
 #include <map>
 #include <mutex>
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class InputDeviceImpl {
 public:
     static InputDeviceImpl& GetInstance();
-    InputDeviceImpl(const InputDeviceImpl &) = delete;
-    InputDeviceImpl &operator=(const InputDeviceImpl &) = delete;
-    InputDeviceImpl(InputDeviceImpl &&) = delete;
+    DISALLOW_COPY_AND_MOVE(InputDeviceImpl);
     ~InputDeviceImpl() = default;
 
     struct InputDeviceInfo {

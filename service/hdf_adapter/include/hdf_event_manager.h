@@ -23,6 +23,7 @@
 #include "libinput.h"
 #include "evdev.h"
 #include "input_type.h"
+#include "nocopyable.h"
 #include "s_input.h"
 #define MAX_INPUT_DEVICE_COUNT MAX_INPUT_DEV_NUM
 #define TOTAL_INPUT_DEVICE_COUNT (2 * MAX_INPUT_DEV_NUM)
@@ -48,6 +49,7 @@ class HdfEventManager {
 public:
     bool Init();
     HdfEventManager();
+    DISALLOW_COPY_AND_MOVE(HdfEventManager);
     virtual ~HdfEventManager();
     void SetupCallback();
     bool OpenHdfDevice(uint32_t devIndex, bool oper);

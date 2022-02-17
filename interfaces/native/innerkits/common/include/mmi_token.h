@@ -15,8 +15,8 @@
 
 #ifndef MMI_TOKEN_H
 #define MMI_TOKEN_H
-
 #include "immi_token.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -25,6 +25,7 @@ public:
     MMIToken(std::u16string descriptor = nullptr) : IMMIToken(descriptor)
     {
     }
+    DISALLOW_COPY_AND_MOVE(MMIToken);
     virtual ~MMIToken() = default;
 
     virtual int32_t GetObjectRefCount() override

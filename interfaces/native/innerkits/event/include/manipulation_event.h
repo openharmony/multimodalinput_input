@@ -17,6 +17,7 @@
 
 #include "mmi_point.h"
 #include "multimodal_event.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 enum ManipulationEnum {
@@ -68,6 +69,8 @@ struct fingerInfos {
 
 class ManipulationEvent : public MMI::MultimodalEvent {
 public:
+    ManipulationEvent() = default;
+    DISALLOW_COPY_AND_MOVE(ManipulationEvent);
     virtual ~ManipulationEvent();
     /**
     * initialize the object.

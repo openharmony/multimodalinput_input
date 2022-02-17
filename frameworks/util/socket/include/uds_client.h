@@ -20,6 +20,7 @@
 #include <functional>
 #include "uds_socket.h"
 #include "net_packet.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -28,6 +29,7 @@ using MsgClientFunCallback = std::function<void(const UDSClient&, NetPacket&)>;
 class UDSClient : public UDSSocket {
 public:
     UDSClient();
+    DISALLOW_COPY_AND_MOVE(UDSClient);
     virtual ~UDSClient();
 
     virtual int32_t Socket() = 0;

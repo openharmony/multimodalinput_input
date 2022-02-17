@@ -22,6 +22,7 @@
 #include "config_multimodal.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -32,6 +33,7 @@ public:
     StreamBuffer(const StreamBuffer& buf);
     virtual ~StreamBuffer() {}
     virtual StreamBuffer& operator= (const StreamBuffer& other);
+    DISALLOW_MOVE(StreamBuffer);
 
     void ResetBuf();
 

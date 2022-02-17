@@ -17,6 +17,7 @@
 #define MULTIMODAL_EVENT_H
 
 #include <string>
+#include "nocopyable.h"
 #include "refbase.h"
 
 namespace OHOS {
@@ -198,6 +199,8 @@ enum MultimodalEventType {
 
 class MultimodalEvent : public RefBase {
 public:
+    MultimodalEvent() = default;
+    DISALLOW_COPY_AND_MOVE(MultimodalEvent);
     virtual ~MultimodalEvent();
     /**
     * initialize the object.

@@ -21,6 +21,7 @@
 #include "singleton.h"
 #include <list>
 #include "key_event.h"
+#include "nocopyable.h"
 #include "pointer_event.h"
 #include "struct_multimodal.h"
 
@@ -38,6 +39,7 @@ struct MonitorItem {
 class InputEventMonitorManager {
 public:
     InputEventMonitorManager();
+    DISALLOW_COPY_AND_MOVE(InputEventMonitorManager);
     virtual ~InputEventMonitorManager();
 
     int32_t AddInputEventMontior(SessionPtr session, int32_t eventType);

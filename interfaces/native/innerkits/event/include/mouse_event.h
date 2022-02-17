@@ -19,6 +19,7 @@
 #include <map>
 #include "struct_multimodal.h"
 #include "mmi_point.h"
+#include "nocopyable.h"
 #include "composite_event.h"
 
 enum class MouseActionEnum: int32_t {
@@ -172,6 +173,8 @@ namespace OHOS {
  */
 class MouseEvent : public CompositeEvent {
 public:
+    MouseEvent() = default;
+    DISALLOW_COPY_AND_MOVE(MouseEvent);
     virtual ~MouseEvent();
     /**
     * initialize the object.
