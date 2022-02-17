@@ -73,14 +73,14 @@ public:
     void OnEventTouchGetSign(const EventTouch& touch, MmiMessageId& msgId);
     void OnEventGestureGetSign(const EventGesture& gesture, MmiMessageId& msgId);
     void GetTouchInfo(const std::pair<uint32_t, int32_t> key, EventTouch& touch);
-    void GetTouchIds(std::vector<std::pair<uint32_t, int32_t>>& touchIds, const uint32_t deviceId);
+    void GetTouchIds(const uint32_t deviceId, std::vector<std::pair<uint32_t, int32_t>>& touchIds);
     int32_t GetTouchInfoSizeByDeviceId(const uint32_t deviceId);
 protected:
     int32_t OnEventGestureEndGetSign(const EventGesture& gesture, MmiMessageId& msgId);
     int32_t OnEventGestureUpdateGetSign(const EventGesture& gesture, MmiMessageId& msgId);
     int32_t OnEventGestureBeginGetSign(const EventGesture& gesture);
-    int32_t OnEventOneFingerHandlerGetSign(MmiMessageId& msgId, TouchInfo& touchUpInfo);
-    int32_t OnEventThreeFingerHandlerGetSign(MmiMessageId& msgId, TouchInfo& touchUpInfo);
+    int32_t OnEventOneFingerHandlerGetSign(const TouchInfo& touchUpInfo, MmiMessageId& msgId);
+    int32_t OnEventThreeFingerHandlerGetSign(const TouchInfo& touchUpInfo, MmiMessageId& msgId);
     int32_t OnEventTouchDownGetSign(const EventTouch& touch);
     int32_t OnEventTouchMotionGetSign(const EventTouch& touch, MmiMessageId& msgId);
     int32_t OnEventTouchUpGetSign(const EventTouch& touch, MmiMessageId& msgId);
@@ -152,7 +152,7 @@ protected:
     static const int32_t BIT5 = 5;
     static const int32_t BIT6 = 6;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define MMIRegEvent OHOS::MMI::RegisterEvent::GetInstance()
 #endif // REGISTER_EVENT_H

@@ -35,7 +35,7 @@ private:
     std::map<std::string, uint32_t> mapDeviceInfo_ = {};
     std::mutex mu_;
 };
-};
-}
+} // namespace MMI
+} // namespace OHOS
 #define DevRegister OHOS::MMI::DeviceRegister::GetInstance()
 #endif // DEVICE_REGISTER_H

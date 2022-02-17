@@ -30,7 +30,7 @@ public:
     ~Want() = default;
     Want& AddEntity(const std::string& entity)
     {
-        MMI_LOGW("Want::AddEntity(%{public}s)", entity.c_str());
+        MMI_LOGW("Want::AddEntity:%{public}s", entity.c_str());
         return *this;
     }
 };
@@ -48,7 +48,7 @@ public:
         static AbilityManager ttt;
         return ttt;
     }
-    void StartAbility(const AAFwk::Want& want, int requestCode = 0) const
+    void StartAbility(const AAFwk::Want& want, int32_t requestCode = 0) const
     {
         MMI_LOGW("AbilityManager::StartAbility");
     }
@@ -57,11 +57,13 @@ public:
 
 #endif
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SystemEventHandler" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SystemEventHandler" };
     }
-}
+} // namespace MMI
+} // namespace OHOS
 
 using namespace OHOS::AAFwk;
 using namespace OHOS::AppExecFwk;
@@ -90,6 +92,7 @@ OHOS::MMI::SystemEventHandler::~SystemEventHandler()
 
 int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
 {
+    MMI_LOGD("enter");
     if (idMsg == MmiMessageId::INVALID) {
         return PARAM_INPUT_INVALID;
     }
@@ -99,15 +102,17 @@ int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
         return UNKNOWN_MSG_ID; // non-system event return
     }
     (*fun)();
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 void OHOS::MMI::SystemEventHandler::OnGotoDesktop()
 {
-    MMI_LOGI("SystemEventHandler::OnGotoDesktop");
+    MMI_LOGD("enter");
     Want want;
     want.AddEntity(Want::FLAG_HOME_INTENT_FROM_SYSTEM);
     AbilityManager::GetInstance().StartAbility(want, 0);
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::SystemEventHandler::OnScreenShot()

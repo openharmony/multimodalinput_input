@@ -20,14 +20,16 @@
 #include <vector>
 
 namespace OHOS {
+namespace MMI {
 class InputManagerCommand {
 public:
-    int32_t ParseCommand(int argc, char *argv[]);
+    int32_t ParseCommand(int32_t argc, char *argv[]);
     int32_t ConnectService();
     void ShowUsage();
 private:
     void InitializeMouseDeathStub();
 };
+}
 } // namespace OHOS
 
 #endif // INPUT_MANAGER_COMMAND_H

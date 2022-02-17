@@ -49,7 +49,6 @@ config("libmmi_server_public_config") {
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/aafwk/standard/frameworks/kits/appkit/native/app/include",
     "//foundation/appexecfwk/adapter/interfaces/innerkits/libeventhandler/include",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
     "//foundation/aafwk/standard/interfaces/innerkits/want/include",
     "//foundation/aafwk/standard/services/abilitymgr/include",
     "//foundation/aafwk/standard/interfaces/innerkits/base/include",
@@ -62,6 +61,7 @@ config("libmmi_server_public_config") {
     "//foundation/multimodalinput/interfaces/native/innerkits/event/include",
     "//foundation/graphic/standard/rosen/modules/2d_graphics/include",
     "//foundation/graphic/standard/rosen/modules/2d_graphics/src",
+    "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
   ]
 
   if (is_mmi_have_hdf) {
@@ -183,7 +183,6 @@ ohos_shared_library("libmmi-server") {
   deps = [
     ":drawing_pointer_image",
     ":mmi_device_config.ini",
-    ":mmi_log.conf",
     ":multimodalinput_config_ability.json",
     "//drivers/peripheral/input/hal:hdi_input",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
@@ -192,8 +191,6 @@ ohos_shared_library("libmmi-server") {
     "//foundation/aafwk/standard/interfaces/innerkits/base:base",
     "//foundation/aafwk/standard/interfaces/innerkits/want:want",
     "//foundation/aafwk/standard/services/abilitymgr:abilityms",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base:appexecfwk_base",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core:appexecfwk_core",
     "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler:libeventhandler",
     "//foundation/graphic/standard/rosen/modules/2d_graphics:2d_graphics",
     "//foundation/graphic/standard/rosen/modules/render_service_client:librender_service_client",
@@ -221,19 +218,13 @@ ohos_shared_library("libmmi-server") {
 
   external_deps = [
     "bytrace_standard:bytrace_core",
+    "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
 
-  part_name = "multimodalinput_base"
-}
-
-ohos_prebuilt_etc("mmi_log.conf") {
-  source = "mmi_log.conf"
-  relative_install_dir = "."
-  subsystem_name = "multimodalinput"
   part_name = "multimodalinput_base"
 }
 

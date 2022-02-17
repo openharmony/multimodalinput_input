@@ -22,8 +22,8 @@ namespace MMI {
 namespace {
     constexpr int MAX_DEVICENAME = 64;
     constexpr int MAX_UUIDSIZE = 64;
-    constexpr int SYSTEMUID = 1000;
-    constexpr int MAX_SOLTED_COORDS_NUMS = 10;
+    constexpr int32_t SYSTEMUID = 1000;
+    constexpr int32_t MAX_SOLTED_COORDS_NUMS = 10;
 }
 enum SENIOR_DEVICE_TYPE {
     INPUT_DEVICE_AISENSOR = 31,
@@ -389,7 +389,7 @@ struct EventTabletPad {
         int number;
     } strip;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif // STRUCT_MULTIMODAL_H

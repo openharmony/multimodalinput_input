@@ -32,5 +32,5 @@ bool TouchEventHandler::OnTouch(const TouchEvent& event)
 {
     return false;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

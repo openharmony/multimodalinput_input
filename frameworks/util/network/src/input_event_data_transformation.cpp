@@ -35,13 +35,13 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
     }
     return RET_OK;
 }
-int32_t InputEventDataTransformation::NetPacketToKeyEvent(bool skipId, 
-    std::shared_ptr<KeyEvent> key, NetPacket &packet)
+int32_t InputEventDataTransformation::NetPacketToKeyEvent(bool skipId,
+    NetPacket &packet, std::shared_ptr<KeyEvent> key)
 {
     int32_t data = 0;
     int32_t size = 0;
     bool isPressed = false;
-    CHKR((RET_OK == DeserializeInputEvent(key, packet)), STREAM_BUF_READ_FAIL, RET_ERR);
+    CHKR((RET_OK == DeserializeInputEvent(packet, key)), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(packet.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
     key->SetKeyCode(data);
     CHKR(packet.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
@@ -78,7 +78,7 @@ int32_t InputEventDataTransformation::SerializeInputEvent(std::shared_ptr<InputE
     return RET_OK;
 }
 
-int32_t InputEventDataTransformation::DeserializeInputEvent(std::shared_ptr<InputEvent> event, NetPacket &packet)
+int32_t InputEventDataTransformation::DeserializeInputEvent(NetPacket &packet, std::shared_ptr<InputEvent> event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     int32_t tField {  };
@@ -160,9 +160,9 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
     return RET_OK;
 }
 
-int32_t InputEventDataTransformation::Unmarshalling(std::shared_ptr<PointerEvent> event, NetPacket &packet)
+int32_t InputEventDataTransformation::Unmarshalling(NetPacket &packet, std::shared_ptr<PointerEvent> event)
 {
-    CHKR((RET_OK == DeserializeInputEvent(event, packet)),
+    CHKR((RET_OK == DeserializeInputEvent(packet, event)),
         STREAM_BUF_READ_FAIL, RET_ERR);
 
     int32_t tField {  };
@@ -201,7 +201,7 @@ int32_t InputEventDataTransformation::Unmarshalling(std::shared_ptr<PointerEvent
 
     while (pointerCnt-- > 0) {
         PointerEvent::PointerItem item;
-        CHKR((RET_OK == DeserializePointerItem(item, packet)), STREAM_BUF_READ_FAIL, RET_ERR);
+        CHKR((RET_OK == DeserializePointerItem(packet, item)), STREAM_BUF_READ_FAIL, RET_ERR);
         event->AddPointerItem(item);
     }
 
@@ -216,7 +216,7 @@ int32_t InputEventDataTransformation::Unmarshalling(std::shared_ptr<PointerEvent
     return RET_OK;
 }
 
-int32_t InputEventDataTransformation::DeserializePointerItem(PointerEvent::PointerItem &item, NetPacket &packet)
+int32_t InputEventDataTransformation::DeserializePointerItem(NetPacket &packet, PointerEvent::PointerItem &item)
 {
     int32_t tField {  };
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
@@ -243,5 +243,5 @@ int32_t InputEventDataTransformation::DeserializePointerItem(PointerEvent::Point
     item.SetDeviceId(tField);
     return RET_OK;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

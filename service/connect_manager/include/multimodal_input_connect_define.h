@@ -20,39 +20,14 @@
 
 namespace OHOS {
 namespace MMI {
-#ifndef RET_OK
-#define RET_OK (0)
-#endif
-
-#ifndef RET_ERR
-#define RET_ERR (-1)
-#endif
-
-#ifndef MAX_EVENT_SIZE
-#define MAX_EVENT_SIZE 100                  // Epoll create maximum event size
-#endif
-
-#ifndef MAX_LIST_SIZE
-#define MAX_LIST_SIZE 100                   // Instantaneous maximum listening buffer size of socket
-#endif
-
-enum {
-    ERR_ALREADY_CONNECT_SERVER = 1,
-};
-
-// 请求结构体
-
-// 响应结构体
-// 返回socket
-
 struct ConnectDefReq {
-    int moduleId;
+    int32_t moduleId;
     std::string clientName;
 };
 
 struct ConnectDefResp {
-    int returnCode;
-    int allocedSocketId;
+    int32_t returnCode;
+    int32_t allocedSocketId;
 };
 } // namespace MMI
 } // namespace OHOS

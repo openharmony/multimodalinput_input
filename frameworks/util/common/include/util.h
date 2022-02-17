@@ -22,7 +22,8 @@
 #include "struct_multimodal.h"
 #include "define_multimodal.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     const char *GetMmiErrorTypeDesc(int32_t errorCodeEnum);
     std::string GetEnv(const std::string& name);
     std::string UuIdGenerate();
@@ -50,6 +51,7 @@ namespace OHOS::MMI {
     void AddId(std::vector<int32_t> &list, int32_t id);
     size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_t> &list2,
         std::vector<int32_t> &difList);
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif // UTIL_H

@@ -56,7 +56,7 @@ public:
 private:
     std::list<MonitorItem> monitors_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define InputMonitorMgr OHOS::Singleton<OHOS::MMI::InputEventMonitorManager>::GetInstance()
 #endif // INPUT_EVENT_MONITOR_MANAGER_H
