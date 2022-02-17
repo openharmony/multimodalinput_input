@@ -13,33 +13,28 @@
 
 import("//build/ohos.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
-mmi_connect_manager_path = "${mmi_path}/service/connect_manager"
+event_filter_path = "${mmi_path}/service/filter"
 
-config("mmi_connect_manager_config") {
+config("mmi_event_filter_config") {
   include_dirs = [
     "//foundation/multimodalinput/input/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/multimodalinput/input/frameworks/util/common/include",
-    "//foundation/multimodalinput/input/service/filter/include",
-    "${mmi_connect_manager_path}/include",
+    "${event_filter_path}/include",
   ]
 }
 
-ohos_source_set("mmi_connect_manager_service") {
+ohos_source_set("mmi_event_filter_service") {
   sources = [
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_stub.cpp",
+    "${event_filter_path}/src/event_filter_parcel.cpp",
+    "${event_filter_path}/src/event_filter_service.cpp",
+    "${event_filter_path}/src/event_filter_stub.cpp",
   ]
-  if (is_mmi_have_weston) {
-    sources += [
-      "${mmi_connect_manager_path}/src/multimodal_input_connect_service.cpp",
-    ]
-  }
 
-  public_configs = [ ":mmi_connect_manager_config" ]
+  public_configs = [ ":mmi_event_filter_config" ]
 
-  configs = [ ":mmi_connect_manager_config" ]
+  configs = [ ":mmi_event_filter_config" ]
 
   cflags = [ "-DOHOS_BUILD" ]
 
@@ -47,21 +42,20 @@ ohos_source_set("mmi_connect_manager_service") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
   ]
 }
 
-ohos_source_set("mmi_connect_manager_proxy") {
+ohos_source_set("mmi_event_filter_proxy") {
   sources = [
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_death_recipient.cpp",
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_manager.cpp",
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_proxy.cpp",
+    "${event_filter_path}/src/event_filter_death_recipient.cpp",
+    "${event_filter_path}/src/event_filter_parcel.cpp",
+    "${event_filter_path}/src/event_filter_proxy.cpp",
+    "${event_filter_path}/src/event_filter_wrap.cpp",
   ]
 
-  public_configs = [ ":mmi_connect_manager_config" ]
+  public_configs = [ ":mmi_event_filter_config" ]
 
-  configs = [ ":mmi_connect_manager_config" ]
+  configs = [ ":mmi_event_filter_config" ]
 
   cflags = [ "-DOHOS_BUILD" ]
 
@@ -69,6 +63,5 @@ ohos_source_set("mmi_connect_manager_proxy") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
   ]
 }
