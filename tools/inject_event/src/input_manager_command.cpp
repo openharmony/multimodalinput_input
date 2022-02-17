@@ -463,5 +463,5 @@ void InputManagerCommand::ShowUsage()
     std::cout << "                                                                  " << std::endl;
     std::cout << "-?  --help                                                        " << std::endl;
 }
-}
+} // namespace MMI
 } // namespace OHOS

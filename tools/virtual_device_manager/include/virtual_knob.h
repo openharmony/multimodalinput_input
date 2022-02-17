@@ -31,6 +31,6 @@ protected:
     const std::vector<uint32_t>& GetReps() const override;
     const std::vector<uint32_t>& GetMscs() const override;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // VIRTUAL_KNOB_H
