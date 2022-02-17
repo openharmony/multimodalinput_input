@@ -52,4 +52,4 @@ HWTEST_F(ProcessingMouseDeviceTest, Test_TransformJsonDataToInputData, TestSize.
     system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_OK);
 }
-}
+} // namespace

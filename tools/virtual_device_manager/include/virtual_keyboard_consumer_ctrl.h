@@ -31,6 +31,6 @@ protected:
     const std::vector<uint32_t>& GetAbs()const override;
     const std::vector<uint32_t>& GetMscs() const override;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // VIRTUAL_KEYBOARD_CONSUMER_CTRL_H

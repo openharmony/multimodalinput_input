@@ -238,10 +238,10 @@ int32_t EventPackage::PackageTabletToolEvent(libinput_event *event, EventTabletT
 {
     MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
-    const uint32_t stylusButton1KeyCode = 331;
-    const uint32_t stylusButton2KeyCode = 332;
-    const uint32_t stylusButton1Value = 1;
-    const uint32_t stylusButton2Value = 2;
+    constexpr uint32_t stylusButton1KeyCode = 331;
+    constexpr uint32_t stylusButton2KeyCode = 332;
+    constexpr uint32_t stylusButton1Value = 1;
+    constexpr uint32_t stylusButton2Value = 2;
     auto data = libinput_event_get_tablet_tool_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
     auto tool = libinput_event_tablet_tool_get_tool(data);

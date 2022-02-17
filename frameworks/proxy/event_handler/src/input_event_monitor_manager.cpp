@@ -34,8 +34,8 @@ InputEventMonitorManager::~InputEventMonitorManager()
 int32_t InputEventMonitorManager::AddInputEventMontior(
     std::function<void (std::shared_ptr<OHOS::MMI::KeyEvent>)> keyEventMonitor)
 {
+    MMI_LOGD("enter");
     CHKPR(keyEventMonitor, INVALID_MONITOR_ID);
-    MMI_LOGD("AddInputEventMontior enter");
     int32_t ret = MMIEventHdl.AddInputEventMontior(OHOS::MMI::InputEvent::EVENT_TYPE_KEY);
     if (ret != RET_OK) {
         MMI_LOGE("MultimodalEventHandler send msg failed");
@@ -52,11 +52,11 @@ int32_t InputEventMonitorManager::AddInputEventMontior(
 
 void InputEventMonitorManager::RemoveInputEventMontior(int32_t monitorId)
 {
+    MMI_LOGD("enter");
     if (monitorId < 0) {
         MMI_LOGE("MonitorId invalid");
         return;
     }
-    MMI_LOGD("RemoveInputEventMontior enter");
     MonitorItem item;
     item.id = monitorId;
     auto it = std::find(monitors_.begin(), monitors_.end(), item);

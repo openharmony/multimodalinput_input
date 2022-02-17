@@ -36,6 +36,6 @@ private:
     static constexpr int32_t READ_CMD_BUFF_SIZE = 1024;
     static constexpr int32_t CMD_EVENT_LENGTH = 6;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // GET_DEVICE_NODE_H

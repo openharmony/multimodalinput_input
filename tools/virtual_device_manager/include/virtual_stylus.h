@@ -31,6 +31,6 @@ protected:
     const std::vector<uint32_t>& GetMscs() const override;
     const std::vector<uint32_t>& GetProperties() const override;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // VIRTUAL_STYLUS_H

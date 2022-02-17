@@ -145,6 +145,6 @@ private:
     static constexpr int32_t HDF_TARGET_INDEX = 1;
     static constexpr int32_t JSON_FILE_PATH_INDEX = 1;
 };
-};
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // INJECTION_EVENT_DISPATCH_H

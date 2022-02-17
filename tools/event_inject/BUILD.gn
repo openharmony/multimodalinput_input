@@ -221,6 +221,42 @@ ohos_unittest("ut-event-injection-out") {
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 }
 
+ohos_executable("hosmmi-event-injection") {
+  sources = [ "src/hosmmi_event_simulate_main.cpp" ]
+  deps = [
+    "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
+    "//foundation/multimodalinput/input/tools/event_inject:event-injection",
+  ]
+
+  if (is_mmi_have_libinput) {
+    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
+  }
+  cflags = [ "-DOHOS_BUILD" ]
+
+  if (is_mmi_have_debug) {
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [ "-DOHOS_BUILD_AI" ]
+  }
+
+  if (is_mmi_have_weston) {
+    cflags += [ "-DOHOS_WESTEN_MODEL" ]
+  }
+
+  install_enable = true
+  part_name = "multimodalinput_base"
+}
+
 group("ut-event-injection") {
   testonly = true
   deps = []

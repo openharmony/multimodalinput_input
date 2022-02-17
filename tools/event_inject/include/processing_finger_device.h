@@ -49,6 +49,6 @@ private:
 private:
     static constexpr int32_t FINGER_BLOCK_TIME = 6;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // PROCESSING_FINGER_DEVICE_H

@@ -40,12 +40,13 @@
     #define DEF_SCREEN_MAX_HEIGHT 960
 #endif
 
+#define MAX_PACKET_BUF_SIZE (1024*8)                // Maximum buffer size of network packets
+#define MAX_STREAM_BUF_SIZE (MAX_PACKET_BUF_SIZE*2) // Maximum buffer size of socket stream
+
+#define MAX_LIST_SIZE 100                   // Instantaneous maximum listening buffer size of socket
 #define MAX_SESSON_ALARM 300                // Client quantity warning value
 #define MAX_EVENT_SIZE 100                  // Epoll create maximum event size
-#define MAX_STREAM_BUF_SIZE (1024*10)       // Maximum buffer size of socket stream
-#define MAX_PACKET_BUF_SIZE (1024*10)            // Maximum buffer size of network packets
 #define DEFINE_EPOLL_TIMEOUT 1000           // Default epoll write timeout
-
 #define CLIENT_RECONNECT_COOLING_TIME 800   // Client reconnection cooldown
 #define SERVER_RESTART_COOLING_TIME 2000    // Server failure restart cooldown
 #define MAX_THREAD_DEATH_TIME (6*1000)      // Thread death threshold time
