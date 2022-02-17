@@ -121,7 +121,7 @@ int32_t TouchEvent::GetPointToolType(int32_t index) const
     }
 
     int32_t tableToolType = 0;
-    switch (mIndex_) {
+    switch (index_) {
         case TABLET_TOOL_TYPE_PEN: {
             tableToolType = BUTTON_TOOL_PEN;
             break;
