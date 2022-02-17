@@ -1511,10 +1511,10 @@ public:
     virtual int32_t GetOriginEventType() const;
 
 private:
-    bool mIsPressed_ = false;
-    int32_t mKeyCode_ = 0;
-    int32_t mKeyDownDuration_ = 0;
-    int32_t mDeviceEventType_ = 0;
+    bool isPressed_ = false;
+    int32_t keyCode_ = 0;
+    int32_t keyDownDuration_ = 0;
+    int32_t deviceEventType_ = 0;
 };
 } // namespace OHOS
 #endif // KEY_EVENT_PRE_H
