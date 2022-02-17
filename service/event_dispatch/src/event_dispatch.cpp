@@ -765,7 +765,7 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
 #endif
 
     MMI_LOGT("4.event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
-             "ActionTime:%{public}d,Action:%{public}d,ActionStartTime:%{public}d,"
+             "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
              "EventType:%{public}d,Flag:%{public}d,"
              "KeyAction:%{public}d,Fd:%{public}d,PreHandlerTime:%{public}" PRId64 "",
              key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
@@ -877,8 +877,8 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
     pointerEvent->SetTargetWindowId(focusId);
 
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
-    MMI_LOGT("pointer event dispatcher of server:eventType:%{public}d,actionTime:%{public}d,"
-             "action:%{public}d,actionStartTime:%{public}d,"
+    MMI_LOGT("Pointer event dispatcher of server:eventType:%{public}d,actionTime:%{public}" PRId64 ","
+             "action:%{public}d,actionStartTime:%{public}" PRId64 ","
              "flag:%{public}d,pointerAction:%{public}d,sourceType:%{public}d,"
              "VerticalAxisValue:%{public}.02f, HorizontalAxisValue:%{public}.02f,"
              "pointerCount:%{public}d",
@@ -894,7 +894,7 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
         OHOS::MMI::PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
 
-        MMI_LOGT("\tdownTime:%{public}d,isPressed:%{public}s,"
+        MMI_LOGT("\tdownTime:%{public}" PRId64 ",isPressed:%{public}s,"
                  "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
                  "width:%{public}d,height:%{public}d,pressure:%{public}d",
                  item.GetDownTime(), (item.IsPressed() ? "true" : "false"),

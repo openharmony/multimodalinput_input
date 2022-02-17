@@ -14,6 +14,7 @@
  */
 
 #include "input_event_monitor_manager.h"
+#include <cinttypes>
 #include "input_event_data_transformation.h"
 #include "proto.h"
 
@@ -71,7 +72,7 @@ void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OH
 {
     CHKPV(keyEvent);
     MMI_LOGD("KeyEvent from libinput, keyCode:%{public}d, keyAction:%{public}d, action:%{public}d, "
-             "deviceId:%{private}d, actionTime:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
+             "device:%{private}d, actionTime:%{public}" PRId64 "", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
              keyEvent->GetAction(), keyEvent->GetDeviceId(), keyEvent->GetActionTime());
     if (monitors_.empty()) {
         MMI_LOGE("No monitor to send msg");
@@ -149,9 +150,9 @@ bool OHOS::MMI::InputEventMonitorManager::ReportTouchpadEvent(std::shared_ptr<OH
 {
     PointerEvent::PointerItem pointer;
     CHKF(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL);
-    MMI_LOGD("monitor-serviceeventTouchpad:time:%{public}d,"
+    MMI_LOGD("Monitor-serviceeventTouchpad:time:%{public}" PRId64 ","
              "sourceType:%{public}d,action:%{public}d,"
-             "pointerId:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
+             "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     OnTouchpadMonitorInputEvent(pointerEvent);

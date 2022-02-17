@@ -15,6 +15,7 @@
 
 #include "js_input_monitor.h"
 #include <cinttypes>
+#include <cinttypes>
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_manager.h"
@@ -185,7 +186,7 @@ void JsInputMonitor::printfPointerEvent(const std::shared_ptr<PointerEvent> poin
     CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     CHK(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item), PARAM_INPUT_FAIL);
-    MMI_LOGD("type:%{public}d,timestamp:%{public}d,deviceId:%{public}d,"
+    MMI_LOGD("type:%{public}d,timestamp:%{public}" PRId64 ",deviceId:%{public}d,"
         "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
         "size:%{public}d,force:%{public}d", pointerEvent->GetSourceType(), item.GetDownTime(),
         item.GetDeviceId(), item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(),

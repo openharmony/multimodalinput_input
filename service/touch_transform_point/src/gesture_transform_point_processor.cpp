@@ -41,7 +41,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_ge
 {
     MMI_LOGD("Touchpad begin event");
     CHKPV(data);
-    auto time = libinput_event_gesture_get_time(data);
+    auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     auto scale = libinput_event_gesture_get_scale(data);
     pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
     pointerEvent_->SetActionStartTime(time);
@@ -74,7 +74,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchUpdate(libinput_event_g
 {
     MMI_LOGD("Touchpad update event");
     CHKPV(data);
-    auto time = libinput_event_gesture_get_time(data);
+    auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     auto scale = libinput_event_gesture_get_scale(data);
     pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
     pointerEvent_->SetActionStartTime(time);
@@ -99,7 +99,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gest
 {
     MMI_LOGT("Touchpad end event");
     CHKPV(data);
-    auto time = libinput_event_gesture_get_time(data);
+    auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     auto scale = libinput_event_gesture_get_scale(data);
     pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
     pointerEvent_->SetActionStartTime(time);

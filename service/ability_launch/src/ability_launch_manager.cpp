@@ -291,9 +291,9 @@ bool AbilityLaunchManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
         CHKPF(keyItem);
         auto upTime = keyEvent->GetActionTime();
         auto downTime = keyItem->GetDownTime();
-        MMI_LOGD("upTime:%{public}d,downTime:%{public}d,keyDownDuration:%{public}d",
+        MMI_LOGD("UpTime:%{public}" PRId64 ",downTime:%{public}" PRId64 ",keyDownDuration:%{public}d",
             upTime, downTime, shortcutKey.keyDownDuration);
-        if (upTime - downTime >= (shortcutKey.keyDownDuration * 1000)) {
+        if (upTime - downTime >= static_cast<int64_t>(shortcutKey.keyDownDuration) * 1000) {
             MMI_LOGD("Skip, upTime - downTime >= duration");
             return false;
         }

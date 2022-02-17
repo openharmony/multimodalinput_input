@@ -101,7 +101,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     return status;
 }
 
-napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, uint64_t value)
+napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, int64_t value)
 {
     napi_status status;
     napi_value napiValue = nullptr;
