@@ -252,7 +252,7 @@ void InputEventHandler::OnCheckEventReport()
         return;
     }
 
-    const uint64_t MAX_DID_TIME = 1000 * 1000 * 3;
+    constexpr uint64_t MAX_DID_TIME = 1000 * 1000 * 3;
     auto curSysClock = GetSysClockTime();
     auto lostTime = curSysClock - initSysClock_;
     if (lostTime < MAX_DID_TIME) {
