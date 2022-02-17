@@ -620,21 +620,21 @@ void OHOS::MMI::InputWindowsManager::TurnTouchScreen(PhysicalDisplayInfo* info, 
     if (direction == Direction90) {
         MMI_LOGD("direction is Direction90");
         int32_t temp = logicalX;
-        logicalX = info->logicWidth - logicalY;
+        logicalX = info->logiHeight - logicalY;
         logicalY = temp;
         MMI_LOGD("logicalX is %{public}d, logicalY is %{public}d", logicalX, logicalY);
         return;
     }
     if (direction == Direction180) {
         MMI_LOGD("direction is Direction180");
-        logicalX = info->logicHeight - logicalX;
-        logicalY = info->logicWidth - logicalY;
+        logicalX = info->logicWidth - logicalX;
+        logicalY = info->logicHeight - logicalY;
         return;
     }
     if (direction == Direction270) {
         MMI_LOGD("direction is Direction270");
         int32_t temp = logicalY;
-        logicalY = info->logicHeight - logicalX;
+        logicalY = info->logicWidth - logicalX;
         logicalX = temp;
     }
 }
@@ -650,18 +650,9 @@ bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(libinput_event_touc
         MMI_LOGE("Get DisplayInfo is error");
         return false;
     }
-    
-    int32_t physicalX;
-    int32_t physicalY;
 
-    if (direction == Direction0 || direction == Direction180) {
-        physicalX = libinput_event_touch_get_x_transformed(touch, info->width) + info->topLeftX;
-        physicalY = libinput_event_touch_get_y_transformed(touch, info->height) + info->topLeftY;
-	}
-	if (direction == Direction90 || direction == Direction270) {
-        physicalX = libinput_event_touch_get_x_transformed(touch, info->height) + info->topLeftX;
-        physicalY = libinput_event_touch_get_y_transformed(touch, info->width) + info->topLeftY;
-	}
+    auto physicalX = libinput_event_touch_get_x_transformed(touch, info->width) + info->topLeftX;
+    auto physicalY = libinput_event_touch_get_y_transformed(touch, info->height) + info->topLeftY;
 
     if ((physicalX >= INT32_MAX) || (physicalY >= INT32_MAX)) {
         MMI_LOGE("Physical display coordinates are out of range");
