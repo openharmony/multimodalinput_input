@@ -18,21 +18,25 @@
 
 namespace OHOS {
 namespace MMI {
-StreamBuffer::StreamBuffer()
+StreamBuffer::StreamBuffer(const StreamBuffer &buf)
 {
-    ResetBuf();
+    Clone(buf);
 }
 
-void StreamBuffer::ResetBuf()
+StreamBuffer &StreamBuffer::operator=(const StreamBuffer &other)
 {
-    CHK(EOK == memset_sp(&szBuff_, sizeof(szBuff_), 0, sizeof(szBuff_)), MEMCPY_SEC_FUN_FAIL);
+    Clone(other);
+    return *this;
 }
 
 void StreamBuffer::Clean()
 {
     rIdx_ = 0;
     wIdx_ = 0;
-    ResetBuf();
+    rCount_ = 0;
+    wCount_ = 0;
+    rwErrorStatus_ = ErrorStatus::ES_OK;
+    CHK(EOK == memset_sp(&szBuff_, sizeof(szBuff_), 0, sizeof(szBuff_)), MEMCPY_SEC_FUN_FAIL);
 }
 
 bool StreamBuffer::SetReadIdx(uint32_t idx)
@@ -46,6 +50,7 @@ bool StreamBuffer::Read(std::string &buf)
 {
     if (rIdx_ == wIdx_) {
         MMI_LOGE("Not enough memory to read, errCode:%{public}d", MEM_NOT_ENOUGH);
+        rwErrorStatus_ = ErrorStatus::ES_READ;
         return false;
     }
     buf = ReadBuf();
@@ -53,21 +58,119 @@ bool StreamBuffer::Read(std::string &buf)
     return (buf.size() > 0);
 }
 
-bool StreamBuffer::Read(char *buf, size_t size)
+bool StreamBuffer::Write(const std::string &buf)
 {
-    CHKPF(buf);
-    if (rIdx_ + size > wIdx_) {
-        MMI_LOGE("Memory out of bounds on read, errCode:%{public}d", MEM_OUT_OF_BOUNDS);
-        return false;
-    }
-    CHKF(EOK == memcpy_sp(buf, size, ReadBuf(), size), MEMCPY_SEC_FUN_FAIL);
-    rIdx_ += static_cast<uint32_t>(size);
-    return true;
+    return Write(buf.c_str(), buf.size() + 1);
+}
+
+bool StreamBuffer::Read(StreamBuffer &buf)
+{
+    return buf.Write(Data(), Size());
 }
 
 bool StreamBuffer::Write(const StreamBuffer &buf)
 {
     return Write(buf.Data(), buf.Size());
+}
+
+bool StreamBuffer::Read(char *buf, size_t size)
+{
+    if (ChkError()) {
+        return false; // No need to print log here, only the first error needs to be printed
+    }
+    if (buf == nullptr) {
+        MMI_LOGE("Invalid input parameter buf=nullptr errCode:%{public}d", ERROR_NULL_POINTER);
+        rwErrorStatus_ = ErrorStatus::ES_READ;
+        return false;
+    }
+    if (size <= 0) {
+        MMI_LOGE("Invalid input parameter size=%{public}zu errCode:%{public}d", size, PARAM_INPUT_INVALID);
+        rwErrorStatus_ = ErrorStatus::ES_READ;
+        return false;
+    }
+    if (rIdx_ + size > wIdx_) {
+        MMI_LOGE("Memory out of bounds on read... errCode:%{public}d", MEM_OUT_OF_BOUNDS);
+        rwErrorStatus_ = ErrorStatus::ES_READ;
+        return false;
+    }
+    if (EOK != memcpy_sp(buf, size, ReadBuf(), size)) {
+        MMI_LOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+        rwErrorStatus_ = ErrorStatus::ES_READ;
+        return false;
+    }
+    rIdx_ += static_cast<uint32_t>(size);
+    rCount_ += 1;
+    return true;
+}
+
+bool StreamBuffer::Write(const char *buf, size_t size)
+{
+    if (ChkError()) {
+        return false; // No need to print log here, only the first error needs to be printed
+    }
+    if (buf == nullptr) {
+        MMI_LOGE("Invalid input parameter buf=nullptr errCode:%{public}d", ERROR_NULL_POINTER);
+        rwErrorStatus_ = ErrorStatus::ES_WRITE;
+        return false;
+    }
+    if (size <= 0) {
+        MMI_LOGE("Invalid input parameter size=%{public}zu errCode:%{public}d", size, PARAM_INPUT_INVALID);
+        rwErrorStatus_ = ErrorStatus::ES_WRITE;
+        return false;
+    }
+    if (wIdx_ + size >= MAX_STREAM_BUF_SIZE) {
+        MMI_LOGE("The write length exceeds buffer. errCode:%{public}d", MEM_OUT_OF_BOUNDS);
+        rwErrorStatus_ = ErrorStatus::ES_WRITE;
+        return false;
+    }
+    if (EOK != memcpy_sp(&szBuff_[wIdx_], (MAX_STREAM_BUF_SIZE - wIdx_), buf, size)) {
+        MMI_LOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+        rwErrorStatus_ = ErrorStatus::ES_WRITE;
+        return false;
+    }
+    wIdx_ += static_cast<uint32_t>(size);
+    wCount_ += 1;
+    return true;
+}
+
+bool StreamBuffer::IsEmpty()
+{
+    if (rIdx_ == wIdx_) {
+        return true;
+    }
+    return false;
+}
+
+size_t StreamBuffer::Size() const
+{
+    return wIdx_;
+}
+
+size_t StreamBuffer::UnreadSize() const
+{
+    CHKR(wIdx_ >= rIdx_, VAL_NOT_EXP, 0);
+    return (wIdx_ - rIdx_);
+}
+
+bool StreamBuffer::ChkError() const
+{
+    return (rwErrorStatus_ != ErrorStatus::ES_OK);
+}
+
+const std::string& StreamBuffer::GetErrorStatusRemark() const
+{
+    static const std::string invalidStatus = "UNKNOWN";
+    static const std::vector<std::pair<ErrorStatus, std::string>> remark {
+        {ErrorStatus::ES_OK, "OK"},
+        {ErrorStatus::ES_READ, "READ_ERROR"},
+        {ErrorStatus::ES_WRITE, "WRITE_ERROR"},
+    };
+    for (const auto& it : remark) {
+        if (it.first == rwErrorStatus_) {
+            return it.second;
+        }
+    }
+    return invalidStatus;
 }
 
 const char *StreamBuffer::Data() const
@@ -89,58 +192,6 @@ bool StreamBuffer::Clone(const StreamBuffer &buf)
 {
     Clean();
     return Write(buf.Data(), buf.Size());
-}
-
-size_t StreamBuffer::Size() const
-{
-    return wIdx_;
-}
-
-size_t StreamBuffer::UnreadSize() const
-{
-    CHKR(wIdx_ >= rIdx_, VAL_NOT_EXP, 0);
-    return (wIdx_ - rIdx_);
-}
-
-bool StreamBuffer::Write(const char *buf, size_t size)
-{
-    CHKPF(buf);
-    if (wIdx_ + size >= MAX_STREAM_BUF_SIZE) {
-        MMI_LOGE("Memory out of bounds on write, errCode:%{public}d", MEM_OUT_OF_BOUNDS);
-        return false;
-    }
-    CHKF(EOK == memcpy_sp(&szBuff_[wIdx_], (MAX_STREAM_BUF_SIZE - wIdx_), buf, size), MEMCPY_SEC_FUN_FAIL);
-    wIdx_ += static_cast<uint32_t>(size);
-    return true;
-}
-
-bool StreamBuffer::Read(StreamBuffer &buf)
-{
-    return buf.Write(Data(), Size());
-}
-
-bool StreamBuffer::Write(const std::string &buf)
-{
-    return Write(buf.c_str(), buf.size() + 1);
-}
-
-StreamBuffer &StreamBuffer::operator=(const StreamBuffer &other)
-{
-    Clone(other);
-    return *this;
-}
-
-StreamBuffer::StreamBuffer(const StreamBuffer &buf)
-{
-    Clone(buf);
-}
-
-bool StreamBuffer::IsEmpty()
-{
-    if (rIdx_ == wIdx_) {
-        return true;
-    }
-    return false;
 }
 } // namespace MMI
 } // namespace OHOS

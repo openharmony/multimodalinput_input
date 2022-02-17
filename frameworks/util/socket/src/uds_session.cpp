@@ -84,6 +84,7 @@ void UDSSession::UpdateDescript()
 
 bool UDSSession::SendMsg(NetPacket& pkt) const
 {
+    CHKF(!pkt.ChkError(), PACKET_WRITE_FAIL);
     StreamBuffer buf;
     pkt.MakeData(buf);
     return SendMsg(buf.Data(), buf.Size());
