@@ -60,6 +60,6 @@ protected:
     uinput_abs_setup absTemp_ = {};
     std::vector<uinput_abs_setup> absInit_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif  // VIRTUAL_DEVICE_H

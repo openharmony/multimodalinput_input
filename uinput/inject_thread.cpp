@@ -47,5 +47,5 @@ void InjectThread::WaitFunc(InjectInputEvent injectInputEvent) const
     injectQueue_.push_back(injectInputEvent);
     conditionVariable_.notify_one();
 }
-}  // namespace MMIS
-}  // namespace OHOS
+} // namespace MMIS
+} // namespace OHOS

@@ -34,4 +34,4 @@ HWTEST_F(InjectionToolsHelpFuncTest, Test_InjectionToolsHelpFuncTest, TestSize.L
     auto ret = injectionToolsHelpFunc.GetHelpText();
     EXPECT_EQ(ret.empty(), false);
 }
-}
+} // namespace
