@@ -64,6 +64,7 @@ bool OHOS::MMI::InputWindowsManager::Init(UDSServer& udsServer)
 {
     // save server handle
     udsServer_ = &udsServer;
+#ifdef OHOS_WESTEN_MODEL
     SetSeatListener([]() {
         WinMgr->UpdateSeatsInfo();
     });
@@ -72,6 +73,7 @@ bool OHOS::MMI::InputWindowsManager::Init(UDSServer& udsServer)
     });
     UpdateSeatsInfo();
     UpdateScreensInfo();
+#endif
     return true;
 }
 
@@ -284,7 +286,6 @@ void OHOS::MMI::InputWindowsManager::Dump(int32_t fd)
 void OHOS::MMI::InputWindowsManager::SaveScreenInfoToMap(const ScreenInfo** screenInfo)
 {
     // check param
-    CHK(udsServer_, ERROR_NULL_POINTER);
     CHK(screenInfo, ERROR_NULL_POINTER);
     CHK(*screenInfo, ERROR_NULL_POINTER);
 
