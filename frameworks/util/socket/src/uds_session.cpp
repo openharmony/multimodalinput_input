@@ -47,12 +47,12 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
     CHKPF(buf);
     CHKF(size > 0 && size <= MAX_PACKET_BUF_SIZE, PARAM_INPUT_INVALID);
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
-    uint64_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
+    ssize_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
     if (ret < 0) {
         const int errNoSaved = errno;
-        MMI_LOGE("UDSSession::SendMsg write return %{public}" PRId64
-                ", fd_:%{public}d, errNoSaved:%{public}d, strerror:%{public}s",
-                ret, fd_, errNoSaved, strerror(errNoSaved));
+        MMI_LOGE("UDSSession::SendMsg write return %{public}zd,"
+                 "fd_:%{public}d,errNoSaved:%{public}d,strerror:%{public}s",
+                 ret, fd_, errNoSaved, strerror(errNoSaved));
         return false;
     }
     return true;
@@ -60,7 +60,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 
 void UDSSession::Close()
 {
-    MMI_LOGT("enter fd_:%{public}d, bHasClosed_ = %d.", fd_, bHasClosed_);
+    MMI_LOGT("enter fd_:%{public}d,bHasClosed_ = %d.", fd_, bHasClosed_);
     if (!bHasClosed_ && fd_ != -1) {
         close(fd_);
         bHasClosed_ = true;
@@ -89,7 +89,7 @@ bool UDSSession::SendMsg(NetPacket& pkt) const
     return SendMsg(buf.Data(), buf.Size());
 }
 
-void UDSSession::RecordEvent(int32_t id, uint64_t time)
+void UDSSession::AddEvent(int32_t id, uint64_t time)
 {
     MMI_LOGI("begin");
     EventTime eventTime = {id, time};
@@ -97,15 +97,15 @@ void UDSSession::RecordEvent(int32_t id, uint64_t time)
     MMI_LOGI("end");
 }
 
-void UDSSession::ClearEventList(int32_t id)
+void UDSSession::DelEvents(int32_t id)
 {
     MMI_LOGI("begin");
     int32_t count = 0;
     for (auto &item : events_) {
-        count++;
+        ++count;
         if (item.id == id) {
             events_.erase(events_.begin(), events_.begin() + count);
-            MMI_LOGI("Delete events.");
+            MMI_LOGI("Delete events");
         }
     }
     MMI_LOGI("end");

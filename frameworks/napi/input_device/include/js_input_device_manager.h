@@ -21,11 +21,11 @@
 
 namespace OHOS {
 namespace MMI {
-class JsInputDeviceManager : public JsEventTarget, public std::enable_shared_from_this<JsInputDeviceManager> {
+class JsInputDeviceManager : public JsEventTarget {
 public:
     void ResetEnv();
-    void GetDeviceIdsAsync(napi_env env, napi_value handle);
-    void GetDeviceAsync(int32_t id, napi_env env, napi_value handle);
+    void GetDeviceIds(napi_env env, napi_value handle = nullptr);
+    void GetDevice(int32_t id, napi_env env, napi_value handle = nullptr);
 };
 } // namespace MMI
 } // namespace OHOS

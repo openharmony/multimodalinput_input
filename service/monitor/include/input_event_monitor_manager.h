@@ -55,7 +55,7 @@ private:
 
     void OnTouchpadMonitorInputEvent(std::shared_ptr<PointerEvent> PointerEvent);
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define InputMonitorServiceMgr OHOS::Singleton<OHOS::MMI::InputEventMonitorManager>::GetInstance()
 #endif // INPUT_EVENT_MONITOR_H

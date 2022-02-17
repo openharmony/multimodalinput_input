@@ -87,7 +87,7 @@ public:
 
     int32_t OnInjectKeyEventTest(SessionPtr sess, OHOS::MMI::NetPacket newPacket)
     {
-        int retResult = OnInjectKeyEvent(sess, newPacket);
+        int32_t retResult = OnInjectKeyEvent(sess, newPacket);
         return retResult;
     }
 };

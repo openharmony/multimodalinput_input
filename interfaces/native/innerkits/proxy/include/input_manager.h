@@ -20,9 +20,10 @@
 #include <list>
 
 #include "display_info.h"
-#include "i_input_event_consumer.h"
 #include "error_multimodal.h"
+#include "i_input_event_consumer.h"
 #include "key_option.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -183,6 +184,7 @@ public:
 
 private:
     InputManager() = default;
+    DISALLOW_COPY_AND_MOVE(InputManager);
     static InputManager *mInstance_;
 };
 } // namespace MMI

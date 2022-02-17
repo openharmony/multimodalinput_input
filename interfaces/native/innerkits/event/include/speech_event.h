@@ -166,5 +166,5 @@ private:
     int32_t mMode_ = 0;
     std::string mActionProperty_ = "";
 };
-}
+} // namespace OHOS
 #endif // SPEECH_EVENT_H

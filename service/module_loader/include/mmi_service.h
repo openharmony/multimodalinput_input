@@ -47,7 +47,7 @@ public:
     virtual void OnStart() override;
     virtual void OnStop() override;
     virtual void OnDump() override;
-    virtual int32_t AllocSocketFd(const std::string &programName, const int moduleType, int &socketFd) override;
+    virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &socketFd) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
 
 protected:
@@ -83,6 +83,6 @@ private:
 #endif // OHOS_BUILD_AI
     std::set<int32_t> authFds_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // MMI_SERVICE_H
