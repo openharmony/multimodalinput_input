@@ -36,13 +36,13 @@ void ManipulationEvent::Initialize(int32_t windowId, int32_t startTime, int32_t 
 
     MultimodalEvent::Initialize(windowId, highLevelEvent, uuid, sourceType, occurredTime, deviceId, inputDeviceId,
                                 isHighLevelEvent, deviceUdevTags);
-    mStartTime_ = startTime;
-    mOperationState_ = operationState;
-    mPointerCount_ = pointerCount;
+    startTime_ = startTime;
+    operationState_ = operationState;
+    pointerCount_ = pointerCount;
     if (fingersInfos != nullptr) {
-        int32_t ret = memset_s(mfingersInfos_, sizeof(fingerInfos) * FINGER_NUM, 0, sizeof(fingerInfos) * FINGER_NUM);
+        int32_t ret = memset_s(fingersInfos_, sizeof(fingerInfos) * FINGER_NUM, 0, sizeof(fingerInfos) * FINGER_NUM);
         CHK(ret == EOK, MEMSET_SEC_FUN_FAIL);
-        ret = memcpy_s(mfingersInfos_, sizeof(fingerInfos) * FINGER_NUM, fingersInfos,
+        ret = memcpy_s(fingersInfos_, sizeof(fingerInfos) * FINGER_NUM, fingersInfos,
                        sizeof(fingerInfos) * pointerCount);
         CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     }
@@ -52,22 +52,22 @@ void ManipulationEvent::Initialize(ManipulationEvent& maniPulationEvent)
 {
     const MultimodalEvent* multimodalEvent = &maniPulationEvent;
     MultimodalEvent::Initialize(*multimodalEvent);
-    mStartTime_ = maniPulationEvent.GetStartTime();
-    mOperationState_ = maniPulationEvent.GetPhase();
-    mPointerCount_ = maniPulationEvent.GetPointerCount();
-    int32_t ret = memcpy_s(mfingersInfos_, sizeof(mfingersInfos_) * FINGER_NUM, maniPulationEvent.GetFingersInfos(),
+    startTime_ = maniPulationEvent.GetStartTime();
+    operationState_ = maniPulationEvent.GetPhase();
+    pointerCount_ = maniPulationEvent.GetPointerCount();
+    int32_t ret = memcpy_s(fingersInfos_, sizeof(fingersInfos_) * FINGER_NUM, maniPulationEvent.GetFingersInfos(),
                            sizeof(fingerInfos)*FINGER_NUM);
     CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
 }
 
 int32_t ManipulationEvent::GetStartTime() const
 {
-    return mStartTime_;
+    return startTime_;
 }
 
 int32_t ManipulationEvent::GetPhase() const
 {
-    return mOperationState_;
+    return operationState_;
 }
 
 MmiPoint ManipulationEvent::GetPointerPosition(int32_t index) const
@@ -75,9 +75,9 @@ MmiPoint ManipulationEvent::GetPointerPosition(int32_t index) const
     if (index < 0 || index >= FINGER_NUM) {
         return MmiPoint(0, 0, 0);
     }
-    for (int32_t i = 0; i < mPointerCount_; i++) {
-        if (mfingersInfos_[i].mPointerId == index) {
-            return mfingersInfos_[i].mMp;
+    for (int i = 0; i < pointerCount_; i++) {
+        if (fingersInfos_[i].mPointerId == index) {
+            return fingersInfos_[i].mMp;
         }
     }
     return MmiPoint(0, 0, 0);
@@ -88,7 +88,7 @@ void ManipulationEvent::SetScreenOffset(float offsetX, float offsetY)
     int32_t pointerCount = GetPointerCount();
 
     for (int32_t i = 0; i < pointerCount; i++) {
-        mfingersInfos_[i].mMp.Setxy(offsetX, offsetY);
+        fingersInfos_[i].mMp.Setxy(offsetX, offsetY);
     }
 }
 
@@ -97,12 +97,12 @@ MmiPoint ManipulationEvent::GetPointerScreenPosition(int32_t index) const
     if (index < 0 || index >= FINGER_NUM) {
         return MmiPoint(0, 0, 0);
     }
-    return mfingersInfos_[index].mMp;
+    return fingersInfos_[index].mMp;
 }
 
 int32_t ManipulationEvent::GetPointerCount() const
 {
-    return mPointerCount_;
+    return pointerCount_;
 }
 
 int32_t ManipulationEvent::GetPointerId(int32_t index) const
@@ -110,7 +110,7 @@ int32_t ManipulationEvent::GetPointerId(int32_t index) const
     if (index < 0 || index >= FINGER_NUM) {
         return -1;
     }
-    return mfingersInfos_[index].mPointerId;
+    return fingersInfos_[index].mPointerId;
 }
 
 float ManipulationEvent::GetForce(int32_t index) const
@@ -118,7 +118,7 @@ float ManipulationEvent::GetForce(int32_t index) const
     if (index < 0 || index >= FINGER_NUM) {
         return 0.0F;
     }
-    return mfingersInfos_[index].mTouchPressure;
+    return fingersInfos_[index].mTouchPressure;
 }
 
 float ManipulationEvent::GetRadius(int32_t index) const
@@ -126,11 +126,11 @@ float ManipulationEvent::GetRadius(int32_t index) const
     if (index < 0 || index >= FINGER_NUM) {
         return 0.0F;
     }
-    return mfingersInfos_[index].mTouchArea;
+    return fingersInfos_[index].mTouchArea;
 }
 
 const fingerInfos* ManipulationEvent::GetFingersInfos() const
 {
-    return mfingersInfos_;
+    return fingersInfos_;
 }
 } // namespace OHOS

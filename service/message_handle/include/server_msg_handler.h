@@ -16,6 +16,7 @@
 #define SERVER_MSG_HANDLER_H
 #include "msg_handler.h"
 #include "event_dispatch.h"
+#include "nocopyable.h"
 #include "senior_input_func_proc_base.h"
 
 namespace OHOS {
@@ -24,6 +25,7 @@ typedef std::function<int32_t(SessionPtr sess, NetPacket& pkt)> ServerMsgFun;
 class ServerMsgHandler : public MsgHandler<ServerMsgFun> {
 public:
     ServerMsgHandler();
+    DISALLOW_COPY_AND_MOVE(ServerMsgHandler);
     virtual ~ServerMsgHandler() override;
 
     bool Init(UDSServer& udsServer);

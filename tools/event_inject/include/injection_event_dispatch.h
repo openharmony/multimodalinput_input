@@ -73,19 +73,19 @@ public:
     bool GetStartSocketPermission(std::string id);
     bool RegistInjectEvent(InjectFunctionMap& msg)
     {
-        auto it = mapFuns_.find(msg.id);
-        if (it != mapFuns_.end()) {
+        auto it = injectFuns_.find(msg.id);
+        if (it != injectFuns_.end()) {
             return false;
         }
-        mapFuns_[msg.id] = msg.fun;
-        mapNeedStartSocket_[msg.id] = msg.needStartSocket;
+        injectFuns_[msg.id] = msg.fun;
+        needStartSocket_[msg.id] = msg.needStartSocket;
         return true;
     }
 
     InjectFunction* GetFun(std::string id)
     {
-        auto it = mapFuns_.find(id);
-        if (it == mapFuns_.end()) {
+        auto it = injectFuns_.find(id);
+        if (it == injectFuns_.end()) {
             return nullptr;
         }
         return &it->second;
@@ -98,9 +98,9 @@ private:
     int32_t argvNum_ = 0;
     ManageInjectDevice manageInjectDevice_;
     std::vector<std::string> injectArgvs_;
-    std::map<std::string, InjectFunction> mapFuns_;
-    std::map<std::string, bool> mapNeedStartSocket_;
-    std::map<std::string, int32_t> mapSendEventType_;
+    std::map<std::string, InjectFunction> injectFuns_;
+    std::map<std::string, bool> needStartSocket_;
+    std::map<std::string, int32_t> sendEventType_;
     std::vector<DeviceInformation> allDevices_ = {};
 private:
     static constexpr uint32_t SEND_EVENT_ARGV_COUNTS = 5;

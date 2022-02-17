@@ -15,10 +15,13 @@
 #ifndef DEVICE_EVENT_H
 #define DEVICE_EVENT_H
 #include "multimodal_event.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 class DeviceEvent : public MMI::MultimodalEvent {
 public:
+    DeviceEvent() = default;
+    DISALLOW_COPY_AND_MOVE(DeviceEvent);
     virtual ~DeviceEvent();
     void Initialize(const std::string& name, const std::string& sysName, int32_t inputDeviceId);
     virtual std::string GetName() const;

@@ -24,12 +24,14 @@
 #include <atomic>
 #include <string>
 #include "libmmi_util.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class UDSSocket {
 public:
     UDSSocket();
+    DISALLOW_COPY_AND_MOVE(UDSSocket);
     virtual ~UDSSocket();
 
     virtual int32_t EpollCreat(int32_t size);

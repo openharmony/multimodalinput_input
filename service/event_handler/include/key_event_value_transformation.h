@@ -21,6 +21,7 @@
 #include <iostream>
 #include <xkbcommon/xkbcommon.h>
 #include "hos_key_event.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -42,6 +43,7 @@ KeyEventValueTransformations KeyValueTransformationByInput(int16_t keyValueOfInp
 class KeyEventValueTransformation {
 public:
     KeyEventValueTransformation();
+    DISALLOW_COPY_AND_MOVE(KeyEventValueTransformation);
     virtual ~KeyEventValueTransformation();
 
     bool Init();
