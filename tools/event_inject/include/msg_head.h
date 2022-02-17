@@ -19,10 +19,9 @@
 #include <ctime>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <stdio.h>
+#include <cstdio>
 #include <unistd.h>
 #include <fcntl.h>
-#include <time.h>
 #include <functional>
 #include <algorithm>
 #include <fstream>
