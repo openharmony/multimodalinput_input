@@ -136,7 +136,7 @@ void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<OHOS::MMI::KeyEvent> k
 {
     MMI_LOGT("Enter");
     auto udsServerPtr = InputHandler->GetUDSServer();
-    CHKP(udsServerPtr);
+    CHKPV(udsServerPtr);
     OHOS::MMI::NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_KEY);
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
     int32_t fd = subscriber->sess_->GetFd();
@@ -174,7 +174,7 @@ bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
     subscriber->timerId_ = TimerMgr->AddTimer(keyOption->GetFinalKeyDownDuration(), 1, [this, weakSubscriber] () {
         MMI_LOGD("timer callback");
         auto subscriber = weakSubscriber.lock();
-        CHKP(subscriber);
+        CHKPV(subscriber);
         OnTimer(subscriber);
     });
 
@@ -192,7 +192,7 @@ bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
 void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscriber)
 {
     MMI_LOGT("Enter");
-    CHKP(subscriber);
+    CHKPV(subscriber);
 
     if (subscriber->timerId_ < 0) {
         MMI_LOGE("Leave, subscribeId:%{public}d,null timerId < 0", subscriber->id_);
@@ -209,7 +209,7 @@ void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscribe
 void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
 {
     MMI_LOGT("Enter");
-    CHKP(subscriber);
+    CHKPV(subscriber);
 
     subscriber->timerId_ = -1;
     if (subscriber->keyEvent_ == nullptr) {

@@ -15,7 +15,7 @@
 <info>
     <process>multimodalinput</process>
     <systemability>
-        <name>3101</name> <!-- Declare MMIService SytemAbilityID-->
+        <name>3101</name>
         <libpath>libmmi-server.z.so</libpath>
         <run-on-create>true</run-on-create>
         <distributed>false</distributed>

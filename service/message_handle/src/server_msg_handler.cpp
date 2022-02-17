@@ -42,8 +42,8 @@ namespace MMI {
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ServerMsgHandler" };
     }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 OHOS::MMI::ServerMsgHandler::ServerMsgHandler()
 {
@@ -121,7 +121,7 @@ void OHOS::MMI::ServerMsgHandler::SetSeniorInputHandle(SeniorInputFuncProcBase& 
 
 void OHOS::MMI::ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
 {
-    CHKP(sess);
+    CHKPV(sess);
     auto id = pkt.GetMsgId();
     OHOS::MMI::TimeCostChk chk("ServerMsgHandler::OnMsgHandler", "overtime 300(us)", MAX_OVER_TIME, id);
     auto fun = GetFun(id);
