@@ -35,7 +35,6 @@ ServerInputFilterManager::PointerEventFilter::PointerEventFilter(int32_t id, std
 
 void ServerInputFilterManager::DeleteFilterFromSess(SessionPtr sess)
 {
-    MMI_LOGD("enter");
     CHKP(sess);
     auto it = keyEventFilterMap_.find(sess);
     if (it == keyEventFilterMap_.end()) {
@@ -44,48 +43,41 @@ void ServerInputFilterManager::DeleteFilterFromSess(SessionPtr sess)
         keyEventFilterMap_.erase(it);
         MMI_LOGD("This sess delete filter success");
     }
-    MMI_LOGD("leave");
 }
 
 int32_t ServerInputFilterManager::KeyEventFilter::GetId()
 {
-    MMI_LOGD("enter");
     return id_;
 }
 
 std::string ServerInputFilterManager::KeyEventFilter::GetName()
 {
-    MMI_LOGD("enter");
     return name_;
 }
 
 Authority ServerInputFilterManager::KeyEventFilter::GetAuthority()
 {
-    MMI_LOGD("enter");
     return authority_;
 }
 
 void ServerInputFilterManager::KeyEventFilter::SetName(std::string name)
 {
-    MMI_LOGD("enter");
     name_ = name;
 }
 
 void ServerInputFilterManager::KeyEventFilter::SetId(int32_t id)
 {
-    MMI_LOGD("enter");
     id_ = id;
 }
 
 void ServerInputFilterManager::KeyEventFilter::SetAuthority(Authority authority)
 {
-    MMI_LOGD("enter");
     authority_ = authority;
 }
 
 bool ServerInputFilterManager::OnKeyEvent(const EventKeyboard& key)
 {
-    MMI_LOGD("enter");
+    MMI_LOGD("Enter");
     if (keyEventFilterMap_.empty()) {
         MMI_LOGD("keyEventFilterMap_ is empty");
         return false;
@@ -111,13 +103,12 @@ bool ServerInputFilterManager::OnKeyEvent(const EventKeyboard& key)
         MMI_LOGE("Sending structure of EventKeyboard failed");
         return false;
     }
-    MMI_LOGD("leave");
+    MMI_LOGD("Leave");
     return true;
 }
 
 int32_t ServerInputFilterManager::AddKeyEventFilter(SessionPtr sess, std::string name, int32_t id, Authority authority)
 {
-    MMI_LOGD("enter");
     auto  it = keyEventFilterMap_.find(sess);
     if (it == keyEventFilterMap_.end()) {
         MMI_LOGD("Can't find sess");
@@ -130,20 +121,17 @@ int32_t ServerInputFilterManager::AddKeyEventFilter(SessionPtr sess, std::string
         it->second.SetId(id);
         it->second.SetName(name);
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t ServerInputFilterManager::RemoveKeyEventFilter(SessionPtr sess, int32_t id)
 {
-    MMI_LOGD("enter");
     auto it = keyEventFilterMap_.find(sess);
     MMI_LOGD("Remove the id:%{public}d", it->second.GetId());
     if (it != keyEventFilterMap_.end() && it->second.GetId() == id) {
         keyEventFilterMap_.erase(it);
         MMI_LOGD("Remove a key Event filter success");
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
@@ -154,37 +142,31 @@ ServerInputFilterManager::TouchEventFilter::TouchEventFilter(int32_t id, std::st
 
 int32_t ServerInputFilterManager::TouchEventFilter::GetId()
 {
-    MMI_LOGD("enter");
     return id_;
 }
 
 std::string ServerInputFilterManager::TouchEventFilter::GetName()
 {
-    MMI_LOGD("enter");
     return name_;
 }
 
 Authority ServerInputFilterManager::TouchEventFilter::GetAuthority()
 {
-    MMI_LOGD("enter");
     return authority_;
 }
 
 void ServerInputFilterManager::TouchEventFilter::SetName(std::string name)
 {
-    MMI_LOGD("enter");
     name_ = name;
 }
 
 void ServerInputFilterManager::TouchEventFilter::SetId(int32_t id)
 {
-    MMI_LOGD("enter");
     id_ = id;
 }
 
 void ServerInputFilterManager::TouchEventFilter::SetAuthority(Authority authority)
 {
-    MMI_LOGD("enter");
     authority_ = authority;
 }
 
@@ -192,7 +174,6 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
                                                              const int32_t fingerCount,
                                                              POINT_EVENT_TYPE& pointEventType)
 {
-    MMI_LOGD("enter");
     CHK(fingerCount > 0, PARAM_INPUT_INVALID);
     CHK(touch.time > 0, PARAM_INPUT_INVALID);
     CHK(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
@@ -236,7 +217,6 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
             }
         }
     }
-    MMI_LOGD("leave");
 }
 
 bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
@@ -335,7 +315,7 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
 int32_t ServerInputFilterManager::AddTouchEventFilter(SessionPtr sess, std::string name, int32_t id,
     Authority authority)
 {
-    MMI_LOGE("enter");
+    MMI_LOGE("Enter");
     auto iter = touchEventFilterMap_.find(sess);
     if (iter != touchEventFilterMap_.end()) {
         if (iter->second.GetAuthority() < authority) {
@@ -348,25 +328,25 @@ int32_t ServerInputFilterManager::AddTouchEventFilter(SessionPtr sess, std::stri
     }
     TouchEventFilter touchEventFilter(id, name, authority);
     touchEventFilterMap_.insert(std::pair<SessionPtr, TouchEventFilter>(sess, touchEventFilter));
-    MMI_LOGE("leave");
+    MMI_LOGE("Leave");
     return RET_OK;
 }
 
 int32_t ServerInputFilterManager::RemoveTouchEventFilter(SessionPtr sess, int32_t id)
 {
-    MMI_LOGE("enter");
+    MMI_LOGE("Enter");
     auto iter = touchEventFilterMap_.find(sess);
     if (iter != touchEventFilterMap_.end() && iter->second.GetId() == id) {
         touchEventFilterMap_.erase(sess);
         MMI_LOGE("Remove a touch filter success");
     }
-    MMI_LOGE("leave");
+    MMI_LOGE("Leave");
     return RET_OK;
 }
 
 int32_t ServerInputFilterManager::RemoveTouchEventFilter(SessionPtr sess)
 {
-    MMI_LOGE("enter");
+    MMI_LOGE("Enter");
     if (sess == nullptr) {
         MMI_LOGE("This sess is nullptr");
         return RET_ERR;
@@ -376,13 +356,13 @@ int32_t ServerInputFilterManager::RemoveTouchEventFilter(SessionPtr sess)
         touchEventFilterMap_.erase(sess);
         MMI_LOGE("This sess delete filter success");
     }
-    MMI_LOGE("leave");
+    MMI_LOGE("Leave");
     return RET_OK;
 }
 
 bool ServerInputFilterManager::OnPointerEvent(EventPointer event_pointer)
 {
-    MMI_LOGD("enter");
+    MMI_LOGD("Enter");
     if (pointerEventFilterMap_.empty()) {
         MMI_LOGD("pointerEventFilterMap_ is empty");
         return false;
@@ -408,14 +388,13 @@ bool ServerInputFilterManager::OnPointerEvent(EventPointer event_pointer)
         MMI_LOGE("Sending structure of pointer failed");
         return false;
     }
-    MMI_LOGD("leave");
+    MMI_LOGD("Leave");
     return true;
 }
 
 int32_t ServerInputFilterManager::RegisterEventInterceptorforServer(const SessionPtr& sess, int32_t id,
                                                                     std::string name, Authority authority)
 {
-    MMI_LOGD("enter");
     auto it = pointerEventFilterMap_.find(sess);
     if (it == pointerEventFilterMap_.end()) {
         MMI_LOGD("Can't find sess");
@@ -428,26 +407,22 @@ int32_t ServerInputFilterManager::RegisterEventInterceptorforServer(const Sessio
         it->second.SetId(id);
         it->second.SetName(name);
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t ServerInputFilterManager::UnregisterEventInterceptorforServer(const SessionPtr& sess, int32_t id)
 {
-    MMI_LOGD("enter");
     auto it = pointerEventFilterMap_.find(sess);
     MMI_LOGD("Remove the id:%{public}d", it->second.GetId());
     if (it != pointerEventFilterMap_.end() && it->second.GetId() == id) {
         pointerEventFilterMap_.erase(it);
         MMI_LOGD("Remove pointer Event interceptor success");
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 void ServerInputFilterManager::DeleteInterceptorFormSess(const SessionPtr& sess)
 {
-    MMI_LOGD("enter");
     CHKP(sess);
     auto it = pointerEventFilterMap_.find(sess);
     if (it == pointerEventFilterMap_.end()) {
@@ -456,42 +431,35 @@ void ServerInputFilterManager::DeleteInterceptorFormSess(const SessionPtr& sess)
         pointerEventFilterMap_.erase(it);
         MMI_LOGD("This interceptor deleted suceess");
     }
-    MMI_LOGD("leave");
 }
 
 int32_t ServerInputFilterManager::PointerEventFilter::GetId()
 {
-    MMI_LOGD("enter");
     return id_;
 }
 
 std::string ServerInputFilterManager::PointerEventFilter::GetName()
 {
-    MMI_LOGD("enter");
     return name_;
 }
 
 Authority ServerInputFilterManager::PointerEventFilter::GetAuthority()
 {
-    MMI_LOGD("enter");
     return authority_;
 }
 
 void ServerInputFilterManager::PointerEventFilter::SetName(std::string name)
 {
-    MMI_LOGD("enter");
     name_ = name;
 }
 
 void ServerInputFilterManager::PointerEventFilter::SetId(int32_t id)
 {
-    MMI_LOGD("enter");
     id_ = id;
 }
 
 void ServerInputFilterManager::PointerEventFilter::SetAuthority(Authority authority)
 {
-    MMI_LOGD("enter");
     authority_ = authority;
 }
 } // namespace MMI

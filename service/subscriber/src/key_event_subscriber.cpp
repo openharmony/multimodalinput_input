@@ -32,7 +32,7 @@ constexpr uint8_t MAX_PRE_KEY_COUNT = 4;
 int32_t KeyEventSubscriber::SubscribeKeyEvent(
         SessionPtr sess, int32_t subscribeId, std::shared_ptr<OHOS::MMI::KeyOption> keyOption)
 {
-    MMI_LOGD("enter");
+    MMI_LOGD("Enter");
     CHKR(subscribeId >= 0, PARAM_INPUT_INVALID, RET_ERR);
     CHKPR(sess, ERROR_NULL_POINTER);
     CHKPR(keyOption, ERROR_NULL_POINTER);
@@ -56,7 +56,7 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
 
     InitSessionDeleteCallback();
 
-    MMI_LOGD("leave");
+    MMI_LOGD("Leave");
     return RET_OK;
 }
 
@@ -117,7 +117,6 @@ void KeyEventSubscriber::OnSessionDelete(SessionPtr sess)
 bool KeyEventSubscriber::IsPreKeysMatch(const std::vector<int32_t>& preKeys,
         const std::vector<int32_t>& pressedKeys) const
 {
-    MMI_LOGD("enter");
     if (preKeys.size() != pressedKeys.size()) {
         return false;
     }
@@ -128,7 +127,7 @@ bool KeyEventSubscriber::IsPreKeysMatch(const std::vector<int32_t>& preKeys,
             return false;
         }
     }
-    MMI_LOGD("leave");
+
     return true;
 }
 
@@ -210,6 +209,7 @@ void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscribe
 void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
 {
     MMI_LOGD("enter");
+    CHKP(subscriber);
     subscriber->timerId_ = -1;
     if (subscriber->keyEvent_ == nullptr) {
         MMI_LOGE("Leave, subscriber->keyEvent is nullptr, subscribeId:%{public}d", subscriber->id_);
@@ -360,27 +360,23 @@ bool KeyEventSubscriber::HandleKeyCanel(const std::shared_ptr<KeyEvent>& keyEven
 
 bool KeyEventSubscriber::CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    MMI_LOGD("enter");
     CHKPF(keyEvent, ERROR_NULL_POINTER);
     if (keyEvent_ == nullptr) {
         MMI_LOGW("keyEvent_ is nullptr");
         keyEvent_ = KeyEvent::Clone(keyEvent);
     }
     CHKPF(keyEvent_);
-    MMI_LOGD("leave");
     return true;
 }
 
 void KeyEventSubscriber::RemoveKeyCode(int32_t keyCode, std::vector<int32_t>& keyCodes)
 {
-    MMI_LOGD("enter");
     for (auto it = keyCodes.begin(); it != keyCodes.end(); ++it) {
         if (*it == keyCode) {
             keyCodes.erase(it);
             return;
         }
     }
-    MMI_LOGD("leave");
 }
 
 }  // namespace MMI
