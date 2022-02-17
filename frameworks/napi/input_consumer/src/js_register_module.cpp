@@ -291,7 +291,7 @@ static napi_value MmiInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("off", JsOff),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
-    MMI_LOGD("success");
+    MMI_LOGD("Leave");
     return exports;
 }
 EXTERN_C_END
