@@ -146,7 +146,7 @@ std::vector<EventRegesterInfo>& MultimodalEventHandler::GetAbilityInfoVec()
 bool MultimodalEventHandler::InitClient()
 {
     MMI_LOGD("enter");
-    if (Client_ != nullptr) {
+    if (client_ != nullptr) {
         return true;
     }
     client_ = std::make_shared<MMIClient>();
