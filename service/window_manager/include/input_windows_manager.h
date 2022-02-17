@@ -167,7 +167,8 @@ public:
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId);
     bool TouchMotionPointToDisplayPoint(libinput_event_touch* touch, Direction& direction,
     int32_t targetDisplayId, int32_t& displayX, int32_t& displayY);
-    bool TransformOfDisplayPoint(libinput_event_touch* touch, Direction& direction, int32_t &globalLogicalX, int32_t &globalLogicalY);
+    bool TransformOfDisplayPoint(libinput_event_touch* touch, Direction& direction, int32_t &globalLogicalX,
+        int32_t &globalLogicalY);
     void TurnTouchScreen(PhysicalDisplayInfo* info, Direction direction,
         int32_t& logicalX, int32_t& logicalY);
     void AdjustCoordinate(double &coordinateX, double &coordinateY);

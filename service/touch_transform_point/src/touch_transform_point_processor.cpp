@@ -135,19 +135,19 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent
     auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
-            if(!OnEventTouchDown(event)) {
+            if (!OnEventTouchDown(event)) {
                 return nullptr;
             }
             break;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
-            if(!OnEventTouchUp(event)) {
+            if (!OnEventTouchUp(event)) {
                 return nullptr;
             }
             break;
         }
         case LIBINPUT_EVENT_TOUCH_MOTION: {
-            if(!OnEventTouchMotion(event)) {
+            if (!OnEventTouchMotion(event)) {
                 return nullptr;
             }
             break;
