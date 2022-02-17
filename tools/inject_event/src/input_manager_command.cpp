@@ -41,7 +41,7 @@ namespace MMI {
 namespace {
 constexpr int32_t SLEEPTIME = 20;
 constexpr int32_t MOUSE_ID = 2;
-constexpr int32_t TWO_MORE_COMMAND = 3;
+constexpr int32_t TWO_MORE_COMMAND = 2;
 constexpr int32_t THREE_MORE_COMMAND = 3;
 }
 
@@ -216,7 +216,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetGlobalX(px);
                             item.SetGlobalY(py);
                             pointerEvent->SetPointerId(0);
-                            pointerEvent->AddPointerItem(item);
+                            pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetButtonId(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
@@ -247,32 +247,27 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             if (optind == isCombinationKey + TWO_MORE_COMMAND) {
                                 downKey.push_back(keyCode);
                                 isCombinationKey = optind;
+                                auto KeyEvent = KeyEvent::Create();
+                                KeyEvent->SetKeyCode(keyCode);
+                                KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
                                 for (size_t i = 0; i < downKey.size(); i++) {
-                                    auto KeyEvent = MMI::KeyEvent::Create();
-                                    KeyEvent->SetKeyCode(downKey[i]);
-                                    KeyEvent->SetKeyAction(MMI::KeyEvent::KEY_ACTION_DOWN);
-                                    KeyEvent::KeyItem item1;
-                                    item1.SetKeyCode(downKey[i]);
-                                    item1.SetPressed(true);
-                                    KeyEvent->AddKeyItem(item1);
-                                    InputManager::GetInstance()->SimulateInputEvent(KeyEvent);
+                                    KeyEvent::KeyItem item[i];
+                                    item[i].SetKeyCode(downKey[i]);
+                                    item[i].SetPressed(true);
+                                    KeyEvent->AddKeyItem(item[i]);
                                 }
+                                InputManager::GetInstance()->SimulateInputEvent(KeyEvent);
                                 break;
                             }
                             downKey.push_back(keyCode);
-                            auto KeyEvent = MMI::KeyEvent::Create();
+                            auto KeyEvent = KeyEvent::Create();
                             KeyEvent->SetKeyCode(keyCode);
-                            KeyEvent->SetKeyAction(MMI::KeyEvent::KEY_ACTION_DOWN);
+                            KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
                             KeyEvent::KeyItem item1;
                             item1.SetKeyCode(keyCode);
                             item1.SetPressed(true);
                             KeyEvent->AddKeyItem(item1);
                             InputManager::GetInstance()->SimulateInputEvent(KeyEvent);
-                            for (size_t i = 0; i < downKey.size(); i++) {
-                                if (keyCode != downKey[i]) {
-                                    std::cout << "downKey value is" << downKey[i] << std::endl;
-                                }
-                            }
                             isCombinationKey = optind;
                             break;
                         }
@@ -285,9 +280,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             std::vector<int32_t>::iterator iter = std::find(downKey.begin(), downKey.end(), keyCode);
                             if (iter != downKey.end()) {
                                 std::cout << "You raised the key " << keyCode << std::endl;
-                                auto KeyEvent = MMI::KeyEvent::Create();
+                                auto KeyEvent = KeyEvent::Create();
                                 KeyEvent->SetKeyCode(keyCode);
-                                KeyEvent->SetKeyAction(MMI::KeyEvent::KEY_ACTION_UP);
+                                KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
                                 KeyEvent::KeyItem item1;
                                 item1.SetKeyCode(keyCode);
                                 item1.SetPressed(true);
@@ -345,13 +340,13 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             item.SetGlobalX(px2);
                             item.SetGlobalY(py2);
-                            pointerEvent->AddPointerItem(item);
-                            pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_MOVE);
-                            pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-                            MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            pointerEvent->UpdatePointerItem(0, item);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             item.SetGlobalX(px2);
                             item.SetGlobalY(py2);
-                            pointerEvent->AddPointerItem(item);
+                            pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -369,16 +364,16 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return EVENT_REG_FAIL;
                             }
                             std::cout << "touch down " << px1 << " " << py1 << std::endl;
-                            auto pointerEvent = MMI::PointerEvent::Create();
-                            MMI::PointerEvent::PointerItem item;
+                            auto pointerEvent = PointerEvent::Create();
+                            PointerEvent::PointerItem item;
                             item.SetPointerId(0);
                             item.SetGlobalX(px1);
                             item.SetGlobalY(py1);
                             pointerEvent->SetPointerId(0);
                             pointerEvent->AddPointerItem(item);
-                            pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_DOWN);
-                            pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-                            MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             optind++;
                             break;
                         }
@@ -392,16 +387,16 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return EVENT_REG_FAIL;
                             }
                             std::cout << "touch up " << px1 << " " << py1 << std::endl;
-                            auto pointerEvent = MMI::PointerEvent::Create();
-                            MMI::PointerEvent::PointerItem item;
+                            auto pointerEvent = PointerEvent::Create();
+                            PointerEvent::PointerItem item;
                             item.SetPointerId(0);
-                            item.SetGlobalX(px2);
-                            item.SetGlobalY(py2);
+                            item.SetGlobalX(px1);
+                            item.SetGlobalY(py1);
                             pointerEvent->SetPointerId(0);
                             pointerEvent->AddPointerItem(item);
-                            pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_UP);
-                            pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-                            MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             optind++;
                             break;
                         }
