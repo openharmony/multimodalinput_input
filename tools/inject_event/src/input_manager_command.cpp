@@ -216,7 +216,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetGlobalX(px);
                             item.SetGlobalY(py);
                             pointerEvent->SetPointerId(0);
-                            pointerEvent->UpdatePointerItem(0,item);
+                            pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetButtonId(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
