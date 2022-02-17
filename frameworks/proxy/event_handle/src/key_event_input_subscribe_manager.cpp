@@ -78,14 +78,13 @@ int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
     
     for (auto it = subscribeInfos_.begin(); it != subscribeInfos_.end(); ++it) {
         if (it->GetSubscribeId() == subscribeId) {
-            if (EventManager.UnSubscribeKeyEvent(subscribeId) == RET_OK) {
-                subscribeInfos_.erase(it);
-                MMI_LOGD("Leave");
-                return RET_OK;
-            } else {
+            if (EventManager.UnSubscribeKeyEvent(subscribeId) != RET_OK) {
                 MMI_LOGE("Leave, unsubscribe key event failed");
                 return RET_ERR;
             }
+            subscribeInfos_.erase(it);
+            MMI_LOGT("Leave");
+            return RET_OK;
         }
     }
     MMI_LOGE("Leave, cannot find subscribe key event info");

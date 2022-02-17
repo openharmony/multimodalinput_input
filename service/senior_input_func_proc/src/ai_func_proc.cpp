@@ -22,8 +22,8 @@ namespace MMI {
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AIFuncProc" };
     }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 using namespace std;
 using namespace OHOS::MMI;

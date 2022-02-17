@@ -39,8 +39,8 @@ public:
     static int32_t notifyFocusChange(int32_t abilityId, int32_t windowId);
     static int32_t GetSystemEventAttrByHosKeyValue(const int16_t keyValueOfHos);
 };
-};
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif
 #endif // OUTER_INTERFACE_H

@@ -136,7 +136,7 @@ void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<OHOS::MMI::KeyEvent> k
 {
     MMI_LOGD("enter");
     auto udsServerPtr = InputHandler->GetUDSServer();
-    CHKP(udsServerPtr);
+    CHKPV(udsServerPtr);
     OHOS::MMI::NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_KEY);
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
     int32_t fd = subscriber->sess_->GetFd();
@@ -174,7 +174,7 @@ bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
     subscriber->timerId_ = TimerMgr->AddTimer(keyOption->GetFinalKeyDownDuration(), 1, [this, weakSubscriber] () {
         MMI_LOGD("timer callback");
         auto subscriber = weakSubscriber.lock();
-        CHKP(subscriber);
+        CHKPV(subscriber);
         OnTimer(subscriber);
     });
 

@@ -45,8 +45,8 @@ private:
     std::mutex mu_;
     std::list<InterceptorItem> interceptor_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 #define InterceptorMgrGbl OHOS::Singleton<OHOS::MMI::InterceptorManagerGlobal>::GetInstance()
 #endif // INTERCEPTOR_MANAGER_GLOBAL_H
