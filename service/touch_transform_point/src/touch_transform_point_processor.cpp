@@ -125,7 +125,7 @@ bool TouchTransformPointProcessor::OnEventTouchUp(libinput_event *event)
 
 std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent(libinput_event *event)
 {
-    CHKPR(event, nullptr);
+    CHKPP(event, nullptr);
     MMI_LOGD("call onLibinputTouchEvent begin");
     if (pointerEvent_ == nullptr) {
         MMI_LOGE("PointerEvent_ is nullptr");
