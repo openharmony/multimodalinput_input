@@ -23,31 +23,31 @@ void MultimodalEvent::Initialize(int32_t windowId, int32_t highLevelEvent, const
                                  uint64_t occurredTime, const std::string& deviceId, int32_t inputDeviceId,
                                  bool isHighLevelEvent, uint16_t deviceUdevTags, bool isIntercepted)
 {
-    mWindowId_ = windowId;
-    mUuid_ = uuid;
-    mOccurredTime_ = occurredTime;
-    mSourceDevice_ = DeviceTypeTransform(sourceType);
-    mHighLevelEvent_ = highLevelEvent;
-    mDeviceId_ = deviceId;
-    mInputDeviceId_ = inputDeviceId;
-    mIsHighLevelEvent_ = isHighLevelEvent;
-    mDeviceUdevTags_ = deviceUdevTags;
-    mEventType_ =  sourceType;
+    windowId_ = windowId;
+    uuid_ = uuid;
+    occurredTime_ = occurredTime;
+    sourceDevice_ = DeviceTypeTransform(sourceType);
+    highLevelEvent_ = highLevelEvent;
+    deviceId_ = deviceId;
+    inputDeviceId_ = inputDeviceId;
+    isHighLevelEvent_ = isHighLevelEvent;
+    deviceUdevTags_ = deviceUdevTags;
+    eventType_ =  sourceType;
     isIntercepted_ = isIntercepted;
 }
 
 void MultimodalEvent::Initialize(const MultimodalEvent& multimodalEvent)
 {
-    mWindowId_ = multimodalEvent.GetWindowID();
-    mUuid_ = multimodalEvent.GetUuid();
-    mOccurredTime_ = multimodalEvent.GetOccurredTime();
-    mSourceDevice_ = multimodalEvent.GetSourceDevice();
-    mHighLevelEvent_ = multimodalEvent.GetHighLevelEvent();
-    mDeviceId_ = multimodalEvent.GetDeviceId();
-    mInputDeviceId_ = multimodalEvent.GetInputDeviceId();
-    mIsHighLevelEvent_ = multimodalEvent.IsHighLevelInput();
-    mDeviceUdevTags_ = multimodalEvent.GetDeviceUdevTags();
-    mEventType_ =  multimodalEvent.GetEventType();
+    windowId_ = multimodalEvent.GetWindowID();
+    uuid_ = multimodalEvent.GetUuid();
+    occurredTime_ = multimodalEvent.GetOccurredTime();
+    sourceDevice_ = multimodalEvent.GetSourceDevice();
+    highLevelEvent_ = multimodalEvent.GetHighLevelEvent();
+    deviceId_ = multimodalEvent.GetDeviceId();
+    inputDeviceId_ = multimodalEvent.GetInputDeviceId();
+    isHighLevelEvent_ = multimodalEvent.IsHighLevelInput();
+    deviceUdevTags_ = multimodalEvent.GetDeviceUdevTags();
+    eventType_ =  multimodalEvent.GetEventType();
 }
 
 /*
@@ -60,7 +60,7 @@ void MultimodalEvent::Initialize(const MultimodalEvent& multimodalEvent)
  */
 bool MultimodalEvent::IsSameEvent(const std::string& id)
 {
-    return mUuid_ == id;
+    return uuid_ == id;
 }
 
 /*
@@ -73,7 +73,7 @@ bool MultimodalEvent::IsSameEvent(const std::string& id)
  */
 bool MultimodalEvent::IsHighLevelInput() const
 {
-    return mIsHighLevelEvent_;
+    return isHighLevelEvent_;
 }
 
 /*
@@ -87,7 +87,7 @@ bool MultimodalEvent::IsHighLevelInput() const
  */
 int32_t MultimodalEvent::GetHighLevelEvent() const
 {
-    return mHighLevelEvent_;
+    return highLevelEvent_;
 }
 
 /*
@@ -108,12 +108,12 @@ int32_t MultimodalEvent::GetHighLevelEvent() const
  */
 int32_t MultimodalEvent::GetSourceDevice() const
 {
-    return mSourceDevice_;
+    return sourceDevice_;
 }
 
 int32_t MultimodalEvent::GetEventType() const
 {
-    return mEventType_;
+    return eventType_;
 }
 
 /*
@@ -129,7 +129,7 @@ int32_t MultimodalEvent::GetEventType() const
  */
 std::string MultimodalEvent::GetDeviceId() const
 {
-    return mDeviceId_;
+    return deviceId_;
 }
 
 /*
@@ -146,7 +146,7 @@ std::string MultimodalEvent::GetDeviceId() const
  */
 int32_t MultimodalEvent::GetInputDeviceId() const
 {
-    return mInputDeviceId_;
+    return inputDeviceId_;
 }
 
 /*
@@ -157,7 +157,7 @@ int32_t MultimodalEvent::GetInputDeviceId() const
  */
 uint64_t MultimodalEvent::GetOccurredTime() const
 {
-    return mOccurredTime_;
+    return occurredTime_;
 }
 
 /**
@@ -168,17 +168,17 @@ uint64_t MultimodalEvent::GetOccurredTime() const
  */
 uint16_t MultimodalEvent::GetDeviceUdevTags() const
 {
-    return mDeviceUdevTags_;
+    return deviceUdevTags_;
 }
 
 std::string MultimodalEvent::GetUuid() const
 {
-    return mUuid_;
+    return uuid_;
 }
 
 int32_t MultimodalEvent::GetWindowID() const
 {
-    return mWindowId_;
+    return windowId_;
 }
 
 bool MultimodalEvent::IsIntercepted() const

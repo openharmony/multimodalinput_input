@@ -25,19 +25,19 @@ void KeyEvent::Initialize(int32_t windowId, bool isPressed, int32_t keyCode, int
 {
     MultimodalEvent::Initialize(windowId, highLevelEvent, uuid, sourceType, occurredTime, deviceId,
                                 inputDeviceId, isHighLevelEvent, deviceUdevTags, isIntercepted);
-    mIsPressed_ = isPressed;
-    mKeyCode_ = keyCode;
-    mKeyDownDuration_ = keyDownDuration;
-    mDeviceEventType_ = deviceEventType;
+    isPressed_ = isPressed;
+    keyCode_ = keyCode;
+    keyDownDuration_ = keyDownDuration;
+    deviceEventType_ = deviceEventType;
 }
 
 void KeyEvent::Initialize(const KeyEvent &keyEvent)
 {
     MultimodalEvent::Initialize(keyEvent);
-    mDeviceEventType_ = keyEvent.GetOriginEventType();
-    mIsPressed_ = keyEvent.IsKeyDown();
-    mKeyCode_ = keyEvent.GetKeyCode();
-    mKeyDownDuration_ = keyEvent.GetKeyDownDuration();
+    deviceEventType_ = keyEvent.GetOriginEventType();
+    isPressed_ = keyEvent.IsKeyDown();
+    keyCode_ = keyEvent.GetKeyCode();
+    keyDownDuration_ = keyEvent.GetKeyDownDuration();
 }
 
 void KeyEvent::DeviceInitialize(MultimodalEvent &deviceEvent)
@@ -52,21 +52,21 @@ int32_t KeyEvent::GetMaxKeyCode() const
 
 bool KeyEvent::IsKeyDown() const
 {
-    return mIsPressed_;
+    return isPressed_;
 }
 
 int32_t KeyEvent::GetKeyCode() const
 {
-    return mKeyCode_;
+    return keyCode_;
 }
 
 int32_t KeyEvent::GetKeyDownDuration() const
 {
-    return mKeyDownDuration_;
+    return keyDownDuration_;
 }
 
 int32_t KeyEvent::GetOriginEventType() const
 {
-    return mDeviceEventType_;
+    return deviceEventType_;
 }
 } // namespace OHOS

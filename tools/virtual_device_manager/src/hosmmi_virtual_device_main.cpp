@@ -30,11 +30,10 @@ int32_t main(int32_t argc, const char *argv[])
     std::string firstArgv = argvList[1];
 
     const std::int32_t usleepTime = 1500000;
-    if (OHOS::MMI::VirtualDevice::FunctionalShunt(firstArgv, argvList)) {
-        while (true) {
-            usleep(usleepTime);
-        }
-    } else {
+    if (!OHOS::MMI::VirtualDevice::FunctionalShunt(firstArgv, argvList)) {
         return 0;
+    }
+    while (true) {
+        usleep(usleepTime);
     }
 }

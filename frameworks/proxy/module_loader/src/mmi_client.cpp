@@ -47,7 +47,7 @@ bool MMIClient::GetCurrentConnectedStatus() const
 
 bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     EventManager.SetClientHandle(GetPtr());
     CHKF(msgHdl->Init(), MSG_HANDLER_INIT_FAIL);
     auto msgHdlImp = static_cast<ClientMsgHandler *>(msgHdl.get());
@@ -110,7 +110,7 @@ void MMIClient::OnConnected()
 
 int32_t MMIClient::Socket()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     const int32_t ret = MultimodalInputConnectManager::GetInstance()->
                         AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
     if (ret != RET_OK) {

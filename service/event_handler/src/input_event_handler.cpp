@@ -236,6 +236,7 @@ int32_t InputEventHandler::OnEventHandler(const multimodal_libinput_event& ev)
     if (ret != 0) {
         MMI_LOGE("Event handling failed. type:%{public}d,ret:%{public}d,errCode:%{public}d",
                  type, ret, EVENT_CONSUM_FAIL);
+        return ret;
     }
     MMI_LOGD("leave");
     return ret;
@@ -245,14 +246,10 @@ void InputEventHandler::OnCheckEventReport()
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
-    if (initSysClock_ == 0) {
+    if (initSysClock_ == 0 || lastSysClock_ != 0) {
         return;
     }
-    if (lastSysClock_ != 0) {
-        return;
-    }
-
-    const uint64_t MAX_DID_TIME = 1000 * 1000 * 3;
+    constexpr uint64_t MAX_DID_TIME = 1000 * 1000 * 3;
     auto curSysClock = GetSysClockTime();
     auto lostTime = curSysClock - initSysClock_;
     if (lostTime < MAX_DID_TIME) {
@@ -507,8 +504,6 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
         MMI_LOGE("On the OnKeyboardEvent translate key event error");
         return RET_ERR;
     }
-    auto device = libinput_event_get_device(event);
-    CHKPR(device, LIBINPUT_DEV_EMPTY);
 
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent_, sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
@@ -528,22 +523,20 @@ int32_t InputEventHandler::OnEventKeyboard(const multimodal_libinput_event& ev)
 #ifdef OHOS_WESTEN_MODEL
     uint64_t sysStartProcessTime = GetSysClockTime();
 #endif
-
     CHKPR(udsServer_, ERROR_NULL_POINTER);
-    EventKeyboard keyBoard = {};
-    auto packageResult = eventPackage_.PackageKeyEvent(ev.event, keyBoard);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
-        MMI_LOGD("The same event occurs on multiple devices, ret:%{puiblic}d", packageResult);
-        return RET_OK;
-    }
-    if (packageResult != RET_OK) {
-        MMI_LOGE("Key event package failed. ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
-        return KEY_EVENT_PKG_FAIL;
-    }
-    
 #ifndef OHOS_WESTEN_MODEL
     return OnKeyboardEvent(ev.event);
 #else
+    EventKeyboard keyBoard = {};
+    auto ret = eventPackage_.PackageKeyEvent(ev.event, keyBoard);
+    if (ret == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
+        MMI_LOGD("The same event occurs on multiple devices, ret:%{puiblic}d", ret);
+        return RET_OK;
+    }
+    if (ret != RET_OK) {
+        MMI_LOGE("Key event package failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_PKG_FAIL);
+        return KEY_EVENT_PKG_FAIL;
+    }
     if (ServerKeyFilter->OnKeyEvent(keyBoard)) {
         MMI_LOGD("Key event filter find a key event from Original event, keyCode:%{puiblic}d", keyBoard.key);
         return RET_OK;
@@ -721,7 +714,6 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 {
     MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
-    MMI_LOGD("InputEventHandler::OnGestureEvent");
     auto pointer = TouchTransformPointManger->OnTouchPadGestrueEvent(event);
     if (pointer == nullptr) {
         MMI_LOGE("Gesture event package failed, errCode:%{public}d", GESTURE_EVENT_PKG_FAIL);
@@ -933,7 +925,6 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
 {
     MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
-    MMI_LOGD("Libinput Events reported");
 
     // 更新 全局 鼠标事件 数据
     MouseEventHdr->Normalize(event);

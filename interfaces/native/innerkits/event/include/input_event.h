@@ -19,6 +19,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include "nocopyable.h"
 #include "parcel.h"
 
 namespace OHOS {
@@ -46,10 +47,9 @@ public:
 
 public:
     InputEvent(const InputEvent& other);
-    InputEvent(InputEvent&& other) = default;
     virtual ~InputEvent();
-    virtual InputEvent& operator=(const InputEvent& other) = default;
-    virtual InputEvent& operator=(InputEvent&& other) = default;
+    virtual InputEvent& operator=(const InputEvent& other) = delete;
+    DISALLOW_MOVE(InputEvent);
     static std::shared_ptr<InputEvent> Create();
 
     void Reset();
