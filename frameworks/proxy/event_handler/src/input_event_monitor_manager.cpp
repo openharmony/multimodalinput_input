@@ -14,6 +14,7 @@
  */
 
 #include "input_event_monitor_manager.h"
+#include <cinttypes>
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 
@@ -120,9 +121,9 @@ int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<OH
     }
     PointerEvent::PointerItem pointer;
     CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL, RET_ERR);
-    MMI_LOGD("monitor-clienteventTouchpad:time::%{public}d,"
-             "sourceType::%{public}d,action::%{public}d,"
-             "pointerId::%{public}d,point.x::%{public}d,point.y::%{public}d,press:%{public}d",
+    MMI_LOGD("Monitor-clienteventTouchpad:time:%{public}" PRId64 ","
+             "sourceType:%{public}d,action:%{public}d,"
+             "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     return OHOS::MMI_STANDARD_EVENT_SUCCESS;

@@ -335,7 +335,7 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
         CHKPF(keyItem);
         auto upTime = keyEvent->GetActionTime();
         auto downTime = keyItem->GetDownTime();
-        if (upTime - downTime >= (duration * 1000)) {
+        if (upTime - downTime >= (static_cast<int64_t>(duration) * 1000)) {
             MMI_LOGE("upTime - downTime >= duration");
             continue;
         }

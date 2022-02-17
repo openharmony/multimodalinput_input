@@ -432,12 +432,12 @@ void KeyEvent::KeyItem::SetKeyCode(int32_t keyCode)
     keyCode_ = keyCode;
 }
 
-int32_t KeyEvent::KeyItem::GetDownTime() const
+int64_t KeyEvent::KeyItem::GetDownTime() const
 {
     return downTime_;
 }
 
-void KeyEvent::KeyItem::SetDownTime(int32_t downTime)
+void KeyEvent::KeyItem::SetDownTime(int64_t downTime)
 {
     downTime_ = downTime;
 }
@@ -468,7 +468,7 @@ bool KeyEvent::KeyItem::WriteToParcel(Parcel &out) const
     if (!out.WriteBool(pressed_)) {
         return false;
     }
-    if (!out.WriteInt32(downTime_)) {
+    if (!out.WriteInt64(downTime_)) {
         return false;
     }
     if (!out.WriteInt32(deviceId_)) {
@@ -486,7 +486,7 @@ bool KeyEvent::KeyItem::ReadFromParcel(Parcel &in)
     if (!in.ReadBool(pressed_)) {
         return false;
     }
-    if (!in.ReadInt32(downTime_)) {
+    if (!in.ReadInt64(downTime_)) {
         return false;
     }
     if (!in.ReadInt32(deviceId_)) {

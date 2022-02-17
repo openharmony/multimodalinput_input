@@ -114,7 +114,7 @@ int64_t MultimodalEventHandlerTest::GetNanoTime()
 {
     timespec time = { 0 };
     clock_gettime(CLOCK_MONOTONIC, &time);
-    return static_cast<uint64_t>(time.tv_sec) * SEC_TO_NANOSEC + time.tv_nsec;
+    return static_cast<int64_t>(time.tv_sec) * SEC_TO_NANOSEC + time.tv_nsec;
 }
 
 
