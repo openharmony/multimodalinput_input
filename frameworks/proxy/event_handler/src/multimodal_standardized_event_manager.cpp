@@ -665,7 +665,7 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const KeyEvent& key)
 
 int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> key)
 {
-    MMI_LOGD("InjectEvent begin");
+    MMI_LOGD("begin");
     CHKR(key, ERROR_NULL_POINTER, RET_ERR);
     key->UpdateId();
     if (key->GetKeyCode() < 0) {

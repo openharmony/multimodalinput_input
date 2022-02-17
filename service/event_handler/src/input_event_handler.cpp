@@ -717,7 +717,6 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 {
     MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
-    MMI_LOGD("InputEventHandler::OnGestureEvent");
     auto pointer = TouchTransformPointManger->OnTouchPadGestrueEvent(event);
     if (pointer == nullptr) {
         MMI_LOGE("Gesture event package failed, errCode:%{public}d", GESTURE_EVENT_PKG_FAIL);
@@ -929,7 +928,6 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
 {
     MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
-    MMI_LOGD("Libinput Events reported");
 
     // 更新 全局 鼠标事件 数据
     MouseEventHdr->Normalize(event);
