@@ -690,8 +690,8 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
         MMI_LOGE("Gesture event package failed, errCode:%{public}d", GESTURE_EVENT_PKG_FAIL);
         return GESTURE_EVENT_PKG_FAIL;
     }
-    MMI_LOGT("GestrueEvent package, eventType:%{public}d,actionTime:%{public}d,"
-             "action:%{public}d,actionStartTime:%{public}d,"
+    MMI_LOGT("GestrueEvent package, eventType:%{public}d,actionTime:%{public}" PRId64 ","
+             "action:%{public}d,actionStartTime:%{public}" PRId64 ","
              "pointerAction:%{public}d,sourceType:%{public}d,"
              "PinchAxisValue:%{public}.2f",
              pointer->GetEventType(), pointer->GetActionTime(),
@@ -701,7 +701,7 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 
     PointerEvent::PointerItem item;
     pointer->GetPointerItem(pointer->GetPointerId(), item);
-    MMI_LOGT("item:DownTime:%{public}d,IsPressed:%{public}s,"
+    MMI_LOGT("Item:DownTime:%{public}" PRId64 ",IsPressed:%{public}s,"
              "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
              "Width:%{public}d,Height:%{public}d,DeviceId:%{public}d",
              item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
@@ -927,7 +927,7 @@ int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEv
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
     PointerEvent::PointerItem item;
     CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item), PARAM_INPUT_FAIL, RET_ERR);
-    MMI_LOGI("MouseEvent Item Normalization Results, DownTime:%{public}d,IsPressed:%{public}d,"
+    MMI_LOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
              "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
              "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,DeviceId:%{public}d",
              item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),

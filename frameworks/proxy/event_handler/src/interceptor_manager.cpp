@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "interceptor_manager.h"
+#include <cinttypes>
 #include "bytrace.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
@@ -85,9 +86,9 @@ int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointer
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     PointerEvent::PointerItem pointer;
     CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL, RET_ERR);
-    MMI_LOGD("interceptor-clienteventTouchpad:actionTime:%{public}d,"
+    MMI_LOGD("Interceptor-clienteventTouchpad:actionTime:%{public}" PRId64 ","
              "sourceType:%{public}d,pointerAction:%{public}d,"
-             "pointerId:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
+             "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     InterceptorItem interceptorItem;

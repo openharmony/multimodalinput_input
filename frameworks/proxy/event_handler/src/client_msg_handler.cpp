@@ -167,7 +167,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     pkt >> fd >> serverStartTime;
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     MMI_LOGD("key event dispatcher of client, KeyCode:%{public}d,"
-             "ActionTime:%{public}d,Action:%{public}d,ActionStartTime:%{public}d,"
+             "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
              "EventType:%{public}d,Flag:%{public}d,"
              "KeyAction:%{public}d,eventNumber:%{public}d,Fd:%{public}d,"
              "ServerStartTime:%{public}" PRId64"",
@@ -194,10 +194,10 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     }
 
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
-    MMI_LOGD("pointer event dispatcher of client, eventType:%{public}s, actionTime:%{public}d, action:%{public}d, "
-             "actionStartTime:%{public}d, flag:%{public}d, pointerAction:%{public}s, sourceType:%{public}s, "
-             "VerticalAxisValue:%{public}.2f, HorizontalAxisValue:%{public}.2f, "
-             "PinchAxisValue:%{public}.2f, pointerCount:%{public}d,  eventNumber:%{public}d",
+    MMI_LOGD("Pointer event dispatcher of client, eventType:%{public}s, actionTime:%{public}" PRId64 ", "
+             "action:%{public}d, actionStartTime:%{public}" PRId64 ", flag:%{public}d, pointerAction:%{public}s, "
+             "sourceType:%{public}s, VerticalAxisValue:%{public}.2f, HorizontalAxisValue:%{public}.2f, "
+             "PinchAxisValue:%{public}.2f, pointerCount:%{public}d, eventNumber:%{public}d",
              pointerEvent->DumpEventType(), pointerEvent->GetActionTime(), pointerEvent->GetAction(),
              pointerEvent->GetActionStartTime(), pointerEvent->GetFlag(), pointerEvent->DumpPointerAction(),
              pointerEvent->DumpSourceType(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
@@ -212,7 +212,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
 
-        MMI_LOGD("downTime:%{public}d,isPressed:%{public}s,"
+        MMI_LOGD("DownTime:%{public}" PRId64 ",isPressed:%{public}s,"
                 "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
                 "width:%{public}d,height:%{public}d,pressure:%{public}d",
                  item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
@@ -251,9 +251,9 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
     int32_t subscribeId = -1;
     pkt >> fd >> subscribeId;
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-    MMI_LOGD("SubscribeId:%{public}d,Fd:%{public}d,KeyEventId:%{public}d,"
-             "KeyCode:%{public}d,ActionTime:%{public}d,ActionStartTime:%{public}d,Action:%{public}d,"
-             "KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}d",
+    MMI_LOGD("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
+             "KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
+             "Action:%{public}d,KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}d",
         subscribeId, fd, keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
         keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
         keyEvent->GetEventType(), keyEvent->GetFlag());

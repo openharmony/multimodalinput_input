@@ -24,7 +24,7 @@ namespace MMI {
         napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, uint32_t value);
         napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, float value);
         napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, double value);
-        napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, uint64_t value);
+        napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, int64_t value);
         napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, std::string value);
         napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, napi_value value);
 
