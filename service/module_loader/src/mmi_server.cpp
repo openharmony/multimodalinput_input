@@ -92,9 +92,6 @@ int32_t OHOS::MMI::MMIServer::Start()
     ret = SaConnectServiceRegister();
     CHKR((ret == RET_OK), ret, ret);
 
-    ret = InitExpSoLibrary();
-    CHKR((ret == RET_OK), ret, ret);
-
     MMI_LOGD("Screen_Manager Init");
     CHKR(WinMgr->Init(*this), WINDOWS_MSG_INIT_FAIL, WINDOWS_MSG_INIT_FAIL);
 
@@ -128,21 +125,6 @@ int32_t OHOS::MMI::MMIServer::Start()
     MMI_LOGW("The server started successfully, time consumed:%{public}" PRId64
             " Ms curTime:%{public}" PRId64 "", consumeTime, curTime);
 #endif
-    return RET_OK;
-}
-
-int32_t OHOS::MMI::MMIServer::InitExpSoLibrary()
-{
-    MMI_LOGD("Load Expansibility Operation");
-    auto expConf = GetEnv("EXP_CONF");
-    if (expConf.empty()) {
-        expConf = DEF_EXP_CONFIG;
-    }
-    auto expSOPath = GetEnv("EXP_SOPATH");
-    if (expSOPath.empty()) {
-        expSOPath = DEF_EXP_SOPATH;
-    }
-    expOper_.LoadExteralLibrary(expConf.c_str(), expSOPath.c_str());
     return RET_OK;
 }
 
