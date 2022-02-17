@@ -128,7 +128,7 @@ void UDSClient::Stop()
 
 void UDSClient::OnRecv(const char *buf, size_t size)
 {
-    CHKP(buf);
+    CHKPV(buf);
     int32_t readIdx = 0;
     int32_t packSize = 0;
     const auto headSize = static_cast<int32_t>(sizeof(PackHead));
