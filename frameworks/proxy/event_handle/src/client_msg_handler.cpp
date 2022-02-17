@@ -220,7 +220,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_LOGD("Operation canceled.");
     }
-    // pointerEvent->SetProcessedCallback(eventProcessedCallback_);
+    pointerEvent->SetProcessedCallback(eventProcessedCallback_);
     int32_t pointerDispatch = 1;
     int32_t touchDispatch = 2;
     if (pointerDispatch == pointerEvent->GetSourceType()) {
