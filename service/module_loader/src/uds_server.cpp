@@ -138,8 +138,6 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName,
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mux_);
-    MMI_LOGD("enter.");
-    MMI_LOGT("enter.");
     int32_t sockFds[2] = {};
 
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockFds) != 0) {
