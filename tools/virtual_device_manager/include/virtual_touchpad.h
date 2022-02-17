@@ -29,6 +29,6 @@ protected:
     const std::vector<uint32_t>& GetKeys() const override;
     const std::vector<uint32_t>& GetAbs()const override;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // VIRTUAL_TOUCHPAD_H

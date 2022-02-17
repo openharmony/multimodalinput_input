@@ -64,5 +64,5 @@ void KeyboardInject::InjectKeyEvent(uint16_t code, uint32_t value) const
     InjectInputEvent injectInputSync = {injectThread_->KEYBOARD_DEVICE_ID, EV_SYN, SYN_REPORT, 0};
     injectThread_->WaitFunc(injectInputSync);
 }
-}  // namespace MMIS
-}  // namespace OHOS
+} // namespace MMIS
+} // namespace OHOS

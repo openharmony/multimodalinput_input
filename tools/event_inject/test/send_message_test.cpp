@@ -33,4 +33,4 @@ HWTEST_F(SendMessageTest, Test_GetDevIndexByName, TestSize.Level1)
     auto ret = sendMessage.GetDevIndexByName(deviceName);
     EXPECT_EQ(ret, 32);
 }
-}
+} // namespace
