@@ -511,7 +511,7 @@ int32_t InjectionEventDispatch::OnSendEvent()
         return RET_ERR;
     }
     write(fd, &event, sizeof(event));
-    if (fd > 0) {
+    if (fd >= 0) {
         close(fd);
     }
     return RET_OK;

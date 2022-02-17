@@ -152,7 +152,7 @@ protected:
     static constexpr int32_t BIT5 = 5;
     static constexpr int32_t BIT6 = 6;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define MMIRegEvent OHOS::MMI::RegisterEvent::GetInstance()
 #endif // REGISTER_EVENT_H
