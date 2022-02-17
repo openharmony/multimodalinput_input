@@ -14,7 +14,7 @@
  */
 
 #include "uds_client.h"
-#include <inttypes.h>
+#include <cinttypes>
 #include "util.h"
 
 namespace OHOS {
