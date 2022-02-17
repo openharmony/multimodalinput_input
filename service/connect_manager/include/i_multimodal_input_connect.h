@@ -23,11 +23,11 @@ namespace OHOS {
 namespace MMI {
 class IMultimodalInputConnect : public IRemoteBroker {
 public:
-    [[maybe_unused]] static constexpr int INVALID_SOCKET_FD = -1;
-    static const int MULTIMODAL_INPUT_CONNECT_SERVICE_ID = 3101;
+    [[maybe_unused]] static constexpr int32_t INVALID_SOCKET_FD = -1;
+    static const int32_t MULTIMODAL_INPUT_CONNECT_SERVICE_ID = 3101;
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.multimodalinput.IConnectManager");
 
-    virtual int32_t AllocSocketFd(const std::string &programName, const int moduleType, int &socketFd) = 0;
+    virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &socketFd) = 0;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) = 0;
 
     enum {
@@ -39,7 +39,6 @@ public:
         CONNECT_MODULE_TYPE_MMI_CLIENT = 0,
         CONNECT_MODULE_TYPE_AI = 1,
         CONNECT_MODULE_TYPE_SIMULATE_INJECT = 2,
-        CONNECT_MODULE_TYPE_ST_TEST = 3,
     };
 };
 } // namespace MMI

@@ -202,7 +202,7 @@ void mmi_console_log(bool withoutFileInfo, char *fileName, int lineNo, int level
     timeval tv;
     gettimeofday(&tv, nullptr);
     tm* p = localtime(&tv.tv_sec);
-    CHKP(p);
+    CHKPV(p);
     const uint32_t precise = uint32_t(tv.tv_usec / SECONDE_UNIT); // 毫秒
 
     int32_t ret;
@@ -316,7 +316,7 @@ void LogManager::WriteFile(LogDataPtr pLog)
     // 时间
     char longTime[LOG_MAX_TIME_LEN] = {};
     tm* p = localtime(&pLog->curTime);
-    CHKP(p);
+    CHKPV(p);
     int32_t ret = snprintf_s(longTime, sizeof(longTime), LOG_MAX_TIME_LEN, "%02d-%02d-%02d %02d:%02d:%02d.%03d",
                              p->tm_year + AD_1900, p->tm_mon + 1, p->tm_mday, p->tm_hour, p->tm_min, p->tm_sec, pLog->precise);
     if (ret < 0) {

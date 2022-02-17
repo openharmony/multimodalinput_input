@@ -78,7 +78,7 @@ public:
     void OnSetHotPlugs(uint32_t devIndex, uint32_t devSatatus);
     int32_t OnSetEventInject(const RawInputEvent& allEvent, int32_t devType);
     bool SetDeviceHotStatus(int32_t devIndex, int32_t status);
-    int32_t ScanInputDevice(DevDesc *staArr, uint32_t arrLen);
+    int32_t ScanInputDevice(uint32_t arrLen, DevDesc *staArr);
     bool ReportHotPlugEvent(uint32_t devIndex, uint32_t status);
 public:
     InputHostCb hotPlugcallback_;
@@ -89,8 +89,8 @@ private:
     MMI::UDSServer* udsServerPtr_ = nullptr;
     std::vector<DeviceInformation> deviceArray_ = {};
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define MMIHdiInject OHOS::MMI::DelayedSingleton<OHOS::MMI::HdiInject>::GetInstance()
 #endif // OHOS_BUILD_HDF
 #endif // HDI_INJECT_H

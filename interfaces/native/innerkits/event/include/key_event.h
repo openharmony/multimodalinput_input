@@ -1508,6 +1508,6 @@ private:
     std::vector<KeyItem> keys_;
     int32_t keyAction_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // KEY_EVENT_H

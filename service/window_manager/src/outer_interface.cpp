@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "OuterInterface" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "OuterInterface" };
     }
 const std::map<int16_t, int16_t> MAP_SYSTEM_EVENT_ATTR = {
     {HOS_KEY_MUTE, MMI_SYSTEM_SERVICE_AND_APP},
@@ -61,19 +61,19 @@ bool OuterInterface::SystemEventHandler(const KeyEventValueTransformations& trs,
 {
     switch (systemEventAttr) {
         case MMI_SYSTEM_SERVICE: {
-            MMI_LOGT("Event dispatcher of server:Key:%{public}d, state:%{public}d, sourceType=300, "
+            MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "%{public}s is SystemKey, Dispatch to System Module",
                      trs.keyValueOfHos, state, trs.keyEvent.c_str());
             break;
         }
         case MMI_SYSTEM_SERVICE_AND_APP: {
-            MMI_LOGT("Event dispatcher of server:Key:%{public}d, state:%{public}d, sourceType=300, "
+            MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "%{public}s is SystemKey, Dispatch to System Module. System Module return false",
                      trs.keyValueOfHos, state, trs.keyEvent.c_str());
             break;
         }
         case MMI_CAMERA_APP: {
-            MMI_LOGT("Event dispatcher of server:Key:%{public}d, state:%{public}d, sourceType=300, "
+            MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "KEY_CAMERA is SystemKey, Dispatch to Camera Module",
                      trs.keyValueOfHos, state);
             break;
@@ -90,19 +90,19 @@ bool OuterInterface::DistributedEventHandler(const KeyEventValueTransformations&
 {
     switch (systemEventAttr) {
         case MMI_SYSTEM_SERVICE: {
-            MMI_LOGT("Event dispatcher of server:Key:%{public}d, state:%{public}d, sourceType=300, "
+            MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "%{public}s is SystemKey, Dispatch to Distributed System",
                      trs.keyValueOfHos, state, trs.keyEvent.c_str());
             break;
         }
         case MMI_SYSTEM_SERVICE_AND_APP: {
-            MMI_LOGT("Event dispatcher of server:Key:%{public}d, state:%{public}d, sourceType=300, "
+            MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "%{public}s is SystemKey, Dispatch to Distributed System. Distributed System return false",
                      trs.keyValueOfHos, state, trs.keyEvent.c_str());
             break;
         }
         case MMI_CAMERA_APP: {
-            MMI_LOGT("Event dispatcher of server:Key:%{public}d, state:%{public}d, sourceType=300, "
+            MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "KEY_CAMERA is SystemKey, Dispatch to Distributed System",
                      trs.keyValueOfHos, state);
             break;
@@ -144,6 +144,6 @@ int32_t OuterInterface::GetSystemEventAttrByHosKeyValue(const int16_t keyValueOf
     }
     return it->second;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif

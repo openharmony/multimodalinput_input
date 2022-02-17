@@ -105,4 +105,4 @@ HWTEST_F(SystemEventHandlerTest, Test_OnBack, TestSize.Level1)
     auto rt = SysEveHdl->OnSystemEventHandler(MmiMessageId::ON_BACK);
     EXPECT_EQ(rt, RET_OK);
 }
-}
+} // namespace

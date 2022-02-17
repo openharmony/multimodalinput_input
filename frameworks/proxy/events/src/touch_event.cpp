@@ -20,7 +20,7 @@
 namespace OHOS {
     namespace {
         using namespace OHOS::MMI;
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "TouchEvent"};
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "TouchEvent"};
     }
 
 TouchEvent::~TouchEvent() {}
@@ -59,7 +59,7 @@ void TouchEvent::Initialize(int32_t windowId, MultimodalEventPtr deviceEvent, in
                             int32_t index, float forcePrecision, float maxForce, float tapCount, int32_t startTime,
                             int32_t operationState, int32_t pointerCount, fingerInfos fingersInfos[], bool isStandard)
 {
-    CHKP(deviceEvent);
+    CHKPV(deviceEvent);
     ManipulationEvent::Initialize(windowId, startTime, operationState, pointerCount, fingersInfos,
                                   deviceEvent->GetHighLevelEvent(), deviceEvent->GetUuid(),
                                   deviceEvent->GetEventType(), deviceEvent->GetOccurredTime(),
@@ -168,4 +168,4 @@ int32_t TouchEvent::GetOriginEventType() const
 {
     return mDeviceEventType_;
 }
-}
+} // namespace OHOS

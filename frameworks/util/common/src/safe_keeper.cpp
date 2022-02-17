@@ -18,7 +18,8 @@
 #include "log.h"
 #include "util.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SafeKeeper" };
 }
@@ -43,7 +44,7 @@ bool SafeKeeper::RegisterEvent(uint64_t tid, const std::string& remark)
     std::lock_guard<std::mutex> lock(mtx_);
     const SafeEvent event = {tid, GetCurMillisTime(), remark};
     dList_.push_back(event);
-    MMI_LOGI("SafeKeeper register tid:[%{public}" PRId64 "] remark:[%{public}s]", tid, remark.c_str());
+    MMI_LOGI("SafeKeeper register tid:%{public}" PRId64 ",remark:%{public}s", tid, remark.c_str());
     return true;
 }
 
@@ -60,7 +61,7 @@ void SafeKeeper::ReportHealthStatus(uint64_t tid)
     std::lock_guard<std::mutex> lock(mtx_);
     auto ptr = GetEvent(tid);
     if (!ptr) {
-        MMI_LOGE("SafeKeeper report ptr = nullptr tid:[%{public}" PRId64 "] errCode:%{public}d",
+        MMI_LOGE("SafeKeeper report ptr = nullptr tid:%{public}" PRId64 ",errCode:%{public}d",
                  tid, ERROR_NULL_POINTER);
         return;
     }
@@ -84,4 +85,5 @@ void SafeKeeper::ProcessEvents()
         }
     }
 }
-}
+} // namespace MMI
+} // namespace OHOS

@@ -122,7 +122,7 @@ group("multimodalinput_mmi_packages") {
     "frameworks/proxy:libmmi-client",
     "service:libmmi-server",
     "tools/event_inject:hosmmi-event-injection",
-    "tools/inject_event:inject_event_zhu",
+    "tools/inject_event:input",
     "tools/virtual_device_manager:hosmmi-virtual-device-manager",
   ]
 

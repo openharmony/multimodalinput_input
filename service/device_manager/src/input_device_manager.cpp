@@ -14,12 +14,11 @@
  */
 
 #include "input_device_manager.h"
-#include "pointer_drawing_manager.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceManager"};
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceManager"};
     constexpr int32_t INVALID_DEVICE_ID {-1};
 }
 #ifdef OHOS_WESTEN_MODEL
@@ -47,19 +46,23 @@ void InputDeviceManager::Init(weston_compositor* wc)
 
 void InputDeviceManager::GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback)
 {
+    MMI_LOGD("enter");
     MMIMsgPost.RunOnWestonThread([this, callback](weston_compositor* wc) {
         auto ids = GetInputDeviceIdsSync(wc);
         callback(ids);
     });
+    MMI_LOGD("leave");
 }
 
 void InputDeviceManager::FindInputDeviceByIdAsync(int32_t deviceId,
     std::function<void(std::shared_ptr<InputDevice>)> callback)
 {
+    MMI_LOGD("enter");
     MMIMsgPost.RunOnWestonThread([this, deviceId, callback](weston_compositor* wc) {
-        auto device = FindInputDeviceByIdSync(wc, deviceId);
+        auto device = FindInputDeviceByIdSync(deviceId, wc);
         callback(device);
     });
+    MMI_LOGD("leave");
 }
 
 std::vector<int32_t> InputDeviceManager::GetInputDeviceIdsSync(weston_compositor* wc)
@@ -74,7 +77,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIdsSync(weston_compositor
     return ids;
 }
 
-std::shared_ptr<InputDevice> InputDeviceManager::FindInputDeviceByIdSync(weston_compositor* wc, int32_t deviceId)
+std::shared_ptr<InputDevice> InputDeviceManager::FindInputDeviceByIdSync(int32_t deviceId, weston_compositor* wc)
 {
     MMI_LOGD("begin");
     Init(wc);
@@ -133,7 +136,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds()
 void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
 {
     MMI_LOGD("begin");
-    CHKP(inputDevice);
+    CHKPV(inputDevice);
 #ifdef OHOS_WESTEN_MODEL
     if (initFlag_) {
         return;
@@ -152,8 +155,8 @@ void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
     inputDevice_[nextId_] = inputDevice;
     ++nextId_;
 
-    if (IsPointerDevice(inputDevice)) {
-        DrawWgr->TellDeviceInfo(true);
+    if (IsPointerDevice(static_cast<struct libinput_device *>(inputDevice))) {
+        NotifyPointerDevice(true);
     }
     MMI_LOGD("end");
 }
@@ -161,7 +164,7 @@ void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
 void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
 {
     MMI_LOGD("begin");
-    CHKP(inputDevice);
+    CHKPV(inputDevice);
 #ifdef OHOS_WESTEN_MODEL
     if (initFlag_) {
         return;
@@ -171,7 +174,7 @@ void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
         if (it->second == inputDevice) {
             inputDevice_.erase(it);
             if (IsPointerDevice(inputDevice)) {
-                DrawWgr->TellDeviceInfo(false);
+                NotifyPointerDevice(false);
             }
             break;
         }
@@ -181,10 +184,32 @@ void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
 
 bool InputDeviceManager::IsPointerDevice(libinput_device* device)
 {
+    MMI_LOGD("enter");
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
-    MMI_LOGD("udev tag is%{public}d", static_cast<int32_t>(udevTags));
+    MMI_LOGD("udev tag:%{public}d", static_cast<int32_t>(udevTags));
+    MMI_LOGD("leave");
     return udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK | 
     EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD);
+}
+
+void InputDeviceManager::Attach(std::shared_ptr<DeviceObserver> observer)
+{
+    MMI_LOGI("begin");
+    observers_.push_back(observer);
+}
+
+void InputDeviceManager::Detach(std::shared_ptr<DeviceObserver> observer)
+{
+    MMI_LOGI("begin");
+    observers_.remove(observer);
+}
+
+void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice)
+{
+    MMI_LOGI("observers_ size:%{public}d", static_cast<int32_t>(observers_.size()));
+    for (auto observer = observers_.begin(); observer != observers_.end(); observer++) {
+        (*observer)->UpdatePointerDevice(hasPointerDevice);
+    }
 }
 
 int32_t InputDeviceManager::FindInputDeviceId(libinput_device* inputDevice)

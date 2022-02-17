@@ -31,7 +31,8 @@ public:
     {
         return 0;
     }
-    virtual int SendRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option) override
+    virtual int32_t SendRequest(uint32_t code, MessageParcel& data,
+        MessageParcel& reply, MessageOption& option) override
     {
         return 0;
     }
@@ -72,6 +73,6 @@ private:
     std::string bundlerName_ = "DefaultBundlerName";
     std::string name_ = "DefaultName";
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // MMI_TOKEN_H

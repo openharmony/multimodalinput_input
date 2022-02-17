@@ -17,7 +17,8 @@
 #include <inttypes.h>
 #include "util.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSClient" };
 }
@@ -55,9 +56,9 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
     CHKPF(buf);
     CHKF(size > 0 && size <= MAX_PACKET_BUF_SIZE, PARAM_INPUT_INVALID);
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
-    uint64_t ret = write(fd_, static_cast<const void *>(buf), size);
+    ssize_t ret = write(fd_, static_cast<const void *>(buf), size);
     if (ret < 0) {
-        MMI_LOGE("SendMsg write errCode:%{public}d return %{public}" PRId64 "", MSG_SEND_FAIL, ret);
+        MMI_LOGE("SendMsg write errCode:%{public}d,return %{public}zd", MSG_SEND_FAIL, ret);
         return false;
     }
     return true;
@@ -87,22 +88,23 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
 {
     MMI_LOGT("enter detachMode = %d", detachMode);
     recvFun_ = fun;
-    isRun_ = true;
+    isRunning_ = true;
     isConnected_ = true;
     if (ConnectTo() < 0) {
-        MMI_LOGW("Client connection failed...Try again later...");
+        MMI_LOGW("Client connection failed, Try again later");
         isConnected_ = false;
 
         if (IsFirstConnectFailExit()) {
+            MMI_LOGE("first connection faild");
             return false;
         }
     }
     t_ = std::thread(std::bind(&UDSClient::OnThread, this, std::ref(threadPromiseHadEnd_)));
     if (detachMode) {
-        MMI_LOGW("uds client thread detach...");
+        MMI_LOGW("uds client thread detach");
         t_.detach();
     } else {
-        MMI_LOGW("uds client thread join..");
+        MMI_LOGW("uds client thread join");
     }
     return true;
 }
@@ -111,7 +113,7 @@ void UDSClient::Stop()
 {
     MMI_LOGT("enter");
     Close();
-    isRun_ = false;
+    isRunning_ = false;
     epoll_event ev = {};
     if (fd_ >= 0) {
         EpollCtl(fd_, EPOLL_CTL_DEL, ev);
@@ -126,7 +128,7 @@ void UDSClient::Stop()
 
 void UDSClient::OnRecv(const char *buf, size_t size)
 {
-    CHKP(buf);
+    CHKPV(buf);
     int32_t readIdx = 0;
     int32_t packSize = 0;
     const auto headSize = static_cast<int32_t>(sizeof(PackHead));
@@ -152,7 +154,7 @@ void UDSClient::OnEvent(const epoll_event& ev, StreamBuffer& buf)
     auto isoverflow = false;
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGI("fd:%{public}d, ev.events = 0x%{public}x", fd, ev.events);
+        MMI_LOGI("ev.events:0x%{public}x,fd:%{public}d same as fd_:%{public}d", ev.events, fd, fd_);
         OnDisconnected();
         epoll_event event = {};
         EpollCtl(fd, EPOLL_CTL_DEL, event);
@@ -187,13 +189,13 @@ void UDSClient::OnEvent(const epoll_event& ev, StreamBuffer& buf)
 
 void UDSClient::OnThread(std::promise<bool>& threadPromise)
 {
-    SetThreadName(std::string("uds_client"));
+    SetThreadName("uds_client");
     MMI_LOGD("UDSClient::OnThread begin");
     isThreadHadRun_ = true;
     StreamBuffer streamBuf;
     epoll_event events[MAX_EVENT_SIZE] = {};
 
-    while (isRun_) {
+    while (isRunning_) {
         if (isConnected_) {
             streamBuf.Clean();
             auto count = EpollWait(*events, MAX_EVENT_SIZE, DEFINE_EPOLL_TIMEOUT);
@@ -202,7 +204,7 @@ void UDSClient::OnThread(std::promise<bool>& threadPromise)
             }
         } else {
             if (ConnectTo() < 0) {
-                MMI_LOGW("Client reconnection failed...Try again after %{public}d ms!!!",
+                MMI_LOGW("Client reconnection failed, Try again after %{public}d ms",
                          CLIENT_RECONNECT_COOLING_TIME);
                 std::this_thread::sleep_for(std::chrono::milliseconds(CLIENT_RECONNECT_COOLING_TIME));
                 continue;
@@ -213,17 +215,18 @@ void UDSClient::OnThread(std::promise<bool>& threadPromise)
         OnThreadLoop();
 
         if (isToExit_) {
-            isRun_ = false;
+            isRunning_ = false;
             MMI_LOGW("Client thread exit");
             break;
         }
     }
     threadPromise.set_value(true);
-    MMI_LOGD("UDSClient::OnThread end...");
+    MMI_LOGD("UDSClient::OnThread end");
 }
 
 void UDSClient::SetToExit()
 {
     isToExit_ = true;
 }
-}
+} // namespace MMI
+} // namespace OHOS

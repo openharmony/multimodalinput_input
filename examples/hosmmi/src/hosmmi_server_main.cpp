@@ -42,6 +42,6 @@ int32_t main(int32_t argc, const char *argv[])
     }
 #endif
 
-    MMI_LOGD("hosmmi-server stopping... argc:%{public}d, argv:%{public}s", argc, argv[0]);
+    MMI_LOGD("hosmmi-server stopping. argc:%{public}d, argv:%{public}s", argc, argv[0]);
     return RET_OK;
 }

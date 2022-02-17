@@ -50,6 +50,6 @@ public:
 protected:
     explicit AxisEvent(int32_t eventType);
 };
-}
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 #endif // AXIS_EVENT_H
