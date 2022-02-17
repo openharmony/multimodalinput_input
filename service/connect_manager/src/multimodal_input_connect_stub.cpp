@@ -51,7 +51,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
 
 int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     int32_t ret = RET_OK;
 
     do {
