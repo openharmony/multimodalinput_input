@@ -306,7 +306,6 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
         return MSG_SEND_FAIL;
     }
 #endif
-
     return RET_OK;
 }
 
