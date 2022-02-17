@@ -16,7 +16,7 @@
 #include "s_input.h"
 #include <climits>
 #include <fcntl.h>
-#include <inttypes.h>
+#include <cinttypes>
 #include <sys/epoll.h>
 #include <unistd.h>
 #include "libmmi_util.h"
