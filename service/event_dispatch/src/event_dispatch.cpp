@@ -722,10 +722,10 @@ void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, i
     int32_t keyCode = key->GetKeyCode();
     std::string checkKeyCode;
     if (checkLaunchAbility == number) {
-        checkKeyCode = "CheckLaunchAbility service GetKeyCode = " + std::to_string(keyCode);
+        checkKeyCode = "CheckLaunchAbility service GetKeyCode=" + std::to_string(keyCode);
         MMI_LOGT("CheckLaunchAbility service trace GetKeyCode:%{public}d", keyCode);
     } else {
-        checkKeyCode = "FilterSubscribeKeyEvent service GetKeyCode = " + std::to_string(keyCode);
+        checkKeyCode = "FilterSubscribeKeyEvent service GetKeyCode=" + std::to_string(keyCode);
         MMI_LOGT("FilterSubscribeKeyEvent service trace GetKeyCode:%{public}d", keyCode);
     }
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, checkKeyCode);
