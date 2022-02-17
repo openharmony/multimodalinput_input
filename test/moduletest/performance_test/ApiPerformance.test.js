@@ -49,14 +49,14 @@ describe("apiPerformanceTest", function () {
     it("MulJsTest001", 0, function () {
         console.info('----------------------MulJsTest001 start----------------------------');
         var start = new Date().getTime();
-        for (var i = 1; i<=10; i++) {
+        for (var i = 1; i<=1; i++) {
             inputDevice.getDevice(1,(data,err)=>{
             });
         }
         var end = new Date().getTime();
         var allTime = (end - start);
         console.info("getDevice running totalTime:" + allTime + "ms");
-        var time = (end-start)/10;
+        var time = (end-start)/1;
         console.info("getDevice running averageTime:" + time + "ms");
         expect(true).assertEqual(true);
     })
@@ -70,14 +70,14 @@ describe("apiPerformanceTest", function () {
     it("MulJsTest002", 0, function () {
         console.info('----------------------MulJsTest002 start----------------------------');
         var start = new Date().getTime();
-        for (var i = 1; i<=10; i++) {
+        for (var i = 1; i<=1; i++) {
             inputDevice.getDeviceIds((data,err)=>{
             });
         }
         var end = new Date().getTime();
         var allTime = (end - start);
         console.info("getDeviceIds running totalTime:" + allTime + "ms");
-        var time = (end-start)/10;
+        var time = (end-start)/1;
         console.info("getDeviceIds running averageTime:" + time + "ms");
         expect(true).assertEqual(true);
     })
@@ -91,14 +91,14 @@ describe("apiPerformanceTest", function () {
     it("MulJsTest003", 0, function () {
         console.info('----------------------MulJsTest003 start----------------------------');
         var start = new Date().getTime();
-        for (var i = 1; i<=1000; i++) {
+        for (var i = 1; i<=1; i++) {
             inputMonitor.on("touch", (touchEvent)=>{
             });
         }
         var end = new Date().getTime();
         var allTime = (end - start);
         console.info("inputMonitor_on running totalTime:" + allTime + "ms");
-        var time = (end-start)/1000;
+        var time = (end-start)/1;
         console.info("inputMonitor_on running averageTime:" + time + "ms");
         expect(true).assertEqual(true);
     })
@@ -112,14 +112,14 @@ describe("apiPerformanceTest", function () {
     it("MulJsTest004", 0, function () {
         console.info('----------------------MulJsTest004 start----------------------------');
         var start = new Date().getTime();
-        for (var i = 1; i<=1000; i++) {
+        for (var i = 1; i<=1; i++) {
             inputMonitor.off("touch", (touchEvent)=>{
             });
         }
         var end = new Date().getTime();
         var allTime = (end - start);
         console.info("inputMonitor_off running totalTime:" + allTime + "ms");
-        var time = (end-start)/1000;
+        var time = (end-start)/1;
         console.info("inputMonitor_off running averageTime:" + time + "ms");
         expect(true).assertEqual(true);
     })
@@ -133,14 +133,14 @@ describe("apiPerformanceTest", function () {
     it("MulJsTest005", 0, function () {
         console.info('----------------------MulJsTest005 start----------------------------');
         var start = new Date().getTime();
-        for (var i = 1; i<=1000; i++) {
+        for (var i = 1; i<=1; i++) {
             inputConsumer.on('key', {preKeys:[],'finalKey':22, 'isFinalKeyDown':true,'finalKeyDownDuration':0},(data,err)=>{
             });
         }
         var end = new Date().getTime();
         var allTime = (end - start);
         console.info("inputConsumer_on running totalTime:" + allTime + "ms");
-        var time = (end-start)/1000;
+        var time = (end-start)/1;
         console.info("inputConsumer_on running averageTime:" + time + "ms");
         expect(true).assertEqual(true);
     })
@@ -154,14 +154,14 @@ describe("apiPerformanceTest", function () {
     it("MulJsTest006", 0, function () {
         console.info('----------------------MulJsTest006 start----------------------------');
         var start = new Date().getTime();
-        for (var i = 1; i<=1000; i++) {
+        for (var i = 1; i<=1; i++) {
             inputConsumer.off('key', {preKeys:[],'finalKey':22, 'isFinalKeyDown':true,'finalKeyDownDuration':0},(data,err)=>{
             });
         }
         var end = new Date().getTime();
         var allTime = (end - start);
         console.info("inputConsumer_off running totalTime:" + allTime + "ms");
-        var time = (end-start)/1000;
+        var time = (end-start)/1;
         console.info("inputConsumer_off running averageTime:" + time + "ms");
         expect(true).assertEqual(true);
     })
