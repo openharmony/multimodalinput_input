@@ -281,7 +281,7 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
 int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
 {
     int32_t ret = RET_OK;
-    sptr<ConnectDefReqParcel> req = data.ReadParcelable<ConnectDefReqParcel>();
+    sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
     if (req == nullptr) {
         MMI_LOGE("read data error.");
         return RET_ERR;
