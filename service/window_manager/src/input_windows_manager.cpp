@@ -201,7 +201,7 @@ void OHOS::MMI::InputWindowsManager::PrintDebugInfo()
 
 size_t OHOS::MMI::InputWindowsManager::GetSurfaceIdList(std::vector<int32_t>& ids)
 {
-    const int32_t TEST_THREE_WINDOWS = 3;
+    constexpr int32_t TEST_THREE_WINDOWS = 3;
     std::lock_guard<std::mutex> lock(mu_);
     for (const auto &item : surfaces_) {
         if (item.second.surfaceId != focusInfoID_ && TEST_THREE_WINDOWS != item.second.surfaceId) {
