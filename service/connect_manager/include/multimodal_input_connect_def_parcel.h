@@ -21,26 +21,26 @@
 
 namespace OHOS {
 namespace MMI {
-struct ConnectDefReqParcel final : public Parcelable {
-    ConnectDefReqParcel() = default;
+struct ConnectReqParcel final : public Parcelable {
+    ConnectReqParcel() = default;
 
-    ~ConnectDefReqParcel() override = default;
+    ~ConnectReqParcel() override = default;
 
     bool Marshalling(Parcel& out) const override;
 
-    static ConnectDefReqParcel *Unmarshalling(Parcel& in);
+    static ConnectReqParcel *Unmarshalling(Parcel& in);
 
     ConnectDefReq data;
 };
 
-struct ConnectDefRespParcel final : public Parcelable {
-    ConnectDefRespParcel() = default;
+struct ConnectRespParcel final : public Parcelable {
+    ConnectRespParcel() = default;
 
-    ~ConnectDefRespParcel() override = default;
+    ~ConnectRespParcel() override = default;
 
     bool Marshalling(Parcel &out) const override;
 
-    static ConnectDefRespParcel *Unmarshalling(Parcel &in);
+    static ConnectRespParcel *Unmarshalling(Parcel &in);
 
     ConnectDefResp data;
 };
