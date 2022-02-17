@@ -14,7 +14,7 @@
  */
 
 #include "uds_client.h"
-#include <inttypes.h>
+#include <cinttypes>
 #include "util.h"
 
 namespace OHOS {
@@ -25,14 +25,14 @@ namespace {
 
 UDSClient::UDSClient()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
 }
 
 UDSClient::~UDSClient()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     Stop();
-    MMI_LOGT("leave");
+    MMI_LOGD("leave");
 }
 
 int32_t UDSClient::ConnectTo()
@@ -112,7 +112,7 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
 
 void UDSClient::Stop()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     Close();
     isRunning_ = false;
     epoll_event ev = {};
@@ -124,7 +124,7 @@ void UDSClient::Stop()
         MMI_LOGT("thread join");
         t_.join();
     }
-    MMI_LOGT("leave");
+    MMI_LOGD("leave");
 }
 
 void UDSClient::OnRecv(const char *buf, size_t size)
@@ -190,8 +190,8 @@ void UDSClient::OnEvent(const epoll_event& ev, StreamBuffer& buf)
 
 void UDSClient::OnThread(std::promise<bool>& threadPromise)
 {
+    MMI_LOGD("begin");
     SetThreadName("uds_client");
-    MMI_LOGD("UDSClient::OnThread begin");
     isThreadHadRun_ = true;
     StreamBuffer streamBuf;
     epoll_event events[MAX_EVENT_SIZE] = {};
@@ -222,7 +222,7 @@ void UDSClient::OnThread(std::promise<bool>& threadPromise)
         }
     }
     threadPromise.set_value(true);
-    MMI_LOGD("UDSClient::OnThread end");
+    MMI_LOGD("end");
 }
 
 void UDSClient::SetToExit()

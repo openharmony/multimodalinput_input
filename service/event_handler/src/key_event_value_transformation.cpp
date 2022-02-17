@@ -445,7 +445,7 @@ KeyEventValueTransformations KeyValueTransformationByInput(int16_t keyValueOfInp
     MMI_LOGD("enter");
     auto it = MAP_KEY_EVENT_VALUE_TRANSFORMATION.find(keyValueOfInput);
     if (it == MAP_KEY_EVENT_VALUE_TRANSFORMATION.end()) {
-        const int16_t UNKNOWN_KEY_BASE = 10000;
+        constexpr int16_t UNKNOWN_KEY_BASE = 10000;
         KeyEventValueTransformations unknownKey = {
             "UNKNOWN_KEY", keyValueOfInput, UNKNOWN_KEY_BASE + keyValueOfInput, HOS_UNKNOWN_KEY_BASE, 0
         };
@@ -512,7 +512,7 @@ bool KeyEventValueTransformation::Init()
 uint32_t KeyEventValueTransformation::KeyboardHandleKeySym(uint32_t keyboardKey)
 {
     MMI_LOGD("enter");
-    const uint32_t XKB_EVDEV_OFFSET = 8;
+    constexpr uint32_t XKB_EVDEV_OFFSET = 8;
     uint32_t code = keyboardKey + XKB_EVDEV_OFFSET;
     xkb_keysym_t syms = XKB_KEY_NoSymbol;
     xkb_keysym_t* pSyms = &syms;

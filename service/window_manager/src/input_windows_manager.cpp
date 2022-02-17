@@ -64,6 +64,7 @@ bool OHOS::MMI::InputWindowsManager::Init(UDSServer& udsServer)
 {
     // save server handle
     udsServer_ = &udsServer;
+#ifdef OHOS_WESTEN_MODEL
     SetSeatListener([]() {
         WinMgr->UpdateSeatsInfo();
     });
@@ -72,6 +73,7 @@ bool OHOS::MMI::InputWindowsManager::Init(UDSServer& udsServer)
     });
     UpdateSeatsInfo();
     UpdateScreensInfo();
+#endif
     return true;
 }
 
@@ -201,7 +203,7 @@ void OHOS::MMI::InputWindowsManager::PrintDebugInfo()
 
 size_t OHOS::MMI::InputWindowsManager::GetSurfaceIdList(std::vector<int32_t>& ids)
 {
-    const int32_t TEST_THREE_WINDOWS = 3;
+    constexpr int32_t TEST_THREE_WINDOWS = 3;
     std::lock_guard<std::mutex> lock(mu_);
     for (const auto &item : surfaces_) {
         if (item.second.surfaceId != focusInfoID_ && TEST_THREE_WINDOWS != item.second.surfaceId) {
@@ -284,7 +286,6 @@ void OHOS::MMI::InputWindowsManager::Dump(int32_t fd)
 void OHOS::MMI::InputWindowsManager::SaveScreenInfoToMap(const ScreenInfo** screenInfo)
 {
     // check param
-    CHK(udsServer_, ERROR_NULL_POINTER);
     CHK(screenInfo, ERROR_NULL_POINTER);
     CHK(*screenInfo, ERROR_NULL_POINTER);
 

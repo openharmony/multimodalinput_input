@@ -24,6 +24,8 @@
 #include <set>
 #include "parcel.h"
 #include "input_event.h"
+#include "nocopyable.h"
+
 namespace OHOS {
 namespace MMI {
 class PointerEvent : public InputEvent {
@@ -400,10 +402,9 @@ public:
 
 public:
     PointerEvent(const PointerEvent& other);
-    PointerEvent(PointerEvent&& other) = default;
     virtual ~PointerEvent();
-    virtual PointerEvent& operator=(const PointerEvent& other) = default;
-    virtual PointerEvent& operator=(PointerEvent&& other) = default;
+    PointerEvent& operator=(const PointerEvent& other) = delete;
+    DISALLOW_MOVE(PointerEvent);
 
     static std::shared_ptr<PointerEvent> Create();
 
