@@ -75,5 +75,5 @@ HWTEST_F(OuterInterfaceTest, GetSystemEventAttrByHosKeyValue, TestSize.Level1)
     OuterInterface outerInterface;
     EXPECT_TRUE((outerInterface.GetSystemEventAttrByHosKeyValue(3)) == MMI_SYSTEM_SERVICE_AND_APP);
 }
-}
+} // namespace
 #endif

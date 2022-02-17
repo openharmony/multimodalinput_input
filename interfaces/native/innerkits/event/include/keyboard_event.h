@@ -15,10 +15,13 @@
 #ifndef KEYBOARD_EVENT_H
 #define KEYBOARD_EVENT_H
 #include "key_event_pre.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 class KeyBoardEvent : public KeyEvent {
 public:
+    KeyBoardEvent() = default;
+    DISALLOW_COPY_AND_MOVE(KeyBoardEvent);
     virtual ~KeyBoardEvent();
     /**
     * initialize the object.

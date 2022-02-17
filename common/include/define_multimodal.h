@@ -36,18 +36,18 @@
 #endif
 
 #ifdef DEBUG_CODE_TEST
-#define CKP(cond, ...) \
+#define CHKPL(cond, ...) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("%{public}s, (%{public}d), CKP(%{public}s) is null, do nothing", \
+            MMI_LOGE("%{public}s, (%{public}d), CHKPL(%{public}s) is null, do nothing", \
                 __FILE__, __LINE__, #cond); \
         } \
     } while (0)
 
-#define CHKP(cond, ...) \
+#define CHKPV(cond, ...) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHKP(%{public}s) is null", \
+            MMI_LOGE("%{public}s, (%{public}d), CHKPV(%{public}s) is null", \
                 __FILE__, __LINE__, #cond); \
             return; \
         } \
@@ -89,10 +89,10 @@
         } \
     } while (0)
 
-#define CHKPRP(cond, r) \
+#define CHKPP(cond, r) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHKPR(%{public}s) is null, return value is null", \
+            MMI_LOGE("%{public}s, (%{public}d), CHKPP(%{public}s) is null, return value is null", \
                 __FILE__, __LINE__, #cond); \
             return r; \
         } \
@@ -143,17 +143,17 @@
     } while (0)
 
 #else // DEBUG_CODE_TEST
-#define CKP(cond, ...) \
+#define CHKPL(cond, ...) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("CKP(%{public}s) is null, do nothing", #cond); \
+            MMI_LOGE("CHKPL(%{public}s) is null, do nothing", #cond); \
         } \
     } while (0)
 
-#define CHKP(cond, ...) \
+#define CHKPV(cond, ...) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("%{public}s is null", #cond); \
+            MMI_LOGE("CHKPV(%{public}s) is null", #cond); \
             return; \
         } \
     } while (0)
@@ -190,10 +190,10 @@
         } \
     } while (0)
 
-#define CHKPRP(cond, r) \
+#define CHKPP(cond, r) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("CHKPR(%{public}s) is null, return value is null", #cond); \
+            MMI_LOGE("CHKPP(%{public}s) is null, return value is null", #cond); \
             return r; \
         } \
     } while (0)

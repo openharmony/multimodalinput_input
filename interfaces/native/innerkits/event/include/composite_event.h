@@ -14,8 +14,8 @@
  */
 #ifndef COMPOSITE_EVENT_H
 #define COMPOSITE_EVENT_H
-
 #include "multimodal_event.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 /**
@@ -35,6 +35,8 @@ namespace OHOS {
  */
 class CompositeEvent : public MMI::MultimodalEvent {
 public:
+    CompositeEvent() = default;
+    DISALLOW_COPY_AND_MOVE(CompositeEvent);
     virtual ~CompositeEvent();
 };
 } // namespace OHOS

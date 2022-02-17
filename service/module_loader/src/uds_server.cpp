@@ -15,7 +15,7 @@
 
 #include "uds_server.h"
 #include <list>
-#include <inttypes.h>
+#include <cinttypes>
 #include <sys/socket.h>
 #include "i_multimodal_input_connect.h"
 #include "log.h"
@@ -30,8 +30,8 @@ namespace MMI {
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "UDSServer"};
     }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 OHOS::MMI::UDSServer::UDSServer()
 {
@@ -136,7 +136,9 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName,
     const int32_t moduleType, const int32_t uid, const int32_t pid,
     int32_t& serverFd, int32_t& toReturnClientFd)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mux_);
+    MMI_LOGD("enter.");
     MMI_LOGT("enter.");
     int32_t sockFds[2] = {};
 
@@ -154,7 +156,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName,
         return RET_ERR;
     }
 
-    const size_t bufferSize = 32 * 1024;
+    constexpr size_t bufferSize = 32 * 1024;
     setsockopt(sockFds[0], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
@@ -270,7 +272,7 @@ bool OHOS::MMI::UDSServer::StartServer()
 
 void OHOS::MMI::UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
 {
-    CHKP(buf);
+    CHKPV(buf);
     CHK(fd >= 0, PARAM_INPUT_INVALID);
     auto sess = GetSession(fd);
     CHK(sess, ERROR_NULL_POINTER);
@@ -302,7 +304,7 @@ void OHOS::MMI::UDSServer::OnEpollRecv(int32_t fd, const char *buf, size_t size)
 
 void OHOS::MMI::UDSServer::OnEvent(const epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
 {
-    const int32_t maxCount = static_cast<int32_t>(MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE) + 1;
+    constexpr int32_t maxCount = static_cast<int32_t>(MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE) + 1;
     CHK(maxCount > 0, VAL_NOT_EXP);
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
@@ -342,7 +344,7 @@ void OHOS::MMI::UDSServer::OnEvent(const epoll_event& ev, std::map<int32_t, Stre
 
 void OHOS::MMI::UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, epoll_event& ev)
 {
-    const int32_t maxCount = static_cast<int32_t>(MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE) + 1;
+    constexpr int32_t maxCount = static_cast<int32_t>(MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE) + 1;
     CHK(maxCount > 0, VAL_NOT_EXP);
     CHK(ev.data.ptr, ERROR_NULL_POINTER);
     auto fd = *static_cast<int32_t*>(ev.data.ptr);

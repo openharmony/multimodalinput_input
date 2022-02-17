@@ -14,7 +14,7 @@
  */
 
 #include <sys/ioctl.h>
-#include <inttypes.h>
+#include <cinttypes>
 #include "event_dump.h"
 #include "input_device_manager.h"
 #include "mmi_interface.h"
@@ -35,8 +35,8 @@ namespace MMI {
         static bool g_bThreadTerm = false;
 #endif
     }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 static std::atomic_bool g_isRun(false);
 

@@ -16,7 +16,7 @@
 #include "s_input.h"
 #include <climits>
 #include <fcntl.h>
-#include <inttypes.h>
+#include <cinttypes>
 #include <sys/epoll.h>
 #include <unistd.h>
 #include "libmmi_util.h"
@@ -48,17 +48,17 @@ static void InitHiLogFunc(struct libinput* input)
     libinput_log_set_handler(input, &OHOS::MMI::HiLogFunc);
     initFlag = true;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 void OHOS::MMI::SInput::LoginfoPackagingTool(libinput_event *event)
 {
-    CHKP(event);
+    CHKPV(event);
     auto context = libinput_event_get_context(event);
     InitHiLogFunc(context);
 }
 
-const static libinput_interface LIBINPUT_INTERFACE = {
+constexpr static libinput_interface LIBINPUT_INTERFACE = {
     .open_restricted = [](const char *path, int32_t flags, void *user_data)->int32_t {
         using namespace OHOS::MMI;
         CHKPR(path, errno);
@@ -117,7 +117,7 @@ bool OHOS::MMI::SInput::Init(FunInputEvent funInputEvent, const std::string& sea
 
 void OHOS::MMI::SInput::EventDispatch(epoll_event& ev)
 {
-    CHKP(ev.data.ptr);
+    CHKPV(ev.data.ptr);
     auto fd = *static_cast<int*>(ev.data.ptr);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
         MMI_LOGF("SInput::OnEventDispatch epoll unrecoverable error,"
@@ -145,7 +145,7 @@ void OHOS::MMI::SInput::Stop()
 
 void OHOS::MMI::SInput::OnEventHandler()
 {
-    CHKP(funInputEvent_);
+    CHKPV(funInputEvent_);
 #ifndef OHOS_WESTEN_MODEL
     multimodal_libinput_event ev = { nullptr, nullptr };
     while ((ev.event = libinput_get_event(input_))) {
