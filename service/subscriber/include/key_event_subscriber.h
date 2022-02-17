@@ -76,7 +76,7 @@ private:
     bool callbackInitialized_ { false };
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define KeyEventSubscriber_ OHOS::MMI::KeyEventSubscriber::GetInstance()
 #endif  // KEY_EVENT_SUBSCRIBER_H

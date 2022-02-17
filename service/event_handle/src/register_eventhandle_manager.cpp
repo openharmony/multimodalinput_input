@@ -24,18 +24,15 @@ namespace MMI {
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RegisterEventHandleManager" };
     }
-}
-}
-
-OHOS::MMI::RegisterEventHandleManager::RegisterEventHandleManager()
+RegisterEventHandleManager::RegisterEventHandleManager()
 {
 }
 
-OHOS::MMI::RegisterEventHandleManager::~RegisterEventHandleManager()
+RegisterEventHandleManager::~RegisterEventHandleManager()
 {
 }
 
-int32_t OHOS::MMI::RegisterEventHandleManager::RegisterEvent(MmiMessageId messageId, int32_t fd)
+int32_t RegisterEventHandleManager::RegisterEvent(MmiMessageId messageId, int32_t fd)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
@@ -68,7 +65,7 @@ int32_t OHOS::MMI::RegisterEventHandleManager::RegisterEvent(MmiMessageId messag
     return RET_OK;
 }
 
-int32_t OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleManager(MmiMessageId messageId, int32_t fd)
+int32_t RegisterEventHandleManager::UnregisterEventHandleManager(MmiMessageId messageId, int32_t fd)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
@@ -100,7 +97,7 @@ int32_t OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleManager(MmiM
     return RET_OK;
 }
 
-void OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleBySocketFd(int32_t fd)
+void RegisterEventHandleManager::UnregisterEventHandleBySocketFd(int32_t fd)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
@@ -116,7 +113,7 @@ void OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleBySocketFd(int3
     MMI_LOGD("leave");
 }
 
-void OHOS::MMI::RegisterEventHandleManager::FindSocketFds(const MmiMessageId messageId, std::vector<int32_t>& fds)
+void RegisterEventHandleManager::FindSocketFds(const MmiMessageId messageId, std::vector<int32_t>& fds)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
@@ -131,7 +128,7 @@ void OHOS::MMI::RegisterEventHandleManager::FindSocketFds(const MmiMessageId mes
     MMI_LOGD("leave");
 }
 
-void OHOS::MMI::RegisterEventHandleManager::PrintfMap()
+void RegisterEventHandleManager::PrintfMap()
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
@@ -143,7 +140,7 @@ void OHOS::MMI::RegisterEventHandleManager::PrintfMap()
     MMI_LOGD("leave");
 }
 
-void OHOS::MMI::RegisterEventHandleManager::Dump(int32_t fd)
+void RegisterEventHandleManager::Dump(int32_t fd)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
@@ -165,7 +162,7 @@ void OHOS::MMI::RegisterEventHandleManager::Dump(int32_t fd)
     MMI_LOGD("leave");
 }
 
-void OHOS::MMI::RegisterEventHandleManager::Clear()
+void RegisterEventHandleManager::Clear()
 {
     MMI_LOGD("enter");
     if (mu_.try_lock()) {
@@ -175,9 +172,9 @@ void OHOS::MMI::RegisterEventHandleManager::Clear()
     MMI_LOGD("leave");
 }
 
-void OHOS::MMI::RegisterEventHandleManager::RegisterEventHandleByIdMsage(const MmiMessageId idMsgBegin,
-                                                                         const MmiMessageId idMsgEnd,
-                                                                         const int32_t fd)
+void RegisterEventHandleManager::RegisterEventHandleByIdMsage(const MmiMessageId idMsgBegin,
+                                                              const MmiMessageId idMsgEnd,
+                                                              const int32_t fd)
 {
     MMI_LOGD("enter");
     const int32_t messageIdBeginTemp = static_cast<int32_t>(idMsgBegin);
@@ -189,9 +186,9 @@ void OHOS::MMI::RegisterEventHandleManager::RegisterEventHandleByIdMsage(const M
     MMI_LOGD("leave");
 }
 
-void OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleByIdMsage(const MmiMessageId idMsgBegin,
-                                                                           const MmiMessageId idMsgEnd,
-                                                                           const int32_t fd)
+void RegisterEventHandleManager::UnregisterEventHandleByIdMsage(const MmiMessageId idMsgBegin,
+                                                                const MmiMessageId idMsgEnd,
+                                                                const int32_t fd)
 {
     MMI_LOGD("enter");
     MmiMessageId idMsg = static_cast<MmiMessageId>(static_cast<int32_t>(idMsgBegin) + 1);
@@ -205,3 +202,5 @@ void OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleByIdMsage(const
     }
     MMI_LOGD("leave");
 }
+} // namespace MMI
+} // namespace OHOS
