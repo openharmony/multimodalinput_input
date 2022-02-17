@@ -35,7 +35,7 @@ ServerInputFilterManager::PointerEventFilter::PointerEventFilter(int32_t id, std
 
 void ServerInputFilterManager::DeleteFilterFromSess(SessionPtr sess)
 {
-    CHKP(sess);
+    CHKPV(sess);
     auto it = keyEventFilterMap_.find(sess);
     if (it == keyEventFilterMap_.end()) {
         MMI_LOGD("This sess have not any filter");
@@ -423,7 +423,7 @@ int32_t ServerInputFilterManager::UnregisterEventInterceptorforServer(const Sess
 
 void ServerInputFilterManager::DeleteInterceptorFormSess(const SessionPtr& sess)
 {
-    CHKP(sess);
+    CHKPV(sess);
     auto it = pointerEventFilterMap_.find(sess);
     if (it == pointerEventFilterMap_.end()) {
         MMI_LOGD("This sess have not any interceptor");

@@ -30,8 +30,8 @@ namespace MMI {
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "UDSServer"};
     }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 OHOS::MMI::UDSServer::UDSServer()
 {
@@ -271,7 +271,7 @@ bool OHOS::MMI::UDSServer::StartServer()
 
 void OHOS::MMI::UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
 {
-    CHKP(buf);
+    CHKPV(buf);
     CHK(fd >= 0, PARAM_INPUT_INVALID);
     auto sess = GetSession(fd);
     CHK(sess, ERROR_NULL_POINTER);

@@ -40,7 +40,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(libinput_event *event)
     MMI_LOGD("Enter");
     CHKP(event);
     auto data = libinput_event_get_touchpad_event(event);
-    CHKP(data);
+    CHKPV(data);
     auto seatSlot = libinput_event_touchpad_get_seat_slot(data);
     auto logicalX = libinput_event_touchpad_get_x(data);
     auto logicalY = libinput_event_touchpad_get_y(data);
@@ -68,9 +68,9 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(libinput_event *event)
 void TouchPadTransformPointProcessor::OnEventTouchPadMotion(libinput_event *event)
 {
     MMI_LOGD("Enter");
-    CHKP(event);
+    CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
-    CHKP(data);
+    CHKPV(data);
     auto seatSlot = libinput_event_touchpad_get_seat_slot(data);
     auto logicalX = libinput_event_touchpad_get_x(data);
     auto logicalY = libinput_event_touchpad_get_y(data);
@@ -90,9 +90,9 @@ void TouchPadTransformPointProcessor::OnEventTouchPadMotion(libinput_event *even
 void TouchPadTransformPointProcessor::OnEventTouchPadUp(libinput_event *event)
 {
     MMI_LOGD("Enter");
-    CHKP(event);
+    CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
-    CHKP(data);
+    CHKPV(data);
     auto seatSlot = libinput_event_touchpad_get_seat_slot(data);
     auto logicalX = libinput_event_touchpad_get_x(data);
     auto logicalY = libinput_event_touchpad_get_y(data);
@@ -115,7 +115,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
     libinput_event *event)
 {
     MMI_LOGD("begin");
-    CHKPRP(event, nullptr);
+    CHKPP(event, nullptr);
     auto type = libinput_event_get_type(event);
     pointerEvent_->UpdateId();
     switch (type) {

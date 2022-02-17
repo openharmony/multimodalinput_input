@@ -103,5 +103,5 @@ void MouseDeviceState::ChangeMouseState(const BUTTON_STATE btnState, int32_t &bt
         btnStateCount = 0;
     }
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
