@@ -796,4 +796,4 @@ HWTEST_F(DeviceBaseTest, Test_SetThrottle, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].event.value, value);
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
-}
+} // namespace

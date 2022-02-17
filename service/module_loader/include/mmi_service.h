@@ -56,7 +56,7 @@ protected:
     bool ChkAuthFd(int32_t fd) const;
 
     bool InitLibinputService();
-    bool InitSAService();
+    bool InitService();
     bool InitSignalHandler();
     int32_t Init();
 

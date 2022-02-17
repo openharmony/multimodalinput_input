@@ -48,4 +48,4 @@ HWTEST_F(GetDeviceNodeTest, Test_GetDeviceNodeTestCmdError, TestSize.Level1)
     auto ret = getDeviceNode.ExecuteCmd(cmd, cmdResult);
     EXPECT_GT(ret, 0);
 }
-}
+} // namespace

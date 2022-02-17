@@ -68,6 +68,6 @@ private:
     void AnalysisTouchScreenToInputData(InputEventArray& inputEventArray,
                                         const TouchSingleEventData& touchSingleEventData);
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // PROCESSING_TOUCH_SCREEN_DEVICE_H

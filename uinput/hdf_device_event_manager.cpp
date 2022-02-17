@@ -64,8 +64,8 @@ void HdfDeviceEventManager::ConnectHDFInit()
         ret = inputInterface_->iInputReporter->RegisterReportCallback(TOUCH_DEV_ID, &callback_);
     }
 }
-}  // namespace MMIS
-}  // namespace OHOS
+} // namespace MMIS
+} // namespace OHOS
 
 int32_t main()
 {

@@ -72,8 +72,8 @@ int32_t MultimodalEventHandler::RegisterStandardizedEventHandle(const sptr<IRemo
     int32_t windowId, StandEventPtr standardizedEventHandle)
 {
 #ifdef OHOS_WESTEN_MODEL
+    MMI_LOGD("start!");
     KMSG_LOGI("Register Standardized Event Handle start!");
-    MMI_LOGT("Register Standardized Event Handle start!");
     int32_t ret = OHOS::MMI_STANDARD_EVENT_SUCCESS;
     EventRegesterInfo regInfo = {};
     if (client_ && client_->GetCurrentConnectedStatus()) {
@@ -89,7 +89,7 @@ int32_t MultimodalEventHandler::RegisterStandardizedEventHandle(const sptr<IRemo
         MMI_LOGE("init client failed!");
         return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
-    MMI_LOGT("Register Standardized Event Handle end!");
+    MMI_LOGD("end!");
     return ret;
 #else
     return RET_OK;
