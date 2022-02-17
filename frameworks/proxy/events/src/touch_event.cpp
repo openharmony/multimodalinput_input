@@ -117,12 +117,11 @@ const MultimodalEvent *TouchEvent::GetMultimodalEvent() const
 
 int32_t TouchEvent::GetPointToolType(int32_t index) const
 {
-    int32_t tableToolType = 0;
-
     if (index < 0) {
         return 0;
     }
 
+    int32_t tableToolType = 0;
     switch (mIndex_) {
         case TABLET_TOOL_TYPE_PEN: {
             tableToolType = BUTTON_TOOL_PEN;
