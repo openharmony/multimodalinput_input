@@ -161,10 +161,10 @@ public:
     virtual int32_t GetMatchMode() const;
 
 private:
-    int32_t mAction_ = 0;
-    int32_t mScene_ = 0;
-    int32_t mMode_ = 0;
-    std::string mActionProperty_ = "";
+    int32_t action_ = 0;
+    int32_t scene_ = 0;
+    int32_t mode_ = 0;
+    std::string actionProperty_ = "";
 };
 } // namespace OHOS
 #endif // SPEECH_EVENT_H

@@ -23,14 +23,14 @@
 
 namespace OHOS {
 namespace MMI {
-InputManager *InputManager::mInstance_ = nullptr;
+InputManager *InputManager::instance_ = nullptr;
 
 InputManager *InputManager::GetInstance()
 {
-    if (mInstance_ == nullptr) {
-        mInstance_ = new InputManager();
+    if (instance_ == nullptr) {
+        instance_ = new InputManager();
     }
-    return mInstance_;
+    return instance_;
 }
 
 void InputManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
