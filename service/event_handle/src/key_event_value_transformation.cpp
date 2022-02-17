@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
             LOG_CORE, MMI_LOG_DOMAIN, "KeyEventValueTransformations"
         };
     }
@@ -525,5 +525,5 @@ uint32_t KeyEventValueTransformation::KeyboardHandleKeySym(uint32_t keyboardKey)
     MMI_LOGD("leave");
     return sym;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

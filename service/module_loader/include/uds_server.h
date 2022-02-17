@@ -90,6 +90,6 @@ protected:
     std::map<int32_t, int32_t> idxPidMap_ = {};
     std::list<std::function<void(SessionPtr)>> callbacks_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // UDS_SERVER_H

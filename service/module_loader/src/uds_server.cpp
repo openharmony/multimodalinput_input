@@ -30,8 +30,8 @@ namespace MMI {
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "UDSServer"};
     }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 OHOS::MMI::UDSServer::UDSServer()
 {
@@ -136,8 +136,8 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName,
     const int32_t moduleType, int32_t& serverFd, const int32_t uid,
     const int32_t pid, int32_t& toReturnClientFd)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mux_);
-    MMI_LOGT("enter.");
     const int32_t NUMBER_TWO = 2;
     int32_t sockFds[NUMBER_TWO] = {};
 
@@ -271,7 +271,7 @@ bool OHOS::MMI::UDSServer::StartServer()
 
 void OHOS::MMI::UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
 {
-    CHKP(buf);
+    CHKPV(buf);
     CHK(fd >= 0, PARAM_INPUT_INVALID);
     auto sess = GetSession(fd);
     CHK(sess, ERROR_NULL_POINTER);
