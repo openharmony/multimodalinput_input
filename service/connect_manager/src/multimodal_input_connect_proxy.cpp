@@ -51,7 +51,7 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
         return ERR_INVALID_VALUE;
     }
 
-    ConnectDefReqParcel req;
+    ConnectReqParcel req;
     req.data.moduleId = moduleType;
     req.data.clientName = programName;
     if (!data.WriteParcelable(&req)) {

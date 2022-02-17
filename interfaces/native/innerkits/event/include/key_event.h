@@ -16,6 +16,7 @@
 #define KEY_EVENT_H
 #include <memory>
 #include <vector>
+#include "nocopyable.h"
 #include "parcel.h"
 #include "input_event.h"
 
@@ -1472,7 +1473,11 @@ public:
     static std::shared_ptr<KeyEvent> Clone(std::shared_ptr<KeyEvent> keyEvent);
 
 public:
+    KeyEvent(const KeyEvent& other);
+    KeyEvent& operator=(const KeyEvent& other) = delete;
+    DISALLOW_MOVE(KeyEvent);
     virtual ~KeyEvent();
+
     static std::shared_ptr<KeyEvent> Create();
     // Get or change the key code of the device.
     // Only one key will change in an event report

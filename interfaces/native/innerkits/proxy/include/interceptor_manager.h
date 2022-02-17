@@ -19,12 +19,14 @@
 #include "pointer_event.h"
 #include "singleton.h"
 #include "multimodal_event_handler.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class InterceptorManager {
 public:
     InterceptorManager();
+    DISALLOW_COPY_AND_MOVE(InterceptorManager);
     ~InterceptorManager();
     int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
     int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);

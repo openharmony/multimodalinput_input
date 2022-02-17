@@ -30,6 +30,6 @@ namespace MMI {
         virtual const std::vector<uint32_t>& GetProperties() const override;
         virtual const std::vector<uint32_t>& GetAbs() const override;
     };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif  // VIRTUAL_TOUCHSCREEN_H

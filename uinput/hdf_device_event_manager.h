@@ -43,7 +43,7 @@ private:
     InputEventCb callback_;
     const uint32_t TOUCH_DEV_ID = 1;
 };
-}  // namespace MMIS
-}  // namespace OHOS
+} // namespace MMIS
+} // namespace OHOS
 
 #endif  // HDF_DEVICE_EVENT_MANAGER_H

@@ -16,6 +16,7 @@
 #define BUILTINKEY_EVENT_H
 
 #include "key_event_pre.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 /**
@@ -31,6 +32,8 @@ namespace OHOS {
  */
 class BuiltinKeyEvent : public KeyEvent {
 public:
+    BuiltinKeyEvent() = default;
+    DISALLOW_COPY_AND_MOVE(BuiltinKeyEvent);
     virtual ~BuiltinKeyEvent();
 };
 } // namespace OHOS

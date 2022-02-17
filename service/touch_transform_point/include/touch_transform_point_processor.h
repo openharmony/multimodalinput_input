@@ -19,22 +19,25 @@
 #include <memory>
 #include "pointer_event.h"
 #include "input_windows_manager.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class TouchTransformPointProcessor {
 public:
     TouchTransformPointProcessor(int32_t deviceId);
+    DISALLOW_COPY_AND_MOVE(TouchTransformPointProcessor);
     ~TouchTransformPointProcessor();
     std::shared_ptr<PointerEvent> OnLibinputTouchEvent(libinput_event *event);
     void SetPointEventSource(int32_t sourceType);
 private:
-    void OnEventTouchDown(libinput_event *event);
-    void OnEventTouchMotion(libinput_event *event);
-    void OnEventTouchUp(libinput_event *event);
+    bool OnEventTouchDown(libinput_event *event);
+    bool OnEventTouchMotion(libinput_event *event);
+    bool OnEventTouchUp(libinput_event *event);
 private:
     int32_t deviceId_;
     std::shared_ptr<PointerEvent> pointerEvent_;
+    Direction direction_ {Direction0};
 };
 } // namespace MMI
 } // namespace OHOS

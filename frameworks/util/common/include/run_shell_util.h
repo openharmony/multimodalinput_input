@@ -19,12 +19,14 @@
 #include <regex>
 #include <string>
 #include <vector>
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class RunShellUtil {
 public:
     RunShellUtil();
+    DISALLOW_COPY_AND_MOVE(RunShellUtil);
     ~RunShellUtil();
     int32_t RunShellCommand(const std::string &command, std::vector<std::string> &vLog);
     int32_t SetLogMaxSize(int32_t logSize);

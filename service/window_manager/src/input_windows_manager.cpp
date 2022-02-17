@@ -64,6 +64,7 @@ bool OHOS::MMI::InputWindowsManager::Init(UDSServer& udsServer)
 {
     // save server handle
     udsServer_ = &udsServer;
+#ifdef OHOS_WESTEN_MODEL
     SetSeatListener([]() {
         WinMgr->UpdateSeatsInfo();
     });
@@ -72,6 +73,7 @@ bool OHOS::MMI::InputWindowsManager::Init(UDSServer& udsServer)
     });
     UpdateSeatsInfo();
     UpdateScreensInfo();
+#endif
     return true;
 }
 
@@ -201,7 +203,7 @@ void OHOS::MMI::InputWindowsManager::PrintDebugInfo()
 
 size_t OHOS::MMI::InputWindowsManager::GetSurfaceIdList(std::vector<int32_t>& ids)
 {
-    const int32_t TEST_THREE_WINDOWS = 3;
+    constexpr int32_t TEST_THREE_WINDOWS = 3;
     std::lock_guard<std::mutex> lock(mu_);
     for (const auto &item : surfaces_) {
         if (item.second.surfaceId != focusInfoID_ && TEST_THREE_WINDOWS != item.second.surfaceId) {
@@ -284,7 +286,6 @@ void OHOS::MMI::InputWindowsManager::Dump(int32_t fd)
 void OHOS::MMI::InputWindowsManager::SaveScreenInfoToMap(const ScreenInfo** screenInfo)
 {
     // check param
-    CHK(udsServer_, ERROR_NULL_POINTER);
     CHK(screenInfo, ERROR_NULL_POINTER);
     CHK(*screenInfo, ERROR_NULL_POINTER);
 
@@ -517,7 +518,7 @@ int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<Input
 void OHOS::MMI::InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
     const std::vector<LogicalDisplayInfo> &logicalDisplays)
 {
-    MMI_LOGD("InputWindowsManager::UpdateDisplayInfo enter");
+    MMI_LOGD("enter");
     physicalDisplays_.clear();
     logicalDisplays_.clear();
     windowInfos_.clear();
@@ -536,7 +537,7 @@ void OHOS::MMI::InputWindowsManager::UpdateDisplayInfo(const std::vector<Physica
         PointerDrawMgr->TellDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
     }
     PrintDisplayDebugInfo();
-    MMI_LOGD("InputWindowsManager::UpdateDisplayInfo leave");
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
@@ -610,7 +611,36 @@ OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::FindPhysicalDisp
     return nullptr;
 }
 
-bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(libinput_event_touch* touch,
+void OHOS::MMI::InputWindowsManager::TurnTouchScreen(PhysicalDisplayInfo* info, Direction direction,
+    int32_t& logicalX, int32_t& logicalY)
+{
+    if (direction == Direction0) {
+        MMI_LOGD("direction is Direction0");
+        return;
+    }
+    if (direction == Direction90) {
+        MMI_LOGD("direction is Direction90");
+        int32_t temp = logicalX;
+        logicalX = info->logicHeight - logicalY;
+        logicalY = temp;
+        MMI_LOGD("logicalX is %{public}d, logicalY is %{public}d", logicalX, logicalY);
+        return;
+    }
+    if (direction == Direction180) {
+        MMI_LOGD("direction is Direction180");
+        logicalX = info->logicWidth - logicalX;
+        logicalY = info->logicHeight - logicalY;
+        return;
+    }
+    if (direction == Direction270) {
+        MMI_LOGD("direction is Direction270");
+        int32_t temp = logicalY;
+        logicalY = info->logicWidth - logicalX;
+        logicalX = temp;
+    }
+}
+
+bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(libinput_event_touch* touch, Direction& direction,
     int32_t &globalLogicalX, int32_t &globalLogicalY)
 {
     CHKPF(touch);
@@ -622,14 +652,14 @@ bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(libinput_event_touc
         return false;
     }
 
-    auto width = libinput_event_touch_get_x_transformed(touch, info->width) + info->topLeftX;
-    auto height = libinput_event_touch_get_y_transformed(touch, info->height) + info->topLeftY;
-    if ((width >= INT32_MAX) || (height >= INT32_MAX)) {
+    auto physicalX = libinput_event_touch_get_x_transformed(touch, info->width) + info->topLeftX;
+    auto physicalY = libinput_event_touch_get_y_transformed(touch, info->height) + info->topLeftY;
+    if ((physicalX >= INT32_MAX) || (physicalY >= INT32_MAX)) {
         MMI_LOGE("Physical display coordinates are out of range");
         return false;
     }
-    int32_t localPhysicalX = static_cast<int32_t>(width);
-    int32_t localPhysicalY = static_cast<int32_t>(height);
+    int32_t localPhysicalX = static_cast<int32_t>(physicalX);
+    int32_t localPhysicalY = static_cast<int32_t>(physicalY);
 
     auto logicX = (1L * info->logicWidth * localPhysicalX / info->width);
     auto logicY = (1L * info->logicHeight * localPhysicalY / info->height);
@@ -640,35 +670,50 @@ bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(libinput_event_touc
     int32_t localLogcialX = (int32_t)(logicX);
     int32_t localLogcialY = (int32_t)(logicY);
 
+    direction = info->direction;
+    TurnTouchScreen(info, direction, localLogcialX, localLogcialY);
+
     globalLogicalX = localLogcialX;
     globalLogicalY = localLogcialY;
 
     for (auto left = GetPhysicalDisplay(info->leftDisplayId); left != nullptr;
         left = GetPhysicalDisplay(left->leftDisplayId)) {
-        globalLogicalX += left->logicWidth;
+        if (direction == Direction0 || direction == Direction180) {
+            globalLogicalX += left->logicWidth;
+        }
+        if (direction == Direction90 || direction == Direction270) {
+            globalLogicalX += left->logicHeight;
+        }
     }
 
     for (auto upper = GetPhysicalDisplay(info->upDisplayId); upper != nullptr;
         upper = GetPhysicalDisplay(upper->upDisplayId)) {
-        globalLogicalY += upper->logicHeight;
+        if (direction == Direction0 || direction == Direction180) {
+            globalLogicalY += upper->logicHeight;
+        }
+        if (direction == Direction90 || direction == Direction270) {
+            globalLogicalY += upper->logicWidth;
+        }
     }
 
     return true;
 }
 
-bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(libinput_event_touch* touch,
+bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(libinput_event_touch* touch, Direction& direction,
     int32_t targetDisplayId, int32_t& displayX, int32_t& displayY)
 {
     CHKPF(touch);
     int32_t globalLogicalX;
     int32_t globalLogicalY;
-    auto isTransform = TransformOfDisplayPoint(touch, globalLogicalX, globalLogicalY);
+    auto isTransform = TransformOfDisplayPoint(touch, direction, globalLogicalX, globalLogicalY);
     if (!isTransform) {
         return isTransform;
     }
 
     for (const auto &display : logicalDisplays_) {
         if (targetDisplayId == display.id ) {
+            MMI_LOGD("targetDisplayId is %{public}d, displayX is %{public}d, displayY is %{public}d ",
+                targetDisplayId, displayX, displayY);
             displayX = globalLogicalX - display.topLeftX;
             displayY = globalLogicalY - display.topLeftY;
         }
@@ -678,13 +723,13 @@ bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(libinput_eve
     return false;
 }
 
-bool OHOS::MMI::InputWindowsManager::TouchDownPointToDisplayPoint(libinput_event_touch* touch,
+bool OHOS::MMI::InputWindowsManager::TouchDownPointToDisplayPoint(libinput_event_touch* touch, Direction& direction,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
 {
     CHKPF(touch);
     int32_t globalLogicalX;
     int32_t globalLogicalY;
-    auto isTransform = TransformOfDisplayPoint(touch, globalLogicalX, globalLogicalY);
+    auto isTransform = TransformOfDisplayPoint(touch, direction, globalLogicalX, globalLogicalY);
     if (!isTransform) {
         return isTransform;
     }
@@ -701,6 +746,8 @@ bool OHOS::MMI::InputWindowsManager::TouchDownPointToDisplayPoint(libinput_event
         logicalDisplayId = display.id;
         logicalX = globalLogicalX - display.topLeftX;
         logicalY = globalLogicalY - display.topLeftY;
+        MMI_LOGD("targetDisplayId is %{public}d, displayX is %{public}d, displayY is %{public}d ",
+            logicalDisplayId, logicalX, logicalY);
         return true;
     }
 
@@ -958,7 +1005,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<Poi
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("UpdateTargetPointer begin");
+    MMI_LOGD("enter");
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto source = pointerEvent->GetSourceType();
     switch (source) {
@@ -977,6 +1024,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTargetPointer(std::shared_ptr<Poin
         }
     }
     MMI_LOGE("Source is not of the correct type, source:%{public}d", source);
+    MMI_LOGD("leave");
     return RET_ERR;
 }
 

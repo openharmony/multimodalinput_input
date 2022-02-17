@@ -66,4 +66,4 @@ HWTEST_F(GetDeviceObjectTest, Test_GetDeviceObjectTestNotFindDevice, TestSize.Le
     }
     EXPECT_EQ(result, true);
 }
-}
+} // namespace

@@ -263,9 +263,9 @@ void PrintWMSInfo(const std::string& str, const int32_t fd, const int32_t abilit
     MMI_LOGT("CALL_AMS, fd:%{public}d,abilityID:%{public}d", fd, abilityId);
 }
 
-int GetPid()
+int32_t GetPid()
 {
-    return (int)getpid();
+    return static_cast<int32_t>(getpid());
 }
 
 std::string GetFileName(const std::string& strPath)
@@ -430,6 +430,21 @@ size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_
     std::sort(l2.begin(), l2.end());
     std::set_difference(l1.begin(), l1.end(), l2.begin(), l2.end(), std::back_inserter(difList));
     return difList.size();
+}
+
+std::string StringFmt(const char* str, ...)
+{
+    CHKR(str != nullptr, PARAM_INPUT_INVALID, "");
+    va_list args;
+    va_start(args, str);
+    char buf[MAX_PACKET_BUF_SIZE] = {};
+    if (vsnprintf_s(buf, sizeof(buf), sizeof(buf) - 1, str, args) == -1) {
+        MMI_LOGE("vsnprintf_s error");
+        va_end(args);
+        return "";
+    }
+    va_end(args);
+    return buf;
 }
 
 } // namespace MMI

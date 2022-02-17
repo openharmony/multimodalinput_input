@@ -17,6 +17,7 @@
 #define TOUCH_EVENT_H
 #include "manipulation_event.h"
 #include "mouse_event.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 enum TouchEnum {
@@ -155,6 +156,8 @@ enum TouchEnum {
  */
 class TouchEvent : public ManipulationEvent {
 public:
+    TouchEvent() = default;
+    DISALLOW_COPY_AND_MOVE(TouchEvent);
     virtual ~TouchEvent();
     /**
     * initialize the object.
