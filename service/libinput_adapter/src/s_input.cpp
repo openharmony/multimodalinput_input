@@ -16,7 +16,7 @@
 #include "s_input.h"
 #include <climits>
 #include <fcntl.h>
-#include <inttypes.h>
+#include <cinttypes>
 #include <sys/epoll.h>
 #include <unistd.h>
 #include "libmmi_util.h"
@@ -58,7 +58,7 @@ void OHOS::MMI::SInput::LoginfoPackagingTool(libinput_event *event)
     InitHiLogFunc(context);
 }
 
-const static libinput_interface LIBINPUT_INTERFACE = {
+constexpr static libinput_interface LIBINPUT_INTERFACE = {
     .open_restricted = [](const char *path, int32_t flags, void *user_data)->int32_t {
         using namespace OHOS::MMI;
         CHKPR(path, errno);

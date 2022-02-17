@@ -19,12 +19,14 @@
 #include <memory>
 #include "pointer_event.h"
 #include "input_windows_manager.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class GestureTransformPointProcessor {
 public:
     GestureTransformPointProcessor(int32_t deviceId);
+    DISALLOW_COPY_AND_MOVE(GestureTransformPointProcessor);
     ~GestureTransformPointProcessor();
     std::shared_ptr<PointerEvent> OnTouchPadGestrueEvent(libinput_event *event);
     void SetPointEventSource(int32_t sourceType);

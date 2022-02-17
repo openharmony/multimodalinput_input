@@ -506,6 +506,13 @@ std::shared_ptr<KeyEvent> KeyEvent::from(std::shared_ptr<InputEvent> inputEvent)
 
 KeyEvent::KeyEvent(int32_t eventType) : InputEvent(eventType) {}
 
+KeyEvent::KeyEvent(const KeyEvent& other)
+    : InputEvent(other),
+    keyCode_(other.keyCode_),
+    keys_(other.keys_),
+    keyAction_(other.keyAction_)
+{}
+
 KeyEvent::~KeyEvent() {}
 
 std::shared_ptr<KeyEvent> KeyEvent::Create()

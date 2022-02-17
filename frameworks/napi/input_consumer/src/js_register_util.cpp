@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include "js_register_util.h"
-#include <inttypes.h>
+#include <cinttypes>
 
 namespace OHOS {
 namespace MMI {

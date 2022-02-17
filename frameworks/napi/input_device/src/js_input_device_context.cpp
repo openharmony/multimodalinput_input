@@ -23,15 +23,15 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN,
 
 JsInputDeviceContext::JsInputDeviceContext()
 {
-    jsInputDeviceMgr_ = std::make_shared<JsInputDeviceManager>();
-    CHKPL(jsInputDeviceMgr_);
+    mager_ = std::make_shared<JsInputDeviceManager>();
+    CHKPL(mager_);
 }
 
 JsInputDeviceContext::~JsInputDeviceContext()
 {
     std::lock_guard<std::mutex> guard(mtx_);
-    auto jsInputDeviceMgr =  jsInputDeviceMgr_;
-    jsInputDeviceMgr_.reset();
+    auto jsInputDeviceMgr =  mager_;
+    mager_.reset();
     if (jsInputDeviceMgr) {
         jsInputDeviceMgr->ResetEnv();
     }
@@ -183,7 +183,7 @@ JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
 
 std::shared_ptr<JsInputDeviceManager> JsInputDeviceContext::GetJsInputDeviceMgr()
 {
-    return jsInputDeviceMgr_;
+    return mager_;
 }
 
 napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info info)
