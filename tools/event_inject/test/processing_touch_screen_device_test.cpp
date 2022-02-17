@@ -100,4 +100,4 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataSingl
     system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);
 }
-}
+} // namespace

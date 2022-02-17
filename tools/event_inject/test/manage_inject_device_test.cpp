@@ -103,4 +103,4 @@ HWTEST_F(ManageInjectDeviceTest, Test_SendEventToDeviveNodeError, TestSize.Level
     auto ret = manageInjectDevice.SendEventToDeviveNode(inputEventArray);
     EXPECT_EQ(ret, RET_ERR);
 }
-}
+} // namespace

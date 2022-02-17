@@ -19,30 +19,30 @@
 #include "device_base.h"
 
 namespace OHOS {
-    namespace MMI {
-        class ProcessingGamePadDevice : public DeviceBase {
-            struct GamePadEvent {
-                std::string eventType;
-                std::string direction;
-                int32_t keyValue;
-                int32_t blockTime;
-                std::vector<int32_t> gameEvents;
-            };
-        public:
-            ProcessingGamePadDevice() = default;
-            ~ProcessingGamePadDevice() = default;
-            int32_t TransformJsonDataToInputData(const Json& originalEvent, InputEventArray& inputEventArray);
-        private:
-            int32_t AnalysisGamePadEvent(const Json& inputData, std::vector<GamePadEvent>& padEventArray);
-            void TransformPadEventToInputEvent(const std::vector<GamePadEvent>& padEventArray,
-                                               InputEventArray& inputEventArray);
-            void TransformKeyPressEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray);
-            void TransformKeyReleaseEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray);
-            void TransformKeyClickEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray);
-            void TransformRocker1Event(const GamePadEvent& padEvent, InputEventArray& inputEventArray);
-            void TransformRocker2Event(const GamePadEvent& padEvent, InputEventArray& inputEventArray);
-            void TransformDerectionKeyEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray);
-        };
-    }
-}
+namespace MMI {
+class ProcessingGamePadDevice : public DeviceBase {
+    struct GamePadEvent {
+        std::string eventType;
+        std::string direction;
+        int32_t keyValue;
+        int32_t blockTime;
+        std::vector<int32_t> gameEvents;
+    };
+public:
+    ProcessingGamePadDevice() = default;
+    ~ProcessingGamePadDevice() = default;
+    int32_t TransformJsonDataToInputData(const Json& originalEvent, InputEventArray& inputEventArray);
+private:
+    int32_t AnalysisGamePadEvent(const Json& inputData, std::vector<GamePadEvent>& padEventArray);
+    void TransformPadEventToInputEvent(const std::vector<GamePadEvent>& padEventArray,
+                                       InputEventArray& inputEventArray);
+    void TransformKeyPressEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray);
+    void TransformKeyReleaseEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray);
+    void TransformKeyClickEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray);
+    void TransformRocker1Event(const GamePadEvent& padEvent, InputEventArray& inputEventArray);
+    void TransformRocker2Event(const GamePadEvent& padEvent, InputEventArray& inputEventArray);
+    void TransformDerectionKeyEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray);
+};
+} // namespace MMI
+} // namespace OHOS
 #endif // PROCESSING_GAME_PAD_DEVICE_H

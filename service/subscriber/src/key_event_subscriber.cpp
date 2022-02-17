@@ -62,12 +62,12 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
 
 int32_t KeyEventSubscriber::UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
 {
-    MMI_LOGT("Enter, subscribeId:%{public}d", subscribeId);
+    MMI_LOGD("enter, subscribeId:%{public}d", subscribeId);
     for (auto it = subscribers_.begin(); it != subscribers_.end(); ++it) {
         if ((*it)->id_ == subscribeId && (*it)->sess_ == sess) {
             ClearTimer(*it);
             subscribers_.erase(it);
-            MMI_LOGD("Leave");
+            MMI_LOGD("leave");
             return RET_OK;
         }
     }
@@ -183,7 +183,7 @@ bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
         return false;
     }
     subscriber->keyEvent_ = keyEvent_;
-    MMI_LOGT("Leave, add timer success, subscribeId:%{public}d,"
+    MMI_LOGD("leave, add timer success, subscribeId:%{public}d,"
         "duration:%{public}d,timerId:%{public}d",
         subscriber->id_, keyOption->GetFinalKeyDownDuration(), subscriber->timerId_);
     return true;
@@ -203,14 +203,13 @@ void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscribe
     subscriber->keyEvent_.reset();
     subscriber->timerId_ = -1;
     TimerMgr->RemoveTimer(timerId);
-    MMI_LOGT("Leave, subscribeId:%{public}d,subscribeId:%{public}d", subscriber->id_, timerId);
+    MMI_LOGD("leave, subscribeId:%{public}d,subscribeId:%{public}d", subscriber->id_, timerId);
 }
 
 void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
 {
     MMI_LOGD("Enter");
     CHKPV(subscriber);
-
     subscriber->timerId_ = -1;
     if (subscriber->keyEvent_ == nullptr) {
         MMI_LOGE("Leave, subscriber->keyEvent is nullptr, subscribeId:%{public}d", subscriber->id_);
@@ -219,7 +218,7 @@ void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
 
     NotifySubscriber(subscriber->keyEvent_, subscriber);
     subscriber->keyEvent_.reset();
-    MMI_LOGT("Leave, subscribeId:%{public}d", subscriber->id_);
+    MMI_LOGD("leave, subscribeId:%{public}d", subscriber->id_);
 }
 
 bool KeyEventSubscriber::InitSessionDeleteCallback()
@@ -286,7 +285,7 @@ bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent
         }
     }
 
-    MMI_LOGT("Leave %{public}s", handled ? "true" : "false");
+    MMI_LOGD("leave %{public}s", handled ? "true" : "false");
     return handled;
 }
 
@@ -345,7 +344,7 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
         handled = true;
     }
 
-    MMI_LOGT("Leave %{public}s", handled ? "true" : "false");
+    MMI_LOGD("leave %{public}s", handled ? "true" : "false");
     return handled;
 }
 

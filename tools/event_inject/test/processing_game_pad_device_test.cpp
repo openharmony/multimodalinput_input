@@ -197,4 +197,4 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
     system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);
 }
-}
+} // namespace
