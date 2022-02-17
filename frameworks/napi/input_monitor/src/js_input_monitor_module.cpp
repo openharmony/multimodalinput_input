@@ -156,13 +156,13 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
 EXTERN_C_START
 static napi_value MmiInputMonitorInit(napi_env env, napi_value exports)
 {
-    MMI_LOGD("MmiInputMonitorInit: Enter");
+    MMI_LOGD("Enter");
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
-    MMI_LOGD("MmiInputMonitorInit: success");
+    MMI_LOGD("Leave");
     return exports;
 }
 EXTERN_C_END

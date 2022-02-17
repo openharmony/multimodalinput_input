@@ -68,7 +68,7 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int moduleType)
 
 int32_t MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair() const
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     MMI_LOGD("leave");
     return socketFd_;
 }

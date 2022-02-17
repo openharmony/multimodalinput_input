@@ -395,7 +395,7 @@ bool MMIService::InitSignalHandler()
         return false;
     }
 
-    MMI_LOGD("success");
+    MMI_LOGD("Leave");
     return true;
 }
 

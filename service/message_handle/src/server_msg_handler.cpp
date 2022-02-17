@@ -351,13 +351,13 @@ int32_t OHOS::MMI::ServerMsgHandler::CheckReplyMessageFormClient(SessionPtr sess
 
 int32_t OHOS::MMI::ServerMsgHandler::NewCheckReplyMessageFormClient(SessionPtr sess, NetPacket& pkt)
 {
+    MMI_LOGD("begin");
     CHKPR(sess, ERROR_NULL_POINTER);
-    MMI_LOGT("begin");
     int32_t id = 0;
     pkt >> id;
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     sess->DelEvents(id);
-    MMI_LOGT("end");
+    MMI_LOGD("end");
     return RET_OK;
 }
 

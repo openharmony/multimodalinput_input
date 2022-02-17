@@ -42,7 +42,7 @@ std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent()
 
 void MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttionId_);
 
@@ -97,7 +97,7 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
         constexpr int32_t timeout = 100; // 100 ms
         std::weak_ptr<MouseEventHandler> weakPtr = shared_from_this();
         timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
-            MMI_LOGT("enter");
+            MMI_LOGD("enter");
             auto sharedPtr = weakPtr.lock();
             CHKPV(sharedPtr);
             MMI_LOGD("timer:%{public}d", sharedPtr->timerId_);
@@ -106,7 +106,7 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
             CHKPV(pointerEvent);
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
             InputHandler->OnMouseEventEndTimerHandler(pointerEvent);
-            MMI_LOGD("leave, axis end");
+            MMI_LOGD("leave");
         });
 
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
@@ -126,7 +126,7 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
 void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t deviceId,
                                         PointerEvent::PointerItem& pointerItem)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
 
     auto mouseInfo = WinMgr->GetMouseInfo();
     MouseState->SetMouseCoords(mouseInfo.globleX, mouseInfo.globleY);
@@ -154,7 +154,7 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
 
-    MMI_LOGT("leave");
+    MMI_LOGD("leave");
 }
 
 void MouseEventHandler::Normalize(libinput_event *event)
