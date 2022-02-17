@@ -397,7 +397,7 @@ void OHOS::MMI::HdfEventManager::GetEventCallback(const EventPackage **pkgs, uin
 {
     MMI_LOGD("enter");
     const uint16_t byteSize = 8;
-    CHKP(pkgs);
+    CHKPV(pkgs);
     input_event eventarry[MAX_EVENT_PKG_NUM];
     for (uint32_t i = 0; i < count && i < MAX_EVENT_PKG_NUM; i++) {
         eventarry[i].code = pkgs[i]->code;

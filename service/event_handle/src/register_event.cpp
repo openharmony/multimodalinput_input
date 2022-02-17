@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RegisterEvent" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RegisterEvent" };
     }
 struct GetModeCode {
     int32_t keystate;
@@ -509,18 +509,18 @@ int32_t RegisterEvent::OnEventTouchMotionGetSign(const EventTouch& touch, MmiMes
     CHKF(touch.time > 0, PARAM_INPUT_INVALID);
     CHKF(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
     auto iter = touchInfos_.find(std::make_pair(touch.deviceId, touch.seatSlot));
-    if (iter != touchInfos_.end()) {
-        iter->second.endX = touch.point.x;
-        iter->second.endY = touch.point.y;
-        iter->second.endTime = touch.time;
-        iter->second.eventType = touch.eventType;
-        iter->second.pressure = touch.pressure;
-        iter->second.area = touch.area;
-        iter->second.seatSlot = touch.seatSlot;
-        iter->second.slot = touch.slot;
-    } else {
+    if (iter == touchInfos_.end()) {
+        MMI_LOGE("Failed to find touchinfo");
         return RET_ERR;
     }
+    iter->second.endX = touch.point.x;
+    iter->second.endY = touch.point.y;
+    iter->second.endTime = touch.time;
+    iter->second.eventType = touch.eventType;
+    iter->second.pressure = touch.pressure;
+    iter->second.area = touch.area;
+    iter->second.seatSlot = touch.seatSlot;
+    iter->second.slot = touch.slot;
 
     if (GetTouchInfoSizeByDeviceId(touch.deviceId) == ONEFINGER) {
         if ((iter->second.beginY >= MINY) && (iter->second.beginY < MINY + REGION) && (iter->second.beginX != MINX) &&
