@@ -23,7 +23,7 @@ namespace MMI {
         LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectDefParcel"
     };
 }
-bool ConnectDefReqParcel::Marshalling(Parcel& out) const
+bool ConnectReqParcel::Marshalling(Parcel& out) const
 {
     MMI_LOGD("enter");
     if (!out.WriteInt32(data.moduleId)) {
@@ -36,10 +36,10 @@ bool ConnectDefReqParcel::Marshalling(Parcel& out) const
     return true;
 }
 
-ConnectDefReqParcel *ConnectDefReqParcel::Unmarshalling(Parcel& in)
+ConnectReqParcel *ConnectReqParcel::Unmarshalling(Parcel& in)
 {
     MMI_LOGD("enter");
-    auto* request = new (std::nothrow) ConnectDefReqParcel();
+    auto* request = new (std::nothrow) ConnectReqParcel();
     if (request == nullptr) {
         return nullptr;
     }
@@ -55,7 +55,7 @@ ConnectDefReqParcel *ConnectDefReqParcel::Unmarshalling(Parcel& in)
     return request;
 }
 
-bool ConnectDefRespParcel::Marshalling(Parcel &out) const
+bool ConnectRespParcel::Marshalling(Parcel &out) const
 {
     MMI_LOGD("enter");
     if (!out.WriteInt32(data.returnCode)) {
@@ -68,10 +68,10 @@ bool ConnectDefRespParcel::Marshalling(Parcel &out) const
     return true;
 }
 
-ConnectDefRespParcel *ConnectDefRespParcel::Unmarshalling(Parcel &in)
+ConnectRespParcel *ConnectRespParcel::Unmarshalling(Parcel &in)
 {
     MMI_LOGD("enter");
-    auto *response = new (std::nothrow) ConnectDefRespParcel();
+    auto *response = new (std::nothrow) ConnectRespParcel();
     if (response == nullptr) {
         return nullptr;
     }
