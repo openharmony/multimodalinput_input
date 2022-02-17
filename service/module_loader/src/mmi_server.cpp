@@ -14,7 +14,7 @@
  */
 
 #include "mmi_server.h"
-#include <inttypes.h>
+#include <cinttypes>
 #include "event_dump.h"
 #include "log.h"
 #include "multimodal_input_connect_service.h"

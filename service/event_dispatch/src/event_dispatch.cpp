@@ -14,7 +14,7 @@
  */
 
 #include "event_dispatch.h"
-#include <inttypes.h>
+#include <cinttypes>
 #include "input-event-codes.h"
 #include "ability_launch_manager.h"
 #include "bytrace.h"
