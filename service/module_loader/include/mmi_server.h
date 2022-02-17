@@ -16,7 +16,6 @@
 #define MMI_SERVER_H
 #include "app_register.h"
 #include "device_register.h"
-#include "expansibility_operation.h"
 #include "server_msg_handler.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
@@ -54,7 +53,6 @@ protected:
 
 protected:
     ServerMsgHandler sMsgHandler_;
-    ExpansibilityOperation expOper_;
 #ifdef  OHOS_BUILD_AI
     SeniorInputFuncProcBase seniorInput_;
 #endif // OHOS_BUILD_AI
@@ -64,7 +62,6 @@ protected:
 #endif
 private:
     int32_t InitUds();
-    int32_t InitExpSoLibrary();
     int32_t InitLibinput();
 };
 } // namespace MMI

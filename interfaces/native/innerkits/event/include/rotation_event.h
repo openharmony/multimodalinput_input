@@ -59,7 +59,7 @@ public:
     virtual float GetRotationValue() const;
 
 private:
-    float mRotationValue_ = 0;
+    float rotationValue_ = 0;
 };
 } // namespace OHOS
 #endif // ROTATION_EVENT_H

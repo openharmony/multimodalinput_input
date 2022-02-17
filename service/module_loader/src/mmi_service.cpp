@@ -162,25 +162,9 @@ bool MMIService::InitSAService()
     return true;
 }
 
-bool MMIService::InitExpSoLibrary()
-{
-    MMI_LOGD("Load Expansibility Operation");
-    auto expConf = GetEnv("EXP_CONF");
-    if (expConf.empty()) {
-        expConf = DEF_EXP_CONFIG;
-    }
-    auto expSOPath = GetEnv("EXP_SOPATH");
-    if (expSOPath.empty()) {
-        expSOPath = DEF_EXP_SOPATH;
-    }
-    expOper_.LoadExteralLibrary(expConf.c_str(), expSOPath.c_str());
-    return true;
-}
-
 int32_t MMIService::Init()
 {
     CheckDefine();
-    CHKR(InitExpSoLibrary(), EXP_SO_LIBY_INIT_FAIL, EXP_SO_LIBY_INIT_FAIL);
 
 #ifdef  OHOS_BUILD_AI
     MMI_LOGD("SeniorInput Init");

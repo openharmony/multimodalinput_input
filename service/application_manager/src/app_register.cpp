@@ -37,9 +37,9 @@ AppRegister::~AppRegister()
 bool AppRegister::Init(UDSServer& udsServer)
 {
     MMI_LOGD("enter");
-    mapSurface_.clear();
+    surfaceInfo_.clear();
     waitQueue_.clear();
-    mapConnectState_.clear();
+    connectState_.clear();
     if (mu_.try_lock()) {
         mu_.unlock();
     }
@@ -52,8 +52,8 @@ const AppInfo& AppRegister::FindByWinId(int32_t windowId)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
-    auto it = mapSurface_.find(windowId);
-    if (it != mapSurface_.end()) {
+    auto it = surfaceInfo_.find(windowId);
+    if (it != surfaceInfo_.end()) {
         return it->second;
     }
     MMI_LOGD("leave");
@@ -65,7 +65,7 @@ const AppInfo& AppRegister::FindBySocketFd(int32_t fd)
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     CHKR(fd >= 0, PARAM_INPUT_INVALID, appInfoError_);
-    for (const auto &item : mapSurface_) {
+    for (const auto &item : surfaceInfo_) {
         if (item.second.fd == fd) {
             return item.second;
         }
@@ -78,7 +78,7 @@ void AppRegister::RegisterAppInfoforServer(const AppInfo& appInfo)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
-    mapSurface_.insert(std::pair<int32_t, AppInfo>(appInfo.windowId, appInfo));
+    surfaceInfo_.insert(std::pair<int32_t, AppInfo>(appInfo.windowId, appInfo));
     AddId(fds_, appInfo.fd);
     MMI_LOGD("leave");
 }
@@ -95,10 +95,10 @@ void AppRegister::UnregisterAppInfoBySocketFd(int32_t fd)
 void AppRegister::UnregisterBySocketFd(int32_t fd)
 {
     MMI_LOGD("enter");
-    auto it = mapSurface_.begin();
-    while (it != mapSurface_.end()) {
+    auto it = surfaceInfo_.begin();
+    while (it != surfaceInfo_.end()) {
         if (it->second.fd == fd) {
-            it = mapSurface_.erase(it);
+            it = surfaceInfo_.erase(it);
         } else {
             it++;
         }
@@ -109,18 +109,18 @@ void AppRegister::UnregisterBySocketFd(int32_t fd)
 std::map<int32_t, AppInfo>::iterator AppRegister::EraseAppInfo(const std::map<int32_t, AppInfo>::iterator &it)
 {
     MMI_LOGD("enter");
-    return mapSurface_.erase(it);
+    return surfaceInfo_.erase(it);
 }
 
 std::map<int32_t, AppInfo>::iterator AppRegister::UnregisterAppInfo(int32_t winId)
 {
     MMI_LOGD("enter");
     if (winId <= 0) {
-        return mapSurface_.end();
+        return surfaceInfo_.end();
     }
-    auto itr = mapSurface_.find(winId);
-    if (itr == mapSurface_.end()) {
-        return mapSurface_.end();
+    auto itr = surfaceInfo_.find(winId);
+    if (itr == surfaceInfo_.end()) {
+        return surfaceInfo_.end();
     }
     MMI_LOGD("leave");
     return EraseAppInfo(itr);
@@ -130,7 +130,7 @@ void AppRegister::PrintfMap()
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
-    for (const auto &item : mapSurface_) {
+    for (const auto &item : surfaceInfo_) {
         std::cout << "mapSurface " << item.second.abilityId << ", " << item.second.windowId <<
             ", " << item.second.fd << std::endl;
     }
@@ -141,8 +141,8 @@ void OHOS::MMI::AppRegister::Dump(int32_t fd)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
-    mprintf(fd, "AppInfos: count=%d", mapSurface_.size());
-    for (const auto &item : mapSurface_) {
+    mprintf(fd, "AppInfos: count=%d", surfaceInfo_.size());
+    for (const auto &item : surfaceInfo_) {
         mprintf(fd, "\tabilityId=%d windowId=%d fd=%d bundlerName=%s appName=%s", item.second.abilityId,
                 item.second.windowId, item.second.fd, item.second.bundlerName.c_str(), item.second.appName.c_str());
     }
@@ -164,7 +164,7 @@ int32_t AppRegister::QueryMapSurfaceNum()
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     MMI_LOGD("leave");
-    return static_cast<int32_t>(mapSurface_.size());
+    return static_cast<int32_t>(surfaceInfo_.size());
 }
 
 bool AppRegister::IsMultimodeInputReady(MmiMessageId idMsg, const int32_t findFd, uint64_t inputTime,
@@ -231,8 +231,8 @@ bool AppRegister::CheckFindFdError(const int32_t findFd)
 bool AppRegister::CheckConnectionIsDead(const int32_t findFd)
 {
     MMI_LOGD("enter");
-    if (mapConnectState_.find(findFd) == mapConnectState_.end()) {
-        MMI_LOGE("IsMultimodeInputReady: The connection is dead! fd:%{public}d,errCode:%{public}d",
+    if (connectState_.find(findFd) == connectState_.end()) {
+        MMI_LOGE("IsMultimodeInputReady: The connection is dead! fd:%{public}d, errCode:%{public}d",
                  findFd, CONN_BREAK);
         return false;
     }
@@ -285,7 +285,7 @@ void AppRegister::RegisterConnectState(int32_t fd)
     MMI_LOGD("enter");
     CHK(fd >= 0, PARAM_INPUT_INVALID);
     std::lock_guard<std::mutex> lock(mu_);
-    mapConnectState_.insert(std::pair<int32_t, int8_t>(fd, 0));
+    connectState_.insert(std::pair<int32_t, int8_t>(fd, 0));
     MMI_LOGD("leave");
 }
 
@@ -295,9 +295,9 @@ void AppRegister::UnregisterConnectState(int32_t fd)
     CHK(fd >= 0, PARAM_INPUT_INVALID);
     std::lock_guard<std::mutex> lock(mu_);
 
-    auto iter = mapConnectState_.find(fd);
-    if (iter != mapConnectState_.end()) {
-        mapConnectState_.erase(iter);
+    auto iter = connectState_.find(fd);
+    if (iter != connectState_.end()) {
+        connectState_.erase(iter);
     }
     MMI_LOGD("leave");
 }

@@ -15,7 +15,7 @@
 
 #include "uds_server.h"
 #include <list>
-#include <inttypes.h>
+#include <cinttypes>
 #include <sys/socket.h>
 #include "i_multimodal_input_connect.h"
 #include "log.h"

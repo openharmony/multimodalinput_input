@@ -14,7 +14,7 @@
  */
 
 #include "uds_socket.h"
-#include <inttypes.h>
+#include <cinttypes>
 #include "log.h"
 
 namespace OHOS {

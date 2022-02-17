@@ -33,26 +33,26 @@ void TouchEvent::Initialize(int32_t windowId, int32_t action, int32_t index, flo
     ManipulationEvent::Initialize(windowId, startTime, operationState, pointerCount, fingersInfos,
                                   highLevelEvent, uuid, sourceType, occurredTime, deviceId,
                                   inputDeviceId, isHighLevelEvent, deviceUdevTags);
-    mDeviceEventType_ = deviceEventType;
-    mAction_ = action;
-    mIndex_ = index;
-    mForcePrecision_ = forcePrecision;
-    mMaxForce_ = maxForce;
-    mTapCount_ = tapCount;
-    mIsStandard_ = isStandard;
+    deviceEventType_ = deviceEventType;
+    action_ = action;
+    index_ = index;
+    forcePrecision_ = forcePrecision;
+    maxForce_ = maxForce;
+    tapCount_ = tapCount;
+    isStandard_  = isStandard;
 }
 
 
 void TouchEvent::Initialize(TouchEvent& touchEvent)
 {
     ManipulationEvent::Initialize(touchEvent);
-    mDeviceEventType_ = touchEvent.GetOriginEventType();
-    mAction_ = touchEvent.GetAction();
-    mIndex_ = touchEvent.GetIndex();
-    mForcePrecision_ = touchEvent.GetForcePrecision();
-    mMaxForce_ = touchEvent.GetMaxForce();
-    mTapCount_ = touchEvent.GetTapCount();
-    mIsStandard_ = touchEvent.GetIsStandard();
+    deviceEventType_ = touchEvent.GetOriginEventType();
+    action_ = touchEvent.GetAction();
+    index_ = touchEvent.GetIndex();
+    forcePrecision_ = touchEvent.GetForcePrecision();
+    maxForce_ = touchEvent.GetMaxForce();
+    tapCount_ = touchEvent.GetTapCount();
+    isStandard_  = touchEvent.GetIsStandard();
 }
 
 void TouchEvent::Initialize(int32_t windowId, MultimodalEventPtr deviceEvent, int32_t deviceEventType, int32_t action,
@@ -65,54 +65,54 @@ void TouchEvent::Initialize(int32_t windowId, MultimodalEventPtr deviceEvent, in
                                   deviceEvent->GetEventType(), deviceEvent->GetOccurredTime(),
                                   deviceEvent->GetDeviceId(), deviceEvent->GetInputDeviceId(),
                                   deviceEvent->IsHighLevelInput(), deviceEvent->GetDeviceUdevTags());
-    mDeviceEventType_ = deviceEventType;
-    mAction_ = action;
-    mIndex_ = index;
-    mForcePrecision_ = forcePrecision;
-    mMaxForce_ = maxForce;
-    mTapCount_ = tapCount;
-    mIsStandard_ = isStandard;
+    deviceEventType_ = deviceEventType;
+    action_ = action;
+    index_ = index;
+    forcePrecision_ = forcePrecision;
+    maxForce_ = maxForce;
+    tapCount_ = tapCount;
+    isStandard_  = isStandard;
     setMultimodalEvent(deviceEvent);
 }
 
 void TouchEvent::setMultimodalEvent(MultimodalEventPtr deviceEvent)
 {
-    mDeviceEvent_ = deviceEvent;
+    deviceEvent_ = deviceEvent;
 }
 
 int32_t TouchEvent::GetAction() const
 {
-    return mAction_;
+    return action_;
 }
 
 int32_t TouchEvent::GetIndex() const
 {
-    return mIndex_;
+    return index_;
 }
 
 float TouchEvent::GetForcePrecision() const
 {
-    return mForcePrecision_;
+    return forcePrecision_;
 }
 
 float TouchEvent::GetMaxForce() const
 {
-    return mMaxForce_;
+    return maxForce_;
 }
 
 float TouchEvent::GetTapCount() const
 {
-    return mTapCount_;
+    return tapCount_;
 }
 
 bool TouchEvent::GetIsStandard() const
 {
-    return mIsStandard_;
+    return isStandard_ ;
 }
 
 const MultimodalEvent *TouchEvent::GetMultimodalEvent() const
 {
-    return mDeviceEvent_;
+    return deviceEvent_;
 }
 
 int32_t TouchEvent::GetPointToolType(int32_t index) const
@@ -123,7 +123,7 @@ int32_t TouchEvent::GetPointToolType(int32_t index) const
         return 0;
     }
 
-    switch (mIndex_) {
+    switch (index_) {
         case TABLET_TOOL_TYPE_PEN: {
             tableToolType = BUTTON_TOOL_PEN;
             break;
@@ -166,6 +166,6 @@ int32_t TouchEvent::GetPointToolType(int32_t index) const
 
 int32_t TouchEvent::GetOriginEventType() const
 {
-    return mDeviceEventType_;
+    return deviceEventType_;
 }
 } // namespace OHOS

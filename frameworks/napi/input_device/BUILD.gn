@@ -13,7 +13,6 @@
 
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-## Build libmmi.so {{{
 config("libinputdevice_config") {
   visibility = [ ":*" ]
 

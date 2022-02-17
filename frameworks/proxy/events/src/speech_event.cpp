@@ -24,38 +24,38 @@ void SpeechEvent::Initialize(int32_t windowId, int32_t action, int32_t scene, in
 {
     MultimodalEvent::Initialize(windowId, highLevelEvent, uuid, sourceType, occurredTime, deviceId,
                                 inputDeviceId, isHighLevelEvent, deviceUdevTags);
-    mAction_ = action;
-    mScene_ = scene;
-    mMode_ = mode;
-    mActionProperty_ = actionProperty;
+    action_ = action;
+    scene_ = scene;
+    mode_ = mode;
+    actionProperty_ = actionProperty;
 }
 
 void SpeechEvent::Initialize(SpeechEvent& speechEvent)
 {
     MultimodalEvent::Initialize(speechEvent);
-    mAction_ = speechEvent.GetAction();
-    mScene_ = speechEvent.GetScene();
-    mMode_ = speechEvent.GetMatchMode();
-    mActionProperty_ = speechEvent.GetActionProperty();
+    action_ = speechEvent.GetAction();
+    scene_ = speechEvent.GetScene();
+    mode_ = speechEvent.GetMatchMode();
+    actionProperty_ = speechEvent.GetActionProperty();
 }
 
 int32_t SpeechEvent::GetAction() const
 {
-    return mAction_;
+    return action_;
 }
 
 int32_t SpeechEvent::GetScene() const
 {
-    return mScene_;
+    return scene_;
 }
 
 std::string SpeechEvent::GetActionProperty() const
 {
-    return mActionProperty_;
+    return actionProperty_;
 }
 
 int32_t SpeechEvent::GetMatchMode() const
 {
-    return mMode_;
+    return mode_;
 }
 } // namespace OHOS

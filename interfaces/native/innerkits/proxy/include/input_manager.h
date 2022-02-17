@@ -185,7 +185,7 @@ public:
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
-    static InputManager *mInstance_;
+    static InputManager *instance_;
 };
 } // namespace MMI
 } // namespace OHOS
