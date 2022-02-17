@@ -1025,7 +1025,7 @@ void ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client, NetPacket&
              tabletPad.time, tabletPad.deviceType, tabletPad.deviceName, tabletPad.eventType,
              tabletPad.ring.number, tabletPad.ring.position, tabletPad.ring.source, tabletPad.strip.number,
              tabletPad.strip.position, tabletPad.strip.source, fd, serverStartTime);
-    // multimodal ANR
+    // Multimodal ANR
     MmiPoint mmiPoint;
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EventType::EVENT_MOUSE);
     CHKPV(mousePtr);
