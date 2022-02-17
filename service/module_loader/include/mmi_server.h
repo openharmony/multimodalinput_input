@@ -19,6 +19,7 @@
 #include "server_msg_handler.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
+#include "nocopyable.h"
 #include "register_eventhandle_manager.h"
 
 #ifndef OHOS_WESTEN_MODEL
@@ -39,6 +40,7 @@ namespace MMI {
 class MMIServer : public UDSServer {
 public:
     MMIServer();
+    DISALLOW_COPY_AND_MOVE(MMIServer);
     virtual ~MMIServer() override;
     int32_t Start();
     void OnTimer();
