@@ -98,9 +98,11 @@ void EventDump::Dump(int32_t fd)
     auto strCurTime = Strftime();
     mprintf(fd, "MMIDumpsBegin: %s", strCurTime.c_str());
     ChkConfig(fd);
+#ifdef OHOS_WESTEN_MODEL
     ChkAppInfos(fd);
     WinMgr->Dump(fd);
     RegEventHM->Dump(fd);
+#endif
     if (udsServer_) {
         udsServer_->Dump(fd);
     }
@@ -140,7 +142,7 @@ void EventDump::InsertDumpInfo(const std::string& str)
     CHK(!str.empty(), PARAM_INPUT_INVALID);
     std::lock_guard<std::mutex> lock(mu_);
 
-    const int32_t VECMAXSIZE = 300;
+    constexpr int32_t VECMAXSIZE = 300;
     while (dumpInfo_.size() > VECMAXSIZE) {
         dumpInfo_.erase(dumpInfo_.begin());
     }

@@ -20,7 +20,7 @@
 #include <thread>
 #include <functional>
 #include <list>
-
+#include "nocopyable.h"
 #include "i_uds_server.h"
 #include "uds_session.h"
 #include "uds_socket.h"
@@ -44,6 +44,7 @@ using MsgServerFunCallback = std::function<void(SessionPtr, NetPacket&)>;
 class UDSServer : public UDSSocket, public IUdsServer {
 public:
     UDSServer();
+    DISALLOW_COPY_AND_MOVE(UDSServer);
     virtual ~UDSServer();
     void UdsStop();
     bool SendMsg(int32_t fd, NetPacket& pkt);

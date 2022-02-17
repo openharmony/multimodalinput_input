@@ -29,66 +29,67 @@ public:
     class KeyEventFilter {
     public:
         KeyEventFilter(){}
-        KeyEventFilter(std::string name, Authority authority, std::function<void(KeyBoardEvent)> handler);
+        KeyEventFilter(std::string name, Authority authority, std::function<void(const KeyBoardEvent&)> handler);
         void SetId(int32_t id);
         int32_t GetId();
         std::string GetName();
         Authority GetAuthority();
-        std::function<void(KeyBoardEvent)> GetHandler();
+        std::function<void(const KeyBoardEvent&)> GetHandler();
         ~KeyEventFilter(){}
     private:
         int32_t id_;
         std::string name_;
         Authority authority_;
-        std::function<void(KeyBoardEvent)> handler_;
+        std::function<void(const KeyBoardEvent&)> handler_;
     };
-    int32_t FilterKeyEvent(std::string name, Authority authority, std::function<void(KeyBoardEvent)> handler);
+    int32_t FilterKeyEvent(std::string name, Authority authority, std::function<void(const KeyBoardEvent&)> handler);
     int32_t UnFilterKeyEvent(int32_t id);
-    int32_t OnKeyEvent(KeyBoardEvent event, int32_t id);
+    int32_t OnKeyEvent(const KeyBoardEvent& event, int32_t id);
 
 public:
     class TouchEventFilter {
     public:
         TouchEventFilter(){}
-        TouchEventFilter(std::string name, Authority authority, std::function<void(TouchEvent)> handler);
+        TouchEventFilter(std::string name, Authority authority, std::function<void(const TouchEvent&)> handler);
         void SetId(int32_t id);
         int32_t GetId();
         std::string GetName();
         Authority GetAuthority();
-        std::function<void(TouchEvent)> GetHandler();
+        std::function<void(const TouchEvent&)> GetHandler();
         ~TouchEventFilter(){}
     private:
         int32_t id_;
         std::string name_;
         Authority authority_;
-        std::function<void(TouchEvent)> handler_;
+        std::function<void(const TouchEvent&)> handler_;
     };
-    int32_t FilterTouchEvent(std::string name, Authority authority, std::function<void(TouchEvent)> handler);
+    int32_t FilterTouchEvent(std::string name, Authority authority, std::function<void(const TouchEvent&)> handler);
     int32_t UnFilterTouchEvent(int32_t id);
-    int32_t OnTouchEvent(TouchEvent event, int32_t id);
+    int32_t OnTouchEvent(const TouchEvent& event, int32_t id);
 
 public:
     class PointerEventInterceptor {
     public:
         PointerEventInterceptor(){}
-        PointerEventInterceptor(std::string name_, Authority authority_, std::function<void(MouseEvent)> handler_);
+        PointerEventInterceptor(std::string name_, Authority authority_,
+            std::function<void(const MouseEvent&)> handler_);
         int32_t GetId();
         void SetId(int32_t id);
         std::string GetName();
         Authority GetAuthority();
-        std::function<void(MouseEvent)> GetHandler();
+        std::function<void(const MouseEvent&)> GetHandler();
         ~PointerEventInterceptor(){}
 
     private:
         int32_t id_;
         std::string name_;
         Authority authority_;
-        std::function<void(MouseEvent)> handler_;
+        std::function<void(const MouseEvent&)> handler_;
     };
     int32_t RegisterPointerEventInterceptor(std::string name_, Authority authority_,
-                                            std::function<void(MouseEvent)> handler_);
+                                            std::function<void(const MouseEvent&)> handler_);
     int32_t UnRegisterPointerEventInterceptor(int32_t id_);
-    int32_t OnPointerEvent(MouseEvent event, int32_t id_);
+    int32_t OnPointerEvent(const MouseEvent& event, int32_t id_);
 
 private:
     int32_t GetHighAuthorityFilterId();

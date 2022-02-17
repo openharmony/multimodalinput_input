@@ -21,7 +21,7 @@ config("mmi_connect_manager_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/multimodalinput/input/frameworks/util/common/include",
-    "//foundation/multimodalinput/input/service/event_filter_binder/include",
+    "//foundation/multimodalinput/input/service/filter/include",
     "${mmi_connect_manager_path}/include",
   ]
 }

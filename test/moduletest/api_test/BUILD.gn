@@ -20,7 +20,6 @@ ohos_moduletest("api-test-out") {
   module_out_path = module_output_path
   include_dirs =
       [ "//foundation/multimodalinput/input/test/moduletest/include" ]
-
   sources = [
     "common_event_handler_api_test.cpp",
     "key_event_api_test.cpp",
