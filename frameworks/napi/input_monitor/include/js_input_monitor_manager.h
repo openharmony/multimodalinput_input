@@ -18,7 +18,7 @@
 
 #include <list>
 #include <mutex>
-#include <inttypes.h>
+#include <cinttypes>
 #include "js_input_monitor.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"

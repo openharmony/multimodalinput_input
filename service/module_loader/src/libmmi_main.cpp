@@ -14,7 +14,7 @@
  */
 
 #include <sys/ioctl.h>
-#include <inttypes.h>
+#include <cinttypes>
 #include "event_dump.h"
 #include "input_device_manager.h"
 #include "mmi_interface.h"

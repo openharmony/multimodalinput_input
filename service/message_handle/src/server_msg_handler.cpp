@@ -14,7 +14,7 @@
  */
 
 #include "server_msg_handler.h"
-#include <inttypes.h>
+#include <cinttypes>
 #include "ability_launch_manager.h"
 #include "ai_func_proc.h"
 #include "event_dump.h"
