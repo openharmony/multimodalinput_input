@@ -59,7 +59,7 @@ int32_t SendMessage::SendToHdi(const InputEventArray& inputEventArray)
 {
     int32_t devIndex = GetDevIndexByName(inputEventArray.deviceName);
     if (devIndex == RET_ERR) {
-        MMI_LOGE("Get devIndex error by name:%{public}s.", inputEventArray.deviceName.c_str());
+        MMI_LOGE("Get devIndex error by name:%{public}s", inputEventArray.deviceName.c_str());
         return RET_ERR;
     }
     RawInputEvent speechEvent = {};
@@ -103,5 +103,5 @@ void SendMessage::TransitionHdiEvent(const input_event& event, RawInputEvent& sp
     speechEvent.ev_type = event.type;
     speechEvent.ev_code = event.code;
     speechEvent.ev_value =  static_cast<uint32_t>(event.value);
-    speechEvent.stamp = static_cast<unsigned int>(event.input_event_usec);
+    speechEvent.stamp = static_cast<uint32_t>(event.input_event_usec);
 }

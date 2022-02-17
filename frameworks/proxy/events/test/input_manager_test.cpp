@@ -28,6 +28,9 @@
 #include "multimodal_event_handler.h"
 #include "pointer_event.h"
 #include "proto.h"
+#include "key_event_handler.h"
+#include "mmi_client.h"
+#include "mmi_token.h"
 #include "run_shell_util.h"
 
 namespace {
@@ -312,11 +315,132 @@ void InputManagerTest::TestMarkConsumedStep6()
     };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 
-    MMI_LOGD("Call InputManager::SimulatePointerEvent ...");
+    MMI_LOGD("Call InputManager::SimulatePointerEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
+}
+
+HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.Level1)
+{
+    std::string command = "Inject keyCode = 2,action = 2";
+    std::vector<std::string> slogs {SearchForLog(command, true)};
+    int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
+    OHOS::MMI::KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    injectDownEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+
+    std::shared_ptr<OHOS::MMI::KeyEvent> injectUpEvent = OHOS::MMI::KeyEvent::Create();
+    downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    OHOS::MMI::KeyEvent::KeyItem kitUp;
+    kitUp.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    kitUp.SetPressed(false);
+    kitUp.SetDownTime(downTime);
+    injectUpEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    injectUpEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
+    injectUpEvent->RemoveReleasedKeyItems(kitUp);
+    InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
+    std::vector<std::string> tlogs {SearchForLog(command, slogs)};
+    EXPECT_TRUE(!tlogs.empty());
+}
+
+HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_002, TestSize.Level1)
+{
+    std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
+    int32_t downTime = -1;
+    OHOS::MMI::KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_HOME);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_HOME);
+    injectDownEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+}
+
+HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.Level1)
+{
+    std::string command = "Inject keyCode:2, action:2";
+    std::vector<std::string> slogs {SearchForLog(command, true)};
+    std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
+    int32_t downTime = 0;
+    OHOS::MMI::KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    injectDownEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+
+    std::shared_ptr<OHOS::MMI::KeyEvent> injectUpEvent = OHOS::MMI::KeyEvent::Create();
+    OHOS::MMI::KeyEvent::KeyItem kitUp;
+    kitUp.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    kitUp.SetPressed(false);
+    kitUp.SetDownTime(downTime);
+    injectUpEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    injectUpEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
+    injectUpEvent->RemoveReleasedKeyItems(kitUp);
+    InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
+    std::vector<std::string> tlogs {SearchForLog(command, slogs)};
+    EXPECT_TRUE(!tlogs.empty());
+}
+
+HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_004, TestSize.Level1)
+{
+    std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
+    int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    OHOS::MMI::KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_UNKNOWN);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_UNKNOWN);
+    injectDownEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    MMI_LOGD("MMIEventHdl.InjectEvent begin");
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    MMI_LOGD("MMIEventHdl.InjectEvent end");
+}
+
+HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.Level1)
+{
+    std::string command = "Inject keyCode:0, action:2";
+    std::vector<std::string> slogs {SearchForLog(command, true)};
+    std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
+    int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    OHOS::MMI::KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_FN);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_FN);
+    injectDownEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    if (injectDownEvent == nullptr) {
+        MMI_LOGD("injectDownEvent is nullptr!");
+    }
+    MMI_LOGD("MMIEventHdl.InjectEvent begin!");
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    MMI_LOGD("MMIEventHdl.InjectEvent end!");
+
+    std::shared_ptr<OHOS::MMI::KeyEvent> injectUpEvent = OHOS::MMI::KeyEvent::Create();
+    downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    OHOS::MMI::KeyEvent::KeyItem kitUp;
+    kitUp.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_FN);
+    kitUp.SetPressed(false);
+    kitUp.SetDownTime(downTime);
+    injectUpEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_FN);
+    injectUpEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
+    injectUpEvent->RemoveReleasedKeyItems(kitUp);
+    InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
+    std::vector<std::string> tlogs {SearchForLog(command, slogs)};
+    EXPECT_TRUE(!tlogs.empty());
 }
 
 HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, TestSize.Level1)
@@ -546,7 +670,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_004, TestSize.Level1)
     };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 
-    MMI_LOGD("Call InputManager::SimulateInputEvent ...");
+    MMI_LOGD("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
@@ -922,8 +1046,8 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_015, TestSize.Level1)
 
 void InputManagerTest::KeyMonitorCallBack(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
-    MMI_LOGD("KeyMonitorCallBack: keyCode:%{public}d, keyAction:%{public}d, action:%{public}d, "
-             "deviceId:%{private}d, actionTime:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
+    MMI_LOGD("KeyMonitorCallBack: keyCode:%{public}d,keyAction:%{public}d,action:%{public}d,"
+             "deviceId:%{private}d,actionTime:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
              keyEvent->GetAction(), keyEvent->GetDeviceId(), keyEvent->GetActionTime());
     EXPECT_EQ(keyEvent->GetKeyCode(), OHOS::MMI::KeyEvent::KEYCODE_BACK);
     EXPECT_EQ(keyEvent->GetKeyAction(), OHOS::MMI::KeyEvent::KEY_ACTION_UP);
@@ -1175,9 +1299,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Leve
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [=](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     {
-        MMI_LOGD("KeyEventId:%{public}d, KeyCode:%{public}d, ActionTime:%{public}d, "
-                 "ActionStartTime:%{public}d, Action:%{public}d, KeyAction:%{public}d, "
-                 "EventType:%{public}d, Flag:%{public}d",
+        MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"
+                 "ActionStartTime:%{public}d,Action:%{public}d,KeyAction:%{public}d,"
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1225,9 +1349,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     {
-        MMI_LOGD("KeyEventId:%{public}d, KeyCode:%{public}d, ActionTime:%{public}d, "
-                 "ActionStartTime:%{public}d, Action:%{public}d, KeyAction:%{public}d, "
-                 "EventType:%{public}d, Flag:%{public}d",
+        MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"
+                 "ActionStartTime:%{public}d,Action:%{public}d,KeyAction:%{public}d,"
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1238,9 +1362,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
     response2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     {
-        MMI_LOGD("KeyEventId:%{public}d, KeyCode:%{public}d, ActionTime:%{public}d, "
-                 "ActionStartTime:%{public}d, Action:%{public}d, KeyAction:%{public}d, "
-                 "EventType:%{public}d, Flag:%{public}d",
+        MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"
+                 "ActionStartTime:%{public}d,Action:%{public}d,KeyAction:%{public}d,"
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1287,9 +1411,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_003, TestSize.Leve
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     {
-        MMI_LOGD("KeyEventId:%{public}d, KeyCode:%{public}d, ActionTime:%{public}d, "
-                 "ActionStartTime:%{public}d, Action:%{public}d, KeyAction:%{public}d, "
-                 "EventType:%{public}d, Flag:%{public}d",
+        MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"
+                 "ActionStartTime:%{public}d,Action:%{public}d,KeyAction:%{public}d,"
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1336,9 +1460,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_004, TestSize.Leve
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     {
-        MMI_LOGD("KeyEventId:%{public}d, KeyCode:%{public}d, ActionTime:%{public}d, "
-                 "ActionStartTime:%{public}d, Action:%{public}d, KeyAction:%{public}d, "
-                 "EventType:%{public}d, Flag:%{public}d",
+        MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"
+                 "ActionStartTime:%{public}d,Action:%{public}d,KeyAction:%{public}d,"
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1384,9 +1508,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_005, TestSize.Leve
     keyOption->SetFinalKeyDownDuration(2000);
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
-        MMI_LOGD("KeyEventId:%{public}d, KeyCode:%{public}d, ActionTime:%{public}d, "
-                 "ActionStartTime:%{public}d, Action:%{public}d, KeyAction:%{public}d, "
-                 "EventType:%{public}d, Flag:%{public}d",
+        MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"
+                 "ActionStartTime:%{public}d,Action:%{public}d,KeyAction:%{public}d,"
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1432,9 +1556,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_006, TestSize.Leve
     keyOption->SetFinalKeyDownDuration(2000);
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
-        MMI_LOGD("KeyEventId:%{public}d, KeyCode:%{public}d, ActionTime:%{public}d, "
-                 "ActionStartTime:%{public}d, Action:%{public}d, KeyAction:%{public}d, "
-                 "EventType:%{public}d, Flag:%{public}d",
+        MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"
+                 "ActionStartTime:%{public}d,Action:%{public}d,KeyAction:%{public}d,"
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1495,9 +1619,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_007, TestSize.Leve
     keyOption->SetFinalKeyDownDuration(0);
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
-        MMI_LOGD("KeyEventId:%{public}d, KeyCode:%{public}d, ActionTime:%{public}d, "
-                 "ActionStartTime:%{public}d, Action:%{public}d, KeyAction:%{public}d, "
-                 "EventType:%{public}d, Flag:%{public}d",
+        MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"
+                 "ActionStartTime:%{public}d,Action:%{public}d,KeyAction:%{public}d,"
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1565,9 +1689,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_009, TestSize.Leve
     // KEYCODE_MUTE, KEYCODE_HEADSETHOOK, MEDIA_PLAY, MEDIA_PAUSE, MEDIA_PLAY_PAUSE
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
-        MMI_LOGD("KeyEventId:%{public}d, KeyCode:%{public}d, ActionTime:%{public}d, "
-                 "ActionStartTime:%{public}d, Action:%{public}d, KeyAction:%{public}d, "
-                 "EventType:%{public}d, Flag:%{public}d",
+        MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"
+                 "ActionStartTime:%{public}d,Action:%{public}d,KeyAction:%{public}d,"
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1618,9 +1742,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
     keyOption->SetFinalKeyDownDuration(2000);
     subscribeId1 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
-        MMI_LOGD("KeyEventId:%{public}d, KeyCode:%{public}d, ActionTime:%{public}d, "
-                 "ActionStartTime:%{public}d, Action:%{public}d, KeyAction:%{public}d, "
-                 "EventType:%{public}d, Flag:%{public}d",
+        MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"
+                 "ActionStartTime:%{public}d,Action:%{public}d,KeyAction:%{public}d,"
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1637,9 +1761,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
     keyOption2->SetFinalKeyDownDuration(0);
     subscribeId2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption2,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
-        MMI_LOGD("KeyEventId:%{public}d, KeyCode:%{public}d, ActionTime:%{public}d, "
-                 "ActionStartTime:%{public}d, Action:%{public}d, KeyAction:%{public}d, "
-                 "EventType:%{public}d, Flag:%{public}d",
+        MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"
+                 "ActionStartTime:%{public}d,Action:%{public}d,KeyAction:%{public}d,"
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1677,9 +1801,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_011, TestSize.Leve
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [=](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     {
-        MMI_LOGD("KeyEventId:%{public}d, KeyCode:%{public}d, ActionTime:%{public}d, "
-                 "ActionStartTime:%{public}d, Action:%{public}d, KeyAction:%{public}d, "
-                 "EventType:%{public}d, Flag:%{public}d",
+        MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"
+                 "ActionStartTime:%{public}d,Action:%{public}d,KeyAction:%{public}d,"
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1695,9 +1819,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_011, TestSize.Leve
     keyOption2->SetFinalKeyDownDuration(0);
     subscribeId2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption2,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
-        MMI_LOGD("KeyEventId:%{public}d, KeyCode:%{public}d, ActionTime:%{public}d, "
-                 "ActionStartTime:%{public}d, Action:%{public}d, KeyAction:%{public}d, "
-                 "EventType:%{public}d, Flag:%{public}d",
+        MMI_LOGD("KeyEventId:%{public}d,KeyCode:%{public}d,ActionTime:%{public}d,"
+                 "ActionStartTime:%{public}d,Action:%{public}d,KeyAction:%{public}d,"
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1756,9 +1880,9 @@ void InputEventInterceptor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEv
 {
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
     MMI_LOGD("Pointer event intercepted:");
-    MMI_LOGD("eventType:%{public}s, actionTime:%{public}d, "
-             "action:%{public}d, actionStartTime:%{public}d, "
-             "flag:%{public}d, pointerAction:%{public}s, sourceType:%{public}s, "
+    MMI_LOGD("eventType:%{public}s, actionTime:%{public}d,"
+             "action:%{public}d,actionStartTime:%{public}d,"
+             "flag:%{public}d,pointerAction:%{public}s, sourceType:%{public}s, "
              "VerticalAxisValue:%{public}.2f, HorizontalAxisValue:%{public}.2f, "
              "pointerCount:%{public}d",
              pointerEvent->DumpEventType(), pointerEvent->GetActionTime(),
@@ -1772,8 +1896,8 @@ void InputEventInterceptor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEv
         OHOS::MMI::PointerEvent::PointerItem item;
         CHK(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL);
 
-        MMI_LOGD("downTime:%{public}d, isPressed:%{public}s,"
-                 "globalX:%{public}d, globalY:%{public}d, pressure:%{public}d",
+        MMI_LOGD("downTime:%{public}d,isPressed:%{public}s,"
+                 "globalX:%{public}d,globalY:%{public}d,pressure:%{public}d",
                  item.GetDownTime(),
                  item.IsPressed() ? "true" : "false",
                  item.GetGlobalX(),
@@ -2141,8 +2265,8 @@ void InputManagerTest::TouchPadMonitorCallBack(std::shared_ptr<OHOS::MMI::Pointe
     int32_t pointerId = pointerEvent->GetPointerId();
     OHOS::MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerId, pointerItem);
-    MMI_LOGD("TouchPadMonitorCallBack: pointerAction:%{public}d, pointerId:%{public}d, "
-        "x:%{public}d, y:%{public}d", pointerEvent->GetPointerAction(),
+    MMI_LOGD("TouchPadMonitorCallBack: pointerAction:%{public}d,pointerId:%{public}d,"
+        "x:%{public}d,y:%{public}d", pointerEvent->GetPointerAction(),
         pointerEvent->GetPointerId(), pointerItem.GetGlobalX(), pointerItem.GetGlobalY());
 }
 
@@ -2163,7 +2287,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     MMI_LOGD("Call MontiorManager");
 
-    std::string command { "PointerEvent received." };
+    std::string command { "PointerEvent received" };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 
     int32_t monitorId { };
@@ -2200,7 +2324,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     MMI_LOGD("Call MontiorManager");
 
-    std::string command { "PointerEvent received." };
+    std::string command { "PointerEvent received" };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 
     int32_t monitorId { };
@@ -2237,7 +2361,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     MMI_LOGD("Call MontiorManager");
 
-    std::string command { "PointerEvent received." };
+    std::string command { "PointerEvent received" };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 
     int32_t monitorId { };
@@ -2287,7 +2411,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
 
     std::string command {
         "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
-        "PointerEvent received."
+        "PointerEvent received"
     };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 
@@ -2331,7 +2455,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
 
     std::string command {
         "EventDispatch: in handlePointerEvent, #[[:digit:]]\\{1,\\}, "
-        "Unknown source type!"
+        "Unknown source type"
     };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 
@@ -2378,7 +2502,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize
 
     std::string command {
         "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
-        "PointerEvent received."
+        "PointerEvent received"
     };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 
@@ -2418,7 +2542,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize
 
     std::string command {
         "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
-        "PointerEvent received."
+        "PointerEvent received"
     };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 
@@ -2458,7 +2582,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize
 
     std::string command {
         "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
-        "PointerEvent received."
+        "PointerEvent received"
     };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 
@@ -2514,7 +2638,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
 
     std::string command {
         "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
-        "PointerEvent received."
+        "PointerEvent received"
     };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 
@@ -2532,7 +2656,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_005, TestSize
 {
     std::string command {
         "EventDispatch: in handlePointerEvent, #[[:digit:]]\\{1,\\}, "
-        "Unknown source type!"
+        "Unknown source type"
     };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 
@@ -2638,7 +2762,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
 
     std::string command {
         "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
-        "PointerEvent received."
+        "PointerEvent received"
     };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 

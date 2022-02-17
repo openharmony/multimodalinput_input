@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include "singleton.h"
+#include "../../../common/include/device_observer.h"
 #include "struct_multimodal.h"
 #include "pixel_map.h"
 #include "window.h"
@@ -26,19 +27,20 @@
 #define IMAGE_SIZE 64
 namespace OHOS {
 namespace MMI {
-class MouseDrawingManager : public DelayedSingleton<MouseDrawingManager> {
+class PointerDrawingManager : public DelayedSingleton<PointerDrawingManager>, public DeviceObserver {
 public:
-    MouseDrawingManager();
-    ~MouseDrawingManager();
+    PointerDrawingManager();
+    ~PointerDrawingManager();
     std::unique_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(std::string imagePath);
     void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY);
     void TellDisplayInfo(int32_t displayId, int32_t width, int32_t height);
-    void TellDeviceInfo(bool hasPointerDevice);
+    void UpdatePointerDevice(bool hasPointerDevice);
+    bool Init();
 
 private:
     void DoDraw(uint8_t *addr, uint32_t width, uint32_t height);
     void DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas);
-    void Init();
+    void DrawManager();
 
 private:
     sptr<OHOS::Rosen::Window> drawWindow_;
@@ -48,7 +50,7 @@ private:
     int32_t displayHeight_;
     bool hasPointerDevice_ { false };
 };
-}
-}
-#define DrawWgr OHOS::MMI::MouseDrawingManager::GetInstance()
+} // namespace MMI
+} // namespace OHOS
+#define PointerDrawMgr OHOS::MMI::PointerDrawingManager::GetInstance()
 #endif // POINTER_DRAWING_MANAGER_H

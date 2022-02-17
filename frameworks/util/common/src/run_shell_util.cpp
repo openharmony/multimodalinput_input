@@ -43,7 +43,7 @@ int32_t RunShellUtil::RunShellCommand(const std::string &command, std::vector<st
         fp_ = nullptr;
         return RET_ERR;
     }
-    int i = 0;
+    int32_t i = 0;
     while (logMaxSize_ > i) {
         char buf[MAXSIZE] = {0};
         if (fgets(buf, sizeof(buf), fp_) == nullptr) {

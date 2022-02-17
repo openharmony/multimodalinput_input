@@ -38,6 +38,6 @@ public:
                       const std::string &jsonEventValue);
     void SetIniFile(const std::string &fileName, const std::string &jsonEventValue);
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // MULTI_INPUT_COMMON_H

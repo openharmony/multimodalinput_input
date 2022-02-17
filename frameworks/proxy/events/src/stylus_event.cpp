@@ -76,4 +76,4 @@ int32_t StylusEvent::stylusButtonMapping(int32_t stylusButton) const
     }
     return actionButton;
 }
-}
+} // namespace OHOS
