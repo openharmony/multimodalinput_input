@@ -24,14 +24,14 @@ namespace MMI {
 class KeyEvent : public InputEvent {
 public:
     // KEYCODE
-    static constexpr int32_t KEYCODE_FN = 0;
+    static const int32_t KEYCODE_FN;
     /* *
      * Keycode constant: unknown keycode
      * <p>The keycode is unknown.
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_UNKNOWN = -1;
+    static const int32_t KEYCODE_UNKNOWN;
 
     /* *
      * Keycode constant: Home key
@@ -39,35 +39,35 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_HOME = 1;
+    static const int32_t KEYCODE_HOME;
 
     /* *
      * Keycode constant: Back key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_BACK = 2;
+    static const int32_t KEYCODE_BACK;
 
     /* *
      * Keycode constant: Call key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_CALL = 3;
+    static const int32_t KEYCODE_CALL;
 
     /* *
      * Keycode constant: End Call key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_ENDCALL = 4;
+    static const int32_t KEYCODE_ENDCALL;
 
     /* *
      * Keycode constant: Clear key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_CLEAR = 5;
+    static const int32_t KEYCODE_CLEAR;
 
     /* *
      * Keycode constant: Headset Hook key
@@ -75,7 +75,7 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_HEADSETHOOK = 6;
+    static const int32_t KEYCODE_HEADSETHOOK;
 
     /* *
      * Keycode constant: Camera Focus key
@@ -83,84 +83,84 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_FOCUS = 7;
+    static const int32_t KEYCODE_FOCUS;
 
     /* *
      * Keycode constant: Notification key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NOTIFICATION = 8;
+    static const int32_t KEYCODE_NOTIFICATION;
 
     /* *
      * Keycode constant: Search key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_SEARCH = 9;
+    static const int32_t KEYCODE_SEARCH;
 
     /* *
      * Keycode constant: Play/Pause media key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_MEDIA_PLAY_PAUSE = 10;
+    static const int32_t KEYCODE_MEDIA_PLAY_PAUSE;
 
     /* *
      * Keycode constant: Stop media key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_MEDIA_STOP = 11;
+    static const int32_t KEYCODE_MEDIA_STOP;
 
     /* *
      * Keycode constant: Play Next media key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_MEDIA_NEXT = 12;
+    static const int32_t KEYCODE_MEDIA_NEXT;
 
     /* *
      * Keycode constant: Play Previous media key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_MEDIA_PREVIOUS = 13;
+    static const int32_t KEYCODE_MEDIA_PREVIOUS;
 
     /* *
      * Keycode constant: Rewind media key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_MEDIA_REWIND = 14;
+    static const int32_t KEYCODE_MEDIA_REWIND;
 
     /* *
      * Keycode constant: Fast Forward media key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_MEDIA_FAST_FORWARD = 15;
+    static const int32_t KEYCODE_MEDIA_FAST_FORWARD;
 
     /* *
      * Turns up the volume.
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_VOLUME_UP = 16;
+    static const int32_t KEYCODE_VOLUME_UP;
 
     /* *
      * Turns down the volume.
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_VOLUME_DOWN = 17;
+    static const int32_t KEYCODE_VOLUME_DOWN;
 
     /* *
      * Presses the power button.
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_POWER = 18;
+    static const int32_t KEYCODE_POWER;
 
     /* *
      * Presses the camera key.
@@ -168,7 +168,7 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_CAMERA = 19;
+    static const int32_t KEYCODE_CAMERA;
 
     /* *
      * Voice Assistant key
@@ -176,7 +176,7 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_VOICE_ASSISTANT = 20;
+    static const int32_t KEYCODE_VOICE_ASSISTANT;
 
     /* *
      * Custom key 1
@@ -184,115 +184,115 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_CUSTOM1 = 21;
+    static const int32_t KEYCODE_CUSTOM1;
 
-    static constexpr int32_t KEYCODE_VOLUME_MUTE = 22;
-    static constexpr int32_t KEYCODE_MUTE = 23;
+    static const int32_t KEYCODE_VOLUME_MUTE;
+    static const int32_t KEYCODE_MUTE;
 
     /* *
      * Brightness UP key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_BRIGHTNESS_UP = 40;
+    static const int32_t KEYCODE_BRIGHTNESS_UP;
 
     /* *
      * Brightness Down key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_BRIGHTNESS_DOWN = 41;
+    static const int32_t KEYCODE_BRIGHTNESS_DOWN;
 
     /* *
      * Indicates general-purpose key 1 on the wearables
      *
      * @since 3
      */
-    static constexpr int32_t KEYCODE_WEAR_1 = 1001;
+    static const int32_t KEYCODE_WEAR_1;
 
     /* *
      * Keycode constant: '0' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_0 = 2000;
+    static const int32_t KEYCODE_0;
 
     /* *
      * Keycode constant: '1' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_1 = 2001;
+    static const int32_t KEYCODE_1;
 
     /* *
      * Keycode constant: '2' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_2 = 2002;
+    static const int32_t KEYCODE_2;
 
     /* *
      * Keycode constant: '3' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_3 = 2003;
+    static const int32_t KEYCODE_3;
 
     /* *
      * Keycode constant: '4' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_4 = 2004;
+    static const int32_t KEYCODE_4;
 
     /* *
      * Keycode constant: '5' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_5 = 2005;
+    static const int32_t KEYCODE_5;
 
     /* *
      * Keycode constant: '6' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_6 = 2006;
+    static const int32_t KEYCODE_6;
 
     /* *
      * Keycode constant: '7' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_7 = 2007;
+    static const int32_t KEYCODE_7;
 
     /* *
      * Keycode constant: '8' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_8 = 2008;
+    static const int32_t KEYCODE_8;
 
     /* *
      * Keycode constant: '9' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_9 = 2009;
+    static const int32_t KEYCODE_9;
 
     /* *
      * Keycode constant: '*' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_STAR = 2010;
+    static const int32_t KEYCODE_STAR;
 
     /* *
      * Keycode constant: '#' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_POUND = 2011;
+    static const int32_t KEYCODE_POUND;
 
     /* *
      * Keycode constant: Directional Pad Up key
@@ -300,7 +300,7 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_DPAD_UP = 2012;
+    static const int32_t KEYCODE_DPAD_UP;
 
     /* *
      * Keycode constant: Directional Pad Down key
@@ -308,7 +308,7 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_DPAD_DOWN = 2013;
+    static const int32_t KEYCODE_DPAD_DOWN;
 
     /* *
      * Keycode constant: Directional Pad Left key
@@ -316,7 +316,7 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_DPAD_LEFT = 2014;
+    static const int32_t KEYCODE_DPAD_LEFT;
 
     /* *
      * Keycode constant: Directional Pad Right key
@@ -324,7 +324,7 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_DPAD_RIGHT = 2015;
+    static const int32_t KEYCODE_DPAD_RIGHT;
 
     /* *
      * Keycode constant: Directional Pad Center key
@@ -332,245 +332,245 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_DPAD_CENTER = 2016;
+    static const int32_t KEYCODE_DPAD_CENTER;
 
     /* *
      * Keycode constant: 'A' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_A = 2017;
+    static const int32_t KEYCODE_A;
 
     /* *
      * Keycode constant: 'B' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_B = 2018;
+    static const int32_t KEYCODE_B;
 
     /* *
      * Keycode constant: 'C' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_C = 2019;
+    static const int32_t KEYCODE_C;
 
     /* *
      * Keycode constant: 'D' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_D = 2020;
+    static const int32_t KEYCODE_D;
 
     /* *
      * Keycode constant: 'E' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_E = 2021;
+    static const int32_t KEYCODE_E;
 
     /* *
      * Keycode constant: 'F' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_F = 2022;
+    static const int32_t KEYCODE_F;
 
     /* *
      * Keycode constant: 'G' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_G = 2023;
+    static const int32_t KEYCODE_G;
 
     /* *
      * Keycode constant: 'H' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_H = 2024;
+    static const int32_t KEYCODE_H;
 
     /* *
      * Keycode constant: 'I' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_I = 2025;
+    static const int32_t KEYCODE_I;
 
     /* *
      * Keycode constant: 'J' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_J = 2026;
+    static const int32_t KEYCODE_J;
 
     /* *
      * Keycode constant: 'K' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_K = 2027;
+    static const int32_t KEYCODE_K;
 
     /* *
      * Keycode constant: 'L' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_L = 2028;
+    static const int32_t KEYCODE_L;
 
     /* *
      * Keycode constant: 'M' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_M = 2029;
+    static const int32_t KEYCODE_M;
 
     /* *
      * Keycode constant: 'N' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_N = 2030;
+    static const int32_t KEYCODE_N;
 
     /* *
      * Keycode constant: 'O' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_O = 2031;
+    static const int32_t KEYCODE_O;
 
     /* *
      * Keycode constant: 'P' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_P = 2032;
+    static const int32_t KEYCODE_P;
 
     /* *
      * Keycode constant: 'Q' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_Q = 2033;
+    static const int32_t KEYCODE_Q;
 
     /* *
      * Keycode constant: 'R' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_R = 2034;
+    static const int32_t KEYCODE_R;
 
     /* *
      * Keycode constant: 'S' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_S = 2035;
+    static const int32_t KEYCODE_S;
 
     /* *
      * Keycode constant: 'T' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_T = 2036;
+    static const int32_t KEYCODE_T;
 
     /* *
      * Keycode constant: 'U' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_U = 2037;
+    static const int32_t KEYCODE_U;
 
     /* *
      * Keycode constant: 'V' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_V = 2038;
+    static const int32_t KEYCODE_V;
 
     /* *
      * Keycode constant: 'W' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_W = 2039;
+    static const int32_t KEYCODE_W;
 
     /* *
      * Keycode constant: 'X' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_X = 2040;
+    static const int32_t KEYCODE_X;
 
     /* *
      * Keycode constant: 'Y' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_Y = 2041;
+    static const int32_t KEYCODE_Y;
 
     /* *
      * Keycode constant: 'Z' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_Z = 2042;
+    static const int32_t KEYCODE_Z;
 
     /* *
      * Keycode constant: ';' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_COMMA = 2043;
+    static const int32_t KEYCODE_COMMA;
 
     /* *
      * Keycode constant: '.' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_PERIOD = 2044;
+    static const int32_t KEYCODE_PERIOD;
 
     /* *
      * Keycode constant: Left Alt modifier key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_ALT_LEFT = 2045;
+    static const int32_t KEYCODE_ALT_LEFT;
 
     /* *
      * Keycode constant: Right Alt modifier key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_ALT_RIGHT = 2046;
+    static const int32_t KEYCODE_ALT_RIGHT;
 
     /* *
      * Keycode constant: Left Shift modifier key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_SHIFT_LEFT = 2047;
+    static const int32_t KEYCODE_SHIFT_LEFT;
 
     /* *
      * Keycode constant: Right Shift modifier key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_SHIFT_RIGHT = 2048;
+    static const int32_t KEYCODE_SHIFT_RIGHT;
 
     /* *
      * Keycode constant: Tab key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_TAB = 2049;
+    static const int32_t KEYCODE_TAB;
 
     /* *
      * Keycode constant: Space key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_SPACE = 2050;
+    static const int32_t KEYCODE_SPACE;
 
     /* *
      * Keycode constant: Symbol modifier key
@@ -578,7 +578,7 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_SYM = 2051;
+    static const int32_t KEYCODE_SYM;
 
     /* *
      * Keycode constant: Explorer function key
@@ -586,7 +586,7 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_EXPLORER = 2052;
+    static const int32_t KEYCODE_EXPLORER;
 
     /* *
      * Keycode constant: Email function key
@@ -594,14 +594,14 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_ENVELOPE = 2053;
+    static const int32_t KEYCODE_ENVELOPE;
 
     /* *
      * Keycode constant: Enter key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_ENTER = 2054;
+    static const int32_t KEYCODE_ENTER;
 
     /* *
      * Keycode constant: Backspace key
@@ -610,112 +610,112 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_DEL = 2055;
+    static const int32_t KEYCODE_DEL;
 
     /* *
      * Keycode constant: '`' key (backtick key)
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_GRAVE = 2056;
+    static const int32_t KEYCODE_GRAVE;
 
     /* *
      * Keycode constant: '-' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_MINUS = 2057;
+    static const int32_t KEYCODE_MINUS;
 
     /* *
      * Keycode constant: '=' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_EQUALS = 2058;
+    static const int32_t KEYCODE_EQUALS;
 
     /* *
      * Keycode constant: '[' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_LEFT_BRACKET = 2059;
+    static const int32_t KEYCODE_LEFT_BRACKET;
 
     /* *
      * Keycode constant: ']' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_RIGHT_BRACKET = 2060;
+    static const int32_t KEYCODE_RIGHT_BRACKET;
 
     /* *
      * Keycode constant: '\' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_BACKSLASH = 2061;
+    static const int32_t KEYCODE_BACKSLASH;
 
     /* *
      * Keycode constant: ';' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_SEMICOLON = 2062;
+    static const int32_t KEYCODE_SEMICOLON;
 
     /* *
      * Keycode constant: ''' key (apostrophe key)
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_APOSTROPHE = 2063;
+    static const int32_t KEYCODE_APOSTROPHE;
 
     /* *
      * Keycode constant: '/' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_SLASH = 2064;
+    static const int32_t KEYCODE_SLASH;
 
     /* *
      * Keycode constant: '{@literal @}' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_AT = 2065;
+    static const int32_t KEYCODE_AT;
 
     /* *
      * Keycode constant: '+' key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_PLUS = 2066;
+    static const int32_t KEYCODE_PLUS;
 
     /* *
      * Keycode constant: Menu key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_MENU = 2067;
+    static const int32_t KEYCODE_MENU;
 
     /* *
      * Keycode constant: Page Up key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_PAGE_UP = 2068;
+    static const int32_t KEYCODE_PAGE_UP;
 
     /* *
      * Keycode constant: Page Down key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_PAGE_DOWN = 2069;
+    static const int32_t KEYCODE_PAGE_DOWN;
 
     /* *
      * Keycode constant: Escape key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_ESCAPE = 2070;
+    static const int32_t KEYCODE_ESCAPE;
 
     /* *
      * Keycode constant: Forward Delete key
@@ -724,70 +724,70 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_FORWARD_DEL = 2071;
+    static const int32_t KEYCODE_FORWARD_DEL;
 
     /* *
      * Keycode constant: Left Control modifier key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_CTRL_LEFT = 2072;
+    static const int32_t KEYCODE_CTRL_LEFT;
 
     /* *
      * Keycode constant: Right Control modifier key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_CTRL_RIGHT = 2073;
+    static const int32_t KEYCODE_CTRL_RIGHT;
 
     /* *
      * Keycode constant: Caps Lock key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_CAPS_LOCK = 2074;
+    static const int32_t KEYCODE_CAPS_LOCK;
 
     /* *
      * Keycode constant: Scroll Lock key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_SCROLL_LOCK = 2075;
+    static const int32_t KEYCODE_SCROLL_LOCK;
 
     /* *
      * Keycode constant: Left Meta modifier key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_META_LEFT = 2076;
+    static const int32_t KEYCODE_META_LEFT;
 
     /* *
      * Keycode constant: Right Meta modifier key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_META_RIGHT = 2077;
+    static const int32_t KEYCODE_META_RIGHT;
 
     /* *
      * Keycode constant: Function modifier key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_FUNCTION = 2078;
+    static const int32_t KEYCODE_FUNCTION;
 
     /* *
      * Keycode constant: System Request/Print Screen key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_SYSRQ = 2079;
+    static const int32_t KEYCODE_SYSRQ;
 
     /* *
      * Keycode constant: Break/Pause key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_BREAK = 2080;
+    static const int32_t KEYCODE_BREAK;
 
     /* *
      * Keycode constant: Home Movement key
@@ -796,7 +796,7 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_MOVE_HOME = 2081;
+    static const int32_t KEYCODE_MOVE_HOME;
 
     /* *
      * Keycode constant: End Movement key
@@ -805,7 +805,7 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_MOVE_END = 2082;
+    static const int32_t KEYCODE_MOVE_END;
 
     /* *
      * Keycode constant: Insert key
@@ -813,7 +813,7 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_INSERT = 2083;
+    static const int32_t KEYCODE_INSERT;
 
     /* *
      * Keycode constant: Forward key
@@ -822,21 +822,21 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_FORWARD = 2084;
+    static const int32_t KEYCODE_FORWARD;
 
     /* *
      * Keycode constant: Play media key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_MEDIA_PLAY = 2085;
+    static const int32_t KEYCODE_MEDIA_PLAY;
 
     /* *
      * Keycode constant: Pause media key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_MEDIA_PAUSE = 2086;
+    static const int32_t KEYCODE_MEDIA_PAUSE;
 
     /* *
      * Keycode constant: Close media key
@@ -844,7 +844,7 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_MEDIA_CLOSE = 2087;
+    static const int32_t KEYCODE_MEDIA_CLOSE;
 
     /* *
      * Keycode constant: Eject media key
@@ -852,98 +852,98 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_MEDIA_EJECT = 2088;
+    static const int32_t KEYCODE_MEDIA_EJECT;
 
     /* *
      * Keycode constant: Record media key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_MEDIA_RECORD = 2089;
+    static const int32_t KEYCODE_MEDIA_RECORD;
 
     /* *
      * Keycode constant: F1 key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_F1 = 2090;
+    static const int32_t KEYCODE_F1;
 
     /* *
      * Keycode constant: F2 key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_F2 = 2091;
+    static const int32_t KEYCODE_F2;
 
     /* *
      * Keycode constant: F3 key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_F3 = 2092;
+    static const int32_t KEYCODE_F3;
 
     /* *
      * Keycode constant: F4 key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_F4 = 2093;
+    static const int32_t KEYCODE_F4;
 
     /* *
      * Keycode constant: F5 key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_F5 = 2094;
+    static const int32_t KEYCODE_F5;
 
     /* *
      * Keycode constant: F6 key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_F6 = 2095;
+    static const int32_t KEYCODE_F6;
 
     /* *
      * Keycode constant: F7 key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_F7 = 2096;
+    static const int32_t KEYCODE_F7;
 
     /* *
      * Keycode constant: F8 key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_F8 = 2097;
+    static const int32_t KEYCODE_F8;
 
     /* *
      * Keycode constant: F9 key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_F9 = 2098;
+    static const int32_t KEYCODE_F9;
 
     /* *
      * Keycode constant: F10 key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_F10 = 2099;
+    static const int32_t KEYCODE_F10;
 
     /* *
      * Keycode constant: F11 key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_F11 = 2100;
+    static const int32_t KEYCODE_F11;
 
     /* *
      * Keycode constant: F12 key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_F12 = 2101;
+    static const int32_t KEYCODE_F12;
 
     /* *
      * Keycode constant: Num Lock key
@@ -951,105 +951,105 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUM_LOCK = 2102;
+    static const int32_t KEYCODE_NUM_LOCK;
 
     /* *
      * Keycode constant: '0' key on the numeric keypad
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_0 = 2103;
+    static const int32_t KEYCODE_NUMPAD_0;
 
     /* *
      * Keycode constant: '1' key on the numeric keypad
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_1 = 2104;
+    static const int32_t KEYCODE_NUMPAD_1;
 
     /* *
      * Keycode constant: '2' key on the numeric keypad
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_2 = 2105;
+    static const int32_t KEYCODE_NUMPAD_2;
 
     /* *
      * Keycode constant: '3' key on the numeric keypad
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_3 = 2106;
+    static const int32_t KEYCODE_NUMPAD_3;
 
     /* *
      * Keycode constant: '4' key on the numeric keypad
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_4 = 2107;
+    static const int32_t KEYCODE_NUMPAD_4;
 
     /* *
      * Keycode constant: '5' key on the numeric keypad
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_5 = 2108;
+    static const int32_t KEYCODE_NUMPAD_5;
 
     /* *
      * Keycode constant: '6' key on the numeric keypad
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_6 = 2109;
+    static const int32_t KEYCODE_NUMPAD_6;
 
     /* *
      * Keycode constant: '7' key on the numeric keypad
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_7 = 2110;
+    static const int32_t KEYCODE_NUMPAD_7;
 
     /* *
      * Keycode constant: '8' key on the numeric keypad
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_8 = 2111;
+    static const int32_t KEYCODE_NUMPAD_8;
 
     /* *
      * Keycode constant: '9' key on the numeric keypad
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_9 = 2112;
+    static const int32_t KEYCODE_NUMPAD_9;
 
     /* *
      * Keycode constant: '/' key (for division) on the numeric keypad
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_DIVIDE = 2113;
+    static const int32_t KEYCODE_NUMPAD_DIVIDE;
 
     /* *
      * Keycode constant: '*' key (for multiplication) on the numeric keypad
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_MULTIPLY = 2114;
+    static const int32_t KEYCODE_NUMPAD_MULTIPLY;
 
     /* *
      * Keycode constant: '-' key (for subtraction) on the numeric keypad
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_SUBTRACT = 2115;
+    static const int32_t KEYCODE_NUMPAD_SUBTRACT;
 
     /* *
      * Keycode constant: '+' key (for addition) on the numeric keypad
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_ADD = 2116;
+    static const int32_t KEYCODE_NUMPAD_ADD;
 
     /* *
      * Key code constant: '.' key (for decimals or digit grouping) on the
@@ -1057,7 +1057,7 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_DOT = 2117;
+    static const int32_t KEYCODE_NUMPAD_DOT;
 
     /* *
      * Key code constant: ';' key (for decimals or digit grouping) on the
@@ -1065,287 +1065,287 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_COMMA = 2118;
+    static const int32_t KEYCODE_NUMPAD_COMMA;
 
     /* *
      * Keycode constant: Enter key on the numeric keypad
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_ENTER = 2119;
+    static const int32_t KEYCODE_NUMPAD_ENTER;
 
     /* *
      * Keycode constant: '=' key on the numeric keypad
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_EQUALS = 2120;
+    static const int32_t KEYCODE_NUMPAD_EQUALS;
 
     /* *
      * Keycode constant: '(' key on the numeric keypad
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_LEFT_PAREN = 2121;
+    static const int32_t KEYCODE_NUMPAD_LEFT_PAREN;
 
     /* *
      * Keycode constant: ')' key on the numeric keypad
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_NUMPAD_RIGHT_PAREN = 2122;
+    static const int32_t KEYCODE_NUMPAD_RIGHT_PAREN;
 
     /* *
      * Key code:  The virtual multitask key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_VIRTUAL_MULTITASK = 2210;
+    static const int32_t KEYCODE_VIRTUAL_MULTITASK;
 
     /* *
      * Key code:  The handle button key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_BUTTON_A = 2301;
-    static constexpr int32_t KEYCODE_BUTTON_B = 2302;
-    static constexpr int32_t KEYCODE_BUTTON_C = 2303;
-    static constexpr int32_t KEYCODE_BUTTON_X = 2304;
-    static constexpr int32_t KEYCODE_BUTTON_Y = 2305;
-    static constexpr int32_t KEYCODE_BUTTON_Z = 2306;
-    static constexpr int32_t KEYCODE_BUTTON_L1 = 2307;
-    static constexpr int32_t KEYCODE_BUTTON_R1 = 2308;
-    static constexpr int32_t KEYCODE_BUTTON_L2 = 2309;
-    static constexpr int32_t KEYCODE_BUTTON_R2 = 2310;
-    static constexpr int32_t KEYCODE_BUTTON_SELECT = 2311;
-    static constexpr int32_t KEYCODE_BUTTON_START = 2312;
-    static constexpr int32_t KEYCODE_BUTTON_MODE = 2313;
-    static constexpr int32_t KEYCODE_BUTTON_THUMBL = 2314;
-    static constexpr int32_t KEYCODE_BUTTON_THUMBR = 2315;
+    static const int32_t KEYCODE_BUTTON_A;
+    static const int32_t KEYCODE_BUTTON_B;
+    static const int32_t KEYCODE_BUTTON_C;
+    static const int32_t KEYCODE_BUTTON_X;
+    static const int32_t KEYCODE_BUTTON_Y;
+    static const int32_t KEYCODE_BUTTON_Z;
+    static const int32_t KEYCODE_BUTTON_L1;
+    static const int32_t KEYCODE_BUTTON_R1;
+    static const int32_t KEYCODE_BUTTON_L2;
+    static const int32_t KEYCODE_BUTTON_R2;
+    static const int32_t KEYCODE_BUTTON_SELECT;
+    static const int32_t KEYCODE_BUTTON_START;
+    static const int32_t KEYCODE_BUTTON_MODE;
+    static const int32_t KEYCODE_BUTTON_THUMBL;
+    static const int32_t KEYCODE_BUTTON_THUMBR;
 
     /* *
      * Key code:  The joystick button key
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_BUTTON_TRIGGER = 2401;
-    static constexpr int32_t KEYCODE_BUTTON_THUMB = 2402;
-    static constexpr int32_t KEYCODE_BUTTON_THUMB2 = 2403;
-    static constexpr int32_t KEYCODE_BUTTON_TOP = 2404;
-    static constexpr int32_t KEYCODE_BUTTON_TOP2 = 2405;
-    static constexpr int32_t KEYCODE_BUTTON_PINKIE = 2406;
-    static constexpr int32_t KEYCODE_BUTTON_BASE1 = 2407;
-    static constexpr int32_t KEYCODE_BUTTON_BASE2 = 2408;
-    static constexpr int32_t KEYCODE_BUTTON_BASE3 = 2409;
-    static constexpr int32_t KEYCODE_BUTTON_BASE4 = 2410;
-    static constexpr int32_t KEYCODE_BUTTON_BASE5 = 2411;
-    static constexpr int32_t KEYCODE_BUTTON_BASE6 = 2412;
-    static constexpr int32_t KEYCODE_BUTTON_BASE7 = 2413;
-    static constexpr int32_t KEYCODE_BUTTON_BASE8 = 2414;
-    static constexpr int32_t KEYCODE_BUTTON_BASE9 = 2415;
-    static constexpr int32_t KEYCODE_BUTTON_DEAD = 2416;
+    static const int32_t KEYCODE_BUTTON_TRIGGER;
+    static const int32_t KEYCODE_BUTTON_THUMB;
+    static const int32_t KEYCODE_BUTTON_THUMB2;
+    static const int32_t KEYCODE_BUTTON_TOP;
+    static const int32_t KEYCODE_BUTTON_TOP2;
+    static const int32_t KEYCODE_BUTTON_PINKIE;
+    static const int32_t KEYCODE_BUTTON_BASE1;
+    static const int32_t KEYCODE_BUTTON_BASE2;
+    static const int32_t KEYCODE_BUTTON_BASE3;
+    static const int32_t KEYCODE_BUTTON_BASE4;
+    static const int32_t KEYCODE_BUTTON_BASE5;
+    static const int32_t KEYCODE_BUTTON_BASE6;
+    static const int32_t KEYCODE_BUTTON_BASE7;
+    static const int32_t KEYCODE_BUTTON_BASE8;
+    static const int32_t KEYCODE_BUTTON_BASE9;
+    static const int32_t KEYCODE_BUTTON_DEAD;
 
-    static constexpr int32_t KEYCODE_SLEEP = 2600;
-    static constexpr int32_t KEYCODE_ZENKAKU_HANKAKU = 2601;
-    static constexpr int32_t KEYCODE_102ND = 2602;
-    static constexpr int32_t KEYCODE_RO = 2603;
-    static constexpr int32_t KEYCODE_KATAKANA = 2604;
-    static constexpr int32_t KEYCODE_HIRAGANA = 2605;
-    static constexpr int32_t KEYCODE_HENKAN = 2606;
-    static constexpr int32_t KEYCODE_KATAKANA_HIRAGANA = 2607;
-    static constexpr int32_t KEYCODE_MUHENKAN = 2608;
-    static constexpr int32_t KEYCODE_LINEFEED = 2609;
-    static constexpr int32_t KEYCODE_MACRO = 2610;
-    static constexpr int32_t KEYCODE_NUMPAD_PLUSMINUS = 2611;
-    static constexpr int32_t KEYCODE_SCALE = 2612;
-    static constexpr int32_t KEYCODE_HANGUEL = 2613;
-    static constexpr int32_t KEYCODE_HANJA = 2614;
-    static constexpr int32_t KEYCODE_YEN = 2615;
-    static constexpr int32_t KEYCODE_STOP = 2616;
-    static constexpr int32_t KEYCODE_AGAIN = 2617;
-    static constexpr int32_t KEYCODE_PROPS = 2618;
-    static constexpr int32_t KEYCODE_UNDO = 2619;
-    static constexpr int32_t KEYCODE_COPY = 2620;
-    static constexpr int32_t KEYCODE_OPEN = 2621;
-    static constexpr int32_t KEYCODE_PASTE = 2622;
-    static constexpr int32_t KEYCODE_FIND = 2623;
-    static constexpr int32_t KEYCODE_CUT = 2624;
-    static constexpr int32_t KEYCODE_HELP = 2625;
-    static constexpr int32_t KEYCODE_CALC = 2626;
-    static constexpr int32_t KEYCODE_FILE = 2627;
-    static constexpr int32_t KEYCODE_BOOKMARKS = 2628;
-    static constexpr int32_t KEYCODE_NEXT = 2629;
-    static constexpr int32_t KEYCODE_PLAYPAUSE = 2630;
-    static constexpr int32_t KEYCODE_PREVIOUS = 2631;
-    static constexpr int32_t KEYCODE_STOPCD = 2632;
-    static constexpr int32_t KEYCODE_CONFIG = 2634;
-    static constexpr int32_t KEYCODE_REFRESH = 2635;
-    static constexpr int32_t KEYCODE_EXIT = 2636;
-    static constexpr int32_t KEYCODE_EDIT = 2637;
-    static constexpr int32_t KEYCODE_SCROLLUP = 2638;
-    static constexpr int32_t KEYCODE_SCROLLDOWN = 2639;
-    static constexpr int32_t KEYCODE_NEW = 2640;
-    static constexpr int32_t KEYCODE_REDO = 2641;
-    static constexpr int32_t KEYCODE_CLOSE = 2642;
-    static constexpr int32_t KEYCODE_PLAY = 2643;
-    static constexpr int32_t KEYCODE_BASSBOOST = 2644;
-    static constexpr int32_t KEYCODE_PRINT = 2645;
-    static constexpr int32_t KEYCODE_CHAT = 2646;
-    static constexpr int32_t KEYCODE_FINANCE = 2647;
-    static constexpr int32_t KEYCODE_CANCEL = 2648;
-    static constexpr int32_t KEYCODE_KBDILLUM_TOGGLE = 2649;
-    static constexpr int32_t KEYCODE_KBDILLUM_DOWN = 2650;
-    static constexpr int32_t KEYCODE_KBDILLUM_UP = 2651;
-    static constexpr int32_t KEYCODE_SEND = 2652;
-    static constexpr int32_t KEYCODE_REPLY = 2653;
-    static constexpr int32_t KEYCODE_FORWARDMAIL = 2654;
-    static constexpr int32_t KEYCODE_SAVE = 2655;
-    static constexpr int32_t KEYCODE_DOCUMENTS = 2656;
-    static constexpr int32_t KEYCODE_VIDEO_NEXT = 2657;
-    static constexpr int32_t KEYCODE_VIDEO_PREV = 2658;
-    static constexpr int32_t KEYCODE_BRIGHTNESS_CYCLE = 2659;
-    static constexpr int32_t KEYCODE_BRIGHTNESS_ZERO = 2660;
-    static constexpr int32_t KEYCODE_DISPLAY_OFF = 2661;
-    static constexpr int32_t KEYCODE_BTN_MISC = 2662;
-    static constexpr int32_t KEYCODE_GOTO = 2663;
-    static constexpr int32_t KEYCODE_INFO = 2664;
-    static constexpr int32_t KEYCODE_PROGRAM = 2665;
-    static constexpr int32_t KEYCODE_PVR = 2666;
-    static constexpr int32_t KEYCODE_SUBTITLE = 2667;
-    static constexpr int32_t KEYCODE_FULL_SCREEN = 2668;
-    static constexpr int32_t KEYCODE_KEYBOARD = 2669;
-    static constexpr int32_t KEYCODE_ASPECT_RATIO = 2670;
-    static constexpr int32_t KEYCODE_PC = 2671;
-    static constexpr int32_t KEYCODE_TV = 2672;
-    static constexpr int32_t KEYCODE_TV2 = 2673;
-    static constexpr int32_t KEYCODE_VCR = 2674;
-    static constexpr int32_t KEYCODE_VCR2 = 2675;
-    static constexpr int32_t KEYCODE_SAT = 2676;
-    static constexpr int32_t KEYCODE_CD = 2677;
-    static constexpr int32_t KEYCODE_TAPE = 2678;
-    static constexpr int32_t KEYCODE_TUNER = 2679;
-    static constexpr int32_t KEYCODE_PLAYER = 2680;
-    static constexpr int32_t KEYCODE_DVD = 2681;
-    static constexpr int32_t KEYCODE_AUDIO = 2682;
-    static constexpr int32_t KEYCODE_VIDEO = 2683;
-    static constexpr int32_t KEYCODE_MEMO = 2684;
-    static constexpr int32_t KEYCODE_CALENDAR = 2685;
-    static constexpr int32_t KEYCODE_RED = 2686;
-    static constexpr int32_t KEYCODE_GREEN = 2687;
-    static constexpr int32_t KEYCODE_YELLOW = 2688;
-    static constexpr int32_t KEYCODE_BLUE = 2689;
-    static constexpr int32_t KEYCODE_CHANNELUP = 2690;
-    static constexpr int32_t KEYCODE_CHANNELDOWN = 2691;
-    static constexpr int32_t KEYCODE_LAST = 2692;
-    static constexpr int32_t KEYCODE_RESTART = 2693;
-    static constexpr int32_t KEYCODE_SLOW = 2694;
-    static constexpr int32_t KEYCODE_SHUFFLE = 2695;
-    static constexpr int32_t KEYCODE_VIDEOPHONE = 2696;
-    static constexpr int32_t KEYCODE_GAMES = 2697;
-    static constexpr int32_t KEYCODE_ZOOMIN = 2698;
-    static constexpr int32_t KEYCODE_ZOOMOUT = 2699;
-    static constexpr int32_t KEYCODE_ZOOMRESET = 2700;
-    static constexpr int32_t KEYCODE_WORDPROCESSOR = 2701;
-    static constexpr int32_t KEYCODE_EDITOR = 2702;
-    static constexpr int32_t KEYCODE_SPREADSHEET = 2703;
-    static constexpr int32_t KEYCODE_GRAPHICSEDITOR = 2704;
-    static constexpr int32_t KEYCODE_PRESENTATION = 2705;
-    static constexpr int32_t KEYCODE_DATABASE = 2706;
-    static constexpr int32_t KEYCODE_NEWS = 2707;
-    static constexpr int32_t KEYCODE_VOICEMAIL = 2708;
-    static constexpr int32_t KEYCODE_ADDRESSBOOK = 2709;
-    static constexpr int32_t KEYCODE_MESSENGER = 2710;
-    static constexpr int32_t KEYCODE_BRIGHTNESS_TOGGLE = 2711;
-    static constexpr int32_t KEYCODE_SPELLCHECK = 2712;
-    static constexpr int32_t KEYCODE_COFFEE = 2713;
-    static constexpr int32_t KEYCODE_MEDIA_REPEAT = 2714;
-    static constexpr int32_t KEYCODE_IMAGES = 2715;
-    static constexpr int32_t KEYCODE_BUTTONCONFIG = 2716;
-    static constexpr int32_t KEYCODE_TASKMANAGER = 2717;
-    static constexpr int32_t KEYCODE_JOURNAL = 2718;
-    static constexpr int32_t KEYCODE_CONTROLPANEL = 2719;
-    static constexpr int32_t KEYCODE_APPSELECT = 2720;
-    static constexpr int32_t KEYCODE_SCREENSAVER = 2721;
-    static constexpr int32_t KEYCODE_ASSISTANT = 2722;
-    static constexpr int32_t KEYCODE_KBD_LAYOUT_NEXT = 2723;
-    static constexpr int32_t KEYCODE_BRIGHTNESS_MIN = 2724;
-    static constexpr int32_t KEYCODE_BRIGHTNESS_MAX = 2725;
-    static constexpr int32_t KEYCODE_KBDINPUTASSIST_PREV = 2726;
-    static constexpr int32_t KEYCODE_KBDINPUTASSIST_NEXT = 2727;
-    static constexpr int32_t KEYCODE_KBDINPUTASSIST_PREVGROUP = 2728;
-    static constexpr int32_t KEYCODE_KBDINPUTASSIST_NEXTGROUP = 2729;
-    static constexpr int32_t KEYCODE_KBDINPUTASSIST_ACCEPT = 2730;
-    static constexpr int32_t KEYCODE_KBDINPUTASSIST_CANCEL = 2731;
+    static const int32_t KEYCODE_SLEEP;
+    static const int32_t KEYCODE_ZENKAKU_HANKAKU;
+    static const int32_t KEYCODE_102ND;
+    static const int32_t KEYCODE_RO;
+    static const int32_t KEYCODE_KATAKANA;
+    static const int32_t KEYCODE_HIRAGANA;
+    static const int32_t KEYCODE_HENKAN;
+    static const int32_t KEYCODE_KATAKANA_HIRAGANA;
+    static const int32_t KEYCODE_MUHENKAN;
+    static const int32_t KEYCODE_LINEFEED;
+    static const int32_t KEYCODE_MACRO;
+    static const int32_t KEYCODE_NUMPAD_PLUSMINUS;
+    static const int32_t KEYCODE_SCALE;
+    static const int32_t KEYCODE_HANGUEL;
+    static const int32_t KEYCODE_HANJA;
+    static const int32_t KEYCODE_YEN;
+    static const int32_t KEYCODE_STOP;
+    static const int32_t KEYCODE_AGAIN;
+    static const int32_t KEYCODE_PROPS;
+    static const int32_t KEYCODE_UNDO;
+    static const int32_t KEYCODE_COPY;
+    static const int32_t KEYCODE_OPEN;
+    static const int32_t KEYCODE_PASTE;
+    static const int32_t KEYCODE_FIND;
+    static const int32_t KEYCODE_CUT;
+    static const int32_t KEYCODE_HELP;
+    static const int32_t KEYCODE_CALC;
+    static const int32_t KEYCODE_FILE;
+    static const int32_t KEYCODE_BOOKMARKS;
+    static const int32_t KEYCODE_NEXT;
+    static const int32_t KEYCODE_PLAYPAUSE;
+    static const int32_t KEYCODE_PREVIOUS;
+    static const int32_t KEYCODE_STOPCD;
+    static const int32_t KEYCODE_CONFIG;
+    static const int32_t KEYCODE_REFRESH;
+    static const int32_t KEYCODE_EXIT;
+    static const int32_t KEYCODE_EDIT;
+    static const int32_t KEYCODE_SCROLLUP;
+    static const int32_t KEYCODE_SCROLLDOWN;
+    static const int32_t KEYCODE_NEW;
+    static const int32_t KEYCODE_REDO;
+    static const int32_t KEYCODE_CLOSE;
+    static const int32_t KEYCODE_PLAY;
+    static const int32_t KEYCODE_BASSBOOST;
+    static const int32_t KEYCODE_PRINT;
+    static const int32_t KEYCODE_CHAT;
+    static const int32_t KEYCODE_FINANCE;
+    static const int32_t KEYCODE_CANCEL;
+    static const int32_t KEYCODE_KBDILLUM_TOGGLE;
+    static const int32_t KEYCODE_KBDILLUM_DOWN;
+    static const int32_t KEYCODE_KBDILLUM_UP;
+    static const int32_t KEYCODE_SEND;
+    static const int32_t KEYCODE_REPLY;
+    static const int32_t KEYCODE_FORWARDMAIL;
+    static const int32_t KEYCODE_SAVE;
+    static const int32_t KEYCODE_DOCUMENTS;
+    static const int32_t KEYCODE_VIDEO_NEXT;
+    static const int32_t KEYCODE_VIDEO_PREV;
+    static const int32_t KEYCODE_BRIGHTNESS_CYCLE;
+    static const int32_t KEYCODE_BRIGHTNESS_ZERO;
+    static const int32_t KEYCODE_DISPLAY_OFF;
+    static const int32_t KEYCODE_BTN_MISC;
+    static const int32_t KEYCODE_GOTO;
+    static const int32_t KEYCODE_INFO;
+    static const int32_t KEYCODE_PROGRAM;
+    static const int32_t KEYCODE_PVR;
+    static const int32_t KEYCODE_SUBTITLE;
+    static const int32_t KEYCODE_FULL_SCREEN;
+    static const int32_t KEYCODE_KEYBOARD;
+    static const int32_t KEYCODE_ASPECT_RATIO;
+    static const int32_t KEYCODE_PC;
+    static const int32_t KEYCODE_TV;
+    static const int32_t KEYCODE_TV2;
+    static const int32_t KEYCODE_VCR;
+    static const int32_t KEYCODE_VCR2;
+    static const int32_t KEYCODE_SAT;
+    static const int32_t KEYCODE_CD;
+    static const int32_t KEYCODE_TAPE;
+    static const int32_t KEYCODE_TUNER;
+    static const int32_t KEYCODE_PLAYER;
+    static const int32_t KEYCODE_DVD;
+    static const int32_t KEYCODE_AUDIO;
+    static const int32_t KEYCODE_VIDEO;
+    static const int32_t KEYCODE_MEMO;
+    static const int32_t KEYCODE_CALENDAR;
+    static const int32_t KEYCODE_RED;
+    static const int32_t KEYCODE_GREEN;
+    static const int32_t KEYCODE_YELLOW;
+    static const int32_t KEYCODE_BLUE;
+    static const int32_t KEYCODE_CHANNELUP;
+    static const int32_t KEYCODE_CHANNELDOWN;
+    static const int32_t KEYCODE_LAST;
+    static const int32_t KEYCODE_RESTART;
+    static const int32_t KEYCODE_SLOW;
+    static const int32_t KEYCODE_SHUFFLE;
+    static const int32_t KEYCODE_VIDEOPHONE;
+    static const int32_t KEYCODE_GAMES;
+    static const int32_t KEYCODE_ZOOMIN;
+    static const int32_t KEYCODE_ZOOMOUT;
+    static const int32_t KEYCODE_ZOOMRESET;
+    static const int32_t KEYCODE_WORDPROCESSOR;
+    static const int32_t KEYCODE_EDITOR;
+    static const int32_t KEYCODE_SPREADSHEET;
+    static const int32_t KEYCODE_GRAPHICSEDITOR;
+    static const int32_t KEYCODE_PRESENTATION;
+    static const int32_t KEYCODE_DATABASE;
+    static const int32_t KEYCODE_NEWS;
+    static const int32_t KEYCODE_VOICEMAIL;
+    static const int32_t KEYCODE_ADDRESSBOOK;
+    static const int32_t KEYCODE_MESSENGER;
+    static const int32_t KEYCODE_BRIGHTNESS_TOGGLE;
+    static const int32_t KEYCODE_SPELLCHECK;
+    static const int32_t KEYCODE_COFFEE;
+    static const int32_t KEYCODE_MEDIA_REPEAT;
+    static const int32_t KEYCODE_IMAGES;
+    static const int32_t KEYCODE_BUTTONCONFIG;
+    static const int32_t KEYCODE_TASKMANAGER;
+    static const int32_t KEYCODE_JOURNAL;
+    static const int32_t KEYCODE_CONTROLPANEL;
+    static const int32_t KEYCODE_APPSELECT;
+    static const int32_t KEYCODE_SCREENSAVER;
+    static const int32_t KEYCODE_ASSISTANT;
+    static const int32_t KEYCODE_KBD_LAYOUT_NEXT;
+    static const int32_t KEYCODE_BRIGHTNESS_MIN;
+    static const int32_t KEYCODE_BRIGHTNESS_MAX;
+    static const int32_t KEYCODE_KBDINPUTASSIST_PREV;
+    static const int32_t KEYCODE_KBDINPUTASSIST_NEXT;
+    static const int32_t KEYCODE_KBDINPUTASSIST_PREVGROUP;
+    static const int32_t KEYCODE_KBDINPUTASSIST_NEXTGROUP;
+    static const int32_t KEYCODE_KBDINPUTASSIST_ACCEPT;
+    static const int32_t KEYCODE_KBDINPUTASSIST_CANCEL;
 
-    static constexpr int32_t KEYCODE_FRONT = 2800;
-    static constexpr int32_t KEYCODE_SETUP = 2801;
-    static constexpr int32_t KEYCODE_WAKEUP = 2802;
-    static constexpr int32_t KEYCODE_SENDFILE = 2803;
-    static constexpr int32_t KEYCODE_DELETEFILE = 2804;
-    static constexpr int32_t KEYCODE_XFER = 2805;
-    static constexpr int32_t KEYCODE_PROG1 = 2806;
-    static constexpr int32_t KEYCODE_PROG2 = 2807;
-    static constexpr int32_t KEYCODE_MSDOS = 2808;
-    static constexpr int32_t KEYCODE_SCREENLOCK = 2809;
-    static constexpr int32_t KEYCODE_DIRECTION_ROTATE_DISPLAY = 2810;
-    static constexpr int32_t KEYCODE_CYCLEWINDOWS = 2811;
-    static constexpr int32_t KEYCODE_COMPUTER = 2812;
-    static constexpr int32_t KEYCODE_EJECTCLOSECD = 2813;
-    static constexpr int32_t KEYCODE_ISO = 2814;
-    static constexpr int32_t KEYCODE_MOVE = 2815;
-    static constexpr int32_t KEYCODE_F13 = 2816;
-    static constexpr int32_t KEYCODE_F14 = 2817;
-    static constexpr int32_t KEYCODE_F15 = 2818;
-    static constexpr int32_t KEYCODE_F16 = 2819;
-    static constexpr int32_t KEYCODE_F17 = 2820;
-    static constexpr int32_t KEYCODE_F18 = 2821;
-    static constexpr int32_t KEYCODE_F19 = 2822;
-    static constexpr int32_t KEYCODE_F20 = 2823;
-    static constexpr int32_t KEYCODE_F21 = 2824;
-    static constexpr int32_t KEYCODE_F22 = 2825;
-    static constexpr int32_t KEYCODE_F23 = 2826;
-    static constexpr int32_t KEYCODE_F24 = 2827;
-    static constexpr int32_t KEYCODE_PROG3 = 2828;
-    static constexpr int32_t KEYCODE_PROG4 = 2829;
-    static constexpr int32_t KEYCODE_DASHBOARD = 2830;
-    static constexpr int32_t KEYCODE_SUSPEND = 2831;
-    static constexpr int32_t KEYCODE_HP = 2832;
-    static constexpr int32_t KEYCODE_SOUND = 2833;
-    static constexpr int32_t KEYCODE_QUESTION = 2834;
-    static constexpr int32_t KEYCODE_CONNECT = 2836;
-    static constexpr int32_t KEYCODE_SPORT = 2837;
-    static constexpr int32_t KEYCODE_SHOP = 2838;
-    static constexpr int32_t KEYCODE_ALTERASE = 2839;
-    static constexpr int32_t KEYCODE_SWITCHVIDEOMODE = 2841;
-    static constexpr int32_t KEYCODE_BATTERY = 2842;
-    static constexpr int32_t KEYCODE_BLUETOOTH = 2843;
-    static constexpr int32_t KEYCODE_WLAN = 2844;
-    static constexpr int32_t KEYCODE_UWB = 2845;
-    static constexpr int32_t KEYCODE_WWAN_WIMAX = 2846;
-    static constexpr int32_t KEYCODE_RFKILL = 2847;
+    static const int32_t KEYCODE_FRONT;
+    static const int32_t KEYCODE_SETUP;
+    static const int32_t KEYCODE_WAKEUP;
+    static const int32_t KEYCODE_SENDFILE;
+    static const int32_t KEYCODE_DELETEFILE;
+    static const int32_t KEYCODE_XFER;
+    static const int32_t KEYCODE_PROG1;
+    static const int32_t KEYCODE_PROG2;
+    static const int32_t KEYCODE_MSDOS;
+    static const int32_t KEYCODE_SCREENLOCK;
+    static const int32_t KEYCODE_DIRECTION_ROTATE_DISPLAY;
+    static const int32_t KEYCODE_CYCLEWINDOWS;
+    static const int32_t KEYCODE_COMPUTER;
+    static const int32_t KEYCODE_EJECTCLOSECD;
+    static const int32_t KEYCODE_ISO;
+    static const int32_t KEYCODE_MOVE;
+    static const int32_t KEYCODE_F13;
+    static const int32_t KEYCODE_F14;
+    static const int32_t KEYCODE_F15;
+    static const int32_t KEYCODE_F16;
+    static const int32_t KEYCODE_F17;
+    static const int32_t KEYCODE_F18;
+    static const int32_t KEYCODE_F19;
+    static const int32_t KEYCODE_F20;
+    static const int32_t KEYCODE_F21;
+    static const int32_t KEYCODE_F22;
+    static const int32_t KEYCODE_F23;
+    static const int32_t KEYCODE_F24;
+    static const int32_t KEYCODE_PROG3;
+    static const int32_t KEYCODE_PROG4;
+    static const int32_t KEYCODE_DASHBOARD;
+    static const int32_t KEYCODE_SUSPEND;
+    static const int32_t KEYCODE_HP;
+    static const int32_t KEYCODE_SOUND;
+    static const int32_t KEYCODE_QUESTION;
+    static const int32_t KEYCODE_CONNECT;
+    static const int32_t KEYCODE_SPORT;
+    static const int32_t KEYCODE_SHOP;
+    static const int32_t KEYCODE_ALTERASE;
+    static const int32_t KEYCODE_SWITCHVIDEOMODE;
+    static const int32_t KEYCODE_BATTERY;
+    static const int32_t KEYCODE_BLUETOOTH;
+    static const int32_t KEYCODE_WLAN;
+    static const int32_t KEYCODE_UWB;
+    static const int32_t KEYCODE_WWAN_WIMAX;
+    static const int32_t KEYCODE_RFKILL;
 
-    static constexpr int32_t KEYCODE_CHANNEL = 3001;
-    static constexpr int32_t KEYCODE_BTN_0 = 3100;
-    static constexpr int32_t KEYCODE_BTN_1 = 3101;
-    static constexpr int32_t KEYCODE_BTN_2 = 3102;
-    static constexpr int32_t KEYCODE_BTN_3 = 3103;
-    static constexpr int32_t KEYCODE_BTN_4 = 3104;
-    static constexpr int32_t KEYCODE_BTN_5 = 3105;
-    static constexpr int32_t KEYCODE_BTN_6 = 3106;
-    static constexpr int32_t KEYCODE_BTN_7 = 3107;
-    static constexpr int32_t KEYCODE_BTN_8 = 3108;
-    static constexpr int32_t KEYCODE_BTN_9 = 3109;
+    static const int32_t KEYCODE_CHANNEL;
+    static const int32_t KEYCODE_BTN_0;
+    static const int32_t KEYCODE_BTN_1;
+    static const int32_t KEYCODE_BTN_2;
+    static const int32_t KEYCODE_BTN_3;
+    static const int32_t KEYCODE_BTN_4;
+    static const int32_t KEYCODE_BTN_5;
+    static const int32_t KEYCODE_BTN_6;
+    static const int32_t KEYCODE_BTN_7;
+    static const int32_t KEYCODE_BTN_8;
+    static const int32_t KEYCODE_BTN_9;
 
-    static constexpr int32_t KEYCODE_BRL_DOT1 = 3201;
-    static constexpr int32_t KEYCODE_BRL_DOT2 = 3202;
-    static constexpr int32_t KEYCODE_BRL_DOT3 = 3203;
-    static constexpr int32_t KEYCODE_BRL_DOT4 = 3204;
-    static constexpr int32_t KEYCODE_BRL_DOT5 = 3205;
-    static constexpr int32_t KEYCODE_BRL_DOT6 = 3206;
-    static constexpr int32_t KEYCODE_BRL_DOT7 = 3207;
-    static constexpr int32_t KEYCODE_BRL_DOT8 = 3208;
-    static constexpr int32_t KEYCODE_BRL_DOT9 = 3209;
-    static constexpr int32_t KEYCODE_BRL_DOT10 = 3210;
+    static const int32_t KEYCODE_BRL_DOT1;
+    static const int32_t KEYCODE_BRL_DOT2;
+    static const int32_t KEYCODE_BRL_DOT3;
+    static const int32_t KEYCODE_BRL_DOT4;
+    static const int32_t KEYCODE_BRL_DOT5;
+    static const int32_t KEYCODE_BRL_DOT6;
+    static const int32_t KEYCODE_BRL_DOT7;
+    static const int32_t KEYCODE_BRL_DOT8;
+    static const int32_t KEYCODE_BRL_DOT9;
+    static const int32_t KEYCODE_BRL_DOT10;
 
     /* *
      * Left Knob roll-up
@@ -1355,7 +1355,7 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_LEFT_KNOB_ROLL_UP = 10001;
+    static const int32_t KEYCODE_LEFT_KNOB_ROLL_UP;
     /* *
      * Left Knob roll-down
      * <p>In contrast to {@link #static const int32_t KEYCODE_LEFT_KNOB_ROLL_UP};
@@ -1364,7 +1364,7 @@ public:
      * conditioner temperature.
      * @since 1
      */
-    static constexpr int32_t KEYCODE_LEFT_KNOB_ROLL_DOWN = 10002;
+    static const int32_t KEYCODE_LEFT_KNOB_ROLL_DOWN;
 
     /* *
      * Left Knob
@@ -1372,7 +1372,7 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_LEFT_KNOB = 10003;
+    static const int32_t KEYCODE_LEFT_KNOB;
     /* *
      * Right Knob roll-up
      * <p>In contrast to {@link #static const int32_t KEYCODE_RIGHT_KNOB_ROLL_DOWN}; it means rolling
@@ -1382,7 +1382,7 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_RIGHT_KNOB_ROLL_UP = 10004;
+    static const int32_t KEYCODE_RIGHT_KNOB_ROLL_UP;
     /* *
      * Right Knob roll-down
      * <p>In contrast to {@link #static const int32_t KEYCODE_RIGHT_KNOB_ROLL_UP}; it means rolling
@@ -1391,14 +1391,14 @@ public:
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_RIGHT_KNOB_ROLL_DOWN = 10005;
+    static const int32_t KEYCODE_RIGHT_KNOB_ROLL_DOWN;
     /* *
      * Right Knob
      * <p>Pressing the knob will activate its adjustment function.
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_RIGHT_KNOB = 10006;
+    static const int32_t KEYCODE_RIGHT_KNOB;
     /* *
      * Audio Source Switch button
      * <p>Pressing this button will enable the audio source. Depending on the
@@ -1406,26 +1406,26 @@ public:
      * button is pressed.
      * @since 1
      */
-    static constexpr int32_t KEYCODE_VOICE_SOURCE_SWITCH = 10007;
+    static const int32_t KEYCODE_VOICE_SOURCE_SWITCH;
     /* *
      * Menu key
      * <p>Pressing this key will display the launcher page.
      *
      * @since 1
      */
-    static constexpr int32_t KEYCODE_LAUNCHER_MENU = 10008;
+    static const int32_t KEYCODE_LAUNCHER_MENU;
 
     // Unknown key action. Usually used to indicate the initial invalid value
-    static constexpr int32_t KEY_ACTION_UNKNOWN = 0X00000000;
+    static const int32_t KEY_ACTION_UNKNOWN;
     // Indicates cancel action.
     // When the button is pressed, and the lifting action cannot be reported normally, report the key event of this
     // action
-    static constexpr int32_t KEY_ACTION_CANCEL = 0X00000001;
+    static const int32_t KEY_ACTION_CANCEL;
 
     // Indicates key press action
-    static constexpr int32_t KEY_ACTION_DOWN = 0x00000002;
+    static const int32_t KEY_ACTION_DOWN;
     // Indicates key release action
-    static constexpr int32_t KEY_ACTION_UP = 0X00000003;
+    static const int32_t KEY_ACTION_UP;
 
 public:
     class KeyItem {
