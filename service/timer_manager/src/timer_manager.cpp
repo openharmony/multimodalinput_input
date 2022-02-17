@@ -179,5 +179,5 @@ void TimerManager::ProcessTimersInternal()
         timer->callback();
     }
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
     }
 
 void ChkConfig(int32_t fd)
@@ -98,9 +98,11 @@ void EventDump::Dump(int32_t fd)
     auto strCurTime = Strftime();
     mprintf(fd, "MMIDumpsBegin: %s", strCurTime.c_str());
     ChkConfig(fd);
+#ifdef OHOS_WESTEN_MODEL
     ChkAppInfos(fd);
     WinMgr->Dump(fd);
     RegEventHM->Dump(fd);
+#endif
     if (udsServer_) {
         udsServer_->Dump(fd);
     }
@@ -164,5 +166,5 @@ void EventDump::InsertFormat(std::string str, ...)
     InsertDumpInfo(buf);
     MMI_LOGD("leave");
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

@@ -78,6 +78,6 @@ private:
     EventDispatch eventDispatch_;
     std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // SERVER_MSG_HANDLER_H

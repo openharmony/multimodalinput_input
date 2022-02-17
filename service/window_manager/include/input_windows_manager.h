@@ -207,8 +207,8 @@ private:
     std::map<int32_t, WindowInfo> windowInfos_ = {};
     MouseLocation mouseLoction_ = {};
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 #define WinMgr OHOS::MMI::InputWindowsManager::GetInstance()
 #endif // INPUT_WINDOWS_MANAGER_H

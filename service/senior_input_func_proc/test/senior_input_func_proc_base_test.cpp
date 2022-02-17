@@ -115,4 +115,4 @@ using namespace OHOS::MMI;
         const RawInputEvent event = { 0 };
         seniorInputFunc.DeviceEventDispatchProcess(event);
     }
-}
+} // namespace
