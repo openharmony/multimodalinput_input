@@ -62,7 +62,7 @@ void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
     MMI_LOGD("Mark consumed state, monitor:%{public}d,event:%{public}d", monitorId, eventId);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKP(client);
+    CHKPV(client);
     NetPacket pkt(MmiMessageId::MARK_CONSUMED);
     CHK(pkt.Write(monitorId), STREAM_BUF_WRITE_FAIL);
     CHK(pkt.Write(eventId), STREAM_BUF_WRITE_FAIL);
@@ -73,7 +73,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
     std::shared_ptr<IInputEventConsumer> monitor)
 {
     std::lock_guard<std::mutex> guard(lockHandlers_);
-    InputHandlerManager::InputHandler handler {
+    InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,
         .handlerType_ = handlerType,
         .consumer_ = monitor
@@ -89,7 +89,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
 void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handlerType)
 {
     MMIClientPtr client { MMIEventHdl.GetMMIClient() };
-    CHKP(client);
+    CHKPV(client);
     NetPacket pkt(MmiMessageId::ADD_INPUT_HANDLER);
     CHK(pkt.Write(handlerId), STREAM_BUF_WRITE_FAIL);
     CHK(pkt.Write(handlerType), STREAM_BUF_WRITE_FAIL);
@@ -117,7 +117,7 @@ void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType h
 {
     MMI_LOGD("Remove handler:%{public}d from server", handlerId);
     MMIClientPtr client { MMIEventHdl.GetMMIClient() };
-    CHKP(client);
+    CHKPV(client);
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_HANDLER);
     CHK(pkt.Write(handlerId), STREAM_BUF_WRITE_FAIL);
     CHK(pkt.Write(handlerType), STREAM_BUF_WRITE_FAIL);
@@ -159,8 +159,8 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
         std::string touchEventString = "touchEventFilter";
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, touchId);
     }
-    std::map<int32_t, InputHandler>::iterator tItr;
-    std::map<int32_t, InputHandler>::iterator tItrEnd;
+    std::map<int32_t, Handler>::iterator tItr;
+    std::map<int32_t, Handler>::iterator tItrEnd;
     {
         std::lock_guard<std::mutex> guard(lockHandlers_);
         tItr = inputHandlers_.find(handlerId);

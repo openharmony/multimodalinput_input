@@ -17,17 +17,25 @@
 
 namespace OHOS {
 namespace MMI {
-void JsInputDeviceManager::GetDeviceIdsAsync(napi_env env, napi_value handle)
+void JsInputDeviceManager::GetDeviceIds(napi_env env, napi_value handle)
 {
     SetContext(env, handle);
     auto &instance = InputDeviceImpl::GetInstance();
+    if (handle == nullptr) {
+        instance.GetInputDeviceIdsAsync(EmitJsIdsPromise);
+        return;
+    }
     instance.GetInputDeviceIdsAsync(EmitJsIdsAsync);
 }
 
-void JsInputDeviceManager::GetDeviceAsync(int32_t id, napi_env env, napi_value handle)
+void JsInputDeviceManager::GetDevice(int32_t id, napi_env env, napi_value handle)
 {
     SetContext(env, handle);
     auto &instance = InputDeviceImpl::GetInstance();
+    if (handle == nullptr) {
+        instance.GetInputDeviceAsync(id, EmitJsDevPromise);
+        return;
+    }
     instance.GetInputDeviceAsync(id, EmitJsDevAsync);
 }
 

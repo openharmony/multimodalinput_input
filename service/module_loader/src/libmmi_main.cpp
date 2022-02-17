@@ -35,8 +35,8 @@ namespace MMI {
         static bool g_bThreadTerm = false;
 #endif
     }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 static std::atomic_bool g_isRun(false);
 

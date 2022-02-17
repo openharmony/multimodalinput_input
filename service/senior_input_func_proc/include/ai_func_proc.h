@@ -30,6 +30,6 @@ namespace MMI {
         int32_t GetDevType() override;
         int32_t CheckEventCode(const RawInputEvent& event);
     };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // AI_FUNC_PROC_H

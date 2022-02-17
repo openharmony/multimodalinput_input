@@ -48,7 +48,7 @@ template<class ...Ts>
 void CheckDefineOutput(const char* fmt, Ts... args)
 {
     using namespace OHOS::MMI;
-    CHKP(fmt);
+    CHKPV(fmt);
     int32_t ret = 0;
     char buf[MAX_STREAM_BUF_SIZE] = {};
     ret = snprintf_s(buf, MAX_STREAM_BUF_SIZE, MAX_STREAM_BUF_SIZE - 1, fmt, args...);
@@ -208,7 +208,7 @@ int32_t MMIService::Init()
     CHKR(DevRegister->Init(), DEV_REG_INIT_FAIL, DEV_REG_INIT_FAIL);
 
     MMI_LOGD("PointerDrawingManager Init");
-    CHKR(MouseDrawingManager::GetInstance()->Init(), POINTER_DRAW_INIT_FAIL, POINTER_DRAW_INIT_FAIL);
+    CHKR(PointerDrawingManager::GetInstance()->Init(), POINTER_DRAW_INIT_FAIL, POINTER_DRAW_INIT_FAIL);
 
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
     CHKR(mmiFd_ >= 0, EPOLL_CREATE_FAIL, EPOLL_CREATE_FAIL);
@@ -254,7 +254,7 @@ void MMIService::OnDump()
 
 void MMIService::OnConnected(SessionPtr s)
 {
-    CHKP(s);
+    CHKPV(s);
     int32_t fd = s->GetFd();
     MMI_LOGI("MMIService::_OnConnected fd:%{public}d", fd);
     AppRegs->RegisterConnectState(fd);
@@ -262,7 +262,7 @@ void MMIService::OnConnected(SessionPtr s)
 
 void MMIService::OnDisconnected(SessionPtr s)
 {
-    CHKP(s);
+    CHKPV(s);
     MMI_LOGW("MMIService::OnDisconnected enter, session desc:%{public}s", s->GetDescript().c_str());
     int32_t fd = s->GetFd();
 
@@ -280,8 +280,8 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
 
     toReturnClientFd = INVALID_SOCKET_FD;
     int32_t serverFd = INVALID_SOCKET_FD;
-    int32_t uid = GetCallingUid();
-    int32_t pid = GetCallingPid();
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    int32_t pid = IPCSkeleton::GetCallingPid();
     const int32_t ret = AddSocketPairInfo(programName, moduleType, serverFd, uid, pid, toReturnClientFd);
     if (ret != RET_OK) {
         MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
@@ -303,10 +303,6 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
         return RET_ERR;
     }
     MMI_LOGIK("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
-    if (!IsAuthorizedCalling()) {
-        MMI_LOGE("permission denied");
-        return RET_ERR;
-    }
 
     int32_t clientFd = INVALID_SOCKET_FD;
     ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
@@ -323,9 +319,6 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
 
     MMI_LOGI("send clientFd to client, clientFd = %d", clientFd);
     close(clientFd);
-    clientFd = -1;
-    MMI_LOGI(" clientFd = %d, has closed in server", clientFd);
-
     return RET_OK;
 }
 
@@ -452,5 +445,5 @@ void MMIService::OnSignalEvent(int32_t signalFd)
     MMI_LOGD("leave");
 }
 
-}
-}
+} // namespace MMI
+} // namespace OHOS
