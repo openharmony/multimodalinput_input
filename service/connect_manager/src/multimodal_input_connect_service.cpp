@@ -14,7 +14,7 @@
  */
 
 #include "multimodal_input_connect_service.h"
-#include <string.h>
+#include <cstring>
 #include <sys/types.h>
 #include <unistd.h>
 #include "log.h"

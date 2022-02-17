@@ -25,7 +25,7 @@
 #include <cstring>
 #include <sys/stat.h>
 #include <dirent.h>
-#include <signal.h>
+#include <csignal>
 #include <fstream>
 #include <memory>
 #include <cinttypes>
