@@ -192,7 +192,7 @@ bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
 void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscriber)
 {
     MMI_LOGD("enter");
-    CHKP(subscriber);
+    CHKPV(subscriber);
 
     if (subscriber->timerId_ < 0) {
         MMI_LOGE("Leave, subscribeId:%{public}d,null timerId < 0", subscriber->id_);
@@ -209,7 +209,7 @@ void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscribe
 void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
 {
     MMI_LOGD("enter");
-    CHKP(subscriber);
+    CHKPV(subscriber);
     subscriber->timerId_ = -1;
     if (subscriber->keyEvent_ == nullptr) {
         MMI_LOGE("Leave, subscriber->keyEvent is nullptr, subscribeId:%{public}d", subscriber->id_);
