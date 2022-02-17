@@ -14,7 +14,7 @@
  */
 
 #include "mmi_server.h"
-#include <inttypes.h>
+#include <cinttypes>
 #include "event_dump.h"
 #include "log.h"
 #include "multimodal_input_connect_service.h"
@@ -26,14 +26,14 @@ namespace MMI {
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIServer" };
     }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 template<class ...Ts>
 void CheckDefineOutput(const char* fmt, Ts... args)
 {
     using namespace OHOS::MMI;
-    CHKP(fmt);
+    CHKPV(fmt);
     int32_t ret = 0;
 
     char buf[MAX_STREAM_BUF_SIZE] = {};
@@ -92,9 +92,6 @@ int32_t OHOS::MMI::MMIServer::Start()
     ret = SaConnectServiceRegister();
     CHKR((ret == RET_OK), ret, ret);
 
-    ret = InitExpSoLibrary();
-    CHKR((ret == RET_OK), ret, ret);
-
     MMI_LOGD("Screen_Manager Init");
     CHKR(WinMgr->Init(*this), WINDOWS_MSG_INIT_FAIL, WINDOWS_MSG_INIT_FAIL);
 
@@ -128,21 +125,6 @@ int32_t OHOS::MMI::MMIServer::Start()
     MMI_LOGW("The server started successfully, time consumed:%{public}" PRId64
             " Ms curTime:%{public}" PRId64 "", consumeTime, curTime);
 #endif
-    return RET_OK;
-}
-
-int32_t OHOS::MMI::MMIServer::InitExpSoLibrary()
-{
-    MMI_LOGD("Load Expansibility Operation");
-    auto expConf = GetEnv("EXP_CONF");
-    if (expConf.empty()) {
-        expConf = DEF_EXP_CONFIG;
-    }
-    auto expSOPath = GetEnv("EXP_SOPATH");
-    if (expSOPath.empty()) {
-        expSOPath = DEF_EXP_SOPATH;
-    }
-    expOper_.LoadExteralLibrary(expConf.c_str(), expSOPath.c_str());
     return RET_OK;
 }
 
@@ -251,7 +233,7 @@ int32_t OHOS::MMI::MMIServer::SaConnectServiceStop()
 
 void OHOS::MMI::MMIServer::OnConnected(SessionPtr s)
 {
-    CHKP(s);
+    CHKPV(s);
     int32_t fd = s->GetFd();
     MMI_LOGI("MMIServer::_OnConnected fd:%{public}d", fd);
     AppRegs->RegisterConnectState(fd);
@@ -259,7 +241,7 @@ void OHOS::MMI::MMIServer::OnConnected(SessionPtr s)
 
 void OHOS::MMI::MMIServer::OnDisconnected(SessionPtr s)
 {
-    CHKP(s);
+    CHKPV(s);
     MMI_LOGW("MMIServer::OnDisconnected enter, session desc:%{public}s", s->GetDescript().c_str());
     int32_t fd = s->GetFd();
     auto appInfo = AppRegs->FindBySocketFd(fd);

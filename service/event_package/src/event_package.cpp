@@ -189,11 +189,11 @@ int32_t EventPackage::PackageTabletToolOtherParams(libinput_event *event, EventT
 void EventPackage::PackageTabletToolTypeParam(libinput_event *event, EventTabletTool& tableTool)
 {
     MMI_LOGD("enter");
-    CHKP(event);
+    CHKPV(event);
     auto data = libinput_event_get_tablet_tool_event(event);
-    CHKP(data);
+    CHKPV(data);
     auto tool = libinput_event_tablet_tool_get_tool(data);
-    CHKP(tool);
+    CHKPV(tool);
     switch (libinput_tablet_tool_get_type(tool)) {
         case LIBINPUT_TABLET_TOOL_TYPE_PEN: {
             tableTool.tool.type = TABLET_TOOL_TYPE_PEN;
@@ -238,10 +238,10 @@ int32_t EventPackage::PackageTabletToolEvent(libinput_event *event, EventTabletT
 {
     MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
-    const uint32_t stylusButton1KeyCode = 331;
-    const uint32_t stylusButton2KeyCode = 332;
-    const uint32_t stylusButton1Value = 1;
-    const uint32_t stylusButton2Value = 2;
+    constexpr uint32_t stylusButton1KeyCode = 331;
+    constexpr uint32_t stylusButton2KeyCode = 332;
+    constexpr uint32_t stylusButton1Value = 1;
+    constexpr uint32_t stylusButton2Value = 2;
     auto data = libinput_event_get_tablet_tool_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
     auto tool = libinput_event_tablet_tool_get_tool(data);
@@ -265,9 +265,9 @@ int32_t EventPackage::PackageTabletToolEvent(libinput_event *event, EventTabletT
 void EventPackage::PackageTabletPadOtherParams(libinput_event *event, EventTabletPad& tabletPad)
 {
     MMI_LOGD("enter");
-    CHKP(event);
+    CHKPV(event);
     auto data = libinput_event_get_tablet_pad_event(event);
-    CHKP(data);
+    CHKPV(data);
     auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_TABLET_PAD_RING: {
@@ -905,5 +905,5 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
     MMI_LOGD("leave");
     return RET_OK;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

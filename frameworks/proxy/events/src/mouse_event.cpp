@@ -25,87 +25,87 @@ void MouseEvent::Initialize(int32_t windowId, int32_t action, int32_t actionButt
 {
     MultimodalEvent::Initialize(windowId, highLevelEvent, uuid, sourceType, occurredTime, deviceId, inputDeviceId,
                                 isHighLevelEvent, deviceUdevTags);
-    mAction_ = action;
-    mActionButton_ = actionButton;
-    mPressedButtons_ = pressedButtons;
-    mMmiPoint_ = mmiPoint;
-    mXOffset_ = xOffset;
-    mYOffset_ = yOffset;
-    mCursorDelta_ = cursorDelta;
-    mScrollingDelta_ = scrollingDelta;
+    action_ = action;
+    actionButton_ = actionButton;
+    pressedButtons_ = pressedButtons;
+    mmiPoint_ = mmiPoint;
+    xOffset_ = xOffset;
+    yOffset_ = yOffset;
+    cursorDelta_ = cursorDelta;
+    scrollingDelta_ = scrollingDelta;
 
-    mapDeviceAxis_[AXIS_X] = eventJoyStickInfo.abs_x.standardValue;
-    mapDeviceAxis_[AXIS_Y] = eventJoyStickInfo.abs_y.standardValue;
-    mapDeviceAxis_[AXIS_Z] = eventJoyStickInfo.abs_z.standardValue;
-    mapDeviceAxis_[AXIS_RX] = eventJoyStickInfo.abs_rx.standardValue;
-    mapDeviceAxis_[AXIS_RY] = eventJoyStickInfo.abs_ry.standardValue;
-    mapDeviceAxis_[AXIS_RZ] = eventJoyStickInfo.abs_rz.standardValue;
-    mapDeviceAxis_[AXIS_THROTTLE] = eventJoyStickInfo.abs_throttle.standardValue;
-    mapDeviceAxis_[AXIS_HAT_X] = eventJoyStickInfo.abs_hat0x.standardValue;
-    mapDeviceAxis_[AXIS_HAT_Y] = eventJoyStickInfo.abs_hat0y.standardValue;
-    mapDeviceAxis_[AXIS_WHEEL] = eventJoyStickInfo.abs_wheel.standardValue;
-    mapDeviceAxis_[AXIS_TILT_X] = xOffset;
-    mapDeviceAxis_[AXIS_TILT_Y] = yOffset;
+    deviceAxis_[AXIS_X] = eventJoyStickInfo.abs_x.standardValue;
+    deviceAxis_[AXIS_Y] = eventJoyStickInfo.abs_y.standardValue;
+    deviceAxis_[AXIS_Z] = eventJoyStickInfo.abs_z.standardValue;
+    deviceAxis_[AXIS_RX] = eventJoyStickInfo.abs_rx.standardValue;
+    deviceAxis_[AXIS_RY] = eventJoyStickInfo.abs_ry.standardValue;
+    deviceAxis_[AXIS_RZ] = eventJoyStickInfo.abs_rz.standardValue;
+    deviceAxis_[AXIS_THROTTLE] = eventJoyStickInfo.abs_throttle.standardValue;
+    deviceAxis_[AXIS_HAT_X] = eventJoyStickInfo.abs_hat0x.standardValue;
+    deviceAxis_[AXIS_HAT_Y] = eventJoyStickInfo.abs_hat0y.standardValue;
+    deviceAxis_[AXIS_WHEEL] = eventJoyStickInfo.abs_wheel.standardValue;
+    deviceAxis_[AXIS_TILT_X] = xOffset;
+    deviceAxis_[AXIS_TILT_Y] = yOffset;
 }
 
 void MouseEvent::Initialize(MouseEvent& mouseEvent)
 {
     MultimodalEvent::Initialize(mouseEvent);
-    mAction_ = mouseEvent.GetAction();
-    mActionButton_ = mouseEvent.GetActionButton();
-    mPressedButtons_ = mouseEvent.GetPressedButtons();
-    mMmiPoint_ = mouseEvent.GetCursor();
-    mXOffset_ = mouseEvent.GetXOffset();
-    mYOffset_ = mouseEvent.GetYOffset();
-    mCursorDelta_ = mouseEvent.GetCursorDelta(0);
-    mScrollingDelta_ = mouseEvent.GetScrollingDelta(0);
+    action_ = mouseEvent.GetAction();
+    actionButton_ = mouseEvent.GetActionButton();
+    pressedButtons_ = mouseEvent.GetPressedButtons();
+    mmiPoint_ = mouseEvent.GetCursor();
+    xOffset_ = mouseEvent.GetXOffset();
+    yOffset_ = mouseEvent.GetYOffset();
+    cursorDelta_ = mouseEvent.GetCursorDelta(0);
+    scrollingDelta_ = mouseEvent.GetScrollingDelta(0);
 }
 
 int32_t MouseEvent::GetAction() const
 {
-    return mAction_;
+    return action_;
 }
 
 int32_t MouseEvent::GetActionButton() const
 {
-    return mActionButton_;
+    return actionButton_;
 }
 
 int32_t MouseEvent::GetPressedButtons() const
 {
-    return mPressedButtons_;
+    return pressedButtons_;
 }
 
 MmiPoint MouseEvent::GetCursor() const
 {
-    return mMmiPoint_;
+    return mmiPoint_;
 }
 
 void MouseEvent::SetCursorOffset(float offsetX, float offsetY)
 {
-    mXOffset_ = offsetX;
-    mYOffset_ = offsetY;
+    xOffset_ = offsetX;
+    yOffset_ = offsetY;
 }
 
 float MouseEvent::GetXOffset() const
 {
-    return mXOffset_;
+    return xOffset_;
 }
 
 float MouseEvent::GetYOffset() const
 {
-    return mYOffset_;
+    return yOffset_;
 }
 
 float MouseEvent::GetCursorDelta(int32_t axis) const
 {
-    return mCursorDelta_;
+    return cursorDelta_;
 }
 
 float MouseEvent::GetScrollingDelta(int32_t axis) const
 {
-    auto it = mapDeviceAxis_.find(axis);
-    if (it != mapDeviceAxis_.end()) {
+    auto it = deviceAxis_.find(axis);
+    if (it != deviceAxis_.end()) {
         return it->second;
     }
 
@@ -114,8 +114,8 @@ float MouseEvent::GetScrollingDelta(int32_t axis) const
 
 float MouseEvent::GetAxisValue(int32_t axis) const
 {
-    auto it = mapDeviceAxis_.find(axis);
-    if (it != mapDeviceAxis_.end()) {
+    auto it = deviceAxis_.find(axis);
+    if (it != deviceAxis_.end()) {
         return it->second;
     }
 

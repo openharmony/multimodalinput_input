@@ -24,6 +24,6 @@ public:
     int32_t GetDevType() override;
     int32_t CheckEventCode(const RawInputEvent& event);
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // KNUCKLE_FUNC_PROC_H

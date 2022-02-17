@@ -18,6 +18,7 @@
 #include <sys/un.h>
 #include <memory>
 #include "net_packet.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -27,6 +28,7 @@ class UDSSession : public std::enable_shared_from_this<UDSSession> {
 public:
     UDSSession(const std::string& programName, const int moduleType, const int32_t fd, const int32_t uid,
                const int32_t pid);
+    DISALLOW_COPY_AND_MOVE(UDSSession);
     virtual ~UDSSession();
 
     bool SendMsg(const char *buf, size_t size) const;

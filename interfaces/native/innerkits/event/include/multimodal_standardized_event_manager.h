@@ -19,6 +19,7 @@
 #include "singleton.h"
 #include "iremote_object.h"
 #include "if_mmi_client.h"
+#include "nocopyable.h"
 #include "standardized_event_handler.h"
 #include "key_event_input_subscribe_manager.h"
 
@@ -34,8 +35,7 @@ class MultimodalStandardizedEventManager {
 public:
     MultimodalStandardizedEventManager();
     ~MultimodalStandardizedEventManager();
-    MultimodalStandardizedEventManager(const MultimodalStandardizedEventManager&) = delete;
-    MultimodalStandardizedEventManager& operator=(const MultimodalStandardizedEventManager&) = delete;
+    DISALLOW_COPY_AND_MOVE(MultimodalStandardizedEventManager);
 
     void SetClientHandle(MMIClientPtr client);
     const std::set<std::string> *GetRegisterEvent();

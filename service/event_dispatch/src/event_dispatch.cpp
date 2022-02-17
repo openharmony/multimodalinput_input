@@ -14,7 +14,7 @@
  */
 
 #include "event_dispatch.h"
-#include <inttypes.h>
+#include <cinttypes>
 #include "input-event-codes.h"
 #include "ability_launch_manager.h"
 #include "bytrace.h"
@@ -219,13 +219,11 @@ int32_t EventDispatch::KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer
                 SPCL_REG_EVENT_DISP_FAIL);
         }
     }
-    if ((ret1 == RET_OK) && (ret2 == RET_OK)) {
-        MMI_LOGD("leave");
-        return RET_OK;
-    } else {
+    if ((ret1 != RET_OK) || (ret2 != RET_OK)) {
         MMI_LOGE("dispatching special registered event has failed");
         return RET_ERR;
     }
+    return RET_OK;
 }
 
 int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_event *event,
@@ -433,7 +431,6 @@ int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
     MMI_LOGD("enter");
     CHKPR(point, ERROR_NULL_POINTER);
     InputHandlerManagerGlobal::GetInstance().HandleEvent(point);
-    MMI_LOGD("call  DispatchTouchTransformPointEvent begin");
     auto appInfo = AppRegs->FindByWinId(point->GetAgentWindowId()); // obtain application information
     if (appInfo.fd == RET_ERR) {
         MMI_LOGE("Failed to find fd, errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
@@ -724,10 +721,10 @@ void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, i
     int32_t keyCode = key->GetKeyCode();
     std::string checkKeyCode;
     if (checkLaunchAbility == number) {
-        checkKeyCode = "CheckLaunchAbility service GetKeyCode = " + std::to_string(keyCode);
+        checkKeyCode = "CheckLaunchAbility service GetKeyCode=" + std::to_string(keyCode);
         MMI_LOGT("CheckLaunchAbility service trace GetKeyCode:%{public}d", keyCode);
     } else {
-        checkKeyCode = "FilterSubscribeKeyEvent service GetKeyCode = " + std::to_string(keyCode);
+        checkKeyCode = "FilterSubscribeKeyEvent service GetKeyCode=" + std::to_string(keyCode);
         MMI_LOGT("FilterSubscribeKeyEvent service trace GetKeyCode:%{public}d", keyCode);
     }
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, checkKeyCode);
@@ -739,8 +736,8 @@ void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, i
 int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
     std::shared_ptr<KeyEvent> key, const uint64_t preHandlerTime)
 {
+    MMI_LOGD("begin");
     CHKPR(key, PARAM_INPUT_INVALID);
-    MMI_LOGD("DispatchKeyEventByPid begin");
     if (key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         if (InterceptorMgrGbl.OnKeyEvent(key)) {
             MMI_LOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
@@ -761,7 +758,7 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
         return RET_OK;
     }
     auto fd = WinMgr->UpdateTarget(key);
-    CHKR(fd > 0, FD_OBTAIN_FAIL, RET_ERR);
+    CHKR(fd >= 0, FD_OBTAIN_FAIL, RET_ERR);
 #ifdef DEBUG_CODE_TEST
     std::string str = WinMgr->GetSurfaceIdListString();
     PrintWMSInfo(str, fd, 0, key->GetTargetWindowId());

@@ -45,6 +45,6 @@ public:
     static UDSServer* udsServerPtr_;
     static std::map<int32_t, sptr<SeniorInputFuncProcBase>> deviceInfoMap_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // SENIOR_INPUT_FUNC_PROC_BASE_H

@@ -27,8 +27,8 @@ namespace MMI {
 namespace {
 [[maybe_unused]]constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManagerStub"};
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 namespace OHOS {
 namespace MMI {

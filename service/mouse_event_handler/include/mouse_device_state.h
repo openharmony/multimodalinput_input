@@ -66,8 +66,8 @@ private:
     MouseDeviceCoords mouseCoord_;
     std::map<uint32_t, int32_t> mouseBtnState_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 #define MouseState OHOS::MMI::MouseDeviceState::GetInstance()
 #endif // MOUSE_DEVICE_STATE_H
