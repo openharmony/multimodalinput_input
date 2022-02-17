@@ -217,11 +217,11 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
 
     bool isPressed = GetNamedPropertyBool(env, keyHandle, "isPressed");
     int32_t keyCode = GetNamedPropertyInt32(env, keyHandle, "keyCode");
-    bool isIntercepted = GetNamedPropertyBool(env, keyHandle, "isIntercepted");
+    bool isIntercepted = false;
     int32_t keyDownDuration = GetNamedPropertyInt32(env, keyHandle, "keyDownDuration");
 
     OHOS::KeyEvent injectEvent;
-    injectEvent.Initialize(0, isPressed, keyCode, keyDownDuration, 0, "", 0, 0, "", 0, false, 0, isIntercepted);
+    injectEvent.Initialize(0, isPressed, keyCode, keyDownDuration, 0, "", 0, 0, "", 0, false, 0, 0, isIntercepted);
     int32_t response = MMIEventHdl.InjectEvent(injectEvent);
 
     if (napi_create_int32(env, response, &result) != napi_ok) {
