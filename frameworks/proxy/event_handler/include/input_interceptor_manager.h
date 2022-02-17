@@ -18,11 +18,16 @@
 #include <memory>
 #include "input_handler_type.h"
 #include "i_input_event_consumer.h"
+#include "nocopyable.h"
 #include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
 class InputInterceptorManager {
+public:
+    InputInterceptorManager() = default;
+    DISALLOW_COPY_AND_MOVE(InputInterceptorManager);
+
 public:
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
     void RemoveInterceptor(int32_t interceptorId);

@@ -20,6 +20,7 @@
 #include "msg_handler.h"
 #include "uds_client.h"
 #include "multimodal_event.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -29,6 +30,7 @@ class ClientMsgHandler : public MsgHandler<ClientMsgFun>,
     public IfClientMsgHandler, public std::enable_shared_from_this<IfClientMsgHandler> {
 public:
     ClientMsgHandler();
+    DISALLOW_COPY_AND_MOVE(ClientMsgHandler);
     virtual ~ClientMsgHandler();
     virtual bool Init() override;
     virtual void OnMsgHandler(const UDSClient& client, NetPacket& pkt) override;
