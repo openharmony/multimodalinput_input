@@ -56,7 +56,7 @@ struct SeatInfo** GetSeatsInfo()
 
 struct ScreenInfo** GetScreensInfo()
 {
-    MMI_LOGD("GetScreensInfo...");
+    MMI_LOGD("GetScreensInfo");
     const int32_t TEST_VAL = 2;
     const int32_t TEST_LAYER_ID = 2;
     const int32_t TEST_WIDTH = 1920;

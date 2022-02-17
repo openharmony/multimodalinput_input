@@ -119,7 +119,7 @@ uint32_t OHOS::MMI::TestAuxToolClient::GetAiSensorAllowProcCodes(uint32_t item) 
 
 int32_t OHOS::MMI::TestAuxToolClient::Socket()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     const int32_t ret = MultimodalInputConnectManager::GetInstance()->
                         AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_SIMULATE_INJECT);
     if (ret != RET_OK) {

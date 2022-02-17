@@ -79,7 +79,7 @@ OHOS::MMI::MMIServer::MMIServer()
 
 OHOS::MMI::MMIServer::~MMIServer()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
 }
 
 int32_t OHOS::MMI::MMIServer::Start()
@@ -186,7 +186,7 @@ void OHOS::MMI::MMIServer::StopAll()
 
 int32_t OHOS::MMI::MMIServer::SaConnectServiceRegister()
 {
-    MMI_LOGT("enter.");
+    MMI_LOGD("enter.");
 
     int32_t ret;
 
@@ -207,7 +207,7 @@ int32_t OHOS::MMI::MMIServer::SaConnectServiceRegister()
 
 int32_t OHOS::MMI::MMIServer::SaConnectServiceStart()
 {
-    MMI_LOGT("enter.");
+    MMI_LOGD("enter");
 
     int32_t ret = MultimodalInputConnectServiceStart();
     if (ret != RET_OK) {
@@ -220,7 +220,7 @@ int32_t OHOS::MMI::MMIServer::SaConnectServiceStart()
 
 int32_t OHOS::MMI::MMIServer::SaConnectServiceStop()
 {
-    MMI_LOGT("enter.");
+    MMI_LOGD("enter");
 
     int32_t ret = MultimodalInputConnectServiceStop();
     if (ret != RET_OK) {
