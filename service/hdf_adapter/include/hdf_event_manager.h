@@ -74,7 +74,7 @@ private:
     InputEventCb eventCallBack_;
     InputHostCb  hostPlugCallBack_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 extern OHOS::MMI::HdfEventManager  hdfEventManager;
 #endif // HDF_EVENT_MANAGER_H
