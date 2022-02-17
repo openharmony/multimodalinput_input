@@ -518,7 +518,7 @@ int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<Input
 void OHOS::MMI::InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
     const std::vector<LogicalDisplayInfo> &logicalDisplays)
 {
-    MMI_LOGD("InputWindowsManager::UpdateDisplayInfo enter");
+    MMI_LOGD("enter");
     physicalDisplays_.clear();
     logicalDisplays_.clear();
     windowInfos_.clear();
@@ -537,7 +537,7 @@ void OHOS::MMI::InputWindowsManager::UpdateDisplayInfo(const std::vector<Physica
         PointerDrawMgr->TellDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
     }
     PrintDisplayDebugInfo();
-    MMI_LOGD("InputWindowsManager::UpdateDisplayInfo leave");
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
@@ -959,7 +959,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<Poi
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("UpdateTargetPointer begin");
+    MMI_LOGD("enter");
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto source = pointerEvent->GetSourceType();
     switch (source) {
@@ -978,6 +978,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTargetPointer(std::shared_ptr<Poin
         }
     }
     MMI_LOGE("Source is not of the correct type, source:%{public}d", source);
+    MMI_LOGD("leave");
     return RET_ERR;
 }
 
