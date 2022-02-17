@@ -147,9 +147,9 @@ public:
 private:
     int32_t stylusButtonMapping(int32_t stylusButton) const;
 private:
-    int32_t mAction_ = 0;
-    int32_t mButtons_ = 0;
-    int32_t mActionButtons_ = 0;
+    int32_t action_ = 0;
+    int32_t buttons_ = 0;
+    int32_t actionButtons_ = 0;
 };
 } // namespace OHOS
 #endif // STYLUS_EVENT_H

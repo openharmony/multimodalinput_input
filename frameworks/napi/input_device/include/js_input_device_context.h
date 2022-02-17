@@ -34,7 +34,7 @@ public:
     napi_ref contextRef_ {nullptr};
 
 private:
-    std::shared_ptr<JsInputDeviceManager> jsInputDeviceMgr_ {nullptr};
+    std::shared_ptr<JsInputDeviceManager> mager_ {nullptr};
     std::mutex mtx_;
 };
 } // namespace MMI
