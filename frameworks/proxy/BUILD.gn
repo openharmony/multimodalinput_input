@@ -34,7 +34,7 @@ config("libmmi_client_config") {
   ]
 }
 
-ohos_shared_library("libmmi-common") {
+ohos_source_set("libmmi-common") {
   sources = [
     "events/src/input_event.cpp",
     "events/src/key_event.cpp",
