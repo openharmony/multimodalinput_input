@@ -14,6 +14,7 @@
  */
 
 #include "mouse_event_handler.h"
+#include <cinttypes>
 #include "libmmi_util.h"
 #include "input-event-codes.h"
 #include "util.h"
@@ -136,7 +137,7 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerItem.SetPointerId(0);
 
     uint64_t time = libinput_event_pointer_get_time_usec(data);
-    pointerItem.SetDownTime(static_cast<int32_t>(time));
+    pointerItem.SetDownTime(static_cast<int64_t>(time));
     pointerItem.SetWidth(0);
     pointerItem.SetHeight(0);
     pointerItem.SetPressure(0);
@@ -145,8 +146,8 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerEvent_->UpdateId();
     pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent_->SetActionTime(static_cast<int32_t>(GetSysClockTime()));
-    pointerEvent_->SetActionStartTime(static_cast<int32_t>(time));
+    pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
+    pointerEvent_->SetActionStartTime(static_cast<int64_t>(time));
     pointerEvent_->SetDeviceId(deviceId);
     pointerEvent_->SetPointerId(0);
     pointerEvent_->SetTargetDisplayId(-1);
@@ -199,7 +200,7 @@ void MouseEventHandler::DumpInner()
 
     PointerEvent::PointerItem item;
     CHK(pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item), PARAM_INPUT_FAIL);
-    MMI_LOGD("item: DownTime:%{public}d,IsPressed:%{public}s,GlobalX:%{public}d,GlobalY:%{public}d,"
+    MMI_LOGD("Item: DownTime:%{public}" PRId64 ",IsPressed:%{public}s,GlobalX:%{public}d,GlobalY:%{public}d,"
         "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,DeviceId:%{public}d",
         item.GetDownTime(), (item.IsPressed() ? "true" : "false"), item.GetGlobalX(), item.GetGlobalY(),
         item.GetWidth(), item.GetHeight(), item.GetPressure(), item.GetDeviceId());

@@ -163,7 +163,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     auto upTime = keyEvent->GetActionTime();
     auto downTime = keyItem->GetDownTime();
     auto curDurtionTime = keyOption->GetFinalKeyDownDuration();
-    if (curDurtionTime > 0 && (upTime - downTime >= (curDurtionTime * 1000))) {
+    if (curDurtionTime > 0 && (upTime - downTime >= (static_cast<int64_t>(curDurtionTime) * 1000))) {
         MMI_LOGE("Skip, upTime - downTime >= duration");
         return false;
     }

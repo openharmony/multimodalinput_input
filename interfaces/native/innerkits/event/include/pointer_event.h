@@ -221,7 +221,7 @@ public:
          * @return Returns the time.
          * @since 8
          */
-        int32_t GetDownTime() const;
+        int64_t GetDownTime() const;
 
         /**
          * @brief Sets the time when the pointer is pressed.
@@ -229,7 +229,7 @@ public:
          * @return void
          * @since 8
          */
-        void SetDownTime(int32_t downTime);
+        void SetDownTime(int64_t downTime);
 
         /**
          * @brief Checks whether the pointer is pressed.
@@ -386,7 +386,6 @@ public:
 
     private:
         int32_t pointerId_ { 0 };
-        int32_t downTime_ { 0 };
         bool pressed_ { false };
         int32_t globalX_ { 0 };
         int32_t globalY_ { 0 };
@@ -396,6 +395,7 @@ public:
         int32_t height_ { 0 };
         int32_t pressure_ { 0 };
         int32_t deviceId_ { 0 };
+        int64_t downTime_ { 0 };
     };
 
 public:
