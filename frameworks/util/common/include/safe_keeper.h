@@ -69,7 +69,7 @@ protected:
     SafeEventList dList_;
     SafeCallbackFun cbFun_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define SafeKpr OHOS::MMI::SafeKeeper::GetInstance()
 #endif // SAFE_KEEPER_H

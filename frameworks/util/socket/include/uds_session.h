@@ -90,6 +90,6 @@ protected:
     int clientFd_ = -1;
 #endif // OHOS_BUILD_MMI_DEBUG
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // UDS_SESSION_H

@@ -822,4 +822,4 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_TouchFilterAbnormal_
     EXPECT_TRUE(InputFilterMgr.UnFilterTouchEvent(filterId2) == RET_OK);
     EXPECT_TRUE(InputFilterMgr.UnFilterTouchEvent(filterId3) == RET_OK);
 }
-}
+} // namespace
