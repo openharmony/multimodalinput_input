@@ -32,7 +32,6 @@ namespace {
 
 std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::GetInstance()
 {
-    MMI_LOGD("enter");
     static std::once_flag flag;
     std::call_once(flag, [&]() {
         g_instance.reset(new MultimodalInputConnectManager());
@@ -41,7 +40,6 @@ std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::Ge
     if (g_instance != nullptr) {
         g_instance->ConnectMultimodalInputService();
     }
-    MMI_LOGD("leave");
     return g_instance;
 }
 
@@ -62,26 +60,22 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int moduleType)
     }
 
     MMI_LOGI("AllocSocketPair success. socketFd_:%{public}d", socketFd_);
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair() const
 {
     MMI_LOGD("enter");
-    MMI_LOGD("leave");
     return socketFd_;
 }
 
 int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    MMI_LOGD("enter");
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
         MMI_LOGE("multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
-    MMI_LOGD("leave");
     return multimodalInputConnectService_->AddInputEventFilter(filter);
 }
 
@@ -119,7 +113,6 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
         return false;
     }
     MMI_LOGI("get multimodal input connect service successful");
-    MMI_LOGD("leave");
     return true;
 }
 
