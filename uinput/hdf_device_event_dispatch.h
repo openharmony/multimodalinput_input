@@ -36,7 +36,7 @@ public:
 private:
     static InjectThread injectThread_;
 };
-}  // namespace MMIS
-}  // namespace OHOS
+} // namespace MMIS
+} // namespace OHOS
 
 #endif  // HDF_DEVICE_EVENT_DISPATCH_H

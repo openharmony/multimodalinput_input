@@ -790,14 +790,14 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<Key
     kevn->UpdateId();
     auto data = libinput_event_get_keyboard_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
-    auto hosKey = KeyValueTransformationByInput(libinput_event_keyboard_get_key(data));
+    auto oKey = KeyValueTransformationByInput(libinput_event_keyboard_get_key(data));
 
     auto device = libinput_event_get_device(event);
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
-    int32_t keyCode = static_cast<int32_t>(hosKey.keyValueOfHos);
+    int32_t keyCode = static_cast<int32_t>(oKey.keyValueOfHos);
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
-    int32_t actionStartTime = static_cast<int32_t>(libinput_event_keyboard_get_time_usec(data));
+    int64_t actionStartTime = static_cast<int64_t>(libinput_event_keyboard_get_time_usec(data));
 
     kevn->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
     kevn->SetAction(keyAction);
@@ -809,7 +809,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<Key
     KeyEvent::KeyItem item;
     bool isKeyPressed = (libinput_event_keyboard_get_key_state(data) != KEYSTATUS);
     if (isKeyPressed) {
-        int32_t keyDownTime = actionStartTime;
+        int64_t keyDownTime = actionStartTime;
         item.SetDownTime(keyDownTime);
     }
     item.SetKeyCode(keyCode);
@@ -860,7 +860,7 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
     int32_t keyAction = (key.state == KEY_STATE_PRESSED) ?
         (KeyEvent::KEY_ACTION_DOWN) : (KeyEvent::KEY_ACTION_UP);
     int32_t deviceId = static_cast<int32_t>(key.deviceId);
-    int32_t actionStartTime = static_cast<int32_t>(key.time);
+    int64_t actionStartTime = static_cast<int64_t>(key.time);
     auto preAction = keyEventPtr->GetAction();
     if (preAction == KeyEvent::KEY_ACTION_UP) {
         auto preUpKeyItem = keyEventPtr->GetKeyItem();

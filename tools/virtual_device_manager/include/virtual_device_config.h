@@ -25,7 +25,7 @@
 #include <cstring>
 #include <sys/stat.h>
 #include <dirent.h>
-#include <signal.h>
+#include <csignal>
 #include <fstream>
 #include <memory>
 #include <cinttypes>
@@ -53,6 +53,6 @@ namespace MMI {
 
     const std::string g_pid = std::to_string(getpid());
     const std::string g_folderpath = "/data/symbol/";
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // VIRTUAL_DEVICE_CONFIG_H

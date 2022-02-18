@@ -14,7 +14,6 @@
  */
 
 #include <gtest/gtest.h>
-#include <sstream>
 #include "define_multimodal.h"
 #include "input_manager.h"
 #include "key_event.h"
@@ -23,30 +22,18 @@
 #include "proto.h"
 #include "pointer_event.h"
 #include "run_shell_util.h"
+#include "util.h"
 
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
 using namespace OHOS;
-namespace {
-    // static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerEventTest" };
-}
-
 class PointerEventTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
-
-    static int64_t GetMillisTime();
     static std::shared_ptr<PointerEvent> createPointEvent();
 };
-
-int64_t PointerEventTest::GetMillisTime()
-{
-    timespec time = { 0 };
-    clock_gettime(CLOCK_MONOTONIC, &time);
-    return ((static_cast<uint64_t>(time.tv_sec) * 1000000000 + time.tv_nsec) / 1000000);
-}
 
 std::shared_ptr<PointerEvent> PointerEventTest::createPointEvent()
 {

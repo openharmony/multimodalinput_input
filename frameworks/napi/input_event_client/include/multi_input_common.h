@@ -28,7 +28,7 @@
 #include <fstream>
 #include <unistd.h>
 #include <sys/stat.h>
-#include <stdio.h>
+#include <cstdio>
 #include "libmmi_util.h"
 namespace OHOS {
 namespace MMI {

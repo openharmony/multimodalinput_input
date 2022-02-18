@@ -163,7 +163,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     auto upTime = keyEvent->GetActionTime();
     auto downTime = keyItem->GetDownTime();
     auto curDurtionTime = keyOption->GetFinalKeyDownDuration();
-    if (curDurtionTime > 0 && (upTime - downTime >= (curDurtionTime * 1000))) {
+    if (curDurtionTime > 0 && (upTime - downTime >= (static_cast<int64_t>(curDurtionTime) * 1000))) {
         MMI_LOGE("Skip, upTime - downTime >= duration");
         return false;
     }
@@ -291,7 +291,7 @@ static napi_value MmiInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("off", JsOff),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
-    MMI_LOGD("success");
+    MMI_LOGD("Leave");
     return exports;
 }
 EXTERN_C_END

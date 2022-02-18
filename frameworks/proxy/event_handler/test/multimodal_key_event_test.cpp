@@ -52,7 +52,7 @@ int64_t MultimodalKeyEventTest::GetNanoTime()
 {
     timespec time = { 0 };
     clock_gettime(CLOCK_MONOTONIC, &time);
-    return static_cast<uint64_t>(time.tv_sec) * SEC_TO_NANOSEC + time.tv_nsec;
+    return static_cast<int64_t>(time.tv_sec) * SEC_TO_NANOSEC + time.tv_nsec;
 }
 
 bool MultimodalKeyEventTest::FindCommand(const std::string &log, const std::string &command)
@@ -118,7 +118,7 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_001, Test
     RunShellUtil runCommand;
     std::string command = "Inject keyCode = 2,action = 2";
     std::vector<std::string> slogs {SearchForLog(command, true)};
-    int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
     OHOS::MMI::KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
@@ -131,7 +131,7 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_001, Test
     EXPECT_TRUE(response);
 
     std::shared_ptr<OHOS::MMI::KeyEvent> injectUpEvent = OHOS::MMI::KeyEvent::Create();
-    downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     OHOS::MMI::KeyEvent::KeyItem kitUp;
     kitUp.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
     kitUp.SetPressed(false);
@@ -148,7 +148,7 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_001, Test
 HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_002, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
-    int32_t downTime = -1;
+    int64_t downTime = -1;
     OHOS::MMI::KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_HOME);
     kitDown.SetPressed(true);
@@ -164,7 +164,7 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_002, Test
 HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
-    int32_t downTime = 0;
+    int64_t downTime = 0;
     OHOS::MMI::KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
     kitDown.SetPressed(true);
@@ -190,7 +190,7 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_003, Test
 HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_004, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
-    int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     OHOS::MMI::KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_UNKNOWN);
     kitDown.SetPressed(true);
@@ -207,7 +207,7 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_004, Test
 HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
-    int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     OHOS::MMI::KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_FN);
     kitDown.SetPressed(true);
@@ -224,7 +224,7 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_005, Test
     EXPECT_TRUE(response);
 
     std::shared_ptr<OHOS::MMI::KeyEvent> injectUpEvent = OHOS::MMI::KeyEvent::Create();
-    downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     OHOS::MMI::KeyEvent::KeyItem kitUp;
     kitUp.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_FN);
     kitUp.SetPressed(false);

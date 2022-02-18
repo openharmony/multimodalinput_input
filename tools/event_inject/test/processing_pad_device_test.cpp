@@ -52,4 +52,4 @@ HWTEST_F(ProcessingPadDeviceTest, Test_TransformJsonDataToInputData, TestSize.Le
     std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(ret, RET_OK);
 }
-}
+} // namespace
