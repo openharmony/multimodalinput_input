@@ -69,7 +69,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(libinput_event *event)
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(pointer);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_LOGD("LogicalX:%{public}d, logicalY:%{public}d, logicalDisplayId:%{public}d",
+    MMI_LOGD("LogicalX:%{public}d, logicalY:%{public}d, logicalDisplay:%{public}d",
              logicalX, logicalY, logicalDisplayId);
     MMI_LOGD("Leave");
     return true;
