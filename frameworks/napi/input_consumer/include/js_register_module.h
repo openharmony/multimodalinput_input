@@ -14,7 +14,7 @@
  */
 #ifndef JS_REGISTER_MODULE_H
 #define JS_REGISTER_MODULE_H
-#include <stdio.h>
+#include <cstdio>
 #include <map>
 #include <list>
 #include <cstring>
