@@ -18,9 +18,9 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
 #include <pthread.h>
 #include <stdarg.h>
 #include <time.h>

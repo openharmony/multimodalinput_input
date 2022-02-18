@@ -15,7 +15,7 @@
 #ifndef KLOG_H
 #define KLOG_H
 
-#include <string.h>
+#include <cstring>
 
 #ifdef __cplusplus
 extern "C" {
