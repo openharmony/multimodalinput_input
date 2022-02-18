@@ -147,17 +147,17 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Enter handler:%{public}d", handlerId);
-    int32_t pointerFilter = 1;
-    int32_t touchFilter = 2;
-    if (pointerFilter == pointerEvent->GetSourceType()) {
+    if (SOURCE_TYPE_MOUSE == pointerEvent->GetSourceType()) {
         int32_t pointerId = pointerEvent->GetId();
         std::string pointerEventString = "pointerEventFilter";
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventString, pointerId);
+        MMI_LOGI("client Pointerfilter FinishAsyncTrace is end");
     }
-    if (touchFilter == pointerEvent->GetSourceType()) {
+    if (SOURCE_TYPE_TOUCHSCREEN == pointerEvent->GetSourceType()) {
         int32_t touchId = pointerEvent->GetId();
         std::string touchEventString = "touchEventFilter";
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, touchId);
+        MMI_LOGI("client Pointerfilter FinishAsyncTrace is end");
     }
     std::map<int32_t, Handler>::iterator tItr;
     std::map<int32_t, Handler>::iterator tItrEnd;

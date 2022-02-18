@@ -484,13 +484,22 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
         MMI_LOGE("On the OnKeyboardEvent translate key event error");
         return RET_ERR;
     }
-
+    int32_t keyId = keyEvent_->GetId();
+    std::string keyEventString = "OnKeyEvent";
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
+    keyEventString = "service report keyId=" + std::to_string(keyId);
+    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent_, sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d",
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
+    int32_t keyCode = keyEvent_->GetKeyCode();
+    keyEventString = "service dispatch keyCode=" + std::to_string(keyCode);
+    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
+    keyEventString = "OnKeyEvent";
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
     return RET_OK;
 }
 
@@ -603,8 +612,10 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
     int32_t pointerId = point->GetId();
     std::string touchEvent = "OnEventTouch";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, pointerId);
+    MMI_LOGI("Touch StartAsyncTrace is start");
     eventDispatch_.HandlePointerEvent(point);
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, pointerId);
+    MMI_LOGI("Touch FinishAsyncTrace is end");
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         point->RemovePointerItem(point->GetPointerId());
@@ -908,9 +919,11 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
     int32_t pointerId = keyEvent_->GetId();
     std::string pointerEventstring = "OnEventPointer";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, pointerId);
+    MMI_LOGI("Pointer StartAsyncTrace is start");
     // 派发
     eventDispatch_.HandlePointerEvent(pointerEvent);
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, pointerId);
+    MMI_LOGI("Pointer Dispatch FinishAsyncTrace is end");
     // 返回值 代表是 鼠标事件有没有处理过， 不关心成功与失败
     return RET_OK;
 }

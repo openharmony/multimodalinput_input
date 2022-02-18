@@ -137,17 +137,17 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
     MMI_LOGD("Pointer event received, processing");
-    int32_t pointerDispatch = 1;
-    int32_t touchDispatch = 2;
-    if (pointerDispatch == pointerEvent->GetSourceType()) {
+    if (SOURCE_TYPE_MOUSE == pointerEvent->GetSourceType()) {
         int32_t pointerId = pointerEvent->GetId();
         std::string pointerEventstring = "PointerEventDispatch";
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, pointerId);
+        MMI_LOGI("client PointerDispatch FinishAsyncTrace is end");
     }
-    if (touchDispatch == pointerEvent->GetSourceType()) {
+    if (SOURCE_TYPE_TOUCHSCREEN == pointerEvent->GetSourceType()) {
         int32_t touchId = pointerEvent->GetId();
         std::string touchEvent = "touchEventDispatch";
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, touchId);
+        MMI_LOGI("client touchEventDispatch FinishAsyncTrace is end");
     }
     if (consumer_ != nullptr) {
         CHKPV(pointerEvent);
