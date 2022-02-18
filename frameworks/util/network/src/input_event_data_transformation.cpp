@@ -85,6 +85,7 @@ int32_t InputEventDataTransformation::DeserializeInputEvent(NetPacket &packet, s
     int32_t tField {  };
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
+    event->SetId(tField);
     int64_t rField = 0;
     CHKR(packet.Read(rField), STREAM_BUF_READ_FAIL, RET_ERR);
     event->SetActionTime(rField);
