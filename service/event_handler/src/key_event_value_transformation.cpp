@@ -511,7 +511,6 @@ bool KeyEventValueTransformation::Init()
 
 uint32_t KeyEventValueTransformation::KeyboardHandleKeySym(uint32_t keyboardKey)
 {
-    MMI_LOGD("enter");
     constexpr uint32_t XKB_EVDEV_OFFSET = 8;
     uint32_t code = keyboardKey + XKB_EVDEV_OFFSET;
     xkb_keysym_t syms = XKB_KEY_NoSymbol;
@@ -522,7 +521,6 @@ uint32_t KeyEventValueTransformation::KeyboardHandleKeySym(uint32_t keyboardKey)
     if (numSyms == 1) {
         sym = pSyms[0];
     }
-    MMI_LOGD("leave");
     return sym;
 }
 } // namespace MMI
