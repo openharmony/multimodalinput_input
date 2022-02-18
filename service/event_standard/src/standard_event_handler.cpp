@@ -128,7 +128,7 @@ void OHOS::MMI::StandardEventHandler::PointerPressedStandardEvent(struct libinpu
 
 void OHOS::MMI::StandardEventHandler::PointerAbsoluteStandardEvent(libinput_event *event, StandardTouchStruct& data)
 {
-    MMI_LOGD("leave");
+    MMI_LOGD("enter");
     CHKPV(event);
     auto szPoint = libinput_event_get_pointer_event(event);
     CHKPV(szPoint);

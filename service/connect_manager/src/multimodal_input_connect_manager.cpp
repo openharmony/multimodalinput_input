@@ -149,7 +149,7 @@ void MultimodalInputConnectManager::Clean()
 
 void MultimodalInputConnectManager::NotifyDeath()
 {
-    MMI_LOGD("enter,multimodal input connect service is dead, connect again");
+    MMI_LOGD("enter");
 
     int32_t retryCount = 50;
     do {
@@ -160,7 +160,7 @@ void MultimodalInputConnectManager::NotifyDeath()
         }
     } while (--retryCount > 0);
     
-    MMI_LOGI("leave,connectmultimodal input connect service failed");
+    MMI_LOGI("leave");
 }
 } // namespace MMI
 } // namespace OHOS
