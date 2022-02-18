@@ -41,7 +41,6 @@ AbilityLaunchManager::AbilityLaunchManager()
 
 std::string AbilityLaunchManager::GenerateKey(const ShortcutKey& key)
 {
-    MMI_LOGD("enter");
     std::set<int32_t> preKeys = key.preKeys;
     std::stringstream oss;
     for(const auto preKey: preKeys) {
@@ -54,7 +53,6 @@ std::string AbilityLaunchManager::GenerateKey(const ShortcutKey& key)
 
 std::string AbilityLaunchManager::GetConfigFilePath()
 {
-    MMI_LOGD("enter");
     std::string defaultConfig = "/product/multimodalinput/ability_launch_config.json";
     MMI_LOGD("leave");
     return FileExists(defaultConfig) ? defaultConfig : "/system/etc/multimodalinput/ability_launch_config.json";
@@ -62,7 +60,6 @@ std::string AbilityLaunchManager::GetConfigFilePath()
 
 void AbilityLaunchManager::ResolveConfig(const std::string configFile)
 {
-    MMI_LOGD("enter");
     if (!FileExists(configFile)) {
         MMI_LOGE("config file %{public}s not exist", configFile.c_str());
         return;
@@ -96,12 +93,10 @@ void AbilityLaunchManager::ResolveConfig(const std::string configFile)
             shortcutKeys_.emplace(key, shortcutKey);
         }
     }
-    MMI_LOGD("leave");
 }
 
 bool AbilityLaunchManager::ConvertToShortcutKey(const json &jsonData, ShortcutKey &shortcutKey)
 {
-    MMI_LOGD("enter");
     json preKey = jsonData["preKey"];
     if (!preKey.is_array() || preKey.size() > MAX_PREKEYS_NUM) {
         MMI_LOGE("preKey number must less and equal four");
@@ -148,7 +143,6 @@ bool AbilityLaunchManager::ConvertToShortcutKey(const json &jsonData, ShortcutKe
 
 bool AbilityLaunchManager::PackageAbility(const json &jsonAbility, Ability &ability)
 {
-    MMI_LOGD("enter");
     if (!jsonAbility.is_object()) {
         MMI_LOGE("ability must be object");
         return false;
@@ -178,13 +172,11 @@ bool AbilityLaunchManager::PackageAbility(const json &jsonAbility, Ability &abil
         }
         ability.params.emplace(params[i]["key"], params[i]["value"]);
     }
-    MMI_LOGD("leave");
     return true;
 }
 
 void AbilityLaunchManager::Print()
 {
-    MMI_LOGD("enter");
     int32_t count = shortcutKeys_.size();
     MMI_LOGD("shortcutKey count:%{public}d", count);
     for (const auto &item : shortcutKeys_) {
@@ -197,7 +189,6 @@ void AbilityLaunchManager::Print()
             shortcutKey.keyDownDuration, shortcutKey.triggerType,
             shortcutKey.ability.bundleName.c_str(), shortcutKey.ability.abilityName.c_str());
     }
-    MMI_LOGD("leave");
 }
 
 bool AbilityLaunchManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> &key)
@@ -236,7 +227,6 @@ bool AbilityLaunchManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> &k
 }
 
 bool AbilityLaunchManager::Match(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key) {
-    MMI_LOGD("enter");
     if (key->GetKeyCode() != shortcutKey.finalKey || shortcutKey.triggerType != key->GetKeyAction()) {
         return false;
     }
@@ -254,12 +244,10 @@ bool AbilityLaunchManager::Match(const ShortcutKey &shortcutKey, const std::shar
         }
     }
     MMI_LOGD("matched...");
-    MMI_LOGD("leave");
     return true;
 }
 
 bool AbilityLaunchManager::HandleKeyDown(ShortcutKey &shortcutKey){
-    MMI_LOGD("enter");
     if (shortcutKey.keyDownDuration == 0) {
         MMI_LOGD("Start launch ability immediately");
         LaunchAbility(shortcutKey);
@@ -275,16 +263,13 @@ bool AbilityLaunchManager::HandleKeyDown(ShortcutKey &shortcutKey){
         MMI_LOGD("add timer success, timeid:%{public}d", shortcutKey.timerId);
         lastMatchedKey_ = shortcutKey;
     }
-    MMI_LOGD("leave");
     return true;
 }
 
 bool AbilityLaunchManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey){
-    MMI_LOGD("enter");
     if (shortcutKey.keyDownDuration == 0) {
         MMI_LOGD("Start launch ability immediately");
         LaunchAbility(shortcutKey);
-        MMI_LOGD("leave");
         return true;
     } else {
         const KeyEvent::KeyItem* keyItem = keyEvent->GetKeyItem();
@@ -299,7 +284,6 @@ bool AbilityLaunchManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
         }
         MMI_LOGD("Start launch ability immediately");
         LaunchAbility(shortcutKey);
-        MMI_LOGD("leave");
         return true;
     }
 }
@@ -318,7 +302,6 @@ bool AbilityLaunchManager::HandleKeyCancel(ShortcutKey &shortcutKey){
 
 void AbilityLaunchManager::LaunchAbility(ShortcutKey key)
 {
-    MMI_LOGD("enter");
     AAFwk::Want want;
     want.SetElementName(key.ability.deviceId, key.ability.bundleName, key.ability.abilityName);
     want.SetAction(key.ability.action);
@@ -339,16 +322,13 @@ void AbilityLaunchManager::LaunchAbility(ShortcutKey key)
     }
     ResetLastMatchedKey();
     MMI_LOGD("End launch ability, bundleName:%{public}s", key.ability.bundleName.c_str());
-    MMI_LOGD("leave");
 }
 
 void AbilityLaunchManager::ResetLastMatchedKey()
 {
-    MMI_LOGD("enter");
     lastMatchedKey_.preKeys.clear();
     lastMatchedKey_.finalKey = INVALID_VALUE;
     lastMatchedKey_.timerId = INVALID_VALUE;
-    MMI_LOGD("leave");
 }
 } // namespace MMI
 } // namespace OHOS
