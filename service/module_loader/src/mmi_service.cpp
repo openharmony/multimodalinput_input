@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "mmi_service.h"
 #include <cinttypes>
 #include <csignal>
 #include <sys/signalfd.h>
@@ -22,7 +23,6 @@
 #include "event_dump.h"
 #include "input_windows_manager.h"
 #include "mmi_log.h"
-#include "mmi_service.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "pointer_drawing_manager.h"
 #include "register_eventhandle_manager.h"
