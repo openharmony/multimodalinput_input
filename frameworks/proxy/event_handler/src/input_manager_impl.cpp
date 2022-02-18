@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -119,8 +119,8 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
     MMI_LOGD("Enter");
     int32_t getKeyCode = keyEvent->GetKeyCode();
-    std::string keyCodestring = "client dispatchKeyCode=" + std::to_string(getKeyCode);
     MMI_LOGD(" OnKeyEvent client trace getKeyCode:%{public}d", getKeyCode);
+    std::string keyCodestring = "client dispatchKeyCode=" + std::to_string(getKeyCode);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring);
     int32_t keyId = keyEvent->GetId();
     keyCodestring = "KeyEventDispatch";

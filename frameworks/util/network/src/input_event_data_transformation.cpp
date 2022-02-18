@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,8 +35,8 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
     }
     return RET_OK;
 }
-int32_t InputEventDataTransformation::NetPacketToKeyEvent(bool skipId,
-    NetPacket &packet, std::shared_ptr<KeyEvent> key)
+
+int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &packet, std::shared_ptr<KeyEvent> key)
 {
     int32_t data = 0;
     int32_t size = 0;
@@ -85,6 +85,7 @@ int32_t InputEventDataTransformation::DeserializeInputEvent(NetPacket &packet, s
     int32_t tField {  };
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
+    event->SetId(tField);
     int64_t rField = 0;
     CHKR(packet.Read(rField), STREAM_BUF_READ_FAIL, RET_ERR);
     event->SetActionTime(rField);
