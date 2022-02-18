@@ -432,7 +432,8 @@ public:
 
     /**
      * @brief Sets the value of the <b>skipInspection</b> flag.
-     * @param skipInspection Indicates the value of the <b>skipInspection</b> flag to set. The value <b>true</b> means that the event will skip the processing of the listener and interceptor, and the value <b>false</b> means the opposite.
+     * @param skipInspection Indicates the value of the <b>skipInspection</b> flag to set. The value <b>true</b> means that the
+     * event will skip the processing of the listener and interceptor, and the value <b>false</b> means the opposite.
      * @return void
      * @since 8
      */
