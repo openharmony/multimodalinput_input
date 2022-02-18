@@ -141,13 +141,13 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> p
         int32_t pointerId = pointerEvent->GetId();
         std::string pointerEventstring = "PointerEventDispatch";
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, pointerId);
-        MMI_LOGI("client PointerDispatch FinishAsyncTrace is end");
+        MMI_LOGD("client PointerDispatch FinishAsyncTrace is end");
     }
     if (PointerEvent::SOURCE_TYPE_TOUCHSCREEN == pointerEvent->GetSourceType()) {
         int32_t touchId = pointerEvent->GetId();
         std::string touchEvent = "touchEventDispatch";
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, touchId);
-        MMI_LOGI("client touchEventDispatch FinishAsyncTrace is end");
+        MMI_LOGD("client touchEventDispatch FinishAsyncTrace is end");
     }
     if (consumer_ != nullptr) {
         CHKPV(pointerEvent);
