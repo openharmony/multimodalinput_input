@@ -75,11 +75,11 @@ protected:
 #ifdef DEBUG_CODE_TEST
 private:
     const size_t windowCount_ = 2;
-    void OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, enum class IsEventHandler);
+    void OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler isEventHandler);
     /*
      * Differentiated event handling
      */
-    enum class IsEventHandler {
+    enum IsEventHandler {
         KEY_FILTER_EVENT = 1,
         KEY_CHECKLAUNABILITY_EVENT = 2,
         KEY_SUBSCRIBE_EVENT = 3
