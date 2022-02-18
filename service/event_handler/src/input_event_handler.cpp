@@ -609,10 +609,10 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
     int32_t pointerId = point->GetId();
     std::string touchEvent = "OnEventTouch";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, pointerId);
-    MMI_LOGI("Touch StartAsyncTrace is start");
+    MMI_LOGD("Touch StartAsyncTrace is start");
     eventDispatch_.HandlePointerEvent(point);
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, pointerId);
-    MMI_LOGI("Touch FinishAsyncTrace is end");
+    MMI_LOGD("Touch FinishAsyncTrace is end");
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         point->RemovePointerItem(point->GetPointerId());
@@ -914,13 +914,13 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
         pointerEvent->SetPressedKeys(pressedKeys);
     }
     int32_t pointerId = keyEvent_->GetId();
-    std::string pointerEventstring = "OnEventPointer";
+    const std::string pointerEventstring = "OnEventPointer";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, pointerId);
-    MMI_LOGI("Pointer StartAsyncTrace is start");
+    MMI_LOGD("Pointer StartAsyncTrace is start");
     // 派发
     eventDispatch_.HandlePointerEvent(pointerEvent);
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, pointerId);
-    MMI_LOGI("Pointer Dispatch FinishAsyncTrace is end");
+    MMI_LOGD("Pointer Dispatch FinishAsyncTrace is end");
     // 返回值 代表是 鼠标事件有没有处理过， 不关心成功与失败
     return RET_OK;
 }

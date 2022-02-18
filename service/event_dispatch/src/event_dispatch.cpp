@@ -391,13 +391,13 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
             int32_t pointerId = point->GetId();
             std::string pointerEvent = "OnEventPointer";
             FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, pointerId);
-            MMI_LOGI("Pointer Filter FinishAsyncTrace is end");
+            MMI_LOGD("Pointer Filter FinishAsyncTrace is end");
         }
         if (PointerEvent::SOURCE_TYPE_TOUCHSCREEN == point->GetSourceType()) {
             int32_t touchId = point->GetId();
             std::string touchEvent = "OnEventTouch";
             FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, touchId);
-            MMI_LOGI("Touch Filter FinishAsyncTrace is end");
+            MMI_LOGD("Touch Filter FinishAsyncTrace is end");
         }
         return RET_OK;
     }
@@ -731,7 +731,7 @@ void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, I
     }
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, checkKeyCode);
     int32_t keyId = key->GetId();
-    std::string keyEventString = "OnKeyEvent";
+    const std::string keyEventString = "OnKeyEvent";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
 }
 

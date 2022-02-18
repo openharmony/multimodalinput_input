@@ -151,13 +151,13 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
         int32_t pointerId = pointerEvent->GetId();
         std::string pointerEventString = "pointerEventFilter";
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventString, pointerId);
-        MMI_LOGI("client Pointerfilter FinishAsyncTrace is end");
+        MMI_LOGD("client Pointerfilter FinishAsyncTrace is end");
     }
     if (PointerEvent::SOURCE_TYPE_TOUCHSCREEN == pointerEvent->GetSourceType()) {
         int32_t touchId = pointerEvent->GetId();
         std::string touchEventString = "touchEventFilter";
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, touchId);
-        MMI_LOGI("client Pointerfilter FinishAsyncTrace is end");
+        MMI_LOGD("client Pointerfilter FinishAsyncTrace is end");
     }
     std::map<int32_t, Handler>::iterator tItr;
     std::map<int32_t, Handler>::iterator tItrEnd;

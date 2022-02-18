@@ -72,9 +72,6 @@ protected:
     int32_t touchDownFocusSurfaceId_ = 0;
     EventPackage eventPackage_;
     StandardEventHandler standardEvent_;
-#ifdef DEBUG_CODE_TEST
-private:
-    const size_t windowCount_ = 2;
 	/*
      * Differentiated event handling
      */
@@ -84,6 +81,10 @@ private:
         KEY_SUBSCRIBE_EVENT = 3
     };
     void OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler isEventHandler);
+#ifdef DEBUG_CODE_TEST
+private:
+    const size_t windowCount_ = 2;
+	
 #endif
     };
 } // namespace MMI

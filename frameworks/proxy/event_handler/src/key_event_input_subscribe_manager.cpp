@@ -95,7 +95,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
 {
     MMI_LOGD("Enter");
     int32_t keyId = event->GetId();
-    std::string keyEventString = "keyEventSubscribe";
+    const std::string keyEventString = "keyEventSubscribe";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
     if (subscribeId < 0) {
         MMI_LOGE("Leave, the subscribe id is less than 0");
