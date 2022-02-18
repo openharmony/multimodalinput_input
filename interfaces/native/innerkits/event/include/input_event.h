@@ -66,8 +66,8 @@ public:
      * The default value is the object creation time
      * Under normal circumstances, do not need to set
      */
-    int32_t GetActionTime() const;
-    void SetActionTime(int32_t actionTime);
+    int64_t GetActionTime() const;
+    void SetActionTime(int64_t actionTime);
 
     /*
      * Get or set the current action
@@ -80,8 +80,8 @@ public:
      * For instantaneous actions, it is consistent with the time when the action occurred.
      * For continuous actions, it indicates the start time of the continuous action
      */
-    int32_t GetActionStartTime() const;
-    void SetActionStartTime(int32_t time);
+    int64_t GetActionStartTime() const;
+    void SetActionStartTime(int64_t time);
 
     /*
      * Get or set the unique identifier of the input device that reports the input event
@@ -151,9 +151,9 @@ protected:
 protected:
     int32_t eventType_;
     int32_t id_;
-    int32_t actionTime_;
+    int64_t actionTime_;
     int32_t action_;
-    int32_t actionStartTime_;
+    int64_t actionStartTime_;
     int32_t deviceId_;
     int32_t targetDisplayId_;
     int32_t targetWindowId_;

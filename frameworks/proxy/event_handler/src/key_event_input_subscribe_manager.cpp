@@ -83,7 +83,7 @@ int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
                 return RET_ERR;
             }
             subscribeInfos_.erase(it);
-            MMI_LOGT("Leave");
+            MMI_LOGD("Leave");
             return RET_OK;
         }
     }

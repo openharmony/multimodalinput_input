@@ -31,6 +31,6 @@ protected:
     const std::vector<uint32_t>& GetLeds() const override;
     const std::vector<uint32_t>& GetReps() const override;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif  // VIRTUAL_KEYBOARD_H

@@ -39,9 +39,9 @@ void GestureTransformPointProcessor::SetPointEventSource(int32_t sourceType)
 
 void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_gesture *data)
 {
-    MMI_LOGT("Touchpad begin event");
+    MMI_LOGD("Touchpad begin event");
     CHKPV(data);
-    auto time = libinput_event_gesture_get_time(data);
+    auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     auto scale = libinput_event_gesture_get_scale(data);
     pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
     pointerEvent_->SetActionStartTime(time);
@@ -72,9 +72,9 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_ge
 
 void GestureTransformPointProcessor::OnEventTouchPadPinchUpdate(libinput_event_gesture *data)
 {
-    MMI_LOGT("Touchpad update event");
+    MMI_LOGD("Touchpad update event");
     CHKPV(data);
-    auto time = libinput_event_gesture_get_time(data);
+    auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     auto scale = libinput_event_gesture_get_scale(data);
     pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
     pointerEvent_->SetActionStartTime(time);
@@ -97,9 +97,9 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchUpdate(libinput_event_g
 
 void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gesture *data)
 {
-    MMI_LOGT("Touchpad end event");
+    MMI_LOGD("Touchpad end event");
     CHKPV(data);
-    auto time = libinput_event_gesture_get_time(data);
+    auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     auto scale = libinput_event_gesture_get_scale(data);
     pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
     pointerEvent_->SetActionStartTime(time);
@@ -123,7 +123,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gest
 std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestrueEvent(
     libinput_event *event)
 {
-    MMI_LOGT("call OnTouchPadGestrueEvent begin");
+    MMI_LOGD("begin");
     CHKPP(event, nullptr);
     auto data = libinput_event_get_gesture_event(event);
     CHKPP(data, nullptr);
@@ -156,7 +156,7 @@ std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestrueE
             return nullptr;
         }
     }
-    MMI_LOGT("call OnTouchPadGestrueEvent end");
+    MMI_LOGD("end");
     return pointerEvent_;
 }
 } // namespace MMI

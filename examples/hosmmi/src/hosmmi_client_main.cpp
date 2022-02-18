@@ -372,14 +372,14 @@ void RunClient()
     MMI_LOGD("UnRegisterStandardizedEventHandle end, wait 3000ms exit");
 }
 
-void ClientStopHandler(int signalNo)
+void ClientStopHandler(int32_t signalNo)
 {
     MMI_LOGI("client will exit! %d", signalNo);
     g_clientExit = true;
 }
 }
 
-int main(int argc, char* argv[])
+int32_t main(int32_t argc, char* argv[])
 {
 #ifdef OHOS_BUILD_MMI_DEBUG
     VerifyLogManagerRun();

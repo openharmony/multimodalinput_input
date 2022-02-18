@@ -172,11 +172,6 @@ HWTEST_F(StreamBufferTest, Data, TestSize.Level1)
     EXPECT_TRUE(retResult);
 }
 
-HWTEST_F(StreamBufferTest, ResetBuf_001, TestSize.Level1)
-{
-    StreamBuffer streamBuffer;
-    streamBuffer.ResetBuf();
-}
 
 HWTEST_F(StreamBufferTest, Size_001, TestSize.Level1)
 {
@@ -184,11 +179,6 @@ HWTEST_F(StreamBufferTest, Size_001, TestSize.Level1)
     streamBuffer.Size();
 }
 
-HWTEST_F(StreamBufferTest, wbuf, TestSize.Level1)
-{
-    StreamBuffer streamBuffer;
-    streamBuffer.ResetBuf();
-}
 HWTEST_F(StreamBufferTest, operatorLeft, TestSize.Level1)
 {
     StreamBuffer streamBufferSrc;

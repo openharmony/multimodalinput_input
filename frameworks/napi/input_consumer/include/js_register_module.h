@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <map>
 #include <list>
-#include <string.h>
+#include <cstring>
 #include <iostream>
 #include "multimodal_event_handler.h"
 #include "key_event.h"

@@ -14,10 +14,10 @@
  */
 #ifndef JS_REGISTER_MODULE_H
 #define JS_REGISTER_MODULE_H
-#include <stdio.h>
+#include <cstdio>
 #include <map>
 #include <list>
-#include <string.h>
+#include <cstring>
 #include <iostream>
 #include "libmmi_util.h"
 #include "multimodal_event_handler.h"
