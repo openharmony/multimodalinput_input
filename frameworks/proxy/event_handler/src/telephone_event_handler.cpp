@@ -14,7 +14,7 @@
  */
 
 #include "telephone_event_handler.h"
-#include "log.h"
+#include "mmi_log.h"
 #include "proto.h"
 
 namespace OHOS {

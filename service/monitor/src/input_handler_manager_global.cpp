@@ -17,7 +17,7 @@
 #include "define_multimodal.h"
 #include "event_dispatch.h"
 #include "input_event_data_transformation.h"
-#include "log.h"
+#include "mmi_log.h"
 #include "net_packet.h"
 #include "proto.h"
 

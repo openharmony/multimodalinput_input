@@ -14,7 +14,7 @@
  */
 
 #include "message_send_recv_stat_mgr.h"
-#include "log.h"
+#include "mmi_log.h"
 
 using namespace std;
 using namespace OHOS::MMI;
