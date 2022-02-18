@@ -34,12 +34,13 @@
         (void)(x) \
     } while (0)
 
-#define MAX_LOG_SIZE 1024
+constexpr int32_t MAX_LOG_SIZE = 1024;
 #define BASE_YEAR 1900
 #define UNLIKELY(x)    __builtin_expect(!!(x), 0)
 
 static int g_fd_klog = -1;
 
+namespace{
 void KLogOpenLogDevice(void)
 {
 #ifdef _CLOEXEC_
@@ -107,5 +108,5 @@ void kMsgLog(const char* fileName, int line, const char* kLevel,
     }
     return;
 }
-
+}
 // #endif // OHOS_BUILD_MMI_DEBUG
