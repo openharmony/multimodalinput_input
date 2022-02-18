@@ -102,7 +102,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
         return RET_OK;
     }
 
-    MMI_LOGD("leave, success with hasSendToMmiServer is already true");
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
@@ -136,7 +136,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Pointer event received, processing");
+    MMI_LOGD("enter");
     int32_t pointerDispatch = 1;
     int32_t touchDispatch = 2;
     if (pointerDispatch == pointerEvent->GetSourceType()) {
@@ -156,7 +156,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> p
         return;
     }
 
-    MMI_LOGD("No comsumer respond, let it go");
+    MMI_LOGD("leave");
 }
 
 int32_t InputManagerImpl::PackDisplayData(OHOS::MMI::NetPacket &ckt)
