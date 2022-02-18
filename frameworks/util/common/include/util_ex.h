@@ -18,7 +18,7 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <time.h>
+#include <ctime>
 #include <type_traits>
 #include "securec.h"
 #include "struct_multimodal.h"
