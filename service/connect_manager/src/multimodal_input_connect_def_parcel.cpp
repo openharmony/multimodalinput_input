@@ -14,15 +14,9 @@
  */
 
 #include "multimodal_input_connect_def_parcel.h"
-#include "log.h"
 
 namespace OHOS {
 namespace MMI {
-    namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
-        LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectDefParcel"
-    };
-}
 bool ConnectReqParcel::Marshalling(Parcel& out) const
 {
     if (!out.WriteInt32(data.moduleId)) {
