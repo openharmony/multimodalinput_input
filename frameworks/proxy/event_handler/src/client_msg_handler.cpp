@@ -223,14 +223,12 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         MMI_LOGD("Operation canceled.");
     }
     pointerEvent->SetProcessedCallback(eventProcessedCallback_);
-    int32_t pointerDispatch = 1;
-    if (pointerDispatch == pointerEvent->GetSourceType()) {
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         int32_t pointerId = pointerEvent->GetId();
         std::string pointerEventstring = "PointerEventDispatch";
         StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, pointerId);
     }
-    int32_t touchDispatch = 2;
-    if (touchDispatch == pointerEvent->GetSourceType()) {
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         int32_t touchId = pointerEvent->GetId();
         std::string touchEvent = "touchEventDispatch";
         StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, touchId);
@@ -841,14 +839,12 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
         MMI_LOGE("Failed to deserialize pointer event");
         return RET_ERR;
     }
-    int32_t pointerFilter = 1;
-    if (pointerFilter == pointerEvent->GetSourceType()) {
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         int32_t pointerId = pointerEvent->GetId();
         std::string pointerEventString = "pointerEventFilter";
         StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventString, pointerId);
     }
-    int32_t touchFilter = 2;
-    if (touchFilter == pointerEvent->GetSourceType()) {
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         int32_t touchId = pointerEvent->GetId();
         std::string touchEventString = "touchEventFilter";
         StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, touchId);

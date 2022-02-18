@@ -387,14 +387,12 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     }
     if (!point->NeedSkipInspection() &&
         InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
-        int32_t pointerFilter = 1;
-        int32_t touchFilter = 2;
-        if (pointerFilter == point->GetSourceType()) {
+        if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
             int32_t pointerId = point->GetId();
             std::string pointerEvent = "OnEventPointer";
             FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, pointerId);
         }
-        if (touchFilter == point->GetSourceType()) {
+        if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
             int32_t touchId = point->GetId();
             std::string touchEvent = "OnEventTouch";
             FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, touchId);
@@ -714,22 +712,24 @@ int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_e
     return ret;
 }
 
-void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, int32_t number)
+void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler isEventHandler)
 {
     MMI_LOGD("enter");
-    int32_t checkLaunchAbility = 1;
     int32_t keyCode = key->GetKeyCode();
     std::string checkKeyCode;
-    if (checkLaunchAbility == number) {
+    if (isEventHandler == KEY_FILTER_EVENT) {
+        checkKeyCode = "key intercept service GetKeyCode=" + std::to_string(keyCode);
+        MMI_LOGT("key intercept service trace GetKeyCode:%{public}d", keyCode);
+    } else if (isEventHandler == KEY_CHECKLAUNABILITY_EVENT) {
         checkKeyCode = "CheckLaunchAbility service GetKeyCode=" + std::to_string(keyCode);
         MMI_LOGT("CheckLaunchAbility service trace GetKeyCode:%{public}d", keyCode);
     } else {
-        checkKeyCode = "FilterSubscribeKeyEvent service GetKeyCode=" + std::to_string(keyCode);
-        MMI_LOGT("FilterSubscribeKeyEvent service trace GetKeyCode:%{public}d", keyCode);
+        checkKeyCode = "SubscribeKeyEvent service GetKeyCode=" + std::to_string(keyCode);
+        MMI_LOGT("SubscribeKeyEvent service trace GetKeyCode:%{public}d", keyCode);
     }
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, checkKeyCode);
     int32_t keyId = key->GetId();
-    std::string keyEventString = "OnKeyEvent";
+    const std::string keyEventString = "OnKeyEvent";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
 }
 
@@ -742,19 +742,18 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
         if (InterceptorMgrGbl.OnKeyEvent(key)) {
             MMI_LOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
                 key->GetKeyCode());
+            OnKeyboardEventTrace(key, KEY_FILTER_EVENT);
             return RET_OK;
         }
     }
     if (AbilityMgr->CheckLaunchAbility(key)) {
         MMI_LOGD("The keyEvent start launch an ability, keyCode:%{public}d", key->GetKeyCode());
-        int32_t checkLaunchAbility = 1;
-        OnKeyboardEventTrace(key, checkLaunchAbility);
+        OnKeyboardEventTrace(key, KEY_CHECKLAUNABILITY_EVENT);
         return RET_OK;
     }
     if (KeyEventSubscriber_.FilterSubscribeKeyEvent(key)) {
         MMI_LOGD("Subscribe keyEvent filter success. keyCode:%{public}d", key->GetKeyCode());
-        int32_t filterSubscribeKeyEvent = 2;
-        OnKeyboardEventTrace(key, filterSubscribeKeyEvent);
+        OnKeyboardEventTrace(key, KEY_SUBSCRIBE_EVENT);
         return RET_OK;
     }
     auto fd = WinMgr->UpdateTarget(key);
