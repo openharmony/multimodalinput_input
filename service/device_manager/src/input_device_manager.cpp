@@ -46,7 +46,6 @@ void InputDeviceManager::Init(weston_compositor* wc)
 
 void InputDeviceManager::GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback)
 {
-
     MMIMsgPost.RunOnWestonThread([this, callback](weston_compositor* wc) {
         auto ids = GetInputDeviceIdsSync(wc);
         callback(ids);
