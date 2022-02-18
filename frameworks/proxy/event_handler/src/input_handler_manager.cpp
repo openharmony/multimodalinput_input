@@ -148,12 +148,12 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
 {
     MMI_LOGD("Enter handler:%{public}d", handlerId);
     int32_t pointerFilter = 1;
-    int32_t touchFilter = 2;
     if (pointerFilter == pointerEvent->GetSourceType()) {
         int32_t pointerId = pointerEvent->GetId();
         std::string pointerEventString = "pointerEventFilter";
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventString, pointerId);
     }
+    int32_t touchFilter = 2;
     if (touchFilter == pointerEvent->GetSourceType()) {
         int32_t touchId = pointerEvent->GetId();
         std::string touchEventString = "touchEventFilter";
