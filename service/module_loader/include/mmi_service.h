@@ -52,7 +52,7 @@ protected:
     virtual void OnDisconnected(SessionPtr s) override;
     virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) override;
 
-    virtual int32_t EpollCtlAdd(EpollEventType type, int32_t fd) override;
+    virtual int32_t AddEpoll(EpollEventType type, int32_t fd) override;
     bool ChkAuthFd(int32_t fd) const;
 
     bool InitLibinputService();
