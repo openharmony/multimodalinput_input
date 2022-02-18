@@ -69,7 +69,7 @@ using namespace OHOS::AAFwk;
 using namespace OHOS::AppExecFwk;
 OHOS::MMI::SystemEventHandler::SystemEventHandler()
 {
-    mapFuns_ = {
+    callbacks_ = {
         {MmiMessageId::ON_SCREEN_SHOT, std::bind(&SystemEventHandler::OnScreenShot, this)},
         {MmiMessageId::ON_SCREEN_SPLIT, std::bind(&SystemEventHandler::OnScreenSplit, this)},
         {MmiMessageId::ON_START_SCREEN_RECORD, std::bind(&SystemEventHandler::OnStopScreenRecord, this)},
@@ -96,12 +96,12 @@ int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
     if (idMsg == MmiMessageId::INVALID) {
         return PARAM_INPUT_INVALID;
     }
-    auto fun = GetFun(idMsg);
-    if (!fun) {
+    auto callback = GetMsgCallback(idMsg);
+    if (callback == nullptr) {
         MMI_LOGE("Non system event return");
         return UNKNOWN_MSG_ID; // non-system event return
     }
-    (*fun)();
+    (*callback)();
     MMI_LOGD("leave");
     return RET_OK;
 }

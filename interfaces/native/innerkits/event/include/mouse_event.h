@@ -293,5 +293,5 @@ private:
     float scrollingDelta_ = 0.f;
     std::map<int32_t, float> deviceAxis_ = {};
 };
-}
+} // namespace OHOS
 #endif // MOUSE_EVENT_H

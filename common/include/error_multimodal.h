@@ -195,5 +195,5 @@ namespace OHOS {
         MMI_SERVICE_INVALID = 0, // 多模服务不存在，多模输入服务异常
         MMI_SERVICE_RUNNING,     // 多模服务运行正常
     };
-}
+} // namespace OHOS
 #endif // ERROR_MULTIMODAL_H

@@ -112,6 +112,6 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> k
             item.session->SendMsg(newPkt);
         }
     }
-    MMI_LOGD("enter");
+    MMI_LOGD("leave");
     return true;
 }
