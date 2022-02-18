@@ -714,7 +714,7 @@ int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_e
     return ret;
 }
 
-void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, enum IsEventHandler)
+void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, enum class IsEventHandler)
 {
     MMI_LOGD("enter");
     int32_t keyCode = key->GetKeyCode();
