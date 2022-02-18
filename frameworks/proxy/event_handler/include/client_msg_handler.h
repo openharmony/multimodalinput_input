@@ -25,7 +25,6 @@
 namespace OHOS {
 namespace MMI {
 typedef std::function<int32_t(const UDSClient&, NetPacket&)> ClientMsgFun;
-static constexpr bool fSkipId = false;
 class ClientMsgHandler : public MsgHandler<ClientMsgFun>,
     public IfClientMsgHandler, public std::enable_shared_from_this<IfClientMsgHandler> {
 public:
