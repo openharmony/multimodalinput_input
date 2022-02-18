@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Description: Configuring the Key source type for KeyEvent Interception
  * Author: h00580190
  * Create: 2022-1-11
