@@ -731,12 +731,12 @@ HWTEST_F(InputManagerTest, InputManager_ANR_TEST_001, TestSize.Level1)
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 }
 
-/*
-    * @tc.name:InputManager_ANR_TEST
-    * @tc.desc:detection of ANR
-    * @tc.type: FUNC
-    * @tc.require:SR000GGN6G
-    */
+/**
+ * @tc.name:InputManager_ANR_TEST
+ * @tc.desc: detection of ANR
+ * @tc.type: FUNC
+ * @tc.require: SR000GGN6G
+ */
 HWTEST_F(InputManagerTest, InputManager_ANR_TEST_002, TestSize.Level1)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(20000));
