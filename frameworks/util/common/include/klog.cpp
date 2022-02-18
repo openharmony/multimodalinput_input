@@ -22,9 +22,9 @@
 #include <cstring>
 #include <cstdlib>
 #include <pthread.h>
-#include <stdarg.h>
-#include <time.h>
-#include <errno.h>
+#include <cstdarg>
+#include <ctime>
+#include <cerrno>
 #include "securec.h"
 #include "hilog/log.h"
 
