@@ -242,7 +242,8 @@ bool KeyEventSubscriber::InitSessionDeleteCallback()
 
 bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent)
 {
-    MMI_LOGT("Enter");    
+    MMI_LOGT("Enter");
+    bool handled = false;
     auto keyCode = keyEvent->GetKeyCode();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     RemoveKeyCode(keyCode, pressedKeys);
@@ -272,7 +273,7 @@ bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent
             MMI_LOGD("preKeysMatch failed");
             continue;
         }
-        bool handled = false;
+
         if (keyOption->GetFinalKeyDownDuration() <= 0) {
             MMI_LOGD("keyOption->GetFinalKeyDownDuration() <= 0");
             NotifySubscriber(keyEvent, subscriber);
