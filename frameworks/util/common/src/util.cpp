@@ -128,7 +128,7 @@ std::string GetThisThreadIdOfString()
         long tid = syscall(SYS_gettid);
         const size_t bufSize = 10;
         char buf[bufSize] = {};
-        const int ret = sprintf_s(buf, bufSize, "%06d", tid);
+        const int32_t ret = sprintf_s(buf, bufSize, "%06d", tid);
         if (ret < 0) {
             printf("ERR: in %s, #%d, call sprintf_s fail, ret = %d.", __func__, __LINE__, ret);
             return threadLocalId;
@@ -319,7 +319,7 @@ const char* GetProgramName()
         KMSG_LOGE("copySize is 0.");
         return "";
     }
-    int ret = memcpy_s(programName, programNameSize, tempName.c_str(), copySize);
+    int32_t ret = memcpy_s(programName, programNameSize, tempName.c_str(), copySize);
     if (RET_OK != ret) {
         return "";
     }
@@ -353,14 +353,14 @@ std::string GetStackInfo()
     const size_t bufferSize = 1024;
     void* buffer[bufferSize];
 
-    const int nptrs = backtrace(buffer, bufferSize);
+    const int32_t nptrs = backtrace(buffer, bufferSize);
     char** strings = backtrace_symbols(buffer, nptrs);
     if (strings == nullptr) {
         perror("backtrace_symbols");
         return std::string();
     }
 
-    for (int i = 1; i < nptrs; i++) {
+    for (int32_t i = 1; i < nptrs; i++) {
         oss << strings[i] << std::endl;
     }
     free(strings);
@@ -393,7 +393,7 @@ const std::string& GetThreadName()
         thisThreadName[MAX_THREAD_NAME_SIZE] = '\0';
         g_threadName = thisThreadName;
     } else {
-        const int errnoSaved = errno;
+        const int32_t errnoSaved = errno;
         printf("in GetThreadName, call prctl get name fail, errno: %d, error msg: %s.\n",
                errnoSaved, strerror(errnoSaved));
     }
