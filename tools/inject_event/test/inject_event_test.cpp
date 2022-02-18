@@ -43,3 +43,4 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectMouse_001, TestSize.Level1)
  */
 HWTEST_F(InjectEventTest, InjectEvent_InjectMouse_002, TestSize.Level1)
 {}
+}
