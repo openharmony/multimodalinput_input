@@ -377,7 +377,7 @@ void ClientStopHandler(int32_t signalNo)
     MMI_LOGI("client will exit! %d", signalNo);
     g_clientExit = true;
 }
-}
+} // namespace
 
 int32_t main(int32_t argc, char* argv[])
 {

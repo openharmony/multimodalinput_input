@@ -31,6 +31,6 @@ protected:
     std::mutex mux_;
     std::list<std::string> commandQueue_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // UDS_COMMAND_QUEUE_H

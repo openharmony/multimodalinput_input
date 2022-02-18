@@ -41,4 +41,4 @@ HWTEST_F(UtilExTest, EnumAdd_002, TestSize.Level1)
     auto messageId2 = EnumAdd(messageId1, -1);
     EXPECT_EQ(messageId2, MmiMessageId::INVALID);
 }
-}
+} // namespace
