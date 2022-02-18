@@ -442,7 +442,6 @@ const std::multimap<int16_t, KeyEventValueTransformations> MAP_KEY_EVENT_VALUE_T
 
 KeyEventValueTransformations KeyValueTransformationByInput(int16_t keyValueOfInput)
 {
-    MMI_LOGD("enter");
     auto it = MAP_KEY_EVENT_VALUE_TRANSFORMATION.find(keyValueOfInput);
     if (it == MAP_KEY_EVENT_VALUE_TRANSFORMATION.end()) {
         constexpr int16_t UNKNOWN_KEY_BASE = 10000;
@@ -453,7 +452,6 @@ KeyEventValueTransformations KeyValueTransformationByInput(int16_t keyValueOfInp
                  "UNKNOWN_KEY_BASE:%{public}d", keyValueOfInput, UNKNOWN_KEY_BASE);
         return unknownKey;
     }
-    MMI_LOGD("leave");
     return it->second;
 }
 
@@ -469,7 +467,6 @@ KeyEventValueTransformation::~KeyEventValueTransformation()
 
 bool KeyEventValueTransformation::Init()
 {
-    MMI_LOGD("enter");
     xkb_context* context = nullptr;
     xkb_keymap* keyMap = nullptr;
     int32_t ctxFlags = XKB_CONTEXT_NO_DEFAULT_INCLUDES;
@@ -505,7 +502,6 @@ bool KeyEventValueTransformation::Init()
 
     xkb_context_unref(context);
     xkb_keymap_unref(keyMap);
-    MMI_LOGD("leave");
     return true;
 }
 
