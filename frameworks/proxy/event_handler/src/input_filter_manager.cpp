@@ -191,7 +191,6 @@ int32_t InputFilterManager::UnFilterTouchEvent(int32_t id)
         return RET_ERR;
     }
 
-    int32_t highAuthorityFilterId = GetHighAuthorityFilterId();
     for (auto it = touchEventFilterList_.begin(); it != touchEventFilterList_.end(); it++) {
         if (it->GetId() == id) {
             MMI_LOGD("remove client filter success");
@@ -205,6 +204,7 @@ int32_t InputFilterManager::UnFilterTouchEvent(int32_t id)
         return RET_ERR;
     }
 
+    int32_t highAuthorityFilterId = GetHighAuthorityFilterId();
     if (id == highAuthorityFilterId && highAuthorityFilterId != 0) {
         MMIEventHdl.RemoveTouchEventFilter(id);
 
