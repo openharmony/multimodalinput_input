@@ -22,16 +22,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
 #include <stdarg.h>
 #include <time.h>
-#include <string.h>
 #include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include "securec.h"
 #include "hilog/log.h"
 
