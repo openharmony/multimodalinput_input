@@ -79,7 +79,7 @@ private:
     /*
      * Differentiated event handling
      */
-    enum IsEventHandler {
+    enum class IsEventHandler {
         KEY_FILTER_EVENT = 1,
         KEY_CHECKLAUNABILITY_EVENT = 2,
         KEY_SUBSCRIBE_EVENT = 3
