@@ -26,7 +26,7 @@ class MsgHandler {
 public:
     void Clear()
     {
-        mapFuns_.clear();
+        callbacks_.clear();
     }
 
 protected:
@@ -37,24 +37,26 @@ protected:
 
 protected:
     virtual ~MsgHandler() {};
-    T *GetFun(MmiMessageId id)
+    T *GetMsgCallback(MmiMessageId id)
     {
-        auto it = mapFuns_.find(id);
-        if (it == mapFuns_.end())
+        auto it = callbacks_.find(id);
+        if (it == callbacks_.end()) {
             return nullptr;
+        }
         return &it->second;
     }
     bool RegistrationEvent(MsgCallback& msg)
     {
-        auto it = mapFuns_.find(msg.id);
-        if (it != mapFuns_.end())
+        auto it = callbacks_.find(msg.id);
+        if (it != callbacks_.end()) {
             return false;
-        mapFuns_[msg.id] = msg.fun;
+        }
+        callbacks_[msg.id] = msg.fun;
         return true;
     }
 
 protected:
-    std::map<MmiMessageId, T> mapFuns_;
+    std::map<MmiMessageId, T> callbacks_;
 };
 }
 }
