@@ -387,13 +387,13 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     }
     if (!point->NeedSkipInspection() &&
         InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
-        if (SOURCE_TYPE_MOUSE == point->GetSourceType()) {
+        if (PointerEvent::SOURCE_TYPE_MOUSE == point->GetSourceType()) {
             int32_t pointerId = point->GetId();
             std::string pointerEvent = "OnEventPointer";
             FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, pointerId);
             MMI_LOGI("Pointer Filter FinishAsyncTrace is end");
         }
-        if (SOURCE_TYPE_TOUCHSCREEN == point->GetSourceType()) {
+        if (PointerEvent::SOURCE_TYPE_TOUCHSCREEN == point->GetSourceType()) {
             int32_t touchId = point->GetId();
             std::string touchEvent = "OnEventTouch";
             FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, touchId);
