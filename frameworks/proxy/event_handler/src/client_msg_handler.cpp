@@ -37,7 +37,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ClientMsgHandler"};
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ClientMsgHandler"};
 }
 
 ClientMsgHandler::ClientMsgHandler()
@@ -142,7 +142,7 @@ int32_t ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)
 {
     auto key = KeyEvent::Create();
     CHKPR(key, ERROR_NULL_POINTER);
-    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, pkt, key);
+    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, key);
     if (ret != RET_OK) {
         MMI_LOGE("OnKeyMonitor read netPacket failed");
         return RET_ERR;
@@ -159,7 +159,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     int32_t fd = 0;
     uint64_t serverStartTime = 0;
     auto key = KeyEvent::Create();
-    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, pkt, key);
+    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, key);
     if (ret != RET_OK) {
         MMI_LOGE("read netPacket failed");
         return RET_ERR;
@@ -242,7 +242,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
 int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, NetPacket &pkt)
 {
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, pkt, keyEvent);
+    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent);
     if (ret != RET_OK) {
         MMI_LOGE("read net packet failed");
         return RET_ERR;
@@ -821,7 +821,7 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
     int32_t handlerId;
     CHKR(pkt.Read(handlerId), STREAM_BUF_READ_FAIL, RET_ERR);
     auto keyEvent = KeyEvent::Create();
-    if (InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, pkt, keyEvent) != ERR_OK) {
+    if (InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent) != ERR_OK) {
         MMI_LOGE("Failed to deserialize key event.");
         return RET_ERR;
     }
@@ -878,7 +878,7 @@ int32_t ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetP
 int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket& pkt)
 {
     auto keyEvent = KeyEvent::Create();
-    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, pkt, keyEvent);
+    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent);
     if (ret != RET_OK) {
         MMI_LOGE("TouchpadEventInterceptor read netPacket failed");
         return RET_ERR;

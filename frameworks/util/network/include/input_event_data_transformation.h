@@ -26,7 +26,7 @@ class InputEventDataTransformation {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventDataTransformation" };
 public:
     static int32_t KeyEventToNetPacket(const std::shared_ptr<KeyEvent> key, NetPacket &packet);
-    static int32_t NetPacketToKeyEvent(bool skipId, NetPacket &packet, std::shared_ptr<KeyEvent> key);
+    static int32_t NetPacketToKeyEvent(NetPacket &packet, std::shared_ptr<KeyEvent> key);
     static int32_t SerializeInputEvent(std::shared_ptr<InputEvent> event, NetPacket &packet);
     static int32_t DeserializeInputEvent(NetPacket &packet, std::shared_ptr<InputEvent> event);
     static int32_t Marshalling(std::shared_ptr<PointerEvent> event, NetPacket &packet);

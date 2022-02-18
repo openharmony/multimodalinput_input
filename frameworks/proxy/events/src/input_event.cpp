@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static int64_t g_nextEventId = 1;
+    int64_t g_nextEventId = 1;
 }
 const int32_t InputEvent::EVENT_TYPE_KEY;
 const int32_t InputEvent::EVENT_TYPE_POINTER;
