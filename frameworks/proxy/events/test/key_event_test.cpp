@@ -141,4 +141,4 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_005, TestSize.Level1)
     KeyEvent->AddKeyItem(item2);
     ASSERT_TRUE(KeyEvent->IsValid());
 }
-}
+} // namespace

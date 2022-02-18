@@ -29,6 +29,6 @@ public:
     virtual void Detach(std::shared_ptr<DeviceObserver> observer) = 0;
     virtual void NotifyPointerDevice(bool) = 0;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif
