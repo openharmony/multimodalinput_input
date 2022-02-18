@@ -14,15 +14,17 @@
  */
 #ifndef SERVER_INPUT_FILTER_MANAGER_H
 #define SERVER_INPUT_FILTER_MANAGER_H
+
 #include <vector>
 #include <string>
-#include "proto.h"
-#include "uds_server.h"
-#include "singleton.h"
-#include "register_event.h"
 #include "event_package.h"
-#include "log.h"
 #include "key_event.h"
+#include "mmi_log.h"
+#include "proto.h"
+#include "register_event.h"
+#include "singleton.h"
+#include "uds_server.h"
+
 namespace OHOS {
 namespace MMI {
 class ServerInputFilterManager : public DelayedSingleton<ServerInputFilterManager> {

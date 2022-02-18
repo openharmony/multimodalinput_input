@@ -17,7 +17,7 @@
 #include <cstring>
 #include <sys/types.h>
 #include <unistd.h>
-#include "log.h"
+#include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "singleton.h"
 #include "string_ex.h"

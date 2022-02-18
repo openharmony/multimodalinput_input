@@ -19,8 +19,8 @@
 #include "i_multimodal_input_connect.h"
 #include "ipc_skeleton.h"
 #include "iremote_stub.h"
-#include "log.h"
 #include "message_parcel.h"
+#include "mmi_log.h"
 #include "multimodal_input_connect_define.h"
 #include "nocopyable.h"
 

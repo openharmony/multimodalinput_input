@@ -15,7 +15,7 @@
 
 #include "safe_keeper.h"
 #include <cinttypes>
-#include "log.h"
+#include "mmi_log.h"
 #include "util.h"
 
 namespace OHOS {

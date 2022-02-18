@@ -14,8 +14,8 @@
  */
 
 #include "input_filter_manager.h"
-#include "log.h"
 #include "mmi_client.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
