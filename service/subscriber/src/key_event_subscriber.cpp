@@ -72,7 +72,7 @@ int32_t KeyEventSubscriber::UnSubscribeKeyEvent(SessionPtr sess, int32_t subscri
         }
     }
 
-    MMI_LOGE("Leave, cannot find subscribe key event info");
+    MMI_LOGD("Leave");
     return RET_ERR;
 }
 

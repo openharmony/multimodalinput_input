@@ -25,7 +25,7 @@ namespace {
 int32_t ProcessingMouseDevice::TransformJsonDataToInputData(const Json& fingerEventArrays,
                                                             InputEventArray& inputEventArray)
 {
-    MMI_LOGI("Enter TransformJsonDataForMouse function.");
+    MMI_LOGD("Enter");
     if (fingerEventArrays.empty()) {
         return RET_ERR;
     }
@@ -39,7 +39,7 @@ int32_t ProcessingMouseDevice::TransformJsonDataToInputData(const Json& fingerEv
         return RET_ERR;
     }
     TransformMouseEventToInputEvent(mouseEventArray, inputEventArray);
-    MMI_LOGI("Leave TransformJsonDataForMouse function.");
+    MMI_LOGD("Leave");
 
     return RET_OK;
 }
