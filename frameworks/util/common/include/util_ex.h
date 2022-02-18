@@ -55,15 +55,15 @@ namespace MMI {
     }
 
     template<class ...Ts>
-    void DumpData(const char* dataPtr, const size_t dataSize, const char* fileName, const int lineNo,
+    void DumpData(const char* dataPtr, const size_t dataSize, const char* fileName, const int32_t lineNo,
         const char* titleFormat, Ts... args)
     {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilEx" };
 
         constexpr size_t outBufSize = 1024;
         char outBuf[outBufSize] = {};
-        int writeLen = 0;
-        int ret;
+        int32_t writeLen = 0;
+        int32_t ret;
         auto funcAdvanceWriteLen = [&writeLen, ret]() {
             if (ret > 0) {
                 writeLen += ret;
@@ -97,7 +97,7 @@ namespace MMI {
         constexpr size_t writePosHexStep1 = 2;
         constexpr size_t writePosHexStep2 = 3;
         size_t i = 0;
-        auto funCheckRetAndLog = [ret](const char* fileName, const int lineNo) -> void {
+        auto funCheckRetAndLog = [ret](const char* fileName, const int32_t lineNo) -> void {
             if (ret == -1) {
                 MMI_LOGE("SEC_RET_EQ: ret:%{public}d, %s:%d", ret, fileName, lineNo);
             }
