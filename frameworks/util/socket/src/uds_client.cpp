@@ -170,6 +170,9 @@ void UDSClient::OnEvent(const epoll_event& ev, StreamBuffer& buf)
     CHK(maxCount > 0, VAL_NOT_EXP);
     for (auto j = 0; j < maxCount; j++) {
         auto size = read(fd, static_cast<void *>(szBuf), MAX_PACKET_BUF_SIZE);
+        if (size < 0) {
+            MMI_LOGE("size:%{public}d", size);
+        }
         if (size > 0) {
             if (!buf.Write(szBuf, size)) {
                 isoverflow = true;
