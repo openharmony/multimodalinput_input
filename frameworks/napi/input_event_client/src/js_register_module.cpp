@@ -117,7 +117,7 @@ static napi_value OnEvent(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result);
 
-    static EventInfo event = {};
+    EventInfo event = {};
     if (GetEventInfo(env, info, event) == nullptr) {
         MMI_LOGE("GetEventInfo failed");
         return result;
@@ -158,7 +158,7 @@ static napi_value OffEvent(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result);
 
-    static EventInfo event = {};
+    EventInfo event = {};
     if (GetEventInfo(env, info, event) == nullptr) {
         MMI_LOGE("GetEventInfo failed");
         return result;

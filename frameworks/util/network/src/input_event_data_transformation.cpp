@@ -35,8 +35,8 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
     }
     return RET_OK;
 }
-int32_t InputEventDataTransformation::NetPacketToKeyEvent(bool skipId,
-    NetPacket &packet, std::shared_ptr<KeyEvent> key)
+
+int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &packet, std::shared_ptr<KeyEvent> key)
 {
     int32_t data = 0;
     int32_t size = 0;

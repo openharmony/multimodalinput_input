@@ -401,7 +401,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnNewInjectKeyEvent(SessionPtr sess, NetPac
     CHKPR(sess, ERROR_NULL_POINTER);
     uint64_t preHandlerTime = GetSysClockTime();
     auto creKey = OHOS::MMI::KeyEvent::Create();
-    int32_t errCode = InputEventDataTransformation::NetPacketToKeyEvent(true, pkt, creKey);
+    int32_t errCode = InputEventDataTransformation::NetPacketToKeyEvent(pkt, creKey);
     if (errCode != RET_OK) {
         MMI_LOGE("Deserialization is Failed, errCode:%{public}u", errCode);
         return RET_ERR;
