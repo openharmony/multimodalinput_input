@@ -217,7 +217,7 @@ void InputManagerImpl::PrintDisplayDebugInfo()
 {
     MMI_LOGD("physicalDisplays,num:%{public}d", static_cast<int32_t>(physicalDisplays_.size()));
     for (const auto &item : physicalDisplays_) {
-        MMI_LOGD("physicalDisplays,id:%{public}d,leftDisplayId:%{public}d,upDisplayId:%{public}d,"
+        MMI_LOGD("physicalDisplays,id:%{public}d,leftDisplay:%{public}d,upDisplayId:%{public}d,"
             "topLeftX:%{public}d,topLeftY:%{public}d,width:%{public}d,height:%{public}d,"
             "name:%{public}s,seatId:%{public}s,seatName:%{public}s,logicWidth:%{public}d,"
             "logicHeight:%{public}d,direction:%{public}d",
