@@ -26,7 +26,7 @@ using namespace OHOS;
 
 namespace {
     constexpr int32_t SLEEP = 1000;
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RunShellUtilTest" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RunShellUtilTest" };
 }
 
 class RunShellUtilTest : public testing::Test {
@@ -90,4 +90,4 @@ HWTEST_F(RunShellUtilTest, RunShellUtilTest_RunShellCommand_002, TestSize.Level1
         EXPECT_TRUE(std::strcmp(vLog.back().c_str(), firstLog.back().c_str()) != 0);
     }
 }
-}
+} // namespace

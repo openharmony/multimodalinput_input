@@ -222,15 +222,16 @@ int32_t InputEventHandler::OnEventHandler(const multimodal_libinput_event& ev)
     CHKPR(ev.event, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(ev.event);
     TimeCostChk chk("InputEventHandler::OnEventHandler", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
-    auto fun = GetFun(static_cast<MmiMessageId>(type));
-    if (!fun) {
+    auto callback = GetMsgCallback(static_cast<MmiMessageId>(type));
+    if (callback == nullptr) {
         MMI_LOGE("Unknown event type:%{public}d,errCode:%{public}d", type, UNKNOWN_EVENT);
         return UNKNOWN_EVENT;
     }
-    auto ret = (*fun)(ev);
+    auto ret = (*callback)(ev);
     if (ret != 0) {
         MMI_LOGE("Event handling failed. type:%{public}d,ret:%{public}d,errCode:%{public}d",
                  type, ret, EVENT_CONSUM_FAIL);
+        return ret;
     }
     return ret;
 }
@@ -238,13 +239,9 @@ int32_t InputEventHandler::OnEventHandler(const multimodal_libinput_event& ev)
 void InputEventHandler::OnCheckEventReport()
 {
     std::lock_guard<std::mutex> lock(mu_);
-    if (initSysClock_ == 0) {
+    if (initSysClock_ == 0 || lastSysClock_ != 0) {
         return;
     }
-    if (lastSysClock_ != 0) {
-        return;
-    }
-
     constexpr uint64_t MAX_DID_TIME = 1000 * 1000 * 3;
     auto curSysClock = GetSysClockTime();
     auto lostTime = curSysClock - initSysClock_;

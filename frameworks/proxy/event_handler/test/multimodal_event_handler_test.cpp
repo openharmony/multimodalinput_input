@@ -93,7 +93,7 @@ void MultimodalEventHandlerTest::TearDownTestCase()
 
 void MultimodalEventHandlerTest::RegisterStandardizedEventHandle()
 {
-    MMI_LOGI("MMIClientDemo RegisterStandardizedEventHandle enter.");
+    MMI_LOGD("enter");
     using namespace OHOS::MMI;
     auto appKey = CreateEvent<AppKeyEventHandle>();
     handerMap_[std::string("AppKeyEventHandle")] = appKey;
@@ -102,7 +102,7 @@ void MultimodalEventHandlerTest::RegisterStandardizedEventHandle()
 
 void MultimodalEventHandlerTest::UnregisterStandardizedEventHandle()
 {
-    MMI_LOGI("MMIClientDemo::UnregisterStandardizedEventHandle enter.");
+    MMI_LOGD("enter");
     for (auto it = handerMap_.begin(); it != handerMap_.end();) {
         MMI_LOGT("UnregisterStandardizedEventHandle:%{public}s", it->first.c_str());
         MMIEventHdl.UnregisterStandardizedEventHandle(remoteObject_, windowId_, it->second);
@@ -822,4 +822,4 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_TouchFilterAbnormal_
     EXPECT_TRUE(InputFilterMgr.UnFilterTouchEvent(filterId2) == RET_OK);
     EXPECT_TRUE(InputFilterMgr.UnFilterTouchEvent(filterId3) == RET_OK);
 }
-}
+} // namespace

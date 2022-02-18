@@ -82,7 +82,7 @@ constexpr static int32_t RATE_PARA = 2;
 constexpr static int32_t ONE_MILLION = 1024 * 1024;
 
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MmiConsoleLog" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MmiConsoleLog" };
 }
 
 // LogManager
@@ -839,8 +839,8 @@ LogData::LogData()
     curLine = 0;
     level = 0;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 bool VerifyLogManagerRun()
 {
