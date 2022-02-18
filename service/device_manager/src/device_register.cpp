@@ -32,7 +32,6 @@ DeviceRegister::~DeviceRegister()
 
 bool DeviceRegister::Init()
 {
-    MMI_LOGD("enter");
     deviceId_.clear();
     deviceInfo_.clear();
     if (mu_.try_lock()) {
@@ -44,13 +43,11 @@ bool DeviceRegister::Init()
     deviceInfo_.insert(std::pair<std::string, uint32_t>(sensor.physical, sensor.seniorDeviceType));
     deviceId_.insert(knuckle.seniorDeviceType);
     deviceInfo_.insert(std::pair<std::string, uint32_t>(knuckle.physical, knuckle.seniorDeviceType));
-    MMI_LOGD("leave");
     return true;
 }
 
 bool DeviceRegister::FindDeviceId(const std::string& physical, uint32_t& deviceId)
 {
-    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     constexpr uint32_t DEFAULT_DEVICE_ID = 0;
     auto it = deviceInfo_.find(physical);
@@ -59,13 +56,11 @@ bool DeviceRegister::FindDeviceId(const std::string& physical, uint32_t& deviceI
         return false;
     }
     deviceId = it->second;
-    MMI_LOGD("leave");
     return true;
 }
 
 uint32_t DeviceRegister::AddDeviceInfo(const std::string& physical)
 {
-    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     constexpr uint32_t BEGIN_NUM = 1;
     auto it = deviceId_.find(BEGIN_NUM);
@@ -82,14 +77,12 @@ uint32_t DeviceRegister::AddDeviceInfo(const std::string& physical)
         deviceId_.insert(addDeviceId);
         deviceInfo_.insert(std::pair<std::string, uint32_t>(physical, addDeviceId));
         MMI_LOGD("Adding Device number succeed");
-        MMI_LOGD("leave");
         return addDeviceId;
     }
 }
 
 bool DeviceRegister::DeleteDeviceInfo(const std::string& physical)
 {
-    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     auto it = deviceInfo_.find(physical);
     if (it != deviceInfo_.end()) {
@@ -99,7 +92,6 @@ bool DeviceRegister::DeleteDeviceInfo(const std::string& physical)
         return true;
     }
     MMI_LOGE("Failed to delete device info");
-    MMI_LOGD("leave");
     return false;
 }
 } // namespace MMI
