@@ -37,7 +37,7 @@ namespace MMI {
         }
         int32_t ret = 0;
 
-        const size_t bufSize = 1024 * 10;
+        constexpr size_t bufSize = 1024 * 10;
         char buf[bufSize] = {};
         ret = snprintf_s(buf, bufSize, bufSize - 1, fmt, args...);
         if (ret < 0) {
@@ -60,7 +60,7 @@ namespace MMI {
     {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilEx" };
 
-        const size_t outBufSize = 1024;
+        constexpr size_t outBufSize = 1024;
         char outBuf[outBufSize] = {};
         int writeLen = 0;
         int ret;
@@ -85,17 +85,17 @@ namespace MMI {
 
         funcOutput();
 
-        const size_t bufSize = 81;
-        const size_t oneLineCharCount = 16;
-        const size_t countStep = 2;
-        const size_t byteSize = 8;
-        const size_t wordSize = 16;
+        constexpr size_t bufSize = 81;
+        constexpr size_t oneLineCharCount = 16;
+        constexpr size_t countStep = 2;
+        constexpr size_t byteSize = 8;
+        constexpr size_t wordSize = 16;
         char bufLeft[bufSize] = {};
         char bufRight[bufSize] = {};
         size_t writePosHex = 0;
         size_t writePosChar = 0;
-        const size_t writePosHexStep1 = 2;
-        const size_t writePosHexStep2 = 3;
+        constexpr size_t writePosHexStep1 = 2;
+        constexpr size_t writePosHexStep2 = 3;
         size_t i = 0;
         auto funCheckRetAndLog = [ret](const char* fileName, const int lineNo) -> void {
             if (ret == -1) {
