@@ -482,7 +482,7 @@ int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<Input
     }
 
     if (inputEvent->GetTargetDisplayId() == -1) {
-        MMI_LOGD("target display id is -1");
+        MMI_LOGD("target display is -1");
         inputEvent->SetTargetDisplayId(logicalDisplays_[0].id);
         inputEvent->SetTargetWindowId(logicalDisplays_[0].focusWindowId);
         auto it = windowInfos_.find(logicalDisplays_[0].focusWindowId);
@@ -499,7 +499,7 @@ int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<Input
         if (item.id != inputEvent->GetTargetDisplayId()) {
             continue;
         }
-        MMI_LOGD("target display id:%{public}d", inputEvent->GetTargetDisplayId());
+        MMI_LOGD("target display:%{public}d", inputEvent->GetTargetDisplayId());
         inputEvent->SetTargetWindowId(item.focusWindowId);
         auto it = windowInfos_.find(item.focusWindowId);
         if (it == windowInfos_.end()) {
@@ -511,7 +511,7 @@ int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<Input
         return it->second.pid;
     }
 
-    MMI_LOGE("leave,cant't find logical display,target display id:%{public}d", inputEvent->GetTargetDisplayId());
+    MMI_LOGE("leave,cant't find logical display,target display:%{public}d", inputEvent->GetTargetDisplayId());
     return RET_ERR;
 }
 
@@ -712,7 +712,7 @@ bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(libinput_eve
 
     for (const auto &display : logicalDisplays_) {
         if (targetDisplayId == display.id ) {
-            MMI_LOGD("targetDisplayId is %{public}d, displayX is %{public}d, displayY is %{public}d ",
+            MMI_LOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
                 targetDisplayId, displayX, displayY);
             displayX = globalLogicalX - display.topLeftX;
             displayY = globalLogicalY - display.topLeftY;
@@ -746,7 +746,7 @@ bool OHOS::MMI::InputWindowsManager::TouchDownPointToDisplayPoint(libinput_event
         logicalDisplayId = display.id;
         logicalX = globalLogicalX - display.topLeftX;
         logicalY = globalLogicalY - display.topLeftY;
-        MMI_LOGD("targetDisplayId is %{public}d, displayX is %{public}d, displayY is %{public}d ",
+        MMI_LOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
             logicalDisplayId, logicalX, logicalY);
         return true;
     }

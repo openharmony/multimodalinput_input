@@ -217,7 +217,7 @@ void InputManagerImpl::PrintDisplayDebugInfo()
 {
     MMI_LOGD("physicalDisplays,num:%{public}d", static_cast<int32_t>(physicalDisplays_.size()));
     for (const auto &item : physicalDisplays_) {
-        MMI_LOGD("physicalDisplays,id:%{public}d,leftDisplayId:%{public}d,upDisplayId:%{public}d,"
+        MMI_LOGD("physicalDisplays,id:%{public}d,leftDisplay:%{public}d,upDisplay:%{public}d,"
             "topLeftX:%{public}d,topLeftY:%{public}d,width:%{public}d,height:%{public}d,"
             "name:%{public}s,seatId:%{public}s,seatName:%{public}s,logicWidth:%{public}d,"
             "logicHeight:%{public}d,direction:%{public}d",
@@ -240,7 +240,7 @@ void InputManagerImpl::PrintDisplayDebugInfo()
 
         for (const auto &win : item.windowsInfo_) {
             MMI_LOGD("windowid:%{public}d,pid:%{public}d,uid:%{public}d,hotZoneTopLeftX:%{public}d,"
-                "hotZoneTopLeftY:%{public}d,hotZoneWidth:%{public}d,hotZoneHeight:%{public}d,displayId:%{public}d,"
+                "hotZoneTopLeftY:%{public}d,hotZoneWidth:%{public}d,hotZoneHeight:%{public}d,display:%{public}d,"
                 "agentWindowId:%{public}d,winTopLeftX:%{public}d,winTopLeftY:%{public}d",
                 win.id, win.pid,
                 win.uid, win.hotZoneTopLeftX,
