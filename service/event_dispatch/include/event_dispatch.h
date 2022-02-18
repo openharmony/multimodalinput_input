@@ -75,7 +75,8 @@ protected:
 #ifdef DEBUG_CODE_TEST
 private:
     const size_t windowCount_ = 2;
-    /*
+    void OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler isEventHandler);
+	/*
      * Differentiated event handling
      */
     enum IsEventHandler {
@@ -83,7 +84,6 @@ private:
         KEY_CHECKLAUNABILITY_EVENT = 2,
         KEY_SUBSCRIBE_EVENT = 3
     };
-    void OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler isEventHandler);
 #endif
     };
 } // namespace MMI
