@@ -87,7 +87,7 @@ int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
             return RET_OK;
         }
     }
-    MMI_LOGE("Leave, cannot find subscribe key event info");
+    MMI_LOGE("Leave");
     return RET_ERR;
 }
 
@@ -108,7 +108,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
             return RET_OK;
         }
     }
-    MMI_LOGE("Leave, client cannot find subscribe key event callback");
+    MMI_LOGE("Leave");
     return RET_ERR;
 }
 } // namespace MMI
