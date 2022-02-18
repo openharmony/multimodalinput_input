@@ -421,4 +421,4 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_005, TestSize.L
     pointerEvent->AddPointerItem(item2);
     ASSERT_TRUE(pointerEvent->IsValid());
 }
-}
+} // namespace
