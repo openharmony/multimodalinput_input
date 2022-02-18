@@ -20,7 +20,7 @@
 #include <list>
 #include <memory>
 #include "define_multimodal.h"
-#include "log.h"
+#include "mmi_log.h"
 #include "singleton.h"
 #include "util.h"
 

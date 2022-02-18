@@ -18,7 +18,7 @@
 #include <sys/types.h>
 #include "event_filter_parcel.h"
 #include "ipc_skeleton.h"
-#include "log.h"
+#include "mmi_log.h"
 #include "string_ex.h"
 
 namespace OHOS {
