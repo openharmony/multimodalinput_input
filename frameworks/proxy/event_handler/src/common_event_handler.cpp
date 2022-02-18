@@ -14,7 +14,7 @@
  */
 
 #include "common_event_handler.h"
-#include "log.h"
+#include "mmi_log.h"
 #include "proto.h"
 
 namespace OHOS {
@@ -23,9 +23,11 @@ CommonEventHandler::CommonEventHandler()
 {
     type_ = MmiMessageId::COMMON_EVENT_BEGIN;
 }
+
 CommonEventHandler::~CommonEventHandler()
 {
 }
+
 bool CommonEventHandler::OnShowMenu(const MultimodalEvent& event)
 {
     return false;

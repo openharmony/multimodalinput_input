@@ -15,7 +15,7 @@
 
 #include "uds_socket.h"
 #include <cinttypes>
-#include "log.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {

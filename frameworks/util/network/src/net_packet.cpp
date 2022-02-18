@@ -14,7 +14,7 @@
  */
 
 #include "net_packet.h"
-#include "log.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {

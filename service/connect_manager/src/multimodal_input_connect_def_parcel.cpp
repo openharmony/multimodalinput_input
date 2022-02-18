@@ -14,7 +14,7 @@
  */
 
 #include "multimodal_input_connect_def_parcel.h"
-#include "log.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {

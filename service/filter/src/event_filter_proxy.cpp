@@ -15,8 +15,8 @@
 
 #include "event_filter_proxy.h"
 #include "event_filter_parcel.h"
-#include "log.h"
 #include "message_option.h"
+#include "mmi_log.h"
 #include "string_ex.h"
 
 namespace OHOS {

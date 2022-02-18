@@ -21,9 +21,9 @@
 #undef protected
 #include "libinput-seat-export.h"
 #include "event_dump.h"
+#include "mmi_log.h"
 #include "mmi_server.h"
 #include "util.h"
-#include "log.h"
 
 namespace {
     using namespace testing::ext;

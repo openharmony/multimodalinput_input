@@ -18,9 +18,9 @@
 #include <gtest/gtest.h>
 #include "error_multimodal.h"
 #include "key_event_handler.h"
-#include "log.h"
 #include "media_event_handler.h"
 #include "mmi_client.h"
+#include "mmi_log.h"
 #include "mmi_token.h"
 #include "proto.h"
 #include "touch_event_handler.h"
