@@ -56,6 +56,6 @@ protected:
 protected:
     std::map<MmiMessageId, T> mapFuns_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // MSG_HANDLER_H
