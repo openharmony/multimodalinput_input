@@ -25,7 +25,7 @@ namespace {
 int32_t ProcessingKeyboardDevice::TransformJsonDataToInputData(const Json& fingerEventArrays,
     InputEventArray& inputEventArray)
 {
-    MMI_LOGI("Enter TransformJsonDataForKeyBoard function.");
+    MMI_LOGD("Enter");
     if (fingerEventArrays.empty()) {
         return RET_ERR;
     }
@@ -39,7 +39,7 @@ int32_t ProcessingKeyboardDevice::TransformJsonDataToInputData(const Json& finge
         return RET_ERR;
     }
     TransformKeyBoardEventToInputEvent(keyBoardEventArray, inputEventArray);
-    MMI_LOGI("Leave TransformJsonDataForKeyBoard function.");
+    MMI_LOGD("Leave");
 
     return RET_OK;
 }

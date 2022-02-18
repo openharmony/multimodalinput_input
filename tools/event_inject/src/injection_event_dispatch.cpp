@@ -58,7 +58,7 @@ void InjectionEventDispatch::InitManageFunction()
 
 int32_t InjectionEventDispatch::OnJson()
 {
-    MMI_LOGI("Enter onJson function");
+    MMI_LOGD("Enter");
     const string path = injectArgvs_.at(JSON_FILE_PATH_INDEX);
     std::ifstream reader(path);
     if (!reader) {
@@ -70,7 +70,7 @@ int32_t InjectionEventDispatch::OnJson()
     reader.close();
 
     int32_t ret = manageInjectDevice_.TransformJsonData(inputEventArrays);
-    MMI_LOGI("Leave onJson function");
+    MMI_LOGI("Leave");
     return ret;
 }
 
@@ -91,7 +91,7 @@ string InjectionEventDispatch::GetFunId()
 
 void InjectionEventDispatch::HandleInjectCommandItems()
 {
-    MMI_LOGI("InjectionEventDispatch::HandleInjectCommandItems");
+    MMI_LOGD("Enter");
 
     string id = GetFunId();
     auto fun = GetFun(id);
@@ -205,7 +205,7 @@ int32_t InjectionEventDispatch::ExecuteFunction(string funId)
 
 int32_t InjectionEventDispatch::OnAisensor()
 {
-    MMI_LOGI("into function: OnAisensor()");
+    MMI_LOGD("Enter");
     int32_t exRet = RET_ERR;
 
     if (argvNum_ < AI_SENDOR_MIN_ARGV_NUMS) {
@@ -391,7 +391,7 @@ int32_t InjectionEventDispatch::OnKnuckleAll()
 
 int32_t InjectionEventDispatch::OnHdi()
 {
-    MMI_LOGI("into Onhdi function.");
+    MMI_LOGD("Enter");
     if ((injectArgvs_.size() < HDI_MIN_ARGV_NUMS) || (injectArgvs_.size() > HDI_MAX_ARGV_NUMS)) {
         MMI_LOGE("Wrong number of input parameters! errCode:%{public}d", PARAM_INPUT_FAIL);
         return RET_ERR;
@@ -404,7 +404,7 @@ int32_t InjectionEventDispatch::OnHdi()
 
 int32_t InjectionEventDispatch::OnHdiStatus()
 {
-    MMI_LOGI("into function: OnHdiStatus()");
+    MMI_LOGD("Enter");
     if (injectArgvs_.size() != HDI_STATUS_COUNTS) {
         MMI_LOGE("Wrong number of input parameters! errCode:%{public}d", PARAM_INPUT_FAIL);
         return RET_ERR;

@@ -74,7 +74,7 @@ protected:
     std::promise<bool> threadPromiseHadEnd_;
     std::future<bool> threadFutureHadEnd_ = threadPromiseHadEnd_.get_future();
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif // UDS_CLIENT_H

@@ -25,7 +25,7 @@ namespace {
 int32_t ProcessingPadDevice::TransformJsonDataToInputData(const Json& fingerEventArrays,
     InputEventArray& inputEventArray)
 {
-    MMI_LOGI("Enter TransformJsonDataForTouchPad function.");
+    MMI_LOGD("Enter");
     if (fingerEventArrays.empty()) {
         return RET_ERR;
     }
@@ -39,7 +39,7 @@ int32_t ProcessingPadDevice::TransformJsonDataToInputData(const Json& fingerEven
         return RET_ERR;
     }
     TransformPadEventToInputEvent(padEventArray, inputEventArray);
-    MMI_LOGI("Leave TransformJsonDataForTouchPad function.");
+    MMI_LOGD("Leave");
 
     return RET_OK;
 }
