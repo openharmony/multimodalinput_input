@@ -49,7 +49,6 @@ protected:
     bool IsFirstConnectFailExit() override;
 
 protected:
-    bool isRun_ = false;
     TestAuxToolMsgHandler cMsgHandler_;
 };
 } // namespace MMI
