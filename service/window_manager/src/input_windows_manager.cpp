@@ -39,7 +39,7 @@ using namespace OHOS::MMI;
 
 static void SeatsInfoDebugPrint(const SeatInfo** seats)
 {
-    MMI_LOGD("Seats:");
+    MMI_LOGD("Enter");
     for (int32_t i = 0; seats[i]; i++) {
         MMI_LOGD("-Seat%{public}02d,seatName:%{public}s,deviceFlags:%{public}d,focusWindowId:%{public}d", i + 1,
                  seats[i]->seatName, seats[i]->deviceFlags, seats[i]->focusWindowId);
@@ -227,7 +227,7 @@ std::string OHOS::MMI::InputWindowsManager::GetSurfaceIdListString()
 
 void OHOS::MMI::InputWindowsManager::Clear()
 {
-    MMI_LOGD("InputWindowsManager destructor begin");
+    MMI_LOGD("Enter");
     std::lock_guard<std::mutex> lock(mu_);
     if (seatsInfo_) {
         FreeSeatsInfo(seatsInfo_);
@@ -242,7 +242,7 @@ void OHOS::MMI::InputWindowsManager::Clear()
     layers_.clear();
     surfaces_.clear();
     surfacesList_.clear();
-    MMI_LOGD("InputWindowsManager destructor end");
+    MMI_LOGD("Leave");
 }
 
 void OHOS::MMI::InputWindowsManager::Dump(int32_t fd)
@@ -482,7 +482,7 @@ int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<Input
     }
 
     if (inputEvent->GetTargetDisplayId() == -1) {
-        MMI_LOGD("target display id is -1");
+        MMI_LOGD("target display is -1");
         inputEvent->SetTargetDisplayId(logicalDisplays_[0].id);
         inputEvent->SetTargetWindowId(logicalDisplays_[0].focusWindowId);
         auto it = windowInfos_.find(logicalDisplays_[0].focusWindowId);
@@ -499,7 +499,7 @@ int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<Input
         if (item.id != inputEvent->GetTargetDisplayId()) {
             continue;
         }
-        MMI_LOGD("target display id:%{public}d", inputEvent->GetTargetDisplayId());
+        MMI_LOGD("target display:%{public}d", inputEvent->GetTargetDisplayId());
         inputEvent->SetTargetWindowId(item.focusWindowId);
         auto it = windowInfos_.find(item.focusWindowId);
         if (it == windowInfos_.end()) {
@@ -511,7 +511,7 @@ int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<Input
         return it->second.pid;
     }
 
-    MMI_LOGE("leave,cant't find logical display,target display id:%{public}d", inputEvent->GetTargetDisplayId());
+    MMI_LOGE("leave,cant't find logical display,target display:%{public}d", inputEvent->GetTargetDisplayId());
     return RET_ERR;
 }
 
@@ -712,7 +712,7 @@ bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(libinput_eve
 
     for (const auto &display : logicalDisplays_) {
         if (targetDisplayId == display.id ) {
-            MMI_LOGD("targetDisplayId is %{public}d, displayX is %{public}d, displayY is %{public}d ",
+            MMI_LOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
                 targetDisplayId, displayX, displayY);
             displayX = globalLogicalX - display.topLeftX;
             displayY = globalLogicalY - display.topLeftY;
@@ -746,7 +746,7 @@ bool OHOS::MMI::InputWindowsManager::TouchDownPointToDisplayPoint(libinput_event
         logicalDisplayId = display.id;
         logicalX = globalLogicalX - display.topLeftX;
         logicalY = globalLogicalY - display.topLeftY;
-        MMI_LOGD("targetDisplayId is %{public}d, displayX is %{public}d, displayY is %{public}d ",
+        MMI_LOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
             logicalDisplayId, logicalX, logicalY);
         return true;
     }
@@ -870,7 +870,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTargetOld(std::shared_ptr<Poi
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("UpdateMouseTarget begin");
+    MMI_LOGD("Enter");
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!IsCheckDisplayIdIfExist(displayId)) {
         MMI_LOGE("This display:%{public}d is not exist", displayId);
@@ -993,13 +993,13 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTouchPadTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("touchPad event is dropped");
+    MMI_LOGD("Enter");
     return RET_ERR;
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("touchPad event is dropped");
+    MMI_LOGD("Enter");
     return RET_ERR;
 }
 

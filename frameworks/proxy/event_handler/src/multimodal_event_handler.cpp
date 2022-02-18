@@ -22,10 +22,9 @@
 
 namespace OHOS {
 namespace MMI {
-    namespace {
-        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MultimodalEventHandler"};
-    }
-
+namespace {
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MultimodalEventHandler"};
+}
 void OnConnected(const OHOS::MMI::IfMMIClient& client)
 {
 #ifdef OHOS_WESTEN_MODEL
@@ -37,13 +36,6 @@ void OnConnected(const OHOS::MMI::IfMMIClient& client)
     if (!abilityInfoVec.empty()) {
         winId = abilityInfoVec[0].windowId;
         abilityId = *reinterpret_cast<int32_t*>(abilityInfoVec[0].token.GetRefPtr());
-        /* 三方联调代码，token中带bundlerName和appName，本注释三方代码修改后打开
-        auto token = static_cast<IMMIToken*>(abilityInfoVec[0].token.GetRefPtr());
-        if (token) {
-            bundlerName = token->GetBundlerName();
-            appName = token->GetName();
-        }
-        */
     }
     OHOS::MMI::NetPacket ckt(MmiMessageId::REGISTER_APP_INFO);
     ckt << abilityId << winId << bundlerName << appName;
@@ -157,7 +149,7 @@ bool MultimodalEventHandler::InitClient()
     if (!(client_->Start(cMsgHandler_, true))) {
         return false;
     }
-    MMI_LOGD("init client success!");
+    MMI_LOGD("leave");
     return true;
 }
 
@@ -292,10 +284,10 @@ int32_t MultimodalEventHandler::RemoveInterceptor(int32_t id)
 
 int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
 {
+    MMI_LOGD("enter");
     if (!InitClient()) {
         return MMI_SERVICE_INVALID;
     }
-    MMI_LOGD("AddInputEventMontior enter");
     NetPacket pkt(MmiMessageId::ADD_INPUT_EVENT_MONITOR);
     pkt << keyEventType;
     client_->SendMessage(pkt);
@@ -304,10 +296,10 @@ int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
 
 void MultimodalEventHandler::RemoveInputEventMontior(int32_t keyEventType)
 {
+    MMI_LOGD("enter");
     if (!InitClient()) {
         return;
     }
-    MMI_LOGD("RemoveInputEventMontior enter");
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_EVENT_MONITOR);
     pkt << keyEventType;
     client_->SendMessage(pkt);
@@ -315,7 +307,7 @@ void MultimodalEventHandler::RemoveInputEventMontior(int32_t keyEventType)
 
 void MultimodalEventHandler::RemoveInputEventTouchpadMontior(int32_t pointerEventType)
 {
-    MMI_LOGD("MultimodalEventHandler::RemoveInputEventTouchpadMontior");
+    MMI_LOGD("enter");
     if (!InitClient()) {
         return;
     }
@@ -326,7 +318,7 @@ void MultimodalEventHandler::RemoveInputEventTouchpadMontior(int32_t pointerEven
 
 int32_t MultimodalEventHandler::AddInputEventTouchpadMontior(int32_t pointerEventType)
 {
-    MMI_LOGE("MultimodalEventHandler::AddInputEventTouchpadMontior");
+    MMI_LOGD("enter");
     if (!InitClient()) {
         return MMI_SERVICE_INVALID;
     }

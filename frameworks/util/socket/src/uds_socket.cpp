@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSocket" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSocket" };
     }
 
 UDSSocket::UDSSocket()
@@ -186,5 +186,5 @@ void UDSSocket::Close()
     }
     fd_ = -1;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
