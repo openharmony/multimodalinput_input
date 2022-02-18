@@ -136,8 +136,8 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerItem.SetLocalY(0);
     pointerItem.SetPointerId(0);
 
-    uint64_t time = libinput_event_pointer_get_time_usec(data);
-    pointerItem.SetDownTime(static_cast<int64_t>(time));
+    int64_t time = static_cast<int64_t>(GetSysClockTime());
+    pointerItem.SetDownTime(time);
     pointerItem.SetWidth(0);
     pointerItem.SetHeight(0);
     pointerItem.SetPressure(0);
@@ -146,8 +146,8 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerEvent_->UpdateId();
     pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
-    pointerEvent_->SetActionStartTime(static_cast<int64_t>(time));
+    pointerEvent_->SetActionTime(time);
+    pointerEvent_->SetActionStartTime(time);
     pointerEvent_->SetDeviceId(deviceId);
     pointerEvent_->SetPointerId(0);
     pointerEvent_->SetTargetDisplayId(-1);
