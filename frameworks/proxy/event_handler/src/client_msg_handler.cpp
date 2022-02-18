@@ -223,17 +223,15 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         MMI_LOGD("Operation canceled.");
     }
     pointerEvent->SetProcessedCallback(eventProcessedCallback_);
-    if (PointerEvent::SOURCE_TYPE_MOUSE == pointerEvent->GetSourceType()) {
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         int32_t pointerId = pointerEvent->GetId();
         std::string pointerEventstring = "PointerEventDispatch";
         StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, pointerId);
-        MMI_LOGD("client PointerDispatch StartAsyncTrace is start");
     }
-    if (PointerEvent::SOURCE_TYPE_TOUCHSCREEN == pointerEvent->GetSourceType()) {
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         int32_t touchId = pointerEvent->GetId();
         std::string touchEvent = "touchEventDispatch";
         StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, touchId);
-        MMI_LOGD("client TouchDispatch StartAsyncTrace is start");
     }
     InputManagerImpl::GetInstance()->OnPointerEvent(pointerEvent);
     return RET_OK;
@@ -841,17 +839,15 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
         MMI_LOGE("Failed to deserialize pointer event");
         return RET_ERR;
     }
-    if (PointerEvent::SOURCE_TYPE_MOUSE == pointerEvent->GetSourceType()) {
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         int32_t pointerId = pointerEvent->GetId();
         std::string pointerEventString = "pointerEventFilter";
         StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventString, pointerId);
-        MMI_LOGD("client Pointerfilter StartAsyncTrace is start");
     }
-    if (PointerEvent::SOURCE_TYPE_TOUCHSCREEN == pointerEvent->GetSourceType()) {
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         int32_t touchId = pointerEvent->GetId();
         std::string touchEventString = "touchEventFilter";
         StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, touchId);
-        MMI_LOGD("client touchfilter StartAsyncTrace is start");
     }
     InputHandlerManager::GetInstance().OnInputEvent(handlerId, pointerEvent);
     return RET_OK;
