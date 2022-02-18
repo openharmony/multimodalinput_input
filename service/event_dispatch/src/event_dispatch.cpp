@@ -714,15 +714,15 @@ int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_e
     return ret;
 }
 
-void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, enum class IsEventHandler)
+void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler isEventHandler)
 {
     MMI_LOGD("enter");
     int32_t keyCode = key->GetKeyCode();
     std::string checkKeyCode;
-    if (IsEventHandler == KEY_FILTER_EVENT) {
+    if (isEventHandler == KEY_FILTER_EVENT) {
         checkKeyCode = "key intercept service GetKeyCode=" + std::to_string(keyCode);
         MMI_LOGT("key intercept service trace GetKeyCode:%{public}d", keyCode);
-    } else if (IsEventHandler == KEY_CHECKLAUNABILITY_EVENT) {
+    } else if (isEventHandler == KEY_CHECKLAUNABILITY_EVENT) {
         checkKeyCode = "CheckLaunchAbility service GetKeyCode=" + std::to_string(keyCode);
         MMI_LOGT("CheckLaunchAbility service trace GetKeyCode:%{public}d", keyCode);
     } else {
