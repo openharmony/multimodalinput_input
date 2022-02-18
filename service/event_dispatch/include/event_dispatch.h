@@ -72,7 +72,7 @@ protected:
     int32_t touchDownFocusSurfaceId_ = 0;
     EventPackage eventPackage_;
     StandardEventHandler standardEvent_;
-	/*
+    /*
      * Differentiated event handling
      */
     enum IsEventHandler {
@@ -84,7 +84,6 @@ protected:
 #ifdef DEBUG_CODE_TEST
 private:
     const size_t windowCount_ = 2;
-	
 #endif
     };
 } // namespace MMI
