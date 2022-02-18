@@ -37,7 +37,7 @@ namespace MMI {
 
 struct SeatInfo** GetSeatsInfo()
 {
-    MMI_LOGD("GetSeatsInfo");
+    MMI_LOGD("Enter");
     const int32_t TEST_VAL = 2;
     const int32_t TEST_SEATNAME_SIZE = 32;
     auto setInfo = static_cast<SeatInfo**>(malloc(sizeof(SeatInfo*) * TEST_VAL));
@@ -56,7 +56,7 @@ struct SeatInfo** GetSeatsInfo()
 
 struct ScreenInfo** GetScreensInfo()
 {
-    MMI_LOGD("GetScreensInfo");
+    MMI_LOGD("Enter");
     const int32_t TEST_VAL = 2;
     const int32_t TEST_LAYER_ID = 2;
     const int32_t TEST_WIDTH = 1920;
@@ -106,7 +106,7 @@ struct ScreenInfo** GetScreensInfo()
 
 void FreeSurfaceInfo(struct SurfaceInfo* pSurface)
 {
-    MMI_LOGD("FreeSurfaceInfo");
+    MMI_LOGD("Enter");
     if (pSurface) {
         free(const_cast<SurfaceInfo*>(pSurface));
     }
@@ -114,7 +114,7 @@ void FreeSurfaceInfo(struct SurfaceInfo* pSurface)
 
 void FreeLayerInfo(struct LayerInfo* pLayer)
 {
-    MMI_LOGD("FreeLayerInfo");
+    MMI_LOGD("Enter");
     if (pLayer) {
         if (pLayer->surfaces) {
             for (int32_t i = 0; i < pLayer->nSurfaces; i++) {
@@ -128,7 +128,7 @@ void FreeLayerInfo(struct LayerInfo* pLayer)
 
 void FreeScreenInfo(struct ScreenInfo* pScreen)
 {
-    MMI_LOGD("FreeScreenInfo");
+    MMI_LOGD("Enter");
     if (pScreen) {
         if (pScreen->layers) {
             for (int32_t i = 0; i < pScreen->nLayers; i++) {
@@ -145,7 +145,7 @@ void FreeScreenInfo(struct ScreenInfo* pScreen)
 
 void FreeScreensInfo(struct ScreenInfo** screens)
 {
-    MMI_LOGD("FreeScreensInfo");
+    MMI_LOGD("Enter");
     if (!screens) {
         MMI_LOGE("screens is null.");
         return;
@@ -158,7 +158,7 @@ void FreeScreensInfo(struct ScreenInfo** screens)
 
 void FreeSeatsInfo(struct SeatInfo** seats)
 {
-    MMI_LOGD("FreeSeatsInfo");
+    MMI_LOGD("Enter");
     if (!seats) {
         MMI_LOGE("seats is null.");
         return;
@@ -174,17 +174,17 @@ void FreeSeatsInfo(struct SeatInfo** seats)
 
 void SetSeatListener(const SeatInfoChangeListener listener)
 {
-    MMI_LOGD("SetSeatListener");
+    MMI_LOGD("Enter");
 }
 
 void SetScreenListener(const ScreenInfoChangeListener listener)
 {
-    MMI_LOGT("SetScreenListener");
+    MMI_LOGD("Enter");
 }
 
 void SetLibInputEventListener(const LibInputEventListener listener)
 {
-    MMI_LOGD("SetLibInputEventListener");
+    MMI_LOGD("Enter");
 }
 } // namespace OHOS
 } // namespace MMI

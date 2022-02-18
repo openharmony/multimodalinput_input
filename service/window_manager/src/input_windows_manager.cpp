@@ -39,7 +39,7 @@ using namespace OHOS::MMI;
 
 static void SeatsInfoDebugPrint(const SeatInfo** seats)
 {
-    MMI_LOGD("Seats:");
+    MMI_LOGD("Enter");
     for (int32_t i = 0; seats[i]; i++) {
         MMI_LOGD("-Seat%{public}02d,seatName:%{public}s,deviceFlags:%{public}d,focusWindowId:%{public}d", i + 1,
                  seats[i]->seatName, seats[i]->deviceFlags, seats[i]->focusWindowId);
@@ -227,7 +227,7 @@ std::string OHOS::MMI::InputWindowsManager::GetSurfaceIdListString()
 
 void OHOS::MMI::InputWindowsManager::Clear()
 {
-    MMI_LOGD("InputWindowsManager destructor begin");
+    MMI_LOGD("Enter");
     std::lock_guard<std::mutex> lock(mu_);
     if (seatsInfo_) {
         FreeSeatsInfo(seatsInfo_);
@@ -242,7 +242,7 @@ void OHOS::MMI::InputWindowsManager::Clear()
     layers_.clear();
     surfaces_.clear();
     surfacesList_.clear();
-    MMI_LOGD("InputWindowsManager destructor end");
+    MMI_LOGD("Leave");
 }
 
 void OHOS::MMI::InputWindowsManager::Dump(int32_t fd)
@@ -870,7 +870,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTargetOld(std::shared_ptr<Poi
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("UpdateMouseTarget begin");
+    MMI_LOGD("Enter");
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!IsCheckDisplayIdIfExist(displayId)) {
         MMI_LOGE("This display:%{public}d is not exist", displayId);
@@ -993,13 +993,13 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTouchPadTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("touchPad event is dropped");
+    MMI_LOGD("Enter");
     return RET_ERR;
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("touchPad event is dropped");
+    MMI_LOGD("Enter");
     return RET_ERR;
 }
 

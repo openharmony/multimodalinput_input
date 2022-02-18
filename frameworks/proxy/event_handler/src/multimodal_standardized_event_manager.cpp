@@ -155,7 +155,7 @@ int32_t MultimodalStandardizedEventManager::UnSubscribeKeyEvent(int32_t subscrib
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManagerkey::OnKey");
+    MMI_LOGD("enter");
 #ifdef DEBUG_CODE_TEST
     if (event.GetDeviceUdevTags() == DEVICE_TYPE_VIRTUAL_KEYBOARD) {
         MMI_LOGD("Inject, keyCode:%{public}d,action:%{public}d,revPid:%{public}d",
@@ -174,7 +174,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEven
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnTouch(const TouchEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManagertouch::OnTouch");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::TOUCH_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.windowId == event.GetWindowID() && i->second.eventCallBack->OnTouch(event) == false) {
@@ -187,7 +187,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnTouch(const TouchEvent&
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnShowMenu(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnShowMenu");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnShowMenu(event) == false) {
@@ -199,7 +199,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnShowMenu(const Multimod
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnSend(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnSend");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnSend(event) == false) {
@@ -211,7 +211,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnSend(const MultimodalEv
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnCopy(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnCopy");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnCopy(event) == false) {
@@ -223,7 +223,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnCopy(const MultimodalEv
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnPaste(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnPaste");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnPaste(event) == false) {
@@ -235,7 +235,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnPaste(const MultimodalE
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnCut(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnCut");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnCut(event) == false) {
@@ -247,7 +247,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnCut(const MultimodalEve
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnUndo(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnUndo");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnUndo(event) == false) {
@@ -259,7 +259,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnUndo(const MultimodalEv
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnRefresh(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnRefresh");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnRefresh(event) == false) {
@@ -271,7 +271,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnRefresh(const Multimoda
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnStartDrag(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnStartDrag");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnStartDrag(event) == false) {
@@ -283,7 +283,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnStartDrag(const Multimo
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnCancel(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnCancel");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnCancel(event) == false) {
@@ -295,7 +295,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnCancel(const Multimodal
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnEnter(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnEnter");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnEnter(event) == false) {
@@ -307,7 +307,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnEnter(const MultimodalE
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnPrevious(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnPrevious");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnPrevious(event) == false) {
@@ -319,7 +319,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnPrevious(const Multimod
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnNext(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnNext");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnNext(event) == false) {
@@ -331,7 +331,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnNext(const MultimodalEv
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnBack(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnBack");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnBack(event) == false) {
@@ -343,7 +343,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnBack(const MultimodalEv
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnPrint(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnPrint");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::COMMON_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnPrint(event) == false) {
@@ -355,7 +355,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnPrint(const MultimodalE
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnPlay(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnPlay");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::MEDIA_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnPlay(event) == false) {
@@ -367,7 +367,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnPlay(const MultimodalEv
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnPause(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnPause");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::MEDIA_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnPause(event) == false) {
@@ -379,7 +379,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnPause(const MultimodalE
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnMediaControl(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnMediaControl");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::MEDIA_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnMediaControl(event) == false) {
@@ -391,7 +391,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnMediaControl(const Mult
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnScreenShot(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnScreenShot");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnScreenShot(event) == false) {
@@ -403,7 +403,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnScreenShot(const Multim
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnScreenSplit(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnScreenSplit");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnScreenSplit(event) == false) {
@@ -415,7 +415,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnScreenSplit(const Multi
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnStartScreenRecord(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnStartScreenRecord");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnStartScreenRecord(event) == false) {
@@ -427,7 +427,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnStartScreenRecord(const
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnStopScreenRecord(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnStopScreenRecord");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnStopScreenRecord(event) == false) {
@@ -439,7 +439,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnStopScreenRecord(const 
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnGotoDesktop(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnGotoDesktop");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnGotoDesktop(event) == false) {
@@ -451,7 +451,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnGotoDesktop(const Multi
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnRecent(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnRecent");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnRecent(event) == false) {
@@ -463,7 +463,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnRecent(const Multimodal
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnShowNotification(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnShowNotification");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnShowNotification(event) == false) {
@@ -475,7 +475,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnShowNotification(const 
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnLockScreen(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnLockScreen");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnLockScreen(event) == false) {
@@ -487,7 +487,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnLockScreen(const Multim
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnSearch(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnSearch");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnSearch(event) == false) {
@@ -499,7 +499,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnSearch(const Multimodal
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnClosePage(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnClosePage");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnClosePage(event) == false) {
@@ -511,7 +511,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnClosePage(const Multimo
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnLaunchVoiceAssistant(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnLaunchVoiceAssistant");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnLaunchVoiceAssistant(event) == false) {
@@ -523,7 +523,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnLaunchVoiceAssistant(co
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnMute(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnMute");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::SYSTEM_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnMute(event) == false) {
@@ -535,7 +535,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnMute(const MultimodalEv
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnAnswer(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnAnswer");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::TELEPHONE_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnAnswer(event) == false) {
@@ -547,7 +547,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnAnswer(const Multimodal
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnRefuse(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnRefuse");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::TELEPHONE_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnRefuse(event) == false) {
@@ -559,7 +559,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnRefuse(const Multimodal
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnHangup(const MultimodalEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnHangup");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::TELEPHONE_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnHangup(event) == false) {
@@ -571,7 +571,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnHangup(const Multimodal
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnTelephoneControl(const MultimodalEvent& event)
 {
-    MMI_LOGI("MultimodalStandardizedEventManager::OnTelephoneControl");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::TELEPHONE_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnTelephoneControl(event) == false) {
@@ -583,7 +583,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnTelephoneControl(const 
 
 int32_t MultimodalStandardizedEventManager::OnDeviceAdd(const DeviceEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnDeviceAdd");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::DEVICE_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnDeviceAdd(event) == false) {
@@ -595,7 +595,7 @@ int32_t MultimodalStandardizedEventManager::OnDeviceAdd(const DeviceEvent& event
 
 int32_t MultimodalStandardizedEventManager::OnDeviceRemove(const DeviceEvent& event)
 {
-    MMI_LOGD("MultimodalStandardizedEventManager::OnDeviceRemove");
+    MMI_LOGD("enter");
     auto range = mapEvents_.equal_range(MmiMessageId::DEVICE_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.eventCallBack->OnDeviceRemove(event) == false) {
@@ -684,7 +684,7 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<Ke
 
 int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Inject pointer event.");
+    MMI_LOGD("enter");
     CHKPR(pointerEvent, RET_ERR);
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
     MMI_LOGD("Pointer event dispatcher of client:eventType:%{public}s,actionTime:%{public}" PRId64 ","
@@ -717,7 +717,7 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
     OHOS::MMI::NetPacket netPkt(MmiMessageId::INJECT_POINTER_EVENT);
     CHKR((RET_OK == InputEventDataTransformation::Marshalling(pointerEvent, netPkt)),
         STREAM_BUF_WRITE_FAIL, RET_ERR);
-    MMI_LOGD("Pointer event packaged, send to server");
+    MMI_LOGD("leave");
     CHKR(SendMsg(netPkt), MSG_SEND_FAIL, RET_ERR);
     return RET_OK;
 }
