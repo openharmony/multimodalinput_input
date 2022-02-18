@@ -495,7 +495,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
 
 int32_t OHOS::MMI::ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
 {
-    MMI_LOGD("Inject-pointer-event received, processing");
+    MMI_LOGD("enter");
     auto pointerEvent = OHOS::MMI::PointerEvent::Create();
     CHKR((RET_OK == InputEventDataTransformation::Unmarshalling(pkt, pointerEvent)),
         STREAM_BUF_READ_FAIL, RET_ERR);
@@ -536,7 +536,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveKeyEventFilter(SessionPtr sess, Net
 
 int32_t OHOS::MMI::ServerMsgHandler::OnAddTouchEventFilter(SessionPtr sess, NetPacket& pkt)
 {
-    MMI_LOGD("ServerMsgHandler::OnAddTouchEventFilter");
+    MMI_LOGD("enter");
     if (sess->GetUid() != SYSTEMUID && sess->GetUid() != 0) {
         MMI_LOGD("Insufficient permissions");
         return RET_ERR;
@@ -552,7 +552,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnAddTouchEventFilter(SessionPtr sess, NetP
 
 int32_t OHOS::MMI::ServerMsgHandler::OnRemoveTouchEventFilter(SessionPtr sess, NetPacket& pkt)
 {
-    MMI_LOGD("ServerMsgHandler::OnRemoveTouchEventFilter");
+    MMI_LOGD("enter");
 	if (sess->GetUid() != SYSTEMUID && sess->GetUid() != 0) {
         MMI_LOGD("Insufficient permissions");
         return RET_ERR;
@@ -617,7 +617,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &p
     }
 
     OHOS::MMI::InputWindowsManager::GetInstance()->UpdateDisplayInfo(physicalDisplays, logicalDisplays);
-    MMI_LOGD("ServerMsgHandler::OnDisplayInfo leave");
+    MMI_LOGD("leave");
     return RET_OK;
 }
 

@@ -25,7 +25,7 @@ namespace {
 int32_t ProcessingJoystickDevice::TransformJsonDataToInputData(const Json& originalEvent,
                                                                InputEventArray& inputEventArray)
 {
-    MMI_LOGI("Enter TransformJsonDataForJoystick function");
+    MMI_LOGD("Enter");
     if (originalEvent.empty()) {
         return RET_ERR;
     }
@@ -43,7 +43,7 @@ int32_t ProcessingJoystickDevice::TransformJsonDataToInputData(const Json& origi
         return RET_ERR;
     }
     TransformPadEventToInputEvent(JoystickEventArray, inputEventArray);
-    MMI_LOGI("Leave TransformJsonDataForJoystick function");
+    MMI_LOGD("Leave");
 
     return RET_OK;
 }

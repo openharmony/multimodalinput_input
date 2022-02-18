@@ -39,7 +39,7 @@ public:
 
     virtual bool OnKey(const OHOS::KeyEvent& keylEvent) override
     {
-        MMI_LOGD("AppKeyEventHandle::Onkey");
+        MMI_LOGD("enter");
         return true;
     }
 };
@@ -51,7 +51,7 @@ public:
 
     virtual bool OnTouch(const TouchEvent& touchEvent) override
     {
-        MMI_LOGD("AppTouchEventHandle::OnTouch");
+        MMI_LOGD("enter");
         return true;
     }
 };
@@ -63,85 +63,85 @@ public:
 
     virtual bool OnShowMenu(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppCommonEventHandle::OnShowMenu");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnSend(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppCommonEventHandle::OnSend");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnCopy(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppCommonEventHandle::OnCopy");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnPaste(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppCommonEventHandle::OnPaste");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnCut(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppCommonEventHandle::OnCut");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnUndo(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppCommonEventHandle::OnUndo");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnRefresh(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppCommonEventHandle::OnRefresh");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnStartDrag(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppCommonEventHandle::OnStartDrag");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnCancel(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppCommonEventHandle::OnCancel");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnEnter(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppCommonEventHandle::OnEnter");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnPrevious(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppCommonEventHandle::OnPrevious");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnNext(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppCommonEventHandle::OnNext");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnBack(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppCommonEventHandle::OnBack");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnPrint(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppCommonEventHandle::OnPrint");
+        MMI_LOGD("enter");
         return true;
     }
 };
@@ -153,19 +153,19 @@ public:
 
     virtual bool OnPlay(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppMediaEventHandle::OnPlay");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnPause(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppMediaEventHandle::OnPause");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnMediaControl(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppMediaEventHandle::OnMediaControl");
+        MMI_LOGD("enter");
         return true;
     }
 };
@@ -177,73 +177,73 @@ public:
 
     virtual bool OnClosePage(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppSystemEventHandle::OnClosePage");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnLaunchVoiceAssistant(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppSystemEventHandle::OnLaunchVoiceAssistant");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnMute(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppSystemEventHandle::OnMute");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnScreenShot(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppSystemEventHandle::OnScreenShot");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnScreenSplit(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppSystemEventHandle::OnScreenSplit");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnStartScreenRecord(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppSystemEventHandle::OnStartScreenRecord");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnStopScreenRecord(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppSystemEventHandle::OnStopScreenRecord");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnGotoDesktop(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppSystemEventHandle::OnGotoDesktop");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnRecent(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppSystemEventHandle::OnRecent");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnShowNotification(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppSystemEventHandle::OnShowNotification");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnLockScreen(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppSystemEventHandle::OnLockScreen");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnSearch(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppSystemEventHandle::OnSearch");
+        MMI_LOGD("enter");
         return true;
     }
 };
@@ -255,25 +255,25 @@ public:
 
     virtual bool OnAnswer(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppTelephoneEventHandle::OnAnswer");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnRefuse(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppTelephoneEventHandle::OnRefuse");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnHangup(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppTelephoneEventHandle::OnHangup");
+        MMI_LOGD("enter");
         return true;
     }
 
     virtual bool OnTelephoneControl(const MultimodalEvent& event) override
     {
-        MMI_LOGD("AppTelephoneEventHandle::OnTelephoneControl");
+        MMI_LOGD("enter");
         return true;
     }
 };
@@ -305,7 +305,7 @@ public:
 
     void RegisterStandardizedEventHandle()
     {
-        MMI_LOGI("MMIClientDemo RegisterStandardizedEventHandle enter");
+        MMI_LOGD("enter");
 
         MMI_LOGD("Register key event");
 
@@ -343,7 +343,7 @@ public:
 
     void UnregisterStandardizedEventHandle()
     {
-        MMI_LOGI("MMIClientDemo::UnregisterStandardizedEventHandle enter");
+        MMI_LOGD("enter");
         for (auto it = handerMap_.begin(); it != handerMap_.end();) {
             MMI_LOGD("UnregisterStandardizedEventHandle:%{public}s", it->first.c_str());
             MMIEventHdl.UnregisterStandardizedEventHandle(remoteObject_, windowId_, it->second);
@@ -360,6 +360,7 @@ static std::atomic_bool g_clientExit(false);
 
 void RunClient()
 {
+    MMI_LOGD("begin");
     MMIClientDemo client;
     client.RegisterStandardizedEventHandle();
 
@@ -367,9 +368,8 @@ void RunClient()
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
-    MMI_LOGD("UnRegisterStandardizedEventHandle begin");
     client.UnregisterStandardizedEventHandle();
-    MMI_LOGD("UnRegisterStandardizedEventHandle end, wait 3000ms exit");
+    MMI_LOGD("end");
 }
 
 void ClientStopHandler(int32_t signalNo)
@@ -396,7 +396,7 @@ int32_t main(int32_t argc, char* argv[])
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
-    MMI_LOGD("hosmmi-client exit");
+    MMI_LOGD("leave");
 
     return 0;
 }
