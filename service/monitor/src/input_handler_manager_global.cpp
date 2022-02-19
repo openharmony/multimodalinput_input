@@ -84,7 +84,6 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 
 bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("enter");
     CHKPF(pointerEvent);
     if (interceptors_.HandleEvent(pointerEvent)) {
         MMI_LOGD("Pointer event was intercepted");
@@ -221,7 +220,6 @@ bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId,
 
 void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("enter");
     CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         MMI_LOGE("This is not a touch-screen event");

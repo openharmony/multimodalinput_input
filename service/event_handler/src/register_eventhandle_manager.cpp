@@ -33,7 +33,6 @@ RegisterEventHandleManager::~RegisterEventHandleManager()
 
 int32_t RegisterEventHandleManager::RegisterEvent(MmiMessageId messageId, int32_t fd)
 {
-    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     CHKR(messageId >= MmiMessageId::INVALID, PARAM_INPUT_INVALID, UNKNOWN_EVENT);
     switch (messageId) {
@@ -60,13 +59,11 @@ int32_t RegisterEventHandleManager::RegisterEvent(MmiMessageId messageId, int32_
             return UNKNOWN_EVENT;
     }
     MMI_LOGT("event:%{public}d,fd:%{public}d ", messageId, fd);
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t RegisterEventHandleManager::UnregisterEventHandleManager(MmiMessageId messageId, int32_t fd)
 {
-    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     CHKR(messageId >= MmiMessageId::INVALID, PARAM_INPUT_INVALID, UNKNOWN_EVENT);
     switch (messageId) {
@@ -92,13 +89,11 @@ int32_t RegisterEventHandleManager::UnregisterEventHandleManager(MmiMessageId me
             MMI_LOGD("It's no this event handle! ");
             return UNKNOWN_EVENT;
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 void RegisterEventHandleManager::UnregisterEventHandleBySocketFd(int32_t fd)
 {
-    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     CHK(fd >= 0, PARAM_INPUT_INVALID);
     auto iter = mapRegisterManager_.begin();
@@ -109,12 +104,10 @@ void RegisterEventHandleManager::UnregisterEventHandleBySocketFd(int32_t fd)
             iter++;
         }
     }
-    MMI_LOGD("leave");
 }
 
 void RegisterEventHandleManager::FindSocketFds(const MmiMessageId messageId, std::vector<int32_t>& fds)
 {
-    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     auto it = mapRegisterManager_.equal_range(messageId);
     if (it.first == std::end(mapRegisterManager_)) {
@@ -124,24 +117,20 @@ void RegisterEventHandleManager::FindSocketFds(const MmiMessageId messageId, std
     for (auto iter = it.first; iter != it.second; ++iter) {
         fds.push_back(iter->second);
     }
-    MMI_LOGD("leave");
 }
 
 void RegisterEventHandleManager::PrintfMap()
 {
-    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     for (const auto &item : mapRegisterManager_) {
         std::cout << "event handle is "
             << static_cast<int32_t>(item.first)
             << ", fd is " << item.second << std::endl;
     }
-    MMI_LOGD("leave");
 }
 
 void RegisterEventHandleManager::Dump(int32_t fd)
 {
-    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
     std::string strTmp;
     mprintf(fd, "RegsEvent: count=%d", mapRegisterManager_.size());
@@ -158,38 +147,32 @@ void RegisterEventHandleManager::Dump(int32_t fd)
         strTmp += "]";
         mprintf(fd, "\t%s", strTmp.c_str());
     }
-    MMI_LOGD("leave");
 }
 
 void RegisterEventHandleManager::Clear()
 {
-    MMI_LOGD("enter");
     if (mu_.try_lock()) {
         mu_.unlock();
     }
     mapRegisterManager_.clear();
-    MMI_LOGD("leave");
 }
 
 void RegisterEventHandleManager::RegisterEventHandleByIdMsage(const MmiMessageId idMsgBegin,
                                                               const MmiMessageId idMsgEnd,
                                                               const int32_t fd)
 {
-    MMI_LOGD("enter");
     const int32_t messageIdBeginTemp = static_cast<int32_t>(idMsgBegin);
     const int32_t messageIdEndTemp = static_cast<int32_t>(idMsgEnd);
     for (auto it = messageIdBeginTemp + 1; it < messageIdEndTemp; it++) {
         auto tempId = static_cast<MmiMessageId>(it);
         mapRegisterManager_.insert(std::pair<MmiMessageId, int32_t>(tempId, fd));
     }
-    MMI_LOGD("leave");
 }
 
 void RegisterEventHandleManager::UnregisterEventHandleByIdMsage(const MmiMessageId idMsgBegin,
                                                                 const MmiMessageId idMsgEnd,
                                                                 const int32_t fd)
 {
-    MMI_LOGD("enter");
     MmiMessageId idMsg = static_cast<MmiMessageId>(static_cast<int32_t>(idMsgBegin) + 1);
     auto it = mapRegisterManager_.find(idMsg);
     while (it != mapRegisterManager_.end()) {
@@ -199,7 +182,6 @@ void RegisterEventHandleManager::UnregisterEventHandleByIdMsage(const MmiMessage
             it++;
         }
     }
-    MMI_LOGD("leave");
 }
 } // namespace MMI
 } // namespace OHOS
