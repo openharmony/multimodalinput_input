@@ -453,7 +453,7 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, point.time, preHandlerTime)) {
         KeyEventValueTransformations KeyEventValue = {};
         KeyEventValue = KeyValueTransformationByInput(point.button);
-        point.button = KeyEventValue.keyValueOfHos;
+        point.button = KeyEventValue.keyValueOfSys;
         NetPacket newPacket(MmiMessageId::ON_TOUCH);
         int32_t inputType = INPUT_DEVICE_CAP_POINTER;
         newPacket << inputType << inputEvent.curRventType << point << appInfo.abilityId
@@ -798,7 +798,7 @@ int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *ev
         MMI_LOGE("Failed to find, fd:%{public}d,errCode:%{public}d", focusId, FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
     }
-    key.key = trs.keyValueOfHos; // struct EventKeyboard tranformed into HOS_L3
+    key.key = trs.keyValueOfSys; // struct EventKeyboard tranformed into L3
 
     MMI_LOGT("4.event dispatcher of server, eventKeyboard:time:%{public}" PRId64 ",deviceType:%{public}u,"
              "deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,unicode:%{public}d,key:%{public}u,"

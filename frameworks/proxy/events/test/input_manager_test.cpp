@@ -39,7 +39,7 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace MMI;
 namespace {
-constexpr int32_t HOS_KEY_BACK = 2;
+constexpr int32_t MMI_KEY_BACK = 2;
 constexpr bool ACTION_DOWN = true;
 constexpr bool ACTION_UP = false;
 constexpr int32_t DEFAULT_DEVICE_ID = 1;
@@ -456,14 +456,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, Tes
 
     OHOS::KeyEvent injectDownEvent;
     int64_t downTime = static_cast<int64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
-    injectDownEvent.Initialize(0, ACTION_DOWN, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectDownEvent.Initialize(0, ACTION_DOWN, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
     EXPECT_TRUE(response);
 
     OHOS::KeyEvent injectUpEvent;
     downTime = static_cast<int64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
-    injectUpEvent.Initialize(0, ACTION_UP, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
+    injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
     EXPECT_TRUE(response);
 
@@ -1129,7 +1129,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_001, TestSize.Level1)
 
     OHOS::KeyEvent injectUpEvent;
     uint64_t downTime = static_cast<uint64_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectUpEvent.Initialize(0, ACTION_UP, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
     EXPECT_TRUE(response);
@@ -1161,7 +1161,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_002, TestSize.Level1)
 
     OHOS::KeyEvent injectUpEvent;
     uint64_t downTime = static_cast<uint64_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectUpEvent.Initialize(0, ACTION_UP, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
     EXPECT_TRUE(response);
