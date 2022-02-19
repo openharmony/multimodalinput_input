@@ -133,10 +133,10 @@ const std::vector<char> RemovePrivacyIdentifierInFmt(const std::string& format)
 
     size_t readPos = 0;
     size_t writePos = 0;
-    const size_t oneLineSize = 10;
+    constexpr size_t oneLineSize = 10;
     while (readPos < formatLen) {
         if (formatLen - readPos >= (oneLineSize - 1)) {
-            const size_t publicFormatLen = 9;
+            constexpr size_t publicFormatLen = 9;
             if (format.size() >= publicFormatLen && format.substr(readPos, publicFormatLen) == "%{public}") {
                 readPos += (oneLineSize - 1);
                 format2.push_back('%');
@@ -146,7 +146,7 @@ const std::vector<char> RemovePrivacyIdentifierInFmt(const std::string& format)
         }
 
         if (formatLen - readPos >= oneLineSize) {
-            const size_t privateFormatLen = 10;
+            constexpr size_t privateFormatLen = 10;
             if (format.size() >= privateFormatLen && format.substr(readPos, privateFormatLen) == "%{private}") {
                 readPos += oneLineSize;
                 format2.push_back('%');
@@ -501,8 +501,8 @@ void LogManager::ParseLogLimitSize(const std::string& str)
 {
     size_t size = limitSize_;
     size_t limit = atoi(str.c_str());
-    const size_t minLimitSize = 10;
-    const size_t maxLimitSize = 1024;
+    constexpr size_t minLimitSize = 10;
+    constexpr size_t maxLimitSize = 1024;
     limit = (limit <= 0) ? minLimitSize : limit;
     limit = (limit > maxLimitSize) ? maxLimitSize : limit;
     limitSize_ = limit * ONE_MILLION;

@@ -38,8 +38,8 @@ protected:
     int32_t StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
 
 private:
-    static const int32_t SYSTEM_UID = 1000;
-    static const int32_t ROOT_UID = 0;
+    static constexpr int32_t SYSTEM_UID = 1000;
+    static constexpr int32_t ROOT_UID = 0;
 };
 } // namespace MMI
 } // namespace OHOS
