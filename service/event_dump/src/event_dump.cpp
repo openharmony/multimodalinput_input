@@ -82,6 +82,7 @@ void ChkAppInfos(int32_t fd)
 void EventDump::Init(UDSServer& udss)
 {
     udsServer_ = &udss;
+}
 
 void EventDump::Dump(int32_t fd)
 {
