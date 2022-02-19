@@ -37,8 +37,8 @@ bool DeviceRegister::Init()
     if (mu_.try_lock()) {
         mu_.unlock();
     }
-    SeniorDeviceInfo sensor = { "hos_input_device_aisensor", INPUT_DEVICE_AISENSOR };
-    SeniorDeviceInfo knuckle = { "hos_input_device_knuckle", INPUT_DEVICE_KNUCKLE };
+    SeniorDeviceInfo sensor = { "input_device_aisensor", INPUT_DEVICE_AISENSOR };
+    SeniorDeviceInfo knuckle = { "input_device_knuckle", INPUT_DEVICE_KNUCKLE };
     deviceId_.insert(sensor.seniorDeviceType);
     deviceInfo_.insert(std::pair<std::string, uint32_t>(sensor.physical, sensor.seniorDeviceType));
     deviceId_.insert(knuckle.seniorDeviceType);

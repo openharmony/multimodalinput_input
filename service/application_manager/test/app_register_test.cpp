@@ -607,7 +607,7 @@ HWTEST_F(AppRegisterTest, KeyEventValueTransformation_001, TestSize.Level1)
     const int32_t keyValueOfInput = 30;
 
     valTest = KeyValueTransformationByInput(keyValueOfInput);
-    EXPECT_TRUE(valTest.keyValueOfHos == 2017);
+    EXPECT_TRUE(valTest.keyValueOfSys == 2017);
 }
 
 HWTEST_F(AppRegisterTest, KeyEventValueTransformation_002, TestSize.Level1)
@@ -616,7 +616,7 @@ HWTEST_F(AppRegisterTest, KeyEventValueTransformation_002, TestSize.Level1)
     const int32_t keyValueOfInput = -1;
 
     valTest = KeyValueTransformationByInput(keyValueOfInput);
-    EXPECT_TRUE(valTest.keyValueOfHos >= 10000);
+    EXPECT_TRUE(valTest.keyValueOfSys >= 10000);
 }
 
 HWTEST_F(AppRegisterTest, Init_001, TestSize.Level1)
