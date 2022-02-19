@@ -27,23 +27,23 @@ namespace MMI {
 class InputEvent {
 public:
     // Unknown action. Usually used to indicate the initial value of the input event action
-    static const int32_t ACTION_UNKNOWN = 0;
+    static constexpr int32_t ACTION_UNKNOWN = 0;
     // Cancel the action. Used to indicate that a continuous input event is cancelled
-    static const int32_t ACTION_CANCEL = 1;
+    static constexpr int32_t ACTION_CANCEL = 1;
 
     // The actual type of the current input event is the basic type (InputEvent type)
-    static const int32_t EVENT_TYPE_BASE = 0X00000000;
+    static constexpr int32_t EVENT_TYPE_BASE = 0X00000000;
     // The actual type of the current input event is the KeyEvent type or its derived class
-    static const int32_t EVENT_TYPE_KEY = 0X00010000;
+    static constexpr int32_t EVENT_TYPE_KEY = 0X00010000;
     // The actual type of the current input event is the PointerEvent type or its derived class
-    static const int32_t EVENT_TYPE_POINTER = 0X00020000;
+    static constexpr int32_t EVENT_TYPE_POINTER = 0X00020000;
     // The actual type of the current input event is the AxisEvent type or its derived class
-    static const int32_t EVENT_TYPE_AXIS = 0X00030000;
+    static constexpr int32_t EVENT_TYPE_AXIS = 0X00030000;
 
-    static const int32_t EVENT_FLAG_NONE = 0;
-    static const int32_t EVENT_FLAG_NO_INTERCEPT = 1;
+    static constexpr int32_t EVENT_FLAG_NONE = 0;
+    static constexpr int32_t EVENT_FLAG_NO_INTERCEPT = 1;
 
-    static const int32_t DEFALUTID = -1;
+    static constexpr int32_t DEFALUTID = -1;
 
 public:
     InputEvent(const InputEvent& other);

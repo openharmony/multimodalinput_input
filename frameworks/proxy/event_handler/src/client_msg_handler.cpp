@@ -1090,9 +1090,9 @@ void ClientMsgHandler::PrintEventTabletToolInfo(EventTabletTool tableTool, uint6
 void ClientMsgHandler::GetStandardStylusActionType(int32_t curRventType, int32_t &stylusAction,
                                                    int32_t &touchAction) const
 {
-    const int32_t EVENT_TOUCH_DOWN = 500;               // LIBINPUT_EVENT_TOUCH_DOWN
-    const int32_t EVENT_TOUCH_UP = 501;                 // LIBINPUT_EVENT_TOUCH_UP
-    const int32_t EVENT_TOUCH_MOTION = 502;             // LIBINPUT_EVENT_TOUCH_MOTION
+    constexpr int32_t EVENT_TOUCH_DOWN = 500;               // LIBINPUT_EVENT_TOUCH_DOWN
+    constexpr int32_t EVENT_TOUCH_UP = 501;                 // LIBINPUT_EVENT_TOUCH_UP
+    constexpr int32_t EVENT_TOUCH_MOTION = 502;             // LIBINPUT_EVENT_TOUCH_MOTION
 
     if (curRventType == EVENT_TOUCH_UP) {
         stylusAction = STYLUS_UP;
@@ -1120,7 +1120,7 @@ int32_t ClientMsgHandler::GetNonStandardStylusActionType(int32_t tableToolState)
 void ClientMsgHandler::GetMouseActionType(int32_t eventType, int32_t proximityState,
                                           int32_t &mouseAction, int32_t &touchAction) const
 {
-    const int32_t EVENT_TABLET_TOOL_PROXIMITY = 601;    // LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY
+    constexpr int32_t EVENT_TABLET_TOOL_PROXIMITY = 601;    // LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY
     if (eventType == EVENT_TABLET_TOOL_PROXIMITY) {
         if (TABLET_TOOL_PROXIMITY_STATE_IN == proximityState) {
             mouseAction = static_cast<int32_t>(MouseActionEnum::HOVER_ENTER);
@@ -1138,7 +1138,7 @@ void ClientMsgHandler::GetMouseActionType(int32_t eventType, int32_t proximitySt
 void ClientMsgHandler::AnalysisStandardTabletToolEvent(NetPacket& pkt, int32_t curRventType,
                                                        EventTabletTool tableTool, int32_t windowId) const
 {
-    const int32_t MOUSE_BTN_LEFT = 0x110;       // left button
+    constexpr int32_t MOUSE_BTN_LEFT = 0x110;       // left button
     int32_t deviceEventType = 0;
     int32_t touchAction = static_cast<int32_t>(MouseActionEnum::MMNONE);
     EventJoyStickAxis eventJoyStickAxis = {};

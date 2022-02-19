@@ -58,7 +58,7 @@ enum ManipulationEnum {
     PHASE_CANCEL = 4
 };
 
-const int32_t FINGER_NUM = 10;
+constexpr int32_t FINGER_NUM = 10;
 
 struct fingerInfos {
     int32_t mPointerId;

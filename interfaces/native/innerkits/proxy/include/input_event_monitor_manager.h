@@ -51,7 +51,7 @@ public:
     int32_t OnTouchpadMonitorInputEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
 
 public:
-    static const int32_t INVALID_MONITOR_ID { -1 };
+    static constexpr int32_t INVALID_MONITOR_ID { -1 };
 
 private:
     std::list<MonitorItem> monitors_;
