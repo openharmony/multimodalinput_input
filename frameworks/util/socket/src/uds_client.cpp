@@ -152,7 +152,6 @@ void UDSClient::OnRecv(const char *buf, size_t size)
 
 void UDSClient::OnEvent(const epoll_event& ev, StreamBuffer& buf)
 {
-    auto isoverflow = false;
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
         MMI_LOGI("ev.events:0x%{public}x,fd:%{public}d same as fd_:%{public}d", ev.events, fd, fd_);
@@ -168,6 +167,7 @@ void UDSClient::OnEvent(const epoll_event& ev, StreamBuffer& buf)
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
     const auto maxCount = static_cast<int32_t>(MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE) + 1;
     CHK(maxCount > 0, VAL_NOT_EXP);
+    auto isoverflow = false;
     for (auto j = 0; j < maxCount; j++) {
         auto size = read(fd, static_cast<void *>(szBuf), MAX_PACKET_BUF_SIZE);
         if (size > 0) {

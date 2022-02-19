@@ -28,12 +28,12 @@ Uuid::Uuid()
     struct timezone tz;
     tm randomTime;
     unsigned int randNum = 0;
-    unsigned long int tvUsec = 0;
 
     rand_r(&randNum);
     gettimeofday(&tv, &tz);
     localtime_r(&tv.tv_sec, &randomTime);
 
+    unsigned long int tvUsec = 0;
     tvUsec = (unsigned long int)tv.tv_usec;
 
     uuid_[UUID_NODE_SIXTH_BYTE] =
