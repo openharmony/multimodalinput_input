@@ -94,7 +94,7 @@ uint64_t GetSysClockTime()
         return 0;
     }
 
-    const int32_t conversionStep = 1000;
+    constexpr int32_t conversionStep = 1000;
     return (ts.tv_sec * static_cast<uint64_t>(1e6)) + (ts.tv_nsec / conversionStep);
 }
 
@@ -125,7 +125,7 @@ std::string GetThisThreadIdOfString()
     thread_local std::string threadLocalId;
     if (threadLocalId.empty()) {
         long tid = syscall(SYS_gettid);
-        const size_t bufSize = 10;
+        constexpr size_t bufSize = 10;
         char buf[bufSize] = {};
         const int32_t ret = sprintf_s(buf, bufSize, "%06d", tid);
         if (ret < 0) {
@@ -279,13 +279,13 @@ std::string GetFileName(const std::string& strPath)
 
 const char* GetProgramName()
 {
-    const size_t programNameSize = 256;
+    constexpr size_t programNameSize = 256;
     static char programName[programNameSize] = {};
     if (programName[0] != '\0') {
         return programName;
     }
 
-    const size_t bufSize = 512;
+    constexpr size_t bufSize = 512;
     char buf[bufSize] = { 0 };
     if (sprintf_s(buf, bufSize, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
         KMSG_LOGE("GetProcessInfo sprintf_s /proc/.../cmdline error");
@@ -296,7 +296,7 @@ const char* GetProgramName()
         KMSG_LOGE("fp is nullptr, filename = %s.", buf);
         return "";
     }
-    const size_t bufLineSize = 512;
+    constexpr size_t bufLineSize = 512;
     char bufLine[bufLineSize] = { 0 };
     if ((fgets(bufLine, bufLineSize, fp) == nullptr)) {
         KMSG_LOGE("fgets fail.");
@@ -349,7 +349,7 @@ std::string GetStackInfo()
 {
 #ifndef OHOS_BUILD
     std::ostringstream oss;
-    const size_t bufferSize = 1024;
+    constexpr size_t bufferSize = 1024;
     void* buffer[bufferSize];
 
     const int32_t nptrs = backtrace(buffer, bufferSize);
@@ -383,7 +383,7 @@ const std::string& GetThreadName()
         return g_threadName;
     }
 
-    const size_t MAX_THREAD_NAME_SIZE = 16;
+    constexpr size_t MAX_THREAD_NAME_SIZE = 16;
     char thisThreadName[MAX_THREAD_NAME_SIZE + 1];
 
     // Get current thread name and compare with the specified one.

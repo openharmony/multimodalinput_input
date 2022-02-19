@@ -21,15 +21,15 @@
 
 namespace OHOS {
 namespace MMI {
-static const int32_t SOURCETYPE_UNKNOWN = 0;
+static constexpr int32_t SOURCETYPE_UNKNOWN = 0;
 // Mouse source type. Indicates that the source of the pointer type event is a mouse-like device
-static const int32_t SOURCETYPE_MOUSE = 1;
+static constexpr int32_t SOURCETYPE_MOUSE = 1;
 // Touch screen source type. Indicates that the source of pointer type events is a touch screen device
-static const int32_t SOURCETYPE_TOUCHSCREEN = 2;
+static constexpr int32_t SOURCETYPE_TOUCHSCREEN = 2;
 // Touchpad source type. Indicates that the source of pointer type events is a touchpad device
-static const int32_t SOURCETYPE_TOUCHPAD = 3;
+static constexpr int32_t SOURCETYPE_TOUCHPAD = 3;
 // Key source type. Indicates that the source of key type events is a key device
-static const int32_t SOURCETYPE_KEY = 4;
+static constexpr int32_t SOURCETYPE_KEY = 4;
 } // namespace MMI
 } // namespace OHOS
 

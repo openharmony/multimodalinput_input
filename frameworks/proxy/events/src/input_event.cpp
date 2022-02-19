@@ -22,8 +22,6 @@ namespace MMI {
 namespace {
     int64_t g_nextEventId = 1;
 }
-const int32_t InputEvent::EVENT_TYPE_KEY;
-const int32_t InputEvent::EVENT_TYPE_POINTER;
 
 InputEvent::InputEvent(int32_t eventType) : eventType_(eventType)
 {

@@ -26,12 +26,12 @@ namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
 }
 
-const uint32_t EVENT_NAME_LEN = 64;
-const uint32_t ARGC_NUM = 3;
-const uint32_t ARGV_FIRST = 0;
-const uint32_t ARGV_SECOND = 1;
-const uint32_t ARGV_THIRD = 2;
-const uint32_t PRE_KEYS_SIZE = 4;
+constexpr uint32_t EVENT_NAME_LEN = 64;
+constexpr uint32_t ARGC_NUM = 3;
+constexpr uint32_t ARGV_FIRST = 0;
+constexpr uint32_t ARGV_SECOND = 1;
+constexpr uint32_t ARGV_THIRD = 2;
+constexpr uint32_t PRE_KEYS_SIZE = 4;
 static Callbacks callbacks = {};
 
 int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
