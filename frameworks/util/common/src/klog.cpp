@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,8 @@
 #include <cerrno>
 #include "securec.h"
 #include "hilog/log.h"
+
+#ifdef OHOS_BUILD_MMI_DEBUG
 
 namespace OHOS {
 namespace MMI {
@@ -96,3 +98,5 @@ void kMsgLog(const char* fileName, int line, const char* kLevel,
 }
 } // namespace MMI
 } // namespace OHOS
+
+#endif // OHOS_BUILD_MMI_DEBUG
