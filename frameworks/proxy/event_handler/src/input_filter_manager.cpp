@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -191,7 +191,6 @@ int32_t InputFilterManager::UnFilterTouchEvent(int32_t id)
         return RET_ERR;
     }
 
-    int32_t highAuthorityFilterId = GetHighAuthorityFilterId();
     for (auto it = touchEventFilterList_.begin(); it != touchEventFilterList_.end(); it++) {
         if (it->GetId() == id) {
             MMI_LOGD("remove client filter success");
@@ -205,6 +204,7 @@ int32_t InputFilterManager::UnFilterTouchEvent(int32_t id)
         return RET_ERR;
     }
 
+    int32_t highAuthorityFilterId = GetHighAuthorityFilterId();
     if (id == highAuthorityFilterId && highAuthorityFilterId != 0) {
         MMIEventHdl.RemoveTouchEventFilter(id);
 
