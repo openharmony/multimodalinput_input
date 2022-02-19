@@ -128,12 +128,12 @@ static std::pair<std::string, std::string> SplitString(const std::string& str, c
 const std::vector<char> RemovePrivacyIdentifierInFmt(const std::string& format)
 {
     const size_t formatLen = format.size();
-    const size_t oneLineSize = 10;
     std::vector<char> format2;
     format2.reserve(formatLen + 1);
 
     size_t readPos = 0;
     size_t writePos = 0;
+    const size_t oneLineSize = 10;
     while (readPos < formatLen) {
         if (formatLen - readPos >= (oneLineSize - 1)) {
             const size_t publicFormatLen = 9;
@@ -314,9 +314,9 @@ void LogManager::WriteFile(LogDataPtr pLog)
         return;
     }
     // 时间
-    char longTime[LOG_MAX_TIME_LEN] = {};
     tm* p = localtime(&pLog->curTime);
     CHKPV(p);
+    char longTime[LOG_MAX_TIME_LEN] = {};
     int32_t ret = snprintf_s(longTime, sizeof(longTime), LOG_MAX_TIME_LEN, "%02d-%02d-%02d %02d:%02d:%02d.%03d",
                              p->tm_year + AD_1900, p->tm_mon + 1, p->tm_mday, p->tm_hour, p->tm_min, p->tm_sec, pLog->precise);
     if (ret < 0) {

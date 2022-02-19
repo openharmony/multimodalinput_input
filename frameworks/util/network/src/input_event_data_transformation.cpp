@@ -38,15 +38,15 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
 
 int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &packet, std::shared_ptr<KeyEvent> key)
 {
-    int32_t data = 0;
-    int32_t size = 0;
-    bool isPressed = false;
     CHKR((RET_OK == DeserializeInputEvent(packet, key)), STREAM_BUF_READ_FAIL, RET_ERR);
+    int32_t data = 0;
     CHKR(packet.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
     key->SetKeyCode(data);
     CHKR(packet.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
     key->SetKeyAction(data);
+    int32_t size = 0;
     CHKR(packet.Read(size), STREAM_BUF_READ_FAIL, RET_ERR);
+    bool isPressed = false;
     for (int32_t i = 0; i < size; i++) {
         KeyEvent::KeyItem keyItem;
         CHKR(packet.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);

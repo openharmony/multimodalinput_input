@@ -498,16 +498,15 @@ HWTEST_F(AppRegisterTest, UnregisterEventHandleManager_008, TestSize.Level1)
 HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_001, TestSize.Level1)
 {
     AppRegister appRegister;
-    int32_t fd = 4;
     const AppInfo a = { 1004, 101, 16, "", ""};
     appRegister.RegisterAppInfoforServer(a);
+    int32_t fd = 4;
     appRegister.UnregisterAppInfoBySocketFd(fd);
 }
 
 HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_002, TestSize.Level1)
 {
     AppRegister appRegister;
-    int32_t fd = 8;
     const AppInfo a[] = {
         {1004, 101, 16, "", ""},
         {1005, 102, 17, "", ""}
@@ -515,13 +514,13 @@ HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_002, TestSize.Level1)
     for (int32_t i = 0; i < 2; i++) {
         appRegister.RegisterAppInfoforServer(a[i]);
     }
+    int32_t fd = 8;
     appRegister.UnregisterAppInfoBySocketFd(fd);
 }
 
 HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_003, TestSize.Level1)
 {
     AppRegister appRegister;
-    int32_t fd = 12;
     const AppInfo a[] = {
         {1004, 101, 16, "", ""},
         {1005, 102, 17, "", ""},
@@ -530,13 +529,13 @@ HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_003, TestSize.Level1)
     for (int32_t i = 0; i < 3; i++) {
         appRegister.RegisterAppInfoforServer(a[i]);
     }
+    int32_t fd = 12;
     appRegister.UnregisterAppInfoBySocketFd(fd);
 }
 
 HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_004, TestSize.Level1)
 {
     AppRegister appRegister;
-    int32_t fd = 16;
     const AppInfo a[] = {
         {1004, 101, 16, "", ""},
         {1005, 102, 17, "", ""},
@@ -546,13 +545,13 @@ HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_004, TestSize.Level1)
     for (int32_t i = 0; i < 4; i++) {
         appRegister.RegisterAppInfoforServer(a[i]);
     }
+    int32_t fd = 16;
     appRegister.UnregisterAppInfoBySocketFd(fd);
 }
 
 HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_005, TestSize.Level1)
 {
     AppRegister appRegister;
-    int32_t fd = 20;
     const AppInfo a[] = {
         {1004, 101, 16, "", ""},
         {1005, 102, 17, "", ""},
@@ -563,6 +562,7 @@ HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_005, TestSize.Level1)
     for (int32_t i = 0; i < 5; i++) {
         appRegister.RegisterAppInfoforServer(a[i]);
     }
+    int32_t fd = 20;
     appRegister.UnregisterAppInfoBySocketFd(fd);
 }
 

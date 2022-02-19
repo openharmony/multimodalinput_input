@@ -88,14 +88,13 @@ int64_t GetMicrotime()
 
 uint64_t GetSysClockTime()
 {
-    const int32_t conversionStep = 1000;
     timespec ts = { 0, 0 };
-
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
         MMI_LOGT("clock_gettime failed:%{public}s", strerror(errno));
         return 0;
     }
 
+    const int32_t conversionStep = 1000;
     return (ts.tv_sec * static_cast<uint64_t>(1e6)) + (ts.tv_nsec / conversionStep);
 }
 
