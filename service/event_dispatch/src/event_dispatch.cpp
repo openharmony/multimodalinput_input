@@ -930,13 +930,13 @@ int32_t EventDispatch::IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id
         MMI_LOGI("event is cleared");
     }
 
-    int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-        "APPLICATION_BLOCK_INPUT",
-        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
-    if (ret < 0) {
-        MMI_LOGE("failed to notify HiSysEvent");
-        return TRIGGER_ANR;
-    }
+    // int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+    //     "APPLICATION_BLOCK_INPUT",
+    //     OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+    // if (ret < 0) {
+    //     MMI_LOGE("failed to notify HiSysEvent");
+    //     return TRIGGER_ANR;
+    // }
 
     MMI_LOGD("end");
     return TRIGGER_ANR;
