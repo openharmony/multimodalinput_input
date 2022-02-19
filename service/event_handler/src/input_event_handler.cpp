@@ -465,7 +465,7 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
         return KEY_EVENT_PKG_FAIL;
     }
 
-    auto oKey = KeyValueTransformationByInput(keyBoard.key); // libinput key transformed into HOS key
+    auto oKey = KeyValueTransformationByInput(keyBoard.key); // libinput key transformed into key
     keyBoard.unicode = 0;
 
 #ifdef OHOS_WESTEN_MODEL
@@ -476,7 +476,7 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
-    keyBoard.key = static_cast<uint32_t>(oKey.keyValueOfHos);
+    keyBoard.key = static_cast<uint32_t>(oKey.keyValueOfSys);
     if (EventPackage::KeyboardToKeyEvent(keyBoard, keyEvent_) == RET_ERR) {
         MMI_LOGE("On the OnKeyboardEvent translate key event error");
         return RET_ERR;
@@ -524,7 +524,7 @@ int32_t InputEventHandler::OnEventKeyboard(const multimodal_libinput_event& ev)
         MMI_LOGD("Key event filter find a key event from Original event, keyCode:%{puiblic}d", keyBoard.key);
         return RET_OK;
     }
-    auto oKey = KeyValueTransformationByInput(keyBoard.key); // libinput key transformed into HOS key
+    auto oKey = KeyValueTransformationByInput(keyBoard.key); // libinput key transformed into key
     keyBoard.unicode = 0;
     if (oKey.isSystemKey && OnSystemEvent(oKey, keyBoard.state)) { // Judging whether key is system key.
         return RET_OK;
@@ -820,7 +820,7 @@ int32_t InputEventHandler::OnEventTabletPadKey(const multimodal_libinput_event& 
                  packageResult, TABLETPAD_KEY_EVENT_PKG_FAIL);
         return TABLETPAD_KEY_EVENT_PKG_FAIL;
     }
-    auto oKey = KeyValueTransformationByInput(key.key);           // libinput key transformed into HOS key
+    auto oKey = KeyValueTransformationByInput(key.key);           // libinput key transformed into key
 #ifdef OHOS_WESTEN_MODEL
     if (oKey.isSystemKey && OnSystemEvent(oKey, key.state)) {   // Judging whether key is system key.
         return RET_OK;
@@ -846,7 +846,7 @@ int32_t InputEventHandler::OnEventJoyStickKey(const multimodal_libinput_event& e
                  packageResult, JOYSTICK_KEY_EVENT_PKG_FAIL);
         return JOYSTICK_KEY_EVENT_PKG_FAIL;
     }
-    // libinput key transformed into HOS key
+    // libinput key transformed into key
     auto oKey = KeyValueTransformationByInput(key.key);
     key.unicode = 0;
 #ifdef OHOS_WESTEN_MODEL
@@ -953,7 +953,7 @@ bool InputEventHandler::SendMsg(const int32_t fd, NetPacket& pkt) const
 bool InputEventHandler::OnSystemEvent(const KeyEventValueTransformations& temp,
     const enum KEY_STATE state) const
 {
-    const int32_t systemEventAttr = OuterInterface::GetSystemEventAttrByHosKeyValue(temp.keyValueOfHos);
+    const int32_t systemEventAttr = OuterInterface::GetSystemEventAttrByKeyValue(temp.keyValueOfSys);
     uint16_t retCode = 0;
     switch (systemEventAttr) {
         case MMI_SYSTEM_SERVICE: {

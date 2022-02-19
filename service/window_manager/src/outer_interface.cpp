@@ -63,19 +63,19 @@ bool OuterInterface::SystemEventHandler(const KeyEventValueTransformations& trs,
         case MMI_SYSTEM_SERVICE: {
             MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "%{public}s is SystemKey, Dispatch to System Module",
-                     trs.keyValueOfHos, state, trs.keyEvent.c_str());
+                     trs.keyValueOfSys, state, trs.keyEvent.c_str());
             break;
         }
         case MMI_SYSTEM_SERVICE_AND_APP: {
             MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "%{public}s is SystemKey, Dispatch to System Module. System Module return false",
-                     trs.keyValueOfHos, state, trs.keyEvent.c_str());
+                     trs.keyValueOfSys, state, trs.keyEvent.c_str());
             break;
         }
         case MMI_CAMERA_APP: {
             MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "KEY_CAMERA is SystemKey, Dispatch to Camera Module",
-                     trs.keyValueOfHos, state);
+                     trs.keyValueOfSys, state);
             break;
         }
         default: {
@@ -92,19 +92,19 @@ bool OuterInterface::DistributedEventHandler(const KeyEventValueTransformations&
         case MMI_SYSTEM_SERVICE: {
             MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "%{public}s is SystemKey, Dispatch to Distributed System",
-                     trs.keyValueOfHos, state, trs.keyEvent.c_str());
+                     trs.keyValueOfSys, state, trs.keyEvent.c_str());
             break;
         }
         case MMI_SYSTEM_SERVICE_AND_APP: {
             MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "%{public}s is SystemKey, Dispatch to Distributed System. Distributed System return false",
-                     trs.keyValueOfHos, state, trs.keyEvent.c_str());
+                     trs.keyValueOfSys, state, trs.keyEvent.c_str());
             break;
         }
         case MMI_CAMERA_APP: {
             MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "KEY_CAMERA is SystemKey, Dispatch to Distributed System",
-                     trs.keyValueOfHos, state);
+                     trs.keyValueOfSys, state);
             break;
         }
         default: {
@@ -135,11 +135,11 @@ int OuterInterface::notifyFocusChange(int32_t abilityId, int32_t windowId)
     return RET_ERR;
 }
 
-int32_t OuterInterface::GetSystemEventAttrByHosKeyValue(const int16_t keyValueOfHos)
+int32_t OuterInterface::GetSystemEventAttrByKeyValue(const int16_t keyValueOfSys)
 {
-    auto it = MAP_SYSTEM_EVENT_ATTR.find(keyValueOfHos);
+    auto it = MAP_SYSTEM_EVENT_ATTR.find(keyValueOfSys);
     if (it == MAP_SYSTEM_EVENT_ATTR.end()) {
-        MMI_LOGE("No key found, keyValue:%{public}d", keyValueOfHos);
+        MMI_LOGE("No key found, keyValue:%{public}d", keyValueOfSys);
         return RET_ERR;
     }
     return it->second;

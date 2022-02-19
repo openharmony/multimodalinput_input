@@ -751,7 +751,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<Key
 
     auto device = libinput_event_get_device(event);
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
-    int32_t keyCode = static_cast<int32_t>(oKey.keyValueOfHos);
+    int32_t keyCode = static_cast<int32_t>(oKey.keyValueOfSys);
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
     int64_t actionStartTime = static_cast<int64_t>(libinput_event_keyboard_get_time_usec(data));
