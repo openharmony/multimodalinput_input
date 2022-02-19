@@ -17,9 +17,7 @@
 
 #include <cstring>
 
-// #ifdef __cplusplus
-// extern "C" {
-// #endif
+#ifdef OHOS_BUILD_MMI_DEBUG
 namespace OHOS {
 namespace MMI {
 void kMsgLog(const char *fileName, int line, const char *kLevel, const char *fmt, ...);
@@ -35,10 +33,5 @@ void kMsgLog(const char *fileName, int line, const char *kLevel, const char *fmt
 #define KMSG_LOGF(fmt, ...) kMsgLog((MMI_FILE_NAME), (__LINE__), "<3>", fmt"\n", ##__VA_ARGS__)
 }
 }
-
-
-// #ifdef __cplusplus
-// }
-// #endif
-
+#endif // OHOS_BUILD_MMI_DEBUG
 #endif // KLOG_H
