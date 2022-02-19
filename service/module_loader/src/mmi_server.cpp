@@ -79,7 +79,6 @@ OHOS::MMI::MMIServer::MMIServer()
 
 OHOS::MMI::MMIServer::~MMIServer()
 {
-    MMI_LOGD("enter");
 }
 
 int32_t OHOS::MMI::MMIServer::Start()
@@ -170,7 +169,6 @@ void OHOS::MMI::MMIServer::OnTimer()
 
 void OHOS::MMI::MMIServer::StopAll()
 {
-    MMI_LOGD("enter");
     int32_t ret = SaConnectServiceStop();
     if (ret != RET_OK) {
         MMI_LOGE("call SaConnectServiceStop fail, ret:%{public}d", ret);
@@ -181,7 +179,6 @@ void OHOS::MMI::MMIServer::StopAll()
 #ifndef OHOS_WESTEN_MODEL
     input_.Stop();
 #endif
-    MMI_LOGD("leave");
 }
 
 int32_t OHOS::MMI::MMIServer::SaConnectServiceRegister()
@@ -208,26 +205,22 @@ int32_t OHOS::MMI::MMIServer::SaConnectServiceRegister()
 int32_t OHOS::MMI::MMIServer::SaConnectServiceStart()
 {
     MMI_LOGD("enter");
-
     int32_t ret = MultimodalInputConnectServiceStart();
     if (ret != RET_OK) {
         MMI_LOGE("call MultimodalInputConnectServiceStart fail, ret:%{public}d", ret);
         return RET_ERR;
     }
-
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t OHOS::MMI::MMIServer::SaConnectServiceStop()
 {
-    MMI_LOGD("enter");
-
     int32_t ret = MultimodalInputConnectServiceStop();
     if (ret != RET_OK) {
         MMI_LOGE("call MultimodalInputConnectServiceStop fail, ret:%{public}d", ret);
         return RET_ERR;
     }
-
     return RET_OK;
 }
 
