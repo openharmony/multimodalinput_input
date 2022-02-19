@@ -33,8 +33,8 @@ enum MMI_SYSTEM_KEY_STATE {
 struct KeyEventValueTransformations {
     std::string keyEvent;
     int16_t keyValueOfNative;
-    int16_t keyValueOfHos;
-    int16_t keyEventOfHos;
+    int16_t keyValueOfSys;
+    int16_t keyEventOfSys;
     int16_t isSystemKey;
 };
 

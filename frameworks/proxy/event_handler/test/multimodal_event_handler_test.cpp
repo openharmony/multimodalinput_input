@@ -28,7 +28,7 @@ using namespace OHOS::MMI;
 using namespace OHOS;
 
 namespace {
-    constexpr int32_t HOS_KEY_BACK = 2;
+    constexpr int32_t MMI_KEY_BACK = 2;
     constexpr bool ACTION_DOWN = true;
     constexpr bool ACTION_UP = false;
     constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
@@ -140,14 +140,14 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_InjectKeyEvent_001, 
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
     OHOS::KeyEvent injectDownEvent;
     uint64_t downTime = static_cast<uint64_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectDownEvent.Initialize(0, ACTION_DOWN, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectDownEvent.Initialize(0, ACTION_DOWN, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
     EXPECT_TRUE(response);
 
     OHOS::KeyEvent injectUpEvent;
     downTime = static_cast<uint64_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectUpEvent.Initialize(0, ACTION_UP, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
     EXPECT_TRUE(response);
@@ -174,7 +174,7 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_InjectKeyEvent_003, 
 {
     OHOS::KeyEvent injectDownEvent;
     int32_t downTime = -1;
-    injectDownEvent.Initialize(0, ACTION_DOWN, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectDownEvent.Initialize(0, ACTION_DOWN, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
     EXPECT_FALSE(response);
@@ -191,14 +191,14 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_InjectKeyEvent_004, 
 {
     OHOS::KeyEvent injectDownEvent;
     int32_t downTime = 0;
-    injectDownEvent.Initialize(0, ACTION_DOWN, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectDownEvent.Initialize(0, ACTION_DOWN, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
     EXPECT_TRUE(response);
 
     OHOS::KeyEvent injectUpEvent;
     downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectUpEvent.Initialize(0, ACTION_UP, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
     EXPECT_TRUE(response);
@@ -258,19 +258,19 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddKeyBoardFilter_00
 {
     std::string name = "KeyBoardFilter";
     InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](const KeyBoardEvent& event) {
-        EXPECT_TRUE(event.GetKeyCode() == HOS_KEY_BACK);
+        EXPECT_TRUE(event.GetKeyCode() == MMI_KEY_BACK);
         MMI_LOGD("filter 1 receive keycode:%{public}d", event.GetKeyCode());
     });
     OHOS::KeyEvent injectDownEvent;
     uint64_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectDownEvent.Initialize(0, ACTION_DOWN, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectDownEvent.Initialize(0, ACTION_DOWN, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
     EXPECT_TRUE(response);
 
     OHOS::KeyEvent injectUpEvent;
     downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectUpEvent.Initialize(0, ACTION_UP, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
     sleep(5);
@@ -289,7 +289,7 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddKeyBoardFilter_00
 {
     std::string name = "KeyBoardFilter";
     InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](const KeyBoardEvent& event) {
-        EXPECT_TRUE(event.GetKeyCode() == HOS_KEY_BACK);
+        EXPECT_TRUE(event.GetKeyCode() == MMI_KEY_BACK);
         MMI_LOGD("filter 1 receive keycode:%{public}d", event.GetKeyCode());
     });
     InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](const KeyBoardEvent& event) {
@@ -298,14 +298,14 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddKeyBoardFilter_00
     });
     OHOS::KeyEvent injectDownEvent;
     int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectDownEvent.Initialize(0, ACTION_DOWN, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectDownEvent.Initialize(0, ACTION_DOWN, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
     EXPECT_TRUE(response);
 
     OHOS::KeyEvent injectUpEvent;
     downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectUpEvent.Initialize(0, ACTION_UP, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
     EXPECT_TRUE(response);
@@ -329,19 +329,19 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddKeyBoardFilter_00
         MMI_LOGD("filter 1 receive keycode:%{public}d", event.GetKeyCode());
     });
     InputFilterMgr.FilterKeyEvent(name, MIDDLE_AUTHORITY, [](const KeyBoardEvent& event) {
-        EXPECT_TRUE(event.GetKeyCode() == HOS_KEY_BACK);
+        EXPECT_TRUE(event.GetKeyCode() == MMI_KEY_BACK);
         MMI_LOGD("filter 2 receive keycode:%{public}d", event.GetKeyCode());
     });
     OHOS::KeyEvent injectDownEvent;
     int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectDownEvent.Initialize(0, ACTION_DOWN, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectDownEvent.Initialize(0, ACTION_DOWN, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
     EXPECT_TRUE(response);
 
     OHOS::KeyEvent injectUpEvent;
     downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectUpEvent.Initialize(0, ACTION_UP, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
     EXPECT_TRUE(response);
@@ -367,14 +367,14 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemoveKeyBoardFilter
     EXPECT_TRUE(InputFilterMgr.UnFilterKeyEvent(6) == RET_OK);
     OHOS::KeyEvent injectDownEvent;
     int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectDownEvent.Initialize(0, ACTION_DOWN, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectDownEvent.Initialize(0, ACTION_DOWN, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
     EXPECT_TRUE(response);
 
     OHOS::KeyEvent injectUpEvent;
     downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectUpEvent.Initialize(0, ACTION_UP, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
     EXPECT_TRUE(response);
@@ -392,7 +392,7 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemoveKeyBoardFilter
 {
     std::string name = "KeyBoardFilter";
     InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](const KeyBoardEvent& event) {
-        EXPECT_TRUE(event.GetKeyCode() == HOS_KEY_BACK);
+        EXPECT_TRUE(event.GetKeyCode() == MMI_KEY_BACK);
         MMI_LOGD("filter 1 receive keycode:%{public}d", event.GetKeyCode());
     });
     InputFilterMgr.FilterKeyEvent(name, MIDDLE_AUTHORITY, [](const KeyBoardEvent& event) {
@@ -403,14 +403,14 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemoveKeyBoardFilter
     sleep(5);
     OHOS::KeyEvent injectDownEvent;
     int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectDownEvent.Initialize(0, ACTION_DOWN, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectDownEvent.Initialize(0, ACTION_DOWN, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
     EXPECT_TRUE(response);
 
     OHOS::KeyEvent injectUpEvent;
     downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectUpEvent.Initialize(0, ACTION_UP, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
     EXPECT_TRUE(response);
@@ -433,7 +433,7 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemoveKeyBoardFilter
         MMI_LOGD("filter 1 receive keycode:%{public}d", event.GetKeyCode());
     });
     InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](const KeyBoardEvent& event) {
-        EXPECT_TRUE(event.GetKeyCode() == HOS_KEY_BACK);
+        EXPECT_TRUE(event.GetKeyCode() == MMI_KEY_BACK);
         MMI_LOGD("filter 2 receive keycode:%{public}d", event.GetKeyCode());
     });
     InputFilterMgr.FilterKeyEvent(name, LOW_AUTHORITY, [](const KeyBoardEvent& event) {
@@ -443,14 +443,14 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemoveKeyBoardFilter
     EXPECT_TRUE(InputFilterMgr.UnFilterKeyEvent(9) == RET_OK);
     OHOS::KeyEvent injectDownEvent;
     int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectDownEvent.Initialize(0, ACTION_DOWN, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectDownEvent.Initialize(0, ACTION_DOWN, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
     EXPECT_TRUE(response);
 
     OHOS::KeyEvent injectUpEvent;
     downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectUpEvent.Initialize(0, ACTION_UP, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
     EXPECT_TRUE(response);
@@ -482,14 +482,14 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_filterAbnormal_001, 
 
     OHOS::KeyEvent injectDownEvent;
     int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectDownEvent.Initialize(0, ACTION_DOWN, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectDownEvent.Initialize(0, ACTION_DOWN, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
     EXPECT_TRUE(response);
 
     OHOS::KeyEvent injectUpEvent;
     downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectUpEvent.Initialize(0, ACTION_UP, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
     EXPECT_TRUE(response);
