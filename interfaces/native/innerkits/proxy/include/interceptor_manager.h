@@ -33,7 +33,7 @@ public:
     void RemoveInterceptor(int32_t interceptorId);
     int32_t OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id);
 public:
-    static const int32_t INVALID_INTERCEPTOR_ID { -1 };
+    static constexpr int32_t INVALID_INTERCEPTOR_ID { -1 };
     int32_t OnKeyEvent(std::shared_ptr<KeyEvent> pointerEvent);
     
 private:

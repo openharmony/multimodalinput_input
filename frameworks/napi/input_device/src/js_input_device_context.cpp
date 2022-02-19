@@ -48,7 +48,7 @@ napi_value JsInputDeviceContext::CreateInstance(napi_env env)
         return nullptr;
     }
 
-    const char className[] = "JsInputDeviceContext";
+    constexpr char className[] = "JsInputDeviceContext";
     napi_value jsClass = nullptr;
     napi_property_descriptor desc[] = {};
     status = napi_define_class(env, className, sizeof(className), JsInputDeviceContext::JsConstructor, nullptr,

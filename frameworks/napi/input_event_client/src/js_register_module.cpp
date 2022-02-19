@@ -26,11 +26,11 @@ namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
 }
 
-const uint32_t EVENT_NAME_LEN = 64;
-const uint32_t ARGC_NUM = 2;
-const uint32_t ARGC_UT_NUM = 2;
-const uint32_t ARGV_FIRST = 0;
-const uint32_t ARGV_SECOND = 1;
+constexpr uint32_t EVENT_NAME_LEN = 64;
+constexpr uint32_t ARGC_NUM = 2;
+constexpr uint32_t ARGC_UT_NUM = 2;
+constexpr uint32_t ARGV_FIRST = 0;
+constexpr uint32_t ARGV_SECOND = 1;
 
 template<class T>
 static StandEventPtr CreateEvent(napi_env env)
