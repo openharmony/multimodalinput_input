@@ -42,7 +42,6 @@ static int g_fd_klog = -1;
 
 namespace {
 constexpr int32_t MAX_LOG_SIZE = 1024;
-constexpr int32_t BASE_YEAR = 1024;
 
 void KLogOpenLogDevice(void)
 {
@@ -54,24 +53,6 @@ void KLogOpenLogDevice(void)
     if (fd >= 0) {
         g_fd_klog = fd;
     }
-    return;
-}
-
-void KLogEnableDevKmsg(void)
-{
-    /* printk_devkmsg default value is ratelimit, We need to set "on" and remove the restrictions */
-#ifdef _CLOEXEC_
-    int fd = open("/proc/sys/kernel/printk_devkmsg", O_WRONLY | O_CLOEXEC, S_IRUSR | S_IWUSR | S_IRGRP | S_IRGRP);
-#else
-    int fd = open("/proc/sys/kernel/printk_devkmsg", O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IRGRP);
-#endif
-    if (fd < 0) {
-        return;
-    }
-    char kmsgStatus[] = "on";
-    write(fd, kmsgStatus, strlen(kmsgStatus) + 1);
-    close(fd);
-    fd = -1;
     return;
 }
 
@@ -87,7 +68,7 @@ void kMsgLog(const char* fileName, int line, const char* kLevel,
     va_list vargs;
     va_start(vargs, fmt);
     char tmpFmt[MAX_LOG_SIZE];
-    if (vsnprintf_s(tmpFmt, MAX_LOG_SIZE, MAX_LOG_SIZE - 1, fmt, vargs) == -1) {
+    if (vsnprintf_s(tmpFmt, sizeof(tmpFmt), sizeof(tmpFmt) - 1, fmt, vargs) == -1) {
         va_end(vargs);
         close(g_fd_klog);
         g_fd_klog = -1;
@@ -95,7 +76,7 @@ void kMsgLog(const char* fileName, int line, const char* kLevel,
     }
 
     char logInfo[MAX_LOG_SIZE];
-    if (snprintf_s(logInfo, MAX_LOG_SIZE, MAX_LOG_SIZE - 1,
+    if (snprintf_s(logInfo, sizeof(tmpFmt), sizeof(tmpFmt) - 1,
         "%s[dm=%08X][pid=%d][%s:%d][%s][%s] %s",
         kLevel, 0x0D002800, getpid(), fileName, line, "klog", "info", tmpFmt) == -1) {
         va_end(vargs);
