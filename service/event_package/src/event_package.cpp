@@ -26,7 +26,6 @@ namespace {
 
     void FillEventJoyStickAxisAbsInfo(const libinput_event_joystick_axis_abs_info& r, EventJoyStickAxisAbsInfo& l)
     {
-        MMI_LOGD("enter");
         l.code = r.code;
         l.value = r.value;
         l.minimum = r.minimum;
@@ -36,24 +35,20 @@ namespace {
         l.resolution = r.resolution;
         l.standardValue = r.standardValue;
         l.isChanged = true;
-        MMI_LOGD("leave");
     }
 
     void FillEventSlotedCoordsInfo(const sloted_coords_info& r, SlotedCoordsInfo& l)
     {
-        MMI_LOGD("enter");
         l.activeCount = r.active_count;
         for (int32_t i = 0; i < MAX_SOLTED_COORDS_NUMS; i++) {
             l.coords[i].isActive = r.coords[i].is_active;
             l.coords[i].x = r.coords[i].x;
             l.coords[i].y = r.coords[i].y;
         }
-        MMI_LOGD("leave");
     }
 
     DEVICE_TYPE GetDeviceType(libinput_device* device)
     {
-        MMI_LOGD("enter");
         CHKPR(device, DEVICE_TYPE_UNKNOWN);
         enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
         if (udevTags & EVDEV_UDEV_TAG_JOYSTICK) {
@@ -86,7 +81,6 @@ EventPackage::~EventPackage()
 template<class EventType>
 int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& data)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
@@ -130,13 +124,11 @@ int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& d
         CHKR(deviceId, ADD_DEVICE_INFO_CALL_FAIL, RET_ERR);
         data.deviceId = deviceId;
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventPackage::PackageTabletToolOtherParams(libinput_event *event, EventTabletTool& tableTool)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(event);
     auto data = libinput_event_get_tablet_tool_event(event);
@@ -183,12 +175,10 @@ int32_t EventPackage::PackageTabletToolOtherParams(libinput_event *event, EventT
             return MULTIDEVICE_SAME_EVENT_MARK;
         }
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 void EventPackage::PackageTabletToolTypeParam(libinput_event *event, EventTabletTool& tableTool)
 {
-    MMI_LOGD("enter");
     CHKPV(event);
     auto data = libinput_event_get_tablet_tool_event(event);
     CHKPV(data);
@@ -231,12 +221,10 @@ void EventPackage::PackageTabletToolTypeParam(libinput_event *event, EventTablet
             break;
         }
     }
-    MMI_LOGD("leave");
 }
 
 int32_t EventPackage::PackageTabletToolEvent(libinput_event *event, EventTabletTool& tableTool)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     constexpr uint32_t stylusButton1KeyCode = 331;
     constexpr uint32_t stylusButton2KeyCode = 332;
@@ -259,12 +247,10 @@ int32_t EventPackage::PackageTabletToolEvent(libinput_event *event, EventTabletT
     } else if (tableTool.button == stylusButton2KeyCode) {
         tableTool.button = stylusButton2Value;
     }
-    MMI_LOGD("leave");
     return ret;
 }
 void EventPackage::PackageTabletPadOtherParams(libinput_event *event, EventTabletPad& tabletPad)
 {
-    MMI_LOGD("enter");
     CHKPV(event);
     auto data = libinput_event_get_tablet_pad_event(event);
     CHKPV(data);
@@ -294,12 +280,10 @@ void EventPackage::PackageTabletPadOtherParams(libinput_event *event, EventTable
             break;
         }
     }
-    MMI_LOGD("leave");
 }
 
 int32_t EventPackage::PackageTabletPadEvent(libinput_event *event, EventTabletPad& tabletPad)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_tablet_pad_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
@@ -311,13 +295,11 @@ int32_t EventPackage::PackageTabletPadEvent(libinput_event *event, EventTabletPa
         return DEV_PARAM_PKG_FAIL;
     }
     PackageTabletPadOtherParams(event, tabletPad);
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventPackage::PackageTabletPadKeyEvent(libinput_event *event, EventKeyboard& key)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_tablet_pad_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
@@ -360,13 +342,11 @@ int32_t EventPackage::PackageTabletPadKeyEvent(libinput_event *event, EventKeybo
     if (key.state == KEY_STATE_RELEASED && key.seat_key_count != 0) {
         return MULTIDEVICE_SAME_EVENT_MARK;
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventPackage::PackageJoyStickKeyEvent(libinput_event *event, EventKeyboard& key)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_joystick_pointer_button_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
@@ -383,13 +363,11 @@ int32_t EventPackage::PackageJoyStickKeyEvent(libinput_event *event, EventKeyboa
     } else {
         key.state = KEY_STATE_PRESSED;
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventPackage::PackagePointerEventByMotion(libinput_event *event, EventPointer& point)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_pointer_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
@@ -399,13 +377,11 @@ int32_t EventPackage::PackagePointerEventByMotion(libinput_event *event, EventPo
     point.delta.y = libinput_event_pointer_get_dy(data);
     point.delta_raw.x = libinput_event_pointer_get_dx_unaccelerated(data);
     point.delta_raw.y = libinput_event_pointer_get_dy_unaccelerated(data);
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventPackage::PackagePointerEventByMotionAbs(libinput_event *event, EventPointer& point)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_pointer_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
@@ -415,13 +391,11 @@ int32_t EventPackage::PackagePointerEventByMotionAbs(libinput_event *event, Even
                                                                          DEF_SCREEN_MAX_WIDTH);
     point.absolute.y = libinput_event_pointer_get_absolute_y_transformed(data,
                                                                          DEF_SCREEN_MAX_HEIGHT);
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventPackage::PackagePointerEventByButton(libinput_event *event, EventPointer& point)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_pointer_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
@@ -441,13 +415,11 @@ int32_t EventPackage::PackagePointerEventByButton(libinput_event *event, EventPo
     if ((point.state == BUTTON_STATE_RELEASED) && (point.seat_button_count != 0)) {
         return MULTIDEVICE_SAME_EVENT_MARK;
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventPackage::PackagePointerEventByAxis(libinput_event *event, EventPointer& point)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_pointer_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
@@ -491,13 +463,11 @@ int32_t EventPackage::PackagePointerEventByAxis(libinput_event *event, EventPoin
         point.discrete.x = libinput_event_pointer_get_axis_value_discrete(data,
                                                                           LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event, EventJoyStickAxis& eventJoyStickAxis)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto joyEvent = libinput_event_get_joystick_axis_event(event);
     CHKPR(joyEvent, ERROR_NULL_POINTER);
@@ -532,13 +502,11 @@ int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event, EventJoySt
             FillEventJoyStickAxisAbsInfo(*pAbsInfo, item.absInfo);
         }
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 void EventPackage::PackageTouchEventByType(int32_t type, libinput_event_touch *data, EventTouch& touch)
 {
-    MMI_LOGD("enter");
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
             touch.point.x = libinput_event_touch_get_x(data);
@@ -575,13 +543,11 @@ void EventPackage::PackageTouchEventByType(int32_t type, libinput_event_touch *d
             break;
         }
     }
-    MMI_LOGD("leave");
     return;
 }
 
 int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
@@ -636,13 +602,11 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
             break;
         }
     } */
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventPackage::PackagePointerEvent(libinput_event *event, EventPointer& point)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto rDevRet = PackageEventDeviceInfo<EventPointer>(event, point);
     if (rDevRet != RET_OK) {
@@ -674,13 +638,11 @@ int32_t EventPackage::PackagePointerEvent(libinput_event *event, EventPointer& p
             break;
         }
     }
-    MMI_LOGD("leave");
     return ret;
 }
 
 int32_t EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& gesture)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_gesture_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
@@ -733,26 +695,22 @@ int32_t EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& g
             break;
         }
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventPackage::PackageDeviceManageEvent(libinput_event *event, DeviceManage& deviceManage)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto ret = PackageEventDeviceInfo<DeviceManage>(event, deviceManage);
     if (ret != RET_OK) {
         MMI_LOGE("Device param package failed. ret:%{public}d,errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_keyboard_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
@@ -778,7 +736,6 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key)
         MMI_LOGD("Release the same button on multiple devices, state:%{puiblic}d", key.state);
         return MULTIDEVICE_SAME_EVENT_MARK;
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
@@ -827,7 +784,6 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<Key
 
 int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key)
 {
-    MMI_LOGD("enter");
     const std::string uid = GetUUid();
     int32_t ret = memcpy_s(key.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size());
     CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
@@ -845,13 +801,11 @@ int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& k
     } else {
         key.seat_key_count = SEAT_KEY_COUNT_ZERO;
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_ptr<KeyEvent> keyEventPtr)
 {
-    MMI_LOGD("enter");
     CHKPR(keyEventPtr, ERROR_NULL_POINTER);
     keyEventPtr->UpdateId();
     KeyEvent::KeyItem keyItem;
@@ -902,7 +856,6 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
     } else {
         // nothing to do.
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 } // namespace MMI

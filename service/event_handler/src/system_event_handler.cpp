@@ -92,7 +92,6 @@ OHOS::MMI::SystemEventHandler::~SystemEventHandler()
 
 int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
 {
-    MMI_LOGD("enter");
     if (idMsg == MmiMessageId::INVALID) {
         return PARAM_INPUT_INVALID;
     }
@@ -102,7 +101,6 @@ int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
         return UNKNOWN_MSG_ID; // non-system event return
     }
     (*callback)();
-    MMI_LOGD("leave");
     return RET_OK;
 }
 

@@ -34,7 +34,6 @@ OHOS::MMI::StandardEventHandler::~StandardEventHandler()
 
 void OHOS::MMI::StandardEventHandler::StandardTouchEvent(libinput_event *event, StandardTouchStruct& data)
 {
-    MMI_LOGD("enter");
     CHKPV(event);
     enum libinput_event_type eventType = {};
     eventType = libinput_event_get_type(event);
@@ -69,12 +68,10 @@ void OHOS::MMI::StandardEventHandler::StandardTouchEvent(libinput_event *event, 
             break;
         }
     }
-    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::StandardEventHandler::PointerPressedStandard(libinput_event *event, StandardTouchStruct& data)
 {
-    MMI_LOGD("enter");
     CHKPV(event);
     auto szPoint = libinput_event_get_pointer_event(event);
     CHKPV(szPoint);
@@ -91,13 +88,11 @@ void OHOS::MMI::StandardEventHandler::PointerPressedStandard(libinput_event *eve
     } else {
         data.curRventType = RET_ERR;
     }
-    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::StandardEventHandler::PointerReleasedStandardEvent(struct libinput_event_pointer& szPoint,
                                                                    StandardTouchStruct& data)
 {
-    MMI_LOGD("enter");
     data.msgType = LIBINPUT_EVENT_TOUCH_UP;
     data.reRventType = LIBINPUT_EVENT_POINTER_BUTTON;
     data.curRventType = LIBINPUT_EVENT_TOUCH_UP;
@@ -107,13 +102,11 @@ void OHOS::MMI::StandardEventHandler::PointerReleasedStandardEvent(struct libinp
     MMI_LOGT("3.standard event:pointLeftLiftEvent:reRventType:%{public}d,curRventType:%{public}d,"
              "buttonCode:%{public}d,buttonState:%{public}d",
              data.reRventType, data.curRventType, data.buttonType, data.buttonState);
-    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::StandardEventHandler::PointerPressedStandardEvent(struct libinput_event_pointer& szPoint,
                                                                   StandardTouchStruct& data)
 {
-    MMI_LOGD("enter");
     data.msgType = LIBINPUT_EVENT_TOUCH_DOWN;
     data.reRventType = LIBINPUT_EVENT_POINTER_BUTTON;
     data.curRventType = LIBINPUT_EVENT_TOUCH_DOWN;
@@ -123,12 +116,10 @@ void OHOS::MMI::StandardEventHandler::PointerPressedStandardEvent(struct libinpu
     MMI_LOGT("3.standard event:pointLeftPressEvent:reRventType:%{public}d,curRventType:%{public}d,"
              "buttonCode:%{public}d,buttonState:%{public}d",
              data.reRventType, data.curRventType, data.buttonType, data.buttonState);
-    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::StandardEventHandler::PointerAbsoluteStandardEvent(libinput_event *event, StandardTouchStruct& data)
 {
-    MMI_LOGD("enter");
     CHKPV(event);
     auto szPoint = libinput_event_get_pointer_event(event);
     CHKPV(szPoint);
@@ -150,12 +141,10 @@ void OHOS::MMI::StandardEventHandler::PointerAbsoluteStandardEvent(libinput_even
     } else {
         data.curRventType = RET_ERR;
     }
-    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::StandardEventHandler::PointerMotionStandardEvent(libinput_event *event, StandardTouchStruct& data)
 {
-    MMI_LOGD("enter");
     CHKPV(event);
     auto szPoint = libinput_event_get_pointer_event(event);
     CHKPV(szPoint);
@@ -182,12 +171,10 @@ void OHOS::MMI::StandardEventHandler::PointerMotionStandardEvent(libinput_event 
     } else {
         data.curRventType = RET_ERR;
     }
-    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::StandardEventHandler::TipStandardEvent(libinput_event *event, StandardTouchStruct& data)
 {
-    MMI_LOGD("enter");
     CHKPV(event);
     auto szPoint = libinput_event_get_tablet_tool_event(event);
     CHKPV(szPoint);
@@ -199,13 +186,11 @@ void OHOS::MMI::StandardEventHandler::TipStandardEvent(libinput_event *event, St
     } else {
         data.curRventType = RET_ERR;
     }
-    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::StandardEventHandler::TipUpStandardEvent(struct libinput_event_tablet_tool& szPoint,
                                                          StandardTouchStruct& data)
 {
-    MMI_LOGD("enter");
     data.msgType = LIBINPUT_EVENT_TOUCH_UP;
     data.reRventType = LIBINPUT_EVENT_TABLET_TOOL_TIP;
     data.curRventType = LIBINPUT_EVENT_TOUCH_UP;
@@ -215,13 +200,11 @@ void OHOS::MMI::StandardEventHandler::TipUpStandardEvent(struct libinput_event_t
     MMI_LOGT("3.standard event:TipUpStandarEvent:reRventType:%{public}d,curRventType:%{public}d,"
              "tipState:%{public}d,x:%{public}f,y:%{public}f",
              data.reRventType, data.curRventType, data.tipState, data.x, data.y);
-    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::StandardEventHandler::TipDownStandardEvent(struct libinput_event_tablet_tool& szPoint,
                                                            StandardTouchStruct& data)
 {
-    MMI_LOGD("enter");
     data.time = libinput_event_tablet_tool_get_time_usec(&szPoint);
     data.x = libinput_event_tablet_tool_get_x(&szPoint);
     data.y = libinput_event_tablet_tool_get_y(&szPoint);
@@ -231,12 +214,10 @@ void OHOS::MMI::StandardEventHandler::TipDownStandardEvent(struct libinput_event
     MMI_LOGT("3.standard event:TipDownStandarEvent:reRventType:%{public}d,curRventType:%{public}d,"
         "tipState:%{public}d,x:%{public}f,y:%{public}f",
         data.reRventType, data.curRventType, data.tipState, data.x, data.y);
-    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::StandardEventHandler::TipMotionStandardEvent(libinput_event *event, StandardTouchStruct& data)
 {
-    MMI_LOGD("enter");
     CHKPV(event);
     auto szPoint = libinput_event_get_tablet_tool_event(event);
     CHKPV(szPoint);
@@ -253,5 +234,4 @@ void OHOS::MMI::StandardEventHandler::TipMotionStandardEvent(libinput_event *eve
     } else {
         data.curRventType = RET_ERR;
     }
-    MMI_LOGD("leave");
 }
