@@ -139,7 +139,7 @@ void HdiInject::ShowAllDeviceInfo()
     for (const auto &item : deviceArray_) {
         MMI_LOGI("deviceName:%{public}s,devIndex:%{public}d,status:%{public}d,devType:%{public}d",
             item.chipName, item.devIndex, item.status, item.devType);
-    }OnSetEventInject
+    }
 }
 
 int32_t HdiInject::GetDeviceCount()
