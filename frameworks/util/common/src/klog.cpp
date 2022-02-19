@@ -68,7 +68,7 @@ void kMsgLog(const char* fileName, int line, const char* kLevel,
     va_list vargs;
     va_start(vargs, fmt);
     char tmpFmt[MAX_LOG_SIZE];
-    if (vsnprintf_s(tmpFmt, sizeof(tmpFmt), sizeof(tmpFmt) - 1, fmt, vargs) == -1) {
+    if (vsnprintf_s(tmpFmt, MAX_LOG_SIZE, MAX_LOG_SIZE - 1, fmt, vargs) == -1) {
         va_end(vargs);
         close(g_fd_klog);
         g_fd_klog = -1;
@@ -76,7 +76,7 @@ void kMsgLog(const char* fileName, int line, const char* kLevel,
     }
 
     char logInfo[MAX_LOG_SIZE];
-    if (snprintf_s(logInfo, sizeof(tmpFmt), sizeof(tmpFmt) - 1,
+    if (snprintf_s(logInfo, MAX_LOG_SIZE, MAX_LOG_SIZE - 1,
         "%s[dm=%08X][pid=%d][%s:%d][%s][%s] %s",
         kLevel, 0x0D002800, getpid(), fileName, line, "klog", "info", tmpFmt) == -1) {
         va_end(vargs);
