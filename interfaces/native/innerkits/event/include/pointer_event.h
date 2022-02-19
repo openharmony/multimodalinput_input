@@ -422,10 +422,30 @@ public:
      * @since 8
      */
     void SetPointerAction(int32_t pointerAction);
+
+    /**
+     * @brief Dumps the action of this pointer input event as a string.
+     * @return Returns the pointer to the string.
+     * @since 8
+     */
     const char* DumpPointerAction() const;
 
+    /**
+     * @brief Sets the value of the <b>skipInspection</b> flag.
+     * @param skipInspection Indicates the value of the <b>skipInspection</b> flag to set. The value <b>true</b> means that the
+     * event will skip the processing of the listener and interceptor, and the value <b>false</b> means the opposite.
+     * @return void
+     * @since 8
+     */
     void SetSkipInspection(bool skipInspection);
+
+    /**
+     * @brief Reads the value of the <b>skipInspection</b> flag.
+     * @return Returns <b>true</b> if the event needs to skip the processing of the listener and interceptor; returns <b>false></b> otherwise.
+     * @since 8
+     */
     bool NeedSkipInspection();
+
     /**
      * @brief Obtains the pointer ID in this event.
      * @return Returns the pointer ID.
@@ -534,6 +554,12 @@ public:
      * @since 8
      */
     void SetSourceType(int32_t sourceType);
+
+    /**
+     * @brief Dumps the source type of this pointer input event as a string.
+     * @return Returns the pointer to the string.
+     * @since 8
+     */
     const char* DumpSourceType() const;
 
     /**

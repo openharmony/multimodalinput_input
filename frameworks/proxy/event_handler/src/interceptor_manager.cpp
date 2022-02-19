@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -105,7 +105,7 @@ int32_t InterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     int32_t keyId = keyEvent->GetId();
-    std::string keyEventString = "keyEventFilter";
+    const std::string keyEventString = "keyEventFilter";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
     for (auto &item : interceptor_) {
         if (item.sourceType == SOURCETYPE_KEY) {
