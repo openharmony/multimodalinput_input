@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,7 +48,7 @@ napi_value JsInputDeviceContext::CreateInstance(napi_env env)
         return nullptr;
     }
 
-    const char className[] = "JsInputDeviceContext";
+    constexpr char className[] = "JsInputDeviceContext";
     napi_value jsClass = nullptr;
     napi_property_descriptor desc[] = {};
     status = napi_define_class(env, className, sizeof(className), JsInputDeviceContext::JsConstructor, nullptr,

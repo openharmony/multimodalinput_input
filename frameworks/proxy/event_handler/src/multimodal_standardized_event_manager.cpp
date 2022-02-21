@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -83,7 +83,6 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
     CHKR((token && standardizedEventHandle), PARAM_INPUT_INVALID, MMI_STANDARD_EVENT_INVALID_PARAMETER);
     auto typeId = standardizedEventHandle->GetType();
     CHKR(typeId > MmiMessageId::INVALID, VAL_NOT_EXP, MMI_STANDARD_EVENT_INVALID_PARAMETER);
-    auto range = mapEvents_.equal_range(typeId);
 
     std::string registerhandle;
     if (!MakeRegisterHandle(typeId, windowId, registerhandle)) {
@@ -92,6 +91,7 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
         return MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
     registerEvents_.erase(registerhandle);
+    auto range = mapEvents_.equal_range(typeId);
     bool isHandleExist = false;
     for (StandEventMMaps::iterator it = range.first; it != range.second; ++it) {
         if (it->second.eventCallBack == standardizedEventHandle) {

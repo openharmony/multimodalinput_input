@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,12 +28,12 @@ Uuid::Uuid()
     struct timezone tz;
     tm randomTime;
     unsigned int randNum = 0;
-    unsigned long int tvUsec = 0;
 
     rand_r(&randNum);
     gettimeofday(&tv, &tz);
     localtime_r(&tv.tv_sec, &randomTime);
 
+    unsigned long int tvUsec = 0;
     tvUsec = (unsigned long int)tv.tv_usec;
 
     uuid_[UUID_NODE_SIXTH_BYTE] =
@@ -83,7 +83,7 @@ char ConvertToHex(uint8_t c)
 
 void Uuid::ConvertToStdString(std::string& s) const
 {
-    const int uuidBufMaxSize = 37;
+    constexpr int uuidBufMaxSize = 37;
     char uuidBuf[uuidBufMaxSize + 1] = {0};
     int writePos = 0;
     for (size_t i = 0; i < UUID128_BYTES_TYPE; i++) {

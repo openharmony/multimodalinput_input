@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -56,8 +56,8 @@ int32_t StylusEvent::GetActionButton() const
 
 int32_t StylusEvent::stylusButtonMapping(int32_t stylusButton) const
 {
-    const int32_t FIRST_BUTTON = 0x14b;   // stylus first button
-    const int32_t SECOND_BUTTON = 0x14c;  // stylus second button
+    constexpr int32_t FIRST_BUTTON = 0x14b;   // stylus first button
+    constexpr int32_t SECOND_BUTTON = 0x14c;  // stylus second button
     int32_t actionButton = stylusButton;
 
     switch (stylusButton) {
