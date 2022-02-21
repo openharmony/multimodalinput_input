@@ -254,7 +254,6 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     item.SetPressed(isPressed);
     item.SetDownTime(static_cast<int64_t>(keyDownDuration));
     keyEvent->AddKeyItem(item);
-
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
 #endif // OHOS_WESTEN_MODEL
     napi_create_int32(env, 0, &result);
