@@ -277,12 +277,12 @@ void OHOS::MMI::UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
     CHK(sess, ERROR_NULL_POINTER);
     int32_t readIdx = 0;
     int32_t packSize = 0;
-    const auto headSize = static_cast<int32_t>(sizeof(PackHead));
+    const size_t headSize = sizeof(PackHead);
     CHK(size >= headSize, VAL_NOT_EXP);
     while (size > 0 && recvFun_) {
         CHK(size >= headSize, VAL_NOT_EXP);
         auto head = (PackHead*)&buf[readIdx];
-        CHK(head->size[0] < static_cast<int32_t>(size), VAL_NOT_EXP);
+        CHK(head->size[0] < size, VAL_NOT_EXP);
         packSize = headSize + head->size[0];
 
         NetPacket pkt(head->idMsg);
@@ -302,7 +302,7 @@ void OHOS::MMI::UDSServer::OnEpollRecv(int32_t fd, const char *buf, size_t size)
 
 void OHOS::MMI::UDSServer::OnEvent(const epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
 {
-    constexpr int32_t maxCount = static_cast<int32_t>(MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE) + 1;
+    constexpr size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
     CHK(maxCount > 0, VAL_NOT_EXP);
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
@@ -324,7 +324,7 @@ void OHOS::MMI::UDSServer::OnEvent(const epoll_event& ev, std::map<int32_t, Stre
             return;
         }
         char szBuf[MAX_PACKET_BUF_SIZE] = {};
-        for (auto j = 0; j < maxCount; j++) {
+        for (size_t j = 0; j < maxCount; j++) {
             auto size = read(fd, (void*)szBuf, MAX_PACKET_BUF_SIZE);
 #ifdef OHOS_BUILD_HAVE_DUMP_DATA
             DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
@@ -342,7 +342,7 @@ void OHOS::MMI::UDSServer::OnEvent(const epoll_event& ev, std::map<int32_t, Stre
 
 void OHOS::MMI::UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, epoll_event& ev)
 {
-    constexpr int32_t maxCount = static_cast<int32_t>(MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE) + 1;
+    constexpr size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
     CHK(maxCount > 0, VAL_NOT_EXP);
     CHK(ev.data.ptr, ERROR_NULL_POINTER);
     auto fd = *static_cast<int32_t*>(ev.data.ptr);
@@ -365,7 +365,7 @@ void OHOS::MMI::UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap
             return;
         }
         char szBuf[MAX_PACKET_BUF_SIZE] = {};
-        for (auto j = 0; j < maxCount; j++) {
+        for (size_t j = 0; j < maxCount; j++) {
             auto size = read(fd, (void*)szBuf, MAX_PACKET_BUF_SIZE);
 #ifdef OHOS_BUILD_HAVE_DUMP_DATA
             DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
