@@ -34,7 +34,6 @@ OHOS::MMI::HdfEventManager *OHOS::MMI::HdfEventManager::m_globleThis;
 int OHOS::MMI::HdfEventManager::EvdevSimIoctl(int hdindex, int pcmd, void *iobuff)
 {
     const int size = (pcmd >> IOCTL_CMD_SHIFT) & IOCTL_CMD_MASK;
-    const int iobuffSize = size;
     int cmd = pcmd & 0xff;
 
     MMI_LOGD("evdev_simioctl index:%{public}d,cmd:%{public}02x,size:%{public}d,"
@@ -49,6 +48,7 @@ int OHOS::MMI::HdfEventManager::EvdevSimIoctl(int hdindex, int pcmd, void *iobuf
             break;
         }
     }
+    const int iobuffSize = size;
     int ret = 0;
     switch (cmd) {
         case IO_BITS:
@@ -109,7 +109,6 @@ int OHOS::MMI::HdfEventManager::EvdevSimIoctl(int hdindex, int pcmd, void *iobuf
 int32_t OHOS::MMI::HdfEventManager::EvdevIoctl(int hdiindex, int pcmd, void *iobuff)
 {
     int32_t size = (pcmd >> IOCTL_CMD_SHIFT) & IOCTL_CMD_MASK;
-    const int32_t iobuffSize = size;
     int32_t cmd = pcmd & 0xff;
     DeviceInfo *deviceinfo = nullptr;
     MMI_LOGD("evdev_ioctl index:%{public}d,cmd:%{public}02x,size:%{public}d,"
@@ -123,6 +122,7 @@ int32_t OHOS::MMI::HdfEventManager::EvdevIoctl(int hdiindex, int pcmd, void *iob
     if (deviceinfo == nullptr) {
         return 0;
     }
+    const int32_t iobuffSize = size;
     int32_t ret = 0;
     switch (cmd) {
         case IO_BITS:
