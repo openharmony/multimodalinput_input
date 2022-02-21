@@ -27,7 +27,7 @@ class EventFilterStub : public IRemoteStub<IEventFilter> {
 public:
     EventFilterStub() = default;
     virtual ~EventFilterStub() = default;
-    int OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& options) override;
+    int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& options) override;
 protected:
     int32_t StubHandlePointerEvent(MessageParcel& data, MessageParcel& reply);
 };

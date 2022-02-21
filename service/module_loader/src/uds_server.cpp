@@ -141,7 +141,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName,
     int32_t sockFds[2] = {};
 
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockFds) != 0) {
-        const int savedErrNo = errno;
+        const int32_t savedErrNo = errno;
         MMI_LOGE("call socketpair fail, errno:%{public}d,msg:%{public}s", savedErrNo, strerror(savedErrNo));
         return RET_ERR;
     }
@@ -149,7 +149,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName,
     serverFd = sockFds[0];
     toReturnClientFd = sockFds[1]; // fcntl(sockFds[1], F_DUPFD_CLOEXEC, 0);
     if (toReturnClientFd < 0) {
-        const int savedErrNo = errno;
+        const int32_t savedErrNo = errno;
         MMI_LOGE("call fcntl fail, errno:%{public}d,msg:%{public}s", savedErrNo, strerror(savedErrNo));
         return RET_ERR;
     }

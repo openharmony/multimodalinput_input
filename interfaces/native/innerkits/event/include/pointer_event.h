@@ -508,7 +508,7 @@ public:
      * @return Returns <b>true</b> if the button is being pressed; returns <b>false</b> otherwise.
      * @since 8
      */
-    bool IsButtonPressed(int buttonId) const;
+    bool IsButtonPressed(int32_t buttonId) const;
 
     /**
      * @brief Sets the pressed state for a button.
@@ -516,7 +516,7 @@ public:
      * @return void
      * @since 8
      */
-    void SetButtonPressed(int buttonId);
+    void SetButtonPressed(int32_t buttonId);
 
     /**
      * @brief Deletes a released button.
@@ -524,7 +524,7 @@ public:
      * @return void
      * @since 8
      */
-    void DeleteReleaseButton(int buttonId);
+    void DeleteReleaseButton(int32_t buttonId);
 
     /**
      * @brief Clears the button in the pressed state.

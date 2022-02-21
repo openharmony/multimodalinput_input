@@ -120,7 +120,7 @@ bool OuterInterface::DistributedEventHandler(const KeyEventValueTransformations&
 * @desSurfaceId destinction windowid
 * @return switched windowid;if not switched then return srcSurfaceId. if switched then return desSurfaceId.
 */
-int OuterInterface::IsFocusChange(int32_t srcSurfaceId, int32_t desSurfaceId)
+int32_t OuterInterface::IsFocusChange(int32_t srcSurfaceId, int32_t desSurfaceId)
 {
     return desSurfaceId;
 }
@@ -130,7 +130,7 @@ int OuterInterface::IsFocusChange(int32_t srcSurfaceId, int32_t desSurfaceId)
 * @windowId focus windowid
 * @return: if succeed then return 1 Or return -1.
 */
-int OuterInterface::notifyFocusChange(int32_t abilityId, int32_t windowId)
+int32_t OuterInterface::notifyFocusChange(int32_t abilityId, int32_t windowId)
 {
     return RET_ERR;
 }

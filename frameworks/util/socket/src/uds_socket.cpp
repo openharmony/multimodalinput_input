@@ -53,7 +53,7 @@ int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, epoll_event& event, int32_t 
     CHKR(epollFd >= 0, PARAM_INPUT_INVALID, RET_ERR);
     auto ret = epoll_ctl(epollFd, op, fd, &event);
     if (ret < 0) {
-        const int errnoSaved = errno;
+        const int32_t errnoSaved = errno;
         MMI_LOGE("UDSSocket::EpollCtl epoll_ctl retrun %{public}d,epollFd_:%{public}d,"
                  "op:%{public}d,fd:%{public}d,errno:%{public}d,error msg: %{public}s",
                  ret, epollFd, op, fd, errnoSaved, strerror(errnoSaved));
