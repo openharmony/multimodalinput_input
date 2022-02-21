@@ -28,8 +28,6 @@
 #include "securec.h"
 #include "hilog/log.h"
 
-#ifdef OHOS_BUILD_MMI_DEBUG
-
 namespace OHOS {
 namespace MMI {
 // dmesg
@@ -42,7 +40,6 @@ namespace MMI {
 
 static int g_fd_klog = -1;
 
-namespace {
 constexpr int32_t MAX_LOG_SIZE = 1024;
 
 void KLogOpenLogDevice(void)
@@ -94,9 +91,5 @@ void kMsgLog(const char* fileName, int line, const char* kLevel,
     }
     return;
 }
-// #endif // OHOS_BUILD_MMI_DEBUG
-}
 } // namespace MMI
 } // namespace OHOS
-
-#endif // OHOS_BUILD_MMI_DEBUG
