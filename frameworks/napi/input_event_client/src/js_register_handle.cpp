@@ -214,7 +214,7 @@ int32_t JSRegisterHandle::Unregister(int32_t winId, uint32_t type)
         }
         g_registerMap.erase(iter);
     }
-    MMI_LOGI("unregister success. register map size:%{public}d", static_cast<int32_t>(g_registerMap.size()));
+    MMI_LOGI("unregister success. register map size:%{public}zu", g_registerMap.size());
     return response;
 }
 
@@ -232,7 +232,7 @@ int32_t JSRegisterHandle::UnregisterAll()
         MMI_LOGD("unregister handle:%{public}s", iter->first.c_str());
         g_registerMap.erase(iter);
     }
-    MMI_LOGI("unregister all success. register map size:%{public}d", static_cast<int32_t>(g_registerMap.size()));
+    MMI_LOGI("unregister all success. register map size:%{public}zu", g_registerMap.size());
     return response;
 }
 } // namespace MMI

@@ -847,14 +847,14 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
              "action:%{public}d,actionStartTime:%{public}" PRId64 ","
              "flag:%{public}d,pointerAction:%{public}d,sourceType:%{public}d,"
              "VerticalAxisValue:%{public}.02f, HorizontalAxisValue:%{public}.02f,"
-             "pointerCount:%{public}d",
+             "pointerCount:%{public}zu",
              pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
              pointerEvent->GetFlag(), pointerEvent->GetPointerAction(),
              pointerEvent->GetSourceType(),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
-             static_cast<int32_t>(pointerIds.size()));
+             pointerIds.size());
 
     for (const auto &pointerId : pointerIds) {
         OHOS::MMI::PointerEvent::PointerItem item;

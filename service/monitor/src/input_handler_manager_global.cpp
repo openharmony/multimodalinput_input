@@ -139,8 +139,8 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionHa
 {
     std::lock_guard<std::mutex> guard(lockMonitors_);
     if (monitors_.size() >= MAX_N_INPUT_MONITORS) {
-        MMI_LOGE("The number of monitors exceeds the maximum:%{public}d,monitors,errCode:%{public}d",
-                 static_cast<int32_t>(monitors_.size()), INVALID_MONITOR_MON);
+        MMI_LOGE("The number of monitors exceeds the maximum:%{public}zu,monitors,errCode:%{public}d",
+                 monitors_.size(), INVALID_MONITOR_MON);
         return RET_ERR;
     }
     auto ret = monitors_.insert(monitor);
@@ -246,7 +246,7 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
 void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<PointerEvent> pointerEvent)
 {
     std::lock_guard<std::mutex> guard(lockMonitors_);
-    MMI_LOGD("There are currently %{public}d monitors", static_cast<int32_t>(monitors_.size()));
+    MMI_LOGD("There are currently %{public}zu monitors", monitors_.size());
     for (const auto &monitor : monitors_) {
         monitor.SendToClient(pointerEvent);
     }
@@ -276,8 +276,7 @@ bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_p
     if (interceptors_.empty()) {
         return false;
     }
-    MMI_LOGD("There are currently:%{public}d interceptors",
-        static_cast<int32_t>(interceptors_.size()));
+    MMI_LOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     for (const auto &interceptor : interceptors_) {
         interceptor.SendToClient(keyEvent);
     }
@@ -290,8 +289,7 @@ bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_p
     if (interceptors_.empty()) {
         return false;
     }
-    MMI_LOGD("There are currently:%{public}d interceptors",
-        static_cast<int32_t>(interceptors_.size()));
+    MMI_LOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     for (const auto &interceptor : interceptors_) {
         interceptor.SendToClient(pointerEvent);
     }

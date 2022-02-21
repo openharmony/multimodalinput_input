@@ -1944,14 +1944,14 @@ void InputEventInterceptor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEv
              "action:%{public}d,actionStartTime:%{public}" PRId64 ","
              "flag:%{public}d,pointerAction:%{public}s, sourceType:%{public}s, "
              "VerticalAxisValue:%{public}.2f, HorizontalAxisValue:%{public}.2f, "
-             "pointerCount:%{public}d",
+             "pointerCount:%{public}zu",
              pointerEvent->DumpEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
              pointerEvent->GetFlag(), pointerEvent->DumpPointerAction(),
              pointerEvent->DumpSourceType(),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
-             static_cast<int32_t>(pointerIds.size()));
+             pointerIds.size());
     for (int32_t pointerId : pointerIds) {
         OHOS::MMI::PointerEvent::PointerItem item;
         CHK(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL);
