@@ -210,7 +210,7 @@ void MMIService::OnStart()
     MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
 
     int32_t ret = Init();
-    CHK((RET_OK == ret, ret);
+    CHK(RET_OK == ret, ret);
     state_ = ServiceRunningState::STATE_RUNNING;
     MMI_LOGD("MMIService Started successfully");
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
