@@ -63,8 +63,8 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
 {
     MMI_LOGD("enter");
     if (physicalDisplays.empty() || logicalDisplays.empty()) {
-        MMI_LOGE("display info check failed! physicalDisplays size:%{public}d,logicalDisplays size:%{public}d",
-            static_cast<int32_t>(physicalDisplays.size()), static_cast<int32_t>(logicalDisplays.size()));
+        MMI_LOGE("display info check failed! physicalDisplays size:%{public}zu,logicalDisplays size:%{public}zu",
+            physicalDisplays.size(), logicalDisplays.size());
         return;
     }
 
@@ -213,7 +213,7 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &ckt)
 
 void InputManagerImpl::PrintDisplayDebugInfo()
 {
-    MMI_LOGD("physicalDisplays,num:%{public}d", static_cast<int32_t>(physicalDisplays_.size()));
+    MMI_LOGD("physicalDisplays,num:%{public}zu", physicalDisplays_.size());
     for (const auto &item : physicalDisplays_) {
         MMI_LOGD("physicalDisplays,id:%{public}d,leftDisplay:%{public}d,upDisplay:%{public}d,"
             "topLeftX:%{public}d,topLeftY:%{public}d,width:%{public}d,height:%{public}d,"
@@ -226,15 +226,15 @@ void InputManagerImpl::PrintDisplayDebugInfo()
             item.direction);
     }
 
-    MMI_LOGD("logicalDisplays,num:%{public}d", static_cast<int32_t>(logicalDisplays_.size()));
+    MMI_LOGD("logicalDisplays,num:%{public}zu", logicalDisplays_.size());
     for (const auto &item : logicalDisplays_) {
         MMI_LOGD("logicalDisplays, id:%{public}d,topLeftX:%{public}d,topLeftY:%{public}d,"
             "width:%{public}d,height:%{public}d,name:%{public}s,"
-            "seatId:%{public}s,seatName:%{public}s,focusWindowId:%{public}d,window num:%{public}d",
+            "seatId:%{public}s,seatName:%{public}s,focusWindowId:%{public}d,window num:%{public}zu",
             item.id, item.topLeftX, item.topLeftY,
             item.width, item.height, item.name.c_str(),
             item.seatId.c_str(), item.seatName.c_str(),
-            item.focusWindowId, static_cast<int32_t>(item.windowsInfo_.size()));
+            item.focusWindowId, item.windowsInfo_.size());
 
         for (const auto &win : item.windowsInfo_) {
             MMI_LOGD("windowid:%{public}d,pid:%{public}d,uid:%{public}d,hotZoneTopLeftX:%{public}d,"
@@ -368,8 +368,8 @@ void InputManagerImpl::OnConnected()
     MMI_LOGD("enter");
 
     if (physicalDisplays_.empty() || logicalDisplays_.empty()) {
-        MMI_LOGE("display info check failed! physicalDisplays_ size:%{public}d,logicalDisplays_ size:%{public}d",
-            static_cast<int32_t>(physicalDisplays_.size()), static_cast<int32_t>(logicalDisplays_.size()));
+        MMI_LOGE("display info check failed! physicalDisplays_ size:%{public}zu,logicalDisplays_ size:%{public}zu",
+            physicalDisplays_.size(), logicalDisplays_.size());
         return;
     }
     PrintDisplayDebugInfo();
