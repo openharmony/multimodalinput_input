@@ -44,7 +44,7 @@ int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programN
     int32_t serverFd = INVALID_SOCKET_FD;
     int32_t uid = IPCSkeleton::GetCallingUid();
     int32_t pid = IPCSkeleton::GetCallingPi
-    const int32_t ret = udsServer_->AddSocketPairInfo(programName, moduleType, serverFd, uid, pid, toReturnClientFd);
+    const int32_t ret = udsServer_->AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd);
     if (ret != RET_OK) {
         MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
         return RET_ERR;
