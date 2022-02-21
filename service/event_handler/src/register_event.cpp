@@ -445,12 +445,12 @@ int32_t RegisterEvent::OnEventTouchUpGetSign(const EventTouch& touch, MmiMessage
 {
     CHKF(touch.time > 0, PARAM_INPUT_INVALID);
     CHKF(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
-    TouchInfo touchUpInfo = {};
     auto iter = touchInfos_.find(std::make_pair(touch.deviceId, touch.seatSlot));
     if (iter == touchInfos_.end()) {
         MMI_LOGE("Failed to find touch event");
         return RET_ERR;
     }
+    TouchInfo touchUpInfo = {};
     touchUpInfo = iter->second;
     touchInfos_.erase(iter);
 

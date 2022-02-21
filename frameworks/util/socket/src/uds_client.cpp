@@ -132,7 +132,7 @@ void UDSClient::OnRecv(const char *buf, size_t size)
     CHKPV(buf);
     int32_t readIdx = 0;
     int32_t packSize = 0;
-    const auto headSize = static_cast<int32_t>(sizeof(PackHead));
+    const size_t headSize = sizeof(PackHead);
     CHK(size >= headSize, VAL_NOT_EXP);
     while (size > 0 && recvFun_) {
         CHK(size >= headSize, VAL_NOT_EXP);
@@ -165,10 +165,10 @@ void UDSClient::OnEvent(const epoll_event& ev, StreamBuffer& buf)
     }
 
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
-    const auto maxCount = static_cast<int32_t>(MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE) + 1;
+    const size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
     CHK(maxCount > 0, VAL_NOT_EXP);
     auto isoverflow = false;
-    for (auto j = 0; j < maxCount; j++) {
+    for (size_t j = 0; j < maxCount; j++) {
         auto size = read(fd, static_cast<void *>(szBuf), MAX_PACKET_BUF_SIZE);
         if (size < 0) {
             MMI_LOGE("size:%{public}zu", size);
