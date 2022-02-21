@@ -166,7 +166,7 @@ void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
         return;
     }
 #endif
-    for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
+    for (auto it = inputDevice_.begin(); it != inputDevice_.end(); it++) {
         if (it->second == inputDevice) {
             inputDevice_.erase(it);
             if (IsPointerDevice(inputDevice)) {
