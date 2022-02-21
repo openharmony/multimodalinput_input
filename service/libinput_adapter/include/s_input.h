@@ -36,14 +36,14 @@ public:
 
     int32_t GetInputFd() const
     {
-        return lfd_;
+        return fd_;
     }
 
 protected:
     void OnEventHandler();
 
 protected:
-    int32_t lfd_ = -1;
+    int32_t fd_ = -1;
     udev *udev_ = nullptr;
     libinput *input_ = nullptr;
 

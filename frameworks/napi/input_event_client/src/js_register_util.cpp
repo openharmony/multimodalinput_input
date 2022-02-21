@@ -20,9 +20,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterUtil" };
+    constexpr size_t MAX_STRING_LEN = 1024;
 }
-
-constexpr uint32_t MAX_STRING_LEN = 1024;
 
 void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, bool value)
 {

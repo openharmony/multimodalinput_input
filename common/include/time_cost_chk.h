@@ -26,7 +26,7 @@ template<class T>
 class TimeCostChk {
     static inline constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TimeCostChk" };
 public:
-    TimeCostChk(const std::string& strReason, const std::string& strOutputStr, uint32_t tmChk, T llParam1,
+    TimeCostChk(const std::string& strReason, const std::string& strOutputStr, int64_t tmChk, T llParam1,
                 int64_t llParam2 = 0)
         : beginTime_(std::chrono::high_resolution_clock::now()),
           strOutput_(strOutputStr),
@@ -38,34 +38,34 @@ public:
 
     ~TimeCostChk(void)
     {
-        auto ullCost = GetElapsed_micro();
+        int64_t ullCost = GetElapsed_micro();
         if ((ullCost > uiTime_) && strReason_.size() > 0 && strOutput_.size() > 0) {
             if (llParam1_ != 0 || llParam2_ != 0) {
-                MMI_LOGW("Time cost overtime (%{public}" PRId64 ",(us)>%{public}u(us))"
-                         "when Reason:%{public}s,chk:%{public}s,"
+                MMI_LOGW("Time cost overtime (%{public}" PRId64 ",(us)>%{public}" PRId64
+                         "(us)) when Reason:%{public}s,chk:%{public}s,"
                          "param1:%{public}" PRId64 ",param2:%{public}" PRId64 "",
                          ullCost, uiTime_, strReason_.c_str(), strOutput_.c_str(), llParam1_, llParam2_);
             } else {
-                MMI_LOGW("TimeCostChk Overtime(%{public}" PRId64 ",(us)>%{public}u(us))"
-                         " when Reason:%{public}s,chk:%{public}s",
+                MMI_LOGW("TimeCostChk Overtime(%{public}" PRId64 ",(us)>%{public}" PRId64
+                         "(us)) when Reason:%{public}s,chk:%{public}s",
                          ullCost, uiTime_, strReason_.c_str(), strOutput_.c_str());
             }
         }
     }
 
-    uint64_t GetElapsed_micro() const
+    int64_t GetElapsed_micro() const
     {
-        auto tm64Cost = std::chrono::duration_cast<std::chrono::microseconds>(
+        int64_t tm64Cost = std::chrono::duration_cast<std::chrono::microseconds>(
                             std::chrono::high_resolution_clock::now() - beginTime_
                         ).count();
-        return static_cast<uint64_t>(tm64Cost);
+        return tm64Cost;
     }
 
 private:
     const std::chrono::time_point<std::chrono::high_resolution_clock> beginTime_;
     const std::string strOutput_ = "";
     const std::string strReason_ = "";
-    const uint32_t uiTime_ = 0;
+    const int64_t uiTime_ = 0;
     const int64_t llParam1_ = 0;
     const int64_t llParam2_ = 0;
 };
