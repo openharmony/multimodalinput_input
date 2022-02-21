@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef LOG_H
-#define LOG_H
+#ifndef MMI_LOG_H
+#define MMI_LOG_H
 
 #include <string>
 #include <future>
@@ -22,12 +22,12 @@
 #include "klog.h"
 
 namespace OHOS {
-    namespace MMI {
-        namespace {
-            constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
-        }
-    }
+namespace MMI {
+namespace {
+    constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
 }
+} // namespace MMI
+} // namespace OHOS
 
 #ifndef MMI_FUNC_FMT
 #define MMI_FUNC_FMT "in %{public}s, #%{public}d, "
@@ -102,4 +102,4 @@ namespace OHOS {
     MMI_LOGF(fmt, ##__VA_ARGS__); \
 } while (0)
 
-#endif // LOG_H
+#endif // MMI_LOG_H

@@ -16,10 +16,10 @@
 #include "mmi_server.h"
 #include <cinttypes>
 #include "event_dump.h"
-#include "log.h"
+#include "mmi_log.h"
 #include "multimodal_input_connect_service.h"
-#include "util.h"
 #include "timer_manager.h"
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {

@@ -14,7 +14,7 @@
  */
 
 #include "multimodal_input_connect_death_recipient.h"
-#include "log.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {

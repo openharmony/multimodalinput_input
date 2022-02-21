@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "mmi_service.h"
 #include <cinttypes>
 #include <csignal>
 #include <sys/signalfd.h>
@@ -21,14 +22,13 @@
 #include "device_register.h"
 #include "event_dump.h"
 #include "input_windows_manager.h"
+#include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "pointer_drawing_manager.h"
 #include "register_eventhandle_manager.h"
 #include "safe_keeper.h"
 #include "timer_manager.h"
 #include "util.h"
-#include "log.h"
-#include "mmi_service.h"
 
 namespace OHOS {
 namespace MMI {
@@ -36,6 +36,7 @@ namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIService" };
 static const std::string DEF_INPUT_SEAT = "seat0";
 }
+
 const bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
 
