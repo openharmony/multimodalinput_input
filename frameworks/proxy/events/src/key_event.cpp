@@ -1437,7 +1437,7 @@ bool KeyEvent::IsValidKeyItem() const
         }
         
         auto item = it;
-        for (++item; item != keys_.end(); item++) {
+        for (item++; item != keys_.end(); item++) {
             if (it->GetKeyCode() == item->GetKeyCode()) {
                 HiLog::Error(LABEL, "Keyitems keyCode exist same items");
                 return false;
@@ -1521,7 +1521,7 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
     if (keysSize < 0) {
         return false;
     }
-    for (int32_t i = 0; i < keysSize; ++i) {
+    for (int32_t i = 0; i < keysSize; i++) {
         KeyItem val = {};
         if (!val.ReadFromParcel(in)) {
             return false;

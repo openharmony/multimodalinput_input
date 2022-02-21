@@ -61,7 +61,7 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv, napi_value receiver)
     std::shared_ptr<JsInputMonitor> monitor;
     {
         std::lock_guard<std::mutex> guard(mutex_);
-        for (auto it = monitors_.begin(); it != monitors_.end(); ++it) {
+        for (auto it = monitors_.begin(); it != monitors_.end(); it++) {
             if ((*it)->IsMatch(jsEnv, receiver) == RET_OK) {
                 monitor = *it;
                 monitors_.erase(it);
@@ -88,7 +88,7 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv)
                 monitors_.erase(it++);
                 continue;
             }
-            ++it;
+            it++;
         }
     }
     for (const auto &item : monitors) {

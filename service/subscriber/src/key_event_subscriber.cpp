@@ -63,7 +63,7 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
 int32_t KeyEventSubscriber::UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
 {
     MMI_LOGD("enter, subscribeId:%{public}d", subscribeId);
-    for (auto it = subscribers_.begin(); it != subscribers_.end(); ++it) {
+    for (auto it = subscribers_.begin(); it != subscribers_.end(); it++) {
         if ((*it)->id_ == subscribeId && (*it)->sess_ == sess) {
             ClearTimer(*it);
             subscribers_.erase(it);
@@ -108,7 +108,7 @@ void KeyEventSubscriber::OnSessionDelete(SessionPtr sess)
             subscribers_.erase(it++);
             continue;
         }
-        ++it;
+        it++;
     }
 
     MMI_LOGD("Leave");
@@ -371,7 +371,7 @@ bool KeyEventSubscriber::CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 
 void KeyEventSubscriber::RemoveKeyCode(int32_t keyCode, std::vector<int32_t>& keyCodes)
 {
-    for (auto it = keyCodes.begin(); it != keyCodes.end(); ++it) {
+    for (auto it = keyCodes.begin(); it != keyCodes.end(); it++) {
         if (*it == keyCode) {
             keyCodes.erase(it);
             return;

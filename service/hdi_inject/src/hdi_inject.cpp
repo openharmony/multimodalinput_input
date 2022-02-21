@@ -149,7 +149,7 @@ int32_t HdiInject::GetDeviceCount()
 
 bool HdiInject::SetDeviceHotStatus(int32_t devIndex, int32_t status)
 {
-    for (auto iter = deviceArray_.begin(); iter != deviceArray_.end(); ++iter) {
+    for (auto iter = deviceArray_.begin(); iter != deviceArray_.end(); iter++) {
         if (iter->devIndex == devIndex) {
             if (iter->status == status) {
                 MMI_LOGE("Failed to find status");
