@@ -438,7 +438,7 @@ int OHOS::MMI::HdfEventManager::HdfDevHandle(int index, hdf_event_type cmd)
         MMI_LOGD("HdfRmv function start");
         uhdf *hdiuhdf = nullptr;
         for (std::list<uhdf*>::iterator it = globleThis_->hdflist_.begin();
-             it != globleThis_->hdflist_.end(); ++it) {
+             it != globleThis_->hdflist_.end(); it++) {
             uhdf *hdiuhdfit = *it;
             if (hdiuhdfit->index == static_cast<int32_t>(index)) {
                 hdiuhdf = *it;
@@ -456,7 +456,7 @@ int OHOS::MMI::HdfEventManager::HdfDevHandle(int index, hdf_event_type cmd)
 
     uhdf *hdiuhdf = nullptr;
     for (std::list<uhdf*>::iterator it = globleThis_->hdflist_.begin();
-        it != globleThis_->hdflist_.end(); ++it) {
+        it != globleThis_->hdflist_.end(); it++) {
         uhdf *hdiuhdfit = *it;
         if (hdiuhdfit->index != static_cast<int32_t>(index)) {
             continue;
