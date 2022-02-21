@@ -209,8 +209,8 @@ void MMIService::OnStart()
     auto tid = GetThisThreadIdOfLL();
     MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
 
-    int32_t ret = 0;
-    CHK((RET_OK == (ret = Init())), ret);
+    int32_t ret = Init();
+    CHK(RET_OK == ret, ret);
     state_ = ServiceRunningState::STATE_RUNNING;
     MMI_LOGD("MMIService Started successfully");
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
@@ -281,7 +281,6 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
 
 int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
 {
-    int32_t ret = RET_OK;
     sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
     if (req == nullptr) {
         MMI_LOGE("read data error.");
@@ -290,7 +289,7 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
     MMI_LOGIK("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
 
     int32_t clientFd = INVALID_SOCKET_FD;
-    ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
+    int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
     if (ret != RET_OK) {
         MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
         reply.WriteInt32(RET_ERR);
