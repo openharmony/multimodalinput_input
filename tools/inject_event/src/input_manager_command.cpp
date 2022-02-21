@@ -248,10 +248,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 downKey.push_back(keyCode);
                                 isCombinationKey = optind;
                                 auto KeyEvent = KeyEvent::Create();
-                                KeyEvent->SetKeyCode(keyCode);
-                                KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+                                KeyEvent::KeyItem item[downKey.size()];
                                 for (size_t i = 0; i < downKey.size(); i++) {
-                                    KeyEvent::KeyItem item[i];
+                                    KeyEvent->SetKeyCode(keyCode);
+                                    KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
                                     item[i].SetKeyCode(downKey[i]);
                                     item[i].SetPressed(true);
                                     KeyEvent->AddKeyItem(item[i]);

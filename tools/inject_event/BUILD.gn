@@ -44,3 +44,26 @@ ohos_executable("input") {
   subsystem_name = "multimodalinput"
   part_name = "multimodalinput_base"
 }
+
+module_output_path = "multimodalinput/unit_out"
+ohos_unittest("InjectEventTest") {
+  module_out_path = module_output_path
+  include_dirs = [ "include" ]
+
+  sources = [ "test/inject_event_test.cpp" ]
+
+  cflags = [ "-DOHOS_BUILD" ]
+
+  deps = [
+    "$SUBSYSTEM_FRAMEWORKS_DIR/proxy:libmmi-client",
+    "$SUBSYSTEM_FRAMEWORKS_DIR/util:libmmi-util",
+  ]
+
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+}
+
+group("inject_event") {
+  testonly = true
+  deps = []
+  deps += [ ":InjectEventTest" ]
+}

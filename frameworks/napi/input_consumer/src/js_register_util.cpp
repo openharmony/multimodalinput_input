@@ -216,7 +216,7 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
     return JS_CALLBACK_EVENT_NOT_EXIST;
 }
 
-static void AsyncWorkFn_(napi_env env, OHOS::MMI::KeyEventMonitorInfo *event, napi_value result[2])
+static void AsyncWorkFn(napi_env env, OHOS::MMI::KeyEventMonitorInfo *event, napi_value result[2])
 {
     if (event->status < 0) {
         MMI_LOGD("Status < 0 enter");
@@ -257,33 +257,6 @@ static void AsyncWorkFn_(napi_env env, OHOS::MMI::KeyEventMonitorInfo *event, na
     }
 }
 
-static void AsyncWorkFn(napi_env env, napi_status status, void *data)
-{
-    MMI_LOGD("Napi async work enter");
-    OHOS::MMI::KeyEventMonitorInfo *event = (OHOS::MMI::KeyEventMonitorInfo *)data;
-    napi_value callback = nullptr;
-    if (napi_get_reference_value(env, event->callback[0], &callback) != napi_ok) {
-        MMI_LOGE("Event get reference value failed");
-        return;
-    }
-    napi_value result[2] = { 0 };
-    AsyncWorkFn_(env, event, result);
-    napi_value callResult = nullptr;
-    auto callFunResult = napi_call_function(env, nullptr, callback, 2, result, &callResult);
-    MMI_LOGD("CallFunResult:%{public}d", static_cast<int32_t>(callFunResult));
-    if (callFunResult != napi_ok) {
-        MMI_LOGE("Call function fail, callFunResult:%{public}d", callFunResult);
-        return;
-    }
-    if (event->status <= 0) {
-        napi_delete_reference(env, event->callback[0]);
-        napi_delete_async_work(env, event->asyncWork);
-        delete event;
-        event = nullptr;
-    }
-    MMI_LOGD("Napi async work left");
-}
-
 void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
 {
     MMI_LOGD("enter");
@@ -296,7 +269,31 @@ void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
     }
     napi_create_async_work(
         reportEvent->env, nullptr, resourceName, [](napi_env env, void *data) {},
-        &AsyncWorkFn, reportEvent, &reportEvent->asyncWork);
+        [](napi_env env, napi_status status, void *data) {
+            MMI_LOGD("Napi async work enter");
+            OHOS::MMI::KeyEventMonitorInfo *event = (OHOS::MMI::KeyEventMonitorInfo *)data;
+            napi_value callback = nullptr;
+            if (napi_get_reference_value(env, event->callback[0], &callback) != napi_ok) {
+                MMI_LOGE("Event get reference value failed");
+                return;
+            }
+            napi_value result[2] = { 0 };
+            AsyncWorkFn(env, event, result);
+            napi_value callResult = nullptr;
+            auto callFunResult = napi_call_function(env, nullptr, callback, 2, result, &callResult);
+            MMI_LOGD("CallFunResult:%{public}d", static_cast<int32_t>(callFunResult));
+            if (callFunResult != napi_ok) {
+                MMI_LOGE("Call function fail, callFunResult:%{public}d", callFunResult);
+                return;
+            }
+            if (event->status <= 0) {
+                napi_delete_reference(env, event->callback[0]);
+                napi_delete_async_work(env, event->asyncWork);
+                delete event;
+                event = nullptr;
+            }
+            MMI_LOGD("Napi async work left");
+        }, reportEvent, &reportEvent->asyncWork);
     napi_queue_async_work(reportEvent->env, reportEvent->asyncWork);
     MMI_LOGD("EmitAsyncCallbackWork left");
 }
