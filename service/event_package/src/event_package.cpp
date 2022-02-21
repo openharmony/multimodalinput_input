@@ -809,12 +809,10 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
     CHKPR(keyEventPtr, ERROR_NULL_POINTER);
     keyEventPtr->UpdateId();
     KeyEvent::KeyItem keyItem;
-    int32_t actionTime = static_cast<int64_t>(GetSysClockTime());
     int32_t keyCode = static_cast<int32_t>(key.key);
     int32_t keyAction = (key.state == KEY_STATE_PRESSED) ?
         (KeyEvent::KEY_ACTION_DOWN) : (KeyEvent::KEY_ACTION_UP);
     int32_t deviceId = static_cast<int32_t>(key.deviceId);
-    int64_t actionStartTime = static_cast<int64_t>(key.time);
     auto preAction = keyEventPtr->GetAction();
     if (preAction == KeyEvent::KEY_ACTION_UP) {
         auto preUpKeyItem = keyEventPtr->GetKeyItem();
@@ -825,19 +823,19 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
         }
     }
 
-    keyEventPtr->SetActionTime(actionStartTime);
+    int32_t time = static_cast<int64_t>(GetSysClockTime());
+    keyEventPtr->SetActionTime(time);
     keyEventPtr->SetAction(keyAction);
     keyEventPtr->SetDeviceId(deviceId);
-
     keyEventPtr->SetKeyCode(keyCode);
     keyEventPtr->SetKeyAction(keyAction);
 
     if (keyEventPtr->GetPressedKeys().empty()) {
-        keyEventPtr->SetActionStartTime(actionStartTime);
+        keyEventPtr->SetActionStartTime(time);
     }
 
     bool isKeyPressed = (key.state == KEY_STATE_PRESSED) ? (true) : (false);
-    keyItem.SetDownTime(actionStartTime);
+    keyItem.SetDownTime(time);
     keyItem.SetKeyCode(keyCode);
     keyItem.SetDeviceId(deviceId);
     keyItem.SetPressed(isKeyPressed);
