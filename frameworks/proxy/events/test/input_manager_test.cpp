@@ -1227,7 +1227,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
     std::vector<int32_t> ids(N_TEST_CASES);
     std::vector<std::shared_ptr<InputEventCallback>> cbs(N_TEST_CASES);
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         cbs[i] = InputEventCallback::GetPtr();
         EXPECT_TRUE(cbs[i] != nullptr);
         ids[i] = InputManager::GetInstance()->AddMonitor(cbs[i]);
@@ -1258,7 +1258,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
     }
     EXPECT_TRUE(rLogs.size() >= N_TEST_CASES);
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         if (IsValidHandlerId(ids[i])) {
             InputManager::GetInstance()->RemoveMonitor(ids[i]);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -1279,7 +1279,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_004, TestSize.Level1)
     std::shared_ptr<InputEventCallback> cb = InputEventCallback::GetPtr();
     EXPECT_TRUE(cb != nullptr);
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         ids[i] = InputManager::GetInstance()->AddMonitor(cb);
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -1291,7 +1291,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_004, TestSize.Level1)
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         if (IsValidHandlerId(ids[i])) {
             InputManager::GetInstance()->RemoveMonitor(ids[i]);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2111,7 +2111,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_002, TestSize.Level1)
     std::vector<int32_t> ids(N_TEST_CASES);
     std::shared_ptr<OHOS::MMI::IInputEventConsumer> interceptor { InputEventInterceptor::GetPtr() };
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         ids[i] = InputManager::GetInstance()->AddInterceptor(interceptor);
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2138,7 +2138,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_002, TestSize.Level1)
     }
     EXPECT_TRUE(rLogs.size() >= N_TEST_CASES);
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         if (IsValidHandlerId(ids[i])) {
             InputManager::GetInstance()->RemoveInterceptor(ids[i]);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2152,7 +2152,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_003, TestSize.Level1)
     std::vector<int32_t> ids(N_TEST_CASES);
     std::shared_ptr<OHOS::MMI::IInputEventConsumer> interceptor { InputEventInterceptor::GetPtr() };
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         ids[i] = InputManager::GetInstance()->AddInterceptor(interceptor);
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2164,7 +2164,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_003, TestSize.Level1)
     };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         if (IsValidHandlerId(ids[i])) {
             InputManager::GetInstance()->RemoveInterceptor(ids[i]);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2463,7 +2463,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
 
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         ids[i] = InputManager::GetInstance()->AddMonitor(callBackPtr);
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2490,7 +2490,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
     }
     EXPECT_TRUE(rLogs.size() >= N_TEST_CASES);
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         InputManager::GetInstance()->RemoveMonitor(ids[i]);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
@@ -2793,7 +2793,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1
     std::shared_ptr<InputEventCallback> cb = InputEventCallback::GetPtr();
     EXPECT_TRUE(cb != nullptr);
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         ids[i] = InputManager::GetInstance()->AddMonitor(cb);
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2804,7 +2804,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         if (IsValidHandlerId(ids[i])) {
             InputManager::GetInstance()->RemoveMonitor(ids[i]);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
