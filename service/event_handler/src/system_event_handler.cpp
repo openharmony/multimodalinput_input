@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -92,7 +92,6 @@ OHOS::MMI::SystemEventHandler::~SystemEventHandler()
 
 int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
 {
-    MMI_LOGD("enter");
     if (idMsg == MmiMessageId::INVALID) {
         return PARAM_INPUT_INVALID;
     }
@@ -102,7 +101,6 @@ int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
         return UNKNOWN_MSG_ID; // non-system event return
     }
     (*callback)();
-    MMI_LOGD("leave");
     return RET_OK;
 }
 

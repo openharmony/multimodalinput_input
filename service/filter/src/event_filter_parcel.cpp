@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,7 +23,6 @@ namespace {
 }
 bool PointerEventParcel::Marshalling(Parcel& out) const
 {
-    MMI_LOGD("enter");
     if (data_ == nullptr) {
         data_ = PointerEvent::Create();
     }
@@ -32,13 +31,11 @@ bool PointerEventParcel::Marshalling(Parcel& out) const
         data_ = nullptr;
         return false;
     }
-    MMI_LOGD("leave");
     return true;
 }
 
 PointerEventParcel *PointerEventParcel::Unmarshalling(Parcel& in)
 {
-    MMI_LOGD("enter");
     auto* request = new (std::nothrow) PointerEventParcel();
     if (request == nullptr) {
         return nullptr;
@@ -58,7 +55,6 @@ PointerEventParcel *PointerEventParcel::Unmarshalling(Parcel& in)
         request = nullptr;
         return nullptr;
     }
-    MMI_LOGD("leave");
     return request;
 }
 } // namespace MMI

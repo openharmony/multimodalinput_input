@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,14 +23,14 @@ namespace OHOS {
 namespace MMI {
 class AxisEvent : public InputEvent {
 public:
-    static const int32_t AXIS_ACTION_UNKNOWN = 0;
-    static const int32_t AXIS_ACTION_CANCEL = 1;
+    static constexpr int32_t AXIS_ACTION_UNKNOWN = 0;
+    static constexpr int32_t AXIS_ACTION_CANCEL = 1;
 
-    static const int32_t AXIS_ACTION_START = 2;
-    static const int32_t AXIS_ACTION_UPDATE = 3;
-    static const int32_t AXIS_ACTION_END = 4;
+    static constexpr int32_t AXIS_ACTION_START = 2;
+    static constexpr int32_t AXIS_ACTION_UPDATE = 3;
+    static constexpr int32_t AXIS_ACTION_END = 4;
 
-    static const int32_t AXIS_TYPE_UNKNOWN = 0;
+    static constexpr int32_t AXIS_TYPE_UNKNOWN = 0;
 
 public:
     static std::shared_ptr<AxisEvent> from(std::shared_ptr<InputEvent> inputEvent);

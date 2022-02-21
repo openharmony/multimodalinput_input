@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,7 +34,6 @@ int32_t RunShellUtil::RunShellCommand(const std::string &command, std::vector<st
 {
     MMI_LOGD("enter");
     vLog.clear();
-    std::string retLog = "";
     const std::string command_ = HILOG_GREP + "'" + command + "'";
 
     if ((fp_ = popen(command_.c_str(), "r")) == nullptr) {
@@ -43,6 +42,7 @@ int32_t RunShellUtil::RunShellCommand(const std::string &command, std::vector<st
         fp_ = nullptr;
         return RET_ERR;
     }
+    std::string retLog = "";
     int32_t i = 0;
     while (logMaxSize_ > i) {
         char buf[MAXSIZE] = {0};
