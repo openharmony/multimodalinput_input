@@ -84,8 +84,7 @@ void MultimodalInputConnectService::OnStart()
         MMI_LOGE("Failed to initialize");
         return;
     }
-    bool ret = Publish(DelayedSingleton<MultimodalInputConnectService>::GetInstance().get());
-    if (!ret) {
+    if (!Publish(this)) {
         MMI_LOGE("Failed to publish service");
         return;
     }
