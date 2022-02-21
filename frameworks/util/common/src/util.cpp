@@ -323,7 +323,7 @@ const char* GetProgramName()
     if (RET_OK != ret) {
         return "";
     }
-
+    KMSG_LOGE("test KMSG_LOGE log");
     KMSG_LOGI("GetProgramName success. programName = %s", programName);
 
     return programName;
