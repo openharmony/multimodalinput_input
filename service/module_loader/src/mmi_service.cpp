@@ -406,7 +406,8 @@ void MMIService::OnSignalEvent(int32_t signalFd)
     signalfd_siginfo sigInfo;
     int32_t size = ::read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
     if (size != sizeof(signalfd_siginfo)) {
-        MMI_LOGE("read signal info faild, invalid size:%{public}d", size);
+        const int savedErrNo = errno;
+        MMI_LOGE("read signal info faild, invalid size:%{public}d, signalFd:%{public}d, errNo%{public}d, msg: %{public}s!", size, signalFd, savedErrNo, strerror(savedErrNo));
         return;
     }
 
