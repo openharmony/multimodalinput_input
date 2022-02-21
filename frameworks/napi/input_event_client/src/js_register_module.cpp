@@ -206,14 +206,11 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
 {
     MMI_LOGE("enter");
     napi_value result = nullptr;
-    if (napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result) != napi_ok) {
-        MMI_LOGE("call napi_create_int32 fail");
-        return result;
-    }
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
         MMI_LOGE("call napi_get_cb_info fail");
+        napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result);
         return result;
     }
     NAPI_ASSERT(env, argc == 1, "paramater num error");
@@ -234,10 +231,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     OHOS::KeyEvent injectEvent;
     injectEvent.Initialize(0, isPressed, keyCode, keyDownDuration, 0, "", 0, 0, "", 0, false, 0, 0, isIntercepted);
     int32_t response = MMIEventHdl.InjectEvent(injectEvent);
-    if (napi_create_int32(env, response, &result) != napi_ok) {
-        MMI_LOGE("call napi_create_int32 fail");
-        return result;
-    }
+    napi_create_int32(env, response, &result);
 #else
     auto keyEvent = KeyEvent::Create();
     if (isPressed) {
@@ -255,8 +249,8 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     item.SetDownTime(static_cast<int64_t>(keyDownDuration));
     keyEvent->AddKeyItem(item);
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
-#endif // OHOS_WESTEN_MODEL
     napi_create_int32(env, 0, &result);
+#endif // OHOS_WESTEN_MODEL
     MMI_LOGE("leave");
     return result;
 }
