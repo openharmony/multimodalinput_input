@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,7 +39,7 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace MMI;
 namespace {
-constexpr int32_t HOS_KEY_BACK = 2;
+constexpr int32_t MMI_KEY_BACK = 2;
 constexpr bool ACTION_DOWN = true;
 constexpr bool ACTION_UP = false;
 constexpr int32_t DEFAULT_DEVICE_ID = 1;
@@ -456,14 +456,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, Tes
 
     OHOS::KeyEvent injectDownEvent;
     int64_t downTime = static_cast<int64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
-    injectDownEvent.Initialize(0, ACTION_DOWN, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectDownEvent.Initialize(0, ACTION_DOWN, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
     EXPECT_TRUE(response);
 
     OHOS::KeyEvent injectUpEvent;
     downTime = static_cast<int64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
-    injectUpEvent.Initialize(0, ACTION_UP, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
+    injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
     EXPECT_TRUE(response);
 
@@ -678,7 +678,66 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_004, TestSize.Level1)
     EXPECT_TRUE(!tLogs.empty());
 }
 
+/**
+ * @tc.name:InputManager_ANR_TEST
+ * @tc.desc: detection of ANR
+ * @tc.type: FUNC
+ * @tc.require: AR000GJG6G
+ */
 HWTEST_F(InputManagerTest, InputManager_ANR_TEST_001, TestSize.Level1)
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(20000));
+    auto pointerEvent = PointerEvent::Create();
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetGlobalX(823);
+    item.SetGlobalY(723);
+    item.SetPressure(5);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(-1);
+    pointerEvent->SetPointerId(0);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    MMI_LOGD("InputManager_ANR_TEST_001 wait 2s");
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+    item.SetPointerId(1);
+    item.SetGlobalX(823);
+    item.SetGlobalY(723);
+    item.SetPressure(5);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(-1);
+    pointerEvent->SetPointerId(1);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    MMI_LOGD("InputManager_ANR_TEST_001 wait 5s");
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+
+    item.SetPointerId(2);
+    item.SetGlobalX(823);
+    item.SetGlobalY(723);
+    item.SetPressure(5);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(-1);
+    pointerEvent->SetPointerId(2);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name:InputManager_ANR_TEST
+ * @tc.desc: detection of ANR
+ * @tc.type: FUNC
+ * @tc.require: SR000GGN6G
+ */
+HWTEST_F(InputManagerTest, InputManager_ANR_TEST_002, TestSize.Level1)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(20000));
     auto pointerEvent = PointerEvent::Create();
@@ -1070,7 +1129,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_001, TestSize.Level1)
 
     OHOS::KeyEvent injectUpEvent;
     uint64_t downTime = static_cast<uint64_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectUpEvent.Initialize(0, ACTION_UP, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
     EXPECT_TRUE(response);
@@ -1102,7 +1161,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_002, TestSize.Level1)
 
     OHOS::KeyEvent injectUpEvent;
     uint64_t downTime = static_cast<uint64_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    injectUpEvent.Initialize(0, ACTION_UP, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
+    injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
     EXPECT_TRUE(response);
@@ -2779,4 +2838,4 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
-}
+} // namespace

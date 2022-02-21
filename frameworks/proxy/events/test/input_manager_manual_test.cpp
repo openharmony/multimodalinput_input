@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -122,4 +122,4 @@ HWTEST_F(InputManagerManualTest, HandlePointerEventFilter_001, TestSize.Level1)
     SimulateInputEventHelper(10, 10, 1); // set global x and global y are 10, will expect value is 1
     SimulateInputEventHelper(0, 0, 2); // set global x and global y are not 10, will expect value is 2
 }
-}
+} // namespace

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Description: The testing of KeyEvent injection
  * Author: h00580190
  * Create: 2022-1-11
@@ -189,6 +189,7 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_003, Test
 
 HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_004, TestSize.Level1)
 {
+    MMI_LOGD("begin");
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
     int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     OHOS::MMI::KeyEvent::KeyItem kitDown;
@@ -198,7 +199,6 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_004, Test
     injectDownEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_UNKNOWN);
     injectDownEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
-    MMI_LOGD("begin");
     int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
     MMI_LOGD("end, response:%{public}u", response);
     EXPECT_TRUE(response < 0);
@@ -206,6 +206,7 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_004, Test
 
 HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.Level1)
 {
+    MMI_LOGD("begin");
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
     int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     OHOS::MMI::KeyEvent::KeyItem kitDown;
@@ -218,9 +219,8 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_005, Test
     if (injectDownEvent == nullptr) {
         MMI_LOGD("injectDownEvent is nullptr");
     }
-    MMI_LOGD("MMIEventHdl.InjectEvent begin");
     int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
-    MMI_LOGD("MMIEventHdl.InjectEvent end");
+    MMI_LOGD("end");
     EXPECT_TRUE(response);
 
     std::shared_ptr<OHOS::MMI::KeyEvent> injectUpEvent = OHOS::MMI::KeyEvent::Create();

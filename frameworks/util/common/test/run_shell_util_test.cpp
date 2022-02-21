@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,7 @@ using namespace OHOS;
 
 namespace {
     constexpr int32_t SLEEP = 1000;
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RunShellUtilTest" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RunShellUtilTest" };
 }
 
 class RunShellUtilTest : public testing::Test {
@@ -90,4 +90,4 @@ HWTEST_F(RunShellUtilTest, RunShellUtilTest_RunShellCommand_002, TestSize.Level1
         EXPECT_TRUE(std::strcmp(vLog.back().c_str(), firstLog.back().c_str()) != 0);
     }
 }
-}
+} // namespace

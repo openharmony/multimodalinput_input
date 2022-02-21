@@ -35,70 +35,70 @@ public:
      * 
      * @since 8
      */
-    static const int32_t POINTER_ACTION_UNKNOWN = 0;
+    static constexpr int32_t POINTER_ACTION_UNKNOWN = 0;
 
     /**
      * Indicates a pointer action that has been canceled.
      * 
      * @since 8
      */
-    static const int32_t POINTER_ACTION_CANCEL = 1;
+    static constexpr int32_t POINTER_ACTION_CANCEL = 1;
 
     /**
      * Indicates a pointer action representing that a funger is pressed on a touchscreen or touchpad.
      * 
      * @since 8
      */
-    static const int32_t POINTER_ACTION_DOWN = 2;
+    static constexpr int32_t POINTER_ACTION_DOWN = 2;
 
     /**
      * Indicates a pointer action representing that a funger moves on a touchscreen or touchpad or a mouse pointer moves.
      * 
      * @since 8
      */
-    static const int32_t POINTER_ACTION_MOVE = 3;
+    static constexpr int32_t POINTER_ACTION_MOVE = 3;
 
     /**
      * Indicates a pointer action representing that a funger leaves  the touchscreen or touchpad.
      * 
      * @since 8
      */
-    static const int32_t POINTER_ACTION_UP = 4;
+    static constexpr int32_t POINTER_ACTION_UP = 4;
 
     /**
      * Indicates the start action of the axis event related to the pointer.
      * 
      * @since 8
      */
-    static const int32_t POINTER_ACTION_AXIS_BEGIN = 5;
+    static constexpr int32_t POINTER_ACTION_AXIS_BEGIN = 5;
 
     /**
      * Indicates the update action of the axis event related to the pointer.
      * 
      * @since 8
      */
-    static const int32_t POINTER_ACTION_AXIS_UPDATE = 6;
+    static constexpr int32_t POINTER_ACTION_AXIS_UPDATE = 6;
 
     /**
      * Indicates the end action of the axis event related to the pointer.
      * 
      * @since 8
      */
-    static const int32_t POINTER_ACTION_AXIS_END = 7;
+    static constexpr int32_t POINTER_ACTION_AXIS_END = 7;
 
     /**
      * Indicates a pointer action representing that a button is pressed.
      * 
      * @since 8
      */
-    static const int32_t POINTER_ACTION_BUTTON_DOWN = 8;
+    static constexpr int32_t POINTER_ACTION_BUTTON_DOWN = 8;
 
     /**
      * Indicates a pointer action representing that a button is released.
      * 
      * @since 8
      */
-    static const int32_t POINTER_ACTION_BUTTON_UP = 9;
+    static constexpr int32_t POINTER_ACTION_BUTTON_UP = 9;
 
     enum AxisType {
         /**
@@ -142,56 +142,56 @@ public:
      * 
      * @since 8
      */
-    static const int32_t SOURCE_TYPE_UNKNOWN = 0;
+    static constexpr int32_t SOURCE_TYPE_UNKNOWN = 0;
 
     /**
      * Indicates that the input source generates events similar to mouse cursor movement, button press and release, and wheel scrolling.
      * 
      * @since 8
      */
-    static const int32_t SOURCE_TYPE_MOUSE = 1;
+    static constexpr int32_t SOURCE_TYPE_MOUSE = 1;
 
     /**
      * Indicates that the input source generates a touchscreen multi-touch event.
      * 
      * @since 8
      */
-    static const int32_t SOURCE_TYPE_TOUCHSCREEN = 2;
+    static constexpr int32_t SOURCE_TYPE_TOUCHSCREEN = 2;
 
     /**
      * Indicates that the input source generates a touchpad multi-touch event.
      * 
      * @since 8
      */
-    static const int32_t SOURCE_TYPE_TOUCHPAD = 3;
+    static constexpr int32_t SOURCE_TYPE_TOUCHPAD = 3;
 
     /**
      * Indicates an invalid button ID.
      * 
      * @since 8
      */
-    static const int32_t BUTTON_NONE = -1;
+    static constexpr int32_t BUTTON_NONE = -1;
 
     /**
      * Indicates the left button on a mouse.
      * 
      * @since 8
      */
-    static const int32_t MOUSE_BUTTON_LEFT = 0;
+    static constexpr int32_t MOUSE_BUTTON_LEFT = 0;
 
     /**
      * Indicates the right button on a mouse.
      * 
      * @since 8
      */
-    static const int32_t MOUSE_BUTTON_RIGHT = 1;
+    static constexpr int32_t MOUSE_BUTTON_RIGHT = 1;
 
     /**
      * Indicates the middle button on a mouse.
      * 
      * @since 8
      */
-    static const int32_t MOUSE_BUTTON_MIDDLE = 2;
+    static constexpr int32_t MOUSE_BUTTON_MIDDLE = 2;
 
 public:
     static std::shared_ptr<PointerEvent> from(std::shared_ptr<InputEvent> inputEvent);
@@ -422,10 +422,30 @@ public:
      * @since 8
      */
     void SetPointerAction(int32_t pointerAction);
+
+    /**
+     * @brief Dumps the action of this pointer input event as a string.
+     * @return Returns the pointer to the string.
+     * @since 8
+     */
     const char* DumpPointerAction() const;
 
+    /**
+     * @brief Sets the value of the <b>skipInspection</b> flag.
+     * @param skipInspection Indicates the value of the <b>skipInspection</b> flag to set. The value <b>true</b> means that the
+     * event will skip the processing of the listener and interceptor, and the value <b>false</b> means the opposite.
+     * @return void
+     * @since 8
+     */
     void SetSkipInspection(bool skipInspection);
+
+    /**
+     * @brief Reads the value of the <b>skipInspection</b> flag.
+     * @return Returns <b>true</b> if the event needs to skip the processing of the listener and interceptor; returns <b>false></b> otherwise.
+     * @since 8
+     */
     bool NeedSkipInspection();
+
     /**
      * @brief Obtains the pointer ID in this event.
      * @return Returns the pointer ID.
@@ -534,6 +554,12 @@ public:
      * @since 8
      */
     void SetSourceType(int32_t sourceType);
+
+    /**
+     * @brief Dumps the source type of this pointer input event as a string.
+     * @return Returns the pointer to the string.
+     * @since 8
+     */
     const char* DumpSourceType() const;
 
     /**

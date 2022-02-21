@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,7 +34,6 @@ const bool REGISTER_RESULT =
 int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programName, const int32_t moduleType,
                                                      int32_t &toReturnClientFd)
 {
-    MMI_LOGD("enter");
     MMI_LOGI("MultimodalInputConnectService::AllocSocketFd enter, programName:%{public}s,moduleType:%{public}d",
              programName.c_str(), moduleType);
     if (udsServer_ == nullptr) {
@@ -53,7 +52,6 @@ int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programN
 
     MMI_LOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
         programName.c_str(), moduleType);
-
     return RET_OK;
 }
 
