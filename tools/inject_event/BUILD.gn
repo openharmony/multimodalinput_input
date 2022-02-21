@@ -67,4 +67,3 @@ group("inject_event") {
   deps = []
   deps += [ ":InjectEventTest" ]
 }
-
