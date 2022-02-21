@@ -281,7 +281,6 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
 
 int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
 {
-    int32_t ret = RET_OK;
     sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
     if (req == nullptr) {
         MMI_LOGE("read data error.");
@@ -290,6 +289,7 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
     MMI_LOGIK("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
 
     int32_t clientFd = INVALID_SOCKET_FD;
+    int32_t ret = RET_OK;
     ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
     if (ret != RET_OK) {
         MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
