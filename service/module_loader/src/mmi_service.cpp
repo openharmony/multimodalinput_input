@@ -151,7 +151,7 @@ bool MMIService::InitLibinputService()
 bool MMIService::InitService()
 {
     CHKF(state_ == ServiceRunningState::STATE_NOT_START, SASERVICE_INIT_FAIL);
-    CHKF(Publish(DelayedSingleton<MMIService>::GetInstance().get()), SASERVICE_INIT_FAIL);
+    CHKF(Publish(this), SASERVICE_INIT_FAIL);
     CHKF(EpollCreat(MAX_EVENT_SIZE) >= 0, SASERVICE_INIT_FAIL);
     auto ret = AddEpoll(EPOLL_EVENT_SOCKET, epollFd_);
     if (ret <  0) {
