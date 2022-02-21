@@ -50,9 +50,8 @@ void CheckDefineOutput(const char* fmt, Ts... args)
 {
     using namespace OHOS::MMI;
     CHKPV(fmt);
-    int32_t ret = 0;
     char buf[MAX_STREAM_BUF_SIZE] = {};
-    ret = snprintf_s(buf, MAX_STREAM_BUF_SIZE, MAX_STREAM_BUF_SIZE - 1, fmt, args...);
+    int32_t ret = snprintf_s(buf, MAX_STREAM_BUF_SIZE, MAX_STREAM_BUF_SIZE - 1, fmt, args...);
     if (ret < 0) {
         KMSG_LOGI("call snprintf_s fail.ret = %d", ret);
         return;
@@ -209,8 +208,8 @@ void MMIService::OnStart()
     auto tid = GetThisThreadIdOfLL();
     MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
 
-    int32_t ret = 0;
-    CHK((RET_OK == (ret = Init())), ret);
+    int32_t ret = Init();
+    CHK((RET_OK == ret, ret);
     state_ = ServiceRunningState::STATE_RUNNING;
     MMI_LOGD("MMIService Started successfully");
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
@@ -289,8 +288,7 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
     MMI_LOGIK("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
 
     int32_t clientFd = INVALID_SOCKET_FD;
-    int32_t ret = RET_OK;
-    ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
+    int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
     if (ret != RET_OK) {
         MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
         reply.WriteInt32(RET_ERR);
