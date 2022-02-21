@@ -18,11 +18,11 @@
 OHOS::MMI::VirtualFinger::VirtualFinger() : VirtualDevice("Virtual Finger",
     BUS_USB, 0x56a, 0x392)
 {
-    const int32_t ABS_MAX_X = 6400;
-    const int32_t ABS_MAX_Y = 4000;
-    const int32_t ABS_MAX_MT_SLOT = 9;
-    const int32_t ABS_MAX_MT_TOUCH_MAJOR = 21;
-    const int32_t ABS_MAX_MT_TRACKING_ID = 65535;
+    constexpr int32_t ABS_MAX_X = 6400;
+    constexpr int32_t ABS_MAX_Y = 4000;
+    constexpr int32_t ABS_MAX_MT_SLOT = 9;
+    constexpr int32_t ABS_MAX_MT_TOUCH_MAJOR = 21;
+    constexpr int32_t ABS_MAX_MT_TRACKING_ID = 65535;
 
     dev_.absmin[ABS_X] = 0;
     dev_.absmax[ABS_X] = ABS_MAX_X;

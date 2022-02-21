@@ -153,8 +153,8 @@ bool OHOS::MMI::VirtualDevice::CreateKey()
 
 bool OHOS::MMI::VirtualDevice::SetAbsResolution(const std::string deviceName)
 {
-    const int32_t ABS_RESOLUTION = 200;
-    const int32_t ABS_RESOLUTION_FINGER = 40;
+    constexpr int32_t ABS_RESOLUTION = 200;
+    constexpr int32_t ABS_RESOLUTION_FINGER = 40;
     if (deviceName == "Virtual Stylus" || deviceName == "Virtual Touchpad") {
         absTemp_.code = 0x00;
         absTemp_.absinfo.resolution = ABS_RESOLUTION;
