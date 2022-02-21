@@ -15,9 +15,6 @@
 #ifndef CONFIG_MULTIMODAL_H
 #define CONFIG_MULTIMODAL_H
 
-#ifndef DEBUG_CODE_TEST
-#define DEBUG_CODE_TEST             // Test code build switch
-#endif
 #define DEF_SEAT_ID "seat0"         // Default libinput seat
 
 #ifndef OHOS_BUILD

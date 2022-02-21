@@ -16,7 +16,7 @@
 #ifdef OHOS_WESTEN_MODEL
 #include "message_post.h"
 #include "uds_socket.h"
-#include "log.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {

@@ -711,7 +711,7 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
 {
     MMI_LOGD("begin");
     CHKPR(key, PARAM_INPUT_INVALID);
-    if (key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
+    if (!key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         if (InterceptorMgrGbl.OnKeyEvent(key)) {
             MMI_LOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
                 key->GetKeyCode());
@@ -847,14 +847,14 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
              "action:%{public}d,actionStartTime:%{public}" PRId64 ","
              "flag:%{public}d,pointerAction:%{public}d,sourceType:%{public}d,"
              "VerticalAxisValue:%{public}.02f, HorizontalAxisValue:%{public}.02f,"
-             "pointerCount:%{public}d",
+             "pointerCount:%{public}zu",
              pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
              pointerEvent->GetFlag(), pointerEvent->GetPointerAction(),
              pointerEvent->GetSourceType(),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
-             static_cast<int32_t>(pointerIds.size()));
+             pointerIds.size());
 
     for (const auto &pointerId : pointerIds) {
         OHOS::MMI::PointerEvent::PointerItem item;

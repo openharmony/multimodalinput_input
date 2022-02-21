@@ -15,7 +15,7 @@
 #ifndef DEFINE_MULTIMODAL_H
 #define DEFINE_MULTIMODAL_H
 
-#include "log.h"
+#include "mmi_log.h"
 
 #ifndef RET_OK
     #define RET_OK (0)

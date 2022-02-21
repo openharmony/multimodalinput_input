@@ -17,19 +17,18 @@
 #include <codecvt>
 #include <gtest/gtest.h>
 #include "error_multimodal.h"
-#include "log.h"
+#include "media_event_handler.h"
+#include "mmi_log.h"
 #include "mmi_token.h"
 #include "multimodal_event_handler.h"
 #include "proto.h"
 #include "string_ex.h"
 #include "util_ex.h"
-#include "media_event_handler.h"
 
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
 using namespace OHOS;
-
 
 class EventHandleMediaTest : public testing::Test {
 public:

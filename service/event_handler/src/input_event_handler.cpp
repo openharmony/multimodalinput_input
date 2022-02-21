@@ -247,7 +247,7 @@ void InputEventHandler::OnCheckEventReport()
     auto curSysClock = GetSysClockTime();
     auto lostTime = curSysClock - initSysClock_;
     if (lostTime < MAX_DID_TIME) {
-        MMI_LOGD("The lost time is less than the max done time which is set to 3s, lostTime:%{public}", lostTime);
+        MMI_LOGD("The lost time is less than the max done time which is 3s, lostTime:%{public}" PRId64, lostTime);
         return;
     }
     MMI_LOGE("Event not responding. id:%{public}" PRId64 ",eventType:%{public}d,initSysClock:%{public}" PRId64 ","
@@ -606,6 +606,11 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 {
     MMI_LOGD("Enter");
     CHKPR(event, ERROR_NULL_POINTER);
+    auto type = libinput_event_get_type(event);
+    if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
+        MMI_LOGI("This touch event is canceled type:%{public}d", type);
+        return RET_OK;
+    }
     auto point = TouchTransformPointManger->OnLibinputTouchEvent(event);
     CHKPR(point, ERROR_NULL_POINTER);
     int32_t pointerId = point->GetId();
@@ -613,7 +618,6 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, pointerId);
     eventDispatch_.HandlePointerEvent(point);
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, pointerId);
-    auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         point->RemovePointerItem(point->GetPointerId());
         MMI_LOGD("This touch event is up remove this finger");

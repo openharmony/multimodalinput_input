@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
+#include "multimodal_input_connect_stub.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include "error_multimodal.h"
-#include "log.h"
+#include "mmi_log.h"
 #include "multimodal_input_connect_define.h"
 #include "string_ex.h"
-#include "multimodal_input_connect_stub.h"
 
 namespace OHOS {
 namespace MMI {
@@ -39,9 +39,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
     }
 
     switch (code) {
-        case static_cast<uint32_t>(IMultimodalInputConnect::ALLOC_SOCKET_FD):
+        case IMultimodalInputConnect::ALLOC_SOCKET_FD:
             return StubHandleAllocSocketFd(data, reply);
-        case static_cast<uint32_t>(IMultimodalInputConnect::SET_EVENT_POINTER_FILTER):
+        case IMultimodalInputConnect::SET_EVENT_POINTER_FILTER:
             return StubAddInputEventFilter(data, reply);
         default:
             MMI_LOGE("unknown code:%{public}u, go switch defaut", code);

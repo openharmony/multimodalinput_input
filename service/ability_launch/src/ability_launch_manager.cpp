@@ -18,9 +18,9 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>
-#include "log.h"
-#include "file_ex.h"
 #include "ability_manager_client.h"
+#include "file_ex.h"
+#include "mmi_log.h"
 #include "ohos/aafwk/base/string_wrapper.h"
 #include "timer_manager.h"
 
@@ -225,7 +225,9 @@ bool AbilityLaunchManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> &k
     return false;
 }
 
-bool AbilityLaunchManager::Match(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key) {
+bool AbilityLaunchManager::Match(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key)
+{
+    MMI_LOGD("enter");
     if (key->GetKeyCode() != shortcutKey.finalKey || shortcutKey.triggerType != key->GetKeyAction()) {
         return false;
     }
@@ -246,7 +248,9 @@ bool AbilityLaunchManager::Match(const ShortcutKey &shortcutKey, const std::shar
     return true;
 }
 
-bool AbilityLaunchManager::HandleKeyDown(ShortcutKey &shortcutKey){
+bool AbilityLaunchManager::HandleKeyDown(ShortcutKey &shortcutKey)
+{
+    MMI_LOGD("enter");
     if (shortcutKey.keyDownDuration == 0) {
         MMI_LOGD("Start launch ability immediately");
         LaunchAbility(shortcutKey);
@@ -265,7 +269,9 @@ bool AbilityLaunchManager::HandleKeyDown(ShortcutKey &shortcutKey){
     return true;
 }
 
-bool AbilityLaunchManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey){
+bool AbilityLaunchManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey)
+{
+    MMI_LOGD("enter");
     if (shortcutKey.keyDownDuration == 0) {
         MMI_LOGD("Start launch ability immediately");
         LaunchAbility(shortcutKey);
@@ -287,7 +293,8 @@ bool AbilityLaunchManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
     }
 }
 
-bool AbilityLaunchManager::HandleKeyCancel(ShortcutKey &shortcutKey){
+bool AbilityLaunchManager::HandleKeyCancel(ShortcutKey &shortcutKey)
+{
     MMI_LOGD("enter");
     if (shortcutKey.timerId < 0) {
        MMI_LOGE("Skip, timerid < 0"); 

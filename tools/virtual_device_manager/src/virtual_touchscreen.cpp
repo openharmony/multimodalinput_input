@@ -18,13 +18,13 @@
 OHOS::MMI::VirtualTouchScreen::VirtualTouchScreen()
     : VirtualDevice("Virtual TouchScreen", BUS_USB, 0x6006, 0x6006)
 {
-    const int32_t ABS_MAX_X = 480;
-    const int32_t ABS_MAX_Y = 960;
-    const int32_t ABS_PRESSURE_MAX = 100;
-    const int32_t ABS_MT_ORIENTATION_MIN = -90;
-    const int32_t ABS_MT_ORIENTATION_MAX = 90;
-    const int32_t ABS_MT_BLOB_ID_MAX = 10;
-    const int32_t ABS_MT_TRACKING_ID_MAX = 9;
+    constexpr int32_t ABS_MAX_X = 480;
+    constexpr int32_t ABS_MAX_Y = 960;
+    constexpr int32_t ABS_PRESSURE_MAX = 100;
+    constexpr int32_t ABS_MT_ORIENTATION_MIN = -90;
+    constexpr int32_t ABS_MT_ORIENTATION_MAX = 90;
+    constexpr int32_t ABS_MT_BLOB_ID_MAX = 10;
+    constexpr int32_t ABS_MT_TRACKING_ID_MAX = 9;
 
     dev_.absmin[ABS_X] = 0;
     dev_.absmax[ABS_X] = ABS_MAX_X;
