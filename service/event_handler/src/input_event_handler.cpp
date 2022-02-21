@@ -205,8 +205,11 @@ void InputEventHandler::OnEvent(void *event)
     lastSysClock_ = 0;
     idSeed_ += 1;
     if (idSeed_ >= maxUInt64) {
+        MMI_LOGE("Invaild value. id:%{public}" PRId64, idSeed_);
         idSeed_ = 1;
+        return;
     }
+
     MMI_LOGT("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
              "initSysClock:%{public}" PRId64, idSeed_, tid, eventType_, initSysClock_);
 
@@ -250,11 +253,6 @@ void InputEventHandler::OnCheckEventReport()
     }
     MMI_LOGE("Event not responding. id:%{public}" PRId64 ",eventType:%{public}d,initSysClock:%{public}" PRId64 ","
              "lostTime:%{public}" PRId64, idSeed_, eventType_, initSysClock_, lostTime);
-}
-
-void InputEventHandler::RegistnotifyDeviceChange(NotifyDeviceChange cb)
-{
-    notifyDeviceChange_ = cb;
 }
 
 UDSServer* InputEventHandler::GetUDSServer()
