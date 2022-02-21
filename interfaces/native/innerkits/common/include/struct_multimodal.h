@@ -20,8 +20,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr int MAX_DEVICENAME = 64;
-    constexpr int MAX_UUIDSIZE = 64;
+    constexpr int32_t MAX_DEVICENAME = 64;
+    constexpr int32_t MAX_UUIDSIZE = 64;
     constexpr int32_t SYSTEMUID = 1000;
     constexpr int32_t MAX_SOLTED_COORDS_NUMS = 10;
 }
@@ -255,7 +255,7 @@ struct TabletAxes {
     double rotation;
     double slider;
     double wheel;
-    int wheel_discrete;
+    int32_t wheel_discrete;
     PhysEllipsis size;
 };
 
@@ -386,7 +386,7 @@ struct EventTabletPad {
     struct {
         enum TABLET_PAD_STRIP_AXIS_SOURCE source;
         double position;
-        int number;
+        int32_t number;
     } strip;
 };
 } // namespace MMI

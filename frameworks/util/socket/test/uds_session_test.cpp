@@ -28,9 +28,9 @@ class UDSSessionTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
-    int fd_ = -1;
+    int32_t fd_ = -1;
     static constexpr char PROGRAM_NAME[] = "uds_sesion_test";
-    const int moduleType_ = 3; // 3 CONNECT_MODULE_TYPE_ST_TEST
+    const int32_t moduleType_ = 3; // 3 CONNECT_MODULE_TYPE_ST_TEST
     static inline int32_t pid_ = 0;
     void SetUp() override;
     void TearDown()  override;
