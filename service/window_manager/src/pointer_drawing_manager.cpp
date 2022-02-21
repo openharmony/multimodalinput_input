@@ -164,8 +164,7 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
 void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas)
 {
     MMI_LOGD("enter");
-    PointerDrawingManager mdm;
-    std::unique_ptr<OHOS::Media::PixelMap> pixelmap = mdm.DecodeImageToPixelMap(IMAGE_POINTER_JPEG_PATH);
+    std::unique_ptr<OHOS::Media::PixelMap> pixelmap = DecodeImageToPixelMap(IMAGE_POINTER_JPEG_PATH);
     CHKPV(pixelmap);
     OHOS::Rosen::Drawing::Pen pen;
     pen.SetAntiAlias(true);
