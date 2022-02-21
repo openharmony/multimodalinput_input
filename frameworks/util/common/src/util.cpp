@@ -83,7 +83,7 @@ int64_t GetMicrotime()
 {
     timeval currentTime = {};
     gettimeofday(&currentTime, nullptr);
-    return currentTime.tv_sec * static_cast<int32_t>(1e6) + currentTime.tv_usec;
+    return currentTime.tv_sec * S2US + currentTime.tv_usec;
 }
 
 uint64_t GetSysClockTime()
@@ -93,9 +93,7 @@ uint64_t GetSysClockTime()
         MMI_LOGT("clock_gettime failed:%{public}s", strerror(errno));
         return 0;
     }
-
-    constexpr int32_t conversionStep = 1000;
-    return (ts.tv_sec * static_cast<uint64_t>(1e6)) + (ts.tv_nsec / conversionStep);
+    return (ts.tv_sec * S2US) + (ts.tv_nsec / US2NS);
 }
 
 int64_t GetMillisTime()
