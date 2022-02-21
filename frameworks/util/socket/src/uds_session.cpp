@@ -104,14 +104,14 @@ void UDSSession::AddEvent(int32_t id, uint64_t time)
 void UDSSession::DelEvents(int32_t id)
 {
     MMI_LOGI("begin");
-    int32_t count = 0;
-    for (auto &item : events_) {
-        ++count;
-        if (item.id == id) {
-            events_.erase(events_.begin(), events_.begin() + count);
-            MMI_LOGI("Delete events");
-        }
-    }
+    // int32_t count = 0;
+    // for (auto &item : events_) {
+    //     ++count;
+    //     if (item.id == id) {
+    //         events_.erase(events_.begin(), events_.begin() + count);
+    //         MMI_LOGI("Delete events");
+    //     }
+    // }
     MMI_LOGI("end");
 }
 
