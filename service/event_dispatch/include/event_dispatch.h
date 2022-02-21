@@ -68,6 +68,9 @@ protected:
         libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime);
     int32_t IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id);
 
+private:
+    void OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler isEventHandler);
+
 protected:
     int32_t touchDownFocusSurfaceId_ = 0;
     EventPackage eventPackage_;
@@ -80,7 +83,6 @@ protected:
         KEY_CHECKLAUNABILITY_EVENT = 2,
         KEY_SUBSCRIBE_EVENT = 3
     };
-    void OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler isEventHandler);
 #ifdef DEBUG_CODE_TEST
 private:
     const size_t windowCount_ = 2;

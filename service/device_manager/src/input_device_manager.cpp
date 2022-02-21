@@ -216,8 +216,7 @@ int32_t InputDeviceManager::FindInputDeviceId(libinput_device* inputDevice)
             return item.first;
         }
     }
-    MMI_LOGI("find input device id failed");
-    MMI_LOGD("end");
+    MMI_LOGE("find input device id failed");
     return INVALID_DEVICE_ID;
 }
 } // namespace MMI
