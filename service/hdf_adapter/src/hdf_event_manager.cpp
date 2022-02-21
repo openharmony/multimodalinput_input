@@ -221,7 +221,7 @@ int32_t OHOS::MMI::HdfEventManager::GetDeviceCount()
 {
     int32_t devcount = 0;
     int32_t ret = memset_s(mountDevIndex_, sizeof(DevDesc) * TOTAL_INPUT_DEVICE_COUNT, 0,
-                       sizeof(DevDesc) * TOTAL_INPUT_DEVICE_COUNT);
+                           sizeof(DevDesc) * TOTAL_INPUT_DEVICE_COUNT);
     if (ret != EOK) {
         MMI_LOGE("call memset_s fail. ret = %d", ret);
     }
