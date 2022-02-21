@@ -34,7 +34,7 @@
 #include "config_multimodal.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-#include "log.h"
+#include "mmi_log.h"
 #include "securec.h"
 #include "uuid.h"
 

@@ -14,7 +14,7 @@
  */
 
 #include "injection_event_dispatch.h"
-#include "log.h"
+#include "mmi_log.h"
 
 namespace {
 [[maybe_unused]] static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {

@@ -14,7 +14,7 @@
  */
 
 #include "event_filter_wrap.h"
-#include "log.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {

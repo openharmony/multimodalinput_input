@@ -14,7 +14,7 @@
  */
 
 #include "standardized_event_handler.h"
-#include "log.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {

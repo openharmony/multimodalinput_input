@@ -20,10 +20,10 @@
 #include <string>
 #include <ctime>
 #include <type_traits>
+#include "define_multimodal.h"
+#include "mmi_log.h"
 #include "securec.h"
 #include "struct_multimodal.h"
-#include "define_multimodal.h"
-#include "log.h"
 #include "util.h"
 
 namespace OHOS {

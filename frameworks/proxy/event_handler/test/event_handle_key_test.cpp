@@ -16,20 +16,19 @@
 #include <locale>
 #include <codecvt>
 #include <gtest/gtest.h>
-#include "string_ex.h"
-#include "proto.h"
-#include "util_ex.h"
-#include "log.h"
 #include "error_multimodal.h"
-#include "multimodal_event_handler.h"
 #include "key_event_handler.h"
+#include "mmi_log.h"
 #include "mmi_token.h"
+#include "multimodal_event_handler.h"
+#include "proto.h"
+#include "string_ex.h"
+#include "util_ex.h"
 
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
 using namespace OHOS;
-
 
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventHandleKeyTest" };
 
