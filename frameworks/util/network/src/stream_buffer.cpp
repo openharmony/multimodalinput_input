@@ -39,7 +39,7 @@ void StreamBuffer::Clean()
     CHK(EOK == memset_sp(&szBuff_, sizeof(szBuff_), 0, sizeof(szBuff_)), MEMCPY_SEC_FUN_FAIL);
 }
 
-bool StreamBuffer::SetReadIdx(uint32_t idx)
+bool StreamBuffer::SetReadIdx(size_t idx)
 {
     CHKF(idx <= wIdx_, PARAM_INPUT_INVALID);
     rIdx_ = idx;
@@ -54,7 +54,7 @@ bool StreamBuffer::Read(std::string &buf)
         return false;
     }
     buf = ReadBuf();
-    rIdx_ += static_cast<uint32_t>(buf.size()) + 1;
+    rIdx_ += buf.size() + 1;
     return (buf.size() > 0);
 }
 
@@ -98,7 +98,7 @@ bool StreamBuffer::Read(char *buf, size_t size)
         rwErrorStatus_ = ErrorStatus::ES_READ;
         return false;
     }
-    rIdx_ += static_cast<uint32_t>(size);
+    rIdx_ += size;
     rCount_ += 1;
     return true;
 }
@@ -128,7 +128,7 @@ bool StreamBuffer::Write(const char *buf, size_t size)
         rwErrorStatus_ = ErrorStatus::ES_WRITE;
         return false;
     }
-    wIdx_ += static_cast<uint32_t>(size);
+    wIdx_ += size;
     wCount_ += 1;
     return true;
 }

@@ -95,7 +95,7 @@ std::vector<int32_t> GetIntArray(const napi_env &env, const napi_value &value)
         return {};
     }
     std::vector<int32_t> paramArrays;
-    for (size_t i = 0; i < arrayLength; i++) {
+    for (uint32_t i = 0; i < arrayLength; i++) {
         napi_value napiElement;
         if (napi_get_element(env, value, i, &napiElement) != napi_ok) {
             MMI_LOGE("Get element failed");
@@ -173,8 +173,8 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
         return JS_CALLBACK_EVENT_FAILED;
     }
     auto it = callbacks[event->eventType];
-    MMI_LOGD("EventType: %{public}s, keyEventMonitorInfos: %{public}d", event->eventType.c_str(),
-        static_cast<int32_t>(it.size()));
+    MMI_LOGD("EventType: %{public}s, keyEventMonitorInfos: %{public}zu",
+        event->eventType.c_str(), it.size());
     napi_value handler1 = nullptr;
     napi_status status = napi_get_reference_value(env, event->callback[0], &handler1);
     if (status != napi_ok) {
@@ -207,13 +207,12 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
             }
             delete monitorInfo;
             monitorInfo = nullptr;
-            MMI_LOGD("Callback has deleted, size: %{public}d",
-                static_cast<int32_t>(it.size()));
+            MMI_LOGD("Callback has deleted, size: %{public}zu", it.size());
             return JS_CALLBACK_EVENT_SUCCESS;
         }
         iter++;
     }
-    MMI_LOGD("Callback size: %{public}d", static_cast<int32_t>(it.size()));
+    MMI_LOGD("Callback size: %{public}zu", it.size());
     return JS_CALLBACK_EVENT_NOT_EXIST;
 }
 
