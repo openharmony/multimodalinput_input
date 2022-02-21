@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -82,7 +82,7 @@ constexpr static int32_t RATE_PARA = 2;
 constexpr static int32_t ONE_MILLION = 1024 * 1024;
 
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MmiConsoleLog" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MmiConsoleLog" };
 }
 
 // LogManager
@@ -128,15 +128,15 @@ static std::pair<std::string, std::string> SplitString(const std::string& str, c
 const std::vector<char> RemovePrivacyIdentifierInFmt(const std::string& format)
 {
     const size_t formatLen = format.size();
-    const size_t oneLineSize = 10;
     std::vector<char> format2;
     format2.reserve(formatLen + 1);
 
     size_t readPos = 0;
     size_t writePos = 0;
+    constexpr size_t oneLineSize = 10;
     while (readPos < formatLen) {
         if (formatLen - readPos >= (oneLineSize - 1)) {
-            const size_t publicFormatLen = 9;
+            constexpr size_t publicFormatLen = 9;
             if (format.size() >= publicFormatLen && format.substr(readPos, publicFormatLen) == "%{public}") {
                 readPos += (oneLineSize - 1);
                 format2.push_back('%');
@@ -146,7 +146,7 @@ const std::vector<char> RemovePrivacyIdentifierInFmt(const std::string& format)
         }
 
         if (formatLen - readPos >= oneLineSize) {
-            const size_t privateFormatLen = 10;
+            constexpr size_t privateFormatLen = 10;
             if (format.size() >= privateFormatLen && format.substr(readPos, privateFormatLen) == "%{private}") {
                 readPos += oneLineSize;
                 format2.push_back('%');
@@ -314,9 +314,9 @@ void LogManager::WriteFile(LogDataPtr pLog)
         return;
     }
     // 时间
-    char longTime[LOG_MAX_TIME_LEN] = {};
     tm* p = localtime(&pLog->curTime);
     CHKPV(p);
+    char longTime[LOG_MAX_TIME_LEN] = {};
     int32_t ret = snprintf_s(longTime, sizeof(longTime), LOG_MAX_TIME_LEN, "%02d-%02d-%02d %02d:%02d:%02d.%03d",
                              p->tm_year + AD_1900, p->tm_mon + 1, p->tm_mday, p->tm_hour, p->tm_min, p->tm_sec, pLog->precise);
     if (ret < 0) {
@@ -501,8 +501,8 @@ void LogManager::ParseLogLimitSize(const std::string& str)
 {
     size_t size = limitSize_;
     size_t limit = atoi(str.c_str());
-    const size_t minLimitSize = 10;
-    const size_t maxLimitSize = 1024;
+    constexpr size_t minLimitSize = 10;
+    constexpr size_t maxLimitSize = 1024;
     limit = (limit <= 0) ? minLimitSize : limit;
     limit = (limit > maxLimitSize) ? maxLimitSize : limit;
     limitSize_ = limit * ONE_MILLION;
@@ -839,8 +839,8 @@ LogData::LogData()
     curLine = 0;
     level = 0;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 bool VerifyLogManagerRun()
 {

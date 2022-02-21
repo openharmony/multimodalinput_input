@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -84,7 +84,6 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 
 bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Handle PointerEvent");
     CHKPF(pointerEvent);
     if (interceptors_.HandleEvent(pointerEvent)) {
         MMI_LOGD("Pointer event was intercepted");
@@ -221,7 +220,6 @@ bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId,
 
 void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Update consumption state");
     CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         MMI_LOGE("This is not a touch-screen event");

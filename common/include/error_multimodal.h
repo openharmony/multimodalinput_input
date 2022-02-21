@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -195,5 +195,5 @@ namespace OHOS {
         MMI_SERVICE_INVALID = 0, // 多模服务不存在，多模输入服务异常
         MMI_SERVICE_RUNNING,     // 多模服务运行正常
     };
-}
+} // namespace OHOS
 #endif // ERROR_MULTIMODAL_H
