@@ -47,7 +47,7 @@ OHOS::MMI::UDSServer::~UDSServer()
 void OHOS::MMI::UDSServer::UdsStop()
 {
     std::lock_guard<std::mutex> lock(mux_);
-    isRun_ = false;
+    isRunning_ = false;
     if (epollFd_ != -1) {
         close(epollFd_);
         epollFd_ = -1;
@@ -62,7 +62,7 @@ void OHOS::MMI::UDSServer::UdsStop()
     }
 }
 
-int32_t OHOS::MMI::UDSServer::GetFdByPid(int32_t pid)
+int32_t OHOS::MMI::UDSServer::GetClientFd(int32_t pid)
 {
     std::lock_guard<std::mutex> lock(mux_);
     auto it = idxPidMap_.find(pid);
@@ -74,7 +74,7 @@ int32_t OHOS::MMI::UDSServer::GetFdByPid(int32_t pid)
     return it->second;
 }
 
-int32_t OHOS::MMI::UDSServer::GetPidByFd(int32_t fd)
+int32_t OHOS::MMI::UDSServer::GetClientPid(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mux_);
     auto it = sessionsMap_.find(fd);
@@ -91,7 +91,7 @@ bool OHOS::MMI::UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
     std::lock_guard<std::mutex> lock(mux_);
     CHKF(fd >= 0, PARAM_INPUT_INVALID);
     auto ses = GetSession(fd);
-    if (!ses) {
+    if (ses == nullptr) {
         MMI_LOGE("SendMsg fd:%{public}d not found, The message was discarded. errCode:%{public}d",
                  fd, SESSION_NOT_FOUND);
         return false;
@@ -193,7 +193,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName,
     nev.data.fd = serverFd;
     ret = EpollCtl(serverFd, EPOLL_CTL_ADD, nev);
 #else
-    ret = EpollCtlAdd(EPOLL_EVENT_SOCKET, serverFd);
+    ret = AddEpoll(EPOLL_EVENT_SOCKET, serverFd);
 #endif
     if (ret != RET_OK) {
         cleanTaskWhenError();
@@ -250,9 +250,9 @@ void OHOS::MMI::UDSServer::OnDisconnected(SessionPtr s)
     MMI_LOGI("UDSServer::OnDisconnected session desc:%{public}s", s->GetDescript().c_str());
 }
 
-int32_t OHOS::MMI::UDSServer::EpollCtlAdd(EpollEventType type, int32_t fd)
+int32_t OHOS::MMI::UDSServer::AddEpoll(EpollEventType type, int32_t fd)
 {
-    MMI_LOGE("UDSServer::EpollCtlAdd This information should not exist. Subclasses should implement this function.");
+    MMI_LOGE("UDSServer::AddEpoll This information should not exist. Subclasses should implement this function.");
     return RET_ERR;
 }
 
@@ -263,7 +263,7 @@ void OHOS::MMI::UDSServer::SetRecvFun(MsgServerFunCallback fun)
 
 bool OHOS::MMI::UDSServer::StartServer()
 {
-    isRun_ = true;
+    isRunning_ = true;
     t_ = std::thread(std::bind(&UDSServer::OnThread, this));
     t_.detach();
     return true;
@@ -426,7 +426,7 @@ void OHOS::MMI::UDSServer::DelSession(int32_t fd)
 {
     MMI_LOGD("DelSession begin fd:%{public}d", fd);
     CHK(fd >= 0, PARAM_INPUT_INVALID);
-    auto pid = GetPidByFd(fd);
+    auto pid = GetClientPid(fd);
     if (pid > 0) {
         idxPidMap_.erase(pid);
     }
@@ -449,7 +449,7 @@ void OHOS::MMI::UDSServer::OnThread()
 
     std::map<int32_t, StreamBufData> bufMap;
     epoll_event ev[MAX_EVENT_SIZE] = {};
-    while (isRun_) {
+    while (isRunning_) {
         auto count = EpollWait(*ev, MAX_EVENT_SIZE, DEFINE_EPOLL_TIMEOUT);
         if (count > 0) {
             bufMap.clear();

@@ -96,7 +96,7 @@ MMIService::~MMIService()
 {
 }
 
-int32_t MMIService::EpollCtlAdd(EpollEventType type, int32_t fd)
+int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 {
     CHKR((type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END), PARAM_INPUT_INVALID, RET_ERR);
     CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
@@ -138,13 +138,13 @@ bool MMIService::InitLibinputService()
     CHKF(input_.Init(std::bind(&InputEventHandler::OnEvent, inputEventHdr_, std::placeholders::_1),
          DEF_INPUT_SEAT), LIBINPUT_INIT_FAIL);
     auto inputFd = input_.GetInputFd();
-    auto ret = EpollCtlAdd(EPOLL_EVENT_INPUT, inputFd);
+    auto ret = AddEpoll(EPOLL_EVENT_INPUT, inputFd);
     if (ret <  0) {
-        MMI_LOGE("EpollCtlAdd error ret:%{public}d", ret);
+        MMI_LOGE("AddEpoll error ret:%{public}d", ret);
         EpollClose();
         return false;
     }
-    MMI_LOGD("EpollCtlAdd, epollfd:%{public}d,fd:%{public}d", mmiFd_, inputFd);
+    MMI_LOGD("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, inputFd);
     return true;
 }
 
@@ -153,13 +153,13 @@ bool MMIService::InitService()
     CHKF(state_ == ServiceRunningState::STATE_NOT_START, SASERVICE_INIT_FAIL);
     CHKF(Publish(DelayedSingleton<MMIService>::GetInstance().get()), SASERVICE_INIT_FAIL);
     CHKF(EpollCreat(MAX_EVENT_SIZE) >= 0, SASERVICE_INIT_FAIL);
-    auto ret = EpollCtlAdd(EPOLL_EVENT_SOCKET, epollFd_);
+    auto ret = AddEpoll(EPOLL_EVENT_SOCKET, epollFd_);
     if (ret <  0) {
-        MMI_LOGE("EpollCtlAdd error ret:%{public}d", ret);
+        MMI_LOGE("AddEpoll error ret:%{public}d", ret);
         EpollClose();
         return false;
     }
-    MMI_LOGD("EpollCtlAdd, epollfd:%{public}d,fd:%{public}d", mmiFd_, epollFd_);
+    MMI_LOGD("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, epollFd_);
     return true;
 }
 
@@ -389,9 +389,9 @@ bool MMIService::InitSignalHandler()
         return false;
     }
 
-    retCode = EpollCtlAdd(EPOLL_EVENT_SIGNAL, fdSignal);
+    retCode = AddEpoll(EPOLL_EVENT_SIGNAL, fdSignal);
     if (retCode < 0) {
-        MMI_LOGE("EpollCtlAdd signalFd failed:%{public}d", retCode);
+        MMI_LOGE("AddEpoll signalFd failed:%{public}d", retCode);
         close(fdSignal);
         return false;
     }
@@ -406,7 +406,9 @@ void MMIService::OnSignalEvent(int32_t signalFd)
     signalfd_siginfo sigInfo;
     int32_t size = ::read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
     if (size != sizeof(signalfd_siginfo)) {
-        MMI_LOGE("read signal info faild, invalid size:%{public}d", size);
+        const int errnoSaved = errno;
+        MMI_LOGE("read signal info faild, invalid size:%{public}d,errno:%{public}d,%{public}s",
+            size, errnoSaved, strerror(errnoSaved));
         return;
     }
 
