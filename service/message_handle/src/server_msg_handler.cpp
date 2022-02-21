@@ -468,7 +468,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
         return FOCUS_ID_OBTAIN_FAIL;
     }
 #ifdef DEBUG_CODE_TEST
-    int32_t pid = udsServer_->GetPidByFd(appInfo.fd);
+    int32_t pid = udsServer_->GetClientPid(appInfo.fd);
     if (pid != RET_ERR) {
         MMI_LOGT("Inject keyCode:%{public}d,action:%{public}d,focusPid:%{public}d",
             key.key, key.state, pid);
@@ -691,7 +691,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPac
     int32_t finalKeyDownDuration = 0;
     pkt >> subscribeId >> finalKey >> isFinalKeyDown >> finalKeyDownDuration >> preKeySize;
     std::vector<int32_t> preKeys;
-    for (int32_t i = 0; i < preKeySize; ++i) {
+    for (uint32_t i = 0; i < preKeySize; ++i) {
         int32_t tmpKey = -1;
         pkt >> tmpKey;
         preKeys.push_back(tmpKey);

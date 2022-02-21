@@ -15,7 +15,7 @@
 #include "input_handler_manager.h"
 #include "bytrace.h"
 #include "input_handler_type.h"
-#include "log.h"
+#include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "net_packet.h"
 #include "proto.h"

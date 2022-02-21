@@ -20,10 +20,10 @@
 #include <string>
 #include <ctime>
 #include <type_traits>
+#include "define_multimodal.h"
+#include "mmi_log.h"
 #include "securec.h"
 #include "struct_multimodal.h"
-#include "define_multimodal.h"
-#include "log.h"
 #include "util.h"
 
 namespace OHOS {
@@ -35,11 +35,10 @@ namespace MMI {
         if (fmt == nullptr) {
             return RET_ERR;
         }
-        int32_t ret = 0;
 
         constexpr size_t bufSize = 1024 * 10;
         char buf[bufSize] = {};
-        ret = snprintf_s(buf, bufSize, bufSize - 1, fmt, args...);
+        int32_t ret = snprintf_s(buf, bufSize, bufSize - 1, fmt, args...);
         if (ret < 0) {
             return ret;
         }

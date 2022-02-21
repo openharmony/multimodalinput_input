@@ -17,9 +17,9 @@
 #define EVENT_FILTER_STUB_H
 
 #include "i_event_filter.h"
-#include "log.h"
 #include "iremote_stub.h"
 #include "message_parcel.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {

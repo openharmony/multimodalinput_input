@@ -14,15 +14,15 @@
  */
 #include <display_type.h>
 #include <ui/rs_surface_node.h>
-#include "pointer_drawing_manager.h"
 #include "libmmi_util.h"
+#include "image/bitmap.h"
+#include "image_source.h"
 #include "image_type.h"
 #include "image_utils.h"
-#include "image_source.h"
-#include "pixel_map.h"
-#include "log.h"
-#include "image/bitmap.h"
 #include "input_device_manager.h"
+#include "mmi_log.h"
+#include "pixel_map.h"
+#include "pointer_drawing_manager.h"
 
 namespace OHOS {
 namespace MMI {

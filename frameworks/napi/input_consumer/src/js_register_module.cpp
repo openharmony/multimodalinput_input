@@ -24,14 +24,14 @@ namespace OHOS {
 namespace MMI {
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
+    constexpr size_t EVENT_NAME_LEN = 64;
+    constexpr size_t ARGC_NUM = 3;
+    constexpr size_t ARGV_FIRST = 0;
+    constexpr size_t ARGV_SECOND = 1;
+    constexpr size_t ARGV_THIRD = 2;
+    constexpr size_t PRE_KEYS_SIZE = 4;
 }
 
-constexpr uint32_t EVENT_NAME_LEN = 64;
-constexpr uint32_t ARGC_NUM = 3;
-constexpr uint32_t ARGV_FIRST = 0;
-constexpr uint32_t ARGV_SECOND = 1;
-constexpr uint32_t ARGV_THIRD = 2;
-constexpr uint32_t PRE_KEYS_SIZE = 4;
 static Callbacks callbacks = {};
 
 int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
@@ -86,7 +86,7 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
         return ERROR_CODE;
     }
     std::vector<int32_t> preKeys = GetIntArray(env, receiceValue);
-    MMI_LOGD("PreKeys size:%{public}d", static_cast<int32_t>(preKeys.size()));
+    MMI_LOGD("PreKeys size:%{public}zu", preKeys.size());
     std::vector<int32_t> sortPrekeys = preKeys;
     sort(sortPrekeys.begin(), sortPrekeys.end());
     keyOption->SetPreKeys(preKeys);
@@ -177,7 +177,7 @@ static void SubKeyEventCallback(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     while (iter != callbacks.end()) {
         auto &list = iter->second;
         iter++;
-        MMI_LOGD("list size:%{public}d", static_cast<int32_t>(list.size()));
+        MMI_LOGD("list size:%{public}zu", list.size());
         auto infoIter = list.begin();
         while (infoIter != list.end()) {
             auto monitorInfo = *infoIter;

@@ -17,7 +17,7 @@
 #include <chrono>
 #include <thread>
 #include "iservice_registry.h"
-#include "log.h"
+#include "mmi_log.h"
 #include "multimodal_input_connect_death_recipient.h"
 #include "multimodal_input_connect_define.h"
 #include "system_ability_definition.h"
