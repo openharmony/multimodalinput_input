@@ -138,6 +138,7 @@ group("unittests") {
     "frameworks/util:ut-mmi-util",
     "service:ut-mmi-service",
     "tools/event_inject:ut-event-injection",
+    "tools/inject_event:inject_event",
     "tools/virtual_device_manager:ut-virtual-device",
   ]
 }
