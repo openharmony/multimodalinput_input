@@ -40,26 +40,6 @@ namespace MMI {
 
 static std::atomic_bool g_isRun(false);
 
-#ifdef DEBUG_CODE_TEST
-static int64_t g_llStartTime = 0;
-static std::atomic_bool g_isAllRun(false);
-
-bool IsMmiServerWorking()
-{
-    return !!g_isAllRun;
-}
-
-void SetMmiServerWorking()
-{
-    g_isAllRun = true;
-}
-
-int64_t GetMmiServerStartTime()
-{
-    return g_llStartTime;
-}
-#endif // DEBUG_CODE_TEST
-
 #ifdef OHOS_WESTEN_MODEL
 namespace {
 void OnThreadTermination(int32_t outTime, uint64_t tid, const std::string& remark)
@@ -114,9 +94,6 @@ void OnThread()
             break;
         }
     }
-#ifdef DEBUG_CODE_TEST
-    g_isAllRun = false;
-#endif
     MMI_LOGI("libmmi_main OnThread end...");
 }
 }
@@ -140,13 +117,6 @@ void StartMmiServer(void)
 {
 #ifdef OHOS_BUILD_MMI_DEBUG
     VerifyLogManagerRun();
-#endif
-
-#ifdef DEBUG_CODE_TEST
-    using namespace OHOS::MMI;
-    uint64_t tid = OHOS::MMI::GetThisThreadIdOfLL();
-    g_llStartTime = OHOS::MMI::GetMillisTime();
-    MMI_LOGI("start tid:%" PRId64 ",current timestamp:%" PRId64" Ms", tid, g_llStartTime);
 #endif
     g_isRun = true;
     static std::thread t(&OnThread);
