@@ -466,7 +466,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent>
     MMI_LOGD("enter");
     int32_t pid = GetPidUpdateTarget(inputEvent);
     CHKR(pid > 0, PID_OBTAIN_FAIL, RET_ERR);
-    int32_t fd = udsServer_->GetFdByPid(pid);
+    int32_t fd = udsServer_->GetClientFd(pid);
     CHKR(fd >= 0, FD_OBTAIN_FAIL, RET_ERR);
     MMI_LOGD("leave");
     return fd;
@@ -916,7 +916,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     pointerItem.SetLocalX(localX);
     pointerItem.SetLocalY(localY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-    auto fd = udsServer_->GetFdByPid(focusWindow->pid);
+    auto fd = udsServer_->GetClientFd(focusWindow->pid);
     auto size = pointerEvent->GetPressedButtons();
 
     MMI_LOGD("fd:%{public}d,pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
@@ -982,7 +982,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
     pointerItem.SetLocalY(localY);
     pointerEvent->RemovePointerItem(pointerId);
     pointerEvent->AddPointerItem(pointerItem);
-    auto fd = udsServer_->GetFdByPid(touchWindow->pid);
+    auto fd = udsServer_->GetClientFd(touchWindow->pid);
     MMI_LOGD("pid:%{public}d,fd:%{public}d,globalX01:%{public}d,"
              "globalY01:%{public}d,localX:%{public}d,localY:%{public}d,"
              "TargetWindowId:%{public}d,AgentWindowId:%{public}d",
@@ -1038,7 +1038,7 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
         return;
     }
     for (const auto &item : logicalDisplayInfo) {
-        bool isOutside[CORNER] = { false, false, false, false };   
+        bool isOutside[CORNER] = { false, false, false, false };
         if (item.id >= 0) {
             if (integerX < item.topLeftX) {
                 mouseLoction_.globleX = item.topLeftX;

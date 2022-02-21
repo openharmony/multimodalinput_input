@@ -51,8 +51,8 @@ public:
     void Broadcast(NetPacket& pkt);
     void Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt);
     void Dump(int32_t fd);
-    int32_t GetFdByPid(int32_t pid);
-    int32_t GetPidByFd(int32_t fd);
+    int32_t GetClientFd(int32_t pid);
+    int32_t GetClientPid(int32_t fd);
     void OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, epoll_event& ev);
     void OnEpollRecv(int32_t fd, const char *buf, size_t size);
 
@@ -68,7 +68,7 @@ protected:
 
     virtual void OnConnected(SessionPtr s);
     virtual void OnDisconnected(SessionPtr s);
-    virtual int32_t EpollCtlAdd(EpollEventType type, int32_t fd);
+    virtual int32_t AddEpoll(EpollEventType type, int32_t fd);
 
     bool StartServer();
     void OnRecv(int32_t fd, const char *buf, size_t size);
@@ -85,7 +85,7 @@ protected:
 protected:
     std::mutex mux_;
     std::thread t_;
-    bool isRun_ = false;
+    bool isRunning_ = false;
     MsgServerFunCallback recvFun_ = nullptr;
     std::map<int32_t, SessionPtr> sessionsMap_ = {};
     std::map<int32_t, int32_t> idxPidMap_ = {};
