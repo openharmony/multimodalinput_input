@@ -24,13 +24,12 @@ namespace OHOS {
 namespace MMI {
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
+    constexpr size_t EVENT_NAME_LEN = 64;
+    constexpr size_t ARGC_NUM = 2;
+    constexpr size_t ARGC_UT_NUM = 2;
+    constexpr size_t ARGV_FIRST = 0;
+    constexpr size_t ARGV_SECOND = 1;
 }
-
-constexpr uint32_t EVENT_NAME_LEN = 64;
-constexpr uint32_t ARGC_NUM = 2;
-constexpr uint32_t ARGC_UT_NUM = 2;
-constexpr uint32_t ARGV_FIRST = 0;
-constexpr uint32_t ARGV_SECOND = 1;
 
 template<class T>
 static StandEventPtr CreateEvent(napi_env env)
@@ -223,7 +222,6 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     OHOS::KeyEvent injectEvent;
     injectEvent.Initialize(0, isPressed, keyCode, keyDownDuration, 0, "", 0, 0, "", 0, false, 0, isIntercepted);
     int32_t response = MMIEventHdl.InjectEvent(injectEvent);
-
     if (napi_create_int32(env, response, &result) != napi_ok) {
         MMI_LOGE("call napi_create_int32 fail");
         return result;

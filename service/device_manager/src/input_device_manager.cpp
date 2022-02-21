@@ -200,7 +200,7 @@ void InputDeviceManager::Detach(std::shared_ptr<DeviceObserver> observer)
 
 void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice)
 {
-    MMI_LOGI("observers_ size:%{public}d", static_cast<int32_t>(observers_.size()));
+    MMI_LOGI("observers_ size:%{public}zu", observers_.size());
     for (auto observer = observers_.begin(); observer != observers_.end(); observer++) {
         (*observer)->UpdatePointerDevice(hasPointerDevice);
     }

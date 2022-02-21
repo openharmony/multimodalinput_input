@@ -36,7 +36,7 @@ public:
     DISALLOW_MOVE(StreamBuffer);
 
     void Clean();
-    bool SetReadIdx(uint32_t idx);
+    bool SetReadIdx(size_t idx);
 
     bool Read(std::string& buf);
     bool Write(const std::string& buf);
@@ -80,8 +80,8 @@ protected:
     int16_t rCount_ = 0;
     int16_t wCount_ = 0;
 
-    uint32_t rIdx_ = 0;
-    uint32_t wIdx_ = 0;
+    size_t rIdx_ = 0;
+    size_t wIdx_ = 0;
     char szBuff_[MAX_STREAM_BUF_SIZE] = {};
 };
 

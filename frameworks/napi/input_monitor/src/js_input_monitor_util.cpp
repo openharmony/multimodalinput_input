@@ -20,7 +20,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorUtil" };
-    constexpr uint32_t MAX_STRING_LEN = 1024;
+    constexpr size_t MAX_STRING_LEN = 1024;
 }
 
 napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, bool value)

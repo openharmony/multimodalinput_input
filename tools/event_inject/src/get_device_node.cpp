@@ -40,9 +40,9 @@ int32_t GetDeviceNode::GetDeviceNodeByName(const string &targetName, string &dev
         MMI_LOGE("GetDeviceNodeByName faild for find deviceName:%{public}s", deviceName.c_str());
         return RET_ERR;
     }
-    int32_t targetSize = static_cast<int32_t>(iter->second.size());
+    size_t targetSize = iter->second.size();
     if (devIndex > targetSize) {
-        MMI_LOGE("GetDeviceNodeByName faild for devIndex:%{public}d > targetSize:%{public}d", devIndex, targetSize);
+        MMI_LOGE("GetDeviceNodeByName faild for devIndex:%{public}d > targetSize:%{public}zu", devIndex, targetSize);
         return RET_ERR;
     }
     string nodeRootPath = "/dev/input/";

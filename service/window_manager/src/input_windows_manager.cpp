@@ -542,7 +542,7 @@ void OHOS::MMI::InputWindowsManager::UpdateDisplayInfo(const std::vector<Physica
 
 void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
 {
-    MMI_LOGD("physicalDisplays,num:%{public}d", static_cast<int32_t>(physicalDisplays_.size()));
+    MMI_LOGD("physicalDisplays,num:%{public}zu", physicalDisplays_.size());
     for (const auto &item : physicalDisplays_) {
         MMI_LOGD("PhysicalDisplays,id:%{public}d,leftDisplay:%{public}d,upDisplay:%{public}d,"
             "topLeftX:%{public}d,topLeftY:%{public}d,width:%{public}d,height:%{public}d,name:%{public}s,"
@@ -554,18 +554,18 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
             item.seatName.c_str(), item.logicWidth, item.logicHeight, item.direction);
     }
 
-    MMI_LOGD("logicalDisplays,num:%{public}d", static_cast<int32_t>(logicalDisplays_.size()));
+    MMI_LOGD("logicalDisplays,num:%{public}zu", logicalDisplays_.size());
     for (const auto &item : logicalDisplays_) {
         MMI_LOGD("logicalDisplays, id:%{public}d,topLeftX:%{public}d,topLeftY:%{public}d,"
             "width:%{public}d,height:%{public}d,name:%{public}s,"
-            "seatId:%{public}s,seatName:%{public}s,focusWindowId:%{public}d,window num:%{public}d",
+            "seatId:%{public}s,seatName:%{public}s,focusWindowId:%{public}d,window num:%{public}zu",
             item.id, item.topLeftX, item.topLeftY,
             item.width, item.height, item.name.c_str(),
             item.seatId.c_str(), item.seatName.c_str(), item.focusWindowId,
-            static_cast<int32_t>(item.windowsInfo_.size()));
+            item.windowsInfo_.size());
     }
 
-    MMI_LOGD("window info,num:%{public}d", static_cast<int32_t>(windowInfos_.size()));
+    MMI_LOGD("window info,num:%{public}zu", windowInfos_.size());
     for (const auto &item : windowInfos_) {
         MMI_LOGD("windowId:%{public}d,id:%{public}d,pid:%{public}d,uid:%{public}d,hotZoneTopLeftX:%{public}d,"
             "hotZoneTopLeftY:%{public}d,hotZoneWidth:%{public}d,hotZoneHeight:%{public}d,display:%{public}d,"
@@ -920,9 +920,9 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     auto size = pointerEvent->GetPressedButtons();
 
     MMI_LOGD("fd:%{public}d,pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
-             "globalX:%{public}d,globalY:%{public}d,pressedButtons size:%{public}d",
+             "globalX:%{public}d,globalY:%{public}d,pressedButtons size:%{public}zu",
              fd, focusWindow->pid, focusWindow->id, focusWindow->agentWindowId,
-             globalX, globalY, static_cast<int32_t>(size.size()));
+             globalX, globalY, size.size());
     return fd;
 }
 
