@@ -35,11 +35,10 @@ namespace MMI {
         if (fmt == nullptr) {
             return RET_ERR;
         }
-        int32_t ret = 0;
 
         constexpr size_t bufSize = 1024 * 10;
         char buf[bufSize] = {};
-        ret = snprintf_s(buf, bufSize, bufSize - 1, fmt, args...);
+        int32_t ret = snprintf_s(buf, bufSize, bufSize - 1, fmt, args...);
         if (ret < 0) {
             return ret;
         }

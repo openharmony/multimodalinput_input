@@ -111,10 +111,11 @@ void MMIClient::OnConnected()
 int32_t MMIClient::Socket()
 {
     MMI_LOGD("enter");
-    const int32_t ret = MultimodalInputConnectManager::GetInstance()->
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->
                         AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
     if (ret != RET_OK) {
         MMI_LOGE("UDSSocket::Socket, call MultimodalInputConnectManager::AllocSocketPair return %{public}d", ret);
+        return -1;
     }
     fd_ = MultimodalInputConnectManager::GetInstance()->GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {

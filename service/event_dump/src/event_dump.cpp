@@ -79,9 +79,9 @@ void ChkAppInfos(int32_t fd)
     AppRegs->Dump(fd);
 }
 
-void EventDump::Init(UDSServer& udss)
+void EventDump::Init(UDSServer& uds)
 {
-    udsServer_ = &udss;
+    udsServer_ = &uds;
 }
 
 void EventDump::Dump(int32_t fd)
@@ -132,7 +132,7 @@ void EventDump::InsertDumpInfo(const std::string& str)
     std::lock_guard<std::mutex> lock(mu_);
 
     constexpr int32_t VECMAXSIZE = 300;
-    while (dumpInfo_.size() > VECMAXSIZE) {
+    if (dumpInfo_.size() > VECMAXSIZE) {
         dumpInfo_.erase(dumpInfo_.begin());
     }
     dumpInfo_.push_back(str);
