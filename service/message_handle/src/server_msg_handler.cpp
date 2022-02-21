@@ -467,20 +467,6 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
     if (appInfo.fd == RET_ERR) {
         return FOCUS_ID_OBTAIN_FAIL;
     }
-#ifdef DEBUG_CODE_TEST
-    int32_t pid = udsServer_->GetClientPid(appInfo.fd);
-    if (pid != RET_ERR) {
-        MMI_LOGT("Inject keyCode:%{public}d,action:%{public}d,focusPid:%{public}d",
-            key.key, key.state, pid);
-    }
-#endif
-#ifdef DEBUG_CODE_TEST
-    MMI_LOGT("4.event dispatcher of server:eventKeyboard:time:%{public}" PRId64 ",sourceType:%{public}d,key:%{public}u,"
-             "seat_key_count:%{public}u,state:%{public}d,fd:%{public}d,abilityId:%{public}d,"
-             "windowId:%{public}s(%{public}d)",
-             key.time, LIBINPUT_EVENT_KEYBOARD_KEY, key.key, key.seat_key_count, key.state, appInfo.fd,
-             appInfo.abilityId, WinMgr->GetSurfaceIdListString().c_str(), focusId);
-#endif
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, appInfo.fd, key.time)) {
         NetPacket pkt2(MmiMessageId::ON_KEY);
