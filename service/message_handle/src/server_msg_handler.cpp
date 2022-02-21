@@ -227,9 +227,9 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterAppInfo(SessionPtr sess, NetPacke
     int32_t windowId = 0;
     std::string bundlerName;
     std::string appName;
-    int32_t fd = sess->GetFd();
     pkt >> abilityId >> windowId >> bundlerName >> appName;
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    int32_t fd = sess->GetFd();
     AppInfo appInfo = { abilityId, windowId, fd, bundlerName, appName };
 
     AppRegs->RegisterAppInfoforServer(appInfo);
@@ -250,9 +250,9 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterMsgHandler(SessionPtr sess, NetPa
     int32_t winId = 0;
     std::string bundlerName;
     std::string appName;
-    int32_t fd = sess->GetFd();
     pkt >> eventType >> abilityId >> winId >> bundlerName >> appName;
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    int32_t fd = sess->GetFd();
     RegEventHM->RegisterEvent(eventType, fd);
     if (winId > 0) {
         AppRegs->RegisterAppInfoforServer({ abilityId, winId, fd, bundlerName, appName });
@@ -267,9 +267,9 @@ int32_t OHOS::MMI::ServerMsgHandler::OnUnregisterMsgHandler(SessionPtr sess, Net
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     MmiMessageId messageId = MmiMessageId::INVALID;
-    int32_t fd = sess->GetFd();
     pkt >> messageId;
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    int32_t fd = sess->GetFd();
     RegEventHM->UnregisterEventHandleManager(messageId, fd);
     return RET_OK;
 }
@@ -277,10 +277,10 @@ int32_t OHOS::MMI::ServerMsgHandler::OnUnregisterMsgHandler(SessionPtr sess, Net
 int32_t OHOS::MMI::ServerMsgHandler::OnWindow(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(udsServer_, ERROR_NULL_POINTER);
-    MMISurfaceInfo surfaces = {};
     TestSurfaceData mysurfaceInfo = {};
     pkt >> mysurfaceInfo;
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    MMISurfaceInfo surfaces = {};
     surfaces.opacity = mysurfaceInfo.opacity;
     surfaces.onLayerId = mysurfaceInfo.onLayerId;
     surfaces.visibility = mysurfaceInfo.visibility;
@@ -381,9 +381,9 @@ int32_t OHOS::MMI::ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetP
     CHKPR(sess, ERROR_NULL_POINTER);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     TagPackHead tagPackHead;
-    int32_t fd = sess->GetFd();
     pkt >> tagPackHead;
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    int32_t fd = sess->GetFd();
     if (tagPackHead.idMsg != MmiMessageId::INVALID) {
         TagPackHead tagPackHeadAck = { MmiMessageId::INVALID, {fd}};
         NetPacket pktAck(MmiMessageId::GET_MMI_INFO_ACK);
@@ -760,8 +760,8 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& p
     MMI_LOGD("begin");
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData = 0;
-    int32_t deviceId = 0;
     CHKR(pkt.Read(userData), STREAM_BUF_READ_FAIL, RET_ERR);
+    int32_t deviceId = 0;
     CHKR(pkt.Read(deviceId), STREAM_BUF_READ_FAIL, RET_ERR);
 
 #ifdef OHOS_WESTEN_MODEL

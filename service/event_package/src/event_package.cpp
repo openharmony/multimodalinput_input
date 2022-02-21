@@ -130,7 +130,6 @@ int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& d
 int32_t EventPackage::PackageTabletToolOtherParams(libinput_event *event, EventTabletTool& tableTool)
 {
     CHKPR(event, ERROR_NULL_POINTER);
-    auto type = libinput_event_get_type(event);
     auto data = libinput_event_get_tablet_tool_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
     auto tool = libinput_event_tablet_tool_get_tool(data);
@@ -159,6 +158,7 @@ int32_t EventPackage::PackageTabletToolOtherParams(libinput_event *event, EventT
     } else {
         tableTool.tip_state = TABLET_TOOL_TIP_DOWN;
     }
+    auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TABLET_TOOL_BUTTON) {
         tableTool.button = libinput_event_tablet_tool_get_button(data);
         if (libinput_event_tablet_tool_get_button_state(data) == 0) {
@@ -226,10 +226,6 @@ void EventPackage::PackageTabletToolTypeParam(libinput_event *event, EventTablet
 int32_t EventPackage::PackageTabletToolEvent(libinput_event *event, EventTabletTool& tableTool)
 {
     CHKPR(event, ERROR_NULL_POINTER);
-    constexpr uint32_t stylusButton1KeyCode = 331;
-    constexpr uint32_t stylusButton2KeyCode = 332;
-    constexpr uint32_t stylusButton1Value = 1;
-    constexpr uint32_t stylusButton2Value = 2;
     auto data = libinput_event_get_tablet_tool_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
     auto tool = libinput_event_tablet_tool_get_tool(data);
@@ -241,6 +237,10 @@ int32_t EventPackage::PackageTabletToolEvent(libinput_event *event, EventTabletT
     }
     tableTool.time = libinput_event_tablet_tool_get_time(data);
     PackageTabletToolTypeParam(event, tableTool);
+    constexpr uint32_t stylusButton1KeyCode = 331;
+    constexpr uint32_t stylusButton2KeyCode = 332;
+    constexpr uint32_t stylusButton1Value = 1;
+    constexpr uint32_t stylusButton2Value = 2;
     auto ret = PackageTabletToolOtherParams(event, tableTool);
     if (tableTool.button == stylusButton1KeyCode) {
         tableTool.button = stylusButton1Value;
@@ -303,13 +303,13 @@ int32_t EventPackage::PackageTabletPadKeyEvent(libinput_event *event, EventKeybo
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_tablet_pad_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
-    auto type = libinput_event_get_type(event);
     key.time = libinput_event_tablet_pad_get_time_usec(data);
     auto ret = PackageEventDeviceInfo<EventKeyboard>(event, key);
     if (ret != RET_OK) {
         MMI_LOGE("Device param package failed. ret:%{public}d,errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
+    auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_TABLET_PAD_BUTTON: {
             key.key = libinput_event_tablet_pad_get_button_number(data) | TabletPadButtonNumberPrefix;
