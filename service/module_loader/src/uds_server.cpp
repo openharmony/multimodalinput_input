@@ -91,7 +91,7 @@ bool OHOS::MMI::UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
     std::lock_guard<std::mutex> lock(mux_);
     CHKF(fd >= 0, PARAM_INPUT_INVALID);
     auto ses = GetSession(fd);
-    if (ses != nullptr) {
+    if (ses == nullptr) {
         MMI_LOGE("SendMsg fd:%{public}d not found, The message was discarded. errCode:%{public}d",
                  fd, SESSION_NOT_FOUND);
         return false;
