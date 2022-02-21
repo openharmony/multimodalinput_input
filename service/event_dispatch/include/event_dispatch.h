@@ -69,7 +69,6 @@ protected:
     int32_t IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id);
 
 private:
-    int32_t touchDownFocusSurfaceId_ = 0;
     EventPackage eventPackage_;
     StandardEventHandler standardEvent_;
     /*
