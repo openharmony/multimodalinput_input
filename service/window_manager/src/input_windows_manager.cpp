@@ -444,6 +444,7 @@ void OHOS::MMI::InputWindowsManager::TransfromToSurfaceCoordinate(const MMISurfa
 /*********************************新框架接口添加****************************/
 int32_t OHOS::MMI::InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent> inputEvent)
 {
+    CHKPR(inputEvent, ERROR_NULL_POINTER);
 #ifdef OHOS_WESTEN_MODEL
     MMI_LOGD("enter");
     int32_t focId = GetFocusSurfaceId();
