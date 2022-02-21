@@ -810,10 +810,10 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
     keyEventPtr->UpdateId();
     KeyEvent::KeyItem keyItem;
     int32_t actionTime = static_cast<int64_t>(GetSysClockTime());
-    int32_t keyCode = static_cast<int32_t>(key.key);
+    int32_t keyCode = key.key;
     int32_t keyAction = (key.state == KEY_STATE_PRESSED) ?
         (KeyEvent::KEY_ACTION_DOWN) : (KeyEvent::KEY_ACTION_UP);
-    int32_t deviceId = static_cast<int32_t>(key.deviceId);
+    int32_t deviceId = key.deviceId;
     int64_t actionStartTime = static_cast<int64_t>(key.time);
     auto preAction = keyEventPtr->GetAction();
     if (preAction == KeyEvent::KEY_ACTION_UP) {
