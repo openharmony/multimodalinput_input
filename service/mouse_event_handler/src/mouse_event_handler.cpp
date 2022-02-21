@@ -159,10 +159,11 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
 
 void MouseEventHandler::Normalize(libinput_event *event)
 {
-    MMI_LOGD("Enter");
+    MMI_LOGD("enter");
     CHKPV(event);
     auto data = libinput_event_get_pointer_event(event);
     CHKPV(data);
+    CHKPV(pointerEvent_);
     PointerEvent::PointerItem pointerItem;
     const int32_t type = libinput_event_get_type(event);
     switch (type) {
