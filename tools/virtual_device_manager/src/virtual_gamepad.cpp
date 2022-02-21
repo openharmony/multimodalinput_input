@@ -18,13 +18,13 @@
 OHOS::MMI::VirtualGamePad::VirtualGamePad() : VirtualDevice("Virtual GamePad",
     BUS_USB, 0x79, 0x181c)
 {
-    const int32_t ABS_MAX_RXYZ = 255;
-    const int32_t ABS_FLAT = 15;
-    const int32_t ABS_MIN_HAT = -1;
-    const int32_t ABS_min_VALUE = -32768;
-    const int32_t ABS_MAX_VALUE = 32767;
-    const int32_t ABS_FUZZ_VALUE = 16;
-    const int32_t ABS_FLAT_VALUE = 128;
+    constexpr int32_t ABS_MAX_RXYZ = 255;
+    constexpr int32_t ABS_FLAT = 15;
+    constexpr int32_t ABS_MIN_HAT = -1;
+    constexpr int32_t ABS_min_VALUE = -32768;
+    constexpr int32_t ABS_MAX_VALUE = 32767;
+    constexpr int32_t ABS_FUZZ_VALUE = 16;
+    constexpr int32_t ABS_FLAT_VALUE = 128;
 
     dev_.absmin[ABS_X] = 0;
     dev_.absmax[ABS_X] = ABS_MAX_RXYZ;
