@@ -362,10 +362,9 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         return KEY_EVENT_PKG_FAIL;
     }
 
+#ifdef OHOS_WESTEN_MODEL
     int32_t action = keyEvent_->GetKeyAction();
     KEY_STATE kacState = (action == KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
-
-#ifdef OHOS_WESTEN_MODEL
     int16_t lowKeyCode = static_cast<int16_t>(keyEvent_->GetKeyCode());
     auto oKey = KeyValueTransformationByInput(lowKeyCode);
     if (oKey.isSystemKey) {
@@ -373,13 +372,10 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
     }
 #endif
 
-    auto device = libinput_event_get_device(event);
-    CHKPR(device, ERROR_NULL_POINTER);
-
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent_, sysStartProcessTime);
-    if (eventDispatchResult != RET_OK) {
+    auto ret = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent_, sysStartProcessTime);
+    if (ret != RET_OK) {
         MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d",
-                 eventDispatchResult, KEY_EVENT_DISP_FAIL);
+                 ret, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
     int32_t keyCode = keyEvent_->GetKeyCode();
@@ -904,6 +900,7 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
+    CHKPR(keyEvent_, ERROR_NULL_POINTER);
     if (keyEvent_ != nullptr) {
         std::vector<int32_t> pressedKeys = keyEvent_->GetPressedKeys();
         if (pressedKeys.empty()) {

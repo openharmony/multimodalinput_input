@@ -68,8 +68,7 @@ protected:
         libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime);
     int32_t IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id);
 
-protected:
-    int32_t touchDownFocusSurfaceId_ = 0;
+private:
     EventPackage eventPackage_;
     StandardEventHandler standardEvent_;
     /*
