@@ -676,10 +676,15 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<Ke
     NetPacket ckv(MmiMessageId::NEW_INJECT_KEY_EVENT);
     int32_t errCode = InputEventDataTransformation::KeyEventToNetPacket(key, ckv);
     if (errCode != RET_OK) {
-        MMI_LOGE("Serialization is Failed，errCode:%{public}u", errCode);
+        MMI_LOGE("Serialization is Failed, errCode:%{public}u", errCode);
         return RET_ERR;
     }
-    return SendMsg(ckv);
+    if (!SendMsg(ckv)) {
+        MMI_LOGE("Send inject event Msg error");
+        return RET_ERR;
+    }
+    MMI_LOGD("leave");
+    return RET_OK;
 }
 
 int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
