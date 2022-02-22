@@ -872,7 +872,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTargetOld(std::shared_ptr<Poi
 int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Enter");
-	CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!IsCheckDisplayIdIfExist(displayId)) {
         MMI_LOGE("This display:%{public}d is not exist", displayId);
@@ -893,9 +893,9 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     FixCursorPosition(globalX, globalY, IMAGE_SIZE, IMAGE_SIZE);
     PointerDrawMgr->DrawPointer(displayId, globalX, globalY);
     int32_t action = pointerEvent->GetPointerAction();
-	bool isFirstBtnDown  = (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) 
-		&& (pointerEvent->GetPressedButtons().size() == 1);
-	bool isMove = (action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty());
+    bool isFirstBtnDown  = (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) 
+        && (pointerEvent->GetPressedButtons().size() == 1);
+    bool isMove = (action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty());
     if ((firstBtnDownWindowId_ == -1) || isFirstBtnDown || isMove) {
         for (auto &item : logicalDisplayInfo->windowsInfo_) {
             if (IsInsideWindow(globalX, globalY, item)) {
@@ -903,16 +903,16 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
                 break;
             }
         }
-    } 
-	WindowInfo* firstBtnDownWindow = nullptr;
-	for (auto &item : logicalDisplayInfo->windowsInfo_) {
-	 	if (item.id == firstBtnDownWindowId_) {
-			firstBtnDownWindow = &item;
-			break;
-		}
-           
     }
-	CHKPR(firstBtnDownWindow, ERROR_NULL_POINTER);	
+    WindowInfo* firstBtnDownWindow = nullptr;
+    for (auto &item : logicalDisplayInfo->windowsInfo_) {
+        if (item.id == firstBtnDownWindowId_) {
+            firstBtnDownWindow = &item;
+            break;
+        }
+
+    }
+    CHKPR(firstBtnDownWindow, ERROR_NULL_POINTER);	
     pointerEvent->SetTargetWindowId(firstBtnDownWindow->id);
     pointerEvent->SetAgentWindowId(firstBtnDownWindow->agentWindowId);
     int32_t localX = globalX - firstBtnDownWindow->winTopLeftX;
@@ -920,8 +920,8 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     pointerItem.SetLocalX(localX);
     pointerItem.SetLocalY(localY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-	CHKPR(udsServer_, ERROR_NULL_POINTER);
-    auto fd = udsServer_->GetClientFd(firstBtnDownWindow->pid);   
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
+    auto fd = udsServer_->GetClientFd(firstBtnDownWindow->pid);
 
     MMI_LOGD("fd:%{public}d,pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
              "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d",

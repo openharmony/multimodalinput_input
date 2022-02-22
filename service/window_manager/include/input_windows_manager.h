@@ -202,7 +202,7 @@ private:
     std::map<int32_t, LayerInfo> layers_ = {};
     std::map<int32_t, MMISurfaceInfo> surfaces_ = {};
     UDSServer* udsServer_ = nullptr;
-	int32_t firstBtnDownWindowId_ = -1;
+    int32_t firstBtnDownWindowId_ = -1;
     /* *********************************新框架接口添加*************************** */
     std::vector<PhysicalDisplayInfo> physicalDisplays_ = {};
     std::vector<LogicalDisplayInfo> logicalDisplays_ = {};
