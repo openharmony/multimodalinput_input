@@ -114,7 +114,7 @@ void RegisterEventHandleManager::FindSocketFds(const MmiMessageId messageId, std
         MMI_LOGE("The message id was not found in the mapRegisterManager_, event:%{public}d", messageId);
         return;
     }
-    for (auto iter = it.first; iter != it.second; iter++) {
+    for (auto iter = it.first; iter != it.second; ++iter) {
         fds.push_back(iter->second);
     }
 }
@@ -140,7 +140,7 @@ void RegisterEventHandleManager::Dump(int32_t fd)
         auto evs = mapRegisterManager_.equal_range(it->first);
         strTmp = "type=";
         strTmp += std::to_string(static_cast<int32_t>(it->first)) + " fds:[";
-        for (auto itr = evs.first; itr != evs.second; itr++) {
+        for (auto itr = evs.first; itr != evs.second; ++itr) {
             strTmp += std::to_string(itr->second) + ",";
         }
         strTmp.resize(strTmp.size()-1);

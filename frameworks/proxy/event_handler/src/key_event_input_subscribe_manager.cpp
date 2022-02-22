@@ -76,7 +76,7 @@ int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
         return RET_ERR;
     }
     
-    for (auto it = subscribeInfos_.begin(); it != subscribeInfos_.end(); it++) {
+    for (auto it = subscribeInfos_.begin(); it != subscribeInfos_.end(); ++it) {
         if (it->GetSubscribeId() == subscribeId) {
             if (EventManager.UnSubscribeKeyEvent(subscribeId) != RET_OK) {
                 MMI_LOGE("Leave, unsubscribe key event failed");

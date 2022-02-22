@@ -48,7 +48,7 @@ int32_t MultimodalStandardizedEventManager::RegisterStandardizedEventHandle(cons
     auto messageId = standardizedEventHandle->GetType();
     CHKR(messageId > MmiMessageId::INVALID, VAL_NOT_EXP, MMI_STANDARD_EVENT_INVALID_PARAMETER);
     auto range = mapEvents_.equal_range(messageId);
-    for (auto it = range.first; it != range.second; it++) {
+    for (auto it = range.first; it != range.second; ++it) {
         if (it->second.eventCallBack == standardizedEventHandle) {
             MMI_LOGE("Duplicate registration information, registration failed. errCode:%{public}d",
                      MMI_STANDARD_EVENT_EXIST);
@@ -93,7 +93,7 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
     registerEvents_.erase(registerhandle);
     auto range = mapEvents_.equal_range(typeId);
     bool isHandleExist = false;
-    for (StandEventMMaps::iterator it = range.first; it != range.second; it++) {
+    for (StandEventMMaps::iterator it = range.first; it != range.second; ++it) {
         if (it->second.eventCallBack == standardizedEventHandle) {
             mapEvents_.erase(it);
             isHandleExist = true;

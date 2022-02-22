@@ -202,7 +202,7 @@ bool AbilityLaunchManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> &k
         TimerMgr->RemoveTimer(lastMatchedKey_.timerId);
     }
     ResetLastMatchedKey();
-    for (auto iter = shortcutKeys_.begin(); iter != shortcutKeys_.end(); iter++) {
+    for (auto iter = shortcutKeys_.begin(); iter != shortcutKeys_.end(); ++iter) {
         ShortcutKey &shortcutKey = iter->second;
         if (!Match(shortcutKey, key)) {
             MMI_LOGD("not matched, next");
