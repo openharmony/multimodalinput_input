@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 #include "s_input.h"
 #include <climits>
 #include <fcntl.h>
-#include <inttypes.h>
+#include <cinttypes>
 #include <sys/epoll.h>
 #include <unistd.h>
 #include "libmmi_util.h"
@@ -48,17 +48,17 @@ static void InitHiLogFunc(struct libinput* input)
     libinput_log_set_handler(input, &OHOS::MMI::HiLogFunc);
     initFlag = true;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 void OHOS::MMI::SInput::LoginfoPackagingTool(libinput_event *event)
 {
-    CHKP(event);
+    CHKPV(event);
     auto context = libinput_event_get_context(event);
     InitHiLogFunc(context);
 }
 
-const static libinput_interface LIBINPUT_INTERFACE = {
+constexpr static libinput_interface LIBINPUT_INTERFACE = {
     .open_restricted = [](const char *path, int32_t flags, void *user_data)->int32_t {
         using namespace OHOS::MMI;
         CHKPR(path, errno);
@@ -89,6 +89,7 @@ OHOS::MMI::SInput::~SInput()
 
 bool OHOS::MMI::SInput::Init(FunInputEvent funInputEvent, const std::string& seat_id)
 {
+    MMI_LOGD("enter");
     CHKPF(funInputEvent);
     funInputEvent_ = funInputEvent;
     seat_id_ = seat_id;
@@ -103,21 +104,25 @@ bool OHOS::MMI::SInput::Init(FunInputEvent funInputEvent, const std::string& sea
     if (rt != 0) {
         libinput_unref(input_);
         udev_unref(udev_);
+        MMI_LOGE("rt is not 0");
         return false;
     }
-    lfd_ = libinput_get_fd(input_);
-    if (lfd_ < 0) {
+    fd_ = libinput_get_fd(input_);
+    if (fd_ < 0) {
         libinput_unref(input_);
         udev_unref(udev_);
-        lfd_ = -1;
+        fd_ = -1;
+        MMI_LOGE("fd_ is less than 0");
         return false;
     }
+    MMI_LOGD("leave");
     return true;
 }
 
 void OHOS::MMI::SInput::EventDispatch(epoll_event& ev)
 {
-    CHKP(ev.data.ptr);
+    MMI_LOGD("enter");
+    CHKPV(ev.data.ptr);
     auto fd = *static_cast<int*>(ev.data.ptr);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
         MMI_LOGF("SInput::OnEventDispatch epoll unrecoverable error,"
@@ -131,21 +136,25 @@ void OHOS::MMI::SInput::EventDispatch(epoll_event& ev)
         return;
     }
     OnEventHandler();
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::SInput::Stop()
 {
-    if (lfd_ >= 0) {
-        close(lfd_);
-        lfd_ = -1;
+    MMI_LOGD("enter");
+    if (fd_ >= 0) {
+        close(fd_);
+        fd_ = -1;
     }
     libinput_unref(input_);
     udev_unref(udev_);
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::SInput::OnEventHandler()
 {
-    CHKP(funInputEvent_);
+    MMI_LOGD("enter");
+    CHKPV(funInputEvent_);
 #ifndef OHOS_WESTEN_MODEL
     multimodal_libinput_event ev = { nullptr, nullptr };
     while ((ev.event = libinput_get_event(input_))) {
@@ -153,4 +162,5 @@ void OHOS::MMI::SInput::OnEventHandler()
         libinput_event_destroy(ev.event);
     }
 #endif
+    MMI_LOGD("leave");
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -49,6 +49,6 @@ private:
     static constexpr int32_t EV_ABS_Z_DEFAULT_VALUE = 450;
     static constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE = 2114;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // PROCESSING_PEN_DEVICE_H

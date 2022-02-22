@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 #include "uds_session.h"
 #include <sstream>
 #include <fcntl.h>
-#include <inttypes.h>
+#include <cinttypes>
 #include <sys/types.h>
 #include <sys/un.h>
 #include <unistd.h>
@@ -27,7 +27,7 @@ namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
 }
 
-UDSSession::UDSSession(const std::string& programName, const int moduleType, const int32_t fd,
+UDSSession::UDSSession(const std::string& programName, const int32_t moduleType, const int32_t fd,
     const int32_t uid, const int32_t pid)
     : programName_(programName),
       moduleType_(moduleType),
@@ -45,11 +45,14 @@ UDSSession::~UDSSession()
 bool UDSSession::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
-    CHKF(size > 0 && size <= MAX_PACKET_BUF_SIZE, PARAM_INPUT_INVALID);
+    if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
+        MMI_LOGD("buf size:%{public}zu", size);
+        return PARAM_INPUT_INVALID;
+    }
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
     ssize_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
     if (ret < 0) {
-        const int errNoSaved = errno;
+        const int32_t errNoSaved = errno;
         MMI_LOGE("UDSSession::SendMsg write return %{public}zd,"
                  "fd_:%{public}d,errNoSaved:%{public}d,strerror:%{public}s",
                  ret, fd_, errNoSaved, strerror(errNoSaved));
@@ -84,6 +87,7 @@ void UDSSession::UpdateDescript()
 
 bool UDSSession::SendMsg(NetPacket& pkt) const
 {
+    CHKF(!pkt.ChkError(), PACKET_WRITE_FAIL);
     StreamBuffer buf;
     pkt.MakeData(buf);
     return SendMsg(buf.Data(), buf.Size());

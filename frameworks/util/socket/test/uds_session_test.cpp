@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,9 +28,9 @@ class UDSSessionTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
-    int fd_ = -1;
+    int32_t fd_ = -1;
     static constexpr char PROGRAM_NAME[] = "uds_sesion_test";
-    const int moduleType_ = 3; // 3 CONNECT_MODULE_TYPE_ST_TEST
+    const int32_t moduleType_ = 3; // 3 CONNECT_MODULE_TYPE_ST_TEST
     static inline int32_t pid_ = 0;
     void SetUp() override;
     void TearDown()  override;

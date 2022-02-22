@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,26 +19,26 @@
 #include "device_base.h"
 
 namespace OHOS {
-    namespace MMI {
-        class ProcessingPadDevice : public DeviceBase {
-            struct PadEvent {
-                std::string eventType;
-                int32_t keyValue;
-                std::vector<int32_t> ringEvents;
-            };
-        public:
-            ProcessingPadDevice() = default;
-            ~ProcessingPadDevice() = default;
-            int32_t TransformJsonDataToInputData(const Json& inputEventArrays, InputEventArray& inputEventArray);
-        private:
-            int32_t AnalysisPadEvent(const Json& inputData, std::vector<PadEvent>& padEventArray);
-            void TransformPadEventToInputEvent(const std::vector<PadEvent>& padEventArray,
-                                               InputEventArray& inputEventArray);
-            void TransformKeyPressEvent(const PadEvent& padEvent, InputEventArray& inputEventArray);
-            void TransformKeyReleaseEvent(const PadEvent& padEvent, InputEventArray& inputEventArray);
-            void TransformKeyClickEvent(const PadEvent& padEvent, InputEventArray& inputEventArray);
-            void TransformRingEvent(const PadEvent& padEvent, InputEventArray& inputEventArray);
-        };
-    }
-}
+namespace MMI {
+class ProcessingPadDevice : public DeviceBase {
+    struct PadEvent {
+        std::string eventType;
+        int32_t keyValue;
+        std::vector<int32_t> ringEvents;
+    };
+public:
+    ProcessingPadDevice() = default;
+    ~ProcessingPadDevice() = default;
+    int32_t TransformJsonDataToInputData(const Json& inputEventArrays, InputEventArray& inputEventArray);
+private:
+    int32_t AnalysisPadEvent(const Json& inputData, std::vector<PadEvent>& padEventArray);
+    void TransformPadEventToInputEvent(const std::vector<PadEvent>& padEventArray,
+                                       InputEventArray& inputEventArray);
+    void TransformKeyPressEvent(const PadEvent& padEvent, InputEventArray& inputEventArray);
+    void TransformKeyReleaseEvent(const PadEvent& padEvent, InputEventArray& inputEventArray);
+    void TransformKeyClickEvent(const PadEvent& padEvent, InputEventArray& inputEventArray);
+    void TransformRingEvent(const PadEvent& padEvent, InputEventArray& inputEventArray);
+};
+} // namespace MMI
+} // namespace OHOS
 #endif // PROCESSING_PAD_DEVICE_H

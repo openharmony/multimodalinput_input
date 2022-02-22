@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,9 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "log.h"
-#include "mouse_device_state.h"
 #include "gesture_transform_point_processor.h"
+#include "mmi_log.h"
+#include "mouse_device_state.h"
 
 namespace OHOS {
 namespace MMI {
@@ -39,9 +39,9 @@ void GestureTransformPointProcessor::SetPointEventSource(int32_t sourceType)
 
 void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_gesture *data)
 {
-    MMI_LOGT("Touchpad begin event");
-    CHKP(data);
-    auto time = libinput_event_gesture_get_time(data);
+    MMI_LOGD("Touchpad begin event");
+    CHKPV(data);
+    auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     auto scale = libinput_event_gesture_get_scale(data);
     pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
     pointerEvent_->SetActionStartTime(time);
@@ -72,9 +72,9 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_ge
 
 void GestureTransformPointProcessor::OnEventTouchPadPinchUpdate(libinput_event_gesture *data)
 {
-    MMI_LOGT("Touchpad update event");
-    CHKP(data);
-    auto time = libinput_event_gesture_get_time(data);
+    MMI_LOGD("Touchpad update event");
+    CHKPV(data);
+    auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     auto scale = libinput_event_gesture_get_scale(data);
     pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
     pointerEvent_->SetActionStartTime(time);
@@ -97,9 +97,9 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchUpdate(libinput_event_g
 
 void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gesture *data)
 {
-    MMI_LOGT("Touchpad end event");
-    CHKP(data);
-    auto time = libinput_event_gesture_get_time(data);
+    MMI_LOGD("Touchpad end event");
+    CHKPV(data);
+    auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     auto scale = libinput_event_gesture_get_scale(data);
     pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
     pointerEvent_->SetActionStartTime(time);
@@ -123,10 +123,10 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gest
 std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestrueEvent(
     libinput_event *event)
 {
-    MMI_LOGT("call OnTouchPadGestrueEvent begin");
-    CHKPRP(event, nullptr);
+    MMI_LOGD("begin");
+    CHKPP(event, nullptr);
     auto data = libinput_event_get_gesture_event(event);
-    CHKPRP(data, nullptr);
+    CHKPP(data, nullptr);
     pointerEvent_->UpdateId();
     auto type = libinput_event_get_type(event);
     switch (type) {
@@ -156,7 +156,7 @@ std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestrueE
             return nullptr;
         }
     }
-    MMI_LOGT("call OnTouchPadGestrueEvent end");
+    MMI_LOGD("end");
     return pointerEvent_;
 }
 } // namespace MMI

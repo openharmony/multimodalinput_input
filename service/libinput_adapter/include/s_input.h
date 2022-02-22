@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #include <functional>
 #include <libinput.h>
 #include <sys/epoll.h>
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -26,6 +27,7 @@ typedef std::function<void(void *event)> FunInputEvent;
 class SInput {
 public:
     SInput();
+    DISALLOW_COPY_AND_MOVE(SInput);
     virtual ~SInput();
     static void LoginfoPackagingTool(libinput_event *event);
     bool Init(FunInputEvent funInputEvent, const std::string& seat_id = "seat0");
@@ -34,20 +36,20 @@ public:
 
     int32_t GetInputFd() const
     {
-        return lfd_;
+        return fd_;
     }
 
 protected:
     void OnEventHandler();
 
 protected:
-    int32_t lfd_ = -1;
+    int32_t fd_ = -1;
     udev *udev_ = nullptr;
     libinput *input_ = nullptr;
 
     FunInputEvent funInputEvent_;
     std::string seat_id_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // S_INPUT_H

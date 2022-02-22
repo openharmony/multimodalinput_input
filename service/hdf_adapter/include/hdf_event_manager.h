@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@
 #include "libinput.h"
 #include "evdev.h"
 #include "input_type.h"
+#include "nocopyable.h"
 #include "s_input.h"
 #define MAX_INPUT_DEVICE_COUNT MAX_INPUT_DEV_NUM
 #define TOTAL_INPUT_DEVICE_COUNT (2 * MAX_INPUT_DEV_NUM)
@@ -41,28 +42,29 @@ enum hdf_event_type {
     HDF_RMV_DEVICE,
 };
 struct Devcmd {
-    int index;
-    int cmd;
+    int32_t index;
+    int32_t cmd;
 };
 class HdfEventManager {
 public:
     bool Init();
     HdfEventManager();
+    DISALLOW_COPY_AND_MOVE(HdfEventManager);
     virtual ~HdfEventManager();
     void SetupCallback();
     bool OpenHdfDevice(uint32_t devIndex, bool oper);
-    int GetDeviceCount();
-    int GetJectDeviceCount();
-    static int EvdevSimIoctl(int hdindex, int pcmd, void *iobuff);
-    static int EvdevIoctl(int hdiindex, int pcmd, void *iobuff);
+    int32_t GetDeviceCount();
+    int32_t GetJectDeviceCount();
+    static int32_t EvdevSimIoctl(int32_t hdindex, int32_t pcmd, void *iobuff);
+    static int32_t EvdevIoctl(int32_t hdiindex, int32_t pcmd, void *iobuff);
     static void HotPlugCallback(const HotPlugEvent *event);
     static void GetEventCallback(const EventPackage **pkgs, uint32_t count, uint32_t devIndex);
-    static int DeviceAddHandle(uint32_t devIndex, uint32_t devType);
-    static int DeviceRemoveHandle(uint32_t devIndex, uint32_t devType);
+    static int32_t DeviceAddHandle(uint32_t devIndex, uint32_t devType);
+    static int32_t DeviceRemoveHandle(uint32_t devIndex, uint32_t devType);
     void AddDevice(uint32_t devIndex, uint32_t typeIndex);
-    int HdfdevtypeMapLibinputType(uint32_t devIndex, uint32_t devType);
+    int32_t HdfdevtypeMapLibinputType(uint32_t devIndex, uint32_t devType);
     static libinput *HdfLibinputInit();
-    static int HdfDevHandle(int index, hdf_event_type cmd);
+    static int32_t HdfDevHandle(int32_t index, hdf_event_type cmd);
 private:
     libinput *hdiinput_ = nullptr;
     std::list<uhdf *> hdflist_;
@@ -74,7 +76,7 @@ private:
     InputEventCb eventCallBack_;
     InputHostCb  hostPlugCallBack_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 extern OHOS::MMI::HdfEventManager  hdfEventManager;
 #endif // HDF_EVENT_MANAGER_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 #define MULTIMODAL_EVENT_H
 
 #include <string>
+#include "nocopyable.h"
 #include "refbase.h"
 
 namespace OHOS {
@@ -198,6 +199,8 @@ enum MultimodalEventType {
 
 class MultimodalEvent : public RefBase {
 public:
+    MultimodalEvent() = default;
+    DISALLOW_COPY_AND_MOVE(MultimodalEvent);
     virtual ~MultimodalEvent();
     /**
     * initialize the object.
@@ -322,16 +325,16 @@ private:
     int32_t DeviceTypeTransform(int32_t sourceType) const;
 
 private:
-    int32_t mWindowId_ = 0;
-    std::string mUuid_ = "";
-    std::string mDeviceId_ = "";
-    int32_t mHighLevelEvent_ = 0;
-    int32_t mSourceDevice_ = 0;
-    uint64_t mOccurredTime_ = 0;
-    int32_t mInputDeviceId_ = 0;
-    bool mIsHighLevelEvent_ = false;
-    uint16_t mDeviceUdevTags_ = 0;
-    int32_t mEventType_ = 0;
+    int32_t windowId_ = 0;
+    std::string uuid_ = "";
+    std::string deviceId_ = "";
+    int32_t highLevelEvent_ = 0;
+    int32_t sourceDevice_ = 0;
+    uint64_t occurredTime_ = 0;
+    int32_t inputDeviceId_ = 0;
+    bool isHighLevelEvent_ = false;
+    uint16_t deviceUdevTags_ = 0;
+    int32_t eventType_ = 0;
     bool isIntercepted_ = true;
 };
 using MultimodalEventPtr = sptr<MultimodalEvent>;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,12 +24,14 @@
 #include <atomic>
 #include <string>
 #include "libmmi_util.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class UDSSocket {
 public:
     UDSSocket();
+    DISALLOW_COPY_AND_MOVE(UDSSocket);
     virtual ~UDSSocket();
 
     virtual int32_t EpollCreat(int32_t size);
@@ -60,6 +62,6 @@ protected:
     int32_t fd_ = -1;
     int32_t epollFd_ = -1;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // UDS_SOCKET_H

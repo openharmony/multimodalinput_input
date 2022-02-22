@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 #define SPEECH_EVENT_H
 
 #include "multimodal_event.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 enum SpeechEnum {
@@ -103,6 +104,8 @@ enum SpeechEnum {
  */
 class SpeechEvent : public MMI::MultimodalEvent {
 public:
+    SpeechEvent() = default;
+    DISALLOW_COPY_AND_MOVE(SpeechEvent);
     virtual ~SpeechEvent();
     /**
     * initialize the object.
@@ -161,10 +164,10 @@ public:
     virtual int32_t GetMatchMode() const;
 
 private:
-    int32_t mAction_ = 0;
-    int32_t mScene_ = 0;
-    int32_t mMode_ = 0;
-    std::string mActionProperty_ = "";
+    int32_t action_ = 0;
+    int32_t scene_ = 0;
+    int32_t mode_ = 0;
+    std::string actionProperty_ = "";
 };
 } // namespace OHOS
 #endif // SPEECH_EVENT_H

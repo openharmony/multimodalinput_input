@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -28,10 +28,13 @@ config("libmmi_client_config") {
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//utils/native/base/include",
     "//foundation/multimodalinput/input/service/input_interceptor/include",
+    "//utils/native/base/include",
+    "event_handler/include",
+    "module_loader/include",
   ]
 }
 
-ohos_shared_library("libmmi-common") {
+ohos_source_set("libmmi-common") {
   sources = [
     "events/src/input_event.cpp",
     "events/src/key_event.cpp",
@@ -58,27 +61,27 @@ ohos_shared_library("libmmi-common") {
 
 ohos_shared_library("libmmi-client") {
   sources = [
-    "event_handle/src/client_msg_handler.cpp",
-    "event_handle/src/common_event_handler.cpp",
-    "event_handle/src/device_handler.cpp",
-    "event_handle/src/event_factory.cpp",
-    "event_handle/src/input_device_impl.cpp",
-    "event_handle/src/input_event_monitor_manager.cpp",
-    "event_handle/src/input_filter_manager.cpp",
-    "event_handle/src/input_handler_manager.cpp",
-    "event_handle/src/input_interceptor_manager.cpp",
-    "event_handle/src/input_manager_impl.cpp",
-    "event_handle/src/input_monitor_manager.cpp",
-    "event_handle/src/interceptor_manager.cpp",
-    "event_handle/src/key_event_handler.cpp",
-    "event_handle/src/key_event_input_subscribe_manager.cpp",
-    "event_handle/src/media_event_handler.cpp",
-    "event_handle/src/multimodal_event_handler.cpp",
-    "event_handle/src/multimodal_standardized_event_manager.cpp",
-    "event_handle/src/standardized_event_handler.cpp",
-    "event_handle/src/system_event_handler.cpp",
-    "event_handle/src/telephone_event_handler.cpp",
-    "event_handle/src/touch_event_handler.cpp",
+    "event_handler/src/client_msg_handler.cpp",
+    "event_handler/src/common_event_handler.cpp",
+    "event_handler/src/device_handler.cpp",
+    "event_handler/src/event_factory.cpp",
+    "event_handler/src/input_device_impl.cpp",
+    "event_handler/src/input_event_monitor_manager.cpp",
+    "event_handler/src/input_filter_manager.cpp",
+    "event_handler/src/input_handler_manager.cpp",
+    "event_handler/src/input_interceptor_manager.cpp",
+    "event_handler/src/input_manager_impl.cpp",
+    "event_handler/src/input_monitor_manager.cpp",
+    "event_handler/src/interceptor_manager.cpp",
+    "event_handler/src/key_event_handler.cpp",
+    "event_handler/src/key_event_input_subscribe_manager.cpp",
+    "event_handler/src/media_event_handler.cpp",
+    "event_handler/src/multimodal_event_handler.cpp",
+    "event_handler/src/multimodal_standardized_event_manager.cpp",
+    "event_handler/src/standardized_event_handler.cpp",
+    "event_handler/src/system_event_handler.cpp",
+    "event_handler/src/telephone_event_handler.cpp",
+    "event_handler/src/touch_event_handler.cpp",
     "events/src/axis_event.cpp",
     "events/src/builtinkey_event.cpp",
     "events/src/composite_event.cpp",
@@ -120,7 +123,7 @@ ohos_shared_library("libmmi-client") {
     ":libmmi-common",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
-    "//foundation/multimodalinput/input/service/event_filter_binder:mmi_event_filter_service",
+    "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
   ]
 
   part_name = "multimodalinput_base"
@@ -132,6 +135,12 @@ ohos_unittest("ut-mmi-proxy-out") {
   include_dirs = [
     "//utils/native/base/include",
     "//third_party/googletest/googletest/include",
+    "//utils/native/base/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/frameworks/proxy/event_handler",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/frameworks/util/common",
     "${mmi_path}/frameworks/util/common/include",
     "${mmi_path}/frameworks/util/network",
@@ -172,25 +181,25 @@ ohos_unittest("ut-mmi-proxy-out") {
   }
 
   sources = [
-    "event_handle/test/client_msg_handler_test.cpp",
-    "event_handle/test/common_event_handler_test.cpp",
-    "event_handle/test/device_handler_test.cpp",
-    "event_handle/test/event_factory_test.cpp",
-    "event_handle/test/event_handle_common_test.cpp",
-    "event_handle/test/event_handle_key_test.cpp",
-    "event_handle/test/event_handle_media_test.cpp",
-    "event_handle/test/event_handle_standardized_test.cpp",
-    "event_handle/test/event_handle_system_test.cpp",
-    "event_handle/test/event_handle_telephone_test.cpp",
-    "event_handle/test/event_handle_touch_test.cpp",
-    "event_handle/test/multimodal_event_handler_test.cpp",
-    "event_handle/test/multimodal_key_event_test.cpp",
-    "event_handle/test/multimodal_semanager_first_test.cpp",
-    "event_handle/test/multimodal_semanager_second_test.cpp",
-    "event_handle/test/multimodal_semanager_third_test.cpp",
-    "event_handle/test/standardized_event_handler_test.cpp",
-    "event_handle/test/standardized_event_process_test.cpp",
-    "event_handle/test/system_event_handler_test.cpp",
+    "event_handler/test/client_msg_handler_test.cpp",
+    "event_handler/test/common_event_handler_test.cpp",
+    "event_handler/test/device_handler_test.cpp",
+    "event_handler/test/event_factory_test.cpp",
+    "event_handler/test/event_handle_common_test.cpp",
+    "event_handler/test/event_handle_key_test.cpp",
+    "event_handler/test/event_handle_media_test.cpp",
+    "event_handler/test/event_handle_standardized_test.cpp",
+    "event_handler/test/event_handle_system_test.cpp",
+    "event_handler/test/event_handle_telephone_test.cpp",
+    "event_handler/test/event_handle_touch_test.cpp",
+    "event_handler/test/multimodal_event_handler_test.cpp",
+    "event_handler/test/multimodal_key_event_test.cpp",
+    "event_handler/test/multimodal_semanager_first_test.cpp",
+    "event_handler/test/multimodal_semanager_second_test.cpp",
+    "event_handler/test/multimodal_semanager_third_test.cpp",
+    "event_handler/test/standardized_event_handler_test.cpp",
+    "event_handler/test/standardized_event_process_test.cpp",
+    "event_handler/test/system_event_handler_test.cpp",
     "events/test/device_event_test.cpp",
     "events/test/key_event_pre_test.cpp",
     "events/test/keyboard_event_test.cpp",
@@ -220,6 +229,12 @@ ohos_unittest("MultimodalinputEventHandlerTest") {
   include_dirs = [
     "//utils/native/base/include",
     "//third_party/googletest/googletest/include",
+    "//utils/native/base/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/frameworks/proxy/event_handler",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/frameworks/util/common",
     "${mmi_path}/frameworks/util/common/include",
     "${mmi_path}/frameworks/util/network",
@@ -259,7 +274,7 @@ ohos_unittest("MultimodalinputEventHandlerTest") {
     cflags += [ "-DOHOS_BUILD_AI" ]
   }
 
-  sources = [ "event_handle/test/multimodal_event_handler_test.cpp" ]
+  sources = [ "event_handler/test/multimodal_event_handler_test.cpp" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -276,6 +291,12 @@ ohos_unittest("KeyEventTest") {
   include_dirs = [
     "//utils/native/base/include",
     "//third_party/googletest/googletest/include",
+    "//utils/native/base/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/frameworks/proxy/event_handler",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/frameworks/util/common",
     "${mmi_path}/frameworks/util/common/include",
     "${mmi_path}/frameworks/util/network",
@@ -332,6 +353,12 @@ ohos_unittest("MultimodalKeyEventTest") {
   include_dirs = [
     "//utils/native/base/include",
     "//third_party/googletest/googletest/include",
+    "//utils/native/base/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/frameworks/proxy/event_handler",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/frameworks/util/common",
     "${mmi_path}/frameworks/util/common/include",
     "${mmi_path}/frameworks/util/network",
@@ -371,7 +398,7 @@ ohos_unittest("MultimodalKeyEventTest") {
     cflags += [ "-DOHOS_BUILD_AI" ]
   }
 
-  sources = [ "event_handle/test/multimodal_key_event_test.cpp" ]
+  sources = [ "event_handler/test/multimodal_key_event_test.cpp" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -388,6 +415,12 @@ ohos_unittest("InputManagerTest") {
   include_dirs = [
     "//utils/native/base/include",
     "//third_party/googletest/googletest/include",
+    "//utils/native/base/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/frameworks/proxy/event_handler",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/frameworks/util/common",
     "${mmi_path}/frameworks/util/common/include",
     "${mmi_path}/frameworks/util/network",
@@ -444,6 +477,12 @@ ohos_unittest("InputManagerManualTest") {
   include_dirs = [
     "//utils/native/base/include",
     "//third_party/googletest/googletest/include",
+    "//utils/native/base/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/frameworks/proxy/event_handler",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/frameworks/util/common",
     "${mmi_path}/frameworks/util/common/include",
     "${mmi_path}/frameworks/util/network",
@@ -500,6 +539,12 @@ ohos_unittest("PointerEventTest") {
   include_dirs = [
     "//utils/native/base/include",
     "//third_party/googletest/googletest/include",
+    "//utils/native/base/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/frameworks/proxy/event_handler",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/frameworks/util/common",
     "${mmi_path}/frameworks/util/common/include",
     "${mmi_path}/frameworks/util/network",
@@ -553,8 +598,7 @@ ohos_unittest("PointerEventTest") {
 
 group("ut-mmi-proxy") {
   testonly = true
-  deps = []
-  deps += [
+  deps = [
     ":InputManagerTest",
     ":KeyEventTest",
     ":MultimodalKeyEventTest",

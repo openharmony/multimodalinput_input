@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,12 +19,14 @@
 #include <memory>
 #include "pointer_event.h"
 #include "input_windows_manager.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class GestureTransformPointProcessor {
 public:
     GestureTransformPointProcessor(int32_t deviceId);
+    DISALLOW_COPY_AND_MOVE(GestureTransformPointProcessor);
     ~GestureTransformPointProcessor();
     std::shared_ptr<PointerEvent> OnTouchPadGestrueEvent(libinput_event *event);
     void SetPointEventSource(int32_t sourceType);
@@ -37,7 +39,7 @@ private:
     int32_t deviceId_;
     std::shared_ptr<PointerEvent> pointerEvent_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif // GESTURE_TRANSFORM_POINT_PROCESSOR_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,7 +25,7 @@ namespace {
 int32_t ProcessingPenDevice::TransformJsonDataToInputData(const Json& penEventArrays,
     InputEventArray& inputEventArray)
 {
-    MMI_LOGI("Enter TransformJsonDataForTouchPen function.");
+    MMI_LOGD("Enter");
     if (penEventArrays.empty()) {
         return RET_ERR;
     }
@@ -44,7 +44,7 @@ int32_t ProcessingPenDevice::TransformJsonDataToInputData(const Json& penEventAr
         return RET_ERR;
     }
     TransformPenEventToInputEvent(penEventArray, inputEventArray);
-    MMI_LOGI("Leave TransformJsonDataForTouchPen function.");
+    MMI_LOGD("Leave");
     return RET_OK;
 }
 

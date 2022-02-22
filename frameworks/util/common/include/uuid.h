@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,9 +17,9 @@
 #define UUID_H
 
 #include <array>
-#include <stdint.h>
+#include <cstdint>
 #include <string>
-#include <string.h>
+#include <cstring>
 
 /**
  * @brief The OHOS subsystem.
@@ -35,39 +35,39 @@ namespace MMI {
 class Uuid {
 public:
     // 128 bits uuid length type
-    constexpr static int UUID128_BYTES_TYPE = 16;
+    constexpr static int32_t UUID128_BYTES_TYPE = 16;
     // 32 bits uuid length
-    constexpr static int UUID32_BYTES_TYPE = 4;
+    constexpr static int32_t UUID32_BYTES_TYPE = 4;
     // 16 bits uuid length
-    constexpr static int UUID16_BYTES_TYPE = 2;
+    constexpr static int32_t UUID16_BYTES_TYPE = 2;
     using UUID128Bit = std::array<uint8_t, UUID128_BYTES_TYPE>;
 
-    constexpr static int UUID_TIME_LOW_FIRST_BYTE = 0;
-    constexpr static int UUID_TIME_LOW_SECEND_BYTE = 1;
-    constexpr static int UUID_TIME_LOW_THIRD_BYTE = 2;
-    constexpr static int UUID_TIME_LOW_FOURTH_BYTE = 3;
-    constexpr static int UUID_TIME_MID_FIRST_BYTE = 4;
-    constexpr static int UUID_TIME_MID_SECEND_BYTE = 5;
-    constexpr static int UUID_VERSION = 6;
-    constexpr static int UUID_TIME_HIGH = 7;
-    constexpr static int UUID_VARIANT = 8;
-    constexpr static int UUID_CLOCK_SEQ = 9;
-    constexpr static int UUID_NODE_FIRST_BYTE = 10;
-    constexpr static int UUID_NODE_SECEND_BYTE = 11;
-    constexpr static int UUID_NODE_THIRD_BYTE = 12;
-    constexpr static int UUID_NODE_FOURTH_BYTE = 13;
-    constexpr static int UUID_NODE_FIFTH_BYTE = 14;
-    constexpr static int UUID_NODE_SIXTH_BYTE = 15;
+    constexpr static int32_t UUID_TIME_LOW_FIRST_BYTE = 0;
+    constexpr static int32_t UUID_TIME_LOW_SECEND_BYTE = 1;
+    constexpr static int32_t UUID_TIME_LOW_THIRD_BYTE = 2;
+    constexpr static int32_t UUID_TIME_LOW_FOURTH_BYTE = 3;
+    constexpr static int32_t UUID_TIME_MID_FIRST_BYTE = 4;
+    constexpr static int32_t UUID_TIME_MID_SECEND_BYTE = 5;
+    constexpr static int32_t UUID_VERSION = 6;
+    constexpr static int32_t UUID_TIME_HIGH = 7;
+    constexpr static int32_t UUID_VARIANT = 8;
+    constexpr static int32_t UUID_CLOCK_SEQ = 9;
+    constexpr static int32_t UUID_NODE_FIRST_BYTE = 10;
+    constexpr static int32_t UUID_NODE_SECEND_BYTE = 11;
+    constexpr static int32_t UUID_NODE_THIRD_BYTE = 12;
+    constexpr static int32_t UUID_NODE_FOURTH_BYTE = 13;
+    constexpr static int32_t UUID_NODE_FIFTH_BYTE = 14;
+    constexpr static int32_t UUID_NODE_SIXTH_BYTE = 15;
 
-    constexpr static int BASE_BIT_OPT_SIZE = 8;
-    constexpr static int BIT_OPT_TWO_BYTE = 2;
-    constexpr static int BIT_OPT_THREE_BYTE = 3;
-    constexpr static int BIT_OPT_FOUR_BYTE = 4;
-    constexpr static int BIT_OPT_FIVE_BYTE = 5;
-    constexpr static int BIT_OPT_SIX_BYTE = 6;
-    constexpr static int BIT_OPT_SEVEN_BYTE = 7;
+    constexpr static int32_t BASE_BIT_OPT_SIZE = 8;
+    constexpr static int32_t BIT_OPT_TWO_BYTE = 2;
+    constexpr static int32_t BIT_OPT_THREE_BYTE = 3;
+    constexpr static int32_t BIT_OPT_FOUR_BYTE = 4;
+    constexpr static int32_t BIT_OPT_FIVE_BYTE = 5;
+    constexpr static int32_t BIT_OPT_SIX_BYTE = 6;
+    constexpr static int32_t BIT_OPT_SEVEN_BYTE = 7;
 
-    constexpr static int SIZE_STRING_TO_INT = 2;
+    constexpr static int32_t SIZE_STRING_TO_INT = 2;
     /**
      * @brief A constructor used to create an <b>UUID</b> instance.
      *

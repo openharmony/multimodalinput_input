@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 #include "pointer_event.h"
 #include "key_event.h"
 #include "input_windows_manager.h"
+#include "nocopyable.h"
 #include "uds_server.h"
 #include "util.h"
 #define KEYSTATUS 0
@@ -28,6 +29,7 @@ namespace MMI {
         static constexpr uint32_t TabletPadButtonNumberPrefix = 0x100;
     public:
         EventPackage();
+        DISALLOW_COPY_AND_MOVE(EventPackage);
         virtual ~EventPackage();
         template<class EventType>
         int32_t PackageEventDeviceInfo(libinput_event *event, EventType& data);

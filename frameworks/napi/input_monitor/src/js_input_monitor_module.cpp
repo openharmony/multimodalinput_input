@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,8 +25,9 @@ namespace OHOS {
 namespace MMI {
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorModule" };
-    constexpr uint32_t MAX_STRING_LEN = 1024;
+    constexpr size_t MAX_STRING_LEN = 1024;
 }
+
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     MMI_LOGD("Enter");
@@ -156,13 +157,13 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
 EXTERN_C_START
 static napi_value MmiInputMonitorInit(napi_env env, napi_value exports)
 {
-    MMI_LOGD("MmiInputMonitorInit: Enter");
+    MMI_LOGD("Enter");
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
-    MMI_LOGD("MmiInputMonitorInit: success");
+    MMI_LOGD("Leave");
     return exports;
 }
 EXTERN_C_END

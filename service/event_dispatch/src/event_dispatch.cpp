@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  */
 
 #include "event_dispatch.h"
-#include <inttypes.h>
+#include <cinttypes>
 #include "input-event-codes.h"
 #include "ability_launch_manager.h"
 #include "bytrace.h"
@@ -42,13 +42,11 @@ constexpr int32_t NOT_TRIGGER_ANR = 1;
 
 static void PrintEventSlotedCoordsInfo(const SlotedCoordsInfo& r)
 {
-    MMI_LOGD("enter");
     using namespace OHOS::MMI;
     for (int32_t i = 0; i < MAX_SOLTED_COORDS_NUMS; i++) {
         MMI_LOGT("[%{public}d] isActive:%{public}d,x:%{public}f,y:%{public}f",
             i, r.coords[i].isActive, r.coords[i].x, r.coords[i].y);
     }
-    MMI_LOGD("leave");
 }
 
 EventDispatch::EventDispatch()
@@ -63,7 +61,6 @@ void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
                                                   const int32_t fingerCount,
                                                   POINT_EVENT_TYPE& pointEventType)
 {
-    MMI_LOGD("enter");
     CHK(fingerCount > 0, PARAM_INPUT_INVALID);
     CHK(touch.time > 0, PARAM_INPUT_INVALID);
     CHK(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
@@ -105,7 +102,6 @@ void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
             }
         }
     }
-    MMI_LOGD("leave");
 }
 
 int32_t EventDispatch::GestureRegisteredEventDispatch(const MmiMessageId& idMsg,
@@ -113,7 +109,6 @@ int32_t EventDispatch::GestureRegisteredEventDispatch(const MmiMessageId& idMsg,
                                                       RegisteredEvent& registeredEvent,
                                                       uint64_t preHandlerTime)
 {
-    MMI_LOGD("enter");
     auto ret = RET_OK;
     if (idMsg == MmiMessageId::ON_PREVIOUS) {
         ret = DispatchRegEvent(MmiMessageId::ON_PREVIOUS, udsServer, registeredEvent,
@@ -135,14 +130,12 @@ int32_t EventDispatch::GestureRegisteredEventDispatch(const MmiMessageId& idMsg,
         ret = DispatchRegEvent(idMsg, udsServer, registeredEvent,
             INPUT_DEVICE_CAP_GESTURE, preHandlerTime);
     }
-    MMI_LOGD("leave");
     return ret;
 }
 
 int32_t EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& udsServer,
     const RegisteredEvent& registeredEvent, int32_t inputDeviceType, uint64_t preHandlerTime)
 {
-    MMI_LOGD("enter");
     CHKR(idMsg > MmiMessageId::INVALID, PARAM_INPUT_INVALID, PARAM_INPUT_INVALID);
     std::vector<int32_t> fds;
     RegEventHM->FindSocketFds(idMsg, fds);
@@ -167,14 +160,12 @@ int32_t EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& ud
             CHKR(udsServer.SendMsg(fd, newPacket), MSG_SEND_FAIL, MSG_SEND_FAIL);
         }
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventDispatch::KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer& udsServer,
     libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     RegisteredEvent eve = {};
     auto result = eventPackage_.PackageRegisteredEvent<EventKeyboard>(key, eve);
@@ -219,19 +210,16 @@ int32_t EventDispatch::KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer
                 SPCL_REG_EVENT_DISP_FAIL);
         }
     }
-    if ((ret1 == RET_OK) && (ret2 == RET_OK)) {
-        MMI_LOGD("leave");
-        return RET_OK;
-    } else {
+    if ((ret1 != RET_OK) || (ret2 != RET_OK)) {
         MMI_LOGE("dispatching special registered event has failed");
         return RET_ERR;
     }
+    return RET_OK;
 }
 
 int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_event *event,
     const EventTabletPad& tabletPad, const uint64_t preHandlerTime)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
@@ -277,14 +265,12 @@ int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_eve
             return MSG_SEND_FAIL;
         }
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_event *event,
     const EventJoyStickAxis& eventJoyStickAxis, const uint64_t preHandlerTime)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
@@ -312,14 +298,12 @@ int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_even
             return MSG_SEND_FAIL;
         }
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, libinput_event *event,
     const EventTabletTool& tableTool, const uint64_t preHandlerTime)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     int32_t focusId = WinMgr->GetFocusSurfaceId(); // obtaining focusId
     if (focusId < 0) {
@@ -367,20 +351,16 @@ int32_t EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, libinput_ev
             return MSG_SEND_FAIL;
         }
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 bool EventDispatch::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point)
 {
-    MMI_LOGD("enter");
-    MMI_LOGD("leave");
     return EventFilterWrap::GetInstance().HandlePointerEventFilter(point);
 }
 
 int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 {
-    MMI_LOGD("Enter");
     CHKPR(point, ERROR_NULL_POINTER);
     auto fd = WinMgr->UpdateTargetPointer(point);
     if (HandlePointerEventFilter(point)) {
@@ -389,14 +369,12 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     }
     if (!point->NeedSkipInspection() &&
         InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
-        int32_t pointerFilter = 1;
-        int32_t touchFilter = 2;
-        if (pointerFilter == point->GetSourceType()) {
+        if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
             int32_t pointerId = point->GetId();
             std::string pointerEvent = "OnEventPointer";
             FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, pointerId);
         }
-        if (touchFilter == point->GetSourceType()) {
+        if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
             int32_t touchId = point->GetId();
             std::string touchEvent = "OnEventTouch";
             FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, touchId);
@@ -423,7 +401,6 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
-    MMI_LOGD("Leave");
     return RET_OK;
 }
 
@@ -433,7 +410,6 @@ int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
     MMI_LOGD("enter");
     CHKPR(point, ERROR_NULL_POINTER);
     InputHandlerManagerGlobal::GetInstance().HandleEvent(point);
-    MMI_LOGD("call  DispatchTouchTransformPointEvent begin");
     auto appInfo = AppRegs->FindByWinId(point->GetAgentWindowId()); // obtain application information
     if (appInfo.fd == RET_ERR) {
         MMI_LOGE("Failed to find fd, errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
@@ -452,7 +428,6 @@ int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
 int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event *event,
     EventPointer &point, const uint64_t preHandlerTime)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
@@ -478,7 +453,7 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, point.time, preHandlerTime)) {
         KeyEventValueTransformations KeyEventValue = {};
         KeyEventValue = KeyValueTransformationByInput(point.button);
-        point.button = KeyEventValue.keyValueOfHos;
+        point.button = KeyEventValue.keyValueOfSys;
         NetPacket newPacket(MmiMessageId::ON_TOUCH);
         int32_t inputType = INPUT_DEVICE_CAP_POINTER;
         newPacket << inputType << inputEvent.curRventType << point << appInfo.abilityId
@@ -525,14 +500,12 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event
             return MSG_SEND_FAIL;
         }
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event *event,
     const EventGesture& gesture, const uint64_t preHandlerTime)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
@@ -583,14 +556,12 @@ int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event
             return MSG_SEND_FAIL;
         }
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
     const EventTouch& touch, const uint64_t preHandlerTime)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
@@ -676,13 +647,11 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
             return MSG_SEND_FAIL;
         }
     }
-    MMI_LOGD("leave");
     return ret;
 }
 int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_event *event,
     const EventPointer& point, const uint64_t preHandlerTime)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     auto type = libinput_event_get_type(event);
@@ -713,62 +682,62 @@ int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_e
                 ret, REG_EVENT_DISP_FAIL);
         }
     }
-    MMI_LOGD("leave");
     return ret;
 }
 
-void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, int32_t number)
+void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler isEventHandler)
 {
     MMI_LOGD("enter");
-    int32_t checkLaunchAbility = 1;
     int32_t keyCode = key->GetKeyCode();
     std::string checkKeyCode;
-    if (checkLaunchAbility == number) {
-        checkKeyCode = "CheckLaunchAbility service GetKeyCode = " + std::to_string(keyCode);
+    if (isEventHandler == KEY_FILTER_EVENT) {
+        checkKeyCode = "key intercept service GetKeyCode=" + std::to_string(keyCode);
+        MMI_LOGT("key intercept service trace GetKeyCode:%{public}d", keyCode);
+    } else if (isEventHandler == KEY_CHECKLAUNABILITY_EVENT) {
+        checkKeyCode = "CheckLaunchAbility service GetKeyCode=" + std::to_string(keyCode);
         MMI_LOGT("CheckLaunchAbility service trace GetKeyCode:%{public}d", keyCode);
     } else {
-        checkKeyCode = "FilterSubscribeKeyEvent service GetKeyCode = " + std::to_string(keyCode);
-        MMI_LOGT("FilterSubscribeKeyEvent service trace GetKeyCode:%{public}d", keyCode);
+        checkKeyCode = "SubscribeKeyEvent service GetKeyCode=" + std::to_string(keyCode);
+        MMI_LOGT("SubscribeKeyEvent service trace GetKeyCode:%{public}d", keyCode);
     }
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, checkKeyCode);
     int32_t keyId = key->GetId();
-    std::string keyEventString = "OnKeyEvent";
+    const std::string keyEventString = "OnKeyEvent";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
 }
 
 int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
     std::shared_ptr<KeyEvent> key, const uint64_t preHandlerTime)
 {
+    MMI_LOGD("begin");
     CHKPR(key, PARAM_INPUT_INVALID);
-    MMI_LOGD("DispatchKeyEventByPid begin");
-    if (key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
+    if (!key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         if (InterceptorMgrGbl.OnKeyEvent(key)) {
             MMI_LOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
                 key->GetKeyCode());
+            OnKeyboardEventTrace(key, KEY_FILTER_EVENT);
             return RET_OK;
         }
     }
     if (AbilityMgr->CheckLaunchAbility(key)) {
         MMI_LOGD("The keyEvent start launch an ability, keyCode:%{public}d", key->GetKeyCode());
-        int32_t checkLaunchAbility = 1;
-        OnKeyboardEventTrace(key, checkLaunchAbility);
+        OnKeyboardEventTrace(key, KEY_CHECKLAUNABILITY_EVENT);
         return RET_OK;
     }
     if (KeyEventSubscriber_.FilterSubscribeKeyEvent(key)) {
         MMI_LOGD("Subscribe keyEvent filter success. keyCode:%{public}d", key->GetKeyCode());
-        int32_t filterSubscribeKeyEvent = 2;
-        OnKeyboardEventTrace(key, filterSubscribeKeyEvent);
+        OnKeyboardEventTrace(key, KEY_SUBSCRIBE_EVENT);
         return RET_OK;
     }
     auto fd = WinMgr->UpdateTarget(key);
-    CHKR(fd > 0, FD_OBTAIN_FAIL, RET_ERR);
+    CHKR(fd >= 0, FD_OBTAIN_FAIL, RET_ERR);
 #ifdef DEBUG_CODE_TEST
     std::string str = WinMgr->GetSurfaceIdListString();
     PrintWMSInfo(str, fd, 0, key->GetTargetWindowId());
 #endif
 
     MMI_LOGT("4.event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
-             "ActionTime:%{public}d,Action:%{public}d,ActionStartTime:%{public}d,"
+             "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
              "EventType:%{public}d,Flag:%{public}d,"
              "KeyAction:%{public}d,Fd:%{public}d,PreHandlerTime:%{public}" PRId64 "",
              key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
@@ -789,14 +758,12 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
         return MSG_SEND_FAIL;
     }
     MMI_LOGD("DispatchKeyEventByPid end");
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *event,
     const KeyEventValueTransformations& trs, EventKeyboard& key, const uint64_t preHandlerTime)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
@@ -831,7 +798,7 @@ int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *ev
         MMI_LOGE("Failed to find, fd:%{public}d,errCode:%{public}d", focusId, FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
     }
-    key.key = trs.keyValueOfHos; // struct EventKeyboard tranformed into HOS_L3
+    key.key = trs.keyValueOfSys; // struct EventKeyboard tranformed into L3
 
     MMI_LOGT("4.event dispatcher of server, eventKeyboard:time:%{public}" PRId64 ",deviceType:%{public}u,"
              "deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,unicode:%{public}d,key:%{public}u,"
@@ -847,21 +814,17 @@ int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *ev
             return MSG_SEND_FAIL;
         }
     }
-    MMI_LOGD("leave");
     return ret;
 }
 
 int32_t EventDispatch::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    MMI_LOGD("enter");
-    MMI_LOGD("leave");
     return EventFilterWrap::GetInstance().AddInputEventFilter(filter);
 }
 
 int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_event *event,
     std::shared_ptr<PointerEvent> pointerEvent, const uint64_t preHandlerTime)
 {
-    MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
@@ -880,24 +843,24 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
     pointerEvent->SetTargetWindowId(focusId);
 
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
-    MMI_LOGT("pointer event dispatcher of server:eventType:%{public}d,actionTime:%{public}d,"
-             "action:%{public}d,actionStartTime:%{public}d,"
+    MMI_LOGT("Pointer event dispatcher of server:eventType:%{public}d,actionTime:%{public}" PRId64 ","
+             "action:%{public}d,actionStartTime:%{public}" PRId64 ","
              "flag:%{public}d,pointerAction:%{public}d,sourceType:%{public}d,"
              "VerticalAxisValue:%{public}.02f, HorizontalAxisValue:%{public}.02f,"
-             "pointerCount:%{public}d",
+             "pointerCount:%{public}zu",
              pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
              pointerEvent->GetFlag(), pointerEvent->GetPointerAction(),
              pointerEvent->GetSourceType(),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
-             static_cast<int32_t>(pointerIds.size()));
+             pointerIds.size());
 
     for (const auto &pointerId : pointerIds) {
         OHOS::MMI::PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
 
-        MMI_LOGT("\tdownTime:%{public}d,isPressed:%{public}s,"
+        MMI_LOGT("\tdownTime:%{public}" PRId64 ",isPressed:%{public}s,"
                  "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
                  "width:%{public}d,height:%{public}d,pressure:%{public}d",
                  item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
@@ -912,7 +875,6 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
         MMI_LOGE("Sending structure of PointerEvent failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
@@ -934,13 +896,13 @@ int32_t EventDispatch::IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id
         MMI_LOGI("event is cleared");
     }
 
-    int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-        "APPLICATION_BLOCK_INPUT",
-        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
-    if (ret < 0) {
-        MMI_LOGE("failed to notify HiSysEvent");
-        return TRIGGER_ANR;
-    }
+    // int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+    //     "APPLICATION_BLOCK_INPUT",
+    //     OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+    // if (ret < 0) {
+    //     MMI_LOGE("failed to notify HiSysEvent");
+    //     return TRIGGER_ANR;
+    // }
 
     MMI_LOGD("end");
     return TRIGGER_ANR;

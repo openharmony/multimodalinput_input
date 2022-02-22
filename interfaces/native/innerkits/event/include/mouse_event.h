@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #include <map>
 #include "struct_multimodal.h"
 #include "mmi_point.h"
+#include "nocopyable.h"
 #include "composite_event.h"
 
 enum class MouseActionEnum: int32_t {
@@ -172,6 +173,8 @@ namespace OHOS {
  */
 class MouseEvent : public CompositeEvent {
 public:
+    MouseEvent() = default;
+    DISALLOW_COPY_AND_MOVE(MouseEvent);
     virtual ~MouseEvent();
     /**
     * initialize the object.
@@ -280,15 +283,15 @@ public:
     virtual float GetAxisValue(int32_t axis) const;
 
 private:
-    int32_t mAction_ = 0;
-    int32_t mActionButton_ = 0;
-    int32_t mPressedButtons_ = 0;
-    MmiPoint mMmiPoint_;
-    float mXOffset_ = 0.f;
-    float mYOffset_ = 0.f;
-    float mCursorDelta_ = 0.f;
-    float mScrollingDelta_ = 0.f;
-    std::map<int32_t, float> mapDeviceAxis_ = {};
+    int32_t action_ = 0;
+    int32_t actionButton_ = 0;
+    int32_t pressedButtons_ = 0;
+    MmiPoint mmiPoint_;
+    float xOffset_ = 0.f;
+    float yOffset_ = 0.f;
+    float cursorDelta_ = 0.f;
+    float scrollingDelta_ = 0.f;
+    std::map<int32_t, float> deviceAxis_ = {};
 };
-}
+} // namespace OHOS
 #endif // MOUSE_EVENT_H

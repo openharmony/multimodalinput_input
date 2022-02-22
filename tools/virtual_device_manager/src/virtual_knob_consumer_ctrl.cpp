@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,7 @@
 OHOS::MMI::VirtualKnobConsumerCtrl::VirtualKnobConsumerCtrl() : VirtualDevice("Virtual KnobConsumerCtrl",
     BUS_USB, 0x5ac, 0x202)
 {
-    const int32_t ABS_MAX_VOLUME = 572;
+    constexpr int32_t ABS_MAX_VOLUME = 572;
 
     dev_.absmin[ABS_VOLUME] = 0;
     dev_.absmax[ABS_VOLUME] = ABS_MAX_VOLUME;

@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -96,7 +96,7 @@ ohos_shared_library("event-injection") {
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
-    "//foundation/multimodalinput/input/service/event_filter_binder:mmi_event_filter_service",
+    "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
@@ -114,6 +114,12 @@ ohos_unittest("ut-event-injection-out") {
     "//utils/native/base/include",
     "//third_party/googletest/googletest/include",
     "//third_party/wayland-ivi-extension/include",
+    "//utils/native/base/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/frameworks/proxy/event_handler",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/frameworks/util/common",
     "${mmi_path}/frameworks/util/common/include",
     "${mmi_path}/frameworks/util/network",
@@ -133,7 +139,7 @@ ohos_unittest("ut-event-injection-out") {
     "${mmi_path}/service/application_manager/include",
     "${mmi_path}/service/device_scalability/include",
     "${mmi_path}/service/event_dispatch/include",
-    "${mmi_path}/service/event_handle/include",
+    "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/event_standard/include",
     "${mmi_path}/service/hdi_inject/include",
     "${mmi_path}/service/hdf_adapter/include",
@@ -213,6 +219,42 @@ ohos_unittest("ut-event-injection-out") {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+}
+
+ohos_executable("hosmmi-event-injection") {
+  sources = [ "src/hosmmi_event_simulate_main.cpp" ]
+  deps = [
+    "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
+    "//foundation/multimodalinput/input/tools/event_inject:event-injection",
+  ]
+
+  if (is_mmi_have_libinput) {
+    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
+  }
+  cflags = [ "-DOHOS_BUILD" ]
+
+  if (is_mmi_have_debug) {
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [ "-DOHOS_BUILD_AI" ]
+  }
+
+  if (is_mmi_have_weston) {
+    cflags += [ "-DOHOS_WESTEN_MODEL" ]
+  }
+
+  install_enable = true
+  part_name = "multimodalinput_base"
 }
 
 group("ut-event-injection") {

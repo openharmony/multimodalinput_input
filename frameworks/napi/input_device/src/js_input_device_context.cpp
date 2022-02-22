@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,15 +23,15 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN,
 
 JsInputDeviceContext::JsInputDeviceContext()
 {
-    jsInputDeviceMgr_ = std::make_shared<JsInputDeviceManager>();
-    CKP(jsInputDeviceMgr_);
+    mager_ = std::make_shared<JsInputDeviceManager>();
+    CHKPL(mager_);
 }
 
 JsInputDeviceContext::~JsInputDeviceContext()
 {
     std::lock_guard<std::mutex> guard(mtx_);
-    auto jsInputDeviceMgr =  jsInputDeviceMgr_;
-    jsInputDeviceMgr_.reset();
+    auto jsInputDeviceMgr =  mager_;
+    mager_.reset();
     if (jsInputDeviceMgr) {
         jsInputDeviceMgr->ResetEnv();
     }
@@ -48,7 +48,7 @@ napi_value JsInputDeviceContext::CreateInstance(napi_env env)
         return nullptr;
     }
 
-    const char className[] = "JsInputDeviceContext";
+    constexpr char className[] = "JsInputDeviceContext";
     napi_value jsClass = nullptr;
     napi_property_descriptor desc[] = {};
     status = napi_define_class(env, className, sizeof(className), JsInputDeviceContext::JsConstructor, nullptr,
@@ -87,7 +87,7 @@ napi_value JsInputDeviceContext::CreateInstance(napi_env env)
         MMI_LOGE("failed to get jsContext");
         return nullptr;
     }
-    CKP(jsContext);
+    CHKPP(jsContext, nullptr);
     status = napi_create_reference(env, jsInstance, 1, &(jsContext->contextRef_));
     if (status != napi_ok) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to create contextRef_");
@@ -183,7 +183,7 @@ JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
 
 std::shared_ptr<JsInputDeviceManager> JsInputDeviceContext::GetJsInputDeviceMgr()
 {
-    return jsInputDeviceMgr_;
+    return mager_;
 }
 
 napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info info)
@@ -193,31 +193,42 @@ napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info i
     napi_value argv[1];
     napi_status status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (status != napi_ok) {
+        MMI_LOGE("parameter acquisition failed");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: parameter acquisition failed");
         return nullptr;
     }
     if (argc > 1) {
+        MMI_LOGE("too many parameters");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: too many parameters");
         return nullptr;
     }
 
     JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
     auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
-    if (argc == 1) {
-        napi_valuetype valueType = napi_undefined;
-        status = napi_typeof(env, argv[0], &valueType);
+    if (argc == 0) {
+        status = napi_create_promise(env, &JsEventTarget::deferred_, &JsEventTarget::promise_);
         if (status != napi_ok) {
-            napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to get the first parameter type");
+            napi_throw_error(env, nullptr, "JsEventTarget: failed to create promise");
+            MMI_LOGE("failed to create promise");
             return nullptr;
         }
-        if (valueType != napi_function) {
-            napi_throw_error(env, nullptr, "JsInputDeviceContext: the first parameter is not a function");
-            return nullptr;
-        }
-        jsInputDeviceMgr->GetDeviceIdsAsync(env, argv[0]);
-    } else {
-        // promise
+        jsInputDeviceMgr->GetDeviceIds(env);
+        return JsEventTarget::promise_;
     }
+
+    napi_valuetype valueType = napi_undefined;
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        MMI_LOGE("failed to get the first parameter type");
+        napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to get the first parameter type");
+        return nullptr;
+    }
+    if (valueType != napi_function) {
+        MMI_LOGE("the first parameter is not a function");
+        napi_throw_error(env, nullptr, "JsInputDeviceContext: the first parameter is not a function");
+        return nullptr;
+    }
+    jsInputDeviceMgr->GetDeviceIds(env, argv[0]);
     MMI_LOGD("end");
     return nullptr;
 }
@@ -233,6 +244,7 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
         return nullptr;
     }
     if (argc < 1 || argc > 2) {
+        MMI_LOGE("the number of parameters is not as expected");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: the number of parameters is not as expected");
         return nullptr;
     }
@@ -240,14 +252,19 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
     napi_valuetype valueType = napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
+        MMI_LOGE("failed to get the first parameter type");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to get the first parameter type");
+        return nullptr;
     }
     if (valueType != napi_number) {
+        MMI_LOGE("the first parameter is not a number");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: the first parameter is not a number");
+        return nullptr;
     }
     int32_t id = 0;
     status = napi_get_value_int32(env, argv[0], &id);
     if (status != napi_ok) {
+        MMI_LOGE("failed to get id");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to get id");
         return nullptr;
     }
@@ -255,19 +272,29 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
     if (argc == 1) {
-        // promise
-    } else {
-        status = napi_typeof(env, argv[1], &valueType);
+        status = napi_create_promise(env, &JsEventTarget::deferred_, &JsEventTarget::promise_);
         if (status != napi_ok) {
-            napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to get the second parameter type");
+            napi_throw_error(env, nullptr, "JsEventTarget: failed to create promise");
+            MMI_LOGE("failed to create promise");
             return nullptr;
         }
-        if (valueType != napi_function) {
-            napi_throw_error(env, nullptr, "JsInputDeviceContext: the second parameter is not a function");
-            return nullptr;
-        }
-        jsInputDeviceMgr->GetDeviceAsync(id, env, argv[1]);
+        jsInputDeviceMgr->GetDevice(id, env);
+        MMI_LOGD("promise end");
+        return JsEventTarget::promise_;
     }
+    status = napi_typeof(env, argv[1], &valueType);
+    if (status != napi_ok) {
+        MMI_LOGE("failed to get the second parameter type");
+        napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to get the second parameter type");
+        return nullptr;
+    }
+    if (valueType != napi_function) {
+        MMI_LOGE("the second parameter is not a function");
+        napi_throw_error(env, nullptr, "JsInputDeviceContext: the second parameter is not a function");
+        return nullptr;
+    }
+    jsInputDeviceMgr->GetDevice(id, env, argv[1]);
+
     MMI_LOGD("end");
     return nullptr;
 }

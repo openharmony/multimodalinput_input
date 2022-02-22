@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  */
 
 #include "uds_client.h"
-#include <inttypes.h>
+#include <cinttypes>
 #include "util.h"
 
 namespace OHOS {
@@ -25,14 +25,14 @@ namespace {
 
 UDSClient::UDSClient()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
 }
 
 UDSClient::~UDSClient()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     Stop();
-    MMI_LOGT("leave");
+    MMI_LOGD("leave");
 }
 
 int32_t UDSClient::ConnectTo()
@@ -66,6 +66,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
 
 bool UDSClient::SendMsg(const NetPacket& pkt) const
 {
+    CHKF(!pkt.ChkError(), PACKET_WRITE_FAIL);
     StreamBuffer buf;
     pkt.MakeData(buf);
     return SendMsg(buf.Data(), buf.Size());
@@ -111,7 +112,7 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
 
 void UDSClient::Stop()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     Close();
     isRunning_ = false;
     epoll_event ev = {};
@@ -123,15 +124,15 @@ void UDSClient::Stop()
         MMI_LOGT("thread join");
         t_.join();
     }
-    MMI_LOGT("leave");
+    MMI_LOGD("leave");
 }
 
 void UDSClient::OnRecv(const char *buf, size_t size)
 {
-    CHKP(buf);
+    CHKPV(buf);
     int32_t readIdx = 0;
     int32_t packSize = 0;
-    const auto headSize = static_cast<int32_t>(sizeof(PackHead));
+    const size_t headSize = sizeof(PackHead);
     CHK(size >= headSize, VAL_NOT_EXP);
     while (size > 0 && recvFun_) {
         CHK(size >= headSize, VAL_NOT_EXP);
@@ -151,7 +152,6 @@ void UDSClient::OnRecv(const char *buf, size_t size)
 
 void UDSClient::OnEvent(const epoll_event& ev, StreamBuffer& buf)
 {
-    auto isoverflow = false;
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
         MMI_LOGI("ev.events:0x%{public}x,fd:%{public}d same as fd_:%{public}d", ev.events, fd, fd_);
@@ -165,10 +165,14 @@ void UDSClient::OnEvent(const epoll_event& ev, StreamBuffer& buf)
     }
 
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
-    const auto maxCount = static_cast<int32_t>(MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE) + 1;
+    const size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
     CHK(maxCount > 0, VAL_NOT_EXP);
-    for (auto j = 0; j < maxCount; j++) {
+    auto isoverflow = false;
+    for (size_t j = 0; j < maxCount; j++) {
         auto size = read(fd, static_cast<void *>(szBuf), MAX_PACKET_BUF_SIZE);
+        if (size < 0) {
+            MMI_LOGE("size:%{public}zu", size);
+        }
         if (size > 0) {
             if (!buf.Write(szBuf, size)) {
                 isoverflow = true;
@@ -189,8 +193,8 @@ void UDSClient::OnEvent(const epoll_event& ev, StreamBuffer& buf)
 
 void UDSClient::OnThread(std::promise<bool>& threadPromise)
 {
+    MMI_LOGD("begin");
     SetThreadName("uds_client");
-    MMI_LOGD("UDSClient::OnThread begin");
     isThreadHadRun_ = true;
     StreamBuffer streamBuf;
     epoll_event events[MAX_EVENT_SIZE] = {};
@@ -221,7 +225,7 @@ void UDSClient::OnThread(std::promise<bool>& threadPromise)
         }
     }
     threadPromise.set_value(true);
-    MMI_LOGD("UDSClient::OnThread end");
+    MMI_LOGD("end");
 }
 
 void UDSClient::SetToExit()

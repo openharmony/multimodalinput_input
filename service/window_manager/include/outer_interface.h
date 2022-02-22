@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,10 +37,10 @@ public:
         const int16_t systemEventAttr);
     static int32_t IsFocusChange(int32_t srcSurfaceId, int32_t desSurfaceId);
     static int32_t notifyFocusChange(int32_t abilityId, int32_t windowId);
-    static int32_t GetSystemEventAttrByHosKeyValue(const int16_t keyValueOfHos);
+    static int32_t GetSystemEventAttrByKeyValue(const int16_t keyValueOfSys);
 };
-};
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif
 #endif // OUTER_INTERFACE_H

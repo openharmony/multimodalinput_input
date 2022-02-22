@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  */
 
 #include <algorithm>
-#include <inttypes.h>
+#include <cinttypes>
 #include "input_manager.h"
 #include "js_register_util.h"
 #include "js_register_module.h"
@@ -23,16 +23,16 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
+    constexpr size_t EVENT_NAME_LEN = 64;
+    constexpr size_t ARGC_NUM = 3;
+    constexpr size_t ARGV_FIRST = 0;
+    constexpr size_t ARGV_SECOND = 1;
+    constexpr size_t ARGV_THIRD = 2;
+    constexpr size_t PRE_KEYS_SIZE = 4;
 }
 
-const uint32_t EVENT_NAME_LEN = 64;
-const uint32_t ARGC_NUM = 3;
-const uint32_t ARGV_FIRST = 0;
-const uint32_t ARGV_SECOND = 1;
-const uint32_t ARGV_THIRD = 2;
-const uint32_t PRE_KEYS_SIZE = 4;
-Callbacks callbacks = {};
+static Callbacks callbacks = {};
 
 int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
     std::shared_ptr<KeyOption> keyOption)
@@ -86,7 +86,7 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
         return ERROR_CODE;
     }
     std::vector<int32_t> preKeys = GetIntArray(env, receiceValue);
-    MMI_LOGD("PreKeys size:%{public}d", static_cast<int32_t>(preKeys.size()));
+    MMI_LOGD("PreKeys size:%{public}zu", preKeys.size());
     std::vector<int32_t> sortPrekeys = preKeys;
     sort(sortPrekeys.begin(), sortPrekeys.end());
     keyOption->SetPreKeys(preKeys);
@@ -113,10 +113,6 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
         (isFinalKeyDown == true?1:0), subKeyNames.c_str());
 
     int32_t finalKeyDownDuriation = GetNamedPropertyInt32(env, argv[ARGV_SECOND], "finalKeyDownDuration");
-    if (napi_get_value_int32(env, receiceValue, &finalKeyDownDuriation) != napi_ok) {
-        napi_throw_error(env, nullptr, "FinalKeyDownDuriation get value failed");
-        return ERROR_CODE;
-    }
     subKeyNames += std::to_string(finalKeyDownDuriation);
     keyOption->SetFinalKeyDownDuration(finalKeyDownDuriation);
     event->eventType = subKeyNames;
@@ -167,7 +163,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     auto upTime = keyEvent->GetActionTime();
     auto downTime = keyItem->GetDownTime();
     auto curDurtionTime = keyOption->GetFinalKeyDownDuration();
-    if (curDurtionTime > 0 && (upTime - downTime >= (curDurtionTime * 1000))) {
+    if (curDurtionTime > 0 && (upTime - downTime >= (static_cast<int64_t>(curDurtionTime) * 1000))) {
         MMI_LOGE("Skip, upTime - downTime >= duration");
         return false;
     }
@@ -181,7 +177,7 @@ static void SubKeyEventCallback(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     while (iter != callbacks.end()) {
         auto &list = iter->second;
         iter++;
-        MMI_LOGD("list size:%{public}d", static_cast<int32_t>(list.size()));
+        MMI_LOGD("list size:%{public}zu", list.size());
         auto infoIter = list.begin();
         while (infoIter != list.end()) {
             auto monitorInfo = *infoIter;
@@ -220,7 +216,7 @@ bool CheckPara(const std::shared_ptr<KeyOption> keyOption)
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     MMI_LOGD("enter");
-    KeyEventMonitorInfo *event = new KeyEventMonitorInfo {
+    KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
         .env = env,
         .asyncWork = nullptr,
     };
@@ -240,7 +236,6 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         MMI_LOGE("AddEventCallback failed");
         return nullptr;
     }
-
     if (preSubscribeId < 0) {
         MMI_LOGD("eventType:%{public}s,eventName:%{public}s", event->eventType.c_str(),  event->name.c_str());
         int32_t subscribeId = -1;
@@ -262,11 +257,11 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     MMI_LOGD("enter");
-    KeyEventMonitorInfo *event = new KeyEventMonitorInfo {
+    KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
         .env = env,
         .asyncWork = nullptr,
     };
-    auto keyOption = std::shared_ptr<KeyOption>(new KeyOption());
+    auto keyOption = std::make_shared<KeyOption>();
     if (GetEventInfo(env, info, event, keyOption) < 0) {
         MMI_LOGE("GetEventInfo failed");
         return nullptr;
@@ -279,7 +274,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         return nullptr;
     }
     MMI_LOGD("SubscribeId:%{public}d", subscribeId);
-    if (subscribeId > 0) {
+    if (subscribeId >= 0) {
         InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
     }
     event->status = 0;
@@ -296,7 +291,7 @@ static napi_value MmiInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("off", JsOff),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
-    MMI_LOGD("success");
+    MMI_LOGD("Leave");
     return exports;
 }
 EXTERN_C_END
@@ -315,5 +310,5 @@ extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
     napi_module_register(&mmiModule);
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

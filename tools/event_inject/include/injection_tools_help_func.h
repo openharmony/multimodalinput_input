@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,15 +15,15 @@
 #ifndef INJECTION_TOOLS_HELP_FUNC_H
 #define INJECTION_TOOLS_HELP_FUNC_H
 
-#include <string.h>
+#include <cstring>
 #include "util.h"
 
 namespace OHOS {
-    namespace MMI {
-        class InjectionToolsHelpFunc {
-        public:
-            std::string GetHelpText();
-        };
-    }
-}
+namespace MMI {
+class InjectionToolsHelpFunc {
+public:
+    std::string GetHelpText();
+};
+} // namespace MMI
+} // namespace OHOS
 #endif // INJECTION_TOOLS_HELP_FUNC_H

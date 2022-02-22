@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,9 +29,17 @@ namespace MMI {
 class JsEventTarget {
 public:
     static void EmitJsIdsAsync(std::vector<int32_t> ids);
-    static void EmitJsDevAsync(std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device);
     static void CallIdsAsyncWork(napi_env env, napi_status status, void* data);
+
+    static void EmitJsIdsPromise(std::vector<int32_t> ids);
+    static void CallIdsPromiseWork(napi_env env, napi_status status, void* data);
+
+    static void EmitJsDevAsync(std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device);
     static void CallDevAsyncWork(napi_env env, napi_status status, void* data);
+
+    static void EmitJsDevPromise(std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device);
+    static void CallDevPromiseWork(napi_env env, napi_status status, void* data);
+
     void SetContext(napi_env env, napi_value handle);
     void ResetEnv();
 
@@ -44,6 +52,8 @@ public:
     static napi_ref ref_;
     static napi_env env_;
     static napi_async_work asyncWork_;
+    static napi_deferred deferred_;
+    static napi_value promise_;
 
     struct DeviceType {
         std::string deviceTypeName;

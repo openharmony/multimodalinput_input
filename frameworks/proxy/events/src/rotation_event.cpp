@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,17 +23,17 @@ void RotationEvent::Initialize(int32_t windowId, float rotationValue, int32_t hi
 {
     MultimodalEvent::Initialize(windowId, highLevelEvent, uuid, sourceType, occurredTime, deviceId, inputDeviceId,
                                 isHighLevelEvent, deviceUdevTags);
-    mRotationValue_ = rotationValue;
+    rotationValue_ = rotationValue;
 }
 
 void RotationEvent::Initialize(RotationEvent& rotationEvent)
 {
     MultimodalEvent::Initialize(rotationEvent);
-    mRotationValue_ = rotationEvent.GetRotationValue();
+    rotationValue_ = rotationEvent.GetRotationValue();
 }
 
 float RotationEvent::GetRotationValue() const
 {
-    return mRotationValue_;
+    return rotationValue_;
 }
 } // namespace OHOS

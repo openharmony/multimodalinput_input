@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@
 #include <functional>
 #include "uds_socket.h"
 #include "net_packet.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -28,6 +29,7 @@ using MsgClientFunCallback = std::function<void(const UDSClient&, NetPacket&)>;
 class UDSClient : public UDSSocket {
 public:
     UDSClient();
+    DISALLOW_COPY_AND_MOVE(UDSClient);
     virtual ~UDSClient();
 
     virtual int32_t Socket() = 0;
@@ -72,7 +74,7 @@ protected:
     std::promise<bool> threadPromiseHadEnd_;
     std::future<bool> threadFutureHadEnd_ = threadPromiseHadEnd_.get_future();
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif // UDS_CLIENT_H

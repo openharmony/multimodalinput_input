@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,10 +16,10 @@
 #define MMI_SERVER_H
 #include "app_register.h"
 #include "device_register.h"
-#include "expansibility_operation.h"
 #include "server_msg_handler.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
+#include "nocopyable.h"
 #include "register_eventhandle_manager.h"
 
 #ifndef OHOS_WESTEN_MODEL
@@ -40,6 +40,7 @@ namespace MMI {
 class MMIServer : public UDSServer {
 public:
     MMIServer();
+    DISALLOW_COPY_AND_MOVE(MMIServer);
     virtual ~MMIServer() override;
     int32_t Start();
     void OnTimer();
@@ -54,7 +55,6 @@ protected:
 
 protected:
     ServerMsgHandler sMsgHandler_;
-    ExpansibilityOperation expOper_;
 #ifdef  OHOS_BUILD_AI
     SeniorInputFuncProcBase seniorInput_;
 #endif // OHOS_BUILD_AI
@@ -64,9 +64,8 @@ protected:
 #endif
 private:
     int32_t InitUds();
-    int32_t InitExpSoLibrary();
     int32_t InitLibinput();
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // MMI_SERVER_H

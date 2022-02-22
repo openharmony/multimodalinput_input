@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,14 +23,14 @@
 
 namespace OHOS {
 namespace MMI {
-InputManager *InputManager::mInstance_ = nullptr;
+InputManager *InputManager::instance_ = nullptr;
 
 InputManager *InputManager::GetInstance()
 {
-    if (mInstance_ == nullptr) {
-        mInstance_ = new InputManager();
+    if (instance_ == nullptr) {
+        instance_ = new InputManager();
     }
-    return mInstance_;
+    return instance_;
 }
 
 void InputManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,10 +20,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static int64_t g_nextEventId = 1;
+    int64_t g_nextEventId = 1;
 }
-const int32_t InputEvent::EVENT_TYPE_KEY;
-const int32_t InputEvent::EVENT_TYPE_POINTER;
 
 InputEvent::InputEvent(int32_t eventType) : eventType_(eventType)
 {
@@ -42,12 +40,12 @@ InputEvent::~InputEvent() {}
 
 void InputEvent::Reset()
 {
-    int32_t conversionStep = 1000000;
     timespec ts = { 0, 0 };
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
         actionTime_ = 0;
     }
     id_ = DEFALUTID;
+    int32_t conversionStep = 1000000;
     uint64_t nowTime = (ts.tv_sec * static_cast<uint64_t>(1e3)) + (ts.tv_nsec / conversionStep);
     int32_t actionTime = static_cast<int32_t>(nowTime);
     actionTime_ = actionTime;
@@ -80,12 +78,12 @@ void InputEvent::UpdateId()
     id_ = g_nextEventId++;
 }
 
-int32_t InputEvent::GetActionTime() const
+int64_t InputEvent::GetActionTime() const
 {
     return actionTime_;
 }
 
-void InputEvent::SetActionTime(int32_t actionTime)
+void InputEvent::SetActionTime(int64_t actionTime)
 {
     actionTime_ = actionTime;
 }
@@ -100,12 +98,12 @@ void InputEvent::SetAction(int32_t action)
     action_ = action;
 }
 
-int32_t InputEvent::GetActionStartTime() const
+int64_t InputEvent::GetActionStartTime() const
 {
     return actionStartTime_;
 }
 
-void InputEvent::SetActionStartTime(int32_t actionStartTime)
+void InputEvent::SetActionStartTime(int64_t actionStartTime)
 {
     actionStartTime_ = actionStartTime;
 }
@@ -217,7 +215,7 @@ bool InputEvent::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    if (!out.WriteInt32(actionTime_)) {
+    if (!out.WriteInt64(actionTime_)) {
         return false;
     }
 
@@ -225,7 +223,7 @@ bool InputEvent::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    if (!out.WriteInt32(actionStartTime_)) {
+    if (!out.WriteInt64(actionStartTime_)) {
         return false;
     }
 
@@ -262,7 +260,7 @@ bool InputEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    if (!in.ReadInt32(actionTime_)) {
+    if (!in.ReadInt64(actionTime_)) {
         return false;
     }
 
@@ -270,7 +268,7 @@ bool InputEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    if (!in.ReadInt32(actionStartTime_)) {
+    if (!in.ReadInt64(actionStartTime_)) {
         return false;
     }
 

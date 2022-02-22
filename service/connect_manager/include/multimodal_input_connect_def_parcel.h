@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,26 +21,26 @@
 
 namespace OHOS {
 namespace MMI {
-struct ConnectDefReqParcel final : public Parcelable {
-    ConnectDefReqParcel() = default;
+struct ConnectReqParcel final : public Parcelable {
+    ConnectReqParcel() = default;
 
-    ~ConnectDefReqParcel() override = default;
+    ~ConnectReqParcel() override = default;
 
     bool Marshalling(Parcel& out) const override;
 
-    static ConnectDefReqParcel *Unmarshalling(Parcel& in);
+    static ConnectReqParcel *Unmarshalling(Parcel& in);
 
     ConnectDefReq data;
 };
 
-struct ConnectDefRespParcel final : public Parcelable {
-    ConnectDefRespParcel() = default;
+struct ConnectRespParcel final : public Parcelable {
+    ConnectRespParcel() = default;
 
-    ~ConnectDefRespParcel() override = default;
+    ~ConnectRespParcel() override = default;
 
     bool Marshalling(Parcel &out) const override;
 
-    static ConnectDefRespParcel *Unmarshalling(Parcel &in);
+    static ConnectRespParcel *Unmarshalling(Parcel &in);
 
     ConnectDefResp data;
 };

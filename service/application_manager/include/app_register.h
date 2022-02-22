@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -80,9 +80,9 @@ private:
 
 private:
     std::vector<int32_t> fds_;
-    std::map<int32_t, AppInfo> mapSurface_ = {}; // key=windowId:value=AppInfo
+    std::map<int32_t, AppInfo> surfaceInfo_ = {}; // key=windowId:value=AppInfo
     std::vector<WaitQueueEvent> waitQueue_ = {};
-    std::map<int32_t, int8_t> mapConnectState_ = {};
+    std::map<int32_t, int8_t> connectState_ = {};
 
     std::mutex mu_;
     UDSServer *udsServer_ = nullptr;
