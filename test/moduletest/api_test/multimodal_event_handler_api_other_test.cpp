@@ -131,7 +131,7 @@ HWTEST_F(MultimodalEventHandlerApiOtherTest, Api_Test_GetAbilityInfoVec, TestSiz
     auto retAbilityInfoVec = multimodalEventHandlerTest.GetAbilityInfoVec();
     int32_t retWindowId = 0;
     auto iter = retAbilityInfoVec.cbegin();
-    for (; iter != retAbilityInfoVec.cend(); iter++) {
+    for (; iter != retAbilityInfoVec.cend(); ++iter) {
         retWindowId = iter[0].windowId;
     }
     EXPECT_EQ(retWindowId, windowId);
