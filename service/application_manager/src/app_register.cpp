@@ -89,7 +89,7 @@ void AppRegister::UnregisterBySocketFd(int32_t fd)
         if (it->second.fd == fd) {
             it = surfaceInfo_.erase(it);
         } else {
-            it++;
+            ++it;
         }
     }
 }
@@ -213,7 +213,7 @@ bool AppRegister::CheckConnectionIsDead(const int32_t findFd)
 
 bool AppRegister::CheckWaitQueueBlock(ssize_t currentTime, ssize_t timeOut, const int32_t findFd)
 {
-    for (auto iter = waitQueue_.begin(); iter != waitQueue_.end(); iter++) {
+    for (auto iter = waitQueue_.begin(); iter != waitQueue_.end(); ++iter) {
         if (findFd == iter->fd) {
             if (currentTime >= (iter->serverTime + timeOut)) {
                 MMI_LOGE("IsMultimodeInputReady: The wait queue is blocked! fd:%{public}d,idMsg:%{public}d,"
@@ -230,7 +230,7 @@ void AppRegister::DeleteEventFromWaitQueue(int32_t fd, int32_t idMsg)
 {
     std::lock_guard<std::mutex> lock(mu_);
     CHK(fd >= 0, PARAM_INPUT_INVALID);
-    for (auto iter = waitQueue_.begin(); iter != waitQueue_.end(); iter++) {
+    for (auto iter = waitQueue_.begin(); iter != waitQueue_.end(); ++iter) {
         if ((iter->event == idMsg) && (iter->fd == fd)) {
             waitQueue_.erase(iter);
             break;

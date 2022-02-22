@@ -54,7 +54,7 @@ int32_t InputFilterManager::UnFilterKeyEvent(int32_t id)
         MMI_LOGD("keyEventFilterList_ size is zero ");
         return RET_ERR;
     }
-    for (auto it = keyEventFilterList_.begin(); it != keyEventFilterList_.end(); it++) {
+    for (auto it = keyEventFilterList_.begin(); it != keyEventFilterList_.end(); ++it) {
         if (it->GetId() == id) {
             keyEventFilterList_.erase(it);
             if (id == highestId_) {
@@ -76,7 +76,7 @@ int32_t InputFilterManager::UnFilterKeyEvent(int32_t id)
         return RET_OK;
     }
     auto item = keyEventFilterList_.begin();
-    for (auto it = keyEventFilterList_.begin(); it != keyEventFilterList_.end(); it++) {
+    for (auto it = keyEventFilterList_.begin(); it != keyEventFilterList_.end(); ++it) {
         if (it->GetAuthority() > highestAuthority_) {
             highestAuthority_ = it->GetAuthority();
             highestId_ = it->GetId();
@@ -191,7 +191,7 @@ int32_t InputFilterManager::UnFilterTouchEvent(int32_t id)
         return RET_ERR;
     }
 
-    for (auto it = touchEventFilterList_.begin(); it != touchEventFilterList_.end(); it++) {
+    for (auto it = touchEventFilterList_.begin(); it != touchEventFilterList_.end(); ++it) {
         if (it->GetId() == id) {
             MMI_LOGD("remove client filter success");
             touchEventFilterList_.erase(it);
@@ -299,7 +299,7 @@ int32_t InputFilterManager::UnRegisterPointerEventInterceptor(int32_t id_)
         MMI_LOGD("The number of [pointer event interceptors] is 0");
         return RET_OK;
     }
-    for (auto it = PointerEventInterceptorList_.begin(); it != PointerEventInterceptorList_.end(); it++) {
+    for (auto it = PointerEventInterceptorList_.begin(); it != PointerEventInterceptorList_.end(); ++it) {
         if (it->GetId() == id_) {
             PointerEventInterceptorList_.erase(it);
             if (id_ == pHighestId_) {
@@ -321,7 +321,7 @@ int32_t InputFilterManager::UnRegisterPointerEventInterceptor(int32_t id_)
         return RET_OK;
     }
     auto item = PointerEventInterceptorList_.begin();
-    for (auto it = PointerEventInterceptorList_.begin(); it != PointerEventInterceptorList_.end(); it++) {
+    for (auto it = PointerEventInterceptorList_.begin(); it != PointerEventInterceptorList_.end(); ++it) {
         if (it->GetAuthority() > pHighestAuthority_) {
             pHighestAuthority_ = it->GetAuthority();
             pHighestId_ = it->GetId();
