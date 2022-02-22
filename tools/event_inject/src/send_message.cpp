@@ -26,7 +26,7 @@ namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "SendMessage"};
 }
 
-int32_t SendMessage::GetDevIndexByName(const std::string& deviceName)
+int32_t SendMessage::GetDevIndexName(const std::string& deviceName)
 {
     static const std::map<std::string, INPUT_DEVICE_INDEX> deviceTypeToIndexMap = {
         {"keyboard model1", INPUT_DEVICE_KEYBOARD_INDEX},
@@ -57,7 +57,7 @@ int32_t SendMessage::GetDevIndexByName(const std::string& deviceName)
 
 int32_t SendMessage::SendToHdi(const InputEventArray& inputEventArray)
 {
-    int32_t devIndex = GetDevIndexByName(inputEventArray.deviceName);
+    int32_t devIndex = GetDevIndexName(inputEventArray.deviceName);
     if (devIndex == RET_ERR) {
         MMI_LOGE("Get devIndex error by name:%{public}s", inputEventArray.deviceName.c_str());
         return RET_ERR;

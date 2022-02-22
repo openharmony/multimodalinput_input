@@ -52,11 +52,11 @@ namespace MMI {
         void PackageTabletPadOtherParams(libinput_event *event, EventTabletPad& tabletPad);
         int32_t PackageTabletToolOtherParams(libinput_event *event, EventTabletTool& tableTool);
         void PackageTabletToolTypeParam(libinput_event *event, EventTabletTool& tableTool);
-        int32_t PackagePointerEventByMotion(libinput_event *event, EventPointer& point);
-        int32_t PackagePointerEventByMotionAbs(libinput_event *event, EventPointer& point);
-        int32_t PackagePointerEventByButton(libinput_event *event, EventPointer& point);
-        int32_t PackagePointerEventByAxis(libinput_event *event, EventPointer& point);
-        void PackageTouchEventByType(int32_t type, libinput_event_touch *data, EventTouch& touch);
+        int32_t PackagePointerEventMotion(libinput_event *event, EventPointer& point);
+        int32_t PackagePointerEventMotionAbs(libinput_event *event, EventPointer& point);
+        int32_t PackagePointerEventButton(libinput_event *event, EventPointer& point);
+        int32_t PackagePointerEventAxis(libinput_event *event, EventPointer& point);
+        void PackageTouchEventType(int32_t type, libinput_event_touch *data, EventTouch& touch);
     };
     template<class T>
     int32_t EventPackage::PackageRegisteredEvent(const T& data, RegisteredEvent& event)

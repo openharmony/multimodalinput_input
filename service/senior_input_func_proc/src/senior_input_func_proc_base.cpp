@@ -118,7 +118,7 @@ int32_t SeniorInputFuncProcBase::DeviceEventProcess(const RawInputEvent& event)
         deviceId = static_cast<int32_t>(INPUT_DEVICE_KNUCKLE);
     }
     for (const auto &fd : fds) {
-        auto appInfo = AppRegs->FindBySocketFd(fd);
+        auto appInfo = AppRegs->FindSocketFd(fd);
         NetPacket newPacket(msgId);
         const uint64_t serverStartTime = GetSysClockTime();
         newPacket << deviceType << msgId << deviceId << fd << appInfo.windowId << appInfo.abilityId <<

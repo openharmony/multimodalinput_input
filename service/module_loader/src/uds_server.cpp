@@ -62,7 +62,7 @@ void OHOS::MMI::UDSServer::UdsStop()
     }
 }
 
-int32_t OHOS::MMI::UDSServer::GetFdByPid(int32_t pid)
+int32_t OHOS::MMI::UDSServer::GetFdPid(int32_t pid)
 {
     std::lock_guard<std::mutex> lock(mux_);
     auto it = idxPidMap_.find(pid);
@@ -74,7 +74,7 @@ int32_t OHOS::MMI::UDSServer::GetFdByPid(int32_t pid)
     return it->second;
 }
 
-int32_t OHOS::MMI::UDSServer::GetPidByFd(int32_t fd)
+int32_t OHOS::MMI::UDSServer::GetPidFd(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mux_);
     auto it = sessionsMap_.find(fd);
@@ -426,7 +426,7 @@ void OHOS::MMI::UDSServer::DelSession(int32_t fd)
 {
     MMI_LOGD("DelSession begin fd:%{public}d", fd);
     CHK(fd >= 0, PARAM_INPUT_INVALID);
-    auto pid = GetPidByFd(fd);
+    auto pid = GetPidFd(fd);
     if (pid > 0) {
         idxPidMap_.erase(pid);
     }

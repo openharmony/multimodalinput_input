@@ -64,8 +64,8 @@ public:
     int32_t OnAisensorOne(MmiMessageId code, uint32_t value);
     int32_t OnKnuckleOne(MmiMessageId code, uint32_t value);
     int32_t ExecuteFunction(std::string funId);
-    int32_t GetDevTypeByIndex(int32_t devIndex);
-    int32_t GetDevIndexByType(int32_t devType);
+    int32_t GetDevTypeIndex(int32_t devIndex);
+    int32_t GetDevIndexType(int32_t devType);
     int32_t GetDeviceIndex(const std::string& deviceNameText);
     int32_t GetDeviceStatus(const std::string& deviceStatusText);
     std::string GetFunId();
@@ -91,8 +91,8 @@ public:
         return &it->second;
     }
 private:
-    void ProcessAiSensorInfoByCycleNum(uint16_t cycleNum);
-    void ProcessKnuckleInfoByCycleNum(uint16_t cycleNum);
+    void ProcessAiSensorInfoCycleNum(uint16_t cycleNum);
+    void ProcessKnuckleInfoCycleNum(uint16_t cycleNum);
 private:
     std::string funId_ = "";
     int32_t argvNum_ = 0;

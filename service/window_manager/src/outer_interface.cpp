@@ -135,7 +135,7 @@ int OuterInterface::notifyFocusChange(int32_t abilityId, int32_t windowId)
     return RET_ERR;
 }
 
-int32_t OuterInterface::GetSystemEventAttrByHosKeyValue(const int16_t keyValueOfHos)
+int32_t OuterInterface::GetSystemEventAttrHosKeyValue(const int16_t keyValueOfHos)
 {
     auto it = MAP_SYSTEM_EVENT_ATTR.find(keyValueOfHos);
     if (it == MAP_SYSTEM_EVENT_ATTR.end()) {

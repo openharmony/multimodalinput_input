@@ -51,8 +51,8 @@ public:
     void Broadcast(NetPacket& pkt);
     void Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt);
     void Dump(int32_t fd);
-    int32_t GetFdByPid(int32_t pid);
-    int32_t GetPidByFd(int32_t fd);
+    int32_t GetFdPid(int32_t pid);
+    int32_t GetPidFd(int32_t fd);
     void OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, epoll_event& ev);
     void OnEpollRecv(int32_t fd, const char *buf, size_t size);
 

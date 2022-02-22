@@ -74,7 +74,7 @@ public:
     void OnEventGestureGetSign(const EventGesture& gesture, MmiMessageId& msgId);
     void GetTouchInfo(const std::pair<uint32_t, int32_t> key, EventTouch& touch);
     void GetTouchIds(const uint32_t deviceId, std::vector<std::pair<uint32_t, int32_t>>& touchIds);
-    int32_t GetTouchInfoSizeByDeviceId(const uint32_t deviceId);
+    int32_t GetTouchInfoSizeDeviceId(const uint32_t deviceId);
 protected:
     int32_t OnEventGestureEndGetSign(const EventGesture& gesture, MmiMessageId& msgId);
     int32_t OnEventGestureUpdateGetSign(const EventGesture& gesture, MmiMessageId& msgId);
@@ -113,7 +113,7 @@ protected:
     int32_t BitSetOne(const int32_t signCode, const int32_t bitCode) const;
     void TouchInfoBegin(const uint64_t time, const double x, const double y, TouchInfo& touchinfo);
     void TouchInfoEnd(const uint64_t time, const double x, const double y, TouchInfo& touchinfo);
-    void DeleteTouchInfoByDeviceId(uint32_t deviceId);
+    void DeleteTouchInfoDeviceId(uint32_t deviceId);
 
 protected:
     EventKeyboard key_ = {};

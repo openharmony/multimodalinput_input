@@ -33,7 +33,7 @@ public:
 
     int32_t UnregisterEventHandleManager(MmiMessageId messageId, int32_t fd);
 
-    void UnregisterEventHandleBySocketFd(int32_t fd);
+    void UnregisterEventHandleSocketFd(int32_t fd);
 
     void FindSocketFds(const MmiMessageId messageId, std::vector<int32_t>& fds);
 
@@ -42,8 +42,8 @@ public:
     void Clear();
 
 private:
-    void RegisterEventHandleByIdMsage(const MmiMessageId idMsgBegin, const MmiMessageId idMsgEnd, const int32_t fd);
-    void UnregisterEventHandleByIdMsage(const MmiMessageId idMsgBegin, const MmiMessageId idMsgEnd, const int32_t fd);
+    void RegisterEventHandleIdMsage(const MmiMessageId idMsgBegin, const MmiMessageId idMsgEnd, const int32_t fd);
+    void UnregisterEventHandleIdMsage(const MmiMessageId idMsgBegin, const MmiMessageId idMsgEnd, const int32_t fd);
 
 private:
     std::mutex mu_;
