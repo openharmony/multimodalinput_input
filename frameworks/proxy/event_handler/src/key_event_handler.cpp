@@ -23,8 +23,7 @@ KeyEventHandler::KeyEventHandler()
     type_ = MmiMessageId::KEY_EVENT_BEGIN;
 }
 KeyEventHandler::~KeyEventHandler()
-{
-}
+{}
 bool KeyEventHandler::OnKey(const OHOS::KeyEvent& event)
 {
     return false;

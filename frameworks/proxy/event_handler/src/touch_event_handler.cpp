@@ -24,9 +24,7 @@ TouchEventHandler::TouchEventHandler()
     type_ = MmiMessageId::TOUCH_EVENT_BEGIN;
 }
 
-TouchEventHandler::~TouchEventHandler()
-{
-}
+TouchEventHandler::~TouchEventHandler() {}
 
 bool TouchEventHandler::OnTouch(const TouchEvent& event)
 {
