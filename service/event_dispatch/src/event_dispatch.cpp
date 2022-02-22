@@ -396,7 +396,6 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 
     if (IsANRProcess(udsServer, fd, point->GetId()) == TRIGGER_ANR) {
         MMI_LOGE("the pointer event does not report normally, triggering ANR");
-        return RET_ERR;
     }
 
     if (!udsServer->SendMsg(fd, newPacket)) {
@@ -749,7 +748,6 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
 
     if (IsANRProcess(&udsServer, fd, key->GetId()) == TRIGGER_ANR) {
         MMI_LOGE("the key event does not report normally, triggering ANR");
-        return RET_ERR;
     }
 
     InputMonitorServiceMgr.OnMonitorInputEvent(key);
@@ -893,10 +891,6 @@ int32_t EventDispatch::IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id
     if (currentTime < (firstTime + INPUT_UI_TIMEOUT_TIME)) {
         MMI_LOGI("the event reports normally");
         return NOT_TRIGGER_ANR;
-    }
-    if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME_MAX)) {
-        session->ClearEventsVct();
-        MMI_LOGI("event is cleared");
     }
 
     int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
