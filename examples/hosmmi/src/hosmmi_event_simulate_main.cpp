@@ -17,7 +17,7 @@
 #include "log.h"
 
 namespace {
-[[maybe_unused]] static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
+[[maybe_unused]] constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
     LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "HosMmiEventSimulateDemoMain" 
 };
 }
