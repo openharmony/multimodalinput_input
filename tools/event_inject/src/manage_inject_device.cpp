@@ -45,7 +45,7 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
         if (item.find("devIndex") != item.end()) {
             devIndex = item.at("devIndex").get<uint16_t>();
         }
-        if (getDeviceNodeObject_.GetDeviceNodeByName(deviceName, deviceNode, devIndex) == RET_ERR) {
+        if (getDeviceNodeObject_.GetDeviceNodeName(deviceName, deviceNode, devIndex) == RET_ERR) {
             return RET_ERR;
         }
         inputEventArray.target = deviceNode;

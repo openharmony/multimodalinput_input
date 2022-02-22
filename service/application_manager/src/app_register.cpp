@@ -48,7 +48,7 @@ bool AppRegister::Init(UDSServer& udsServer)
     return true;
 }
 
-const AppInfo& AppRegister::FindByWinId(int32_t windowId)
+const AppInfo& AppRegister::FindWinId(int32_t windowId)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
@@ -60,7 +60,7 @@ const AppInfo& AppRegister::FindByWinId(int32_t windowId)
     return AppRegister::appInfoError_;
 }
 
-const AppInfo& AppRegister::FindBySocketFd(int32_t fd)
+const AppInfo& AppRegister::FindSocketFd(int32_t fd)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
@@ -83,7 +83,7 @@ void AppRegister::RegisterAppInfoforServer(const AppInfo& appInfo)
     MMI_LOGD("leave");
 }
 
-void AppRegister::UnregisterAppInfoBySocketFd(int32_t fd)
+void AppRegister::UnregisterAppInfoSocketFd(int32_t fd)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
@@ -92,7 +92,7 @@ void AppRegister::UnregisterAppInfoBySocketFd(int32_t fd)
     MMI_LOGD("leave");
 }
 
-void AppRegister::UnregisterBySocketFd(int32_t fd)
+void AppRegister::UnregisterSocketFd(int32_t fd)
 {
     MMI_LOGD("enter");
     auto it = surfaceInfo_.begin();

@@ -35,7 +35,7 @@ public:
     std::vector<int32_t> GetInputDeviceIds();
     std::shared_ptr<InputDevice> GetInputDevice(int32_t id);
     void GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback);
-    void FindInputDeviceByIdAsync(int32_t deviceId, std::function<void(std::shared_ptr<InputDevice>)> callback);
+    void FindInputDeviceIdAsync(int32_t deviceId, std::function<void(std::shared_ptr<InputDevice>)> callback);
     int32_t FindInputDeviceId(libinput_device* inputDevice);
     void Attach(std::shared_ptr<DeviceObserver> observer);
     void Detach(std::shared_ptr<DeviceObserver> observer);
@@ -45,7 +45,7 @@ private:
 #ifdef OHOS_WESTEN_MODEL
     void Init(weston_compositor *wc);
     std::vector<int32_t> GetInputDeviceIdsSync(weston_compositor *wc);
-    std::shared_ptr<InputDevice> FindInputDeviceByIdSync(int32_t deviceId, weston_compositor *wc);
+    std::shared_ptr<InputDevice> FindInputDeviceIdSync(int32_t deviceId, weston_compositor *wc);
 #endif
     bool IsPointerDevice(libinput_device* device);
 

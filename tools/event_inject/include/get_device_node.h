@@ -26,11 +26,11 @@ class GetDeviceNode {
 public:
     GetDeviceNode();
     ~GetDeviceNode() = default;
-    int32_t GetDeviceNodeByName(const std::string& targetName, std::string& deviceNode, uint16_t devIndex = 0);
+    int32_t GetDeviceNodeName(const std::string& targetName, std::string& deviceNode, uint16_t devIndex = 0);
 private:
     void InitDeviceInfo();
     int32_t ExecuteCmd(const std::string cmd, std::vector<std::string> &cmdResult);
-    void GetDeviceInfoByCmdResult(const std::vector<std::string>& cmdResult, DeviceMapData& deviceMapData);
+    void GetDeviceInfoCmdResult(const std::vector<std::string>& cmdResult, DeviceMapData& deviceMapData);
 private:
     std::map<std::string, std::string> deviceMap_;
     static constexpr int32_t READ_CMD_BUFF_SIZE = 1024;
