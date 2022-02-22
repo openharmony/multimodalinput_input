@@ -38,7 +38,7 @@ void OHOS::MMI::InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, i
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
-    InterceptorItem interceptorItem {};
+    InterceptorItem interceptorItem = {};
     interceptorItem.sourceType = sourceType;
     interceptorItem.id = id;
     interceptorItem.session =  session;
@@ -57,7 +57,7 @@ void OHOS::MMI::InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
-    InterceptorItem interceptorItem {};
+    InterceptorItem interceptorItem = {};
     interceptorItem.id = id;
     auto iter = std::find(interceptor_.begin(), interceptor_.end(), interceptorItem);
     if (iter == interceptor_.end()) {
@@ -86,9 +86,8 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     NetPacket pkt(MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
-    std::list<InterceptorItem>::iterator iter;
     for (const auto &item : interceptor_) {
-        pkt << item.session->GetPid() <<iter->id;
+        pkt << item.session->GetPid() << item.id;
         MMI_LOGD("server send the interceptor msg to client, pid:%{public}d", item.session->GetPid());
         item.session->SendMsg(pkt);
     }
