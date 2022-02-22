@@ -49,7 +49,7 @@ namespace MMI {
 #define MAX_PARAMETER_NUMBER 3
 #define MAX_PARAMETER_NUMBER_FOR_ADD_DEL 2
 #define IS_FILE_JUDGE 8
-#define BIN_NAME "hosmmi-virtual-device-manger"
+#define BIN_NAME "mmi-virtual-device-manger"
 
     const std::string g_pid = std::to_string(getpid());
     const std::string g_folderpath = "/data/symbol/";
