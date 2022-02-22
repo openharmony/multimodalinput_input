@@ -91,7 +91,7 @@ int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, 
 
 int32_t TimerManager::RemoveTimerInternal(int32_t timerId)
 {
-    for (auto it = timers_.begin(); it != timers_.end(); it++) {
+    for (auto it = timers_.begin(); it != timers_.end(); ++it) {
         if ((*it)->id == timerId) {
             timers_.erase(it);
             return RET_OK;
@@ -102,7 +102,7 @@ int32_t TimerManager::RemoveTimerInternal(int32_t timerId)
 
 int32_t TimerManager::ResetTimerInternal(int32_t timerId)
 {
-    for (auto it = timers_.begin(); it != timers_.end(); it++) {
+    for (auto it = timers_.begin(); it != timers_.end(); ++it) {
         if ((*it)->id == timerId) {
             auto timer = std::move(*it);
             timers_.erase(it);
@@ -118,7 +118,7 @@ int32_t TimerManager::ResetTimerInternal(int32_t timerId)
 
 bool TimerManager::IsExistInternal(int32_t timerId)
 {
-    for (auto it = timers_.begin(); it != timers_.end(); it++) {
+    for (auto it = timers_.begin(); it != timers_.end(); ++it) {
         if ((*it)->id == timerId) {
             return true;
         }
@@ -128,7 +128,7 @@ bool TimerManager::IsExistInternal(int32_t timerId)
 
 std::unique_ptr<TimerManager::TimerItem>& TimerManager::InsertTimerInternal(std::unique_ptr<TimerItem>& timer)
 {
-    for (auto it = timers_.begin(); it != timers_.end(); it++) {
+    for (auto it = timers_.begin(); it != timers_.end(); ++it) {
         if ((*it)->nextCallTime > timer->nextCallTime) {
             return *(timers_.insert(it, std::move(timer)));
         }
