@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,7 @@
 #include "define_multimodal.h"
 #include "event_dispatch.h"
 #include "input_event_data_transformation.h"
-#include "log.h"
+#include "mmi_log.h"
 #include "net_packet.h"
 #include "proto.h"
 
@@ -84,7 +84,6 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 
 bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Handle PointerEvent");
     CHKPF(pointerEvent);
     if (interceptors_.HandleEvent(pointerEvent)) {
         MMI_LOGD("Pointer event was intercepted");
@@ -103,7 +102,7 @@ void InputHandlerManagerGlobal::InitSessionLostCallback()
         return;
     }
     auto udsServerPtr = InputHandler->GetUDSServer();
-    CHKP(udsServerPtr);
+    CHKPV(udsServerPtr);
     udsServerPtr->AddSessionDeletedCallback(std::bind(
         &InputHandlerManagerGlobal::OnSessionLost, this, std::placeholders::_1));
     sessionLostCallbackInitialized_ = true;
@@ -140,8 +139,8 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionHa
 {
     std::lock_guard<std::mutex> guard(lockMonitors_);
     if (monitors_.size() >= MAX_N_INPUT_MONITORS) {
-        MMI_LOGE("The number of monitors exceeds the maximum:%{public}d,monitors,errCode:%{public}d",
-                 static_cast<int32_t>(monitors_.size()), INVALID_MONITOR_MON);
+        MMI_LOGE("The number of monitors exceeds the maximum:%{public}zu,monitors,errCode:%{public}d",
+                 monitors_.size(), INVALID_MONITOR_MON);
         return RET_ERR;
     }
     auto ret = monitors_.insert(monitor);
@@ -221,14 +220,13 @@ bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId,
 
 void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Update consumption state");
-    CHKP(pointerEvent);
+    CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         MMI_LOGE("This is not a touch-screen event");
         return;
     }
     lastPointerEvent_ = pointerEvent;
-    const size_t nPtrsIndNewProc = 1;
+    constexpr size_t nPtrsIndNewProc = 1;
 
     if (pointerEvent->GetPointersIdList().size() != nPtrsIndNewProc) {
         MMI_LOGD("First press and last lift intermediate process");
@@ -248,7 +246,7 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
 void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<PointerEvent> pointerEvent)
 {
     std::lock_guard<std::mutex> guard(lockMonitors_);
-    MMI_LOGD("There are currently %{public}d monitors", static_cast<int32_t>(monitors_.size()));
+    MMI_LOGD("There are currently %{public}zu monitors", monitors_.size());
     for (const auto &monitor : monitors_) {
         monitor.SendToClient(pointerEvent);
     }
@@ -278,8 +276,7 @@ bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_p
     if (interceptors_.empty()) {
         return false;
     }
-    MMI_LOGD("There are currently:%{public}d interceptors",
-        static_cast<int32_t>(interceptors_.size()));
+    MMI_LOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     for (const auto &interceptor : interceptors_) {
         interceptor.SendToClient(keyEvent);
     }
@@ -292,8 +289,7 @@ bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_p
     if (interceptors_.empty()) {
         return false;
     }
-    MMI_LOGD("There are currently:%{public}d interceptors",
-        static_cast<int32_t>(interceptors_.size()));
+    MMI_LOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     for (const auto &interceptor : interceptors_) {
         interceptor.SendToClient(pointerEvent);
     }

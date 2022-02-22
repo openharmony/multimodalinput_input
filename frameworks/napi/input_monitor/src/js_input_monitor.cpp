@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,7 @@
  */
 
 #include "js_input_monitor.h"
+#include <cinttypes>
 #include <cinttypes>
 #include "define_multimodal.h"
 #include "error_multimodal.h"
@@ -64,7 +65,7 @@ void InputMonitor::SetCallback(std::function<void(std::shared_ptr<PointerEvent>)
 void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
     MMI_LOGD("Enter");
-    CHKP(pointerEvent);
+    CHKPV(pointerEvent);
     if (!JSIMM.GetMonitor(id_)) {
         MMI_LOGE("failed to process pointer event, id:%{public}d", id_);
         return;
@@ -81,7 +82,7 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
         }
         callback = callback_;
     }
-    CHKP(callback);
+    CHKPV(callback);
     callback(pointerEvent);
     MMI_LOGD("Leave");
 }
@@ -117,7 +118,7 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, napi_value receiver, int32_t id)
     if (monitor_ != nullptr) {
         monitor_->SetCallback([jsId=id](std::shared_ptr<PointerEvent> pointerEvent) {
             auto jsMonitor = JSIMM.GetMonitor(jsId);
-            CHKP(jsMonitor);
+            CHKPV(jsMonitor);
            jsMonitor->OnPointerEvent(pointerEvent);
         });
         monitor_->SetId(id_);
@@ -143,7 +144,7 @@ void JsInputMonitor::SetReceiver(napi_value receiver)
 
 void JsInputMonitor::MarkConsumed(int32_t eventId)
 {
-    CHKP(monitor_);
+    CHKPV(monitor_);
     monitor_->MarkConsumed(eventId);
 }
 
@@ -182,10 +183,10 @@ int32_t JsInputMonitor::IsMatch(napi_env jsEnv)
 
 void JsInputMonitor::printfPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    CHKP(pointerEvent);
+    CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     CHK(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item), PARAM_INPUT_FAIL);
-    MMI_LOGD("type:%{public}d,timestamp:%{public}d,deviceId:%{public}d,"
+    MMI_LOGD("type:%{public}d,timestamp:%{public}" PRId64 ",deviceId:%{public}d,"
         "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
         "size:%{public}d,force:%{public}d", pointerEvent->GetSourceType(), item.GetDownTime(),
         item.GetDeviceId(), item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(),
@@ -324,7 +325,7 @@ JsInputMonitor::~JsInputMonitor()
 
 void JsInputMonitor::Stop() {
     MMI_LOGD("Enter");
-    CHKP(monitor_);
+    CHKPV(monitor_);
     if (isMonitoring_) {
         isMonitoring_ = false;
         if (monitor_ != nullptr) {
@@ -342,7 +343,7 @@ int32_t JsInputMonitor::GetId()
 void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Enter");
-    CHKP(monitor_);
+    CHKPV(monitor_);
     int32_t num = 0;
     {
         std::lock_guard<std::mutex> guard(mutex_);
@@ -367,7 +368,7 @@ void JsInputMonitor::JsCallback(uv_work_t *work, int32_t status)
     delete work;
     work = nullptr;
     auto jsMonitor = JSIMM.GetMonitor(*id);
-    CHKP(jsMonitor);
+    CHKPV(jsMonitor);
     jsMonitor->OnPointerEventInJsThread();
     id = nullptr;
     MMI_LOGD("Leave");
@@ -380,8 +381,8 @@ void JsInputMonitor::OnPointerEventInJsThread()
         MMI_LOGE("js monitor stop");
         return;
     }
-    CHKP(jsEnv_);
-    CHKP(receiver_);
+    CHKPV(jsEnv_);
+    CHKPV(receiver_);
     std::lock_guard<std::mutex> guard(mutex_);
     napi_handle_scope scope = nullptr;
     while (!evQueue_.empty()) {

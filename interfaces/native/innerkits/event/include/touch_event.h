@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 #define TOUCH_EVENT_H
 #include "manipulation_event.h"
 #include "mouse_event.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 enum TouchEnum {
@@ -155,6 +156,8 @@ enum TouchEnum {
  */
 class TouchEvent : public ManipulationEvent {
 public:
+    TouchEvent() = default;
+    DISALLOW_COPY_AND_MOVE(TouchEvent);
     virtual ~TouchEvent();
     /**
     * initialize the object.
@@ -263,14 +266,14 @@ public:
     virtual int32_t GetOriginEventType () const;
 
 private:
-    int32_t mAction_ = 0;
-    int32_t mIndex_ = 0;
-    float mForcePrecision_ = 0.f;
-    float mMaxForce_ = 0.f;
-    float mTapCount_ = 0.f;
-    bool mIsStandard_ = false;
-    int32_t mDeviceEventType_ = 0;
-    MMI::MultimodalEventPtr mDeviceEvent_ = nullptr;
+    int32_t action_ = 0;
+    int32_t index_ = 0;
+    float forcePrecision_ = 0.f;
+    float maxForce_ = 0.f;
+    float tapCount_ = 0.f;
+    bool isStandard_ = false;
+    int32_t deviceEventType_ = 0;
+    MMI::MultimodalEventPtr deviceEvent_ = nullptr;
 };
 } // namespace OHOS
 #endif // TOUCH_EVENT_H

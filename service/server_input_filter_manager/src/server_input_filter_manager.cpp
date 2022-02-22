@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,7 +35,7 @@ ServerInputFilterManager::PointerEventFilter::PointerEventFilter(int32_t id, std
 
 void ServerInputFilterManager::DeleteFilterFromSess(SessionPtr sess)
 {
-    CHKP(sess);
+    CHKPV(sess);
     auto it = keyEventFilterMap_.find(sess);
     if (it == keyEventFilterMap_.end()) {
         MMI_LOGD("This sess have not any filter");
@@ -222,8 +222,8 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
 bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
     const EventTouch& touch, const uint64_t preHandlerTime)
 {
-    CHKPF(event);
     MMI_LOGD("Enter");
+    CHKPF(event);
     if (touchEventFilterMap_.empty()) {
         MMI_LOGE("touchEventFilterMap_ is empty");
         return false;
@@ -423,7 +423,7 @@ int32_t ServerInputFilterManager::UnregisterEventInterceptorforServer(const Sess
 
 void ServerInputFilterManager::DeleteInterceptorFormSess(const SessionPtr& sess)
 {
-    CHKP(sess);
+    CHKPV(sess);
     auto it = pointerEventFilterMap_.find(sess);
     if (it == pointerEventFilterMap_.end()) {
         MMI_LOGD("This sess have not any interceptor");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -58,7 +58,7 @@ void InjectionEventDispatch::InitManageFunction()
 
 int32_t InjectionEventDispatch::OnJson()
 {
-    MMI_LOGI("Enter onJson function");
+    MMI_LOGD("Enter");
     const string path = injectArgvs_.at(JSON_FILE_PATH_INDEX);
     std::ifstream reader(path);
     if (!reader) {
@@ -70,14 +70,14 @@ int32_t InjectionEventDispatch::OnJson()
     reader.close();
 
     int32_t ret = manageInjectDevice_.TransformJsonData(inputEventArrays);
-    MMI_LOGI("Leave onJson function");
+    MMI_LOGI("Leave");
     return ret;
 }
 
 bool InjectionEventDispatch::GetStartSocketPermission(string id)
 {
-    auto it = mapNeedStartSocket_.find(id);
-    if (it == mapNeedStartSocket_.end()) {
+    auto it = needStartSocket_.find(id);
+    if (it == needStartSocket_.end()) {
         return false;
     }
 
@@ -91,7 +91,7 @@ string InjectionEventDispatch::GetFunId()
 
 void InjectionEventDispatch::HandleInjectCommandItems()
 {
-    MMI_LOGI("InjectionEventDispatch::HandleInjectCommandItems");
+    MMI_LOGD("Enter");
 
     string id = GetFunId();
     auto fun = GetFun(id);
@@ -112,14 +112,14 @@ void InjectionEventDispatch::HandleInjectCommandItems()
 
 bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const vector<string> &argv)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     if (argc < ARGV_VALID || argv.at(ARGVS_TARGET_INDEX).empty()) {
         MMI_LOGE("Invaild Input Para, Plase Check the validity of the para. errCode:%{public}d", PARAM_INPUT_FAIL);
         return false;
     }
 
     bool result = false;
-    for (const auto &item : mapFuns_) {
+    for (const auto &item : injectFuns_) {
         string temp(argv.at(ARGVS_TARGET_INDEX));
         if (temp == item.first) {
             funId_ = temp;
@@ -140,7 +140,7 @@ bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const vector<strin
 
 bool InjectionEventDispatch::StartSocket()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     return TestAuxToolClient::GetInstance().Start(false);
 }
 
@@ -156,7 +156,7 @@ bool InjectionEventDispatch::SendMsg(NetPacket ckt)
 
 void InjectionEventDispatch::Run()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     string id = GetFunId();
     auto fun = GetFun(id);
     if (!fun) {
@@ -205,7 +205,7 @@ int32_t InjectionEventDispatch::ExecuteFunction(string funId)
 
 int32_t InjectionEventDispatch::OnAisensor()
 {
-    MMI_LOGI("into function: OnAisensor()");
+    MMI_LOGD("Enter");
     int32_t exRet = RET_ERR;
 
     if (argvNum_ < AI_SENDOR_MIN_ARGV_NUMS) {
@@ -358,7 +358,7 @@ int32_t InjectionEventDispatch::OnHelp()
 
 int32_t InjectionEventDispatch::OnAisensorAll()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     uint16_t cycleNum = 0;
     if (argvNum_ == AI_SENSOR_DEFAULT_NUMS) {
         cycleNum = AI_SENSOR_DEFAULT_CYCLE_NUMS;
@@ -391,7 +391,7 @@ int32_t InjectionEventDispatch::OnKnuckleAll()
 
 int32_t InjectionEventDispatch::OnHdi()
 {
-    MMI_LOGI("into Onhdi function.");
+    MMI_LOGD("Enter");
     if ((injectArgvs_.size() < HDI_MIN_ARGV_NUMS) || (injectArgvs_.size() > HDI_MAX_ARGV_NUMS)) {
         MMI_LOGE("Wrong number of input parameters! errCode:%{public}d", PARAM_INPUT_FAIL);
         return RET_ERR;
@@ -404,7 +404,7 @@ int32_t InjectionEventDispatch::OnHdi()
 
 int32_t InjectionEventDispatch::OnHdiStatus()
 {
-    MMI_LOGI("into function: OnHdiStatus()");
+    MMI_LOGD("Enter");
     if (injectArgvs_.size() != HDI_STATUS_COUNTS) {
         MMI_LOGE("Wrong number of input parameters! errCode:%{public}d", PARAM_INPUT_FAIL);
         return RET_ERR;
@@ -511,7 +511,7 @@ int32_t InjectionEventDispatch::OnSendEvent()
         return RET_ERR;
     }
     write(fd, &event, sizeof(event));
-    if (fd > 0) {
+    if (fd >= 0) {
         close(fd);
     }
     return RET_OK;
@@ -562,7 +562,7 @@ int32_t InjectionEventDispatch::GetDevIndexByType(int32_t devType)
 
 void OHOS::MMI::InjectionEventDispatch::ProcessAiSensorInfoByCycleNum(uint16_t cycleNum)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     static const vector<MmiMessageId> aiSensorAllowProcCodes {
         MmiMessageId::ON_SHOW_MENU,
         MmiMessageId::ON_SEND,

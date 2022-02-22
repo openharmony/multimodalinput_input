@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -135,6 +135,8 @@ namespace OHOS {
         CLEAR_DEAD_SESSION_FAIL,                    // 清理无效的session错误
         INIT_SIGNAL_HANDLER_FAIL,                   // 初始化全局信号处理器失败
         FCNTL_FAIL,                                 // fcntl 函数调用错误
+        PACKET_WRITE_FAIL,                          // 写入数据错误
+        PACKET_READ_FAIL,                           // 读取数据错误
         POINTER_DRAW_INIT_FAIL,                     // 初始化画鼠标失败
     };
     // Error code for util
@@ -193,5 +195,5 @@ namespace OHOS {
         MMI_SERVICE_INVALID = 0, // 多模服务不存在，多模输入服务异常
         MMI_SERVICE_RUNNING,     // 多模服务运行正常
     };
-}
+} // namespace OHOS
 #endif // ERROR_MULTIMODAL_H

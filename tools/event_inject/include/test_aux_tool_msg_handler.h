@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,6 @@ namespace MMI {
         int32_t OnAiServerReply(const UDSClient& client, NetPacket& pkt);
         int32_t OnHdiServerReply(const UDSClient& client, NetPacket& pkt);
     };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // TEST_AUX_TOOL_MSG_HANDLER_H

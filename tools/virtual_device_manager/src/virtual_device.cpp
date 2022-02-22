@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -153,8 +153,8 @@ bool OHOS::MMI::VirtualDevice::CreateKey()
 
 bool OHOS::MMI::VirtualDevice::SetAbsResolution(const std::string deviceName)
 {
-    const int32_t ABS_RESOLUTION = 200;
-    const int32_t ABS_RESOLUTION_FINGER = 40;
+    constexpr int32_t ABS_RESOLUTION = 200;
+    constexpr int32_t ABS_RESOLUTION_FINGER = 40;
     if (deviceName == "Virtual Stylus" || deviceName == "Virtual Touchpad") {
         absTemp_.code = 0x00;
         absTemp_.absinfo.resolution = ABS_RESOLUTION;
@@ -436,7 +436,7 @@ bool OHOS::MMI::VirtualDevice::CloseDevice(const std::vector<std::string>& fileL
     if (!result) {
         return false;
     } else {
-        if (closePid.find("all") == 0) {
+        if (closePid.compare("all_") == 0) {
             CloseAllDevice(alldevice);
             return true;
         }

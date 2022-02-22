@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 #define ROTATION_EVENT_H
 
 #include "multimodal_event.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 /**
@@ -27,6 +28,8 @@ namespace OHOS {
  */
 class RotationEvent : public MMI::MultimodalEvent {
 public:
+    RotationEvent() = default;
+    DISALLOW_COPY_AND_MOVE(RotationEvent);
     virtual ~RotationEvent();
 
     /**
@@ -59,7 +62,7 @@ public:
     virtual float GetRotationValue() const;
 
 private:
-    float mRotationValue_ = 0;
+    float rotationValue_ = 0;
 };
 } // namespace OHOS
 #endif // ROTATION_EVENT_H

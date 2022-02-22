@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,15 +17,14 @@
 #include <functional>
 #include <map>
 #include <mutex>
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class InputDeviceImpl {
 public:
     static InputDeviceImpl& GetInstance();
-    InputDeviceImpl(const InputDeviceImpl &) = delete;
-    InputDeviceImpl &operator=(const InputDeviceImpl &) = delete;
-    InputDeviceImpl(InputDeviceImpl &&) = delete;
+    DISALLOW_COPY_AND_MOVE(InputDeviceImpl);
     ~InputDeviceImpl() = default;
 
     struct InputDeviceInfo {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -432,12 +432,12 @@ void KeyEvent::KeyItem::SetKeyCode(int32_t keyCode)
     keyCode_ = keyCode;
 }
 
-int32_t KeyEvent::KeyItem::GetDownTime() const
+int64_t KeyEvent::KeyItem::GetDownTime() const
 {
     return downTime_;
 }
 
-void KeyEvent::KeyItem::SetDownTime(int32_t downTime)
+void KeyEvent::KeyItem::SetDownTime(int64_t downTime)
 {
     downTime_ = downTime;
 }
@@ -468,7 +468,7 @@ bool KeyEvent::KeyItem::WriteToParcel(Parcel &out) const
     if (!out.WriteBool(pressed_)) {
         return false;
     }
-    if (!out.WriteInt32(downTime_)) {
+    if (!out.WriteInt64(downTime_)) {
         return false;
     }
     if (!out.WriteInt32(deviceId_)) {
@@ -486,7 +486,7 @@ bool KeyEvent::KeyItem::ReadFromParcel(Parcel &in)
     if (!in.ReadBool(pressed_)) {
         return false;
     }
-    if (!in.ReadInt32(downTime_)) {
+    if (!in.ReadInt64(downTime_)) {
         return false;
     }
     if (!in.ReadInt32(deviceId_)) {
@@ -505,6 +505,13 @@ std::shared_ptr<KeyEvent> KeyEvent::from(std::shared_ptr<InputEvent> inputEvent)
 }
 
 KeyEvent::KeyEvent(int32_t eventType) : InputEvent(eventType) {}
+
+KeyEvent::KeyEvent(const KeyEvent& other)
+    : InputEvent(other),
+    keyCode_(other.keyCode_),
+    keys_(other.keys_),
+    keyAction_(other.keyAction_)
+{}
 
 KeyEvent::~KeyEvent() {}
 

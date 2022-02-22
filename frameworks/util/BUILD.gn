@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -48,7 +48,7 @@ config("libmmi_util_public_config") {
 
 ohos_shared_library("libmmi-util") {
   sources = [
-    "common/include/klog.c",
+    "common/src/klog.cpp",
     "common/src/libmmi_util.cpp",
     "common/src/run_shell_util.cpp",
     "common/src/safe_keeper.cpp",
@@ -86,6 +86,12 @@ ohos_unittest("ut-mmi-util-out") {
   include_dirs = [
     "//utils/native/base/include",
     "//third_party/googletest/googletest/include",
+    "//utils/native/base/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/frameworks/proxy/event_handler",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/frameworks/util/common",
     "${mmi_path}/frameworks/util/common/include",
     "${mmi_path}/frameworks/util/network",
@@ -148,6 +154,12 @@ ohos_unittest("RunShellUtilTest") {
   include_dirs = [
     "//utils/native/base/include",
     "//third_party/googletest/googletest/include",
+    "//utils/native/base/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/frameworks/proxy/event_handler",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/frameworks/util/common",
     "${mmi_path}/frameworks/util/common/include",
     "${mmi_path}/frameworks/util/network",

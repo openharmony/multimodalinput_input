@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,19 +19,21 @@
 #include "pointer_event.h"
 #include "singleton.h"
 #include "multimodal_event_handler.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class InterceptorManager {
 public:
     InterceptorManager();
+    DISALLOW_COPY_AND_MOVE(InterceptorManager);
     ~InterceptorManager();
     int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
     int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
     void RemoveInterceptor(int32_t interceptorId);
     int32_t OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id);
 public:
-    static const int32_t INVALID_INTERCEPTOR_ID { -1 };
+    static constexpr int32_t INVALID_INTERCEPTOR_ID { -1 };
     int32_t OnKeyEvent(std::shared_ptr<KeyEvent> pointerEvent);
     
 private:

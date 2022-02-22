@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,10 +15,13 @@
 #ifndef DEVICE_EVENT_H
 #define DEVICE_EVENT_H
 #include "multimodal_event.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 class DeviceEvent : public MMI::MultimodalEvent {
 public:
+    DeviceEvent() = default;
+    DISALLOW_COPY_AND_MOVE(DeviceEvent);
     virtual ~DeviceEvent();
     void Initialize(const std::string& name, const std::string& sysName, int32_t inputDeviceId);
     virtual std::string GetName() const;

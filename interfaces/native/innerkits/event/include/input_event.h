@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include "nocopyable.h"
 #include "parcel.h"
 
 namespace OHOS {
@@ -26,30 +27,29 @@ namespace MMI {
 class InputEvent {
 public:
     // Unknown action. Usually used to indicate the initial value of the input event action
-    static const int32_t ACTION_UNKNOWN = 0;
+    static constexpr int32_t ACTION_UNKNOWN = 0;
     // Cancel the action. Used to indicate that a continuous input event is cancelled
-    static const int32_t ACTION_CANCEL = 1;
+    static constexpr int32_t ACTION_CANCEL = 1;
 
     // The actual type of the current input event is the basic type (InputEvent type)
-    static const int32_t EVENT_TYPE_BASE = 0X00000000;
+    static constexpr int32_t EVENT_TYPE_BASE = 0X00000000;
     // The actual type of the current input event is the KeyEvent type or its derived class
-    static const int32_t EVENT_TYPE_KEY = 0X00010000;
+    static constexpr int32_t EVENT_TYPE_KEY = 0X00010000;
     // The actual type of the current input event is the PointerEvent type or its derived class
-    static const int32_t EVENT_TYPE_POINTER = 0X00020000;
+    static constexpr int32_t EVENT_TYPE_POINTER = 0X00020000;
     // The actual type of the current input event is the AxisEvent type or its derived class
-    static const int32_t EVENT_TYPE_AXIS = 0X00030000;
+    static constexpr int32_t EVENT_TYPE_AXIS = 0X00030000;
 
-    static const int32_t EVENT_FLAG_NONE = 0;
-    static const int32_t EVENT_FLAG_NO_INTERCEPT = 1;
+    static constexpr int32_t EVENT_FLAG_NONE = 0;
+    static constexpr int32_t EVENT_FLAG_NO_INTERCEPT = 1;
 
-    static const int32_t DEFALUTID = -1;
+    static constexpr int32_t DEFALUTID = -1;
 
 public:
     InputEvent(const InputEvent& other);
-    InputEvent(InputEvent&& other) = default;
     virtual ~InputEvent();
-    virtual InputEvent& operator=(const InputEvent& other) = default;
-    virtual InputEvent& operator=(InputEvent&& other) = default;
+    virtual InputEvent& operator=(const InputEvent& other) = delete;
+    DISALLOW_MOVE(InputEvent);
     static std::shared_ptr<InputEvent> Create();
 
     void Reset();
@@ -66,8 +66,8 @@ public:
      * The default value is the object creation time
      * Under normal circumstances, do not need to set
      */
-    int32_t GetActionTime() const;
-    void SetActionTime(int32_t actionTime);
+    int64_t GetActionTime() const;
+    void SetActionTime(int64_t actionTime);
 
     /*
      * Get or set the current action
@@ -80,8 +80,8 @@ public:
      * For instantaneous actions, it is consistent with the time when the action occurred.
      * For continuous actions, it indicates the start time of the continuous action
      */
-    int32_t GetActionStartTime() const;
-    void SetActionStartTime(int32_t time);
+    int64_t GetActionStartTime() const;
+    void SetActionStartTime(int64_t time);
 
     /*
      * Get or set the unique identifier of the input device that reports the input event
@@ -151,9 +151,9 @@ protected:
 protected:
     int32_t eventType_;
     int32_t id_;
-    int32_t actionTime_;
+    int64_t actionTime_;
     int32_t action_;
-    int32_t actionStartTime_;
+    int64_t actionStartTime_;
     int32_t deviceId_;
     int32_t targetDisplayId_;
     int32_t targetWindowId_;

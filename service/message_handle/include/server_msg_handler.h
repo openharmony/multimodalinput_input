@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #define SERVER_MSG_HANDLER_H
 #include "msg_handler.h"
 #include "event_dispatch.h"
+#include "nocopyable.h"
 #include "senior_input_func_proc_base.h"
 
 namespace OHOS {
@@ -24,6 +25,7 @@ typedef std::function<int32_t(SessionPtr sess, NetPacket& pkt)> ServerMsgFun;
 class ServerMsgHandler : public MsgHandler<ServerMsgFun> {
 public:
     ServerMsgHandler();
+    DISALLOW_COPY_AND_MOVE(ServerMsgHandler);
     virtual ~ServerMsgHandler() override;
 
     bool Init(UDSServer& udsServer);
@@ -78,6 +80,6 @@ private:
     EventDispatch eventDispatch_;
     std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent_;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // SERVER_MSG_HANDLER_H

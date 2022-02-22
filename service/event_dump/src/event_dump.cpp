@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,12 +28,11 @@
 namespace OHOS {
 namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
     }
 
 void ChkConfig(int32_t fd)
 {
-    MMI_LOGD("enter");
     mprintf(fd, "ChkMMIConfig: ");
 #ifdef OHOS_BUILD
     mprintf(fd, "\tOHOS_BUILD");
@@ -61,12 +60,10 @@ void ChkConfig(int32_t fd)
     mprintf(fd, "\tEXP_CONFIG: %s\n", DEF_EXP_CONFIG);
     mprintf(fd, "\tEXP_SOPATH: %s\n", DEF_EXP_SOPATH);
     mprintf(fd, "\tXKB_CONFIG_PATH: %s\n", DEF_XKB_CONFIG);
-    MMI_LOGD("leave");
 }
 
 void ChkAppInfos(int32_t fd)
 {
-    MMI_LOGD("enter");
     auto focusId = WinMgr->GetFocusSurfaceId();
     auto touchFocusId = WinMgr->GetTouchFocusSurfaceId();
     auto appInfo = AppRegs->FindByWinId(focusId);
@@ -80,27 +77,25 @@ void ChkAppInfos(int32_t fd)
                 appInfo.appName.c_str());
     }
     AppRegs->Dump(fd);
-    MMI_LOGD("leave");
 }
 
-void EventDump::Init(UDSServer& udss)
+void EventDump::Init(UDSServer& uds)
 {
-    MMI_LOGD("enter");
-    udsServer_ = &udss;
-    MMI_LOGD("leave");
+    udsServer_ = &uds;
 }
 
 void EventDump::Dump(int32_t fd)
 {
-    MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
 
     auto strCurTime = Strftime();
     mprintf(fd, "MMIDumpsBegin: %s", strCurTime.c_str());
     ChkConfig(fd);
+#ifdef OHOS_WESTEN_MODEL
     ChkAppInfos(fd);
     WinMgr->Dump(fd);
     RegEventHM->Dump(fd);
+#endif
     if (udsServer_) {
         udsServer_->Dump(fd);
     }
@@ -112,12 +107,10 @@ void EventDump::Dump(int32_t fd)
     }
     strCurTime = Strftime();
     mprintf(fd, "MMIDumpsEnd: %s", strCurTime.c_str());
-    MMI_LOGD("leave");
 }
 
 void EventDump::TestDump()
 {
-    MMI_LOGD("enter");
     constexpr int32_t MAX_PATH_SIZE = 128;
     char szPath[MAX_PATH_SIZE] = {};
     CHK(sprintf_s(szPath, MAX_PATH_SIZE, "%s/mmidump-%s.txt", DEF_MMI_DATA_ROOT, Strftime("%y%m%d%H%M%S").c_str()) >= 0,
@@ -131,26 +124,22 @@ void EventDump::TestDump()
     CHK(fd >= 0, FILE_OPEN_FAIL);
     Dump(fd);
     close(fd);
-    MMI_LOGD("leave");
 }
 
 void EventDump::InsertDumpInfo(const std::string& str)
 {
-    MMI_LOGD("enter");
     CHK(!str.empty(), PARAM_INPUT_INVALID);
     std::lock_guard<std::mutex> lock(mu_);
 
-    const int32_t VECMAXSIZE = 300;
-    while (dumpInfo_.size() > VECMAXSIZE) {
+    constexpr int32_t VECMAXSIZE = 300;
+    if (dumpInfo_.size() > VECMAXSIZE) {
         dumpInfo_.erase(dumpInfo_.begin());
     }
     dumpInfo_.push_back(str);
-    MMI_LOGD("leave");
 }
 
 void EventDump::InsertFormat(std::string str, ...)
 {
-    MMI_LOGD("enter");
     CHK(!str.empty(), INVALID_PARAM);
     va_list args;
     va_start(args, str);
@@ -162,7 +151,6 @@ void EventDump::InsertFormat(std::string str, ...)
     }
     va_end(args);
     InsertDumpInfo(buf);
-    MMI_LOGD("leave");
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

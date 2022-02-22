@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 #include "mmi_point.h"
 #include "multimodal_event.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 enum ManipulationEnum {
@@ -57,7 +58,7 @@ enum ManipulationEnum {
     PHASE_CANCEL = 4
 };
 
-const int32_t FINGER_NUM = 10;
+constexpr int32_t FINGER_NUM = 10;
 
 struct fingerInfos {
     int32_t mPointerId;
@@ -68,6 +69,8 @@ struct fingerInfos {
 
 class ManipulationEvent : public MMI::MultimodalEvent {
 public:
+    ManipulationEvent() = default;
+    DISALLOW_COPY_AND_MOVE(ManipulationEvent);
     virtual ~ManipulationEvent();
     /**
     * initialize the object.
@@ -217,10 +220,10 @@ public:
     */
     virtual const fingerInfos* GetFingersInfos() const;
 private:
-    int32_t mStartTime_ = 0;
-    int32_t mOperationState_ = 0;
-    int32_t mPointerCount_ = 0;
-    fingerInfos mfingersInfos_[FINGER_NUM] = {};
+    int32_t startTime_ = 0;
+    int32_t operationState_ = 0;
+    int32_t pointerCount_ = 0;
+    fingerInfos fingersInfos_[FINGER_NUM] = {};
 };
 } // namespace OHOS
 #endif // MANIPULATION_EVENT_H

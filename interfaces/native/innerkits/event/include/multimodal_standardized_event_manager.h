@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #include "singleton.h"
 #include "iremote_object.h"
 #include "if_mmi_client.h"
+#include "nocopyable.h"
 #include "standardized_event_handler.h"
 #include "key_event_input_subscribe_manager.h"
 
@@ -34,8 +35,7 @@ class MultimodalStandardizedEventManager {
 public:
     MultimodalStandardizedEventManager();
     ~MultimodalStandardizedEventManager();
-    MultimodalStandardizedEventManager(const MultimodalStandardizedEventManager&) = delete;
-    MultimodalStandardizedEventManager& operator=(const MultimodalStandardizedEventManager&) = delete;
+    DISALLOW_COPY_AND_MOVE(MultimodalStandardizedEventManager);
 
     void SetClientHandle(MMIClientPtr client);
     const std::set<std::string> *GetRegisterEvent();

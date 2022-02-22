@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -145,7 +145,7 @@ int32_t DelEventCallback(const napi_env& env, CallbackMap& jsEvent, const EventI
         if (isEquals) {
             napi_delete_reference(env, *it);
             iter->second.erase(it);
-            MMI_LOGD("callback function size:%{public}d", static_cast<int32_t>(iter->second.size()));
+            MMI_LOGD("callback function size:%{public}zu", iter->second.size());
             return JS_CALLBACK_EVENT_SUCCESS;
         }
         it++;
@@ -332,8 +332,8 @@ static void AddStylusData(const napi_env& env, napi_value argv, const StylusEven
 bool SendMultimodalEvent(const napi_env& env, const CallbackMap& jsEvent, int32_t type,
                          const MultimodalEvent& event)
 {
-    MMI_LOGD("send event:%{public}s, CallbackMap size:%{public}d",
-        eventTable[type].c_str(), static_cast<int32_t>(jsEvent.size()));
+    MMI_LOGD("send event:%{public}s, CallbackMap size:%{public}zu",
+        eventTable[type].c_str(), jsEvent.size());
     napi_value thisVar = nullptr;
     bool getResult = false;
     if (napi_get_undefined(env, &thisVar) != napi_ok) {
@@ -761,7 +761,7 @@ void AppTouchEventHandle::PrepareData(const napi_env& env, napi_value argv,
         AddMouseData(env, argv, *mouseEvent);
     } else if (deviceEventType == STYLUS_EVENT) {
         StylusEvent* stylusEvent = (StylusEvent*)event.GetMultimodalEvent();
-        CHKP(stylusEvent);
+        CHKPV(stylusEvent);
         AddStylusData(env, argv, *stylusEvent);
     }
 }

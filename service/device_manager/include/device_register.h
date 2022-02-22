@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,8 +31,8 @@ public:
     bool FindDeviceId(const std::string& physical, uint32_t& deviceId);
     uint32_t AddDeviceInfo(const std::string& physical);
 private:
-    std::set<uint32_t> setDeviceId_ = {};
-    std::map<std::string, uint32_t> mapDeviceInfo_ = {};
+    std::set<uint32_t> deviceId_ = {};
+    std::map<std::string, uint32_t> deviceInfo_ = {};
     std::mutex mu_;
 };
 } // namespace MMI

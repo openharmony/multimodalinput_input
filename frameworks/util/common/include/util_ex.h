@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,12 +18,12 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <time.h>
+#include <ctime>
 #include <type_traits>
+#include "define_multimodal.h"
+#include "mmi_log.h"
 #include "securec.h"
 #include "struct_multimodal.h"
-#include "define_multimodal.h"
-#include "log.h"
 #include "util.h"
 
 namespace OHOS {
@@ -35,11 +35,10 @@ namespace MMI {
         if (fmt == nullptr) {
             return RET_ERR;
         }
-        int32_t ret = 0;
 
-        const size_t bufSize = 1024 * 10;
+        constexpr size_t bufSize = 1024 * 10;
         char buf[bufSize] = {};
-        ret = snprintf_s(buf, bufSize, bufSize - 1, fmt, args...);
+        int32_t ret = snprintf_s(buf, bufSize, bufSize - 1, fmt, args...);
         if (ret < 0) {
             return ret;
         }
@@ -55,15 +54,15 @@ namespace MMI {
     }
 
     template<class ...Ts>
-    void DumpData(const char* dataPtr, const size_t dataSize, const char* fileName, const int lineNo,
+    void DumpData(const char* dataPtr, const size_t dataSize, const char* fileName, const int32_t lineNo,
         const char* titleFormat, Ts... args)
     {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilEx" };
 
-        const size_t outBufSize = 1024;
+        constexpr size_t outBufSize = 1024;
         char outBuf[outBufSize] = {};
-        int writeLen = 0;
-        int ret;
+        int32_t writeLen = 0;
+        int32_t ret;
         auto funcAdvanceWriteLen = [&writeLen, ret]() {
             if (ret > 0) {
                 writeLen += ret;
@@ -85,19 +84,19 @@ namespace MMI {
 
         funcOutput();
 
-        const size_t bufSize = 81;
-        const size_t oneLineCharCount = 16;
-        const size_t countStep = 2;
-        const size_t byteSize = 8;
-        const size_t wordSize = 16;
+        constexpr size_t bufSize = 81;
+        constexpr size_t oneLineCharCount = 16;
+        constexpr size_t countStep = 2;
+        constexpr size_t byteSize = 8;
+        constexpr size_t wordSize = 16;
         char bufLeft[bufSize] = {};
         char bufRight[bufSize] = {};
         size_t writePosHex = 0;
         size_t writePosChar = 0;
-        const size_t writePosHexStep1 = 2;
-        const size_t writePosHexStep2 = 3;
+        constexpr size_t writePosHexStep1 = 2;
+        constexpr size_t writePosHexStep2 = 3;
         size_t i = 0;
-        auto funCheckRetAndLog = [ret](const char* fileName, const int lineNo) -> void {
+        auto funCheckRetAndLog = [ret](const char* fileName, const int32_t lineNo) -> void {
             if (ret == -1) {
                 MMI_LOGE("SEC_RET_EQ: ret:%{public}d, %s:%d", ret, fileName, lineNo);
             }

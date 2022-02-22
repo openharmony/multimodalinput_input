@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,22 +13,20 @@
  * limitations under the License.
  */
 
+#include "multimodal_input_connect_stub.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include "error_multimodal.h"
-#include "ipc_skeleton.h"
-#include "log.h"
+#include "mmi_log.h"
 #include "multimodal_input_connect_define.h"
 #include "string_ex.h"
-#include "multimodal_input_connect_stub.h"
 
 namespace OHOS {
 namespace MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
-            LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectStub"
-        };
-    }
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectStub" };
+}
+
 int32_t MultimodalInputConnectStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
@@ -41,9 +39,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
     }
 
     switch (code) {
-        case static_cast<uint32_t>(IMultimodalInputConnect::ALLOC_SOCKET_FD):
+        case IMultimodalInputConnect::ALLOC_SOCKET_FD:
             return StubHandleAllocSocketFd(data, reply);
-        case static_cast<uint32_t>(IMultimodalInputConnect::SET_EVENT_POINTER_FILTER):
+        case IMultimodalInputConnect::SET_EVENT_POINTER_FILTER:
             return StubAddInputEventFilter(data, reply);
         default:
             MMI_LOGE("unknown code:%{public}u, go switch defaut", code);
@@ -51,30 +49,13 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
     }
 }
 
-bool MultimodalInputConnectStub::IsAuthorizedCalling() const
-{
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
-    MMI_LOGIK("Calling uid:%{public}d", callingUid);
-    return true;
-}
-
-int32_t MultimodalInputConnectStub::GetCallingUid() const
-{
-    return IPCSkeleton::GetCallingUid();
-}
-
-int32_t MultimodalInputConnectStub::GetCallingPid() const
-{
-    return IPCSkeleton::GetCallingPid();
-}
-
 int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     int32_t ret = RET_OK;
 
     do {
-        const int32_t uid = GetCallingUid();
+        const int32_t uid = IPCSkeleton::GetCallingUid();
         if (uid != SYSTEM_UID && uid != ROOT_UID) {
             MMI_LOGE("uid is not root or system");
             ret = SASERVICE_PERMISSION_FAIL;

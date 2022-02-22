@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,10 +14,10 @@
  */
 #ifndef JS_REGISTER_MODULE_H
 #define JS_REGISTER_MODULE_H
-#include <stdio.h>
+#include <cstdio>
 #include <map>
 #include <list>
-#include <string.h>
+#include <cstring>
 #include <iostream>
 #include "libmmi_util.h"
 #include "multimodal_event_handler.h"

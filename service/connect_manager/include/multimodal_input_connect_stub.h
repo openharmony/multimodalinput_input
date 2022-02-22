@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,11 +17,12 @@
 #define MULTIMODAL_INPUT_CONNECT_STUB_H
 
 #include "i_multimodal_input_connect.h"
-#include "log.h"
+#include "ipc_skeleton.h"
 #include "iremote_stub.h"
 #include "message_parcel.h"
-#include "nocopyable.h"
+#include "mmi_log.h"
 #include "multimodal_input_connect_define.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -33,15 +34,12 @@ public:
     int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& options) override;
 
 protected:
-    bool IsAuthorizedCalling() const;
-    int32_t GetCallingUid() const;
-    int32_t GetCallingPid() const;
     virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) = 0;
     int32_t StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
 
 private:
-    static const int32_t SYSTEM_UID = 1000;
-    static const int32_t ROOT_UID = 0;
+    static constexpr int32_t SYSTEM_UID = 1000;
+    static constexpr int32_t ROOT_UID = 0;
 };
 } // namespace MMI
 } // namespace OHOS

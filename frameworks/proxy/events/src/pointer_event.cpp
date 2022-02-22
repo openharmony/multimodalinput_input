@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,12 +41,12 @@ void PointerEvent::PointerItem::SetPointerId(int32_t pointerId)
     pointerId_ = pointerId;
 }
 
-int32_t PointerEvent::PointerItem::GetDownTime() const
+int64_t PointerEvent::PointerItem::GetDownTime() const
 {
     return downTime_;
 }
 
-void PointerEvent::PointerItem::SetDownTime(int32_t downTime)
+void PointerEvent::PointerItem::SetDownTime(int64_t downTime)
 {
     downTime_ = downTime;
 }
@@ -147,7 +147,7 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    if (!out.WriteInt32(downTime_)) {
+    if (!out.WriteInt64(downTime_)) {
         return false;
     }
 
@@ -196,7 +196,7 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    if (!in.ReadInt32(downTime_)) {
+    if (!in.ReadInt64(downTime_)) {
         return false;
     }
 
