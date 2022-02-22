@@ -905,15 +905,17 @@ int32_t EventDispatch::IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id
         "UID", session->GetUid(),
         "PACKAGE_NAME", "",
         "PROCESS_NAME", "",
-        "MSG", "multimodalinput");
-    if (ret < 0) {
-        MMI_LOGE("failed to notify HiviewDFX");
+        "MSG", "failed to dispatch pointer and key events of multimodalinput");
+    if (ret != 0) {
+        MMI_LOGE("HiviewDFX Write failed, HiviewDFX errCode: %{public}d", ret);
         return TRIGGER_ANR;
     }
 
-    bool result = OHOS::AAFwk::AbilityManagerClient::GetInstance()->SendANRProcessID(session->GetPid());
-    CHKR(result, INVALID_RETURN_VALUE, TRIGGER_ANR);
-
+    ret = OHOS::AAFwk::AbilityManagerClient::GetInstance()->SendANRProcessID(session->GetPid());
+    if (ret != 0) {
+        MMI_LOGE("AAFwk SendANRProcessID failed, AAFwk errCode: %{public}d", ret);
+        return TRIGGER_ANR;
+    }
     MMI_LOGD("end");
     return TRIGGER_ANR;
 }
