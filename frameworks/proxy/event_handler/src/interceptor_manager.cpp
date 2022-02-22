@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "interceptor_manager.h"
+#include <cinttypes>
 #include "bytrace.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
@@ -29,9 +30,7 @@ InterceptorManager::InterceptorManager()
     InterceptorItemId = 0;
 }
 
-InterceptorManager::~InterceptorManager()
-{
-}
+InterceptorManager::~InterceptorManager() {}
 
 int32_t InterceptorManager::AddInterceptor(int32_t sourceType,
     std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
@@ -85,9 +84,9 @@ int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointer
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     PointerEvent::PointerItem pointer;
     CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL, RET_ERR);
-    MMI_LOGD("interceptor-clienteventTouchpad:actionTime:%{public}d,"
+    MMI_LOGD("Interceptor-clienteventTouchpad:actionTime:%{public}" PRId64 ","
              "sourceType:%{public}d,pointerAction:%{public}d,"
-             "pointerId:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
+             "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     InterceptorItem interceptorItem;
@@ -104,7 +103,7 @@ int32_t InterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     int32_t keyId = keyEvent->GetId();
-    std::string keyEventString = "keyEventFilter";
+    const std::string keyEventString = "keyEventFilter";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
     for (auto &item : interceptor_) {
         if (item.sourceType == SOURCETYPE_KEY) {

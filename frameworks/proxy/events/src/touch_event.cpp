@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -116,12 +116,11 @@ const MultimodalEvent *TouchEvent::GetMultimodalEvent() const
 
 int32_t TouchEvent::GetPointToolType(int32_t index) const
 {
-    int32_t tableToolType = 0;
-
     if (index < 0) {
         return 0;
     }
 
+    int32_t tableToolType = 0;
     switch (index_) {
         case TABLET_TOOL_TYPE_PEN: {
             tableToolType = BUTTON_TOOL_PEN;

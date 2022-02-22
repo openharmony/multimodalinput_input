@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,15 +14,15 @@
  */
 #include <display_type.h>
 #include <ui/rs_surface_node.h>
-#include "pointer_drawing_manager.h"
 #include "libmmi_util.h"
+#include "image/bitmap.h"
+#include "image_source.h"
 #include "image_type.h"
 #include "image_utils.h"
-#include "image_source.h"
-#include "pixel_map.h"
-#include "log.h"
-#include "image/bitmap.h"
 #include "input_device_manager.h"
+#include "mmi_log.h"
+#include "pixel_map.h"
+#include "pointer_drawing_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -62,7 +62,7 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
 
 void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY)
 {
-    MMI_LOGD("enter, displayId:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
+    MMI_LOGD("enter, display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
     if (drawWindow_ == nullptr) {
         std::string windowName = "pointer window";
         sptr<OHOS::Rosen::WindowOption> option = new OHOS::Rosen::WindowOption();

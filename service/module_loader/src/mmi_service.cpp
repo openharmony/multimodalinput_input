@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,22 +13,22 @@
  * limitations under the License.
  */
 
+#include "mmi_service.h"
 #include <cinttypes>
-#include <signal.h>
+#include <csignal>
 #include <sys/signalfd.h>
 
 #include "app_register.h"
 #include "device_register.h"
 #include "event_dump.h"
 #include "input_windows_manager.h"
+#include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "pointer_drawing_manager.h"
 #include "register_eventhandle_manager.h"
 #include "safe_keeper.h"
 #include "timer_manager.h"
 #include "util.h"
-#include "log.h"
-#include "mmi_service.h"
 
 namespace OHOS {
 namespace MMI {
@@ -36,6 +36,7 @@ namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIService" };
 static const std::string DEF_INPUT_SEAT = "seat0";
 }
+
 const bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
 
@@ -95,7 +96,7 @@ MMIService::~MMIService()
 {
 }
 
-int32_t MMIService::EpollCtlAdd(EpollEventType type, int32_t fd)
+int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 {
     CHKR((type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END), PARAM_INPUT_INVALID, RET_ERR);
     CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
@@ -137,28 +138,28 @@ bool MMIService::InitLibinputService()
     CHKF(input_.Init(std::bind(&InputEventHandler::OnEvent, inputEventHdr_, std::placeholders::_1),
          DEF_INPUT_SEAT), LIBINPUT_INIT_FAIL);
     auto inputFd = input_.GetInputFd();
-    auto ret = EpollCtlAdd(EPOLL_EVENT_INPUT, inputFd);
+    auto ret = AddEpoll(EPOLL_EVENT_INPUT, inputFd);
     if (ret <  0) {
-        MMI_LOGE("EpollCtlAdd error ret:%{public}d", ret);
+        MMI_LOGE("AddEpoll error ret:%{public}d", ret);
         EpollClose();
         return false;
     }
-    MMI_LOGD("EpollCtlAdd, epollfd:%{public}d,fd:%{public}d", mmiFd_, inputFd);
+    MMI_LOGD("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, inputFd);
     return true;
 }
 
 bool MMIService::InitService()
 {
     CHKF(state_ == ServiceRunningState::STATE_NOT_START, SASERVICE_INIT_FAIL);
-    CHKF(Publish(DelayedSingleton<MMIService>::GetInstance().get()), SASERVICE_INIT_FAIL);
+    CHKF(Publish(this), SASERVICE_INIT_FAIL);
     CHKF(EpollCreat(MAX_EVENT_SIZE) >= 0, SASERVICE_INIT_FAIL);
-    auto ret = EpollCtlAdd(EPOLL_EVENT_SOCKET, epollFd_);
+    auto ret = AddEpoll(EPOLL_EVENT_SOCKET, epollFd_);
     if (ret <  0) {
-        MMI_LOGE("EpollCtlAdd error ret:%{public}d", ret);
+        MMI_LOGE("AddEpoll error ret:%{public}d", ret);
         EpollClose();
         return false;
     }
-    MMI_LOGD("EpollCtlAdd, epollfd:%{public}d,fd:%{public}d", mmiFd_, epollFd_);
+    MMI_LOGD("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, epollFd_);
     return true;
 }
 
@@ -208,8 +209,8 @@ void MMIService::OnStart()
     auto tid = GetThisThreadIdOfLL();
     MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
 
-    int32_t ret = 0;
-    CHK((RET_OK == (ret = Init())), ret);
+    int32_t ret = Init();
+    CHK(RET_OK == ret, ret);
     state_ = ServiceRunningState::STATE_RUNNING;
     MMI_LOGD("MMIService Started successfully");
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
@@ -266,7 +267,7 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     int32_t serverFd = INVALID_SOCKET_FD;
     int32_t uid = IPCSkeleton::GetCallingUid();
     int32_t pid = IPCSkeleton::GetCallingPid();
-    const int32_t ret = AddSocketPairInfo(programName, moduleType, serverFd, uid, pid, toReturnClientFd);
+    const int32_t ret = AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd);
     if (ret != RET_OK) {
         MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
         return RET_ERR;
@@ -280,7 +281,6 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
 
 int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
 {
-    int32_t ret = RET_OK;
     sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
     if (req == nullptr) {
         MMI_LOGE("read data error.");
@@ -289,7 +289,7 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
     MMI_LOGIK("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
 
     int32_t clientFd = INVALID_SOCKET_FD;
-    ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
+    int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
     if (ret != RET_OK) {
         MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
         reply.WriteInt32(RET_ERR);
@@ -388,9 +388,9 @@ bool MMIService::InitSignalHandler()
         return false;
     }
 
-    retCode = EpollCtlAdd(EPOLL_EVENT_SIGNAL, fdSignal);
+    retCode = AddEpoll(EPOLL_EVENT_SIGNAL, fdSignal);
     if (retCode < 0) {
-        MMI_LOGE("EpollCtlAdd signalFd failed:%{public}d", retCode);
+        MMI_LOGE("AddEpoll signalFd failed:%{public}d", retCode);
         close(fdSignal);
         return false;
     }
@@ -405,7 +405,9 @@ void MMIService::OnSignalEvent(int32_t signalFd)
     signalfd_siginfo sigInfo;
     int32_t size = ::read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
     if (size != sizeof(signalfd_siginfo)) {
-        MMI_LOGE("read signal info faild, invalid size:%{public}d", size);
+        const int errnoSaved = errno;
+        MMI_LOGE("read signal info faild, invalid size:%{public}d,errno:%{public}d,%{public}s",
+            size, errnoSaved, strerror(errnoSaved));
         return;
     }
 

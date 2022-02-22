@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,13 +27,13 @@ Uuid::Uuid()
     timeval tv;
     struct timezone tz;
     tm randomTime;
-    unsigned int randNum = 0;
-    unsigned long int tvUsec = 0;
+    uint32_t randNum = 0;
 
     rand_r(&randNum);
     gettimeofday(&tv, &tz);
     localtime_r(&tv.tv_sec, &randomTime);
 
+    unsigned long int tvUsec = 0;
     tvUsec = (unsigned long int)tv.tv_usec;
 
     uuid_[UUID_NODE_SIXTH_BYTE] =
@@ -54,20 +54,20 @@ Uuid::Uuid()
         (uint8_t)((tvUsec & 0xFF00000000000000) >> BIT_OPT_SEVEN_BYTE * BASE_BIT_OPT_SIZE);
     // 4 - 6
     uuid_[UUID_VERSION] =
-        (uint8_t)(((unsigned int)randomTime.tm_sec + randNum) & 0xFF);
+        (uint8_t)(((uint32_t)randomTime.tm_sec + randNum) & 0xFF);
     uuid_[UUID_TIME_MID_SECEND_BYTE] =
-        (uint8_t)(((unsigned int)randomTime.tm_min + (randNum >> BASE_BIT_OPT_SIZE)) & 0xFF);
+        (uint8_t)(((uint32_t)randomTime.tm_min + (randNum >> BASE_BIT_OPT_SIZE)) & 0xFF);
     uuid_[UUID_TIME_MID_FIRST_BYTE] =
-        (uint8_t)(((unsigned int)randomTime.tm_hour + (randNum >> BIT_OPT_TWO_BYTE * BASE_BIT_OPT_SIZE)) & 0xFF);
+        (uint8_t)(((uint32_t)randomTime.tm_hour + (randNum >> BIT_OPT_TWO_BYTE * BASE_BIT_OPT_SIZE)) & 0xFF);
     // 0 - 3
     uuid_[UUID_TIME_LOW_FOURTH_BYTE] =
-        (uint8_t)(((unsigned int)randomTime.tm_mday + (randNum >> BIT_OPT_THREE_BYTE * BASE_BIT_OPT_SIZE)) & 0xFF);
+        (uint8_t)(((uint32_t)randomTime.tm_mday + (randNum >> BIT_OPT_THREE_BYTE * BASE_BIT_OPT_SIZE)) & 0xFF);
     uuid_[UUID_TIME_LOW_THIRD_BYTE] =
-        (uint8_t)((unsigned int)randomTime.tm_mon & 0xFF);
+        (uint8_t)((uint32_t)randomTime.tm_mon & 0xFF);
     uuid_[UUID_TIME_LOW_SECEND_BYTE] =
-        (uint8_t)((unsigned int)randomTime.tm_year & 0xFF);
+        (uint8_t)((uint32_t)randomTime.tm_year & 0xFF);
     uuid_[UUID_TIME_LOW_FIRST_BYTE] =
-        (uint8_t)(((unsigned int)randomTime.tm_year & 0xFF00) >> BASE_BIT_OPT_SIZE);
+        (uint8_t)(((uint32_t)randomTime.tm_year & 0xFF00) >> BASE_BIT_OPT_SIZE);
 }
 
 char ConvertToHex(uint8_t c)
@@ -83,9 +83,9 @@ char ConvertToHex(uint8_t c)
 
 void Uuid::ConvertToStdString(std::string& s) const
 {
-    const int uuidBufMaxSize = 37;
+    constexpr int32_t uuidBufMaxSize = 37;
     char uuidBuf[uuidBufMaxSize + 1] = {0};
-    int writePos = 0;
+    int32_t writePos = 0;
     for (size_t i = 0; i < UUID128_BYTES_TYPE; i++) {
         const uint8_t c = uuid_[i];
         const uint8_t low4Bit = (c & 0xf);

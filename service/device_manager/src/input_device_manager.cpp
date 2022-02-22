@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,23 +46,19 @@ void InputDeviceManager::Init(weston_compositor* wc)
 
 void InputDeviceManager::GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback)
 {
-    MMI_LOGD("enter");
     MMIMsgPost.RunOnWestonThread([this, callback](weston_compositor* wc) {
         auto ids = GetInputDeviceIdsSync(wc);
         callback(ids);
     });
-    MMI_LOGD("leave");
 }
 
 void InputDeviceManager::FindInputDeviceIdAsync(int32_t deviceId,
     std::function<void(std::shared_ptr<InputDevice>)> callback)
 {
-    MMI_LOGD("enter");
     MMIMsgPost.RunOnWestonThread([this, deviceId, callback](weston_compositor* wc) {
         auto device = FindInputDeviceIdSync(deviceId, wc);
         callback(device);
     });
-    MMI_LOGD("leave");
 }
 
 std::vector<int32_t> InputDeviceManager::GetInputDeviceIdsSync(weston_compositor* wc)
@@ -184,10 +180,8 @@ void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
 
 bool InputDeviceManager::IsPointerDevice(libinput_device* device)
 {
-    MMI_LOGD("enter");
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
     MMI_LOGD("udev tag:%{public}d", static_cast<int32_t>(udevTags));
-    MMI_LOGD("leave");
     return udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK | 
     EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD);
 }
@@ -206,7 +200,7 @@ void InputDeviceManager::Detach(std::shared_ptr<DeviceObserver> observer)
 
 void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice)
 {
-    MMI_LOGI("observers_ size:%{public}d", static_cast<int32_t>(observers_.size()));
+    MMI_LOGI("observers_ size:%{public}zu", observers_.size());
     for (auto observer = observers_.begin(); observer != observers_.end(); observer++) {
         (*observer)->UpdatePointerDevice(hasPointerDevice);
     }
@@ -222,8 +216,7 @@ int32_t InputDeviceManager::FindInputDeviceId(libinput_device* inputDevice)
             return item.first;
         }
     }
-    MMI_LOGI("find input device id failed");
-    MMI_LOGD("end");
+    MMI_LOGE("find input device id failed");
     return INVALID_DEVICE_ID;
 }
 } // namespace MMI

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,7 @@
  */
 
 #include "input_event_monitor_manager.h"
+#include <cinttypes>
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 
@@ -23,13 +24,9 @@ namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventMonitorManager" };
 }
 
-InputEventMonitorManager::InputEventMonitorManager()
-{
-}
+InputEventMonitorManager::InputEventMonitorManager() {}
 
-InputEventMonitorManager::~InputEventMonitorManager()
-{
-}
+InputEventMonitorManager::~InputEventMonitorManager() {}
 
 int32_t InputEventMonitorManager::AddInputEventMontior(
     std::function<void (std::shared_ptr<OHOS::MMI::KeyEvent>)> keyEventMonitor)
@@ -120,9 +117,9 @@ int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<OH
     }
     PointerEvent::PointerItem pointer;
     CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL, RET_ERR);
-    MMI_LOGD("monitor-clienteventTouchpad:time::%{public}d,"
-             "sourceType::%{public}d,action::%{public}d,"
-             "pointerId::%{public}d,point.x::%{public}d,point.y::%{public}d,press:%{public}d",
+    MMI_LOGD("Monitor-clienteventTouchpad:time:%{public}" PRId64 ","
+             "sourceType:%{public}d,action:%{public}d,"
+             "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     return OHOS::MMI_STANDARD_EVENT_SUCCESS;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,24 +35,25 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
     }
     return RET_OK;
 }
-int32_t InputEventDataTransformation::NetPacketToKeyEvent(bool skipId,
-    NetPacket &packet, std::shared_ptr<KeyEvent> key)
+
+int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &packet, std::shared_ptr<KeyEvent> key)
 {
-    int32_t data = 0;
-    int32_t size = 0;
-    bool isPressed = false;
     CHKR((RET_OK == DeserializeInputEvent(packet, key)), STREAM_BUF_READ_FAIL, RET_ERR);
+    int32_t data = 0;
     CHKR(packet.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
     key->SetKeyCode(data);
     CHKR(packet.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
     key->SetKeyAction(data);
+    int32_t size = 0;
     CHKR(packet.Read(size), STREAM_BUF_READ_FAIL, RET_ERR);
+    bool isPressed = false;
     for (int32_t i = 0; i < size; i++) {
         KeyEvent::KeyItem keyItem;
         CHKR(packet.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
         keyItem.SetKeyCode(data);
-        CHKR(packet.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
-        keyItem.SetDownTime(data);
+        int64_t datatime = 0;
+        CHKR(packet.Read(datatime), STREAM_BUF_READ_FAIL, RET_ERR);
+        keyItem.SetDownTime(datatime);
         CHKR(packet.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
         keyItem.SetDeviceId(data);
         CHKR(packet.Read(isPressed), STREAM_BUF_READ_FAIL, RET_ERR);
@@ -84,12 +85,14 @@ int32_t InputEventDataTransformation::DeserializeInputEvent(NetPacket &packet, s
     int32_t tField {  };
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
-    CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
-    event->SetActionTime(tField);
+    event->SetId(tField);
+    int64_t rField = 0;
+    CHKR(packet.Read(rField), STREAM_BUF_READ_FAIL, RET_ERR);
+    event->SetActionTime(rField);
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
     event->SetAction(tField);
-    CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
-    event->SetActionStartTime(tField);
+    CHKR(packet.Read(rField), STREAM_BUF_READ_FAIL, RET_ERR);
+    event->SetActionStartTime(rField);
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
     event->SetDeviceId(tField);
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
@@ -221,8 +224,9 @@ int32_t InputEventDataTransformation::DeserializePointerItem(NetPacket &packet, 
     int32_t tField {  };
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
     item.SetPointerId(tField);
-    CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
-    item.SetDownTime(tField);
+    int64_t rField = 0;
+    CHKR(packet.Read(rField), STREAM_BUF_READ_FAIL, RET_ERR);
+    item.SetDownTime(rField);
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
     item.SetPressed(static_cast<bool>(tField));
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,7 @@
 #include <chrono>
 #include <thread>
 #include "iservice_registry.h"
-#include "log.h"
+#include "mmi_log.h"
 #include "multimodal_input_connect_death_recipient.h"
 #include "multimodal_input_connect_define.h"
 #include "system_ability_definition.h"
@@ -32,7 +32,6 @@ namespace {
 
 std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::GetInstance()
 {
-    MMI_LOGD("enter");
     static std::once_flag flag;
     std::call_once(flag, [&]() {
         g_instance.reset(new MultimodalInputConnectManager());
@@ -41,11 +40,10 @@ std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::Ge
     if (g_instance != nullptr) {
         g_instance->ConnectMultimodalInputService();
     }
-    MMI_LOGD("leave");
     return g_instance;
 }
 
-int32_t MultimodalInputConnectManager::AllocSocketPair(const int moduleType)
+int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> guard(lock_);
@@ -62,26 +60,22 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int moduleType)
     }
 
     MMI_LOGI("AllocSocketPair success. socketFd_:%{public}d", socketFd_);
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair() const
 {
     MMI_LOGD("enter");
-    MMI_LOGD("leave");
     return socketFd_;
 }
 
 int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    MMI_LOGD("enter");
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
         MMI_LOGE("multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
-    MMI_LOGD("leave");
     return multimodalInputConnectService_->AddInputEventFilter(filter);
 }
 
@@ -119,7 +113,6 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
         return false;
     }
     MMI_LOGI("get multimodal input connect service successful");
-    MMI_LOGD("leave");
     return true;
 }
 

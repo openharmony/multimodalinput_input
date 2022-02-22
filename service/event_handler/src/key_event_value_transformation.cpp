@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -442,7 +442,6 @@ const std::multimap<int16_t, KeyEventValueTransformations> MAP_KEY_EVENT_VALUE_T
 
 KeyEventValueTransformations KeyValueTransformationInput(int16_t keyValueOfInput)
 {
-    MMI_LOGD("enter");
     auto it = MAP_KEY_EVENT_VALUE_TRANSFORMATION.find(keyValueOfInput);
     if (it == MAP_KEY_EVENT_VALUE_TRANSFORMATION.end()) {
         constexpr int16_t UNKNOWN_KEY_BASE = 10000;
@@ -453,7 +452,6 @@ KeyEventValueTransformations KeyValueTransformationInput(int16_t keyValueOfInput
                  "UNKNOWN_KEY_BASE:%{public}d", keyValueOfInput, UNKNOWN_KEY_BASE);
         return unknownKey;
     }
-    MMI_LOGD("leave");
     return it->second;
 }
 
@@ -469,12 +467,9 @@ KeyEventValueTransformation::~KeyEventValueTransformation()
 
 bool KeyEventValueTransformation::Init()
 {
-    MMI_LOGD("enter");
-    xkb_context* context = nullptr;
-    xkb_keymap* keyMap = nullptr;
     int32_t ctxFlags = XKB_CONTEXT_NO_DEFAULT_INCLUDES;
-
     ctxFlags = ctxFlags | XKB_CONTEXT_NO_ENVIRONMENT_NAMES;
+    xkb_context* context = nullptr;
     context = xkb_context_new(static_cast<xkb_context_flags>(ctxFlags));
     CHKPF(context);
     auto strPath = GetEnv("top_srcdir");
@@ -488,6 +483,7 @@ bool KeyEventValueTransformation::Init()
         return false;
     }
 
+    xkb_keymap* keyMap = nullptr;
     keyMap = xkb_keymap_new_from_names(context, nullptr, XKB_KEYMAP_COMPILE_NO_FLAGS);
     if (keyMap == nullptr) {
         xkb_context_unref(context);
@@ -505,13 +501,11 @@ bool KeyEventValueTransformation::Init()
 
     xkb_context_unref(context);
     xkb_keymap_unref(keyMap);
-    MMI_LOGD("leave");
     return true;
 }
 
 uint32_t KeyEventValueTransformation::KeyboardHandleKeySym(uint32_t keyboardKey)
 {
-    MMI_LOGD("enter");
     constexpr uint32_t XKB_EVDEV_OFFSET = 8;
     uint32_t code = keyboardKey + XKB_EVDEV_OFFSET;
     xkb_keysym_t syms = XKB_KEY_NoSymbol;
@@ -522,7 +516,6 @@ uint32_t KeyEventValueTransformation::KeyboardHandleKeySym(uint32_t keyboardKey)
     if (numSyms == 1) {
         sym = pSyms[0];
     }
-    MMI_LOGD("leave");
     return sym;
 }
 } // namespace MMI

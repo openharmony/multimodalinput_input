@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -75,7 +75,7 @@ MmiPoint ManipulationEvent::GetPointerPosition(int32_t index) const
     if (index < 0 || index >= FINGER_NUM) {
         return MmiPoint(0, 0, 0);
     }
-    for (int i = 0; i < pointerCount_; i++) {
+    for (int32_t i = 0; i < pointerCount_; i++) {
         if (fingersInfos_[i].mPointerId == index) {
             return fingersInfos_[i].mMp;
         }

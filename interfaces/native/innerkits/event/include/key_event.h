@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1440,8 +1440,8 @@ public:
         void SetKeyCode(int32_t keyCode);
 
         // Get or set the key press time
-        int32_t GetDownTime() const;
-        void SetDownTime(int32_t downTime);
+        int64_t GetDownTime() const;
+        void SetDownTime(int64_t downTime);
 
         // Get or set the unique identifier of the device reporting this button. i
         // The default value is 0, which means that the non-real device reports.
@@ -1458,9 +1458,9 @@ public:
 
     private:
         bool pressed_;
-        int32_t downTime_;
         int32_t deviceId_;
         int32_t keyCode_;
+        int64_t downTime_;
     };
 
 public:

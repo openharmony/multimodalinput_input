@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,8 +33,8 @@ enum MMI_SYSTEM_KEY_STATE {
 struct KeyEventValueTransformations {
     std::string keyEvent;
     int16_t keyValueOfNative;
-    int16_t keyValueOfHos;
-    int16_t keyEventOfHos;
+    int16_t keyValueOfSys;
+    int16_t keyEventOfSys;
     int16_t isSystemKey;
 };
 

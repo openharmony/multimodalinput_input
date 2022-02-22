@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,12 +15,12 @@
 
 #include "uds_socket.h"
 #include <cinttypes>
-#include "log.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSocket" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSocket" };
     }
 
 UDSSocket::UDSSocket()
@@ -53,7 +53,7 @@ int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, epoll_event& event, int32_t 
     CHKR(epollFd >= 0, PARAM_INPUT_INVALID, RET_ERR);
     auto ret = epoll_ctl(epollFd, op, fd, &event);
     if (ret < 0) {
-        const int errnoSaved = errno;
+        const int32_t errnoSaved = errno;
         MMI_LOGE("UDSSocket::EpollCtl epoll_ctl retrun %{public}d,epollFd_:%{public}d,"
                  "op:%{public}d,fd:%{public}d,errno:%{public}d,error msg: %{public}s",
                  ret, epollFd, op, fd, errnoSaved, strerror(errnoSaved));
@@ -69,7 +69,9 @@ int32_t UDSSocket::EpollWait(epoll_event& events, int32_t maxevents, int32_t tim
     CHKR(epollFd >= 0, PARAM_INPUT_INVALID, RET_ERR);
     auto ret = epoll_wait(epollFd, &events, maxevents, timeout);
     if (ret < 0) {
-        MMI_LOGE("UDSSocket::EpollWait epoll_wait retrun %{public}d", ret);
+        const int errnoSaved = errno;
+        MMI_LOGE("UDSSocket::EpollWait epoll_wait retrun %{public}d,errno:%{public}d,%{public}s",
+            ret, errnoSaved, strerror(errnoSaved));
     }
     return ret;
 }
@@ -79,7 +81,7 @@ int32_t UDSSocket::SetBlockMode(int32_t fd, bool isBlock)
     CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
     int32_t flags = fcntl(fd, F_GETFL);
     if (flags < 0) {
-        MMI_LOGE("fcntl F_GETFL fail. fd:%{public}d,flags:%{public}d,msg:%{public}s,errCode:%{public}d", 
+        MMI_LOGE("fcntl F_GETFL fail. fd:%{public}d,flags:%{public}d,msg:%{public}s,errCode:%{public}d",
             fd, flags, strerror(errno), FCNTL_FAIL);
         return flags;
     }
@@ -90,7 +92,7 @@ int32_t UDSSocket::SetBlockMode(int32_t fd, bool isBlock)
     }
     flags = fcntl(fd, F_SETFL, flags);
     if (flags < 0) {
-        MMI_LOGE("fcntl F_SETFL fail. fd:%{public}d,flags:%{public}d,msg:%{public}s,errCode:%{public}d", 
+        MMI_LOGE("fcntl F_SETFL fail. fd:%{public}d,flags:%{public}d,msg:%{public}s,errCode:%{public}d",
             fd, flags, strerror(errno), FCNTL_FAIL);
         return flags;
     }
@@ -186,5 +188,5 @@ void UDSSocket::Close()
     }
     fd_ = -1;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

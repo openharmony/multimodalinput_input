@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,14 +16,22 @@
 #define UTIL_H
 
 #include <map>
-#include <vector>
 #include <string>
-#include <time.h>
+#include <ctime>
+#include <vector>
 #include "struct_multimodal.h"
 #include "define_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
+namespace {
+    constexpr int64_t S2MS = 1000;
+    constexpr int64_t S2US = 1000 * 1000;
+    constexpr int64_t S2NS = 1000 * 1000 * 1000;
+    constexpr int64_t MS2NS = 1000 * 1000;
+    constexpr int64_t US2NS = 1000;
+}
+
     const char *GetMmiErrorTypeDesc(int32_t errorCodeEnum);
     std::string GetEnv(const std::string& name);
     std::string UuIdGenerate();
@@ -41,7 +49,7 @@ namespace MMI {
     void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
         const int32_t abilityId, const int32_t focusId, const uint64_t preHandlerTime);
     void PrintWMSInfo(const std::string& str, const int32_t fd, const int32_t abilityId, const int32_t focusId);
-    int GetPid();
+    int32_t GetPid();
     std::string GetFileName(const std::string& strPath);
     const char* GetProgramName();
     char* MmiBasename(char* path);
@@ -51,6 +59,7 @@ namespace MMI {
     void AddId(std::vector<int32_t> &list, int32_t id);
     size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_t> &list2,
         std::vector<int32_t> &difList);
+    std::string StringFmt(const char* str, ...);
 } // namespace MMI
 } // namespace OHOS
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,7 @@
  */
 
 #include "multimodal_standardized_event_manager.h"
+#include <cinttypes>
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "immi_token.h"
@@ -82,7 +83,6 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
     CHKR((token && standardizedEventHandle), PARAM_INPUT_INVALID, MMI_STANDARD_EVENT_INVALID_PARAMETER);
     auto typeId = standardizedEventHandle->GetType();
     CHKR(typeId > MmiMessageId::INVALID, VAL_NOT_EXP, MMI_STANDARD_EVENT_INVALID_PARAMETER);
-    auto range = mapEvents_.equal_range(typeId);
 
     std::string registerhandle;
     if (!MakeRegisterHandle(typeId, windowId, registerhandle)) {
@@ -91,6 +91,7 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
         return MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
     registerEvents_.erase(registerhandle);
+    auto range = mapEvents_.equal_range(typeId);
     bool isHandleExist = false;
     for (StandEventMMaps::iterator it = range.first; it != range.second; ++it) {
         if (it->second.eventCallBack == standardizedEventHandle) {
@@ -686,23 +687,23 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
     MMI_LOGD("enter");
     CHKPR(pointerEvent, RET_ERR);
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
-    MMI_LOGD("pointer event dispatcher of client:eventType:%{public}s,actionTime:%{public}d,"
-             "action:%{public}d,actionStartTime:%{public}d,flag:%{public}d,pointerAction:%{public}s,"
-             "sourceType:%{public}s,VerticalAxisValue:%{public}f,HorizontalAxisValue:%{public}f,"
-             "pointerCount:%{public}d",
+    MMI_LOGD("Pointer event dispatcher of client:eventType:%{public}s,actionTime:%{public}" PRId64 ","
+             "action:%{public}d,actionStartTime:%{public}" PRId64 ","
+             "flag:%{public}d,pointerAction:%{public}s,sourceType:%{public}s,"
+             "VerticalAxisValue:%{public}f,HorizontalAxisValue:%{public}f,pointerCount:%{public}zu",
              pointerEvent->DumpEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
              pointerEvent->GetFlag(), pointerEvent->DumpPointerAction(),
              pointerEvent->DumpSourceType(),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
-             static_cast<int32_t>(pointerIds.size()));
+             pointerIds.size());
 
     for (const auto &pointerId : pointerIds) {
         OHOS::MMI::PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
 
-        MMI_LOGD("downTime:%{public}d,isPressed:%{public}s,"
+        MMI_LOGD("DownTime:%{public}" PRId64 ",isPressed:%{public}s,"
                 "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
                 "width:%{public}d,height:%{public}d,pressure:%{public}d",
                  item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
