@@ -189,7 +189,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnSeniorInputFuncProc(SessionPtr SessionPtr
                  fd, msgType, processResult);
     }
 
-    const int responseCode = seniorInput_->ReplyMessage(SessionPtr, processResult);
+    const int32_t responseCode = seniorInput_->ReplyMessage(SessionPtr, processResult);
     if (responseCode == RET_ERR) {
         MMI_LOGW("reply msg to client fail, fd:%{public}d,msgType:%{public}d,"
                  " processResult:%{public}d,replyCode:%{public}d",
