@@ -101,7 +101,7 @@ void RegisterEventHandleManager::UnregisterEventHandleBySocketFd(int32_t fd)
         if (iter->second == fd) {
             iter = mapRegisterManager_.erase(iter);
         } else {
-            iter++;
+            ++iter;
         }
     }
 }
@@ -163,7 +163,7 @@ void RegisterEventHandleManager::RegisterEventHandleByIdMsage(const MmiMessageId
 {
     const int32_t messageIdBeginTemp = static_cast<int32_t>(idMsgBegin);
     const int32_t messageIdEndTemp = static_cast<int32_t>(idMsgEnd);
-    for (auto it = messageIdBeginTemp + 1; it < messageIdEndTemp; it++) {
+    for (auto it = messageIdBeginTemp + 1; it < messageIdEndTemp; ++it) {
         auto tempId = static_cast<MmiMessageId>(it);
         mapRegisterManager_.insert(std::pair<MmiMessageId, int32_t>(tempId, fd));
     }
@@ -179,7 +179,7 @@ void RegisterEventHandleManager::UnregisterEventHandleByIdMsage(const MmiMessage
         if ((it->first < idMsgEnd) && (it->second == fd)) {
             it = mapRegisterManager_.erase(it);
         } else {
-            it++;
+            ++it;
         }
     }
 }

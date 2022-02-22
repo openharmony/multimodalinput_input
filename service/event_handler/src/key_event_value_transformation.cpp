@@ -467,11 +467,9 @@ KeyEventValueTransformation::~KeyEventValueTransformation()
 
 bool KeyEventValueTransformation::Init()
 {
-    xkb_context* context = nullptr;
-    xkb_keymap* keyMap = nullptr;
     int32_t ctxFlags = XKB_CONTEXT_NO_DEFAULT_INCLUDES;
-
     ctxFlags = ctxFlags | XKB_CONTEXT_NO_ENVIRONMENT_NAMES;
+    xkb_context* context = nullptr;
     context = xkb_context_new(static_cast<xkb_context_flags>(ctxFlags));
     CHKPF(context);
     auto strPath = GetEnv("top_srcdir");
@@ -485,6 +483,7 @@ bool KeyEventValueTransformation::Init()
         return false;
     }
 
+    xkb_keymap* keyMap = nullptr;
     keyMap = xkb_keymap_new_from_names(context, nullptr, XKB_KEYMAP_COMPILE_NO_FLAGS);
     if (keyMap == nullptr) {
         xkb_context_unref(context);

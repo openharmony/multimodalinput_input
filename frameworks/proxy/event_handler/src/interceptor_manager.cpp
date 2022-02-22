@@ -30,9 +30,7 @@ InterceptorManager::InterceptorManager()
     InterceptorItemId = 0;
 }
 
-InterceptorManager::~InterceptorManager()
-{
-}
+InterceptorManager::~InterceptorManager() {}
 
 int32_t InterceptorManager::AddInterceptor(int32_t sourceType,
     std::function<void(std::shared_ptr<PointerEvent>)> interceptor)

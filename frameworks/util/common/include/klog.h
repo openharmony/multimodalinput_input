@@ -15,12 +15,10 @@
 #ifndef KLOG_H
 #define KLOG_H
 
-#include <string.h>
+#include <cstring>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
+namespace OHOS {
+namespace MMI {
 void kMsgLog(const char *fileName, int line, const char *kLevel, const char *fmt, ...);
 
 #ifndef MMI_FILE_NAME
@@ -32,9 +30,7 @@ void kMsgLog(const char *fileName, int line, const char *kLevel, const char *fmt
 #define KMSG_LOGW(fmt, ...) kMsgLog((MMI_FILE_NAME), (__LINE__), "<4>", fmt"\n", ##__VA_ARGS__)
 #define KMSG_LOGE(fmt, ...) kMsgLog((MMI_FILE_NAME), (__LINE__), "<3>", fmt"\n", ##__VA_ARGS__)
 #define KMSG_LOGF(fmt, ...) kMsgLog((MMI_FILE_NAME), (__LINE__), "<3>", fmt"\n", ##__VA_ARGS__)
-
-#ifdef __cplusplus
 }
-#endif
+}
 
 #endif // KLOG_H

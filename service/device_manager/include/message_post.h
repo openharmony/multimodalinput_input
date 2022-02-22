@@ -27,9 +27,9 @@ namespace OHOS {
 namespace MMI {
 class MessagePost : public OHOS::Singleton<OHOS::MMI::MessagePost> {
 public:
-    void SetFd(int fd);
+    void SetFd(int32_t fd);
     void RunOnWestonThread(std::function<void(weston_compositor *)> taskItem);
-    static int RunTaskOnWestonThread(int fd, uint32_t mask, void *data);
+    static int32_t RunTaskOnWestonThread(int32_t fd, uint32_t mask, void *data);
     void SetWestonCompositor(weston_compositor *ec);
 
 private:
@@ -38,7 +38,7 @@ private:
 
     std::mutex lk_;
     std::list<std::function<void(weston_compositor *)>> asyncTasks_;
-    int fd_;
+    int32_t fd_;
     weston_compositor *ec_ {nullptr};
 };
 } // namespace MMI
