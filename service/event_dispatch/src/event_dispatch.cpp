@@ -396,6 +396,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 
     if (IsANRProcess(udsServer, fd, point->GetId()) == TRIGGER_ANR) {
         MMI_LOGE("the pointer event does not report normally, triggering ANR");
+        return RET_ERR;
     }
 
     if (!udsServer->SendMsg(fd, newPacket)) {
@@ -748,6 +749,7 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
 
     if (IsANRProcess(&udsServer, fd, key->GetId()) == TRIGGER_ANR) {
         MMI_LOGE("the key event does not report normally, triggering ANR");
+        return RET_ERR;
     }
 
     InputMonitorServiceMgr.OnMonitorInputEvent(key);
@@ -905,7 +907,7 @@ int32_t EventDispatch::IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id
         "UID", session->GetUid(),
         "PACKAGE_NAME", "",
         "PROCESS_NAME", "",
-        "MSG", "failed to dispatch pointer and key events of multimodalinput");
+        "MSG", "failed to dispatch pointer or key events of multimodalinput");
     if (ret != 0) {
         MMI_LOGE("HiviewDFX Write failed, HiviewDFX errCode: %{public}d", ret);
         return TRIGGER_ANR;
