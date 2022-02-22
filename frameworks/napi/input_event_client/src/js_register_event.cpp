@@ -120,7 +120,7 @@ int32_t AddEventCallback(const napi_env& env, CallbackMap& jsEvent, const EventI
             MMI_LOGD("event %{public}s callback already exists", event.name.c_str());
             return JS_CALLBACK_EVENT_EXIST;
         }
-        it++;
+        ++it;
     }
     napi_ref callbackRef = nullptr;
     napi_create_reference(env, event.handle, 1, &callbackRef);
@@ -148,7 +148,7 @@ int32_t DelEventCallback(const napi_env& env, CallbackMap& jsEvent, const EventI
             MMI_LOGD("callback function size:%{public}zu", iter->second.size());
             return JS_CALLBACK_EVENT_SUCCESS;
         }
-        it++;
+        ++it;
     }
     return JS_CALLBACK_EVENT_NOT_EXIST;
 }
@@ -159,7 +159,7 @@ uint32_t GetEventCallbackNum(const CallbackMap& jsEvent)
     auto iter = jsEvent.begin();
     while (iter != jsEvent.end()) {
         callbackNum += iter->second.size();
-        iter++;
+        ++iter;
     }
     return callbackNum;
 }
