@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,16 +51,16 @@ public:
     void Broadcast(NetPacket& pkt);
     void Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt);
     void Dump(int32_t fd);
-    int32_t GetFdPid(int32_t pid);
-    int32_t GetPidFd(int32_t fd);
+    int32_t GetClientFd(int32_t pid);
+    int32_t GetClientPid(int32_t fd);
     void OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, epoll_event& ev);
     void OnEpollRecv(int32_t fd, const char *buf, size_t size);
 
     void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
 
 public:
-    virtual int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, int32_t& serverFd,
-                                      const int32_t uid, const int32_t pid, int32_t& toReturnClientFd);
+    virtual int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,
+                                      const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd);
     SessionPtr GetSession(int32_t fd) const;
 
 protected:
@@ -68,7 +68,7 @@ protected:
 
     virtual void OnConnected(SessionPtr s);
     virtual void OnDisconnected(SessionPtr s);
-    virtual int32_t EpollCtlAdd(EpollEventType type, int32_t fd);
+    virtual int32_t AddEpoll(EpollEventType type, int32_t fd);
 
     bool StartServer();
     void OnRecv(int32_t fd, const char *buf, size_t size);
@@ -85,7 +85,7 @@ protected:
 protected:
     std::mutex mux_;
     std::thread t_;
-    bool isRun_ = false;
+    bool isRunning_ = false;
     MsgServerFunCallback recvFun_ = nullptr;
     std::map<int32_t, SessionPtr> sessionsMap_ = {};
     std::map<int32_t, int32_t> idxPidMap_ = {};

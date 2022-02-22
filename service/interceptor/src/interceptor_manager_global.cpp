@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "interceptor_manager_global.h"
+#include <cinttypes>
 #include "input_event_data_transformation.h"
 #include "proto.h"
 #include "souceType.h"
@@ -78,9 +79,9 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
     }
     PointerEvent::PointerItem pointer;
     CHKF(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL);
-    MMI_LOGT("interceptor-servereventTouchpad:actionTime:%{public}d,"
+    MMI_LOGT("Interceptor-servereventTouchpad:actionTime:%{public}" PRId64 ","
              "sourceType:%{public}d,pointerAction:%{public}d,"
-             "pointerId:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
+             "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     NetPacket newPkt(MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR);

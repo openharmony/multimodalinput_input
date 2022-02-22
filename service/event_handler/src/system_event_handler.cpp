@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -69,7 +69,7 @@ using namespace OHOS::AAFwk;
 using namespace OHOS::AppExecFwk;
 OHOS::MMI::SystemEventHandler::SystemEventHandler()
 {
-    mapFuns_ = {
+    callbacks_ = {
         {MmiMessageId::ON_SCREEN_SHOT, std::bind(&SystemEventHandler::OnScreenShot, this)},
         {MmiMessageId::ON_SCREEN_SPLIT, std::bind(&SystemEventHandler::OnScreenSplit, this)},
         {MmiMessageId::ON_START_SCREEN_RECORD, std::bind(&SystemEventHandler::OnStopScreenRecord, this)},
@@ -92,17 +92,15 @@ OHOS::MMI::SystemEventHandler::~SystemEventHandler()
 
 int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
 {
-    MMI_LOGD("enter");
     if (idMsg == MmiMessageId::INVALID) {
         return PARAM_INPUT_INVALID;
     }
-    auto fun = GetFun(idMsg);
-    if (!fun) {
+    auto callback = GetMsgCallback(idMsg);
+    if (callback == nullptr) {
         MMI_LOGE("Non system event return");
         return UNKNOWN_MSG_ID; // non-system event return
     }
-    (*fun)();
-    MMI_LOGD("leave");
+    (*callback)();
     return RET_OK;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,7 @@ class UDSSession;
 using SessionPtr = std::shared_ptr<UDSSession>;
 class UDSSession : public std::enable_shared_from_this<UDSSession> {
 public:
-    UDSSession(const std::string& programName, const int moduleType, const int32_t fd, const int32_t uid,
+    UDSSession(const std::string& programName, const int32_t moduleType, const int32_t fd, const int32_t uid,
                const int32_t pid);
     DISALLOW_COPY_AND_MOVE(UDSSession);
     virtual ~UDSSession();
@@ -66,7 +66,7 @@ public:
     void ClearEventsVct();
 
 #ifdef OHOS_BUILD_MMI_DEBUG
-    void SetClientFd(const int clientFd)
+    void SetClientFd(const int32_t clientFd)
     {
         clientFd_ = clientFd;
         UpdateDescript();
@@ -82,14 +82,14 @@ protected:
     std::string descript_;
     bool bHasClosed_ = false;
     const std::string programName_;
-    const int moduleType_;
+    const int32_t moduleType_;
     const int32_t fd_;
     const int32_t uid_;
     const int32_t pid_;
 #ifdef OHOS_BUILD_MMI_DEBUG
-    int clientFd_ = -1;
+    int32_t clientFd_ = -1;
 #endif // OHOS_BUILD_MMI_DEBUG
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // UDS_SESSION_H

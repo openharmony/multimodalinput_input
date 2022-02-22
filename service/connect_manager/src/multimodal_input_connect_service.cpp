@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,10 +14,10 @@
  */
 
 #include "multimodal_input_connect_service.h"
-#include <string.h>
+#include <cstring>
 #include <sys/types.h>
 #include <unistd.h>
-#include "log.h"
+#include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "singleton.h"
 #include "string_ex.h"
@@ -34,7 +34,6 @@ const bool REGISTER_RESULT =
 int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programName, const int32_t moduleType,
                                                      int32_t &toReturnClientFd)
 {
-    MMI_LOGD("enter");
     MMI_LOGI("MultimodalInputConnectService::AllocSocketFd enter, programName:%{public}s,moduleType:%{public}d",
              programName.c_str(), moduleType);
     if (udsServer_ == nullptr) {
@@ -45,7 +44,7 @@ int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programN
     int32_t serverFd = INVALID_SOCKET_FD;
     int32_t uid = IPCSkeleton::GetCallingUid();
     int32_t pid = IPCSkeleton::GetCallingPi
-    const int32_t ret = udsServer_->AddSocketPairInfo(programName, moduleType, serverFd, uid, pid, toReturnClientFd);
+    const int32_t ret = udsServer_->AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd);
     if (ret != RET_OK) {
         MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
         return RET_ERR;
@@ -53,7 +52,6 @@ int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programN
 
     MMI_LOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
         programName.c_str(), moduleType);
-
     return RET_OK;
 }
 
@@ -86,8 +84,7 @@ void MultimodalInputConnectService::OnStart()
         MMI_LOGE("Failed to initialize");
         return;
     }
-    bool ret = Publish(DelayedSingleton<MultimodalInputConnectService>::GetInstance().get());
-    if (!ret) {
+    if (!Publish(this)) {
         MMI_LOGE("Failed to publish service");
         return;
     }

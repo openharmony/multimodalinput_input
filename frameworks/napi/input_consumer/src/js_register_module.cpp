@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,15 +23,15 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
+    constexpr size_t EVENT_NAME_LEN = 64;
+    constexpr size_t ARGC_NUM = 3;
+    constexpr size_t ARGV_FIRST = 0;
+    constexpr size_t ARGV_SECOND = 1;
+    constexpr size_t ARGV_THIRD = 2;
+    constexpr size_t PRE_KEYS_SIZE = 4;
 }
 
-const uint32_t EVENT_NAME_LEN = 64;
-const uint32_t ARGC_NUM = 3;
-const uint32_t ARGV_FIRST = 0;
-const uint32_t ARGV_SECOND = 1;
-const uint32_t ARGV_THIRD = 2;
-const uint32_t PRE_KEYS_SIZE = 4;
 static Callbacks callbacks = {};
 
 int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
@@ -86,7 +86,7 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
         return ERROR_CODE;
     }
     std::vector<int32_t> preKeys = GetIntArray(env, receiceValue);
-    MMI_LOGD("PreKeys size:%{public}d", static_cast<int32_t>(preKeys.size()));
+    MMI_LOGD("PreKeys size:%{public}zu", preKeys.size());
     std::vector<int32_t> sortPrekeys = preKeys;
     sort(sortPrekeys.begin(), sortPrekeys.end());
     keyOption->SetPreKeys(preKeys);
@@ -163,7 +163,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     auto upTime = keyEvent->GetActionTime();
     auto downTime = keyItem->GetDownTime();
     auto curDurtionTime = keyOption->GetFinalKeyDownDuration();
-    if (curDurtionTime > 0 && (upTime - downTime >= (curDurtionTime * 1000))) {
+    if (curDurtionTime > 0 && (upTime - downTime >= (static_cast<int64_t>(curDurtionTime) * 1000))) {
         MMI_LOGE("Skip, upTime - downTime >= duration");
         return false;
     }
@@ -177,7 +177,7 @@ static void SubKeyEventCallback(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     while (iter != callbacks.end()) {
         auto &list = iter->second;
         iter++;
-        MMI_LOGD("list size:%{public}d", static_cast<int32_t>(list.size()));
+        MMI_LOGD("list size:%{public}zu", list.size());
         auto infoIter = list.begin();
         while (infoIter != list.end()) {
             auto monitorInfo = *infoIter;
@@ -310,5 +310,5 @@ extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
     napi_module_register(&mmiModule);
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

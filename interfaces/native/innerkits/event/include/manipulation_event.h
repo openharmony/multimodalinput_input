@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -58,7 +58,7 @@ enum ManipulationEnum {
     PHASE_CANCEL = 4
 };
 
-const int32_t FINGER_NUM = 10;
+constexpr int32_t FINGER_NUM = 10;
 
 struct fingerInfos {
     int32_t mPointerId;

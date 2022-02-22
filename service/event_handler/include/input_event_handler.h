@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,7 +34,6 @@ public:
     bool Init(UDSServer& udsServer);
     void OnEvent(void *event);
     void OnCheckEventReport();
-    void RegistnotifyDeviceChange(NotifyDeviceChange cb);
     int32_t OnMouseEventEndTimerHandler(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
     UDSServer *GetUDSServer();
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);

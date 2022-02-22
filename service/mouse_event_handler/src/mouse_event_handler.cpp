@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,7 @@
  */
 
 #include "mouse_event_handler.h"
+#include <cinttypes>
 #include "libmmi_util.h"
 #include "input-event-codes.h"
 #include "util.h"
@@ -128,15 +129,15 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     MMI_LOGD("enter");
 
     auto mouseInfo = WinMgr->GetMouseInfo();
-    MouseState->SetMouseCoords(mouseInfo.globleX, mouseInfo.globleY);
-    pointerItem.SetGlobalX(mouseInfo.globleX);
-    pointerItem.SetGlobalY(mouseInfo.globleY);
+    MouseState->SetMouseCoords(mouseInfo.globalX, mouseInfo.globalY);
+    pointerItem.SetGlobalX(mouseInfo.globalX);
+    pointerItem.SetGlobalY(mouseInfo.globalY);
     pointerItem.SetLocalX(0);
     pointerItem.SetLocalY(0);
     pointerItem.SetPointerId(0);
 
-    uint64_t time = libinput_event_pointer_get_time_usec(data);
-    pointerItem.SetDownTime(static_cast<int32_t>(time));
+    int64_t time = static_cast<int64_t>(GetSysClockTime());
+    pointerItem.SetDownTime(time);
     pointerItem.SetWidth(0);
     pointerItem.SetHeight(0);
     pointerItem.SetPressure(0);
@@ -145,8 +146,8 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerEvent_->UpdateId();
     pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent_->SetActionTime(static_cast<int32_t>(GetSysClockTime()));
-    pointerEvent_->SetActionStartTime(static_cast<int32_t>(time));
+    pointerEvent_->SetActionTime(time);
+    pointerEvent_->SetActionStartTime(time);
     pointerEvent_->SetDeviceId(deviceId);
     pointerEvent_->SetPointerId(0);
     pointerEvent_->SetTargetDisplayId(-1);
@@ -158,10 +159,11 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
 
 void MouseEventHandler::Normalize(libinput_event *event)
 {
-    MMI_LOGD("Enter");
+    MMI_LOGD("enter");
     CHKPV(event);
     auto data = libinput_event_get_pointer_event(event);
     CHKPV(data);
+    CHKPV(pointerEvent_);
     PointerEvent::PointerItem pointerItem;
     const int32_t type = libinput_event_get_type(event);
     switch (type) {
@@ -199,7 +201,7 @@ void MouseEventHandler::DumpInner()
 
     PointerEvent::PointerItem item;
     CHK(pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item), PARAM_INPUT_FAIL);
-    MMI_LOGD("item: DownTime:%{public}d,IsPressed:%{public}s,GlobalX:%{public}d,GlobalY:%{public}d,"
+    MMI_LOGD("Item: DownTime:%{public}" PRId64 ",IsPressed:%{public}s,GlobalX:%{public}d,GlobalY:%{public}d,"
         "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,DeviceId:%{public}d",
         item.GetDownTime(), (item.IsPressed() ? "true" : "false"), item.GetGlobalX(), item.GetGlobalY(),
         item.GetWidth(), item.GetHeight(), item.GetPressure(), item.GetDeviceId());

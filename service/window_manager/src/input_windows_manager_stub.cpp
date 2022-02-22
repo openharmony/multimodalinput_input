@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,8 +38,8 @@ namespace MMI {
 struct SeatInfo** GetSeatsInfo()
 {
     MMI_LOGD("Enter");
-    const int32_t TEST_VAL = 2;
-    const int32_t TEST_SEATNAME_SIZE = 32;
+    constexpr int32_t TEST_VAL = 2;
+    constexpr int32_t TEST_SEATNAME_SIZE = 32;
     auto setInfo = static_cast<SeatInfo**>(malloc(sizeof(SeatInfo*) * TEST_VAL));
     CHKF(setInfo, OHOS::MALLOC_FAIL);
     setInfo[0] = static_cast<SeatInfo*>(malloc(sizeof(SeatInfo)));
@@ -57,12 +57,12 @@ struct SeatInfo** GetSeatsInfo()
 struct ScreenInfo** GetScreensInfo()
 {
     MMI_LOGD("Enter");
-    const int32_t TEST_VAL = 2;
-    const int32_t TEST_LAYER_ID = 2;
-    const int32_t TEST_WIDTH = 1920;
-    const int32_t TEST_HEIGHT = 1080;
-    const int32_t TEST_SURFACE_ID = 3;
-    const int32_t TEST_ON_LAYER_ID = 2;
+    constexpr int32_t TEST_VAL = 2;
+    constexpr int32_t TEST_LAYER_ID = 2;
+    constexpr int32_t TEST_WIDTH = 1920;
+    constexpr int32_t TEST_HEIGHT = 1080;
+    constexpr int32_t TEST_SURFACE_ID = 3;
+    constexpr int32_t TEST_ON_LAYER_ID = 2;
 
     auto screenInfo = static_cast<ScreenInfo**>(malloc(sizeof(ScreenInfo*) * TEST_VAL));
     CHKF(screenInfo, OHOS::MALLOC_FAIL);

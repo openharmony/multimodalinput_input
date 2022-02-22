@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -214,7 +214,7 @@ int32_t JSRegisterHandle::Unregister(int32_t winId, uint32_t type)
         }
         g_registerMap.erase(iter);
     }
-    MMI_LOGI("unregister success. register map size:%{public}d", static_cast<int32_t>(g_registerMap.size()));
+    MMI_LOGI("unregister success. register map size:%{public}zu", g_registerMap.size());
     return response;
 }
 
@@ -232,7 +232,7 @@ int32_t JSRegisterHandle::UnregisterAll()
         MMI_LOGD("unregister handle:%{public}s", iter->first.c_str());
         g_registerMap.erase(iter);
     }
-    MMI_LOGI("unregister all success. register map size:%{public}d", static_cast<int32_t>(g_registerMap.size()));
+    MMI_LOGI("unregister all success. register map size:%{public}zu", g_registerMap.size());
     return response;
 }
 } // namespace MMI

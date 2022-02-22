@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,11 +25,6 @@ namespace MMI {
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(libinput_event *event)
 {
     CHKPP(event, nullptr);
-    auto type = libinput_event_get_type(event);
-    if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
-        MMI_LOGT("This touch event is canceled type:%{public}d", type); 
-        return nullptr;
-    }
     auto device = libinput_event_get_device(event);
     CHKPP(device, nullptr);
     std::shared_ptr<TouchTransformPointProcessor> processor;

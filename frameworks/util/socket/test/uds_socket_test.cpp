@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,12 +41,12 @@ public:
         return Write(buf, size);
     }
 
-    size_t SendUnitTest(const char *buf, size_t size, int flags = 0)
+    size_t SendUnitTest(const char *buf, size_t size, int32_t flags = 0)
     {
         return Send(buf, size, flags);
     }
 
-    size_t RecvUnitTest(char *buf, size_t size, int flags = 0)
+    size_t RecvUnitTest(char *buf, size_t size, int32_t flags = 0)
     {
         return Recv(buf, size, flags);
     }
@@ -109,7 +109,7 @@ HWTEST_F(UDSSocketTest, Connect_002, TestSize.Level1)
 
 HWTEST_F(UDSSocketTest, Listen_001, TestSize.Level1)
 {
-    int n = -1001;
+    int32_t n = -1001;
 
     UDSSocketUnitTest socObj;
     int32_t retResult = socObj.Listen(n);
@@ -118,7 +118,7 @@ HWTEST_F(UDSSocketTest, Listen_001, TestSize.Level1)
 
 HWTEST_F(UDSSocketTest, Listen_002, TestSize.Level1)
 {
-    int n = 1001;
+    int32_t n = 1001;
 
     UDSSocketUnitTest socObj;
     int32_t retResult = socObj.Listen(n);
@@ -219,7 +219,7 @@ HWTEST_F(UDSSocketTest, Send_001, TestSize.Level1)
 {
     const char *buf = "";
     size_t size = 1;
-    int flags = 0;
+    int32_t flags = 0;
 
     UDSSocketUnitTest socObj;
     socObj.SendUnitTest(buf, size, flags);
@@ -229,7 +229,7 @@ HWTEST_F(UDSSocketTest, Send_002, TestSize.Level1)
 {
     const char *buf = "THIS IS RECEIVE DATA";
     size_t size = 18;
-    int flags = 0;
+    int32_t flags = 0;
 
     UDSSocketUnitTest socObj;
     socObj.SendUnitTest(buf, size, flags);
@@ -239,7 +239,7 @@ HWTEST_F(UDSSocketTest, Send_003, TestSize.Level1)
 {
     const char *buf = "This is receive data.";
     size_t size = -18;
-    int flags = 0;
+    int32_t flags = 0;
 
     UDSSocketUnitTest socObj;
     socObj.SendUnitTest(buf, size, flags);
@@ -249,7 +249,7 @@ HWTEST_F(UDSSocketTest, Send_004, TestSize.Level1)
 {
     const char *buf = "data";
     size_t size = 4;
-    int flags = 1;
+    int32_t flags = 1;
 
     UDSSocketUnitTest socObj;
     socObj.SendUnitTest(buf, size, flags);
@@ -259,7 +259,7 @@ HWTEST_F(UDSSocketTest, Send_005, TestSize.Level1)
 {
     const char *buf = nullptr;
     size_t size = 0;
-    int flags = 1;
+    int32_t flags = 1;
 
     UDSSocketUnitTest socObj;
     socObj.SendUnitTest(buf, size, flags);
@@ -269,7 +269,7 @@ HWTEST_F(UDSSocketTest, Recv_001, TestSize.Level1)
 {
     char buf[] = "";
     size_t size = 1;
-    int flags = 0;
+    int32_t flags = 0;
 
     UDSSocketUnitTest socObj;
     socObj.RecvUnitTest(buf, size, flags);
@@ -279,7 +279,7 @@ HWTEST_F(UDSSocketTest, Recv_002, TestSize.Level1)
 {
     char buf[] = "This is Recv data.";
     size_t size = 18;
-    int flags = 0;
+    int32_t flags = 0;
 
     UDSSocketUnitTest socObj;
     socObj.RecvUnitTest(buf, size, flags);
@@ -289,7 +289,7 @@ HWTEST_F(UDSSocketTest, Recv_003, TestSize.Level1)
 {
     char buf[] = "This is Recv data.";
     size_t size = -18;
-    int flags = 0;
+    int32_t flags = 0;
 
     UDSSocketUnitTest socObj;
     socObj.RecvUnitTest(buf, size, flags);
@@ -299,7 +299,7 @@ HWTEST_F(UDSSocketTest, Recv_004, TestSize.Level1)
 {
     char buf[] = "This is Recv data.";
     size_t size = 0;
-    int flags = 1;
+    int32_t flags = 1;
 
     UDSSocketUnitTest socObj;
     socObj.RecvUnitTest(buf, size, flags);
@@ -309,7 +309,7 @@ HWTEST_F(UDSSocketTest, Recv_005, TestSize.Level1)
 {
     char *buf = nullptr;
     size_t size = 18;
-    int flags = 0;
+    int32_t flags = 0;
 
     UDSSocketUnitTest socObj;
     socObj.RecvUnitTest(buf, size, flags);
@@ -319,7 +319,7 @@ HWTEST_F(UDSSocketTest, Recv_006, TestSize.Level1)
 {
     char *buf = nullptr;
     size_t size = 0;
-    int flags = 0;
+    int32_t flags = 0;
 
     UDSSocketUnitTest socObj;
     socObj.RecvUnitTest(buf, size, flags);

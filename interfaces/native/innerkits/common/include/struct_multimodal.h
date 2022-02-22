@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,8 +20,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr int MAX_DEVICENAME = 64;
-    constexpr int MAX_UUIDSIZE = 64;
+    constexpr int32_t MAX_DEVICENAME = 64;
+    constexpr int32_t MAX_UUIDSIZE = 64;
     constexpr int32_t SYSTEMUID = 1000;
     constexpr int32_t MAX_SOLTED_COORDS_NUMS = 10;
 }
@@ -132,7 +132,7 @@ struct EventJoyStickAxisAbsInfo {
 };
 
 struct EventJoyStickAxis {
-    uint32_t deviceId;
+    int32_t deviceId;
     char physical[MAX_DEVICENAME];
     char deviceName[MAX_DEVICENAME];
     DEVICE_TYPE deviceType;
@@ -187,7 +187,7 @@ struct Threshold {
 };
 
 struct RegisteredEvent {
-    uint32_t deviceId;
+    int32_t deviceId;
     char uuid[MAX_UUIDSIZE];
     int32_t eventType;
     uint64_t occurredTime;
@@ -209,22 +209,22 @@ struct StandardTouchStruct {
 };
 
 struct EventKeyboard {
-    uint32_t deviceId;
+    int32_t deviceId;
     char physical[MAX_DEVICENAME];
     char deviceName[MAX_DEVICENAME];
     DEVICE_TYPE deviceType;
     int32_t eventType;
     char uuid[MAX_UUIDSIZE];
     uint64_t time;
-    uint32_t key;
-    uint32_t seat_key_count;
+    int32_t key;
+    int32_t seat_key_count;
     enum KEY_STATE state;
     int32_t unicode;
     bool isIntercepted {true};
 };
 
 struct EventPointer {
-    uint32_t deviceId;
+    int32_t deviceId;
     char physical[MAX_DEVICENAME];
     char deviceName[MAX_DEVICENAME];
     DEVICE_TYPE deviceType;
@@ -235,8 +235,8 @@ struct EventPointer {
     DeviceFloatCoords delta_raw;
     DeviceCoords absolute;
     DiscreteCoords discrete;
-    uint32_t button;
-    uint32_t seat_button_count;
+    int32_t button;
+    int32_t seat_button_count;
     enum BUTTON_STATE state;
     enum POINTER_AXIS_SOURCE source;
     enum POINTER_AXIS axis;
@@ -255,7 +255,7 @@ struct TabletAxes {
     double rotation;
     double slider;
     double wheel;
-    int wheel_discrete;
+    int32_t wheel_discrete;
     PhysEllipsis size;
 };
 
@@ -266,7 +266,7 @@ struct TabletTool {
 };
 
 struct EventTabletTool {
-    uint32_t deviceId;
+    int32_t deviceId;
     char physical[MAX_DEVICENAME];
     char deviceName[MAX_DEVICENAME];
     DEVICE_TYPE deviceType;
@@ -283,7 +283,7 @@ struct EventTabletTool {
 };
 
 struct EventTouch {
-    uint32_t deviceId;
+    int32_t deviceId;
     char physical[MAX_DEVICENAME];
     char deviceName[MAX_DEVICENAME];
     char uuid[MAX_UUIDSIZE];
@@ -309,7 +309,7 @@ struct SlotedCoordsInfo {
 };
 
 struct EventGesture {
-    uint32_t deviceId;
+    int32_t deviceId;
     char physical[MAX_DEVICENAME];
     char deviceName[MAX_DEVICENAME];
     DEVICE_TYPE deviceType;
@@ -386,7 +386,7 @@ struct EventTabletPad {
     struct {
         enum TABLET_PAD_STRIP_AXIS_SOURCE source;
         double position;
-        int number;
+        int32_t number;
     } strip;
 };
 } // namespace MMI

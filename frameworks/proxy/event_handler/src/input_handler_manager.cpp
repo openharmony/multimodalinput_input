@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,7 @@
 #include "input_handler_manager.h"
 #include "bytrace.h"
 #include "input_handler_type.h"
-#include "log.h"
+#include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "net_packet.h"
 #include "proto.h"
@@ -147,14 +147,12 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Enter handler:%{public}d", handlerId);
-    int32_t pointerFilter = 1;
-    int32_t touchFilter = 2;
-    if (pointerFilter == pointerEvent->GetSourceType()) {
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         int32_t pointerId = pointerEvent->GetId();
         std::string pointerEventString = "pointerEventFilter";
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventString, pointerId);
     }
-    if (touchFilter == pointerEvent->GetSourceType()) {
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         int32_t touchId = pointerEvent->GetId();
         std::string touchEventString = "touchEventFilter";
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, touchId);

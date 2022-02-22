@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,9 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "log.h"
-#include "mouse_device_state.h"
 #include "gesture_transform_point_processor.h"
+#include "mmi_log.h"
+#include "mouse_device_state.h"
 
 namespace OHOS {
 namespace MMI {
@@ -41,7 +41,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_ge
 {
     MMI_LOGD("Touchpad begin event");
     CHKPV(data);
-    auto time = libinput_event_gesture_get_time(data);
+    auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     auto scale = libinput_event_gesture_get_scale(data);
     pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
     pointerEvent_->SetActionStartTime(time);
@@ -74,7 +74,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchUpdate(libinput_event_g
 {
     MMI_LOGD("Touchpad update event");
     CHKPV(data);
-    auto time = libinput_event_gesture_get_time(data);
+    auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     auto scale = libinput_event_gesture_get_scale(data);
     pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
     pointerEvent_->SetActionStartTime(time);
@@ -99,7 +99,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gest
 {
     MMI_LOGD("Touchpad end event");
     CHKPV(data);
-    auto time = libinput_event_gesture_get_time(data);
+    auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     auto scale = libinput_event_gesture_get_scale(data);
     pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
     pointerEvent_->SetActionStartTime(time);

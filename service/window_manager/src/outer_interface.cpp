@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -63,19 +63,19 @@ bool OuterInterface::SystemEventHandler(const KeyEventValueTransformations& trs,
         case MMI_SYSTEM_SERVICE: {
             MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "%{public}s is SystemKey, Dispatch to System Module",
-                     trs.keyValueOfHos, state, trs.keyEvent.c_str());
+                     trs.keyValueOfSys, state, trs.keyEvent.c_str());
             break;
         }
         case MMI_SYSTEM_SERVICE_AND_APP: {
             MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "%{public}s is SystemKey, Dispatch to System Module. System Module return false",
-                     trs.keyValueOfHos, state, trs.keyEvent.c_str());
+                     trs.keyValueOfSys, state, trs.keyEvent.c_str());
             break;
         }
         case MMI_CAMERA_APP: {
             MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "KEY_CAMERA is SystemKey, Dispatch to Camera Module",
-                     trs.keyValueOfHos, state);
+                     trs.keyValueOfSys, state);
             break;
         }
         default: {
@@ -92,19 +92,19 @@ bool OuterInterface::DistributedEventHandler(const KeyEventValueTransformations&
         case MMI_SYSTEM_SERVICE: {
             MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "%{public}s is SystemKey, Dispatch to Distributed System",
-                     trs.keyValueOfHos, state, trs.keyEvent.c_str());
+                     trs.keyValueOfSys, state, trs.keyEvent.c_str());
             break;
         }
         case MMI_SYSTEM_SERVICE_AND_APP: {
             MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "%{public}s is SystemKey, Dispatch to Distributed System. Distributed System return false",
-                     trs.keyValueOfHos, state, trs.keyEvent.c_str());
+                     trs.keyValueOfSys, state, trs.keyEvent.c_str());
             break;
         }
         case MMI_CAMERA_APP: {
             MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "KEY_CAMERA is SystemKey, Dispatch to Distributed System",
-                     trs.keyValueOfHos, state);
+                     trs.keyValueOfSys, state);
             break;
         }
         default: {
@@ -120,7 +120,7 @@ bool OuterInterface::DistributedEventHandler(const KeyEventValueTransformations&
 * @desSurfaceId destinction windowid
 * @return switched windowid;if not switched then return srcSurfaceId. if switched then return desSurfaceId.
 */
-int OuterInterface::IsFocusChange(int32_t srcSurfaceId, int32_t desSurfaceId)
+int32_t OuterInterface::IsFocusChange(int32_t srcSurfaceId, int32_t desSurfaceId)
 {
     return desSurfaceId;
 }
@@ -130,16 +130,16 @@ int OuterInterface::IsFocusChange(int32_t srcSurfaceId, int32_t desSurfaceId)
 * @windowId focus windowid
 * @return: if succeed then return 1 Or return -1.
 */
-int OuterInterface::notifyFocusChange(int32_t abilityId, int32_t windowId)
+int32_t OuterInterface::notifyFocusChange(int32_t abilityId, int32_t windowId)
 {
     return RET_ERR;
 }
 
-int32_t OuterInterface::GetSystemEventAttrHosKeyValue(const int16_t keyValueOfHos)
+int32_t OuterInterface::GetSystemEventAttrKeyValue(const int16_t keyValueOfSys)
 {
-    auto it = MAP_SYSTEM_EVENT_ATTR.find(keyValueOfHos);
+    auto it = MAP_SYSTEM_EVENT_ATTR.find(keyValueOfSys);
     if (it == MAP_SYSTEM_EVENT_ATTR.end()) {
-        MMI_LOGE("No key found, keyValue:%{public}d", keyValueOfHos);
+        MMI_LOGE("No key found, keyValue:%{public}d", keyValueOfSys);
         return RET_ERR;
     }
     return it->second;

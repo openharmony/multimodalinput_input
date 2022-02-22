@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,7 @@
 #include <cstring>
 #include <sys/types.h>
 #include <unistd.h>
-#include "log.h"
+#include "mmi_log.h"
 #include "string_ex.h"
 
 namespace OHOS {
@@ -38,16 +38,12 @@ EventFilterService::~EventFilterService()
 
 void EventFilterService::SetPointerEventPtr(std::function<bool(std::shared_ptr<PointerEvent>)> pointerFilter)
 {
-    MMI_LOGD("enter");
     pointerFilter_ = pointerFilter;
-    MMI_LOGD("leave");
 }
 
 bool EventFilterService::HandlePointerEvent(const std::shared_ptr<PointerEvent> event)
 {
-    MMI_LOGD("enter");
     CHKPF(pointerFilter_);
-    MMI_LOGD("leave");
     return pointerFilter_(event);
 }
 } // namespace MMI

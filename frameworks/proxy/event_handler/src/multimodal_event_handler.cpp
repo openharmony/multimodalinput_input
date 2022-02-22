@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,10 +22,9 @@
 
 namespace OHOS {
 namespace MMI {
-    namespace {
-        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MultimodalEventHandler"};
-    }
-
+namespace {
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MultimodalEventHandler"};
+}
 void OnConnected(const OHOS::MMI::IfMMIClient& client)
 {
 #ifdef OHOS_WESTEN_MODEL
@@ -37,13 +36,6 @@ void OnConnected(const OHOS::MMI::IfMMIClient& client)
     if (!abilityInfoVec.empty()) {
         winId = abilityInfoVec[0].windowId;
         abilityId = *reinterpret_cast<int32_t*>(abilityInfoVec[0].token.GetRefPtr());
-        /* 三方联调代码，token中带bundlerName和appName，本注释三方代码修改后打开
-        auto token = static_cast<IMMIToken*>(abilityInfoVec[0].token.GetRefPtr());
-        if (token) {
-            bundlerName = token->GetBundlerName();
-            appName = token->GetName();
-        }
-        */
     }
     OHOS::MMI::NetPacket ckt(MmiMessageId::REGISTER_APP_INFO);
     ckt << abilityId << winId << bundlerName << appName;
@@ -146,12 +138,13 @@ std::vector<EventRegesterInfo>& MultimodalEventHandler::GetAbilityInfoVec()
 bool MultimodalEventHandler::InitClient()
 {
     MMI_LOGD("enter");
-    if (client_) {
+    if (client_ != nullptr) {
         return true;
     }
     client_ = std::make_shared<MMIClient>();
     CHKPF(client_);
     cMsgHandler_ = std::make_shared<ClientMsgHandler>();
+    CHKPF(cMsgHandler_);
     EventManager.SetClientHandle(client_);
     client_->RegisterConnectedFunction(&OnConnected);
     if (!(client_->Start(cMsgHandler_, true))) {

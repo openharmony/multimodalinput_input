@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,9 +40,9 @@ int32_t GetDeviceNode::GetDeviceNodeName(const string &targetName, string &devic
         MMI_LOGE("GetDeviceNodeName faild for find deviceName:%{public}s", deviceName.c_str());
         return RET_ERR;
     }
-    int32_t targetSize = static_cast<int32_t>(iter->second.size());
+    size_t targetSize = iter->second.size();
     if (devIndex > targetSize) {
-        MMI_LOGE("GetDeviceNodeName faild for devIndex:%{public}d > targetSize:%{public}d", devIndex, targetSize);
+        MMI_LOGE("GetDeviceNodeName faild for devIndex:%{public}d > targetSize:%{public}zu", devIndex, targetSize);
         return RET_ERR;
     }
     string nodeRootPath = "/dev/input/";

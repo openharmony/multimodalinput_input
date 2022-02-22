@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,8 +24,8 @@
 namespace OHOS {
 namespace MMI {
 struct IInputEventHandler {
-    static const int32_t DEFAULT_INTERCEPTOR = 10;
-    static const int32_t DEFAULT_MONITOR = 20;
+    static constexpr int32_t DEFAULT_INTERCEPTOR = 10;
+    static constexpr int32_t DEFAULT_MONITOR = 20;
     virtual int32_t GetPriority() const = 0;
     virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) = 0;
     virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) = 0;
