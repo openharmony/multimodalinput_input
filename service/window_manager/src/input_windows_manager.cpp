@@ -893,7 +893,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     FixCursorPosition(globalX, globalY, IMAGE_SIZE, IMAGE_SIZE);
     PointerDrawMgr->DrawPointer(displayId, globalX, globalY);
     int32_t action = pointerEvent->GetPointerAction();
-    bool isFirstBtnDown  = (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) 
+    bool isFirstBtnDown = (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN)
         && (pointerEvent->GetPressedButtons().size() == 1);
     bool isMove = (action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty());
     if ((firstBtnDownWindowId_ == -1) || isFirstBtnDown || isMove) {
@@ -911,7 +911,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
             break;
         }
     }
-    CHKPR(firstBtnDownWindow, ERROR_NULL_POINTER);	
+    CHKPR(firstBtnDownWindow, ERROR_NULL_POINTER);
     pointerEvent->SetTargetWindowId(firstBtnDownWindow->id);
     pointerEvent->SetAgentWindowId(firstBtnDownWindow->agentWindowId);
     int32_t localX = globalX - firstBtnDownWindow->winTopLeftX;
