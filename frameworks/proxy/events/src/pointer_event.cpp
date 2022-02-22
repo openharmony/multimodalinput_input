@@ -758,7 +758,7 @@ bool PointerEvent::IsValidCheckTouch() const
         }
 
         auto itemtmp = item;
-        for (itemtmp++; itemtmp != pointers_.end(); itemtmp++) {
+        for (++itemtmp; itemtmp != pointers_.end(); itemtmp++) {
             if (item->GetPointerId() == itemtmp->GetPointerId()) {
                 HiLog::Error(LABEL, "Pointitems pointerid exist same items and is invalid");
                 return false;

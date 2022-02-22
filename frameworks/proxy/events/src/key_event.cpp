@@ -1437,7 +1437,7 @@ bool KeyEvent::IsValidKeyItem() const
         }
         
         auto item = it;
-        for (item++; item != keys_.end(); item++) {
+        for (++item; item != keys_.end(); item++) {
             if (it->GetKeyCode() == item->GetKeyCode()) {
                 HiLog::Error(LABEL, "Keyitems keyCode exist same items");
                 return false;
