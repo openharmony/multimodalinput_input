@@ -33,7 +33,7 @@ InputEvent::InputEvent(const InputEvent& other)
     action_(other.action_), actionStartTime_(other.actionStartTime_),
     deviceId_(other.deviceId_), targetDisplayId_(other.targetDisplayId_),
     targetWindowId_(other.targetWindowId_), agentWindowId_(other.agentWindowId_),
-    flag_(other.flag_), processedCallback_(other.processedCallback_)
+    bitwise_(other.bitwise_), flag_(other.flag_), processedCallback_(other.processedCallback_)
 {}
 
 InputEvent::~InputEvent() {}
@@ -55,6 +55,7 @@ void InputEvent::Reset()
     targetDisplayId_ = DEFALUTID;
     targetWindowId_ = DEFALUTID;
     agentWindowId_ = DEFALUTID;
+    bitwise_ = 0;
     flag_ = 0;
 }
 
@@ -170,17 +171,37 @@ const char* InputEvent::DumpEventType() const
     return "unknown";
 }
 
-int32_t InputEvent::GetFlag() const
+uint32_t InputEvent::GetBit() const
+{
+    return bitwise_;
+}
+
+bool InputEvent::HasBit(uint32_t bit)
+{
+    return (bitwise_ & bit) != 0;
+}
+
+void InputEvent::SetBit(uint32_t bit)
+{
+    bitwise_ |= bit;
+}
+
+void InputEvent::ClearBit()
+{
+    bitwise_ = 0X00000000;
+}
+
+uint32_t InputEvent::GetFlag() const
 {
     return flag_;
 }
 
-bool InputEvent::HasFlag(int32_t flag)
+bool InputEvent::HasFlag(uint32_t flag)
 {
     return (flag_ & flag) != 0;
 }
 
-void InputEvent::AddFlag(int32_t flag)
+void InputEvent::AddFlag(uint32_t flag)
 {
     flag_ |= flag;
 }
@@ -243,7 +264,11 @@ bool InputEvent::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    if (!out.WriteInt32(flag_)) {
+    if (!out.WriteUint32(flag_)) {
+        return false;
+    }
+
+    if (!out.WriteUint32(bitwise_)) {
         return false;
     }
 
@@ -288,7 +313,11 @@ bool InputEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    if (!in.ReadInt32(flag_)) {
+    if (!in.ReadUint32(flag_)) {
+        return false;
+    }
+
+    if (!in.ReadUint32(bitwise_)) {
         return false;
     }
 
