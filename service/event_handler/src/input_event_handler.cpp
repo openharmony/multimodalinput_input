@@ -243,14 +243,12 @@ void InputEventHandler::OnCheckEventReport()
 {
     std::lock_guard<std::mutex> lock(mu_);
     if (initSysClock_ == 0 || lastSysClock_ != 0) {
-        MMI_LOGD("Either the initSysClock is zero or the lastSysClock isn't zero");
         return;
     }
     constexpr uint64_t MAX_DID_TIME = 1000 * 1000 * 3;
     auto curSysClock = GetSysClockTime();
     auto lostTime = curSysClock - initSysClock_;
     if (lostTime < MAX_DID_TIME) {
-        MMI_LOGD("The lost time is less than the max done time which is 3s, lostTime:%{public}" PRId64, lostTime);
         return;
     }
     MMI_LOGE("Event not responding. id:%{public}" PRId64 ",eventType:%{public}d,initSysClock:%{public}" PRId64 ","
