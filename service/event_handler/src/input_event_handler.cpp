@@ -205,8 +205,11 @@ void InputEventHandler::OnEvent(void *event)
     lastSysClock_ = 0;
     idSeed_ += 1;
     if (idSeed_ >= maxUInt64) {
+        MMI_LOGE("Invaild value. id:%{public}" PRId64, idSeed_);
         idSeed_ = 1;
+        return;
     }
+
     MMI_LOGT("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
              "initSysClock:%{public}" PRId64, idSeed_, tid, eventType_, initSysClock_);
 
@@ -250,11 +253,6 @@ void InputEventHandler::OnCheckEventReport()
     }
     MMI_LOGE("Event not responding. id:%{public}" PRId64 ",eventType:%{public}d,initSysClock:%{public}" PRId64 ","
              "lostTime:%{public}" PRId64, idSeed_, eventType_, initSysClock_, lostTime);
-}
-
-void InputEventHandler::RegistnotifyDeviceChange(NotifyDeviceChange cb)
-{
-    notifyDeviceChange_ = cb;
 }
 
 UDSServer* InputEventHandler::GetUDSServer()
@@ -362,10 +360,9 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         return KEY_EVENT_PKG_FAIL;
     }
 
+#ifdef OHOS_WESTEN_MODEL
     int32_t action = keyEvent_->GetKeyAction();
     KEY_STATE kacState = (action == KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
-
-#ifdef OHOS_WESTEN_MODEL
     int16_t lowKeyCode = static_cast<int16_t>(keyEvent_->GetKeyCode());
     auto oKey = KeyValueTransformationByInput(lowKeyCode);
     if (oKey.isSystemKey) {
@@ -373,13 +370,10 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
     }
 #endif
 
-    auto device = libinput_event_get_device(event);
-    CHKPR(device, ERROR_NULL_POINTER);
-
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent_, sysStartProcessTime);
-    if (eventDispatchResult != RET_OK) {
+    auto ret = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent_, sysStartProcessTime);
+    if (ret != RET_OK) {
         MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d",
-                 eventDispatchResult, KEY_EVENT_DISP_FAIL);
+                 ret, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
     int32_t keyCode = keyEvent_->GetKeyCode();
@@ -904,6 +898,7 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
+    CHKPR(keyEvent_, ERROR_NULL_POINTER);
     if (keyEvent_ != nullptr) {
         std::vector<int32_t> pressedKeys = keyEvent_->GetPressedKeys();
         if (pressedKeys.empty()) {

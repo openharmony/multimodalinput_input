@@ -129,9 +129,9 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     MMI_LOGD("enter");
 
     auto mouseInfo = WinMgr->GetMouseInfo();
-    MouseState->SetMouseCoords(mouseInfo.globleX, mouseInfo.globleY);
-    pointerItem.SetGlobalX(mouseInfo.globleX);
-    pointerItem.SetGlobalY(mouseInfo.globleY);
+    MouseState->SetMouseCoords(mouseInfo.globalX, mouseInfo.globalY);
+    pointerItem.SetGlobalX(mouseInfo.globalX);
+    pointerItem.SetGlobalY(mouseInfo.globalY);
     pointerItem.SetLocalX(0);
     pointerItem.SetLocalY(0);
     pointerItem.SetPointerId(0);
@@ -159,10 +159,11 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
 
 void MouseEventHandler::Normalize(libinput_event *event)
 {
-    MMI_LOGD("Enter");
+    MMI_LOGD("enter");
     CHKPV(event);
     auto data = libinput_event_get_pointer_event(event);
     CHKPV(data);
+    CHKPV(pointerEvent_);
     PointerEvent::PointerItem pointerItem;
     const int32_t type = libinput_event_get_type(event);
     switch (type) {

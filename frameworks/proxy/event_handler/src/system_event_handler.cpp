@@ -24,9 +24,7 @@ SystemEventHandler::SystemEventHandler()
     type_ = MmiMessageId::SYSTEM_EVENT_BEGIN;
 }
 
-SystemEventHandler::~SystemEventHandler()
-{
-}
+SystemEventHandler::~SystemEventHandler() {}
 
 bool SystemEventHandler::OnClosePage(const MultimodalEvent& event)
 {

@@ -43,7 +43,7 @@ std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::Ge
     return g_instance;
 }
 
-int32_t MultimodalInputConnectManager::AllocSocketPair(const int moduleType)
+int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> guard(lock_);

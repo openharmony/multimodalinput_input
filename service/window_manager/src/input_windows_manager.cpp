@@ -788,7 +788,7 @@ void OHOS::MMI::InputWindowsManager::AdjustGlobalCoordinate(int32_t& globalX, in
     }
 }
 
-bool OHOS::MMI::InputWindowsManager::IsCheckDisplayIdIfExist(int32_t& displayId)
+bool OHOS::MMI::InputWindowsManager::UpdataDisplayId(int32_t& displayId)
 {
     if (logicalDisplays_.empty()) {
         MMI_LOGE("logicalDisplays_is empty");
@@ -850,6 +850,7 @@ void OHOS::MMI::InputWindowsManager::FixCursorPosition(int32_t &globalX, int32_t
     }
 
     if (logicalDisplays_.empty()) {
+        MMI_LOGE("logicalDisplays_ is empty");
         return;
     }
 
@@ -873,7 +874,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
 {
     MMI_LOGD("Enter");
     auto displayId = pointerEvent->GetTargetDisplayId();
-    if (!IsCheckDisplayIdIfExist(displayId)) {
+    if (!UpdataDisplayId(displayId)) {
         MMI_LOGE("This display:%{public}d is not exist", displayId);
         return RET_ERR;
     }
@@ -935,7 +936,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTargetOld(std::shared_p
 int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     auto displayId = pointerEvent->GetTargetDisplayId();
-    if (!IsCheckDisplayIdIfExist(displayId)) {
+    if (!UpdataDisplayId(displayId)) {
         MMI_LOGE("This display is not exist");
         return RET_ERR;
     }
@@ -1042,28 +1043,28 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
         bool isOutside[CORNER] = { false, false, false, false };
         if (item.id >= 0) {
             if (integerX < item.topLeftX) {
-                mouseLoction_.globleX = item.topLeftX;
+                mouseLoction_.globalX = item.topLeftX;
                 x = item.topLeftX;
                 isOutside[TOP_LEFT_X] = true;
             } else {
                 isOutside[TOP_LEFT_X] = false;
             }
             if (integerX > (item.topLeftX + item.width)) {
-                mouseLoction_.globleX = item.topLeftX + item.width;
+                mouseLoction_.globalX = item.topLeftX + item.width;
                 x = item.topLeftX + item.width;
                 isOutside[TOP_RIGHT_X] = true;
             } else {
                 isOutside[TOP_RIGHT_X] = false;
             }
             if (integerY < item.topLeftY) {
-                mouseLoction_.globleY = item.topLeftY;
+                mouseLoction_.globalY = item.topLeftY;
                 y = item.topLeftY;
                 isOutside[TOP_LEFT_Y] = true;
             } else {
                 isOutside[TOP_LEFT_Y] = false;
             }
             if (integerY > (item.topLeftY + item.height)) {
-                mouseLoction_.globleY = item.topLeftY + item.height;
+                mouseLoction_.globalY = item.topLeftY + item.height;
                 y = item.topLeftY + item.height;
                 isOutside[TOP_RIGHT_Y] = true;
             } else {
@@ -1071,13 +1072,13 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
             }
             if ((isOutside[TOP_LEFT_X] != true) && (isOutside[TOP_LEFT_Y] != true) &&
                 (isOutside[TOP_RIGHT_X] != true) && (isOutside[TOP_RIGHT_Y] != true)) {
-                mouseLoction_.globleX = x;
-                mouseLoction_.globleY = y;
+                mouseLoction_.globalX = x;
+                mouseLoction_.globalY = y;
                 break;
             }
         }
     }
-    MMI_LOGI("Mouse Data: globleX:%{public}d,globleY:%{public}d", mouseLoction_.globleX, mouseLoction_.globleY);
+    MMI_LOGD("Mouse Data: globalX:%{public}d,globalY:%{public}d", mouseLoction_.globalX, mouseLoction_.globalY);
 }
 
 MouseLocation OHOS::MMI::InputWindowsManager::GetMouseInfo()
