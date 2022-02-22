@@ -25,12 +25,10 @@ namespace {
 }
 
 InputEventMonitorManager::InputEventMonitorManager()
-{
-}
+{}
 
 InputEventMonitorManager::~InputEventMonitorManager()
-{
-}
+{}
 
 int32_t InputEventMonitorManager::AddInputEventMontior(
     std::function<void (std::shared_ptr<OHOS::MMI::KeyEvent>)> keyEventMonitor)
