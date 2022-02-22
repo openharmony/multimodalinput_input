@@ -26,12 +26,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    void Dump(int fd);
-    int GetMultimodeInputinformation(void);
+    void Dump(int32_t fd);
+    int32_t GetMultimodeInputinformation(void);
 #ifdef OHOS_WESTEN_MODEL
     void StartMmiServer(void);
 #endif
-int wet_module_init(struct weston_compositor* ec, int* argc, char* argv[]);
+int32_t wet_module_init(struct weston_compositor* ec, int* argc, char* argv[]);
 #ifdef __cplusplus
 }
 #endif

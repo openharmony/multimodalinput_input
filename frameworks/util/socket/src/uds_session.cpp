@@ -27,7 +27,7 @@ namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
 }
 
-UDSSession::UDSSession(const std::string& programName, const int moduleType, const int32_t fd,
+UDSSession::UDSSession(const std::string& programName, const int32_t moduleType, const int32_t fd,
     const int32_t uid, const int32_t pid)
     : programName_(programName),
       moduleType_(moduleType),
@@ -52,7 +52,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
     ssize_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
     if (ret < 0) {
-        const int errNoSaved = errno;
+        const int32_t errNoSaved = errno;
         MMI_LOGE("UDSSession::SendMsg write return %{public}zd,"
                  "fd_:%{public}d,errNoSaved:%{public}d,strerror:%{public}s",
                  ret, fd_, errNoSaved, strerror(errNoSaved));
