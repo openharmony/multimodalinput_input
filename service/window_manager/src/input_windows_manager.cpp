@@ -910,7 +910,6 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
             firstBtnDownWindow = &item;
             break;
         }
-
     }
     CHKPR(firstBtnDownWindow, ERROR_NULL_POINTER);	
     pointerEvent->SetTargetWindowId(firstBtnDownWindow->id);
