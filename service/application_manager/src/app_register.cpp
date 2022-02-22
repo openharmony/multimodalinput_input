@@ -79,7 +79,7 @@ void AppRegister::UnregisterAppInfoSocketFd(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
     CHK(fd >= 0, PARAM_INPUT_INVALID);
-    UnregisterBySocketFd(fd);
+    UnregisterSocketFd(fd);
 }
 
 void AppRegister::UnregisterSocketFd(int32_t fd)
