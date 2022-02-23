@@ -164,7 +164,7 @@ int32_t EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& ud
 }
 
 int32_t EventDispatch::KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer& udsServer,
-    libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime)
+    struct libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     RegisteredEvent eve = {};
@@ -217,7 +217,7 @@ int32_t EventDispatch::KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer
     return RET_OK;
 }
 
-int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_event *event,
+int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, struct libinput_event *event,
     const EventTabletPad& tabletPad, const uint64_t preHandlerTime)
 {
     CHKPR(event, ERROR_NULL_POINTER);
@@ -268,7 +268,7 @@ int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_eve
     return RET_OK;
 }
 
-int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_event *event,
+int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, struct libinput_event *event,
     const EventJoyStickAxis& eventJoyStickAxis, const uint64_t preHandlerTime)
 {
     CHKPR(event, ERROR_NULL_POINTER);
@@ -301,7 +301,7 @@ int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_even
     return RET_OK;
 }
 
-int32_t EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, libinput_event *event,
+int32_t EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, struct libinput_event *event,
     const EventTabletTool& tableTool, const uint64_t preHandlerTime)
 {
     CHKPR(event, ERROR_NULL_POINTER);
@@ -367,8 +367,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_LOGI("Pointer event interception succeeded");
         return RET_OK;
     }
-    if (!point->HasBit(InputEvent::EVENT_FLAG_NO_INTERCEPT) &&
-        InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
+    if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
         if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
             int32_t pointerId = point->GetId();
             std::string pointerEvent = "OnEventPointer";
@@ -425,7 +424,7 @@ int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
     return RET_OK;
 }
 
-int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event *event,
+int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, struct libinput_event *event,
     EventPointer &point, const uint64_t preHandlerTime)
 {
     CHKPR(event, ERROR_NULL_POINTER);
@@ -503,7 +502,7 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event
     return RET_OK;
 }
 
-int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event *event,
+int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, struct libinput_event *event,
     const EventGesture& gesture, const uint64_t preHandlerTime)
 {
     CHKPR(event, ERROR_NULL_POINTER);
@@ -559,7 +558,7 @@ int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event
     return RET_OK;
 }
 
-int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
+int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, struct libinput_event *event,
     const EventTouch& touch, const uint64_t preHandlerTime)
 {
     CHKPR(event, ERROR_NULL_POINTER);
@@ -649,7 +648,7 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
     }
     return ret;
 }
-int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_event *event,
+int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, struct libinput_event *event,
     const EventPointer& point, const uint64_t preHandlerTime)
 {
     CHKPR(event, ERROR_NULL_POINTER);
@@ -761,7 +760,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
     return RET_OK;
 }
 
-int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *event,
+int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, struct libinput_event *event,
     const KeyEventValueTransformations& trs, EventKeyboard& key, const uint64_t preHandlerTime)
 {
     CHKPR(event, ERROR_NULL_POINTER);
@@ -822,7 +821,7 @@ int32_t EventDispatch::AddInputEventFilter(sptr<IEventFilter> filter)
     return EventFilterWrap::GetInstance().AddInputEventFilter(filter);
 }
 
-int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_event *event,
+int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, struct libinput_event *event,
     std::shared_ptr<PointerEvent> pointerEvent, const uint64_t preHandlerTime)
 {
     CHKPR(event, ERROR_NULL_POINTER);
