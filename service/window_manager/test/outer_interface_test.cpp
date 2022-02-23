@@ -70,7 +70,6 @@ HWTEST_F(OuterInterfaceTest, notifyFocusChange, TestSize.Level1)
     EXPECT_TRUE((outerInterface.notifyFocusChange(1, 1)) == RET_ERR);
 }
 
-
 HWTEST_F(OuterInterfaceTest, GetSystemEventAttrKeyValue, TestSize.Level1)
 {
     OuterInterface outerInterface;

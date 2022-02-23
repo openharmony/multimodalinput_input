@@ -145,7 +145,7 @@ int32_t EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& ud
     }
 
     for (const auto& fd : fds) {
-        auto appInfo = AppRegs->FindBySocketFd(fd);
+        auto appInfo = AppRegs->FindSocketFd(fd);
         MMI_LOGT("Event dispatcher of server, RegisteredEvent:physical:%{public}s,"
                  "deviceType:%{public}u,eventType:%{public}u,occurredTime:%{public}" PRId64 ","
                  "conbinecode:%{public}d,fd:%{public}d",
@@ -231,7 +231,7 @@ int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_eve
     if (focusId < 0) {
         return RET_OK;
     }
-    auto appInfo = AppRegs->FindByWinId(focusId); // obtain application information for focusId
+    auto appInfo = AppRegs->FindWinId(focusId); // obtain application information for focusId
     if (appInfo.fd == RET_ERR) {
         MMI_LOGE("Failed to find fd, errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
@@ -278,7 +278,7 @@ int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_even
     if (focusId < 0) {
         return RET_OK;
     }
-    auto appInfo = AppRegs->FindByWinId(focusId); // obtain application information for focusId
+    auto appInfo = AppRegs->FindWinId(focusId); // obtain application information for focusId
     if (appInfo.fd == RET_ERR) {
         MMI_LOGE("Failed to find fd, errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
@@ -310,7 +310,7 @@ int32_t EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, libinput_ev
         return RET_OK;
     }
     // obtain application information for focusId
-    auto appInfo = AppRegs->FindByWinId(focusId);
+    auto appInfo = AppRegs->FindWinId(focusId);
     if (appInfo.fd == RET_ERR) {
         return FOCUS_ID_OBTAIN_FAIL;
     }
@@ -367,7 +367,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_LOGI("Pointer event interception succeeded");
         return RET_OK;
     }
-    if (!point->NeedSkipInspection() &&
+    if (!point->HasBit(InputEvent::EVENT_FLAG_NO_INTERCEPT) &&
         InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
         if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
             int32_t pointerId = point->GetId();
@@ -410,7 +410,7 @@ int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
     MMI_LOGD("enter");
     CHKPR(point, ERROR_NULL_POINTER);
     InputHandlerManagerGlobal::GetInstance().HandleEvent(point);
-    auto appInfo = AppRegs->FindByWinId(point->GetAgentWindowId()); // obtain application information
+    auto appInfo = AppRegs->FindWinId(point->GetAgentWindowId()); // obtain application information
     if (appInfo.fd == RET_ERR) {
         MMI_LOGE("Failed to find fd, errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
@@ -442,7 +442,7 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event
         return RET_OK;
     }
     // obtain application information for focusId
-    auto appInfo = AppRegs->FindByWinId(desWindowId);
+    auto appInfo = AppRegs->FindWinId(desWindowId);
     if (appInfo.fd == RET_ERR) {
         MMI_LOGE("Failed to find focus");
         return FOCUS_ID_OBTAIN_FAIL;
@@ -452,7 +452,7 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, point.time, preHandlerTime)) {
         KeyEventValueTransformations KeyEventValue = {};
-        KeyEventValue = KeyValueTransformationByInput(point.button);
+        KeyEventValue = KeyValueTransformationInput(point.button);
         point.button = KeyEventValue.keyValueOfSys;
         NetPacket newPacket(MmiMessageId::ON_TOUCH);
         int32_t inputType = INPUT_DEVICE_CAP_POINTER;
@@ -531,7 +531,7 @@ int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event
         MMI_LOGE("Focus Id is invalid! errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
         return RET_OK;
     }
-    auto appInfo = AppRegs->FindByWinId(focusId); // obtain application information
+    auto appInfo = AppRegs->FindWinId(focusId); // obtain application information
     if (appInfo.fd == RET_ERR) {
         MMI_LOGT("Failed to find fd, errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
@@ -585,7 +585,7 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
         }
     }
     int32_t touchFocusId = WinMgr->GetTouchFocusSurfaceId();
-    auto appInfo = AppRegs->FindByWinId(touchFocusId); // obtain application information
+    auto appInfo = AppRegs->FindWinId(touchFocusId); // obtain application information
     if (appInfo.fd == RET_ERR) {
         MMI_LOGE("Failed to find fd:%{public}d,errCode:%{public}d", touchFocusId, FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
@@ -603,7 +603,7 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, touch.time, preHandlerTime)) {
         NetPacket newPacket(MmiMessageId::ON_TOUCH);
-        int32_t fingerCount = MMIRegEvent->GetTouchInfoSizeByDeviceId(touch.deviceId);
+        int32_t fingerCount = MMIRegEvent->GetTouchInfoSizeDeviceId(touch.deviceId);
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
             fingerCount++;
         }
@@ -706,12 +706,12 @@ void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, I
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
 }
 
-int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
+int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
     std::shared_ptr<KeyEvent> key, const uint64_t preHandlerTime)
 {
     MMI_LOGD("begin");
     CHKPR(key, PARAM_INPUT_INVALID);
-    if (!key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
+    if (!key->HasBit(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         if (InterceptorMgrGbl.OnKeyEvent(key)) {
             MMI_LOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
                 key->GetKeyCode());
@@ -738,12 +738,12 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
 
     MMI_LOGT("4.event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
              "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
-             "EventType:%{public}d,Flag:%{public}d,"
+             "EventType:%{public}d,Flag:%{public}u,"
              "KeyAction:%{public}d,Fd:%{public}d,PreHandlerTime:%{public}" PRId64 "",
              key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
              key->GetActionStartTime(),
              key->GetEventType(),
-             key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
+             key->GetBit(), key->GetKeyAction(), fd, preHandlerTime);
 
     if (IsANRProcess(&udsServer, fd, key->GetId()) == TRIGGER_ANR) {
         MMI_LOGE("the key event does not report normally, triggering ANR");
@@ -757,7 +757,7 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
         MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
-    MMI_LOGD("DispatchKeyEventByPid end");
+    MMI_LOGD("end");
     return RET_OK;
 }
 
@@ -793,7 +793,7 @@ int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *ev
         MMI_LOGE("Don't find focus window, so the event will be discarded. errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
         return RET_OK;
     }
-    auto appInfo = AppRegs->FindByWinId(focusId); // obtain application information for focusId
+    auto appInfo = AppRegs->FindWinId(focusId); // obtain application information for focusId
     if (appInfo.fd == RET_ERR) {
         MMI_LOGE("Failed to find, fd:%{public}d,errCode:%{public}d", focusId, FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
@@ -834,7 +834,7 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
         MMI_LOGW("Failed to get focus surface, focus:%{public}d", focusId);
         return RET_OK;
     }
-    auto appInfo = AppRegs->FindByWinId(focusId); // obtain application information
+    auto appInfo = AppRegs->FindWinId(focusId); // obtain application information
     if (appInfo.fd == RET_ERR) {
         MMI_LOGE("Failed to find fd, errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
@@ -845,12 +845,12 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
     MMI_LOGT("Pointer event dispatcher of server:eventType:%{public}d,actionTime:%{public}" PRId64 ","
              "action:%{public}d,actionStartTime:%{public}" PRId64 ","
-             "flag:%{public}d,pointerAction:%{public}d,sourceType:%{public}d,"
+             "flag:%{public}u,pointerAction:%{public}d,sourceType:%{public}d,"
              "VerticalAxisValue:%{public}.02f, HorizontalAxisValue:%{public}.02f,"
              "pointerCount:%{public}zu",
              pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
-             pointerEvent->GetFlag(), pointerEvent->GetPointerAction(),
+             pointerEvent->GetBit(), pointerEvent->GetPointerAction(),
              pointerEvent->GetSourceType(),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
