@@ -90,7 +90,7 @@ static napi_value GetEventInfo(napi_env env, napi_callback_info info, EventInfo&
     return result;
 }
 
-static int32_t RegisterByTypeCode(napi_env env, JSRegisterHandle &registerHandle, const EventInfo &event)
+static int32_t RegisterTypeCode(napi_env env, JSRegisterHandle &registerHandle, const EventInfo &event)
 {
     int32_t response = ERROR_CODE;
     if (SYSTEM_TYPE_CODE == event.type) {
@@ -137,7 +137,7 @@ static napi_value OnEvent(napi_env env, napi_callback_info info)
     JSRegisterHandle registerHandle(env);
     int32_t response = MMI_STANDARD_EVENT_SUCCESS;
     if (!registerHandle.CheckRegistered(event.winId, event.type)) {
-        response = RegisterByTypeCode(env, registerHandle, event);
+        response = RegisterTypeCode(env, registerHandle, event);
         if (response != MMI_STANDARD_EVENT_SUCCESS) {
             MMI_LOGD("register failed, response=%d", response);
             napi_create_int32(env, response, &result);

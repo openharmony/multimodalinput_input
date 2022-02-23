@@ -46,7 +46,7 @@ bool AppRegister::Init(UDSServer& udsServer)
     return true;
 }
 
-const AppInfo& AppRegister::FindByWinId(int32_t windowId)
+const AppInfo& AppRegister::FindWinId(int32_t windowId)
 {
     std::lock_guard<std::mutex> lock(mu_);
     auto it = surfaceInfo_.find(windowId);
@@ -56,7 +56,7 @@ const AppInfo& AppRegister::FindByWinId(int32_t windowId)
     return AppRegister::appInfoError_;
 }
 
-const AppInfo& AppRegister::FindBySocketFd(int32_t fd)
+const AppInfo& AppRegister::FindSocketFd(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
     CHKR(fd >= 0, PARAM_INPUT_INVALID, appInfoError_);
@@ -75,14 +75,14 @@ void AppRegister::RegisterAppInfoforServer(const AppInfo& appInfo)
     AddId(fds_, appInfo.fd);
 }
 
-void AppRegister::UnregisterAppInfoBySocketFd(int32_t fd)
+void AppRegister::UnregisterAppInfoSocketFd(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
     CHK(fd >= 0, PARAM_INPUT_INVALID);
-    UnregisterBySocketFd(fd);
+    UnregisterSocketFd(fd);
 }
 
-void AppRegister::UnregisterBySocketFd(int32_t fd)
+void AppRegister::UnregisterSocketFd(int32_t fd)
 {
     auto it = surfaceInfo_.begin();
     while (it != surfaceInfo_.end()) {

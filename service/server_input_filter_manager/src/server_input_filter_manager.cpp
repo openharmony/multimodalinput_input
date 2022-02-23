@@ -251,7 +251,7 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
     MMIRegEvent->OnEventTouchGetSign(touch, idMsg);
 
     int32_t touchFocusId = WinMgr->GetTouchFocusSurfaceId();
-    auto appInfo = AppRegs->FindByWinId(touchFocusId); // obtain application information
+    auto appInfo = AppRegs->FindWinId(touchFocusId); // obtain application information
     if (appInfo.fd == RET_ERR) {
         MMI_LOGE("Failed to find fd:%{public}d,errCode:%{public}d", touchFocusId, FOCUS_ID_OBTAIN_FAIL);
         return false;
@@ -263,7 +263,7 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, touch.time)) {
         NetPacket newPacket(MmiMessageId::TOUCH_EVENT_INTERCEPTOR);
-        int32_t fingerCount = MMIRegEvent->GetTouchInfoSizeByDeviceId(touch.deviceId);
+        int32_t fingerCount = MMIRegEvent->GetTouchInfoSizeDeviceId(touch.deviceId);
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
             fingerCount++;
         }

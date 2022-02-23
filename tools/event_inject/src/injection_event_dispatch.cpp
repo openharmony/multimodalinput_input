@@ -368,7 +368,7 @@ int32_t InjectionEventDispatch::OnAisensorAll()
         // nothing to do.
     }
 
-    ProcessAiSensorInfoByCycleNum(cycleNum);
+    ProcessAiSensorInfoCycleNum(cycleNum);
 
     return RET_OK;
 }
@@ -384,7 +384,7 @@ int32_t InjectionEventDispatch::OnKnuckleAll()
         // nothing to do.
     }
 
-    ProcessKnuckleInfoByCycleNum(cycleNum);
+    ProcessKnuckleInfoCycleNum(cycleNum);
 
     return RET_OK;
 }
@@ -540,7 +540,7 @@ void InjectionEventDispatch::InitDeviceInfo()
     allDevices_.insert(allDevices_.begin(), deviceInfoArray, deviceInfoArray + counts);
 }
 
-int32_t InjectionEventDispatch::GetDevTypeByIndex(int32_t devIndex)
+int32_t InjectionEventDispatch::GetDevTypeIndex(int32_t devIndex)
 {
     for (const auto &item : allDevices_) {
         if (devIndex == item.devIndex) {
@@ -550,7 +550,7 @@ int32_t InjectionEventDispatch::GetDevTypeByIndex(int32_t devIndex)
     return RET_ERR;
 }
 
-int32_t InjectionEventDispatch::GetDevIndexByType(int32_t devType)
+int32_t InjectionEventDispatch::GetDevIndexType(int32_t devType)
 {
     for (const auto &item : allDevices_) {
         if (item.devType == devType) {
@@ -560,7 +560,7 @@ int32_t InjectionEventDispatch::GetDevIndexByType(int32_t devType)
     return RET_ERR;
 }
 
-void OHOS::MMI::InjectionEventDispatch::ProcessAiSensorInfoByCycleNum(uint16_t cycleNum)
+void OHOS::MMI::InjectionEventDispatch::ProcessAiSensorInfoCycleNum(uint16_t cycleNum)
 {
     MMI_LOGD("enter");
     static const vector<MmiMessageId> aiSensorAllowProcCodes {
@@ -614,7 +614,7 @@ void OHOS::MMI::InjectionEventDispatch::ProcessAiSensorInfoByCycleNum(uint16_t c
     }
 }
 
-void OHOS::MMI::InjectionEventDispatch::ProcessKnuckleInfoByCycleNum(uint16_t cycleNum)
+void OHOS::MMI::InjectionEventDispatch::ProcessKnuckleInfoCycleNum(uint16_t cycleNum)
 {
     static const vector<MmiMessageId> aiSensorAllowProcCodes = {
         MmiMessageId::ON_SCREEN_SHOT,

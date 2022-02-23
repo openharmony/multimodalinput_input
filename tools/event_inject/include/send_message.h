@@ -24,7 +24,7 @@ class SendMessage {
 public:
     SendMessage() = default;
     ~SendMessage() = default;
-    int32_t GetDevIndexByName(const std::string& deviceName);
+    int32_t GetDevIndexName(const std::string& deviceName);
     int32_t SendToHdi(const InputEventArray& inputEventArray);
     int32_t SendToHdi(const int32_t& devType, const RawInputEvent& event);
     bool SendMsg(const NetPacket& ckt);

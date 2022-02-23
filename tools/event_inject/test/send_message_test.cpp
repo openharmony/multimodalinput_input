@@ -26,11 +26,11 @@ public:
     static void TearDownTestCase(void) {}
 };
 
-HWTEST_F(SendMessageTest, Test_GetDevIndexByName, TestSize.Level1)
+HWTEST_F(SendMessageTest, Test_GetDevIndexName, TestSize.Level1)
 {
     SendMessage sendMessage;
     const std::string deviceName = "mouse";
-    auto ret = sendMessage.GetDevIndexByName(deviceName);
+    auto ret = sendMessage.GetDevIndexName(deviceName);
     EXPECT_EQ(ret, 32);
 }
 } // namespace

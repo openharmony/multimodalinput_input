@@ -290,7 +290,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
     if (focusId < 0) {
         return RET_OK; // DeviceAdded event will be discarded if focusId < 0
     }
-    auto appInfo = AppRegs->FindByWinId(focusId);
+    auto appInfo = AppRegs->FindWinId(focusId);
     if (appInfo.fd == RET_ERR) {
         return RET_OK; // DeviceAdded event will be discarded if appInfo.fd == RET_ERR
     }
@@ -328,7 +328,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
     if (focusId < 0) {
         return RET_OK; // DeviceRemoved event will be discarded if focusId < 0
     }
-    auto appInfo = AppRegs->FindByWinId(focusId);
+    auto appInfo = AppRegs->FindWinId(focusId);
     if (appInfo.fd == RET_ERR) {
         return RET_OK; // DeviceRemoved event will be discarded if appInfo.fd == RET_ERR
     }
@@ -364,13 +364,13 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
     int32_t action = keyEvent_->GetKeyAction();
     KEY_STATE kacState = (action == KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
     int16_t lowKeyCode = static_cast<int16_t>(keyEvent_->GetKeyCode());
-    auto oKey = KeyValueTransformationByInput(lowKeyCode);
+    auto oKey = KeyValueTransformationInput(lowKeyCode);
     if (oKey.isSystemKey) {
         OnSystemEvent(oKey, kacState);
     }
 #endif
 
-    auto ret = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent_, sysStartProcessTime);
+    auto ret = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_, sysStartProcessTime);
     if (ret != RET_OK) {
         MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d",
                  ret, KEY_EVENT_DISP_FAIL);
@@ -425,7 +425,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
     int32_t action = keyEvent_->GetKeyAction();
     KEY_STATE kacState = (action == KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
     int16_t lowKeyCode = static_cast<int16_t>(keyEvent_->GetKeyCode());
-    auto oKey = KeyValueTransformationByInput(lowKeyCode);
+    auto oKey = KeyValueTransformationInput(lowKeyCode);
     if (oKey.isSystemKey) {
         OnSystemEvent(oKey, kacState);
     }
@@ -433,7 +433,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
     auto device = libinput_event_get_device(ev.event);
     CHKPR(device, ERROR_NULL_POINTER);
 
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent_, sysStartProcessTime);
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_, sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d, errCode:%{public}d",
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
@@ -459,7 +459,7 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
         return KEY_EVENT_PKG_FAIL;
     }
 
-    auto oKey = KeyValueTransformationByInput(keyBoard.key); // libinput key transformed into key
+    auto oKey = KeyValueTransformationInput(keyBoard.key); // libinput key transformed into key
     keyBoard.unicode = 0;
 
 #ifdef OHOS_WESTEN_MODEL
@@ -480,7 +480,7 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
     keyEventString = "service report keyId=" + std::to_string(keyId);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent_, sysStartProcessTime);
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_, sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d",
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
@@ -518,7 +518,7 @@ int32_t InputEventHandler::OnEventKeyboard(const multimodal_libinput_event& ev)
         MMI_LOGD("Key event filter find a key event from Original event, keyCode:%{puiblic}d", keyBoard.key);
         return RET_OK;
     }
-    auto oKey = KeyValueTransformationByInput(keyBoard.key); // libinput key transformed into key
+    auto oKey = KeyValueTransformationInput(keyBoard.key); // libinput key transformed into key
     keyBoard.unicode = 0;
     if (oKey.isSystemKey && OnSystemEvent(oKey, keyBoard.state)) { // Judging whether key is system key.
         return RET_OK;
@@ -818,7 +818,7 @@ int32_t InputEventHandler::OnEventTabletPadKey(const multimodal_libinput_event& 
                  packageResult, TABLETPAD_KEY_EVENT_PKG_FAIL);
         return TABLETPAD_KEY_EVENT_PKG_FAIL;
     }
-    auto oKey = KeyValueTransformationByInput(key.key);           // libinput key transformed into key
+    auto oKey = KeyValueTransformationInput(key.key);           // libinput key transformed into key
 #ifdef OHOS_WESTEN_MODEL
     if (oKey.isSystemKey && OnSystemEvent(oKey, key.state)) {   // Judging whether key is system key.
         return RET_OK;
@@ -845,7 +845,7 @@ int32_t InputEventHandler::OnEventJoyStickKey(const multimodal_libinput_event& e
         return JOYSTICK_KEY_EVENT_PKG_FAIL;
     }
     // libinput key transformed into key
-    auto oKey = KeyValueTransformationByInput(key.key);
+    auto oKey = KeyValueTransformationInput(key.key);
     key.unicode = 0;
 #ifdef OHOS_WESTEN_MODEL
     // Judging whether key is system key.
@@ -952,7 +952,7 @@ bool InputEventHandler::SendMsg(const int32_t fd, NetPacket& pkt) const
 bool InputEventHandler::OnSystemEvent(const KeyEventValueTransformations& temp,
     const enum KEY_STATE state) const
 {
-    const int32_t systemEventAttr = OuterInterface::GetSystemEventAttrByKeyValue(temp.keyValueOfSys);
+    const int32_t systemEventAttr = OuterInterface::GetSystemEventAttrKeyValue(temp.keyValueOfSys);
     uint16_t retCode = 0;
     switch (systemEventAttr) {
         case MMI_SYSTEM_SERVICE: {
