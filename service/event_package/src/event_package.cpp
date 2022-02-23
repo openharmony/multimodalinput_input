@@ -638,7 +638,7 @@ int32_t EventPackage::PackagePointerEvent(struct libinput_event *event, EventPoi
     return ret;
 }
 
-static void PackageGestureSwipeUpdateEvent(struct libinput_event_gesture* data, EventGesture& gesture)
+static int32_t PackageGestureSwipeUpdateEvent(struct libinput_event_gesture* data, EventGesture& gesture)
 {
     MMI_LOGI("Three finger slide event update");
     gesture.delta.x = libinput_event_gesture_get_dx(data);
@@ -648,6 +648,7 @@ static void PackageGestureSwipeUpdateEvent(struct libinput_event_gesture* data, 
     struct sloted_coords_info* pSoltTouches = libinput_event_gesture_get_solt_touches(data);
     CHKPR(pSoltTouches, ERROR_NULL_POINTER);
     FillEventSlotedCoordsInfo(*pSoltTouches, gesture.soltTouches);
+    return RET_OK;
 }
 
 int32_t EventPackage::PackageGestureEvent(struct libinput_event *event, EventGesture& gesture)
@@ -683,7 +684,8 @@ int32_t EventPackage::PackageGestureEvent(struct libinput_event *event, EventGes
         }
         /* Third, it refers to the use of requirements, and the code is reserved */
         case LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE: {
-            PackageGestureSwipeUpdateEvent(data, gesture);
+            ret = PackageGestureSwipeUpdateEvent(data, gesture);
+            CHKR(ret == RET_OK, ret, ret);
             break;
         }
         /* Third, it refers to the use of requirements, and the code is reserved */
