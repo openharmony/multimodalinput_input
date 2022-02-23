@@ -367,7 +367,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_LOGI("Pointer event interception succeeded");
         return RET_OK;
     }
-    if (!point->HasBit(InputEvent::EVENT_FLAG_NO_INTERCEPT) &&
+    if (!point->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT) &&
         InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
         if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
             int32_t pointerId = point->GetId();
@@ -711,7 +711,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
 {
     MMI_LOGD("begin");
     CHKPR(key, PARAM_INPUT_INVALID);
-    if (!key->HasBit(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
+    if (!key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         if (InterceptorMgrGbl.OnKeyEvent(key)) {
             MMI_LOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
                 key->GetKeyCode());
@@ -743,7 +743,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
              key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
              key->GetActionStartTime(),
              key->GetEventType(),
-             key->GetBit(), key->GetKeyAction(), fd, preHandlerTime);
+             key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
 
     if (IsANRProcess(&udsServer, fd, key->GetId()) == TRIGGER_ANR) {
         MMI_LOGE("the key event does not report normally, triggering ANR");
@@ -850,7 +850,7 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
              "pointerCount:%{public}zu",
              pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
-             pointerEvent->GetBit(), pointerEvent->GetPointerAction(),
+             pointerEvent->GetFlag(), pointerEvent->GetPointerAction(),
              pointerEvent->GetSourceType(),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
