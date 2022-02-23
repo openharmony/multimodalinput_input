@@ -210,7 +210,7 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
             MMI_LOGD("Callback has deleted, size: %{public}zu", it.size());
             return JS_CALLBACK_EVENT_SUCCESS;
         }
-        iter++;
+        ++iter;
     }
     MMI_LOGD("Callback size: %{public}zu", it.size());
     return JS_CALLBACK_EVENT_NOT_EXIST;

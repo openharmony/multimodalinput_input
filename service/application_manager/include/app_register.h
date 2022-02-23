@@ -45,13 +45,13 @@ public:
 
     bool Init(UDSServer& udsServer);
 
-    const AppInfo& FindByWinId(int32_t windowId);
+    const AppInfo& FindWinId(int32_t windowId);
 
-    const AppInfo& FindBySocketFd(int32_t fd);
+    const AppInfo& FindSocketFd(int32_t fd);
 
     void RegisterAppInfoforServer(const AppInfo& appInfo);
 
-    void UnregisterAppInfoBySocketFd(int32_t fd);
+    void UnregisterAppInfoSocketFd(int32_t fd);
 
     void UnregisterConnectState(int32_t fd);
 
@@ -73,7 +73,7 @@ private:
     bool CheckFindFdError(const int32_t findFd);
     bool CheckConnectionIsDead(const int32_t findFd);
     bool CheckWaitQueueBlock(ssize_t currentTime, ssize_t timeOut, const int32_t findFd);
-    void UnregisterBySocketFd(int32_t fd);
+    void UnregisterSocketFd(int32_t fd);
 
     std::map<int32_t, AppInfo>::iterator EraseAppInfo(const std::map<int32_t, AppInfo>::iterator &it);
     std::map<int32_t, AppInfo>::iterator UnregisterAppInfo(int32_t winId);

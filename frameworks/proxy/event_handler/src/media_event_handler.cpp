@@ -22,9 +22,7 @@ MediaEventHandler::MediaEventHandler()
 {
     type_ = MmiMessageId::MEDIA_EVENT_BEGIN;
 }
-MediaEventHandler::~MediaEventHandler()
-{
-}
+MediaEventHandler::~MediaEventHandler() {}
 bool MediaEventHandler::OnPlay(const MultimodalEvent& event)
 {
     return false;

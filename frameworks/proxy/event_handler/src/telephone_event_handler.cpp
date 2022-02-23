@@ -24,9 +24,7 @@ TelephoneEventHandler::TelephoneEventHandler()
     type_ = MmiMessageId::TELEPHONE_EVENT_BEGIN;
 }
 
-TelephoneEventHandler::~TelephoneEventHandler()
-{
-}
+TelephoneEventHandler::~TelephoneEventHandler() {}
 
 bool TelephoneEventHandler::OnAnswer(const MultimodalEvent& event)
 {

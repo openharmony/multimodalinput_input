@@ -493,7 +493,7 @@ std::string InputManagerTest::DumpPointerEvent(const std::shared_ptr<PointerEven
          << ",actionTime=" << pointerEvent->GetActionTime()
          << ",action=" << pointerEvent->GetAction()
          << ",actionStartTime=" << pointerEvent->GetActionStartTime()
-         << ",flag=" << pointerEvent->GetFlag()
+         << ",flag=" << pointerEvent->GetBit()
          << ",pointerAction=" << pointerEvent->DumpPointerAction()
          << ",sourceType=" << pointerEvent->DumpSourceType()
          << ",VerticalAxisValue=" << std::fixed << std::setprecision(precision)
@@ -1227,7 +1227,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
     std::vector<int32_t> ids(N_TEST_CASES);
     std::vector<std::shared_ptr<InputEventCallback>> cbs(N_TEST_CASES);
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         cbs[i] = InputEventCallback::GetPtr();
         EXPECT_TRUE(cbs[i] != nullptr);
         ids[i] = InputManager::GetInstance()->AddMonitor(cbs[i]);
@@ -1258,7 +1258,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
     }
     EXPECT_TRUE(rLogs.size() >= N_TEST_CASES);
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         if (IsValidHandlerId(ids[i])) {
             InputManager::GetInstance()->RemoveMonitor(ids[i]);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -1279,7 +1279,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_004, TestSize.Level1)
     std::shared_ptr<InputEventCallback> cb = InputEventCallback::GetPtr();
     EXPECT_TRUE(cb != nullptr);
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         ids[i] = InputManager::GetInstance()->AddMonitor(cb);
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -1291,7 +1291,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_004, TestSize.Level1)
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         if (IsValidHandlerId(ids[i])) {
             InputManager::GetInstance()->RemoveMonitor(ids[i]);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -1361,10 +1361,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Leve
     {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,Flag:%{public}d",
+                 "EventType:%{public}d,Flag:%{public}u",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-                 keyEvent->GetEventType(), keyEvent->GetFlag());
+                 keyEvent->GetEventType(), keyEvent->GetBit());
         MMI_LOGD("subscribe key event trigger callback");
     });
     EXPECT_TRUE(response > 0);
@@ -1410,10 +1410,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
     {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,Flag:%{public}d",
+                 "EventType:%{public}d,Flag:%{public}u",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-                 keyEvent->GetEventType(), keyEvent->GetFlag());
+                 keyEvent->GetEventType(), keyEvent->GetBit());
         MMI_LOGD("subscribe key event trigger callback");
     });
     EXPECT_TRUE(response > 0);
@@ -1424,10 +1424,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
     {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,Flag:%{public}d",
+                 "EventType:%{public}d,Flag:%{public}u",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-                 keyEvent->GetEventType(), keyEvent->GetFlag());
+                 keyEvent->GetEventType(), keyEvent->GetBit());
         MMI_LOGD("subscribe key event trigger callback");
     });
     EXPECT_TRUE(response2 < 0);
@@ -1473,10 +1473,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_003, TestSize.Leve
     {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,Flag:%{public}d",
+                 "EventType:%{public}d,Flag:%{public}u",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-                 keyEvent->GetEventType(), keyEvent->GetFlag());
+                 keyEvent->GetEventType(), keyEvent->GetBit());
         MMI_LOGD("subscribe key event trigger callback");
     });
     EXPECT_TRUE(response > 0);
@@ -1522,10 +1522,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_004, TestSize.Leve
     {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,Flag:%{public}d",
+                 "EventType:%{public}d,Flag:%{public}u",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-                 keyEvent->GetEventType(), keyEvent->GetFlag());
+                 keyEvent->GetEventType(), keyEvent->GetBit());
         MMI_LOGD("subscribe key event down trigger callback");
     });
     EXPECT_TRUE(response > 0);
@@ -1570,10 +1570,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_005, TestSize.Leve
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,Flag:%{public}d",
+                 "EventType:%{public}d,flag:%{public}u",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-                 keyEvent->GetEventType(), keyEvent->GetFlag());
+                 keyEvent->GetEventType(), keyEvent->GetBit());
         MMI_LOGD("hold down for a while. subscribe key event down trigger callback");
     });
     EXPECT_TRUE(response > 0);
@@ -1618,10 +1618,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_006, TestSize.Leve
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,Flag:%{public}d",
+                 "EventType:%{public}d,flag:%{public}u",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-                 keyEvent->GetEventType(), keyEvent->GetFlag());
+                 keyEvent->GetEventType(), keyEvent->GetBit());
         MMI_LOGD("hold down for a while. subscribe key event down trigger callback");
     });
     EXPECT_TRUE(response > 0);
@@ -1681,10 +1681,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_007, TestSize.Leve
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,Flag:%{public}d",
+                 "EventType:%{public}d,flag:%{public}u",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-                 keyEvent->GetEventType(), keyEvent->GetFlag());
+                 keyEvent->GetEventType(), keyEvent->GetBit());
         MMI_LOGD("subscribe key event up trigger callback");
     });
     EXPECT_TRUE(response > 0);
@@ -1751,10 +1751,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_009, TestSize.Leve
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,Flag:%{public}d",
+                 "EventType:%{public}d,flag:%{public}u",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-                 keyEvent->GetEventType(), keyEvent->GetFlag());
+                 keyEvent->GetEventType(), keyEvent->GetBit());
         MMI_LOGD("subscribe key event KEYCODE_MUTE trigger callback");
     });
     EXPECT_TRUE(response > 0);
@@ -1804,10 +1804,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,Flag:%{public}d",
+                 "EventType:%{public}d,flag:%{public}u",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-                 keyEvent->GetEventType(), keyEvent->GetFlag());
+                 keyEvent->GetEventType(), keyEvent->GetBit());
         MMI_LOGD("subscribe key event KEYCODE_POWER down trigger callback");
     });
     EXPECT_TRUE(subscribeId1 > 0);
@@ -1823,10 +1823,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,Flag:%{public}d",
+                 "EventType:%{public}d,flag:%{public}u",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-                 keyEvent->GetEventType(), keyEvent->GetFlag());
+                 keyEvent->GetEventType(), keyEvent->GetBit());
         MMI_LOGD("subscribe key event KEYCODE_POWER up trigger callback");
     });
     EXPECT_TRUE(subscribeId2 > 0);
@@ -1863,10 +1863,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_011, TestSize.Leve
     {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,Flag:%{public}d",
+                 "EventType:%{public}d,flag:%{public}u",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-                 keyEvent->GetEventType(), keyEvent->GetFlag());
+                 keyEvent->GetEventType(), keyEvent->GetBit());
         MMI_LOGD("subscribe key event KEYCODE_F1 down trigger callback");
     });
     EXPECT_TRUE(response > 0);
@@ -1881,10 +1881,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_011, TestSize.Leve
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,Flag:%{public}d",
+                 "EventType:%{public}d,flag:%{public}u",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-                 keyEvent->GetEventType(), keyEvent->GetFlag());
+                 keyEvent->GetEventType(), keyEvent->GetBit());
         MMI_LOGD("subscribe key event KEYCODE_F1 up trigger callback");
     });
     EXPECT_TRUE(subscribeId2 > 0);
@@ -1942,12 +1942,12 @@ void InputEventInterceptor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEv
     MMI_LOGD("Pointer event intercepted:");
     MMI_LOGD("EventType:%{public}s, actionTime:%{public}" PRId64 ","
              "action:%{public}d,actionStartTime:%{public}" PRId64 ","
-             "flag:%{public}d,pointerAction:%{public}s, sourceType:%{public}s, "
+             "flag:%{public}u,pointerAction:%{public}s, sourceType:%{public}s, "
              "VerticalAxisValue:%{public}.2f, HorizontalAxisValue:%{public}.2f, "
              "pointerCount:%{public}zu",
              pointerEvent->DumpEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
-             pointerEvent->GetFlag(), pointerEvent->DumpPointerAction(),
+             pointerEvent->GetBit(), pointerEvent->DumpPointerAction(),
              pointerEvent->DumpSourceType(),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
@@ -1989,7 +1989,7 @@ std::string InputManagerTest::DumpPointerEvent2(const std::shared_ptr<PointerEve
          << ",actionTime=" << pointerEvent->GetActionTime()
          << ",action=" << pointerEvent->GetAction()
          << ",actionStartTime=" << pointerEvent->GetActionStartTime()
-         << ",flag=" << pointerEvent->GetFlag()
+         << ",flag=" << pointerEvent->GetBit()
          << ",pointerAction=" << pointerEvent->DumpPointerAction()
          << ",sourceType=" << pointerEvent->DumpSourceType()
          << ",VerticalAxisValue=" << std::fixed << std::setprecision(precision)
@@ -2111,7 +2111,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_002, TestSize.Level1)
     std::vector<int32_t> ids(N_TEST_CASES);
     std::shared_ptr<OHOS::MMI::IInputEventConsumer> interceptor { InputEventInterceptor::GetPtr() };
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         ids[i] = InputManager::GetInstance()->AddInterceptor(interceptor);
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2138,7 +2138,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_002, TestSize.Level1)
     }
     EXPECT_TRUE(rLogs.size() >= N_TEST_CASES);
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         if (IsValidHandlerId(ids[i])) {
             InputManager::GetInstance()->RemoveInterceptor(ids[i]);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2152,7 +2152,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_003, TestSize.Level1)
     std::vector<int32_t> ids(N_TEST_CASES);
     std::shared_ptr<OHOS::MMI::IInputEventConsumer> interceptor { InputEventInterceptor::GetPtr() };
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         ids[i] = InputManager::GetInstance()->AddInterceptor(interceptor);
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2164,7 +2164,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_003, TestSize.Level1)
     };
     std::vector<std::string> sLogs { SearchForLog(command, true) };
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         if (IsValidHandlerId(ids[i])) {
             InputManager::GetInstance()->RemoveInterceptor(ids[i]);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2463,7 +2463,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
 
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         ids[i] = InputManager::GetInstance()->AddMonitor(callBackPtr);
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2490,7 +2490,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
     }
     EXPECT_TRUE(rLogs.size() >= N_TEST_CASES);
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         InputManager::GetInstance()->RemoveMonitor(ids[i]);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
@@ -2793,7 +2793,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1
     std::shared_ptr<InputEventCallback> cb = InputEventCallback::GetPtr();
     EXPECT_TRUE(cb != nullptr);
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         ids[i] = InputManager::GetInstance()->AddMonitor(cb);
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2804,7 +2804,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         if (IsValidHandlerId(ids[i])) {
             InputManager::GetInstance()->RemoveMonitor(ids[i]);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));

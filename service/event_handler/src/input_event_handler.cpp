@@ -952,7 +952,6 @@ bool InputEventHandler::SendMsg(const int32_t fd, NetPacket& pkt) const
 bool InputEventHandler::OnSystemEvent(const KeyEventValueTransformations& temp,
     const enum KEY_STATE state) const
 {
-
     const int32_t systemEventAttr = OuterInterface::GetSystemEventAttrKeyValue(temp.keyValueOfSys);
     uint16_t retCode = 0;
     switch (systemEventAttr) {
