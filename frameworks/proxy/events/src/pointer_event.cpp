@@ -246,8 +246,7 @@ PointerEvent::PointerEvent(const PointerEvent& other)
     pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
     pointerAction_(other.pointerAction_), buttonId_(other.buttonId_),
     axes_(other.axes_), axisValues_(other.axisValues_),
-    pressedKeys_(other.pressedKeys_)
-{}
+    pressedKeys_(other.pressedKeys_) {}
 
 PointerEvent::~PointerEvent() {}
 

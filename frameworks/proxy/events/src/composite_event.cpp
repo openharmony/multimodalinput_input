@@ -16,7 +16,5 @@
 #include "composite_event.h"
 
 namespace OHOS {
-CompositeEvent::~CompositeEvent()
-{
-}
+CompositeEvent::~CompositeEvent() {}
 } // namespace OHOS

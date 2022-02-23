@@ -16,7 +16,5 @@
 #include "builtinkey_event.h"
 
 namespace OHOS {
-BuiltinKeyEvent::~BuiltinKeyEvent()
-{
-}
+BuiltinKeyEvent::~BuiltinKeyEvent() {}
 } // namespace OHOS
