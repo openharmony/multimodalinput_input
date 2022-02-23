@@ -221,8 +221,8 @@ ohos_unittest("ut-event-injection-out") {
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 }
 
-ohos_executable("hosmmi-event-injection") {
-  sources = [ "src/hosmmi_event_simulate_main.cpp" ]
+ohos_executable("mmi-event-injection") {
+  sources = [ "src/mmi_event_simulate_main.cpp" ]
   deps = [
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/tools/event_inject:event-injection",

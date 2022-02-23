@@ -14,9 +14,9 @@
 import("//build/ohos.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-ohos_executable("hosmmi-client") {
+ohos_executable("mmi-client") {
   include_dirs = [ "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include" ]
-  sources = [ "src/hosmmi_client_main.cpp" ]
+  sources = [ "src/mmi_client_main.cpp" ]
   deps = [
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
@@ -45,13 +45,13 @@ ohos_executable("hosmmi-client") {
   part_name = "multimodalinput_base"
 }
 
-ohos_executable("hosmmi-server") {
+ohos_executable("mmi-server") {
   include_dirs = [ "$root_out_dir/gen/third_party/wayland_standard/protocol/" ]
   sources = []
   if (is_mmi_have_weston) {
-    sources += [ "src/hosmmi_server_main.cpp" ]
+    sources += [ "src/mmi_server_main.cpp" ]
   } else {
-    sources += [ "src/hosmmi_service_main.cpp" ]
+    sources += [ "src/mmi_service_main.cpp" ]
   }
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
