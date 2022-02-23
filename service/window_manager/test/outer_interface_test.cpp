@@ -70,10 +70,11 @@ HWTEST_F(OuterInterfaceTest, notifyFocusChange, TestSize.Level1)
     EXPECT_TRUE((outerInterface.notifyFocusChange(1, 1)) == RET_ERR);
 }
 
-HWTEST_F(OuterInterfaceTest, GetSystemEventAttr, TestSize.Level1)
+
+HWTEST_F(OuterInterfaceTest, GetSystemEventAttrKeyValue, TestSize.Level1)
 {
     OuterInterface outerInterface;
-    EXPECT_TRUE((outerInterface.GetSystemEventAttr(3)) == MMI_SYSTEM_SERVICE_AND_APP);
+    EXPECT_TRUE((outerInterface.GetSystemEventAttrKeyValue(3)) == MMI_SYSTEM_SERVICE_AND_APP);
 }
 } // namespace
 #endif
