@@ -26,13 +26,9 @@ constexpr int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 constexpr int32_t INPUT_NUI_TIMEOUT_TIME = 10 * 1000000;
 constexpr int32_t WAIT_QUEUE_EVENTS_MAX = 128;
 #endif
-AppRegister::AppRegister()
-{
-}
+AppRegister::AppRegister() {}
 
-AppRegister::~AppRegister()
-{
-}
+AppRegister::~AppRegister() {}
 
 bool AppRegister::Init(UDSServer& udsServer)
 {

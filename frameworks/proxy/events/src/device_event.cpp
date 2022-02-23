@@ -15,9 +15,7 @@
 
 #include "device_event.h"
 
-OHOS::DeviceEvent::~DeviceEvent()
-{
-}
+OHOS::DeviceEvent::~DeviceEvent() {}
 void OHOS::DeviceEvent::Initialize(const std::string& name, const std::string& sysName, int32_t inputDeviceId)
 {
     name_ = name;

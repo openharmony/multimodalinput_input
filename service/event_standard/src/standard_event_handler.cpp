@@ -24,13 +24,9 @@ namespace MMI {
 } // namespace MMI
 } // namespace OHOS
 
-OHOS::MMI::StandardEventHandler::StandardEventHandler()
-{
-}
+OHOS::MMI::StandardEventHandler::StandardEventHandler() {}
 
-OHOS::MMI::StandardEventHandler::~StandardEventHandler()
-{
-}
+OHOS::MMI::StandardEventHandler::~StandardEventHandler() {}
 
 void OHOS::MMI::StandardEventHandler::StandardTouchEvent(struct libinput_event *event, StandardTouchStruct& data)
 {

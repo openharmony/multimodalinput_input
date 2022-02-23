@@ -258,7 +258,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
                 CALL_NAPI_API_ERR, RET_ERR);
             CHKR(SetNameProperty(jsEnv_, currentPointer, "force", it.GetPressure()) == napi_ok,
                 CALL_NAPI_API_ERR, RET_ERR);
-            CHKR(SetNameProperty(jsEnv_, result, "timestamp", it.GetDownTime()) == napi_ok,
+            CHKR(SetNameProperty(jsEnv_, result, "timestamp", pointerEvent->GetActionTime()) == napi_ok,
                 CALL_NAPI_API_ERR, RET_ERR);
             CHKR(SetNameProperty(jsEnv_, result, "deviceId", it.GetDeviceId()) == napi_ok,
                 CALL_NAPI_API_ERR, RET_ERR);

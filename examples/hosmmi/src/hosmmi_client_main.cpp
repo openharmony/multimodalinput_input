@@ -14,9 +14,11 @@
  */
 
 #include "mmi_client.h"
+
 #include <codecvt>
 #include <csignal>
 #include <locale>
+
 #include "common_event_handler.h"
 #include "key_event_handler.h"
 #include "media_event_handler.h"
