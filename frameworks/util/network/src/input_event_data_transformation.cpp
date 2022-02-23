@@ -75,7 +75,7 @@ int32_t InputEventDataTransformation::SerializeInputEvent(std::shared_ptr<InputE
     CHKR(packet.Write(event->GetTargetDisplayId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(packet.Write(event->GetTargetWindowId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(packet.Write(event->GetAgentWindowId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(packet.Write(event->GetBit()), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(packet.Write(event->GetFlag()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     return RET_OK;
 }
 
@@ -102,7 +102,7 @@ int32_t InputEventDataTransformation::DeserializeInputEvent(NetPacket &packet, s
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
     event->SetAgentWindowId(tField);
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
-    event->SetBit(tField);
+    event->AddFlag(tField);
     return RET_OK;
 }
 
