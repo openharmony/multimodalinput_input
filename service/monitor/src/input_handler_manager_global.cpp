@@ -85,7 +85,7 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
-    if (pointerEvent->HasBit(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         MMI_LOGD("This event has been tagged as not to be intercepted");
     } else {
         if (interceptors_.HandleEvent(pointerEvent)) {
@@ -93,7 +93,7 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointe
             return true;
         }
     }
-    if (pointerEvent->HasBit(InputEvent::EVENT_FLAG_NO_MONITOR)) {
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_NO_MONITOR)) {
         MMI_LOGD("This event has been tagged as not to be monitored");
     } else {
         if (monitors_.HandleEvent(pointerEvent)) {
@@ -193,7 +193,7 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
     std::shared_ptr<PointerEvent> pointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetActionTime(static_cast<int32_t>(GetSysClockTime()));
-    pointerEvent->SetBit(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
     EventDispatch eDispatch;
     eDispatch.HandlePointerEvent(pointerEvent);
 }
