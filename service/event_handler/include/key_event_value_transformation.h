@@ -38,7 +38,7 @@ struct KeyEventValueTransformations {
     int16_t isSystemKey;
 };
 
-KeyEventValueTransformations KeyValueTransformationByInput(int16_t keyValueOfInput);
+KeyEventValueTransformations KeyValueTransformationInput(int16_t keyValueOfInput);
 
 class KeyEventValueTransformation {
 public:

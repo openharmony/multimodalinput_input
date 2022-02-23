@@ -326,7 +326,7 @@ bool PointerEvent::GetPointerItem(int32_t pointerId, PointerItem &pointerItem)
 
 void PointerEvent::RemovePointerItem(int32_t pointerId)
 {
-    for (auto it = pointers_.begin(); it != pointers_.end(); it++) {
+    for (auto it = pointers_.begin(); it != pointers_.end(); ++it) {
         if (it->GetPointerId() == pointerId) {
             pointers_.erase(it);
             break;
@@ -555,7 +555,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    for (int32_t i = 0; i < pointersSize; ++i) {
+    for (int32_t i = 0; i < pointersSize; i++) {
         PointerItem val = {};
         if (!val.ReadFromParcel(in)) {
             return false;
@@ -569,7 +569,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    for (int32_t i = 0; i < pressedButtonsSize; ++i) {
+    for (int32_t i = 0; i < pressedButtonsSize; i++) {
         int32_t val = 0;
         if (!in.ReadInt32(val)) {
             return false;
@@ -603,7 +603,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    for (int32_t i = 0; i < axisValueSize; ++i) {
+    for (int32_t i = 0; i < axisValueSize; i++) {
         double val = {};
         if (!in.ReadDouble(val)) {
             return false;

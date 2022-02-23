@@ -72,8 +72,8 @@ public:
     bool SyncDeviceHotStatus();
     bool ReportHotPlugEvent();
     void OnInitHdiServerStatus();
-    int32_t GetDevTypeByIndex(int32_t devIndex);
-    int32_t GetDevIndexByType(int32_t devType);
+    int32_t GetDevTypeIndex(int32_t devIndex);
+    int32_t GetDevIndexType(int32_t devType);
     int32_t ManageHdfInject(const MMI::SessionPtr sess, MMI::NetPacket &pkt);
     void OnSetHotPlugs(uint32_t devIndex, uint32_t devSatatus);
     int32_t OnSetEventInject(const RawInputEvent& allEvent, int32_t devType);
