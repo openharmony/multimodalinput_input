@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include "input_manager.h"
 #include "input_manager_command.h"
 
 namespace {
@@ -42,7 +43,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectMouse_001, TestSize.Level1)
     char command5[] = {"12"};
     char *argv[] = {command1, command2, command3, command4, command5};
     int32_t result = inputManagerCommand->ParseCommand(5, argv);
-    EXPECT_EQ(ERR_OK, result);
+    EXPECT_EQ(OHOS::ERR_OK, result);
 }
 
 /**
@@ -60,7 +61,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectMouse_002, TestSize.Level1)
     char command4[] = {"1"};
     char *argv[] = {command1, command2, command3, command4};
     int32_t result = inputManagerCommand->ParseCommand(4, argv);
-    EXPECT_EQ(ERR_OK, result);
+    EXPECT_EQ(OHOS::ERR_OK, result);
 }
 
 /**
@@ -78,7 +79,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectMouse_003, TestSize.Level1)
     char command4[] = {"50"};
     char *argv[] = {command1, command2, command3, command4};
     int32_t result = inputManagerCommand->ParseCommand(4, argv);
-    EXPECT_EQ(ERR_OK, result);
+    EXPECT_EQ(OHOS::ERR_OK, result);
 }
 
 /**
@@ -96,7 +97,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectMouse_004, TestSize.Level1)
     char command4[] = {"1"};
     char *argv[] = {command1, command2, command3, command4};
     int32_t result = inputManagerCommand->ParseCommand(4, argv);
-    EXPECT_EQ(ERR_OK, result);
+    EXPECT_EQ(OHOS::ERR_OK, result);
 }
 
 /**
@@ -114,7 +115,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectMouse_005, TestSize.Level1)
     char command4[] = {"1"};
     char *argv[] = {command1, command2, command3, command4};
     int32_t result = inputManagerCommand->ParseCommand(4, argv);
-    EXPECT_EQ(ERR_OK, result);
+    EXPECT_EQ(OHOS::ERR_OK, result);
 }
 
 /**
@@ -132,7 +133,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectKey_001, TestSize.Level1)
     char command4[] = {"1"};
     char *argv[] = {command1, command2, command3, command4};
     int32_t result = inputManagerCommand->ParseCommand(4, argv);
-    EXPECT_EQ(ERR_OK, result);
+    EXPECT_EQ(OHOS::ERR_OK, result);
 }
 
 /**
@@ -152,7 +153,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectKey_002, TestSize.Level1)
     char command6[] = {"2"};
     char *argv[] = {command1, command2, command3, command4, command5, command6};
     int32_t result = inputManagerCommand->ParseCommand(6, argv);
-    EXPECT_EQ(ERR_OK, result);
+    EXPECT_EQ(OHOS::ERR_OK, result);
 }
 
 /**
@@ -172,7 +173,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectKey_003, TestSize.Level1)
     char command6[] = {"1"};
     char *argv[] = {command1, command2, command3, command4, command5, command6};
     int32_t result = inputManagerCommand->ParseCommand(6, argv);
-    EXPECT_EQ(ERR_OK, result);
+    EXPECT_EQ(OHOS::ERR_OK, result);
 }
 
 /**
@@ -193,7 +194,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectTouch_001, TestSize.Level1)
     char command7[] = {"14"};
     char *argv[] = {command1, command2, command3, command4, command5, command6, command7};
     int32_t result = inputManagerCommand->ParseCommand(7, argv);
-    EXPECT_EQ(ERR_OK, result);
+    EXPECT_EQ(OHOS::ERR_OK, result);
 }
 
 /**
@@ -212,7 +213,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectTouch_002, TestSize.Level1)
     char command5[] = {"12"};
     char *argv[] = {command1, command2, command3, command4, command5};
     int32_t result = inputManagerCommand->ParseCommand(5, argv);
-    EXPECT_EQ(ERR_OK, result);
+    EXPECT_EQ(OHOS::ERR_OK, result);
 }
 
 /**
@@ -231,6 +232,6 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectTouch_003, TestSize.Level1)
     char command5[] = {"12"};
     char *argv[] = {command1, command2, command3, command4, command5};
     int32_t result = inputManagerCommand->ParseCommand(5, argv);
-    EXPECT_EQ(ERR_OK, result);
+    EXPECT_EQ(OHOS::ERR_OK, result);
 }
 }
