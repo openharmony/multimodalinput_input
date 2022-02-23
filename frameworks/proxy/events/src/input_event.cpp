@@ -170,26 +170,6 @@ const char* InputEvent::DumpEventType() const
     return "unknown";
 }
 
-uint32_t InputEvent::GetBit() const
-{
-    return bitwise_;
-}
-
-bool InputEvent::HasBit(uint32_t bit)
-{
-    return (bitwise_ & bit) != 0;
-}
-
-void InputEvent::SetBit(uint32_t bit)
-{
-    bitwise_ |= bit;
-}
-
-void InputEvent::ClearBit()
-{
-    bitwise_ = EVENT_FLAG_NONE;
-}
-
 uint32_t InputEvent::GetFlag() const
 {
     return bitwise_;
