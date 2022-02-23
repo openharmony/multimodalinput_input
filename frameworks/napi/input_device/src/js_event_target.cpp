@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsEventTarget" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsEventTarget" };
     JsEventTarget::DeviceType g_deviceType[] = {
         {"keyboard", JsEventTarget::EVDEV_UDEV_TAG_KEYBOARD},
         {"mouse", JsEventTarget::EVDEV_UDEV_TAG_MOUSE},
