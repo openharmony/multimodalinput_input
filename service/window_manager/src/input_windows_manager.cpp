@@ -765,7 +765,7 @@ const std::map<int32_t, WindowInfo>& OHOS::MMI::InputWindowsManager::GetWindowIn
     return windowInfos_;
 }
 
-bool OHOS::MMI::InputWindowsManager::IsTouchWindow(int32_t x, int32_t y, const WindowInfo &info) const
+bool OHOS::MMI::InputWindowsManager::IsInsideWindow(int32_t x, int32_t y, const WindowInfo &info) const
 {
     return (x >= info.hotZoneTopLeftX) && (x <= (info.hotZoneTopLeftX + info.hotZoneWidth)) &&
         (y >= info.hotZoneTopLeftY) && (y <= (info.hotZoneTopLeftY + info.hotZoneHeight));
@@ -873,6 +873,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTargetOld(std::shared_ptr<Poi
 int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Enter");
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdataDisplayId(displayId)) {
         MMI_LOGE("This display:%{public}d is not exist", displayId);
@@ -892,39 +893,40 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     int32_t globalY = pointerItem.GetGlobalY();
     FixCursorPosition(globalX, globalY, IMAGE_SIZE, IMAGE_SIZE);
     PointerDrawMgr->DrawPointer(displayId, globalX, globalY);
-    WindowInfo *focusWindow = nullptr;
     int32_t action = pointerEvent->GetPointerAction();
-    if ((firstBtnDownWindow_.pid == 0)
-        || (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN && pointerEvent->GetPressedButtons().size() == 1)
-        || (action == PointerEvent::POINTER_ACTION_MOVE && pointerEvent->GetPressedButtons().empty())) {
-        for (auto it : logicalDisplayInfo->windowsInfo_) {
-            if (IsTouchWindow(globalX, globalY, it)) {
-                focusWindow = &it;
-                firstBtnDownWindow_ = *focusWindow;
+    bool isFirstBtnDown = (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN)
+        && (pointerEvent->GetPressedButtons().size() == 1);
+    bool isMove = (action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty());
+    if ((firstBtnDownWindowId_ == -1) || isFirstBtnDown || isMove) {
+        for (auto &item : logicalDisplayInfo->windowsInfo_) {
+            if (IsInsideWindow(globalX, globalY, item)) {
+                firstBtnDownWindowId_ = item.id;
                 break;
             }
         }
-    } else {
-        focusWindow = &firstBtnDownWindow_ ;
     }
-    if (focusWindow == nullptr) {
-        MMI_LOGE("Find foucusWindow failed");
-        return RET_ERR;
+    WindowInfo* firstBtnDownWindow = nullptr;
+    for (auto &item : logicalDisplayInfo->windowsInfo_) {
+        if (item.id == firstBtnDownWindowId_) {
+            firstBtnDownWindow = &item;
+            break;
+        }
     }
-    pointerEvent->SetTargetWindowId(focusWindow->id);
-    pointerEvent->SetAgentWindowId(focusWindow->agentWindowId);
-    int32_t localX = globalX - focusWindow->winTopLeftX;
-    int32_t localY = globalY - focusWindow->winTopLeftY;
+    CHKPR(firstBtnDownWindow, ERROR_NULL_POINTER);
+    pointerEvent->SetTargetWindowId(firstBtnDownWindow->id);
+    pointerEvent->SetAgentWindowId(firstBtnDownWindow->agentWindowId);
+    int32_t localX = globalX - firstBtnDownWindow->winTopLeftX;
+    int32_t localY = globalY - firstBtnDownWindow->winTopLeftY;
     pointerItem.SetLocalX(localX);
     pointerItem.SetLocalY(localY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-    auto fd = udsServer_->GetClientFd(focusWindow->pid);
-    auto size = pointerEvent->GetPressedButtons();
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
+    auto fd = udsServer_->GetClientFd(firstBtnDownWindow->pid);
 
     MMI_LOGD("fd:%{public}d,pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
-             "globalX:%{public}d,globalY:%{public}d,pressedButtons size:%{public}zu",
-             fd, focusWindow->pid, focusWindow->id, focusWindow->agentWindowId,
-             globalX, globalY, size.size());
+             "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d",
+             fd, firstBtnDownWindow->pid, firstBtnDownWindow->id, firstBtnDownWindow->agentWindowId,
+             globalX, globalY, localX, localY);
     return fd;
 }
 
@@ -960,7 +962,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
     WindowInfo *touchWindow = nullptr;
     for (auto item : logicalDisplayInfo->windowsInfo_) {
         if (targetWindowId < 0) {
-            if (IsTouchWindow(globalX, globalY, item)) {
+            if (IsInsideWindow(globalX, globalY, item)) {
                 touchWindow = &item;
                 break;
             }

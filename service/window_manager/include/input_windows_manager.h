@@ -184,7 +184,7 @@ private:
     int32_t UpdateTouchPadTargetOld(std::shared_ptr<PointerEvent> pointerEvent);
 
     /*********************************新框架接口添加*************************** */
-    bool IsTouchWindow(int32_t x, int32_t y, const WindowInfo &info) const;
+    bool IsInsideWindow(int32_t x, int32_t y, const WindowInfo &info) const;
     void PrintDisplayDebugInfo();
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
@@ -202,7 +202,7 @@ private:
     std::map<int32_t, LayerInfo> layers_ = {};
     std::map<int32_t, MMISurfaceInfo> surfaces_ = {};
     UDSServer* udsServer_ = nullptr;
-    WindowInfo firstBtnDownWindow_ = {};
+    int32_t firstBtnDownWindowId_ = -1;
     /* *********************************新框架接口添加*************************** */
     std::vector<PhysicalDisplayInfo> physicalDisplays_ = {};
     std::vector<LogicalDisplayInfo> logicalDisplays_ = {};
