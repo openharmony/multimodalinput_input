@@ -47,6 +47,7 @@ private:
     void AddToServer(int32_t handlerId, InputHandlerType handlerType);
     int32_t RemoveLocal(int32_t handlerId, InputHandlerType handlerType);
     void RemoveFromServer(int32_t handlerId, InputHandlerType handlerType);
+    std::shared_ptr<IInputEventConsumer> FindHandler(int32_t handlerId);
 
 private:
     std::mutex lockHandlers_;
