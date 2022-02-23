@@ -35,7 +35,7 @@ namespace {
     constexpr int32_t TIME_WAIT_FOR_LOG = 50;
     constexpr int32_t N_TRIES_FOR_LOG = 20;
     const std::regex REGEX_FIND_PID(" ");
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalKeyEventTest" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalKeyEventTest" };
     static RunShellUtil g_runCommand;
 }
 
