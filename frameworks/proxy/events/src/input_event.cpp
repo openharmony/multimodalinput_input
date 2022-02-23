@@ -33,8 +33,7 @@ InputEvent::InputEvent(const InputEvent& other)
     action_(other.action_), actionStartTime_(other.actionStartTime_),
     deviceId_(other.deviceId_), targetDisplayId_(other.targetDisplayId_),
     targetWindowId_(other.targetWindowId_), agentWindowId_(other.agentWindowId_),
-    bitwise_(other.bitwise_), flag_(other.flag_), processedCallback_(other.processedCallback_)
-{}
+    bitwise_(other.bitwise_), flag_(other.flag_), processedCallback_(other.processedCallback_) {}
 
 InputEvent::~InputEvent() {}
 

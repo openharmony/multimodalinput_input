@@ -456,9 +456,7 @@ KeyEventValueTransformations KeyValueTransformationInput(int16_t keyValueOfInput
 }
 
 // class XkbKeyboardHandlerKey begin
-KeyEventValueTransformation::KeyEventValueTransformation()
-{
-}
+KeyEventValueTransformation::KeyEventValueTransformation() {}
 
 KeyEventValueTransformation::~KeyEventValueTransformation()
 {

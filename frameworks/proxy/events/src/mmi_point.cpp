@@ -39,23 +39,15 @@ MmiPoint::MmiPoint(double px, double py)
 }
 
 MmiPoint::MmiPoint(double px, double py, double pz)
-    : MmiPoint(static_cast<float>(px), static_cast<float>(py), static_cast<float>(pz))
-{
-}
+    : MmiPoint(static_cast<float>(px), static_cast<float>(py), static_cast<float>(pz)) {}
 
 MmiPoint::MmiPoint(int32_t px, int32_t py)
-    : MmiPoint(static_cast<float>(px), static_cast<float>(py))
-{
-}
+    : MmiPoint(static_cast<float>(px), static_cast<float>(py)) {}
 
 MmiPoint::MmiPoint(int32_t px, int32_t py, int32_t pz)
-    : MmiPoint(static_cast<float>(px), static_cast<float>(py), static_cast<float>(pz))
-{
-}
+    : MmiPoint(static_cast<float>(px), static_cast<float>(py), static_cast<float>(pz)) {}
 
-MmiPoint::~MmiPoint()
-{
-}
+MmiPoint::~MmiPoint() {}
 
 void MmiPoint::Setxy(float px, float py)
 {
