@@ -436,7 +436,7 @@ bool OHOS::MMI::VirtualDevice::CloseDevice(const std::vector<std::string>& fileL
     if (!result) {
         return false;
     } else {
-        if (closePid.find("all") == 0) {
+        if (closePid.compare("all_") == 0) {
             CloseAllDevice(alldevice);
             return true;
         }
