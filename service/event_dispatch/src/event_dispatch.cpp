@@ -367,7 +367,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_LOGI("Pointer event interception succeeded");
         return RET_OK;
     }
-    if (!point->NeedSkipInspection() &&
+    if (!point->HasBit(InputEvent::EVENT_FLAG_NO_INTERCEPT) &&
         InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
         if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
             int32_t pointerId = point->GetId();
@@ -711,7 +711,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
 {
     MMI_LOGD("begin");
     CHKPR(key, PARAM_INPUT_INVALID);
-    if (!key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
+    if (!key->HasBit(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         if (InterceptorMgrGbl.OnKeyEvent(key)) {
             MMI_LOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
                 key->GetKeyCode());
@@ -738,12 +738,12 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
 
     MMI_LOGT("4.event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
              "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
-             "EventType:%{public}d,Flag:%{public}d,"
+             "EventType:%{public}d,Flag:%{public}u,"
              "KeyAction:%{public}d,Fd:%{public}d,PreHandlerTime:%{public}" PRId64 "",
              key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
              key->GetActionStartTime(),
              key->GetEventType(),
-             key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
+             key->GetBit(), key->GetKeyAction(), fd, preHandlerTime);
 
     if (IsANRProcess(&udsServer, fd, key->GetId()) == TRIGGER_ANR) {
         MMI_LOGE("the key event does not report normally, triggering ANR");
@@ -845,12 +845,12 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
     MMI_LOGT("Pointer event dispatcher of server:eventType:%{public}d,actionTime:%{public}" PRId64 ","
              "action:%{public}d,actionStartTime:%{public}" PRId64 ","
-             "flag:%{public}d,pointerAction:%{public}d,sourceType:%{public}d,"
+             "flag:%{public}u,pointerAction:%{public}d,sourceType:%{public}d,"
              "VerticalAxisValue:%{public}.02f, HorizontalAxisValue:%{public}.02f,"
              "pointerCount:%{public}zu",
              pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
-             pointerEvent->GetFlag(), pointerEvent->GetPointerAction(),
+             pointerEvent->GetBit(), pointerEvent->GetPointerAction(),
              pointerEvent->GetSourceType(),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
