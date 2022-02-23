@@ -148,7 +148,7 @@ HWTEST_F(VirtualDeviceTest, Test_AddDevice_false01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
     std::vector<std::string> fileList;
-    fileList.push_back("hosmmi-vitual-device-manger ");
+    fileList.push_back("mmi-vitual-device-manger ");
     fileList.push_back("start");
     auto ret = device.AddDevice(fileList);
     EXPECT_FALSE(ret);

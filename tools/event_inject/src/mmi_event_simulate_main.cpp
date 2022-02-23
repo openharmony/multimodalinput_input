@@ -18,7 +18,7 @@
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
-    LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "HosMmiEventSimulateDemoMain"
+    LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "MmiEventSimulateDemoMain"
 };
 }
 
