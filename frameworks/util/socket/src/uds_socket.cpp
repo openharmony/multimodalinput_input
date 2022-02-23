@@ -37,9 +37,9 @@ int32_t UDSSocket::EpollCreat(int32_t size)
 {
     epollFd_ = epoll_create(size);
     if (epollFd_ < 0) {
-        MMI_LOGE("UDSSocket::EpollCreat epoll_create retrun %{public}d", epollFd_);
+        MMI_LOGE("epoll_create retrun %{public}d", epollFd_);
     } else {
-        MMI_LOGI("UDSSocket::EpollCreat epoll_create, epollFd_:%{public}d", epollFd_);
+        MMI_LOGI("epoll_create, epollFd_:%{public}d", epollFd_);
     }
     return epollFd_;
 }
@@ -54,7 +54,7 @@ int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, epoll_event& event, int32_t 
     auto ret = epoll_ctl(epollFd, op, fd, &event);
     if (ret < 0) {
         const int32_t errnoSaved = errno;
-        MMI_LOGE("UDSSocket::EpollCtl epoll_ctl retrun %{public}d,epollFd_:%{public}d,"
+        MMI_LOGE("epoll_ctl retrun %{public}d,epollFd_:%{public}d,"
                  "op:%{public}d,fd:%{public}d,errno:%{public}d,error msg: %{public}s",
                  ret, epollFd, op, fd, errnoSaved, strerror(errnoSaved));
     }
@@ -70,7 +70,7 @@ int32_t UDSSocket::EpollWait(epoll_event& events, int32_t maxevents, int32_t tim
     auto ret = epoll_wait(epollFd, &events, maxevents, timeout);
     if (ret < 0) {
         const int errnoSaved = errno;
-        MMI_LOGE("UDSSocket::EpollWait epoll_wait retrun %{public}d,errno:%{public}d,%{public}s",
+        MMI_LOGE("epoll_wait retrun %{public}d,errno:%{public}d,%{public}s",
             ret, errnoSaved, strerror(errnoSaved));
     }
     return ret;
@@ -115,7 +115,7 @@ size_t UDSSocket::Read(char *buf, size_t size)
     CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
     ssize_t ret = read(fd_, static_cast<void *>(buf), size);
     if (ret < 0) {
-        MMI_LOGE("UDSSocket::Read read return %{public}zd", ret);
+        MMI_LOGE("read return %{public}zd", ret);
     }
     return ret;
 }
@@ -127,7 +127,7 @@ size_t UDSSocket::Write(const char *buf, size_t size)
     CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
     ssize_t ret = write(fd_, buf, size);
     if (ret < 0) {
-        MMI_LOGE("UDSSocket::Write write return %{public}zd", ret);
+        MMI_LOGE("write return %{public}zd", ret);
     }
     return ret;
 }
@@ -138,7 +138,7 @@ size_t UDSSocket::Send(const char *buf, size_t size, int32_t flags)
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
     ssize_t ret = send(fd_, buf, size, flags);
     if (ret < 0) {
-        MMI_LOGE("UDSSocket::Send send return %{public}zd", ret);
+        MMI_LOGE("send return %{public}zd", ret);
     }
     return ret;
 }
@@ -149,7 +149,7 @@ size_t UDSSocket::Recv(char *buf, size_t size, int32_t flags)
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
     ssize_t ret = recv(fd_, static_cast<void *>(buf), size, flags);
     if (ret < 0) {
-        MMI_LOGE("UDSSocket::Recv recv return %{public}zd", ret);
+        MMI_LOGE("recv return %{public}zd", ret);
     }
     return ret;
 }
@@ -161,7 +161,7 @@ size_t UDSSocket::Recvfrom(char *buf, size_t size, uint32_t flags, sockaddr *add
     CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
     ssize_t ret = recvfrom(fd_, static_cast<void *>(buf), size, flags, addr, reinterpret_cast<socklen_t *>(addrlen));
     if (ret < 0) {
-        MMI_LOGE("UDSSocket::Recvfrom recvfrom return %{public}zd", ret);
+        MMI_LOGE("recvfrom return %{public}zd", ret);
     }
     return ret;
 }
@@ -173,7 +173,7 @@ size_t UDSSocket::Sendto(const char *buf, size_t size, uint32_t flags, sockaddr 
     CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
     ssize_t ret = sendto(fd_, static_cast<const void *>(buf), size, flags, addr, static_cast<socklen_t>(addrlen));
     if (ret < 0) {
-        MMI_LOGE("UDSSocket::Sendto sendto return %{public}zd", ret);
+        MMI_LOGE("sendto return %{public}zd", ret);
     }
     return ret;
 }

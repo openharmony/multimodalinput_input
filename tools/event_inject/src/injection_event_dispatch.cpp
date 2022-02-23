@@ -34,9 +34,11 @@ void InjectionEventDispatch::Init()
 void InjectionEventDispatch::InitManageFunction()
 {
     InjectFunctionMap funs[] = {
+#ifdef OHOS_BUILD_AI
         {"aisensor", SEND_EVENT_TO_HDI, false, bind(&InjectionEventDispatch::OnAisensor, this)},
         {"aisensor-all", SEND_EVENT_TO_HDI, true, bind(&InjectionEventDispatch::OnAisensorAll, this)},
         {"aisensor-each", SEND_EVENT_TO_HDI, true, bind(&InjectionEventDispatch::OnAisensorEach, this)},
+#endif
         {"hdi", SEND_EVENT_TO_HDI, true, bind(&InjectionEventDispatch::OnHdi, this)},
         {"hdi-hot", SEND_EVENT_TO_HDI, true, bind(&InjectionEventDispatch::OnHdiHot, this)},
         {"hdi-status", SEND_EVENT_TO_HDI, true, bind(&InjectionEventDispatch::OnHdiStatus, this)},
