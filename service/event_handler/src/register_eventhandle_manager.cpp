@@ -23,13 +23,9 @@ namespace MMI {
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RegisterEventHandleManager" };
     }
-RegisterEventHandleManager::RegisterEventHandleManager()
-{
-}
+RegisterEventHandleManager::RegisterEventHandleManager() {}
 
-RegisterEventHandleManager::~RegisterEventHandleManager()
-{
-}
+RegisterEventHandleManager::~RegisterEventHandleManager() {}
 
 int32_t RegisterEventHandleManager::RegisterEvent(MmiMessageId messageId, int32_t fd)
 {

@@ -241,7 +241,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     }
     keyEvent->SetKeyCode(keyCode);
     if (!isIntercepted) {
-        keyEvent->SetBit(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+        keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
     }
     KeyEvent::KeyItem item;
     item.SetKeyCode(keyCode);

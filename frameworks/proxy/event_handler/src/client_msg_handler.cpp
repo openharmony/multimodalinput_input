@@ -173,7 +173,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
              "ServerStartTime:%{public}" PRId64"",
              key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
              key->GetActionStartTime(), key->GetEventType(),
-             key->GetBit(), key->GetKeyAction(), key->GetId(), fd, serverStartTime);
+             key->GetFlag(), key->GetKeyAction(), key->GetId(), fd, serverStartTime);
     int32_t keyId = key->GetId();
     std::string keyCodestring = "KeyEventDispatch";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, keyId);
@@ -199,7 +199,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
              "sourceType:%{public}s, VerticalAxisValue:%{public}.2f, HorizontalAxisValue:%{public}.2f, "
              "PinchAxisValue:%{public}.2f, pointerCount:%{public}zu, eventNumber:%{public}d",
              pointerEvent->DumpEventType(), pointerEvent->GetActionTime(), pointerEvent->GetAction(),
-             pointerEvent->GetActionStartTime(), pointerEvent->GetBit(), pointerEvent->DumpPointerAction(),
+             pointerEvent->GetActionStartTime(), pointerEvent->GetFlag(), pointerEvent->DumpPointerAction(),
              pointerEvent->DumpSourceType(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH),
@@ -254,7 +254,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
              "Action:%{public}d,KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}u",
         subscribeId, fd, keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
         keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-        keyEvent->GetEventType(), keyEvent->GetBit());
+        keyEvent->GetEventType(), keyEvent->GetFlag());
     int32_t keyId = keyEvent->GetId();
     std::string keyEventString = "keyEventSubscribe";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);

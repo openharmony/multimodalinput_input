@@ -38,7 +38,7 @@ void OHOS::MMI::InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, i
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
-    InterceptorItem interceptorItem {};
+    InterceptorItem interceptorItem = {};
     interceptorItem.sourceType = sourceType;
     interceptorItem.id = id;
     interceptorItem.session =  session;
@@ -57,7 +57,7 @@ void OHOS::MMI::InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
-    InterceptorItem interceptorItem {};
+    InterceptorItem interceptorItem = {};
     interceptorItem.id = id;
     auto iter = std::find(interceptor_.begin(), interceptor_.end(), interceptorItem);
     if (iter == interceptor_.end()) {
@@ -84,13 +84,12 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
              "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
-    NetPacket newPkt(MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR);
-    InputEventDataTransformation::Marshalling(pointerEvent, newPkt);
-    std::list<InterceptorItem>::iterator iter;
+    NetPacket pkt(MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR);
+    InputEventDataTransformation::Marshalling(pointerEvent, pkt);
     for (const auto &item : interceptor_) {
-        newPkt << item.session->GetPid() <<iter->id;
+        pkt << item.session->GetPid() << item.id;
         MMI_LOGD("server send the interceptor msg to client, pid:%{public}d", item.session->GetPid());
-        item.session->SendMsg(newPkt);
+        item.session->SendMsg(pkt);
     }
     MMI_LOGD("leave");
     return true;
@@ -103,13 +102,13 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> k
         MMI_LOGE("InterceptorManagerGlobal::%{public}s no interceptor to send msg", __func__);
         return false;
     }
-    NetPacket newPkt(MmiMessageId::KEYBOARD_EVENT_INTERCEPTOR);
-    InputEventDataTransformation::KeyEventToNetPacket(keyEvent, newPkt);
+    NetPacket pkt(MmiMessageId::KEYBOARD_EVENT_INTERCEPTOR);
+    InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
     for (const auto &item : interceptor_) {
         if (item.sourceType == SOURCETYPE_KEY) {
-            newPkt << item.session->GetPid();
+            pkt << item.session->GetPid();
             MMI_LOGD("server send the interceptor msg to client, pid:%{public}d", item.session->GetPid());
-            item.session->SendMsg(newPkt);
+            item.session->SendMsg(pkt);
         }
     }
     MMI_LOGD("leave");
