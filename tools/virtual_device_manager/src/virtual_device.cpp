@@ -115,7 +115,7 @@ bool OHOS::MMI::VirtualDevice::SyncSymbolFile()
             fgets(temp, sizeof(temp), cmdName);
             pclose(cmdName);
             processName.append(temp);
-            if (processName.find("hosmmi-virtual-device") == processName.npos) {
+            if (processName.find("mmi-virtual-device") == processName.npos) {
                 std::string removeFile = "find /data/symbol/ -name " + item + "* | xargs rm";
                 system(removeFile.c_str());
             }

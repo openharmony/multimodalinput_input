@@ -33,12 +33,12 @@ namespace {
     {
 #ifdef OHOS_BUILD
         const string path = "/data/json/Test_TransformPenJsonDataToInputData.json";
-        string startDeviceCmd = "hosmmi-virtual-device-manager start touchpad & ";
-        string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+        string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
+        string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
         const string path = "temp/Test_TransformPenJsonDataToInputData.json";
-        string startDeviceCmd = "./hosmmi-virtual-deviced.out start touchpad &";
-        string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+        string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
+        string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
         system(startDeviceCmd.c_str());
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -57,12 +57,12 @@ namespace {
     {
 #ifdef OHOS_BUILD
         const string path = "/data/json/Test_TransformPenJsonDataToInputDataNotfindEvents.json";
-        string startDeviceCmd = "hosmmi-virtual-device-manager start touchpad & ";
-        string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+        string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
+        string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
         const string path = "temp/Test_TransformPenJsonDataToInputDataNotfindEvents.json";
-        string startDeviceCmd = "./hosmmi-virtual-deviced.out start touchpad &";
-        string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+        string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
+        string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
         system(startDeviceCmd.c_str());
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -81,12 +81,12 @@ namespace {
     {
 #ifdef OHOS_BUILD
         const string path = "/data/json/Test_TransformPenJsonDataToInputDataEventsIsEmpty.json";
-        string startDeviceCmd = "hosmmi-virtual-device-manager start touchpad & ";
-        string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+        string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
+        string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
         const string path = "temp/Test_TransformPenJsonDataToInputDataEventsIsEmpty.json";
-        string startDeviceCmd = "./hosmmi-virtual-deviced.out start touchpad &";
-        string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+        string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
+        string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
         system(startDeviceCmd.c_str());
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -105,12 +105,12 @@ namespace {
     {
 #ifdef OHOS_BUILD
         const string path = "/data/json/Test_TransformPenJsonDataToInputDataApprochEventError.json";
-        string startDeviceCmd = "hosmmi-virtual-device-manager start touchpad & ";
-        string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+        string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
+        string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
         const string path = "temp/Test_TransformPenJsonDataToInputDataApprochEventError.json";
-        string startDeviceCmd = "./hosmmi-virtual-deviced.out start touchpad &";
-        string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+        string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
+        string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
         system(startDeviceCmd.c_str());
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -129,12 +129,12 @@ namespace {
     {
 #ifdef OHOS_BUILD
         const string path = "/data/json/Test_TransformPenJsonDataToInputDataSlideEventError.json";
-        string startDeviceCmd = "hosmmi-virtual-device-manager start touchpad & ";
-        string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+        string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
+        string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
         const string path = "temp/Test_TransformPenJsonDataToInputDataSlideEventError.json";
-        string startDeviceCmd = "./hosmmi-virtual-deviced.out start touchpad &";
-        string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+        string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
+        string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
         system(startDeviceCmd.c_str());
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -153,12 +153,12 @@ namespace {
     {
 #ifdef OHOS_BUILD
         const string path = "/data/json/Test_TransformPenJsonDataToInputDataLeaveEventError.json";
-        string startDeviceCmd = "hosmmi-virtual-device-manager start touchpad & ";
-        string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+        string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
+        string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
         const string path = "temp/Test_TransformPenJsonDataToInputDataLeaveEventError.json";
-        string startDeviceCmd = "./hosmmi-virtual-deviced.out start touchpad &";
-        string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+        string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
+        string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
         system(startDeviceCmd.c_str());
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -177,12 +177,12 @@ namespace {
     {
 #ifdef OHOS_BUILD
         const string path = "/data/json/Test_TransformPenJsonDataToInputDataApprochEventEventTypeError.json";
-        string startDeviceCmd = "hosmmi-virtual-device-manager start touchpad & ";
-        string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+        string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
+        string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
         const string path = "temp/Test_TransformPenJsonDataToInputDataApprochEventEventTypeError.json";
-        string startDeviceCmd = "./hosmmi-virtual-deviced.out start touchpad &";
-        string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+        string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
+        string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
         system(startDeviceCmd.c_str());
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -201,12 +201,12 @@ namespace {
     {
 #ifdef OHOS_BUILD
         const string path = "/data/json/Test_TransformPenJsonDataToInputDataLeaveEventEventTypeError.json";
-        string startDeviceCmd = "hosmmi-virtual-device-manager start touchpad & ";
-        string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+        string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
+        string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
         const string path = "temp/Test_TransformPenJsonDataToInputDataLeaveEventEventTypeError.json";
-        string startDeviceCmd = "./hosmmi-virtual-deviced.out start touchpad &";
-        string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+        string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
+        string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
         system(startDeviceCmd.c_str());
         std::this_thread::sleep_for(std::chrono::seconds(1));
