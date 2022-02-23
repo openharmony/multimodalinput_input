@@ -37,8 +37,8 @@ public:
         std::shared_ptr<PointerEvent> pointer, const uint64_t preHandlerTime);
     int32_t DispatchGestureEvent(UDSServer& udsServer, struct libinput_event *event, const EventGesture& gesture,
         const uint64_t preHandlerTime);
-    int32_t DispatchKeyEvent(UDSServer& udsServer, struct libinput_event *event, const KeyEventValueTransformations& trs,
-        EventKeyboard& key, const uint64_t preHandlerTime);
+    int32_t DispatchKeyEvent(UDSServer& udsServer, struct libinput_event *event,
+        const KeyEventValueTransformations& trs, EventKeyboard& key, const uint64_t preHandlerTime);
     int32_t DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key,
         const uint64_t preHandlerTime);
     int32_t DispatchTouchEvent(UDSServer& udsServer, struct libinput_event *event,
@@ -67,6 +67,10 @@ protected:
     int32_t KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer& udsServer,
         struct libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime);
     int32_t IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id);
+
+private:
+    int32_t DispatchTouchEvent(const EventTouch& touch, const int fd,
+        const uint64_t preHandlerTime, UDSServer& udsServer, NetPacket &newPacket) const;
 
 private:
     EventPackage eventPackage_;

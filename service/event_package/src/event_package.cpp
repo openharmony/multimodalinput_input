@@ -24,7 +24,8 @@ namespace {
     constexpr uint32_t SEAT_KEY_COUNT_ZERO = 0;
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventPackage" };
 
-    void FillEventJoyStickAxisAbsInfo(const struct libinput_event_joystick_axis_abs_info& r, EventJoyStickAxisAbsInfo& l)
+    void FillEventJoyStickAxisAbsInfo(const struct libinput_event_joystick_axis_abs_info& r,
+        EventJoyStickAxisAbsInfo& l)
     {
         l.code = r.code;
         l.value = r.value;
