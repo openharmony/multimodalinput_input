@@ -293,7 +293,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
     }
     auto appInfo = AppRegs->FindWinId(focusId);
     if (appInfo.fd == RET_ERR) {
-        MMI_LOGW("Failed to obtain AppInfo, desWindow:%{public}d", focusId);
+        MMI_LOGW("Failed to obtain AppInfo, desWindow:%{public}d.", focusId);
         return RET_OK; // DeviceAdded event will be discarded if appInfo.fd == RET_ERR
     }
     NetPacket newPacket(MmiMessageId::ON_DEVICE_ADDED);
@@ -333,7 +333,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
     }
     auto appInfo = AppRegs->FindWinId(focusId);
     if (appInfo.fd == RET_ERR) {
-        MMI_LOGW("Failed to obtain AppInfo, desWindow:%{public}d", focusId);
+        MMI_LOGW("Failed to obtain AppInfo, desWindow:%{public}d.", focusId);
         return RET_OK; // DeviceRemoved event will be discarded if appInfo.fd == RET_ERR
     }
     NetPacket newPacket(MmiMessageId::ON_DEVICE_REMOVED);
