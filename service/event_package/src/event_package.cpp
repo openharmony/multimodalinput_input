@@ -638,6 +638,18 @@ int32_t EventPackage::PackagePointerEvent(struct libinput_event *event, EventPoi
     return ret;
 }
 
+static void PackageGestureSwipeUpdateEvent(struct libinput_event_gesture* data, EventGesture& gesture)
+{
+    MMI_LOGI("Three finger slide event update");
+    gesture.delta.x = libinput_event_gesture_get_dx(data);
+    gesture.delta.y = libinput_event_gesture_get_dy(data);
+    gesture.deltaUnaccel.x = libinput_event_gesture_get_dx_unaccelerated(data);
+    gesture.deltaUnaccel.y = libinput_event_gesture_get_dy_unaccelerated(data);
+    struct sloted_coords_info* pSoltTouches = libinput_event_gesture_get_solt_touches(data);
+    CHKPR(pSoltTouches, ERROR_NULL_POINTER);
+    FillEventSlotedCoordsInfo(*pSoltTouches, gesture.soltTouches);
+}
+
 int32_t EventPackage::PackageGestureEvent(struct libinput_event *event, EventGesture& gesture)
 {
     CHKPR(event, ERROR_NULL_POINTER);
@@ -671,14 +683,7 @@ int32_t EventPackage::PackageGestureEvent(struct libinput_event *event, EventGes
         }
         /* Third, it refers to the use of requirements, and the code is reserved */
         case LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE: {
-            MMI_LOGI("Three finger slide event update");
-            gesture.delta.x = libinput_event_gesture_get_dx(data);
-            gesture.delta.y = libinput_event_gesture_get_dy(data);
-            gesture.deltaUnaccel.x = libinput_event_gesture_get_dx_unaccelerated(data);
-            gesture.deltaUnaccel.y = libinput_event_gesture_get_dy_unaccelerated(data);
-            struct sloted_coords_info* pSoltTouches = libinput_event_gesture_get_solt_touches(data);
-            CHKPR(pSoltTouches, ERROR_NULL_POINTER);
-            FillEventSlotedCoordsInfo(*pSoltTouches, gesture.soltTouches);
+            PackageGestureSwipeUpdateEvent(data, gesture);
             break;
         }
         /* Third, it refers to the use of requirements, and the code is reserved */
