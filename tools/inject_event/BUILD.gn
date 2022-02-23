@@ -76,6 +76,7 @@ ohos_unittest("InjectEventTest") {
   deps = [
     "$SUBSYSTEM_FRAMEWORKS_DIR/proxy:libmmi-client",
     "$SUBSYSTEM_FRAMEWORKS_DIR/util:libmmi-util",
+    "$SUBSYSTEM_DIR/input/tools/inject_event:input-manager",
   ]
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
