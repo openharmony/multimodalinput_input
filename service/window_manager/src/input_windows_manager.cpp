@@ -190,7 +190,7 @@ void OHOS::MMI::InputWindowsManager::PrintDebugInfo()
 
     MMI_LOGD("window info");
     for (const auto &m : surfaces_) {
-        auto appFd = AppRegs->FindByWinId(m.second.surfaceId);
+        auto appFd = AppRegs->FindWinId(m.second.surfaceId);
         MMI_LOGD("-surface_id:%{public}d,on_screen_id:%{public}d,on_layer_id:%{public}d,src(xywh):[%{public}d,"
                  "%{public}d,%{public}d,%{public}d] desc(xywh):[%{public}d,%{public}d,%{public}d,%{public}d],"
                  "visibility:%{public}d,opacity:%{public}lf, appFd:%{public}d bundlerName:%{public}s appName:"
@@ -266,7 +266,7 @@ void OHOS::MMI::InputWindowsManager::Dump(int32_t fd)
     }
     mprintf(fd, "surfaceInfos count=%zu", surfaces_.size());
     for (auto& item : surfaces_) {
-        auto appFd = AppRegs->FindByWinId(item.second.surfaceId);
+        auto appFd = AppRegs->FindWinId(item.second.surfaceId);
         mprintf(fd, "\tsurfaceId=%d dstX=%d dstY=%d dstW=%d dstH=%d srcX=%d"
                 "srcY=%d srcW=%d srcH=%d opacity=%f visibility=%d onLayerId=%d appFd=%d bundlerName=%s appName=%s",
                 item.second.surfaceId, item.second.dstX,
@@ -331,7 +331,7 @@ void OHOS::MMI::InputWindowsManager::SaveScreenInfoToMap(const ScreenInfo** scre
     surfacesList_ = surfaceList;
 }
 
-bool OHOS::MMI::InputWindowsManager::FindSurfaceByCoordinate(double x, double y, const SurfaceInfo& pstrSurface)
+bool OHOS::MMI::InputWindowsManager::FindSurfaceCoordinate(double x, double y, const SurfaceInfo& pstrSurface)
 {
     if (x >= pstrSurface.srcX && x <= (pstrSurface.srcX + pstrSurface.srcW) &&
         y >= pstrSurface.srcY && y <= (pstrSurface.srcY + pstrSurface.srcH)) {
@@ -349,7 +349,7 @@ bool OHOS::MMI::InputWindowsManager::GetTouchSurfaceId(const double x, const dou
         for (auto it : surfaces_) {
             auto res = static_cast<MMISurfaceInfo*>(&it.second);
             CHKPF(res);
-            if (FindSurfaceByCoordinate(x, y, *res)) {
+            if (FindSurfaceCoordinate(x, y, *res)) {
                 if (res->onLayerId > newLayerId) {
                     newLayerId = res->onLayerId;
                     newSurfaceId = res->surfaceId;
@@ -416,7 +416,7 @@ const MMISurfaceInfo* OHOS::MMI::InputWindowsManager::GetTouchSurfaceInfo(double
         // find window by coordinate
         if (CheckFocusSurface(x, y, it.second) && it.second.onLayerId >= newLayerId) {
             newLayerId = it.second.onLayerId;
-            if (it.second.visibility == 1 && AppRegs->FindByWinId(it.second.surfaceId).fd > 0) {
+            if (it.second.visibility == 1 && AppRegs->FindWinId(it.second.surfaceId).fd > 0) {
                 surfacePtr = &it.second;
             }
         }
@@ -432,7 +432,7 @@ void OHOS::MMI::InputWindowsManager::TransfromToSurfaceCoordinate(const MMISurfa
     x = x - info.dstX;
     y = y - info.dstY;
     if (debug) {
-        auto appFd = AppRegs->FindByWinId(info.surfaceId);
+        auto appFd = AppRegs->FindWinId(info.surfaceId);
         MMI_LOGD("Transfrom touch coordinate. src:[%{public}lf,%{public}lf],focusSurface:%{public}d,"
                  "info:[%{public}d,%{public}d,%{public}d,%{public}d],dest:[%{public}lf,%{public}lf],"
                  "fd:%{public}d,bundler:%{public}s,appName:%{public}s",
@@ -449,7 +449,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent>
     MMI_LOGD("enter");
     int32_t focId = GetFocusSurfaceId();
     CHKR(!(focId < 0), FOCUS_ID_OBTAIN_FAIL, FOCUS_ID_OBTAIN_FAIL);
-    auto appInfo = AppRegs->FindByWinId(focId);
+    auto appInfo = AppRegs->FindWinId(focId);
     if (appInfo.fd == RET_ERR) {
         return RET_ERR;
     }
@@ -788,7 +788,7 @@ void OHOS::MMI::InputWindowsManager::AdjustGlobalCoordinate(int32_t& globalX, in
     }
 }
 
-bool OHOS::MMI::InputWindowsManager::IsCheckDisplayIdIfExist(int32_t& displayId)
+bool OHOS::MMI::InputWindowsManager::UpdataDisplayId(int32_t& displayId)
 {
     if (logicalDisplays_.empty()) {
         MMI_LOGE("logicalDisplays_is empty");
@@ -806,7 +806,7 @@ bool OHOS::MMI::InputWindowsManager::IsCheckDisplayIdIfExist(int32_t& displayId)
     return false;
 }
 
-LogicalDisplayInfo* OHOS::MMI::InputWindowsManager::GetLogicalDisplayById(int32_t displayId)
+LogicalDisplayInfo* OHOS::MMI::InputWindowsManager::GetLogicalDisplayId(int32_t displayId)
 {
     for (auto &it : logicalDisplays_) {
         if (it.id == displayId) {
@@ -850,6 +850,7 @@ void OHOS::MMI::InputWindowsManager::FixCursorPosition(int32_t &globalX, int32_t
     }
 
     if (logicalDisplays_.empty()) {
+        MMI_LOGE("logicalDisplays_ is empty");
         return;
     }
 
@@ -873,7 +874,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
 {
     MMI_LOGD("Enter");
     auto displayId = pointerEvent->GetTargetDisplayId();
-    if (!IsCheckDisplayIdIfExist(displayId)) {
+    if (!UpdataDisplayId(displayId)) {
         MMI_LOGE("This display:%{public}d is not exist", displayId);
         return RET_ERR;
     }
@@ -885,7 +886,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
         MMI_LOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return RET_ERR;
     }
-    LogicalDisplayInfo *logicalDisplayInfo = GetLogicalDisplayById(displayId);
+    LogicalDisplayInfo *logicalDisplayInfo = GetLogicalDisplayId(displayId);
     CHKPR(logicalDisplayInfo, ERROR_NULL_POINTER);
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
@@ -935,7 +936,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTargetOld(std::shared_p
 int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     auto displayId = pointerEvent->GetTargetDisplayId();
-    if (!IsCheckDisplayIdIfExist(displayId)) {
+    if (!UpdataDisplayId(displayId)) {
         MMI_LOGE("This display is not exist");
         return RET_ERR;
     }
@@ -948,7 +949,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
         return RET_ERR;
     }
     MMI_LOGD("UpdateTouchScreenTarget, display:%{public}d", displayId);
-    LogicalDisplayInfo *logicalDisplayInfo = GetLogicalDisplayById(displayId);
+    LogicalDisplayInfo *logicalDisplayInfo = GetLogicalDisplayId(displayId);
     CHKPR(logicalDisplayInfo, ERROR_NULL_POINTER);
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
@@ -1042,28 +1043,28 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
         bool isOutside[CORNER] = { false, false, false, false };
         if (item.id >= 0) {
             if (integerX < item.topLeftX) {
-                mouseLoction_.globleX = item.topLeftX;
+                mouseLoction_.globalX = item.topLeftX;
                 x = item.topLeftX;
                 isOutside[TOP_LEFT_X] = true;
             } else {
                 isOutside[TOP_LEFT_X] = false;
             }
             if (integerX > (item.topLeftX + item.width)) {
-                mouseLoction_.globleX = item.topLeftX + item.width;
+                mouseLoction_.globalX = item.topLeftX + item.width;
                 x = item.topLeftX + item.width;
                 isOutside[TOP_RIGHT_X] = true;
             } else {
                 isOutside[TOP_RIGHT_X] = false;
             }
             if (integerY < item.topLeftY) {
-                mouseLoction_.globleY = item.topLeftY;
+                mouseLoction_.globalY = item.topLeftY;
                 y = item.topLeftY;
                 isOutside[TOP_LEFT_Y] = true;
             } else {
                 isOutside[TOP_LEFT_Y] = false;
             }
             if (integerY > (item.topLeftY + item.height)) {
-                mouseLoction_.globleY = item.topLeftY + item.height;
+                mouseLoction_.globalY = item.topLeftY + item.height;
                 y = item.topLeftY + item.height;
                 isOutside[TOP_RIGHT_Y] = true;
             } else {
@@ -1071,13 +1072,13 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
             }
             if ((isOutside[TOP_LEFT_X] != true) && (isOutside[TOP_LEFT_Y] != true) &&
                 (isOutside[TOP_RIGHT_X] != true) && (isOutside[TOP_RIGHT_Y] != true)) {
-                mouseLoction_.globleX = x;
-                mouseLoction_.globleY = y;
+                mouseLoction_.globalX = x;
+                mouseLoction_.globalY = y;
                 break;
             }
         }
     }
-    MMI_LOGI("Mouse Data: globleX:%{public}d,globleY:%{public}d", mouseLoction_.globleX, mouseLoction_.globleY);
+    MMI_LOGD("Mouse Data: globalX:%{public}d,globalY:%{public}d", mouseLoction_.globalX, mouseLoction_.globalY);
 }
 
 MouseLocation OHOS::MMI::InputWindowsManager::GetMouseInfo()

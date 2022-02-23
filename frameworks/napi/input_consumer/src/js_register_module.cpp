@@ -143,7 +143,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
         if (*it >= 0) {
             infoSize++;
         }
-        it++;
+        ++it;
     }
     int32_t count = 0;
     for (const auto &item : items) {
@@ -176,7 +176,7 @@ static void SubKeyEventCallback(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     auto iter = callbacks.begin();
     while (iter != callbacks.end()) {
         auto &list = iter->second;
-        iter++;
+        ++iter;
         MMI_LOGD("list size:%{public}zu", list.size());
         auto infoIter = list.begin();
         while (infoIter != list.end()) {
@@ -186,7 +186,7 @@ static void SubKeyEventCallback(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
                 monitorInfo->status = 1;
                 EmitAsyncCallbackWork(monitorInfo);
             }
-            infoIter++;
+            ++infoIter;
         }
     }
 }

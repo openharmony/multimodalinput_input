@@ -407,7 +407,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnNewInjectKeyEvent(SessionPtr sess, NetPac
         return RET_ERR;
     }
 
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, creKey, preHandlerTime);
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEventPid(*udsServer_, creKey, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d",
             eventDispatchResult, KEY_EVENT_DISP_FAIL);
@@ -456,14 +456,14 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
         keyEvent_ = OHOS::MMI::KeyEvent::Create();
     }
     EventPackage::KeyboardToKeyEvent(key, keyEvent_);
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent_, preHandlerTime);
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d",
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
     }
     int32_t focusId = WinMgr->GetFocusSurfaceId();
     CHKR(!(focusId < 0), FOCUS_ID_OBTAIN_FAIL, FOCUS_ID_OBTAIN_FAIL);
-    auto appInfo = AppRegs->FindByWinId(focusId);
+    auto appInfo = AppRegs->FindWinId(focusId);
     if (appInfo.fd == RET_ERR) {
         return FOCUS_ID_OBTAIN_FAIL;
     }
@@ -691,7 +691,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPac
     int32_t finalKeyDownDuration = 0;
     pkt >> subscribeId >> finalKey >> isFinalKeyDown >> finalKeyDownDuration >> preKeySize;
     std::vector<int32_t> preKeys;
-    for (uint32_t i = 0; i < preKeySize; ++i) {
+    for (uint32_t i = 0; i < preKeySize; i++) {
         int32_t tmpKey = -1;
         pkt >> tmpKey;
         preKeys.push_back(tmpKey);
@@ -765,7 +765,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& p
     CHKR(pkt.Read(deviceId), STREAM_BUF_READ_FAIL, RET_ERR);
 
 #ifdef OHOS_WESTEN_MODEL
-    InputDevMgr->FindInputDeviceByIdAsync(deviceId,
+    InputDevMgr->FindInputDeviceIdAsync(deviceId,
         [userData, sess, this](std::shared_ptr<InputDevice> inputDevice) {
         CHKPR(sess, ERROR_NULL_POINTER);
         NetPacket pkt2(MmiMessageId::INPUT_DEVICE);

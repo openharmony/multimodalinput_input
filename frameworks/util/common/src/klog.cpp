@@ -18,27 +18,29 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
 #include <pthread.h>
-#include <stdarg.h>
-#include <time.h>
-#include <errno.h>
+#include <cstdarg>
+#include <ctime>
+#include <cerrno>
 #include "securec.h"
 #include "hilog/log.h"
 
+namespace OHOS {
+namespace MMI {
 // dmesg
 #define UNUSED(x) \
     do { \
         (void)(x) \
     } while (0)
 
-#define MAX_LOG_SIZE 1024
-#define BASE_YEAR 1900
 #define UNLIKELY(x)    __builtin_expect(!!(x), 0)
 
 static int g_fd_klog = -1;
+
+constexpr int32_t MAX_LOG_SIZE = 1024;
 
 void KLogOpenLogDevice(void)
 {
@@ -50,24 +52,6 @@ void KLogOpenLogDevice(void)
     if (fd >= 0) {
         g_fd_klog = fd;
     }
-    return;
-}
-
-void KLogEnableDevKmsg(void)
-{
-    /* printk_devkmsg default value is ratelimit, We need to set "on" and remove the restrictions */
-#ifdef _CLOEXEC_
-    int fd = open("/proc/sys/kernel/printk_devkmsg", O_WRONLY | O_CLOEXEC, S_IRUSR | S_IWUSR | S_IRGRP | S_IRGRP);
-#else
-    int fd = open("/proc/sys/kernel/printk_devkmsg", O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IRGRP);
-#endif
-    if (fd < 0) {
-        return;
-    }
-    char kmsgStatus[] = "on";
-    write(fd, kmsgStatus, strlen(kmsgStatus) + 1);
-    close(fd);
-    fd = -1;
     return;
 }
 
@@ -107,5 +91,5 @@ void kMsgLog(const char* fileName, int line, const char* kLevel,
     }
     return;
 }
-
-// #endif // OHOS_BUILD_MMI_DEBUG
+} // namespace MMI
+} // namespace OHOS

@@ -102,7 +102,7 @@ namespace MMI {
             }
         };
 
-        for (i = 0; i < dataSize; ++i) {
+        for (i = 0; i < dataSize; i++) {
             const unsigned char c = static_cast<unsigned char>(dataPtr[i]);
             ret = sprintf_s(bufLeft + writePosHex, bufSize - writePosHex, "%02x ", c);
             funCheckRetAndLog(MMI_LINE_INFO);

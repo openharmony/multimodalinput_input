@@ -27,27 +27,27 @@ GetDeviceNode::GetDeviceNode()
     InitDeviceInfo();
 }
 
-int32_t GetDeviceNode::GetDeviceNodeByName(const string &targetName, string &deviceNode, uint16_t devIndex)
+int32_t GetDeviceNode::GetDeviceNodeName(const string &targetName, string &deviceNode, uint16_t devIndex)
 {
     string cmd = "cat /proc/bus/input/devices";
     std::vector<std::string> cmdResult;
     string deviceName = deviceMap_[targetName];
     ExecuteCmd(cmd, cmdResult);
     DeviceMapData deviceMapData;
-    GetDeviceInfoByCmdResult(cmdResult, deviceMapData);
+    GetDeviceInfoCmdResult(cmdResult, deviceMapData);
     auto iter = deviceMapData.find(deviceName);
     if (iter == deviceMapData.end()) {
-        MMI_LOGE("GetDeviceNodeByName faild for find deviceName:%{public}s", deviceName.c_str());
+        MMI_LOGE("GetDeviceNodeName faild for find deviceName:%{public}s", deviceName.c_str());
         return RET_ERR;
     }
     size_t targetSize = iter->second.size();
     if (devIndex > targetSize) {
-        MMI_LOGE("GetDeviceNodeByName faild for devIndex:%{public}d > targetSize:%{public}zu", devIndex, targetSize);
+        MMI_LOGE("GetDeviceNodeName faild for devIndex:%{public}d > targetSize:%{public}zu", devIndex, targetSize);
         return RET_ERR;
     }
     string nodeRootPath = "/dev/input/";
     deviceNode = nodeRootPath + iter->second[devIndex];
-    MMI_LOGI("GetDeviceNodeByName:%{public}s[%{public}d] --> %{public}s", targetName.c_str(), devIndex,
+    MMI_LOGI("GetDeviceNodeName:%{public}s[%{public}d] --> %{public}s", targetName.c_str(), devIndex,
              deviceNode.c_str());
 
     return RET_OK;
@@ -93,7 +93,7 @@ int32_t GetDeviceNode::ExecuteCmd(const string cmd, std::vector<std::string> &cm
     return pclose(pin);
 }
 
-void GetDeviceNode::GetDeviceInfoByCmdResult(const std::vector<std::string>& cmdResult, DeviceMapData& deviceMapData)
+void GetDeviceNode::GetDeviceInfoCmdResult(const std::vector<std::string>& cmdResult, DeviceMapData& deviceMapData)
 {
     string name;
     string target;

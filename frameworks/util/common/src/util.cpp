@@ -320,7 +320,6 @@ const char* GetProgramName()
     if (RET_OK != ret) {
         return "";
     }
-
     KMSG_LOGI("GetProgramName success. programName = %s", programName);
 
     return programName;

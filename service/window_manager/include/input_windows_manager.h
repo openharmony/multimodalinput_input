@@ -105,8 +105,8 @@ struct MMISurfaceInfo : public SurfaceInfo {
     int32_t screenId;
 };
 struct MouseLocation {
-    int32_t globleX;
-    int32_t globleY;
+    int32_t globalX;
+    int32_t globalY;
 };
 
 class InputWindowsManager : public DelayedSingleton<InputWindowsManager> {
@@ -160,8 +160,8 @@ public:
     MouseLocation GetMouseInfo();
     void UpdateAndAdjustMouseLoction(double& x, double& y);
     void AdjustGlobalCoordinate(int32_t& globalX, int32_t& globalY, int32_t width, int32_t height);
-    bool IsCheckDisplayIdIfExist(int32_t& displayId);
-    LogicalDisplayInfo* GetLogicalDisplayById(int32_t displayId);
+    bool UpdataDisplayId(int32_t& displayId);
+    LogicalDisplayInfo* GetLogicalDisplayId(int32_t displayId);
     int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
     bool TouchDownPointToDisplayPoint(libinput_event_touch* touch, Direction& direction,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId);
@@ -178,7 +178,7 @@ private:
     void SetFocusId(int32_t id);
     void PrintDebugInfo();
     void SaveScreenInfoToMap(const ScreenInfo **screen_info);
-    bool FindSurfaceByCoordinate(double x, double y, const SurfaceInfo& pstrSurface);
+    bool FindSurfaceCoordinate(double x, double y, const SurfaceInfo& pstrSurface);
     int32_t UpdateMouseTargetOld(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTouchScreenTargetOld(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTouchPadTargetOld(std::shared_ptr<PointerEvent> pointerEvent);
