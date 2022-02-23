@@ -315,7 +315,7 @@ int32_t EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, libinput_ev
     // obtain application information for focusId
     auto appInfo = AppRegs->FindWinId(focusId);
     if (appInfo.fd == RET_ERR) {
-        MMI_LOGE("Failed to obtain AppInfo, desWindow:%{public}d,errCode:%{public}d", focusId, FOCUS_ID_OBTAIN_FAIL);
+        MMI_LOGE("Failed to obtain AppInfo, desWindow:%{public}d,errCode:%{public}d.", focusId, FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
     }
     StandardTouchStruct inputEvent = {}; // Standardization handler of struct EventPointer
