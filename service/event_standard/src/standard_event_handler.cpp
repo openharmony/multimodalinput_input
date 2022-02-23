@@ -118,7 +118,8 @@ void OHOS::MMI::StandardEventHandler::PointerPressedStandardEvent(struct libinpu
              data.reRventType, data.curRventType, data.buttonType, data.buttonState);
 }
 
-void OHOS::MMI::StandardEventHandler::PointerAbsoluteStandardEvent(struct libinput_event *event, StandardTouchStruct& data)
+void OHOS::MMI::StandardEventHandler::PointerAbsoluteStandardEvent(
+    struct libinput_event *event, StandardTouchStruct& data)
 {
     CHKPV(event);
     auto szPoint = libinput_event_get_pointer_event(event);
@@ -143,7 +144,8 @@ void OHOS::MMI::StandardEventHandler::PointerAbsoluteStandardEvent(struct libinp
     }
 }
 
-void OHOS::MMI::StandardEventHandler::PointerMotionStandardEvent(struct libinput_event *event, StandardTouchStruct& data)
+void OHOS::MMI::StandardEventHandler::PointerMotionStandardEvent(
+    struct libinput_event *event, StandardTouchStruct& data)
 {
     CHKPV(event);
     auto szPoint = libinput_event_get_pointer_event(event);
