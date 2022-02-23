@@ -396,8 +396,8 @@ int32_t RegisterEvent::OnEventTouchDownGetSign(const EventTouch& touch)
     touchDownInfo.seatSlot = touch.seatSlot;
     touchInfos_.insert(std::map<std::pair<uint32_t, int32_t>,
         TouchInfo>::value_type(std::make_pair(touch.deviceId, touch.seatSlot), touchDownInfo));
-    if (GetTouchInfoSizeByDeviceId(touchDownInfo.deviceId) > MAXFINGER) {
-        DeleteTouchInfoByDeviceId(touchDownInfo.deviceId);
+    if (GetTouchInfoSizeDeviceId(touchDownInfo.deviceId) > MAXFINGER) {
+        DeleteTouchInfoDeviceId(touchDownInfo.deviceId);
         return RET_ERR;
     }
     return RET_OK;
@@ -454,10 +454,10 @@ int32_t RegisterEvent::OnEventTouchUpGetSign(const EventTouch& touch, MmiMessage
     touchUpInfo = iter->second;
     touchInfos_.erase(iter);
 
-    if ((GetTouchInfoSizeByDeviceId(touchUpInfo.deviceId) + 1) == THREEFINGER) {
+    if ((GetTouchInfoSizeDeviceId(touchUpInfo.deviceId) + 1) == THREEFINGER) {
         return OnEventThreeFingerHandlerGetSign(touchUpInfo, msgId);
     }
-    if ((GetTouchInfoSizeByDeviceId(touchUpInfo.deviceId) + 1) == ONEFINGER) {
+    if ((GetTouchInfoSizeDeviceId(touchUpInfo.deviceId) + 1) == ONEFINGER) {
         return OnEventOneFingerHandlerGetSign(touchUpInfo, msgId);
     }
     return RET_OK;
@@ -481,7 +481,7 @@ int32_t RegisterEvent::OnEventTouchMotionGetSign(const EventTouch& touch, MmiMes
     iter->second.seatSlot = touch.seatSlot;
     iter->second.slot = touch.slot;
 
-    if (GetTouchInfoSizeByDeviceId(touch.deviceId) == ONEFINGER) {
+    if (GetTouchInfoSizeDeviceId(touch.deviceId) == ONEFINGER) {
         if ((iter->second.beginY >= MINY) && (iter->second.beginY < MINY + REGION) && (iter->second.beginX != MINX) &&
             (iter->second.beginX != MAXX) && (iter->second.endY - iter->second.beginY > MOVEDISTANCE)) {
             msgId = MmiMessageId::ON_SHOW_NOTIFICATION;
@@ -526,7 +526,7 @@ void RegisterEvent::GetTouchIds(const uint32_t deviceId, std::vector<std::pair<u
     }
 }
 
-int32_t RegisterEvent::GetTouchInfoSizeByDeviceId(uint32_t deviceId)
+int32_t RegisterEvent::GetTouchInfoSizeDeviceId(uint32_t deviceId)
 {
     int32_t count = 0;
     for (const auto &item : touchInfos_) {
@@ -537,7 +537,7 @@ int32_t RegisterEvent::GetTouchInfoSizeByDeviceId(uint32_t deviceId)
     return count;
 }
 
-void RegisterEvent::DeleteTouchInfoByDeviceId(uint32_t deviceId)
+void RegisterEvent::DeleteTouchInfoDeviceId(uint32_t deviceId)
 {
     auto it = touchInfos_.begin();
     while (it != touchInfos_.end()) {

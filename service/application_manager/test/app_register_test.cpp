@@ -49,12 +49,12 @@ HWTEST_F(AppRegisterTest, RegisterAppInfoforServer, TestSize.Level1)
     }
     appReg.PrintfMap();
 
-    testVal = appReg.FindByWinId(101);
+    testVal = appReg.FindWinId(101);
     EXPECT_TRUE(testVal.fd != -1);
 
-    testVal = appReg.FindBySocketFd(20);
+    testVal = appReg.FindSocketFd(20);
     EXPECT_TRUE(testVal.windowId == 105);
-    testVal = appReg.FindByWinId(201);
+    testVal = appReg.FindWinId(201);
     EXPECT_TRUE(testVal.fd == -1);
 
     appReg.PrintfMap();
@@ -501,7 +501,7 @@ HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_001, TestSize.Level1)
     const AppInfo a = { 1004, 101, 16, "", ""};
     appRegister.RegisterAppInfoforServer(a);
     int32_t fd = 4;
-    appRegister.UnregisterAppInfoBySocketFd(fd);
+    appRegister.UnregisterAppInfoSocketFd(fd);
 }
 
 HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_002, TestSize.Level1)
@@ -515,7 +515,7 @@ HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_002, TestSize.Level1)
         appRegister.RegisterAppInfoforServer(a[i]);
     }
     int32_t fd = 8;
-    appRegister.UnregisterAppInfoBySocketFd(fd);
+    appRegister.UnregisterAppInfoSocketFd(fd);
 }
 
 HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_003, TestSize.Level1)
@@ -530,7 +530,7 @@ HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_003, TestSize.Level1)
         appRegister.RegisterAppInfoforServer(a[i]);
     }
     int32_t fd = 12;
-    appRegister.UnregisterAppInfoBySocketFd(fd);
+    appRegister.UnregisterAppInfoSocketFd(fd);
 }
 
 HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_004, TestSize.Level1)
@@ -563,7 +563,7 @@ HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_005, TestSize.Level1)
         appRegister.RegisterAppInfoforServer(a[i]);
     }
     int32_t fd = 20;
-    appRegister.UnregisterAppInfoBySocketFd(fd);
+    appRegister.UnregisterAppInfoSocketFd(fd);
 }
 
 HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_006, TestSize.Level1)
@@ -580,25 +580,25 @@ HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_006, TestSize.Level1)
     for (int32_t i = 0; i < 5; i++) {
         appRegister.RegisterAppInfoforServer(a[i]);
     }
-    appRegister.UnregisterAppInfoBySocketFd(fd);
+    appRegister.UnregisterAppInfoSocketFd(fd);
 }
 
-HWTEST_F(AppRegisterTest, FindSurfaceIdBySocketFd_001, TestSize.Level1)
+HWTEST_F(AppRegisterTest, FindSurfaceIdSocketFd_001, TestSize.Level1)
 {
     AppRegister appReg;
-    appReg.FindBySocketFd(0);
+    appReg.FindSocketFd(0);
 }
 
-HWTEST_F(AppRegisterTest, FindSurfaceIdBySocketFd_002, TestSize.Level1)
+HWTEST_F(AppRegisterTest, FindSurfaceIdSocketFd_002, TestSize.Level1)
 {
     AppRegister appReg;
-    appReg.FindBySocketFd(-100);
+    appReg.FindSocketFd(-100);
 }
 
-HWTEST_F(AppRegisterTest, FindSurfaceIdBySocketFd_003, TestSize.Level1)
+HWTEST_F(AppRegisterTest, FindSurfaceIdSocketFd_003, TestSize.Level1)
 {
     AppRegister appReg;
-    appReg.FindBySocketFd(100);
+    appReg.FindSocketFd(100);
 }
 
 HWTEST_F(AppRegisterTest, KeyEventValueTransformation_001, TestSize.Level1)
@@ -606,7 +606,7 @@ HWTEST_F(AppRegisterTest, KeyEventValueTransformation_001, TestSize.Level1)
     KeyEventValueTransformations valTest = {};
     const int32_t keyValueOfInput = 30;
 
-    valTest = KeyValueTransformationByInput(keyValueOfInput);
+    valTest = KeyValueTransformationInput(keyValueOfInput);
     EXPECT_TRUE(valTest.keyValueOfSys == 2017);
 }
 
@@ -615,7 +615,7 @@ HWTEST_F(AppRegisterTest, KeyEventValueTransformation_002, TestSize.Level1)
     KeyEventValueTransformations valTest = {};
     const int32_t keyValueOfInput = -1;
 
-    valTest = KeyValueTransformationByInput(keyValueOfInput);
+    valTest = KeyValueTransformationInput(keyValueOfInput);
     EXPECT_TRUE(valTest.keyValueOfSys >= 10000);
 }
 

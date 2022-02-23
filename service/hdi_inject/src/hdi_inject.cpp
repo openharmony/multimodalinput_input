@@ -189,7 +189,7 @@ bool HdiInject::ReportHotPlugEvent(uint32_t devIndex, uint32_t status)
         MMI_LOGE("SetDeviceHotStatus error devIndex:%{public}d,status:%{public}d", devIndex, status);
         return false;
     }
-    int32_t devType = GetDevTypeByIndex(devIndex);
+    int32_t devType = GetDevTypeIndex(devIndex);
     if (devType == -1) {
         return false;
     }
@@ -202,7 +202,7 @@ bool HdiInject::ReportHotPlugEvent(uint32_t devIndex, uint32_t status)
     return true;
 }
 
-int32_t HdiInject::GetDevTypeByIndex(int32_t devIndex)
+int32_t HdiInject::GetDevTypeIndex(int32_t devIndex)
 {
     for (const auto &item : deviceArray_) {
         if (item.devIndex == devIndex) {
@@ -212,7 +212,7 @@ int32_t HdiInject::GetDevTypeByIndex(int32_t devIndex)
     return RET_ERR;
 }
 
-int32_t HdiInject::GetDevIndexByType(int32_t devType)
+int32_t HdiInject::GetDevIndexType(int32_t devType)
 {
     vector<DeviceInformation>::iterator iter;
     for (const auto &item : deviceArray_) {
