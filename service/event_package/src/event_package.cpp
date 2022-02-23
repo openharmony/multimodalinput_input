@@ -70,13 +70,9 @@ namespace {
     }
 }
 
-EventPackage::EventPackage()
-{
-}
+EventPackage::EventPackage() {}
 
-EventPackage::~EventPackage()
-{
-}
+EventPackage::~EventPackage() {}
 
 template<class EventType>
 int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& data)

@@ -22,13 +22,9 @@ namespace MMI {
             LOG_CORE, MMI_LOG_DOMAIN, "DeviceRegister"
         };
     }
-DeviceRegister::DeviceRegister()
-{
-}
+DeviceRegister::DeviceRegister() {}
 
-DeviceRegister::~DeviceRegister()
-{
-}
+DeviceRegister::~DeviceRegister() {}
 
 bool DeviceRegister::Init()
 {
