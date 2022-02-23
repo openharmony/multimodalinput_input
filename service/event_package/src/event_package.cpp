@@ -218,7 +218,7 @@ void EventPackage::PackageTabletToolTypeParam(libinput_event *event, EventTablet
             break;
         }
         default: {
-            MMI_LOGW("Unknown type:%{public}d.", libinput_tablet_tool_get_type(tool));
+            MMI_LOGW("Unknown type:%{public}d", libinput_tablet_tool_get_type(tool));
             break;
         }
     }
@@ -278,7 +278,7 @@ void EventPackage::PackageTabletPadOtherParams(libinput_event *event, EventTable
             break;
         }
         default: {
-            MMI_LOGW("Unknown type:%{public}d.", type);
+            MMI_LOGW("Unknown type:%{public}d", type);
             break;
         }
     }
@@ -334,7 +334,7 @@ int32_t EventPackage::PackageTabletPadKeyEvent(libinput_event *event, EventKeybo
             break;
         }
         default: {
-            MMI_LOGW("Unknown type:%{public}d.", type);
+            MMI_LOGW("Unknown type:%{public}d", type);
             break;
         }
     }
