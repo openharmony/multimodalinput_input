@@ -845,33 +845,6 @@ void OHOS::MMI::InputWindowsManager::AdjustCoordinate(double &coordinateX, doubl
     }
 }
 
-void OHOS::MMI::InputWindowsManager::FixCursorPosition(int32_t &globalX, int32_t &globalY,
-                                                       int32_t cursorW, int32_t cursorH)
-{
-    if (globalX < 0) {
-        globalX = 0;
-    }
-
-    if (globalY < 0) {
-        globalY = 0;
-    }
-
-    if (logicalDisplays_.empty()) {
-        MMI_LOGE("logicalDisplays_ is empty");
-        return;
-    }
-
-    int32_t size = 16;
-    int32_t fcursorW = cursorW / size;
-    if ((globalX + fcursorW) > logicalDisplays_[0].width) {
-        globalX = logicalDisplays_[0].width - fcursorW;
-    }
-    int32_t fcursorH = cursorH / size;
-    if ((globalY + fcursorH) > logicalDisplays_[0].height) {
-        globalY = logicalDisplays_[0].height - fcursorH;
-    }
-}
-
 int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
 {
     return RET_ERR;
@@ -898,7 +871,6 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     CHKPR(logicalDisplayInfo, ERROR_NULL_POINTER);
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
-    FixCursorPosition(globalX, globalY, IMAGE_SIZE, IMAGE_SIZE);
     PointerDrawMgr->DrawPointer(displayId, globalX, globalY);
     int32_t action = pointerEvent->GetPointerAction();
     bool isFirstBtnDown = (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN)
