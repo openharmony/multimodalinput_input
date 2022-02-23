@@ -750,10 +750,10 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
     }
 
     InputMonitorServiceMgr.OnMonitorInputEvent(key);
-    NetPacket newPkt(MmiMessageId::ON_KEYEVENT);
-    InputEventDataTransformation::KeyEventToNetPacket(key, newPkt);
-    newPkt << fd << preHandlerTime;
-    if (!udsServer.SendMsg(fd, newPkt)) {
+    NetPacket pkt(MmiMessageId::ON_KEYEVENT);
+    InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
+    pkt << fd << preHandlerTime;
+    if (!udsServer.SendMsg(fd, pkt)) {
         MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
@@ -807,9 +807,9 @@ int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *ev
              key.eventType, key.unicode, key.key, trs.keyEvent.c_str(), key.seat_key_count, key.state, appInfo.fd,
              preHandlerTime);
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, appInfo.fd, key.time, preHandlerTime)) {
-        NetPacket newPkt(MmiMessageId::ON_KEY);
-        newPkt << key << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
-        if (!udsServer.SendMsg(appInfo.fd, newPkt)) {
+        NetPacket pkt(MmiMessageId::ON_KEY);
+        pkt << key << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
+        if (!udsServer.SendMsg(appInfo.fd, pkt)) {
             MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
         }
@@ -868,10 +868,10 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
                  item.GetWidth(), item.GetHeight(), item.GetPressure());
     }
 
-    NetPacket newPkt(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::Marshalling(pointerEvent, newPkt);
-    newPkt << appInfo.fd << preHandlerTime;
-    if (!udsServer.SendMsg(appInfo.fd, newPkt)) {
+    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
+    InputEventDataTransformation::Marshalling(pointerEvent, pkt);
+    pkt << appInfo.fd << preHandlerTime;
+    if (!udsServer.SendMsg(appInfo.fd, pkt)) {
         MMI_LOGE("Sending structure of PointerEvent failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
