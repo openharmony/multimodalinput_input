@@ -86,9 +86,7 @@ OHOS::MMI::SystemEventHandler::SystemEventHandler()
     };
 }
 
-OHOS::MMI::SystemEventHandler::~SystemEventHandler()
-{
-}
+OHOS::MMI::SystemEventHandler::~SystemEventHandler() {}
 
 int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
 {
