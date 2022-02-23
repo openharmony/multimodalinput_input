@@ -97,9 +97,9 @@ bool ServerInputFilterManager::OnKeyEvent(const EventKeyboard& key)
         MMI_LOGD("Send msg id is 0");
         return false;
     }
-    NetPacket newPkt(MmiMessageId::KEY_EVENT_INTERCEPTOR);
-    newPkt << key << id;
-    if (!temp->SendMsg(newPkt)) {
+    NetPacket pkt(MmiMessageId::KEY_EVENT_INTERCEPTOR);
+    pkt << key << id;
+    if (!temp->SendMsg(pkt)) {
         MMI_LOGE("Sending structure of EventKeyboard failed");
         return false;
     }
@@ -382,9 +382,9 @@ bool ServerInputFilterManager::OnPointerEvent(EventPointer event_pointer)
         MMI_LOGD("Send msg id is 0");
         return false;
     }
-    NetPacket newPkt(MmiMessageId::POINTER_EVENT_INTERCEPTOR);
-    newPkt << event_pointer << id;
-    if (!ptr->SendMsg(newPkt)) {
+    NetPacket pkt(MmiMessageId::POINTER_EVENT_INTERCEPTOR);
+    pkt << event_pointer << id;
+    if (!ptr->SendMsg(pkt)) {
         MMI_LOGE("Sending structure of pointer failed");
         return false;
     }
