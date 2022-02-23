@@ -172,7 +172,6 @@ public:
     void TurnTouchScreen(PhysicalDisplayInfo* info, Direction direction,
         int32_t& logicalX, int32_t& logicalY);
     void AdjustCoordinate(double &coordinateX, double &coordinateY);
-    void FixCursorPosition(int32_t &globalX, int32_t &globalY, int32_t cursorW, int32_t cursorH);
 
 private:
     void SetFocusId(int32_t id);
