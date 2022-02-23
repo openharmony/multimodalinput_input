@@ -748,8 +748,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
     if (IsANRProcess(&udsServer, fd, key->GetId()) == TRIGGER_ANR) {
         MMI_LOGE("the key event does not report normally, triggering ANR");
     }
-
-    InputMonitorServiceMgr.OnMonitorInputEvent(key);
+    InputHandlerManagerGlobal::GetInstance().HandleEvent(key);
     NetPacket pkt(MmiMessageId::ON_KEYEVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
     pkt << fd << preHandlerTime;
