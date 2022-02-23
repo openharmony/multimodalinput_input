@@ -35,8 +35,7 @@ namespace OHOS {
 namespace MMI {
 constexpr int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 constexpr int32_t INPUT_UI_TIMEOUT_TIME_MAX = 20 * 1000000;
-constexpr int32_t TRIGGER_ANR = 0;
-constexpr int32_t NOT_TRIGGER_ANR = 1;
+
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
     }
@@ -394,8 +393,9 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         return RET_ERR;
     }
 
-    if (IsANRProcess(udsServer, fd, point->GetId()) == TRIGGER_ANR) {
+    if (IsANRProcess(udsServer, fd, point->GetId())) {
         MMI_LOGE("the pointer event does not report normally, triggering ANR");
+        return RET_ERR;
     }
 
     if (!udsServer->SendMsg(fd, newPacket)) {
@@ -746,8 +746,9 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
              key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
 
-    if (IsANRProcess(&udsServer, fd, key->GetId()) == TRIGGER_ANR) {
+    if (IsANRProcess(&udsServer, fd, key->GetId())) {
         MMI_LOGE("the key event does not report normally, triggering ANR");
+        return RET_ERR;
     }
 
     InputMonitorServiceMgr.OnMonitorInputEvent(key);
@@ -879,20 +880,24 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
     return RET_OK;
 }
 
-int32_t EventDispatch::IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id)
+bool EventDispatch::IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id)
 {
     MMI_LOGD("begin");
     auto session = udsServer->GetSession(fd);
-    CHKPR(session, SESSION_NOT_FOUND);
+    CHKPF(session);
+    if (session->isANRProcess_) {
+        return true;
+    }
     auto currentTime = GetSysClockTime();
     session->AddEvent(id, currentTime);
 
     auto firstTime = session->GetFirstEventTime();
     if (currentTime < (firstTime + INPUT_UI_TIMEOUT_TIME)) {
         MMI_LOGI("the event reports normally");
-        return NOT_TRIGGER_ANR;
+        return false;
     }
 
+    session->isANRProcess_ = true;
     int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
         OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
         "APPLICATION_BLOCK_INPUT",
@@ -904,16 +909,14 @@ int32_t EventDispatch::IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id
         "MSG", "failed to dispatch pointer or key events of multimodalinput");
     if (ret != 0) {
         MMI_LOGE("HiviewDFX Write failed, HiviewDFX errCode: %{public}d", ret);
-        return TRIGGER_ANR;
     }
 
     ret = OHOS::AAFwk::AbilityManagerClient::GetInstance()->SendANRProcessID(session->GetPid());
     if (ret != 0) {
         MMI_LOGE("AAFwk SendANRProcessID failed, AAFwk errCode: %{public}d", ret);
-        return TRIGGER_ANR;
     }
     MMI_LOGD("end");
-    return TRIGGER_ANR;
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS
