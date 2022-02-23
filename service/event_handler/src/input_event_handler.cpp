@@ -46,9 +46,7 @@ InputEventHandler::InputEventHandler()
     notifyDeviceChange_ = nullptr;
 }
 
-InputEventHandler::~InputEventHandler()
-{
-}
+InputEventHandler::~InputEventHandler() {}
 
 bool InputEventHandler::Init(UDSServer& udsServer)
 {

@@ -44,9 +44,7 @@ RegisterEvent::RegisterEvent()
     key_ = {};
 }
 
-RegisterEvent::~RegisterEvent()
-{
-}
+RegisterEvent::~RegisterEvent() {}
 
 void RegisterEvent::OnEventKeyGetSign(const EventKeyboard& key, MmiMessageId& msg, EventKeyboard& prevKey)
 {
