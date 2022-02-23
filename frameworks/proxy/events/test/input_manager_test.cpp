@@ -100,7 +100,7 @@ RunShellUtil InputManagerTest::runCommand_ { };
 
 int64_t InputManagerTest::GetNanoTime()
 {
-    timespec time = { 0 };
+    struct timespec time = { 0 };
     clock_gettime(CLOCK_MONOTONIC, &time);
     return static_cast<int64_t>(time.tv_sec) * SEC_TO_NANOSEC + time.tv_nsec;
 }

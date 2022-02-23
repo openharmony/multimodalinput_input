@@ -43,7 +43,7 @@ int32_t UDSClient::ConnectTo()
     }
     SetBlockMode(fd_); // 设置非阻塞模式
 
-    epoll_event ev;
+    struct epoll_event ev;
     ev.events = EPOLLIN;
     ev.data.fd = fd_;
     CHKR(EpollCtl(fd_, EPOLL_CTL_ADD, ev) >= 0, EPOLL_CREATE_FAIL, RET_ERR);
@@ -115,7 +115,7 @@ void UDSClient::Stop()
     MMI_LOGD("enter");
     Close();
     isRunning_ = false;
-    epoll_event ev = {};
+    struct epoll_event ev = {};
     if (fd_ >= 0) {
         EpollCtl(fd_, EPOLL_CTL_DEL, ev);
     }
@@ -150,13 +150,13 @@ void UDSClient::OnRecv(const char *buf, size_t size)
     }
 }
 
-void UDSClient::OnEvent(const epoll_event& ev, StreamBuffer& buf)
+void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
 {
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
         MMI_LOGI("ev.events:0x%{public}x,fd:%{public}d same as fd_:%{public}d", ev.events, fd, fd_);
         OnDisconnected();
-        epoll_event event = {};
+        struct epoll_event event = {};
         EpollCtl(fd, EPOLL_CTL_DEL, event);
         close(fd);
         fd_ = -1;
@@ -197,7 +197,7 @@ void UDSClient::OnThread(std::promise<bool>& threadPromise)
     SetThreadName("uds_client");
     isThreadHadRun_ = true;
     StreamBuffer streamBuf;
-    epoll_event events[MAX_EVENT_SIZE] = {};
+    struct epoll_event events[MAX_EVENT_SIZE] = {};
 
     while (isRunning_) {
         if (isConnected_) {

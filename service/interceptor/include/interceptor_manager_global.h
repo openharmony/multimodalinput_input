@@ -38,7 +38,7 @@ private:
         int32_t sourceType;
         int32_t id;
         SessionPtr session;
-        bool operator == (const struct InterceptorItem& item)
+        bool operator == (const InterceptorItem& item)
         {
             return id == item.id;
         }
