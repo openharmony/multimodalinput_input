@@ -38,7 +38,7 @@ void InputDeviceImpl::GetInputDeviceIdsAsync(std::function<void(std::vector<int3
         MMI_LOGE("the idsUD_ exceeded the upper limit");
         return;
     }
-    ++idsUD_;
+    idsUD_++;
     MMI_LOGD("end");
 }
 
@@ -53,7 +53,7 @@ void InputDeviceImpl::GetInputDeviceAsync(int32_t deviceId,
         MMI_LOGE("the inputDeviceUD_ exceeded the upper limit");
         return;
     }
-    ++inputDeviceUD_;
+    inputDeviceUD_++;
     MMI_LOGD("end");
 }
 

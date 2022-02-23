@@ -69,7 +69,7 @@ void JsEventTarget::CallIdsAsyncWork(napi_env env, napi_status status, void* dat
             MMI_LOGE("call to napi_set_element failed");
             return;
         }
-        ++index;
+        index++;
     }
     delete cb;
     cb = nullptr;
@@ -347,7 +347,7 @@ void JsEventTarget::CallIdsPromiseWork(napi_env env, napi_status status, void* d
             MMI_LOGE("call to napi_set_element failed");
             return;
         }
-        ++index;
+        index++;
     }
     delete cb;
     cb = nullptr;
