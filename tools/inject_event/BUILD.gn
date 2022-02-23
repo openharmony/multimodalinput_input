@@ -17,11 +17,8 @@ import("//build/test.gni")
 SUBSYSTEM_DIR = "//foundation/multimodalinput"
 SUBSYSTEM_FRAMEWORKS_DIR = "//foundation/multimodalinput/input/frameworks"
 
-ohos_executable("input") {
-  sources = [
-    "src/input_manager_command.cpp",
-    "src/main.cpp",
-  ]
+ohos_shared_library("input-manager") {
+  sources = [ "src/input_manager_command.cpp" ]
 
   include_dirs = [
     "include",
@@ -36,6 +33,28 @@ ohos_executable("input") {
     "$SUBSYSTEM_FRAMEWORKS_DIR/proxy:libmmi-client",
     "$SUBSYSTEM_FRAMEWORKS_DIR/util:libmmi-util",
   ]
+
+  external_deps = [
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+  ]
+  subsystem_name = "multimodalinput"
+  part_name = "multimodalinput_base"
+}
+
+ohos_executable("input") {
+  sources = [ "src/main.cpp" ]
+
+  include_dirs = [
+    "include",
+    "$SUBSYSTEM_FRAMEWORKS_DIR/test/tools/inject_event/include",
+    "out/ohos-arm-release/innerkits/ohos-arm/utils_base/utils/include/include/string_ex.h",
+    "$SUBSYSTEM_DIR/interfaces/native/innerkits/multimodalinput_proxy/include",
+  ]
+
+  cflags = [ "-DOHOS_BUILD" ]
+
+  deps = [ "$SUBSYSTEM_DIR/input/tools/inject_event:input-manager" ]
 
   external_deps = [
     "ipc:ipc_core",
