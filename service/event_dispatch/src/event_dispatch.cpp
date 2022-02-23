@@ -677,7 +677,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
 {
     MMI_LOGD("begin");
     CHKPR(key, PARAM_INPUT_INVALID);
-    if (!key->HasBit(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
+    if (!key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         if (InterceptorMgrGbl.OnKeyEvent(key)) {
             MMI_LOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
                 key->GetKeyCode());
@@ -709,17 +709,17 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
              key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
              key->GetActionStartTime(),
              key->GetEventType(),
-             key->GetBit(), key->GetKeyAction(), fd, preHandlerTime);
+             key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
 
     if (IsANRProcess(&udsServer, fd, key->GetId()) == TRIGGER_ANR) {
         MMI_LOGE("the key event does not report normally, triggering ANR");
     }
 
     InputMonitorServiceMgr.OnMonitorInputEvent(key);
-    NetPacket newPkt(MmiMessageId::ON_KEYEVENT);
-    InputEventDataTransformation::KeyEventToNetPacket(key, newPkt);
-    newPkt << fd << preHandlerTime;
-    if (!udsServer.SendMsg(fd, newPkt)) {
+    NetPacket pkt(MmiMessageId::ON_KEYEVENT);
+    InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
+    pkt << fd << preHandlerTime;
+    if (!udsServer.SendMsg(fd, pkt)) {
         MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
@@ -773,9 +773,9 @@ int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, struct libinput_ev
              key.eventType, key.unicode, key.key, trs.keyEvent.c_str(), key.seat_key_count, key.state, appInfo.fd,
              preHandlerTime);
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, appInfo.fd, key.time, preHandlerTime)) {
-        NetPacket newPkt(MmiMessageId::ON_KEY);
-        newPkt << key << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
-        if (!udsServer.SendMsg(appInfo.fd, newPkt)) {
+        NetPacket pkt(MmiMessageId::ON_KEY);
+        pkt << key << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
+        if (!udsServer.SendMsg(appInfo.fd, pkt)) {
             MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
         }
@@ -816,7 +816,7 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, struct libi
              "pointerCount:%{public}zu",
              pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
-             pointerEvent->GetBit(), pointerEvent->GetPointerAction(),
+             pointerEvent->GetFlag(), pointerEvent->GetPointerAction(),
              pointerEvent->GetSourceType(),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
@@ -834,10 +834,10 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, struct libi
                  item.GetWidth(), item.GetHeight(), item.GetPressure());
     }
 
-    NetPacket newPkt(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::Marshalling(pointerEvent, newPkt);
-    newPkt << appInfo.fd << preHandlerTime;
-    if (!udsServer.SendMsg(appInfo.fd, newPkt)) {
+    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
+    InputEventDataTransformation::Marshalling(pointerEvent, pkt);
+    pkt << appInfo.fd << preHandlerTime;
+    if (!udsServer.SendMsg(appInfo.fd, pkt)) {
         MMI_LOGE("Sending structure of PointerEvent failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }

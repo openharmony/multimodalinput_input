@@ -120,14 +120,6 @@ public:
     int32_t GetEventType() const;
     const char* DumpEventType() const;
 
-    uint32_t GetBit() const;
-
-    bool HasBit(uint32_t bit);
-
-    void SetBit(uint32_t bit);
-
-    void ClearBit();
-
     uint32_t GetFlag() const;
 
     bool HasFlag(uint32_t flag);
@@ -168,7 +160,6 @@ protected:
     int32_t targetWindowId_;
     int32_t agentWindowId_;
     uint32_t bitwise_;
-    uint32_t flag_;
     std::function<void(int32_t)> processedCallback_;
 };
 } // namespace MMI

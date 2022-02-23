@@ -698,7 +698,7 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
              "VerticalAxisValue:%{public}f,HorizontalAxisValue:%{public}f,pointerCount:%{public}zu",
              pointerEvent->DumpEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
-             pointerEvent->GetBit(), pointerEvent->DumpPointerAction(),
+             pointerEvent->GetFlag(), pointerEvent->DumpPointerAction(),
              pointerEvent->DumpSourceType(),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),

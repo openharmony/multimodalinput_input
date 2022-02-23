@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "mmi_service.h"
 #include "mmi_interface.h"
+#include "mmi_service.h"
 
 namespace OHOS {
 namespace MMI {
