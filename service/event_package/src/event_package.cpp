@@ -551,7 +551,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
     CHKPR(event, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
-        MMI_LOGT("This touch event is canceled type:%{public}d", type);
+        MMI_LOGD("This touch event is canceled type:%{public}d", type);
         return UNKNOWN_EVENT_PKG_FAIL;
     }
     auto ret = PackageEventDeviceInfo<EventTouch>(event, touch);

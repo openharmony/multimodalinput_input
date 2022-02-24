@@ -61,19 +61,19 @@ bool OuterInterface::SystemEventHandler(const KeyEventValueTransformations& trs,
 {
     switch (systemEventAttr) {
         case MMI_SYSTEM_SERVICE: {
-            MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
+            MMI_LOGD("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "%{public}s is SystemKey, Dispatch to System Module",
                      trs.keyValueOfSys, state, trs.keyEvent.c_str());
             break;
         }
         case MMI_SYSTEM_SERVICE_AND_APP: {
-            MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
+            MMI_LOGD("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "%{public}s is SystemKey, Dispatch to System Module. System Module return false",
                      trs.keyValueOfSys, state, trs.keyEvent.c_str());
             break;
         }
         case MMI_CAMERA_APP: {
-            MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
+            MMI_LOGD("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "KEY_CAMERA is SystemKey, Dispatch to Camera Module",
                      trs.keyValueOfSys, state);
             break;
@@ -90,19 +90,19 @@ bool OuterInterface::DistributedEventHandler(const KeyEventValueTransformations&
 {
     switch (systemEventAttr) {
         case MMI_SYSTEM_SERVICE: {
-            MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
+            MMI_LOGD("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "%{public}s is SystemKey, Dispatch to Distributed System",
                      trs.keyValueOfSys, state, trs.keyEvent.c_str());
             break;
         }
         case MMI_SYSTEM_SERVICE_AND_APP: {
-            MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
+            MMI_LOGD("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "%{public}s is SystemKey, Dispatch to Distributed System. Distributed System return false",
                      trs.keyValueOfSys, state, trs.keyEvent.c_str());
             break;
         }
         case MMI_CAMERA_APP: {
-            MMI_LOGT("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
+            MMI_LOGD("Event dispatcher of server:Key:%{public}d,state:%{public}d,sourceType=300,"
                      "KEY_CAMERA is SystemKey, Dispatch to Distributed System",
                      trs.keyValueOfSys, state);
             break;
