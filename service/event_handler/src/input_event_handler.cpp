@@ -286,10 +286,12 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
 
     int32_t focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
+        MMI_LOGW("Failed to get the focus window");
         return RET_OK; // DeviceAdded event will be discarded if focusId < 0
     }
     auto appInfo = AppRegs->FindWinId(focusId);
     if (appInfo.fd == RET_ERR) {
+        MMI_LOGW("Failed to obtain AppInfo, desWindow:%{public}d", focusId);
         return RET_OK; // DeviceAdded event will be discarded if appInfo.fd == RET_ERR
     }
     NetPacket newPacket(MmiMessageId::ON_DEVICE_ADDED);
@@ -324,10 +326,12 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
 
     int32_t focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
+        MMI_LOGW("Failed to get the focus window");
         return RET_OK; // DeviceRemoved event will be discarded if focusId < 0
     }
     auto appInfo = AppRegs->FindWinId(focusId);
     if (appInfo.fd == RET_ERR) {
+        MMI_LOGW("Failed to obtain AppInfo, desWindow:%{public}d", focusId);
         return RET_OK; // DeviceRemoved event will be discarded if appInfo.fd == RET_ERR
     }
     NetPacket newPacket(MmiMessageId::ON_DEVICE_REMOVED);
@@ -628,6 +632,7 @@ int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 
     auto point = TouchTransformPointManger->OnLibinputTouchPadEvent(event);
     if (point == nullptr) {
+        MMI_LOGW("PointerEvent is null");
         return RET_OK;
     }
     eventDispatch_.HandlePointerEvent(point);
