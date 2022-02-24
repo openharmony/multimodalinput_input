@@ -48,6 +48,7 @@ void InputMonitor::Stop()
     MMI_LOGD("Enter");
     std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
+        MMI_LOGE("Invalid values");
         return;
     }
     InputMgr->RemoveMonitor(monitorId_);
@@ -103,6 +104,7 @@ void InputMonitor::MarkConsumed(int32_t eventId)
         return;
     }
     if (monitorId_ < 0) {
+        MMI_LOGE("Invalid values");
         return;
     }
     InputMgr->MarkConsumed(monitorId_, eventId);
