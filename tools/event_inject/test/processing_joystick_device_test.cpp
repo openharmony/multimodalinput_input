@@ -33,12 +33,12 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJsonDataToInputData, TestSi
 {
 #ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformJoyStickJsonDataToInputData.json";
-    string startDeviceCmd = "hosmmi-virtual-device-manager start joystick & ";
-    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+    string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
+    string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
     const string path = "temp/Test_TransformJoyStickJsonDataToInputData.json";
-    string startDeviceCmd = "./hosmmi-virtual-deviced.out start joystick &";
-    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+    string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
+    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -57,12 +57,12 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindEvents.json";
-    string startDeviceCmd = "hosmmi-virtual-device-manager start joystick & ";
-    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+    string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
+    string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
     const string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindEvents.json";
-    string startDeviceCmd = "./hosmmi-virtual-deviced.out start joystick &";
-    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+    string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
+    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -81,12 +81,12 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataEventsIsEmpty.json";
-    string startDeviceCmd = "hosmmi-virtual-device-manager start joystick & ";
-    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+    string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
+    string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
     const string path = "temp/Test_TransformJoyStickJsonDataToInputDataEventsIsEmpty.json";
-    string startDeviceCmd = "./hosmmi-virtual-deviced.out start joystick &";
-    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+    string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
+    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -105,12 +105,12 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindKeyValue.json";
-    string startDeviceCmd = "hosmmi-virtual-device-manager start joystick & ";
-    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+    string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
+    string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
     const string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindKeyValue.json";
-    string startDeviceCmd = "./hosmmi-virtual-deviced.out start joystick &";
-    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+    string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
+    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -129,12 +129,12 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindKeyValueInThro.json";
-    string startDeviceCmd = "hosmmi-virtual-device-manager start joystick & ";
-    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+    string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
+    string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
     const string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindKeyValueInThro.json";
-    string startDeviceCmd = "./hosmmi-virtual-deviced.out start joystick &";
-    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+    string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
+    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -153,12 +153,12 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindEventInRocker.json";
-    string startDeviceCmd = "hosmmi-virtual-device-manager start joystick & ";
-    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+    string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
+    string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
     const string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindEventInRocker.json";
-    string startDeviceCmd = "./hosmmi-virtual-deviced.out start joystick &";
-    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+    string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
+    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -178,12 +178,12 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInRocker.json";
-    string startDeviceCmd = "hosmmi-virtual-device-manager start joystick & ";
-    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+    string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
+    string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
     const string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInRocker.json";
-    string startDeviceCmd = "./hosmmi-virtual-deviced.out start joystick &";
-    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+    string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
+    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -203,12 +203,12 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInDirectionKey.json";
-    string startDeviceCmd = "hosmmi-virtual-device-manager start joystick & ";
-    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+    string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
+    string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
     const string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInDirectionKey.json";
-    string startDeviceCmd = "./hosmmi-virtual-deviced.out start joystick &";
-    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+    string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
+    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -227,12 +227,12 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindAnyEventType.json";
-    string startDeviceCmd = "hosmmi-virtual-device-manager start joystick & ";
-    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+    string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
+    string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
     const string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindAnyEventType.json";
-    string startDeviceCmd = "./hosmmi-virtual-deviced.out start joystick &";
-    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+    string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
+    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -251,12 +251,12 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataHasBlockTime.json";
-    string startDeviceCmd = "hosmmi-virtual-device-manager start joystick & ";
-    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+    string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
+    string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
     const string path = "temp/Test_TransformJoyStickJsonDataToInputDataHasBlockTime.json";
-    string startDeviceCmd = "./hosmmi-virtual-deviced.out start joystick &";
-    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+    string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
+    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));

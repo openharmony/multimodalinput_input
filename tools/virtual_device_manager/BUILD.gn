@@ -114,8 +114,8 @@ ohos_shared_library("libmmi-virtual-device") {
   part_name = "multimodalinput_base"
 }
 
-ohos_executable("hosmmi-virtual-device-manager") {
-  sources = [ "src/hosmmi_virtual_device_main.cpp" ]
+ohos_executable("mmi-virtual-device-manager") {
+  sources = [ "src/mmi_virtual_device_main.cpp" ]
   deps = [ "//foundation/multimodalinput/input/tools/virtual_device_manager:libmmi-virtual-device" ]
 
   if (is_mmi_have_libinput) {

@@ -14,12 +14,12 @@
  */
 
 #include "mmi_interface.h"
-#include "mmi_server.h"
+#include "mmi_service.h"
 
 namespace OHOS {
 namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MmiServerDemo" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MmiServiceDemo" };
     }
 }
 }
@@ -30,18 +30,16 @@ int32_t main(int32_t argc, const char *argv[])
 #ifdef OHOS_BUILD_MMI_DEBUG
     VerifyLogManagerRun();
 #endif
-
-#ifdef OHOS_WESTEN_MODEL
-    StartMmiServer();
-#endif
-
-#ifdef DEBUG_CODE_TEST
-    SetMmiServerWorking();
-    while (IsMmiServerWorking()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+    auto service = OHOS::DelayedSingleton<MMIService>::GetInstance();
+    service->OnStart();
+    constexpr int32_t sleepTime = 10 * 60;
+    while (1) {
+        std::this_thread::sleep_for(std::chrono::seconds(sleepTime));
+        
     }
-#endif
+    service->OnStop();
+    service->OnDump();
 
-    MMI_LOGD("hosmmi-server stopping. argc:%{public}d, argv:%{public}s", argc, argv[0]);
+    MMI_LOGD("mmi-service stopping. argc:%{public}d, argv:%{public}s", argc, argv[0]);
     return RET_OK;
 }

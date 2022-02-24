@@ -101,14 +101,14 @@ public:
         virtualDeviceManagerPid_ = fork();
         EXPECT_TRUE(virtualDeviceManagerPid_ >= 0);
         if (virtualDeviceManagerPid_ == 0) {
-            execl(DEF_MMI_VIRTUAL_DEVICE_MANAGER, "hosmmi-virtual-device-manager", "start",
+            execl(DEF_MMI_VIRTUAL_DEVICE_MANAGER, "mmi-virtual-device-manager", "start",
                   currentArgsName_.c_str(), nullptr);
         } else {
             usleep(delayTime);
             LibinputDrainEvents(input_);
             eventinjectionPid_ = fork();
             if (eventinjectionPid_ == 0) {
-                execl(DEF_MMI_EVENT_INJECTION, "hosmmi-event-injection", "json", currentJsonName_.c_str(), nullptr);
+                execl(DEF_MMI_EVENT_INJECTION, "mmi-event-injection", "json", currentJsonName_.c_str(), nullptr);
             } else {
                 waitpid(eventinjectionPid_, nullptr, 0);
                 EXPECT_EQ(libinput_dispatch(input_), 0);
