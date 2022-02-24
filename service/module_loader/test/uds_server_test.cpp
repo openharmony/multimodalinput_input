@@ -67,10 +67,10 @@ HWTEST_F(UDSServerTest, Init_002, TestSize.Level1)
 
 HWTEST_F(UDSServerTest, SendMsg_001, TestSize.Level1)
 {
-    int32_t fd = 1000;
     MmiMessageId msgId = MmiMessageId::INVALID;
     NetPacket newPacket(msgId);
 
+    int32_t fd = 1000;
     UDSServer serObj;
     bool retResult = serObj.SendMsg(fd, newPacket);
     EXPECT_FALSE(retResult);
@@ -78,10 +78,10 @@ HWTEST_F(UDSServerTest, SendMsg_001, TestSize.Level1)
 
 HWTEST_F(UDSServerTest, SendMsg_002, TestSize.Level1)
 {
-    int32_t fd = -1001;
     MmiMessageId msgId = MmiMessageId::INVALID;
     NetPacket newPacket(msgId);
 
+    int32_t fd = -1001;
     UDSServer serObj;
     bool retResult = serObj.SendMsg(fd, newPacket);
     ASSERT_FALSE(retResult);
@@ -89,10 +89,10 @@ HWTEST_F(UDSServerTest, SendMsg_002, TestSize.Level1)
 
 HWTEST_F(UDSServerTest, SendMsg_003, TestSize.Level1)
 {
-    int32_t fd = 3333;
     MmiMessageId msgId = MmiMessageId::BEGIN;
     NetPacket newPacket(msgId);
 
+    int32_t fd = 3333;
     UDSServer serObj;
     bool retResult = serObj.SendMsg(fd, newPacket);
     ASSERT_FALSE(retResult);

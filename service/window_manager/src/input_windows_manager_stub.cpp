@@ -39,11 +39,11 @@ struct SeatInfo** GetSeatsInfo()
 {
     MMI_LOGD("Enter");
     constexpr int32_t TEST_VAL = 2;
-    constexpr int32_t TEST_SEATNAME_SIZE = 32;
     auto setInfo = static_cast<SeatInfo**>(malloc(sizeof(SeatInfo*) * TEST_VAL));
     CHKF(setInfo, OHOS::MALLOC_FAIL);
     setInfo[0] = static_cast<SeatInfo*>(malloc(sizeof(SeatInfo)));
     CHKF(setInfo[0], OHOS::MALLOC_FAIL);
+    constexpr int32_t TEST_SEATNAME_SIZE = 32;
     setInfo[0]->seatName = (char*)malloc(TEST_SEATNAME_SIZE);
     CHKF(setInfo[0]->seatName, OHOS::MALLOC_FAIL);
     int32_t ret = strcpy_s(setInfo[0]->seatName, TEST_SEATNAME_SIZE, "seat0");
