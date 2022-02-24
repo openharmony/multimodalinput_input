@@ -63,7 +63,7 @@ public:
 #if BINDER_TODO
 HWTEST_F(UDSClientTest, ConnectTo_02, TestSize.Level1)
 {
-    int retResult;
+    int32_t retResult;
     const char *path = "1234";
     bool isBind = false;
 
@@ -74,7 +74,7 @@ HWTEST_F(UDSClientTest, ConnectTo_02, TestSize.Level1)
 
 HWTEST_F(UDSClientTest, ConnectTo_03, TestSize.Level1)
 {
-    int retResult;
+    int32_t retResult;
     const char *path = "568*";
     bool isBind = true;
 
@@ -85,7 +85,7 @@ HWTEST_F(UDSClientTest, ConnectTo_03, TestSize.Level1)
 
 HWTEST_F(UDSClientTest, ConnectTo_04, TestSize.Level1)
 {
-    int retResult;
+    int32_t retResult;
     const char *path = "./";
     bool isBind = true;
 

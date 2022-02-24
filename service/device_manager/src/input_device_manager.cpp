@@ -52,11 +52,11 @@ void InputDeviceManager::GetInputDeviceIdsAsync(std::function<void(std::vector<i
     });
 }
 
-void InputDeviceManager::FindInputDeviceByIdAsync(int32_t deviceId,
+void InputDeviceManager::FindInputDeviceIdAsync(int32_t deviceId,
     std::function<void(std::shared_ptr<InputDevice>)> callback)
 {
     MMIMsgPost.RunOnWestonThread([this, deviceId, callback](weston_compositor* wc) {
-        auto device = FindInputDeviceByIdSync(deviceId, wc);
+        auto device = FindInputDeviceIdSync(deviceId, wc);
         callback(device);
     });
 }
@@ -73,7 +73,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIdsSync(weston_compositor
     return ids;
 }
 
-std::shared_ptr<InputDevice> InputDeviceManager::FindInputDeviceByIdSync(int32_t deviceId, weston_compositor* wc)
+std::shared_ptr<InputDevice> InputDeviceManager::FindInputDeviceIdSync(int32_t deviceId, weston_compositor* wc)
 {
     MMI_LOGD("begin");
     Init(wc);
@@ -216,8 +216,7 @@ int32_t InputDeviceManager::FindInputDeviceId(libinput_device* inputDevice)
             return item.first;
         }
     }
-    MMI_LOGI("find input device id failed");
-    MMI_LOGD("end");
+    MMI_LOGE("find input device id failed");
     return INVALID_DEVICE_ID;
 }
 } // namespace MMI

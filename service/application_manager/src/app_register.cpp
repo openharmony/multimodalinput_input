@@ -26,13 +26,9 @@ constexpr int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 constexpr int32_t INPUT_NUI_TIMEOUT_TIME = 10 * 1000000;
 constexpr int32_t WAIT_QUEUE_EVENTS_MAX = 128;
 #endif
-AppRegister::AppRegister()
-{
-}
+AppRegister::AppRegister() {}
 
-AppRegister::~AppRegister()
-{
-}
+AppRegister::~AppRegister() {}
 
 bool AppRegister::Init(UDSServer& udsServer)
 {
@@ -46,7 +42,7 @@ bool AppRegister::Init(UDSServer& udsServer)
     return true;
 }
 
-const AppInfo& AppRegister::FindByWinId(int32_t windowId)
+const AppInfo& AppRegister::FindWinId(int32_t windowId)
 {
     std::lock_guard<std::mutex> lock(mu_);
     auto it = surfaceInfo_.find(windowId);
@@ -56,7 +52,7 @@ const AppInfo& AppRegister::FindByWinId(int32_t windowId)
     return AppRegister::appInfoError_;
 }
 
-const AppInfo& AppRegister::FindBySocketFd(int32_t fd)
+const AppInfo& AppRegister::FindSocketFd(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
     CHKR(fd >= 0, PARAM_INPUT_INVALID, appInfoError_);
@@ -75,21 +71,21 @@ void AppRegister::RegisterAppInfoforServer(const AppInfo& appInfo)
     AddId(fds_, appInfo.fd);
 }
 
-void AppRegister::UnregisterAppInfoBySocketFd(int32_t fd)
+void AppRegister::UnregisterAppInfoSocketFd(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
     CHK(fd >= 0, PARAM_INPUT_INVALID);
-    UnregisterBySocketFd(fd);
+    UnregisterSocketFd(fd);
 }
 
-void AppRegister::UnregisterBySocketFd(int32_t fd)
+void AppRegister::UnregisterSocketFd(int32_t fd)
 {
     auto it = surfaceInfo_.begin();
     while (it != surfaceInfo_.end()) {
         if (it->second.fd == fd) {
             it = surfaceInfo_.erase(it);
         } else {
-            it++;
+            ++it;
         }
     }
 }
@@ -213,7 +209,7 @@ bool AppRegister::CheckConnectionIsDead(const int32_t findFd)
 
 bool AppRegister::CheckWaitQueueBlock(ssize_t currentTime, ssize_t timeOut, const int32_t findFd)
 {
-    for (auto iter = waitQueue_.begin(); iter != waitQueue_.end(); iter++) {
+    for (auto iter = waitQueue_.begin(); iter != waitQueue_.end(); ++iter) {
         if (findFd == iter->fd) {
             if (currentTime >= (iter->serverTime + timeOut)) {
                 MMI_LOGE("IsMultimodeInputReady: The wait queue is blocked! fd:%{public}d,idMsg:%{public}d,"
@@ -230,7 +226,7 @@ void AppRegister::DeleteEventFromWaitQueue(int32_t fd, int32_t idMsg)
 {
     std::lock_guard<std::mutex> lock(mu_);
     CHK(fd >= 0, PARAM_INPUT_INVALID);
-    for (auto iter = waitQueue_.begin(); iter != waitQueue_.end(); iter++) {
+    for (auto iter = waitQueue_.begin(); iter != waitQueue_.end(); ++iter) {
         if ((iter->event == idMsg) && (iter->fd == fd)) {
             waitQueue_.erase(iter);
             break;

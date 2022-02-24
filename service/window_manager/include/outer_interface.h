@@ -37,7 +37,7 @@ public:
         const int16_t systemEventAttr);
     static int32_t IsFocusChange(int32_t srcSurfaceId, int32_t desSurfaceId);
     static int32_t notifyFocusChange(int32_t abilityId, int32_t windowId);
-    static int32_t GetSystemEventAttrByKeyValue(const int16_t keyValueOfSys);
+    static int32_t GetSystemEventAttrKeyValue(const int16_t keyValueOfSys);
 };
 } // namespace MMI
 } // namespace OHOS

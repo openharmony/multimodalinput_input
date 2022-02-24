@@ -115,7 +115,7 @@ bool OHOS::MMI::VirtualDevice::SyncSymbolFile()
             fgets(temp, sizeof(temp), cmdName);
             pclose(cmdName);
             processName.append(temp);
-            if (processName.find("hosmmi-virtual-device") == processName.npos) {
+            if (processName.find("mmi-virtual-device") == processName.npos) {
                 std::string removeFile = "find /data/symbol/ -name " + item + "* | xargs rm";
                 system(removeFile.c_str());
             }
@@ -436,7 +436,7 @@ bool OHOS::MMI::VirtualDevice::CloseDevice(const std::vector<std::string>& fileL
     if (!result) {
         return false;
     } else {
-        if (closePid.find("all") == 0) {
+        if (closePid.compare("all_") == 0) {
             CloseAllDevice(alldevice);
             return true;
         }

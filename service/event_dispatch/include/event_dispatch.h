@@ -39,7 +39,7 @@ public:
         const uint64_t preHandlerTime);
     int32_t DispatchKeyEvent(UDSServer& udsServer, libinput_event *event, const KeyEventValueTransformations& trs,
         EventKeyboard& key, const uint64_t preHandlerTime);
-    int32_t DispatchKeyEventByPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key,
+    int32_t DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key,
         const uint64_t preHandlerTime);
     int32_t DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
         const EventTouch& touch, const uint64_t preHandlerTime);
@@ -68,8 +68,7 @@ protected:
         libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime);
     bool IsANRProcess(int64_t time, SessionPtr ss);
 
-protected:
-    int32_t touchDownFocusSurfaceId_ = 0;
+private:
     EventPackage eventPackage_;
     StandardEventHandler standardEvent_;
     /*

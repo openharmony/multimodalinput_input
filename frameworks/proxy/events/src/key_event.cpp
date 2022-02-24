@@ -510,8 +510,7 @@ KeyEvent::KeyEvent(const KeyEvent& other)
     : InputEvent(other),
     keyCode_(other.keyCode_),
     keys_(other.keys_),
-    keyAction_(other.keyAction_)
-{}
+    keyAction_(other.keyAction_) {}
 
 KeyEvent::~KeyEvent() {}
 
@@ -1415,7 +1414,7 @@ bool KeyEvent::IsValidKeyItem() const
     int32_t keyCode = GetKeyCode();
     int32_t action = GetKeyAction();
     
-    for (auto it = keys_.begin(); it != keys_.end(); it++) {
+    for (auto it = keys_.begin(); it != keys_.end(); ++it) {
         if (it->GetKeyCode() <= KEYCODE_UNKNOWN) {
             HiLog::Error(LABEL, "keyCode is invalid");
             return false;
@@ -1521,7 +1520,7 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
     if (keysSize < 0) {
         return false;
     }
-    for (int32_t i = 0; i < keysSize; ++i) {
+    for (int32_t i = 0; i < keysSize; i++) {
         KeyItem val = {};
         if (!val.ReadFromParcel(in)) {
             return false;

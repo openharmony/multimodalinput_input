@@ -70,13 +70,9 @@ namespace {
     }
 }
 
-EventPackage::EventPackage()
-{
-}
+EventPackage::EventPackage() {}
 
-EventPackage::~EventPackage()
-{
-}
+EventPackage::~EventPackage() {}
 
 template<class EventType>
 int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& data)
@@ -218,6 +214,7 @@ void EventPackage::PackageTabletToolTypeParam(libinput_event *event, EventTablet
             break;
         }
         default: {
+            MMI_LOGW("Unknown type:%{public}d", libinput_tablet_tool_get_type(tool));
             break;
         }
     }
@@ -277,6 +274,7 @@ void EventPackage::PackageTabletPadOtherParams(libinput_event *event, EventTable
             break;
         }
         default: {
+            MMI_LOGW("Unknown type:%{public}d", type);
             break;
         }
     }
@@ -332,6 +330,7 @@ int32_t EventPackage::PackageTabletPadKeyEvent(libinput_event *event, EventKeybo
             break;
         }
         default: {
+            MMI_LOGW("Unknown type:%{public}d", type);
             break;
         }
     }
@@ -366,7 +365,7 @@ int32_t EventPackage::PackageJoyStickKeyEvent(libinput_event *event, EventKeyboa
     return RET_OK;
 }
 
-int32_t EventPackage::PackagePointerEventByMotion(libinput_event *event, EventPointer& point)
+int32_t EventPackage::PackagePointerEventMotion(libinput_event *event, EventPointer& point)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_pointer_event(event);
@@ -380,7 +379,7 @@ int32_t EventPackage::PackagePointerEventByMotion(libinput_event *event, EventPo
     return RET_OK;
 }
 
-int32_t EventPackage::PackagePointerEventByMotionAbs(libinput_event *event, EventPointer& point)
+int32_t EventPackage::PackagePointerEventMotionAbs(libinput_event *event, EventPointer& point)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_pointer_event(event);
@@ -394,7 +393,7 @@ int32_t EventPackage::PackagePointerEventByMotionAbs(libinput_event *event, Even
     return RET_OK;
 }
 
-int32_t EventPackage::PackagePointerEventByButton(libinput_event *event, EventPointer& point)
+int32_t EventPackage::PackagePointerEventButton(libinput_event *event, EventPointer& point)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_pointer_event(event);
@@ -418,7 +417,7 @@ int32_t EventPackage::PackagePointerEventByButton(libinput_event *event, EventPo
     return RET_OK;
 }
 
-int32_t EventPackage::PackagePointerEventByAxis(libinput_event *event, EventPointer& point)
+int32_t EventPackage::PackagePointerEventAxis(libinput_event *event, EventPointer& point)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_pointer_event(event);
@@ -505,7 +504,7 @@ int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event, EventJoySt
     return RET_OK;
 }
 
-void EventPackage::PackageTouchEventByType(int32_t type, libinput_event_touch *data, EventTouch& touch)
+void EventPackage::PackageTouchEventType(int32_t type, libinput_event_touch *data, EventTouch& touch)
 {
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
@@ -521,7 +520,7 @@ void EventPackage::PackageTouchEventByType(int32_t type, libinput_event_touch *d
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
 #ifdef OHOS_WESTEN_MODEL
-            MMIRegEvent->GetTouchInfoByTouchId(std::make_pair(touch.deviceId, touch.seatSlot), touch);
+            MMIRegEvent->GetTouchInfoTouchId(std::make_pair(touch.deviceId, touch.seatSlot), touch);
 #endif
             touch.time = libinput_event_touch_get_time_usec(data);
             touch.eventType = LIBINPUT_EVENT_TOUCH_UP;
@@ -551,7 +550,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
     CHKPR(event, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
-        MMI_LOGT("This touch event is canceled type:%{public}d", type);
+        MMI_LOGD("This touch event is canceled type:%{public}d", type);
         return UNKNOWN_EVENT_PKG_FAIL;
     }
     auto ret = PackageEventDeviceInfo<EventTouch>(event, touch);
@@ -566,7 +565,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
     touch.seatSlot = libinput_event_touch_get_seat_slot(data);
     touch.pressure = libinput_event_get_touch_pressure(event);
 
-    PackageTouchEventByType(type, data, touch);
+    PackageTouchEventType(type, data, touch);
     /* switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
             touch.point.x = libinput_event_touch_get_x(data);
@@ -617,19 +616,19 @@ int32_t EventPackage::PackagePointerEvent(libinput_event *event, EventPointer& p
     auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_POINTER_MOTION: {
-            ret = PackagePointerEventByMotion(event, point);
+            ret = PackagePointerEventMotion(event, point);
             break;
         }
         case LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE: {
-            ret = PackagePointerEventByMotionAbs(event, point);
+            ret = PackagePointerEventMotionAbs(event, point);
             break;
         }
         case LIBINPUT_EVENT_POINTER_BUTTON: {
-            ret = PackagePointerEventByButton(event, point);
+            ret = PackagePointerEventButton(event, point);
             break;
         }
         case LIBINPUT_EVENT_POINTER_AXIS: {
-            ret = PackagePointerEventByAxis(event, point);
+            ret = PackagePointerEventAxis(event, point);
             break;
         }
         default: {
@@ -747,7 +746,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<Key
     kevn->UpdateId();
     auto data = libinput_event_get_keyboard_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
-    auto oKey = KeyValueTransformationByInput(libinput_event_keyboard_get_key(data));
+    auto oKey = KeyValueTransformationInput(libinput_event_keyboard_get_key(data));
 
     auto device = libinput_event_get_device(event);
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);

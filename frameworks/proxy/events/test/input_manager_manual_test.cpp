@@ -59,7 +59,7 @@ void InputManagerManualTest::AddInputEventFilter()
 {
     MMI_LOGD("enter");
     auto callback = [this](std::shared_ptr<PointerEvent> pointer) -> bool {
-        MMI_LOGT("callback enter");
+        MMI_LOGD("callback enter");
         CHKPF(pointer);
         const std::vector<int32_t> ids = pointer->GetPointersIdList();
         if (ids.empty()) {

@@ -25,7 +25,7 @@ namespace {
         LOG_CORE, MMI_LOG_DOMAIN, "MessagePost"
     };
 }
-void MessagePost::SetFd(int fd)
+void MessagePost::SetFd(int32_t fd)
 {
     fd_ = fd;
 }
@@ -42,6 +42,7 @@ void MessagePost::RunOnWestonThread(std::function<void(weston_compositor *)> tas
 void MessagePost::NotifyWestonThread()
 {
     if (fd_ == -1) {
+        MMI_LOGE("Fd is wrong, Notify failure");
         return;
     }
     int32_t value = 0;
@@ -64,7 +65,7 @@ void MessagePost::RunTasks()
     }
 }
 
-int MessagePost::RunTaskOnWestonThread(int fd, uint32_t mask, void *data)
+int32_t MessagePost::RunTaskOnWestonThread(int32_t fd, uint32_t mask, void *data)
 {
     int32_t value = 0;
     read(fd, &value, sizeof(value));

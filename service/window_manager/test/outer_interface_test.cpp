@@ -59,8 +59,8 @@ HWTEST_F(OuterInterfaceTest, DistributedEventHandler_003, TestSize.Level1)
 HWTEST_F(OuterInterfaceTest, IsFocusChange, TestSize.Level1)
 {
     OuterInterface outerInterface;
-    int srcSurfaceId = 1;
-    int desSurfaceId = 2;
+    int32_t srcSurfaceId = 1;
+    int32_t desSurfaceId = 2;
     EXPECT_TRUE((outerInterface.IsFocusChange(srcSurfaceId, desSurfaceId)) == desSurfaceId);
 }
 
@@ -70,10 +70,10 @@ HWTEST_F(OuterInterfaceTest, notifyFocusChange, TestSize.Level1)
     EXPECT_TRUE((outerInterface.notifyFocusChange(1, 1)) == RET_ERR);
 }
 
-HWTEST_F(OuterInterfaceTest, GetSystemEventAttrByKeyValue, TestSize.Level1)
+HWTEST_F(OuterInterfaceTest, GetSystemEventAttrKeyValue, TestSize.Level1)
 {
     OuterInterface outerInterface;
-    EXPECT_TRUE((outerInterface.GetSystemEventAttrByKeyValue(3)) == MMI_SYSTEM_SERVICE_AND_APP);
+    EXPECT_TRUE((outerInterface.GetSystemEventAttrKeyValue(3)) == MMI_SYSTEM_SERVICE_AND_APP);
 }
 } // namespace
 #endif
