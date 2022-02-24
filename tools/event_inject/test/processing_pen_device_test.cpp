@@ -43,6 +43,11 @@ namespace {
         system(startDeviceCmd.c_str());
         std::this_thread::sleep_for(std::chrono::seconds(1));
         std::ifstream reader(path);
+        if (!reader.is_open()) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            system(closeDeviceCmd.c_str());
+            ASSERT_TRUE(false) << "can not open " << path;
+        }
         Json inputEventArrays;
         reader >> inputEventArrays;
         reader.close();
@@ -67,6 +72,11 @@ namespace {
         system(startDeviceCmd.c_str());
         std::this_thread::sleep_for(std::chrono::seconds(1));
         std::ifstream reader(path);
+        if (!reader.is_open()) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            system(closeDeviceCmd.c_str());
+            ASSERT_TRUE(false) << "can not open " << path;
+        }
         Json inputEventArrays;
         reader >> inputEventArrays;
         reader.close();
@@ -91,6 +101,11 @@ namespace {
         system(startDeviceCmd.c_str());
         std::this_thread::sleep_for(std::chrono::seconds(1));
         std::ifstream reader(path);
+        if (!reader.is_open()) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            system(closeDeviceCmd.c_str());
+            ASSERT_TRUE(false) << "can not open " << path;
+        }
         Json inputEventArrays;
         reader >> inputEventArrays;
         reader.close();
@@ -115,6 +130,11 @@ namespace {
         system(startDeviceCmd.c_str());
         std::this_thread::sleep_for(std::chrono::seconds(1));
         std::ifstream reader(path);
+        if (!reader.is_open()) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            system(closeDeviceCmd.c_str());
+            ASSERT_TRUE(false) << "can not open " << path;
+        }
         Json inputEventArrays;
         reader >> inputEventArrays;
         reader.close();
@@ -139,6 +159,11 @@ namespace {
         system(startDeviceCmd.c_str());
         std::this_thread::sleep_for(std::chrono::seconds(1));
         std::ifstream reader(path);
+        if (!reader.is_open()) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            system(closeDeviceCmd.c_str());
+            ASSERT_TRUE(false) << "can not open " << path;
+        }
         Json inputEventArrays;
         reader >> inputEventArrays;
         reader.close();
@@ -163,6 +188,11 @@ namespace {
         system(startDeviceCmd.c_str());
         std::this_thread::sleep_for(std::chrono::seconds(1));
         std::ifstream reader(path);
+        if (!reader.is_open()) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            system(closeDeviceCmd.c_str());
+            ASSERT_TRUE(false) << "can not open " << path;
+        }
         Json inputEventArrays;
         reader >> inputEventArrays;
         reader.close();
@@ -187,6 +217,11 @@ namespace {
         system(startDeviceCmd.c_str());
         std::this_thread::sleep_for(std::chrono::seconds(1));
         std::ifstream reader(path);
+        if (!reader.is_open()) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            system(closeDeviceCmd.c_str());
+            ASSERT_TRUE(false) << "can not open " << path;
+        }
         Json inputEventArrays;
         reader >> inputEventArrays;
         reader.close();
@@ -211,6 +246,11 @@ namespace {
         system(startDeviceCmd.c_str());
         std::this_thread::sleep_for(std::chrono::seconds(1));
         std::ifstream reader(path);
+        if (!reader.is_open()) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            system(closeDeviceCmd.c_str());
+            ASSERT_TRUE(false) << "can not open " << path;
+        }
         Json inputEventArrays;
         reader >> inputEventArrays;
         reader.close();
