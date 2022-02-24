@@ -117,6 +117,7 @@ const MultimodalEvent *TouchEvent::GetMultimodalEvent() const
 int32_t TouchEvent::GetPointToolType(int32_t index) const
 {
     if (index < 0) {
+        MMI_LOGE("Parameter invalid value");
         return 0;
     }
 
@@ -155,6 +156,7 @@ int32_t TouchEvent::GetPointToolType(int32_t index) const
             break;
         }
         default: {
+            MMI_LOGW("Index of the unknown, Index:%{public}d", index_);
             break;
         }
     }
