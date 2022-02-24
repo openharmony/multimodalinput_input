@@ -33,12 +33,12 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputData, 
 {
 #ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformGamePadJsonDataToInputData.json";
-    string startDeviceCmd = "hosmmi-virtual-device-manager start gamepad & ";
-    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+    string startDeviceCmd = "mmi-virtual-device-manager start gamepad & ";
+    string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
     const string path = "temp/Test_TransformGamePadJsonDataToInputData.json";
-    string startDeviceCmd = "./hosmmi-virtual-deviced.out start gamepad &";
-    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+    string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
+    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -57,12 +57,12 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 {
 #ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindEvents.json";
-    string startDeviceCmd = "hosmmi-virtual-device-manager start gamepad & ";
-    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+    string startDeviceCmd = "mmi-virtual-device-manager start gamepad & ";
+    string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
     const string path = "temp/Test_TransformGamePadJsonDataToInputDataNotFindEvents.json";
-    string startDeviceCmd = "./hosmmi-virtual-deviced.out start gamepad &";
-    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+    string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
+    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -81,12 +81,12 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataEv
 {
 #ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformGamePadJsonDataToInputDataEventsIsEmpty.json";
-    string startDeviceCmd = "hosmmi-virtual-device-manager start gamepad & ";
-    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+    string startDeviceCmd = "mmi-virtual-device-manager start gamepad & ";
+    string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
     const string path = "temp/Test_TransformGamePadJsonDataToInputDataEventsIsEmpty.json";
-    string startDeviceCmd = "./hosmmi-virtual-deviced.out start gamepad &";
-    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+    string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
+    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -105,12 +105,12 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 {
 #ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindKeyValueInPress.json";
-    string startDeviceCmd = "hosmmi-virtual-device-manager start gamepad & ";
-    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+    string startDeviceCmd = "mmi-virtual-device-manager start gamepad & ";
+    string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
     const string path = "temp/Test_TransformGamePadJsonDataToInputDataNotFindKeyValueInPress.json";
-    string startDeviceCmd = "./hosmmi-virtual-deviced.out start gamepad &";
-    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+    string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
+    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -129,12 +129,12 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 {
 #ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindEventInRocker.json";
-    string startDeviceCmd = "hosmmi-virtual-device-manager start gamepad & ";
-    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+    string startDeviceCmd = "mmi-virtual-device-manager start gamepad & ";
+    string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
     const string path = "temp/Test_TransformGamePadJsonDataToInputDataNotFindEventInRocker.json";
-    string startDeviceCmd = "./hosmmi-virtual-deviced.out start gamepad &";
-    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+    string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
+    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -153,12 +153,12 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 {
 #ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRocker.json";
-    string startDeviceCmd = "hosmmi-virtual-device-manager start gamepad & ";
-    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+    string startDeviceCmd = "mmi-virtual-device-manager start gamepad & ";
+    string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
     const string path = "temp/Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRocker.json";
-    string startDeviceCmd = "./hosmmi-virtual-deviced.out start gamepad &";
-    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+    string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
+    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -178,12 +178,12 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 {
 #ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRockerDirectionKey.json";
-    string startDeviceCmd = "hosmmi-virtual-device-manager start gamepad & ";
-    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+    string startDeviceCmd = "mmi-virtual-device-manager start gamepad & ";
+    string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
     const string path = "temp/Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRockerDirectionKey.json";
-    string startDeviceCmd = "./hosmmi-virtual-deviced.out start gamepad &";
-    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+    string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
+    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));

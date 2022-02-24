@@ -215,6 +215,7 @@ void EventPackage::PackageTabletToolTypeParam(struct libinput_event *event, Even
             break;
         }
         default: {
+            MMI_LOGW("Unknown type:%{public}d", libinput_tablet_tool_get_type(tool));
             break;
         }
     }
@@ -274,6 +275,7 @@ void EventPackage::PackageTabletPadOtherParams(struct libinput_event *event, Eve
             break;
         }
         default: {
+            MMI_LOGW("Unknown type:%{public}d", type);
             break;
         }
     }
@@ -329,6 +331,7 @@ int32_t EventPackage::PackageTabletPadKeyEvent(struct libinput_event *event, Eve
             break;
         }
         default: {
+            MMI_LOGW("Unknown type:%{public}d", type);
             break;
         }
     }
