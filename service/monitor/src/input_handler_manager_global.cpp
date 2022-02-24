@@ -71,13 +71,21 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_LOGD("Handle KeyEvent");
     CHKPF(keyEvent);
-    if (interceptors_.HandleEvent(keyEvent)) {
-        MMI_LOGD("Key event was intercepted");
-        return true;
+    if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
+        MMI_LOGD("This event has been tagged as not to be intercepted");
+    } else {
+        if (interceptors_.HandleEvent(keyEvent)) {
+            MMI_LOGD("Key event was intercepted");
+            return true;
+        }
     }
-    if (monitors_.HandleEvent(keyEvent)) {
-        MMI_LOGD("Key event was consumed");
-        return true;
+    if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_NO_MONITOR)) {
+        MMI_LOGD("This event has been tagged as not to be monitored");
+    } else {
+        if (monitors_.HandleEvent(keyEvent)) {
+            MMI_LOGD("Key event was consumed");
+            return true;
+        }
     }
     return false;
 }
@@ -198,6 +206,7 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::GetPriority() const
 bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     std::lock_guard<std::mutex> guard(lockMonitors_);
+    MMI_LOGD("There are currently %{public}zu monitors", monitors_.size());
     for (const auto &mon : monitors_) {
         mon.SendToClient(keyEvent);
     }
