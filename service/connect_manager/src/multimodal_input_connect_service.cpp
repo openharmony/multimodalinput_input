@@ -150,10 +150,7 @@ int32_t MultimodalInputConnectService::StubHandleAllocSocketFd(MessageParcel& da
 void MultimodalInputConnectService::SetUdsServer(IUdsServer *server)
 {
     MMI_LOGD("enter");
-    if (server == nullptr) {
-        MMI_LOGE("The uds server is nullptr");
-        return;
-    }
+    CHKPV(server);
     udsServer_ = server;
     MMI_LOGD("leave");
 }
