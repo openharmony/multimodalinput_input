@@ -36,7 +36,7 @@ namespace {
     constexpr bool ISINTERCEPTED_TRUE = true;
     constexpr int32_t SLEEP = 3000;
     const std::regex REGEX_FIND_PID(" ");
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InjectDemo" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InjectDemo" }; // namepace
 }
 
 template<class T>
