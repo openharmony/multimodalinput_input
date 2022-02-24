@@ -156,7 +156,7 @@ int32_t TouchEvent::GetPointToolType(int32_t index) const
             break;
         }
         default: {
-            MMI_LOGE("Index of the unknown, Index:%{public}d", index_);
+            MMI_LOGW("Index of the unknown, Index:%{public}d", index_);
             break;
         }
     }
