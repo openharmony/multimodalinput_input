@@ -28,7 +28,7 @@ using PACKHEAD = struct PackHead {
 namespace OHOS {
 namespace MMI {
 class NetPacket : public StreamBuffer {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NetPacket" }; // namepace
+     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NetPacket" };
 public:
     explicit NetPacket(MmiMessageId idMsg);
     NetPacket(const NetPacket& pack);
