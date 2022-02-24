@@ -133,20 +133,28 @@ int32_t InputHandlerManager::GetNextId()
     return nextId_++;
 }
 
-void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent)
+std::shared_ptr<IInputEventConsumer> InputHandlerManager::FindHandler(int32_t handlerId)
 {
     std::lock_guard<std::mutex> guard(lockHandlers_);
     auto tItr = inputHandlers_.find(handlerId);
     if (tItr != inputHandlers_.end()) {
-        if (tItr->second.consumer_ != nullptr) {
-            tItr->second.consumer_->OnInputEvent(keyEvent);
-        }
+        return tItr->second.consumer_;
+    }
+    return nullptr;
+}
+
+void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent)
+{
+    std::shared_ptr<IInputEventConsumer> consumer = FindHandler(handlerId);
+    if (consumer != nullptr) {
+        consumer->OnInputEvent(keyEvent);
     }
 }
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Enter handler:%{public}d", handlerId);
+    CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         int32_t pointerId = pointerEvent->GetId();
         std::string pointerEventString = "pointerEventFilter";
@@ -157,17 +165,9 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
         std::string touchEventString = "touchEventFilter";
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, touchId);
     }
-    std::map<int32_t, Handler>::iterator tItr;
-    std::map<int32_t, Handler>::iterator tItrEnd;
-    {
-        std::lock_guard<std::mutex> guard(lockHandlers_);
-        tItr = inputHandlers_.find(handlerId);
-        tItrEnd = inputHandlers_.end();
-    }
-    if (tItr != tItrEnd) {
-        if (tItr->second.consumer_ != nullptr) {
-            tItr->second.consumer_->OnInputEvent(pointerEvent);
-        }
+    std::shared_ptr<IInputEventConsumer> consumer = FindHandler(handlerId);
+    if (consumer != nullptr) {
+        consumer->OnInputEvent(pointerEvent);
     }
     MMI_LOGD("Leave");
 }
