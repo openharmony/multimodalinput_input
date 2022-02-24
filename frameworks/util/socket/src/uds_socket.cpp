@@ -23,9 +23,7 @@ namespace MMI {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSocket" };
     }
 
-UDSSocket::UDSSocket()
-{
-}
+UDSSocket::UDSSocket() {}
 
 UDSSocket::~UDSSocket()
 {

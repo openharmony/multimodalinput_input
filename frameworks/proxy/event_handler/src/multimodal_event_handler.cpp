@@ -148,6 +148,7 @@ bool MultimodalEventHandler::InitClient()
     EventManager.SetClientHandle(client_);
     client_->RegisterConnectedFunction(&OnConnected);
     if (!(client_->Start(cMsgHandler_, true))) {
+        MMI_LOGE("The client fails to start");
         return false;
     }
     MMI_LOGD("leave");
