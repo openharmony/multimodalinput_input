@@ -40,9 +40,9 @@ public:
     // The actual type of the current input event is the AxisEvent type or its derived class
     static constexpr int32_t EVENT_TYPE_AXIS = 0X00030000;
 
-    static constexpr uint32_t EVENT_FLAG_NONE = 0x0;
-    static constexpr uint32_t EVENT_FLAG_NO_INTERCEPT = 0x1;
-    static constexpr uint32_t EVENT_FLAG_NO_MONITOR = 0x2;
+    static constexpr uint32_t EVENT_FLAG_NONE = 0x00000000;
+    static constexpr uint32_t EVENT_FLAG_NO_INTERCEPT = 0x00000001;
+    static constexpr uint32_t EVENT_FLAG_NO_MONITOR = 0x00000002;
 
     static constexpr int32_t DEFALUTID = -1;
 
@@ -120,11 +120,11 @@ public:
     int32_t GetEventType() const;
     const char* DumpEventType() const;
 
-    uint32_t GetFlag() const;
+    int32_t GetFlag() const;
 
-    bool HasFlag(uint32_t flag);
+    bool HasFlag(int32_t flag);
 
-    void AddFlag(uint32_t flag);
+    void AddFlag(int32_t flag);
 
     void ClearFlag();
 
@@ -159,7 +159,7 @@ protected:
     int32_t targetDisplayId_;
     int32_t targetWindowId_;
     int32_t agentWindowId_;
-    uint32_t bitwise_;
+    int32_t flag_;
     std::function<void(int32_t)> processedCallback_;
 };
 } // namespace MMI

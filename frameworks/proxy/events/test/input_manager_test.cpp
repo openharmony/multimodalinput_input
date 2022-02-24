@@ -1361,7 +1361,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Leve
     {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,Flag:%{public}u",
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1410,7 +1410,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
     {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,Flag:%{public}u",
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1424,7 +1424,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
     {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,Flag:%{public}u",
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1473,7 +1473,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_003, TestSize.Leve
     {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,Flag:%{public}u",
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1522,7 +1522,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_004, TestSize.Leve
     {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,Flag:%{public}u",
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1570,7 +1570,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_005, TestSize.Leve
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,flag:%{public}u",
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1618,7 +1618,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_006, TestSize.Leve
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,flag:%{public}u",
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1681,7 +1681,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_007, TestSize.Leve
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,flag:%{public}u",
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1751,7 +1751,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_009, TestSize.Leve
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,flag:%{public}u",
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1804,7 +1804,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,flag:%{public}u",
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1823,7 +1823,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,flag:%{public}u",
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1863,7 +1863,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_011, TestSize.Leve
     {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,flag:%{public}u",
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1881,7 +1881,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_011, TestSize.Leve
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
         MMI_LOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
                  "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                 "EventType:%{public}d,flag:%{public}u",
+                 "EventType:%{public}d,Flag:%{public}d",
                  keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                  keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                  keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -1942,7 +1942,7 @@ void InputEventInterceptor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEv
     MMI_LOGD("Pointer event intercepted:");
     MMI_LOGD("EventType:%{public}s, actionTime:%{public}" PRId64 ","
              "action:%{public}d,actionStartTime:%{public}" PRId64 ","
-             "flag:%{public}u,pointerAction:%{public}s, sourceType:%{public}s, "
+             "flag:%{public}d,pointerAction:%{public}s, sourceType:%{public}s, "
              "VerticalAxisValue:%{public}.2f, HorizontalAxisValue:%{public}.2f, "
              "pointerCount:%{public}zu",
              pointerEvent->DumpEventType(), pointerEvent->GetActionTime(),
