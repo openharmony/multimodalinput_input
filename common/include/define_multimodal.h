@@ -190,11 +190,11 @@
         } \
     } while (0)
 
-#define CHKPP(cond, r) \
+#define CHKPP(cond) \
     do { \
         if ((cond) == nullptr) { \
             MMI_LOGE("CHKPP(%{public}s) is null, return value is null", #cond); \
-            return r; \
+            return nullptr; \
         } \
     } while (0)
 
