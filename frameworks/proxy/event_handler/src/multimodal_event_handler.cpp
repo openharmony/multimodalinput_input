@@ -116,6 +116,7 @@ int32_t MultimodalEventHandler::InjectEvent(const OHOS::MMI::KeyEvent& keyEvent)
 
 int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr)
 {
+    CHKPR(keyEventPtr, ERROR_NULL_POINTER);
     if (!InitClient()) {
         return MMI_SERVICE_INVALID;
     }
@@ -181,6 +182,7 @@ int32_t MultimodalEventHandler::GetDevice(int32_t taskId, int32_t deviceId)
 
 int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (!InitClient()) {
         return MMI_SERVICE_INVALID;
     }
