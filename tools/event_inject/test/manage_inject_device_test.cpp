@@ -53,6 +53,11 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileNotEmpty, TestSi
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
     std::ifstream reader(path);
+    if (!reader.is_open()) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        system(closeDeviceCmd.c_str());
+        ASSERT_TRUE(false) << "can not open " << path;
+    }
     Json inputEventArrays;
     reader >> inputEventArrays;
     reader.close();
@@ -77,6 +82,11 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataGetDeviceNodeError, TestS
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
     std::ifstream reader(path);
+    if (!reader.is_open()) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        system(closeDeviceCmd.c_str());
+        ASSERT_TRUE(false) << "can not open " << path;
+    }
     Json inputEventArrays;
     reader >> inputEventArrays;
     reader.close();
