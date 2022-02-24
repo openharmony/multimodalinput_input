@@ -42,6 +42,7 @@ void MessagePost::RunOnWestonThread(std::function<void(weston_compositor *)> tas
 void MessagePost::NotifyWestonThread()
 {
     if (fd_ == -1) {
+        MMI_LOGE("Fd is wrong, Notify failure");
         return;
     }
     int32_t value = 0;

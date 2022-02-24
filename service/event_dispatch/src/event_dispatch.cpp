@@ -229,6 +229,7 @@ int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_eve
 
     auto focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
+        MMI_LOGW("Failed to get the focus window");
         return RET_OK;
     }
     auto appInfo = AppRegs->FindWinId(focusId); // obtain application information for focusId
@@ -276,6 +277,7 @@ int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_even
     CHKPR(device, ERROR_NULL_POINTER);
     auto focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
+        MMI_LOGW("Failed to get the focus window");
         return RET_OK;
     }
     auto appInfo = AppRegs->FindWinId(focusId); // obtain application information for focusId
@@ -307,11 +309,13 @@ int32_t EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, libinput_ev
     CHKPR(event, ERROR_NULL_POINTER);
     int32_t focusId = WinMgr->GetFocusSurfaceId(); // obtaining focusId
     if (focusId < 0) {
+        MMI_LOGW("Failed to get the focus window");
         return RET_OK;
     }
     // obtain application information for focusId
     auto appInfo = AppRegs->FindWinId(focusId);
     if (appInfo.fd == RET_ERR) {
+        MMI_LOGE("Failed to obtain AppInfo, desWindow:%{public}d,errCode:%{public}d", focusId, FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
     }
     StandardTouchStruct inputEvent = {}; // Standardization handler of struct EventPointer

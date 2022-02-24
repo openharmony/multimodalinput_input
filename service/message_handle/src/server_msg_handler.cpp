@@ -465,6 +465,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
     CHKR(!(focusId < 0), FOCUS_ID_OBTAIN_FAIL, FOCUS_ID_OBTAIN_FAIL);
     auto appInfo = AppRegs->FindWinId(focusId);
     if (appInfo.fd == RET_ERR) {
+        MMI_LOGE("Failed to obtain AppInfo, desWindow:%{public}d,errCode:%{public}d", focusId, FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
     }
 #ifdef DEBUG_CODE_TEST
@@ -843,6 +844,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnAddInputEventMontior(SessionPtr sess, Net
     pkt >> eventType;
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     if (eventType != OHOS::MMI::InputEvent::EVENT_TYPE_KEY) {
+        MMI_LOGE("Wrong event type, eventType:%{public}d", eventType);
         return RET_ERR;
     }
     InputMonitorServiceMgr.AddInputEventMontior(sess, eventType);
@@ -857,6 +859,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnAddInputEventTouchpadMontior(SessionPtr s
     pkt >> eventType;
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     if (eventType != OHOS::MMI::InputEvent::EVENT_TYPE_POINTER) {
+        MMI_LOGE("Wrong event type, eventType:%{public}d", eventType);
         return RET_ERR;
     }
     InputMonitorServiceMgr.AddInputEventTouchpadMontior(eventType, sess);
@@ -870,6 +873,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveInputEventMontior(SessionPtr sess, 
     pkt >> eventType;
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     if (eventType != OHOS::MMI::InputEvent::EVENT_TYPE_KEY) {
+        MMI_LOGE("Wrong event type, eventType:%{public}d", eventType);
         return RET_ERR;
     }
     InputMonitorServiceMgr.RemoveInputEventMontior(sess, eventType);
@@ -883,6 +887,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveInputEventTouchpadMontior(SessionPt
     pkt >> eventType;
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     if (eventType != OHOS::MMI::InputEvent::EVENT_TYPE_POINTER) {
+        MMI_LOGE("Wrong event type, eventType:%{public}d", eventType);
         return RET_ERR;
     }
     InputMonitorServiceMgr.RemoveInputEventMontior(sess, eventType);
