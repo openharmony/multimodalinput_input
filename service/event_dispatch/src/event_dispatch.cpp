@@ -363,6 +363,20 @@ bool EventDispatch::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point
     return EventFilterWrap::GetInstance().HandlePointerEventFilter(point);
 }
 
+void EventDispatch::HandlePointerEventTrace(const std::shared_ptr<PointerEvent> &point)
+{
+    if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+        int32_t pointerId = point->GetId();
+        std::string pointerEvent = "OnEventPointer";
+        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, pointerId);
+    }
+    if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        int32_t touchId = point->GetId();
+        std::string touchEvent = "OnEventTouch";
+        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, touchId);
+    }
+}
+
 int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 {
     CHKPR(point, ERROR_NULL_POINTER);
@@ -373,20 +387,12 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     }
     if (!point->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT) &&
         InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
-        if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-            int32_t pointerId = point->GetId();
-            std::string pointerEvent = "OnEventPointer";
-            FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, pointerId);
-        }
-        if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-            int32_t touchId = point->GetId();
-            std::string touchEvent = "OnEventTouch";
-            FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, touchId);
-        }
+        HandlePointerEventTrace(point);
         return RET_OK;
     }
     NetPacket newPacket(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(point, newPacket);
+    HandlePointerEventTrace(point);
     auto udsServer = InputHandler->GetUDSServer();
     if (udsServer == nullptr) {
         MMI_LOGE("UdsServer is a nullptr");
@@ -700,9 +706,12 @@ void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, I
     } else if (isEventHandler == KEY_CHECKLAUNABILITY_EVENT) {
         checkKeyCode = "CheckLaunchAbility service GetKeyCode=" + std::to_string(keyCode);
         MMI_LOGD("CheckLaunchAbility service trace GetKeyCode:%{public}d", keyCode);
-    } else {
+    } else if (isEventHandler == KEY_SUBSCRIBE_EVENT) {
         checkKeyCode = "SubscribeKeyEvent service GetKeyCode=" + std::to_string(keyCode);
         MMI_LOGD("SubscribeKeyEvent service trace GetKeyCode:%{public}d", keyCode);
+    } else {
+        checkKeyCode = "DispatchKeyEvent service GetKeyCode=" + std::to_string(keyCode);
+        MMI_LOGD("DispatchKeyEvent service trace GetKeyCode:%{public}d", keyCode);
     }
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, checkKeyCode);
     int32_t keyId = key->GetId();
@@ -755,6 +764,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
     InputHandlerManagerGlobal::GetInstance().HandleEvent(key);
     NetPacket pkt(MmiMessageId::ON_KEYEVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
+    OnKeyboardEventTrace(key, KEY_DISPATCH_EVENT);
     pkt << fd << preHandlerTime;
     if (!udsServer.SendMsg(fd, pkt)) {
         MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
