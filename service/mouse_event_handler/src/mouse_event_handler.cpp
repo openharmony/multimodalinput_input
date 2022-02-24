@@ -56,7 +56,7 @@ void MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 
 void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem)
 {
-    MMI_LOGT("enter, current action:%{public}d", pointerEvent_->GetPointerAction());
+    MMI_LOGD("enter, current action:%{public}d", pointerEvent_->GetPointerAction());
 
     auto button = libinput_event_pointer_get_button(data);
     if (button == BTN_LEFT) {
