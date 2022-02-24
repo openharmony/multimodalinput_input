@@ -40,8 +40,9 @@ public:
     // The actual type of the current input event is the AxisEvent type or its derived class
     static constexpr int32_t EVENT_TYPE_AXIS = 0X00030000;
 
-    static constexpr int32_t EVENT_FLAG_NONE = 0;
-    static constexpr uint32_t EVENT_FLAG_NO_INTERCEPT = 1;
+    static constexpr uint32_t EVENT_FLAG_NONE = 0x0;
+    static constexpr uint32_t EVENT_FLAG_NO_INTERCEPT = 0x1;
+    static constexpr uint32_t EVENT_FLAG_NO_MONITOR = 0x2;
 
     static constexpr int32_t DEFALUTID = -1;
 

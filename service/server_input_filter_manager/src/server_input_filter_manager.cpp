@@ -136,9 +136,7 @@ int32_t ServerInputFilterManager::RemoveKeyEventFilter(SessionPtr sess, int32_t 
 }
 
 ServerInputFilterManager::TouchEventFilter::TouchEventFilter(int32_t id, std::string name,
-    Authority authority) : id_(id), name_(name), authority_(authority)
-{
-}
+    Authority authority) : id_(id), name_(name), authority_(authority) {}
 
 int32_t ServerInputFilterManager::TouchEventFilter::GetId()
 {

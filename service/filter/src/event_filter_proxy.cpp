@@ -60,7 +60,7 @@ bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> ev
         return false;
     }
 
-    MMI_LOGT("have recieve message from server");
+    MMI_LOGD("have recieve message from server");
 
     bool result = false;
     if (!reply.ReadBool(result)) {

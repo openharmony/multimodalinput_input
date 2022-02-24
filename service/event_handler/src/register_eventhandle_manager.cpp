@@ -51,10 +51,10 @@ int32_t RegisterEventHandleManager::RegisterEvent(MmiMessageId messageId, int32_
             RegisterEventHandleIdMsage(MmiMessageId::TOUCH_EVENT_BEGIN, MmiMessageId::TOUCH_EVENT_END, fd);
             break;
         default:
-            MMI_LOGT("It's no this event handle");
+            MMI_LOGD("It's no this event handle");
             return UNKNOWN_EVENT;
     }
-    MMI_LOGT("event:%{public}d,fd:%{public}d ", messageId, fd);
+    MMI_LOGD("event:%{public}d,fd:%{public}d ", messageId, fd);
     return RET_OK;
 }
 
