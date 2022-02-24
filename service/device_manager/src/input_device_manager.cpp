@@ -181,9 +181,9 @@ void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
 bool InputDeviceManager::IsPointerDevice(libinput_device* device)
 {
     if (device == nullptr) {
-	    MMI_LOGE("The in paranmter device is nullptr");
-		return false;
-	}
+        MMI_LOGE("The in paranmter device is nullptr");
+        return false;
+    }
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
     MMI_LOGD("udev tag:%{public}d", static_cast<int32_t>(udevTags));
     return udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK | 

@@ -42,9 +42,9 @@ static void HiLogFunc(struct libinput* input, enum libinput_log_priority priorit
 static void InitHiLogFunc(struct libinput* input)
 {
     if (input == nullptr) {
-	    MMI_LOGE("The in parameter input ins nullptr");
-		return;
-	}
+        MMI_LOGE("The in parameter input ins nullptr");
+        return;
+    }
     static bool initFlag = false;
     if (initFlag) {
         return;
