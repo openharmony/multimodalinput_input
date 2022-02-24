@@ -26,8 +26,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    std::shared_ptr<MultimodalInputConnectManager> g_instance;
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectManager" };
+std::shared_ptr<MultimodalInputConnectManager> g_instance;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectManager" }; // namespace
 }
 
 std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::GetInstance()
