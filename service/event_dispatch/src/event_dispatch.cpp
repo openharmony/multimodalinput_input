@@ -44,7 +44,7 @@ static void PrintEventSlotedCoordsInfo(const SlotedCoordsInfo& r)
 {
     using namespace OHOS::MMI;
     for (int32_t i = 0; i < MAX_SOLTED_COORDS_NUMS; i++) {
-        MMI_LOGT("[%{public}d] isActive:%{public}d,x:%{public}f,y:%{public}f",
+        MMI_LOGD("[%{public}d] isActive:%{public}d,x:%{public}f,y:%{public}f",
             i, r.coords[i].isActive, r.coords[i].x, r.coords[i].y);
     }
 }
@@ -146,7 +146,7 @@ int32_t EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& ud
 
     for (const auto& fd : fds) {
         auto appInfo = AppRegs->FindSocketFd(fd);
-        MMI_LOGT("Event dispatcher of server, RegisteredEvent:physical:%{public}s,"
+        MMI_LOGD("Event dispatcher of server, RegisteredEvent:physical:%{public}s,"
                  "deviceType:%{public}u,eventType:%{public}u,occurredTime:%{public}" PRId64 ","
                  "conbinecode:%{public}d,fd:%{public}d",
                  registeredEvent.physical, registeredEvent.deviceType,
@@ -238,16 +238,16 @@ int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_eve
         return FOCUS_ID_OBTAIN_FAIL;
     }
 #ifdef DEBUG_CODE_TEST
-    MMI_LOGT("MMIWMS:windowId:%{public}s", str.c_str());
+    MMI_LOGD("MMIWMS:windowId:%{public}s", str.c_str());
     if (focusId == -1) {
-        MMI_LOGT("WMS:windowId = ''");
+        MMI_LOGD("WMS:windowId = ''");
     } else {
-        MMI_LOGT("WMS:windowId:%{public}d", focusId);
+        MMI_LOGD("WMS:windowId:%{public}d", focusId);
     }
-    MMI_LOGT("CALL_AMS, MMIAPPM:fd :%{public}d,abilityID:%{public}d", appInfo.fd, appInfo.abilityId);
+    MMI_LOGD("CALL_AMS, MMIAPPM:fd :%{public}d,abilityID:%{public}d", appInfo.fd, appInfo.abilityId);
 #endif
 
-    MMI_LOGT("4.event dispatcher of server, EventTabletPad:time:%{public}" PRId64 ",deviceType:%{public}u,"
+    MMI_LOGD("4.event dispatcher of server, EventTabletPad:time:%{public}" PRId64 ",deviceType:%{public}u,"
              "deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,"
              "ring.number:%{public}d,ring.position:%{public}lf,ring.source:%{public}d,"
              "strip.number:%{public}d,strip.position:%{public}lf,strip.source:%{public}d,"
@@ -334,7 +334,7 @@ int32_t EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, libinput_ev
         std::string strIds = WinMgr->GetSurfaceIdListString();
         PrintWMSInfo(strIds, appInfo.fd, appInfo.abilityId, focusId);
 #endif
-        MMI_LOGT("4.event dispatcher of server, TabletTool:time:%{public}" PRId64 ","
+        MMI_LOGD("4.event dispatcher of server, TabletTool:time:%{public}" PRId64 ","
                  "deviceType:%{public}u,deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,"
                  "type:%{public}u,serial:%{public}u, button:%{public}d,state:%{public}d,"
                  "point.x:%{public}lf,point.y:%{public}lf,tilt.x:%{public}lf,tilt.y:%{public}lf,"
@@ -468,27 +468,27 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event
 #ifdef DEBUG_CODE_TEST
         auto type = libinput_event_get_type(event);
         if (type != LIBINPUT_EVENT_POINTER_BUTTON) {
-            MMI_LOGT("MMIWMS:windowId:%{public}s", strIds.c_str());
+            MMI_LOGD("MMIWMS:windowId:%{public}s", strIds.c_str());
             if (desWindowId == -1) {
-                MMI_LOGT("WMS:windowId = ''");
+                MMI_LOGD("WMS:windowId = ''");
             } else {
-                MMI_LOGT("WMS:windowId:%{public}d", desWindowId);
+                MMI_LOGD("WMS:windowId:%{public}d", desWindowId);
             }
-            MMI_LOGT("CALL_AMS MMIAPPM:fd:%{public}d,abilityID:%{public}d", appInfo.fd, appInfo.abilityId);
+            MMI_LOGD("CALL_AMS MMIAPPM:fd:%{public}d,abilityID:%{public}d", appInfo.fd, appInfo.abilityId);
         } else {
             if (size == windowCount_) {
-                MMI_LOGT("MMIWMS:windowId:%{public}s,WMS:windowId:%{public}d,CALL_AMS:windowId:%{public}d"
+                MMI_LOGD("MMIWMS:windowId:%{public}s,WMS:windowId:%{public}d,CALL_AMS:windowId:%{public}d"
                     "MMIAPPM:fd:%{public}d,abilityID:%{public}d", strIds.c_str(), desWindowId, desWindowId,
                     appInfo.fd, appInfo.abilityId);
             } else {
-                MMI_LOGT("MMIWMS:windowId:%{public}s,WMS:windowId:%{public}d,CALL_AMS:windowId: ''"
+                MMI_LOGD("MMIWMS:windowId:%{public}s,WMS:windowId:%{public}d,CALL_AMS:windowId: ''"
                     "MMIAPPM:fd:%{public}d,abilityID:%{public}d", strIds.c_str(), desWindowId,
                     appInfo.fd, appInfo.abilityId);
             }
         }
 #endif
 
-        MMI_LOGT("4.event dispatcher of server, eventPointer:time:%{public}" PRId64 ",deviceType:%{public}u,"
+        MMI_LOGD("4.event dispatcher of server, eventPointer:time:%{public}" PRId64 ",deviceType:%{public}u,"
                  "deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,"
                  "buttonCode:%{public}u,seat_button_count:%{public}u,axis:%{public}u,buttonState:%{public}d,"
                  "source:%{public}d,delta.x:%{public}lf,delta.y:%{public}lf,delta_raw.x:%{public}lf,"
@@ -537,11 +537,11 @@ int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event
     }
     auto appInfo = AppRegs->FindWinId(focusId); // obtain application information
     if (appInfo.fd == RET_ERR) {
-        MMI_LOGT("Failed to find fd, errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
+        MMI_LOGD("Failed to find fd, errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
     }
 
-    MMI_LOGT("4.event dispatcher of server, EventGesture:time:%{public}" PRId64 ",deviceType:%{public}u,"
+    MMI_LOGD("4.event dispatcher of server, EventGesture:time:%{public}" PRId64 ",deviceType:%{public}u,"
              "deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,"
              "fingerCount:%{public}d,cancelled:%{public}d,delta.x:%{public}lf,delta.y:%{public}lf,"
              "deltaUnaccel.x:%{public}lf,deltaUnaccel.y:%{public}lf,fd:%{public}d,"
@@ -596,13 +596,13 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
     }
     MMI_LOGD("DispatchTouchEvent focusId:%{public}d,fd:%{public}d", touchFocusId, appInfo.fd);
 #ifdef DEBUG_CODE_TEST
-    MMI_LOGT("MMIWMS:windowId:%{public}s", str.c_str());
+    MMI_LOGD("MMIWMS:windowId:%{public}s", str.c_str());
     if (touchFocusId == -1) {
-        MMI_LOGT("WMS:windowId = ''");
+        MMI_LOGD("WMS:windowId = ''");
     } else {
-        MMI_LOGT("WMS:windowId:%{public}d", touchFocusId);
+        MMI_LOGD("WMS:windowId:%{public}d", touchFocusId);
     }
-    MMI_LOGT("CALL_AMS:windowId:'' MMIAPPM:fd: %{public}d,abilityID:%{public}d", appInfo.fd, appInfo.abilityId);
+    MMI_LOGD("CALL_AMS:windowId:'' MMIAPPM:fd: %{public}d,abilityID:%{public}d", appInfo.fd, appInfo.abilityId);
 #endif
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, touch.time, preHandlerTime)) {
@@ -625,7 +625,7 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
                 errno_t retErr = memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch));
                 CHKR(retErr == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
                 MMIRegEvent->GetTouchInfo(touchId, touchTemp);
-                MMI_LOGT("4.event dispatcher of server, eventTouch:time:%{public}" PRId64 ",deviceType:%{public}u,"
+                MMI_LOGD("4.event dispatcher of server, eventTouch:time:%{public}" PRId64 ",deviceType:%{public}u,"
                          "deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,"
                          "slot:%{public}d,seatSlot:%{public}d,pressure:%{public}lf,point.x:%{public}lf,"
                          "point.y:%{public}lf,fd:%{public}d,preHandlerTime:%{public}" PRId64,
@@ -638,7 +638,7 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
         }
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
             newPacket << touch;
-            MMI_LOGT("4.event dispatcher of server, eventTouch:time:%{public}" PRId64 ",deviceType:%{public}u,"
+            MMI_LOGD("4.event dispatcher of server, eventTouch:time:%{public}" PRId64 ",deviceType:%{public}u,"
                      "deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,"
                      "slot:%{public}d,seatSlot:%{public}d,pressure:%{public}lf,point.x:%{public}lf,"
                      "point.y:%{public}lf,fd:%{public}d,preHandlerTime:%{public}" PRId64,
@@ -696,13 +696,13 @@ void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, I
     std::string checkKeyCode;
     if (isEventHandler == KEY_FILTER_EVENT) {
         checkKeyCode = "key intercept service GetKeyCode=" + std::to_string(keyCode);
-        MMI_LOGT("key intercept service trace GetKeyCode:%{public}d", keyCode);
+        MMI_LOGD("key intercept service trace GetKeyCode:%{public}d", keyCode);
     } else if (isEventHandler == KEY_CHECKLAUNABILITY_EVENT) {
         checkKeyCode = "CheckLaunchAbility service GetKeyCode=" + std::to_string(keyCode);
-        MMI_LOGT("CheckLaunchAbility service trace GetKeyCode:%{public}d", keyCode);
+        MMI_LOGD("CheckLaunchAbility service trace GetKeyCode:%{public}d", keyCode);
     } else {
         checkKeyCode = "SubscribeKeyEvent service GetKeyCode=" + std::to_string(keyCode);
-        MMI_LOGT("SubscribeKeyEvent service trace GetKeyCode:%{public}d", keyCode);
+        MMI_LOGD("SubscribeKeyEvent service trace GetKeyCode:%{public}d", keyCode);
     }
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, checkKeyCode);
     int32_t keyId = key->GetId();
@@ -740,7 +740,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
     PrintWMSInfo(str, fd, 0, key->GetTargetWindowId());
 #endif
 
-    MMI_LOGT("4.event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
+    MMI_LOGD("4.event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
              "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
              "EventType:%{public}d,Flag:%{public}u,"
              "KeyAction:%{public}d,Fd:%{public}d,PreHandlerTime:%{public}" PRId64 "",
@@ -803,7 +803,7 @@ int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *ev
     }
     key.key = trs.keyValueOfSys; // struct EventKeyboard tranformed into L3
 
-    MMI_LOGT("4.event dispatcher of server, eventKeyboard:time:%{public}" PRId64 ",deviceType:%{public}u,"
+    MMI_LOGD("4.event dispatcher of server, eventKeyboard:time:%{public}" PRId64 ",deviceType:%{public}u,"
              "deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,unicode:%{public}d,key:%{public}u,"
              "key_detail:%{public}s,seat_key_count:%{public}u,state:%{public}d,fd:%{public}d,"
              "preHandlerTime:%{public}" PRId64, key.time, key.deviceType, key.deviceName, key.physical,
@@ -846,7 +846,7 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
     pointerEvent->SetTargetWindowId(focusId);
 
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
-    MMI_LOGT("Pointer event dispatcher of server:eventType:%{public}d,actionTime:%{public}" PRId64 ","
+    MMI_LOGD("Pointer event dispatcher of server:eventType:%{public}d,actionTime:%{public}" PRId64 ","
              "action:%{public}d,actionStartTime:%{public}" PRId64 ","
              "flag:%{public}u,pointerAction:%{public}d,sourceType:%{public}d,"
              "VerticalAxisValue:%{public}.02f, HorizontalAxisValue:%{public}.02f,"
@@ -863,7 +863,7 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
         OHOS::MMI::PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
 
-        MMI_LOGT("\tdownTime:%{public}" PRId64 ",isPressed:%{public}s,"
+        MMI_LOGD("\tdownTime:%{public}" PRId64 ",isPressed:%{public}s,"
                  "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
                  "width:%{public}d,height:%{public}d,pressure:%{public}d",
                  item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
