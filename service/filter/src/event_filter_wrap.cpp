@@ -44,10 +44,7 @@ int32_t EventFilterWrap::AddInputEventFilter(sptr<IEventFilter> filter)
 bool EventFilterWrap::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point)
 {
     MMI_LOGD("enter");
-    if (point == nullptr) {
-        MMI_LOGE("The in parameter point is nullptr");
-        return false;
-    }
+    CHKPF(point);
     std::lock_guard<std::mutex> guard(lockInputEventFilter_);
     CHKPF(filter_);
     if (filter_->HandlePointerEvent(point)) {

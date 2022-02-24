@@ -614,10 +614,7 @@ OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::FindPhysicalDisp
 void OHOS::MMI::InputWindowsManager::TurnTouchScreen(PhysicalDisplayInfo* info, Direction direction,
     int32_t& logicalX, int32_t& logicalY)
 {
-    if (info == nullptr) {
-        MMI_LOGE("The in parameter info is nullptr");
-        return;
-    }
+    CHKPV(info);
     if (direction == Direction0) {
         MMI_LOGD("direction is Direction0");
         return;
