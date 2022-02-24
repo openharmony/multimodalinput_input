@@ -34,7 +34,6 @@
 namespace OHOS {
 namespace MMI {
 constexpr int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
-constexpr int32_t INPUT_UI_TIMEOUT_TIME_MAX = 20 * 1000000;
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
     }
