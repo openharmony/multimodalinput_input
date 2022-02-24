@@ -81,7 +81,7 @@ private:
         KEY_DISPATCH_EVENT = 4
     };
     void OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler isEventHandler);
-    void HandlePointerEventTrace(std::shared_ptr<PointerEvent> point);
+    void HandlePointerEventTrace(std::shared_ptr<PointerEvent> &point);
 #ifdef DEBUG_CODE_TEST
 private:
     const size_t windowCount_ = 2;
