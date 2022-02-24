@@ -69,6 +69,7 @@ void OHOS::MMI::InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
 bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("enter");
+    CHKPF(pointerEvent);
     if (interceptor_.empty()) {
         MMI_LOGE("InterceptorManagerGlobal::%{public}s no interceptor to send msg", __func__);
         return false;
@@ -94,6 +95,7 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
 bool OHOS::MMI::InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_LOGD("enter");
+    CHKPF(keyEvent);
     if (interceptor_.empty()) {
         MMI_LOGE("InterceptorManagerGlobal::%{public}s no interceptor to send msg", __func__);
         return false;
