@@ -30,7 +30,7 @@ using namespace testing::ext;
 using namespace OHOS::MMI;
 using namespace OHOS;
 
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventHandleKeyTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventHandleKeyTest" }; // namepace
 
 class EventHandleKeyTest : public testing::Test {
 public:
