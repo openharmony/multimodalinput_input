@@ -31,10 +31,10 @@ int32_t GetDeviceNode::GetDeviceNodeName(const string &targetName, string &devic
 {
     string cmd = "cat /proc/bus/input/devices";
     std::vector<std::string> cmdResult;
-    string deviceName = deviceMap_[targetName];
     ExecuteCmd(cmd, cmdResult);
     DeviceMapData deviceMapData;
     GetDeviceInfoCmdResult(cmdResult, deviceMapData);
+    string deviceName = deviceMap_[targetName];
     auto iter = deviceMapData.find(deviceName);
     if (iter == deviceMapData.end()) {
         MMI_LOGE("GetDeviceNodeName faild for find deviceName:%{public}s", deviceName.c_str());
