@@ -48,13 +48,9 @@ const std::map<int16_t, int16_t> MAP_SYSTEM_EVENT_ATTR = {
     {HOS_KEY_VOICE_ASSISTANT, MMI_SYSTEM_SERVICE},
 };
 
-OuterInterface::OuterInterface()
-{
-}
+OuterInterface::OuterInterface() {}
 
-OuterInterface::~OuterInterface()
-{
-}
+OuterInterface::~OuterInterface() {}
 
 bool OuterInterface::SystemEventHandler(const KeyEventValueTransformations& trs,
                                         const enum KEY_STATE state, const int16_t systemEventAttr)

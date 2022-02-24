@@ -22,9 +22,7 @@ MouseDeviceState::MouseDeviceState()
     mouseCoord_ = {0, 0};
 }
 
-MouseDeviceState::~MouseDeviceState()
-{
-}
+MouseDeviceState::~MouseDeviceState() {}
 
 int32_t MouseDeviceState::GetMouseCoordsX() const
 {
