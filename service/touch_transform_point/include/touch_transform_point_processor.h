@@ -25,7 +25,7 @@ namespace OHOS {
 namespace MMI {
 class TouchTransformPointProcessor {
 public:
-    TouchTransformPointProcessor(int32_t deviceId);
+    explicit TouchTransformPointProcessor(int32_t deviceId);
     DISALLOW_COPY_AND_MOVE(TouchTransformPointProcessor);
     ~TouchTransformPointProcessor();
     std::shared_ptr<PointerEvent> OnLibinputTouchEvent(libinput_event *event);

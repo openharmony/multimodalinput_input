@@ -55,7 +55,7 @@ constexpr int32_t INDEX_SECOND = 2;
 constexpr int32_t INDEX_THIRD = 3;
 constexpr int32_t INDEX_INVALID = -1;
 constexpr int32_t MASK_BASE = 10;
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest" }; // namepace
 }
 
 class InputManagerTest : public testing::Test {
