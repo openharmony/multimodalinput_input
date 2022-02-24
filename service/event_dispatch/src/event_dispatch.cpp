@@ -903,7 +903,7 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
 }
 
 bool EventDispatch::IsANRProcess(int64_t time, SessionPtr ss)
-{   
+{
     int64_t firstTime;
     if (ss->EventsIsEmpty()) {
         firstTime = time;
