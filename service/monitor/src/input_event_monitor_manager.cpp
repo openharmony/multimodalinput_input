@@ -26,13 +26,9 @@ namespace MMI {
 } // namespace MMI
 } // namespace OHOS
 
-OHOS::MMI::InputEventMonitorManager::InputEventMonitorManager()
-{
-}
+OHOS::MMI::InputEventMonitorManager::InputEventMonitorManager() {}
 
-OHOS::MMI::InputEventMonitorManager::~InputEventMonitorManager()
-{
-}
+OHOS::MMI::InputEventMonitorManager::~InputEventMonitorManager() {}
 
 int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventMontior(SessionPtr session, int32_t eventType)
 {
