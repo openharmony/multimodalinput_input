@@ -551,7 +551,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnAddTouchEventFilter(SessionPtr sess, NetP
 
 int32_t OHOS::MMI::ServerMsgHandler::OnRemoveTouchEventFilter(SessionPtr sess, NetPacket& pkt)
 {
-	if (sess->GetUid() != SYSTEMUID && sess->GetUid() != 0) {
+    if (sess->GetUid() != SYSTEMUID && sess->GetUid() != 0) {
         MMI_LOGD("Insufficient permissions");
         return RET_ERR;
     }
