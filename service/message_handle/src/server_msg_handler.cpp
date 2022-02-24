@@ -45,13 +45,9 @@ namespace MMI {
 } // namespace MMI
 } // namespace OHOS
 
-OHOS::MMI::ServerMsgHandler::ServerMsgHandler()
-{
-}
+OHOS::MMI::ServerMsgHandler::ServerMsgHandler() {}
 
-OHOS::MMI::ServerMsgHandler::~ServerMsgHandler()
-{
-}
+OHOS::MMI::ServerMsgHandler::~ServerMsgHandler() {}
 
 bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
 {

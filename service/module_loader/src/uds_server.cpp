@@ -33,9 +33,7 @@ namespace MMI {
 } // namespace MMI
 } // namespace OHOS
 
-OHOS::MMI::UDSServer::UDSServer()
-{
-}
+OHOS::MMI::UDSServer::UDSServer() {}
 
 OHOS::MMI::UDSServer::~UDSServer()
 {
