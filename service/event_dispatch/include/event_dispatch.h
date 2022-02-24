@@ -77,9 +77,11 @@ private:
     enum IsEventHandler {
         KEY_FILTER_EVENT = 1,
         KEY_CHECKLAUNABILITY_EVENT = 2,
-        KEY_SUBSCRIBE_EVENT = 3
+        KEY_SUBSCRIBE_EVENT = 3,
+        KEY_DISPATCH_EVENT = 4
     };
     void OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler isEventHandler);
+    void HandlePointerEventTrace(const std::shared_ptr<PointerEvent> &point);
 #ifdef DEBUG_CODE_TEST
 private:
     const size_t windowCount_ = 2;
