@@ -774,7 +774,7 @@ bool MultimodalStandardizedEventManager::MakeRegisterHandle(MmiMessageId typeId,
             rhandle += "devicehandle";
             break;
         default:
-            MMI_LOGE("Unknown message type, type:%{public}d", type);
+            MMI_LOGW("Unknown message type, type:%{public}d", typeId);
             return false;
     }
     return true;
