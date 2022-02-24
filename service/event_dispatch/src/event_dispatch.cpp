@@ -363,7 +363,7 @@ bool EventDispatch::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point
     return EventFilterWrap::GetInstance().HandlePointerEventFilter(point);
 }
 
-void HandlePointerEventTrace(const std::shared_ptr<PointerEvent> &point)
+void HandlePointerEventTrace(std::shared_ptr<PointerEvent> point)
 {
     if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         int32_t pointerId = point->GetId();
