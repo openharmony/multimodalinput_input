@@ -25,7 +25,7 @@ namespace OHOS {
 namespace MMI {
 class GestureTransformPointProcessor {
 public:
-    GestureTransformPointProcessor(int32_t deviceId);
+    explicit GestureTransformPointProcessor(int32_t deviceId);
     DISALLOW_COPY_AND_MOVE(GestureTransformPointProcessor);
     ~GestureTransformPointProcessor();
     std::shared_ptr<PointerEvent> OnTouchPadGestrueEvent(libinput_event *event);
