@@ -39,6 +39,7 @@ void JsEventTarget::CallIdsAsyncWork(napi_env env, napi_status status, void* dat
 {
     MMI_LOGD("begin");
     CHKPV(env_);
+    CHKPV(data);
     napi_handle_scope scope = nullptr;
     napi_status status_ = napi_open_handle_scope(env, &scope);
     if (status_ != napi_ok) {
@@ -146,6 +147,7 @@ void JsEventTarget::CallDevAsyncWork(napi_env env, napi_status status, void* dat
 {
     MMI_LOGD("begin");
     CHKPV(env_);
+    CHKPV(data);
     napi_handle_scope scope = nullptr;
     napi_status status_ = napi_open_handle_scope(env, &scope);
     if (status_ != napi_ok) {
@@ -317,6 +319,7 @@ void JsEventTarget::CallIdsPromiseWork(napi_env env, napi_status status, void* d
 {
     MMI_LOGD("begin");
     CHKPV(env_);
+    CHKPV(data);
     napi_handle_scope scope = nullptr;
     napi_status status_ = napi_open_handle_scope(env, &scope);
     if (status_ != napi_ok) {
@@ -411,6 +414,7 @@ void JsEventTarget::CallDevPromiseWork(napi_env env, napi_status status, void* d
 {
     MMI_LOGD("begin");
     CHKPV(env_);
+    CHKPV(data);
     napi_handle_scope scope = nullptr;
     napi_status status_ = napi_open_handle_scope(env, &scope);
     if (status_ != napi_ok) {
@@ -537,6 +541,7 @@ void JsEventTarget::EmitJsDevPromise(std::shared_ptr<InputDeviceImpl::InputDevic
 {
     MMI_LOGD("begin");
     CHKPV(env_);
+    CHKPV(device);
     DevCallbackInfo *cb = new (std::nothrow) DevCallbackInfo;
     CHKPV(cb);
     cb->deviceTemp = device;
