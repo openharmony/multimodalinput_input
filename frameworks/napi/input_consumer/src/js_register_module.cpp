@@ -42,47 +42,57 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
     napi_value argv[ARGC_NUM] = { 0 };
     if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
         napi_throw_error(env, nullptr, "Get param failed");
+        MMI_LOGE("Get param failed");
         return ERROR_CODE;
     }
     if (argc != ARGC_NUM) {
         napi_throw_error(env, nullptr, "requires 3 parameter");
+        MMI_LOGE("Requires 3 parameter");
         return ERROR_CODE;
     }
     napi_valuetype valueType = napi_undefined;
     if (napi_typeof(env, argv[ARGV_FIRST], &valueType) != napi_ok) {
         napi_throw_error(env, nullptr, "Get type of first param failed");
+        MMI_LOGE("Get type of first param failed");
         return ERROR_CODE;
     }
     if (valueType != napi_string) {
         napi_throw_error(env, nullptr, "Parameter1 is not napi_string");
+        MMI_LOGE("Parameter1 is not napi_string");
         return ERROR_CODE;
     }
     if (napi_typeof(env, argv[ARGV_SECOND], &valueType) != napi_ok) {
         napi_throw_error(env, nullptr, "Get type of second param failed");
+        MMI_LOGE("Get type of second param failed");
         return ERROR_CODE;
     }
     if (valueType != napi_object) {
         napi_throw_error(env, nullptr, "Parameter2 is not napi_object");
+        MMI_LOGE("Parameter2 is not napi_object");
         return ERROR_CODE;
     }
     if (napi_typeof(env, argv[ARGV_THIRD], &valueType) != napi_ok) {
         napi_throw_error(env, nullptr, "Get type of third param failed");
+        MMI_LOGE("Get type of third param failed");
         return ERROR_CODE;
     }
     if (valueType != napi_function) {
         napi_throw_error(env, nullptr, "Parameter3 is not napi_function");
+        MMI_LOGE("Parameter3 is not napi_function");
         return ERROR_CODE;
     }
     char eventName[EVENT_NAME_LEN] = { 0 };
     size_t typeLen = 0;
     if (napi_get_value_string_utf8(env, argv[ARGV_FIRST], eventName, EVENT_NAME_LEN - 1, &typeLen) != napi_ok) {
         napi_throw_error(env, nullptr, "Get value of first param failed");
+        MMI_LOGE("Get value of first param failed");
         return ERROR_CODE;
     }
     event->name = eventName;
     napi_value receiceValue = nullptr;
     if (napi_get_named_property(env, argv[ARGV_SECOND], "preKeys", &receiceValue) != napi_ok) {
         napi_throw_error(env, nullptr, "Get preKeys failed");
+        MMI_LOGE("Get preKeys failed");
         return ERROR_CODE;
     }
     std::vector<int32_t> preKeys = GetIntArray(env, receiceValue);
@@ -119,6 +129,7 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
     MMI_LOGD("FinalKeyDownDuriation:%{public}d", finalKeyDownDuriation);
     if (napi_create_reference(env, argv[ARGV_THIRD], 1, &event->callback[0]) != napi_ok) {
         napi_throw_error(env, nullptr, "Event create reference failed");
+        MMI_LOGE("Event create reference failed");
         return ERROR_CODE;
     }
     return SUCCESS_CODE;
