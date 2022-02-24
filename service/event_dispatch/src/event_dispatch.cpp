@@ -884,6 +884,7 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
 int32_t EventDispatch::IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id)
 {
     MMI_LOGD("begin");
+    CHKPR(udsServer, ERROR_NULL_POINTER);
     auto session = udsServer->GetSession(fd);
     CHKPR(session, SESSION_NOT_FOUND);
     auto currentTime = GetSysClockTime();
