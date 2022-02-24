@@ -18,6 +18,9 @@
     ],
     "rom": "4000KB",
     "ram": "4000KB",
+    "hisysevent_config":[
+      "//foundation/multimodalinput/input/service/hisysevent.yaml"
+    ],
     "deps": {
       "components": [
         "libhilog",
@@ -44,7 +47,8 @@
         "libxkbcommon",
         "libwayland_server",
         "libweston",
-        "wmserver"
+        "wmserver",
+        "hisysevent_native"
       ],
       "third_party": []
     },
