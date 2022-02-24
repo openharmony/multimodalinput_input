@@ -66,7 +66,7 @@ protected:
         const RegisteredEvent& data, int32_t inputDeviceType, uint64_t preHandlerTime);
     int32_t KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer& udsServer,
         libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime);
-    bool IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id);
+    bool IsANRProcess(int64_t time, SessionPtr ss);
 
 protected:
     int32_t touchDownFocusSurfaceId_ = 0;
