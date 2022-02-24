@@ -66,7 +66,7 @@ protected:
         const RegisteredEvent& data, int32_t inputDeviceType, uint64_t preHandlerTime);
     int32_t KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer& udsServer,
         libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime);
-    int32_t IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id);
+    bool IsANRProcess(int64_t time, SessionPtr ss);
 
 private:
     EventPackage eventPackage_;
