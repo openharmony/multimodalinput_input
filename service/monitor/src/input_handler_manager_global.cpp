@@ -126,9 +126,9 @@ void InputHandlerManagerGlobal::OnSessionLost(SessionPtr session)
 void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent) const
 {
     if (keyEvent == nullptr) {
-	    MMI_LOGE("The in parameter keyEvent is nullptr");
-		return;
-	}
+        MMI_LOGE("The in parameter keyEvent is nullptr");
+        return;
+    }
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
     CHK(pkt.Write(id_), STREAM_BUF_WRITE_FAIL);
     CHK((InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) == RET_OK),
@@ -139,9 +139,9 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Key
 void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
 {
     if (pointerEvent == nullptr) {
-	    MMI_LOGE("The in parameter pointerEvent is nullptr");
-		return;
-	}
+        MMI_LOGE("The in parameter pointerEvent is nullptr");
+        return;
+    }
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
     MMI_LOGD("Service SendToClient id:%{public}d,InputHandlerType:%{public}d", id_, handlerType_);
     CHK(pkt.Write(id_), STREAM_BUF_WRITE_FAIL);
@@ -214,9 +214,9 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::GetPriority() const
 bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     if (keyEvent == nullptr) {
-	    MMI_LOGE("The in parameter keyEvent is nullptr");
-		return false;
-	}
+        MMI_LOGE("The in parameter keyEvent is nullptr");
+        return false;
+    }
     std::lock_guard<std::mutex> guard(lockMonitors_);
     MMI_LOGD("There are currently %{public}zu monitors", monitors_.size());
     for (const auto &mon : monitors_) {
@@ -228,9 +228,9 @@ bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<K
 bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (pointerEvent == nullptr) {
-	    MMI_LOGE("The in parameter pointerEvent is nullptr");
-		return false;
-	}
+        MMI_LOGE("The in parameter pointerEvent is nullptr");
+        return false;
+    }
     UpdateConsumptionState(pointerEvent);
     Monitor(pointerEvent);
     return monitorConsumed_;
@@ -271,9 +271,9 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
 void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (pointerEvent == nullptr) {
-	    MMI_LOGE("The in parameter pointerEvent is nullptr");
-		return;
-	}
+        MMI_LOGE("The in parameter pointerEvent is nullptr");
+        return;
+    }
     std::lock_guard<std::mutex> guard(lockMonitors_);
     MMI_LOGD("There are currently %{public}zu monitors", monitors_.size());
     for (const auto &monitor : monitors_) {
@@ -302,9 +302,9 @@ int32_t InputHandlerManagerGlobal::InterceptorCollection::GetPriority() const
 bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     if (keyEvent == nullptr) {
-	    MMI_LOGE("The in parameter keyEvent is nullptr");
-		return false;
-	}
+        MMI_LOGE("The in parameter keyEvent is nullptr");
+        return false;
+    }
     std::lock_guard<std::mutex> guard(lockInterceptors_);
     if (interceptors_.empty()) {
         return false;
@@ -319,9 +319,9 @@ bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_p
 bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (pointerEvent == nullptr) {
-	    MMI_LOGE("The in parameter pointerEvent is nullptr");
-		return false;
-	}
+        MMI_LOGE("The in parameter pointerEvent is nullptr");
+        return false;
+    }
     std::lock_guard<std::mutex> guard(lockInterceptors_);
     if (interceptors_.empty()) {
         return false;

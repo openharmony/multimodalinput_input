@@ -70,9 +70,9 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
 {
     MMI_LOGD("enter");
     if (pointerEvent == nullptr) {
-	    MMI_LOGE("The in parameter pointerEvent is nullptr");
-		return false;
-	}
+        MMI_LOGE("The in parameter pointerEvent is nullptr");
+        return false;
+    }
     if (interceptor_.empty()) {
         MMI_LOGE("InterceptorManagerGlobal::%{public}s no interceptor to send msg", __func__);
         return false;
@@ -99,9 +99,9 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> k
 {
     MMI_LOGD("enter");
     if (keyEvent == nullptr) {
-	    MMI_LOGE("The in parameter keyEvent is nullptr");
-		return false;
-	}
+        MMI_LOGE("The in parameter keyEvent is nullptr");
+        return false;
+    }
     if (interceptor_.empty()) {
         MMI_LOGE("InterceptorManagerGlobal::%{public}s no interceptor to send msg", __func__);
         return false;

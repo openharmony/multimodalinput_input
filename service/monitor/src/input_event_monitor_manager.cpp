@@ -127,9 +127,9 @@ void OHOS::MMI::InputEventMonitorManager::OnTouchpadMonitorInputEvent(
 {
     MMI_LOGD("Enter");
     if (pointerEvent == nullptr) {
-	    MMI_LOGE("The in parameter pointEvent is nullptr");
-		return;
-	}
+        MMI_LOGE("The in parameter pointEvent is nullptr");
+        return;
+    }
     if (monitorsTouch_.empty()) {
         MMI_LOGE("InputEventMonitorManager::%{public}s no monitor to send msg", __func__);
     }
@@ -149,9 +149,9 @@ void OHOS::MMI::InputEventMonitorManager::OnTouchpadMonitorInputEvent(
 bool OHOS::MMI::InputEventMonitorManager::ReportTouchpadEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
     if (pointerEvent == nullptr) {
-	    MMI_LOGE("The in parameter pointEvent is nullptr");
-		return false;
-	}
+        MMI_LOGE("The in parameter pointEvent is nullptr");
+        return false;
+    }
     PointerEvent::PointerItem pointer;
     CHKF(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL);
     MMI_LOGD("Monitor-serviceeventTouchpad:time:%{public}" PRId64 ","

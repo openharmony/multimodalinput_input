@@ -44,9 +44,9 @@ void MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 {
     MMI_LOGD("enter");
     if (data == nullptr) {
-	    MMI_LOGE("The in data pointerEvent is nullptr");
-		return;
-	}
+        MMI_LOGE("The in parameter data is nullptr");
+        return;
+    }
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttionId_);
 
@@ -61,9 +61,9 @@ void MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem)
 {
     if (data == nullptr) {
-	    MMI_LOGE("The in data pointerEvent is nullptr");
-		return;
-	}
+        MMI_LOGE("The in parameter data is nullptr");
+        return;
+    }
     MMI_LOGD("enter, current action:%{public}d", pointerEvent_->GetPointerAction());
 
     auto button = libinput_event_pointer_get_button(data);
@@ -98,9 +98,9 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEv
 void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
 {
     if (data == nullptr) {
-	    MMI_LOGE("The in data pointerEvent is nullptr");
-		return;
-	}
+        MMI_LOGE("The in parameter data is nullptr");
+        return;
+    }
     if (TimerMgr->IsExist(timerId_)) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
         TimerMgr->ResetTimer(timerId_);
@@ -140,9 +140,9 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
 {
     MMI_LOGD("enter");
     if (data == nullptr) {
-	    MMI_LOGE("The in data pointerEvent is nullptr");
-		return;
-	}
+        MMI_LOGE("The in parameter data is nullptr");
+        return;
+    }
     auto mouseInfo = WinMgr->GetMouseInfo();
     MouseState->SetMouseCoords(mouseInfo.globalX, mouseInfo.globalY);
     pointerItem.SetGlobalX(mouseInfo.globalX);
