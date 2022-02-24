@@ -208,13 +208,13 @@ void InputEventHandler::OnEvent(void *event)
         return;
     }
 
-    MMI_LOGT("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
+    MMI_LOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
              "initSysClock:%{public}" PRId64, idSeed_, tid, eventType_, initSysClock_);
 
     OnEventHandler(*lpMmiEvent);
     lastSysClock_ = GetSysClockTime();
     uint64_t lostTime = lastSysClock_ - initSysClock_;
-    MMI_LOGT("Event handling completed. id:%{public}" PRId64 ",lastSynClock:%{public}" PRId64
+    MMI_LOGD("Event handling completed. id:%{public}" PRId64 ",lastSynClock:%{public}" PRId64
              ",lostTime:%{public}" PRId64, idSeed_, lastSysClock_, lostTime);
 }
 
@@ -280,7 +280,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
                  packageResult, DEV_ADD_EVENT_PKG_FAIL);
         return DEV_ADD_EVENT_PKG_FAIL;
     }
-    MMI_LOGT("4.event dispatcher of server, DeviceManage:physical:%{public}s,"
+    MMI_LOGD("4.event dispatcher of server, DeviceManage:physical:%{public}s,"
              "deviceName:%{public}s,deviceType:%{public}u",
              deviceManage.physical, deviceManage.deviceName, deviceManage.deviceType);
 
@@ -320,7 +320,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
                  packageResult, DEV_REMOVE_EVENT_PKG_FAIL);
         return DEV_REMOVE_EVENT_PKG_FAIL;
     }
-    MMI_LOGT("4.event dispatcher of server, DeviceManage:physical:%{public}s,"
+    MMI_LOGD("4.event dispatcher of server, DeviceManage:physical:%{public}s,"
              "deviceName:%{public}s,deviceType:%{public}u",
              deviceManage.physical, deviceManage.deviceName, deviceManage.deviceType);
 
@@ -572,7 +572,7 @@ int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
         return RET_OK;
     }
 #else
-    MMI_LOGT("2.mapping event, Event:eventType:%{public}d", point.eventType);
+    MMI_LOGD("2.mapping event, Event:eventType:%{public}d", point.eventType);
     /*
     auto retEvent = eventDispatch_.DispatchCommonPointEvent(*udsServer_, *ev.event, point, preHandlerTime);
     if (retEvent != RET_OK) {
@@ -697,7 +697,7 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
         MMI_LOGE("Gesture event package failed, errCode:%{public}d", GESTURE_EVENT_PKG_FAIL);
         return GESTURE_EVENT_PKG_FAIL;
     }
-    MMI_LOGT("GestrueEvent package, eventType:%{public}d,actionTime:%{public}" PRId64 ","
+    MMI_LOGD("GestrueEvent package, eventType:%{public}d,actionTime:%{public}" PRId64 ","
              "action:%{public}d,actionStartTime:%{public}" PRId64 ","
              "pointerAction:%{public}d,sourceType:%{public}d,"
              "PinchAxisValue:%{public}.2f",
@@ -708,7 +708,7 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 
     PointerEvent::PointerItem item;
     pointer->GetPointerItem(pointer->GetPointerId(), item);
-    MMI_LOGT("Item:DownTime:%{public}" PRId64 ",IsPressed:%{public}s,"
+    MMI_LOGD("Item:DownTime:%{public}" PRId64 ",IsPressed:%{public}s,"
              "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
              "Width:%{public}d,Height:%{public}d,DeviceId:%{public}d",
              item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
@@ -766,7 +766,7 @@ int32_t InputEventHandler::OnEventTabletTool(const multimodal_libinput_event& ev
                  packageResult, TABLETTOOL_EVENT_PKG_FAIL);
         return TABLETTOOL_EVENT_PKG_FAIL;
     }
-    MMI_LOGT("2.mapping event, Event:eventType:%{public}d;", tableTool.eventType);
+    MMI_LOGD("2.mapping event, Event:eventType:%{public}d;", tableTool.eventType);
     auto retEvent = eventDispatch_.DispatchTabletToolEvent(*udsServer_, ev.event, tableTool, sysStartProcessTime);
     if (retEvent != RET_OK) {
         MMI_LOGE("Tabletool event dispatch failed. ret:%{public}d,errCode:%{public}d",
@@ -801,7 +801,7 @@ int32_t InputEventHandler::OnEventSwitchToggle(const multimodal_libinput_event& 
 {
     CHKPR(ev.event, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(ev.event);
-    MMI_LOGT("Function is OnEventSwitchToggle, sourceType is LIBINPUT_EVENT_SWITCH_TOGGLE:%{public}d", type);
+    MMI_LOGD("Function is OnEventSwitchToggle, sourceType is LIBINPUT_EVENT_SWITCH_TOGGLE:%{public}d", type);
     return RET_OK;
 }
 

@@ -109,11 +109,11 @@ class InputEventCallback : public OHOS::MMI::IInputEventConsumer {
 public:
     virtual void OnInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) const override
     {
-        MMI_LOGT("OnInputEvent keyCode:%{public}d", keyEvent->GetKeyCode());
+        MMI_LOGD("OnInputEvent keyCode:%{public}d", keyEvent->GetKeyCode());
     }
     virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
     {
-        MMI_LOGT("PointerEvent received.");
+        MMI_LOGD("PointerEvent received.");
     }
     virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {}
     static std::shared_ptr<InputEventCallback> GetPtr();

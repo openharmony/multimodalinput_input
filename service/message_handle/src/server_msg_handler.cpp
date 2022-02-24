@@ -342,7 +342,7 @@ int32_t OHOS::MMI::ServerMsgHandler::CheckReplyMessageFormClient(SessionPtr sess
     MMIEventDump->InsertFormat("MsgDump: msgId=%d fd=%d inputExpendTime=%llu(us) westonExpendTime=%d(us) "
                                "serverExpendTime=%d(us) clientExpendTime=%d(us) allTime=%d(us)", idMsg, fd,
                                waitData.inputTime, westonExpendTime, serverExpendTime, clientExpendTime, allTime);
-    MMI_LOGT("CheckReplyMessageFormClient msgId:%{public}d,fd:%{public}d,inputExpendTime:%{public}" PRIu64 "(us),"
+    MMI_LOGD("CheckReplyMessageFormClient msgId:%{public}d,fd:%{public}d,inputExpendTime:%{public}" PRIu64 "(us),"
              "westonExpendTime:%{public}d(us),serverExpendTime:%{public}d(us),clientExpendTime:%{public}d(us),"
              "allTime:%{public}d(us)", idMsg, fd, waitData.inputTime, westonExpendTime, serverExpendTime,
              clientExpendTime, allTime);
@@ -437,7 +437,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
         MMI_LOGE("keyCode is invalid");
         return RET_ERR;
     }
-    MMI_LOGT("time:%{public}u,keycode:%{public}u,tate:%{public}u,"
+    MMI_LOGD("time:%{public}u,keycode:%{public}u,tate:%{public}u,"
         "isIntercepted:%{public}d", event.keyDownDuration, event.keyCode,
         event.isPressed, event.isIntercepted);
     EventKeyboard key = {};
@@ -471,12 +471,12 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
 #ifdef DEBUG_CODE_TEST
     int32_t pid = udsServer_->GetClientPid(appInfo.fd);
     if (pid != RET_ERR) {
-        MMI_LOGT("Inject keyCode:%{public}d,action:%{public}d,focusPid:%{public}d",
+        MMI_LOGD("Inject keyCode:%{public}d,action:%{public}d,focusPid:%{public}d",
             key.key, key.state, pid);
     }
 #endif
 #ifdef DEBUG_CODE_TEST
-    MMI_LOGT("4.event dispatcher of server:eventKeyboard:time:%{public}" PRId64 ",sourceType:%{public}d,key:%{public}u,"
+    MMI_LOGD("4.event dispatcher of server:eventKeyboard:time:%{public}" PRId64 ",sourceType:%{public}d,key:%{public}u,"
              "seat_key_count:%{public}u,state:%{public}d,fd:%{public}d,abilityId:%{public}d,"
              "windowId:%{public}s(%{public}d)",
              key.time, LIBINPUT_EVENT_KEYBOARD_KEY, key.key, key.seat_key_count, key.state, appInfo.fd,
