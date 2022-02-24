@@ -143,14 +143,14 @@
     } while (0)
 
 #else // DEBUG_CODE_TEST
-#define CHKPL(cond, ...) \
+#define CHKPL(cond) \
     do { \
         if ((cond) == nullptr) { \
             MMI_LOGE("CHKPL(%{public}s) is null, do nothing", #cond); \
         } \
     } while (0)
 
-#define CHKPV(cond, ...) \
+#define CHKPV(cond) \
     do { \
         if ((cond) == nullptr) { \
             MMI_LOGE("CHKPV(%{public}s) is null", #cond); \
@@ -158,7 +158,7 @@
         } \
     } while (0)
 
-#define CHKPF(cond, ...) \
+#define CHKPF(cond) \
     do { \
         if ((cond) == nullptr) { \
             MMI_LOGE("CHKPF(%{public}s) is null", #cond); \
@@ -166,7 +166,7 @@
         } \
     } while (0)
 
-#define CHKPC(cond, ...) \
+#define CHKPC(cond) \
     { \
         if ((cond) == nullptr) { \
             MMI_LOGE("CHKPC(%{public}s) is null, skip then continue", #cond); \
@@ -174,7 +174,7 @@
         } \
     }
 
-#define CHKPB(cond, ...) \
+#define CHKPB(cond) \
     { \
         if ((cond) == nullptr) { \
             MMI_LOGE("CHKPC(%{public}s) is null, skip then break", #cond); \
