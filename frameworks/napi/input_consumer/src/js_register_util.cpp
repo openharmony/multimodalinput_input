@@ -144,6 +144,7 @@ int32_t AddEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks, O
     napi_value handler1 = nullptr;
     napi_status status = napi_get_reference_value(env, event->callback[0], &handler1);
     if (status != napi_ok) {
+        napi_throw_error(env, nullptr, "Handler1 get reference value failed");
         MMI_LOGE("Handler1 get reference value failed");
         return JS_CALLBACK_EVENT_FAILED;
     }

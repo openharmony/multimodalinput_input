@@ -488,11 +488,6 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
-    int32_t keyCode = keyEvent_->GetKeyCode();
-    keyEventString = "service dispatch keyCode=" + std::to_string(keyCode);
-    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
-    keyEventString = "OnKeyEvent";
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
     return RET_OK;
 }
 
@@ -611,7 +606,6 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
     std::string touchEvent = "OnEventTouch";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, pointerId);
     eventDispatch_.HandlePointerEvent(point);
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, pointerId);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         point->RemovePointerItem(point->GetPointerId());
         MMI_LOGD("This touch event is up remove this finger");
@@ -918,7 +912,6 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, pointerId);
     // 派发
     eventDispatch_.HandlePointerEvent(pointerEvent);
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, pointerId);
     // 返回值 代表是 鼠标事件有没有处理过， 不关心成功与失败
     return RET_OK;
 }

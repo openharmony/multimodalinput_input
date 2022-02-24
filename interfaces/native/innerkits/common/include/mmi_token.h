@@ -22,7 +22,7 @@ namespace OHOS {
 namespace MMI {
 class MMIToken : public IMMIToken {
 public:
-    MMIToken(std::u16string descriptor = nullptr) : IMMIToken(descriptor)
+    explicit MMIToken(std::u16string descriptor = nullptr) : IMMIToken(descriptor)
     {
     }
     DISALLOW_COPY_AND_MOVE(MMIToken);

@@ -31,6 +31,7 @@ void ManipulationEvent::Initialize(int32_t windowId, int32_t startTime, int32_t 
                                    int32_t inputDeviceId,  bool isHighLevelEvent, uint16_t deviceUdevTags)
 {
     if (pointerCount < 0 || pointerCount > FINGER_NUM) {
+        MMI_LOGE("PointerCount is invalid, value:%{public}d, Initialization failed", pointerCount);
         return;
     }
 

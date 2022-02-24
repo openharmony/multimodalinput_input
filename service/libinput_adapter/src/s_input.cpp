@@ -41,6 +41,7 @@ static void HiLogFunc(struct libinput* input, enum libinput_log_priority priorit
 
 static void InitHiLogFunc(struct libinput* input)
 {
+    CHKPV(input);
     static bool initFlag = false;
     if (initFlag) {
         return;

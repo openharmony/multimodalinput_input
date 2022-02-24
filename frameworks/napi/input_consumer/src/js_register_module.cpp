@@ -85,6 +85,7 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
     size_t typeLen = 0;
     if (napi_get_value_string_utf8(env, argv[ARGV_FIRST], eventName, EVENT_NAME_LEN - 1, &typeLen) != napi_ok) {
         napi_throw_error(env, nullptr, "Get value of first param failed");
+        MMI_LOGE("Get value of first param failed");
         return ERROR_CODE;
     }
     event->name = eventName;
