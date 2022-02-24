@@ -17,13 +17,9 @@
 
 namespace OHOS {
 namespace MMI {
-UdsCommandQueue::UdsCommandQueue()
-{
-}
+UdsCommandQueue::UdsCommandQueue() {}
 
-UdsCommandQueue::~UdsCommandQueue()
-{
-}
+UdsCommandQueue::~UdsCommandQueue() {}
 
 size_t UdsCommandQueue::GetSize() const
 {

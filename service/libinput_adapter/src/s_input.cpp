@@ -79,13 +79,9 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
     },
 };
 
-OHOS::MMI::SInput::SInput()
-{
-}
+OHOS::MMI::SInput::SInput() {}
 
-OHOS::MMI::SInput::~SInput()
-{
-}
+OHOS::MMI::SInput::~SInput() {}
 
 bool OHOS::MMI::SInput::Init(FunInputEvent funInputEvent, const std::string& seat_id)
 {

@@ -47,9 +47,7 @@ static void SeatsInfoDebugPrint(const SeatInfo** seats)
     }
 }
 
-OHOS::MMI::InputWindowsManager::InputWindowsManager()
-{
-}
+OHOS::MMI::InputWindowsManager::InputWindowsManager() {}
 
 OHOS::MMI::InputWindowsManager::~InputWindowsManager()
 {

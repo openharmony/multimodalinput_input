@@ -28,9 +28,7 @@ GestureTransformPointProcessor::GestureTransformPointProcessor(int32_t deviceId)
     pointerEvent_ = PointerEvent::Create();
 }
 
-GestureTransformPointProcessor::~GestureTransformPointProcessor()
-{
-}
+GestureTransformPointProcessor::~GestureTransformPointProcessor() {}
 
 void GestureTransformPointProcessor::SetPointEventSource(int32_t sourceType)
 {

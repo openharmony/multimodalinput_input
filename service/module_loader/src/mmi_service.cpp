@@ -88,13 +88,9 @@ static void CheckDefine()
 #endif
 }
 
-MMIService::MMIService() : SystemAbility(MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true)
-{
-}
+MMIService::MMIService() : SystemAbility(MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true) {}
 
-MMIService::~MMIService()
-{
-}
+MMIService::~MMIService() {}
 
 int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 {

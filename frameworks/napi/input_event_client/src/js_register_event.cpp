@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsRegisterEvent" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsRegisterEvent" }; // namespace
 }
 static std::map<std::string, uint32_t> g_jsEventType = {};
 

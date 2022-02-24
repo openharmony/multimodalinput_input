@@ -32,7 +32,7 @@ namespace {
 using namespace OHOS;
 using namespace OHOS::MMI;
 
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIClientDemo" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIClientDemo" }; // namespace
 
 class AppKeyEventHandle : public KeyEventHandler {
 public:
