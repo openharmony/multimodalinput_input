@@ -19,11 +19,15 @@
 #include <list>
 #include <cstring>
 #include <iostream>
-#include "libmmi_util.h"
-#include "multimodal_event_handler.h"
-#include "multimodal_event.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "libmmi_util.h"
+#include "utils/log.h"
+#include "client_msg_handler.h"
+
+#ifdef OHOS_WESTEN_MODEL
+#include "multimodal_event_handler.h"
+#include "multimodal_event.h"
 #include "standardized_event_handler.h"
 #include "common_event_handler.h"
 #include "system_event_handler.h"
@@ -32,8 +36,6 @@
 #include "device_handler.h"
 #include "key_event_handler.h"
 #include "media_event_handler.h"
-#include "client_msg_handler.h"
-#include "utils/log.h"
 
 #define SUCCESS_CODE 0
 #define ERROR_CODE (-1)
@@ -78,5 +80,5 @@ typedef struct {
 typedef std::map<std::string, std::list<napi_ref>> CallbackMap;
 } // namespace MMI
 } // namespace OHOS
-
+#endif // OHOS_WESTEN_MODEL
 #endif // JS_REGISTER_MODULE_H

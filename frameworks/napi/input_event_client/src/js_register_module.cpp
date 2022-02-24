@@ -15,22 +15,30 @@
 
 #include "js_register_module.h"
 #include <cinttypes>
-#include "js_register_event.h"
-#include "js_register_handle.h"
+#ifdef OHOS_WESTEN_MODEL
+    #include "js_register_event.h"
+    #include "js_register_handle.h"
+    #include "multi_input_common.h"
+#else
+    #include "input_manager.h"
+#endif // OHOS_WESTEN_MODEL
+
 #include "js_register_util.h"
-#include "multi_input_common.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
+#ifdef OHOS_WESTEN_MODEL
     constexpr size_t EVENT_NAME_LEN = 64;
     constexpr size_t ARGC_NUM = 2;
     constexpr size_t ARGC_UT_NUM = 2;
     constexpr size_t ARGV_FIRST = 0;
     constexpr size_t ARGV_SECOND = 1;
+#endif // OHOS_WESTEN_MODEL
 }
 
+#ifdef OHOS_WESTEN_MODEL
 template<class T>
 static StandEventPtr CreateEvent(napi_env env)
 {
@@ -82,7 +90,7 @@ static napi_value GetEventInfo(napi_env env, napi_callback_info info, EventInfo&
     return result;
 }
 
-static int32_t RegisterByTypeCode(napi_env env, JSRegisterHandle &registerHandle, const EventInfo &event)
+static int32_t RegisterTypeCode(napi_env env, JSRegisterHandle &registerHandle, const EventInfo &event)
 {
     int32_t response = ERROR_CODE;
     if (SYSTEM_TYPE_CODE == event.type) {
@@ -129,7 +137,7 @@ static napi_value OnEvent(napi_env env, napi_callback_info info)
     JSRegisterHandle registerHandle(env);
     int32_t response = MMI_STANDARD_EVENT_SUCCESS;
     if (!registerHandle.CheckRegistered(event.winId, event.type)) {
-        response = RegisterByTypeCode(env, registerHandle, event);
+        response = RegisterTypeCode(env, registerHandle, event);
         if (response != MMI_STANDARD_EVENT_SUCCESS) {
             MMI_LOGD("register failed, response=%d", response);
             napi_create_int32(env, response, &result);
@@ -192,18 +200,17 @@ static napi_value OffEvent(napi_env env, napi_callback_info info)
     napi_create_int32(env, response, &result);
     return result;
 }
+#endif // OHOS_WESTEN_MODEL
 
 static napi_value InjectEvent(napi_env env, napi_callback_info info)
 {
+    MMI_LOGE("enter");
     napi_value result = nullptr;
-    if (napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result) != napi_ok) {
-        MMI_LOGE("call napi_create_int32 fail");
-        return result;
-    }
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
         MMI_LOGE("call napi_get_cb_info fail");
+        napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result);
         return result;
     }
     NAPI_ASSERT(env, argc == 1, "paramater num error");
@@ -220,16 +227,35 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     int32_t keyDownDuration = GetNamedPropertyInt32(env, keyHandle, "keyDownDuration");
     isIntercepted = false;
 
+#ifdef OHOS_WESTEN_MODEL
     OHOS::KeyEvent injectEvent;
     injectEvent.Initialize(0, isPressed, keyCode, keyDownDuration, 0, "", 0, 0, "", 0, false, 0, 0, isIntercepted);
     int32_t response = MMIEventHdl.InjectEvent(injectEvent);
-    if (napi_create_int32(env, response, &result) != napi_ok) {
-        MMI_LOGE("call napi_create_int32 fail");
-        return result;
+    napi_create_int32(env, response, &result);
+#else
+    auto keyEvent = KeyEvent::Create();
+    if (isPressed) {
+        keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    } else {
+        keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     }
+    keyEvent->SetKeyCode(keyCode);
+    if (!isIntercepted) {
+        keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    }
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(keyCode);
+    item.SetPressed(isPressed);
+    item.SetDownTime(static_cast<int64_t>(keyDownDuration));
+    keyEvent->AddKeyItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    napi_create_int32(env, 0, &result);
+#endif // OHOS_WESTEN_MODEL
+    MMI_LOGE("leave");
     return result;
 }
 
+#ifdef OHOS_WESTEN_MODEL
 // only support common/telephone/media/system event
 static napi_value UnitTest(napi_env env, napi_callback_info info)
 {
@@ -308,19 +334,24 @@ static napi_value SetInjectFile(napi_env env, napi_callback_info info)
     }
     return result;
 }
+#endif // OHOS_WESTEN_MODEL
 
 EXTERN_C_START
 static napi_value MmiInit(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
+#ifdef OHOS_WESTEN_MODEL
         DECLARE_NAPI_FUNCTION("on", OnEvent),
         DECLARE_NAPI_FUNCTION("off", OffEvent),
         DECLARE_NAPI_FUNCTION("unitTest", UnitTest),
-        DECLARE_NAPI_FUNCTION("injectEvent", InjectEvent),
         DECLARE_NAPI_FUNCTION("setInjectFile", SetInjectFile)
+#endif // OHOS_WESTEN_MODEL
+        DECLARE_NAPI_FUNCTION("injectEvent", InjectEvent),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+#ifdef OHOS_WESTEN_MODEL
     InitJsEvents();
+#endif // OHOS_WESTEN_MODEL
     return exports;
 }
 EXTERN_C_END

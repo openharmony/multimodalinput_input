@@ -97,9 +97,9 @@ bool ServerInputFilterManager::OnKeyEvent(const EventKeyboard& key)
         MMI_LOGD("Send msg id is 0");
         return false;
     }
-    NetPacket newPkt(MmiMessageId::KEY_EVENT_INTERCEPTOR);
-    newPkt << key << id;
-    if (!temp->SendMsg(newPkt)) {
+    NetPacket pkt(MmiMessageId::KEY_EVENT_INTERCEPTOR);
+    pkt << key << id;
+    if (!temp->SendMsg(pkt)) {
         MMI_LOGE("Sending structure of EventKeyboard failed");
         return false;
     }
@@ -251,7 +251,7 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
     MMIRegEvent->OnEventTouchGetSign(touch, idMsg);
 
     int32_t touchFocusId = WinMgr->GetTouchFocusSurfaceId();
-    auto appInfo = AppRegs->FindByWinId(touchFocusId); // obtain application information
+    auto appInfo = AppRegs->FindWinId(touchFocusId); // obtain application information
     if (appInfo.fd == RET_ERR) {
         MMI_LOGE("Failed to find fd:%{public}d,errCode:%{public}d", touchFocusId, FOCUS_ID_OBTAIN_FAIL);
         return false;
@@ -263,7 +263,7 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, touch.time)) {
         NetPacket newPacket(MmiMessageId::TOUCH_EVENT_INTERCEPTOR);
-        int32_t fingerCount = MMIRegEvent->GetTouchInfoSizeByDeviceId(touch.deviceId);
+        int32_t fingerCount = MMIRegEvent->GetTouchInfoSizeDeviceId(touch.deviceId);
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
             fingerCount++;
         }
@@ -382,9 +382,9 @@ bool ServerInputFilterManager::OnPointerEvent(EventPointer event_pointer)
         MMI_LOGD("Send msg id is 0");
         return false;
     }
-    NetPacket newPkt(MmiMessageId::POINTER_EVENT_INTERCEPTOR);
-    newPkt << event_pointer << id;
-    if (!ptr->SendMsg(newPkt)) {
+    NetPacket pkt(MmiMessageId::POINTER_EVENT_INTERCEPTOR);
+    pkt << event_pointer << id;
+    if (!ptr->SendMsg(pkt)) {
         MMI_LOGE("Sending structure of pointer failed");
         return false;
     }

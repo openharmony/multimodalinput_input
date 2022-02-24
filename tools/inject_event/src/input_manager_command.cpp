@@ -432,10 +432,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
 void InputManagerCommand::ShowUsage()
 {
-    std::cout << "Usage: injectevent <option> <command> <arg>..." << std::endl;
+    std::cout << "Usage: input <option> <command> <arg>..." << std::endl;
     std::cout << "The option are:                                " << std::endl;
-    std::cout << "-M   --mouse                                                  " << std::endl;
-    std::cout << "commands for  mouse:                           " << std::endl;
+    std::cout << "-M  --mouse                                                  " << std::endl;
+    std::cout << "commands for mouse:                           " << std::endl;
     std::cout << "-m <dx> <dy>              --move   <dx> <dy>  -move to relative position (dx,dy) " << std::endl;
     std::cout << "-d <key>                  --down   key        -press down a button,        " << std::endl;
     std::cout << "                                               0 is the left button,1 is the middle," << std::endl;
@@ -444,14 +444,12 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-c <key>                  --click  <key>      -press the left button down,then raise" << std::endl;
     std::cout << "-s <key>                  --scroll <key>      -Positive values are sliding backwards "<<std::endl;
     std::cout << "                                               negative values are sliding forwards" << std::endl;
-    std::cout << "-K   --keyboard                                                  " << std::endl;
-    std::cout << "commands for  keyboard:                                        " << std::endl;
+    std::cout << "-K  --keyboard                                                  " << std::endl;
+    std::cout << "commands for keyboard:                                        " << std::endl;
     std::cout << "-d <key>                   --down   <key>    -press down a key" << std::endl;
-    std::cout << "                                                               " << std::endl;
-    std::cout << "                                                               " << std::endl;
     std::cout << "-u <key>                   --up     <key>    -release a key " << std::endl;
-    std::cout << "-T   --touch                                                      " << std::endl;
-    std::cout << "commands for  touch:                                            " << std::endl;
+    std::cout << "-T  --touch                                                      " << std::endl;
+    std::cout << "commands for touch:                                            " << std::endl;
     std::cout << "-d <dx1> <dy1>             --down   <dx1> <dy1> -press down a position  dx1 dy1, " << std::endl;
     std::cout << "-u <dx1> <dy1>             --up     <dx1> <dy1> -release a position dx1 dy1" << std::endl;
     std::cout << "-m <dx1> <dy1> <dx2> <dy2> --move   <dx1> <dy1> <dx2> <dy2> -move dx1 dy1 to dx2 dy2 " << std::endl;

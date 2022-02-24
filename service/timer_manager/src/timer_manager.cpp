@@ -56,7 +56,7 @@ int32_t TimerManager::TakeNextTimerId()
         timerSlot |= (one << timer->id);
     }
     
-    for (int32_t i = 0; i < MAX_TIMER_COUNT; ++i) {
+    for (int32_t i = 0; i < MAX_TIMER_COUNT; i++) {
         if ((timerSlot & (one << i)) == 0) {
             return i;
         }

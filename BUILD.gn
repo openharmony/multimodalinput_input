@@ -118,15 +118,15 @@ group("multimodalinput_mmi_packages") {
     "frameworks/napi/input_monitor:inputmonitor",
     "frameworks/proxy:libmmi-client",
     "service:libmmi-server",
-    "tools/event_inject:hosmmi-event-injection",
+    "tools/event_inject:mmi-event-injection",
     "tools/inject_event:input",
-    "tools/virtual_device_manager:hosmmi-virtual-device-manager",
+    "tools/virtual_device_manager:mmi-virtual-device-manager",
   ]
 
   if (is_mmi_have_weston) {
     deps += [
-      "examples/hosmmi:hosmmi-client",
-      "examples/hosmmi:hosmmi-server",
+      "examples/mmi:mmi-client",
+      "examples/mmi:mmi-server",
     ]
   }
 }

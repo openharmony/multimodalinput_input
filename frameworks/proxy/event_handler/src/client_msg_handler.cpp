@@ -168,7 +168,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     MMI_LOGD("key event dispatcher of client, KeyCode:%{public}d,"
              "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
-             "EventType:%{public}d,Flag:%{public}d,"
+             "EventType:%{public}d,Flag:%{public}u,"
              "KeyAction:%{public}d,eventNumber:%{public}d,Fd:%{public}d,"
              "ServerStartTime:%{public}" PRId64"",
              key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
@@ -195,7 +195,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
 
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
     MMI_LOGD("Pointer event dispatcher of client, eventType:%{public}s, actionTime:%{public}" PRId64 ", "
-             "action:%{public}d, actionStartTime:%{public}" PRId64 ", flag:%{public}d, pointerAction:%{public}s, "
+             "action:%{public}d, actionStartTime:%{public}" PRId64 ", flag:%{public}u, pointerAction:%{public}s, "
              "sourceType:%{public}s, VerticalAxisValue:%{public}.2f, HorizontalAxisValue:%{public}.2f, "
              "PinchAxisValue:%{public}.2f, pointerCount:%{public}zu, eventNumber:%{public}d",
              pointerEvent->DumpEventType(), pointerEvent->GetActionTime(), pointerEvent->GetAction(),
@@ -251,7 +251,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     MMI_LOGD("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
              "KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
-             "Action:%{public}d,KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}d",
+             "Action:%{public}d,KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}u",
         subscribeId, fd, keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
         keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
         keyEvent->GetEventType(), keyEvent->GetFlag());

@@ -23,13 +23,9 @@ namespace MMI {
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RegisterEventHandleManager" };
     }
-RegisterEventHandleManager::RegisterEventHandleManager()
-{
-}
+RegisterEventHandleManager::RegisterEventHandleManager() {}
 
-RegisterEventHandleManager::~RegisterEventHandleManager()
-{
-}
+RegisterEventHandleManager::~RegisterEventHandleManager() {}
 
 int32_t RegisterEventHandleManager::RegisterEvent(MmiMessageId messageId, int32_t fd)
 {
@@ -37,28 +33,28 @@ int32_t RegisterEventHandleManager::RegisterEvent(MmiMessageId messageId, int32_
     CHKR(messageId >= MmiMessageId::INVALID, PARAM_INPUT_INVALID, UNKNOWN_EVENT);
     switch (messageId) {
         case MmiMessageId::COMMON_EVENT_BEGIN:
-            RegisterEventHandleByIdMsage(MmiMessageId::COMMON_EVENT_BEGIN, MmiMessageId::COMMON_EVENT_END, fd);
+            RegisterEventHandleIdMsage(MmiMessageId::COMMON_EVENT_BEGIN, MmiMessageId::COMMON_EVENT_END, fd);
             break;
         case MmiMessageId::KEY_EVENT_BEGIN:
-            RegisterEventHandleByIdMsage(MmiMessageId::KEY_EVENT_BEGIN, MmiMessageId::KEY_EVENT_END, fd);
+            RegisterEventHandleIdMsage(MmiMessageId::KEY_EVENT_BEGIN, MmiMessageId::KEY_EVENT_END, fd);
             break;
         case MmiMessageId::MEDIA_EVENT_BEGIN:
-            RegisterEventHandleByIdMsage(MmiMessageId::MEDIA_EVENT_BEGIN, MmiMessageId::MEDIA_EVENT_END, fd);
+            RegisterEventHandleIdMsage(MmiMessageId::MEDIA_EVENT_BEGIN, MmiMessageId::MEDIA_EVENT_END, fd);
             break;
         case MmiMessageId::SYSTEM_EVENT_BEGIN:
-            RegisterEventHandleByIdMsage(MmiMessageId::SYSTEM_EVENT_BEGIN, MmiMessageId::SYSTEM_EVENT_END, fd);
+            RegisterEventHandleIdMsage(MmiMessageId::SYSTEM_EVENT_BEGIN, MmiMessageId::SYSTEM_EVENT_END, fd);
             break;
         case MmiMessageId::TELEPHONE_EVENT_BEGIN:
-            RegisterEventHandleByIdMsage(MmiMessageId::TELEPHONE_EVENT_BEGIN, MmiMessageId::TELEPHONE_EVENT_END, fd);
+            RegisterEventHandleIdMsage(MmiMessageId::TELEPHONE_EVENT_BEGIN, MmiMessageId::TELEPHONE_EVENT_END, fd);
             break;
         case MmiMessageId::TOUCH_EVENT_BEGIN:
-            RegisterEventHandleByIdMsage(MmiMessageId::TOUCH_EVENT_BEGIN, MmiMessageId::TOUCH_EVENT_END, fd);
+            RegisterEventHandleIdMsage(MmiMessageId::TOUCH_EVENT_BEGIN, MmiMessageId::TOUCH_EVENT_END, fd);
             break;
         default:
-            MMI_LOGT("It's no this event handle");
+            MMI_LOGD("It's no this event handle");
             return UNKNOWN_EVENT;
     }
-    MMI_LOGT("event:%{public}d,fd:%{public}d ", messageId, fd);
+    MMI_LOGD("event:%{public}d,fd:%{public}d ", messageId, fd);
     return RET_OK;
 }
 
@@ -68,22 +64,22 @@ int32_t RegisterEventHandleManager::UnregisterEventHandleManager(MmiMessageId me
     CHKR(messageId >= MmiMessageId::INVALID, PARAM_INPUT_INVALID, UNKNOWN_EVENT);
     switch (messageId) {
         case MmiMessageId::COMMON_EVENT_BEGIN:
-            UnregisterEventHandleByIdMsage(MmiMessageId::COMMON_EVENT_BEGIN, MmiMessageId::COMMON_EVENT_END, fd);
+            UnregisterEventHandleIdMsage(MmiMessageId::COMMON_EVENT_BEGIN, MmiMessageId::COMMON_EVENT_END, fd);
             break;
         case MmiMessageId::KEY_EVENT_BEGIN:
-            UnregisterEventHandleByIdMsage(MmiMessageId::KEY_EVENT_BEGIN, MmiMessageId::KEY_EVENT_END, fd);
+            UnregisterEventHandleIdMsage(MmiMessageId::KEY_EVENT_BEGIN, MmiMessageId::KEY_EVENT_END, fd);
             break;
         case MmiMessageId::MEDIA_EVENT_BEGIN:
-            UnregisterEventHandleByIdMsage(MmiMessageId::MEDIA_EVENT_BEGIN, MmiMessageId::MEDIA_EVENT_END, fd);
+            UnregisterEventHandleIdMsage(MmiMessageId::MEDIA_EVENT_BEGIN, MmiMessageId::MEDIA_EVENT_END, fd);
             break;
         case MmiMessageId::SYSTEM_EVENT_BEGIN:
-            UnregisterEventHandleByIdMsage(MmiMessageId::SYSTEM_EVENT_BEGIN, MmiMessageId::SYSTEM_EVENT_END, fd);
+            UnregisterEventHandleIdMsage(MmiMessageId::SYSTEM_EVENT_BEGIN, MmiMessageId::SYSTEM_EVENT_END, fd);
             break;
         case MmiMessageId::TELEPHONE_EVENT_BEGIN:
-            UnregisterEventHandleByIdMsage(MmiMessageId::TELEPHONE_EVENT_BEGIN, MmiMessageId::TELEPHONE_EVENT_END, fd);
+            UnregisterEventHandleIdMsage(MmiMessageId::TELEPHONE_EVENT_BEGIN, MmiMessageId::TELEPHONE_EVENT_END, fd);
             break;
         case MmiMessageId::TOUCH_EVENT_BEGIN:
-            UnregisterEventHandleByIdMsage(MmiMessageId::TOUCH_EVENT_BEGIN, MmiMessageId::TOUCH_EVENT_END, fd);
+            UnregisterEventHandleIdMsage(MmiMessageId::TOUCH_EVENT_BEGIN, MmiMessageId::TOUCH_EVENT_END, fd);
             break;
         default:
             MMI_LOGD("It's no this event handle! ");
@@ -92,7 +88,7 @@ int32_t RegisterEventHandleManager::UnregisterEventHandleManager(MmiMessageId me
     return RET_OK;
 }
 
-void RegisterEventHandleManager::UnregisterEventHandleBySocketFd(int32_t fd)
+void RegisterEventHandleManager::UnregisterEventHandleSocketFd(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
     CHK(fd >= 0, PARAM_INPUT_INVALID);
@@ -101,7 +97,7 @@ void RegisterEventHandleManager::UnregisterEventHandleBySocketFd(int32_t fd)
         if (iter->second == fd) {
             iter = mapRegisterManager_.erase(iter);
         } else {
-            iter++;
+            ++iter;
         }
     }
 }
@@ -157,21 +153,21 @@ void RegisterEventHandleManager::Clear()
     mapRegisterManager_.clear();
 }
 
-void RegisterEventHandleManager::RegisterEventHandleByIdMsage(const MmiMessageId idMsgBegin,
-                                                              const MmiMessageId idMsgEnd,
-                                                              const int32_t fd)
+void RegisterEventHandleManager::RegisterEventHandleIdMsage(const MmiMessageId idMsgBegin,
+                                                            const MmiMessageId idMsgEnd,
+                                                            const int32_t fd)
 {
     const int32_t messageIdBeginTemp = static_cast<int32_t>(idMsgBegin);
     const int32_t messageIdEndTemp = static_cast<int32_t>(idMsgEnd);
-    for (auto it = messageIdBeginTemp + 1; it < messageIdEndTemp; it++) {
+    for (auto it = messageIdBeginTemp + 1; it < messageIdEndTemp; ++it) {
         auto tempId = static_cast<MmiMessageId>(it);
         mapRegisterManager_.insert(std::pair<MmiMessageId, int32_t>(tempId, fd));
     }
 }
 
-void RegisterEventHandleManager::UnregisterEventHandleByIdMsage(const MmiMessageId idMsgBegin,
-                                                                const MmiMessageId idMsgEnd,
-                                                                const int32_t fd)
+void RegisterEventHandleManager::UnregisterEventHandleIdMsage(const MmiMessageId idMsgBegin,
+                                                              const MmiMessageId idMsgEnd,
+                                                              const int32_t fd)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(static_cast<int32_t>(idMsgBegin) + 1);
     auto it = mapRegisterManager_.find(idMsg);
@@ -179,7 +175,7 @@ void RegisterEventHandleManager::UnregisterEventHandleByIdMsage(const MmiMessage
         if ((it->first < idMsgEnd) && (it->second == fd)) {
             it = mapRegisterManager_.erase(it);
         } else {
-            it++;
+            ++it;
         }
     }
 }

@@ -30,7 +30,7 @@ namespace {
 int32_t MultimodalInputConnectStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
-    MMI_LOGT("enter, code:%{public}d", code);
+    MMI_LOGD("enter, code:%{public}d", code);
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IMultimodalInputConnect::GetDescriptor()) {
@@ -76,7 +76,7 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
             break;
         }
 
-        MMI_LOGT("filter iface_cast succeeded");
+        MMI_LOGD("filter iface_cast succeeded");
 
         ret = AddInputEventFilter(filter);
     } while (0);
@@ -86,7 +86,7 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
 
-    MMI_LOGT("leave, ret:%{public}d", ret);
+    MMI_LOGD("leave, ret:%{public}d", ret);
     return RET_OK;
 }
 } // namespace MMI

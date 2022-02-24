@@ -19,8 +19,7 @@ namespace OHOS {
 namespace MMI {
 EventFilterDeathRecipient::EventFilterDeathRecipient(
     const std::function<void(const wptr<IRemoteObject> &object)> &deathCallback)
-    : deathCallback_(deathCallback)
-{}
+    : deathCallback_(deathCallback) {}
 
 void EventFilterDeathRecipient::OnRemoteDied(const OHOS::wptr<OHOS::IRemoteObject> &object)
 {

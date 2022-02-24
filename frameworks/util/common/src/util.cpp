@@ -90,7 +90,7 @@ uint64_t GetSysClockTime()
 {
     timespec ts = { 0, 0 };
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
-        MMI_LOGT("clock_gettime failed:%{public}s", strerror(errno));
+        MMI_LOGD("clock_gettime failed:%{public}s", strerror(errno));
         return 0;
     }
     return (ts.tv_sec * S2US) + (ts.tv_nsec / US2NS);
@@ -222,7 +222,7 @@ std::string Strftime(const std::string &format, time_t curTime)
 
 static void PrintEventJoyStickAxisInfo(const std::string &axisName, const EventJoyStickAxisAbsInfo &r)
 {
-    MMI_LOGT("%{public}s: {code:%{public}d,value:%{public}d,min:%{public}d,max:%{public}d,"
+    MMI_LOGD("%{public}s: {code:%{public}d,value:%{public}d,min:%{public}d,max:%{public}d,"
              "fuzz:%{public}d,flat:%{public}d,resolution:%{public}d,"
              "standardValue:%{public}lf,isChanged:%{public}d}, ",
              axisName.c_str(), r.code, r.value, r.minimum, r.maximum, r.fuzz, r.flat, r.resolution,
@@ -232,7 +232,7 @@ static void PrintEventJoyStickAxisInfo(const std::string &axisName, const EventJ
 void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
     const int32_t abilityId, const int32_t focusId, const uint64_t preHandlerTime)
 {
-    MMI_LOGT("4.event dispatcher of server, EventJoyStickAxis:physical:%{public}s,"
+    MMI_LOGD("4.event dispatcher of server, EventJoyStickAxis:physical:%{public}s,"
              "fd:%{public}d,preHandlerTime:%{public}" PRId64 ","
              "time:%{public}" PRId64 ",deviceType:%{public}u,eventType:%{public}d,deviceName:%{public}s",
              r.physical, fd, preHandlerTime, r.time, r.deviceType,
@@ -251,13 +251,13 @@ void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
 
 void PrintWMSInfo(const std::string& str, const int32_t fd, const int32_t abilityId, const int32_t focusId)
 {
-    MMI_LOGT("MMIWMS:windowId:%{public}s", str.c_str());
+    MMI_LOGD("MMIWMS:windowId:%{public}s", str.c_str());
     if (focusId == -1) {
-        MMI_LOGT("WMS:windowId = ''");
+        MMI_LOGD("WMS:windowId = ''");
     } else {
-        MMI_LOGT("WMS:windowId:%{public}d", focusId);
+        MMI_LOGD("WMS:windowId:%{public}d", focusId);
     }
-    MMI_LOGT("CALL_AMS, fd:%{public}d,abilityID:%{public}d", fd, abilityId);
+    MMI_LOGD("CALL_AMS, fd:%{public}d,abilityID:%{public}d", fd, abilityId);
 }
 
 int32_t GetPid()
@@ -320,7 +320,6 @@ const char* GetProgramName()
     if (RET_OK != ret) {
         return "";
     }
-
     KMSG_LOGI("GetProgramName success. programName = %s", programName);
 
     return programName;
