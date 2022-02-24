@@ -49,7 +49,7 @@ bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
     EventManager.SetClientHandle(GetPtr());
     CHKF(msgHdl->Init(), MSG_HANDLER_INIT_FAIL);
     auto msgHdlImp = static_cast<ClientMsgHandler *>(msgHdl.get());
-    CHKPF(msgHdlImp, ERROR_NULL_POINTER);
+    CHKPF(msgHdlImp);
     auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, msgHdlImp, std::placeholders::_1, std::placeholders::_2);
     CHKF(StartClient(callback, detachMode), START_CLI_FAIL);
     return true;
