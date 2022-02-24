@@ -26,13 +26,9 @@ namespace MMI {
 } // namespace MMI
 } // namespace OHOS
 
-OHOS::MMI::InterceptorManagerGlobal::InterceptorManagerGlobal()
-{
-}
+OHOS::MMI::InterceptorManagerGlobal::InterceptorManagerGlobal() {}
 
-OHOS::MMI::InterceptorManagerGlobal::~InterceptorManagerGlobal()
-{
-}
+OHOS::MMI::InterceptorManagerGlobal::~InterceptorManagerGlobal() {}
 
 void OHOS::MMI::InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
 {

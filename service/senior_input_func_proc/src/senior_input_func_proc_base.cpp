@@ -30,13 +30,9 @@ using namespace OHOS::MMI;
 UDSServer* OHOS::MMI::SeniorInputFuncProcBase::udsServerPtr_ = nullptr;
 std::map<int32_t, OHOS::sptr<SeniorInputFuncProcBase>> OHOS::MMI::SeniorInputFuncProcBase::deviceInfoMap_ = {};
 
-OHOS::MMI::SeniorInputFuncProcBase::SeniorInputFuncProcBase()
-{
-}
+OHOS::MMI::SeniorInputFuncProcBase::SeniorInputFuncProcBase() {}
 
-OHOS::MMI::SeniorInputFuncProcBase::~SeniorInputFuncProcBase()
-{
-}
+OHOS::MMI::SeniorInputFuncProcBase::~SeniorInputFuncProcBase() {}
 
 bool SeniorInputFuncProcBase::Init(UDSServer& sess)
 {

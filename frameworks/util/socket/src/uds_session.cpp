@@ -38,9 +38,7 @@ UDSSession::UDSSession(const std::string& programName, const int32_t moduleType,
     UpdateDescript();
 }
 
-UDSSession::~UDSSession()
-{
-}
+UDSSession::~UDSSession() {}
 
 bool UDSSession::SendMsg(const char *buf, size_t size) const
 {
