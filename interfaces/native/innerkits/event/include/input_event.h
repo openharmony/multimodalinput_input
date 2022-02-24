@@ -120,11 +120,11 @@ public:
     int32_t GetEventType() const;
     const char* DumpEventType() const;
 
-    int32_t GetFlag() const;
+    uint32_t GetFlag() const;
 
-    bool HasFlag(int32_t flag);
+    bool HasFlag(uint32_t flag);
 
-    void AddFlag(int32_t flag);
+    void AddFlag(uint32_t flag);
 
     void ClearFlag();
 
@@ -159,7 +159,7 @@ protected:
     int32_t targetDisplayId_;
     int32_t targetWindowId_;
     int32_t agentWindowId_;
-    int32_t flag_;
+    uint32_t bitwise_;
     std::function<void(int32_t)> processedCallback_;
 };
 } // namespace MMI
