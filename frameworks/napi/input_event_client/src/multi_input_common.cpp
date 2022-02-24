@@ -31,6 +31,7 @@ void MultiInputCommon::InjectionIni(const std::string &iniFilePath, const std::s
                                     const std::string &jsonEventValue)
 {
     if (iniFilePath.empty()) {
+        MMI_LOGE("IniFilePath is empty");
         return;
     }
 
