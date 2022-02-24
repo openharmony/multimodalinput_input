@@ -26,13 +26,9 @@ namespace MMI {
 } // namespace MMI
 } // namespace OHOS
 
-OHOS::MMI::InterceptorManagerGlobal::InterceptorManagerGlobal()
-{
-}
+OHOS::MMI::InterceptorManagerGlobal::InterceptorManagerGlobal() {}
 
-OHOS::MMI::InterceptorManagerGlobal::~InterceptorManagerGlobal()
-{
-}
+OHOS::MMI::InterceptorManagerGlobal::~InterceptorManagerGlobal() {}
 
 void OHOS::MMI::InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
 {
@@ -79,7 +75,7 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
     }
     PointerEvent::PointerItem pointer;
     CHKF(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL);
-    MMI_LOGT("Interceptor-servereventTouchpad:actionTime:%{public}" PRId64 ","
+    MMI_LOGD("Interceptor-servereventTouchpad:actionTime:%{public}" PRId64 ","
              "sourceType:%{public}d,pointerAction:%{public}d,"
              "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),

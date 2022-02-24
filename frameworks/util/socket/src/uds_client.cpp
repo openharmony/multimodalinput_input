@@ -87,7 +87,7 @@ bool UDSClient::ThreadIsEnd()
 
 bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
 {
-    MMI_LOGT("enter detachMode = %d", detachMode);
+    MMI_LOGD("enter detachMode = %d", detachMode);
     recvFun_ = fun;
     isRunning_ = true;
     isConnected_ = true;
@@ -121,7 +121,7 @@ void UDSClient::Stop()
     }
     EpollClose();
     if (t_.joinable()) {
-        MMI_LOGT("thread join");
+        MMI_LOGD("thread join");
         t_.join();
     }
     MMI_LOGD("leave");

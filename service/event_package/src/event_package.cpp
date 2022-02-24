@@ -214,6 +214,7 @@ void EventPackage::PackageTabletToolTypeParam(libinput_event *event, EventTablet
             break;
         }
         default: {
+            MMI_LOGW("Unknown type:%{public}d", libinput_tablet_tool_get_type(tool));
             break;
         }
     }
@@ -273,6 +274,7 @@ void EventPackage::PackageTabletPadOtherParams(libinput_event *event, EventTable
             break;
         }
         default: {
+            MMI_LOGW("Unknown type:%{public}d", type);
             break;
         }
     }
@@ -328,6 +330,7 @@ int32_t EventPackage::PackageTabletPadKeyEvent(libinput_event *event, EventKeybo
             break;
         }
         default: {
+            MMI_LOGW("Unknown type:%{public}d", type);
             break;
         }
     }
@@ -547,7 +550,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
     CHKPR(event, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
-        MMI_LOGT("This touch event is canceled type:%{public}d", type);
+        MMI_LOGD("This touch event is canceled type:%{public}d", type);
         return UNKNOWN_EVENT_PKG_FAIL;
     }
     auto ret = PackageEventDeviceInfo<EventTouch>(event, touch);

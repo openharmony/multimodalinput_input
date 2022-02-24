@@ -228,7 +228,7 @@ int32_t InjectionEventDispatch::OnAisensor()
 
 int32_t InjectionEventDispatch::OnAisensorOne(MmiMessageId code, uint32_t value)
 {
-    MMI_LOGT("enter, code = %u, value = %u", code, value);
+    MMI_LOGD("enter, code = %u, value = %u", code, value);
     timeval time;
     RawInputEvent rawEvent = {};
     int32_t msgType = MSG_TYPE_DEVICE_INFO;

@@ -70,13 +70,9 @@ static void CheckDefine()
 #endif
 }
 
-OHOS::MMI::MMIServer::MMIServer()
-{
-}
+OHOS::MMI::MMIServer::MMIServer() {}
 
-OHOS::MMI::MMIServer::~MMIServer()
-{
-}
+OHOS::MMI::MMIServer::~MMIServer() {}
 
 int32_t OHOS::MMI::MMIServer::Start()
 {

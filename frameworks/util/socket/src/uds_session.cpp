@@ -38,9 +38,7 @@ UDSSession::UDSSession(const std::string& programName, const int32_t moduleType,
     UpdateDescript();
 }
 
-UDSSession::~UDSSession()
-{
-}
+UDSSession::~UDSSession() {}
 
 bool UDSSession::SendMsg(const char *buf, size_t size) const
 {
@@ -63,7 +61,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 
 void UDSSession::Close()
 {
-    MMI_LOGT("enter fd_:%{public}d,bHasClosed_ = %d.", fd_, bHasClosed_);
+    MMI_LOGD("enter fd_:%{public}d,bHasClosed_ = %d.", fd_, bHasClosed_);
     if (!bHasClosed_ && fd_ != -1) {
         close(fd_);
         bHasClosed_ = true;
@@ -119,7 +117,7 @@ uint64_t UDSSession::GetFirstEventTime()
 {
     MMI_LOGI("begin");
     if (events_.empty()) {
-        MMI_LOGT("events_ is empty");
+        MMI_LOGD("events_ is empty");
         return 0;
     }
     MMI_LOGI("end");

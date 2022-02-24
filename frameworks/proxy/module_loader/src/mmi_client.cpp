@@ -120,7 +120,7 @@ int32_t MMIClient::Socket()
         MMI_LOGE("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
                  " return invalid fd");
     } else {
-        MMI_LOGT("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
+        MMI_LOGD("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
                  " return fd:%{public}d", fd_);
     }
 
