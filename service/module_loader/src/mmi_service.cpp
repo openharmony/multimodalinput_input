@@ -336,7 +336,7 @@ void MMIService::OnThread()
         count = EpollWait(ev[0], MAX_EVENT_SIZE, timeOut, mmiFd_);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
-            CHKPC(mmiEd, ERROR_NULL_POINTER);
+            CHKPC(mmiEd);
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 input_.EventDispatch(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
