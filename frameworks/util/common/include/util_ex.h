@@ -31,7 +31,7 @@ namespace MMI {
     template<class ...Ts>
     int32_t mprintf(int32_t fd, const char* fmt, Ts... args)
     {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilEx" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilEx" };
         if (fmt == nullptr) {
             return RET_ERR;
         }

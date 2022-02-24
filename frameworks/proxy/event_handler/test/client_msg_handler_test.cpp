@@ -26,7 +26,7 @@ using namespace OHOS::MMI;
 using namespace OHOS;
 using TestMMIClient = OHOS::MMI::MMIClient;
 
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ClientMsgHandlerTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ClientMsgHandlerTest" }; // namepace
 
 class ClientMsgHandlerTest : public testing::Test {
 public:
