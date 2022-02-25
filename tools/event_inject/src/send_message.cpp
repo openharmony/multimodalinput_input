@@ -78,19 +78,19 @@ int32_t SendMessage::SendToHdi(const InputEventArray& inputEventArray)
 int32_t SendMessage::SendToHdi(const int32_t& devIndex, const RawInputEvent& event)
 {
     int32_t sendType = static_cast<int32_t>(SET_EVENT_INJECT);
-    NetPacket cktToHdf(MmiMessageId::HDI_INJECT);
-    cktToHdf << sendType << devIndex << event;
+    NetPacket pkt(MmiMessageId::HDI_INJECT);
+    pkt << sendType << devIndex << event;
 
-    if (!(SendMsg(cktToHdf))) {
+    if (!(SendMsg(pkt))) {
         MMI_LOGE("inject hdi send event to server error");
         return RET_ERR;
     }
     return RET_OK;
 }
 
-bool SendMessage::SendMsg(const NetPacket& ckt)
+bool SendMessage::SendMsg(const NetPacket& pkt)
 {
-    if (TestAuxToolClient::GetInstance().SendMsg(ckt)) {
+    if (TestAuxToolClient::GetInstance().SendMsg(pkt)) {
         MessageSendRecvStatMgr::GetInstance().Increase();
         return true;
     }

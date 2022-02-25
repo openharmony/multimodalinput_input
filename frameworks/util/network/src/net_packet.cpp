@@ -20,9 +20,9 @@ namespace OHOS {
 namespace MMI {
 NetPacket::NetPacket(MmiMessageId idMsg) : idMsg_(idMsg) {}
 
-NetPacket::NetPacket(const NetPacket& pack) : NetPacket(pack.GetMsgId())
+NetPacket::NetPacket(const NetPacket& pkt) : NetPacket(pkt.GetMsgId())
 {
-    Clone(pack);
+    Clone(pkt);
 }
 NetPacket::~NetPacket() {}
 

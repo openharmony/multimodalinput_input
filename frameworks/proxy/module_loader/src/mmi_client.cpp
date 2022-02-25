@@ -67,24 +67,24 @@ void MMIClient::RegisterDisconnectedFunction(ConnectCallback fun)
 
 void MMIClient::VirtualKeyIn(RawInputEvent virtualKeyEvent)
 {
-    NetPacket ckt(MmiMessageId::ON_VIRTUAL_KEY);
-    ckt << virtualKeyEvent;
-    SendMsg(ckt);
+    NetPacket pkt(MmiMessageId::ON_VIRTUAL_KEY);
+    pkt << virtualKeyEvent;
+    SendMsg(pkt);
 }
 
 void MMIClient::ReplyMessageToServer(MmiMessageId idMsg, uint64_t clientTime, uint64_t endTime) const
 {
-    NetPacket ckt(MmiMessageId::CHECK_REPLY_MESSAGE);
-    ckt << idMsg << clientTime << endTime;
-    SendMsg(ckt);
+    NetPacket pkt(MmiMessageId::CHECK_REPLY_MESSAGE);
+    pkt << idMsg << clientTime << endTime;
+    SendMsg(pkt);
 }
 
 void MMIClient::SdkGetMultimodeInputInfo()
 {
     TagPackHead tagPackHead = {MmiMessageId::GET_MMI_INFO_REQ, {0}};
-    NetPacket ckt(MmiMessageId::GET_MMI_INFO_REQ);
-    ckt << tagPackHead;
-    SendMsg(ckt);
+    NetPacket pkt(MmiMessageId::GET_MMI_INFO_REQ);
+    pkt << tagPackHead;
+    SendMsg(pkt);
 }
 
 void MMIClient::OnDisconnected()
