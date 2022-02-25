@@ -58,7 +58,7 @@ int32_t InterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<Ke
         MMI_LOGD("Add AddInterceptor KeyEvent to InterceptorManager success");
         return MMI_STANDARD_EVENT_SUCCESS;
     }
-    return MMI_STANDARD_EVENT_INVALID_PARAMETER;
+    return MMI_STANDARD_EVENT_INVALID_PARAM;
 }
 
 void InterceptorManager::RemoveInterceptor(int32_t interceptorId)

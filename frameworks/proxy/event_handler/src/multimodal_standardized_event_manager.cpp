@@ -44,9 +44,9 @@ void MultimodalStandardizedEventManager::SetClientHandle(MMIClientPtr client)
 int32_t MultimodalStandardizedEventManager::RegisterStandardizedEventHandle(const sptr<IRemoteObject> token,
     int32_t windowId, StandEventPtr standardizedEventHandle)
 {
-    CHKR((token && standardizedEventHandle), PARAM_INPUT_INVALID, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+    CHKR((token && standardizedEventHandle), PARAM_INPUT_INVALID, MMI_STANDARD_EVENT_INVALID_PARAM);
     auto messageId = standardizedEventHandle->GetType();
-    CHKR(messageId > MmiMessageId::INVALID, VAL_NOT_EXP, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+    CHKR(messageId > MmiMessageId::INVALID, VAL_NOT_EXP, MMI_STANDARD_EVENT_INVALID_PARAM);
     auto range = mapEvents_.equal_range(messageId);
     for (auto it = range.first; it != range.second; ++it) {
         if (it->second.eventCallBack == standardizedEventHandle) {
@@ -58,8 +58,8 @@ int32_t MultimodalStandardizedEventManager::RegisterStandardizedEventHandle(cons
     MMI_LOGD("Register app event:typeId:%{public}d", messageId);
     std::string registerhandle;
     if (!MakeRegisterHandle(messageId, windowId, registerhandle)) {
-        MMI_LOGE("Invalid registration parameter, errCode:%{public}d", MMI_STANDARD_EVENT_INVALID_PARAMETER);
-        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
+        MMI_LOGE("Invalid registration parameter, errCode:%{public}d", MMI_STANDARD_EVENT_INVALID_PARAM);
+        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAM;
     }
     registerEvents_.insert(registerhandle);
     StandEventCallBack StandEventInfo = {};
@@ -80,15 +80,15 @@ int32_t MultimodalStandardizedEventManager::RegisterStandardizedEventHandle(cons
 int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(const sptr<IRemoteObject> token,
     int32_t windowId, StandEventPtr standardizedEventHandle)
 {
-    CHKR((token && standardizedEventHandle), PARAM_INPUT_INVALID, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+    CHKR((token && standardizedEventHandle), PARAM_INPUT_INVALID, MMI_STANDARD_EVENT_INVALID_PARAM);
     auto typeId = standardizedEventHandle->GetType();
-    CHKR(typeId > MmiMessageId::INVALID, VAL_NOT_EXP, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+    CHKR(typeId > MmiMessageId::INVALID, VAL_NOT_EXP, MMI_STANDARD_EVENT_INVALID_PARAM);
 
     std::string registerhandle;
     if (!MakeRegisterHandle(typeId, windowId, registerhandle)) {
         MMI_LOGE("Invalid unregistration parameter, typeId:%{public}d,windowId:%{public}d,errCode:%{public}d",
-                 typeId, windowId, MMI_STANDARD_EVENT_INVALID_PARAMETER);
-        return MMI_STANDARD_EVENT_INVALID_PARAMETER;
+                 typeId, windowId, MMI_STANDARD_EVENT_INVALID_PARAM);
+        return MMI_STANDARD_EVENT_INVALID_PARAM;
     }
     registerEvents_.erase(registerhandle);
     auto range = mapEvents_.equal_range(typeId);
