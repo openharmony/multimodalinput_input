@@ -403,25 +403,10 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         return RET_ERR;
     }
 
-    auto session = udsServer->GetSession(fd);
-    CHKPF(session);
-    if (session->isANRProcess_) {
-        return RET_OK;
-    }
-
-    auto currentTime = GetSysClockTime();
-    if (IsANRProcess(currentTime, session)) {
-        session->isANRProcess_ = true;
-        MMI_LOGE("the pointer event does not report normally, triggering ANR");
-        return RET_OK;
-    }
-
     if (!udsServer->SendMsg(fd, newPacket)) {
         MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
-    session->AddEvent(point->GetId(), currentTime);
-
     return RET_OK;
 }
 
@@ -769,18 +754,6 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
              key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
 
-    auto session = udsServer.GetSession(fd);
-    CHKPF(session);
-    if (session->isANRProcess_) {
-        return RET_OK;
-    }
-
-    auto currentTime = GetSysClockTime();
-    if (IsANRProcess(currentTime, session)) {
-        session->isANRProcess_ = true;
-        MMI_LOGE("the key event does not report normally, triggering ANR");
-        return RET_OK;
-    }
     InputHandlerManagerGlobal::GetInstance().HandleEvent(key);
     NetPacket pkt(MmiMessageId::ON_KEYEVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
@@ -790,7 +763,6 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
         MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
-    session->AddEvent(key->GetId(), currentTime);
     MMI_LOGD("end");
     return RET_OK;
 }
