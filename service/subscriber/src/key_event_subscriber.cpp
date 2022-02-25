@@ -79,7 +79,7 @@ int32_t KeyEventSubscriber::UnSubscribeKeyEvent(SessionPtr sess, int32_t subscri
 bool KeyEventSubscriber::FilterSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_LOGD("Enter");
-    CHKPF(keyEvent, ERROR_NULL_POINTER);
+    CHKPF(keyEvent);
     int32_t keyAction = keyEvent->GetKeyAction();
     MMI_LOGD("keyCode:%{public}d,keyAction:%{public}s", keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
     for (const auto &keyCode : keyEvent->GetPressedKeys()) {
@@ -366,7 +366,7 @@ bool KeyEventSubscriber::HandleKeyCanel(const std::shared_ptr<KeyEvent>& keyEven
 
 bool KeyEventSubscriber::CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHKPF(keyEvent, ERROR_NULL_POINTER);
+    CHKPF(keyEvent);
     if (keyEvent_ == nullptr) {
         MMI_LOGW("keyEvent_ is nullptr");
         keyEvent_ = KeyEvent::Clone(keyEvent);

@@ -941,7 +941,7 @@ int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEv
 
 bool InputEventHandler::SendMsg(const int32_t fd, NetPacket& pkt) const
 {
-    CHKPF(udsServer_, OHOS::ERROR_NULL_POINTER);
+    CHKPF(udsServer_);
     return udsServer_->SendMsg(fd, pkt);
 }
 #ifdef OHOS_WESTEN_MODEL

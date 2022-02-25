@@ -24,14 +24,6 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-    constexpr int64_t S2MS = 1000;
-    constexpr int64_t S2US = 1000 * 1000;
-    constexpr int64_t S2NS = 1000 * 1000 * 1000;
-    constexpr int64_t MS2NS = 1000 * 1000;
-    constexpr int64_t US2NS = 1000;
-}
-
     const char *GetMmiErrorTypeDesc(int32_t errorCodeEnum);
     std::string GetEnv(const std::string& name);
     std::string UuIdGenerate();
