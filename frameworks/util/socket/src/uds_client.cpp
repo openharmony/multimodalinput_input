@@ -100,13 +100,13 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
             return false;
         }
     }
-    t_ = std::thread(std::bind(&UDSClient::OnThread, this, std::ref(threadPromiseHadEnd_)));
-    if (detachMode) {
-        MMI_LOGW("uds client thread detach");
-        t_.detach();
-    } else {
-        MMI_LOGW("uds client thread join");
-    }
+    // t_ = std::thread(std::bind(&UDSClient::OnThread, this, std::ref(threadPromiseHadEnd_)));
+    // if (detachMode) {
+    //     MMI_LOGW("uds client thread detach");
+    //     t_.detach();
+    // } else {
+    //     MMI_LOGW("uds client thread join");
+    // }
     return true;
 }
 
@@ -120,10 +120,10 @@ void UDSClient::Stop()
         EpollCtl(fd_, EPOLL_CTL_DEL, ev);
     }
     EpollClose();
-    if (t_.joinable()) {
-        MMI_LOGD("thread join");
-        t_.join();
-    }
+    // if (t_.joinable()) {
+    //     MMI_LOGD("thread join");
+    //     t_.join();
+    // }
     MMI_LOGD("leave");
 }
 

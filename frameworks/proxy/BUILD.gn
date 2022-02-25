@@ -16,6 +16,9 @@ import("//build/test.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 module_output_path = "multimodalinput/unit_out"
 
+import("//foundation/appexecfwk/standard/appexecfwk.gni")
+import("//foundation/appexecfwk/standard/libs/libeventhandler/lib_event_handler_sources.gni")
+
 config("libmmi_client_config") {
   visibility = [ ":*" ]
 
@@ -31,6 +34,7 @@ config("libmmi_client_config") {
     "//utils/native/base/include",
     "event_handler/include",
     "module_loader/include",
+    "${appexecfwk_path}/interfaces/innerkits/libeventhandler/include",
   ]
 }
 
@@ -117,6 +121,7 @@ ohos_shared_library("libmmi-client") {
 
   deps = [
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
+    "${appexecfwk_path}/interfaces/innerkits/libeventhandler:libeventhandler",
   ]
 
   public_deps = [
@@ -156,6 +161,7 @@ ohos_unittest("ut-mmi-proxy-out") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "${appexecfwk_path}/interfaces/innerkits/libeventhandler/include",
   ]
 
   if (is_mmi_have_libinput) {
@@ -220,6 +226,7 @@ ohos_unittest("ut-mmi-proxy-out") {
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
+    "${appexecfwk_path}/interfaces/innerkits/libeventhandler:libeventhandler",
   ]
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 }

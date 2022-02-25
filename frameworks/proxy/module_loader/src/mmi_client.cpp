@@ -15,10 +15,10 @@
 
 #include "mmi_client.h"
 #include "mmi_log.h"
-#include "multimodal_event_handler.h"
-#include "multimodal_input_connect_manager.h"
 #include "proto.h"
 #include "util.h"
+#include "multimodal_event_handler.h"
+#include "multimodal_input_connect_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -26,6 +26,7 @@ namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIClient" };
 }
 
+using namespace AppExecFwk;
 MMIClient::MMIClient() {}
 
 MMIClient::~MMIClient()
@@ -52,6 +53,23 @@ bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
     CHKPF(msgHdlImp);
     auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, msgHdlImp, std::placeholders::_1, std::placeholders::_2);
     CHKF(StartClient(callback, detachMode), START_CLI_FAIL);
+    CHKF(StartFdListener(), START_CLI_FAIL);
+    return true;
+}
+
+bool MMIClient::StartFdListener()
+{
+    eventRunner_ = EventRunner::Create(false);
+    CHKPF(eventRunner_);
+    eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner_);
+    CHKPF(eventHandler_);
+    constexpr uint32_t eventsMask = FILE_DESCRIPTOR_INPUT_EVENT | FILE_DESCRIPTOR_SHUTDOWN_EVENT |
+        FILE_DESCRIPTOR_EXCEPTION_EVENT;
+    auto errCode = eventHandler_->AddFileDescriptorListener(epollFd_, eventsMask, eventRunner_);
+    CHKF(errCode == ERR_OK);
+    eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT);
+    eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_ONTIMER, 0, EVENT_TIME_ONTIMER);
+    eventRunner_->Run();
     return true;
 }
 
@@ -125,6 +143,14 @@ int32_t MMIClient::Socket()
     }
 
     return fd_;
+}
+
+void MMIClient::Stop()
+{
+    UDSClient::Stop();
+    if (eventHandler_) {
+        eventHandler_->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP);
+    }
 }
 } // namespace MMI
 } // namespace OHOS
