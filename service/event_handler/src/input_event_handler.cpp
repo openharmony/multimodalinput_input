@@ -24,7 +24,6 @@
 #include "bytrace.h"
 #include "input_device_manager.h"
 #include "interceptor_manager_global.h"
-#include "mmi_server.h"
 #include "mouse_event_handler.h"
 #include "outer_interface.h"
 #include "s_input.h"

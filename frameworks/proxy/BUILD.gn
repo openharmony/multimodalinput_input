@@ -107,10 +107,6 @@ ohos_shared_library("libmmi-client") {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (is_mmi_have_weston) {
-    cflags += [ "-DOHOS_WESTEN_MODEL" ]
-  }
-
   configs = [ ":libmmi_client_config" ]
 
   public_configs = [ ":libmmi_client_config" ]

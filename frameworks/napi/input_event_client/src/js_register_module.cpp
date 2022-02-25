@@ -15,14 +15,7 @@
 
 #include "js_register_module.h"
 #include <cinttypes>
-#ifdef OHOS_WESTEN_MODEL
-    #include "js_register_event.h"
-    #include "js_register_handle.h"
-    #include "multi_input_common.h"
-#else
-    #include "input_manager.h"
-#endif // OHOS_WESTEN_MODEL
-
+#include "input_manager.h"
 #include "js_register_util.h"
 
 namespace OHOS {

@@ -249,10 +249,6 @@ ohos_executable("mmi-event-injection") {
     cflags += [ "-DOHOS_BUILD_AI" ]
   }
 
-  if (is_mmi_have_weston) {
-    cflags += [ "-DOHOS_WESTEN_MODEL" ]
-  }
-
   install_enable = true
   part_name = "multimodalinput_base"
 }

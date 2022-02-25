@@ -17,7 +17,6 @@
 #include <cstdlib>
 #include "app_register.h"
 #include "event_dump.h"
-#include "mmi_server.h"
 #include "util.h"
 #include "util_ex.h"
 #include "pointer_drawing_manager.h"

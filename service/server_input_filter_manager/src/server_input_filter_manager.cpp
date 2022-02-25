@@ -15,8 +15,9 @@
 
 #include "server_input_filter_manager.h"
 #include <cinttypes>
+#include "app_register.h"
 #include "input_event_data_transformation.h"
-#include "mmi_server.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {

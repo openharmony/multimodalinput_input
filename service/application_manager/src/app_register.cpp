@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 #include "app_register.h"
+#include <iostream>
 #include "util_ex.h"
-#include "mmi_server.h"
 
 namespace OHOS {
 namespace MMI {

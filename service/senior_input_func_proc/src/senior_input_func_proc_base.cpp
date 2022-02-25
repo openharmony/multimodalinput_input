@@ -14,7 +14,6 @@
  */
 
 #include "senior_input_func_proc_base.h"
-#include "mmi_server.h"
 #include "util.h"
 
 namespace OHOS {

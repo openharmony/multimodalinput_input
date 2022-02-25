@@ -14,7 +14,6 @@
  */
 
 #include <gtest/gtest.h>
-#include "mmi_server.h"
 
 namespace {
 using namespace testing::ext;

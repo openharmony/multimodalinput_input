@@ -17,7 +17,6 @@
 #include <gtest/gtest.h>
 #include "knuckle_func_proc.h"
 #include "libmmi_util.h"
-#include "mmi_server.h"
 
 namespace {
 using namespace testing::ext;

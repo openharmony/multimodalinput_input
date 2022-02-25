@@ -15,7 +15,6 @@
 
 #include "event_dump.h"
 #include <gtest/gtest.h>
-#include "mmi_server.h"
 #include "mmi_interface.h"
 
 namespace {

@@ -29,7 +29,7 @@
 #include "key_event_subscriber.h"
 #include "knuckle_func_proc.h"
 #include "mmi_func_callback.h"
-#include "mmi_server.h"
+#include "register_eventhandle_manager.h"
 #include "server_input_filter_manager.h"
 #include "time_cost_chk.h"
 

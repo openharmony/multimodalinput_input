@@ -14,8 +14,8 @@
  */
 
 #include "event_package.h"
-#include "mmi_server.h"
 #include "input_device_manager.h"
+#include "device_register.h"
 namespace OHOS {
 namespace MMI {
 namespace {
