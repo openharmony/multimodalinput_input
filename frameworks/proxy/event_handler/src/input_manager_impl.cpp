@@ -118,6 +118,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::II
 void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
     MMI_LOGD("Enter");
+    CHKPV(keyEvent);
     int32_t getKeyCode = keyEvent->GetKeyCode();
     MMI_LOGD(" OnKeyEvent client trace getKeyCode:%{public}d", getKeyCode);
     std::string keyCodestring = "client dispatchKeyCode=" + std::to_string(getKeyCode);
@@ -137,6 +138,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
     MMI_LOGD("Pointer event received, processing");
+    CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         int32_t pointerId = pointerEvent->GetId();
         std::string pointerEventstring = "PointerEventDispatch";
@@ -302,6 +304,7 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
+    CHKPR(interceptor, ERROR_NULL_POINTER);
     int32_t interceptorId = interceptorManager_.AddInterceptor(interceptor);
     if (interceptorId >= 0) {
         interceptorId = interceptorId * ADD_MASK_BASE + MASK_TOUCH;
@@ -351,6 +354,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
+    CHKPV(keyEvent);
     if (MMIEventHdl.InjectEvent(keyEvent) != RET_OK) {
         MMI_LOGE("Failed to inject keyEvent");
     }
@@ -358,6 +362,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> k
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
+    CHKPV(pointerEvent);
     if (MultimodalEventHandler::GetInstance().InjectPointerEvent(pointerEvent) != RET_OK) {
         MMI_LOGE("Failed to inject pointer event");
     }
