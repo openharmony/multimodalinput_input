@@ -18,7 +18,6 @@
 #include "event_dump.h"
 #include "input_device_manager.h"
 #include "mmi_interface.h"
-#include "mmi_server.h"
 #include "safe_keeper.h"
 #include "util.h"
 #include "wayland-server-core.h"

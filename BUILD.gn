@@ -122,13 +122,6 @@ group("multimodalinput_mmi_packages") {
     "tools/inject_event:input",
     "tools/virtual_device_manager:mmi-virtual-device-manager",
   ]
-
-  if (is_mmi_have_weston) {
-    deps += [
-      "examples/mmi:mmi-client",
-      "examples/mmi:mmi-server",
-    ]
-  }
 }
 
 group("unittests") {

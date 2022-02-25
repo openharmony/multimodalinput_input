@@ -92,14 +92,6 @@ config("libmmi_server_public_config") {
   if (is_mmi_have_ai) {
     cflags += [ "-DOHOS_BUILD_AI" ]
   }
-
-  if (is_mmi_have_weston) {
-    include_dirs += [
-      "//third_party/weston/libweston",
-      "//foundation/graphic/standard/frameworks/wmserver/src",
-    ]
-    cflags += [ "-DOHOS_WESTEN_MODEL" ]
-  }
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
@@ -171,11 +163,7 @@ ohos_shared_library("libmmi-server") {
     ]
   }
 
-  if (is_mmi_have_weston) {
-    sources += [ "module_loader/src/mmi_server.cpp" ]
-  } else {
-    sources += [ "module_loader/src/mmi_service.cpp" ]
-  }
+  sources += [ "module_loader/src/mmi_service.cpp" ]
 
   public_configs = [ ":libmmi_server_public_config" ]
 
@@ -209,10 +197,6 @@ ohos_shared_library("libmmi-server") {
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
-
-  if (is_mmi_have_weston) {
-    deps += [ "//foundation/graphic/standard/frameworks/wmserver:wmserver" ]
   }
 
   external_deps = [
@@ -310,13 +294,7 @@ ohos_unittest("ut-mmi-service-out") {
     "window_manager/test/input_windows_manager_test.cpp",
     "window_manager/test/outer_interface_test.cpp",
   ]
-  if (is_mmi_have_weston) {
-    sources += [
-      "application_manager/test/app_register_test.cpp",
-      "event_handler/test/input_event_handler_test.cpp",
-      "event_handler/test/system_event_handler_test.cpp",
-    ]
-  }
+
   cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
@@ -335,10 +313,6 @@ ohos_unittest("ut-mmi-service-out") {
     cflags += [ "-DOHOS_BUILD_AI" ]
   }
 
-  if (is_mmi_have_weston) {
-    cflags += [ "-DOHOS_WESTEN_MODEL" ]
-  }
-
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",
@@ -354,10 +328,6 @@ ohos_unittest("ut-mmi-service-out") {
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
-
-  if (is_mmi_have_weston) {
-    deps += [ "//foundation/graphic/standard/frameworks/wmserver:wmserver" ]
   }
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]

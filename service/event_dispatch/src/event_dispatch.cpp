@@ -15,18 +15,19 @@
 
 #include "event_dispatch.h"
 #include <cinttypes>
-#include "input-event-codes.h"
 #include "ability_launch_manager.h"
 #include "bytrace.h"
 #include "event_filter_wrap.h"
 #include "hisysevent.h"
 #include "input_event_data_transformation.h"
+#include "input_event_handler.h"
 #include "input_event_monitor_manager.h"
 #include "input_handler_manager_global.h"
+#include "input-event-codes.h"
 #include "interceptor_manager_global.h"
 #include "key_event_subscriber.h"
-#include "mmi_server.h"
 #include "outer_interface.h"
+#include "register_eventhandle_manager.h"
 #include "system_event_handler.h"
 #include "util.h"
 

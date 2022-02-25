@@ -37,9 +37,6 @@ config("libinputmonitor_config") {
   if (is_mmi_have_ai) {
     cflags += [ "-DOHOS_BUILD_AI" ]
   }
-  if (is_mmi_have_weston) {
-    cflags += [ "-DOHOS_WESTEN_MODEL" ]
-  }
 }
 
 ohos_shared_library("inputmonitor") {

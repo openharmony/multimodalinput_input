@@ -14,7 +14,6 @@
  */
 
 #include <gtest/gtest.h>
-#include "mmi_server.h"
 #include "client_msg_handler.h"
 
 namespace {
