@@ -479,6 +479,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent>
 int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<InputEvent> inputEvent)
 {
     MMI_LOGD("enter");
+    CHKPR(inputEvent, ERROR_NULL_POINTER);
     if (logicalDisplays_.empty()) {
         MMI_LOGE("logicalDisplays_ is empty");
         return RET_ERR;
