@@ -46,9 +46,7 @@ static void SeatsInfoDebugPrint(const SeatInfo** seats)
     }
 }
 
-OHOS::MMI::InputWindowsManager::InputWindowsManager()
-{
-}
+OHOS::MMI::InputWindowsManager::InputWindowsManager() {}
 
 OHOS::MMI::InputWindowsManager::~InputWindowsManager()
 {
@@ -476,6 +474,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent>
 int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<InputEvent> inputEvent)
 {
     MMI_LOGD("enter");
+    CHKPR(inputEvent, ERROR_NULL_POINTER);
     if (logicalDisplays_.empty()) {
         MMI_LOGE("logicalDisplays_ is empty");
         return RET_ERR;
@@ -614,6 +613,7 @@ OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::FindPhysicalDisp
 void OHOS::MMI::InputWindowsManager::TurnTouchScreen(PhysicalDisplayInfo* info, Direction direction,
     int32_t& logicalX, int32_t& logicalY)
 {
+    CHKPV(info);
     if (direction == Direction0) {
         MMI_LOGD("direction is Direction0");
         return;
@@ -936,6 +936,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTargetOld(std::shared_p
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdataDisplayId(displayId)) {
         MMI_LOGE("This display is not exist");

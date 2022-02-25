@@ -48,6 +48,7 @@ void InputMonitor::Stop()
     MMI_LOGD("Enter");
     std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
+        MMI_LOGE("Invalid values");
         return;
     }
     InputMgr->RemoveMonitor(monitorId_);
@@ -103,6 +104,7 @@ void InputMonitor::MarkConsumed(int32_t eventId)
         return;
     }
     if (monitorId_ < 0) {
+        MMI_LOGE("Invalid values");
         return;
     }
     InputMgr->MarkConsumed(monitorId_, eventId);
@@ -344,6 +346,7 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Enter");
     CHKPV(monitor_);
+    CHKPV(pointerEvent);
     int32_t num = 0;
     {
         std::lock_guard<std::mutex> guard(mutex_);
@@ -364,6 +367,7 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 void JsInputMonitor::JsCallback(uv_work_t *work, int32_t status)
 {
     MMI_LOGD("Enter");
+    CHKPV(work);
     int32_t *id = static_cast<int32_t *>(work->data);
     delete work;
     work = nullptr;

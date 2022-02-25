@@ -110,14 +110,18 @@ bool StreamBuffer::Write(const T &data)
 template<typename T>
 StreamBuffer &StreamBuffer::operator>>(T &data)
 {
-    CK(Read(data), STREAM_BUF_READ_FAIL);
+    if (!Read(data)) {
+        MMI_LOGW("Read data failed");
+    }
     return *this;
 }
 
 template<typename T>
 StreamBuffer &StreamBuffer::operator<<(const T &data)
 {
-    CK(Write(data), STREAM_BUF_WRITE_FAIL);
+    if (!Write(data)) {
+        MMI_LOGW("Write data failed");
+    }    
     return *this;
 }
 } // namespace MMI

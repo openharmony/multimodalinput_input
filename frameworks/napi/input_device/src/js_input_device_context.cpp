@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDeviceContext" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDeviceContext" }; // namespace
 }
 
 JsInputDeviceContext::JsInputDeviceContext()
@@ -87,7 +87,7 @@ napi_value JsInputDeviceContext::CreateInstance(napi_env env)
         MMI_LOGE("failed to get jsContext");
         return nullptr;
     }
-    CHKPP(jsContext, nullptr);
+    CHKPP(jsContext);
     status = napi_create_reference(env, jsInstance, 1, &(jsContext->contextRef_));
     if (status != napi_ok) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to create contextRef_");

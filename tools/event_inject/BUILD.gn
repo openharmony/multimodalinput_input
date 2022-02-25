@@ -168,7 +168,6 @@ ohos_unittest("ut-event-injection-out") {
     "test/device_base_test.cpp",
     "test/get_device_node_test.cpp",
     "test/get_device_object_test.cpp",
-    "test/injection_event_dispatch_test.cpp",
     "test/injection_tools_help_func_test.cpp",
     "test/libmmi_aisensor_client_test.cpp",
     "test/message_send_recv_stat_mgr_test.cpp",
