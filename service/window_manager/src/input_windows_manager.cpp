@@ -362,7 +362,7 @@ bool OHOS::MMI::InputWindowsManager::GetTouchSurfaceId(const double x, const dou
         }
         return true;
     }
-    MMI_LOGE("Surfaces is empty, Failed to obtain touch surface");
+    MMI_LOGE("Failed to obtain touchsurface");
     return false;
 }
 
