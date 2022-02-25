@@ -15,11 +15,9 @@
 #ifndef EVENT_DISPATCH_H
 #define EVENT_DISPATCH_H
 #include "uds_server.h"
-#include "register_event.h"
 #include "key_event.h"
 #include "key_event_value_transformation.h"
 #include "standard_event_handler.h"
-#include "app_register.h"
 #include "event_package.h"
 #include "nocopyable.h"
 #include "pointer_event.h"
@@ -53,7 +51,6 @@ public:
         EventPointer& point, const uint64_t preHandlerTime);
     int32_t DispatchTabletToolEvent(UDSServer& udsServer, libinput_event *event,
         const EventTabletTool& tableTool, const uint64_t preHandlerTime);
-    int32_t DispatchTouchTransformPointEvent(UDSServer& udsServer, std::shared_ptr<PointerEvent> point);
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> point);
 
 protected:
@@ -62,8 +59,6 @@ protected:
         POINT_EVENT_TYPE& pointEventType);
     int32_t GestureRegisteredEventDispatch(const MmiMessageId& idMsg, UDSServer& udsServer,
         RegisteredEvent& registeredEvent, uint64_t preHandlerTime);
-    int32_t DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& udsServer,
-        const RegisteredEvent& data, int32_t inputDeviceType, uint64_t preHandlerTime);
     int32_t KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer& udsServer,
         libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime);
     bool IsANRProcess(int64_t time, SessionPtr ss);

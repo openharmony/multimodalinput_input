@@ -36,11 +36,6 @@ class MultimodalEventHandler : public Singleton<OHOS::MMI::MultimodalEventHandle
 public:
     MultimodalEventHandler();
     ~MultimodalEventHandler() = default;
-
-    int32_t RegisterStandardizedEventHandle(const sptr<IRemoteObject> token,
-                                            int32_t windowId, StandEventPtr standardizedEventHandle);
-    int32_t UnregisterStandardizedEventHandle(const sptr<IRemoteObject> token,
-                                              int32_t windowId, StandEventPtr standardizedEventHandle);
     int32_t GetMultimodeInputInfo();
     MMIClientPtr GetMMIClient();
     std::vector<EventRegesterInfo>& GetAbilityInfoVec();

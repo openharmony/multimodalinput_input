@@ -27,74 +27,13 @@ namespace {
 }
 void OnConnected(const OHOS::MMI::IfMMIClient& client)
 {
-#ifdef OHOS_WESTEN_MODEL
-    int32_t winId = 0;
-    int32_t abilityId = 0;
-    std::string bundlerName = "EmptyBundlerName";
-    std::string appName = "EmptyAppName";
-    auto abilityInfoVec = MMIEventHdl.GetAbilityInfoVec();
-    if (!abilityInfoVec.empty()) {
-        winId = abilityInfoVec[0].windowId;
-        abilityId = *reinterpret_cast<int32_t*>(abilityInfoVec[0].token.GetRefPtr());
-    }
-    OHOS::MMI::NetPacket ckt(MmiMessageId::REGISTER_APP_INFO);
-    ckt << abilityId << winId << bundlerName << appName;
-    client.SendMessage(ckt);
-
-    for (auto& val : abilityInfoVec) {
-        if (val.sync == REG_STATUS_SYNCED) {
-            val.sync = REG_STATUS_NOT_SYNC;
-            continue;
-        }
-        EventManager.RegisterStandardizedEventHandle(val.token, val.windowId, val.standardizedEventHandle);
-    }
-#else
     InputManagerImpl::GetInstance()->OnConnected();
-#endif
 }
 
 MultimodalEventHandler::MultimodalEventHandler()
 {
 #ifdef OHOS_BUILD_MMI_DEBUG
     VerifyLogManagerRun();
-#endif
-}
-
-int32_t MultimodalEventHandler::RegisterStandardizedEventHandle(const sptr<IRemoteObject> token,
-    int32_t windowId, StandEventPtr standardizedEventHandle)
-{
-#ifdef OHOS_WESTEN_MODEL
-    MMI_LOGD("begin");
-    KMSG_LOGI("Register Standardized Event Handle start!");
-    int32_t ret = OHOS::MMI_STANDARD_EVENT_SUCCESS;
-    EventRegesterInfo regInfo = {};
-    if (client_ && client_->GetCurrentConnectedStatus()) {
-        regInfo.sync = REG_STATUS_SYNCED;
-        ret = EventManager.RegisterStandardizedEventHandle(token, windowId, standardizedEventHandle);
-    }
-    regInfo.token = token;
-    regInfo.windowId = windowId;
-    regInfo.standardizedEventHandle = standardizedEventHandle;
-    abilityInfoVec_.push_back(regInfo);
-
-    if (!InitClient()) {
-        MMI_LOGE("init client failed!");
-        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
-    }
-    MMI_LOGD("end");
-    return ret;
-#else
-    return RET_OK;
-#endif
-}
-
-int32_t MultimodalEventHandler::UnregisterStandardizedEventHandle(const sptr<IRemoteObject> token,
-    int32_t windowId, StandEventPtr standardizedEventHandle)
-{
-#ifdef OHOS_WESTEN_MODEL
-    return EventManager.UnregisterStandardizedEventHandle(token, windowId, standardizedEventHandle);
-#else
-    return RET_OK;
 #endif
 }
 

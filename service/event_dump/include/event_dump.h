@@ -17,7 +17,6 @@
 #define EVENT_DUMP_H
 
 #include "libmmi_util.h"
-#include "app_register.h"
 #include "singleton.h"
 
 namespace OHOS {

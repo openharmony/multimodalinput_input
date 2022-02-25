@@ -22,9 +22,7 @@
 #include "libmmi_util.h"
 #include "safe_keeper.h"
 #include "util.h"
-#ifndef OHOS_WESTEN_MODEL
 #include "input_windows_manager.h"
-#endif
 namespace OHOS {
 namespace MMI {
     namespace {
@@ -152,12 +150,10 @@ void OHOS::MMI::SInput::OnEventHandler()
 {
     MMI_LOGD("enter");
     CHKPV(funInputEvent_);
-#ifndef OHOS_WESTEN_MODEL
     multimodal_libinput_event ev = { nullptr, nullptr };
     while ((ev.event = libinput_get_event(input_))) {
         funInputEvent_(&ev);
         libinput_event_destroy(ev.event);
     }
-#endif
     MMI_LOGD("leave");
 }

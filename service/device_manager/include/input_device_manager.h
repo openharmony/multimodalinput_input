@@ -24,7 +24,6 @@
 #include "event_dispatch.h"
 #include "event_package.h"
 #include "input_device.h"
-#include "message_post.h"
 
 namespace OHOS {
 namespace MMI {
@@ -42,13 +41,7 @@ public:
     void NotifyPointerDevice(bool hasPointerDevice);
 
 private:
-#ifdef OHOS_WESTEN_MODEL
-    void Init(weston_compositor *wc);
-    std::vector<int32_t> GetInputDeviceIdsSync(weston_compositor *wc);
-    std::shared_ptr<InputDevice> FindInputDeviceIdSync(int32_t deviceId, weston_compositor *wc);
-#endif
     bool IsPointerDevice(libinput_device* device);
-
     std::map<int32_t, libinput_device*> inputDevice_;
     bool initFlag_ {false};
     int32_t nextId_ {0};
