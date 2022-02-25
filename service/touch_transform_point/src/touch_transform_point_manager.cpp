@@ -24,9 +24,9 @@ namespace MMI {
 
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(libinput_event *event)
 {
-    CHKPP(event, nullptr);
+    CHKPP(event);
     auto device = libinput_event_get_device(event);
-    CHKPP(device, nullptr);
+    CHKPP(device);
     std::shared_ptr<TouchTransformPointProcessor> processor;
     auto deviceId = InputDevMgr->FindInputDeviceId(device);
     auto it = touchPro_.find(deviceId);
@@ -42,9 +42,9 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(l
 
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEvent(libinput_event *event)
 {
-    CHKPP(event, nullptr);
+    CHKPP(event);
     auto device = libinput_event_get_device(event);
-    CHKPP(device, nullptr);
+    CHKPP(device);
     std::shared_ptr<TouchPadTransformPointProcessor> processor;
     auto deviceId = InputDevMgr->FindInputDeviceId(device);
     auto it = touchpadPro_.find(deviceId);
@@ -60,9 +60,9 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEven
 
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestrueEvent(libinput_event *event)
 {
-    CHKPP(event, nullptr);
+    CHKPP(event);
     auto device = libinput_event_get_device(event);
-    CHKPP(device, nullptr);
+    CHKPP(device);
     std::shared_ptr<GestureTransformPointProcessor> processor;
     auto deviceId = InputDevMgr->FindInputDeviceId(device);
     auto it = gesturePro_.find(deviceId);
