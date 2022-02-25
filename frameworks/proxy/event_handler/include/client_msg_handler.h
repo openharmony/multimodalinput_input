@@ -40,7 +40,6 @@ protected:
     virtual int32_t OnTouchPadMonitor(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnPointerEvent(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnSubscribeKeyEventCallback(const UDSClient& client, NetPacket& pkt);
-    virtual int32_t OnTouch(const UDSClient& client, NetPacket& pkt);
     virtual int32_t GetMultimodeInputInfo(const UDSClient& client, NetPacket& pkt);
     virtual int32_t KeyEventFilter(const UDSClient& client, NetPacket& pkt);
     virtual int32_t TouchEventFilter(const UDSClient& client, NetPacket& pkt);
@@ -53,20 +52,6 @@ protected:
     virtual int32_t KeyEventInterceptor(const UDSClient& client, NetPacket& pkt);
 
 private:
-    void AnalysisPointEvent(const UDSClient& client, NetPacket& pkt) const;
-    void AnalysisTouchEvent(const UDSClient& client, NetPacket& pkt) const;
-    void AnalysisJoystickEvent(const UDSClient& client, NetPacket& pkt) const;
-    void AnalysisTouchPadEvent(const UDSClient& client, NetPacket& pkt) const;
-    void GetStandardStylusActionType(int32_t curRventType, int32_t &stylusAction, int32_t &touchAction) const;
-    int32_t GetNonStandardStylusActionType(int32_t tableToolState) const;
-    void GetMouseActionType(int32_t eventType, int32_t proximityState, int32_t &mouseAction,
-                            int32_t &touchAction) const;
-    void PrintEventTabletToolInfo(EventTabletTool tableTool, uint64_t serverStartTime,
-                                  int32_t abilityId, int32_t windowId, int32_t fd) const;
-    void AnalysisStandardTabletToolEvent(NetPacket& pkt, int32_t curRventType, EventTabletTool tableTool,
-                                         int32_t windowId) const;
-    void AnalysisTabletToolEvent(const UDSClient& client, NetPacket& pkt) const;
-    void AnalysisGestureEvent(const UDSClient& client, NetPacket& pkt) const;
     static void OnEventProcessed(int32_t eventId);
 
 private:
