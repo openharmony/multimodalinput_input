@@ -20,17 +20,11 @@
 #include "iremote_object.h"
 #include "if_mmi_client.h"
 #include "nocopyable.h"
-#include "standardized_event_handler.h"
 #include "key_event_input_subscribe_manager.h"
 
 namespace OHOS {
 namespace MMI {
 class NetPacket;
-struct StandEventCallBack {
-    int32_t windowId;
-    StandEventPtr eventCallBack;
-};
-typedef std::multimap<MmiMessageId, StandEventCallBack> StandEventMMaps;
 class MultimodalStandardizedEventManager {
 public:
     MultimodalStandardizedEventManager();

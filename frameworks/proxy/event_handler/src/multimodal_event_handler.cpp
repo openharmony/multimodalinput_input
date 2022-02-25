@@ -70,11 +70,6 @@ int32_t MultimodalEventHandler::GetMultimodeInputInfo()
     return MMI_SERVICE_RUNNING;
 }
 
-std::vector<EventRegesterInfo>& MultimodalEventHandler::GetAbilityInfoVec()
-{
-    return abilityInfoVec_;
-}
-
 bool MultimodalEventHandler::InitClient()
 {
     MMI_LOGD("enter");
