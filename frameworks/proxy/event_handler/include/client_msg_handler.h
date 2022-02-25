@@ -19,7 +19,6 @@
 #include "key_event_input_subscribe_manager.h"
 #include "msg_handler.h"
 #include "uds_client.h"
-#include "multimodal_event.h"
 #include "nocopyable.h"
 
 namespace OHOS {

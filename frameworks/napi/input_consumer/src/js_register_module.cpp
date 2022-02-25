@@ -18,7 +18,6 @@
 #include "input_manager.h"
 #include "js_register_util.h"
 #include "js_register_module.h"
-#include "key_event_pre.h"
 
 namespace OHOS {
 namespace MMI {

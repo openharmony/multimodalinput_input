@@ -25,12 +25,6 @@ enum RES_STATUS : uint8_t {
     REG_STATUS_NOT_SYNC = 0, // 未同步
     REG_STATUS_SYNCED = 1,   // 以同步
 };
-struct EventRegesterInfo {
-    RES_STATUS sync;
-    sptr<IRemoteObject> token;
-    int32_t windowId;
-    StandEventPtr standardizedEventHandle;
-};
 
 class MultimodalEventHandler : public Singleton<OHOS::MMI::MultimodalEventHandler> {
 public:
@@ -38,9 +32,6 @@ public:
     ~MultimodalEventHandler() = default;
     int32_t GetMultimodeInputInfo();
     MMIClientPtr GetMMIClient();
-    std::vector<EventRegesterInfo>& GetAbilityInfoVec();
-    int32_t InjectEvent(const OHOS::KeyEvent& keyEvent);
-    int32_t InjectEvent(const OHOS::MMI::KeyEvent& keyEvent);
     int32_t InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr);
     
     int32_t AddKeyEventFIlter(int32_t id, std::string name, Authority authority);
@@ -68,8 +59,6 @@ private:
 private:
     MMIClientPtr client_;
     IClientMsgHandlerPtr cMsgHandler_;
-    std::vector<EventRegesterInfo> abilityInfoVec_;
-    StandEventPtr standardizedEventHandle_;
 };
 } // namespace MMI
 } // namespace OHOS
