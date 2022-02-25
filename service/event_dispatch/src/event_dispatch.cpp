@@ -367,7 +367,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_LOGI("Pointer event interception succeeded");
         return RET_OK;
     }
-    if (!point->NeedSkipInspection() &&
+    if (!point->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT) &&
         InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
         if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
             int32_t pointerId = point->GetId();
@@ -738,7 +738,7 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
 
     MMI_LOGT("4.event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
              "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
-             "EventType:%{public}d,Flag:%{public}d,"
+             "EventType:%{public}d,Flag:%{public}u,"
              "KeyAction:%{public}d,Fd:%{public}d,PreHandlerTime:%{public}" PRId64 "",
              key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
              key->GetActionStartTime(),
@@ -845,7 +845,7 @@ int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_ev
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
     MMI_LOGT("Pointer event dispatcher of server:eventType:%{public}d,actionTime:%{public}" PRId64 ","
              "action:%{public}d,actionStartTime:%{public}" PRId64 ","
-             "flag:%{public}d,pointerAction:%{public}d,sourceType:%{public}d,"
+             "flag:%{public}u,pointerAction:%{public}d,sourceType:%{public}d,"
              "VerticalAxisValue:%{public}.02f, HorizontalAxisValue:%{public}.02f,"
              "pointerCount:%{public}zu",
              pointerEvent->GetEventType(), pointerEvent->GetActionTime(),

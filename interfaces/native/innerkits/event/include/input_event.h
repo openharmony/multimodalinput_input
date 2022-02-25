@@ -41,7 +41,7 @@ public:
     static constexpr int32_t EVENT_TYPE_AXIS = 0X00030000;
 
     static constexpr int32_t EVENT_FLAG_NONE = 0;
-    static constexpr int32_t EVENT_FLAG_NO_INTERCEPT = 1;
+    static constexpr uint32_t EVENT_FLAG_NO_INTERCEPT = 1;
 
     static constexpr int32_t DEFALUTID = -1;
 
@@ -119,11 +119,11 @@ public:
     int32_t GetEventType() const;
     const char* DumpEventType() const;
 
-    int32_t GetFlag() const;
+    uint32_t GetFlag() const;
 
-    bool HasFlag(int32_t flag);
+    bool HasFlag(uint32_t flag);
 
-    void AddFlag(int32_t flag);
+    void AddFlag(uint32_t flag);
 
     void ClearFlag();
 
@@ -158,7 +158,7 @@ protected:
     int32_t targetDisplayId_;
     int32_t targetWindowId_;
     int32_t agentWindowId_;
-    int32_t flag_;
+    uint32_t bitwise_;
     std::function<void(int32_t)> processedCallback_;
 };
 } // namespace MMI
