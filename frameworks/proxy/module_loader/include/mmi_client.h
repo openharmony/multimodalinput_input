@@ -17,6 +17,8 @@
 
 #include "client_msg_handler.h"
 #include "if_mmi_client.h"
+#include "mmi_fd_listener.h"
+#include "mmi_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -26,6 +28,7 @@ public:
     virtual ~MMIClient() override;
 
     int32_t Socket() override;
+    virtual void Stop() override;
     virtual bool SendMessage(const NetPacket& pkt) const override;
     virtual bool GetCurrentConnectedStatus() const override;
 
@@ -44,10 +47,15 @@ public:
 protected:
     virtual void OnConnected() override;
     virtual void OnDisconnected() override;
+    bool StartFdListener();
 
 protected:
     ConnectCallback funConnected_;
     ConnectCallback funDisconnected_;
+
+    MMIFdListener fdListener_;
+    std::shared_ptr<AppExecFwk::EventRunner> eventRunner_ = nullptr;
+    std::shared_ptr<MMIEventHandler> eventHandler_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
