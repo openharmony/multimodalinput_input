@@ -76,7 +76,6 @@ ohos_shared_library("libmmi-client") {
     "events/src/axis_event.cpp",
     "events/src/input_manager.cpp",
     "events/src/key_option.cpp",
-    "events/src/multimodal_event.cpp",
     "module_loader/src/mmi_client.cpp",
   ]
 
