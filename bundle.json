@@ -77,7 +77,6 @@
           "header": {
             "header_files": [
               "common/include/struct_multimodal.h",
-              "event/include/device_event.h",
               "event/include/key_event.h",
               "event/include/multimodal_event.h",
               "event/include/multimodal_standardized_event_manager.h",
