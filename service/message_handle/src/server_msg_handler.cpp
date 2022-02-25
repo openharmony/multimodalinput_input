@@ -439,6 +439,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
     EventKeyboard key = {};
     auto packageResult = EventPackage::PackageVirtualKeyEvent(event, key);
     if (packageResult == RET_ERR) {
+        MMI_LOGE("Package Virtual KeyEvent faild");
         return RET_ERR;
     }
 
