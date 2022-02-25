@@ -64,8 +64,6 @@ public:
     void DelEvents(int32_t id);
     uint64_t GetFirstEventTime();
     void ClearEventsVct();
-    bool EventsIsEmpty();
-    bool isANRProcess_ {false};
 
 #ifdef OHOS_BUILD_MMI_DEBUG
     void SetClientFd(const int32_t clientFd)

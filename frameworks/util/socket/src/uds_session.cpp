@@ -24,7 +24,6 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
 }
 
@@ -111,12 +110,7 @@ void UDSSession::DelEvents(int32_t id)
         if (item.id == id) {
             events_.erase(events_.begin(), events_.begin() + count);
             MMI_LOGI("Delete events");
-            break;
         }
-    }
-    auto currentTime = GetSysClockTime();
-    if (events_.empty() || (currentTime < (events_.begin()->eventTime + INPUT_UI_TIMEOUT_TIME))) {
-        isANRProcess_ = false;
     }
     MMI_LOGI("end");
 }
@@ -125,20 +119,16 @@ uint64_t UDSSession::GetFirstEventTime()
 {
     MMI_LOGI("begin");
     if (events_.empty()) {
-        MMI_LOGI("events_ is empty");
+        MMI_LOGT("events_ is empty");
         return 0;
     }
     MMI_LOGI("end");
-    return events_.begin()->eventTime;
+    return events_[0].eventTime;
 }
 
-bool UDSSession::EventsIsEmpty()
+void UDSSession::ClearEventsVct()
 {
-    if (events_.empty()) {
-        MMI_LOGI("events_ is empty");
-        return true;
-    }
-    return false;
+    std::vector<EventTime>().swap(events_);
 }
 } // namespace MMI
 } // namespace OHOS
