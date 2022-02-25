@@ -145,6 +145,7 @@ std::shared_ptr<IInputEventConsumer> InputHandlerManager::FindHandler(int32_t ha
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent)
 {
+    CHKPV(keyEvent);
     std::shared_ptr<IInputEventConsumer> consumer = FindHandler(handlerId);
     if (consumer != nullptr) {
         consumer->OnInputEvent(keyEvent);
