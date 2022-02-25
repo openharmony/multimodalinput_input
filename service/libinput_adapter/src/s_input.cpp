@@ -41,6 +41,7 @@ static void HiLogFunc(struct libinput* input, enum libinput_log_priority priorit
 
 static void InitHiLogFunc(struct libinput* input)
 {
+    CHKPV(input);
     static bool initFlag = false;
     if (initFlag) {
         return;
@@ -79,13 +80,9 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
     },
 };
 
-OHOS::MMI::SInput::SInput()
-{
-}
+OHOS::MMI::SInput::SInput() {}
 
-OHOS::MMI::SInput::~SInput()
-{
-}
+OHOS::MMI::SInput::~SInput() {}
 
 bool OHOS::MMI::SInput::Init(FunInputEvent funInputEvent, const std::string& seat_id)
 {

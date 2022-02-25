@@ -21,16 +21,12 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SafeKeeper" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SafeKeeper" }; // namepace
 }
 
-SafeKeeper::SafeKeeper()
-{
-}
+SafeKeeper::SafeKeeper() {}
 
-SafeKeeper::~SafeKeeper()
-{
-}
+SafeKeeper::~SafeKeeper() {}
 
 void SafeKeeper::Init(SafeCallbackFun fun)
 {

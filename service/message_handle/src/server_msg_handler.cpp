@@ -45,13 +45,9 @@ namespace MMI {
 } // namespace MMI
 } // namespace OHOS
 
-OHOS::MMI::ServerMsgHandler::ServerMsgHandler()
-{
-}
+OHOS::MMI::ServerMsgHandler::ServerMsgHandler() {}
 
-OHOS::MMI::ServerMsgHandler::~ServerMsgHandler()
-{
-}
+OHOS::MMI::ServerMsgHandler::~ServerMsgHandler() {}
 
 bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
 {
@@ -555,7 +551,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnAddTouchEventFilter(SessionPtr sess, NetP
 
 int32_t OHOS::MMI::ServerMsgHandler::OnRemoveTouchEventFilter(SessionPtr sess, NetPacket& pkt)
 {
-	if (sess->GetUid() != SYSTEMUID && sess->GetUid() != 0) {
+    if (sess->GetUid() != SYSTEMUID && sess->GetUid() != 0) {
         MMI_LOGD("Insufficient permissions");
         return RET_ERR;
     }

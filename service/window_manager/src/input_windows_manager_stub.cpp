@@ -106,7 +106,7 @@ struct ScreenInfo** GetScreensInfo()
 void FreeSurfaceInfo(struct SurfaceInfo* pSurface)
 {
     MMI_LOGD("Enter");
-    if (pSurface) {
+    if (pSurface != nullptr) {
         free(const_cast<SurfaceInfo*>(pSurface));
     }
 }
@@ -114,7 +114,7 @@ void FreeSurfaceInfo(struct SurfaceInfo* pSurface)
 void FreeLayerInfo(struct LayerInfo* pLayer)
 {
     MMI_LOGD("Enter");
-    if (pLayer) {
+    if (pLayer != nullptr) {
         if (pLayer->surfaces) {
             for (int32_t i = 0; i < pLayer->nSurfaces; i++) {
                 FreeSurfaceInfo(const_cast<SurfaceInfo*>(pLayer->surfaces[i]));
@@ -128,7 +128,7 @@ void FreeLayerInfo(struct LayerInfo* pLayer)
 void FreeScreenInfo(struct ScreenInfo* pScreen)
 {
     MMI_LOGD("Enter");
-    if (pScreen) {
+    if (pScreen != nullptr) {
         if (pScreen->layers) {
             for (int32_t i = 0; i < pScreen->nLayers; i++) {
                 FreeLayerInfo(const_cast<LayerInfo*>(pScreen->layers[i]));
@@ -145,7 +145,7 @@ void FreeScreenInfo(struct ScreenInfo* pScreen)
 void FreeScreensInfo(struct ScreenInfo** screens)
 {
     MMI_LOGD("Enter");
-    if (!screens) {
+    if (screens == nullptr) {
         MMI_LOGE("screens is null.");
         return;
     }
@@ -158,7 +158,7 @@ void FreeScreensInfo(struct ScreenInfo** screens)
 void FreeSeatsInfo(struct SeatInfo** seats)
 {
     MMI_LOGD("Enter");
-    if (!seats) {
+    if (seats == nullptr) {
         MMI_LOGE("seats is null.");
         return;
     }

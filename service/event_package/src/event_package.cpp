@@ -506,6 +506,7 @@ int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event, EventJoySt
 
 void EventPackage::PackageTouchEventType(int32_t type, libinput_event_touch *data, EventTouch& touch)
 {
+    CHKPV(data);
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
             touch.point.x = libinput_event_touch_get_x(data);

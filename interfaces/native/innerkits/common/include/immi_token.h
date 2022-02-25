@@ -22,7 +22,7 @@ namespace OHOS {
 namespace MMI {
 class IMMIToken : public IRemoteObject {
 public:
-    IMMIToken(std::u16string descriptor = nullptr) : IRemoteObject(descriptor)
+    explicit IMMIToken(std::u16string descriptor = nullptr) : IRemoteObject(descriptor)
     {
     }
     virtual ~IMMIToken() = default;
