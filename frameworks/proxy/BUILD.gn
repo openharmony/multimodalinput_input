@@ -159,9 +159,6 @@ ohos_unittest("ut-mmi-proxy-out") {
 
   sources = [
     "event_handler/test/client_msg_handler_test.cpp",
-    "event_handler/test/common_event_handler_test.cpp",
-    "event_handler/test/event_factory_test.cpp",
-    "event_handler/test/event_handle_common_test.cpp",
     "event_handler/test/event_handle_key_test.cpp",
     "event_handler/test/event_handle_media_test.cpp",
     "event_handler/test/event_handle_standardized_test.cpp",
@@ -170,22 +167,9 @@ ohos_unittest("ut-mmi-proxy-out") {
     "event_handler/test/event_handle_touch_test.cpp",
     "event_handler/test/multimodal_event_handler_test.cpp",
     "event_handler/test/multimodal_key_event_test.cpp",
-    "event_handler/test/multimodal_semanager_first_test.cpp",
-    "event_handler/test/multimodal_semanager_second_test.cpp",
-    "event_handler/test/multimodal_semanager_third_test.cpp",
     "event_handler/test/standardized_event_process_test.cpp",
-    "event_handler/test/system_event_handler_test.cpp",
     "events/test/device_event_test.cpp",
-    "events/test/key_event_pre_test.cpp",
-    "events/test/keyboard_event_test.cpp",
-    "events/test/mani_pulation_event_test.cpp",
-    "events/test/mmi_point_test.cpp",
-    "events/test/mouse_event_test.cpp",
     "events/test/multi_modal_event_test.cpp",
-    "events/test/rotation_event_test.cpp",
-    "events/test/speech_event_test.cpp",
-    "events/test/stylus_event_test.cpp",
-    "events/test/touch_event_test.cpp",
     "module_loader/test/mmi_client_test.cpp",
   ]
 

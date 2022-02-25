@@ -18,6 +18,7 @@
 #include "singleton.h"
 #include "if_client_msg_handler.h"
 #include "multimodal_standardized_event_manager.h"
+#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {

@@ -21,19 +21,8 @@ ohos_moduletest("api-test-out") {
   include_dirs =
       [ "//foundation/multimodalinput/input/test/moduletest/include" ]
   sources = [
-    "common_event_handler_api_test.cpp",
-    "keyboard_event_api_test.cpp",
-    "manipulation_event_api_test.cpp",
-    "media_event_handler_api_test.cpp",
-    "mouse_event_api_test.cpp",
     "multimodal_event_handler_api_other_test.cpp",
     "multimodal_event_handler_api_test.cpp",
-    "rotation_event_api_test.cpp",
-    "speech_event_api_test.cpp",
-    "stylus_event_api_test.cpp",
-    "system_event_handler_api_test.cpp",
-    "telephone_event_handler_api_test.cpp",
-    "touch_event_api_test.cpp",
   ]
 
   cflags = [ "-DOHOS_BUILD" ]

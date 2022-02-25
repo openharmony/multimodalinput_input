@@ -14,6 +14,7 @@
  */
 
 #include "input_filter_manager.h"
+#if 0
 #include "mmi_client.h"
 #include "mmi_log.h"
 
@@ -382,3 +383,4 @@ int32_t InputFilterManager::OnPointerEvent(const MouseEvent& event, int32_t id_)
 } // namespace MMI
 } // namespace OHOS
 
+#endif

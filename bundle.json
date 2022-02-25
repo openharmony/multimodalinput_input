@@ -77,20 +77,10 @@
           "header": {
             "header_files": [
               "common/include/struct_multimodal.h",
-              "common/include/immi_token.h",
-              "event/include/builtinkey_event.h",
-              "event/include/composite_event.h",
               "event/include/device_event.h",
               "event/include/key_event.h",
-              "event/include/keyboard_event.h",
-              "event/include/manipulation_event.h",
-              "event/include/mouse_event.h",
               "event/include/multimodal_event.h",
               "event/include/multimodal_standardized_event_manager.h",
-              "event/include/rotation_event.h",
-              "event/include/speech_event.h",
-              "event/include/stylus_event.h",
-              "event/include/touch_event.h",
               "proxy/include/multimodal_event_handler.h"
             ],
             "header_base": "//foundation/multimodalinput/input/interfaces/native/innerkits"

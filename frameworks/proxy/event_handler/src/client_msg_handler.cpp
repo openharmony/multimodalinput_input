@@ -17,7 +17,6 @@
 #include <iostream>
 #include "mmi_func_callback.h"
 #include "bytrace.h"
-#include "event_factory.h"
 #include "input_device_impl.h"
 #include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
@@ -26,11 +25,9 @@
 #include "input_manager_impl.h"
 #include "input_monitor_manager.h"
 #include "interceptor_manager.h"
-#include "keyboard_event.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "proto.h"
-#include "stylus_event.h"
 #include "time_cost_chk.h"
 #include "util.h"
 
@@ -62,42 +59,7 @@ bool ClientMsgHandler::Init()
         {MmiMessageId::ON_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnPointerEvent, this)},
         {MmiMessageId::ON_TOUCH, MsgCallbackBind2(&ClientMsgHandler::OnTouch, this)},
         {MmiMessageId::ON_TOUCHPAD_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnTouchPadMonitor, this)},
-        {MmiMessageId::ON_COPY, MsgCallbackBind2(&ClientMsgHandler::OnCopy, this)},
-        {MmiMessageId::ON_SHOW_MENU, MsgCallbackBind2(&ClientMsgHandler::OnShowMenu, this)},
-        {MmiMessageId::ON_SEND, MsgCallbackBind2(&ClientMsgHandler::OnSend, this)},
-        {MmiMessageId::ON_PASTE, MsgCallbackBind2(&ClientMsgHandler::OnPaste, this)},
-        {MmiMessageId::ON_CUT, MsgCallbackBind2(&ClientMsgHandler::OnCut, this)},
-        {MmiMessageId::ON_UNDO, MsgCallbackBind2(&ClientMsgHandler::OnUndo, this)},
-        {MmiMessageId::ON_REFRESH, MsgCallbackBind2(&ClientMsgHandler::OnRefresh, this)},
-        {MmiMessageId::ON_START_DRAG, MsgCallbackBind2(&ClientMsgHandler::OnStartDrag, this)},
-        {MmiMessageId::ON_CANCEL, MsgCallbackBind2(&ClientMsgHandler::OnCancel, this)},
-        {MmiMessageId::ON_ENTER, MsgCallbackBind2(&ClientMsgHandler::OnEnter, this)},
-        {MmiMessageId::ON_PREVIOUS, MsgCallbackBind2(&ClientMsgHandler::OnPrevious, this)},
-        {MmiMessageId::ON_NEXT, MsgCallbackBind2(&ClientMsgHandler::OnNext, this)},
-        {MmiMessageId::ON_BACK, MsgCallbackBind2(&ClientMsgHandler::OnBack, this)},
-        {MmiMessageId::ON_PRINT, MsgCallbackBind2(&ClientMsgHandler::OnPrint, this)},
-        {MmiMessageId::ON_PLAY, MsgCallbackBind2(&ClientMsgHandler::OnPlay, this)},
-        {MmiMessageId::ON_PAUSE, MsgCallbackBind2(&ClientMsgHandler::OnPause, this)},
-        {MmiMessageId::ON_MEDIA_CONTROL, MsgCallbackBind2(&ClientMsgHandler::OnMediaControl, this)},
-        {MmiMessageId::ON_SCREEN_SHOT, MsgCallbackBind2(&ClientMsgHandler::OnScreenShot, this)},
-        {MmiMessageId::ON_SCREEN_SPLIT, MsgCallbackBind2(&ClientMsgHandler::OnScreenSplit, this)},
-        {MmiMessageId::ON_START_SCREEN_RECORD, MsgCallbackBind2(&ClientMsgHandler::OnStartScreenRecord, this)},
-        {MmiMessageId::ON_STOP_SCREEN_RECORD, MsgCallbackBind2(&ClientMsgHandler::OnStopScreenRecord, this)},
-        {MmiMessageId::ON_GOTO_DESKTOP, MsgCallbackBind2(&ClientMsgHandler::OnGotoDesktop, this)},
-        {MmiMessageId::ON_RECENT, MsgCallbackBind2(&ClientMsgHandler::OnRecent, this)},
-        {MmiMessageId::ON_SHOW_NOTIFICATION, MsgCallbackBind2(&ClientMsgHandler::OnShowNotification, this)},
-        {MmiMessageId::ON_LOCK_SCREEN, MsgCallbackBind2(&ClientMsgHandler::OnLockScreen, this)},
-        {MmiMessageId::ON_SEARCH, MsgCallbackBind2(&ClientMsgHandler::OnSearch, this)},
-        {MmiMessageId::ON_CLOSE_PAGE, MsgCallbackBind2(&ClientMsgHandler::OnClosePage, this)},
-        {MmiMessageId::ON_LAUNCH_VOICE_ASSISTANT, MsgCallbackBind2(&ClientMsgHandler::OnLaunchVoiceAssistant, this)},
-        {MmiMessageId::ON_MUTE, MsgCallbackBind2(&ClientMsgHandler::OnMute, this)},
-        {MmiMessageId::ON_ANSWER, MsgCallbackBind2(&ClientMsgHandler::OnAnswer, this)},
-        {MmiMessageId::ON_REFUSE, MsgCallbackBind2(&ClientMsgHandler::OnRefuse, this)},
-        {MmiMessageId::ON_HANG_UP, MsgCallbackBind2(&ClientMsgHandler::OnHangup, this)},
-        {MmiMessageId::ON_TELEPHONE_CONTROL, MsgCallbackBind2(&ClientMsgHandler::OnTelephoneControl, this)},
         {MmiMessageId::GET_MMI_INFO_ACK, MsgCallbackBind2(&ClientMsgHandler::GetMultimodeInputInfo, this)},
-        {MmiMessageId::ON_DEVICE_ADDED, MsgCallbackBind2(&ClientMsgHandler::DeviceAdd, this)},
-        {MmiMessageId::ON_DEVICE_REMOVED, MsgCallbackBind2(&ClientMsgHandler::DeviceRemove, this)},
         {MmiMessageId::KEY_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::KeyEventFilter, this)},
         {MmiMessageId::TOUCH_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::TouchEventFilter, this)},
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ClientMsgHandler::OnInputDevice, this)},
@@ -336,317 +298,6 @@ int32_t ClientMsgHandler::OnTouch(const UDSClient& client, NetPacket& pkt)
     return RET_OK;
 }
 
-int32_t ClientMsgHandler::OnCopy(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnCopy(multEvent);
-}
-
-int32_t ClientMsgHandler::OnShowMenu(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnShowMenu(multEvent);
-}
-
-int32_t ClientMsgHandler::OnSend(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnSend(multEvent);
-}
-
-int32_t ClientMsgHandler::OnPaste(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnPaste(multEvent);
-}
-
-int32_t ClientMsgHandler::OnCut(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnCut(multEvent);
-}
-
-int32_t ClientMsgHandler::OnUndo(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnUndo(multEvent);
-}
-
-int32_t ClientMsgHandler::OnRefresh(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnRefresh(multEvent);
-}
-
-int32_t ClientMsgHandler::OnStartDrag(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnStartDrag(multEvent);
-}
-
-int32_t ClientMsgHandler::OnCancel(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnCancel(multEvent);
-}
-
-int32_t ClientMsgHandler::OnEnter(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnEnter(multEvent);
-}
-
-int32_t ClientMsgHandler::OnPrevious(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnPrevious(multEvent);
-}
-
-int32_t ClientMsgHandler::OnNext(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnNext(multEvent);
-}
-
-int32_t ClientMsgHandler::OnBack(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnBack(multEvent);
-}
-
-int32_t ClientMsgHandler::OnPrint(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnPrint(multEvent);
-}
-
-int32_t ClientMsgHandler::OnPlay(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnPlay(multEvent);
-}
-
-int32_t ClientMsgHandler::OnPause(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnPause(multEvent);
-}
-
-int32_t ClientMsgHandler::OnMediaControl(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnMediaControl(multEvent);
-}
-
-int32_t ClientMsgHandler::OnScreenShot(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnScreenShot(multEvent);
-}
-
-int32_t ClientMsgHandler::OnScreenSplit(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnScreenSplit(multEvent);
-}
-
-int32_t ClientMsgHandler::OnStartScreenRecord(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnStartScreenRecord(multEvent);
-}
-
-int32_t ClientMsgHandler::OnStopScreenRecord(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnStopScreenRecord(multEvent);
-}
-
-int32_t ClientMsgHandler::OnGotoDesktop(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnGotoDesktop(multEvent);
-}
-
-int32_t ClientMsgHandler::OnRecent(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnRecent(multEvent);
-}
-
-int32_t ClientMsgHandler::OnShowNotification(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnShowNotification(multEvent);
-}
-
-int32_t ClientMsgHandler::OnLockScreen(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnLockScreen(multEvent);
-}
-
-int32_t ClientMsgHandler::OnSearch(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnSearch(multEvent);
-}
-
-int32_t ClientMsgHandler::OnClosePage(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnClosePage(multEvent);
-}
-
-int32_t ClientMsgHandler::OnLaunchVoiceAssistant(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnLaunchVoiceAssistant(multEvent);
-}
-
-int32_t ClientMsgHandler::OnMute(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnMute(multEvent);
-}
-
-int32_t ClientMsgHandler::OnAnswer(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnAnswer(multEvent);
-}
-
-int32_t ClientMsgHandler::OnRefuse(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnRefuse(multEvent);
-}
-
-int32_t ClientMsgHandler::OnHangup(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnHangup(multEvent);
-}
-
-int32_t ClientMsgHandler::OnTelephoneControl(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    MultimodalEvent multEvent;
-    PackedData(client, pkt, __func__, multEvent);
-    return EventManager.OnTelephoneControl(multEvent);
-}
-
-int32_t ClientMsgHandler::PackedData(const UDSClient& client, NetPacket& pkt,
-                                     const std::string& funName, MultimodalEvent& multEvent)
-{
-    if (isServerReqireStMessage_) {
-        return RET_OK;
-    }
-    RegisteredEvent data = {};
-    int32_t fd = 0;
-    int16_t idMsg = 0;
-    int32_t windowId = 0;
-    int32_t abilityId = 0;
-    uint64_t serverStartTime = 0;
-    int32_t type = 0;
-    int32_t deviceId = 0;
-    uint32_t occurredTime = 0;
-    std::string uuid = "";
-    pkt >> type;
-    if (type == INPUT_DEVICE_CAP_AISENSOR || type == INPUT_DEVICE_CAP_KNUCKLE) {
-        pkt >> idMsg >> deviceId >> fd >> windowId >> abilityId >> serverStartTime >> uuid >> occurredTime;
-        CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-        MMI_LOGD("event dispatcher of client: manager_aisensor"
-                 "Msg:%{public}d,fd:%{public}d,occurredTime:%{public}d",
-                 idMsg, fd, occurredTime);
-        if (type == INPUT_DEVICE_CAP_KNUCKLE) {
-            type = DEVICE_TYPE_KNUCKLE;
-        } else if (type == INPUT_DEVICE_CAP_AISENSOR) {
-            type = DEVICE_TYPE_AI_SPEECH;
-        }
-        multEvent.Initialize(windowId, 0, uuid, type, occurredTime, "", deviceId, 0, 0);
-    } else {
-        pkt >> data >> fd >> windowId >> abilityId >> serverStartTime;
-        CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-        if (windowId == -1) {
-            MMI_LOGD("event dispatcher of client: occurredTime:%{public}" PRId64 ",sourceType:%{public}d,"
-                     "fd:%{public}d",
-                     data.occurredTime, data.eventType, fd);
-        } else {
-            MMI_LOGD("event dispatcher of client: occurredTime:%{public}" PRId64 ",sourceType:%{public}d,"
-                     "fd:%{public}d",
-                     data.occurredTime, data.eventType, fd);
-        }
-        multEvent.Initialize(windowId, 0, data.uuid, data.eventType, data.occurredTime, "", data.deviceId, 0,
-            data.deviceType);
-    }
-    return RET_OK;
-}
-
 int32_t ClientMsgHandler::GetMultimodeInputInfo(const UDSClient& client, NetPacket& pkt)
 {
     TagPackHead tagPackHeadAck;
@@ -654,28 +305,6 @@ int32_t ClientMsgHandler::GetMultimodeInputInfo(const UDSClient& client, NetPack
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     std::cout << "GetMultimodeInputInfo: The client fd is " << tagPackHeadAck.sizeEvent[0] << std::endl;
     return RET_OK;
-}
-
-int32_t ClientMsgHandler::DeviceAdd(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    DeviceManage data = {};
-    pkt >> data;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-    DeviceEvent eventData = {};
-    eventData.Initialize(data.deviceName, data.physical, data.deviceId);
-    return EventManager.OnDeviceAdd(eventData);
-}
-
-int32_t ClientMsgHandler::DeviceRemove(const UDSClient& client, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    DeviceManage data = {};
-    pkt >> data;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-    DeviceEvent eventData = {};
-    eventData.Initialize(data.deviceName, data.physical, data.deviceId);
-    return EventManager.OnDeviceRemove(eventData);
 }
 
 int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& pkt)
@@ -713,6 +342,7 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
 
 int32_t ClientMsgHandler::KeyEventFilter(const UDSClient& client, NetPacket& pkt)
 {
+#if 0
     EventKeyboard key = {};
     int32_t id = 0;
     pkt >> key >>id;
@@ -727,10 +357,14 @@ int32_t ClientMsgHandler::KeyEventFilter(const UDSClient& client, NetPacket& pkt
     event.Initialize(windowId, 0, 0, 0, 0, 0, key.state, key.key, 0, 0, key.uuid, key.eventType,
                      key.time, "", key.deviceId, 0, key.deviceType, deviceEventType);
     return InputFilterMgr.OnKeyEvent(event, id);
+#endif
+    MMI_LOGE("chengmai_todo");
+    return RET_ERR;
 }
 
 int32_t ClientMsgHandler::TouchEventFilter(const UDSClient& client, NetPacket& pkt)
 {
+#if 0
     MMI_LOGD("enter");
     int32_t abilityId = 0;
     int32_t windowId = 0;
@@ -776,10 +410,14 @@ int32_t ClientMsgHandler::TouchEventFilter(const UDSClient& client, NetPacket& p
     pkt >> id;
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     return InputFilterMgr.OnTouchEvent(event, id);
+#endif
+    MMI_LOGE("chengmai_todo");
+    return RET_ERR;
 }
 
 int32_t ClientMsgHandler::PointerEventInterceptor(const UDSClient& client, NetPacket& pkt)
 {
+#if 0
     EventPointer pointData = {};
     int32_t id = 0;
     pkt >> pointData >> id;
@@ -804,6 +442,9 @@ int32_t ClientMsgHandler::PointerEventInterceptor(const UDSClient& client, NetPa
         0, 0, 0, pointData.uuid, pointData.eventType, static_cast<int32_t>(pointData.time),
         "", pointData.deviceId, 0, pointData.deviceType, eventJoyStickAxis);
     return (InputFilterMgr.OnPointerEvent(mouse_event, id));
+#endif
+    MMI_LOGE("chengmai_todo");
+    return RET_ERR;
 }
 
 int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt)
