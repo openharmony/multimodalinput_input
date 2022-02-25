@@ -15,7 +15,6 @@
 
 #include <gtest/gtest.h>
 #include "client_msg_handler.h"
-#include "event_factory.h"
 #include "mmi_client.h"
 #include "proto.h"
 #include "struct_multimodal.h"

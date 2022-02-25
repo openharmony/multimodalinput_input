@@ -16,11 +16,12 @@
 #define MULTIMODAL_STANDARDIZED_EVENT_MANAGER_H
 
 #include <set>
-#include "singleton.h"
-#include "iremote_object.h"
 #include "if_mmi_client.h"
-#include "nocopyable.h"
+#include "iremote_object.h"
 #include "key_event_input_subscribe_manager.h"
+#include "nocopyable.h"
+#include "pointer_event.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {

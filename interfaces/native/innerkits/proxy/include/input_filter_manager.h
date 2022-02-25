@@ -14,13 +14,13 @@
  */
 #ifndef INPUT_FILTER_MANAGER_H
 #define INPUT_FILTER_MANAGER_H
+#if 0
 #include "singleton.h"
 #include "proto.h"
 #include <string>
 #include <list>
 #include <functional>
 #include "keyboard_event.h"
-#include "touch_event.h"
 #include "multimodal_event_handler.h"
 namespace OHOS {
 namespace MMI {
@@ -109,4 +109,6 @@ private:
 } // namespace MMI
 } // namespace OHOS
 #define InputFilterMgr OHOS::MMI::InputFilterManager::GetInstance()
+#endif
+
 #endif // INPUT_FILTER_MANAGER_H
