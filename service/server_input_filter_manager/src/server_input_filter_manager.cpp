@@ -15,7 +15,6 @@
 
 #include "server_input_filter_manager.h"
 #include <cinttypes>
-#include "app_register.h"
 #include "input_event_data_transformation.h"
 
 namespace OHOS {
@@ -245,69 +244,8 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
 
     auto device = libinput_event_get_device(event);
     CHKPF(device);
-
-    MmiMessageId idMsg = MmiMessageId::INVALID;
-    MMIRegEvent->OnEventTouchGetSign(touch, idMsg);
-
-    int32_t touchFocusId = WinMgr->GetTouchFocusSurfaceId();
-    auto appInfo = AppRegs->FindWinId(touchFocusId); // obtain application information
-    if (appInfo.fd == RET_ERR) {
-        MMI_LOGE("Failed to find fd:%{public}d,errCode:%{public}d", touchFocusId, FOCUS_ID_OBTAIN_FAIL);
-        return false;
-    }
-    MMI_LOGD("DispatchTouchEvent focusId:%{public}d,fd:%{public}d", touchFocusId, appInfo.fd);
-
-    int32_t testConnectState = 0;
-    int32_t testBufferState = 0;
-
-    if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, touch.time)) {
-        NetPacket newPacket(MmiMessageId::TOUCH_EVENT_INTERCEPTOR);
-        int32_t fingerCount = MMIRegEvent->GetTouchInfoSizeDeviceId(touch.deviceId);
-        if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
-            fingerCount++;
-        }
-        newPacket << fingerCount;
-        POINT_EVENT_TYPE pointEventType = EVENT_TYPE_INVALID;
-        OnEventTouchGetPointEventType(touch, fingerCount, pointEventType);
-        int32_t eventType = pointEventType;
-        newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime;
-
-        std::vector<std::pair<uint32_t, int32_t>> touchIds;
-        MMIRegEvent->GetTouchIds(touch.deviceId, touchIds);
-        if (!touchIds.empty()) {
-            for (std::pair<uint32_t, int32_t> touchId : touchIds) {
-                EventTouch touchTemp = {};
-                errno_t retErr = memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch));
-                CHKF(retErr == EOK, MEMCPY_SEC_FUN_FAIL);
-                MMIRegEvent->GetTouchInfo(touchId, touchTemp);
-                MMI_LOGD("4.event filter of server 1:eventTouch:time:%{public}" PRId64 ",deviceType:%{public}u,"
-                         "deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,"
-                         "slot:%{public}d,seatSlot:%{public}d,pressure:%{public}lf,point.x:%{public}lf,"
-                         "point.y:%{public}lf,fd:%{public}d,preHandlerTime:%{public}" PRId64,
-                         touchTemp.time, touchTemp.deviceType, touchTemp.deviceName,
-                         touchTemp.physical, touchTemp.eventType, touchTemp.slot, touchTemp.seatSlot,
-                         touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, appInfo.fd,
-                         preHandlerTime);
-                newPacket << touchTemp;
-            }
-        }
-        if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
-            newPacket << touch;
-            MMI_LOGD("4.event filter of server 2:eventTouch:time:%{public}" PRId64 ", deviceType:%{public}u,"
-                     "deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,"
-                     "slot:%{public}d,seatSlot:%{public}d,pressure:%{public}lf,point.x:%{public}lf,"
-                     "point.y:%{public}lf,fd:%{public}d,preHandlerTime:%{public}" PRId64,
-                     touch.time, touch.deviceType, touch.deviceName,
-                     touch.physical, touch.eventType, touch.slot, touch.seatSlot, touch.pressure,
-                     touch.point.x, touch.point.y, appInfo.fd, preHandlerTime);
-        }
-        newPacket << id;
-        if (!temp->SendMsg(newPacket)) {
-            MMI_LOGE("Sending Interceptor EventTouch failed, session.fd:%{public}d", temp->GetFd());
-            return false;
-        }
-    }
-    MMI_LOGD("Leave");
+    
+    MMI_LOGD("Leave, TODO:cm");
     return true;
 }
 

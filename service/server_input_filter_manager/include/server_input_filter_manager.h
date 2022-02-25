@@ -21,7 +21,6 @@
 #include "key_event.h"
 #include "mmi_log.h"
 #include "proto.h"
-#include "register_event.h"
 #include "singleton.h"
 #include "uds_server.h"
 

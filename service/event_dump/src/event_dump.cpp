@@ -20,8 +20,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "input_windows_manager.h"
-#include "register_event.h"
-#include "register_eventhandle_manager.h"
 #include "util.h"
 #include "util_ex.h"
 
@@ -36,9 +34,6 @@ void ChkConfig(int32_t fd)
     mprintf(fd, "ChkMMIConfig: ");
 #ifdef OHOS_BUILD
     mprintf(fd, "\tOHOS_BUILD");
-#endif
-#ifdef OHOS_WESTEN_MODEL
-    mprintf(fd, "\tOHOS_WESTEN_MODEL");
 #endif
 #ifdef OHOS_BUILD_LIBINPUT
     mprintf(fd, "\tOHOS_BUILD_LIBINPUT");
@@ -62,23 +57,6 @@ void ChkConfig(int32_t fd)
     mprintf(fd, "\tXKB_CONFIG_PATH: %s\n", DEF_XKB_CONFIG);
 }
 
-void ChkAppInfos(int32_t fd)
-{
-    auto focusId = WinMgr->GetFocusSurfaceId();
-    auto touchFocusId = WinMgr->GetTouchFocusSurfaceId();
-    auto appInfo = AppRegs->FindWinId(focusId);
-    mprintf(fd, "FocusInfo: winId=%d fd=%d abilityId=%d surfaceId=%d bundlerName=%s appName=%s",
-            focusId, appInfo.fd, appInfo.abilityId, appInfo.windowId, appInfo.bundlerName.c_str(),
-            appInfo.appName.c_str());
-    if (focusId != touchFocusId) {
-        appInfo = AppRegs->FindWinId(touchFocusId);
-        mprintf(fd, "TouchFocusInfo: winId=%d fd=%d abilityId=%d surfaceId=%d bundlerName=%s appName=%s",
-                touchFocusId, appInfo.fd, appInfo.abilityId, appInfo.windowId, appInfo.bundlerName.c_str(),
-                appInfo.appName.c_str());
-    }
-    AppRegs->Dump(fd);
-}
-
 void EventDump::Init(UDSServer& uds)
 {
     udsServer_ = &uds;
@@ -91,11 +69,6 @@ void EventDump::Dump(int32_t fd)
     auto strCurTime = Strftime();
     mprintf(fd, "MMIDumpsBegin: %s", strCurTime.c_str());
     ChkConfig(fd);
-#ifdef OHOS_WESTEN_MODEL
-    ChkAppInfos(fd);
-    WinMgr->Dump(fd);
-    RegEventHM->Dump(fd);
-#endif
     if (udsServer_) {
         udsServer_->Dump(fd);
     }

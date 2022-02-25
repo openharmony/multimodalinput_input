@@ -15,7 +15,6 @@
 
 #include "event_package.h"
 #include "input_device_manager.h"
-#include "device_register.h"
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -511,18 +510,9 @@ void EventPackage::PackageTouchEventType(int32_t type, libinput_event_touch *dat
         case LIBINPUT_EVENT_TOUCH_DOWN: {
             touch.point.x = libinput_event_touch_get_x(data);
             touch.point.y = libinput_event_touch_get_y(data);
-#ifdef OHOS_WESTEN_MODEL
-            auto touchSurfaceInfo = WinMgr->GetTouchSurfaceInfo(touch.point.x, touch.point.y);
-            CHKPR(touchSurfaceInfo, ERROR_NULL_POINTER);
-            WinMgr->SetTouchFocusSurfaceId(touchSurfaceInfo->surfaceId);
-            WinMgr->TransfromToSurfaceCoordinate(*touchSurfaceInfo, touch.point.x, touch.point.y, true);
-#endif
             break;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
-#ifdef OHOS_WESTEN_MODEL
-            MMIRegEvent->GetTouchInfoTouchId(std::make_pair(touch.deviceId, touch.seatSlot), touch);
-#endif
             touch.time = libinput_event_touch_get_time_usec(data);
             touch.eventType = LIBINPUT_EVENT_TOUCH_UP;
             break;
@@ -530,12 +520,6 @@ void EventPackage::PackageTouchEventType(int32_t type, libinput_event_touch *dat
         case LIBINPUT_EVENT_TOUCH_MOTION: {
             touch.point.x = libinput_event_touch_get_x(data);
             touch.point.y = libinput_event_touch_get_y(data);
-#ifdef OHOS_WESTEN_MODEL
-            auto touchSurfaceId = WinMgr->GetTouchFocusSurfaceId();
-            auto touchSurfaceInfo = WinMgr->GetSurfaceInfo(touchSurfaceId);
-            CHKPR(touchSurfaceInfo, ERROR_NULL_POINTER);
-            WinMgr->TransfromToSurfaceCoordinate(*touchSurfaceInfo, touch.point.x, touch.point.y);
-#endif
             break;
         }
         default: {
@@ -571,18 +555,9 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
         case LIBINPUT_EVENT_TOUCH_DOWN: {
             touch.point.x = libinput_event_touch_get_x(data);
             touch.point.y = libinput_event_touch_get_y(data);
-#ifdef OHOS_WESTEN_MODEL
-            auto touchSurfaceInfo = WinMgr->GetTouchSurfaceInfo(touch.point.x, touch.point.y);
-            CHKPR(touchSurfaceInfo, ERROR_NULL_POINTER, RET_ERR);
-            WinMgr->SetTouchFocusSurfaceId(touchSurfaceInfo->surfaceId);
-            WinMgr->TransfromToSurfaceCoordinate(*touchSurfaceInfo, touch.point.x, touch.point.y, true);
-#endif
             break;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
-#ifdef OHOS_WESTEN_MODEL
-            MMIRegEvent->GetTouchInfo(std::make_pair(touch.deviceId, touch.seatSlot), touch);
-#endif
             touch.time = libinput_event_touch_get_time_usec(data);
             touch.eventType = LIBINPUT_EVENT_TOUCH_UP;
             break;
@@ -590,12 +565,6 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
         case LIBINPUT_EVENT_TOUCH_MOTION: {
             touch.point.x = libinput_event_touch_get_x(data);
             touch.point.y = libinput_event_touch_get_y(data);
-#ifdef OHOS_WESTEN_MODEL
-            auto touchSurfaceId = WinMgr->GetTouchFocusSurfaceId();
-            auto touchSurfaceInfo = WinMgr->GetSurfaceInfo(touchSurfaceId);
-            CHKPR(touchSurfaceInfo, ERROR_NULL_POINTER, RET_ERR);
-            WinMgr->TransfromToSurfaceCoordinate(*touchSurfaceInfo, touch.point.x, touch.point.y);
-#endif
             break;
         }
         default: {

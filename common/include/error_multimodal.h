@@ -60,7 +60,6 @@ namespace OHOS {
         UNKNOWN_EVENT,                              // 未知的事件
         ERROR_NULL_POINTER,                         // 空指针
         WINDOWS_MSG_INIT_FAIL,                      // 窗口管理器初始化失败
-        APP_REG_INIT_FAIL,                          // APPRegister初始化失败
         SVR_MSG_HANDLER_INIT_FAIL,                  // 服务消息处理初始化失败
         INPUT_EVENT_HANDLER_INIT_FAIL,              // 输入事件处理初始化失败
         LIBINPUT_INIT_FAIL,                         // libinput初始化失败
@@ -116,7 +115,6 @@ namespace OHOS {
         ADD_DEVICE_INFO_CALL_FAIL,                  // 调用AddDeviceInfo函数失败
         TOUCH_EVENT_PKG_FAIL,                       // 触摸屏事件封装失败
         UNKNOWN_EVENT_PKG_FAIL,                     // 未识别事件封装失败
-        DEV_REG_INIT_FAIL,                          // DeviceRegister初始化失败
         MEMSET_SEC_FUN_FAIL,                        // memset安全函数错误
         DEVICEID_PARAM_PKG_FAIL,                    // 设备号参数封装失败
         MALLOC_FAIL,                                // malloc失败

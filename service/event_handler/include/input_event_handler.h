@@ -59,9 +59,6 @@ protected:
     
     int32_t OnMouseEventHandler(libinput_event *event);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
-#ifdef OHOS_WESTEN_MODEL
-    bool OnSystemEvent(const KeyEventValueTransformations& temp, const enum KEY_STATE state) const;
-#endif
 
 private:
     int32_t OnEventHandler(const multimodal_libinput_event& ev);

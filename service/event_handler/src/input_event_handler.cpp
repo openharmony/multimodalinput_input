@@ -25,7 +25,6 @@
 #include "input_device_manager.h"
 #include "interceptor_manager_global.h"
 #include "mouse_event_handler.h"
-#include "outer_interface.h"
 #include "s_input.h"
 #include "server_input_filter_manager.h"
 #include "time_cost_chk.h"
@@ -265,81 +264,16 @@ int32_t InputEventHandler::AddInputEventFilter(sptr<IEventFilter> filter)
 int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& ev)
 {
     CHKPR(ev.event, ERROR_NULL_POINTER);
-#ifndef OHOS_WESTEN_MODEL
     auto device = libinput_event_get_device(ev.event);
     InputDevMgr->OnInputDeviceAdded(device);
-#else
-    uint64_t sysStartProcessTime = GetSysClockTime();
-    DeviceManage deviceManage = {};
-
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    auto packageResult = eventPackage_.PackageDeviceManageEvent(ev.event, deviceManage);
-    if (packageResult != RET_OK) {
-        MMI_LOGE("Deviceadded event package failed. ret:%{public}d,errCode:%{public}d",
-                 packageResult, DEV_ADD_EVENT_PKG_FAIL);
-        return DEV_ADD_EVENT_PKG_FAIL;
-    }
-    MMI_LOGD("4.event dispatcher of server, DeviceManage:physical:%{public}s,"
-             "deviceName:%{public}s,deviceType:%{public}u",
-             deviceManage.physical, deviceManage.deviceName, deviceManage.deviceType);
-
-    int32_t focusId = WinMgr->GetFocusSurfaceId();
-    if (focusId < 0) {
-        MMI_LOGW("Failed to get the focus window");
-        return RET_OK; // DeviceAdded event will be discarded if focusId < 0
-    }
-    auto appInfo = AppRegs->FindWinId(focusId);
-    if (appInfo.fd == RET_ERR) {
-        MMI_LOGW("Failed to obtain AppInfo, desWindow:%{public}d", focusId);
-        return RET_OK; // DeviceAdded event will be discarded if appInfo.fd == RET_ERR
-    }
-    NetPacket newPacket(MmiMessageId::ON_DEVICE_ADDED);
-    newPacket << deviceManage << appInfo.abilityId << focusId << appInfo.fd << sysStartProcessTime;
-    if (!SendMsg(appInfo.fd, newPacket)) {
-        MMI_LOGE("Sending structure of DeviceManage failed! errCode:%{public}d", MSG_SEND_FAIL);
-        return MSG_SEND_FAIL;
-    }
-#endif
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event& ev)
 {
     CHKPR(ev.event, ERROR_NULL_POINTER);
-#ifndef OHOS_WESTEN_MODEL
     auto device = libinput_event_get_device(ev.event);
     InputDevMgr->OnInputDeviceRemoved(device);
-#else
-    uint64_t sysStartProcessTime = GetSysClockTime();
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    DeviceManage deviceManage = {};
-    auto packageResult = eventPackage_.PackageDeviceManageEvent(ev.event, deviceManage);
-    if (packageResult != RET_OK) {
-        MMI_LOGE("Deviceremoved event package failed. ret:%{public}d,errCode:%{public}d",
-                 packageResult, DEV_REMOVE_EVENT_PKG_FAIL);
-        return DEV_REMOVE_EVENT_PKG_FAIL;
-    }
-    MMI_LOGD("4.event dispatcher of server, DeviceManage:physical:%{public}s,"
-             "deviceName:%{public}s,deviceType:%{public}u",
-             deviceManage.physical, deviceManage.deviceName, deviceManage.deviceType);
-
-    int32_t focusId = WinMgr->GetFocusSurfaceId();
-    if (focusId < 0) {
-        MMI_LOGW("Failed to get the focus window");
-        return RET_OK; // DeviceRemoved event will be discarded if focusId < 0
-    }
-    auto appInfo = AppRegs->FindWinId(focusId);
-    if (appInfo.fd == RET_ERR) {
-        MMI_LOGW("Failed to obtain AppInfo, desWindow:%{public}d", focusId);
-        return RET_OK; // DeviceRemoved event will be discarded if appInfo.fd == RET_ERR
-    }
-    NetPacket newPacket(MmiMessageId::ON_DEVICE_REMOVED);
-    newPacket << deviceManage << appInfo.abilityId << focusId << appInfo.fd << sysStartProcessTime;
-    if (!SendMsg(appInfo.fd, newPacket)) {
-        MMI_LOGE("Sending structure of DeviceManage failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return MSG_SEND_FAIL;
-    }
-#endif
     return RET_OK;
 }
 
@@ -361,16 +295,6 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         return KEY_EVENT_PKG_FAIL;
     }
 
-#ifdef OHOS_WESTEN_MODEL
-    int32_t action = keyEvent_->GetKeyAction();
-    KEY_STATE kacState = (action == KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
-    int16_t lowKeyCode = static_cast<int16_t>(keyEvent_->GetKeyCode());
-    auto oKey = KeyValueTransformationInput(lowKeyCode);
-    if (oKey.isSystemKey) {
-        OnSystemEvent(oKey, kacState);
-    }
-#endif
-
     auto ret = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_, sysStartProcessTime);
     if (ret != RET_OK) {
         MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d",
@@ -389,9 +313,6 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
 
 int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& ev)
 {
-#ifdef OHOS_WESTEN_MODEL
-    uint64_t sysStartProcessTime = GetSysClockTime();
-#endif
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
@@ -410,38 +331,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
     keyEventString = "service report keyId=" + std::to_string(keyId);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
-#ifndef OHOS_WESTEN_MODEL
-    if (InterceptorMgrGbl.OnKeyEvent(keyEvent_)) {
-        MMI_LOGD("key event filter find a key event from Original event keyCode:%{puiblic}d",
-                 keyEvent_->GetKeyCode());
-        int32_t keyCode = keyEvent_->GetKeyCode();
-        keyEventString = "service filter keyCode=" + std::to_string(keyCode);
-        BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
-        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
-        return RET_OK;
-    }
     return OnEventKey(ev.event);
-#else
-
-    int32_t action = keyEvent_->GetKeyAction();
-    KEY_STATE kacState = (action == KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
-    int16_t lowKeyCode = static_cast<int16_t>(keyEvent_->GetKeyCode());
-    auto oKey = KeyValueTransformationInput(lowKeyCode);
-    if (oKey.isSystemKey) {
-        OnSystemEvent(oKey, kacState);
-    }
-
-    auto device = libinput_event_get_device(ev.event);
-    CHKPR(device, ERROR_NULL_POINTER);
-
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_, sysStartProcessTime);
-    if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d, errCode:%{public}d",
-                 eventDispatchResult, KEY_EVENT_DISP_FAIL);
-        return KEY_EVENT_DISP_FAIL;
-    }
-    return RET_OK;
-#endif
 }
 
 int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
@@ -462,12 +352,6 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
 
     auto oKey = KeyValueTransformationInput(keyBoard.key); // libinput key transformed into key
     keyBoard.unicode = 0;
-
-#ifdef OHOS_WESTEN_MODEL
-    if (oKey.isSystemKey) { // Judging whether key is system key.
-        OnSystemEvent(oKey, keyBoard.state);
-    }
-#endif
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
@@ -493,42 +377,8 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
 int32_t InputEventHandler::OnEventKeyboard(const multimodal_libinput_event& ev)
 {
     CHKPR(ev.event, ERROR_NULL_POINTER);
-#ifdef OHOS_WESTEN_MODEL
-    uint64_t sysStartProcessTime = GetSysClockTime();
-#endif
     CHKPR(udsServer_, ERROR_NULL_POINTER);
-#ifndef OHOS_WESTEN_MODEL
     return OnKeyboardEvent(ev.event);
-#else
-    EventKeyboard keyBoard = {};
-    auto ret = eventPackage_.PackageKeyEvent(ev.event, keyBoard);
-    if (ret == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
-        MMI_LOGD("The same event occurs on multiple devices, ret:%{puiblic}d", ret);
-        return RET_OK;
-    }
-    if (ret != RET_OK) {
-        MMI_LOGE("Key event package failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_PKG_FAIL);
-        return KEY_EVENT_PKG_FAIL;
-    }
-    if (ServerKeyFilter->OnKeyEvent(keyBoard)) {
-        MMI_LOGD("Key event filter find a key event from Original event, keyCode:%{puiblic}d", keyBoard.key);
-        return RET_OK;
-    }
-    auto oKey = KeyValueTransformationInput(keyBoard.key); // libinput key transformed into key
-    keyBoard.unicode = 0;
-    if (oKey.isSystemKey && OnSystemEvent(oKey, keyBoard.state)) { // Judging whether key is system key.
-        return RET_OK;
-    }
-
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, oKey, keyBoard,
-                                                               sysStartProcessTime);
-    if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d",
-                 eventDispatchResult, KEY_EVENT_DISP_FAIL);
-        return KEY_EVENT_DISP_FAIL;
-    }
-    return RET_OK;
-#endif
 }
 
 int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
@@ -560,12 +410,6 @@ int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
                  packageResult, POINT_EVENT_PKG_FAIL);
         return POINT_EVENT_PKG_FAIL;
     }
-#ifdef OHOS_WESTEN_MODEL
-    if (ServerKeyFilter->OnPointerEvent(point)) {
-        MMI_LOGD("Pointer event interceptor find a pointer event pointer button:%{puiblic}d", point.button);
-        return RET_OK;
-    }
-#else
     MMI_LOGD("2.mapping event, Event:eventType:%{public}d", point.eventType);
     /*
     auto retEvent = eventDispatch_.DispatchCommonPointEvent(*udsServer_, *ev.event, point, preHandlerTime);
@@ -575,19 +419,7 @@ int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
         return POINT_REG_EVENT_DISP_FAIL;
     }
     */
-#endif
-#ifndef OHOS_WESTEN_MODEL
-    /* New */
     return OnMouseEventHandler(ev.event);
-#else
-    auto retEvent = eventDispatch_.DispatchPointerEvent(*udsServer_, ev.event, point, sysStartProcessTime);
-    if (retEvent != RET_OK) {
-        MMI_LOGE("Pointer event dispatch failed. ret:%{public}d,errCode:%{public}d",
-            retEvent, POINT_EVENT_DISP_FAIL);
-        return POINT_EVENT_DISP_FAIL;
-    }
-    return RET_OK;
-#endif
 }
 
 int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
@@ -647,38 +479,12 @@ int32_t InputEventHandler::OnEventTouch(const multimodal_libinput_event& ev)
 {
     CHKPR(ev.event, ERROR_NULL_POINTER);
     SInput::LoginfoPackagingTool(ev.event);
-#ifndef OHOS_WESTEN_MODEL
     return OnEventTouchSecond(ev.event);
-#else
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    uint64_t sysStartProcessTime = GetSysClockTime();
-    EventTouch touch = {};
-    auto packageResult = eventPackage_.PackageTouchEvent(ev.event, touch);
-    if (packageResult == UNKNOWN_EVENT_PKG_FAIL) {
-        return RET_OK;
-    }
-    if (packageResult != RET_OK) {
-        MMI_LOGE("Touch event package failed, ret:%{public}d,errCode:%{public}d",
-                 packageResult, TOUCH_EVENT_PKG_FAIL);
-        return TOUCH_EVENT_PKG_FAIL;
-    }
-    if (ServerKeyFilter->OnTouchEvent(ev.event, touch, sysStartProcessTime)) {
-        return RET_OK;
-    }
-    auto ret = eventDispatch_.DispatchTouchEvent(*udsServer_, ev.event, touch, sysStartProcessTime);
-    if (ret != RET_OK) {
-        MMI_LOGE("Touch event dispatch failed. ret:%{public}d,errCode:%{public}d", ret, TOUCH_EVENT_DISP_FAIL);
-        return TOUCH_EVENT_DISP_FAIL;
-    }
-#endif
-    return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventTouchpad(const multimodal_libinput_event& ev)
 {
-#ifndef OHOS_WESTEN_MODEL
     OnEventTouchPadSecond(ev.event);
-#endif
     return RET_OK;
 }
 
@@ -719,27 +525,7 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 int32_t InputEventHandler::OnEventGesture(const multimodal_libinput_event& ev)
 {
     CHKPR(ev.event, ERROR_NULL_POINTER);
-#ifndef OHOS_WESTEN_MODEL
     OnGestureEvent(ev.event);
-#else
-    uint64_t sysStartProcessTime = GetSysClockTime();
-    EventGesture gesture = {};
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    auto packageResult = eventPackage_.PackageGestureEvent(ev.event, gesture);
-    if (packageResult != RET_OK) {
-        MMI_LOGE("Gesture swipe event package failed, ret:%{public}d,errCode:%{public}d",
-                 packageResult, GESTURE_EVENT_PKG_FAIL);
-        return GESTURE_EVENT_PKG_FAIL;
-    }
-
-    auto eventDispatchResult = eventDispatch_.DispatchGestureEvent(*udsServer_, ev.event, gesture,
-                                                                   sysStartProcessTime);
-    if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Gesture event dispatch failed, ret:%{public}d,errCode:%{public}d",
-                 eventDispatchResult, GESTURE_EVENT_DISP_FAIL);
-        return GESTURE_EVENT_DISP_FAIL;
-    }
-#endif
     return RET_OK;
 }
 
@@ -815,11 +601,6 @@ int32_t InputEventHandler::OnEventTabletPadKey(const multimodal_libinput_event& 
         return TABLETPAD_KEY_EVENT_PKG_FAIL;
     }
     auto oKey = KeyValueTransformationInput(key.key);           // libinput key transformed into key
-#ifdef OHOS_WESTEN_MODEL
-    if (oKey.isSystemKey && OnSystemEvent(oKey, key.state)) {   // Judging whether key is system key.
-        return RET_OK;
-    }
-#endif
     auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, oKey, key, sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d",
@@ -843,12 +624,6 @@ int32_t InputEventHandler::OnEventJoyStickKey(const multimodal_libinput_event& e
     // libinput key transformed into key
     auto oKey = KeyValueTransformationInput(key.key);
     key.unicode = 0;
-#ifdef OHOS_WESTEN_MODEL
-    // Judging whether key is system key.
-    if (oKey.isSystemKey && OnSystemEvent(oKey, key.state)) {
-        return RET_OK;
-    }
-#endif
     auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, oKey, key, time);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("JoyStick event dispatch failed. ret:%{public}d,errCode:%{public}d",
@@ -943,38 +718,5 @@ bool InputEventHandler::SendMsg(const int32_t fd, NetPacket& pkt) const
     CHKPF(udsServer_);
     return udsServer_->SendMsg(fd, pkt);
 }
-#ifdef OHOS_WESTEN_MODEL
-bool InputEventHandler::OnSystemEvent(const KeyEventValueTransformations& temp,
-    const enum KEY_STATE state) const
-{
-    const int32_t systemEventAttr = OuterInterface::GetSystemEventAttrKeyValue(temp.keyValueOfSys);
-    uint16_t retCode = 0;
-    switch (systemEventAttr) {
-        case MMI_SYSTEM_SERVICE: {
-            (void)OuterInterface::SystemEventHandler(temp, state, systemEventAttr);
-            (void)OuterInterface::DistributedEventHandler(temp, state, systemEventAttr);
-            retCode = 1;
-            break;
-        }
-        case MMI_SYSTEM_SERVICE_AND_APP: {
-            if (OuterInterface::SystemEventHandler(temp, state, systemEventAttr) ||
-                OuterInterface::DistributedEventHandler(temp, state, systemEventAttr)) {
-                retCode = 1;
-            }
-            break;
-        }
-        case MMI_CAMERA_APP: {
-            (void)OuterInterface::SystemEventHandler(temp, state, systemEventAttr);
-            (void)OuterInterface::DistributedEventHandler(temp, state, systemEventAttr);
-            retCode = 1;
-            break;
-        }
-        default: {
-            break;
-        }
-    }
-    return retCode;
-}
-#endif
 } // namespace MMI
 } // namespace OHOS

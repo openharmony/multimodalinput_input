@@ -23,87 +23,8 @@
 #include "pointer_event.h"
 #include "libinput.h"
 
-#ifdef OHOS_WESTEN_MODEL
-extern "C" {
-#include <screen_info.h>
-#include <libinput-seat-export.h>
-}
-#else
 namespace OHOS {
 namespace MMI {
-
-struct SurfaceInfo {
-    int32_t surfaceId;
-    int32_t dstX;
-    int32_t dstY;
-    int32_t dstW;
-    int32_t dstH;
-    int32_t srcX;
-    int32_t srcY;
-    int32_t srcW;
-    int32_t srcH;
-    double opacity;
-    int32_t visibility; // 0 or 1
-    int32_t onLayerId;
-};
-
-struct LayerInfo {
-    int32_t layerId;
-    int32_t dstX;
-    int32_t dstY;
-    int32_t dstW;
-    int32_t dstH;
-    int32_t srcX;
-    int32_t srcY;
-    int32_t srcW;
-    int32_t srcH;
-    double opacity;
-    int32_t visibility; // 0 or 1
-    int32_t onScreenId;
-    int32_t nSurfaces;
-    SurfaceInfo** surfaces;
-};
-
-struct ScreenInfo {
-    int32_t screenId;
-    char* connectorName;
-    int32_t width;
-    int32_t height;
-    int32_t nLayers;
-    LayerInfo** layers;
-};
-
-struct SeatInfo {
-    char* seatName;
-    int32_t deviceFlags;
-    int32_t focusWindowId;
-};
-
-struct multimodal_libinput_event {
-    libinput_event *event;
-    void *userdata;
-};
-
-SeatInfo** GetSeatsInfo(void);
-ScreenInfo** GetScreensInfo(void);
-void FreeSurfaceInfo(SurfaceInfo* pSurface);
-void FreeLayerInfo(LayerInfo* pLayer);
-void FreeScreenInfo(ScreenInfo* pScreen);
-void FreeScreensInfo(ScreenInfo** screens);
-void FreeSeatsInfo(SeatInfo** seats);
-using SeatInfoChangeListener = void (*)();
-using ScreenInfoChangeListener = void (*)();
-void SetSeatListener(const SeatInfoChangeListener listener);
-void SetScreenListener(const ScreenInfoChangeListener listener);
-
-struct multimodal_libinput_event;
-typedef void (*LibInputEventListener)(multimodal_libinput_event *event);
-void SetLibInputEventListener(const LibInputEventListener listener);
-#endif
-
-struct MMISurfaceInfo : public SurfaceInfo {
-    int32_t screenId;
-};
 struct MouseLocation {
     int32_t globalX;
     int32_t globalY;
@@ -120,20 +41,12 @@ public:
 
     const ScreenInfo* GetScreenInfo(int32_t screenId);
     const LayerInfo* GetLayerInfo(int32_t layerId);
-    const MMISurfaceInfo* GetSurfaceInfo(int32_t sufaceId);
-    bool CheckFocusSurface(double x, double y, const MMISurfaceInfo& info) const;
-    const MMISurfaceInfo* GetTouchSurfaceInfo(double x, double y);
-    void TransfromToSurfaceCoordinate(const MMISurfaceInfo& info, double& x, double& y, bool debug = false);
 
     bool GetTouchSurfaceId(const double x, const double y, std::vector<int32_t>& ids);
 
     const std::vector<ScreenInfo>& GetScreenInfo() const;
 
     const std::map<int32_t, LayerInfo>& GetLayerInfo() const;
-
-    const std::map<int32_t, MMISurfaceInfo>& GetSurfaceInfo() const;
-
-    void InsertSurfaceInfo(const MMISurfaceInfo& tmpSurfaceInfo);
 
     void PrintAllNormalSurface();
 

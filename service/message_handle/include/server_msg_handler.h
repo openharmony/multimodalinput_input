@@ -41,7 +41,6 @@ protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
     int32_t OnUnregisterMsgHandler(SessionPtr sess, NetPacket& pkt);
     int32_t OnSeniorInputFuncProc(SessionPtr sess, NetPacket& pkt);
-    int32_t OnListInject(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_HDF
     int32_t OnHdiInject(SessionPtr sess, NetPacket& pkt);
 #endif

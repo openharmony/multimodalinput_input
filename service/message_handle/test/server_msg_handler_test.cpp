@@ -53,10 +53,6 @@ public:
         return OnSeniorInputFuncProc(sess, pkt);
     }
 #endif
-    int32_t OnListInjectTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
-    {
-        return OnListInject(sess, pkt);
-    }
 
 #ifdef OHOS_BUILD_HDF
     int32_t OnHdiInjectTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
