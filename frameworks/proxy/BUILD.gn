@@ -155,82 +155,8 @@ ohos_unittest("ut-mmi-proxy-out") {
   }
 
   sources = [
-    "event_handler/test/client_msg_handler_test.cpp",
-    "event_handler/test/event_handle_key_test.cpp",
-    "event_handler/test/event_handle_media_test.cpp",
-    "event_handler/test/event_handle_standardized_test.cpp",
-    "event_handler/test/event_handle_system_test.cpp",
-    "event_handler/test/event_handle_telephone_test.cpp",
-    "event_handler/test/event_handle_touch_test.cpp",
-    "event_handler/test/multimodal_event_handler_test.cpp",
-    "event_handler/test/multimodal_key_event_test.cpp",
-    "event_handler/test/standardized_event_process_test.cpp",
-    "events/test/device_event_test.cpp",
-    "events/test/multi_modal_event_test.cpp",
     "module_loader/test/mmi_client_test.cpp",
   ]
-
-  deps = [
-    "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/frameworks/util:libmmi-util",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
-}
-
-ohos_unittest("MultimodalinputEventHandlerTest") {
-  module_out_path = module_output_path
-  include_dirs = [
-    "//utils/native/base/include",
-    "//third_party/googletest/googletest/include",
-    "//utils/native/base/include",
-    "${mmi_path}/common/include",
-    "${mmi_path}/frameworks/proxy/event_handler",
-    "${mmi_path}/frameworks/proxy/event_handler/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/frameworks/util/common",
-    "${mmi_path}/frameworks/util/common/include",
-    "${mmi_path}/frameworks/util/network",
-    "${mmi_path}/frameworks/util/network/include",
-    "${mmi_path}/frameworks/util/socket",
-    "${mmi_path}/frameworks/util/socket/include",
-    "${mmi_path}/frameworks/proxy/event_handle",
-    "${mmi_path}/frameworks/proxy/event_handle/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/common/include",
-    "${mmi_path}/interfaces/native/innerkits/common/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${mmi_path}/interfaces/native/innerkits/event/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-  ]
-
-  if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
-
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
-
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
-
-  sources = [ "event_handler/test/multimodal_event_handler_test.cpp" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -293,68 +219,6 @@ ohos_unittest("KeyEventTest") {
   }
 
   sources = [ "events/test/key_event_test.cpp" ]
-
-  deps = [
-    "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/frameworks/util:libmmi-util",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
-}
-
-ohos_unittest("MultimodalKeyEventTest") {
-  module_out_path = module_output_path
-  include_dirs = [
-    "//utils/native/base/include",
-    "//third_party/googletest/googletest/include",
-    "//utils/native/base/include",
-    "${mmi_path}/common/include",
-    "${mmi_path}/frameworks/proxy/event_handler",
-    "${mmi_path}/frameworks/proxy/event_handler/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/frameworks/util/common",
-    "${mmi_path}/frameworks/util/common/include",
-    "${mmi_path}/frameworks/util/network",
-    "${mmi_path}/frameworks/util/network/include",
-    "${mmi_path}/frameworks/util/socket",
-    "${mmi_path}/frameworks/util/socket/include",
-    "${mmi_path}/frameworks/proxy/event_handle",
-    "${mmi_path}/frameworks/proxy/event_handle/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/common/include",
-    "${mmi_path}/interfaces/native/innerkits/common/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${mmi_path}/interfaces/native/innerkits/event/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-  ]
-
-  if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
-
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
-
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
-
-  sources = [ "event_handler/test/multimodal_key_event_test.cpp" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -555,10 +419,7 @@ ohos_unittest("PointerEventTest") {
 group("ut-mmi-proxy") {
   testonly = true
   deps = [
-    ":InputManagerTest",
     ":KeyEventTest",
-    ":MultimodalKeyEventTest",
-    ":MultimodalinputEventHandlerTest",
     ":PointerEventTest",
     ":ut-mmi-proxy-out",
   ]
