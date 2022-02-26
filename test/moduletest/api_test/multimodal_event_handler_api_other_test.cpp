@@ -118,7 +118,7 @@ HWTEST_F(MultimodalEventHandlerApiOtherTest, Api_Test_RegisterStandardizedEventH
     auto retRegister = MMIEventHdl.RegisterStandardizedEventHandle(remoteObject, windowId, appKey);
     g_handerMap[std::string("AppKeyEventHandle")] = appKey;
 
-    EXPECT_EQ(retRegister, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+    EXPECT_EQ(retRegister, MMI_STANDARD_EVENT_INVALID_PARAM);
 }
 
 HWTEST_F(MultimodalEventHandlerApiOtherTest, Api_Test_GetAbilityInfoVec, TestSize.Level1)
@@ -135,7 +135,7 @@ HWTEST_F(MultimodalEventHandlerApiOtherTest, Api_Test_GetAbilityInfoVec, TestSiz
         retWindowId = iter[0].windowId;
     }
     EXPECT_EQ(retWindowId, windowId);
-    EXPECT_EQ(ret, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+    EXPECT_EQ(ret, MMI_STANDARD_EVENT_INVALID_PARAM);
 }
 
 HWTEST_F(MultimodalEventHandlerApiOtherTest, Api_Test_RegisterStandardizedEventHandle_02, TestSize.Level1)
@@ -145,7 +145,7 @@ HWTEST_F(MultimodalEventHandlerApiOtherTest, Api_Test_RegisterStandardizedEventH
     int32_t windowId = 1;
     StandEventPtr standardizedEventHandle = nullptr;
     auto ret = multimodalEventHandlerTest.RegisterStandardizedEventHandle(token, windowId, standardizedEventHandle);
-    EXPECT_EQ(ret, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+    EXPECT_EQ(ret, MMI_STANDARD_EVENT_INVALID_PARAM);
 }
 
 HWTEST_F(MultimodalEventHandlerApiOtherTest, Api_Test_UnregisterStandardizedEventHandle, TestSize.Level1)
@@ -166,6 +166,6 @@ HWTEST_F(MultimodalEventHandlerApiOtherTest, Api_Test_UnregisterStandardizedEven
         retUnRegister = MMIEventHdl.UnregisterStandardizedEventHandle(remoteObject, windowId, it->second);
         g_handerMap.erase(it++);
     }
-    EXPECT_EQ(retUnRegister, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+    EXPECT_EQ(retUnRegister, MMI_STANDARD_EVENT_INVALID_PARAM);
 }
 } // namespace

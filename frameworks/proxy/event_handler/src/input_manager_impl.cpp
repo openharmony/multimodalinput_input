@@ -322,7 +322,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
 {
     if (interceptor == nullptr) {
         MMI_LOGE("AddInterceptor::%{public}s param should not be null", __func__);
-        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
+        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAM;
     }
     int32_t interceptorId = InterceptorMgr.AddInterceptor(interceptor);
     if (interceptorId >= 0) {

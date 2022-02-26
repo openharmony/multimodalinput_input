@@ -79,7 +79,7 @@ int32_t MultimodalEventHandler::RegisterStandardizedEventHandle(const sptr<IRemo
 
     if (!InitClient()) {
         MMI_LOGE("init client failed!");
-        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
+        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAM;
     }
     MMI_LOGD("end");
     return ret;
