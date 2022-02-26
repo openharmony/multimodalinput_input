@@ -40,7 +40,6 @@ public:
 protected:
     int32_t OnEventDeviceAdded(const multimodal_libinput_event& event);
     int32_t OnEventDeviceRemoved(const multimodal_libinput_event& event);
-    int32_t OnEventKeyboard(const multimodal_libinput_event& event);
     int32_t OnEventPointer(const multimodal_libinput_event& event);
     int32_t OnEventTouch(const multimodal_libinput_event& event);
     int32_t OnEventTouchSecond(libinput_event *event);
@@ -48,13 +47,7 @@ protected:
     int32_t OnEventGesture(const multimodal_libinput_event& event);
     int32_t OnEventTouchpad(const multimodal_libinput_event& event);
     int32_t OnGestureEvent(libinput_event *event);
-    int32_t OnEventTabletTool(const multimodal_libinput_event& event);
-    int32_t OnEventTabletPad(const multimodal_libinput_event& event);
-    int32_t OnEventSwitchToggle(const multimodal_libinput_event& event);
-    int32_t OnEventJoyStickKey(const multimodal_libinput_event& event, const uint64_t time);
-    int32_t OnEventTabletPadKey(const multimodal_libinput_event& event);
-    int32_t OnEventJoyStickAxis(const multimodal_libinput_event& event, const uint64_t time);
-    int32_t OnKeyboardEvent(libinput_event *event);
+    int32_t OnKeyboardEvent(const multimodal_libinput_event& event);
     int32_t OnKeyEventDispatch(const multimodal_libinput_event& event);
     
     int32_t OnMouseEventHandler(libinput_event *event);

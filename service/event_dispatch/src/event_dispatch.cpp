@@ -35,17 +35,8 @@ namespace MMI {
 constexpr int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 constexpr int32_t INPUT_UI_TIMEOUT_TIME_MAX = 20 * 1000000;
 
-    namespace {
-        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
-    }
-
-static void PrintEventSlotedCoordsInfo(const SlotedCoordsInfo& r)
-{
-    using namespace OHOS::MMI;
-    for (int32_t i = 0; i < MAX_SOLTED_COORDS_NUMS; i++) {
-        MMI_LOGD("[%{public}d] isActive:%{public}d,x:%{public}f,y:%{public}f",
-            i, r.coords[i].isActive, r.coords[i].x, r.coords[i].y);
-    }
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
 }
 
 EventDispatch::EventDispatch()

@@ -18,6 +18,7 @@
 
 #include "libmmi_util.h"
 #include "singleton.h"
+#include "uds_server.h"
 
 namespace OHOS {
 namespace MMI {

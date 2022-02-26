@@ -60,11 +60,7 @@ bool InputEventHandler::Init(UDSServer& udsServer)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_KEYBOARD_KEY,
-            std::bind(&InputEventHandler::OnEventKeyboard, this, std::placeholders::_1)
-        },
-        {
-            MmiMessageId::LIBINPUT_KEY_EVENT,
-            std::bind(&InputEventHandler::OnKeyEventDispatch, this, std::placeholders::_1)
+            std::bind(&InputEventHandler::OnKeyboardEvent, this, std::placeholders::_1)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_POINTER_MOTION,
@@ -115,38 +111,6 @@ bool InputEventHandler::Init(UDSServer& udsServer)
             std::bind(&InputEventHandler::OnEventTouchpad, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TABLET_TOOL_AXIS,
-            std::bind(&InputEventHandler::OnEventTabletTool, this, std::placeholders::_1)
-        },
-        {
-            MmiMessageId::LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY,
-            std::bind(&InputEventHandler::OnEventTabletTool, this, std::placeholders::_1)
-        },
-        {
-            MmiMessageId::LIBINPUT_EVENT_TABLET_TOOL_TIP,
-            std::bind(&InputEventHandler::OnEventTabletTool, this, std::placeholders::_1)
-        },
-        {
-            MmiMessageId::LIBINPUT_EVENT_TABLET_TOOL_BUTTON,
-            std::bind(&InputEventHandler::OnEventTabletTool, this, std::placeholders::_1)
-        },
-        {
-            MmiMessageId::LIBINPUT_EVENT_TABLET_PAD_BUTTON,
-            std::bind(&InputEventHandler::OnEventTabletPadKey, this, std::placeholders::_1)
-        },
-        {
-            MmiMessageId::LIBINPUT_EVENT_TABLET_PAD_RING,
-            std::bind(&InputEventHandler::OnEventTabletPad, this, std::placeholders::_1)
-        },
-        {
-            MmiMessageId::LIBINPUT_EVENT_TABLET_PAD_STRIP,
-            std::bind(&InputEventHandler::OnEventTabletPad, this, std::placeholders::_1)
-        },
-        {
-            MmiMessageId::LIBINPUT_EVENT_TABLET_PAD_KEY,
-            std::bind(&InputEventHandler::OnEventTabletPadKey, this, std::placeholders::_1)
-        },
-        {
             MmiMessageId::LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN,
             std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
         },
@@ -169,10 +133,6 @@ bool InputEventHandler::Init(UDSServer& udsServer)
         {
             MmiMessageId::LIBINPUT_EVENT_GESTURE_PINCH_END,
             std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
-        },
-        {
-            MmiMessageId::LIBINPUT_EVENT_SWITCH_TOGGLE,
-            std::bind(&InputEventHandler::OnEventSwitchToggle, this, std::placeholders::_1)
         },
     };
     for (auto &item : funs) {
@@ -268,7 +228,6 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
     InputDevMgr->OnInputDeviceAdded(device);
     return RET_OK;
 }
-
 int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event& ev)
 {
     CHKPR(ev.event, ERROR_NULL_POINTER);
@@ -334,8 +293,9 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
     return OnEventKey(ev.event);
 }
 
-int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
+int32_t InputEventHandler::OnKeyboardEvent(const multimodal_libinput_event& ev)
 {
+    libinput_event *event = ev.event;
     CHKPR(event, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
     CHKPR(udsServer_, ERROR_NULL_POINTER);
@@ -374,51 +334,9 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventKeyboard(const multimodal_libinput_event& ev)
-{
-    CHKPR(ev.event, ERROR_NULL_POINTER);
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    return OnKeyboardEvent(ev.event);
-}
-
 int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
 {
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
     CHKPR(ev.event, ERROR_NULL_POINTER);
-    uint64_t sysStartProcessTime = GetSysClockTime();
-    auto device = libinput_event_get_device(ev.event);
-    CHKPR(device, LIBINPUT_DEV_EMPTY);
-    int32_t devicType = static_cast<int32_t>(libinput_device_get_tags(device));
-    if (devicType & EVDEV_UDEV_TAG_JOYSTICK) {
-        auto type = libinput_event_get_type(ev.event);
-        if (type == LIBINPUT_EVENT_POINTER_BUTTON) {
-            MMI_LOGI("JoyStickKey Process");
-            return OnEventJoyStickKey(ev, sysStartProcessTime);
-        } else if (type == LIBINPUT_EVENT_POINTER_AXIS) {
-            MMI_LOGI("JoyStickAxis Process");
-            return OnEventJoyStickAxis(ev, sysStartProcessTime);
-        }
-    }
-    EventPointer point = {};
-    auto packageResult = eventPackage_.PackagePointerEvent(ev.event, point);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
-        MMI_LOGW("The same event reported by multi_device should be discarded");
-        return RET_OK;
-    }
-    if (packageResult != RET_OK) {
-        MMI_LOGE("Pointer event package failed. ret:%{public}d,errCode:%{public}d",
-                 packageResult, POINT_EVENT_PKG_FAIL);
-        return POINT_EVENT_PKG_FAIL;
-    }
-    MMI_LOGD("2.mapping event, Event:eventType:%{public}d", point.eventType);
-    /*
-    auto retEvent = eventDispatch_.DispatchCommonPointEvent(*udsServer_, *ev.event, point, preHandlerTime);
-    if (retEvent != RET_OK) {
-        MMI_LOGE("common_point event dispatch failed. ret:%{public}d,errCode:%{public}d",
-            retEvent, POINT_REG_EVENT_DISP_FAIL);
-        return POINT_REG_EVENT_DISP_FAIL;
-    }
-    */
     return OnMouseEventHandler(ev.event);
 }
 
@@ -526,129 +444,6 @@ int32_t InputEventHandler::OnEventGesture(const multimodal_libinput_event& ev)
 {
     CHKPR(ev.event, ERROR_NULL_POINTER);
     OnGestureEvent(ev.event);
-    return RET_OK;
-}
-
-int32_t InputEventHandler::OnEventTabletTool(const multimodal_libinput_event& ev)
-{
-    CHKPR(ev.event, ERROR_NULL_POINTER);
-    uint64_t sysStartProcessTime = GetSysClockTime();
-    EventTabletTool tableTool = {};
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    auto packageResult = eventPackage_.PackageTabletToolEvent(ev.event, tableTool);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
-        MMI_LOGD("The same event reported by multi_device should be discarded");
-        return RET_OK;
-    }
-    if (packageResult != RET_OK) {
-        MMI_LOGE("Tablettool event package failed. ret:%{public}d,errCode:%{public}d",
-                 packageResult, TABLETTOOL_EVENT_PKG_FAIL);
-        return TABLETTOOL_EVENT_PKG_FAIL;
-    }
-    MMI_LOGD("2.mapping event, Event:eventType:%{public}d;", tableTool.eventType);
-    auto retEvent = eventDispatch_.DispatchTabletToolEvent(*udsServer_, ev.event, tableTool, sysStartProcessTime);
-    if (retEvent != RET_OK) {
-        MMI_LOGE("Tabletool event dispatch failed. ret:%{public}d,errCode:%{public}d",
-                 retEvent, TABLETTOOL_EVENT_DISP_FAIL);
-        return TABLETTOOL_EVENT_DISP_FAIL;
-    }
-    return RET_OK;
-}
-
-int32_t InputEventHandler::OnEventTabletPad(const multimodal_libinput_event& ev)
-{
-    CHKPR(ev.event, ERROR_NULL_POINTER);
-    uint64_t sysStartProcessTime = GetSysClockTime();
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    EventTabletPad tabletPad = {};
-    auto packageResult = eventPackage_.PackageTabletPadEvent(ev.event, tabletPad);
-    if (packageResult != RET_OK) {
-        MMI_LOGE("Tabletpad event package failed. ret:%{public}d,errCode:%{public}d",
-                 packageResult, TABLETPAD_EVENT_PKG_FAIL);
-        return TABLETPAD_EVENT_PKG_FAIL;
-    }
-    auto ret = eventDispatch_.DispatchTabletPadEvent(*udsServer_, ev.event, tabletPad, sysStartProcessTime);
-    if (ret != RET_OK) {
-        MMI_LOGE("Tabletpad event dispatch failed. ret:%{public}d,errCode:%{public}d",
-                 ret, TABLETPAD_EVENT_DISP_FAIL);
-        return TABLETPAD_EVENT_DISP_FAIL;
-    }
-    return RET_OK;
-}
-
-int32_t InputEventHandler::OnEventSwitchToggle(const multimodal_libinput_event& ev)
-{
-    CHKPR(ev.event, ERROR_NULL_POINTER);
-    auto type = libinput_event_get_type(ev.event);
-    MMI_LOGD("Function is OnEventSwitchToggle, sourceType is LIBINPUT_EVENT_SWITCH_TOGGLE:%{public}d", type);
-    return RET_OK;
-}
-
-int32_t InputEventHandler::OnEventTabletPadKey(const multimodal_libinput_event& ev)
-{
-    CHKPR(ev.event, ERROR_NULL_POINTER);
-    uint64_t sysStartProcessTime = GetSysClockTime();
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    EventKeyboard key = {};
-    auto packageResult = eventPackage_.PackageTabletPadKeyEvent(ev.event, key);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
-        MMI_LOGD("The same event reported by multi_device should be discarded");
-        return RET_OK;
-    }
-    if (packageResult != RET_OK) {
-        MMI_LOGE("Tabletpadkey event package failed. ret:%{public}d,errCode:%{public}d",
-                 packageResult, TABLETPAD_KEY_EVENT_PKG_FAIL);
-        return TABLETPAD_KEY_EVENT_PKG_FAIL;
-    }
-    auto oKey = KeyValueTransformationInput(key.key);           // libinput key transformed into key
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, oKey, key, sysStartProcessTime);
-    if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d",
-                 eventDispatchResult, TABLETPAD_KEY_EVENT_DISP_FAIL);
-        return TABLETPAD_KEY_EVENT_DISP_FAIL;
-    }
-    return RET_OK;
-}
-
-int32_t InputEventHandler::OnEventJoyStickKey(const multimodal_libinput_event& ev, const uint64_t time)
-{
-    CHKPR(ev.event, ERROR_NULL_POINTER);
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    EventKeyboard key = {};
-    auto packageResult = eventPackage_.PackageJoyStickKeyEvent(ev.event, key);
-    if (packageResult != RET_OK) {
-        MMI_LOGE("Joystickkey event package failed. ret:%{public}d,errCode:%{public}d",
-                 packageResult, JOYSTICK_KEY_EVENT_PKG_FAIL);
-        return JOYSTICK_KEY_EVENT_PKG_FAIL;
-    }
-    // libinput key transformed into key
-    auto oKey = KeyValueTransformationInput(key.key);
-    key.unicode = 0;
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, oKey, key, time);
-    if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("JoyStick event dispatch failed. ret:%{public}d,errCode:%{public}d",
-                 eventDispatchResult, JOYSTICK_EVENT_DISP_FAIL);
-        return JOYSTICK_EVENT_DISP_FAIL;
-    }
-    return RET_OK;
-}
-
-int32_t InputEventHandler::OnEventJoyStickAxis(const multimodal_libinput_event& ev, const uint64_t time)
-{
-    CHKPR(ev.event, ERROR_NULL_POINTER);
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    EventJoyStickAxis eventJoyStickAxis = {};
-    auto packageResult = eventPackage_.PackageJoyStickAxisEvent(ev.event, eventJoyStickAxis);
-    if (packageResult != RET_OK) {
-        MMI_LOGE("Joystickaxis event package failed. ret:%{public}d,errCode:%{public}d",
-                 packageResult, JOYSTICK_AXIS_EVENT_PKG_FAIL);
-        return JOYSTICK_AXIS_EVENT_PKG_FAIL;
-    }
-    auto ret = eventDispatch_.DispatchJoyStickEvent(*udsServer_, ev.event, eventJoyStickAxis, time);
-    if (ret != RET_OK) {
-        MMI_LOGE("Joystick event dispatch failed. ret:%{public}d,errCode:%{public}d", ret, JOYSTICK_EVENT_DISP_FAIL);
-        return JOYSTICK_EVENT_DISP_FAIL;
-    }
     return RET_OK;
 }
 
