@@ -82,7 +82,7 @@ int32_t InputEventDataTransformation::SerializeInputEvent(std::shared_ptr<InputE
 int32_t InputEventDataTransformation::DeserializeInputEvent(NetPacket &packet, std::shared_ptr<InputEvent> event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
-    int32_t tField {  };
+    int32_t tField = 0;
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
     event->SetId(tField);
@@ -101,8 +101,9 @@ int32_t InputEventDataTransformation::DeserializeInputEvent(NetPacket &packet, s
     event->SetTargetWindowId(tField);
     CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
     event->SetAgentWindowId(tField);
-    CHKR(packet.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
-    event->AddFlag(tField);
+    uint32_t tFlag = InputEvent::EVENT_FLAG_NONE;
+    CHKR(packet.Read(tFlag), STREAM_BUF_READ_FAIL, RET_ERR);
+    event->AddFlag(tFlag);
     return RET_OK;
 }
 

@@ -292,16 +292,6 @@ const char* PointerEvent::DumpPointerAction() const
     return "unknown";
 }
 
-void PointerEvent::SetSkipInspection(bool skipInspection)
-{
-    skipInspection_ = skipInspection;
-}
-
-bool PointerEvent::NeedSkipInspection()
-{
-    return skipInspection_;
-}
-
 int32_t PointerEvent::GetPointerId() const
 {
     return pointerId_;

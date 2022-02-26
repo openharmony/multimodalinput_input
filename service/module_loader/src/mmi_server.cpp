@@ -130,14 +130,14 @@ int32_t OHOS::MMI::MMIServer::InitLibinput()
 
 #ifdef OHOS_BUILD_HDF
     MMI_LOGD("HDF Init");
-    SetLibInputEventListener([](struct multimodal_libinput_event *event) {
+    SetLibInputEventListener([](multimodal_libinput_event *event) {
         InputHandler->OnEvent(event);
     });
     hdfEventManager.SetupCallback();
 #else
     #ifdef OHOS_WESTEN_MODEL
         MMI_LOGD("InitLibinput WestonInit");
-        SetLibInputEventListener([](struct multimodal_libinput_event *event) {
+        SetLibInputEventListener([](multimodal_libinput_event *event) {
             InputHandler->OnEvent(event);
         });
     #else

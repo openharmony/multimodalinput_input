@@ -28,7 +28,7 @@ public:
     int32_t SendToHdi(const InputEventArray& inputEventArray);
     int32_t SendToHdi(const int32_t& devType, const RawInputEvent& event);
     bool SendMsg(const NetPacket& ckt);
-    void TransitionHdiEvent(const input_event& event, RawInputEvent& sEvent);
+    void TransitionHdiEvent(const struct input_event& event, RawInputEvent& sEvent);
 private:
     static constexpr int32_t INJECT_SLEEP_TIMES = 10;
 };
