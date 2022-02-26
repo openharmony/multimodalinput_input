@@ -36,7 +36,7 @@ private:
     bool OnEventTouchUp(struct libinput_event *event);
 private:
     int32_t deviceId_;
-    std::shared_ptr<PointerEvent> pointerEvent_;
+    std::shared_ptr<PointerEvent> pointerEvent_ = nullptr;
     Direction direction_ {Direction0};
 };
 } // namespace MMI

@@ -150,7 +150,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnSeniorInputFuncProc(SessionPtr SessionPtr
             int32_t devType;
             pkt >> devIndex >> devType;
             CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-            sptr<SeniorInputFuncProcBase> ptr;
+            sptr<SeniorInputFuncProcBase> ptr = nullptr;
             if (devType == INPUT_DEVICE_CAP_AISENSOR) {
                 ptr = SeniorInputFuncProcBase::Create<AIFuncProc>();
             } else if (devType == INPUT_DEVICE_CAP_KNUCKLE) {
