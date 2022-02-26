@@ -925,7 +925,7 @@ void ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, NetPacket& pk
     (reinterpret_cast<MouseEvent*> (mousePtr.GetRefPtr()))->Initialize(windowId, action,
         pointData.button, pointData.state, mmiPoint, static_cast<float>(pointData.discrete.x),
         static_cast<float>(pointData.discrete.y), 0, 0, 0, pointData.uuid, pointData.eventType,
-        pointData.time, "", pointData.deviceId, 0,pointData.deviceType, eventJoyStickAxis);
+        pointData.time, "", pointData.deviceId, 0, pointData.deviceType, eventJoyStickAxis);
 
     // 如果是标准化消息，则获取standardTouch
     TouchEvent touchEvent;
@@ -943,7 +943,7 @@ void ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, NetPacket& pk
          */
         fingersInfos[0].mMp.Setxy(standardTouch.x, standardTouch.y);
         touchEvent.Initialize(windowId, mousePtr, deviceEventType, action, 0, 0, 0, 0,
-            standardTouch.time, standardTouch.buttonState, standardTouch.buttonCount,fingersInfos, true);
+            standardTouch.time, standardTouch.buttonState, standardTouch.buttonCount, fingersInfos, true);
     } else { // 非标准化消息，只有mouseEvent消息，其他都没有
         touchEvent.Initialize(windowId, mousePtr, deviceEventType, action, 0, 0, 0, 0,
             0, 0, 1, fingersInfos, false);

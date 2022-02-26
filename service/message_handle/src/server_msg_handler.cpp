@@ -339,9 +339,9 @@ int32_t OHOS::MMI::ServerMsgHandler::CheckReplyMessageFormClient(SessionPtr sess
                                "serverExpendTime=%lld(us) clientExpendTime=%lld(us) allTime=%lld(us)", idMsg, fd,
                                waitData.inputTime, westonExpendTime, serverExpendTime, clientExpendTime, allTime);
     MMI_LOGT("CheckReplyMessageFormClient msg:%{public}d,fd:%{public}d,inputExpendTime:%{public}" PRId64 "(us),"
-             "westonExpendTime:%{public}" PRId64 "(us),serverExpendTime:%{public}" PRId64 "(us),clientExpendTime:%{public}" PRId64 "(us),"
-             "allTime:%{public}" PRId64 "(us)", idMsg, fd, waitData.inputTime, westonExpendTime, serverExpendTime,
-             clientExpendTime, allTime);
+             "westonExpendTime:%{public}" PRId64 "(us),serverExpendTime:%{public}" PRId64 "(us),"
+             "clientExpendTime:%{public}" PRId64 "(us),allTime:%{public}" PRId64 "(us)", idMsg, fd, 
+             waitData.inputTime, westonExpendTime, serverExpendTime,clientExpendTime, allTime);
     return RET_OK;
 }
 
