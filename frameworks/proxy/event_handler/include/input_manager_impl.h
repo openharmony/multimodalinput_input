@@ -43,7 +43,7 @@ public:
 
     void OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent);
     void OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
-    int32_t PackDisplayData(NetPacket &ckt);
+    int32_t PackDisplayData(NetPacket &pkt);
 
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
     int32_t AddMontior(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
@@ -61,8 +61,8 @@ public:
     void OnConnected();
 
 private:
-    int32_t PackPhysicalDisplay(NetPacket &ckt);
-    int32_t PackLogicalDisplay(NetPacket &ckt);
+    int32_t PackPhysicalDisplay(NetPacket &pkt);
+    int32_t PackLogicalDisplay(NetPacket &pkt);
     void PrintDisplayDebugInfo();
     void SendDisplayInfo();
 

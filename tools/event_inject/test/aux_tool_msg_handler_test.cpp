@@ -39,40 +39,40 @@ HWTEST_F(AuxToolMsgHandlerTest, OnMsgHandler_001, TestSize.Level1)
 {
     MmiMessageId idMsg = MmiMessageId::INVALID;
     UDSClient client;
-    NetPacket newPacket(idMsg);
+    NetPacket pkt(idMsg);
 
     TestAuxToolMsgHandler auxObj;
-    auxObj.OnMsgHandler(client, newPacket);
+    auxObj.OnMsgHandler(client, pkt);
 }
 
 HWTEST_F(AuxToolMsgHandlerTest, OnMsgHandler_002, TestSize.Level1)
 {
     MmiMessageId idMsg = MmiMessageId::REGISTER_APP_INFO;
     UDSClient client;
-    NetPacket newPacket(idMsg);
+    NetPacket pkt(idMsg);
 
     TestAuxToolMsgHandler auxObj;
-    auxObj.OnMsgHandler(client, newPacket);
+    auxObj.OnMsgHandler(client, pkt);
 }
 
 HWTEST_F(AuxToolMsgHandlerTest, OnMsgHandler_003, TestSize.Level1)
 {
     MmiMessageId idMsg = MmiMessageId::REGISTER_MSG_HANDLER;
     UDSClient client;
-    NetPacket newPacket(idMsg);
+    NetPacket pkt(idMsg);
 
     TestAuxToolMsgHandler auxObj;
-    auxObj.OnMsgHandler(client, newPacket);
+    auxObj.OnMsgHandler(client, pkt);
 }
 
 HWTEST_F(AuxToolMsgHandlerTest, OnAiServerReply_001, TestSize.Level1)
 {
     MmiMessageId idMsg = MmiMessageId::INVALID;
     UDSClient client;
-    NetPacket newPacket(idMsg);
+    NetPacket pkt(idMsg);
 
     TestAuxToolMsgHandler auxObj;
-    int32_t retResult = auxObj.OnAiServerReply(client, newPacket);
+    int32_t retResult = auxObj.OnAiServerReply(client, pkt);
     EXPECT_EQ(RET_OK, retResult);
 }
 
@@ -82,11 +82,11 @@ HWTEST_F(AuxToolMsgHandlerTest, OnAiServerReply_002, TestSize.Level1)
     int32_t replyCode = RET_ERR;
 
     UDSClient client;
-    NetPacket newPacket(idMsg);
-    newPacket << replyCode;
+    NetPacket pkt(idMsg);
+    pkt << replyCode;
 
     TestAuxToolMsgHandler auxObj;
-    int32_t retResult = auxObj.OnAiServerReply(client, newPacket);
+    int32_t retResult = auxObj.OnAiServerReply(client, pkt);
     EXPECT_EQ(RET_ERR, retResult);
 }
 } // namespace

@@ -44,9 +44,9 @@ void MultimodalStandardizedEventManager::SetClientHandle(MMIClientPtr client)
 int32_t MultimodalStandardizedEventManager::RegisterStandardizedEventHandle(const sptr<IRemoteObject> token,
     int32_t windowId, StandEventPtr standardizedEventHandle)
 {
-    CHKR((token && standardizedEventHandle), PARAM_INPUT_INVALID, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+    CHKR((token && standardizedEventHandle), PARAM_INPUT_INVALID, MMI_STANDARD_EVENT_INVALID_PARAM);
     auto messageId = standardizedEventHandle->GetType();
-    CHKR(messageId > MmiMessageId::INVALID, VAL_NOT_EXP, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+    CHKR(messageId > MmiMessageId::INVALID, VAL_NOT_EXP, MMI_STANDARD_EVENT_INVALID_PARAM);
     auto range = mapEvents_.equal_range(messageId);
     for (auto it = range.first; it != range.second; ++it) {
         if (it->second.eventCallBack == standardizedEventHandle) {
@@ -58,8 +58,8 @@ int32_t MultimodalStandardizedEventManager::RegisterStandardizedEventHandle(cons
     MMI_LOGD("Register app event:typeId:%{public}d", messageId);
     std::string registerhandle;
     if (!MakeRegisterHandle(messageId, windowId, registerhandle)) {
-        MMI_LOGE("Invalid registration parameter, errCode:%{public}d", MMI_STANDARD_EVENT_INVALID_PARAMETER);
-        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
+        MMI_LOGE("Invalid registration parameter, errCode:%{public}d", MMI_STANDARD_EVENT_INVALID_PARAM);
+        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAM;
     }
     registerEvents_.insert(registerhandle);
     StandEventCallBack StandEventInfo = {};
@@ -71,24 +71,24 @@ int32_t MultimodalStandardizedEventManager::RegisterStandardizedEventHandle(cons
     std::string appName = "EmptyAppName";
     auto abilityId = *reinterpret_cast<int32_t*>(token.GetRefPtr());
 
-    OHOS::MMI::NetPacket ck(MmiMessageId::REGISTER_MSG_HANDLER);
-    ck << messageId << abilityId << windowId << bundlerName << appName;
-    SendMsg(ck);
+    OHOS::MMI::NetPacket pkt(MmiMessageId::REGISTER_MSG_HANDLER);
+    pkt << messageId << abilityId << windowId << bundlerName << appName;
+    SendMsg(pkt);
     return OHOS::MMI_STANDARD_EVENT_SUCCESS;
 }
 
 int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(const sptr<IRemoteObject> token,
     int32_t windowId, StandEventPtr standardizedEventHandle)
 {
-    CHKR((token && standardizedEventHandle), PARAM_INPUT_INVALID, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+    CHKR((token && standardizedEventHandle), PARAM_INPUT_INVALID, MMI_STANDARD_EVENT_INVALID_PARAM);
     auto typeId = standardizedEventHandle->GetType();
-    CHKR(typeId > MmiMessageId::INVALID, VAL_NOT_EXP, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+    CHKR(typeId > MmiMessageId::INVALID, VAL_NOT_EXP, MMI_STANDARD_EVENT_INVALID_PARAM);
 
     std::string registerhandle;
     if (!MakeRegisterHandle(typeId, windowId, registerhandle)) {
         MMI_LOGE("Invalid unregistration parameter, typeId:%{public}d,windowId:%{public}d,errCode:%{public}d",
-                 typeId, windowId, MMI_STANDARD_EVENT_INVALID_PARAMETER);
-        return MMI_STANDARD_EVENT_INVALID_PARAMETER;
+                 typeId, windowId, MMI_STANDARD_EVENT_INVALID_PARAM);
+        return MMI_STANDARD_EVENT_INVALID_PARAM;
     }
     registerEvents_.erase(registerhandle);
     auto range = mapEvents_.equal_range(typeId);
@@ -106,9 +106,9 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
         return MMI_STANDARD_EVENT_NOT_EXIST;
     }
     MMI_LOGD("Unregister app event:typeId:%{public}d", typeId);
-    OHOS::MMI::NetPacket ck(MmiMessageId::UNREGISTER_MSG_HANDLER);
-    ck << typeId;
-    SendMsg(ck);
+    OHOS::MMI::NetPacket pkt(MmiMessageId::UNREGISTER_MSG_HANDLER);
+    pkt << typeId;
+    SendMsg(pkt);
     return OHOS::MMI_STANDARD_EVENT_SUCCESS;
 }
 
@@ -623,9 +623,9 @@ int32_t MultimodalStandardizedEventManager::InjectionVirtual(bool isPressed, int
     virtualevent.isPressed = isPressed;
     virtualevent.keyCode = keyCode;
     virtualevent.keyDownDuration = keyDownDuration;
-    OHOS::MMI::NetPacket ckv(MmiMessageId::ON_VIRTUAL_KEY);
-    ckv << virtualevent;
-    return SendMsg(ckv);
+    OHOS::MMI::NetPacket pkt(MmiMessageId::ON_VIRTUAL_KEY);
+    pkt << virtualevent;
+    return SendMsg(pkt);
 }
 
 int32_t MultimodalStandardizedEventManager::InjectEvent(const OHOS::KeyEvent& key)
@@ -643,9 +643,9 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const OHOS::KeyEvent& ke
     virtualevent.keyCode = key.GetKeyCode();
     virtualevent.keyDownDuration = key.GetKeyDownDuration();
     virtualevent.isIntercepted = key.IsIntercepted();
-    NetPacket ckv(MmiMessageId::INJECT_KEY_EVENT);
-    ckv << virtualevent;
-    return SendMsg(ckv);
+    NetPacket pkt(MmiMessageId::INJECT_KEY_EVENT);
+    pkt << virtualevent;
+    return SendMsg(pkt);
 }
 
 int32_t MultimodalStandardizedEventManager::InjectEvent(const KeyEvent& key)
@@ -659,9 +659,9 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const KeyEvent& key)
     virtualevent.keyCode = key.GetKeyCode();
     virtualevent.keyDownDuration = 0;
     virtualevent.isIntercepted = false;
-    NetPacket ckv(MmiMessageId::INJECT_KEY_EVENT);
-    ckv << virtualevent;
-    return SendMsg(ckv);
+    NetPacket pkt(MmiMessageId::INJECT_KEY_EVENT);
+    pkt << virtualevent;
+    return SendMsg(pkt);
 }
 
 int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> key)
@@ -673,13 +673,13 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<Ke
         MMI_LOGE("keyCode is invalid:%{public}u", key->GetKeyCode());
         return RET_ERR;
     }
-    NetPacket ckv(MmiMessageId::NEW_INJECT_KEY_EVENT);
-    int32_t errCode = InputEventDataTransformation::KeyEventToNetPacket(key, ckv);
+    NetPacket pkt(MmiMessageId::NEW_INJECT_KEY_EVENT);
+    int32_t errCode = InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
     if (errCode != RET_OK) {
         MMI_LOGE("Serialization is Failed, errCode:%{public}u", errCode);
         return RET_ERR;
     }
-    if (!SendMsg(ckv)) {
+    if (!SendMsg(pkt)) {
         MMI_LOGE("Send inject event Msg error");
         return RET_ERR;
     }
@@ -719,11 +719,11 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
     for (auto &keyCode : pressedKeys) {
         MMI_LOGI("Pressed keyCode:%{public}d", keyCode);
     }
-    OHOS::MMI::NetPacket netPkt(MmiMessageId::INJECT_POINTER_EVENT);
-    CHKR((RET_OK == InputEventDataTransformation::Marshalling(pointerEvent, netPkt)),
+    OHOS::MMI::NetPacket pkt(MmiMessageId::INJECT_POINTER_EVENT);
+    CHKR((RET_OK == InputEventDataTransformation::Marshalling(pointerEvent, pkt)),
         STREAM_BUF_WRITE_FAIL, RET_ERR);
     MMI_LOGD("leave");
-    CHKR(SendMsg(netPkt), MSG_SEND_FAIL, RET_ERR);
+    CHKR(SendMsg(pkt), MSG_SEND_FAIL, RET_ERR);
     return RET_OK;
 }
 
