@@ -380,7 +380,7 @@ void OHOS::MMI::HdfEventManager::GetEventCallback(const EventPackage **pkgs, uin
 {
     constexpr uint16_t byteSize = 8;
     CHKPV(pkgs);
-    input_event eventarry[MAX_EVENT_PKG_NUM];
+    struct input_event eventarry[MAX_EVENT_PKG_NUM];
     for (uint32_t i = 0; i < count && i < MAX_EVENT_PKG_NUM; i++) {
         eventarry[i].code = pkgs[i]->code;
         eventarry[i].type = (pkgs[i]->type) | (uint16_t)(devIndex<<byteSize); // 不改变livinput结构传递，对象的index参数
@@ -391,7 +391,7 @@ void OHOS::MMI::HdfEventManager::GetEventCallback(const EventPackage **pkgs, uin
     if (!globleThis_->devStatus[devIndex]) {
         return;
     }
-    libinput_pipe_write(globleThis_->hdiinput_, devIndex, eventarry, count * sizeof(input_event));
+    libinput_pipe_write(globleThis_->hdiinput_, devIndex, eventarry, count * sizeof(struct input_event));
 }
 int32_t OHOS::MMI::HdfEventManager::DeviceAddHandle(uint32_t devIndex, uint32_t devType)
 {

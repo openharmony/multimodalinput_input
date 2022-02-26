@@ -30,7 +30,7 @@ public:
     ~MouseEventHandler() = default;
 
     std::shared_ptr<PointerEvent> GetPointerEvent();
-    void Normalize(libinput_event *event);
+    void Normalize(struct libinput_event *event);
 private:
     void HandleMotionInner(libinput_event_pointer* data);
     void HandleButonInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem);

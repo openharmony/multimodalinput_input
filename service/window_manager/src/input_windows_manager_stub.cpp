@@ -35,7 +35,7 @@ namespace MMI {
 #ifndef OHOS_WESTEN_MODEL
 #define MAX_LENGTH 1024
 
-struct SeatInfo** GetSeatsInfo()
+SeatInfo** GetSeatsInfo()
 {
     MMI_LOGD("Enter");
     constexpr int32_t TEST_VAL = 2;
@@ -54,7 +54,7 @@ struct SeatInfo** GetSeatsInfo()
     return setInfo;
 }
 
-struct ScreenInfo** GetScreensInfo()
+ScreenInfo** GetScreensInfo()
 {
     MMI_LOGD("Enter");
     constexpr int32_t TEST_VAL = 2;
@@ -104,7 +104,7 @@ struct ScreenInfo** GetScreensInfo()
     return screenInfo;
 }
 
-void FreeSurfaceInfo(struct SurfaceInfo* pSurface)
+void FreeSurfaceInfo(SurfaceInfo* pSurface)
 {
     MMI_LOGD("Enter");
     if (pSurface != nullptr) {
@@ -112,7 +112,7 @@ void FreeSurfaceInfo(struct SurfaceInfo* pSurface)
     }
 }
 
-void FreeLayerInfo(struct LayerInfo* pLayer)
+void FreeLayerInfo(LayerInfo* pLayer)
 {
     MMI_LOGD("Enter");
     if (pLayer != nullptr) {
@@ -126,7 +126,7 @@ void FreeLayerInfo(struct LayerInfo* pLayer)
     }
 }
 
-void FreeScreenInfo(struct ScreenInfo* pScreen)
+void FreeScreenInfo(ScreenInfo* pScreen)
 {
     MMI_LOGD("Enter");
     if (pScreen != nullptr) {
@@ -143,7 +143,7 @@ void FreeScreenInfo(struct ScreenInfo* pScreen)
     }
 }
 
-void FreeScreensInfo(struct ScreenInfo** screens)
+void FreeScreensInfo(ScreenInfo** screens)
 {
     MMI_LOGD("Enter");
     if (screens == nullptr) {
@@ -156,7 +156,7 @@ void FreeScreensInfo(struct ScreenInfo** screens)
     free(screens);
 }
 
-void FreeSeatsInfo(struct SeatInfo** seats)
+void FreeSeatsInfo(SeatInfo** seats)
 {
     MMI_LOGD("Enter");
     if (seats == nullptr) {

@@ -154,7 +154,7 @@ void StartMmiServer(void)
 }
 #endif
 // weston启动入口函数
-WL_EXPORT int32_t wet_module_init(weston_compositor *ec, int32_t *argc, char *argv[])
+WL_EXPORT int32_t wet_module_init(struct weston_compositor *ec, int32_t *argc, char *argv[])
 {
 #ifdef OHOS_WESTEN_MODEL
     int32_t socketPair[2];

@@ -80,7 +80,7 @@ struct SeatInfo {
 };
 
 struct multimodal_libinput_event {
-    libinput_event *event;
+    struct libinput_event *event;
     void *userdata;
 };
 
@@ -153,8 +153,8 @@ public:
     int32_t UpdateTarget(std::shared_ptr<InputEvent> inputEvent);
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
         const std::vector<LogicalDisplayInfo> &logicalDisplays);
-    bool TouchPadPointToDisplayPoint_2(libinput_event_touch* touch,
-    int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId);
+    bool TouchPadPointToDisplayPoint_2(struct libinput_event_touch* touch,
+        int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId);
     const std::vector<LogicalDisplayInfo>& GetLogicalDisplayInfo() const;
     const std::map<int32_t, WindowInfo>& GetWindowInfo() const;
     MouseLocation GetMouseInfo();
@@ -163,11 +163,11 @@ public:
     bool UpdataDisplayId(int32_t& displayId);
     LogicalDisplayInfo* GetLogicalDisplayId(int32_t displayId);
     int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
-    bool TouchDownPointToDisplayPoint(libinput_event_touch* touch, Direction& direction,
-    int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId);
-    bool TouchMotionPointToDisplayPoint(libinput_event_touch* touch, Direction& direction,
-    int32_t targetDisplayId, int32_t& displayX, int32_t& displayY);
-    bool TransformOfDisplayPoint(libinput_event_touch* touch, Direction& direction, int32_t &globalLogicalX,
+    bool TouchDownPointToDisplayPoint(struct libinput_event_touch* touch, Direction& direction,
+        int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId);
+    bool TouchMotionPointToDisplayPoint(struct libinput_event_touch* touch, Direction& direction,
+        int32_t targetDisplayId, int32_t& displayX, int32_t& displayY);
+    bool TransformOfDisplayPoint(struct libinput_event_touch* touch, Direction& direction, int32_t &globalLogicalX,
         int32_t &globalLogicalY);
     void TurnTouchScreen(PhysicalDisplayInfo* info, Direction direction,
         int32_t& logicalX, int32_t& logicalY);
