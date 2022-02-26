@@ -17,7 +17,6 @@
 
 #include "client_msg_handler.h"
 #include "if_mmi_client.h"
-#include "mmi_fd_listener.h"
 #include "mmi_event_handler.h"
 
 namespace OHOS {
@@ -53,8 +52,8 @@ protected:
     ConnectCallback funConnected_;
     ConnectCallback funDisconnected_;
 
-    MMIFdListener fdListener_;
-    std::shared_ptr<AppExecFwk::EventRunner> eventRunner_ = nullptr;
+    // std::shared_ptr<MMIFdListener> fdListener_ = nullptr;
+    // std::shared_ptr<AppExecFwk::EventRunner> eventRunner_ = nullptr;
     std::shared_ptr<MMIEventHandler> eventHandler_ = nullptr;
 };
 } // namespace MMI

@@ -19,6 +19,7 @@
 #include "util.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "mmi_fd_listener.h"
 
 namespace OHOS {
 namespace MMI {
@@ -59,17 +60,28 @@ bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
 
 bool MMIClient::StartFdListener()
 {
-    eventRunner_ = EventRunner::Create(false);
-    CHKPF(eventRunner_);
-    eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner_);
+    auto eventRunner = EventRunner::Create(false);
+    CHKPF(eventRunner);
+    auto fdListener = std::make_shared<MMIFdListener>();
+    CHKPF(fdListener);
+    eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner);
     CHKPF(eventHandler_);
-    constexpr uint32_t eventsMask = FILE_DESCRIPTOR_INPUT_EVENT | FILE_DESCRIPTOR_SHUTDOWN_EVENT |
-        FILE_DESCRIPTOR_EXCEPTION_EVENT;
-    auto errCode = eventHandler_->AddFileDescriptorListener(epollFd_, eventsMask, eventRunner_);
-    CHKF(errCode == ERR_OK);
-    eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT);
-    eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_ONTIMER, 0, EVENT_TIME_ONTIMER);
-    eventRunner_->Run();
+    constexpr uint32_t eventsMask = (FILE_DESCRIPTOR_INPUT_EVENT | FILE_DESCRIPTOR_SHUTDOWN_EVENT |
+        FILE_DESCRIPTOR_EXCEPTION_EVENT);
+    auto errCode = eventHandler_->AddFileDescriptorListener(epollFd_, eventsMask, fdListener);
+    if (errCode != ERR_OK) {
+        return false;
+    }
+    if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT)) {
+        return false;
+    }
+    if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_ONTIMER, 0, EVENT_TIME_ONTIMER)) {
+        return false;
+    }
+    errCode = eventRunner->Run();
+    if (errCode != ERR_OK) {
+        return false;
+    }
     return true;
 }
 
