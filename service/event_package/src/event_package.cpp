@@ -28,7 +28,7 @@ EventPackage::EventPackage() {}
 
 EventPackage::~EventPackage() {}
 
-int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key)
+int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, EventKeyboard& key)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_keyboard_event(event);
@@ -53,7 +53,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key)
     return RET_OK;
 }
 
-int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<KeyEvent> kevn)
+int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, std::shared_ptr<KeyEvent> kevn)
 {
     MMI_LOGD("enter");
     CHKPR(event, PARAM_INPUT_INVALID);

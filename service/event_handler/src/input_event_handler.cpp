@@ -236,7 +236,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventKey(libinput_event *event)
+int32_t InputEventHandler::OnEventKey(struct libinput_event *event)
 {
     CHKPR(event, PARAM_INPUT_INVALID);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
@@ -340,7 +340,7 @@ int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
     return OnMouseEventHandler(ev.event);
 }
 
-int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
+int32_t InputEventHandler::OnEventTouchSecond(struct libinput_event *event)
 {
     MMI_LOGD("Enter");
     CHKPR(event, ERROR_NULL_POINTER);
@@ -368,7 +368,7 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
+int32_t InputEventHandler::OnEventTouchPadSecond(struct libinput_event *event)
 {
     MMI_LOGD("Enter");
     CHKPR(event, ERROR_NULL_POINTER);
@@ -406,7 +406,7 @@ int32_t InputEventHandler::OnEventTouchpad(const multimodal_libinput_event& ev)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
+int32_t InputEventHandler::OnGestureEvent(struct libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointer = TouchTransformPointManger->OnTouchPadGestrueEvent(event);
@@ -447,7 +447,7 @@ int32_t InputEventHandler::OnEventGesture(const multimodal_libinput_event& ev)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
+int32_t InputEventHandler::OnMouseEventHandler(struct libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
 

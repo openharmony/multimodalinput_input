@@ -29,20 +29,20 @@ namespace OHOS {
 namespace MMI {
 class InputDeviceManager : public DelayedSingleton<InputDeviceManager>, public Subject {
 public:
-    void OnInputDeviceAdded(libinput_device* inputDevice);
-    void OnInputDeviceRemoved(libinput_device* inputDevice);
+    void OnInputDeviceAdded(struct libinput_device* inputDevice);
+    void OnInputDeviceRemoved(struct libinput_device* inputDevice);
     std::vector<int32_t> GetInputDeviceIds();
     std::shared_ptr<InputDevice> GetInputDevice(int32_t id);
     void GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback);
     void FindInputDeviceIdAsync(int32_t deviceId, std::function<void(std::shared_ptr<InputDevice>)> callback);
-    int32_t FindInputDeviceId(libinput_device* inputDevice);
+    int32_t FindInputDeviceId(struct libinput_device* inputDevice);
     void Attach(std::shared_ptr<DeviceObserver> observer);
     void Detach(std::shared_ptr<DeviceObserver> observer);
     void NotifyPointerDevice(bool hasPointerDevice);
 
 private:
     bool IsPointerDevice(libinput_device* device);
-    std::map<int32_t, libinput_device*> inputDevice_;
+    std::map<int32_t, struct libinput_device*> inputDevice_;
     bool initFlag_ {false};
     int32_t nextId_ {0};
     std::list<std::shared_ptr<DeviceObserver>> observers_;

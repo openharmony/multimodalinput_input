@@ -42,7 +42,7 @@ int32_t UDSSocket::EpollCreat(int32_t size)
     return epollFd_;
 }
 
-int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, epoll_event& event, int32_t epollFd)
+int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event& event, int32_t epollFd)
 {
     CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
     if (epollFd < 0) {
@@ -59,7 +59,7 @@ int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, epoll_event& event, int32_t 
     return ret;
 }
 
-int32_t UDSSocket::EpollWait(epoll_event& events, int32_t maxevents, int32_t timeout, int32_t epollFd)
+int32_t UDSSocket::EpollWait(struct epoll_event& events, int32_t maxevents, int32_t timeout, int32_t epollFd)
 {
     if (epollFd < 0) {
         epollFd = epollFd_;

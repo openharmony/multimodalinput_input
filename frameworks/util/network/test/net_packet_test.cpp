@@ -27,52 +27,52 @@ public:
 HWTEST_F(NetPacketTest, construct_001, TestSize.Level1)
 {
     MmiMessageId idMsg = MmiMessageId::INVALID;
-    NetPacket pack(idMsg);
+    NetPacket pkt(idMsg);
 }
 
 HWTEST_F(NetPacketTest, construct_002, TestSize.Level1)
 {
     MmiMessageId idMsg = MmiMessageId::INVALID;
-    NetPacket pack(idMsg);
-    NetPacket packTmp(pack);
+    NetPacket pkt(idMsg);
+    NetPacket packTmp(pkt);
 }
 
 HWTEST_F(NetPacketTest, construct_003, TestSize.Level1)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(-2002);
-    NetPacket pack(idMsg);
-    NetPacket packTmp(pack);
+    NetPacket pkt(idMsg);
+    NetPacket packTmp(pkt);
 }
 
 HWTEST_F(NetPacketTest, GetSize_001, TestSize.Level1)
 {
     MmiMessageId idMsg = MmiMessageId::INVALID;
-    NetPacket pack(idMsg);
-    size_t retResult = pack.GetSize();
+    NetPacket pkt(idMsg);
+    size_t retResult = pkt.GetSize();
     EXPECT_TRUE(retResult == 0);
 }
 
 HWTEST_F(NetPacketTest, GetSize_002, TestSize.Level1)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(-1001);
-    NetPacket pack(idMsg);
-    size_t retResult = pack.GetSize();
+    NetPacket pkt(idMsg);
+    size_t retResult = pkt.GetSize();
     EXPECT_TRUE(retResult == 0);
 }
 
 HWTEST_F(NetPacketTest, GetSize_003, TestSize.Level1)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(65535);
-    NetPacket pack(idMsg);
-    size_t retResult = pack.GetSize();
+    NetPacket pkt(idMsg);
+    size_t retResult = pkt.GetSize();
     EXPECT_TRUE(retResult == 0);
 }
 
 HWTEST_F(NetPacketTest, GetData_001, TestSize.Level1)
 {
     MmiMessageId idMsg = MmiMessageId::INVALID;
-    NetPacket pack(idMsg);
-    const char *retResult = pack.GetData();
+    NetPacket pkt(idMsg);
+    const char *retResult = pkt.GetData();
     EXPECT_TRUE(retResult != nullptr);
 }
 
@@ -80,8 +80,8 @@ HWTEST_F(NetPacketTest, GetData_002, TestSize.Level1)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(-3003);
 
-    NetPacket pack(idMsg);
-    const char *retResult = pack.GetData();
+    NetPacket pkt(idMsg);
+    const char *retResult = pkt.GetData();
     EXPECT_TRUE(retResult != nullptr);
 }
 
@@ -89,8 +89,8 @@ HWTEST_F(NetPacketTest, GetData_003, TestSize.Level1)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(65535);
 
-    NetPacket pack(idMsg);
-    const char *retResult = pack.GetData();
+    NetPacket pkt(idMsg);
+    const char *retResult = pkt.GetData();
     EXPECT_TRUE(retResult != nullptr);
 }
 
@@ -98,8 +98,8 @@ HWTEST_F(NetPacketTest, GetMsgId_001, TestSize.Level1)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(22);
 
-    NetPacket pack(idMsg);
-    const MmiMessageId retResult = pack.GetMsgId();
+    NetPacket pkt(idMsg);
+    const MmiMessageId retResult = pkt.GetMsgId();
     EXPECT_TRUE(retResult == idMsg);
 }
 
@@ -107,8 +107,8 @@ HWTEST_F(NetPacketTest, GetMsgId_002, TestSize.Level1)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(-33);
 
-    NetPacket pack(idMsg);
-    const MmiMessageId retResult = pack.GetMsgId();
+    NetPacket pkt(idMsg);
+    const MmiMessageId retResult = pkt.GetMsgId();
     EXPECT_TRUE(retResult == idMsg);
 }
 
@@ -116,8 +116,8 @@ HWTEST_F(NetPacketTest, GetMsgId_003, TestSize.Level1)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(65535);
 
-    NetPacket pack(idMsg);
-    const MmiMessageId retResult = pack.GetMsgId();
+    NetPacket pkt(idMsg);
+    const MmiMessageId retResult = pkt.GetMsgId();
     EXPECT_TRUE(retResult == idMsg);
 }
 

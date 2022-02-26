@@ -47,7 +47,7 @@ public:
     void Run();
     bool StartSocket();
     void HandleInjectCommandItems();
-    bool SendMsg(OHOS::MMI::NetPacket ckt);
+    bool SendMsg(OHOS::MMI::NetPacket pkt);
     int32_t OnAisensor();
     int32_t OnHdi();
     int32_t OnHdiHot();

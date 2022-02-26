@@ -89,9 +89,9 @@ int32_t MultimodalStandardizedEventManager::InjectionVirtual(bool isPressed, int
     virtualevent.isPressed = isPressed;
     virtualevent.keyCode = keyCode;
     virtualevent.keyDownDuration = keyDownDuration;
-    OHOS::MMI::NetPacket ckv(MmiMessageId::ON_VIRTUAL_KEY);
-    ckv << virtualevent;
-    return SendMsg(ckv);
+    OHOS::MMI::NetPacket pkt(MmiMessageId::ON_VIRTUAL_KEY);
+    pkt << virtualevent;
+    return SendMsg(pkt);
 }
 
 int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> key)
@@ -103,13 +103,13 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<Ke
         MMI_LOGE("keyCode is invalid:%{public}u", key->GetKeyCode());
         return RET_ERR;
     }
-    NetPacket ckv(MmiMessageId::NEW_INJECT_KEY_EVENT);
-    int32_t errCode = InputEventDataTransformation::KeyEventToNetPacket(key, ckv);
+    NetPacket pkt(MmiMessageId::NEW_INJECT_KEY_EVENT);
+    int32_t errCode = InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
     if (errCode != RET_OK) {
         MMI_LOGE("Serialization is Failed, errCode:%{public}u", errCode);
         return RET_ERR;
     }
-    if (!SendMsg(ckv)) {
+    if (!SendMsg(pkt)) {
         MMI_LOGE("Send inject event Msg error");
         return RET_ERR;
     }
@@ -149,11 +149,11 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
     for (auto &keyCode : pressedKeys) {
         MMI_LOGI("Pressed keyCode:%{public}d", keyCode);
     }
-    OHOS::MMI::NetPacket netPkt(MmiMessageId::INJECT_POINTER_EVENT);
-    CHKR((RET_OK == InputEventDataTransformation::Marshalling(pointerEvent, netPkt)),
+    OHOS::MMI::NetPacket pkt(MmiMessageId::INJECT_POINTER_EVENT);
+    CHKR((RET_OK == InputEventDataTransformation::Marshalling(pointerEvent, pkt)),
         STREAM_BUF_WRITE_FAIL, RET_ERR);
     MMI_LOGD("leave");
-    CHKR(SendMsg(netPkt), MSG_SEND_FAIL, RET_ERR);
+    CHKR(SendMsg(pkt), MSG_SEND_FAIL, RET_ERR);
     return RET_OK;
 }
 

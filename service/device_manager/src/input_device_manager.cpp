@@ -56,7 +56,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds()
     return ids;
 }
 
-void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
+void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)
 {
     MMI_LOGD("begin");
     CHKPV(inputDevice);
@@ -79,7 +79,7 @@ void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
     MMI_LOGD("end");
 }
 
-void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
+void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device* inputDevice)
 {
     MMI_LOGD("begin");
     CHKPV(inputDevice);
@@ -95,7 +95,7 @@ void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
     MMI_LOGD("end");
 }
 
-bool InputDeviceManager::IsPointerDevice(libinput_device* device)
+bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)
 {
     CHKPF(device);
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
@@ -124,7 +124,7 @@ void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice)
     }
 }
 
-int32_t InputDeviceManager::FindInputDeviceId(libinput_device* inputDevice)
+int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevice)
 {
     MMI_LOGD("begin");
     CHKPR(inputDevice, INVALID_DEVICE_ID);
