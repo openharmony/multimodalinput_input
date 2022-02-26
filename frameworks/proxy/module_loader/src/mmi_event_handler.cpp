@@ -31,10 +31,10 @@ MMIEventHandler::~MMIEventHandler()
 {
 }
 
-const std::string& MMIEventHandler::GetErrorStr(uint32_t  errCode) const
+const std::string& MMIEventHandler::GetErrorStr(ErrCode code) const
 {
     const static std::string defErrString = "Unknown event handler error!";
-    const static std::map<uint32_t, std::string> mapStrings = {
+    const static std::map<ErrCode, std::string> mapStrings = {
         {ERR_OK, "ERR_OK."},
         {EVENT_HANDLER_ERR_INVALID_PARAM, "Invalid parameters."},
         {EVENT_HANDLER_ERR_NO_EVENT_RUNNER, "Have not set event runner yet."},
@@ -44,7 +44,7 @@ const std::string& MMIEventHandler::GetErrorStr(uint32_t  errCode) const
         {EVENT_HANDLER_ERR_RUNNER_NO_PERMIT, "No permit to start or stop deposited event runner."},
         {EVENT_HANDLER_ERR_RUNNER_ALREADY, "Event runner is already running."}
     };
-    auto it = mapStrings.find(errCode);
+    auto it = mapStrings.find(code);
     if (it != mapStrings.end()) {
         return it->second;
     }
@@ -54,7 +54,7 @@ const std::string& MMIEventHandler::GetErrorStr(uint32_t  errCode) const
 void MMIEventHandler::OnReconnect(const InnerEvent::Pointer &event)
 {
     MMI_LOGD("enter");
-    SendEvent(MMI_EVENT_HANDLER_ID_ONTIMER, 0, EVENT_TIME_ONRECONNECT);
+    SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT);
 }
 
 void MMIEventHandler::OnTimer(const InnerEvent::Pointer &event)
