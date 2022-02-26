@@ -24,8 +24,8 @@ using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "TestAuxToolClient"};
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "TestAuxToolClient"};
+} // namespace
 
 int32_t TestAuxToolClient::ExecuteAllCommand()
 {
