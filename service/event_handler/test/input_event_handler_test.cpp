@@ -348,4 +348,4 @@ HWTEST_F(InputEventHandlerTest, Test_OnEventJoyStickAxis, TestSize.Level1)
     multimodal_libinput_event mmi_event = {event_, nullptr};
     EXPECT_EQ(eventHandler_.OnEventPointer(mmi_event), OHOS::JOYSTICK_EVENT_DISP_FAIL);
 }
-} // namespace
+}
