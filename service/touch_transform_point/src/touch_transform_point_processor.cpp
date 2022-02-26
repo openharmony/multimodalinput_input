@@ -34,7 +34,7 @@ void TouchTransformPointProcessor::SetPointEventSource(int32_t sourceType)
     pointerEvent_->SetSourceType(sourceType);
 }
 
-bool TouchTransformPointProcessor::OnEventTouchDown(libinput_event *event)
+bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event)
 {
     MMI_LOGD("Enter");
     CHKPF(event);
@@ -75,7 +75,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(libinput_event *event)
     return true;
 }
 
-bool TouchTransformPointProcessor::OnEventTouchMotion(libinput_event *event)
+bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *event)
 {
     MMI_LOGD("Enter");
     CHKPF(event);
@@ -103,7 +103,7 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(libinput_event *event)
     return true;
 }
 
-bool TouchTransformPointProcessor::OnEventTouchUp(libinput_event *event)
+bool TouchTransformPointProcessor::OnEventTouchUp(struct libinput_event *event)
 {
     MMI_LOGD("Enter");
     CHKPF(event);
@@ -123,7 +123,7 @@ bool TouchTransformPointProcessor::OnEventTouchUp(libinput_event *event)
     return true;
 }
 
-std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent(libinput_event *event)
+std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent(struct libinput_event *event)
 {
     MMI_LOGD("begin");
     CHKPP(event);

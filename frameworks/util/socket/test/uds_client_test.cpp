@@ -45,7 +45,7 @@ public:
         OnRecv(buf, size);
     }
 
-    void OnEventUnitTest(const epoll_event& ev, StreamBuffer& buf)
+    void OnEventUnitTest(const struct epoll_event& ev, StreamBuffer& buf)
     {
         OnEvent(ev, buf);
     }
@@ -222,7 +222,7 @@ HWTEST_F(UDSClientTest, Stop_001, TestSize.Level1)
 
 HWTEST_F(UDSClientTest, OnEvent, TestSize.Level1)
 {
-    epoll_event ev = {};
+    struct epoll_event ev = {};
     StreamBuffer buf;
 
     UDSClientUnitTest udsClientUt;

@@ -28,7 +28,7 @@ public:
     explicit GestureTransformPointProcessor(int32_t deviceId);
     DISALLOW_COPY_AND_MOVE(GestureTransformPointProcessor);
     ~GestureTransformPointProcessor();
-    std::shared_ptr<PointerEvent> OnTouchPadGestrueEvent(libinput_event *event);
+    std::shared_ptr<PointerEvent> OnTouchPadGestrueEvent(struct libinput_event *event);
     void SetPointEventSource(int32_t sourceType);
 private:
     const int32_t defaultPointerId = 0; // mouse has only one PoingeItem, so id is 0

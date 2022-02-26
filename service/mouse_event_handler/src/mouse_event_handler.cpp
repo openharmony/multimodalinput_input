@@ -160,7 +160,7 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     MMI_LOGD("leave");
 }
 
-void MouseEventHandler::Normalize(libinput_event *event)
+void MouseEventHandler::Normalize(struct libinput_event *event)
 {
     MMI_LOGD("enter");
     CHKPV(event);

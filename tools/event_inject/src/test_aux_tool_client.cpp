@@ -29,7 +29,7 @@ namespace {
 
 int32_t TestAuxToolClient::ExecuteAllCommand()
 {
-    timeval time;
+    struct timeval time;
     RawInputEvent rawEvent = {};
     for (uint32_t item = 0; item < AI_CODE_MAX; item++) {
         gettimeofday(&time, 0);
