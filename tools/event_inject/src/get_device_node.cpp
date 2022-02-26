@@ -15,7 +15,6 @@
 
 #include "get_device_node.h"
 
-using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
@@ -27,14 +26,14 @@ GetDeviceNode::GetDeviceNode()
     InitDeviceInfo();
 }
 
-int32_t GetDeviceNode::GetDeviceNodeName(const string &targetName, string &deviceNode, uint16_t devIndex)
+int32_t GetDeviceNode::GetDeviceNodeName(const std::string &targetName, std::string &deviceNode, uint16_t devIndex)
 {
-    string cmd = "cat /proc/bus/input/devices";
+    std::string cmd = "cat /proc/bus/input/devices";
     std::vector<std::string> cmdResult;
     ExecuteCmd(cmd, cmdResult);
     DeviceMapData deviceMapData;
     GetDeviceInfoCmdResult(cmdResult, deviceMapData);
-    string deviceName = deviceMap_[targetName];
+    std::string deviceName = deviceMap_[targetName];
     auto iter = deviceMapData.find(deviceName);
     if (iter == deviceMapData.end()) {
         MMI_LOGE("GetDeviceNodeName faild for find deviceName:%{public}s", deviceName.c_str());
@@ -45,7 +44,7 @@ int32_t GetDeviceNode::GetDeviceNodeName(const string &targetName, string &devic
         MMI_LOGE("GetDeviceNodeName faild for devIndex:%{public}d > targetSize:%{public}zu", devIndex, targetSize);
         return RET_ERR;
     }
-    string nodeRootPath = "/dev/input/";
+    std::string nodeRootPath = "/dev/input/";
     deviceNode = nodeRootPath + iter->second[devIndex];
     MMI_LOGI("GetDeviceNodeName:%{public}s[%{public}d] --> %{public}s", targetName.c_str(), devIndex,
              deviceNode.c_str());
@@ -74,7 +73,7 @@ void GetDeviceNode::InitDeviceInfo()
     deviceMap_["trackpad model2"] = "Virtual Trackpad";
 }
 
-int32_t GetDeviceNode::ExecuteCmd(const string cmd, std::vector<std::string> &cmdResult)
+int32_t GetDeviceNode::ExecuteCmd(const std::string cmd, std::vector<std::string> &cmdResult)
 {
     if (cmd.empty()) {
         return RET_ERR;
@@ -95,9 +94,9 @@ int32_t GetDeviceNode::ExecuteCmd(const string cmd, std::vector<std::string> &cm
 
 void GetDeviceNode::GetDeviceInfoCmdResult(const std::vector<std::string>& cmdResult, DeviceMapData& deviceMapData)
 {
-    string name;
-    string target;
-    string temp;
+    std::string name;
+    std::string target;
+    std::string temp;
     uint64_t endPos = 0;
     uint64_t startPos = 0;
     uint64_t eventLength = CMD_EVENT_LENGTH;
@@ -109,7 +108,7 @@ void GetDeviceNode::GetDeviceInfoCmdResult(const std::vector<std::string>& cmdRe
             name = item.substr(startPos, endPos - startPos - 1);
         } else if (temp == "H") {
             startPos = item.find("event");
-            string endString = item.substr(startPos + strlen("event") + 1, 1);
+            std::string endString = item.substr(startPos + strlen("event") + 1, 1);
             if (endString != " ") {
                 eventLength = CMD_EVENT_LENGTH + 1;
             }
