@@ -25,13 +25,13 @@ namespace MMI {
 class InputEventDataTransformation {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventDataTransformation" };
 public:
-    static int32_t KeyEventToNetPacket(const std::shared_ptr<KeyEvent> key, NetPacket &packet);
-    static int32_t NetPacketToKeyEvent(NetPacket &packet, std::shared_ptr<KeyEvent> key);
-    static int32_t SerializeInputEvent(std::shared_ptr<InputEvent> event, NetPacket &packet);
-    static int32_t DeserializeInputEvent(NetPacket &packet, std::shared_ptr<InputEvent> event);
-    static int32_t Marshalling(std::shared_ptr<PointerEvent> event, NetPacket &packet);
-    static int32_t Unmarshalling(NetPacket &packet, std::shared_ptr<PointerEvent> event);
-    static int32_t DeserializePointerItem(NetPacket &packet, PointerEvent::PointerItem &item);
+    static int32_t KeyEventToNetPacket(const std::shared_ptr<KeyEvent> key, NetPacket &pkt);
+    static int32_t NetPacketToKeyEvent(NetPacket &pkt, std::shared_ptr<KeyEvent> key);
+    static int32_t SerializeInputEvent(std::shared_ptr<InputEvent> event, NetPacket &pkt);
+    static int32_t DeserializeInputEvent(NetPacket &pkt, std::shared_ptr<InputEvent> event);
+    static int32_t Marshalling(std::shared_ptr<PointerEvent> event, NetPacket &pkt);
+    static int32_t Unmarshalling(NetPacket &pkt, std::shared_ptr<PointerEvent> event);
+    static int32_t DeserializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item);
 };
 } // namespace MMI
 } // namespace OHOS
