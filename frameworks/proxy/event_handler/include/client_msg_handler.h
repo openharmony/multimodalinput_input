@@ -34,7 +34,6 @@ public:
     virtual void OnMsgHandler(const UDSClient& client, NetPacket& pkt) override;
 
 protected:
-    virtual int32_t OnKey(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnKeyEvent(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnKeyMonitor(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnTouchPadMonitor(const UDSClient& client, NetPacket& pkt);
@@ -55,7 +54,6 @@ private:
     static void OnEventProcessed(int32_t eventId);
 
 private:
-    bool isServerReqireStMessage_ = true;
     std::function<void(int32_t)> eventProcessedCallback_;
 };
 } // namespace MMI

@@ -37,16 +37,12 @@ public:
 
 protected:
     int32_t OnVirtualKeyEvent(SessionPtr sess, NetPacket& pkt);
-    int32_t OnRegisterAppInfo(SessionPtr sess, NetPacket& pkt);
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
-    int32_t OnUnregisterMsgHandler(SessionPtr sess, NetPacket& pkt);
     int32_t OnSeniorInputFuncProc(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_HDF
     int32_t OnHdiInject(SessionPtr sess, NetPacket& pkt);
 #endif
-    int32_t OnWindow(SessionPtr sess, NetPacket& pkt);
     int32_t OnDump(SessionPtr sess, NetPacket& pkt);
-    int32_t CheckReplyMessageFormClient(SessionPtr sess, NetPacket& pkt);
     int32_t NewCheckReplyMessageFormClient(SessionPtr sess, NetPacket& pkt);
     int32_t GetMultimodeInputInfo(SessionPtr sess, NetPacket& pkt);
     int32_t OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt);

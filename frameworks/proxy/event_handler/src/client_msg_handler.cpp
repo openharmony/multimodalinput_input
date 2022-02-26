@@ -51,7 +51,6 @@ bool ClientMsgHandler::Init()
 {
     // LCOV_EXCL_START
     MsgCallback funs[] = {
-        {MmiMessageId::ON_KEY, MsgCallbackBind2(&ClientMsgHandler::OnKey, this)},
         {MmiMessageId::ON_KEYEVENT, MsgCallbackBind2(&ClientMsgHandler::OnKeyEvent, this)},
         {MmiMessageId::ON_SUBSCRIBE_KEY, std::bind(&ClientMsgHandler::OnSubscribeKeyEventCallback,
                                                    this, std::placeholders::_1, std::placeholders::_2)},

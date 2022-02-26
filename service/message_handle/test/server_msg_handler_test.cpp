@@ -33,20 +33,6 @@ public:
         return OnVirtualKeyEvent(sess, pkt);
     }
 
-    int32_t OnRegisterAppInfoTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
-    {
-        return OnRegisterAppInfo(sess, pkt);
-    }
-
-    int32_t OnRegisterMsgHandlerTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
-    {
-        return OnRegisterMsgHandler(sess, pkt);
-    }
-
-    int32_t OnUnregisterMsgHandlerTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
-    {
-        return OnUnregisterMsgHandler(sess, pkt);
-    }
 #ifdef  OHOS_BUILD_AI
     int32_t OnAiSensorInfoTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
     {
@@ -69,11 +55,6 @@ public:
     int32_t OnDumpTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
     {
         return OnDump(sess, pkt);
-    }
-
-    int32_t CheckReplyMessageFormClientTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
-    {
-        return CheckReplyMessageFormClient(sess, pkt);
     }
 
     int32_t GetMultimodeInputInfoTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)

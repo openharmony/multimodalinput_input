@@ -94,7 +94,6 @@ void MMIClient::OnDisconnected()
         funDisconnected_(*this);
     }
     isConnected_ = false;
-    EventManager.ClearAll();
 }
 
 void MMIClient::OnConnected()

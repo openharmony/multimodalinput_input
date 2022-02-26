@@ -25,6 +25,53 @@
 
 namespace OHOS {
 namespace MMI {
+struct SurfaceInfo {
+    int32_t surfaceId;
+    int32_t dstX;
+    int32_t dstY;
+    int32_t dstW;
+    int32_t dstH;
+    int32_t srcX;
+    int32_t srcY;
+    int32_t srcW;
+    int32_t srcH;
+    double opacity;
+    int32_t visibility; // 0 or 1
+    int32_t onLayerId;
+};
+struct LayerInfo {
+    int32_t layerId;
+    int32_t dstX;
+    int32_t dstY;
+    int32_t dstW;
+    int32_t dstH;
+    int32_t srcX;
+    int32_t srcY;
+    int32_t srcW;
+    int32_t srcH;
+    double opacity;
+    int32_t visibility; // 0 or 1
+    int32_t onScreenId;
+    int32_t nSurfaces;
+    SurfaceInfo** surfaces;
+};
+struct ScreenInfo {
+    int32_t screenId;
+    char* connectorName;
+    int32_t width;
+    int32_t height;
+    int32_t nLayers;
+    LayerInfo** layers;
+};
+struct SeatInfo {
+    char* seatName;
+    int32_t deviceFlags;
+    int32_t focusWindowId;
+};
+struct multimodal_libinput_event {
+    libinput_event *event;
+    void *userdata;
+};
 struct MouseLocation {
     int32_t globalX;
     int32_t globalY;
@@ -39,25 +86,9 @@ public:
     void UpdateSeatsInfo();
     void UpdateScreensInfo();
 
-    const ScreenInfo* GetScreenInfo(int32_t screenId);
-    const LayerInfo* GetLayerInfo(int32_t layerId);
-
-    bool GetTouchSurfaceId(const double x, const double y, std::vector<int32_t>& ids);
-
-    const std::vector<ScreenInfo>& GetScreenInfo() const;
-
-    const std::map<int32_t, LayerInfo>& GetLayerInfo() const;
 
     void PrintAllNormalSurface();
 
-    void SetFocusSurfaceId(int32_t id);
-    void SetTouchFocusSurfaceId(int32_t id);
-
-    int32_t GetFocusSurfaceId() const;
-    int32_t GetTouchFocusSurfaceId() const;
-
-    size_t GetSurfaceIdList(std::vector<int32_t>& ids);
-    std::string GetSurfaceIdListString();
     void Clear();
     void Dump(int32_t fd);
 
@@ -90,8 +121,6 @@ public:
 private:
     void SetFocusId(int32_t id);
     void PrintDebugInfo();
-    void SaveScreenInfoToMap(const ScreenInfo **screen_info);
-    bool FindSurfaceCoordinate(double x, double y, const SurfaceInfo& pstrSurface);
     int32_t UpdateMouseTargetOld(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTouchScreenTargetOld(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTouchPadTargetOld(std::shared_ptr<PointerEvent> pointerEvent);
@@ -110,10 +139,6 @@ private:
     ScreenInfo **screensInfo_ = nullptr;
     int32_t focusInfoID_ = 0;
     int32_t touchFocusId_ = 0;
-    std::vector<int32_t> surfacesList_; // surfaces ids list
-    std::vector<ScreenInfo> screenInfoVec_ = {};
-    std::map<int32_t, LayerInfo> layers_ = {};
-    std::map<int32_t, MMISurfaceInfo> surfaces_ = {};
     UDSServer* udsServer_ = nullptr;
     int32_t firstBtnDownWindowId_ = -1;
     /* *********************************新框架接口添加*************************** */

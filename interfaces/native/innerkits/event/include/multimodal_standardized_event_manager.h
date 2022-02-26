@@ -34,7 +34,6 @@ public:
 
     void SetClientHandle(MMIClientPtr client);
     const std::set<std::string> *GetRegisterEvent();
-    void ClearAll();
     int32_t InjectionVirtual(bool isPressed, int32_t keyCode, int32_t keyDownDuration, int32_t maxKeyCode);
     int32_t InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
