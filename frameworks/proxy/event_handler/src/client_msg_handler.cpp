@@ -293,7 +293,7 @@ int32_t ClientMsgHandler::KeyEventFilter(const UDSClient& client, NetPacket& pkt
                      key.time, "", key.deviceId, 0, key.deviceType, deviceEventType);
     return InputFilterMgr.OnKeyEvent(event, id);
 #endif
-    MMI_LOGE("chengmai_todo");
+    MMI_LOGE("chengmai_to_adapter");
     return RET_ERR;
 }
 
@@ -346,7 +346,7 @@ int32_t ClientMsgHandler::TouchEventFilter(const UDSClient& client, NetPacket& p
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     return InputFilterMgr.OnTouchEvent(event, id);
 #endif
-    MMI_LOGE("chengmai_todo");
+    MMI_LOGE("chengmai_to_adapter");
     return RET_ERR;
 }
 
@@ -378,7 +378,7 @@ int32_t ClientMsgHandler::PointerEventInterceptor(const UDSClient& client, NetPa
         "", pointData.deviceId, 0, pointData.deviceType, eventJoyStickAxis);
     return (InputFilterMgr.OnPointerEvent(mouse_event, id));
 #endif
-    MMI_LOGE("chengmai_todo");
+    MMI_LOGE("chengmai_to_adapter");
     return RET_ERR;
 }
 

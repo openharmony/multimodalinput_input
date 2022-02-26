@@ -245,7 +245,7 @@ bool ServerInputFilterManager::OnTouchEvent(struct libinput_event *event,
     auto device = libinput_event_get_device(event);
     CHKPF(device);
     
-    MMI_LOGD("Leave, TODO:chengmai");
+    MMI_LOGD("Leave, chengmai_to_adapter");
     return true;
 }
 
