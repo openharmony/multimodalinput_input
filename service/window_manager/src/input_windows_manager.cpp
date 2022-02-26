@@ -362,6 +362,7 @@ bool OHOS::MMI::InputWindowsManager::GetTouchSurfaceId(const double x, const dou
         }
         return true;
     }
+    MMI_LOGE("Failed to obtain touchsurface");
     return false;
 }
 
@@ -373,6 +374,7 @@ const ScreenInfo* OHOS::MMI::InputWindowsManager::GetScreenInfo(int32_t screenId
             return &it;
         }
     }
+    MMI_LOGE("Failed to obtain screen(%{public}d) info", screenId);
     return nullptr;
 }
 
@@ -381,6 +383,7 @@ const LayerInfo* OHOS::MMI::InputWindowsManager::GetLayerInfo(int32_t layerId)
     std::lock_guard<std::mutex> lock(mu_);
     auto it = layers_.find(layerId);
     if (it == layers_.end()) {
+        MMI_LOGE("Failed to obtain layer(%{public}d) info", layerId);
         return nullptr;
     }
     return &it->second;
@@ -391,6 +394,7 @@ const MMISurfaceInfo* OHOS::MMI::InputWindowsManager::GetSurfaceInfo(int32_t suf
     std::lock_guard<std::mutex> lock(mu_);
     auto it = surfaces_.find(sufaceId);
     if (it == surfaces_.end()) {
+        MMI_LOGE("Failed to obtain suface(%{public}d) info", sufaceId);
         return nullptr;
     }
     return &it->second;
@@ -463,7 +467,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent>
     return appInfo.fd;
 #else
     MMI_LOGD("enter");
-    int32_t pid = GetPidUpdateTarget(inputEvent);
+    int32_t pid = GetPidAndUpdateTarget(inputEvent);
     CHKR(pid > 0, PID_OBTAIN_FAIL, RET_ERR);
     int32_t fd = udsServer_->GetClientFd(pid);
     CHKR(fd >= 0, FD_OBTAIN_FAIL, RET_ERR);
@@ -472,7 +476,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent>
 #endif
 }
 
-int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<InputEvent> inputEvent)
+int32_t OHOS::MMI::InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent)
 {
     MMI_LOGD("enter");
     CHKPR(inputEvent, ERROR_NULL_POINTER);
@@ -481,13 +485,13 @@ int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<Input
         return RET_ERR;
     }
 
-    if (inputEvent->GetTargetDisplayId() == -1) {
-        MMI_LOGD("target display is -1");
+    if (inputEvent->GetTargetDisplayId() < 0) {
+        MMI_LOGD("Either the first pressed key or inject event being not specified by display");
         inputEvent->SetTargetDisplayId(logicalDisplays_[0].id);
         inputEvent->SetTargetWindowId(logicalDisplays_[0].focusWindowId);
         auto it = windowInfos_.find(logicalDisplays_[0].focusWindowId);
         if (it == windowInfos_.end()) {
-            MMI_LOGE("can't find winfow info, focuswindowId:%{public}d", logicalDisplays_[0].focusWindowId);
+            MMI_LOGE("can't find window info, focuswindowId:%{public}d", logicalDisplays_[0].focusWindowId);
             return RET_ERR;
         }
         inputEvent->SetAgentWindowId(it->second.agentWindowId);
@@ -500,18 +504,18 @@ int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<Input
             continue;
         }
         MMI_LOGD("target display:%{public}d", inputEvent->GetTargetDisplayId());
-        inputEvent->SetTargetWindowId(item.focusWindowId);
         auto it = windowInfos_.find(item.focusWindowId);
         if (it == windowInfos_.end()) {
-            MMI_LOGE("can't find winfow info, focuswindowId:%{public}d", item.focusWindowId);
+            MMI_LOGE("can't find window info, focuswindowId:%{public}d", item.focusWindowId);
             return RET_ERR;
         }
+        inputEvent->SetTargetWindowId(item.focusWindowId);
         inputEvent->SetAgentWindowId(it->second.agentWindowId);
         MMI_LOGD("pid:%{public}d", it->second.pid);
         return it->second.pid;
     }
 
-    MMI_LOGE("leave,cant't find logical display,target display:%{public}d", inputEvent->GetTargetDisplayId());
+    MMI_LOGE("leave,can't find logical display,target display:%{public}d", inputEvent->GetTargetDisplayId());
     return RET_ERR;
 }
 
@@ -576,7 +580,7 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
     }
 }
 
-bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint_2(libinput_event_touch* touch,
+bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint_2(struct libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
 {
     CHKPF(touch);
@@ -587,6 +591,7 @@ bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint_2(libinput_even
         logicalY = static_cast<int32_t>(libinput_event_touch_get_y_transformed(touch, (*screensInfo_)->height));
         return true;
     }
+    MMI_LOGE("ScreensInfo_ is null");
     return false;
 }
 
@@ -597,6 +602,7 @@ OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::GetPhysicalDispl
             return &it;
         }
     }
+    MMI_LOGE("Failed to obtain physical(%{public}d) display", id);
     return nullptr;
 }
 
@@ -608,6 +614,7 @@ OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::FindPhysicalDisp
             return &it;
         }
     }
+    MMI_LOGE("Failed to search for Physical,seat:%{public}s,name:%{public}s", seatId.c_str(), seatName.c_str());
     return nullptr;
 }
 
@@ -641,7 +648,7 @@ void OHOS::MMI::InputWindowsManager::TurnTouchScreen(PhysicalDisplayInfo* info, 
     }
 }
 
-bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(libinput_event_touch* touch, Direction& direction,
+bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(struct libinput_event_touch* touch, Direction& direction,
     int32_t &globalLogicalX, int32_t &globalLogicalY)
 {
     CHKPF(touch);
@@ -700,7 +707,7 @@ bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(libinput_event_touc
     return true;
 }
 
-bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(libinput_event_touch* touch, Direction& direction,
+bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(struct libinput_event_touch* touch, Direction& direction,
     int32_t targetDisplayId, int32_t& displayX, int32_t& displayY)
 {
     CHKPF(touch);
@@ -724,7 +731,7 @@ bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(libinput_eve
     return false;
 }
 
-bool OHOS::MMI::InputWindowsManager::TouchDownPointToDisplayPoint(libinput_event_touch* touch, Direction& direction,
+bool OHOS::MMI::InputWindowsManager::TouchDownPointToDisplayPoint(struct libinput_event_touch* touch, Direction& direction,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
 {
     CHKPF(touch);
@@ -1037,7 +1044,7 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
 {
     int32_t integerX = static_cast<int32_t>(x);
     int32_t integerY = static_cast<int32_t>(y);
-    const std::vector<struct LogicalDisplayInfo> logicalDisplayInfo = GetLogicalDisplayInfo();
+    const std::vector<LogicalDisplayInfo> logicalDisplayInfo = GetLogicalDisplayInfo();
     if (logicalDisplayInfo.empty()) {
         MMI_LOGE("logicalDisplayInfo is empty");
         return;

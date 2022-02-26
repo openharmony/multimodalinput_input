@@ -43,7 +43,7 @@ HWTEST_F(EventHandleStandardizedTest, RegisterStandardizedEventHandle_NORMAL_001
     auto standHandler = StandardizedEventHandler::Create<StandardizedEventHandler>();
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_,
                                                                      standHandler);
-    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER, regResult);
+    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAM, regResult);
 }
 
 HWTEST_F(EventHandleStandardizedTest, RegisterStandardizedEventHandle_NORMAL_002, TestSize.Level1)
@@ -54,10 +54,10 @@ HWTEST_F(EventHandleStandardizedTest, RegisterStandardizedEventHandle_NORMAL_002
     auto standHandler = StandardizedEventHandler::Create<StandardizedEventHandler>();
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_,
                                                                      standHandler);
-    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER, regResult);
+    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAM, regResult);
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(iRemote, surFaceId_,
                                                                          standHandler);
-    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER, unregResult);
+    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAM, unregResult);
 }
 
 HWTEST_F(EventHandleStandardizedTest, RegisterStandardizedEventHandle_NORMAL_003, TestSize.Level1)
@@ -68,7 +68,7 @@ HWTEST_F(EventHandleStandardizedTest, RegisterStandardizedEventHandle_NORMAL_003
     auto standHandler = StandardizedEventHandler::Create<StandardizedEventHandler>();
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(iRemote, surFaceId_,
                                                                          standHandler);
-    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER, unregResult);
+    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAM, unregResult);
 }
 
 HWTEST_F(EventHandleStandardizedTest, RegisterStandardizedEventHandle_nullptr_001, TestSize.Level1)
@@ -78,7 +78,7 @@ HWTEST_F(EventHandleStandardizedTest, RegisterStandardizedEventHandle_nullptr_00
     auto iRemote = MMIToken::Create(u16Desc);
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(iRemote,
                                                                      surFaceId_, nullptr);
-    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER, regResult);
+    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAM, regResult);
 }
 
 HWTEST_F(EventHandleStandardizedTest, RegisterStandardizedEventHandle_nullptr_002, TestSize.Level1)
@@ -88,11 +88,11 @@ HWTEST_F(EventHandleStandardizedTest, RegisterStandardizedEventHandle_nullptr_00
     auto iRemote = MMIToken::Create(u16Desc);
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(iRemote,
                                                                      surFaceId_, nullptr);
-    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER, regResult);
+    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAM, regResult);
 
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(iRemote, surFaceId_,
                                                                          nullptr);
-    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER, unregResult);
+    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAM, unregResult);
 }
 
 HWTEST_F(EventHandleStandardizedTest, RegisterStandardizedEventHandle_nullptr_003, TestSize.Level1)
@@ -102,7 +102,7 @@ HWTEST_F(EventHandleStandardizedTest, RegisterStandardizedEventHandle_nullptr_00
     auto iRemote = MMIToken::Create(u16Desc);
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(iRemote, surFaceId_,
                                                                          nullptr);
-    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER, unregResult);
+    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAM, unregResult);
 }
 
 HWTEST_F(EventHandleStandardizedTest, RegisterStandardizedEventHandle_VALIDPARAM_001, TestSize.Level1)
@@ -113,7 +113,7 @@ HWTEST_F(EventHandleStandardizedTest, RegisterStandardizedEventHandle_VALIDPARAM
     auto standHandler = StandardizedEventHandler::Create<StandardizedEventHandler>();
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_,
                                                                      standHandler);
-    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER, regResult);
+    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAM, regResult);
 }
 
 HWTEST_F(EventHandleStandardizedTest, RegisterStandardizedEventHandle_VALIDPARAM_002, TestSize.Level1)
@@ -124,10 +124,10 @@ HWTEST_F(EventHandleStandardizedTest, RegisterStandardizedEventHandle_VALIDPARAM
     auto standHandler = StandardizedEventHandler::Create<StandardizedEventHandler>();
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(iRemote, surFaceId_,
                                                                      standHandler);
-    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER, regResult);
+    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAM, regResult);
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(iRemote, surFaceId_,
                                                                          standHandler);
-    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER, unregResult);
+    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAM, unregResult);
 }
 
 HWTEST_F(EventHandleStandardizedTest, RegisterStandardizedEventHandle_VALIDPARAM_003, TestSize.Level1)
@@ -138,6 +138,6 @@ HWTEST_F(EventHandleStandardizedTest, RegisterStandardizedEventHandle_VALIDPARAM
     auto standHandler = StandardizedEventHandler::Create<StandardizedEventHandler>();
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(iRemote, surFaceId_,
                                                                          standHandler);
-    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER, unregResult);
+    EXPECT_NE(OHOS::MMI_STANDARD_EVENT_INVALID_PARAM, unregResult);
 }
 } // namespace

@@ -98,10 +98,12 @@ std::map<int32_t, AppInfo>::iterator AppRegister::EraseAppInfo(const std::map<in
 std::map<int32_t, AppInfo>::iterator AppRegister::UnregisterAppInfo(int32_t winId)
 {
     if (winId <= 0) {
+        MMI_LOGE("Parameter is invalid, Unregister failed");
         return surfaceInfo_.end();
     }
     auto itr = surfaceInfo_.find(winId);
     if (itr == surfaceInfo_.end()) {
+        MMI_LOGE("Window(%{public}d) not found, Unregister failed", winId);
         return surfaceInfo_.end();
     }
     return EraseAppInfo(itr);

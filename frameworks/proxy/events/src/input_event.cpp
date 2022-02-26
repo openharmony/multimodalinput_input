@@ -40,7 +40,7 @@ InputEvent::~InputEvent() {}
 
 void InputEvent::Reset()
 {
-    timespec ts = { 0, 0 };
+    struct timespec ts = { 0, 0 };
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
         actionTime_ = 0;
     }
@@ -55,7 +55,7 @@ void InputEvent::Reset()
     targetDisplayId_ = DEFALUTID;
     targetWindowId_ = DEFALUTID;
     agentWindowId_ = DEFALUTID;
-    bitwise_ = 0;
+    bitwise_ = EVENT_FLAG_NONE;
 }
 
 std::shared_ptr<InputEvent> InputEvent::Create()
@@ -187,7 +187,7 @@ void InputEvent::AddFlag(uint32_t flag)
 
 void InputEvent::ClearFlag()
 {
-    bitwise_ = 0X00000000;
+    bitwise_ = EVENT_FLAG_NONE;
 }
 
 void InputEvent::SetProcessedCallback(std::function<void(int32_t)> callback)

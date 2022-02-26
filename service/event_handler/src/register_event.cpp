@@ -396,6 +396,7 @@ int32_t RegisterEvent::OnEventTouchDownGetSign(const EventTouch& touch)
         TouchInfo>::value_type(std::make_pair(touch.deviceId, touch.seatSlot), touchDownInfo));
     if (GetTouchInfoSizeDeviceId(touchDownInfo.deviceId) > MAXFINGER) {
         DeleteTouchInfoDeviceId(touchDownInfo.deviceId);
+        MMI_LOGE("Device(%{pulic}d) exceeds the maximum finger index", touchDownInfo.deviceId);
         return RET_ERR;
     }
     return RET_OK;

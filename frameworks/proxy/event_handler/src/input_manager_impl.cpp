@@ -118,6 +118,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::II
 void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
     MMI_LOGD("Enter");
+    CHKPV(keyEvent);
     int32_t getKeyCode = keyEvent->GetKeyCode();
     MMI_LOGD(" OnKeyEvent client trace getKeyCode:%{public}d", getKeyCode);
     std::string keyCodestring = "client dispatchKeyCode=" + std::to_string(getKeyCode);
@@ -137,6 +138,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
     MMI_LOGD("Pointer event received, processing");
+    CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         int32_t pointerId = pointerEvent->GetId();
         std::string pointerEventstring = "PointerEventDispatch";
@@ -157,55 +159,55 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> p
     MMI_LOGD("leave");
 }
 
-int32_t InputManagerImpl::PackDisplayData(OHOS::MMI::NetPacket &ckt)
+int32_t InputManagerImpl::PackDisplayData(OHOS::MMI::NetPacket &pkt)
 {
-    if (PackPhysicalDisplay(ckt) == RET_ERR) {
+    if (PackPhysicalDisplay(pkt) == RET_ERR) {
         MMI_LOGE("pack physical display failed");
         return RET_ERR;
     }
-    return PackLogicalDisplay(ckt);
+    return PackLogicalDisplay(pkt);
 }
 
-int32_t InputManagerImpl::PackPhysicalDisplay(NetPacket &ckt)
+int32_t InputManagerImpl::PackPhysicalDisplay(NetPacket &pkt)
 {
     int32_t num = physicalDisplays_.size();
-    CHKR(ckt.Write(num), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt.Write(num), STREAM_BUF_WRITE_FAIL, RET_ERR);
     for (int32_t i = 0; i < num; i++) {
-        CHKR(ckt.Write(physicalDisplays_[i].id), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].leftDisplayId), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].upDisplayId), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].topLeftX), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].topLeftY), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].width), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].height), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].name), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].seatId), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].seatName), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].logicWidth), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].logicHeight), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].direction), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].id), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].leftDisplayId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].upDisplayId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].topLeftX), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].topLeftY), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].width), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].height), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].name), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].seatId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].seatName), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].logicWidth), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].logicHeight), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].direction), STREAM_BUF_WRITE_FAIL, RET_ERR);
     }
     return RET_OK;
 }
 
-int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &ckt)
+int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
 {
     int32_t num = logicalDisplays_.size();
-    CHKR(ckt.Write(num), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt.Write(num), STREAM_BUF_WRITE_FAIL, RET_ERR);
     for (int32_t i = 0; i < num; i++) {
-        CHKR(ckt.Write(logicalDisplays_[i].id), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(logicalDisplays_[i].topLeftX), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(logicalDisplays_[i].topLeftY), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(logicalDisplays_[i].width), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(logicalDisplays_[i].height), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(logicalDisplays_[i].name), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(logicalDisplays_[i].seatId), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(logicalDisplays_[i].seatName), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(logicalDisplays_[i].focusWindowId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(logicalDisplays_[i].id), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(logicalDisplays_[i].topLeftX), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(logicalDisplays_[i].topLeftY), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(logicalDisplays_[i].width), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(logicalDisplays_[i].height), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(logicalDisplays_[i].name), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(logicalDisplays_[i].seatId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(logicalDisplays_[i].seatName), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(logicalDisplays_[i].focusWindowId), STREAM_BUF_WRITE_FAIL, RET_ERR);
         int32_t numWindow = logicalDisplays_[i].windowsInfo_.size();
-        CHKR(ckt.Write(numWindow), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(numWindow), STREAM_BUF_WRITE_FAIL, RET_ERR);
         for (int32_t j = 0; j < numWindow; j++) {
-            CHKR(ckt.Write(logicalDisplays_[i].windowsInfo_[j]), STREAM_BUF_WRITE_FAIL, RET_ERR);
+            CHKR(pkt.Write(logicalDisplays_[i].windowsInfo_[j]), STREAM_BUF_WRITE_FAIL, RET_ERR);
         }
     }
     return RET_OK;
@@ -302,6 +304,7 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
+    CHKPR(interceptor, ERROR_NULL_POINTER);
     int32_t interceptorId = interceptorManager_.AddInterceptor(interceptor);
     if (interceptorId >= 0) {
         interceptorId = interceptorId * ADD_MASK_BASE + MASK_TOUCH;
@@ -319,7 +322,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
 {
     if (interceptor == nullptr) {
         MMI_LOGE("AddInterceptor::%{public}s param should not be null", __func__);
-        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
+        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAM;
     }
     int32_t interceptorId = InterceptorMgr.AddInterceptor(interceptor);
     if (interceptorId >= 0) {
@@ -351,6 +354,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
+    CHKPV(keyEvent);
     if (MMIEventHdl.InjectEvent(keyEvent) != RET_OK) {
         MMI_LOGE("Failed to inject keyEvent");
     }
@@ -358,6 +362,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> k
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
+    CHKPV(pointerEvent);
     if (MultimodalEventHandler::GetInstance().InjectPointerEvent(pointerEvent) != RET_OK) {
         MMI_LOGE("Failed to inject pointer event");
     }
@@ -384,12 +389,12 @@ void InputManagerImpl::SendDisplayInfo()
         return;
     }
 
-    OHOS::MMI::NetPacket ckt(MmiMessageId::DISPLAY_INFO);
-    if (PackDisplayData(ckt) == RET_ERR) {
+    OHOS::MMI::NetPacket pkt(MmiMessageId::DISPLAY_INFO);
+    if (PackDisplayData(pkt) == RET_ERR) {
         MMI_LOGE("pack display info failed");
         return;
     }
-    MultimodalEventHandler::GetInstance().GetMMIClient()->SendMessage(ckt);
+    MultimodalEventHandler::GetInstance().GetMMIClient()->SendMessage(pkt);
 }
 } // namespace MMI
 } // namespace OHOS

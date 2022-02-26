@@ -24,7 +24,8 @@ namespace {
     constexpr uint32_t SEAT_KEY_COUNT_ZERO = 0;
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventPackage" };
 
-    void FillEventJoyStickAxisAbsInfo(const libinput_event_joystick_axis_abs_info& r, EventJoyStickAxisAbsInfo& l)
+    void FillEventJoyStickAxisAbsInfo(const struct libinput_event_joystick_axis_abs_info& r,
+        EventJoyStickAxisAbsInfo& l)
     {
         l.code = r.code;
         l.value = r.value;
@@ -37,7 +38,7 @@ namespace {
         l.isChanged = true;
     }
 
-    void FillEventSlotedCoordsInfo(const sloted_coords_info& r, SlotedCoordsInfo& l)
+    void FillEventSlotedCoordsInfo(const struct sloted_coords_info& r, SlotedCoordsInfo& l)
     {
         l.activeCount = r.active_count;
         for (int32_t i = 0; i < MAX_SOLTED_COORDS_NUMS; i++) {
@@ -47,7 +48,7 @@ namespace {
         }
     }
 
-    DEVICE_TYPE GetDeviceType(libinput_device* device)
+    DEVICE_TYPE GetDeviceType(struct libinput_device* device)
     {
         CHKPR(device, DEVICE_TYPE_UNKNOWN);
         enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
@@ -75,7 +76,7 @@ EventPackage::EventPackage() {}
 EventPackage::~EventPackage() {}
 
 template<class EventType>
-int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& data)
+int32_t EventPackage::PackageEventDeviceInfo(struct libinput_event *event, EventType& data)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
@@ -123,7 +124,7 @@ int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& d
     return RET_OK;
 }
 
-int32_t EventPackage::PackageTabletToolOtherParams(libinput_event *event, EventTabletTool& tableTool)
+int32_t EventPackage::PackageTabletToolOtherParams(struct libinput_event *event, EventTabletTool& tableTool)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_tablet_tool_event(event);
@@ -173,7 +174,7 @@ int32_t EventPackage::PackageTabletToolOtherParams(libinput_event *event, EventT
     }
     return RET_OK;
 }
-void EventPackage::PackageTabletToolTypeParam(libinput_event *event, EventTabletTool& tableTool)
+void EventPackage::PackageTabletToolTypeParam(struct libinput_event *event, EventTabletTool& tableTool)
 {
     CHKPV(event);
     auto data = libinput_event_get_tablet_tool_event(event);
@@ -220,7 +221,7 @@ void EventPackage::PackageTabletToolTypeParam(libinput_event *event, EventTablet
     }
 }
 
-int32_t EventPackage::PackageTabletToolEvent(libinput_event *event, EventTabletTool& tableTool)
+int32_t EventPackage::PackageTabletToolEvent(struct libinput_event *event, EventTabletTool& tableTool)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_tablet_tool_event(event);
@@ -246,7 +247,7 @@ int32_t EventPackage::PackageTabletToolEvent(libinput_event *event, EventTabletT
     }
     return ret;
 }
-void EventPackage::PackageTabletPadOtherParams(libinput_event *event, EventTabletPad& tabletPad)
+void EventPackage::PackageTabletPadOtherParams(struct libinput_event *event, EventTabletPad& tabletPad)
 {
     CHKPV(event);
     auto data = libinput_event_get_tablet_pad_event(event);
@@ -280,7 +281,7 @@ void EventPackage::PackageTabletPadOtherParams(libinput_event *event, EventTable
     }
 }
 
-int32_t EventPackage::PackageTabletPadEvent(libinput_event *event, EventTabletPad& tabletPad)
+int32_t EventPackage::PackageTabletPadEvent(struct libinput_event *event, EventTabletPad& tabletPad)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_tablet_pad_event(event);
@@ -296,7 +297,7 @@ int32_t EventPackage::PackageTabletPadEvent(libinput_event *event, EventTabletPa
     return RET_OK;
 }
 
-int32_t EventPackage::PackageTabletPadKeyEvent(libinput_event *event, EventKeyboard& key)
+int32_t EventPackage::PackageTabletPadKeyEvent(struct libinput_event *event, EventKeyboard& key)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_tablet_pad_event(event);
@@ -344,7 +345,7 @@ int32_t EventPackage::PackageTabletPadKeyEvent(libinput_event *event, EventKeybo
     return RET_OK;
 }
 
-int32_t EventPackage::PackageJoyStickKeyEvent(libinput_event *event, EventKeyboard& key)
+int32_t EventPackage::PackageJoyStickKeyEvent(struct libinput_event *event, EventKeyboard& key)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_joystick_pointer_button_event(event);
@@ -365,7 +366,7 @@ int32_t EventPackage::PackageJoyStickKeyEvent(libinput_event *event, EventKeyboa
     return RET_OK;
 }
 
-int32_t EventPackage::PackagePointerEventMotion(libinput_event *event, EventPointer& point)
+int32_t EventPackage::PackagePointerEventMotion(struct libinput_event *event, EventPointer& point)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_pointer_event(event);
@@ -379,7 +380,7 @@ int32_t EventPackage::PackagePointerEventMotion(libinput_event *event, EventPoin
     return RET_OK;
 }
 
-int32_t EventPackage::PackagePointerEventMotionAbs(libinput_event *event, EventPointer& point)
+int32_t EventPackage::PackagePointerEventMotionAbs(struct libinput_event *event, EventPointer& point)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_pointer_event(event);
@@ -393,7 +394,7 @@ int32_t EventPackage::PackagePointerEventMotionAbs(libinput_event *event, EventP
     return RET_OK;
 }
 
-int32_t EventPackage::PackagePointerEventButton(libinput_event *event, EventPointer& point)
+int32_t EventPackage::PackagePointerEventButton(struct libinput_event *event, EventPointer& point)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_pointer_event(event);
@@ -417,7 +418,7 @@ int32_t EventPackage::PackagePointerEventButton(libinput_event *event, EventPoin
     return RET_OK;
 }
 
-int32_t EventPackage::PackagePointerEventAxis(libinput_event *event, EventPointer& point)
+int32_t EventPackage::PackagePointerEventAxis(struct libinput_event *event, EventPointer& point)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_pointer_event(event);
@@ -465,7 +466,7 @@ int32_t EventPackage::PackagePointerEventAxis(libinput_event *event, EventPointe
     return RET_OK;
 }
 
-int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event, EventJoyStickAxis& eventJoyStickAxis)
+int32_t EventPackage::PackageJoyStickAxisEvent(struct libinput_event *event, EventJoyStickAxis& eventJoyStickAxis)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto joyEvent = libinput_event_get_joystick_axis_event(event);
@@ -504,7 +505,7 @@ int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event, EventJoySt
     return RET_OK;
 }
 
-void EventPackage::PackageTouchEventType(int32_t type, libinput_event_touch *data, EventTouch& touch)
+void EventPackage::PackageTouchEventType(int32_t type, struct libinput_event_touch *data, EventTouch& touch)
 {
     CHKPV(data);
     switch (type) {
@@ -546,7 +547,7 @@ void EventPackage::PackageTouchEventType(int32_t type, libinput_event_touch *dat
     return;
 }
 
-int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch)
+int32_t EventPackage::PackageTouchEvent(struct libinput_event *event, EventTouch& touch)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(event);
@@ -605,7 +606,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
     return RET_OK;
 }
 
-int32_t EventPackage::PackagePointerEvent(libinput_event *event, EventPointer& point)
+int32_t EventPackage::PackagePointerEvent(struct libinput_event *event, EventPointer& point)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto rDevRet = PackageEventDeviceInfo<EventPointer>(event, point);
@@ -641,7 +642,20 @@ int32_t EventPackage::PackagePointerEvent(libinput_event *event, EventPointer& p
     return ret;
 }
 
-int32_t EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& gesture)
+static int32_t PackageGestureSwipeUpdateEvent(struct libinput_event_gesture* data, EventGesture& gesture)
+{
+    MMI_LOGI("Three finger slide event update");
+    gesture.delta.x = libinput_event_gesture_get_dx(data);
+    gesture.delta.y = libinput_event_gesture_get_dy(data);
+    gesture.deltaUnaccel.x = libinput_event_gesture_get_dx_unaccelerated(data);
+    gesture.deltaUnaccel.y = libinput_event_gesture_get_dy_unaccelerated(data);
+    struct sloted_coords_info* pSoltTouches = libinput_event_gesture_get_solt_touches(data);
+    CHKPR(pSoltTouches, ERROR_NULL_POINTER);
+    FillEventSlotedCoordsInfo(*pSoltTouches, gesture.soltTouches);
+    return RET_OK;
+}
+
+int32_t EventPackage::PackageGestureEvent(struct libinput_event *event, EventGesture& gesture)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_gesture_event(event);
@@ -674,14 +688,8 @@ int32_t EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& g
         }
         /* Third, it refers to the use of requirements, and the code is reserved */
         case LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE: {
-            MMI_LOGI("Three finger slide event update");
-            gesture.delta.x = libinput_event_gesture_get_dx(data);
-            gesture.delta.y = libinput_event_gesture_get_dy(data);
-            gesture.deltaUnaccel.x = libinput_event_gesture_get_dx_unaccelerated(data);
-            gesture.deltaUnaccel.y = libinput_event_gesture_get_dy_unaccelerated(data);
-            sloted_coords_info* pSoltTouches = libinput_event_gesture_get_solt_touches(data);
-            CHKPR(pSoltTouches, ERROR_NULL_POINTER);
-            FillEventSlotedCoordsInfo(*pSoltTouches, gesture.soltTouches);
+            ret = PackageGestureSwipeUpdateEvent(data, gesture);
+            CHKR(ret == RET_OK, ret, ret);
             break;
         }
         /* Third, it refers to the use of requirements, and the code is reserved */
@@ -698,7 +706,7 @@ int32_t EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& g
     return RET_OK;
 }
 
-int32_t EventPackage::PackageDeviceManageEvent(libinput_event *event, DeviceManage& deviceManage)
+int32_t EventPackage::PackageDeviceManageEvent(struct libinput_event *event, DeviceManage& deviceManage)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto ret = PackageEventDeviceInfo<DeviceManage>(event, deviceManage);
@@ -709,7 +717,7 @@ int32_t EventPackage::PackageDeviceManageEvent(libinput_event *event, DeviceMana
     return RET_OK;
 }
 
-int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key)
+int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, EventKeyboard& key)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_keyboard_event(event);
@@ -739,7 +747,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key)
     return RET_OK;
 }
 
-int32_t EventPackage::PackageKeyEvent(libinput_event *event, std::shared_ptr<KeyEvent> kevn)
+int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, std::shared_ptr<KeyEvent> kevn)
 {
     MMI_LOGD("enter");
     CHKPR(event, PARAM_INPUT_INVALID);
