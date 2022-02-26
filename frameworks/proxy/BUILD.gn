@@ -154,9 +154,7 @@ ohos_unittest("ut-mmi-proxy-out") {
     cflags += [ "-DOHOS_BUILD_AI" ]
   }
 
-  sources = [
-    "module_loader/test/mmi_client_test.cpp",
-  ]
+  sources = [ "module_loader/test/mmi_client_test.cpp" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
