@@ -131,7 +131,7 @@ bool MMIService::InitLibinputService()
     MMI_LOGD("HDF Init");
     hdfEventManager.SetupCallback();
 #endif
-    CHKF(input_.Init(std::bind(&InputEventHandler::OnEvent, inputEventHdr_, std::placeholders::_1),
+    CHKF(input_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
          DEF_INPUT_SEAT), LIBINPUT_INIT_FAIL);
     auto inputFd = input_.GetInputFd();
     auto ret = AddEpoll(EPOLL_EVENT_INPUT, inputFd);
@@ -170,8 +170,7 @@ int32_t MMIService::Init()
 #endif // OHOS_BUILD_AI
 
     MMI_LOGD("InputEventHandler Init");
-    inputEventHdr_ = OHOS::MMI::InputEventHandler::GetInstance();
-    CHKR(inputEventHdr_->Init(*this), INPUT_EVENT_HANDLER_INIT_FAIL, INPUT_EVENT_HANDLER_INIT_FAIL);
+    InputHandler->Init(*this);
 
     MMI_LOGD("ServerMsgHandler Init");
     CHKR(sMsgHandler_.Init(*this), SVR_MSG_HANDLER_INIT_FAIL, SVR_MSG_HANDLER_INIT_FAIL);
@@ -219,8 +218,8 @@ void MMIService::OnStop()
     MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
 
     UdsStop();
-    if (inputEventHdr_ != nullptr) {
-        inputEventHdr_->Clear();
+    if (InputHandler != nullptr) {
+        InputHandler->Clear();
     }
     input_.Stop();
     state_ = ServiceRunningState::STATE_NOT_START;
@@ -304,17 +303,17 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
 
 int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    if (inputEventHdr_ == nullptr) {
-        MMI_LOGE("inputEventHdr_ is nullptr");
+    if (InputHandler == nullptr) {
+        MMI_LOGE("InputHandler is nullptr");
         return ERROR_NULL_POINTER;
     }
-    return inputEventHdr_->AddInputEventFilter(filter);
+    return InputHandler->AddInputEventFilter(filter);
 }
 
 void MMIService::OnTimer()
 {
-    if (inputEventHdr_ != nullptr) {
-        inputEventHdr_->OnCheckEventReport();
+    if (InputHandler != nullptr) {
+        InputHandler->OnCheckEventReport();
     }
     TimerMgr->ProcessTimers();
 }
