@@ -43,7 +43,7 @@ private:
     void DrawManager();
 
 private:
-    sptr<OHOS::Rosen::Window> drawWindow_;
+    sptr<OHOS::Rosen::Window> drawWindow_ = nullptr;
     bool hasDisplay_ { false };
     int32_t displayId_;
     int32_t displayWidth_;

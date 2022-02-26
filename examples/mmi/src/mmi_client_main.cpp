@@ -353,7 +353,7 @@ public:
         }
     }
 private:
-    sptr<MMIToken> remoteObject_;
+    sptr<MMIToken> remoteObject_ = nullptr;
     int32_t windowId_;
     std::map<std::string, StandEventPtr> handerMap_;
 };

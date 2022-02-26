@@ -72,7 +72,7 @@ private:
     EventPackage eventPackage_;
     KeyEventValueTransformation xkbKeyboardHandlerKey_;
     NotifyDeviceChange notifyDeviceChange_;
-    std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent_;
+    std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent_ = nullptr;
 
     uint64_t idSeed_ = 0;
     int32_t eventType_ = 0;
