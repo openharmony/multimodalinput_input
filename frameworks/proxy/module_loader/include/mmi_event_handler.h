@@ -38,6 +38,8 @@ public:
     virtual ~MMIEventHandler();
     DISALLOW_COPY_AND_MOVE(MMIEventHandler);
 
+    const std::string& GetErrorStr(uint32_t errCode) const;
+
 protected:
     void OnReconnect(const AppExecFwk::InnerEvent::Pointer &event);
     void OnTimer(const AppExecFwk::InnerEvent::Pointer &event);
