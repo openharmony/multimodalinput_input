@@ -28,12 +28,12 @@ public:
     explicit TouchTransformPointProcessor(int32_t deviceId);
     DISALLOW_COPY_AND_MOVE(TouchTransformPointProcessor);
     ~TouchTransformPointProcessor();
-    std::shared_ptr<PointerEvent> OnLibinputTouchEvent(libinput_event *event);
+    std::shared_ptr<PointerEvent> OnLibinputTouchEvent(struct libinput_event *event);
     void SetPointEventSource(int32_t sourceType);
 private:
-    bool OnEventTouchDown(libinput_event *event);
-    bool OnEventTouchMotion(libinput_event *event);
-    bool OnEventTouchUp(libinput_event *event);
+    bool OnEventTouchDown(struct libinput_event *event);
+    bool OnEventTouchMotion(struct libinput_event *event);
+    bool OnEventTouchUp(struct libinput_event *event);
 private:
     int32_t deviceId_;
     std::shared_ptr<PointerEvent> pointerEvent_;

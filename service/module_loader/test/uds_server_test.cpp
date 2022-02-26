@@ -45,7 +45,7 @@ public:
         OnRecv(fd,  buf, size);
     }
 
-    void OnEventUnitTest(const epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
+    void OnEventUnitTest(const struct epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
     {
         OnEvent(ev, bufMap);
     }
@@ -163,7 +163,7 @@ HWTEST_F(UDSServerTest, OnRecv, TestSize.Level1)
 
 HWTEST_F(UDSServerTest, OnEvent, TestSize.Level1)
 {
-    epoll_event ev = {};
+    struct epoll_event ev = {};
     ev.events = 5;
     std::map<int32_t, StreamBufData> bufMap;
 
