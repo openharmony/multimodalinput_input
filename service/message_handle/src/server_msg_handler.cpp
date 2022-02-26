@@ -204,9 +204,9 @@ int32_t OHOS::MMI::ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt
     CHKPR(sess, ERROR_NULL_POINTER);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     const int32_t processingCode = MMIHdiInject->ManageHdfInject(sess, pkt);
-    NetPacket newPacket(MmiMessageId::HDI_INJECT);
-    newPacket << processingCode;
-    if (!sess->SendMsg(newPacket)) {
+    NetPacket pkt(MmiMessageId::HDI_INJECT);
+    pkt << processingCode;
+    if (!sess->SendMsg(pkt)) {
         MMI_LOGE("OnHdiInject reply messaage error");
         return RET_ERR;
     }
@@ -382,9 +382,9 @@ int32_t OHOS::MMI::ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetP
     int32_t fd = sess->GetFd();
     if (tagPackHead.idMsg != MmiMessageId::INVALID) {
         TagPackHead tagPackHeadAck = { MmiMessageId::INVALID, {fd}};
-        NetPacket pktAck(MmiMessageId::GET_MMI_INFO_ACK);
-        pktAck << tagPackHeadAck;
-        if (!udsServer_->SendMsg(fd, pktAck)) {
+        NetPacket pkt(MmiMessageId::GET_MMI_INFO_ACK);
+        pkt << tagPackHeadAck;
+        if (!udsServer_->SendMsg(fd, pkt)) {
             MMI_LOGE("Sending message failed");
             return MSG_SEND_FAIL;
         }
@@ -723,28 +723,28 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket
 #ifdef OHOS_WESTEN_MODEL
     InputDevMgr->GetInputDeviceIdsAsync([userData, sess, this](std::vector<int32_t> ids) {
         CHKPR(sess, ERROR_NULL_POINTER);
-        NetPacket pkt1(MmiMessageId::INPUT_DEVICE_IDS);
+        NetPacket pkt2(MmiMessageId::INPUT_DEVICE_IDS);
         int32_t num = static_cast<int32_t>(ids.size());
-        CHKR(pkt1.Write(userData), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt1.Write(num), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt2.Write(userData), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt2.Write(num), STREAM_BUF_WRITE_FAIL, RET_ERR);
         for (auto item : ids) {
-            CHKR(pkt1.Write(item), STREAM_BUF_WRITE_FAIL, RET_ERR);
+            CHKR(pkt2.Write(item), STREAM_BUF_WRITE_FAIL, RET_ERR);
         }
-        if (!sess->SendMsg(pkt1)) {
+        if (!sess->SendMsg(pkt2)) {
             MMI_LOGE("Sending failed!");
             return MSG_SEND_FAIL;
         }
     });
 #else
     std::vector<int32_t> ids = InputDevMgr->GetInputDeviceIds();
-    NetPacket pkt1(MmiMessageId::INPUT_DEVICE_IDS);
+    NetPacket pkt2(MmiMessageId::INPUT_DEVICE_IDS);
     int32_t size = static_cast<int32_t>(ids.size());
-    CHKR(pkt1.Write(userData), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pkt1.Write(size), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt2.Write(userData), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt2.Write(size), STREAM_BUF_WRITE_FAIL, RET_ERR);
     for (const auto& item : ids) {
-        CHKR(pkt1.Write(item), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt2.Write(item), STREAM_BUF_WRITE_FAIL, RET_ERR);
     }
-    if (!sess->SendMsg(pkt1)) {
+    if (!sess->SendMsg(pkt2)) {
         MMI_LOGE("Sending failed");
         return MSG_SEND_FAIL;
     }

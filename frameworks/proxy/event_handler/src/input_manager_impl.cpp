@@ -159,55 +159,55 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> p
     MMI_LOGD("leave");
 }
 
-int32_t InputManagerImpl::PackDisplayData(OHOS::MMI::NetPacket &ckt)
+int32_t InputManagerImpl::PackDisplayData(OHOS::MMI::NetPacket &pkt)
 {
-    if (PackPhysicalDisplay(ckt) == RET_ERR) {
+    if (PackPhysicalDisplay(pkt) == RET_ERR) {
         MMI_LOGE("pack physical display failed");
         return RET_ERR;
     }
-    return PackLogicalDisplay(ckt);
+    return PackLogicalDisplay(pkt);
 }
 
-int32_t InputManagerImpl::PackPhysicalDisplay(NetPacket &ckt)
+int32_t InputManagerImpl::PackPhysicalDisplay(NetPacket &pkt)
 {
     int32_t num = physicalDisplays_.size();
-    CHKR(ckt.Write(num), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt.Write(num), STREAM_BUF_WRITE_FAIL, RET_ERR);
     for (int32_t i = 0; i < num; i++) {
-        CHKR(ckt.Write(physicalDisplays_[i].id), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].leftDisplayId), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].upDisplayId), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].topLeftX), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].topLeftY), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].width), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].height), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].name), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].seatId), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].seatName), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].logicWidth), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].logicHeight), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(physicalDisplays_[i].direction), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].id), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].leftDisplayId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].upDisplayId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].topLeftX), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].topLeftY), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].width), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].height), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].name), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].seatId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].seatName), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].logicWidth), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].logicHeight), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(physicalDisplays_[i].direction), STREAM_BUF_WRITE_FAIL, RET_ERR);
     }
     return RET_OK;
 }
 
-int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &ckt)
+int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
 {
     int32_t num = logicalDisplays_.size();
-    CHKR(ckt.Write(num), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt.Write(num), STREAM_BUF_WRITE_FAIL, RET_ERR);
     for (int32_t i = 0; i < num; i++) {
-        CHKR(ckt.Write(logicalDisplays_[i].id), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(logicalDisplays_[i].topLeftX), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(logicalDisplays_[i].topLeftY), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(logicalDisplays_[i].width), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(logicalDisplays_[i].height), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(logicalDisplays_[i].name), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(logicalDisplays_[i].seatId), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(logicalDisplays_[i].seatName), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(ckt.Write(logicalDisplays_[i].focusWindowId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(logicalDisplays_[i].id), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(logicalDisplays_[i].topLeftX), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(logicalDisplays_[i].topLeftY), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(logicalDisplays_[i].width), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(logicalDisplays_[i].height), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(logicalDisplays_[i].name), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(logicalDisplays_[i].seatId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(logicalDisplays_[i].seatName), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(logicalDisplays_[i].focusWindowId), STREAM_BUF_WRITE_FAIL, RET_ERR);
         int32_t numWindow = logicalDisplays_[i].windowsInfo_.size();
-        CHKR(ckt.Write(numWindow), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(numWindow), STREAM_BUF_WRITE_FAIL, RET_ERR);
         for (int32_t j = 0; j < numWindow; j++) {
-            CHKR(ckt.Write(logicalDisplays_[i].windowsInfo_[j]), STREAM_BUF_WRITE_FAIL, RET_ERR);
+            CHKR(pkt.Write(logicalDisplays_[i].windowsInfo_[j]), STREAM_BUF_WRITE_FAIL, RET_ERR);
         }
     }
     return RET_OK;
@@ -389,12 +389,12 @@ void InputManagerImpl::SendDisplayInfo()
         return;
     }
 
-    OHOS::MMI::NetPacket ckt(MmiMessageId::DISPLAY_INFO);
-    if (PackDisplayData(ckt) == RET_ERR) {
+    OHOS::MMI::NetPacket pkt(MmiMessageId::DISPLAY_INFO);
+    if (PackDisplayData(pkt) == RET_ERR) {
         MMI_LOGE("pack display info failed");
         return;
     }
-    MultimodalEventHandler::GetInstance().GetMMIClient()->SendMessage(ckt);
+    MultimodalEventHandler::GetInstance().GetMMIClient()->SendMessage(pkt);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -294,9 +294,9 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
         MMI_LOGW("Failed to obtain AppInfo, desWindow:%{public}d", focusId);
         return RET_OK; // DeviceAdded event will be discarded if appInfo.fd == RET_ERR
     }
-    NetPacket newPacket(MmiMessageId::ON_DEVICE_ADDED);
-    newPacket << deviceManage << appInfo.abilityId << focusId << appInfo.fd << sysStartProcessTime;
-    if (!SendMsg(appInfo.fd, newPacket)) {
+    NetPacket pkt(MmiMessageId::ON_DEVICE_ADDED);
+    pkt << deviceManage << appInfo.abilityId << focusId << appInfo.fd << sysStartProcessTime;
+    if (!SendMsg(appInfo.fd, pkt)) {
         MMI_LOGE("Sending structure of DeviceManage failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
@@ -334,9 +334,9 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
         MMI_LOGW("Failed to obtain AppInfo, desWindow:%{public}d", focusId);
         return RET_OK; // DeviceRemoved event will be discarded if appInfo.fd == RET_ERR
     }
-    NetPacket newPacket(MmiMessageId::ON_DEVICE_REMOVED);
-    newPacket << deviceManage << appInfo.abilityId << focusId << appInfo.fd << sysStartProcessTime;
-    if (!SendMsg(appInfo.fd, newPacket)) {
+    NetPacket pkt(MmiMessageId::ON_DEVICE_REMOVED);
+    pkt << deviceManage << appInfo.abilityId << focusId << appInfo.fd << sysStartProcessTime;
+    if (!SendMsg(appInfo.fd, pkt)) {
         MMI_LOGE("Sending structure of DeviceManage failed, errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }

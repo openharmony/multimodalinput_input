@@ -154,10 +154,10 @@ int32_t EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& ud
                  idMsg, fd);
 
         if (AppRegs->IsMultimodeInputReady(idMsg, fd, registeredEvent.occurredTime, preHandlerTime)) {
-            NetPacket newPacket(idMsg);
+            NetPacket pkt(idMsg);
             int32_t type = inputDeviceType;
-            newPacket << type << registeredEvent << fd << appInfo.windowId << appInfo.abilityId << preHandlerTime;
-            CHKR(udsServer.SendMsg(fd, newPacket), MSG_SEND_FAIL, MSG_SEND_FAIL);
+            pkt << type << registeredEvent << fd << appInfo.windowId << appInfo.abilityId << preHandlerTime;
+            CHKR(udsServer.SendMsg(fd, pkt), MSG_SEND_FAIL, MSG_SEND_FAIL);
         }
     }
     return RET_OK;
@@ -258,10 +258,10 @@ int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, struct libin
              appInfo.fd, preHandlerTime);
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, tabletPad.time, preHandlerTime)) {
-        NetPacket newPacket(MmiMessageId::ON_TOUCH);
+        NetPacket pkt(MmiMessageId::ON_TOUCH);
         int32_t inputType = INPUT_DEVICE_CAP_TOUCH_PAD;
-        newPacket << inputType << tabletPad << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
-        if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
+        pkt << inputType << tabletPad << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
+        if (!udsServer.SendMsg(appInfo.fd, pkt)) {
             MMI_LOGE("Sending structure of EventTabletPad failed! errCode:%{public}d", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
         }
@@ -292,10 +292,10 @@ int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, struct libinp
     PrintEventJoyStickAxisInfo(eventJoyStickAxis, appInfo.fd, appInfo.abilityId, focusId, preHandlerTime);
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, eventJoyStickAxis.time, preHandlerTime)) {
-        NetPacket newPacket(MmiMessageId::ON_TOUCH);
+        NetPacket pkt(MmiMessageId::ON_TOUCH);
         int32_t inputType = INPUT_DEVICE_CAP_JOYSTICK;
-        newPacket << inputType << eventJoyStickAxis << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
-        if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
+        pkt << inputType << eventJoyStickAxis << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
+        if (!udsServer.SendMsg(appInfo.fd, pkt)) {
             MMI_LOGE("Sending structure of EventJoyStickAxis failed! errCode:%{public}d", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
         }
@@ -322,12 +322,12 @@ int32_t EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, struct libi
     standardEvent_.StandardTouchEvent(event, inputEvent);
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, tableTool.time, preHandlerTime)) {
-        NetPacket newPacket(MmiMessageId::ON_TOUCH);
+        NetPacket pkt(MmiMessageId::ON_TOUCH);
         int32_t inputType = INPUT_DEVICE_CAP_TABLET_TOOL;
-        newPacket << inputType << inputEvent.curRventType << tableTool << appInfo.abilityId
+        pkt << inputType << inputEvent.curRventType << tableTool << appInfo.abilityId
             << focusId << appInfo.fd << preHandlerTime;
         if (inputEvent.curRventType > 0) {
-            newPacket << inputEvent;
+            pkt << inputEvent;
         }
 
 #ifdef DEBUG_CODE_TEST
@@ -350,7 +350,7 @@ int32_t EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, struct libi
                  tableTool.axes.wheel_discrete, tableTool.axes.size.major, tableTool.axes.size.minor,
                  tableTool.proximity_state, tableTool.tip_state, tableTool.state, tableTool.seat_button_count,
                  preHandlerTime, appInfo.fd);
-        if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
+        if (!udsServer.SendMsg(appInfo.fd, pkt)) {
             MMI_LOGE("Sending structure of EventTabletTool failed! errCode:%{public}d", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
         }
@@ -389,8 +389,8 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         HandlePointerEventTrace(point);
         return RET_OK;
     }
-    NetPacket newPacket(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::Marshalling(point, newPacket);
+    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
+    InputEventDataTransformation::Marshalling(point, pkt);
     HandlePointerEventTrace(point);
     auto udsServer = InputHandler->GetUDSServer();
     if (udsServer == nullptr) {
@@ -402,7 +402,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         return RET_ERR;
     }
 
-    if (!udsServer->SendMsg(fd, newPacket)) {
+    if (!udsServer->SendMsg(fd, pkt)) {
         MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
@@ -420,9 +420,9 @@ int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
         MMI_LOGE("Failed to find fd, errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
     }
-    NetPacket newPacket(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::Marshalling(point, newPacket);
-    if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
+    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
+    InputEventDataTransformation::Marshalling(point, pkt);
+    if (!udsServer.SendMsg(appInfo.fd, pkt)) {
         MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
@@ -454,12 +454,12 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, struct libinpu
         KeyEventValueTransformations KeyEventValue = {};
         KeyEventValue = KeyValueTransformationInput(point.button);
         point.button = KeyEventValue.keyValueOfSys;
-        NetPacket newPacket(MmiMessageId::ON_TOUCH);
+        NetPacket pkt(MmiMessageId::ON_TOUCH);
         int32_t inputType = INPUT_DEVICE_CAP_POINTER;
-        newPacket << inputType << inputEvent.curRventType << point << appInfo.abilityId
+        pkt << inputType << inputEvent.curRventType << point << appInfo.abilityId
             << desWindowId << appInfo.fd << preHandlerTime;
         if (inputEvent.curRventType > 0) {
-            newPacket << inputEvent;
+            pkt << inputEvent;
         }
         MMI_LOGD("4.event dispatcher of server, eventPointer:time:%{public}" PRId64 ",deviceType:%{public}u,"
                  "deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,"
@@ -472,7 +472,7 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, struct libinpu
                  point.state, point.source, point.delta.x, point.delta.y, point.delta_raw.x,
                  point.delta_raw.y, point.absolute.x, point.absolute.y, point.discrete.x,
                  point.discrete.y, appInfo.fd, preHandlerTime);
-        if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
+        if (!udsServer.SendMsg(appInfo.fd, pkt)) {
             MMI_LOGE("Sending structure of EventPointer failed! errCode:%{public}d", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
         }
@@ -525,10 +525,10 @@ int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, struct libinpu
     PrintEventSlotedCoordsInfo(gesture.soltTouches);
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, gesture.time, preHandlerTime)) {
-        NetPacket newPacket(MmiMessageId::ON_TOUCH);
+        NetPacket pkt(MmiMessageId::ON_TOUCH);
         int32_t inputType = INPUT_DEVICE_CAP_GESTURE;
-        newPacket << inputType << gesture << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
-        if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
+        pkt << inputType << gesture << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
+        if (!udsServer.SendMsg(appInfo.fd, pkt)) {
             MMI_LOGE("Sending structure of EventGesture failed! errCode:%{public}d", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
         }
@@ -605,18 +605,18 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, struct libinput_
     }
     MMI_LOGD("DispatchTouchEvent focusId:%{public}d,fd:%{public}d", touchFocusId, appInfo.fd);
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, touch.time, preHandlerTime)) {
-        NetPacket newPacket(MmiMessageId::ON_TOUCH);
+        NetPacket pkt(MmiMessageId::ON_TOUCH);
         int32_t fingerCount = MMIRegEvent->GetTouchInfoSizeDeviceId(touch.deviceId);
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
             fingerCount++;
         }
         int32_t inputType = INPUT_DEVICE_CAP_TOUCH;
-        newPacket << inputType << fingerCount;
+        pkt << inputType << fingerCount;
         POINT_EVENT_TYPE pointEventType = EVENT_TYPE_INVALID;
         OnEventTouchGetPointEventType(touch, fingerCount, pointEventType);
         int32_t eventType = pointEventType;
-        newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime << touch.seatSlot;
-        ret = DispatchTouchEvent(touch, appInfo.fd, preHandlerTime, udsServer, newPacket);
+        pkt << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime << touch.seatSlot;
+        ret = DispatchTouchEvent(touch, appInfo.fd, preHandlerTime, udsServer, pkt);
     }
     return ret;
 }
