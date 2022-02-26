@@ -463,7 +463,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent>
     return appInfo.fd;
 #else
     MMI_LOGD("enter");
-    int32_t pid = GetPidUpdateTarget(inputEvent);
+    int32_t pid = GetPidAndUpdateTarget(inputEvent);
     CHKR(pid > 0, PID_OBTAIN_FAIL, RET_ERR);
     int32_t fd = udsServer_->GetClientFd(pid);
     CHKR(fd >= 0, FD_OBTAIN_FAIL, RET_ERR);
@@ -472,7 +472,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent>
 #endif
 }
 
-int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<InputEvent> inputEvent)
+int32_t OHOS::MMI::InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent)
 {
     MMI_LOGD("enter");
     CHKPR(inputEvent, ERROR_NULL_POINTER);
@@ -481,13 +481,13 @@ int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<Input
         return RET_ERR;
     }
 
-    if (inputEvent->GetTargetDisplayId() == -1) {
-        MMI_LOGD("target display is -1");
+    if (inputEvent->GetTargetDisplayId() < 0) {
+        MMI_LOGD("Either the first pressed key or inject event being not specified by display");
         inputEvent->SetTargetDisplayId(logicalDisplays_[0].id);
         inputEvent->SetTargetWindowId(logicalDisplays_[0].focusWindowId);
         auto it = windowInfos_.find(logicalDisplays_[0].focusWindowId);
         if (it == windowInfos_.end()) {
-            MMI_LOGE("can't find winfow info, focuswindowId:%{public}d", logicalDisplays_[0].focusWindowId);
+            MMI_LOGE("can't find window info, focuswindowId:%{public}d", logicalDisplays_[0].focusWindowId);
             return RET_ERR;
         }
         inputEvent->SetAgentWindowId(it->second.agentWindowId);
@@ -500,18 +500,18 @@ int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<Input
             continue;
         }
         MMI_LOGD("target display:%{public}d", inputEvent->GetTargetDisplayId());
-        inputEvent->SetTargetWindowId(item.focusWindowId);
         auto it = windowInfos_.find(item.focusWindowId);
         if (it == windowInfos_.end()) {
-            MMI_LOGE("can't find winfow info, focuswindowId:%{public}d", item.focusWindowId);
+            MMI_LOGE("can't find window info, focuswindowId:%{public}d", item.focusWindowId);
             return RET_ERR;
         }
+        inputEvent->SetTargetWindowId(item.focusWindowId);
         inputEvent->SetAgentWindowId(it->second.agentWindowId);
         MMI_LOGD("pid:%{public}d", it->second.pid);
         return it->second.pid;
     }
 
-    MMI_LOGE("leave,cant't find logical display,target display:%{public}d", inputEvent->GetTargetDisplayId());
+    MMI_LOGE("leave,can't find logical display,target display:%{public}d", inputEvent->GetTargetDisplayId());
     return RET_ERR;
 }
 

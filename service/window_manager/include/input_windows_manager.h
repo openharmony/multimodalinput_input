@@ -149,7 +149,7 @@ public:
     void Dump(int32_t fd);
 
     /*********************************新框架接口添加*************************** */
-    int32_t GetPidUpdateTarget(std::shared_ptr<InputEvent> inputEvent);
+    int32_t GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent);
     int32_t UpdateTarget(std::shared_ptr<InputEvent> inputEvent);
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
         const std::vector<LogicalDisplayInfo> &logicalDisplays);
