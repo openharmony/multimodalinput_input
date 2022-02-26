@@ -18,7 +18,6 @@
 #include "proto.h"
 #include "util.h"
 
-using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
@@ -35,21 +34,21 @@ void InjectionEventDispatch::InitManageFunction()
 {
     InjectFunctionMap funs[] = {
 #ifdef OHOS_BUILD_AI
-        {"aisensor", SEND_EVENT_TO_HDI, false, bind(&InjectionEventDispatch::OnAisensor, this)},
-        {"aisensor-all", SEND_EVENT_TO_HDI, true, bind(&InjectionEventDispatch::OnAisensorAll, this)},
-        {"aisensor-each", SEND_EVENT_TO_HDI, true, bind(&InjectionEventDispatch::OnAisensorEach, this)},
+        {"aisensor", SEND_EVENT_TO_HDI, false, std::bind(&InjectionEventDispatch::OnAisensor, this)},
+        {"aisensor-all", SEND_EVENT_TO_HDI, true, std::bind(&InjectionEventDispatch::OnAisensorAll, this)},
+        {"aisensor-each", SEND_EVENT_TO_HDI, true, std::bind(&InjectionEventDispatch::OnAisensorEach, this)},
 #endif
-        {"hdi", SEND_EVENT_TO_HDI, true, bind(&InjectionEventDispatch::OnHdi, this)},
-        {"hdi-hot", SEND_EVENT_TO_HDI, true, bind(&InjectionEventDispatch::OnHdiHot, this)},
-        {"hdi-status", SEND_EVENT_TO_HDI, true, bind(&InjectionEventDispatch::OnHdiStatus, this)},
-        {"knuckle-all", SEND_EVENT_TO_HDI, true, bind(&InjectionEventDispatch::OnKnuckleAll, this)},
-        {"knuckle-each", SEND_EVENT_TO_HDI, true, bind(&InjectionEventDispatch::OnKnuckleEach, this)},
-        {"help", SEND_EVENT_TO_DEVICE, false, bind(&InjectionEventDispatch::OnHelp, this)},
+        {"hdi", SEND_EVENT_TO_HDI, true, std::bind(&InjectionEventDispatch::OnHdi, this)},
+        {"hdi-hot", SEND_EVENT_TO_HDI, true, std::bind(&InjectionEventDispatch::OnHdiHot, this)},
+        {"hdi-status", SEND_EVENT_TO_HDI, true, std::bind(&InjectionEventDispatch::OnHdiStatus, this)},
+        {"knuckle-all", SEND_EVENT_TO_HDI, true, std::bind(&InjectionEventDispatch::OnKnuckleAll, this)},
+        {"knuckle-each", SEND_EVENT_TO_HDI, true, std::bind(&InjectionEventDispatch::OnKnuckleEach, this)},
+        {"help", SEND_EVENT_TO_DEVICE, false, std::bind(&InjectionEventDispatch::OnHelp, this)},
 #ifdef OHOS_BUILD_HDF
-        {"json", SEND_EVENT_TO_HDI, true, bind(&InjectionEventDispatch::OnJson, this)},
+        {"json", SEND_EVENT_TO_HDI, true, std::bind(&InjectionEventDispatch::OnJson, this)},
 #else
-        {"sendevent", SEND_EVENT_TO_DEVICE, false, bind(&InjectionEventDispatch::OnSendEvent, this)},
-        {"json", SEND_EVENT_TO_DEVICE, false, bind(&InjectionEventDispatch::OnJson, this)},
+        {"sendevent", SEND_EVENT_TO_DEVICE, false, std::bind(&InjectionEventDispatch::OnSendEvent, this)},
+        {"json", SEND_EVENT_TO_DEVICE, false, std::bind(&InjectionEventDispatch::OnJson, this)},
 #endif
     };
 
@@ -61,7 +60,7 @@ void InjectionEventDispatch::InitManageFunction()
 int32_t InjectionEventDispatch::OnJson()
 {
     MMI_LOGD("Enter");
-    const string path = injectArgvs_.at(JSON_FILE_PATH_INDEX);
+    const std::string path = injectArgvs_.at(JSON_FILE_PATH_INDEX);
     std::ifstream reader(path);
     if (!reader) {
         MMI_LOGE("json file is empty");
@@ -76,7 +75,7 @@ int32_t InjectionEventDispatch::OnJson()
     return ret;
 }
 
-bool InjectionEventDispatch::GetStartSocketPermission(string id)
+bool InjectionEventDispatch::GetStartSocketPermission(std::string id)
 {
     auto it = needStartSocket_.find(id);
     if (it == needStartSocket_.end()) {
@@ -86,7 +85,7 @@ bool InjectionEventDispatch::GetStartSocketPermission(string id)
     return it->second;
 }
 
-string InjectionEventDispatch::GetFunId()
+std::string InjectionEventDispatch::GetFunId()
 {
     return funId_;
 }
@@ -95,7 +94,7 @@ void InjectionEventDispatch::HandleInjectCommandItems()
 {
     MMI_LOGD("Enter");
 
-    string id = GetFunId();
+    std::string id = GetFunId();
     auto fun = GetFun(id);
     if (!fun) {
         MMI_LOGE("event injection Unknown fuction id:%{public}s", id.c_str());
@@ -112,7 +111,7 @@ void InjectionEventDispatch::HandleInjectCommandItems()
     return;
 }
 
-bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const vector<string> &argv)
+bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const std::vector<std::string> &argv)
 {
     MMI_LOGD("enter");
     if (argc < ARGV_VALID || argv.at(ARGVS_TARGET_INDEX).empty()) {
@@ -122,7 +121,7 @@ bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const vector<strin
 
     bool result = false;
     for (const auto &item : injectFuns_) {
-        string temp(argv.at(ARGVS_TARGET_INDEX));
+        std::string temp(argv.at(ARGVS_TARGET_INDEX));
         if (temp == item.first) {
             funId_ = temp;
             result = true;
@@ -159,7 +158,7 @@ bool InjectionEventDispatch::SendMsg(NetPacket ckt)
 void InjectionEventDispatch::Run()
 {
     MMI_LOGD("enter");
-    string id = GetFunId();
+    std::string id = GetFunId();
     auto fun = GetFun(id);
     if (!fun) {
         MMI_LOGE("event injection Unknown fuction id:%{public}s", id.c_str());
@@ -183,7 +182,7 @@ void InjectionEventDispatch::Run()
     }
 }
 
-int32_t InjectionEventDispatch::ExecuteFunction(string funId)
+int32_t InjectionEventDispatch::ExecuteFunction(std::string funId)
 {
     if (funId.empty()) {
         return RET_ERR;
@@ -208,13 +207,13 @@ int32_t InjectionEventDispatch::ExecuteFunction(string funId)
 int32_t InjectionEventDispatch::OnAisensor()
 {
     MMI_LOGD("Enter");
-    int32_t exRet = RET_ERR;
 
     if (argvNum_ < AI_SENDOR_MIN_ARGV_NUMS) {
         MMI_LOGE("Wrong number of input parameters. errCode:%{public}d", PARAM_INPUT_FAIL);
         return RET_ERR;
     }
-    string flag = injectArgvs_[AI_SENSOR_TARGET_INDEX];
+    int32_t exRet = RET_ERR;
+    std::string flag = injectArgvs_[AI_SENSOR_TARGET_INDEX];
     if (flag == "all") {
         exRet = ExecuteFunction("aisensor-all");
     } else if (flag == "each") {
@@ -229,17 +228,17 @@ int32_t InjectionEventDispatch::OnAisensor()
 int32_t InjectionEventDispatch::OnAisensorOne(MmiMessageId code, uint32_t value)
 {
     MMI_LOGD("enter, code = %u, value = %u", code, value);
-    timeval time;
+    struct timeval time;
     RawInputEvent rawEvent = {};
-    int32_t msgType = MSG_TYPE_DEVICE_INFO;
     gettimeofday(&time, 0);
     rawEvent.ev_type = INPUT_DEVICE_CAP_AI_SENSOR;
     rawEvent.ev_code = static_cast<uint32_t>(code);
     rawEvent.ev_value = value;
     rawEvent.stamp = static_cast<uint32_t>(time.tv_usec);
-    NetPacket cktAi(MmiMessageId::SENIOR_INPUT_FUNC);
-    cktAi << msgType << rawEvent;
-    if (!SendMsg(cktAi)) {
+    NetPacket pkt(MmiMessageId::SENIOR_INPUT_FUNC);
+    int32_t msgType = MSG_TYPE_DEVICE_INFO;
+    pkt << msgType << rawEvent;
+    if (!SendMsg(pkt)) {
         MMI_LOGE("Send AI Msg fail. errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
@@ -248,17 +247,17 @@ int32_t InjectionEventDispatch::OnAisensorOne(MmiMessageId code, uint32_t value)
 
 int32_t InjectionEventDispatch::OnKnuckleOne(MmiMessageId code, uint32_t value)
 {
-    timeval time;
+    struct timeval time;
     RawInputEvent rawEvent = {};
-    int32_t msgType = MSG_TYPE_DEVICE_INFO;
     gettimeofday(&time, 0);
     rawEvent.ev_type = INPUT_DEVICE_CAP_AI_SENSOR;
     rawEvent.ev_code = static_cast<uint32_t>(code);
     rawEvent.ev_value = value;
     rawEvent.stamp = static_cast<uint32_t>(time.tv_usec);
-    NetPacket cktKnuckle(MmiMessageId::SENIOR_INPUT_FUNC);
-    cktKnuckle << msgType << rawEvent;
-    if (!SendMsg(cktKnuckle)) {
+    NetPacket pkt(MmiMessageId::SENIOR_INPUT_FUNC);
+    int32_t msgType = MSG_TYPE_DEVICE_INFO;
+    pkt << msgType << rawEvent;
+    if (!SendMsg(pkt)) {
         MMI_LOGE("Send Knuckle Msg fail. errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
@@ -285,13 +284,13 @@ int32_t InjectionEventDispatch::OnAisensorEach()
     int32_t devIndex = 0;
     int32_t devType = INPUT_DEVICE_CAP_AISENSOR;
 
-    NetPacket cktAiInit(MmiMessageId::SENIOR_INPUT_FUNC);
-    cktAiInit << msgType << devIndex << devType;
-    if (!SendMsg(cktAiInit)) {
+    NetPacket pkt(MmiMessageId::SENIOR_INPUT_FUNC);
+    pkt << msgType << devIndex << devType;
+    if (!SendMsg(pkt)) {
         MMI_LOGE("Send AI Msg fail. errCode:%{public}d", MSG_SEND_FAIL);
     }
 
-    timeval time;
+    struct timeval time;
     RawInputEvent rawEvent = {};
     gettimeofday(&time, 0);
     msgType = MSG_TYPE_DEVICE_INFO;
@@ -299,9 +298,9 @@ int32_t InjectionEventDispatch::OnAisensorEach()
     rawEvent.ev_code = static_cast<uint32_t>(stoi(injectArgvs_[AI_SENSOR_CODE_INDEX]));
     rawEvent.ev_value = static_cast<uint32_t>(stoi(injectArgvs_[AI_SENSOR_VALUE_INDEX]));
     rawEvent.stamp = static_cast<uint32_t>(time.tv_usec);
-    NetPacket cktAi(MmiMessageId::SENIOR_INPUT_FUNC);
-    cktAi << msgType << rawEvent;
-    if (!SendMsg(cktAi)) {
+    NetPacket pkt2(MmiMessageId::SENIOR_INPUT_FUNC);
+    pkt2 << msgType << rawEvent;
+    if (!SendMsg(pkt2)) {
         MMI_LOGE("Send AI Msg fail! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
@@ -328,11 +327,11 @@ int32_t InjectionEventDispatch::OnKnuckleEach()
     int32_t devIndex = 0;
     int32_t devType = INPUT_DEVICE_CAP_KNUCKLE;
 
-    NetPacket cktAiInit(MmiMessageId::SENIOR_INPUT_FUNC);
-    cktAiInit << msgType << devIndex << devType;
-    SendMsg(cktAiInit);
+    NetPacket pkt(MmiMessageId::SENIOR_INPUT_FUNC);
+    pkt << msgType << devIndex << devType;
+    SendMsg(pkt);
 
-    timeval time;
+    struct timeval time;
     RawInputEvent rawEvent = {};
     gettimeofday(&time, 0);
     msgType = MSG_TYPE_DEVICE_INFO;
@@ -340,9 +339,9 @@ int32_t InjectionEventDispatch::OnKnuckleEach()
     rawEvent.ev_code = static_cast<uint32_t>(stoi(injectArgvs_[AI_SENSOR_CODE_INDEX]));
     rawEvent.ev_value = static_cast<uint32_t>(stoi(injectArgvs_[AI_SENSOR_VALUE_INDEX]));
     rawEvent.stamp = static_cast<uint32_t>(time.tv_usec);
-    NetPacket cktKnuckle(MmiMessageId::SENIOR_INPUT_FUNC);
-    cktKnuckle << msgType << rawEvent;
-    if (!SendMsg(cktKnuckle)) {
+    NetPacket pkt2(MmiMessageId::SENIOR_INPUT_FUNC);
+    pkt2 << msgType << rawEvent;
+    if (!SendMsg(pkt2)) {
         MMI_LOGE("Send AI Msg fail! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
@@ -352,7 +351,7 @@ int32_t InjectionEventDispatch::OnKnuckleEach()
 int32_t InjectionEventDispatch::OnHelp()
 {
     InjectionToolsHelpFunc helpFunc;
-    string ret = helpFunc.GetHelpText();
+    std::string ret = helpFunc.GetHelpText();
     MMI_LOGI("%s", ret.c_str());
 
     return RET_OK;
@@ -398,7 +397,7 @@ int32_t InjectionEventDispatch::OnHdi()
         MMI_LOGE("Wrong number of input parameters! errCode:%{public}d", PARAM_INPUT_FAIL);
         return RET_ERR;
     }
-    string hdiFunctionId = "hdi-" + injectArgvs_[HDF_TARGET_INDEX];
+    std::string hdiFunctionId = "hdi-" + injectArgvs_[HDF_TARGET_INDEX];
     int32_t ret = ExecuteFunction(hdiFunctionId);
 
     return ret;
@@ -412,9 +411,9 @@ int32_t InjectionEventDispatch::OnHdiStatus()
         return RET_ERR;
     }
     int32_t sendType = static_cast<int32_t>(SHOW_DEVICE_INFO);
-    NetPacket cktHdi(MmiMessageId::HDI_INJECT);
-    cktHdi << sendType;
-    if (!(SendMsg(cktHdi))) {
+    NetPacket pkt(MmiMessageId::HDI_INJECT);
+    pkt << sendType;
+    if (!(SendMsg(pkt))) {
         MMI_LOGE("hdi hot plug to server errot");
         return RET_OK;
     }
@@ -429,14 +428,14 @@ int32_t InjectionEventDispatch::OnHdiHot()
         return RET_ERR;
     }
 
-    string deviceStatusText = injectArgvs_[HDI_STATUS_INDEX];
+    std::string deviceStatusText = injectArgvs_[HDI_STATUS_INDEX];
     int32_t status = GetDeviceStatus(deviceStatusText);
     if (status == RET_ERR) {
         MMI_LOGE("OnHdiHot status error ,status:%{public}d", status);
         return RET_ERR;
     }
 
-    string deviceNameText = injectArgvs_.at(HDI_DEVICE_NAME_INDEX);
+    std::string deviceNameText = injectArgvs_.at(HDI_DEVICE_NAME_INDEX);
     int32_t index = GetDeviceIndex(deviceNameText);
     MMI_LOGI("OnHdiHot index  = %d", index);
     if (index == RET_ERR) {
@@ -447,9 +446,9 @@ int32_t InjectionEventDispatch::OnHdiHot()
     int32_t sendType = static_cast<int32_t>(SET_HOT_PLUGS);
     uint32_t devIndex = static_cast<uint32_t>(index);
     uint32_t devSatatus = static_cast<uint32_t>(status);
-    NetPacket cktHdi(MmiMessageId::HDI_INJECT);
-    cktHdi << sendType << devIndex << devSatatus;
-    if (!(SendMsg(cktHdi))) {
+    NetPacket pkt(MmiMessageId::HDI_INJECT);
+    pkt << sendType << devIndex << devSatatus;
+    if (!(SendMsg(pkt))) {
         MMI_LOGE("hdi hot plug to server error");
         return RET_OK;
     }
@@ -457,7 +456,7 @@ int32_t InjectionEventDispatch::OnHdiHot()
     return RET_OK;
 }
 
-int32_t InjectionEventDispatch::GetDeviceIndex(const string& deviceNameText)
+int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText)
 {
     if (deviceNameText.empty()) {
         MMI_LOGE("Get device index failed");
@@ -471,7 +470,7 @@ int32_t InjectionEventDispatch::GetDeviceIndex(const string& deviceNameText)
     return RET_ERR;
 }
 
-int32_t InjectionEventDispatch::GetDeviceStatus(const string &deviceStatusText)
+int32_t InjectionEventDispatch::GetDeviceStatus(const std::string &deviceStatusText)
 {
     if (deviceStatusText.empty()) {
         MMI_LOGE("Get device status failed");
@@ -493,14 +492,14 @@ int32_t InjectionEventDispatch::OnSendEvent()
         return RET_ERR;
     }
 
-    string deviceNode = injectArgvs_[SEND_EVENT_DEV_NODE_INDEX];
+    std::string deviceNode = injectArgvs_[SEND_EVENT_DEV_NODE_INDEX];
     if (deviceNode.empty()) {
         MMI_LOGE("device node:%s is not exit", deviceNode.c_str());
         return RET_ERR;
     }
-    timeval tm;
+    struct timeval tm;
     gettimeofday(&tm, 0);
-    input_event event = {};
+    struct input_event event = {};
     event.input_event_sec = tm.tv_sec;
     event.input_event_usec = tm.tv_usec;
     event.type = static_cast<uint16_t>(std::stoi(injectArgvs_[SEND_EVENT_TYPE_INDEX]));
@@ -565,7 +564,7 @@ int32_t InjectionEventDispatch::GetDevIndexType(int32_t devType)
 void OHOS::MMI::InjectionEventDispatch::ProcessAiSensorInfoCycleNum(uint16_t cycleNum)
 {
     MMI_LOGD("enter");
-    static const vector<MmiMessageId> aiSensorAllowProcCodes {
+    static const std::vector<MmiMessageId> aiSensorAllowProcCodes {
         MmiMessageId::ON_SHOW_MENU,
         MmiMessageId::ON_SEND,
         MmiMessageId::ON_COPY,
@@ -605,9 +604,9 @@ void OHOS::MMI::InjectionEventDispatch::ProcessAiSensorInfoCycleNum(uint16_t cyc
     int32_t devIndex = 0;
     int32_t devType = INPUT_DEVICE_CAP_AISENSOR;
 
-    NetPacket cktAiInit(MmiMessageId::SENIOR_INPUT_FUNC);
-    cktAiInit << msgType << devIndex << devType;
-    SendMsg(cktAiInit);
+    NetPacket pkt(MmiMessageId::SENIOR_INPUT_FUNC);
+    pkt << msgType << devIndex << devType;
+    SendMsg(pkt);
 
     for (uint32_t item = 0; item < cycleNum; item++) {
         for (auto i : aiSensorAllowProcCodes) {
@@ -618,7 +617,7 @@ void OHOS::MMI::InjectionEventDispatch::ProcessAiSensorInfoCycleNum(uint16_t cyc
 
 void OHOS::MMI::InjectionEventDispatch::ProcessKnuckleInfoCycleNum(uint16_t cycleNum)
 {
-    static const vector<MmiMessageId> aiSensorAllowProcCodes = {
+    static const std::vector<MmiMessageId> aiSensorAllowProcCodes = {
         MmiMessageId::ON_SCREEN_SHOT,
         MmiMessageId::ON_SCREEN_SPLIT,
         MmiMessageId::ON_START_SCREEN_RECORD,
@@ -629,9 +628,9 @@ void OHOS::MMI::InjectionEventDispatch::ProcessKnuckleInfoCycleNum(uint16_t cycl
     int32_t devIndex = 0;
     int32_t devType = INPUT_DEVICE_CAP_KNUCKLE;
 
-    NetPacket cktAiInit(MmiMessageId::SENIOR_INPUT_FUNC);
-    cktAiInit << msgType << devIndex << devType;
-    SendMsg(cktAiInit);
+    NetPacket pkt(MmiMessageId::SENIOR_INPUT_FUNC);
+    pkt << msgType << devIndex << devType;
+    SendMsg(pkt);
 
     for (uint32_t item = 0; item < cycleNum; item++) {
         for (auto i : aiSensorAllowProcCodes) {
