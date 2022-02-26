@@ -60,6 +60,7 @@ bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
 
 bool MMIClient::StartFdListener()
 {
+    MMI_LOGD("enter");
     auto eventRunner = EventRunner::Create(false);
     CHKPF(eventRunner);
     auto fdListener = std::make_shared<MMIFdListener>();
@@ -68,18 +69,24 @@ bool MMIClient::StartFdListener()
     CHKPF(eventHandler_);
     constexpr uint32_t eventsMask = (FILE_DESCRIPTOR_INPUT_EVENT | FILE_DESCRIPTOR_SHUTDOWN_EVENT |
         FILE_DESCRIPTOR_EXCEPTION_EVENT);
-    auto errCode = eventHandler_->AddFileDescriptorListener(epollFd_, eventsMask, fdListener);
+    auto errCode = eventHandler_->AddFileDescriptorListener(fd_, eventsMask, fdListener);
     if (errCode != ERR_OK) {
+        MMI_LOGE("add fd listener error,fd:%{public}d code:%{public}u str:%{public}s", fd_, errCode, 
+            eventHandler_->GetErrorStr(errCode).c_str());
         return false;
     }
     if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT)) {
+        MMI_LOGE("send reconnect event return false.");
         return false;
     }
     if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_ONTIMER, 0, EVENT_TIME_ONTIMER)) {
+        MMI_LOGE("send ontimer event return false.");
         return false;
     }
     errCode = eventRunner->Run();
     if (errCode != ERR_OK) {
+        MMI_LOGE("event runnner run error,code:%{public}u str:%{public}s", errCode, 
+            eventHandler_->GetErrorStr(errCode).c_str());
         return false;
     }
     return true;
