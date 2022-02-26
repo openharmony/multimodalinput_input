@@ -36,7 +36,7 @@ HWTEST_F(KeyEventTest, Initialize_001, TestSize.Level1)
     int32_t highLevelEvent = 1;
     std::string strUuid = "111";
     int32_t sourceType = 1;
-    uint64_t occurredTime = 1;
+    int64_t occurredTime = 1;
     std::string deviceId = "111";
     int32_t inputDeviceId = 1;
     bool isHighLevelEvent = true;
@@ -62,7 +62,7 @@ HWTEST_F(KeyEventTest, Initialize_003, TestSize.Level1)
     int32_t highLevelEvent = 2;
     std::string strUuid = "222";
     int32_t sourceType = 2;
-    uint64_t occurredTime = 2;
+    int64_t occurredTime = 2;
     std::string deviceId = "222";
     int32_t inputDeviceId = 2;
     bool isHighLevelEvent = false;
@@ -84,7 +84,7 @@ HWTEST_F(KeyEventTest, Initialize_004, TestSize.Level1)
     int32_t highLevelEvent = 3;
     std::string strUuid = "333";
     int32_t sourceType = 3;
-    uint64_t occurredTime = 3;
+    int64_t occurredTime = 3;
     std::string deviceId = "333";
     int32_t inputDeviceId = 3;
     bool isHighLevelEvent = false;
@@ -106,7 +106,7 @@ HWTEST_F(KeyEventTest, Initialize_005, TestSize.Level1)
     int32_t highLevelEvent = 4;
     std::string strUuid = "444";
     int32_t sourceType = 4;
-    uint64_t occurredTime = 4;
+    int64_t occurredTime = 4;
     std::string deviceId = "444";
     int32_t inputDeviceId = 4;
     bool isHighLevelEvent = true;
@@ -163,7 +163,7 @@ HWTEST_F(KeyEventTest, Initialize_L, TestSize.Level1)
     int32_t highLevelEvent = 5;
     std::string strUuid = "555";
     int32_t sourceType = 5;
-    uint64_t occurredTime = 5;
+    int64_t occurredTime = 5;
     std::string deviceId = "555";
     int32_t inputDeviceId = 5;
     bool isHighLevelEvent = false;

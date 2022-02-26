@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace MMI {
-    constexpr int32_t CHECK_TIME = 200;
+    constexpr int64_t CHECK_TIME = 200;
     using MsgHandlerFun = std::function<int32_t(const UDSClient&, NetPacket&)>;
     class TestAuxToolMsgHandler : public MsgHandler<MsgHandlerFun> {
     public:

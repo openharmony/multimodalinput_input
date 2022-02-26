@@ -28,7 +28,7 @@ namespace MMI {
     std::string GetEnv(const std::string& name);
     std::string UuIdGenerate();
     int64_t GetMicrotime();
-    uint64_t GetSysClockTime();
+    int64_t GetSysClockTime();
     int64_t GetMillisTime();
     std::string GetUUid();
     std::string GetThisThreadIdOfString();
@@ -39,7 +39,7 @@ namespace MMI {
     void LocalTime(tm& t, time_t curTime = 0);
     std::string Strftime(const std::string& format = "%F %T", time_t curTime = 0);
     void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
-        const int32_t abilityId, const int32_t focusId, const uint64_t preHandlerTime);
+        const int32_t abilityId, const int32_t focusId, const int64_t preHandlerTime);
     void PrintWMSInfo(const std::string& str, const int32_t fd, const int32_t abilityId, const int32_t focusId);
     int32_t GetPid();
     std::string GetFileName(const std::string& strPath);

@@ -33,7 +33,7 @@ public:
     void RegisterConnectedFunction(ConnectCallback fun) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
     void VirtualKeyIn(RawInputEvent virtualKeyEvent);
-    void ReplyMessageToServer(MmiMessageId idMsg, uint64_t clientTime, uint64_t endTime) const;
+    void ReplyMessageToServer(MmiMessageId idMsg, int64_t clientTime, int64_t endTime) const;
 
     void SdkGetMultimodeInputInfo();
     MMIClientPtr GetPtr()
