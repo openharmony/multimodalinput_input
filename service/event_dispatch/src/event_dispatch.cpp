@@ -699,7 +699,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
         OnKeyboardEventTrace(key, KEY_CHECKLAUNABILITY_EVENT);
         return RET_OK;
     }
-    if (KeyEventSubscriber_.FilterSubscribeKeyEvent(key)) {
+    if (KeyEventSubscriber_.SubscribeKeyEvent(key)) {
         MMI_LOGD("Subscribe keyEvent filter success. keyCode:%{public}d", key->GetKeyCode());
         OnKeyboardEventTrace(key, KEY_SUBSCRIBE_EVENT);
         return RET_OK;

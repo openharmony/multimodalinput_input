@@ -38,12 +38,12 @@ void OHOS::MMI::InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, i
     interceptorItem.sourceType = sourceType;
     interceptorItem.id = id;
     interceptorItem.session =  session;
-    auto iter = std::find(interceptor_.begin(), interceptor_.end(), interceptorItem);
-    if (iter != interceptor_.end()) {
+    auto iter = std::find(interceptors_.begin(), interceptors_.end(), interceptorItem);
+    if (iter != interceptors_.end()) {
         MMI_LOGE("ServerInputFilterManager: touchpad event repeate register");
         return;
     } else {
-        iter = interceptor_.insert(iter, interceptorItem);
+        iter = interceptors_.insert(iter, interceptorItem);
         MMI_LOGD("sourceType:%{public}d,fd:%{public}d register in server", sourceType, session->GetFd());
     }
     MMI_LOGD("leave");
@@ -55,13 +55,13 @@ void OHOS::MMI::InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
     std::lock_guard<std::mutex> lock(mu_);
     InterceptorItem interceptorItem = {};
     interceptorItem.id = id;
-    auto iter = std::find(interceptor_.begin(), interceptor_.end(), interceptorItem);
-    if (iter == interceptor_.end()) {
+    auto iter = std::find(interceptors_.begin(), interceptors_.end(), interceptorItem);
+    if (iter == interceptors_.end()) {
         MMI_LOGE("OnRemoveInterceptor::interceptorItem does not exist");
     } else {
         MMI_LOGD("sourceType:%{public}d,fd:%{public}d remove from server", iter->sourceType,
                  iter->session->GetFd());
-        interceptor_.erase(iter);
+        interceptors_.erase(iter);
     }
     MMI_LOGD("leave");
 }
@@ -70,7 +70,7 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
 {
     MMI_LOGD("enter");
     CHKPF(pointerEvent);
-    if (interceptor_.empty()) {
+    if (interceptors_.empty()) {
         MMI_LOGE("InterceptorManagerGlobal::%{public}s no interceptor to send msg", __func__);
         return false;
     }
@@ -81,9 +81,9 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
              "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
-    NetPacket pkt(MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR);
-    InputEventDataTransformation::Marshalling(pointerEvent, pkt);
-    for (const auto &item : interceptor_) {
+    for (const auto &item : interceptors_) {
+        NetPacket pkt(MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR);
+        InputEventDataTransformation::Marshalling(pointerEvent, pkt);
         pkt << item.session->GetPid() << item.id;
         MMI_LOGD("server send the interceptor msg to client, pid:%{public}d", item.session->GetPid());
         item.session->SendMsg(pkt);
@@ -96,14 +96,14 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> k
 {
     MMI_LOGD("enter");
     CHKPF(keyEvent);
-    if (interceptor_.empty()) {
+    if (interceptors_.empty()) {
         MMI_LOGE("InterceptorManagerGlobal::%{public}s no interceptor to send msg", __func__);
         return false;
     }
-    NetPacket pkt(MmiMessageId::KEYBOARD_EVENT_INTERCEPTOR);
-    InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
-    for (const auto &item : interceptor_) {
+    for (const auto &item : interceptors_) {
         if (item.sourceType == SOURCETYPE_KEY) {
+            NetPacket pkt(MmiMessageId::KEYBOARD_EVENT_INTERCEPTOR);
+            InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
             pkt << item.session->GetPid();
             MMI_LOGD("server send the interceptor msg to client, pid:%{public}d", item.session->GetPid());
             item.session->SendMsg(pkt);
