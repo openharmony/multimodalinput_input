@@ -76,7 +76,7 @@ int32_t KeyEventSubscriber::UnSubscribeKeyEvent(SessionPtr sess, int32_t subscri
     return RET_ERR;
 }
 
-bool KeyEventSubscriber::FilterSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_LOGD("Enter");
     CHKPF(keyEvent);
@@ -90,8 +90,10 @@ bool KeyEventSubscriber::FilterSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEv
         handled = HandleKeyDown(keyEvent);
     } else if (keyAction == KeyEvent::KEY_ACTION_UP) {
         handled = HandleKeyUp(keyEvent);
-    } else {
+    } else if (keyAction == KeyEvent::KEY_ACTION_CANCEL) {
         handled = HandleKeyCanel(keyEvent);
+    } else {
+        MMI_LOGW("keyAction exception");
     }
     keyEvent_.reset();
 

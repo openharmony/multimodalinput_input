@@ -236,10 +236,10 @@ int32_t InjectionEventDispatch::OnAisensorOne(MmiMessageId code, uint32_t value)
     rawEvent.ev_code = static_cast<uint32_t>(code);
     rawEvent.ev_value = value;
     rawEvent.stamp = static_cast<uint32_t>(time.tv_usec);
-    NetPacket cktAi(MmiMessageId::SENIOR_INPUT_FUNC);
+    NetPacket pkt(MmiMessageId::SENIOR_INPUT_FUNC);
     int32_t msgType = MSG_TYPE_DEVICE_INFO;
-    cktAi << msgType << rawEvent;
-    if (!SendMsg(cktAi)) {
+    pkt << msgType << rawEvent;
+    if (!SendMsg(pkt)) {
         MMI_LOGE("Send AI Msg fail. errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
@@ -255,10 +255,10 @@ int32_t InjectionEventDispatch::OnKnuckleOne(MmiMessageId code, uint32_t value)
     rawEvent.ev_code = static_cast<uint32_t>(code);
     rawEvent.ev_value = value;
     rawEvent.stamp = static_cast<uint32_t>(time.tv_usec);
-    NetPacket cktKnuckle(MmiMessageId::SENIOR_INPUT_FUNC);
+    NetPacket pkt(MmiMessageId::SENIOR_INPUT_FUNC);
     int32_t msgType = MSG_TYPE_DEVICE_INFO;
-    cktKnuckle << msgType << rawEvent;
-    if (!SendMsg(cktKnuckle)) {
+    pkt << msgType << rawEvent;
+    if (!SendMsg(pkt)) {
         MMI_LOGE("Send Knuckle Msg fail. errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
@@ -285,9 +285,9 @@ int32_t InjectionEventDispatch::OnAisensorEach()
     int32_t devIndex = 0;
     int32_t devType = INPUT_DEVICE_CAP_AISENSOR;
 
-    NetPacket cktAiInit(MmiMessageId::SENIOR_INPUT_FUNC);
-    cktAiInit << msgType << devIndex << devType;
-    if (!SendMsg(cktAiInit)) {
+    NetPacket pkt(MmiMessageId::SENIOR_INPUT_FUNC);
+    pkt << msgType << devIndex << devType;
+    if (!SendMsg(pkt)) {
         MMI_LOGE("Send AI Msg fail. errCode:%{public}d", MSG_SEND_FAIL);
     }
 
@@ -299,9 +299,9 @@ int32_t InjectionEventDispatch::OnAisensorEach()
     rawEvent.ev_code = static_cast<uint32_t>(stoi(injectArgvs_[AI_SENSOR_CODE_INDEX]));
     rawEvent.ev_value = static_cast<uint32_t>(stoi(injectArgvs_[AI_SENSOR_VALUE_INDEX]));
     rawEvent.stamp = static_cast<uint32_t>(time.tv_usec);
-    NetPacket cktAi(MmiMessageId::SENIOR_INPUT_FUNC);
-    cktAi << msgType << rawEvent;
-    if (!SendMsg(cktAi)) {
+    NetPacket pkt2(MmiMessageId::SENIOR_INPUT_FUNC);
+    pkt2 << msgType << rawEvent;
+    if (!SendMsg(pkt2)) {
         MMI_LOGE("Send AI Msg fail! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
@@ -328,9 +328,9 @@ int32_t InjectionEventDispatch::OnKnuckleEach()
     int32_t devIndex = 0;
     int32_t devType = INPUT_DEVICE_CAP_KNUCKLE;
 
-    NetPacket cktAiInit(MmiMessageId::SENIOR_INPUT_FUNC);
-    cktAiInit << msgType << devIndex << devType;
-    SendMsg(cktAiInit);
+    NetPacket pkt(MmiMessageId::SENIOR_INPUT_FUNC);
+    pkt << msgType << devIndex << devType;
+    SendMsg(pkt);
 
     struct timeval time;
     RawInputEvent rawEvent = {};
@@ -340,9 +340,9 @@ int32_t InjectionEventDispatch::OnKnuckleEach()
     rawEvent.ev_code = static_cast<uint32_t>(stoi(injectArgvs_[AI_SENSOR_CODE_INDEX]));
     rawEvent.ev_value = static_cast<uint32_t>(stoi(injectArgvs_[AI_SENSOR_VALUE_INDEX]));
     rawEvent.stamp = static_cast<uint32_t>(time.tv_usec);
-    NetPacket cktKnuckle(MmiMessageId::SENIOR_INPUT_FUNC);
-    cktKnuckle << msgType << rawEvent;
-    if (!SendMsg(cktKnuckle)) {
+    NetPacket pkt2(MmiMessageId::SENIOR_INPUT_FUNC);
+    pkt2 << msgType << rawEvent;
+    if (!SendMsg(pkt2)) {
         MMI_LOGE("Send AI Msg fail! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
@@ -412,9 +412,9 @@ int32_t InjectionEventDispatch::OnHdiStatus()
         return RET_ERR;
     }
     int32_t sendType = static_cast<int32_t>(SHOW_DEVICE_INFO);
-    NetPacket cktHdi(MmiMessageId::HDI_INJECT);
-    cktHdi << sendType;
-    if (!(SendMsg(cktHdi))) {
+    NetPacket pkt(MmiMessageId::HDI_INJECT);
+    pkt << sendType;
+    if (!(SendMsg(pkt))) {
         MMI_LOGE("hdi hot plug to server errot");
         return RET_OK;
     }
@@ -447,9 +447,9 @@ int32_t InjectionEventDispatch::OnHdiHot()
     int32_t sendType = static_cast<int32_t>(SET_HOT_PLUGS);
     uint32_t devIndex = static_cast<uint32_t>(index);
     uint32_t devSatatus = static_cast<uint32_t>(status);
-    NetPacket cktHdi(MmiMessageId::HDI_INJECT);
-    cktHdi << sendType << devIndex << devSatatus;
-    if (!(SendMsg(cktHdi))) {
+    NetPacket pkt(MmiMessageId::HDI_INJECT);
+    pkt << sendType << devIndex << devSatatus;
+    if (!(SendMsg(pkt))) {
         MMI_LOGE("hdi hot plug to server error");
         return RET_OK;
     }
@@ -605,9 +605,9 @@ void OHOS::MMI::InjectionEventDispatch::ProcessAiSensorInfoCycleNum(uint16_t cyc
     int32_t devIndex = 0;
     int32_t devType = INPUT_DEVICE_CAP_AISENSOR;
 
-    NetPacket cktAiInit(MmiMessageId::SENIOR_INPUT_FUNC);
-    cktAiInit << msgType << devIndex << devType;
-    SendMsg(cktAiInit);
+    NetPacket pkt(MmiMessageId::SENIOR_INPUT_FUNC);
+    pkt << msgType << devIndex << devType;
+    SendMsg(pkt);
 
     for (uint32_t item = 0; item < cycleNum; item++) {
         for (auto i : aiSensorAllowProcCodes) {
@@ -629,9 +629,9 @@ void OHOS::MMI::InjectionEventDispatch::ProcessKnuckleInfoCycleNum(uint16_t cycl
     int32_t devIndex = 0;
     int32_t devType = INPUT_DEVICE_CAP_KNUCKLE;
 
-    NetPacket cktAiInit(MmiMessageId::SENIOR_INPUT_FUNC);
-    cktAiInit << msgType << devIndex << devType;
-    SendMsg(cktAiInit);
+    NetPacket pkt(MmiMessageId::SENIOR_INPUT_FUNC);
+    pkt << msgType << devIndex << devType;
+    SendMsg(pkt);
 
     for (uint32_t item = 0; item < cycleNum; item++) {
         for (auto i : aiSensorAllowProcCodes) {
