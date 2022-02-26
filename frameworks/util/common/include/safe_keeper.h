@@ -60,7 +60,7 @@ protected:
     }
     int64_t GetCurMillisTime() const
     {
-        auto curSysTime = static_cast<int64_t>(GetSysClockTime() / 1000);
+        auto curSysTime = GetSysClockTime() / 1000;
         return curSysTime;
     }
 

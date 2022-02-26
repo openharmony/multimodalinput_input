@@ -36,7 +36,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetOriginEventType_Normal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -58,7 +58,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetOriginEventType_Abnormal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -80,7 +80,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetOriginEventType_Min, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -102,7 +102,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetOriginEventType_Max, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -131,7 +131,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_IsKeyDown_Normal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -153,7 +153,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_IsKeyDown_Abnormal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -175,7 +175,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetKeyCode_Normal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -197,7 +197,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetKeyCode_Min, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -219,7 +219,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetKeyCode_Max, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -241,7 +241,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetKeyCode_Abnormal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -263,7 +263,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetKeyCode_MinValue, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -285,7 +285,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetKeyCode_MaxValue, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -307,7 +307,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetKeyDownDuration_Normal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -329,7 +329,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetKeyDownDuration_Abnormal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -351,7 +351,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetKeyDownDuration_Min, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -373,7 +373,7 @@ HWTEST_F(KeyEventApiTest, Api_Test_GetKeyDownDuration_Max, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;

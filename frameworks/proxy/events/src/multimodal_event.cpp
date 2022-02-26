@@ -20,7 +20,7 @@ namespace OHOS {
 namespace MMI {
 MultimodalEvent::~MultimodalEvent() {}
 void MultimodalEvent::Initialize(int32_t windowId, int32_t highLevelEvent, const std::string& uuid, int32_t sourceType,
-                                 uint64_t occurredTime, const std::string& deviceId, int32_t inputDeviceId,
+                                 int64_t occurredTime, const std::string& deviceId, int32_t inputDeviceId,
                                  bool isHighLevelEvent, uint16_t deviceUdevTags, bool isIntercepted)
 {
     windowId_ = windowId;
@@ -155,7 +155,7 @@ int32_t MultimodalEvent::GetInputDeviceId() const
  * @return Returns the time (in ms) when the current event is generated.
  * @since 1
  */
-uint64_t MultimodalEvent::GetOccurredTime() const
+int64_t MultimodalEvent::GetOccurredTime() const
 {
     return occurredTime_;
 }

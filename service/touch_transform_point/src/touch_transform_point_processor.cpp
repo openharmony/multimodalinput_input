@@ -50,7 +50,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
         return false;
     }
     auto pointIds = pointerEvent_->GetPointersIdList();
-    int64_t time = static_cast<int64_t>(GetSysClockTime());
+    int64_t time = GetSysClockTime();
     if (pointIds.empty()) {
         pointerEvent_->SetActionStartTime(time);
         pointerEvent_->SetTargetDisplayId(logicalDisplayId);
@@ -83,7 +83,7 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
     CHKPF(data);
     auto seatSlot = libinput_event_touch_get_seat_slot(data);
     auto pressure = libinput_event_get_touch_pressure(event);
-    int64_t time = static_cast<int64_t>(GetSysClockTime());
+    int64_t time = GetSysClockTime();
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     int32_t logicalY = -1;
@@ -110,7 +110,7 @@ bool TouchTransformPointProcessor::OnEventTouchUp(struct libinput_event *event)
     auto data = libinput_event_get_touch_event(event);
     CHKPF(data);
     auto seatSlot = libinput_event_touch_get_seat_slot(data);
-    int64_t time = static_cast<int64_t>(GetSysClockTime());
+    int64_t time = GetSysClockTime();
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
 
