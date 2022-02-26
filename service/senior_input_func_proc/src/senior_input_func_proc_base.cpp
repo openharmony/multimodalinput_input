@@ -48,6 +48,7 @@ void SeniorInputFuncProcBase::SetSessionFd(int32_t fd)
 int32_t OHOS::MMI::SeniorInputFuncProcBase::GetSessionFd()
 {
     if (sessionFd_ < 0) {
+        MMI_LOGE("The current sessionFd_ is invalid");
         return RET_ERR;
     }
     return sessionFd_;

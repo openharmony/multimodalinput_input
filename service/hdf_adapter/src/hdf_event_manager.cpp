@@ -41,6 +41,7 @@ int32_t OHOS::MMI::HdfEventManager::EvdevSimIoctl(int32_t hdindex, int32_t pcmd,
     DrvType drvtype = g_index2DrvType[hdindex - MAX_INPUT_DEVICE_COUNT];
     MMI_LOGD("evdev_simioctl drvtype:%{public}d", drvtype);
     if (drvtype >= INVALD) {
+        MMI_LOGE("Unknown device type");
         return 0;
     }
     for (const auto &item : m_globleThis->hdflist_) {
@@ -120,6 +121,7 @@ int32_t OHOS::MMI::HdfEventManager::EvdevIoctl(int32_t hdiindex, int32_t pcmd, v
         }
     }
     if (deviceinfo == nullptr) {
+        MMI_LOGE("Deviceinfo is null");
         return 0;
     }
     const int32_t iobuffSize = size;
@@ -199,6 +201,7 @@ int32_t OHOS::MMI::HdfEventManager::HdfdevtypeMapLibinputType(uint32_t devIndex,
 {
     int32_t ret = 0;
     if (devIndex >= MAX_INPUT_DEVICE_COUNT) {
+        MMI_LOGE("The maximum number of devices exceeded, devIndex:%{public}d", devIndex);
         return devType;
     }
     switch (devType) {

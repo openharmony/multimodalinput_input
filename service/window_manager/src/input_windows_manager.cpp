@@ -362,6 +362,7 @@ bool OHOS::MMI::InputWindowsManager::GetTouchSurfaceId(const double x, const dou
         }
         return true;
     }
+    MMI_LOGE("Failed to obtain touchsurface");
     return false;
 }
 
@@ -373,6 +374,7 @@ const ScreenInfo* OHOS::MMI::InputWindowsManager::GetScreenInfo(int32_t screenId
             return &it;
         }
     }
+    MMI_LOGE("Failed to obtain screen(%{public}d) info", screenId);
     return nullptr;
 }
 
@@ -381,6 +383,7 @@ const LayerInfo* OHOS::MMI::InputWindowsManager::GetLayerInfo(int32_t layerId)
     std::lock_guard<std::mutex> lock(mu_);
     auto it = layers_.find(layerId);
     if (it == layers_.end()) {
+        MMI_LOGE("Failed to obtain layer(%{public}d) info", layerId);
         return nullptr;
     }
     return &it->second;
@@ -391,6 +394,7 @@ const MMISurfaceInfo* OHOS::MMI::InputWindowsManager::GetSurfaceInfo(int32_t suf
     std::lock_guard<std::mutex> lock(mu_);
     auto it = surfaces_.find(sufaceId);
     if (it == surfaces_.end()) {
+        MMI_LOGE("Failed to obtain suface(%{public}d) info", sufaceId);
         return nullptr;
     }
     return &it->second;
@@ -587,6 +591,7 @@ bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint_2(struct libinp
         logicalY = static_cast<int32_t>(libinput_event_touch_get_y_transformed(touch, (*screensInfo_)->height));
         return true;
     }
+    MMI_LOGE("ScreensInfo_ is null");
     return false;
 }
 
@@ -597,6 +602,7 @@ OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::GetPhysicalDispl
             return &it;
         }
     }
+    MMI_LOGE("Failed to obtain physical(%{public}d) display", id);
     return nullptr;
 }
 
@@ -608,6 +614,7 @@ OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::FindPhysicalDisp
             return &it;
         }
     }
+    MMI_LOGE("Failed to search for Physical,seat:%{public}s,name:%{public}s", seatId.c_str(), seatName.c_str());
     return nullptr;
 }
 

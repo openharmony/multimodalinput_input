@@ -61,6 +61,7 @@ void OHOS::MMI::StandardEventHandler::StandardTouchEvent(struct libinput_event *
 
         default: {
             data.curRventType = RET_ERR;
+            MMI_LOGW("Unknown event type:%{public}d", eventType);
             break;
         }
     }
