@@ -42,20 +42,20 @@ protected:
     int32_t OnEventDeviceRemoved(const multimodal_libinput_event& event);
     int32_t OnEventPointer(const multimodal_libinput_event& event);
     int32_t OnEventTouch(const multimodal_libinput_event& event);
-    int32_t OnEventTouchSecond(libinput_event *event);
-    int32_t OnEventTouchPadSecond(libinput_event *event);
+    int32_t OnEventTouchSecond(struct libinput_event *event);
+    int32_t OnEventTouchPadSecond(struct libinput_event *event);
     int32_t OnEventGesture(const multimodal_libinput_event& event);
     int32_t OnEventTouchpad(const multimodal_libinput_event& event);
-    int32_t OnGestureEvent(libinput_event *event);
+    int32_t OnGestureEvent(struct libinput_event *event);
     int32_t OnKeyboardEvent(const multimodal_libinput_event& event);
     int32_t OnKeyEventDispatch(const multimodal_libinput_event& event);
     
-    int32_t OnMouseEventHandler(libinput_event *event);
+    int32_t OnMouseEventHandler(struct libinput_event *event);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
 
 private:
     int32_t OnEventHandler(const multimodal_libinput_event& ev);
-    int32_t OnEventKey(libinput_event *event);
+    int32_t OnEventKey(struct libinput_event *event);
     std::mutex mu_;
     UDSServer *udsServer_ = nullptr;
     EventDispatch eventDispatch_;

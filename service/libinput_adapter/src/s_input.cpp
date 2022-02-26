@@ -50,7 +50,7 @@ static void InitHiLogFunc(struct libinput* input)
 } // namespace MMI
 } // namespace OHOS
 
-void OHOS::MMI::SInput::LoginfoPackagingTool(libinput_event *event)
+void OHOS::MMI::SInput::LoginfoPackagingTool(struct libinput_event *event)
 {
     CHKPV(event);
     auto context = libinput_event_get_context(event);
@@ -114,7 +114,7 @@ bool OHOS::MMI::SInput::Init(FunInputEvent funInputEvent, const std::string& sea
     return true;
 }
 
-void OHOS::MMI::SInput::EventDispatch(epoll_event& ev)
+void OHOS::MMI::SInput::EventDispatch(struct epoll_event& ev)
 {
     MMI_LOGD("enter");
     CHKPV(ev.data.ptr);

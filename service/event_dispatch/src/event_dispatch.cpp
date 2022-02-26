@@ -121,13 +121,12 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_LOGI("Pointer event interception succeeded");
         return RET_OK;
     }
-    if (!point->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT) &&
-        InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
+    if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
         HandlePointerEventTrace(point);
         return RET_OK;
     }
-    NetPacket newPacket(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::Marshalling(point, newPacket);
+    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
+    InputEventDataTransformation::Marshalling(point, pkt);
     HandlePointerEventTrace(point);
     auto udsServer = InputHandler->GetUDSServer();
     if (udsServer == nullptr) {
@@ -139,7 +138,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         return RET_ERR;
     }
 
-    if (!udsServer->SendMsg(fd, newPacket)) {
+    if (!udsServer->SendMsg(fd, pkt)) {
         MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
@@ -188,7 +187,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
         OnKeyboardEventTrace(key, KEY_CHECKLAUNABILITY_EVENT);
         return RET_OK;
     }
-    if (KeyEventSubscriber_.FilterSubscribeKeyEvent(key)) {
+    if (KeyEventSubscriber_.SubscribeKeyEvent(key)) {
         MMI_LOGD("Subscribe keyEvent filter success. keyCode:%{public}d", key->GetKeyCode());
         OnKeyboardEventTrace(key, KEY_SUBSCRIBE_EVENT);
         return RET_OK;
