@@ -82,7 +82,6 @@ void ProcessingPenDevice::SetPenApproachPadEvent(const PenEvent& penEvent, Input
 
 void ProcessingPenDevice::SetPenSlidePadEvent(const PenEvent& penEvent, InputEventArray& inputEventArray)
 {
-    static int32_t previousPressure = 0;
     if (penEvent.eventType == "PEN_KEY") {
         SetBtnStylus(inputEventArray, 0, static_cast<uint16_t>(penEvent.keyValue), penEvent.keyStatus);
         return;
@@ -94,6 +93,7 @@ void ProcessingPenDevice::SetPenSlidePadEvent(const PenEvent& penEvent, InputEve
     }
     SetEvAbsX(inputEventArray, 0, penEvent.xPos);
     SetEvAbsY(inputEventArray, 0, penEvent.yPos);
+    static int32_t previousPressure = 0;
     if (penEvent.pressure > 0) {
         if (previousPressure == 0) {
             SetAbsPressure(inputEventArray, 0, penEvent.pressure);

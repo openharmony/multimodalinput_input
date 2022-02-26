@@ -103,7 +103,7 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
     eventData->event_type = type;
     MMI_LOGD("userdata:[fd:%{public}d,type:%{public}d]", eventData->fd, eventData->event_type);
 
-    epoll_event ev = {};
+    struct epoll_event ev = {};
     ev.events = EPOLLIN;
     ev.data.ptr = eventData;
     auto ret = EpollCtl(fd, EPOLL_CTL_ADD, ev, mmiFd_);
@@ -329,7 +329,7 @@ void MMIService::OnThread()
 
     int32_t count = 0;
     constexpr int32_t timeOut = 20;
-    epoll_event ev[MAX_EVENT_SIZE] = {};
+    struct epoll_event ev[MAX_EVENT_SIZE] = {};
     std::map<int32_t, StreamBufData> bufMap;
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         bufMap.clear();

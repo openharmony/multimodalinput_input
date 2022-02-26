@@ -35,7 +35,7 @@ void TouchPadTransformPointProcessor::SetPointEventSource(int32_t sourceType)
     pointerEvent_->SetSourceType(sourceType);
 }
 
-void TouchPadTransformPointProcessor::OnEventTouchPadDown(libinput_event *event)
+void TouchPadTransformPointProcessor::OnEventTouchPadDown(struct libinput_event *event)
 {
     MMI_LOGD("Enter");
     CHKPV(event);
@@ -65,7 +65,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(libinput_event *event)
     MMI_LOGD("End");
 }
 
-void TouchPadTransformPointProcessor::OnEventTouchPadMotion(libinput_event *event)
+void TouchPadTransformPointProcessor::OnEventTouchPadMotion(struct libinput_event *event)
 {
     MMI_LOGD("Enter");
     CHKPV(event);
@@ -87,7 +87,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadMotion(libinput_event *even
     MMI_LOGD("End");
 }
 
-void TouchPadTransformPointProcessor::OnEventTouchPadUp(libinput_event *event)
+void TouchPadTransformPointProcessor::OnEventTouchPadUp(struct libinput_event *event)
 {
     MMI_LOGD("Enter");
     CHKPV(event);
@@ -112,7 +112,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadUp(libinput_event *event)
 }
 
 std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPadEvent(
-    libinput_event *event)
+    struct libinput_event *event)
 {
     MMI_LOGD("begin");
     CHKPP(event);

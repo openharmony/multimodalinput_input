@@ -29,9 +29,9 @@ public:
     SInput();
     DISALLOW_COPY_AND_MOVE(SInput);
     virtual ~SInput();
-    static void LoginfoPackagingTool(libinput_event *event);
+    static void LoginfoPackagingTool(struct libinput_event *event);
     bool Init(FunInputEvent funInputEvent, const std::string& seat_id = "seat0");
-    void EventDispatch(epoll_event& ev);
+    void EventDispatch(struct epoll_event& ev);
     void Stop();
 
     int32_t GetInputFd() const

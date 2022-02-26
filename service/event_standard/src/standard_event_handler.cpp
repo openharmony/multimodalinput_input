@@ -28,7 +28,7 @@ OHOS::MMI::StandardEventHandler::StandardEventHandler() {}
 
 OHOS::MMI::StandardEventHandler::~StandardEventHandler() {}
 
-void OHOS::MMI::StandardEventHandler::StandardTouchEvent(libinput_event *event, StandardTouchStruct& data)
+void OHOS::MMI::StandardEventHandler::StandardTouchEvent(struct libinput_event *event, StandardTouchStruct& data)
 {
     CHKPV(event);
     enum libinput_event_type eventType = {};
@@ -67,7 +67,7 @@ void OHOS::MMI::StandardEventHandler::StandardTouchEvent(libinput_event *event, 
     }
 }
 
-void OHOS::MMI::StandardEventHandler::PointerPressedStandard(libinput_event *event, StandardTouchStruct& data)
+void OHOS::MMI::StandardEventHandler::PointerPressedStandard(struct libinput_event *event, StandardTouchStruct& data)
 {
     CHKPV(event);
     auto szPoint = libinput_event_get_pointer_event(event);
@@ -115,7 +115,8 @@ void OHOS::MMI::StandardEventHandler::PointerPressedStandardEvent(struct libinpu
              data.reRventType, data.curRventType, data.buttonType, data.buttonState);
 }
 
-void OHOS::MMI::StandardEventHandler::PointerAbsoluteStandardEvent(libinput_event *event, StandardTouchStruct& data)
+void OHOS::MMI::StandardEventHandler::PointerAbsoluteStandardEvent(
+    struct libinput_event *event, StandardTouchStruct& data)
 {
     CHKPV(event);
     auto szPoint = libinput_event_get_pointer_event(event);
@@ -140,7 +141,8 @@ void OHOS::MMI::StandardEventHandler::PointerAbsoluteStandardEvent(libinput_even
     }
 }
 
-void OHOS::MMI::StandardEventHandler::PointerMotionStandardEvent(libinput_event *event, StandardTouchStruct& data)
+void OHOS::MMI::StandardEventHandler::PointerMotionStandardEvent(
+    struct libinput_event *event, StandardTouchStruct& data)
 {
     CHKPV(event);
     auto szPoint = libinput_event_get_pointer_event(event);
@@ -170,7 +172,7 @@ void OHOS::MMI::StandardEventHandler::PointerMotionStandardEvent(libinput_event 
     }
 }
 
-void OHOS::MMI::StandardEventHandler::TipStandardEvent(libinput_event *event, StandardTouchStruct& data)
+void OHOS::MMI::StandardEventHandler::TipStandardEvent(struct libinput_event *event, StandardTouchStruct& data)
 {
     CHKPV(event);
     auto szPoint = libinput_event_get_tablet_tool_event(event);
@@ -213,7 +215,7 @@ void OHOS::MMI::StandardEventHandler::TipDownStandardEvent(struct libinput_event
         data.reRventType, data.curRventType, data.tipState, data.x, data.y);
 }
 
-void OHOS::MMI::StandardEventHandler::TipMotionStandardEvent(libinput_event *event, StandardTouchStruct& data)
+void OHOS::MMI::StandardEventHandler::TipMotionStandardEvent(struct libinput_event *event, StandardTouchStruct& data)
 {
     CHKPV(event);
     auto szPoint = libinput_event_get_tablet_tool_event(event);

@@ -128,6 +128,7 @@ int32_t AddEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
     OHOS::MMI::KeyEventMonitorInfo *event, int32_t &preSubscribeId)
 {
     MMI_LOGD("enter");
+    CHKPR(event, ERROR_NULL_POINTER);
     if (callbacks.find(event->eventType) == callbacks.end()) {
         MMI_LOGD("No callback in %{public}s", event->eventType.c_str());
         callbacks[event->eventType] = {};
@@ -173,6 +174,7 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
     OHOS::MMI::KeyEventMonitorInfo *event, int32_t &subscribeId)
 {
     MMI_LOGD("enter");
+    CHKPR(event, ERROR_NULL_POINTER);
     if (callbacks.count(event->eventType) <= 0) {
         MMI_LOGE("Callback doesn't exists");
         return JS_CALLBACK_EVENT_FAILED;
@@ -227,6 +229,7 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
 
 static void AsyncWorkFn(napi_env env, OHOS::MMI::KeyEventMonitorInfo *event, napi_value result[2])
 {
+    CHKPV(event);
     if (event->status < 0) {
         MMI_LOGD("Status < 0 enter");
         napi_value code = nullptr;
