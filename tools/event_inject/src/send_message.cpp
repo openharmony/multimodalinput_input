@@ -23,8 +23,8 @@ using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "SendMessage"};
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "SendMessage"};
+} // namespace
 
 int32_t SendMessage::GetDevIndexName(const std::string& deviceName)
 {

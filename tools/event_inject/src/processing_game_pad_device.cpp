@@ -19,8 +19,8 @@ using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingGamePadDevice" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingGamePadDevice" };
+} // namespace
 
 int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const Json& originalEvent,
     InputEventArray& inputEventArray)

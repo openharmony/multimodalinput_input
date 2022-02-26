@@ -19,8 +19,8 @@ using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ProcessingMouseDevice" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ProcessingMouseDevice" };
+} // namespace
 
 int32_t ProcessingMouseDevice::TransformJsonDataToInputData(const Json& fingerEventArrays,
                                                             InputEventArray& inputEventArray)
