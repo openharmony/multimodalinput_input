@@ -29,22 +29,22 @@ enum MmiEventHandlerId : uint32_t {
     MMI_EVENT_HANDLER_ID_STOP,
 
     MMI_EVENT_HANDLER_ID_END,
-}
+};
 
 class MMIEventHandler : public AppExecFwk::EventHandler
 {
 public:
-    explicit MMIEventHandler(const std::shared_ptr<EventRunner> &runner);
+    explicit MMIEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
     virtual ~MMIEventHandler();
     DISALLOW_COPY_AND_MOVE(MMIEventHandler);
 
 protected:
-    void OnReconnect(const InnerEvent::Pointer &event);
-    void OnTimer(const InnerEvent::Pointer &event);
-    void OnStop(const InnerEvent::Pointer &event);
+    void OnReconnect(const AppExecFwk::InnerEvent::Pointer &event);
+    void OnTimer(const AppExecFwk::InnerEvent::Pointer &event);
+    void OnStop(const AppExecFwk::InnerEvent::Pointer &event);
 
 protected:
-    virtual void ProcessEvent(const InnerEvent::Pointer &event) override;
+    virtual void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
 };
 } // namespace MMI
 } // namespace OHOS
