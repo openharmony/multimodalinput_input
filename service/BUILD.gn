@@ -279,7 +279,6 @@ ohos_unittest("ut-mmi-service-out") {
     "event_dispatch/test/event_dispatch_test.cpp",
     "event_standard/test/standard_event_handler_test.cpp",
     "hdi_inject/test/hdi_inject_test.cpp",
-    "message_handle/test/input_test.cpp",
     "message_handle/test/server_msg_handler_test.cpp",
     "module_loader/test/uds_server_test.cpp",
     "window_manager/test/input_windows_manager_test.cpp",
