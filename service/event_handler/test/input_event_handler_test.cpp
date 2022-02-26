@@ -28,7 +28,8 @@
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventHandlerTest" }; // namespace
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventHandlerTest" };
+} //namespace
 
 static void LibinputDrainEvents(libinput* li)
 {
