@@ -22,7 +22,7 @@ namespace MMI {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TouchTransformPointManager" };
     }
 
-std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(libinput_event *event)
+std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(struct libinput_event *event)
 {
     CHKPP(event);
     auto device = libinput_event_get_device(event);
@@ -40,7 +40,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(l
     return processor->OnLibinputTouchEvent(event);
 }
 
-std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEvent(libinput_event *event)
+std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEvent(struct libinput_event *event)
 {
     CHKPP(event);
     auto device = libinput_event_get_device(event);
@@ -58,7 +58,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEven
     return processor->OnLibinputTouchPadEvent(event);
 }
 
-std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestrueEvent(libinput_event *event)
+std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestrueEvent(struct libinput_event *event)
 {
     CHKPP(event);
     auto device = libinput_event_get_device(event);

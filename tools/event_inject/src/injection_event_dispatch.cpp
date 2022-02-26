@@ -229,7 +229,7 @@ int32_t InjectionEventDispatch::OnAisensor()
 int32_t InjectionEventDispatch::OnAisensorOne(MmiMessageId code, uint32_t value)
 {
     MMI_LOGD("enter, code = %u, value = %u", code, value);
-    timeval time;
+    struct timeval time;
     RawInputEvent rawEvent = {};
     gettimeofday(&time, 0);
     rawEvent.ev_type = INPUT_DEVICE_CAP_AI_SENSOR;
@@ -248,7 +248,7 @@ int32_t InjectionEventDispatch::OnAisensorOne(MmiMessageId code, uint32_t value)
 
 int32_t InjectionEventDispatch::OnKnuckleOne(MmiMessageId code, uint32_t value)
 {
-    timeval time;
+    struct timeval time;
     RawInputEvent rawEvent = {};
     gettimeofday(&time, 0);
     rawEvent.ev_type = INPUT_DEVICE_CAP_AI_SENSOR;
@@ -291,7 +291,7 @@ int32_t InjectionEventDispatch::OnAisensorEach()
         MMI_LOGE("Send AI Msg fail. errCode:%{public}d", MSG_SEND_FAIL);
     }
 
-    timeval time;
+    struct timeval time;
     RawInputEvent rawEvent = {};
     gettimeofday(&time, 0);
     msgType = MSG_TYPE_DEVICE_INFO;
@@ -332,7 +332,7 @@ int32_t InjectionEventDispatch::OnKnuckleEach()
     cktAiInit << msgType << devIndex << devType;
     SendMsg(cktAiInit);
 
-    timeval time;
+    struct timeval time;
     RawInputEvent rawEvent = {};
     gettimeofday(&time, 0);
     msgType = MSG_TYPE_DEVICE_INFO;
@@ -498,9 +498,9 @@ int32_t InjectionEventDispatch::OnSendEvent()
         MMI_LOGE("device node:%s is not exit", deviceNode.c_str());
         return RET_ERR;
     }
-    timeval tm;
+    struct timeval tm;
     gettimeofday(&tm, 0);
-    input_event event = {};
+    struct input_event event = {};
     event.input_event_sec = tm.tv_sec;
     event.input_event_usec = tm.tv_usec;
     event.type = static_cast<uint16_t>(std::stoi(injectArgvs_[SEND_EVENT_TYPE_INDEX]));

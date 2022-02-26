@@ -98,7 +98,7 @@ bool SendMessage::SendMsg(const NetPacket& ckt)
     return false;
 }
 
-void SendMessage::TransitionHdiEvent(const input_event& event, RawInputEvent& speechEvent)
+void SendMessage::TransitionHdiEvent(const struct input_event& event, RawInputEvent& speechEvent)
 {
     speechEvent.ev_type = event.type;
     speechEvent.ev_code = event.code;

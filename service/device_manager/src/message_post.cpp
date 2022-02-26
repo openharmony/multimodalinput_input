@@ -30,7 +30,7 @@ void MessagePost::SetFd(int32_t fd)
     fd_ = fd;
 }
 
-void MessagePost::RunOnWestonThread(std::function<void(weston_compositor *)> taskItem)
+void MessagePost::RunOnWestonThread(std::function<void(struct weston_compositor *)> taskItem)
 {
     {
         std::lock_guard<std::mutex> guard(lk_);
@@ -52,7 +52,7 @@ void MessagePost::NotifyWestonThread()
 void MessagePost::RunTasks()
 {
     while (true) {
-        std::function<void(weston_compositor *)> taskItem;
+        std::function<void(struct weston_compositor *)> taskItem;
         {
             std::lock_guard<std::mutex> guard(lk_);
             if (asyncTasks_.empty()) {
@@ -73,7 +73,7 @@ int32_t MessagePost::RunTaskOnWestonThread(int32_t fd, uint32_t mask, void *data
     return 0;
 }
 
-void MessagePost::SetWestonCompositor(weston_compositor *ec)
+void MessagePost::SetWestonCompositor(struct weston_compositor *ec)
 {
     ec_ = ec;
 }

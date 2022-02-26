@@ -443,7 +443,7 @@ HWTEST_F(UDSSocketTest, EpollCtl_001, TestSize.Level1)
 {
     int32_t fd = 1001;
     int32_t op = 0;
-    epoll_event event = {};
+    struct epoll_event event = {};
 
     UDSSocketUnitTest socObj;
     int32_t retResult = socObj.EpollCtl(fd, op, event);
@@ -454,7 +454,7 @@ HWTEST_F(UDSSocketTest, EpollCtl_003, TestSize.Level1)
 {
     int32_t fd = -1001;
     int32_t op = 1001;
-    epoll_event event = {};
+    struct epoll_event event = {};
 
     UDSSocketUnitTest socObj;
     int32_t retResult = socObj.EpollCtl(fd, op, event);
@@ -465,7 +465,7 @@ HWTEST_F(UDSSocketTest, EpollCtl_004, TestSize.Level1)
 {
     int32_t fd = -1001;
     int32_t op = -2002;
-    epoll_event event = {};
+    struct epoll_event event = {};
 
     UDSSocketUnitTest socObj;
     int32_t retResult = socObj.EpollCtl(fd, op, event);
@@ -474,7 +474,7 @@ HWTEST_F(UDSSocketTest, EpollCtl_004, TestSize.Level1)
 
 HWTEST_F(UDSSocketTest, EpollWait_001, TestSize.Level1)
 {
-    epoll_event events[MAX_EVENT_SIZE] = {};
+    struct epoll_event events[MAX_EVENT_SIZE] = {};
     int32_t timeout = -1;
 
     UDSSocketUnitTest socObj;
@@ -484,7 +484,7 @@ HWTEST_F(UDSSocketTest, EpollWait_001, TestSize.Level1)
 
 HWTEST_F(UDSSocketTest, EpollWait_002, TestSize.Level1)
 {
-    epoll_event events[MAX_EVENT_SIZE] = {};
+    struct epoll_event events[MAX_EVENT_SIZE] = {};
     int32_t timeout = 1001;
 
     UDSSocketUnitTest socObj;
@@ -494,7 +494,7 @@ HWTEST_F(UDSSocketTest, EpollWait_002, TestSize.Level1)
 
 HWTEST_F(UDSSocketTest, EpollWait_003, TestSize.Level1)
 {
-    epoll_event events[MAX_EVENT_SIZE] = {};
+    struct epoll_event events[MAX_EVENT_SIZE] = {};
     int32_t timeout = -1001;
 
     UDSSocketUnitTest socObj;
@@ -504,7 +504,7 @@ HWTEST_F(UDSSocketTest, EpollWait_003, TestSize.Level1)
 
 HWTEST_F(UDSSocketTest, EpollWait_004, TestSize.Level1)
 {
-    epoll_event events[MAX_EVENT_SIZE] = {};
+    struct epoll_event events[MAX_EVENT_SIZE] = {};
     int32_t timeout = -1001;
 
     UDSSocketUnitTest socObj;

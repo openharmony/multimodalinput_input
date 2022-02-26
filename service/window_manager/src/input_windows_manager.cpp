@@ -576,7 +576,7 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
     }
 }
 
-bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint_2(libinput_event_touch* touch,
+bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint_2(struct libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
 {
     CHKPF(touch);
@@ -641,7 +641,7 @@ void OHOS::MMI::InputWindowsManager::TurnTouchScreen(PhysicalDisplayInfo* info, 
     }
 }
 
-bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(libinput_event_touch* touch, Direction& direction,
+bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(struct libinput_event_touch* touch, Direction& direction,
     int32_t &globalLogicalX, int32_t &globalLogicalY)
 {
     CHKPF(touch);
@@ -700,7 +700,7 @@ bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(libinput_event_touc
     return true;
 }
 
-bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(libinput_event_touch* touch, Direction& direction,
+bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(struct libinput_event_touch* touch, Direction& direction,
     int32_t targetDisplayId, int32_t& displayX, int32_t& displayY)
 {
     CHKPF(touch);
@@ -724,7 +724,7 @@ bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(libinput_eve
     return false;
 }
 
-bool OHOS::MMI::InputWindowsManager::TouchDownPointToDisplayPoint(libinput_event_touch* touch, Direction& direction,
+bool OHOS::MMI::InputWindowsManager::TouchDownPointToDisplayPoint(struct libinput_event_touch* touch, Direction& direction,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
 {
     CHKPF(touch);
@@ -1037,7 +1037,7 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
 {
     int32_t integerX = static_cast<int32_t>(x);
     int32_t integerY = static_cast<int32_t>(y);
-    const std::vector<struct LogicalDisplayInfo> logicalDisplayInfo = GetLogicalDisplayInfo();
+    const std::vector<LogicalDisplayInfo> logicalDisplayInfo = GetLogicalDisplayInfo();
     if (logicalDisplayInfo.empty()) {
         MMI_LOGE("logicalDisplayInfo is empty");
         return;
