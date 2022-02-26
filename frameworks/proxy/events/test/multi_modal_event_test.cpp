@@ -34,7 +34,7 @@ HWTEST_F(MultimodalEventTest, Initialize_001, TestSize.Level1)
     int32_t highLevelEvent = 1;
     std::string strUuid = "1";
     int32_t sourceType = 1;
-    int32_t occurredTime = 1;
+    int64_t occurredTime = 1;
     std::string deviceId = "1";
     int32_t inputDeviceId = 1;
     bool isHighLevelEvent = false;
@@ -81,13 +81,13 @@ HWTEST_F(MultimodalEventTest, GetUuid_004, TestSize.Level1)
 
 HWTEST_F(MultimodalEventTest, GetOccurredTime_001, TestSize.Level1)
 {
-    uint64_t retResult = multiModalEvent.GetOccurredTime();
+    int64_t retResult = multiModalEvent.GetOccurredTime();
     EXPECT_TRUE(retResult == 1);
 }
 
 HWTEST_F(MultimodalEventTest, GetOccurredTime_002, TestSize.Level1)
 {
-    uint64_t retResult = multiModalEvent.GetOccurredTime();
+    int64_t retResult = multiModalEvent.GetOccurredTime();
     EXPECT_FALSE(retResult == 2);
 }
 
@@ -213,13 +213,13 @@ HWTEST_F(MultimodalEventTest, GetUuid_L_004, TestSize.Level1)
 
 HWTEST_F(MultimodalEventTest, GetOccurredTime_L_001, TestSize.Level1)
 {
-    uint64_t retResult = multiModalEvent.GetOccurredTime();
+    int64_t retResult = multiModalEvent.GetOccurredTime();
     EXPECT_TRUE(retResult == 9);
 }
 
 HWTEST_F(MultimodalEventTest, GetOccurredTime_L_002, TestSize.Level1)
 {
-    uint64_t retResult = multiModalEvent.GetOccurredTime();
+    int64_t retResult = multiModalEvent.GetOccurredTime();
     EXPECT_FALSE(retResult == 7);
 }
 
@@ -319,7 +319,7 @@ HWTEST_F(MultimodalEventTest, IsSameEvent_TMP_001, TestSize.Level1)
     int32_t highLevel = 1;
     std::string strUuid = "2342";
     int32_t sourceType = 1;
-    int32_t occurredTime = 1;
+    int64_t occurredTime = 1;
     std::string deviceId = "1";
     int32_t inputDeviceId = 1;
     bool isHighLevelEvent = false;
@@ -337,7 +337,7 @@ HWTEST_F(MultimodalEventTest, IsSameEvent_TMP_002, TestSize.Level1)
     int32_t highLevel = 25;
     std::string strUuid = "uuid_3356";
     int32_t sourceType = 25;
-    int32_t occurredTime = 25;
+    int64_t occurredTime = 25;
     std::string deviceId = "25";
     int32_t inputDeviceId = 25;
     bool isHighLevelEvent = false;
@@ -355,7 +355,7 @@ HWTEST_F(MultimodalEventTest, IsSameEvent_TMP_003, TestSize.Level1)
     int32_t highLevel = 25;
     std::string strUuid = "-number -a&d";
     int32_t sourceType = 25;
-    int32_t occurredTime = 25;
+    int64_t occurredTime = 25;
     std::string deviceId = "25";
     int32_t inputDeviceId = 25;
     bool isHighLevelEvent = false;
@@ -373,7 +373,7 @@ HWTEST_F(MultimodalEventTest, IsSameEvent_TMP_004, TestSize.Level1)
     int32_t highLevel = 25;
     std::string strUuid = "uuid_1001";
     int32_t sourceType = 25;
-    int32_t occurredTime = 25;
+    int64_t occurredTime = 25;
     std::string deviceId = "25";
     int32_t inputDeviceId = 25;
     bool isHighLevelEvent = false;
@@ -391,7 +391,7 @@ HWTEST_F(MultimodalEventTest, IsHighLevelInput_TMP_001, TestSize.Level1)
     int32_t highLevel = 1;
     std::string strUuid = "2342";
     int32_t sourceType = 1;
-    int32_t occurredTime = 1;
+    int64_t occurredTime = 1;
     std::string deviceId = "1";
     int32_t inputDeviceId = 1;
     bool isHighLevelEvent = false;
@@ -409,7 +409,7 @@ HWTEST_F(MultimodalEventTest, IsHighLevelInput_TMP_002, TestSize.Level1)
     int32_t highLevel = 25;
     std::string strUuid = "uuid_3356";
     int32_t sourceType = 25;
-    int32_t occurredTime = 25;
+    int64_t occurredTime = 25;
     std::string deviceId = "25";
     int32_t inputDeviceId = 25;
     bool isHighLevelEvent = true;
@@ -427,7 +427,7 @@ HWTEST_F(MultimodalEventTest, GetHighLevelEvent_TMP_001, TestSize.Level1)
     int32_t highLevel = -65535;
     std::string strUuid = "2342";
     int32_t sourceType = 1;
-    int32_t occurredTime = 1;
+    int64_t occurredTime = 1;
     std::string deviceId = "1";
     int32_t inputDeviceId = 1;
     bool isHighLevelEvent = false;
@@ -445,7 +445,7 @@ HWTEST_F(MultimodalEventTest, GetHighLevelEvent_TMP_002, TestSize.Level1)
     int32_t highLevel = 65535;
     std::string strUuid = "uuid_3356";
     int32_t sourceType = 25;
-    int32_t occurredTime = 25;
+    int64_t occurredTime = 25;
     std::string deviceId = "25";
     int32_t inputDeviceId = 25;
     bool isHighLevelEvent = false;
@@ -463,7 +463,7 @@ HWTEST_F(MultimodalEventTest, GetHighLevelEvent_TMP_003, TestSize.Level1)
     int32_t highLevel = static_cast<int32_t>('a');
     std::string strUuid = "-number -a&d";
     int32_t sourceType = 25;
-    int32_t occurredTime = 25;
+    int64_t occurredTime = 25;
     std::string deviceId = "25";
     int32_t inputDeviceId = 25;
     bool isHighLevelEvent = false;
@@ -481,7 +481,7 @@ HWTEST_F(MultimodalEventTest, GetHighLevelEvent_TMP_004, TestSize.Level1)
     int32_t highLevel = static_cast<int32_t>('a') + static_cast<int32_t>('s');
     std::string strUuid = "uuid_1001";
     int32_t sourceType = 25;
-    int32_t occurredTime = 25;
+    int64_t occurredTime = 25;
     std::string deviceId = "25";
     int32_t inputDeviceId = 25;
     bool isHighLevelEvent = false;
@@ -499,7 +499,7 @@ HWTEST_F(MultimodalEventTest, GetSourceDevice_TMP_001, TestSize.Level1)
     int32_t highLevel = 1;
     std::string strUuid = "555";
     int32_t sourceType = -65535;
-    int32_t occurredTime = 1;
+    int64_t occurredTime = 1;
     std::string deviceId = "1";
     int32_t inputDeviceId = 1;
     bool isHighLevelEvent = false;
@@ -517,7 +517,7 @@ HWTEST_F(MultimodalEventTest, GetSourceDevice_TMP_002, TestSize.Level1)
     int32_t highLevel = 25;
     std::string strUuid = "555";
     int32_t sourceType = 65535;
-    int32_t occurredTime = 25;
+    int64_t occurredTime = 25;
     std::string deviceId = "25";
     int32_t inputDeviceId = 25;
     bool isHighLevelEvent = false;
@@ -535,7 +535,7 @@ HWTEST_F(MultimodalEventTest, GetSourceDevice_TMP_003, TestSize.Level1)
     int32_t highLevel = 25;
     std::string strUuid = "555";
     int32_t sourceType = static_cast<int32_t>('b');
-    int32_t occurredTime = 25;
+    int64_t occurredTime = 25;
     std::string deviceId = "25";
     int32_t inputDeviceId = 25;
     bool isHighLevelEvent = false;
@@ -553,7 +553,7 @@ HWTEST_F(MultimodalEventTest, GetSourceDevice_TMP_004, TestSize.Level1)
     int32_t highLevel = 25;
     std::string strUuid = "555";
     int32_t sourceType = static_cast<int32_t>('d') + static_cast<int32_t>('s');
-    int32_t occurredTime = 25;
+    int64_t occurredTime = 25;
     std::string deviceId = "25";
     int32_t inputDeviceId = 25;
     bool isHighLevelEvent = false;
@@ -571,7 +571,7 @@ HWTEST_F(MultimodalEventTest, GetDeviceId_TMP_001, TestSize.Level1)
     int32_t highLevel = 1;
     std::string strUuid = "555";
     int32_t sourceType = -65535;
-    int32_t occurredTime = 1;
+    int64_t occurredTime = 1;
     std::string deviceId = "-65535";
     int32_t inputDeviceId = 1;
     bool isHighLevelEvent = false;
@@ -589,7 +589,7 @@ HWTEST_F(MultimodalEventTest, GetDeviceId_TMP_002, TestSize.Level1)
     int32_t highLevel = 25;
     std::string strUuid = "555";
     int32_t sourceType = 65535;
-    int32_t occurredTime = 25;
+    int64_t occurredTime = 25;
     std::string deviceId = "uuid_3356";
     int32_t inputDeviceId = 25;
     bool isHighLevelEvent = false;
@@ -607,7 +607,7 @@ HWTEST_F(MultimodalEventTest, GetDeviceId_TMP_003, TestSize.Level1)
     int32_t highLevel = 25;
     std::string strUuid = "555";
     int32_t sourceType = static_cast<int32_t>('b');
-    int32_t occurredTime = 25;
+    int64_t occurredTime = 25;
     std::string deviceId = "-number -a&d";
     int32_t inputDeviceId = 25;
     bool isHighLevelEvent = false;
@@ -625,7 +625,7 @@ HWTEST_F(MultimodalEventTest, GetDeviceId_TMP_004, TestSize.Level1)
     int32_t highLevel = 25;
     std::string strUuid = "555";
     int32_t sourceType = static_cast<int32_t>('d') + static_cast<int32_t>('s');
-    int32_t occurredTime = 25;
+    int64_t occurredTime = 25;
     std::string deviceId = "uuid_1001";
     int32_t inputDeviceId = 25;
     bool isHighLevelEvent = false;
@@ -643,7 +643,7 @@ HWTEST_F(MultimodalEventTest, GetInputDeviceId_TMP_001, TestSize.Level1)
     int32_t highLevel = 1;
     std::string strUuid = "555";
     int32_t sourceType = -65535;
-    int32_t occurredTime = 1;
+    int64_t occurredTime = 1;
     std::string deviceId = "1";
     int32_t inputDeviceId = -65535;
     bool isHighLevelEvent = false;
@@ -661,7 +661,7 @@ HWTEST_F(MultimodalEventTest, GetInputDeviceId_TMP_002, TestSize.Level1)
     int32_t highLevel = 25;
     std::string strUuid = "555";
     int32_t sourceType = 65535;
-    int32_t occurredTime = 25;
+    int64_t occurredTime = 25;
     std::string deviceId = "25";
     int32_t inputDeviceId = 65535;
     bool isHighLevelEvent = false;
@@ -679,7 +679,7 @@ HWTEST_F(MultimodalEventTest, GetInputDeviceId_TMP_003, TestSize.Level1)
     int32_t highLevel = 25;
     std::string strUuid = "555";
     int32_t sourceType = static_cast<int32_t>('b');
-    int32_t occurredTime = 25;
+    int64_t occurredTime = 25;
     std::string deviceId = "25";
     int32_t inputDeviceId = static_cast<int32_t>('h');
     bool isHighLevelEvent = false;
@@ -697,7 +697,7 @@ HWTEST_F(MultimodalEventTest, GetInputDeviceId_TMP_004, TestSize.Level1)
     int32_t highLevel = 25;
     std::string strUuid = "555";
     int32_t sourceType = static_cast<int32_t>('d') + static_cast<int32_t>('s');
-    int32_t occurredTime = 25;
+    int64_t occurredTime = 25;
     std::string deviceId = "25";
     int32_t inputDeviceId = static_cast<int32_t>('d') + static_cast<int32_t>('s');
     bool isHighLevelEvent = false;
@@ -715,7 +715,7 @@ HWTEST_F(MultimodalEventTest, GetOccurredTime_TMP_001, TestSize.Level1)
     int32_t highLevel = 1;
     std::string strUuid = "555";
     int32_t sourceType = -65535;
-    uint64_t occurredTime = -65535;
+    int64_t occurredTime = -65535;
     std::string deviceId = "1";
     int32_t inputDeviceId = -65535;
     bool isHighLevelEvent = false;
@@ -723,7 +723,7 @@ HWTEST_F(MultimodalEventTest, GetOccurredTime_TMP_001, TestSize.Level1)
     MultimodalEvent multiModalEventTmp;
     multiModalEventTmp.Initialize(windowId, highLevel, strUuid, sourceType, occurredTime,
                                   deviceId, inputDeviceId, isHighLevelEvent);
-    uint64_t retResult = multiModalEventTmp.GetOccurredTime();
+    int64_t retResult = multiModalEventTmp.GetOccurredTime();
     EXPECT_EQ(retResult, occurredTime);
 }
 
@@ -733,7 +733,7 @@ HWTEST_F(MultimodalEventTest, GetOccurredTime_TMP_002, TestSize.Level1)
     int32_t highLevel = 25;
     std::string strUuid = "555";
     int32_t sourceType = 65535;
-    uint64_t occurredTime = 65535;
+    int64_t occurredTime = 65535;
     std::string deviceId = "25";
     int32_t inputDeviceId = 65535;
     bool isHighLevelEvent = false;
@@ -741,7 +741,7 @@ HWTEST_F(MultimodalEventTest, GetOccurredTime_TMP_002, TestSize.Level1)
     MultimodalEvent multiModalEventTmp;
     multiModalEventTmp.Initialize(windowId, highLevel, strUuid, sourceType, occurredTime,
                                   deviceId, inputDeviceId, isHighLevelEvent);
-    uint64_t retResult = multiModalEventTmp.GetOccurredTime();
+    int64_t retResult = multiModalEventTmp.GetOccurredTime();
     EXPECT_EQ(retResult, occurredTime);
 }
 
@@ -751,7 +751,7 @@ HWTEST_F(MultimodalEventTest, GetOccurredTime_TMP_003, TestSize.Level1)
     int32_t highLevel = 25;
     std::string strUuid = "555";
     int32_t sourceType = static_cast<int32_t>('b');
-    uint64_t occurredTime = static_cast<int32_t>('s');
+    int64_t occurredTime = static_cast<int64_t>('s');
     std::string deviceId = "25";
     int32_t inputDeviceId = static_cast<int32_t>('h');
     bool isHighLevelEvent = false;
@@ -759,7 +759,7 @@ HWTEST_F(MultimodalEventTest, GetOccurredTime_TMP_003, TestSize.Level1)
     MultimodalEvent multiModalEventTmp;
     multiModalEventTmp.Initialize(windowId, highLevel, strUuid, sourceType, occurredTime,
                                   deviceId, inputDeviceId, isHighLevelEvent);
-    uint64_t retResult = multiModalEventTmp.GetOccurredTime();
+    int64_t retResult = multiModalEventTmp.GetOccurredTime();
     EXPECT_EQ(retResult, occurredTime);
 }
 
@@ -769,7 +769,7 @@ HWTEST_F(MultimodalEventTest, GetOccurredTime_TMP_004, TestSize.Level1)
     int32_t highLevel = 25;
     std::string strUuid = "555";
     int32_t sourceType = static_cast<int32_t>('d') + static_cast<int32_t>('s');
-    uint64_t occurredTime = static_cast<int32_t>('d') + static_cast<int32_t>('s');
+    int64_t occurredTime = static_cast<int64_t>('d') + static_cast<int64_t>('s');
     std::string deviceId = "25";
     int32_t inputDeviceId = static_cast<int32_t>('d') + static_cast<int32_t>('s');
     bool isHighLevelEvent = false;
@@ -777,7 +777,7 @@ HWTEST_F(MultimodalEventTest, GetOccurredTime_TMP_004, TestSize.Level1)
     MultimodalEvent multiModalEventTmp;
     multiModalEventTmp.Initialize(windowId, highLevel, strUuid, sourceType, occurredTime,
                                   deviceId, inputDeviceId, isHighLevelEvent);
-    uint64_t retResult = multiModalEventTmp.GetOccurredTime();
+    int64_t retResult = multiModalEventTmp.GetOccurredTime();
     EXPECT_EQ(retResult, occurredTime);
 }
 
@@ -787,7 +787,7 @@ HWTEST_F(MultimodalEventTest, GetUuid_TMP_001, TestSize.Level1)
     int32_t highLevel = 1;
     std::string strUuid = "555";
     int32_t sourceType = -65535;
-    int32_t occurredTime = 1;
+    int64_t occurredTime = 1;
     std::string deviceId = "-65535";
     int32_t inputDeviceId = 1;
     bool isHighLevelEvent = false;
@@ -805,7 +805,7 @@ HWTEST_F(MultimodalEventTest, GetUuid_TMP_002, TestSize.Level1)
     int32_t highLevel = 25;
     std::string strUuid = "uuid_3356";
     int32_t sourceType = 65535;
-    int32_t occurredTime = 25;
+    int64_t occurredTime = 25;
     std::string deviceId = "uuid_3356";
     int32_t inputDeviceId = 25;
     bool isHighLevelEvent = false;
@@ -823,7 +823,7 @@ HWTEST_F(MultimodalEventTest, GetUuid_TMP_003, TestSize.Level1)
     int32_t highLevel = 25;
     std::string strUuid = "-number -a&d";
     int32_t sourceType = static_cast<int32_t>('b');
-    int32_t occurredTime = 25;
+    int64_t occurredTime = 25;
     std::string deviceId = "-number -a&d";
     int32_t inputDeviceId = 25;
     bool isHighLevelEvent = false;
@@ -841,7 +841,7 @@ HWTEST_F(MultimodalEventTest, GetUuid_TMP_004, TestSize.Level1)
     int32_t highLevel = 25;
     std::string strUuid = "uuid_1001";
     int32_t sourceType = static_cast<int32_t>('d') + static_cast<int32_t>('s');
-    int32_t occurredTime = 25;
+    int64_t occurredTime = 25;
     std::string deviceId = "uuid_1001";
     int32_t inputDeviceId = 25;
     bool isHighLevelEvent = false;

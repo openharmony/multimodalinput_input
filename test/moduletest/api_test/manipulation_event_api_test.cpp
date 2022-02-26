@@ -30,14 +30,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetStartTime_Normal, TestSize.Level1
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 0;
     int32_t pointerCount = 0;
     fingerInfos* fingersInfos = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -52,14 +52,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetStartTime_Abnormal, TestSize.Leve
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 0xFFFFFFFF;
+    int64_t startTime = 0xFFFFFFFF;
     int32_t operationState = 0;
     int32_t pointerCount = 0;
     fingerInfos* fingersInfos = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -74,14 +74,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetStartTime_Min, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = static_cast<int32_t>(0xFFFFFFFF);
+    int64_t startTime = static_cast<int64_t>(0xFFFFFFFF);
     int32_t operationState = 0;
     int32_t pointerCount = 0;
     fingerInfos* fingersInfos = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -96,14 +96,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetStartTime_Max, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 0x7FFFFFFF;
+    int64_t startTime = 0x7FFFFFFF;
     int32_t operationState = 0;
     int32_t pointerCount = 0;
     fingerInfos* fingersInfos = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -118,14 +118,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetPhase_Normal, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 0;
     fingerInfos* fingersInfos = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -140,14 +140,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetPhase_Abnormal, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 0xFFFFFFFF;
     int32_t pointerCount = 0;
     fingerInfos* fingersInfos = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -162,14 +162,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetPhase_Min, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = static_cast<int32_t>(0xFFFFFFFF);
     int32_t pointerCount = 0;
     fingerInfos* fingersInfos = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -184,14 +184,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetPhase_Max, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 0x7FFFFFFF;
     int32_t pointerCount = 0;
     fingerInfos* fingersInfos = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -206,14 +206,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerPosition_Normal, TestSize.
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 2;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -234,14 +234,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerPosition_Fail, TestSize.Le
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 2;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -262,14 +262,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerPosition_Abnormal, TestSiz
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 2;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -290,14 +290,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerPosition_Abnormal_Paramete
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 2;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -318,14 +318,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_SetScreenOffset_GetFingersInfos_Norm
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 2;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -345,14 +345,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_SetScreenOffset_GetFingersInfos_Abno
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 2;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -372,14 +372,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerCount_Normal, TestSize.Lev
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 2;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -395,14 +395,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerCount_Abnormal, TestSize.L
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 0xFFFFFFFF;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -418,14 +418,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerCount_Min, TestSize.Level1
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = static_cast<int32_t>(0xFFFFFFFF);
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -441,14 +441,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerCount_Max, TestSize.Level1
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 0x7FFFFFFF;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -464,14 +464,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerScreenPosition_Normal, Tes
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 3;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -492,14 +492,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerScreenPosition_Abnormal, T
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 3;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -520,14 +520,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerScreenPosition_Abnormal_Pa
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 3;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -548,14 +548,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerId_Normal, TestSize.Level1
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 3;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -572,14 +572,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerId_Anomalous, TestSize.Lev
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 3;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -596,14 +596,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerId_Min, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 3;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -620,14 +620,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerId_Max, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 3;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -644,14 +644,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetForce_Normal, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 3;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -668,14 +668,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetForce_Anomalous, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 3;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -692,14 +692,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetForce_Min, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 3;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -716,14 +716,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetForce_Max, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 3;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -740,14 +740,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetRadius_Normal, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 3;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -764,14 +764,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetRadius_Anomalous, TestSize.Level1
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 3;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -788,14 +788,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetRadius_Min, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 3;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -812,14 +812,14 @@ HWTEST_F(ManipulationEventApiTest, Api_Test_GetRadius_Max, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
-    int32_t startTime = 100;
+    int64_t startTime = 100;
     int32_t operationState = 10;
     int32_t pointerCount = 3;
     fingerInfos fingersInfos[FINGER_NUM] = {};
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;

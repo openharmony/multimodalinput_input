@@ -35,7 +35,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_IsSameEvent_Normal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -54,7 +54,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_IsSameEvent_Abnormal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -73,7 +73,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_IsHighLevelInput_Normal, TestSize.Leve
     int32_t highLevelEvent = 0;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -91,7 +91,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_IsHighLevelInput_Abnormal, TestSize.Le
     int32_t highLevelEvent = 0;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = false;
@@ -109,7 +109,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetHighLevelEvent_Normal, TestSize.Lev
     int32_t highLevelEvent = 10;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -127,7 +127,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetHighLevelEvent_Abnormal, TestSize.L
     int32_t highLevelEvent = 0xFFFFFFFF;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -145,7 +145,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetHighLevelEvent_Min, TestSize.Level1
     int32_t highLevelEvent = static_cast<int32_t>(0xFFFFFFFF);
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -163,7 +163,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetHighLevelEvent_Max, TestSize.Level1
     int32_t highLevelEvent = 0x7FFFFFFF;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -181,7 +181,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetSourceDevice_Normal, TestSize.Level
     int32_t highLevelEvent = 10;
     const std::string uuid = "aEvent";
     int32_t sourceType = DEVICE_TYPE_KEYBOARD;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -199,7 +199,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetSourceDevice_Abnormal, TestSize.Lev
     int32_t highLevelEvent = 10;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0xFFFFFFFF;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -217,7 +217,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetSourceDevice_Min, TestSize.Level1)
     int32_t highLevelEvent = 10;
     const std::string uuid = "aEvent";
     int32_t sourceType = static_cast<int32_t>(0xFFFFFFFF);
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -235,7 +235,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetSourceDevice_Max, TestSize.Level1)
     int32_t highLevelEvent = 10;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0x7FFFFFFF;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -253,7 +253,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetDeviceId_Normal, TestSize.Level1)
     int32_t highLevelEvent = 10;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "bDevice";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -271,7 +271,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetDeviceId_Abnormal, TestSize.Level1)
     int32_t highLevelEvent = 10;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "error";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -289,7 +289,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetDeviceId_NULL, TestSize.Level1)
     int32_t highLevelEvent = 10;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -307,7 +307,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetDeviceId_ERROR, TestSize.Level1)
     int32_t highLevelEvent = 10;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "ERROR";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -325,7 +325,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetInputDeviceId_Normal, TestSize.Leve
     int32_t highLevelEvent = 10;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "bDevice";
     int32_t inputDeviceId = 10;
     bool isHighLevelEvent = true;
@@ -343,7 +343,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetInputDeviceId_Abnormal, TestSize.Le
     int32_t highLevelEvent = 10;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "bDevice";
     int32_t inputDeviceId = 0xFFFFFFFF;
     bool isHighLevelEvent = true;
@@ -361,7 +361,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetInputDeviceId_Min, TestSize.Level1)
     int32_t highLevelEvent = 10;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "bDevice";
     int32_t inputDeviceId = static_cast<int32_t>(0xFFFFFFFF);
     bool isHighLevelEvent = true;
@@ -379,7 +379,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetInputDeviceId_Max, TestSize.Level1)
     int32_t highLevelEvent = 10;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "bDevice";
     int32_t inputDeviceId = 0x7FFFFFFF;
     bool isHighLevelEvent = true;
@@ -397,7 +397,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetOccurredTime_Normal, TestSize.Level
     int32_t highLevelEvent = 10;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 100;
+    int64_t occurredTime = 100;
     const std::string deviceId = "bDevice";
     int32_t inputDeviceId = 10;
     bool isHighLevelEvent = true;
@@ -415,7 +415,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetOccurredTime_Abnormal, TestSize.Lev
     int32_t highLevelEvent = 10;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0xFFFFFFFFFFFFFFFF;
+    int64_t occurredTime = 0xFFFFFFFFFFFFFFFF;
     const std::string deviceId = "bDevice";
     int32_t inputDeviceId = 10;
     bool isHighLevelEvent = true;
@@ -433,7 +433,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetOccurredTime_Min, TestSize.Level1)
     int32_t highLevelEvent = 10;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "bDevice";
     int32_t inputDeviceId = 10;
     bool isHighLevelEvent = true;
@@ -451,7 +451,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetWindowID_Normal, TestSize.Level1)
     int32_t highLevelEvent = 10;
     const std::string uuid = "aEvent";
     int32_t sourceType = 10;
-    uint64_t occurredTime = 100;
+    int64_t occurredTime = 100;
     const std::string deviceId = "bDevice";
     int32_t inputDeviceId = 10;
     bool isHighLevelEvent = true;
@@ -469,7 +469,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetWindowID_Abnormal, TestSize.Level1)
     int32_t highLevelEvent = 10;
     const std::string uuid = "aEvent";
     int32_t sourceType = 10;
-    uint64_t occurredTime = 100;
+    int64_t occurredTime = 100;
     const std::string deviceId = "bDevice";
     int32_t inputDeviceId = 10;
     bool isHighLevelEvent = true;
@@ -487,7 +487,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetUuid_Normal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "aEvent";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -505,7 +505,7 @@ HWTEST_F(MultimodalEventApiTest, Api_Test_GetUuid_Abnormal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "Error";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;

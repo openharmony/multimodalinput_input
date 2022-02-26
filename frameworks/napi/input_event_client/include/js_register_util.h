@@ -23,7 +23,7 @@ void SetNamedProperty(const napi_env& env, napi_value object, const std::string&
 void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, uint32_t value);
 void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, float value);
 void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, double value);
-void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, uint64_t value);
+void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, int64_t value);
 void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, std::string value);
 void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, napi_value value);
 
