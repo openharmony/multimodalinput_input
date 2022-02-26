@@ -748,12 +748,11 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
     if (IsANRProcess(&udsServer, fd, key->GetId()) == TRIGGER_ANR) {
         MMI_LOGE("the key event does not report normally, triggering ANR");
     }
-
-    InputMonitorServiceMgr.OnMonitorInputEvent(key);
-    NetPacket newPkt(MmiMessageId::ON_KEYEVENT);
-    InputEventDataTransformation::KeyEventToNetPacket(key, newPkt);
-    newPkt << fd << preHandlerTime;
-    if (!udsServer.SendMsg(fd, newPkt)) {
+    InputHandlerManagerGlobal::GetInstance().HandleEvent(key);
+    NetPacket pkt(MmiMessageId::ON_KEYEVENT);
+    InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
+    pkt << fd << preHandlerTime;
+    if (!udsServer.SendMsg(fd, pkt)) {
         MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
