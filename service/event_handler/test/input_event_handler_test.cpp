@@ -29,11 +29,10 @@ namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventHandlerTest" };
-} //namespace
 
 static void LibinputDrainEvents(libinput* li)
 {
-    libinput_event* event;
+    struct libinput_event* event;
     libinput_dispatch(li);
     while ((event = libinput_get_event(li))) {
         libinput_event_destroy(event);
@@ -130,7 +129,7 @@ public:
 protected:
     MMIServer server_;
     InputEventHandler eventHandler_;
-    libinput_event* event_ = nullptr;
+    struct libinput_event* event_ = nullptr;
     udev* udev_ = nullptr;
     libinput* input_ = nullptr;
     pid_t virtualDeviceManagerPid_ = 0;
@@ -348,4 +347,4 @@ HWTEST_F(InputEventHandlerTest, Test_OnEventJoyStickAxis, TestSize.Level1)
     multimodal_libinput_event mmi_event = {event_, nullptr};
     EXPECT_EQ(eventHandler_.OnEventPointer(mmi_event), OHOS::JOYSTICK_EVENT_DISP_FAIL);
 }
-}
+} // namespace
