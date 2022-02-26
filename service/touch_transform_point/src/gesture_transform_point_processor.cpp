@@ -41,7 +41,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_ge
     CHKPV(data);
     auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     auto scale = libinput_event_gesture_get_scale(data);
-    pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
+    pointerEvent_->SetActionTime(GetSysClockTime());
     pointerEvent_->SetActionStartTime(time);
 
     PointerEvent::PointerItem pointerItem;
@@ -74,7 +74,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchUpdate(libinput_event_g
     CHKPV(data);
     auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     auto scale = libinput_event_gesture_get_scale(data);
-    pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
+    pointerEvent_->SetActionTime(GetSysClockTime());
     pointerEvent_->SetActionStartTime(time);
 
     PointerEvent::PointerItem pointerItem;
@@ -99,7 +99,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gest
     CHKPV(data);
     auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     auto scale = libinput_event_gesture_get_scale(data);
-    pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
+    pointerEvent_->SetActionTime(GetSysClockTime());
     pointerEvent_->SetActionStartTime(time);
 
     PointerEvent::PointerItem pointerItem;

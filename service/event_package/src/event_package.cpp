@@ -233,7 +233,7 @@ int32_t EventPackage::PackageTabletToolEvent(struct libinput_event *event, Event
         MMI_LOGE("Device param package failed. ret:%{public}d,errCode:%{public}d", rDevRet, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
-    tableTool.time = libinput_event_tablet_tool_get_time(data);
+    tableTool.time = static_cast<int64_t>(libinput_event_tablet_tool_get_time(data));
     PackageTabletToolTypeParam(event, tableTool);
     constexpr uint32_t stylusButton1KeyCode = 331;
     constexpr uint32_t stylusButton2KeyCode = 332;
@@ -287,7 +287,7 @@ int32_t EventPackage::PackageTabletPadEvent(struct libinput_event *event, EventT
     auto data = libinput_event_get_tablet_pad_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
     tabletPad.mode = libinput_event_tablet_pad_get_mode(data);
-    tabletPad.time = libinput_event_tablet_pad_get_time_usec(data);
+    tabletPad.time = static_cast<int64_t>(libinput_event_tablet_pad_get_time_usec(data));
     auto ret = PackageEventDeviceInfo<EventTabletPad>(event, tabletPad);
     if (ret != RET_OK) {
         MMI_LOGE("Device param package failed. ret:%{public}d,errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
@@ -302,7 +302,7 @@ int32_t EventPackage::PackageTabletPadKeyEvent(struct libinput_event *event, Eve
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_tablet_pad_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
-    key.time = libinput_event_tablet_pad_get_time_usec(data);
+    key.time = static_cast<int64_t>(libinput_event_tablet_pad_get_time_usec(data));
     auto ret = PackageEventDeviceInfo<EventKeyboard>(event, key);
     if (ret != RET_OK) {
         MMI_LOGE("Device param package failed. ret:%{public}d,errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
@@ -350,7 +350,7 @@ int32_t EventPackage::PackageJoyStickKeyEvent(struct libinput_event *event, Even
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_joystick_pointer_button_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
-    key.time = libinput_event_joystick_button_time(data);
+    key.time = static_cast<int64_t>(libinput_event_joystick_button_time(data));
     key.key = libinput_event_joystick_button_get_key(data);
     auto ret = PackageEventDeviceInfo<EventKeyboard>(event, key);
     if (ret != RET_OK) {
@@ -372,7 +372,7 @@ int32_t EventPackage::PackagePointerEventMotion(struct libinput_event *event, Ev
     auto data = libinput_event_get_pointer_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
 
-    point.time = libinput_event_pointer_get_time_usec(data);
+    point.time = static_cast<int64_t>(libinput_event_pointer_get_time_usec(data));
     point.delta.x = libinput_event_pointer_get_dx(data);
     point.delta.y = libinput_event_pointer_get_dy(data);
     point.delta_raw.x = libinput_event_pointer_get_dx_unaccelerated(data);
@@ -386,7 +386,7 @@ int32_t EventPackage::PackagePointerEventMotionAbs(struct libinput_event *event,
     auto data = libinput_event_get_pointer_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
 
-    point.time = libinput_event_pointer_get_time_usec(data);
+    point.time = static_cast<int64_t>(libinput_event_pointer_get_time_usec(data));
     point.absolute.x = libinput_event_pointer_get_absolute_x_transformed(data,
                                                                          DEF_SCREEN_MAX_WIDTH);
     point.absolute.y = libinput_event_pointer_get_absolute_y_transformed(data,
@@ -400,7 +400,7 @@ int32_t EventPackage::PackagePointerEventButton(struct libinput_event *event, Ev
     auto data = libinput_event_get_pointer_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
 
-    point.time = libinput_event_pointer_get_time_usec(data);
+    point.time = static_cast<int64_t>(libinput_event_pointer_get_time_usec(data));
     point.button = libinput_event_pointer_get_button(data);
     point.seat_button_count = libinput_event_pointer_get_seat_button_count(data);
     if (libinput_event_pointer_get_button_state(data) == LIBINPUT_BUTTON_STATE_RELEASED) {
@@ -424,7 +424,7 @@ int32_t EventPackage::PackagePointerEventAxis(struct libinput_event *event, Even
     auto data = libinput_event_get_pointer_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
 
-    point.time = libinput_event_pointer_get_time_usec(data);
+    point.time = static_cast<int64_t>(libinput_event_pointer_get_time_usec(data));
     auto axisSource = libinput_event_pointer_get_axis_source(data);
     switch (axisSource) {
         case LIBINPUT_POINTER_AXIS_SOURCE_WHEEL: {
@@ -476,7 +476,7 @@ int32_t EventPackage::PackageJoyStickAxisEvent(struct libinput_event *event, Eve
         MMI_LOGE("Device param package failed. ret:%{public}d,errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
-    eventJoyStickAxis.time = libinput_event_get_joystick_axis_time(joyEvent);
+    eventJoyStickAxis.time = static_cast<int64_t>(libinput_event_get_joystick_axis_time(joyEvent));
     struct {
         const std::string name;
         JOYSTICK_AXIS_SOURCE axis;
@@ -524,7 +524,7 @@ void EventPackage::PackageTouchEventType(int32_t type, struct libinput_event_tou
 #ifdef OHOS_WESTEN_MODEL
             MMIRegEvent->GetTouchInfoTouchId(std::make_pair(touch.deviceId, touch.seatSlot), touch);
 #endif
-            touch.time = libinput_event_touch_get_time_usec(data);
+            touch.time = static_cast<int64_t>(libinput_event_touch_get_time_usec(data));
             touch.eventType = LIBINPUT_EVENT_TOUCH_UP;
             break;
         }
@@ -562,7 +562,7 @@ int32_t EventPackage::PackageTouchEvent(struct libinput_event *event, EventTouch
     }
     auto data = libinput_event_get_touch_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
-    touch.time = libinput_event_touch_get_time_usec(data);
+    touch.time = static_cast<int64_t>(libinput_event_touch_get_time_usec(data));
     touch.slot = libinput_event_touch_get_slot(data);
     touch.seatSlot = libinput_event_touch_get_seat_slot(data);
     touch.pressure = libinput_event_get_touch_pressure(event);
@@ -764,7 +764,7 @@ int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, std::shared_
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
     int64_t actionStartTime = static_cast<int64_t>(libinput_event_keyboard_get_time_usec(data));
 
-    kevn->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
+    kevn->SetActionTime(GetSysClockTime());
     kevn->SetAction(keyAction);
     kevn->SetActionStartTime(actionStartTime);
     kevn->SetDeviceId(deviceId);
@@ -831,7 +831,7 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
         }
     }
 
-    int32_t time = static_cast<int64_t>(GetSysClockTime());
+    int64_t time = GetSysClockTime();
     keyEventPtr->SetActionTime(time);
     keyEventPtr->SetAction(keyAction);
     keyEventPtr->SetDeviceId(deviceId);

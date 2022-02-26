@@ -197,7 +197,7 @@ int32_t RegisterEvent::BitSetOne(const int32_t signCode, const int32_t bitCode) 
     return signCode | (BIT1 << bitCode);
 }
 
-void RegisterEvent::TouchInfoBegin(const uint64_t time, const double x, const double y, TouchInfo& touchinfo)
+void RegisterEvent::TouchInfoBegin(const int64_t time, const double x, const double y, TouchInfo& touchinfo)
 {
     CHK(time > 0, PARAM_INPUT_INVALID);
     touchinfo.beginTime = time;
@@ -205,7 +205,7 @@ void RegisterEvent::TouchInfoBegin(const uint64_t time, const double x, const do
     touchinfo.beginY = y;
 }
 
-void RegisterEvent::TouchInfoEnd(const uint64_t time, const double x, const double y, TouchInfo& touchinfo)
+void RegisterEvent::TouchInfoEnd(const int64_t time, const double x, const double y, TouchInfo& touchinfo)
 {
     CHK(time > 0, PARAM_INPUT_INVALID);
     touchinfo.endTime = time;
@@ -213,7 +213,7 @@ void RegisterEvent::TouchInfoEnd(const uint64_t time, const double x, const doub
     touchinfo.endY = y;
 }
 
-int32_t RegisterEvent::OnEventPointButton(const int32_t buttonCode, const uint64_t timeNow,
+int32_t RegisterEvent::OnEventPointButton(const int32_t buttonCode, const int64_t timeNow,
                                           const BUTTON_STATE stateValue, MmiMessageId& msgId)
 {
     CHKF(buttonCode >= 0, PARAM_INPUT_INVALID);

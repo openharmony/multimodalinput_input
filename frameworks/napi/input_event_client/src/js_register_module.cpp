@@ -280,7 +280,7 @@ static napi_value UnitTest(napi_env env, napi_callback_info info)
     NAPI_ASSERT(env, eventObjType == napi_object, "parameter2 is not napi_object");
 
     std::string uuid = GetNamedPropertyString(env, argv[ARGV_SECOND], "uuid");
-    uint64_t occurredTime = GetNamedPropertyInt64(env, argv[ARGV_SECOND], "occurredTime");
+    int64_t occurredTime = GetNamedPropertyInt64(env, argv[ARGV_SECOND], "occurredTime");
     int32_t sourceDevice = GetNamedPropertyInt32(env, argv[ARGV_SECOND], "sourceDevice");
     int32_t inputDeviceId = GetNamedPropertyInt32(env, argv[ARGV_SECOND], "inputDeviceId");
     uint32_t eventType = GetNamedPropertyUint32(env, argv[ARGV_SECOND], "type");

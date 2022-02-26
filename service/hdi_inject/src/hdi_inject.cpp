@@ -76,7 +76,7 @@ int32_t HdiInject::OnSetEventInject(const RawInputEvent& allEvent, int32_t devIn
     pack[0]->type = (int32_t)allEvent.ev_type;
     pack[0]->code = (uint32_t)allEvent.ev_code;
     pack[0]->value = (int32_t)allEvent.ev_value;
-    pack[0]->timestamp = GetSysClockTime();
+    pack[0]->timestamp = static_cast<uint64_t>(GetSysClockTime());
     MMIHdiInject->eventcallback_.EventPkgCallback((const EventPackage**)pack, 1, devIndex);
     free(pack[0]);
     MMI_LOGD("leave");
