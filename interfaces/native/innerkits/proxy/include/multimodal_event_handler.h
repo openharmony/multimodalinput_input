@@ -59,8 +59,8 @@ private:
     bool InitClient();
 
 private:
-    MMIClientPtr client_;
-    IClientMsgHandlerPtr cMsgHandler_;
+    MMIClientPtr client_ = nullptr;
+    IClientMsgHandlerPtr cMsgHandler_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS

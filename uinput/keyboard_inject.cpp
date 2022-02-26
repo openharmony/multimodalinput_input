@@ -28,7 +28,7 @@ using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMIS {
 namespace {
-    std::shared_ptr<KeyboardInject> g_instance;
+    std::shared_ptr<KeyboardInject> g_instance = nullptr;
     constexpr HiLogLabel LABEL = { LOG_CORE, 0xD002800, "HdfDeviceEventManager" };
 }
 std::mutex KeyboardInject::mutex_;

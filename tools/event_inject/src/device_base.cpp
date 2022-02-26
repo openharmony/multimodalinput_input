@@ -15,7 +15,6 @@
 
 #include "device_base.h"
 
-using namespace std;
 using namespace OHOS::MMI;
 
 void DeviceBase::SetTimeToLibinputEvent(InjectEvent& injectEvent)
