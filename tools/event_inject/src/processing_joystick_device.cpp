@@ -18,8 +18,8 @@
 using namespace OHOS::MMI;
 
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ProcessingJoystickDevice" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ProcessingJoystickDevice" };
+} // namespace
 
 int32_t ProcessingJoystickDevice::TransformJsonDataToInputData(const Json& originalEvent,
                                                                InputEventArray& inputEventArray)
