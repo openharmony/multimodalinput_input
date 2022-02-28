@@ -86,7 +86,7 @@ int64_t GetMicrotime()
     return currentTime.tv_sec * 1000 * 1000 + currentTime.tv_usec;
 }
 
-uint64_t GetSysClockTime()
+int64_t GetSysClockTime()
 {
     struct timespec ts = { 0, 0 };
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
@@ -230,7 +230,7 @@ static void PrintEventJoyStickAxisInfo(const std::string &axisName, const EventJ
 }
 
 void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
-    const int32_t abilityId, const int32_t focusId, const uint64_t preHandlerTime)
+    const int32_t abilityId, const int32_t focusId, const int64_t preHandlerTime)
 {
     MMI_LOGD("4.event dispatcher of server, EventJoyStickAxis:physical:%{public}s,"
              "fd:%{public}d,preHandlerTime:%{public}" PRId64 ","

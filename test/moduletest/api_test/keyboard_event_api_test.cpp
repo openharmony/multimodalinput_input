@@ -41,7 +41,7 @@ HWTEST_F(KeyboardEventApiTest, Api_Test_IsHandledByIme_InitTrue, TestSize.Level1
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -69,7 +69,7 @@ HWTEST_F(KeyboardEventApiTest, Api_Test_IsHandledByIme_InitFalse, TestSize.Level
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -221,7 +221,7 @@ HWTEST_F(KeyboardEventApiTest, Api_Test_GetUnicode_Normal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -249,7 +249,7 @@ HWTEST_F(KeyboardEventApiTest, Api_Test_GetUnicode_Abnormal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -277,7 +277,7 @@ HWTEST_F(KeyboardEventApiTest, Api_Test_GetUnicode_Min, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -305,7 +305,7 @@ HWTEST_F(KeyboardEventApiTest, Api_Test_GetUnicode_Max, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    uint64_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "1";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;

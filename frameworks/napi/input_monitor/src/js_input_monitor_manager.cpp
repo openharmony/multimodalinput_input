@@ -58,7 +58,7 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, napi_value receiver)
 void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv, napi_value receiver)
 {
     MMI_LOGD("Enter");
-    std::shared_ptr<JsInputMonitor> monitor;
+    std::shared_ptr<JsInputMonitor> monitor = nullptr;
     {
         std::lock_guard<std::mutex> guard(mutex_);
         for (auto it = monitors_.begin(); it != monitors_.end(); ++it) {

@@ -25,7 +25,7 @@ using namespace testing::ext;
 using namespace OHOS::MMI;
 using namespace OHOS;
 
-const int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
+const int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 
 class AppRegisterTest : public testing::Test {
 public:
@@ -73,7 +73,7 @@ HWTEST_F(AppRegisterTest, QueryMapSurfaceNum, TestSize.Level1)
 
 HWTEST_F(AppRegisterTest, IsMultimodeInputReady_001, TestSize.Level1)
 {
-    ssize_t time = GetMicrotime();
+    int64_t time = GetMicrotime();
     UDSServer udsServer;
 
     AppRegister appReg;
@@ -85,7 +85,7 @@ HWTEST_F(AppRegisterTest, IsMultimodeInputReady_001, TestSize.Level1)
 
 HWTEST_F(AppRegisterTest, IsMultimodeInputReady_002, TestSize.Level1)
 {
-    ssize_t time = GetMicrotime();
+    int64_t time = GetMicrotime();
     UDSServer udsServer;
 
     AppRegister appReg;
@@ -97,7 +97,7 @@ HWTEST_F(AppRegisterTest, IsMultimodeInputReady_002, TestSize.Level1)
 
 HWTEST_F(AppRegisterTest, IsMultimodeInputReady_003, TestSize.Level1)
 {
-    ssize_t time = GetMicrotime();
+    int64_t time = GetMicrotime();
     UDSServer udsServer;
 
     AppRegister appReg;
@@ -109,7 +109,7 @@ HWTEST_F(AppRegisterTest, IsMultimodeInputReady_003, TestSize.Level1)
 
 HWTEST_F(AppRegisterTest, IsMultimodeInputReady_004, TestSize.Level1)
 {
-    ssize_t time = GetMicrotime();
+    int64_t time = GetMicrotime();
     UDSServer udsServer;
 
     AppRegister appReg;
@@ -122,7 +122,7 @@ HWTEST_F(AppRegisterTest, IsMultimodeInputReady_004, TestSize.Level1)
 HWTEST_F(AppRegisterTest, IsMultimodeInputReady_005, TestSize.Level1)
 {
     const int32_t WAIT_QUEUE_EVENTS_MAX = 128;
-    ssize_t time = GetMicrotime();
+    int64_t time = GetMicrotime();
     UDSServer udsServer;
 
     AppRegister appReg;
@@ -134,7 +134,7 @@ HWTEST_F(AppRegisterTest, IsMultimodeInputReady_005, TestSize.Level1)
 
 HWTEST_F(AppRegisterTest, IsMultimodeInputReady_006, TestSize.Level1)
 {
-    ssize_t time = GetMicrotime();
+    int64_t time = GetMicrotime();
     UDSServer udsServer;
 
     AppRegister appReg;
@@ -146,7 +146,7 @@ HWTEST_F(AppRegisterTest, IsMultimodeInputReady_006, TestSize.Level1)
 
 HWTEST_F(AppRegisterTest, IsMultimodeInputReady_007, TestSize.Level1)
 {
-    ssize_t time = GetMicrotime();
+    int64_t time = GetMicrotime();
     time += INPUT_UI_TIMEOUT_TIME;
     UDSServer udsServer;
 
@@ -159,7 +159,7 @@ HWTEST_F(AppRegisterTest, IsMultimodeInputReady_007, TestSize.Level1)
 
 HWTEST_F(AppRegisterTest, IsMultimodeInputReady_008, TestSize.Level1)
 {
-    ssize_t time2 = GetMicrotime();
+    int64_t time2 = GetMicrotime();
     time2 += INPUT_UI_TIMEOUT_TIME;
     UDSServer udsServer;
 
@@ -172,7 +172,7 @@ HWTEST_F(AppRegisterTest, IsMultimodeInputReady_008, TestSize.Level1)
 
 HWTEST_F(AppRegisterTest, IsMultimodeInputReady_009, TestSize.Level1)
 {
-    ssize_t time = GetMicrotime();
+    int64_t time = GetMicrotime();
     time += INPUT_UI_TIMEOUT_TIME;
     UDSServer udsServer;
 
@@ -185,7 +185,7 @@ HWTEST_F(AppRegisterTest, IsMultimodeInputReady_009, TestSize.Level1)
 
 HWTEST_F(AppRegisterTest, IsMultimodeInputReady_010, TestSize.Level1)
 {
-    ssize_t time2 = GetMicrotime();
+    int64_t time2 = GetMicrotime();
     time2 += INPUT_UI_TIMEOUT_TIME;
     UDSServer udsServer;
 
@@ -198,7 +198,7 @@ HWTEST_F(AppRegisterTest, IsMultimodeInputReady_010, TestSize.Level1)
 
 HWTEST_F(AppRegisterTest, IsMultimodeInputReady_011, TestSize.Level1)
 {
-    ssize_t time = GetMicrotime();
+    int64_t time = GetMicrotime();
     time += INPUT_UI_TIMEOUT_TIME;
     UDSServer udsServer;
 
@@ -211,7 +211,7 @@ HWTEST_F(AppRegisterTest, IsMultimodeInputReady_011, TestSize.Level1)
 
 HWTEST_F(AppRegisterTest, IsMultimodeInputReady_012, TestSize.Level1)
 {
-    ssize_t time2 = GetMicrotime();
+    int64_t time2 = GetMicrotime();
     time2 += INPUT_UI_TIMEOUT_TIME;
     UDSServer udsServer;
 
@@ -224,7 +224,7 @@ HWTEST_F(AppRegisterTest, IsMultimodeInputReady_012, TestSize.Level1)
 
 HWTEST_F(AppRegisterTest, IsMultimodeInputReady_013, TestSize.Level1)
 {
-    ssize_t time = GetMicrotime();
+    int64_t time = GetMicrotime();
     UDSServer udsServer;
 
     AppRegister appReg;
@@ -236,7 +236,7 @@ HWTEST_F(AppRegisterTest, IsMultimodeInputReady_013, TestSize.Level1)
 
 HWTEST_F(AppRegisterTest, IsMultimodeInputReady_014, TestSize.Level1)
 {
-    ssize_t time2 = GetMicrotime();
+    int64_t time2 = GetMicrotime();
     time2 += INPUT_UI_TIMEOUT_TIME;
     UDSServer udsServer;
 

@@ -31,7 +31,7 @@ class InputEventHandler : public MsgHandler<EventFun>, public DelayedSingleton<I
 public:
     InputEventHandler();
     virtual ~InputEventHandler() override;
-    bool Init(UDSServer& udsServer);
+    void Init(UDSServer& udsServer);
     void OnEvent(void *event);
     void OnCheckEventReport();
     int32_t OnMouseEventEndTimerHandler(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
@@ -51,9 +51,9 @@ protected:
     int32_t OnEventTabletTool(const multimodal_libinput_event& event);
     int32_t OnEventTabletPad(const multimodal_libinput_event& event);
     int32_t OnEventSwitchToggle(const multimodal_libinput_event& event);
-    int32_t OnEventJoyStickKey(const multimodal_libinput_event& event, const uint64_t time);
+    int32_t OnEventJoyStickKey(const multimodal_libinput_event& event, const int64_t time);
     int32_t OnEventTabletPadKey(const multimodal_libinput_event& event);
-    int32_t OnEventJoyStickAxis(const multimodal_libinput_event& event, const uint64_t time);
+    int32_t OnEventJoyStickAxis(const multimodal_libinput_event& event, const int64_t time);
     int32_t OnKeyboardEvent(struct libinput_event *event);
     int32_t OnKeyEventDispatch(const multimodal_libinput_event& event);
     
@@ -72,12 +72,12 @@ private:
     EventPackage eventPackage_;
     KeyEventValueTransformation xkbKeyboardHandlerKey_;
     NotifyDeviceChange notifyDeviceChange_;
-    std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent_;
+    std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent_ = nullptr;
 
     uint64_t idSeed_ = 0;
     int32_t eventType_ = 0;
-    uint64_t initSysClock_ = 0;
-    uint64_t lastSysClock_ = 0;
+    int64_t initSysClock_ = 0;
+    int64_t lastSysClock_ = 0;
 };
 } // namespace MMI
 } // namespace OHOS

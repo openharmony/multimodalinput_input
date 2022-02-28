@@ -36,7 +36,7 @@ private:
     void OnEventTouchPadUp(struct libinput_event *event);
 private:
     int32_t deviceId_;
-    std::shared_ptr<PointerEvent> pointerEvent_;
+    std::shared_ptr<PointerEvent> pointerEvent_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
