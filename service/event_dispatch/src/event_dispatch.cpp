@@ -33,8 +33,6 @@
 namespace OHOS {
 namespace MMI {
 constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
-constexpr int64_t INPUT_UI_TIMEOUT_TIME_MAX = 20 * 1000000;
-
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
 }
@@ -138,10 +136,25 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         return RET_ERR;
     }
 
+    auto session = udsServer->GetSession(fd);
+    CHKPF(session);
+    if (session->isANRProcess_) {
+        MMI_LOGI("is ANR process");
+        return RET_OK;
+    }
+
+    auto currentTime = GetSysClockTime();
+    if (IsANRProcess(currentTime, session)) {
+        session->isANRProcess_ = true;
+        MMI_LOGE("the pointer event does not report normally, triggering ANR");
+        return RET_OK;
+    }
+
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
+    session->AddEvent(point->GetId(), currentTime);
     return RET_OK;
 }
 
@@ -205,6 +218,20 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
              key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
 
     InputHandlerManagerGlobal::GetInstance().HandleEvent(key);
+    auto session = udsServer.GetSession(fd);
+    CHKPF(session);
+    if (session->isANRProcess_) {
+        MMI_LOGI("is ANR process");
+        return RET_OK;
+    }
+
+    auto currentTime = GetSysClockTime();
+    if (IsANRProcess(currentTime, session)) {
+        session->isANRProcess_ = true;
+        MMI_LOGE("the key event does not report normally, triggering ANR");
+        return RET_OK;
+    }
+
     NetPacket pkt(MmiMessageId::ON_KEYEVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
     OnKeyboardEventTrace(key, KEY_DISPATCH_EVENT);
@@ -213,6 +240,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
         MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
+    session->AddEvent(key->GetId(), currentTime);
     MMI_LOGD("end");
     return RET_OK;
 }
@@ -224,6 +252,7 @@ int32_t EventDispatch::AddInputEventFilter(sptr<IEventFilter> filter)
 
 bool EventDispatch::IsANRProcess(int64_t time, SessionPtr ss)
 {
+    MMI_LOGD("begin");
     int64_t firstTime;
     if (ss->EventsIsEmpty()) {
         firstTime = time;
@@ -254,6 +283,7 @@ bool EventDispatch::IsANRProcess(int64_t time, SessionPtr ss)
     if (ret != 0) {
         MMI_LOGE("AAFwk SendANRProcessID failed, AAFwk errCode: %{public}d", ret);
     }
+    MMI_LOGD("end");
     return true;
 }
 } // namespace MMI
