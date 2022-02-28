@@ -169,7 +169,7 @@ ohos_unittest("ut-virtual-device-out") {
 
   sources = [ "test/virtual_device_test.cpp" ]
 
-  configs = [ ":virtual_device_public_config" ]  
+  configs = [ ":virtual_device_public_config" ]
 
   cflags = [ "-DOHOS_BUILD" ]
 
