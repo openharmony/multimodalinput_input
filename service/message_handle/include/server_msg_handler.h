@@ -46,15 +46,8 @@ protected:
     int32_t NewCheckReplyMessageFormClient(SessionPtr sess, NetPacket& pkt);
     int32_t GetMultimodeInputInfo(SessionPtr sess, NetPacket& pkt);
     int32_t OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt);
-    int32_t OnNewInjectKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt);
-    int32_t OnAddKeyEventFilter(SessionPtr sess, NetPacket& pkt);
-    int32_t OnRemoveKeyEventFilter(SessionPtr sess, NetPacket& pkt);
-    int32_t OnAddTouchEventFilter(SessionPtr sess, NetPacket& pkt);
-    int32_t OnRemoveTouchEventFilter(SessionPtr sess, NetPacket& pkt);
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
-    int32_t OnAddEventInterceptor(SessionPtr sess, NetPacket& pkt);
-    int32_t OnRemoveEventInterceptor(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputHandler(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt);
     int32_t OnMarkConsumed(SessionPtr sess, NetPacket& pkt);

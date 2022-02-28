@@ -29,7 +29,6 @@
 #include "key_event_subscriber.h"
 #include "knuckle_func_proc.h"
 #include "mmi_func_callback.h"
-#include "server_input_filter_manager.h"
 #include "time_cost_chk.h"
 
 #ifdef OHOS_BUILD_HDF
@@ -61,15 +60,9 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::ON_DUMP, MsgCallbackBind2(&ServerMsgHandler::OnDump, this)},
         {MmiMessageId::GET_MMI_INFO_REQ, MsgCallbackBind2(&ServerMsgHandler::GetMultimodeInputInfo, this)},
         {MmiMessageId::INJECT_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectKeyEvent, this) },
-        {MmiMessageId::NEW_INJECT_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnNewInjectKeyEvent, this) },
         {MmiMessageId::INJECT_POINTER_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectPointerEvent, this) },
-        {MmiMessageId::ADD_KEY_EVENT_INTERCEPTOR, MsgCallbackBind2(&ServerMsgHandler::OnAddKeyEventFilter, this)},
-        {MmiMessageId::REMOVE_KEY_EVENT_INTERCEPTOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveKeyEventFilter, this)},
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ServerMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ServerMsgHandler::OnInputDeviceIds, this)},
-        {MmiMessageId::ADD_TOUCH_EVENT_INTERCEPTOR, MsgCallbackBind2(&ServerMsgHandler::OnAddTouchEventFilter, this)},
-        {MmiMessageId::REMOVE_TOUCH_EVENT_INTERCEPTOR,
-            MsgCallbackBind2(&ServerMsgHandler::OnRemoveTouchEventFilter, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
         {MmiMessageId::ADD_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputEventMontior, this)},
         {MmiMessageId::REMOVE_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputEventMontior, this)},
@@ -77,8 +70,6 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
             MsgCallbackBind2(&ServerMsgHandler::OnAddInputEventTouchpadMontior, this)},
         {MmiMessageId::REMOVE_INPUT_EVENT_TOUCHPAD_MONITOR,
             MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputEventTouchpadMontior, this)},
-        {MmiMessageId::ADD_POINTER_INTERCEPTOR, MsgCallbackBind2(&ServerMsgHandler::OnAddEventInterceptor, this)},
-        {MmiMessageId::REMOVE_POINTER_INTERCEPTOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveEventInterceptor, this)},
         {MmiMessageId::ADD_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnAddInputHandler, this)},
         {MmiMessageId::REMOVE_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputHandler, this)},
         {MmiMessageId::MARK_CONSUMED, MsgCallbackBind2(&ServerMsgHandler::OnMarkConsumed, this)},
@@ -264,7 +255,7 @@ int32_t OHOS::MMI::ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetP
     return RET_OK;
 }
 
-int32_t OHOS::MMI::ServerMsgHandler::OnNewInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
+int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     int64_t preHandlerTime = GetSysClockTime();
@@ -284,55 +275,6 @@ int32_t OHOS::MMI::ServerMsgHandler::OnNewInjectKeyEvent(SessionPtr sess, NetPac
     return RET_OK;
 }
 
-int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int64_t preHandlerTime = GetSysClockTime();
-    VirtualKey event;
-    if (!pkt.Read(event)) {
-        MMI_LOGE("read data failed");
-        return RET_ERR;
-    }
-    if (!pkt.IsEmpty()) {
-        MMI_LOGE("event is abandoned");
-        return RET_ERR;
-    }
-    if (event.keyDownDuration < 0) {
-        MMI_LOGE("keyDownDuration is invalid");
-        return RET_ERR;
-    }
-    if (event.keyCode < 0) {
-        MMI_LOGE("keyCode is invalid");
-        return RET_ERR;
-    }
-    MMI_LOGD("time:%{public}u,keycode:%{public}u,tate:%{public}u,"
-        "isIntercepted:%{public}d", event.keyDownDuration, event.keyCode,
-        event.isPressed, event.isIntercepted);
-    EventKeyboard key = {};
-    auto packageResult = EventPackage::PackageVirtualKeyEvent(event, key);
-    if (packageResult == RET_ERR) {
-        MMI_LOGE("Package Virtual KeyEvent faild");
-        return RET_ERR;
-    }
-
-    if (event.isIntercepted) {
-        if (ServerKeyFilter->OnKeyEvent(key)) {
-            MMI_LOGD("key event filter find a key event from Original event keyCode:%{puiblic}d", key.key);
-            return RET_OK;
-        }
-    }
-    if (keyEvent_ == nullptr) {
-        keyEvent_ = OHOS::MMI::KeyEvent::Create();
-    }
-    EventPackage::KeyboardToKeyEvent(key, keyEvent_);
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_, preHandlerTime);
-    if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d",
-                 eventDispatchResult, KEY_EVENT_DISP_FAIL);
-    }
-    return RET_OK;
-}
-
 int32_t OHOS::MMI::ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
 {
     MMI_LOGD("enter");
@@ -342,66 +284,6 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPa
     pointerEvent->UpdateId();
     CHKR((RET_OK == eventDispatch_.HandlePointerEvent(pointerEvent)), POINT_EVENT_DISP_FAIL, RET_ERR);
     MMI_LOGD("leave");
-    return RET_OK;
-}
-
-int32_t OHOS::MMI::ServerMsgHandler::OnAddKeyEventFilter(SessionPtr sess, NetPacket& pkt)
-{
-    if (sess->GetUid() != SYSTEMUID && sess->GetUid() != 0) {
-        MMI_LOGD("Insufficient permissions");
-        return RET_ERR;
-    }
-    int32_t id = 0;
-    MMI_LOGD("server add a key event filter");
-    std::string name;
-    Authority authority;
-    pkt>>id>>name>>authority;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-    ServerKeyFilter->AddKeyEventFilter(sess, name, id, authority);
-    return RET_OK;
-}
-
-int32_t OHOS::MMI::ServerMsgHandler::OnRemoveKeyEventFilter(SessionPtr sess, NetPacket& pkt)
-{
-    if (sess->GetUid() != SYSTEMUID && sess->GetUid() != 0) {
-        MMI_LOGD("Insufficient permissions");
-        return RET_ERR;
-    }
-    int32_t id = 0;
-    MMI_LOGD("server remove a key event filter");
-    pkt>>id;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-    ServerKeyFilter->RemoveKeyEventFilter(sess, id);
-    return RET_OK;
-}
-
-int32_t OHOS::MMI::ServerMsgHandler::OnAddTouchEventFilter(SessionPtr sess, NetPacket& pkt)
-{
-    MMI_LOGD("enter");
-    if (sess->GetUid() != SYSTEMUID && sess->GetUid() != 0) {
-        MMI_LOGD("Insufficient permissions");
-        return RET_ERR;
-    }
-    int32_t id = 0;
-    std::string name;
-    Authority authority;
-    pkt >> id >> name >> authority;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-    ServerKeyFilter->AddTouchEventFilter(sess, name, id, authority);
-    MMI_LOGD("leave");
-    return RET_OK;
-}
-
-int32_t OHOS::MMI::ServerMsgHandler::OnRemoveTouchEventFilter(SessionPtr sess, NetPacket& pkt)
-{
-    if (sess->GetUid() != SYSTEMUID && sess->GetUid() != 0) {
-        MMI_LOGD("Insufficient permissions");
-        return RET_ERR;
-    }
-    int32_t id = 0;
-    pkt >> id;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-    ServerKeyFilter->RemoveTouchEventFilter(sess, id);
     return RET_OK;
 }
 
@@ -459,36 +341,6 @@ int32_t OHOS::MMI::ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &p
 
     OHOS::MMI::InputWindowsManager::GetInstance()->UpdateDisplayInfo(physicalDisplays, logicalDisplays);
     MMI_LOGD("leave");
-    return RET_OK;
-}
-
-int32_t OHOS::MMI::ServerMsgHandler::OnAddEventInterceptor(SessionPtr sess, NetPacket& pkt)
-{
-    if (sess->GetUid() != SYSTEMUID && sess->GetUid() != 0) {
-        MMI_LOGD("Insufficient permissions");
-        return RET_ERR;
-    }
-    int32_t id = 0;
-    MMI_LOGD("server add a pointer event filter");
-    std::string name;
-    Authority authority;
-    pkt >> id >> name >> authority;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-    ServerKeyFilter->RegisterEventInterceptorforServer(sess, id, name, authority);
-    return RET_OK;
-}
-
-int32_t OHOS::MMI::ServerMsgHandler::OnRemoveEventInterceptor(SessionPtr sess, NetPacket& pkt)
-{
-    if (sess->GetUid() != SYSTEMUID && sess->GetUid() != 0) {
-        MMI_LOGD("Insufficient permissions");
-        return RET_ERR;
-    }
-    int32_t id = 0;
-    MMI_LOGD("server remove a pointer event filter");
-    pkt >> id;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-    ServerKeyFilter->UnregisterEventInterceptorforServer(sess, id);
     return RET_OK;
 }
 

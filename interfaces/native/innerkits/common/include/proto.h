@@ -174,7 +174,6 @@ enum class MmiMessageId : int32_t {
     ON_EXCEPTION = 13050,
     ON_LIST,
     INJECT_KEY_EVENT = 14000,
-    NEW_INJECT_KEY_EVENT = 15000,
     INJECT_POINTER_EVENT,
 
     END,

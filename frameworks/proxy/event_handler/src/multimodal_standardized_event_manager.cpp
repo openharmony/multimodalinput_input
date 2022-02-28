@@ -103,7 +103,7 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<Ke
         MMI_LOGE("keyCode is invalid:%{public}u", key->GetKeyCode());
         return RET_ERR;
     }
-    NetPacket pkt(MmiMessageId::NEW_INJECT_KEY_EVENT);
+    NetPacket pkt(MmiMessageId::INJECT_KEY_EVENT);
     int32_t errCode = InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
     if (errCode != RET_OK) {
         MMI_LOGE("Serialization is Failed, errCode:%{public}u", errCode);
