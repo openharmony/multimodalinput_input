@@ -347,13 +347,13 @@ public:
     {
         MMI_LOGD("enter");
         for (auto it = handerMap_.begin(); it != handerMap_.end();) {
-            MMI_LOGD("UnregisterStandardizedEventHandle:%{public}s", it->first.c_str());
+            MMI_LOGD("%{public}s", it->first.c_str());
             MMIEventHdl.UnregisterStandardizedEventHandle(remoteObject_, windowId_, it->second);
             handerMap_.erase(it++);
         }
     }
 private:
-    sptr<MMIToken> remoteObject_;
+    sptr<MMIToken> remoteObject_ = nullptr;
     int32_t windowId_;
     std::map<std::string, StandEventPtr> handerMap_;
 };

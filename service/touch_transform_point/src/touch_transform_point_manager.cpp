@@ -22,12 +22,12 @@ namespace MMI {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TouchTransformPointManager" };
     }
 
-std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(libinput_event *event)
+std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(struct libinput_event *event)
 {
-    CHKPP(event, nullptr);
+    CHKPP(event);
     auto device = libinput_event_get_device(event);
-    CHKPP(device, nullptr);
-    std::shared_ptr<TouchTransformPointProcessor> processor;
+    CHKPP(device);
+    std::shared_ptr<TouchTransformPointProcessor> processor = nullptr;
     auto deviceId = InputDevMgr->FindInputDeviceId(device);
     auto it = touchPro_.find(deviceId);
     if (it != touchPro_.end()) {
@@ -40,12 +40,12 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(l
     return processor->OnLibinputTouchEvent(event);
 }
 
-std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEvent(libinput_event *event)
+std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEvent(struct libinput_event *event)
 {
-    CHKPP(event, nullptr);
+    CHKPP(event);
     auto device = libinput_event_get_device(event);
-    CHKPP(device, nullptr);
-    std::shared_ptr<TouchPadTransformPointProcessor> processor;
+    CHKPP(device);
+    std::shared_ptr<TouchPadTransformPointProcessor> processor = nullptr;
     auto deviceId = InputDevMgr->FindInputDeviceId(device);
     auto it = touchpadPro_.find(deviceId);
     if (it != touchpadPro_.end()) {
@@ -58,12 +58,12 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEven
     return processor->OnLibinputTouchPadEvent(event);
 }
 
-std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestrueEvent(libinput_event *event)
+std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestrueEvent(struct libinput_event *event)
 {
-    CHKPP(event, nullptr);
+    CHKPP(event);
     auto device = libinput_event_get_device(event);
-    CHKPP(device, nullptr);
-    std::shared_ptr<GestureTransformPointProcessor> processor;
+    CHKPP(device);
+    std::shared_ptr<GestureTransformPointProcessor> processor = nullptr;
     auto deviceId = InputDevMgr->FindInputDeviceId(device);
     auto it = gesturePro_.find(deviceId);
     if (it != gesturePro_.end()) {

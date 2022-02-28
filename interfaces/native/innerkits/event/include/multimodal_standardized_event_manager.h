@@ -28,7 +28,7 @@ namespace MMI {
 class NetPacket;
 struct StandEventCallBack {
     int32_t windowId;
-    StandEventPtr eventCallBack;
+    StandEventPtr eventCallBack = { nullptr };
 };
 typedef std::multimap<MmiMessageId, StandEventCallBack> StandEventMMaps;
 class MultimodalStandardizedEventManager {

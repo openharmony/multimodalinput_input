@@ -37,7 +37,7 @@ HWTEST_F(SpeechEventApiTest, Api_Test_GetAction_Normal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "b";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "c";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -59,7 +59,7 @@ HWTEST_F(SpeechEventApiTest, Api_Test_GetAction_Abnormal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "b";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "c";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -81,7 +81,7 @@ HWTEST_F(SpeechEventApiTest, Api_Test_GetScene_Normal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "b";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "c";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -103,7 +103,7 @@ HWTEST_F(SpeechEventApiTest, Api_Test_GetScene_Abnormal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "b";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "c";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -125,7 +125,7 @@ HWTEST_F(SpeechEventApiTest, Api_Test_GetActionProperty_Normal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "b";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "c";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -147,7 +147,7 @@ HWTEST_F(SpeechEventApiTest, Api_Test_GetActionProperty_Abnormal, TestSize.Level
     int32_t highLevelEvent = 0;
     const std::string uuid = "b";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "c";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -169,7 +169,7 @@ HWTEST_F(SpeechEventApiTest, Api_Test_GetMatchMode_Normal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "b";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "c";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -191,7 +191,7 @@ HWTEST_F(SpeechEventApiTest, Api_Test_GetMatchMode_Abnormal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "b";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "c";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;

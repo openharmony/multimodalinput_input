@@ -27,9 +27,9 @@ enum RES_STATUS : uint8_t {
 };
 struct EventRegesterInfo {
     RES_STATUS sync;
-    sptr<IRemoteObject> token;
+    sptr<IRemoteObject> token = { nullptr };
     int32_t windowId;
-    StandEventPtr standardizedEventHandle;
+    StandEventPtr standardizedEventHandle = { nullptr };
 };
 
 class MultimodalEventHandler : public Singleton<OHOS::MMI::MultimodalEventHandler> {
@@ -71,10 +71,10 @@ private:
     bool InitClient();
 
 private:
-    MMIClientPtr client_;
-    IClientMsgHandlerPtr cMsgHandler_;
+    MMIClientPtr client_ = nullptr;
+    IClientMsgHandlerPtr cMsgHandler_ = nullptr;
     std::vector<EventRegesterInfo> abilityInfoVec_;
-    StandEventPtr standardizedEventHandle_;
+    StandEventPtr standardizedEventHandle_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS

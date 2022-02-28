@@ -32,8 +32,8 @@ struct TouchInfo {
     double beginY;
     double endX;
     double endY;
-    uint64_t beginTime;
-    uint64_t endTime;
+    int64_t beginTime;
+    int64_t endTime;
     int32_t eventType;
     int32_t slot;
     int32_t seatSlot;
@@ -43,8 +43,8 @@ struct GestureInfo {
     int32_t cancelled;
     NormalizedCoords delta;
     NormalizedCoords deltaUnaccel;
-    uint64_t beginTime;
-    uint64_t endTime;
+    int64_t beginTime;
+    int64_t endTime;
     bool enabled;
 };
 
@@ -60,7 +60,7 @@ public:
     * Qualifier: 判断键盘事件是否为功能键（ctrl,alt,shift,logo）
     */
     void OnEventKeyGetSign(const EventKeyboard& key, MmiMessageId& msg, EventKeyboard& prevKey);
-    int32_t OnEventPointButton(const int32_t buttonCode, const uint64_t timeNow,
+    int32_t OnEventPointButton(const int32_t buttonCode, const int64_t timeNow,
         const BUTTON_STATE stateValue, MmiMessageId& msgId);
     int32_t OnEventPointAxis(const EventPointer& point, MmiMessageId& msgId);
     /*
@@ -111,15 +111,15 @@ protected:
     * Qualifier: 对应标志位置1
     */
     int32_t BitSetOne(const int32_t signCode, const int32_t bitCode) const;
-    void TouchInfoBegin(const uint64_t time, const double x, const double y, TouchInfo& touchinfo);
-    void TouchInfoEnd(const uint64_t time, const double x, const double y, TouchInfo& touchinfo);
+    void TouchInfoBegin(const int64_t time, const double x, const double y, TouchInfo& touchinfo);
+    void TouchInfoEnd(const int64_t time, const double x, const double y, TouchInfo& touchinfo);
     void DeleteTouchInfoDeviceId(uint32_t deviceId);
 
 protected:
     EventKeyboard key_ = {};
     int32_t modMask_ = 0;
     int32_t modTask_ = 0;
-    uint64_t timeCount_ = 0;
+    int64_t timeCount_ = 0;
     int32_t baseKey_ = 0;
     std::map<std::pair<uint32_t, int32_t>, TouchInfo> touchInfos_ = {};
     GestureInfo gestureInfo_ = {};
@@ -129,8 +129,8 @@ protected:
     static constexpr int32_t KEY_SCREENRECORD = 0x282; /* remote SCREENRECORD key */
     static constexpr int32_t KEY_RECENT = 0x283; /* remote switch windows key */
     static constexpr int32_t KEY_NOTIFICATION = 0x284; /* remote NOTIFICATION key */
-    static constexpr uint64_t INTERVALTIME = 1000000;
-    static constexpr uint64_t PRESSTIME = 6000000;  // 6s
+    static constexpr int64_t INTERVALTIME = 1000000;
+    static constexpr int64_t PRESSTIME = 6000000;  // 6s
     static constexpr int32_t MAXFINGER = 5;
     static constexpr int32_t MOVEDISTANCE = 100;
     static constexpr int32_t MOVETABLEPAD = 500;
