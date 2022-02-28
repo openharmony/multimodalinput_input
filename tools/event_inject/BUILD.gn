@@ -88,9 +88,10 @@ ohos_shared_library("event-injection") {
     "src/test_aux_tool_msg_handler.cpp",
   ]
 
-  configs = [ ":event_injection_config" ]
-
-  public_configs = [ ":event_injection_public_config" ]
+  configs = [
+    ":event_injection_config",
+    ":event_injection_public_config",
+  ]
 
   deps = [
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
@@ -222,6 +223,9 @@ ohos_unittest("ut-event-injection-out") {
 
 ohos_executable("mmi-event-injection") {
   sources = [ "src/mmi_event_simulate_main.cpp" ]
+
+  configs = [ ":event_injection_public_config" ]
+
   deps = [
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/tools/event_inject:event-injection",
