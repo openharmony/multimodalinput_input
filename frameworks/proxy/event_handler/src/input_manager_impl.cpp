@@ -120,7 +120,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     MMI_LOGD("Enter");
     CHKPV(keyEvent);
     int32_t getKeyCode = keyEvent->GetKeyCode();
-    MMI_LOGD(" OnKeyEvent client trace getKeyCode:%{public}d", getKeyCode);
+    MMI_LOGD("client trace getKeyCode:%{public}d", getKeyCode);
     std::string keyCodestring = "client dispatchKeyCode=" + std::to_string(getKeyCode);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring);
     int32_t keyId = keyEvent->GetId();
@@ -321,7 +321,7 @@ int32_t InputManagerImpl::AddInterceptor(int32_t sourceType,
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
     if (interceptor == nullptr) {
-        MMI_LOGE("AddInterceptor::%{public}s param should not be null", __func__);
+        MMI_LOGE("%{public}s param should not be null", __func__);
         return OHOS::MMI_STANDARD_EVENT_INVALID_PARAM;
     }
     int32_t interceptorId = InterceptorMgr.AddInterceptor(interceptor);
