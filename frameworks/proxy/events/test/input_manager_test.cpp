@@ -68,8 +68,8 @@ public:
     static void TearDownTestCase(void) {}
     static int64_t GetNanoTime();
     static bool FindCommand(const std::string &log, const std::string &command);
-    static std::vector<std::string> SearchForLog(const std::string &command, bool noWait = false);
-    static std::vector<std::string> SearchForLog(const std::string &command,
+    static std::vector<std::string> SearchLog(const std::string &command, bool noWait = false);
+    static std::vector<std::string> SearchLog(const std::string &command,
     const std::vector<std::string> &excludes, bool noWait = false);
     static std::string DumpPointerItem(const PointerEvent::PointerItem &item);
     static std::string DumpPointerEvent(const std::shared_ptr<PointerEvent> &pointE);
@@ -152,13 +152,13 @@ bool InputManagerTest::FindCommand(const std::string &log, const std::string &co
     return std::regex_search(log, pattern);
 }
 
-std::vector<std::string> InputManagerTest::SearchForLog(const std::string &command, bool noWait)
+std::vector<std::string> InputManagerTest::SearchLog(const std::string &command, bool noWait)
 {
     std::vector<std::string> excludes;
-    return SearchForLog(command, excludes, noWait);
+    return SearchLog(command, excludes, noWait);
 }
 
-std::vector<std::string> InputManagerTest::SearchForLog(const std::string &command,
+std::vector<std::string> InputManagerTest::SearchLog(const std::string &command,
     const std::vector<std::string> &excludes, bool noWait)
 {
     int32_t nTries { N_TRIES_FOR_LOG };
@@ -231,12 +231,12 @@ void InputManagerTest::TestMarkConsumedStep3(int32_t monitorId, int32_t eventId)
         "ClientMsgHandler: in OnPointerEvent, #[[:digit:]]\\{1,\\}, "
         "Operation canceled"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     MMI_LOGD("Call InputManager::MarkConsumed");
     InputManager::GetInstance()->MarkConsumed(monitorId, eventId);
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 }
 
@@ -260,12 +260,12 @@ void InputManagerTest::TestMarkConsumedStep4()
         "InputHandlerManagerGlobal: in HandleEvent, #[[:digit:]]\\{1,\\}, "
         "Pointer event was consumed"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     MMI_LOGD("Call InputManager::SimulatePointerEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 }
 
@@ -289,12 +289,12 @@ void InputManagerTest::TestMarkConsumedStep5()
         "InputHandlerManagerGlobal: in HandleEvent, #[[:digit:]]\\{1,\\}, "
         "Pointer event was consumed"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     MMI_LOGD("Call InputManager::SimulatePointerEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 }
 
@@ -318,19 +318,19 @@ void InputManagerTest::TestMarkConsumedStep6()
         "InputManagerImpl: in OnPointerEvent, #[[:digit:]]\\{1,\\}, "
         "Pointer event received, processing"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     MMI_LOGD("Call InputManager::SimulatePointerEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 }
 
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.Level1)
 {
     std::string command = "Inject keyCode = 2,action = 2";
-    std::vector<std::string> slogs {SearchForLog(command, true)};
+    std::vector<std::string> slogs {SearchLog(command, true)};
     int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
     OHOS::MMI::KeyEvent::KeyItem kitDown;
@@ -352,7 +352,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.L
     injectUpEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
     InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
-    std::vector<std::string> tlogs {SearchForLog(command, slogs)};
+    std::vector<std::string> tlogs {SearchLog(command, slogs)};
     EXPECT_TRUE(!tlogs.empty());
 }
 
@@ -373,7 +373,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_002, TestSize.L
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.Level1)
 {
     std::string command = "Inject keyCode:2, action:2";
-    std::vector<std::string> slogs {SearchForLog(command, true)};
+    std::vector<std::string> slogs {SearchLog(command, true)};
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
     int32_t downTime = 0;
     OHOS::MMI::KeyEvent::KeyItem kitDown;
@@ -394,7 +394,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.L
     injectUpEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
     InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
-    std::vector<std::string> tlogs {SearchForLog(command, slogs)};
+    std::vector<std::string> tlogs {SearchLog(command, slogs)};
     EXPECT_TRUE(!tlogs.empty());
 }
 
@@ -417,7 +417,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_004, TestSize.L
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.Level1)
 {
     std::string command = "Inject keyCode:0, action:2";
-    std::vector<std::string> slogs {SearchForLog(command, true)};
+    std::vector<std::string> slogs {SearchLog(command, true)};
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
     int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
     OHOS::MMI::KeyEvent::KeyItem kitDown;
@@ -444,7 +444,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.L
     injectUpEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
     InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
-    std::vector<std::string> tlogs {SearchForLog(command, slogs)};
+    std::vector<std::string> tlogs {SearchLog(command, slogs)};
     EXPECT_TRUE(!tlogs.empty());
 }
 
@@ -452,7 +452,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.L
 HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, TestSize.Level1)
 {
     std::string command = "ServerStartTime =";
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
@@ -472,7 +472,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, Tes
     response = MMIEventHdl.InjectEvent(injectUpEvent);
     EXPECT_TRUE(response);
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 }
 #endif
@@ -586,23 +586,23 @@ void InputManagerTest::TestSimulateInputEvent(std::shared_ptr<PointerEvent> poin
     PointerEvent::PointerItem item;
     pointerEvent->GetPointerItem(0, item);
     std::string sItem1 { DumpPointerItem(item) };
-    std::vector<std::string> sLogItem1s { SearchForLog(sItem1, true) };
+    std::vector<std::string> sLogItem1s { SearchLog(sItem1, true) };
     MMI_LOGD("sItem1:%{public}s", sItem1.c_str());
 
     pointerEvent->GetPointerItem(1, item);
     std::string sItem2 { DumpPointerItem(item) };
-    std::vector<std::string> sLogItem2s { SearchForLog(sItem2, true) };
+    std::vector<std::string> sLogItem2s { SearchLog(sItem2, true) };
     MMI_LOGD("sItem2:%{public}s", sItem2.c_str());
 
     std::string sPointeE { DumpPointerEvent(pointerEvent) };
-    std::vector<std::string> sLogPointerEs { SearchForLog(sPointeE, true) };
+    std::vector<std::string> sLogPointerEs { SearchLog(sPointeE, true) };
     MMI_LOGD("sPointerE:%{public}s", sPointeE.c_str());
 
     std::string sCmd {
         "InputManagerImpl: in OnPointerEvent, #[[:digit:]]\\{1,\\}, "
         "Pointer event received, processing"
     };
-    std::vector<std::string> sLogs { SearchForLog(sCmd, true) };
+    std::vector<std::string> sLogs { SearchLog(sCmd, true) };
 
     MMI_LOGD("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -611,25 +611,25 @@ void InputManagerTest::TestSimulateInputEvent(std::shared_ptr<PointerEvent> poin
 
     while (true) {
         if (!states.test(0)) {
-            std::vector<std::string> tLogPointerEs { SearchForLog(sPointeE, sLogPointerEs, true) };
+            std::vector<std::string> tLogPointerEs { SearchLog(sPointeE, sLogPointerEs, true) };
             if (!tLogPointerEs.empty()) {
                 states.set(0);
             }
         }
         if (!states.test(1)) {
-            std::vector<std::string> tLogItem1s { SearchForLog(sItem1, sLogItem1s, true) };
+            std::vector<std::string> tLogItem1s { SearchLog(sItem1, sLogItem1s, true) };
             if (!tLogItem1s.empty()) {
                 states.set(1);
             }
         }
         if (!states.test(2)) {
-            std::vector<std::string> tLogItem2s { SearchForLog(sItem2, sLogItem2s, true) };
+            std::vector<std::string> tLogItem2s { SearchLog(sItem2, sLogItem2s, true) };
             if (!tLogItem2s.empty()) {
                 states.set(2);
             }
         }
         if (!states.test(3)) {
-            std::vector<std::string> tLogs { SearchForLog(sCmd, sLogs, true) };
+            std::vector<std::string> tLogs { SearchLog(sCmd, sLogs, true) };
             if (!tLogs.empty()) {
                 states.set(3);
             }
@@ -675,12 +675,12 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_004, TestSize.Level1)
         "InputWindowsManager: in UpdateTouchScreenTarget, #[[:digit:]]\\{1,\\}, "
         "Can.t find pointer item, pointer:"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     MMI_LOGD("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 }
 
@@ -795,18 +795,18 @@ void InputManagerTest::TestSimulateInputEvent_2(std::shared_ptr<PointerEvent> po
     PointerEvent::PointerItem item;
     pointerEvent->GetPointerItem(1, item);
     std::string sItem1 { DumpPointerItem(item) };
-    std::vector<std::string> sLogItem1s { SearchForLog(sItem1, true) };
+    std::vector<std::string> sLogItem1s { SearchLog(sItem1, true) };
     MMI_LOGD("sItem1:%{public}s", sItem1.c_str());
 
     std::string sPointeE { DumpPointerEvent(pointerEvent) };
-    std::vector<std::string> sLogPointerEs { SearchForLog(sPointeE, true) };
+    std::vector<std::string> sLogPointerEs { SearchLog(sPointeE, true) };
     MMI_LOGD("sPointerE:%{public}s", sPointeE.c_str());
 
     std::string sCmd {
         "InputManagerImpl: in OnPointerEvent, #[[:digit:]]\\{1,\\}, "
         "Pointer event received, processing"
     };
-    std::vector<std::string> sLogs { SearchForLog(sCmd, true) };
+    std::vector<std::string> sLogs { SearchLog(sCmd, true) };
 
     MMI_LOGD("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -824,21 +824,21 @@ void InputManagerTest::TestSimulateInputEvent_2(std::shared_ptr<PointerEvent> po
     while (true) {
         if (!states.test(0)) {
             // 搜索日志，匹配按下手指的数据；
-            std::vector<std::string> tLogItem1s { SearchForLog(sItem1, sLogItem1s, true) };
+            std::vector<std::string> tLogItem1s { SearchLog(sItem1, sLogItem1s, true) };
             if (!tLogItem1s.empty()) {
                 states.set(0);
             }
         }
         if (!states.test(1)) {
             // 搜索日志，匹配PointerEvent事件结构的数据；
-            std::vector<std::string> tLogPointerEs { SearchForLog(sPointeE, sLogPointerEs, true) };
+            std::vector<std::string> tLogPointerEs { SearchLog(sPointeE, sLogPointerEs, true) };
             if (!tLogPointerEs.empty()) {
                 states.set(1);
             }
         }
         if (!states.test(2)) {
             // 搜索标识客户端成功接收到事件的关键性日志；
-            std::vector<std::string> tLogs { SearchForLog(sCmd, sLogs, true) };
+            std::vector<std::string> tLogs { SearchLog(sCmd, sLogs, true) };
             if (!tLogs.empty()) {
                 states.set(2);
             }
@@ -1016,7 +1016,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_012, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_013, TestSize.Level1)
 {
     std::string command = "pointerAction=axis-begin";
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     auto pointerEvent = PointerEvent::Create();
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -1041,14 +1041,14 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_013, TestSize.Level1)
     MMI_LOGI("Inject POINTER_ACTION_AXIS_BEGIN");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 }
 
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_014, TestSize.Level1)
 {
     std::string command = "pointerAction=axis-update";
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     auto pointerEvent = PointerEvent::Create();
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -1073,14 +1073,14 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_014, TestSize.Level1)
     MMI_LOGI("Inject POINTER_ACTION_AXIS_UPDATE");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 }
 
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_015, TestSize.Level1)
 {
     std::string command = "pointerAction=axis-end";
-    std::vector<std::string>  sLogs { SearchForLog(command, true) };
+    std::vector<std::string>  sLogs { SearchLog(command, true) };
 
     auto pointerEvent = PointerEvent::Create();
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -1106,7 +1106,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_015, TestSize.Level1)
     MMI_LOGI("Inject POINTER_ACTION_AXIS_END");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 }
 
@@ -1191,7 +1191,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_001, TestSize.Level1)
         "InputHandlerManagerGlobal: in AddMonitor, #[[:digit:]]\\{1,\\}, "
         "Service AddMonitor Success"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
@@ -1199,7 +1199,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_001, TestSize.Level1)
     int32_t id1 = InputManager::GetInstance()->AddMonitor(callBackPtr);
     EXPECT_TRUE(IsValidHandlerId(id1));
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
     if (IsValidHandlerId(id1)) {
@@ -1220,12 +1220,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_002, TestSize.Level1)
         "InputHandlerManagerGlobal: in RemoveMonitor, #[[:digit:]]\\{1,\\}, "
         "Service RemoveMonitor Success"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
     MMI_LOGD("InputManagerTest_AddHandler_002");
     if (IsValidHandlerId(id1)) {
         InputManager::GetInstance()->RemoveMonitor(id1);
     }
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 }
 
@@ -1247,7 +1247,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
         "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
         "PointerEvent received"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     auto pointerEvent = SetupPointerEvent001();
     MMI_LOGD("InputManagerTest_AddHandler_003");
@@ -1256,7 +1256,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
     std::vector<std::string> rLogs;
 
     while (true) {
-        std::vector<std::string> tLogs { SearchForLog(command, sLogs, true) };
+        std::vector<std::string> tLogs { SearchLog(command, sLogs, true) };
         rLogs.insert(rLogs.end(), tLogs.begin(), tLogs.end());
         if ((rLogs.size() >= N_TEST_CASES) || (--nTries <= 0)) {
             break;
@@ -1280,7 +1280,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_004, TestSize.Level1)
         "InputHandlerManager: in AddHandler, #[[:digit:]]\\{1,\\}, "
         "The number of handlers exceeds the maximum"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     const std::vector<int32_t>::size_type N_TEST_CASES { MAX_N_INPUT_HANDLERS };
     std::vector<int32_t> ids(N_TEST_CASES);
@@ -1296,7 +1296,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_004, TestSize.Level1)
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
     EXPECT_TRUE(!IsValidHandlerId(monitorId));
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
@@ -2016,16 +2016,16 @@ void InputManagerTest::TestInputEventInterceptor(std::shared_ptr<PointerEvent> p
         "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
         "Pointer event intercepted:"
     };
-    std::vector<std::string> sLogs { SearchForLog(sCmd, true) };
+    std::vector<std::string> sLogs { SearchLog(sCmd, true) };
 
     std::string sPointeE { DumpPointerEvent2(pointerEvent) };
-    std::vector<std::string> sLogPointerEs { SearchForLog(sPointeE, true) };
+    std::vector<std::string> sLogPointerEs { SearchLog(sPointeE, true) };
     MMI_LOGD("sPointerE:%{public}s", sPointeE.c_str());
 
     PointerEvent::PointerItem item;
     EXPECT_TRUE(pointerEvent->GetPointerItem(DEFAULT_POINTER_ID, item));
     std::string sItem1 { DumpPointerItem2(item) };
-    std::vector<std::string> sLogItem1s { SearchForLog(sItem1, true) };
+    std::vector<std::string> sLogItem1s { SearchLog(sItem1, true) };
     MMI_LOGD("sItem1:%{public}s", sItem1.c_str());
 
     MMI_LOGD("Call InputManager::SimulateInputEvent");
@@ -2044,21 +2044,21 @@ void InputManagerTest::TestInputEventInterceptor(std::shared_ptr<PointerEvent> p
     while (true) {
         if (!states.test(0)) {
             // 搜索标识拦截器成功接收到事件的关键性日志；
-            std::vector<std::string> tLogs { SearchForLog(sCmd, sLogs, true) };
+            std::vector<std::string> tLogs { SearchLog(sCmd, sLogs, true) };
             if (!tLogs.empty()) {
                 states.set(0);
             }
         }
         if (!states.test(1)) {
             // 搜索日志，匹配PointerEvent事件结构的数据；
-            std::vector<std::string> tLogPointerEs { SearchForLog(sPointeE, sLogPointerEs, true) };
+            std::vector<std::string> tLogPointerEs { SearchLog(sPointeE, sLogPointerEs, true) };
             if (!tLogPointerEs.empty()) {
                 states.set(1);
             }
         }
         if (!states.test(2)) {
             // 搜索日志，匹配按下手指的数据；
-            std::vector<std::string> tLogItem1s { SearchForLog(sItem1, sLogItem1s, true) };
+            std::vector<std::string> tLogItem1s { SearchLog(sItem1, sLogItem1s, true) };
             if (!tLogItem1s.empty()) {
                 states.set(2);
             }
@@ -2132,14 +2132,14 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_002, TestSize.Level1)
         "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
         "Pointer event intercepted"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     int32_t nTries { N_TRIES_FOR_LOG };
     std::vector<std::string> rLogs;
 
     while (true) {
-        std::vector<std::string> tLogs { SearchForLog(command, sLogs, true) };
+        std::vector<std::string> tLogs { SearchLog(command, sLogs, true) };
         rLogs.insert(rLogs.end(), tLogs.begin(), tLogs.end());
         if ((rLogs.size() >= N_TEST_CASES) || (--nTries <= 0)) {
             break;
@@ -2173,7 +2173,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_003, TestSize.Level1)
         "InputHandlerManagerGlobal: in RemoveInterceptor, #[[:digit:]]\\{1,\\}, "
         "Unregister interceptor successfully"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         if (IsValidHandlerId(ids[i])) {
@@ -2186,7 +2186,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_003, TestSize.Level1)
     std::vector<std::string> rLogs;
 
     while (true) {
-        std::vector<std::string> tLogs { SearchForLog(command, sLogs, true) };
+        std::vector<std::string> tLogs { SearchLog(command, sLogs, true) };
         rLogs.insert(rLogs.end(), tLogs.begin(), tLogs.end());
         if ((rLogs.size() >= N_TEST_CASES) || (--nTries <= 0)) {
             break;
@@ -2203,13 +2203,13 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
         "InputInterceptorManager: in AddInterceptor, #[[:digit:]]\\{1,\\}, "
         "No interceptor was specified"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     std::shared_ptr<OHOS::MMI::IInputEventConsumer> interceptor;
     int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor) };
     EXPECT_TRUE(!IsValidHandlerId(interceptorId));
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 }
 
@@ -2246,19 +2246,19 @@ void InputManagerTest::TestInputEventInterceptor2(std::shared_ptr<PointerEvent> 
         "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
         "Pointer event intercepted:"
     };
-    std::vector<std::string> sLogs { SearchForLog(sCmd, true) };
+    std::vector<std::string> sLogs { SearchLog(sCmd, true) };
 
     std::string sPointeE { DumpPointerEvent2(pointerEvent) };
-    std::vector<std::string> sLogPointerEs { SearchForLog(sPointeE, true) };
+    std::vector<std::string> sLogPointerEs { SearchLog(sPointeE, true) };
 
     PointerEvent::PointerItem item;
     pointerEvent->GetPointerItem(0, item);
     std::string sItem1 { DumpPointerItem2(item) };
-    std::vector<std::string> sLogItem1s { SearchForLog(sItem1, true) };
+    std::vector<std::string> sLogItem1s { SearchLog(sItem1, true) };
 
     pointerEvent->GetPointerItem(1, item);
     std::string sItem2 { DumpPointerItem2(item) };
-    std::vector<std::string> sLogItem2s { SearchForLog(sItem2, true) };
+    std::vector<std::string> sLogItem2s { SearchLog(sItem2, true) };
 
     MMI_LOGD("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -2267,25 +2267,25 @@ void InputManagerTest::TestInputEventInterceptor2(std::shared_ptr<PointerEvent> 
 
     while (true) {
         if (!states.test(0)) {
-            std::vector<std::string> tLogs { SearchForLog(sCmd, sLogs, true) };
+            std::vector<std::string> tLogs { SearchLog(sCmd, sLogs, true) };
             if (!tLogs.empty()) {
                 states.set(0);
             }
         }
         if (!states.test(1)) {
-            std::vector<std::string> tLogPointerEs { SearchForLog(sPointeE, sLogPointerEs, true) };
+            std::vector<std::string> tLogPointerEs { SearchLog(sPointeE, sLogPointerEs, true) };
             if (!tLogPointerEs.empty()) {
                 states.set(1);
             }
         }
         if (!states.test(2)) {
-            std::vector<std::string> tLogItem1s { SearchForLog(sItem1, sLogItem1s, true) };
+            std::vector<std::string> tLogItem1s { SearchLog(sItem1, sLogItem1s, true) };
             if (!tLogItem1s.empty()) {
                 states.set(2);
             }
         }
         if (!states.test(3)) {
-            std::vector<std::string> tLogItem2s { SearchForLog(sItem2, sLogItem2s, true) };
+            std::vector<std::string> tLogItem2s { SearchLog(sItem2, sLogItem2s, true) };
             if (!tLogItem2s.empty()) {
                 states.set(3);
             }
@@ -2359,7 +2359,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
     MMI_LOGD("Call MontiorManager");
 
     std::string command { "PointerEvent received" };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     int32_t monitorId { };
     auto callBackPtr = InputEventCallback::GetPtr();
@@ -2371,7 +2371,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
     int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
     EXPECT_EQ(RET_OK, response);
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
     InputManager::GetInstance()->RemoveMonitor(monitorId);
@@ -2396,7 +2396,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
     MMI_LOGD("Call MontiorManager");
 
     std::string command { "PointerEvent received" };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     int32_t monitorId { };
     auto callBackPtr = InputEventCallback::GetPtr();
@@ -2408,7 +2408,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
     int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
     EXPECT_EQ(RET_OK, response);
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
     InputManager::GetInstance()->RemoveMonitor(monitorId);
@@ -2433,7 +2433,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
     MMI_LOGD("Call MontiorManager");
 
     std::string command { "PointerEvent received" };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     int32_t monitorId { };
     auto callBackPtr = InputEventCallback::GetPtr();
@@ -2445,7 +2445,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
     int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
     EXPECT_EQ(RET_OK, response);
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
     InputManager::GetInstance()->RemoveMonitor(monitorId);
@@ -2484,14 +2484,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
         "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
         "PointerEvent received"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     int32_t nTries { N_TRIES_FOR_LOG };
     std::vector<std::string> rLogs;
 
     while (true) {
-        std::vector<std::string> tLogs { SearchForLog(command, sLogs, true) };
+        std::vector<std::string> tLogs { SearchLog(command, sLogs, true) };
         rLogs.insert(rLogs.end(), tLogs.begin(), tLogs.end());
         if ((rLogs.size() >= N_TEST_CASES) || (--nTries <= 0)) {
             break;
@@ -2528,7 +2528,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
         "EventDispatch: in handlePointerEvent, #[[:digit:]]\\{1,\\}, "
         "Unknown source type"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     int32_t monitorId { };
     auto callBackPtr = InputEventCallback::GetPtr();
@@ -2540,7 +2540,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
     int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
     EXPECT_EQ(RET_OK, response);
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
     InputManager::GetInstance()->RemoveMonitor(monitorId);
@@ -2575,12 +2575,12 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize
         "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
         "PointerEvent received"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     MMI_LOGD("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
     InputManager::GetInstance()->RemoveMonitor(monitorId);
@@ -2615,12 +2615,12 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize
         "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
         "PointerEvent received"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     MMI_LOGD("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
     InputManager::GetInstance()->RemoveMonitor(monitorId);
@@ -2655,12 +2655,12 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize
         "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
         "PointerEvent received"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     MMI_LOGD("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
     InputManager::GetInstance()->RemoveMonitor(monitorId);
@@ -2711,12 +2711,12 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
         "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
         "PointerEvent received"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     MMI_LOGD("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
     InputManager::GetInstance()->RemoveMonitor(monitorId);
@@ -2729,7 +2729,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_005, TestSize
         "EventDispatch: in handlePointerEvent, #[[:digit:]]\\{1,\\}, "
         "Unknown source type"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     auto pointerEvent = PointerEvent::Create();
     PointerEvent::PointerItem item;
@@ -2746,7 +2746,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_005, TestSize
     MMI_LOGD("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 }
 
@@ -2756,13 +2756,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1
         "InputHandlerManagerGlobal: in AddMonitor, #[[:digit:]]\\{1,\\}, "
         "Service AddMonitor Success"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     int32_t id1 = InputManager::GetInstance()->AddMonitor(callBackPtr);
     EXPECT_TRUE(IsValidHandlerId(id1));
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     if (IsValidHandlerId(id1)) {
         InputManager::GetInstance()->RemoveMonitor(id1);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2782,12 +2782,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1
         "InputHandlerManagerGlobal: in RemoveMonitor, #[[:digit:]]\\{1,\\}, "
         "Service RemoveMonitor Success"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
     if (IsValidHandlerId(id1)) {
         InputManager::GetInstance()->RemoveMonitor(id1);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 }
 
@@ -2797,7 +2797,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1
         "InputHandlerManager: in AddHandler, #[[:digit:]]\\{1,\\}, "
         "The number of handlers exceeds the maximum"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     const std::vector<int32_t>::size_type N_TEST_CASES { MAX_N_INPUT_HANDLERS };
     std::vector<int32_t> ids(N_TEST_CASES);
@@ -2812,7 +2812,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1
 
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
     EXPECT_TRUE(!IsValidHandlerId(monitorId));
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
@@ -2835,14 +2835,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
         "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
         "PointerEvent received"
     };
-    std::vector<std::string> sLogs { SearchForLog(command, true) };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     auto pointerEvent = SetupPointerEvent006();
     EXPECT_TRUE(pointerEvent != nullptr);
     MMI_LOGD("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
     if (IsValidHandlerId(id1)) {
         InputManager::GetInstance()->RemoveMonitor(id1);
