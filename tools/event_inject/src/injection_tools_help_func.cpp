@@ -14,11 +14,12 @@
  */
 
 #include "injection_tools_help_func.h"
+#include <string.h>
 
 using namespace OHOS::MMI;
 
 std::string InjectionToolsHelpFunc::GetHelpText()
 {
-    string ret = "\n                           Harmony device event injection ...\n\n";
+    std::string ret = "\n                           Harmony device event injection ...\n\n";
     return ret;
 }
