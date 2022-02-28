@@ -37,45 +37,45 @@ Uuid::Uuid()
     tvUsec = (unsigned long int)tv.tv_usec;
 
     uuid_[UUID_NODE_SIXTH_BYTE] =
-        (uint8_t)(tvUsec & 0x00000000000000FF);
+        static_cast<uint8_t>(tvUsec & 0x00000000000000FF);
     uuid_[UUID_NODE_FIFTH_BYTE] =
-        (uint8_t)((tvUsec & 0x000000000000FF00) >> BASE_BIT_OPT_SIZE);
+        static_cast<uint8_t>((tvUsec & 0x000000000000FF00) >> BASE_BIT_OPT_SIZE);
     uuid_[UUID_NODE_FOURTH_BYTE] =
-        (uint8_t)((tvUsec & 0x0000000000FF0000) >> BIT_OPT_TWO_BYTE * BASE_BIT_OPT_SIZE);
+        static_cast<uint8_t>((tvUsec & 0x0000000000FF0000) >> BIT_OPT_TWO_BYTE * BASE_BIT_OPT_SIZE);
     uuid_[UUID_NODE_THIRD_BYTE] =
-        (uint8_t)((tvUsec & 0x00000000FF000000) >> BIT_OPT_THREE_BYTE * BASE_BIT_OPT_SIZE);
+        static_cast<uint8_t>((tvUsec & 0x00000000FF000000) >> BIT_OPT_THREE_BYTE * BASE_BIT_OPT_SIZE);
     uuid_[UUID_NODE_FIRST_BYTE] =
-        (uint8_t)((tvUsec & 0x000000FF00000000) >> BIT_OPT_FOUR_BYTE * BASE_BIT_OPT_SIZE);
+        static_cast<uint8_t>((tvUsec & 0x000000FF00000000) >> BIT_OPT_FOUR_BYTE * BASE_BIT_OPT_SIZE);
     uuid_[UUID_CLOCK_SEQ] =
-        (uint8_t)((tvUsec & 0x0000FF0000000000) >> BIT_OPT_FIVE_BYTE * BASE_BIT_OPT_SIZE);
+        static_cast<uint8_t>((tvUsec & 0x0000FF0000000000) >> BIT_OPT_FIVE_BYTE * BASE_BIT_OPT_SIZE);
     uuid_[UUID_VARIANT] =
-        (uint8_t)((tvUsec & 0x00FF000000000000) >> BIT_OPT_SIX_BYTE * BASE_BIT_OPT_SIZE);
+        static_cast<uint8_t>((tvUsec & 0x00FF000000000000) >> BIT_OPT_SIX_BYTE * BASE_BIT_OPT_SIZE);
     uuid_[UUID_TIME_HIGH] =
-        (uint8_t)((tvUsec & 0xFF00000000000000) >> BIT_OPT_SEVEN_BYTE * BASE_BIT_OPT_SIZE);
+        static_cast<uint8_t>((tvUsec & 0xFF00000000000000) >> BIT_OPT_SEVEN_BYTE * BASE_BIT_OPT_SIZE);
     // 4 - 6
     uuid_[UUID_VERSION] =
-        (uint8_t)(((uint32_t)randomTime.tm_sec + randNum) & 0xFF);
+        static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_sec) + randNum) & 0xFF);
     uuid_[UUID_TIME_MID_SECEND_BYTE] =
-        (uint8_t)(((uint32_t)randomTime.tm_min + (randNum >> BASE_BIT_OPT_SIZE)) & 0xFF);
-    uuid_[UUID_TIME_MID_FIRST_BYTE] =
-        (uint8_t)(((uint32_t)randomTime.tm_hour + (randNum >> BIT_OPT_TWO_BYTE * BASE_BIT_OPT_SIZE)) & 0xFF);
+        static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_min) + (randNum >> BASE_BIT_OPT_SIZE)) & 0xFF);
+    uuid_[UUID_TIME_MID_FIRST_BYTE] = static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_hour) +
+                                      (randNum >> BIT_OPT_TWO_BYTE * BASE_BIT_OPT_SIZE)) & 0xFF);
     // 0 - 3
-    uuid_[UUID_TIME_LOW_FOURTH_BYTE] =
-        (uint8_t)(((uint32_t)randomTime.tm_mday + (randNum >> BIT_OPT_THREE_BYTE * BASE_BIT_OPT_SIZE)) & 0xFF);
+    uuid_[UUID_TIME_LOW_FOURTH_BYTE] = static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_mday) +
+                                       (randNum >> BIT_OPT_THREE_BYTE * BASE_BIT_OPT_SIZE)) & 0xFF);
     uuid_[UUID_TIME_LOW_THIRD_BYTE] =
-        (uint8_t)((uint32_t)randomTime.tm_mon & 0xFF);
+        static_cast<uint8_t>(static_cast<uint32_t>(randomTime.tm_mon) & 0xFF);
     uuid_[UUID_TIME_LOW_SECEND_BYTE] =
-        (uint8_t)((uint32_t)randomTime.tm_year & 0xFF);
+        static_cast<uint8_t>(static_cast<uint32_t>(randomTime.tm_year) & 0xFF);
     uuid_[UUID_TIME_LOW_FIRST_BYTE] =
-        (uint8_t)(((uint32_t)randomTime.tm_year & 0xFF00) >> BASE_BIT_OPT_SIZE);
+        static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_year) & 0xFF00) >> BASE_BIT_OPT_SIZE);
 }
 
 char ConvertToHex(uint8_t c)
 {
     if (c < 0xa) {
-        return char(c + '0');
+        return static_cast<char>(c + '0');
     } else if (c >= 0xa && c <= 0xf) {
-        return char(c - 0xa + 'a');
+        return static_cast<char>(c - 0xa + 'a');
     }
 
     return '0';

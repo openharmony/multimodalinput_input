@@ -29,12 +29,6 @@
     #include "hdf_event_manager.h"
 #endif
 
-#ifdef DEBUG_CODE_TEST
-bool IsMmiServerWorking();
-void SetMmiServerWorking();
-int64_t GetMmiServerStartTime();
-#endif
-
 namespace OHOS {
 namespace MMI {
 class MMIServer : public UDSServer {

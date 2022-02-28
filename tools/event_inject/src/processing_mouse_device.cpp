@@ -15,7 +15,6 @@
 
 #include "processing_mouse_device.h"
 
-using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
@@ -34,7 +33,7 @@ int32_t ProcessingMouseDevice::TransformJsonDataToInputData(const Json& fingerEv
         MMI_LOGE("manage KeyBoard array faild, inputData is empty.");
         return RET_ERR;
     }
-    vector<MouseEvent> mouseEventArray;
+    std::vector<MouseEvent> mouseEventArray;
     if (AnalysisMouseEvent(inputData, mouseEventArray) == RET_ERR) {
         return RET_ERR;
     }

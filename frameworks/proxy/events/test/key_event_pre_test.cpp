@@ -236,7 +236,7 @@ HWTEST_F(KeyEventTest, GetKeyCode_TMP_001, TestSize.Level1)
 
 HWTEST_F(KeyEventTest, GetKeyCode_TMP_002, TestSize.Level1)
 {
-    int32_t keyCode = int32_t('s');
+    int32_t keyCode = static_cast<int32_t>('s');
     KeyEvent keyEventTmp;
     keyEventTmp.Initialize(34, true, keyCode, 34, 34, "34", 34, 34, "34", 34, false);
     int32_t retResult = keyEventTmp.GetKeyCode();
