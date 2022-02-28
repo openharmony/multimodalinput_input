@@ -21,8 +21,8 @@
 using namespace OHOS::MMI;
 
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InjectionEventDispatch" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InjectionEventDispatch" };
+} // namespace
 
 void InjectionEventDispatch::Init()
 {
