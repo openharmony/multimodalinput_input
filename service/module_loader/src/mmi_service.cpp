@@ -70,9 +70,6 @@ static void CheckDefine()
 #ifdef OHOS_BUILD_HDF
     CheckDefineOutput("%-40s", "OHOS_BUILD_HDF");
 #endif
-#ifdef DEBUG_CODE_TEST
-    CheckDefineOutput("%-40s", "DEBUG_CODE_TEST");
-#endif
 #ifdef OHOS_BUILD_MMI_DEBUG
     CheckDefineOutput("%-40s", "OHOS_BUILD_MMI_DEBUG");
 #endif

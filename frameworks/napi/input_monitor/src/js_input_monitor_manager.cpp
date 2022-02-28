@@ -125,7 +125,7 @@ bool JsInputMonitorManager::AddEnv(napi_env env, napi_callback_info cbInfo)
     auto status = napi_wrap(env, thisVar, static_cast<void*>(id),
                             [](napi_env env, void *data, void *hint) {
                                 MMI_LOGD("napi_wrap enter");
-                                int32_t *id = (int32_t *)data;
+                                int32_t *id = static_cast<int32_t *>(data);
                                 delete id;
                                 id = nullptr;
                                 JSIMM.RemoveMonitor(env);

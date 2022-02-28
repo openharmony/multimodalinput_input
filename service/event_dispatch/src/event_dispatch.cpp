@@ -194,10 +194,6 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
     }
     auto fd = WinMgr->UpdateTarget(key);
     CHKR(fd >= 0, FD_OBTAIN_FAIL, RET_ERR);
-#ifdef DEBUG_CODE_TEST
-    std::string str = WinMgr->GetSurfaceIdListString();
-    PrintWMSInfo(str, fd, 0, key->GetTargetWindowId());
-#endif
 
     MMI_LOGD("4.event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
              "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","

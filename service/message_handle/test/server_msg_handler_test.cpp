@@ -100,7 +100,7 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_05, TestSize.Level1)
 HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_06, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess;
+    SessionPtr sess = nullptr;
     NetPacket pkt(MmiMessageId::INVALID);
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, pkt);
 }
@@ -108,7 +108,7 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_06, TestSize.Level1)
 HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_07, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess;
+    SessionPtr sess = nullptr;
     NetPacket pkt(static_cast<MmiMessageId>(-1));
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, pkt);
 }
@@ -116,7 +116,7 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_07, TestSize.Level1)
 HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_08, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess;
+    SessionPtr sess = nullptr;
     NetPacket pkt(static_cast<MmiMessageId>(1));
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, pkt);
 }
@@ -124,7 +124,7 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_08, TestSize.Level1)
 HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_09, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess;
+    SessionPtr sess = nullptr;
     NetPacket pkt(static_cast<MmiMessageId>(10000));
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, pkt);
 }
@@ -132,7 +132,7 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_09, TestSize.Level1)
 HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_010, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess;
+    SessionPtr sess = nullptr;
     NetPacket pkt(static_cast<MmiMessageId>(-10000));
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, pkt);
 }
@@ -180,7 +180,7 @@ HWTEST_F(ServerMsgHandlerTest, OnDumpTest_05, TestSize.Level1)
 HWTEST_F(ServerMsgHandlerTest, OnDumpTest_06, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess;
+    SessionPtr sess = nullptr;
     NetPacket pkt(MmiMessageId::INVALID);
     serverMsgHandlerTest.OnDumpTest(sess, pkt);
 }
@@ -188,7 +188,7 @@ HWTEST_F(ServerMsgHandlerTest, OnDumpTest_06, TestSize.Level1)
 HWTEST_F(ServerMsgHandlerTest, OnDumpTest_07, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess;
+    SessionPtr sess = nullptr;
     NetPacket pkt(static_cast<MmiMessageId>(-1));
     serverMsgHandlerTest.OnDumpTest(sess, pkt);
 }
@@ -196,7 +196,7 @@ HWTEST_F(ServerMsgHandlerTest, OnDumpTest_07, TestSize.Level1)
 HWTEST_F(ServerMsgHandlerTest, OnDumpTest_08, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess;
+    SessionPtr sess = nullptr;
     NetPacket pkt(static_cast<MmiMessageId>(1));
     serverMsgHandlerTest.OnDumpTest(sess, pkt);
 }
@@ -204,7 +204,7 @@ HWTEST_F(ServerMsgHandlerTest, OnDumpTest_08, TestSize.Level1)
 HWTEST_F(ServerMsgHandlerTest, OnDumpTest_09, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess;
+    SessionPtr sess = nullptr;
     NetPacket pkt(static_cast<MmiMessageId>(10000));
     serverMsgHandlerTest.OnDumpTest(sess, pkt);
 }
@@ -212,7 +212,7 @@ HWTEST_F(ServerMsgHandlerTest, OnDumpTest_09, TestSize.Level1)
 HWTEST_F(ServerMsgHandlerTest, OnDumpTest_010, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess;
+    SessionPtr sess = nullptr;
     NetPacket pkt(static_cast<MmiMessageId>(-10000));
     serverMsgHandlerTest.OnDumpTest(sess, pkt);
 }
@@ -260,7 +260,7 @@ HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_05, TestSize.Level1)
 HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_06, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess;
+    SessionPtr sess = nullptr;
     NetPacket pkt(MmiMessageId::INVALID);
     serverMsgHandlerTest.GetMultimodeInputInfoTest(sess, pkt);
 }
@@ -268,7 +268,7 @@ HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_06, TestSize.Level1)
 HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_07, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess;
+    SessionPtr sess = nullptr;
     NetPacket pkt(static_cast<MmiMessageId>(-1));
     serverMsgHandlerTest.GetMultimodeInputInfoTest(sess, pkt);
 }
@@ -276,7 +276,7 @@ HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_07, TestSize.Level1)
 HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_08, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess;
+    SessionPtr sess = nullptr;
     NetPacket pkt(static_cast<MmiMessageId>(1));
     serverMsgHandlerTest.GetMultimodeInputInfoTest(sess, pkt);
 }
@@ -284,7 +284,7 @@ HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_08, TestSize.Level1)
 HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_09, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess;
+    SessionPtr sess = nullptr;
     NetPacket pkt(static_cast<MmiMessageId>(10000));
     serverMsgHandlerTest.GetMultimodeInputInfoTest(sess, pkt);
 }
