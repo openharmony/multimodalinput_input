@@ -675,8 +675,8 @@ bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(struct libinput_eve
         MMI_LOGE("Physical display logical coordinates out of range");
         return false;
     }
-    int32_t localLogcialX = (int32_t)(logicX);
-    int32_t localLogcialY = (int32_t)(logicY);
+    int32_t localLogcialX = static_cast<int32_t>(logicX);
+    int32_t localLogcialY = static_cast<int32_t>(logicY);
 
     direction = info->direction;
     TurnTouchScreen(info, direction, localLogcialX, localLogcialY);
