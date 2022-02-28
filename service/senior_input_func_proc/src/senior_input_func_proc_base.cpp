@@ -48,6 +48,7 @@ void SeniorInputFuncProcBase::SetSessionFd(int32_t fd)
 int32_t OHOS::MMI::SeniorInputFuncProcBase::GetSessionFd()
 {
     if (sessionFd_ < 0) {
+        MMI_LOGE("The current sessionFd_ is invalid");
         return RET_ERR;
     }
     return sessionFd_;
@@ -115,11 +116,11 @@ int32_t SeniorInputFuncProcBase::DeviceEventProcess(const RawInputEvent& event)
     }
     for (const auto &fd : fds) {
         auto appInfo = AppRegs->FindSocketFd(fd);
-        NetPacket newPacket(msgId);
+        NetPacket pkt(msgId);
         const uint64_t serverStartTime = GetSysClockTime();
-        newPacket << deviceType << msgId << deviceId << fd << appInfo.windowId << appInfo.abilityId <<
+        pkt << deviceType << msgId << deviceId << fd << appInfo.windowId << appInfo.abilityId <<
             serverStartTime << uuid << occurredTime;
-        if (!udsServerPtr_->SendMsg(fd, newPacket)) {
+        if (!udsServerPtr_->SendMsg(fd, pkt)) {
             MMI_LOGE("Sending structure of event failed. fd:%{public}d", fd);
             return RET_ERR;
         }
@@ -139,9 +140,9 @@ int32_t SeniorInputFuncProcBase::GetDevType()
 int32_t SeniorInputFuncProcBase::ReplyMessage(SessionPtr aiSessionPtr, int32_t status)
 {
     CHKPR(aiSessionPtr, ERROR_NULL_POINTER);
-    NetPacket newPacket(MmiMessageId::SENIOR_INPUT_FUNC);
-    newPacket << status;
-    if (!aiSessionPtr->SendMsg(newPacket)) {
+    NetPacket pkt(MmiMessageId::SENIOR_INPUT_FUNC);
+    pkt << status;
+    if (!aiSessionPtr->SendMsg(pkt)) {
         return RET_ERR;
     }
     return RET_OK;

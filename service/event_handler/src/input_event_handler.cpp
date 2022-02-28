@@ -24,6 +24,7 @@
 #include "bytrace.h"
 #include "input_device_manager.h"
 #include "interceptor_manager_global.h"
+#include "mmi_func_callback.h"
 #include "mmi_server.h"
 #include "mouse_event_handler.h"
 #include "outer_interface.h"
@@ -48,139 +49,139 @@ InputEventHandler::InputEventHandler()
 
 InputEventHandler::~InputEventHandler() {}
 
-bool InputEventHandler::Init(UDSServer& udsServer)
+void InputEventHandler::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
     MsgCallback funs[] = {
         {
             MmiMessageId::LIBINPUT_EVENT_DEVICE_ADDED,
-            std::bind(&InputEventHandler::OnEventDeviceAdded, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventDeviceAdded, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_DEVICE_REMOVED,
-            std::bind(&InputEventHandler::OnEventDeviceRemoved, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventDeviceRemoved, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_KEYBOARD_KEY,
-            std::bind(&InputEventHandler::OnEventKeyboard, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventKeyboard, this)
         },
         {
             MmiMessageId::LIBINPUT_KEY_EVENT,
-            std::bind(&InputEventHandler::OnKeyEventDispatch, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnKeyEventDispatch, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_POINTER_MOTION,
-            std::bind(&InputEventHandler::OnEventPointer, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventPointer, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE,
-            std::bind(&InputEventHandler::OnEventPointer, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventPointer, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_POINTER_BUTTON,
-            std::bind(&InputEventHandler::OnEventPointer, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventPointer, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_POINTER_AXIS,
-            std::bind(&InputEventHandler::OnEventPointer, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventPointer, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TOUCH_DOWN,
-            std::bind(&InputEventHandler::OnEventTouch, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TOUCH_UP,
-            std::bind(&InputEventHandler::OnEventTouch, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TOUCH_MOTION,
-            std::bind(&InputEventHandler::OnEventTouch, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TOUCH_CANCEL,
-            std::bind(&InputEventHandler::OnEventTouch, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TOUCH_FRAME,
-            std::bind(&InputEventHandler::OnEventTouch, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TOUCHPAD_DOWN,
-            std::bind(&InputEventHandler::OnEventTouchpad, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTouchpad, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TOUCHPAD_UP,
-            std::bind(&InputEventHandler::OnEventTouchpad, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTouchpad, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TOUCHPAD_MOTION,
-            std::bind(&InputEventHandler::OnEventTouchpad, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTouchpad, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TABLET_TOOL_AXIS,
-            std::bind(&InputEventHandler::OnEventTabletTool, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTabletTool, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY,
-            std::bind(&InputEventHandler::OnEventTabletTool, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTabletTool, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TABLET_TOOL_TIP,
-            std::bind(&InputEventHandler::OnEventTabletTool, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTabletTool, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TABLET_TOOL_BUTTON,
-            std::bind(&InputEventHandler::OnEventTabletTool, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTabletTool, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TABLET_PAD_BUTTON,
-            std::bind(&InputEventHandler::OnEventTabletPadKey, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTabletPadKey, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TABLET_PAD_RING,
-            std::bind(&InputEventHandler::OnEventTabletPad, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTabletPad, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TABLET_PAD_STRIP,
-            std::bind(&InputEventHandler::OnEventTabletPad, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTabletPad, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TABLET_PAD_KEY,
-            std::bind(&InputEventHandler::OnEventTabletPadKey, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTabletPadKey, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN,
-            std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE,
-            std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_GESTURE_SWIPE_END,
-            std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_GESTURE_PINCH_BEGIN,
-            std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_GESTURE_PINCH_UPDATE,
-            std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_GESTURE_PINCH_END,
-            std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_SWITCH_TOGGLE,
-            std::bind(&InputEventHandler::OnEventSwitchToggle, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventSwitchToggle, this)
         },
     };
     for (auto &item : funs) {
         CHKC(RegistrationEvent(item), EVENT_REG_FAIL);
     }
-    return true;
+    return;
 }
 
 void InputEventHandler::OnEvent(void *event)
@@ -198,10 +199,10 @@ void InputEventHandler::OnEvent(void *event)
 
     eventType_ = libinput_event_get_type(lpEvent);
     auto tid = GetThisThreadIdOfLL();
-    const uint64_t maxUInt64 = (std::numeric_limits<uint64_t>::max)() - 1;
     initSysClock_ = GetSysClockTime();
     lastSysClock_ = 0;
     idSeed_ += 1;
+    const uint64_t maxUInt64 = (std::numeric_limits<uint64_t>::max)() - 1;
     if (idSeed_ >= maxUInt64) {
         MMI_LOGE("Invaild value. id:%{public}" PRId64, idSeed_);
         idSeed_ = 1;
@@ -213,7 +214,7 @@ void InputEventHandler::OnEvent(void *event)
 
     OnEventHandler(*lpMmiEvent);
     lastSysClock_ = GetSysClockTime();
-    uint64_t lostTime = lastSysClock_ - initSysClock_;
+    int64_t lostTime = lastSysClock_ - initSysClock_;
     MMI_LOGD("Event handling completed. id:%{public}" PRId64 ",lastSynClock:%{public}" PRId64
              ",lostTime:%{public}" PRId64, idSeed_, lastSysClock_, lostTime);
 }
@@ -270,7 +271,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
     auto device = libinput_event_get_device(ev.event);
     InputDevMgr->OnInputDeviceAdded(device);
 #else
-    uint64_t sysStartProcessTime = GetSysClockTime();
+    int64_t sysStartProcessTime = GetSysClockTime();
     DeviceManage deviceManage = {};
 
     CHKPR(udsServer_, ERROR_NULL_POINTER);
@@ -294,9 +295,9 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
         MMI_LOGW("Failed to obtain AppInfo, desWindow:%{public}d", focusId);
         return RET_OK; // DeviceAdded event will be discarded if appInfo.fd == RET_ERR
     }
-    NetPacket newPacket(MmiMessageId::ON_DEVICE_ADDED);
-    newPacket << deviceManage << appInfo.abilityId << focusId << appInfo.fd << sysStartProcessTime;
-    if (!SendMsg(appInfo.fd, newPacket)) {
+    NetPacket pkt(MmiMessageId::ON_DEVICE_ADDED);
+    pkt << deviceManage << appInfo.abilityId << focusId << appInfo.fd << sysStartProcessTime;
+    if (!SendMsg(appInfo.fd, pkt)) {
         MMI_LOGE("Sending structure of DeviceManage failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
@@ -311,7 +312,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
     auto device = libinput_event_get_device(ev.event);
     InputDevMgr->OnInputDeviceRemoved(device);
 #else
-    uint64_t sysStartProcessTime = GetSysClockTime();
+    int64_t sysStartProcessTime = GetSysClockTime();
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     DeviceManage deviceManage = {};
     auto packageResult = eventPackage_.PackageDeviceManageEvent(ev.event, deviceManage);
@@ -334,9 +335,9 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
         MMI_LOGW("Failed to obtain AppInfo, desWindow:%{public}d", focusId);
         return RET_OK; // DeviceRemoved event will be discarded if appInfo.fd == RET_ERR
     }
-    NetPacket newPacket(MmiMessageId::ON_DEVICE_REMOVED);
-    newPacket << deviceManage << appInfo.abilityId << focusId << appInfo.fd << sysStartProcessTime;
-    if (!SendMsg(appInfo.fd, newPacket)) {
+    NetPacket pkt(MmiMessageId::ON_DEVICE_REMOVED);
+    pkt << deviceManage << appInfo.abilityId << focusId << appInfo.fd << sysStartProcessTime;
+    if (!SendMsg(appInfo.fd, pkt)) {
         MMI_LOGE("Sending structure of DeviceManage failed, errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
@@ -344,11 +345,11 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventKey(libinput_event *event)
+int32_t InputEventHandler::OnEventKey(struct libinput_event *event)
 {
     CHKPR(event, PARAM_INPUT_INVALID);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
-    uint64_t sysStartProcessTime = GetSysClockTime();
+    int64_t sysStartProcessTime = GetSysClockTime();
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
@@ -391,7 +392,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
 int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& ev)
 {
 #ifdef OHOS_WESTEN_MODEL
-    uint64_t sysStartProcessTime = GetSysClockTime();
+    int64_t sysStartProcessTime = GetSysClockTime();
 #endif
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
@@ -445,10 +446,10 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
 #endif
 }
 
-int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
+int32_t InputEventHandler::OnKeyboardEvent(struct libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
-    uint64_t sysStartProcessTime = GetSysClockTime();
+    int64_t sysStartProcessTime = GetSysClockTime();
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     EventKeyboard keyBoard = {};
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyBoard);
@@ -495,7 +496,7 @@ int32_t InputEventHandler::OnEventKeyboard(const multimodal_libinput_event& ev)
 {
     CHKPR(ev.event, ERROR_NULL_POINTER);
 #ifdef OHOS_WESTEN_MODEL
-    uint64_t sysStartProcessTime = GetSysClockTime();
+    int64_t sysStartProcessTime = GetSysClockTime();
 #endif
     CHKPR(udsServer_, ERROR_NULL_POINTER);
 #ifndef OHOS_WESTEN_MODEL
@@ -536,7 +537,7 @@ int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
 {
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     CHKPR(ev.event, ERROR_NULL_POINTER);
-    uint64_t sysStartProcessTime = GetSysClockTime();
+    int64_t sysStartProcessTime = GetSysClockTime();
     auto device = libinput_event_get_device(ev.event);
     CHKPR(device, LIBINPUT_DEV_EMPTY);
     int32_t devicType = static_cast<int32_t>(libinput_device_get_tags(device));
@@ -591,7 +592,7 @@ int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
 #endif
 }
 
-int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
+int32_t InputEventHandler::OnEventTouchSecond(struct libinput_event *event)
 {
     MMI_LOGD("Enter");
     CHKPR(event, ERROR_NULL_POINTER);
@@ -619,7 +620,7 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
+int32_t InputEventHandler::OnEventTouchPadSecond(struct libinput_event *event)
 {
     MMI_LOGD("Enter");
     CHKPR(event, ERROR_NULL_POINTER);
@@ -652,7 +653,7 @@ int32_t InputEventHandler::OnEventTouch(const multimodal_libinput_event& ev)
     return OnEventTouchSecond(ev.event);
 #else
     CHKPR(udsServer_, ERROR_NULL_POINTER);
-    uint64_t sysStartProcessTime = GetSysClockTime();
+    int64_t sysStartProcessTime = GetSysClockTime();
     EventTouch touch = {};
     auto packageResult = eventPackage_.PackageTouchEvent(ev.event, touch);
     if (packageResult == UNKNOWN_EVENT_PKG_FAIL) {
@@ -683,7 +684,7 @@ int32_t InputEventHandler::OnEventTouchpad(const multimodal_libinput_event& ev)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
+int32_t InputEventHandler::OnGestureEvent(struct libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointer = TouchTransformPointManger->OnTouchPadGestrueEvent(event);
@@ -723,7 +724,7 @@ int32_t InputEventHandler::OnEventGesture(const multimodal_libinput_event& ev)
 #ifndef OHOS_WESTEN_MODEL
     OnGestureEvent(ev.event);
 #else
-    uint64_t sysStartProcessTime = GetSysClockTime();
+    int64_t sysStartProcessTime = GetSysClockTime();
     EventGesture gesture = {};
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto packageResult = eventPackage_.PackageGestureEvent(ev.event, gesture);
@@ -747,7 +748,7 @@ int32_t InputEventHandler::OnEventGesture(const multimodal_libinput_event& ev)
 int32_t InputEventHandler::OnEventTabletTool(const multimodal_libinput_event& ev)
 {
     CHKPR(ev.event, ERROR_NULL_POINTER);
-    uint64_t sysStartProcessTime = GetSysClockTime();
+    int64_t sysStartProcessTime = GetSysClockTime();
     EventTabletTool tableTool = {};
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto packageResult = eventPackage_.PackageTabletToolEvent(ev.event, tableTool);
@@ -773,7 +774,7 @@ int32_t InputEventHandler::OnEventTabletTool(const multimodal_libinput_event& ev
 int32_t InputEventHandler::OnEventTabletPad(const multimodal_libinput_event& ev)
 {
     CHKPR(ev.event, ERROR_NULL_POINTER);
-    uint64_t sysStartProcessTime = GetSysClockTime();
+    int64_t sysStartProcessTime = GetSysClockTime();
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     EventTabletPad tabletPad = {};
     auto packageResult = eventPackage_.PackageTabletPadEvent(ev.event, tabletPad);
@@ -802,7 +803,7 @@ int32_t InputEventHandler::OnEventSwitchToggle(const multimodal_libinput_event& 
 int32_t InputEventHandler::OnEventTabletPadKey(const multimodal_libinput_event& ev)
 {
     CHKPR(ev.event, ERROR_NULL_POINTER);
-    uint64_t sysStartProcessTime = GetSysClockTime();
+    int64_t sysStartProcessTime = GetSysClockTime();
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     EventKeyboard key = {};
     auto packageResult = eventPackage_.PackageTabletPadKeyEvent(ev.event, key);
@@ -830,7 +831,7 @@ int32_t InputEventHandler::OnEventTabletPadKey(const multimodal_libinput_event& 
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventJoyStickKey(const multimodal_libinput_event& ev, const uint64_t time)
+int32_t InputEventHandler::OnEventJoyStickKey(const multimodal_libinput_event& ev, const int64_t time)
 {
     CHKPR(ev.event, ERROR_NULL_POINTER);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
@@ -859,7 +860,7 @@ int32_t InputEventHandler::OnEventJoyStickKey(const multimodal_libinput_event& e
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventJoyStickAxis(const multimodal_libinput_event& ev, const uint64_t time)
+int32_t InputEventHandler::OnEventJoyStickAxis(const multimodal_libinput_event& ev, const int64_t time)
 {
     CHKPR(ev.event, ERROR_NULL_POINTER);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
@@ -878,7 +879,7 @@ int32_t InputEventHandler::OnEventJoyStickAxis(const multimodal_libinput_event& 
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
+int32_t InputEventHandler::OnMouseEventHandler(struct libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
 
@@ -941,7 +942,7 @@ int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEv
 
 bool InputEventHandler::SendMsg(const int32_t fd, NetPacket& pkt) const
 {
-    CHKPF(udsServer_, OHOS::ERROR_NULL_POINTER);
+    CHKPF(udsServer_);
     return udsServer_->SendMsg(fd, pkt);
 }
 #ifdef OHOS_WESTEN_MODEL

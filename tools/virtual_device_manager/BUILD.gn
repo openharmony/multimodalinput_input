@@ -88,8 +88,6 @@ ohos_shared_library("libmmi-virtual-device") {
 
   configs = [ ":virtual_device_config" ]
 
-  public_configs = [ ":virtual_device_public_config" ]
-
   cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
@@ -116,6 +114,9 @@ ohos_shared_library("libmmi-virtual-device") {
 
 ohos_executable("mmi-virtual-device-manager") {
   sources = [ "src/mmi_virtual_device_main.cpp" ]
+
+  configs = [ ":virtual_device_public_config" ]
+
   deps = [ "//foundation/multimodalinput/input/tools/virtual_device_manager:libmmi-virtual-device" ]
 
   if (is_mmi_have_libinput) {
@@ -167,6 +168,8 @@ ohos_unittest("ut-virtual-device-out") {
   }
 
   sources = [ "test/virtual_device_test.cpp" ]
+
+  configs = [ ":virtual_device_public_config" ]
 
   cflags = [ "-DOHOS_BUILD" ]
 

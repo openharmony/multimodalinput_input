@@ -78,9 +78,9 @@ public:
     * @return void
     * @since 1
     */
-    void Initialize(int32_t windowId, int32_t startTime, int32_t operationState, int32_t pointerCount,
+    void Initialize(int32_t windowId, int64_t startTime, int32_t operationState, int32_t pointerCount,
                     fingerInfos fingersInfos[], int32_t highLevelEvent, const std::string& uuid, int32_t sourceType,
-                    uint64_t occurredTime, const std::string& deviceId, int32_t inputDeviceId,  bool isHighLevelEvent,
+                    int64_t occurredTime, const std::string& deviceId, int32_t inputDeviceId,  bool isHighLevelEvent,
                     uint16_t deviceUdevTags = 0);
     /**
     * initialize the object.
@@ -96,7 +96,7 @@ public:
     * @return Returns the time (in ms) of the operation start phase.
     * @since 1
     */
-    virtual int32_t GetStartTime() const;
+    virtual int64_t GetStartTime() const;
 
     /**
      * Obtains the operation phase of the event.
@@ -220,7 +220,7 @@ public:
     */
     virtual const fingerInfos* GetFingersInfos() const;
 private:
-    int32_t startTime_ = 0;
+    int64_t startTime_ = 0;
     int32_t operationState_ = 0;
     int32_t pointerCount_ = 0;
     fingerInfos fingersInfos_[FINGER_NUM] = {};

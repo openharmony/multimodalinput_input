@@ -15,7 +15,6 @@
 
 #include "processing_finger_device.h"
 
-using namespace std;
 using namespace OHOS::MMI;
 
 namespace {

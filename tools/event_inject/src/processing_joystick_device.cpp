@@ -15,7 +15,6 @@
 
 #include "processing_joystick_device.h"
 
-using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
@@ -38,7 +37,7 @@ int32_t ProcessingJoystickDevice::TransformJsonDataToInputData(const Json& origi
         MMI_LOGE("manage finger array faild, inputData is empty");
         return RET_ERR;
     }
-    vector<JoystickEvent> JoystickEventArray;
+    std::vector<JoystickEvent> JoystickEventArray;
     if (AnalysisJoystickEvent(inputData, JoystickEventArray) == RET_ERR) {
         return RET_ERR;
     }
@@ -54,7 +53,7 @@ int32_t ProcessingJoystickDevice::AnalysisJoystickEvent(const Json& inputData,
     JoystickEvent joystickEvent = {};
     for (const auto &item : inputData) {
         joystickEvent = {};
-        string eventType = item.at("eventType").get<std::string>();
+        std::string eventType = item.at("eventType").get<std::string>();
         if ((item.find("blockTime")) != item.end()) {
             joystickEvent.blockTime = item.at("blockTime").get<int32_t>();
         }
@@ -147,7 +146,7 @@ void ProcessingJoystickDevice::TransformKeyClickEvent(const JoystickEvent& joyst
 void ProcessingJoystickDevice::TransformRocker1Event(const JoystickEvent& joystickEvent,
                                                      InputEventArray& inputEventArray)
 {
-    string direction = joystickEvent.direction;
+    std::string direction = joystickEvent.direction;
     for (const auto &item : joystickEvent.gameEvents) {
         if ((direction == "left")||(direction == "right")) {
             SetEvAbsX(inputEventArray, 0, item);
@@ -175,7 +174,7 @@ void ProcessingJoystickDevice::TransformRocker1Event(const JoystickEvent& joysti
 void ProcessingJoystickDevice::TransformDerectionKeyEvent(const JoystickEvent& joystickEvent,
                                                           InputEventArray& inputEventArray)
 {
-    string direction = joystickEvent.direction;
+    std::string direction = joystickEvent.direction;
     if (direction == "left") {
         SetEvAbsHat0X(inputEventArray, 0, -1);
         SetSynReport(inputEventArray);

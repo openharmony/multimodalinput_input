@@ -36,13 +36,13 @@ HWTEST_F(ManipulationEventTest, Initialize_003, TestSize.Level1)
 
 HWTEST_F(ManipulationEventTest, GetStartTime_001, TestSize.Level1)
 {
-    int32_t retResult = maniPulationEvent.GetStartTime();
+    int64_t retResult = maniPulationEvent.GetStartTime();
     EXPECT_EQ(0, retResult);
 }
 
 HWTEST_F(ManipulationEventTest, GetStartTime_002, TestSize.Level1)
 {
-    int32_t retResult = maniPulationEvent.GetStartTime();
+    int64_t retResult = maniPulationEvent.GetStartTime();
     EXPECT_NE(2, retResult);
 }
 

@@ -45,7 +45,7 @@ public:
         OnRecv(fd,  buf, size);
     }
 
-    void OnEventUnitTest(const epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
+    void OnEventUnitTest(const struct epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
     {
         OnEvent(ev, bufMap);
     }
@@ -67,82 +67,82 @@ HWTEST_F(UDSServerTest, Init_002, TestSize.Level1)
 
 HWTEST_F(UDSServerTest, SendMsg_001, TestSize.Level1)
 {
-    int32_t fd = 1000;
     MmiMessageId msgId = MmiMessageId::INVALID;
-    NetPacket newPacket(msgId);
+    NetPacket pkt(msgId);
 
+    int32_t fd = 1000;
     UDSServer serObj;
-    bool retResult = serObj.SendMsg(fd, newPacket);
+    bool retResult = serObj.SendMsg(fd, pkt);
     EXPECT_FALSE(retResult);
 }
 
 HWTEST_F(UDSServerTest, SendMsg_002, TestSize.Level1)
 {
-    int32_t fd = -1001;
     MmiMessageId msgId = MmiMessageId::INVALID;
-    NetPacket newPacket(msgId);
+    NetPacket pkt(msgId);
 
+    int32_t fd = -1001;
     UDSServer serObj;
-    bool retResult = serObj.SendMsg(fd, newPacket);
+    bool retResult = serObj.SendMsg(fd, pkt);
     ASSERT_FALSE(retResult);
 }
 
 HWTEST_F(UDSServerTest, SendMsg_003, TestSize.Level1)
 {
-    int32_t fd = 3333;
     MmiMessageId msgId = MmiMessageId::BEGIN;
-    NetPacket newPacket(msgId);
+    NetPacket pkt(msgId);
 
+    int32_t fd = 3333;
     UDSServer serObj;
-    bool retResult = serObj.SendMsg(fd, newPacket);
+    bool retResult = serObj.SendMsg(fd, pkt);
     ASSERT_FALSE(retResult);
 }
 
 HWTEST_F(UDSServerTest, Broadcast_001, TestSize.Level1)
 {
     MmiMessageId msgId = MmiMessageId::INVALID;
-    NetPacket newPacket(msgId);
+    NetPacket pkt(msgId);
 
     UDSServer serObj;
-    serObj.Broadcast(newPacket);
+    serObj.Broadcast(pkt);
 }
 
 HWTEST_F(UDSServerTest, Broadcast_002, TestSize.Level1)
 {
     MmiMessageId msgId = MmiMessageId::BEGIN;
-    NetPacket newPacket(msgId);
+    NetPacket pkt(msgId);
 
     UDSServer serObj;
-    serObj.Broadcast(newPacket);
+    serObj.Broadcast(pkt);
 }
 
 HWTEST_F(UDSServerTest, Broadcast_003, TestSize.Level1)
 {
     MmiMessageId msgId = MmiMessageId::REGISTER_APP_INFO;
-    NetPacket newPacket(msgId);
+    NetPacket pkt(msgId);
 
     UDSServer serObj;
-    serObj.Broadcast(newPacket);
+    serObj.Broadcast(pkt);
 }
 
 HWTEST_F(UDSServerTest, Broadcast_004, TestSize.Level1)
 {
     MmiMessageId msgId = MmiMessageId::REGISTER_MSG_HANDLER;
-    NetPacket newPacket(msgId);
+    NetPacket pkt(msgId);
 
     UDSServer serObj;
-    serObj.Broadcast(newPacket);
+    serObj.Broadcast(pkt);
 }
 
 HWTEST_F(UDSServerTest, Multicast, TestSize.Level1)
 {
     MmiMessageId msgId = MmiMessageId::INVALID;
-    NetPacket newPacket(msgId);
+    NetPacket pkt(msgId);
     std::vector<int32_t> fds;
     fds.push_back(1);
 
     UDSServer serObj;
-    serObj.Multicast(fds, newPacket);
+    serObj.Multicast(fds, pkt);
 }
 
 HWTEST_F(UDSServerTest, OnAccept, TestSize.Level1)
@@ -163,7 +163,7 @@ HWTEST_F(UDSServerTest, OnRecv, TestSize.Level1)
 
 HWTEST_F(UDSServerTest, OnEvent, TestSize.Level1)
 {
-    epoll_event ev = {};
+    struct epoll_event ev = {};
     ev.events = 5;
     std::map<int32_t, StreamBufData> bufMap;
 

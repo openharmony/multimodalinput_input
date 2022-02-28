@@ -122,7 +122,7 @@ static int32_t RegisterTypeCode(napi_env env, JSRegisterHandle &registerHandle, 
 static napi_value OnEvent(napi_env env, napi_callback_info info)
 {
     napi_value result = nullptr;
-    napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result);
+    napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAM, &result);
 
     EventInfo event = {};
     if (GetEventInfo(env, info, event) == nullptr) {
@@ -163,7 +163,7 @@ static napi_value OnEvent(napi_env env, napi_callback_info info)
 static napi_value OffEvent(napi_env env, napi_callback_info info)
 {
     napi_value result = nullptr;
-    napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result);
+    napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAM, &result);
 
     EventInfo event = {};
     if (GetEventInfo(env, info, event) == nullptr) {
@@ -210,7 +210,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     napi_value argv[1] = { 0 };
     if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
         MMI_LOGE("call napi_get_cb_info fail");
-        napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result);
+        napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAM, &result);
         return result;
     }
     NAPI_ASSERT(env, argc == 1, "paramater num error");
@@ -280,7 +280,7 @@ static napi_value UnitTest(napi_env env, napi_callback_info info)
     NAPI_ASSERT(env, eventObjType == napi_object, "parameter2 is not napi_object");
 
     std::string uuid = GetNamedPropertyString(env, argv[ARGV_SECOND], "uuid");
-    uint64_t occurredTime = GetNamedPropertyInt64(env, argv[ARGV_SECOND], "occurredTime");
+    int64_t occurredTime = GetNamedPropertyInt64(env, argv[ARGV_SECOND], "occurredTime");
     int32_t sourceDevice = GetNamedPropertyInt32(env, argv[ARGV_SECOND], "sourceDevice");
     int32_t inputDeviceId = GetNamedPropertyInt32(env, argv[ARGV_SECOND], "inputDeviceId");
     uint32_t eventType = GetNamedPropertyUint32(env, argv[ARGV_SECOND], "type");
@@ -296,7 +296,7 @@ static napi_value UnitTest(napi_env env, napi_callback_info info)
     UnitSent(env, winId, eventType, multimodalEvent);
 
     if (napi_create_int32(env, SUCCESS_CODE, &result) != napi_ok) {
-        MMI_LOGE("UnitTest: call napi_create_int32 fail");
+        MMI_LOGE("call napi_create_int32 fail");
         return result;
     }
     return result;

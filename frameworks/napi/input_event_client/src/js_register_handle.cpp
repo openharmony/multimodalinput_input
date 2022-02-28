@@ -23,9 +23,9 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterHandle" }; // namespace
 }
 struct RegisterHanldeInfo {
-    sptr<MMIToken> remoteObj;
+    sptr<MMIToken> remoteObj = { nullptr };
     int32_t winId;
-    std::shared_ptr<EventContext> context;
+    std::shared_ptr<EventContext> context = { nullptr };
 };
 std::map<std::string, RegisterHanldeInfo> g_registerMap = {};
 
