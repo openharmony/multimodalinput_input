@@ -182,9 +182,3 @@ ohos_unittest("ut-virtual-device-out") {
   }
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 }
-
-group("ut-virtual-device") {
-  testonly = true
-  deps = []
-  deps += [ ":ut-virtual-device-out" ]
-}
