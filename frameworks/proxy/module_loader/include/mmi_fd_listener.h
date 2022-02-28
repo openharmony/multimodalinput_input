@@ -27,7 +27,6 @@ public:
     DISALLOW_COPY_AND_MOVE(MMIFdListener);
 
     virtual void OnReadable(int32_t fd) override;
-    virtual void OnWritable(int32_t fd) override;
     virtual void OnShutdown(int32_t fd) override;
     virtual void OnException(int32_t fd) override;
 

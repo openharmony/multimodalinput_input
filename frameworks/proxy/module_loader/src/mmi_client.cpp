@@ -62,9 +62,9 @@ bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
 bool MMIClient::StartEventRunner()
 {
     MMI_LOGD("enter");
-    eventRunner_ = EventRunner::Create(false);
-    CHKPF(eventRunner_);
-    eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner_, GetPtr());
+    auto eventRunner = EventRunner::Create(false);
+    CHKPF(eventRunner);
+    eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner, GetPtr());
     CHKPF(eventHandler_);
     if (isConnected_ && fd_ >= 0) {
         if (!AddFdListener(fd_)) {
@@ -77,12 +77,11 @@ bool MMIClient::StartEventRunner()
             return false;
         }
     }
-
     // if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_ONTIMER, 0, EVENT_TIME_ONTIMER)) {
     //     MMI_LOGE("send ontimer event return false.");
     //     return false;
     // }
-    auto errCode = eventRunner_->Run();
+    auto errCode = eventRunner->Run();
     if (errCode != ERR_OK) {
         MMI_LOGE("event runnner run error,code:%{public}u str:%{public}s", errCode,
             eventHandler_->GetErrorStr(errCode).c_str());
@@ -96,9 +95,9 @@ bool MMIClient::AddFdListener(int32_t fd)
     MMI_LOGD("enter");
     CHKF(fd >= 0, C_INVALID_INPUT_PARAM);
     CHKPF(eventHandler_);
-    fdListener_ = std::make_shared<MMIFdListener>(GetPtr());
-    CHKPF(fdListener_);
-    auto errCode = eventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_EVENTS_MASK, fdListener_);
+    auto fdListener = std::make_shared<MMIFdListener>(GetPtr());
+    CHKPF(fdListener);
+    auto errCode = eventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_INPUT_EVENT, fdListener);
     if (errCode != ERR_OK) {
         MMI_LOGE("add fd listener error,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode,
             eventHandler_->GetErrorStr(errCode).c_str());
@@ -132,6 +131,11 @@ void MMIClient::OnRecvMsg(const char *buf, size_t size)
 int32_t MMIClient::Reconnect()
 {
     return ConnectTo();
+}
+
+void MMIClient::OnDisconnect()
+{
+    OnDisconnected();
 }
 
 void MMIClient::RegisterConnectedFunction(ConnectCallback fun)
