@@ -18,8 +18,8 @@
 using namespace OHOS::MMI;
 
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingKeyboardDevice" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingKeyboardDevice" };
+} // namespace
 
 int32_t ProcessingKeyboardDevice::TransformJsonDataToInputData(const Json& fingerEventArrays,
     InputEventArray& inputEventArray)
