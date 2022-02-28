@@ -1954,7 +1954,10 @@ void InputEventInterceptor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEv
              pointerIds.size());
     for (int32_t pointerId : pointerIds) {
         OHOS::MMI::PointerEvent::PointerItem item;
-        CHK(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL);
+        if (!pointerEvent->GetPointerItem(pointerId, item)) {
+            MMI_LOGE("Can't find the pointerItem, pointer:%{public}d, errCode:%{public}d", pointerId, PARAM_INPUT_FAIL);
+            return;
+        }
 
         MMI_LOGD("DownTime:%{public}" PRId64 ",isPressed:%{public}s,"
                  "globalX:%{public}d,globalY:%{public}d,pressure:%{public}d",

@@ -1386,11 +1386,20 @@ HWTEST_F(ClientMsgHandlerTest, OnTouch2, TestSize.Level1)
     int64_t serverStartTime = 7;
     EventTouch touchData = {};
     int32_t ret = memcpy_s(touchData.deviceName, MAX_DEVICENAME, "name", MAX_DEVICENAME);
-    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
+    if (ret != EOK) {
+        MMI_LOGE("Memcpy data is failed, errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+        return;
+    }
     ret = memcpy_s(touchData.physical, MAX_DEVICENAME, "TouchScreen", MAX_DEVICENAME);
-    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
+    if (ret != EOK) {
+        MMI_LOGE("Memcpy data is failed, errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+        return;
+    }
     ret = memcpy_s(touchData.uuid, MAX_DEVICENAME, "12345", MAX_DEVICENAME);
-    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
+    if (ret != EOK) {
+        MMI_LOGE("Memcpy data is failed, errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+        return;
+    }
     touchData.eventType = 500;
     touchData.time = 500;
     touchData.slot = 500;

@@ -902,7 +902,10 @@ void ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, NetPacket& pk
     int32_t ret = RET_ERR;
     EventPointer pointData = {};
     pkt >> ret >> pointData >> abilityId >> windowId >> fd >> serverStartTime;
-    CHK(!pkt.ChkError(), PACKET_READ_FAIL);
+    if (pkt.ChkError()) {
+        MMI_LOGE("The packet read is error, errCode:%{public}d", PACKET_READ_FAIL);
+        return;
+    }
     MMI_LOGD("event dispatcher of client: mouse_data eventPointer:time:%{public}" PRId64 ",eventType:%{public}d,"
              "buttonCode:%{public}u,deviceType:%{public}u,seat_button_count:%{public}u,"
              "axis:%{public}u,buttonState:%{public}d,source:%{public}d,delta.x:%{public}lf,delta.y:%{public}lf, "
@@ -935,7 +938,10 @@ void ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, NetPacket& pk
     StandardTouchStruct standardTouch = {};
     if (ret > 0) {
         pkt >> standardTouch;
-        CHK(!pkt.ChkError(), PACKET_READ_FAIL);
+        if (pkt.ChkError()) {
+        MMI_LOGE("The packet read is error, errCode:%{public}d", PACKET_READ_FAIL);
+        return;
+        }
 
         /* 根据收到的standardTouch数据和MouseEvent对象，构造TouchEvent对象
          * 其中TouchEvent对象的action,index,forcePrecision,maxForce,tapCount五个字段
@@ -961,7 +967,10 @@ void ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, NetPacket& pk
     int32_t seatSlot = 0;
     int64_t serverStartTime = 0;
     pkt >> fingerCount >> eventAction >> abilityId >> windowId >> fd >> serverStartTime >> seatSlot;
-    CHK(!pkt.ChkError(), PACKET_READ_FAIL);
+    if (pkt.ChkError()) {
+        MMI_LOGE("The packet read is error, errCode:%{public}d", PACKET_READ_FAIL);
+        return;
+    }
 
     EventTouch touchData = {};
     fingerInfos fingersInfos[FINGER_NUM] = {};
@@ -972,7 +981,10 @@ void ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, NetPacket& pk
     */
     for (int32_t i = 0; i < fingerCount; i++) {
         pkt >> touchData;
-        CHK(!pkt.ChkError(), PACKET_READ_FAIL);
+        if (pkt.ChkError()) {
+        MMI_LOGE("The packet read is error, errCode:%{public}d", PACKET_READ_FAIL);
+        return;
+        }
         fingersInfos[i].mPointerId = touchData.seatSlot;
         fingersInfos[i].mTouchArea = static_cast<float>(touchData.area);
         fingersInfos[i].mTouchPressure = static_cast<float>(touchData.pressure);
@@ -1000,7 +1012,10 @@ void ClientMsgHandler::AnalysisJoystickEvent(const UDSClient& client, NetPacket&
     int32_t fd = 0;
     int64_t serverStartTime = 0;
     pkt >> eventJoyStickData >> abilityId >> windowId >> fd >> serverStartTime;
-    CHK(!pkt.ChkError(), PACKET_READ_FAIL);
+    if (pkt.ChkError()) {
+        MMI_LOGE("The packet read is error, errCode:%{public}d", PACKET_READ_FAIL);
+        return;
+    }
     MMI_LOGD("event dispatcher of client: "
         "event JoyStick: fd:%{public}d", fd);
     PrintEventJoyStickAxisInfo(eventJoyStickData, fd, abilityId, windowId, serverStartTime);
@@ -1032,7 +1047,10 @@ void ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client, NetPacket&
     int32_t fd = 0;
     int64_t serverStartTime = 0;
     pkt >> tabletPad >> abilityId >> windowId >> fd >> serverStartTime;
-    CHK(!pkt.ChkError(), PACKET_READ_FAIL);
+    if (pkt.ChkError()) {
+        MMI_LOGE("The packet read is error, errCode:%{public}d", PACKET_READ_FAIL);
+        return;
+    }
     MMI_LOGD("event dispatcher of client: event tablet Pad :time:%{public}" PRId64 ",deviceType:%{public}u,"
              "deviceName:%{public}s,eventType:%{public}d,"
              "ring.number:%{public}d,ring.position:%{public}lf,ring.source:%{public}d,"
@@ -1153,7 +1171,10 @@ void ClientMsgHandler::AnalysisStandardTabletToolEvent(NetPacket& pkt, int32_t c
     fingerInfos fingersInfos[FINGER_NUM] = {};
     if (curRventType > 0) {
         pkt >> standardTouchEvent;
-        CHK(!pkt.ChkError(), PACKET_READ_FAIL);
+        if (pkt.ChkError()) {
+        MMI_LOGE("The packet read is error, errCode:%{public}d", PACKET_READ_FAIL);
+        return;
+        }
         fingersInfos[0].mMp.Setxy(standardTouchEvent.x, standardTouchEvent.y);
         int32_t stylusAction = POINT_MOVE;
         deviceEventType = STYLUS_EVENT;
@@ -1201,7 +1222,10 @@ void ClientMsgHandler::AnalysisTabletToolEvent(const UDSClient& client, NetPacke
     int64_t serverStartTime = 0;
 
     pkt >> curRventType >> tableTool >> abilityId >> windowId >> fd >> serverStartTime;
-    CHK(!pkt.ChkError(), PACKET_READ_FAIL);
+    if (pkt.ChkError()) {
+        MMI_LOGE("The packet read is error, errCode:%{public}d", PACKET_READ_FAIL);
+        return;
+    }
     PrintEventTabletToolInfo(tableTool, serverStartTime, abilityId, windowId, fd);
     // 如果是标准化消息，则获取standardTouchEvent
     AnalysisStandardTabletToolEvent(pkt, curRventType, tableTool, windowId);
@@ -1215,7 +1239,10 @@ void ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, NetPacket& 
     int32_t fd = 0;
     int64_t serverStartTime = 0;
     pkt >> gesture >> abilityId >> windowId >> fd >> serverStartTime;
-    CHK(!pkt.ChkError(), PACKET_READ_FAIL);
+    if (pkt.ChkError()) {
+        MMI_LOGE("The packet read is error, errCode:%{public}d", PACKET_READ_FAIL);
+        return;
+    }
     MMI_LOGD("event dispatcher of client: event Gesture :time:%{public}" PRId64 ","
              "deviceType:%{public}u,deviceName:%{public}s, devNode:%{public}s,eventType:%{public}d,"
              "fingerCount:%{public}d,cancelled:%{public}d,delta.x:%{public}lf,delta.y:%{public}lf, "
@@ -1255,7 +1282,10 @@ void ClientMsgHandler::OnEventProcessed(int32_t eventId)
     CHKPV(client);
     NetPacket pkt(MmiMessageId::NEW_CHECK_REPLY_MESSAGE);
     pkt << eventId;
-    CHK(client->SendMessage(pkt), MSG_SEND_FAIL);
+    if (!client->SendMessage(pkt)) {
+        MMI_LOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return;
+    }
 }
 } // namespace MMI
 } // namespace OHOS
