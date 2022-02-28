@@ -228,7 +228,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterAppInfo(SessionPtr sess, NetPacke
     int32_t fd = sess->GetFd();
     AppInfo appInfo = { abilityId, windowId, fd, bundlerName, appName };
 
-    AppRegs->RegisterAppInfoforServer(appInfo);
+    AppRegs->RegisterAppInfoServer(appInfo);
 #if !defined(OHOS_BUILD) || !defined(OHOS_WESTEN_MODEL)
     WinMgr->SetFocusSurfaceId(windowId);
     WinMgr->SetTouchFocusSurfaceId(windowId);
@@ -251,7 +251,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterMsgHandler(SessionPtr sess, NetPa
     int32_t fd = sess->GetFd();
     RegEventHM->RegisterEvent(eventType, fd);
     if (winId > 0) {
-        AppRegs->RegisterAppInfoforServer({ abilityId, winId, fd, bundlerName, appName });
+        AppRegs->RegisterAppInfoServer({ abilityId, winId, fd, bundlerName, appName });
     }
     MMI_LOGD("OnRegisterMsgHandler fd:%{public}d,eventType:%{public}d,"
              "bundlerName:%{public}s,appName:%{public}s",
@@ -618,7 +618,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnAddEventInterceptor(SessionPtr sess, NetP
     Authority authority;
     pkt >> id >> name >> authority;
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-    ServerKeyFilter->RegisterEventInterceptorforServer(sess, id, name, authority);
+    ServerKeyFilter->RegisterEventInterceptorServer(sess, id, name, authority);
     return RET_OK;
 }
 
@@ -632,7 +632,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveEventInterceptor(SessionPtr sess, N
     MMI_LOGD("server remove a pointer event filter");
     pkt >> id;
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-    ServerKeyFilter->UnregisterEventInterceptorforServer(sess, id);
+    ServerKeyFilter->UnregisterEventInterceptorServer(sess, id);
     return RET_OK;
 }
 

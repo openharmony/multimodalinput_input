@@ -49,7 +49,7 @@ public:
 
     const AppInfo& FindSocketFd(int32_t fd);
 
-    void RegisterAppInfoforServer(const AppInfo& appInfo);
+    void RegisterAppInfoServer(const AppInfo& appInfo);
 
     void UnregisterAppInfoSocketFd(int32_t fd);
 

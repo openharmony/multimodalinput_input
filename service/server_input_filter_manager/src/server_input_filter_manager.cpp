@@ -390,8 +390,8 @@ bool ServerInputFilterManager::OnPointerEvent(EventPointer event_pointer)
     return true;
 }
 
-int32_t ServerInputFilterManager::RegisterEventInterceptorforServer(const SessionPtr& sess, int32_t id,
-                                                                    std::string name, Authority authority)
+int32_t ServerInputFilterManager::RegisterEventInterceptorServer(const SessionPtr& sess, int32_t id,
+                                                                 std::string name, Authority authority)
 {
     auto it = pointerEventFilterMap_.find(sess);
     if (it == pointerEventFilterMap_.end()) {
@@ -408,7 +408,7 @@ int32_t ServerInputFilterManager::RegisterEventInterceptorforServer(const Sessio
     return RET_OK;
 }
 
-int32_t ServerInputFilterManager::UnregisterEventInterceptorforServer(const SessionPtr& sess, int32_t id)
+int32_t ServerInputFilterManager::UnregisterEventInterceptorServer(const SessionPtr& sess, int32_t id)
 {
     auto it = pointerEventFilterMap_.find(sess);
     MMI_LOGD("Remove the id:%{public}d", it->second.GetId());

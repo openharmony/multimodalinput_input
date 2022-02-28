@@ -90,9 +90,9 @@ public:
         Authority authority_;
     };
     bool OnPointerEvent(EventPointer event_pointer);
-    int32_t RegisterEventInterceptorforServer(const SessionPtr& sess, int32_t id,
+    int32_t RegisterEventInterceptorServer(const SessionPtr& sess, int32_t id,
         std::string name, Authority authority);
-    int32_t UnregisterEventInterceptorforServer(const SessionPtr& sess, int32_t id);
+    int32_t UnregisterEventInterceptorServer(const SessionPtr& sess, int32_t id);
     void DeleteInterceptorFormSess(const SessionPtr& sess);
 
 protected:
