@@ -1453,7 +1453,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, UnregisterStandardizedEventHandle_001, Te
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
     int32_t windowId = 1;
-    StandEventPtr standardizedEventHandle;
+    StandEventPtr standardizedEventHandle = nullptr;
 
     int32_t retResult = multimodalTest.UnregisterStandardizedEventHandle(iRemote,
                                                                          windowId, standardizedEventHandle);

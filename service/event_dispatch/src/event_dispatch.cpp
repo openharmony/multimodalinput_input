@@ -223,10 +223,6 @@ int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, struct libin
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
-#ifdef DEBUG_CODE_TEST
-    std::string str = WinMgr->GetSurfaceIdListString();
-#endif
-
     auto focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
         MMI_LOGW("Failed to get the focus window");
@@ -237,16 +233,6 @@ int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, struct libin
         MMI_LOGE("Failed to find fd, errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
     }
-#ifdef DEBUG_CODE_TEST
-    MMI_LOGD("MMIWMS:windowId:%{public}s", str.c_str());
-    if (focusId == -1) {
-        MMI_LOGD("WMS:windowId = ''");
-    } else {
-        MMI_LOGD("WMS:windowId:%{public}d", focusId);
-    }
-    MMI_LOGD("CALL_AMS, MMIAPPM:fd :%{public}d,abilityID:%{public}d", appInfo.fd, appInfo.abilityId);
-#endif
-
     MMI_LOGD("4.event dispatcher of server, EventTabletPad:time:%{public}" PRId64 ",deviceType:%{public}u,"
              "deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,"
              "ring.number:%{public}d,ring.position:%{public}lf,ring.source:%{public}d,"
@@ -285,10 +271,6 @@ int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, struct libinp
         MMI_LOGE("Failed to find fd, errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
     }
-#ifdef DEBUG_CODE_TEST
-    std::string str = WinMgr->GetSurfaceIdListString();
-    PrintWMSInfo(str, appInfo.fd, appInfo.abilityId, focusId);
-#endif
     PrintEventJoyStickAxisInfo(eventJoyStickAxis, appInfo.fd, appInfo.abilityId, focusId, preHandlerTime);
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, eventJoyStickAxis.time, preHandlerTime)) {
@@ -329,11 +311,6 @@ int32_t EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, struct libi
         if (inputEvent.curRventType > 0) {
             pkt << inputEvent;
         }
-
-#ifdef DEBUG_CODE_TEST
-        std::string strIds = WinMgr->GetSurfaceIdListString();
-        PrintWMSInfo(strIds, appInfo.fd, appInfo.abilityId, focusId);
-#endif
         MMI_LOGD("4.event dispatcher of server, TabletTool:time:%{public}" PRId64 ","
                  "deviceType:%{public}u,deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,"
                  "type:%{public}u,serial:%{public}u, button:%{public}d,state:%{public}d,"
@@ -629,9 +606,6 @@ int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, struct lib
     auto type = libinput_event_get_type(event);
     CHKPR(device, ERROR_NULL_POINTER);
 
-#ifdef DEBUG_CODE_TEST
-    std::string str = WinMgr->GetSurfaceIdListString();
-#endif
     int32_t ret = RET_OK;
     MmiMessageId idMsg = MmiMessageId::INVALID;
     if (type == LIBINPUT_EVENT_POINTER_BUTTON) {
@@ -706,10 +680,6 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
     }
     auto fd = WinMgr->UpdateTarget(key);
     CHKR(fd >= 0, FD_OBTAIN_FAIL, RET_ERR);
-#ifdef DEBUG_CODE_TEST
-    std::string str = WinMgr->GetSurfaceIdListString();
-    PrintWMSInfo(str, fd, 0, key->GetTargetWindowId());
-#endif
 
     MMI_LOGD("4.event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
              "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","

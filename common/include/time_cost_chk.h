@@ -46,7 +46,7 @@ public:
                          "param1:%{public}" PRId64 ",param2:%{public}" PRId64 "",
                          ullCost, uiTime_, strReason_.c_str(), strOutput_.c_str(), llParam1_, llParam2_);
             } else {
-                MMI_LOGW("TimeCostChk Overtime(%{public}" PRId64 ",(us)>%{public}" PRId64
+                MMI_LOGW("Overtime(%{public}" PRId64 ",(us)>%{public}" PRId64
                          "(us)) when Reason:%{public}s,chk:%{public}s",
                          ullCost, uiTime_, strReason_.c_str(), strOutput_.c_str());
             }
