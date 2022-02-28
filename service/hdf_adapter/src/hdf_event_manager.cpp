@@ -362,7 +362,7 @@ int32_t OHOS::MMI::HdfEventManager::DeviceRemoveHandle(uint32_t devIndex, uint32
         __func__, __LINE__, devIndex, devType);
     Devcmd cmd;
     cmd.index = devIndex;
-    cmd.cmd = (int32_t)HDF_RMV_DEVICE;
+    cmd.cmd = static_cast<int32_t>(HDF_RMV_DEVICE);
     libinput_devpipe_write(m_globleThis->hdiinput_, &cmd, sizeof(Devcmd));
     if (devIndex < MAX_INPUT_DEVICE_COUNT) {
         uint32_t ret = m_globleThis->inputInterface_->iInputReporter->UnregisterReportCallback(devIndex);
@@ -386,7 +386,7 @@ void OHOS::MMI::HdfEventManager::GetEventCallback(const EventPackage **pkgs, uin
     struct input_event eventarry[MAX_EVENT_PKG_NUM];
     for (uint32_t i = 0; i < count && i < MAX_EVENT_PKG_NUM; i++) {
         eventarry[i].code = pkgs[i]->code;
-        eventarry[i].type = (pkgs[i]->type) | (uint16_t)(devIndex<<byteSize); // 不改变livinput结构传递，对象的index参数
+        eventarry[i].type = (pkgs[i]->type) | static_cast<uint16_t>(devIndex<<byteSize); // 不改变livinput结构传递，对象的index参数
         eventarry[i].value = pkgs[i]->value;
         eventarry[i].input_event_sec = (pkgs[i]->timestamp) / (USEC_PER_SEC);
         eventarry[i].input_event_usec = (pkgs[i]->timestamp) % (USEC_PER_SEC);
@@ -412,7 +412,7 @@ int32_t OHOS::MMI::HdfEventManager::DeviceAddHandle(uint32_t devIndex, uint32_t 
     globleThis_->hdflist_.push_back(hdiuhdf);
     Devcmd cmd;
     cmd.index = devIndex;
-    cmd.cmd = (int32_t)HDF_ADD_DEVICE;
+    cmd.cmd = static_cast<int32_t>(HDF_ADD_DEVICE);
     libinput_devpipe_write(globleThis_->hdiinput_, &cmd, sizeof(Devcmd));
     return RET_OK;
 }

@@ -62,10 +62,10 @@ typedef struct {
     std::string name;
     napi_value handle;
     int32_t status;
-    std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent;
+    std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent = { nullptr };
     napi_ref callback[1] = { 0 };
     int32_t subscribeId;
-    std::shared_ptr<KeyOption> keyOption;
+    std::shared_ptr<KeyOption> keyOption = { nullptr };
 } KeyEventMonitorInfo;
 
 typedef std::map<std::string, std::list<KeyEventMonitorInfo *>> Callbacks;

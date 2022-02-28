@@ -77,12 +77,12 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
     TimeCostChk chk("ClientMsgHandler::OnMsgHandler", "overtime 300(us)", MAX_OVER_TIME, id);
     auto callback = GetMsgCallback(id);
     if (callback == nullptr) {
-        MMI_LOGE("CClientMsgHandler::OnMsgHandler Unknown msg id:%{public}d", id);
+        MMI_LOGE("Unknown msg id:%{public}d", id);
         return;
     }
     auto ret = (*callback)(client, pkt);
     if (ret < 0) {
-        MMI_LOGE("CClientMsgHandler::OnMsgHandler Msg handling failed. id:%{public}d,ret:%{public}d", id, ret);
+        MMI_LOGE("Msg handling failed. id:%{public}d,ret:%{public}d", id, ret);
         return;
     }
 }
@@ -93,7 +93,7 @@ int32_t ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)
     CHKPR(key, ERROR_NULL_POINTER);
     int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, key);
     if (ret != RET_OK) {
-        MMI_LOGE("OnKeyMonitor read netPacket failed");
+        MMI_LOGE("read netPacket failed");
         return RET_ERR;
     }
     int32_t pid;
@@ -218,7 +218,7 @@ int32_t ClientMsgHandler::OnTouchPadMonitor(const UDSClient& client, NetPacket& 
     auto pointer = PointerEvent::Create();
     int32_t ret = InputEventDataTransformation::Unmarshalling(pkt, pointer);
     if (ret != RET_OK) {
-        MMI_LOGE("OnTouchPadMonitor read netPacket failed");
+        MMI_LOGE("read netPacket failed");
         return RET_ERR;
     }
     int32_t pid = 0;
@@ -316,7 +316,7 @@ int32_t ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetP
     auto pointerEvent = PointerEvent::Create();
     int32_t ret = InputEventDataTransformation::Unmarshalling(pkt, pointerEvent);
     if (ret != RET_OK) {
-        MMI_LOGE("TouchpadEventInterceptor read netPacket failed");
+        MMI_LOGE("read netPacket failed");
         return RET_ERR;
     }
     int32_t pid = 0;
@@ -333,7 +333,7 @@ int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket
     auto keyEvent = KeyEvent::Create();
     int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent);
     if (ret != RET_OK) {
-        MMI_LOGE("TouchpadEventInterceptor read netPacket failed");
+        MMI_LOGE("read netPacket failed");
         return RET_ERR;
     }
     int32_t pid = 0;
