@@ -191,6 +191,8 @@ private:
     int32_t UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent);
     PhysicalDisplayInfo* GetPhysicalDisplay(int32_t id);
     PhysicalDisplayInfo* FindPhysicalDisplayInfo(const std::string seatId, const std::string seatName);
+    int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent);
+
 private:
     std::mutex mu_;
     SeatInfo** seatsInfo_ = nullptr;
