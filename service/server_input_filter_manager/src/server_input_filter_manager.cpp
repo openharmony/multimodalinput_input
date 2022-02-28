@@ -391,7 +391,7 @@ bool ServerInputFilterManager::OnPointerEvent(EventPointer event_pointer)
 }
 
 int32_t ServerInputFilterManager::RegisterEventInterceptorServer(const SessionPtr& sess, int32_t id,
-                                                                    std::string name, Authority authority)
+                                                                 std::string name, Authority authority)
 {
     auto it = pointerEventFilterMap_.find(sess);
     if (it == pointerEventFilterMap_.end()) {
