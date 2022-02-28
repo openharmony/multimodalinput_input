@@ -106,7 +106,8 @@ bool ClientMsgHandler::Init()
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
         {MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::TouchpadEventInterceptor, this)},
-        {MmiMessageId::KEYBOARD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::KeyEventInterceptor, this)},
+        {MmiMessageId::CLIENT_TEST001, MsgCallbackBind2(&ClientMsgHandler::ClientTest001, this)},
+        
     };
     // LCOV_EXCL_STOP
     for (auto& it : funs) {
@@ -891,6 +892,14 @@ int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket
     MMI_LOGD("client receive the msg from server: keyCode:%{public}d,pid:%{public}d",
         keyEvent->GetKeyCode(), pid);
     return InterceptorMgr.OnKeyEvent(keyEvent);
+}
+
+int32_t ClientMsgHandler::ClientTest001(const UDSClient& client, NetPacket& pkt)
+{
+    int32_t fd = 0;
+    pkt >> fd;
+    MMI_LOGD("enter. ClientTest001");
+    return RET_OK;
 }
 
 void ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, NetPacket& pkt) const

@@ -47,7 +47,6 @@ public:
     }
 
 protected:
-    
     virtual void OnConnected() override;
     virtual void OnDisconnected() override;
     bool StartEventRunner();
