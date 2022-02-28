@@ -476,34 +476,34 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent>
 #endif
 }
 
+int32_t OHOS::MMI::InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent)
+{
+    int32_t displayId = inputEvent->GetTargetDisplayId();
+    if (displayId < 0) {
+        MMI_LOGD("target display is -1");
+        if (logicalDisplays_.empty()) {
+            return displayId;
+        }
+        displayId = logicalDisplays_[0].id;
+        inputEvent->SetTargetDisplayId(displayId);
+    }
+    return displayId;
+}
+
 int32_t OHOS::MMI::InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent)
 {
     MMI_LOGD("enter");
     CHKPR(inputEvent, ERROR_NULL_POINTER);
-    if (logicalDisplays_.empty()) {
-        MMI_LOGE("logicalDisplays_ is empty");
+    const int32_t targetDisplayId = GetDisplayId(inputEvent);
+    if (targetDisplayId < 0) {
+        MMI_LOGE("No display is available.");
         return RET_ERR;
     }
-
-    if (inputEvent->GetTargetDisplayId() < 0) {
-        MMI_LOGD("Either the first pressed key or inject event being not specified by display");
-        inputEvent->SetTargetDisplayId(logicalDisplays_[0].id);
-        inputEvent->SetTargetWindowId(logicalDisplays_[0].focusWindowId);
-        auto it = windowInfos_.find(logicalDisplays_[0].focusWindowId);
-        if (it == windowInfos_.end()) {
-            MMI_LOGE("can't find window info, focuswindowId:%{public}d", logicalDisplays_[0].focusWindowId);
-            return RET_ERR;
-        }
-        inputEvent->SetAgentWindowId(it->second.agentWindowId);
-        MMI_LOGD("pid:%{public}d", it->second.pid);
-        return it->second.pid;
-    }
-
     for (const auto &item : logicalDisplays_) {
-        if (item.id != inputEvent->GetTargetDisplayId()) {
+        if (item.id != targetDisplayId) {
             continue;
         }
-        MMI_LOGD("target display:%{public}d", inputEvent->GetTargetDisplayId());
+        MMI_LOGD("target display:%{public}d", targetDisplayId);
         auto it = windowInfos_.find(item.focusWindowId);
         if (it == windowInfos_.end()) {
             MMI_LOGE("can't find window info, focuswindowId:%{public}d", item.focusWindowId);
@@ -515,7 +515,7 @@ int32_t OHOS::MMI::InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<In
         return it->second.pid;
     }
 
-    MMI_LOGE("leave,can't find logical display,target display:%{public}d", inputEvent->GetTargetDisplayId());
+    MMI_LOGE("leave,can't find logical display,target display:%{public}d", targetDisplayId);
     return RET_ERR;
 }
 
