@@ -142,8 +142,8 @@ int32_t AppRegister::QueryMapSurfaceNum()
     return static_cast<int32_t>(surfaceInfo_.size());
 }
 
-bool AppRegister::IsMultimodeInputReady(MmiMessageId idMsg, const int32_t findFd, uint64_t inputTime,
-                                        uint64_t westonTime)
+bool AppRegister::IsMultimodeInputReady(MmiMessageId idMsg, const int32_t findFd, int64_t inputTime,
+                                        int64_t westonTime)
 {
 #if 0 // temp comment for test
     std::lock_guard<std::mutex> lock(mu_);

@@ -95,7 +95,7 @@ void SetNamedProperty(const napi_env& env, napi_value object, const std::string&
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
 }
 
-void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, uint64_t value)
+void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, int64_t value)
 {
     napi_status status;
     napi_value napiValue = nullptr;
