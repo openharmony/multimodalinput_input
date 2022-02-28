@@ -15,7 +15,6 @@
 
 #include "processing_keyboard_device.h"
 
-using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
@@ -34,7 +33,7 @@ int32_t ProcessingKeyboardDevice::TransformJsonDataToInputData(const Json& finge
         MMI_LOGE("manage KeyBoard array faild, inputData is empty.");
         return RET_ERR;
     }
-    vector<KeyBoardEvent> keyBoardEventArray;
+    std::vector<KeyBoardEvent> keyBoardEventArray;
     if (AnalysisKeyBoardEvent(inputData, keyBoardEventArray) == RET_ERR) {
         return RET_ERR;
     }
@@ -90,10 +89,10 @@ void ProcessingKeyboardDevice::TransformKeyPressEvent(const KeyBoardEvent& keyBo
 void ProcessingKeyboardDevice::TransformKeyLongPressEvent(const KeyBoardEvent& keyBoardEvent,
                                                           InputEventArray& inputEventArray)
 {
-    int32_t keyEventNum = (keyBoardEvent.blockTime / EVENT_REPROT_COUNTS) + 1;
     uint16_t keyValue = static_cast<uint16_t>(keyBoardEvent.keyValue);
     SetKeyPressEvent(inputEventArray, EVENT_REPROT_TIMES, keyValue);
     SetSynReport(inputEventArray);
+    int32_t keyEventNum = (keyBoardEvent.blockTime / EVENT_REPROT_COUNTS) + 1;
     int32_t count = 0;
     while (count++ < keyEventNum) {
         SetKeyLongPressEvent(inputEventArray, EVENT_REPROT_TIMES, keyValue);

@@ -37,9 +37,9 @@ public:
 class ClientMsgHandlerSelf : public OHOS::MMI::ClientMsgHandler {
 public:
 
-    bool OnKeyUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnKeyUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnKey(udsClient, netPkt);
+        return OnKey(udsClient, pkt);
     }
     bool OnTouchUnitTest(INPUT_DEVICE_TYPE msgId)
     {
@@ -66,189 +66,189 @@ public:
         return OnTouch(clientObj, pkt);
     }
 
-    bool OnTouchUnitTest2(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnTouchUnitTest2(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnTouch(udsClient, netPkt);
+        return OnTouch(udsClient, pkt);
     }
 
-    bool OnCopyUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnCopyUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnCopy(udsClient, netPkt);
+        return OnCopy(udsClient, pkt);
     }
 
-    bool OnShowMenuUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnShowMenuUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnShowMenu(udsClient, netPkt);
+        return OnShowMenu(udsClient, pkt);
     }
 
-    bool OnSendUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnSendUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnSend(udsClient, netPkt);
+        return OnSend(udsClient, pkt);
     }
 
-    bool OnPasteUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnPasteUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnPaste(udsClient, netPkt);
+        return OnPaste(udsClient, pkt);
     }
 
-    bool OnCutUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnCutUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnCut(udsClient, netPkt);
+        return OnCut(udsClient, pkt);
     }
 
-    bool OnUndoUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnUndoUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnUndo(udsClient, netPkt);
+        return OnUndo(udsClient, pkt);
     }
 
-    bool OnRefreshUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnRefreshUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnRefresh(udsClient, netPkt);
+        return OnRefresh(udsClient, pkt);
     }
 
-    bool OnStartDragUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnStartDragUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnStartDrag(udsClient, netPkt);
+        return OnStartDrag(udsClient, pkt);
     }
 
-    bool OnCancelUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnCancelUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnCancel(udsClient, netPkt);
+        return OnCancel(udsClient, pkt);
     }
 
-    bool OnEnterUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnEnterUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnEnter(udsClient, netPkt);
+        return OnEnter(udsClient, pkt);
     }
 
-    bool OnPreviousUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnPreviousUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnPrevious(udsClient, netPkt);
+        return OnPrevious(udsClient, pkt);
     }
 
-    bool OnNextUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnNextUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnNext(udsClient, netPkt);
+        return OnNext(udsClient, pkt);
     }
 
-    bool OnBackUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnBackUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnBack(udsClient, netPkt);
+        return OnBack(udsClient, pkt);
     }
 
-    bool OnPrintUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnPrintUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnPrint(udsClient, netPkt);
+        return OnPrint(udsClient, pkt);
     }
 
-    bool OnPlayUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnPlayUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnPlay(udsClient, netPkt);
+        return OnPlay(udsClient, pkt);
     }
 
-    bool OnPauseUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnPauseUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnPause(udsClient, netPkt);
+        return OnPause(udsClient, pkt);
     }
 
-    bool OnMediaControlUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnMediaControlUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnMediaControl(udsClient, netPkt);
+        return OnMediaControl(udsClient, pkt);
     }
 
-    bool OnScreenShotUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnScreenShotUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnScreenShot(udsClient, netPkt);
+        return OnScreenShot(udsClient, pkt);
     }
 
-    bool OnScreenSplitUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnScreenSplitUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnScreenSplit(udsClient, netPkt);
+        return OnScreenSplit(udsClient, pkt);
     }
 
-    bool OnStartScreenRecordUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnStartScreenRecordUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnStartScreenRecord(udsClient, netPkt);
+        return OnStartScreenRecord(udsClient, pkt);
     }
 
-    bool OnStopScreenRecordUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnStopScreenRecordUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnStopScreenRecord(udsClient, netPkt);
+        return OnStopScreenRecord(udsClient, pkt);
     }
 
-    bool OnGotoDesktopUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnGotoDesktopUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnGotoDesktop(udsClient, netPkt);
+        return OnGotoDesktop(udsClient, pkt);
     }
 
-    bool OnRecentUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnRecentUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnRecent(udsClient, netPkt);
+        return OnRecent(udsClient, pkt);
     }
 
-    bool OnShowNotificationUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnShowNotificationUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnShowNotification(udsClient, netPkt);
+        return OnShowNotification(udsClient, pkt);
     }
 
-    bool OnLockScreenUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnLockScreenUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnLockScreen(udsClient, netPkt);
+        return OnLockScreen(udsClient, pkt);
     }
 
-    bool OnSearchUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnSearchUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnSearch(udsClient, netPkt);
+        return OnSearch(udsClient, pkt);
     }
 
-    bool OnClosePageUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnClosePageUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnClosePage(udsClient, netPkt);
+        return OnClosePage(udsClient, pkt);
     }
 
-    bool OnLaunchVoiceAssistantUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnLaunchVoiceAssistantUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnLaunchVoiceAssistant(udsClient, netPkt);
+        return OnLaunchVoiceAssistant(udsClient, pkt);
     }
 
-    bool OnMuteUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnMuteUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnMute(udsClient, netPkt);
+        return OnMute(udsClient, pkt);
     }
 
-    bool OnAnswerUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnAnswerUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnAnswer(udsClient, netPkt);
+        return OnAnswer(udsClient, pkt);
     }
 
-    bool OnRefuseUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnRefuseUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnRefuse(udsClient, netPkt);
+        return OnRefuse(udsClient, pkt);
     }
 
-    bool OnHangupUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnHangupUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnHangup(udsClient, netPkt);
+        return OnHangup(udsClient, pkt);
     }
 
-    bool OnTelephoneControlUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool OnTelephoneControlUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return OnTelephoneControl(udsClient, netPkt);
+        return OnTelephoneControl(udsClient, pkt);
     }
 
-    bool GetMultimodeInputInfoUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool GetMultimodeInputInfoUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return GetMultimodeInputInfo(udsClient, netPkt);
+        return GetMultimodeInputInfo(udsClient, pkt);
     }
 
-    bool DeviceAddUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool DeviceAddUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return DeviceAdd(udsClient, netPkt);
+        return DeviceAdd(udsClient, pkt);
     }
 
-    bool DeviceRemoveUnitTest(const UDSClient& udsClient, NetPacket& netPkt)
+    bool DeviceRemoveUnitTest(const UDSClient& udsClient, NetPacket& pkt)
     {
-        return DeviceRemove(udsClient, netPkt);
+        return DeviceRemove(udsClient, pkt);
     }
 };
 
@@ -279,7 +279,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONKEY_002, TestSize.Level1)
     int32_t fileData = 5;
     int32_t windowId = -1;
     int32_t abilityId = 7;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "key_board" };
     pkt >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId >> serverStartTime;
 
@@ -298,7 +298,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONKEY_003, TestSize.Level1)
     int32_t fileData = 5;
     int32_t windowId = -1;
     int32_t abilityId = 7;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "key_board" };
     pkt >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId << serverStartTime;
 
@@ -335,7 +335,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONKEY_005, TestSize.Level1)
     int32_t fileData = 11;
     int32_t windowId = -1;
     int32_t abilityId = 33;
-    uint64_t serverStartTime = 44;
+    int64_t serverStartTime = 44;
     RegisteredEvent mixData = {1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "key_board"};
     pkt >> typeNum >> mixData >> fileData >> windowId >> abilityId >> serverStartTime;
 
@@ -365,7 +365,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONTOUCH_002, TestSize.Level1)
     int32_t fileData = 5;
     int32_t windowId = -1;
     int32_t abilityId = 7;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     RegisteredEvent mixData = { 1, "abc123@34", 500, 10000, static_cast<DEVICE_TYPE>(0), "touchscreen" };
     pkt >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId >> serverStartTime;
 
@@ -385,7 +385,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONTOUCH_003, TestSize.Level1)
     int32_t fileData = 5;
     int32_t windowId = -1;
     int32_t abilityId = 7;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     RegisteredEvent mixData = { 1, "abc123@34", 500, 10000, static_cast<DEVICE_TYPE>(0), "touchscreen" };
     pkt >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId << serverStartTime;
 
@@ -422,7 +422,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONTOUCH_005, TestSize.Level1)
     int32_t fileData = 11;
     int32_t windowId = -1;
     int32_t abilityId = 33;
-    uint64_t serverStartTime = 44;
+    int64_t serverStartTime = 44;
     RegisteredEvent mixData = { 1, "abc123@34", 500, 10000, static_cast<DEVICE_TYPE>(0), "touchscreen" };
     pkt >> typeNum >> mixData >> fileData >> windowId >> abilityId >> serverStartTime;
 
@@ -452,7 +452,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONCOPY_002, TestSize.Level1)
     int32_t fileData = 5;
     int32_t windowId = -1;
     int32_t abilityId = 7;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     pkt >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId >> serverStartTime;
 
@@ -472,7 +472,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONCOPY_003, TestSize.Level1)
     int32_t fileData = 5;
     int32_t windowId = -1;
     int32_t abilityId = 7;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     pkt >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId << serverStartTime;
 
@@ -509,7 +509,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONCOPY_005, TestSize.Level1)
     int32_t fileData = 11;
     int32_t windowId = -1;
     int32_t abilityId = 33;
-    uint64_t serverStartTime = 44;
+    int64_t serverStartTime = 44;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     pkt >> typeNum >> mixData >> fileData >> windowId >> abilityId >> serverStartTime;
 
@@ -539,7 +539,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONSHOWMENU_002, TestSize.Level1)
     int32_t fileData = 5;
     int32_t windowId = -1;
     int32_t abilityId = 7;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     RegisteredEvent mixData = { 1, "abc123@34", 402, 10000, static_cast<DEVICE_TYPE>(2), "mouse" };
     pkt >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId >> serverStartTime;
 
@@ -559,7 +559,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONSHOWMENU_003, TestSize.Level1)
     int32_t fileData = 5;
     int32_t windowId = -1;
     int32_t abilityId = 7;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     pkt >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId << serverStartTime;
 
@@ -579,7 +579,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONSHOWMENU_004, TestSize.Level1)
     int32_t fileData = 5;
     int32_t windowId = -1;
     int32_t abilityId = 7;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     pkt >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId >> serverStartTime;
 
     ClientMsgHandler clientHandlerObj;
@@ -596,7 +596,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONSHOWMENU_005, TestSize.Level1)
     int32_t fileData = 11;
     int32_t windowId = -1;
     int32_t abilityId = 33;
-    uint64_t serverStartTime = 44;
+    int64_t serverStartTime = 44;
     RegisteredEvent mixData = { 1, "abc123@34", 402, 10000, static_cast<DEVICE_TYPE>(2), "mouse" };
     pkt >> typeNum >> mixData >> fileData >> windowId >> abilityId >> serverStartTime;
 
@@ -626,7 +626,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONSEND_002, TestSize.Level1)
     int32_t fileData = 5;
     int32_t windowId = -1;
     int32_t abilityId = 7;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     pkt >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId >> serverStartTime;
 
@@ -646,7 +646,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONSEND_003, TestSize.Level1)
     int32_t fileData = 5;
     int32_t windowId = -1;
     int32_t abilityId = 7;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     pkt >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId << serverStartTime;
 
@@ -683,7 +683,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONSEND_005, TestSize.Level1)
     int32_t fileData = 11;
     int32_t windowId = -1;
     int32_t abilityId = 33;
-    uint64_t serverStartTime = 44;
+    int64_t serverStartTime = 44;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     pkt >> typeNum >> mixData >> fileData >> windowId >> abilityId >> serverStartTime;
 
@@ -713,7 +713,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONPASTE_002, TestSize.Level1)
     int32_t fileData = 5;
     int32_t windowId = -1;
     int32_t abilityId = 7;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     pkt >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId >> serverStartTime;
 
@@ -733,7 +733,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONPASTE_003, TestSize.Level1)
     int32_t fileData = 5;
     int32_t windowId = -1;
     int32_t abilityId = 7;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     pkt >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId << serverStartTime;
 
@@ -770,7 +770,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONPASTE_005, TestSize.Level1)
     int32_t fileData = 11;
     int32_t windowId = -1;
     int32_t abilityId = 33;
-    uint64_t serverStartTime = 44;
+    int64_t serverStartTime = 44;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     pkt >> typeNum >> mixData >> fileData >> windowId >> abilityId >> serverStartTime;
 
@@ -800,7 +800,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONCUT_002, TestSize.Level1)
     int32_t fileData = 5;
     int32_t windowId = -1;
     int32_t abilityId = 7;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     pkt >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId >> serverStartTime;
 
@@ -820,7 +820,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONCUT_003, TestSize.Level1)
     int32_t fileData = 5;
     int32_t windowId = -1;
     int32_t abilityId = 7;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     pkt >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId << serverStartTime;
 
@@ -857,7 +857,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONCUT_005, TestSize.Level1)
     int32_t fileData = 11;
     int32_t windowId = -1;
     int32_t abilityId = 33;
-    uint64_t serverStartTime = 44;
+    int64_t serverStartTime = 44;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     pkt >> typeNum >> mixData >> fileData >> windowId >> abilityId >> serverStartTime;
 
@@ -887,7 +887,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONUNDO_002, TestSize.Level1)
     int32_t fileData = 5;
     int32_t windowId = -1;
     int32_t abilityId = 7;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     pkt >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId >> serverStartTime;
 
@@ -907,7 +907,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONUNDO_003, TestSize.Level1)
     int32_t fileData = 5;
     int32_t windowId = -1;
     int32_t abilityId = 7;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     pkt >> mixData >> typeNum >> idMsg >> aiDeviceFd >> fileData >> windowId >> abilityId << serverStartTime;
 
@@ -944,7 +944,7 @@ HWTEST_F(ClientMsgHandlerTest, OnMsgHandler_ONUNDO_005, TestSize.Level1)
     int32_t fileData = 11;
     int32_t windowId = -1;
     int32_t abilityId = 33;
-    uint64_t serverStartTime = 44;
+    int64_t serverStartTime = 44;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     pkt >> typeNum >> mixData >> fileData >> windowId >> abilityId >> serverStartTime;
 
@@ -1383,7 +1383,7 @@ HWTEST_F(ClientMsgHandlerTest, OnTouch2, TestSize.Level1)
     int32_t abilityId = 4;
     int32_t screenId = 5;
     int32_t fileData = 6;
-    uint64_t serverStartTime = 7;
+    int64_t serverStartTime = 7;
     EventTouch touchData = {};
     int32_t ret = memcpy_s(touchData.deviceName, MAX_DEVICENAME, "name", MAX_DEVICENAME);
     CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
@@ -1450,7 +1450,7 @@ HWTEST_F(ClientMsgHandlerTest, OnCopy_002, TestSize.Level1)
     int32_t fileData = 5;
     int32_t windowId = -1;
     int32_t abilityId = 7;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     RegisteredEvent mixData = { 1, "abc123@34", 403, 10000, static_cast<DEVICE_TYPE>(7), "JOYSTICK" };
 
     pkt << mixData;
@@ -1473,7 +1473,7 @@ HWTEST_F(ClientMsgHandlerTest, OnCopy_003, TestSize.Level1)
     int32_t fileData = 5;
     int32_t windowId = -1;
     int32_t abilityId = 7;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(9), "aisensor" };
 
     pkt << mixData;
@@ -1515,7 +1515,7 @@ HWTEST_F(ClientMsgHandlerTest, OnCopy_005, TestSize.Level1)
     int32_t fileData = 11;
     int32_t windowId = -1;
     int32_t abilityId = 33;
-    uint64_t serverStartTime = 44;
+    int64_t serverStartTime = 44;
     RegisteredEvent mixData = { 1, "abc123@34", 300, 10000, static_cast<DEVICE_TYPE>(1), "keyboard" };
     pkt >> typeNum;
     pkt >> mixData >> fileData >> windowId >> abilityId >> serverStartTime;

@@ -18,17 +18,17 @@
 
 namespace OHOS {
 namespace MMI {
-NetPacket::NetPacket(MmiMessageId idMsg) : idMsg_(idMsg) {}
+NetPacket::NetPacket(MmiMessageId msgId) : msgId_(msgId) {}
 
-NetPacket::NetPacket(const NetPacket& pack) : NetPacket(pack.GetMsgId())
+NetPacket::NetPacket(const NetPacket& pkt) : NetPacket(pkt.GetMsgId())
 {
-    Clone(pack);
+    Clone(pkt);
 }
 NetPacket::~NetPacket() {}
 
 void NetPacket::MakeData(StreamBuffer& buf) const
 {
-    PACKHEAD head = {idMsg_, {static_cast<int32_t>(wIdx_)}};
+    PACKHEAD head = {msgId_, {static_cast<int32_t>(wIdx_)}};
     buf << head;
     if (wIdx_ > 0) {
         CHK(buf.Write(&szBuff_[0], wIdx_), STREAM_BUF_WRITE_FAIL);

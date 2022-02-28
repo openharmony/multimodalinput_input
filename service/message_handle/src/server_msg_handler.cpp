@@ -150,7 +150,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnSeniorInputFuncProc(SessionPtr SessionPtr
             int32_t devType;
             pkt >> devIndex >> devType;
             CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-            sptr<SeniorInputFuncProcBase> ptr;
+            sptr<SeniorInputFuncProcBase> ptr = nullptr;
             if (devType == INPUT_DEVICE_CAP_AISENSOR) {
                 ptr = SeniorInputFuncProcBase::Create<AIFuncProc>();
             } else if (devType == INPUT_DEVICE_CAP_KNUCKLE) {
@@ -204,9 +204,9 @@ int32_t OHOS::MMI::ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt
     CHKPR(sess, ERROR_NULL_POINTER);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     const int32_t processingCode = MMIHdiInject->ManageHdfInject(sess, pkt);
-    NetPacket newPacket(MmiMessageId::HDI_INJECT);
-    newPacket << processingCode;
-    if (!sess->SendMsg(newPacket)) {
+    NetPacket pkt(MmiMessageId::HDI_INJECT);
+    pkt << processingCode;
+    if (!sess->SendMsg(pkt)) {
         MMI_LOGE("OnHdiInject reply messaage error");
         return RET_ERR;
     }
@@ -318,8 +318,8 @@ int32_t OHOS::MMI::ServerMsgHandler::OnDump(SessionPtr sess, NetPacket& pkt)
 int32_t OHOS::MMI::ServerMsgHandler::CheckReplyMessageFormClient(SessionPtr sess, NetPacket& pkt)
 {
     int32_t idMsg = 0;
-    uint64_t clientTime = 0;
-    uint64_t endTime = 0;
+    int64_t clientTime = 0;
+    int64_t endTime = 0;
     pkt >> idMsg >> clientTime >> endTime;
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     int32_t fd = sess->GetFd();
@@ -330,18 +330,18 @@ int32_t OHOS::MMI::ServerMsgHandler::CheckReplyMessageFormClient(SessionPtr sess
     AppRegs->DeleteEventFromWaitQueue(fd, idMsg);
 
     // add msg to dump
-    auto curTime = GetSysClockTime();
-    int32_t westonExpendTime = static_cast<int32_t>(waitData.westonTime - waitData.inputTime);
-    int32_t serverExpendTime = static_cast<int32_t>(waitData.serverTime - waitData.westonTime);
-    int32_t clientExpendTime = static_cast<int32_t>(endTime - clientTime);
-    int32_t allTime = static_cast<int32_t>(curTime - waitData.westonTime);
-    MMIEventDump->InsertFormat("MsgDump: msgId=%d fd=%d inputExpendTime=%llu(us) westonExpendTime=%d(us) "
-                               "serverExpendTime=%d(us) clientExpendTime=%d(us) allTime=%d(us)", idMsg, fd,
+    int64_t westonExpendTime = waitData.westonTime - waitData.inputTime;
+    int64_t serverExpendTime = waitData.serverTime - waitData.westonTime;
+    int64_t clientExpendTime = endTime - clientTime;
+    int64_t curTime = GetSysClockTime();
+    int64_t allTime = curTime - waitData.westonTime;
+    MMIEventDump->InsertFormat("MsgDump: msgId=%d fd=%d inputExpendTime=%lld(us) westonExpendTime=%lld(us) "
+                               "serverExpendTime=%lld(us) clientExpendTime=%lld(us) allTime=%lld(us)", idMsg, fd,
                                waitData.inputTime, westonExpendTime, serverExpendTime, clientExpendTime, allTime);
-    MMI_LOGD("CheckReplyMessageFormClient msgId:%{public}d,fd:%{public}d,inputExpendTime:%{public}" PRIu64 "(us),"
-             "westonExpendTime:%{public}d(us),serverExpendTime:%{public}d(us),clientExpendTime:%{public}d(us),"
-             "allTime:%{public}d(us)", idMsg, fd, waitData.inputTime, westonExpendTime, serverExpendTime,
-             clientExpendTime, allTime);
+    MMI_LOGT("CheckReplyMessageFormClient msg:%{public}d,fd:%{public}d,inputExpendTime:%{public}" PRId64 "(us),"
+             "westonExpendTime:%{public}" PRId64 "(us),serverExpendTime:%{public}" PRId64 "(us),"
+             "clientExpendTime:%{public}" PRId64 "(us),allTime:%{public}" PRId64 "(us)", idMsg, fd,
+             waitData.inputTime, westonExpendTime, serverExpendTime, clientExpendTime, allTime);
     return RET_OK;
 }
 
@@ -382,9 +382,9 @@ int32_t OHOS::MMI::ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetP
     int32_t fd = sess->GetFd();
     if (tagPackHead.idMsg != MmiMessageId::INVALID) {
         TagPackHead tagPackHeadAck = { MmiMessageId::INVALID, {fd}};
-        NetPacket pktAck(MmiMessageId::GET_MMI_INFO_ACK);
-        pktAck << tagPackHeadAck;
-        if (!udsServer_->SendMsg(fd, pktAck)) {
+        NetPacket pkt(MmiMessageId::GET_MMI_INFO_ACK);
+        pkt << tagPackHeadAck;
+        if (!udsServer_->SendMsg(fd, pkt)) {
             MMI_LOGE("Sending message failed");
             return MSG_SEND_FAIL;
         }
@@ -395,7 +395,7 @@ int32_t OHOS::MMI::ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetP
 int32_t OHOS::MMI::ServerMsgHandler::OnNewInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    uint64_t preHandlerTime = GetSysClockTime();
+    int64_t preHandlerTime = GetSysClockTime();
     auto creKey = OHOS::MMI::KeyEvent::Create();
     int32_t errCode = InputEventDataTransformation::NetPacketToKeyEvent(pkt, creKey);
     if (errCode != RET_OK) {
@@ -415,7 +415,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnNewInjectKeyEvent(SessionPtr sess, NetPac
 int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    uint64_t preHandlerTime = GetSysClockTime();
+    int64_t preHandlerTime = GetSysClockTime();
     VirtualKey event;
     if (!pkt.Read(event)) {
         MMI_LOGE("read data failed");
@@ -439,6 +439,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
     EventKeyboard key = {};
     auto packageResult = EventPackage::PackageVirtualKeyEvent(event, key);
     if (packageResult == RET_ERR) {
+        MMI_LOGE("Package Virtual KeyEvent faild");
         return RET_ERR;
     }
 
@@ -464,20 +465,6 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
         MMI_LOGE("Failed to obtain AppInfo, desWindow:%{public}d,errCode:%{public}d", focusId, FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
     }
-#ifdef DEBUG_CODE_TEST
-    int32_t pid = udsServer_->GetClientPid(appInfo.fd);
-    if (pid != RET_ERR) {
-        MMI_LOGD("Inject keyCode:%{public}d,action:%{public}d,focusPid:%{public}d",
-            key.key, key.state, pid);
-    }
-#endif
-#ifdef DEBUG_CODE_TEST
-    MMI_LOGD("4.event dispatcher of server:eventKeyboard:time:%{public}" PRId64 ",sourceType:%{public}d,key:%{public}u,"
-             "seat_key_count:%{public}u,state:%{public}d,fd:%{public}d,abilityId:%{public}d,"
-             "windowId:%{public}s(%{public}d)",
-             key.time, LIBINPUT_EVENT_KEYBOARD_KEY, key.key, key.seat_key_count, key.state, appInfo.fd,
-             appInfo.abilityId, WinMgr->GetSurfaceIdListString().c_str(), focusId);
-#endif
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, appInfo.fd, key.time)) {
         NetPacket pkt2(MmiMessageId::ON_KEY);
@@ -722,28 +709,28 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket
 #ifdef OHOS_WESTEN_MODEL
     InputDevMgr->GetInputDeviceIdsAsync([userData, sess, this](std::vector<int32_t> ids) {
         CHKPR(sess, ERROR_NULL_POINTER);
-        NetPacket pkt1(MmiMessageId::INPUT_DEVICE_IDS);
+        NetPacket pkt2(MmiMessageId::INPUT_DEVICE_IDS);
         int32_t num = static_cast<int32_t>(ids.size());
-        CHKR(pkt1.Write(userData), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt1.Write(num), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt2.Write(userData), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt2.Write(num), STREAM_BUF_WRITE_FAIL, RET_ERR);
         for (auto item : ids) {
-            CHKR(pkt1.Write(item), STREAM_BUF_WRITE_FAIL, RET_ERR);
+            CHKR(pkt2.Write(item), STREAM_BUF_WRITE_FAIL, RET_ERR);
         }
-        if (!sess->SendMsg(pkt1)) {
+        if (!sess->SendMsg(pkt2)) {
             MMI_LOGE("Sending failed!");
             return MSG_SEND_FAIL;
         }
     });
 #else
     std::vector<int32_t> ids = InputDevMgr->GetInputDeviceIds();
-    NetPacket pkt1(MmiMessageId::INPUT_DEVICE_IDS);
+    NetPacket pkt2(MmiMessageId::INPUT_DEVICE_IDS);
     int32_t size = static_cast<int32_t>(ids.size());
-    CHKR(pkt1.Write(userData), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pkt1.Write(size), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt2.Write(userData), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt2.Write(size), STREAM_BUF_WRITE_FAIL, RET_ERR);
     for (const auto& item : ids) {
-        CHKR(pkt1.Write(item), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt2.Write(item), STREAM_BUF_WRITE_FAIL, RET_ERR);
     }
-    if (!sess->SendMsg(pkt1)) {
+    if (!sess->SendMsg(pkt2)) {
         MMI_LOGE("Sending failed");
         return MSG_SEND_FAIL;
     }

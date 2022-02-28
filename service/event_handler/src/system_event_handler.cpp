@@ -91,6 +91,7 @@ OHOS::MMI::SystemEventHandler::~SystemEventHandler() {}
 int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
 {
     if (idMsg == MmiMessageId::INVALID) {
+        MMI_LOGE("Invalid parameter, errCode:%{public}d", PARAM_INPUT_INVALID);
         return PARAM_INPUT_INVALID;
     }
     auto callback = GetMsgCallback(idMsg);

@@ -17,7 +17,6 @@
 #include <chrono>
 #include <thread>
 
-using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
@@ -32,9 +31,9 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
         return RET_ERR;
     }
     int32_t ret = RET_ERR;
-    string deviceName;
-    string sendType;
-    string deviceNode;
+    std::string deviceName;
+    std::string sendType;
+    std::string deviceNode;
     GetDeviceObject getDeviceObject;
     for (const auto &item : configData) {
         deviceName = item.at("deviceName").get<std::string>();
@@ -86,7 +85,7 @@ int32_t ManageInjectDevice::SendEventToHdi(const InputEventArray& inputEventArra
 int32_t ManageInjectDevice::SendEventToDeviveNode(const InputEventArray& inputEventArray)
 {
     MMI_LOGD("Enter");
-    string deviceNode = inputEventArray.target;
+    std::string deviceNode = inputEventArray.target;
     if (deviceNode.empty()) {
         MMI_LOGE("device node:%{public}s is not exit", deviceNode.c_str());
         return RET_ERR;

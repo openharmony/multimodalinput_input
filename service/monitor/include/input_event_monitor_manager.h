@@ -29,7 +29,7 @@ namespace OHOS {
 namespace MMI {
 struct MonitorItem {
     int32_t eventType;
-    SessionPtr session;
+    SessionPtr session = nullptr;
     bool operator == (const MonitorItem& item)
     {
         return eventType == item.eventType && session == item.session;

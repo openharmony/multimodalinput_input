@@ -41,6 +41,7 @@ int32_t OHOS::MMI::HdfEventManager::EvdevSimIoctl(int32_t hdindex, int32_t pcmd,
     DrvType drvtype = g_index2DrvType[hdindex - MAX_INPUT_DEVICE_COUNT];
     MMI_LOGD("evdev_simioctl drvtype:%{public}d", drvtype);
     if (drvtype >= INVALD) {
+        MMI_LOGE("Unknown device type");
         return 0;
     }
     for (const auto &item : m_globleThis->hdflist_) {
@@ -120,6 +121,7 @@ int32_t OHOS::MMI::HdfEventManager::EvdevIoctl(int32_t hdiindex, int32_t pcmd, v
         }
     }
     if (deviceinfo == nullptr) {
+        MMI_LOGE("Deviceinfo is null");
         return 0;
     }
     const int32_t iobuffSize = size;
@@ -199,6 +201,7 @@ int32_t OHOS::MMI::HdfEventManager::HdfdevtypeMapLibinputType(uint32_t devIndex,
 {
     int32_t ret = 0;
     if (devIndex >= MAX_INPUT_DEVICE_COUNT) {
+        MMI_LOGE("The maximum number of devices exceeded, devIndex:%{public}d", devIndex);
         return devType;
     }
     switch (devType) {
@@ -359,7 +362,7 @@ int32_t OHOS::MMI::HdfEventManager::DeviceRemoveHandle(uint32_t devIndex, uint32
         __func__, __LINE__, devIndex, devType);
     Devcmd cmd;
     cmd.index = devIndex;
-    cmd.cmd = (int32_t)HDF_RMV_DEVICE;
+    cmd.cmd = static_cast<int32_t>(HDF_RMV_DEVICE);
     libinput_devpipe_write(m_globleThis->hdiinput_, &cmd, sizeof(Devcmd));
     if (devIndex < MAX_INPUT_DEVICE_COUNT) {
         uint32_t ret = m_globleThis->inputInterface_->iInputReporter->UnregisterReportCallback(devIndex);
@@ -380,10 +383,10 @@ void OHOS::MMI::HdfEventManager::GetEventCallback(const EventPackage **pkgs, uin
 {
     constexpr uint16_t byteSize = 8;
     CHKPV(pkgs);
-    input_event eventarry[MAX_EVENT_PKG_NUM];
+    struct input_event eventarry[MAX_EVENT_PKG_NUM];
     for (uint32_t i = 0; i < count && i < MAX_EVENT_PKG_NUM; i++) {
         eventarry[i].code = pkgs[i]->code;
-        eventarry[i].type = (pkgs[i]->type) | (uint16_t)(devIndex<<byteSize); // 不改变livinput结构传递，对象的index参数
+        eventarry[i].type = (pkgs[i]->type) | static_cast<uint16_t>(devIndex<<byteSize); // 不改变livinput结构传递，对象的index参数
         eventarry[i].value = pkgs[i]->value;
         eventarry[i].input_event_sec = (pkgs[i]->timestamp) / (USEC_PER_SEC);
         eventarry[i].input_event_usec = (pkgs[i]->timestamp) % (USEC_PER_SEC);
@@ -391,7 +394,7 @@ void OHOS::MMI::HdfEventManager::GetEventCallback(const EventPackage **pkgs, uin
     if (!globleThis_->devStatus[devIndex]) {
         return;
     }
-    libinput_pipe_write(globleThis_->hdiinput_, devIndex, eventarry, count * sizeof(input_event));
+    libinput_pipe_write(globleThis_->hdiinput_, devIndex, eventarry, count * sizeof(struct input_event));
 }
 int32_t OHOS::MMI::HdfEventManager::DeviceAddHandle(uint32_t devIndex, uint32_t devType)
 {
@@ -409,7 +412,7 @@ int32_t OHOS::MMI::HdfEventManager::DeviceAddHandle(uint32_t devIndex, uint32_t 
     globleThis_->hdflist_.push_back(hdiuhdf);
     Devcmd cmd;
     cmd.index = devIndex;
-    cmd.cmd = (int32_t)HDF_ADD_DEVICE;
+    cmd.cmd = static_cast<int32_t>(HDF_ADD_DEVICE);
     libinput_devpipe_write(globleThis_->hdiinput_, &cmd, sizeof(Devcmd));
     return RET_OK;
 }

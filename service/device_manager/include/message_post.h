@@ -28,18 +28,18 @@ namespace MMI {
 class MessagePost : public OHOS::Singleton<OHOS::MMI::MessagePost> {
 public:
     void SetFd(int32_t fd);
-    void RunOnWestonThread(std::function<void(weston_compositor *)> taskItem);
+    void RunOnWestonThread(std::function<void(struct weston_compositor *)> taskItem);
     static int32_t RunTaskOnWestonThread(int32_t fd, uint32_t mask, void *data);
-    void SetWestonCompositor(weston_compositor *ec);
+    void SetWestonCompositor(struct weston_compositor *ec);
 
 private:
     void NotifyWestonThread();
     void RunTasks();
 
     std::mutex lk_;
-    std::list<std::function<void(weston_compositor *)>> asyncTasks_;
+    std::list<std::function<void(struct weston_compositor *)>> asyncTasks_;
     int32_t fd_;
-    weston_compositor *ec_ {nullptr};
+    struct weston_compositor *ec_ {nullptr};
 };
 } // namespace MMI
 } // namespace OHOS

@@ -49,9 +49,6 @@ void ChkConfig(int32_t fd)
 #ifdef OHOS_BUILD_AI
     mprintf(fd, "\tOHOS_BUILD_AI");
 #endif
-#ifdef DEBUG_CODE_TEST
-    mprintf(fd, "\tDEBUG_CODE_TEST");
-#endif
 #ifdef OHOS_BUILD_MMI_DEBUG
     mprintf(fd, "\tOHOS_BUILD_MMI_DEBUG");
 #endif // OHOS_BUILD_MMI_DEBUG

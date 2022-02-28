@@ -44,7 +44,7 @@
         } \
     } while (0)
 
-#define CHKPV(cond, ...) \
+#define CHKPV(cond) \
     do { \
         if ((cond) == nullptr) { \
             MMI_LOGE("%{public}s, (%{public}d), CHKPV(%{public}s) is null", \
@@ -53,7 +53,7 @@
         } \
     } while (0)
 
-#define CHKPF(cond, ...) \
+#define CHKPF(cond) \
     do { \
         if ((cond) == nullptr) { \
             MMI_LOGE("%{public}s, (%{public}d), CHKPF(%{public}s) is null", \
@@ -62,23 +62,23 @@
         } \
     } while (0)
 
-#define CHKPC(cond, ...) \
-    do { \
+#define CHKPC(cond) \
+    { \
         if ((cond) == nullptr) { \
             MMI_LOGE("%{public}s, (%{public}d), CHKPC(%{public}s) is null, skip then continue", \
                 __FILE__, __LINE__, #cond); \
             continue; \
         } \
-    } while (0)
+    }
 
-#define CHKPB(cond, ...) \
-    do { \
+#define CHKPB(cond) \
+    { \
         if ((cond) == nullptr) { \
             MMI_LOGE("%{public}s, (%{public}d), CHKPC(%{public}s) is null, skip then break", \
                 __FILE__, __LINE__, #cond); \
-            continue; \
+            break; \
         } \
-    } while (0)
+    }
 
 #define CHKPR(cond, r) \
     do { \
@@ -89,12 +89,12 @@
         } \
     } while (0)
 
-#define CHKPP(cond, r) \
+#define CHKPP(cond) \
     do { \
         if ((cond) == nullptr) { \
             MMI_LOGE("%{public}s, (%{public}d), CHKPP(%{public}s) is null, return value is null", \
                 __FILE__, __LINE__, #cond); \
-            return r; \
+            return nullptr; \
         } \
     } while (0)
 
@@ -125,13 +125,13 @@
     } while (0)
 
 #define CHKC(cond, ec) \
-    do { \
+    { \
         if (!(cond)) { \
             MMI_LOGE("%{public}s, (%{public}d), CHKC(%{public}s), errCode:%{public}d", \
                 __FILE__, __LINE__, #cond, ec); \
             continue; \
         } \
-    } while (0)
+    }
 
 #define CHKR(cond, ec, r) \
     do { \
@@ -143,14 +143,14 @@
     } while (0)
 
 #else // DEBUG_CODE_TEST
-#define CHKPL(cond, ...) \
+#define CHKPL(cond) \
     do { \
         if ((cond) == nullptr) { \
             MMI_LOGE("CHKPL(%{public}s) is null, do nothing", #cond); \
         } \
     } while (0)
 
-#define CHKPV(cond, ...) \
+#define CHKPV(cond) \
     do { \
         if ((cond) == nullptr) { \
             MMI_LOGE("CHKPV(%{public}s) is null", #cond); \
@@ -158,7 +158,7 @@
         } \
     } while (0)
 
-#define CHKPF(cond, ...) \
+#define CHKPF(cond) \
     do { \
         if ((cond) == nullptr) { \
             MMI_LOGE("CHKPF(%{public}s) is null", #cond); \
@@ -166,21 +166,21 @@
         } \
     } while (0)
 
-#define CHKPC(cond, ...) \
-    do { \
+#define CHKPC(cond) \
+    { \
         if ((cond) == nullptr) { \
             MMI_LOGE("CHKPC(%{public}s) is null, skip then continue", #cond); \
             continue; \
         } \
-    } while (0)
+    }
 
-#define CHKPB(cond, ...) \
-    do { \
+#define CHKPB(cond) \
+    { \
         if ((cond) == nullptr) { \
             MMI_LOGE("CHKPC(%{public}s) is null, skip then break", #cond); \
-            continue; \
+            break; \
         } \
-    } while (0)
+    }
 
 #define CHKPR(cond, r) \
     do { \
@@ -190,11 +190,11 @@
         } \
     } while (0)
 
-#define CHKPP(cond, r) \
+#define CHKPP(cond) \
     do { \
         if ((cond) == nullptr) { \
             MMI_LOGE("CHKPP(%{public}s) is null, return value is null", #cond); \
-            return r; \
+            return nullptr; \
         } \
     } while (0)
 
@@ -222,12 +222,12 @@
     } while (0)
 
 #define CHKC(cond, ec) \
-    do { \
+    { \
         if (!(cond)) { \
             MMI_LOGE("CHKC(%{public}s), errCode:%{public}d", #cond, ec); \
             continue; \
         } \
-    } while (0)
+    }
 
 #define CHKR(cond, ec, r) \
     do { \

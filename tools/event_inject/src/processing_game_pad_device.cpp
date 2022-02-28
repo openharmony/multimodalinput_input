@@ -15,7 +15,6 @@
 
 #include "processing_game_pad_device.h"
 
-using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
@@ -38,7 +37,7 @@ int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const Json& origin
         MMI_LOGE("manage finger array faild, inputData is empty");
         return RET_ERR;
     }
-    vector<GamePadEvent> padEventArray;
+    std::vector<GamePadEvent> padEventArray;
     if (AnalysisGamePadEvent(inputData, padEventArray) == RET_ERR) {
         return RET_ERR;
     }
@@ -52,7 +51,7 @@ int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const Json& inputData, std
 {
     for (const auto &item : inputData) {
         GamePadEvent padEvent = {};
-        string eventType = item.at("eventType").get<std::string>();
+        std::string eventType = item.at("eventType").get<std::string>();
         padEvent.eventType = eventType;
         if ((item.find("blockTime")) != item.end()) {
             padEvent.blockTime = item.at("blockTime").get<int32_t>();
@@ -135,7 +134,7 @@ void ProcessingGamePadDevice::TransformKeyClickEvent(const GamePadEvent& padEven
 
 void ProcessingGamePadDevice::TransformRocker1Event(const GamePadEvent& padEvent, InputEventArray& inputEventArray)
 {
-    string direction = padEvent.direction;
+    std::string direction = padEvent.direction;
     for (const auto &item : padEvent.gameEvents) {
         int32_t value;
         if (direction == "left") {
@@ -175,7 +174,7 @@ void ProcessingGamePadDevice::TransformRocker1Event(const GamePadEvent& padEvent
 
 void ProcessingGamePadDevice::TransformRocker2Event(const GamePadEvent& padEvent, InputEventArray& inputEventArray)
 {
-    string direction = padEvent.direction;
+    std::string direction = padEvent.direction;
     for (int32_t item : padEvent.gameEvents) {
         int32_t value;
         if (direction == "left") {
@@ -215,7 +214,7 @@ void ProcessingGamePadDevice::TransformRocker2Event(const GamePadEvent& padEvent
 
 void ProcessingGamePadDevice::TransformDerectionKeyEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray)
 {
-    string direction = padEvent.direction;
+    std::string direction = padEvent.direction;
     if (direction == "left") {
         SetEvAbsHat0X(inputEventArray, padEvent.blockTime, -1);
         SetSynReport(inputEventArray);
