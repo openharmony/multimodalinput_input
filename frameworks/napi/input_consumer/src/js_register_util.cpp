@@ -86,41 +86,47 @@ int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, con
     return value;
 }
 
-std::set<int32_t> GetIntArray(const napi_env &env, const napi_value &value)
+bool GetPreKeys(const napi_env &env, const napi_value &value, std::set<int32_t> &params)
 {
     MMI_LOGD("enter");
     uint32_t arrayLength = 0;
     if (napi_get_array_length(env, value, &arrayLength) != napi_ok) {
         MMI_LOGE("Get array length failed");
-        return {};
+        return false;
     }
-    std::set<int32_t> paramArrays;
     for (uint32_t i = 0; i < arrayLength; i++) {
         napi_value napiElement;
         if (napi_get_element(env, value, i, &napiElement) != napi_ok) {
             MMI_LOGE("Get element failed");
-            return {};
+            return false;
         }
 
         napi_valuetype valuetype;
         if (napi_typeof(env, napiElement, &valuetype) != napi_ok) {
             MMI_LOGE("Call typeof napiElement failed");
-            return {};
+            return false;
         }
         if (valuetype != napi_number) {
             MMI_LOGE("Wrong argument type, Numbers expected");
-            return {};
+            return false;
         }
         int32_t value = 0;
         if (napi_get_value_int32(env, napiElement, &value) != napi_ok) {
             MMI_LOGE("NapiElement get int32 value failed");
-            return {};
+            return false;
+        }
+        if (value < 0) {
+            MMI_LOGE("preKey:%{public}d is less 0, can not process", value);
+            return false;
         }
         MMI_LOGD("Get int array number:%{public}d", value);
-        paramArrays.insert(value);
+        if (!params.insert(value).second) {
+            MMI_LOGE("params insert value failed");
+            return false;
+        }
     }
     MMI_LOGD("leave");
-    return paramArrays;
+    return true;
 }
 
 int32_t GetPreSubscribeId(OHOS::MMI::Callbacks &callbacks, OHOS::MMI::KeyEventMonitorInfo *event)
@@ -144,8 +150,8 @@ int32_t AddEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks, O
     napi_value handler1 = nullptr;
     napi_status status = napi_get_reference_value(env, event->callback[0], &handler1);
     if (status != napi_ok) {
-        napi_throw_error(env, nullptr, "Handler1 get reference value failed");
         MMI_LOGE("Handler1 get reference value failed");
+        napi_throw_error(env, nullptr, "Handler1 get reference value failed");
         return JS_CALLBACK_EVENT_FAILED;
     }
     auto it = callbacks.find(event->eventType);
