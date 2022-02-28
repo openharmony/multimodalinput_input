@@ -124,7 +124,6 @@ group("multimodalinput_mmi_packages") {
 
 group("mmi_debug_tools") {
   deps = [
-    "//third_party/eudev:udevadm",
     "patch/diff_libinput_mmi:libinput-analyze-mmi",
     "patch/diff_libinput_mmi:libinput-debug-mmi",
     "patch/diff_libinput_mmi:libinput-list-mmi",
@@ -134,6 +133,7 @@ group("mmi_debug_tools") {
     "patch/diff_libinput_mmi:libinput-tablet-mmi",
     "tools/event_inject:mmi-event-injection",
     "tools/virtual_device_manager:mmi-virtual-device-manager",
+    "//third_party/eudev:udevadm",
   ]
 }
 
