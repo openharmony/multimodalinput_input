@@ -17,6 +17,7 @@
 #define POINTER_DRAWING_MANAGER_H
 
 #include <iostream>
+#include <ui/rs_surface_node.h>
 #include "singleton.h"
 #include "../../../common/include/device_observer.h"
 #include "struct_multimodal.h"
@@ -24,26 +25,33 @@
 #include "window.h"
 #include "draw/canvas.h"
 
-#define IMAGE_SIZE 64
 namespace OHOS {
 namespace MMI {
 class PointerDrawingManager : public DelayedSingleton<PointerDrawingManager>, public DeviceObserver {
 public:
     PointerDrawingManager();
     ~PointerDrawingManager();
-    std::unique_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(std::string imagePath);
     void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY);
     void TellDisplayInfo(int32_t displayId, int32_t width, int32_t height);
     void UpdatePointerDevice(bool hasPointerDevice);
     bool Init();
 
+public:
+    static const int32_t IMAGE_WIDTH = 64;
+    static const int32_t IMAGE_HEIGHT = 64;
+
 private:
+    void CreatePointerWindow(int32_t displayId, int32_t globalX, int32_t globalY);
+    sptr<OHOS::Surface> GetLayer();
+    sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer);
     void DoDraw(uint8_t *addr, uint32_t width, uint32_t height);
     void DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas);
     void DrawManager();
+    void FixCursorPosition(int32_t &globalX, int32_t &globalY);
+    std::unique_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
 
 private:
-    sptr<OHOS::Rosen::Window> drawWindow_ = nullptr;
+    sptr<OHOS::Rosen::Window> pointerWindow_ = nullptr;
     bool hasDisplay_ { false };
     int32_t displayId_;
     int32_t displayWidth_;
