@@ -80,9 +80,6 @@ static void CheckDefine()
 #ifdef OHOS_BUILD_AI
     CheckDefineOutput("%-40s", "OHOS_BUILD_AI");
 #endif
-#ifdef DEBUG_CODE_TEST
-    CheckDefineOutput("%-40s", "DEBUG_CODE_TEST");
-#endif
 #ifdef OHOS_BUILD_MMI_DEBUG
     CheckDefineOutput("%-40s", "OHOS_BUILD_MMI_DEBUG");
 #endif

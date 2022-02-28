@@ -65,9 +65,6 @@ static void CheckDefine()
 #ifdef OHOS_BUILD_AI
     CheckDefineOutput("%-40s", "\tOHOS_BUILD_AI");
 #endif
-#ifdef DEBUG_CODE_TEST
-    CheckDefineOutput("%-40s", "\tDEBUG_CODE_TEST");
-#endif
 #ifdef OHOS_BUILD_MMI_DEBUG
     CheckDefineOutput("%-40s", "\tOHOS_BUILD_MMI_DEBUG");
 #endif
@@ -113,13 +110,6 @@ int32_t OHOS::MMI::MMIServer::Start()
 
     ret = SaConnectServiceStart();
     CHKR((ret == RET_OK), ret, ret);
-
-#ifdef DEBUG_CODE_TEST
-    uint64_t curTime = OHOS::MMI::GetMillisTime();
-    uint64_t consumeTime = curTime - GetMmiServerStartTime();
-    MMI_LOGW("The server started successfully, time consumed:%{public}" PRId64
-            " Ms curTime:%{public}" PRId64 "", consumeTime, curTime);
-#endif
     return RET_OK;
 }
 

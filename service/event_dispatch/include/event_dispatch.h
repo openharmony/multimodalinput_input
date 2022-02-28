@@ -86,10 +86,6 @@ private:
     };
     void OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler isEventHandler);
     void HandlePointerEventTrace(const std::shared_ptr<PointerEvent> &point);
-#ifdef DEBUG_CODE_TEST
-private:
-    const size_t windowCount_ = 2;
-#endif
     };
 } // namespace MMI
 } // namespace OHOS

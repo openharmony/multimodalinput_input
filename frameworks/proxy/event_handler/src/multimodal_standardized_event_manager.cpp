@@ -156,12 +156,6 @@ int32_t MultimodalStandardizedEventManager::UnSubscribeKeyEvent(int32_t subscrib
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEvent& event)
 {
     MMI_LOGD("enter");
-#ifdef DEBUG_CODE_TEST
-    if (event.GetDeviceUdevTags() == DEVICE_TYPE_VIRTUAL_KEYBOARD) {
-        MMI_LOGD("Inject, keyCode:%{public}d,action:%{public}d,revPid:%{public}d",
-            event.GetKeyCode(), event.IsKeyDown(), GetPid());
-    }
-#endif
     auto range = mapEvents_.equal_range(MmiMessageId::KEY_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; i++) {
         if (i->second.windowId == event.GetWindowID() && i->second.eventCallBack->OnKey(event) == false) {
