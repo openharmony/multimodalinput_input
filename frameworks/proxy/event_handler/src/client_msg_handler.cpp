@@ -20,7 +20,6 @@
 #include "input_device_impl.h"
 #include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
-#include "input_filter_manager.h"
 #include "input_handler_manager.h"
 #include "input_manager_impl.h"
 #include "input_monitor_manager.h"
@@ -58,11 +57,8 @@ bool ClientMsgHandler::Init()
         {MmiMessageId::ON_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnPointerEvent, this)},
         {MmiMessageId::ON_TOUCHPAD_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnTouchPadMonitor, this)},
         {MmiMessageId::GET_MMI_INFO_ACK, MsgCallbackBind2(&ClientMsgHandler::GetMultimodeInputInfo, this)},
-        {MmiMessageId::KEY_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::KeyEventFilter, this)},
-        {MmiMessageId::TOUCH_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::TouchEventFilter, this)},
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ClientMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ClientMsgHandler::OnInputDeviceIds, this)},
-        {MmiMessageId::POINTER_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::PointerEventInterceptor, this)},
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
         {MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::TouchpadEventInterceptor, this)},
@@ -273,113 +269,6 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
 
     InputDeviceImpl::GetInstance().OnInputDevice(userData, id, name, deviceType);
     return RET_OK;
-}
-
-int32_t ClientMsgHandler::KeyEventFilter(const UDSClient& client, NetPacket& pkt)
-{
-#if 0
-    EventKeyboard key = {};
-    int32_t id = 0;
-    pkt >> key >>id;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-    MMI_LOGD("key event filter : event dispatcher of client:eventKeyboard:time:%{public}" PRId64
-        ",key:%{public}u,deviceId=%{private}u,"
-        "deviceType:%{public}u,seat_key_count:%{public}u,state:%{public}d",
-        key.time, key.key, key.deviceId, key.deviceType, key.seat_key_count, key.state);
-    KeyBoardEvent event;
-    int32_t windowId = 0;
-    int32_t deviceEventType = KEY_EVENT;
-    event.Initialize(windowId, 0, 0, 0, 0, 0, key.state, key.key, 0, 0, key.uuid, key.eventType,
-                     key.time, "", key.deviceId, 0, key.deviceType, deviceEventType);
-    return InputFilterMgr.OnKeyEvent(event, id);
-#endif
-    MMI_LOGE("chengmai_to_adapter");
-    return RET_ERR;
-}
-
-int32_t ClientMsgHandler::TouchEventFilter(const UDSClient& client, NetPacket& pkt)
-{
-#if 0
-    MMI_LOGD("enter");
-    int32_t abilityId = 0;
-    int32_t windowId = 0;
-    int32_t fd = 0;
-    int32_t fingerCount = 0;
-    int32_t eventAction = 0;
-    int64_t serverStartTime = 0;
-    pkt >> fingerCount >> eventAction >> abilityId >> windowId >> fd >> serverStartTime;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-
-    EventTouch touchData = {};
-    fingerInfos fingersInfos[FINGER_NUM] = {};
-    /* 根据收到的touchData，构造TouchEvent对象
-    *  其中TouchEvent对象的action,index,forcePrecision,maxForce,tapCount五个字段
-    *  和ManipulationEvent对象的startTime,operationState,pointerCount,pointerId，  touchArea，touchPressure六个字段，
-    *  和MultimodalEvent对象的highLevelEvent, deviceId, isHighLevelEvent三个字段缺失，暂时填0
-    */
-    for (int32_t i = 0; i < fingerCount; i++) {
-        pkt >> touchData;
-        CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-        fingersInfos[i].mPointerId = i;
-        fingersInfos[i].mTouchArea = static_cast<float>(touchData.area);
-        fingersInfos[i].mTouchPressure = static_cast<float>(touchData.pressure);
-        fingersInfos[i].mMp.Setxy(touchData.point.x, touchData.point.y);
-    }
-
-    MMI_LOGD("Event filter of client:eventTouch:time:%{public}" PRId64 ","
-             "deviceType:%{public}u,eventType:%{public}d,slot:%{public}d,seatSlot:%{public}d,fd:%{public}d",
-             touchData.time, touchData.deviceType, touchData.eventType, touchData.slot, touchData.seatSlot, fd);
-
-    int32_t fingerIndex = 0;
-    if (PRIMARY_POINT_DOWN == eventAction || PRIMARY_POINT_UP == eventAction ||
-        OTHER_POINT_DOWN == eventAction || OTHER_POINT_UP == eventAction) {
-        fingerIndex = fingersInfos[0].mPointerId;
-    }
-    TouchEvent event;
-    int32_t deviceEventType = TOUCH_EVENT;
-    event.Initialize(windowId, eventAction, fingerIndex, 0, 0, 0, 0, 0, fingerCount, fingersInfos, 0,
-        touchData.uuid, touchData.eventType, touchData.time, "",
-        touchData.deviceId, 0, false, touchData.deviceType, deviceEventType);
-
-    int32_t id = 0;
-    pkt >> id;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-    return InputFilterMgr.OnTouchEvent(event, id);
-#endif
-    MMI_LOGE("chengmai_to_adapter");
-    return RET_ERR;
-}
-
-int32_t ClientMsgHandler::PointerEventInterceptor(const UDSClient& client, NetPacket& pkt)
-{
-#if 0
-    EventPointer pointData = {};
-    int32_t id = 0;
-    pkt >> pointData >> id;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-    MmiPoint mmiPoint;
-    mmiPoint.Setxy(pointData.delta.x, pointData.delta.y);
-    MMI_LOGD("WangYuanevent dispatcher of client: mouse_data eventPointer:time:%{public}" PRId64 ","
-             "eventType:%{public}d,buttonCode:%{public}u,deviceType:%{public}u,"
-             "seat_button_count:%{public}u,axis:%{public}u,buttonState:%{public}d,source:%{public}d,"
-             "delta.x:%{public}lf,delta.y:%{public}lf,delta_raw.x:%{public}lf,delta_raw.y:%{public}lf,"
-             "absolute.x:%{public}lf,absolute.y:%{public}lf,discYe.x:%{public}lf,discrete.y:%{public}lf",
-             pointData.time, pointData.eventType, pointData.button, pointData.deviceType,
-             pointData.seat_button_count, pointData.axis, pointData.state, pointData.source, pointData.delta.x,
-             pointData.delta.y, pointData.delta_raw.x, pointData.delta_raw.y, pointData.absolute.x,
-             pointData.absolute.y, pointData.discrete.x, pointData.discrete.y);
-    int32_t action = pointData.state;
-    EventJoyStickAxis eventJoyStickAxis = {};
-    int32_t windowId = 0;
-    MouseEvent mouse_event;
-    mouse_event.Initialize(windowId, action, pointData.button, pointData.state, mmiPoint,
-        static_cast<float>(pointData.discrete.x), static_cast<float>(pointData.discrete.y),
-        0, 0, 0, pointData.uuid, pointData.eventType, pointData.time,
-        "", pointData.deviceId, 0, pointData.deviceType, eventJoyStickAxis);
-    return (InputFilterMgr.OnPointerEvent(mouse_event, id));
-#endif
-    MMI_LOGE("chengmai_to_adapter");
-    return RET_ERR;
 }
 
 int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt)

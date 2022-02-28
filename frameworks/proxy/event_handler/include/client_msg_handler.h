@@ -40,9 +40,6 @@ protected:
     virtual int32_t OnPointerEvent(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnSubscribeKeyEventCallback(const UDSClient& client, NetPacket& pkt);
     virtual int32_t GetMultimodeInputInfo(const UDSClient& client, NetPacket& pkt);
-    virtual int32_t KeyEventFilter(const UDSClient& client, NetPacket& pkt);
-    virtual int32_t TouchEventFilter(const UDSClient& client, NetPacket& pkt);
-    virtual int32_t PointerEventInterceptor(const UDSClient& client, NetPacket& pkt);
     virtual int32_t ReportKeyEvent(const UDSClient& client, NetPacket& pkt);
     virtual int32_t ReportPointerEvent(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnInputDevice(const UDSClient& client, NetPacket& pkt);
