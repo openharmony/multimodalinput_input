@@ -27,7 +27,6 @@
 #include "input_windows_manager.h"
 #include "interceptor_manager_global.h"
 #include "key_event_subscriber.h"
-#include "knuckle_func_proc.h"
 #include "mmi_func_callback.h"
 #include "time_cost_chk.h"
 
@@ -79,9 +78,6 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
             MsgCallbackBind2(&ServerMsgHandler::OnAddTouchpadEventFilter, this)},
         {MmiMessageId::REMOVE_EVENT_INTERCEPTOR,
             MsgCallbackBind2(&ServerMsgHandler::OnRemoveTouchpadEventFilter, this)},
-#ifdef OHOS_BUILD_AI
-        {MmiMessageId::SENIOR_INPUT_FUNC, MsgCallbackBind2(&ServerMsgHandler::OnSeniorInputFuncProc, this)},
-#endif // OHOS_BUILD_AI
 #ifdef OHOS_BUILD_HDF
         {MmiMessageId::HDI_INJECT, MsgCallbackBind2(&ServerMsgHandler::OnHdiInject, this)},
 #endif // OHOS_BUILD_HDF
@@ -91,13 +87,6 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
     }
     return true;
 }
-
-#ifdef OHOS_BUILD_AI
-void OHOS::MMI::ServerMsgHandler::SetSeniorInputHandle(SeniorInputFuncProcBase& seniorInputFuncProc)
-{
-    seniorInput_ = &seniorInputFuncProc;
-}
-#endif
 
 void OHOS::MMI::ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
 {
@@ -114,72 +103,6 @@ void OHOS::MMI::ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
         MMI_LOGE("ServerMsgHandler::OnMsgHandler Msg handling failed. id:%{public}d,errCode:%{public}d", id, ret);
     }
 }
-
-#ifdef  OHOS_BUILD_AI
-int32_t OHOS::MMI::ServerMsgHandler::OnSeniorInputFuncProc(SessionPtr SessionPtr, NetPacket& pkt)
-{
-    CHKPR(SessionPtr, ERROR_NULL_POINTER);
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    const int32_t fd = SessionPtr->GetFd();
-    seniorInput_->SetSessionFd(fd);
-
-    MSG_TYPE msgType;
-    pkt >> msgType;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-
-    bool processResult = false;
-    do {
-        if (msgType == MSG_TYPE_DEVICE_INIT) {
-            int32_t devIndex;
-            int32_t devType;
-            pkt >> devIndex >> devType;
-            CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-            sptr<SeniorInputFuncProcBase> ptr = nullptr;
-            if (devType == INPUT_DEVICE_CAP_AISENSOR) {
-                ptr = SeniorInputFuncProcBase::Create<AIFuncProc>();
-            } else if (devType == INPUT_DEVICE_CAP_KNUCKLE) {
-                ptr = SeniorInputFuncProcBase::Create<KnuckleFuncProc>();
-            } else {
-                MMI_LOGE("unknown devType:%{public}d,replyCode:%{public}d", devType, processResult);
-                break;
-            }
-
-            if (ptr == nullptr) {
-                MMI_LOGE("ptr is null, devType:%{public}d,replyCode:%{public}d", devType, processResult);
-                break;
-            }
-
-            processResult = seniorInput_->DeviceInit(fd, ptr);
-        } else if (msgType == MSG_TYPE_DEVICE_INFO) {
-            RawInputEvent seniorInputEvent = {};
-            pkt >> seniorInputEvent;
-            CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
-            MMI_LOGD("recived data: type:%{public}d,code:%{public}d,value:%{public}d",
-                     seniorInputEvent.ev_type, seniorInputEvent.ev_code, seniorInputEvent.ev_value);
-            processResult = seniorInput_->DeviceEventDispatch(fd, seniorInputEvent);
-        } else {
-            MMI_LOGE("unknown msgType:%{public}d,replyCode:%{public}d", msgType, processResult);
-        }
-    } while (0);
-
-    if (processResult) {
-        MMI_LOGI("process success");
-    } else {
-        MMI_LOGE("process fail, fd:%{public}d,msgType:%{public}d,processResult:%{public}d",
-                 fd, msgType, processResult);
-    }
-
-    const int32_t responseCode = seniorInput_->ReplyMessage(SessionPtr, processResult);
-    if (responseCode == RET_ERR) {
-        MMI_LOGW("reply msg to client fail, fd:%{public}d,msgType:%{public}d,"
-                 " processResult:%{public}d,replyCode:%{public}d",
-                 fd, msgType, processResult, responseCode);
-        return responseCode;
-    }
-
-    return RET_OK;
-}
-#endif // OHOS_BUILD_AI
 
 #ifdef OHOS_BUILD_HDF
 int32_t OHOS::MMI::ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)

@@ -33,13 +33,6 @@ public:
         return OnVirtualKeyEvent(sess, pkt);
     }
 
-#ifdef  OHOS_BUILD_AI
-    int32_t OnAiSensorInfoTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
-    {
-        return OnSeniorInputFuncProc(sess, pkt);
-    }
-#endif
-
 #ifdef OHOS_BUILD_HDF
     int32_t OnHdiInjectTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
     {
@@ -143,88 +136,6 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_010, TestSize.Level1)
     NetPacket pkt(static_cast<MmiMessageId>(-10000));
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, pkt);
 }
-
-#ifdef  OHOS_BUILD_AI
-HWTEST_F(ServerMsgHandlerTest, OnAiSensorInfoTest_01, TestSize.Level1)
-{
-    ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess = nullptr;
-    NetPacket pkt(MmiMessageId::INVALID);
-    serverMsgHandlerTest.OnAiSensorInfoTest(sess, pkt);
-}
-
-HWTEST_F(ServerMsgHandlerTest, OnAiSensorInfoTest_02, TestSize.Level1)
-{
-    ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess = nullptr;
-    NetPacket pkt(static_cast<MmiMessageId>(1));
-    serverMsgHandlerTest.OnAiSensorInfoTest(sess, pkt);
-}
-
-HWTEST_F(ServerMsgHandlerTest, OnAiSensorInfoTest_03, TestSize.Level1)
-{
-    ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess = nullptr;
-    NetPacket pkt(static_cast<MmiMessageId>(-1));
-    serverMsgHandlerTest.OnAiSensorInfoTest(sess, pkt);
-}
-
-HWTEST_F(ServerMsgHandlerTest, OnAiSensorInfoTest_04, TestSize.Level1)
-{
-    ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess = nullptr;
-    NetPacket pkt(static_cast<MmiMessageId>(10000));
-    serverMsgHandlerTest.OnAiSensorInfoTest(sess, pkt);
-}
-
-HWTEST_F(ServerMsgHandlerTest, OnAiSensorInfoTest_05, TestSize.Level1)
-{
-    ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess = nullptr;
-    NetPacket pkt(static_cast<MmiMessageId>(-10000));
-    serverMsgHandlerTest.OnAiSensorInfoTest(sess, pkt);
-}
-
-HWTEST_F(ServerMsgHandlerTest, OnAiSensorInfoTest_06, TestSize.Level1)
-{
-    ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess;
-    NetPacket pkt(MmiMessageId::INVALID);
-    serverMsgHandlerTest.OnAiSensorInfoTest(sess, pkt);
-}
-
-HWTEST_F(ServerMsgHandlerTest, OnAiSensorInfoTest_07, TestSize.Level1)
-{
-    ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess;
-    NetPacket pkt(static_cast<MmiMessageId>(-1));
-    serverMsgHandlerTest.OnAiSensorInfoTest(sess, pkt);
-}
-
-HWTEST_F(ServerMsgHandlerTest, OnAiSensorInfoTest_08, TestSize.Level1)
-{
-    ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess;
-    NetPacket pkt(static_cast<MmiMessageId>(1));
-    serverMsgHandlerTest.OnAiSensorInfoTest(sess, pkt);
-}
-
-HWTEST_F(ServerMsgHandlerTest, OnAiSensorInfoTest_09, TestSize.Level1)
-{
-    ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess;
-    NetPacket pkt(static_cast<MmiMessageId>(10000));
-    serverMsgHandlerTest.OnAiSensorInfoTest(sess, pkt);
-}
-
-HWTEST_F(ServerMsgHandlerTest, OnAiSensorInfoTest_010, TestSize.Level1)
-{
-    ServerMsgHandlerUnitTest serverMsgHandlerTest;
-    SessionPtr sess;
-    NetPacket pkt(static_cast<MmiMessageId>(-10000));
-    serverMsgHandlerTest.OnAiSensorInfoTest(sess, pkt);
-}
-#endif
 
 HWTEST_F(ServerMsgHandlerTest, OnDumpTest_01, TestSize.Level1)
 {

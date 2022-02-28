@@ -30,14 +30,9 @@ public:
     bool Init(UDSServer& udsServer);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
 
-#ifdef OHOS_BUILD_AI
-    void SetSeniorInputHandle(SeniorInputFuncProcBase& seniorInputFuncProc);
-#endif
-
 protected:
     int32_t OnVirtualKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
-    int32_t OnSeniorInputFuncProc(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_HDF
     int32_t OnHdiInject(SessionPtr sess, NetPacket& pkt);
 #endif
@@ -63,7 +58,6 @@ protected:
 
 private:
     UDSServer *udsServer_ = nullptr; // External references, do not delete
-    SeniorInputFuncProcBase *seniorInput_ = nullptr;
     EventDispatch eventDispatch_;
     std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent_ = nullptr;
 };

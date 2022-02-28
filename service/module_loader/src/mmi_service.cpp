@@ -70,9 +70,6 @@ static void CheckDefine()
 #ifdef OHOS_BUILD_HDF
     CheckDefineOutput("%-40s", "OHOS_BUILD_HDF");
 #endif
-#ifdef OHOS_BUILD_AI
-    CheckDefineOutput("%-40s", "OHOS_BUILD_AI");
-#endif
 #ifdef DEBUG_CODE_TEST
     CheckDefineOutput("%-40s", "DEBUG_CODE_TEST");
 #endif
@@ -156,12 +153,6 @@ int32_t MMIService::Init()
 {
     CheckDefine();
 
-#ifdef  OHOS_BUILD_AI
-    MMI_LOGD("SeniorInput Init");
-    CHKR(seniorInput_.Init(*this), SENIOR_INPUT_DEV_INIT_FAIL, SENIOR_INPUT_DEV_INIT_FAIL);
-    sMsgHandler_.SetSeniorInputHandle(seniorInput_);
-#endif // OHOS_BUILD_AI
-
     MMI_LOGD("InputEventHandler Init");
     InputHandler->Init(*this);
 
@@ -231,9 +222,6 @@ void MMIService::OnDisconnected(SessionPtr s)
     CHKPV(s);    
     int32_t fd = s->GetFd();
     MMI_LOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), fd);
-#ifdef  OHOS_BUILD_AI
-    seniorInput_.DeviceDisconnect(fd);
-#endif // OHOS_BUILD_AI
 }
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)

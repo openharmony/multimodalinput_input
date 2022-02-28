@@ -41,9 +41,6 @@ void ChkConfig(int32_t fd)
 #ifdef OHOS_BUILD_HDF
     mprintf(fd, "\tOHOS_BUILD_HDF");
 #endif
-#ifdef OHOS_BUILD_AI
-    mprintf(fd, "\tOHOS_BUILD_AI");
-#endif
 #ifdef DEBUG_CODE_TEST
     mprintf(fd, "\tDEBUG_CODE_TEST");
 #endif
