@@ -118,9 +118,7 @@ group("multimodalinput_mmi_packages") {
     "frameworks/napi/input_monitor:inputmonitor",
     "frameworks/proxy:libmmi-client",
     "service:libmmi-server",
-    "tools/event_inject:mmi-event-injection",
     "tools/inject_event:input",
-    "tools/virtual_device_manager:mmi-virtual-device-manager",
   ]
 
   if (is_mmi_have_weston) {
