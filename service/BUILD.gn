@@ -117,7 +117,6 @@ ohos_shared_library("libmmi-server") {
     "event_handler/src/key_event_value_transformation.cpp",
     "event_handler/src/system_event_handler.cpp",
     "event_package/src/event_package.cpp",
-    "event_standard/src/standard_event_handler.cpp",
     "interceptor/src/interceptor_manager_global.cpp",
     "libinput_adapter/src/s_input.cpp",
     "message_handle/src/server_msg_handler.cpp",
@@ -273,7 +272,6 @@ ohos_unittest("ut-mmi-service-out") {
 
   sources = [
     "event_dispatch/test/event_dispatch_test.cpp",
-    "event_standard/test/standard_event_handler_test.cpp",
     "hdi_inject/test/hdi_inject_test.cpp",
     "message_handle/test/server_msg_handler_test.cpp",
     "module_loader/test/uds_server_test.cpp",
