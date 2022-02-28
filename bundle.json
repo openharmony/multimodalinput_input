@@ -84,26 +84,6 @@
             "header_base": "//foundation/multimodalinput/input/interfaces/native/innerkits"
           },
           "type": "so"
-        },
-        {
-          "name": "//foundation/multimodalinput/input/service:libmmi-server",
-          "header": {
-            "header_files": [
-              "include/mmi_interface.h"
-            ],
-            "header_base": "//foundation/multimodalinput/input/service/module_loader"
-          },
-          "type": "so"
-        },
-        {
-          "name": "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
-          "header": {
-            "header_files": [
-              "libinput.h"
-            ],
-            "header_base": "//${root_out_dir}/diff_libinput_mmi/export_include"
-          },
-          "type": "so"
         }
       ],
       "test": [

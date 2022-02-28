@@ -21,7 +21,6 @@ extern "C" {
 #endif
     void Dump(int32_t fd);
     int32_t GetMultimodeInputinformation(void);
-int32_t wet_module_init(struct weston_compositor* ec, int* argc, char* argv[]);
 #ifdef __cplusplus
 }
 #endif
