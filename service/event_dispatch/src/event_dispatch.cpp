@@ -514,7 +514,7 @@ int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, struct libinpu
 }
 
 int32_t EventDispatch::DispatchTouchEvent(const EventTouch& touch, const int fd,
-    const int64_t preHandlerTime, UDSServer& udsServer, NetPacket &newPacket) const
+    const int64_t preHandlerTime, UDSServer& udsServer, NetPacket &pkt) const
 {
     std::vector<std::pair<uint32_t, int32_t>> touchIds;
     MMIRegEvent->GetTouchIds(touch.deviceId, touchIds);
@@ -532,11 +532,11 @@ int32_t EventDispatch::DispatchTouchEvent(const EventTouch& touch, const int fd,
                         touchTemp.physical, touchTemp.eventType, touchTemp.slot, touchTemp.seatSlot,
                         touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, fd,
                         preHandlerTime);
-            newPacket << touchTemp;
+            pkt << touchTemp;
         }
     }
     if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
-        newPacket << touch;
+        pkt << touch;
         MMI_LOGT("4.event dispatcher of server, eventTouch:time:%{public}" PRId64 ",deviceType:%{public}u,"
                     "deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,"
                     "slot:%{public}d,seatSlot:%{public}d,pressure:%{public}lf,point.x:%{public}lf,"
@@ -545,7 +545,7 @@ int32_t EventDispatch::DispatchTouchEvent(const EventTouch& touch, const int fd,
                     touch.physical, touch.eventType, touch.slot, touch.seatSlot, touch.pressure,
                     touch.point.x, touch.point.y, fd, preHandlerTime);
     }
-    if (!udsServer.SendMsg(fd, newPacket)) {
+    if (!udsServer.SendMsg(fd, pkt)) {
         MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
