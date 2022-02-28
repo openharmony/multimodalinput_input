@@ -296,7 +296,7 @@ static napi_value UnitTest(napi_env env, napi_callback_info info)
     UnitSent(env, winId, eventType, multimodalEvent);
 
     if (napi_create_int32(env, SUCCESS_CODE, &result) != napi_ok) {
-        MMI_LOGE("UnitTest: call napi_create_int32 fail");
+        MMI_LOGE("call napi_create_int32 fail");
         return result;
     }
     return result;
