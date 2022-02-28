@@ -94,7 +94,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int3
             return;
         }
 
-        sptr<OHOS::SurfaceBuffer> buffer;
+        sptr<OHOS::SurfaceBuffer> buffer = nullptr;
         int32_t releaseFence;
         OHOS::BufferRequestConfig config = {
             .width = IMAGE_SIZE,  // small

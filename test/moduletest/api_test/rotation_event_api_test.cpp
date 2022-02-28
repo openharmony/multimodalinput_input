@@ -34,7 +34,7 @@ HWTEST_F(RotationEventApiTest, Api_Test_GetRotationValue_Normal, TestSize.Level1
     int32_t highLevelEvent = 0;
     const std::string uuid = "q";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "a";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -53,7 +53,7 @@ HWTEST_F(RotationEventApiTest, Api_Test_GetRotationValue_Abnormal, TestSize.Leve
     int32_t highLevelEvent = 0;
     const std::string uuid = "q";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "a";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;

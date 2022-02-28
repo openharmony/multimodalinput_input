@@ -44,7 +44,7 @@ HWTEST_F(MouseEventTest, Initialize_001, TestSize.Level1)
     int32_t highLevelEvent = 1;
     std::string strUuid = "1";
     int32_t sourceType = 1;
-    int32_t occurredTime = 1;
+    int64_t occurredTime = 1;
     std::string deviceId = "1";
     int32_t inputDeviceId = 1;
     bool isHighLevelEvent = true;

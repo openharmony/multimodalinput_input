@@ -17,8 +17,8 @@
 #define TIME_COST_CHK_H
 #include <cinttypes>
 
-#define MAX_INPUT_EVENT_TIME (1000)
-#define MAX_OVER_TIME (300)
+constexpr int64_t MAX_INPUT_EVENT_TIME = 1000;
+constexpr int64_t MAX_OVER_TIME = 300;
 
 namespace OHOS {
 namespace MMI {

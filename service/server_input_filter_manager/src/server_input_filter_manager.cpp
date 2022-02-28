@@ -82,7 +82,7 @@ bool ServerInputFilterManager::OnKeyEvent(const EventKeyboard& key)
         MMI_LOGD("keyEventFilterMap_ is empty");
         return false;
     }
-    SessionPtr temp;
+    SessionPtr temp = nullptr;
     int32_t id = 0;
     Authority authorityTemp = NO_AUTHORITY;
     for (auto &item : keyEventFilterMap_) {
@@ -218,7 +218,7 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
 }
 
 bool ServerInputFilterManager::OnTouchEvent(struct libinput_event *event,
-    const EventTouch& touch, const uint64_t preHandlerTime)
+    const EventTouch& touch, const int64_t preHandlerTime)
 {
     MMI_LOGD("Enter");
     CHKPF(event);
@@ -226,7 +226,7 @@ bool ServerInputFilterManager::OnTouchEvent(struct libinput_event *event,
         MMI_LOGE("touchEventFilterMap_ is empty");
         return false;
     }
-    SessionPtr temp;
+    SessionPtr temp = nullptr;
     int32_t id = 0;
     Authority authorityTemp = NO_AUTHORITY;
     for (auto &item : touchEventFilterMap_) {
@@ -365,7 +365,7 @@ bool ServerInputFilterManager::OnPointerEvent(EventPointer event_pointer)
         MMI_LOGD("pointerEventFilterMap_ is empty");
         return false;
     }
-    SessionPtr ptr;
+    SessionPtr ptr = nullptr;
     int32_t id;
     Authority authority = NO_AUTHORITY;
     for (auto &item : pointerEventFilterMap_) {

@@ -33,9 +33,9 @@ struct AppInfo {
 struct WaitQueueEvent {
     int32_t fd;
     int32_t event;
-    uint64_t inputTime;
-    uint64_t westonTime;
-    uint64_t serverTime;
+    int64_t inputTime;
+    int64_t westonTime;
+    int64_t serverTime;
 };
 
 class AppRegister : public DelayedSingleton<AppRegister> {
@@ -61,7 +61,7 @@ public:
 
     int32_t QueryMapSurfaceNum();
 
-    bool IsMultimodeInputReady(MmiMessageId idMsg, const int32_t findFd, uint64_t inputTime, uint64_t westonTime = 0);
+    bool IsMultimodeInputReady(MmiMessageId idMsg, const int32_t findFd, int64_t inputTime, int64_t westonTime = 0);
 
     WaitQueueEvent GetWaitQueueEvent(int32_t fd, int32_t idMsg);
     void DeleteEventFromWaitQueue(int32_t fd, int32_t idMsg);
