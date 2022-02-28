@@ -26,9 +26,9 @@
 #include "util.h"
 
 namespace {
-    using namespace OHOS::MMI;
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "HdfEventManager"};
-}
+using namespace OHOS::MMI;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "HdfEventManager"};
+} // namespace
 
 OHOS::MMI::HdfEventManager *OHOS::MMI::HdfEventManager::m_globleThis;
 int32_t OHOS::MMI::HdfEventManager::EvdevSimIoctl(int32_t hdindex, int32_t pcmd, void *iobuff)
