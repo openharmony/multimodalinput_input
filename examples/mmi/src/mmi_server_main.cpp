@@ -35,13 +35,6 @@ int32_t main(int32_t argc, const char *argv[])
     StartMmiServer();
 #endif
 
-#ifdef DEBUG_CODE_TEST
-    SetMmiServerWorking();
-    while (IsMmiServerWorking()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
-#endif
-
     MMI_LOGD("mmi-server stopping. argc:%{public}d, argv:%{public}s", argc, argv[0]);
     return RET_OK;
 }
