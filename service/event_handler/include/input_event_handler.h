@@ -31,7 +31,7 @@ class InputEventHandler : public MsgHandler<EventFun>, public DelayedSingleton<I
 public:
     InputEventHandler();
     virtual ~InputEventHandler() override;
-    bool Init(UDSServer& udsServer);
+    void Init(UDSServer& udsServer);
     void OnEvent(void *event);
     void OnCheckEventReport();
     int32_t OnMouseEventEndTimerHandler(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
@@ -66,8 +66,8 @@ private:
 
     uint64_t idSeed_ = 0;
     int32_t eventType_ = 0;
-    uint64_t initSysClock_ = 0;
-    uint64_t lastSysClock_ = 0;
+    int64_t initSysClock_ = 0;
+    int64_t lastSysClock_ = 0;
 };
 } // namespace MMI
 } // namespace OHOS

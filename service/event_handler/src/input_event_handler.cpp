@@ -46,17 +46,17 @@ InputEventHandler::InputEventHandler()
 
 InputEventHandler::~InputEventHandler() {}
 
-bool InputEventHandler::Init(UDSServer& udsServer)
+void InputEventHandler::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
     MsgCallback funs[] = {
         {
             MmiMessageId::LIBINPUT_EVENT_DEVICE_ADDED,
-            std::bind(&InputEventHandler::OnEventDeviceAdded, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventDeviceAdded, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_DEVICE_REMOVED,
-            std::bind(&InputEventHandler::OnEventDeviceRemoved, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventDeviceRemoved, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_KEYBOARD_KEY,
@@ -64,81 +64,81 @@ bool InputEventHandler::Init(UDSServer& udsServer)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_POINTER_MOTION,
-            std::bind(&InputEventHandler::OnEventPointer, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventPointer, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE,
-            std::bind(&InputEventHandler::OnEventPointer, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventPointer, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_POINTER_BUTTON,
-            std::bind(&InputEventHandler::OnEventPointer, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventPointer, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_POINTER_AXIS,
-            std::bind(&InputEventHandler::OnEventPointer, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventPointer, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TOUCH_DOWN,
-            std::bind(&InputEventHandler::OnEventTouch, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TOUCH_UP,
-            std::bind(&InputEventHandler::OnEventTouch, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TOUCH_MOTION,
-            std::bind(&InputEventHandler::OnEventTouch, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TOUCH_CANCEL,
-            std::bind(&InputEventHandler::OnEventTouch, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TOUCH_FRAME,
-            std::bind(&InputEventHandler::OnEventTouch, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TOUCHPAD_DOWN,
-            std::bind(&InputEventHandler::OnEventTouchpad, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTouchpad, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TOUCHPAD_UP,
-            std::bind(&InputEventHandler::OnEventTouchpad, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTouchpad, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_TOUCHPAD_MOTION,
-            std::bind(&InputEventHandler::OnEventTouchpad, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventTouchpad, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN,
-            std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE,
-            std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_GESTURE_SWIPE_END,
-            std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_GESTURE_PINCH_BEGIN,
-            std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_GESTURE_PINCH_UPDATE,
-            std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
             MmiMessageId::LIBINPUT_EVENT_GESTURE_PINCH_END,
-            std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
     };
     for (auto &item : funs) {
         CHKC(RegistrationEvent(item), EVENT_REG_FAIL);
     }
-    return true;
+    return;
 }
 
 void InputEventHandler::OnEvent(void *event)
@@ -156,10 +156,10 @@ void InputEventHandler::OnEvent(void *event)
 
     eventType_ = libinput_event_get_type(lpEvent);
     auto tid = GetThisThreadIdOfLL();
-    const uint64_t maxUInt64 = (std::numeric_limits<uint64_t>::max)() - 1;
     initSysClock_ = GetSysClockTime();
     lastSysClock_ = 0;
     idSeed_ += 1;
+    const uint64_t maxUInt64 = (std::numeric_limits<uint64_t>::max)() - 1;
     if (idSeed_ >= maxUInt64) {
         MMI_LOGE("Invaild value. id:%{public}" PRId64, idSeed_);
         idSeed_ = 1;
@@ -171,7 +171,7 @@ void InputEventHandler::OnEvent(void *event)
 
     OnEventHandler(*lpMmiEvent);
     lastSysClock_ = GetSysClockTime();
-    uint64_t lostTime = lastSysClock_ - initSysClock_;
+    int64_t lostTime = lastSysClock_ - initSysClock_;
     MMI_LOGD("Event handling completed. id:%{public}" PRId64 ",lastSynClock:%{public}" PRId64
              ",lostTime:%{public}" PRId64, idSeed_, lastSysClock_, lostTime);
 }
@@ -240,7 +240,7 @@ int32_t InputEventHandler::OnEventKey(struct libinput_event *event)
 {
     CHKPR(event, PARAM_INPUT_INVALID);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
-    uint64_t sysStartProcessTime = GetSysClockTime();
+    int64_t sysStartProcessTime = GetSysClockTime();
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
@@ -297,7 +297,7 @@ int32_t InputEventHandler::OnKeyboardEvent(const multimodal_libinput_event& ev)
 {
     libinput_event *event = ev.event;
     CHKPR(event, ERROR_NULL_POINTER);
-    uint64_t sysStartProcessTime = GetSysClockTime();
+    int64_t sysStartProcessTime = GetSysClockTime();
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     EventKeyboard keyBoard = {};
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyBoard);

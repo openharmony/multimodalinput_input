@@ -32,8 +32,8 @@
 
 namespace OHOS {
 namespace MMI {
-constexpr int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
-constexpr int32_t INPUT_UI_TIMEOUT_TIME_MAX = 20 * 1000000;
+constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
+constexpr int64_t INPUT_UI_TIMEOUT_TIME_MAX = 20 * 1000000;
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
@@ -170,7 +170,7 @@ void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, I
 }
 
 int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
-    std::shared_ptr<KeyEvent> key, const uint64_t preHandlerTime)
+    std::shared_ptr<KeyEvent> key, const int64_t preHandlerTime)
 {
     MMI_LOGD("begin");
     CHKPR(key, PARAM_INPUT_INVALID);
