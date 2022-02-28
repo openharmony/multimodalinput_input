@@ -72,7 +72,7 @@ void MMIClient::VirtualKeyIn(RawInputEvent virtualKeyEvent)
     SendMsg(pkt);
 }
 
-void MMIClient::ReplyMessageToServer(MmiMessageId idMsg, uint64_t clientTime, uint64_t endTime) const
+void MMIClient::ReplyMessageToServer(MmiMessageId idMsg, int64_t clientTime, int64_t endTime) const
 {
     NetPacket pkt(MmiMessageId::CHECK_REPLY_MESSAGE);
     pkt << idMsg << clientTime << endTime;

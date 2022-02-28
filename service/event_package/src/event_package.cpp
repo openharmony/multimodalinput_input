@@ -70,7 +70,7 @@ int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, std::shared_
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
     int64_t actionStartTime = static_cast<int64_t>(libinput_event_keyboard_get_time_usec(data));
 
-    kevn->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
+    kevn->SetActionTime(GetSysClockTime());
     kevn->SetAction(keyAction);
     kevn->SetActionStartTime(actionStartTime);
     kevn->SetDeviceId(deviceId);
@@ -137,7 +137,7 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
         }
     }
 
-    int32_t time = static_cast<int64_t>(GetSysClockTime());
+    int64_t time = GetSysClockTime();
     keyEventPtr->SetActionTime(time);
     keyEventPtr->SetAction(keyAction);
     keyEventPtr->SetDeviceId(deviceId);

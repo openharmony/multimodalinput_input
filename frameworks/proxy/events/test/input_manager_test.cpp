@@ -453,14 +453,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, Tes
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::MMI::KeyEvent injectDownEvent;
-    int64_t downTime = static_cast<int64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     injectDownEvent.Initialize(0, ACTION_DOWN, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
     EXPECT_TRUE(response);
 
     KeyEvent injectUpEvent;
-    downTime = static_cast<int64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
     EXPECT_TRUE(response);
@@ -1126,7 +1126,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_001, TestSize.Level1)
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     KeyEvent injectUpEvent;
-    uint64_t downTime = static_cast<uint64_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
@@ -1158,7 +1158,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_002, TestSize.Level1)
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     KeyEvent injectUpEvent;
-    uint64_t downTime = static_cast<uint64_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
@@ -1369,7 +1369,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Leve
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::MMI::KeyEvent injectDownEvent;
-    uint64_t downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     injectDownEvent.Initialize(0, ACTION_DOWN, OHOS::MMI::KeyEvent::KEYCODE_MENU,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
     MMIEventHdl.InjectEvent(injectDownEvent);
@@ -1377,7 +1377,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Leve
 
     // release pressed key
     KeyEvent injectUpEvent;
-    downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     injectUpEvent.Initialize(0, ACTION_UP, OHOS::MMI::KeyEvent::KEYCODE_MENU,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
     MMIEventHdl.InjectEvent(injectUpEvent);
@@ -1432,7 +1432,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::MMI::KeyEvent injectDownEvent;
-    uint64_t downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     injectDownEvent.Initialize(0, ACTION_DOWN, OHOS::MMI::KeyEvent::KEYCODE_POWER,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
     MMIEventHdl.InjectEvent(injectDownEvent);
@@ -1440,7 +1440,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
 
     // release pressed key
     KeyEvent injectUpEvent;
-    downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     injectUpEvent.Initialize(0, ACTION_UP, OHOS::MMI::KeyEvent::KEYCODE_POWER,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
     MMIEventHdl.InjectEvent(injectUpEvent);
@@ -1481,7 +1481,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_003, TestSize.Leve
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::MMI::KeyEvent injectDownEvent;
-    uint64_t downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     injectDownEvent.Initialize(0, ACTION_DOWN, OHOS::MMI::KeyEvent::KEYCODE_HOME,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
     MMIEventHdl.InjectEvent(injectDownEvent);
@@ -1489,7 +1489,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_003, TestSize.Leve
 
     // release pressed key
     KeyEvent injectUpEvent;
-    downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     injectUpEvent.Initialize(0, ACTION_UP, OHOS::MMI::KeyEvent::KEYCODE_HOME,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
     MMIEventHdl.InjectEvent(injectUpEvent);
@@ -1530,7 +1530,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_004, TestSize.Leve
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::MMI::KeyEvent injectDownEvent;
-    uint64_t downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     injectDownEvent.Initialize(0, ACTION_DOWN, OHOS::MMI::KeyEvent::KEYCODE_BACK,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
     MMIEventHdl.InjectEvent(injectDownEvent);
@@ -1538,7 +1538,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_004, TestSize.Leve
 
     // release pressed key
     KeyEvent injectUpEvent;
-    downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     injectUpEvent.Initialize(0, ACTION_UP, OHOS::MMI::KeyEvent::KEYCODE_BACK,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
     MMIEventHdl.InjectEvent(injectUpEvent);
@@ -1578,7 +1578,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_005, TestSize.Leve
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::MMI::KeyEvent injectDownEvent;
-    uint64_t downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     injectDownEvent.Initialize(0, ACTION_DOWN, OHOS::MMI::KeyEvent::KEYCODE_CALL,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
     MMIEventHdl.InjectEvent(injectDownEvent);
@@ -1586,7 +1586,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_005, TestSize.Leve
 
     // release pressed key
     KeyEvent injectUpEvent;
-    downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     injectUpEvent.Initialize(0, ACTION_UP, OHOS::MMI::KeyEvent::KEYCODE_CALL,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
     MMIEventHdl.InjectEvent(injectUpEvent);
@@ -1625,14 +1625,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_006, TestSize.Leve
     EXPECT_TRUE(response > 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     OHOS::MMI::KeyEvent injectDownEvent;
-    uint64_t downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     injectDownEvent.Initialize(0, ACTION_DOWN, OHOS::MMI::KeyEvent::KEYCODE_ENDCALL,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
     MMIEventHdl.InjectEvent(injectDownEvent);
     // other keys are pressed during the hold time
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     OHOS::KeyEvent injectDownEvent2;
     injectDownEvent2.Initialize(0, ACTION_DOWN, OHOS::MMI::KeyEvent::KEYCODE_VOLUME_UP,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
@@ -1641,7 +1641,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_006, TestSize.Leve
 
     // release pressed key1
     OHOS::KeyEvent injectUpEvent1;
-    downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     injectUpEvent1.Initialize(0, ACTION_UP, OHOS::MMI::KeyEvent::KEYCODE_ENDCALL,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
     MMIEventHdl.InjectEvent(injectUpEvent1);
@@ -1649,7 +1649,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_006, TestSize.Leve
 
     // release pressed key2
     OHOS::KeyEvent injectUpEvent2;
-    downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     injectUpEvent2.Initialize(0, ACTION_UP, OHOS::MMI::KeyEvent::KEYCODE_VOLUME_UP,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
     MMIEventHdl.InjectEvent(injectUpEvent2);
@@ -1688,7 +1688,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_007, TestSize.Leve
     EXPECT_TRUE(response > 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    uint64_t downTime = static_cast<uint64_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     OHOS::MMI::KeyEvent injectDownEvent;
     injectDownEvent.Initialize(0, ACTION_DOWN, OHOS::MMI::KeyEvent::KEYCODE_VOLUME_DOWN,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
@@ -1697,7 +1697,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_007, TestSize.Leve
 
     // release pressed key , up trigger
     KeyEvent injectUpEvent;
-    downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     injectUpEvent.Initialize(0, ACTION_UP, OHOS::MMI::KeyEvent::KEYCODE_VOLUME_DOWN,
                              downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
     MMIEventHdl.InjectEvent(injectUpEvent);
@@ -1759,7 +1759,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_009, TestSize.Leve
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::MMI::KeyEvent injectDownEvent;
-    uint64_t downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     injectDownEvent.Initialize(0, ACTION_DOWN, OHOS::MMI::KeyEvent::KEYCODE_MUTE,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
     MMIEventHdl.InjectEvent(injectDownEvent);
@@ -1767,7 +1767,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_009, TestSize.Leve
 
     // release pressed key
     KeyEvent injectUpEvent;
-    downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     injectUpEvent.Initialize(0, ACTION_UP, OHOS::MMI::KeyEvent::KEYCODE_MUTE,
                              downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
     MMIEventHdl.InjectEvent(injectUpEvent);
@@ -1890,7 +1890,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_011, TestSize.Leve
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     
     // pressed key
-    uint64_t downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     OHOS::KeyEvent injectDownEvent1;
     injectDownEvent1.Initialize(0, ACTION_DOWN, OHOS::MMI::KeyEvent::KEYCODE_F1,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
@@ -1898,7 +1898,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_011, TestSize.Leve
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     // release pressed key
-    downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     OHOS::KeyEvent injectUpEven1;
     injectUpEven1.Initialize(0, ACTION_UP, OHOS::MMI::KeyEvent::KEYCODE_F1,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
@@ -1906,7 +1906,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_011, TestSize.Leve
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     
     // pressed key
-    downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     OHOS::KeyEvent injectDownEvent2;
     injectDownEvent2.Initialize(0, ACTION_DOWN, OHOS::MMI::KeyEvent::KEYCODE_F1,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
@@ -1914,7 +1914,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_011, TestSize.Leve
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     // release pressed key
-    downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     OHOS::KeyEvent injectUpEvent2;
     injectUpEvent2.Initialize(0, ACTION_UP, OHOS::MMI::KeyEvent::KEYCODE_F1,
                                downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
@@ -2542,7 +2542,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    int64_t actionTime = static_cast<int64_t>(GetSysClockTime());
+    int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
     PointerEvent::PointerItem item { };
     item.SetPointerId(DEFAULT_POINTER_ID);
@@ -2582,7 +2582,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    int64_t actionTime = static_cast<int64_t>(GetSysClockTime());
+    int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
     PointerEvent::PointerItem item { };
     item.SetPointerId(DEFAULT_POINTER_ID);
@@ -2622,7 +2622,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    int64_t actionTime = static_cast<int64_t>(GetSysClockTime());
+    int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
     PointerEvent::PointerItem item { };
     item.SetPointerId(DEFAULT_POINTER_ID);
@@ -2662,7 +2662,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    int64_t actionTime = static_cast<int64_t>(GetSysClockTime());
+    int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
     PointerEvent::PointerItem item { };
     item.SetPointerId(DEFAULT_POINTER_ID);

@@ -306,7 +306,7 @@ int32_t ClientMsgHandler::TouchEventFilter(const UDSClient& client, NetPacket& p
     int32_t fd = 0;
     int32_t fingerCount = 0;
     int32_t eventAction = 0;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     pkt >> fingerCount >> eventAction >> abilityId >> windowId >> fd >> serverStartTime;
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
 
@@ -338,7 +338,7 @@ int32_t ClientMsgHandler::TouchEventFilter(const UDSClient& client, NetPacket& p
     TouchEvent event;
     int32_t deviceEventType = TOUCH_EVENT;
     event.Initialize(windowId, eventAction, fingerIndex, 0, 0, 0, 0, 0, fingerCount, fingersInfos, 0,
-        touchData.uuid, touchData.eventType, static_cast<int32_t>(touchData.time), "",
+        touchData.uuid, touchData.eventType, touchData.time, "",
         touchData.deviceId, 0, false, touchData.deviceType, deviceEventType);
 
     int32_t id = 0;
@@ -374,7 +374,7 @@ int32_t ClientMsgHandler::PointerEventInterceptor(const UDSClient& client, NetPa
     MouseEvent mouse_event;
     mouse_event.Initialize(windowId, action, pointData.button, pointData.state, mmiPoint,
         static_cast<float>(pointData.discrete.x), static_cast<float>(pointData.discrete.y),
-        0, 0, 0, pointData.uuid, pointData.eventType, static_cast<int32_t>(pointData.time),
+        0, 0, 0, pointData.uuid, pointData.eventType, pointData.time,
         "", pointData.deviceId, 0, pointData.deviceType, eventJoyStickAxis);
     return (InputFilterMgr.OnPointerEvent(mouse_event, id));
 #endif

@@ -267,7 +267,7 @@ int32_t OHOS::MMI::ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetP
 int32_t OHOS::MMI::ServerMsgHandler::OnNewInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    uint64_t preHandlerTime = GetSysClockTime();
+    int64_t preHandlerTime = GetSysClockTime();
     auto creKey = OHOS::MMI::KeyEvent::Create();
     int32_t errCode = InputEventDataTransformation::NetPacketToKeyEvent(pkt, creKey);
     if (errCode != RET_OK) {
@@ -287,7 +287,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnNewInjectKeyEvent(SessionPtr sess, NetPac
 int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    uint64_t preHandlerTime = GetSysClockTime();
+    int64_t preHandlerTime = GetSysClockTime();
     VirtualKey event;
     if (!pkt.Read(event)) {
         MMI_LOGE("read data failed");
