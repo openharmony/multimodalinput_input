@@ -216,7 +216,7 @@ void MMIService::OnConnected(SessionPtr s)
 
 void MMIService::OnDisconnected(SessionPtr s)
 {
-    CHKPV(s);    
+    CHKPV(s);
     int32_t fd = s->GetFd();
     MMI_LOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), fd);
 }
