@@ -57,11 +57,11 @@ Uuid::Uuid()
         static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_sec) + randNum) & 0xFF);
     uuid_[UUID_TIME_MID_SECEND_BYTE] =
         static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_min) + (randNum >> BASE_BIT_OPT_SIZE)) & 0xFF);
-    uuid_[UUID_TIME_MID_FIRST_BYTE] =
-        static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_hour) + (randNum >> BIT_OPT_TWO_BYTE * BASE_BIT_OPT_SIZE)) & 0xFF);
+    uuid_[UUID_TIME_MID_FIRST_BYTE] = static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_hour) +
+                                      (randNum >> BIT_OPT_TWO_BYTE * BASE_BIT_OPT_SIZE)) & 0xFF);
     // 0 - 3
-    uuid_[UUID_TIME_LOW_FOURTH_BYTE] =
-        static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_mday) + (randNum >> BIT_OPT_THREE_BYTE * BASE_BIT_OPT_SIZE)) & 0xFF);
+    uuid_[UUID_TIME_LOW_FOURTH_BYTE] = static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_mday) +
+                                       (randNum >> BIT_OPT_THREE_BYTE * BASE_BIT_OPT_SIZE)) & 0xFF);
     uuid_[UUID_TIME_LOW_THIRD_BYTE] =
         static_cast<uint8_t>(static_cast<uint32_t>(randomTime.tm_mon) & 0xFF);
     uuid_[UUID_TIME_LOW_SECEND_BYTE] =
