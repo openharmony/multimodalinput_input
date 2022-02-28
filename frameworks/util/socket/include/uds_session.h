@@ -63,7 +63,6 @@ public:
     void AddEvent(int32_t id, int64_t time);
     void DelEvents(int32_t id);
     int64_t GetFirstEventTime();
-    void ClearEventsVct();
     bool EventsIsEmpty();
     bool isANRProcess_ {false};
 
