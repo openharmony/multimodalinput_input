@@ -27,9 +27,9 @@ enum RES_STATUS : uint8_t {
 };
 struct EventRegesterInfo {
     RES_STATUS sync;
-    sptr<IRemoteObject> token;
+    sptr<IRemoteObject> token = { nullptr };
     int32_t windowId;
-    StandEventPtr standardizedEventHandle;
+    StandEventPtr standardizedEventHandle = { nullptr };
 };
 
 class MultimodalEventHandler : public Singleton<OHOS::MMI::MultimodalEventHandler> {

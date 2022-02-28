@@ -47,7 +47,7 @@ public:
         std::vector<int32_t> idsTemp;
     };
     struct DevCallbackInfo {
-        std::shared_ptr<InputDeviceImpl::InputDeviceInfo> deviceTemp;
+        std::shared_ptr<InputDeviceImpl::InputDeviceInfo> deviceTemp = { nullptr };
     };
     static napi_ref ref_;
     static napi_env env_;
