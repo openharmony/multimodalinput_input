@@ -17,7 +17,6 @@
 #include "msg_handler.h"
 #include "event_dispatch.h"
 #include "nocopyable.h"
-#include "senior_input_func_proc_base.h"
 
 namespace OHOS {
 namespace MMI {
