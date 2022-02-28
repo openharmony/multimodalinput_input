@@ -15,13 +15,14 @@
 #ifndef MMI_FD_LISTENER_H
 #define MMI_FD_LISTENER_H
 #include "file_descriptor_listener.h"
+#include "if_mmi_client.h"
 
 namespace OHOS {
 namespace MMI {
 class MMIFdListener : public AppExecFwk::FileDescriptorListener
 {
 public:
-    MMIFdListener();
+    MMIFdListener(MMIClientPtr client);
     virtual ~MMIFdListener();
     DISALLOW_COPY_AND_MOVE(MMIFdListener);
 
@@ -29,6 +30,9 @@ public:
     virtual void OnWritable(int32_t fd) override;
     virtual void OnShutdown(int32_t fd) override;
     virtual void OnException(int32_t fd) override;
+
+private:
+    MMIClientPtr mmiClient_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -30,6 +30,8 @@
 #include "timer_manager.h"
 #include "util.h"
 
+#include "proto.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -239,6 +241,9 @@ void MMIService::OnConnected(SessionPtr s)
     int32_t fd = s->GetFd();
     MMI_LOGI("fd:%{public}d", fd);
     AppRegs->RegisterConnectState(fd);
+    NetPacket pkt(MmiMessageId::ON_LIST);
+    pkt << fd;
+    s->SendMsg(pkt);
 }
 
 void MMIService::OnDisconnected(SessionPtr s)
@@ -317,6 +322,10 @@ void MMIService::OnTimer()
         inputEventHdr_->OnCheckEventReport();
     }
     TimerMgr->ProcessTimers();
+    int32_t fd = 12;
+    NetPacket pkt(MmiMessageId::ON_LIST);
+    pkt << fd;
+    Broadcast(pkt);
 }
 
 void MMIService::OnThread()

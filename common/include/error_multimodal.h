@@ -39,6 +39,7 @@ namespace OHOS {
         C_INVALID_EVENT_HANDLER_ID,                 // 无效人EventHandlerId
         C_ADD_FD_LISTENER_FAIL,                     // 增加FD监听错误
         C_DEL_FD_LISTENER_FAIL,                     // 删除FD监听错误
+        C_CLIENT_POINTER_NULL,                      // Client指针为空
     };
 
     // Error code for event simulate
