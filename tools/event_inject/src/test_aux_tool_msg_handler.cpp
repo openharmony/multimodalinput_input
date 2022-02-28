@@ -45,13 +45,13 @@ void TestAuxToolMsgHandler::OnMsgHandler(const UDSClient &client, NetPacket &pkt
     OHOS::MMI::TimeCostChk chk("TestAuxToolMsgHandler::OnMsgHandler", "overtime 200(us)", CHECK_TIME, id);
     auto callback = GetMsgCallback(id);
     if (callback == nullptr) {
-        MMI_LOGE("TestAuxToolMsgHandler::OnMsgHandler Unknown msg id:%{public}d,errCode:%{public}d",
+        MMI_LOGE("Unknown msg id:%{public}d,errCode:%{public}d",
                  id, UNKNOWN_MSG_ID);
         return;
     }
     auto ret = (*callback)(client, pkt);
     if (ret < 0) {
-        MMI_LOGE("TestAuxToolMsgHandler::OnMsgHandler Msg handling failed. id:%{public}d,errCode:%{public}d",
+        MMI_LOGE("Msg handling failed. id:%{public}d,errCode:%{public}d",
                  id, ret);
     }
 }
