@@ -53,11 +53,14 @@ void MMIFdListener::OnReadable(int32_t fd)
     const int32_t flags = MSG_DONTWAIT | MSG_NOSIGNAL;
     for (int32_t i = 0; i < maxCount; i++) {
         auto size = recv(fd, szBuf, sizeof(szBuf), flags);
-        if (size <= 0) {
+        if (size < 0) {
             MMI_LOGE("recv return %{public}zu %{public}s", size, strerror(errno));
             break;
-        }
-        if (size > 0) {
+        } else if (size == 0) {
+            MMI_LOGE("recv return 0 %{public}s", strerror(errno));
+            mmiClient_->OnDisconnect();
+            break;
+        } else if (size > 0) {
             if (!buf.Write(szBuf, size)) {
                 isoverflow = true;
                 break;
@@ -78,20 +81,14 @@ void MMIFdListener::OnReadable(int32_t fd)
     // }
 }
 
-void MMIFdListener::OnWritable(int32_t fd)
-{
-    uint64_t tid = GetThisThreadIdOfLL();
-    int32_t pid = GetPid();
-    MMI_LOGD("enter. pid:%{public}d tid:%{public}" PRIu64, pid, tid);
-    CHK(fd >= 0, C_INVALID_INPUT_PARAM);
-}
-
 void MMIFdListener::OnShutdown(int32_t fd)
 {
     uint64_t tid = GetThisThreadIdOfLL();
     int32_t pid = GetPid();
     MMI_LOGD("enter. pid:%{public}d tid:%{public}" PRIu64, pid, tid);
     CHK(fd >= 0, C_INVALID_INPUT_PARAM);
+    CHKPV(mmiClient_);
+    mmiClient_->OnDisconnect();
 }
 
 void MMIFdListener::OnException(int32_t fd)
@@ -100,6 +97,8 @@ void MMIFdListener::OnException(int32_t fd)
     int32_t pid = GetPid();
     MMI_LOGD("enter. pid:%{public}d tid:%{public}" PRIu64, pid, tid);
     CHK(fd >= 0, C_INVALID_INPUT_PARAM);
+    CHKPV(mmiClient_);
+    mmiClient_->OnDisconnect();
 }
 
 } // namespace MMI
