@@ -88,8 +88,9 @@ ohos_shared_library("event-injection") {
     "src/test_aux_tool_msg_handler.cpp",
   ]
 
-  configs = [ ":event_injection_config",
-              ":event_injection_public_config"
+  configs = [
+    ":event_injection_config",
+    ":event_injection_public_config",
   ]
 
   deps = [
@@ -222,7 +223,7 @@ ohos_unittest("ut-event-injection-out") {
 
 ohos_executable("mmi-event-injection") {
   sources = [ "src/mmi_event_simulate_main.cpp" ]
-  
+
   configs = [ ":event_injection_public_config" ]
 
   deps = [
