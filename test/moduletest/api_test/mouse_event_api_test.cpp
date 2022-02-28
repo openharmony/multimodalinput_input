@@ -42,7 +42,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetAction_Normal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -70,7 +70,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetAction_Abnormal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -98,7 +98,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetAction_Min, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -126,7 +126,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetAction_Max, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -154,7 +154,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetActionButton_Normal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -182,7 +182,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetActionButton_Abnormal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -210,7 +210,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetActionButton_Min, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -238,7 +238,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetActionButton_Max, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -266,7 +266,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetPressedButtons_Normal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -294,7 +294,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetPressedButtons_Abnormal, TestSize.Level1
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -322,7 +322,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetPressedButtons_Min, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -350,7 +350,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetPressedButtons_Max, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -378,7 +378,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetCursor_Normal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -410,7 +410,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetCursor_Abnormal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -482,7 +482,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetAxisValue_Normal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -512,7 +512,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetAxisValue_Anomalous, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -542,7 +542,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetCursorDelta_Normal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -571,7 +571,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetCursorDelta_Abnormal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -600,7 +600,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetScrollingDelta_Normal, TestSize.Level1)
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;
@@ -630,7 +630,7 @@ HWTEST_F(MouseEventApiTest, Api_Test_GetScrollingDelta_Anomalous, TestSize.Level
     int32_t highLevelEvent = 0;
     const std::string uuid = "a";
     int32_t sourceType = 0;
-    int32_t occurredTime = 0;
+    int64_t occurredTime = 0;
     const std::string deviceId = "b";
     int32_t inputDeviceId = 0;
     bool isHighLevelEvent = true;

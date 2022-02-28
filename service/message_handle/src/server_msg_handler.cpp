@@ -318,8 +318,8 @@ int32_t OHOS::MMI::ServerMsgHandler::OnDump(SessionPtr sess, NetPacket& pkt)
 int32_t OHOS::MMI::ServerMsgHandler::CheckReplyMessageFormClient(SessionPtr sess, NetPacket& pkt)
 {
     int32_t idMsg = 0;
-    uint64_t clientTime = 0;
-    uint64_t endTime = 0;
+    int64_t clientTime = 0;
+    int64_t endTime = 0;
     pkt >> idMsg >> clientTime >> endTime;
     CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     int32_t fd = sess->GetFd();
@@ -330,18 +330,18 @@ int32_t OHOS::MMI::ServerMsgHandler::CheckReplyMessageFormClient(SessionPtr sess
     AppRegs->DeleteEventFromWaitQueue(fd, idMsg);
 
     // add msg to dump
-    auto curTime = GetSysClockTime();
-    int32_t westonExpendTime = static_cast<int32_t>(waitData.westonTime - waitData.inputTime);
-    int32_t serverExpendTime = static_cast<int32_t>(waitData.serverTime - waitData.westonTime);
-    int32_t clientExpendTime = static_cast<int32_t>(endTime - clientTime);
-    int32_t allTime = static_cast<int32_t>(curTime - waitData.westonTime);
-    MMIEventDump->InsertFormat("MsgDump: msgId=%d fd=%d inputExpendTime=%llu(us) westonExpendTime=%d(us) "
-                               "serverExpendTime=%d(us) clientExpendTime=%d(us) allTime=%d(us)", idMsg, fd,
+    int64_t westonExpendTime = waitData.westonTime - waitData.inputTime;
+    int64_t serverExpendTime = waitData.serverTime - waitData.westonTime;
+    int64_t clientExpendTime = endTime - clientTime;
+    int64_t curTime = GetSysClockTime();
+    int64_t allTime = curTime - waitData.westonTime;
+    MMIEventDump->InsertFormat("MsgDump: msgId=%d fd=%d inputExpendTime=%lld(us) westonExpendTime=%lld(us) "
+                               "serverExpendTime=%lld(us) clientExpendTime=%lld(us) allTime=%lld(us)", idMsg, fd,
                                waitData.inputTime, westonExpendTime, serverExpendTime, clientExpendTime, allTime);
-    MMI_LOGD("CheckReplyMessageFormClient msgId:%{public}d,fd:%{public}d,inputExpendTime:%{public}" PRIu64 "(us),"
-             "westonExpendTime:%{public}d(us),serverExpendTime:%{public}d(us),clientExpendTime:%{public}d(us),"
-             "allTime:%{public}d(us)", idMsg, fd, waitData.inputTime, westonExpendTime, serverExpendTime,
-             clientExpendTime, allTime);
+    MMI_LOGT("CheckReplyMessageFormClient msg:%{public}d,fd:%{public}d,inputExpendTime:%{public}" PRId64 "(us),"
+             "westonExpendTime:%{public}" PRId64 "(us),serverExpendTime:%{public}" PRId64 "(us),"
+             "clientExpendTime:%{public}" PRId64 "(us),allTime:%{public}" PRId64 "(us)", idMsg, fd,
+             waitData.inputTime, westonExpendTime, serverExpendTime, clientExpendTime, allTime);
     return RET_OK;
 }
 
@@ -395,7 +395,7 @@ int32_t OHOS::MMI::ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetP
 int32_t OHOS::MMI::ServerMsgHandler::OnNewInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    uint64_t preHandlerTime = GetSysClockTime();
+    int64_t preHandlerTime = GetSysClockTime();
     auto creKey = OHOS::MMI::KeyEvent::Create();
     int32_t errCode = InputEventDataTransformation::NetPacketToKeyEvent(pkt, creKey);
     if (errCode != RET_OK) {
@@ -415,7 +415,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnNewInjectKeyEvent(SessionPtr sess, NetPac
 int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    uint64_t preHandlerTime = GetSysClockTime();
+    int64_t preHandlerTime = GetSysClockTime();
     VirtualKey event;
     if (!pkt.Read(event)) {
         MMI_LOGE("read data failed");

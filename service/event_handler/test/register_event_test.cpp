@@ -29,7 +29,7 @@ public:
 
 class RegisterEventUnitTest : public RegisterEvent {
 public:
-    void SetTimeCount(uint64_t timeCount)
+    void SetTimeCount(int64_t timeCount)
     {
         timeCount_ = timeCount;
     }

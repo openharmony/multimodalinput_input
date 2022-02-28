@@ -139,7 +139,7 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerItem.SetLocalY(0);
     pointerItem.SetPointerId(0);
 
-    int64_t time = static_cast<int64_t>(GetSysClockTime());
+    int64_t time = GetSysClockTime();
     pointerItem.SetDownTime(time);
     pointerItem.SetWidth(0);
     pointerItem.SetHeight(0);

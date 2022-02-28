@@ -218,7 +218,7 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
 }
 
 bool ServerInputFilterManager::OnTouchEvent(struct libinput_event *event,
-    const EventTouch& touch, const uint64_t preHandlerTime)
+    const EventTouch& touch, const int64_t preHandlerTime)
 {
     MMI_LOGD("Enter");
     CHKPF(event);

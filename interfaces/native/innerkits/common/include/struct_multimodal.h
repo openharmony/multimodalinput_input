@@ -138,7 +138,7 @@ struct EventJoyStickAxis {
     DEVICE_TYPE deviceType;
     int32_t eventType;
     char uuid[MAX_UUIDSIZE];
-    uint64_t time;
+    int64_t time;
     EventJoyStickAxisAbsInfo abs_throttle;
     EventJoyStickAxisAbsInfo abs_hat0x;
     EventJoyStickAxisAbsInfo abs_hat0y;
@@ -190,13 +190,13 @@ struct RegisteredEvent {
     int32_t deviceId;
     char uuid[MAX_UUIDSIZE];
     int32_t eventType;
-    uint64_t occurredTime;
+    int64_t occurredTime;
     DEVICE_TYPE deviceType;
     char physical[MAX_DEVICENAME];
 };
 
 struct StandardTouchStruct {
-    uint64_t time;
+    int64_t time;
     uint32_t msgType;
     int32_t buttonType;
     int32_t buttonCount;
@@ -215,7 +215,7 @@ struct EventKeyboard {
     DEVICE_TYPE deviceType;
     int32_t eventType;
     char uuid[MAX_UUIDSIZE];
-    uint64_t time;
+    int64_t time;
     int32_t key;
     int32_t seat_key_count;
     enum KEY_STATE state;
@@ -230,7 +230,7 @@ struct EventPointer {
     DEVICE_TYPE deviceType;
     int32_t eventType;
     char uuid[MAX_UUIDSIZE];
-    uint64_t time;
+    int64_t time;
     NormalizedCoords delta;
     DeviceFloatCoords delta_raw;
     DeviceCoords absolute;
@@ -275,7 +275,7 @@ struct EventTabletTool {
     uint32_t button;
     enum BUTTON_STATE state;
     uint32_t seat_button_count;
-    uint64_t time;
+    int64_t time;
     TabletAxes axes;
     TabletTool tool;
     enum TABLE_TOOL_PROXIMITY_STATE proximity_state;
@@ -288,7 +288,7 @@ struct EventTouch {
     char deviceName[MAX_DEVICENAME];
     char uuid[MAX_UUIDSIZE];
     int32_t eventType;
-    uint64_t time;
+    int64_t time;
     int32_t slot;
     int32_t seatSlot;
     DeviceCoords point;
@@ -315,7 +315,7 @@ struct EventGesture {
     DEVICE_TYPE deviceType;
     int32_t eventType;
     char uuid[MAX_UUIDSIZE];
-    uint64_t time;
+    int64_t time;
     int32_t fingerCount;
     int32_t cancelled;
     NormalizedCoords delta;
@@ -368,7 +368,7 @@ struct EventTabletPad {
     DEVICE_TYPE deviceType;
     int32_t eventType;
     char uuid[MAX_UUIDSIZE];
-    uint64_t time;
+    int64_t time;
     uint32_t mode;
     struct {
         uint32_t number;
