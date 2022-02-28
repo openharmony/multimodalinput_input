@@ -43,8 +43,8 @@ class MultimodalKeyEventTest : public testing::Test {
 public:
     static int64_t GetNanoTime();
     static bool FindCommand(const std::string &log, const std::string &command);
-    static std::vector<std::string> SearchForLog(const std::string &command, bool noWait = false);
-    static std::vector<std::string> SearchForLog(const std::string &command,
+    static std::vector<std::string> SearchLog(const std::string &command, bool noWait = false);
+    static std::vector<std::string> SearchLog(const std::string &command,
         const std::vector<std::string> &excludes, bool noWait = false);
 };
 
@@ -79,13 +79,13 @@ bool MultimodalKeyEventTest::FindCommand(const std::string &log, const std::stri
     return std::regex_search(log, pattern);
 }
 
-std::vector<std::string> MultimodalKeyEventTest::SearchForLog(const std::string &command, bool noWait)
+std::vector<std::string> MultimodalKeyEventTest::SearchLog(const std::string &command, bool noWait)
 {
     std::vector<std::string> excludes;
-    return SearchForLog(command, excludes, noWait);
+    return SearchLog(command, excludes, noWait);
 }
 
-std::vector<std::string> MultimodalKeyEventTest::SearchForLog(const std::string &command,
+std::vector<std::string> MultimodalKeyEventTest::SearchLog(const std::string &command,
     const std::vector<std::string> &excludes, bool noWait)
 {
     MMI_LOGD("excludes.size():%{public}d", excludes.size());
@@ -117,7 +117,7 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_001, Test
 {
     RunShellUtil runCommand;
     std::string command = "Inject keyCode = 2,action = 2";
-    std::vector<std::string> slogs {SearchForLog(command, true)};
+    std::vector<std::string> slogs {SearchLog(command, true)};
     int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
     OHOS::MMI::KeyEvent::KeyItem kitDown;
@@ -141,7 +141,7 @@ HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_001, Test
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
     MMI_LOGD("response:%{public}u", response);
-    std::vector<std::string> tlogs {SearchForLog(command, slogs)};
+    std::vector<std::string> tlogs {SearchLog(command, slogs)};
     EXPECT_TRUE(!tlogs.empty());
 }
 

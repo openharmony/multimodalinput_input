@@ -64,7 +64,7 @@ const AppInfo& AppRegister::FindSocketFd(int32_t fd)
     return AppRegister::appInfoError_;
 }
 
-void AppRegister::RegisterAppInfoforServer(const AppInfo& appInfo)
+void AppRegister::RegisterAppInfoServer(const AppInfo& appInfo)
 {
     std::lock_guard<std::mutex> lock(mu_);
     surfaceInfo_.insert(std::pair<int32_t, AppInfo>(appInfo.windowId, appInfo));
