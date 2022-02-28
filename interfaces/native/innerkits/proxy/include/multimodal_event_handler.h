@@ -35,13 +35,6 @@ public:
     int32_t GetMultimodeInputInfo();
     MMIClientPtr GetMMIClient();
     int32_t InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr);
-    
-    int32_t AddKeyEventFIlter(int32_t id, std::string name, Authority authority);
-    int32_t RemoveKeyEventFIlter(int32_t id);
-    int32_t AddTouchEventFilter(int32_t id, std::string name, Authority authority);
-    int32_t RemoveTouchEventFilter(int32_t id);
-    int32_t AddEventInterceptor(int32_t id, std::string name, Authority authority);
-    int32_t RemoveEventInterceptor(int32_t id);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetDevice(int32_t taskId, int32_t deviceId);
     int32_t GetDeviceIds(int32_t taskId);    
