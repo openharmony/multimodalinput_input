@@ -46,7 +46,9 @@ public:
 protected:
     virtual void OnConnected() override;
     virtual void OnDisconnected() override;
-    bool StartFdListener();
+    bool StartEventRunner();
+    bool AddFdListener(int32_t fd);
+    bool DelFdListener(int32_t fd);
 
 protected:
     ConnectCallback funConnected_;

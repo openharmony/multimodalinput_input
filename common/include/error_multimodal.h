@@ -38,6 +38,7 @@ namespace OHOS {
         C_INVALID_INPUT_PARAM,                      // 无效的输入参数
         C_INVALID_EVENT_HANDLER_ID,                 // 无效人EventHandlerId
         C_ADD_FD_LISTENER_FAIL,                     // 增加FD监听错误
+        C_DEL_FD_LISTENER_FAIL,                     // 删除FD监听错误
     };
 
     // Error code for event simulate

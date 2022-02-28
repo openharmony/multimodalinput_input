@@ -54,41 +54,71 @@ bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
     CHKPF(msgHdlImp);
     auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, msgHdlImp, std::placeholders::_1, std::placeholders::_2);
     CHKF(StartClient(callback, detachMode), START_CLI_FAIL);
-    CHKF(StartFdListener(), START_CLI_FAIL);
+    CHKF(StartEventRunner(), START_CLI_FAIL);
     return true;
 }
 
-bool MMIClient::StartFdListener()
+bool MMIClient::StartEventRunner()
 {
     MMI_LOGD("enter");
     auto eventRunner = EventRunner::Create(false);
     CHKPF(eventRunner);
-    auto fdListener = std::make_shared<MMIFdListener>();
-    CHKPF(fdListener);
     eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner);
     CHKPF(eventHandler_);
-    constexpr uint32_t eventsMask = (FILE_DESCRIPTOR_INPUT_EVENT | FILE_DESCRIPTOR_SHUTDOWN_EVENT |
-        FILE_DESCRIPTOR_EXCEPTION_EVENT);
-    auto errCode = eventHandler_->AddFileDescriptorListener(fd_, eventsMask, fdListener);
-    if (errCode != ERR_OK) {
-        MMI_LOGE("add fd listener error,fd:%{public}d code:%{public}u str:%{public}s", fd_, errCode, 
-            eventHandler_->GetErrorStr(errCode).c_str());
-        return false;
+    if (isConnected_ && fd_ >= 0) {
+        if (!AddFdListener(fd_)) {
+            MMI_LOGE("add fd listener return false");
+            return false;
+        }
+    } else {
+        if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT)) {
+            MMI_LOGE("send reconnect event return false.");
+            return false;
+        }
     }
-    if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT)) {
-        MMI_LOGE("send reconnect event return false.");
-        return false;
-    }
+
     if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_ONTIMER, 0, EVENT_TIME_ONTIMER)) {
         MMI_LOGE("send ontimer event return false.");
         return false;
     }
-    errCode = eventRunner->Run();
+    auto errCode = eventRunner->Run();
     if (errCode != ERR_OK) {
         MMI_LOGE("event runnner run error,code:%{public}u str:%{public}s", errCode, 
             eventHandler_->GetErrorStr(errCode).c_str());
         return false;
     }
+    return true;
+}
+
+bool MMIClient::AddFdListener(int32_t fd)
+{
+    MMI_LOGD("enter");
+    CHKF(fd >= 0, C_INVALID_INPUT_PARAM);
+    CHKPF(eventHandler_);
+    constexpr uint32_t eventsMask = (FILE_DESCRIPTOR_INPUT_EVENT | FILE_DESCRIPTOR_SHUTDOWN_EVENT |
+        FILE_DESCRIPTOR_EXCEPTION_EVENT);
+    auto fdListener = std::make_shared<MMIFdListener>();
+    CHKPF(fdListener);
+    auto errCode = eventHandler_->AddFileDescriptorListener(fd, eventsMask, fdListener);
+    if (errCode != ERR_OK) {
+        MMI_LOGE("add fd listener error,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode, 
+            eventHandler_->GetErrorStr(errCode).c_str());
+        return false;
+    }
+    uint64_t tid = GetThisThreadIdOfLL();
+    CHKF(tid > 0, VAL_NOT_EXP);
+    isRunning_ = true;
+    MMI_LOGI("serverFd:%{public}d was listening,mask:%{public}u,threadId:%{public}" PRIu64 "", fd, eventsMask);
+    return true;
+}
+
+bool MMIClient::DelFdListener(int32_t fd)
+{
+    MMI_LOGD("enter");
+    CHKF(fd >= 0, C_INVALID_INPUT_PARAM);
+    CHKPF(eventHandler_);
+    eventHandler_->RemoveFileDescriptorListener(fd);
+    isRunning_ = false;
     return true;
 }
 
@@ -132,6 +162,7 @@ void MMIClient::OnDisconnected()
     }
     isConnected_ = false;
     EventManager.ClearAll();
+    CK(DelFdListener(fd_), C_DEL_FD_LISTENER_FAIL);
 }
 
 void MMIClient::OnConnected()
@@ -141,6 +172,9 @@ void MMIClient::OnConnected()
         funConnected_(*this);
     }
     isConnected_ = true;
+    if (!isRunning_ && fd_ >= 0) {
+        CHK(AddFdListener(fd_), C_ADD_FD_LISTENER_FAIL);
+    }
 }
 
 int32_t MMIClient::Socket()

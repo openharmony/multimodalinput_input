@@ -89,7 +89,6 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
 {
     MMI_LOGD("enter detachMode = %d", detachMode);
     recvFun_ = fun;
-    isRunning_ = true;
     isConnected_ = true;
     if (ConnectTo() < 0) {
         MMI_LOGW("Client connection failed, Try again later");
@@ -196,6 +195,7 @@ void UDSClient::OnThread(std::promise<bool>& threadPromise)
     MMI_LOGD("begin");
     SetThreadName("uds_client");
     isThreadHadRun_ = true;
+    isRunning_ = true;
     StreamBuffer streamBuf;
     epoll_event events[MAX_EVENT_SIZE] = {};
 
