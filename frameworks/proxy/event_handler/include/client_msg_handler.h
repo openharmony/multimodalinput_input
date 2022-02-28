@@ -87,6 +87,7 @@ protected:
     virtual int32_t OnInputDeviceIds(const UDSClient& client, NetPacket& pkt);
     virtual int32_t TouchpadEventInterceptor(const UDSClient& client, NetPacket& pkt);
     virtual int32_t KeyEventInterceptor(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t ClientTest001(const UDSClient& client, NetPacket& pkt);
 
 private:
     int32_t PackedData(const UDSClient& client, NetPacket& pkt, const std::string& funName, MultimodalEvent& multe);
