@@ -39,7 +39,7 @@ void InputTest::TearDownTestCase(void)
 #ifdef OHOS_BUILD_AI
 HWTEST_F(InputTest, Init_001, TestSize.Level1)
 {
-    UDSServer udsServer;
+    UDSServer udsServer = nullptr;
     ServerMsgHandler serverMsgHandler;
     SeniorInputFuncProcBase seniorInputFuncProc;
     serverMsgHandler.Init(udsServer);
@@ -49,7 +49,7 @@ HWTEST_F(InputTest, Init_001, TestSize.Level1)
 
 HWTEST_F(InputTest, OnMsgHandler, TestSize.Level1)
 {
-    SessionPtr sess;
+    SessionPtr sess = nullptr;
     NetPacket pkt(static_cast<MmiMessageId>(10));
     ServerMsgHandler serverMsgHandler;
     serverMsgHandler.OnMsgHandler(sess, pkt);
@@ -57,7 +57,7 @@ HWTEST_F(InputTest, OnMsgHandler, TestSize.Level1)
 
 HWTEST_F(InputTest, OnMsgHandler_01, TestSize.Level1)
 {
-    SessionPtr sess;
+    SessionPtr sess = nullptr;
     NetPacket pkt(MmiMessageId::INVALID);
     ServerMsgHandler serverMsgHandler;
     serverMsgHandler.OnMsgHandler(sess, pkt);
@@ -65,7 +65,7 @@ HWTEST_F(InputTest, OnMsgHandler_01, TestSize.Level1)
 
 HWTEST_F(InputTest, OnMsgHandler_02, TestSize.Level1)
 {
-    SessionPtr sess;
+    SessionPtr sess = nullptr;
     NetPacket pkt(static_cast<MmiMessageId>(-10));
     ServerMsgHandler serverMsgHandler;
     serverMsgHandler.OnMsgHandler(sess, pkt);
