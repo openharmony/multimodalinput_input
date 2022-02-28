@@ -30,9 +30,9 @@ namespace MMI {
 class NetPacket : public StreamBuffer {
      static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NetPacket" };
 public:
-    explicit NetPacket(MmiMessageId idMsg);
-    NetPacket(const NetPacket& pack);
-    NetPacket& operator = (const NetPacket& pack);
+    explicit NetPacket(MmiMessageId msgId);
+    NetPacket(const NetPacket& pkt);
+    NetPacket& operator = (const NetPacket& pkt);
     DISALLOW_MOVE(NetPacket);
     virtual ~NetPacket();
 
@@ -48,11 +48,11 @@ public:
     }
     MmiMessageId GetMsgId() const
     {
-        return idMsg_;
+        return msgId_;
     }
 
 protected:
-    MmiMessageId idMsg_ = MmiMessageId::INVALID;
+    MmiMessageId msgId_ = MmiMessageId::INVALID;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -89,7 +89,7 @@ HWTEST_F(MultimodalEventHandlerApiTest, Api_Test_GetAbilityInfoVec, TestSize.Lev
         retWindowId = iter[0].windowId;
     }
     EXPECT_EQ(retWindowId, windowId);
-    EXPECT_EQ(ret, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+    EXPECT_EQ(ret, MMI_STANDARD_EVENT_INVALID_PARAM);
 }
 
 HWTEST_F(MultimodalEventHandlerApiTest, Api_Test_RegisterStandardizedEventHandle_01, TestSize.Level1)
@@ -118,7 +118,7 @@ HWTEST_F(MultimodalEventHandlerApiTest, Api_Test_RegisterStandardizedEventHandle
     int32_t windowId = 1;
     StandEventPtr standardizedEventHandle = nullptr;
     auto ret = multimodalEventHandlerTest.RegisterStandardizedEventHandle(token, windowId, standardizedEventHandle);
-    EXPECT_EQ(ret, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+    EXPECT_EQ(ret, MMI_STANDARD_EVENT_INVALID_PARAM);
 }
 
 HWTEST_F(MultimodalEventHandlerApiTest, Api_Test_UnregisterStandardizedEventHandle_02, TestSize.Level1)

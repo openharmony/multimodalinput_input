@@ -26,7 +26,7 @@ namespace MMIS {
 namespace {
     constexpr HiLogLabel LABEL = { LOG_CORE, 0xD002800, "HdfDeviceEventDispatch"};
 }
-std::unique_ptr<VirtualTouchScreen> g_pTouchScreen;
+std::unique_ptr<VirtualTouchScreen> g_pTouchScreen = nullptr;
 InjectThread HdfDeviceEventDispatch::injectThread_;
 
 HdfDeviceEventDispatch::HdfDeviceEventDispatch(const uint32_t maxX, const uint32_t maxY)

@@ -81,7 +81,7 @@ struct DeviceInformation {
 };
 
 struct InjectEvent {
-    input_event event;
+    struct input_event event;
     int32_t blockTime;
 };
 

@@ -82,7 +82,7 @@ bool ServerInputFilterManager::OnKeyEvent(const EventKeyboard& key)
         MMI_LOGD("keyEventFilterMap_ is empty");
         return false;
     }
-    SessionPtr temp;
+    SessionPtr temp = nullptr;
     int32_t id = 0;
     Authority authorityTemp = NO_AUTHORITY;
     for (auto &item : keyEventFilterMap_) {
@@ -217,8 +217,8 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
     }
 }
 
-bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
-    const EventTouch& touch, const uint64_t preHandlerTime)
+bool ServerInputFilterManager::OnTouchEvent(struct libinput_event *event,
+    const EventTouch& touch, const int64_t preHandlerTime)
 {
     MMI_LOGD("Enter");
     CHKPF(event);
@@ -226,7 +226,7 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
         MMI_LOGE("touchEventFilterMap_ is empty");
         return false;
     }
-    SessionPtr temp;
+    SessionPtr temp = nullptr;
     int32_t id = 0;
     Authority authorityTemp = NO_AUTHORITY;
     for (auto &item : touchEventFilterMap_) {
@@ -260,16 +260,16 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
     int32_t testBufferState = 0;
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, touch.time)) {
-        NetPacket newPacket(MmiMessageId::TOUCH_EVENT_INTERCEPTOR);
+        NetPacket pkt(MmiMessageId::TOUCH_EVENT_INTERCEPTOR);
         int32_t fingerCount = MMIRegEvent->GetTouchInfoSizeDeviceId(touch.deviceId);
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
             fingerCount++;
         }
-        newPacket << fingerCount;
+        pkt << fingerCount;
         POINT_EVENT_TYPE pointEventType = EVENT_TYPE_INVALID;
         OnEventTouchGetPointEventType(touch, fingerCount, pointEventType);
         int32_t eventType = pointEventType;
-        newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime;
+        pkt << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime;
 
         std::vector<std::pair<uint32_t, int32_t>> touchIds;
         MMIRegEvent->GetTouchIds(touch.deviceId, touchIds);
@@ -287,11 +287,11 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
                          touchTemp.physical, touchTemp.eventType, touchTemp.slot, touchTemp.seatSlot,
                          touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, appInfo.fd,
                          preHandlerTime);
-                newPacket << touchTemp;
+                pkt << touchTemp;
             }
         }
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
-            newPacket << touch;
+            pkt << touch;
             MMI_LOGD("4.event filter of server 2:eventTouch:time:%{public}" PRId64 ", deviceType:%{public}u,"
                      "deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,"
                      "slot:%{public}d,seatSlot:%{public}d,pressure:%{public}lf,point.x:%{public}lf,"
@@ -300,8 +300,8 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
                      touch.physical, touch.eventType, touch.slot, touch.seatSlot, touch.pressure,
                      touch.point.x, touch.point.y, appInfo.fd, preHandlerTime);
         }
-        newPacket << id;
-        if (!temp->SendMsg(newPacket)) {
+        pkt << id;
+        if (!temp->SendMsg(pkt)) {
             MMI_LOGE("Sending Interceptor EventTouch failed, session.fd:%{public}d", temp->GetFd());
             return false;
         }
@@ -365,7 +365,7 @@ bool ServerInputFilterManager::OnPointerEvent(EventPointer event_pointer)
         MMI_LOGD("pointerEventFilterMap_ is empty");
         return false;
     }
-    SessionPtr ptr;
+    SessionPtr ptr = nullptr;
     int32_t id;
     Authority authority = NO_AUTHORITY;
     for (auto &item : pointerEventFilterMap_) {

@@ -431,22 +431,6 @@ public:
     const char* DumpPointerAction() const;
 
     /**
-     * @brief Sets the value of the <b>skipInspection</b> flag.
-     * @param skipInspection Indicates the value of the <b>skipInspection</b> flag to set. The value <b>true</b> means that the
-     * event will skip the processing of the listener and interceptor, and the value <b>false</b> means the opposite.
-     * @return void
-     * @since 8
-     */
-    void SetSkipInspection(bool skipInspection);
-
-    /**
-     * @brief Reads the value of the <b>skipInspection</b> flag.
-     * @return Returns <b>true</b> if the event needs to skip the processing of the listener and interceptor; returns <b>false></b> otherwise.
-     * @since 8
-     */
-    bool NeedSkipInspection();
-
-    /**
      * @brief Obtains the pointer ID in this event.
      * @return Returns the pointer ID.
      * @since 8
@@ -667,7 +651,6 @@ private:
     bool IsValidCheckTouch() const;
 
 private:
-    bool skipInspection_ { false };
     int32_t pointerId_ { 0 };
     std::list<PointerItem> pointers_;
     std::set<int32_t> pressedButtons_;

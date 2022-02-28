@@ -76,7 +76,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, RegisterStandardizedEventHandle_001, Test
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
     int32_t windowId = 1;
-    StandEventPtr standardizedEventHandle;
+    StandEventPtr standardizedEventHandle = nullptr;
     int32_t retResult = multimodalTest.RegisterStandardizedEventHandle(iRemote,
                                                                        windowId, standardizedEventHandle);
     EXPECT_TRUE(retResult != 1);
@@ -89,7 +89,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, RegisterStandardizedEventHandle_002, Test
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
     auto windowId = static_cast<int32_t>('b');
-    StandEventPtr standardizedEventHandle;
+    StandEventPtr standardizedEventHandle = nullptr;
     int32_t retResult = multimodalTestTmp.RegisterStandardizedEventHandle(iRemote,
                                                                           windowId, standardizedEventHandle);
     EXPECT_TRUE(retResult != 1);
@@ -102,7 +102,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, RegisterStandardizedEventHandle_003, Test
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
     auto windowId = static_cast<int32_t>('c');
-    StandEventPtr standardizedEventHandle;
+    StandEventPtr standardizedEventHandle = nullptr;
     int32_t retResult = multimodalTestTmp.RegisterStandardizedEventHandle(iRemote,
                                                                           windowId, standardizedEventHandle);
     EXPECT_TRUE(retResult != 1);
@@ -115,7 +115,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, RegisterStandardizedEventHandle_004, Test
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
     auto windowId = static_cast<int32_t>('c') + static_cast<int32_t>('u');
-    StandEventPtr standardizedEventHandle;
+    StandEventPtr standardizedEventHandle = nullptr;
     int32_t retResult = multimodalTestTmp.RegisterStandardizedEventHandle(iRemote,
                                                                           windowId, standardizedEventHandle);
     EXPECT_TRUE(retResult != 1);
@@ -128,7 +128,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, RegisterStandardizedEventHandle_005, Test
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
     int32_t windowId = -65535;
-    StandEventPtr standardizedEventHandle;
+    StandEventPtr standardizedEventHandle = nullptr;
     int32_t retResult = multimodalTestTmp.RegisterStandardizedEventHandle(iRemote,
                                                                           windowId, standardizedEventHandle);
     EXPECT_TRUE(retResult != 1);
@@ -141,7 +141,7 @@ HWTEST_F(MultimodalSemanagerFirstTest, RegisterStandardizedEventHandle_006, Test
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
     int32_t windowId = 2147483647;
-    StandEventPtr standardizedEventHandle;
+    StandEventPtr standardizedEventHandle = nullptr;
     int32_t retResult = multimodalTestTmp.RegisterStandardizedEventHandle(iRemote,
                                                                           windowId, standardizedEventHandle);
     EXPECT_TRUE(retResult != 1);

@@ -44,7 +44,7 @@ HWTEST_F(KeyboardEventTest, Initialize_true, TestSize.Level1)
     int32_t highLevelEvent = 1;
     std::string strUuid = "111";
     int32_t sourceType = 1;
-    uint64_t occurredTime = 1;
+    int64_t occurredTime = 1;
     std::string deviceId = "111";
     int32_t inputDeviceId = 1;
     bool isHighLevelEvent = true;
@@ -134,7 +134,7 @@ HWTEST_F(KeyboardEventTest, Initialize_false, TestSize.Level1)
     int32_t highLevelEvent = 1;
     std::string strUuid = "222";
     int32_t sourceType = 1;
-    uint64_t occurredTime = 1;
+    int64_t occurredTime = 1;
     std::string deviceId = "111";
     int32_t inputDeviceId = 1;
     bool isHighLevelEvent = false;

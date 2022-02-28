@@ -60,9 +60,9 @@ public:
     }
 
     void UpdateDescript();
-    void AddEvent(int32_t id, uint64_t time);
+    void AddEvent(int32_t id, int64_t time);
     void DelEvents(int32_t id);
-    uint64_t GetFirstEventTime();
+    int64_t GetFirstEventTime();
     void ClearEventsVct();
     bool EventsIsEmpty();
     bool isANRProcess_ {false};
@@ -78,7 +78,7 @@ public:
 protected:
     struct EventTime {
         int32_t id;
-        uint64_t eventTime;
+        int64_t eventTime;
     };
     std::vector<EventTime> events_;
     std::string descript_;

@@ -29,7 +29,7 @@ namespace {
 
 int32_t TestAuxToolClient::ExecuteAllCommand()
 {
-    timeval time;
+    struct timeval time;
     RawInputEvent rawEvent = {};
     for (uint32_t item = 0; item < AI_CODE_MAX; item++) {
         gettimeofday(&time, 0);
@@ -37,9 +37,9 @@ int32_t TestAuxToolClient::ExecuteAllCommand()
         rawEvent.ev_type = static_cast<uint32_t>(INPUT_DEVICE_CAP_AI_SENSOR);
         rawEvent.ev_code = GetAiSensorAllowProcCodes(item);
         rawEvent.ev_value = item;
-        NetPacket cktAi(MmiMessageId::SENIOR_INPUT_FUNC);
-        cktAi << rawEvent;
-        SendMsg(cktAi);
+        NetPacket pkt(MmiMessageId::SENIOR_INPUT_FUNC);
+        pkt << rawEvent;
+        SendMsg(pkt);
     }
     return RET_OK;
 }

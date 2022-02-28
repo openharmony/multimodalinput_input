@@ -52,7 +52,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
     ssize_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
     if (ret < 0) {
         const int32_t errNoSaved = errno;
-        MMI_LOGE("UDSSession::SendMsg write return %{public}zd,"
+        MMI_LOGE("write return %{public}zd,"
                  "fd_:%{public}d,errNoSaved:%{public}d,strerror:%{public}s",
                  ret, fd_, errNoSaved, strerror(errNoSaved));
         return false;
@@ -92,7 +92,7 @@ bool UDSSession::SendMsg(NetPacket& pkt) const
     return SendMsg(buf.Data(), buf.Size());
 }
 
-void UDSSession::AddEvent(int32_t id, uint64_t time)
+void UDSSession::AddEvent(int32_t id, int64_t time)
 {
     MMI_LOGI("begin");
     EventTime eventTime = {id, time};
@@ -119,7 +119,7 @@ void UDSSession::DelEvents(int32_t id)
     MMI_LOGI("end");
 }
 
-uint64_t UDSSession::GetFirstEventTime()
+int64_t UDSSession::GetFirstEventTime()
 {
     MMI_LOGI("begin");
     if (events_.empty()) {
