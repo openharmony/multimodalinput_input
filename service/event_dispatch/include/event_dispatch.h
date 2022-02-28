@@ -17,7 +17,6 @@
 #include "uds_server.h"
 #include "key_event.h"
 #include "key_event_value_transformation.h"
-#include "standard_event_handler.h"
 #include "event_package.h"
 #include "nocopyable.h"
 #include "pointer_event.h"
@@ -69,7 +68,6 @@ private:
 
 private:
     EventPackage eventPackage_;
-    StandardEventHandler standardEvent_;
     /*
      * Differentiated event handling
      */
