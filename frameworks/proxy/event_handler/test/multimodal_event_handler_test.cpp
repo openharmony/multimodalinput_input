@@ -52,7 +52,7 @@ public:
 
     virtual bool OnKey(const OHOS::KeyEvent& keyEvent) override
     {
-        MMI_LOGD("AppKeyEventHandle::Onkey KeyCode:%{public}d", keyEvent.GetKeyCode());
+        MMI_LOGD("KeyCode:%{public}d", keyEvent.GetKeyCode());
         return true;
     }
 };
@@ -104,7 +104,7 @@ void MultimodalEventHandlerTest::UnregisterStandardizedEventHandle()
 {
     MMI_LOGD("enter");
     for (auto it = handerMap_.begin(); it != handerMap_.end();) {
-        MMI_LOGD("UnregisterStandardizedEventHandle:%{public}s", it->first.c_str());
+        MMI_LOGD("%{public}s", it->first.c_str());
         MMIEventHdl.UnregisterStandardizedEventHandle(remoteObject_, windowId_, it->second);
         handerMap_.erase(it++);
     }
