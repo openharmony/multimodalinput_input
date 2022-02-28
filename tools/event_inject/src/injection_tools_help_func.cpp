@@ -14,7 +14,7 @@
  */
 
 #include "injection_tools_help_func.h"
-#include <string.h>
+#include <string>
 
 using namespace OHOS::MMI;
 
