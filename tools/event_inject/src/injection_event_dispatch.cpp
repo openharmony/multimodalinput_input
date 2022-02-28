@@ -431,15 +431,15 @@ int32_t InjectionEventDispatch::OnHdiHot()
     std::string deviceStatusText = injectArgvs_[HDI_STATUS_INDEX];
     int32_t status = GetDeviceStatus(deviceStatusText);
     if (status == RET_ERR) {
-        MMI_LOGE("OnHdiHot status error ,status:%{public}d", status);
+        MMI_LOGE("status error ,status:%{public}d", status);
         return RET_ERR;
     }
 
     std::string deviceNameText = injectArgvs_.at(HDI_DEVICE_NAME_INDEX);
     int32_t index = GetDeviceIndex(deviceNameText);
-    MMI_LOGI("OnHdiHot index  = %d", index);
+    MMI_LOGI("index  = %d", index);
     if (index == RET_ERR) {
-        MMI_LOGE("OnHdiHot index error ,index:%{public}d", index);
+        MMI_LOGE("index error ,index:%{public}d", index);
         return RET_ERR;
     }
 
