@@ -42,10 +42,16 @@ void ManipulationEvent::Initialize(int32_t windowId, int64_t startTime, int32_t 
     pointerCount_ = pointerCount;
     if (fingersInfos != nullptr) {
         int32_t ret = memset_s(fingersInfos_, sizeof(fingerInfos) * FINGER_NUM, 0, sizeof(fingerInfos) * FINGER_NUM);
-        CHK(ret == EOK, MEMSET_SEC_FUN_FAIL);
+        if (ret != EOK) {
+            MMI_LOGE("Memset data is failed, errCode:%{public}d", MEMSET_SEC_FUN_FAIL);
+            return;
+        }
         ret = memcpy_s(fingersInfos_, sizeof(fingerInfos) * FINGER_NUM, fingersInfos,
                        sizeof(fingerInfos) * pointerCount);
-        CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
+        if (ret != EOK) {
+            MMI_LOGE("Memset data is failed, errCode:%{public}d", MEMSET_SEC_FUN_FAIL);
+            return;
+        }
     }
 }
 
@@ -58,7 +64,10 @@ void ManipulationEvent::Initialize(ManipulationEvent& maniPulationEvent)
     pointerCount_ = maniPulationEvent.GetPointerCount();
     int32_t ret = memcpy_s(fingersInfos_, sizeof(fingersInfos_) * FINGER_NUM, maniPulationEvent.GetFingersInfos(),
                            sizeof(fingerInfos)*FINGER_NUM);
-    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
+    if (ret != EOK) {
+        MMI_LOGE("Memset data is failed, errCode:%{public}d", MEMSET_SEC_FUN_FAIL);
+        return;
+    }
 }
 
 int64_t ManipulationEvent::GetStartTime() const
