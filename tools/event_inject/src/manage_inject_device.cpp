@@ -40,7 +40,7 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
         deviceName = item.at("deviceName").get<std::string>();
         InputEventArray inputEventArray = {};
         inputEventArray.deviceName = deviceName;
-#ifndef OHOS_BUILD_HDF
+
         uint16_t devIndex = 0;
         if (item.find("devIndex") != item.end()) {
             devIndex = item.at("devIndex").get<uint16_t>();
@@ -49,7 +49,7 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
             return RET_ERR;
         }
         inputEventArray.target = deviceNode;
-#endif
+
         devicePtr_ = getDeviceObject.CreateDeviceObject(deviceName);
         if (devicePtr_ == nullptr) {
             return RET_ERR;
@@ -70,17 +70,7 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
 
 int32_t ManageInjectDevice::SendEvent(const InputEventArray& inputEventArray)
 {
-#ifdef OHOS_BUILD_HDF
-    return SendEventToHdi(inputEventArray);
-#else
     return SendEventToDeviveNode(inputEventArray);
-#endif
-}
-
-int32_t ManageInjectDevice::SendEventToHdi(const InputEventArray& inputEventArray)
-{
-    SendMessage sendMessage;
-    return sendMessage.SendToHdi(inputEventArray);
 }
 
 int32_t ManageInjectDevice::SendEventToDeviveNode(const InputEventArray& inputEventArray)

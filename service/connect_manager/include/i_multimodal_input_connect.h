@@ -37,8 +37,6 @@ public:
 
     enum {
         CONNECT_MODULE_TYPE_MMI_CLIENT = 0,
-        CONNECT_MODULE_TYPE_AI = 1,
-        CONNECT_MODULE_TYPE_SIMULATE_INJECT = 2,
     };
 };
 } // namespace MMI

@@ -48,10 +48,6 @@ ohos_executable("mmi-server") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
-
   install_enable = true
   part_name = "multimodalinput_base"
 }

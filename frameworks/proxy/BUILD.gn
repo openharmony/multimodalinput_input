@@ -149,10 +149,6 @@ ohos_unittest("ut-mmi-proxy-out") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
-
   sources = [ "module_loader/test/mmi_client_test.cpp" ]
 
   deps = [
@@ -209,10 +205,6 @@ ohos_unittest("KeyEventTest") {
 
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
-
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
   }
 
   sources = [ "events/test/key_event_test.cpp" ]
@@ -273,10 +265,6 @@ ohos_unittest("InputManagerTest") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
-
   sources = [ "events/test/input_manager_test.cpp" ]
 
   deps = [
@@ -335,10 +323,6 @@ ohos_unittest("InputManagerManualTest") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
-
   sources = [ "events/test/input_manager_manual_test.cpp" ]
 
   deps = [
@@ -395,10 +379,6 @@ ohos_unittest("PointerEventTest") {
 
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
-
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
   }
 
   sources = [ "events/test/pointer_event_test.cpp" ]
