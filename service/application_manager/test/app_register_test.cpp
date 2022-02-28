@@ -33,7 +33,7 @@ public:
     static void TearDownTestCase(void) {}
 };
 
-HWTEST_F(AppRegisterTest, RegisterAppInfoforServer, TestSize.Level1)
+HWTEST_F(AppRegisterTest, RegisterAppInfoServer, TestSize.Level1)
 {
     const AppInfo a[] = {
         {1004, 101, 16, "", ""},
@@ -45,7 +45,7 @@ HWTEST_F(AppRegisterTest, RegisterAppInfoforServer, TestSize.Level1)
     AppInfo testVal;
     AppRegister appReg;
     for (int32_t i = 0; i < 5; i++) {
-        appReg.RegisterAppInfoforServer(a[i]);
+        appReg.RegisterAppInfoServer(a[i]);
     }
     appReg.PrintfMap();
 
@@ -495,16 +495,16 @@ HWTEST_F(AppRegisterTest, UnregisterEventHandleManager_008, TestSize.Level1)
     EXPECT_TRUE(retResult != 0);
 }
 
-HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_001, TestSize.Level1)
+HWTEST_F(AppRegisterTest, RegisterAppInfoServer_001, TestSize.Level1)
 {
     AppRegister appRegister;
     const AppInfo a = { 1004, 101, 16, "", ""};
-    appRegister.RegisterAppInfoforServer(a);
+    appRegister.RegisterAppInfoServer(a);
     int32_t fd = 4;
     appRegister.UnregisterAppInfoSocketFd(fd);
 }
 
-HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_002, TestSize.Level1)
+HWTEST_F(AppRegisterTest, RegisterAppInfoServer_002, TestSize.Level1)
 {
     AppRegister appRegister;
     const AppInfo a[] = {
@@ -512,13 +512,13 @@ HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_002, TestSize.Level1)
         {1005, 102, 17, "", ""}
     };
     for (int32_t i = 0; i < 2; i++) {
-        appRegister.RegisterAppInfoforServer(a[i]);
+        appRegister.RegisterAppInfoServer(a[i]);
     }
     int32_t fd = 8;
     appRegister.UnregisterAppInfoSocketFd(fd);
 }
 
-HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_003, TestSize.Level1)
+HWTEST_F(AppRegisterTest, RegisterAppInfoServer_003, TestSize.Level1)
 {
     AppRegister appRegister;
     const AppInfo a[] = {
@@ -527,13 +527,13 @@ HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_003, TestSize.Level1)
         {1006, 103, 18, "", ""}
     };
     for (int32_t i = 0; i < 3; i++) {
-        appRegister.RegisterAppInfoforServer(a[i]);
+        appRegister.RegisterAppInfoServer(a[i]);
     }
     int32_t fd = 12;
     appRegister.UnregisterAppInfoSocketFd(fd);
 }
 
-HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_004, TestSize.Level1)
+HWTEST_F(AppRegisterTest, RegisterAppInfoServer_004, TestSize.Level1)
 {
     AppRegister appRegister;
     const AppInfo a[] = {
@@ -543,13 +543,13 @@ HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_004, TestSize.Level1)
         {1007, 104, 19, "", ""}
     };
     for (int32_t i = 0; i < 4; i++) {
-        appRegister.RegisterAppInfoforServer(a[i]);
+        appRegister.RegisterAppInfoServer(a[i]);
     }
     int32_t fd = 16;
     appRegister.UnregisterAppInfoBySocketFd(fd);
 }
 
-HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_005, TestSize.Level1)
+HWTEST_F(AppRegisterTest, RegisterAppInfoServer_005, TestSize.Level1)
 {
     AppRegister appRegister;
     const AppInfo a[] = {
@@ -560,13 +560,13 @@ HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_005, TestSize.Level1)
         {1005, 105, 20, "", ""}
     };
     for (int32_t i = 0; i < 5; i++) {
-        appRegister.RegisterAppInfoforServer(a[i]);
+        appRegister.RegisterAppInfoServer(a[i]);
     }
     int32_t fd = 20;
     appRegister.UnregisterAppInfoSocketFd(fd);
 }
 
-HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_006, TestSize.Level1)
+HWTEST_F(AppRegisterTest, RegisterAppInfoServer_006, TestSize.Level1)
 {
     AppRegister appRegister;
     int32_t fd = 16;
@@ -578,7 +578,7 @@ HWTEST_F(AppRegisterTest, RegisterAppInfoforServer_006, TestSize.Level1)
         {1005, 105, 20, "", ""}
     };
     for (int32_t i = 0; i < 5; i++) {
-        appRegister.RegisterAppInfoforServer(a[i]);
+        appRegister.RegisterAppInfoServer(a[i]);
     }
     appRegister.UnregisterAppInfoSocketFd(fd);
 }

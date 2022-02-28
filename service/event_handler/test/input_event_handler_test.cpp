@@ -26,9 +26,9 @@
 #include "util.h"
 
 namespace {
-    using namespace testing::ext;
-    using namespace OHOS::MMI;
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventHandlerTest" };
+using namespace testing::ext;
+using namespace OHOS::MMI;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventHandlerTest" };
 
 static void LibinputDrainEvents(libinput* li)
 {

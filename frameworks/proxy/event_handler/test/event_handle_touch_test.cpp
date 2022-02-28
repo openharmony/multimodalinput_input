@@ -31,9 +31,9 @@ using namespace OHOS::MMI;
 
 namespace OHOS {
 namespace MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventHandleTouchTest" };
-    }
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventHandleTouchTest" };
+} // namespace
 }
 }
 
