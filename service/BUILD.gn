@@ -17,7 +17,6 @@ mmi_service_path = "${mmi_path}/service"
 
 config("libmmi_server_public_config") {
   include_dirs = [
-    "senior_input_func_proc/include",
     "device_manager/include",
     "device_scalability/include",
     "event_dispatch/include",
@@ -142,14 +141,6 @@ ohos_shared_library("libmmi-server") {
     ]
   }
 
-  if (is_mmi_have_ai) {
-    sources += [
-      "senior_input_func_proc/src/ai_func_proc.cpp",
-      "senior_input_func_proc/src/knuckle_func_proc.cpp",
-      "senior_input_func_proc/src/senior_input_func_proc_base.cpp",
-    ]
-  }
-
   sources += [ "module_loader/src/mmi_service.cpp" ]
 
   public_configs = [ ":libmmi_server_public_config" ]
@@ -240,7 +231,6 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/service/include",
-    "${mmi_path}/service/senior_input_func_proc/include",
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/device_scalability/include",
     "${mmi_path}/service/event_dispatch/include",
