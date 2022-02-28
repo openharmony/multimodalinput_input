@@ -14,6 +14,7 @@
  */
 
 #include "mmi_client.h"
+#include <cinttypes>
 #include "mmi_log.h"
 #include "proto.h"
 #include "util.h"
@@ -61,9 +62,9 @@ bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
 bool MMIClient::StartEventRunner()
 {
     MMI_LOGD("enter");
-    auto eventRunner = EventRunner::Create(false);
-    CHKPF(eventRunner);
-    eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner);
+    eventRunner_ = EventRunner::Create(false);
+    CHKPF(eventRunner_);
+    eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner_, GetPtr());
     CHKPF(eventHandler_);
     if (isConnected_ && fd_ >= 0) {
         if (!AddFdListener(fd_)) {
@@ -77,13 +78,13 @@ bool MMIClient::StartEventRunner()
         }
     }
 
-    if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_ONTIMER, 0, EVENT_TIME_ONTIMER)) {
-        MMI_LOGE("send ontimer event return false.");
-        return false;
-    }
-    auto errCode = eventRunner->Run();
+    // if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_ONTIMER, 0, EVENT_TIME_ONTIMER)) {
+    //     MMI_LOGE("send ontimer event return false.");
+    //     return false;
+    // }
+    auto errCode = eventRunner_->Run();
     if (errCode != ERR_OK) {
-        MMI_LOGE("event runnner run error,code:%{public}u str:%{public}s", errCode, 
+        MMI_LOGE("event runnner run error,code:%{public}u str:%{public}s", errCode,
             eventHandler_->GetErrorStr(errCode).c_str());
         return false;
     }
@@ -95,20 +96,19 @@ bool MMIClient::AddFdListener(int32_t fd)
     MMI_LOGD("enter");
     CHKF(fd >= 0, C_INVALID_INPUT_PARAM);
     CHKPF(eventHandler_);
-    constexpr uint32_t eventsMask = (FILE_DESCRIPTOR_INPUT_EVENT | FILE_DESCRIPTOR_SHUTDOWN_EVENT |
-        FILE_DESCRIPTOR_EXCEPTION_EVENT);
-    auto fdListener = std::make_shared<MMIFdListener>();
-    CHKPF(fdListener);
-    auto errCode = eventHandler_->AddFileDescriptorListener(fd, eventsMask, fdListener);
+    fdListener_ = std::make_shared<MMIFdListener>(GetPtr());
+    CHKPF(fdListener_);
+    auto errCode = eventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_EVENTS_MASK, fdListener_);
     if (errCode != ERR_OK) {
-        MMI_LOGE("add fd listener error,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode, 
+        MMI_LOGE("add fd listener error,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode,
             eventHandler_->GetErrorStr(errCode).c_str());
         return false;
     }
     uint64_t tid = GetThisThreadIdOfLL();
-    CHKF(tid > 0, VAL_NOT_EXP);
+    int32_t pid = GetPid();
     isRunning_ = true;
-    MMI_LOGI("serverFd:%{public}d was listening,mask:%{public}u,threadId:%{public}" PRIu64 "", fd, eventsMask);
+    MMI_LOGI("serverFd:%{public}d was listening,mask:%{public}u pid:%{public}d threadId:%{public}" PRIu64,
+        fd, FILE_DESCRIPTOR_EVENTS_MASK, pid, tid);
     return true;
 }
 
@@ -120,6 +120,18 @@ bool MMIClient::DelFdListener(int32_t fd)
     eventHandler_->RemoveFileDescriptorListener(fd);
     isRunning_ = false;
     return true;
+}
+
+void MMIClient::OnRecvMsg(const char *buf, size_t size)
+{
+    CHKPV(buf);
+    CHK(size > 0, C_INVALID_INPUT_PARAM);
+    OnRecv(buf, size);
+}
+
+int32_t MMIClient::Reconnect()
+{
+    return ConnectTo();
 }
 
 void MMIClient::RegisterConnectedFunction(ConnectCallback fun)
@@ -172,7 +184,7 @@ void MMIClient::OnConnected()
         funConnected_(*this);
     }
     isConnected_ = true;
-    if (!isRunning_ && fd_ >= 0) {
+    if (!isRunning_ && fd_ >= 0 && eventHandler_ != nullptr) {
         CHK(AddFdListener(fd_), C_ADD_FD_LISTENER_FAIL);
     }
 }
