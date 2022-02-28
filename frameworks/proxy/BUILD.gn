@@ -416,6 +416,7 @@ ohos_unittest("PointerEventTest") {
 group("ut-mmi-proxy") {
   testonly = true
   deps = [
+    ":InputManagerTest",
     ":KeyEventTest",
     ":PointerEventTest",
     ":ut-mmi-proxy-out",

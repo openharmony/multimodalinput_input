@@ -136,7 +136,6 @@ ohos_unittest("ut-event-injection-out") {
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/service/include",
     "${mmi_path}/service/ai_sensor_adapter/include",
-    "${mmi_path}/service/application_manager/include",
     "${mmi_path}/service/device_scalability/include",
     "${mmi_path}/service/event_dispatch/include",
     "${mmi_path}/service/event_handler/include",
