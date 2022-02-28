@@ -15,12 +15,11 @@
 
 #include "injection_tools_help_func.h"
 
-using namespace std;
 using namespace OHOS::MMI;
 
-string InjectionToolsHelpFunc::GetHelpText()
+std::string InjectionToolsHelpFunc::GetHelpText()
 {
-    string ret = "\n                           Harmony device event injection ...\n\n"
+    std::string ret = "\n                           Harmony device event injection ...\n\n"
         "---------------------------------global commands:----------------------------------\n"
         "aisensor-all    -Inject all voice events\n"
         "aisensor-each   -Inject a single voice event\n"
