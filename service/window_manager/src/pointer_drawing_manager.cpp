@@ -104,7 +104,8 @@ void PointerDrawingManager::FixCursorPosition(int32_t &globalX, int32_t &globalY
 
 void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t globalX, int32_t globalY)
 {
-    sptr<OHOS::Rosen::WindowOption> option = new OHOS::Rosen::WindowOption();
+    sptr<OHOS::Rosen::WindowOption> option = new (std::nothrow) OHOS::Rosen::WindowOption();
+    CHKPV(option);
     option->SetWindowType(OHOS::Rosen::WindowType::WINDOW_TYPE_POINTER);
     option->SetWindowMode(OHOS::Rosen::WindowMode::WINDOW_MODE_FLOATING);
     option->SetDisplayId(displayId);
