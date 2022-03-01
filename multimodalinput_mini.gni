@@ -15,12 +15,8 @@ import("//build/ohos.gni")
 mmi_path = "//foundation/multimodalinput/input"
 is_mmi_have_libinput = true
 is_mmi_have_hdf = false
-is_mmi_have_ai = false
 is_mmi_have_debug = false
-is_mmi_have_weston = false
 
 print("is_mmi_have_libinput = ${is_mmi_have_libinput}")
 print("is_mmi_have_hdf = ${is_mmi_have_hdf}")
-print("is_mmi_have_ai = ${is_mmi_have_ai}")
 print("is_mmi_have_debug = ${is_mmi_have_debug}")
-print("is_mmi_have_weston = ${is_mmi_have_weston}")

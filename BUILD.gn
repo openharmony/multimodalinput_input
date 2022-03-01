@@ -120,13 +120,21 @@ group("multimodalinput_mmi_packages") {
     "service:libmmi-server",
     "tools/inject_event:input",
   ]
+}
 
-  if (is_mmi_have_weston) {
-    deps += [
-      "examples/mmi:mmi-client",
-      "examples/mmi:mmi-server",
-    ]
-  }
+group("mmi_debug_tools") {
+  deps = [
+    "patch/diff_libinput_mmi:libinput-analyze-mmi",
+    "patch/diff_libinput_mmi:libinput-debug-mmi",
+    "patch/diff_libinput_mmi:libinput-list-mmi",
+    "patch/diff_libinput_mmi:libinput-measure-mmi",
+    "patch/diff_libinput_mmi:libinput-quirks-mmi",
+    "patch/diff_libinput_mmi:libinput-record-mmi",
+    "patch/diff_libinput_mmi:libinput-tablet-mmi",
+    "tools/event_inject:mmi-event-injection",
+    "tools/virtual_device_manager:mmi-virtual-device-manager",
+    "//third_party/eudev:udevadm",
+  ]
 }
 
 group("unittests") {

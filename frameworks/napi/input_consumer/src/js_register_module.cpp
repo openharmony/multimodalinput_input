@@ -18,7 +18,6 @@
 #include "input_manager.h"
 #include "js_register_util.h"
 #include "js_register_module.h"
-#include "key_event_pre.h"
 
 namespace OHOS {
 namespace MMI {
@@ -221,7 +220,7 @@ bool CheckPara(const std::shared_ptr<KeyOption> keyOption)
             MMI_LOGE("preKey:%{public}d is less 0, can not process", item);
             return false;
         }
-        if (std::find(checkRepeat.begin(), checkRepeat.end(), item) != checkRepeat.end()){
+        if (std::find(checkRepeat.begin(), checkRepeat.end(), item) != checkRepeat.end()) {
             MMI_LOGE("preKey is repeat, can not process");
             return false;
         }
