@@ -35,7 +35,7 @@ void StreamBuffer::Clean()
     wIdx_ = 0;
     rCount_ = 0;
     wCount_ = 0;
-    rwErrorStatus_ = ErrorStatus::ES_OK;
+    rwErrorStatus_ = ErrorStatus::ERROR_STATUS_OK;
     CHK(EOK == memset_sp(&szBuff_, sizeof(szBuff_), 0, sizeof(szBuff_)), MEMCPY_SEC_FUN_FAIL);
 }
 
@@ -50,7 +50,7 @@ bool StreamBuffer::Read(std::string &buf)
 {
     if (rIdx_ == wIdx_) {
         MMI_LOGE("Not enough memory to read, errCode:%{public}d", MEM_NOT_ENOUGH);
-        rwErrorStatus_ = ErrorStatus::ES_READ;
+        rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
     buf = ReadBuf();
@@ -75,27 +75,27 @@ bool StreamBuffer::Write(const StreamBuffer &buf)
 
 bool StreamBuffer::Read(char *buf, size_t size)
 {
-    if (ChkError()) {
+    if (ChkRWError()) {
         return false; // No need to print log here, only the first error needs to be printed
     }
     if (buf == nullptr) {
         MMI_LOGE("Invalid input parameter buf=nullptr errCode:%{public}d", ERROR_NULL_POINTER);
-        rwErrorStatus_ = ErrorStatus::ES_READ;
+        rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
-    if (size <= 0) {
+    if (size == 0) {
         MMI_LOGE("Invalid input parameter size=%{public}zu errCode:%{public}d", size, PARAM_INPUT_INVALID);
-        rwErrorStatus_ = ErrorStatus::ES_READ;
+        rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
     if (rIdx_ + size > wIdx_) {
         MMI_LOGE("Memory out of bounds on read... errCode:%{public}d", MEM_OUT_OF_BOUNDS);
-        rwErrorStatus_ = ErrorStatus::ES_READ;
+        rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
     if (EOK != memcpy_sp(buf, size, ReadBuf(), size)) {
         MMI_LOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
-        rwErrorStatus_ = ErrorStatus::ES_READ;
+        rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
     rIdx_ += size;
@@ -105,27 +105,27 @@ bool StreamBuffer::Read(char *buf, size_t size)
 
 bool StreamBuffer::Write(const char *buf, size_t size)
 {
-    if (ChkError()) {
+    if (ChkRWError()) {
         return false; // No need to print log here, only the first error needs to be printed
     }
     if (buf == nullptr) {
         MMI_LOGE("Invalid input parameter buf=nullptr errCode:%{public}d", ERROR_NULL_POINTER);
-        rwErrorStatus_ = ErrorStatus::ES_WRITE;
+        rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
-    if (size <= 0) {
+    if (size == 0) {
         MMI_LOGE("Invalid input parameter size=%{public}zu errCode:%{public}d", size, PARAM_INPUT_INVALID);
-        rwErrorStatus_ = ErrorStatus::ES_WRITE;
+        rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
     if (wIdx_ + size >= MAX_STREAM_BUF_SIZE) {
         MMI_LOGE("The write length exceeds buffer. errCode:%{public}d", MEM_OUT_OF_BOUNDS);
-        rwErrorStatus_ = ErrorStatus::ES_WRITE;
+        rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
     if (EOK != memcpy_sp(&szBuff_[wIdx_], (MAX_STREAM_BUF_SIZE - wIdx_), buf, size)) {
         MMI_LOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
-        rwErrorStatus_ = ErrorStatus::ES_WRITE;
+        rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
     wIdx_ += size;
@@ -135,7 +135,7 @@ bool StreamBuffer::Write(const char *buf, size_t size)
 
 bool StreamBuffer::IsEmpty()
 {
-    if (rIdx_ == wIdx_) {
+    if ((rIdx_ == wIdx_) && (wIdx_ == 0)) {
         return true;
     }
     return false;
@@ -152,18 +152,18 @@ size_t StreamBuffer::UnreadSize() const
     return (wIdx_ - rIdx_);
 }
 
-bool StreamBuffer::ChkError() const
+bool StreamBuffer::ChkRWError() const
 {
-    return (rwErrorStatus_ != ErrorStatus::ES_OK);
+    return (rwErrorStatus_ != ErrorStatus::ERROR_STATUS_OK);
 }
 
 const std::string& StreamBuffer::GetErrorStatusRemark() const
 {
     static const std::string invalidStatus = "UNKNOWN";
     static const std::vector<std::pair<ErrorStatus, std::string>> remark {
-        {ErrorStatus::ES_OK, "OK"},
-        {ErrorStatus::ES_READ, "READ_ERROR"},
-        {ErrorStatus::ES_WRITE, "WRITE_ERROR"},
+        {ErrorStatus::ERROR_STATUS_OK, "OK"},
+        {ErrorStatus::ERROR_STATUS_READ, "READ_ERROR"},
+        {ErrorStatus::ERROR_STATUS_WRITE, "WRITE_ERROR"},
     };
     for (const auto& it : remark) {
         if (it.first == rwErrorStatus_) {
