@@ -180,7 +180,10 @@ void MMIService::OnStart()
     MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
 
     int32_t ret = Init();
-    CHK(RET_OK == ret, ret);
+    if (RET_OK != ret) {
+        MMI_LOGE("Init mmi_service failed");
+        return;
+    }
     state_ = ServiceRunningState::STATE_RUNNING;
     MMI_LOGD("MMIService Started successfully");
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
@@ -290,7 +293,10 @@ void MMIService::OnThread()
 {
     OHOS::MMI::SetThreadName(std::string("mmi_service"));
     uint64_t tid = GetThisThreadIdOfLL();
-    CHK(tid > 0, VAL_NOT_EXP);
+    if (tid <= 0) {
+        MMI_LOGE("The tid is error, errCode:%{public}d", VAL_NOT_EXP);
+        return;
+    }
     MMI_LOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
     SafeKpr->RegisterEvent(tid, "mmi_service");
 
