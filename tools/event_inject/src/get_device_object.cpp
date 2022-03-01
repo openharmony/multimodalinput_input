@@ -17,12 +17,11 @@
 #include <chrono>
 #include <thread>
 
-using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GetDeviceObject" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GetDeviceObject" };
+} // namespace
 
 DeviceBase* GetDeviceObject::CreateDeviceObject(const std::string deviceName)
 {

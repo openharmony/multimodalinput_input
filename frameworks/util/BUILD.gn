@@ -40,10 +40,6 @@ config("libmmi_util_public_config") {
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
-
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
 }
 
 ohos_shared_library("libmmi-util") {
@@ -126,10 +122,6 @@ ohos_unittest("ut-mmi-util-out") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
-
   sources = [
     "common/test/safe_keeper_test.cpp",
     "common/test/util_test.cpp",
@@ -193,10 +185,6 @@ ohos_unittest("RunShellUtilTest") {
 
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
-
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
   }
 
   sources = [ "common/test/run_shell_util_test.cpp" ]

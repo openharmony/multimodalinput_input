@@ -50,7 +50,7 @@ public:
     uint32_t KeyboardHandleKeySym(uint32_t keyboardKey);
 
 private:
-    xkb_state *state_ = nullptr;
+    struct xkb_state *state_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS

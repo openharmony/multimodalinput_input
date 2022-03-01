@@ -17,15 +17,11 @@
 #include <cinttypes>
 #include <csignal>
 #include <sys/signalfd.h>
-
-#include "app_register.h"
-#include "device_register.h"
 #include "event_dump.h"
 #include "input_windows_manager.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "pointer_drawing_manager.h"
-#include "register_eventhandle_manager.h"
 #include "safe_keeper.h"
 #include "timer_manager.h"
 #include "util.h"
@@ -35,9 +31,9 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIService" };
-static const std::string DEF_INPUT_SEAT = "seat0";
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIService" };
+const std::string DEF_INPUT_SEAT = "seat0";
+} // namespace
 
 const bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
@@ -70,20 +66,11 @@ static void CheckDefine()
 #ifdef OHOS_BUILD
     CheckDefineOutput("%-40s", "OHOS_BUILD");
 #endif
-#ifdef OHOS_WESTEN_MODEL
-    CheckDefineOutput("%-40s", "OHOS_WESTEN_MODEL");
-#endif
 #ifdef OHOS_BUILD_LIBINPUT
     CheckDefineOutput("%-40s", "OHOS_BUILD_LIBINPUT");
 #endif
 #ifdef OHOS_BUILD_HDF
     CheckDefineOutput("%-40s", "OHOS_BUILD_HDF");
-#endif
-#ifdef OHOS_BUILD_AI
-    CheckDefineOutput("%-40s", "OHOS_BUILD_AI");
-#endif
-#ifdef DEBUG_CODE_TEST
-    CheckDefineOutput("%-40s", "DEBUG_CODE_TEST");
 #endif
 #ifdef OHOS_BUILD_MMI_DEBUG
     CheckDefineOutput("%-40s", "OHOS_BUILD_MMI_DEBUG");
@@ -105,7 +92,7 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
     eventData->event_type = type;
     MMI_LOGD("userdata:[fd:%{public}d,type:%{public}d]", eventData->fd, eventData->event_type);
 
-    epoll_event ev = {};
+    struct epoll_event ev = {};
     ev.events = EPOLLIN;
     ev.data.ptr = eventData;
     auto ret = EpollCtl(fd, EPOLL_CTL_ADD, ev, mmiFd_);
@@ -133,7 +120,7 @@ bool MMIService::InitLibinputService()
     MMI_LOGD("HDF Init");
     hdfEventManager.SetupCallback();
 #endif
-    CHKF(input_.Init(std::bind(&InputEventHandler::OnEvent, inputEventHdr_, std::placeholders::_1),
+    CHKF(input_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
          DEF_INPUT_SEAT), LIBINPUT_INIT_FAIL);
     auto inputFd = input_.GetInputFd();
     auto ret = AddEpoll(EPOLL_EVENT_INPUT, inputFd);
@@ -165,15 +152,8 @@ int32_t MMIService::Init()
 {
     CheckDefine();
 
-#ifdef  OHOS_BUILD_AI
-    MMI_LOGD("SeniorInput Init");
-    CHKR(seniorInput_.Init(*this), SENIOR_INPUT_DEV_INIT_FAIL, SENIOR_INPUT_DEV_INIT_FAIL);
-    sMsgHandler_.SetSeniorInputHandle(seniorInput_);
-#endif // OHOS_BUILD_AI
-
     MMI_LOGD("InputEventHandler Init");
-    inputEventHdr_ = OHOS::MMI::InputEventHandler::GetInstance();
-    CHKR(inputEventHdr_->Init(*this), INPUT_EVENT_HANDLER_INIT_FAIL, INPUT_EVENT_HANDLER_INIT_FAIL);
+    InputHandler->Init(*this);
 
     MMI_LOGD("ServerMsgHandler Init");
     CHKR(sMsgHandler_.Init(*this), SVR_MSG_HANDLER_INIT_FAIL, SVR_MSG_HANDLER_INIT_FAIL);
@@ -183,13 +163,7 @@ int32_t MMIService::Init()
 
     MMI_LOGD("WindowsManager Init");
     CHKR(WinMgr->Init(*this), WINDOWS_MSG_INIT_FAIL, WINDOWS_MSG_INIT_FAIL);
-#ifdef OHOS_WESTEN_MODEL
-    MMI_LOGD("AppRegister Init");
-    CHKR(AppRegs->Init(*this), APP_REG_INIT_FAIL, APP_REG_INIT_FAIL);
 
-    MMI_LOGD("DeviceRegister Init");
-    CHKR(DevRegister->Init(), DEV_REG_INIT_FAIL, DEV_REG_INIT_FAIL);
-#endif
     MMI_LOGD("PointerDrawingManager Init");
     CHKR(PointerDrawingManager::GetInstance()->Init(), POINTER_DRAW_INIT_FAIL, POINTER_DRAW_INIT_FAIL);
 
@@ -221,8 +195,8 @@ void MMIService::OnStop()
     MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
 
     UdsStop();
-    if (inputEventHdr_ != nullptr) {
-        inputEventHdr_->Clear();
+    if (InputHandler != nullptr) {
+        InputHandler->Clear();
     }
     input_.Stop();
     state_ = ServiceRunningState::STATE_NOT_START;
@@ -240,20 +214,13 @@ void MMIService::OnConnected(SessionPtr s)
     CHKPV(s);
     int32_t fd = s->GetFd();
     MMI_LOGI("fd:%{public}d", fd);
-    AppRegs->RegisterConnectState(fd);
 }
 
 void MMIService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
-    MMI_LOGW("enter, session desc:%{public}s", s->GetDescript().c_str());
     int32_t fd = s->GetFd();
-
-    auto appInfo = AppRegs->FindSocketFd(fd);
-    AppRegs->UnregisterConnectState(fd);
-#ifdef  OHOS_BUILD_AI
-    seniorInput_.DeviceDisconnect(fd);
-#endif // OHOS_BUILD_AI
+    MMI_LOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), fd);
 }
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)
@@ -306,17 +273,17 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
 
 int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    if (inputEventHdr_ == nullptr) {
-        MMI_LOGE("inputEventHdr_ is nullptr");
+    if (InputHandler == nullptr) {
+        MMI_LOGE("InputHandler is nullptr");
         return ERROR_NULL_POINTER;
     }
-    return inputEventHdr_->AddInputEventFilter(filter);
+    return InputHandler->AddInputEventFilter(filter);
 }
 
 void MMIService::OnTimer()
 {
-    if (inputEventHdr_ != nullptr) {
-        inputEventHdr_->OnCheckEventReport();
+    if (InputHandler != nullptr) {
+        InputHandler->OnCheckEventReport();
     }
     TimerMgr->ProcessTimers();
 
@@ -341,7 +308,7 @@ void MMIService::OnThread()
 
     int32_t count = 0;
     constexpr int32_t timeOut = 20;
-    epoll_event ev[MAX_EVENT_SIZE] = {};
+    struct epoll_event ev[MAX_EVENT_SIZE] = {};
     std::map<int32_t, StreamBufData> bufMap;
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         bufMap.clear();

@@ -54,7 +54,7 @@ private:
         }
         int32_t id_;
         InputHandlerType handlerType_;
-        SessionPtr session_;
+        SessionPtr session_ = nullptr;
     };
 
     struct MonitorCollection : public IInputEventHandler, protected NoCopyable {
@@ -73,7 +73,7 @@ private:
 
         std::mutex lockMonitors_;
         std::set<SessionHandler> monitors_;
-        std::shared_ptr<PointerEvent> lastPointerEvent_;
+        std::shared_ptr<PointerEvent> lastPointerEvent_ = nullptr;
         int32_t downEventId_ { -1 };
         bool monitorConsumed_ { false };
     };

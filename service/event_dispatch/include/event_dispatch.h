@@ -15,11 +15,8 @@
 #ifndef EVENT_DISPATCH_H
 #define EVENT_DISPATCH_H
 #include "uds_server.h"
-#include "register_event.h"
 #include "key_event.h"
 #include "key_event_value_transformation.h"
-#include "standard_event_handler.h"
-#include "app_register.h"
 #include "event_package.h"
 #include "nocopyable.h"
 #include "pointer_event.h"
@@ -33,27 +30,26 @@ public:
     DISALLOW_COPY_AND_MOVE(EventDispatch);
     virtual ~EventDispatch();
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter);
-    int32_t DispatchGestureNewEvent(UDSServer& udsServer, libinput_event *event,
-        std::shared_ptr<PointerEvent> pointer, const uint64_t preHandlerTime);
-    int32_t DispatchGestureEvent(UDSServer& udsServer, libinput_event *event, const EventGesture& gesture,
-        const uint64_t preHandlerTime);
-    int32_t DispatchKeyEvent(UDSServer& udsServer, libinput_event *event, const KeyEventValueTransformations& trs,
-        EventKeyboard& key, const uint64_t preHandlerTime);
+    int32_t DispatchGestureNewEvent(UDSServer& udsServer, struct libinput_event *event,
+        std::shared_ptr<PointerEvent> pointer, const int64_t preHandlerTime);
+    int32_t DispatchGestureEvent(UDSServer& udsServer, struct libinput_event *event, const EventGesture& gesture,
+        const int64_t preHandlerTime);
+    int32_t DispatchKeyEvent(UDSServer& udsServer, struct libinput_event *event,
+        const KeyEventValueTransformations& trs, EventKeyboard& key, const int64_t preHandlerTime);
     int32_t DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key,
-        const uint64_t preHandlerTime);
-    int32_t DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
-        const EventTouch& touch, const uint64_t preHandlerTime);
-    int32_t DispatchTabletPadEvent(UDSServer& udsServer, libinput_event *event,
-        const EventTabletPad& tabletPad, const uint64_t preHandlerTime);
-    int32_t DispatchJoyStickEvent(UDSServer& udsServer, libinput_event *event,
-        const EventJoyStickAxis& eventJoyStickAxis, const uint64_t preHandlerTime);
-    int32_t DispatchCommonPointEvent(UDSServer& udsServer, libinput_event *event,
-        const EventPointer& point, const uint64_t preHandlerTime);
-    int32_t DispatchPointerEvent(UDSServer& udsServer, libinput_event *event,
-        EventPointer& point, const uint64_t preHandlerTime);
-    int32_t DispatchTabletToolEvent(UDSServer& udsServer, libinput_event *event,
-        const EventTabletTool& tableTool, const uint64_t preHandlerTime);
-    int32_t DispatchTouchTransformPointEvent(UDSServer& udsServer, std::shared_ptr<PointerEvent> point);
+        const int64_t preHandlerTime);
+    int32_t DispatchTouchEvent(UDSServer& udsServer, struct libinput_event *event,
+        const EventTouch& touch, const int64_t preHandlerTime);
+    int32_t DispatchTabletPadEvent(UDSServer& udsServer, struct libinput_event *event,
+        const EventTabletPad& tabletPad, const int64_t preHandlerTime);
+    int32_t DispatchJoyStickEvent(UDSServer& udsServer, struct libinput_event *event,
+        const EventJoyStickAxis& eventJoyStickAxis, const int64_t preHandlerTime);
+    int32_t DispatchCommonPointEvent(UDSServer& udsServer, struct libinput_event *event,
+        const EventPointer& point, const int64_t preHandlerTime);
+    int32_t DispatchPointerEvent(UDSServer& udsServer, struct libinput_event *event,
+        EventPointer& point, const int64_t preHandlerTime);
+    int32_t DispatchTabletToolEvent(UDSServer& udsServer, struct libinput_event *event,
+        const EventTabletTool& tableTool, const int64_t preHandlerTime);
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> point);
 
 protected:
@@ -61,16 +57,17 @@ protected:
     void OnEventTouchGetPointEventType(const EventTouch& touch, const int32_t fingerCount,
         POINT_EVENT_TYPE& pointEventType);
     int32_t GestureRegisteredEventDispatch(const MmiMessageId& idMsg, UDSServer& udsServer,
-        RegisteredEvent& registeredEvent, uint64_t preHandlerTime);
-    int32_t DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& udsServer,
-        const RegisteredEvent& data, int32_t inputDeviceType, uint64_t preHandlerTime);
+        RegisteredEvent& registeredEvent, int64_t preHandlerTime);
     int32_t KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer& udsServer,
-        libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime);
+        struct libinput_event *event, int32_t inputDeviceType, int64_t preHandlerTime);
     bool IsANRProcess(int64_t time, SessionPtr ss);
 
 private:
+    int32_t DispatchTouchEvent(const EventTouch& touch, const int fd,
+        const int64_t preHandlerTime, UDSServer& udsServer, NetPacket &newPacket) const;
+
+private:
     EventPackage eventPackage_;
-    StandardEventHandler standardEvent_;
     /*
      * Differentiated event handling
      */
@@ -82,10 +79,6 @@ private:
     };
     void OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler isEventHandler);
     void HandlePointerEventTrace(const std::shared_ptr<PointerEvent> &point);
-#ifdef DEBUG_CODE_TEST
-private:
-    const size_t windowCount_ = 2;
-#endif
     };
 } // namespace MMI
 } // namespace OHOS

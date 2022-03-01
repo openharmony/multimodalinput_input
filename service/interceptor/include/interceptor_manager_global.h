@@ -37,15 +37,15 @@ private:
     struct InterceptorItem {
         int32_t sourceType;
         int32_t id;
-        SessionPtr session;
-        bool operator == (const struct InterceptorItem& item)
+        SessionPtr session = nullptr;
+        bool operator == (const InterceptorItem& item)
         {
             return id == item.id;
         }
     };
 private:
     std::mutex mu_;
-    std::list<InterceptorItem> interceptor_;
+    std::list<InterceptorItem> interceptors_;
 };
 } // namespace MMI
 } // namespace OHOS

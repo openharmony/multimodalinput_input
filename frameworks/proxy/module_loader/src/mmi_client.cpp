@@ -25,8 +25,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIClient" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIClient" };
+} // namespace
 
 using namespace AppExecFwk;
 MMIClient::MMIClient() {}
@@ -150,24 +150,24 @@ void MMIClient::RegisterDisconnectedFunction(ConnectCallback fun)
 
 void MMIClient::VirtualKeyIn(RawInputEvent virtualKeyEvent)
 {
-    NetPacket ckt(MmiMessageId::ON_VIRTUAL_KEY);
-    ckt << virtualKeyEvent;
-    SendMsg(ckt);
+    NetPacket pkt(MmiMessageId::ON_VIRTUAL_KEY);
+    pkt << virtualKeyEvent;
+    SendMsg(pkt);
 }
 
-void MMIClient::ReplyMessageToServer(MmiMessageId idMsg, uint64_t clientTime, uint64_t endTime) const
+void MMIClient::ReplyMessageToServer(MmiMessageId idMsg, int64_t clientTime, int64_t endTime) const
 {
-    NetPacket ckt(MmiMessageId::CHECK_REPLY_MESSAGE);
-    ckt << idMsg << clientTime << endTime;
-    SendMsg(ckt);
+    NetPacket pkt(MmiMessageId::CHECK_REPLY_MESSAGE);
+    pkt << idMsg << clientTime << endTime;
+    SendMsg(pkt);
 }
 
 void MMIClient::SdkGetMultimodeInputInfo()
 {
     TagPackHead tagPackHead = {MmiMessageId::GET_MMI_INFO_REQ, {0}};
-    NetPacket ckt(MmiMessageId::GET_MMI_INFO_REQ);
-    ckt << tagPackHead;
-    SendMsg(ckt);
+    NetPacket pkt(MmiMessageId::GET_MMI_INFO_REQ);
+    pkt << tagPackHead;
+    SendMsg(pkt);
 }
 
 void MMIClient::OnDisconnected()
@@ -177,7 +177,6 @@ void MMIClient::OnDisconnected()
         funDisconnected_(*this);
     }
     isConnected_ = false;
-    EventManager.ClearAll();
     CK(DelFdListener(fd_), C_DEL_FD_LISTENER_FAIL);
 }
 

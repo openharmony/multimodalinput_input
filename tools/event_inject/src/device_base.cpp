@@ -15,12 +15,11 @@
 
 #include "device_base.h"
 
-using namespace std;
 using namespace OHOS::MMI;
 
 void DeviceBase::SetTimeToLibinputEvent(InjectEvent& injectEvent)
 {
-    timeval tm;
+    struct timeval tm;
     gettimeofday(&tm, 0);
     injectEvent.event.input_event_sec = tm.tv_sec;
     injectEvent.event.input_event_usec = tm.tv_usec;

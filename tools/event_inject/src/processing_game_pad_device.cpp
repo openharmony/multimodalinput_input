@@ -15,12 +15,11 @@
 
 #include "processing_game_pad_device.h"
 
-using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingGamePadDevice" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingGamePadDevice" };
+} // namespace
 
 int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const Json& originalEvent,
     InputEventArray& inputEventArray)
@@ -38,7 +37,7 @@ int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const Json& origin
         MMI_LOGE("manage finger array faild, inputData is empty");
         return RET_ERR;
     }
-    vector<GamePadEvent> padEventArray;
+    std::vector<GamePadEvent> padEventArray;
     if (AnalysisGamePadEvent(inputData, padEventArray) == RET_ERR) {
         return RET_ERR;
     }
@@ -52,7 +51,7 @@ int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const Json& inputData, std
 {
     for (const auto &item : inputData) {
         GamePadEvent padEvent = {};
-        string eventType = item.at("eventType").get<std::string>();
+        std::string eventType = item.at("eventType").get<std::string>();
         padEvent.eventType = eventType;
         if ((item.find("blockTime")) != item.end()) {
             padEvent.blockTime = item.at("blockTime").get<int32_t>();
@@ -60,24 +59,24 @@ int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const Json& inputData, std
         if ((eventType == "KEY_EVENT_CLICK") || (eventType == "KEY_EVENT_PRESS") ||
             (eventType == "KEY_EVENT_RELEASE")) {
             if ((item.find("keyValue")) == item.end()) {
-                MMI_LOGE("function AnalysisGamePadEvent not find keyValue On Event:%{public}s", eventType.c_str());
+                MMI_LOGE("not find keyValue On Event:%{public}s", eventType.c_str());
                 return RET_ERR;
             }
             padEvent.keyValue = item.at("keyValue").get<int32_t>();
         } else if ((eventType == "ROCKER_1") || (eventType == "ROCKER_2")) {
             if ((item.find("event")) == item.end()) {
-                MMI_LOGE("function AnalysisGamePadEvent not find event On Event:%{public}s", eventType.c_str());
+                MMI_LOGE("not find event On Event:%{public}s", eventType.c_str());
                 return RET_ERR;
             }
             if ((item.find("direction")) == item.end()) {
-                MMI_LOGE("function AnalysisGamePadEvent not find direction On Event:%{public}s", eventType.c_str());
+                MMI_LOGE("not find direction On Event:%{public}s", eventType.c_str());
                 return RET_ERR;
             }
             padEvent.gameEvents = item.at("event").get<std::vector<int32_t>>();
             padEvent.direction = item.at("direction").get<std::string>();
         } else if (eventType == "DERECTION_KEY") {
             if ((item.find("direction")) == item.end()) {
-                MMI_LOGE("function AnalysisGamePadEvent not find direction On Event:%{public}s", eventType.c_str());
+                MMI_LOGE("not find direction On Event:%{public}s", eventType.c_str());
                 return RET_ERR;
             }
             padEvent.direction = item.at("direction").get<std::string>();
@@ -135,7 +134,7 @@ void ProcessingGamePadDevice::TransformKeyClickEvent(const GamePadEvent& padEven
 
 void ProcessingGamePadDevice::TransformRocker1Event(const GamePadEvent& padEvent, InputEventArray& inputEventArray)
 {
-    string direction = padEvent.direction;
+    std::string direction = padEvent.direction;
     for (const auto &item : padEvent.gameEvents) {
         int32_t value;
         if (direction == "left") {
@@ -175,7 +174,7 @@ void ProcessingGamePadDevice::TransformRocker1Event(const GamePadEvent& padEvent
 
 void ProcessingGamePadDevice::TransformRocker2Event(const GamePadEvent& padEvent, InputEventArray& inputEventArray)
 {
-    string direction = padEvent.direction;
+    std::string direction = padEvent.direction;
     for (int32_t item : padEvent.gameEvents) {
         int32_t value;
         if (direction == "left") {
@@ -215,7 +214,7 @@ void ProcessingGamePadDevice::TransformRocker2Event(const GamePadEvent& padEvent
 
 void ProcessingGamePadDevice::TransformDerectionKeyEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray)
 {
-    string direction = padEvent.direction;
+    std::string direction = padEvent.direction;
     if (direction == "left") {
         SetEvAbsHat0X(inputEventArray, padEvent.blockTime, -1);
         SetSynReport(inputEventArray);

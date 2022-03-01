@@ -15,12 +15,11 @@
 
 #include "processing_finger_device.h"
 
-using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingFingerDevice" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingFingerDevice" };
+} // namespace
 
 int32_t ProcessingFingerDevice::TransformJsonDataToInputData(const Json& fingerEventArrays,
     InputEventArray& inputEventArray)
