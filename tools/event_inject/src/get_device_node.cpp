@@ -18,8 +18,8 @@
 using namespace OHOS::MMI;
 
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GetDeviceNode" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GetDeviceNode" };
+} // namespace
 
 GetDeviceNode::GetDeviceNode()
 {
@@ -36,17 +36,17 @@ int32_t GetDeviceNode::GetDeviceNodeName(const std::string &targetName, std::str
     std::string deviceName = deviceMap_[targetName];
     auto iter = deviceMapData.find(deviceName);
     if (iter == deviceMapData.end()) {
-        MMI_LOGE("GetDeviceNodeName faild for find deviceName:%{public}s", deviceName.c_str());
+        MMI_LOGE("faild for find deviceName:%{public}s", deviceName.c_str());
         return RET_ERR;
     }
     size_t targetSize = iter->second.size();
     if (devIndex > targetSize) {
-        MMI_LOGE("GetDeviceNodeName faild for devIndex:%{public}d > targetSize:%{public}zu", devIndex, targetSize);
+        MMI_LOGE("faild for devIndex:%{public}d > targetSize:%{public}zu", devIndex, targetSize);
         return RET_ERR;
     }
     std::string nodeRootPath = "/dev/input/";
     deviceNode = nodeRootPath + iter->second[devIndex];
-    MMI_LOGI("GetDeviceNodeName:%{public}s[%{public}d] --> %{public}s", targetName.c_str(), devIndex,
+    MMI_LOGI("%{public}s[%{public}d] --> %{public}s", targetName.c_str(), devIndex,
              deviceNode.c_str());
 
     return RET_OK;

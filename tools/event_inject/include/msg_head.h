@@ -63,15 +63,6 @@ enum PressEvent {
     TOUCH_PAD_PRESS = 15
 };
 
-enum HdiInfoType :uint16_t {
-    GET_STATUS_INFO = 1001,
-    SET_HOT_PLUGS = 1002,
-    SET_EVENT_INJECT = 1003,
-    GET_DEVICE_INFO = 1004,
-    SHOW_DEVICE_INFO = 1005,
-    REPLY_STATUS_INFO = 2001,
-};
-
 struct DeviceInformation {
     bool status;
     int32_t devIndex;
@@ -91,6 +82,5 @@ struct InputEventArray {
     std::vector<InjectEvent> events;
 };
 
-typedef std::function<void(void)> HandleInjectCommandItemsFuncType;
 typedef std::function<int32_t (const InputEvent& inputEvent)> WriteDeviceFun;
 #endif // MSG_HEAD_H

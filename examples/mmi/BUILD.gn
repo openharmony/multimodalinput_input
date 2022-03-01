@@ -14,54 +14,14 @@
 import("//build/ohos.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-ohos_executable("mmi-client") {
-  include_dirs = [ "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include" ]
-  sources = [ "src/mmi_client_main.cpp" ]
-  deps = [
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
-    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
-    "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
-  ]
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
-
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
-
-  install_enable = true
-  part_name = "multimodalinput_base"
-}
-
 ohos_executable("mmi-server") {
   include_dirs = [ "$root_out_dir/gen/third_party/wayland_standard/protocol/" ]
-  sources = []
-  if (is_mmi_have_weston) {
-    sources += [ "src/mmi_server_main.cpp" ]
-  } else {
-    sources += [ "src/mmi_service_main.cpp" ]
-  }
+  sources = [ "src/mmi_service_main.cpp" ]
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service:libmmi-server",
   ]
-
-  if (is_mmi_have_weston) {
-    deps += [ "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service" ]
-  }
 
   if (is_mmi_have_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
@@ -86,14 +46,6 @@ ohos_executable("mmi-server") {
 
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
-
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
-
-  if (is_mmi_have_weston) {
-    cflags += [ "-DOHOS_WESTEN_MODEL" ]
   }
 
   install_enable = true

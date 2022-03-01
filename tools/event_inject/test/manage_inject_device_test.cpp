@@ -97,14 +97,6 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataGetDeviceNodeError, TestS
     EXPECT_EQ(ret, RET_ERR);
 }
 
-HWTEST_F(ManageInjectDeviceTest, Test_SendEventToHdi, TestSize.Level1)
-{
-    ManageInjectDevice manageInjectDevice;
-    InputEventArray inputEventArray = {};
-    auto ret = manageInjectDevice.SendEventToHdi(inputEventArray);
-    EXPECT_EQ(ret, RET_ERR);
-}
-
 HWTEST_F(ManageInjectDeviceTest, Test_SendEventToDeviveNodeError, TestSize.Level1)
 {
     ManageInjectDevice manageInjectDevice;
