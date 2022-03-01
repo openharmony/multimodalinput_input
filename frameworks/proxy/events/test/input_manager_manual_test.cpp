@@ -25,8 +25,8 @@
 #include "proto.h"
 #include "run_shell_util.h"
 
-namespace OHOS{
-namespace MMI{
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS;
