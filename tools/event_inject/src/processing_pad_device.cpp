@@ -15,7 +15,6 @@
 
 #include "processing_pad_device.h"
 
-using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
@@ -34,7 +33,7 @@ int32_t ProcessingPadDevice::TransformJsonDataToInputData(const Json& fingerEven
         MMI_LOGE("manage finger array faild, inputData is empty.");
         return RET_ERR;
     }
-    vector<PadEvent> padEventArray;
+    std::vector<PadEvent> padEventArray;
     if (AnalysisPadEvent(inputData, padEventArray) == RET_ERR) {
         return RET_ERR;
     }

@@ -15,7 +15,6 @@
 
 #include "processing_pen_device.h"
 
-using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
@@ -38,7 +37,7 @@ int32_t ProcessingPenDevice::TransformJsonDataToInputData(const Json& penEventAr
         MMI_LOGE("manage pen array faild, inputData is empty.");
         return RET_ERR;
     }
-    vector<PenEvent> penEventArray;
+    std::vector<PenEvent> penEventArray;
     if (AnalysisPenPadEvent(inputData, penEventArray) == RET_ERR) {
         MMI_LOGE("AnalysisPenPadEvent error.");
         return RET_ERR;

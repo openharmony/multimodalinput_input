@@ -21,7 +21,6 @@
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
-using namespace std;
 class DeviceBaseTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
