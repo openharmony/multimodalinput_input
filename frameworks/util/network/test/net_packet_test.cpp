@@ -146,9 +146,9 @@ HWTEST_F(NetPacketTest, WriteError, TestSize.Level1)
     TestData data = {333, "test111"};
     NetPacket pkt(MmiMessageId::REGISTER_APP_INFO);
     pkt << p1 << p2;
-    EXPECT_FALSE(pkt.ChkError());
+    EXPECT_FALSE(pkt.ChkRWError());
     pkt << data;
-    EXPECT_TRUE(pkt.ChkError());
+    EXPECT_TRUE(pkt.ChkRWError());
 }
 
 HWTEST_F(NetPacketTest, ReadError, TestSize.Level1)
@@ -157,16 +157,16 @@ HWTEST_F(NetPacketTest, ReadError, TestSize.Level1)
     std::string p2 = "test111";
     NetPacket pkt(MmiMessageId::REGISTER_APP_INFO);
     pkt << p1 << p2;
-    EXPECT_FALSE(pkt.ChkError());
+    EXPECT_FALSE(pkt.ChkRWError());
     
     int32_t r1 = 0;
     std::string r2;
     pkt >> r1 >> r2;
-    EXPECT_FALSE(pkt.ChkError());
+    EXPECT_FALSE(pkt.ChkRWError());
     EXPECT_EQ(p1, r1);
     EXPECT_EQ(p2, r2);
     int32_t r3;
     pkt >> r3;
-    EXPECT_TRUE(pkt.ChkError());
+    EXPECT_TRUE(pkt.ChkRWError());
 }
 } // namespace

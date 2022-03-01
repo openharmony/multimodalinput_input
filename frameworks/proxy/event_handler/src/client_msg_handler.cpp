@@ -98,7 +98,7 @@ int32_t ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)
     }
     int32_t pid;
     pkt >> pid;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     MMI_LOGD("Client receive the msg from server, keyCode:%{public}d,pid:%{public}d", key->GetKeyCode(), pid);
     return InputMonitorMgr.OnMonitorInputEvent(key);
 }
@@ -114,7 +114,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
         return RET_ERR;
     }
     pkt >> fd >> serverStartTime;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     MMI_LOGD("key event dispatcher of client, KeyCode:%{public}d,"
              "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
              "EventType:%{public}d,Flag:%{public}u,"
@@ -197,7 +197,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
     int32_t fd = -1;
     int32_t subscribeId = -1;
     pkt >> fd >> subscribeId;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     MMI_LOGD("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
              "KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
              "Action:%{public}d,KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}u",
@@ -223,7 +223,7 @@ int32_t ClientMsgHandler::OnTouchPadMonitor(const UDSClient& client, NetPacket& 
     }
     int32_t pid = 0;
     pkt >> pid;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     MMI_LOGD("client receive the msg from server: EventType:%{public}d,pid:%{public}d",
         pointer->GetEventType(), pid);
     return InputMonitorMgr.OnTouchpadMonitorInputEvent(pointer);
@@ -233,7 +233,7 @@ int32_t ClientMsgHandler::GetMultimodeInputInfo(const UDSClient& client, NetPack
 {
     TagPackHead tagPackHeadAck;
     pkt >> tagPackHeadAck;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     std::cout << "GetMultimodeInputInfo: The client fd is " << tagPackHeadAck.sizeEvent[0] << std::endl;
     return RET_OK;
 }
@@ -322,7 +322,7 @@ int32_t ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetP
     int32_t pid = 0;
     int32_t id = 0;
     pkt >> pid >> id;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     MMI_LOGD("client receive the msg from server: pointId:%{public}d,pid:%{public}d",
              pointerEvent->GetPointerId(), pid);
     return InterceptorMgr.OnPointerEvent(pointerEvent, id);
@@ -338,7 +338,7 @@ int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket
     }
     int32_t pid = 0;
     pkt >> pid;
-    CHKR(!pkt.ChkError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
 
     int32_t keyId = keyEvent->GetId();
     std::string keyEventString = "keyEventFilter";
