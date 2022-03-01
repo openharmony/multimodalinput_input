@@ -91,7 +91,10 @@ int32_t RegisterEventHandleManager::UnregisterEventHandleManager(MmiMessageId me
 void RegisterEventHandleManager::UnregisterEventHandleSocketFd(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    CHK(fd >= 0, PARAM_INPUT_INVALID);
+    if (fd < 0) {
+        MMI_LOGE("The fd is less than 0");
+        return;
+    }
     auto iter = mapRegisterManager_.begin();
     while (iter != mapRegisterManager_.end()) {
         if (iter->second == fd) {

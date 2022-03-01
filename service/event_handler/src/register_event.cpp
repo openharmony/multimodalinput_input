@@ -48,7 +48,9 @@ RegisterEvent::~RegisterEvent() {}
 
 void RegisterEvent::OnEventKeyGetSign(const EventKeyboard& key, MmiMessageId& msg, EventKeyboard& prevKey)
 {
-    CHK((key.state == 0) || (key.state == BIT1), PARAM_INPUT_INVALID);
+    if (key.state != 0 && key.state != BIT1) {
+        MMI_LOGE("The in parameter is error, errCode:%{public}d", PARAM_INPUT_INVALID);
+    }
     int32_t temp = modTask_;
     GetModeCode getModeCode[] = {
         {RELEASE, KEY_LEFTMETA, BIT0},
@@ -73,7 +75,10 @@ void RegisterEvent::OnEventKeyGetSign(const EventKeyboard& key, MmiMessageId& ms
         {GetBitNum(BIT6) + GetBitNum(BIT5), BIT3},
     };
     int32_t ret = memcpy_s(&prevKey, sizeof(prevKey), &key, sizeof(key));
-    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
+    if (ret != EOK) {
+        MMI_LOGE("The memcpy_s function perform error, errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+        return;
+    }
     for (const auto &item : getModeCode) {
         if ((item.keystate == key.state) && (item.keyCode == key.key)) {
             if (key.state == KEY_STATE_RELEASED) {
@@ -81,7 +86,10 @@ void RegisterEvent::OnEventKeyGetSign(const EventKeyboard& key, MmiMessageId& ms
             } else {
                 modMask_ = BitSetOne(modMask_, item.modCode);
                 ret = memcpy_s(&key_, sizeof(key_), &key, sizeof(key));
-                CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
+                if (ret != EOK) {
+                    MMI_LOGE("The memcpy_s function perform error, errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+                    return;
+                }
             }
         }
     }
@@ -199,7 +207,10 @@ int32_t RegisterEvent::BitSetOne(const int32_t signCode, const int32_t bitCode) 
 
 void RegisterEvent::TouchInfoBegin(const int64_t time, const double x, const double y, TouchInfo& touchinfo)
 {
-    CHK(time > 0, PARAM_INPUT_INVALID);
+    if (time <= 0) {
+        MMI_LOGE("The in parameter is error, errCode:%{public}d", PARAM_INPUT_INVALID);
+        return;
+    }
     touchinfo.beginTime = time;
     touchinfo.beginX = x;
     touchinfo.beginY = y;
@@ -207,7 +218,10 @@ void RegisterEvent::TouchInfoBegin(const int64_t time, const double x, const dou
 
 void RegisterEvent::TouchInfoEnd(const int64_t time, const double x, const double y, TouchInfo& touchinfo)
 {
-    CHK(time > 0, PARAM_INPUT_INVALID);
+    if (time <= 0) {
+        MMI_LOGE("The in parameter is error, errCode:%{public}d", PARAM_INPUT_INVALID);
+        return;
+    }
     touchinfo.endTime = time;
     touchinfo.endX = x;
     touchinfo.endY = y;
@@ -265,6 +279,10 @@ void RegisterEvent::OnEventGestureGetSign(const EventGesture& gesture, MmiMessag
     CHK(gesture.time > 0, PARAM_INPUT_INVALID);
     CHK(gesture.fingerCount > 0, PARAM_INPUT_INVALID);
     CHK(gesture.eventType > 0, PARAM_INPUT_INVALID);
+    if () {
+        MMI_LOGE("The");
+        return;
+    }
     switch (gesture.eventType) {
         case LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN: {
             OnEventGestureBeginGetSign(gesture);
