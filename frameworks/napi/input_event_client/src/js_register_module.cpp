@@ -50,7 +50,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     isIntercepted = false;
 
     auto keyEvent = KeyEvent::Create();
-    if(keyEvent == nullptr) {
+    if (keyEvent == nullptr) {
         MMI_LOGE("keyEvent is null");
         napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAM, &result);
         return result;
