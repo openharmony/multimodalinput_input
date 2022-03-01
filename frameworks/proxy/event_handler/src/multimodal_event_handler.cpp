@@ -27,30 +27,7 @@ namespace {
 }
 void OnConnected(const OHOS::MMI::IfMMIClient& client)
 {
-#ifdef OHOS_WESTEN_MODEL
-    int32_t winId = 0;
-    int32_t abilityId = 0;
-    std::string bundlerName = "EmptyBundlerName";
-    std::string appName = "EmptyAppName";
-    auto abilityInfoVec = MMIEventHdl.GetAbilityInfoVec();
-    if (!abilityInfoVec.empty()) {
-        winId = abilityInfoVec[0].windowId;
-        abilityId = *reinterpret_cast<int32_t*>(abilityInfoVec[0].token.GetRefPtr());
-    }
-    OHOS::MMI::NetPacket ckt(MmiMessageId::REGISTER_APP_INFO);
-    ckt << abilityId << winId << bundlerName << appName;
-    client.SendMessage(ckt);
-
-    for (auto& val : abilityInfoVec) {
-        if (val.sync == REG_STATUS_SYNCED) {
-            val.sync = REG_STATUS_NOT_SYNC;
-            continue;
-        }
-        EventManager.RegisterStandardizedEventHandle(val.token, val.windowId, val.standardizedEventHandle);
-    }
-#else
     InputManagerImpl::GetInstance()->OnConnected();
-#endif
 }
 
 MultimodalEventHandler::MultimodalEventHandler()
@@ -60,62 +37,9 @@ MultimodalEventHandler::MultimodalEventHandler()
 #endif
 }
 
-int32_t MultimodalEventHandler::RegisterStandardizedEventHandle(const sptr<IRemoteObject> token,
-    int32_t windowId, StandEventPtr standardizedEventHandle)
-{
-#ifdef OHOS_WESTEN_MODEL
-    MMI_LOGD("begin");
-    KMSG_LOGI("Register Standardized Event Handle start!");
-    int32_t ret = OHOS::MMI_STANDARD_EVENT_SUCCESS;
-    EventRegesterInfo regInfo = {};
-    if (client_ && client_->GetCurrentConnectedStatus()) {
-        regInfo.sync = REG_STATUS_SYNCED;
-        ret = EventManager.RegisterStandardizedEventHandle(token, windowId, standardizedEventHandle);
-    }
-    regInfo.token = token;
-    regInfo.windowId = windowId;
-    regInfo.standardizedEventHandle = standardizedEventHandle;
-    abilityInfoVec_.push_back(regInfo);
-
-    if (!InitClient()) {
-        MMI_LOGE("init client failed!");
-        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
-    }
-    MMI_LOGD("end");
-    return ret;
-#else
-    return RET_OK;
-#endif
-}
-
-int32_t MultimodalEventHandler::UnregisterStandardizedEventHandle(const sptr<IRemoteObject> token,
-    int32_t windowId, StandEventPtr standardizedEventHandle)
-{
-#ifdef OHOS_WESTEN_MODEL
-    return EventManager.UnregisterStandardizedEventHandle(token, windowId, standardizedEventHandle);
-#else
-    return RET_OK;
-#endif
-}
-
-int32_t MultimodalEventHandler::InjectEvent(const OHOS::KeyEvent& keyEvent)
-{
-    if (!InitClient()) {
-        return MMI_SERVICE_INVALID;
-    }
-    return EventManager.InjectEvent(keyEvent);
-}
-
-int32_t MultimodalEventHandler::InjectEvent(const OHOS::MMI::KeyEvent& keyEvent)
-{
-    if (!InitClient()) {
-        return MMI_SERVICE_INVALID;
-    }
-    return EventManager.InjectEvent(keyEvent);
-}
-
 int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr)
 {
+    CHKPR(keyEventPtr, ERROR_NULL_POINTER);
     if (!InitClient()) {
         return MMI_SERVICE_INVALID;
     }
@@ -128,11 +52,6 @@ int32_t MultimodalEventHandler::GetMultimodeInputInfo()
         return MMI_SERVICE_INVALID;
     }
     return MMI_SERVICE_RUNNING;
-}
-
-std::vector<EventRegesterInfo>& MultimodalEventHandler::GetAbilityInfoVec()
-{
-    return abilityInfoVec_;
 }
 
 bool MultimodalEventHandler::InitClient()
@@ -181,80 +100,11 @@ int32_t MultimodalEventHandler::GetDevice(int32_t taskId, int32_t deviceId)
 
 int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (!InitClient()) {
         return MMI_SERVICE_INVALID;
     }
     return EventManager.InjectPointerEvent(pointerEvent);
-}
-
-int32_t MultimodalEventHandler::AddKeyEventFIlter(int32_t id, std::string name, Authority authority)
-{
-    if (authority < NO_AUTHORITY || authority > HIGH_AUTHORITY) {
-        MMI_LOGD("the input authority is incorrect");
-        return RET_ERR;
-    }
-    OHOS::MMI::NetPacket ckt(MmiMessageId::ADD_KEY_EVENT_INTERCEPTOR);
-    MMI_LOGD("client add a key event filter");
-    ckt<<id<<name<<authority;
-    client_->SendMessage(ckt);
-    return RET_OK;
-}
-
-int32_t MultimodalEventHandler::RemoveKeyEventFIlter(int32_t id)
-{
-    OHOS::MMI::NetPacket ckt(MmiMessageId::REMOVE_KEY_EVENT_INTERCEPTOR);
-    MMI_LOGD("client remove a key event filter");
-    ckt<<id;
-    client_->SendMessage(ckt);
-    return RET_OK;
-}
-
-int32_t MultimodalEventHandler::AddTouchEventFilter(int32_t id, std::string name, Authority authority)
-{
-    if (!InitClient()) {
-        return MMI_SERVICE_INVALID;
-    }
-    MMI_LOGD("client add a touch event filter");
-    OHOS::MMI::NetPacket ckt(MmiMessageId::ADD_TOUCH_EVENT_INTERCEPTOR);
-    int32_t ret = OHOS::MMI_STANDARD_EVENT_SUCCESS;
-    ckt << id << name << authority;
-    client_->SendMessage(ckt);
-    return ret;
-}
-
-int32_t MultimodalEventHandler::RemoveTouchEventFilter(int32_t id)
-{
-    if (!InitClient()) {
-        return MMI_SERVICE_INVALID;
-    }
-    MMI_LOGD("client remove a touch event filter");
-    OHOS::MMI::NetPacket ckt(MmiMessageId::REMOVE_TOUCH_EVENT_INTERCEPTOR);
-    int32_t ret = OHOS::MMI_STANDARD_EVENT_SUCCESS;
-    ckt << id;
-    client_->SendMessage(ckt);
-    return ret;
-}
-
-int32_t MultimodalEventHandler::AddEventInterceptor(int32_t id, std::string name, Authority authority)
-{
-    if (authority < NO_AUTHORITY || authority > HIGH_AUTHORITY) {
-        MMI_LOGD("the input authority is incorrect");
-        return RET_ERR;
-    }
-    OHOS::MMI::NetPacket ckt(MmiMessageId::ADD_POINTER_INTERCEPTOR);
-    MMI_LOGD("client add a pointer event interceptor");
-    ckt << id << name << authority;
-    client_->SendMessage(ckt);
-    return RET_OK;
-}
-
-int32_t MultimodalEventHandler::RemoveEventInterceptor(int32_t id)
-{
-    OHOS::MMI::NetPacket ckt(MmiMessageId::REMOVE_POINTER_INTERCEPTOR);
-    MMI_LOGD("client remove a pointer event interceptor");
-    ckt << id;
-    client_->SendMessage(ckt);
-    return RET_OK;
 }
 
 int32_t MultimodalEventHandler::AddInterceptor(int32_t sourceType, int32_t id)
@@ -263,9 +113,9 @@ int32_t MultimodalEventHandler::AddInterceptor(int32_t sourceType, int32_t id)
         return MMI_SERVICE_INVALID;
     }
 
-    OHOS::MMI::NetPacket ck(MmiMessageId::ADD_EVENT_INTERCEPTOR);
-    ck << sourceType << id;
-    client_->SendMessage(ck);
+    OHOS::MMI::NetPacket pkt(MmiMessageId::ADD_EVENT_INTERCEPTOR);
+    pkt << sourceType << id;
+    client_->SendMessage(pkt);
     MMI_LOGD("client add a touchpad event interceptor");
     return RET_OK;
 }
@@ -277,9 +127,9 @@ int32_t MultimodalEventHandler::RemoveInterceptor(int32_t id)
         return MMI_SERVICE_INVALID;
     }
 
-    OHOS::MMI::NetPacket ckt(MmiMessageId::REMOVE_EVENT_INTERCEPTOR);
-    ckt << id;
-    client_->SendMessage(ckt);
+    OHOS::MMI::NetPacket pkt(MmiMessageId::REMOVE_EVENT_INTERCEPTOR);
+    pkt << id;
+    client_->SendMessage(pkt);
     MMI_LOGD("client remove a touchpad event interceptor");
     return RET_OK;
 }
@@ -313,9 +163,9 @@ void MultimodalEventHandler::RemoveInputEventTouchpadMontior(int32_t pointerEven
     if (!InitClient()) {
         return;
     }
-    NetPacket ck(MmiMessageId::REMOVE_INPUT_EVENT_TOUCHPAD_MONITOR);
-    ck << OHOS::MMI::InputEvent::EVENT_TYPE_POINTER;
-    client_->SendMessage(ck);
+    NetPacket pkt(MmiMessageId::REMOVE_INPUT_EVENT_TOUCHPAD_MONITOR);
+    pkt << OHOS::MMI::InputEvent::EVENT_TYPE_POINTER;
+    client_->SendMessage(pkt);
 }
 
 int32_t MultimodalEventHandler::AddInputEventTouchpadMontior(int32_t pointerEventType)
@@ -324,10 +174,10 @@ int32_t MultimodalEventHandler::AddInputEventTouchpadMontior(int32_t pointerEven
     if (!InitClient()) {
         return MMI_SERVICE_INVALID;
     }
-    NetPacket ck(MmiMessageId::ADD_INPUT_EVENT_TOUCHPAD_MONITOR);
-    ck << OHOS::MMI::InputEvent::EVENT_TYPE_POINTER;
+    NetPacket pkt(MmiMessageId::ADD_INPUT_EVENT_TOUCHPAD_MONITOR);
+    pkt << OHOS::MMI::InputEvent::EVENT_TYPE_POINTER;
     MMI_LOGE("send msg before");
-    bool isSuc = client_->SendMessage(ck);
+    bool isSuc = client_->SendMessage(pkt);
     if (isSuc)
         MMI_LOGD("sendAdd msg Success");
     return RET_OK;

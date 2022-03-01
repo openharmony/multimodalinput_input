@@ -47,7 +47,7 @@ class ProcessingTouchScreenDevice : public DeviceBase {
 public:
     ProcessingTouchScreenDevice() = default;
     ~ProcessingTouchScreenDevice() = default;
-    int32_t TransformJsonDataForSingleTouchScreen(const Json& inputEventArrays, InputEventArray& inputEventArray);
+    int32_t TransformJsonDataSingleTouchScreen(const Json& inputEventArrays, InputEventArray& inputEventArray);
     int32_t TransformJsonDataToInputData(const Json& inputEventArrays, InputEventArray& inputEventArray);
 private:
     void AnalysisTouchScreenDate(const Json& inputData, TouchScreenInputEvents& touchScreenInputEvents);

@@ -20,7 +20,6 @@
 #include "input_handler_manager.h"
 #include "input_manager.h"
 #include "interceptor_manager.h"
-#include "key_event_pre.h"
 #include "multimodal_event_handler.h"
 #include "pointer_event.h"
 #include "proto.h"
@@ -32,8 +31,8 @@ using namespace OHOS;
 using namespace MMI;
 namespace {
 constexpr int32_t TIME_WAIT_FOR_OP = 500;
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerManualTest" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerManualTest" };
+} // namespace
 
 class InputManagerManualTest : public testing::Test {
 public:

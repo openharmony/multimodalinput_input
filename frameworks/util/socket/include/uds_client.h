@@ -60,7 +60,7 @@ protected:
 
     bool StartClient(MsgClientFunCallback fun, bool detachMode);
     void OnRecv(const char *buf, size_t size);
-    void OnEvent(const epoll_event& ev, StreamBuffer& buf);
+    void OnEvent(const struct epoll_event& ev, StreamBuffer& buf);
     void OnThread(std::promise<bool>& threadPromise);
     void SetToExit();
 

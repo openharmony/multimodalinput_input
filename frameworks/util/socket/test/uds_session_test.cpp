@@ -103,29 +103,29 @@ HWTEST_F(UDSSessionTest, SendMsg_type1_005, TestSize.Level1)
 HWTEST_F(UDSSessionTest, SendMsg_type2_001, TestSize.Level1)
 {
     int32_t fd = -1;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket pkt(MmiMessageId::INVALID);
 
     UDSSession sesObj(PROGRAM_NAME, moduleType_, fd, UID_ROOT, pid_);
-    bool retResult = sesObj.SendMsg(newPacket);
+    bool retResult = sesObj.SendMsg(pkt);
     EXPECT_FALSE(retResult);
 }
 
 HWTEST_F(UDSSessionTest, SendMsg_type2_002, TestSize.Level1)
 {
-    NetPacket newPacket(MmiMessageId::BEGIN);
+    NetPacket pkt(MmiMessageId::BEGIN);
 
     UDSSession sesObj(PROGRAM_NAME, moduleType_, fd_, UID_ROOT, pid_);
-    bool retResult = sesObj.SendMsg(newPacket);
+    bool retResult = sesObj.SendMsg(pkt);
     EXPECT_TRUE(retResult);
 }
 
 HWTEST_F(UDSSessionTest, SendMsg_type2_003, TestSize.Level1)
 {
     int32_t fd = -65535;
-    NetPacket newPacket(MmiMessageId::BEGIN);
+    NetPacket pkt(MmiMessageId::BEGIN);
 
     UDSSession sesObj(PROGRAM_NAME, moduleType_, fd, UID_ROOT, pid_);
-    bool retResult = sesObj.SendMsg(newPacket);
+    bool retResult = sesObj.SendMsg(pkt);
     EXPECT_FALSE(retResult);
 }
 } // namespace

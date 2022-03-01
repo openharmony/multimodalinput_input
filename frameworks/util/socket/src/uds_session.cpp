@@ -25,9 +25,9 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
-}
+constexpr int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
+} // namespace
 
 UDSSession::UDSSession(const std::string& programName, const int32_t moduleType, const int32_t fd,
     const int32_t uid, const int32_t pid)
@@ -93,7 +93,7 @@ bool UDSSession::SendMsg(NetPacket& pkt) const
     return SendMsg(buf.Data(), buf.Size());
 }
 
-void UDSSession::AddEvent(int32_t id, uint64_t time)
+void UDSSession::AddEvent(int32_t id, int64_t time)
 {
     MMI_LOGI("begin");
     EventTime eventTime = {id, time};
@@ -120,7 +120,7 @@ void UDSSession::DelEvents(int32_t id)
     MMI_LOGI("end");
 }
 
-uint64_t UDSSession::GetFirstEventTime()
+int64_t UDSSession::GetFirstEventTime()
 {
     MMI_LOGI("begin");
     if (events_.empty()) {

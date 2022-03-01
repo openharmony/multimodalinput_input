@@ -39,10 +39,6 @@ ohos_moduletest("sdk-test-out") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
-
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",

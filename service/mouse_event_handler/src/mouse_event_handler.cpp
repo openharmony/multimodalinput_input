@@ -27,8 +27,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MouseEventHandler"};
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MouseEventHandler"};
+} // namespace
 MouseEventHandler::MouseEventHandler()
 {
     pointerEvent_ = PointerEvent::Create();
@@ -139,7 +139,7 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerItem.SetLocalY(0);
     pointerItem.SetPointerId(0);
 
-    int64_t time = static_cast<int64_t>(GetSysClockTime());
+    int64_t time = GetSysClockTime();
     pointerItem.SetDownTime(time);
     pointerItem.SetWidth(0);
     pointerItem.SetHeight(0);
@@ -160,7 +160,7 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     MMI_LOGD("leave");
 }
 
-void MouseEventHandler::Normalize(libinput_event *event)
+void MouseEventHandler::Normalize(struct libinput_event *event)
 {
     MMI_LOGD("enter");
     CHKPV(event);

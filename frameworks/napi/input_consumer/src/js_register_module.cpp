@@ -18,7 +18,6 @@
 #include "input_manager.h"
 #include "js_register_util.h"
 #include "js_register_module.h"
-#include "key_event_pre.h"
 
 namespace OHOS {
 namespace MMI {
@@ -38,6 +37,8 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
     std::shared_ptr<KeyOption> keyOption)
 {
     MMI_LOGD("enter");
+    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(keyOption, ERROR_NULL_POINTER);
     size_t argc = ARGC_NUM;
     napi_value argv[ARGC_NUM] = { 0 };
     if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
@@ -138,6 +139,8 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
 static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
     MMI_LOGD("enter");
+    CHKPF(monitorInfo);
+    CHKPF(keyEvent);
     auto keyOption = monitorInfo->keyOption;
     std::vector<KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
     int32_t infoFinalKey = keyOption->GetFinalKey();
@@ -184,6 +187,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
 static void SubKeyEventCallback(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
     MMI_LOGD("enter");
+    CHKPV(keyEvent);
     auto iter = callbacks.begin();
     while (iter != callbacks.end()) {
         auto &list = iter->second;
@@ -204,6 +208,7 @@ static void SubKeyEventCallback(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 
 bool CheckPara(const std::shared_ptr<KeyOption> keyOption)
 {
+    CHKPF(keyOption);
     std::vector<int32_t> preKeys = keyOption->GetPreKeys();
     if (preKeys.size() > PRE_KEYS_SIZE) {
         MMI_LOGE("preKeys size is bigger than 4, can not process");
@@ -215,7 +220,7 @@ bool CheckPara(const std::shared_ptr<KeyOption> keyOption)
             MMI_LOGE("preKey:%{public}d is less 0, can not process", item);
             return false;
         }
-        if (std::find(checkRepeat.begin(), checkRepeat.end(), item) != checkRepeat.end()){
+        if (std::find(checkRepeat.begin(), checkRepeat.end(), item) != checkRepeat.end()) {
             MMI_LOGE("preKey is repeat, can not process");
             return false;
         }
