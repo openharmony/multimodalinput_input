@@ -28,7 +28,7 @@ AxisEvent::~AxisEvent() {}
 
 std::shared_ptr<AxisEvent> AxisEvent::Create()
 {
-    return std::shared_ptr<AxisEvent>(new AxisEvent(InputEvent::EVENT_TYPE_AXIS));
+    return std::shared_ptr<AxisEvent>(new (std::nothrow) AxisEvent(InputEvent::EVENT_TYPE_AXIS));
 }
 
 int32_t AxisEvent::GetAxisAction()
