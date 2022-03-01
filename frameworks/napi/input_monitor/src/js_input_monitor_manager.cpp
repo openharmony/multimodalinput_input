@@ -145,7 +145,10 @@ bool JsInputMonitorManager::AddEnv(napi_env env, napi_callback_info cbInfo)
         delete id;
         return false;
     }
-    envManager_.insert(std::pair<napi_env, napi_ref>(env, ref));
+    auto iter = envManager_.insert(std::pair<napi_env, napi_ref>(env, ref));
+    if (!iter.second) {
+        MMI_LOGE("Insert the failure");
+    }
     MMI_LOGD("Leave");
     return true;
 }

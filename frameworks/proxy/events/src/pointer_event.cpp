@@ -352,7 +352,10 @@ bool PointerEvent::IsButtonPressed(int32_t buttonId) const
 
 void PointerEvent::SetButtonPressed(int32_t buttonId)
 {
-    pressedButtons_.insert(buttonId);
+    auto iter = pressedButtons_.insert(buttonId);
+    if (!iter.second) {
+        HiLog::Error(LABEL, "Insert the failure, button:%{public}d", buttonId);
+    }
 }
 
 void PointerEvent::DeleteReleaseButton(int32_t buttonId)
@@ -563,7 +566,10 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         if (!in.ReadInt32(val)) {
             return false;
         }
-        pressedButtons_.insert(val);
+        auto iter = pressedButtons_.insert(val);
+        if (!iter.second) {
+            HiLog::Error(LABEL, "Insert the failure, val:%{public}d", val);
+        }
     }
 
     if (!in.ReadInt32(sourceType_)) {
