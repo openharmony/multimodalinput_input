@@ -41,7 +41,10 @@ void StreamBuffer::Clean()
 
 bool StreamBuffer::SetReadIdx(size_t idx)
 {
-    CHKF(idx <= wIdx_, PARAM_INPUT_INVALID);
+    if (idx > wIdx_) {
+        MMI_LOGE("Invalid parameter input");
+        return false;
+    }
     rIdx_ = idx;
     return true;
 }
