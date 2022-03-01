@@ -60,12 +60,12 @@ void InputDeviceImpl::GetInputDeviceAsync(int32_t deviceId,
 void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, std::string name, int32_t deviceType)
 {
     MMI_LOGD("begin");
-    auto inputDeviceInfo = std::make_shared<InputDeviceInfo>(id, name, deviceType);
     auto iter = inputDevcices_.find(userData);
     if (iter == inputDevcices_.end()) {
         MMI_LOGE("failed to find the callback function");
         return;
     }
+    auto inputDeviceInfo = std::make_shared<InputDeviceInfo>(id, name, deviceType);
     iter->second(inputDeviceInfo);
     MMI_LOGD("end");
 }
