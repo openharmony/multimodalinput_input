@@ -75,7 +75,10 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
         return false;
     }
     PointerEvent::PointerItem pointer;
-    CHKF(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL);
+    if (!(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer))) {
+        MMI_LOGE("The obtained pointer parameter is invalid");
+        return false;
+    }
     MMI_LOGD("Interceptor-servereventTouchpad:actionTime:%{public}" PRId64 ","
              "sourceType:%{public}d,pointerAction:%{public}d,"
              "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",

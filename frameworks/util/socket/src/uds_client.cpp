@@ -54,8 +54,14 @@ int32_t UDSClient::ConnectTo()
 bool UDSClient::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
-    CHKF(size > 0 && size <= MAX_PACKET_BUF_SIZE, PARAM_INPUT_INVALID);
-    CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
+    if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
+        MMI_LOGE("Stream buffer size out of range");
+        return false;
+    }
+    if (fd_ < 0) {
+        MMI_LOGE("fd_ is less than 0");
+        return false;
+    }
     ssize_t ret = write(fd_, static_cast<const void *>(buf), size);
     if (ret < 0) {
         MMI_LOGE("SendMsg write errCode:%{public}d,return %{public}zd", MSG_SEND_FAIL, ret);
@@ -66,7 +72,10 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
 
 bool UDSClient::SendMsg(const NetPacket& pkt) const
 {
-    CHKF(!pkt.ChkRWError(), PACKET_WRITE_FAIL);
+    if (pkt.ChkRWError()) {
+        MMI_LOGE("Read and write status is error");
+        return false;
+    }
     StreamBuffer buf;
     pkt.MakeData(buf);
     return SendMsg(buf.Data(), buf.Size());
