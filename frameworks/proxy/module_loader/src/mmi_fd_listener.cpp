@@ -50,14 +50,13 @@ void MMIFdListener::OnReadable(int32_t fd)
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
     const int32_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
     CHK(maxCount > 0, VAL_NOT_EXP);
-    const int32_t flags = MSG_DONTWAIT | MSG_NOSIGNAL;
     for (int32_t i = 0; i < maxCount; i++) {
-        auto size = recv(fd, szBuf, sizeof(szBuf), flags);
+        auto size = recv(fd, szBuf, sizeof(szBuf), SOCKET_FLAGS);
         if (size < 0) {
-            MMI_LOGE("recv return %{public}zu %{public}s", size, strerror(errno));
+            MMI_LOGE("recv return %{public}zu strerr:%{public}s", size, strerror(errno));
             break;
         } else if (size == 0) {
-            MMI_LOGE("recv return 0 %{public}s", strerror(errno));
+            MMI_LOGE("The service side disconnect with the client. size:0 strerr:%{public}s", strerror(errno));
             mmiClient_->OnDisconnect();
             break;
         } else if (size > 0) {

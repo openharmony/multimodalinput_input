@@ -20,6 +20,7 @@
 #include <sys/types.h>
 #include <sys/un.h>
 #include <unistd.h>
+#include "uds_socket.h"
 
 namespace OHOS {
 namespace MMI {
@@ -49,12 +50,12 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         return PARAM_INPUT_INVALID;
     }
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
-    ssize_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
+    // ssize_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
+    ssize_t ret = send(fd_, buf, size, SOCKET_FLAGS);
     if (ret < 0) {
         const int32_t errNoSaved = errno;
-        MMI_LOGE("UDSSession::SendMsg write return %{public}zd,"
-                 "fd_:%{public}d,errNoSaved:%{public}d,strerror:%{public}s",
-                 ret, fd_, errNoSaved, strerror(errNoSaved));
+        MMI_LOGE("send return %{public}zd,fd_:%{public}d,errNoSaved:%{public}d,strerror:%{public}s",
+            ret, fd_, errNoSaved, strerror(errNoSaved));
         return false;
     }
     return true;
