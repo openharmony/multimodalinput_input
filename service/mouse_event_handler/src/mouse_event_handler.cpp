@@ -204,7 +204,7 @@ void MouseEventHandler::DumpInner()
 
     PointerEvent::PointerItem item;
     if (!pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item)) {
-        MMI_LOGE("Can't find the pointer item data, pointer:%{public}d, errCode:%{public}d", 
+        MMI_LOGE("Can't find the pointer item data, pointer:%{public}d, errCode:%{public}d",
                  pointerEvent_->GetPointerId(), PARAM_INPUT_FAIL);
         return;
     }
