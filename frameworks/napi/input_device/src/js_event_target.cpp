@@ -31,7 +31,7 @@ JsEventTarget::DeviceType g_deviceType[] = {
 
 napi_env JsEventTarget::env_ = nullptr;
 static std::map<int32_t, JsEventTarget::CallbackInfo*> callback_ {};
-int32_t userData_ = 0;
+int32_t JsEventTarget::userData_ = 0;
 
 void JsEventTarget::CallIdsAsyncWork(napi_env env, napi_status status, void* data)
 {
