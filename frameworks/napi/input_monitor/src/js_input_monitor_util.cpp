@@ -163,7 +163,7 @@ std::string GetNamePropertyString(const napi_env& env, const napi_value& object,
         return value;
     }
     if (tmpType != napi_string) {
-        MMI_LOGD("value is not bool");
+        MMI_LOGD("value is not string");
         return value;
     }
 
