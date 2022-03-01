@@ -20,7 +20,6 @@
 #include <list>
 #include "input_type.h"
 #include "uds_server.h"
-#include "register_eventhandle_manager.h"
 #include "input_manager.h"
 
 namespace OHOS {
