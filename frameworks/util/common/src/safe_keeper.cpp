@@ -35,7 +35,7 @@ void SafeKeeper::Init(SafeCallbackFun fun)
 
 bool SafeKeeper::RegisterEvent(uint64_t tid, const std::string& remark)
 {
-    if (IsThreadExist(tid)) {
+    if (!IsThreadExist(tid)) {
         MMI_LOGE("This thread does not exist");
         return false;
     }
