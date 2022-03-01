@@ -64,7 +64,7 @@ protected:
 
 private:
     int32_t DispatchTouchEvent(const EventTouch& touch, const int fd,
-        const int64_t preHandlerTime, UDSServer& udsServer, NetPacket &newPacket) const;
+        const int64_t preHandlerTime, UDSServer& udsServer, NetPacket &pkt) const;
 
 private:
     EventPackage eventPackage_;

@@ -15,7 +15,6 @@
 
 #include "processing_touch_screen_device.h"
 
-using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
