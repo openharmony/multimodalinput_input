@@ -148,7 +148,7 @@ bool JsInputMonitorManager::AddEnv(napi_env env, napi_callback_info cbInfo)
     auto iter = envManager_.insert(std::pair<napi_env, napi_ref>(env, ref));
     if (!iter.second) {
         MMI_LOGE("Insert the failure");
-        return fasle;
+        return false;
     }
     MMI_LOGD("Leave");
     return true;
