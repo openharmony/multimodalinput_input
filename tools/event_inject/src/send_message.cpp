@@ -17,7 +17,6 @@
 #include "proto.h"
 #include "sys/file.h"
 
-using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
