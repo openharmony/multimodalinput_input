@@ -32,10 +32,13 @@
 #include "mmi_token.h"
 #include "run_shell_util.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::MMI;
+} // namespace
 namespace {
 #ifdef OHOS_WESTEN_MODEL
 constexpr int32_t MMI_KEY_BACK = 2;
@@ -59,8 +62,8 @@ constexpr int32_t INDEX_THIRD = 3;
 constexpr int32_t INDEX_INVALID = -1;
 #endif
 constexpr int32_t MASK_BASE = 10;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest" }; // namepace
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest" };
+} // namespace
 
 class InputManagerTest : public testing::Test {
 public:
@@ -2849,4 +2852,5 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

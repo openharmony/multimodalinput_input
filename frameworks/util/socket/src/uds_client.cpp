@@ -66,7 +66,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
 
 bool UDSClient::SendMsg(const NetPacket& pkt) const
 {
-    CHKF(!pkt.ChkError(), PACKET_WRITE_FAIL);
+    CHKF(!pkt.ChkRWError(), PACKET_WRITE_FAIL);
     StreamBuffer buf;
     pkt.MakeData(buf);
     return SendMsg(buf.Data(), buf.Size());
