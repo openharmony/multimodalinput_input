@@ -35,12 +35,12 @@ void SafeKeeper::Init(SafeCallbackFun fun)
 
 bool SafeKeeper::RegisterEvent(uint64_t tid, const std::string& remark)
 {
-    if (IsExist(tid)) {
+    if (IsThreadExist(tid)) {
         MMI_LOGE("This thread does not exist");
         return false;
     }
     if (remark.empty()) {
-        MMI_LOGE("Thread name is null");
+        MMI_LOGE("Thread name is empty");
         return false;
     }
     std::lock_guard<std::mutex> lock(mtx_);
