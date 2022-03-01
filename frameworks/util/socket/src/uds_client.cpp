@@ -72,7 +72,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
 
 bool UDSClient::SendMsg(const NetPacket& pkt) const
 {
-    if (pkt.ChkError()) {
+    if (pkt.ChkRWError()) {
         MMI_LOGE("Read and write status is error");
         return false;
     }
