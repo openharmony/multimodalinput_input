@@ -355,7 +355,8 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
     }
     if (num < 1) {
         int32_t *id = &id_;
-        uv_work_t *work = new uv_work_t;
+        uv_work_t *work = new (std::nothrow) uv_work_t;
+        CHKPV(work);
         work->data = id;
         uv_queue_work(loop_, work, [](uv_work_t *work){}, &JsInputMonitor::JsCallback);
         std::lock_guard<std::mutex> guard(mutex_);
