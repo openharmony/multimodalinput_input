@@ -48,10 +48,6 @@ config("virtual_device_config") {
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
-
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
 }
 
 config("virtual_device_public_config") {
@@ -88,8 +84,6 @@ ohos_shared_library("libmmi-virtual-device") {
 
   configs = [ ":virtual_device_config" ]
 
-  public_configs = [ ":virtual_device_public_config" ]
-
   cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
@@ -104,10 +98,6 @@ ohos_shared_library("libmmi-virtual-device") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
-
   deps = [ "//utils/native/base:utils" ]
 
   install_enable = true
@@ -116,6 +106,9 @@ ohos_shared_library("libmmi-virtual-device") {
 
 ohos_executable("mmi-virtual-device-manager") {
   sources = [ "src/mmi_virtual_device_main.cpp" ]
+
+  configs = [ ":virtual_device_public_config" ]
+
   deps = [ "//foundation/multimodalinput/input/tools/virtual_device_manager:libmmi-virtual-device" ]
 
   if (is_mmi_have_libinput) {
@@ -133,14 +126,6 @@ ohos_executable("mmi-virtual-device-manager") {
 
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
-
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
-
-  if (is_mmi_have_weston) {
-    cflags += [ "-DOHOS_WESTEN_MODEL" ]
   }
 
   install_enable = true
@@ -168,6 +153,8 @@ ohos_unittest("ut-virtual-device-out") {
 
   sources = [ "test/virtual_device_test.cpp" ]
 
+  configs = [ ":virtual_device_public_config" ]
+
   cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
@@ -180,10 +167,6 @@ ohos_unittest("ut-virtual-device-out") {
 
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
-
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
   }
 
   deps = [

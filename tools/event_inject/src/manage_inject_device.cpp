@@ -17,12 +17,11 @@
 #include <chrono>
 #include <thread>
 
-using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ManageInjectDevice" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ManageInjectDevice" };
+} // namespace
 
 int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
 {
@@ -32,15 +31,15 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
         return RET_ERR;
     }
     int32_t ret = RET_ERR;
-    string deviceName;
-    string sendType;
-    string deviceNode;
+    std::string deviceName;
+    std::string sendType;
+    std::string deviceNode;
     GetDeviceObject getDeviceObject;
     for (const auto &item : configData) {
         deviceName = item.at("deviceName").get<std::string>();
         InputEventArray inputEventArray = {};
         inputEventArray.deviceName = deviceName;
-#ifndef OHOS_BUILD_HDF
+
         uint16_t devIndex = 0;
         if (item.find("devIndex") != item.end()) {
             devIndex = item.at("devIndex").get<uint16_t>();
@@ -49,7 +48,7 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
             return RET_ERR;
         }
         inputEventArray.target = deviceNode;
-#endif
+
         devicePtr_ = getDeviceObject.CreateDeviceObject(deviceName);
         if (devicePtr_ == nullptr) {
             return RET_ERR;
@@ -70,23 +69,13 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
 
 int32_t ManageInjectDevice::SendEvent(const InputEventArray& inputEventArray)
 {
-#ifdef OHOS_BUILD_HDF
-    return SendEventToHdi(inputEventArray);
-#else
     return SendEventToDeviveNode(inputEventArray);
-#endif
-}
-
-int32_t ManageInjectDevice::SendEventToHdi(const InputEventArray& inputEventArray)
-{
-    SendMessage sendMessage;
-    return sendMessage.SendToHdi(inputEventArray);
 }
 
 int32_t ManageInjectDevice::SendEventToDeviveNode(const InputEventArray& inputEventArray)
 {
     MMI_LOGD("Enter");
-    string deviceNode = inputEventArray.target;
+    std::string deviceNode = inputEventArray.target;
     if (deviceNode.empty()) {
         MMI_LOGE("device node:%{public}s is not exit", deviceNode.c_str());
         return RET_ERR;

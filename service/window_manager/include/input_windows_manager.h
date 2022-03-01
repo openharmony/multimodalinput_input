@@ -23,15 +23,8 @@
 #include "pointer_event.h"
 #include "libinput.h"
 
-#ifdef OHOS_WESTEN_MODEL
-extern "C" {
-#include <screen_info.h>
-#include <libinput-seat-export.h>
-}
-#else
 namespace OHOS {
 namespace MMI {
-
 struct SurfaceInfo {
     int32_t surfaceId;
     int32_t dstX;
@@ -46,7 +39,6 @@ struct SurfaceInfo {
     int32_t visibility; // 0 or 1
     int32_t onLayerId;
 };
-
 struct LayerInfo {
     int32_t layerId;
     int32_t dstX;
@@ -63,7 +55,6 @@ struct LayerInfo {
     int32_t nSurfaces;
     SurfaceInfo** surfaces;
 };
-
 struct ScreenInfo {
     int32_t screenId;
     char* connectorName;
@@ -72,37 +63,14 @@ struct ScreenInfo {
     int32_t nLayers;
     LayerInfo** layers;
 };
-
 struct SeatInfo {
     char* seatName;
     int32_t deviceFlags;
     int32_t focusWindowId;
 };
-
 struct multimodal_libinput_event {
     struct libinput_event *event;
     void *userdata;
-};
-
-SeatInfo** GetSeatsInfo(void);
-ScreenInfo** GetScreensInfo(void);
-void FreeSurfaceInfo(SurfaceInfo* pSurface);
-void FreeLayerInfo(LayerInfo* pLayer);
-void FreeScreenInfo(ScreenInfo* pScreen);
-void FreeScreensInfo(ScreenInfo** screens);
-void FreeSeatsInfo(SeatInfo** seats);
-using SeatInfoChangeListener = void (*)();
-using ScreenInfoChangeListener = void (*)();
-void SetSeatListener(const SeatInfoChangeListener listener);
-void SetScreenListener(const ScreenInfoChangeListener listener);
-
-struct multimodal_libinput_event;
-typedef void (*LibInputEventListener)(multimodal_libinput_event *event);
-void SetLibInputEventListener(const LibInputEventListener listener);
-#endif
-
-struct MMISurfaceInfo : public SurfaceInfo {
-    int32_t screenId;
 };
 struct MouseLocation {
     int32_t globalX;
@@ -118,33 +86,9 @@ public:
     void UpdateSeatsInfo();
     void UpdateScreensInfo();
 
-    const ScreenInfo* GetScreenInfo(int32_t screenId);
-    const LayerInfo* GetLayerInfo(int32_t layerId);
-    const MMISurfaceInfo* GetSurfaceInfo(int32_t sufaceId);
-    bool CheckFocusSurface(double x, double y, const MMISurfaceInfo& info) const;
-    const MMISurfaceInfo* GetTouchSurfaceInfo(double x, double y);
-    void TransfromToSurfaceCoordinate(const MMISurfaceInfo& info, double& x, double& y, bool debug = false);
-
-    bool GetTouchSurfaceId(const double x, const double y, std::vector<int32_t>& ids);
-
-    const std::vector<ScreenInfo>& GetScreenInfo() const;
-
-    const std::map<int32_t, LayerInfo>& GetLayerInfo() const;
-
-    const std::map<int32_t, MMISurfaceInfo>& GetSurfaceInfo() const;
-
-    void InsertSurfaceInfo(const MMISurfaceInfo& tmpSurfaceInfo);
 
     void PrintAllNormalSurface();
 
-    void SetFocusSurfaceId(int32_t id);
-    void SetTouchFocusSurfaceId(int32_t id);
-
-    int32_t GetFocusSurfaceId() const;
-    int32_t GetTouchFocusSurfaceId() const;
-
-    size_t GetSurfaceIdList(std::vector<int32_t>& ids);
-    std::string GetSurfaceIdListString();
     void Clear();
     void Dump(int32_t fd);
 
@@ -172,13 +116,10 @@ public:
     void TurnTouchScreen(PhysicalDisplayInfo* info, Direction direction,
         int32_t& logicalX, int32_t& logicalY);
     void AdjustCoordinate(double &coordinateX, double &coordinateY);
-    void FixCursorPosition(int32_t &globalX, int32_t &globalY, int32_t cursorW, int32_t cursorH);
 
 private:
     void SetFocusId(int32_t id);
     void PrintDebugInfo();
-    void SaveScreenInfoToMap(const ScreenInfo **screen_info);
-    bool FindSurfaceCoordinate(double x, double y, const SurfaceInfo& pstrSurface);
     int32_t UpdateMouseTargetOld(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTouchScreenTargetOld(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTouchPadTargetOld(std::shared_ptr<PointerEvent> pointerEvent);
@@ -191,16 +132,14 @@ private:
     int32_t UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent);
     PhysicalDisplayInfo* GetPhysicalDisplay(int32_t id);
     PhysicalDisplayInfo* FindPhysicalDisplayInfo(const std::string seatId, const std::string seatName);
+    int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent);
+
 private:
     std::mutex mu_;
     SeatInfo** seatsInfo_ = nullptr;
     ScreenInfo **screensInfo_ = nullptr;
     int32_t focusInfoID_ = 0;
     int32_t touchFocusId_ = 0;
-    std::vector<int32_t> surfacesList_; // surfaces ids list
-    std::vector<ScreenInfo> screenInfoVec_ = {};
-    std::map<int32_t, LayerInfo> layers_ = {};
-    std::map<int32_t, MMISurfaceInfo> surfaces_ = {};
     UDSServer* udsServer_ = nullptr;
     int32_t firstBtnDownWindowId_ = -1;
     /* *********************************新框架接口添加*************************** */
