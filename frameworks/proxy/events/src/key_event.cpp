@@ -516,7 +516,7 @@ KeyEvent::~KeyEvent() {}
 
 std::shared_ptr<KeyEvent> KeyEvent::Create()
 {
-    return std::shared_ptr<KeyEvent>(new KeyEvent(InputEvent::EVENT_TYPE_KEY));
+    return std::shared_ptr<KeyEvent>(new (std::nothrow) KeyEvent(InputEvent::EVENT_TYPE_KEY));
 }
 
 int32_t KeyEvent::GetKeyCode() const
@@ -1404,7 +1404,7 @@ std::shared_ptr<KeyEvent> KeyEvent::Clone(std::shared_ptr<KeyEvent> keyEvent) {
         return nullptr;
     }
 
-    return std::shared_ptr<KeyEvent>(new KeyEvent(*keyEvent.get()));
+    return std::shared_ptr<KeyEvent>(new (std::nothrow) KeyEvent(*keyEvent.get()));
 }
 
 bool KeyEvent::IsValidKeyItem() const
