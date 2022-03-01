@@ -35,17 +35,16 @@ public:
         int32_t devcieType;
     };
 
-    void GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback);
-    void GetInputDeviceAsync(int32_t deviceId, std::function<void(std::shared_ptr<InputDeviceInfo>)> callback);
+    void GetInputDeviceIdsAsync(int32_t userData, std::function<void(int32_t, std::vector<int32_t>)> callback);
+    void GetInputDeviceAsync(int32_t userData, int32_t deviceId,
+        std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)> callback);
     void OnInputDevice(int32_t userData, int32_t id, std::string name, int32_t deviceId);
     void OnInputDeviceIds(int32_t userData, std::vector<int32_t> ids);
 
 private:
     InputDeviceImpl() = default;
-    std::map<int32_t, std::function<void(std::shared_ptr<InputDeviceInfo>)>> inputDevcices_;
-    std::map<int32_t, std::function<void(std::vector<int32_t>)>> inputDevciceIds_;
-    int32_t inputDeviceUD_ {0};
-    int32_t idsUD_ {0};
+    std::map<int32_t, std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)>> inputDevcices_;
+    std::map<int32_t, std::function<void(int32_t, std::vector<int32_t>)>> inputDevciceIds_;
     std::mutex mtx_;
 };
 } // namespace MMI
