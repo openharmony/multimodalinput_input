@@ -52,11 +52,7 @@ public:
 
     void OnThreadUnitTest()
     {
-        std::promise<bool> threadPromise;
-        std::future<bool> threadFuture = threadPromise.get_future();
-        OnThread(std::ref(threadPromise));
-        const bool ret = threadFuture.get();
-        ASSERT_EQ(ret, true);
+        OnThread();
     }
 };
 
