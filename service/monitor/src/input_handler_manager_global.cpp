@@ -186,7 +186,7 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
         MMI_LOGW("Specified monitor does not exist, monitor:%{public}d", monitorId);
         return;
     }
-    if (monitorConsumed_) {
+    if (isMonitorConsumed_) {
         MMI_LOGW("Event consumed");
         return;
     }
@@ -198,9 +198,9 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
         MMI_LOGW("A new process has began %{public}d,%{public}d", downEventId_, eventId);
         return;
     }
-    monitorConsumed_ = true;
+    isMonitorConsumed_ = true;
     MMI_LOGD("Cancel operation");
-    std::shared_ptr<PointerEvent> pointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
+    auto pointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetActionTime(GetSysClockTime());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
@@ -229,7 +229,7 @@ bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<P
     CHKPF(pointerEvent);
     UpdateConsumptionState(pointerEvent);
     Monitor(pointerEvent);
-    return monitorConsumed_;
+    return isMonitorConsumed_;
 }
 
 bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId, SessionPtr session)
@@ -247,16 +247,15 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
         return;
     }
     lastPointerEvent_ = pointerEvent;
-    constexpr size_t nPtrsIndNewProc = 1;
 
-    if (pointerEvent->GetPointersIdList().size() != nPtrsIndNewProc) {
-        MMI_LOGD("First press and last lift intermediate process");
+    if (pointerEvent->GetPointersIdList().size() != 1) {
+        MMI_LOGD("First down and last up intermediate process");
         return;
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
         MMI_LOGD("Press for the first time");
         downEventId_ = pointerEvent->GetId();
-        monitorConsumed_ = false;
+        isMonitorConsumed_ = false;
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
         MMI_LOGD("The last time lift");
         downEventId_ = -1;
