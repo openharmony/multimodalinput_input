@@ -27,30 +27,7 @@ namespace {
 }
 void OnConnected(const OHOS::MMI::IfMMIClient& client)
 {
-#ifdef OHOS_WESTEN_MODEL
-    int32_t winId = 0;
-    int32_t abilityId = 0;
-    std::string bundlerName = "EmptyBundlerName";
-    std::string appName = "EmptyAppName";
-    auto abilityInfoVec = MMIEventHdl.GetAbilityInfoVec();
-    if (!abilityInfoVec.empty()) {
-        winId = abilityInfoVec[0].windowId;
-        abilityId = *reinterpret_cast<int32_t*>(abilityInfoVec[0].token.GetRefPtr());
-    }
-    OHOS::MMI::NetPacket pkt(MmiMessageId::REGISTER_APP_INFO);
-    pkt << abilityId << winId << bundlerName << appName;
-    client.SendMessage(pkt);
-
-    for (auto& val : abilityInfoVec) {
-        if (val.sync == REG_STATUS_SYNCED) {
-            val.sync = REG_STATUS_NOT_SYNC;
-            continue;
-        }
-        EventManager.RegisterStandardizedEventHandle(val.token, val.windowId, val.standardizedEventHandle);
-    }
-#else
     InputManagerImpl::GetInstance()->OnConnected();
-#endif
 }
 
 MultimodalEventHandler::MultimodalEventHandler()
@@ -58,60 +35,6 @@ MultimodalEventHandler::MultimodalEventHandler()
 #ifdef OHOS_BUILD_MMI_DEBUG
     VerifyLogManagerRun();
 #endif
-}
-
-int32_t MultimodalEventHandler::RegisterStandardizedEventHandle(const sptr<IRemoteObject> token,
-    int32_t windowId, StandEventPtr standardizedEventHandle)
-{
-#ifdef OHOS_WESTEN_MODEL
-    MMI_LOGD("begin");
-    KMSG_LOGI("Register Standardized Event Handle start!");
-    int32_t ret = OHOS::MMI_STANDARD_EVENT_SUCCESS;
-    EventRegesterInfo regInfo = {};
-    if (client_ && client_->GetCurrentConnectedStatus()) {
-        regInfo.sync = REG_STATUS_SYNCED;
-        ret = EventManager.RegisterStandardizedEventHandle(token, windowId, standardizedEventHandle);
-    }
-    regInfo.token = token;
-    regInfo.windowId = windowId;
-    regInfo.standardizedEventHandle = standardizedEventHandle;
-    abilityInfoVec_.push_back(regInfo);
-
-    if (!InitClient()) {
-        MMI_LOGE("init client failed!");
-        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAM;
-    }
-    MMI_LOGD("end");
-    return ret;
-#else
-    return RET_OK;
-#endif
-}
-
-int32_t MultimodalEventHandler::UnregisterStandardizedEventHandle(const sptr<IRemoteObject> token,
-    int32_t windowId, StandEventPtr standardizedEventHandle)
-{
-#ifdef OHOS_WESTEN_MODEL
-    return EventManager.UnregisterStandardizedEventHandle(token, windowId, standardizedEventHandle);
-#else
-    return RET_OK;
-#endif
-}
-
-int32_t MultimodalEventHandler::InjectEvent(const OHOS::KeyEvent& keyEvent)
-{
-    if (!InitClient()) {
-        return MMI_SERVICE_INVALID;
-    }
-    return EventManager.InjectEvent(keyEvent);
-}
-
-int32_t MultimodalEventHandler::InjectEvent(const OHOS::MMI::KeyEvent& keyEvent)
-{
-    if (!InitClient()) {
-        return MMI_SERVICE_INVALID;
-    }
-    return EventManager.InjectEvent(keyEvent);
 }
 
 int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr)
@@ -129,11 +52,6 @@ int32_t MultimodalEventHandler::GetMultimodeInputInfo()
         return MMI_SERVICE_INVALID;
     }
     return MMI_SERVICE_RUNNING;
-}
-
-std::vector<EventRegesterInfo>& MultimodalEventHandler::GetAbilityInfoVec()
-{
-    return abilityInfoVec_;
 }
 
 bool MultimodalEventHandler::InitClient()
@@ -187,76 +105,6 @@ int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent>
         return MMI_SERVICE_INVALID;
     }
     return EventManager.InjectPointerEvent(pointerEvent);
-}
-
-int32_t MultimodalEventHandler::AddKeyEventFIlter(int32_t id, std::string name, Authority authority)
-{
-    if (authority < NO_AUTHORITY || authority > HIGH_AUTHORITY) {
-        MMI_LOGD("the input authority is incorrect");
-        return RET_ERR;
-    }
-    OHOS::MMI::NetPacket pkt(MmiMessageId::ADD_KEY_EVENT_INTERCEPTOR);
-    MMI_LOGD("client add a key event filter");
-    pkt << id << name << authority;
-    client_->SendMessage(pkt);
-    return RET_OK;
-}
-
-int32_t MultimodalEventHandler::RemoveKeyEventFIlter(int32_t id)
-{
-    OHOS::MMI::NetPacket pkt(MmiMessageId::REMOVE_KEY_EVENT_INTERCEPTOR);
-    MMI_LOGD("client remove a key event filter");
-    pkt << id;
-    client_->SendMessage(pkt);
-    return RET_OK;
-}
-
-int32_t MultimodalEventHandler::AddTouchEventFilter(int32_t id, std::string name, Authority authority)
-{
-    if (!InitClient()) {
-        return MMI_SERVICE_INVALID;
-    }
-    MMI_LOGD("client add a touch event filter");
-    OHOS::MMI::NetPacket pkt(MmiMessageId::ADD_TOUCH_EVENT_INTERCEPTOR);
-    int32_t ret = OHOS::MMI_STANDARD_EVENT_SUCCESS;
-    pkt << id << name << authority;
-    client_->SendMessage(pkt);
-    return ret;
-}
-
-int32_t MultimodalEventHandler::RemoveTouchEventFilter(int32_t id)
-{
-    if (!InitClient()) {
-        return MMI_SERVICE_INVALID;
-    }
-    MMI_LOGD("client remove a touch event filter");
-    OHOS::MMI::NetPacket pkt(MmiMessageId::REMOVE_TOUCH_EVENT_INTERCEPTOR);
-    int32_t ret = OHOS::MMI_STANDARD_EVENT_SUCCESS;
-    pkt << id;
-    client_->SendMessage(pkt);
-    return ret;
-}
-
-int32_t MultimodalEventHandler::AddEventInterceptor(int32_t id, std::string name, Authority authority)
-{
-    if (authority < NO_AUTHORITY || authority > HIGH_AUTHORITY) {
-        MMI_LOGD("the input authority is incorrect");
-        return RET_ERR;
-    }
-    OHOS::MMI::NetPacket pkt(MmiMessageId::ADD_POINTER_INTERCEPTOR);
-    MMI_LOGD("client add a pointer event interceptor");
-    pkt << id << name << authority;
-    client_->SendMessage(pkt);
-    return RET_OK;
-}
-
-int32_t MultimodalEventHandler::RemoveEventInterceptor(int32_t id)
-{
-    OHOS::MMI::NetPacket pkt(MmiMessageId::REMOVE_POINTER_INTERCEPTOR);
-    MMI_LOGD("client remove a pointer event interceptor");
-    pkt << id;
-    client_->SendMessage(pkt);
-    return RET_OK;
 }
 
 int32_t MultimodalEventHandler::AddInterceptor(int32_t sourceType, int32_t id)

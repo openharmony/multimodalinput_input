@@ -17,15 +17,11 @@
 #include <cinttypes>
 #include <csignal>
 #include <sys/signalfd.h>
-
-#include "app_register.h"
-#include "device_register.h"
 #include "event_dump.h"
 #include "input_windows_manager.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "pointer_drawing_manager.h"
-#include "register_eventhandle_manager.h"
 #include "safe_keeper.h"
 #include "timer_manager.h"
 #include "util.h"
@@ -68,17 +64,11 @@ static void CheckDefine()
 #ifdef OHOS_BUILD
     CheckDefineOutput("%-40s", "OHOS_BUILD");
 #endif
-#ifdef OHOS_WESTEN_MODEL
-    CheckDefineOutput("%-40s", "OHOS_WESTEN_MODEL");
-#endif
 #ifdef OHOS_BUILD_LIBINPUT
     CheckDefineOutput("%-40s", "OHOS_BUILD_LIBINPUT");
 #endif
 #ifdef OHOS_BUILD_HDF
     CheckDefineOutput("%-40s", "OHOS_BUILD_HDF");
-#endif
-#ifdef OHOS_BUILD_AI
-    CheckDefineOutput("%-40s", "OHOS_BUILD_AI");
 #endif
 #ifdef OHOS_BUILD_MMI_DEBUG
     CheckDefineOutput("%-40s", "OHOS_BUILD_MMI_DEBUG");
@@ -160,12 +150,6 @@ int32_t MMIService::Init()
 {
     CheckDefine();
 
-#ifdef  OHOS_BUILD_AI
-    MMI_LOGD("SeniorInput Init");
-    CHKR(seniorInput_.Init(*this), SENIOR_INPUT_DEV_INIT_FAIL, SENIOR_INPUT_DEV_INIT_FAIL);
-    sMsgHandler_.SetSeniorInputHandle(seniorInput_);
-#endif // OHOS_BUILD_AI
-
     MMI_LOGD("InputEventHandler Init");
     InputHandler->Init(*this);
 
@@ -177,13 +161,7 @@ int32_t MMIService::Init()
 
     MMI_LOGD("WindowsManager Init");
     CHKR(WinMgr->Init(*this), WINDOWS_MSG_INIT_FAIL, WINDOWS_MSG_INIT_FAIL);
-#ifdef OHOS_WESTEN_MODEL
-    MMI_LOGD("AppRegister Init");
-    CHKR(AppRegs->Init(*this), APP_REG_INIT_FAIL, APP_REG_INIT_FAIL);
 
-    MMI_LOGD("DeviceRegister Init");
-    CHKR(DevRegister->Init(), DEV_REG_INIT_FAIL, DEV_REG_INIT_FAIL);
-#endif
     MMI_LOGD("PointerDrawingManager Init");
     CHKR(PointerDrawingManager::GetInstance()->Init(), POINTER_DRAW_INIT_FAIL, POINTER_DRAW_INIT_FAIL);
 
@@ -234,20 +212,13 @@ void MMIService::OnConnected(SessionPtr s)
     CHKPV(s);
     int32_t fd = s->GetFd();
     MMI_LOGI("fd:%{public}d", fd);
-    AppRegs->RegisterConnectState(fd);
 }
 
 void MMIService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
-    MMI_LOGW("enter, session desc:%{public}s", s->GetDescript().c_str());
     int32_t fd = s->GetFd();
-
-    auto appInfo = AppRegs->FindSocketFd(fd);
-    AppRegs->UnregisterConnectState(fd);
-#ifdef  OHOS_BUILD_AI
-    seniorInput_.DeviceDisconnect(fd);
-#endif // OHOS_BUILD_AI
+    MMI_LOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), fd);
 }
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)

@@ -74,9 +74,6 @@ private:
     UDSServer udsServer_;
     ServerMsgHandler sMsgHandler_;
     std::shared_ptr<InputEventHandler> inputEventHdr_ {nullptr};
-#ifdef  OHOS_BUILD_AI
-    SeniorInputFuncProcBase seniorInput_;
-#endif // OHOS_BUILD_AI
     std::set<int32_t> authFds_;
 };
 } // namespace MMI

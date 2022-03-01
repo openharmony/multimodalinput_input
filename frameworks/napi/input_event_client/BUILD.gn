@@ -39,14 +39,6 @@ config("libinputeventclient_config") {
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
-
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
-
-  if (is_mmi_have_weston) {
-    cflags += [ "-DOHOS_WESTEN_MODEL" ]
-  }
 }
 
 ohos_shared_library("inputeventclient") {
@@ -70,14 +62,6 @@ ohos_shared_library("inputeventclient") {
     "//third_party/wayland-ivi-extension:libscreen-info-module",
     "//utils/native/base:utils",
   ]
-
-  if (is_mmi_have_weston) {
-    sources += [
-      "src/js_register_event.cpp",
-      "src/js_register_handle.cpp",
-      "src/multi_input_common.cpp",
-    ]
-  }
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]

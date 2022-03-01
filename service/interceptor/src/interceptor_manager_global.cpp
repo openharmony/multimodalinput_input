@@ -40,7 +40,7 @@ void OHOS::MMI::InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, i
     interceptorItem.session = session;
     auto iter = std::find(interceptors_.begin(), interceptors_.end(), interceptorItem);
     if (iter != interceptors_.end()) {
-        MMI_LOGE("ServerInputFilterManager: touchpad event repeate register");
+        MMI_LOGE("touchpad event repeate register");
         return;
     } else {
         iter = interceptors_.insert(iter, interceptorItem);
