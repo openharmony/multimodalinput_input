@@ -517,15 +517,15 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
         MMI_LOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return RET_ERR;
     }
-    MMI_LOGD("UpdateTouchScreenTarget, display:%{public}d", displayId);
+    MMI_LOGD("display:%{public}d", displayId);
     LogicalDisplayInfo *logicalDisplayInfo = GetLogicalDisplayId(displayId);
     CHKPR(logicalDisplayInfo, ERROR_NULL_POINTER);
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
-    MMI_LOGD("UpdateTouchScreenTarget, globalX:%{public}d,globalY:%{public}d", globalX, globalY);
+    MMI_LOGD("globalX:%{public}d,globalY:%{public}d", globalX, globalY);
     AdjustGlobalCoordinate(globalX, globalY, logicalDisplayInfo->width, logicalDisplayInfo->height);
     auto targetWindowId = pointerEvent->GetTargetWindowId();
-    MMI_LOGD("UpdateTouchScreenTarget, targetWindow:%{public}d", targetWindowId);
+    MMI_LOGD("targetWindow:%{public}d", targetWindowId);
     WindowInfo *touchWindow = nullptr;
     for (auto item : logicalDisplayInfo->windowsInfo_) {
         if (targetWindowId < 0) {
