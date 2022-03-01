@@ -23,6 +23,8 @@
 #include "run_shell_util.h"
 #include "util.h"
 
+namespace OHOS{
+namespace MMI{
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
@@ -419,5 +421,6 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_005, TestSize.L
     item2.SetPressed(false);
     pointerEvent->AddPointerItem(item2);
     ASSERT_TRUE(pointerEvent->IsValid());
-}
-} // namespace
+
+} // namespace MMI}
+} // namespace OHOS
