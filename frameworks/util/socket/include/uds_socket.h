@@ -28,6 +28,7 @@
 
 namespace OHOS {
 namespace MMI {
+#define SOCKET_FLAGS (MSG_DONTWAIT | MSG_NOSIGNAL)
 class UDSSocket {
 public:
     UDSSocket();
@@ -49,14 +50,6 @@ public:
     {
         return epollFd_;
     }
-
-protected:
-    virtual size_t Read(char *buf, size_t size);
-    virtual size_t Write(const char *buf, size_t size);
-    virtual size_t Send(const char *buf, size_t size, int32_t flags);
-    virtual size_t Recv(char *buf, size_t size, int32_t flags);
-    virtual size_t Recvfrom(char *buf, size_t size, uint32_t flags, sockaddr *addr, size_t *addrlen);
-    virtual size_t Sendto(const char *buf, size_t size, uint32_t flags, sockaddr *addr, size_t addrlen);
 
 protected:
     int32_t fd_ = -1;

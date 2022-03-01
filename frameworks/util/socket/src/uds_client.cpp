@@ -41,7 +41,7 @@ int32_t UDSClient::ConnectTo()
     if (epollFd_ < 0) {
         CHKR(EpollCreat(MAX_EVENT_SIZE) >= 0, EPOLL_CREATE_FAIL, RET_ERR);
     }
-    SetBlockMode(fd_); // 设置非阻塞模式
+    // SetBlockMode(fd_); // 设置非阻塞模式
 
     epoll_event ev;
     ev.events = EPOLLIN;
@@ -56,9 +56,11 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
     CHKPF(buf);
     CHKF(size > 0 && size <= MAX_PACKET_BUF_SIZE, PARAM_INPUT_INVALID);
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
-    ssize_t ret = write(fd_, static_cast<const void *>(buf), size);
+    // ssize_t ret = write(fd_, static_cast<const void *>(buf), size);
+    ssize_t ret = send(fd_, buf, size, SOCKET_FLAGS);
     if (ret < 0) {
-        MMI_LOGE("SendMsg write errCode:%{public}d,return %{public}zd", MSG_SEND_FAIL, ret);
+        MMI_LOGE("SendMsg write errCode:%{public}d,return %{public}zd,strerr:%{public}s", 
+            MSG_SEND_FAIL, ret, strerror(errno));
         return false;
     }
     return true;
@@ -168,7 +170,7 @@ void UDSClient::OnEvent(const epoll_event& ev, StreamBuffer& buf)
     CHK(maxCount > 0, VAL_NOT_EXP);
     auto isoverflow = false;
     for (size_t j = 0; j < maxCount; j++) {
-        auto size = read(fd, static_cast<void *>(szBuf), MAX_PACKET_BUF_SIZE);
+        auto size = recv(fd, szBuf, sizeof(szBuf), SOCKET_FLAGS);
         if (size < 0) {
             MMI_LOGE("size:%{public}zu", size);
         }
