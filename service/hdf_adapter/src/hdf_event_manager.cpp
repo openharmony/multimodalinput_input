@@ -112,7 +112,7 @@ int32_t OHOS::MMI::HdfEventManager::EvdevIoctl(int32_t hdiindex, int32_t pcmd, v
     int32_t size = (pcmd >> IOCTL_CMD_SHIFT) & IOCTL_CMD_MASK;
     int32_t cmd = pcmd & 0xff;
     DeviceInfo *deviceinfo = nullptr;
-    MMI_LOGD("evdev_ioctl index:%{public}d,cmd:%{public}02x,size:%{public}d,"
+    MMI_LOGD("index:%{public}d,cmd:%{public}02x,size:%{public}d,"
         "pcmd:%{public}04x", hdiindex, cmd, size, pcmd);
     for (auto &item : globleThis_->hdflist_){
         if (item.index == hdiindex) {
@@ -192,9 +192,9 @@ OHOS::MMI::HdfEventManager::~HdfEventManager()
 {
     uint32_t ret = inputInterface_->iInputReporter->UnregisterHotPlugCallback();
     if (ret == INPUT_SUCCESS) {
-        MMI_LOGI("%{public}s:%{public}d UnregisterHotPlugCallback INPUT_SUCCESS", __func__, __LINE__);
+        MMI_LOGI("%{public}s:%{public}d INPUT_SUCCESS", __func__, __LINE__);
     } else {
-        MMI_LOGE("%{public}s:%{public}d UnregisterHotPlugCallback INPUT_ERROR", __func__, __LINE__);
+        MMI_LOGE("%{public}s:%{public}d INPUT_ERROR", __func__, __LINE__);
     }
 }
 int32_t OHOS::MMI::HdfEventManager::HdfdevtypeMapLibinputType(uint32_t devIndex, uint32_t devType)

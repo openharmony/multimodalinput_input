@@ -89,7 +89,7 @@ bool OHOS::MMI::UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
     CHKF(fd >= 0, PARAM_INPUT_INVALID);
     auto ses = GetSession(fd);
     if (ses == nullptr) {
-        MMI_LOGE("SendMsg fd:%{public}d not found, The message was discarded. errCode:%{public}d",
+        MMI_LOGE("fd:%{public}d not found, The message was discarded. errCode:%{public}d",
                  fd, SESSION_NOT_FOUND);
         return false;
     }
@@ -231,17 +231,17 @@ void OHOS::MMI::UDSServer::Dump(int32_t fd)
 
 void OHOS::MMI::UDSServer::OnConnected(SessionPtr s)
 {
-    MMI_LOGI("UDSServer::OnConnected session desc:%{public}s", s->GetDescript().c_str());
+    MMI_LOGI("session desc:%{public}s", s->GetDescript().c_str());
 }
 
 void OHOS::MMI::UDSServer::OnDisconnected(SessionPtr s)
 {
-    MMI_LOGI("UDSServer::OnDisconnected session desc:%{public}s", s->GetDescript().c_str());
+    MMI_LOGI("session desc:%{public}s", s->GetDescript().c_str());
 }
 
 int32_t OHOS::MMI::UDSServer::AddEpoll(EpollEventType type, int32_t fd)
 {
-    MMI_LOGE("UDSServer::AddEpoll This information should not exist. Subclasses should implement this function.");
+    MMI_LOGE("This information should not exist. Subclasses should implement this function.");
     return RET_ERR;
 }
 
@@ -296,7 +296,7 @@ void OHOS::MMI::UDSServer::OnEvent(const struct epoll_event& ev, std::map<int32_
     CHK(maxCount > 0, VAL_NOT_EXP);
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGD("UDSServer::OnEvent fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
+        MMI_LOGD("fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
         auto secPtr = GetSession(fd);
         if (secPtr) {
             OnDisconnected(secPtr);
@@ -309,7 +309,7 @@ void OHOS::MMI::UDSServer::OnEvent(const struct epoll_event& ev, std::map<int32_
     if (fd != IMultimodalInputConnect::INVALID_SOCKET_FD && (ev.events & EPOLLIN)) {
         auto bufData = &bufMap[fd];
         if (bufData->isOverflow) {
-            MMI_LOGE("OnEvent StreamBuffer full or write error, Data discarded errCode:%{public}d",
+            MMI_LOGE("StreamBuffer full or write error, Data discarded errCode:%{public}d",
                 STREAMBUFF_OVER_FLOW);
             return;
         }
@@ -338,7 +338,7 @@ void OHOS::MMI::UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap
     auto fd = *static_cast<int32_t*>(ev.data.ptr);
     CHK(fd >= 0, INVALID_PARAM);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGD("OnEpollEvent EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
+        MMI_LOGD("EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
         auto secPtr = GetSession(fd);
         if (secPtr != nullptr) {
             OnDisconnected(secPtr);
@@ -350,7 +350,7 @@ void OHOS::MMI::UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap
     } else if (ev.events & EPOLLIN) {
         auto bufData = &bufMap[fd];
         if (bufData->isOverflow) {
-            MMI_LOGE("OnEpollEvent StreamBuffer full or write error, Data discarded errCode:%{public}d",
+            MMI_LOGE("StreamBuffer full or write error, Data discarded errCode:%{public}d",
                 STREAMBUFF_OVER_FLOW);
             return;
         }
@@ -396,7 +396,7 @@ OHOS::MMI::SessionPtr OHOS::MMI::UDSServer::GetSession(int32_t fd) const
 bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
 {
     CHKPF(ses);
-    MMI_LOGD("AddSession pid:%{public}d,fd:%{public}d", ses->GetPid(), ses->GetFd());
+    MMI_LOGD("pid:%{public}d,fd:%{public}d", ses->GetPid(), ses->GetFd());
     auto fd = ses->GetFd();
     CHKF(fd >= 0, VAL_NOT_EXP);
     auto pid = ses->GetPid();
@@ -414,7 +414,7 @@ bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
 
 void OHOS::MMI::UDSServer::DelSession(int32_t fd)
 {
-    MMI_LOGD("DelSession begin fd:%{public}d", fd);
+    MMI_LOGD("begin fd:%{public}d", fd);
     CHK(fd >= 0, PARAM_INPUT_INVALID);
     auto pid = GetClientPid(fd);
     if (pid > 0) {

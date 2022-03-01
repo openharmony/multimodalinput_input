@@ -182,7 +182,7 @@ void MMIService::OnStart()
     int32_t ret = Init();
     CHK(RET_OK == ret, ret);
     state_ = ServiceRunningState::STATE_RUNNING;
-    MMI_LOGD("MMIService Started successfully");
+    MMI_LOGD("Started successfully");
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
     t_.detach();
 }

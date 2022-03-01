@@ -57,7 +57,7 @@ void OHOS::MMI::InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
     interceptorItem.id = id;
     auto iter = std::find(interceptors_.begin(), interceptors_.end(), interceptorItem);
     if (iter == interceptors_.end()) {
-        MMI_LOGE("OnRemoveInterceptor::interceptorItem does not exist");
+        MMI_LOGE("interceptorItem does not exist");
     } else {
         MMI_LOGD("sourceType:%{public}d,fd:%{public}d remove from server", iter->sourceType,
                  iter->session->GetFd());
@@ -71,7 +71,7 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
     MMI_LOGD("enter");
     CHKPF(pointerEvent);
     if (interceptors_.empty()) {
-        MMI_LOGE("InterceptorManagerGlobal::%{public}s no interceptor to send msg", __func__);
+        MMI_LOGE("%{public}s no interceptor to send msg", __func__);
         return false;
     }
     PointerEvent::PointerItem pointer;
@@ -100,7 +100,7 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> k
     MMI_LOGD("enter");
     CHKPF(keyEvent);
     if (interceptors_.empty()) {
-        MMI_LOGE("InterceptorManagerGlobal::%{public}s no interceptor to send msg", __func__);
+        MMI_LOGE("%{public}s no interceptor to send msg", __func__);
         return false;
     }
     for (const auto &item : interceptors_) {
