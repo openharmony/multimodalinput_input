@@ -17,14 +17,11 @@ mmi_service_path = "${mmi_path}/service"
 
 config("libmmi_server_public_config") {
   include_dirs = [
-    "senior_input_func_proc/include",
-    "application_manager/include",
     "device_manager/include",
     "device_scalability/include",
     "event_dispatch/include",
     "event_package/include",
     "event_handler/include",
-    "event_standard/include",
     "event_dump/include",
     "monitor/include",
     "interceptor/include",
@@ -33,7 +30,6 @@ config("libmmi_server_public_config") {
     "module_loader/include",
     "window_manager/include",
     "touch_transform_point/include",
-    "server_input_filter_manager/include",
     "ability_launch/include",
     "subscriber/include",
     "timer_manager/include",
@@ -88,18 +84,6 @@ config("libmmi_server_public_config") {
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
-
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
-
-  if (is_mmi_have_weston) {
-    include_dirs += [
-      "//third_party/weston/libweston",
-      "//foundation/graphic/standard/frameworks/wmserver/src",
-    ]
-    cflags += [ "-DOHOS_WESTEN_MODEL" ]
-  }
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
@@ -119,30 +103,22 @@ ohos_prebuilt_etc("drawing_pointer_image") {
 ohos_shared_library("libmmi-server") {
   sources = [
     "ability_launch/src/ability_launch_manager.cpp",
-    "application_manager/src/app_register.cpp",
-    "device_manager/src/device_register.cpp",
     "device_manager/src/input_device.cpp",
     "device_manager/src/input_device_manager.cpp",
-    "device_manager/src/message_post.cpp",
     "event_dispatch/src/event_dispatch.cpp",
     "event_dump/src/event_dump.cpp",
     "event_handler/src/input_event_handler.cpp",
     "event_handler/src/key_event_value_transformation.cpp",
-    "event_handler/src/register_event.cpp",
-    "event_handler/src/register_eventhandle_manager.cpp",
     "event_handler/src/system_event_handler.cpp",
     "event_package/src/event_package.cpp",
-    "event_standard/src/standard_event_handler.cpp",
     "interceptor/src/interceptor_manager_global.cpp",
     "libinput_adapter/src/s_input.cpp",
     "message_handle/src/server_msg_handler.cpp",
-    "module_loader/src/libmmi_main.cpp",
     "module_loader/src/uds_server.cpp",
     "monitor/src/input_event_monitor_manager.cpp",
     "monitor/src/input_handler_manager_global.cpp",
     "mouse_event_handler/src/mouse_device_state.cpp",
     "mouse_event_handler/src/mouse_event_handler.cpp",
-    "server_input_filter_manager/src/server_input_filter_manager.cpp",
     "subscriber/src/key_event_subscriber.cpp",
     "subscriber/src/key_option.cpp",
     "timer_manager/src/timer_manager.cpp",
@@ -151,8 +127,6 @@ ohos_shared_library("libmmi-server") {
     "touch_transform_point/src/touch_transform_point_processor.cpp",
     "touch_transform_point/src/touchpad_transform_point_processor.cpp",
     "window_manager/src/input_windows_manager.cpp",
-    "window_manager/src/input_windows_manager_stub.cpp",
-    "window_manager/src/outer_interface.cpp",
     "window_manager/src/pointer_drawing_manager.cpp",
   ]
 
@@ -163,19 +137,7 @@ ohos_shared_library("libmmi-server") {
     ]
   }
 
-  if (is_mmi_have_ai) {
-    sources += [
-      "senior_input_func_proc/src/ai_func_proc.cpp",
-      "senior_input_func_proc/src/knuckle_func_proc.cpp",
-      "senior_input_func_proc/src/senior_input_func_proc_base.cpp",
-    ]
-  }
-
-  if (is_mmi_have_weston) {
-    sources += [ "module_loader/src/mmi_server.cpp" ]
-  } else {
-    sources += [ "module_loader/src/mmi_service.cpp" ]
-  }
+  sources += [ "module_loader/src/mmi_service.cpp" ]
 
   public_configs = [ ":libmmi_server_public_config" ]
 
@@ -209,10 +171,6 @@ ohos_shared_library("libmmi-server") {
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
-
-  if (is_mmi_have_weston) {
-    deps += [ "//foundation/graphic/standard/frameworks/wmserver:wmserver" ]
   }
 
   external_deps = [
@@ -269,14 +227,11 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/service/include",
-    "${mmi_path}/service/senior_input_func_proc/include",
-    "${mmi_path}/service/application_manager/include",
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/device_scalability/include",
     "${mmi_path}/service/event_dispatch/include",
     "${mmi_path}/service/event_package/include",
     "${mmi_path}/service/event_handler/include",
-    "${mmi_path}/service/event_standard/include",
     "${mmi_path}/service/hdi_inject/include",
     "${mmi_path}/service/event_dump/include",
     "${mmi_path}/service/hdf_adapter/include",
@@ -301,23 +256,12 @@ ohos_unittest("ut-mmi-service-out") {
 
   sources = [
     "event_dispatch/test/event_dispatch_test.cpp",
-    "event_handler/test/register_event_test.cpp",
-    "event_standard/test/standard_event_handler_test.cpp",
     "hdi_inject/test/hdi_inject_test.cpp",
-    "message_handle/test/input_test.cpp",
     "message_handle/test/server_msg_handler_test.cpp",
-    "module_loader/test/libmmi_server_test.cpp",
     "module_loader/test/uds_server_test.cpp",
     "window_manager/test/input_windows_manager_test.cpp",
-    "window_manager/test/outer_interface_test.cpp",
   ]
-  if (is_mmi_have_weston) {
-    sources += [
-      "application_manager/test/app_register_test.cpp",
-      "event_handler/test/input_event_handler_test.cpp",
-      "event_handler/test/system_event_handler_test.cpp",
-    ]
-  }
+
   cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
@@ -330,14 +274,6 @@ ohos_unittest("ut-mmi-service-out") {
 
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
-
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
-
-  if (is_mmi_have_weston) {
-    cflags += [ "-DOHOS_WESTEN_MODEL" ]
   }
 
   deps = [
@@ -355,10 +291,6 @@ ohos_unittest("ut-mmi-service-out") {
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
-
-  if (is_mmi_have_weston) {
-    deps += [ "//foundation/graphic/standard/frameworks/wmserver:wmserver" ]
   }
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]

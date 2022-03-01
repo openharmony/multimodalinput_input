@@ -19,7 +19,6 @@
 #include <sys/socket.h>
 #include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
-#include "multimodal_input_connect_service.h"
 #include "safe_keeper.h"
 #include "uds_command_queue.h"
 #include "util.h"
@@ -184,14 +183,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName,
     }
 
     int32_t ret = RET_OK;
-#ifdef OHOS_WESTEN_MODEL
-    struct epoll_event nev = {};
-    nev.events = EPOLLIN;
-    nev.data.fd = serverFd;
-    ret = EpollCtl(serverFd, EPOLL_CTL_ADD, nev);
-#else
     ret = AddEpoll(EPOLL_EVENT_SOCKET, serverFd);
-#endif
     if (ret != RET_OK) {
         cleanTaskWhenError();
         MMI_LOGE("epoll_ctl EPOLL_CTL_ADD return %{public}d,errCode:%{public}d", ret, EPOLL_MODIFY_FAIL);
@@ -269,23 +261,41 @@ bool OHOS::MMI::UDSServer::StartServer()
 void OHOS::MMI::UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
 {
     CHKPV(buf);
-    CHK(fd >= 0, PARAM_INPUT_INVALID);
+    if (fd < 0) {
+        MMI_LOGE("The fd less than 0");
+        return;
+    }
     auto sess = GetSession(fd);
-    CHK(sess, ERROR_NULL_POINTER);
+    CHKPV(sess, ERROR_NULL_POINTER);
     int32_t readIdx = 0;
     int32_t packSize = 0;
     const size_t headSize = sizeof(PackHead);
-    CHK(size >= headSize, VAL_NOT_EXP);
+    if (size < headSize) {
+        MMI_LOGE("The in parameter size is error, errCode:%{public}d", VAL_NOT_EXP);
+        return;
+    }
     while (size > 0 && recvFun_) {
-        CHK(size >= headSize, VAL_NOT_EXP);
+        if (size < headSize) {
+            MMI_LOGE("The size is error, errCode:%{public}d", VAL_NOT_EXP);
+            return;
+        }
         auto head = (PackHead*)&buf[readIdx];
-        CHK(head->size[0] < size, VAL_NOT_EXP);
+        if (head->size[0] >= size) {
+            MMI_LOGE("The head->size[0] is error, errCode:%{public}d", VAL_NOT_EXP);
+            return;
+        }
         packSize = headSize + head->size[0];
-        CHK(size >= packSize, VAL_NOT_EXP);
-        
+        if (size < packSize) {
+            MMI_LOGE("The size less than packSize, errCode:%{public}d", VAL_NOT_EXP);
+            return;
+        }
+
         NetPacket pkt(head->idMsg);
         if (head->size[0] > 0) {
-            CHK(pkt.Write(&buf[readIdx + headSize], head->size[0]), STREAM_BUF_WRITE_FAIL);
+            if (!pkt.Write(&buf[readIdx + headSize], head->size[0])) {
+                MMI_LOGE("Write to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+                return;
+            }
         }
         recvFun_(sess, pkt);
         size -= packSize;
@@ -301,7 +311,10 @@ void OHOS::MMI::UDSServer::OnEpollRecv(int32_t fd, const char *buf, size_t size)
 void OHOS::MMI::UDSServer::OnEvent(const struct epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
 {
     constexpr size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
-    CHK(maxCount > 0, VAL_NOT_EXP);
+    if (maxCount <= 0) {
+        MMI_LOGE("The maxCount is error, errCode:%{public}d", VAL_NOT_EXP);
+        return;
+    }
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
         MMI_LOGD("UDSServer::OnEvent fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
@@ -341,10 +354,16 @@ void OHOS::MMI::UDSServer::OnEvent(const struct epoll_event& ev, std::map<int32_
 void OHOS::MMI::UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct epoll_event& ev)
 {
     constexpr size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
-    CHK(maxCount > 0, VAL_NOT_EXP);
-    CHK(ev.data.ptr, ERROR_NULL_POINTER);
+    if (maxCount <= 0) {
+        MMI_LOGE("The maxCount is error, errCode:%{public}d", VAL_NOT_EXP);
+        return;
+    }
+    CHKPV(ev.data.ptr, ERROR_NULL_POINTER);
     auto fd = *static_cast<int32_t*>(ev.data.ptr);
-    CHK(fd >= 0, INVALID_PARAM);
+    if (fd < 0) {
+        MMI_LOGE("The fd less than 0, errCode:%{public}d", INVALID_PARAM);
+        return;
+    }
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
         MMI_LOGD("OnEpollEvent EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
         auto secPtr = GetSession(fd);
@@ -423,7 +442,10 @@ bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
 void OHOS::MMI::UDSServer::DelSession(int32_t fd)
 {
     MMI_LOGD("DelSession begin fd:%{public}d", fd);
-    CHK(fd >= 0, PARAM_INPUT_INVALID);
+    if (fd < 0) {
+        MMI_LOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
+        return;
+    }
     auto pid = GetClientPid(fd);
     if (pid > 0) {
         idxPidMap_.erase(pid);
@@ -441,7 +463,10 @@ void OHOS::MMI::UDSServer::OnThread()
 {
     OHOS::MMI::SetThreadName(std::string("uds_server"));
     uint64_t tid = GetThisThreadIdOfLL();
-    CHK(tid > 0, VAL_NOT_EXP);
+    if (tid <= 0) {
+        MMI_LOGE("The tid is error, errCode:%{public}d", VAL_NOT_EXP);
+        return;
+    }
     MMI_LOGD("begin tid:%{public}" PRId64 "", tid);
     SafeKpr->RegisterEvent(tid, "UDSServer::_OnThread");
 

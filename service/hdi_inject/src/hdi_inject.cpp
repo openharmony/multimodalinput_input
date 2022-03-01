@@ -25,8 +25,8 @@ using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "HdiInject" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "HdiInject" };
+} // namespace
 
 bool HdiInject::Init(UDSServer &sess)
 {
@@ -73,9 +73,9 @@ int32_t HdiInject::OnSetEventInject(const RawInputEvent& allEvent, int32_t devIn
     MMI_LOG("enter");
     EventPackage* pack[EVENT_PACKAGE_ARROW_SIZE];
     pack[0] = (EventPackage*)malloc(sizeof(EventPackage));
-    pack[0]->type = (int32_t)allEvent.ev_type;
-    pack[0]->code = (uint32_t)allEvent.ev_code;
-    pack[0]->value = (int32_t)allEvent.ev_value;
+    pack[0]->type = static_cast<int32_t>(allEvent.ev_type);
+    pack[0]->code = static_cast<uint32_t>allEvent.ev_code;
+    pack[0]->value = static_cast<int32_t>(allEvent.ev_value);
     pack[0]->timestamp = static_cast<uint64_t>(GetSysClockTime());
     MMIHdiInject->eventcallback_.EventPkgCallback((const EventPackage**)pack, 1, devIndex);
     free(pack[0]);

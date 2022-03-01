@@ -106,15 +106,6 @@
         } \
     } while (0)
 
-#define CHK(cond, ec) \
-    do { \
-        if (!(cond)) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHK(%{public}s), errCode:%{public}d", \
-                __FILE__, __LINE__, #cond, ec); \
-            return; \
-        } \
-    } while (0)
-
 #define CHKF(cond, ec) \
     do { \
         if (!(cond)) { \
@@ -202,14 +193,6 @@
     do { \
         if (!(cond)) { \
             MMI_LOGE("CK(%{public}s), errCode:%{public}d", #cond, ec); \
-        } \
-    } while (0)
-
-#define CHK(cond, ec) \
-    do { \
-        if (!(cond)) { \
-            MMI_LOGE("CHK(%{public}s), errCode:%{public}d", #cond, ec); \
-            return; \
         } \
     } while (0)
 

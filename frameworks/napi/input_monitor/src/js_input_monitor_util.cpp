@@ -29,7 +29,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     napi_value napiValue = nullptr;
     status = napi_create_int32(env, value, &napiValue);
     if (status != napi_ok) {
-        MMI_LOGD("SetNameProperty:%{public}s=%{public}d failed", name.c_str(), value);
+        MMI_LOGD("%{public}s=%{public}d failed", name.c_str(), value);
         return status;
     }
     status = napi_set_named_property(env, object, name.c_str(), napiValue);
@@ -42,7 +42,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     napi_value napiValue = nullptr;
     status = napi_create_uint32(env, value, &napiValue);
     if (status != napi_ok) {
-        MMI_LOGD("SetNameProperty:%{public}s=%{public}u failed", name.c_str(), value);
+        MMI_LOGD("%{public}s=%{public}u failed", name.c_str(), value);
         return status;
     }
     status = napi_set_named_property(env, object, name.c_str(), napiValue);
@@ -55,7 +55,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     napi_value napiValue = nullptr;
     status = napi_create_uint32(env, value, &napiValue);
     if (status != napi_ok) {
-        MMI_LOGD("SetNameProperty:%{public}s=%{public}u failed", name.c_str(), value);
+        MMI_LOGD("%{public}s=%{public}u failed", name.c_str(), value);
         return status;
     }
     status = napi_set_named_property(env, object, name.c_str(), napiValue);
@@ -68,7 +68,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     napi_value napiValue = nullptr;
     status = napi_create_int32(env, value, &napiValue);
     if (status != napi_ok) {
-        MMI_LOGD("SetNameProperty:%{public}s=%{public}d failed", name.c_str(), value);
+        MMI_LOGD("%{public}s=%{public}d failed", name.c_str(), value);
         return status;
     }
     status = napi_set_named_property(env, object, name.c_str(), napiValue);
@@ -81,7 +81,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     napi_value napiValue = nullptr;
     status = napi_create_double(env, value, &napiValue);
     if (status != napi_ok) {
-        MMI_LOGD("SetNameProperty:%{public}s=%{public}f failed", name.c_str(), value);
+        MMI_LOGD("%{public}s=%{public}f failed", name.c_str(), value);
         return status;
     }
     status = napi_set_named_property(env, object, name.c_str(), napiValue);
@@ -94,7 +94,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     napi_value napiValue = nullptr;
     status = napi_create_double(env, value, &napiValue);
     if (status != napi_ok) {
-        MMI_LOGD("SetNameProperty:%{public}s=%{public}lf failed", name.c_str(), value);
+        MMI_LOGD("%{public}s=%{public}lf failed", name.c_str(), value);
         return status;
     }
     status = napi_set_named_property(env, object, name.c_str(), napiValue);
@@ -107,7 +107,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     napi_value napiValue = nullptr;
     status = napi_create_int64(env, value, &napiValue);
     if (status != napi_ok) {
-        MMI_LOGD("SetNameProperty:%{public}s=%{public}" PRId64 " failed", name.c_str(), value);
+        MMI_LOGD("%{public}s=%{public}" PRId64 " failed", name.c_str(), value);
         return status;
     }
     status = napi_set_named_property(env, object, name.c_str(), napiValue);
@@ -120,7 +120,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     napi_value napiValue = nullptr;
     status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &napiValue);
     if (status != napi_ok) {
-        MMI_LOGD("SetNameProperty: %{public}s=%{public}s failed", name.c_str(), value.c_str());
+        MMI_LOGD("%{public}s=%{public}s failed", name.c_str(), value.c_str());
         return status;
     }
     status = napi_set_named_property(env, object, name.c_str(), napiValue);
@@ -139,12 +139,12 @@ bool GetNamePropertyBool(const napi_env& env, const napi_value& object, const st
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_LOGD("GetNamePropertyBool: call napi_typeof fail");
+        MMI_LOGD("call napi_typeof fail");
         return false;
     }
     bool value = false;
     if (tmpType != napi_boolean) {
-        MMI_LOGD("GetNamePropertyBool: value is not bool");
+        MMI_LOGD("value is not bool");
         return value;
     }
 
@@ -159,11 +159,11 @@ std::string GetNamePropertyString(const napi_env& env, const napi_value& object,
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_LOGD("GetNamePropertyString: call napi_typeof fail");
+        MMI_LOGD("call napi_typeof fail");
         return value;
     }
     if (tmpType != napi_string) {
-        MMI_LOGD("GetNamePropertyString: value is not bool");
+        MMI_LOGD("value is not bool");
         return value;
     }
 
@@ -181,11 +181,11 @@ int32_t GetNamePropertyInt32(const napi_env& env, const napi_value& object, cons
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_LOGD("GetNamePropertyInt32: call napi_typeof fail");
+        MMI_LOGD("call napi_typeof fail");
         return value;
     }
     if (tmpType != napi_number) {
-        MMI_LOGD("GetNamePropertyInt32: value is not number");
+        MMI_LOGD("value is not number");
         return value;
     }
     napi_get_value_int32(env, napiValue, &value);
@@ -199,11 +199,11 @@ int64_t GetNamePropertyInt64(const napi_env& env, const napi_value& object, cons
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_LOGD("GetNamePropertyInt64: call napi_typeof fail");
+        MMI_LOGD("call napi_typeof fail");
         return value;
     }
     if (tmpType != napi_number) {
-        MMI_LOGD("GetNamePropertyInt64: value is not number");
+        MMI_LOGD("value is not number");
         return value;
     }
     napi_get_value_int64(env, napiValue, &value);
@@ -217,11 +217,11 @@ uint32_t GetNamePropertyUint32(const napi_env& env, const napi_value& object, co
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_LOGD("GetNamePropertyUint32: call napi_typeof fail");
+        MMI_LOGD("call napi_typeof fail");
         return value;
     }
     if (tmpType != napi_number) {
-        MMI_LOGD("GetNamePropertyUint32: value is not number");
+        MMI_LOGD("value is not number");
         return value;
     }
     napi_get_value_uint32(env, napiValue, &value);
