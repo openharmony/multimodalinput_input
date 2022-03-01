@@ -79,8 +79,8 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
 {
     MMI_LOGD("enter");
     if (eventFilterService_ == nullptr) {
-        eventFilterService_ = new EventFilterService();
-        MMI_LOGD("new EventFilterService");
+        eventFilterService_ = new (std::nothrow) EventFilterService();
+        CHKPR(eventFilterService_, RET_ERR);
     }
 
     if (eventFilterService_ == nullptr) {

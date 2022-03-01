@@ -85,13 +85,19 @@ int32_t MultimodalStandardizedEventManager::UnSubscribeKeyEvent(int32_t subscrib
 int32_t MultimodalStandardizedEventManager::InjectionVirtual(bool isPressed, int32_t keyCode,
                                                              int32_t keyDownDuration, int32_t maxKeyCode)
 {
-    VirtualKey virtualevent;
-    virtualevent.isPressed = isPressed;
-    virtualevent.keyCode = keyCode;
-    virtualevent.keyDownDuration = keyDownDuration;
+    MMI_LOGD("Enter");
+    VirtualKey virtualEvent;
+    virtualEvent.isPressed = isPressed;
+    virtualEvent.keyCode = keyCode;
+    virtualEvent.keyDownDuration = keyDownDuration;
     OHOS::MMI::NetPacket pkt(MmiMessageId::ON_VIRTUAL_KEY);
-    pkt << virtualevent;
-    return SendMsg(pkt);
+    pkt << virtualEvent;
+    if (!SendMsg(pkt)) {
+        MMI_LOGE("Send virtual event Msg error");
+        return RET_ERR;
+    }
+    MMI_LOGD("leave");
+    return RET_OK;
 }
 
 int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> key)

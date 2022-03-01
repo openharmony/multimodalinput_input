@@ -22,7 +22,6 @@
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
-using namespace std;
 class GetDeviceObjectTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
@@ -32,13 +31,13 @@ public:
 HWTEST_F(GetDeviceObjectTest, Test_GetDeviceObjectTest, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
-    const string path = "/data/json/Test_GetDeviceObjectTest.json";
-    string startDeviceCmd = "mmi-virtual-device-manager start all & ";
-    string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    const std::string path = "/data/json/Test_GetDeviceObjectTest.json";
+    std::string startDeviceCmd = "mmi-virtual-device-manager start all & ";
+    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
-    const string path = "temp/Test_GetDeviceObjectTest.json";
-    string startDeviceCmd = "./mmi-virtual-deviced.out start all &";
-    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "temp/Test_GetDeviceObjectTest.json";
+    std::string startDeviceCmd = "./mmi-virtual-deviced.out start all &";
+    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -60,7 +59,7 @@ HWTEST_F(GetDeviceObjectTest, Test_GetDeviceObjectTest, TestSize.Level1)
 
 HWTEST_F(GetDeviceObjectTest, Test_GetDeviceObjectTestNotFindDevice, TestSize.Level1)
 {
-    const string deviceName = "temp";
+    const std::string deviceName = "temp";
     bool result;
     GetDeviceObject getDeviceObject;
     auto ret = getDeviceObject.CreateDeviceObject(deviceName);
