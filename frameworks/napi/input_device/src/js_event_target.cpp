@@ -29,12 +29,6 @@ JsEventTarget::DeviceType g_deviceType[] = {
 };
 }
 
-// static std::map<int32_t, JsEventTarget::CallbackInfo*> Create()
-// {
-//     std::map<int32_t, JsEventTarget::CallbackInfo*> temp;
-//     temp[0] = nullptr;
-//     return temp;
-// }
 napi_env JsEventTarget::env_ = nullptr;
 static std::map<int32_t, JsEventTarget::CallbackInfo*> callback_ {};
 int32_t userData_ = 0;
