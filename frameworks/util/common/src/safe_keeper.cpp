@@ -53,7 +53,10 @@ void SafeKeeper::ClearAll()
 
 void SafeKeeper::ReportHealthStatus(uint64_t tid)
 {
-    CHK(tid > 0, PARAM_INPUT_INVALID);
+    if (tid <= 0) {
+        MMI_LOGE("The in parameter is error");
+        return;
+    }
     std::lock_guard<std::mutex> lock(mtx_);
     auto ptr = GetEvent(tid);
     if (!ptr) {

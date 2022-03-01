@@ -74,7 +74,10 @@ void AppRegister::RegisterAppInfoforServer(const AppInfo& appInfo)
 void AppRegister::UnregisterAppInfoSocketFd(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    CHK(fd >= 0, PARAM_INPUT_INVALID);
+    if (fd < 0) {
+        MMI_LOGE("The fd is less than 0");
+        return;
+    }
     UnregisterSocketFd(fd);
 }
 
@@ -227,7 +230,10 @@ bool AppRegister::CheckWaitQueueBlock(ssize_t currentTime, ssize_t timeOut, cons
 void AppRegister::DeleteEventFromWaitQueue(int32_t fd, int32_t idMsg)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    CHK(fd >= 0, PARAM_INPUT_INVALID);
+    if (fd < 0) {
+        MMI_LOGE("The fd is less than 0");
+        return;
+    }
     for (auto iter = waitQueue_.begin(); iter != waitQueue_.end(); ++iter) {
         if ((iter->event == idMsg) && (iter->fd == fd)) {
             waitQueue_.erase(iter);
@@ -245,14 +251,20 @@ bool AppRegister::OnAnrLocked(int32_t fd) const
 
 void AppRegister::RegisterConnectState(int32_t fd)
 {
-    CHK(fd >= 0, PARAM_INPUT_INVALID);
+    if (fd < 0) {
+        MMI_LOGE("The fd is less than 0");
+        return;
+    }
     std::lock_guard<std::mutex> lock(mu_);
     connectState_.insert(std::pair<int32_t, int8_t>(fd, 0));
 }
 
 void AppRegister::UnregisterConnectState(int32_t fd)
 {
-    CHK(fd >= 0, PARAM_INPUT_INVALID);
+    if (fd < 0) {
+        MMI_LOGE("The fd is less than 0");
+        return;
+    }
     std::lock_guard<std::mutex> lock(mu_);
 
     auto iter = connectState_.find(fd);
