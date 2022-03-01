@@ -16,7 +16,6 @@
 #ifndef SEND_MESSAGE_H
 #define SEND_MESSAGE_H
 #include "msg_head.h"
-#include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {
@@ -25,10 +24,6 @@ public:
     SendMessage() = default;
     ~SendMessage() = default;
     int32_t GetDevIndexName(const std::string& deviceName);
-    int32_t SendToHdi(const InputEventArray& inputEventArray);
-    int32_t SendToHdi(const int32_t& devType, const RawInputEvent& event);
-    bool SendMsg(const NetPacket& pkt);
-    void TransitionHdiEvent(const struct input_event& event, RawInputEvent& sEvent);
 private:
     static constexpr int32_t INJECT_SLEEP_TIMES = 10;
 };

@@ -19,7 +19,6 @@
 #include <sys/socket.h>
 #include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
-#include "multimodal_input_connect_service.h"
 #include "safe_keeper.h"
 #include "uds_command_queue.h"
 #include "util.h"
@@ -184,14 +183,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName,
     }
 
     int32_t ret = RET_OK;
-#ifdef OHOS_WESTEN_MODEL
-    struct epoll_event nev = {};
-    nev.events = EPOLLIN;
-    nev.data.fd = serverFd;
-    ret = EpollCtl(serverFd, EPOLL_CTL_ADD, nev);
-#else
     ret = AddEpoll(EPOLL_EVENT_SOCKET, serverFd);
-#endif
     if (ret != RET_OK) {
         cleanTaskWhenError();
         MMI_LOGE("epoll_ctl EPOLL_CTL_ADD return %{public}d,errCode:%{public}d", ret, EPOLL_MODIFY_FAIL);

@@ -14,17 +14,15 @@
  */
 
 #include "send_message.h"
-#include "message_send_recv_stat_mgr.h"
 #include "proto.h"
 #include "sys/file.h"
-#include "test_aux_tool_client.h"
 
 using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "SendMessage"};
-} // namespace
+[[maybe_unused]] static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "SendMessage"};
+}
 
 int32_t SendMessage::GetDevIndexName(const std::string& deviceName)
 {
@@ -53,55 +51,4 @@ int32_t SendMessage::GetDevIndexName(const std::string& deviceName)
         return RET_ERR;
     }
     return static_cast<int32_t>(iter->second);
-}
-
-int32_t SendMessage::SendToHdi(const InputEventArray& inputEventArray)
-{
-    int32_t devIndex = GetDevIndexName(inputEventArray.deviceName);
-    if (devIndex == RET_ERR) {
-        MMI_LOGE("Get devIndex error by name:%{public}s", inputEventArray.deviceName.c_str());
-        return RET_ERR;
-    }
-    RawInputEvent speechEvent = {};
-    for (const auto &item : inputEventArray.events) {
-        TransitionHdiEvent(item.event, speechEvent);
-        SendToHdi(devIndex, speechEvent);
-        int32_t blockTime = (item.blockTime == 0) ? INJECT_SLEEP_TIMES : item.blockTime;
-        std::this_thread::sleep_for(std::chrono::milliseconds(blockTime));
-    }
-    return RET_OK;
-}
-
-/*
- * Sending Event Injection information to HDI
- */
-int32_t SendMessage::SendToHdi(const int32_t& devIndex, const RawInputEvent& event)
-{
-    int32_t sendType = static_cast<int32_t>(SET_EVENT_INJECT);
-    NetPacket pkt(MmiMessageId::HDI_INJECT);
-    pkt << sendType << devIndex << event;
-
-    if (!(SendMsg(pkt))) {
-        MMI_LOGE("inject hdi send event to server error");
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
-bool SendMessage::SendMsg(const NetPacket& pkt)
-{
-    if (TestAuxToolClient::GetInstance().SendMsg(pkt)) {
-        MessageSendRecvStatMgr::GetInstance().Increase();
-        return true;
-    }
-
-    return false;
-}
-
-void SendMessage::TransitionHdiEvent(const struct input_event& event, RawInputEvent& speechEvent)
-{
-    speechEvent.ev_type = event.type;
-    speechEvent.ev_code = event.code;
-    speechEvent.ev_value =  static_cast<uint32_t>(event.value);
-    speechEvent.stamp = static_cast<uint32_t>(event.input_event_usec);
 }

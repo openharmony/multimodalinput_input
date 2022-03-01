@@ -21,79 +21,6 @@ namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceManager"};
     constexpr int32_t INVALID_DEVICE_ID {-1};
 }
-#ifdef OHOS_WESTEN_MODEL
-void InputDeviceManager::Init(struct weston_compositor* wc)
-{
-    MMI_LOGD("begin");
-    if (initFlag_) {
-        return;
-    }
-    constexpr int32_t size = 32;
-    void* devices[size] = {0};
-    weston_get_device_info(wc, size, devices);
-    for (int32_t i = 0; i < size; i++) {
-        struct libinput_device* item = static_cast<struct libinput_device*>(devices[i]);
-        if (item == NULL) {
-            continue;
-        }
-        inputDevice_.insert(std::pair<int32_t, struct libinput_device*>(nextId_,
-            static_cast<struct libinput_device*>(devices[i])));
-        nextId_++;
-    }
-    initFlag_ = true;
-    MMI_LOGD("end");
-}
-
-void InputDeviceManager::GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback)
-{
-    MMIMsgPost.RunOnWestonThread([this, callback](struct weston_compositor* wc) {
-        auto ids = GetInputDeviceIdsSync(wc);
-        callback(ids);
-    });
-}
-
-void InputDeviceManager::FindInputDeviceIdAsync(int32_t deviceId,
-    std::function<void(std::shared_ptr<InputDevice>)> callback)
-{
-    MMIMsgPost.RunOnWestonThread([this, deviceId, callback](struct weston_compositor* wc) {
-        auto device = FindInputDeviceIdSync(deviceId, wc);
-        callback(device);
-    });
-}
-
-std::vector<int32_t> InputDeviceManager::GetInputDeviceIdsSync(struct weston_compositor* wc)
-{
-    MMI_LOGD("begin");
-    Init(wc);
-    std::vector<int32_t> ids;
-    for (const auto& item : inputDevice_) {
-        ids.push_back(item.first);
-    }
-    MMI_LOGD("end");
-    return ids;
-}
-
-std::shared_ptr<InputDevice> InputDeviceManager::FindInputDeviceIdSync(int32_t deviceId, struct weston_compositor* wc)
-{
-    MMI_LOGD("begin");
-    Init(wc);
-    auto item = inputDevice_.find(deviceId);
-    if (item == inputDevice_.end()) {
-        MMI_LOGE("failed to search for the device");
-        return nullptr;
-    }
-
-    std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
-    inputDevice->SetId(item->first);
-    int32_t deviceType = static_cast<int32_t>(libinput_device_get_tags(
-        static_cast<struct libinput_device *>(item->second)));
-    inputDevice->SetType(deviceType);
-    std::string name = libinput_device_get_name(static_cast<struct libinput_device *>(item->second));
-    inputDevice->SetName(name);
-    MMI_LOGD("end");
-    return inputDevice;
-}
-#endif
 
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id)
 {
@@ -133,11 +60,6 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)
 {
     MMI_LOGD("begin");
     CHKPV(inputDevice);
-#ifdef OHOS_WESTEN_MODEL
-    if (initFlag_) {
-        return;
-    }
-#endif
     for (const auto& item : inputDevice_) {
         if (item.second == inputDevice) {
             MMI_LOGI("the device already exists");
@@ -161,11 +83,6 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device* inputDevic
 {
     MMI_LOGD("begin");
     CHKPV(inputDevice);
-#ifdef OHOS_WESTEN_MODEL
-    if (initFlag_) {
-        return;
-    }
-#endif
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second == inputDevice) {
             inputDevice_.erase(it);

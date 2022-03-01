@@ -47,14 +47,6 @@ config("event_injection_config") {
   if (is_mmi_have_libinput) {
     cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
-
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
 }
 
 config("event_injection_public_config") {
@@ -74,7 +66,6 @@ ohos_shared_library("event-injection") {
     "src/injection_event_dispatch.cpp",
     "src/injection_tools_help_func.cpp",
     "src/manage_inject_device.cpp",
-    "src/message_send_recv_stat_mgr.cpp",
     "src/processing_finger_device.cpp",
     "src/processing_game_pad_device.cpp",
     "src/processing_joystick_device.cpp",
@@ -84,8 +75,6 @@ ohos_shared_library("event-injection") {
     "src/processing_pen_device.cpp",
     "src/processing_touch_screen_device.cpp",
     "src/send_message.cpp",
-    "src/test_aux_tool_client.cpp",
-    "src/test_aux_tool_msg_handler.cpp",
   ]
 
   configs = [
@@ -100,7 +89,7 @@ ohos_shared_library("event-injection") {
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
   ]
 
-  if (is_mmi_have_libinput || is_mmi_have_hdf) {
+  if (is_mmi_have_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
 
@@ -136,14 +125,10 @@ ohos_unittest("ut-event-injection-out") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/service/include",
-    "${mmi_path}/service/ai_sensor_adapter/include",
-    "${mmi_path}/service/application_manager/include",
     "${mmi_path}/service/device_scalability/include",
     "${mmi_path}/service/event_dispatch/include",
     "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/event_standard/include",
-    "${mmi_path}/service/hdi_inject/include",
-    "${mmi_path}/service/hdf_adapter/include",
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/module_loader/include",
@@ -160,18 +145,15 @@ ohos_unittest("ut-event-injection-out") {
     "$HDF_FWKS/inclue",
   ]
 
-  if (is_mmi_have_libinput || is_mmi_have_hdf) {
+  if (is_mmi_have_libinput) {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
   sources = [
-    "test/aux_tool_msg_handler_test.cpp",
     "test/device_base_test.cpp",
     "test/get_device_node_test.cpp",
     "test/get_device_object_test.cpp",
     "test/injection_tools_help_func_test.cpp",
-    "test/libmmi_aisensor_client_test.cpp",
-    "test/message_send_recv_stat_mgr_test.cpp",
     "test/processing_finger_device_test.cpp",
     "test/processing_game_pad_device_test.cpp",
     "test/processing_joystick_device_test.cpp",
@@ -193,20 +175,11 @@ ohos_unittest("ut-event-injection-out") {
     cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
 
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
-
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
-
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/tools/event_inject:event-injection",
-    "//drivers/peripheral/input/hal:hdi_input",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//third_party/libxkbcommon:libxkbcommon",
@@ -215,7 +188,7 @@ ohos_unittest("ut-event-injection-out") {
     "//utils/native/base:utils",
   ]
 
-  if (is_mmi_have_libinput || is_mmi_have_hdf) {
+  if (is_mmi_have_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
@@ -242,18 +215,6 @@ ohos_executable("mmi-event-injection") {
 
   if (is_mmi_have_libinput) {
     cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
-
-  if (is_mmi_have_ai) {
-    cflags += [ "-DOHOS_BUILD_AI" ]
-  }
-
-  if (is_mmi_have_weston) {
-    cflags += [ "-DOHOS_WESTEN_MODEL" ]
   }
 
   install_enable = true
