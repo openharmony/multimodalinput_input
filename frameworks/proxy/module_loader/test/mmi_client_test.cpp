@@ -16,8 +16,8 @@
 #include "mmi_client.h"
 #include <gtest/gtest.h>
 
-namespace OHOS{
-namespace MMI{
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
