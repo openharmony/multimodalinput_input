@@ -80,8 +80,9 @@ void EventDump::TestDump()
 {
     constexpr int32_t MAX_PATH_SIZE = 128;
     char szPath[MAX_PATH_SIZE] = {};
-    auto ret = sprintf_s(szPath, MAX_PATH_SIZE, "%s/mmidump-%s.txt", DEF_MMI_DATA_ROOT, Strftime("%y%m%d%H%M%S").c_str());
-    if (ret < 0) {
+    error_t ret = sprintf_s(szPath, MAX_PATH_SIZE, "%s/mmidump-%s.txt",
+                         DEF_MMI_DATA_ROOT, Strftime("%y%m%d%H%M%S").c_str());
+    if (ret != EOK) {
         MMI_LOGE("The function sprintf_s perform error, errCode:%{public}d", SPRINTF_S_SEC_FUN_FAIL);
         return;
     }

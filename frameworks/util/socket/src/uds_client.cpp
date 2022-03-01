@@ -151,7 +151,7 @@ void UDSClient::OnRecv(const char *buf, size_t size)
 
         NetPacket pkt(head->idMsg);
         if (head->size[0] > 0) {
-            if(!pkt.Write(&buf[readIdx + headSize], head->size[0])) {
+            if (!pkt.Write(&buf[readIdx + headSize], head->size[0])) {
                 MMI_LOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
                 return;
             }
