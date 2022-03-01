@@ -42,7 +42,7 @@ protected:
     };
     typedef std::vector<SafeEvent> SafeEventList;
 
-    bool IsExist(uint64_t tid) const
+    bool IsThreadExist(uint64_t tid) const
     {
         for (const auto &item : dList_) {
             if (item.tid == tid)
