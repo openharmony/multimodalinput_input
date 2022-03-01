@@ -17,17 +17,11 @@
 #include "mmi_log.h"
 
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
-    LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "MmiEventSimulateDemoMain"
-};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "MmiEventSimulateDemoMain" };
 }
 
 int32_t main(int32_t argc, const char* argv[])
 {
-#ifdef OHOS_BUILD_MMI_DEBUG
-    VerifyLogManagerRun();
-#endif
-
     do {
         OHOS::MMI::SetThreadName("main");
         if (argc < OHOS::MMI::ARGV_VALID) {
@@ -45,18 +39,7 @@ int32_t main(int32_t argc, const char* argv[])
             break;
         }
         injection.Run();
-        if (OHOS::MMI::TestAuxToolClient::GetInstance().ThreadIsEnd()) {
-            MMI_LOGI("TestAuxToolClient thread is end.");
-        }
     } while (0);
-
-#ifdef OHOS_BUILD_MMI_DEBUG
-    OHOS::MMI::LogManager::GetInstance().Stop();
-
-    if (OHOS::MMI::LogManager::GetInstance().ThreadIsEnd()) {
-        MMI_LOGI("LogManager thread is end.");
-    }
-#endif
 
     return RET_OK;
 }
