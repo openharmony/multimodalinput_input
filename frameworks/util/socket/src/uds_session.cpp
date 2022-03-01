@@ -89,7 +89,7 @@ void UDSSession::UpdateDescript()
 
 bool UDSSession::SendMsg(NetPacket& pkt) const
 {
-    if (pkt.ChkError()) {
+    if (pkt.ChkRWError()) {
         MMI_LOGE("Read and write status is error");
         return false;
     }
