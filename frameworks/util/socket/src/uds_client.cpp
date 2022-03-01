@@ -81,19 +81,6 @@ bool UDSClient::SendMsg(const NetPacket& pkt) const
     return SendMsg(buf.Data(), buf.Size());
 }
 
-bool UDSClient::ThreadIsEnd()
-{
-    if (!isThreadHadRun_) {
-        MMI_LOGI("thread is not run. this: %p, isThreadHadRun_: %p, isThreadHadRun_: %d",
-                 this, &isThreadHadRun_, isThreadHadRun_);
-        return false;
-    }
-
-    const bool ret = threadFutureHadEnd_.get();
-    MMI_LOGI("thread is end, ret = %d.", ret);
-    return true;
-}
-
 bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
 {
     MMI_LOGD("enter detachMode = %d", detachMode);
@@ -109,7 +96,7 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
             return false;
         }
     }
-    t_ = std::thread(std::bind(&UDSClient::OnThread, this, std::ref(threadPromiseHadEnd_)));
+    t_ = std::thread(std::bind(&UDSClient::OnThread, this));
     if (detachMode) {
         MMI_LOGW("uds client thread detach");
         t_.detach();
@@ -200,7 +187,7 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
     }
 }
 
-void UDSClient::OnThread(std::promise<bool>& threadPromise)
+void UDSClient::OnThread()
 {
     MMI_LOGD("begin");
     SetThreadName("uds_client");
@@ -233,7 +220,6 @@ void UDSClient::OnThread(std::promise<bool>& threadPromise)
             break;
         }
     }
-    threadPromise.set_value(true);
     MMI_LOGD("end");
 }
 
