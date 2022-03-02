@@ -179,7 +179,6 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
         MMI_LOGE("Callback doesn't exists");
         return JS_CALLBACK_EVENT_FAILED;
     }
-    auto it = callbacks[event->eventType];
     MMI_LOGD("EventType: %{public}s, keyEventMonitorInfos: %{public}zu",
         event->eventType.c_str(), callbacks[event->eventType].size());
     napi_value handler1 = nullptr;
