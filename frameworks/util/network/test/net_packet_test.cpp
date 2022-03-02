@@ -15,9 +15,12 @@
 #include "net_packet.h"
 #include <gtest/gtest.h>
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+} // namespace
 class NetPacketTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
@@ -169,4 +172,5 @@ HWTEST_F(NetPacketTest, ReadError, TestSize.Level1)
     pkt >> r3;
     EXPECT_TRUE(pkt.ChkRWError());
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

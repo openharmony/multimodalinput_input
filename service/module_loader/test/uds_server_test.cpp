@@ -17,9 +17,12 @@
 #include <gtest/gtest.h>
 #include "proto.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+} // namespace
 
 class UDSServerTest : public testing::Test {
 public:
@@ -201,4 +204,5 @@ HWTEST_F(UDSServerTest, GetSession_003, TestSize.Level1)
     EXPECT_TRUE(retResult == nullptr);
 }
 #endif
-} // namespace
+} // namespace MMI
+} // namespace OHOS

@@ -16,13 +16,17 @@
 #include "input_windows_manager.h"
 #include <gtest/gtest.h>
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+} // namespace
 
 class InputWindowsManagerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
-} // namespace
+} // namespace MMI
+} // namespace OHOS
