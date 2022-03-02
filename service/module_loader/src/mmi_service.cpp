@@ -22,7 +22,6 @@
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "pointer_drawing_manager.h"
-#include "safe_keeper.h"
 #include "timer_manager.h"
 #include "util.h"
 
@@ -292,7 +291,6 @@ void MMIService::OnThread()
     uint64_t tid = GetThisThreadIdOfLL();
     CHK(tid > 0, VAL_NOT_EXP);
     MMI_LOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
-    SafeKpr->RegisterEvent(tid, "mmi_service");
 
     int32_t count = 0;
     constexpr int32_t timeOut = 20;
@@ -323,7 +321,6 @@ void MMIService::OnThread()
             }
             OnEpollRecv(it.first, it.second.sBuf.Data(), it.second.sBuf.Size());
         }
-        SafeKpr->ReportHealthStatus(tid);
         OnTimer();
     }
     MMI_LOGI("Main worker thread stop. tid:%{public}" PRId64 "", tid);
