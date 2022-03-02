@@ -89,13 +89,13 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
         MMI_LOGE("Get value of first param failed");
         return ERROR_CODE;
     }
-    event->name = eventName;
     napi_value receiceValue = nullptr;
     if (napi_get_named_property(env, argv[ARGV_SECOND], "preKeys", &receiceValue) != napi_ok) {
         napi_throw_error(env, nullptr, "Get preKeys failed");
         MMI_LOGE("Get preKeys failed");
         return ERROR_CODE;
     }
+    event->name = eventName;
     std::vector<int32_t> preKeys = GetIntArray(env, receiceValue);
     MMI_LOGD("PreKeys size:%{public}zu", preKeys.size());
     std::vector<int32_t> sortPrekeys = preKeys;

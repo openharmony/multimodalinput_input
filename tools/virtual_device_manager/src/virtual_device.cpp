@@ -86,11 +86,11 @@ bool OHOS::MMI::VirtualDevice::CatFload(std::vector<std::string>& fileList)
 bool OHOS::MMI::VirtualDevice::SyncSymbolFile()
 {
     std::vector<std::string> tempList;
-    std::vector<std::string> res;
-
     if (!CatFload(tempList)) {
         return false;
     }
+
+    std::vector<std::string> res;
     for (const auto &item : tempList) {
         std::string::size_type pos = item.find("_");
         res.push_back(item.substr(0, pos));
