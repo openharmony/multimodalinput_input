@@ -15,14 +15,14 @@
 #ifndef KEY_OPTION_H
 #define KEY_OPTION_H
 
-#include <vector>
+#include <set>
 
 namespace OHOS {
 namespace MMI {
 class KeyOption {
 public:
-    std::vector<int32_t> GetPreKeys() const;
-    void SetPreKeys(const std::vector<int32_t>& preKeys);
+    std::set<int32_t> GetPreKeys() const;
+    void SetPreKeys(const std::set<int32_t>& preKeys);
     int32_t GetFinalKey() const;
     void SetFinalKey(int32_t finalKey);
 
@@ -33,7 +33,7 @@ public:
     void SetFinalKeyDownDuration(int32_t duration);
 
 private:
-    std::vector<int32_t> preKeys_ {};
+    std::set<int32_t> preKeys_ {};
     int32_t finalKey_ { -1 };
     bool isFinalKeyDown_;
     int32_t finalKeyDownDuration_ { 0 };

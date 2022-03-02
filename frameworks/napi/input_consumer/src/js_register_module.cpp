@@ -42,68 +42,75 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
     size_t argc = ARGC_NUM;
     napi_value argv[ARGC_NUM] = { 0 };
     if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
-        napi_throw_error(env, nullptr, "Get param failed");
         MMI_LOGE("Get param failed");
+        napi_throw_error(env, nullptr, "Get param failed");
         return ERROR_CODE;
     }
     if (argc != ARGC_NUM) {
-        napi_throw_error(env, nullptr, "requires 3 parameter");
         MMI_LOGE("Requires 3 parameter");
+        napi_throw_error(env, nullptr, "Requires 3 parameter");
         return ERROR_CODE;
     }
     napi_valuetype valueType = napi_undefined;
     if (napi_typeof(env, argv[ARGV_FIRST], &valueType) != napi_ok) {
-        napi_throw_error(env, nullptr, "Get type of first param failed");
         MMI_LOGE("Get type of first param failed");
+        napi_throw_error(env, nullptr, "Get type of first param failed");
         return ERROR_CODE;
     }
     if (valueType != napi_string) {
-        napi_throw_error(env, nullptr, "Parameter1 is not napi_string");
         MMI_LOGE("Parameter1 is not napi_string");
+        napi_throw_error(env, nullptr, "Parameter1 is not napi_string");
         return ERROR_CODE;
     }
     if (napi_typeof(env, argv[ARGV_SECOND], &valueType) != napi_ok) {
-        napi_throw_error(env, nullptr, "Get type of second param failed");
         MMI_LOGE("Get type of second param failed");
+        napi_throw_error(env, nullptr, "Get type of second param failed");
         return ERROR_CODE;
     }
     if (valueType != napi_object) {
-        napi_throw_error(env, nullptr, "Parameter2 is not napi_object");
         MMI_LOGE("Parameter2 is not napi_object");
+        napi_throw_error(env, nullptr, "Parameter2 is not napi_object");
         return ERROR_CODE;
     }
     if (napi_typeof(env, argv[ARGV_THIRD], &valueType) != napi_ok) {
-        napi_throw_error(env, nullptr, "Get type of third param failed");
         MMI_LOGE("Get type of third param failed");
+        napi_throw_error(env, nullptr, "Get type of third param failed");
         return ERROR_CODE;
     }
     if (valueType != napi_function) {
-        napi_throw_error(env, nullptr, "Parameter3 is not napi_function");
         MMI_LOGE("Parameter3 is not napi_function");
+        napi_throw_error(env, nullptr, "Parameter3 is not napi_function");
         return ERROR_CODE;
     }
     char eventName[EVENT_NAME_LEN] = { 0 };
     size_t typeLen = 0;
     if (napi_get_value_string_utf8(env, argv[ARGV_FIRST], eventName, EVENT_NAME_LEN - 1, &typeLen) != napi_ok) {
-        napi_throw_error(env, nullptr, "Get value of first param failed");
         MMI_LOGE("Get value of first param failed");
+        napi_throw_error(env, nullptr, "Get value of first param failed");
         return ERROR_CODE;
     }
     event->name = eventName;
     napi_value receiceValue = nullptr;
     if (napi_get_named_property(env, argv[ARGV_SECOND], "preKeys", &receiceValue) != napi_ok) {
-        napi_throw_error(env, nullptr, "Get preKeys failed");
         MMI_LOGE("Get preKeys failed");
+        napi_throw_error(env, nullptr, "Get preKeys failed");
         return ERROR_CODE;
     }
-    std::vector<int32_t> preKeys = GetIntArray(env, receiceValue);
-    MMI_LOGD("PreKeys size:%{public}zu", preKeys.size());
-    std::vector<int32_t> sortPrekeys = preKeys;
-    sort(sortPrekeys.begin(), sortPrekeys.end());
+    std::set<int32_t> preKeys;
+    if (!GetPreKeys(env, receiceValue, preKeys)) {
+        MMI_LOGE("Get preKeys failed");
+        napi_throw_error(env, nullptr, "Get preKeys failed");
+        return ERROR_CODE;
+    }
+    if (preKeys.size() > PRE_KEYS_SIZE) {
+        MMI_LOGE("PreKeys size invalid");
+        napi_throw_error(env, nullptr, "PreKeys size invalid");
+        return ERROR_CODE;
+    }
+    MMI_LOGD("PreKeys size:%{public}d", static_cast<int32_t>(preKeys.size()));
     keyOption->SetPreKeys(preKeys);
-
     std::string subKeyNames = "";
-    for (const auto &item : sortPrekeys){
+    for (const auto &item : preKeys) {
         subKeyNames += std::to_string(item);
         subKeyNames += ",";
         MMI_LOGD("preKeys:%{public}d", item);
@@ -129,8 +136,8 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
     event->eventType = subKeyNames;
     MMI_LOGD("FinalKeyDownDuriation:%{public}d", finalKeyDownDuriation);
     if (napi_create_reference(env, argv[ARGV_THIRD], 1, &event->callback[0]) != napi_ok) {
-        napi_throw_error(env, nullptr, "Event create reference failed");
         MMI_LOGE("Event create reference failed");
+        napi_throw_error(env, nullptr, "Event create reference failed");
         return ERROR_CODE;
     }
     return SUCCESS_CODE;
@@ -150,7 +157,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
         MMI_LOGD("%{public}d", __LINE__);
         return false;
     }
-    std::vector<int32_t> infoPreKeys = keyOption->GetPreKeys();
+    std::set<int32_t> infoPreKeys = keyOption->GetPreKeys();
     int32_t infoSize = 0;
     auto it = infoPreKeys.begin();
     while (it != infoPreKeys.end()) {
@@ -206,29 +213,6 @@ static void SubKeyEventCallback(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     }
 }
 
-bool CheckPara(const std::shared_ptr<KeyOption> keyOption)
-{
-    CHKPF(keyOption);
-    std::vector<int32_t> preKeys = keyOption->GetPreKeys();
-    if (preKeys.size() > PRE_KEYS_SIZE) {
-        MMI_LOGE("preKeys size is bigger than 4, can not process");
-        return false;
-    }
-    std::vector<int32_t> checkRepeat;
-    for (const auto &item : preKeys) {
-        if (item < 0) {
-            MMI_LOGE("preKey:%{public}d is less 0, can not process", item);
-            return false;
-        }
-        if (std::find(checkRepeat.begin(), checkRepeat.end(), item) != checkRepeat.end()) {
-            MMI_LOGE("preKey is repeat, can not process");
-            return false;
-        }
-        checkRepeat.push_back(item);
-    }
-    return true;
-}
-
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     MMI_LOGD("enter");
@@ -237,9 +221,9 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         .asyncWork = nullptr,
     };
     CHKPP(event);
-    auto keyOption = std::shared_ptr<KeyOption>(new (std::nothrow) KeyOption());
+    auto keyOption = std::make_shared<KeyOption>();
     CHKPP(keyOption);
-    if (GetEventInfo(env, info, event, keyOption) < 0 || !CheckPara(keyOption)) {
+    if (GetEventInfo(env, info, event, keyOption) < 0) {
         delete event;
         event = nullptr;
         MMI_LOGE("GetEventInfo failed");
@@ -247,8 +231,8 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     }
 
     event->keyOption = keyOption;
-    int32_t preSubscribeId = -1;
-    if (AddEventCallback(env, callbacks, event, preSubscribeId) < 0) {
+    int32_t preSubscribeId = GetPreSubscribeId(callbacks, event);
+    if (AddEventCallback(env, callbacks, event) < 0) {
         delete event;
         event = nullptr;
         MMI_LOGE("AddEventCallback failed");
