@@ -151,7 +151,10 @@ size_t StreamBuffer::Size() const
 
 size_t StreamBuffer::UnreadSize() const
 {
-    CHKR(wIdx_ >= rIdx_, VAL_NOT_EXP, 0);
+    if (wIdx_ < rIdx_) {
+        MMI_LOGW("Widx_ less than ridx_, wIdx_:%{public}d,rIdx_:%{public}d", wIdx_, rIdx_);
+        return 0;
+    }
     return (wIdx_ - rIdx_);
 }
 

@@ -71,7 +71,10 @@ const char *GetMmiErrorTypeDesc(int32_t errorCodeEnum)
 
 std::string GetEnv(const std::string &name)
 {
-    CHKR(!name.empty(), PARAM_INPUT_INVALID, "");
+    if (name.empty()) {
+        MMI_LOGW("Name is empty");
+        return "";
+    }
     auto val = getenv(name.c_str());
     if (val == nullptr) {
         return "";
@@ -430,7 +433,10 @@ size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_
 
 std::string StringFmt(const char* str, ...)
 {
-    CHKR(str != nullptr, PARAM_INPUT_INVALID, "");
+    if (str == nullptr) {
+        MMI_LOGW("Str is nullptr");
+        return "";
+    }
     va_list args;
     va_start(args, str);
     char buf[MAX_PACKET_BUF_SIZE] = {};
