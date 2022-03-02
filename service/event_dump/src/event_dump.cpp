@@ -82,7 +82,10 @@ void EventDump::TestDump()
     char szPath[MAX_PATH_SIZE] = {};
     auto ret = sprintf_s(szPath, MAX_PATH_SIZE, "%s/mmidump-%s.txt",
                          DEF_MMI_DATA_ROOT, Strftime("%y%m%d%H%M%S").c_str());
-    funcAdvanceWriteLen(ret);
+    if (ret < 0) {
+        MMI_LOGE("The function sprintf_s perform error, errCode:%{public}d", SPRINTF_S_SEC_FUN_FAIL);
+        return;
+    }
     char path[PATH_MAX] = {};
     if (realpath(szPath, path) == nullptr) {
         MMI_LOGE("path is error, szPath:%{public}s", szPath);
