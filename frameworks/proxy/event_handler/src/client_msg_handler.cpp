@@ -66,7 +66,10 @@ bool ClientMsgHandler::Init()
     };
     // LCOV_EXCL_STOP
     for (auto& it : funs) {
-        CHKC(RegistrationEvent(it), EVENT_REG_FAIL);
+        if (!RegistrationEvent(it)) {
+            MMI_LOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
+            continue;
+        }
     }
     return true;
 }
