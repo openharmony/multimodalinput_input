@@ -123,7 +123,7 @@ void HdiInject::InitDeviceInfo()
     int32_t counts = sizeof(deviceInfoArray) / sizeof(DeviceInformation);
     auto iter = deviceArray_.insert(deviceArray_.begin(), deviceInfoArray, deviceInfoArray + counts);
     if (!iter.second) {
-        MMI_LOGE("Insert the failure");
+        MMI_LOGE("Insert value failed");
     }
 }
 
