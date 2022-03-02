@@ -37,16 +37,25 @@ UDSClient::~UDSClient()
 
 int32_t UDSClient::ConnectTo()
 {
-    CHKR(Socket() >= 0, SOCKET_CREATE_FAIL, RET_ERR);
+    if (Socket() < 0) {
+        MMI_LOGE("Socket failed");
+        return RET_ERR;
+    }
     if (epollFd_ < 0) {
-        CHKR(EpollCreat(MAX_EVENT_SIZE) >= 0, EPOLL_CREATE_FAIL, RET_ERR);
+        if (EpollCreat(MAX_EVENT_SIZE) < 0) {
+            MMI_LOGE("EpollCreat failed");
+            return RET_ERR;
+        }
     }
     SetBlockMode(fd_); // 设置非阻塞模式
 
     struct epoll_event ev;
     ev.events = EPOLLIN;
     ev.data.fd = fd_;
-    CHKR(EpollCtl(fd_, EPOLL_CTL_ADD, ev) >= 0, EPOLL_CREATE_FAIL, RET_ERR);
+    if (EpollCtl(fd_, EPOLL_CTL_ADD, ev) < 0) {
+        MMI_LOGE("EpollCtl failed");
+        return RET_ERR;
+    }
     OnConnected();
     return RET_OK;
 }
