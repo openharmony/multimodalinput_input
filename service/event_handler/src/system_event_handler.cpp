@@ -30,7 +30,7 @@ public:
     ~Want() = default;
     Want& AddEntity(const std::string& entity)
     {
-        MMI_LOGW("Want::AddEntity:%{public}s", entity.c_str());
+        MMI_LOGW("%{public}s", entity.c_str());
         return *this;
     }
 };

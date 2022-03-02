@@ -236,7 +236,9 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         .env = env,
         .asyncWork = nullptr,
     };
-    auto keyOption = std::shared_ptr<KeyOption>(new KeyOption());
+    CHKPP(event);
+    auto keyOption = std::shared_ptr<KeyOption>(new (std::nothrow) KeyOption());
+    CHKPP(keyOption);
     if (GetEventInfo(env, info, event, keyOption) < 0 || !CheckPara(keyOption)) {
         delete event;
         event = nullptr;
@@ -277,6 +279,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         .env = env,
         .asyncWork = nullptr,
     };
+    CHKPP(event);
     auto keyOption = std::make_shared<KeyOption>();
     if (GetEventInfo(env, info, event, keyOption) < 0) {
         MMI_LOGE("GetEventInfo failed");

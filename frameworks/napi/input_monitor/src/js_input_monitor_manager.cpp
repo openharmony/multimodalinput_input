@@ -119,7 +119,8 @@ bool JsInputMonitorManager::AddEnv(napi_env env, napi_callback_info cbInfo)
     }
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    int32_t *id = new int32_t;
+    int32_t *id = new (std::nothrow) int32_t;
+    CHKPF(id);
     *id = 0;
     napi_get_cb_info(env, cbInfo, nullptr, nullptr, &thisVar, &data);
     auto status = napi_wrap(env, thisVar, static_cast<void*>(id),
