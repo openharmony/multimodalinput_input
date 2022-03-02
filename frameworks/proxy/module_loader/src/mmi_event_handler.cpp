@@ -60,6 +60,7 @@ void MMIEventHandler::OnReconnect(const InnerEvent::Pointer &event)
     if (mmiClient_->Reconnect() != RET_OK) {
         SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT);
     }
+    // SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT);
 }
 
 void MMIEventHandler::OnTimer(const InnerEvent::Pointer &event)
@@ -96,7 +97,7 @@ void MMIEventHandler::ProcessEvent(const InnerEvent::Pointer &event)
             break;
         }
         default: {
-            MMI_LOGE("Unknown event handler id=%{public}u", eventId);
+            MMI_LOGE("Unknown event handler id:%{public}u", eventId);
             break;
         }
     }

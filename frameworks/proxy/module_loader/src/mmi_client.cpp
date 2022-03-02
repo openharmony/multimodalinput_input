@@ -62,7 +62,7 @@ bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
 bool MMIClient::StartEventRunner()
 {
     MMI_LOGD("enter");
-    auto eventRunner = EventRunner::Create(false);
+    auto eventRunner = EventRunner::GetMainEventRunner();
     CHKPF(eventRunner);
     eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner, GetPtr());
     CHKPF(eventHandler_);
@@ -77,16 +77,17 @@ bool MMIClient::StartEventRunner()
             return false;
         }
     }
-    // if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_ONTIMER, 0, EVENT_TIME_ONTIMER)) {
-    //     MMI_LOGE("send ontimer event return false.");
-    //     return false;
-    // }
-    auto errCode = eventRunner->Run();
-    if (errCode != ERR_OK) {
-        MMI_LOGE("event runnner run error,code:%{public}u str:%{public}s", errCode,
-            eventHandler_->GetErrorStr(errCode).c_str());
+    if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_ONTIMER, 0, EVENT_TIME_ONTIMER)) {
+        MMI_LOGE("send ontimer event return false.");
         return false;
     }
+    // auto errCode = eventRunner->Run();
+    // if (errCode != ERR_OK) {
+    //     MMI_LOGE("event runnner run error,code:%{public}u str:%{public}s", errCode,
+    //         eventHandler_->GetErrorStr(errCode).c_str());
+    //     return false;
+    // }
+    MMI_LOGD("leave");
     return true;
 }
 
