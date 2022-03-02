@@ -279,6 +279,8 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     };
     auto keyOption = std::make_shared<KeyOption>();
     if (GetEventInfo(env, info, event, keyOption) < 0) {
+        delete event;
+        event = nullptr;
         MMI_LOGE("GetEventInfo failed");
         return nullptr;
     }

@@ -179,9 +179,8 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
         MMI_LOGE("Callback doesn't exists");
         return JS_CALLBACK_EVENT_FAILED;
     }
-    auto it = callbacks[event->eventType];
     MMI_LOGD("EventType: %{public}s, keyEventMonitorInfos: %{public}zu",
-        event->eventType.c_str(), it.size());
+        event->eventType.c_str(), callbacks[event->eventType].size());
     napi_value handler1 = nullptr;
     napi_status status = napi_get_reference_value(env, event->callback[0], &handler1);
     if (status != napi_ok) {
@@ -189,7 +188,7 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
         MMI_LOGE("Handler1 get reference value failed");
         return JS_CALLBACK_EVENT_FAILED;
     }
-    for (auto iter = it.begin(); iter != it.end();) {
+    for (auto iter = callbacks[event->eventType].begin(); iter != callbacks[event->eventType].end();) {
         napi_value handler2 = nullptr;
         status = napi_get_reference_value(env, (*iter)->callback[0], &handler2);
         if (status != napi_ok) {
@@ -212,18 +211,18 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
                 return JS_CALLBACK_EVENT_FAILED;
             }
             KeyEventMonitorInfo *monitorInfo = *iter;
-            it.erase(iter++);
-            if (it.empty()) {
+            iter = callbacks[event->eventType].erase(iter);
+            if (callbacks[event->eventType].empty()) {
                 subscribeId = monitorInfo->subscribeId;
             }
             delete monitorInfo;
             monitorInfo = nullptr;
-            MMI_LOGD("Callback has deleted, size: %{public}zu", it.size());
+            MMI_LOGD("Callback has deleted, size: %{public}zu", callbacks[event->eventType].size());
             return JS_CALLBACK_EVENT_SUCCESS;
         }
         ++iter;
     }
-    MMI_LOGD("Callback size: %{public}zu", it.size());
+    MMI_LOGD("Callback size: %{public}zu", callbacks[event->eventType].size());
     return JS_CALLBACK_EVENT_NOT_EXIST;
 }
 
