@@ -47,7 +47,6 @@ ohos_shared_library("libmmi-util") {
     "common/src/klog.cpp",
     "common/src/libmmi_util.cpp",
     "common/src/run_shell_util.cpp",
-    "common/src/safe_keeper.cpp",
     "common/src/util.cpp",
     "common/src/uuid.cpp",
     "network/src/input_event_data_transformation.cpp",
@@ -123,7 +122,6 @@ ohos_unittest("ut-mmi-util-out") {
   }
 
   sources = [
-    "common/test/safe_keeper_test.cpp",
     "common/test/util_test.cpp",
     "network/test/net_packet_test.cpp",
     "socket/test/stream_buffer_test.cpp",
