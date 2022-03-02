@@ -57,7 +57,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     }
     int32_t keyCode = GetNamedPropertyInt32(env, keyHandle, "keyCode");
     keyEvent->SetKeyCode(keyCode);
-    isIntercepted = false;
+    bool isIntercepted = false;
     if (!isIntercepted) {
         keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
     }
