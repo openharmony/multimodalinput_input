@@ -255,7 +255,10 @@ void OHOS::MMI::VirtualDevice::CloseAllDevice(const std::vector<std::string>& fi
 {
     for (auto it : fileList) {
         kill(atoi(it.c_str()), SIGKILL);
-        it.insert(0, OHOS::MMI::g_folderpath.c_str());
+        auto iter = it.insert(0, OHOS::MMI::g_folderpath.c_str());
+        if (!iter.second) {
+            MMI_LOGE("Insert file failed, folderpath:%{public}s", OHOS::MMI::g_folderpath.c_str());
+        }
         const int32_t ret = remove(it.c_str());
         if (ret == -1) {
             const int32_t errnoSaved = errno;
@@ -443,7 +446,10 @@ bool OHOS::MMI::VirtualDevice::CloseDevice(const std::vector<std::string>& fileL
         for (auto it : alldevice) {
             if (it.find(closePid) == 0) {
                 kill(atoi(it.c_str()), SIGKILL);
-                it.insert(0, OHOS::MMI::g_folderpath.c_str());
+                auto iter = it.insert(0, OHOS::MMI::g_folderpath.c_str());
+                if (!iter.second) {
+                   MMI_LOGE("Insert file failed, folderpath:%{public}s", OHOS::MMI::g_folderpath.c_str());
+                }
                 const int32_t ret = remove(it.c_str());
                 if (ret == -1) {
                     const int32_t errnoSaved = errno;
