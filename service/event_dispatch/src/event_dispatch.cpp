@@ -116,11 +116,12 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     CHKPR(point, ERROR_NULL_POINTER);
     auto fd = WinMgr->UpdateTargetPointer(point);
     if (HandlePointerEventFilter(point)) {
-        MMI_LOGI("Pointer event interception succeeded");
+        MMI_LOGI("Pointer event Filter succeeded");
         return RET_OK;
     }
     if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
         HandlePointerEventTrace(point);
+        MMI_LOGD("Interception and monitor succeeded");
         return RET_OK;
     }
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);

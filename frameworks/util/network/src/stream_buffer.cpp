@@ -41,7 +41,10 @@ void StreamBuffer::Clean()
 
 bool StreamBuffer::SetReadIdx(size_t idx)
 {
-    CHKF(idx <= wIdx_, PARAM_INPUT_INVALID);
+    if (idx > wIdx_) {
+        MMI_LOGE("Invalid parameter input");
+        return false;
+    }
     rIdx_ = idx;
     return true;
 }
@@ -159,7 +162,6 @@ bool StreamBuffer::ChkRWError() const
 
 const std::string& StreamBuffer::GetErrorStatusRemark() const
 {
-    static const std::string invalidStatus = "UNKNOWN";
     static const std::vector<std::pair<ErrorStatus, std::string>> remark {
         {ErrorStatus::ERROR_STATUS_OK, "OK"},
         {ErrorStatus::ERROR_STATUS_READ, "READ_ERROR"},
@@ -170,6 +172,7 @@ const std::string& StreamBuffer::GetErrorStatusRemark() const
             return it.second;
         }
     }
+    static const std::string invalidStatus = "UNKNOWN";
     return invalidStatus;
 }
 
