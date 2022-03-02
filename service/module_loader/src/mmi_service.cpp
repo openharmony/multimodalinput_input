@@ -122,7 +122,7 @@ bool MMIService::InitLibinputService()
     hdfEventManager.SetupCallback();
 #endif
     if (!(input_.Init(std::bind(&InputEventHandler::OnEvent, inputEventHdr_, std::placeholders::_1),
-         DEF_INPUT_SEAT))) {
+        DEF_INPUT_SEAT))) {
         MMI_LOGE("libinput initialization failed");
         return false;
     }
