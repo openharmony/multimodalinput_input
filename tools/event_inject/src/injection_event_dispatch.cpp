@@ -37,7 +37,10 @@ void InjectionEventDispatch::InitManageFunction()
     };
 
     for (auto &it : funs) {
-        CHKC(RegistInjectEvent(it), EVENT_REG_FAIL);
+        if (!RegistInjectEvent(it)) {
+            MMI_LOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
+            continue;
+        }
     }
 }
 

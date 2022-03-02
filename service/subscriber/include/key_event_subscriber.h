@@ -20,6 +20,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <set>
 #include <thread>
 #include "key_event.h"
 #include "key_option.h"
@@ -56,7 +57,7 @@ private:
     bool HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent);
     bool HandleKeyCanel(const std::shared_ptr<KeyEvent>& keyEvent);
 
-    bool IsPreKeysMatch(const std::vector<int32_t>& preKeys, const std::vector<int32_t>& pressedKeys) const;
+    bool IsPreKeysMatch(const std::set<int32_t>& preKeys, const std::vector<int32_t>& pressedKeys) const;
 
     void NotifySubscriber(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent,
             const std::shared_ptr<Subscriber>& subscriber);
