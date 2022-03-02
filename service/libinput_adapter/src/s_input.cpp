@@ -20,7 +20,6 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 #include "libmmi_util.h"
-#include "safe_keeper.h"
 #include "util.h"
 #include "input_windows_manager.h"
 namespace OHOS {

@@ -16,11 +16,11 @@
 
 namespace OHOS {
 namespace MMI {
-std::vector<int32_t> KeyOption::GetPreKeys() const
+std::set<int32_t> KeyOption::GetPreKeys() const
 {
     return preKeys_;
 }
-void KeyOption::SetPreKeys(const std::vector<int32_t> &preKeys)
+void KeyOption::SetPreKeys(const std::set<int32_t> &preKeys)
 {
     preKeys_ = preKeys;
 }

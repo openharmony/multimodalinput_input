@@ -31,7 +31,10 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
     InitSessionLostCallback();
-    CHKR(IsValidHandlerId(handlerId), PARAM_INPUT_INVALID, RET_ERR);
+    if (!IsValidHandlerId(handlerId)) {
+        MMI_LOGE("Invalid handler");
+        return RET_ERR;
+    }
     CHKPR(session, RET_ERR);
     if (handlerType == InputHandlerType::MONITOR) {
         MMI_LOGD("Register monitor:%{public}d", handlerId);

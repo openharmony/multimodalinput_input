@@ -82,7 +82,10 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
 #endif // OHOS_BUILD_HDF
     };
     for (auto& it : funs) {
-        CHKC(RegistrationEvent(it), EVENT_REG_FAIL);
+        if (!RegistrationEvent(it)) {
+            MMI_LOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
+            continue;
+        }
     }
     return true;
 }
@@ -304,11 +307,11 @@ int32_t OHOS::MMI::ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPac
     bool isFinalKeyDown = true;
     int32_t finalKeyDownDuration = 0;
     pkt >> subscribeId >> finalKey >> isFinalKeyDown >> finalKeyDownDuration >> preKeySize;
-    std::vector<int32_t> preKeys;
-    for (uint32_t i = 0; i < preKeySize; i++) {
+    std::set<int32_t> preKeys;
+    for (int32_t i = 0; i < preKeySize; ++i) {
         int32_t tmpKey = -1;
         pkt >> tmpKey;
-        preKeys.push_back(tmpKey);
+        preKeys.insert(tmpKey);
     }
     CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     auto keyOption = std::make_shared<OHOS::MMI::KeyOption>();
