@@ -348,10 +348,8 @@ char* MmiBasename(char* path)
 std::string GetStackInfo()
 {
 #ifndef OHOS_BUILD
-    std::ostringstream oss;
     constexpr size_t bufferSize = 1024;
     void* buffer[bufferSize];
-
     const int32_t nptrs = backtrace(buffer, bufferSize);
     char** strings = backtrace_symbols(buffer, nptrs);
     if (strings == nullptr) {
@@ -359,6 +357,7 @@ std::string GetStackInfo()
         return std::string();
     }
 
+    std::ostringstream oss;
     for (int32_t i = 1; i < nptrs; i++) {
         oss << strings[i] << std::endl;
     }
