@@ -131,6 +131,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring);
     key->SetProcessedCallback(eventProcessedCallback_);
     InputManagerImpl::GetInstance()->OnKeyEvent(key);
+    key->MarkProcessed();
     return RET_OK;
 }
 
