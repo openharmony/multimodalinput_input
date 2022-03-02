@@ -59,7 +59,7 @@ public:
     }
     static sptr<MMIToken> Create(const std::u16string& u16)
     {
-        return sptr<MMIToken>(new MMIToken(u16));
+        return sptr<MMIToken>(new (std::nothrow) MMIToken(u16));
     }
     void SetBundlerName(const std::string& name)
     {

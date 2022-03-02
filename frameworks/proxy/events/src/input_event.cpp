@@ -60,7 +60,7 @@ void InputEvent::Reset()
 
 std::shared_ptr<InputEvent> InputEvent::Create()
 {
-    return std::shared_ptr<InputEvent>(new InputEvent(InputEvent::EVENT_TYPE_BASE));
+    return std::shared_ptr<InputEvent>(new (std::nothrow) InputEvent(InputEvent::EVENT_TYPE_BASE));
 }
 
 int32_t InputEvent::GetId() const

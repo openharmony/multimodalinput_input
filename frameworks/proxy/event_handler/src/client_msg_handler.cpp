@@ -66,7 +66,10 @@ bool ClientMsgHandler::Init()
     };
     // LCOV_EXCL_STOP
     for (auto& it : funs) {
-        CHKC(RegistrationEvent(it), EVENT_REG_FAIL);
+        if (!RegistrationEvent(it)) {
+            MMI_LOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
+            continue;
+        }
     }
     return true;
 }
@@ -105,14 +108,14 @@ int32_t ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)
 
 int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
 {
-    int32_t fd = 0;
-    uint64_t serverStartTime = 0;
     auto key = KeyEvent::Create();
     int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, key);
     if (ret != RET_OK) {
         MMI_LOGE("read netPacket failed");
         return RET_ERR;
     }
+    int32_t fd = 0;
+    uint64_t serverStartTime = 0;
     pkt >> fd >> serverStartTime;
     CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     MMI_LOGD("key event dispatcher of client, KeyCode:%{public}d,"

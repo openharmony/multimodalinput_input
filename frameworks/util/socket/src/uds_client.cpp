@@ -54,8 +54,14 @@ int32_t UDSClient::ConnectTo()
 bool UDSClient::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
-    CHKF(size > 0 && size <= MAX_PACKET_BUF_SIZE, PARAM_INPUT_INVALID);
-    CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
+    if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
+        MMI_LOGE("Stream buffer size out of range");
+        return false;
+    }
+    if (fd_ < 0) {
+        MMI_LOGE("fd_ is less than 0");
+        return false;
+    }
     ssize_t ret = write(fd_, static_cast<const void *>(buf), size);
     if (ret < 0) {
         MMI_LOGE("SendMsg write errCode:%{public}d,return %{public}zd", MSG_SEND_FAIL, ret);
@@ -66,23 +72,13 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
 
 bool UDSClient::SendMsg(const NetPacket& pkt) const
 {
-    CHKF(!pkt.ChkRWError(), PACKET_WRITE_FAIL);
+    if (pkt.ChkRWError()) {
+        MMI_LOGE("Read and write status is error");
+        return false;
+    }
     StreamBuffer buf;
     pkt.MakeData(buf);
     return SendMsg(buf.Data(), buf.Size());
-}
-
-bool UDSClient::ThreadIsEnd()
-{
-    if (!isThreadHadRun_) {
-        MMI_LOGI("thread is not run. this: %p, isThreadHadRun_: %p, isThreadHadRun_: %d",
-                 this, &isThreadHadRun_, isThreadHadRun_);
-        return false;
-    }
-
-    const bool ret = threadFutureHadEnd_.get();
-    MMI_LOGI("thread is end, ret = %d.", ret);
-    return true;
 }
 
 bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
@@ -100,7 +96,7 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
             return false;
         }
     }
-    t_ = std::thread(std::bind(&UDSClient::OnThread, this, std::ref(threadPromiseHadEnd_)));
+    t_ = std::thread(std::bind(&UDSClient::OnThread, this));
     if (detachMode) {
         MMI_LOGW("uds client thread detach");
         t_.detach();
@@ -191,7 +187,7 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
     }
 }
 
-void UDSClient::OnThread(std::promise<bool>& threadPromise)
+void UDSClient::OnThread()
 {
     MMI_LOGD("begin");
     SetThreadName("uds_client");
@@ -224,7 +220,6 @@ void UDSClient::OnThread(std::promise<bool>& threadPromise)
             break;
         }
     }
-    threadPromise.set_value(true);
     MMI_LOGD("end");
 }
 

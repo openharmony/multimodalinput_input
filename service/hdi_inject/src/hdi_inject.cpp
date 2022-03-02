@@ -86,10 +86,10 @@ int32_t HdiInject::OnSetEventInject(const RawInputEvent& allEvent, int32_t devIn
 void HdiInject::OnSetHotPlugs(uint32_t devIndex, uint32_t devSatatus)
 {
     if (!(ReportHotPlugEvent(devIndex, devSatatus))) {
-        MMI_LOGE("OnSetHotPlugs ReportHotPlugEvent faild");
+        MMI_LOGE("ReportHotPlugEvent faild");
         return;
     }
-    MMI_LOGI("OnSetHotPlugs ReportHotPlugEvent success");
+    MMI_LOGI("ReportHotPlugEvent success");
 }
 
 void HdiInject::InitDeviceInfo()
