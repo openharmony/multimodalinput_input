@@ -101,7 +101,10 @@ int32_t ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)
     }
     int32_t pid;
     pkt >> pid;
-    CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    if (pkt.ChkRWError()) {
+        MMI_LOGE("Packet read pid failed");
+        return PACKET_READ_FAIL;
+    }
     MMI_LOGD("Client receive the msg from server, keyCode:%{public}d,pid:%{public}d", key->GetKeyCode(), pid);
     return InputMonitorMgr.OnMonitorInputEvent(key);
 }
@@ -117,7 +120,10 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     int32_t fd = 0;
     uint64_t serverStartTime = 0;
     pkt >> fd >> serverStartTime;
-    CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    if (pkt.ChkRWError()) {
+        MMI_LOGE("Packet read fd failed");
+        return PACKET_READ_FAIL;
+    }
     MMI_LOGD("key event dispatcher of client, KeyCode:%{public}d,"
              "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
              "EventType:%{public}d,Flag:%{public}u,"
@@ -162,8 +168,10 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     }
     for (auto &pointerId : pointerIds) {
         PointerEvent::PointerItem item;
-        CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
-
+        if (!pointerEvent->GetPointerItem(pointerId, item)) {
+            MMI_LOGE("Get pointer item failed. pointer:%{public}d", pointerId);
+            return RET_ERR;
+        }
         MMI_LOGD("DownTime:%{public}" PRId64 ",isPressed:%{public}s,"
                 "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
                 "width:%{public}d,height:%{public}d,pressure:%{public}d",
@@ -200,7 +208,10 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
     int32_t fd = -1;
     int32_t subscribeId = -1;
     pkt >> fd >> subscribeId;
-    CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    if (pkt.ChkRWError()) {
+        MMI_LOGE("Packet read fd failed");
+        return PACKET_READ_FAIL;
+    }
     MMI_LOGD("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
              "KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
              "Action:%{public}d,KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}u",
@@ -226,7 +237,10 @@ int32_t ClientMsgHandler::OnTouchPadMonitor(const UDSClient& client, NetPacket& 
     }
     int32_t pid = 0;
     pkt >> pid;
-    CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    if (pkt.ChkRWError()) {
+        MMI_LOGE("Packet read pid failed");
+        return PACKET_READ_FAIL;
+    }
     MMI_LOGD("client receive the msg from server: EventType:%{public}d,pid:%{public}d",
         pointer->GetEventType(), pid);
     return InputMonitorMgr.OnTouchpadMonitorInputEvent(pointer);
@@ -236,7 +250,10 @@ int32_t ClientMsgHandler::GetMultimodeInputInfo(const UDSClient& client, NetPack
 {
     TagPackHead tagPackHeadAck;
     pkt >> tagPackHeadAck;
-    CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    if (pkt.ChkRWError()) {
+        MMI_LOGE("Packet read tagPackHeadAck failed");
+        return PACKET_READ_FAIL;
+    }
     std::cout << "GetMultimodeInputInfo: The client fd is " << tagPackHeadAck.sizeEvent[0] << std::endl;
     return RET_OK;
 }
@@ -247,11 +264,20 @@ int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& p
     int32_t userData;
     int32_t size;
     std::vector<int32_t> inputDeviceIds;
-    CHKR(pkt.Read(userData), STREAM_BUF_READ_FAIL, RET_ERR);
-    CHKR(pkt.Read(size), STREAM_BUF_READ_FAIL, RET_ERR);
+    if (!pkt.Read(userData)) {
+        MMI_LOGE("Packet read userData failed");
+        return RET_ERR;
+    }
+    if (!pkt.Read(size)) {
+        MMI_LOGE("Packet read size failed");
+        return RET_ERR;
+    }
     for (int32_t i = 0; i < size; i++) {
         int32_t deviceId = 0;
-        CHKR(pkt.Read(deviceId), STREAM_BUF_READ_FAIL, RET_ERR);
+        if (!pkt.Read(deviceId)) {
+            MMI_LOGE("Packet read device failed");
+            return RET_ERR;
+        }
         inputDeviceIds.push_back(deviceId);
     }
     InputDeviceImpl::GetInstance().OnInputDeviceIds(userData, inputDeviceIds);
@@ -265,10 +291,22 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
     int32_t id;
     std::string name;
     int32_t deviceType;
-    CHKR(pkt.Read(userData), STREAM_BUF_READ_FAIL, RET_ERR);
-    CHKR(pkt.Read(id), STREAM_BUF_READ_FAIL, RET_ERR);
-    CHKR(pkt.Read(name), STREAM_BUF_READ_FAIL, RET_ERR);
-    CHKR(pkt.Read(deviceType), STREAM_BUF_READ_FAIL, RET_ERR);
+    if (!pkt.Read(userData)) {
+        MMI_LOGE("Packet read userData failed");
+        return RET_ERR;
+    }
+    if (!pkt.Read(id)) {
+        MMI_LOGE("Packet read data failed");
+        return RET_ERR;
+    }
+    if (!pkt.Read(name)) {
+        MMI_LOGE("Packet read name failed");
+        return RET_ERR;
+    }
+    if (!pkt.Read(deviceType)) {
+        MMI_LOGE("Packet read deviceType failed");
+        return RET_ERR;
+    }
 
     InputDeviceImpl::GetInstance().OnInputDevice(userData, id, name, deviceType);
     return RET_OK;
@@ -277,7 +315,10 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
 int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt)
 {
     int32_t handlerId;
-    CHKR(pkt.Read(handlerId), STREAM_BUF_READ_FAIL, RET_ERR);
+    if (!pkt.Read(handlerId)) {
+        MMI_LOGE("Packet read handler failed");
+        return RET_ERR;
+    }
     auto keyEvent = KeyEvent::Create();
     if (InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent) != ERR_OK) {
         MMI_LOGE("Failed to deserialize key event.");
@@ -292,8 +333,14 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
     MMI_LOGD("enter");
     int32_t handlerId;
     InputHandlerType handlerType;
-    CHKR(pkt.Read(handlerId), STREAM_BUF_READ_FAIL, RET_ERR);
-    CHKR(pkt.Read(handlerType), STREAM_BUF_READ_FAIL, RET_ERR);
+    if (!pkt.Read(handlerId)) {
+        MMI_LOGE("Packet read handler failed");
+        return RET_ERR;
+    }
+    if (!pkt.Read(handlerType)) {
+        MMI_LOGE("Packet read handlerType failed");
+        return RET_ERR;
+    }
     MMI_LOGD("Client handlerId:%{public}d,handlerType:%{public}d", handlerId, handlerType);
     auto pointerEvent { PointerEvent::Create() };
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
@@ -325,7 +372,10 @@ int32_t ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetP
     int32_t pid = 0;
     int32_t id = 0;
     pkt >> pid >> id;
-    CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    if (pkt.ChkRWError()) {
+        MMI_LOGE("Packet read pid failed");
+        return PACKET_READ_FAIL;
+    }
     MMI_LOGD("client receive the msg from server: pointId:%{public}d,pid:%{public}d",
              pointerEvent->GetPointerId(), pid);
     return InterceptorMgr.OnPointerEvent(pointerEvent, id);
@@ -341,7 +391,10 @@ int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket
     }
     int32_t pid = 0;
     pkt >> pid;
-    CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    if (pkt.ChkRWError()) {
+        MMI_LOGE("Packet read pid failed");
+        return PACKET_READ_FAIL;
+    }
 
     int32_t keyId = keyEvent->GetId();
     std::string keyEventString = "keyEventFilter";
