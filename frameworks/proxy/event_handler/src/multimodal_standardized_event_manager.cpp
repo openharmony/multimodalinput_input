@@ -51,7 +51,7 @@ int32_t MultimodalStandardizedEventManager::SubscribeKeyEvent(
     pkt << subscribeInfo.GetSubscribeId() << keyOption->GetFinalKey() << keyOption->IsFinalKeyDown()
     << keyOption->GetFinalKeyDownDuration() << preKeySize;
 
-    std::vector<int32_t> preKeys = keyOption->GetPreKeys();
+    std::set<int32_t> preKeys = keyOption->GetPreKeys();
     for (const auto &item : preKeys) {
         pkt << item;
     }
