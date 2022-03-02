@@ -64,7 +64,6 @@ OHOS::MMI::VirtualDevice::~VirtualDevice()
 
 bool OHOS::MMI::VirtualDevice::CatFload(std::vector<std::string>& fileList)
 {
-    dirent* ptr = nullptr;
     DIR* dir = opendir(OHOS::MMI::g_folderpath.c_str());
     if (dir == nullptr) {
         printf("Failed to open folder");
@@ -72,6 +71,7 @@ bool OHOS::MMI::VirtualDevice::CatFload(std::vector<std::string>& fileList)
     }
 
     fileList.clear();
+    dirent* ptr = nullptr;
     while ((ptr = readdir(dir)) != nullptr) {
         if (ptr->d_type == IS_FILE_JUDGE) {
             fileList.push_back(ptr->d_name);
