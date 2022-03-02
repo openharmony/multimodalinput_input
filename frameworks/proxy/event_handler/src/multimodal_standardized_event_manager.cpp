@@ -103,7 +103,7 @@ int32_t MultimodalStandardizedEventManager::InjectionVirtual(bool isPressed, int
 int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> key)
 {
     MMI_LOGD("begin");
-    CHKR(key, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(key, RET_ERR);
     key->UpdateId();
     if (key->GetKeyCode() < 0) {
         MMI_LOGE("keyCode is invalid:%{public}u", key->GetKeyCode());
@@ -142,8 +142,10 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
 
     for (const auto &pointerId : pointerIds) {
         OHOS::MMI::PointerEvent::PointerItem item;
-        CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
-
+        if (!pointerEvent->GetPointerItem(pointerId, item)) {
+            MMI_LOGE("Get pointer item failed. pointer:%{public}d", pointerId);
+            return RET_ERR;
+        }
         MMI_LOGD("DownTime:%{public}" PRId64 ",isPressed:%{public}s,"
                 "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
                 "width:%{public}d,height:%{public}d,pressure:%{public}d",
@@ -156,10 +158,15 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
         MMI_LOGI("Pressed keyCode:%{public}d", keyCode);
     }
     OHOS::MMI::NetPacket pkt(MmiMessageId::INJECT_POINTER_EVENT);
-    CHKR((RET_OK == InputEventDataTransformation::Marshalling(pointerEvent, pkt)),
-        STREAM_BUF_WRITE_FAIL, RET_ERR);
+    if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
+        MMI_LOGE("Marshalling pointer event failed");
+        return RET_ERR;
+    }
     MMI_LOGD("leave");
-    CHKR(SendMsg(pkt), MSG_SEND_FAIL, RET_ERR);
+    if (!SendMsg(pkt)) {
+        MMI_LOGE("SendMsg failed");
+        return RET_ERR;
+    }
     return RET_OK;
 }
 

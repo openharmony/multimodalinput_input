@@ -116,7 +116,10 @@ int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<OH
         item.TouchPadEventMonitor(pointerEvent);
     }
     PointerEvent::PointerItem pointer;
-    CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL, RET_ERR);
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer)) {
+        MMI_LOGE("Get pointer item failed");
+        return RET_ERR;
+    }
     MMI_LOGD("Monitor-clienteventTouchpad:time:%{public}" PRId64 ","
              "sourceType:%{public}d,action:%{public}d,"
              "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",

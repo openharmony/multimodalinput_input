@@ -207,8 +207,10 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
         return RET_OK;
     }
     auto fd = WinMgr->UpdateTarget(key);
-    CHKR(fd >= 0, FD_OBTAIN_FAIL, RET_ERR);
-
+    if (fd < 0) {
+        MMI_LOGE("Invalid fd");
+        return RET_ERR;
+    }
     MMI_LOGD("4.event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
              "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
              "EventType:%{public}d,Flag:%{public}u,"

@@ -33,7 +33,10 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
         SessionPtr sess, int32_t subscribeId, std::shared_ptr<OHOS::MMI::KeyOption> keyOption)
 {
     MMI_LOGD("Enter");
-    CHKR(subscribeId >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    if (subscribeId < 0) {
+        MMI_LOGE("Invalid subscribe");
+        return RET_ERR;
+    }
     CHKPR(sess, ERROR_NULL_POINTER);
     CHKPR(keyOption, ERROR_NULL_POINTER);
     int32_t preKeySize = keyOption->GetPreKeys().size();
