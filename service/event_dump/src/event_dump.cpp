@@ -80,22 +80,32 @@ void EventDump::TestDump()
 {
     constexpr int32_t MAX_PATH_SIZE = 128;
     char szPath[MAX_PATH_SIZE] = {};
-    CHK(sprintf_s(szPath, MAX_PATH_SIZE, "%s/mmidump-%s.txt", DEF_MMI_DATA_ROOT, Strftime("%y%m%d%H%M%S").c_str()) >= 0,
-        SPRINTF_S_SEC_FUN_FAIL);
+    auto ret = sprintf_s(szPath, MAX_PATH_SIZE, "%s/mmidump-%s.txt",
+                         DEF_MMI_DATA_ROOT, Strftime("%y%m%d%H%M%S").c_str());
+    if (ret < 0) {
+        MMI_LOGE("The function sprintf_s perform error, errCode:%{public}d", SPRINTF_S_SEC_FUN_FAIL);
+        return;
+    }
     char path[PATH_MAX] = {};
     if (realpath(szPath, path) == nullptr) {
         MMI_LOGE("path is error, szPath:%{public}s", szPath);
         return;
     }
     auto fd = open(path, O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
-    CHK(fd >= 0, FILE_OPEN_FAIL);
+    if (fd < 0) {
+        MMI_LOGE("The fd less than 0, errCode:%{public}d", FILE_OPEN_FAIL);
+        return;
+    }
     Dump(fd);
     close(fd);
 }
 
 void EventDump::InsertDumpInfo(const std::string& str)
 {
-    CHK(!str.empty(), PARAM_INPUT_INVALID);
+    if (str.empty()) {
+        MMI_LOGE("The in parameter str is empty, errCode:%{public}d", PARAM_INPUT_INVALID);
+        return;
+    }
     std::lock_guard<std::mutex> lock(mu_);
 
     constexpr int32_t VECMAXSIZE = 300;
@@ -107,7 +117,10 @@ void EventDump::InsertDumpInfo(const std::string& str)
 
 void EventDump::InsertFormat(std::string str, ...)
 {
-    CHK(!str.empty(), INVALID_PARAM);
+    if (str.empty()) {
+        MMI_LOGE("The in parameter str is empty, errCode:%{public}d", PARAM_INPUT_INVALID);
+        return;
+    }
     va_list args;
     va_start(args, str);
     char buf[MAX_STREAM_BUF_SIZE] = {};
