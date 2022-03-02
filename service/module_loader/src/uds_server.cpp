@@ -19,7 +19,6 @@
 #include <sys/socket.h>
 #include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
-#include "safe_keeper.h"
 #include "uds_command_queue.h"
 #include "util.h"
 #include "util_ex.h"
@@ -435,7 +434,6 @@ void OHOS::MMI::UDSServer::OnThread()
     uint64_t tid = GetThisThreadIdOfLL();
     CHK(tid > 0, VAL_NOT_EXP);
     MMI_LOGD("begin tid:%{public}" PRId64 "", tid);
-    SafeKpr->RegisterEvent(tid, "UDSServer::_OnThread");
 
     std::map<int32_t, StreamBufData> bufMap;
     struct epoll_event ev[MAX_EVENT_SIZE] = {};
@@ -453,7 +451,6 @@ void OHOS::MMI::UDSServer::OnThread()
                 OnRecv(item.first, item.second.sBuf.Data(), item.second.sBuf.Size());
             }
         }
-        SafeKpr->ReportHealthStatus(tid);
     }
     MMI_LOGI("end");
 }
