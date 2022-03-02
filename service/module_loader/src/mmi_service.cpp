@@ -121,8 +121,11 @@ bool MMIService::InitLibinputService()
     MMI_LOGD("HDF Init");
     hdfEventManager.SetupCallback();
 #endif
-    CHKF(input_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
-         DEF_INPUT_SEAT), LIBINPUT_INIT_FAIL);
+    if (!(input_.Init(std::bind(&InputEventHandler::OnEvent, inputEventHdr_, std::placeholders::_1),
+        DEF_INPUT_SEAT))) {
+        MMI_LOGE("libinput initialization failed");
+        return false;
+    }
     auto inputFd = input_.GetInputFd();
     auto ret = AddEpoll(EPOLL_EVENT_INPUT, inputFd);
     if (ret <  0) {
@@ -136,9 +139,18 @@ bool MMIService::InitLibinputService()
 
 bool MMIService::InitService()
 {
-    CHKF(state_ == ServiceRunningState::STATE_NOT_START, SASERVICE_INIT_FAIL);
-    CHKF(Publish(this), SASERVICE_INIT_FAIL);
-    CHKF(EpollCreat(MAX_EVENT_SIZE) >= 0, SASERVICE_INIT_FAIL);
+    if (state_ != ServiceRunningState::STATE_NOT_START) {
+        MMI_LOGE("Service running status is not enabled");
+        return false;
+    }
+    if (!(Publish(this))) {
+        MMI_LOGE("Service initialization failed");
+        return false;
+    }
+    if (EpollCreat(MAX_EVENT_SIZE) < 0) {
+        MMI_LOGE("epoll create failed");
+        return false;
+    }
     auto ret = AddEpoll(EPOLL_EVENT_SOCKET, epollFd_);
     if (ret <  0) {
         MMI_LOGE("AddEpoll error ret:%{public}d", ret);
