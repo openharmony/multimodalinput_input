@@ -38,7 +38,7 @@ void InjectionEventDispatch::InitManageFunction()
 
     for (auto &it : funs) {
         if (!RegistInjectEvent(it)) {
-            MMI_LOGE("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
+            MMI_LOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
             continue;
         }
     }
