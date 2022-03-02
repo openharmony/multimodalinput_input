@@ -85,7 +85,10 @@ int32_t OHOS::MMI::UDSServer::GetClientPid(int32_t fd)
 bool OHOS::MMI::UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
 {
     std::lock_guard<std::mutex> lock(mux_);
-    CHKF(fd >= 0, PARAM_INPUT_INVALID);
+    if (fd < 0) {
+        MMI_LOGE("fd is less than 0");
+        return false;
+    }
     auto ses = GetSession(fd);
     if (ses == nullptr) {
         MMI_LOGE("fd:%{public}d not found, The message was discarded. errCode:%{public}d",
@@ -397,9 +400,15 @@ bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
     CHKPF(ses);
     MMI_LOGD("pid:%{public}d,fd:%{public}d", ses->GetPid(), ses->GetFd());
     auto fd = ses->GetFd();
-    CHKF(fd >= 0, VAL_NOT_EXP);
+    if (fd < 0) {
+        MMI_LOGE("fd is less than 0");
+        return false;
+    }
     auto pid = ses->GetPid();
-    CHKF(pid > 0, VAL_NOT_EXP);
+    if (pid <= 0) {
+        MMI_LOGE("Get process faild");
+        return false;
+    }
     idxPidMap_[pid] = fd;
     sessionsMap_[fd] = ses;
     DumpSession("AddSession");
