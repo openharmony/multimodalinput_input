@@ -260,41 +260,23 @@ bool OHOS::MMI::UDSServer::StartServer()
 void OHOS::MMI::UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
 {
     CHKPV(buf);
-    if (fd < 0) {
-        MMI_LOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
-        return;
-    }
+    CHK(fd >= 0, PARAM_INPUT_INVALID);
     auto sess = GetSession(fd);
-    CHKPV(sess);
+    CHK(sess, ERROR_NULL_POINTER);
     int32_t readIdx = 0;
     int32_t packSize = 0;
     const size_t headSize = sizeof(PackHead);
-    if (size < headSize) {
-        MMI_LOGE("The in parameter size less than headSize, errCode%{public}d", VAL_NOT_EXP);
-        return;
-    }
+    CHK(size >= headSize, VAL_NOT_EXP);
     while (size > 0 && recvFun_) {
-        if (size < headSize) {
-            MMI_LOGE("The size less than headSize, errCode%{public}d", VAL_NOT_EXP);
-            return;
-        }
+        CHK(size >= headSize, VAL_NOT_EXP);
         auto head = (PackHead*)&buf[readIdx];
-        if (head->size[0] >= size) {
-            MMI_LOGE("The head->size[0] more or equal than size, errCode:%{public}d", VAL_NOT_EXP);
-            return;
-        }
+        CHK(head->size[0] < size, VAL_NOT_EXP);
         packSize = headSize + head->size[0];
-        if (size < packSize) {
-            MMI_LOGE("The size less than packSize, errCode:%{public}d", VAL_NOT_EXP);
-            return;
-        }
+        CHK(size >= packSize, VAL_NOT_EXP);
         
         NetPacket pkt(head->idMsg);
         if (head->size[0] > 0) {
-            if (!pkt.Write(&buf[readIdx + headSize], head->size[0])) {
-                MMI_LOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
-                return;
-            }
+            CHK(pkt.Write(&buf[readIdx + headSize], head->size[0]), STREAM_BUF_WRITE_FAIL);
         }
         recvFun_(sess, pkt);
         size -= packSize;
@@ -310,10 +292,7 @@ void OHOS::MMI::UDSServer::OnEpollRecv(int32_t fd, const char *buf, size_t size)
 void OHOS::MMI::UDSServer::OnEvent(const struct epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
 {
     constexpr size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
-    if (maxCount <= 0) {
-        MMI_LOGE("The maxCount value is error, errCode:%{public}d", VAL_NOT_EXP);
-        return;
-    }
+    CHK(maxCount > 0, VAL_NOT_EXP);
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
         MMI_LOGD("fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
@@ -353,16 +332,10 @@ void OHOS::MMI::UDSServer::OnEvent(const struct epoll_event& ev, std::map<int32_
 void OHOS::MMI::UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct epoll_event& ev)
 {
     constexpr size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
-    if (maxCount <= 0) {
-        MMI_LOGE("The maxCount value is error, errCode:%{public}d", VAL_NOT_EXP);
-        return;
-    }
-    CHKPV(ev.data.ptr);
+    CHK(maxCount > 0, VAL_NOT_EXP);
+    CHK(ev.data.ptr, ERROR_NULL_POINTER);
     auto fd = *static_cast<int32_t*>(ev.data.ptr);
-    if (fd < 0) {
-        MMI_LOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
-        return;
-    }
+    CHK(fd >= 0, INVALID_PARAM);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
         MMI_LOGD("EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
         auto secPtr = GetSession(fd);
@@ -441,10 +414,7 @@ bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
 void OHOS::MMI::UDSServer::DelSession(int32_t fd)
 {
     MMI_LOGD("begin fd:%{public}d", fd);
-    if (fd < 0) {
-        MMI_LOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
-        return;
-    }
+    CHK(fd >= 0, PARAM_INPUT_INVALID);
     auto pid = GetClientPid(fd);
     if (pid > 0) {
         idxPidMap_.erase(pid);
@@ -462,10 +432,7 @@ void OHOS::MMI::UDSServer::OnThread()
 {
     OHOS::MMI::SetThreadName(std::string("uds_server"));
     uint64_t tid = GetThisThreadIdOfLL();
-    if (tid <= 0) {
-        MMI_LOGE("The tid value is error, errCode:%{public}d", VAL_NOT_EXP);
-        return;
-    }
+    CHK(tid > 0, VAL_NOT_EXP);
     MMI_LOGD("begin tid:%{public}" PRId64 "", tid);
 
     std::map<int32_t, StreamBufData> bufMap;

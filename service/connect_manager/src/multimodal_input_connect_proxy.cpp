@@ -43,9 +43,6 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
 {
     MMI_LOGD("enter");
     MessageParcel data;
-    MessageParcel reply;
-    MessageOption option; // (MessageOption::TF_ASYNC);
-
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
         MMI_LOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
@@ -59,6 +56,8 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
         return ERR_INVALID_VALUE;
     }
 
+    MessageParcel reply;
+    MessageOption option; // (MessageOption::TF_ASYNC);
     int32_t requestResult = Remote()->SendRequest(ALLOC_SOCKET_FD, data, reply, option);
     if (requestResult != NO_ERROR) {
         MMI_LOGE("send request fail, result:%{public}d", requestResult);
@@ -83,9 +82,6 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
 {
     MMI_LOGD("enter");
     MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
-
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
         MMI_LOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
@@ -96,6 +92,8 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
         return ERR_INVALID_VALUE;
     }
 
+    MessageParcel reply;
+    MessageOption option;
     int32_t requestResult = Remote()->SendRequest(SET_EVENT_POINTER_FILTER, data, reply, option);
     if (requestResult != NO_ERROR) {
         MMI_LOGE("send request fail, result:%{public}d", requestResult);
