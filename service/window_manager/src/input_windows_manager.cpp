@@ -56,9 +56,15 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent>
     CHKPR(inputEvent, ERROR_NULL_POINTER);
     MMI_LOGD("enter");
     int32_t pid = GetPidAndUpdateTarget(inputEvent);
-    CHKR(pid > 0, PID_OBTAIN_FAIL, RET_ERR);
+    if (pid <= 0) {
+        MMI_LOGE("Invalid pid");
+        return RET_ERR;
+    }
     int32_t fd = udsServer_->GetClientFd(pid);
-    CHKR(fd >= 0, FD_OBTAIN_FAIL, RET_ERR);
+    if (fd < 0) {
+        MMI_LOGE("Invalid fd");
+        return RET_ERR;
+    }
     MMI_LOGD("leave");
     return fd;
 }

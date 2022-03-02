@@ -499,7 +499,10 @@ int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEv
              pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
     PointerEvent::PointerItem item;
-    CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item), PARAM_INPUT_FAIL, RET_ERR);
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+        MMI_LOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
+        return RET_ERR;
+    }
     MMI_LOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
              "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
              "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,DeviceId:%{public}d",

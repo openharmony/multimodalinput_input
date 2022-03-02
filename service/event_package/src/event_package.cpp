@@ -100,9 +100,15 @@ int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& k
 {
     const std::string uid = GetUUid();
     int32_t ret = memcpy_s(key.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size());
-    CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    if (ret != EOK) {
+        MMI_LOGE("Memcpy data failed");
+        return RET_ERR;
+    }
     ret = memcpy_s(key.deviceName, MAX_UUIDSIZE, VIRTUAL_KEYBOARD.c_str(), VIRTUAL_KEYBOARD.size());
-    CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    if (ret != EOK) {
+        MMI_LOGE("Memcpy data failed");
+        return RET_ERR;
+    }
     key.time = event.keyDownDuration;
     key.key = event.keyCode;
     key.isIntercepted = event.isIntercepted;
