@@ -151,7 +151,10 @@ size_t StreamBuffer::Size() const
 
 size_t StreamBuffer::UnreadSize() const
 {
-    CHKR(wIdx_ >= rIdx_, VAL_NOT_EXP, 0);
+    if (wIdx_ < rIdx_) {
+        MMI_LOGW("Widx_ less than ridx_, wIdx_:%{public}d,rIdx_:%{public}d", wIdx_, rIdx_);
+        return 0;
+    }
     return (wIdx_ - rIdx_);
 }
 
@@ -162,7 +165,6 @@ bool StreamBuffer::ChkRWError() const
 
 const std::string& StreamBuffer::GetErrorStatusRemark() const
 {
-    static const std::string invalidStatus = "UNKNOWN";
     static const std::vector<std::pair<ErrorStatus, std::string>> remark {
         {ErrorStatus::ERROR_STATUS_OK, "OK"},
         {ErrorStatus::ERROR_STATUS_READ, "READ_ERROR"},
@@ -173,6 +175,7 @@ const std::string& StreamBuffer::GetErrorStatusRemark() const
             return it.second;
         }
     }
+    static const std::string invalidStatus = "UNKNOWN";
     return invalidStatus;
 }
 

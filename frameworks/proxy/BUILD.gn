@@ -31,6 +31,8 @@ config("libmmi_client_config") {
     "//utils/native/base/include",
     "event_handler/include",
     "module_loader/include",
+    "//foundation/multimodalinput/input/common/include",
+    "//foundation/multimodalinput/input/frameworks/util/common/include",
   ]
 }
 

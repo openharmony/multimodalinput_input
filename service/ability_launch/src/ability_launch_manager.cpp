@@ -89,7 +89,10 @@ void AbilityLaunchManager::ResolveConfig(const std::string configFile)
         std::string key = GenerateKey(shortcutKey);
         auto res = shortcutKeys_.find(key);
         if (res == shortcutKeys_.end()) {
-            shortcutKeys_.emplace(key, shortcutKey);
+            auto iter = shortcutKeys_.emplace(key, shortcutKey);
+            if (!iter.second) {
+                MMI_LOGE("Duplicate shortcutKey:%{public}s", key.c_str());
+            }
         }
     }
 }
@@ -169,7 +172,10 @@ bool AbilityLaunchManager::PackageAbility(const json &jsonAbility, Ability &abil
             MMI_LOGE("param must be object");
             return false;
         }
-        ability.params.emplace(params[i]["key"], params[i]["value"]);
+        auto ret = ability.params.emplace(params[i]["key"], params[i]["value"]);
+        if (!ret.second) {
+            MMI_LOGE("Emplace to failed");
+        }
     }
     return true;
 }
