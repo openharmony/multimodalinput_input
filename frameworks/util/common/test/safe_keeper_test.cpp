@@ -30,7 +30,7 @@ class SafeKeeperUnitTest : public SafeKeeper {
 public:
     bool IsExistUnitTest(uint64_t tid) const
     {
-        return IsExist(tid);
+        return IsThreadExist(tid);
     }
     SafeEvent *GetEventUnitTest(uint64_t tid)
     {

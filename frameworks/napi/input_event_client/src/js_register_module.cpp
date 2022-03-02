@@ -26,7 +26,7 @@ namespace {
 
 static napi_value InjectEvent(napi_env env, napi_callback_info info)
 {
-    MMI_LOGE("enter");
+    MMI_LOGD("enter");
     napi_value result = nullptr;
     size_t argc = 1;
     napi_value argv[1] = { 0 };
@@ -50,6 +50,11 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     isIntercepted = false;
 
     auto keyEvent = KeyEvent::Create();
+    if (keyEvent == nullptr) {
+        MMI_LOGE("keyEvent is null");
+        napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAM, &result);
+        return result;
+    }
     if (isPressed) {
         keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     } else {
@@ -66,7 +71,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     keyEvent->AddKeyItem(item);
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     napi_create_int32(env, 0, &result);
-    MMI_LOGE("leave");
+    MMI_LOGD("leave");
     return result;
 }
 

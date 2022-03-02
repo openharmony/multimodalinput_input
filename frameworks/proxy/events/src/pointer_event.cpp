@@ -252,7 +252,7 @@ PointerEvent::~PointerEvent() {}
 
 std::shared_ptr<PointerEvent> PointerEvent::Create()
 {
-    return std::shared_ptr<PointerEvent>(new PointerEvent(InputEvent::EVENT_TYPE_POINTER));
+    return std::shared_ptr<PointerEvent>(new (std::nothrow) PointerEvent(InputEvent::EVENT_TYPE_POINTER));
 }
 
 int32_t PointerEvent::GetPointerAction() const
