@@ -19,9 +19,12 @@
 #undef private
 
 // head file
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+} // namespace
 
 class InjectionEventDispatchTest : public testing::Test {
 public:
@@ -48,4 +51,5 @@ HWTEST_F(InjectionEventDispatchTest, Test_OnJson, TestSize.Level1)
     int32_t ret = injectionEventDispatch.OnJson();
     EXPECT_EQ(ret, RET_ERR);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS
