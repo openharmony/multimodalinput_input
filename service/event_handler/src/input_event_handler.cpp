@@ -137,7 +137,7 @@ void InputEventHandler::Init(UDSServer& udsServer)
     };
     for (auto &item : funs) {
         if (!RegistrationEvent(item)) {
-            MMI_LOGE("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
+            MMI_LOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
             continue;
         }
     }
