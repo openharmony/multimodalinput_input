@@ -121,7 +121,10 @@ void HdiInject::InitDeviceInfo()
          HDF_DEVICE_FD_DEFAULT_STATUS, "remoteControl"},
     };
     int32_t counts = sizeof(deviceInfoArray) / sizeof(DeviceInformation);
-    deviceArray_.insert(deviceArray_.begin(), deviceInfoArray, deviceInfoArray + counts);
+    auto iter = deviceArray_.insert(deviceArray_.begin(), deviceInfoArray, deviceInfoArray + counts);
+    if (!iter.second) {
+        MMI_LOGE("Insert value failed");
+    }
 }
 
 void HdiInject::StartHdiserver()

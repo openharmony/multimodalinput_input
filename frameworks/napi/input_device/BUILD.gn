@@ -25,6 +25,7 @@ config("libinputdevice_config") {
     "//utils/native/base/include",
     "//foundation/multimodalinput/input/common/include",
     "//foundation/multimodalinput/input/tools/event_inject/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
   ]
 
   cflags = [ "-DOHOS_BUILD" ]

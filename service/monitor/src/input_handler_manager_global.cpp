@@ -31,7 +31,10 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
     InitSessionLostCallback();
-    CHKR(IsValidHandlerId(handlerId), PARAM_INPUT_INVALID, RET_ERR);
+    if (!IsValidHandlerId(handlerId)) {
+        MMI_LOGE("Invalid handler");
+        return RET_ERR;
+    }
     CHKPR(session, RET_ERR);
     if (handlerType == InputHandlerType::MONITOR) {
         MMI_LOGD("Register monitor:%{public}d", handlerId);
@@ -135,7 +138,7 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Key
 {
     CHKPV(keyEvent);
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
-    if (!pkt.write(id_)) {
+    if (!pkt.Write(id_)) {
         MMI_LOGE("Write to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
     }
@@ -154,7 +157,7 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Poi
     CHKPV(pointerEvent);
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
     MMI_LOGD("Service SendToClient id:%{public}d,InputHandlerType:%{public}d", id_, handlerType_);
-    if (!pkt.write(id_) || !pkt.Write(handlerType_)) {
+    if (!pkt.Write(id_) || !pkt.Write(handlerType_)) {
         MMI_LOGE("Write id_ to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
     }

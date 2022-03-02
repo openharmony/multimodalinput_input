@@ -49,10 +49,12 @@ void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
                                                   const int32_t fingerCount,
                                                   POINT_EVENT_TYPE& pointEventType)
 {
-    CHK(fingerCount > 0, PARAM_INPUT_INVALID);
-    CHK(touch.time > 0, PARAM_INPUT_INVALID);
-    CHK(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
-    CHK(touch.eventType >= 0, PARAM_INPUT_INVALID);
+    if (fingerCount <= 0 || touch.time <= 0 || touch.seatSlot < 0 || touch.eventType < 0) {
+        MMI_LOGE("The in parameter is error, fingerCount:%{public}d, touch.time:%{public}" PRId64 ","
+                 "touch.seatSlot:%{public}d, touch.eventType:%{public}d",
+                 fingerCount, touch.time, touch.seatSlot, touch.eventType);
+                 return;
+    }
     if (fingerCount == 1) {
         switch (touch.eventType) {
             case LIBINPUT_EVENT_TOUCH_DOWN: {
@@ -207,8 +209,10 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
         return RET_OK;
     }
     auto fd = WinMgr->UpdateTarget(key);
-    CHKR(fd >= 0, FD_OBTAIN_FAIL, RET_ERR);
-
+    if (fd < 0) {
+        MMI_LOGE("Invalid fd");
+        return RET_ERR;
+    }
     MMI_LOGD("4.event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
              "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
              "EventType:%{public}d,Flag:%{public}u,"
