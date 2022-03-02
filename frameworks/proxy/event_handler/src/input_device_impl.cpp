@@ -28,45 +28,34 @@ InputDeviceImpl& InputDeviceImpl::GetInstance()
     return instance;
 }
 
-void InputDeviceImpl::GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback)
+void InputDeviceImpl::GetInputDeviceIdsAsync(int32_t userData,
+    std::function<void(int32_t, std::vector<int32_t>)> callback)
 {
     MMI_LOGD("begin");
-    std::lock_guard<std::mutex> guard(mtx_);
-    inputDevciceIds_[idsUD_] = callback;
-    MMIEventHdl.GetDeviceIds(idsUD_);
-    if (idsUD_ == INT32_MAX) {
-        MMI_LOGE("the idsUD_ exceeded the upper limit");
-        return;
-    }
-    idsUD_++;
+    inputDevciceIds_[userData] = callback;
+    MMIEventHdl.GetDeviceIds(userData);
     MMI_LOGD("end");
 }
 
-void InputDeviceImpl::GetInputDeviceAsync(int32_t deviceId,
-    std::function<void(std::shared_ptr<InputDeviceInfo>)> callback)
+void InputDeviceImpl::GetInputDeviceAsync(int32_t userData, int32_t deviceId,
+    std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)> callback)
 {
     MMI_LOGD("begin");
-    std::lock_guard<std::mutex> guard(mtx_);
-    inputDevcices_[inputDeviceUD_] = callback;
-    MMIEventHdl.GetDevice(inputDeviceUD_, deviceId);
-    if (inputDeviceUD_ == INT32_MAX) {
-        MMI_LOGE("the inputDeviceUD_ exceeded the upper limit");
-        return;
-    }
-    inputDeviceUD_++;
+    inputDevcices_[userData] = callback;
+    MMIEventHdl.GetDevice(userData, deviceId);
     MMI_LOGD("end");
 }
 
 void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, std::string name, int32_t deviceType)
 {
     MMI_LOGD("begin");
-    auto inputDeviceInfo = std::make_shared<InputDeviceInfo>(id, name, deviceType);
     auto iter = inputDevcices_.find(userData);
     if (iter == inputDevcices_.end()) {
         MMI_LOGE("failed to find the callback function");
         return;
     }
-    iter->second(inputDeviceInfo);
+    auto inputDeviceInfo = std::make_shared<InputDeviceInfo>(id, name, deviceType);
+    iter->second(userData, inputDeviceInfo);
     MMI_LOGD("end");
 }
 
@@ -78,7 +67,7 @@ void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> id
         MMI_LOGE("failed to find the callback function");
         return;
     }
-    iter->second(ids);
+    iter->second(userData, ids);
     MMI_LOGD("end");
 }
 } // namespace MMI
