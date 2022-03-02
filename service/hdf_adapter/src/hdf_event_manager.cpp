@@ -326,10 +326,10 @@ void OHOS::MMI::HdfEventManager::AddDevice(uint32_t devIndex, uint32_t devType)
 }
 bool OHOS::MMI::HdfEventManager::OpenHdfDevice(uint32_t devIndex, bool oper)
 {
-    int32_t ret = -1;
     if (devIndex >= MAX_INPUT_DEVICE_COUNT) {
         return true;
     }
+    int32_t ret = -1;
     if (oper) {
         ret = inputInterface_->iInputManager->OpenInputDevice(devIndex);
     } else {
