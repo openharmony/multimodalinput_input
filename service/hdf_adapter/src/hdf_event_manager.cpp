@@ -111,9 +111,9 @@ int32_t OHOS::MMI::HdfEventManager::EvdevIoctl(int32_t hdiindex, int32_t pcmd, v
 {
     int32_t size = (pcmd >> IOCTL_CMD_SHIFT) & IOCTL_CMD_MASK;
     int32_t cmd = pcmd & 0xff;
-    DeviceInfo *deviceinfo = nullptr;
     MMI_LOGD("index:%{public}d,cmd:%{public}02x,size:%{public}d,"
         "pcmd:%{public}04x", hdiindex, cmd, size, pcmd);
+    DeviceInfo *deviceinfo = nullptr;
     for (auto &item : globleThis_->hdflist_){
         if (item.index == hdiindex) {
             deviceinfo = static_cast<DeviceInfo*>(item->deviceinfo);
@@ -199,11 +199,11 @@ OHOS::MMI::HdfEventManager::~HdfEventManager()
 }
 int32_t OHOS::MMI::HdfEventManager::HdfdevtypeMapLibinputType(uint32_t devIndex, uint32_t devType)
 {
-    int32_t ret = 0;
     if (devIndex >= MAX_INPUT_DEVICE_COUNT) {
         MMI_LOGE("The maximum number of devices exceeded, devIndex:%{public}d", devIndex);
         return devType;
     }
+    int32_t ret = 0;
     switch (devType) {
         case INDEV_TYPE_TOUCH:
             ret = HDF_INPUT | HDF_TOUCHSCREEN;
@@ -222,12 +222,12 @@ int32_t OHOS::MMI::HdfEventManager::HdfdevtypeMapLibinputType(uint32_t devIndex,
 #ifdef  OHOS_BUILD_HDF
 int32_t OHOS::MMI::HdfEventManager::GetDeviceCount()
 {
-    int32_t devcount = 0;
     int32_t ret = memset_s(mountDevIndex_, sizeof(DevDesc) * TOTAL_INPUT_DEVICE_COUNT, 0,
                            sizeof(DevDesc) * TOTAL_INPUT_DEVICE_COUNT);
     if (ret != EOK) {
         MMI_LOGE("call memset_s fail. ret = %d", ret);
     }
+    int32_t devcount = 0;
     if (inputInterface_ != nullptr || inputInterface_->iInputManager != nullptr) {
         int32_t ret = inputInterface_->iInputManager->ScanInputDevice(MAX_INPUT_DEVICE_COUNT, mountDevIndex_);
         if (ret) {
