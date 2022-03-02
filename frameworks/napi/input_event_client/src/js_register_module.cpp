@@ -43,27 +43,25 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     napi_typeof(env, keyHandle, &tmpType);
     NAPI_ASSERT(env, tmpType == napi_object, "parameter1 is not napi_object");
 
-    bool isPressed = GetNamedPropertyBool(env, keyHandle, "isPressed");
-    int32_t keyCode = GetNamedPropertyInt32(env, keyHandle, "keyCode");
-    bool isIntercepted = GetNamedPropertyBool(env, keyHandle, "isIntercepted");
-    int32_t keyDownDuration = GetNamedPropertyInt32(env, keyHandle, "keyDownDuration");
-    isIntercepted = false;
-
     auto keyEvent = KeyEvent::Create();
     if (keyEvent == nullptr) {
         MMI_LOGE("keyEvent is null");
         napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAM, &result);
         return result;
     }
+    bool isPressed = GetNamedPropertyBool(env, keyHandle, "isPressed");
     if (isPressed) {
         keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     } else {
         keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     }
+    int32_t keyCode = GetNamedPropertyInt32(env, keyHandle, "keyCode");
     keyEvent->SetKeyCode(keyCode);
+    bool isIntercepted = false;
     if (!isIntercepted) {
         keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
     }
+    int32_t keyDownDuration = GetNamedPropertyInt32(env, keyHandle, "keyDownDuration");
     KeyEvent::KeyItem item;
     item.SetKeyCode(keyCode);
     item.SetPressed(isPressed);

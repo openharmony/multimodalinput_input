@@ -126,7 +126,6 @@ void SetNamedProperty(const napi_env& env, napi_value object, const std::string&
 
 bool GetNamedPropertyBool(const napi_env& env, const napi_value& object, const std::string& name)
 {
-    bool value = false;
     napi_value napiValue = {};
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
@@ -136,9 +135,10 @@ bool GetNamedPropertyBool(const napi_env& env, const napi_value& object, const s
     }
     if (tmpType != napi_boolean) {
         MMI_LOGE("value is not bool");
-        return value;
+        return false;
     }
 
+    bool value = false;
     napi_get_value_bool(env, napiValue, &value);
     return value;
 }
