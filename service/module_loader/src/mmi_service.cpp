@@ -121,8 +121,11 @@ bool MMIService::InitLibinputService()
     MMI_LOGD("HDF Init");
     hdfEventManager.SetupCallback();
 #endif
-    CHKF(input_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
-         DEF_INPUT_SEAT), LIBINPUT_INIT_FAIL);
+    if (!(input_.Init(std::bind(&InputEventHandler::OnEvent, inputEventHdr_, std::placeholders::_1),
+        DEF_INPUT_SEAT))) {
+        MMI_LOGE("libinput initialization failed");
+        return false;
+    }
     auto inputFd = input_.GetInputFd();
     auto ret = AddEpoll(EPOLL_EVENT_INPUT, inputFd);
     if (ret <  0) {
@@ -136,9 +139,18 @@ bool MMIService::InitLibinputService()
 
 bool MMIService::InitService()
 {
-    CHKF(state_ == ServiceRunningState::STATE_NOT_START, SASERVICE_INIT_FAIL);
-    CHKF(Publish(this), SASERVICE_INIT_FAIL);
-    CHKF(EpollCreat(MAX_EVENT_SIZE) >= 0, SASERVICE_INIT_FAIL);
+    if (state_ != ServiceRunningState::STATE_NOT_START) {
+        MMI_LOGE("Service running status is not enabled");
+        return false;
+    }
+    if (!(Publish(this))) {
+        MMI_LOGE("Service initialization failed");
+        return false;
+    }
+    if (EpollCreat(MAX_EVENT_SIZE) < 0) {
+        MMI_LOGE("epoll create failed");
+        return false;
+    }
     auto ret = AddEpoll(EPOLL_EVENT_SOCKET, epollFd_);
     if (ret <  0) {
         MMI_LOGE("AddEpoll error ret:%{public}d", ret);
@@ -183,10 +195,7 @@ void MMIService::OnStart()
     MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
 
     int32_t ret = Init();
-    if (RET_OK != ret) {
-        MMI_LOGE("Init mmi_service failed");
-        return;
-    }
+    CHK(RET_OK == ret, ret);
     state_ = ServiceRunningState::STATE_RUNNING;
     MMI_LOGD("Started successfully");
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
@@ -296,10 +305,7 @@ void MMIService::OnThread()
 {
     OHOS::MMI::SetThreadName(std::string("mmi_service"));
     uint64_t tid = GetThisThreadIdOfLL();
-    if (tid <= 0) {
-        MMI_LOGE("The tid is error, errCode:%{public}d", VAL_NOT_EXP);
-        return;
-    }
+    CHK(tid > 0, VAL_NOT_EXP);
     MMI_LOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
 
     int32_t count = 0;

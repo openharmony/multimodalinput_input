@@ -49,7 +49,10 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
 #ifdef OHOS_BUILD_HDF
-    CHKF(MMIHdiInject->Init(udsServer), SENIOR_INPUT_DEV_INIT_FAIL);
+    if (!(MMIHdiInject->Init(udsServer))) {
+        MMI_LOGE("Input device initialization failed");
+        return false;
+    }
 #endif
     MsgCallback funs[] = {
         {MmiMessageId::ON_VIRTUAL_KEY, MsgCallbackBind2(&ServerMsgHandler::OnVirtualKeyEvent, this)},
