@@ -428,7 +428,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         ShowUsage();
         return EVENT_REG_FAIL;
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
     return ERR_OK;
 }
 
