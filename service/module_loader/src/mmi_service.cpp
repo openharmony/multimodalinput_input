@@ -293,7 +293,7 @@ void MMIService::OnTimer()
         int32_t fd = 12;
         NetPacket pkt(MmiMessageId::CLIENT_TEST001);
         pkt << fd;
-        Broadcast(pkt);
+        // Broadcast(pkt);
         lastTime = GetMillisTime();
     }
 }

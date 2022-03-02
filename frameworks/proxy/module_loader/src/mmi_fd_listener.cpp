@@ -46,39 +46,39 @@ void MMIFdListener::OnReadable(int32_t fd)
     CHK(fd >= 0, C_INVALID_INPUT_PARAM);
     CHKPV(mmiClient_);
 
-    // StreamBuffer buf;
-    // bool isoverflow = false;
-    // char szBuf[MAX_PACKET_BUF_SIZE] = {};
-    // const int32_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
-    // CHK(maxCount > 0, VAL_NOT_EXP);
-    // for (int32_t i = 0; i < maxCount; i++) {
-    //     auto size = recv(fd, szBuf, sizeof(szBuf), SOCKET_FLAGS);
-    //     if (size < 0) {
-    //         MMI_LOGE("recv return %{public}zu strerr:%{public}s", size, strerror(errno));
-    //         break;
-    //     } else if (size == 0) {
-    //         MMI_LOGE("The service side disconnect with the client. size:0 strerr:%{public}s", strerror(errno));
-    //         mmiClient_->OnDisconnect();
-    //         break;
-    //     } else if (size > 0) {
-    //         if (!buf.Write(szBuf, size)) {
-    //             isoverflow = true;
-    //             break;
-    //         }
-    //     }
-    //     if (size < MAX_PACKET_BUF_SIZE) {
-    //         break;
-    //     }
-    // }
-    // if (!isoverflow && buf.Size() > 0) {
-    //     mmiClient_->OnRecvMsg(buf.Data(), buf.Size());
-    // }
-
-    int32_t i = 10;
-    while (i-- >= 0) {
-        std::this_thread::sleep_for(std::chrono::seconds(10));
-        MMI_LOGW("OnReadable sleeping.... %{public}d pid:%{public}d tid:%{public}" PRIu64, i, pid, tid);
+    StreamBuffer buf;
+    bool isoverflow = false;
+    char szBuf[MAX_PACKET_BUF_SIZE] = {};
+    const int32_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
+    CHK(maxCount > 0, VAL_NOT_EXP);
+    for (int32_t i = 0; i < maxCount; i++) {
+        auto size = recv(fd, szBuf, sizeof(szBuf), SOCKET_FLAGS);
+        if (size < 0) {
+            MMI_LOGE("recv return %{public}zu strerr:%{public}s", size, strerror(errno));
+            break;
+        } else if (size == 0) {
+            MMI_LOGE("The service side disconnect with the client. size:0 strerr:%{public}s", strerror(errno));
+            mmiClient_->OnDisconnect();
+            break;
+        } else if (size > 0) {
+            if (!buf.Write(szBuf, size)) {
+                isoverflow = true;
+                break;
+            }
+        }
+        if (size < MAX_PACKET_BUF_SIZE) {
+            break;
+        }
     }
+    if (!isoverflow && buf.Size() > 0) {
+        mmiClient_->OnRecvMsg(buf.Data(), buf.Size());
+    }
+
+    // int32_t i = 10;
+    // while (i-- >= 0) {
+    //     std::this_thread::sleep_for(std::chrono::seconds(10));
+    //     MMI_LOGW("OnReadable sleeping.... %{public}d pid:%{public}d tid:%{public}" PRIu64, i, pid, tid);
+    // }
 }
 
 void MMIFdListener::OnShutdown(int32_t fd)
