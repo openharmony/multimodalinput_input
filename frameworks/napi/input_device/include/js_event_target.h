@@ -16,6 +16,8 @@
 #ifndef JS_EVENT_TARGET_H
 #define JS_EVENT_TARGET_H
 
+#include <map>
+
 #include "libmmi_util.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -28,37 +30,35 @@ namespace OHOS {
 namespace MMI {
 class JsEventTarget {
 public:
-    static void EmitJsIdsAsync(std::vector<int32_t> ids);
+    static void EmitJsIdsAsync(int32_t userData, std::vector<int32_t> ids);
     static void CallIdsAsyncWork(napi_env env, napi_status status, void* data);
 
-    static void EmitJsIdsPromise(std::vector<int32_t> ids);
+    static void EmitJsIdsPromise(int32_t userData, std::vector<int32_t> ids);
     static void CallIdsPromiseWork(napi_env env, napi_status status, void* data);
 
-    static void EmitJsDevAsync(std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device);
+    static void EmitJsDevAsync(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device);
     static void CallDevAsyncWork(napi_env env, napi_status status, void* data);
 
-    static void EmitJsDevPromise(std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device);
+    static void EmitJsDevPromise(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device);
     static void CallDevPromiseWork(napi_env env, napi_status status, void* data);
 
-    void SetContext(napi_env env, napi_value handle);
+    napi_value CreateCallbackInfo(napi_env env, napi_value handle);
     void ResetEnv();
+    static bool CheckEnv(napi_env env);
 
-    struct IdsCallbackInfo {
-        std::vector<int32_t> idsTemp;
+    struct CallbackInfo {
+        napi_ref ref = nullptr;
+        napi_async_work asyncWork = nullptr;
+        napi_deferred deferred = nullptr;
+        napi_value promise = nullptr;
+        std::vector<int32_t> ids = {0};
+        std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device = nullptr;
     };
-    struct DevCallbackInfo {
-        std::shared_ptr<InputDeviceImpl::InputDeviceInfo> deviceTemp = { nullptr };
-    };
-    static napi_ref ref_;
-    static napi_env env_;
-    static napi_async_work asyncWork_;
-    static napi_deferred deferred_;
-    static napi_value promise_;
-
     struct DeviceType {
         std::string deviceTypeName;
         uint32_t typeBit;
     };
+
     static constexpr uint32_t EVDEV_UDEV_TAG_KEYBOARD = (1 << 1);
     static constexpr uint32_t EVDEV_UDEV_TAG_MOUSE = (1 << 2);
     static constexpr uint32_t EVDEV_UDEV_TAG_TOUCHPAD = (1 << 3);
@@ -70,6 +70,9 @@ public:
     static constexpr uint32_t EVDEV_UDEV_TAG_POINTINGSTICK = (1 << 9);
     static constexpr uint32_t EVDEV_UDEV_TAG_TRACKBALL = (1 << 10);
     static constexpr uint32_t EVDEV_UDEV_TAG_SWITCH = (1 << 11);
+
+    static napi_env env_;
+    static int32_t userData_;
 };
 } // namespace MMI
 } // namespace OHOS
