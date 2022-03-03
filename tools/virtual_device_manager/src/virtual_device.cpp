@@ -564,4 +564,3 @@ const std::vector<uint32_t>& VirtualDevice::GetSws() const
 }
 } // namespace MMI
 } // namespace OHOS
-
