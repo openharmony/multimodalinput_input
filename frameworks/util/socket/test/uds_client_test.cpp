@@ -17,9 +17,12 @@
 #include <future>
 #include <gtest/gtest.h>
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+} // namespace
 
 class UDSClientTest : public testing::Test {
 public:
@@ -231,4 +234,5 @@ HWTEST_F(UDSClientTest, OnThread, TestSize.Level1)
     udsClientUt.OnThreadUnitTest();
 }
 #endif
-} // namespace
+} // namespace MMI
+} // namespace OHOS

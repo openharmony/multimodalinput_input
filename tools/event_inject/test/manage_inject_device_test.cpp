@@ -20,10 +20,13 @@
 #include "manage_inject_device.h"
 #undef private
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
 using namespace std;
+} // namespace
 class ManageInjectDeviceTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
@@ -105,4 +108,5 @@ HWTEST_F(ManageInjectDeviceTest, Test_SendEventToDeviveNodeError, TestSize.Level
     auto ret = manageInjectDevice.SendEventToDeviveNode(inputEventArray);
     EXPECT_EQ(ret, RET_ERR);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

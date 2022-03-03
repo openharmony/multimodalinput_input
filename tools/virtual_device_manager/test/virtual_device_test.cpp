@@ -15,9 +15,12 @@
 #include <gtest/gtest.h>
 #include "virtual_device.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+} // namespace
 
 class VirtualDeviceTest : public testing::Test {
 public:
@@ -360,4 +363,5 @@ HWTEST_F(VirtualDeviceTest, Test_SetUp_01, TestSize.Level1)
     auto ret = device.SetUp();
     EXPECT_TRUE(ret);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

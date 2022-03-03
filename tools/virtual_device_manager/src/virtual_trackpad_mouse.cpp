@@ -15,14 +15,16 @@
 
 #include "virtual_trackpad_mouse.h"
 
-OHOS::MMI::VirtualTrackpadMouse::VirtualTrackpadMouse() : VirtualDevice("Virtual TrackPadMouse",
+namespace OHOS {
+namespace MMI {
+VirtualTrackpadMouse::VirtualTrackpadMouse() : VirtualDevice("Virtual TrackPadMouse",
     BUS_USB, 0x62a, 0x8255)
 {
 }
 
-OHOS::MMI::VirtualTrackpadMouse::~VirtualTrackpadMouse() {}
+VirtualTrackpadMouse::~VirtualTrackpadMouse() {}
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpadMouse::GetEventTypes() const
+const std::vector<uint32_t>& VirtualTrackpadMouse::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {
         EV_KEY, EV_REL, EV_MSC
@@ -30,7 +32,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpadMouse::GetEventTypes() co
     return evt_types;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpadMouse::GetKeys() const
+const std::vector<uint32_t>& VirtualTrackpadMouse::GetKeys() const
 {
     static const std::vector<uint32_t> keys {
         BTN_LEFT, BTN_RIGHT, BTN_MIDDLE, BTN_SIDE, BTN_EXTRA
@@ -38,7 +40,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpadMouse::GetKeys() const
     return keys;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpadMouse::GetRelBits() const
+const std::vector<uint32_t>& VirtualTrackpadMouse::GetRelBits() const
 {
     static const std::vector<uint32_t> rels {
         REL_X, REL_Y, REL_HWHEEL, REL_WHEEL, REL_WHEEL_HI_RES, REL_HWHEEL_HI_RES
@@ -46,10 +48,12 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpadMouse::GetRelBits() const
     return rels;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpadMouse::GetMscs() const
+const std::vector<uint32_t>& VirtualTrackpadMouse::GetMscs() const
 {
     static const std::vector<uint32_t> mscs {
         MSC_SCAN
     };
     return mscs;
 }
+} // namespace MMI
+} // namespace OHOS
