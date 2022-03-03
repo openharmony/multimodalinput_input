@@ -49,10 +49,12 @@ void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
                                                   const int32_t fingerCount,
                                                   POINT_EVENT_TYPE& pointEventType)
 {
-    CHK(fingerCount > 0, PARAM_INPUT_INVALID);
-    CHK(touch.time > 0, PARAM_INPUT_INVALID);
-    CHK(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
-    CHK(touch.eventType >= 0, PARAM_INPUT_INVALID);
+    if (fingerCount <= 0 || touch.time <= 0 || touch.seatSlot < 0 || touch.eventType < 0) {
+        MMI_LOGE("The in parameter is error, fingerCount:%{public}d, touch.time:%{public}" PRId64 ","
+                 "touch.seatSlot:%{public}d, touch.eventType:%{public}d",
+                 fingerCount, touch.time, touch.seatSlot, touch.eventType);
+                 return;
+    }
     if (fingerCount == 1) {
         switch (touch.eventType) {
             case LIBINPUT_EVENT_TOUCH_DOWN: {

@@ -138,10 +138,18 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Key
 {
     CHKPV(keyEvent);
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
-    CHK(pkt.Write(id_), STREAM_BUF_WRITE_FAIL);
-    CHK((InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) == RET_OK),
-        STREAM_BUF_WRITE_FAIL);
-    CHK(session_->SendMsg(pkt), MSG_SEND_FAIL);
+    if (!pkt.Write(id_)) {
+        MMI_LOGE("Write to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        return;
+    }
+    if (InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) != RET_OK) {
+        MMI_LOGE("Packet key event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        return;
+    }
+    if (!session_->SendMsg(pkt)) {
+        MMI_LOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return;
+    }
 }
 
 void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
@@ -149,11 +157,18 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Poi
     CHKPV(pointerEvent);
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
     MMI_LOGD("Service SendToClient id:%{public}d,InputHandlerType:%{public}d", id_, handlerType_);
-    CHK(pkt.Write(id_), STREAM_BUF_WRITE_FAIL);
-    CHK(pkt.Write(handlerType_), STREAM_BUF_WRITE_FAIL);
-    CHK((OHOS::MMI::InputEventDataTransformation::Marshalling(pointerEvent, pkt) == RET_OK),
-        STREAM_BUF_WRITE_FAIL);
-    CHK(session_->SendMsg(pkt), MSG_SEND_FAIL);
+    if (!pkt.Write(id_) || !pkt.Write(handlerType_)) {
+        MMI_LOGE("Write id_ to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        return;
+    }
+    if (OHOS::MMI::InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
+        MMI_LOGE("Marshalling pointer event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        return;
+    }
+    if (!session_->SendMsg(pkt)) {
+        MMI_LOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return;
+    }
 }
 
 int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionHandler& monitor)

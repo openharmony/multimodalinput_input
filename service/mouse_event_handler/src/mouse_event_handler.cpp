@@ -203,7 +203,11 @@ void MouseEventHandler::DumpInner()
         pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
 
     PointerEvent::PointerItem item;
-    CHK(pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item), PARAM_INPUT_FAIL);
+    if (!pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item)) {
+        MMI_LOGE("Can't find the pointer item data, pointer:%{public}d, errCode:%{public}d",
+                 pointerEvent_->GetPointerId(), PARAM_INPUT_FAIL);
+                 return;
+    }
     MMI_LOGD("Item: DownTime:%{public}" PRId64 ",IsPressed:%{public}s,GlobalX:%{public}d,GlobalY:%{public}d,"
         "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,DeviceId:%{public}d",
         item.GetDownTime(), (item.IsPressed() ? "true" : "false"), item.GetGlobalX(), item.GetGlobalY(),

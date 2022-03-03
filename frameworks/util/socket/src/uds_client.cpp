@@ -138,16 +138,28 @@ void UDSClient::OnRecv(const char *buf, size_t size)
     int32_t readIdx = 0;
     int32_t packSize = 0;
     const size_t headSize = sizeof(PackHead);
-    CHK(size >= headSize, VAL_NOT_EXP);
+    if (size < headSize) {
+        MMI_LOGE("The in parameter size is error, errCode:%{public}d", VAL_NOT_EXP);
+        return;
+    }
     while (size > 0 && recvFun_) {
-        CHK(size >= headSize, VAL_NOT_EXP);
+        if (size < headSize) {
+            MMI_LOGE("The size is less than headSize, errCode:%{public}d", VAL_NOT_EXP);
+            return;
+        }
         auto head = reinterpret_cast<PackHead *>(const_cast<char *>(&buf[readIdx]));
-        CHK(head->size[0] >= 0 && head->size[0] < static_cast<int32_t>(size), VAL_NOT_EXP);
+        if (head->size[0] < 0 || head->size[0] >= static_cast<int32_t>(size)) {
+            MMI_LOGE("Head size[0] is error, head->size[0]:%{public}d, errCode:%{public}d", head->size[0], VAL_NOT_EXP);
+            return;
+        }
         packSize = headSize + head->size[0];
 
         NetPacket pkt(head->idMsg);
         if (head->size[0] > 0) {
-            CHK(pkt.Write(&buf[readIdx + headSize], head->size[0]), STREAM_BUF_WRITE_FAIL);
+            if (!pkt.Write(&buf[readIdx + headSize], head->size[0])) {
+                MMI_LOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+                return;
+            }
         }
         recvFun_(*this, pkt);
         size -= packSize;
@@ -171,7 +183,9 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
 
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
     const size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
-    CHK(maxCount > 0, VAL_NOT_EXP);
+    if (maxCount <= 0) {
+        MMI_LOGE("The maxCount is error, maxCount:%{public}d, errCode:%{public}d", maxCount, VAL_NOT_EXP);
+    }
     auto isoverflow = false;
     for (size_t j = 0; j < maxCount; j++) {
         auto size = read(fd, static_cast<void *>(szBuf), MAX_PACKET_BUF_SIZE);

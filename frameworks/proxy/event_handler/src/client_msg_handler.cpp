@@ -414,7 +414,10 @@ void ClientMsgHandler::OnEventProcessed(int32_t eventId)
     CHKPV(client);
     NetPacket pkt(MmiMessageId::NEW_CHECK_REPLY_MESSAGE);
     pkt << eventId;
-    CHK(client->SendMessage(pkt), MSG_SEND_FAIL);
+    if (!client->SendMessage(pkt)) {
+        MMI_LOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return;
+    }
 }
 } // namespace MMI
 } // namespace OHOS
