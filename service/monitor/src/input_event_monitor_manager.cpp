@@ -99,7 +99,7 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventTouchpadMontior(int32_
         return RET_ERR;
     }
     iter = monitorsTouch_.insert(iter, monitorItemTouchpad);
-    MMI_LOGD("AddInputEventTouchpadMontior, Success, eventType:%{public}d,fd:%{public}d register in server",
+    MMI_LOGD("Success, eventType:%{public}d,fd:%{public}d register in server",
         eventType, session->GetFd());
     return RET_OK;
 }
@@ -128,7 +128,7 @@ void OHOS::MMI::InputEventMonitorManager::OnTouchpadMonitorInputEvent(
     MMI_LOGD("Enter");
     CHKPV(pointerEvent);
     if (monitorsTouch_.empty()) {
-        MMI_LOGE("InputEventMonitorManager::%{public}s no monitor to send msg", __func__);
+        MMI_LOGE("%{public}s no monitor to send msg", __func__);
     }
     NetPacket pkt(MmiMessageId::ON_TOUCHPAD_MONITOR);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
@@ -147,7 +147,10 @@ bool OHOS::MMI::InputEventMonitorManager::ReportTouchpadEvent(std::shared_ptr<OH
 {
     CHKPF(pointerEvent);
     PointerEvent::PointerItem pointer;
-    CHKF(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL);
+    if (!(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer))) {
+        MMI_LOGE("Get pointer parameter failed");
+        return false;
+    }
     MMI_LOGD("Monitor-serviceeventTouchpad:time:%{public}" PRId64 ","
              "sourceType:%{public}d,action:%{public}d,"
              "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",

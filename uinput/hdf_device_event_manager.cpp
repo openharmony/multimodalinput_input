@@ -69,10 +69,10 @@ void HdfDeviceEventManager::ConnectHDFInit()
 
 int32_t main()
 {
-    static std::int32_t usleepTime = 1500000;
     HiLog::Info(OHOS::MMIS::LABEL, "%{public}s running", __func__);
     OHOS::MMIS::HdfDeviceEventManager iHdfDeviceEventManager;
     iHdfDeviceEventManager.ConnectHDFInit();
+    static std::int32_t usleepTime = 1500000;
     while (true) {
         usleep(usleepTime);
     }

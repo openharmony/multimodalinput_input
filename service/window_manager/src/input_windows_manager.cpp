@@ -56,9 +56,15 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent>
     CHKPR(inputEvent, ERROR_NULL_POINTER);
     MMI_LOGD("enter");
     int32_t pid = GetPidAndUpdateTarget(inputEvent);
-    CHKR(pid > 0, PID_OBTAIN_FAIL, RET_ERR);
+    if (pid <= 0) {
+        MMI_LOGE("Invalid pid");
+        return RET_ERR;
+    }
     int32_t fd = udsServer_->GetClientFd(pid);
-    CHKR(fd >= 0, FD_OBTAIN_FAIL, RET_ERR);
+    if (fd < 0) {
+        MMI_LOGE("Invalid fd");
+        return RET_ERR;
+    }
     MMI_LOGD("leave");
     return fd;
 }
@@ -517,15 +523,15 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
         MMI_LOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return RET_ERR;
     }
-    MMI_LOGD("UpdateTouchScreenTarget, display:%{public}d", displayId);
+    MMI_LOGD("display:%{public}d", displayId);
     LogicalDisplayInfo *logicalDisplayInfo = GetLogicalDisplayId(displayId);
     CHKPR(logicalDisplayInfo, ERROR_NULL_POINTER);
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
-    MMI_LOGD("UpdateTouchScreenTarget, globalX:%{public}d,globalY:%{public}d", globalX, globalY);
+    MMI_LOGD("globalX:%{public}d,globalY:%{public}d", globalX, globalY);
     AdjustGlobalCoordinate(globalX, globalY, logicalDisplayInfo->width, logicalDisplayInfo->height);
     auto targetWindowId = pointerEvent->GetTargetWindowId();
-    MMI_LOGD("UpdateTouchScreenTarget, targetWindow:%{public}d", targetWindowId);
+    MMI_LOGD("targetWindow:%{public}d", targetWindowId);
     WindowInfo *touchWindow = nullptr;
     for (auto item : logicalDisplayInfo->windowsInfo_) {
         if (targetWindowId < 0) {

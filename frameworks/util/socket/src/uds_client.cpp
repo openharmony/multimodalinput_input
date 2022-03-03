@@ -37,16 +37,25 @@ UDSClient::~UDSClient()
 
 int32_t UDSClient::ConnectTo()
 {
-    CHKR(Socket() >= 0, SOCKET_CREATE_FAIL, RET_ERR);
+    if (Socket() < 0) {
+        MMI_LOGE("Socket failed");
+        return RET_ERR;
+    }
     if (epollFd_ < 0) {
-        CHKR(EpollCreat(MAX_EVENT_SIZE) >= 0, EPOLL_CREATE_FAIL, RET_ERR);
+        if (EpollCreat(MAX_EVENT_SIZE) < 0) {
+            MMI_LOGE("EpollCreat failed");
+            return RET_ERR;
+        }
     }
     // SetBlockMode(fd_); // 设置非阻塞模式
 
     struct epoll_event ev;
     ev.events = EPOLLIN;
     ev.data.fd = fd_;
-    CHKR(EpollCtl(fd_, EPOLL_CTL_ADD, ev) >= 0, EPOLL_CREATE_FAIL, RET_ERR);
+    if (EpollCtl(fd_, EPOLL_CTL_ADD, ev) < 0) {
+        MMI_LOGE("EpollCtl failed");
+        return RET_ERR;
+    }
     OnConnected();
     return RET_OK;
 }
@@ -54,8 +63,14 @@ int32_t UDSClient::ConnectTo()
 bool UDSClient::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
-    CHKF(size > 0 && size <= MAX_PACKET_BUF_SIZE, PARAM_INPUT_INVALID);
-    CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
+    if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
+        MMI_LOGE("Stream buffer size out of range");
+        return false;
+    }
+    if (fd_ < 0) {
+        MMI_LOGE("fd_ is less than 0");
+        return false;
+    }
     // ssize_t ret = write(fd_, static_cast<const void *>(buf), size);
     ssize_t ret = send(fd_, buf, size, SOCKET_FLAGS);
     if (ret < 0) {
@@ -68,23 +83,13 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
 
 bool UDSClient::SendMsg(const NetPacket& pkt) const
 {
-    CHKF(!pkt.ChkError(), PACKET_WRITE_FAIL);
+    if (pkt.ChkRWError()) {
+        MMI_LOGE("Read and write status is error");
+        return false;
+    }
     StreamBuffer buf;
     pkt.MakeData(buf);
     return SendMsg(buf.Data(), buf.Size());
-}
-
-bool UDSClient::ThreadIsEnd()
-{
-    if (!isThreadHadRun_) {
-        MMI_LOGI("thread is not run. this: %p, isThreadHadRun_: %p, isThreadHadRun_: %d",
-                 this, &isThreadHadRun_, isThreadHadRun_);
-        return false;
-    }
-
-    const bool ret = threadFutureHadEnd_.get();
-    MMI_LOGI("thread is end, ret = %d.", ret);
-    return true;
 }
 
 bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
@@ -101,7 +106,7 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
             return false;
         }
     }
-    // t_ = std::thread(std::bind(&UDSClient::OnThread, this, std::ref(threadPromiseHadEnd_)));
+    // t_ = std::thread(std::bind(&UDSClient::OnThread, this));
     // if (detachMode) {
     //     MMI_LOGW("uds client thread detach");
     //     t_.detach();
@@ -134,16 +139,28 @@ void UDSClient::OnRecv(const char *buf, size_t size)
     int32_t readIdx = 0;
     int32_t packSize = 0;
     const size_t headSize = sizeof(PackHead);
-    CHK(size >= headSize, VAL_NOT_EXP);
+    if (size < headSize) {
+        MMI_LOGE("The in parameter size is error, errCode:%{public}d", VAL_NOT_EXP);
+        return;
+    }
     while (size > 0 && recvFun_) {
-        CHK(size >= headSize, VAL_NOT_EXP);
+        if (size < headSize) {
+            MMI_LOGE("The size is less than headSize, errCode:%{public}d", VAL_NOT_EXP);
+            return;
+        }
         auto head = reinterpret_cast<PackHead *>(const_cast<char *>(&buf[readIdx]));
-        CHK(head->size[0] >= 0 && head->size[0] < static_cast<int32_t>(size), VAL_NOT_EXP);
+        if (head->size[0] < 0 || head->size[0] >= static_cast<int32_t>(size)) {
+            MMI_LOGE("Head size[0] is error, head->size[0]:%{public}d, errCode:%{public}d", head->size[0], VAL_NOT_EXP);
+            return;
+        }
         packSize = headSize + head->size[0];
 
         NetPacket pkt(head->idMsg);
         if (head->size[0] > 0) {
-            CHK(pkt.Write(&buf[readIdx + headSize], head->size[0]), STREAM_BUF_WRITE_FAIL);
+            if (!pkt.Write(&buf[readIdx + headSize], head->size[0])) {
+                MMI_LOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+                return;
+            }
         }
         recvFun_(*this, pkt);
         size -= packSize;
@@ -167,7 +184,9 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
 
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
     const size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
-    CHK(maxCount > 0, VAL_NOT_EXP);
+    if (maxCount <= 0) {
+        MMI_LOGE("The maxCount is error, maxCount:%{public}d, errCode:%{public}d", maxCount, VAL_NOT_EXP);
+    }
     auto isoverflow = false;
     for (size_t j = 0; j < maxCount; j++) {
         auto size = recv(fd, szBuf, sizeof(szBuf), SOCKET_FLAGS);
@@ -192,7 +211,7 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
     }
 }
 
-void UDSClient::OnThread(std::promise<bool>& threadPromise)
+void UDSClient::OnThread()
 {
     MMI_LOGD("begin");
     SetThreadName("uds_client");
@@ -226,7 +245,6 @@ void UDSClient::OnThread(std::promise<bool>& threadPromise)
             break;
         }
     }
-    threadPromise.set_value(true);
     MMI_LOGD("end");
 }
 

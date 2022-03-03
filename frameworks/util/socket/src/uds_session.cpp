@@ -49,7 +49,10 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         MMI_LOGD("buf size:%{public}zu", size);
         return PARAM_INPUT_INVALID;
     }
-    CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
+    if (fd_ < 0) {
+        MMI_LOGE("fd_ is less than 0");
+        return false;
+    }
     // ssize_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
     ssize_t ret = send(fd_, buf, size, SOCKET_FLAGS);
     if (ret < 0) {
@@ -87,7 +90,10 @@ void UDSSession::UpdateDescript()
 
 bool UDSSession::SendMsg(NetPacket& pkt) const
 {
-    CHKF(!pkt.ChkError(), PACKET_WRITE_FAIL);
+    if (pkt.ChkRWError()) {
+        MMI_LOGE("Read and write status is error");
+        return false;
+    }
     StreamBuffer buf;
     pkt.MakeData(buf);
     return SendMsg(buf.Data(), buf.Size());

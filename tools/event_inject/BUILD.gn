@@ -220,9 +220,3 @@ ohos_executable("mmi-event-injection") {
   install_enable = true
   part_name = "multimodalinput_base"
 }
-
-group("ut-event-injection") {
-  testonly = true
-  deps = []
-  deps += [ ":ut-event-injection-out" ]
-}

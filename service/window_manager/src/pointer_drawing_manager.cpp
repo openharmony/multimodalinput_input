@@ -104,7 +104,8 @@ void PointerDrawingManager::FixCursorPosition(int32_t &globalX, int32_t &globalY
 
 void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t globalX, int32_t globalY)
 {
-    sptr<OHOS::Rosen::WindowOption> option = new OHOS::Rosen::WindowOption();
+    sptr<OHOS::Rosen::WindowOption> option = new (std::nothrow) OHOS::Rosen::WindowOption();
+    CHKPV(option);
     option->SetWindowType(OHOS::Rosen::WindowType::WINDOW_TYPE_POINTER);
     option->SetWindowMode(OHOS::Rosen::WindowMode::WINDOW_MODE_FLOATING);
     option->SetDisplayId(displayId);
@@ -170,7 +171,10 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
     constexpr uint32_t stride = 4;
     int32_t addrSize = width * height * stride;
     auto ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
-    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
+    if (ret != EOK) {
+        MMI_LOGE("Memcpy data is error, errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+        return;
+    }
     MMI_LOGD("leave");
 }
 

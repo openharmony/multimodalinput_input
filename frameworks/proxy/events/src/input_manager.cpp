@@ -28,7 +28,7 @@ InputManager *InputManager::instance_ = nullptr;
 InputManager *InputManager::GetInstance()
 {
     if (instance_ == nullptr) {
-        instance_ = new InputManager();
+        instance_ = new (std::nothrow) InputManager();
     }
     return instance_;
 }

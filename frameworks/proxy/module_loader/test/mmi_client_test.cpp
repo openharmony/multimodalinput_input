@@ -16,9 +16,12 @@
 #include "mmi_client.h"
 #include <gtest/gtest.h>
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+} // namespace
 
 class MMIClientTest : public testing::Test {
 public:
@@ -138,4 +141,5 @@ HWTEST_F(MMIClientTest, Re_OnDisconnected_002, TestSize.Level1)
     mmiClientTest.RegisterDisconnectedFunction(funTmp);
     mmiClientTest.OnDisconnectedUnitTest();
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

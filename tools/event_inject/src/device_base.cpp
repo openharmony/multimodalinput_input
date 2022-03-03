@@ -95,9 +95,9 @@ void DeviceBase::SetTrackingId(InputEventArray& inputEventArray, int32_t blockTi
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
-    static int32_t trackingId = 0;
     injectEvent.event.type = EV_ABS;
     injectEvent.event.code = ABS_MT_TRACKING_ID;
+    static int32_t trackingId = 0;
     injectEvent.event.value = ((value == 0) ? trackingId++ : value);
     SetTimeToLibinputEvent(injectEvent);
     inputEventArray.events.push_back(injectEvent);

@@ -187,7 +187,10 @@ void JsInputMonitor::printfPointerEvent(const std::shared_ptr<PointerEvent> poin
 {
     CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
-    CHK(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item), PARAM_INPUT_FAIL);
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+        MMI_LOGE("Can't find the pointerItem Info, pointer:%{public}d", pointerEvent->GetPointerId());
+        return;
+    }
     MMI_LOGD("type:%{public}d,timestamp:%{public}" PRId64 ",deviceId:%{public}d,"
         "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
         "size:%{public}d,force:%{public}d", pointerEvent->GetSourceType(), item.GetDownTime(),
@@ -214,8 +217,10 @@ std::string JsInputMonitor::GetAction(int32_t action)
 int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    CHKR(SetNameProperty(jsEnv_, result, "type", GetAction(pointerEvent->GetPointerAction())) == napi_ok,
-        CALL_NAPI_API_ERR, RET_ERR);
+    if (SetNameProperty(jsEnv_, result, "type", GetAction(pointerEvent->GetPointerAction())) != napi_ok) {
+        MMI_LOGE("Set type property failed");
+        return RET_ERR;
+    }
 
     napi_value pointers = nullptr;
     auto status = napi_create_array(jsEnv_, &pointers);
@@ -227,7 +232,10 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
     std::vector<PointerEvent::PointerItem> pointerItems;
     for (auto &item : pointerEvent->GetPointersIdList()) {
         PointerEvent::PointerItem pointerItem;
-        CHKR(pointerEvent->GetPointerItem(item, pointerItem), PARAM_INPUT_FAIL, RET_ERR);
+        if (!pointerEvent->GetPointerItem(item, pointerItem)) {
+            MMI_LOGE("Get pointer item failed");
+            return RET_ERR;
+        }
         pointerItems.push_back(pointerItem);
     }
     uint32_t index = 0;
@@ -247,37 +255,65 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
                 MMI_LOGE("napi_create_object is failed");
                 return RET_ERR;
             }
-            CHKR(SetNameProperty(jsEnv_, currentPointer, "globalX", it.GetGlobalX()) == napi_ok,
-                CALL_NAPI_API_ERR, RET_ERR);
-            CHKR(SetNameProperty(jsEnv_, currentPointer, "globalY", it.GetGlobalY()) == napi_ok,
-                CALL_NAPI_API_ERR, RET_ERR);
-            CHKR(SetNameProperty(jsEnv_, currentPointer, "localX", 0) == napi_ok,
-                CALL_NAPI_API_ERR, RET_ERR);
-            CHKR(SetNameProperty(jsEnv_, currentPointer, "localY", 0) == napi_ok,
-                CALL_NAPI_API_ERR, RET_ERR);
+            if (SetNameProperty(jsEnv_, currentPointer, "globalX", it.GetGlobalX()) != napi_ok) {
+                MMI_LOGE("Set globalX property failed");
+                return RET_ERR;
+            }
+            if (SetNameProperty(jsEnv_, currentPointer, "globalY", it.GetGlobalY()) != napi_ok) {
+                MMI_LOGE("Set globalY property failed");
+                return RET_ERR;
+            }
+            if (SetNameProperty(jsEnv_, currentPointer, "localX", 0) != napi_ok) {
+                MMI_LOGE("Set localX property failed");
+                return RET_ERR;
+            }
+            if (SetNameProperty(jsEnv_, currentPointer, "localY", 0) != napi_ok) {
+                MMI_LOGE("Set localY property failed");
+                return RET_ERR;
+            }
             touchArea = (it.GetWidth() + it.GetHeight()) / 2;
-            CHKR(SetNameProperty(jsEnv_, currentPointer, "size", touchArea) == napi_ok,
-                CALL_NAPI_API_ERR, RET_ERR);
-            CHKR(SetNameProperty(jsEnv_, currentPointer, "force", it.GetPressure()) == napi_ok,
-                CALL_NAPI_API_ERR, RET_ERR);
-            CHKR(SetNameProperty(jsEnv_, result, "timestamp", pointerEvent->GetActionTime()) == napi_ok,
-                CALL_NAPI_API_ERR, RET_ERR);
-            CHKR(SetNameProperty(jsEnv_, result, "deviceId", it.GetDeviceId()) == napi_ok,
-                CALL_NAPI_API_ERR, RET_ERR);
+            if (SetNameProperty(jsEnv_, currentPointer, "size", touchArea) != napi_ok) {
+                MMI_LOGE("Set size property failed");
+                return RET_ERR;
+            }
+            if (SetNameProperty(jsEnv_, currentPointer, "force", it.GetPressure()) != napi_ok) {
+                MMI_LOGE("Set force property failed");
+                return RET_ERR;
+            }
+            if (SetNameProperty(jsEnv_, result, "timestamp", pointerEvent->GetActionTime()) != napi_ok) {
+                MMI_LOGE("Set timestamp property failed");
+                return RET_ERR;
+            }
+            if (SetNameProperty(jsEnv_, result, "deviceId", it.GetDeviceId()) != napi_ok) {
+                MMI_LOGE("Set deviceId property failed");
+                return RET_ERR;
+            }
         }
-        CHKR(SetNameProperty(jsEnv_, element, "globalX", it.GetGlobalX()) == napi_ok,
-            CALL_NAPI_API_ERR, RET_ERR);
-        CHKR(SetNameProperty(jsEnv_, element, "globalY", it.GetGlobalY()) == napi_ok,
-            CALL_NAPI_API_ERR, RET_ERR);
-        CHKR(SetNameProperty(jsEnv_, element, "localX", 0) == napi_ok,
-            CALL_NAPI_API_ERR, RET_ERR);
-        CHKR(SetNameProperty(jsEnv_, element, "localY", 0) == napi_ok,
-            CALL_NAPI_API_ERR, RET_ERR);
+        if (SetNameProperty(jsEnv_, element, "globalX", it.GetGlobalX()) != napi_ok) {
+                MMI_LOGE("Set globalX property failed");
+                return RET_ERR;
+        }
+        if (SetNameProperty(jsEnv_, element, "globalY", it.GetGlobalY()) != napi_ok) {
+                MMI_LOGE("Set globalY property failed");
+                return RET_ERR;
+        }
+        if (SetNameProperty(jsEnv_, element, "localX", 0) != napi_ok) {
+                MMI_LOGE("Set localX property failed");
+                return RET_ERR;
+        }
+        if (SetNameProperty(jsEnv_, element, "localY", 0) != napi_ok) {
+                MMI_LOGE("Set localY property failed");
+                return RET_ERR;
+        }
         touchArea = (it.GetWidth() + it.GetHeight()) / 2;
-        CHKR(SetNameProperty(jsEnv_, element, "size", touchArea) == napi_ok,
-            CALL_NAPI_API_ERR, RET_ERR);
-        CHKR(SetNameProperty(jsEnv_, element, "force", it.GetPressure()) == napi_ok,
-            CALL_NAPI_API_ERR, RET_ERR);
+        if (SetNameProperty(jsEnv_, element, "size", touchArea) != napi_ok) {
+                MMI_LOGE("Set size property failed");
+                return RET_ERR;
+        }
+        if (SetNameProperty(jsEnv_, element, "force", it.GetPressure()) != napi_ok) {
+                MMI_LOGE("Set force property failed");
+                return RET_ERR;
+        }
         status = napi_set_element(jsEnv_, pointers, index, element);
         if (status != napi_ok) {
             MMI_LOGE("napi_set_element is failed");
@@ -285,10 +321,14 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
         }
         index++;
     }
-    CHKR(SetNameProperty(jsEnv_, result, "touches", pointers) == napi_ok,
-        CALL_NAPI_API_ERR, RET_ERR);
-    CHKR(SetNameProperty(jsEnv_, result, "changedTouches", currentPointer) == napi_ok,
-        CALL_NAPI_API_ERR, RET_ERR);
+    if (SetNameProperty(jsEnv_, result, "touches", pointers) != napi_ok) {
+            MMI_LOGE("Set touches property failed");
+            return RET_ERR;
+    }
+    if (SetNameProperty(jsEnv_, result, "changedTouches", currentPointer) != napi_ok) {
+            MMI_LOGE("Set changedTouches property failed");
+            return RET_ERR;
+    }
     return RET_OK;
 }
 
@@ -355,7 +395,8 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
     }
     if (num < 1) {
         int32_t *id = &id_;
-        uv_work_t *work = new uv_work_t;
+        uv_work_t *work = new (std::nothrow) uv_work_t;
+        CHKPV(work);
         work->data = id;
         uv_queue_work(loop_, work, [](uv_work_t *work){}, &JsInputMonitor::JsCallback);
         std::lock_guard<std::mutex> guard(mutex_);
