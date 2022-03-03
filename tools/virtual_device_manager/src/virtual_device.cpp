@@ -257,10 +257,7 @@ void VirtualDevice::CloseAllDevice(const std::vector<std::string>& fileList)
 {
     for (auto it : fileList) {
         kill(atoi(it.c_str()), SIGKILL);
-        auto iter = it.insert(0, g_folderpath.c_str());
-        if (!iter.second) {
-            MMI_LOGE("Insert file failed, folderpath:%{public}s", g_folderpath.c_str());
-        }
+        it.insert(0, g_folderpath.c_str());
         const int32_t ret = remove(it.c_str());
         if (ret == -1) {
             const int32_t errnoSaved = errno;
@@ -448,10 +445,7 @@ bool VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
         for (auto it : alldevice) {
             if (it.find(closePid) == 0) {
                 kill(atoi(it.c_str()), SIGKILL);
-                auto iter = it.insert(0, g_folderpath.c_str());
-                if (!iter.second) {
-                    MMI_LOGE("Insert file failed, folderpath:%{public}s", g_folderpath.c_str());
-                }
+                it.insert(0, g_folderpath.c_str());
                 const int32_t ret = remove(it.c_str());
                 if (ret == -1) {
                     const int32_t errnoSaved = errno;
