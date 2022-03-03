@@ -61,7 +61,10 @@ bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
         MMI_LOGE("Client startup failed");
         return false;
     }
-    CHKF(StartEventRunner(), START_CLI_FAIL);
+    if (!StartEventRunner()) {
+        MMI_LOGE("Start runner failed");
+        return false;
+    }
     return true;
 }
 
@@ -100,7 +103,10 @@ bool MMIClient::StartEventRunner()
 bool MMIClient::AddFdListener(int32_t fd)
 {
     MMI_LOGD("enter");
-    CHKF(fd >= 0, C_INVALID_INPUT_PARAM);
+    if (fd < 0) {
+        MMI_LOGE("Invalid fd:%{public}d", fd);
+        return false;
+    }
     CHKPF(eventHandler_);
     auto fdListener = std::make_shared<MMIFdListener>(GetPtr());
     CHKPF(fdListener);
@@ -121,8 +127,11 @@ bool MMIClient::AddFdListener(int32_t fd)
 bool MMIClient::DelFdListener(int32_t fd)
 {
     MMI_LOGD("enter");
-    CHKF(fd >= 0, C_INVALID_INPUT_PARAM);
     CHKPF(eventHandler_);
+    if (fd < 0) {
+        MMI_LOGE("Invalid fd:%{public}d", fd);
+        return false;
+    }
     eventHandler_->RemoveFileDescriptorListener(fd);
     isRunning_ = false;
     return true;
@@ -131,7 +140,10 @@ bool MMIClient::DelFdListener(int32_t fd)
 void MMIClient::OnRecvMsg(const char *buf, size_t size)
 {
     CHKPV(buf);
-    CHK(size > 0, C_INVALID_INPUT_PARAM);
+    if (size == 0) {
+        MMI_LOGE("Invalid input param size");
+        return;
+    }
     OnRecv(buf, size);
 }
 
@@ -180,13 +192,14 @@ void MMIClient::SdkGetMultimodeInputInfo()
 void MMIClient::OnDisconnected()
 {
     MMI_LOGD("Disconnected from server, fd:%{public}d", GetFd());
-    CHK(eventHandler_, C_INVALID_INPUT_PARAM);
     if (funDisconnected_) {
         funDisconnected_(*this);
     }
     isConnected_ = false;
-    CK(DelFdListener(fd_), C_DEL_FD_LISTENER_FAIL);
-    if (!isToExit_) {
+    if (!DelFdListener(fd_)) {
+        MMI_LOGE("delete fd listener failed.");
+    }
+    if (!isToExit_ && eventHandler_) {
         if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT)) {
             MMI_LOGE("send reconnect event return false.");
         }
@@ -203,7 +216,9 @@ void MMIClient::OnConnected()
         funConnected_(*this);
     }
     if (!isRunning_ && fd_ >= 0 && eventHandler_ != nullptr) {
-        CHK(AddFdListener(fd_), C_ADD_FD_LISTENER_FAIL);
+        if (!AddFdListener(fd_)) {
+            MMI_LOGE("Add fd listener failed");
+        }
     }
 }
 

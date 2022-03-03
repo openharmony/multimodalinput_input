@@ -43,14 +43,20 @@ void MMIFdListener::OnReadable(int32_t fd)
     uint64_t tid = GetThisThreadIdOfLL();
     int32_t pid = GetPid();
     MMI_LOGD("enter. pid:%{public}d tid:%{public}" PRIu64, pid, tid);
-    CHK(fd >= 0, C_INVALID_INPUT_PARAM);
+    if (fd < 0) {
+        MMI_LOGE("Invalid fd:%{public}d", fd);
+        return;
+    }
     CHKPV(mmiClient_);
 
     StreamBuffer buf;
     bool isoverflow = false;
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
     const int32_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
-    CHK(maxCount > 0, VAL_NOT_EXP);
+    if (maxCount <= 0) {
+        MMI_LOGE("Invalid max count");
+        return;
+    }
     for (int32_t i = 0; i < maxCount; i++) {
         auto size = recv(fd, szBuf, sizeof(szBuf), SOCKET_FLAGS);
         if (size < 0) {
@@ -86,7 +92,9 @@ void MMIFdListener::OnShutdown(int32_t fd)
     uint64_t tid = GetThisThreadIdOfLL();
     int32_t pid = GetPid();
     MMI_LOGD("enter. pid:%{public}d tid:%{public}" PRIu64, pid, tid);
-    CHK(fd >= 0, C_INVALID_INPUT_PARAM);
+    if (fd < 0) {
+        MMI_LOGE("Invalid fd:%{public}d", fd);
+    }
     CHKPV(mmiClient_);
     mmiClient_->OnDisconnect();
 }
@@ -96,7 +104,9 @@ void MMIFdListener::OnException(int32_t fd)
     uint64_t tid = GetThisThreadIdOfLL();
     int32_t pid = GetPid();
     MMI_LOGD("enter. pid:%{public}d tid:%{public}" PRIu64, pid, tid);
-    CHK(fd >= 0, C_INVALID_INPUT_PARAM);
+    if (fd < 0) {
+        MMI_LOGE("Invalid fd:%{public}d", fd);
+    }
     CHKPV(mmiClient_);
     mmiClient_->OnDisconnect();
 }
