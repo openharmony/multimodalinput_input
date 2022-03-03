@@ -37,11 +37,13 @@ private:
     void HandleAxisInner(libinput_event_pointer* data);
     void HandlePostInner(libinput_event_pointer* data, int32_t deviceId, PointerEvent::PointerItem& pointerItem);
     void DumpInner();
+    void InitAbsolution();
+
 private:
     std::shared_ptr<PointerEvent> pointerEvent_ = nullptr;
     int32_t timerId_ = -1;
-    double absolutionX_ = 0;
-    double absolutionY_ = 0;
+    double absolutionX_ = -1;
+    double absolutionY_ = -1;
     int32_t buttionId_ = -1;
 };
 } // namespace MMI
