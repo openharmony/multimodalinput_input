@@ -96,10 +96,10 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
 {
     MMI_LOGD("enter detachMode = %d", detachMode);
     recvFun_ = fun;
-    isConnected_ = true;
+    // isConnected_ = true;
     if (ConnectTo() < 0) {
         MMI_LOGW("Client connection failed, Try again later");
-        isConnected_ = false;
+        // isConnected_ = false;
 
         if (IsFirstConnectFailExit()) {
             MMI_LOGE("first connection faild");
@@ -234,7 +234,7 @@ void UDSClient::OnThread()
                 std::this_thread::sleep_for(std::chrono::milliseconds(CLIENT_RECONNECT_COOLING_TIME));
                 continue;
             }
-            isConnected_ = true;
+            // isConnected_ = true;
         }
 
         OnThreadLoop();
