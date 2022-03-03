@@ -123,7 +123,10 @@ void InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInf
         size_t numWindow = logicalDisplays[i].windowsInfo_.size();
         for (size_t j = 0; j < numWindow; j++) {
             WindowInfo myWindow = logicalDisplays[i].windowsInfo_[j];
-            windowInfos_.insert(std::pair<int32_t, WindowInfo>(myWindow.id, myWindow));
+            auto iter = windowInfos_.insert(std::pair<int32_t, WindowInfo>(myWindow.id, myWindow));
+            if (!iter.second) {
+                MMI_LOGE("Insert value failed, Window:%{public}d", myWindow.id);
+            }
         }
     }
     if (!logicalDisplays.empty()) {

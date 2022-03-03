@@ -312,7 +312,9 @@ int32_t ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
     for (int32_t i = 0; i < preKeySize; ++i) {
         int32_t tmpKey = -1;
         pkt >> tmpKey;
-        preKeys.insert(tmpKey);
+        if (!(preKeys.insert(tmpKey).second)) {
+            MMI_LOGE("Insert value failed, tmpKey:%{public}d", tmpKey);
+        }
     }
     CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     auto keyOption = std::make_shared<KeyOption>();
