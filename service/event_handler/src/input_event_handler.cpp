@@ -204,7 +204,7 @@ void InputEventHandler::OnCheckEventReport()
     if (initSysClock_ == 0 || lastSysClock_ != 0) {
         return;
     }
-    constexpr uint64_t MAX_DID_TIME = 1000 * 1000 * 3;
+    constexpr int64_t MAX_DID_TIME = 1000 * 1000 * 3;
     auto curSysClock = GetSysClockTime();
     auto lostTime = curSysClock - initSysClock_;
     if (lostTime < MAX_DID_TIME) {
