@@ -15,14 +15,16 @@
 
 #include "virtual_keyboard_sys_ctrl.h"
 
-OHOS::MMI::VirtualKeyboardSysCtrl::VirtualKeyboardSysCtrl() : VirtualDevice("Virtual KeyboardSysCtrl",
+namespace OHOS {
+namespace MMI {
+VirtualKeyboardSysCtrl::VirtualKeyboardSysCtrl() : VirtualDevice("Virtual KeyboardSysCtrl",
     BUS_USB, 0x24ae, 0x4035)
 {
 }
 
-OHOS::MMI::VirtualKeyboardSysCtrl::~VirtualKeyboardSysCtrl() {}
+VirtualKeyboardSysCtrl::~VirtualKeyboardSysCtrl() {}
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardSysCtrl::GetEventTypes() const
+const std::vector<uint32_t>& VirtualKeyboardSysCtrl::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {
         EV_KEY, EV_MSC
@@ -30,7 +32,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardSysCtrl::GetEventTypes() 
     return evt_types;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardSysCtrl::GetKeys() const
+const std::vector<uint32_t>& VirtualKeyboardSysCtrl::GetKeys() const
 {
     static const std::vector<uint32_t> keys {
         KEY_POWER, KEY_SLEEP, KEY_WAKEUP
@@ -38,10 +40,12 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardSysCtrl::GetKeys() const
     return keys;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardSysCtrl::GetMscs() const
+const std::vector<uint32_t>& VirtualKeyboardSysCtrl::GetMscs() const
 {
     static const std::vector<uint32_t> mscs {
         MSC_SCAN
     };
     return mscs;
 }
+} // namespace MMI
+} // namespace OHOS

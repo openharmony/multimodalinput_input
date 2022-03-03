@@ -15,12 +15,14 @@
 
 #include "virtual_keyboard_ext.h"
 
-OHOS::MMI::VirtualKeyboardExt::VirtualKeyboardExt() : VirtualDevice("Virtual keyboardExt",
+namespace OHOS {
+namespace MMI {
+VirtualKeyboardExt::VirtualKeyboardExt() : VirtualDevice("Virtual keyboardExt",
     BUS_USB, 0x24ae, 0x4035)
 {
 }
 
-OHOS::MMI::VirtualKeyboardExt::~VirtualKeyboardExt() {}
+VirtualKeyboardExt::~VirtualKeyboardExt() {}
 
 static std::vector<uint32_t> g_virtualKey = {
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 30, 31,
@@ -29,7 +31,7 @@ static std::vector<uint32_t> g_virtualKey = {
     102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 116, 117, 119, 127, 183, 184, 185, 186, 187, 188, 189, 190, 191
 };
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardExt::GetEventTypes() const
+const std::vector<uint32_t>& VirtualKeyboardExt::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {
         EV_KEY, EV_MSC, EV_REP
@@ -37,7 +39,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardExt::GetEventTypes() cons
     return evt_types;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardExt::GetKeys() const
+const std::vector<uint32_t>& VirtualKeyboardExt::GetKeys() const
 {
     static const std::vector<uint32_t> keys(g_virtualKey.begin(),
                                             g_virtualKey.end());
@@ -45,7 +47,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardExt::GetKeys() const
     return keys;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardExt::GetMscs() const
+const std::vector<uint32_t>& VirtualKeyboardExt::GetMscs() const
 {
     static const std::vector<uint32_t> mscs {
         MSC_SCAN
@@ -53,10 +55,12 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardExt::GetMscs() const
     return mscs;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardExt::GetReps() const
+const std::vector<uint32_t>& VirtualKeyboardExt::GetReps() const
 {
     static const std::vector<uint32_t> reps {
         REP_DELAY, REP_PERIOD
     };
     return reps;
 }
+} // namespace MMI
+} // namespace OHOS
