@@ -19,15 +19,19 @@
 #include "msg_head.h"
 #include "proto.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
-    using namespace testing::ext;
-    using namespace OHOS::MMI;
-    using namespace std;
-    class ProcessingJoyStickDeviceTest : public testing::Test {
-    public:
-        static void SetUpTestCase(void) {}
-        static void TearDownTestCase(void) {}
-    };
+using namespace testing::ext;
+using namespace OHOS::MMI;
+using namespace std;
+} // namespace
+
+class ProcessingJoyStickDeviceTest : public testing::Test {
+public:
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
+};
 
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJsonDataToInputData, TestSize.Level1)
 {
@@ -320,4 +324,5 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(ret, RET_OK);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

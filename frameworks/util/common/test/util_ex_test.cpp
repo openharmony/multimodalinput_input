@@ -17,11 +17,13 @@
 #include <gtest/gtest.h>
 #include "proto.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::MMI;
-
+} // namespace
 class UtilExTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
@@ -41,4 +43,5 @@ HWTEST_F(UtilExTest, EnumAdd_002, TestSize.Level1)
     auto messageId2 = EnumAdd(messageId1, -1);
     EXPECT_EQ(messageId2, MmiMessageId::INVALID);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

@@ -18,9 +18,13 @@
 #include "msg_head.h"
 #include "proto.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+} // namespace
+
 class DeviceBaseTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
@@ -795,4 +799,5 @@ HWTEST_F(DeviceBaseTest, Test_SetThrottle, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].event.value, value);
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS
