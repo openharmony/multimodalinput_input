@@ -48,7 +48,7 @@ bool VirtualDevice::DoIoctl(int32_t fd, int32_t request, const uint32_t value)
 }
 
 VirtualDevice::VirtualDevice(const std::string &device_name, uint16_t busType,
-                                        uint16_t vendorId, uint16_t product_id)
+    uint16_t vendorId, uint16_t product_id)
     : deviceName_(device_name),
       busTtype_(busType),
       vendorId_(vendorId),
