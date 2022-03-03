@@ -83,7 +83,7 @@ int32_t StandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
 }
 
 int32_t StandardizedEventManager::InjectionVirtual(bool isPressed, int32_t keyCode,
-    int32_t keyDownDuration, int32_t maxKeyCode)
+    int64_t keyDownDuration, int32_t maxKeyCode)
 {
     MMI_LOGD("Enter");
     VirtualKey virtualEvent;

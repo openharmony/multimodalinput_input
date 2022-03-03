@@ -26,7 +26,7 @@ class ProcessingMouseDevice : public DeviceBase {
         int32_t yPos;
         int32_t keyValue;
         int32_t distance;
-        int32_t blockTime;
+        int64_t blockTime;
         std::string eventType;
         std::string direction;
     };

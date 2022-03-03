@@ -54,7 +54,7 @@ int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const Json& inputData, std
         std::string eventType = item.at("eventType").get<std::string>();
         padEvent.eventType = eventType;
         if ((item.find("blockTime")) != item.end()) {
-            padEvent.blockTime = item.at("blockTime").get<int32_t>();
+            padEvent.blockTime = item.at("blockTime").get<int64_t>();
         }
         if ((eventType == "KEY_EVENT_CLICK") || (eventType == "KEY_EVENT_PRESS") ||
             (eventType == "KEY_EVENT_RELEASE")) {

@@ -25,7 +25,7 @@ class ProcessingTouchScreenDevice : public DeviceBase {
         int32_t trackingId;
         int32_t xPos;
         int32_t yPos;
-        int32_t blockTime;
+        int64_t blockTime;
         std::string eventType;
         std::string reportType;
     };

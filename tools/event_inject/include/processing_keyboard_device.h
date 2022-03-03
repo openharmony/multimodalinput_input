@@ -24,7 +24,7 @@ class ProcessingKeyboardDevice : public DeviceBase {
     struct KeyBoardEvent {
         std::string eventType;
         int32_t keyValue;
-        int32_t blockTime;
+        int64_t blockTime;
     };
 public:
     ProcessingKeyboardDevice() = default;
@@ -41,7 +41,7 @@ private:
 private:
     static constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE = 15;
     static constexpr int32_t EVENT_REPROT_COUNTS = 50;
-    static constexpr int32_t EVENT_REPROT_TIMES = 20;
+    static constexpr int64_t EVENT_REPROT_TIMES = 20;
 };
 } // namespace MMI
 } // namespace OHOS
