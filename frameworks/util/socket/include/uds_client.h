@@ -34,12 +34,10 @@ public:
 
     virtual int32_t Socket() = 0;
     virtual void Stop();
-    virtual bool ThreadIsEnd();
 
     int32_t ConnectTo();
     bool SendMsg(const char *buf, size_t size) const;
     bool SendMsg(const NetPacket& pkt) const;
-    void Stop();
     bool GetRunStatus() const
     {
         return isRunning_;
