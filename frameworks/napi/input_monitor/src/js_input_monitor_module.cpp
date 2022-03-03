@@ -32,28 +32,28 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     MMI_LOGD("Enter");
     size_t argc = 2;
-    size_t requireArgc = 2;
+    const size_t requireArgc = 2;
     napi_value argv[requireArgc];
     napi_status status = napi_generic_failure;
 
     status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (status != napi_ok) {
-        MMI_LOGE("Register js monitor failed, get cb info failed");
+        napi_throw_error(env, nullptr, "Register js monitor failed, get cb info failed");
         return nullptr;
     }
     if (argc < requireArgc) {
-        MMI_LOGE("Register js monitor failed, the number of parameter is error");
+        napi_throw_error(env, nullptr, "Register js monitor failed, the number of parameter is error");
         return nullptr;
     }
 
     napi_valuetype valueType = napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
-        MMI_LOGE("Register js monitor failed, typeof failed");
+        napi_throw_error(env, nullptr, "Register js monitor failed, typeof failed");
         return nullptr;
     }
     if (valueType != napi_string) {
-        MMI_LOGE("Register js monitor failed, value type is not napi_string");
+        napi_throw_error(env, nullptr, "Register js monitor failed, value type is not napi_string");
         return nullptr;
     }
 
@@ -61,7 +61,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     size_t len = 0;
     status = napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len);
     if (status != napi_ok) {
-        MMI_LOGE("Register js monitor failed, napi_get_value_string_utf8 failed");
+        napi_throw_error(env, nullptr, "Register js monitor failed, napi_get_value_string_utf8 failed");
         return nullptr;
     }
     if (std::strcmp(typeName, "touch") != 0) {
@@ -71,18 +71,18 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 
     status = napi_typeof(env, argv[1], &valueType);
     if (status != napi_ok) {
-        MMI_LOGE("Register js monitor failed, typeof failed");
+        napi_throw_error(env, nullptr, "Register js monitor failed, typeof failed");
         return nullptr;
     }
     if (valueType != napi_function) {
-        MMI_LOGE("Register js monitor failed, is not napi_function");
+        napi_throw_error(env, nullptr, "Register js monitor failed, value type is not napi_function");
         return nullptr;
     }
-    if (!JSIMM.AddEnv(env, info)) {
-        MMI_LOGE("AddEnv failed, register js monitor failed");
+    if (!JsInputMonMgr.AddEnv(env, info)) {
+        napi_throw_error(env, nullptr, "AddEnv failed, register js monitor failed");
         return nullptr;
     }
-    JSIMM.AddMonitor(env, argv[1]);
+    JsInputMonMgr.AddMonitor(env, argv[1]);
     MMI_LOGD("Leave");
     return nullptr;
 }
@@ -98,26 +98,26 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
 
     status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (status != napi_ok) {
-        MMI_LOGE("Unregister js monitor failed, get cb info failed");
+        napi_throw_error(env, nullptr, "Unregister js monitor failed, get cb info failed");
         return nullptr;
     }
     size_t minArgc = 1;
     if (argc < minArgc) {
-        MMI_LOGE("Unregister js monitor failed, the number of parameter is error");
+        napi_throw_error(env, nullptr, "Unregister js monitor failed, the number of parameter is error");
         return nullptr;
     }
     if (argv[0] == nullptr) {
-        MMI_LOGE("Unregister js monitor failed, the first parameter is null");
+        napi_throw_error(env, nullptr, "Unregister js monitor failed, the first parameter is null");
         return nullptr;
     }
     napi_valuetype valueType = napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
-        MMI_LOGE("Unregister js monitor failed, typeof failed");
+        napi_throw_error(env, nullptr, "Unregister js monitor failed, typeof failed");
         return nullptr;
     }
     if (valueType != napi_string) {
-        MMI_LOGE("Unregister js monitor failed, value type is not napi_string");
+        napi_throw_error(env, nullptr, "Unregister js monitor failed, value type is not napi_string");
         return nullptr;
     }
 
@@ -125,31 +125,31 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     size_t len = 0;
     status = napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len);
     if (status != napi_ok) {
-        MMI_LOGE("Unregister js monitor failed, napi_get_value_string_utf8 failed");
+        napi_throw_error(env, nullptr, "Unregister js monitor failed, napi_get_value_string_utf8 failed");
         return nullptr;
     }
     if (std::strcmp(typeName, "touch") != 0) {
-        MMI_LOGE("Unregister js monitor failed, the first parameter is error");
+        napi_throw_error(env, nullptr, "Unregister js monitor failed, the first parameter is error");
         return nullptr;
     }
     if (argv[1] == nullptr) {
-        JSIMM.RemoveMonitor(env);
+        JsInputMonMgr.RemoveMonitor(env);
         MMI_LOGD("remove all monitor");
         return nullptr;
     }
 
     status = napi_typeof(env, argv[1], &valueType);
     if (status != napi_ok) {
-        MMI_LOGE("Unregister js monitor failed, typeof failed");
+        napi_throw_error(env, nullptr, "Unregister js monitor failed, typeof failed");
         return nullptr;
     }
     if (valueType != napi_function) {
-        JSIMM.RemoveMonitor(env);
+        JsInputMonMgr.RemoveMonitor(env);
         MMI_LOGD("remove all monitor");
         return nullptr;
     }
 
-    JSIMM.RemoveMonitor(env, argv[1]);
+    JsInputMonMgr.RemoveMonitor(env, argv[1]);
     MMI_LOGD("Leave");
     return nullptr;
 }
