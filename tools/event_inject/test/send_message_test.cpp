@@ -16,10 +16,14 @@
 #include "send_message.h"
 #include <gtest/gtest.h>
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
 using namespace std;
+} // namespace
+
 class SendMessageTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
@@ -33,4 +37,5 @@ HWTEST_F(SendMessageTest, Test_GetDevIndexName, TestSize.Level1)
     auto ret = sendMessage.GetDevIndexName(deviceName);
     EXPECT_EQ(ret, 32);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

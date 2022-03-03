@@ -16,13 +16,17 @@
 #include <gtest/gtest.h>
 #include "libmmi_util.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+} // namespace
 
 class HdiInjectTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
-} // namespace
+} // namespace MMI
+} // namespace OHOS

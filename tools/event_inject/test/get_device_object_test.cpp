@@ -19,9 +19,13 @@
 #include "msg_head.h"
 #include "proto.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+} // namespace
+
 class GetDeviceObjectTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
@@ -70,4 +74,5 @@ HWTEST_F(GetDeviceObjectTest, Test_GetDeviceObjectTestNotFindDevice, TestSize.Le
     }
     EXPECT_EQ(result, true);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

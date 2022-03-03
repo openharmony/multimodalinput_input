@@ -17,7 +17,7 @@
 #include "bytrace.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-#include "multimodal_standardized_event_manager.h"
+#include "standardized_event_manager.h"
 
 namespace OHOS {
 namespace MMI {

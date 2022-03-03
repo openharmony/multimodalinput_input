@@ -16,9 +16,12 @@
 #include "server_msg_handler.h"
 #include <gtest/gtest.h>
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+} // namespace
 
 class ServerMsgHandlerTest : public testing::Test {
 public:
@@ -288,4 +291,5 @@ HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_09, TestSize.Level1)
     NetPacket pkt(static_cast<MmiMessageId>(10000));
     serverMsgHandlerTest.GetMultimodeInputInfoTest(sess, pkt);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS
