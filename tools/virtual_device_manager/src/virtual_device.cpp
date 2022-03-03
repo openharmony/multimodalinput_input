@@ -448,7 +448,7 @@ bool OHOS::MMI::VirtualDevice::CloseDevice(const std::vector<std::string>& fileL
                 kill(atoi(it.c_str()), SIGKILL);
                 auto iter = it.insert(0, OHOS::MMI::g_folderpath.c_str());
                 if (!iter.second) {
-                   MMI_LOGE("Insert file failed, folderpath:%{public}s", OHOS::MMI::g_folderpath.c_str());
+                    MMI_LOGE("Insert file failed, folderpath:%{public}s", OHOS::MMI::g_folderpath.c_str());
                 }
                 const int32_t ret = remove(it.c_str());
                 if (ret == -1) {
