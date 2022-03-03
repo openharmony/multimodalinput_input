@@ -17,12 +17,16 @@
 #include <gtest/gtest.h>
 #include "proto.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+} // namespace
+
 namespace {
     constexpr int32_t UID_ROOT = 0;
-}
+} // namespace
 
 class UDSSessionTest : public testing::Test {
 public:
@@ -128,4 +132,5 @@ HWTEST_F(UDSSessionTest, SendMsg_type2_003, TestSize.Level1)
     bool retResult = sesObj.SendMsg(pkt);
     EXPECT_FALSE(retResult);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

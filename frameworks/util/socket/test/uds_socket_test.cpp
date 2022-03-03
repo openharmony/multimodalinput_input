@@ -16,9 +16,12 @@
 #include "uds_socket.h"
 #include <gtest/gtest.h>
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+} // namespace
 
 class UDSSocketTest : public testing::Test {
 public:
@@ -512,4 +515,5 @@ HWTEST_F(UDSSocketTest, EpollWait_004, TestSize.Level1)
     ASSERT_EQ(-1, retResult);
 }
 #endif
-} // namespace
+} // namespace MMI
+} // namespace OHOS
