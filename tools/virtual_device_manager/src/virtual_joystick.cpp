@@ -15,7 +15,9 @@
 
 #include "virtual_joystick.h"
 
-OHOS::MMI::VirtualJoystick::VirtualJoystick() : VirtualDevice("Virtual Joystick",
+namespace OHOS {
+namespace MMI {
+VirtualJoystick::VirtualJoystick() : VirtualDevice("Virtual Joystick",
     BUS_USB, 0x44f, 0xb10a)
 {
     constexpr int32_t ABS_MAX_XY = 16383;
@@ -56,9 +58,9 @@ OHOS::MMI::VirtualJoystick::VirtualJoystick() : VirtualDevice("Virtual Joystick"
     dev_.absflat[ABS_HAT0Y] = 0;
 }
 
-OHOS::MMI::VirtualJoystick::~VirtualJoystick() {}
+VirtualJoystick::~VirtualJoystick() {}
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualJoystick::GetEventTypes() const
+const std::vector<uint32_t>& VirtualJoystick::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {
         EV_KEY, EV_ABS
@@ -66,7 +68,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualJoystick::GetEventTypes() const
     return evt_types;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualJoystick::GetKeys() const
+const std::vector<uint32_t>& VirtualJoystick::GetKeys() const
 {
     static const std::vector<uint32_t> keys {
         BTN_TRIGGER, BTN_THUMB, BTN_THUMB2, BTN_TOP, BTN_TOP2, BTN_PINKIE, BTN_BASE,
@@ -75,10 +77,12 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualJoystick::GetKeys() const
     return keys;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualJoystick::GetAbs() const
+const std::vector<uint32_t>& VirtualJoystick::GetAbs() const
 {
     static const std::vector<uint32_t> abs {
         ABS_X, ABS_Y, ABS_RZ, ABS_THROTTLE, ABS_HAT0X, ABS_HAT0Y
     };
     return abs;
 }
+} // namespace MMI
+} // namespace OHOS
