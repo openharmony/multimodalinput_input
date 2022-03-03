@@ -15,14 +15,16 @@
 
 #include "virtual_trackpad_sys_ctrl.h"
 
-OHOS::MMI::VirtualTrackpadSysCtrl::VirtualTrackpadSysCtrl() : VirtualDevice("Virtual TrackpadSysCtrl",
+namespace OHOS {
+namespace MMI {
+VirtualTrackpadSysCtrl::VirtualTrackpadSysCtrl() : VirtualDevice("Virtual TrackpadSysCtrl",
     BUS_USB, 0x62a, 0x8255)
 {
 }
 
-OHOS::MMI::VirtualTrackpadSysCtrl::~VirtualTrackpadSysCtrl() {}
+VirtualTrackpadSysCtrl::~VirtualTrackpadSysCtrl() {}
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpadSysCtrl::GetEventTypes() const
+const std::vector<uint32_t>& VirtualTrackpadSysCtrl::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {
         EV_KEY, EV_MSC
@@ -30,7 +32,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpadSysCtrl::GetEventTypes() 
     return evt_types;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpadSysCtrl::GetKeys() const
+const std::vector<uint32_t>& VirtualTrackpadSysCtrl::GetKeys() const
 {
     static const std::vector<uint32_t> keys {
         KEY_POWER, KEY_SLEEP, KEY_WAKEUP
@@ -39,10 +41,12 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpadSysCtrl::GetKeys() const
     return keys;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpadSysCtrl::GetMscs() const
+const std::vector<uint32_t>& VirtualTrackpadSysCtrl::GetMscs() const
 {
     static const std::vector<uint32_t> mscs {
         MSC_SCAN
     };
     return mscs;
 }
+} // namespace MMI
+} // namespace OHOS

@@ -15,14 +15,16 @@
 
 #include "virtual_trackball.h"
 
-OHOS::MMI::VirtualTrackball::VirtualTrackball() : VirtualDevice("Virtual Trackball",
+namespace OHOS {
+namespace MMI {
+VirtualTrackball::VirtualTrackball() : VirtualDevice("Virtual Trackball",
     BUS_USB, 0x47d, 0x2041)
 {
 }
 
-OHOS::MMI::VirtualTrackball::~VirtualTrackball() {}
+VirtualTrackball::~VirtualTrackball() {}
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTrackball::GetEventTypes() const
+const std::vector<uint32_t>& VirtualTrackball::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {
         EV_KEY, EV_REL, EV_MSC
@@ -30,7 +32,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTrackball::GetEventTypes() const
     return evt_types;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTrackball::GetKeys() const
+const std::vector<uint32_t>& VirtualTrackball::GetKeys() const
 {
     static const std::vector<uint32_t> keys {
         BTN_LEFT, BTN_RIGHT, BTN_MIDDLE, BTN_SIDE
@@ -38,7 +40,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTrackball::GetKeys() const
     return keys;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTrackball::GetRelBits() const
+const std::vector<uint32_t>& VirtualTrackball::GetRelBits() const
 {
     static const std::vector<uint32_t> rels {
         REL_X, REL_Y, REL_WHEEL, REL_WHEEL_HI_RES
@@ -46,11 +48,12 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTrackball::GetRelBits() const
     return rels;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTrackball::GetMscs() const
+const std::vector<uint32_t>& VirtualTrackball::GetMscs() const
 {
     static const std::vector<uint32_t> mscs {
         MSC_SCAN
     };
     return mscs;
 }
-
+} // namespace MMI
+} // namespace OHOS
