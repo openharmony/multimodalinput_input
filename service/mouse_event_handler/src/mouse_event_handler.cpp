@@ -47,12 +47,26 @@ void MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttionId_);
 
+    InitAbsolution();
     absolutionX_ += libinput_event_pointer_get_dx(data);
     absolutionY_ += libinput_event_pointer_get_dy(data);
 
     WinMgr->UpdateAndAdjustMouseLoction(absolutionX_, absolutionY_);
 
     MMI_LOGD("Change Coordinate : x:%{public}lf,y:%{public}lf",  absolutionX_, absolutionY_);
+}
+
+void MouseEventHandler::InitAbsolution()
+{
+    if (absolutionX_ != -1 || absolutionY_ != -1) {
+        return;
+    }
+    MMI_LOGD("init absolution");
+    auto logicalDisplayInfo = WinMgr->GetLogicalDisplayInfo();
+    if (!logicalDisplayInfo.empty()) {
+        absolutionX_ = logicalDisplayInfo[0].width / 2;
+        absolutionY_ = logicalDisplayInfo[0].height / 2;
+    }
 }
 
 void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem)
