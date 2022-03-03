@@ -93,7 +93,10 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
         return false;
     }
     PointerEvent::PointerItem pointer;
-    CHKF(pointerEvent_->GetPointerItem(seatSlot, pointer), PARAM_INPUT_FAIL);
+    if (!(pointerEvent_->GetPointerItem(seatSlot, pointer))) {
+        MMI_LOGE("Get pointer parameter failed");
+        return false;
+    }
     pointer.SetPressure(pressure);
     pointer.SetGlobalX(logicalX);
     pointer.SetGlobalY(logicalY);
@@ -115,7 +118,10 @@ bool TouchTransformPointProcessor::OnEventTouchUp(struct libinput_event *event)
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
 
     PointerEvent::PointerItem pointer;
-    CHKF(pointerEvent_->GetPointerItem(seatSlot, pointer), PARAM_INPUT_FAIL);
+    if (!(pointerEvent_->GetPointerItem(seatSlot, pointer))) {
+        MMI_LOGE("Get pointer parameter failed");
+        return false;
+    }
     pointer.SetPressed(false);
     pointerEvent_->UpdatePointerItem(seatSlot, pointer);
     pointerEvent_->SetPointerId(seatSlot);

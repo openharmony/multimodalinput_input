@@ -31,7 +31,10 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
     InitSessionLostCallback();
-    CHKR(IsValidHandlerId(handlerId), PARAM_INPUT_INVALID, RET_ERR);
+    if (!IsValidHandlerId(handlerId)) {
+        MMI_LOGE("Invalid handler");
+        return RET_ERR;
+    }
     CHKPR(session, RET_ERR);
     if (handlerType == InputHandlerType::MONITOR) {
         MMI_LOGD("Register monitor:%{public}d", handlerId);
@@ -135,10 +138,18 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Key
 {
     CHKPV(keyEvent);
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
-    CHK(pkt.Write(id_), STREAM_BUF_WRITE_FAIL);
-    CHK((InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) == RET_OK),
-        STREAM_BUF_WRITE_FAIL);
-    CHK(session_->SendMsg(pkt), MSG_SEND_FAIL);
+    if (!pkt.Write(id_)) {
+        MMI_LOGE("Write to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        return;
+    }
+    if (InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) != RET_OK) {
+        MMI_LOGE("Packet key event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        return;
+    }
+    if (!session_->SendMsg(pkt)) {
+        MMI_LOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return;
+    }
 }
 
 void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
@@ -146,11 +157,18 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Poi
     CHKPV(pointerEvent);
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
     MMI_LOGD("Service SendToClient id:%{public}d,InputHandlerType:%{public}d", id_, handlerType_);
-    CHK(pkt.Write(id_), STREAM_BUF_WRITE_FAIL);
-    CHK(pkt.Write(handlerType_), STREAM_BUF_WRITE_FAIL);
-    CHK((OHOS::MMI::InputEventDataTransformation::Marshalling(pointerEvent, pkt) == RET_OK),
-        STREAM_BUF_WRITE_FAIL);
-    CHK(session_->SendMsg(pkt), MSG_SEND_FAIL);
+    if (!pkt.Write(id_) || !pkt.Write(handlerType_)) {
+        MMI_LOGE("Write id_ to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        return;
+    }
+    if (OHOS::MMI::InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
+        MMI_LOGE("Marshalling pointer event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        return;
+    }
+    if (!session_->SendMsg(pkt)) {
+        MMI_LOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return;
+    }
 }
 
 int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionHandler& monitor)
@@ -186,7 +204,7 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
         MMI_LOGW("Specified monitor does not exist, monitor:%{public}d", monitorId);
         return;
     }
-    if (monitorConsumed_) {
+    if (isMonitorConsumed_) {
         MMI_LOGW("Event consumed");
         return;
     }
@@ -198,9 +216,9 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
         MMI_LOGW("A new process has began %{public}d,%{public}d", downEventId_, eventId);
         return;
     }
-    monitorConsumed_ = true;
+    isMonitorConsumed_ = true;
     MMI_LOGD("Cancel operation");
-    std::shared_ptr<PointerEvent> pointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
+    auto pointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetActionTime(GetSysClockTime());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
@@ -229,7 +247,7 @@ bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<P
     CHKPF(pointerEvent);
     UpdateConsumptionState(pointerEvent);
     Monitor(pointerEvent);
-    return monitorConsumed_;
+    return isMonitorConsumed_;
 }
 
 bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId, SessionPtr session)
@@ -247,16 +265,15 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
         return;
     }
     lastPointerEvent_ = pointerEvent;
-    constexpr size_t nPtrsIndNewProc = 1;
 
-    if (pointerEvent->GetPointersIdList().size() != nPtrsIndNewProc) {
-        MMI_LOGD("First press and last lift intermediate process");
+    if (pointerEvent->GetPointersIdList().size() != 1) {
+        MMI_LOGD("First down and last up intermediate process");
         return;
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
         MMI_LOGD("Press for the first time");
         downEventId_ = pointerEvent->GetId();
-        monitorConsumed_ = false;
+        isMonitorConsumed_ = false;
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
         MMI_LOGD("The last time lift");
         downEventId_ = -1;

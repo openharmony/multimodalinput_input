@@ -64,16 +64,6 @@ bool VirtualDevice::SetUp()
         return false;
     }
 
-    errno_t ret = strncpy_s(dev_.name, MAX_NAME_LENGTH, deviceName_, sizeof(dev_.name));
-    if (ret != EOK) {
-        HiLog::Error(LABEL, "%{public}s, failed to copy deviceName", __func__);
-        return false;
-    }
-
-    dev_.id.bustype = busType_;
-    dev_.id.vendor = vendorId_;
-    dev_.id.product = productId_;
-    dev_.id.version = version_;
     for (const auto &item : GetEventTypes()) {
         if (!DoIoctl(fd_, UI_SET_EVBIT, item)) {
             HiLog::Error(LABEL, "%{public}s Error setting event type:%{public}u", __func__, item);
@@ -105,6 +95,15 @@ bool VirtualDevice::SetUp()
         }
     }
 
+    errno_t ret = strncpy_s(dev_.name, MAX_NAME_LENGTH, deviceName_, sizeof(dev_.name));
+    if (ret != EOK) {
+        HiLog::Error(LABEL, "%{public}s, failed to copy deviceName", __func__);
+        return false;
+    }
+    dev_.id.bustype = busType_;
+    dev_.id.vendor = vendorId_;
+    dev_.id.product = productId_;
+    dev_.id.version = version_;
     if (write(fd_, &dev_, sizeof(dev_)) < 0) {
         HiLog::Error(LABEL, "Unable to set input device info:%{public}s", __func__);
         return false;

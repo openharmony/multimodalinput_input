@@ -64,9 +64,14 @@ void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     NetPacket pkt(MmiMessageId::MARK_CONSUMED);
-    CHK(pkt.Write(monitorId), STREAM_BUF_WRITE_FAIL);
-    CHK(pkt.Write(eventId), STREAM_BUF_WRITE_FAIL);
-    CHK(client->SendMessage(pkt), MSG_SEND_FAIL);
+    if (!pkt.Write(monitorId) || !pkt.Write(eventId)) {
+        MMI_LOGE("Packet write is error, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        return;
+    }
+    if (!client->SendMessage(pkt)) {
+        MMI_LOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return;
+    }
 }
 
 int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType,
@@ -91,9 +96,14 @@ void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handle
     MMIClientPtr client { MMIEventHdl.GetMMIClient() };
     CHKPV(client);
     NetPacket pkt(MmiMessageId::ADD_INPUT_HANDLER);
-    CHK(pkt.Write(handlerId), STREAM_BUF_WRITE_FAIL);
-    CHK(pkt.Write(handlerType), STREAM_BUF_WRITE_FAIL);
-    CHK(client->SendMessage(pkt), MSG_SEND_FAIL);
+    if (!pkt.Write(handlerId) || !pkt.Write(handlerType)) {
+        MMI_LOGE("Packet write is error, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        return;
+    }
+    if (!client->SendMessage(pkt)) {
+        MMI_LOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return;
+    }
 }
 
 int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType handlerType)
@@ -119,9 +129,14 @@ void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType h
     MMIClientPtr client { MMIEventHdl.GetMMIClient() };
     CHKPV(client);
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_HANDLER);
-    CHK(pkt.Write(handlerId), STREAM_BUF_WRITE_FAIL);
-    CHK(pkt.Write(handlerType), STREAM_BUF_WRITE_FAIL);
-    CHK(client->SendMessage(pkt), MSG_SEND_FAIL);
+    if (!pkt.Write(handlerId) || !pkt.Write(handlerType)) {
+        MMI_LOGE("Packet write is error, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        return;
+    }
+    if (!client->SendMessage(pkt)) {
+        MMI_LOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return;
+    }
 }
 
 int32_t InputHandlerManager::GetNextId()

@@ -37,7 +37,10 @@ void InjectionEventDispatch::InitManageFunction()
     };
 
     for (auto &it : funs) {
-        CHKC(RegistInjectEvent(it), EVENT_REG_FAIL);
+        if (!RegistInjectEvent(it)) {
+            MMI_LOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
+            continue;
+        }
     }
 }
 
@@ -120,8 +123,8 @@ int32_t InjectionEventDispatch::ExecuteFunction(std::string funId)
         MMI_LOGE("event injection Unknown fuction id:%{public}s", funId.c_str());
         return false;
     }
-    int32_t ret = RET_ERR;
     MMI_LOGI("Inject tools into function:%{public}s", funId.c_str());
+    int32_t ret = RET_ERR;
     ret = (*fun)();
     if (ret == RET_OK) {
         MMI_LOGI("injecte function success id:%{public}s", funId.c_str());
@@ -167,6 +170,12 @@ int32_t InjectionEventDispatch::OnSendEvent()
         MMI_LOGE("device node:%s is not exit", deviceNode.c_str());
         return RET_ERR;
     }
+    int32_t fd = open(deviceNode.c_str(), O_RDWR);
+    if (fd < 0) {
+        MMI_LOGE("open device node:%s faild", deviceNode.c_str());
+        return RET_ERR;
+    }
+
     struct timeval tm;
     gettimeofday(&tm, 0);
     struct input_event event = {};
@@ -175,12 +184,6 @@ int32_t InjectionEventDispatch::OnSendEvent()
     event.type = static_cast<uint16_t>(std::stoi(injectArgvs_[SEND_EVENT_TYPE_INDEX]));
     event.code = static_cast<uint16_t>(std::stoi(injectArgvs_[SEND_EVENT_CODE_INDEX]));
     event.value = static_cast<int32_t>(std::stoi(injectArgvs_[SEND_EVENT_VALUE_INDEX]));
-
-    int32_t fd = open(deviceNode.c_str(), O_RDWR);
-    if (fd < 0) {
-        MMI_LOGE("open device node:%s faild", deviceNode.c_str());
-        return RET_ERR;
-    }
     write(fd, &event, sizeof(event));
     if (fd >= 0) {
         close(fd);

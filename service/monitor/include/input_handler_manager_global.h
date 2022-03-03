@@ -75,7 +75,7 @@ private:
         std::set<SessionHandler> monitors_;
         std::shared_ptr<PointerEvent> lastPointerEvent_ = nullptr;
         int32_t downEventId_ { -1 };
-        bool monitorConsumed_ { false };
+        bool isMonitorConsumed_ { false };
     };
 
     struct InterceptorCollection : public IInputEventHandler, protected NoCopyable {
