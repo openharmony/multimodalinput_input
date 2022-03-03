@@ -17,10 +17,13 @@
 #include "input_manager.h"
 #include "input_manager_command.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
 using namespace std;
+} // namespace
 class InjectEventTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
@@ -234,4 +237,5 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectTouch_003, TestSize.Level1)
     int32_t result = inputManagerCommand->ParseCommand(5, argv);
     EXPECT_EQ(OHOS::ERR_OK, result);
 }
-}
+} // namespace MMI
+} // namespace OHOS
