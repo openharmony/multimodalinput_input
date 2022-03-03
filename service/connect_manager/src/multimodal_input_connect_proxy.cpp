@@ -30,12 +30,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Multi
 MultimodalInputConnectProxy::MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl) :
     IRemoteProxy<IMultimodalInputConnect>(impl)
 {
-    MMI_LOGI("MultimodalInputConnectProxy()");
+    MMI_LOGI("enter MultimodalInputConnectProxy");
 }
 
 MultimodalInputConnectProxy::~MultimodalInputConnectProxy()
 {
-    MMI_LOGI("~MultimodalInputConnectProxy()");
+    MMI_LOGI("enter ~MultimodalInputConnectProxy");
 }
 
 int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programName,
@@ -64,7 +64,7 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
         return RET_ERR;
     }
 
-    MMI_LOGD("have recieve message from server");
+    MMI_LOGD("recieved message from server");
 
     int32_t result = reply.ReadInt32();
     MMI_LOGD("result:%{public}d", result);
@@ -102,7 +102,7 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
 
     int32_t result = reply.ReadInt32();
     if (result != RET_OK) {
-        MMI_LOGE("responce return error:%{public}d", result);
+        MMI_LOGE("reply readint32 error:%{public}d", result);
     }
     MMI_LOGD("leave");
     return result;
