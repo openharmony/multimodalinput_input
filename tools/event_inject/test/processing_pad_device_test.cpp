@@ -19,10 +19,13 @@
 #include "processing_keyboard_device.h"
 #include "proto.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
-    using namespace testing::ext;
-    using namespace OHOS::MMI;
-    using namespace std;
+using namespace testing::ext;
+using namespace OHOS::MMI;
+using namespace std;
+} // namespace
 class ProcessingPadDeviceTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
@@ -57,4 +60,5 @@ HWTEST_F(ProcessingPadDeviceTest, Test_TransformJsonDataToInputData, TestSize.Le
     std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(ret, RET_OK);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

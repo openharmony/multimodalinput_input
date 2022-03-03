@@ -19,15 +19,19 @@
 #include "msg_head.h"
 #include "proto.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
-    using namespace testing::ext;
-    using namespace OHOS::MMI;
-    using namespace std;
-    class ProcessingPenDeviceTest : public testing::Test {
-    public:
-        static void SetUpTestCase(void) {}
-        static void TearDownTestCase(void) {}
-    };
+using namespace testing::ext;
+using namespace OHOS::MMI;
+using namespace std;
+} // namespace
+
+class ProcessingPenDeviceTest : public testing::Test {
+public:
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
+};
 
     HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputData, TestSize.Level1)
     {
@@ -260,4 +264,5 @@ namespace {
         system(closeDeviceCmd.c_str());
         EXPECT_EQ(ret, RET_ERR);
     }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

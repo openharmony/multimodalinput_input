@@ -17,10 +17,13 @@
 #include <gtest/gtest.h>
 #include "error_multimodal.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::MMI;
+} // namespace
 
 class UtilTest : public testing::Test {
 public:
@@ -136,4 +139,5 @@ HWTEST_F(UtilTest, StringSplit, TestSize.Level1)
     std::vector<std::string> vecList;
     OHOS::MMI::StringSplit(str, sep, vecList);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS
