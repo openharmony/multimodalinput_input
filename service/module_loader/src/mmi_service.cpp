@@ -123,17 +123,17 @@ bool MMIService::InitLibinputService()
 #endif
     if (!(input_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
         DEF_INPUT_SEAT))) {
-        MMI_LOGE("libinput initialization failed");
+        MMI_LOGE("libinput init, bind failed");
         return false;
     }
     auto inputFd = input_.GetInputFd();
     auto ret = AddEpoll(EPOLL_EVENT_INPUT, inputFd);
     if (ret <  0) {
-        MMI_LOGE("AddEpoll error ret:%{public}d", ret);
+        MMI_LOGE("AddEpoll error ret: %{public}d", ret);
         EpollClose();
         return false;
     }
-    MMI_LOGD("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, inputFd);
+    MMI_LOGD("AddEpoll, epollfd: %{public}d, fd: %{public}d", mmiFd_, inputFd);
     return true;
 }
 
