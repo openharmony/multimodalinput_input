@@ -86,10 +86,10 @@ bool MMIClient::StartEventRunner()
             return false;
         }
     }
-    // if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_ONTIMER, 0, EVENT_TIME_ONTIMER)) {
-    //     MMI_LOGE("send ontimer event return false.");
-    //     return false;
-    // }
+    if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_ONTIMER, 0, EVENT_TIME_ONTIMER)) {
+        MMI_LOGE("send ontimer event return false.");
+        return false;
+    }
     // auto errCode = eventRunner->Run();
     // if (errCode != ERR_OK) {
     //     MMI_LOGE("event runnner run error,code:%{public}u str:%{public}s", errCode,

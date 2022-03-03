@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace MMI {
 #define EVENT_TIME_ONRECONNECT (3*1000)
-#define EVENT_TIME_ONTIMER (1*1000)
+#define EVENT_TIME_ONTIMER (6*1000)
 
 enum MmiEventHandlerId : uint32_t {
     MMI_EVENT_HANDLER_ID_INVALID = 0,
