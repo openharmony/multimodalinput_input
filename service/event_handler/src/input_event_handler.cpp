@@ -243,7 +243,6 @@ int32_t InputEventHandler::OnEventKey(struct libinput_event *event)
 {
     CHKPR(event, PARAM_INPUT_INVALID);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
-    int64_t sysStartProcessTime = GetSysClockTime();
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
@@ -257,7 +256,7 @@ int32_t InputEventHandler::OnEventKey(struct libinput_event *event)
         return KEY_EVENT_PKG_FAIL;
     }
 
-    auto ret = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_, sysStartProcessTime);
+    auto ret = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_);
     if (ret != RET_OK) {
         MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d",
                  ret, KEY_EVENT_DISP_FAIL);
@@ -300,7 +299,6 @@ int32_t InputEventHandler::OnKeyboardEvent(const multimodal_libinput_event& ev)
 {
     libinput_event *event = ev.event;
     CHKPR(event, ERROR_NULL_POINTER);
-    int64_t sysStartProcessTime = GetSysClockTime();
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     EventKeyboard keyBoard = {};
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyBoard);
@@ -328,10 +326,9 @@ int32_t InputEventHandler::OnKeyboardEvent(const multimodal_libinput_event& ev)
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
     keyEventString = "service report keyId=" + std::to_string(keyId);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_, sysStartProcessTime);
-    if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d",
-                 eventDispatchResult, KEY_EVENT_DISP_FAIL);
+    auto result = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_);
+    if (result != RET_OK) {
+        MMI_LOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d", result, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
     return RET_OK;
@@ -468,17 +465,11 @@ int32_t InputEventHandler::OnMouseEventHandler(struct libinput_event *event)
         keyEvent_ = KeyEvent::Create();
     }
     CHKPR(keyEvent_, ERROR_NULL_POINTER);
-    if (keyEvent_ != nullptr) {
-        std::vector<int32_t> pressedKeys = keyEvent_->GetPressedKeys();
-        if (pressedKeys.empty()) {
-            MMI_LOGI("Pressed keys is empty");
-        } else {
-            for (int32_t keyCode : pressedKeys) {
-                MMI_LOGI("Pressed keyCode:%{public}d", keyCode);
-            }
-        }
-        pointerEvent->SetPressedKeys(pressedKeys);
+    std::vector<int32_t> pressedKeys = keyEvent_->GetPressedKeys();
+    for (const int32_t& keyCode : pressedKeys) {
+        MMI_LOGI("Pressed keyCode:%{public}d", keyCode);
     }
+    pointerEvent->SetPressedKeys(pressedKeys);
     int32_t pointerId = keyEvent_->GetId();
     const std::string pointerEventstring = "OnEventPointer";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, pointerId);

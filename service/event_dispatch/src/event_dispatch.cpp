@@ -185,8 +185,7 @@ void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, I
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
 }
 
-int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
-    std::shared_ptr<KeyEvent> key, const int64_t preHandlerTime)
+int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
 {
     MMI_LOGD("begin");
     CHKPR(key, PARAM_INPUT_INVALID);
@@ -216,11 +215,11 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
     MMI_LOGD("4.event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
              "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
              "EventType:%{public}d,Flag:%{public}u,"
-             "KeyAction:%{public}d,Fd:%{public}d,PreHandlerTime:%{public}" PRId64 "",
+             "KeyAction:%{public}d,Fd:%{public}d",
              key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
              key->GetActionStartTime(),
              key->GetEventType(),
-             key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
+             key->GetFlag(), key->GetKeyAction(), fd);
 
     InputHandlerManagerGlobal::GetInstance().HandleEvent(key);
     auto session = udsServer.GetSession(fd);
@@ -240,7 +239,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
     NetPacket pkt(MmiMessageId::ON_KEYEVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
     OnKeyboardEventTrace(key, KEY_DISPATCH_EVENT);
-    pkt << fd << preHandlerTime;
+    pkt << fd;
     if (!udsServer.SendMsg(fd, pkt)) {
         MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
