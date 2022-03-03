@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "multimodal_standardized_event_manager.h"
+#include "standardized_event_manager.h"
 #include <cinttypes>
 #include "define_multimodal.h"
 #include "error_multimodal.h"
@@ -27,21 +27,21 @@ namespace OHOS {
 namespace MMI {
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
-            LOG_CORE, MMI_LOG_DOMAIN, "MultimodalStandardizedEventManager"
+            LOG_CORE, MMI_LOG_DOMAIN, "StandardizedEventManager"
         };
     }
 
-MultimodalStandardizedEventManager::MultimodalStandardizedEventManager() {}
+StandardizedEventManager::StandardizedEventManager() {}
 
-MultimodalStandardizedEventManager::~MultimodalStandardizedEventManager() {}
+StandardizedEventManager::~StandardizedEventManager() {}
 
-void MultimodalStandardizedEventManager::SetClientHandle(MMIClientPtr client)
+void StandardizedEventManager::SetClientHandle(MMIClientPtr client)
 {
     MMI_LOGD("enter");
     client_ = client;
 }
 
-int32_t MultimodalStandardizedEventManager::SubscribeKeyEvent(
+int32_t StandardizedEventManager::SubscribeKeyEvent(
     const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
 {
     MMI_LOGD("Enter");
@@ -66,7 +66,7 @@ int32_t MultimodalStandardizedEventManager::SubscribeKeyEvent(
     return RET_OK;
 }
 
-int32_t MultimodalStandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
+int32_t StandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
 {
     MMI_LOGD("Enter");
     OHOS::MMI::NetPacket pkt(MmiMessageId::UNSUBSCRIBE_KEY_EVENT);
@@ -82,8 +82,8 @@ int32_t MultimodalStandardizedEventManager::UnSubscribeKeyEvent(int32_t subscrib
     return RET_OK;
 }
 
-int32_t MultimodalStandardizedEventManager::InjectionVirtual(bool isPressed, int32_t keyCode,
-                                                             int32_t keyDownDuration, int32_t maxKeyCode)
+int32_t StandardizedEventManager::InjectionVirtual(bool isPressed, int32_t keyCode,
+    int32_t keyDownDuration, int32_t maxKeyCode)
 {
     MMI_LOGD("Enter");
     VirtualKey virtualEvent;
@@ -100,7 +100,7 @@ int32_t MultimodalStandardizedEventManager::InjectionVirtual(bool isPressed, int
     return RET_OK;
 }
 
-int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> key)
+int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> key)
 {
     MMI_LOGD("begin");
     CHKPR(key, RET_ERR);
@@ -123,7 +123,7 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<Ke
     return RET_OK;
 }
 
-int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("enter");
     CHKPR(pointerEvent, RET_ERR);
@@ -170,21 +170,21 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
     return RET_OK;
 }
 
-int32_t MultimodalStandardizedEventManager::GetDeviceIds(int32_t userData)
+int32_t StandardizedEventManager::GetDeviceIds(int32_t userData)
 {
     OHOS::MMI::NetPacket pkt(MmiMessageId::INPUT_DEVICE_IDS);
     pkt << userData;
     return SendMsg(pkt);
 }
 
-int32_t MultimodalStandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId)
+int32_t StandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId)
 {
     OHOS::MMI::NetPacket pkt(MmiMessageId::INPUT_DEVICE);
     pkt << userData << deviceId;
     return SendMsg(pkt);
 }
 
-bool MultimodalStandardizedEventManager::SendMsg(NetPacket& pkt) const
+bool StandardizedEventManager::SendMsg(NetPacket& pkt) const
 {
     CHKPF(client_);
     return client_->SendMessage(pkt);

@@ -73,7 +73,7 @@ ohos_shared_library("libmmi-client") {
     "event_handler/src/interceptor_manager.cpp",
     "event_handler/src/key_event_input_subscribe_manager.cpp",
     "event_handler/src/multimodal_event_handler.cpp",
-    "event_handler/src/multimodal_standardized_event_manager.cpp",
+    "event_handler/src/standardized_event_manager.cpp",
     "events/src/axis_event.cpp",
     "events/src/input_manager.cpp",
     "events/src/key_option.cpp",
