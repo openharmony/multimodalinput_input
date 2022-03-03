@@ -83,10 +83,10 @@ bool MMIClient::StartEventRunner()
             return false;
         }
     }
-    if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_ONTIMER, 0, EVENT_TIME_ONTIMER)) {
-        MMI_LOGE("send ontimer event return false.");
-        return false;
-    }
+    // if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_ONTIMER, 0, EVENT_TIME_ONTIMER)) {
+    //     MMI_LOGE("send ontimer event return false.");
+    //     return false;
+    // }
     // auto errCode = eventRunner->Run();
     // if (errCode != ERR_OK) {
     //     MMI_LOGE("event runnner run error,code:%{public}u str:%{public}s", errCode,
@@ -180,20 +180,28 @@ void MMIClient::SdkGetMultimodeInputInfo()
 void MMIClient::OnDisconnected()
 {
     MMI_LOGD("Disconnected from server, fd:%{public}d", GetFd());
+    CHK(eventHandler_, C_INVALID_INPUT_PARAM);
     if (funDisconnected_) {
         funDisconnected_(*this);
     }
     isConnected_ = false;
     CK(DelFdListener(fd_), C_DEL_FD_LISTENER_FAIL);
+    if (!isToExit_) {
+        if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT)) {
+            MMI_LOGE("send reconnect event return false.");
+        }
+    } else {
+        MMI_LOGW("toExit is true.Reconnection closed");
+    }
 }
 
 void MMIClient::OnConnected()
 {
     MMI_LOGD("Connection to server succeeded, fd:%{public}d", GetFd());
+    isConnected_ = true;
     if (funConnected_) {
         funConnected_(*this);
     }
-    isConnected_ = true;
     if (!isRunning_ && fd_ >= 0 && eventHandler_ != nullptr) {
         CHK(AddFdListener(fd_), C_ADD_FD_LISTENER_FAIL);
     }

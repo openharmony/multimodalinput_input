@@ -60,7 +60,6 @@ void MMIEventHandler::OnReconnect(const InnerEvent::Pointer &event)
     if (mmiClient_->Reconnect() != RET_OK) {
         SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT);
     }
-    // SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT);
 }
 
 void MMIEventHandler::OnTimer(const InnerEvent::Pointer &event)
