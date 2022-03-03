@@ -211,7 +211,7 @@ OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::FindPhysicalDisp
     return nullptr;
 }
 
-void OHOS::MMI::InputWindowsManager::TurnTouchScreen(PhysicalDisplayInfo* info, Direction direction,
+void OHOS::MMI::InputWindowsManager::RotateTouchScreen(PhysicalDisplayInfo* info, Direction direction,
     int32_t& logicalX, int32_t& logicalY)
 {
     CHKPV(info);
@@ -241,7 +241,7 @@ void OHOS::MMI::InputWindowsManager::TurnTouchScreen(PhysicalDisplayInfo* info, 
     }
 }
 
-bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(struct libinput_event_touch* touch, Direction& direction,
+bool OHOS::MMI::InputWindowsManager::TransformDisplayPoint(struct libinput_event_touch* touch, Direction& direction,
     int32_t &globalLogicalX, int32_t &globalLogicalY)
 {
     CHKPF(touch);
@@ -272,7 +272,7 @@ bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(struct libinput_eve
     int32_t localLogcialY = static_cast<int32_t>(logicY);
 
     direction = info->direction;
-    TurnTouchScreen(info, direction, localLogcialX, localLogcialY);
+    RotateTouchScreen(info, direction, localLogcialX, localLogcialY);
 
     globalLogicalX = localLogcialX;
     globalLogicalY = localLogcialY;
@@ -306,7 +306,7 @@ bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(struct libin
     CHKPF(touch);
     int32_t globalLogicalX;
     int32_t globalLogicalY;
-    auto isTransform = TransformOfDisplayPoint(touch, direction, globalLogicalX, globalLogicalY);
+    auto isTransform = TransformDisplayPoint(touch, direction, globalLogicalX, globalLogicalY);
     if (!isTransform) {
         return isTransform;
     }
@@ -330,7 +330,7 @@ bool OHOS::MMI::InputWindowsManager::TouchDownPointToDisplayPoint(struct libinpu
     CHKPF(touch);
     int32_t globalLogicalX;
     int32_t globalLogicalY;
-    auto isTransform = TransformOfDisplayPoint(touch, direction, globalLogicalX, globalLogicalY);
+    auto isTransform = TransformDisplayPoint(touch, direction, globalLogicalX, globalLogicalY);
     if (!isTransform) {
         return isTransform;
     }
