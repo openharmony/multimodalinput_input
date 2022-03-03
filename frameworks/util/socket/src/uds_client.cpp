@@ -47,7 +47,7 @@ int32_t UDSClient::ConnectTo()
             return RET_ERR;
         }
     }
-    // SetBlockMode(fd_); // 设置非阻塞模式
+    SetBlockMode(fd_); // 设置非阻塞模式
 
     struct epoll_event ev;
     ev.events = EPOLLIN;
