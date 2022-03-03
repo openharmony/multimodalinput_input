@@ -146,8 +146,8 @@ void OHOS::MMI::InputEventMonitorManager::OnTouchpadMonitorInputEvent(
 bool OHOS::MMI::InputEventMonitorManager::ReportTouchpadEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
-    PointerEvent::PointerItem pointer;
-    if (!(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer))) {
+    PointerEvent::PointerItem item;
+    if (!(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item))) {
         MMI_LOGE("Get pointer parameter failed");
         return false;
     }
@@ -155,7 +155,7 @@ bool OHOS::MMI::InputEventMonitorManager::ReportTouchpadEvent(std::shared_ptr<OH
              "sourceType:%{public}d,action:%{public}d,"
              "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
-             pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
+             pointerEvent->GetPointerId(), item.GetGlobalX(), item.GetGlobalY(), item.IsPressed());
     OnTouchpadMonitorInputEvent(pointerEvent);
     return true;
 }
