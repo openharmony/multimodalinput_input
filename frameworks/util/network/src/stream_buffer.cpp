@@ -36,7 +36,10 @@ void StreamBuffer::Clean()
     rCount_ = 0;
     wCount_ = 0;
     rwErrorStatus_ = ErrorStatus::ERROR_STATUS_OK;
-    CHK(EOK == memset_sp(&szBuff_, sizeof(szBuff_), 0, sizeof(szBuff_)), MEMCPY_SEC_FUN_FAIL);
+    if (EOK != memset_sp(&szBuff_, sizeof(szBuff_), 0, sizeof(szBuff_))) {
+        MMI_LOGE("");
+        return;
+    }
 }
 
 bool StreamBuffer::SetReadIdx(size_t idx)

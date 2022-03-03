@@ -39,11 +39,10 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
 {
     MMI_LOGI("into function ManageHdfInject");
     int32_t sendType = 0;
+    pkt >> sendType;
     uint32_t devIndex = 0;
     uint32_t devSatatus = 0;
     RawInputEvent speechEvent = {};
-    vector<RawInputEvent> allEvent;
-    pkt >> sendType;
     switch (sendType) {
         case GET_STATUS_INFO:
             OnInitHdiServerStatus();

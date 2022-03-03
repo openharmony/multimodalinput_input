@@ -187,7 +187,10 @@ void JsInputMonitor::printfPointerEvent(const std::shared_ptr<PointerEvent> poin
 {
     CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
-    CHK(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item), PARAM_INPUT_FAIL);
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+        MMI_LOGE("Can't find the pointerItem Info, pointer:%{public}d", pointerEvent->GetPointerId());
+        return;
+    }
     MMI_LOGD("type:%{public}d,timestamp:%{public}" PRId64 ",deviceId:%{public}d,"
         "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
         "size:%{public}d,force:%{public}d", pointerEvent->GetSourceType(), item.GetDownTime(),

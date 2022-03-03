@@ -49,7 +49,10 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
 #ifdef OHOS_BUILD_HDF
-    CHKF(MMIHdiInject->Init(udsServer), SENIOR_INPUT_DEV_INIT_FAIL);
+    if (!(MMIHdiInject->Init(udsServer))) {
+        MMI_LOGE("Input device initialization failed");
+        return false;
+    }
 #endif
     MsgCallback funs[] = {
         {MmiMessageId::ON_VIRTUAL_KEY, MsgCallbackBind2(&ServerMsgHandler::OnVirtualKeyEvent, this)},
@@ -339,8 +342,8 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket
     int32_t userData = 0;
     CHKR(pkt.Read(userData), STREAM_BUF_READ_FAIL, RET_ERR);
     std::vector<int32_t> ids = InputDevMgr->GetInputDeviceIds();
-    NetPacket pkt2(MmiMessageId::INPUT_DEVICE_IDS);
     int32_t size = static_cast<int32_t>(ids.size());
+    NetPacket pkt2(MmiMessageId::INPUT_DEVICE_IDS);
     CHKR(pkt2.Write(userData), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pkt2.Write(size), STREAM_BUF_WRITE_FAIL, RET_ERR);
     for (const auto& item : ids) {
