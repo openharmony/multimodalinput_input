@@ -15,12 +15,14 @@
 
 #include "virtual_knob.h"
 
-OHOS::MMI::VirtualKnob::VirtualKnob() : VirtualDevice("Virtual Knob",
+namespace OHOS {
+namespace MMI {
+VirtualKnob::VirtualKnob() : VirtualDevice("Virtual Knob",
     BUS_USB, 0x5ac, 0x202)
 {
 }
 
-OHOS::MMI::VirtualKnob::~VirtualKnob() {}
+VirtualKnob::~VirtualKnob() {}
 
 static std::vector<uint32_t> g_virtualKey = {
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
@@ -31,7 +33,7 @@ static std::vector<uint32_t> g_virtualKey = {
     138, 179, 180, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 240
 };
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKnob::GetEventTypes() const
+const std::vector<uint32_t>& VirtualKnob::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {
         EV_KEY, EV_MSC, EV_LED, EV_REP
@@ -39,14 +41,14 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKnob::GetEventTypes() const
     return evt_types;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKnob::GetKeys() const
+const std::vector<uint32_t>& VirtualKnob::GetKeys() const
 {
     static const std::vector<uint32_t> keys(g_virtualKey.begin(),
                                             g_virtualKey.end());
     return keys;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKnob::GetLeds() const
+const std::vector<uint32_t>& VirtualKnob::GetLeds() const
 {
     static const std::vector<uint32_t> leds {
         LED_NUML, LED_CAPSL, LED_SCROLLL
@@ -54,7 +56,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKnob::GetLeds() const
     return leds;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKnob::GetReps() const
+const std::vector<uint32_t>& VirtualKnob::GetReps() const
 {
     static const std::vector<uint32_t> reps {
         REP_DELAY, REP_PERIOD
@@ -62,11 +64,12 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKnob::GetReps() const
     return reps;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKnob::GetMscs() const
+const std::vector<uint32_t>& VirtualKnob::GetMscs() const
 {
     static const std::vector<uint32_t> mscs {
         MSC_SCAN
     };
     return mscs;
 }
-
+} // namespace MMI
+} // namespace OHOS

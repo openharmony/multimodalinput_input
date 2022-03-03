@@ -15,7 +15,9 @@
 
 #include "virtual_gamepad.h"
 
-OHOS::MMI::VirtualGamePad::VirtualGamePad() : VirtualDevice("Virtual GamePad",
+namespace OHOS {
+namespace MMI {
+VirtualGamePad::VirtualGamePad() : VirtualDevice("Virtual GamePad",
     BUS_USB, 0x79, 0x181c)
 {
     constexpr int32_t ABS_MAX_RXYZ = 255;
@@ -77,9 +79,9 @@ OHOS::MMI::VirtualGamePad::VirtualGamePad() : VirtualDevice("Virtual GamePad",
     dev_.absflat[ABS_HAT0Y] = 0;
 }
 
-OHOS::MMI::VirtualGamePad::~VirtualGamePad() {}
+VirtualGamePad::~VirtualGamePad() {}
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualGamePad::GetEventTypes() const
+const std::vector<uint32_t>& VirtualGamePad::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {
         EV_KEY, EV_ABS, EV_MSC
@@ -87,7 +89,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualGamePad::GetEventTypes() const
     return evt_types;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualGamePad::GetKeys() const
+const std::vector<uint32_t>& VirtualGamePad::GetKeys() const
 {
     static const std::vector<uint32_t> keys {
         KEY_HOMEPAGE, BTN_SOUTH, BTN_EAST, BTN_C, BTN_NORTH, BTN_WEST, BTN_Z,
@@ -97,7 +99,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualGamePad::GetKeys() const
     return keys;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualGamePad::GetAbs() const
+const std::vector<uint32_t>& VirtualGamePad::GetAbs() const
 {
     static const std::vector<uint32_t> abs {
         ABS_X, ABS_Y, ABS_Z, ABS_RX, ABS_RY, ABS_RZ, ABS_GAS, ABS_BRAKE, ABS_HAT0X, ABS_HAT0Y
@@ -106,10 +108,12 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualGamePad::GetAbs() const
     return abs;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualGamePad::GetMscs() const
+const std::vector<uint32_t>& VirtualGamePad::GetMscs() const
 {
     static const std::vector<uint32_t> mscs {
         MSC_SCAN
     };
     return mscs;
 }
+} // namespace MMI
+} // namespace OHOS

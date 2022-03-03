@@ -15,12 +15,14 @@
 
 #include "virtual_remote_control.h"
 
-OHOS::MMI::VirtualRemoteControl::VirtualRemoteControl() : VirtualDevice("Virtual RemoteControl",
+namespace OHOS {
+namespace MMI {
+VirtualRemoteControl::VirtualRemoteControl() : VirtualDevice("Virtual RemoteControl",
     BUS_USB, 0x44f, 0x6008)
 {
 }
 
-OHOS::MMI::VirtualRemoteControl::~VirtualRemoteControl() {}
+VirtualRemoteControl::~VirtualRemoteControl() {}
 
 static std::vector<uint32_t> g_virtualKey = {
     116, 408, 142, 142, 228, 139, 353, 103, 108, 105, 106, 1, 78, 74, 358, 370, 379, 212, 398, 399, 401, 400, 375,
@@ -33,7 +35,7 @@ static std::vector<uint32_t> g_virtualKey = {
     625, 626, 744
 };
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualRemoteControl::GetEventTypes() const
+const std::vector<uint32_t>& VirtualRemoteControl::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {
         EV_KEY
@@ -41,9 +43,11 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualRemoteControl::GetEventTypes() co
     return evt_types;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualRemoteControl::GetKeys() const
+const std::vector<uint32_t>& VirtualRemoteControl::GetKeys() const
 {
     static const std::vector<uint32_t> keys(g_virtualKey.begin(),
                                             g_virtualKey.end());
     return keys;
 }
+} // namespace MMI
+} // namespace OHOS
