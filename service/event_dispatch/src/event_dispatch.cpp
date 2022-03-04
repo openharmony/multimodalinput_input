@@ -258,14 +258,14 @@ int32_t EventDispatch::AddInputEventFilter(sptr<IEventFilter> filter)
 bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
 {
     MMI_LOGD("begin");
-    int64_t firstTime;
+    int64_t earlist;
     if (sess->IsEventQueueEmpty()) {
-        firstTime = time;
+        earlist = time;
     } else {
-        firstTime = sess->GetEarlistEventTime();
+        earlist = sess->GetEarlistEventTime();
     }
 
-    if (time < (firstTime + INPUT_UI_TIMEOUT_TIME)) {
+    if (time < (earlist + INPUT_UI_TIMEOUT_TIME)) {
         sess->isANRProcess_ = false;
         MMI_LOGD("the event reports normally");
         return false;
@@ -279,7 +279,7 @@ bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
         "UID", sess->GetUid(),
         "PACKAGE_NAME", "",
         "PROCESS_NAME", "",
-        "MSG", "The UI framework is not responding");
+        "MSG", "User input does not respond");
     if (ret != 0) {
         MMI_LOGE("HiviewDFX Write failed, HiviewDFX errCode: %{public}d", ret);
     }
