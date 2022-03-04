@@ -172,8 +172,8 @@ int32_t InputManagerImpl::PackPhysicalDisplay(NetPacket &pkt)
 {
     int32_t num = physicalDisplays_.size();
     if (!pkt.Write(num)) {
-         MMI_LOGE("Packet write num failed");
-         return RET_ERR;
+        MMI_LOGE("Packet write num failed");
+        return RET_ERR;
     }
     for (int32_t i = 0; i < num; i++) {
         if (!pkt.Write(physicalDisplays_[i].id)) {
