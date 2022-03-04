@@ -123,7 +123,10 @@ void InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInf
         size_t numWindow = logicalDisplays[i].windowsInfo_.size();
         for (size_t j = 0; j < numWindow; j++) {
             WindowInfo myWindow = logicalDisplays[i].windowsInfo_[j];
-            windowInfos_.insert(std::pair<int32_t, WindowInfo>(myWindow.id, myWindow));
+            auto iter = windowInfos_.insert(std::pair<int32_t, WindowInfo>(myWindow.id, myWindow));
+            if (!iter.second) {
+                MMI_LOGE("Insert value failed, Window:%{public}d", myWindow.id);
+            }
         }
     }
     if (!logicalDisplays.empty()) {
@@ -207,7 +210,7 @@ PhysicalDisplayInfo* InputWindowsManager::FindPhysicalDisplayInfo(const std::str
     return nullptr;
 }
 
-void InputWindowsManager::TurnTouchScreen(PhysicalDisplayInfo* info, Direction direction,
+void InputWindowsManager::RotateTouchScreen(PhysicalDisplayInfo* info, Direction direction,
     int32_t& logicalX, int32_t& logicalY)
 {
     CHKPV(info);
@@ -237,7 +240,7 @@ void InputWindowsManager::TurnTouchScreen(PhysicalDisplayInfo* info, Direction d
     }
 }
 
-bool InputWindowsManager::TransformOfDisplayPoint(struct libinput_event_touch* touch, Direction& direction,
+bool InputWindowsManager::TransformDisplayPoint(struct libinput_event_touch* touch, Direction& direction,
     int32_t &globalLogicalX, int32_t &globalLogicalY)
 {
     CHKPF(touch);
@@ -268,7 +271,7 @@ bool InputWindowsManager::TransformOfDisplayPoint(struct libinput_event_touch* t
     int32_t localLogcialY = static_cast<int32_t>(logicY);
 
     direction = info->direction;
-    TurnTouchScreen(info, direction, localLogcialX, localLogcialY);
+    RotateTouchScreen(info, direction, localLogcialX, localLogcialY);
 
     globalLogicalX = localLogcialX;
     globalLogicalY = localLogcialY;
@@ -302,7 +305,7 @@ bool InputWindowsManager::TouchMotionPointToDisplayPoint(struct libinput_event_t
     CHKPF(touch);
     int32_t globalLogicalX;
     int32_t globalLogicalY;
-    auto isTransform = TransformOfDisplayPoint(touch, direction, globalLogicalX, globalLogicalY);
+    auto isTransform = TransformDisplayPoint(touch, direction, globalLogicalX, globalLogicalY);
     if (!isTransform) {
         return isTransform;
     }
@@ -326,7 +329,7 @@ bool InputWindowsManager::TouchDownPointToDisplayPoint(struct libinput_event_tou
     CHKPF(touch);
     int32_t globalLogicalX;
     int32_t globalLogicalY;
-    auto isTransform = TransformOfDisplayPoint(touch, direction, globalLogicalX, globalLogicalY);
+    auto isTransform = TransformDisplayPoint(touch, direction, globalLogicalX, globalLogicalY);
     if (!isTransform) {
         return isTransform;
     }

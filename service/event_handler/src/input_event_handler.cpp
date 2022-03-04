@@ -204,7 +204,7 @@ void InputEventHandler::OnCheckEventReport()
     if (initSysClock_ == 0 || lastSysClock_ != 0) {
         return;
     }
-    constexpr uint64_t MAX_DID_TIME = 1000 * 1000 * 3;
+    constexpr int64_t MAX_DID_TIME = 1000 * 1000 * 3;
     auto curSysClock = GetSysClockTime();
     auto lostTime = curSysClock - initSysClock_;
     if (lostTime < MAX_DID_TIME) {
@@ -346,7 +346,7 @@ int32_t InputEventHandler::OnEventTouchSecond(struct libinput_event *event)
     CHKPR(event, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
-        MMI_LOGI("This touch event is canceled type:%{public}d", type);
+        MMI_LOGD("This touch event is canceled type:%{public}d", type);
         return RET_OK;
     }
     auto point = TouchTransformPointManger->OnLibinputTouchEvent(event);

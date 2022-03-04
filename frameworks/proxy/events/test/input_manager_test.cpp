@@ -334,7 +334,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.L
 {
     std::string command = "Inject keyCode = 2,action = 2";
     std::vector<std::string> slogs {SearchLog(command, true)};
-    int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
     OHOS::MMI::KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
@@ -346,7 +346,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.L
     InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
 
     std::shared_ptr<OHOS::MMI::KeyEvent> injectUpEvent = OHOS::MMI::KeyEvent::Create();
-    downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     OHOS::MMI::KeyEvent::KeyItem kitUp;
     kitUp.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
     kitUp.SetPressed(false);
@@ -362,7 +362,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.L
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_002, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
-    int32_t downTime = -1;
+    int64_t downTime = -1;
     OHOS::MMI::KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_HOME);
     kitDown.SetPressed(true);
@@ -378,7 +378,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.L
     std::string command = "Inject keyCode:2, action:2";
     std::vector<std::string> slogs {SearchLog(command, true)};
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
-    int32_t downTime = 0;
+    int64_t downTime = 0;
     OHOS::MMI::KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
     kitDown.SetPressed(true);
@@ -404,7 +404,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.L
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_004, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
-    int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     OHOS::MMI::KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_UNKNOWN);
     kitDown.SetPressed(true);
@@ -422,7 +422,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.L
     std::string command = "Inject keyCode:0, action:2";
     std::vector<std::string> slogs {SearchLog(command, true)};
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
-    int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     OHOS::MMI::KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_FN);
     kitDown.SetPressed(true);
@@ -438,7 +438,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.L
     MMI_LOGD("MMIEventHdl.InjectEvent end!");
 
     std::shared_ptr<OHOS::MMI::KeyEvent> injectUpEvent = OHOS::MMI::KeyEvent::Create();
-    downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     OHOS::MMI::KeyEvent::KeyItem kitUp;
     kitUp.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_FN);
     kitUp.SetPressed(false);
@@ -1372,7 +1372,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("subscribe key event trigger callback");
     });
-    EXPECT_TRUE(response > 0);
+    EXPECT_TRUE(response >= 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::MMI::KeyEvent injectDownEvent;
@@ -1423,7 +1423,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("subscribe key event trigger callback");
     });
-    EXPECT_TRUE(response > 0);
+    EXPECT_TRUE(response >= 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     int32_t response2 = -1;
     response2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
@@ -1488,7 +1488,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_003, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("subscribe key event trigger callback");
     });
-    EXPECT_TRUE(response > 0);
+    EXPECT_TRUE(response >= 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::MMI::KeyEvent injectDownEvent;
@@ -1537,7 +1537,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_004, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("subscribe key event down trigger callback");
     });
-    EXPECT_TRUE(response > 0);
+    EXPECT_TRUE(response >= 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::MMI::KeyEvent injectDownEvent;
@@ -1585,7 +1585,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_005, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("hold down for a while. subscribe key event down trigger callback");
     });
-    EXPECT_TRUE(response > 0);
+    EXPECT_TRUE(response >= 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::MMI::KeyEvent injectDownEvent;
@@ -1633,7 +1633,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_006, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("hold down for a while. subscribe key event down trigger callback");
     });
-    EXPECT_TRUE(response > 0);
+    EXPECT_TRUE(response >= 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     OHOS::MMI::KeyEvent injectDownEvent;
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
@@ -1696,7 +1696,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_007, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("subscribe key event up trigger callback");
     });
-    EXPECT_TRUE(response > 0);
+    EXPECT_TRUE(response >= 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
@@ -1768,7 +1768,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_009, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("subscribe key event KEYCODE_MUTE trigger callback");
     });
-    EXPECT_TRUE(response > 0);
+    EXPECT_TRUE(response >= 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::MMI::KeyEvent injectDownEvent;
@@ -1822,7 +1822,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("subscribe key event KEYCODE_POWER down trigger callback");
     });
-    EXPECT_TRUE(subscribeId1 > 0);
+    EXPECT_TRUE(subscribeId1 >= 0);
 
     // 电源键抬起订阅
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption2 = std::make_shared<OHOS::MMI::KeyOption>();
@@ -1841,7 +1841,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("subscribe key event KEYCODE_POWER up trigger callback");
     });
-    EXPECT_TRUE(subscribeId2 > 0);
+    EXPECT_TRUE(subscribeId2 >= 0);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(10000));
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId1);

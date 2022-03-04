@@ -70,7 +70,7 @@ int32_t ProcessingKeyboardDevice::AnalysisKeyBoardEvent(const Json& inputData,
             keyBoardEvent.keyValue = item.at("keyValue").get<int32_t>();
         }
         if ((item.find("blockTime")) != item.end()) {
-            keyBoardEvent.blockTime = item.at("blockTime").get<int32_t>();
+            keyBoardEvent.blockTime = item.at("blockTime").get<int64_t>();
         }
         keyBoardEventArray.push_back(keyBoardEvent);
     }

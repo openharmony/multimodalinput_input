@@ -108,10 +108,11 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointe
         MMI_LOGD("This event has been tagged as not to be monitored");
     } else {
         if (monitors_.HandleEvent(pointerEvent)) {
-            MMI_LOGD("Pointer event was consumed");
+            MMI_LOGD("Pointer event was monitor");
             return true;
         }
     }
+    MMI_LOGD("Interception and monitor failed");
     return false;
 }
 
@@ -267,15 +268,15 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
     lastPointerEvent_ = pointerEvent;
 
     if (pointerEvent->GetPointersIdList().size() != 1) {
-        MMI_LOGD("First down and last up intermediate process");
+        MMI_LOGD("First press down and last press up intermediate process");
         return;
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-        MMI_LOGD("Press for the first time");
+        MMI_LOGD("First press down");
         downEventId_ = pointerEvent->GetId();
         isMonitorConsumed_ = false;
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
-        MMI_LOGD("The last time lift");
+        MMI_LOGD("Last press up");
         downEventId_ = -1;
         lastPointerEvent_.reset();
     }

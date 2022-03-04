@@ -25,7 +25,7 @@ class ProcessingJoystickDevice : public DeviceBase {
         std::string eventType;
         std::string direction;
         int32_t keyValue;
-        int32_t blockTime;
+        int64_t blockTime;
         std::vector<int32_t> gameEvents;
     };
 public:
