@@ -15,14 +15,16 @@
 
 #include "virtual_mouse.h"
 
-OHOS::MMI::VirtualMouse::VirtualMouse() : VirtualDevice("Virtual Mouse",
+namespace OHOS {
+namespace MMI {
+VirtualMouse::VirtualMouse() : VirtualDevice("Virtual Mouse",
     BUS_USB, 0x93a, 0x2510)
 {
 }
 
-OHOS::MMI::VirtualMouse::~VirtualMouse() {}
+VirtualMouse::~VirtualMouse() {}
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualMouse::GetEventTypes() const
+const std::vector<uint32_t>& VirtualMouse::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {
         EV_KEY, EV_REL, EV_MSC
@@ -30,7 +32,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualMouse::GetEventTypes() const
     return evt_types;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualMouse::GetKeys() const
+const std::vector<uint32_t>& VirtualMouse::GetKeys() const
 {
     static const std::vector<uint32_t> keys {
         BTN_LEFT, BTN_RIGHT, BTN_MIDDLE, BTN_SIDE, BTN_EXTRA, BTN_FORWARD, BTN_BACK, BTN_TASK
@@ -38,7 +40,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualMouse::GetKeys() const
     return keys;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualMouse::GetRelBits() const
+const std::vector<uint32_t>& VirtualMouse::GetRelBits() const
 {
     static const std::vector<uint32_t> rels {
         REL_X, REL_Y, REL_WHEEL, REL_WHEEL_HI_RES
@@ -46,11 +48,12 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualMouse::GetRelBits() const
     return rels;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualMouse::GetMscs() const
+const std::vector<uint32_t>& VirtualMouse::GetMscs() const
 {
     static const std::vector<uint32_t> mscs {
         MSC_SCAN
     };
     return mscs;
 }
-
+} // namespace MMI
+} // namespace OHOS
