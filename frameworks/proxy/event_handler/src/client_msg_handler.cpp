@@ -118,7 +118,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
         return RET_ERR;
     }
     int32_t fd = 0;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     pkt >> fd >> serverStartTime;
     if (pkt.ChkRWError()) {
         MMI_LOGE("Packet read fd failed");
