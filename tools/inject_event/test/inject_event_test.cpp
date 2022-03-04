@@ -135,7 +135,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectMouse_006, TestSize.Level1)
     char command3[] = {"-m"};
     char command4[] = {"1"};
     char *argv[] = {command1, command2, command3, command4};
-    int32_t result = inputManagerCommand->ParseCommand(4, argv); 
+    int32_t result = inputManagerCommand->ParseCommand(4, argv);
     EXPECT_EQ(OHOS::EVENT_REG_FAIL, result);
 }
 
@@ -153,7 +153,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectMouse_007, TestSize.Level1)
     char command3[] = {"-d"};
     char command4[] = {"a"};
     char *argv[] = {command1, command2, command3, command4};
-    int32_t result = inputManagerCommand->ParseCommand(4, argv); 
+    int32_t result = inputManagerCommand->ParseCommand(4, argv);
     EXPECT_EQ(OHOS::EVENT_REG_FAIL, result);
 }
 
