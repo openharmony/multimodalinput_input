@@ -22,7 +22,6 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
-using namespace std;
 } // namespace
 class InjectEventTest : public testing::Test {
 public:
