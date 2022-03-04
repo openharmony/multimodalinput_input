@@ -61,10 +61,10 @@ bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
         MMI_LOGE("Client startup failed");
         return false;
     }
-    if (!StartEventRunner()) {
-        MMI_LOGE("Start runner failed");
-        return false;
-    }
+    // if (!StartEventRunner()) {
+    //     MMI_LOGE("Start runner failed");
+    //     return false;
+    // }
     return true;
 }
 
@@ -86,14 +86,8 @@ bool MMIClient::StartEventRunner()
             return false;
         }
     }
-    if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_ONTIMER, 0, EVENT_TIME_ONTIMER)) {
-        MMI_LOGE("send ontimer event return false.");
-        return false;
-    }
-    // auto errCode = eventRunner->Run();
-    // if (errCode != ERR_OK) {
-    //     MMI_LOGE("event runnner run error,code:%{public}u str:%{public}s", errCode,
-    //         eventHandler_->GetErrorStr(errCode).c_str());
+    // if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_ONTIMER, 0, EVENT_TIME_ONTIMER)) {
+    //     MMI_LOGE("send ontimer event return false.");
     //     return false;
     // }
     MMI_LOGD("leave");

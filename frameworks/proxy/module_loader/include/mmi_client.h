@@ -52,6 +52,7 @@ protected:
     bool StartEventRunner();
     bool AddFdListener(int32_t fd);
     bool DelFdListener(int32_t fd);
+    void OnThread();
 
 protected:
     ConnectCallback funConnected_;
