@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
+constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
 } // namespace
 
