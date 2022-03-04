@@ -389,12 +389,12 @@ int32_t ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket& pkt)
     int32_t size = static_cast<int32_t>(ids.size());
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE_IDS);
     if (!pkt2.Write(userData)) {
-         MMI_LOGE("Packet write userData failed");
-         return RET_ERR;
+        MMI_LOGE("Packet write userData failed");
+        return RET_ERR;
     }
     if (!pkt2.Write(size)) {
-         MMI_LOGE("Packet write size failed");
-         return RET_ERR;
+        MMI_LOGE("Packet write size failed");
+        return RET_ERR;
     }
     for (const auto& item : ids) {
         if (!pkt2.Write(item)) {

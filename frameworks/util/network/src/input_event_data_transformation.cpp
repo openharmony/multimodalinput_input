@@ -22,22 +22,22 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
     const std::shared_ptr<KeyEvent> key, NetPacket &pkt)
 {
     if (SerializeInputEvent(key, pkt) != RET_OK) {
-         MMI_LOGE("Serialize input event failed");
-         return RET_ERR;
+        MMI_LOGE("Serialize input event failed");
+        return RET_ERR;
     }
     if (!pkt.Write(key->GetKeyCode())) {
-         MMI_LOGE("Packet write keyCode failed");
-         return RET_ERR;
+        MMI_LOGE("Packet write keyCode failed");
+        return RET_ERR;
     }
     if (!pkt.Write(key->GetKeyAction())) {
-         MMI_LOGE("Packet write keyAction failed");
-         return RET_ERR;
+        MMI_LOGE("Packet write keyAction failed");
+        return RET_ERR;
     }
     auto keys = key->GetKeyItems();
     int32_t size = keys.size();
     if (!pkt.Write(size)) {
-         MMI_LOGE("Packet write keys size failed");
-         return RET_ERR;
+        MMI_LOGE("Packet write keys size failed");
+        return RET_ERR;
     }
     for (const auto &item : keys) {
         if (!pkt.Write(item.GetKeyCode())) {
@@ -63,8 +63,8 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
 int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::shared_ptr<KeyEvent> key)
 {
     if (DeserializeInputEvent(pkt, key) != RET_OK) {
-         MMI_LOGE("Deserialize input event failed");
-         return RET_ERR;
+        MMI_LOGE("Deserialize input event failed");
+        return RET_ERR;
     }
     int32_t data = 0;
     if (!pkt.Read(data)) {
@@ -219,8 +219,8 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
 {
     CHKPR(event, ERROR_NULL_POINTER);
     if (SerializeInputEvent(event, pkt) != RET_OK) {
-         MMI_LOGE("Serialize input event failed");
-         return RET_ERR;
+        MMI_LOGE("Serialize input event failed");
+        return RET_ERR;
     }
 
     if (!pkt.Write(event->GetPointerAction())) {
@@ -350,8 +350,8 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
 int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_ptr<PointerEvent> event)
 {
     if (DeserializeInputEvent(pkt, event) != RET_OK) {
-         MMI_LOGE("Deserialize input event failed");
-         return RET_ERR;
+        MMI_LOGE("Deserialize input event failed");
+        return RET_ERR;
     }
     int32_t tField {  };
     if (!pkt.Read(tField)) {
