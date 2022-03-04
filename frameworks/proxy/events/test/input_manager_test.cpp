@@ -1372,7 +1372,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("subscribe key event trigger callback");
     });
-    EXPECT_TRUE(response > 0);
+    EXPECT_TRUE(response >= 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::MMI::KeyEvent injectDownEvent;
@@ -1423,7 +1423,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("subscribe key event trigger callback");
     });
-    EXPECT_TRUE(response > 0);
+    EXPECT_TRUE(response >= 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     int32_t response2 = -1;
     response2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
@@ -1488,7 +1488,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_003, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("subscribe key event trigger callback");
     });
-    EXPECT_TRUE(response > 0);
+    EXPECT_TRUE(response >= 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::MMI::KeyEvent injectDownEvent;
@@ -1537,7 +1537,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_004, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("subscribe key event down trigger callback");
     });
-    EXPECT_TRUE(response > 0);
+    EXPECT_TRUE(response >= 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::MMI::KeyEvent injectDownEvent;
@@ -1585,7 +1585,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_005, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("hold down for a while. subscribe key event down trigger callback");
     });
-    EXPECT_TRUE(response > 0);
+    EXPECT_TRUE(response >= 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::MMI::KeyEvent injectDownEvent;
@@ -1633,7 +1633,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_006, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("hold down for a while. subscribe key event down trigger callback");
     });
-    EXPECT_TRUE(response > 0);
+    EXPECT_TRUE(response >= 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     OHOS::MMI::KeyEvent injectDownEvent;
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
@@ -1696,7 +1696,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_007, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("subscribe key event up trigger callback");
     });
-    EXPECT_TRUE(response > 0);
+    EXPECT_TRUE(response >= 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
@@ -1768,7 +1768,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_009, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("subscribe key event KEYCODE_MUTE trigger callback");
     });
-    EXPECT_TRUE(response > 0);
+    EXPECT_TRUE(response >= 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::MMI::KeyEvent injectDownEvent;
@@ -1822,7 +1822,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("subscribe key event KEYCODE_POWER down trigger callback");
     });
-    EXPECT_TRUE(subscribeId1 > 0);
+    EXPECT_TRUE(subscribeId1 >= 0);
 
     // 电源键抬起订阅
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption2 = std::make_shared<OHOS::MMI::KeyOption>();
@@ -1841,7 +1841,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("subscribe key event KEYCODE_POWER up trigger callback");
     });
-    EXPECT_TRUE(subscribeId2 > 0);
+    EXPECT_TRUE(subscribeId2 >= 0);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(10000));
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId1);
