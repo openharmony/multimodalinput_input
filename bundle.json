@@ -78,7 +78,7 @@
             "header_files": [
               "common/include/struct_multimodal.h",
               "event/include/key_event.h",
-              "event/include/multimodal_standardized_event_manager.h",
+              "event/include/standardized_event_manager.h",
               "proxy/include/multimodal_event_handler.h"
             ],
             "header_base": "//foundation/multimodalinput/input/interfaces/native/innerkits"

@@ -20,17 +20,15 @@
 
 namespace OHOS {
 namespace MMI {
-    namespace {
-        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManagerGlobal" };
-    }
-} // namespace MMI
-} // namespace OHOS
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManagerGlobal" };
+} // namespace
 
-OHOS::MMI::InterceptorManagerGlobal::InterceptorManagerGlobal() {}
+InterceptorManagerGlobal::InterceptorManagerGlobal() {}
 
-OHOS::MMI::InterceptorManagerGlobal::~InterceptorManagerGlobal() {}
+InterceptorManagerGlobal::~InterceptorManagerGlobal() {}
 
-void OHOS::MMI::InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
+void InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
@@ -49,7 +47,7 @@ void OHOS::MMI::InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, i
     MMI_LOGD("leave");
 }
 
-void OHOS::MMI::InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
+void InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
@@ -66,7 +64,7 @@ void OHOS::MMI::InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
     MMI_LOGD("leave");
 }
 
-bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+bool InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("enter");
     CHKPF(pointerEvent);
@@ -95,7 +93,7 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
     return true;
 }
 
-bool OHOS::MMI::InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+bool InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_LOGD("enter");
     CHKPF(keyEvent);
@@ -115,3 +113,5 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> k
     MMI_LOGD("leave");
     return true;
 }
+} // namespace MMI
+} // namespace OHOS
