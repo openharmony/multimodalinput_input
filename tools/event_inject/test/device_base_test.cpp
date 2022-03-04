@@ -48,7 +48,7 @@ HWTEST_F(DeviceBaseTest, Test_SetTimeToLibinputEvent, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetSynConfigReport, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetSynConfigReport(inputEventArray, blockTime);
     EXPECT_GT(inputEventArray.events.size(), 0);
@@ -64,7 +64,7 @@ HWTEST_F(DeviceBaseTest, Test_SetSynConfigReport, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetKeyLongPressEvent, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t code = KEY_A;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetKeyLongPressEvent(inputEventArray, blockTime, code);
@@ -81,7 +81,7 @@ HWTEST_F(DeviceBaseTest, Test_SetKeyLongPressEvent, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetKeyPressEvent, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t code = KEY_A;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetKeyPressEvent(inputEventArray, blockTime, code);
@@ -98,7 +98,7 @@ HWTEST_F(DeviceBaseTest, Test_SetKeyPressEvent, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetKeyReleaseEvent, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t code = KEY_A;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetKeyReleaseEvent(inputEventArray, blockTime, code);
@@ -115,7 +115,7 @@ HWTEST_F(DeviceBaseTest, Test_SetKeyReleaseEvent, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetMtSlot, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 0;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetMtSlot(inputEventArray, blockTime, value);
@@ -132,7 +132,7 @@ HWTEST_F(DeviceBaseTest, Test_SetMtSlot, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetTrackingId, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 0;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetTrackingId(inputEventArray, blockTime, value);
@@ -149,7 +149,7 @@ HWTEST_F(DeviceBaseTest, Test_SetTrackingId, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetPositionX, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 10;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetPositionX(inputEventArray, blockTime, value);
@@ -166,7 +166,7 @@ HWTEST_F(DeviceBaseTest, Test_SetPositionX, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetPositionY, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 10;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetPositionY(inputEventArray, blockTime, value);
@@ -183,7 +183,7 @@ HWTEST_F(DeviceBaseTest, Test_SetPositionY, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetMtTouchMajor, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 10;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetMtTouchMajor(inputEventArray, blockTime, value);
@@ -200,7 +200,7 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchMajor, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetMtTouchMinor, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 10;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetMtTouchMinor(inputEventArray, blockTime, value);
@@ -217,7 +217,7 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchMinor, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetMtOrientation, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 10;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetMtOrientation(inputEventArray, blockTime, value);
@@ -234,7 +234,7 @@ HWTEST_F(DeviceBaseTest, Test_SetMtOrientation, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetBtnTouch, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 10;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetBtnTouch(inputEventArray, blockTime, value);
@@ -251,7 +251,7 @@ HWTEST_F(DeviceBaseTest, Test_SetBtnTouch, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetEvAbsX, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 10;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetEvAbsX(inputEventArray, blockTime, value);
@@ -268,7 +268,7 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsX, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetEvAbsY, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 10;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetEvAbsY(inputEventArray, blockTime, value);
@@ -285,7 +285,7 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsY, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetMtTouchOneFingerType, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 1;
     int32_t status = 1;
     DeviceBaseDemo deviceBaseDemo;
@@ -303,7 +303,7 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchOneFingerType, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetMtTouchTwoFingerType, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 2;
     int32_t status = 1;
     DeviceBaseDemo deviceBaseDemo;
@@ -321,7 +321,7 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchTwoFingerType, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetMtTouchThreeFingerType, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 3;
     int32_t status = 1;
     DeviceBaseDemo deviceBaseDemo;
@@ -339,7 +339,7 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchThreeFingerType, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetMtTouchFourFingerType, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 4;
     int32_t status = 1;
     DeviceBaseDemo deviceBaseDemo;
@@ -357,7 +357,7 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchFourFingerType, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetMtTouchFiveFingerType, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 5;
     int32_t status = 1;
     DeviceBaseDemo deviceBaseDemo;
@@ -375,7 +375,7 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchFiveFingerType, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetMtTouchOtherFingerType, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 6;
     int32_t status = 1;
     DeviceBaseDemo deviceBaseDemo;
@@ -393,7 +393,7 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchOtherFingerType, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetEvAbsZ, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 5;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetEvAbsZ(inputEventArray, blockTime, value);
@@ -410,7 +410,7 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsZ, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetEvAbsRx, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 5;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetEvAbsRx(inputEventArray, blockTime, value);
@@ -427,7 +427,7 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsRx, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetEvAbsRy, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 5;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetEvAbsRy(inputEventArray, blockTime, value);
@@ -444,7 +444,7 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsRy, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetEvAbsHat0X, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 5;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetEvAbsHat0X(inputEventArray, blockTime, value);
@@ -461,7 +461,7 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsHat0X, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetEvAbsHat0Y, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 5;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetEvAbsHat0Y(inputEventArray, blockTime, value);
@@ -478,7 +478,7 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsHat0Y, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetEvAbsRz, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 5;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetEvAbsRz(inputEventArray, blockTime, value);
@@ -495,7 +495,7 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsRz, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetEvAbs, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 5;
     uint16_t code = 0;
     DeviceBaseDemo deviceBaseDemo;
@@ -513,7 +513,7 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbs, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetRelX, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 5;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetRelX(inputEventArray, blockTime, value);
@@ -530,7 +530,7 @@ HWTEST_F(DeviceBaseTest, Test_SetRelX, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetRelY, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 5;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetRelY(inputEventArray, blockTime, value);
@@ -547,7 +547,7 @@ HWTEST_F(DeviceBaseTest, Test_SetRelY, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetRelWheel, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 5;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetRelWheel(inputEventArray, blockTime, value);
@@ -564,7 +564,7 @@ HWTEST_F(DeviceBaseTest, Test_SetRelWheel, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetRelHwheel, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 5;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetRelHwheel(inputEventArray, blockTime, value);
@@ -581,7 +581,7 @@ HWTEST_F(DeviceBaseTest, Test_SetRelHwheel, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetEvAbsWheel, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 5;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetEvAbsWheel(inputEventArray, blockTime, value);
@@ -598,7 +598,7 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsWheel, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetAbsMiscStartStatus, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 1;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetAbsMisc(inputEventArray, blockTime, value);
@@ -615,7 +615,7 @@ HWTEST_F(DeviceBaseTest, Test_SetAbsMiscStartStatus, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetAbsMiscEndStatus, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 2;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetAbsMisc(inputEventArray, blockTime, value);
@@ -632,7 +632,7 @@ HWTEST_F(DeviceBaseTest, Test_SetAbsMiscEndStatus, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetAbsTiltX, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 20;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetAbsTiltX(inputEventArray, blockTime, value);
@@ -649,7 +649,7 @@ HWTEST_F(DeviceBaseTest, Test_SetAbsTiltX, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetAbsTiltY, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 20;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetAbsTiltY(inputEventArray, blockTime, value);
@@ -666,7 +666,7 @@ HWTEST_F(DeviceBaseTest, Test_SetAbsTiltY, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetAbsPressure, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 20;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetAbsPressure(inputEventArray, blockTime, value);
@@ -683,7 +683,7 @@ HWTEST_F(DeviceBaseTest, Test_SetAbsPressure, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetAbsDistance, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 20;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetAbsDistance(inputEventArray, blockTime, value);
@@ -700,7 +700,7 @@ HWTEST_F(DeviceBaseTest, Test_SetAbsDistance, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetBtnPen, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 20;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetBtnPen(inputEventArray, blockTime, value);
@@ -717,7 +717,7 @@ HWTEST_F(DeviceBaseTest, Test_SetBtnPen, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetBtnStylus, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 20;
     uint16_t code = BTN_STYLUS;
     DeviceBaseDemo deviceBaseDemo;
@@ -735,7 +735,7 @@ HWTEST_F(DeviceBaseTest, Test_SetBtnStylus, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetBtnRubber, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 20;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetBtnRubber(inputEventArray, blockTime, value);
@@ -752,7 +752,7 @@ HWTEST_F(DeviceBaseTest, Test_SetBtnRubber, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetMscSerial, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 20;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetMscSerial(inputEventArray, blockTime, value);
@@ -769,7 +769,7 @@ HWTEST_F(DeviceBaseTest, Test_SetMscSerial, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetSynMtReport, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 0;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetSynMtReport(inputEventArray, blockTime, value);
@@ -786,7 +786,7 @@ HWTEST_F(DeviceBaseTest, Test_SetSynMtReport, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetThrottle, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int32_t blockTime = 10;
+    int64_t blockTime = 10;
     int32_t value = 0;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetThrottle(inputEventArray, blockTime, value);

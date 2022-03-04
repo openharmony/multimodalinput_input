@@ -15,7 +15,9 @@
 
 #include "virtual_touchscreen.h"
 
-OHOS::MMI::VirtualTouchScreen::VirtualTouchScreen()
+namespace OHOS {
+namespace MMI {
+VirtualTouchScreen::VirtualTouchScreen()
     : VirtualDevice("Virtual TouchScreen", BUS_USB, 0x6006, 0x6006)
 {
     constexpr int32_t ABS_MAX_X = 480;
@@ -55,9 +57,9 @@ OHOS::MMI::VirtualTouchScreen::VirtualTouchScreen()
     dev_.absmax[ABS_MT_PRESSURE] = ABS_PRESSURE_MAX;
 }
 
-OHOS::MMI::VirtualTouchScreen::~VirtualTouchScreen() {}
+VirtualTouchScreen::~VirtualTouchScreen() {}
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTouchScreen::GetEventTypes() const
+const std::vector<uint32_t>& VirtualTouchScreen::GetEventTypes() const
 {
     static const std::vector<uint32_t> evTypes {
         EV_ABS, EV_KEY
@@ -65,7 +67,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTouchScreen::GetEventTypes() cons
     return evTypes;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTouchScreen::GetKeys() const
+const std::vector<uint32_t>& VirtualTouchScreen::GetKeys() const
 {
     static const std::vector<uint32_t> keys {
         BTN_TOUCH
@@ -73,7 +75,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTouchScreen::GetKeys() const
     return keys;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTouchScreen::GetProperties() const
+const std::vector<uint32_t>& VirtualTouchScreen::GetProperties() const
 {
     static const std::vector<uint32_t> properties {
         INPUT_PROP_DIRECT
@@ -81,7 +83,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTouchScreen::GetProperties() cons
     return properties;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTouchScreen::GetAbs() const
+const std::vector<uint32_t>& VirtualTouchScreen::GetAbs() const
 {
     static const std::vector<uint32_t> abs {
         ABS_X, ABS_Y, ABS_PRESSURE, ABS_MT_TOUCH_MAJOR, ABS_MT_TOUCH_MINOR, ABS_MT_ORIENTATION, ABS_MT_POSITION_X,
@@ -89,3 +91,5 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTouchScreen::GetAbs() const
     };
     return abs;
 }
+} // namespace MMI
+} // namespace OHOS

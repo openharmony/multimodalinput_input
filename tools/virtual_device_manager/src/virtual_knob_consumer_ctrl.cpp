@@ -15,7 +15,9 @@
 
 #include "virtual_knob_consumer_ctrl.h"
 
-OHOS::MMI::VirtualKnobConsumerCtrl::VirtualKnobConsumerCtrl() : VirtualDevice("Virtual KnobConsumerCtrl",
+namespace OHOS {
+namespace MMI {
+VirtualKnobConsumerCtrl::VirtualKnobConsumerCtrl() : VirtualDevice("Virtual KnobConsumerCtrl",
     BUS_USB, 0x5ac, 0x202)
 {
     constexpr int32_t ABS_MAX_VOLUME = 572;
@@ -26,7 +28,7 @@ OHOS::MMI::VirtualKnobConsumerCtrl::VirtualKnobConsumerCtrl() : VirtualDevice("V
     dev_.absflat[ABS_VOLUME] = 0;
 }
 
-OHOS::MMI::VirtualKnobConsumerCtrl::~VirtualKnobConsumerCtrl() {}
+VirtualKnobConsumerCtrl::~VirtualKnobConsumerCtrl() {}
 
 static std::vector<uint32_t> g_virtualKey = {
     1, 28, 74, 78, 103, 105, 106, 108, 113, 114, 115, 116, 119, 128, 130, 131, 133, 134, 135, 136, 137, 138, 139, 140,
@@ -37,7 +39,7 @@ static std::vector<uint32_t> g_virtualKey = {
     429, 430, 431, 432, 433, 439, 442, 576, 577, 578, 579, 580, 581, 582, 583, 592, 593
 };
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKnobConsumerCtrl::GetEventTypes() const
+const std::vector<uint32_t>& VirtualKnobConsumerCtrl::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {
         EV_KEY, EV_REL, EV_ABS, EV_MSC
@@ -45,7 +47,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKnobConsumerCtrl::GetEventTypes()
     return evt_types;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKnobConsumerCtrl::GetKeys() const
+const std::vector<uint32_t>& VirtualKnobConsumerCtrl::GetKeys() const
 {
     static const std::vector<uint32_t> keys(g_virtualKey.begin(),
                                             g_virtualKey.end());
@@ -53,7 +55,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKnobConsumerCtrl::GetKeys() const
     return keys;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKnobConsumerCtrl::GetRelBits() const
+const std::vector<uint32_t>& VirtualKnobConsumerCtrl::GetRelBits() const
 {
     static const std::vector<uint32_t> rels {
         REL_HWHEEL, REL_HWHEEL_HI_RES
@@ -62,7 +64,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKnobConsumerCtrl::GetRelBits() co
     return rels;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKnobConsumerCtrl::GetAbs() const
+const std::vector<uint32_t>& VirtualKnobConsumerCtrl::GetAbs() const
 {
     static const std::vector<uint32_t> abs {
         ABS_VOLUME
@@ -71,10 +73,12 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKnobConsumerCtrl::GetAbs() const
     return abs;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKnobConsumerCtrl::GetMscs() const
+const std::vector<uint32_t>& VirtualKnobConsumerCtrl::GetMscs() const
 {
     static const std::vector<uint32_t> mscs {
         MSC_SCAN
     };
     return mscs;
 }
+} // namespace MMI
+} // namespace OHOS

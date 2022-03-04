@@ -106,7 +106,7 @@ void ProcessingTouchScreenDevice::AnalysisSingleTouchScreenDate(const Json& inpu
             touchSingleEventData.yPos = item.at("yPos").get<int32_t>();
         }
         if ((item.find("blockTime")) != item.end()) {
-            touchSingleEventData.blockTime = item.at("blockTime").get<int32_t>();
+            touchSingleEventData.blockTime = item.at("blockTime").get<int64_t>();
         }
         touchSingleEventData.reportType = item.at("reportType").get<std::string>();
         touchSingleEventDatas.push_back(touchSingleEventData);

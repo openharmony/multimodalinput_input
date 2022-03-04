@@ -15,7 +15,9 @@
 
 #include "virtual_touchpad.h"
 
-OHOS::MMI::VirtualTouchpad::VirtualTouchpad() : VirtualDevice("Virtual Touchpad",
+namespace OHOS {
+namespace MMI {
+VirtualTouchpad::VirtualTouchpad() : VirtualDevice("Virtual Touchpad",
     BUS_USB, 0x56a, 0x392)
 {
     constexpr int32_t ABS_MAX_WHEEL = 71;
@@ -41,7 +43,7 @@ OHOS::MMI::VirtualTouchpad::VirtualTouchpad() : VirtualDevice("Virtual Touchpad"
     dev_.absflat[ABS_MISC] = 0;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTouchpad::GetEventTypes() const
+const std::vector<uint32_t>& VirtualTouchpad::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {
         EV_KEY, EV_ABS
@@ -49,9 +51,9 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTouchpad::GetEventTypes() const
     return evt_types;
 }
 
-OHOS::MMI::VirtualTouchpad::~VirtualTouchpad() {}
+VirtualTouchpad::~VirtualTouchpad() {}
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTouchpad::GetKeys() const
+const std::vector<uint32_t>& VirtualTouchpad::GetKeys() const
 {
     static const std::vector<uint32_t> keys {
         BTN_0, BTN_1, BTN_2, BTN_3, BTN_4, BTN_5, BTN_6, BTN_STYLUS, BTN_TOOL_PEN
@@ -59,10 +61,12 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTouchpad::GetKeys() const
     return keys;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTouchpad::GetAbs() const
+const std::vector<uint32_t>& VirtualTouchpad::GetAbs() const
 {
     static const std::vector<uint32_t> abs {
         ABS_X, ABS_Y, ABS_WHEEL, ABS_MISC
     };
     return abs;
 }
+} // namespace MMI
+} // namespace OHOS

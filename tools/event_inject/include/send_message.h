@@ -25,7 +25,7 @@ public:
     ~SendMessage() = default;
     int32_t GetDevIndexName(const std::string& deviceName);
 private:
-    static constexpr int32_t INJECT_SLEEP_TIMES = 10;
+    static constexpr int64_t INJECT_SLEEP_TIMES = 10;
 };
 } // namespace MMI
 } // namespace OHOS
