@@ -122,6 +122,42 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectMouse_005, TestSize.Level1)
 }
 
 /**
+ * @tc.name:InjectEvent_InjectMouse_006
+ * @tc.desc: test inject mouse move interface
+ * @tc.type: FUNC
+ * @tc.require: SR000GGQBJ
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectMouse_006, TestSize.Level1)
+{
+    std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"input"};
+    char command2[] = {"-M"};
+    char command3[] = {"-m"};
+    char command4[] = {"1"};
+    char *argv[] = {command1, command2, command3, command4};
+    int32_t result = inputManagerCommand->ParseCommand(4, argv);
+    EXPECT_EQ(OHOS::EVENT_REG_FAIL, result);
+}
+
+/**
+ * @tc.name:InjectEvent_InjectMouse_007
+ * @tc.desc: test inject mouse down interface
+ * @tc.type: FUNC
+ * @tc.require: SR000GGQBJ
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectMouse_007, TestSize.Level1)
+{
+    std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"input"};
+    char command2[] = {"-M"};
+    char command3[] = {"-d"};
+    char command4[] = {"a"};
+    char *argv[] = {command1, command2, command3, command4};
+    int32_t result = inputManagerCommand->ParseCommand(4, argv);
+    EXPECT_EQ(OHOS::EVENT_REG_FAIL, result);
+}
+
+/**
  * @tc.name:InjectEvent_InjectKey_001
  * @tc.desc: test inject key down interface
  * @tc.type: FUNC
@@ -180,6 +216,26 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectKey_003, TestSize.Level1)
 }
 
 /**
+ * @tc.name:InjectEvent_InjectKey_004
+ * @tc.desc: test inject key up interface
+ * @tc.type: FUNC
+ * @tc.require: SR000GGQBJ
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectKey_004, TestSize.Level1)
+{
+    std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"input"};
+    char command2[] = {"-K"};
+    char command3[] = {"-d"};
+    char command4[] = {"1"};
+    char command5[] = {"-u"};
+    char command6[] = {"a"};
+    char *argv[] = {command1, command2, command3, command4, command5, command6};
+    int32_t result = inputManagerCommand->ParseCommand(6, argv);
+    EXPECT_EQ(OHOS::EVENT_REG_FAIL, result);
+}
+
+/**
  * @tc.name:InjectEvent_InjectTouch_001
  * @tc.desc: test inject touch move interface
  * @tc.type: FUNC
@@ -211,7 +267,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectTouch_002, TestSize.Level1)
     std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
     char command1[] = {"input"};
     char command2[] = {"-T"};
-    char command3[] = {"-m"};
+    char command3[] = {"-d"};
     char command4[] = {"10"};
     char command5[] = {"12"};
     char *argv[] = {command1, command2, command3, command4, command5};
@@ -236,6 +292,42 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectTouch_003, TestSize.Level1)
     char *argv[] = {command1, command2, command3, command4, command5};
     int32_t result = inputManagerCommand->ParseCommand(5, argv);
     EXPECT_EQ(OHOS::ERR_OK, result);
+}
+
+/**
+ * @tc.name:InjectEvent_InjectTouch_004
+ * @tc.desc: test inject touch down interface
+ * @tc.type: FUNC
+ * @tc.require: SR000GGQBJ
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectTouch_004, TestSize.Level1)
+{
+    std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"input"};
+    char command2[] = {"-T"};
+    char command3[] = {"-d"};
+    char command4[] = {"10"};
+    char *argv[] = {command1, command2, command3, command4};
+    int32_t result = inputManagerCommand->ParseCommand(4, argv);
+    EXPECT_EQ(OHOS::EVENT_REG_FAIL, result);
+}
+
+/**
+ * @tc.name:InjectEvent_InjectTouch_005
+ * @tc.desc: test inject touch up interface
+ * @tc.type: FUNC
+ * @tc.require: SR000GGQBJ
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectTouch_005, TestSize.Level1)
+{
+    std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"input"};
+    char command2[] = {"-T"};
+    char command3[] = {"-u"};
+    char command4[] = {"10"};
+    char *argv[] = {command1, command2, command3, command4};
+    int32_t result = inputManagerCommand->ParseCommand(4, argv);
+    EXPECT_EQ(OHOS::EVENT_REG_FAIL, result);
 }
 } // namespace MMI
 } // namespace OHOS
