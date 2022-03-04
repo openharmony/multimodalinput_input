@@ -100,7 +100,7 @@ bool UDSSession::SendMsg(NetPacket& pkt) const
 
 void UDSSession::AddEvent(int32_t id, int64_t time)
 {
-    MMI_LOGD("begin, event id: %{public}d", id);
+    MMI_LOGD("begin, event: %{public}d", id);
     EventTime eventTime = {id, time};
     events_.push_back(eventTime);
     MMI_LOGD("end");
@@ -108,7 +108,7 @@ void UDSSession::AddEvent(int32_t id, int64_t time)
 
 void UDSSession::DelEvents(int32_t id)
 {
-    MMI_LOGD("begin");
+    MMI_LOGD("begin, event: %{public}d", id);
     int32_t count = 0;
     for (auto &item : events_) {
         ++count;
