@@ -45,10 +45,7 @@ void InputEvent::Reset()
         actionTime_ = 0;
     }
     id_ = DEFALUTID;
-    int32_t conversionStep = 1000000;
-    uint64_t nowTime = (ts.tv_sec * static_cast<uint64_t>(1e3)) + (ts.tv_nsec / conversionStep);
-    int32_t actionTime = static_cast<int32_t>(nowTime);
-    actionTime_ = actionTime;
+    actionTime_ = (ts.tv_sec * 1000000 + (ts.tv_nsec / 1000));
     action_ = ACTION_UNKNOWN;
     actionStartTime_ = actionTime_;
     deviceId_ = DEFALUTID;
