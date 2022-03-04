@@ -43,7 +43,7 @@ int32_t UDSClient::ConnectTo()
     }
     if (epollFd_ < 0) {
         if (EpollCreat(MAX_EVENT_SIZE) < 0) {
-            MMI_LOGE("EpollCreat failed");
+            MMI_LOGE("Epoll creat failed");
             return RET_ERR;
         }
     }
