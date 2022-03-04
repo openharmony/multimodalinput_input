@@ -47,7 +47,7 @@ int32_t UDSClient::ConnectTo()
             return RET_ERR;
         }
     }
-    SetBlockMode(fd_); // 设置非阻塞模式
+    // SetBlockMode(fd_); // 设置非阻塞模式
 
     struct epoll_event ev;
     ev.events = EPOLLIN;
@@ -190,6 +190,7 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
     }
     auto isoverflow = false;
     for (size_t j = 0; j < maxCount; j++) {
+        // auto size = read(fd, static_cast<void *>(szBuf), MAX_PACKET_BUF_SIZE);
         auto size = recv(fd, szBuf, sizeof(szBuf), SOCKET_FLAGS);
         if (size < 0) {
             MMI_LOGE("size:%{public}zu", size);

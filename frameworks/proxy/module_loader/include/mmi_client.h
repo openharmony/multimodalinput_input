@@ -49,14 +49,16 @@ public:
 protected:
     virtual void OnConnected() override;
     virtual void OnDisconnected() override;
+    void OnThirdThread();
     bool StartEventRunner();
     bool AddFdListener(int32_t fd);
     bool DelFdListener(int32_t fd);
-    void OnThread();
 
 protected:
     ConnectCallback funConnected_;
     ConnectCallback funDisconnected_;
+
+    std::thread t_;
     std::shared_ptr<MMIEventHandler> eventHandler_ = nullptr;
 };
 } // namespace MMI

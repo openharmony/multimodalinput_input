@@ -175,7 +175,6 @@ enum class MmiMessageId : int32_t {
     ON_LIST,
     INJECT_KEY_EVENT = 14000,
     INJECT_POINTER_EVENT,
-    CLIENT_TEST001,
 
     END,
 };

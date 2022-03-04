@@ -61,16 +61,30 @@ bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
         MMI_LOGE("Client startup failed");
         return false;
     }
-    // if (!StartEventRunner()) {
-    //     MMI_LOGE("Start runner failed");
-    //     return false;
-    // }
+    if (!StartEventRunner()) {
+        MMI_LOGE("Start runner failed");
+        return false;
+    }
     return true;
+}
+
+void MMIClient::OnThirdThread()
+{
+    MMI_LOGD("enter");
+    uint64_t tid = GetThisThreadIdOfLL();
+    int32_t pid = GetPid();
+    MMI_LOGI("OnThread pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
+    CHKPV(eventHandler_);
+    auto runner = eventHandler_->GetEventRunner();
+    CHKPV(runner);
+    runner->Run();
+    MMI_LOGD("leave");
 }
 
 bool MMIClient::StartEventRunner()
 {
     MMI_LOGD("enter");
+    auto curRunner = EventRunner::Current();
     auto eventRunner = EventRunner::GetMainEventRunner();
     CHKPF(eventRunner);
     eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner, GetPtr());
@@ -90,6 +104,10 @@ bool MMIClient::StartEventRunner()
     //     MMI_LOGE("send ontimer event return false.");
     //     return false;
     // }
+    if (curRunner == nullptr) {
+        t_ = std::thread(std::bind(&MMIClient::OnThirdThread, this));
+        t_.detach();
+    }
     MMI_LOGD("leave");
     return true;
 }
