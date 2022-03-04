@@ -111,11 +111,12 @@ ohos_shared_library("libmmi-client") {
   public_deps = [ "//utils/native/base:utils" ]
 
   deps = [
+    ":libmmi-common",
     "//drivers/peripheral/input/hal:hdi_input",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
-    "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service"
+    "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
   ]
 
   part_name = "multimodalinput_base"
