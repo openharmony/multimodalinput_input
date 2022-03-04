@@ -63,7 +63,6 @@ bool ClientMsgHandler::Init()
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
         {MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::TouchpadEventInterceptor, this)},
         {MmiMessageId::KEYBOARD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::KeyEventInterceptor, this)},
-		{MmiMessageId::CLIENT_TEST001, MsgCallbackBind2(&ClientMsgHandler::ClientTest001, this)},
     };
     // LCOV_EXCL_STOP
     for (auto& it : funs) {
@@ -419,17 +418,6 @@ void ClientMsgHandler::OnEventProcessed(int32_t eventId)
         MMI_LOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
-}
-
-int32_t ClientMsgHandler::ClientTest001(const UDSClient& client, NetPacket& pkt)
-{
-    int32_t fd = 0;
-    int32_t count = 0;
-    static int32_t mcount = 0;
-    mcount += 1;
-    pkt >> fd >> count;
-    MMI_LOGD("enter. ClientTest001 %{public}d/%{public}d", mcount, count);
-    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

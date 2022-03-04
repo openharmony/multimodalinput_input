@@ -25,8 +25,6 @@
 #include "timer_manager.h"
 #include "util.h"
 
-#include "proto.h"
-
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -304,19 +302,6 @@ void MMIService::OnTimer()
         InputHandler->OnCheckEventReport();
     }
     TimerMgr->ProcessTimers();
-
-    // auto curTime = GetMillisTime();
-    // static auto lastTime = GetMillisTime();
-    // static int32_t scount = 0;
-    // if (curTime - lastTime >= 3000) {
-    //     int32_t fd = 12;
-    //     scount += 1;
-    //     NetPacket pkt(MmiMessageId::CLIENT_TEST001);
-    //     pkt << fd << scount;
-    //     Broadcast(pkt);
-    //     lastTime = GetMillisTime();
-    //     MMI_LOGD("Broadcast Test001 %{public}d", scount);
-    // }
 }
 
 void MMIService::OnThread()
