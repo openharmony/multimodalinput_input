@@ -335,11 +335,11 @@ bool InputWindowsManager::TouchDownPointToDisplayPoint(struct libinput_event_tou
     }
 
     for (const auto &display : logicalDisplays_) {
-        if (globalLogicalX < display.topLeftX || globalLogicalX > display.topLeftX + display.width) {
+        if ((globalLogicalX < display.topLeftX) || (globalLogicalX > display.topLeftX + display.width)) {
             continue;
         }
 
-        if (globalLogicalY < display.topLeftY || globalLogicalY > display.topLeftY + display.height) {
+        if ((globalLogicalY < display.topLeftY) || (globalLogicalY > display.topLeftY + display.height)) {
             continue;
         }
 
