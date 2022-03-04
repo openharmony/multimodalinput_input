@@ -35,7 +35,9 @@
 #include "virtual_remote_control.h"
 #include "virtual_touchscreen.h"
 
-bool OHOS::MMI::VirtualDevice::DoIoctl(int32_t fd, int32_t request, const uint32_t value)
+namespace OHOS {
+namespace MMI {
+bool VirtualDevice::DoIoctl(int32_t fd, int32_t request, const uint32_t value)
 {
     int32_t rc = ioctl(fd, request, value);
     if (rc < 0) {
@@ -45,15 +47,15 @@ bool OHOS::MMI::VirtualDevice::DoIoctl(int32_t fd, int32_t request, const uint32
     return true;
 }
 
-OHOS::MMI::VirtualDevice::VirtualDevice(const std::string &device_name, uint16_t busType,
-                                        uint16_t vendorId, uint16_t product_id)
+VirtualDevice::VirtualDevice(const std::string &device_name, uint16_t busType,
+    uint16_t vendorId, uint16_t product_id)
     : deviceName_(device_name),
       busTtype_(busType),
       vendorId_(vendorId),
       productId_(product_id),
       version_(1) {}  // The version number is one.
 
-OHOS::MMI::VirtualDevice::~VirtualDevice()
+VirtualDevice::~VirtualDevice()
 {
     if (fd_ >= 0) {
         ioctl(fd_, UI_DEV_DESTROY);
@@ -62,9 +64,9 @@ OHOS::MMI::VirtualDevice::~VirtualDevice()
     }
 }
 
-bool OHOS::MMI::VirtualDevice::CatFload(std::vector<std::string>& fileList)
+bool VirtualDevice::CatFload(std::vector<std::string>& fileList)
 {
-    DIR* dir = opendir(OHOS::MMI::g_folderpath.c_str());
+    DIR* dir = opendir(g_folderpath.c_str());
     if (dir == nullptr) {
         printf("Failed to open folder");
         return false;
@@ -83,7 +85,7 @@ bool OHOS::MMI::VirtualDevice::CatFload(std::vector<std::string>& fileList)
     return true;
 }
 
-bool OHOS::MMI::VirtualDevice::SyncSymbolFile()
+bool VirtualDevice::SyncSymbolFile()
 {
     std::vector<std::string> tempList;
     if (!CatFload(tempList)) {
@@ -124,7 +126,7 @@ bool OHOS::MMI::VirtualDevice::SyncSymbolFile()
     return true;
 }
 
-bool OHOS::MMI::VirtualDevice::CreateKey()
+bool VirtualDevice::CreateKey()
 {
     auto fun = [&](int32_t uiSet, const std::vector<uint32_t>& list) ->bool {
         for (const auto &item : list) {
@@ -151,7 +153,7 @@ bool OHOS::MMI::VirtualDevice::CreateKey()
     return true;
 }
 
-bool OHOS::MMI::VirtualDevice::SetAbsResolution(const std::string deviceName)
+bool VirtualDevice::SetAbsResolution(const std::string deviceName)
 {
     constexpr int32_t ABS_RESOLUTION = 200;
     constexpr int32_t ABS_RESOLUTION_FINGER = 40;
@@ -178,7 +180,7 @@ bool OHOS::MMI::VirtualDevice::SetAbsResolution(const std::string deviceName)
     return true;
 }
 
-bool OHOS::MMI::VirtualDevice::SetPhys(const std::string deviceName)
+bool VirtualDevice::SetPhys(const std::string deviceName)
 {
     std::string phys;
     std::map<std::string, std::string> typeDevice = {
@@ -204,7 +206,7 @@ bool OHOS::MMI::VirtualDevice::SetPhys(const std::string deviceName)
         {"Virtual TouchScreen",          "touchscreen"},
     };
     std::string deviceType = typeDevice.find(deviceName)->second;
-    phys.append(deviceType).append(OHOS::MMI::g_pid).append("/").append(OHOS::MMI::g_pid);
+    phys.append(deviceType).append(g_pid).append("/").append(g_pid);
 
     if (ioctl(fd_, UI_SET_PHYS, phys.c_str()) < 0) {
         return false;
@@ -212,7 +214,7 @@ bool OHOS::MMI::VirtualDevice::SetPhys(const std::string deviceName)
     return true;
 }
 
-bool OHOS::MMI::VirtualDevice::SetUp()
+bool VirtualDevice::SetUp()
 {
     fd_ = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
     if (fd_ < 0) {
@@ -251,11 +253,11 @@ bool OHOS::MMI::VirtualDevice::SetUp()
     return true;
 }
 
-void OHOS::MMI::VirtualDevice::CloseAllDevice(const std::vector<std::string>& fileList)
+void VirtualDevice::CloseAllDevice(const std::vector<std::string>& fileList)
 {
     for (auto it : fileList) {
         kill(atoi(it.c_str()), SIGKILL);
-        it.insert(0, OHOS::MMI::g_folderpath.c_str());
+        it.insert(0, g_folderpath.c_str());
         const int32_t ret = remove(it.c_str());
         if (ret == -1) {
             const int32_t errnoSaved = errno;
@@ -265,51 +267,51 @@ void OHOS::MMI::VirtualDevice::CloseAllDevice(const std::vector<std::string>& fi
     }
 }
 
-void OHOS::MMI::VirtualDevice::StartAllDevices()
+void VirtualDevice::StartAllDevices()
 {
-    static OHOS::MMI::VirtualMouse virtualMouse;
+    static VirtualMouse virtualMouse;
     virtualMouse.SetUp();
-    static OHOS::MMI::VirtualKeyboard virtualKey;
+    static VirtualKeyboard virtualKey;
     virtualKey.SetUp();
-    static OHOS::MMI::VirtualKeyboardSysCtrl virtualKeyboardSysCtrl;
+    static VirtualKeyboardSysCtrl virtualKeyboardSysCtrl;
     virtualKeyboardSysCtrl.SetUp();
-    static OHOS::MMI::VirtualKeyboardConsumerCtrl virtualKeyboardConsumerCtrl;
+    static VirtualKeyboardConsumerCtrl virtualKeyboardConsumerCtrl;
     virtualKeyboardConsumerCtrl.SetUp();
-    static OHOS::MMI::VirtualKeyboardExt virtualKeyext;
+    static VirtualKeyboardExt virtualKeyext;
     virtualKeyext.SetUp();
-    static OHOS::MMI::VirtualJoystick virtualJoystick;
+    static VirtualJoystick virtualJoystick;
     virtualJoystick.SetUp();
-    static OHOS::MMI::VirtualTrackball virtualTrackball;
+    static VirtualTrackball virtualTrackball;
     virtualTrackball.SetUp();
-    static OHOS::MMI::VirtualRemoteControl virtualRemoteControl;
+    static VirtualRemoteControl virtualRemoteControl;
     virtualRemoteControl.SetUp();
-    static OHOS::MMI::VirtualTrackpad virtualTrackpad;
+    static VirtualTrackpad virtualTrackpad;
     virtualTrackpad.SetUp();
-    static OHOS::MMI::VirtualTrackpadMouse virtualMousepadMouse;
+    static VirtualTrackpadMouse virtualMousepadMouse;
     virtualMousepadMouse.SetUp();
-    static OHOS::MMI::VirtualTrackpadSysCtrl virtualTrackpadSysCtrl;
+    static VirtualTrackpadSysCtrl virtualTrackpadSysCtrl;
     virtualTrackpadSysCtrl.SetUp();
-    static OHOS::MMI::VirtualKnob virtualKnob;
+    static VirtualKnob virtualKnob;
     virtualKnob.SetUp();
-    static OHOS::MMI::VirtualKnobConsumerCtrl virtualKnobConsumerCtrl;
+    static VirtualKnobConsumerCtrl virtualKnobConsumerCtrl;
     virtualKnobConsumerCtrl.SetUp();
-    static OHOS::MMI::VirtualKnobMouse virtualKnobMouse;
+    static VirtualKnobMouse virtualKnobMouse;
     virtualKnobMouse.SetUp();
-    static OHOS::MMI::VirtualKnobSysCtrl virtualKnobSysCtrl;
+    static VirtualKnobSysCtrl virtualKnobSysCtrl;
     virtualKnobSysCtrl.SetUp();
-    static OHOS::MMI::VirtualGamePad virtualGamePad;
+    static VirtualGamePad virtualGamePad;
     virtualGamePad.SetUp();
-    static OHOS::MMI::VirtualStylus virtualStylus;
+    static VirtualStylus virtualStylus;
     virtualStylus.SetUp();
-    static OHOS::MMI::VirtualTouchpad virtualTouchpad;
+    static VirtualTouchpad virtualTouchpad;
     virtualTouchpad.SetUp();
-    static OHOS::MMI::VirtualFinger virtualFinger;
+    static VirtualFinger virtualFinger;
     virtualFinger.SetUp();
-    static OHOS::MMI::VirtualTouchScreen virtualTouchScreen;
+    static VirtualTouchScreen virtualTouchScreen;
     virtualTouchScreen.SetUp();
 }
 
-void OHOS::MMI::VirtualDevice::MakeFolder(const std::string &filePath)
+void VirtualDevice::MakeFolder(const std::string &filePath)
 {
     DIR* dir = opendir(filePath.c_str());
     bool flag = false;
@@ -322,7 +324,7 @@ void OHOS::MMI::VirtualDevice::MakeFolder(const std::string &filePath)
     }
 }
 
-bool OHOS::MMI::VirtualDevice::SelectDevice(std::vector<std::string> &fileList)
+bool VirtualDevice::SelectDevice(std::vector<std::string> &fileList)
 {
     if (fileList.size() == MAX_PARAMETER_NUMBER) {
         printf("Invaild Input Para, Plase Check the validity of the para");
@@ -340,57 +342,57 @@ bool OHOS::MMI::VirtualDevice::SelectDevice(std::vector<std::string> &fileList)
     return true;
 }
 
-bool OHOS::MMI::VirtualDevice::CreateHandle(const std::string deviceArgv)
+bool VirtualDevice::CreateHandle(const std::string deviceArgv)
 {
     if (deviceArgv == "mouse") {
-        static OHOS::MMI::VirtualMouse virtualMouse;
+        static VirtualMouse virtualMouse;
         virtualMouse.SetUp();
     } else if (deviceArgv == "keyboard") {
-        static OHOS::MMI::VirtualKeyboard virtualKey;
+        static VirtualKeyboard virtualKey;
         virtualKey.SetUp();
-        static OHOS::MMI::VirtualKeyboardSysCtrl virtualKeyboardSysCtrl;
+        static VirtualKeyboardSysCtrl virtualKeyboardSysCtrl;
         virtualKeyboardSysCtrl.SetUp();
-        static OHOS::MMI::VirtualKeyboardConsumerCtrl virtualKeyboardConsumerCtrl;
+        static VirtualKeyboardConsumerCtrl virtualKeyboardConsumerCtrl;
         virtualKeyboardConsumerCtrl.SetUp();
-        static OHOS::MMI::VirtualKeyboardExt virtualKeyext;
+        static VirtualKeyboardExt virtualKeyext;
         virtualKeyext.SetUp();
     } else if (deviceArgv == "joystick") {
-        static OHOS::MMI::VirtualJoystick virtualJoystick;
+        static VirtualJoystick virtualJoystick;
         virtualJoystick.SetUp();
     } else if (deviceArgv == "trackball") {
-        static OHOS::MMI::VirtualTrackball virtualTrackball;
+        static VirtualTrackball virtualTrackball;
         virtualTrackball.SetUp();
     } else if (deviceArgv == "remotecontrol") {
-        static OHOS::MMI::VirtualRemoteControl virtualRemoteControl;
+        static VirtualRemoteControl virtualRemoteControl;
         virtualRemoteControl.SetUp();
     } else if (deviceArgv == "trackpad") {
-        static OHOS::MMI::VirtualTrackpad virtualTrackpad;
+        static VirtualTrackpad virtualTrackpad;
         virtualTrackpad.SetUp();
-        static OHOS::MMI::VirtualTrackpadMouse virtualMousepadMouse;
+        static VirtualTrackpadMouse virtualMousepadMouse;
         virtualMousepadMouse.SetUp();
-        static OHOS::MMI::VirtualTrackpadSysCtrl virtualTrackpadSysCtrl;
+        static VirtualTrackpadSysCtrl virtualTrackpadSysCtrl;
         virtualTrackpadSysCtrl.SetUp();
     } else if (deviceArgv == "knob") {
-        static OHOS::MMI::VirtualKnob virtualKnob;
+        static VirtualKnob virtualKnob;
         virtualKnob.SetUp();
-        static OHOS::MMI::VirtualKnobConsumerCtrl virtualKnobConsumerCtrl;
+        static VirtualKnobConsumerCtrl virtualKnobConsumerCtrl;
         virtualKnobConsumerCtrl.SetUp();
-        static OHOS::MMI::VirtualKnobMouse virtualKnobMouse;
+        static VirtualKnobMouse virtualKnobMouse;
         virtualKnobMouse.SetUp();
-        static OHOS::MMI::VirtualKnobSysCtrl virtualKnobSysCtrl;
+        static VirtualKnobSysCtrl virtualKnobSysCtrl;
         virtualKnobSysCtrl.SetUp();
     } else if (deviceArgv == "gamepad") {
-        static OHOS::MMI::VirtualGamePad virtualGamePad;
+        static VirtualGamePad virtualGamePad;
         virtualGamePad.SetUp();
     } else if (deviceArgv == "touchpad") {
-        static OHOS::MMI::VirtualStylus virtualStylus;
+        static VirtualStylus virtualStylus;
         virtualStylus.SetUp();
-        static OHOS::MMI::VirtualTouchpad virtualTouchpad;
+        static VirtualTouchpad virtualTouchpad;
         virtualTouchpad.SetUp();
-        static OHOS::MMI::VirtualFinger virtualFinger;
+        static VirtualFinger virtualFinger;
         virtualFinger.SetUp();
     } else if (deviceArgv == "touchscreen") {
-        static OHOS::MMI::VirtualTouchScreen virtualTouchScreen;
+        static VirtualTouchScreen virtualTouchScreen;
         virtualTouchScreen.SetUp();
     } else if (deviceArgv == "all") {
         StartAllDevices();
@@ -401,7 +403,7 @@ bool OHOS::MMI::VirtualDevice::CreateHandle(const std::string deviceArgv)
     return true;
 }
 
-bool OHOS::MMI::VirtualDevice::AddDevice(const std::vector<std::string>& fileList)
+bool VirtualDevice::AddDevice(const std::vector<std::string>& fileList)
 {
     if (fileList.size() == MAX_PARAMETER_NUMBER_FOR_ADD_DEL) {
         printf("Invaild Input Para, Plase Check the validity of the para");
@@ -413,7 +415,7 @@ bool OHOS::MMI::VirtualDevice::AddDevice(const std::vector<std::string>& fileLis
     }
 
     std::string symbolFile;
-    symbolFile.append(OHOS::MMI::g_folderpath).append(OHOS::MMI::g_pid).append("_").append(deviceArgv);
+    symbolFile.append(g_folderpath).append(g_pid).append("_").append(deviceArgv);
     std::ofstream flagFile;
     flagFile.open(symbolFile.c_str());
     if (!flagFile.is_open()) {
@@ -423,7 +425,7 @@ bool OHOS::MMI::VirtualDevice::AddDevice(const std::vector<std::string>& fileLis
     return true;
 }
 
-bool OHOS::MMI::VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
+bool VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
 {
     if (fileList.size() == MAX_PARAMETER_NUMBER_FOR_ADD_DEL) {
         printf("Invaild Input Para, Plase Check the validity of the para");
@@ -443,7 +445,7 @@ bool OHOS::MMI::VirtualDevice::CloseDevice(const std::vector<std::string>& fileL
         for (auto it : alldevice) {
             if (it.find(closePid) == 0) {
                 kill(atoi(it.c_str()), SIGKILL);
-                it.insert(0, OHOS::MMI::g_folderpath.c_str());
+                it.insert(0, g_folderpath.c_str());
                 const int32_t ret = remove(it.c_str());
                 if (ret == -1) {
                     const int32_t errnoSaved = errno;
@@ -460,7 +462,7 @@ bool OHOS::MMI::VirtualDevice::CloseDevice(const std::vector<std::string>& fileL
     }
 }
 
-bool OHOS::MMI::VirtualDevice::FunctionalShunt(const std::string firstArgv, std::vector<std::string> argvList)
+bool VirtualDevice::FunctionalShunt(const std::string firstArgv, std::vector<std::string> argvList)
 {
     SyncSymbolFile();
     if (firstArgv == "start") {
@@ -498,65 +500,67 @@ bool OHOS::MMI::VirtualDevice::FunctionalShunt(const std::string firstArgv, std:
     }
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualDevice::GetEventTypes() const
+const std::vector<uint32_t>& VirtualDevice::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {
     };
     return evt_types;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualDevice::GetKeys() const
+const std::vector<uint32_t>& VirtualDevice::GetKeys() const
 {
     static const std::vector<uint32_t> keys {
     };
     return keys;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualDevice::GetProperties() const
+const std::vector<uint32_t>& VirtualDevice::GetProperties() const
 {
     static const std::vector<uint32_t> properties {
     };
     return properties;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualDevice::GetAbs() const
+const std::vector<uint32_t>& VirtualDevice::GetAbs() const
 {
     static const std::vector<uint32_t> abs {
     };
     return abs;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualDevice::GetRelBits() const
+const std::vector<uint32_t>& VirtualDevice::GetRelBits() const
 {
     static const std::vector<uint32_t> relBits {
     };
     return relBits;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualDevice::GetLeds() const
+const std::vector<uint32_t>& VirtualDevice::GetLeds() const
 {
     static const std::vector<uint32_t> leds {
     };
     return leds;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualDevice::GetReps() const
+const std::vector<uint32_t>& VirtualDevice::GetReps() const
 {
     static const std::vector<uint32_t> reps {
     };
     return reps;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualDevice::GetMscs() const
+const std::vector<uint32_t>& VirtualDevice::GetMscs() const
 {
     static const std::vector<uint32_t> mscs {
     };
     return mscs;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualDevice::GetSws() const
+const std::vector<uint32_t>& VirtualDevice::GetSws() const
 {
     static const std::vector<uint32_t> sws {
     };
     return sws;
 }
+} // namespace MMI
+} // namespace OHOS

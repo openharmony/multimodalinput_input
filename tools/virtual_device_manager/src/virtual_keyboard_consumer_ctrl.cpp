@@ -15,7 +15,9 @@
 
 #include "virtual_keyboard_consumer_ctrl.h"
 
-OHOS::MMI::VirtualKeyboardConsumerCtrl::VirtualKeyboardConsumerCtrl() : VirtualDevice("Virtual KeyboardConsumerCtrl",
+namespace OHOS {
+namespace MMI {
+VirtualKeyboardConsumerCtrl::VirtualKeyboardConsumerCtrl() : VirtualDevice("Virtual KeyboardConsumerCtrl",
     BUS_USB, 0x24ae, 0x4035)
 {
     constexpr int32_t ABS_MAX_VOLUME = 572;
@@ -26,7 +28,7 @@ OHOS::MMI::VirtualKeyboardConsumerCtrl::VirtualKeyboardConsumerCtrl() : VirtualD
     dev_.absflat[ABS_VOLUME] = 0;
 }
 
-OHOS::MMI::VirtualKeyboardConsumerCtrl::~VirtualKeyboardConsumerCtrl() {}
+VirtualKeyboardConsumerCtrl::~VirtualKeyboardConsumerCtrl() {}
 
 static std::vector<uint32_t> g_virtualKey = {
     1, 28, 74, 78, 103, 105, 106, 108, 113, 114, 115, 116, 119, 128, 130, 131, 133, 134, 135, 136, 137, 138, 139, 140,
@@ -37,7 +39,7 @@ static std::vector<uint32_t> g_virtualKey = {
     429, 430, 431, 432, 433, 439, 442, 576, 577, 578, 579, 580, 581, 582, 583, 592, 593
 };
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardConsumerCtrl::GetEventTypes() const
+const std::vector<uint32_t>& VirtualKeyboardConsumerCtrl::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {
         EV_KEY, EV_REL, EV_ABS, EV_MSC
@@ -45,7 +47,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardConsumerCtrl::GetEventTyp
     return evt_types;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardConsumerCtrl::GetKeys() const
+const std::vector<uint32_t>& VirtualKeyboardConsumerCtrl::GetKeys() const
 {
     static const std::vector<uint32_t> keys(g_virtualKey.begin(),
                                             g_virtualKey.end());
@@ -53,7 +55,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardConsumerCtrl::GetKeys() c
     return keys;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardConsumerCtrl::GetRelBits() const
+const std::vector<uint32_t>& VirtualKeyboardConsumerCtrl::GetRelBits() const
 {
     static const std::vector<uint32_t> rels {
         REL_HWHEEL, REL_HWHEEL_HI_RES
@@ -62,7 +64,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardConsumerCtrl::GetRelBits(
     return rels;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardConsumerCtrl::GetAbs() const
+const std::vector<uint32_t>& VirtualKeyboardConsumerCtrl::GetAbs() const
 {
     static const std::vector<uint32_t> abs {
         ABS_VOLUME
@@ -71,10 +73,12 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardConsumerCtrl::GetAbs() co
     return abs;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboardConsumerCtrl::GetMscs() const
+const std::vector<uint32_t>& VirtualKeyboardConsumerCtrl::GetMscs() const
 {
     static const std::vector<uint32_t> mscs {
         MSC_SCAN
     };
     return mscs;
 }
+} // namespace MMI
+} // namespace OHOS
