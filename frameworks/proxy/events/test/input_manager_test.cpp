@@ -1954,10 +1954,10 @@ void InputEventInterceptor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEv
 {
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
     MMI_LOGD("Pointer event intercepted:");
-    MMI_LOGD("EventType:%{public}s, actionTime:%{public}" PRId64 ","
+    MMI_LOGD("eventType:%{public}s,actionTime:%{public}" PRId64 ","
              "action:%{public}d,actionStartTime:%{public}" PRId64 ","
-             "flag:%{public}u,pointerAction:%{public}s, sourceType:%{public}s, "
-             "VerticalAxisValue:%{public}.2f, HorizontalAxisValue:%{public}.2f, "
+             "flag:%{public}u,pointerAction:%{public}s,sourceType:%{public}s,"
+             "VerticalAxisValue:%{public}.2f,HorizontalAxisValue:%{public}.2f,"
              "pointerCount:%{public}zu",
              pointerEvent->DumpEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
@@ -1974,7 +1974,7 @@ void InputEventInterceptor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEv
             return;
         }
 
-        MMI_LOGD("DownTime:%{public}" PRId64 ",isPressed:%{public}s,"
+        MMI_LOGD("downTime:%{public}" PRId64 ",isPressed:%{public}s,"
                  "globalX:%{public}d,globalY:%{public}d,pressure:%{public}d",
                  item.GetDownTime(),
                  item.IsPressed() ? "true" : "false",
@@ -1992,9 +1992,9 @@ std::shared_ptr<OHOS::MMI::IInputEventConsumer> InputEventInterceptor::GetPtr()
 std::string InputManagerTest::DumpPointerItem2(const PointerEvent::PointerItem &item)
 {
     std::ostringstream strm;
-    strm << "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, downTime=" << item.GetDownTime()
-         << ",isPressed=" << std::boolalpha << item.IsPressed() << ",globalX=" << item.GetGlobalX()
-         << ",globalY=" << item.GetGlobalY() << ",pressure=" << item.GetPressure();
+    strm << "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, downTime:" << item.GetDownTime()
+         << ",isPressed:" << std::boolalpha << item.IsPressed() << ",globalX:" << item.GetGlobalX()
+         << ",globalY:" << item.GetGlobalY() << ",pressure:" << item.GetPressure();
     return strm.str();
 }
 
@@ -2003,16 +2003,16 @@ std::string InputManagerTest::DumpPointerEvent2(const std::shared_ptr<PointerEve
     const int precision = 2;
     std::ostringstream strm;
     strm << "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
-         << "eventType=" << pointerEvent->DumpEventType()
-         << ",actionTime=" << pointerEvent->GetActionTime()
-         << ",action=" << pointerEvent->GetAction()
-         << ",actionStartTime=" << pointerEvent->GetActionStartTime()
-         << ",flag=" << pointerEvent->GetFlag()
-         << ",pointerAction=" << pointerEvent->DumpPointerAction()
-         << ",sourceType=" << pointerEvent->DumpSourceType()
-         << ",VerticalAxisValue=" << std::fixed << std::setprecision(precision)
+         << "eventType:" << pointerEvent->DumpEventType()
+         << ",actionTime:" << pointerEvent->GetActionTime()
+         << ",action:" << pointerEvent->GetAction()
+         << ",actionStartTime:" << pointerEvent->GetActionStartTime()
+         << ",flag:" << pointerEvent->GetFlag()
+         << ",pointerAction:" << pointerEvent->DumpPointerAction()
+         << ",sourceType:" << pointerEvent->DumpSourceType()
+         << ",VerticalAxisValue:" << std::fixed << std::setprecision(precision)
          << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)
-         << ",HorizontalAxisValue=" << std::fixed << std::setprecision(precision)
+         << ",HorizontalAxisValue:" << std::fixed << std::setprecision(precision)
          << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL);
     return strm.str();
 }
@@ -2207,8 +2207,8 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_003, TestSize.Level1)
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
 {
     std::string command {
-        "InputInterceptorManager: in AddInterceptor, #[[:digit:]]\\{1,\\}, "
-        "No interceptor was specified"
+        "InputManagerImpl: in AddInterceptor, #[[:digit:]]\\{1,\\}, "
+        "CHKPR.interceptor. is null, return value is -1"
     };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
