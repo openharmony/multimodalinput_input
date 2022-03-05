@@ -377,10 +377,7 @@ int32_t InputEventHandler::OnEventTouchPadSecond(struct libinput_event *event)
     CHKPR(event, ERROR_NULL_POINTER);
 
     auto point = TouchTransformPointManger->OnLibinputTouchPadEvent(event);
-    if (point == nullptr) {
-        MMI_LOGW("PointerEvent is null");
-        return RET_OK;
-    }
+    CHKPR(point, RET_ERR);
     eventDispatch_.HandlePointerEvent(point);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
