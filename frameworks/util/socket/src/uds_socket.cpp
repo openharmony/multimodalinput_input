@@ -44,11 +44,17 @@ int32_t UDSSocket::EpollCreat(int32_t size)
 
 int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event& event, int32_t epollFd)
 {
-    CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    if (fd < 0) {
+        MMI_LOGE("Invalid fd");
+        return RET_ERR;
+    }
     if (epollFd < 0) {
         epollFd = epollFd_;
     }
-    CHKR(epollFd >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    if (epollFd < 0) {
+        MMI_LOGE("Invalid param epollFd");
+        return RET_ERR;
+    }
     auto ret = epoll_ctl(epollFd, op, fd, &event);
     if (ret < 0) {
         const int32_t errnoSaved = errno;
@@ -64,7 +70,10 @@ int32_t UDSSocket::EpollWait(struct epoll_event& events, int32_t maxevents, int3
     if (epollFd < 0) {
         epollFd = epollFd_;
     }
-    CHKR(epollFd >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    if (epollFd < 0) {
+        MMI_LOGE("Invalid param epollFd");
+        return RET_ERR;
+    }
     auto ret = epoll_wait(epollFd, &events, maxevents, timeout);
     if (ret < 0) {
         const int errnoSaved = errno;
@@ -76,7 +85,10 @@ int32_t UDSSocket::EpollWait(struct epoll_event& events, int32_t maxevents, int3
 
 int32_t UDSSocket::SetBlockMode(int32_t fd, bool isBlock)
 {
-    CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    if (fd < 0) {
+        MMI_LOGE("Invalid fd");
+        return RET_ERR;
+    }
     int32_t flags = fcntl(fd, F_GETFL);
     if (flags < 0) {
         MMI_LOGE("fcntl F_GETFL fail. fd:%{public}d,flags:%{public}d,msg:%{public}s,errCode:%{public}d",
@@ -109,8 +121,14 @@ void UDSSocket::EpollClose()
 size_t UDSSocket::Read(char *buf, size_t size)
 {
     CHKPR(buf, -1);
-    CHKR(size > 0, PARAM_INPUT_INVALID, -1);
-    CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
+    if (size <= 0) {
+        MMI_LOGE("Invalid param size");
+        return -1;
+    }
+    if (fd_ < 0) {
+        MMI_LOGE("Invalid param fd_");
+        return -1;
+    }
     ssize_t ret = read(fd_, static_cast<void *>(buf), size);
     if (ret < 0) {
         MMI_LOGE("read return %{public}zd", ret);
@@ -121,8 +139,14 @@ size_t UDSSocket::Read(char *buf, size_t size)
 size_t UDSSocket::Write(const char *buf, size_t size)
 {
     CHKPR(buf, -1);
-    CHKR(size > 0, PARAM_INPUT_INVALID, -1);
-    CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
+    if (size <= 0) {
+        MMI_LOGE("Invalid param size");
+        return -1;
+    }
+    if (fd_ < 0) {
+        MMI_LOGE("Invalid param fd_");
+        return -1;
+    }
     ssize_t ret = write(fd_, buf, size);
     if (ret < 0) {
         MMI_LOGE("write return %{public}zd", ret);
@@ -133,7 +157,10 @@ size_t UDSSocket::Write(const char *buf, size_t size)
 size_t UDSSocket::Send(const char *buf, size_t size, int32_t flags)
 {
     CHKPR(buf, -1);
-    CHKR(size > 0, PARAM_INPUT_INVALID, -1);
+    if (size <= 0) {
+        MMI_LOGE("Invalid param size");
+        return -1;
+    }
     ssize_t ret = send(fd_, buf, size, flags);
     if (ret < 0) {
         MMI_LOGE("send return %{public}zd", ret);
@@ -144,7 +171,10 @@ size_t UDSSocket::Send(const char *buf, size_t size, int32_t flags)
 size_t UDSSocket::Recv(char *buf, size_t size, int32_t flags)
 {
     CHKPR(buf, -1);
-    CHKR(size > 0, PARAM_INPUT_INVALID, -1);
+    if (size <= 0) {
+        MMI_LOGE("Invalid param size");
+        return -1;
+    }
     ssize_t ret = recv(fd_, static_cast<void *>(buf), size, flags);
     if (ret < 0) {
         MMI_LOGE("recv return %{public}zd", ret);
@@ -155,8 +185,14 @@ size_t UDSSocket::Recv(char *buf, size_t size, int32_t flags)
 size_t UDSSocket::Recvfrom(char *buf, size_t size, uint32_t flags, sockaddr *addr, size_t *addrlen)
 {
     CHKPR(buf, -1);
-    CHKR(size > 0, PARAM_INPUT_INVALID, -1);
-    CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
+    if (size <= 0) {
+        MMI_LOGE("Invalid param size");
+        return -1;
+    }
+    if (fd_ < 0) {
+        MMI_LOGE("Invalid param fd_");
+        return -1;
+    }
     ssize_t ret = recvfrom(fd_, static_cast<void *>(buf), size, flags, addr, reinterpret_cast<socklen_t *>(addrlen));
     if (ret < 0) {
         MMI_LOGE("recvfrom return %{public}zd", ret);
@@ -167,8 +203,14 @@ size_t UDSSocket::Recvfrom(char *buf, size_t size, uint32_t flags, sockaddr *add
 size_t UDSSocket::Sendto(const char *buf, size_t size, uint32_t flags, sockaddr *addr, size_t addrlen)
 {
     CHKPR(buf, -1);
-    CHKR(size > 0, PARAM_INPUT_INVALID, -1);
-    CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
+    if (size <= 0) {
+        MMI_LOGE("Invalid param size");
+        return -1;
+    }
+    if (fd_ < 0) {
+        MMI_LOGE("Invalid param fd_");
+        return -1;
+    }
     ssize_t ret = sendto(fd_, static_cast<const void *>(buf), size, flags, addr, static_cast<socklen_t>(addrlen));
     if (ret < 0) {
         MMI_LOGE("sendto return %{public}zd", ret);
