@@ -171,21 +171,63 @@ int32_t InputManagerImpl::PackDisplayData(OHOS::MMI::NetPacket &pkt)
 int32_t InputManagerImpl::PackPhysicalDisplay(NetPacket &pkt)
 {
     int32_t num = physicalDisplays_.size();
-    CHKR(pkt.Write(num), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    if (!pkt.Write(num)) {
+        MMI_LOGE("Packet write num failed");
+        return RET_ERR;
+    }
     for (int32_t i = 0; i < num; i++) {
-        CHKR(pkt.Write(physicalDisplays_[i].id), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(physicalDisplays_[i].leftDisplayId), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(physicalDisplays_[i].upDisplayId), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(physicalDisplays_[i].topLeftX), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(physicalDisplays_[i].topLeftY), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(physicalDisplays_[i].width), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(physicalDisplays_[i].height), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(physicalDisplays_[i].name), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(physicalDisplays_[i].seatId), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(physicalDisplays_[i].seatName), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(physicalDisplays_[i].logicWidth), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(physicalDisplays_[i].logicHeight), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(physicalDisplays_[i].direction), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        if (!pkt.Write(physicalDisplays_[i].id)) {
+            MMI_LOGE("Packet write physical data failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(physicalDisplays_[i].leftDisplayId)) {
+            MMI_LOGE("Packet write physical leftDisplay failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(physicalDisplays_[i].upDisplayId)) {
+            MMI_LOGE("Packet write physical upDisplay failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(physicalDisplays_[i].topLeftX)) {
+            MMI_LOGE("Packet write physical topLeftX failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(physicalDisplays_[i].topLeftY)) {
+            MMI_LOGE("Packet write physical topLeftY failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(physicalDisplays_[i].width)) {
+            MMI_LOGE("Packet write physical width failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(physicalDisplays_[i].height)) {
+            MMI_LOGE("Packet write physical height failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(physicalDisplays_[i].name)) {
+            MMI_LOGE("Packet write physical name failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(physicalDisplays_[i].seatId)) {
+            MMI_LOGE("Packet write physical seatId failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(physicalDisplays_[i].seatName)) {
+            MMI_LOGE("Packet write physical seatName failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(physicalDisplays_[i].logicWidth)) {
+            MMI_LOGE("Packet write physical logicWidth failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(physicalDisplays_[i].logicHeight)) {
+            MMI_LOGE("Packet write physical logicHeight failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(physicalDisplays_[i].direction)) {
+            MMI_LOGE("Packet write physical direction failed");
+            return RET_ERR;
+        }
     }
     return RET_OK;
 }
@@ -193,21 +235,57 @@ int32_t InputManagerImpl::PackPhysicalDisplay(NetPacket &pkt)
 int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
 {
     int32_t num = logicalDisplays_.size();
-    CHKR(pkt.Write(num), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    if (!pkt.Write(num)) {
+        MMI_LOGE("Packet write logical num failed");
+        return RET_ERR;
+    }
     for (int32_t i = 0; i < num; i++) {
-        CHKR(pkt.Write(logicalDisplays_[i].id), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(logicalDisplays_[i].topLeftX), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(logicalDisplays_[i].topLeftY), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(logicalDisplays_[i].width), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(logicalDisplays_[i].height), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(logicalDisplays_[i].name), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(logicalDisplays_[i].seatId), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(logicalDisplays_[i].seatName), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        CHKR(pkt.Write(logicalDisplays_[i].focusWindowId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        if (!pkt.Write(logicalDisplays_[i].id)) {
+            MMI_LOGE("Packet write logical data failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(logicalDisplays_[i].topLeftX)) {
+            MMI_LOGE("Packet write logical topLeftX failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(logicalDisplays_[i].topLeftY)) {
+            MMI_LOGE("Packet write logical topLeftY failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(logicalDisplays_[i].width)) {
+            MMI_LOGE("Packet write logical width failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(logicalDisplays_[i].height)) {
+            MMI_LOGE("Packet write logical height failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(logicalDisplays_[i].name)) {
+            MMI_LOGE("Packet write logical name failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(logicalDisplays_[i].seatId)) {
+            MMI_LOGE("Packet write logical seat failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(logicalDisplays_[i].seatName)) {
+            MMI_LOGE("Packet write logical seatName failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(logicalDisplays_[i].focusWindowId)) {
+            MMI_LOGE("Packet write logical focusWindow failed");
+            return RET_ERR;
+        }
         int32_t numWindow = logicalDisplays_[i].windowsInfo_.size();
-        CHKR(pkt.Write(numWindow), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        if (!pkt.Write(numWindow)) {
+            MMI_LOGE("Packet write logical numWindow failed");
+            return RET_ERR;
+        }
         for (int32_t j = 0; j < numWindow; j++) {
-            CHKR(pkt.Write(logicalDisplays_[i].windowsInfo_[j]), STREAM_BUF_WRITE_FAIL, RET_ERR);
+            if (!pkt.Write(logicalDisplays_[i].windowsInfo_[j])) {
+                MMI_LOGE("Packet write logical windowsInfo failed");
+                return RET_ERR;
+            }
         }
     }
     return RET_OK;
