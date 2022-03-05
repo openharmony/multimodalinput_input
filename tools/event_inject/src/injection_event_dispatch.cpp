@@ -123,8 +123,8 @@ int32_t InjectionEventDispatch::ExecuteFunction(std::string funId)
         MMI_LOGE("event injection Unknown fuction id:%{public}s", funId.c_str());
         return false;
     }
-    int32_t ret = RET_ERR;
     MMI_LOGI("Inject tools into function:%{public}s", funId.c_str());
+    int32_t ret = RET_ERR;
     ret = (*fun)();
     if (ret == RET_OK) {
         MMI_LOGI("injecte function success id:%{public}s", funId.c_str());

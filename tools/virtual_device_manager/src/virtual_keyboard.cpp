@@ -15,12 +15,14 @@
 
 #include "virtual_keyboard.h"
 
-OHOS::MMI::VirtualKeyboard::VirtualKeyboard() : VirtualDevice("Virtual keyboard",
+namespace OHOS {
+namespace MMI {
+VirtualKeyboard::VirtualKeyboard() : VirtualDevice("Virtual keyboard",
     BUS_USB, 0x24ae, 0x4035)
 {
 }
 
-OHOS::MMI::VirtualKeyboard::~VirtualKeyboard() {}
+VirtualKeyboard::~VirtualKeyboard() {}
 
 static std::vector<uint32_t> g_virtualKey = {
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
@@ -34,7 +36,7 @@ static std::vector<uint32_t> g_virtualKey = {
     153, 154, 157, 160, 162, 170, 175, 182, 200, 201, 202, 203, 204, 205, 101, 112, 118, 120
 };
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboard::GetEventTypes() const
+const std::vector<uint32_t>& VirtualKeyboard::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {
         EV_KEY, EV_MSC, EV_LED, EV_REP
@@ -42,7 +44,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboard::GetEventTypes() const
     return evt_types;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboard::GetKeys() const
+const std::vector<uint32_t>& VirtualKeyboard::GetKeys() const
 {
     static const std::vector<uint32_t> keys(g_virtualKey.begin(),
                                             g_virtualKey.end());
@@ -50,7 +52,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboard::GetKeys() const
     return keys;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboard::GetMscs() const
+const std::vector<uint32_t>& VirtualKeyboard::GetMscs() const
 {
     static const std::vector<uint32_t> mscs {
         MSC_SCAN
@@ -58,7 +60,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboard::GetMscs() const
     return mscs;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboard::GetLeds() const
+const std::vector<uint32_t>& VirtualKeyboard::GetLeds() const
 {
     static const std::vector<uint32_t> leds {
         LED_NUML, LED_CAPSL, LED_SCROLLL, LED_COMPOSE, LED_KANA
@@ -66,10 +68,12 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboard::GetLeds() const
     return leds;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualKeyboard::GetReps() const
+const std::vector<uint32_t>& VirtualKeyboard::GetReps() const
 {
     static const std::vector<uint32_t> reps {
         REP_DELAY, REP_PERIOD
     };
     return reps;
 }
+} // namespace MMI
+} // namespace OHOS

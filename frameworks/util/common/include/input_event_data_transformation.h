@@ -17,7 +17,6 @@
 
 #include "key_event.h"
 #include "net_packet.h"
-#include "proto.h"
 #include "pointer_event.h"
 
 namespace OHOS {

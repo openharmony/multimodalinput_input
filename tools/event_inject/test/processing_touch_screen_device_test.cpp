@@ -19,10 +19,13 @@
 #include "msg_head.h"
 #include "proto.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
-using namespace std;
+} // namespace
+
 class ProcessingTouchScreenDeviceTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
@@ -32,13 +35,13 @@ public:
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
-    const string path = "/data/json/Test_TransformTouchScreenJsonDataToInputData.json";
-    string startDeviceCmd = "mmi-virtual-device-manager start touchscreen & ";
-    string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    const std::string path = "/data/json/Test_TransformTouchScreenJsonDataToInputData.json";
+    std::string startDeviceCmd = "mmi-virtual-device-manager start touchscreen & ";
+    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
-    const string path = "temp/Test_TransformTouchScreenJsonDataToInputData.json";
-    string startDeviceCmd = "./mmi-virtual-deviced.out start touchscreen &";
-    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "temp/Test_TransformTouchScreenJsonDataToInputData.json";
+    std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchscreen &";
+    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -61,13 +64,13 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, Tes
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
-    const string path = "/data/json/Test_TransformJsonDataToInputDataEventsIsEmpty.json";
-    string startDeviceCmd = "mmi-virtual-device-manager start touchscreen & ";
-    string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    const std::string path = "/data/json/Test_TransformJsonDataToInputDataEventsIsEmpty.json";
+    std::string startDeviceCmd = "mmi-virtual-device-manager start touchscreen & ";
+    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
-    const string path = "temp/Test_TransformJsonDataToInputDataEventsIsEmpty.json";
-    string startDeviceCmd = "./mmi-virtual-deviced.out start touchscreen &";
-    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "temp/Test_TransformJsonDataToInputDataEventsIsEmpty.json";
+    std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchscreen &";
+    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -90,13 +93,13 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEvent
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataSingleEventsIsEmpty, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
-    const string path = "/data/json/Test_TransformJsonDataToInputDataSingleEventsIsEmpty.json";
-    string startDeviceCmd = "mmi-virtual-device-manager start touchscreen & ";
-    string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    const std::string path = "/data/json/Test_TransformJsonDataToInputDataSingleEventsIsEmpty.json";
+    std::string startDeviceCmd = "mmi-virtual-device-manager start touchscreen & ";
+    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
-    const string path = "temp/Test_TransformJsonDataToInputDataSingleEventsIsEmpty.json";
-    string startDeviceCmd = "./mmi-virtual-deviced.out start touchscreen &";
-    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "temp/Test_TransformJsonDataToInputDataSingleEventsIsEmpty.json";
+    std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchscreen &";
+    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -115,4 +118,5 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataSingl
     system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS
