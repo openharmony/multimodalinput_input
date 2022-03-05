@@ -80,11 +80,23 @@ MMIService::~MMIService() {}
 
 int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 {
-    CHKR((type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END), PARAM_INPUT_INVALID, RET_ERR);
-    CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
-    CHKR(mmiFd_ >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    if (!(type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END)) {
+        MMI_LOGE("Invalid param type");
+        return RET_ERR;
+    }
+    if (fd < 0) {
+        MMI_LOGE("Invalid param fd_");
+        return RET_ERR;
+    }
+    if (mmiFd_ < 0) {
+        MMI_LOGE("Invalid param mmiFd_");
+        return RET_ERR;
+    }
     auto eventData = static_cast<mmi_epoll_event*>(malloc(sizeof(mmi_epoll_event)));
-    CHKR(eventData, MALLOC_FAIL, RET_ERR);
+    if (!eventData) {
+        MMI_LOGE("Malloc failed");
+        return RET_ERR;
+    }
     eventData->fd = fd;
     eventData->event_type = type;
     MMI_LOGD("userdata:[fd:%{public}d,type:%{public}d]", eventData->fd, eventData->event_type);
@@ -169,22 +181,41 @@ int32_t MMIService::Init()
     InputHandler->Init(*this);
 
     MMI_LOGD("ServerMsgHandler Init");
-    CHKR(sMsgHandler_.Init(*this), SVR_MSG_HANDLER_INIT_FAIL, SVR_MSG_HANDLER_INIT_FAIL);
-
+    if (!sMsgHandler_.Init(*this)) {
+        MMI_LOGE("Message handler init failed");
+        return SVR_MSG_HANDLER_INIT_FAIL;
+    }
     MMI_LOGD("EventDump Init");
     MMIEventDump->Init(*this);
 
     MMI_LOGD("WindowsManager Init");
-    CHKR(WinMgr->Init(*this), WINDOWS_MSG_INIT_FAIL, WINDOWS_MSG_INIT_FAIL);
-
+    if (!WinMgr->Init(*this)) {
+        MMI_LOGE("Windows message init failed");
+        return WINDOWS_MSG_INIT_FAIL;
+    }
     MMI_LOGD("PointerDrawingManager Init");
-    CHKR(PointerDrawingManager::GetInstance()->Init(), POINTER_DRAW_INIT_FAIL, POINTER_DRAW_INIT_FAIL);
-
+    if (!PointerDrawingManager::GetInstance()->Init()) {
+        MMI_LOGE("Pointer draw init failed");
+        return POINTER_DRAW_INIT_FAIL;
+    }
+    
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
-    CHKR(mmiFd_ >= 0, EPOLL_CREATE_FAIL, EPOLL_CREATE_FAIL);
-    CHKR(InitService(), SASERVICE_INIT_FAIL, SASERVICE_INIT_FAIL);
-    CHKR(InitLibinputService(), LIBINPUT_INIT_FAIL, LIBINPUT_INIT_FAIL);
-    CHKR(InitSignalHandler(), INIT_SIGNAL_HANDLER_FAIL, INIT_SIGNAL_HANDLER_FAIL);
+    if (mmiFd_ < 0) {
+        MMI_LOGE("Epoll creat failed");
+        return EPOLL_CREATE_FAIL;
+    }
+    if (!InitService()) {
+        MMI_LOGE("Saservice init failed");
+        return SASERVICE_INIT_FAIL;
+    }
+    if (!InitLibinputService()) {
+        MMI_LOGE("Libinput init failed");
+        return LIBINPUT_INIT_FAIL;
+    }
+    if (!InitSignalHandler()) {
+        MMI_LOGE("Signal handler init failed");
+        return INIT_SIGNAL_HANDLER_FAIL;
+    }
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
     return RET_OK;
 }

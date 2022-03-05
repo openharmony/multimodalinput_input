@@ -15,6 +15,7 @@
 
 #include "uds_socket.h"
 #include <cinttypes>
+#include "error_multimodal.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -44,11 +45,17 @@ int32_t UDSSocket::EpollCreat(int32_t size)
 
 int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event& event, int32_t epollFd)
 {
-    CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    if (fd < 0) {
+        MMI_LOGE("Invalid fd");
+        return RET_ERR;
+    }
     if (epollFd < 0) {
         epollFd = epollFd_;
     }
-    CHKR(epollFd >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    if (epollFd < 0) {
+        MMI_LOGE("Invalid param epollFd");
+        return RET_ERR;
+    }
     auto ret = epoll_ctl(epollFd, op, fd, &event);
     if (ret < 0) {
         const int32_t errnoSaved = errno;
@@ -64,7 +71,10 @@ int32_t UDSSocket::EpollWait(struct epoll_event& events, int32_t maxevents, int3
     if (epollFd < 0) {
         epollFd = epollFd_;
     }
-    CHKR(epollFd >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    if (epollFd < 0) {
+        MMI_LOGE("Invalid param epollFd");
+        return RET_ERR;
+    }
     auto ret = epoll_wait(epollFd, &events, maxevents, timeout);
     if (ret < 0) {
         const int errnoSaved = errno;
@@ -76,7 +86,10 @@ int32_t UDSSocket::EpollWait(struct epoll_event& events, int32_t maxevents, int3
 
 int32_t UDSSocket::SetBlockMode(int32_t fd, bool isBlock)
 {
-    CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    if (fd < 0) {
+        MMI_LOGE("Invalid fd");
+        return RET_ERR;
+    }
     int32_t flags = fcntl(fd, F_GETFL);
     if (flags < 0) {
         MMI_LOGE("fcntl F_GETFL fail. fd:%{public}d,flags:%{public}d,msg:%{public}s,errCode:%{public}d",
