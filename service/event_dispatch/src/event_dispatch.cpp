@@ -168,23 +168,23 @@ void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, I
     std::string checkKeyCode;
     switch (handlerType) {
         case KEY_INTERCEPT_EVENT: {
-            checkKeyCode = "key intercept service GetKeyCode=" + std::to_string(keyCode);
+            checkKeyCode = "Intercept keycode=" + std::to_string(keyCode);
             break;
         }
         case KEY_LAUNCH_EVENT: {
-            checkKeyCode = "CheckLaunchAbility service GetKeyCode=" + std::to_string(keyCode);
+            checkKeyCode = "Launch keycode=" + std::to_string(keyCode);
             break;
         }
         case KEY_SUBSCRIBE_EVENT: {
-            checkKeyCode = "SubscribeKeyEvent service GetKeyCode=" + std::to_string(keyCode);
+            checkKeyCode = "Subscribe keycode=" + std::to_string(keyCode);
             break;
         }
         case KEY_DISPATCH_EVENT: {
-            checkKeyCode = "DispatchKeyEvent service GetKeyCode=" + std::to_string(keyCode);
+            checkKeyCode = "Dispatch keycode=" + std::to_string(keyCode);
             break;
         }
         default: {
-            MMI_LOGW("Unknow Event Handler type, type%{public}d", handlerType);
+            MMI_LOGW("Unknow Event Handler type, type:%{public}d", handlerType);
             break;
         }
     }
