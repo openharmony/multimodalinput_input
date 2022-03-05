@@ -209,7 +209,8 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
          TestSize.Level1)
 {
 #ifdef OHOS_BUILD
-    const std::string path = "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRockerDirectionKey.json";
+    const std::string path =
+     "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRockerDirectionKey.json";
     std::string startDeviceCmd = "mmi-virtual-device-manager start gamepad & ";
     std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
