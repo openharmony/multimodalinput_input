@@ -352,7 +352,7 @@ int32_t InputEventHandler::OnEventTouchSecond(struct libinput_event *event)
         MMI_LOGI("This touch event is canceled type:%{public}d", type);
         return RET_OK;
     }
-    auto point = TouchTransformPointManger->OnLibinputTouchEvent(event);
+    auto point = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
     CHKPR(point, ERROR_NULL_POINTER);
     int32_t pointerId = point->GetId();
     std::string touchEvent = "OnEventTouch";
@@ -376,7 +376,7 @@ int32_t InputEventHandler::OnEventTouchPadSecond(struct libinput_event *event)
     MMI_LOGD("Enter");
     CHKPR(event, ERROR_NULL_POINTER);
 
-    auto point = TouchTransformPointManger->OnLibinputTouchPadEvent(event);
+    auto point = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH_PAD);
     if (point == nullptr) {
         MMI_LOGW("PointerEvent is null");
         return RET_OK;
@@ -412,7 +412,7 @@ int32_t InputEventHandler::OnEventTouchpad(const multimodal_libinput_event& ev)
 int32_t InputEventHandler::OnGestureEvent(struct libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointer = TouchTransformPointManger->OnTouchPadGestrueEvent(event);
+    auto pointer = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_GESTURE);
     if (pointer == nullptr) {
         MMI_LOGE("Gesture event package failed, errCode:%{public}d", GESTURE_EVENT_PKG_FAIL);
         return GESTURE_EVENT_PKG_FAIL;
