@@ -72,8 +72,8 @@ bool InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> poin
         MMI_LOGE("%{public}s no interceptor to send msg", __func__);
         return false;
     }
-    PointerEvent::PointerItem pointer;
-    if (!(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer))) {
+    PointerEvent::PointerItem pointerItem;
+    if (!(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem))) {
         MMI_LOGE("The obtained pointer parameter is invalid");
         return false;
     }
@@ -81,7 +81,7 @@ bool InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> poin
              "sourceType:%{public}d,pointerAction:%{public}d,"
              "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
-             pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
+             pointerEvent->GetPointerId(), pointerItem.GetGlobalX(), pointerItem.GetGlobalY(), pointerItem.IsPressed());
     for (const auto &item : interceptors_) {
         NetPacket pkt(MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR);
         InputEventDataTransformation::Marshalling(pointerEvent, pkt);

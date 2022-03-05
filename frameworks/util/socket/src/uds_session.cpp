@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
+constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
 } // namespace
 
@@ -45,8 +45,8 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
     if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
-        MMI_LOGD("buf size:%{public}zu", size);
-        return PARAM_INPUT_INVALID;
+        MMI_LOGE("buf size:%{public}zu", size);
+        return false;
     }
     if (fd_ < 0) {
         MMI_LOGE("fd_ is less than 0");
