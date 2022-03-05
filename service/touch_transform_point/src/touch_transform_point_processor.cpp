@@ -71,7 +71,6 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     pointerEvent_->SetPointerId(seatSlot);
     MMI_LOGD("LogicalX:%{public}d, logicalY:%{public}d, logicalDisplay:%{public}d",
              logicalX, logicalY, logicalDisplayId);
-    MMI_LOGD("Leave");
     return true;
 }
 
@@ -88,6 +87,7 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
     int32_t logicalX = -1;
     int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
     if (!WinMgr->TouchMotionPointToDisplayPoint(data, direction_, logicalDisplayId, logicalX, logicalY)) {
+        MMI_LOGE("Get TouchMotionPointToDisplayPoint failed");
         return false;
     }
     PointerEvent::PointerItem item;
@@ -139,18 +139,21 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
             if (!OnEventTouchDown(event)) {
+                MMI_LOGE("Get OnEventTouchDown failed");
                 return nullptr;
             }
             break;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
             if (!OnEventTouchUp(event)) {
+                MMI_LOGE("Get OnEventTouchUp failed");
                 return nullptr;
             }
             break;
         }
         case LIBINPUT_EVENT_TOUCH_MOTION: {
             if (!OnEventTouchMotion(event)) {
+                MMI_LOGE("Get OnEventTouchMotion failed");
                 return nullptr;
             }
             break;
