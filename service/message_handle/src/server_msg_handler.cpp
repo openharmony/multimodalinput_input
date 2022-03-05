@@ -196,18 +196,15 @@ int32_t ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetPacket& pkt)
 int32_t ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    int64_t preHandlerTime = GetSysClockTime();
     auto creKey = KeyEvent::Create();
     int32_t errCode = InputEventDataTransformation::NetPacketToKeyEvent(pkt, creKey);
     if (errCode != RET_OK) {
         MMI_LOGE("Deserialization is Failed, errCode:%{public}u", errCode);
         return RET_ERR;
     }
-
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEventPid(*udsServer_, creKey, preHandlerTime);
-    if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d",
-            eventDispatchResult, KEY_EVENT_DISP_FAIL);
+    auto result = eventDispatch_.DispatchKeyEventPid(*udsServer_, creKey);
+    if (result != RET_OK) {
+        MMI_LOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d", result, KEY_EVENT_DISP_FAIL);
     }
     MMI_LOGD("Inject keyCode:%{public}d, action:%{public}d", creKey->GetKeyCode(), creKey->GetKeyAction());
     return RET_OK;
