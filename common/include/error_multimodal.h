@@ -88,10 +88,6 @@ namespace OHOS {
         TOUCH_EVENT_DISP_FAIL,                      // 触摸屏事件派发失败
         POINT_REG_EVENT_DISP_FAIL,                  // 鼠标注册事件派发失败
         POINT_EVENT_DISP_FAIL,                      // 鼠标事件派发失败
-        XKB_ALLOC_CONTEXT_FAIL,                     // XKB分配上下文失败
-        XKB_INCL_PATH_FAIL,                         // XKB包含路径失败
-        XKB_COMPILE_KEYMAP_FAIL,                    // XKB编译keymap失败
-        XKB_ALLOC_STATE_FAIL,                       // XKB分配state失败
         KEY_EVENT_PKG_FAIL,                         // 键盘事件封装失败
         POINT_EVENT_PKG_FAIL,                       // 鼠标事件封装失败
         JOYSTICK_AXIS_EVENT_PKG_FAIL,               // 摇杆手柄轴事件封装失败
