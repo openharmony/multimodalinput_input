@@ -16,7 +16,6 @@
 #define DEFINE_MULTIMODAL_H
 
 #include "mmi_log.h"
-
 #ifndef RET_OK
     #define RET_OK (0)
 #endif

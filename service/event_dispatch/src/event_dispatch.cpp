@@ -18,6 +18,7 @@
 #include "ability_launch_manager.h"
 #include "ability_manager_client.h"
 #include "bytrace.h"
+#include "error_multimodal.h"
 #include "event_filter_wrap.h"
 #include "hisysevent.h"
 #include "input_event_data_transformation.h"
@@ -27,7 +28,6 @@
 #include "input-event-codes.h"
 #include "interceptor_manager_global.h"
 #include "key_event_subscriber.h"
-#include "system_event_handler.h"
 #include "util.h"
 
 namespace OHOS {

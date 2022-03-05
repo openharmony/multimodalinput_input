@@ -69,7 +69,6 @@ ohos_shared_library("libmmi-util") {
   public_deps = [
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
-    "//third_party/bounds_checking_function:libsec_static",
     "//utils/native/base:utils",
   ]
 
