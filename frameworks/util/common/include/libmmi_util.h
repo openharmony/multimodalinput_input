@@ -17,8 +17,4 @@
 
 #include "config_multimodal.h"
 #include "define_multimodal.h"
-#include "error_multimodal.h"
-#include "struct_multimodal.h"
-#include "refbase.h"
-#include "securec.h"
 #endif // LIBMMI_UTIL_H

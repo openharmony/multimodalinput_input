@@ -20,16 +20,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorManager" };
-}
-
-JsInputMonitorManager::~JsInputMonitorManager()
-{
-    for (const auto &item : monitors_) {
-        item->Stop();
-    }
-    monitors_.clear();
-    RemoveAllEnv();
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorManager" };
 }
 
 JsInputMonitorManager& JsInputMonitorManager::GetInstance()
@@ -38,38 +29,46 @@ JsInputMonitorManager& JsInputMonitorManager::GetInstance()
     return instance;
 }
 
-void JsInputMonitorManager::AddMonitor(napi_env jsEnv, napi_value receiver)
+void JsInputMonitorManager::AddMonitor(napi_env jsEnv, napi_value callback)
 {
     MMI_LOGD("Enter");
     std::lock_guard<std::mutex> guard(mutex_);
-    for (auto& item : monitors_) {
-        if (item->IsMatch(jsEnv, receiver) != RET_ERR) {
+    for (const auto& item : monitors_) {
+        if (item->IsMatch(jsEnv, callback) != RET_ERR) {
+            MMI_LOGD("add js monitor failed");
             return;
         }
     }
-    std::shared_ptr<JsInputMonitor> monitor = std::make_shared<JsInputMonitor>(jsEnv, receiver, nextId_++);
-    monitors_.push_back(monitor);
+    auto monitor = std::make_shared<JsInputMonitor>(jsEnv, callback, nextId_++);
     if (!monitor->Start()) {
-        monitors_.pop_back();
+        MMI_LOGD("js monitor startup failed");
+        return;
     }
+    monitors_.push_back(monitor);
     MMI_LOGD("Leave");
 }
 
-void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv, napi_value receiver)
+void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv, napi_value callback)
 {
     MMI_LOGD("Enter");
     std::shared_ptr<JsInputMonitor> monitor = nullptr;
-    {
+    do {
         std::lock_guard<std::mutex> guard(mutex_);
-        for (auto it = monitors_.begin(); it != monitors_.end(); ++it) {
-            if ((*it)->IsMatch(jsEnv, receiver) == RET_OK) {
+        for (auto it = monitors_.begin(); it != monitors_.end();) {
+            if ((*it) == nullptr) {
+                it = monitors_.erase(it);
+                continue;
+            }
+            if ((*it)->IsMatch(jsEnv, callback) == RET_OK) {
                 monitor = *it;
                 monitors_.erase(it);
                 MMI_LOGD("Found monitor");
                 break;
             }
+            ++it;
         }
-    }
+    } while (0);
+    
     if (monitor != nullptr) {
         monitor->Stop();
     }
@@ -80,9 +79,13 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv)
 {
     MMI_LOGD("Enter");
     std::list<std::shared_ptr<JsInputMonitor>> monitors;
-    {
+    do {
         std::lock_guard<std::mutex> guard(mutex_);
         for (auto it = monitors_.begin(); it != monitors_.end();) {
+            if ((*it) == nullptr) {
+                it = monitors_.erase(it);
+                continue;
+            }
             if ((*it)->IsMatch(jsEnv) == RET_OK) {
                 monitors.push_back(*it);
                 monitors_.erase(it++);
@@ -90,7 +93,8 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv)
             }
             ++it;
         }
-    }
+    } while (0);
+
     for (const auto &item : monitors) {
         item->Stop();
     }
@@ -100,7 +104,7 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv)
 std::shared_ptr<JsInputMonitor> JsInputMonitorManager::GetMonitor(int32_t id) {
     MMI_LOGD("Enter");
     std::lock_guard<std::mutex> guard(mutex_);
-    for (auto &item : monitors_) {
+    for (const auto &item : monitors_) {
         if (item->GetId() == id) {
             MMI_LOGD("Leave");
             return item;
@@ -129,8 +133,8 @@ bool JsInputMonitorManager::AddEnv(napi_env env, napi_callback_info cbInfo)
                                 int32_t *id = static_cast<int32_t *>(data);
                                 delete id;
                                 id = nullptr;
-                                JSIMM.RemoveMonitor(env);
-                                JSIMM.RemoveEnv(env);
+                                JsInputMonMgr.RemoveMonitor(env);
+                                JsInputMonMgr.RemoveEnv(env);
                                 MMI_LOGD("napi_wrap leave");
                                 }, nullptr, nullptr);
     if (status != napi_ok) {

@@ -44,9 +44,6 @@
         "image_native",
         "libwm",
         "libwmutil",
-        "libxkbcommon",
-        "libwayland_server",
-        "libweston",
         "wmserver",
         "hisysevent_native"
       ],
