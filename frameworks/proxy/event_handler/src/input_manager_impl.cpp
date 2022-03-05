@@ -382,7 +382,7 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
-    CHKPR(interceptor, ERROR_NULL_POINTER);
+    CHKPR(interceptor, INVALID_HANDLER_ID);
     int32_t interceptorId = interceptorManager_.AddInterceptor(interceptor);
     if (interceptorId >= 0) {
         interceptorId = interceptorId * ADD_MASK_BASE + MASK_TOUCH;
