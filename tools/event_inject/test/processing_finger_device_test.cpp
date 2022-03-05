@@ -24,7 +24,6 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
-using namespace std;
 } // namespace
 
 class ProcessingFingerDeviceTest : public testing::Test {
@@ -36,13 +35,13 @@ public:
 HWTEST_F(ProcessingFingerDeviceTest, Test_TransformJsonDataToInputData, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
-    const string path = "/data/json/Test_TransformFingerJsonDataToInputData.json";
-    string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
-    string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    const std::string path = "/data/json/Test_TransformFingerJsonDataToInputData.json";
+    std::string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
+    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
-    const string path = "temp/Test_TransformFingerJsonDataToInputData.json";
-    string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
-    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "temp/Test_TransformFingerJsonDataToInputData.json";
+    std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
+    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
