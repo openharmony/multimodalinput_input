@@ -68,10 +68,7 @@ struct SeatInfo {
     int32_t deviceFlags;
     int32_t focusWindowId;
 };
-struct multimodal_libinput_event {
-    struct libinput_event *event;
-    void *userdata;
-};
+
 struct MouseLocation {
     int32_t globalX;
     int32_t globalY;
