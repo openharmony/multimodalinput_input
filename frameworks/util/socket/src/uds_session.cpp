@@ -53,7 +53,6 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         MMI_LOGE("fd_ is less than 0");
         return false;
     }
-    // ssize_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
     ssize_t ret = send(fd_, buf, size, SOCKET_FLAGS);
     if (ret < 0) {
         const int32_t errNoSaved = errno;

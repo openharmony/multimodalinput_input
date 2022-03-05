@@ -30,8 +30,7 @@ enum MmiEventHandlerId : uint32_t {
     MMI_EVENT_HANDLER_ID_END,
 };
 
-class MMIEventHandler : public AppExecFwk::EventHandler
-{
+class MMIEventHandler : public AppExecFwk::EventHandler {
 public:
     explicit MMIEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner, MMIClientPtr client);
     virtual ~MMIEventHandler();
@@ -52,4 +51,3 @@ private:
 } // namespace MMI
 } // namespace OHOS
 #endif // MMI_EVENT_HANDLER_H
-

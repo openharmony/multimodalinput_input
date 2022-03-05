@@ -19,8 +19,7 @@
 
 namespace OHOS {
 namespace MMI {
-class MMIFdListener : public AppExecFwk::FileDescriptorListener
-{
+class MMIFdListener : public AppExecFwk::FileDescriptorListener {
 public:
     MMIFdListener(MMIClientPtr client);
     virtual ~MMIFdListener();
@@ -36,4 +35,3 @@ private:
 } // namespace MMI
 } // namespace OHOS
 #endif // MMI_FD_LISTENER_H
-

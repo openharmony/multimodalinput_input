@@ -156,7 +156,6 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
-    // SetBlockMode(serverFd); // 设置非阻塞模式
 
     MMI_LOGD("alloc socketpair, serverFd:%{public}d,clientFd:%{public}d(%{public}d)",
              serverFd, toReturnClientFd, sockFds[1]);
@@ -336,7 +335,6 @@ void UDSServer::OnEvent(const struct epoll_event& ev, std::map<int32_t, StreamBu
         }
         char szBuf[MAX_PACKET_BUF_SIZE] = {};
         for (size_t j = 0; j < maxCount; j++) {
-            // auto size = read(fd, (void*)szBuf, MAX_PACKET_BUF_SIZE);
             auto size = recv(fd, szBuf, sizeof(szBuf), SOCKET_FLAGS);
 #ifdef OHOS_BUILD_HAVE_DUMP_DATA
             DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
@@ -384,7 +382,6 @@ void UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct ep
         }
         char szBuf[MAX_PACKET_BUF_SIZE] = {};
         for (size_t j = 0; j < maxCount; j++) {
-            // auto size = read(fd, (void*)szBuf, MAX_PACKET_BUF_SIZE);
             auto size = recv(fd, szBuf, sizeof(szBuf), SOCKET_FLAGS);
 #ifdef OHOS_BUILD_HAVE_DUMP_DATA
             DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
