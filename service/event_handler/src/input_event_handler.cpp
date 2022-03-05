@@ -407,7 +407,7 @@ int32_t InputEventHandler::OnGestureEvent(struct libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TouchTransformPointManger->OnTouchPadGestrueEvent(event);
-    CHKPR(event, GESTURE_EVENT_PKG_FAIL);
+    CHKPR(pointerEvent, GESTURE_EVENT_PKG_FAIL);
     MMI_LOGD("GestrueEvent package, eventType:%{public}d,actionTime:%{public}" PRId64 ","
              "action:%{public}d,actionStartTime:%{public}" PRId64 ","
              "pointerAction:%{public}d,sourceType:%{public}d,"
