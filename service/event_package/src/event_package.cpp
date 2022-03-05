@@ -21,7 +21,6 @@ namespace {
 const std::string VIRTUAL_KEYBOARD = "virtual_keyboard";
 constexpr uint32_t SEAT_KEY_COUNT_ONE = 1;
 constexpr uint32_t SEAT_KEY_COUNT_ZERO = 0;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventPackage" };
 }
 
 EventPackage::EventPackage() {}

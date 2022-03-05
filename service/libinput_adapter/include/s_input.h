@@ -17,8 +17,8 @@
 #include <thread>
 #include <libudev.h>
 #include <functional>
-#include <libinput.h>
 #include <sys/epoll.h>
+#include "libinput.h"
 #include "nocopyable.h"
 
 namespace OHOS {
