@@ -17,7 +17,8 @@ import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 module_output_path = "multimodalinput/unit_out"
 
 import("//foundation/appexecfwk/standard/appexecfwk.gni")
-import("//foundation/appexecfwk/standard/libs/libeventhandler/lib_event_handler_sources.gni")
+import(
+    "//foundation/appexecfwk/standard/libs/libeventhandler/lib_event_handler_sources.gni")
 
 config("libmmi_client_config") {
   visibility = [ ":*" ]
@@ -118,12 +119,12 @@ ohos_shared_library("libmmi-client") {
 
   deps = [
     ":libmmi-common",
+    "${appexecfwk_path}/interfaces/innerkits/libeventhandler:libeventhandler",
     "//drivers/peripheral/input/hal:hdi_input",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
-    "${appexecfwk_path}/interfaces/innerkits/libeventhandler:libeventhandler",
   ]
 
   part_name = "multimodalinput_base"
@@ -180,12 +181,12 @@ ohos_unittest("ut-mmi-proxy-out") {
   sources = [ "module_loader/test/mmi_client_test.cpp" ]
 
   deps = [
+    "${appexecfwk_path}/interfaces/innerkits/libeventhandler:libeventhandler",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "${appexecfwk_path}/interfaces/innerkits/libeventhandler:libeventhandler",
   ]
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 }

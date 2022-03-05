@@ -24,9 +24,8 @@ namespace {
 }
 
 using namespace AppExecFwk;
-MMIEventHandler::MMIEventHandler(const std::shared_ptr<EventRunner> &runner, MMIClientPtr client) :
-    EventHandler(runner),
-    mmiClient_(client)
+MMIEventHandler::MMIEventHandler(const std::shared_ptr<EventRunner> &runner, MMIClientPtr client)
+    : EventHandler(runner), mmiClient_(client)
 {
 }
 
