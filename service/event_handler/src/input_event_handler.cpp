@@ -351,7 +351,7 @@ int32_t InputEventHandler::OnEventTouchSecond(struct libinput_event *event)
     }
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    int32_t pointerId = point->GetId();
+    int32_t pointerId = pointerEvent->GetId();
     std::string touchEvent = "OnEventTouch";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, pointerId);
     eventDispatch_.HandlePointerEvent(pointerEvent);
