@@ -79,12 +79,6 @@ void MMIFdListener::OnReadable(int32_t fd)
     if (!isoverflow && buf.Size() > 0) {
         mmiClient_->OnRecvMsg(buf.Data(), buf.Size());
     }
-
-    // int32_t i = 10;
-    // while (i-- >= 0) {
-    //     std::this_thread::sleep_for(std::chrono::seconds(10));
-    //     MMI_LOGW("OnReadable sleeping.... %{public}d pid:%{public}d tid:%{public}" PRIu64, i, pid, tid);
-    // }
 }
 
 void MMIFdListener::OnShutdown(int32_t fd)
@@ -110,7 +104,5 @@ void MMIFdListener::OnException(int32_t fd)
     CHKPV(mmiClient_);
     mmiClient_->OnDisconnect();
 }
-
 } // namespace MMI
 } // namespace OHOS
-

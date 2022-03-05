@@ -260,4 +260,3 @@ void MMIClient::Stop()
 }
 } // namespace MMI
 } // namespace OHOS
-

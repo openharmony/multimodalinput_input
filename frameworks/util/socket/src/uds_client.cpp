@@ -47,7 +47,6 @@ int32_t UDSClient::ConnectTo()
             return RET_ERR;
         }
     }
-    // SetBlockMode(fd_); // 设置非阻塞模式
 
     struct epoll_event ev;
     ev.events = EPOLLIN;
@@ -71,10 +70,9 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
         MMI_LOGE("fd_ is less than 0");
         return false;
     }
-    // ssize_t ret = write(fd_, static_cast<const void *>(buf), size);
     ssize_t ret = send(fd_, buf, size, SOCKET_FLAGS);
     if (ret < 0) {
-        MMI_LOGE("SendMsg write errCode:%{public}d,return %{public}zd,strerr:%{public}s", 
+        MMI_LOGE("SendMsg write errCode:%{public}d,return %{public}zd,strerr:%{public}s",
             MSG_SEND_FAIL, ret, strerror(errno));
         return false;
     }
@@ -107,13 +105,6 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
             return false;
         }
     }
-    // t_ = std::thread(std::bind(&UDSClient::OnThread, this));
-    // if (detachMode) {
-    //     MMI_LOGW("uds client thread detach");
-    //     t_.detach();
-    // } else {
-    //     MMI_LOGW("uds client thread join");
-    // }
     return true;
 }
 
@@ -127,10 +118,6 @@ void UDSClient::Stop()
         EpollCtl(fd_, EPOLL_CTL_DEL, ev);
     }
     EpollClose();
-    // if (t_.joinable()) {
-    //     MMI_LOGD("thread join");
-    //     t_.join();
-    // }
     MMI_LOGD("leave");
 }
 
@@ -190,7 +177,6 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
     }
     auto isoverflow = false;
     for (size_t j = 0; j < maxCount; j++) {
-        // auto size = read(fd, static_cast<void *>(szBuf), MAX_PACKET_BUF_SIZE);
         auto size = recv(fd, szBuf, sizeof(szBuf), SOCKET_FLAGS);
         if (size < 0) {
             MMI_LOGE("size:%{public}zu", size);

@@ -25,7 +25,8 @@ namespace {
 
 using namespace AppExecFwk;
 MMIEventHandler::MMIEventHandler(const std::shared_ptr<EventRunner> &runner, MMIClientPtr client) :
-    EventHandler(runner), mmiClient_(client)
+    EventHandler(runner),
+    mmiClient_(client)
 {
 }
 
@@ -91,7 +92,5 @@ void MMIEventHandler::ProcessEvent(const InnerEvent::Pointer &event)
         }
     }
 }
-
 } // namespace MMI
 } // namespace OHOS
-
