@@ -20,13 +20,11 @@
 namespace OHOS {
 namespace MMI {
 #define EVENT_TIME_ONRECONNECT (3*1000)
-#define EVENT_TIME_ONTIMER (6*1000)
 
 enum MmiEventHandlerId : uint32_t {
     MMI_EVENT_HANDLER_ID_INVALID = 0,
     MMI_EVENT_HANDLER_ID_BEGIN = 1,
     MMI_EVENT_HANDLER_ID_RECONNECT = MMI_EVENT_HANDLER_ID_BEGIN,
-    MMI_EVENT_HANDLER_ID_ONTIMER,
     MMI_EVENT_HANDLER_ID_STOP,
 
     MMI_EVENT_HANDLER_ID_END,
@@ -43,7 +41,6 @@ public:
 
 protected:
     void OnReconnect(const AppExecFwk::InnerEvent::Pointer &event);
-    void OnTimer(const AppExecFwk::InnerEvent::Pointer &event);
     void OnStop(const AppExecFwk::InnerEvent::Pointer &event);
 
 protected:
@@ -55,3 +52,4 @@ private:
 } // namespace MMI
 } // namespace OHOS
 #endif // MMI_EVENT_HANDLER_H
+
