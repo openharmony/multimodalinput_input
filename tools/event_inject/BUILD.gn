@@ -103,7 +103,6 @@ ohos_unittest("ut-event-injection-out") {
     "//drivers/adapter/uhdf2/adapter/osal/include",
     "//utils/native/base/include",
     "//third_party/googletest/googletest/include",
-    "//third_party/wayland-ivi-extension/include",
     "//utils/native/base/include",
     "${mmi_path}/common/include",
     "${mmi_path}/frameworks/proxy/event_handler",
@@ -182,9 +181,6 @@ ohos_unittest("ut-event-injection-out") {
     "${mmi_path}/tools/event_inject:event-injection",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//third_party/libxkbcommon:libxkbcommon",
-    "//third_party/wayland-ivi-extension:ivi-controller",
-    "//third_party/wayland-ivi-extension:libscreen-info-module",
     "//utils/native/base:utils",
   ]
 

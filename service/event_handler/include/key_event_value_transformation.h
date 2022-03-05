@@ -17,41 +17,17 @@
 #define KEY_EVENT_VALUE_TRANSFORMATION_H
 
 #include <string>
-#include <map>
-#include <iostream>
-#include <xkbcommon/xkbcommon.h>
-#include "hos_key_event.h"
-#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
-enum MMI_SYSTEM_KEY_STATE {
-    MMI_NO_SYSTEM_KEY = 0,
-    MMI_SYSTEM_KEY = 1,
-};
-
 struct KeyEventValueTransformations {
     std::string keyEvent;
     int16_t keyValueOfNative;
     int16_t keyValueOfSys;
     int16_t keyEventOfSys;
-    int16_t isSystemKey;
 };
 
 KeyEventValueTransformations KeyValueTransformationInput(int16_t keyValueOfInput);
-
-class KeyEventValueTransformation {
-public:
-    KeyEventValueTransformation();
-    DISALLOW_COPY_AND_MOVE(KeyEventValueTransformation);
-    virtual ~KeyEventValueTransformation();
-
-    bool Init();
-    uint32_t KeyboardHandleKeySym(uint32_t keyboardKey);
-
-private:
-    struct xkb_state *state_ = nullptr;
-};
 } // namespace MMI
 } // namespace OHOS
 

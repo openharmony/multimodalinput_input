@@ -20,7 +20,6 @@
 #include "util.h"
 #include "hilog/log.h"
 #include "klog.h"
-
 namespace OHOS {
 namespace MMI {
 namespace {

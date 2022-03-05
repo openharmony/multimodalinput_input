@@ -18,6 +18,7 @@
 #include "ability_launch_manager.h"
 #include "event_dump.h"
 #include "event_package.h"
+#include "hos_key_event.h"
 #include "input_device_manager.h"
 #include "input_event_data_transformation.h"
 #include "input_event.h"

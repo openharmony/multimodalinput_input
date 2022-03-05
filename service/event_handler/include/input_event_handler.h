@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace MMI {
-using EventFun = std::function<int32_t(const multimodal_libinput_event& ev)>;
+using EventFun = std::function<int32_t(libinput_event *event)>;
 using NotifyDeviceChange = std::function<void(int32_t, int32_t, char *)>;
 class InputEventHandler : public MsgHandler<EventFun>, public DelayedSingleton<InputEventHandler> {
 public:
@@ -38,29 +38,28 @@ public:
     UDSServer *GetUDSServer();
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
 protected:
-    int32_t OnEventDeviceAdded(const multimodal_libinput_event& event);
-    int32_t OnEventDeviceRemoved(const multimodal_libinput_event& event);
-    int32_t OnEventPointer(const multimodal_libinput_event& event);
-    int32_t OnEventTouch(const multimodal_libinput_event& event);
-    int32_t OnEventTouchSecond(struct libinput_event *event);
-    int32_t OnEventTouchPadSecond(struct libinput_event *event);
-    int32_t OnEventGesture(const multimodal_libinput_event& event);
-    int32_t OnEventTouchpad(const multimodal_libinput_event& event);
-    int32_t OnGestureEvent(struct libinput_event *event);
-    int32_t OnKeyboardEvent(const multimodal_libinput_event& event);
-    int32_t OnKeyEventDispatch(const multimodal_libinput_event& event);
+    int32_t OnEventDeviceAdded(libinput_event *event);
+    int32_t OnEventDeviceRemoved(libinput_event *event);
+    int32_t OnEventPointer(libinput_event *event);
+    int32_t OnEventTouch(libinput_event *event);
+    int32_t OnEventTouchSecond(libinput_event *event);
+    int32_t OnEventTouchPadSecond(libinput_event *event);
+    int32_t OnEventGesture(libinput_event *event);
+    int32_t OnEventTouchpad(libinput_event *event);
+    int32_t OnGestureEvent(libinput_event *event);
+    int32_t OnKeyboardEvent(libinput_event *event);
+    int32_t OnKeyEventDispatch(libinput_event *event);
     
     int32_t OnMouseEventHandler(struct libinput_event *event);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
 
 private:
-    int32_t OnEventHandler(const multimodal_libinput_event& ev);
+    int32_t OnEventHandler(libinput_event *event);
     int32_t OnEventKey(struct libinput_event *event);
     std::mutex mu_;
     UDSServer *udsServer_ = nullptr;
     EventDispatch eventDispatch_;
     EventPackage eventPackage_;
-    KeyEventValueTransformation xkbKeyboardHandlerKey_;
     NotifyDeviceChange notifyDeviceChange_;
     std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent_ = nullptr;
 
