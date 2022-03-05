@@ -352,18 +352,18 @@ int32_t InputEventHandler::OnEventTouchSecond(struct libinput_event *event)
         MMI_LOGD("This touch event is canceled type:%{public}d", type);
         return RET_OK;
     }
-    auto point = TouchTransformPointManger->OnLibinputTouchEvent(event);
-    CHKPR(point, ERROR_NULL_POINTER);
-    int32_t pointerId = point->GetId();
+    auto pointerEvent = TouchTransformPointManger->OnLibinputTouchEvent(event);
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    int32_t pointerId = pointerEvent->GetId();
     std::string touchEvent = "OnEventTouch";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, pointerId);
-    eventDispatch_.HandlePointerEvent(point);
+    eventDispatch_.HandlePointerEvent(pointerEvent);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
-        point->RemovePointerItem(point->GetPointerId());
+        pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
         MMI_LOGD("This touch event is up remove this finger");
-        if (point->GetPointersIdList().empty()) {
+        if (pointerEvent->GetPointersIdList().empty()) {
             MMI_LOGD("This touch event is final finger up remove this finger");
-            point->Reset();
+            pointerEvent->Reset();
         }
         return RET_OK;
     }
@@ -376,19 +376,19 @@ int32_t InputEventHandler::OnEventTouchPadSecond(struct libinput_event *event)
     MMI_LOGD("Enter");
     CHKPR(event, ERROR_NULL_POINTER);
 
-    auto point = TouchTransformPointManger->OnLibinputTouchPadEvent(event);
-    if (point == nullptr) {
+    auto pointerEvent = TouchTransformPointManger->OnLibinputTouchPadEvent(event);
+    if (pointerEvent == nullptr) {
         MMI_LOGW("PointerEvent is null");
         return RET_OK;
     }
-    eventDispatch_.HandlePointerEvent(point);
+    eventDispatch_.HandlePointerEvent(pointerEvent);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
-        point->RemovePointerItem(point->GetPointerId());
+        pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
         MMI_LOGD("This touch pad event is up remove this finger");
-        if (point->GetPointersIdList().empty()) {
+        if (pointerEvent->GetPointersIdList().empty()) {
             MMI_LOGD("This touch pad event is final finger up remove this finger");
-            point->Reset();
+            pointerEvent->Reset();
         }
         return RET_OK;
     }
@@ -412,8 +412,8 @@ int32_t InputEventHandler::OnEventTouchpad(const multimodal_libinput_event& ev)
 int32_t InputEventHandler::OnGestureEvent(struct libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointer = TouchTransformPointManger->OnTouchPadGestrueEvent(event);
-    if (pointer == nullptr) {
+    auto pointerEvent = TouchTransformPointManger->OnTouchPadGestrueEvent(event);
+    if (pointerEvent == nullptr) {
         MMI_LOGE("Gesture event package failed, errCode:%{public}d", GESTURE_EVENT_PKG_FAIL);
         return GESTURE_EVENT_PKG_FAIL;
     }
@@ -421,13 +421,13 @@ int32_t InputEventHandler::OnGestureEvent(struct libinput_event *event)
              "action:%{public}d,actionStartTime:%{public}" PRId64 ","
              "pointerAction:%{public}d,sourceType:%{public}d,"
              "PinchAxisValue:%{public}.2f",
-             pointer->GetEventType(), pointer->GetActionTime(),
-             pointer->GetAction(), pointer->GetActionStartTime(),
-             pointer->GetPointerAction(), pointer->GetSourceType(),
-             pointer->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH));
+             pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
+             pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
+             pointerEvent->GetPointerAction(), pointerEvent->GetSourceType(),
+             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH));
 
     PointerEvent::PointerItem item;
-    pointer->GetPointerItem(pointer->GetPointerId(), item);
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
     MMI_LOGD("Item:DownTime:%{public}" PRId64 ",IsPressed:%{public}s,"
              "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
              "Width:%{public}d,Height:%{public}d,DeviceId:%{public}d",
@@ -435,7 +435,7 @@ int32_t InputEventHandler::OnGestureEvent(struct libinput_event *event)
              item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
              item.GetWidth(), item.GetHeight(), item.GetDeviceId());
 
-    int32_t ret = eventDispatch_.HandlePointerEvent(pointer);
+    int32_t ret = eventDispatch_.HandlePointerEvent(pointerEvent);
     if (ret != RET_OK) {
         MMI_LOGE("Gesture event dispatch failed, errCode:%{public}d", GESTURE_EVENT_DISP_FAIL);
         return GESTURE_EVENT_DISP_FAIL;
