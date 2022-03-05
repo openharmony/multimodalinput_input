@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MULTIMODAL_STANDARDIZED_EVENT_MANAGER_H
-#define MULTIMODAL_STANDARDIZED_EVENT_MANAGER_H
+#ifndef STANDARDIZED_EVENT_MANAGER_H
+#define STANDARDIZED_EVENT_MANAGER_H
 
 #include <set>
 #include "if_mmi_client.h"
@@ -26,15 +26,15 @@
 namespace OHOS {
 namespace MMI {
 class NetPacket;
-class MultimodalStandardizedEventManager {
+class StandardizedEventManager {
 public:
-    MultimodalStandardizedEventManager();
-    ~MultimodalStandardizedEventManager();
-    DISALLOW_COPY_AND_MOVE(MultimodalStandardizedEventManager);
+    StandardizedEventManager();
+    ~StandardizedEventManager();
+    DISALLOW_COPY_AND_MOVE(StandardizedEventManager);
 
     void SetClientHandle(MMIClientPtr client);
     const std::set<std::string> *GetRegisterEvent();
-    int32_t InjectionVirtual(bool isPressed, int32_t keyCode, int32_t keyDownDuration, int32_t maxKeyCode);
+    int32_t InjectionVirtual(bool isPressed, int32_t keyCode, int64_t keyDownDuration, int32_t maxKeyCode);
     int32_t InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetDevice(int32_t userData, int32_t deviceId);
@@ -49,5 +49,5 @@ protected:
 };
 } // namespace MMI
 } // namespace OHOS
-#define EventManager OHOS::Singleton<OHOS::MMI::MultimodalStandardizedEventManager>::GetInstance()
-#endif // MULTIMODAL_STANDARDIZED_EVENT_MANAGER_H
+#define EventManager OHOS::Singleton<OHOS::MMI::StandardizedEventManager>::GetInstance()
+#endif // STANDARDIZED_EVENT_MANAGER_H

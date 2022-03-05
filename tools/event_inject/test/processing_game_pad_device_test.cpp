@@ -19,10 +19,13 @@
 #include "msg_head.h"
 #include "proto.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
 using namespace std;
+} // namespace
 class ProcessingGamePadDeviceTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
@@ -232,4 +235,5 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
     system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

@@ -15,7 +15,9 @@
 
 #include "virtual_stylus.h"
 
-OHOS::MMI::VirtualStylus::VirtualStylus() : VirtualDevice("Virtual Stylus",
+namespace OHOS {
+namespace MMI {
+VirtualStylus::VirtualStylus() : VirtualDevice("Virtual Stylus",
     BUS_USB, 0x56a, 0x392)
 {
     constexpr int32_t ABS_MAX_X = 31920;
@@ -76,9 +78,9 @@ OHOS::MMI::VirtualStylus::VirtualStylus() : VirtualDevice("Virtual Stylus",
     dev_.absflat[ABS_MISC] = 0;
 }
 
-OHOS::MMI::VirtualStylus::~VirtualStylus() {}
+VirtualStylus::~VirtualStylus() {}
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualStylus::GetEventTypes() const
+const std::vector<uint32_t>& VirtualStylus::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {
         EV_KEY, EV_ABS, EV_MSC
@@ -86,7 +88,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualStylus::GetEventTypes() const
     return evt_types;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualStylus::GetKeys() const
+const std::vector<uint32_t>& VirtualStylus::GetKeys() const
 {
     static const std::vector<uint32_t> keys {
         BTN_TOOL_PEN, BTN_TOOL_RUBBER, BTN_TOOL_BRUSH, BTN_TOOL_PENCIL, BTN_TOOL_AIRBRUSH, BTN_TOOL_MOUSE,
@@ -95,7 +97,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualStylus::GetKeys() const
     return keys;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualStylus::GetAbs() const
+const std::vector<uint32_t>& VirtualStylus::GetAbs() const
 {
     static const std::vector<uint32_t> abs {
         ABS_X, ABS_Y, ABS_Z, ABS_WHEEL, ABS_PRESSURE, ABS_DISTANCE, ABS_TILT_X, ABS_TILT_Y, ABS_MISC
@@ -103,7 +105,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualStylus::GetAbs() const
     return abs;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualStylus::GetMscs() const
+const std::vector<uint32_t>& VirtualStylus::GetMscs() const
 {
     static const std::vector<uint32_t> mscs {
         MSC_SERIAL
@@ -112,10 +114,12 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualStylus::GetMscs() const
     return mscs;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualStylus::GetProperties() const
+const std::vector<uint32_t>& VirtualStylus::GetProperties() const
 {
     static const std::vector<uint32_t> pros {
         INPUT_PROP_POINTER
     };
     return pros;
 }
+} // namespace MMI
+} // namespace OHOS

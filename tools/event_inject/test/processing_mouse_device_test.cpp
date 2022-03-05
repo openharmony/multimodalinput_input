@@ -19,10 +19,13 @@
 #include "processing_keyboard_device.h"
 #include "proto.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
-using namespace std;
+} // namespace
+
 class ProcessingMouseDeviceTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
@@ -32,13 +35,13 @@ public:
 HWTEST_F(ProcessingMouseDeviceTest, Test_TransformJsonDataToInputData, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
-    const string path = "/data/json/Test_TransformMouseJsonDataToInputData.json";
-    string startDeviceCmd = "mmi-virtual-device-manager start mouse & ";
-    string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    const std::string path = "/data/json/Test_TransformMouseJsonDataToInputData.json";
+    std::string startDeviceCmd = "mmi-virtual-device-manager start mouse & ";
+    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
-    const string path = "temp/Test_TransformMouseJsonDataToInputData.json";
-    string startDeviceCmd = "./mmi-virtual-deviced.out start mouse &";
-    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "temp/Test_TransformMouseJsonDataToInputData.json";
+    std::string startDeviceCmd = "./mmi-virtual-deviced.out start mouse &";
+    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -57,4 +60,5 @@ HWTEST_F(ProcessingMouseDeviceTest, Test_TransformJsonDataToInputData, TestSize.
     system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_OK);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

@@ -16,9 +16,12 @@
 #include "stream_buffer.h"
 #include <gtest/gtest.h>
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+} // namespace
 
 class StreamBufferTest : public testing::Test {
 public:
@@ -215,4 +218,5 @@ HWTEST_F(StreamBufferTest, Clone, TestSize.Level1)
     bool retResult = bufObj.CloneUnitTest(buf);
     EXPECT_FALSE(retResult);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

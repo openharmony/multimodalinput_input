@@ -115,8 +115,8 @@ int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<OH
         MMI_LOGD("send msg");
         item.TouchPadEventMonitor(pointerEvent);
     }
-    PointerEvent::PointerItem pointer;
-    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer)) {
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
         MMI_LOGE("Get pointer item failed");
         return RET_ERR;
     }
@@ -124,7 +124,7 @@ int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<OH
              "sourceType:%{public}d,action:%{public}d,"
              "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
-             pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
+             pointerEvent->GetPointerId(), pointerItem.GetGlobalX(), pointerItem.GetGlobalY(), pointerItem.IsPressed());
     return OHOS::MMI_STANDARD_EVENT_SUCCESS;
 }
 } // namespace MMI

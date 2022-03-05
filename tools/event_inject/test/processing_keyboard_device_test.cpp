@@ -19,10 +19,14 @@
 #include "manage_inject_device.h"
 #include "msg_head.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
 using namespace std;
+} // namespace
+
 class ProcessingKeyboardDeviceTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
@@ -86,4 +90,5 @@ HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputData
     std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(ret, RET_ERR);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

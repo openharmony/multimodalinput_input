@@ -15,12 +15,14 @@
 
 #include "virtual_trackpad.h"
 
-OHOS::MMI::VirtualTrackpad::VirtualTrackpad() : VirtualDevice("Virtual Trackpad",
+namespace OHOS {
+namespace MMI {
+VirtualTrackpad::VirtualTrackpad() : VirtualDevice("Virtual Trackpad",
     BUS_USB, 0x62a, 0x8255)
 {
 }
 
-OHOS::MMI::VirtualTrackpad::~VirtualTrackpad() {}
+VirtualTrackpad::~VirtualTrackpad() {}
 
 static std::vector<uint32_t> virtualKey = {
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
@@ -32,7 +34,7 @@ static std::vector<uint32_t> virtualKey = {
     187, 188, 189, 190, 191, 192, 193, 194, 240
 };
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpad::GetEventTypes() const
+const std::vector<uint32_t>& VirtualTrackpad::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {
         EV_KEY, EV_MSC, EV_LED, EV_REP
@@ -40,14 +42,14 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpad::GetEventTypes() const
     return evt_types;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpad::GetKeys() const
+const std::vector<uint32_t>& VirtualTrackpad::GetKeys() const
 {
     static const std::vector<uint32_t> keys(virtualKey.begin(),
                                             virtualKey.end());
     return keys;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpad::GetMscs() const
+const std::vector<uint32_t>& VirtualTrackpad::GetMscs() const
 {
     static const std::vector<uint32_t> mscs {
         MSC_SCAN
@@ -55,7 +57,7 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpad::GetMscs() const
     return mscs;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpad::GetLeds() const
+const std::vector<uint32_t>& VirtualTrackpad::GetLeds() const
 {
     static const std::vector<uint32_t> leds {
         LED_NUML, LED_CAPSL, LED_SCROLLL
@@ -63,10 +65,12 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpad::GetLeds() const
     return leds;
 }
 
-const std::vector<uint32_t>& OHOS::MMI::VirtualTrackpad::GetReps() const
+const std::vector<uint32_t>& VirtualTrackpad::GetReps() const
 {
     static const std::vector<uint32_t> reps {
         REP_DELAY, REP_PERIOD
     };
     return reps;
 }
+} // namespace MMI
+} // namespace OHOS
