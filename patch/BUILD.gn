@@ -18,7 +18,6 @@ group("patch_packages") {
   deps = [
     "diff_libinput_mmi:libinput-third-mmi",
     "prebuild_eudev:prebuild_eudev",
-    "prebuild_x_keyboard_config:prebuild_x_keyboard_config",
   ]
 
   if (is_mmi_have_hdf) {

@@ -23,7 +23,6 @@
     #define DEF_MMI_DATA_ROOT       "/root/projects/run_root/"
     #define DEF_EXP_CONFIG          "/root/projects/run_root/etc/mmi_device_config.ini" // Default device config file
     #define DEF_EXP_SOPATH          "/root/projects/run_root/lib"                 // Default device so path
-    #define DEF_XKB_CONFIG          "/root/projects/run_root/etc/xkb"        // Default xkb config
     #define DEF_SCREEN_MAX_WIDTH    65535          // Default screen max width
     #define DEF_SCREEN_MAX_HEIGHT   65535          // Default screen max height
 #else
@@ -32,7 +31,6 @@
     #define DEF_MMI_DATA_ROOT "/data/mmi/"
     #define DEF_EXP_CONFIG "/system/etc/mmi_device_config.ini"
     #define DEF_EXP_SOPATH "/system/lib/"
-    #define DEF_XKB_CONFIG "/system/etc/xkb"
     #define DEF_SCREEN_MAX_WIDTH 480
     #define DEF_SCREEN_MAX_HEIGHT 960
 #endif

@@ -148,9 +148,7 @@ void InputEventHandler::OnEvent(void *event)
 {
     CHKPV(event);
     std::lock_guard<std::mutex> lock(mu_);
-    auto *lpMmiEvent = static_cast<multimodal_libinput_event *>(event);
-    CHKPV(lpMmiEvent);
-    auto *lpEvent = lpMmiEvent->event;
+    auto *lpEvent = static_cast<libinput_event *>(event);
     CHKPV(lpEvent);
     if (initSysClock_ != 0 && lastSysClock_ == 0) {
         MMI_LOGE("Event not handled. id:%{public}" PRId64 ",eventType:%{public}d,initSysClock:%{public}" PRId64,
@@ -172,24 +170,24 @@ void InputEventHandler::OnEvent(void *event)
     MMI_LOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
              "initSysClock:%{public}" PRId64, idSeed_, tid, eventType_, initSysClock_);
 
-    OnEventHandler(*lpMmiEvent);
+    OnEventHandler(lpEvent);
     lastSysClock_ = GetSysClockTime();
     int64_t lostTime = lastSysClock_ - initSysClock_;
     MMI_LOGD("Event handling completed. id:%{public}" PRId64 ",lastSynClock:%{public}" PRId64
              ",lostTime:%{public}" PRId64, idSeed_, lastSysClock_, lostTime);
 }
 
-int32_t InputEventHandler::OnEventHandler(const multimodal_libinput_event& ev)
+int32_t InputEventHandler::OnEventHandler(libinput_event *event)
 {
-    CHKPR(ev.event, ERROR_NULL_POINTER);
-    auto type = libinput_event_get_type(ev.event);
+    CHKPR(event, ERROR_NULL_POINTER);
+    auto type = libinput_event_get_type(event);
     TimeCostChk chk("InputEventHandler::OnEventHandler", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
     auto callback = GetMsgCallback(static_cast<MmiMessageId>(type));
     if (callback == nullptr) {
         MMI_LOGE("Unknown event type:%{public}d,errCode:%{public}d", type, UNKNOWN_EVENT);
         return UNKNOWN_EVENT;
     }
-    auto ret = (*callback)(ev);
+    auto ret = (*callback)(event);
     if (ret != 0) {
         MMI_LOGE("Event handling failed. type:%{public}d,ret:%{public}d,errCode:%{public}d",
                  type, ret, EVENT_CONSUM_FAIL);
@@ -224,22 +222,22 @@ int32_t InputEventHandler::AddInputEventFilter(sptr<IEventFilter> filter)
     return eventDispatch_.AddInputEventFilter(filter);
 }
 
-int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& ev)
+int32_t InputEventHandler::OnEventDeviceAdded(libinput_event *event)
 {
-    CHKPR(ev.event, ERROR_NULL_POINTER);
-    auto device = libinput_event_get_device(ev.event);
+    CHKPR(event, ERROR_NULL_POINTER);
+    auto device = libinput_event_get_device(event);
     InputDevMgr->OnInputDeviceAdded(device);
     return RET_OK;
 }
-int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event& ev)
+int32_t InputEventHandler::OnEventDeviceRemoved(libinput_event *event)
 {
-    CHKPR(ev.event, ERROR_NULL_POINTER);
-    auto device = libinput_event_get_device(ev.event);
+    CHKPR(event, ERROR_NULL_POINTER);
+    auto device = libinput_event_get_device(event);
     InputDevMgr->OnInputDeviceRemoved(device);
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventKey(struct libinput_event *event)
+int32_t InputEventHandler::OnEventKey(libinput_event *event)
 {
     CHKPR(event, PARAM_INPUT_INVALID);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
@@ -272,13 +270,13 @@ int32_t InputEventHandler::OnEventKey(struct libinput_event *event)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& ev)
+int32_t InputEventHandler::OnKeyEventDispatch(libinput_event *event)
 {
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
     CHKPR(udsServer_, ERROR_NULL_POINTER);
-    auto packageResult = eventPackage_.PackageKeyEvent(ev.event, keyEvent_);
+    auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_LOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
@@ -292,12 +290,11 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
     keyEventString = "service report keyId=" + std::to_string(keyId);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
-    return OnEventKey(ev.event);
+    return OnEventKey(event);
 }
 
-int32_t InputEventHandler::OnKeyboardEvent(const multimodal_libinput_event& ev)
+int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
 {
-    libinput_event *event = ev.event;
     CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     EventKeyboard keyBoard = {};
@@ -334,13 +331,13 @@ int32_t InputEventHandler::OnKeyboardEvent(const multimodal_libinput_event& ev)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
+int32_t InputEventHandler::OnEventPointer(libinput_event *event)
 {
-    CHKPR(ev.event, ERROR_NULL_POINTER);
-    return OnMouseEventHandler(ev.event);
+    CHKPR(event, ERROR_NULL_POINTER);
+    return OnMouseEventHandler(event);
 }
 
-int32_t InputEventHandler::OnEventTouchSecond(struct libinput_event *event)
+int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 {
     MMI_LOGD("Enter");
     CHKPR(event, ERROR_NULL_POINTER);
@@ -368,7 +365,7 @@ int32_t InputEventHandler::OnEventTouchSecond(struct libinput_event *event)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventTouchPadSecond(struct libinput_event *event)
+int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 {
     MMI_LOGD("Enter");
     CHKPR(event, ERROR_NULL_POINTER);
@@ -393,20 +390,20 @@ int32_t InputEventHandler::OnEventTouchPadSecond(struct libinput_event *event)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventTouch(const multimodal_libinput_event& ev)
+int32_t InputEventHandler::OnEventTouch(libinput_event *event)
 {
-    CHKPR(ev.event, ERROR_NULL_POINTER);
-    SInput::LoginfoPackagingTool(ev.event);
-    return OnEventTouchSecond(ev.event);
+    CHKPR(event, ERROR_NULL_POINTER);
+    SInput::LoginfoPackagingTool(event);
+    return OnEventTouchSecond(event);
 }
 
-int32_t InputEventHandler::OnEventTouchpad(const multimodal_libinput_event& ev)
+int32_t InputEventHandler::OnEventTouchpad(libinput_event *event)
 {
-    OnEventTouchPadSecond(ev.event);
+    OnEventTouchPadSecond(event);
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnGestureEvent(struct libinput_event *event)
+int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TouchTransformPointManger->OnTouchPadGestrueEvent(event);
@@ -440,14 +437,14 @@ int32_t InputEventHandler::OnGestureEvent(struct libinput_event *event)
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventGesture(const multimodal_libinput_event& ev)
+int32_t InputEventHandler::OnEventGesture(libinput_event *event)
 {
-    CHKPR(ev.event, ERROR_NULL_POINTER);
-    OnGestureEvent(ev.event);
+    CHKPR(event, ERROR_NULL_POINTER);
+    OnGestureEvent(event);
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnMouseEventHandler(struct libinput_event *event)
+int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
 
