@@ -45,8 +45,8 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
     if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
-        MMI_LOGD("buf size:%{public}zu", size);
-        return PARAM_INPUT_INVALID;
+        MMI_LOGE("buf size:%{public}zu", size);
+        return false;
     }
     if (fd_ < 0) {
         MMI_LOGE("fd_ is less than 0");
