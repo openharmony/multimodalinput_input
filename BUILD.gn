@@ -54,7 +54,6 @@ ohos_executable("uinput_inject") {
     "$HDF_FWKS/ability/sbuf/include",
     "$HDF_FWKS/core/shared/include",
     "$HDF_FWKS/utils/include",
-    "//third_party/bounds_checking_function/include",
   ]
 
   deps = [
@@ -92,7 +91,6 @@ ohos_shared_library("mmi_uinject") {
     "$HDF_FWKS/ability/sbuf/include",
     "$HDF_FWKS/core/shared/include",
     "$HDF_FWKS/utils/include",
-    "//third_party/bounds_checking_function/include",
   ]
 
   deps = [

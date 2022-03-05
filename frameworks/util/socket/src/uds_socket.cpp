@@ -15,6 +15,7 @@
 
 #include "uds_socket.h"
 #include <cinttypes>
+#include "error_multimodal.h"
 #include "mmi_log.h"
 
 namespace OHOS {
