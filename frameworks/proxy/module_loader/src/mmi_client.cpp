@@ -100,10 +100,6 @@ bool MMIClient::StartEventRunner()
             return false;
         }
     }
-    // if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_ONTIMER, 0, EVENT_TIME_ONTIMER)) {
-    //     MMI_LOGE("send ontimer event return false.");
-    //     return false;
-    // }
     if (curRunner == nullptr) {
         t_ = std::thread(std::bind(&MMIClient::OnThirdThread, this));
         t_.detach();

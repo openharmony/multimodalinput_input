@@ -62,12 +62,6 @@ void MMIEventHandler::OnReconnect(const InnerEvent::Pointer &event)
     }
 }
 
-void MMIEventHandler::OnTimer(const InnerEvent::Pointer &event)
-{
-    MMI_LOGD("enter");
-    SendEvent(MMI_EVENT_HANDLER_ID_ONTIMER, 0, EVENT_TIME_ONTIMER);
-}
-
 void MMIEventHandler::OnStop(const InnerEvent::Pointer &event)
 {
     MMI_LOGD("enter");
@@ -87,10 +81,6 @@ void MMIEventHandler::ProcessEvent(const InnerEvent::Pointer &event)
             OnReconnect(event);
             break;
         }
-        case MMI_EVENT_HANDLER_ID_ONTIMER: {
-            OnTimer(event);
-            break;
-        }
         case MMI_EVENT_HANDLER_ID_STOP: {
             OnStop(event);
             break;
@@ -104,3 +94,4 @@ void MMIEventHandler::ProcessEvent(const InnerEvent::Pointer &event)
 
 } // namespace MMI
 } // namespace OHOS
+

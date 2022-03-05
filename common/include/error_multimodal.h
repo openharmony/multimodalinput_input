@@ -35,11 +35,6 @@ namespace OHOS {
         EVENT_CONSUM_FAIL,                          // 事件消费失败
         UNKNOW_TOUCH_TYPE,                          // 客户端处理Touch时间时，收到了客户端发来的位置类型
         STRCPY_S_CALLBACK_FAIL,                     // strcpy_s返回错误
-        C_INVALID_INPUT_PARAM,                      // 无效的输入参数
-        C_INVALID_EVENT_HANDLER_ID,                 // 无效人EventHandlerId
-        C_ADD_FD_LISTENER_FAIL,                     // 增加FD监听错误
-        C_DEL_FD_LISTENER_FAIL,                     // 删除FD监听错误
-        C_CLIENT_POINTER_NULL,                      // Client指针为空
     };
 
     // Error code for event simulate
