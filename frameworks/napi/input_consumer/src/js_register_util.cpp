@@ -300,8 +300,9 @@ void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
                 MMI_LOGE("Event get reference value failed");
                 return;
             }
-            napi_value result[2] = { 0 };
-            AsyncWorkFn(env, event, result);
+            const uint32_t resultSize = 2;
+            napi_value result[resultSize] = {};
+            AsyncWorkFn(env, event, result, resultSize);
             napi_value callResult = nullptr;
             auto callFunResult = napi_call_function(env, nullptr, callback, 2, result, &callResult);
             MMI_LOGD("CallFunResult:%{public}d", static_cast<int32_t>(callFunResult));
