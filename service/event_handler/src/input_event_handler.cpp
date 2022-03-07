@@ -404,10 +404,7 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_GESTURE);
-    if (pointerEvent == nullptr) {
-        MMI_LOGE("Gesture event package failed, errCode:%{public}d", GESTURE_EVENT_PKG_FAIL);
-        return GESTURE_EVENT_PKG_FAIL;
-    }
+    CHKPR(pointerEvent, GESTURE_EVENT_PKG_FAIL);
     MMI_LOGD("GestrueEvent package, eventType:%{public}d,actionTime:%{public}" PRId64 ","
              "action:%{public}d,actionStartTime:%{public}" PRId64 ","
              "pointerAction:%{public}d,sourceType:%{public}d,"
@@ -449,10 +446,7 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
     MouseEventHdr->Normalize(event);
 
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
-    if (pointerEvent == nullptr) {
-        MMI_LOGE("MouseEvent is NULL");
-        return RET_ERR;
-    }
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
 
     // 处理 按键 + 鼠标
     if (keyEvent_ == nullptr) {
