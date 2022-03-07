@@ -25,6 +25,7 @@ namespace {
 TouchTransformPointProcessor::TouchTransformPointProcessor(int32_t deviceId) : deviceId_(deviceId)
 {
     pointerEvent_ = PointerEvent::Create();
+    CHKPL(pointerEvent_);
 }
 
 TouchTransformPointProcessor::~TouchTransformPointProcessor() {}
