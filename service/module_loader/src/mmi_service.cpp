@@ -421,7 +421,6 @@ void MMIService::OnSignalEvent(int32_t signalFd)
         MMI_LOGE("read signal info faild, invalid size:%{public}d,errno:%{public}d", size, errno);
         return;
     }
-
     int32_t signo = sigInfo.ssi_signo;
     MMI_LOGD("receive signal:%{public}d", signo);
     switch (signo) {
@@ -441,6 +440,5 @@ void MMIService::OnSignalEvent(int32_t signalFd)
     }
     MMI_LOGD("leave");
 }
-
 } // namespace MMI
 } // namespace OHOS

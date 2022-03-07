@@ -368,11 +368,8 @@ const std::string& GetThreadName()
     if (!g_threadName.empty()) {
         return g_threadName;
     }
-
     constexpr size_t MAX_THREAD_NAME_SIZE = 16;
     char thisThreadName[MAX_THREAD_NAME_SIZE + 1];
-
-    // Get current thread name and compare with the specified one.
     int32_t ret = prctl(PR_GET_NAME, thisThreadName);
     if (ret == 0) {
         thisThreadName[MAX_THREAD_NAME_SIZE] = '\0';
@@ -380,7 +377,6 @@ const std::string& GetThreadName()
     } else {
         printf("in GetThreadName, call prctl get name fail, errno: %d.\n", errno);
     }
-
     return g_threadName;
 }
 
