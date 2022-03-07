@@ -24,7 +24,6 @@
 #include "bytrace.h"
 #include "input_device_manager.h"
 #include "interceptor_manager_global.h"
-#include "libinput.h"
 #include "mmi_func_callback.h"
 #include "mouse_event_handler.h"
 #include "s_input.h"
@@ -52,87 +51,87 @@ void InputEventHandler::Init(UDSServer& udsServer)
     udsServer_ = &udsServer;
     MsgCallback funs[] = {
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_DEVICE_ADDED),
+            MmiMessageId::LIBINPUT_EVENT_DEVICE_ADDED,
             MsgCallbackBind1(&InputEventHandler::OnEventDeviceAdded, this)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_DEVICE_REMOVED),
+            MmiMessageId::LIBINPUT_EVENT_DEVICE_REMOVED,
             MsgCallbackBind1(&InputEventHandler::OnEventDeviceRemoved, this)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_KEYBOARD_KEY),
+            MmiMessageId::LIBINPUT_EVENT_KEYBOARD_KEY,
             std::bind(&InputEventHandler::OnKeyboardEvent, this, std::placeholders::_1)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_POINTER_MOTION),
+            MmiMessageId::LIBINPUT_EVENT_POINTER_MOTION,
             MsgCallbackBind1(&InputEventHandler::OnEventPointer, this)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE),
+            MmiMessageId::LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE,
             MsgCallbackBind1(&InputEventHandler::OnEventPointer, this)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_POINTER_BUTTON),
+            MmiMessageId::LIBINPUT_EVENT_POINTER_BUTTON,
             MsgCallbackBind1(&InputEventHandler::OnEventPointer, this)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_POINTER_AXIS),
+            MmiMessageId::LIBINPUT_EVENT_POINTER_AXIS,
             MsgCallbackBind1(&InputEventHandler::OnEventPointer, this)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_TOUCH_DOWN),
+            MmiMessageId::LIBINPUT_EVENT_TOUCH_DOWN,
             MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_TOUCH_UP),
+            MmiMessageId::LIBINPUT_EVENT_TOUCH_UP,
             MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_TOUCH_MOTION),
+            MmiMessageId::LIBINPUT_EVENT_TOUCH_MOTION,
             MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_TOUCH_CANCEL),
+            MmiMessageId::LIBINPUT_EVENT_TOUCH_CANCEL,
             MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_TOUCH_FRAME),
+            MmiMessageId::LIBINPUT_EVENT_TOUCH_FRAME,
             MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_TOUCHPAD_DOWN),
+            MmiMessageId::LIBINPUT_EVENT_TOUCHPAD_DOWN,
             MsgCallbackBind1(&InputEventHandler::OnEventTouchpad, this)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_TOUCHPAD_UP),
+            MmiMessageId::LIBINPUT_EVENT_TOUCHPAD_UP,
             MsgCallbackBind1(&InputEventHandler::OnEventTouchpad, this)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_TOUCHPAD_MOTION),
+            MmiMessageId::LIBINPUT_EVENT_TOUCHPAD_MOTION,
             MsgCallbackBind1(&InputEventHandler::OnEventTouchpad, this)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN),
+            MmiMessageId::LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN,
             MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE),
+            MmiMessageId::LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE,
             MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_GESTURE_SWIPE_END),
+            MmiMessageId::LIBINPUT_EVENT_GESTURE_SWIPE_END,
             MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_GESTURE_PINCH_BEGIN),
+            MmiMessageId::LIBINPUT_EVENT_GESTURE_PINCH_BEGIN,
             MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_GESTURE_PINCH_UPDATE),
+            MmiMessageId::LIBINPUT_EVENT_GESTURE_PINCH_UPDATE,
             MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
-            static_cast<MmiMessageId>(LIBINPUT_EVENT_GESTURE_PINCH_END),
+            MmiMessageId::LIBINPUT_EVENT_GESTURE_PINCH_END,
             MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
     };
