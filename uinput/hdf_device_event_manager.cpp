@@ -14,19 +14,17 @@
  */
 
 #include "hdf_device_event_manager.h"
-
 #include <cstring>
 #include <functional>
-
 #include <unistd.h>
-
-#include "hilog/log.h"
+#include "hdf_device_event_dispatch.h"
+#include "mmi_log.h"
 
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
-namespace MMIS {
+namespace MMI {
 namespace {
-    constexpr HiLogLabel LABEL = { LOG_CORE, 0xD002800, "HdfDeviceEventManager" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "HdfDeviceEventManager"};
 }
 
 HdfDeviceEventManager::HdfDeviceEventManager() {}
@@ -37,12 +35,12 @@ void HdfDeviceEventManager::ConnectHDFInit()
 {
     int32_t ret = GetInputInterface(&inputInterface_);
     if (ret != 0) {
-        HiLog::Error(LABEL, "Initialize:%{public}s fail. ret:%{public}u", __func__, ret);
+        MMI_LOGE("Initialize fail");
         return;
     }
 
     if (inputInterface_ == nullptr || inputInterface_->iInputManager == nullptr) {
-        HiLog::Error(LABEL, "%{public}s inputInterface_ or iInputManager is nullptr", __func__);
+        MMI_LOGE("inputInterface_ or iInputManager is nullptr");
         return;
     }
 
@@ -51,26 +49,24 @@ void HdfDeviceEventManager::ConnectHDFInit()
     if ((ret == INPUT_SUCCESS) && (inputInterface_->iInputReporter != nullptr)) {
         ret = inputInterface_->iInputManager->GetInputDevice(TOUCH_DEV_ID, &iDevInfo_);
         if (ret != INPUT_SUCCESS) {
-            HiLog::Error(LABEL, "%{public}s GetInputDevice error %{public}d", __func__, ret);
+            MMI_LOGE("GetInputDevice error");
             return;
         }
         std::unique_ptr<HdfDeviceEventDispatch> hdf = std::make_unique<HdfDeviceEventDispatch>(\
             iDevInfo_->attrSet.axisInfo[ABS_MT_POSITION_X].max, iDevInfo_->attrSet.axisInfo[ABS_MT_POSITION_Y].max);
         if (hdf == nullptr) {
-            HiLog::Error(LABEL, "%{public}s hdf is nullptr", __func__);
+            MMI_LOGE("hdf is nullptr");
             return;
         }
         callback_.EventPkgCallback = hdf->GetEventCallbackDispatch;
         ret = inputInterface_->iInputReporter->RegisterReportCallback(TOUCH_DEV_ID, &callback_);
     }
 }
-} // namespace MMIS
+} // namespace MMI
 } // namespace OHOS
-
 int32_t main()
 {
-    HiLog::Info(OHOS::MMIS::LABEL, "%{public}s running", __func__);
-    OHOS::MMIS::HdfDeviceEventManager iHdfDeviceEventManager;
+    OHOS::MMI::HdfDeviceEventManager iHdfDeviceEventManager;
     iHdfDeviceEventManager.ConnectHDFInit();
     static std::int32_t usleepTime = 1500000;
     while (true) {

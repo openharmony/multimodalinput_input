@@ -18,22 +18,23 @@
 #include <cerrno>
 #include <cinttypes>
 #include <cstring>
-
 #include <fcntl.h>
 #include <securec.h>
 #include <unistd.h>
+#include "mmi_log.h"
 
-#include "hilog/log.h"
-
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace OHOS::HiviewDFX;
-constexpr HiLogLabel LABEL = { LOG_CORE, 0xD002800, "VirtualDevice" };
+constexpr HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "VirtualDevice"};
+
 
 bool DoIoctl(int32_t fd, int32_t request, const uint32_t value)
 {
     int32_t rc = ioctl(fd, request, value);
     if (rc < 0) {
-        HiLog::Error(LABEL, "%{public}s ioctl failed", __func__);
+        MMI_LOGE("ioctl failed");
         return false;
     }
     return true;
@@ -60,44 +61,43 @@ bool VirtualDevice::SetUp()
 {
     fd_ = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
     if (fd_ < 0) {
-        HiLog::Error(LABEL, "Failed to open uinput %{public}s", __func__);
+        MMI_LOGE("Failed to open uinput");
         return false;
     }
-
     for (const auto &item : GetEventTypes()) {
         if (!DoIoctl(fd_, UI_SET_EVBIT, item)) {
-            HiLog::Error(LABEL, "%{public}s Error setting event type:%{public}u", __func__, item);
+            MMI_LOGE("Error setting event type:%{public}u", item);
             return false;
         }
     }
     for (const auto &item : GetKeys()) {
         if (!DoIoctl(fd_, UI_SET_KEYBIT, item)) {
-            HiLog::Error(LABEL, "%{public}s Error setting key:%{public}u", __func__, item);
+            MMI_LOGE("Error setting key:%{public}u", item);
             return false;
         }
     }
     for (const auto &item :  GetProperties()) {
         if (!DoIoctl(fd_, UI_SET_PROPBIT, item)) {
-            HiLog::Error(LABEL, "%{public}s Error setting property:%{public}u", __func__, item);
+            MMI_LOGE("Error setting property:%{public}u", item);
             return false;
         }
     }
     for (const auto &item : GetAbs()) {
         if (!DoIoctl(fd_, UI_SET_ABSBIT, item)) {
-            HiLog::Error(LABEL, "%{public}s Error setting property:%{public}u", __func__, item);
+            MMI_LOGE("Error setting property:%{public}u", item);
             return false;
         }
     }
     for (const auto &item : GetRelBits()) {
         if (!DoIoctl(fd_, UI_SET_RELBIT, item)) {
-            HiLog::Error(LABEL, "%{public}s Error setting rel:%{public}u", __func__, item);
+            MMI_LOGE("Error setting rel:%{public}u", item);
             return false;
         }
     }
 
     errno_t ret = strncpy_s(dev_.name, MAX_NAME_LENGTH, deviceName_, sizeof(dev_.name));
     if (ret != EOK) {
-        HiLog::Error(LABEL, "%{public}s, failed to copy deviceName", __func__);
+        MMI_LOGE("failed to copy deviceName");
         return false;
     }
     dev_.id.bustype = busType_;
@@ -105,11 +105,11 @@ bool VirtualDevice::SetUp()
     dev_.id.product = productId_;
     dev_.id.version = version_;
     if (write(fd_, &dev_, sizeof(dev_)) < 0) {
-        HiLog::Error(LABEL, "Unable to set input device info:%{public}s", __func__);
+        MMI_LOGE("Unable to set input device info");
         return false;
     }
     if (ioctl(fd_, UI_DEV_CREATE) < 0) {
-        HiLog::Error(LABEL, "Unable to create input device:%{public}s", __func__);
+        MMI_LOGE("Unable to create input device");
         return false;
     }
     return true;
@@ -125,7 +125,7 @@ bool VirtualDevice::EmitEvent(uint16_t type, uint16_t code, uint32_t value) cons
     gettimeofday(&event.time, nullptr);
 #endif
     if (write(fd_, &event, sizeof(event)) < static_cast<ssize_t>(sizeof(event))) {
-        HiLog::Error(LABEL, "Event write failed %{public}s aborting", __func__);
+        MMI_LOGE("Event write failed");
         return false;
     }
     return true;
@@ -159,4 +159,6 @@ const std::vector<uint32_t> &VirtualDevice::GetRelBits() const
 {
     static const std::vector<uint32_t> relBits {};
     return relBits;
+}
+}
 }
