@@ -427,7 +427,7 @@ void PointerEvent::SetAxisValue(AxisType axis, double axisValue)
 {
     if ((axis >= AXIS_TYPE_UNKNOWN) && (axis < AXIS_TYPE_MAX)) {
         axisValues_[axis] = axisValue;
-        axes_ |= (1 << axis);
+        axes_ = static_cast<int32_t>(static_cast<uint32_t>(axes_) | (1 << static_cast<uint32_t>(axis)));
     }
 }
 
@@ -435,7 +435,7 @@ bool PointerEvent::HasAxis(int32_t axes, AxisType axis)
 {
     bool ret { false };
     if ((axis >= AXIS_TYPE_UNKNOWN) && (axis < AXIS_TYPE_MAX)) {
-        ret = static_cast<bool>(axes & (1 << axis));
+        ret = static_cast<bool>(static_cast<uint32_t>(axes) & (1 << static_cast<uint32_t>(axis)));
     }
     return ret;
 }
@@ -582,7 +582,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    if (!in.ReadInt32(axes_)) {
+    if (!in.ReadUint32(axes_)) {
         return false;
     }
 
@@ -615,8 +615,8 @@ bool PointerEvent::IsValidCheckMouseFunc() const
         return false;
     }
 
-    int32_t mouseButton = 3;
-    if (pressedButtons_.size() > mouseButton) {
+    size_t maxPressedButtons = 3;
+    if (pressedButtons_.size() > maxPressedButtons) {
         MMI_LOGE("PressedButtons_.size is greater than three and is invalid");
         return false;
     }

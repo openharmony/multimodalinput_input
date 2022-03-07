@@ -344,7 +344,7 @@ int32_t ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
     int32_t finalKeyDownDuration = 0;
     pkt >> subscribeId >> finalKey >> isFinalKeyDown >> finalKeyDownDuration >> preKeySize;
     std::set<int32_t> preKeys;
-    for (int32_t i = 0; i < preKeySize; ++i) {
+    for (uint32_t i = 0; i < preKeySize; ++i) {
         int32_t tmpKey = -1;
         pkt >> tmpKey;
         if (!(preKeys.insert(tmpKey).second)) {
