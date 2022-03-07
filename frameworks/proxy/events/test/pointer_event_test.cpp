@@ -26,6 +26,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN,"PointerEventTest"};
 using namespace testing::ext;
 using namespace OHOS::MMI;
 using namespace OHOS;
