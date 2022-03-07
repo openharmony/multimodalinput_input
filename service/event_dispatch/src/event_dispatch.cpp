@@ -115,6 +115,7 @@ void EventDispatch::HandlePointerEventTrace(const std::shared_ptr<PointerEvent> 
 
 int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 {
+    CALL_LOG_ENTER;
     CHKPR(point, ERROR_NULL_POINTER);
     auto fd = WinMgr->UpdateTargetPointer(point);
     if (HandlePointerEventFilter(point)) {
@@ -163,7 +164,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 
 void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler isEventHandler)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     int32_t keyCode = key->GetKeyCode();
     std::string checkKeyCode;
     if (isEventHandler == KEY_FILTER_EVENT) {
@@ -187,7 +188,7 @@ void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, I
 
 int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
     if (!key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         if (InterceptorMgrGbl.OnKeyEvent(key)) {
@@ -212,7 +213,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
         MMI_LOGE("Invalid fd");
         return RET_ERR;
     }
-    MMI_LOGD("4.event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
+    MMI_LOGD("event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
              "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
              "EventType:%{public}d,Flag:%{public}u,"
              "KeyAction:%{public}d,Fd:%{public}d",
@@ -245,7 +246,6 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
         return MSG_SEND_FAIL;
     }
     session->AddEvent(key->GetId(), currentTime);
-    MMI_LOGD("end");
     return RET_OK;
 }
 
@@ -256,7 +256,7 @@ int32_t EventDispatch::AddInputEventFilter(sptr<IEventFilter> filter)
 
 bool EventDispatch::IsANRProcess(int64_t time, SessionPtr ss)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     int64_t firstTime;
     if (ss->EventsIsEmpty()) {
         firstTime = time;
@@ -287,7 +287,6 @@ bool EventDispatch::IsANRProcess(int64_t time, SessionPtr ss)
     if (ret != 0) {
         MMI_LOGE("AAFwk SendANRProcessID failed, AAFwk errCode: %{public}d", ret);
     }
-    MMI_LOGD("end");
     return true;
 }
 } // namespace MMI

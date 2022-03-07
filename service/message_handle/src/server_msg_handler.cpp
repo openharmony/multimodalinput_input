@@ -215,6 +215,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
 {
     MMI_LOGD("enter");
     auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, RET_ERR);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != RET_OK) {
         MMI_LOGE("Unmarshalling failed");
         return RET_ERR;
