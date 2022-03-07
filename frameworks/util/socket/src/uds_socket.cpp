@@ -95,9 +95,9 @@ int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isBlock)
     }
     MMI_LOGD("F_GETFL fd:%{public}d,flags:%{public}d", fd, flags);
     uint32_t mask = static_cast<uint32_t>(flags);
-    mask |= O_NONBLOCK; // 非阻塞模式
+    mask |= O_NONBLOCK;
     if (isBlock) {
-        mask &= ~O_NONBLOCK; // 阻塞模式
+        mask &= ~O_NONBLOCK;
     }
     flags = fcntl(fd, F_SETFL, static_cast<int32_t>(mask));
     if (flags < 0) {
