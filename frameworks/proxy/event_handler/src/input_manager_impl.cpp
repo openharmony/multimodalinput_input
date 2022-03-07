@@ -234,7 +234,7 @@ int32_t InputManagerImpl::PackPhysicalDisplay(NetPacket &pkt)
 
 int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
 {
-    int32_t num = logicalDisplays_.size();
+    int32_t num = static_cast<int32_t>(logicalDisplays_.size());
     if (!pkt.Write(num)) {
         MMI_LOGE("Packet write logical num failed");
         return RET_ERR;
@@ -276,7 +276,7 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
             MMI_LOGE("Packet write logical focusWindow failed");
             return RET_ERR;
         }
-        int32_t numWindow = logicalDisplays_[i].windowsInfo_.size();
+        int32_t numWindow = static_cast<int32_t>(logicalDisplays_[i].windowsInfo_.size());
         if (!pkt.Write(numWindow)) {
             MMI_LOGE("Packet write logical numWindow failed");
             return RET_ERR;
