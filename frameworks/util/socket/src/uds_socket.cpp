@@ -94,11 +94,12 @@ int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isBlock)
         return flags;
     }
     MMI_LOGD("F_GETFL fd:%{public}d,flags:%{public}d", fd, flags);
-    flags |= O_NONBLOCK;
+    uint32_t mask = static_cast<uint32_t>(flags);
+    mask |= O_NONBLOCK;
     if (isBlock) {
-        flags &= ~O_NONBLOCK;
+        mask &= ~O_NONBLOCK;
     }
-    flags = fcntl(fd, F_SETFL, flags);
+    flags = fcntl(fd, F_SETFL, static_cast<int32_t>(mask));
     if (flags < 0) {
         MMI_LOGE("fcntl F_SETFL fail. fd:%{public}d,flags:%{public}d,errno:%{public}d,errCode:%{public}d",
             fd, flags, errno, FCNTL_FAIL);

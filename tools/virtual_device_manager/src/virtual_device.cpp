@@ -260,7 +260,7 @@ void VirtualDevice::CloseAllDevice(const std::vector<std::string>& fileList)
         it.insert(0, g_folderpath.c_str());
         const int32_t ret = remove(it.c_str());
         if (ret == -1) {
-            printf("remove file fail. file name: %s, errno: %d\n", it.c_str(), errno);
+            printf("remove file fail. file name: %s, errno: %d.\n", it.c_str(), errno);
         }
     }
 }
@@ -446,7 +446,7 @@ bool VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
                 it.insert(0, g_folderpath.c_str());
                 const int32_t ret = remove(it.c_str());
                 if (ret == -1) {
-                    printf("remove file fail. file name: %s, errno: %d\n", it.c_str(), errno);
+                    printf("remove file fail. file name: %s, errno: %d.\n", it.c_str(), errno);
                 }
                 return true;
             } else {

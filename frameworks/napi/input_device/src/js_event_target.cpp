@@ -199,7 +199,7 @@ void JsEventTarget::CallDevAsyncWork(napi_env env, napi_status status, void* dat
         return;
     }
 
-    int32_t types = cbTemp.device->devcieType;
+    uint32_t types = cbTemp.device->devcieType;
     std::vector<std::string> sources;
     for (const auto & item : g_deviceType) {
         if (types & item.typeBit) {
@@ -479,7 +479,7 @@ void JsEventTarget::CallDevPromiseWork(napi_env env, napi_status status, void* d
         return;
     }
 
-    int32_t types = cbTemp.device->devcieType;
+    uint32_t types = cbTemp.device->devcieType;
     if (types <= 0) {
         napi_throw_error(env, nullptr, "devcieType is less than zero");
         MMI_LOGE("devcieType is less than zero");

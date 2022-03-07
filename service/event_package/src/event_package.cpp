@@ -32,7 +32,7 @@ int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, EventKeyboar
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_keyboard_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
-    key.key = libinput_event_keyboard_get_key(data);
+    key.key = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
     if (libinput_event_keyboard_get_key_state(data) == 0) {
         key.state = KEY_STATE_RELEASED;
     } else {

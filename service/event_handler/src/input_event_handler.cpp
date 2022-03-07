@@ -315,9 +315,9 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
     keyBoard.unicode = 0;
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
+        CHKPR(keyEvent_, ERROR_NULL_POINTER);
     }
-    CHKPR(keyEvent_, ERROR_NULL_POINTER);
-    keyBoard.key = static_cast<uint32_t>(oKey.keyValueOfSys);
+    keyBoard.key = static_cast<int32_t>(oKey.keyValueOfSys);
     if (EventPackage::KeyboardToKeyEvent(keyBoard, keyEvent_) == RET_ERR) {
         MMI_LOGE("On the OnKeyboardEvent translate key event error");
         return RET_ERR;
