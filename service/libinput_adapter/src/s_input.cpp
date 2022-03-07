@@ -152,6 +152,5 @@ void SInput::OnEventHandler()
     }
     MMI_LOGD("leave");
 }
-
 } // namespace MMI
 } // namespace OHOS
