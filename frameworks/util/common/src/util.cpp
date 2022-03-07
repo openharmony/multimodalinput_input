@@ -69,19 +69,6 @@ const char *GetMmiErrorTypeDesc(int32_t errorCodeEnum)
     return str->second.c_str();
 }
 
-std::string GetEnv(const std::string &name)
-{
-    if (name.empty()) {
-        MMI_LOGW("Name is empty");
-        return "";
-    }
-    auto val = getenv(name.c_str());
-    if (val == nullptr) {
-        return "";
-    }
-    return val;
-}
-
 int64_t GetMicrotime()
 {
     struct timeval currentTime = {};
