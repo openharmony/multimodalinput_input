@@ -235,7 +235,7 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
 static void AsyncWorkFn(napi_env env, OHOS::MMI::KeyEventMonitorInfo *event, napi_value result[2], uint32_t resultSize)
 {
     CHKPV(event);
-    if (resultSize < 2) {
+    if (resultSize <= 1) {
         MMI_LOGE("resultSize(%{public}u) too short", resultSize);
         return;
     }
