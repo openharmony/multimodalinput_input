@@ -25,7 +25,7 @@
 #include "virtual_keyboard.h"
 
 namespace OHOS {
-namespace MMIS {
+namespace MMI {
 class KeyboardInject : public Singleton<KeyboardInject> {
 public:
     KeyboardInject();
@@ -33,13 +33,13 @@ public:
     void InjectKeyEvent(uint16_t code, uint32_t value) const;
 
 private:
-    static std::unique_ptr<InjectThread> injectThread_;
+    static std::unique_ptr<OHOS::MMI::InjectThread> injectThread_;
     std::map<int32_t, int32_t> keyCodeMap_ = {};
     static std::mutex mutex_;
     static constexpr int32_t INPUT_KEY_BACK = 2;
     static constexpr int32_t LINUX_KEY_BACK = 158;
 };
-} // namespace MMIS
+} // namespace MMI
 } // namespace OHOS
 
 #endif // KEYBOARD_INJECT_H

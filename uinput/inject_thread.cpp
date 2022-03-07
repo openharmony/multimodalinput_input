@@ -20,7 +20,7 @@
 #include <unistd.h>
 
 namespace OHOS {
-namespace MMIS {
+namespace MMI {
 std::mutex InjectThread::mutex_;
 std::condition_variable InjectThread::conditionVariable_;
 std::vector<InjectInputEvent> InjectThread::injectQueue_;
@@ -47,5 +47,5 @@ void InjectThread::WaitFunc(InjectInputEvent injectInputEvent) const
     injectQueue_.push_back(injectInputEvent);
     conditionVariable_.notify_one();
 }
-} // namespace MMIS
+} // namespace MMI
 } // namespace OHOS
