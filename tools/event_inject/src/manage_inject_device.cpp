@@ -32,8 +32,7 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
     }
     int32_t ret = RET_ERR;
     for (const auto &item : configData) {
-        std::string deviceName;
-        deviceName = item.at("deviceName").get<std::string>();
+        std::string deviceName = item.at("deviceName").get<std::string>();
         InputEventArray inputEventArray = {};
         inputEventArray.deviceName = deviceName;
         uint16_t devIndex = 0;

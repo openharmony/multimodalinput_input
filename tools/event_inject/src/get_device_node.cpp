@@ -33,7 +33,7 @@ int32_t GetDeviceNode::GetDeviceNodeName(const std::string &targetName, uint16_t
     ExecuteCmd(cmd, cmdResult);
     DeviceList deviceList;
     GetDeviceCmd(cmdResult, deviceList);
-    if(deviceList.empty()) {
+    if (deviceList.empty()) {
         MMI_LOGE("device list is null");
         return RET_ERR;
     }
