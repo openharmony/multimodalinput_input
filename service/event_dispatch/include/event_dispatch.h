@@ -36,8 +36,7 @@ public:
         const int64_t preHandlerTime);
     int32_t DispatchKeyEvent(UDSServer& udsServer, struct libinput_event *event,
         const KeyEventValueTransformations& trs, EventKeyboard& key, const int64_t preHandlerTime);
-    int32_t DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key,
-        const int64_t preHandlerTime);
+    int32_t DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key);
     int32_t DispatchTouchEvent(UDSServer& udsServer, struct libinput_event *event,
         const EventTouch& touch, const int64_t preHandlerTime);
     int32_t DispatchTabletPadEvent(UDSServer& udsServer, struct libinput_event *event,

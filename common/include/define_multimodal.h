@@ -16,7 +16,6 @@
 #define DEFINE_MULTIMODAL_H
 
 #include "mmi_log.h"
-
 #ifndef RET_OK
     #define RET_OK (0)
 #endif
@@ -106,15 +105,6 @@
         } \
     } while (0)
 
-#define CHKR(cond, ec, r) \
-    do { \
-        if (!(cond)) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHKR(%{public}s), errCode:%{public}d", \
-                __FILE__, __LINE__, #cond, ec); \
-            return r; \
-        } \
-    } while (0)
-
 #else // DEBUG_CODE_TEST
 #define CHKPL(cond) \
     do { \
@@ -175,14 +165,6 @@
     do { \
         if (!(cond)) { \
             MMI_LOGE("CK(%{public}s), errCode:%{public}d", #cond, ec); \
-        } \
-    } while (0)
-
-#define CHKR(cond, ec, r) \
-    do { \
-        if (!(cond)) { \
-            MMI_LOGE("CHKR(%{public}s), errCode:%{public}d", #cond, ec); \
-            return r; \
         } \
     } while (0)
 
