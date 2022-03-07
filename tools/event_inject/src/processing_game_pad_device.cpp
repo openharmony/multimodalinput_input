@@ -72,7 +72,7 @@ int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const Json& inputData, std
                 MMI_LOGE("not find direction On Event:%{public}s", eventType.c_str());
                 return RET_ERR;
             }
-            padEvent.gameEvents = item.at("event").get<std::vector<int32_t>>();
+            padEvent.gameEvents = item.at("event").get<std::vector<uint32_t>>();
             padEvent.direction = item.at("direction").get<std::string>();
         } else if (eventType == "DERECTION_KEY") {
             if ((item.find("direction")) == item.end()) {
