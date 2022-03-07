@@ -43,13 +43,11 @@ static void InitHiLogFunc(struct libinput* input)
     if (initFlag) {
         return;
     }
-    libinput_log_set_handler(input, &OHOS::MMI::HiLogFunc);
+    libinput_log_set_handler(input, &HiLogFunc);
     initFlag = true;
 }
-} // namespace MMI
-} // namespace OHOS
 
-void OHOS::MMI::SInput::LoginfoPackagingTool(struct libinput_event *event)
+void SInput::LoginfoPackagingTool(struct libinput_event *event)
 {
     CHKPV(event);
     auto context = libinput_event_get_context(event);
@@ -58,7 +56,6 @@ void OHOS::MMI::SInput::LoginfoPackagingTool(struct libinput_event *event)
 
 constexpr static libinput_interface LIBINPUT_INTERFACE = {
     .open_restricted = [](const char *path, int32_t flags, void *user_data)->int32_t {
-        using namespace OHOS::MMI;
         CHKPR(path, errno);
         char realPath[PATH_MAX] = {};
         if (realpath(path, realPath) == nullptr) {
@@ -71,17 +68,16 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
     },
     .close_restricted = [](int32_t fd, void *user_data)
     {
-        using namespace OHOS::MMI;
         MMI_LOGI("libinput .close_restricted fd:%{public}d", fd);
         close(fd);
     },
 };
 
-OHOS::MMI::SInput::SInput() {}
+SInput::SInput() {}
 
-OHOS::MMI::SInput::~SInput() {}
+SInput::~SInput() {}
 
-bool OHOS::MMI::SInput::Init(FunInputEvent funInputEvent, const std::string& seat_id)
+bool SInput::Init(FunInputEvent funInputEvent, const std::string& seat_id)
 {
     MMI_LOGD("enter");
     CHKPF(funInputEvent);
@@ -113,7 +109,7 @@ bool OHOS::MMI::SInput::Init(FunInputEvent funInputEvent, const std::string& sea
     return true;
 }
 
-void OHOS::MMI::SInput::EventDispatch(struct epoll_event& ev)
+void SInput::EventDispatch(struct epoll_event& ev)
 {
     MMI_LOGD("enter");
     CHKPV(ev.data.ptr);
@@ -133,7 +129,7 @@ void OHOS::MMI::SInput::EventDispatch(struct epoll_event& ev)
     MMI_LOGD("leave");
 }
 
-void OHOS::MMI::SInput::Stop()
+void SInput::Stop()
 {
     MMI_LOGD("enter");
     if (fd_ >= 0) {
@@ -145,7 +141,7 @@ void OHOS::MMI::SInput::Stop()
     MMI_LOGD("leave");
 }
 
-void OHOS::MMI::SInput::OnEventHandler()
+void SInput::OnEventHandler()
 {
     MMI_LOGD("enter");
     CHKPV(funInputEvent_);
@@ -156,3 +152,5 @@ void OHOS::MMI::SInput::OnEventHandler()
     }
     MMI_LOGD("leave");
 }
+} // namespace MMI
+} // namespace OHOS
