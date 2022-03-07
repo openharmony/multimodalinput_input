@@ -35,7 +35,7 @@ private:
     bool OnEventTouchMotion(struct libinput_event *event);
     bool OnEventTouchUp(struct libinput_event *event);
 private:
-    int32_t deviceId_;
+    int32_t deviceId_ {0};
     std::shared_ptr<PointerEvent> pointerEvent_ = nullptr;
     Direction direction_ {Direction0};
 };
