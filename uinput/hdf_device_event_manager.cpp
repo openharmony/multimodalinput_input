@@ -35,7 +35,7 @@ HdfDeviceEventManager::~HdfDeviceEventManager() {}
 
 void HdfDeviceEventManager::ConnectHDFInit()
 {
-    uint32_t ret = GetInputInterface(&inputInterface_);
+    int32_t ret = GetInputInterface(&inputInterface_);
     if (ret != 0) {
         HiLog::Error(LABEL, "Initialize:%{public}s fail. ret:%{public}u", __func__, ret);
         return;
