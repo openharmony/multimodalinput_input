@@ -230,6 +230,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep2()
 
 void InputManagerTest::TestMarkConsumedStep3(int32_t monitorId, int32_t eventId)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     std::string command {
         "ClientMsgHandler: in OnPointerEvent, #[[:digit:]]\\{1,\\}, "
         "Operation canceled"
@@ -261,7 +262,7 @@ void InputManagerTest::TestMarkConsumedStep4()
 
     std::string command {
         "InputHandlerManagerGlobal: in HandleEvent, #[[:digit:]]\\{1,\\}, "
-        "Pointer event was consumed"
+        "Pointer event was monitor"
     };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
@@ -274,6 +275,7 @@ void InputManagerTest::TestMarkConsumedStep4()
 
 void InputManagerTest::TestMarkConsumedStep5()
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     auto pointerEvent = PointerEvent::Create();
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
@@ -290,7 +292,7 @@ void InputManagerTest::TestMarkConsumedStep5()
 
     std::string command {
         "InputHandlerManagerGlobal: in HandleEvent, #[[:digit:]]\\{1,\\}, "
-        "Pointer event was consumed"
+        "Pointer event was monitor"
     };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
@@ -303,6 +305,7 @@ void InputManagerTest::TestMarkConsumedStep5()
 
 void InputManagerTest::TestMarkConsumedStep6()
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     auto pointerEvent = PointerEvent::Create();
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
@@ -2532,8 +2535,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
     MMI_LOGD("Call MontiorManager");
 
     std::string command {
-        "EventDispatch: in handlePointerEvent, #[[:digit:]]\\{1,\\}, "
-        "Unknown source type"
+        "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
+        "PointerEvent received"
     };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 

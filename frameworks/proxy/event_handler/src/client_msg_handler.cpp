@@ -341,7 +341,8 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
         return RET_ERR;
     }
     MMI_LOGD("Client handlerId:%{public}d,handlerType:%{public}d", handlerId, handlerType);
-    auto pointerEvent { PointerEvent::Create() };
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
         MMI_LOGE("Failed to deserialize pointer event");
         return RET_ERR;
@@ -396,7 +397,7 @@ int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket
     }
 
     int32_t keyId = keyEvent->GetId();
-    std::string keyEventString = "keyEventFilter";
+    std::string keyEventString = "intercept";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
     int32_t keyCode = keyEvent->GetKeyCode();
     keyEventString = "client filter keyCode=" + std::to_string(keyCode);
