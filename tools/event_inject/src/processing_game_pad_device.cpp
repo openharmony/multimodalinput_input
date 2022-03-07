@@ -136,7 +136,7 @@ void ProcessingGamePadDevice::TransformRocker1Event(const GamePadEvent& padEvent
 {
     std::string direction = padEvent.direction;
     for (const auto &item : padEvent.gameEvents) {
-        int32_t value;
+        uint32_t value;
         if (direction == "left") {
             value = ~item + 1;
             SetEvAbsX(inputEventArray, 0, value);
@@ -175,8 +175,8 @@ void ProcessingGamePadDevice::TransformRocker1Event(const GamePadEvent& padEvent
 void ProcessingGamePadDevice::TransformRocker2Event(const GamePadEvent& padEvent, InputEventArray& inputEventArray)
 {
     std::string direction = padEvent.direction;
-    for (int32_t item : padEvent.gameEvents) {
-        int32_t value;
+    for (uint32_t item : padEvent.gameEvents) {
+        uint32_t value;
         if (direction == "left") {
             value = ~item + 1;
             SetEvAbsRx(inputEventArray, 0, value);

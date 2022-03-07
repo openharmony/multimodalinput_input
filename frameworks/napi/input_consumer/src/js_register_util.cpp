@@ -232,9 +232,13 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
     return JS_CALLBACK_EVENT_FAILED;
 }
 
-static void AsyncWorkFn(napi_env env, OHOS::MMI::KeyEventMonitorInfo *event, napi_value result[2])
+static void AsyncWorkFn(napi_env env, OHOS::MMI::KeyEventMonitorInfo *event, napi_value result[2], uint32_t resultSize)
 {
     CHKPV(event);
+    if (resultSize < 2) {
+        MMI_LOGE("resultSize(%{public}u) too short", resultSize);
+        return;
+    }
     if (event->status < 0) {
         MMI_LOGD("Status < 0 enter");
         napi_value code = nullptr;

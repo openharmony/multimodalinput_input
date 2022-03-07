@@ -93,7 +93,7 @@ int64_t GetSysClockTime()
 {
     struct timespec ts = { 0, 0 };
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
-        MMI_LOGD("clock_gettime failed:%{public}s", strerror(errno));
+        MMI_LOGD("clock_gettime failed:%{public}d", errno);
         return 0;
     }
     return (ts.tv_sec * 1000 * 1000) + (ts.tv_nsec / 1000);
@@ -391,9 +391,7 @@ const std::string& GetThreadName()
         thisThreadName[MAX_THREAD_NAME_SIZE] = '\0';
         g_threadName = thisThreadName;
     } else {
-        const int32_t errnoSaved = errno;
-        printf("in GetThreadName, call prctl get name fail, errno: %d, error msg: %s.\n",
-               errnoSaved, strerror(errnoSaved));
+        printf("in GetThreadName, call prctl get name fail, errno: %d.\n", errno);
     }
 
     return g_threadName;
