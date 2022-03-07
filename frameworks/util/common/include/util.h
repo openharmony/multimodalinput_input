@@ -25,7 +25,6 @@
 namespace OHOS {
 namespace MMI {
     const char *GetMmiErrorTypeDesc(int32_t errorCodeEnum);
-    std::string GetEnv(const std::string& name);
     std::string UuIdGenerate();
     int64_t GetMicrotime();
     int64_t GetSysClockTime();
