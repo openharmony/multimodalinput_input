@@ -501,6 +501,5 @@ extern "C" int32_t HdfDevHandle(int32_t index, hdf_event_type cmd)
     return hdfEventManager.HdfDevHandle(index, cmd);
 }
 #endif
-
 } // namespace MMI
 } // namespace OHOS
