@@ -58,10 +58,9 @@ int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event& event, i
     }
     auto ret = epoll_ctl(epollFd, op, fd, &event);
     if (ret < 0) {
-        const int32_t errnoSaved = errno;
         MMI_LOGE("epoll_ctl retrun %{public}d,epollFd_:%{public}d,"
-                 "op:%{public}d,fd:%{public}d,errno:%{public}d,error msg: %{public}s",
-                 ret, epollFd, op, fd, errnoSaved, strerror(errnoSaved));
+                 "op:%{public}d,fd:%{public}d,errno:%{public}d",
+                 ret, epollFd, op, fd, errno);
     }
     return ret;
 }
@@ -77,14 +76,12 @@ int32_t UDSSocket::EpollWait(struct epoll_event& events, int32_t maxevents, int3
     }
     auto ret = epoll_wait(epollFd, &events, maxevents, timeout);
     if (ret < 0) {
-        const int errnoSaved = errno;
-        MMI_LOGE("epoll_wait retrun %{public}d,errno:%{public}d,%{public}s",
-            ret, errnoSaved, strerror(errnoSaved));
+        MMI_LOGE("epoll_wait ret:%{public}d,errno:%{public}d", ret, errno);
     }
     return ret;
 }
 
-int32_t UDSSocket::SetBlockMode(int32_t fd, bool isBlock)
+int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isBlock)
 {
     if (fd < 0) {
         MMI_LOGE("Invalid fd");
@@ -92,19 +89,19 @@ int32_t UDSSocket::SetBlockMode(int32_t fd, bool isBlock)
     }
     int32_t flags = fcntl(fd, F_GETFL);
     if (flags < 0) {
-        MMI_LOGE("fcntl F_GETFL fail. fd:%{public}d,flags:%{public}d,msg:%{public}s,errCode:%{public}d",
-            fd, flags, strerror(errno), FCNTL_FAIL);
+        MMI_LOGE("fcntl F_GETFL fail. fd:%{public}d,flags:%{public}d,errno:%{public}d,errCode:%{public}d",
+            fd, flags, errno, FCNTL_FAIL);
         return flags;
     }
     MMI_LOGD("F_GETFL fd:%{public}d,flags:%{public}d", fd, flags);
-    flags |= O_NONBLOCK; // 非阻塞模式
+    flags |= O_NONBLOCK;
     if (isBlock) {
-        flags &= ~O_NONBLOCK; // 阻塞模式
+        flags &= ~O_NONBLOCK;
     }
     flags = fcntl(fd, F_SETFL, flags);
     if (flags < 0) {
-        MMI_LOGE("fcntl F_SETFL fail. fd:%{public}d,flags:%{public}d,msg:%{public}s,errCode:%{public}d",
-            fd, flags, strerror(errno), FCNTL_FAIL);
+        MMI_LOGE("fcntl F_SETFL fail. fd:%{public}d,flags:%{public}d,errno:%{public}d,errCode:%{public}d",
+            fd, flags, errno, FCNTL_FAIL);
         return flags;
     }
     MMI_LOGD("F_SETFL fd:%{public}d,flags:%{public}d", fd, flags);
