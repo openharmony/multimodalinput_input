@@ -34,7 +34,7 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
         return RET_ERR;
     }
     auto keys = key->GetKeyItems();
-    int32_t size = keys.size();
+    int32_t size = static_cast<int32_t>(keys.size());
     if (!pkt.Write(size)) {
         MMI_LOGE("Packet write keys size failed");
         return RET_ERR;

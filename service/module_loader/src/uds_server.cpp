@@ -269,36 +269,37 @@ void UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
     CHKPV(sess);
     int32_t readIdx = 0;
     int32_t packSize = 0;
-    const size_t headSize = sizeof(PackHead);
-    if (size < headSize) {
+    int32_t bufSize = static_cast<int32_t>(size);
+    const int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
+    if (bufSize < headSize) {
         MMI_LOGE("The in parameter size less than headSize, errCode%{public}d", VAL_NOT_EXP);
         return;
     }
-    while (size > 0 && recvFun_) {
-        if (size < headSize) {
+    while (bufSize > 0 && recvFun_) {
+        if (bufSize < headSize) {
             MMI_LOGE("The size less than headSize, errCode%{public}d", VAL_NOT_EXP);
             return;
         }
         auto head = (PackHead*)&buf[readIdx];
-        if (head->size[0] >= size) {
+        if (head->size[0] >= bufSize) {
             MMI_LOGE("The head->size[0] more or equal than size, errCode:%{public}d", VAL_NOT_EXP);
             return;
         }
         packSize = headSize + head->size[0];
-        if (size < packSize) {
+        if (bufSize < packSize) {
             MMI_LOGE("The size less than packSize, errCode:%{public}d", VAL_NOT_EXP);
             return;
         }
         
         NetPacket pkt(head->idMsg);
         if (head->size[0] > 0) {
-            if (!pkt.Write(&buf[readIdx + headSize], head->size[0])) {
+            if (!pkt.Write(&buf[readIdx + headSize], static_cast<size_t>(head->size[0]))) {
                 MMI_LOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
                 return;
             }
         }
         recvFun_(sess, pkt);
-        size -= packSize;
+        bufSize -= packSize;
         readIdx += packSize;
     }
 }
