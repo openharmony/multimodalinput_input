@@ -100,7 +100,7 @@ public:
      */
     static constexpr int32_t POINTER_ACTION_BUTTON_UP = 9;
 
-    class enum AxisType : uint32 {
+    enum AxisType {
         /**
          * Indicates an unknown axis type. It is generally used as the initial value.
          * 
@@ -622,7 +622,7 @@ public:
      * @return Returns <b>true</b> if the axes set contains the specified axis type; returns <b>false</b> otherwise.
      * @since 8
      */
-    static bool HasAxis(uint32_t axes, AxisType axis);
+    static bool HasAxis(int32_t axes, AxisType axis);
 
 public:
     /**
