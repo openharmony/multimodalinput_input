@@ -17,6 +17,7 @@
 #define JS_INPUT_MONITOR_MANAGER_H
 
 #include <list>
+#include <map>
 #include <mutex>
 #include <cinttypes>
 #include "js_input_monitor.h"
