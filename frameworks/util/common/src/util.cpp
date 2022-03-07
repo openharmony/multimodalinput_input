@@ -71,7 +71,10 @@ const char *GetMmiErrorTypeDesc(int32_t errorCodeEnum)
 
 std::string GetEnv(const std::string &name)
 {
-    CHKR(!name.empty(), PARAM_INPUT_INVALID, "");
+    if (name.empty()) {
+        MMI_LOGW("Name is empty");
+        return "";
+    }
     auto val = getenv(name.c_str());
     if (val == nullptr) {
         return "";
@@ -345,10 +348,8 @@ char* MmiBasename(char* path)
 std::string GetStackInfo()
 {
 #ifndef OHOS_BUILD
-    std::ostringstream oss;
     constexpr size_t bufferSize = 1024;
     void* buffer[bufferSize];
-
     const int32_t nptrs = backtrace(buffer, bufferSize);
     char** strings = backtrace_symbols(buffer, nptrs);
     if (strings == nullptr) {
@@ -356,6 +357,7 @@ std::string GetStackInfo()
         return std::string();
     }
 
+    std::ostringstream oss;
     for (int32_t i = 1; i < nptrs; i++) {
         oss << strings[i] << std::endl;
     }
@@ -430,7 +432,10 @@ size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_
 
 std::string StringFmt(const char* str, ...)
 {
-    CHKR(str != nullptr, PARAM_INPUT_INVALID, "");
+    if (str == nullptr) {
+        MMI_LOGW("Str is nullptr");
+        return "";
+    }
     va_list args;
     va_start(args, str);
     char buf[MAX_PACKET_BUF_SIZE] = {};

@@ -18,10 +18,13 @@
 #include "msg_head.h"
 #include "proto.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
-using namespace std;
+} // namespace
+
 class InjectionToolsHelpFuncTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {};
@@ -34,4 +37,5 @@ HWTEST_F(InjectionToolsHelpFuncTest, Test_InjectionToolsHelpFuncTest, TestSize.L
     auto ret = injectionToolsHelpFunc.GetHelpText();
     EXPECT_EQ(ret.empty(), false);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

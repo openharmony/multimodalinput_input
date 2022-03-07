@@ -20,10 +20,12 @@
 #include "get_device_node.h"
 #undef private
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
-using namespace std;
+} // namespace
 
 class GetDeviceNodeTest : public testing::Test {
 public:
@@ -34,7 +36,7 @@ public:
 HWTEST_F(GetDeviceNodeTest, Test_GetDeviceNodeTest, TestSize.Level1)
 {
     GetDeviceNode getDeviceNode;
-    const string cmd = "";
+    const std::string cmd = "";
     std::vector<std::string> cmdResult;
     auto ret = getDeviceNode.ExecuteCmd(cmd, cmdResult);
     EXPECT_EQ(ret, RET_ERR);
@@ -43,9 +45,10 @@ HWTEST_F(GetDeviceNodeTest, Test_GetDeviceNodeTest, TestSize.Level1)
 HWTEST_F(GetDeviceNodeTest, Test_GetDeviceNodeTestCmdError, TestSize.Level1)
 {
     GetDeviceNode getDeviceNode;
-    const string cmd = "temp";
+    const std::string cmd = "temp";
     std::vector<std::string> cmdResult;
     auto ret = getDeviceNode.ExecuteCmd(cmd, cmdResult);
     EXPECT_GT(ret, 0);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

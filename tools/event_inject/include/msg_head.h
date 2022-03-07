@@ -48,7 +48,7 @@ struct InputEvent {
     int32_t fp;
     int32_t devType;
     int32_t track;
-    int32_t blockTime;
+    int64_t blockTime;
     int32_t multiReprot;
 };
 
@@ -73,7 +73,7 @@ struct DeviceInformation {
 
 struct InjectEvent {
     struct input_event event;
-    int32_t blockTime;
+    int64_t blockTime;
 };
 
 struct InputEventArray {

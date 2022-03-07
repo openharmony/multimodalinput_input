@@ -66,7 +66,7 @@ private:
 
 class JsInputMonitor {
 public:
-    JsInputMonitor(napi_env jsEnv, napi_value receiver, int32_t id);
+    JsInputMonitor(napi_env jsEnv, napi_value callback, int32_t id);
 
     ~JsInputMonitor();
 
@@ -76,7 +76,7 @@ public:
 
     void MarkConsumed(const int32_t eventId);
 
-    int32_t IsMatch(const napi_env jsEnv, napi_value receiver);
+    int32_t IsMatch(const napi_env jsEnv, napi_value callback);
 
     int32_t IsMatch(napi_env jsEnv);
 
@@ -84,30 +84,28 @@ public:
 
     void OnPointerEventInJsThread();
 
-    void OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void OnPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
     
     static void JsCallback(uv_work_t *work, int32_t status);
 private:
-    void OnPointerEventInJsThread(std::shared_ptr<PointerEvent> pointerEvent);
 
-    void SetReceiver(napi_value receiver);
-
-    void printfPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) const;
+    void SetCallback(napi_value callback);
 
     int32_t TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
 
     std::string GetAction(int32_t action);
 
+    int32_t GetJsPointerItem(const PointerEvent::PointerItem &item, napi_value value);
+
 private:
     std::shared_ptr<InputMonitor> monitor_ {nullptr};
     napi_ref receiver_ {nullptr};
     napi_env jsEnv_ {nullptr};
-    uv_loop_s *loop_ = nullptr;
     int32_t id_ = 0;
     bool isMonitoring_ = false;
     std::queue<std::shared_ptr<PointerEvent>> evQueue_;
     std::mutex mutex_;
-    int32_t jsThreadNum_ = 0;
+    int32_t jsTaskNum_ = 0;
 };
 } // namespace MMI
 } // namespace OHOS

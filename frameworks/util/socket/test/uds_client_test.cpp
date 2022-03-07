@@ -17,9 +17,12 @@
 #include <future>
 #include <gtest/gtest.h>
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+} // namespace
 
 class UDSClientTest : public testing::Test {
 public:
@@ -52,11 +55,7 @@ public:
 
     void OnThreadUnitTest()
     {
-        std::promise<bool> threadPromise;
-        std::future<bool> threadFuture = threadPromise.get_future();
-        OnThread(std::ref(threadPromise));
-        const bool ret = threadFuture.get();
-        ASSERT_EQ(ret, true);
+        OnThread();
     }
 };
 
@@ -235,4 +234,5 @@ HWTEST_F(UDSClientTest, OnThread, TestSize.Level1)
     udsClientUt.OnThreadUnitTest();
 }
 #endif
-} // namespace
+} // namespace MMI
+} // namespace OHOS

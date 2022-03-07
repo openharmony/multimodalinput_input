@@ -24,8 +24,8 @@ namespace MMI {
 class JsInputDeviceManager : public JsEventTarget {
 public:
     void ResetEnv();
-    void GetDeviceIds(napi_env env, napi_value handle = nullptr);
-    void GetDevice(int32_t id, napi_env env, napi_value handle = nullptr);
+    napi_value GetDeviceIds(napi_env env, napi_value handle = nullptr);
+    napi_value GetDevice(int32_t id, napi_env env, napi_value handle = nullptr);
 };
 } // namespace MMI
 } // namespace OHOS

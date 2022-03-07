@@ -39,11 +39,10 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
 {
     MMI_LOGI("into function ManageHdfInject");
     int32_t sendType = 0;
+    pkt >> sendType;
     uint32_t devIndex = 0;
     uint32_t devSatatus = 0;
     RawInputEvent speechEvent = {};
-    vector<RawInputEvent> allEvent;
-    pkt >> sendType;
     switch (sendType) {
         case GET_STATUS_INFO:
             OnInitHdiServerStatus();
@@ -86,10 +85,10 @@ int32_t HdiInject::OnSetEventInject(const RawInputEvent& allEvent, int32_t devIn
 void HdiInject::OnSetHotPlugs(uint32_t devIndex, uint32_t devSatatus)
 {
     if (!(ReportHotPlugEvent(devIndex, devSatatus))) {
-        MMI_LOGE("OnSetHotPlugs ReportHotPlugEvent faild");
+        MMI_LOGE("ReportHotPlugEvent faild");
         return;
     }
-    MMI_LOGI("OnSetHotPlugs ReportHotPlugEvent success");
+    MMI_LOGI("ReportHotPlugEvent success");
 }
 
 void HdiInject::InitDeviceInfo()
@@ -121,7 +120,10 @@ void HdiInject::InitDeviceInfo()
          HDF_DEVICE_FD_DEFAULT_STATUS, "remoteControl"},
     };
     int32_t counts = sizeof(deviceInfoArray) / sizeof(DeviceInformation);
-    deviceArray_.insert(deviceArray_.begin(), deviceInfoArray, deviceInfoArray + counts);
+    auto iter = deviceArray_.insert(deviceArray_.begin(), deviceInfoArray, deviceInfoArray + counts);
+    if (!iter.second) {
+        MMI_LOGE("Insert value failed");
+    }
 }
 
 void HdiInject::StartHdiserver()

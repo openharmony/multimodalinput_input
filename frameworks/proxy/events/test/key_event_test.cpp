@@ -17,14 +17,17 @@
 #include "define_multimodal.h"
 #include "input_manager.h"
 #include "key_event.h"
-#include "multimodal_standardized_event_manager.h"
+#include "standardized_event_manager.h"
 #include "proto.h"
 #include "key_event.h"
 #include "run_shell_util.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+} // namespace
 
 class KeyEventTest : public testing::Test {
 public:
@@ -140,4 +143,5 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_005, TestSize.Level1)
     KeyEvent->AddKeyItem(item2);
     ASSERT_TRUE(KeyEvent->IsValid());
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

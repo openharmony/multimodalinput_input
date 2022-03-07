@@ -55,7 +55,7 @@ int32_t ProcessingJoystickDevice::AnalysisJoystickEvent(const Json& inputData,
         joystickEvent = {};
         std::string eventType = item.at("eventType").get<std::string>();
         if ((item.find("blockTime")) != item.end()) {
-            joystickEvent.blockTime = item.at("blockTime").get<int32_t>();
+            joystickEvent.blockTime = item.at("blockTime").get<int64_t>();
         }
         joystickEvent.eventType = eventType;
         if ((eventType == "KEY_EVENT_CLICK") || (eventType == "KEY_EVENT_PRESS") ||

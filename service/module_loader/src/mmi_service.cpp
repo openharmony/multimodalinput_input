@@ -22,7 +22,6 @@
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "pointer_drawing_manager.h"
-#include "safe_keeper.h"
 #include "timer_manager.h"
 #include "util.h"
 
@@ -81,11 +80,23 @@ MMIService::~MMIService() {}
 
 int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 {
-    CHKR((type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END), PARAM_INPUT_INVALID, RET_ERR);
-    CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
-    CHKR(mmiFd_ >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    if (!(type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END)) {
+        MMI_LOGE("Invalid param type");
+        return RET_ERR;
+    }
+    if (fd < 0) {
+        MMI_LOGE("Invalid param fd_");
+        return RET_ERR;
+    }
+    if (mmiFd_ < 0) {
+        MMI_LOGE("Invalid param mmiFd_");
+        return RET_ERR;
+    }
     auto eventData = static_cast<mmi_epoll_event*>(malloc(sizeof(mmi_epoll_event)));
-    CHKR(eventData, MALLOC_FAIL, RET_ERR);
+    if (!eventData) {
+        MMI_LOGE("Malloc failed");
+        return RET_ERR;
+    }
     eventData->fd = fd;
     eventData->event_type = type;
     MMI_LOGD("userdata:[fd:%{public}d,type:%{public}d]", eventData->fd, eventData->event_type);
@@ -100,7 +111,11 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
         ev.data.ptr = nullptr;
         return ret;
     }
-    authFds_.emplace(fd);
+    auto iter = authFds_.emplace(fd);
+    if (!iter.second) {
+        MMI_LOGE("Emplace to failed, fd:%{public}d", fd);
+        return RET_ERR;
+    }
     return RET_OK;
 }
 
@@ -118,24 +133,36 @@ bool MMIService::InitLibinputService()
     MMI_LOGD("HDF Init");
     hdfEventManager.SetupCallback();
 #endif
-    CHKF(input_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
-         DEF_INPUT_SEAT), LIBINPUT_INIT_FAIL);
+    if (!(input_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
+        DEF_INPUT_SEAT))) {
+        MMI_LOGE("libinput init, bind failed");
+        return false;
+    }
     auto inputFd = input_.GetInputFd();
     auto ret = AddEpoll(EPOLL_EVENT_INPUT, inputFd);
     if (ret <  0) {
-        MMI_LOGE("AddEpoll error ret:%{public}d", ret);
+        MMI_LOGE("AddEpoll error ret: %{public}d", ret);
         EpollClose();
         return false;
     }
-    MMI_LOGD("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, inputFd);
+    MMI_LOGD("AddEpoll, epollfd: %{public}d, fd: %{public}d", mmiFd_, inputFd);
     return true;
 }
 
 bool MMIService::InitService()
 {
-    CHKF(state_ == ServiceRunningState::STATE_NOT_START, SASERVICE_INIT_FAIL);
-    CHKF(Publish(this), SASERVICE_INIT_FAIL);
-    CHKF(EpollCreat(MAX_EVENT_SIZE) >= 0, SASERVICE_INIT_FAIL);
+    if (state_ != ServiceRunningState::STATE_NOT_START) {
+        MMI_LOGE("Service running status is not enabled");
+        return false;
+    }
+    if (!(Publish(this))) {
+        MMI_LOGE("Service initialization failed");
+        return false;
+    }
+    if (EpollCreat(MAX_EVENT_SIZE) < 0) {
+        MMI_LOGE("epoll create failed");
+        return false;
+    }
     auto ret = AddEpoll(EPOLL_EVENT_SOCKET, epollFd_);
     if (ret <  0) {
         MMI_LOGE("AddEpoll error ret:%{public}d", ret);
@@ -154,22 +181,41 @@ int32_t MMIService::Init()
     InputHandler->Init(*this);
 
     MMI_LOGD("ServerMsgHandler Init");
-    CHKR(sMsgHandler_.Init(*this), SVR_MSG_HANDLER_INIT_FAIL, SVR_MSG_HANDLER_INIT_FAIL);
-
+    if (!sMsgHandler_.Init(*this)) {
+        MMI_LOGE("Message handler init failed");
+        return SVR_MSG_HANDLER_INIT_FAIL;
+    }
     MMI_LOGD("EventDump Init");
     MMIEventDump->Init(*this);
 
     MMI_LOGD("WindowsManager Init");
-    CHKR(WinMgr->Init(*this), WINDOWS_MSG_INIT_FAIL, WINDOWS_MSG_INIT_FAIL);
-
+    if (!WinMgr->Init(*this)) {
+        MMI_LOGE("Windows message init failed");
+        return WINDOWS_MSG_INIT_FAIL;
+    }
     MMI_LOGD("PointerDrawingManager Init");
-    CHKR(PointerDrawingManager::GetInstance()->Init(), POINTER_DRAW_INIT_FAIL, POINTER_DRAW_INIT_FAIL);
-
+    if (!PointerDrawingManager::GetInstance()->Init()) {
+        MMI_LOGE("Pointer draw init failed");
+        return POINTER_DRAW_INIT_FAIL;
+    }
+    
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
-    CHKR(mmiFd_ >= 0, EPOLL_CREATE_FAIL, EPOLL_CREATE_FAIL);
-    CHKR(InitService(), SASERVICE_INIT_FAIL, SASERVICE_INIT_FAIL);
-    CHKR(InitLibinputService(), LIBINPUT_INIT_FAIL, LIBINPUT_INIT_FAIL);
-    CHKR(InitSignalHandler(), INIT_SIGNAL_HANDLER_FAIL, INIT_SIGNAL_HANDLER_FAIL);
+    if (mmiFd_ < 0) {
+        MMI_LOGE("Epoll creat failed");
+        return EPOLL_CREATE_FAIL;
+    }
+    if (!InitService()) {
+        MMI_LOGE("Saservice init failed");
+        return SASERVICE_INIT_FAIL;
+    }
+    if (!InitLibinputService()) {
+        MMI_LOGE("Libinput init failed");
+        return LIBINPUT_INIT_FAIL;
+    }
+    if (!InitSignalHandler()) {
+        MMI_LOGE("Signal handler init failed");
+        return INIT_SIGNAL_HANDLER_FAIL;
+    }
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
     return RET_OK;
 }
@@ -180,9 +226,12 @@ void MMIService::OnStart()
     MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
 
     int32_t ret = Init();
-    CHK(RET_OK == ret, ret);
+    if (RET_OK != ret) {
+        MMI_LOGE("Init mmi_service failed");
+        return;
+    }
     state_ = ServiceRunningState::STATE_RUNNING;
-    MMI_LOGD("MMIService Started successfully");
+    MMI_LOGD("Started successfully");
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
     t_.detach();
 }
@@ -290,9 +339,11 @@ void MMIService::OnThread()
 {
     OHOS::MMI::SetThreadName(std::string("mmi_service"));
     uint64_t tid = GetThisThreadIdOfLL();
-    CHK(tid > 0, VAL_NOT_EXP);
+    if (tid <= 0) {
+        MMI_LOGE("The tid is error, errCode:%{public}d", VAL_NOT_EXP);
+        return;
+    }
     MMI_LOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
-    SafeKpr->RegisterEvent(tid, "mmi_service");
 
     int32_t count = 0;
     constexpr int32_t timeOut = 20;
@@ -323,7 +374,6 @@ void MMIService::OnThread()
             }
             OnEpollRecv(it.first, it.second.sBuf.Data(), it.second.sBuf.Size());
         }
-        SafeKpr->ReportHealthStatus(tid);
         OnTimer();
     }
     MMI_LOGI("Main worker thread stop. tid:%{public}" PRId64 "", tid);

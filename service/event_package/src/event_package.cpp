@@ -21,7 +21,6 @@ namespace {
 const std::string VIRTUAL_KEYBOARD = "virtual_keyboard";
 constexpr uint32_t SEAT_KEY_COUNT_ONE = 1;
 constexpr uint32_t SEAT_KEY_COUNT_ZERO = 0;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventPackage" };
 }
 
 EventPackage::EventPackage() {}
@@ -100,9 +99,15 @@ int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& k
 {
     const std::string uid = GetUUid();
     int32_t ret = memcpy_s(key.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size());
-    CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    if (ret != EOK) {
+        MMI_LOGE("Memcpy data failed");
+        return RET_ERR;
+    }
     ret = memcpy_s(key.deviceName, MAX_UUIDSIZE, VIRTUAL_KEYBOARD.c_str(), VIRTUAL_KEYBOARD.size());
-    CHKR(ret == EOK, MEMCPY_SEC_FUN_FAIL, RET_ERR);
+    if (ret != EOK) {
+        MMI_LOGE("Memcpy data failed");
+        return RET_ERR;
+    }
     key.time = event.keyDownDuration;
     key.key = event.keyCode;
     key.isIntercepted = event.isIntercepted;

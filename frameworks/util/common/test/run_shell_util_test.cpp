@@ -19,15 +19,15 @@
 #include <gtest/gtest.h>
 #include "define_multimodal.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
 using namespace OHOS;
-
-namespace {
-    constexpr int32_t SLEEP = 1000;
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RunShellUtilTest" };
-}
+constexpr int32_t SLEEP = 1000;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RunShellUtilTest" };
+} // namespace
 
 class RunShellUtilTest : public testing::Test {
 public:
@@ -90,4 +90,5 @@ HWTEST_F(RunShellUtilTest, RunShellUtilTest_RunShellCommand_002, TestSize.Level1
         EXPECT_TRUE(std::strcmp(vLog.back().c_str(), firstLog.back().c_str()) != 0);
     }
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

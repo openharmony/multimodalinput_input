@@ -82,13 +82,16 @@ void InterceptorManager::RemoveInterceptor(int32_t interceptorId)
 int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    PointerEvent::PointerItem pointer;
-    CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL, RET_ERR);
+    PointerEvent::PointerItem item;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+        MMI_LOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
+        return RET_ERR;
+    }
     MMI_LOGD("Interceptor-clienteventTouchpad:actionTime:%{public}" PRId64 ","
              "sourceType:%{public}d,pointerAction:%{public}d,"
              "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
-             pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
+             pointerEvent->GetPointerId(), item.GetGlobalX(), item.GetGlobalY(), item.IsPressed());
     InterceptorItem interceptorItem;
     interceptorItem.id_ = id;
     auto iter = std::find(interceptor_.begin(), interceptor_.end(), interceptorItem);

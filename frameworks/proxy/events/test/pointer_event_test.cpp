@@ -17,16 +17,19 @@
 #include "define_multimodal.h"
 #include "input_manager.h"
 #include "key_event.h"
-#include "multimodal_standardized_event_manager.h"
+#include "standardized_event_manager.h"
 #include "proto.h"
 #include "pointer_event.h"
 #include "run_shell_util.h"
 #include "util.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
 using namespace OHOS;
+} // namespace
 class PointerEventTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
@@ -420,4 +423,5 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_005, TestSize.L
     pointerEvent->AddPointerItem(item2);
     ASSERT_TRUE(pointerEvent->IsValid());
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

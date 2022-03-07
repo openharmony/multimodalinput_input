@@ -52,15 +52,15 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(struct libinput_event 
     }
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    PointerEvent::PointerItem pointer;
-    pointer.SetPointerId(seatSlot);
-    pointer.SetDownTime(time);
-    pointer.SetPressed(true);
-    pointer.SetGlobalX(static_cast<int32_t>(logicalX));
-    pointer.SetGlobalY(static_cast<int32_t>(logicalY));
-    pointer.SetDeviceId(deviceId_);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(seatSlot);
+    item.SetDownTime(time);
+    item.SetPressed(true);
+    item.SetGlobalX(static_cast<int32_t>(logicalX));
+    item.SetGlobalY(static_cast<int32_t>(logicalY));
+    item.SetDeviceId(deviceId_);
     pointerEvent_->SetDeviceId(deviceId_);
-    pointerEvent_->AddPointerItem(pointer);
+    pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
     MMI_LOGD("End");
 }
@@ -78,11 +78,15 @@ void TouchPadTransformPointProcessor::OnEventTouchPadMotion(struct libinput_even
     int64_t time = GetSysClockTime();
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    PointerEvent::PointerItem pointer;
-    CHK(pointerEvent_->GetPointerItem(seatSlot, pointer), PARAM_INPUT_FAIL);
-    pointer.SetGlobalX(static_cast<int32_t>(logicalX));
-    pointer.SetGlobalY(static_cast<int32_t>(logicalY));
-    pointerEvent_->UpdatePointerItem(seatSlot, pointer);
+    PointerEvent::PointerItem item;
+    if (!pointerEvent_->GetPointerItem(seatSlot, item)) {
+        MMI_LOGE("Can't find the pointer item data, seatSlot:%{public}d, errCode:%{public}d",
+                 seatSlot, PARAM_INPUT_FAIL);
+                 return;
+    }
+    item.SetGlobalX(static_cast<int32_t>(logicalX));
+    item.SetGlobalY(static_cast<int32_t>(logicalY));
+    pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
     MMI_LOGD("End");
 }
@@ -101,12 +105,16 @@ void TouchPadTransformPointProcessor::OnEventTouchPadUp(struct libinput_event *e
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
 
-    PointerEvent::PointerItem pointer;
-    CHK(pointerEvent_->GetPointerItem(seatSlot, pointer), PARAM_INPUT_FAIL);
-    pointer.SetPressed(false);
-    pointer.SetGlobalX(static_cast<int32_t>(logicalX));
-    pointer.SetGlobalY(static_cast<int32_t>(logicalY));
-    pointerEvent_->UpdatePointerItem(seatSlot, pointer);
+    PointerEvent::PointerItem item;
+    if (!pointerEvent_->GetPointerItem(seatSlot, item)) {
+        MMI_LOGE("Can't find the pointer item data, seatSlot:%{public}d, errCode:%{public}d",
+                 seatSlot, PARAM_INPUT_FAIL);
+                 return;
+    }
+    item.SetPressed(false);
+    item.SetGlobalX(static_cast<int32_t>(logicalX));
+    item.SetGlobalY(static_cast<int32_t>(logicalY));
+    pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
     MMI_LOGD("End");
 }
@@ -116,6 +124,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
 {
     MMI_LOGD("begin");
     CHKPP(event);
+    CHKPP(pointerEvent_);
     auto type = libinput_event_get_type(event);
     pointerEvent_->UpdateId();
     switch (type) {

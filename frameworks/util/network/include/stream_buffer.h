@@ -51,7 +51,7 @@ public:
     size_t Size() const;
     size_t UnreadSize() const;
 
-    bool ChkError() const;
+    bool ChkRWError() const;
     const std::string& GetErrorStatusRemark() const;
     const char *Data() const;
 
@@ -71,14 +71,14 @@ protected:
     bool Clone(const StreamBuffer& buf);
 
 protected:
-    enum class ErrorStatus : int8_t {
-        ES_OK,
-        ES_READ,
-        ES_WRITE,
+    enum class ErrorStatus {
+        ERROR_STATUS_OK,
+        ERROR_STATUS_READ,
+        ERROR_STATUS_WRITE,
     };
-    ErrorStatus rwErrorStatus_ = ErrorStatus::ES_OK;
-    int16_t rCount_ = 0;
-    int16_t wCount_ = 0;
+    ErrorStatus rwErrorStatus_ = ErrorStatus::ERROR_STATUS_OK;
+    int32_t rCount_ = 0;
+    int32_t wCount_ = 0;
 
     size_t rIdx_ = 0;
     size_t wIdx_ = 0;

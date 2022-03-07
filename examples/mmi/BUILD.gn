@@ -15,7 +15,6 @@ import("//build/ohos.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
 ohos_executable("mmi-server") {
-  include_dirs = [ "$root_out_dir/gen/third_party/wayland_standard/protocol/" ]
   sources = [ "src/mmi_service_main.cpp" ]
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",

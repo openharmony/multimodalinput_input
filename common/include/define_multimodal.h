@@ -16,7 +16,6 @@
 #define DEFINE_MULTIMODAL_H
 
 #include "mmi_log.h"
-
 #ifndef RET_OK
     #define RET_OK (0)
 #endif
@@ -106,42 +105,6 @@
         } \
     } while (0)
 
-#define CHK(cond, ec) \
-    do { \
-        if (!(cond)) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHK(%{public}s), errCode:%{public}d", \
-                __FILE__, __LINE__, #cond, ec); \
-            return; \
-        } \
-    } while (0)
-
-#define CHKF(cond, ec) \
-    do { \
-        if (!(cond)) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHKF(%{public}s), errCode:%{public}d", \
-                __FILE__, __LINE__, #cond, ec); \
-            return false; \
-        } \
-    } while (0)
-
-#define CHKC(cond, ec) \
-    { \
-        if (!(cond)) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHKC(%{public}s), errCode:%{public}d", \
-                __FILE__, __LINE__, #cond, ec); \
-            continue; \
-        } \
-    }
-
-#define CHKR(cond, ec, r) \
-    do { \
-        if (!(cond)) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHKR(%{public}s), errCode:%{public}d", \
-                __FILE__, __LINE__, #cond, ec); \
-            return r; \
-        } \
-    } while (0)
-
 #else // DEBUG_CODE_TEST
 #define CHKPL(cond) \
     do { \
@@ -202,38 +165,6 @@
     do { \
         if (!(cond)) { \
             MMI_LOGE("CK(%{public}s), errCode:%{public}d", #cond, ec); \
-        } \
-    } while (0)
-
-#define CHK(cond, ec) \
-    do { \
-        if (!(cond)) { \
-            MMI_LOGE("CHK(%{public}s), errCode:%{public}d", #cond, ec); \
-            return; \
-        } \
-    } while (0)
-
-#define CHKF(cond, ec) \
-    do { \
-        if (!(cond)) { \
-            MMI_LOGE("CHKF(%{public}s), errCode:%{public}d", #cond, ec); \
-            return 0; \
-        } \
-    } while (0)
-
-#define CHKC(cond, ec) \
-    { \
-        if (!(cond)) { \
-            MMI_LOGE("CHKC(%{public}s), errCode:%{public}d", #cond, ec); \
-            continue; \
-        } \
-    }
-
-#define CHKR(cond, ec, r) \
-    do { \
-        if (!(cond)) { \
-            MMI_LOGE("CHKR(%{public}s), errCode:%{public}d", #cond, ec); \
-            return r; \
         } \
     } while (0)
 
