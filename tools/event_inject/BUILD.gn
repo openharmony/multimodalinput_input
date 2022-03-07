@@ -26,9 +26,7 @@ config("event_injection_config") {
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
 
-  cflags = [
-    "-DOHOS_BUILD",
-  ]
+  cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
