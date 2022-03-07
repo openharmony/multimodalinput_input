@@ -24,12 +24,12 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventInputSubscribeManager" };
 constexpr int32_t INVALID_SUBSCRIBE_ID = -1;
-}
+} // namespace
 int32_t KeyEventInputSubscribeManager::subscribeIdManager_ = 0;
 
 KeyEventInputSubscribeManager::SubscribeKeyEventInfo::SubscribeKeyEventInfo(
-    std::shared_ptr<OHOS::MMI::KeyOption> keyOption,
-    std::function<void(std::shared_ptr<OHOS::MMI::KeyEvent>)> callback)
+    std::shared_ptr<KeyOption> keyOption,
+    std::function<void(std::shared_ptr<KeyEvent>)> callback)
     : keyOption_(keyOption), callback_(callback)
 {
     if (KeyEventInputSubscribeManager::subscribeIdManager_ >= INT_MAX) {
@@ -41,8 +41,8 @@ KeyEventInputSubscribeManager::SubscribeKeyEventInfo::SubscribeKeyEventInfo(
     ++KeyEventInputSubscribeManager::subscribeIdManager_;
 }
 
-int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<OHOS::MMI::KeyOption> keyOption,
-    std::function<void(std::shared_ptr<OHOS::MMI::KeyEvent>)> callback)
+int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
+    std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
     MMI_LOGD("Enter");
     CHKPR(keyOption, INVALID_SUBSCRIBE_ID);

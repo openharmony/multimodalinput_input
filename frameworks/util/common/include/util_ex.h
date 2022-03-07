@@ -75,7 +75,7 @@ namespace MMI {
             ret = 0;
         };
 
-        ret = sprintf_s(outBuf, outBufSize - writeLen, "[%s]", OHOS::MMI::GetProgramName());
+        ret = sprintf_s(outBuf, outBufSize - writeLen, "[%s]", GetProgramName());
         funcAdvanceWriteLen(ret);
         ret = sprintf_s(outBuf, outBufSize - writeLen, titleFormat, args...);
         funcAdvanceWriteLen(ret);

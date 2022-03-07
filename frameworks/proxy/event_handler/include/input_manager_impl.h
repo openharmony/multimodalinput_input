@@ -39,10 +39,10 @@ public:
         const std::vector<LogicalDisplayInfo> &logicalDisplays);                         // 建议本地调用，可IPC
     int32_t AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter);
 
-    void SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::IInputEventConsumer> inputEventConsumer);
+    void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer);
 
-    void OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent);
-    void OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
+    void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+    void OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t PackDisplayData(NetPacket &pkt);
 
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
@@ -56,8 +56,8 @@ public:
     int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
     void RemoveInterceptor(int32_t interceptorId);
 
-    void SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent);
-    void SimulateInputEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
+    void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);
+    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
 
 private:
@@ -68,7 +68,7 @@ private:
 
 private:
     sptr<EventFilterService> eventFilterService_ {nullptr};
-    std::shared_ptr<OHOS::MMI::IInputEventConsumer> consumer_ = nullptr;
+    std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
     std::vector<PhysicalDisplayInfo> physicalDisplays_;
     std::vector<LogicalDisplayInfo> logicalDisplays_;
     InputMonitorManager monitorManager_;
