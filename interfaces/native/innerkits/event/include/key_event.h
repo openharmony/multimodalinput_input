@@ -1459,7 +1459,7 @@ public:
     private:
         bool pressed_ = false;
         int32_t deviceId_ = DEFALUTID;
-        int32_t keyCode_ = KEYCODE_UNKNOWN;
+        int32_t keyCode_ = -1;
         int64_t downTime_ = 0;
     };
 
@@ -1509,9 +1509,9 @@ private:
     bool IsValidKeyItem() const;
 
 private:
-    int32_t keyCode_ = KEYCODE_UNKNOWN;
+    int32_t keyCode_ = -1;
     std::vector<KeyItem> keys_;
-    int32_t keyAction_ = KEY_ACTION_UNKNOWN;
+    int32_t keyAction_ = 0;
 };
 } // namespace MMI
 } // namespace OHOS
