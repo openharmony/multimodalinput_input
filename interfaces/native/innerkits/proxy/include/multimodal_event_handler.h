@@ -17,7 +17,7 @@
 
 #include "singleton.h"
 #include "if_client_msg_handler.h"
-#include "multimodal_standardized_event_manager.h"
+#include "standardized_event_manager.h"
 #include "pointer_event.h"
 #include "proto.h"
 

@@ -118,7 +118,8 @@ napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info 
         return nullptr;
     }
 
-    JsInputDeviceContext *jsContext = new JsInputDeviceContext();
+    JsInputDeviceContext *jsContext = new (std::nothrow) JsInputDeviceContext();
+    CHKPP(jsContext);
     status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void* data, void* hin) {
         MMI_LOGI("jsvm ends");
         JsInputDeviceContext *context = (JsInputDeviceContext*)data;
@@ -206,14 +207,7 @@ napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info i
     JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
     auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
     if (argc == 0) {
-        status = napi_create_promise(env, &JsEventTarget::deferred_, &JsEventTarget::promise_);
-        if (status != napi_ok) {
-            napi_throw_error(env, nullptr, "JsEventTarget: failed to create promise");
-            MMI_LOGE("failed to create promise");
-            return nullptr;
-        }
-        jsInputDeviceMgr->GetDeviceIds(env);
-        return JsEventTarget::promise_;
+        return jsInputDeviceMgr->GetDeviceIds(env);
     }
 
     napi_valuetype valueType = napi_undefined;
@@ -272,15 +266,8 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
     if (argc == 1) {
-        status = napi_create_promise(env, &JsEventTarget::deferred_, &JsEventTarget::promise_);
-        if (status != napi_ok) {
-            napi_throw_error(env, nullptr, "JsEventTarget: failed to create promise");
-            MMI_LOGE("failed to create promise");
-            return nullptr;
-        }
-        jsInputDeviceMgr->GetDevice(id, env);
         MMI_LOGD("promise end");
-        return JsEventTarget::promise_;
+        return jsInputDeviceMgr->GetDevice(id, env);
     }
     status = napi_typeof(env, argv[1], &valueType);
     if (status != napi_ok) {
@@ -294,7 +281,6 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
         return nullptr;
     }
     jsInputDeviceMgr->GetDevice(id, env, argv[1]);
-
     MMI_LOGD("end");
     return nullptr;
 }

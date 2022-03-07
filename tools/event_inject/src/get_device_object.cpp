@@ -27,27 +27,37 @@ DeviceBase* GetDeviceObject::CreateDeviceObject(const std::string deviceName)
 {
     DeviceBase* deviceBasePtr = nullptr;
     if (deviceName == "finger") {
-        deviceBasePtr = new ProcessingFingerDevice();
+        deviceBasePtr = new (std::nothrow) ProcessingFingerDevice();
+        CHKPP(deviceBasePtr);
     } else if (deviceName == "pen") {
-        deviceBasePtr = new ProcessingPenDevice();
+        deviceBasePtr = new (std::nothrow) ProcessingPenDevice();
+        CHKPP(deviceBasePtr);
     } else if (deviceName == "pad") {
-        deviceBasePtr = new ProcessingPadDevice();
+        deviceBasePtr = new (std::nothrow) ProcessingPadDevice();
+        CHKPP(deviceBasePtr);
     } else if (deviceName == "touch") {
-        deviceBasePtr = new ProcessingTouchScreenDevice();
+        deviceBasePtr = new (std::nothrow) ProcessingTouchScreenDevice();
+        CHKPP(deviceBasePtr);
     } else if (deviceName == "gamePad") {
-        deviceBasePtr = new ProcessingGamePadDevice();
+        deviceBasePtr = new (std::nothrow) ProcessingGamePadDevice();
+        CHKPP(deviceBasePtr);
     } else if (deviceName == "joystick") {
-        deviceBasePtr = new ProcessingJoystickDevice();
+        deviceBasePtr = new (std::nothrow) ProcessingJoystickDevice();
+        CHKPP(deviceBasePtr);
     } else if ((deviceName == "keyboard model1") || (deviceName == "keyboard model2")
                || (deviceName == "keyboard model3")) {
-        deviceBasePtr = new ProcessingKeyboardDevice();
+        deviceBasePtr = new (std::nothrow) ProcessingKeyboardDevice();
+        CHKPP(deviceBasePtr);
     } else if ((deviceName == "mouse") || (deviceName == "trackball")) {
-        deviceBasePtr = new ProcessingMouseDevice();
+        deviceBasePtr = new (std::nothrow) ProcessingMouseDevice();
+        CHKPP(deviceBasePtr);
     } else if (deviceName == "remoteControl") {
-        deviceBasePtr = new ProcessingKeyboardDevice();
+        deviceBasePtr = new (std::nothrow) ProcessingKeyboardDevice();
+        CHKPP(deviceBasePtr);
     } else if ((deviceName == "knob model1") || (deviceName == "knob model2") || (deviceName == "knob model3")
                || (deviceName == "trackpad model1") || (deviceName == "trackpad model2")) {
-        deviceBasePtr = new ProcessingMouseDevice();
+        deviceBasePtr = new (std::nothrow) ProcessingMouseDevice();
+        CHKPP(deviceBasePtr);
     } else {
         MMI_LOGI("Not create device object from deviceName:%s", deviceName.c_str());
     }

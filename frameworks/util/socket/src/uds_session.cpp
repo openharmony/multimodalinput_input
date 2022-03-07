@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
+constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
 } // namespace
 
@@ -45,10 +45,13 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
     if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
-        MMI_LOGD("buf size:%{public}zu", size);
-        return PARAM_INPUT_INVALID;
+        MMI_LOGE("buf size:%{public}zu", size);
+        return false;
     }
-    CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
+    if (fd_ < 0) {
+        MMI_LOGE("fd_ is less than 0");
+        return false;
+    }
     ssize_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
     if (ret < 0) {
         const int32_t errNoSaved = errno;
@@ -86,7 +89,10 @@ void UDSSession::UpdateDescript()
 
 bool UDSSession::SendMsg(NetPacket& pkt) const
 {
-    CHKF(!pkt.ChkError(), PACKET_WRITE_FAIL);
+    if (pkt.ChkRWError()) {
+        MMI_LOGE("Read and write status is error");
+        return false;
+    }
     StreamBuffer buf;
     pkt.MakeData(buf);
     return SendMsg(buf.Data(), buf.Size());

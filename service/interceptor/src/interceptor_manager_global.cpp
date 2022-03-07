@@ -20,17 +20,15 @@
 
 namespace OHOS {
 namespace MMI {
-    namespace {
-        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManagerGlobal" };
-    }
-} // namespace MMI
-} // namespace OHOS
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManagerGlobal" };
+} // namespace
 
-OHOS::MMI::InterceptorManagerGlobal::InterceptorManagerGlobal() {}
+InterceptorManagerGlobal::InterceptorManagerGlobal() {}
 
-OHOS::MMI::InterceptorManagerGlobal::~InterceptorManagerGlobal() {}
+InterceptorManagerGlobal::~InterceptorManagerGlobal() {}
 
-void OHOS::MMI::InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
+void InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
@@ -49,7 +47,7 @@ void OHOS::MMI::InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, i
     MMI_LOGD("leave");
 }
 
-void OHOS::MMI::InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
+void InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
 {
     MMI_LOGD("enter");
     std::lock_guard<std::mutex> lock(mu_);
@@ -57,7 +55,7 @@ void OHOS::MMI::InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
     interceptorItem.id = id;
     auto iter = std::find(interceptors_.begin(), interceptors_.end(), interceptorItem);
     if (iter == interceptors_.end()) {
-        MMI_LOGE("OnRemoveInterceptor::interceptorItem does not exist");
+        MMI_LOGE("interceptorItem does not exist");
     } else {
         MMI_LOGD("sourceType:%{public}d,fd:%{public}d remove from server", iter->sourceType,
                  iter->session->GetFd());
@@ -66,21 +64,24 @@ void OHOS::MMI::InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
     MMI_LOGD("leave");
 }
 
-bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+bool InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("enter");
     CHKPF(pointerEvent);
     if (interceptors_.empty()) {
-        MMI_LOGE("InterceptorManagerGlobal::%{public}s no interceptor to send msg", __func__);
+        MMI_LOGE("%{public}s no interceptor to send msg", __func__);
         return false;
     }
-    PointerEvent::PointerItem pointer;
-    CHKF(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL);
+    PointerEvent::PointerItem pointerItem;
+    if (!(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem))) {
+        MMI_LOGE("The obtained pointer parameter is invalid");
+        return false;
+    }
     MMI_LOGD("Interceptor-servereventTouchpad:actionTime:%{public}" PRId64 ","
              "sourceType:%{public}d,pointerAction:%{public}d,"
              "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
-             pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
+             pointerEvent->GetPointerId(), pointerItem.GetGlobalX(), pointerItem.GetGlobalY(), pointerItem.IsPressed());
     for (const auto &item : interceptors_) {
         NetPacket pkt(MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR);
         InputEventDataTransformation::Marshalling(pointerEvent, pkt);
@@ -92,12 +93,12 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
     return true;
 }
 
-bool OHOS::MMI::InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+bool InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_LOGD("enter");
     CHKPF(keyEvent);
     if (interceptors_.empty()) {
-        MMI_LOGE("InterceptorManagerGlobal::%{public}s no interceptor to send msg", __func__);
+        MMI_LOGE("%{public}s no interceptor to send msg", __func__);
         return false;
     }
     for (const auto &item : interceptors_) {
@@ -112,3 +113,5 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> k
     MMI_LOGD("leave");
     return true;
 }
+} // namespace MMI
+} // namespace OHOS

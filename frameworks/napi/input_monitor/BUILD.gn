@@ -53,9 +53,6 @@ ohos_shared_library("inputmonitor") {
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//third_party/libuv:uv_static",
-    "//third_party/libxkbcommon:libxkbcommon",
-    "//third_party/wayland-ivi-extension:ivi-controller",
-    "//third_party/wayland-ivi-extension:libscreen-info-module",
     "//utils/native/base:utils",
   ]
 

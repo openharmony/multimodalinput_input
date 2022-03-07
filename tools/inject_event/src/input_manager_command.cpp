@@ -230,6 +230,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             return EVENT_REG_FAIL;
                         }
                     }
+                    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
                 }
                 break;
             }
@@ -301,6 +302,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             return EVENT_REG_FAIL;
                         }
                     }
+                    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
                 }
                 for (size_t i = 0; i < downKey.size(); i++) {
                     std::cout << "you have a key " << downKey[i]<<" not release"<< std::endl;
@@ -426,6 +428,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         ShowUsage();
         return EVENT_REG_FAIL;
     }
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
     return ERR_OK;
 }
 

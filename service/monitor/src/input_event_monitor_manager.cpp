@@ -20,17 +20,15 @@
 
 namespace OHOS {
 namespace MMI {
-    namespace {
-        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventMonitorManager" };
-    }
-} // namespace MMI
-} // namespace OHOS
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventMonitorManager" };
+} // namespace
 
-OHOS::MMI::InputEventMonitorManager::InputEventMonitorManager() {}
+InputEventMonitorManager::InputEventMonitorManager() {}
 
-OHOS::MMI::InputEventMonitorManager::~InputEventMonitorManager() {}
+InputEventMonitorManager::~InputEventMonitorManager() {}
 
-int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventMontior(SessionPtr session, int32_t eventType)
+int32_t InputEventMonitorManager::AddInputEventMontior(SessionPtr session, int32_t eventType)
 {
     MMI_LOGD("Enter");
     CHKPR(session, ERROR_NULL_POINTER);
@@ -48,7 +46,7 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventMontior(SessionPtr ses
     return RET_OK;
 }
 
-void OHOS::MMI::InputEventMonitorManager::RemoveInputEventMontior(SessionPtr session, int32_t eventType)
+void InputEventMonitorManager::RemoveInputEventMontior(SessionPtr session, int32_t eventType)
 {
     MMI_LOGD("Enter");
     CHKPV(session);
@@ -64,7 +62,7 @@ void OHOS::MMI::InputEventMonitorManager::RemoveInputEventMontior(SessionPtr ses
     MMI_LOGD("Leave");
 }
 
-void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+void InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
     MMI_LOGD("KeyEvent from libinput, keyCode:%{public}d, keyAction:%{public}d, action:%{public}d, "
@@ -86,7 +84,7 @@ void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OH
     }
 }
 
-int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
+int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
 {
     MMI_LOGD("Enter");
     std::lock_guard<std::mutex> lock(mu_);
@@ -99,12 +97,12 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventTouchpadMontior(int32_
         return RET_ERR;
     }
     iter = monitorsTouch_.insert(iter, monitorItemTouchpad);
-    MMI_LOGD("AddInputEventTouchpadMontior, Success, eventType:%{public}d,fd:%{public}d register in server",
+    MMI_LOGD("Success, eventType:%{public}d,fd:%{public}d register in server",
         eventType, session->GetFd());
     return RET_OK;
 }
 
-void OHOS::MMI::InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
+void InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
 {
     MMI_LOGD("Enter");
     std::lock_guard<std::mutex> lock(mu_);
@@ -122,13 +120,13 @@ void OHOS::MMI::InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_
     MMI_LOGD("Leave");
 }
 
-void OHOS::MMI::InputEventMonitorManager::OnTouchpadMonitorInputEvent(
-    std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
+void InputEventMonitorManager::OnTouchpadMonitorInputEvent(
+    std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Enter");
     CHKPV(pointerEvent);
     if (monitorsTouch_.empty()) {
-        MMI_LOGE("InputEventMonitorManager::%{public}s no monitor to send msg", __func__);
+        MMI_LOGE("%{public}s no monitor to send msg", __func__);
     }
     NetPacket pkt(MmiMessageId::ON_TOUCHPAD_MONITOR);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
@@ -143,16 +141,21 @@ void OHOS::MMI::InputEventMonitorManager::OnTouchpadMonitorInputEvent(
     MMI_LOGD("Leave");
 }
 
-bool OHOS::MMI::InputEventMonitorManager::ReportTouchpadEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
+bool InputEventMonitorManager::ReportTouchpadEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
-    PointerEvent::PointerItem pointer;
-    CHKF(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL);
+    PointerEvent::PointerItem item;
+    if (!(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item))) {
+        MMI_LOGE("Get pointer parameter failed");
+        return false;
+    }
     MMI_LOGD("Monitor-serviceeventTouchpad:time:%{public}" PRId64 ","
              "sourceType:%{public}d,action:%{public}d,"
              "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
-             pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
+             pointerEvent->GetPointerId(), item.GetGlobalX(), item.GetGlobalY(), item.IsPressed());
     OnTouchpadMonitorInputEvent(pointerEvent);
     return true;
 }
+} // namespace MMI
+} // namespace OHOS

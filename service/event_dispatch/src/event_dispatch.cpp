@@ -18,6 +18,7 @@
 #include "ability_launch_manager.h"
 #include "ability_manager_client.h"
 #include "bytrace.h"
+#include "error_multimodal.h"
 #include "event_filter_wrap.h"
 #include "hisysevent.h"
 #include "input_event_data_transformation.h"
@@ -27,7 +28,6 @@
 #include "input-event-codes.h"
 #include "interceptor_manager_global.h"
 #include "key_event_subscriber.h"
-#include "system_event_handler.h"
 #include "util.h"
 
 namespace OHOS {
@@ -49,10 +49,12 @@ void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
                                                   const int32_t fingerCount,
                                                   POINT_EVENT_TYPE& pointEventType)
 {
-    CHK(fingerCount > 0, PARAM_INPUT_INVALID);
-    CHK(touch.time > 0, PARAM_INPUT_INVALID);
-    CHK(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
-    CHK(touch.eventType >= 0, PARAM_INPUT_INVALID);
+    if (fingerCount <= 0 || touch.time <= 0 || touch.seatSlot < 0 || touch.eventType < 0) {
+        MMI_LOGE("The in parameter is error, fingerCount:%{public}d, touch.time:%{public}" PRId64 ","
+                 "touch.seatSlot:%{public}d, touch.eventType:%{public}d",
+                 fingerCount, touch.time, touch.seatSlot, touch.eventType);
+                 return;
+    }
     if (fingerCount == 1) {
         switch (touch.eventType) {
             case LIBINPUT_EVENT_TOUCH_DOWN: {
@@ -116,11 +118,12 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     CHKPR(point, ERROR_NULL_POINTER);
     auto fd = WinMgr->UpdateTargetPointer(point);
     if (HandlePointerEventFilter(point)) {
-        MMI_LOGI("Pointer event interception succeeded");
+        MMI_LOGI("Pointer event Filter succeeded");
         return RET_OK;
     }
     if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
         HandlePointerEventTrace(point);
+        MMI_LOGD("Interception and monitor succeeded");
         return RET_OK;
     }
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
@@ -182,8 +185,7 @@ void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, I
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
 }
 
-int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
-    std::shared_ptr<KeyEvent> key, const int64_t preHandlerTime)
+int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
 {
     MMI_LOGD("begin");
     CHKPR(key, PARAM_INPUT_INVALID);
@@ -206,16 +208,18 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
         return RET_OK;
     }
     auto fd = WinMgr->UpdateTarget(key);
-    CHKR(fd >= 0, FD_OBTAIN_FAIL, RET_ERR);
-
+    if (fd < 0) {
+        MMI_LOGE("Invalid fd");
+        return RET_ERR;
+    }
     MMI_LOGD("4.event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
              "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
              "EventType:%{public}d,Flag:%{public}u,"
-             "KeyAction:%{public}d,Fd:%{public}d,PreHandlerTime:%{public}" PRId64 "",
+             "KeyAction:%{public}d,Fd:%{public}d",
              key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
              key->GetActionStartTime(),
              key->GetEventType(),
-             key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
+             key->GetFlag(), key->GetKeyAction(), fd);
 
     InputHandlerManagerGlobal::GetInstance().HandleEvent(key);
     auto session = udsServer.GetSession(fd);
@@ -235,7 +239,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
     NetPacket pkt(MmiMessageId::ON_KEYEVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
     OnKeyboardEventTrace(key, KEY_DISPATCH_EVENT);
-    pkt << fd << preHandlerTime;
+    pkt << fd;
     if (!udsServer.SendMsg(fd, pkt)) {
         MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;

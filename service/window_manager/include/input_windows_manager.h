@@ -68,10 +68,7 @@ struct SeatInfo {
     int32_t deviceFlags;
     int32_t focusWindowId;
 };
-struct multimodal_libinput_event {
-    struct libinput_event *event;
-    void *userdata;
-};
+
 struct MouseLocation {
     int32_t globalX;
     int32_t globalY;
@@ -111,9 +108,9 @@ public:
         int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId);
     bool TouchMotionPointToDisplayPoint(struct libinput_event_touch* touch, Direction& direction,
         int32_t targetDisplayId, int32_t& displayX, int32_t& displayY);
-    bool TransformOfDisplayPoint(struct libinput_event_touch* touch, Direction& direction, int32_t &globalLogicalX,
+    bool TransformDisplayPoint(struct libinput_event_touch* touch, Direction& direction, int32_t &globalLogicalX,
         int32_t &globalLogicalY);
-    void TurnTouchScreen(PhysicalDisplayInfo* info, Direction direction,
+    void RotateTouchScreen(PhysicalDisplayInfo* info, Direction direction,
         int32_t& logicalX, int32_t& logicalY);
     void AdjustCoordinate(double &coordinateX, double &coordinateY);
 

@@ -348,7 +348,7 @@ struct TestSurfaceData {
 struct VirtualKey {
     bool isPressed;
     int32_t keyCode;
-    int32_t keyDownDuration;
+    int64_t keyDownDuration;
     bool isIntercepted {true};
 };
 

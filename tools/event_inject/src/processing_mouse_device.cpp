@@ -74,7 +74,7 @@ int32_t ProcessingMouseDevice::AnalysisMouseEvent(const Json& inputData,
             mouseEvent.keyValue = item.at("keyValue").get<int32_t>();
         }
         if ((item.find("blockTime")) != item.end()) {
-            mouseEvent.blockTime = item.at("blockTime").get<int32_t>();
+            mouseEvent.blockTime = item.at("blockTime").get<int64_t>();
         }
         if ((item.find("xPos")) != item.end()) {
             mouseEvent.xPos = item.at("xPos").get<int32_t>();

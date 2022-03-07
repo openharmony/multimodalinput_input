@@ -25,7 +25,7 @@ void DeviceBase::SetTimeToLibinputEvent(InjectEvent& injectEvent)
     injectEvent.event.input_event_usec = tm.tv_usec;
 }
 
-void DeviceBase::SetSynConfigReport(InputEventArray& inputEventArray, int32_t blockTime)
+void DeviceBase::SetSynConfigReport(InputEventArray& inputEventArray, int64_t blockTime)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -36,7 +36,7 @@ void DeviceBase::SetSynConfigReport(InputEventArray& inputEventArray, int32_t bl
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetKeyLongPressEvent(InputEventArray& inputEventArray, int32_t blockTime, int32_t code)
+void DeviceBase::SetKeyLongPressEvent(InputEventArray& inputEventArray, int64_t blockTime, int32_t code)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -47,7 +47,7 @@ void DeviceBase::SetKeyLongPressEvent(InputEventArray& inputEventArray, int32_t 
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetSynReport(InputEventArray& inputEventArray, int32_t blockTime)
+void DeviceBase::SetSynReport(InputEventArray& inputEventArray, int64_t blockTime)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -58,7 +58,7 @@ void DeviceBase::SetSynReport(InputEventArray& inputEventArray, int32_t blockTim
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetKeyPressEvent(InputEventArray& inputEventArray, int32_t blockTime, uint16_t code)
+void DeviceBase::SetKeyPressEvent(InputEventArray& inputEventArray, int64_t blockTime, uint16_t code)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -69,7 +69,7 @@ void DeviceBase::SetKeyPressEvent(InputEventArray& inputEventArray, int32_t bloc
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetKeyReleaseEvent(InputEventArray& inputEventArray, int32_t blockTime, uint16_t code)
+void DeviceBase::SetKeyReleaseEvent(InputEventArray& inputEventArray, int64_t blockTime, uint16_t code)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -80,7 +80,7 @@ void DeviceBase::SetKeyReleaseEvent(InputEventArray& inputEventArray, int32_t bl
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetMtSlot(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetMtSlot(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -91,19 +91,19 @@ void DeviceBase::SetMtSlot(InputEventArray& inputEventArray, int32_t blockTime, 
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetTrackingId(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetTrackingId(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
-    static int32_t trackingId = 0;
     injectEvent.event.type = EV_ABS;
     injectEvent.event.code = ABS_MT_TRACKING_ID;
+    static int32_t trackingId = 0;
     injectEvent.event.value = ((value == 0) ? trackingId++ : value);
     SetTimeToLibinputEvent(injectEvent);
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetPositionX(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetPositionX(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -114,7 +114,7 @@ void DeviceBase::SetPositionX(InputEventArray& inputEventArray, int32_t blockTim
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetPositionY(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetPositionY(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -125,7 +125,7 @@ void DeviceBase::SetPositionY(InputEventArray& inputEventArray, int32_t blockTim
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetMtTouchMajor(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetMtTouchMajor(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -136,7 +136,7 @@ void DeviceBase::SetMtTouchMajor(InputEventArray& inputEventArray, int32_t block
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetMtTouchMinor(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetMtTouchMinor(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -147,7 +147,7 @@ void DeviceBase::SetMtTouchMinor(InputEventArray& inputEventArray, int32_t block
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetMtOrientation(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetMtOrientation(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -158,7 +158,7 @@ void DeviceBase::SetMtOrientation(InputEventArray& inputEventArray, int32_t bloc
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetBtnTouch(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetBtnTouch(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -169,7 +169,7 @@ void DeviceBase::SetBtnTouch(InputEventArray& inputEventArray, int32_t blockTime
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetEvAbsX(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetEvAbsX(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -180,7 +180,7 @@ void DeviceBase::SetEvAbsX(InputEventArray& inputEventArray, int32_t blockTime, 
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetEvAbsY(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetEvAbsY(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -191,7 +191,7 @@ void DeviceBase::SetEvAbsY(InputEventArray& inputEventArray, int32_t blockTime, 
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetMtTouchFingerType(InputEventArray& inputEventArray, int32_t blockTime,
+void DeviceBase::SetMtTouchFingerType(InputEventArray& inputEventArray, int64_t blockTime,
     int32_t value, int32_t status)
 {
     InjectEvent injectEvent = {};
@@ -215,7 +215,7 @@ void DeviceBase::SetMtTouchFingerType(InputEventArray& inputEventArray, int32_t 
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetEvAbsZ(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetEvAbsZ(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -226,7 +226,7 @@ void DeviceBase::SetEvAbsZ(InputEventArray& inputEventArray, int32_t blockTime, 
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetEvAbsRx(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetEvAbsRx(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -237,7 +237,7 @@ void DeviceBase::SetEvAbsRx(InputEventArray& inputEventArray, int32_t blockTime,
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetEvAbsRy(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetEvAbsRy(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -248,7 +248,7 @@ void DeviceBase::SetEvAbsRy(InputEventArray& inputEventArray, int32_t blockTime,
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetEvAbsHat0X(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetEvAbsHat0X(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -259,7 +259,7 @@ void DeviceBase::SetEvAbsHat0X(InputEventArray& inputEventArray, int32_t blockTi
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetEvAbsHat0Y(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetEvAbsHat0Y(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -270,7 +270,7 @@ void DeviceBase::SetEvAbsHat0Y(InputEventArray& inputEventArray, int32_t blockTi
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetEvAbsRz(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetEvAbsRz(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -281,7 +281,7 @@ void DeviceBase::SetEvAbsRz(InputEventArray& inputEventArray, int32_t blockTime,
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetEvAbs(InputEventArray& inputEventArray, int32_t blockTime, uint16_t code, int32_t value)
+void DeviceBase::SetEvAbs(InputEventArray& inputEventArray, int64_t blockTime, uint16_t code, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -292,7 +292,7 @@ void DeviceBase::SetEvAbs(InputEventArray& inputEventArray, int32_t blockTime, u
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetRelX(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetRelX(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -303,7 +303,7 @@ void DeviceBase::SetRelX(InputEventArray& inputEventArray, int32_t blockTime, in
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetRelY(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetRelY(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -314,7 +314,7 @@ void DeviceBase::SetRelY(InputEventArray& inputEventArray, int32_t blockTime, in
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetRelWheel(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetRelWheel(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -325,7 +325,7 @@ void DeviceBase::SetRelWheel(InputEventArray& inputEventArray, int32_t blockTime
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetRelHwheel(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetRelHwheel(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -336,7 +336,7 @@ void DeviceBase::SetRelHwheel(InputEventArray& inputEventArray, int32_t blockTim
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetEvAbsWheel(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetEvAbsWheel(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -347,7 +347,7 @@ void DeviceBase::SetEvAbsWheel(InputEventArray& inputEventArray, int32_t blockTi
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetAbsMisc(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetAbsMisc(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -362,7 +362,7 @@ void DeviceBase::SetAbsMisc(InputEventArray& inputEventArray, int32_t blockTime,
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetAbsTiltX(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetAbsTiltX(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -373,7 +373,7 @@ void DeviceBase::SetAbsTiltX(InputEventArray& inputEventArray, int32_t blockTime
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetAbsTiltY(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetAbsTiltY(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -384,7 +384,7 @@ void DeviceBase::SetAbsTiltY(InputEventArray& inputEventArray, int32_t blockTime
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetAbsPressure(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetAbsPressure(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -395,7 +395,7 @@ void DeviceBase::SetAbsPressure(InputEventArray& inputEventArray, int32_t blockT
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetAbsDistance(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetAbsDistance(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -406,7 +406,7 @@ void DeviceBase::SetAbsDistance(InputEventArray& inputEventArray, int32_t blockT
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetBtnPen(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetBtnPen(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -417,7 +417,7 @@ void DeviceBase::SetBtnPen(InputEventArray& inputEventArray, int32_t blockTime, 
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetBtnStylus(InputEventArray& inputEventArray, int32_t blockTime, uint16_t code,
+void DeviceBase::SetBtnStylus(InputEventArray& inputEventArray, int64_t blockTime, uint16_t code,
     int32_t value)
 {
     InjectEvent injectEvent = {};
@@ -429,7 +429,7 @@ void DeviceBase::SetBtnStylus(InputEventArray& inputEventArray, int32_t blockTim
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetBtnRubber(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetBtnRubber(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -440,7 +440,7 @@ void DeviceBase::SetBtnRubber(InputEventArray& inputEventArray, int32_t blockTim
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetMscSerial(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetMscSerial(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -451,7 +451,7 @@ void DeviceBase::SetMscSerial(InputEventArray& inputEventArray, int32_t blockTim
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetSynMtReport(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetSynMtReport(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
@@ -462,7 +462,7 @@ void DeviceBase::SetSynMtReport(InputEventArray& inputEventArray, int32_t blockT
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetThrottle(InputEventArray& inputEventArray, int32_t blockTime, int32_t value)
+void DeviceBase::SetThrottle(InputEventArray& inputEventArray, int64_t blockTime, int32_t value)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
