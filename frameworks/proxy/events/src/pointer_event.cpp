@@ -427,7 +427,7 @@ void PointerEvent::SetAxisValue(AxisType axis, double axisValue)
 {
     if ((axis >= AXIS_TYPE_UNKNOWN) && (axis < AXIS_TYPE_MAX)) {
         axisValues_[axis] = axisValue;
-        axes_ = static_cast<int32_t>(static_cast<uint32_t>(axes) | (1 << static_cast<uint32_t>(axis)));
+        axes_ = static_cast<int32_t>(static_cast<uint32_t>(axes_) | (1 << static_cast<uint32_t>(axis)));
     }
 }
 
@@ -582,7 +582,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    if (!in.ReadInt32(axes_)) {
+    if (!in.ReadUint32(axes_)) {
         return false;
     }
 
