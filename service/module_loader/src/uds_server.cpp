@@ -138,16 +138,14 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     int32_t sockFds[2] = {};
 
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockFds) != 0) {
-        const int32_t savedErrNo = errno;
-        MMI_LOGE("call socketpair fail, errno:%{public}d,msg:%{public}s", savedErrNo, strerror(savedErrNo));
+        MMI_LOGE("call socketpair fail, errno:%{public}d", errno);
         return RET_ERR;
     }
 
     serverFd = sockFds[0];
-    toReturnClientFd = sockFds[1]; // fcntl(sockFds[1], F_DUPFD_CLOEXEC, 0);
+    toReturnClientFd = sockFds[1];
     if (toReturnClientFd < 0) {
-        const int32_t savedErrNo = errno;
-        MMI_LOGE("call fcntl fail, errno:%{public}d,msg:%{public}s", savedErrNo, strerror(savedErrNo));
+        MMI_LOGE("call fcntl fail, errno:%{public}d", errno);
         return RET_ERR;
     }
 
@@ -156,7 +154,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
-    SetBlockMode(serverFd); // 设置非阻塞模式
+    SetNonBlockMode(serverFd);
 
     MMI_LOGD("alloc socketpair, serverFd:%{public}d,clientFd:%{public}d(%{public}d)",
              serverFd, toReturnClientFd, sockFds[1]);
