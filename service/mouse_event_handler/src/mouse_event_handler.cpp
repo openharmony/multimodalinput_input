@@ -64,8 +64,8 @@ void MouseEventHandler::InitAbsolution()
     MMI_LOGD("init absolution");
     auto logicalDisplayInfo = WinMgr->GetLogicalDisplayInfo();
     if (!logicalDisplayInfo.empty()) {
-        absolutionX_ = logicalDisplayInfo[0].width / 2;
-        absolutionY_ = logicalDisplayInfo[0].height / 2;
+        absolutionX_ = logicalDisplayInfo[0].width * 1.0 / 2;
+        absolutionY_ = logicalDisplayInfo[0].height * 1.0 / 2;
     }
 }
 
@@ -223,9 +223,9 @@ void MouseEventHandler::DumpInner()
                  return;
     }
     MMI_LOGD("Item: DownTime:%{public}" PRId64 ",IsPressed:%{public}s,GlobalX:%{public}d,GlobalY:%{public}d,"
-        "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,DeviceId:%{public}d",
+        "Width:%{public}d,Height:%{public}d,Pressure:%{public}d",
         item.GetDownTime(), (item.IsPressed() ? "true" : "false"), item.GetGlobalX(), item.GetGlobalY(),
-        item.GetWidth(), item.GetHeight(), item.GetPressure(), item.GetDeviceId());
+        item.GetWidth(), item.GetHeight(), item.GetPressure());
 }
 } // namespace MMI
 } // namespace OHOS
