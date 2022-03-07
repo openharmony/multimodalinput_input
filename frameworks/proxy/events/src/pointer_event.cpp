@@ -305,7 +305,7 @@ void PointerEvent::SetPointerId(int32_t pointerId)
 
 bool PointerEvent::GetPointerItem(int32_t pointerId, PointerItem &pointerItem)
 {
-    for (auto &item : pointers_) {
+    for (const auto &item : pointers_) {
         if (item.GetPointerId() == pointerId) {
             pointerItem = item;
             return true;
@@ -337,7 +337,6 @@ void PointerEvent::UpdatePointerItem(int32_t pointerId, PointerItem &pointerItem
             return;
         }
     }
-
     pointers_.push_back(pointerItem); // insert
 }
 
