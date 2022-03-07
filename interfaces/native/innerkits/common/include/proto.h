@@ -16,7 +16,7 @@
 #define PROTO_H
 
 #include <sys/types.h>
-#include "libinput.h"
+
 enum class MmiMessageId : int32_t {
     INVALID = 0,
 
