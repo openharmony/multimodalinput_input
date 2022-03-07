@@ -28,16 +28,6 @@ config("event_injection_config") {
 
   cflags = [
     "-DOHOS_BUILD",
-    "-Wno-unused-parameter",
-    "-Wno-implicit-int",
-    "-Wno-return-type",
-    "-Wno-unused-function",
-    "-Wno-string-conversion",
-    "-Wheader-hygiene",
-    "-Wunused-private-field",
-    "-Wsign-compare",
-    "-Wformat",
-    "-Wdeprecated-declarations",
   ]
 
   if (is_mmi_have_debug) {
