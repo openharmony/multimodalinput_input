@@ -106,7 +106,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
     return RET_OK;
 }
 
-void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::IInputEventConsumer> inputEventConsumer)
+void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
 {
     MMI_LOGD("enter");
     MMIEventHdl.GetMultimodeInputInfo();
@@ -115,7 +115,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::II
     MMI_LOGD("leave");
 }
 
-void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_LOGD("Enter");
     CHKPV(keyEvent);
@@ -135,7 +135,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     MMI_LOGD("Leave");
 }
 
-void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
+void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Pointer event received, processing");
     CHKPV(pointerEvent);
@@ -159,7 +159,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> p
     MMI_LOGD("leave");
 }
 
-int32_t InputManagerImpl::PackDisplayData(OHOS::MMI::NetPacket &pkt)
+int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 {
     if (PackPhysicalDisplay(pkt) == RET_ERR) {
         MMI_LOGE("pack physical display failed");
@@ -430,7 +430,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
     }
 }
 
-void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
     if (MMIEventHdl.InjectEvent(keyEvent) != RET_OK) {
@@ -438,7 +438,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> k
     }
 }
 
-void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
+void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     if (MultimodalEventHandler::GetInstance().InjectPointerEvent(pointerEvent) != RET_OK) {
@@ -467,7 +467,7 @@ void InputManagerImpl::SendDisplayInfo()
         return;
     }
 
-    OHOS::MMI::NetPacket pkt(MmiMessageId::DISPLAY_INFO);
+    NetPacket pkt(MmiMessageId::DISPLAY_INFO);
     if (PackDisplayData(pkt) == RET_ERR) {
         MMI_LOGE("pack display info failed");
         return;

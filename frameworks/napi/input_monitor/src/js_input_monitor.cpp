@@ -22,14 +22,13 @@
 #include "js_input_monitor_manager.h"
 #include "js_input_monitor_util.h"
 
-#define InputMgr OHOS::MMI::InputManager::GetInstance()
-
 namespace OHOS {
 namespace MMI {
+#define InputMgr InputManager::GetInstance()
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitor" };
-    constexpr int32_t NAPI_ERR = 3;
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitor" };
+constexpr int32_t NAPI_ERR = 3;
+} // namespace
 
 bool InputMonitor::Start()
 {

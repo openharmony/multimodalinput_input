@@ -42,7 +42,6 @@ public:
 void UDSSessionTest::SetUp()
 {
     UDSSessionTest::pid_ = getpid();
-    fd_ = STDOUT_FILENO;
 }
 
 void UDSSessionTest::TearDown()
@@ -63,7 +62,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type1_001, TestSize.Level1)
     size_t size = 4;
     UDSSession sesObj(PROGRAM_NAME, moduleType_, fd_, UID_ROOT, pid_);
     bool retResult = sesObj.SendMsg(buf, size);
-    EXPECT_TRUE(retResult);
+    EXPECT_FALSE(retResult);
 }
 
 HWTEST_F(UDSSessionTest, SendMsg_type1_002, TestSize.Level1)
@@ -92,7 +91,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type1_004, TestSize.Level1)
 
     UDSSession sesObj(PROGRAM_NAME, moduleType_, fd_, UID_ROOT, pid_);
     bool retResult = sesObj.SendMsg(buf, size);
-    EXPECT_TRUE(retResult);
+    EXPECT_FALSE(retResult);
 }
 
 HWTEST_F(UDSSessionTest, SendMsg_type1_005, TestSize.Level1)
@@ -121,7 +120,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type2_002, TestSize.Level1)
 
     UDSSession sesObj(PROGRAM_NAME, moduleType_, fd_, UID_ROOT, pid_);
     bool retResult = sesObj.SendMsg(pkt);
-    EXPECT_TRUE(retResult);
+    EXPECT_FALSE(retResult);
 }
 
 HWTEST_F(UDSSessionTest, SendMsg_type2_003, TestSize.Level1)
