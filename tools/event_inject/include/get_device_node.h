@@ -18,7 +18,7 @@
 
 #include "msg_head.h"
 
-#define DeviceMapData std::map<std::string, std::vector<std::string>>
+#define DeviceList std::map<std::string, std::vector<std::string>>
 
 namespace OHOS {
 namespace MMI {
@@ -26,13 +26,13 @@ class GetDeviceNode {
 public:
     GetDeviceNode();
     ~GetDeviceNode() = default;
-    int32_t GetDeviceNodeName(const std::string& targetName, std::string& deviceNode, uint16_t devIndex = 0);
+    int32_t GetDeviceNodeName(const std::string& targetName, uint16_t devIndex, std::string& deviceNode);
 private:
     void InitDeviceInfo();
     int32_t ExecuteCmd(const std::string cmd, std::vector<std::string> &cmdResult);
-    void GetDeviceInfoCmdResult(const std::vector<std::string>& cmdResult, DeviceMapData& deviceMapData);
+    void GetDeviceCmd(const std::vector<std::string>& cmdResult, DeviceList& deviceList);
 private:
-    std::map<std::string, std::string> deviceMap_;
+    std::map<std::string, std::string> deviceList_;
     static constexpr int32_t READ_CMD_BUFF_SIZE = 1024;
     static constexpr int32_t CMD_EVENT_LENGTH = 6;
 };

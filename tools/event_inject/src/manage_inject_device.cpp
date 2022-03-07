@@ -31,22 +31,20 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
         return RET_ERR;
     }
     int32_t ret = RET_ERR;
-    std::string deviceName;
-    std::string sendType;
-    std::string deviceNode;
-    GetDeviceObject getDeviceObject;
     for (const auto &item : configData) {
+        std::string deviceName;
         deviceName = item.at("deviceName").get<std::string>();
         InputEventArray inputEventArray = {};
         inputEventArray.deviceName = deviceName;
-
         uint16_t devIndex = 0;
         if (item.find("devIndex") != item.end()) {
             devIndex = item.at("devIndex").get<uint16_t>();
         }
-        if (getDeviceNodeObject_.GetDeviceNodeName(deviceName, deviceNode, devIndex) == RET_ERR) {
+        std::string deviceNode;
+        if (getDeviceNodeObject_.GetDeviceNodeName(deviceName, devIndex, deviceNode) == RET_ERR) {
             return RET_ERR;
         }
+        GetDeviceObject getDeviceObject;
         inputEventArray.target = deviceNode;
 
         devicePtr_ = getDeviceObject.CreateDeviceObject(deviceName);
