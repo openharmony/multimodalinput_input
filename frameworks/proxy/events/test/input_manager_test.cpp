@@ -187,6 +187,7 @@ std::vector<std::string> InputManagerTest::SearchLog(const std::string &command,
 std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep1()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(823);   // test code，set the GlobalX = 823
@@ -209,6 +210,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep1()
 std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep2()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(1023);  // test code，set the GlobalX = 823
@@ -246,6 +248,7 @@ void InputManagerTest::TestMarkConsumedStep3(int32_t monitorId, int32_t eventId)
 void InputManagerTest::TestMarkConsumedStep4()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(1123);  // test code，set the GlobalX = 823
@@ -275,6 +278,7 @@ void InputManagerTest::TestMarkConsumedStep4()
 void InputManagerTest::TestMarkConsumedStep5()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(0);  // test code，set the GlobalX = 823
@@ -304,6 +308,7 @@ void InputManagerTest::TestMarkConsumedStep5()
 void InputManagerTest::TestMarkConsumedStep6()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(823);   // test code，set the GlobalX = 823
@@ -515,6 +520,7 @@ std::string InputManagerTest::DumpPointerEvent(const std::shared_ptr<PointerEven
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent001()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(823);   // test code，set the GlobalX = 823
@@ -539,6 +545,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent001()
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent002()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(823);   // test code，set the GlobalX = 823
@@ -563,6 +570,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent002()
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent003()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(823);   // test code，set the GlobalX = 823
@@ -860,6 +868,7 @@ void InputManagerTest::TestSimulateInputEvent_2(std::shared_ptr<PointerEvent> po
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent006()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
@@ -887,6 +896,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent006()
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent007()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->SetPointerId(1);
@@ -911,6 +921,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent007()
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent008()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
@@ -938,6 +949,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent008()
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent009()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
     pointerEvent->SetPointerId(1);
@@ -987,6 +999,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_009, TestSize.Level1)
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent012()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
     pointerEvent->SetPointerId(1);

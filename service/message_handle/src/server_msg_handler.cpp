@@ -198,6 +198,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     auto creKey = KeyEvent::Create();
+    CHKPR(creKey, ERROR_NULL_POINTER);
     int32_t errCode = InputEventDataTransformation::NetPacketToKeyEvent(pkt, creKey);
     if (errCode != RET_OK) {
         MMI_LOGE("Deserialization is Failed, errCode:%{public}u", errCode);
@@ -215,6 +216,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
 {
     MMI_LOGD("enter");
     auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != RET_OK) {
         MMI_LOGE("Unmarshalling failed");
         return RET_ERR;
