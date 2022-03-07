@@ -538,7 +538,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 touchWindow = &item;
                 break;
             }
-        } else if (targetWindowId >= 0) {
+        } else {
             if (targetWindowId == item.id) {
                 touchWindow = &item;
                 break;
@@ -546,7 +546,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
     if (touchWindow == nullptr) {
-        MMI_LOGE("touchWindow is nullptr");
+        MMI_LOGE("touchWindow is nullptr, targetWindow:%{public}d", targetWindowId);
         return RET_ERR;
     }
 
@@ -556,8 +556,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     int32_t localY = globalY - touchWindow->winTopLeftY;
     pointerItem.SetLocalX(localX);
     pointerItem.SetLocalY(localY);
-    pointerEvent->RemovePointerItem(pointerId);
-    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
     MMI_LOGD("pid:%{public}d,fd:%{public}d,globalX01:%{public}d,"
              "globalY01:%{public}d,localX:%{public}d,localY:%{public}d,"

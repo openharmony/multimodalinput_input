@@ -53,7 +53,8 @@ void UDSSessionTest::TearDown()
 HWTEST_F(UDSSessionTest, Construct, TestSize.Level1)
 {
     UDSSession udsSession(PROGRAM_NAME, moduleType_, fd_, UID_ROOT, pid_);
-    udsSession.Close();
+    bool retResult = udsSession.EventsIsEmpty();
+    EXPECT_TRUE(retResult);
 }
 
 HWTEST_F(UDSSessionTest, SendMsg_type1_001, TestSize.Level1)

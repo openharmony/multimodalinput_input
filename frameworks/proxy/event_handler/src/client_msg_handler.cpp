@@ -118,8 +118,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
         return RET_ERR;
     }
     int32_t fd = 0;
-    int64_t serverStartTime = 0;
-    pkt >> fd >> serverStartTime;
+    pkt >> fd;
     if (pkt.ChkRWError()) {
         MMI_LOGE("Packet read fd failed");
         return PACKET_READ_FAIL;
@@ -127,11 +126,10 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     MMI_LOGD("key event dispatcher of client, KeyCode:%{public}d,"
              "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
              "EventType:%{public}d,Flag:%{public}u,"
-             "KeyAction:%{public}d,eventNumber:%{public}d,Fd:%{public}d,"
-             "ServerStartTime:%{public}" PRId64"",
+             "KeyAction:%{public}d,eventNumber:%{public}d,Fd:%{public}d,",
              key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
              key->GetActionStartTime(), key->GetEventType(),
-             key->GetFlag(), key->GetKeyAction(), key->GetId(), fd, serverStartTime);
+             key->GetFlag(), key->GetKeyAction(), key->GetId(), fd);
     int32_t keyId = key->GetId();
     std::string keyCodestring = "KeyEventDispatch";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, keyId);

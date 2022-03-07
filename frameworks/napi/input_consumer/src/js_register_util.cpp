@@ -14,6 +14,7 @@
  */
 #include "js_register_util.h"
 #include <cinttypes>
+#include "error_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
