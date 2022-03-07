@@ -22,6 +22,23 @@ namespace MMI {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TouchTransformPointManager" };
     }
 
+std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibInput(
+    struct libinput_event *event, INPUT_DEVICE_TYPE deviceType)
+{
+    switch (deviceType) {
+        case INPUT_DEVICE_CAP_TOUCH:
+            return OnLibinputTouchEvent(event);
+        case INPUT_DEVICE_CAP_TOUCH_PAD:
+            return OnLibinputTouchPadEvent(event);
+        case INPUT_DEVICE_CAP_GESTURE:
+            return OnTouchPadGestrueEvent(event);
+        default:
+            MMI_LOGE("The in parameter deviceType is error, deviceType:%{public}d", deviceType);
+            break;
+    }
+    return nullptr;
+}
+
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(struct libinput_event *event)
 {
     CHKPP(event);

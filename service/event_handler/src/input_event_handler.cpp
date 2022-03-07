@@ -346,7 +346,7 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
         MMI_LOGD("This touch event is canceled type:%{public}d", type);
         return RET_OK;
     }
-    auto pointerEvent = TouchTransformPointManger->OnLibinputTouchEvent(event);
+    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t pointerId = pointerEvent->GetId();
     std::string touchEvent = "OnEventTouch";
@@ -370,7 +370,7 @@ int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
     MMI_LOGD("Enter");
     CHKPR(event, ERROR_NULL_POINTER);
 
-    auto pointerEvent = TouchTransformPointManger->OnLibinputTouchPadEvent(event);
+    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH_PAD);
     CHKPR(pointerEvent, RET_ERR);
     eventDispatch_.HandlePointerEvent(pointerEvent);
     auto type = libinput_event_get_type(event);
@@ -403,7 +403,7 @@ int32_t InputEventHandler::OnEventTouchpad(libinput_event *event)
 int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchTransformPointManger->OnTouchPadGestrueEvent(event);
+    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_GESTURE);
     if (pointerEvent == nullptr) {
         MMI_LOGE("Gesture event package failed, errCode:%{public}d", GESTURE_EVENT_PKG_FAIL);
         return GESTURE_EVENT_PKG_FAIL;
