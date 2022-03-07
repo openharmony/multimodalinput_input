@@ -245,6 +245,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
+    CHKPR(keyEvent_, ERROR_NULL_POINTER);
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_LOGD("The same event reported by multi_device should be discarded");
@@ -276,6 +277,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(libinput_event *event)
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
+    CHKPR(keyEvent_, ERROR_NULL_POINTER);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
@@ -314,6 +316,7 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
+    CHKPR(keyEvent_, ERROR_NULL_POINTER);
     keyBoard.key = static_cast<uint32_t>(oKey.keyValueOfSys);
     if (EventPackage::KeyboardToKeyEvent(keyBoard, keyEvent_) == RET_ERR) {
         MMI_LOGE("On the OnKeyboardEvent translate key event error");
