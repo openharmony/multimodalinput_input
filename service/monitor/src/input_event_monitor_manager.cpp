@@ -32,7 +32,6 @@ int32_t InputEventMonitorManager::AddInputEventMontior(SessionPtr session, int32
 {
     MMI_LOGD("Enter");
     CHKPR(session, ERROR_NULL_POINTER);
-    std::lock_guard<std::mutex> lock(mu_);
     MonitorItem monitorItem;
     monitorItem.eventType = eventType;
     monitorItem.session =  session;
@@ -50,7 +49,6 @@ void InputEventMonitorManager::RemoveInputEventMontior(SessionPtr session, int32
 {
     MMI_LOGD("Enter");
     CHKPV(session);
-    std::lock_guard<std::mutex> lock(mu_);
     MonitorItem monitorItem;
     monitorItem.eventType = eventType;
     monitorItem.session =  session;
@@ -87,7 +85,6 @@ void InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<KeyEvent> key
 int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
 {
     MMI_LOGD("Enter");
-    std::lock_guard<std::mutex> lock(mu_);
     MonitorItem monitorItemTouchpad;
     monitorItemTouchpad.eventType = eventType;
     monitorItemTouchpad.session = session;
@@ -105,7 +102,6 @@ int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(int32_t eventType
 void InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
 {
     MMI_LOGD("Enter");
-    std::lock_guard<std::mutex> lock(mu_);
     MonitorItem monitorItemtouchpad;
     monitorItemtouchpad.eventType = eventType;
     monitorItemtouchpad.session = session;
