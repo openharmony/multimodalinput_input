@@ -66,8 +66,7 @@ bool StreamBuffer::Read(std::string &buf)
 
 bool StreamBuffer::Write(const std::string &buf)
 {
-    buf += '\0';
-    return Write(buf.c_str(), buf.length());
+    return Write(buf.c_str(), buf.length()+1);
 }
 
 bool StreamBuffer::Read(StreamBuffer &buf)
