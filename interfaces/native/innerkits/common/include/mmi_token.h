@@ -30,7 +30,6 @@ public:
 
     virtual int32_t GetObjectRefCount() override
     {
-        
         return 0;
     }
     virtual int32_t SendRequest(uint32_t code, MessageParcel& data,
