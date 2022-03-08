@@ -15,6 +15,7 @@
 #include "client_msg_handler.h"
 #include <cinttypes>
 #include <iostream>
+#include <sstream>
 #include "mmi_func_callback.h"
 #include "bytrace.h"
 #include "input_device_impl.h"
@@ -145,40 +146,19 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
 
 int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
+    CALL_LOG_ENTER;
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
         MMI_LOGE("Failed to deserialize pointer event.");
         return RET_ERR;
     }
-
-    std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
-    MMI_LOGD("Pointer event dispatcher of client, eventType:%{public}s, actionTime:%{public}" PRId64 ", "
-             "action:%{public}d, actionStartTime:%{public}" PRId64 ", flag:%{public}u, pointerAction:%{public}s, "
-             "sourceType:%{public}s, VerticalAxisValue:%{public}.2f, HorizontalAxisValue:%{public}.2f, "
-             "PinchAxisValue:%{public}.2f, pointerCount:%{public}zu, eventNumber:%{public}d",
-             pointerEvent->DumpEventType(), pointerEvent->GetActionTime(), pointerEvent->GetAction(),
-             pointerEvent->GetActionStartTime(), pointerEvent->GetFlag(), pointerEvent->DumpPointerAction(),
-             pointerEvent->DumpSourceType(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
-             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
-             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH),
-             pointerIds.size(), pointerEvent->GetId());
-    std::vector<int32_t> pressedKeys = pointerEvent->GetPressedKeys();
-    for (auto &item : pressedKeys) {
-        MMI_LOGI("Pressed keyCode:%{public}d", item);
-    }
-    for (auto &pointerId : pointerIds) {
-        PointerEvent::PointerItem item;
-        if (!pointerEvent->GetPointerItem(pointerId, item)) {
-            MMI_LOGE("Get pointer item failed. pointer:%{public}d", pointerId);
-            return RET_ERR;
-        }
-        MMI_LOGD("DownTime:%{public}" PRId64 ",isPressed:%{public}s,"
-                "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
-                "width:%{public}d,height:%{public}d,pressure:%{public}d",
-                 item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
-                 item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
-                 item.GetWidth(), item.GetHeight(), item.GetPressure());
+    MMI_LOGD("Pointer event dispatcher of client:");
+    std::stringstream sStream;
+    sStream << *pointerEvent;
+    std::string sLine;
+    while (std::getline(sStream, sLine)) {
+        MMI_LOGD("%{public}s", sLine.c_str());
     }
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_LOGD("Operation canceled.");
@@ -263,7 +243,7 @@ int32_t ClientMsgHandler::GetMultimodeInputInfo(const UDSClient& client, NetPack
 
 int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     int32_t userData;
     int32_t size;
     std::vector<int32_t> inputDeviceIds;
@@ -289,7 +269,7 @@ int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& p
 
 int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     int32_t userData;
     int32_t id;
     std::string name;
@@ -317,6 +297,7 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
 
 int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt)
 {
+    CALL_LOG_ENTER;
     int32_t handlerId;
     if (!pkt.Read(handlerId)) {
         MMI_LOGE("Packet read handler failed");
@@ -334,7 +315,7 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
 
 int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     int32_t handlerId;
     InputHandlerType handlerType;
     if (!pkt.Read(handlerId)) {
