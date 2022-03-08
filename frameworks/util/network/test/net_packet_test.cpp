@@ -31,7 +31,7 @@ public:
  * @tc.name:construct_001
  * @tc.desc:Verify net packet
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(NetPacketTest, construct_001, TestSize.Level1)
 {
@@ -43,7 +43,7 @@ HWTEST_F(NetPacketTest, construct_001, TestSize.Level1)
  * @tc.name:construct_002
  * @tc.desc:Verify net packet
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(NetPacketTest, construct_002, TestSize.Level1)
 {
@@ -56,7 +56,7 @@ HWTEST_F(NetPacketTest, construct_002, TestSize.Level1)
  * @tc.name:construct_002
  * @tc.desc:Verify net packet
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(NetPacketTest, construct_003, TestSize.Level1)
 {
@@ -69,7 +69,7 @@ HWTEST_F(NetPacketTest, construct_003, TestSize.Level1)
  * @tc.name:construct_002
  * @tc.desc:Verify net packet
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(NetPacketTest, GetSize_001, TestSize.Level1)
 {
@@ -83,7 +83,7 @@ HWTEST_F(NetPacketTest, GetSize_001, TestSize.Level1)
  * @tc.name:construct_002
  * @tc.desc:Verify net packet
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(NetPacketTest, GetSize_002, TestSize.Level1)
 {
@@ -97,7 +97,7 @@ HWTEST_F(NetPacketTest, GetSize_002, TestSize.Level1)
  * @tc.name:construct_002
  * @tc.desc:Verify net packet
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(NetPacketTest, GetSize_003, TestSize.Level1)
 {
@@ -111,7 +111,7 @@ HWTEST_F(NetPacketTest, GetSize_003, TestSize.Level1)
  * @tc.name:construct_002
  * @tc.desc:Verify net packet
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(NetPacketTest, GetData_001, TestSize.Level1)
 {
@@ -125,7 +125,7 @@ HWTEST_F(NetPacketTest, GetData_001, TestSize.Level1)
  * @tc.name:construct_002
  * @tc.desc:Verify net packet
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(NetPacketTest, GetData_002, TestSize.Level1)
 {
@@ -140,7 +140,7 @@ HWTEST_F(NetPacketTest, GetData_002, TestSize.Level1)
  * @tc.name:construct_002
  * @tc.desc:Verify net packet
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(NetPacketTest, GetData_003, TestSize.Level1)
 {
@@ -155,7 +155,7 @@ HWTEST_F(NetPacketTest, GetData_003, TestSize.Level1)
  * @tc.name:construct_002
  * @tc.desc:Verify net packet
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(NetPacketTest, GetMsgId_001, TestSize.Level1)
 {
@@ -170,7 +170,7 @@ HWTEST_F(NetPacketTest, GetMsgId_001, TestSize.Level1)
  * @tc.name:construct_002
  * @tc.desc:Verify net packet
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(NetPacketTest, GetMsgId_002, TestSize.Level1)
 {
@@ -185,7 +185,7 @@ HWTEST_F(NetPacketTest, GetMsgId_002, TestSize.Level1)
  * @tc.name:construct_002
  * @tc.desc:Verify net packet
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(NetPacketTest, GetMsgId_003, TestSize.Level1)
 {
@@ -200,7 +200,7 @@ HWTEST_F(NetPacketTest, GetMsgId_003, TestSize.Level1)
  * @tc.name:construct_002
  * @tc.desc:Verify net packet
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(NetPacketTest, ReadAndWrite, TestSize.Level1)
 {
@@ -220,7 +220,7 @@ HWTEST_F(NetPacketTest, ReadAndWrite, TestSize.Level1)
  * @tc.name:construct_002
  * @tc.desc:Verify net packet
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(NetPacketTest, WriteError, TestSize.Level1)
 {
@@ -242,7 +242,7 @@ HWTEST_F(NetPacketTest, WriteError, TestSize.Level1)
  * @tc.name:construct_002
  * @tc.desc:Verify net packet
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(NetPacketTest, ReadError, TestSize.Level1)
 {

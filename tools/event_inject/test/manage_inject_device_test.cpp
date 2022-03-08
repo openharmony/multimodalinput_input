@@ -36,7 +36,7 @@ public:
  * @tc.name:Test_TransformJsonDataCheckFileIsEmpty
  * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileIsEmpty, TestSize.Level1)
 {
@@ -51,7 +51,7 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileIsEmpty, TestSiz
  * @tc.name:Test_TransformJsonDataCheckFileNotEmpty
  * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileNotEmpty, TestSize.Level1)
 {
@@ -86,7 +86,7 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileNotEmpty, TestSi
  * @tc.name:Test_TransformJsonDataGetDeviceNodeError
  * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataGetDeviceNodeError, TestSize.Level1)
 {
@@ -121,7 +121,7 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataGetDeviceNodeError, TestS
  * @tc.name:Test_SendEventToDeviveNodeError
  * @tc.desc:Verify ManageInjectDevice function SendEventToDeviveNode
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(ManageInjectDeviceTest, Test_SendEventToDeviveNodeError, TestSize.Level1)
 {

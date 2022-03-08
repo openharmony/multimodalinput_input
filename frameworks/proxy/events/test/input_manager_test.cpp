@@ -340,9 +340,9 @@ void InputManagerTest::TestMarkConsumedStep6()
 
 /**
  * @tc.name:MultimodalEventHandler_InjectKeyEvent_001
- * @tc.desc:Verify inject key Back 
+ * @tc.desc:Verify inject key Back
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.Level1)
 {
@@ -375,9 +375,9 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.L
 
 /**
  * @tc.name:MultimodalEventHandler_InjectKeyEvent_002
- * @tc.desc:Verify inject key home 
+ * @tc.desc:Verify inject key home
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_002, TestSize.Level1)
 {
@@ -397,7 +397,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_002, TestSize.L
  * @tc.name:MultimodalEventHandler_InjectKeyEvent_003
  * @tc.desc:Verify inject key down
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.Level1)
 {
@@ -431,7 +431,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.L
  * @tc.name:MultimodalEventHandler_InjectKeyEvent_004
  * @tc.desc:Verify inject key unknown
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_004, TestSize.Level1)
 {
@@ -453,7 +453,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_004, TestSize.L
  * @tc.name:MultimodalEventHandler_InjectKeyEvent_005
  * @tc.desc:Verify inject key fn
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.Level1)
 {
@@ -694,7 +694,7 @@ void InputManagerTest::TestSimulateInputEvent(std::shared_ptr<PointerEvent> poin
  * @tc.name:InputManager_SimulateInputEvent_001
  * @tc.desc:Verify Simulate pointer down event
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_001, TestSize.Level1)
 {
@@ -706,7 +706,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_001, TestSize.Level1)
  * @tc.name:InputManager_SimulateInputEvent_002
  * @tc.desc:Verify Simulate pointer move event
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_002, TestSize.Level1)
 {
@@ -718,7 +718,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_002, TestSize.Level1)
  * @tc.name:InputManager_SimulateInputEvent_003
  * @tc.desc:Verify Simulate pointer up event
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_003, TestSize.Level1)
 {
@@ -730,7 +730,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_003, TestSize.Level1)
  * @tc.name:InputManager_SimulateInputEvent_004
  * @tc.desc:Verify Simulate pointer event
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_004, TestSize.Level1)
 {
@@ -756,7 +756,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_004, TestSize.Level1)
  * @tc.name:InputManager_ANR_TEST
  * @tc.desc: detection of ANR
  * @tc.type: FUNC
- * @tc.require: AR000GJG6G
+ * @tc.require:AR000GJG6G
  */
 HWTEST_F(InputManagerTest, InputManager_ANR_TEST_001, TestSize.Level1)
 {
@@ -809,7 +809,7 @@ HWTEST_F(InputManagerTest, InputManager_ANR_TEST_001, TestSize.Level1)
  * @tc.name:InputManager_ANR_TEST
  * @tc.desc: detection of ANR
  * @tc.type: FUNC
- * @tc.require: SR000GGN6G
+ * @tc.require:SR000GGN6G
  */
 HWTEST_F(InputManagerTest, InputManager_ANR_TEST_002, TestSize.Level1)
 {
@@ -1033,7 +1033,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent009()
  * @tc.name:InputManager_SimulateInputEvent_006
  * @tc.desc:Verify simulate mouse event
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_006, TestSize.Level1)
 {
@@ -1045,7 +1045,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_006, TestSize.Level1)
  * @tc.name:InputManager_SimulateInputEvent_007
  * @tc.desc:Verify simulate mouse event
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_007, TestSize.Level1)
 {
@@ -1057,7 +1057,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_007, TestSize.Level1)
  * @tc.name:InputManager_SimulateInputEvent_008
  * @tc.desc:Verify simulate mouse event
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_008, TestSize.Level1)
 {
@@ -1069,7 +1069,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_008, TestSize.Level1)
  * @tc.name:InputManager_SimulateInputEvent_009
  * @tc.desc:Verify simulate mouse event
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_009, TestSize.Level1)
 {
@@ -1108,7 +1108,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent012()
  * @tc.name:InputManager_SimulateInputEvent_012
  * @tc.desc:Verify simulate mouse event
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_012, TestSize.Level1)
 {
@@ -1120,7 +1120,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_012, TestSize.Level1)
  * @tc.name:InputManager_SimulateInputEvent_013
  * @tc.desc:Verify simulate mouse event
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_013, TestSize.Level1)
 {
@@ -1158,7 +1158,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_013, TestSize.Level1)
  * @tc.name:InputManager_SimulateInputEvent_014
  * @tc.desc:Verify simulate mouse event
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_014, TestSize.Level1)
 {
@@ -1196,7 +1196,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_014, TestSize.Level1)
  * @tc.name:InputManager_SimulateInputEvent_015
  * @tc.desc:Verify simulate mouse event
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_015, TestSize.Level1)
 {
@@ -1308,9 +1308,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_002, TestSize.Level1)
 
 /**
  * @tc.name:InputManagerTest_AddHandler_001
- * @tc.desc:Verify monitor 
+ * @tc.desc:Verify monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_001, TestSize.Level1)
 {
@@ -1337,9 +1337,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_001, TestSize.Level1)
 
 /**
  * @tc.name:InputManagerTest_AddHandler_002
- * @tc.desc:Verify monitor 
+ * @tc.desc:Verify monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_002, TestSize.Level1)
 {
@@ -1366,7 +1366,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_002, TestSize.Level1)
  * @tc.name:InputManagerTest_AddHandler_003
  * @tc.desc:Verify monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
 {
@@ -1417,7 +1417,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
  * @tc.name:InputManagerTest_AddHandler_004
  * @tc.desc:Verify monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_004, TestSize.Level1)
 {
@@ -1456,7 +1456,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_004, TestSize.Level1)
  * @tc.name:InputManagerTest_AddHandler_005
  * @tc.desc:Verify monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_005, TestSize.Level1)
 {
@@ -1483,7 +1483,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_005, TestSize.Level1)
  * @tc.name:InputManagerTest_AddHandler_006
  * @tc.desc:Verify monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_006, TestSize.Level1)
 {
@@ -1554,7 +1554,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Leve
  * @tc.name:InputManagerTest_SubscribeKeyEvent_002
  * @tc.desc:Verify the repeat subscribe key event.
  * @tc.type: FUNC
- * @tc.require: SR000GGQL4  AR000GJNGN
+ * @tc.require:SR000GGQL4  AR000GJNGN
  * @tc.author: yangguang
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Level1)
@@ -1619,7 +1619,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
  * @tc.name:InputManagerTest_SubscribeKeyEvent_003
  * @tc.desc:Verify the unsubscribe key event.
  * @tc.type: FUNC
- * @tc.require: SR000GGQL4  AR000GJNGN
+ * @tc.require:SR000GGQL4  AR000GJNGN
  * @tc.author: yangguang
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_003, TestSize.Level1)
@@ -1668,7 +1668,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_003, TestSize.Leve
  * @tc.name:InputManagerTest_SubscribeKeyEvent_004
  * @tc.desc:Verify down trigger subscribe key event.
  * @tc.type: FUNC
- * @tc.require: SR000GGQL4  AR000GJNGN
+ * @tc.require:SR000GGQL4  AR000GJNGN
  * @tc.author: yangguang
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_004, TestSize.Level1)
@@ -1717,7 +1717,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_004, TestSize.Leve
  * @tc.name:InputManagerTest_SubscribeKeyEvent_005
  * @tc.desc:Verify down trigger subscribe key event, need to hold down for a while.
  * @tc.type: FUNC
- * @tc.require: SR000GGQL4  AR000GJNGN
+ * @tc.require:SR000GGQL4  AR000GJNGN
  * @tc.author: yangguang
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_005, TestSize.Level1)
@@ -1765,7 +1765,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_005, TestSize.Leve
  * @tc.name:InputManagerTest_SubscribeKeyEvent_006
  * @tc.desc:Verify down trigger subscribe key event, other keys are pressed during the hold time.
  * @tc.type: FUNC
- * @tc.require: SR000GGQL4  AR000GJNGN
+ * @tc.require:SR000GGQL4  AR000GJNGN
  * @tc.author: yangguang
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_006, TestSize.Level1)
@@ -1828,7 +1828,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_006, TestSize.Leve
  * @tc.name:InputManagerTest_SubscribeKeyEvent_007
  * @tc.desc:Verify up trigger subscribe key event.
  * @tc.type: FUNC
- * @tc.require: SR000GGQL4  AR000GJNGN
+ * @tc.require:SR000GGQL4  AR000GJNGN
  * @tc.author: yangguang
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_007, TestSize.Level1)
@@ -1877,7 +1877,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_007, TestSize.Leve
  * @tc.name:InputManagerTest_SubscribeKeyEvent_008
  * @tc.desc:Verify invalid parameter.
  * @tc.type: FUNC
- * @tc.require: SR000GGQL4  AR000GJNGN
+ * @tc.require:SR000GGQL4  AR000GJNGN
  * @tc.author: yangguang
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_008, TestSize.Level1)
@@ -1899,7 +1899,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_008, TestSize.Leve
  * @tc.name:InputManagerTest_SubscribeKeyEvent_009
  * @tc.desc:Verify subscribe different key event.
  * @tc.type: FUNC
- * @tc.require: SR000GGQL4  AR000GJNGN
+ * @tc.require:SR000GGQL4  AR000GJNGN
  * @tc.author: yangguang
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_009, TestSize.Level1)
@@ -1949,7 +1949,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_009, TestSize.Leve
  * @tc.name:InputManagerTest_SubscribeKeyEvent_010
  * @tc.desc:Verify subscribe power key event.
  * @tc.type: FUNC
- * @tc.require: SR000GGQL4  AR000GJNGN
+ * @tc.require:SR000GGQL4  AR000GJNGN
  * @tc.author: zhaoxueyuan
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Level1)
@@ -2008,7 +2008,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
  * @tc.name:InputManagerTest_SubscribeKeyEvent_011
  * @tc.desc:Verify subscribe F1 key event.
  * @tc.type: FUNC
- * @tc.require: SR000GGQL4  AR000GJNGN
+ * @tc.require:SR000GGQL4  AR000GJNGN
  * @tc.author: wanghao
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_011, TestSize.Level1)
@@ -2239,7 +2239,7 @@ void InputManagerTest::TestInputEventInterceptor(std::shared_ptr<PointerEvent> p
  * @tc.name:TestInputEventInterceptor_001
  * @tc.desc:Verify interceptor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_001, TestSize.Level1)
 {
@@ -2272,7 +2272,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_001, TestSize.Level1)
  * @tc.name:TestInputEventInterceptor_002
  * @tc.desc:Verify interceptor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_002, TestSize.Level1)
 {
@@ -2334,7 +2334,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_002, TestSize.Level1)
  * @tc.name:TestInputEventInterceptor_003
  * @tc.desc:Verify interceptor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_003, TestSize.Level1)
 {
@@ -2380,7 +2380,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_003, TestSize.Level1)
  * @tc.name:TestInputEventInterceptor_004
  * @tc.desc:Verify interceptor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
 {
@@ -2402,7 +2402,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
  * @tc.name:TestInputEventInterceptor_005
  * @tc.desc:Verify interceptor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_005, TestSize.Level1)
 {
@@ -2493,7 +2493,7 @@ void InputManagerTest::TestInputEventInterceptor2(std::shared_ptr<PointerEvent> 
  * @tc.name:TestInputEventInterceptor_006
  * @tc.desc:Verify interceptor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_006, TestSize.Level1)
 {
@@ -2542,7 +2542,7 @@ void InputManagerTest::TouchPadMonitorCallBack(std::shared_ptr<OHOS::MMI::Pointe
  * @tc.name:InputManagerTest_OnAddTouchPadMonitor_001
  * @tc.desc:Verify touchpad monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.Level1)
 {
@@ -2585,7 +2585,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
  * @tc.name:InputManagerTest_OnAddTouchPadMonitor_002
  * @tc.desc:Verify touchpad monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.Level1)
 {
@@ -2628,7 +2628,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
  * @tc.name:InputManagerTest_OnAddTouchPadMonitor_003
  * @tc.desc:Verify touchpad monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.Level1)
 {
@@ -2671,7 +2671,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
  * @tc.name:InputManagerTest_OnAddTouchPadMonitor_004
  * @tc.desc:Verify touchpad monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.Level1)
 {
@@ -2732,7 +2732,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
  * @tc.name:InputManagerTest_OnAddTouchPadMonitor_005
  * @tc.desc:Verify touchpad monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.Level1)
 {
@@ -2778,7 +2778,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
  * @tc.name:InputManager_TouchPadSimulateInputEvent_001
  * @tc.desc:Verify touchpad simulate and monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize.Level1)
 {
@@ -2824,7 +2824,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize
  * @tc.name:InputManager_TouchPadSimulateInputEvent_002
  * @tc.desc:Verify touchpad simulate and monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize.Level1)
 {
@@ -2870,7 +2870,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize
  * @tc.name:InputManager_TouchPadSimulateInputEvent_003
  * @tc.desc:Verify touchpad simulate and monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize.Level1)
 {
@@ -2916,7 +2916,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize
  * @tc.name:InputManager_TouchPadSimulateInputEvent_004
  * @tc.desc:Verify touchpad simulate and monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize.Level1)
 {
@@ -2978,7 +2978,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
  * @tc.name:InputManager_TouchPadSimulateInputEvent_005
  * @tc.desc:Verify touchpad simulate and monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_005, TestSize.Level1)
 {
@@ -3011,7 +3011,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_005, TestSize
  * @tc.name:InputManagerTest_AddMouseMonitor_001
  * @tc.desc:Verify mouse monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1)
 {
@@ -3036,7 +3036,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1
  * @tc.name:InputManagerTest_AddMouseMonitor_002
  * @tc.desc:Verify mouse monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1)
 {
@@ -3064,7 +3064,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1
  * @tc.name:InputManagerTest_AddMouseMonitor_003
  * @tc.desc:Verify mouse monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1)
 {
@@ -3102,7 +3102,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1
  * @tc.name:InputManagerTest_AddMouseMonitor_004
  * @tc.desc:Verify mouse monitor
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1)
 {

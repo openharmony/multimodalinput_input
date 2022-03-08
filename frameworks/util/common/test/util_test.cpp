@@ -35,7 +35,7 @@ public:
  * @tc.name:getEnumString_001
  * @tc.desc:Verify get enum string
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UtilTest, getEnumString_001, TestSize.Level1)
 {
@@ -48,7 +48,7 @@ HWTEST_F(UtilTest, getEnumString_001, TestSize.Level1)
  * @tc.name:getEnumString_002
  * @tc.desc:Verify get enum string
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UtilTest, getEnumString_002, TestSize.Level1)
 {
@@ -61,7 +61,7 @@ HWTEST_F(UtilTest, getEnumString_002, TestSize.Level1)
  * @tc.name:getEnumString_003
  * @tc.desc:Verify get enum string
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UtilTest, getEnumString_003, TestSize.Level1)
 {
@@ -74,7 +74,7 @@ HWTEST_F(UtilTest, getEnumString_003, TestSize.Level1)
  * @tc.name:getEnumString_004
  * @tc.desc:Verify get enum string
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UtilTest, getEnumString_004, TestSize.Level1)
 {
@@ -87,7 +87,7 @@ HWTEST_F(UtilTest, getEnumString_004, TestSize.Level1)
  * @tc.name:getEnumString_005
  * @tc.desc:Verify get enum string
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UtilTest, getEnumString_005, TestSize.Level1)
 {
@@ -100,7 +100,7 @@ HWTEST_F(UtilTest, getEnumString_005, TestSize.Level1)
  * @tc.name:GetMicrotime
  * @tc.desc:Verify get micro time
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UtilTest, GetMicrotime, TestSize.Level1)
 {
@@ -112,7 +112,7 @@ HWTEST_F(UtilTest, GetMicrotime, TestSize.Level1)
  * @tc.name:GetMillisTime
  * @tc.desc:Verify get millis time
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UtilTest, GetMillisTime, TestSize.Level1)
 {
@@ -124,7 +124,7 @@ HWTEST_F(UtilTest, GetMillisTime, TestSize.Level1)
  * @tc.name:UuIdGenerate
  * @tc.desc:Verify generate uuid
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UtilTest, UuIdGenerate, TestSize.Level1)
 {
@@ -136,7 +136,7 @@ HWTEST_F(UtilTest, UuIdGenerate, TestSize.Level1)
  * @tc.name:GetUUid
  * @tc.desc:Verify get uuid
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UtilTest, GetUUid, TestSize.Level1)
 {
@@ -148,7 +148,7 @@ HWTEST_F(UtilTest, GetUUid, TestSize.Level1)
  * @tc.name:GetThisThreadIdOfString
  * @tc.desc:Verify get thread id
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UtilTest, GetThisThreadIdOfString, TestSize.Level1)
 {
@@ -160,7 +160,7 @@ HWTEST_F(UtilTest, GetThisThreadIdOfString, TestSize.Level1)
  * @tc.name:GetThisThreadIdOfLL
  * @tc.desc:Verify get thread id
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UtilTest, GetThisThreadIdOfLL, TestSize.Level1)
 {
@@ -172,7 +172,7 @@ HWTEST_F(UtilTest, GetThisThreadIdOfLL, TestSize.Level1)
  * @tc.name:StringToken_001
  * @tc.desc:Verify string token
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UtilTest, StringToken_001, TestSize.Level1)
 {
@@ -186,7 +186,7 @@ HWTEST_F(UtilTest, StringToken_001, TestSize.Level1)
  * @tc.name:StringToken_002
  * @tc.desc:Verify string token
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UtilTest, StringToken_002, TestSize.Level1)
 {
@@ -200,7 +200,7 @@ HWTEST_F(UtilTest, StringToken_002, TestSize.Level1)
  * @tc.name:StringToken_003
  * @tc.desc:Verify string token
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UtilTest, StringToken_003, TestSize.Level1)
 {
@@ -214,7 +214,7 @@ HWTEST_F(UtilTest, StringToken_003, TestSize.Level1)
  * @tc.name:StringSplit
  * @tc.desc:Verify string token
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UtilTest, StringSplit, TestSize.Level1)
 {

@@ -35,7 +35,7 @@ public:
  * @tc.name:Test_TransformJsonDataToInputData
  * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(ProcessingPadDeviceTest, Test_TransformJsonDataToInputData, TestSize.Level1)
 {

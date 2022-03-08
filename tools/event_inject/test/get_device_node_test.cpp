@@ -37,7 +37,7 @@ public:
  * @tc.name:Test_GetDeviceNodeTest
  * @tc.desc:Verify ExecuteCmd function Wrong argument passed in 
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(GetDeviceNodeTest, Test_GetDeviceNodeTest, TestSize.Level1)
 {
@@ -52,7 +52,7 @@ HWTEST_F(GetDeviceNodeTest, Test_GetDeviceNodeTest, TestSize.Level1)
  * @tc.name:Test_GetDeviceNodeTestCmdError
  * @tc.desc:Verify ExecuteCmd function right argument passed in 
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(GetDeviceNodeTest, Test_GetDeviceNodeTestCmdError, TestSize.Level1)
 {

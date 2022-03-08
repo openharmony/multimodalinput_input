@@ -54,7 +54,7 @@ void UDSSessionTest::TearDown()
  * @tc.name:Construct
  * @tc.desc:Verify uds session function EventsIsEmpty
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UDSSessionTest, Construct, TestSize.Level1)
 {
@@ -67,7 +67,7 @@ HWTEST_F(UDSSessionTest, Construct, TestSize.Level1)
  * @tc.name:SendMsg_type1_001
  * @tc.desc:Verify uds session function sendMsg
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UDSSessionTest, SendMsg_type1_001, TestSize.Level1)
 {
@@ -82,7 +82,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type1_001, TestSize.Level1)
  * @tc.name:SendMsg_type1_002
  * @tc.desc:Verify uds session function SendMsg
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UDSSessionTest, SendMsg_type1_002, TestSize.Level1)
 {
@@ -98,7 +98,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type1_002, TestSize.Level1)
  * @tc.name:SendMsg_type1_003
  * @tc.desc:Verify uds session function SendMsg
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UDSSessionTest, SendMsg_type1_003, TestSize.Level1)
 {
@@ -113,7 +113,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type1_003, TestSize.Level1)
  * @tc.name:SendMsg_type1_004
  * @tc.desc:Verify uds session function SendMsg
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UDSSessionTest, SendMsg_type1_004, TestSize.Level1)
 {
@@ -129,7 +129,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type1_004, TestSize.Level1)
  * @tc.name:SendMsg_type1_005
  * @tc.desc:Verify uds session function SendMsg
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UDSSessionTest, SendMsg_type1_005, TestSize.Level1)
 {
@@ -145,7 +145,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type1_005, TestSize.Level1)
  * @tc.name:SendMsg_type2_001
  * @tc.desc:Verify uds session function SendMsg
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UDSSessionTest, SendMsg_type2_001, TestSize.Level1)
 {
@@ -161,7 +161,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type2_001, TestSize.Level1)
  * @tc.name:SendMsg_type2_002
  * @tc.desc:Verify uds session function SendMsg
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UDSSessionTest, SendMsg_type2_002, TestSize.Level1)
 {
@@ -176,7 +176,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type2_002, TestSize.Level1)
  * @tc.name:SendMsg_type2_003
  * @tc.desc:Verify uds session function SendMsg
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UDSSessionTest, SendMsg_type2_003, TestSize.Level1)
 {

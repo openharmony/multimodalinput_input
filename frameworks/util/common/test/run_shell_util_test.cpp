@@ -43,7 +43,7 @@ public:
  * @tc.name:RunShellUtilTest_RunShellCommand_001
  * @tc.desc:Verify run shell command
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(RunShellUtilTest, RunShellUtilTest_RunShellCommand_001, TestSize.Level1)
 {
@@ -68,7 +68,7 @@ HWTEST_F(RunShellUtilTest, RunShellUtilTest_RunShellCommand_001, TestSize.Level1
  * @tc.name:RunShellUtilTest_RunShellCommand_002
  * @tc.desc:Verify run shell command
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(RunShellUtilTest, RunShellUtilTest_RunShellCommand_002, TestSize.Level1)
 {

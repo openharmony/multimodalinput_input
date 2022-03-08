@@ -34,7 +34,7 @@ public:
  * @tc.name:EnumAdd_001
  * @tc.desc:Verify enum add
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UtilExTest, EnumAdd_001, TestSize.Level1)
 {
@@ -47,7 +47,7 @@ HWTEST_F(UtilExTest, EnumAdd_001, TestSize.Level1)
  * @tc.name:EnumAdd_002
  * @tc.desc:Verify enum add
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(UtilExTest, EnumAdd_002, TestSize.Level1)
 {
