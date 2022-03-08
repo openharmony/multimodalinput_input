@@ -1457,10 +1457,10 @@ public:
         bool ReadFromParcel(Parcel &in);
 
     private:
-        bool pressed_;
-        int32_t deviceId_;
-        int32_t keyCode_;
-        int64_t downTime_;
+        bool pressed_ = false;
+        int32_t deviceId_ = DEFALUTID;
+        int32_t keyCode_ = -1;
+        int64_t downTime_ = 0;
     };
 
 public:
@@ -1509,9 +1509,9 @@ private:
     bool IsValidKeyItem() const;
 
 private:
-    int32_t keyCode_;
+    int32_t keyCode_ = -1;
     std::vector<KeyItem> keys_;
-    int32_t keyAction_;
+    int32_t keyAction_ = 0;
 };
 } // namespace MMI
 } // namespace OHOS

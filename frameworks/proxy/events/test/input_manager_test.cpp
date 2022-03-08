@@ -187,6 +187,7 @@ std::vector<std::string> InputManagerTest::SearchLog(const std::string &command,
 std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep1()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(823);   // test code，set the GlobalX = 823
@@ -209,6 +210,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep1()
 std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep2()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(1023);  // test code，set the GlobalX = 823
@@ -230,6 +232,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep2()
 
 void InputManagerTest::TestMarkConsumedStep3(int32_t monitorId, int32_t eventId)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     std::string command {
         "ClientMsgHandler: in OnPointerEvent, #[[:digit:]]\\{1,\\}, "
         "Operation canceled"
@@ -246,6 +249,7 @@ void InputManagerTest::TestMarkConsumedStep3(int32_t monitorId, int32_t eventId)
 void InputManagerTest::TestMarkConsumedStep4()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(1123);  // test code，set the GlobalX = 823
@@ -261,7 +265,7 @@ void InputManagerTest::TestMarkConsumedStep4()
 
     std::string command {
         "InputHandlerManagerGlobal: in HandleEvent, #[[:digit:]]\\{1,\\}, "
-        "Pointer event was consumed"
+        "Pointer event was monitor"
     };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
@@ -274,7 +278,9 @@ void InputManagerTest::TestMarkConsumedStep4()
 
 void InputManagerTest::TestMarkConsumedStep5()
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(0);  // test code，set the GlobalX = 823
@@ -290,7 +296,7 @@ void InputManagerTest::TestMarkConsumedStep5()
 
     std::string command {
         "InputHandlerManagerGlobal: in HandleEvent, #[[:digit:]]\\{1,\\}, "
-        "Pointer event was consumed"
+        "Pointer event was monitor"
     };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
@@ -303,7 +309,9 @@ void InputManagerTest::TestMarkConsumedStep5()
 
 void InputManagerTest::TestMarkConsumedStep6()
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(823);   // test code，set the GlobalX = 823
@@ -1174,8 +1182,8 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_015, TestSize.Level1)
 void InputManagerTest::KeyMonitorCallBack(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
     MMI_LOGD("KeyMonitorCallBack: keyCode:%{public}d,keyAction:%{public}d,action:%{public}d,"
-             "device:%{private}d,actionTime:%{public}" PRId64 "", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
-             keyEvent->GetAction(), keyEvent->GetDeviceId(), keyEvent->GetActionTime());
+             "actionTime:%{public}" PRId64 "", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
+             keyEvent->GetAction(), keyEvent->GetActionTime());
     EXPECT_EQ(keyEvent->GetKeyCode(), OHOS::MMI::KeyEvent::KEYCODE_BACK);
     EXPECT_EQ(keyEvent->GetKeyAction(), OHOS::MMI::KeyEvent::KEY_ACTION_UP);
     EXPECT_EQ(keyEvent->GetAction(), OHOS::MMI::KeyEvent::KEY_ACTION_UP);
@@ -2597,8 +2605,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
     MMI_LOGD("Call MontiorManager");
 
     std::string command {
-        "EventDispatch: in handlePointerEvent, #[[:digit:]]\\{1,\\}, "
-        "Unknown source type"
+        "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
+        "PointerEvent received"
     };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
