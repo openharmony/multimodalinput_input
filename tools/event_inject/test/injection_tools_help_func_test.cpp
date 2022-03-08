@@ -35,7 +35,7 @@ public:
  * @tc.name:Test_InjectionToolsHelpFuncTest
  * @tc.desc:Verify InjectionToolsHelpFunc function GetHelpText
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InjectionToolsHelpFuncTest, Test_InjectionToolsHelpFuncTest, TestSize.Level1)
 {

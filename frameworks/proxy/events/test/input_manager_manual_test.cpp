@@ -120,7 +120,7 @@ void InputManagerManualTest::SimulateInputEventHelper(int32_t globalX, int32_t g
  * @tc.name:HandlePointerEventFilter_001
  * @tc.desc:Verify pointer event filter
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerManualTest, HandlePointerEventFilter_001, TestSize.Level1)
 {

@@ -36,7 +36,7 @@ public:
  * @tc.name:Test_TransformKeyBoardJsonDataToInputData
  * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputData, TestSize.Level1)
 {
@@ -71,7 +71,7 @@ HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputData
  * @tc.name:Test_TransformKeyBoardJsonDataToInputDataEventsIsEmpty
  * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {

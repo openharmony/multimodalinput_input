@@ -36,7 +36,7 @@ public:
  * @tc.name:Test_GetDeviceObjectTest
  * @tc.desc:Verify TransformJsonData function
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(GetDeviceObjectTest, Test_GetDeviceObjectTest, TestSize.Level1)
 {
@@ -71,7 +71,7 @@ HWTEST_F(GetDeviceObjectTest, Test_GetDeviceObjectTest, TestSize.Level1)
  * @tc.name:Test_GetDeviceObjectTestNotFindDevice
  * @tc.desc:Verify CreateDeviceObject function
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(GetDeviceObjectTest, Test_GetDeviceObjectTestNotFindDevice, TestSize.Level1)
 {

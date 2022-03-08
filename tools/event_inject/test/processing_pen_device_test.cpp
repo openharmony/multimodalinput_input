@@ -36,7 +36,7 @@ public:
  * @tc.name:Test_TransformPenJsonDataToInputData
  * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputData, TestSize.Level1)
 {
@@ -71,7 +71,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputData, TestSize
  * @tc.name:Test_TransformPenJsonDataToInputDataNotfindEvents
  * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataNotfindEvents, TestSize.Level1)
 {
@@ -106,7 +106,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataNotfindEve
  * @tc.name:Test_TransformPenJsonDataToInputDataEventsIsEmpty
  * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {
@@ -141,7 +141,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataEventsIsEm
  * @tc.name:Test_TransformPenJsonDataToInputDataApprochEventError
  * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApprochEventError, TestSize.Level1)
 {
@@ -176,7 +176,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApprochEve
  * @tc.name:Test_TransformPenJsonDataToInputDataSlideEventError
  * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataSlideEventError, TestSize.Level1)
 {
@@ -211,7 +211,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataSlideEvent
  * @tc.name:Test_TransformPenJsonDataToInputDataLeaveEventError
  * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEventError, TestSize.Level1)
 {
@@ -246,7 +246,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEvent
  * @tc.name:Test_TransformPenJsonDataToInputDataApprochEventEventTypeError
  * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApprochEventEventTypeError, TestSize.Level1)
 {
@@ -281,7 +281,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApprochEve
  * @tc.name:Test_TransformPenJsonDataToInputDataLeaveEventEventTypeError
  * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEventEventTypeError, TestSize.Level1)
 {

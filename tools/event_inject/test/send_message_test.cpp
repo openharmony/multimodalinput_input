@@ -33,7 +33,7 @@ public:
  * @tc.name:Test_GetDevIndexName
  * @tc.desc:Verify SendMessage function GetDevIndexName
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(SendMessageTest, Test_GetDevIndexName, TestSize.Level1)
 {

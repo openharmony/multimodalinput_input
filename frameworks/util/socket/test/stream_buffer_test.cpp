@@ -49,7 +49,7 @@ public:
  * @tc.name:construct_001
  * @tc.desc:Verify stream buffer
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest, construct_001, TestSize.Level1)
 {
@@ -60,7 +60,7 @@ HWTEST_F(StreamBufferTest, construct_001, TestSize.Level1)
  * @tc.name:construct_002
  * @tc.desc:Verify stream buffer
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest, construct_002, TestSize.Level1)
 {
@@ -72,7 +72,7 @@ HWTEST_F(StreamBufferTest, construct_002, TestSize.Level1)
  * @tc.name:SetReadIdx_001
  * @tc.desc:Verify stream buffer set read idx
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest, SetReadIdx_001, TestSize.Level1)
 {
@@ -85,7 +85,7 @@ HWTEST_F(StreamBufferTest, SetReadIdx_001, TestSize.Level1)
  * @tc.name:SetReadIdx_002
  * @tc.desc:Verify stream buffer buffer set read idx
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest, SetReadIdx_002, TestSize.Level1)
 {
@@ -102,7 +102,7 @@ HWTEST_F(StreamBufferTest, SetReadIdx_002, TestSize.Level1)
  * @tc.name:read_Type1_001
  * @tc.desc:Verify stream buffer read
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest, read_Type1_001, TestSize.Level1)
 {
@@ -118,7 +118,7 @@ HWTEST_F(StreamBufferTest, read_Type1_001, TestSize.Level1)
  * @tc.name:read_Type1_002
  * @tc.desc:Verify stream buffer read
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest, read_Type1_002, TestSize.Level1)
 {
@@ -134,7 +134,7 @@ HWTEST_F(StreamBufferTest, read_Type1_002, TestSize.Level1)
  * @tc.name:read_Type2_001
  * @tc.desc:Verify stream buffer read
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest,  read_Type2_001, TestSize.Level1)
 {
@@ -149,7 +149,7 @@ HWTEST_F(StreamBufferTest,  read_Type2_001, TestSize.Level1)
  * @tc.name:read_Type2_002
  * @tc.desc:Verify stream buffer read
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest, read_Type2_002, TestSize.Level1)
 {
@@ -164,7 +164,7 @@ HWTEST_F(StreamBufferTest, read_Type2_002, TestSize.Level1)
  * @tc.name:read_Type3_001
  * @tc.desc:Verify stream buffer read
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest,  read_Type3_001, TestSize.Level1)
 {
@@ -179,7 +179,7 @@ HWTEST_F(StreamBufferTest,  read_Type3_001, TestSize.Level1)
  * @tc.name:write_Type1_001
  * @tc.desc:Verify stream buffer write
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest, write_Type1_001, TestSize.Level1)
 {
@@ -194,7 +194,7 @@ HWTEST_F(StreamBufferTest, write_Type1_001, TestSize.Level1)
  * @tc.name:write_Type1_002
  * @tc.desc:Verify stream buffer write
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest, write_Type1_002, TestSize.Level1)
 {
@@ -209,7 +209,7 @@ HWTEST_F(StreamBufferTest, write_Type1_002, TestSize.Level1)
  * @tc.name:write_Type2_001
  * @tc.desc:Verify stream buffer write
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest, write_Type2_001, TestSize.Level1)
 {
@@ -224,7 +224,7 @@ HWTEST_F(StreamBufferTest, write_Type2_001, TestSize.Level1)
  * @tc.name:write_Type3_001
  * @tc.desc:Verify stream buffer write
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest, write_Type3_001, TestSize.Level1)
 {
@@ -240,7 +240,7 @@ HWTEST_F(StreamBufferTest, write_Type3_001, TestSize.Level1)
  * @tc.name:write_Type3_002
  * @tc.desc:Verify stream buffer write
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest, write_Type3_002, TestSize.Level1)
 {
@@ -256,7 +256,7 @@ HWTEST_F(StreamBufferTest, write_Type3_002, TestSize.Level1)
  * @tc.name:Data
  * @tc.desc:Verify stream buffer data
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest, Data, TestSize.Level1)
 {
@@ -269,7 +269,7 @@ HWTEST_F(StreamBufferTest, Data, TestSize.Level1)
  * @tc.name:Size_001
  * @tc.desc:Verify stream buffer size
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest, Size_001, TestSize.Level1)
 {
@@ -281,7 +281,7 @@ HWTEST_F(StreamBufferTest, Size_001, TestSize.Level1)
  * @tc.name:operatorLeft
  * @tc.desc:Verify stream buffer operator left
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest, operatorLeft, TestSize.Level1)
 {
@@ -294,7 +294,7 @@ HWTEST_F(StreamBufferTest, operatorLeft, TestSize.Level1)
  * @tc.name:operatorRight
  * @tc.desc:Verify stream buffer operator right
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest, operatorRight, TestSize.Level1)
 {
@@ -307,7 +307,7 @@ HWTEST_F(StreamBufferTest, operatorRight, TestSize.Level1)
  * @tc.name:ReadBuf
  * @tc.desc:Verify stream buffer read buffer 
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest, ReadBuf, TestSize.Level1)
 {
@@ -320,7 +320,7 @@ HWTEST_F(StreamBufferTest, ReadBuf, TestSize.Level1)
  * @tc.name:WriteBuf
  * @tc.desc:Verify stream buffer write buffer 
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest, WriteBuf, TestSize.Level1)
 {
@@ -333,7 +333,7 @@ HWTEST_F(StreamBufferTest, WriteBuf, TestSize.Level1)
  * @tc.name:Clone
  * @tc.desc:Verify stream buffer clone
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(StreamBufferTest, Clone, TestSize.Level1)
 {

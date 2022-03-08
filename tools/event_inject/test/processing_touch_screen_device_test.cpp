@@ -34,9 +34,9 @@ public:
 
 /**
  * @tc.name:Test_TransformJsonDataToInputData
- * @tc.desc:
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, TestSize.Level1)
 {
@@ -69,9 +69,9 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, Tes
 
 /**
  * @tc.name:Test_TransformJsonDataToInputDataEventsIsEmpty
- * @tc.desc:
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {
@@ -104,9 +104,9 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEvent
 
 /**
  * @tc.name:Test_TransformJsonDataToInputDataSingleEventsIsEmpty
- * @tc.desc:
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataSingleEventsIsEmpty, TestSize.Level1)
 {

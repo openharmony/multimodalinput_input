@@ -36,7 +36,7 @@ public:
  * @tc.name:Test_Init
  * @tc.desc:Verify InjectionEventDispatch Init 
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InjectionEventDispatchTest, Test_Init, TestSize.Level1)
 {
@@ -48,7 +48,7 @@ HWTEST_F(InjectionEventDispatchTest, Test_Init, TestSize.Level1)
  * @tc.name:Test_OnJson
  * @tc.desc:Verify InjectionEventDispatch OnJson
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InjectionEventDispatchTest, Test_OnJson, TestSize.Level1)
 {

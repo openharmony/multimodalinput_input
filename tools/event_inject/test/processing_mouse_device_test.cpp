@@ -36,7 +36,7 @@ public:
  * @tc.name:Test_TransformJsonDataToInputData
  * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(ProcessingMouseDeviceTest, Test_TransformJsonDataToInputData, TestSize.Level1)
 {
