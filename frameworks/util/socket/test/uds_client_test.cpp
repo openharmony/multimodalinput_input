@@ -47,7 +47,6 @@ public:
     {
         OnRecv(buf, size);
     }
-
 };
 
 #if BINDER_TODO
