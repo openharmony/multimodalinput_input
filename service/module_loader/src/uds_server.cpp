@@ -19,7 +19,6 @@
 #include <sys/socket.h>
 #include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
-#include "uds_command_queue.h"
 #include "util.h"
 #include "util_ex.h"
 
@@ -94,14 +93,6 @@ bool UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
         return false;
     }
     return ses->SendMsg(pkt);
-}
-
-void UDSServer::Broadcast(NetPacket& pkt)
-{
-    std::lock_guard<std::mutex> lock(mux_);
-    for (const auto &item : sessionsMap_) {
-        item.second->SendMsg(pkt);
-    }
 }
 
 void UDSServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
