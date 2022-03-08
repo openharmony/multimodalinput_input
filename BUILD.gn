@@ -58,12 +58,11 @@ ohos_executable("uinput_inject") {
     "$HDF_FWKS/utils/include",
   ]
 
-  deps = [
-    "//drivers/peripheral/input/hal:hdi_input",
-    "//utils/native/base:utils",
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "input_device_driver:hdi_input",
+    "utils_base:utils",
   ]
-
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 
   part_name = "multimodalinput_base"
   subsystem_name = "multimodalinput"
@@ -97,12 +96,11 @@ ohos_shared_library("mmi_uinject") {
     "$HDF_FWKS/utils/include",
   ]
 
-  deps = [
-    "//drivers/peripheral/input/hal:hdi_input",
-    "//utils/native/base:utils",
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "input_device_driver:hdi_input",
+    "utils_base:utils",
   ]
-
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 
   part_name = "multimodalinput_base"
   subsystem_name = "multimodalinput"
