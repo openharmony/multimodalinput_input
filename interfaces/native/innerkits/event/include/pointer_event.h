@@ -452,7 +452,7 @@ public:
      * @return Returns <b>true</b> if the data of the pointer with the specified ID exists; returns <b>false</b> otherwise.
      * @since 8
      */
-    bool GetPointerItem(int32_t pointerId, PointerItem &pointerItem) const;
+    bool GetPointerItem(int32_t pointerId, PointerItem &pointerItem);
 
     /**
      * @brief Adds a pointer item.
