@@ -192,92 +192,104 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
     MMI_LOGD("EventType: %{public}s, keyEventMonitorInfos: %{public}zu",
         event->eventType.c_str(), info.size());
     napi_value handler1 = nullptr;
-    napi_status status = napi_get_reference_value(env, event->callback[0], &handler1);
-    if (status != napi_ok) {
-        MMI_LOGE("Handler1 get reference value failed");
-        return JS_CALLBACK_EVENT_FAILED;
+    napi_status status;
+    if (event->callback[0] != nullptr) {
+        status = napi_get_reference_value(env, event->callback[0], &handler1);
+        if (status != napi_ok) {
+            MMI_LOGE("Handler1 get reference value failed");
+            return JS_CALLBACK_EVENT_FAILED;
+        }
     }
     for (auto iter = info.begin(); iter != info.end();) {
-        napi_value handler2 = nullptr;
-        status = napi_get_reference_value(env, (*iter)->callback[0], &handler2);
-        if (status != napi_ok) {
-            MMI_LOGE("Handler2 get reference value failed");
-            return JS_CALLBACK_EVENT_FAILED;
-        }
-        bool isEquals = false;
-        status = napi_strict_equals(env, handler1, handler2, &isEquals);
-        if (status != napi_ok) {
-            MMI_LOGE("Compare two handler failed");
-            return JS_CALLBACK_EVENT_FAILED;
-        }
-        if (isEquals) {
-            status = napi_delete_reference(env, (*iter)->callback[0]);
+        if (handler1 !=nullptr) {
+            napi_value handler2 = nullptr;
+            status = napi_get_reference_value(env, (*iter)->callback[0], &handler2);
             if (status != napi_ok) {
-                MMI_LOGE("Delete reference failed");
+                MMI_LOGE("Handler2 get reference value failed");
                 return JS_CALLBACK_EVENT_FAILED;
             }
-            KeyEventMonitorInfo *monitorInfo = *iter;
-            info.erase(iter++);
-            if (info.empty()) {
-                subscribeId = monitorInfo->subscribeId;
+            bool isEquals = false;
+            status = napi_strict_equals(env, handler1, handler2, &isEquals);
+            if (status != napi_ok) {
+                MMI_LOGE("Compare two handler failed");
+                return JS_CALLBACK_EVENT_FAILED;
             }
-            delete monitorInfo;
-            monitorInfo = nullptr;
-            MMI_LOGD("Callback has deleted, size: %{public}zu", info.size());
-            return JS_CALLBACK_EVENT_SUCCESS;
+            if (isEquals) {
+                status = napi_delete_reference(env, (*iter)->callback[0]);
+                if (status != napi_ok) {
+                    MMI_LOGE("Delete reference failed");
+                    return JS_CALLBACK_EVENT_FAILED;
+                }
+                KeyEventMonitorInfo *monitorInfo = *iter;
+                info.erase(iter++);
+                if (info.empty()) {
+                    subscribeId = monitorInfo->subscribeId;
+                }
+                delete monitorInfo;
+                monitorInfo = nullptr;
+                MMI_LOGD("Callback has deleted, size: %{public}zu", info.size());
+                return JS_CALLBACK_EVENT_SUCCESS;
+            }
+            ++iter;
+            continue;
         }
+        status = napi_delete_reference(env, (*iter)->callback[0]);
+        if (status != napi_ok) {
+            MMI_LOGE("Delete reference failed");
+            return JS_CALLBACK_EVENT_FAILED;
+        }
+        KeyEventMonitorInfo *monitorInfo = *iter;
+        info.erase(iter++);
+        if (info.empty()) {
+            subscribeId = monitorInfo->subscribeId;
+        }
+        delete monitorInfo;
+        monitorInfo = nullptr;
+        MMI_LOGD("Callback has deleted, size: %{public}zu", info.size());
         ++iter;
     }
     MMI_LOGD("Callback size: %{public}zu", info.size());
-    return JS_CALLBACK_EVENT_FAILED;
+    return JS_CALLBACK_EVENT_SUCCESS;
 }
 
-static void AsyncWorkFn(napi_env env, OHOS::MMI::KeyEventMonitorInfo *event, napi_value result[2], uint32_t resultSize)
+static void AsyncWorkFn(const napi_env &env, OHOS::MMI::KeyEventMonitorInfo *event, napi_value &result)
 {
     CHKPV(event);
-    if (resultSize <= 1) {
-        MMI_LOGE("resultSize(%{public}u) too short", resultSize);
+    
+    MMI_LOGD("Status > 0 enter");
+    napi_status status;
+    status = napi_create_object(env, &result);
+    if (status != napi_ok) {
+        MMI_LOGE("create object failed");
         return;
     }
-    if (event->status < 0) {
-        MMI_LOGD("Status < 0 enter");
-        napi_value code = nullptr;
-        napi_create_string_utf8(env, "-1", NAPI_AUTO_LENGTH, &code);
-        napi_value message = nullptr;
-        napi_create_string_utf8(env, "failed", NAPI_AUTO_LENGTH, &message);
-        napi_create_error(env, code, message, &result[0]);
-        napi_get_undefined(env, &result[1]);
-    } else if (event->status == 0) {
-        MMI_LOGD("Status = 0 enter");
-        napi_get_undefined(env, &result[0]);
-        napi_get_undefined(env, &result[1]);
-    } else {
-        MMI_LOGD("Status > 0 enter");
-        if (napi_create_object(env, &result[1]) != napi_ok) {
-            MMI_LOGE("Result1 create object failed");
-            return;
-        }
-        napi_value arr;
-        napi_value value;
-        napi_create_array(env, &arr);
-        std::set<int32_t> preKeys = event->keyOption->GetPreKeys();
-        int32_t i = 0;
-        for (const auto &preKey : preKeys) {
-            napi_create_int32(env, preKey, &value);
-            napi_set_element(env, arr, i, value);
-            ++i;
-        }
-        std::string preKeysStr = "preKeys";
-        NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, result[1], preKeysStr.c_str(), arr));
-        MMI::SetNamedProperty(env, result[1], "finalKey", event->keyOption->GetFinalKey());
-        MMI::SetNamedProperty(env, result[1], "isFinalKeyDown", event->keyOption->IsFinalKeyDown());
-        MMI::SetNamedProperty(env, result[1], "finalKeyDownDuration",
-            event->keyOption->GetFinalKeyDownDuration());
-        if (napi_get_undefined(env, &result[0]) != napi_ok) {
-            MMI_LOGE("Result0 get undefined failed");
-            return;
-        }
+    napi_value arr;
+    status = napi_create_array(env, &arr);
+    if (status != napi_ok) {
+        MMI_LOGE("create array failed");
+        return;
     }
+    std::set<int32_t> preKeys = event->keyOption->GetPreKeys();
+    int32_t i = 0;
+	napi_value value;
+    for (const auto &preKey : preKeys) {
+        status = napi_create_int32(env, preKey, &value);
+        if (status != napi_ok) {
+            MMI_LOGE("create int32 failed");
+            return;
+        }
+        status = napi_set_element(env, arr, i, value);
+        if (status != napi_ok) {
+            MMI_LOGE("set element failed");
+            return;
+        }
+        ++i;
+    }
+    std::string preKeysStr = "preKeys";
+    NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, result, preKeysStr.c_str(), arr));
+    MMI::SetNamedProperty(env, result, "finalKey", event->keyOption->GetFinalKey());
+    MMI::SetNamedProperty(env, result, "isFinalKeyDown", event->keyOption->IsFinalKeyDown());
+    MMI::SetNamedProperty(env, result, "finalKeyDownDuration", event->keyOption->GetFinalKeyDownDuration());
 }
 
 void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
@@ -300,21 +312,14 @@ void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
                 MMI_LOGE("Event get reference value failed");
                 return;
             }
-            const uint32_t resultSize = 2;
-            napi_value result[resultSize] = {};
-            AsyncWorkFn(env, event, result, resultSize);
+            napi_value result = nullptr;
+            AsyncWorkFn(env, event, result);
             napi_value callResult = nullptr;
-            auto callFunResult = napi_call_function(env, nullptr, callback, 2, result, &callResult);
-            MMI_LOGD("CallFunResult:%{public}d", static_cast<int32_t>(callFunResult));
-            if (callFunResult != napi_ok) {
-                MMI_LOGE("Call function fail, callFunResult:%{public}d", callFunResult);
+            status = napi_call_function(env, nullptr, callback, 1, &result, &callResult);
+            MMI_LOGD("CallFunResult:%{public}d", static_cast<int32_t>(status));
+            if (status != napi_ok) {
+                MMI_LOGE("Call function fail, status:%{public}d", status);
                 return;
-            }
-            if (event->status <= 0) {
-                napi_delete_reference(env, event->callback[0]);
-                napi_delete_async_work(env, event->asyncWork);
-                delete event;
-                event = nullptr;
             }
             MMI_LOGD("Napi async work left");
         }, reportEvent, &reportEvent->asyncWork);
