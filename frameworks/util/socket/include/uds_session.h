@@ -81,7 +81,6 @@ protected:
     };
     std::vector<EventTime> events_;
     std::string descript_;
-    bool bHasClosed_ = false;
     const std::string programName_;
     const int32_t moduleType_;
     const int32_t fd_;

@@ -60,13 +60,14 @@ bool StreamBuffer::Read(std::string &buf)
         return false;
     }
     buf = ReadBuf();
-    rIdx_ += buf.size() + 1;
-    return (buf.size() > 0);
+    rIdx_ += buf.length() + 1;
+    return (buf.length() > 0);
 }
 
 bool StreamBuffer::Write(const std::string &buf)
 {
-    return Write(buf.c_str(), buf.size() + 1);
+    buf += '\0';
+    return Write(buf.c_str(), buf.length());
 }
 
 bool StreamBuffer::Read(StreamBuffer &buf)

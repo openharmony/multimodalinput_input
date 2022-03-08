@@ -148,15 +148,15 @@ void UDSClient::OnRecv(const char *buf, size_t size)
             return;
         }
         auto head = reinterpret_cast<PackHead *>(const_cast<char *>(&buf[readIdx]));
-        if (head->size[0] < 0 || head->size[0] >= static_cast<int32_t>(size)) {
-            MMI_LOGE("Head size[0] is error, head->size[0]:%{public}d, errCode:%{public}d", head->size[0], VAL_NOT_EXP);
+        if (head->size < 0 || head->size >= static_cast<int32_t>(size)) {
+            MMI_LOGE("Head size[0] is error, head->size[0]:%{public}d, errCode:%{public}d", head->size, VAL_NOT_EXP);
             return;
         }
-        packSize = headSize + head->size[0];
+        packSize = headSize + head->size;
 
         NetPacket pkt(head->idMsg);
-        if (head->size[0] > 0) {
-            if (!pkt.Write(&buf[readIdx + headSize], head->size[0])) {
+        if (head->size > 0) {
+            if (!pkt.Write(&buf[readIdx + headSize], head->size)) {
                 MMI_LOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
                 return;
             }
