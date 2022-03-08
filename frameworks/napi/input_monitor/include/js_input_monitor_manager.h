@@ -16,12 +16,14 @@
 #ifndef JS_INPUT_MONITOR_MANAGER_H
 #define JS_INPUT_MONITOR_MANAGER_H
 
+#include <cinttypes>
 #include <list>
 #include <mutex>
-#include <cinttypes>
-#include "js_input_monitor.h"
+
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+
+#include "js_input_monitor.h"
 
 namespace OHOS {
 namespace MMI {

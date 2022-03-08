@@ -20,9 +20,11 @@
 #include <mutex>
 #include <queue>
 #include <uv.h>
-#include "i_input_event_consumer.h"
+
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+
+#include "i_input_event_consumer.h"
 
 namespace OHOS {
 namespace MMI {
