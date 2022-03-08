@@ -28,7 +28,7 @@ public:
     DISALLOW_COPY_AND_MOVE(MMIToken);
     virtual ~MMIToken() = default;
 
-    virtual int32_t GetObjectRefCount() const override
+    virtual int32_t GetObjectRefCount() override
     {
         return 0;
     }
