@@ -118,8 +118,8 @@ void InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInf
 
     physicalDisplays_ = physicalDisplays;
     logicalDisplays_ = logicalDisplays;
-    int32_t numLogicalDisplay = logicalDisplays.size();
-    for (int32_t i = 0; i < numLogicalDisplay; i++) {
+    size_t numLogicalDisplay = logicalDisplays.size();
+    for (size_t i = 0; i < numLogicalDisplay; ++i) {
         size_t numWindow = logicalDisplays[i].windowsInfo_.size();
         for (size_t j = 0; j < numWindow; j++) {
             WindowInfo myWindow = logicalDisplays[i].windowsInfo_[j];
@@ -335,11 +335,11 @@ bool InputWindowsManager::TouchDownPointToDisplayPoint(struct libinput_event_tou
     }
 
     for (const auto &display : logicalDisplays_) {
-        if (globalLogicalX < display.topLeftX || globalLogicalX > display.topLeftX + display.width) {
+        if ((globalLogicalX < display.topLeftX) || (globalLogicalX > display.topLeftX + display.width)) {
             continue;
         }
 
-        if (globalLogicalY < display.topLeftY || globalLogicalY > display.topLeftY + display.height) {
+        if ((globalLogicalY < display.topLeftY) || (globalLogicalY > display.topLeftY + display.height)) {
             continue;
         }
 

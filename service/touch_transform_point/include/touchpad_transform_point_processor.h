@@ -35,7 +35,7 @@ private:
     void OnEventTouchPadMotion(struct libinput_event *event);
     void OnEventTouchPadUp(struct libinput_event *event);
 private:
-    int32_t deviceId_;
+    int32_t deviceId_ {0};
     std::shared_ptr<PointerEvent> pointerEvent_ = nullptr;
 };
 } // namespace MMI

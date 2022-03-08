@@ -26,6 +26,7 @@ namespace MMI {
 TouchPadTransformPointProcessor::TouchPadTransformPointProcessor(int32_t deviceId) : deviceId_(deviceId)
 {
     pointerEvent_ = PointerEvent::Create();
+    CHKPL(pointerEvent_);
 }
 
 TouchPadTransformPointProcessor::~TouchPadTransformPointProcessor() {}
