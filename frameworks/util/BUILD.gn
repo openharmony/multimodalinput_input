@@ -61,7 +61,7 @@ ohos_shared_library("libmmi-util") {
     sources += [ "common/src/uds_command_queue.cpp" ]
   }
 
-  public_configs = [
+  configs = [
     "//foundation/multimodalinput/input:multimodalinput_mmi_public_config",
     ":libmmi_util_public_config",
   ]
