@@ -24,7 +24,7 @@ ohos_moduletest("sdk-test-out") {
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
     "//foundation/multimodalinput/input/frameworks/util/common/include",
     "//foundation/multimodalinput/input/frameworks/util/socket/include",
-    "//foundation/multimodalinput/input/frameworks/util/network/include"
+    "//foundation/multimodalinput/input/frameworks/util/network/include",
   ]
 
   sources = [ "dfx_sdk_test.cpp" ]
