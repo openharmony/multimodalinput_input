@@ -15,13 +15,11 @@
 
 #ifndef VIRTUAL_TOUCH_SCREEN_H
 #define VIRTUAL_TOUCH_SCREEN_H
-
-#include <cstdint>
-
 #include "linux/input.h"
-
 #include "virtual_device.h"
 
+namespace OHOS {
+namespace MMI {
 class VirtualTouchScreen : public VirtualDevice {
 public:
     VirtualTouchScreen(const uint32_t maxX, const uint32_t maxY);
@@ -33,6 +31,7 @@ protected:
     virtual const std::vector<uint32_t>& GetProperties() const;
     virtual const std::vector<uint32_t>& GetAbs() const;
 };
-
+} // namespace MMI
+} // namespace OHOS
 
 #endif // VIRTUAL_TOUCH_SCREEN_H

@@ -17,7 +17,8 @@
 #define VIRTUAL_KEYBOARD_H
 
 #include "virtual_device.h"
-
+namespace OHOS {
+namespace MMI {
 class VirtualKeyboard : public VirtualDevice {
 public:
     VirtualKeyboard();
@@ -28,5 +29,6 @@ protected:
 
     const std::vector<uint32_t> &GetKeys() const override;
 };
-
+} // namespace MMI
+} // namespace OHOS
 #endif // VIRTUAL_KEYBOARD_H

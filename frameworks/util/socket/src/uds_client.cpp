@@ -47,7 +47,7 @@ int32_t UDSClient::ConnectTo()
             return RET_ERR;
         }
     }
-    SetBlockMode(fd_); // 设置非阻塞模式
+    SetNonBlockMode(fd_);
 
     struct epoll_event ev;
     ev.events = EPOLLIN;
@@ -137,32 +137,33 @@ void UDSClient::OnRecv(const char *buf, size_t size)
     CHKPV(buf);
     int32_t readIdx = 0;
     int32_t packSize = 0;
-    const size_t headSize = sizeof(PackHead);
-    if (size < headSize) {
+    int32_t bufSize = static_cast<int32_t>(size);
+    const int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
+    if (bufSize < headSize) {
         MMI_LOGE("The in parameter size is error, errCode:%{public}d", VAL_NOT_EXP);
         return;
     }
-    while (size > 0 && recvFun_) {
-        if (size < headSize) {
+    while (bufSize > 0 && recvFun_) {
+        if (bufSize < headSize) {
             MMI_LOGE("The size is less than headSize, errCode:%{public}d", VAL_NOT_EXP);
             return;
         }
         auto head = reinterpret_cast<PackHead *>(const_cast<char *>(&buf[readIdx]));
-        if (head->size < 0 || head->size >= static_cast<int32_t>(size)) {
-            MMI_LOGE("Head size[0] is error, head->size[0]:%{public}d, errCode:%{public}d", head->size, VAL_NOT_EXP);
+        if (head->size < 0 || head->size >= static_cast<int32_t>(bufSize)) {
+            MMI_LOGE("Head size is error, head->size:%{public}d, errCode:%{public}d", head->size, VAL_NOT_EXP);
             return;
         }
         packSize = headSize + head->size;
 
         NetPacket pkt(head->idMsg);
         if (head->size > 0) {
-            if (!pkt.Write(&buf[readIdx + headSize], head->size)) {
+            if (!pkt.Write(&buf[readIdx + headSize], static_cast<size_t>(head->size))) {
                 MMI_LOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
                 return;
             }
         }
         recvFun_(*this, pkt);
-        size -= packSize;
+        bufSize -= packSize;
         readIdx += packSize;
     }
 }

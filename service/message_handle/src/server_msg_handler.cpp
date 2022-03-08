@@ -197,6 +197,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     auto creKey = KeyEvent::Create();
+    CHKPR(creKey, ERROR_NULL_POINTER);
     int32_t errCode = InputEventDataTransformation::NetPacketToKeyEvent(pkt, creKey);
     if (errCode != RET_OK) {
         MMI_LOGE("Deserialization is Failed, errCode:%{public}u", errCode);
@@ -214,6 +215,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
 {
     MMI_LOGD("enter");
     auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != RET_OK) {
         MMI_LOGE("Unmarshalling failed");
         return RET_ERR;
@@ -341,7 +343,7 @@ int32_t ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
     int32_t finalKeyDownDuration = 0;
     pkt >> subscribeId >> finalKey >> isFinalKeyDown >> finalKeyDownDuration >> preKeySize;
     std::set<int32_t> preKeys;
-    for (int32_t i = 0; i < preKeySize; ++i) {
+    for (uint32_t i = 0; i < preKeySize; ++i) {
         int32_t tmpKey = -1;
         pkt >> tmpKey;
         if (!(preKeys.insert(tmpKey).second)) {

@@ -199,7 +199,7 @@ void JsEventTarget::CallDevAsyncWork(napi_env env, napi_status status, void* dat
         return;
     }
 
-    int32_t types = cbTemp.device->devcieType;
+    uint32_t types = cbTemp.device->devcieType;
     std::vector<std::string> sources;
     for (const auto & item : g_deviceType) {
         if (types & item.typeBit) {
@@ -447,50 +447,54 @@ void JsEventTarget::CallDevPromiseWork(napi_env env, napi_status status, void* d
     napi_value id = nullptr;
     status_ = napi_create_int64(env, cbTemp.device->id, &id);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_create_int64 failed");
-        MMI_LOGE("call to napi_create_int64 failed");
+        napi_throw_error(env, nullptr, "napi_create_int64 failed");
+        MMI_LOGE("napi_create_int64 failed");
         return;
     }
     napi_value name = nullptr;
     status_ = napi_create_string_utf8(env, (cbTemp.device->name).c_str(), NAPI_AUTO_LENGTH, &name);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_create_string_utf8 failed");
-        MMI_LOGE("call to napi_create_string_utf8 failed");
+        napi_throw_error(env, nullptr, "napi_create_string_utf8 failed");
+        MMI_LOGE("napi_create_string_utf8 failed");
         return;
     }
     napi_value object = nullptr;
     status_ = napi_create_object(env, &object);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_create_object failed");
-        MMI_LOGE("call to napi_create_object failed");
+        napi_throw_error(env, nullptr, "napi_create_object failed");
+        MMI_LOGE("napi_create_object failed");
         return;
     }
 
     status_ = napi_set_named_property(env, object, "id", id);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_set_named_property failed");
-        MMI_LOGE("call to napi_set_named_property failed");
+        napi_throw_error(env, nullptr, "napi_set_named_property set id failed");
+        MMI_LOGE("napi_set_named_property set id failed");
         return;
     }
     status_ = napi_set_named_property(env, object, "name", name);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_set_named_property failed");
-        MMI_LOGE("call to napi_set_named_property failed");
+        napi_throw_error(env, nullptr, "napi_set_named_property set name failed");
+        MMI_LOGE("napi_set_named_property set name failed");
         return;
     }
 
-    int32_t types = cbTemp.device->devcieType;
+    uint32_t types = cbTemp.device->devcieType;
+    if (types <= 0) {
+        napi_throw_error(env, nullptr, "devcieType is less than zero");
+        MMI_LOGE("devcieType is less than zero");
+    }
     std::vector<std::string> sources;
     for (const auto & item : g_deviceType) {
-        if (types & item.typeBit) {
+        if (static_cast<uint32_t>(types) & item.typeBit) {
             sources.push_back(item.deviceTypeName);
         }
     }
     napi_value devSources = nullptr;
     status_ = napi_create_array(env, &devSources);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_create_array failed");
-        MMI_LOGE("call to napi_create_array failed");
+        napi_throw_error(env, nullptr, "napi_create_array failed");
+        MMI_LOGE("napi_create_array failed");
         return;
     }
 
@@ -499,14 +503,14 @@ void JsEventTarget::CallDevPromiseWork(napi_env env, napi_status status, void* d
     for (const auto &item : sources) {
         status_ = napi_create_string_utf8(env, item.c_str(), NAPI_AUTO_LENGTH, &value);
         if (status_ != napi_ok) {
-            napi_throw_error(env, nullptr, "JsEventTarget: call to napi_create_string_utf8 failed");
-            MMI_LOGE("call to napi_create_string_utf8 failed");
+            napi_throw_error(env, nullptr, "napi_create_string_utf8 failed");
+            MMI_LOGE("napi_create_string_utf8 failed");
             return;
         }
         status_ = napi_set_element(env, devSources, index, value);
         if (status_ != napi_ok) {
-            napi_throw_error(env, nullptr, "JsEventTarget: call to napi_set_element failed");
-            MMI_LOGE("call to napi_set_element failed");
+            napi_throw_error(env, nullptr, "napi_set_element failed");
+            MMI_LOGE("napi_set_element failed");
         }
     }
     status_ = napi_set_named_property(env, object, "sources", devSources);
