@@ -56,7 +56,7 @@ config("libmmi_server_config") {
     "//foundation/multimodalinput/input/frameworks/util/common/include",
     "//foundation/multimodalinput/input/frameworks/util/socket/include",
     "//foundation/multimodalinput/input/frameworks/util/network/include",
-    "//foundation/multimodalinput/input/common/include"
+    "//foundation/multimodalinput/input/common/include",
   ]
 
   if (is_mmi_have_hdf) {
