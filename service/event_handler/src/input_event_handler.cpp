@@ -24,6 +24,7 @@
 #include "bytrace.h"
 #include "input_device_manager.h"
 #include "interceptor_manager_global.h"
+#include "libinput.h"
 #include "mmi_func_callback.h"
 #include "mouse_event_handler.h"
 #include "s_input.h"
@@ -51,87 +52,87 @@ void InputEventHandler::Init(UDSServer& udsServer)
     udsServer_ = &udsServer;
     MsgCallback funs[] = {
         {
-            MmiMessageId::LIBINPUT_EVENT_DEVICE_ADDED,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_DEVICE_ADDED),
             MsgCallbackBind1(&InputEventHandler::OnEventDeviceAdded, this)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_DEVICE_REMOVED,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_DEVICE_REMOVED),
             MsgCallbackBind1(&InputEventHandler::OnEventDeviceRemoved, this)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_KEYBOARD_KEY,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_KEYBOARD_KEY),
             std::bind(&InputEventHandler::OnKeyboardEvent, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_POINTER_MOTION,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_POINTER_MOTION),
             MsgCallbackBind1(&InputEventHandler::OnEventPointer, this)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE),
             MsgCallbackBind1(&InputEventHandler::OnEventPointer, this)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_POINTER_BUTTON,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_POINTER_BUTTON),
             MsgCallbackBind1(&InputEventHandler::OnEventPointer, this)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_POINTER_AXIS,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_POINTER_AXIS),
             MsgCallbackBind1(&InputEventHandler::OnEventPointer, this)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TOUCH_DOWN,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_TOUCH_DOWN),
             MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TOUCH_UP,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_TOUCH_UP),
             MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TOUCH_MOTION,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_TOUCH_MOTION),
             MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TOUCH_CANCEL,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_TOUCH_CANCEL),
             MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TOUCH_FRAME,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_TOUCH_FRAME),
             MsgCallbackBind1(&InputEventHandler::OnEventTouch, this)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TOUCHPAD_DOWN,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_TOUCHPAD_DOWN),
             MsgCallbackBind1(&InputEventHandler::OnEventTouchpad, this)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TOUCHPAD_UP,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_TOUCHPAD_UP),
             MsgCallbackBind1(&InputEventHandler::OnEventTouchpad, this)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TOUCHPAD_MOTION,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_TOUCHPAD_MOTION),
             MsgCallbackBind1(&InputEventHandler::OnEventTouchpad, this)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN),
             MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE),
             MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_GESTURE_SWIPE_END,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_GESTURE_SWIPE_END),
             MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_GESTURE_PINCH_BEGIN,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_GESTURE_PINCH_BEGIN),
             MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_GESTURE_PINCH_UPDATE,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_GESTURE_PINCH_UPDATE),
             MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_GESTURE_PINCH_END,
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_GESTURE_PINCH_END),
             MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
     };
@@ -244,6 +245,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
+    CHKPR(keyEvent_, ERROR_NULL_POINTER);
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_LOGD("The same event reported by multi_device should be discarded");
@@ -275,6 +277,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(libinput_event *event)
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
+    CHKPR(keyEvent_, ERROR_NULL_POINTER);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
@@ -312,8 +315,9 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
     keyBoard.unicode = 0;
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
+        CHKPR(keyEvent_, ERROR_NULL_POINTER);
     }
-    keyBoard.key = static_cast<uint32_t>(oKey.keyValueOfSys);
+    keyBoard.key = static_cast<int32_t>(oKey.keyValueOfSys);
     if (EventPackage::KeyboardToKeyEvent(keyBoard, keyEvent_) == RET_ERR) {
         MMI_LOGE("On the OnKeyboardEvent translate key event error");
         return RET_ERR;
@@ -346,7 +350,7 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
         MMI_LOGD("This touch event is canceled type:%{public}d", type);
         return RET_OK;
     }
-    auto pointerEvent = TouchTransformPointManger->OnLibinputTouchEvent(event);
+    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t pointerId = pointerEvent->GetId();
     std::string touchEvent = "OnEventTouch";
@@ -370,7 +374,7 @@ int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
     MMI_LOGD("Enter");
     CHKPR(event, ERROR_NULL_POINTER);
 
-    auto pointerEvent = TouchTransformPointManger->OnLibinputTouchPadEvent(event);
+    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH_PAD);
     CHKPR(pointerEvent, RET_ERR);
     eventDispatch_.HandlePointerEvent(pointerEvent);
     auto type = libinput_event_get_type(event);
@@ -403,11 +407,8 @@ int32_t InputEventHandler::OnEventTouchpad(libinput_event *event)
 int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchTransformPointManger->OnTouchPadGestrueEvent(event);
-    if (pointerEvent == nullptr) {
-        MMI_LOGE("Gesture event package failed, errCode:%{public}d", GESTURE_EVENT_PKG_FAIL);
-        return GESTURE_EVENT_PKG_FAIL;
-    }
+    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_GESTURE);
+    CHKPR(pointerEvent, GESTURE_EVENT_PKG_FAIL);
     MMI_LOGD("GestrueEvent package, eventType:%{public}d,actionTime:%{public}" PRId64 ","
              "action:%{public}d,actionStartTime:%{public}" PRId64 ","
              "pointerAction:%{public}d,sourceType:%{public}d,"
@@ -421,10 +422,10 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
     MMI_LOGD("Item:DownTime:%{public}" PRId64 ",IsPressed:%{public}s,"
              "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
-             "Width:%{public}d,Height:%{public}d,DeviceId:%{public}d",
+             "Width:%{public}d,Height:%{public}d",
              item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
              item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
-             item.GetWidth(), item.GetHeight(), item.GetDeviceId());
+             item.GetWidth(), item.GetHeight());
 
     int32_t ret = eventDispatch_.HandlePointerEvent(pointerEvent);
     if (ret != RET_OK) {
@@ -449,10 +450,7 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
     MouseEventHdr->Normalize(event);
 
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
-    if (pointerEvent == nullptr) {
-        MMI_LOGE("MouseEvent is NULL");
-        return RET_ERR;
-    }
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
 
     // 处理 按键 + 鼠标
     if (keyEvent_ == nullptr) {
@@ -490,7 +488,7 @@ int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEv
     }
     MMI_LOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
              "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
-             "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,DeviceId:%{public}d",
+             "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,Device:%{public}d",
              item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
              item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
              item.GetDeviceId());

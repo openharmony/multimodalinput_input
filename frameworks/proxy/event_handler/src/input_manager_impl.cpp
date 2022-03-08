@@ -170,12 +170,12 @@ int32_t InputManagerImpl::PackDisplayData(OHOS::MMI::NetPacket &pkt)
 
 int32_t InputManagerImpl::PackPhysicalDisplay(NetPacket &pkt)
 {
-    int32_t num = physicalDisplays_.size();
+    uint32_t num = static_cast<uint32_t>(physicalDisplays_.size());
     if (!pkt.Write(num)) {
         MMI_LOGE("Packet write num failed");
         return RET_ERR;
     }
-    for (int32_t i = 0; i < num; i++) {
+    for (uint32_t i = 0; i < num; i++) {
         if (!pkt.Write(physicalDisplays_[i].id)) {
             MMI_LOGE("Packet write physical data failed");
             return RET_ERR;
@@ -234,7 +234,7 @@ int32_t InputManagerImpl::PackPhysicalDisplay(NetPacket &pkt)
 
 int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
 {
-    int32_t num = logicalDisplays_.size();
+    int32_t num = static_cast<int32_t>(logicalDisplays_.size());
     if (!pkt.Write(num)) {
         MMI_LOGE("Packet write logical num failed");
         return RET_ERR;
@@ -276,7 +276,7 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
             MMI_LOGE("Packet write logical focusWindow failed");
             return RET_ERR;
         }
-        int32_t numWindow = logicalDisplays_[i].windowsInfo_.size();
+        int32_t numWindow = static_cast<int32_t>(logicalDisplays_[i].windowsInfo_.size());
         if (!pkt.Write(numWindow)) {
             MMI_LOGE("Packet write logical numWindow failed");
             return RET_ERR;

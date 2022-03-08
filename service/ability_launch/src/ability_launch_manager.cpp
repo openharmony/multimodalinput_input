@@ -182,8 +182,8 @@ bool AbilityLaunchManager::PackageAbility(const json &jsonAbility, Ability &abil
 
 void AbilityLaunchManager::Print()
 {
-    int32_t count = shortcutKeys_.size();
-    MMI_LOGD("shortcutKey count:%{public}d", count);
+    uint32_t count = shortcutKeys_.size();
+    MMI_LOGD("shortcutKey count:%{public}u", count);
     for (const auto &item : shortcutKeys_) {
         auto &shortcutKey = item.second;
         for (auto prekey: shortcutKey.preKeys) {
