@@ -271,7 +271,7 @@ ohos_unittest("ut-mmi-service-out") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
-  configs = [":libmmi_server_config"]
+  configs = [ ":libmmi_server_config" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
