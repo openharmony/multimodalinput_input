@@ -29,8 +29,8 @@ using MsgClientFunCallback = std::function<void(const UDSClient&, NetPacket&)>;
 class UDSClient : public UDSSocket {
 public:
     UDSClient();
-    DISALLOW_COPY_AND_MOVE(UDSClient);
     virtual ~UDSClient();
+    DISALLOW_COPY_AND_MOVE(UDSClient);
 
     virtual int32_t Socket() = 0;
     virtual void Stop();
@@ -38,33 +38,21 @@ public:
     int32_t ConnectTo();
     bool SendMsg(const char *buf, size_t size) const;
     bool SendMsg(const NetPacket& pkt) const;
-    bool GetRunStatus() const
-    {
-        return isRunning_;
-    }
+
     bool GetConnectedStatus() const
     {
         return isConnected_;
     }
 
 protected:
-    virtual bool IsFirstConnectFailExit()
-    {
-        return false;
-    }
     virtual void OnConnected() {}
     virtual void OnDisconnected() {}
-    virtual void OnThreadLoop() {}
 
     bool StartClient(MsgClientFunCallback fun, bool detachMode);
     void OnRecv(const char *buf, size_t size);
-    void OnEvent(const struct epoll_event& ev, StreamBuffer& buf);
-    void OnThread();
     void SetToExit();
 
 protected:
-    std::thread t_;
-    bool isThreadHadRun_ = false;
     bool isToExit_ = false;
     bool isRunning_ = false;
     bool isConnected_ = false;

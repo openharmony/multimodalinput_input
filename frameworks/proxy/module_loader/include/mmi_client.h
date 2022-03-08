@@ -38,9 +38,7 @@ public:
     void RegisterConnectedFunction(ConnectCallback fun) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
     void VirtualKeyIn(RawInputEvent virtualKeyEvent);
-    void ReplyMessageToServer(MmiMessageId idMsg, int64_t clientTime, int64_t endTime) const;
 
-    void SdkGetMultimodeInputInfo();
     MMIClientPtr GetPtr()
     {
         return shared_from_this();
@@ -49,6 +47,7 @@ public:
 protected:
     virtual void OnConnected() override;
     virtual void OnDisconnected() override;
+    
     void OnThirdThread();
     bool StartEventRunner();
     bool AddFdListener(int32_t fd);
