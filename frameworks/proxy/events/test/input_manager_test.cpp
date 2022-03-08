@@ -187,6 +187,7 @@ std::vector<std::string> InputManagerTest::SearchLog(const std::string &command,
 std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep1()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(823);   // test code，set the GlobalX = 823
@@ -209,6 +210,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep1()
 std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep2()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(1023);  // test code，set the GlobalX = 823
@@ -230,6 +232,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep2()
 
 void InputManagerTest::TestMarkConsumedStep3(int32_t monitorId, int32_t eventId)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     std::string command {
         "ClientMsgHandler: in OnPointerEvent, #[[:digit:]]\\{1,\\}, "
         "Operation canceled"
@@ -246,6 +249,7 @@ void InputManagerTest::TestMarkConsumedStep3(int32_t monitorId, int32_t eventId)
 void InputManagerTest::TestMarkConsumedStep4()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(1123);  // test code，set the GlobalX = 823
@@ -261,7 +265,7 @@ void InputManagerTest::TestMarkConsumedStep4()
 
     std::string command {
         "InputHandlerManagerGlobal: in HandleEvent, #[[:digit:]]\\{1,\\}, "
-        "Pointer event was consumed"
+        "Pointer event was monitor"
     };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
@@ -274,7 +278,9 @@ void InputManagerTest::TestMarkConsumedStep4()
 
 void InputManagerTest::TestMarkConsumedStep5()
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(0);  // test code，set the GlobalX = 823
@@ -290,7 +296,7 @@ void InputManagerTest::TestMarkConsumedStep5()
 
     std::string command {
         "InputHandlerManagerGlobal: in HandleEvent, #[[:digit:]]\\{1,\\}, "
-        "Pointer event was consumed"
+        "Pointer event was monitor"
     };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
@@ -303,7 +309,9 @@ void InputManagerTest::TestMarkConsumedStep5()
 
 void InputManagerTest::TestMarkConsumedStep6()
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(823);   // test code，set the GlobalX = 823
@@ -515,6 +523,7 @@ std::string InputManagerTest::DumpPointerEvent(const std::shared_ptr<PointerEven
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent001()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(823);   // test code，set the GlobalX = 823
@@ -539,6 +548,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent001()
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent002()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(823);   // test code，set the GlobalX = 823
@@ -563,6 +573,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent002()
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent003()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(823);   // test code，set the GlobalX = 823
@@ -860,6 +871,7 @@ void InputManagerTest::TestSimulateInputEvent_2(std::shared_ptr<PointerEvent> po
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent006()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
@@ -887,6 +899,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent006()
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent007()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->SetPointerId(1);
@@ -911,6 +924,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent007()
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent008()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
@@ -938,6 +952,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent008()
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent009()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
     pointerEvent->SetPointerId(1);
@@ -987,6 +1002,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_009, TestSize.Level1)
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent012()
 {
     auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
     pointerEvent->SetPointerId(1);
@@ -1116,8 +1132,8 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_015, TestSize.Level1)
 void InputManagerTest::KeyMonitorCallBack(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_LOGD("KeyMonitorCallBack: keyCode:%{public}d,keyAction:%{public}d,action:%{public}d,"
-             "device:%{private}d,actionTime:%{public}" PRId64 "", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
-             keyEvent->GetAction(), keyEvent->GetDeviceId(), keyEvent->GetActionTime());
+             "actionTime:%{public}" PRId64 "", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
+             keyEvent->GetAction(), keyEvent->GetActionTime());
     EXPECT_EQ(keyEvent->GetKeyCode(), KeyEvent::KEYCODE_BACK);
     EXPECT_EQ(keyEvent->GetKeyAction(), KeyEvent::KEY_ACTION_UP);
     EXPECT_EQ(keyEvent->GetAction(), KeyEvent::KEY_ACTION_UP);
@@ -2532,8 +2548,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
     MMI_LOGD("Call MontiorManager");
 
     std::string command {
-        "EventDispatch: in handlePointerEvent, #[[:digit:]]\\{1,\\}, "
-        "Unknown source type"
+        "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
+        "PointerEvent received"
     };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 

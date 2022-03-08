@@ -217,7 +217,7 @@ struct EventKeyboard {
     char uuid[MAX_UUIDSIZE];
     int64_t time;
     int32_t key;
-    int32_t seat_key_count;
+    uint32_t seat_key_count;
     enum KEY_STATE state;
     int32_t unicode;
     bool isIntercepted {true};

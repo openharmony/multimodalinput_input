@@ -24,6 +24,8 @@
 #include "linux/input.h"
 #include "linux/uinput.h"
 
+namespace OHOS {
+namespace MMI {
 class VirtualDevice {
 public:
     VirtualDevice(const char *deviceName, uint16_t productId);
@@ -46,4 +48,6 @@ protected:
     uinput_user_dev dev_ {};
     static constexpr uint32_t MAX_NAME_LENGTH = 80;
 };
+} // namespace MMI
+} // namespace OHOS
 #endif // VIRTUAL_DEVICE_H

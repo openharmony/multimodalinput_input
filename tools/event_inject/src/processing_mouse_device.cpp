@@ -131,21 +131,21 @@ void ProcessingMouseDevice::TransformMouseMoveEvent(const MouseEvent& mouseEvent
 void ProcessingMouseDevice::TransformMouseWheelEvent(const MouseEvent& mouseEvent,
     InputEventArray& inputEventArray)
 {
-    int32_t distance = mouseEvent.distance;
+    uint32_t distance = static_cast<uint32_t>(mouseEvent.distance);
     if (mouseEvent.direction == "up") {
         distance = ~distance + 1;
     }
-    SetRelWheel(inputEventArray, mouseEvent.blockTime, distance);
+    SetRelWheel(inputEventArray, mouseEvent.blockTime, static_cast<int32_t>(distance));
     SetSynReport(inputEventArray);
 }
 
 void ProcessingMouseDevice::TransformMouseHwheelEvent(const MouseEvent& mouseEvent,
     InputEventArray& inputEventArray)
 {
-    int32_t distance = mouseEvent.distance;
+    uint32_t distance = static_cast<uint32_t>(mouseEvent.distance);
     if (mouseEvent.direction == "left") {
         distance = ~distance + 1;
     }
-    SetRelWheel(inputEventArray, mouseEvent.blockTime, distance);
+    SetRelWheel(inputEventArray, mouseEvent.blockTime, static_cast<int32_t>(distance));
     SetSynReport(inputEventArray);
 }

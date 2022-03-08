@@ -100,7 +100,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
         return RET_ERR;
     }
     int32_t keyId = event->GetId();
-    const std::string keyEventString = "keyEventSubscribe";
+    std::string keyEventString = "keyEventSubscribe";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
     for (const auto& subscriber : subscribeInfos_) {
         if (subscriber.GetSubscribeId() == subscribeId) {

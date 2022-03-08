@@ -26,6 +26,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "PointerEventTest"};
 using namespace testing::ext;
 } // namespace
 class PointerEventTest : public testing::Test {
@@ -38,6 +39,7 @@ public:
 std::shared_ptr<PointerEvent> PointerEventTest::createPointEvent()
 {
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     int64_t downTime = GetMillisTime();
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code£¬set the PointerId = 0
