@@ -60,10 +60,10 @@ void MMIFdListener::OnReadable(int32_t fd)
     for (int32_t i = 0; i < maxCount; i++) {
         auto size = recv(fd, szBuf, sizeof(szBuf), SOCKET_FLAGS);
         if (size < 0) {
-            MMI_LOGE("recv return %{public}zu strerr:%{public}s", size, strerror(errno));
+            MMI_LOGE("recv return %{public}zu errno:%{public}d", size, errno);
             break;
         } else if (size == 0) {
-            MMI_LOGE("The service side disconnect with the client. size:0 strerr:%{public}s", strerror(errno));
+            MMI_LOGE("The service side disconnect with the client. size:0 errno:%{public}d", errno);
             mmiClient_->OnDisconnect();
             break;
         } else if (size > 0) {

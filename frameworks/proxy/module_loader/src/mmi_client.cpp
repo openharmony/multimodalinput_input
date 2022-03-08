@@ -128,7 +128,7 @@ bool MMIClient::AddFdListener(int32_t fd)
     int32_t pid = GetPid();
     isRunning_ = true;
     MMI_LOGI("serverFd:%{public}d was listening,mask:%{public}u pid:%{public}d threadId:%{public}" PRIu64,
-        fd, FILE_DESCRIPTOR_EVENTS_MASK, pid, tid);
+        fd, FILE_DESCRIPTOR_INPUT_EVENT, pid, tid);
     return true;
 }
 
@@ -179,21 +179,6 @@ void MMIClient::VirtualKeyIn(RawInputEvent virtualKeyEvent)
 {
     NetPacket pkt(MmiMessageId::ON_VIRTUAL_KEY);
     pkt << virtualKeyEvent;
-    SendMsg(pkt);
-}
-
-void MMIClient::ReplyMessageToServer(MmiMessageId idMsg, int64_t clientTime, int64_t endTime) const
-{
-    NetPacket pkt(MmiMessageId::CHECK_REPLY_MESSAGE);
-    pkt << idMsg << clientTime << endTime;
-    SendMsg(pkt);
-}
-
-void MMIClient::SdkGetMultimodeInputInfo()
-{
-    TagPackHead tagPackHead = {MmiMessageId::GET_MMI_INFO_REQ, {0}};
-    NetPacket pkt(MmiMessageId::GET_MMI_INFO_REQ);
-    pkt << tagPackHead;
     SendMsg(pkt);
 }
 

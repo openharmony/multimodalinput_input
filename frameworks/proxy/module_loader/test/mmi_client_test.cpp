@@ -60,26 +60,6 @@ HWTEST_F(MMIClientTest, VirtualKeyIn, TestSize.Level1)
     mmiClient.VirtualKeyIn(virtualKeyEvent);
 }
 
-HWTEST_F(MMIClientTest, ReplyMessageToServer_001, TestSize.Level1)
-{
-    int64_t serverStartTime = 1;
-    int64_t clientEndTime = 1;
-
-    mmiClient.ReplyMessageToServer(static_cast<MmiMessageId>(4), serverStartTime, clientEndTime);
-}
-
-HWTEST_F(MMIClientTest, ReplyMessageToServer_002, TestSize.Level1)
-{
-    int64_t serverStartTime = 0;
-    int64_t clientEndTime = 0;
-
-    mmiClient.ReplyMessageToServer(static_cast<MmiMessageId>(3), serverStartTime, clientEndTime);
-}
-
-HWTEST_F(MMIClientTest, SdkGetMultimodeInputInfo, TestSize.Level1)
-{
-    mmiClient.SdkGetMultimodeInputInfo();
-}
 
 MMIClientUnitTest mmiClientTest;
 HWTEST_F(MMIClientTest, Re_RegisterConnectedFunction, TestSize.Level1)
@@ -96,27 +76,6 @@ HWTEST_F(MMIClientTest, Re_VirtualKeyIn, TestSize.Level1)
 {
     RawInputEvent virtualKeyEvent = {};
     mmiClientTest.VirtualKeyIn(virtualKeyEvent);
-}
-
-HWTEST_F(MMIClientTest, Re_ReplyMessageToServer_001, TestSize.Level1)
-{
-    int64_t serverStartTime = 1;
-    int64_t clientEndTime = 1;
-
-    mmiClientTest.ReplyMessageToServer(static_cast<MmiMessageId>(1), serverStartTime, clientEndTime);
-}
-
-HWTEST_F(MMIClientTest, Re_ReplyMessageToServer_002, TestSize.Level1)
-{
-    int64_t serverStartTime = 0;
-    int64_t clientEndTime = 0;
-
-    mmiClientTest.ReplyMessageToServer(static_cast<MmiMessageId>(2), serverStartTime, clientEndTime);
-}
-
-HWTEST_F(MMIClientTest, Re_SdkGetMultimodeInputInfo, TestSize.Level1)
-{
-    mmiClientTest.SdkGetMultimodeInputInfo();
 }
 
 HWTEST_F(MMIClientTest, Re_OnConnected, TestSize.Level1)
