@@ -65,10 +65,10 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 
 void UDSSession::Close()
 {
-    MMI_LOGD("enter fd_:%{public}d,bHasClosed_ = %d.", fd_, bHasClosed_);
-    if (!bHasClosed_ && fd_ != -1) {
+    MMI_LOGD("enter fd_:%{public}d.", fd_);
+    if (fd_ >= 0) {
         close(fd_);
-        bHasClosed_ = true;
+        fd_ = -1;
         UpdateDescript();
     }
 }
@@ -79,7 +79,7 @@ void UDSSession::UpdateDescript()
     oss << "fd = " << fd_
         << ", programName = " << programName_
         << ", moduleType = " << moduleType_
-        << (bHasClosed_ ? ", closed" : ", opened")
+        << ((fd_ < 0) ? ", closed" : ", opened")
 #ifdef OHOS_BUILD_MMI_DEBUG
         << ", clientFd = " << clientFd_
 #endif // OHOS_BUILD_MMI_DEBUG
