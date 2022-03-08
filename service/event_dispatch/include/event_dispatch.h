@@ -71,12 +71,12 @@ private:
      * Differentiated event handling
      */
     enum IsEventHandler {
-        KEY_FILTER_EVENT = 1,
-        KEY_CHECKLAUNABILITY_EVENT = 2,
+        KEY_INTERCEPT_EVENT = 1,
+        KEY_LAUNCH_EVENT = 2,
         KEY_SUBSCRIBE_EVENT = 3,
         KEY_DISPATCH_EVENT = 4
     };
-    void OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler isEventHandler);
+    void OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler handlerType);
     void HandlePointerEventTrace(const std::shared_ptr<PointerEvent> &point);
     };
 } // namespace MMI

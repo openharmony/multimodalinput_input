@@ -21,6 +21,7 @@
 #include <iostream>
 #include <thread>
 #include <algorithm>
+#include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "error_multimodal.h"
 #include "getopt.h"
@@ -39,6 +40,7 @@ private:
 namespace OHOS {
 namespace MMI {
 namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerCommand"};
 constexpr int32_t SLEEPTIME = 20;
 constexpr int32_t MOUSE_ID = 2;
 constexpr int32_t TWO_MORE_COMMAND = 2;
@@ -99,6 +101,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             }
                             std::cout << "move to " << px << " " << py << std::endl;
                             auto pointerEvent = PointerEvent::Create();
+                            CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
                             item.SetPointerId(0);
                             item.SetGlobalX(px);
@@ -124,6 +127,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             }
                             std::cout << "press down" << buttonId << std::endl;
                             auto pointerEvent = PointerEvent::Create();
+                            CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
                             item.SetPointerId(0);
                             item.SetGlobalX(px);
@@ -151,6 +155,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             }
                             std::cout << "lift up button " << buttonId << std::endl;
                             auto pointerEvent = PointerEvent::Create();
+                            CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
                             item.SetPointerId(0);
                             item.SetGlobalX(px);
@@ -173,6 +178,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             }
                             std::cout << "scroll wheel " << scrollValue << std::endl;
                             auto pointerEvent = PointerEvent::Create();
+                            CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
                             item.SetPointerId(0);
                             item.SetPressed(false);
@@ -199,6 +205,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             }
                             std::cout << "click   " << buttonId << std::endl;
                             auto pointerEvent = PointerEvent::Create();
+                            CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
                             item.SetPointerId(0);
                             item.SetPressed(true);
@@ -249,6 +256,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 downKey.push_back(keyCode);
                                 isCombinationKey = optind;
                                 auto KeyEvent = KeyEvent::Create();
+                                CHKPR(KeyEvent, ERROR_NULL_POINTER);
                                 KeyEvent::KeyItem item[downKey.size()];
                                 for (size_t i = 0; i < downKey.size(); i++) {
                                     KeyEvent->SetKeyCode(keyCode);
@@ -262,6 +270,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             }
                             downKey.push_back(keyCode);
                             auto KeyEvent = KeyEvent::Create();
+                            CHKPR(KeyEvent, ERROR_NULL_POINTER);
                             KeyEvent->SetKeyCode(keyCode);
                             KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
                             KeyEvent::KeyItem item1;
@@ -282,6 +291,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             if (iter != downKey.end()) {
                                 std::cout << "You raised the key " << keyCode << std::endl;
                                 auto KeyEvent = KeyEvent::Create();
+                                CHKPR(KeyEvent, ERROR_NULL_POINTER);
                                 KeyEvent->SetKeyCode(keyCode);
                                 KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
                                 KeyEvent::KeyItem item1;
@@ -331,6 +341,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return EVENT_REG_FAIL;
                             }
                             auto pointerEvent = PointerEvent::Create();
+                            CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
                             item.SetPointerId(0);
                             item.SetGlobalX(px1);
@@ -367,6 +378,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             }
                             std::cout << "touch down " << px1 << " " << py1 << std::endl;
                             auto pointerEvent = PointerEvent::Create();
+                            CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
                             item.SetPointerId(0);
                             item.SetGlobalX(px1);
@@ -390,6 +402,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             }
                             std::cout << "touch up " << px1 << " " << py1 << std::endl;
                             auto pointerEvent = PointerEvent::Create();
+                            CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
                             item.SetPointerId(0);
                             item.SetGlobalX(px1);
