@@ -83,7 +83,7 @@ protected:
     std::string descript_;
     const std::string programName_;
     const int32_t moduleType_;
-    const int32_t fd_;
+    int32_t fd_;
     const int32_t uid_;
     const int32_t pid_;
 #ifdef OHOS_BUILD_MMI_DEBUG
