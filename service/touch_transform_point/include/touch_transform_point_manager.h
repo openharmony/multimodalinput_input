@@ -27,6 +27,8 @@ namespace OHOS {
 namespace MMI {
 class TouchTransformPointManager : public DelayedSingleton<TouchTransformPointManager> {
 public:
+    std::shared_ptr<PointerEvent> OnLibInput(struct libinput_event *event, INPUT_DEVICE_TYPE deviceType);
+private:
     std::shared_ptr<PointerEvent> OnLibinputTouchEvent(struct libinput_event *event);
     std::shared_ptr<PointerEvent> OnLibinputTouchPadEvent(struct libinput_event *event);
     std::shared_ptr<PointerEvent> OnTouchPadGestrueEvent(struct libinput_event *event);
