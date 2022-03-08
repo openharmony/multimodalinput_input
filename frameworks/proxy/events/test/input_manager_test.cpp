@@ -338,6 +338,12 @@ void InputManagerTest::TestMarkConsumedStep6()
     EXPECT_TRUE(!tLogs.empty());
 }
 
+/**
+ * @tc.name:MultimodalEventHandler_InjectKeyEvent_001
+ * @tc.desc:Verify inject key Back 
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.Level1)
 {
     std::string command = "Inject keyCode = 2,action = 2";
@@ -367,6 +373,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.L
     EXPECT_TRUE(!tlogs.empty());
 }
 
+/**
+ * @tc.name:MultimodalEventHandler_InjectKeyEvent_002
+ * @tc.desc:Verify inject key home 
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_002, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
@@ -381,6 +393,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_002, TestSize.L
     InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
 }
 
+/**
+ * @tc.name:MultimodalEventHandler_InjectKeyEvent_003
+ * @tc.desc:Verify inject key down
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.Level1)
 {
     std::string command = "Inject keyCode:2, action:2";
@@ -409,6 +427,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.L
     EXPECT_TRUE(!tlogs.empty());
 }
 
+/**
+ * @tc.name:MultimodalEventHandler_InjectKeyEvent_004
+ * @tc.desc:Verify inject key unknown
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_004, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
@@ -425,6 +449,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_004, TestSize.L
     MMI_LOGD("MMIEventHdl.InjectEvent end");
 }
 
+/**
+ * @tc.name:MultimodalEventHandler_InjectKeyEvent_005
+ * @tc.desc:Verify inject key fn
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.Level1)
 {
     std::string command = "Inject keyCode:0, action:2";
@@ -660,24 +690,48 @@ void InputManagerTest::TestSimulateInputEvent(std::shared_ptr<PointerEvent> poin
     EXPECT_TRUE(states.test(3));
 }
 
+/**
+ * @tc.name:InputManager_SimulateInputEvent_001
+ * @tc.desc:Verify Simulate pointer down event
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_001, TestSize.Level1)
 {
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent001() };
     TestSimulateInputEvent(pointerEvent);
 }
 
+/**
+ * @tc.name:InputManager_SimulateInputEvent_002
+ * @tc.desc:Verify Simulate pointer move event
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_002, TestSize.Level1)
 {
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent002() };
     TestSimulateInputEvent(pointerEvent);
 }
 
+/**
+ * @tc.name:InputManager_SimulateInputEvent_003
+ * @tc.desc:Verify Simulate pointer up event
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_003, TestSize.Level1)
 {
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent002() };
     TestSimulateInputEvent(pointerEvent);
 }
 
+/**
+ * @tc.name:InputManager_SimulateInputEvent_004
+ * @tc.desc:Verify Simulate pointer event
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_004, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -975,24 +1029,48 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent009()
     return pointerEvent;
 }
 
+/**
+ * @tc.name:InputManager_SimulateInputEvent_006
+ * @tc.desc:Verify simulate mouse event
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_006, TestSize.Level1)
 {
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent006() };
     TestSimulateInputEvent_2(pointerEvent);
 }
 
+/**
+ * @tc.name:InputManager_SimulateInputEvent_007
+ * @tc.desc:Verify simulate mouse event
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_007, TestSize.Level1)
 {
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent007() };
     TestSimulateInputEvent_2(pointerEvent);
 }
 
+/**
+ * @tc.name:InputManager_SimulateInputEvent_008
+ * @tc.desc:Verify simulate mouse event
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_008, TestSize.Level1)
 {
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent008() };
     TestSimulateInputEvent_2(pointerEvent);
 }
 
+/**
+ * @tc.name:InputManager_SimulateInputEvent_009
+ * @tc.desc:Verify simulate mouse event
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_009, TestSize.Level1)
 {
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent009() };
@@ -1026,12 +1104,24 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent012()
     return pointerEvent;
 }
 
+/**
+ * @tc.name:InputManager_SimulateInputEvent_012
+ * @tc.desc:Verify simulate mouse event
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_012, TestSize.Level1)
 {
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent012() };
     TestSimulateInputEvent_2(pointerEvent);
 }
 
+/**
+ * @tc.name:InputManager_SimulateInputEvent_013
+ * @tc.desc:Verify simulate mouse event
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_013, TestSize.Level1)
 {
     std::string command = "pointerAction=axis-begin";
@@ -1064,6 +1154,12 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_013, TestSize.Level1)
     EXPECT_TRUE(!tLogs.empty());
 }
 
+/**
+ * @tc.name:InputManager_SimulateInputEvent_014
+ * @tc.desc:Verify simulate mouse event
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_014, TestSize.Level1)
 {
     std::string command = "pointerAction=axis-update";
@@ -1096,6 +1192,12 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_014, TestSize.Level1)
     EXPECT_TRUE(!tLogs.empty());
 }
 
+/**
+ * @tc.name:InputManager_SimulateInputEvent_015
+ * @tc.desc:Verify simulate mouse event
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_015, TestSize.Level1)
 {
     std::string command = "pointerAction=axis-end";
@@ -1204,6 +1306,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_002, TestSize.Level1)
 }
 #endif
 
+/**
+ * @tc.name:InputManagerTest_AddHandler_001
+ * @tc.desc:Verify monitor 
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_001, TestSize.Level1)
 {
     std::string command {
@@ -1227,6 +1335,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_001, TestSize.Level1)
     }
 }
 
+/**
+ * @tc.name:InputManagerTest_AddHandler_002
+ * @tc.desc:Verify monitor 
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_002, TestSize.Level1)
 {
     auto callBackPtr = InputEventCallback::GetPtr();
@@ -1248,6 +1362,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_002, TestSize.Level1)
     EXPECT_TRUE(!tLogs.empty());
 }
 
+/**
+ * @tc.name:InputManagerTest_AddHandler_003
+ * @tc.desc:Verify monitor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
 {
     const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
@@ -1293,6 +1413,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
     }
 }
 
+/**
+ * @tc.name:InputManagerTest_AddHandler_004
+ * @tc.desc:Verify monitor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_004, TestSize.Level1)
 {
     std::string command {
@@ -1326,6 +1452,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_004, TestSize.Level1)
     }
 }
 
+/**
+ * @tc.name:InputManagerTest_AddHandler_005
+ * @tc.desc:Verify monitor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_005, TestSize.Level1)
 {
     RunShellUtil runCommand;
@@ -1347,6 +1479,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_005, TestSize.Level1)
     }
 }
 
+/**
+ * @tc.name:InputManagerTest_AddHandler_006
+ * @tc.desc:Verify monitor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_006, TestSize.Level1)
 {
     RunShellUtil runCommand;
@@ -2097,6 +2235,12 @@ void InputManagerTest::TestInputEventInterceptor(std::shared_ptr<PointerEvent> p
     EXPECT_TRUE(states.test(2));
 }
 
+/**
+ * @tc.name:TestInputEventInterceptor_001
+ * @tc.desc:Verify interceptor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_001, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -2124,6 +2268,12 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_001, TestSize.Level1)
     }
 }
 
+/**
+ * @tc.name:TestInputEventInterceptor_002
+ * @tc.desc:Verify interceptor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_002, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -2180,6 +2330,12 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_002, TestSize.Level1)
     }
 }
 
+/**
+ * @tc.name:TestInputEventInterceptor_003
+ * @tc.desc:Verify interceptor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_003, TestSize.Level1)
 {
     const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
@@ -2220,6 +2376,12 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_003, TestSize.Level1)
     EXPECT_TRUE(rLogs.size() >= N_TEST_CASES);
 }
 
+/**
+ * @tc.name:TestInputEventInterceptor_004
+ * @tc.desc:Verify interceptor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
 {
     std::string command {
@@ -2236,6 +2398,12 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
     EXPECT_TRUE(!tLogs.empty());
 }
 
+/**
+ * @tc.name:TestInputEventInterceptor_005
+ * @tc.desc:Verify interceptor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_005, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -2321,6 +2489,12 @@ void InputManagerTest::TestInputEventInterceptor2(std::shared_ptr<PointerEvent> 
     EXPECT_TRUE(states.all());
 }
 
+/**
+ * @tc.name:TestInputEventInterceptor_006
+ * @tc.desc:Verify interceptor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_006, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -2364,6 +2538,12 @@ void InputManagerTest::TouchPadMonitorCallBack(std::shared_ptr<OHOS::MMI::Pointe
         pointerEvent->GetPointerId(), pointerItem.GetGlobalX(), pointerItem.GetGlobalY());
 }
 
+/**
+ * @tc.name:InputManagerTest_OnAddTouchPadMonitor_001
+ * @tc.desc:Verify touchpad monitor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -2401,6 +2581,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
+/**
+ * @tc.name:InputManagerTest_OnAddTouchPadMonitor_002
+ * @tc.desc:Verify touchpad monitor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -2438,6 +2624,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
+/**
+ * @tc.name:InputManagerTest_OnAddTouchPadMonitor_003
+ * @tc.desc:Verify touchpad monitor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -2475,6 +2667,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
+/**
+ * @tc.name:InputManagerTest_OnAddTouchPadMonitor_004
+ * @tc.desc:Verify touchpad monitor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -2530,6 +2728,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
     }
 }
 
+/**
+ * @tc.name:InputManagerTest_OnAddTouchPadMonitor_005
+ * @tc.desc:Verify touchpad monitor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -2570,6 +2774,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
+/**
+ * @tc.name:InputManager_TouchPadSimulateInputEvent_001
+ * @tc.desc:Verify touchpad simulate and monitor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize.Level1)
 {
     auto callBackPtr = InputEventCallback::GetPtr();
@@ -2610,6 +2820,12 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
+/**
+ * @tc.name:InputManager_TouchPadSimulateInputEvent_002
+ * @tc.desc:Verify touchpad simulate and monitor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize.Level1)
 {
     auto callBackPtr = InputEventCallback::GetPtr();
@@ -2650,6 +2866,12 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
+/**
+ * @tc.name:InputManager_TouchPadSimulateInputEvent_003
+ * @tc.desc:Verify touchpad simulate and monitor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize.Level1)
 {
     auto callBackPtr = InputEventCallback::GetPtr();
@@ -2690,6 +2912,12 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
+/**
+ * @tc.name:InputManager_TouchPadSimulateInputEvent_004
+ * @tc.desc:Verify touchpad simulate and monitor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize.Level1)
 {
     auto callBackPtr = InputEventCallback::GetPtr();
@@ -2746,6 +2974,12 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
+/**
+ * @tc.name:InputManager_TouchPadSimulateInputEvent_005
+ * @tc.desc:Verify touchpad simulate and monitor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_005, TestSize.Level1)
 {
     std::string command {
@@ -2773,6 +3007,12 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_005, TestSize
     EXPECT_TRUE(!tLogs.empty());
 }
 
+/**
+ * @tc.name:InputManagerTest_AddMouseMonitor_001
+ * @tc.desc:Verify mouse monitor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1)
 {
     std::string command {
@@ -2792,6 +3032,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1
     }
 }
 
+/**
+ * @tc.name:InputManagerTest_AddMouseMonitor_002
+ * @tc.desc:Verify mouse monitor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1)
 {
     auto callBackPtr = InputEventCallback::GetPtr();
@@ -2814,6 +3060,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1
     EXPECT_TRUE(!tLogs.empty());
 }
 
+/**
+ * @tc.name:InputManagerTest_AddMouseMonitor_003
+ * @tc.desc:Verify mouse monitor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1)
 {
     std::string command {
@@ -2846,6 +3098,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1
     }
 }
 
+/**
+ * @tc.name:InputManagerTest_AddMouseMonitor_004
+ * @tc.desc:Verify mouse monitor
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1)
 {
     auto callBackPtr = InputEventCallback::GetPtr();
