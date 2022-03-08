@@ -418,7 +418,7 @@ void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
-    NetPacket pkt(MmiMessageId::NEW_CHECK_REPLY_MESSAGE);
+    NetPacket pkt(MmiMessageId::MARK_PROCESS);
     pkt << eventId;
     if (!client->SendMessage(pkt)) {
         MMI_LOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
