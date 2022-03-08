@@ -24,11 +24,11 @@ namespace MMI {
 class InputDevice {
 public:
     void SetId(int32_t deviceId);
-    int32_t GetId();
+    int32_t GetId() const;
     void SetName(std::string name);
-    std::string GetName();
+    std::string GetName() const;
     void SetType(int32_t deviceType);
-    int32_t GetType();
+    int32_t GetType() const;
 private:
     int32_t id_;
     std::string name_;
