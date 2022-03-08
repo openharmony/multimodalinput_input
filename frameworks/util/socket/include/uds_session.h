@@ -35,12 +35,12 @@ public:
     bool SendMsg(NetPacket& pkt) const;
     void Close();
 
-    int32_t GetUid()
+    int32_t GetUid() const
     {
         return uid_;
     }
 
-    int32_t GetPid()
+    int32_t GetPid() const
     {
         return pid_;
     }
@@ -62,7 +62,7 @@ public:
     void UpdateDescript();
     void AddEvent(int32_t id, int64_t time);
     void DelEvents(int32_t id);
-    int64_t GetFirstEventTime();
+    int64_t GetFirstEventTime() const;
     bool EventsIsEmpty();
     bool isANRProcess_ {false};
 

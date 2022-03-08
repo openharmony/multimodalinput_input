@@ -30,7 +30,7 @@ public:
 private:
     void InitDeviceInfo();
     int32_t ExecuteCmd(const std::string cmd, std::vector<std::string> &cmdResult);
-    void GetDeviceInfoCmdResult(const std::vector<std::string>& cmdResult, DeviceMapData& deviceMapData);
+    void GetDeviceInfoCmdResult(const std::vector<std::string>& cmdResult, DeviceMapData& deviceMapData) const;
 private:
     std::map<std::string, std::string> deviceMap_;
     static constexpr int32_t READ_CMD_BUFF_SIZE = 1024;

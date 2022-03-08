@@ -54,7 +54,7 @@ public:
     void SetMouseCoords(const int32_t x, const int32_t y);
     bool IsLeftBtnPressed();
     void GetPressedButtons(std::vector<int32_t>& pressedButtons);
-    std::map<uint32_t, int32_t> GetMouseBtnState();
+    std::map<uint32_t, int32_t> GetMouseBtnState() const;
     void MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE btnState);
 
 private:

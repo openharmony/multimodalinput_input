@@ -124,7 +124,7 @@ void UDSSession::DelEvents(int32_t id)
     MMI_LOGI("end");
 }
 
-int64_t UDSSession::GetFirstEventTime()
+int64_t UDSSession::GetFirstEventTime() const
 {
     MMI_LOGI("begin");
     if (events_.empty()) {
