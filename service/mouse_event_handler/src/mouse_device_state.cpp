@@ -47,7 +47,6 @@ void MouseDeviceState::SetMouseCoords(const int32_t x, const int32_t y)
 
 bool MouseDeviceState::IsLeftBtnPressed()
 {
-    std::lock_guard<std::mutex> lock(mu_);
     auto iter = mouseBtnState_.find(LIBINPUT_LEFT_BUTTON_CODE);
     if (iter == mouseBtnState_.end()) {
         return false;
@@ -60,7 +59,6 @@ bool MouseDeviceState::IsLeftBtnPressed()
 
 void MouseDeviceState::GetPressedButtons(std::vector<int32_t>& pressedButtons)
 {
-    std::lock_guard<std::mutex> lock(mu_);
     for (const auto &item : mouseBtnState_) {
         if (item.second > 0) {
             pressedButtons.push_back(LibinputChangeToPointer(item.first));
@@ -75,7 +73,6 @@ std::map<uint32_t, int32_t> MouseDeviceState::GetMouseBtnState()
 
 void MouseDeviceState::MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE btnState)
 {
-    std::lock_guard<std::mutex> lock(mu_);
     std::map<uint32_t, int32_t>::iterator iter = mouseBtnState_.find(btnCode);
     if (iter == mouseBtnState_.end()) {
         auto ret = mouseBtnState_.insert(std::make_pair(btnCode, ((btnState == BUTTON_STATE_PRESSED) ? 1 : 0)));
