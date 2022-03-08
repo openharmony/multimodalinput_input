@@ -17,7 +17,6 @@
 #define HDF_DEVICE_EVENT_DISPATCH_H
 
 #include <linux/input.h>
-
 #include "inject_thread.h"
 #include "input_controller.h"
 #include "input_manager.h"
@@ -26,7 +25,7 @@
 #include "virtual_touch_screen.h"
 
 namespace OHOS {
-namespace MMIS {
+namespace MMI {
 class HdfDeviceEventDispatch {
 public:
     HdfDeviceEventDispatch(const uint32_t maxX, const uint32_t maxY);
@@ -36,7 +35,7 @@ public:
 private:
     static InjectThread injectThread_;
 };
-} // namespace MMIS
+} // namespace MMI
 } // namespace OHOS
 
 #endif  // HDF_DEVICE_EVENT_DISPATCH_H
