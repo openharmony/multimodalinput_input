@@ -17,7 +17,9 @@
 #include <list>
 #include <cinttypes>
 #include <sys/socket.h>
+#include "accesstoken_kit.h"
 #include "i_multimodal_input_connect.h"
+#include "ipc_skeleton.h"
 #include "mmi_log.h"
 #include "safe_keeper.h"
 #include "uds_command_queue.h"
@@ -197,7 +199,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName,
             programName.c_str(), pid, MAKE_SHARED_FAIL);
         return RET_ERR;
     }
-
+    AddPermission(sess);
 #ifdef OHOS_BUILD_MMI_DEBUG
     sess->SetClientFd(toReturnClientFd);
 #endif // OHOS__BUILD_MMI_DEBUG
@@ -209,6 +211,24 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName,
     }
     OnConnected(sess);
     return RET_OK;
+}
+
+void OHOS::MMI::UDSServer::AddPermission(SessionPtr sess)
+{
+    uint32_t callerToken = IPCSkeleton::GetCallingTokenID();
+    int32_t result;
+    std::string permissionMonitor = "ohos.permission.INPUT_MONITORING";
+    
+    if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) ==
+        Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
+        MMI_LOGD("get token type flag is TOKEN_HAP");
+        result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionMonitor);
+        MMI_LOGD("verify access token result:%{public}d", result);
+        if (result != Security::AccessToken::PERMISSION_GRANTED) {
+            MMI_LOGD("permission is not granted");
+            sess->AddPermission(false);
+        }
+    }
 }
 
 void OHOS::MMI::UDSServer::Dump(int32_t fd)
