@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 mmi_service_path = "${mmi_path}/service"
 
-config("libmmi_server_public_config") {
+config("libmmi_server_config") {
   include_dirs = [
     "device_manager/include",
     "device_scalability/include",
@@ -35,6 +35,7 @@ config("libmmi_server_public_config") {
     "timer_manager/include",
     "${mmi_service_path}/connect_manager/include",
     "${mmi_service_path}/filter/include",
+    "${mmi_service_path}/module_loader/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "mouse_event_handler/include",
@@ -52,6 +53,11 @@ config("libmmi_server_public_config") {
     "//foundation/graphic/standard/rosen/modules/2d_graphics/include",
     "//foundation/graphic/standard/rosen/modules/2d_graphics/src",
     "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
+    "//foundation/multimodalinput/input/frameworks/util/common/include",
+    "//foundation/multimodalinput/input/frameworks/util/socket/include",
+    "//foundation/multimodalinput/input/frameworks/util/network/include",
+    "//foundation/multimodalinput/input/common/include",
   ]
 
   if (is_mmi_have_hdf) {
@@ -132,7 +138,7 @@ ohos_shared_library("libmmi-server") {
 
   sources += [ "module_loader/src/mmi_service.cpp" ]
 
-  public_configs = [ ":libmmi_server_public_config" ]
+  configs = [ ":libmmi_server_config" ]
 
   deps = [
     ":drawing_pointer_image",
@@ -264,6 +270,8 @@ ohos_unittest("ut-mmi-service-out") {
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
+
+  configs = [ ":libmmi_server_config" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",

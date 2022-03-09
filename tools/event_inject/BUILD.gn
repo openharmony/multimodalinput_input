@@ -24,6 +24,8 @@ config("event_injection_config") {
     "include",
     "//foundation/multimodalinput/input/common/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/multimodalinput/input/frameworks/util/common/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
   ]
 
   cflags = [ "-DOHOS_BUILD" ]
