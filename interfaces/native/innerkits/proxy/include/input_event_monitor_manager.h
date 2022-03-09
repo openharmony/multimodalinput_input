@@ -18,6 +18,7 @@
 #include "key_event.h"
 #include "pointer_event.h"
 #include "multimodal_event_handler.h"
+#include "nocopyable.h"
 #include "proto.h"
 #include "singleton.h"
 
@@ -39,6 +40,7 @@ struct MonitorItem {
 class InputEventMonitorManager {
 public:
     InputEventMonitorManager();
+    DISALLOW_COPY_AND_MOVE(InputEventMonitorManager);
     virtual ~InputEventMonitorManager();
 
     int32_t AddInputEventMontior(std::function<void (std::shared_ptr<KeyEvent>)> keyEventMonitor);

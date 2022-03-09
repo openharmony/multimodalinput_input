@@ -15,7 +15,6 @@
 
 #ifndef JS_INPUT_DEVICE_CONTEXT_H
 #define JS_INPUT_DEVICE_CONTEXT_H
-
 #include "js_input_device_manager.h"
 
 namespace OHOS {
@@ -23,6 +22,7 @@ namespace MMI {
 class JsInputDeviceContext {
 public:
     JsInputDeviceContext();
+    DISALLOW_COPY_AND_MOVE(JsInputDeviceContext);
     ~JsInputDeviceContext();
     static napi_value CreateInstance(napi_env env);
     static JsInputDeviceContext* GetInstance(napi_env env);

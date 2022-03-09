@@ -15,7 +15,6 @@
 
 #ifndef VIRTUAL_KEYBOARD_EXT_H
 #define VIRTUAL_KEYBOARD_EXT_H
-
 #include "virtual_device.h"
 
 namespace OHOS {
@@ -24,6 +23,8 @@ class VirtualKeyboardExt : public VirtualDevice {
 public:
     VirtualKeyboardExt();
     ~VirtualKeyboardExt();
+    DISALLOW_COPY_AND_MOVE(VirtualKeyboardExt);
+
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
     const std::vector<uint32_t>& GetKeys() const override;

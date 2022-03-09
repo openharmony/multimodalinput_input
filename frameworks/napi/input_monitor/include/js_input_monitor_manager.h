@@ -23,6 +23,7 @@
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "nocopyable.h"
 
 #include "js_input_monitor.h"
 
@@ -31,7 +32,7 @@ namespace MMI {
 class JsInputMonitorManager {
 public:
     static JsInputMonitorManager& GetInstance();
-
+    DISALLOW_COPY_AND_MOVE(JsInputMonitorManager);
     ~JsInputMonitorManager() = default;
 
     void AddMonitor(napi_env jsEnv, napi_value callback);
@@ -53,9 +54,6 @@ private:
     void RemoveAllEnv();
 
     JsInputMonitorManager() = default;
-    JsInputMonitorManager(const JsInputMonitorManager&) = delete;
-    JsInputMonitorManager(JsInputMonitorManager&&) = delete;
-    JsInputMonitorManager& operator=(const JsInputMonitorManager&) = delete;
 
 private:
     int32_t nextId_ {0};

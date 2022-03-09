@@ -15,7 +15,7 @@
 
 #ifndef VIRTUAL_DEVICE_H
 #define VIRTUAL_DEVICE_H
-
+#include "nocopyable.h"
 #include "virtual_device_config.h"
 
 namespace OHOS {
@@ -24,6 +24,7 @@ class VirtualDevice {
 public:
     VirtualDevice(const std::string &device_name, uint16_t busType, uint16_t vendorId, uint16_t product_id);
     virtual ~VirtualDevice();
+    DISALLOW_COPY_AND_MOVE(VirtualDevice);
     static bool CatFload(std::vector<std::string>& fileList);
     static bool SyncSymbolFile();
     bool DoIoctl(int32_t fd, int32_t request, const uint32_t value);

@@ -17,6 +17,7 @@
 
 #include <map>
 #include <mutex>
+#include "nocopyable.h"
 #include "pointer_event.h"
 #include "struct_multimodal.h"
 #include "singleton.h"
@@ -48,6 +49,7 @@ public:
 public:
     MouseDeviceState();
     ~MouseDeviceState();
+    DISALLOW_COPY_AND_MOVE(MouseDeviceState);
 
     int32_t GetMouseCoordsX() const;
     int32_t GetMouseCoordsY() const;

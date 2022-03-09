@@ -23,6 +23,7 @@
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "nocopyable.h"
 
 #include "i_input_event_consumer.h"
 
@@ -32,6 +33,7 @@ class InputMonitor : public IInputEventConsumer,
                      public std::enable_shared_from_this<InputMonitor> {
 public:
     InputMonitor() = default;
+    DISALLOW_COPY_AND_MOVE(InputMonitor);
     virtual ~InputMonitor() = default;
 
     bool Start();
@@ -49,13 +51,6 @@ public:
     virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override;
 
     virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override;
-
-private:
-    InputMonitor(const InputMonitor&) = delete;
-
-    InputMonitor(InputMonitor&&) = delete;
-
-    InputMonitor& operator=(const InputMonitor&) = delete;
 
 private:
     int32_t id_ {-1};
