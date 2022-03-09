@@ -56,7 +56,7 @@ bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
     }
     auto msgHdlImp = static_cast<ClientMsgHandler *>(msgHdl.get());
     CHKPF(msgHdlImp);
-    auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, msgHdlImp, std::placeholders::_1, std::placeholders::_2);
+    auto callback = std::bind(&MMIClient::OnMsgHandler, this, std::placeholders::_1);
     if (!(StartClient(callback, detachMode))) {
         MMI_LOGE("Client startup failed");
         return false;
@@ -66,6 +66,15 @@ bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
         return false;
     }
     return true;
+}
+
+void MMIClient::OnMsgHandler(NetPacket& pkt)
+{
+    CHKPV(eventHandler_);
+    auto msgHdlImp = static_cast<ClientMsgHandler *>(msgHdl.get());
+    CHKPF(msgHdlImp);
+    auto fun = [this, ]
+    eventHandler_->PostTask(, EventHandler::Priority::IMMEDIATE);
 }
 
 void MMIClient::OnThirdThread()
@@ -89,17 +98,17 @@ bool MMIClient::StartEventRunner()
     CHKPF(eventRunner);
     eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner, GetPtr());
     CHKPF(eventHandler_);
-    if (isConnected_ && fd_ >= 0) {
-        if (!AddFdListener(fd_)) {
-            MMI_LOGE("add fd listener return false");
-            return false;
-        }
-    } else {
-        if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT)) {
-            MMI_LOGE("send reconnect event return false.");
-            return false;
-        }
-    }
+    // if (isConnected_ && fd_ >= 0) {
+    //     if (!AddFdListener(fd_)) {
+    //         MMI_LOGE("add fd listener return false");
+    //         return false;
+    //     }
+    // } else {
+    //     if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT)) {
+    //         MMI_LOGE("send reconnect event return false.");
+    //         return false;
+    //     }
+    // }
     if (curRunner == nullptr) {
         t_ = std::thread(std::bind(&MMIClient::OnThirdThread, this));
         t_.detach();
@@ -185,20 +194,20 @@ void MMIClient::VirtualKeyIn(RawInputEvent virtualKeyEvent)
 void MMIClient::OnDisconnected()
 {
     MMI_LOGD("Disconnected from server, fd:%{public}d", GetFd());
+    isConnected_ = false;
     if (funDisconnected_) {
         funDisconnected_(*this);
     }
-    isConnected_ = false;
-    if (!DelFdListener(fd_)) {
-        MMI_LOGE("delete fd listener failed.");
-    }
-    if (!isToExit_ && eventHandler_) {
-        if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT)) {
-            MMI_LOGE("send reconnect event return false.");
-        }
-    } else {
-        MMI_LOGW("toExit is true.Reconnection closed");
-    }
+    // if (!DelFdListener(fd_)) {
+    //     MMI_LOGE("delete fd listener failed.");
+    // }
+    // if (!isToExit_ && eventHandler_) {
+    //     if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT)) {
+    //         MMI_LOGE("send reconnect event return false.");
+    //     }
+    // } else {
+    //     MMI_LOGW("toExit is true.Reconnection closed");
+    // }
 }
 
 void MMIClient::OnConnected()
@@ -208,11 +217,11 @@ void MMIClient::OnConnected()
     if (funConnected_) {
         funConnected_(*this);
     }
-    if (!isRunning_ && fd_ >= 0 && eventHandler_ != nullptr) {
-        if (!AddFdListener(fd_)) {
-            MMI_LOGE("Add fd listener failed");
-        }
-    }
+    // if (!isRunning_ && fd_ >= 0 && eventHandler_ != nullptr) {
+    //     if (!AddFdListener(fd_)) {
+    //         MMI_LOGE("Add fd listener failed");
+    //     }
+    // }
 }
 
 int32_t MMIClient::Socket()
