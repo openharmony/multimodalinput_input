@@ -21,6 +21,10 @@ ohos_moduletest("sdk-test-out") {
   include_dirs = [
     "//foundation/multimodalinput/input/test/moduletest/include",
     "//foundation/multimodalinput/input/service/event_dump/include",
+    "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
+    "//foundation/multimodalinput/input/frameworks/util/common/include",
+    "//foundation/multimodalinput/input/frameworks/util/socket/include",
+    "//foundation/multimodalinput/input/frameworks/util/network/include",
   ]
 
   sources = [ "dfx_sdk_test.cpp" ]

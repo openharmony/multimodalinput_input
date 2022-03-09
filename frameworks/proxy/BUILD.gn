@@ -62,8 +62,6 @@ ohos_source_set("libmmi-common") {
 
   configs = [ ":libmmi_client_config" ]
 
-  public_configs = [ ":libmmi_client_config" ]
-
   deps = [ "//utils/native/base:utils" ]
 
   public_deps =
