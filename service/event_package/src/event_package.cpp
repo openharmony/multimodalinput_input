@@ -39,6 +39,8 @@ int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, std::shared_
     auto device = libinput_event_get_device(event);
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
     int32_t keyCode = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
+    auto Okey = KeyValueTransformationInput(keyCode);
+    keyCode = static_cast<int32_t>(Okey.keyValueOfSys);
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
     auto preAction = key->GetAction();
