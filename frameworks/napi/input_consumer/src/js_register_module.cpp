@@ -85,7 +85,6 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
     std::set<int32_t> preKeys;
     if (!GetPreKeys(env, receiceValue, preKeys)) {
         MMI_LOGE("Get preKeys failed");
-        napi_throw_error(env, nullptr, "Get preKeys failed");
         return ERROR_CODE;
     }
     if (preKeys.size() > PRE_KEYS_SIZE) {
@@ -133,11 +132,13 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
             napi_throw_error(env, nullptr, "Event create reference failed");
             return ERROR_CODE;
         }
+    } else {
+        event->callback[0] = nullptr;
     }
     return SUCCESS_CODE;
 }
 
-static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_LOGD("enter");
     CHKPF(monitorInfo);
@@ -148,7 +149,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     int32_t keyEventFinalKey = keyEvent->GetKeyCode();
     MMI_LOGD("infoFinalKey:%{public}d,keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
     if (infoFinalKey != keyEventFinalKey || items.size() > 4) {
-        MMI_LOGD("%{public}d", __LINE__);
+        MMI_LOGE("param invalid");
         return false;
     }
     std::set<int32_t> infoPreKeys = keyOption->GetPreKeys();
@@ -167,7 +168,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
         }
         auto iter = find(infoPreKeys.begin(), infoPreKeys.end(), item.GetKeyCode());
         if (iter == infoPreKeys.end()) {
-            MMI_LOGE("No keyCode in preKeys");
+            MMI_LOGD("No keyCode in preKeys");
             return false;
         }
         count++;
@@ -185,7 +186,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     return count == infoSize;
 }
 
-static void SubKeyEventCallback(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_LOGD("enter");
     CHKPV(keyEvent);
@@ -260,6 +261,8 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     CHKPP(event);
     auto keyOption = std::make_shared<KeyOption>();
     if (GetEventInfo(env, info, event, keyOption) < 0) {
+        delete event;
+        event = nullptr;
         MMI_LOGE("GetEventInfo failed");
         return nullptr;
     }
@@ -274,7 +277,9 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     if (subscribeId >= 0) {
         InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
     }
-    napi_delete_reference(env, event->callback[0]);
+    if (event->callback[0] != nullptr) {
+        napi_delete_reference(env, event->callback[0]);
+    }
     delete event;
     event = nullptr;
     return nullptr;
