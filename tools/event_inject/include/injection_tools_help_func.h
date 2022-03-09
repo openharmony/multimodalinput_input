@@ -22,7 +22,7 @@ namespace OHOS {
 namespace MMI {
 class InjectionToolsHelpFunc {
 public:
-    std::string GetHelpText() const;
+    std::string GetHelpText();
 };
 } // namespace MMI
 } // namespace OHOS
