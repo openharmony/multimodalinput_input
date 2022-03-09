@@ -94,7 +94,7 @@ int32_t GetDeviceNode::ExecuteCmd(const std::string cmd, std::vector<std::string
     return pclose(pin);
 }
 
-void GetDeviceNode::GetDeviceCmd(const std::vector<std::string>& cmdResult, DeviceList& deviceList)
+void GetDeviceNode::GetDeviceCmd(const std::vector<std::string>& cmdResult, DeviceList& deviceList) const
 {
     std::string name;
     for (const auto &item : cmdResult) {

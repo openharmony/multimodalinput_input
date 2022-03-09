@@ -65,7 +65,7 @@ int32_t InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent> inputEvent
     return fd;
 }
 
-int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent)
+int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const
 {
     int32_t displayId = inputEvent->GetTargetDisplayId();
     if (displayId < 0) {
@@ -79,7 +79,7 @@ int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent
     return displayId;
 }
 
-int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent)
+int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent) const
 {
     MMI_LOGD("enter");
     CHKPR(inputEvent, ERROR_NULL_POINTER);
@@ -118,8 +118,8 @@ void InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInf
 
     physicalDisplays_ = physicalDisplays;
     logicalDisplays_ = logicalDisplays;
-    int32_t numLogicalDisplay = logicalDisplays.size();
-    for (int32_t i = 0; i < numLogicalDisplay; i++) {
+    size_t numLogicalDisplay = logicalDisplays.size();
+    for (size_t i = 0; i < numLogicalDisplay; ++i) {
         size_t numWindow = logicalDisplays[i].windowsInfo_.size();
         for (size_t j = 0; j < numWindow; j++) {
             WindowInfo myWindow = logicalDisplays[i].windowsInfo_[j];
@@ -335,11 +335,11 @@ bool InputWindowsManager::TouchDownPointToDisplayPoint(struct libinput_event_tou
     }
 
     for (const auto &display : logicalDisplays_) {
-        if (globalLogicalX < display.topLeftX || globalLogicalX > display.topLeftX + display.width) {
+        if ((globalLogicalX < display.topLeftX) || (globalLogicalX > display.topLeftX + display.width)) {
             continue;
         }
 
-        if (globalLogicalY < display.topLeftY || globalLogicalY > display.topLeftY + display.height) {
+        if ((globalLogicalY < display.topLeftY) || (globalLogicalY > display.topLeftY + display.height)) {
             continue;
         }
 
@@ -654,7 +654,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, double& y)
     MMI_LOGD("Mouse Data: globalX:%{public}d,globalY:%{public}d", mouseLoction_.globalX, mouseLoction_.globalY);
 }
 
-MouseLocation InputWindowsManager::GetMouseInfo()
+MouseLocation InputWindowsManager::GetMouseInfo() const
 {
     return mouseLoction_;
 }

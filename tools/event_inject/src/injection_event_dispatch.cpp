@@ -63,7 +63,7 @@ int32_t InjectionEventDispatch::OnJson()
     return ret;
 }
 
-std::string InjectionEventDispatch::GetFunId()
+std::string InjectionEventDispatch::GetFunId() const
 {
     return funId_;
 }
@@ -145,7 +145,7 @@ int32_t InjectionEventDispatch::OnHelp()
     return RET_OK;
 }
 
-int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText)
+int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText) const
 {
     if (deviceNameText.empty()) {
         MMI_LOGE("Get device index failed");
@@ -171,7 +171,12 @@ int32_t InjectionEventDispatch::OnSendEvent()
         MMI_LOGE("device node:%s is not exit", deviceNode.c_str());
         return RET_ERR;
     }
-    int32_t fd = open(deviceNode.c_str(), O_RDWR);
+    char realPath[PATH_MAX] = {};
+    if (realpath(deviceNode.c_str(), realPath) == nullptr) {
+        MMI_LOGE("path is error, path:%{public}s", deviceNode.c_str());
+        return RET_ERR;
+    }
+    int32_t fd = open(realPath, O_RDWR);
     if (fd < 0) {
         MMI_LOGE("open device node:%s faild", deviceNode.c_str());
         return RET_ERR;
@@ -192,7 +197,7 @@ int32_t InjectionEventDispatch::OnSendEvent()
     return RET_OK;
 }
 
-int32_t InjectionEventDispatch::GetDevTypeIndex(int32_t devIndex)
+int32_t InjectionEventDispatch::GetDevTypeIndex(int32_t devIndex) const
 {
     for (const auto &item : allDevices_) {
         if (devIndex == item.devIndex) {
@@ -202,7 +207,7 @@ int32_t InjectionEventDispatch::GetDevTypeIndex(int32_t devIndex)
     return RET_ERR;
 }
 
-int32_t InjectionEventDispatch::GetDevIndexType(int32_t devType)
+int32_t InjectionEventDispatch::GetDevIndexType(int32_t devType) const
 {
     for (const auto &item : allDevices_) {
         if (item.devType == devType) {

@@ -24,21 +24,11 @@ config("event_injection_config") {
     "include",
     "//foundation/multimodalinput/input/common/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/multimodalinput/input/frameworks/util/common/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
   ]
 
-  cflags = [
-    "-DOHOS_BUILD",
-    "-Wno-unused-parameter",
-    "-Wno-implicit-int",
-    "-Wno-return-type",
-    "-Wno-unused-function",
-    "-Wno-string-conversion",
-    "-Wheader-hygiene",
-    "-Wunused-private-field",
-    "-Wsign-compare",
-    "-Wformat",
-    "-Wdeprecated-declarations",
-  ]
+  cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]

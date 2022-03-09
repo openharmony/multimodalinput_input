@@ -32,8 +32,6 @@ ohos_source_set("mmi_event_filter_service") {
     "${event_filter_path}/src/event_filter_stub.cpp",
   ]
 
-  public_configs = [ ":mmi_event_filter_config" ]
-
   configs = [ ":mmi_event_filter_config" ]
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -52,8 +50,6 @@ ohos_source_set("mmi_event_filter_proxy") {
     "${event_filter_path}/src/event_filter_proxy.cpp",
     "${event_filter_path}/src/event_filter_wrap.cpp",
   ]
-
-  public_configs = [ ":mmi_event_filter_config" ]
 
   configs = [ ":mmi_event_filter_config" ]
 

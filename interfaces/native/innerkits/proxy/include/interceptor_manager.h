@@ -51,8 +51,8 @@ private:
     int32_t InterceptorItemId;
     std::list<InterceptorItem> interceptor_;
 };
+
+#define InterceptorMgr OHOS::Singleton<InterceptorManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-
-#define InterceptorMgr OHOS::Singleton<OHOS::MMI::InterceptorManager>::GetInstance()
 #endif // INTERCEPTOR_MANAGER_H
