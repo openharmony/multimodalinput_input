@@ -796,7 +796,6 @@ bool PointerEvent::IsValid() const
         default: {
             MMI_LOGE("SourceType is invalid");
             return false;
-            break;
         }
     }
     MMI_LOGD("end");
