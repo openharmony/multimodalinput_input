@@ -17,6 +17,7 @@
 #define JS_INPUT_MONITOR_MODULE_H
 
 #include <cstring>
+
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 

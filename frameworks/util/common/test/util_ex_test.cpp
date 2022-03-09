@@ -30,6 +30,12 @@ public:
     static void TearDownTestCase(void) {}
 };
 
+/**
+ * @tc.name:EnumAdd_001
+ * @tc.desc:Verify enum add
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UtilExTest, EnumAdd_001, TestSize.Level1)
 {
     MmiMessageId messageId1 = MmiMessageId::INVALID;
@@ -37,6 +43,12 @@ HWTEST_F(UtilExTest, EnumAdd_001, TestSize.Level1)
     EXPECT_EQ(messageId2, MmiMessageId::LIBINPUT_EVENT_DEVICE_ADDED);
 }
 
+/**
+ * @tc.name:EnumAdd_002
+ * @tc.desc:Verify enum add
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UtilExTest, EnumAdd_002, TestSize.Level1)
 {
     MmiMessageId messageId1 = MmiMessageId::LIBINPUT_EVENT_DEVICE_ADDED;

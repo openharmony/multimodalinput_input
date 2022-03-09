@@ -89,7 +89,7 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
     }
     auto sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sm == nullptr) {
-        MMI_LOGE("get registry fail");
+        MMI_LOGE("get system ability manager fail");
         return false;
     }
     auto sa = sm->GetSystemAbility(IMultimodalInputConnect::MULTIMODAL_INPUT_CONNECT_SERVICE_ID);
@@ -111,10 +111,10 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
     sa->AddDeathRecipient(multimodalInputConnectRecipient_);
     multimodalInputConnectService_ = iface_cast<IMultimodalInputConnect>(sa);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_LOGE("get multimodal input connect service fail");
+        MMI_LOGE("get multimodalinput service fail");
         return false;
     }
-    MMI_LOGI("get multimodal input connect service successful");
+    MMI_LOGI("get multimodalinput service successful");
     return true;
 }
 
@@ -150,7 +150,7 @@ void MultimodalInputConnectManager::NotifyDeath()
     do {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         if (ConnectMultimodalInputService()) {
-            MMI_LOGD("connect multimodal input connect service successful");
+            MMI_LOGD("connect multimodalinput service successful");
             return;
         }
     } while (--retryCount > 0);

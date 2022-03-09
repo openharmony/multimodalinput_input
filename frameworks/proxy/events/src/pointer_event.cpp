@@ -14,6 +14,7 @@
  */
 
 #include "pointer_event.h"
+#include <iomanip>
 #include "mmi_log.h"
 
 using namespace OHOS::HiviewDFX;
@@ -305,7 +306,7 @@ void PointerEvent::SetPointerId(int32_t pointerId)
 
 bool PointerEvent::GetPointerItem(int32_t pointerId, PointerItem &pointerItem)
 {
-    for (auto &item : pointers_) {
+    for (const auto &item : pointers_) {
         if (item.GetPointerId() == pointerId) {
             pointerItem = item;
             return true;
@@ -337,7 +338,6 @@ void PointerEvent::UpdatePointerItem(int32_t pointerId, PointerItem &pointerItem
             return;
         }
     }
-
     pointers_.push_back(pointerItem); // insert
 }
 
@@ -428,15 +428,15 @@ void PointerEvent::SetAxisValue(AxisType axis, double axisValue)
 {
     if ((axis >= AXIS_TYPE_UNKNOWN) && (axis < AXIS_TYPE_MAX)) {
         axisValues_[axis] = axisValue;
-        axes_ |= (1 << axis);
+        axes_ = static_cast<int32_t>(static_cast<uint32_t>(axes_) | (1 << static_cast<uint32_t>(axis)));
     }
 }
 
-bool PointerEvent::HasAxis(int32_t axes, AxisType axis)
+bool PointerEvent::HasAxis(uint32_t axes, AxisType axis)
 {
     bool ret { false };
     if ((axis >= AXIS_TYPE_UNKNOWN) && (axis < AXIS_TYPE_MAX)) {
-        ret = static_cast<bool>(axes & (1 << axis));
+        ret = static_cast<bool>(static_cast<uint32_t>(axes) & (1 << static_cast<uint32_t>(axis)));
     }
     return ret;
 }
@@ -503,7 +503,7 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    if (!out.WriteInt32(axes_)) {
+    if (!out.WriteUint32(axes_)) {
         return false;
     }
 
@@ -583,7 +583,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    if (!in.ReadInt32(axes_)) {
+    if (!in.ReadUint32(axes_)) {
         return false;
     }
 
@@ -610,14 +610,14 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
 bool PointerEvent::IsValidCheckMouseFunc() const
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     if (pointers_.size() != 1) {
         MMI_LOGE("Pointers_ is invalid");
         return false;
     }
 
-    int32_t mouseButton = 3;
-    if (pressedButtons_.size() > mouseButton) {
+    size_t maxPressedButtons = 3;
+    if (pressedButtons_.size() > maxPressedButtons) {
         MMI_LOGE("PressedButtons_.size is greater than three and is invalid");
         return false;
     }
@@ -650,13 +650,12 @@ bool PointerEvent::IsValidCheckMouseFunc() const
             return false;
         }
     }
-    MMI_LOGD("end");
     return true;
 }
 
 bool PointerEvent::IsValidCheckMouse() const
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     int32_t mousePointID = GetPointerId();
     if (mousePointID < 0) {
         MMI_LOGE("MousePointID is invalid");
@@ -689,13 +688,12 @@ bool PointerEvent::IsValidCheckMouse() const
             return false;
         }
     }
-    MMI_LOGD("end");
     return true;
 }
 
 bool PointerEvent::IsValidCheckTouchFunc() const
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     int32_t touchPointID = GetPointerId();
     if (touchPointID < 0) {
         MMI_LOGE("TouchPointID is invalid");
@@ -718,13 +716,12 @@ bool PointerEvent::IsValidCheckTouchFunc() const
         MMI_LOGE("ButtonId is invalid");
         return false;
     }
-    MMI_LOGD("PointerEvent::IsValidCheckTouchFunc end");
     return true;
 }
 
 bool PointerEvent::IsValidCheckTouch() const
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     if (!IsValidCheckTouchFunc()) {
         MMI_LOGE("IsValidCheckTouchFunc is invalid");
         return false;
@@ -764,13 +761,12 @@ bool PointerEvent::IsValidCheckTouch() const
         MMI_LOGE("Item.pointerid is not same to touchPointID and is invalid");
         return false;
     }
-    MMI_LOGD("end");
     return true;
 }
 
 bool PointerEvent::IsValid() const
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     int32_t sourceType = GetSourceType();
     if (sourceType != SOURCE_TYPE_MOUSE && sourceType != SOURCE_TYPE_TOUCHSCREEN &&
         sourceType != SOURCE_TYPE_TOUCHPAD) {
@@ -796,11 +792,53 @@ bool PointerEvent::IsValid() const
         default: {
             MMI_LOGE("SourceType is invalid");
             return false;
-            break;
         }
     }
-    MMI_LOGD("end");
     return true;
+}
+
+std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
+{
+    const int precision = 2;
+    std::vector<int32_t> pointerIds { pointerEvent.GetPointersIdList() };
+    ostream << "EventType:" << pointerEvent.DumpEventType()
+         << ",ActionTime:" << pointerEvent.GetActionTime()
+         << ",Action:" << pointerEvent.GetAction()
+         << ",ActionStartTime:" << pointerEvent.GetActionStartTime()
+         << ",Flag:" << pointerEvent.GetFlag()
+         << ",PointerAction:" << pointerEvent.DumpPointerAction()
+         << ",SourceType:" << pointerEvent.DumpSourceType()
+         << ",VerticalAxisValue:" << std::fixed << std::setprecision(precision)
+         << pointerEvent.GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)
+         << ",HorizontalAxisValue:" << std::fixed << std::setprecision(precision)
+         << pointerEvent.GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)
+         << ",PinchAxisValue:" << std::fixed << std::setprecision(precision)
+         << pointerEvent.GetAxisValue(PointerEvent::AXIS_TYPE_PINCH)
+         << ",PointerCount:" << pointerIds.size()
+         << ",EventNumber:" << pointerEvent.GetId() << std::endl;
+
+    for (const auto& pointerId : pointerIds) {
+        PointerEvent::PointerItem item;
+        if (!pointerEvent.GetPointerItem(pointerId, item)) {
+            MMI_LOGE("Invalid pointer: %{public}d.", pointerId);
+            return ostream;
+        }
+        ostream << "DownTime:" << item.GetDownTime()
+            << ",IsPressed:" << std::boolalpha << item.IsPressed()
+            << ",GlobalX:" << item.GetGlobalX() << ",GlobalY:" << item.GetGlobalY()
+            << ",LocalX:" << item.GetLocalX() << ",LocalY:" << item.GetLocalY()
+            << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
+            << ",Pressure:" << item.GetPressure() << std::endl;
+    }
+    std::vector<int32_t> pressedKeys = pointerEvent.GetPressedKeys();
+    if (!pressedKeys.empty()) {
+        ostream << "Pressed keyCode: [";
+        for (const auto& keyCode : pressedKeys) {
+            ostream << keyCode << ",";
+        }
+        ostream << "]" << std::endl;
+    }
+    return ostream;
 }
 } // namespace MMI
 } // namespace OHOS

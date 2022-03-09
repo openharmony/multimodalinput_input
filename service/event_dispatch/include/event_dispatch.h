@@ -59,7 +59,7 @@ protected:
         RegisteredEvent& registeredEvent, int64_t preHandlerTime);
     int32_t KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer& udsServer,
         struct libinput_event *event, int32_t inputDeviceType, int64_t preHandlerTime);
-    bool IsANRProcess(int64_t time, SessionPtr ss);
+    bool TriggerANR(int64_t time, SessionPtr sess);
 
 private:
     int32_t DispatchTouchEvent(const EventTouch& touch, const int fd,
@@ -71,12 +71,12 @@ private:
      * Differentiated event handling
      */
     enum IsEventHandler {
-        KEY_FILTER_EVENT = 1,
-        KEY_CHECKLAUNABILITY_EVENT = 2,
+        KEY_INTERCEPT_EVENT = 1,
+        KEY_LAUNCH_EVENT = 2,
         KEY_SUBSCRIBE_EVENT = 3,
         KEY_DISPATCH_EVENT = 4
     };
-    void OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler isEventHandler);
+    void OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler handlerType);
     void HandlePointerEventTrace(const std::shared_ptr<PointerEvent> &point);
     };
 } // namespace MMI

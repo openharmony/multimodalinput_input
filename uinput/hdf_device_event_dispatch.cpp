@@ -18,13 +18,13 @@
 #include <cstdio>
 #include <cstring>
 #include <functional>
-#include "hilog/log.h"
+#include "mmi_log.h"
 
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
-namespace MMIS {
+namespace MMI {
 namespace {
-    constexpr HiLogLabel LABEL = { LOG_CORE, 0xD002800, "HdfDeviceEventDispatch"};
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "HdfDeviceEventDispatch"};
 }
 std::unique_ptr<VirtualTouchScreen> g_pTouchScreen = nullptr;
 InjectThread HdfDeviceEventDispatch::injectThread_;
@@ -41,7 +41,7 @@ void HdfDeviceEventDispatch::GetEventCallbackDispatch(
     const EventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
     if (pkgs == nullptr) {
-        HiLog::Error(LABEL, " %{public}s fail! pkgs is nullptr", __func__);
+        MMI_LOGE("pkgs is nullptr");
         return;
     }
     for (uint32_t i = 0; i < count; i++) {
@@ -61,5 +61,5 @@ void HdfDeviceEventDispatch::GetEventCallbackDispatch(
         injectThread_.WaitFunc(injectInputEvent);
     }
 }
-} // namespace MMIS
+} // namespace MMI
 } // namespace OHOS

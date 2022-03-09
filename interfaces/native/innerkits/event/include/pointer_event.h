@@ -20,7 +20,7 @@
 #include <list>
 #include <vector>
 #include <memory>
-#include <map>
+#include <ostream>
 #include <set>
 #include "parcel.h"
 #include "input_event.h"
@@ -591,7 +591,7 @@ public:
      * @return Returns all the axis, Each bit indicates an axis.
      * @since 8
      */
-    int32_t GetAxes() const;
+    uint32_t GetAxes() const;
 
     /**
      * @brief Set the front keys in the key combination.
@@ -622,7 +622,7 @@ public:
      * @return Returns <b>true</b> if the axes set contains the specified axis type; returns <b>false</b> otherwise.
      * @since 8
      */
-    static bool HasAxis(int32_t axes, AxisType axis);
+    static bool HasAxis(uint32_t axes, AxisType axis);
 
 public:
     /**
@@ -657,7 +657,7 @@ private:
     int32_t sourceType_ { 0 };
     int32_t pointerAction_ { 0 };
     int32_t buttonId_ { -1 };
-    int32_t axes_ { 0 };
+    uint32_t axes_ { 0 };
     std::array<double, AXIS_TYPE_MAX>   axisValues_ { };
     std::vector<int32_t> pressedKeys_;
 };
@@ -667,10 +667,12 @@ inline bool PointerEvent::HasAxis(AxisType axis) const
     return HasAxis(axes_, axis);
 }
 
-inline int32_t PointerEvent::GetAxes() const
+inline uint32_t PointerEvent::GetAxes() const
 {
     return axes_;
 }
+
+std::ostream& operator<<(std::ostream&, PointerEvent&);
 } // namespace MMI
 } // namespace OHOS
 #endif // POINTER_EVENT_H

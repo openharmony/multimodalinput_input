@@ -43,7 +43,7 @@ public:
 private:
     void CreatePointerWindow(int32_t displayId, int32_t globalX, int32_t globalY);
     sptr<OHOS::Surface> GetLayer();
-    sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer);
+    sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer) const;
     void DoDraw(uint8_t *addr, uint32_t width, uint32_t height);
     void DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas);
     void DrawManager();
@@ -52,11 +52,11 @@ private:
 
 private:
     sptr<OHOS::Rosen::Window> pointerWindow_ = nullptr;
-    bool hasDisplay_ { false };
-    int32_t displayId_;
-    int32_t displayWidth_;
-    int32_t displayHeight_;
-    bool hasPointerDevice_ { false };
+    bool hasDisplay_ = false;
+    int32_t displayId_ = -1;
+    int32_t displayWidth_ = 0;
+    int32_t displayHeight_ = 0;
+    bool hasPointerDevice_ = false;
 };
 
 #define PointerDrawMgr PointerDrawingManager::GetInstance()

@@ -15,6 +15,8 @@
 
 #include "virtual_touch_screen.h"
 
+namespace OHOS {
+namespace MMI {
 const std::vector<uint32_t> &VirtualTouchScreen::GetEventTypes() const
 {
     static const std::vector<uint32_t> evtTypes {EV_ABS, EV_KEY, EV_SYN};
@@ -82,3 +84,5 @@ VirtualTouchScreen::VirtualTouchScreen(const uint32_t maxX, const uint32_t maxY)
     dev_.absmin[ABS_MT_PRESSURE] = 0;
     dev_.absmax[ABS_MT_PRESSURE] = 100;
 }
+} // namespace MMI
+} // namespace OHOS
