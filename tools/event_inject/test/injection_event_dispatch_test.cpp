@@ -34,7 +34,7 @@ public:
 
 /**
  * @tc.name:Test_Init
- * @tc.desc:Verify InjectionEventDispatch Init 
+ * @tc.desc:Verify InjectionEventDispatch Init
  * @tc.type: FUNC
  * @tc.require:
  */

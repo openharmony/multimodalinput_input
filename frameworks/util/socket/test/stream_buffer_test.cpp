@@ -305,7 +305,7 @@ HWTEST_F(StreamBufferTest, operatorRight, TestSize.Level1)
 
 /**
  * @tc.name:ReadBuf
- * @tc.desc:Verify stream buffer read buffer 
+ * @tc.desc:Verify stream buffer read buffer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -318,7 +318,7 @@ HWTEST_F(StreamBufferTest, ReadBuf, TestSize.Level1)
 
 /**
  * @tc.name:WriteBuf
- * @tc.desc:Verify stream buffer write buffer 
+ * @tc.desc:Verify stream buffer write buffer
  * @tc.type: FUNC
  * @tc.require:
  */
