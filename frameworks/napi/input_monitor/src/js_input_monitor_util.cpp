@@ -12,8 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "js_input_monitor_util.h"
+
 #include <cinttypes>
+
 #include "define_multimodal.h"
 
 namespace OHOS {

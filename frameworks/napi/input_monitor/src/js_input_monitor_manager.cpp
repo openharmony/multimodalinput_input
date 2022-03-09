@@ -14,7 +14,9 @@
  */
 
 #include "js_input_monitor_manager.h"
+
 #include <uv.h>
+
 #include "define_multimodal.h"
 
 namespace OHOS {

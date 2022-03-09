@@ -18,13 +18,14 @@
 
 #include <map>
 
-#include "libmmi_util.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "utils/log.h"
-#include "input_device_impl.h"
+
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+#include "input_device_impl.h"
+#include "libmmi_util.h"
 
 namespace OHOS {
 namespace MMI {
