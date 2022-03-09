@@ -23,19 +23,7 @@ config("virtual_device_config") {
     "//utils/native/base/include",
   ]
 
-  cflags = [
-    "-DOHOS_BUILD",
-    "-Wno-unused-parameter",
-    "-Wno-implicit-int",
-    "-Wno-return-type",
-    "-Wno-unused-function",
-    "-Wno-string-conversion",
-    "-Wheader-hygiene",
-    "-Wunused-private-field",
-    "-Wsign-compare",
-    "-Wformat",
-    "-Wdeprecated-declarations",
-  ]
+  cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]

@@ -170,9 +170,9 @@ int32_t InputManagerImpl::PackDisplayData(OHOS::MMI::NetPacket &pkt)
 
 int32_t InputManagerImpl::PackPhysicalDisplay(NetPacket &pkt)
 {
-    int32_t num = physicalDisplays_.size();
+    uint32_t num = static_cast<uint32_t>(physicalDisplays_.size());
     CHKR(pkt.Write(num), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    for (int32_t i = 0; i < num; i++) {
+    for (uint32_t i = 0; i < num; i++) {
         CHKR(pkt.Write(physicalDisplays_[i].id), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt.Write(physicalDisplays_[i].leftDisplayId), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt.Write(physicalDisplays_[i].upDisplayId), STREAM_BUF_WRITE_FAIL, RET_ERR);
@@ -192,7 +192,7 @@ int32_t InputManagerImpl::PackPhysicalDisplay(NetPacket &pkt)
 
 int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
 {
-    int32_t num = logicalDisplays_.size();
+    int32_t num = static_cast<int32_t>(logicalDisplays_.size());
     CHKR(pkt.Write(num), STREAM_BUF_WRITE_FAIL, RET_ERR);
     for (int32_t i = 0; i < num; i++) {
         CHKR(pkt.Write(logicalDisplays_[i].id), STREAM_BUF_WRITE_FAIL, RET_ERR);
@@ -204,7 +204,7 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
         CHKR(pkt.Write(logicalDisplays_[i].seatId), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt.Write(logicalDisplays_[i].seatName), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt.Write(logicalDisplays_[i].focusWindowId), STREAM_BUF_WRITE_FAIL, RET_ERR);
-        int32_t numWindow = logicalDisplays_[i].windowsInfo_.size();
+        int32_t numWindow = static_cast<int32_t>(logicalDisplays_[i].windowsInfo_.size());
         CHKR(pkt.Write(numWindow), STREAM_BUF_WRITE_FAIL, RET_ERR);
         for (int32_t j = 0; j < numWindow; j++) {
             CHKR(pkt.Write(logicalDisplays_[i].windowsInfo_[j]), STREAM_BUF_WRITE_FAIL, RET_ERR);

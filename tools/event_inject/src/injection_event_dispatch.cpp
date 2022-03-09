@@ -167,6 +167,17 @@ int32_t InjectionEventDispatch::OnSendEvent()
         MMI_LOGE("device node:%s is not exit", deviceNode.c_str());
         return RET_ERR;
     }
+    char realPath[PATH_MAX] = {};
+    if (realpath(deviceNode.c_str(), realPath) == nullptr) {
+        MMI_LOGE("path is error, path:%{public}s", deviceNode.c_str());
+        return RET_ERR;
+    }
+    int32_t fd = open(realPath, O_RDWR);
+    if (fd < 0) {
+        MMI_LOGE("open device node:%s faild", deviceNode.c_str());
+        return RET_ERR;
+    }
+
     struct timeval tm;
     gettimeofday(&tm, 0);
     struct input_event event = {};
@@ -175,12 +186,6 @@ int32_t InjectionEventDispatch::OnSendEvent()
     event.type = static_cast<uint16_t>(std::stoi(injectArgvs_[SEND_EVENT_TYPE_INDEX]));
     event.code = static_cast<uint16_t>(std::stoi(injectArgvs_[SEND_EVENT_CODE_INDEX]));
     event.value = static_cast<int32_t>(std::stoi(injectArgvs_[SEND_EVENT_VALUE_INDEX]));
-
-    int32_t fd = open(deviceNode.c_str(), O_RDWR);
-    if (fd < 0) {
-        MMI_LOGE("open device node:%s faild", deviceNode.c_str());
-        return RET_ERR;
-    }
     write(fd, &event, sizeof(event));
     if (fd >= 0) {
         close(fd);

@@ -258,9 +258,7 @@ void OHOS::MMI::VirtualDevice::CloseAllDevice(const std::vector<std::string>& fi
         it.insert(0, OHOS::MMI::g_folderpath.c_str());
         const int32_t ret = remove(it.c_str());
         if (ret == -1) {
-            const int32_t errnoSaved = errno;
-            printf("remove file fail. file name: %s, errno: %d, error message: %s\n",
-                it.c_str(), errnoSaved, strerror(errnoSaved));
+            printf("remove file fail. file name: %s, errno: %d.\n", it.c_str(), errno);
         }
     }
 }
@@ -446,9 +444,7 @@ bool OHOS::MMI::VirtualDevice::CloseDevice(const std::vector<std::string>& fileL
                 it.insert(0, OHOS::MMI::g_folderpath.c_str());
                 const int32_t ret = remove(it.c_str());
                 if (ret == -1) {
-                    const int32_t errnoSaved = errno;
-                    printf("remove file fail. file name: %s, errno: %d, error message: %s\n",
-                        it.c_str(), errnoSaved, strerror(errnoSaved));
+                    printf("remove file fail. file name: %s, errno: %d.\n", it.c_str(), errno);
                 }
                 return true;
             } else {
