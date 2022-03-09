@@ -205,9 +205,9 @@ void MouseEventHandler::DumpInner()
     PointerEvent::PointerItem item;
     CHK(pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item), PARAM_INPUT_FAIL);
     MMI_LOGD("Item: DownTime:%{public}" PRId64 ",IsPressed:%{public}s,GlobalX:%{public}d,GlobalY:%{public}d,"
-        "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,DeviceId:%{public}d",
+        "Width:%{public}d,Height:%{public}d,Pressure:%{public}d",
         item.GetDownTime(), (item.IsPressed() ? "true" : "false"), item.GetGlobalX(), item.GetGlobalY(),
-        item.GetWidth(), item.GetHeight(), item.GetPressure(), item.GetDeviceId());
+        item.GetWidth(), item.GetHeight(), item.GetPressure());
 }
 } // namespace MMI
 } // namespace OHOS

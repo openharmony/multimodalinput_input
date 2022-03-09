@@ -25,9 +25,9 @@
 
 namespace OHOS {
 namespace MMI {
-    const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_icon/angle.png";
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerDrawingManager" };
+const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_icon/angle.png";
 }
 } // namespace MMI
 } // namespace OHOS
@@ -160,15 +160,12 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUYE };
     bitmap.Build(width, height, format);
-
     OHOS::Rosen::Drawing::Canvas canvas;
     canvas.Bind(bitmap);
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
-
     DrawPixelmap(canvas);
-
     constexpr uint32_t stride = 4;
-    int32_t addrSize = width * height * stride;
+    uint32_t addrSize = width * height * stride;
     auto ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
     CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     MMI_LOGD("leave");

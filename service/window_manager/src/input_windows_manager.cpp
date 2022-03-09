@@ -116,8 +116,8 @@ void OHOS::MMI::InputWindowsManager::UpdateDisplayInfo(const std::vector<Physica
 
     physicalDisplays_ = physicalDisplays;
     logicalDisplays_ = logicalDisplays;
-    int32_t numLogicalDisplay = logicalDisplays.size();
-    for (int32_t i = 0; i < numLogicalDisplay; i++) {
+    size_t numLogicalDisplay = logicalDisplays.size();
+    for (size_t i = 0; i < numLogicalDisplay; ++i) {
         size_t numWindow = logicalDisplays[i].windowsInfo_.size();
         for (size_t j = 0; j < numWindow; j++) {
             WindowInfo myWindow = logicalDisplays[i].windowsInfo_[j];

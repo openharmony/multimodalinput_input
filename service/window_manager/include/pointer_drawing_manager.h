@@ -52,11 +52,11 @@ private:
 
 private:
     sptr<OHOS::Rosen::Window> pointerWindow_ = nullptr;
-    bool hasDisplay_ { false };
-    int32_t displayId_;
-    int32_t displayWidth_;
-    int32_t displayHeight_;
-    bool hasPointerDevice_ { false };
+    bool hasDisplay_ = false;
+    int32_t displayId_ = -1;
+    int32_t displayWidth_ = 0;
+    int32_t displayHeight_ = 0;
+    bool hasPointerDevice_ = false;
 };
 } // namespace MMI
 } // namespace OHOS
