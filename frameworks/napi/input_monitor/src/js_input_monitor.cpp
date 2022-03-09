@@ -33,19 +33,18 @@ constexpr int32_t NAPI_ERR = 3;
 
 bool InputMonitor::Start()
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
         monitorId_ = InputMgr->AddMonitor(shared_from_this());
         return monitorId_ >= 0;
     }
-    MMI_LOGD("Leave");
     return true;
 }
 
 void InputMonitor::Stop()
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
         MMI_LOGE("Invalid values");
@@ -53,7 +52,6 @@ void InputMonitor::Stop()
     }
     InputMgr->RemoveMonitor(monitorId_);
     monitorId_ = -1;
-    MMI_LOGD("Leave");
     return;
 }
 
@@ -65,7 +63,7 @@ void InputMonitor::SetCallback(std::function<void(std::shared_ptr<PointerEvent>)
 
 void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPV(pointerEvent);
     if (JsInputMonMgr.GetMonitor(id_) == nullptr) {
         MMI_LOGE("failed to process pointer event, id:%{public}d", id_);
@@ -85,7 +83,6 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
     }
     CHKPV(callback);
     callback(pointerEvent);
-    MMI_LOGD("Leave");
 }
 
 void InputMonitor::SetId(int32_t id) {
@@ -304,7 +301,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
 }
 
 bool JsInputMonitor::Start() {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPF(monitor_);
     if (isMonitoring_) {
         MMI_LOGW("js is monitoring");
@@ -314,13 +311,12 @@ bool JsInputMonitor::Start() {
         isMonitoring_ = true;
         return true;
     }
-    MMI_LOGD("Leave");
     return false;
 }
 
 JsInputMonitor::~JsInputMonitor()
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     if (isMonitoring_) {
         isMonitoring_ = false;
         if (monitor_ != nullptr) {
@@ -333,11 +329,10 @@ JsInputMonitor::~JsInputMonitor()
         MMI_LOGE("napi_reference_unref is failed");
         return;
     }
-    MMI_LOGD("Leave");
 }
 
 void JsInputMonitor::Stop() {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPV(monitor_);
     if (isMonitoring_) {
         isMonitoring_ = false;
@@ -345,7 +340,6 @@ void JsInputMonitor::Stop() {
             monitor_->Stop();
         }
     }
-    MMI_LOGD("Leave");
 }
 
 int32_t JsInputMonitor::GetId() const
@@ -355,7 +349,7 @@ int32_t JsInputMonitor::GetId() const
 
 void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPV(monitor_);
     CHKPV(pointerEvent);
     int32_t num = 0;
@@ -379,12 +373,11 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
         std::lock_guard<std::mutex> guard(mutex_);
         jsTaskNum_++;
     }
-    MMI_LOGD("Leave");
 }
 
 void JsInputMonitor::JsCallback(uv_work_t *work, int32_t status)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPV(work);
     int32_t *id = static_cast<int32_t *>(work->data);
     delete work;
@@ -393,12 +386,11 @@ void JsInputMonitor::JsCallback(uv_work_t *work, int32_t status)
     CHKPV(jsMonitor);
     jsMonitor->OnPointerEventInJsThread();
     id = nullptr;
-    MMI_LOGD("Leave");
 }
 
 void JsInputMonitor::OnPointerEventInJsThread()
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     if (!isMonitoring_) {
         MMI_LOGE("js monitor stop");
         return;
@@ -459,7 +451,6 @@ void JsInputMonitor::OnPointerEventInJsThread()
         napi_close_handle_scope(jsEnv_, scope);
     }
     --jsTaskNum_;
-     MMI_LOGD("Leave");
 }
 } // namespace MMI
 } // namespace OHOS
