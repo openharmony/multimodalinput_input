@@ -149,7 +149,7 @@ void UDSClient::OnRecv(const char *buf, size_t size)
             return;
         }
         auto head = reinterpret_cast<PackHead *>(const_cast<char *>(&buf[readIdx]));
-        if (head->size < 0 || head->size >= static_cast<int32_t>(bufSize)) {
+        if (head->size < 0 || head->size >= bufSize) {
             MMI_LOGE("Head size is error, head->size:%{public}d, errCode:%{public}d", head->size, VAL_NOT_EXP);
             return;
         }
