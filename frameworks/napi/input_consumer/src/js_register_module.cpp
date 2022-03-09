@@ -36,7 +36,7 @@ static Callbacks callbacks = {};
 int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
     std::shared_ptr<KeyOption> keyOption)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(keyOption, ERROR_NULL_POINTER);
     size_t argc = ARGC_NUM;
@@ -145,7 +145,7 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
 
 static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<KeyEvent> keyEvent)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPF(monitorInfo);
     CHKPF(keyEvent);
     auto keyOption = monitorInfo->keyOption;
@@ -193,7 +193,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
 
 static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPV(keyEvent);
     auto iter = callbacks.begin();
     while (iter != callbacks.end()) {
@@ -215,7 +215,7 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
 
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
         .env = env,
         .asyncWork = nullptr,
@@ -258,7 +258,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
         .env = env,
         .asyncWork = nullptr,
@@ -290,13 +290,12 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
 EXTERN_C_START
 static napi_value MmiInit(napi_env env, napi_value exports)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
-    MMI_LOGD("Leave");
     return exports;
 }
 EXTERN_C_END

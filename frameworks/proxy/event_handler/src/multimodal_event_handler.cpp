@@ -57,7 +57,7 @@ int32_t MultimodalEventHandler::GetMultimodeInputInfo()
 
 bool MultimodalEventHandler::InitClient()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (client_ != nullptr) {
         return true;
     }
@@ -71,7 +71,6 @@ bool MultimodalEventHandler::InitClient()
         MMI_LOGE("The client fails to start");
         return false;
     }
-    MMI_LOGD("leave");
     return true;
 }
 
@@ -137,7 +136,7 @@ int32_t MultimodalEventHandler::RemoveInterceptor(int32_t id)
 
 int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (!InitClient()) {
         return MMI_SERVICE_INVALID;
     }
@@ -149,7 +148,7 @@ int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
 
 void MultimodalEventHandler::RemoveInputEventMontior(int32_t keyEventType)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (!InitClient()) {
         return;
     }
@@ -160,7 +159,7 @@ void MultimodalEventHandler::RemoveInputEventMontior(int32_t keyEventType)
 
 void MultimodalEventHandler::RemoveInputEventTouchpadMontior(int32_t pointerEventType)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (!InitClient()) {
         return;
     }
@@ -171,7 +170,7 @@ void MultimodalEventHandler::RemoveInputEventTouchpadMontior(int32_t pointerEven
 
 int32_t MultimodalEventHandler::AddInputEventTouchpadMontior(int32_t pointerEventType)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (!InitClient()) {
         return MMI_SERVICE_INVALID;
     }

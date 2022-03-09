@@ -44,7 +44,7 @@ KeyEventInputSubscribeManager::SubscribeKeyEventInfo::SubscribeKeyEventInfo(
 int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
     std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPR(keyOption, INVALID_SUBSCRIBE_ID);
     CHKPR(callback, INVALID_SUBSCRIBE_ID);
     for (auto preKey : keyOption->GetPreKeys()) {
@@ -60,13 +60,12 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         return INVALID_SUBSCRIBE_ID;
     }
     subscribeInfos_.push_back(subscribeInfo);
-    MMI_LOGD("Leave");
     return subscribeInfo.GetSubscribeId();
 }
 
 int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     if (subscribeId < 0) {
         MMI_LOGE("the subscribe id is less than 0");
         return RET_ERR;
@@ -83,17 +82,15 @@ int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
                 return RET_ERR;
             }
             subscribeInfos_.erase(it);
-            MMI_LOGD("Leave");
             return RET_OK;
         }
     }
-    MMI_LOGE("Leave");
     return RET_ERR;
 }
 
 int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_ptr<KeyEvent> event, int32_t subscribeId)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     if (subscribeId < 0) {
         MMI_LOGE("Leave, the subscribe id is less than 0");
@@ -109,7 +106,6 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
             return RET_OK;
         }
     }
-    MMI_LOGE("Leave");
     return RET_ERR;
 }
 } // namespace MMI
