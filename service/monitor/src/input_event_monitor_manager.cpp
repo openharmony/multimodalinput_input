@@ -72,7 +72,6 @@ void InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<KeyEvent> key
     }
     NetPacket pkt(MmiMessageId::ON_KEYMONITOR);
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
-    std::list<MonitorItem>::iterator iter;
     for (const auto &item : monitors_) {
         CHKPV(item.session);
         pkt << item.session->GetPid();
