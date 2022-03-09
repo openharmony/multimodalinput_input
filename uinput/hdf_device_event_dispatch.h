@@ -22,6 +22,7 @@
 #include "input_manager.h"
 #include "input_reporter.h"
 #include "input_type.h"
+#include "nocopyable.h"
 #include "virtual_touch_screen.h"
 
 namespace OHOS {
@@ -29,6 +30,7 @@ namespace MMI {
 class HdfDeviceEventDispatch {
 public:
     HdfDeviceEventDispatch(const uint32_t maxX, const uint32_t maxY);
+    DISALLOW_COPY_AND_MOVE(HdfDeviceEventDispatch);
     virtual ~HdfDeviceEventDispatch();
     static void GetEventCallbackDispatch(const EventPackage **pkgs, uint32_t count, uint32_t devIndex);
 

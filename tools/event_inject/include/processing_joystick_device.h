@@ -14,7 +14,6 @@
  */
 #ifndef PROCESSING_JOYSTICK_DEVICE_H
 #define PROCESSING_JOYSTICK_DEVICE_H
-
 #include "msg_head.h"
 #include "device_base.h"
 
@@ -31,6 +30,7 @@ class ProcessingJoystickDevice : public DeviceBase {
 public:
     ProcessingJoystickDevice() = default;
     ~ProcessingJoystickDevice() = default;
+    DISALLOW_COPY_AND_MOVE(ProcessingJoystickDevice);
     int32_t TransformJsonDataToInputData(const Json& originalEvent, InputEventArray& inputEventArray);
 private:
     int32_t AnalysisJoystickEvent(const Json& inputData, std::vector<JoystickEvent>& JoystickEventArray);

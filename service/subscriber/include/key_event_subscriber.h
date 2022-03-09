@@ -24,6 +24,7 @@
 #include <thread>
 #include "key_event.h"
 #include "key_option.h"
+#include "nocopyable.h"
 #include "singleton.h"
 #include "uds_server.h"
 
@@ -33,6 +34,7 @@ class KeyEventSubscriber : public Singleton<KeyEventSubscriber> {
 public:
     KeyEventSubscriber() = default;
     ~KeyEventSubscriber() = default;
+    DISALLOW_COPY_AND_MOVE(KeyEventSubscriber);
 
     int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
             const std::shared_ptr<OHOS::MMI::KeyOption> keyOption);

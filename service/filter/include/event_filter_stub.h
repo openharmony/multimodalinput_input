@@ -20,12 +20,14 @@
 #include "iremote_stub.h"
 #include "message_parcel.h"
 #include "mmi_log.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class EventFilterStub : public IRemoteStub<IEventFilter> {
 public:
     EventFilterStub() = default;
+    DISALLOW_COPY_AND_MOVE(EventFilterStub);
     virtual ~EventFilterStub() = default;
     int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& options) override;
 protected:

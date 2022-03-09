@@ -17,6 +17,7 @@
 
 #include "singleton.h"
 #include "if_client_msg_handler.h"
+#include "nocopyable.h"
 #include "standardized_event_manager.h"
 #include "pointer_event.h"
 #include "proto.h"
@@ -32,6 +33,7 @@ class MultimodalEventHandler : public Singleton<MultimodalEventHandler> {
 public:
     MultimodalEventHandler();
     ~MultimodalEventHandler() = default;
+    DISALLOW_COPY_AND_MOVE(MultimodalEventHandler);
     int32_t GetMultimodeInputInfo();
     MMIClientPtr GetMMIClient();
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
