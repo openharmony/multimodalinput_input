@@ -13,11 +13,13 @@
  * limitations under the License.
  */
 
+#include "js_register_module.h"
+
 #include <algorithm>
 #include <cinttypes>
+
 #include "input_manager.h"
 #include "js_register_util.h"
-#include "js_register_module.h"
 
 namespace OHOS {
 namespace MMI {
@@ -153,7 +155,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     int32_t infoFinalKey = keyOption->GetFinalKey();
     int32_t keyEventFinalKey = keyEvent->GetKeyCode();
     MMI_LOGD("infoFinalKey:%{public}d,keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
-    if (infoFinalKey != keyEventFinalKey || items.size() > 4) {
+    if (infoFinalKey != keyEventFinalKey || items.size() > PRE_KEY_MAX_COUNT) {
         MMI_LOGD("%{public}d", __LINE__);
         return false;
     }

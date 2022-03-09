@@ -14,9 +14,11 @@
  */
 
 #include "js_input_monitor_module.h"
+
 #include <cinttypes>
 #include <string>
 #include <uv.h>
+
 #include "define_multimodal.h"
 #include "js_input_monitor_manager.h"
 
