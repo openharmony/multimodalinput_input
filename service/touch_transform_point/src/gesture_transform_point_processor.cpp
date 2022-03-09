@@ -26,6 +26,7 @@ namespace MMI {
 GestureTransformPointProcessor::GestureTransformPointProcessor(int32_t deviceId) : deviceId_(deviceId)
 {
     pointerEvent_ = PointerEvent::Create();
+    CHKPL(pointerEvent_);
 }
 
 GestureTransformPointProcessor::~GestureTransformPointProcessor() {}

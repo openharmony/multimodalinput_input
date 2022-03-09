@@ -28,11 +28,11 @@ public:
     ~InputDeviceImpl() = default;
 
     struct InputDeviceInfo {
-        InputDeviceInfo(int32_t id, std::string name, int32_t devcieType) : id(id),
+        InputDeviceInfo(int32_t id, std::string name, uint32_t devcieType) : id(id),
             name(name), devcieType(devcieType) {}
         int32_t id;
         std::string name;
-        int32_t devcieType;
+        uint32_t devcieType;
     };
 
     void GetInputDeviceIdsAsync(int32_t userData, std::function<void(int32_t, std::vector<int32_t>)> callback);

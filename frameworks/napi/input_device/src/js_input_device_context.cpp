@@ -182,7 +182,7 @@ JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
     return instance;
 }
 
-std::shared_ptr<JsInputDeviceManager> JsInputDeviceContext::GetJsInputDeviceMgr()
+std::shared_ptr<JsInputDeviceManager> JsInputDeviceContext::GetJsInputDeviceMgr() const
 {
     return mager_;
 }

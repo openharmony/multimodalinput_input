@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+set -e
+
 <<COMMENT
 
 # -p NUM  --strip=NUM  Strip NUM leading components from file names.
@@ -24,8 +26,6 @@ bash -x  ./apply_patch.sh  \
  ./diff_libinput_mmi
 
 COMMENT
-
-set -e
 
 curdir=$(pwd)
 source_dir=$1

@@ -26,12 +26,12 @@ bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const s
 std::string GetNamedPropertyString(const napi_env &env, const napi_value &object, const std::string &name);
 int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, const std::string &name);
 bool GetPreKeys(const napi_env &env, const napi_value &value, std::set<int32_t> &params);
-int32_t GetPreSubscribeId(OHOS::MMI::Callbacks &callbacks, OHOS::MMI::KeyEventMonitorInfo *event);
-int32_t AddEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
-    OHOS::MMI::KeyEventMonitorInfo *event);
-int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
-    OHOS::MMI::KeyEventMonitorInfo *event, int32_t &subscribeId);
-void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *event);
+int32_t GetPreSubscribeId(Callbacks &callbacks, KeyEventMonitorInfo *event);
+int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks,
+    KeyEventMonitorInfo *event);
+int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
+    KeyEventMonitorInfo *event, int32_t &subscribeId);
+void EmitAsyncCallbackWork(KeyEventMonitorInfo *event);
 } // namespace MMI
 } // namespace OHOS
 

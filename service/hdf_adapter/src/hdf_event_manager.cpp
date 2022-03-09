@@ -25,13 +25,14 @@
 #include "mmi_log.h"
 #include "util.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
-using namespace OHOS::MMI;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "HdfEventManager"};
 } // namespace
 
-OHOS::MMI::HdfEventManager *OHOS::MMI::HdfEventManager::m_globleThis;
-int32_t OHOS::MMI::HdfEventManager::EvdevSimIoctl(int32_t hdindex, int32_t pcmd, void *iobuff)
+HdfEventManager *HdfEventManager::m_globleThis;
+int32_t HdfEventManager::EvdevSimIoctl(int32_t hdindex, int32_t pcmd, void *iobuff)
 {
     const int32_t size = (pcmd >> IOCTL_CMD_SHIFT) & IOCTL_CMD_MASK;
     int32_t cmd = pcmd & 0xff;
@@ -107,7 +108,7 @@ int32_t OHOS::MMI::HdfEventManager::EvdevSimIoctl(int32_t hdindex, int32_t pcmd,
     }
     return RET_OK;
 }
-int32_t OHOS::MMI::HdfEventManager::EvdevIoctl(int32_t hdiindex, int32_t pcmd, void *iobuff)
+int32_t HdfEventManager::EvdevIoctl(int32_t hdiindex, int32_t pcmd, void *iobuff)
 {
     int32_t size = (pcmd >> IOCTL_CMD_SHIFT) & IOCTL_CMD_MASK;
     int32_t cmd = pcmd & 0xff;
@@ -183,12 +184,12 @@ int32_t OHOS::MMI::HdfEventManager::EvdevIoctl(int32_t hdiindex, int32_t pcmd, v
     return 0;
 }
 
-OHOS::MMI::HdfEventManager::HdfEventManager()
+HdfEventManager::HdfEventManager()
 {
     globleThis_ = this;
     hdiinput_ = nullptr;
 }
-OHOS::MMI::HdfEventManager::~HdfEventManager()
+HdfEventManager::~HdfEventManager()
 {
     uint32_t ret = inputInterface_->iInputReporter->UnregisterHotPlugCallback();
     if (ret == INPUT_SUCCESS) {
@@ -197,7 +198,7 @@ OHOS::MMI::HdfEventManager::~HdfEventManager()
         MMI_LOGE("%{public}s:%{public}d INPUT_ERROR", __func__, __LINE__);
     }
 }
-int32_t OHOS::MMI::HdfEventManager::HdfdevtypeMapLibinputType(uint32_t devIndex, uint32_t devType)
+int32_t HdfEventManager::HdfdevtypeMapLibinputType(uint32_t devIndex, uint32_t devType)
 {
     if (devIndex >= MAX_INPUT_DEVICE_COUNT) {
         MMI_LOGE("The maximum number of devices exceeded, devIndex:%{public}d", devIndex);
@@ -220,7 +221,7 @@ int32_t OHOS::MMI::HdfEventManager::HdfdevtypeMapLibinputType(uint32_t devIndex,
     return ret;
 }
 #ifdef  OHOS_BUILD_HDF
-int32_t OHOS::MMI::HdfEventManager::GetDeviceCount()
+int32_t HdfEventManager::GetDeviceCount()
 {
     int32_t ret = memset_s(mountDevIndex_, sizeof(DevDesc) * TOTAL_INPUT_DEVICE_COUNT, 0,
                            sizeof(DevDesc) * TOTAL_INPUT_DEVICE_COUNT);
@@ -259,7 +260,7 @@ int32_t OHOS::MMI::HdfEventManager::GetDeviceCount()
     }
     return devcount + jectcount;
 }
-void OHOS::MMI::HdfEventManager::SetupCallback()
+void HdfEventManager::SetupCallback()
 {
     MMI_LOGD("%{public}s:%{public}d ThreadSetupCallback start", __func__, __LINE__);
     uint32_t ret = GetInputInterface(&inputInterface_);
@@ -305,7 +306,7 @@ void OHOS::MMI::HdfEventManager::SetupCallback()
     }
 }
 
-void OHOS::MMI::HdfEventManager::AddDevice(uint32_t devIndex, uint32_t devType)
+void HdfEventManager::AddDevice(uint32_t devIndex, uint32_t devType)
 {
     uint32_t ret = 0;
     if (devIndex >= MAX_INPUT_DEVICE_COUNT) {
@@ -324,7 +325,7 @@ void OHOS::MMI::HdfEventManager::AddDevice(uint32_t devIndex, uint32_t devType)
             "devindex:%{public}u,devType:%{public}u", __func__, __LINE__, devIndex, devType);
     }
 }
-bool OHOS::MMI::HdfEventManager::OpenHdfDevice(uint32_t devIndex, bool oper)
+bool HdfEventManager::OpenHdfDevice(uint32_t devIndex, bool oper)
 {
     if (devIndex >= MAX_INPUT_DEVICE_COUNT) {
         return true;
@@ -345,7 +346,7 @@ bool OHOS::MMI::HdfEventManager::OpenHdfDevice(uint32_t devIndex, bool oper)
     }
     return false;
 }
-void OHOS::MMI::HdfEventManager::HotPlugCallback(const HotPlugEvent *event)
+void HdfEventManager::HotPlugCallback(const HotPlugEvent *event)
 {
     MMI_LOGD("%{public}s:%{public}d HotPlugCallback status:%{public}u,devindex:%{public}u"
         "devType:%{public}u", __func__, __LINE__, event->status, event->devIndex, event->devType);
@@ -356,7 +357,7 @@ void OHOS::MMI::HdfEventManager::HotPlugCallback(const HotPlugEvent *event)
         DeviceRemoveHandle(event->devIndex, event->devType);
     }
 }
-int32_t OHOS::MMI::HdfEventManager::DeviceRemoveHandle(uint32_t devIndex, uint32_t devType)
+int32_t HdfEventManager::DeviceRemoveHandle(uint32_t devIndex, uint32_t devType)
 {
     MMI_LOGD("%{public}s:%{public}d DeviceRemoveHandle devindex:%{public}u,devType:%{public}u",
         __func__, __LINE__, devIndex, devType);
@@ -379,7 +380,7 @@ int32_t OHOS::MMI::HdfEventManager::DeviceRemoveHandle(uint32_t devIndex, uint32
 }
 
 
-void OHOS::MMI::HdfEventManager::GetEventCallback(const EventPackage **pkgs, uint32_t count, uint32_t devIndex)
+void HdfEventManager::GetEventCallback(const EventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
     constexpr uint16_t byteSize = 8;
     CHKPV(pkgs);
@@ -396,7 +397,7 @@ void OHOS::MMI::HdfEventManager::GetEventCallback(const EventPackage **pkgs, uin
     }
     libinput_pipe_write(globleThis_->hdiinput_, devIndex, eventarry, count * sizeof(struct input_event));
 }
-int32_t OHOS::MMI::HdfEventManager::DeviceAddHandle(uint32_t devIndex, uint32_t devType)
+int32_t HdfEventManager::DeviceAddHandle(uint32_t devIndex, uint32_t devType)
 {
     MMI_LOGD("%{public}s:%{public}d DeviceAddHandle devindex:%{public}u,devType:%{public}u",
         __func__, __LINE__, devIndex, devType);
@@ -427,7 +428,7 @@ constexpr struct libinput_interface _hdfinterface = {
         MMI_LOGD("libinput .close_restricted fd:%{public}d", fd);
     },
 };
-libinput *OHOS::MMI::HdfEventManager::HdfLibinputInit()
+libinput *HdfEventManager::HdfLibinputInit()
 {
     if (globleThis_->hdiinput_ == nullptr) {
         globleThis_->hdiinput_ = libinput_hdf_create_context(&_hdfinterface, nullptr);
@@ -435,7 +436,7 @@ libinput *OHOS::MMI::HdfEventManager::HdfLibinputInit()
     MMI_LOGD("HdfLibinputInit function end");
     return globleThis_->hdiinput_;
 }
-int32_t OHOS::MMI::HdfEventManager::HdfDevHandle(int32_t index, hdf_event_type cmd)
+int32_t HdfEventManager::HdfDevHandle(int32_t index, hdf_event_type cmd)
 {
     if (cmd != HDF_ADD_DEVICE) {
         MMI_LOGD("HdfRmv function start");
@@ -483,20 +484,22 @@ int32_t OHOS::MMI::HdfEventManager::HdfDevHandle(int32_t index, hdf_event_type c
     }
     return RET_OK;
 }
-bool OHOS::MMI::HdfEventManager::Init()
+bool HdfEventManager::Init()
 {
     return true;
 }
-OHOS::MMI::HdfEventManager  hdfEventManager;
+HdfEventManager  hdfEventManager;
 extern "C" libinput *HdfAdfInit()
 {
     MMI_LOGD("HdfAdfInit function start");
     return hdfEventManager.HdfLibinputInit();
 }
 
-extern "C" int32_t HdfDevHandle(int32_t index, OHOS::MMI::hdf_event_type cmd)
+extern "C" int32_t HdfDevHandle(int32_t index, hdf_event_type cmd)
 {
     MMI_LOGD("HdfDevHandle function start index:%{public}d,cmd:%{public}d", index, cmd);
     return hdfEventManager.HdfDevHandle(index, cmd);
 }
 #endif
+} // namespace MMI
+} // namespace OHOS
