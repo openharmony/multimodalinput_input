@@ -14,11 +14,15 @@
  */
 #ifndef UDS_SESSION_H
 #define UDS_SESSION_H
+
+#include <memory>
+
 #include <sys/socket.h>
 #include <sys/un.h>
-#include <memory>
-#include "net_packet.h"
+
 #include "nocopyable.h"
+
+#include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {

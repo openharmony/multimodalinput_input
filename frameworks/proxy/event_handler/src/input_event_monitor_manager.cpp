@@ -14,9 +14,12 @@
  */
 
 #include "input_event_monitor_manager.h"
+
 #include <cinttypes>
+
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+
 
 namespace OHOS {
 namespace MMI {

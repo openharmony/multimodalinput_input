@@ -13,8 +13,10 @@
  * limitations under the License.
  */
 
-#include "stream_buffer.h"
 #include <gtest/gtest.h>
+
+#include "stream_buffer.h"
+
 
 namespace OHOS {
 namespace MMI {

@@ -12,21 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "klog.h"
+
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <cstdarg>
+#include <ctime>
+#include <cerrno>
+
+#include <fcntl.h>
+#include <pthread.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-#include <pthread.h>
-#include <cstdarg>
-#include <ctime>
-#include <cerrno>
-#include "securec.h"
+
 #include "hilog/log.h"
+#include "securec.h"
+
 
 namespace OHOS {
 namespace MMI {

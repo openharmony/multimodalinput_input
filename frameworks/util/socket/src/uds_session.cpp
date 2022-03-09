@@ -14,9 +14,11 @@
  */
 
 #include "uds_session.h"
-#include <sstream>
-#include <fcntl.h>
+
 #include <cinttypes>
+#include <sstream>
+
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/un.h>
 #include <unistd.h>

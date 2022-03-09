@@ -14,7 +14,9 @@
  */
 
 #include "standardized_event_manager.h"
+
 #include <sstream>
+
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "immi_token.h"

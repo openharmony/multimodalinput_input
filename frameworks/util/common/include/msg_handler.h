@@ -15,8 +15,9 @@
 #ifndef MSG_HANDLER_H
 #define MSG_HANDLER_H
 
-#include <map>
 #include <functional>
+#include <map>
+
 #include "proto.h"
 
 namespace OHOS {
