@@ -265,7 +265,6 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
         delete monitorInfo;
         monitorInfo = nullptr;
         MMI_LOGD("Callback has deleted, size: %{public}zu", info.size());
-        ++iter;
     }
     MMI_LOGD("Callback size: %{public}zu", info.size());
     return JS_CALLBACK_EVENT_SUCCESS;
