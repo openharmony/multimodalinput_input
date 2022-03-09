@@ -23,7 +23,7 @@ class SendMessage {
 public:
     SendMessage() = default;
     ~SendMessage() = default;
-    int32_t GetDevIndexName(const std::string& deviceName) const;
+    int32_t GetDevIndexName(const std::string& deviceName);
 private:
     static constexpr int64_t INJECT_SLEEP_TIMES = 10;
 };
