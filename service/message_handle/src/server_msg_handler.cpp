@@ -158,7 +158,7 @@ int32_t ServerMsgHandler::OnDump(SessionPtr sess, NetPacket& pkt)
 
 int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t eventId = 0;
     pkt >> eventId;
@@ -168,7 +168,6 @@ int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
         return PACKET_READ_FAIL;
     }
     sess->DelEvents(eventId);
-    MMI_LOGD("end");
     return RET_OK;
 }
 
@@ -215,7 +214,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
 
 int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != RET_OK) {
@@ -227,13 +226,12 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
         MMI_LOGE("HandlePointerEvent failed");
         return RET_ERR;
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
 
     std::vector<PhysicalDisplayInfo> physicalDisplays;
@@ -284,7 +282,6 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     }
 
     InputWindowsManager::GetInstance()->UpdateDisplayInfo(physicalDisplays, logicalDisplays);
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
@@ -379,7 +376,7 @@ int32_t ServerMsgHandler::OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
 
 int32_t ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket& pkt)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData = 0;
     if (!pkt.Read(userData)) {
@@ -407,13 +404,12 @@ int32_t ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket& pkt)
         MMI_LOGE("Sending failed");
         return MSG_SEND_FAIL;
     }
-    MMI_LOGD("end");
     return RET_OK;
 }
 
 int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData = 0;
     if (!pkt.Read(userData)) {
@@ -477,7 +473,6 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
         MMI_LOGE("Sending failed");
         return MSG_SEND_FAIL;
     }
-    MMI_LOGD("end");
     return RET_OK;
 }
 
@@ -500,7 +495,7 @@ int32_t ServerMsgHandler::OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt
 
 int32_t ServerMsgHandler::OnAddInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t eventType = 0;
     pkt >> eventType;
