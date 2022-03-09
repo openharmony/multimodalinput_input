@@ -147,14 +147,14 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
     return RET_OK;
 }
 
-int32_t StandardizedEventManager::GetDeviceIds(int32_t userData)
+int32_t StandardizedEventManager::GetDeviceIds(int32_t userData) const
 {
     OHOS::MMI::NetPacket pkt(MmiMessageId::INPUT_DEVICE_IDS);
     pkt << userData;
     return SendMsg(pkt);
 }
 
-int32_t StandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId)
+int32_t StandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId) const
 {
     OHOS::MMI::NetPacket pkt(MmiMessageId::INPUT_DEVICE);
     pkt << userData << deviceId;

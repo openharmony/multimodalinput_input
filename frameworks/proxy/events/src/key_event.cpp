@@ -544,7 +544,7 @@ void KeyEvent::AddKeyItem(const KeyItem& keyItem)
     keys_.push_back(keyItem);
 }
 
-std::vector<KeyEvent::KeyItem> KeyEvent::GetKeyItems()
+std::vector<KeyEvent::KeyItem> KeyEvent::GetKeyItems() const
 {
     return keys_;
 }

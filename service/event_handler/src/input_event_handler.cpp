@@ -211,7 +211,7 @@ void InputEventHandler::OnCheckEventReport()
              "lostTime:%{public}" PRId64, idSeed_, eventType_, initSysClock_, lostTime);
 }
 
-UDSServer* InputEventHandler::GetUDSServer()
+UDSServer* InputEventHandler::GetUDSServer() const
 {
     return udsServer_;
 }

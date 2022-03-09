@@ -30,7 +30,7 @@ public:
     static napi_value Export(napi_env env, napi_value exports);
     static napi_value GetDeviceIds(napi_env env, napi_callback_info info);
     static napi_value GetDevice(napi_env env, napi_callback_info info);
-    std::shared_ptr<JsInputDeviceManager> GetJsInputDeviceMgr();
+    std::shared_ptr<JsInputDeviceManager> GetJsInputDeviceMgr() const;
     napi_ref contextRef_ {nullptr};
 
 private:

@@ -51,7 +51,7 @@ std::string AbilityLaunchManager::GenerateKey(const ShortcutKey& key)
     return std::string(oss.str());
 }
 
-std::string AbilityLaunchManager::GetConfigFilePath()
+std::string AbilityLaunchManager::GetConfigFilePath() const
 {
     std::string defaultConfig = "/product/multimodalinput/ability_launch_config.json";
     return FileExists(defaultConfig) ? defaultConfig : "/system/etc/multimodalinput/ability_launch_config.json";
