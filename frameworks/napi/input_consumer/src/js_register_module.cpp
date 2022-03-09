@@ -13,23 +13,25 @@
  * limitations under the License.
  */
 
+#include "js_register_module.h"
+
 #include <algorithm>
 #include <cinttypes>
+
 #include "input_manager.h"
 #include "js_register_util.h"
-#include "js_register_module.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
-    constexpr size_t EVENT_NAME_LEN = 64;
-    constexpr size_t ARGC_NUM = 3;
-    constexpr size_t ARGV_FIRST = 0;
-    constexpr size_t ARGV_SECOND = 1;
-    constexpr size_t ARGV_THIRD = 2;
-    constexpr size_t PRE_KEYS_SIZE = 4;
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
+constexpr size_t EVENT_NAME_LEN = 64;
+constexpr size_t ARGC_NUM = 3;
+constexpr size_t ARGV_FIRST = 0;
+constexpr size_t ARGV_SECOND = 1;
+constexpr size_t ARGV_THIRD = 2;
+constexpr size_t PRE_KEYS_SIZE = 4;
+} // namespace
 
 static Callbacks callbacks = {};
 
@@ -143,7 +145,7 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
     return SUCCESS_CODE;
 }
 
-static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_LOGD("enter");
     CHKPF(monitorInfo);
@@ -153,7 +155,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     int32_t infoFinalKey = keyOption->GetFinalKey();
     int32_t keyEventFinalKey = keyEvent->GetKeyCode();
     MMI_LOGD("infoFinalKey:%{public}d,keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
-    if (infoFinalKey != keyEventFinalKey || items.size() > 4) {
+    if (infoFinalKey != keyEventFinalKey || items.size() > PRE_KEY_MAX_COUNT) {
         MMI_LOGD("%{public}d", __LINE__);
         return false;
     }
@@ -191,7 +193,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     return count == infoSize;
 }
 
-static void SubKeyEventCallback(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_LOGD("enter");
     CHKPV(keyEvent);

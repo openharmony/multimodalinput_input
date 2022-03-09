@@ -44,34 +44,69 @@ public:
 MMIClient mmiClient;
 ConnectCallback connectFun;
 
+/**
+ * @tc.name:RegisterConnectedFunction
+ * @tc.desc:Verify register connected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(MMIClientTest, RegisterConnectedFunction, TestSize.Level1)
 {
     mmiClient.RegisterConnectedFunction(connectFun);
 }
 
+/**
+ * @tc.name:RegisterConnectedFunction
+ * @tc.desc:Verify register disconnected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(MMIClientTest, RegisterDisconnectedFunction, TestSize.Level1)
 {
     mmiClient.RegisterDisconnectedFunction(connectFun);
 }
 
+/**
+ * @tc.name:VirtualKeyIn
+ * @tc.desc:Verify virtual key in
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(MMIClientTest, VirtualKeyIn, TestSize.Level1)
 {
     RawInputEvent virtualKeyEvent = {};
     mmiClient.VirtualKeyIn(virtualKeyEvent);
 }
 
-
 MMIClientUnitTest mmiClientTest;
+/**
+ * @tc.name:Re_RegisterConnectedFunction
+ * @tc.desc:Verify register connetct
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(MMIClientTest, Re_RegisterConnectedFunction, TestSize.Level1)
 {
     mmiClientTest.RegisterConnectedFunction(connectFun);
 }
 
+/**
+ * @tc.name:Re_RegisterDisconnectedFunction
+ * @tc.desc:Verify register disconnetct
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(MMIClientTest, Re_RegisterDisconnectedFunction, TestSize.Level1)
 {
     mmiClientTest.RegisterDisconnectedFunction(connectFun);
 }
 
+/**
+ * @tc.name:Re_VirtualKeyIn
+ * @tc.desc:Verify virtual key in
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(MMIClientTest, Re_VirtualKeyIn, TestSize.Level1)
 {
     RawInputEvent virtualKeyEvent = {};
@@ -82,6 +117,13 @@ HWTEST_F(MMIClientTest, Re_OnConnected, TestSize.Level1)
 {
     mmiClientTest.OnConnectedUnitTest();
 }
+
+/**
+ * @tc.name:Re_OnConnected_002
+ * @tc.desc:Verify connnected unit
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(MMIClientTest, Re_OnConnected_002, TestSize.Level1)
 {
     ConnectCallback funTmp;
@@ -89,11 +131,23 @@ HWTEST_F(MMIClientTest, Re_OnConnected_002, TestSize.Level1)
     mmiClientTest.OnConnectedUnitTest();
 }
 
+/**
+ * @tc.name:Re_OnDisconnected
+ * @tc.desc:Verify disconnnected unit
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(MMIClientTest, Re_OnDisconnected, TestSize.Level1)
 {
     mmiClientTest.OnDisconnectedUnitTest();
 }
 
+/**
+ * @tc.name:Re_OnDisconnected_002
+ * @tc.desc:Verify disconnnected unit
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(MMIClientTest, Re_OnDisconnected_002, TestSize.Level1)
 {
     ConnectCallback funTmp;

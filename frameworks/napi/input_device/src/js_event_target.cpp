@@ -35,7 +35,7 @@ int32_t JsEventTarget::userData_ = 0;
 
 void JsEventTarget::CallIdsAsyncWork(napi_env env, napi_status status, void* data)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     napi_handle_scope scope = nullptr;
     napi_status status_ = napi_open_handle_scope(env, &scope);
     if (status_ != napi_ok) {
@@ -108,12 +108,11 @@ void JsEventTarget::CallIdsAsyncWork(napi_env env, napi_status status, void* dat
         MMI_LOGE("failed to close scope");
         return;
     }
-    MMI_LOGD("end");
 }
 
 void JsEventTarget::EmitJsIdsAsync(int32_t userData, std::vector<int32_t> ids)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     if (CheckEnv(env_)) {
         MMI_LOGE("env_ is nullptr");
         return;
@@ -145,12 +144,11 @@ void JsEventTarget::EmitJsIdsAsync(int32_t userData, std::vector<int32_t> ids)
         MMI_LOGE("call to napi_queue_async_work failed");
         return;
     }
-    MMI_LOGD("end");
 }
 
 void JsEventTarget::CallDevAsyncWork(napi_env env, napi_status status, void* data)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     napi_handle_scope scope = nullptr;
     napi_status status_ = napi_open_handle_scope(env, &scope);
     if (status_ != napi_ok) {
@@ -284,12 +282,11 @@ void JsEventTarget::CallDevAsyncWork(napi_env env, napi_status status, void* dat
         MMI_LOGE("failed to close scope");
         return;
     }
-    MMI_LOGD("end");
 }
 
 void JsEventTarget::EmitJsDevAsync(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     if (CheckEnv(env_)) {
         MMI_LOGE("env_ is nullptr");
         return;
@@ -322,12 +319,11 @@ void JsEventTarget::EmitJsDevAsync(int32_t userData, std::shared_ptr<InputDevice
         MMI_LOGE("call to napi_queue_async_work failed");
         return;
     }
-    MMI_LOGD("end");
 }
 
 void JsEventTarget::CallIdsPromiseWork(napi_env env, napi_status status, void* data)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     napi_handle_scope scope = nullptr;
     napi_status status_ = napi_open_handle_scope(env, &scope);
     if (status_ != napi_ok) {
@@ -385,12 +381,11 @@ void JsEventTarget::CallIdsPromiseWork(napi_env env, napi_status status, void* d
         MMI_LOGE("failed to close scope");
         return;
     }
-    MMI_LOGD("end");
 }
 
 void JsEventTarget::EmitJsIdsPromise(int32_t userData, std::vector<int32_t> ids)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     if (CheckEnv(env_)) {
         MMI_LOGE("env_ is nullptr");
         return;
@@ -425,12 +420,11 @@ void JsEventTarget::EmitJsIdsPromise(int32_t userData, std::vector<int32_t> ids)
         MMI_LOGE("call to napi_queue_async_work failed");
         return;
     }
-    MMI_LOGD("end");
 }
 
 void JsEventTarget::CallDevPromiseWork(napi_env env, napi_status status, void* data)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     napi_handle_scope scope = nullptr;
     napi_status status_ = napi_open_handle_scope(env, &scope);
     if (status_ != napi_ok) {
@@ -554,12 +548,11 @@ void JsEventTarget::CallDevPromiseWork(napi_env env, napi_status status, void* d
         MMI_LOGE("failed to close scope");
         return;
     }
-    MMI_LOGD("end");
 }
 
 void JsEventTarget::EmitJsDevPromise(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     if (CheckEnv(env_)) {
         MMI_LOGE("env_ is nullptr");
         return;
@@ -593,7 +586,6 @@ void JsEventTarget::EmitJsDevPromise(int32_t userData, std::shared_ptr<InputDevi
         MMI_LOGE("call to napi_queue_async_work failed");
         return;
     }
-    MMI_LOGD("end");
 }
 
 napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle)
