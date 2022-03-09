@@ -35,7 +35,7 @@ public:
     void OnEvent(void *event);
     void OnCheckEventReport();
     int32_t OnMouseEventEndTimerHandler(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
-    UDSServer *GetUDSServer();
+    UDSServer *GetUDSServer() const;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
 protected:
     int32_t OnEventDeviceAdded(libinput_event *event);
@@ -47,16 +47,13 @@ protected:
     int32_t OnEventGesture(libinput_event *event);
     int32_t OnEventTouchpad(libinput_event *event);
     int32_t OnGestureEvent(libinput_event *event);
-    int32_t OnKeyboardEvent(libinput_event *event);
-    int32_t OnKeyEventDispatch(libinput_event *event);
+    int32_t OnEventKey(libinput_event *event);
     
     int32_t OnMouseEventHandler(struct libinput_event *event);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
 
 private:
     int32_t OnEventHandler(libinput_event *event);
-    int32_t OnEventKey(struct libinput_event *event);
-    std::mutex mu_;
     UDSServer *udsServer_ = nullptr;
     EventDispatch eventDispatch_;
     EventPackage eventPackage_;

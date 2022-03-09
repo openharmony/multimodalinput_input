@@ -29,6 +29,12 @@ public:
     static void TearDownTestCase(void) {}
 };
 
+/**
+ * @tc.name:Test_GetDevIndexName
+ * @tc.desc:Verify SendMessage function GetDevIndexName
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(SendMessageTest, Test_GetDevIndexName, TestSize.Level1)
 {
     SendMessage sendMessage;

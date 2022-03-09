@@ -61,7 +61,7 @@ private:
 void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
     const std::vector<LogicalDisplayInfo> &logicalDisplays)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (physicalDisplays.empty() || logicalDisplays.empty()) {
         MMI_LOGE("display info check failed! physicalDisplays size:%{public}zu,logicalDisplays size:%{public}zu",
             physicalDisplays.size(), logicalDisplays.size());
@@ -72,12 +72,11 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
     logicalDisplays_ = logicalDisplays;
     PrintDisplayDebugInfo();
     SendDisplayInfo();
-    MMI_LOGD("leave");
 }
 
 int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (eventFilterService_ == nullptr) {
         eventFilterService_ = new (std::nothrow) EventFilterService();
         CHKPR(eventFilterService_, RET_ERR);
@@ -101,23 +100,20 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
         MMI_LOGI("AddInputEventFilter has send to server success");
         return RET_OK;
     }
-
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
-void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::IInputEventConsumer> inputEventConsumer)
+void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     MMIEventHdl.GetMultimodeInputInfo();
     CHKPV(inputEventConsumer);
     consumer_ = inputEventConsumer;
-    MMI_LOGD("leave");
 }
 
-void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPV(keyEvent);
     int32_t getKeyCode = keyEvent->GetKeyCode();
     MMI_LOGD("client trace getKeyCode:%{public}d", getKeyCode);
@@ -129,13 +125,11 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     if (consumer_ != nullptr) {
         CHKPV(keyEvent);
         consumer_->OnInputEvent(keyEvent);
-        MMI_LOGD("leave");
         return;
     }
-    MMI_LOGD("Leave");
 }
 
-void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
+void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Pointer event received, processing");
     CHKPV(pointerEvent);
@@ -155,11 +149,9 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> p
         consumer_->OnInputEvent(pointerEvent);
         return;
     }
-
-    MMI_LOGD("leave");
 }
 
-int32_t InputManagerImpl::PackDisplayData(OHOS::MMI::NetPacket &pkt)
+int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 {
     if (PackPhysicalDisplay(pkt) == RET_ERR) {
         MMI_LOGE("pack physical display failed");
@@ -430,7 +422,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
     }
 }
 
-void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
     if (MMIEventHdl.InjectEvent(keyEvent) != RET_OK) {
@@ -438,7 +430,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> k
     }
 }
 
-void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
+void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     if (MultimodalEventHandler::GetInstance().InjectPointerEvent(pointerEvent) != RET_OK) {
@@ -448,8 +440,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::PointerEven
 
 void InputManagerImpl::OnConnected()
 {
-    MMI_LOGD("enter");
-
+    CALL_LOG_ENTER;
     if (physicalDisplays_.empty() || logicalDisplays_.empty()) {
         MMI_LOGE("display info check failed! physicalDisplays_ size:%{public}zu,logicalDisplays_ size:%{public}zu",
             physicalDisplays_.size(), logicalDisplays_.size());
@@ -457,7 +448,6 @@ void InputManagerImpl::OnConnected()
     }
     PrintDisplayDebugInfo();
     SendDisplayInfo();
-    MMI_LOGD("leave");
 }
 
 void InputManagerImpl::SendDisplayInfo()
@@ -467,7 +457,7 @@ void InputManagerImpl::SendDisplayInfo()
         return;
     }
 
-    OHOS::MMI::NetPacket pkt(MmiMessageId::DISPLAY_INFO);
+    NetPacket pkt(MmiMessageId::DISPLAY_INFO);
     if (PackDisplayData(pkt) == RET_ERR) {
         MMI_LOGE("pack display info failed");
         return;

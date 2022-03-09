@@ -12,15 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "js_register_util.h"
+
 #include <cinttypes>
+
 #include "error_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterUtil" }; // namespace
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterUtil" };
+} // namespace
 
 void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, int32_t value)
 {
@@ -94,7 +97,7 @@ int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, con
 
 bool GetPreKeys(const napi_env &env, const napi_value &value, std::set<int32_t> &params)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     uint32_t arrayLength = 0;
     if (napi_get_array_length(env, value, &arrayLength) != napi_ok) {
         MMI_LOGE("Get array length failed");
@@ -138,7 +141,6 @@ bool GetPreKeys(const napi_env &env, const napi_value &value, std::set<int32_t> 
             return false;
         }
     }
-    MMI_LOGD("leave");
     return true;
 }
 
@@ -155,7 +157,7 @@ int32_t GetPreSubscribeId(Callbacks &callbacks, KeyEventMonitorInfo *event)
 
 int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMonitorInfo *event)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     if (callbacks.find(event->eventType) == callbacks.end()) {
         MMI_LOGD("No callback in %{public}s", event->eventType.c_str());
@@ -196,7 +198,7 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
 int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
     KeyEventMonitorInfo *event, int32_t &subscribeId)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     if (callbacks.count(event->eventType) <= 0) {
         MMI_LOGE("Callback doesn't exists");
@@ -314,7 +316,7 @@ static void AsyncWorkFn(const napi_env &env, KeyEventMonitorInfo *event, napi_va
 
 void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPV(reportEvent);
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(reportEvent->env, "AsyncCallback", NAPI_AUTO_LENGTH, &resourceName);

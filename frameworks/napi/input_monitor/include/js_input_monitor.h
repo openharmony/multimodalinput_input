@@ -20,9 +20,11 @@
 #include <mutex>
 #include <queue>
 #include <uv.h>
-#include "i_input_event_consumer.h"
+
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+
+#include "i_input_event_consumer.h"
 
 namespace OHOS {
 namespace MMI {
@@ -80,7 +82,7 @@ public:
 
     int32_t IsMatch(napi_env jsEnv);
 
-    int32_t GetId();
+    int32_t GetId() const;
 
     void OnPointerEventInJsThread();
 
@@ -93,9 +95,9 @@ private:
 
     int32_t TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
 
-    std::string GetAction(int32_t action);
+    std::string GetAction(int32_t action) const;
 
-    int32_t GetJsPointerItem(const PointerEvent::PointerItem &item, napi_value value);
+    int32_t GetJsPointerItem(const PointerEvent::PointerItem &item, napi_value value) const;
 
 private:
     std::shared_ptr<InputMonitor> monitor_ {nullptr};
