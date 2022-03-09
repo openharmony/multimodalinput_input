@@ -31,7 +31,7 @@ InputEventMonitorManager::~InputEventMonitorManager() {}
 int32_t InputEventMonitorManager::AddInputEventMontior(
     std::function<void (std::shared_ptr<KeyEvent>)> keyEventMonitor)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPR(keyEventMonitor, INVALID_MONITOR_ID);
     int32_t ret = MMIEventHdl.AddInputEventMontior(InputEvent::EVENT_TYPE_KEY);
     if (ret != RET_OK) {
@@ -49,7 +49,7 @@ int32_t InputEventMonitorManager::AddInputEventMontior(
 
 void InputEventMonitorManager::RemoveInputEventMontior(int32_t monitorId)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (monitorId < 0) {
         MMI_LOGE("MonitorId invalid");
         return;
@@ -84,7 +84,6 @@ int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(
     monitors_.push_back(monitorItem);
     MMI_LOGD("monitorId:%{public}d", monitorId);
     MMIEventHdl.AddInputEventTouchpadMontior(InputEvent::EVENT_TYPE_POINTER);
-    MMI_LOGD("leave");
     return monitorItem.id;
 }
 
@@ -108,7 +107,7 @@ void InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t monitorId
 
 int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     std::list<MonitorItem>::iterator iter;
     for (const auto &item : monitors_) {
