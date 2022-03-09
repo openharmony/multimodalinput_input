@@ -73,7 +73,6 @@ private:
     SInput input_;
     UDSServer udsServer_;
     ServerMsgHandler sMsgHandler_;
-    std::shared_ptr<InputEventHandler> inputEventHdr_ {nullptr};
     std::set<int32_t> authFds_;
 };
 } // namespace MMI
