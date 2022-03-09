@@ -21,8 +21,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-using namespace OHOS;
-using namespace OHOS::MMI;
 } // namespace
 
 class UtilTest : public testing::Test {
@@ -31,6 +29,12 @@ public:
     static void TearDownTestCase(void) {}
 };
 
+/**
+ * @tc.name:getEnumString_001
+ * @tc.desc:Verify get enum string
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UtilTest, getEnumString_001, TestSize.Level1)
 {
     const int32_t errorCodeEnum = MSG_SEND_FAIL;
@@ -38,6 +42,12 @@ HWTEST_F(UtilTest, getEnumString_001, TestSize.Level1)
     EXPECT_STREQ(retResult, "Send Message Failed");
 }
 
+/**
+ * @tc.name:getEnumString_002
+ * @tc.desc:Verify get enum string
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UtilTest, getEnumString_002, TestSize.Level1)
 {
     const int32_t errorCodeEnum = NON_STD_EVENT;
@@ -45,6 +55,12 @@ HWTEST_F(UtilTest, getEnumString_002, TestSize.Level1)
     EXPECT_STREQ(retResult, "Non-Standardized Event");
 }
 
+/**
+ * @tc.name:getEnumString_003
+ * @tc.desc:Verify get enum string
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UtilTest, getEnumString_003, TestSize.Level1)
 {
     const int32_t errorCodeEnum = UNKNOWN_EVENT;
@@ -52,6 +68,12 @@ HWTEST_F(UtilTest, getEnumString_003, TestSize.Level1)
     EXPECT_STREQ(retResult, "Unknown Event");
 }
 
+/**
+ * @tc.name:getEnumString_004
+ * @tc.desc:Verify get enum string
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UtilTest, getEnumString_004, TestSize.Level1)
 {
     const int32_t errorCodeEnum = UNPROC_MSG;
@@ -59,6 +81,12 @@ HWTEST_F(UtilTest, getEnumString_004, TestSize.Level1)
     EXPECT_STREQ(retResult, "Unprocessed Message");
 }
 
+/**
+ * @tc.name:getEnumString_005
+ * @tc.desc:Verify get enum string
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UtilTest, getEnumString_005, TestSize.Level1)
 {
     const int32_t errorCodeEnum = UNKNOWN_MSG_ID;
@@ -66,78 +94,132 @@ HWTEST_F(UtilTest, getEnumString_005, TestSize.Level1)
     EXPECT_STREQ(retResult, "Unknown Message Id");
 }
 
-HWTEST_F(UtilTest, GetEnv, TestSize.Level1)
-{
-    std::string retResult = OHOS::MMI::GetEnv("123");
-    EXPECT_STREQ(retResult.c_str(), "");
-}
-
+/**
+ * @tc.name:GetMicrotime
+ * @tc.desc:Verify get micro time
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UtilTest, GetMicrotime, TestSize.Level1)
 {
-    int64_t retResult = OHOS::MMI::GetMicrotime();
+    int64_t retResult = GetMicrotime();
     EXPECT_TRUE(retResult > 0);
 }
 
+/**
+ * @tc.name:GetMillisTime
+ * @tc.desc:Verify get millis time
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UtilTest, GetMillisTime, TestSize.Level1)
 {
-    int64_t retResult = OHOS::MMI::GetMillisTime();
+    int64_t retResult = GetMillisTime();
     EXPECT_TRUE(retResult > 0);
 }
 
+/**
+ * @tc.name:UuIdGenerate
+ * @tc.desc:Verify generate uuid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UtilTest, UuIdGenerate, TestSize.Level1)
 {
-    std::string retResult = OHOS::MMI::UuIdGenerate();
+    std::string retResult = UuIdGenerate();
     EXPECT_TRUE(retResult.length() == 0);
 }
 
+/**
+ * @tc.name:GetUUid
+ * @tc.desc:Verify get uuid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UtilTest, GetUUid, TestSize.Level1)
 {
-    std::string retResult = OHOS::MMI::GetUUid();
+    std::string retResult = GetUUid();
     EXPECT_TRUE(retResult.length() >= 0);
 }
 
+/**
+ * @tc.name:GetThisThreadIdOfString
+ * @tc.desc:Verify get thread id
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UtilTest, GetThisThreadIdOfString, TestSize.Level1)
 {
-    std::string retResult = OHOS::MMI::GetThisThreadIdOfString();
+    std::string retResult = GetThisThreadIdOfString();
     EXPECT_TRUE(retResult.length() >= 0);
 }
 
+/**
+ * @tc.name:GetThisThreadIdOfLL
+ * @tc.desc:Verify get thread id
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UtilTest, GetThisThreadIdOfLL, TestSize.Level1)
 {
     uint64_t retResult = GetThisThreadIdOfLL();
     EXPECT_TRUE(retResult >= 0);
 }
 
+/**
+ * @tc.name:StringToken_001
+ * @tc.desc:Verify string token
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UtilTest, StringToken_001, TestSize.Level1)
 {
     std::string str = "sdf_wef_1";
     const std::string sep = "sdf_wef_1.sss";
     std::string token = "_";
-    OHOS::MMI::StringToken(str, sep, token);
+    StringToken(str, sep, token);
 }
 
+/**
+ * @tc.name:StringToken_002
+ * @tc.desc:Verify string token
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UtilTest, StringToken_002, TestSize.Level1)
 {
     std::string str = { 0 };
     const std::string sep;
     std::string token;
-    OHOS::MMI::StringToken(str, sep, token);
+    StringToken(str, sep, token);
 }
 
+/**
+ * @tc.name:StringToken_003
+ * @tc.desc:Verify string token
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UtilTest, StringToken_003, TestSize.Level1)
 {
     std::string str = { 0, 1, 2, 3 };
     const std::string sep = { 2 };
     std::string token;
-    OHOS::MMI::StringToken(str, sep, token);
+    StringToken(str, sep, token);
 }
 
+/**
+ * @tc.name:StringSplit
+ * @tc.desc:Verify string token
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UtilTest, StringSplit, TestSize.Level1)
 {
     const std::string str;
     const std::string sep;
     std::vector<std::string> vecList;
-    OHOS::MMI::StringSplit(str, sep, vecList);
+    StringSplit(str, sep, vecList);
 }
 } // namespace MMI
 } // namespace OHOS

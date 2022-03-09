@@ -385,19 +385,19 @@ bool MMIService::InitSignalHandler()
     sigset_t mask = {0};
     int32_t retCode = sigfillset(&mask);
     if (retCode < 0) {
-        MMI_LOGE("fill signal set failed:%{public}s", strerror(errno));
+        MMI_LOGE("fill signal set failed:%{public}d", errno);
         return false;
     }
 
     retCode = sigprocmask(SIG_SETMASK, &mask, nullptr);
     if (retCode < 0) {
-        MMI_LOGE("sigprocmask failed:%{public}s", strerror(errno));
+        MMI_LOGE("sigprocmask failed:%{public}d", errno);
         return false;
     }
 
     int32_t fdSignal = signalfd(-1, &mask, SFD_NONBLOCK|SFD_CLOEXEC);
     if (fdSignal < 0) {
-        MMI_LOGE("signal fd failed:%{public}s", strerror(errno));
+        MMI_LOGE("signal fd failed:%{public}d", errno);
         return false;
     }
 
@@ -418,12 +418,9 @@ void MMIService::OnSignalEvent(int32_t signalFd)
     signalfd_siginfo sigInfo;
     int32_t size = ::read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
     if (size != sizeof(signalfd_siginfo)) {
-        const int errnoSaved = errno;
-        MMI_LOGE("read signal info faild, invalid size:%{public}d,errno:%{public}d,%{public}s",
-            size, errnoSaved, strerror(errnoSaved));
+        MMI_LOGE("read signal info faild, invalid size:%{public}d,errno:%{public}d", size, errno);
         return;
     }
-
     int32_t signo = sigInfo.ssi_signo;
     MMI_LOGD("receive signal:%{public}d", signo);
     switch (signo) {
@@ -443,6 +440,5 @@ void MMIService::OnSignalEvent(int32_t signalFd)
     }
     MMI_LOGD("leave");
 }
-
 } // namespace MMI
 } // namespace OHOS

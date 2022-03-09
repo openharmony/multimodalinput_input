@@ -71,7 +71,6 @@ private:
         void Monitor(std::shared_ptr<PointerEvent> pointerEvent);
         void OnSessionLost(SessionPtr session);
 
-        std::mutex lockMonitors_;
         std::set<SessionHandler> monitors_;
         std::shared_ptr<PointerEvent> lastPointerEvent_ = nullptr;
         int32_t downEventId_ { -1 };

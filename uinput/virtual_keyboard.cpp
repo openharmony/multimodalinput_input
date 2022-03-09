@@ -16,6 +16,8 @@
 #include "virtual_keyboard.h"
 #include <linux/input.h>
 #include <linux/uinput.h>
+namespace OHOS {
+namespace MMI {
 VirtualKeyboard::VirtualKeyboard() : VirtualDevice("VSoC keyboard", 0x6008) {}
 
 const std::vector<uint32_t>& VirtualKeyboard::GetEventTypes() const
@@ -28,3 +30,5 @@ const std::vector<uint32_t>& VirtualKeyboard::GetKeys() const
     static const std::vector<uint32_t> keys {KEY_BACK};
     return keys;
 }
+} // namespace MMI
+} // namespace OHOS

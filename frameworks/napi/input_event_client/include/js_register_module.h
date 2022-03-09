@@ -14,14 +14,18 @@
  */
 #ifndef JS_REGISTER_MODULE_H
 #define JS_REGISTER_MODULE_H
+
 #include <cstdio>
-#include <map>
-#include <list>
 #include <cstring>
 #include <iostream>
+#include <list>
+#include <map>
+
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "libmmi_util.h"
 #include "utils/log.h"
+
 #include "client_msg_handler.h"
+#include "libmmi_util.h"
+
 #endif // JS_REGISTER_MODULE_H

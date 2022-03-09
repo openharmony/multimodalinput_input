@@ -62,7 +62,7 @@ public:
 private:
     void ResolveConfig(std::string configFile);
     bool ConvertToShortcutKey(const json &jsonData, ShortcutKey &shortcutKey);
-    std::string GetConfigFilePath();
+    std::string GetConfigFilePath() const;
     void LaunchAbility(ShortcutKey key);
     std::string GenerateKey(const ShortcutKey& key);
     bool PackageAbility(const json &jsonStr, Ability &ability);

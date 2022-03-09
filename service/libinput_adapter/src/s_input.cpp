@@ -32,7 +32,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SInpu
 static void HiLogFunc(struct libinput* input, enum libinput_log_priority priority, const char* fmt, va_list args)
 {
     char buffer[256];
-    (void)vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args);
+    int ret = vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args);
+    if (ret == -1) {
+        MMI_LOGE("call vsnprintf_s fail, ret:%{public}d", ret);
+        va_end(args);
+        return;
+    }
     MMI_LOGE("PrintLog_Info:%{public}s", buffer);
     va_end(args);
 }
@@ -57,7 +62,6 @@ void SInput::LoginfoPackagingTool(struct libinput_event *event)
 
 constexpr static libinput_interface LIBINPUT_INTERFACE = {
     .open_restricted = [](const char *path, int32_t flags, void *user_data)->int32_t {
-        using namespace OHOS::MMI;
         CHKPR(path, errno);
         char realPath[PATH_MAX] = {};
         if (realpath(path, realPath) == nullptr) {
@@ -70,7 +74,6 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
     },
     .close_restricted = [](int32_t fd, void *user_data)
     {
-        using namespace OHOS::MMI;
         MMI_LOGI("libinput .close_restricted fd:%{public}d", fd);
         close(fd);
     },
