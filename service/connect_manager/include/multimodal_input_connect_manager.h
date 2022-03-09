@@ -20,8 +20,8 @@
 #include <map>
 #include <set>
 #include <string>
-
 #include "i_multimodal_input_connect.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -34,10 +34,7 @@ public:
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
 private:
     MultimodalInputConnectManager() = default;
-    MultimodalInputConnectManager(const MultimodalInputConnectManager &manager) = delete;
-    MultimodalInputConnectManager& operator=(const MultimodalInputConnectManager &manager) = delete;
-    MultimodalInputConnectManager(const MultimodalInputConnectManager &&manager) = delete;
-    MultimodalInputConnectManager& operator=(const MultimodalInputConnectManager &&manager) = delete;
+    DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);
 
     bool ConnectMultimodalInputService();
     void OnDeath();

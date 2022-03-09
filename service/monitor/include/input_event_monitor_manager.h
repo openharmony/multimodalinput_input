@@ -51,7 +51,6 @@ public:
     bool ReportTouchpadEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
 
 private:
-    std::mutex mu_;
     std::list<MonitorItem> monitors_;
     std::list<MonitorItem> monitorsTouch_;
 

@@ -148,7 +148,6 @@ void InputEventHandler::Init(UDSServer& udsServer)
 void InputEventHandler::OnEvent(void *event)
 {
     CHKPV(event);
-    std::lock_guard<std::mutex> lock(mu_);
     auto *lpEvent = static_cast<libinput_event *>(event);
     CHKPV(lpEvent);
     if (initSysClock_ != 0 && lastSysClock_ == 0) {
@@ -199,7 +198,6 @@ int32_t InputEventHandler::OnEventHandler(libinput_event *event)
 
 void InputEventHandler::OnCheckEventReport()
 {
-    std::lock_guard<std::mutex> lock(mu_);
     if (initSysClock_ == 0 || lastSysClock_ != 0) {
         return;
     }

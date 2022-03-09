@@ -55,8 +55,8 @@ bool ServerMsgHandler::Init(UDSServer& udsServer)
 #endif
     MsgCallback funs[] = {
         {MmiMessageId::ON_VIRTUAL_KEY, MsgCallbackBind2(&ServerMsgHandler::OnVirtualKeyEvent, this)},
-        {MmiMessageId::NEW_CHECK_REPLY_MESSAGE,
-            MsgCallbackBind2(&ServerMsgHandler::NewCheckReplyMessageFormClient, this)},
+        {MmiMessageId::MARK_PROCESS,
+            MsgCallbackBind2(&ServerMsgHandler::MarkProcessed, this)},
         {MmiMessageId::ON_DUMP, MsgCallbackBind2(&ServerMsgHandler::OnDump, this)},
         {MmiMessageId::GET_MMI_INFO_REQ, MsgCallbackBind2(&ServerMsgHandler::GetMultimodeInputInfo, this)},
         {MmiMessageId::INJECT_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectKeyEvent, this) },
@@ -156,17 +156,18 @@ int32_t ServerMsgHandler::OnDump(SessionPtr sess, NetPacket& pkt)
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::NewCheckReplyMessageFormClient(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
 {
     MMI_LOGD("begin");
     CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t id = 0;
-    pkt >> id;
+    int32_t eventId = 0;
+    pkt >> eventId;
+    MMI_LOGD("event is: %{public}d", eventId);
     if (pkt.ChkRWError()) {
         MMI_LOGE("Packet read data failed");
         return PACKET_READ_FAIL;
     }
-    sess->DelEvents(id);
+    sess->DelEvents(eventId);
     MMI_LOGD("end");
     return RET_OK;
 }
