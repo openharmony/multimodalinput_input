@@ -59,7 +59,7 @@ protected:
 private:
     UDSServer *udsServer_ = nullptr; // External references, do not delete
     EventDispatch eventDispatch_;
-    std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent_ = nullptr;
+    std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS

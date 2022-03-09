@@ -38,7 +38,7 @@ enum EpollEventType {
 
 struct StreamBufData {
     bool isOverflow = false;
-    OHOS::MMI::StreamBuffer sBuf;
+    StreamBuffer sBuf;
 };
 using MsgServerFunCallback = std::function<void(SessionPtr, NetPacket&)>;
 class UDSServer : public UDSSocket, public IUdsServer {

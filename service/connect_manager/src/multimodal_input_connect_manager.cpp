@@ -53,7 +53,7 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
         return RET_ERR;
     }
 
-    const std::string programName(OHOS::MMI::GetProgramName());
+    const std::string programName(GetProgramName());
     int32_t result = multimodalInputConnectService_->AllocSocketFd(programName, moduleType, socketFd_);
     if (result != RET_OK) {
         MMI_LOGE("AllocSocketFd has error:%{public}d", result);

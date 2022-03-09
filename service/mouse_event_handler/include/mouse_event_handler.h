@@ -46,8 +46,8 @@ private:
     double absolutionY_ = -1;
     int32_t buttionId_ = -1;
 };
+
+#define MouseEventHdr MouseEventHandler::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define MouseEventHdr OHOS::MMI::MouseEventHandler::GetInstance()
-
 #endif // MOUSE_EVENT_HANDLER_H

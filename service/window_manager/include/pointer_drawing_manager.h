@@ -58,7 +58,8 @@ private:
     int32_t displayHeight_;
     bool hasPointerDevice_ { false };
 };
+
+#define PointerDrawMgr PointerDrawingManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define PointerDrawMgr OHOS::MMI::PointerDrawingManager::GetInstance()
 #endif // POINTER_DRAWING_MANAGER_H
