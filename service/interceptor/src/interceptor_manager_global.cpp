@@ -31,7 +31,6 @@ InterceptorManagerGlobal::~InterceptorManagerGlobal() {}
 void InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
 {
     MMI_LOGD("enter");
-    std::lock_guard<std::mutex> lock(mu_);
     InterceptorItem interceptorItem = {};
     interceptorItem.sourceType = sourceType;
     interceptorItem.id = id;
@@ -50,7 +49,6 @@ void InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, 
 void InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
 {
     MMI_LOGD("enter");
-    std::lock_guard<std::mutex> lock(mu_);
     InterceptorItem interceptorItem = {};
     interceptorItem.id = id;
     auto iter = std::find(interceptors_.begin(), interceptors_.end(), interceptorItem);

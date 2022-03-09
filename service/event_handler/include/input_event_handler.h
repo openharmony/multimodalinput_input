@@ -56,7 +56,6 @@ protected:
 private:
     int32_t OnEventHandler(libinput_event *event);
     int32_t OnEventKey(struct libinput_event *event);
-    std::mutex mu_;
     UDSServer *udsServer_ = nullptr;
     EventDispatch eventDispatch_;
     EventPackage eventPackage_;

@@ -44,7 +44,6 @@ private:
         }
     };
 private:
-    std::mutex mu_;
     std::list<InterceptorItem> interceptors_;
 };
 } // namespace MMI
