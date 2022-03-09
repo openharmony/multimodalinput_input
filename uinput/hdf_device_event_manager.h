@@ -18,7 +18,6 @@
 
 #include <iostream>
 #include <thread>
-
 #include "hdf_device_event_dispatch.h"
 #include "inject_thread.h"
 #include "input_controller.h"
@@ -28,7 +27,7 @@
 #include "keyboard_inject.h"
 
 namespace OHOS {
-namespace MMIS {
+namespace MMI {
 class HdfDeviceEventManager {
 public:
     HdfDeviceEventManager();
@@ -40,10 +39,10 @@ public:
 private:
     DeviceInfo *iDevInfo_ = nullptr;
     IInputInterface *inputInterface_ = nullptr;
-    InputEventCb callback_;
+    InputEventCb callback_ {};
     const uint32_t TOUCH_DEV_ID = 1;
 };
-} // namespace MMIS
+} // namespace MMI
 } // namespace OHOS
 
 #endif  // HDF_DEVICE_EVENT_MANAGER_H

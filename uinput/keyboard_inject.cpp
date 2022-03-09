@@ -13,23 +13,20 @@
  * limitations under the License.
  */
 
-#include "hilog/log.h"
 #include "keyboard_inject.h"
-
 #include <cstdio>
 #include <cstring>
 #include <functional>
 #include <iostream>
 #include <mutex>
-
-#include "hilog/log.h"
+#include "mmi_log.h"
 
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
-namespace MMIS {
+namespace MMI {
 namespace {
     std::shared_ptr<KeyboardInject> g_instance = nullptr;
-    constexpr HiLogLabel LABEL = { LOG_CORE, 0xD002800, "HdfDeviceEventManager" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "keyBoardInject"};
 }
 std::mutex KeyboardInject::mutex_;
 std::unique_ptr<VirtualKeyboard> g_pKeyboard = nullptr;
@@ -41,11 +38,11 @@ KeyboardInject::KeyboardInject()
     auto it = keyCodeMap_.find(INPUT_KEY_BACK);
     if (it == keyCodeMap_.end()) {
         auto ret = keyCodeMap_.insert(std::make_pair(INPUT_KEY_BACK, LINUX_KEY_BACK));
-        HiLog::Debug(LABEL, "%{public}s ret.second:%{public}d", __func__, ret.second);
+        MMI_LOGD("ret.second:%{public}d", ret.second);
     }
     injectThread_ = std::make_unique<InjectThread>();
     if (injectThread_ == nullptr) {
-        HiLog::Error(LABEL, "%{public}s injectThread_ is null", __func__);
+        MMI_LOGE("injectThread_ is null");
         return;
     }
     g_pKeyboard = std::make_unique<VirtualKeyboard>();
@@ -64,5 +61,5 @@ void KeyboardInject::InjectKeyEvent(uint16_t code, uint32_t value) const
     InjectInputEvent injectInputSync = {injectThread_->KEYBOARD_DEVICE_ID, EV_SYN, SYN_REPORT, 0};
     injectThread_->WaitFunc(injectInputSync);
 }
-} // namespace MMIS
+} // namespace MMI
 } // namespace OHOS

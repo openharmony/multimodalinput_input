@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace MMI {
-class InputHandlerManager : public Singleton<OHOS::MMI::InputHandlerManager> {
+class InputHandlerManager : public Singleton<InputHandlerManager> {
 public:
     int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer);
     void RemoveHandler(int32_t handlerId, InputHandlerType handlerType);

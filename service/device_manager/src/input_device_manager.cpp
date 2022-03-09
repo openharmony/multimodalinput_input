@@ -22,7 +22,7 @@ namespace {
     constexpr int32_t INVALID_DEVICE_ID {-1};
 }
 
-std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id)
+std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) const
 {
     MMI_LOGD("begin");
     auto item = inputDevice_.find(id);
@@ -45,7 +45,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id)
     return inputDevice;
 }
 
-std::vector<int32_t> InputDeviceManager::GetInputDeviceIds()
+std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
 {
     MMI_LOGD("begin");
     std::vector<int32_t> ids;

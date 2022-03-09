@@ -22,7 +22,7 @@ void InputDevice::SetId(int32_t deviceId)
     id_ = deviceId;
 }
 
-int32_t InputDevice::GetId()
+int32_t InputDevice::GetId() const
 {
     return id_;
 }
@@ -32,7 +32,7 @@ void InputDevice::SetName(std::string name)
     name_ = name;
 }
 
-std::string InputDevice::GetName()
+std::string InputDevice::GetName() const
 {
     return name_;
 }
@@ -42,7 +42,7 @@ void InputDevice::SetType(int32_t deviceType)
     deviceType_ = deviceType;
 }
 
-int32_t InputDevice::GetType()
+int32_t InputDevice::GetType() const
 {
     return deviceType_;
 }

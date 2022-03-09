@@ -101,4 +101,25 @@ namespace {
     MMI_LOGF(fmt, ##__VA_ARGS__); \
 } while (0)
 
+namespace OHOS {
+namespace MMI {
+class InnerFunctionTracer {
+public:
+    InnerFunctionTracer(const OHOS::HiviewDFX::HiLogLabel& label, const char *func)
+        : label_ { label }, func_ { func }
+    {
+        OHOS::HiviewDFX::HiLog::Debug(label_, "in %{public}s, enter", func_);
+    }
+    ~InnerFunctionTracer()
+    {
+        OHOS::HiviewDFX::HiLog::Debug(label_, "in %{public}s, leave", func_);
+    }
+private:
+    const OHOS::HiviewDFX::HiLogLabel& label_;
+    const char* func_ { nullptr };
+};
+} // namespace MMI
+} // namespace OHOS
+
+#define CALL_LOG_ENTER   InnerFunctionTracer ___innerFuncTracer___ { LABEL, __FUNCTION__ }
 #endif // MMI_LOG_H

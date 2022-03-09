@@ -19,12 +19,8 @@
 #include "virtual_keyboard.h"
 #include "virtual_touch_screen.h"
 
-#include <condition_variable>
-#include <mutex>
-#include <vector>
-
 namespace OHOS {
-namespace MMIS {
+namespace MMI {
 extern std::unique_ptr<VirtualTouchScreen> g_pTouchScreen;
 extern std::unique_ptr<VirtualKeyboard> g_pKeyboard;
 
@@ -49,7 +45,7 @@ private:
     static std::condition_variable conditionVariable_;
     static std::vector<InjectInputEvent> injectQueue_;
 };
-} // namespace MMIS
+} // namespace MMI
 } // namespace OHOS
 
 #endif  // INJECT_THREAD_H

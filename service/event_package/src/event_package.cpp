@@ -32,15 +32,14 @@ int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, EventKeyboar
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_keyboard_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
-    key.key = libinput_event_keyboard_get_key(data);
+    key.key = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
     if (libinput_event_keyboard_get_key_state(data) == 0) {
         key.state = KEY_STATE_RELEASED;
     } else {
         key.state = KEY_STATE_PRESSED;
     }
-    key.seat_key_count = libinput_event_keyboard_get_seat_key_count(data);
-    key.time = libinput_event_keyboard_get_time_usec(data);
-    // Ignore key events that are not seat wide state changes.
+    key.seat_key_count = static_cast<int32_t>(libinput_event_keyboard_get_seat_key_count(data));
+    key.time = static_cast<int64_t>(libinput_event_keyboard_get_time_usec(data));
     if (key.state == KEY_STATE_PRESSED && key.seat_key_count != 1) {
         MMI_LOGD("The same button is pressed on multiple devices, state:%{puiblic}d", key.state);
         return MULTIDEVICE_SAME_EVENT_MARK;

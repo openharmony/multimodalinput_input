@@ -51,7 +51,7 @@ std::string AbilityLaunchManager::GenerateKey(const ShortcutKey& key)
     return std::string(oss.str());
 }
 
-std::string AbilityLaunchManager::GetConfigFilePath()
+std::string AbilityLaunchManager::GetConfigFilePath() const
 {
     std::string defaultConfig = "/product/multimodalinput/ability_launch_config.json";
     return FileExists(defaultConfig) ? defaultConfig : "/system/etc/multimodalinput/ability_launch_config.json";
@@ -182,8 +182,8 @@ bool AbilityLaunchManager::PackageAbility(const json &jsonAbility, Ability &abil
 
 void AbilityLaunchManager::Print()
 {
-    int32_t count = shortcutKeys_.size();
-    MMI_LOGD("shortcutKey count:%{public}d", count);
+    uint32_t count = shortcutKeys_.size();
+    MMI_LOGD("shortcutKey count:%{public}u", count);
     for (const auto &item : shortcutKeys_) {
         auto &shortcutKey = item.second;
         for (auto prekey: shortcutKey.preKeys) {
