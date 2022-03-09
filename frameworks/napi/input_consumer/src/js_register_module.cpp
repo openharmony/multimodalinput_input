@@ -22,14 +22,14 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
-    constexpr size_t EVENT_NAME_LEN = 64;
-    constexpr size_t ARGC_NUM = 3;
-    constexpr size_t ARGV_FIRST = 0;
-    constexpr size_t ARGV_SECOND = 1;
-    constexpr size_t ARGV_THIRD = 2;
-    constexpr size_t PRE_KEYS_SIZE = 4;
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
+constexpr size_t EVENT_NAME_LEN = 64;
+constexpr size_t ARGC_NUM = 3;
+constexpr size_t ARGV_FIRST = 0;
+constexpr size_t ARGV_SECOND = 1;
+constexpr size_t ARGV_THIRD = 2;
+constexpr size_t PRE_KEYS_SIZE = 4;
+} // namespace
 
 static Callbacks callbacks = {};
 
@@ -143,7 +143,7 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
     return SUCCESS_CODE;
 }
 
-static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_LOGD("enter");
     CHKPF(monitorInfo);
@@ -191,7 +191,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     return count == infoSize;
 }
 
-static void SubKeyEventCallback(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_LOGD("enter");
     CHKPV(keyEvent);

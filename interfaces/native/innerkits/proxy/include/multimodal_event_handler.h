@@ -28,13 +28,13 @@ enum RES_STATUS : uint8_t {
     REG_STATUS_SYNCED = 1,   // 以同步
 };
 
-class MultimodalEventHandler : public Singleton<OHOS::MMI::MultimodalEventHandler> {
+class MultimodalEventHandler : public Singleton<MultimodalEventHandler> {
 public:
     MultimodalEventHandler();
     ~MultimodalEventHandler() = default;
     int32_t GetMultimodeInputInfo();
     MMIClientPtr GetMMIClient();
-    int32_t InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr);
+    int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetDevice(int32_t taskId, int32_t deviceId);
     int32_t GetDeviceIds(int32_t taskId);
@@ -55,8 +55,8 @@ private:
     MMIClientPtr client_ = nullptr;
     IClientMsgHandlerPtr cMsgHandler_ = nullptr;
 };
+
+#define MMIEventHdl MultimodalEventHandler::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define MMIEventHdl OHOS::MMI::MultimodalEventHandler::GetInstance()
-
 #endif // MULTIMODAL_EVENT_HANDLER_H

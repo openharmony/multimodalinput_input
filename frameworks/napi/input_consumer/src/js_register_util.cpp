@@ -19,8 +19,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterUtil" }; // namespace
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterUtil" };
+} // namespace
 
 void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, int32_t value)
 {
@@ -130,7 +130,7 @@ bool GetPreKeys(const napi_env &env, const napi_value &value, std::set<int32_t> 
     return true;
 }
 
-int32_t GetPreSubscribeId(OHOS::MMI::Callbacks &callbacks, OHOS::MMI::KeyEventMonitorInfo *event)
+int32_t GetPreSubscribeId(Callbacks &callbacks, KeyEventMonitorInfo *event)
 {
     auto it = callbacks.find(event->eventType);
     if (it == callbacks.end() || it->second.empty()) {
@@ -141,7 +141,7 @@ int32_t GetPreSubscribeId(OHOS::MMI::Callbacks &callbacks, OHOS::MMI::KeyEventMo
     return it->second.front()->subscribeId;
 }
 
-int32_t AddEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks, OHOS::MMI::KeyEventMonitorInfo *event)
+int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMonitorInfo *event)
 {
     MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
@@ -179,8 +179,8 @@ int32_t AddEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks, O
     return JS_CALLBACK_EVENT_SUCCESS;
 }
 
-int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
-    OHOS::MMI::KeyEventMonitorInfo *event, int32_t &subscribeId)
+int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
+    KeyEventMonitorInfo *event, int32_t &subscribeId)
 {
     MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
@@ -232,7 +232,7 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
     return JS_CALLBACK_EVENT_FAILED;
 }
 
-static void AsyncWorkFn(napi_env env, OHOS::MMI::KeyEventMonitorInfo *event, napi_value result[2], uint32_t resultSize)
+static void AsyncWorkFn(napi_env env, KeyEventMonitorInfo *event, napi_value result[2], uint32_t resultSize)
 {
     CHKPV(event);
     if (resultSize <= 1) {
@@ -280,7 +280,7 @@ static void AsyncWorkFn(napi_env env, OHOS::MMI::KeyEventMonitorInfo *event, nap
     }
 }
 
-void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
+void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
 {
     MMI_LOGD("enter");
     CHKPV(reportEvent);
@@ -294,7 +294,7 @@ void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
         reportEvent->env, nullptr, resourceName, [](napi_env env, void *data) {},
         [](napi_env env, napi_status status, void *data) {
             MMI_LOGD("Napi async work enter");
-            OHOS::MMI::KeyEventMonitorInfo *event = (OHOS::MMI::KeyEventMonitorInfo *)data;
+            KeyEventMonitorInfo *event = (KeyEventMonitorInfo *)data;
             napi_value callback = nullptr;
             if (napi_get_reference_value(env, event->callback[0], &callback) != napi_ok) {
                 MMI_LOGE("Event get reference value failed");
