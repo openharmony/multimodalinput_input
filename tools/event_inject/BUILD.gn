@@ -24,6 +24,8 @@ config("event_injection_config") {
     "include",
     "//foundation/multimodalinput/input/common/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/multimodalinput/input/frameworks/util/common/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
   ]
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -80,9 +82,7 @@ ohos_shared_library("event-injection") {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
 
-  external_deps = [
-    "ipc:ipc_core"
-  ]
+  external_deps = [ "ipc:ipc_core" ]
 
   part_name = "multimodalinput_base"
 }
@@ -177,11 +177,11 @@ ohos_unittest("ut-event-injection-out") {
   if (is_mmi_have_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
-  
+
   external_deps = [
-    "utils_base:utils",
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "hiviewdfx_hilog_native:libhilog"
+    "utils_base:utils",
   ]
 }
 

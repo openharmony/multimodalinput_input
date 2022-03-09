@@ -90,7 +90,7 @@ public:
     void Dump(int32_t fd);
 
     /*********************************新框架接口添加*************************** */
-    int32_t GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent);
+    int32_t GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent) const;
     int32_t UpdateTarget(std::shared_ptr<InputEvent> inputEvent);
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
         const std::vector<LogicalDisplayInfo> &logicalDisplays);
@@ -98,7 +98,7 @@ public:
         int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId);
     const std::vector<LogicalDisplayInfo>& GetLogicalDisplayInfo() const;
     const std::map<int32_t, WindowInfo>& GetWindowInfo() const;
-    MouseLocation GetMouseInfo();
+    MouseLocation GetMouseInfo() const;
     void UpdateAndAdjustMouseLoction(double& x, double& y);
     void AdjustGlobalCoordinate(int32_t& globalX, int32_t& globalY, int32_t width, int32_t height);
     bool UpdataDisplayId(int32_t& displayId);
@@ -129,7 +129,7 @@ private:
     int32_t UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent);
     PhysicalDisplayInfo* GetPhysicalDisplay(int32_t id);
     PhysicalDisplayInfo* FindPhysicalDisplayInfo(const std::string seatId, const std::string seatName);
-    int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent);
+    int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
 
 private:
     std::mutex mu_;

@@ -20,8 +20,6 @@ config("libmmi_client_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "event_handle/include",
-    "module_loader/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/common/include",
     "//foundation/multimodalinput/input/frameworks/util/common/include",
@@ -30,8 +28,6 @@ config("libmmi_client_config") {
     "//foundation/multimodalinput/input/frameworks/util/common/include",
     "//foundation/multimodalinput/input/common/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//utils/native/base/include",
-    "//foundation/multimodalinput/input/service/input_interceptor/include",
     "//utils/native/base/include",
     "event_handler/include",
     "module_loader/include",
@@ -63,8 +59,6 @@ ohos_source_set("libmmi-common") {
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
-
-  configs = [ ":libmmi_client_config" ]
 
   public_configs = [ ":libmmi_client_config" ]
 
@@ -121,10 +115,10 @@ ohos_shared_library("libmmi-client") {
 
   part_name = "multimodalinput_base"
   external_deps = [
-    "ipc:ipc_core",
     "bytrace_standard:bytrace_core",
     "hiviewdfx_hilog_native:libhilog",
     "input_device_driver:hdi_input",
+    "ipc:ipc_core",
     "utils_base:utils",
   ]
 }
@@ -184,8 +178,8 @@ ohos_unittest("ut-mmi-proxy-out") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "hiviewdfx_hilog_native:libhilog"
   ]
 }
 
@@ -244,8 +238,8 @@ ohos_unittest("KeyEventTest") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "hiviewdfx_hilog_native:libhilog"
   ]
 }
 
@@ -304,8 +298,8 @@ ohos_unittest("InputManagerTest") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "hiviewdfx_hilog_native:libhilog"
   ]
 }
 
@@ -364,8 +358,8 @@ ohos_unittest("InputManagerManualTest") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "hiviewdfx_hilog_native:libhilog"
   ]
 }
 
@@ -424,8 +418,8 @@ ohos_unittest("PointerEventTest") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "hiviewdfx_hilog_native:libhilog"
   ]
 }
 

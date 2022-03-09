@@ -168,7 +168,7 @@ ohos_unittest("ut-virtual-device-out") {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
   external_deps = [
-    "utils_base:utils",
     "hiviewdfx_hilog_native:libhilog",
+    "utils_base:utils",
   ]
 }

@@ -21,8 +21,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-using namespace OHOS;
-using namespace OHOS::MMI;
 } // namespace
 
 class UtilTest : public testing::Test {
@@ -68,31 +66,31 @@ HWTEST_F(UtilTest, getEnumString_005, TestSize.Level1)
 
 HWTEST_F(UtilTest, GetMicrotime, TestSize.Level1)
 {
-    int64_t retResult = OHOS::MMI::GetMicrotime();
+    int64_t retResult = GetMicrotime();
     EXPECT_TRUE(retResult > 0);
 }
 
 HWTEST_F(UtilTest, GetMillisTime, TestSize.Level1)
 {
-    int64_t retResult = OHOS::MMI::GetMillisTime();
+    int64_t retResult = GetMillisTime();
     EXPECT_TRUE(retResult > 0);
 }
 
 HWTEST_F(UtilTest, UuIdGenerate, TestSize.Level1)
 {
-    std::string retResult = OHOS::MMI::UuIdGenerate();
+    std::string retResult = UuIdGenerate();
     EXPECT_TRUE(retResult.length() == 0);
 }
 
 HWTEST_F(UtilTest, GetUUid, TestSize.Level1)
 {
-    std::string retResult = OHOS::MMI::GetUUid();
+    std::string retResult = GetUUid();
     EXPECT_TRUE(retResult.length() >= 0);
 }
 
 HWTEST_F(UtilTest, GetThisThreadIdOfString, TestSize.Level1)
 {
-    std::string retResult = OHOS::MMI::GetThisThreadIdOfString();
+    std::string retResult = GetThisThreadIdOfString();
     EXPECT_TRUE(retResult.length() >= 0);
 }
 
@@ -107,7 +105,7 @@ HWTEST_F(UtilTest, StringToken_001, TestSize.Level1)
     std::string str = "sdf_wef_1";
     const std::string sep = "sdf_wef_1.sss";
     std::string token = "_";
-    OHOS::MMI::StringToken(str, sep, token);
+    StringToken(str, sep, token);
 }
 
 HWTEST_F(UtilTest, StringToken_002, TestSize.Level1)
@@ -115,7 +113,7 @@ HWTEST_F(UtilTest, StringToken_002, TestSize.Level1)
     std::string str = { 0 };
     const std::string sep;
     std::string token;
-    OHOS::MMI::StringToken(str, sep, token);
+    StringToken(str, sep, token);
 }
 
 HWTEST_F(UtilTest, StringToken_003, TestSize.Level1)
@@ -123,7 +121,7 @@ HWTEST_F(UtilTest, StringToken_003, TestSize.Level1)
     std::string str = { 0, 1, 2, 3 };
     const std::string sep = { 2 };
     std::string token;
-    OHOS::MMI::StringToken(str, sep, token);
+    StringToken(str, sep, token);
 }
 
 HWTEST_F(UtilTest, StringSplit, TestSize.Level1)
@@ -131,7 +129,7 @@ HWTEST_F(UtilTest, StringSplit, TestSize.Level1)
     const std::string str;
     const std::string sep;
     std::vector<std::string> vecList;
-    OHOS::MMI::StringSplit(str, sep, vecList);
+    StringSplit(str, sep, vecList);
 }
 } // namespace MMI
 } // namespace OHOS

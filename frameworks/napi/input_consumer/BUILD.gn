@@ -19,6 +19,7 @@ config("libinputeventclient_config") {
   include_dirs = [
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "//foundation/multimodalinput/input/frameworks/util/common/include",
     "//foundation/ace/napi",
     "//foundation/ace/napi/interfaces/kits/napi",
     "//third_party/node/src",
@@ -60,10 +61,10 @@ ohos_shared_library("inputconsumer") {
   }
 
   external_deps = [
-    "napi:ace_napi",
-    "ipc:ipc_core",
     "hiviewdfx_hilog_native:libhilog",
     "input_device_driver:hdi_input",
+    "ipc:ipc_core",
+    "napi:ace_napi",
     "utils_base:utils",
   ]
 

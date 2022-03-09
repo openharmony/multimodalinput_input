@@ -57,11 +57,7 @@ ohos_shared_library("libmmi-util") {
     "socket/src/uds_socket.cpp",
   ]
 
-  if (is_mmi_have_debug) {
-    sources += [ "common/src/uds_command_queue.cpp" ]
-  }
-
-  public_configs = [
+  configs = [
     "//foundation/multimodalinput/input:multimodalinput_mmi_public_config",
     ":libmmi_util_public_config",
   ]
@@ -193,8 +189,8 @@ ohos_unittest("RunShellUtilTest") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "hiviewdfx_hilog_native:libhilog"
   ]
 }
 
