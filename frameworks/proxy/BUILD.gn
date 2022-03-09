@@ -277,6 +277,7 @@ ohos_unittest("InputManagerTest") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "${appexecfwk_path}/interfaces/innerkits/libeventhandler/include",
   ]
 
   if (is_mmi_have_libinput) {
@@ -300,6 +301,7 @@ ohos_unittest("InputManagerTest") {
   sources = [ "events/test/input_manager_test.cpp" ]
 
   deps = [
+    "${appexecfwk_path}/interfaces/innerkits/libeventhandler:libeventhandler",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
