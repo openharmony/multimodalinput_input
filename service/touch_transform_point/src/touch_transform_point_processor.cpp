@@ -37,7 +37,7 @@ void TouchTransformPointProcessor::SetPointEventSource(int32_t sourceType)
 
 bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPF(event);
     auto data = libinput_event_get_touch_event(event);
     CHKPF(data);
@@ -132,7 +132,7 @@ bool TouchTransformPointProcessor::OnEventTouchUp(struct libinput_event *event)
 
 std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent(struct libinput_event *event)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     CHKPP(event);
     CHKPP(pointerEvent_);
     pointerEvent_->UpdateId();
@@ -164,7 +164,6 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent
             return nullptr;
         }
     }
-    MMI_LOGD("end");
     return pointerEvent_;
 }
 } // namespace MMI

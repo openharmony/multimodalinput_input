@@ -65,7 +65,7 @@ int32_t InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent> inputEvent
     return fd;
 }
 
-int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent)
+int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const
 {
     int32_t displayId = inputEvent->GetTargetDisplayId();
     if (displayId < 0) {
@@ -79,7 +79,7 @@ int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent
     return displayId;
 }
 
-int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent)
+int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent) const
 {
     MMI_LOGD("enter");
     CHKPR(inputEvent, ERROR_NULL_POINTER);
@@ -654,7 +654,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, double& y)
     MMI_LOGD("Mouse Data: globalX:%{public}d,globalY:%{public}d", mouseLoction_.globalX, mouseLoction_.globalY);
 }
 
-MouseLocation InputWindowsManager::GetMouseInfo()
+MouseLocation InputWindowsManager::GetMouseInfo() const
 {
     return mouseLoction_;
 }

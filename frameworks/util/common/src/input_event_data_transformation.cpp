@@ -18,6 +18,9 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventDataTransformation" };
+}
 int32_t InputEventDataTransformation::KeyEventToNetPacket(
     const std::shared_ptr<KeyEvent> key, NetPacket &pkt)
 {
@@ -353,7 +356,7 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
         MMI_LOGE("Deserialize input event failed");
         return RET_ERR;
     }
-    int32_t tField {  };
+    int32_t tField { 0 };
     if (!pkt.Read(tField)) {
         MMI_LOGE("Packet read pointerAction failed");
         return RET_ERR;
@@ -374,26 +377,27 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
         return RET_ERR;
     }
     event->SetButtonId(tField);
-    if (!pkt.Read(tField)) {
+    uint32_t tAxes { 0 };
+    if (!pkt.Read(tAxes)) {
         MMI_LOGE("Packet read axis failed");
         return RET_ERR;
     }
-    double axisValue {  };
-    if (PointerEvent::HasAxis(tField, PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)) {
+    double axisValue { 0.0 };
+    if (PointerEvent::HasAxis(tAxes, PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)) {
         if (!pkt.Read(axisValue)) {
             MMI_LOGE("Packet read vertical scroll axisValue failed");
             return RET_ERR;
         }
         event->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
     }
-    if (PointerEvent::HasAxis(tField, PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)) {
+    if (PointerEvent::HasAxis(tAxes, PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)) {
         if (!pkt.Read(axisValue)) {
             MMI_LOGE("Packet read horizontal scroll axisValue failed");
             return RET_ERR;
         }
         event->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
     }
-    if (PointerEvent::HasAxis(tField, PointerEvent::AXIS_TYPE_PINCH)) {
+    if (PointerEvent::HasAxis(tAxes, PointerEvent::AXIS_TYPE_PINCH)) {
         if (!pkt.Read(axisValue)) {
             MMI_LOGE("Packet read pinch axisValue failed");
             return RET_ERR;

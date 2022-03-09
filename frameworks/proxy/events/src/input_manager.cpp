@@ -44,7 +44,7 @@ int32_t InputManager::AddInputEventFilter(std::function<bool(std::shared_ptr<Poi
     return InputManagerImpl::GetInstance()->AddInputEventFilter(filter);
 }
 
-void InputManager::SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::IInputEventConsumer> inputEventConsumer)
+void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
 {
     InputManagerImpl::GetInstance()->SetWindowInputEventConsumer(inputEventConsumer);
 }

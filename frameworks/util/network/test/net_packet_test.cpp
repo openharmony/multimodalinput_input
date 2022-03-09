@@ -27,12 +27,24 @@ public:
     static void TearDownTestCase(void) {}
 };
 
+/**
+ * @tc.name:construct_001
+ * @tc.desc:Verify net packet
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(NetPacketTest, construct_001, TestSize.Level1)
 {
     MmiMessageId idMsg = MmiMessageId::INVALID;
     NetPacket pkt(idMsg);
 }
 
+/**
+ * @tc.name:construct_002
+ * @tc.desc:Verify net packet
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(NetPacketTest, construct_002, TestSize.Level1)
 {
     MmiMessageId idMsg = MmiMessageId::INVALID;
@@ -40,6 +52,12 @@ HWTEST_F(NetPacketTest, construct_002, TestSize.Level1)
     NetPacket packTmp(pkt);
 }
 
+/**
+ * @tc.name:construct_002
+ * @tc.desc:Verify net packet
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(NetPacketTest, construct_003, TestSize.Level1)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(-2002);
@@ -47,6 +65,12 @@ HWTEST_F(NetPacketTest, construct_003, TestSize.Level1)
     NetPacket packTmp(pkt);
 }
 
+/**
+ * @tc.name:construct_002
+ * @tc.desc:Verify net packet
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(NetPacketTest, GetSize_001, TestSize.Level1)
 {
     MmiMessageId idMsg = MmiMessageId::INVALID;
@@ -55,6 +79,12 @@ HWTEST_F(NetPacketTest, GetSize_001, TestSize.Level1)
     EXPECT_TRUE(retResult == 0);
 }
 
+/**
+ * @tc.name:construct_002
+ * @tc.desc:Verify net packet
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(NetPacketTest, GetSize_002, TestSize.Level1)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(-1001);
@@ -63,6 +93,12 @@ HWTEST_F(NetPacketTest, GetSize_002, TestSize.Level1)
     EXPECT_TRUE(retResult == 0);
 }
 
+/**
+ * @tc.name:construct_002
+ * @tc.desc:Verify net packet
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(NetPacketTest, GetSize_003, TestSize.Level1)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(65535);
@@ -71,6 +107,12 @@ HWTEST_F(NetPacketTest, GetSize_003, TestSize.Level1)
     EXPECT_TRUE(retResult == 0);
 }
 
+/**
+ * @tc.name:construct_002
+ * @tc.desc:Verify net packet
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(NetPacketTest, GetData_001, TestSize.Level1)
 {
     MmiMessageId idMsg = MmiMessageId::INVALID;
@@ -79,6 +121,12 @@ HWTEST_F(NetPacketTest, GetData_001, TestSize.Level1)
     EXPECT_TRUE(retResult != nullptr);
 }
 
+/**
+ * @tc.name:construct_002
+ * @tc.desc:Verify net packet
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(NetPacketTest, GetData_002, TestSize.Level1)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(-3003);
@@ -88,6 +136,12 @@ HWTEST_F(NetPacketTest, GetData_002, TestSize.Level1)
     EXPECT_TRUE(retResult != nullptr);
 }
 
+/**
+ * @tc.name:construct_002
+ * @tc.desc:Verify net packet
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(NetPacketTest, GetData_003, TestSize.Level1)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(65535);
@@ -97,6 +151,12 @@ HWTEST_F(NetPacketTest, GetData_003, TestSize.Level1)
     EXPECT_TRUE(retResult != nullptr);
 }
 
+/**
+ * @tc.name:construct_002
+ * @tc.desc:Verify net packet
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(NetPacketTest, GetMsgId_001, TestSize.Level1)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(22);
@@ -106,6 +166,12 @@ HWTEST_F(NetPacketTest, GetMsgId_001, TestSize.Level1)
     EXPECT_TRUE(retResult == idMsg);
 }
 
+/**
+ * @tc.name:construct_002
+ * @tc.desc:Verify net packet
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(NetPacketTest, GetMsgId_002, TestSize.Level1)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(-33);
@@ -115,6 +181,12 @@ HWTEST_F(NetPacketTest, GetMsgId_002, TestSize.Level1)
     EXPECT_TRUE(retResult == idMsg);
 }
 
+/**
+ * @tc.name:construct_002
+ * @tc.desc:Verify net packet
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(NetPacketTest, GetMsgId_003, TestSize.Level1)
 {
     MmiMessageId idMsg = static_cast<MmiMessageId>(65535);
@@ -124,6 +196,12 @@ HWTEST_F(NetPacketTest, GetMsgId_003, TestSize.Level1)
     EXPECT_TRUE(retResult == idMsg);
 }
 
+/**
+ * @tc.name:construct_002
+ * @tc.desc:Verify net packet
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(NetPacketTest, ReadAndWrite, TestSize.Level1)
 {
     int32_t p1 = 112;
@@ -138,6 +216,12 @@ HWTEST_F(NetPacketTest, ReadAndWrite, TestSize.Level1)
     EXPECT_EQ(p2, r2);
 }
 
+/**
+ * @tc.name:construct_002
+ * @tc.desc:Verify net packet
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(NetPacketTest, WriteError, TestSize.Level1)
 {
     int32_t p1 = 112;
@@ -154,6 +238,12 @@ HWTEST_F(NetPacketTest, WriteError, TestSize.Level1)
     EXPECT_TRUE(pkt.ChkRWError());
 }
 
+/**
+ * @tc.name:construct_002
+ * @tc.desc:Verify net packet
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(NetPacketTest, ReadError, TestSize.Level1)
 {
     int32_t p1 = 112;
