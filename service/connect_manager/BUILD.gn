@@ -32,8 +32,6 @@ ohos_source_set("mmi_connect_manager_service") {
     "${mmi_connect_manager_path}/src/multimodal_input_connect_stub.cpp",
   ]
 
-  public_configs = [ ":mmi_connect_manager_config" ]
-
   configs = [ ":mmi_connect_manager_config" ]
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -53,8 +51,6 @@ ohos_source_set("mmi_connect_manager_proxy") {
     "${mmi_connect_manager_path}/src/multimodal_input_connect_manager.cpp",
     "${mmi_connect_manager_path}/src/multimodal_input_connect_proxy.cpp",
   ]
-
-  public_configs = [ ":mmi_connect_manager_config" ]
 
   configs = [ ":mmi_connect_manager_config" ]
 

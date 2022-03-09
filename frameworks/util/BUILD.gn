@@ -57,7 +57,7 @@ ohos_shared_library("libmmi-util") {
     "socket/src/uds_socket.cpp",
   ]
 
-  public_configs = [
+  configs = [
     "//foundation/multimodalinput/input:multimodalinput_mmi_public_config",
     ":libmmi_util_public_config",
   ]
