@@ -1491,7 +1491,7 @@ public:
     // Get the list of keys currently in the pressed state
     std::vector<int32_t> GetPressedKeys() const;
     void AddKeyItem(const KeyItem& keyItem);
-    std::vector<KeyEvent::KeyItem> GetKeyItems();
+    std::vector<KeyEvent::KeyItem> GetKeyItems() const;
     void AddPressedKeyItems(const KeyItem& keyItem);
     void RemoveReleasedKeyItems(const KeyItem& keyItem);
 

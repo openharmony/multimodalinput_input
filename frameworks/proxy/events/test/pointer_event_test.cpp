@@ -28,8 +28,6 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "PointerEventTest"};
 using namespace testing::ext;
-using namespace OHOS::MMI;
-using namespace OHOS;
 } // namespace
 class PointerEventTest : public testing::Test {
 public:
@@ -83,7 +81,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_001, TestSiz
 
     std::shared_ptr<PointerEvent> pointerEvent = createPointEvent();
     // KEYCODE_CTRL_LEFT = 2072
-    std::vector<int32_t> pressedKeys { OHOS::MMI::KeyEvent::KEYCODE_CTRL_LEFT };
+    std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT };
     pointerEvent->SetPressedKeys(pressedKeys);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -115,7 +113,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_002, TestSiz
 
     std::shared_ptr<PointerEvent> pointerEvent = createPointEvent();
     // KEYCODE_CTRL_RIGHT = 2073
-    std::vector<int32_t> pressedKeys { OHOS::MMI::KeyEvent::KEYCODE_CTRL_RIGHT };
+    std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_RIGHT };
     pointerEvent->SetPressedKeys(pressedKeys);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -147,8 +145,8 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSiz
 
     std::shared_ptr<PointerEvent> pointerEvent = createPointEvent();
     // KEYCODE_CTRL_LEFT = 2072, KEYCODE_CTRL_RIGHT = 2073
-    std::vector<int32_t> pressedKeys { OHOS::MMI::KeyEvent::KEYCODE_CTRL_LEFT,
-        OHOS::MMI::KeyEvent::KEYCODE_CTRL_RIGHT };
+    std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT,
+        KeyEvent::KEYCODE_CTRL_RIGHT };
     pointerEvent->SetPressedKeys(pressedKeys);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));

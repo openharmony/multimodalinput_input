@@ -134,7 +134,7 @@ sptr<OHOS::Surface> PointerDrawingManager::GetLayer()
     return surfaceNode->GetSurface();
 }
 
-sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Surface> layer)
+sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Surface> layer) const
 {
     sptr<OHOS::SurfaceBuffer> buffer;
     int32_t releaseFence = 0;

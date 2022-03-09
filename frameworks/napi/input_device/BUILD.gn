@@ -18,6 +18,7 @@ config("libinputdevice_config") {
 
   include_dirs = [
     "//foundation/multimodalinput/input/frameworks/napi/input_device/include",
+    "//foundation/multimodalinput/input/frameworks/util/common/include",
     "//foundation/ace/napi",
     "//foundation/ace/napi/interfaces/kits/napi",
     "//third_party/node/src",
@@ -60,10 +61,10 @@ ohos_shared_library("inputdevice") {
   }
 
   external_deps = [
-    "napi:ace_napi",
-    "ipc:ipc_core",
     "hiviewdfx_hilog_native:libhilog",
     "input_device_driver:hdi_input",
+    "ipc:ipc_core",
+    "napi:ace_napi",
     "utils_base:utils",
   ]
 

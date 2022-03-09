@@ -59,7 +59,7 @@ protected:
         RegisteredEvent& registeredEvent, int64_t preHandlerTime);
     int32_t KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer& udsServer,
         struct libinput_event *event, int32_t inputDeviceType, int64_t preHandlerTime);
-    bool IsANRProcess(int64_t time, SessionPtr ss);
+    bool TriggerANR(int64_t time, SessionPtr sess);
 
 private:
     int32_t DispatchTouchEvent(const EventTouch& touch, const int fd,

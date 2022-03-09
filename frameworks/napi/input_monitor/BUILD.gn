@@ -19,6 +19,7 @@ config("libinputmonitor_config") {
   include_dirs = [
     "//foundation/multimodalinput/input/frameworks/napi/input_monitor/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "//foundation/multimodalinput/input/frameworks/util/common/include",
     "//foundation/ace/napi",
     "//foundation/ace/napi/interfaces/kits/napi",
     "//foundation/multimodalinput/input/common/include",
@@ -53,10 +54,10 @@ ohos_shared_library("inputmonitor") {
   ]
 
   external_deps = [
-    "napi:ace_napi",
-    "ipc:ipc_core",
     "hiviewdfx_hilog_native:libhilog",
     "input_device_driver:hdi_input",
+    "ipc:ipc_core",
+    "napi:ace_napi",
     "utils_base:utils",
   ]
 
