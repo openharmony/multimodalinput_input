@@ -35,7 +35,7 @@ public:
     void SetClientHandle(MMIClientPtr client);
     const std::set<std::string> *GetRegisterEvent();
     int32_t InjectionVirtual(bool isPressed, int32_t keyCode, int64_t keyDownDuration, int32_t maxKeyCode);
-    int32_t InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr);
+    int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetDevice(int32_t userData, int32_t deviceId) const;
     int32_t GetDeviceIds(int32_t userData) const;
@@ -47,7 +47,8 @@ protected:
 protected:
     MMIClientPtr client_ = nullptr;
 };
+
+#define EventManager OHOS::Singleton<StandardizedEventManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define EventManager OHOS::Singleton<OHOS::MMI::StandardizedEventManager>::GetInstance()
 #endif // STANDARDIZED_EVENT_MANAGER_H

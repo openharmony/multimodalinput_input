@@ -26,11 +26,11 @@
 
 namespace OHOS {
 namespace MMI {
-    namespace {
-        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
-            LOG_CORE, MMI_LOG_DOMAIN, "StandardizedEventManager"
-        };
-    }
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
+    LOG_CORE, MMI_LOG_DOMAIN, "StandardizedEventManager"
+};
+} // namespace
 
 StandardizedEventManager::StandardizedEventManager() {}
 
@@ -46,8 +46,8 @@ int32_t StandardizedEventManager::SubscribeKeyEvent(
     const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
 {
     CALL_LOG_ENTER;
-    OHOS::MMI::NetPacket pkt(MmiMessageId::SUBSCRIBE_KEY_EVENT);
-    std::shared_ptr<OHOS::MMI::KeyOption> keyOption = subscribeInfo.GetKeyOption();
+    NetPacket pkt(MmiMessageId::SUBSCRIBE_KEY_EVENT);
+    std::shared_ptr<KeyOption> keyOption = subscribeInfo.GetKeyOption();
     uint32_t preKeySize = keyOption->GetPreKeys().size();
     pkt << subscribeInfo.GetSubscribeId() << keyOption->GetFinalKey() << keyOption->IsFinalKeyDown()
     << keyOption->GetFinalKeyDownDuration() << preKeySize;
@@ -70,7 +70,7 @@ int32_t StandardizedEventManager::SubscribeKeyEvent(
 int32_t StandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
 {
     CALL_LOG_ENTER;
-    OHOS::MMI::NetPacket pkt(MmiMessageId::UNSUBSCRIBE_KEY_EVENT);
+    NetPacket pkt(MmiMessageId::UNSUBSCRIBE_KEY_EVENT);
     pkt << subscribeId;
     if (MMIEventHdl.GetMMIClient() == nullptr) {
         MMI_LOGE("client init failed");
@@ -91,7 +91,7 @@ int32_t StandardizedEventManager::InjectionVirtual(bool isPressed, int32_t keyCo
     virtualEvent.isPressed = isPressed;
     virtualEvent.keyCode = keyCode;
     virtualEvent.keyDownDuration = keyDownDuration;
-    OHOS::MMI::NetPacket pkt(MmiMessageId::ON_VIRTUAL_KEY);
+    NetPacket pkt(MmiMessageId::ON_VIRTUAL_KEY);
     pkt << virtualEvent;
     if (!SendMsg(pkt)) {
         MMI_LOGE("Send virtual event Msg error");
@@ -135,7 +135,7 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
     while (std::getline(sStream, sLine)) {
         MMI_LOGD("%{public}s", sLine.c_str());
     }
-    OHOS::MMI::NetPacket pkt(MmiMessageId::INJECT_POINTER_EVENT);
+    NetPacket pkt(MmiMessageId::INJECT_POINTER_EVENT);
     if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
         MMI_LOGE("Marshalling pointer event failed");
         return RET_ERR;
@@ -149,14 +149,14 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
 
 int32_t StandardizedEventManager::GetDeviceIds(int32_t userData) const
 {
-    OHOS::MMI::NetPacket pkt(MmiMessageId::INPUT_DEVICE_IDS);
+    NetPacket pkt(MmiMessageId::INPUT_DEVICE_IDS);
     pkt << userData;
     return SendMsg(pkt);
 }
 
 int32_t StandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId) const
 {
-    OHOS::MMI::NetPacket pkt(MmiMessageId::INPUT_DEVICE);
+    NetPacket pkt(MmiMessageId::INPUT_DEVICE);
     pkt << userData << deviceId;
     return SendMsg(pkt);
 }

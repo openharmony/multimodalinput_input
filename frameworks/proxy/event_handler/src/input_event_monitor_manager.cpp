@@ -21,19 +21,19 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventMonitorManager" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventMonitorManager" };
+} // namespace
 
 InputEventMonitorManager::InputEventMonitorManager() {}
 
 InputEventMonitorManager::~InputEventMonitorManager() {}
 
 int32_t InputEventMonitorManager::AddInputEventMontior(
-    std::function<void (std::shared_ptr<OHOS::MMI::KeyEvent>)> keyEventMonitor)
+    std::function<void (std::shared_ptr<KeyEvent>)> keyEventMonitor)
 {
     MMI_LOGD("enter");
     CHKPR(keyEventMonitor, INVALID_MONITOR_ID);
-    int32_t ret = MMIEventHdl.AddInputEventMontior(OHOS::MMI::InputEvent::EVENT_TYPE_KEY);
+    int32_t ret = MMIEventHdl.AddInputEventMontior(InputEvent::EVENT_TYPE_KEY);
     if (ret != RET_OK) {
         MMI_LOGE("MultimodalEventHandler send msg failed");
         return INVALID_MONITOR_ID;
@@ -59,12 +59,12 @@ void InputEventMonitorManager::RemoveInputEventMontior(int32_t monitorId)
     auto it = std::find(monitors_.begin(), monitors_.end(), item);
     if (it != monitors_.end()) {
         monitors_.erase(it);
-        MMIEventHdl.RemoveInputEventMontior(OHOS::MMI::InputEvent::EVENT_TYPE_KEY);
+        MMIEventHdl.RemoveInputEventMontior(InputEvent::EVENT_TYPE_KEY);
         MMI_LOGD("MonitorId:%{public}d removed", monitorId);
     }
 }
 
-int32_t InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+int32_t InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     for (const auto &monitor : monitors_) {
@@ -74,7 +74,7 @@ int32_t InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OHOS::MMI:
 }
 
 int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(
-    std::function<void (std::shared_ptr<OHOS::MMI::PointerEvent>)> TouchPadEventMonitor)
+    std::function<void (std::shared_ptr<PointerEvent>)> TouchPadEventMonitor)
 {
     CHKPR(TouchPadEventMonitor, ERROR_NULL_POINTER);
     MonitorItem monitorItem;
@@ -83,7 +83,7 @@ int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(
     monitorItem.id = ++monitorId;
     monitors_.push_back(monitorItem);
     MMI_LOGD("monitorId:%{public}d", monitorId);
-    MMIEventHdl.AddInputEventTouchpadMontior(OHOS::MMI::InputEvent::EVENT_TYPE_POINTER);
+    MMIEventHdl.AddInputEventTouchpadMontior(InputEvent::EVENT_TYPE_POINTER);
     MMI_LOGD("leave");
     return monitorItem.id;
 }
@@ -101,12 +101,12 @@ void InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t monitorId
         MMI_LOGE("MonitorId does not exist");
     } else {
         iter = monitors_.erase(iter);
-        MMIEventHdl.RemoveInputEventTouchpadMontior(OHOS::MMI::InputEvent::EVENT_TYPE_POINTER);
+        MMIEventHdl.RemoveInputEventTouchpadMontior(InputEvent::EVENT_TYPE_POINTER);
         MMI_LOGD("monitorItem id:%{public}d removed", monitorId);
     }
 }
 
-int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
+int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("enter");
     CHKPR(pointerEvent, ERROR_NULL_POINTER);

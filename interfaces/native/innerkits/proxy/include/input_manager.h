@@ -64,7 +64,7 @@ public:
      * will be called back to the consumer object for processing.
      * @since 8
      */
-    void SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::IInputEventConsumer> inputEventConsumer);
+    void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer);
 
     /**
      * @brief Subscribes to the key input event that meets a specific condition. When such an event occurs,
