@@ -34,6 +34,10 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
     CHKR(IsValidHandlerId(handlerId), PARAM_INPUT_INVALID, RET_ERR);
     CHKPR(session, RET_ERR);
     if (handlerType == InputHandlerType::MONITOR) {
+        if (!session->HasPermission()) {
+            MMI_LOGE("no permission, can not add monitor");
+            return RET_ERR;
+        }
         MMI_LOGD("Register monitor:%{public}d", handlerId);
         SessionHandler mon { handlerId, handlerType, session };
         return monitors_.AddMonitor(mon);
@@ -51,6 +55,10 @@ void InputHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
     if (handlerType == InputHandlerType::MONITOR) {
+        if (!session->HasPermission()) {
+            MMI_LOGE("no permission, can not remove monitor");
+            return;
+        }
         MMI_LOGD("Unregister monitor:%{public}d", handlerId);
         SessionHandler monitor { handlerId, handlerType, session };
         monitors_.RemoveMonitor(monitor);
