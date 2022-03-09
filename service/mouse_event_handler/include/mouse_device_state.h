@@ -62,7 +62,6 @@ private:
     void ChangeMouseState(const BUTTON_STATE btnState, int32_t& btnStateCount);
 
 private:
-    std::mutex mu_;
     MouseDeviceCoords mouseCoord_;
     std::map<uint32_t, int32_t> mouseBtnState_;
 };

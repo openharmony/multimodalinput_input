@@ -62,8 +62,8 @@ public:
     void UpdateDescript();
     void AddEvent(int32_t id, int64_t time);
     void DelEvents(int32_t id);
-    int64_t GetFirstEventTime();
-    bool EventsIsEmpty();
+    int64_t GetEarlistEventTime();
+    bool IsEventQueueEmpty();
     bool isANRProcess_ {false};
 
 #ifdef OHOS_BUILD_MMI_DEBUG
