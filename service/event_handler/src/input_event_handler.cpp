@@ -61,7 +61,7 @@ void InputEventHandler::Init(UDSServer& udsServer)
         },
         {
             static_cast<MmiMessageId>(LIBINPUT_EVENT_KEYBOARD_KEY),
-            std::bind(&InputEventHandler::OnKeyboardEvent, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventKey, this)
         },
         {
             static_cast<MmiMessageId>(LIBINPUT_EVENT_POINTER_MOTION),
@@ -238,12 +238,12 @@ int32_t InputEventHandler::OnEventDeviceRemoved(libinput_event *event)
 
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
 {
-    CHKPR(event, PARAM_INPUT_INVALID);
+    CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
-    CHKPR(keyEvent_, ERROR_NULL_POINTER);
+
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_LOGD("The same event reported by multi_device should be discarded");
@@ -253,83 +253,20 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         MMI_LOGE("KeyEvent package failed. ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
+
+    int32_t keyId = keyEvent_->GetId();
+    std::string keyEventString = "OnKeyEvent";
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
+    keyEventString = "service report keyId=" + std::to_string(keyId);
+    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
 
     auto ret = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_);
     if (ret != RET_OK) {
-        MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d",
-                 ret, KEY_EVENT_DISP_FAIL);
+        MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
-    int32_t keyCode = keyEvent_->GetKeyCode();
-    std::string keyEventString = "service dispatch keyCode=" + std::to_string(keyCode);
-    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
-    int32_t keyId = keyEvent_->GetId();
-    keyEventString = "OnKeyEvent";
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
-    MMI_LOGD("Inject keyCode=%{public}d, action=%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
-    return RET_OK;
-}
 
-int32_t InputEventHandler::OnKeyEventDispatch(libinput_event *event)
-{
-    if (keyEvent_ == nullptr) {
-        keyEvent_ = KeyEvent::Create();
-    }
-    CHKPR(keyEvent_, ERROR_NULL_POINTER);
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent_);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
-        MMI_LOGD("The same event reported by multi_device should be discarded");
-        return RET_OK;
-    }
-    if (packageResult != RET_OK) {
-        MMI_LOGE("KeyEvent package failed. ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
-        return KEY_EVENT_PKG_FAIL;
-    }
-    int32_t keyId = keyEvent_->GetId();
-    std::string keyEventString = "OnKeyEvent";
-    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
-    keyEventString = "service report keyId=" + std::to_string(keyId);
-    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
-    return OnEventKey(event);
-}
-
-int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
-{
-    CHKPR(event, ERROR_NULL_POINTER);
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    EventKeyboard keyBoard = {};
-    auto packageResult = eventPackage_.PackageKeyEvent(event, keyBoard);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
-        MMI_LOGD("The same event occurs on multiple devices, ret:%{puiblic}d", packageResult);
-        return RET_OK;
-    }
-    if (packageResult != RET_OK) {
-        MMI_LOGE("Key event package failed. ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
-        return KEY_EVENT_PKG_FAIL;
-    }
-
-    auto oKey = KeyValueTransformationInput(keyBoard.key); // libinput key transformed into key
-    keyBoard.unicode = 0;
-    if (keyEvent_ == nullptr) {
-        keyEvent_ = KeyEvent::Create();
-        CHKPR(keyEvent_, ERROR_NULL_POINTER);
-    }
-    keyBoard.key = static_cast<int32_t>(oKey.keyValueOfSys);
-    if (EventPackage::KeyboardToKeyEvent(keyBoard, keyEvent_) == RET_ERR) {
-        MMI_LOGE("On the OnKeyboardEvent translate key event error");
-        return RET_ERR;
-    }
-    int32_t keyId = keyEvent_->GetId();
-    std::string keyEventString = "OnKeyEvent";
-    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
-    keyEventString = "service report keyId=" + std::to_string(keyId);
-    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
-    auto result = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_);
-    if (result != RET_OK) {
-        MMI_LOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d", result, KEY_EVENT_DISP_FAIL);
-        return KEY_EVENT_DISP_FAIL;
-    }
+    MMI_LOGD("keyCode:%{public}d,action:%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
     return RET_OK;
 }
 
