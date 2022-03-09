@@ -35,9 +35,9 @@ public:
     ~KeyEventSubscriber() = default;
 
     int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
-            const std::shared_ptr<OHOS::MMI::KeyOption> keyOption);
+            const std::shared_ptr<KeyOption> keyOption);
     int32_t UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId);
-    bool SubscribeKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent);
+    bool SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 
 private:
     struct Subscriber {
@@ -47,7 +47,7 @@ private:
         }
         int32_t id_ { -1 };
         SessionPtr sess_ { nullptr };
-        std::shared_ptr<OHOS::MMI::KeyOption> keyOption_ { nullptr };
+        std::shared_ptr<KeyOption> keyOption_ { nullptr };
         int32_t timerId_ { -1 };
         std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
     };
@@ -59,7 +59,7 @@ private:
 
     bool IsPreKeysMatch(const std::set<int32_t>& preKeys, const std::vector<int32_t>& pressedKeys) const;
 
-    void NotifySubscriber(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent,
+    void NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
             const std::shared_ptr<Subscriber>& subscriber);
 
     bool AddTimer(const std::shared_ptr<Subscriber>& subscriber, const std::shared_ptr<KeyEvent>& keyEvent);
@@ -77,7 +77,8 @@ private:
     bool callbackInitialized_ { false };
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
 };
+
+#define KeyEventSubscriber_ KeyEventSubscriber::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define KeyEventSubscriber_ OHOS::MMI::KeyEventSubscriber::GetInstance()
 #endif  // KEY_EVENT_SUBSCRIBER_H

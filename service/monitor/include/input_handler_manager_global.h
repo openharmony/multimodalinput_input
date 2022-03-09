@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace MMI {
-class InputHandlerManagerGlobal : public Singleton<OHOS::MMI::InputHandlerManagerGlobal> {
+class InputHandlerManagerGlobal : public Singleton<InputHandlerManagerGlobal> {
 public:
     int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);

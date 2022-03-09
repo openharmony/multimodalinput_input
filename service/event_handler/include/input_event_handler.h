@@ -34,7 +34,7 @@ public:
     void Init(UDSServer& udsServer);
     void OnEvent(void *event);
     void OnCheckEventReport();
-    int32_t OnMouseEventEndTimerHandler(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
+    int32_t OnMouseEventEndTimerHandler(std::shared_ptr<PointerEvent> pointerEvent);
     UDSServer *GetUDSServer();
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
 protected:
@@ -61,14 +61,15 @@ private:
     EventDispatch eventDispatch_;
     EventPackage eventPackage_;
     NotifyDeviceChange notifyDeviceChange_;
-    std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent_ = nullptr;
+    std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
 
     uint64_t idSeed_ = 0;
     int32_t eventType_ = 0;
     int64_t initSysClock_ = 0;
     int64_t lastSysClock_ = 0;
 };
+
+#define InputHandler InputEventHandler::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define InputHandler OHOS::MMI::InputEventHandler::GetInstance()
 #endif // INPUT_EVENT_HANDLER_H
