@@ -70,7 +70,7 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv, napi_value callback)
     
     if (monitor != nullptr) {
         monitor->Stop();
-    }   
+    }
 }
 
 void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv)
