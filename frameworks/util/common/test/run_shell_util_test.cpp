@@ -13,11 +13,13 @@
  * limitations under the License.
  */
 
-#include "run_shell_util.h"
 #include <thread>
 #include <vector>
+
 #include <gtest/gtest.h>
+
 #include "define_multimodal.h"
+#include "run_shell_util.h"
 
 namespace OHOS {
 namespace MMI {

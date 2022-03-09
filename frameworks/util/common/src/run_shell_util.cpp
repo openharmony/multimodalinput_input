@@ -14,8 +14,11 @@
  */
 
 #include "run_shell_util.h"
+
 #include <cstdio>
+
 #include "define_multimodal.h"
+
 
 namespace OHOS {
 namespace MMI {

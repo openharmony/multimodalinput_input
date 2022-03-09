@@ -13,23 +13,24 @@
  * limitations under the License.
  */
 
-#include "input_manager.h"
-#include "error_multimodal.h"
 #include <bitset>
 #include <cinttypes>
 #include <regex>
 #include <sstream>
+
 #include <gtest/gtest.h>
+
 #include "define_multimodal.h"
-#include "input_handler_type.h"
+#include "error_multimodal.h"
 #include "input_event_monitor_manager.h"
-#include "interceptor_manager.h"
+#include "input_handler_type.h"
 #include "input_manager.h"
+#include "interceptor_manager.h"
 #include "multimodal_event_handler.h"
-#include "pointer_event.h"
-#include "proto.h"
 #include "mmi_client.h"
 #include "mmi_token.h"
+#include "pointer_event.h"
+#include "proto.h"
 #include "run_shell_util.h"
 
 namespace OHOS {

@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include "mmi_client.h"
 #include <gtest/gtest.h>
+
+#include "mmi_client.h"
 
 namespace OHOS {
 namespace MMI {

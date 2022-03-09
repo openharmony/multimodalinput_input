@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 
-#include "util.h"
 #include <gtest/gtest.h>
+
 #include "error_multimodal.h"
+#include "util.h"
+
 
 namespace OHOS {
 namespace MMI {

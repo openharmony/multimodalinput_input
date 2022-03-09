@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 
-#include "uds_session.h"
 #include <gtest/gtest.h>
+
 #include "proto.h"
+#include "uds_session.h"
+
 
 namespace OHOS {
 namespace MMI {

@@ -15,12 +15,13 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <ctime>
 #include <map>
 #include <string>
-#include <ctime>
 #include <vector>
-#include "struct_multimodal.h"
+
 #include "define_multimodal.h"
+#include "struct_multimodal.h"
 
 namespace OHOS {
 namespace MMI {

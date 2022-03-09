@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
-#include "util_ex.h"
 #include <gtest/gtest.h>
+
 #include "proto.h"
+#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
