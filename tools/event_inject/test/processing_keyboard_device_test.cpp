@@ -32,6 +32,12 @@ public:
     static void TearDownTestCase(void) {}
 };
 
+/**
+ * @tc.name:Test_TransformKeyBoardJsonDataToInputData
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputData, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
@@ -61,6 +67,12 @@ HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputData
     EXPECT_EQ(ret, RET_OK);
 }
 
+/**
+ * @tc.name:Test_TransformKeyBoardJsonDataToInputDataEventsIsEmpty
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {
 #ifdef OHOS_BUILD

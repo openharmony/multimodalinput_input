@@ -32,6 +32,12 @@ public:
     static void TearDownTestCase(void) {}
 };
 
+/**
+ * @tc.name:Test_GetDeviceObjectTest
+ * @tc.desc:Verify TransformJsonData function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(GetDeviceObjectTest, Test_GetDeviceObjectTest, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
@@ -61,6 +67,12 @@ HWTEST_F(GetDeviceObjectTest, Test_GetDeviceObjectTest, TestSize.Level1)
     EXPECT_EQ(ret, RET_OK);
 }
 
+/**
+ * @tc.name:Test_GetDeviceObjectTestNotFindDevice
+ * @tc.desc:Verify CreateDeviceObject function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(GetDeviceObjectTest, Test_GetDeviceObjectTestNotFindDevice, TestSize.Level1)
 {
     const std::string deviceName = "temp";

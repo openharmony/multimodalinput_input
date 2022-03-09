@@ -31,6 +31,12 @@ public:
     static void TearDownTestCase(void) {}
 };
 
+/**
+ * @tc.name:Test_TransformGamePadJsonDataToInputData
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputData, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
@@ -60,6 +66,12 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputData, 
     EXPECT_EQ(ret, RET_OK);
 }
 
+/**
+ * @tc.name:Test_TransformGamePadJsonDataToInputDataNotFindEvents
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNotFindEvents, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
@@ -89,6 +101,12 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
     EXPECT_EQ(ret, RET_ERR);
 }
 
+/**
+ * @tc.name:Test_TransformGamePadJsonDataToInputDataEventsIsEmpty
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
@@ -118,6 +136,12 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataEv
     EXPECT_EQ(ret, RET_ERR);
 }
 
+/**
+ * @tc.name:Test_TransformGamePadJsonDataToInputDataNotFindKeyValueInPress
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNotFindKeyValueInPress, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
@@ -147,6 +171,12 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
     EXPECT_EQ(ret, RET_ERR);
 }
 
+/**
+ * @tc.name:Test_TransformGamePadJsonDataToInputDataNotFindEventInRocker
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNotFindEventInRocker, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
@@ -176,6 +206,12 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
     EXPECT_EQ(ret, RET_ERR);
 }
 
+/**
+ * @tc.name:Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRocker
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRocker, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
@@ -205,6 +241,12 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
     EXPECT_EQ(ret, RET_ERR);
 }
 
+/**
+ * @tc.name:Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRockerDirectionKey
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRockerDirectionKey,
          TestSize.Level1)
 {

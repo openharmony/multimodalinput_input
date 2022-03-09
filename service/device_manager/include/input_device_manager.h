@@ -31,8 +31,8 @@ class InputDeviceManager : public DelayedSingleton<InputDeviceManager>, public S
 public:
     void OnInputDeviceAdded(struct libinput_device* inputDevice);
     void OnInputDeviceRemoved(struct libinput_device* inputDevice);
-    std::vector<int32_t> GetInputDeviceIds();
-    std::shared_ptr<InputDevice> GetInputDevice(int32_t id);
+    std::vector<int32_t> GetInputDeviceIds() const;
+    std::shared_ptr<InputDevice> GetInputDevice(int32_t id) const;
     void GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback);
     void FindInputDeviceIdAsync(int32_t deviceId, std::function<void(std::shared_ptr<InputDevice>)> callback);
     int32_t FindInputDeviceId(struct libinput_device* inputDevice);

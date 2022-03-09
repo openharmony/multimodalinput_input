@@ -32,6 +32,12 @@ public:
     static void TearDownTestCase(void) {}
 };
 
+/**
+ * @tc.name:Test_TransformJsonDataToInputData
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
@@ -61,6 +67,12 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, Tes
     EXPECT_EQ(ret, RET_OK);
 }
 
+/**
+ * @tc.name:Test_TransformJsonDataToInputDataEventsIsEmpty
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
@@ -90,6 +102,12 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEvent
     EXPECT_EQ(ret, RET_ERR);
 }
 
+/**
+ * @tc.name:Test_TransformJsonDataToInputDataSingleEventsIsEmpty
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataSingleEventsIsEmpty, TestSize.Level1)
 {
 #ifdef OHOS_BUILD

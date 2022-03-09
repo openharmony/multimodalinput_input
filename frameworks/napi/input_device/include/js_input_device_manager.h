@@ -17,6 +17,7 @@
 #define JS_INPUT_DEVICE_MANAGER_H
 
 #include <memory>
+
 #include "js_event_target.h"
 
 namespace OHOS {
