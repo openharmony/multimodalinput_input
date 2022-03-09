@@ -32,6 +32,12 @@ public:
     static void TearDownTestCase(void) {}
 };
 
+/**
+ * @tc.name:Test_TransformJsonDataToInputData
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingFingerDeviceTest, Test_TransformJsonDataToInputData, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
