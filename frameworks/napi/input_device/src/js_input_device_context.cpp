@@ -219,7 +219,7 @@ napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info i
         napi_throw_error(env, nullptr, "JsInputDeviceContext: the first parameter is not a function");
         return nullptr;
     }
-    jsInputDeviceMgr->GetDeviceIds(env, argv[0]);  
+    jsInputDeviceMgr->GetDeviceIds(env, argv[0]);
     return nullptr;
 }
 
