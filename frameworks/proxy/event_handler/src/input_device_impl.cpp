@@ -31,24 +31,22 @@ InputDeviceImpl& InputDeviceImpl::GetInstance()
 void InputDeviceImpl::GetInputDeviceIdsAsync(int32_t userData,
     std::function<void(int32_t, std::vector<int32_t>)> callback)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     inputDevciceIds_[userData] = callback;
     MMIEventHdl.GetDeviceIds(userData);
-    MMI_LOGD("end");
 }
 
 void InputDeviceImpl::GetInputDeviceAsync(int32_t userData, int32_t deviceId,
     std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)> callback)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     inputDevcices_[userData] = callback;
     MMIEventHdl.GetDevice(userData, deviceId);
-    MMI_LOGD("end");
 }
 
 void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, std::string name, int32_t deviceType)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     auto iter = inputDevcices_.find(userData);
     if (iter == inputDevcices_.end()) {
         MMI_LOGE("failed to find the callback function");
@@ -56,19 +54,17 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, std::string na
     }
     auto inputDeviceInfo = std::make_shared<InputDeviceInfo>(id, name, deviceType);
     iter->second(userData, inputDeviceInfo);
-    MMI_LOGD("end");
 }
 
 void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> ids)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     auto iter = inputDevciceIds_.find(userData);
     if (iter == inputDevciceIds_.end()) {
         MMI_LOGE("failed to find the callback function");
         return;
     }
     iter->second(userData, ids);
-    MMI_LOGD("end");
 }
 } // namespace MMI
 } // namespace OHOS

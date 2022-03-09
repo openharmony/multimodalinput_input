@@ -610,7 +610,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
 bool PointerEvent::IsValidCheckMouseFunc() const
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     if (pointers_.size() != 1) {
         MMI_LOGE("Pointers_ is invalid");
         return false;
@@ -650,13 +650,12 @@ bool PointerEvent::IsValidCheckMouseFunc() const
             return false;
         }
     }
-    MMI_LOGD("end");
     return true;
 }
 
 bool PointerEvent::IsValidCheckMouse() const
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     int32_t mousePointID = GetPointerId();
     if (mousePointID < 0) {
         MMI_LOGE("MousePointID is invalid");
@@ -689,13 +688,12 @@ bool PointerEvent::IsValidCheckMouse() const
             return false;
         }
     }
-    MMI_LOGD("end");
     return true;
 }
 
 bool PointerEvent::IsValidCheckTouchFunc() const
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     int32_t touchPointID = GetPointerId();
     if (touchPointID < 0) {
         MMI_LOGE("TouchPointID is invalid");
@@ -718,13 +716,12 @@ bool PointerEvent::IsValidCheckTouchFunc() const
         MMI_LOGE("ButtonId is invalid");
         return false;
     }
-    MMI_LOGD("PointerEvent::IsValidCheckTouchFunc end");
     return true;
 }
 
 bool PointerEvent::IsValidCheckTouch() const
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     if (!IsValidCheckTouchFunc()) {
         MMI_LOGE("IsValidCheckTouchFunc is invalid");
         return false;
@@ -764,13 +761,12 @@ bool PointerEvent::IsValidCheckTouch() const
         MMI_LOGE("Item.pointerid is not same to touchPointID and is invalid");
         return false;
     }
-    MMI_LOGD("end");
     return true;
 }
 
 bool PointerEvent::IsValid() const
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     int32_t sourceType = GetSourceType();
     if (sourceType != SOURCE_TYPE_MOUSE && sourceType != SOURCE_TYPE_TOUCHSCREEN &&
         sourceType != SOURCE_TYPE_TOUCHPAD) {
@@ -798,7 +794,6 @@ bool PointerEvent::IsValid() const
             return false;
         }
     }
-    MMI_LOGD("end");
     return true;
 }
 

@@ -126,7 +126,7 @@ void UDSSession::DelEvents(int32_t id)
 
 int64_t UDSSession::GetEarlistEventTime() const
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     if (events_.empty()) {
         MMI_LOGD("events_ is empty");
         return 0;

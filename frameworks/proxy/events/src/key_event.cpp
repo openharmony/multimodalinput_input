@@ -1409,7 +1409,7 @@ std::shared_ptr<KeyEvent> KeyEvent::Clone(std::shared_ptr<KeyEvent> keyEvent) {
 
 bool KeyEvent::IsValidKeyItem() const
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     int32_t noPressNum = 0;
     int32_t keyCode = GetKeyCode();
     int32_t action = GetKeyAction();
@@ -1448,13 +1448,12 @@ bool KeyEvent::IsValidKeyItem() const
         MMI_LOGE("keyCode is not unique when isPressed is false");
         return false;
     }
-    MMI_LOGD("leave");
     return true;
 }
 
 bool KeyEvent::IsValid() const
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     int32_t keyCode = GetKeyCode();
     if (keyCode <= KEYCODE_UNKNOWN) {
         MMI_LOGE("KeyCode_ is invalid");
@@ -1477,7 +1476,6 @@ bool KeyEvent::IsValid() const
         MMI_LOGE("IsValidKeyItem is invalid");
         return false;
     }
-    MMI_LOGD("leave");
     return true;
 }
 

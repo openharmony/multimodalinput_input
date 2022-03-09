@@ -39,7 +39,7 @@ JsInputDeviceContext::~JsInputDeviceContext()
 
 napi_value JsInputDeviceContext::CreateInstance(napi_env env)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     napi_value global = nullptr;
     napi_status status = napi_get_global(env, &global);
     if (status != napi_ok) {
@@ -102,13 +102,12 @@ napi_value JsInputDeviceContext::CreateInstance(napi_env env)
         MMI_LOGE("failed to create contextRef_ reference");
         return nullptr;
     }
-    MMI_LOGD("end");
     return jsInstance;
 }
 
 napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info info)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
@@ -130,13 +129,12 @@ napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info 
         MMI_LOGE("failed to wrap jsContext");
         return nullptr;
     }
-    MMI_LOGD("end");
     return thisVar;
 }
 
 JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     napi_value global = nullptr;
     napi_status status = napi_get_global(env, &global);
     if (status != napi_ok) {
@@ -178,7 +176,6 @@ JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
         MMI_LOGE("instance is nullptr");
         return nullptr;
     }
-    MMI_LOGD("end");
     return instance;
 }
 
@@ -189,7 +186,7 @@ std::shared_ptr<JsInputDeviceManager> JsInputDeviceContext::GetJsInputDeviceMgr(
 
 napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info info)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     size_t argc = 1;
     napi_value argv[1];
     napi_status status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
@@ -223,13 +220,12 @@ napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info i
         return nullptr;
     }
     jsInputDeviceMgr->GetDeviceIds(env, argv[0]);
-    MMI_LOGD("end");
     return nullptr;
 }
 
 napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     size_t argc = 2;
     napi_value argv[2];
     napi_status status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
@@ -281,13 +277,12 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
         return nullptr;
     }
     jsInputDeviceMgr->GetDevice(id, env, argv[1]);
-    MMI_LOGD("end");
     return nullptr;
 }
 
 napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     auto instance = CreateInstance(env);
     if (instance == nullptr) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to create instance");
@@ -299,7 +294,6 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceIds", GetDeviceIds),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
-    MMI_LOGD("end");
     return exports;
 }
 } // namespace MMI
