@@ -66,8 +66,6 @@ ohos_source_set("patch_gen_mtdev-third") {
 
   configs = [ ":libmtdev_config" ]
 
-  public_configs = [ ":libmtdev_public_config" ]
-
   deps = [ ":apply_patch" ]
 
   public_deps = []
@@ -77,8 +75,6 @@ ohos_shared_library("libmtdev-hdf") {
   sources = []
 
   configs = [ ":libmtdev_config" ]
-
-  public_configs = [ ":libmtdev_public_config" ]
 
   deps = []
 

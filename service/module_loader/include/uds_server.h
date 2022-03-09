@@ -48,7 +48,6 @@ public:
     virtual ~UDSServer();
     void UdsStop();
     bool SendMsg(int32_t fd, NetPacket& pkt);
-    void Broadcast(NetPacket& pkt);
     void Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt);
     void Dump(int32_t fd);
     int32_t GetClientFd(int32_t pid);

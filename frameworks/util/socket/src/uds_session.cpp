@@ -54,10 +54,9 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
     }
     ssize_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
     if (ret < 0) {
-        const int32_t errNoSaved = errno;
         MMI_LOGE("write return %{public}zd,"
-                 "fd_:%{public}d,errNoSaved:%{public}d,strerror:%{public}s",
-                 ret, fd_, errNoSaved, strerror(errNoSaved));
+                 "fd_:%{public}d,errno:%{public}d",
+                 ret, fd_, errno);
         return false;
     }
     return true;
@@ -100,21 +99,21 @@ bool UDSSession::SendMsg(NetPacket& pkt) const
 
 void UDSSession::AddEvent(int32_t id, int64_t time)
 {
-    MMI_LOGI("begin");
+    MMI_LOGD("begin, event: %{public}d", id);
     EventTime eventTime = {id, time};
     events_.push_back(eventTime);
-    MMI_LOGI("end");
+    MMI_LOGD("end");
 }
 
 void UDSSession::DelEvents(int32_t id)
 {
-    MMI_LOGI("begin");
+    MMI_LOGD("begin, event: %{public}d", id);
     int32_t count = 0;
     for (auto &item : events_) {
         ++count;
         if (item.id == id) {
             events_.erase(events_.begin(), events_.begin() + count);
-            MMI_LOGI("Delete events");
+            MMI_LOGD("Delete events");
             break;
         }
     }
@@ -122,24 +121,24 @@ void UDSSession::DelEvents(int32_t id)
     if (events_.empty() || (currentTime < (events_.begin()->eventTime + INPUT_UI_TIMEOUT_TIME))) {
         isANRProcess_ = false;
     }
-    MMI_LOGI("end");
+    MMI_LOGD("end");
 }
 
-int64_t UDSSession::GetFirstEventTime()
+int64_t UDSSession::GetEarlistEventTime() const
 {
-    MMI_LOGI("begin");
+    MMI_LOGD("begin");
     if (events_.empty()) {
-        MMI_LOGI("events_ is empty");
+        MMI_LOGD("events_ is empty");
         return 0;
     }
-    MMI_LOGI("end");
+    MMI_LOGD("end");
     return events_.begin()->eventTime;
 }
 
-bool UDSSession::EventsIsEmpty()
+bool UDSSession::IsEventQueueEmpty()
 {
     if (events_.empty()) {
-        MMI_LOGI("events_ is empty");
+        MMI_LOGD("events_ is empty");
         return true;
     }
     return false;

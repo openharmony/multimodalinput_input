@@ -26,7 +26,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "KeyEventSubscriber"};
-constexpr uint8_t MAX_PRE_KEY_COUNT = 4;
+constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
 }
 
 int32_t KeyEventSubscriber::SubscribeKeyEvent(
@@ -39,26 +39,22 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
     }
     CHKPR(sess, ERROR_NULL_POINTER);
     CHKPR(keyOption, ERROR_NULL_POINTER);
-    int32_t preKeySize = keyOption->GetPreKeys().size();
+    uint32_t preKeySize = keyOption->GetPreKeys().size();
     if (preKeySize > MAX_PRE_KEY_COUNT) {
-        MMI_LOGE("Leave, pre key size %{public}d more than %{public}d", preKeySize, MAX_PRE_KEY_COUNT);
+        MMI_LOGE("Leave, preKeySize:%{public}u", preKeySize);
         return RET_ERR;
     }
 
     for (const auto &keyCode : keyOption->GetPreKeys()) {
         MMI_LOGD("keyOption->prekey:%{public}d", keyCode);
     }
-
     MMI_LOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
         "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuriation:%{public}d",
         subscribeId, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
-
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
     subscribers_.push_back(subscriber);
-
     InitSessionDeleteCallback();
-
     MMI_LOGD("Leave");
     return RET_OK;
 }

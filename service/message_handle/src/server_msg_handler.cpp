@@ -55,8 +55,8 @@ bool ServerMsgHandler::Init(UDSServer& udsServer)
 #endif
     MsgCallback funs[] = {
         {MmiMessageId::ON_VIRTUAL_KEY, MsgCallbackBind2(&ServerMsgHandler::OnVirtualKeyEvent, this)},
-        {MmiMessageId::NEW_CHECK_REPLY_MESSAGE,
-            MsgCallbackBind2(&ServerMsgHandler::NewCheckReplyMessageFormClient, this)},
+        {MmiMessageId::MARK_PROCESS,
+            MsgCallbackBind2(&ServerMsgHandler::MarkProcessed, this)},
         {MmiMessageId::ON_DUMP, MsgCallbackBind2(&ServerMsgHandler::OnDump, this)},
         {MmiMessageId::GET_MMI_INFO_REQ, MsgCallbackBind2(&ServerMsgHandler::GetMultimodeInputInfo, this)},
         {MmiMessageId::INJECT_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectKeyEvent, this) },
@@ -156,17 +156,18 @@ int32_t ServerMsgHandler::OnDump(SessionPtr sess, NetPacket& pkt)
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::NewCheckReplyMessageFormClient(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
 {
     MMI_LOGD("begin");
     CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t id = 0;
-    pkt >> id;
+    int32_t eventId = 0;
+    pkt >> eventId;
+    MMI_LOGD("event is: %{public}d", eventId);
     if (pkt.ChkRWError()) {
         MMI_LOGE("Packet read data failed");
         return PACKET_READ_FAIL;
     }
-    sess->DelEvents(id);
+    sess->DelEvents(eventId);
     MMI_LOGD("end");
     return RET_OK;
 }
@@ -198,6 +199,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     auto creKey = KeyEvent::Create();
+    CHKPR(creKey, ERROR_NULL_POINTER);
     int32_t errCode = InputEventDataTransformation::NetPacketToKeyEvent(pkt, creKey);
     if (errCode != RET_OK) {
         MMI_LOGE("Deserialization is Failed, errCode:%{public}u", errCode);
@@ -215,6 +217,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
 {
     MMI_LOGD("enter");
     auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != RET_OK) {
         MMI_LOGE("Unmarshalling failed");
         return RET_ERR;
@@ -342,7 +345,7 @@ int32_t ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
     int32_t finalKeyDownDuration = 0;
     pkt >> subscribeId >> finalKey >> isFinalKeyDown >> finalKeyDownDuration >> preKeySize;
     std::set<int32_t> preKeys;
-    for (int32_t i = 0; i < preKeySize; ++i) {
+    for (uint32_t i = 0; i < preKeySize; ++i) {
         int32_t tmpKey = -1;
         pkt >> tmpKey;
         if (!(preKeys.insert(tmpKey).second)) {
