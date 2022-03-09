@@ -37,7 +37,7 @@ void TouchTransformPointProcessor::SetPointEventSource(int32_t sourceType)
 
 bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPF(event);
     auto data = libinput_event_get_touch_event(event);
     CHKPF(data);

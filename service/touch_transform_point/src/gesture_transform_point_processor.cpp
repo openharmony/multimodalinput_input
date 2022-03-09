@@ -38,7 +38,7 @@ void GestureTransformPointProcessor::SetPointEventSource(int32_t sourceType)
 
 void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_gesture *data)
 {
-    MMI_LOGD("Touchpad begin event");
+    CALL_LOG_ENTER;
     CHKPV(data);
     auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     auto scale = libinput_event_gesture_get_scale(data);
