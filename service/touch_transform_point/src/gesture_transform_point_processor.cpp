@@ -122,7 +122,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gest
 std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestrueEvent(
     struct libinput_event *event)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     CHKPP(event);
     auto data = libinput_event_get_gesture_event(event);
     CHKPP(data);
@@ -155,7 +155,6 @@ std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestrueE
             return nullptr;
         }
     }
-    MMI_LOGD("end");
     return pointerEvent_;
 }
 } // namespace MMI
