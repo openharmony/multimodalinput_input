@@ -66,7 +66,7 @@ void MouseDeviceState::GetPressedButtons(std::vector<int32_t>& pressedButtons)
     }
 }
 
-std::map<uint32_t, int32_t> MouseDeviceState::GetMouseBtnState()
+std::map<uint32_t, int32_t> MouseDeviceState::GetMouseBtnState() const
 {
     return mouseBtnState_;
 }

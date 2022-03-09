@@ -35,7 +35,7 @@ MouseEventHandler::MouseEventHandler()
     CHKPL(pointerEvent_);
 }
 
-std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent()
+std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
 {
     return pointerEvent_;
 }

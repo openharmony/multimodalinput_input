@@ -184,7 +184,7 @@ int32_t JsInputMonitor::IsMatch(napi_env jsEnv)
     return RET_ERR;
 }
 
-std::string JsInputMonitor::GetAction(int32_t action)
+std::string JsInputMonitor::GetAction(int32_t action) const
 {
     switch (action) {
         case PointerEvent::POINTER_ACTION_CANCEL:
@@ -200,7 +200,7 @@ std::string JsInputMonitor::GetAction(int32_t action)
     }
 }
 
-int32_t JsInputMonitor::GetJsPointerItem(const PointerEvent::PointerItem &item, napi_value value)
+int32_t JsInputMonitor::GetJsPointerItem(const PointerEvent::PointerItem &item, napi_value value) const
 {
     if (SetNameProperty(jsEnv_, value, "globalX", item.GetGlobalX()) != napi_ok) {
         MMI_LOGE("Set globalX property failed");
@@ -348,7 +348,7 @@ void JsInputMonitor::Stop() {
     MMI_LOGD("Leave");
 }
 
-int32_t JsInputMonitor::GetId()
+int32_t JsInputMonitor::GetId() const
 {
     return id_;
 }

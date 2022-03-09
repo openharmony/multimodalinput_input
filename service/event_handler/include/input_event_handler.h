@@ -35,7 +35,7 @@ public:
     void OnEvent(void *event);
     void OnCheckEventReport();
     int32_t OnMouseEventEndTimerHandler(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
-    UDSServer *GetUDSServer();
+    UDSServer *GetUDSServer() const;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
 protected:
     int32_t OnEventDeviceAdded(libinput_event *event);

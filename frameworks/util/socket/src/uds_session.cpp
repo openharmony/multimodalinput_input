@@ -124,7 +124,7 @@ void UDSSession::DelEvents(int32_t id)
     MMI_LOGD("end");
 }
 
-int64_t UDSSession::GetEarlistEventTime()
+int64_t UDSSession::GetEarlistEventTime() const
 {
     MMI_LOGD("begin");
     if (events_.empty()) {
