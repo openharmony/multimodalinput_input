@@ -213,7 +213,7 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
 
 void UDSClient::OnThread()
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     SetThreadName("uds_client");
     isThreadHadRun_ = true;
     StreamBuffer streamBuf;
@@ -244,7 +244,6 @@ void UDSClient::OnThread()
             break;
         }
     }
-    MMI_LOGD("end");
 }
 
 void UDSClient::SetToExit()

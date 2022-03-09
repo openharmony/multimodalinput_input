@@ -38,7 +38,7 @@ void TouchPadTransformPointProcessor::SetPointEventSource(int32_t sourceType)
 
 void TouchPadTransformPointProcessor::OnEventTouchPadDown(struct libinput_event *event)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
     CHKPV(data);
@@ -63,12 +63,11 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(struct libinput_event 
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_LOGD("End");
 }
 
 void TouchPadTransformPointProcessor::OnEventTouchPadMotion(struct libinput_event *event)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
     CHKPV(data);
@@ -89,12 +88,11 @@ void TouchPadTransformPointProcessor::OnEventTouchPadMotion(struct libinput_even
     item.SetGlobalY(static_cast<int32_t>(logicalY));
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_LOGD("End");
 }
 
 void TouchPadTransformPointProcessor::OnEventTouchPadUp(struct libinput_event *event)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
     CHKPV(data);
@@ -117,13 +115,12 @@ void TouchPadTransformPointProcessor::OnEventTouchPadUp(struct libinput_event *e
     item.SetGlobalY(static_cast<int32_t>(logicalY));
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_LOGD("End");
 }
 
 std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPadEvent(
     struct libinput_event *event)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     CHKPP(event);
     CHKPP(pointerEvent_);
     auto type = libinput_event_get_type(event);
@@ -145,7 +142,6 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
             return nullptr;
         }
     }
-    MMI_LOGD("end");
     return pointerEvent_;
 }
 } // namespace MMI

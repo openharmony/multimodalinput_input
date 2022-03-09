@@ -24,7 +24,7 @@ namespace {
 
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) const
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     auto item = inputDevice_.find(id);
     if (item == inputDevice_.end()) {
         MMI_LOGE("failed to search for the device");
@@ -41,24 +41,22 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     inputDevice->SetType(deviceType);
     std::string name = libinput_device_get_name(item->second);
     inputDevice->SetName(name);
-    MMI_LOGD("end");
     return inputDevice;
 }
 
 std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     std::vector<int32_t> ids;
     for (const auto &item : inputDevice_) {
         ids.push_back(item.first);
     }
-    MMI_LOGD("end");
     return ids;
 }
 
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     CHKPV(inputDevice);
     for (const auto& item : inputDevice_) {
         if (item.second == inputDevice) {
@@ -76,12 +74,11 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)
     if (IsPointerDevice(static_cast<struct libinput_device *>(inputDevice))) {
         NotifyPointerDevice(true);
     }
-    MMI_LOGD("end");
 }
 
 void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device* inputDevice)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     CHKPV(inputDevice);
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second == inputDevice) {
@@ -92,7 +89,6 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device* inputDevic
             break;
         }
     }
-    MMI_LOGD("end");
 }
 
 bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)
@@ -106,13 +102,13 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)
 
 void InputDeviceManager::Attach(std::shared_ptr<DeviceObserver> observer)
 {
-    MMI_LOGI("begin");
+    CALL_LOG_ENTER;
     observers_.push_back(observer);
 }
 
 void InputDeviceManager::Detach(std::shared_ptr<DeviceObserver> observer)
 {
-    MMI_LOGI("begin");
+    CALL_LOG_ENTER;
     observers_.remove(observer);
 }
 
@@ -126,7 +122,7 @@ void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice)
 
 int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevice)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     CHKPR(inputDevice, INVALID_DEVICE_ID);
     for (const auto& item : inputDevice_) {
         if (item.second == inputDevice) {
