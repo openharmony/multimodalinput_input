@@ -200,7 +200,6 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
             auto monitorInfo = *infoIter;
             if (MatchCombinationkeys(monitorInfo, keyEvent)) {
                 monitorInfo->keyEvent = keyEvent;
-                monitorInfo->status = 1;
                 EmitAsyncCallbackWork(monitorInfo);
             }
             ++infoIter;
