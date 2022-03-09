@@ -33,7 +33,7 @@ public:
     void Normalize(struct libinput_event *event);
 private:
     void HandleMotionInner(libinput_event_pointer* data);
-    void HandleButonInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem);
+    void HandleButonInner(libinput_event_pointer* data);
     void HandleAxisInner(libinput_event_pointer* data);
     void HandlePostInner(libinput_event_pointer* data, int32_t deviceId, PointerEvent::PointerItem& pointerItem);
     void DumpInner();
@@ -45,6 +45,7 @@ private:
     double absolutionX_ = -1;
     double absolutionY_ = -1;
     int32_t buttionId_ = -1;
+    bool isPressed_ = false;
 };
 } // namespace MMI
 } // namespace OHOS
