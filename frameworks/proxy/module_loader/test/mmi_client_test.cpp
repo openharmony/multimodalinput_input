@@ -120,7 +120,7 @@ HWTEST_F(MMIClientTest, SdkGetMultimodeInputInfo, TestSize.Level1)
 MMIClientUnitTest mmiClientTest;
 /**
  * @tc.name:Re_RegisterConnectedFunction
- * @tc.desc:Verify register connetct 
+ * @tc.desc:Verify register connetct
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -131,7 +131,7 @@ HWTEST_F(MMIClientTest, Re_RegisterConnectedFunction, TestSize.Level1)
 
 /**
  * @tc.name:Re_RegisterDisconnectedFunction
- * @tc.desc:Verify register disconnetct 
+ * @tc.desc:Verify register disconnetct
  * @tc.type: FUNC
  * @tc.require:
  */
