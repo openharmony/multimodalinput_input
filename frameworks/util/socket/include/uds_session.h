@@ -62,6 +62,8 @@ public:
     void UpdateDescript();
     void AddEvent(int32_t id, int64_t time);
     void DelEvents(int32_t id);
+    void AddPermission(bool hasPermission);
+    bool HasPermission();
     int64_t GetFirstEventTime();
     bool EventsIsEmpty();
     bool isANRProcess_ {false};
@@ -87,6 +89,7 @@ protected:
     const int32_t fd_;
     const int32_t uid_;
     const int32_t pid_;
+    bool hasPermission_ = true;
 #ifdef OHOS_BUILD_MMI_DEBUG
     int32_t clientFd_ = -1;
 #endif // OHOS_BUILD_MMI_DEBUG
