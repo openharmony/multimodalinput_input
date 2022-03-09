@@ -47,6 +47,7 @@ public:
 protected:
     virtual void OnConnected() override;
     virtual void OnDisconnected() override;
+    void OnMsgHandler(NetPacket& pkt);
     
     void OnThirdThread();
     bool StartEventRunner();

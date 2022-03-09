@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace MMI {
 class UDSClient;
-using MsgClientFunCallback = std::function<void(const UDSClient&, NetPacket&)>;
+using MsgClientFunCallback = std::function<void(NetPacket&)>;
 class UDSClient : public UDSSocket {
 public:
     UDSClient();
@@ -50,6 +50,8 @@ protected:
 
     bool StartClient(MsgClientFunCallback fun, bool detachMode);
     void OnRecv(const char *buf, size_t size);
+    void OnEvent(const struct epoll_event& ev, StreamBuffer& buf);
+    void OnThread();
     void SetToExit();
 
 protected:

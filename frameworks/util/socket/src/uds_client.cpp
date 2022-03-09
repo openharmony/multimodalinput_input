@@ -37,6 +37,20 @@ int32_t UDSClient::ConnectTo()
         MMI_LOGE("Socket failed");
         return RET_ERR;
     }
+    if (epollFd_ < 0) {
+        if (EpollCreat(MAX_EVENT_SIZE) < 0) {
+            MMI_LOGE("Epoll creat failed");
+            return RET_ERR;
+        }
+    }
+
+    struct epoll_event ev;
+    ev.events = EPOLLIN;
+    ev.data.fd = fd_;
+    if (EpollCtl(fd_, EPOLL_CTL_ADD, ev) < 0) {
+        MMI_LOGE("EpollCtl failed");
+        return RET_ERR;
+    }
     OnConnected();
     return RET_OK;
 }
@@ -79,6 +93,13 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
     if (ConnectTo() < 0) {
         MMI_LOGW("Client connection failed, Try again later");
     }
+     t_ = std::thread(std::bind(&UDSClient::OnThread, this));
+    if (detachMode) {
+        MMI_LOGW("uds client thread detach");
+        t_.detach();
+    } else {
+        MMI_LOGW("uds client thread join");
+    }
     return true;
 }
 
@@ -119,11 +140,92 @@ void UDSClient::OnRecv(const char *buf, size_t size)
                 return;
             }
         }
-        recvFun_(*this, pkt);
+        recvFun_(pkt);
         packSize = headSize + head->size[0];
         bufSize -= packSize;
         readIdx += packSize;
     }
+}
+
+void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
+{
+    auto fd = ev.data.fd;
+    if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
+        MMI_LOGI("ev.events:0x%{public}x,fd:%{public}d same as fd_:%{public}d", ev.events, fd, fd_);
+        OnDisconnected();
+        struct epoll_event event = {};
+        EpollCtl(fd, EPOLL_CTL_DEL, event);
+        close(fd);
+        fd_ = -1;
+        return;
+    }
+
+    char szBuf[MAX_PACKET_BUF_SIZE] = {};
+    const size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
+    if (maxCount <= 0) {
+        MMI_LOGE("The maxCount is error, maxCount:%{public}d, errCode:%{public}d", maxCount, VAL_NOT_EXP);
+    }
+    auto isoverflow = false;
+    for (size_t j = 0; j < maxCount; j++) {
+        auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, SOCKET_FLAGS);
+        if (size < 0) {
+            int32_t eno = errno;
+            if(eno == EAGAIN || eno == EINTR || eno == EWOULDBLOCK) {
+                continue;
+            }
+            MMI_LOGE("recv return %{public}zu errno:%{public}d", size, eno);
+            break;
+        }
+        if (size == 0) {
+            MMI_LOGE("The service side disconnect with the client. size:0 errno:%{public}d", errno);
+            OnDisconnected();
+            close(fd);
+            fd_ = -1;
+            break;
+        }
+        if (!buf.Write(szBuf, size)) {
+            isoverflow = true;
+            break;
+        }
+        if (size < MAX_PACKET_BUF_SIZE) {
+            break;
+        }
+    }
+    if (!isoverflow && buf.Size() > 0) {
+        OnRecv(buf.Data(), buf.Size());
+    }
+}
+
+void UDSClient::OnThread()
+{
+    MMI_LOGD("begin");
+    SetThreadName("uds_client");
+    isRunning_ = true;
+    StreamBuffer streamBuf;
+    struct epoll_event events[MAX_EVENT_SIZE] = {};
+
+    while (isRunning_) {
+        if (isConnected_) {
+            streamBuf.Clean();
+            auto count = EpollWait(*events, MAX_EVENT_SIZE, DEFINE_EPOLL_TIMEOUT);
+            for (auto i = 0; i < count; i++) {
+                OnEvent(events[i], streamBuf);
+            }
+        } else {
+            if (ConnectTo() < 0) {
+                MMI_LOGW("Client reconnection failed, Try again after %{public}d ms",
+                         CLIENT_RECONNECT_COOLING_TIME);
+                std::this_thread::sleep_for(std::chrono::milliseconds(CLIENT_RECONNECT_COOLING_TIME));
+                continue;
+            }
+        }
+        if (isToExit_) {
+            isRunning_ = false;
+            MMI_LOGW("Client thread exit");
+            break;
+        }
+    }
+    MMI_LOGD("end");
 }
 
 void UDSClient::SetToExit()
