@@ -34,7 +34,7 @@ static Callbacks callbacks = {};
 int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
     std::shared_ptr<KeyOption> keyOption)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(keyOption, ERROR_NULL_POINTER);
     size_t argc = 3;
