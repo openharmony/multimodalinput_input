@@ -57,7 +57,6 @@ protected:
 
 private:
     int32_t OnEventHandler(libinput_event *event);
-
     UDSServer *udsServer_ = nullptr;
     EventDispatch eventDispatch_;
     EventPackage eventPackage_;
