@@ -30,7 +30,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Multi
 int32_t MultimodalInputConnectStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
-    MMI_LOGD("enter, request ode:%{public}d", code);
+    CALL_LOG_ENTER;
+    MMI_LOGD("request ode:%{public}d", code);
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IMultimodalInputConnect::GetDescriptor()) {

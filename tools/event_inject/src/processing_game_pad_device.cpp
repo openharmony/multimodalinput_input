@@ -24,7 +24,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Proce
 int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const Json& originalEvent,
     InputEventArray& inputEventArray)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     if (originalEvent.empty()) {
         return RET_ERR;
     }
@@ -42,8 +42,6 @@ int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const Json& origin
         return RET_ERR;
     }
     TransformPadEventToInputEvent(padEventArray, inputEventArray);
-    MMI_LOGD("Leave");
-
     return RET_OK;
 }
 

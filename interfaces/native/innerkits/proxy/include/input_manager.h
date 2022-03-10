@@ -19,11 +19,12 @@
 #include <memory>
 #include <list>
 
+#include "nocopyable.h"
+
 #include "display_info.h"
 #include "error_multimodal.h"
 #include "i_input_event_consumer.h"
 #include "key_option.h"
-#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
