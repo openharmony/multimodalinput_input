@@ -18,13 +18,15 @@
 
 #include <array>
 #include <list>
-#include <vector>
 #include <memory>
 #include <ostream>
 #include <set>
-#include "parcel.h"
-#include "input_event.h"
+#include <vector>
+
 #include "nocopyable.h"
+#include "parcel.h"
+
+#include "input_event.h"
 
 namespace OHOS {
 namespace MMI {
