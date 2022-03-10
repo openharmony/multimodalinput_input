@@ -67,7 +67,8 @@ private:
 private:
         std::list<std::unique_ptr<TimerItem>> timers_;
 };
+
+#define TimerMgr TimerManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define TimerMgr OHOS::MMI::TimerManager::GetInstance()
 #endif // TIMER_MANAGER_H

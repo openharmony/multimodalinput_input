@@ -49,8 +49,8 @@ private:
     int32_t buttionId_ = -1;
     bool isPressed_ = false;
 };
+
+#define MouseEventHdr MouseEventHandler::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define MouseEventHdr OHOS::MMI::MouseEventHandler::GetInstance()
-
 #endif // MOUSE_EVENT_HANDLER_H

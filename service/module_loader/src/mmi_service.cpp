@@ -337,7 +337,7 @@ void MMIService::OnTimer()
 
 void MMIService::OnThread()
 {
-    OHOS::MMI::SetThreadName(std::string("mmi_service"));
+    SetThreadName(std::string("mmi_service"));
     uint64_t tid = GetThisThreadIdOfLL();
     if (tid <= 0) {
         MMI_LOGE("The tid is error, errCode:%{public}d", VAL_NOT_EXP);

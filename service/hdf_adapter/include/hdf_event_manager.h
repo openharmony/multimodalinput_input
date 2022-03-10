@@ -68,7 +68,7 @@ public:
 private:
     libinput *hdiinput_ = nullptr;
     std::list<uhdf *> hdflist_;
-    static OHOS::MMI::HdfEventManager *globleThis_;
+    static HdfEventManager *globleThis_;
     bool devStatus[TOTAL_INPUT_DEVICE_STATUS_COUNT];
     DevDesc mountDevIndex_[TOTAL_INPUT_DEVICE_COUNT];
     IInputInterface *inputInterface_;
@@ -76,7 +76,8 @@ private:
     InputEventCb eventCallBack_;
     InputHostCb  hostPlugCallBack_;
 };
+
+extern HdfEventManager  hdfEventManager;
 } // namespace MMI
 } // namespace OHOS
-extern OHOS::MMI::HdfEventManager  hdfEventManager;
 #endif // HDF_EVENT_MANAGER_H
