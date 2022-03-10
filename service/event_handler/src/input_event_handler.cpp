@@ -284,7 +284,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         return KEY_EVENT_DISP_FAIL;
     }
 
-    if (!TimerMgr->IsExist(timerId_) && keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN){
+    if (!TimerMgr->IsExist(timerId_) && keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
         AddHandleTimer();
         MMI_LOGD("axis begin");
     }
