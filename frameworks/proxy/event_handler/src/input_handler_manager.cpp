@@ -169,7 +169,8 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Enter handler:%{public}d", handlerId);
+    CALL_LOG_ENTER;
+    MMI_LOGD("handler:%{public}d", handlerId);
     CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         int32_t pointerId = pointerEvent->GetId();
@@ -185,7 +186,6 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
     if (consumer != nullptr) {
         consumer->OnInputEvent(pointerEvent);
     }
-    MMI_LOGD("Leave");
 }
 } // namespace MMI
 } // namespace OHOS
