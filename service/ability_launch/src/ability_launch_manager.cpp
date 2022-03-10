@@ -304,7 +304,7 @@ bool AbilityLaunchManager::HandleKeyCancel(ShortcutKey &shortcutKey)
 {
     CALL_LOG_ENTER;
     if (shortcutKey.timerId < 0) {
-       MMI_LOGE("Skip, timerid less than 0");
+        MMI_LOGE("Skip, timerid less than 0");
     }
     auto timerId = shortcutKey.timerId;
     shortcutKey.timerId = -1;
