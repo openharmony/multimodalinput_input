@@ -32,6 +32,8 @@ const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_i
 } // namespace MMI
 } // namespace OHOS
 
+namespace OHOS {
+namespace MMI {
 PointerDrawingManager::PointerDrawingManager() {}
 
 PointerDrawingManager::~PointerDrawingManager() {}
