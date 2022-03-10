@@ -49,7 +49,7 @@ int32_t EventFilterStub::OnRemoteRequest(
 
 int32_t EventFilterStub::StubHandlePointerEvent(MessageParcel& data, MessageParcel& reply)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     std::shared_ptr<PointerEvent> event = PointerEvent::Create();
     if (event == nullptr) {
         MMI_LOGE("event is nullptr");
@@ -66,8 +66,6 @@ int32_t EventFilterStub::StubHandlePointerEvent(MessageParcel& data, MessageParc
         MMI_LOGE("WriteBool:%{public}d fail", ret);
         return RET_ERR;
     }
-
-    MMI_LOGD("leave");
     return RET_OK;
 }
 } // namespace MMI

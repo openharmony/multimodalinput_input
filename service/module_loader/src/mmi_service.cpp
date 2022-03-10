@@ -381,7 +381,7 @@ void MMIService::OnThread()
 
 bool MMIService::InitSignalHandler()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     sigset_t mask = {0};
     int32_t retCode = sigfillset(&mask);
     if (retCode < 0) {
@@ -407,14 +407,12 @@ bool MMIService::InitSignalHandler()
         close(fdSignal);
         return false;
     }
-
-    MMI_LOGD("Leave");
     return true;
 }
 
 void MMIService::OnSignalEvent(int32_t signalFd)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     signalfd_siginfo sigInfo;
     int32_t size = ::read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
     if (size != sizeof(signalfd_siginfo)) {
@@ -438,7 +436,6 @@ void MMIService::OnSignalEvent(int32_t signalFd)
         default:
             break;
     }
-    MMI_LOGD("leave");
 }
 } // namespace MMI
 } // namespace OHOS

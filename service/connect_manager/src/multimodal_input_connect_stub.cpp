@@ -51,7 +51,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
 
 int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     int32_t ret = RET_OK;
 
     do {
@@ -86,7 +86,7 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
 
-    MMI_LOGD("leave, ret:%{public}d", ret);
+    MMI_LOGD("ret:%{public}d", ret);
     return RET_OK;
 }
 } // namespace MMI
