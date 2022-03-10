@@ -26,7 +26,7 @@ class ProcessingGamePadDevice : public DeviceBase {
         std::string direction;
         int32_t keyValue;
         int32_t blockTime;
-        std::vector<int32_t> gameEvents;
+        std::vector<uint32_t> gameEvents;
     };
 public:
     ProcessingGamePadDevice() = default;

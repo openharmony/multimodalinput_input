@@ -51,10 +51,9 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
     ssize_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
     if (ret < 0) {
-        const int32_t errNoSaved = errno;
         MMI_LOGE("write return %{public}zd,"
-                 "fd_:%{public}d,errNoSaved:%{public}d,strerror:%{public}s",
-                 ret, fd_, errNoSaved, strerror(errNoSaved));
+                 "fd_:%{public}d,errno:%{public}d",
+                 ret, fd_, errno);
         return false;
     }
     return true;

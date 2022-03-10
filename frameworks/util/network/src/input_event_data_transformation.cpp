@@ -25,7 +25,7 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
     CHKR(pkt.Write(key->GetKeyCode()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pkt.Write(key->GetKeyAction()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     auto keys = key->GetKeyItems();
-    int32_t size = keys.size();
+    int32_t size = static_cast<int32_t>(keys.size());
     CHKR(pkt.Write(size), STREAM_BUF_WRITE_FAIL, RET_ERR);
     for (const auto &item : keys) {
         CHKR(pkt.Write(item.GetKeyCode()), STREAM_BUF_WRITE_FAIL, RET_ERR);

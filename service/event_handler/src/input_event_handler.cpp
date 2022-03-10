@@ -427,10 +427,10 @@ int32_t InputEventHandler::OnGestureEvent(struct libinput_event *event)
     pointer->GetPointerItem(pointer->GetPointerId(), item);
     MMI_LOGD("Item:DownTime:%{public}" PRId64 ",IsPressed:%{public}s,"
              "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
-             "Width:%{public}d,Height:%{public}d,DeviceId:%{public}d",
+             "Width:%{public}d,Height:%{public}d",
              item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
              item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
-             item.GetWidth(), item.GetHeight(), item.GetDeviceId());
+             item.GetWidth(), item.GetHeight());
 
     int32_t ret = eventDispatch_.HandlePointerEvent(pointer);
     if (ret != RET_OK) {
@@ -499,10 +499,9 @@ int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEv
     CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item), PARAM_INPUT_FAIL, RET_ERR);
     MMI_LOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
              "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
-             "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,DeviceId:%{public}d",
+             "Width:%{public}d,Height:%{public}d,Pressure:%{public}d",
              item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
-             item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
-             item.GetDeviceId());
+             item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure());
 
     eventDispatch_.HandlePointerEvent(pointerEvent);
     return RET_OK;

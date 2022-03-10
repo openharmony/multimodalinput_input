@@ -80,7 +80,12 @@ int32_t ManageInjectDevice::SendEventToDeviveNode(const InputEventArray& inputEv
         MMI_LOGE("device node:%{public}s is not exit", deviceNode.c_str());
         return RET_ERR;
     }
-    int32_t fd = open(deviceNode.c_str(), O_RDWR);
+    char realPath[PATH_MAX] = {};
+    if (realpath(deviceNode.c_str(), realPath) == nullptr) {
+        MMI_LOGE("path is error, path:%{public}s", deviceNode.c_str());
+        return RET_ERR;
+    }
+    int32_t fd = open(realPath, O_RDWR);
     if (fd < 0) {
         MMI_LOGE("open device node:%{public}s faild", deviceNode.c_str());
         return RET_ERR;

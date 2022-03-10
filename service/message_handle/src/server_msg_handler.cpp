@@ -305,7 +305,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPac
     int32_t finalKeyDownDuration = 0;
     pkt >> subscribeId >> finalKey >> isFinalKeyDown >> finalKeyDownDuration >> preKeySize;
     std::vector<int32_t> preKeys;
-    for (uint32_t i = 0; i < preKeySize; i++) {
+    for (uint32_t i = 0; i < preKeySize; ++i) {
         int32_t tmpKey = -1;
         pkt >> tmpKey;
         preKeys.push_back(tmpKey);

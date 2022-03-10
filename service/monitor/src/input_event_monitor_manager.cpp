@@ -68,8 +68,8 @@ void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OH
 {
     CHKPV(keyEvent);
     MMI_LOGD("KeyEvent from libinput, keyCode:%{public}d, keyAction:%{public}d, action:%{public}d, "
-             "device:%{private}d, actionTime:%{public}" PRId64 "", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
-             keyEvent->GetAction(), keyEvent->GetDeviceId(), keyEvent->GetActionTime());
+             "actionTime:%{public}" PRId64 "", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
+             keyEvent->GetAction(), keyEvent->GetActionTime());
     if (monitors_.empty()) {
         MMI_LOGE("No monitor to send msg");
         return;
