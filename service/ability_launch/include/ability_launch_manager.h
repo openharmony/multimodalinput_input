@@ -74,7 +74,8 @@ private:
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey);
     bool HandleKeyDown(ShortcutKey &shortcutKey);
     bool HandleKeyCancel(ShortcutKey &shortcutKey);
-    void ResetLastMatchedKey() {
+    void ResetLastMatchedKey()
+    {
         lastMatchedKey_.preKeys.clear();
         lastMatchedKey_.finalKey = -1;
         lastMatchedKey_.timerId = -1;
