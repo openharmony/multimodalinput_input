@@ -16,9 +16,10 @@
 #ifndef EVENT_DUMP_H
 #define EVENT_DUMP_H
 
-#include "libmmi_util.h"
 #include "nocopyable.h"
 #include "singleton.h"
+
+#include "libmmi_util.h"
 #include "uds_server.h"
 
 namespace OHOS {

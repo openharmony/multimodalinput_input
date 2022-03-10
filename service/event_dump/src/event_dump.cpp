@@ -14,11 +14,14 @@
  */
 
 #include "event_dump.h"
+
 #include <climits>
 #include <cstdarg>
+
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
+
 #include "input_windows_manager.h"
 #include "util.h"
 #include "util_ex.h"

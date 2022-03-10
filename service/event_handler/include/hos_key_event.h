@@ -12,8 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef HOS_KEY_EVENT_H
 #define HOS_KEY_EVENT_H
+
 #include "libmmi_util.h"
 
 namespace OHOS {
