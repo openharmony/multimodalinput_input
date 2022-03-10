@@ -34,9 +34,8 @@ UDSServer::UDSServer() {}
 
 UDSServer::~UDSServer()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     UdsStop();
-    MMI_LOGD("leave");
 }
 
 void UDSServer::UdsStop()
@@ -126,7 +125,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     const int32_t moduleType, const int32_t uid, const int32_t pid,
     int32_t& serverFd, int32_t& toReturnClientFd)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     std::lock_guard<std::mutex> lock(mux_);
     int32_t sockFds[2] = {};
 
@@ -477,13 +476,14 @@ void UDSServer::DelSession(int32_t fd)
 
 void UDSServer::OnThread()
 {
+    CALL_LOG_ENTER;
     SetThreadName(std::string("uds_server"));
     uint64_t tid = GetThisThreadIdOfLL();
     if (tid <= 0) {
         MMI_LOGE("The tid value is error, errCode:%{public}d", VAL_NOT_EXP);
         return;
     }
-    MMI_LOGD("begin tid:%{public}" PRId64 "", tid);
+    MMI_LOGD("tid:%{public}" PRId64 "", tid);
 
     std::map<int32_t, StreamBufData> bufMap;
     struct epoll_event ev[MAX_EVENT_SIZE] = {};
@@ -502,23 +502,20 @@ void UDSServer::OnThread()
             }
         }
     }
-    MMI_LOGI("end");
 }
 
 void UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callback)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     callbacks_.push_back(callback);
-    MMI_LOGD("Leave");
 }
 
 void UDSServer::NotifySessionDeleted(SessionPtr ses)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     for (const auto& callback : callbacks_) {
         callback(ses);
     }
-    MMI_LOGD("Leave");
 }
 } // namespace MMI
 } // namespace OHOS

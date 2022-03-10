@@ -278,7 +278,7 @@ int32_t InputEventHandler::OnEventPointer(libinput_event *event)
 
 int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
@@ -300,13 +300,12 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
         }
         return RET_OK;
     }
-    MMI_LOGD("Leave");
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
 
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH_PAD);
@@ -322,7 +321,6 @@ int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
         }
         return RET_OK;
     }
-    MMI_LOGD("Leave");
     return RET_OK;
 }
 
