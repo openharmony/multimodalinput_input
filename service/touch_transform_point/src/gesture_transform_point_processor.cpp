@@ -18,10 +18,10 @@
 
 namespace OHOS {
 namespace MMI {
-    namespace {
-        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN,
-            "GestureTransformPointProcessor"};
-    }
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN,
+    "GestureTransformPointProcessor"};
+} // namespace
 
 GestureTransformPointProcessor::GestureTransformPointProcessor(int32_t deviceId) : deviceId_(deviceId)
 {

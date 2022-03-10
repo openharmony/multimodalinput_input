@@ -32,12 +32,7 @@ void OnConnected(const IfMMIClient& client)
     InputManagerImpl::GetInstance()->OnConnected();
 }
 
-MultimodalEventHandler::MultimodalEventHandler()
-{
-#ifdef OHOS_BUILD_MMI_DEBUG
-    VerifyLogManagerRun();
-#endif
-}
+MultimodalEventHandler::MultimodalEventHandler() {}
 
 int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr)
 {

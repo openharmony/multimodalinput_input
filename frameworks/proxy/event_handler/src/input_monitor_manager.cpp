@@ -21,8 +21,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputMonitorManager" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputMonitorManager" };
+} // namespace
 
 int32_t InputMonitorManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor)
 {

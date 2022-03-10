@@ -20,12 +20,12 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr size_t    MAX_N_INPUT_HANDLERS { 16 };
-    constexpr size_t    MAX_N_INPUT_MONITORS { MAX_N_INPUT_HANDLERS };
-    constexpr size_t    MAX_N_INPUT_INTERCEPTORS { MAX_N_INPUT_HANDLERS };
-    constexpr int32_t   MIN_HANDLER_ID { 1 };
-    constexpr int32_t   INVALID_HANDLER_ID { -1 };
-}
+constexpr size_t    MAX_N_INPUT_HANDLERS { 16 };
+constexpr size_t    MAX_N_INPUT_MONITORS { MAX_N_INPUT_HANDLERS };
+constexpr size_t    MAX_N_INPUT_INTERCEPTORS { MAX_N_INPUT_HANDLERS };
+constexpr int32_t   MIN_HANDLER_ID { 1 };
+constexpr int32_t   INVALID_HANDLER_ID { -1 };
+} // namespace
 
 enum InputHandlerType : int32_t {
     NONE,

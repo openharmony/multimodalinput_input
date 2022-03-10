@@ -21,8 +21,9 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceImpl"}; // namepace
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceImpl"};
+} // namespace
+
 InputDeviceImpl& InputDeviceImpl::GetInstance()
 {
     static InputDeviceImpl instance;
