@@ -21,7 +21,7 @@ namespace {
 const std::string VIRTUAL_KEYBOARD = "virtual_keyboard";
 constexpr uint32_t SEAT_KEY_COUNT_ONE = 1;
 constexpr uint32_t SEAT_KEY_COUNT_ZERO = 0;
-}
+} // namespace
 
 EventPackage::EventPackage() {}
 

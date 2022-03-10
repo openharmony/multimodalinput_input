@@ -50,7 +50,7 @@ bool InputWindowsManager::Init(UDSServer& udsServer)
 int32_t InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent> inputEvent)
 {
     CHKPR(inputEvent, ERROR_NULL_POINTER);
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     int32_t pid = GetPidAndUpdateTarget(inputEvent);
     if (pid <= 0) {
         MMI_LOGE("Invalid pid");
@@ -61,7 +61,6 @@ int32_t InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent> inputEvent
         MMI_LOGE("Invalid fd");
         return RET_ERR;
     }
-    MMI_LOGD("leave");
     return fd;
 }
 
@@ -81,7 +80,7 @@ int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent
 
 int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent) const
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPR(inputEvent, ERROR_NULL_POINTER);
     const int32_t targetDisplayId = GetDisplayId(inputEvent);
     if (targetDisplayId < 0) {
@@ -104,14 +103,14 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> i
         return it->second.pid;
     }
 
-    MMI_LOGE("leave,can't find logical display,target display:%{public}d", targetDisplayId);
+    MMI_LOGE("can't find logical display,target display:%{public}d", targetDisplayId);
     return RET_ERR;
 }
 
 void InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
     const std::vector<LogicalDisplayInfo> &logicalDisplays)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     physicalDisplays_.clear();
     logicalDisplays_.clear();
     windowInfos_.clear();
@@ -133,7 +132,6 @@ void InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInf
         PointerDrawMgr->TellDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
     }
     PrintDisplayDebugInfo();
-    MMI_LOGD("leave");
 }
 
 void InputWindowsManager::PrintDisplayDebugInfo()
@@ -444,7 +442,7 @@ int32_t InputWindowsManager::UpdateMouseTargetOld(std::shared_ptr<PointerEvent> 
 
 int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdataDisplayId(displayId)) {
@@ -568,19 +566,19 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
 
 int32_t InputWindowsManager::UpdateTouchPadTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     return RET_ERR;
 }
 
 int32_t InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     return RET_ERR;
 }
 
 int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto source = pointerEvent->GetSourceType();
     switch (source) {
@@ -599,7 +597,6 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
         }
     }
     MMI_LOGE("Source is not of the correct type, source:%{public}d", source);
-    MMI_LOGD("leave");
     return RET_ERR;
 }
 

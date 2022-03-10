@@ -14,9 +14,10 @@
  */
 
 #include "multimodal_event_handler.h"
-#include "input_manager_impl.h"
+
 #include "immi_token.h"
 #include "input_event.h"
+#include "input_manager_impl.h"
 #include "mmi_client.h"
 #include "proto.h"
 
@@ -31,12 +32,7 @@ void OnConnected(const IfMMIClient& client)
     InputManagerImpl::GetInstance()->OnConnected();
 }
 
-MultimodalEventHandler::MultimodalEventHandler()
-{
-#ifdef OHOS_BUILD_MMI_DEBUG
-    VerifyLogManagerRun();
-#endif
-}
+MultimodalEventHandler::MultimodalEventHandler() {}
 
 int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr)
 {

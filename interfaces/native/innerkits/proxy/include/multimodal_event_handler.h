@@ -15,12 +15,13 @@
 #ifndef MULTIMODAL_EVENT_HANDLER_H
 #define MULTIMODAL_EVENT_HANDLER_H
 
-#include "singleton.h"
-#include "if_client_msg_handler.h"
 #include "nocopyable.h"
-#include "standardized_event_manager.h"
+#include "singleton.h"
+
+#include "if_client_msg_handler.h"
 #include "pointer_event.h"
 #include "proto.h"
+#include "standardized_event_manager.h"
 
 namespace OHOS {
 namespace MMI {

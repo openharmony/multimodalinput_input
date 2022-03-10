@@ -20,7 +20,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-using namespace OHOS::MMI;
 } // namespace
 
 class ServerMsgHandlerTest : public testing::Test {
@@ -31,29 +30,29 @@ public:
 
 class ServerMsgHandlerUnitTest : public ServerMsgHandler {
 public:
-    int32_t OnVirtualKeyEventTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
+    int32_t OnVirtualKeyEventTest(SessionPtr sess, NetPacket& pkt)
     {
         return OnVirtualKeyEvent(sess, pkt);
     }
 
 #ifdef OHOS_BUILD_HDF
-    int32_t OnHdiInjectTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
+    int32_t OnHdiInjectTest(SessionPtr sess, NetPacket& pkt)
     {
         return OnHdiInject(sess, pkt);
     }
 #endif
 
-    int32_t OnDumpTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
+    int32_t OnDumpTest(SessionPtr sess, NetPacket& pkt)
     {
         return OnDump(sess, pkt);
     }
 
-    int32_t GetMultimodeInputInfoTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
+    int32_t GetMultimodeInputInfoTest(SessionPtr sess, NetPacket& pkt)
     {
         return GetMultimodeInputInfo(sess, pkt);
     }
 
-    int32_t OnInjectKeyEventTest(SessionPtr sess, OHOS::MMI::NetPacket pkt)
+    int32_t OnInjectKeyEventTest(SessionPtr sess, NetPacket pkt)
     {
         int32_t retResult = OnInjectKeyEvent(sess, pkt);
         return retResult;

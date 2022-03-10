@@ -50,7 +50,8 @@ private:
     int32_t nextId_ {0};
     std::list<std::shared_ptr<DeviceObserver>> observers_;
 };
+
+#define InputDevMgr InputDeviceManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define InputDevMgr OHOS::MMI::InputDeviceManager::GetInstance()
 #endif // INPUT_DEVICE_MANAGER_H

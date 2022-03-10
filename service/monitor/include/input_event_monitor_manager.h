@@ -44,11 +44,11 @@ public:
 
     int32_t AddInputEventMontior(SessionPtr session, int32_t eventType);
     void RemoveInputEventMontior(SessionPtr session, int32_t eventType);
-    void OnMonitorInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent);
+    void OnMonitorInputEvent(std::shared_ptr<KeyEvent> keyEvent);
 
     int32_t AddInputEventTouchpadMontior(int32_t eventType, SessionPtr session);
     void RemoveInputEventTouchpadMontior(int32_t eventType, SessionPtr session);
-    bool ReportTouchpadEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
+    bool ReportTouchpadEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
     std::list<MonitorItem> monitors_;
@@ -56,7 +56,8 @@ private:
 
     void OnTouchpadMonitorInputEvent(std::shared_ptr<PointerEvent> PointerEvent);
 };
+
+#define InputMonitorServiceMgr OHOS::Singleton<InputEventMonitorManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define InputMonitorServiceMgr OHOS::Singleton<OHOS::MMI::InputEventMonitorManager>::GetInstance()
 #endif // INPUT_EVENT_MONITOR_H

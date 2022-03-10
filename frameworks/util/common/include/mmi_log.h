@@ -15,16 +15,19 @@
 #ifndef MMI_LOG_H
 #define MMI_LOG_H
 
-#include <string>
 #include <future>
-#include "util.h"
+#include <string>
+
 #include "hilog/log.h"
+
+#include "util.h"
 #include "klog.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
-}
+constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
+} // namespace
 } // namespace MMI
 } // namespace OHOS
 

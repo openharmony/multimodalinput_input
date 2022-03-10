@@ -17,6 +17,7 @@
 #define I_INPUT_EVENT_HANDLER_H
 
 #include <mutex>
+
 #include "key_event.h"
 #include "pointer_event.h"
 #include "uds_session.h"

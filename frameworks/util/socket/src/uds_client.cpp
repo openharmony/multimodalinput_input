@@ -14,14 +14,16 @@
  */
 
 #include "uds_client.h"
+
 #include <cinttypes>
+
 #include "util.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSClient" }; // namepace
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSClient" };
+} // namespace
 
 UDSClient::UDSClient()
 {
@@ -91,7 +93,8 @@ bool UDSClient::SendMsg(const NetPacket& pkt) const
 
 bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
 {
-    MMI_LOGD("enter detachMode = %d", detachMode);
+    CALL_LOG_ENTER;
+    MMI_LOGD("detachMode = %d", detachMode);
     recvFun_ = fun;
     isRunning_ = true;
     isConnected_ = true;

@@ -25,9 +25,9 @@ using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
 namespace {
-    std::shared_ptr<KeyboardInject> g_instance = nullptr;
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "keyBoardInject"};
-}
+std::shared_ptr<KeyboardInject> g_instance = nullptr;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "keyBoardInject"};
+} // namespace
 std::mutex KeyboardInject::mutex_;
 std::unique_ptr<VirtualKeyboard> g_pKeyboard = nullptr;
 std::unique_ptr<InjectThread> KeyboardInject::injectThread_ = nullptr;

@@ -14,7 +14,9 @@
  */
 
 #include "standardized_event_manager.h"
+
 #include <sstream>
+
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "immi_token.h"
@@ -97,7 +99,6 @@ int32_t StandardizedEventManager::InjectionVirtual(bool isPressed, int32_t keyCo
         MMI_LOGE("Send virtual event Msg error");
         return RET_ERR;
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
@@ -120,7 +121,6 @@ int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> ke
         MMI_LOGE("Send inject event Msg error");
         return RET_ERR;
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
