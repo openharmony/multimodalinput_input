@@ -622,7 +622,7 @@ public:
      * @return Returns <b>true</b> if the axes set contains the specified axis type; returns <b>false</b> otherwise.
      * @since 8
      */
-    static bool HasAxis(int32_t axes, AxisType axis);
+    static bool HasAxis(uint32_t axes, AxisType axis);
 
 public:
     /**
@@ -657,7 +657,7 @@ private:
     int32_t sourceType_ { 0 };
     int32_t pointerAction_ { 0 };
     int32_t buttonId_ { -1 };
-    int32_t axes_ { 0 };
+    uint32_t axes_ { 0 };
     std::array<double, AXIS_TYPE_MAX>   axisValues_ { };
     std::vector<int32_t> pressedKeys_;
 };

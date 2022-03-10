@@ -39,7 +39,7 @@ void StreamBuffer::Clean()
     CHK(EOK == memset_sp(&szBuff_, sizeof(szBuff_), 0, sizeof(szBuff_)), MEMCPY_SEC_FUN_FAIL);
 }
 
-bool StreamBuffer::SetReadIdx(size_t idx)
+bool StreamBuffer::SetReadIdx(int32_t idx)
 {
     CHKF(idx <= wIdx_, PARAM_INPUT_INVALID);
     rIdx_ = idx;
@@ -54,7 +54,7 @@ bool StreamBuffer::Read(std::string &buf)
         return false;
     }
     buf = ReadBuf();
-    rIdx_ += buf.size() + 1;
+    rIdx_ += static_cast<int32_t>(buf.size()) + 1;
     return (buf.size() > 0);
 }
 
@@ -88,7 +88,7 @@ bool StreamBuffer::Read(char *buf, size_t size)
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
-    if (rIdx_ + size > wIdx_) {
+    if (rIdx_ + static_cast<int32_t>(size) > wIdx_) {
         MMI_LOGE("Memory out of bounds on read... errCode:%{public}d", MEM_OUT_OF_BOUNDS);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
@@ -98,7 +98,7 @@ bool StreamBuffer::Read(char *buf, size_t size)
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
-    rIdx_ += size;
+    rIdx_ += static_cast<int32_t>(size);
     rCount_ += 1;
     return true;
 }
@@ -118,17 +118,17 @@ bool StreamBuffer::Write(const char *buf, size_t size)
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
-    if (wIdx_ + size >= MAX_STREAM_BUF_SIZE) {
+    if (wIdx_ + static_cast<int32_t>(size) >= MAX_STREAM_BUF_SIZE) {
         MMI_LOGE("The write length exceeds buffer. errCode:%{public}d", MEM_OUT_OF_BOUNDS);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
-    if (EOK != memcpy_sp(&szBuff_[wIdx_], (MAX_STREAM_BUF_SIZE - wIdx_), buf, size)) {
+    if (EOK != memcpy_sp(&szBuff_[wIdx_], static_cast<size_t>(MAX_STREAM_BUF_SIZE - wIdx_), buf, size)) {
         MMI_LOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
-    wIdx_ += size;
+    wIdx_ += static_cast<int32_t>(size);
     wCount_ += 1;
     return true;
 }
@@ -143,13 +143,13 @@ bool StreamBuffer::IsEmpty()
 
 size_t StreamBuffer::Size() const
 {
-    return wIdx_;
+    return static_cast<size_t>(wIdx_);
 }
 
 size_t StreamBuffer::UnreadSize() const
 {
     CHKR(wIdx_ >= rIdx_, VAL_NOT_EXP, 0);
-    return (wIdx_ - rIdx_);
+    return static_cast<size_t>(wIdx_ - rIdx_);
 }
 
 bool StreamBuffer::ChkRWError() const

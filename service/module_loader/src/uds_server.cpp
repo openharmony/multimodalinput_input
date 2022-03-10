@@ -140,16 +140,14 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName,
     int32_t sockFds[2] = {};
 
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockFds) != 0) {
-        const int32_t savedErrNo = errno;
-        MMI_LOGE("call socketpair fail, errno:%{public}d,msg:%{public}s", savedErrNo, strerror(savedErrNo));
+        MMI_LOGE("call socketpair fail, errno:%{public}d", errno);
         return RET_ERR;
     }
 
     serverFd = sockFds[0];
-    toReturnClientFd = sockFds[1]; // fcntl(sockFds[1], F_DUPFD_CLOEXEC, 0);
+    toReturnClientFd = sockFds[1];
     if (toReturnClientFd < 0) {
-        const int32_t savedErrNo = errno;
-        MMI_LOGE("call fcntl fail, errno:%{public}d,msg:%{public}s", savedErrNo, strerror(savedErrNo));
+        MMI_LOGE("call fcntl fail, errno:%{public}d", errno);
         return RET_ERR;
     }
 
@@ -158,7 +156,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName,
     setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
-    SetBlockMode(serverFd); // 设置非阻塞模式
+    SetNonBlockMode(serverFd);
 
     MMI_LOGD("alloc socketpair, serverFd:%{public}d,clientFd:%{public}d(%{public}d)",
              serverFd, toReturnClientFd, sockFds[1]);
@@ -286,21 +284,37 @@ void OHOS::MMI::UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
     CHK(sess, ERROR_NULL_POINTER);
     int32_t readIdx = 0;
     int32_t packSize = 0;
-    const size_t headSize = sizeof(PackHead);
-    CHK(size >= headSize, VAL_NOT_EXP);
-    while (size > 0 && recvFun_) {
-        CHK(size >= headSize, VAL_NOT_EXP);
+    int32_t bufSize = static_cast<int32_t>(size);
+    const int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
+    if (bufSize < headSize) {
+        MMI_LOGE("The in parameter size less than headSize, errCode%{public}d", VAL_NOT_EXP);
+        return;
+    }
+    while (bufSize > 0 && recvFun_) {
+        if (bufSize < headSize) {
+            MMI_LOGE("The size less than headSize, errCode%{public}d", VAL_NOT_EXP);
+            return;
+        }
         auto head = (PackHead*)&buf[readIdx];
-        CHK(head->size[0] < size, VAL_NOT_EXP);
+        if (head->size[0] >= bufSize) {
+            MMI_LOGE("The head->size[0] more or equal than size, errCode:%{public}d", VAL_NOT_EXP);
+            return;
+        }
         packSize = headSize + head->size[0];
-        CHK(size >= packSize, VAL_NOT_EXP);
+        if (bufSize < packSize) {
+            MMI_LOGE("The size less than packSize, errCode:%{public}d", VAL_NOT_EXP);
+            return;
+        }
         
         NetPacket pkt(head->idMsg);
         if (head->size[0] > 0) {
-            CHK(pkt.Write(&buf[readIdx + headSize], head->size[0]), STREAM_BUF_WRITE_FAIL);
+            if (!pkt.Write(&buf[readIdx + headSize], static_cast<size_t>(head->size[0]))) {
+                MMI_LOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+                return;
+            }
         }
         recvFun_(sess, pkt);
-        size -= packSize;
+        bufSize -= packSize;
         readIdx += packSize;
     }
 }

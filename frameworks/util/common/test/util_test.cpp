@@ -63,12 +63,6 @@ HWTEST_F(UtilTest, getEnumString_005, TestSize.Level1)
     EXPECT_STREQ(retResult, "Unknown Message Id");
 }
 
-HWTEST_F(UtilTest, GetEnv, TestSize.Level1)
-{
-    std::string retResult = OHOS::MMI::GetEnv("123");
-    EXPECT_STREQ(retResult.c_str(), "");
-}
-
 HWTEST_F(UtilTest, GetMicrotime, TestSize.Level1)
 {
     int64_t retResult = OHOS::MMI::GetMicrotime();
