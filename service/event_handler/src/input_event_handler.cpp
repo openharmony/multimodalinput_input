@@ -278,7 +278,6 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
     keyEventString = "service report keyId=" + std::to_string(keyId);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
 
-
     auto ret = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_);
     if (ret != RET_OK) {
         MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
