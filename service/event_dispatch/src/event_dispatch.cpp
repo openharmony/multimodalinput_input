@@ -35,15 +35,11 @@ namespace MMI {
 constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
-}
+} // namespace
 
-EventDispatch::EventDispatch()
-{
-}
+EventDispatch::EventDispatch() {}
 
-EventDispatch::~EventDispatch()
-{
-}
+EventDispatch::~EventDispatch() {}
 
 void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
                                                   const int32_t fingerCount,
