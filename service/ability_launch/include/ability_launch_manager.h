@@ -16,21 +16,22 @@
 #ifndef ABILITY_LAUNCH_MANAGER_H
 #define ABILITY_LAUNCH_MANAGER_H
 
+#include <chrono>
+#include <condition_variable>
+#include <functional>
 #include <fstream>
 #include <map>
-#include <condition_variable>
-#include <thread>
-#include <chrono>
-#include <functional>
 #include <mutex>
-#include <vector>
 #include <set>
+#include <thread>
+#include <vector>
 
+#include "nocopyable.h"
 #include "nlohmann/json.hpp"
 #include "singleton.h"
-#include "struct_multimodal.h"
+
 #include "key_event.h"
-#include "nocopyable.h"
+#include "struct_multimodal.h"
 
 namespace OHOS {
 namespace MMI {

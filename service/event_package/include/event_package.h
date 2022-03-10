@@ -12,14 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef EVENT_PACKAGE_H
 #define EVENT_PACKAGE_H
-#include "pointer_event.h"
-#include "key_event.h"
-#include "input_windows_manager.h"
+
 #include "nocopyable.h"
+
+#include "input_windows_manager.h"
+#include "key_event.h"
+#include "pointer_event.h"
 #include "uds_server.h"
 #include "util.h"
+
 #define KEYSTATUS 0
 
 namespace OHOS {

@@ -16,12 +16,13 @@
 #ifndef MULTIMODAL_INPUT_CONNECT_PROXY_H
 #define MULTIMODAL_INPUT_CONNECT_PROXY_H
 
-#include "i_multimodal_input_connect.h"
-#include "iremote_proxy.h"
-#include "singleton.h"
 #include "iremote_object.h"
-#include "system_ability.h"
+#include "iremote_proxy.h"
 #include "nocopyable.h"
+#include "singleton.h"
+#include "system_ability.h"
+
+#include "i_multimodal_input_connect.h"
 
 namespace OHOS {
 namespace MMI {
