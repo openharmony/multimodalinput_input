@@ -69,7 +69,7 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
 
 int32_t HdiInject::OnSetEventInject(const RawInputEvent& allEvent, int32_t devIndex)
 {
-    MMI_LOG("enter");
+    CALL_LOG_ENTER;
     EventPackage* pack[EVENT_PACKAGE_ARROW_SIZE];
     pack[0] = (EventPackage*)malloc(sizeof(EventPackage));
     pack[0]->type = static_cast<int32_t>(allEvent.ev_type);
@@ -78,7 +78,6 @@ int32_t HdiInject::OnSetEventInject(const RawInputEvent& allEvent, int32_t devIn
     pack[0]->timestamp = static_cast<uint64_t>(GetSysClockTime());
     MMIHdiInject->eventcallback_.EventPkgCallback((const EventPackage**)pack, 1, devIndex);
     free(pack[0]);
-    MMI_LOGD("leave");
     return RET_OK;
 }
 

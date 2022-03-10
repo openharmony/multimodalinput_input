@@ -456,7 +456,8 @@ bool UDSServer::AddSession(SessionPtr ses)
 
 void UDSServer::DelSession(int32_t fd)
 {
-    MMI_LOGD("begin fd:%{public}d", fd);
+    CALL_LOG_ENTER;
+    MMI_LOGD("fd:%{public}d", fd);
     if (fd < 0) {
         MMI_LOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
         return;
@@ -471,7 +472,6 @@ void UDSServer::DelSession(int32_t fd)
         sessionsMap_.erase(it);
     }
     DumpSession("DelSession");
-    MMI_LOGI("DelSession end");
 }
 
 void UDSServer::OnThread()

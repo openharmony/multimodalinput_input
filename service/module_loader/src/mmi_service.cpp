@@ -272,7 +272,8 @@ void MMIService::OnDisconnected(SessionPtr s)
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)
 {
-    MMI_LOGI("enter, programName:%{public}s,moduleType:%{public}d",
+    CALL_LOG_ENTER;
+    MMI_LOGI("programName:%{public}s,moduleType:%{public}d",
              programName.c_str(), moduleType);
 
     toReturnClientFd = INVALID_SOCKET_FD;
