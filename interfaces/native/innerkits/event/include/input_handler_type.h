@@ -15,6 +15,7 @@
 
 #ifndef INPUT_HANDLER_TYPE_H
 #define INPUT_HANDLER_TYPE_H
+
 #include <limits>
 
 namespace OHOS {

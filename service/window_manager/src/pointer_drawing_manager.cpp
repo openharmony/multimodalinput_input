@@ -40,7 +40,8 @@ PointerDrawingManager::~PointerDrawingManager() {}
 
 void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY)
 {
-    MMI_LOGD("enter, display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
+    CALL_LOG_ENTER;
+    MMI_LOGD("display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
     FixCursorPosition(globalX, globalY);
     if (pointerWindow_ != nullptr) {
         pointerWindow_->MoveTo(globalX, globalY);
@@ -78,7 +79,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int3
     OHOS::SurfaceError ret = layer->FlushBuffer(buffer, -1, flushConfig);
     MMI_LOGD("draw pointer FlushBuffer ret:%{public}s", SurfaceErrorStr(ret).c_str());
     pointerWindow_->Show();
-    MMI_LOGD("leave, display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
+    MMI_LOGD("display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
 }
 
 void PointerDrawingManager::FixCursorPosition(int32_t &globalX, int32_t &globalY)
@@ -156,7 +157,7 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
 
 void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t height)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     OHOS::Rosen::Drawing::Bitmap bitmap;
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUYE };
@@ -172,12 +173,11 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
         MMI_LOGE("Memcpy data is error, ret:%{public}d", ret);
         return;
     }
-    MMI_LOGD("leave");
 }
 
 void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     std::unique_ptr<OHOS::Media::PixelMap> pixelmap = DecodeImageToPixelMap(IMAGE_POINTER_JPEG_PATH);
     CHKPV(pixelmap);
     OHOS::Rosen::Drawing::Pen pen;
@@ -187,7 +187,6 @@ void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas)
     pen.SetWidth(penWidth);
     canvas.AttachPen(pen);
     canvas.DrawBitmap(*pixelmap, 0, 0);
-    MMI_LOGD("leave");
 }
 
 std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixelMap(const std::string &imagePath)
@@ -211,7 +210,7 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
 
 void PointerDrawingManager::TellDisplayInfo(int32_t displayId, int32_t width, int32_t height) 
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     hasDisplay_ = true;
     displayId_ = displayId;
     displayWidth_ = width;
@@ -221,7 +220,7 @@ void PointerDrawingManager::TellDisplayInfo(int32_t displayId, int32_t width, in
 
 void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     hasPointerDevice_ = hasPointerDevice;
     DrawManager();
 }
@@ -243,7 +242,7 @@ void PointerDrawingManager::DrawManager()
 
 bool PointerDrawingManager::Init()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     InputDevMgr->Attach(GetInstance());
     return true;
 }
