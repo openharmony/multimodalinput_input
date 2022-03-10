@@ -18,8 +18,8 @@
 using namespace OHOS::MMI;
 
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingTouchScreenDevice" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingTouchScreenDevice" };
+} // namespace
 
 int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const Json& touchScreenEventArrays,
                                                                   InputEventArray& inputEventArray)

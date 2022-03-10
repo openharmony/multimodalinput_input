@@ -20,7 +20,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventDataTransformation" };
-}
+} // namespace
+
 int32_t InputEventDataTransformation::KeyEventToNetPacket(
     const std::shared_ptr<KeyEvent> key, NetPacket &pkt)
 {
