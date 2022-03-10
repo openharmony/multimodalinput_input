@@ -113,7 +113,6 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 {
     CALL_LOG_ENTER;
     CHKPR(point, ERROR_NULL_POINTER);
-    auto fd = WinMgr->UpdateTargetPointer(point);
     if (HandlePointerEventFilter(point)) {
         MMI_LOGI("Pointer event Filter succeeded");
         return RET_OK;
@@ -131,6 +130,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_LOGE("UdsServer is a nullptr");
         return RET_ERR;
     }
+    auto fd = WinMgr->UpdateTargetPointer(point);
     if (fd < 0) {
         MMI_LOGE("The fd less than 0, fd: %{public}d", fd);
         return RET_ERR;
