@@ -15,7 +15,6 @@
 
 #ifndef VIRTUAL_KNOB_SYS_CTRL_H
 #define VIRTUAL_KNOB_SYS_CTRL_H
-
 #include "virtual_device.h"
 
 namespace OHOS {
@@ -24,6 +23,8 @@ class VirtualKnobSysCtrl : public VirtualDevice {
 public:
     VirtualKnobSysCtrl();
     ~VirtualKnobSysCtrl();
+    DISALLOW_COPY_AND_MOVE(VirtualKnobSysCtrl);
+
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
     const std::vector<uint32_t>& GetKeys() const override;

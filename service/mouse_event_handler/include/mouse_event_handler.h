@@ -18,6 +18,7 @@
 
 #include <memory>
 #include "libinput.h"
+#include "nocopyable.h"
 #include "pointer_event.h"
 #include "singleton.h"
 
@@ -28,6 +29,7 @@ class MouseEventHandler : public DelayedSingleton<MouseEventHandler>,
 public:
     MouseEventHandler();
     ~MouseEventHandler() = default;
+    DISALLOW_COPY_AND_MOVE(MouseEventHandler);
 
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
     void Normalize(struct libinput_event *event);

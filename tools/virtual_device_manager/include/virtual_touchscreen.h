@@ -15,7 +15,6 @@
 
 #ifndef VIRTUAL_TOUCHSCREEN_H
 #define VIRTUAL_TOUCHSCREEN_H
-
 #include "virtual_device.h"
 
 namespace OHOS {
@@ -24,6 +23,8 @@ namespace MMI {
     public:
         VirtualTouchScreen();
         ~VirtualTouchScreen();
+        DISALLOW_COPY_AND_MOVE(VirtualTouchScreen);
+
     protected:
         virtual const std::vector<uint32_t>& GetEventTypes() const override;
         virtual const std::vector<uint32_t>& GetKeys() const override;

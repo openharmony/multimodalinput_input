@@ -23,6 +23,7 @@
 
 #include "linux/input.h"
 #include "linux/uinput.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -30,6 +31,7 @@ class VirtualDevice {
 public:
     VirtualDevice(const char *deviceName, uint16_t productId);
     virtual ~VirtualDevice();
+    DISALLOW_COPY_AND_MOVE(VirtualDevice);
     bool EmitEvent(uint16_t type, uint16_t code, uint32_t value) const;
     bool SetUp();
 

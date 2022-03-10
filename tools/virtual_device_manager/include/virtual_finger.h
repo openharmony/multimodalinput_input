@@ -15,7 +15,6 @@
 
 #ifndef VIRTUAL_FINGER_H
 #define VIRTUAL_FINGER_H
-
 #include "virtual_device.h"
 
 namespace OHOS {
@@ -24,6 +23,8 @@ class VirtualFinger : public VirtualDevice {
 public:
     VirtualFinger();
     ~VirtualFinger();
+    DISALLOW_COPY_AND_MOVE(VirtualFinger);
+
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
     const std::vector<uint32_t>& GetKeys() const override;
