@@ -14,7 +14,9 @@
  */
 
 #include "input_manager_impl.h"
+
 #include "bytrace.h"
+
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "event_filter_service.h"

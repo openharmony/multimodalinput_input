@@ -15,11 +15,14 @@
 #ifndef MMI_LOG_H
 #define MMI_LOG_H
 
-#include <string>
 #include <future>
-#include "util.h"
+#include <string>
+
 #include "hilog/log.h"
+
+#include "util.h"
 #include "klog.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {

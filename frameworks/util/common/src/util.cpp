@@ -14,13 +14,15 @@
  */
 
 #include "util.h"
+
 #include <chrono>
+#include <cinttypes>
 #include <cstdarg>
 #include <iomanip>
 #include <sstream>
 #include <thread>
+
 #include <fcntl.h>
-#include <cinttypes>
 #include <sys/prctl.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
