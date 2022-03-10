@@ -14,6 +14,7 @@
  */
 
 #include "input_device_impl.h"
+
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 

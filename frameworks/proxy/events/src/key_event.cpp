@@ -14,7 +14,9 @@
  */
 
 #include "key_event.h"
+
 #include "mmi_log.h"
+
 
 using namespace OHOS::HiviewDFX;
 namespace OHOS {

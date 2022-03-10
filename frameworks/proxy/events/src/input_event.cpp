@@ -14,6 +14,7 @@
  */
 
 #include "input_event.h"
+
 #include <cassert>
 #include <chrono>
 

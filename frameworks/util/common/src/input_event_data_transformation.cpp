@@ -14,6 +14,7 @@
  */
 
 #include "input_event_data_transformation.h"
+
 #include "define_multimodal.h"
 
 namespace OHOS {

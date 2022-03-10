@@ -12,8 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "input_handler_manager.h"
+
 #include "bytrace.h"
+
 #include "input_handler_type.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"

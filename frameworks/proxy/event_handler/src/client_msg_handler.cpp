@@ -12,12 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "client_msg_handler.h"
+
 #include <cinttypes>
 #include <iostream>
 #include <sstream>
-#include "mmi_func_callback.h"
+
 #include "bytrace.h"
+
 #include "input_device_impl.h"
 #include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
@@ -26,6 +29,7 @@
 #include "input_monitor_manager.h"
 #include "interceptor_manager.h"
 #include "mmi_client.h"
+#include "mmi_func_callback.h"
 #include "multimodal_event_handler.h"
 #include "proto.h"
 #include "time_cost_chk.h"
