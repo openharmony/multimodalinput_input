@@ -47,15 +47,13 @@ protected:
     int32_t OnEventGesture(const multimodal_libinput_event& event);
     int32_t OnEventTouchpad(const multimodal_libinput_event& event);
     int32_t OnGestureEvent(struct libinput_event *event);
-    int32_t OnKeyboardEvent(const multimodal_libinput_event& event);
-    int32_t OnKeyEventDispatch(const multimodal_libinput_event& event);
+    int32_t OnEventKey(const multimodal_libinput_event& event);
     
     int32_t OnMouseEventHandler(struct libinput_event *event);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
 
 private:
     int32_t OnEventHandler(const multimodal_libinput_event& ev);
-    int32_t OnEventKey(struct libinput_event *event);
     std::mutex mu_;
     UDSServer *udsServer_ = nullptr;
     EventDispatch eventDispatch_;
