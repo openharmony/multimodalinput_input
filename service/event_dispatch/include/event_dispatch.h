@@ -14,13 +14,15 @@
  */
 #ifndef EVENT_DISPATCH_H
 #define EVENT_DISPATCH_H
-#include "uds_server.h"
+
+#include "nocopyable.h"
+
+#include "event_package.h"
+#include "i_event_filter.h"
 #include "key_event.h"
 #include "key_event_value_transformation.h"
-#include "event_package.h"
-#include "nocopyable.h"
 #include "pointer_event.h"
-#include "i_event_filter.h"
+#include "uds_server.h"
 
 namespace OHOS {
 namespace MMI {

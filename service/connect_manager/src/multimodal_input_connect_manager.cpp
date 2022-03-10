@@ -14,13 +14,16 @@
  */
 
 #include "multimodal_input_connect_manager.h"
+
 #include <chrono>
 #include <thread>
+
 #include "iservice_registry.h"
+#include "system_ability_definition.h"
+
 #include "mmi_log.h"
 #include "multimodal_input_connect_death_recipient.h"
 #include "multimodal_input_connect_define.h"
-#include "system_ability_definition.h"
 #include "util.h"
 
 namespace OHOS {

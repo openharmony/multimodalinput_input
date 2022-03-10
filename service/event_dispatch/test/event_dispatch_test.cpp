@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 
-#include "event_dispatch.h"
 #include <gtest/gtest.h>
+
+#include "event_dispatch.h"
 #include "libmmi_util.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {
