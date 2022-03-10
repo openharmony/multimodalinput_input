@@ -28,15 +28,15 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerDrawingManager" };
 const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_icon/angle.png";
-}
+} // namespace
 } // namespace MMI
 } // namespace OHOS
 
 namespace OHOS {
 namespace MMI {
-OHOS::MMI::PointerDrawingManager::PointerDrawingManager() {}
+PointerDrawingManager::PointerDrawingManager() {}
 
-OHOS::MMI::PointerDrawingManager::~PointerDrawingManager() {}
+PointerDrawingManager::~PointerDrawingManager() {}
 
 void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY)
 {

@@ -38,7 +38,8 @@ private:
     std::vector<std::string> dumpInfo_;
     UDSServer* udsServer_ = nullptr;
 };
+
+#define MMIEventDump EventDump::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define MMIEventDump OHOS::MMI::EventDump::GetInstance()
 #endif // EVENT_DUMP_H

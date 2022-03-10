@@ -27,10 +27,10 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "KeyEventSubscriber"};
 constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
-}
+} // namespace
 
 int32_t KeyEventSubscriber::SubscribeKeyEvent(
-        SessionPtr sess, int32_t subscribeId, std::shared_ptr<OHOS::MMI::KeyOption> keyOption)
+        SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)
 {
     MMI_LOGD("Enter");
     if (subscribeId < 0) {
@@ -132,7 +132,7 @@ bool KeyEventSubscriber::IsPreKeysMatch(const std::set<int32_t>& preKeys,
     return true;
 }
 
-void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent,
+void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
         const std::shared_ptr<Subscriber>& subscriber)
 {
     MMI_LOGD("Enter");
@@ -140,7 +140,7 @@ void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<OHOS::MMI::KeyEvent> k
     CHKPV(subscriber);
     auto udsServerPtr = InputHandler->GetUDSServer();
     CHKPV(udsServerPtr);
-    OHOS::MMI::NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_KEY);
+    NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_KEY);
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
     int32_t fd = subscriber->sess_->GetFd();
     pkt << fd << subscriber->id_;
@@ -386,5 +386,5 @@ void KeyEventSubscriber::RemoveKeyCode(int32_t keyCode, std::vector<int32_t>& ke
     }
 }
 
-}  // namespace MMI
-}  // namespace OHOS
+} // namespace MMI
+} // namespace OHOS
