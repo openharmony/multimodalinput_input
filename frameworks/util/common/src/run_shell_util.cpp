@@ -32,7 +32,7 @@ RunShellUtil::~RunShellUtil() {}
 
 int32_t RunShellUtil::RunShellCommand(const std::string &command, std::vector<std::string> &vLog)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     vLog.clear();
     const std::string command_ = HILOG_GREP + "'" + command + "'";
 

@@ -29,7 +29,7 @@ EventPackage::~EventPackage() {}
 
 int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, std::shared_ptr<KeyEvent> key)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPR(event, PARAM_INPUT_INVALID);
     CHKPR(key, ERROR_NULL_POINTER);
     key->UpdateId();
@@ -82,7 +82,6 @@ int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, std::shared_
         key->RemoveReleasedKeyItems(item);
         key->AddPressedKeyItems(item);
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 

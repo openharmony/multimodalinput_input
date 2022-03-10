@@ -84,7 +84,7 @@ SInput::~SInput() {}
 
 bool SInput::Init(FunInputEvent funInputEvent, const std::string& seat_id)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPF(funInputEvent);
     funInputEvent_ = funInputEvent;
     seat_id_ = seat_id;
@@ -110,13 +110,12 @@ bool SInput::Init(FunInputEvent funInputEvent, const std::string& seat_id)
         MMI_LOGE("fd_ is less than 0");
         return false;
     }
-    MMI_LOGD("leave");
     return true;
 }
 
 void SInput::EventDispatch(struct epoll_event& ev)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int*>(ev.data.ptr);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
@@ -131,31 +130,28 @@ void SInput::EventDispatch(struct epoll_event& ev)
         return;
     }
     OnEventHandler();
-    MMI_LOGD("leave");
 }
 
 void SInput::Stop()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (fd_ >= 0) {
         close(fd_);
         fd_ = -1;
     }
     libinput_unref(input_);
     udev_unref(udev_);
-    MMI_LOGD("leave");
 }
 
 void SInput::OnEventHandler()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPV(funInputEvent_);
     libinput_event *event = nullptr;
     while ((event = libinput_get_event(input_))) {
         funInputEvent_(event);
         libinput_event_destroy(event);
     }
-    MMI_LOGD("leave");
 }
 } // namespace MMI
 } // namespace OHOS

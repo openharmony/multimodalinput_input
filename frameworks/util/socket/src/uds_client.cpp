@@ -25,14 +25,13 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSCl
 
 UDSClient::UDSClient()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
 }
 
 UDSClient::~UDSClient()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     Stop();
-    MMI_LOGD("leave");
 }
 
 int32_t UDSClient::ConnectTo()
@@ -117,7 +116,7 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
 
 void UDSClient::Stop()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     Close();
     isRunning_ = false;
     struct epoll_event ev = {};
@@ -129,7 +128,6 @@ void UDSClient::Stop()
         MMI_LOGD("thread join");
         t_.join();
     }
-    MMI_LOGD("leave");
 }
 
 void UDSClient::OnRecv(const char *buf, size_t size)
