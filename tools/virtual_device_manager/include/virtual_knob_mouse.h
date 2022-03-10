@@ -15,7 +15,6 @@
 
 #ifndef VIRTUAL_KNOB_MOUSE_H
 #define VIRTUAL_KNOB_MOUSE_H
-
 #include "virtual_device.h"
 
 namespace OHOS {
@@ -24,6 +23,8 @@ class VirtualKnobMouse : public VirtualDevice {
 public:
     VirtualKnobMouse();
     ~VirtualKnobMouse();
+    DISALLOW_COPY_AND_MOVE(VirtualKnobMouse);
+
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
     const std::vector<uint32_t>& GetKeys() const override;

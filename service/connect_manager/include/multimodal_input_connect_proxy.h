@@ -28,6 +28,7 @@ namespace MMI {
 class MultimodalInputConnectProxy final : public IRemoteProxy<IMultimodalInputConnect> {
 public:
     explicit MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl);
+    DISALLOW_COPY_AND_MOVE(MultimodalInputConnectProxy);
     virtual ~MultimodalInputConnectProxy() override;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &socketFd) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;

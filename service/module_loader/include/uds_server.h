@@ -80,6 +80,7 @@ protected:
     bool ClearDeadSessionInMap(const int32_t serverFd, const int32_t clientFd);
 
     void NotifySessionDeleted(SessionPtr ses);
+    void AddPermission(SessionPtr sess);
 
 protected:
     std::mutex mux_;

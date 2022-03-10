@@ -29,6 +29,7 @@ namespace MMI {
 class MultimodalInputConnectStub : public IRemoteStub<IMultimodalInputConnect> {
 public:
     MultimodalInputConnectStub() = default;
+    DISALLOW_COPY_AND_MOVE(MultimodalInputConnectStub);
     ~MultimodalInputConnectStub() = default;
 
     int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& options) override;

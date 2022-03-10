@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include "nocopyable.h"
 #include "singleton.h"
 
 #include "display_info.h"
@@ -35,6 +36,7 @@ namespace MMI {
 class InputManagerImpl : public DelayedSingleton<InputManagerImpl> {
 public:
     virtual ~InputManagerImpl() = default;
+    DISALLOW_COPY_AND_MOVE(InputManagerImpl);
     InputManagerImpl() = default;
 
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,

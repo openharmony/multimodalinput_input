@@ -17,6 +17,7 @@
 #define EVENT_FILTER_DEATH_RECIPIENT_H
 
 #include "iremote_broker.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -24,6 +25,7 @@ class EventFilterDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
     explicit EventFilterDeathRecipient(const std::function<void(const wptr<IRemoteObject> &object)>
                                                   &deathCallback);
+    DISALLOW_COPY_AND_MOVE(EventFilterDeathRecipient);
     virtual ~EventFilterDeathRecipient() = default;
     void OnRemoteDied(const wptr<IRemoteObject> &object) override;
 

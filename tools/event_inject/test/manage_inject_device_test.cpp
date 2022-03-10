@@ -32,6 +32,12 @@ public:
     static void TearDownTestCase(void) {}
 };
 
+/**
+ * @tc.name:Test_TransformJsonDataCheckFileIsEmpty
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileIsEmpty, TestSize.Level1)
 {
     Json inputEventArrays;
@@ -41,6 +47,12 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileIsEmpty, TestSiz
     EXPECT_EQ(ret, RET_ERR);
 }
 
+/**
+ * @tc.name:Test_TransformJsonDataCheckFileNotEmpty
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileNotEmpty, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
@@ -70,6 +82,12 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileNotEmpty, TestSi
     EXPECT_EQ(ret, RET_OK);
 }
 
+/**
+ * @tc.name:Test_TransformJsonDataGetDeviceNodeError
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataGetDeviceNodeError, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
@@ -99,6 +117,12 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataGetDeviceNodeError, TestS
     EXPECT_EQ(ret, RET_ERR);
 }
 
+/**
+ * @tc.name:Test_SendEventToDeviveNodeError
+ * @tc.desc:Verify ManageInjectDevice function SendEventToDeviveNode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ManageInjectDeviceTest, Test_SendEventToDeviveNodeError, TestSize.Level1)
 {
     ManageInjectDevice manageInjectDevice;
