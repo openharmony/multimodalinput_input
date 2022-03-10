@@ -38,6 +38,12 @@ class DeviceBaseDemo : public DeviceBase {
     }
 };
 
+/**
+ * @tc.name:Test_SetTimeToLibinputEvent
+ * @tc.desc:Verify device base function SetTimeToLibinputEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetTimeToLibinputEvent, TestSize.Level1)
 {
     InjectEvent injectEvent = {};
@@ -45,6 +51,12 @@ HWTEST_F(DeviceBaseTest, Test_SetTimeToLibinputEvent, TestSize.Level1)
     deviceBaseDemo.SetTimeToLibinputEvent(injectEvent);
 }
 
+/**
+ * @tc.name:Test_SetSynConfigReport
+ * @tc.desc:Verify device base function SetSynConfigReport
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetSynConfigReport, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -61,6 +73,12 @@ HWTEST_F(DeviceBaseTest, Test_SetSynConfigReport, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetKeyLongPressEvent
+ * @tc.desc:Verify device base function SetKeyLongPressEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetKeyLongPressEvent, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -78,6 +96,12 @@ HWTEST_F(DeviceBaseTest, Test_SetKeyLongPressEvent, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetKeyPressEvent
+ * @tc.desc:Verify device base function SetKeyPressEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetKeyPressEvent, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -95,6 +119,12 @@ HWTEST_F(DeviceBaseTest, Test_SetKeyPressEvent, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetKeyReleaseEvent
+ * @tc.desc:Verify device base function SetKeyReleaseEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetKeyReleaseEvent, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -112,6 +142,12 @@ HWTEST_F(DeviceBaseTest, Test_SetKeyReleaseEvent, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetMtSlot
+ * @tc.desc:Verify device base function SetMtSlot
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetMtSlot, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -129,6 +165,12 @@ HWTEST_F(DeviceBaseTest, Test_SetMtSlot, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetTrackingId
+ * @tc.desc:Verify device base function SetTrackingId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetTrackingId, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -146,6 +188,12 @@ HWTEST_F(DeviceBaseTest, Test_SetTrackingId, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetPositionX
+ * @tc.desc:Verify device base function SetPositionX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetPositionX, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -163,6 +211,12 @@ HWTEST_F(DeviceBaseTest, Test_SetPositionX, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetPositionY
+ * @tc.desc:Verify device base function SetPositionY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetPositionY, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -180,6 +234,12 @@ HWTEST_F(DeviceBaseTest, Test_SetPositionY, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetMtTouchMajor
+ * @tc.desc:Verify device base function SetMtTouchMajor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetMtTouchMajor, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -197,6 +257,12 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchMajor, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetMtTouchMinor
+ * @tc.desc:Verify device base function SetMtTouchMinor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetMtTouchMinor, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -214,6 +280,12 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchMinor, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetMtOrientation
+ * @tc.desc:Verify device base function SetMtOrientation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetMtOrientation, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -231,6 +303,12 @@ HWTEST_F(DeviceBaseTest, Test_SetMtOrientation, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetBtnTouch
+ * @tc.desc:Verify device base function SetBtnTouch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetBtnTouch, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -248,6 +326,12 @@ HWTEST_F(DeviceBaseTest, Test_SetBtnTouch, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetEvAbsX
+ * @tc.desc:Verify device base function SetEvAbsX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetEvAbsX, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -265,6 +349,12 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsX, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetEvAbsY
+ * @tc.desc:Verify device base function SetEvAbsY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetEvAbsY, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -282,6 +372,12 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsY, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetMtTouchOneFingerType
+ * @tc.desc:Verify device base function SetMtTouchFingerType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetMtTouchOneFingerType, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -300,6 +396,12 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchOneFingerType, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetMtTouchTwoFingerType
+ * @tc.desc:Verify device base function SetMtTouchFingerType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetMtTouchTwoFingerType, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -318,6 +420,12 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchTwoFingerType, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetMtTouchThreeFingerType
+ * @tc.desc:Verify device base function SetMtTouchFingerType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetMtTouchThreeFingerType, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -336,6 +444,12 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchThreeFingerType, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetMtTouchFourFingerType
+ * @tc.desc:Verify device base function SetMtTouchFingerType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetMtTouchFourFingerType, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -354,6 +468,12 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchFourFingerType, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetMtTouchFiveFingerType
+ * @tc.desc:Verify device base function SetMtTouchFingerType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetMtTouchFiveFingerType, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -372,6 +492,12 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchFiveFingerType, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetMtTouchOtherFingerType
+ * @tc.desc:Verify device base function SetMtTouchFingerType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetMtTouchOtherFingerType, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -390,6 +516,12 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchOtherFingerType, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetEvAbsZ
+ * @tc.desc:Verify device base function SetEvAbsZ
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetEvAbsZ, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -407,6 +539,12 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsZ, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetEvAbsRx
+ * @tc.desc:Verify device base function SetEvAbsRx
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetEvAbsRx, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -424,6 +562,12 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsRx, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetEvAbsRy
+ * @tc.desc:Verify device base function SetEvAbsRy
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetEvAbsRy, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -441,6 +585,12 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsRy, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetEvAbsHat0X
+ * @tc.desc:Verify device base function SetEvAbsHat0X
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetEvAbsHat0X, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -458,6 +608,12 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsHat0X, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetEvAbsHat0Y
+ * @tc.desc:Verify device base function SetEvAbsHat0Y
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetEvAbsHat0Y, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -475,6 +631,12 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsHat0Y, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetEvAbsRz
+ * @tc.desc:Verify device base function SetEvAbsRz
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetEvAbsRz, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -492,6 +654,12 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsRz, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetEvAbs
+ * @tc.desc:Verify device base function SetEvAbs
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetEvAbs, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -510,6 +678,12 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbs, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetRelX
+ * @tc.desc:Verify device base function SetRelX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetRelX, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -527,6 +701,12 @@ HWTEST_F(DeviceBaseTest, Test_SetRelX, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetRelY
+ * @tc.desc:Verify device base function SetRelY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetRelY, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -544,6 +724,12 @@ HWTEST_F(DeviceBaseTest, Test_SetRelY, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetRelWheel
+ * @tc.desc:Verify device base function SetRelWheel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetRelWheel, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -561,6 +747,12 @@ HWTEST_F(DeviceBaseTest, Test_SetRelWheel, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetRelHwheel
+ * @tc.desc:Verify device base function SetRelHwheel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetRelHwheel, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -578,6 +770,12 @@ HWTEST_F(DeviceBaseTest, Test_SetRelHwheel, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetEvAbsWheel
+ * @tc.desc:Verify device base function SetEvAbsWheel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetEvAbsWheel, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -595,6 +793,12 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsWheel, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetAbsMiscStartStatus
+ * @tc.desc:Verify device base function SetAbsMisc
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetAbsMiscStartStatus, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -612,6 +816,12 @@ HWTEST_F(DeviceBaseTest, Test_SetAbsMiscStartStatus, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetAbsMiscEndStatus
+ * @tc.desc:Verify device base function SetAbsMisc
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetAbsMiscEndStatus, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -629,6 +839,12 @@ HWTEST_F(DeviceBaseTest, Test_SetAbsMiscEndStatus, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetAbsTiltX
+ * @tc.desc:Verify device base function SetAbsTiltX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetAbsTiltX, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -646,6 +862,12 @@ HWTEST_F(DeviceBaseTest, Test_SetAbsTiltX, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetAbsTiltY
+ * @tc.desc:Verify device base function SetAbsTiltY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetAbsTiltY, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -663,6 +885,12 @@ HWTEST_F(DeviceBaseTest, Test_SetAbsTiltY, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetAbsPressure
+ * @tc.desc:Verify device base function SetAbsPressure
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetAbsPressure, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -680,6 +908,12 @@ HWTEST_F(DeviceBaseTest, Test_SetAbsPressure, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetAbsDistance
+ * @tc.desc:Verify device base function SetAbsDistance
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetAbsDistance, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -697,6 +931,12 @@ HWTEST_F(DeviceBaseTest, Test_SetAbsDistance, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetBtnPen
+ * @tc.desc:Verify device base function SetBtnPen
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetBtnPen, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -714,6 +954,12 @@ HWTEST_F(DeviceBaseTest, Test_SetBtnPen, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetBtnStylus
+ * @tc.desc:Verify device base function SetBtnStylus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetBtnStylus, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -732,6 +978,12 @@ HWTEST_F(DeviceBaseTest, Test_SetBtnStylus, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetBtnRubber
+ * @tc.desc:Verify device base function SetBtnRubber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetBtnRubber, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -749,6 +1001,12 @@ HWTEST_F(DeviceBaseTest, Test_SetBtnRubber, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetMscSerial
+ * @tc.desc:Verify device base function SetMscSerial
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetMscSerial, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -766,6 +1024,12 @@ HWTEST_F(DeviceBaseTest, Test_SetMscSerial, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetSynMtReport
+ * @tc.desc:Verify device base function SetSynMtReport
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetSynMtReport, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
@@ -783,6 +1047,12 @@ HWTEST_F(DeviceBaseTest, Test_SetSynMtReport, TestSize.Level1)
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
 
+/**
+ * @tc.name:Test_SetThrottle
+ * @tc.desc:Verify device base function SetThrottle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DeviceBaseTest, Test_SetThrottle, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};

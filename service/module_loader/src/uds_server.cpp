@@ -17,7 +17,9 @@
 #include <list>
 #include <cinttypes>
 #include <sys/socket.h>
+#include "accesstoken_kit.h"
 #include "i_multimodal_input_connect.h"
+#include "ipc_skeleton.h"
 #include "mmi_log.h"
 #include "util.h"
 #include "util_ex.h"
@@ -32,9 +34,8 @@ UDSServer::UDSServer() {}
 
 UDSServer::~UDSServer()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     UdsStop();
-    MMI_LOGD("leave");
 }
 
 void UDSServer::UdsStop()
@@ -124,7 +125,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     const int32_t moduleType, const int32_t uid, const int32_t pid,
     int32_t& serverFd, int32_t& toReturnClientFd)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     std::lock_guard<std::mutex> lock(mux_);
     int32_t sockFds[2] = {};
 
@@ -186,7 +187,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
             programName.c_str(), pid, MAKE_SHARED_FAIL);
         return RET_ERR;
     }
-
+    AddPermission(sess);
 #ifdef OHOS_BUILD_MMI_DEBUG
     sess->SetClientFd(toReturnClientFd);
 #endif // OHOS__BUILD_MMI_DEBUG
@@ -198,6 +199,24 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     }
     OnConnected(sess);
     return RET_OK;
+}
+
+void UDSServer::AddPermission(SessionPtr sess)
+{
+    uint32_t callerToken = IPCSkeleton::GetCallingTokenID();
+    int32_t result;
+    std::string permissionMonitor = "ohos.permission.INPUT_MONITORING";
+    
+    if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) ==
+        Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
+        MMI_LOGD("get token type flag is TOKEN_HAP");
+        result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionMonitor);
+        MMI_LOGD("verify access token result:%{public}d", result);
+        if (result != Security::AccessToken::PERMISSION_GRANTED) {
+            MMI_LOGD("permission is not granted");
+            sess->AddPermission(false);
+        }
+    }
 }
 
 void UDSServer::Dump(int32_t fd)
@@ -457,13 +476,14 @@ void UDSServer::DelSession(int32_t fd)
 
 void UDSServer::OnThread()
 {
+    CALL_LOG_ENTER;
     SetThreadName(std::string("uds_server"));
     uint64_t tid = GetThisThreadIdOfLL();
     if (tid <= 0) {
         MMI_LOGE("The tid value is error, errCode:%{public}d", VAL_NOT_EXP);
         return;
     }
-    MMI_LOGD("begin tid:%{public}" PRId64 "", tid);
+    MMI_LOGD("tid:%{public}" PRId64 "", tid);
 
     std::map<int32_t, StreamBufData> bufMap;
     struct epoll_event ev[MAX_EVENT_SIZE] = {};
@@ -482,23 +502,20 @@ void UDSServer::OnThread()
             }
         }
     }
-    MMI_LOGI("end");
 }
 
 void UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callback)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     callbacks_.push_back(callback);
-    MMI_LOGD("Leave");
 }
 
 void UDSServer::NotifySessionDeleted(SessionPtr ses)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     for (const auto& callback : callbacks_) {
         callback(ses);
     }
-    MMI_LOGD("Leave");
 }
 } // namespace MMI
 } // namespace OHOS

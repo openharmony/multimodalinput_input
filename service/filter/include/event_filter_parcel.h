@@ -15,7 +15,7 @@
 
 #ifndef EVENT_FILTER_PARCEL_H
 #define EVENT_FILTER_PARCEL_H
-
+#include "nocopyable.h"
 #include "parcel.h"
 #include "pointer_event.h"
 
@@ -23,6 +23,7 @@ namespace OHOS {
 namespace MMI {
 struct PointerEventParcel final : public Parcelable {
     PointerEventParcel() = default;
+    DISALLOW_COPY_AND_MOVE(PointerEventParcel);
     ~PointerEventParcel() override = default;
 
     bool Marshalling(Parcel& out) const override;

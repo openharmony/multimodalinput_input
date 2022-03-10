@@ -163,6 +163,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSiz
     }
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckMousePointEvent_001
+ * @tc.desc:Verify mouse point event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_001, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -195,6 +201,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_001, TestSize.L
     ASSERT_TRUE(!pointerEvent1->IsValid());
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckMousePointEvent_002
+ * @tc.desc:Verify mouse point event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_002, TestSize.Level1)
 {
     auto pointerEvent1 = PointerEvent::Create();
@@ -226,6 +238,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_002, TestSize.L
     ASSERT_TRUE(!pointerEvent3->IsValid());
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckMousePointEvent_003
+ * @tc.desc:Verify mouse point event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_003, TestSize.Level1)
 {
     auto pointerEvent1 = PointerEvent::Create();
@@ -250,6 +268,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_003, TestSize.L
     ASSERT_TRUE(!pointerEvent2->IsValid());
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckMousePointEvent_004
+ * @tc.desc:Verify mouse point event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_004, TestSize.Level1)
 {
     auto pointerEvent1 = PointerEvent::Create();
@@ -287,6 +311,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_004, TestSize.L
     ASSERT_TRUE(!pointerEvent3->IsValid());
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckMousePointEvent_005
+ * @tc.desc:Verify mouse point event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_005, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -303,6 +333,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_005, TestSize.L
     ASSERT_TRUE(pointerEvent->IsValid());
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckTouchPointEvent_001
+ * @tc.desc:Verify touch screen event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_001, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -329,6 +365,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_001, TestSize.L
     ASSERT_TRUE(!pointerEvent2->IsValid());
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckTouchPointEvent_002
+ * @tc.desc:Verify touch screen event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_002, TestSize.Level1)
 {
     auto pointerEvent1 = PointerEvent::Create();
@@ -353,6 +395,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_002, TestSize.L
     ASSERT_TRUE(!pointerEvent2->IsValid());
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckTouchPointEvent_003
+ * @tc.desc:Verify touch screen event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_003, TestSize.Level1)
 {
     auto pointerEvent1 = PointerEvent::Create();
@@ -385,6 +433,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_003, TestSize.L
     ASSERT_TRUE(!pointerEvent2->IsValid());
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckTouchPointEvent_004
+ * @tc.desc:Verify touch screen event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_004, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -405,6 +459,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_004, TestSize.L
     ASSERT_TRUE(!pointerEvent->IsValid());
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckTouchPointEvent_005
+ * @tc.desc:Verify touch screen event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_005, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();

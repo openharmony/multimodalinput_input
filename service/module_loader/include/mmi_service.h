@@ -22,7 +22,7 @@
 #include "system_ability.h"
 #include "nocopyable.h"
 #include "multimodal_input_connect_stub.h"
-
+#include "nocopyable.h"
 #include "s_input.h"
 #include "uds_server.h"
 #include "input_event_handler.h"
@@ -39,6 +39,7 @@ enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class MMIService : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_DELAYED_SINGLETON(MMIService);
     DECLEAR_SYSTEM_ABILITY(MMIService);
+    DISALLOW_COPY_AND_MOVE(MMIService);
 
 public:
     virtual void OnStart() override;

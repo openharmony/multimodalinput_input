@@ -15,15 +15,16 @@
 
 #ifndef JS_INPUT_DEVICE_MANAGER_H
 #define JS_INPUT_DEVICE_MANAGER_H
-
 #include <memory>
-
 #include "js_event_target.h"
 
 namespace OHOS {
 namespace MMI {
 class JsInputDeviceManager : public JsEventTarget {
 public:
+    JsInputDeviceManager() = default;
+    DISALLOW_COPY_AND_MOVE(JsInputDeviceManager);
+
     void ResetEnv();
     napi_value GetDeviceIds(napi_env env, napi_value handle = nullptr);
     napi_value GetDevice(int32_t id, napi_env env, napi_value handle = nullptr);

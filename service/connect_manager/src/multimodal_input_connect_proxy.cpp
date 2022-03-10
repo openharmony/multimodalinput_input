@@ -41,7 +41,7 @@ MultimodalInputConnectProxy::~MultimodalInputConnectProxy()
 int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programName,
     const int32_t moduleType, int32_t &socketFd)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     MessageParcel data;
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
         MMI_LOGE("Failed to write descriptor");
@@ -74,13 +74,12 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
     }
     socketFd = reply.ReadFileDescriptor();
     MMI_LOGD("socketFd:%{public}d", socketFd);
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     MessageParcel data;
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
         MMI_LOGE("Failed to write descriptor");
@@ -104,7 +103,6 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
     if (result != RET_OK) {
         MMI_LOGE("reply readint32 error:%{public}d", result);
     }
-    MMI_LOGD("leave");
     return result;
 }
 } // namespace MMI

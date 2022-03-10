@@ -17,12 +17,14 @@
 
 #include "client_msg_handler.h"
 #include "if_mmi_client.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class MMIClient : public UDSClient, public IfMMIClient, public std::enable_shared_from_this<IfMMIClient> {
 public:
     MMIClient();
+    DISALLOW_COPY_AND_MOVE(MMIClient);
     virtual ~MMIClient() override;
 
     int32_t Socket() override;

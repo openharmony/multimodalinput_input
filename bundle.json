@@ -23,6 +23,7 @@
     ],
     "deps": {
       "components": [
+        "access_token",
         "libhilog",
         "ipc_core",
         "system_ability_fwk",

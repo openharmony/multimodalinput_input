@@ -21,6 +21,7 @@
 #include "i_event_filter.h"
 #include "mouse_event_handler.h"
 #include "msg_handler.h"
+#include "nocopyable.h"
 #include "singleton.h"
 
 namespace OHOS {
@@ -30,6 +31,7 @@ using NotifyDeviceChange = std::function<void(int32_t, int32_t, char *)>;
 class InputEventHandler : public MsgHandler<EventFun>, public DelayedSingleton<InputEventHandler> {
 public:
     InputEventHandler();
+    DISALLOW_COPY_AND_MOVE(InputEventHandler);
     virtual ~InputEventHandler() override;
     void Init(UDSServer& udsServer);
     void OnEvent(void *event);
@@ -47,15 +49,13 @@ protected:
     int32_t OnEventGesture(libinput_event *event);
     int32_t OnEventTouchpad(libinput_event *event);
     int32_t OnGestureEvent(libinput_event *event);
-    int32_t OnKeyboardEvent(libinput_event *event);
-    int32_t OnKeyEventDispatch(libinput_event *event);
+    int32_t OnEventKey(libinput_event *event);
     
     int32_t OnMouseEventHandler(struct libinput_event *event);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
 
 private:
     int32_t OnEventHandler(libinput_event *event);
-    int32_t OnEventKey(struct libinput_event *event);
     UDSServer *udsServer_ = nullptr;
     EventDispatch eventDispatch_;
     EventPackage eventPackage_;

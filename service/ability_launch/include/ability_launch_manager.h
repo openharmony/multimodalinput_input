@@ -30,6 +30,7 @@
 #include "singleton.h"
 #include "struct_multimodal.h"
 #include "key_event.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -57,6 +58,7 @@ struct ShortcutKey {
 class AbilityLaunchManager : public DelayedSingleton<AbilityLaunchManager> {
 public:
     AbilityLaunchManager();
+    DISALLOW_COPY_AND_MOVE(AbilityLaunchManager);
     ~AbilityLaunchManager() = default;
     bool CheckLaunchAbility(const std::shared_ptr<KeyEvent> &event);
 private:

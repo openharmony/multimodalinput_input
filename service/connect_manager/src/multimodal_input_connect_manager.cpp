@@ -46,7 +46,7 @@ std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::Ge
 
 int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
         MMI_LOGE("client has not connect server");
@@ -66,7 +66,7 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
 
 int32_t MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair() const
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     return socketFd_;
 }
 
@@ -82,7 +82,7 @@ int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> fi
 
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ != nullptr) {
         return true;
@@ -120,15 +120,14 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 
 void MultimodalInputConnectManager::OnDeath()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     Clean();
     NotifyDeath();
-    MMI_LOGD("leave");
 }
 
 void MultimodalInputConnectManager::Clean()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ != nullptr) {
         multimodalInputConnectService_.clear();
@@ -139,12 +138,11 @@ void MultimodalInputConnectManager::Clean()
         multimodalInputConnectRecipient_.clear();
         multimodalInputConnectRecipient_ = nullptr;
     }
-    MMI_LOGD("leave");
 }
 
 void MultimodalInputConnectManager::NotifyDeath()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
 
     int32_t retryCount = 50;
     do {
@@ -154,8 +152,6 @@ void MultimodalInputConnectManager::NotifyDeath()
             return;
         }
     } while (--retryCount > 0);
-    
-    MMI_LOGI("leave");
 }
 } // namespace MMI
 } // namespace OHOS
