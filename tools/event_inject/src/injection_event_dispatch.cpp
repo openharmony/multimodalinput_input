@@ -47,7 +47,7 @@ void InjectionEventDispatch::InitManageFunction()
 
 int32_t InjectionEventDispatch::OnJson()
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     const std::string path = injectArgvs_.at(JSON_FILE_PATH_INDEX);
     std::ifstream reader(path);
     if (!reader) {
@@ -59,7 +59,6 @@ int32_t InjectionEventDispatch::OnJson()
     reader.close();
 
     int32_t ret = manageInjectDevice_.TransformJsonData(inputEventArrays);
-    MMI_LOGI("Leave");
     return ret;
 }
 
@@ -70,7 +69,7 @@ std::string InjectionEventDispatch::GetFunId() const
 
 bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const std::vector<std::string> &argv)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (argc < ARGV_VALID || argv.at(ARGVS_TARGET_INDEX).empty()) {
         MMI_LOGE("Invaild Input Para, Plase Check the validity of the para. errCode:%{public}d", PARAM_INPUT_FAIL);
         return false;
@@ -98,7 +97,7 @@ bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const std::vector<
 
 void InjectionEventDispatch::Run()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     std::string id = GetFunId();
     auto fun = GetFun(id);
     if (!fun) {

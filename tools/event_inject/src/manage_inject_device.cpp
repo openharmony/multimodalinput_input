@@ -25,7 +25,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Manage
 
 int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     if (configData.empty()) {
         MMI_LOGE("input data from json file is empty");
         return RET_ERR;
@@ -62,8 +62,6 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
         delete devicePtr_;
         devicePtr_ = nullptr;
     }
-    MMI_LOGD("Leave");
-
     return ret;
 }
 
@@ -74,7 +72,7 @@ int32_t ManageInjectDevice::SendEvent(const InputEventArray& inputEventArray)
 
 int32_t ManageInjectDevice::SendEventToDeviveNode(const InputEventArray& inputEventArray)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     std::string deviceNode = inputEventArray.target;
     if (deviceNode.empty()) {
         MMI_LOGE("device node:%{public}s is not exit", deviceNode.c_str());
@@ -98,6 +96,5 @@ int32_t ManageInjectDevice::SendEventToDeviveNode(const InputEventArray& inputEv
     if (fd >= 0) {
         close(fd);
     }
-    MMI_LOGD("Leave");
     return RET_OK;
 }
