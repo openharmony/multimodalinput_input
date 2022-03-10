@@ -22,11 +22,12 @@
 #include "libmmi_util.h"
 #include "util.h"
 #include "input_windows_manager.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SInput" };
-}
+} // namespace
 
 static void HiLogFunc(struct libinput* input, enum libinput_log_priority priority, const char* fmt, va_list args)
 {

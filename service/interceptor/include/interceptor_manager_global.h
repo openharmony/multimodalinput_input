@@ -32,7 +32,7 @@ public:
     void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session);
     void OnRemoveInterceptor(int32_t id);
     bool OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
-    bool OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent);
+    bool OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 private:
     struct InterceptorItem {
         int32_t sourceType;
@@ -46,8 +46,8 @@ private:
 private:
     std::list<InterceptorItem> interceptors_;
 };
+
+#define InterceptorMgrGbl OHOS::Singleton<InterceptorManagerGlobal>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-
-#define InterceptorMgrGbl OHOS::Singleton<OHOS::MMI::InterceptorManagerGlobal>::GetInstance()
 #endif // INTERCEPTOR_MANAGER_GLOBAL_H

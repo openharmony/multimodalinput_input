@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include "uds_socket.h"
 #include <gtest/gtest.h>
+
+#include "uds_socket.h"
 
 namespace OHOS {
 namespace MMI {

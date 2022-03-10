@@ -14,7 +14,9 @@
  */
 
 #include "pointer_event.h"
+
 #include <iomanip>
+
 #include "mmi_log.h"
 
 using namespace OHOS::HiviewDFX;

@@ -19,8 +19,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "TouchTransformPointProcessor"};
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "TouchTransformPointProcessor"};
+} // namespace
 
 TouchTransformPointProcessor::TouchTransformPointProcessor(int32_t deviceId) : deviceId_(deviceId)
 {
@@ -77,7 +77,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
 
 bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *event)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPF(event);
     auto data = libinput_event_get_touch_event(event);
     CHKPF(data);
@@ -103,13 +103,12 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
     item.SetGlobalY(logicalY);
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_LOGD("Leave");
     return true;
 }
 
 bool TouchTransformPointProcessor::OnEventTouchUp(struct libinput_event *event)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPF(event);
     auto data = libinput_event_get_touch_event(event);
     CHKPF(data);
@@ -126,7 +125,6 @@ bool TouchTransformPointProcessor::OnEventTouchUp(struct libinput_event *event)
     item.SetPressed(false);
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_LOGD("Leave");
     return true;
 }
 

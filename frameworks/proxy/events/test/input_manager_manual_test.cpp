@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_event_monitor_manager.h"

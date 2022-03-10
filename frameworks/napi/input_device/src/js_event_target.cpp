@@ -27,7 +27,7 @@ JsEventTarget::DeviceType g_deviceType[] = {
     {"joystick", JsEventTarget::EVDEV_UDEV_TAG_JOYSTICK},
     {"trackball", JsEventTarget::EVDEV_UDEV_TAG_TRACKBALL},
 };
-}
+} // namespace
 
 napi_env JsEventTarget::env_ = nullptr;
 static std::map<int32_t, JsEventTarget::CallbackInfo*> callback_ {};

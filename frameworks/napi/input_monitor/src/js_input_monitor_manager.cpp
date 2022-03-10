@@ -23,7 +23,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorManager" };
-}
+} // namespace
 
 JsInputMonitorManager& JsInputMonitorManager::GetInstance()
 {

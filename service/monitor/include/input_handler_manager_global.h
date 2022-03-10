@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace MMI {
-class InputHandlerManagerGlobal : public Singleton<OHOS::MMI::InputHandlerManagerGlobal> {
+class InputHandlerManagerGlobal : public Singleton<InputHandlerManagerGlobal> {
 public:
     InputHandlerManagerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(InputHandlerManagerGlobal);
