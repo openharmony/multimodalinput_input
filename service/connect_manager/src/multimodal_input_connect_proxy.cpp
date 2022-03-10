@@ -24,9 +24,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectProxy" };
-}
+} // namespace
 
-// 获取其他设备注册的SA的Proxy
 MultimodalInputConnectProxy::MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl) :
     IRemoteProxy<IMultimodalInputConnect>(impl)
 {

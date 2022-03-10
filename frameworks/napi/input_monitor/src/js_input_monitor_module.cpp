@@ -22,13 +22,12 @@
 #include "define_multimodal.h"
 #include "js_input_monitor_manager.h"
 
-
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorModule" };
-    constexpr size_t MAX_STRING_LEN = 1024;
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorModule" };
+constexpr size_t MAX_STRING_LEN = 1024;
+} // namespace
 
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {

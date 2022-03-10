@@ -18,9 +18,9 @@
 
 namespace OHOS {
 namespace MMI {
-    namespace {
-        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TouchTransformPointManager" };
-    }
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TouchTransformPointManager" };
+} // namespace
 
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibInput(
     struct libinput_event *event, INPUT_DEVICE_TYPE deviceType)

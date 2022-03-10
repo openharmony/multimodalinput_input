@@ -26,8 +26,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManager" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManager" };
+} // namespace
 
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
     std::shared_ptr<IInputEventConsumer> consumer)

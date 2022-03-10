@@ -21,8 +21,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    int64_t g_nextEventId = 1;
-}
+int64_t g_nextEventId = 1;
+} // namespace
 
 InputEvent::InputEvent(int32_t eventType) : eventType_(eventType)
 {

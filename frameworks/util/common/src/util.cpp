@@ -43,8 +43,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Util"};
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Util"};
+} // namespace
 
 const std::map<int32_t, std::string> ERROR_STRING_MAP = {
     {MSG_SEND_FAIL, "Send Message Failed"},
@@ -364,7 +364,7 @@ void SetThreadName(const std::string& name)
 
 namespace {
 thread_local std::string g_threadName;
-}
+} // namespace
 const std::string& GetThreadName()
 {
     if (!g_threadName.empty()) {
