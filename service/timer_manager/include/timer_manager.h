@@ -21,6 +21,7 @@
 #include <memory>
 #include "define_multimodal.h"
 #include "mmi_log.h"
+#include "nocopyable.h"
 #include "singleton.h"
 #include "util.h"
 
@@ -28,6 +29,8 @@ namespace OHOS {
 namespace MMI {
 class TimerManager : public DelayedSingleton<TimerManager> {
 public:
+    TimerManager() = default;
+    DISALLOW_COPY_AND_MOVE(TimerManager);
     int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
     int32_t RemoveTimer(int32_t timerId);
     int32_t ResetTimer(int32_t timerId);

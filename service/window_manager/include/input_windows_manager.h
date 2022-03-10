@@ -22,6 +22,7 @@
 #include "input_event.h"
 #include "pointer_event.h"
 #include "libinput.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -78,6 +79,7 @@ class InputWindowsManager : public DelayedSingleton<InputWindowsManager> {
 public:
     InputWindowsManager();
     virtual ~InputWindowsManager();
+    DISALLOW_COPY_AND_MOVE(InputWindowsManager);
 
     bool Init(UDSServer& udsServer);
     void UpdateSeatsInfo();

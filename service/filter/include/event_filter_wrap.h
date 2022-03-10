@@ -18,6 +18,7 @@
 
 #include <mutex>
 #include "i_event_filter.h"
+#include "nocopyable.h"
 #include "singleton.h"
 
 namespace OHOS {
@@ -25,6 +26,7 @@ namespace MMI {
 class EventFilterWrap : public Singleton<EventFilterWrap> {
 public:
     EventFilterWrap();
+    DISALLOW_COPY_AND_MOVE(EventFilterWrap);
     ~EventFilterWrap();
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);

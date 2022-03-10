@@ -27,12 +27,14 @@
 #include "event_filter_service.h"
 #include "input_monitor_manager.h"
 #include "input_interceptor_manager.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class InputManagerImpl : public DelayedSingleton<InputManagerImpl> {
 public:
     virtual ~InputManagerImpl() = default;
+    DISALLOW_COPY_AND_MOVE(InputManagerImpl);
     InputManagerImpl() = default;
 
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,

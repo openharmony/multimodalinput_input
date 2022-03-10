@@ -15,8 +15,8 @@
 
 #ifndef MULTIMODAL_INPUT_CONNECT_DEATH_RECIPIENT_H
 #define MULTIMODAL_INPUT_CONNECT_DEATH_RECIPIENT_H
-
 #include "iremote_broker.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -24,6 +24,7 @@ class MultimodalInputConnectDeathRecipient : public IRemoteObject::DeathRecipien
 public:
     explicit MultimodalInputConnectDeathRecipient(const std::function<void(const wptr<IRemoteObject> &object)>
                                                   &deathCallback);
+    DISALLOW_COPY_AND_MOVE(MultimodalInputConnectDeathRecipient);
     virtual ~MultimodalInputConnectDeathRecipient() = default;
     void OnRemoteDied(const wptr<IRemoteObject> &object) override;
 

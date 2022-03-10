@@ -24,6 +24,7 @@
 #include "pixel_map.h"
 #include "window.h"
 #include "draw/canvas.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -31,6 +32,7 @@ class PointerDrawingManager : public DelayedSingleton<PointerDrawingManager>, pu
 public:
     PointerDrawingManager();
     ~PointerDrawingManager();
+    DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
     void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY);
     void TellDisplayInfo(int32_t displayId, int32_t width, int32_t height);
     void UpdatePointerDevice(bool hasPointerDevice);

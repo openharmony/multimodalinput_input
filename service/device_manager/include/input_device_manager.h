@@ -24,11 +24,14 @@
 #include "event_dispatch.h"
 #include "event_package.h"
 #include "input_device.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class InputDeviceManager : public DelayedSingleton<InputDeviceManager>, public Subject {
 public:
+    InputDeviceManager() = default;
+    DISALLOW_COPY_AND_MOVE(InputDeviceManager);
     void OnInputDeviceAdded(struct libinput_device* inputDevice);
     void OnInputDeviceRemoved(struct libinput_device* inputDevice);
     std::vector<int32_t> GetInputDeviceIds() const;

@@ -15,7 +15,6 @@
 
 #ifndef MSG_HEAD_H
 #define MSG_HEAD_H
-
 #include <ctime>
 #include <sys/types.h>
 #include <sys/stat.h>
