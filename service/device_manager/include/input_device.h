@@ -15,8 +15,10 @@
 
 #ifndef INPUT_DEVICE_H
 #define INPUT_DEVICE_H
+
 #include <string>
 #include <vector>
+
 #include "nocopyable.h"
 
 namespace OHOS {

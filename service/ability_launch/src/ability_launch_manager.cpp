@@ -14,14 +14,17 @@
  */
 
 #include "ability_launch_manager.h"
-#include <fstream>
-#include <sstream>
-#include <iostream>
+
 #include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+
 #include "ability_manager_client.h"
 #include "file_ex.h"
-#include "mmi_log.h"
 #include "ohos/aafwk/base/string_wrapper.h"
+
+#include "mmi_log.h"
 #include "timer_manager.h"
 
 namespace OHOS {
