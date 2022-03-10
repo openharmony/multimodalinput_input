@@ -19,10 +19,12 @@
 #include <functional>
 #include <list>
 #include <memory>
-#include "key_event.h"
-#include "key_option.h"
+
 #include "nocopyable.h"
 #include "singleton.h"
+
+#include "key_event.h"
+#include "key_option.h"
 
 namespace OHOS {
 namespace MMI {
