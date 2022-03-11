@@ -15,8 +15,10 @@
 
 #ifndef SEND_MESSAGE_H
 #define SEND_MESSAGE_H
-#include "msg_head.h"
+
 #include "nocopyable.h"
+
+#include "msg_head.h"
 
 namespace OHOS {
 namespace MMI {

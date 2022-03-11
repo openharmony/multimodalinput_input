@@ -14,14 +14,15 @@
  */
 #ifndef GET_DEVICE_OBJECT_H
 #define GET_DEVICE_OBJECT_H
+
 #include "device_base.h"
 #include "processing_finger_device.h"
-#include "processing_pen_device.h"
-#include "processing_pad_device.h"
 #include "processing_game_pad_device.h"
 #include "processing_joystick_device.h"
-#include "processing_mouse_device.h"
 #include "processing_keyboard_device.h"
+#include "processing_mouse_device.h"
+#include "processing_pad_device.h"
+#include "processing_pen_device.h"
 #include "processing_touch_screen_device.h"
 
 namespace OHOS {
