@@ -14,13 +14,15 @@
  */
 #ifndef EVENT_DISPATCH_H
 #define EVENT_DISPATCH_H
-#include "uds_server.h"
+
+#include "nocopyable.h"
+
+#include "event_package.h"
+#include "i_event_filter.h"
 #include "key_event.h"
 #include "key_event_value_transformation.h"
-#include "event_package.h"
-#include "nocopyable.h"
 #include "pointer_event.h"
-#include "i_event_filter.h"
+#include "uds_server.h"
 
 namespace OHOS {
 namespace MMI {
@@ -59,7 +61,7 @@ protected:
         RegisteredEvent& registeredEvent, int64_t preHandlerTime);
     int32_t KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer& udsServer,
         struct libinput_event *event, int32_t inputDeviceType, int64_t preHandlerTime);
-    bool IsANRProcess(int64_t time, SessionPtr ss);
+    bool TriggerANR(int64_t time, SessionPtr sess);
 
 private:
     int32_t DispatchTouchEvent(const EventTouch& touch, const int fd,

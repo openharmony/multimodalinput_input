@@ -19,11 +19,12 @@
 #include <memory>
 #include <list>
 
+#include "nocopyable.h"
+
 #include "display_info.h"
 #include "error_multimodal.h"
 #include "i_input_event_consumer.h"
 #include "key_option.h"
-#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -64,7 +65,7 @@ public:
      * will be called back to the consumer object for processing.
      * @since 8
      */
-    void SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::IInputEventConsumer> inputEventConsumer);
+    void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer);
 
     /**
      * @brief Subscribes to the key input event that meets a specific condition. When such an event occurs,

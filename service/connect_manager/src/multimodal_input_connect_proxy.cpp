@@ -14,6 +14,7 @@
  */
 
 #include "multimodal_input_connect_proxy.h"
+
 #include "message_option.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
@@ -24,24 +25,23 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectProxy" };
-}
+} // namespace
 
-// 获取其他设备注册的SA的Proxy
 MultimodalInputConnectProxy::MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl) :
     IRemoteProxy<IMultimodalInputConnect>(impl)
 {
-    MMI_LOGI("MultimodalInputConnectProxy()");
+    MMI_LOGI("enter MultimodalInputConnectProxy");
 }
 
 MultimodalInputConnectProxy::~MultimodalInputConnectProxy()
 {
-    MMI_LOGI("~MultimodalInputConnectProxy()");
+    MMI_LOGI("enter ~MultimodalInputConnectProxy");
 }
 
 int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programName,
     const int32_t moduleType, int32_t &socketFd)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     MessageParcel data;
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
         MMI_LOGE("Failed to write descriptor");
@@ -64,7 +64,7 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
         return RET_ERR;
     }
 
-    MMI_LOGD("have recieve message from server");
+    MMI_LOGD("recieved message from server");
 
     int32_t result = reply.ReadInt32();
     MMI_LOGD("result:%{public}d", result);
@@ -74,13 +74,12 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
     }
     socketFd = reply.ReadFileDescriptor();
     MMI_LOGD("socketFd:%{public}d", socketFd);
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     MessageParcel data;
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
         MMI_LOGE("Failed to write descriptor");
@@ -102,9 +101,8 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
 
     int32_t result = reply.ReadInt32();
     if (result != RET_OK) {
-        MMI_LOGE("responce return error:%{public}d", result);
+        MMI_LOGE("reply readint32 error:%{public}d", result);
     }
-    MMI_LOGD("leave");
     return result;
 }
 } // namespace MMI

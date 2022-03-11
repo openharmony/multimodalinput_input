@@ -18,11 +18,14 @@
 
 #include <string>
 #include <vector>
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class InputManagerCommand {
 public:
+    InputManagerCommand() = default;
+    DISALLOW_COPY_AND_MOVE(InputManagerCommand);
     int32_t ParseCommand(int32_t argc, char *argv[]);
     int32_t ConnectService();
     void ShowUsage();

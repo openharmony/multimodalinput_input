@@ -14,13 +14,13 @@
  */
 
 #include <gtest/gtest.h>
+
 #include "define_multimodal.h"
 #include "input_manager.h"
 #include "key_event.h"
-#include "standardized_event_manager.h"
 #include "proto.h"
-#include "key_event.h"
 #include "run_shell_util.h"
+#include "standardized_event_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -35,6 +35,12 @@ public:
     static void TearDownTestCase(void) {}
 };
 
+/**
+ * @tc.name:KeyEventTest_OnCheckKeyEvent_001
+ * @tc.desc:Verify key event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_001, TestSize.Level1)
 {
     auto KeyEvent = KeyEvent::Create();
@@ -51,6 +57,12 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_001, TestSize.Level1)
     ASSERT_TRUE(!KeyEvent->IsValid());
 }
 
+/**
+ * @tc.name:KeyEventTest_OnCheckKeyEvent_002
+ * @tc.desc:Verify key event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_002, TestSize.Level1)
 {
     auto KeyEvent1 = KeyEvent::Create();
@@ -72,6 +84,12 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_002, TestSize.Level1)
     ASSERT_TRUE(!KeyEvent2->IsValid());
 }
 
+/**
+ * @tc.name:KeyEventTest_OnCheckKeyEvent_003
+ * @tc.desc:Verify key event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_003, TestSize.Level1)
 {
     auto KeyEvent1 = KeyEvent::Create();
@@ -96,6 +114,12 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_003, TestSize.Level1)
     ASSERT_TRUE(!KeyEvent2->IsValid());
 }
 
+/**
+ * @tc.name:KeyEventTest_OnCheckKeyEvent_004
+ * @tc.desc:Verify key event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_004, TestSize.Level1)
 {
     auto KeyEvent1 = KeyEvent::Create();
@@ -125,6 +149,12 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_004, TestSize.Level1)
     ASSERT_TRUE(!KeyEvent2->IsValid());
 }
 
+/**
+ * @tc.name:KeyEventTest_OnCheckKeyEvent_005
+ * @tc.desc:Verify key event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_005, TestSize.Level1)
 {
     auto KeyEvent = KeyEvent::Create();

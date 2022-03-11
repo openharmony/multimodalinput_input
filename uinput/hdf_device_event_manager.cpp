@@ -24,8 +24,8 @@ using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "HdfDeviceEventManager"};
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "HdfDeviceEventManager"};
+} // namespace
 
 HdfDeviceEventManager::HdfDeviceEventManager() {}
 

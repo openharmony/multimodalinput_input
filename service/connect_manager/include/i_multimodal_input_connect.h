@@ -17,6 +17,7 @@
 #define I_MULTIMODAL_INPUT_CONNECT_H
 
 #include "iremote_broker.h"
+
 #include "i_event_filter.h"
 
 namespace OHOS {

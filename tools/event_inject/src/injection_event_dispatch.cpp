@@ -47,7 +47,7 @@ void InjectionEventDispatch::InitManageFunction()
 
 int32_t InjectionEventDispatch::OnJson()
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     const std::string path = injectArgvs_.at(JSON_FILE_PATH_INDEX);
     std::ifstream reader(path);
     if (!reader) {
@@ -59,18 +59,17 @@ int32_t InjectionEventDispatch::OnJson()
     reader.close();
 
     int32_t ret = manageInjectDevice_.TransformJsonData(inputEventArrays);
-    MMI_LOGI("Leave");
     return ret;
 }
 
-std::string InjectionEventDispatch::GetFunId()
+std::string InjectionEventDispatch::GetFunId() const
 {
     return funId_;
 }
 
 bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const std::vector<std::string> &argv)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (argc < ARGV_VALID || argv.at(ARGVS_TARGET_INDEX).empty()) {
         MMI_LOGE("Invaild Input Para, Plase Check the validity of the para. errCode:%{public}d", PARAM_INPUT_FAIL);
         return false;
@@ -98,7 +97,7 @@ bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const std::vector<
 
 void InjectionEventDispatch::Run()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     std::string id = GetFunId();
     auto fun = GetFun(id);
     if (!fun) {
@@ -145,7 +144,7 @@ int32_t InjectionEventDispatch::OnHelp()
     return RET_OK;
 }
 
-int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText)
+int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText) const
 {
     if (deviceNameText.empty()) {
         MMI_LOGE("Get device index failed");
@@ -197,7 +196,7 @@ int32_t InjectionEventDispatch::OnSendEvent()
     return RET_OK;
 }
 
-int32_t InjectionEventDispatch::GetDevTypeIndex(int32_t devIndex)
+int32_t InjectionEventDispatch::GetDevTypeIndex(int32_t devIndex) const
 {
     for (const auto &item : allDevices_) {
         if (devIndex == item.devIndex) {
@@ -207,7 +206,7 @@ int32_t InjectionEventDispatch::GetDevTypeIndex(int32_t devIndex)
     return RET_ERR;
 }
 
-int32_t InjectionEventDispatch::GetDevIndexType(int32_t devType)
+int32_t InjectionEventDispatch::GetDevIndexType(int32_t devType) const
 {
     for (const auto &item : allDevices_) {
         if (item.devType == devType) {

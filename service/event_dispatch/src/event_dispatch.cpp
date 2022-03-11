@@ -14,18 +14,21 @@
  */
 
 #include "event_dispatch.h"
+
 #include <cinttypes>
-#include "ability_launch_manager.h"
+
 #include "ability_manager_client.h"
 #include "bytrace.h"
+#include "input-event-codes.h"
+#include "hisysevent.h"
+
+#include "ability_launch_manager.h"
 #include "error_multimodal.h"
 #include "event_filter_wrap.h"
-#include "hisysevent.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "input_event_monitor_manager.h"
 #include "input_handler_manager_global.h"
-#include "input-event-codes.h"
 #include "interceptor_manager_global.h"
 #include "key_event_subscriber.h"
 #include "util.h"
@@ -35,15 +38,11 @@ namespace MMI {
 constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
-}
+} // namespace
 
-EventDispatch::EventDispatch()
-{
-}
+EventDispatch::EventDispatch() {}
 
-EventDispatch::~EventDispatch()
-{
-}
+EventDispatch::~EventDispatch() {}
 
 void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
                                                   const int32_t fingerCount,
@@ -115,6 +114,7 @@ void EventDispatch::HandlePointerEventTrace(const std::shared_ptr<PointerEvent> 
 
 int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 {
+    CALL_LOG_ENTER;
     CHKPR(point, ERROR_NULL_POINTER);
     auto fd = WinMgr->UpdateTargetPointer(point);
     if (HandlePointerEventFilter(point)) {
@@ -135,21 +135,21 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         return RET_ERR;
     }
     if (fd < 0) {
-        MMI_LOGE("The fd less than 0");
+        MMI_LOGE("The fd less than 0, fd: %{public}d", fd);
         return RET_ERR;
     }
 
     auto session = udsServer->GetSession(fd);
     CHKPF(session);
     if (session->isANRProcess_) {
-        MMI_LOGI("is ANR process");
+        MMI_LOGD("is ANR process");
         return RET_OK;
     }
 
     auto currentTime = GetSysClockTime();
-    if (IsANRProcess(currentTime, session)) {
+    if (TriggerANR(currentTime, session)) {
         session->isANRProcess_ = true;
-        MMI_LOGE("the pointer event does not report normally, triggering ANR");
+        MMI_LOGW("the pointer event does not report normally, triggering ANR");
         return RET_OK;
     }
 
@@ -163,7 +163,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 
 void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler handlerType)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     int32_t keyCode = key->GetKeyCode();
     std::string checkKeyCode;
     switch (handlerType) {
@@ -196,7 +196,7 @@ void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, I
 
 int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
     if (!key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         if (InterceptorMgrGbl.OnKeyEvent(key)) {
@@ -218,10 +218,10 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
     }
     auto fd = WinMgr->UpdateTarget(key);
     if (fd < 0) {
-        MMI_LOGE("Invalid fd");
+        MMI_LOGE("Invalid fd, fd: %{public}d", fd);
         return RET_ERR;
     }
-    MMI_LOGD("4.event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
+    MMI_LOGD("event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
              "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
              "EventType:%{public}d,Flag:%{public}u,"
              "KeyAction:%{public}d,Fd:%{public}d",
@@ -234,14 +234,14 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
     auto session = udsServer.GetSession(fd);
     CHKPF(session);
     if (session->isANRProcess_) {
-        MMI_LOGI("is ANR process");
+        MMI_LOGD("is ANR process");
         return RET_OK;
     }
 
     auto currentTime = GetSysClockTime();
-    if (IsANRProcess(currentTime, session)) {
+    if (TriggerANR(currentTime, session)) {
         session->isANRProcess_ = true;
-        MMI_LOGE("the key event does not report normally, triggering ANR");
+        MMI_LOGW("the key event does not report normally, triggering ANR");
         return RET_OK;
     }
 
@@ -254,7 +254,6 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
         return MSG_SEND_FAIL;
     }
     session->AddEvent(key->GetId(), currentTime);
-    MMI_LOGD("end");
     return RET_OK;
 }
 
@@ -263,19 +262,19 @@ int32_t EventDispatch::AddInputEventFilter(sptr<IEventFilter> filter)
     return EventFilterWrap::GetInstance().AddInputEventFilter(filter);
 }
 
-bool EventDispatch::IsANRProcess(int64_t time, SessionPtr ss)
+bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
 {
-    MMI_LOGD("begin");
-    int64_t firstTime;
-    if (ss->EventsIsEmpty()) {
-        firstTime = time;
+    CALL_LOG_ENTER;
+    int64_t earlist;
+    if (sess->IsEventQueueEmpty()) {
+        earlist = time;
     } else {
-        firstTime = ss->GetFirstEventTime();
+        earlist = sess->GetEarlistEventTime();
     }
 
-    if (time < (firstTime + INPUT_UI_TIMEOUT_TIME)) {
-        ss->isANRProcess_ = false;
-        MMI_LOGI("the event reports normally");
+    if (time < (earlist + INPUT_UI_TIMEOUT_TIME)) {
+        sess->isANRProcess_ = false;
+        MMI_LOGD("the event reports normally");
         return false;
     }
 
@@ -283,20 +282,19 @@ bool EventDispatch::IsANRProcess(int64_t time, SessionPtr ss)
         OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
         "APPLICATION_BLOCK_INPUT",
         OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
-        "PID", ss->GetPid(),
-        "UID", ss->GetUid(),
+        "PID", sess->GetPid(),
+        "UID", sess->GetUid(),
         "PACKAGE_NAME", "",
         "PROCESS_NAME", "",
-        "MSG", "failed to dispatch pointer or key events of multimodalinput");
+        "MSG", "User input does not respond");
     if (ret != 0) {
         MMI_LOGE("HiviewDFX Write failed, HiviewDFX errCode: %{public}d", ret);
     }
 
-    ret = OHOS::AAFwk::AbilityManagerClient::GetInstance()->SendANRProcessID(ss->GetPid());
+    ret = OHOS::AAFwk::AbilityManagerClient::GetInstance()->SendANRProcessID(sess->GetPid());
     if (ret != 0) {
         MMI_LOGE("AAFwk SendANRProcessID failed, AAFwk errCode: %{public}d", ret);
     }
-    MMI_LOGD("end");
     return true;
 }
 } // namespace MMI

@@ -15,40 +15,43 @@
 #ifndef INPUT_EVENT_MONITOR_MANAGER_H
 #define INPUT_EVENT_MONITOR_MANAGER_H
 
-#include "key_event.h"
-#include "pointer_event.h"
-#include "multimodal_event_handler.h"
-#include "proto.h"
+#include <list>
+
+#include "nocopyable.h"
 #include "singleton.h"
 
-#include <list>
+#include "key_event.h"
+#include "multimodal_event_handler.h"
+#include "pointer_event.h"
+#include "proto.h"
 
 namespace OHOS {
 namespace MMI {
 struct MonitorItem {
     int32_t id;
-    std::function<void (std::shared_ptr<OHOS::MMI::KeyEvent>)> keyEventMonitor;
+    std::function<void (std::shared_ptr<KeyEvent>)> keyEventMonitor;
     bool operator == (const MonitorItem& item) const
     {
         return id == item.id;
     }
     std::string name;
-    std::function<void (std::shared_ptr<OHOS::MMI::PointerEvent>)> TouchPadEventMonitor;
+    std::function<void (std::shared_ptr<PointerEvent>)> TouchPadEventMonitor;
 };
 
 class InputEventMonitorManager {
 public:
     InputEventMonitorManager();
+    DISALLOW_COPY_AND_MOVE(InputEventMonitorManager);
     virtual ~InputEventMonitorManager();
 
-    int32_t AddInputEventMontior(std::function<void (std::shared_ptr<OHOS::MMI::KeyEvent>)> keyEventMonitor);
+    int32_t AddInputEventMontior(std::function<void (std::shared_ptr<KeyEvent>)> keyEventMonitor);
     void RemoveInputEventMontior(int32_t monitorId);
-    int32_t OnMonitorInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent);
+    int32_t OnMonitorInputEvent(std::shared_ptr<KeyEvent> keyEvent);
 
-    int32_t AddInputEventTouchpadMontior(std::function<void (std::shared_ptr<OHOS::MMI::PointerEvent>)>
+    int32_t AddInputEventTouchpadMontior(std::function<void (std::shared_ptr<PointerEvent>)>
                                         TouchPadEventMonitor);
     void RemoveInputEventTouchpadMontior(int32_t monitorId);
-    int32_t OnTouchpadMonitorInputEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
+    int32_t OnTouchpadMonitorInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
 public:
     static constexpr int32_t INVALID_MONITOR_ID { -1 };
@@ -56,7 +59,8 @@ public:
 private:
     std::list<MonitorItem> monitors_;
 };
+
+#define InputMonitorMgr OHOS::Singleton<InputEventMonitorManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define InputMonitorMgr OHOS::Singleton<OHOS::MMI::InputEventMonitorManager>::GetInstance()
 #endif // INPUT_EVENT_MONITOR_MANAGER_H

@@ -14,13 +14,14 @@
  */
 
 #include <gtest/gtest.h>
+
 #include "define_multimodal.h"
 #include "input_manager.h"
 #include "key_event.h"
-#include "standardized_event_manager.h"
-#include "proto.h"
 #include "pointer_event.h"
+#include "proto.h"
 #include "run_shell_util.h"
+#include "standardized_event_manager.h"
 #include "util.h"
 
 namespace OHOS {
@@ -28,8 +29,6 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "PointerEventTest"};
 using namespace testing::ext;
-using namespace OHOS::MMI;
-using namespace OHOS;
 } // namespace
 class PointerEventTest : public testing::Test {
 public:
@@ -83,7 +82,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_001, TestSiz
 
     std::shared_ptr<PointerEvent> pointerEvent = createPointEvent();
     // KEYCODE_CTRL_LEFT = 2072
-    std::vector<int32_t> pressedKeys { OHOS::MMI::KeyEvent::KEYCODE_CTRL_LEFT };
+    std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT };
     pointerEvent->SetPressedKeys(pressedKeys);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -115,7 +114,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_002, TestSiz
 
     std::shared_ptr<PointerEvent> pointerEvent = createPointEvent();
     // KEYCODE_CTRL_RIGHT = 2073
-    std::vector<int32_t> pressedKeys { OHOS::MMI::KeyEvent::KEYCODE_CTRL_RIGHT };
+    std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_RIGHT };
     pointerEvent->SetPressedKeys(pressedKeys);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -147,8 +146,8 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSiz
 
     std::shared_ptr<PointerEvent> pointerEvent = createPointEvent();
     // KEYCODE_CTRL_LEFT = 2072, KEYCODE_CTRL_RIGHT = 2073
-    std::vector<int32_t> pressedKeys { OHOS::MMI::KeyEvent::KEYCODE_CTRL_LEFT,
-        OHOS::MMI::KeyEvent::KEYCODE_CTRL_RIGHT };
+    std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT,
+        KeyEvent::KEYCODE_CTRL_RIGHT };
     pointerEvent->SetPressedKeys(pressedKeys);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -164,6 +163,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSiz
     }
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckMousePointEvent_001
+ * @tc.desc:Verify mouse point event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_001, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -196,6 +201,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_001, TestSize.L
     ASSERT_TRUE(!pointerEvent1->IsValid());
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckMousePointEvent_002
+ * @tc.desc:Verify mouse point event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_002, TestSize.Level1)
 {
     auto pointerEvent1 = PointerEvent::Create();
@@ -227,6 +238,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_002, TestSize.L
     ASSERT_TRUE(!pointerEvent3->IsValid());
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckMousePointEvent_003
+ * @tc.desc:Verify mouse point event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_003, TestSize.Level1)
 {
     auto pointerEvent1 = PointerEvent::Create();
@@ -251,6 +268,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_003, TestSize.L
     ASSERT_TRUE(!pointerEvent2->IsValid());
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckMousePointEvent_004
+ * @tc.desc:Verify mouse point event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_004, TestSize.Level1)
 {
     auto pointerEvent1 = PointerEvent::Create();
@@ -288,6 +311,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_004, TestSize.L
     ASSERT_TRUE(!pointerEvent3->IsValid());
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckMousePointEvent_005
+ * @tc.desc:Verify mouse point event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_005, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -304,6 +333,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_005, TestSize.L
     ASSERT_TRUE(pointerEvent->IsValid());
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckTouchPointEvent_001
+ * @tc.desc:Verify touch screen event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_001, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -330,6 +365,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_001, TestSize.L
     ASSERT_TRUE(!pointerEvent2->IsValid());
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckTouchPointEvent_002
+ * @tc.desc:Verify touch screen event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_002, TestSize.Level1)
 {
     auto pointerEvent1 = PointerEvent::Create();
@@ -354,6 +395,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_002, TestSize.L
     ASSERT_TRUE(!pointerEvent2->IsValid());
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckTouchPointEvent_003
+ * @tc.desc:Verify touch screen event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_003, TestSize.Level1)
 {
     auto pointerEvent1 = PointerEvent::Create();
@@ -386,6 +433,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_003, TestSize.L
     ASSERT_TRUE(!pointerEvent2->IsValid());
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckTouchPointEvent_004
+ * @tc.desc:Verify touch screen event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_004, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -406,6 +459,12 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_004, TestSize.L
     ASSERT_TRUE(!pointerEvent->IsValid());
 }
 
+/**
+ * @tc.name:PointerEventTest_CheckTouchPointEvent_005
+ * @tc.desc:Verify touch screen event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_005, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();

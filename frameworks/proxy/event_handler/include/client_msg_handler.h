@@ -15,11 +15,12 @@
 #ifndef CLIENT_MSG_HANDLER_H
 #define CLIENT_MSG_HANDLER_H
 
+#include "nocopyable.h"
+
 #include "if_client_msg_handler.h"
 #include "key_event_input_subscribe_manager.h"
 #include "msg_handler.h"
 #include "uds_client.h"
-#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {

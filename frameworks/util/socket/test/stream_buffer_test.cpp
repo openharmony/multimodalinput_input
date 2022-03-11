@@ -13,8 +13,10 @@
  * limitations under the License.
  */
 
-#include "stream_buffer.h"
 #include <gtest/gtest.h>
+
+#include "stream_buffer.h"
+
 
 namespace OHOS {
 namespace MMI {
@@ -45,17 +47,35 @@ public:
     }
 };
 
+/**
+ * @tc.name:construct_001
+ * @tc.desc:Verify stream buffer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest, construct_001, TestSize.Level1)
 {
     StreamBuffer bufObj;
 }
 
+/**
+ * @tc.name:construct_002
+ * @tc.desc:Verify stream buffer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest, construct_002, TestSize.Level1)
 {
     StreamBuffer bufObj;
     StreamBuffer bufObjTmp(bufObj);
 }
 
+/**
+ * @tc.name:SetReadIdx_001
+ * @tc.desc:Verify stream buffer set read idx
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest, SetReadIdx_001, TestSize.Level1)
 {
     StreamBuffer bufObj;
@@ -63,6 +83,12 @@ HWTEST_F(StreamBufferTest, SetReadIdx_001, TestSize.Level1)
     EXPECT_FALSE(retResult);
 }
 
+/**
+ * @tc.name:SetReadIdx_002
+ * @tc.desc:Verify stream buffer buffer set read idx
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest, SetReadIdx_002, TestSize.Level1)
 {
     char buf[100] = "stream data type3 001";
@@ -74,7 +100,13 @@ HWTEST_F(StreamBufferTest, SetReadIdx_002, TestSize.Level1)
     EXPECT_TRUE(retResult);
 }
 
-HWTEST_F(StreamBufferTest,  read_Type1_001, TestSize.Level1)
+/**
+ * @tc.name:read_Type1_001
+ * @tc.desc:Verify stream buffer read
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(StreamBufferTest, read_Type1_001, TestSize.Level1)
 {
     char buf[] = "";
     size_t size = 4;
@@ -84,6 +116,12 @@ HWTEST_F(StreamBufferTest,  read_Type1_001, TestSize.Level1)
     EXPECT_FALSE(retResult);
 }
 
+/**
+ * @tc.name:read_Type1_002
+ * @tc.desc:Verify stream buffer read
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest, read_Type1_002, TestSize.Level1)
 {
     char buf[] = "1234";
@@ -94,6 +132,12 @@ HWTEST_F(StreamBufferTest, read_Type1_002, TestSize.Level1)
     EXPECT_FALSE(retResult);
 }
 
+/**
+ * @tc.name:read_Type2_001
+ * @tc.desc:Verify stream buffer read
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest,  read_Type2_001, TestSize.Level1)
 {
     std::string buf = "";
@@ -103,6 +147,12 @@ HWTEST_F(StreamBufferTest,  read_Type2_001, TestSize.Level1)
     ASSERT_FALSE(retResult);
 }
 
+/**
+ * @tc.name:read_Type2_002
+ * @tc.desc:Verify stream buffer read
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest, read_Type2_002, TestSize.Level1)
 {
     std::string buf = "Stream Data";
@@ -112,6 +162,12 @@ HWTEST_F(StreamBufferTest, read_Type2_002, TestSize.Level1)
     ASSERT_FALSE(retResult);
 }
 
+/**
+ * @tc.name:read_Type3_001
+ * @tc.desc:Verify stream buffer read
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest,  read_Type3_001, TestSize.Level1)
 {
     StreamBuffer buf;
@@ -121,6 +177,12 @@ HWTEST_F(StreamBufferTest,  read_Type3_001, TestSize.Level1)
     ASSERT_FALSE(retResult);
 }
 
+/**
+ * @tc.name:write_Type1_001
+ * @tc.desc:Verify stream buffer write
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest, write_Type1_001, TestSize.Level1)
 {
     std::string buf;
@@ -130,6 +192,12 @@ HWTEST_F(StreamBufferTest, write_Type1_001, TestSize.Level1)
     ASSERT_TRUE(retResult);
 }
 
+/**
+ * @tc.name:write_Type1_002
+ * @tc.desc:Verify stream buffer write
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest, write_Type1_002, TestSize.Level1)
 {
     std::string buf = "stream data";
@@ -139,6 +207,12 @@ HWTEST_F(StreamBufferTest, write_Type1_002, TestSize.Level1)
     ASSERT_TRUE(retResult);
 }
 
+/**
+ * @tc.name:write_Type2_001
+ * @tc.desc:Verify stream buffer write
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest, write_Type2_001, TestSize.Level1)
 {
     StreamBuffer buf;
@@ -148,6 +222,12 @@ HWTEST_F(StreamBufferTest, write_Type2_001, TestSize.Level1)
     ASSERT_FALSE(retResult);
 }
 
+/**
+ * @tc.name:write_Type3_001
+ * @tc.desc:Verify stream buffer write
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest, write_Type3_001, TestSize.Level1)
 {
     char buf[100];
@@ -158,6 +238,12 @@ HWTEST_F(StreamBufferTest, write_Type3_001, TestSize.Level1)
     EXPECT_FALSE(retResult);
 }
 
+/**
+ * @tc.name:write_Type3_002
+ * @tc.desc:Verify stream buffer write
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest, write_Type3_002, TestSize.Level1)
 {
     char buf[100] = "stream data type3 001";
@@ -168,6 +254,12 @@ HWTEST_F(StreamBufferTest, write_Type3_002, TestSize.Level1)
     EXPECT_TRUE(retResult);
 }
 
+/**
+ * @tc.name:Data
+ * @tc.desc:Verify stream buffer data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest, Data, TestSize.Level1)
 {
     StreamBuffer bufObj;
@@ -175,13 +267,24 @@ HWTEST_F(StreamBufferTest, Data, TestSize.Level1)
     EXPECT_TRUE(retResult);
 }
 
-
+/**
+ * @tc.name:Size_001
+ * @tc.desc:Verify stream buffer size
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest, Size_001, TestSize.Level1)
 {
     StreamBuffer streamBuffer;
     streamBuffer.Size();
 }
 
+/**
+ * @tc.name:operatorLeft
+ * @tc.desc:Verify stream buffer operator left
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest, operatorLeft, TestSize.Level1)
 {
     StreamBuffer streamBufferSrc;
@@ -189,6 +292,12 @@ HWTEST_F(StreamBufferTest, operatorLeft, TestSize.Level1)
     streamBufferCopy << streamBufferSrc;
 }
 
+/**
+ * @tc.name:operatorRight
+ * @tc.desc:Verify stream buffer operator right
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest, operatorRight, TestSize.Level1)
 {
     StreamBuffer streamBufferSrc;
@@ -196,6 +305,12 @@ HWTEST_F(StreamBufferTest, operatorRight, TestSize.Level1)
     streamBufferCopy >> streamBufferSrc;
 }
 
+/**
+ * @tc.name:ReadBuf
+ * @tc.desc:Verify stream buffer read buffer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest, ReadBuf, TestSize.Level1)
 {
     StreamBufferUnitTest bufObj;
@@ -203,6 +318,12 @@ HWTEST_F(StreamBufferTest, ReadBuf, TestSize.Level1)
     EXPECT_NE(retResult, nullptr);
 }
 
+/**
+ * @tc.name:WriteBuf
+ * @tc.desc:Verify stream buffer write buffer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest, WriteBuf, TestSize.Level1)
 {
     StreamBufferUnitTest bufObj;
@@ -210,6 +331,12 @@ HWTEST_F(StreamBufferTest, WriteBuf, TestSize.Level1)
     EXPECT_NE(retResult, nullptr);
 }
 
+/**
+ * @tc.name:Clone
+ * @tc.desc:Verify stream buffer clone
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StreamBufferTest, Clone, TestSize.Level1)
 {
     const StreamBuffer buf;

@@ -14,11 +14,15 @@
  */
 #ifndef UDS_SESSION_H
 #define UDS_SESSION_H
+
+#include <memory>
+
 #include <sys/socket.h>
 #include <sys/un.h>
-#include <memory>
-#include "net_packet.h"
+
 #include "nocopyable.h"
+
+#include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {
@@ -35,12 +39,12 @@ public:
     bool SendMsg(NetPacket& pkt) const;
     void Close();
 
-    int32_t GetUid()
+    int32_t GetUid() const
     {
         return uid_;
     }
 
-    int32_t GetPid()
+    int32_t GetPid() const
     {
         return pid_;
     }
@@ -62,8 +66,10 @@ public:
     void UpdateDescript();
     void AddEvent(int32_t id, int64_t time);
     void DelEvents(int32_t id);
-    int64_t GetFirstEventTime();
-    bool EventsIsEmpty();
+    void AddPermission(bool hasPermission);
+    bool HasPermission();
+    int64_t GetEarlistEventTime() const;
+    bool IsEventQueueEmpty();
     bool isANRProcess_ {false};
 
 #ifdef OHOS_BUILD_MMI_DEBUG
@@ -86,6 +92,7 @@ protected:
     int32_t fd_;
     const int32_t uid_;
     const int32_t pid_;
+    bool hasPermission_ = true;
 #ifdef OHOS_BUILD_MMI_DEBUG
     int32_t clientFd_ = -1;
 #endif // OHOS_BUILD_MMI_DEBUG

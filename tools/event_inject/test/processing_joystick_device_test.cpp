@@ -32,6 +32,12 @@ public:
     static void TearDownTestCase(void) {}
 };
 
+/**
+ * @tc.name:Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRockerDirectionKey
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJsonDataToInputData, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
@@ -61,6 +67,12 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJsonDataToInputData, TestSi
     EXPECT_EQ(ret, RET_OK);
 }
 
+/**
+ * @tc.name:Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRockerDirectionKey
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataNotFindEvents, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
@@ -90,6 +102,12 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     EXPECT_EQ(ret, RET_ERR);
 }
 
+/**
+ * @tc.name:Test_TransformJoyStickJsonDataToInputDataEventsIsEmpty
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
@@ -119,6 +137,12 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     EXPECT_EQ(ret, RET_ERR);
 }
 
+/**
+ * @tc.name:Test_TransformJoyStickJsonDataToInputDataNotFindKeyValue
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataNotFindKeyValue, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
@@ -148,6 +172,12 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     EXPECT_EQ(ret, RET_ERR);
 }
 
+/**
+ * @tc.name:Test_TransformJoyStickJsonDataToInputDataNotFindKeyValueInThro
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataNotFindKeyValueInThro, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
@@ -177,6 +207,12 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     EXPECT_EQ(ret, RET_ERR);
 }
 
+/**
+ * @tc.name:Test_TransformJoyStickJsonDataToInputDataNotFindEventInRocker
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataNotFindEventInRocker, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
@@ -206,6 +242,12 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     EXPECT_EQ(ret, RET_ERR);
 }
 
+/**
+ * @tc.name:Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInRocker
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInRocker,
          TestSize.Level1)
 {
@@ -236,6 +278,12 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     EXPECT_EQ(ret, RET_ERR);
 }
 
+/**
+ * @tc.name:Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInDirectionKey
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInDirectionKey,
          TestSize.Level1)
 {
@@ -266,6 +314,12 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     EXPECT_EQ(ret, RET_ERR);
 }
 
+/**
+ * @tc.name:Test_TransformJoyStickJsonDataToInputDataNotFindAnyEventType
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataNotFindAnyEventType, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
@@ -295,6 +349,12 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     EXPECT_EQ(ret, RET_OK);
 }
 
+/**
+ * @tc.name:Test_TransformJoyStickJsonDataToInputDataHasBlockTime
+ * @tc.desc:Verify ManageInjectDevice function TransformJsonData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataHasBlockTime, TestSize.Level1)
 {
 #ifdef OHOS_BUILD

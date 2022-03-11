@@ -15,11 +15,13 @@
 #ifndef MULTIMODAL_EVENT_HANDLER_H
 #define MULTIMODAL_EVENT_HANDLER_H
 
+#include "nocopyable.h"
 #include "singleton.h"
+
 #include "if_client_msg_handler.h"
-#include "standardized_event_manager.h"
 #include "pointer_event.h"
 #include "proto.h"
+#include "standardized_event_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -28,16 +30,17 @@ enum RES_STATUS : uint8_t {
     REG_STATUS_SYNCED = 1,   // 以同步
 };
 
-class MultimodalEventHandler : public Singleton<OHOS::MMI::MultimodalEventHandler> {
+class MultimodalEventHandler : public Singleton<MultimodalEventHandler> {
 public:
     MultimodalEventHandler();
     ~MultimodalEventHandler() = default;
+    DISALLOW_COPY_AND_MOVE(MultimodalEventHandler);
     int32_t GetMultimodeInputInfo();
     MMIClientPtr GetMMIClient();
-    int32_t InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr);
+    int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetDevice(int32_t taskId, int32_t deviceId);
-    int32_t GetDeviceIds(int32_t taskId);    
+    int32_t GetDeviceIds(int32_t taskId);
     int32_t AddInputEventMontior(int32_t keyEventType);
     void RemoveInputEventMontior(int32_t keyEventType);
     int32_t AddInputEventTouchpadMontior(int32_t pointerEventType);
@@ -55,8 +58,8 @@ private:
     MMIClientPtr client_ = nullptr;
     IClientMsgHandlerPtr cMsgHandler_ = nullptr;
 };
+
+#define MMIEventHdl MultimodalEventHandler::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define MMIEventHdl OHOS::MMI::MultimodalEventHandler::GetInstance()
-
 #endif // MULTIMODAL_EVENT_HANDLER_H

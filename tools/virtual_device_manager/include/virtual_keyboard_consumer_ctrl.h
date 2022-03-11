@@ -15,7 +15,6 @@
 
 #ifndef VIRTUAL_KEYBOARD_CONSUMER_CTRL_H
 #define VIRTUAL_KEYBOARD_CONSUMER_CTRL_H
-
 #include "virtual_device.h"
 
 namespace OHOS {
@@ -24,6 +23,8 @@ class VirtualKeyboardConsumerCtrl : public VirtualDevice {
 public:
     VirtualKeyboardConsumerCtrl();
     ~VirtualKeyboardConsumerCtrl();
+    DISALLOW_COPY_AND_MOVE(VirtualKeyboardConsumerCtrl);
+
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
     const std::vector<uint32_t>& GetKeys() const override;

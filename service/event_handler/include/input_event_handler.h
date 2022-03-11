@@ -12,16 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef INPUT_EVENT_HANDLER_H
 #define INPUT_EVENT_HANDLER_H
 
 #include <memory>
+
+#include "nocopyable.h"
+#include "singleton.h"
+
 #include "event_dispatch.h"
 #include "event_package.h"
 #include "i_event_filter.h"
 #include "mouse_event_handler.h"
 #include "msg_handler.h"
-#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
@@ -30,13 +34,15 @@ using NotifyDeviceChange = std::function<void(int32_t, int32_t, char *)>;
 class InputEventHandler : public MsgHandler<EventFun>, public DelayedSingleton<InputEventHandler> {
 public:
     InputEventHandler();
+    DISALLOW_COPY_AND_MOVE(InputEventHandler);
     virtual ~InputEventHandler() override;
     void Init(UDSServer& udsServer);
     void OnEvent(void *event);
     void OnCheckEventReport();
-    int32_t OnMouseEventEndTimerHandler(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
-    UDSServer *GetUDSServer();
+    int32_t OnMouseEventEndTimerHandler(std::shared_ptr<PointerEvent> pointerEvent);
+    UDSServer *GetUDSServer() const;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
+    void AddHandleTimer();
 protected:
     int32_t OnEventDeviceAdded(libinput_event *event);
     int32_t OnEventDeviceRemoved(libinput_event *event);
@@ -47,28 +53,27 @@ protected:
     int32_t OnEventGesture(libinput_event *event);
     int32_t OnEventTouchpad(libinput_event *event);
     int32_t OnGestureEvent(libinput_event *event);
-    int32_t OnKeyboardEvent(libinput_event *event);
-    int32_t OnKeyEventDispatch(libinput_event *event);
+    int32_t OnEventKey(libinput_event *event);
     
     int32_t OnMouseEventHandler(struct libinput_event *event);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
 
 private:
     int32_t OnEventHandler(libinput_event *event);
-    int32_t OnEventKey(struct libinput_event *event);
-    std::mutex mu_;
     UDSServer *udsServer_ = nullptr;
     EventDispatch eventDispatch_;
     EventPackage eventPackage_;
     NotifyDeviceChange notifyDeviceChange_;
-    std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent_ = nullptr;
+    std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
 
     uint64_t idSeed_ = 0;
     int32_t eventType_ = 0;
     int64_t initSysClock_ = 0;
     int64_t lastSysClock_ = 0;
+    int32_t timerId_ = -1;
 };
+
+#define InputHandler InputEventHandler::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define InputHandler OHOS::MMI::InputEventHandler::GetInstance()
 #endif // INPUT_EVENT_HANDLER_H

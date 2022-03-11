@@ -14,25 +14,26 @@
  */
 
 #include "uds_client.h"
+
 #include <cinttypes>
+
 #include "util.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSClient" }; // namepace
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSClient" };
+} // namespace
 
 UDSClient::UDSClient()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
 }
 
 UDSClient::~UDSClient()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     Stop();
-    MMI_LOGD("leave");
 }
 
 int32_t UDSClient::ConnectTo()
@@ -92,7 +93,8 @@ bool UDSClient::SendMsg(const NetPacket& pkt) const
 
 bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
 {
-    MMI_LOGD("enter detachMode = %d", detachMode);
+    CALL_LOG_ENTER;
+    MMI_LOGD("detachMode = %d", detachMode);
     recvFun_ = fun;
     isRunning_ = true;
     isConnected_ = true;
@@ -117,7 +119,7 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
 
 void UDSClient::Stop()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     Close();
     isRunning_ = false;
     struct epoll_event ev = {};
@@ -129,7 +131,6 @@ void UDSClient::Stop()
         MMI_LOGD("thread join");
         t_.join();
     }
-    MMI_LOGD("leave");
 }
 
 void UDSClient::OnRecv(const char *buf, size_t size)
@@ -213,7 +214,7 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
 
 void UDSClient::OnThread()
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     SetThreadName("uds_client");
     isThreadHadRun_ = true;
     StreamBuffer streamBuf;
@@ -244,7 +245,6 @@ void UDSClient::OnThread()
             break;
         }
     }
-    MMI_LOGD("end");
 }
 
 void UDSClient::SetToExit()
