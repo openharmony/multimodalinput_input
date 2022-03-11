@@ -14,7 +14,6 @@
  */
 #ifndef GET_DEVICE_OBJECT_H
 #define GET_DEVICE_OBJECT_H
-
 #include "device_base.h"
 #include "processing_finger_device.h"
 #include "processing_pen_device.h"
@@ -29,9 +28,8 @@ namespace OHOS {
 namespace MMI {
 class GetDeviceObject {
 public:
-    GetDeviceObject() = default;
-    ~GetDeviceObject() = default;
-    DeviceBase* CreateDeviceObject(const std::string deviceName);
+    DISALLOW_COPY_AND_MOVE(GetDeviceObject);
+    static DeviceBase* CreateDeviceObject(const std::string deviceName);
 };
 } // namespace MMI
 } // namespace OHOS

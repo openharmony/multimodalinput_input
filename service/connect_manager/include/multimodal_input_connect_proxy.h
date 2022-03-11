@@ -16,18 +16,20 @@
 #ifndef MULTIMODAL_INPUT_CONNECT_PROXY_H
 #define MULTIMODAL_INPUT_CONNECT_PROXY_H
 
-#include "i_multimodal_input_connect.h"
-#include "iremote_proxy.h"
-#include "singleton.h"
 #include "iremote_object.h"
-#include "system_ability.h"
+#include "iremote_proxy.h"
 #include "nocopyable.h"
+#include "singleton.h"
+#include "system_ability.h"
+
+#include "i_multimodal_input_connect.h"
 
 namespace OHOS {
 namespace MMI {
 class MultimodalInputConnectProxy final : public IRemoteProxy<IMultimodalInputConnect> {
 public:
     explicit MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl);
+    DISALLOW_COPY_AND_MOVE(MultimodalInputConnectProxy);
     virtual ~MultimodalInputConnectProxy() override;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &socketFd) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;

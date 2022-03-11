@@ -14,15 +14,17 @@
  */
 
 #include "uds_socket.h"
+
 #include <cinttypes>
+
 #include "error_multimodal.h"
 #include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
-    namespace {
-        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSocket" };
-    }
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSocket" };
+} // namespace
 
 UDSSocket::UDSSocket() {}
 

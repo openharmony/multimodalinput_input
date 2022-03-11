@@ -14,20 +14,23 @@
  */
 
 #include "event_dump.h"
+
 #include <climits>
 #include <cstdarg>
+
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
+
 #include "input_windows_manager.h"
 #include "util.h"
 #include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
-    namespace {
-        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
-    }
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
+} // namespace
 
 void ChkConfig(int32_t fd)
 {

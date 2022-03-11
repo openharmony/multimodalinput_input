@@ -19,12 +19,14 @@
 #include "i_event_filter.h"
 #include "iremote_proxy.h"
 #include "iremote_object.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class EventFilterProxy final : public IRemoteProxy<IEventFilter> {
 public:
     explicit EventFilterProxy(const sptr<IRemoteObject> &impl);
+    DISALLOW_COPY_AND_MOVE(EventFilterProxy);
     virtual ~EventFilterProxy() override;
     virtual bool HandlePointerEvent(const std::shared_ptr<PointerEvent> event) override;
 private:

@@ -25,43 +25,44 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Manage
 
 int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     if (configData.empty()) {
         MMI_LOGE("input data from json file is empty");
         return RET_ERR;
     }
-    int32_t ret = RET_ERR;
     for (const auto &item : configData) {
         std::string deviceName = item.at("deviceName").get<std::string>();
-        InputEventArray inputEventArray = {};
-        inputEventArray.deviceName = deviceName;
         uint16_t devIndex = 0;
         if (item.find("devIndex") != item.end()) {
             devIndex = item.at("devIndex").get<uint16_t>();
         }
         std::string deviceNode;
         if (getDeviceNodeObject_.GetDeviceNodeName(deviceName, devIndex, deviceNode) == RET_ERR) {
+            MMI_LOGE("fail get device:%{public}s node", deviceName.c_str());
             return RET_ERR;
         }
-        GetDeviceObject getDeviceObject;
+        InputEventArray inputEventArray = {};
+        inputEventArray.deviceName = deviceName;
         inputEventArray.target = deviceNode;
-
-        devicePtr_ = getDeviceObject.CreateDeviceObject(deviceName);
-        if (devicePtr_ == nullptr) {
-            return RET_ERR;
+        auto devicePtr = GetDeviceObject::CreateDeviceObject(deviceName);
+        CHKPR(devicePtr, RET_ERR);
+        int32_t ret = devicePtr->TransformJsonDataToInputData(item, inputEventArray);
+        if (devicePtr != nullptr) {
+            delete devicePtr;
+            devicePtr = nullptr;
         }
-        ret = devicePtr_->TransformJsonDataToInputData(item, inputEventArray);
-        if (ret != RET_ERR) {
-            ret = SendEvent(inputEventArray);
+        if (ret == RET_ERR) {
+            MMI_LOGE("fail read json file");
+            return ret;
+        }
+        ret = SendEvent(inputEventArray);
+        if (ret == RET_ERR) {
+            MMI_LOGE("SendEvent fail");
+            return ret;
         }
     }
-    if (devicePtr_ != nullptr) {
-        delete devicePtr_;
-        devicePtr_ = nullptr;
-    }
-    MMI_LOGD("Leave");
 
-    return ret;
+    return RET_OK;
 }
 
 int32_t ManageInjectDevice::SendEvent(const InputEventArray& inputEventArray)
@@ -71,7 +72,7 @@ int32_t ManageInjectDevice::SendEvent(const InputEventArray& inputEventArray)
 
 int32_t ManageInjectDevice::SendEventToDeviveNode(const InputEventArray& inputEventArray)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     std::string deviceNode = inputEventArray.target;
     if (deviceNode.empty()) {
         MMI_LOGE("device node:%{public}s is not exit", deviceNode.c_str());
@@ -94,7 +95,7 @@ int32_t ManageInjectDevice::SendEventToDeviveNode(const InputEventArray& inputEv
     }
     if (fd >= 0) {
         close(fd);
+        fd = -1;
     }
-    MMI_LOGD("Leave");
     return RET_OK;
 }

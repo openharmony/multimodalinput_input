@@ -14,13 +14,16 @@
  */
 #ifndef KEY_OPTION_H
 #define KEY_OPTION_H
-
 #include <set>
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class KeyOption {
 public:
+    KeyOption() = default;
+    DISALLOW_COPY_AND_MOVE(KeyOption);
+
     std::set<int32_t> GetPreKeys() const;
     void SetPreKeys(const std::set<int32_t>& preKeys);
     int32_t GetFinalKey() const;

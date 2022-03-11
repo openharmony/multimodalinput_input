@@ -14,7 +14,6 @@
  */
 #ifndef PROCESSING_KEYBOARD_DEVICE_H
 #define PROCESSING_KEYBOARD_DEVICE_H
-
 #include "msg_head.h"
 #include "device_base.h"
 
@@ -29,6 +28,7 @@ class ProcessingKeyboardDevice : public DeviceBase {
 public:
     ProcessingKeyboardDevice() = default;
     ~ProcessingKeyboardDevice() = default;
+    DISALLOW_COPY_AND_MOVE(ProcessingKeyboardDevice);
     int32_t TransformJsonDataToInputData(const Json& inputEventArrays, InputEventArray& inputEventArray);
 private:
     int32_t AnalysisKeyBoardEvent(const Json& inputData, std::vector<KeyBoardEvent>& keyBoardEvent);

@@ -138,6 +138,7 @@ config("libinput-third_public_config") {
 }
 
 ohos_source_set("patch_gen_libinput-third-mmi") {
+  part_name = "multimodalinput_base"
   sources = [
     "$gen_dst_dir/src/evdev-debounce.c",
     "$gen_dst_dir/src/evdev-fallback.c",
@@ -228,6 +229,7 @@ ohos_shared_library("libinput-third-mmi") {
 
 if (is_mmi_have_libinput) {
   ohos_source_set("patch_gen_libinput-debug") {
+    part_name = "multimodalinput_base"
     sources = [
       "$gen_dst_dir/tools/libinput-debug-events.c",
       "$gen_dst_dir/tools/shared.c",
@@ -271,6 +273,7 @@ if (is_mmi_have_libinput) {
   }
 
   ohos_source_set("patch_gen_libinput-list") {
+    part_name = "multimodalinput_base"
     sources = [
       "$gen_dst_dir/tools/libinput-list-devices.c",
       "$gen_dst_dir/tools/shared.c",
@@ -314,6 +317,7 @@ if (is_mmi_have_libinput) {
   }
 
   ohos_source_set("patch_gen_libinput-tablet") {
+    part_name = "multimodalinput_base"
     sources = [
       "$gen_dst_dir/tools/libinput-debug-tablet.c",
       "$gen_dst_dir/tools/shared.c",
@@ -357,6 +361,7 @@ if (is_mmi_have_libinput) {
   }
 
   ohos_source_set("patch_gen_libinput-record") {
+    part_name = "multimodalinput_base"
     sources = [
       "$gen_dst_dir/hm_src/hm_missing.c",
       "$gen_dst_dir/tools/libinput-record.c",
@@ -401,6 +406,7 @@ if (is_mmi_have_libinput) {
   }
 
   ohos_source_set("patch_gen_libinput-analyze") {
+    part_name = "multimodalinput_base"
     sources = [
       "$gen_dst_dir/tools/libinput-analyze.c",
       "$gen_dst_dir/tools/shared.c",
@@ -444,6 +450,7 @@ if (is_mmi_have_libinput) {
   }
 
   ohos_source_set("patch_gen_libinput-measure") {
+    part_name = "multimodalinput_base"
     sources = [
       "$gen_dst_dir/tools/libinput-measure.c",
       "$gen_dst_dir/tools/shared.c",
@@ -487,6 +494,7 @@ if (is_mmi_have_libinput) {
   }
 
   ohos_source_set("patch_gen_libinput-quirks") {
+    part_name = "multimodalinput_base"
     sources = [
       "$gen_dst_dir/tools/libinput-quirks.c",
       "$gen_dst_dir/tools/shared.c",

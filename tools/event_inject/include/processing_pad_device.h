@@ -14,7 +14,6 @@
  */
 #ifndef PROCESSING_PAD_DEVICE_H
 #define PROCESSING_PAD_DEVICE_H
-
 #include "msg_head.h"
 #include "device_base.h"
 
@@ -29,6 +28,7 @@ class ProcessingPadDevice : public DeviceBase {
 public:
     ProcessingPadDevice() = default;
     ~ProcessingPadDevice() = default;
+    DISALLOW_COPY_AND_MOVE(ProcessingPadDevice);
     int32_t TransformJsonDataToInputData(const Json& inputEventArrays, InputEventArray& inputEventArray);
 private:
     int32_t AnalysisPadEvent(const Json& inputData, std::vector<PadEvent>& padEventArray);

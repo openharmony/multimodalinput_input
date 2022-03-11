@@ -14,7 +14,6 @@
  */
 #ifndef PROCESSING_PEN_DEVICE_H
 #define PROCESSING_PEN_DEVICE_H
-
 #include "msg_head.h"
 #include "device_base.h"
 
@@ -35,6 +34,7 @@ class ProcessingPenDevice : public DeviceBase {
 public:
     ProcessingPenDevice() = default;
     ~ProcessingPenDevice() = default;
+    DISALLOW_COPY_AND_MOVE(ProcessingPenDevice);
     int32_t TransformJsonDataToInputData(const Json& inputEventArrays, InputEventArray& inputEventArray);
 private:
     void TransformPenEventToInputEvent(const std::vector<PenEvent>& penEventArray, InputEventArray& inputEventArray);

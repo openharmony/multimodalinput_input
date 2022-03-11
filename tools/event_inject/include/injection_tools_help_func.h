@@ -14,15 +14,17 @@
  */
 #ifndef INJECTION_TOOLS_HELP_FUNC_H
 #define INJECTION_TOOLS_HELP_FUNC_H
-
 #include <cstring>
+#include "nocopyable.h"
 #include "util.h"
 
 namespace OHOS {
 namespace MMI {
 class InjectionToolsHelpFunc {
 public:
-    std::string GetHelpText() const;
+    InjectionToolsHelpFunc() = default;
+    DISALLOW_COPY_AND_MOVE(InjectionToolsHelpFunc);
+    std::string GetHelpText();
 };
 } // namespace MMI
 } // namespace OHOS

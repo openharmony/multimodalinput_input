@@ -80,6 +80,7 @@ void GetDeviceNode::InitDeviceInfo()
 int32_t GetDeviceNode::ExecuteCmd(const std::string cmd, std::vector<std::string> &cmdResult)
 {
     if (cmd.empty()) {
+        MMI_LOGE("cmd is null");
         return RET_ERR;
     }
     FILE* pin = popen(cmd.c_str(), "r");
@@ -94,11 +95,15 @@ int32_t GetDeviceNode::ExecuteCmd(const std::string cmd, std::vector<std::string
     return pclose(pin);
 }
 
-
 void GetDeviceNode::GetDeviceCmd(const std::vector<std::string>& cmdResult, DeviceList& deviceList) const
 {
     std::string name;
     for (const auto &item : cmdResult) {
+        if(item.empty())
+        {
+            MMI_LOGE("device info is none");
+            return;
+        }
         std::string temp = item.substr(0, 1);
         uint64_t endPos = 0;
         uint64_t startPos = 0;
@@ -108,12 +113,8 @@ void GetDeviceNode::GetDeviceCmd(const std::vector<std::string>& cmdResult, Devi
             name = item.substr(startPos, endPos - startPos - 1);
         }
         if (temp == "H") {
-            startPos = item.find("event");
-            std::string endString = item.substr(startPos + strlen("event") + 1, 1);
-            uint64_t eventLength = CMD_EVENT_LENGTH;
-            if (endString != " ") {
-                eventLength = CMD_EVENT_LENGTH + 1;
-            }
+            startPos = item.rfind("event");
+            uint64_t eventLength = item.substr(startPos).find_first_of(" ");
             std::string target = item.substr(startPos, eventLength);
             if (!(name.empty())) {
                 deviceList[name].push_back(target);

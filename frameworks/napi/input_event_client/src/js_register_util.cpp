@@ -12,16 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "js_register_util.h"
-#include "js_register_module.h"
+
 #include <cinttypes>
+
+#include "js_register_module.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterUtil" };
-    constexpr size_t MAX_STRING_LEN = 1024;
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterUtil" };
+constexpr size_t MAX_STRING_LEN = 1024;
+} // namespace
 
 void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, bool value)
 {
