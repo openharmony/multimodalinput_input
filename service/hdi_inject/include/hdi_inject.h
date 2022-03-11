@@ -80,8 +80,8 @@ public:
     int32_t ScanInputDevice(uint32_t arrLen, DevDesc *staArr);
     bool ReportHotPlugEvent(uint32_t devIndex, uint32_t status);
 public:
-    InputHostCb hotPlugcallback_;
-    InputEventCb eventcallback_;
+    InputHostCb hotPlugcallback_ {};
+    InputEventCb eventcallback_ {};
 private:
     bool initStatus_ = false;
     HotPlugEvent** event_ = nullptr;
