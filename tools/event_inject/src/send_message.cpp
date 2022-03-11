@@ -14,8 +14,10 @@
  */
 
 #include "send_message.h"
-#include "proto.h"
+
 #include "sys/file.h"
+
+#include "proto.h"
 
 using namespace OHOS::MMI;
 

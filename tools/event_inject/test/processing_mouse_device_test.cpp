@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+
 #include "manage_inject_device.h"
 #include "msg_head.h"
 #include "processing_keyboard_device.h"

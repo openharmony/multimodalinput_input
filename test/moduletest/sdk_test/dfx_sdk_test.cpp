@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+
 #include "client_msg_handler.h"
 
 namespace {

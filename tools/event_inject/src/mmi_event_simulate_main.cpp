@@ -14,6 +14,7 @@
  */
 
 #include "injection_event_dispatch.h"
+
 #include "mmi_log.h"
 
 namespace {
