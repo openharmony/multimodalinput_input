@@ -44,6 +44,7 @@ public:
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_001, TestSize.Level1)
 {
     auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
     KeyEvent->SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
     ASSERT_TRUE(!KeyEvent->IsValid());
 
@@ -66,6 +67,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_001, TestSize.Level1)
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_002, TestSize.Level1)
 {
     auto KeyEvent1 = KeyEvent::Create();
+    ASSERT_NE(KeyEvent1, nullptr);
     KeyEvent1->SetKeyCode(KeyEvent::KEYCODE_HOME);
     KeyEvent1->SetActionTime(100);
     KeyEvent1->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
@@ -75,6 +77,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_002, TestSize.Level1)
     ASSERT_TRUE(!KeyEvent1->IsValid());
 
     auto KeyEvent2 = KeyEvent::Create();
+    ASSERT_NE(KeyEvent2, nullptr);
     KeyEvent2->SetKeyCode(KeyEvent::KEYCODE_HOME);
     KeyEvent2->SetActionTime(100);
     KeyEvent2->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
@@ -93,6 +96,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_002, TestSize.Level1)
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_003, TestSize.Level1)
 {
     auto KeyEvent1 = KeyEvent::Create();
+    ASSERT_NE(KeyEvent1, nullptr);
     KeyEvent1->SetKeyCode(KeyEvent::KEYCODE_HOME);
     KeyEvent1->SetActionTime(100);
     KeyEvent1->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
@@ -104,6 +108,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_003, TestSize.Level1)
     ASSERT_TRUE(!KeyEvent1->IsValid());
 
     auto KeyEvent2 = KeyEvent::Create();
+    ASSERT_NE(KeyEvent2, nullptr);
     KeyEvent2->SetKeyCode(KeyEvent::KEYCODE_HOME);
     KeyEvent2->SetActionTime(100);
     KeyEvent2->SetKeyAction(KeyEvent::KEY_ACTION_UP);
@@ -123,6 +128,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_003, TestSize.Level1)
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_004, TestSize.Level1)
 {
     auto KeyEvent1 = KeyEvent::Create();
+    ASSERT_NE(KeyEvent1, nullptr);
     KeyEvent1->SetKeyCode(KeyEvent::KEYCODE_HOME);
     KeyEvent1->SetActionTime(100);
     KeyEvent1->SetKeyAction(KeyEvent::KEY_ACTION_UP);
@@ -139,6 +145,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_004, TestSize.Level1)
     ASSERT_TRUE(!KeyEvent1->IsValid());
 
     auto KeyEvent2 = KeyEvent::Create();
+    ASSERT_NE(KeyEvent2, nullptr);
     KeyEvent2->SetKeyCode(KeyEvent::KEYCODE_HOME);
     KeyEvent2->SetActionTime(100);
     KeyEvent2->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
@@ -158,6 +165,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_004, TestSize.Level1)
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_005, TestSize.Level1)
 {
     auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
     KeyEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
     KeyEvent->SetActionTime(100);
     KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
