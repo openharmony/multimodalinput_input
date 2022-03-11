@@ -568,7 +568,7 @@ void JsEventTarget::EmitJsDevPromise(int32_t userData, std::shared_ptr<InputDevi
     napi_status status = napi_create_string_latin1(env_, "InputDevicePromis", NAPI_AUTO_LENGTH, &resourceName);
     if (status != napi_ok) {
         napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_string_latin1 failed");
-        MMI_LOGE("call to napi_create_string_latin1 failed");
+        MMI_LOGE("call to napi create string failed");
         return;
     }
 
