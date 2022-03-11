@@ -13,9 +13,12 @@
  * limitations under the License.
  */
 
-#include "uds_client.h"
 #include <future>
+
 #include <gtest/gtest.h>
+
+#include "uds_client.h"
+
 
 namespace OHOS {
 namespace MMI {

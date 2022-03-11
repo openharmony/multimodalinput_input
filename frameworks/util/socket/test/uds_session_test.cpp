@@ -13,19 +13,20 @@
  * limitations under the License.
  */
 
-#include "uds_session.h"
 #include <gtest/gtest.h>
+
 #include "proto.h"
+#include "uds_session.h"
+
 
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-using namespace OHOS::MMI;
 } // namespace
 
 namespace {
-    constexpr int32_t UID_ROOT = 0;
+constexpr int32_t UID_ROOT = 0;
 } // namespace
 
 class UDSSessionTest : public testing::Test {
@@ -50,6 +51,12 @@ void UDSSessionTest::TearDown()
     // do nothing
 }
 
+/**
+ * @tc.name:Construct
+ * @tc.desc:Verify uds session function EventsIsEmpty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UDSSessionTest, Construct, TestSize.Level1)
 {
     UDSSession udsSession(PROGRAM_NAME, moduleType_, fd_, UID_ROOT, pid_);
@@ -57,6 +64,12 @@ HWTEST_F(UDSSessionTest, Construct, TestSize.Level1)
     EXPECT_TRUE(retResult);
 }
 
+/**
+ * @tc.name:SendMsg_type1_001
+ * @tc.desc:Verify uds session function sendMsg
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UDSSessionTest, SendMsg_type1_001, TestSize.Level1)
 {
     const char *buf = "1234";
@@ -66,6 +79,12 @@ HWTEST_F(UDSSessionTest, SendMsg_type1_001, TestSize.Level1)
     EXPECT_TRUE(retResult);
 }
 
+/**
+ * @tc.name:SendMsg_type1_002
+ * @tc.desc:Verify uds session function SendMsg
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UDSSessionTest, SendMsg_type1_002, TestSize.Level1)
 {
     const char *buf = nullptr;
@@ -76,6 +95,12 @@ HWTEST_F(UDSSessionTest, SendMsg_type1_002, TestSize.Level1)
     EXPECT_FALSE(retResult);
 }
 
+/**
+ * @tc.name:SendMsg_type1_003
+ * @tc.desc:Verify uds session function SendMsg
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UDSSessionTest, SendMsg_type1_003, TestSize.Level1)
 {
     const char *buf = nullptr;
@@ -85,6 +110,12 @@ HWTEST_F(UDSSessionTest, SendMsg_type1_003, TestSize.Level1)
     EXPECT_FALSE(retResult);
 }
 
+/**
+ * @tc.name:SendMsg_type1_004
+ * @tc.desc:Verify uds session function SendMsg
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UDSSessionTest, SendMsg_type1_004, TestSize.Level1)
 {
     const char *buf = "this unit data";
@@ -95,6 +126,12 @@ HWTEST_F(UDSSessionTest, SendMsg_type1_004, TestSize.Level1)
     EXPECT_TRUE(retResult);
 }
 
+/**
+ * @tc.name:SendMsg_type1_005
+ * @tc.desc:Verify uds session function SendMsg
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UDSSessionTest, SendMsg_type1_005, TestSize.Level1)
 {
     const char *buf = "this unit data";
@@ -105,6 +142,12 @@ HWTEST_F(UDSSessionTest, SendMsg_type1_005, TestSize.Level1)
     EXPECT_FALSE(retResult);
 }
 
+/**
+ * @tc.name:SendMsg_type2_001
+ * @tc.desc:Verify uds session function SendMsg
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UDSSessionTest, SendMsg_type2_001, TestSize.Level1)
 {
     int32_t fd = -1;
@@ -115,6 +158,12 @@ HWTEST_F(UDSSessionTest, SendMsg_type2_001, TestSize.Level1)
     EXPECT_FALSE(retResult);
 }
 
+/**
+ * @tc.name:SendMsg_type2_002
+ * @tc.desc:Verify uds session function SendMsg
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UDSSessionTest, SendMsg_type2_002, TestSize.Level1)
 {
     NetPacket pkt(MmiMessageId::BEGIN);
@@ -124,6 +173,12 @@ HWTEST_F(UDSSessionTest, SendMsg_type2_002, TestSize.Level1)
     EXPECT_TRUE(retResult);
 }
 
+/**
+ * @tc.name:SendMsg_type2_003
+ * @tc.desc:Verify uds session function SendMsg
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(UDSSessionTest, SendMsg_type2_003, TestSize.Level1)
 {
     int32_t fd = -65535;

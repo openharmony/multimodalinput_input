@@ -15,7 +15,6 @@
 
 #ifndef INJECTION_EVENT_DISPATCH_H
 #define INJECTION_EVENT_DISPATCH_H
-
 #include "manage_inject_device.h"
 #include "injection_tools_help_func.h"
 
@@ -34,6 +33,8 @@ class InjectionEventDispatch {
 public:
     InjectionEventDispatch() = default;
     ~InjectionEventDispatch() = default;
+    DISALLOW_COPY_AND_MOVE(InjectionEventDispatch);
+
     void Init();
     void InitManageFunction();
     void Run();

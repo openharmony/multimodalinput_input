@@ -14,9 +14,10 @@
  */
 
 #include "multimodal_event_handler.h"
-#include "input_manager_impl.h"
+
 #include "immi_token.h"
 #include "input_event.h"
+#include "input_manager_impl.h"
 #include "mmi_client.h"
 #include "proto.h"
 
@@ -31,12 +32,7 @@ void OnConnected(const IfMMIClient& client)
     InputManagerImpl::GetInstance()->OnConnected();
 }
 
-MultimodalEventHandler::MultimodalEventHandler()
-{
-#ifdef OHOS_BUILD_MMI_DEBUG
-    VerifyLogManagerRun();
-#endif
-}
+MultimodalEventHandler::MultimodalEventHandler() {}
 
 int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr)
 {
@@ -57,7 +53,7 @@ int32_t MultimodalEventHandler::GetMultimodeInputInfo()
 
 bool MultimodalEventHandler::InitClient()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (client_ != nullptr) {
         return true;
     }
@@ -71,7 +67,6 @@ bool MultimodalEventHandler::InitClient()
         MMI_LOGE("The client fails to start");
         return false;
     }
-    MMI_LOGD("leave");
     return true;
 }
 
@@ -137,7 +132,7 @@ int32_t MultimodalEventHandler::RemoveInterceptor(int32_t id)
 
 int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (!InitClient()) {
         return MMI_SERVICE_INVALID;
     }
@@ -149,7 +144,7 @@ int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
 
 void MultimodalEventHandler::RemoveInputEventMontior(int32_t keyEventType)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (!InitClient()) {
         return;
     }
@@ -160,7 +155,7 @@ void MultimodalEventHandler::RemoveInputEventMontior(int32_t keyEventType)
 
 void MultimodalEventHandler::RemoveInputEventTouchpadMontior(int32_t pointerEventType)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (!InitClient()) {
         return;
     }
@@ -171,7 +166,7 @@ void MultimodalEventHandler::RemoveInputEventTouchpadMontior(int32_t pointerEven
 
 int32_t MultimodalEventHandler::AddInputEventTouchpadMontior(int32_t pointerEventType)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (!InitClient()) {
         return MMI_SERVICE_INVALID;
     }

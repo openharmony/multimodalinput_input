@@ -14,7 +14,6 @@
  */
 #ifndef PROCESSING_TOUCH_SCREEN_DEVICE_H
 #define PROCESSING_TOUCH_SCREEN_DEVICE_H
-
 #include "msg_head.h"
 #include "device_base.h"
 
@@ -47,6 +46,7 @@ class ProcessingTouchScreenDevice : public DeviceBase {
 public:
     ProcessingTouchScreenDevice() = default;
     ~ProcessingTouchScreenDevice() = default;
+    DISALLOW_COPY_AND_MOVE(ProcessingTouchScreenDevice);
     int32_t TransformJsonDataSingleTouchScreen(const Json& inputEventArrays, InputEventArray& inputEventArray);
     int32_t TransformJsonDataToInputData(const Json& inputEventArrays, InputEventArray& inputEventArray);
 private:

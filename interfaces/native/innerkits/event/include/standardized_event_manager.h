@@ -16,12 +16,14 @@
 #define STANDARDIZED_EVENT_MANAGER_H
 
 #include <set>
-#include "if_mmi_client.h"
+
 #include "iremote_object.h"
-#include "key_event_input_subscribe_manager.h"
 #include "nocopyable.h"
-#include "pointer_event.h"
 #include "singleton.h"
+
+#include "if_mmi_client.h"
+#include "key_event_input_subscribe_manager.h"
+#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
@@ -37,8 +39,8 @@ public:
     int32_t InjectionVirtual(bool isPressed, int32_t keyCode, int64_t keyDownDuration, int32_t maxKeyCode);
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
-    int32_t GetDevice(int32_t userData, int32_t deviceId) const;
-    int32_t GetDeviceIds(int32_t userData) const;
+    int32_t GetDevice(int32_t userData, int32_t deviceId);
+    int32_t GetDeviceIds(int32_t userData);
     int32_t SubscribeKeyEvent(const KeyEventInputSubscribeManager::SubscribeKeyEventInfo& subscribeInfo);
     int32_t UnSubscribeKeyEvent(int32_t subscribeId);
 protected:

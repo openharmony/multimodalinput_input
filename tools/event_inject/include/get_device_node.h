@@ -15,8 +15,8 @@
 
 #ifndef GET_DEVICE_NODE_H
 #define GET_DEVICE_NODE_H
-
 #include "msg_head.h"
+#include "nocopyable.h"
 
 #define DeviceList std::map<std::string, std::vector<std::string>>
 
@@ -26,6 +26,7 @@ class GetDeviceNode {
 public:
     GetDeviceNode();
     ~GetDeviceNode() = default;
+    DISALLOW_COPY_AND_MOVE(GetDeviceNode);
     int32_t GetDeviceNodeName(const std::string& targetName, uint16_t devIndex, std::string& deviceNode);
 private:
     void InitDeviceInfo();

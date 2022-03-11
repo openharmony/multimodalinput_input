@@ -14,7 +14,6 @@
  */
 #ifndef MANAGE_INJECT_DEVICE_H
 #define MANAGE_INJECT_DEVICE_H
-
 #include "get_device_node.h"
 #include "get_device_object.h"
 #include "send_message.h"
@@ -25,6 +24,7 @@ class ManageInjectDevice {
 public:
     ManageInjectDevice() = default;
     ~ManageInjectDevice() = default;
+    DISALLOW_COPY_AND_MOVE(ManageInjectDevice);
     int32_t TransformJsonData(const Json& configData);
 private:
     int32_t SendEvent(const InputEventArray& inputEventArray);
@@ -32,7 +32,6 @@ private:
     int32_t SendEventToDeviveNode(const InputEventArray& inputEventArray);
 private:
     GetDeviceNode getDeviceNodeObject_;
-    DeviceBase* devicePtr_ = nullptr;
 private:
     static constexpr int64_t INJECT_SLEEP_TIMES = 10;
 };

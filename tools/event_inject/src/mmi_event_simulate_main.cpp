@@ -15,10 +15,11 @@
 
 #include "injection_event_dispatch.h"
 #include "mmi_log.h"
+#include "error_multimodal.h"
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "MmiEventSimulateDemoMain" };
-}
+} // namespace
 
 int32_t main(int32_t argc, const char* argv[])
 {

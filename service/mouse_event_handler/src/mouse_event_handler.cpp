@@ -42,7 +42,7 @@ std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
 
 void MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPV(data);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttionId_);
@@ -69,10 +69,11 @@ void MouseEventHandler::InitAbsolution()
     }
 }
 
-void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem)
+void MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
 {
+    CALL_LOG_ENTER;
     CHKPV(data);
-    MMI_LOGD("enter, current action:%{public}d", pointerEvent_->GetPointerAction());
+    MMI_LOGD("current action:%{public}d", pointerEvent_->GetPointerAction());
 
     auto button = libinput_event_pointer_get_button(data);
     if (button == BTN_LEFT) {
@@ -90,13 +91,13 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEv
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_RELEASED);
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
         pointerEvent_->DeleteReleaseButton(button);
-        pointerItem.SetPressed(false);
+        isPressed_ = false;
         buttionId_ = PointerEvent::BUTTON_NONE;
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_PRESSED);
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
         pointerEvent_->SetButtonPressed(button);
-        pointerItem.SetPressed(true);
+        isPressed_ = true;
         buttionId_ = pointerEvent_->GetButtonId();
     } else {
         MMI_LOGW("unknown state, state:%{public}u", state);
@@ -114,7 +115,7 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
         constexpr int32_t timeout = 100; // 100 ms
         std::weak_ptr<MouseEventHandler> weakPtr = shared_from_this();
         timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
-            MMI_LOGD("enter");
+            CALL_LOG_ENTER;
             auto sharedPtr = weakPtr.lock();
             CHKPV(sharedPtr);
             MMI_LOGD("timer:%{public}d", sharedPtr->timerId_);
@@ -123,7 +124,6 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
             CHKPV(pointerEvent);
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
             InputHandler->OnMouseEventEndTimerHandler(pointerEvent);
-            MMI_LOGD("leave");
         });
 
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
@@ -143,7 +143,7 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
 void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t deviceId,
                                         PointerEvent::PointerItem& pointerItem)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPV(data);
     auto mouseInfo = WinMgr->GetMouseInfo();
     MouseState->SetMouseCoords(mouseInfo.globalX, mouseInfo.globalY);
@@ -152,6 +152,7 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerItem.SetLocalX(0);
     pointerItem.SetLocalY(0);
     pointerItem.SetPointerId(0);
+    pointerItem.SetPressed(isPressed_);
 
     int64_t time = GetSysClockTime();
     pointerItem.SetDownTime(time);
@@ -170,13 +171,11 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerEvent_->SetTargetDisplayId(-1);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
-
-    MMI_LOGD("leave");
 }
 
 void MouseEventHandler::Normalize(struct libinput_event *event)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPV(event);
     auto data = libinput_event_get_pointer_event(event);
     CHKPV(data);
@@ -190,7 +189,7 @@ void MouseEventHandler::Normalize(struct libinput_event *event)
             break;
         }
         case LIBINPUT_EVENT_POINTER_BUTTON: {
-            HandleButonInner(data, pointerItem);
+            HandleButonInner(data);
             break;
         }
         case LIBINPUT_EVENT_POINTER_AXIS: {
@@ -205,7 +204,6 @@ void MouseEventHandler::Normalize(struct libinput_event *event)
     int32_t deviceId = InputDevMgr->FindInputDeviceId(libinput_event_get_device(event));
     HandlePostInner(data, deviceId, pointerItem);
     DumpInner();
-    MMI_LOGD("Leave");
 }
 
 void MouseEventHandler::DumpInner()

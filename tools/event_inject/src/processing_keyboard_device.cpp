@@ -24,7 +24,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Proce
 int32_t ProcessingKeyboardDevice::TransformJsonDataToInputData(const Json& fingerEventArrays,
     InputEventArray& inputEventArray)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     if (fingerEventArrays.empty()) {
         return RET_ERR;
     }
@@ -38,8 +38,6 @@ int32_t ProcessingKeyboardDevice::TransformJsonDataToInputData(const Json& finge
         return RET_ERR;
     }
     TransformKeyBoardEventToInputEvent(keyBoardEventArray, inputEventArray);
-    MMI_LOGD("Leave");
-
     return RET_OK;
 }
 
@@ -55,6 +53,8 @@ void ProcessingKeyboardDevice::TransformKeyBoardEventToInputEvent(const std::vec
             TransformKeyClickEvent(item, inputEventArray);
         } else if (item.eventType == "KEY_EVENT_LONG_PRESS") {
             TransformKeyLongPressEvent(item, inputEventArray);
+        } else {
+            MMI_LOGW("json file format error");
         }
     }
 }

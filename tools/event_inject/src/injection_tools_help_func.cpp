@@ -18,7 +18,7 @@
 
 using namespace OHOS::MMI;
 
-std::string InjectionToolsHelpFunc::GetHelpText() const
+std::string InjectionToolsHelpFunc::GetHelpText()
 {
     std::string ret = "\n                           Harmony device event injection ...\n\n";
     return ret;

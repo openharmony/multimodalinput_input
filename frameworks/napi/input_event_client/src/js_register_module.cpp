@@ -14,19 +14,21 @@
  */
 
 #include "js_register_module.h"
+
 #include <cinttypes>
+
 #include "input_manager.h"
 #include "js_register_util.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
+} // namespace
 
 static napi_value InjectEvent(napi_env env, napi_callback_info info)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     napi_value result = nullptr;
     size_t argc = 1;
     napi_value argv[1] = { 0 };
@@ -69,7 +71,6 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     keyEvent->AddKeyItem(item);
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     napi_create_int32(env, 0, &result);
-    MMI_LOGD("leave");
     return result;
 }
 

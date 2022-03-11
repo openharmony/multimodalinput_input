@@ -16,6 +16,7 @@
 #ifndef TIME_COST_CHK_H
 #define TIME_COST_CHK_H
 #include <cinttypes>
+#include "nocopyable.h"
 
 constexpr int64_t MAX_INPUT_EVENT_TIME = 1000;
 constexpr int64_t MAX_OVER_TIME = 300;
@@ -52,6 +53,8 @@ public:
             }
         }
     }
+
+    DISALLOW_COPY_AND_MOVE(TimeCostChk);
 
     int64_t GetElapsed_micro() const
     {

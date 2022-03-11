@@ -12,15 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "input_interceptor_manager.h"
+
 #include "input_handler_manager.h"
 #include "util.h"
+
 
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputInterceptorManager" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputInterceptorManager" };
+} // namespace
 
 int32_t InputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {

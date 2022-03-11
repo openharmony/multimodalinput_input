@@ -16,8 +16,9 @@
 #ifndef AXIS_EVENT_H
 #define AXIS_EVENT_H
 
-#include "input_event.h"
 #include "nocopyable.h"
+
+#include "input_event.h"
 
 namespace OHOS {
 namespace MMI {
@@ -40,7 +41,7 @@ public:
     DISALLOW_COPY_AND_MOVE(AxisEvent);
     virtual ~AxisEvent();
 
-    int32_t GetAxisAction() const;
+    int32_t GetAxisAction();
     void SetAxisAction(int32_t axisAction);
 
     int32_t GetAxisType() const;

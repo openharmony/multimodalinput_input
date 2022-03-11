@@ -15,11 +15,14 @@
 
 #ifndef INPUT_MONITOR_MANAGER_H
 #define INPUT_MONITOR_MANAGER_H
+
 #include <memory>
-#include "input_handler_type.h"
-#include "i_input_event_consumer.h"
+
 #include "nocopyable.h"
 #include "singleton.h"
+
+#include "i_input_event_consumer.h"
+#include "input_handler_type.h"
 
 namespace OHOS {
 namespace MMI {

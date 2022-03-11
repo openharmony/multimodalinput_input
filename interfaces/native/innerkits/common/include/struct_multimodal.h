@@ -20,11 +20,12 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr int32_t MAX_DEVICENAME = 64;
-    constexpr int32_t MAX_UUIDSIZE = 64;
-    constexpr int32_t SYSTEMUID = 1000;
-    constexpr int32_t MAX_SOLTED_COORDS_NUMS = 10;
-}
+constexpr int32_t MAX_DEVICENAME = 64;
+constexpr int32_t MAX_UUIDSIZE = 64;
+constexpr int32_t SYSTEMUID = 1000;
+constexpr int32_t MAX_SOLTED_COORDS_NUMS = 10;
+} // namespace
+
 enum SENIOR_DEVICE_TYPE {
     INPUT_DEVICE_AISENSOR = 31,
     INPUT_DEVICE_KNUCKLE = 41

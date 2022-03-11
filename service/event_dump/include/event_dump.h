@@ -16,14 +16,18 @@
 #ifndef EVENT_DUMP_H
 #define EVENT_DUMP_H
 
-#include "libmmi_util.h"
+#include "nocopyable.h"
 #include "singleton.h"
+
+#include "libmmi_util.h"
 #include "uds_server.h"
 
 namespace OHOS {
 namespace MMI {
 class EventDump : public DelayedSingleton<EventDump> {
 public:
+    EventDump() = default;
+    DISALLOW_COPY_AND_MOVE(EventDump);
     void Init(UDSServer& udss);
     void Dump(int32_t fd = 0); // -1=printf, 0=hilog, (fd>0)=file
     void TestDump();
@@ -35,7 +39,8 @@ private:
     std::vector<std::string> dumpInfo_;
     UDSServer* udsServer_ = nullptr;
 };
+
+#define MMIEventDump EventDump::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define MMIEventDump OHOS::MMI::EventDump::GetInstance()
 #endif // EVENT_DUMP_H

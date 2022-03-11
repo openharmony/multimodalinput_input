@@ -17,6 +17,7 @@
 #define KEY_OPTION_H
 
 #include <set>
+
 #include "nocopyable.h"
 
 namespace OHOS {

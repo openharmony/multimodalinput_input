@@ -22,6 +22,7 @@
 #include "input_event.h"
 #include "pointer_event.h"
 #include "libinput.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -78,6 +79,7 @@ class InputWindowsManager : public DelayedSingleton<InputWindowsManager> {
 public:
     InputWindowsManager();
     virtual ~InputWindowsManager();
+    DISALLOW_COPY_AND_MOVE(InputWindowsManager);
 
     bool Init(UDSServer& udsServer);
     void UpdateSeatsInfo();
@@ -145,8 +147,8 @@ private:
     std::map<int32_t, WindowInfo> windowInfos_ = {};
     MouseLocation mouseLoction_ = {};
 };
+
+#define WinMgr InputWindowsManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-
-#define WinMgr OHOS::MMI::InputWindowsManager::GetInstance()
 #endif // INPUT_WINDOWS_MANAGER_H

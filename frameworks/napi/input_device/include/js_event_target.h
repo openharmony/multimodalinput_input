@@ -15,21 +15,22 @@
 
 #ifndef JS_EVENT_TARGET_H
 #define JS_EVENT_TARGET_H
-
 #include <map>
-
-#include "libmmi_util.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "utils/log.h"
-#include "input_device_impl.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+#include "input_device_impl.h"
+#include "libmmi_util.h"
 
 namespace OHOS {
 namespace MMI {
 class JsEventTarget {
 public:
+    JsEventTarget() = default;
+    DISALLOW_COPY_AND_MOVE(JsEventTarget);
+
     static void EmitJsIdsAsync(int32_t userData, std::vector<int32_t> ids);
     static void CallIdsAsyncWork(napi_env env, napi_status status, void* data);
 

@@ -24,7 +24,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Proce
 int32_t ProcessingPenDevice::TransformJsonDataToInputData(const Json& penEventArrays,
     InputEventArray& inputEventArray)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     if (penEventArrays.empty()) {
         return RET_ERR;
     }
@@ -43,7 +43,6 @@ int32_t ProcessingPenDevice::TransformJsonDataToInputData(const Json& penEventAr
         return RET_ERR;
     }
     TransformPenEventToInputEvent(penEventArray, inputEventArray);
-    MMI_LOGD("Leave");
     return RET_OK;
 }
 

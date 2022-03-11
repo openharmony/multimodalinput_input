@@ -18,13 +18,13 @@
 using namespace OHOS::MMI;
 
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingTouchScreenDevice" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingTouchScreenDevice" };
+} // namespace
 
 int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const Json& touchScreenEventArrays,
                                                                   InputEventArray& inputEventArray)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     if (touchScreenEventArrays.empty()) {
         return RET_ERR;
     }
@@ -46,15 +46,13 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const Json& to
     uint64_t releaseEventIndex = static_cast<uint64_t>(touchScreenInputEvents.eventNumber) - 1;
     TouchScreenInputEvent releaseEvents = touchScreenInputEvents.eventArray[releaseEventIndex];
     AnalysisTouchScreenReleaseData(inputEventArray, releaseEvents);
-
-    MMI_LOGD("Leave");
     return RET_OK;
 }
 
 int32_t ProcessingTouchScreenDevice::TransformJsonDataSingleTouchScreen(const Json& touchScreenEventArrays,
     InputEventArray& inputEventArray)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     if (touchScreenEventArrays.empty()) {
         return RET_ERR;
     }
@@ -69,7 +67,6 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataSingleTouchScreen(const Js
     for (const auto &item : touchSingleEventDatas) {
         AnalysisTouchScreenToInputData(inputEventArray, item);
     }
-    MMI_LOGD("Leave");
     return RET_OK;
 }
 

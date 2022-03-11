@@ -14,7 +14,9 @@
  */
 
 #include "standardized_event_manager.h"
+
 #include <sstream>
+
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "immi_token.h"
@@ -97,7 +99,6 @@ int32_t StandardizedEventManager::InjectionVirtual(bool isPressed, int32_t keyCo
         MMI_LOGE("Send virtual event Msg error");
         return RET_ERR;
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
@@ -120,7 +121,6 @@ int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> ke
         MMI_LOGE("Send inject event Msg error");
         return RET_ERR;
     }
-    MMI_LOGD("leave");
     return RET_OK;
 }
 
@@ -147,14 +147,14 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
     return RET_OK;
 }
 
-int32_t StandardizedEventManager::GetDeviceIds(int32_t userData) const
+int32_t StandardizedEventManager::GetDeviceIds(int32_t userData)
 {
     NetPacket pkt(MmiMessageId::INPUT_DEVICE_IDS);
     pkt << userData;
     return SendMsg(pkt);
 }
 
-int32_t StandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId) const
+int32_t StandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId)
 {
     NetPacket pkt(MmiMessageId::INPUT_DEVICE);
     pkt << userData << deviceId;

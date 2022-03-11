@@ -20,7 +20,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-using namespace OHOS::MMI;
 } // namespace
 
 class ServerMsgHandlerTest : public testing::Test {
@@ -31,35 +30,41 @@ public:
 
 class ServerMsgHandlerUnitTest : public ServerMsgHandler {
 public:
-    int32_t OnVirtualKeyEventTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
+    int32_t OnVirtualKeyEventTest(SessionPtr sess, NetPacket& pkt)
     {
         return OnVirtualKeyEvent(sess, pkt);
     }
 
 #ifdef OHOS_BUILD_HDF
-    int32_t OnHdiInjectTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
+    int32_t OnHdiInjectTest(SessionPtr sess, NetPacket& pkt)
     {
         return OnHdiInject(sess, pkt);
     }
 #endif
 
-    int32_t OnDumpTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
+    int32_t OnDumpTest(SessionPtr sess, NetPacket& pkt)
     {
         return OnDump(sess, pkt);
     }
 
-    int32_t GetMultimodeInputInfoTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
+    int32_t GetMultimodeInputInfoTest(SessionPtr sess, NetPacket& pkt)
     {
         return GetMultimodeInputInfo(sess, pkt);
     }
 
-    int32_t OnInjectKeyEventTest(SessionPtr sess, OHOS::MMI::NetPacket pkt)
+    int32_t OnInjectKeyEventTest(SessionPtr sess, NetPacket pkt)
     {
         int32_t retResult = OnInjectKeyEvent(sess, pkt);
         return retResult;
     }
 };
 
+/**
+ * @tc.name:OnVirtualKeyEventTest_01
+ * @tc.desc:Verify virtual key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_01, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -68,6 +73,12 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_01, TestSize.Level1)
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, pkt);
 }
 
+/**
+ * @tc.name:OnVirtualKeyEventTest_02
+ * @tc.desc:Verify virtual key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_02, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -76,6 +87,12 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_02, TestSize.Level1)
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, pkt);
 }
 
+/**
+ * @tc.name:OnVirtualKeyEventTest_03
+ * @tc.desc:Verify virtual key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_03, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -84,6 +101,12 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_03, TestSize.Level1)
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, pkt);
 }
 
+/**
+ * @tc.name:OnVirtualKeyEventTest_04
+ * @tc.desc:Verify virtual key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_04, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -92,6 +115,12 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_04, TestSize.Level1)
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, pkt);
 }
 
+/**
+ * @tc.name:OnVirtualKeyEventTest_05
+ * @tc.desc:Verify virtual key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_05, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -100,6 +129,12 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_05, TestSize.Level1)
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, pkt);
 }
 
+/**
+ * @tc.name:OnVirtualKeyEventTest_06
+ * @tc.desc:Verify virtual key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_06, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -108,6 +143,12 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_06, TestSize.Level1)
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, pkt);
 }
 
+/**
+ * @tc.name:OnVirtualKeyEventTest_07
+ * @tc.desc:Verify virtual key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_07, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -116,6 +157,12 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_07, TestSize.Level1)
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, pkt);
 }
 
+/**
+ * @tc.name:OnVirtualKeyEventTest_08
+ * @tc.desc:Verify virtual key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_08, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -124,6 +171,12 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_08, TestSize.Level1)
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, pkt);
 }
 
+/**
+ * @tc.name:OnVirtualKeyEventTest_09
+ * @tc.desc:Verify virtual key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_09, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -132,6 +185,12 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_09, TestSize.Level1)
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, pkt);
 }
 
+/**
+ * @tc.name:OnVirtualKeyEventTest_010
+ * @tc.desc:Verify virtual key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_010, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -140,6 +199,12 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_010, TestSize.Level1)
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, pkt);
 }
 
+/**
+ * @tc.name:OnDumpTest_01
+ * @tc.desc:Verify dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnDumpTest_01, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -148,6 +213,12 @@ HWTEST_F(ServerMsgHandlerTest, OnDumpTest_01, TestSize.Level1)
     serverMsgHandlerTest.OnDumpTest(sess, pkt);
 }
 
+/**
+ * @tc.name:OnDumpTest_02
+ * @tc.desc:Verify dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnDumpTest_02, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -156,6 +227,12 @@ HWTEST_F(ServerMsgHandlerTest, OnDumpTest_02, TestSize.Level1)
     serverMsgHandlerTest.OnDumpTest(sess, pkt);
 }
 
+/**
+ * @tc.name:OnDumpTest_03
+ * @tc.desc:Verify dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnDumpTest_03, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -164,6 +241,12 @@ HWTEST_F(ServerMsgHandlerTest, OnDumpTest_03, TestSize.Level1)
     serverMsgHandlerTest.OnDumpTest(sess, pkt);
 }
 
+/**
+ * @tc.name:OnDumpTest_04
+ * @tc.desc:Verify dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnDumpTest_04, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -172,6 +255,12 @@ HWTEST_F(ServerMsgHandlerTest, OnDumpTest_04, TestSize.Level1)
     serverMsgHandlerTest.OnDumpTest(sess, pkt);
 }
 
+/**
+ * @tc.name:OnDumpTest_05
+ * @tc.desc:Verify dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnDumpTest_05, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -180,6 +269,12 @@ HWTEST_F(ServerMsgHandlerTest, OnDumpTest_05, TestSize.Level1)
     serverMsgHandlerTest.OnDumpTest(sess, pkt);
 }
 
+/**
+ * @tc.name:OnDumpTest_06
+ * @tc.desc:Verify dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnDumpTest_06, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -188,6 +283,12 @@ HWTEST_F(ServerMsgHandlerTest, OnDumpTest_06, TestSize.Level1)
     serverMsgHandlerTest.OnDumpTest(sess, pkt);
 }
 
+/**
+ * @tc.name:OnDumpTest_07
+ * @tc.desc:Verify dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnDumpTest_07, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -196,6 +297,12 @@ HWTEST_F(ServerMsgHandlerTest, OnDumpTest_07, TestSize.Level1)
     serverMsgHandlerTest.OnDumpTest(sess, pkt);
 }
 
+/**
+ * @tc.name:OnDumpTest_08
+ * @tc.desc:Verify dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnDumpTest_08, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -204,6 +311,12 @@ HWTEST_F(ServerMsgHandlerTest, OnDumpTest_08, TestSize.Level1)
     serverMsgHandlerTest.OnDumpTest(sess, pkt);
 }
 
+/**
+ * @tc.name:OnDumpTest_09
+ * @tc.desc:Verify dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnDumpTest_09, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -212,6 +325,12 @@ HWTEST_F(ServerMsgHandlerTest, OnDumpTest_09, TestSize.Level1)
     serverMsgHandlerTest.OnDumpTest(sess, pkt);
 }
 
+/**
+ * @tc.name:OnDumpTest_010
+ * @tc.desc:Verify dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, OnDumpTest_010, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -220,6 +339,12 @@ HWTEST_F(ServerMsgHandlerTest, OnDumpTest_010, TestSize.Level1)
     serverMsgHandlerTest.OnDumpTest(sess, pkt);
 }
 
+/**
+ * @tc.name:GetMultimodeInputInfoTest_01
+ * @tc.desc:Verify getmultimodal input info
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_01, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -228,6 +353,12 @@ HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_01, TestSize.Level1)
     serverMsgHandlerTest.GetMultimodeInputInfoTest(sess, pkt);
 }
 
+/**
+ * @tc.name:GetMultimodeInputInfoTest_02
+ * @tc.desc:Verify getmultimodal input info
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_02, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -236,6 +367,12 @@ HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_02, TestSize.Level1)
     serverMsgHandlerTest.GetMultimodeInputInfoTest(sess, pkt);
 }
 
+/**
+ * @tc.name:GetMultimodeInputInfoTest_03
+ * @tc.desc:Verify getmultimodal input info
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_03, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -244,6 +381,12 @@ HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_03, TestSize.Level1)
     serverMsgHandlerTest.GetMultimodeInputInfoTest(sess, pkt);
 }
 
+/**
+ * @tc.name:GetMultimodeInputInfoTest_04
+ * @tc.desc:Verify getmultimodal input info
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_04, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -252,6 +395,12 @@ HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_04, TestSize.Level1)
     serverMsgHandlerTest.GetMultimodeInputInfoTest(sess, pkt);
 }
 
+/**
+ * @tc.name:GetMultimodeInputInfoTest_05
+ * @tc.desc:Verify getmultimodal input info
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_05, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -260,6 +409,12 @@ HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_05, TestSize.Level1)
     serverMsgHandlerTest.GetMultimodeInputInfoTest(sess, pkt);
 }
 
+/**
+ * @tc.name:GetMultimodeInputInfoTest_06
+ * @tc.desc:Verify getmultimodal input info
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_06, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -268,6 +423,12 @@ HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_06, TestSize.Level1)
     serverMsgHandlerTest.GetMultimodeInputInfoTest(sess, pkt);
 }
 
+/**
+ * @tc.name:GetMultimodeInputInfoTest_07
+ * @tc.desc:Verify getmultimodal input info
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_07, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -276,6 +437,12 @@ HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_07, TestSize.Level1)
     serverMsgHandlerTest.GetMultimodeInputInfoTest(sess, pkt);
 }
 
+/**
+ * @tc.name:GetMultimodeInputInfoTest_08
+ * @tc.desc:Verify getmultimodal input info
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_08, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
@@ -284,6 +451,12 @@ HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_08, TestSize.Level1)
     serverMsgHandlerTest.GetMultimodeInputInfoTest(sess, pkt);
 }
 
+/**
+ * @tc.name:GetMultimodeInputInfoTest_09
+ * @tc.desc:Verify getmultimodal input info
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_09, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;

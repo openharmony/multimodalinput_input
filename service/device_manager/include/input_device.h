@@ -19,10 +19,15 @@
 #include <string>
 #include <vector>
 
+#include "nocopyable.h"
+
 namespace OHOS {
 namespace MMI {
 class InputDevice {
 public:
+    InputDevice() = default;
+    DISALLOW_COPY_AND_MOVE(InputDevice);
+
     void SetId(int32_t deviceId);
     int32_t GetId() const;
     void SetName(std::string name);

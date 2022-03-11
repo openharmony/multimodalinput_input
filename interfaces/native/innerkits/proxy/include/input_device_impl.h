@@ -14,9 +14,11 @@
  */
 #ifndef OHOS_INPUT_DEVICE_EVENT_H
 #define OHOS_INPUT_DEVICE_EVENT_H
+
 #include <functional>
 #include <map>
 #include <mutex>
+
 #include "nocopyable.h"
 
 namespace OHOS {
