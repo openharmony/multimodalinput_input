@@ -613,12 +613,18 @@ void InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, double& y)
     if (integerX > width) {
         x = static_cast<double>(width);
         mouseLoction_.globalX = width;
+    } else if (integerX < 0) {
+        x = 0;
+        mouseLoction_.globalX = 0;
     } else {
         mouseLoction_.globalX = integerX;
     }
     if (integerY > height) {
         y = static_cast<double>(height);
         mouseLoction_.globalY = height;
+    } else if (integerY < 0) {
+        y = 0;
+        mouseLoction_.globalY = 0;
     } else {
         mouseLoction_.globalY = integerY;
     }
