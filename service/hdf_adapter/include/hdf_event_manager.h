@@ -69,12 +69,12 @@ private:
     libinput *hdiinput_ = nullptr;
     std::list<uhdf *> hdflist_;
     static HdfEventManager *globleThis_;
-    bool devStatus[TOTAL_INPUT_DEVICE_STATUS_COUNT];
+    bool devStatus[TOTAL_INPUT_DEVICE_STATUS_COUNT] {false};
     DevDesc mountDevIndex_[TOTAL_INPUT_DEVICE_COUNT];
-    IInputInterface *inputInterface_;
-    IInputInterface *injectInterface_;
-    InputEventCb eventCallBack_;
-    InputHostCb  hostPlugCallBack_;
+    IInputInterface *inputInterface_ {nullptr};
+    IInputInterface *injectInterface_ {nullptr};
+    InputEventCb eventCallBack_ {};
+    InputHostCb  hostPlugCallBack_ {};
 };
 
 extern HdfEventManager  hdfEventManager;
