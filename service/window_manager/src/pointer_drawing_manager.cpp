@@ -12,16 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "pointer_drawing_manager.h"
+
 #include <display_type.h>
-#include "libmmi_util.h"
+
 #include "image/bitmap.h"
 #include "image_source.h"
 #include "image_type.h"
 #include "image_utils.h"
+#include "pixel_map.h"
+
+#include "libmmi_util.h"
 #include "input_device_manager.h"
 #include "mmi_log.h"
-#include "pixel_map.h"
 
 namespace OHOS {
 namespace MMI {

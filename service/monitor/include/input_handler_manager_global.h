@@ -15,13 +15,16 @@
 
 #ifndef INPUT_HANDLER_MANAGER_GLOBAL_H
 #define INPUT_HANDLER_MANAGER_GLOBAL_H
+
 #include <mutex>
 #include <set>
-#include "input_handler_type.h"
-#include "i_input_event_handler.h"
+
 #include "nocopyable.h"
-#include "uds_session.h"
 #include "singleton.h"
+
+#include "i_input_event_handler.h"
+#include "input_handler_type.h"
+#include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
