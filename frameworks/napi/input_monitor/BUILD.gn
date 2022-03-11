@@ -18,11 +18,7 @@ config("libinputmonitor_config") {
 
   include_dirs = [
     "//foundation/multimodalinput/input/frameworks/napi/input_monitor/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/multimodalinput/input/frameworks/util/common/include",
-    "//foundation/ace/napi",
-    "//foundation/ace/napi/interfaces/kits/napi",
-    "//foundation/multimodalinput/input/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
   ]
 

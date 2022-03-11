@@ -17,22 +17,10 @@ config("libinputeventclient_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
-    "//foundation/multimodalinput/input/frameworks/napi/input_event_client/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
-    "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
     "//foundation/multimodalinput/input/frameworks/util/common/include",
-    "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
-    "//foundation/multimodalinput/input/frameworks/util/socket/include",
-    "//foundation/multimodalinput/input/frameworks/util/network/include",
-    "//foundation/ace/napi",
-    "//foundation/ace/napi/interfaces/kits/napi",
-    "//third_party/node/src",
-    "//third_party/quickjs",
-    "//utils/native/base/include",
     "//foundation/multimodalinput/input/common/include",
+    "//foundation/multimodalinput/input/frameworks/napi/input_consumer/include",
     "//foundation/multimodalinput/input/tools/event_inject/include",
-    "//third_party/libuv/include/",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
   ]
 

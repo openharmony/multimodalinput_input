@@ -14,9 +14,12 @@
  */
 
 #include "mmi_service.h"
+
 #include <cinttypes>
 #include <csignal>
+
 #include <sys/signalfd.h>
+
 #include "event_dump.h"
 #include "input_windows_manager.h"
 #include "mmi_log.h"

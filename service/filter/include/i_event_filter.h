@@ -17,6 +17,7 @@
 #define I_EVENT_FILTER_H
 
 #include "iremote_broker.h"
+
 #include "pointer_event.h"
 
 namespace OHOS {
