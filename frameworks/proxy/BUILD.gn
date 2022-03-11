@@ -24,9 +24,6 @@ config("libmmi_client_config") {
     "//foundation/multimodalinput/input/common/include",
     "//foundation/multimodalinput/input/frameworks/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//utils/native/base/include",
     "event_handler/include",
     "module_loader/include",
   ]
@@ -39,7 +36,6 @@ config("libmmi_public_client_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
     "//foundation/multimodalinput/input/common/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//utils/native/base/include",
   ]
 }
 
