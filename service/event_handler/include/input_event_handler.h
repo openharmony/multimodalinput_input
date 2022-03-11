@@ -12,17 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef INPUT_EVENT_HANDLER_H
 #define INPUT_EVENT_HANDLER_H
 
 #include <memory>
+
+#include "nocopyable.h"
+#include "singleton.h"
+
 #include "event_dispatch.h"
 #include "event_package.h"
 #include "i_event_filter.h"
 #include "mouse_event_handler.h"
 #include "msg_handler.h"
-#include "nocopyable.h"
-#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {

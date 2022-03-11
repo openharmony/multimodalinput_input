@@ -15,16 +15,19 @@
 
 #ifndef INPUT_DEVICE_MANAGER_H
 #define INPUT_DEVICE_MANAGER_H
+
 #include <list>
 #include <string>
-#include "util.h"
+
+#include "nocopyable.h"
 #include "singleton.h"
+
 #include "../../../common/include/device_observer.h"
-#include "msg_handler.h"
 #include "event_dispatch.h"
 #include "event_package.h"
 #include "input_device.h"
-#include "nocopyable.h"
+#include "msg_handler.h"
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {
