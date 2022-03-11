@@ -12,18 +12,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef INPUT_EVENT_MONITOR_H
 #define INPUT_EVENT_MONITOR_H
+
+#include <algorithm>
+#include <list>
 #include <map>
 #include <vector>
-#include <algorithm>
-#include "uds_session.h"
-#include "singleton.h"
-#include <list>
-#include "key_event.h"
+
 #include "nocopyable.h"
+#include "singleton.h"
+
+#include "key_event.h"
 #include "pointer_event.h"
 #include "struct_multimodal.h"
+#include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {

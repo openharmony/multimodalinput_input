@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+
 #include "libmmi_util.h"
 
 namespace OHOS {

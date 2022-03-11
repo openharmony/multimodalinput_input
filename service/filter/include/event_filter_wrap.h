@@ -17,9 +17,11 @@
 #define EVENT_FILTER_WRAP_H
 
 #include <mutex>
-#include "i_event_filter.h"
+
 #include "nocopyable.h"
 #include "singleton.h"
+
+#include "i_event_filter.h"
 
 namespace OHOS {
 namespace MMI {

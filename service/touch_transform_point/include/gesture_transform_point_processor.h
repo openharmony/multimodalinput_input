@@ -17,9 +17,11 @@
 #define GESTURE_TRANSFORM_POINT_PROCESSOR_H
 
 #include <memory>
-#include "pointer_event.h"
-#include "input_windows_manager.h"
+
 #include "nocopyable.h"
+
+#include "input_windows_manager.h"
+#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {

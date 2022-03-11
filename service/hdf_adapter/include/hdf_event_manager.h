@@ -15,16 +15,19 @@
 #ifndef HDF_EVENT_MANAGER_H
 #define HDF_EVENT_MANAGER_H
 
-#include <iostream>
 #include <functional>
-#include <map>
+#include <iostream>
 #include <list>
-#include "input_manager.h"
-#include "libinput.h"
+#include <map>
+
 #include "evdev.h"
 #include "input_type.h"
+#include "libinput.h"
 #include "nocopyable.h"
+
+#include "input_manager.h"
 #include "s_input.h"
+
 #define MAX_INPUT_DEVICE_COUNT MAX_INPUT_DEV_NUM
 #define TOTAL_INPUT_DEVICE_COUNT (2 * MAX_INPUT_DEV_NUM)
 #define TOTAL_INPUT_DEVICE_STATUS_COUNT (TOTAL_INPUT_DEVICE_COUNT + 1)

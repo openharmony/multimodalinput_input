@@ -12,7 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "gesture_transform_point_processor.h"
+
 #include "mmi_log.h"
 #include "mouse_device_state.h"
 

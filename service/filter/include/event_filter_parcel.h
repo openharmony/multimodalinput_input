@@ -15,8 +15,10 @@
 
 #ifndef EVENT_FILTER_PARCEL_H
 #define EVENT_FILTER_PARCEL_H
+
 #include "nocopyable.h"
 #include "parcel.h"
+
 #include "pointer_event.h"
 
 namespace OHOS {

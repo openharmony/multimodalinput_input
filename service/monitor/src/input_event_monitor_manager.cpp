@@ -14,9 +14,12 @@
  */
 
 #include "input_event_monitor_manager.h"
+
 #include <cinttypes>
+
 #include "input_event_data_transformation.h"
 #include "proto.h"
+
 
 namespace OHOS {
 namespace MMI {
