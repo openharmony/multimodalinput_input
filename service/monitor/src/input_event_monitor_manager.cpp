@@ -30,7 +30,7 @@ InputEventMonitorManager::~InputEventMonitorManager() {}
 
 int32_t InputEventMonitorManager::AddInputEventMontior(SessionPtr session, int32_t eventType)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPR(session, ERROR_NULL_POINTER);
     MonitorItem monitorItem;
     monitorItem.eventType = eventType;
@@ -47,7 +47,7 @@ int32_t InputEventMonitorManager::AddInputEventMontior(SessionPtr session, int32
 
 void InputEventMonitorManager::RemoveInputEventMontior(SessionPtr session, int32_t eventType)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPV(session);
     MonitorItem monitorItem;
     monitorItem.eventType = eventType;
@@ -57,7 +57,6 @@ void InputEventMonitorManager::RemoveInputEventMontior(SessionPtr session, int32
         monitors_.erase(it);
         MMI_LOGW("EventType:%{public}d,fd:%{public}d remove from server", eventType, session->GetFd());
     }
-    MMI_LOGD("Leave");
 }
 
 void InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<KeyEvent> keyEvent)
@@ -83,7 +82,7 @@ void InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<KeyEvent> key
 
 int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     MonitorItem monitorItemTouchpad;
     monitorItemTouchpad.eventType = eventType;
     monitorItemTouchpad.session = session;
@@ -100,7 +99,7 @@ int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(int32_t eventType
 
 void InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     MonitorItem monitorItemtouchpad;
     monitorItemtouchpad.eventType = eventType;
     monitorItemtouchpad.session = session;
@@ -112,13 +111,12 @@ void InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t eventType
         iter = monitorsTouch_.erase(iter);
         MMI_LOGD("Service RemoveInputEventTouchpadMontior Success");
     }
-    MMI_LOGD("Leave");
 }
 
 void InputEventMonitorManager::OnTouchpadMonitorInputEvent(
     std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPV(pointerEvent);
     if (monitorsTouch_.empty()) {
         MMI_LOGE("%{public}s no monitor to send msg", __func__);
@@ -133,7 +131,6 @@ void InputEventMonitorManager::OnTouchpadMonitorInputEvent(
         item.session->SendMsg(pkt);
         MMI_LOGD("Service SendMsg Success");
     }
-    MMI_LOGD("Leave");
 }
 
 bool InputEventMonitorManager::ReportTouchpadEvent(std::shared_ptr<PointerEvent> pointerEvent)

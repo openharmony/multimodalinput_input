@@ -19,7 +19,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDeviceManager" };
-}
+} // namespace
+
 napi_value JsInputDeviceManager::GetDeviceIds(napi_env env, napi_value handle)
 {
     napi_value ret = CreateCallbackInfo(env, handle);

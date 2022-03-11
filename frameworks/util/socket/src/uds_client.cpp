@@ -14,21 +14,26 @@
  */
 
 #include "uds_client.h"
+
 #include <cinttypes>
+
 #include "util.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSClient" }; // namepace
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSClient" };
+} // namespace
 
 UDSClient::UDSClient()
 {
+    CALL_LOG_ENTER;
 }
 
 UDSClient::~UDSClient()
 {
+    CALL_LOG_ENTER;
+    Stop();
 }
 
 int32_t UDSClient::ConnectTo()
@@ -88,7 +93,8 @@ bool UDSClient::SendMsg(const NetPacket& pkt) const
 
 bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
 {
-    MMI_LOGD("enter detachMode = %d", detachMode);
+    CALL_LOG_ENTER;
+    MMI_LOGD("detachMode = %d", detachMode);
     recvFun_ = fun;
     if (ConnectTo() < 0) {
         MMI_LOGW("Client connection failed, Try again later");
@@ -105,11 +111,10 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
 
 void UDSClient::Stop()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     Close();
     isRunning_ = false;
     isToExit_ = true;
-    MMI_LOGD("leave");
 }
 
 void UDSClient::OnRecv(const char *buf, size_t size)

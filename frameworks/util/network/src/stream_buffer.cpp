@@ -14,7 +14,9 @@
  */
 
 #include "stream_buffer.h"
+
 #include <vector>
+
 #include "define_multimodal.h"
 
 namespace OHOS {

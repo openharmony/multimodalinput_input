@@ -16,19 +16,21 @@
 #ifndef MULTIMODAL_INPUT_CONNECT_STUB_H
 #define MULTIMODAL_INPUT_CONNECT_STUB_H
 
-#include "i_multimodal_input_connect.h"
 #include "ipc_skeleton.h"
 #include "iremote_stub.h"
 #include "message_parcel.h"
+#include "nocopyable.h"
+
+#include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_define.h"
-#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
 class MultimodalInputConnectStub : public IRemoteStub<IMultimodalInputConnect> {
 public:
     MultimodalInputConnectStub() = default;
+    DISALLOW_COPY_AND_MOVE(MultimodalInputConnectStub);
     ~MultimodalInputConnectStub() = default;
 
     int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& options) override;

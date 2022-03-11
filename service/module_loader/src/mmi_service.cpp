@@ -259,7 +259,8 @@ void MMIService::OnDisconnected(SessionPtr s)
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)
 {
-    MMI_LOGI("enter, programName:%{public}s,moduleType:%{public}d",
+    CALL_LOG_ENTER;
+    MMI_LOGI("programName:%{public}s,moduleType:%{public}d",
              programName.c_str(), moduleType);
 
     toReturnClientFd = INVALID_SOCKET_FD;
@@ -324,7 +325,7 @@ void MMIService::OnTimer()
 
 void MMIService::OnThread()
 {
-    OHOS::MMI::SetThreadName(std::string("mmi_service"));
+    SetThreadName(std::string("mmi_service"));
     uint64_t tid = GetThisThreadIdOfLL();
     if (tid <= 0) {
         MMI_LOGE("The tid is error, errCode:%{public}d", VAL_NOT_EXP);
@@ -368,7 +369,7 @@ void MMIService::OnThread()
 
 bool MMIService::InitSignalHandler()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     sigset_t mask = {0};
     int32_t retCode = sigfillset(&mask);
     if (retCode < 0) {
@@ -394,14 +395,12 @@ bool MMIService::InitSignalHandler()
         close(fdSignal);
         return false;
     }
-
-    MMI_LOGD("Leave");
     return true;
 }
 
 void MMIService::OnSignalEvent(int32_t signalFd)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     signalfd_siginfo sigInfo;
     int32_t size = ::read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
     if (size != sizeof(signalfd_siginfo)) {
@@ -425,7 +424,6 @@ void MMIService::OnSignalEvent(int32_t signalFd)
         default:
             break;
     }
-    MMI_LOGD("leave");
 }
 } // namespace MMI
 } // namespace OHOS

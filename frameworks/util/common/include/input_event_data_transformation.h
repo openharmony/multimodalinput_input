@@ -14,7 +14,6 @@
  */
 #ifndef INPUT_EVENT_DATA_TRANSFORMATION_H
 #define INPUT_EVENT_DATA_TRANSFORMATION_H
-
 #include "key_event.h"
 #include "net_packet.h"
 #include "pointer_event.h"
@@ -22,6 +21,9 @@
 namespace OHOS {
 namespace MMI {
 class InputEventDataTransformation {
+    InputEventDataTransformation() = delete;
+    DISALLOW_COPY_AND_MOVE(InputEventDataTransformation);
+
 public:
     static int32_t KeyEventToNetPacket(const std::shared_ptr<KeyEvent> key, NetPacket &pkt);
     static int32_t NetPacketToKeyEvent(NetPacket &pkt, std::shared_ptr<KeyEvent> key);

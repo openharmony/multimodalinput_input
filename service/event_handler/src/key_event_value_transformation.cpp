@@ -14,7 +14,9 @@
  */
 
 #include "key_event_value_transformation.h"
+
 #include <map>
+
 #include "hos_key_event.h"
 #include "util.h"
 
@@ -22,7 +24,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventValueTransformations" };
-}
+} // namespace
+
 const std::multimap<int16_t, KeyEventValueTransformations> MAP_KEY_EVENT_VALUE_TRANSFORMATION = {
     {11, {"KEY_0", 11, 2000, HOS_KEY_0}},
     {2, {"KEY_1", 2, 2001, HOS_KEY_1}},

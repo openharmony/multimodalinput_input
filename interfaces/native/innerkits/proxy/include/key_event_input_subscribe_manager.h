@@ -19,9 +19,12 @@
 #include <functional>
 #include <list>
 #include <memory>
+
+#include "nocopyable.h"
+#include "singleton.h"
+
 #include "key_event.h"
 #include "key_option.h"
-#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
@@ -57,6 +60,7 @@ public:
 public:
     KeyEventInputSubscribeManager() = default;
     ~KeyEventInputSubscribeManager() = default;
+    DISALLOW_COPY_AND_MOVE(KeyEventInputSubscribeManager);
 
     int32_t SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
         std::function<void(std::shared_ptr<KeyEvent>)> callback);

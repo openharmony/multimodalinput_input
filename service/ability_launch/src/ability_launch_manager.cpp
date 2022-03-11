@@ -14,23 +14,26 @@
  */
 
 #include "ability_launch_manager.h"
-#include <fstream>
-#include <sstream>
-#include <iostream>
+
 #include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+
 #include "ability_manager_client.h"
 #include "file_ex.h"
-#include "mmi_log.h"
 #include "ohos/aafwk/base/string_wrapper.h"
+
+#include "mmi_log.h"
 #include "timer_manager.h"
 
 namespace OHOS {
 namespace MMI {
-    namespace {
-        constexpr int32_t MAX_PREKEYS_NUM = 4;
-        constexpr int32_t INVALID_VALUE = -1;
-        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AbilityLaunchManager" };
-    }
+namespace {
+constexpr int32_t MAX_PREKEYS_NUM = 4;
+constexpr int32_t INVALID_VALUE = -1;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AbilityLaunchManager" };
+} // namespace
 
 AbilityLaunchManager::AbilityLaunchManager()
 {
@@ -198,7 +201,7 @@ void AbilityLaunchManager::Print()
 
 bool AbilityLaunchManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> &key)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (Match(lastMatchedKey_, key)) {
         MMI_LOGE("The same key is waiting timeout, skip");
         return true;
@@ -227,13 +230,12 @@ bool AbilityLaunchManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> &k
             return HandleKeyCancel(shortcutKey);
         }
     }
-    MMI_LOGD("leave");
     return false;
 }
 
 bool AbilityLaunchManager::Match(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (key->GetKeyCode() != shortcutKey.finalKey || shortcutKey.triggerType != key->GetKeyAction()) {
         return false;
     }
@@ -256,7 +258,7 @@ bool AbilityLaunchManager::Match(const ShortcutKey &shortcutKey, const std::shar
 
 bool AbilityLaunchManager::HandleKeyDown(ShortcutKey &shortcutKey)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (shortcutKey.keyDownDuration == 0) {
         MMI_LOGD("Start launch ability immediately");
         LaunchAbility(shortcutKey);
@@ -277,7 +279,7 @@ bool AbilityLaunchManager::HandleKeyDown(ShortcutKey &shortcutKey)
 
 bool AbilityLaunchManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (shortcutKey.keyDownDuration == 0) {
         MMI_LOGD("Start launch ability immediately");
         LaunchAbility(shortcutKey);
@@ -301,14 +303,14 @@ bool AbilityLaunchManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
 
 bool AbilityLaunchManager::HandleKeyCancel(ShortcutKey &shortcutKey)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (shortcutKey.timerId < 0) {
        MMI_LOGE("Skip, timerid < 0"); 
     }
     auto timerId = shortcutKey.timerId;
     shortcutKey.timerId = -1;
     TimerMgr->RemoveTimer(timerId);
-    MMI_LOGD("Leave, timerId: %{public}d", timerId);
+    MMI_LOGD("timerId: %{public}d", timerId);
     return false;
 }
 

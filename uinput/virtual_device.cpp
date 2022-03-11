@@ -29,7 +29,6 @@ namespace {
 using namespace OHOS::HiviewDFX;
 constexpr HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "VirtualDevice"};
 
-
 bool DoIoctl(int32_t fd, int32_t request, const uint32_t value)
 {
     int32_t rc = ioctl(fd, request, value);
@@ -39,7 +38,7 @@ bool DoIoctl(int32_t fd, int32_t request, const uint32_t value)
     }
     return true;
 }
-}
+} // namespace
 
 VirtualDevice::VirtualDevice(const char *deviceName, uint16_t productId)
     : deviceName_(deviceName),

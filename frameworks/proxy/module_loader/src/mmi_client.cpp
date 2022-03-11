@@ -14,7 +14,7 @@
  */
 
 #include "mmi_client.h"
-#include <cinttypes>
+
 #include "mmi_log.h"
 #include "proto.h"
 #include "util.h"
@@ -33,7 +33,7 @@ MMIClient::MMIClient() {}
 
 MMIClient::~MMIClient()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
 }
 
 bool MMIClient::SendMessage(const NetPacket &pkt) const
@@ -48,7 +48,7 @@ bool MMIClient::GetCurrentConnectedStatus() const
 
 bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     EventManager.SetClientHandle(GetPtr());
     if (!(msgHdl->Init())) {
         MMI_LOGE("Message processing initialization failed");
@@ -226,7 +226,7 @@ void MMIClient::OnConnected()
 
 int32_t MMIClient::Socket()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     int32_t ret = MultimodalInputConnectManager::GetInstance()->
                         AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
     if (ret != RET_OK) {

@@ -16,12 +16,14 @@
 #ifndef MULTIMODAL_INPUT_CONNECT_MANAGER_H
 #define MULTIMODAL_INPUT_CONNECT_MANAGER_H
 
-#include <memory>
 #include <map>
+#include <memory>
 #include <set>
 #include <string>
-#include "i_multimodal_input_connect.h"
+
 #include "nocopyable.h"
+
+#include "i_multimodal_input_connect.h"
 
 namespace OHOS {
 namespace MMI {

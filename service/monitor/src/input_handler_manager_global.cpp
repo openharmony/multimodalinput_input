@@ -24,8 +24,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManagerGlobal" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManagerGlobal" };
+} // namespace
 
 int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
@@ -37,6 +37,10 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
     }
     CHKPR(session, RET_ERR);
     if (handlerType == InputHandlerType::MONITOR) {
+        if (!session->HasPermission()) {
+            MMI_LOGE("no permission, can not add monitor");
+            return RET_ERR;
+        }
         MMI_LOGD("Register monitor:%{public}d", handlerId);
         SessionHandler mon { handlerId, handlerType, session };
         return monitors_.AddMonitor(mon);
@@ -54,6 +58,10 @@ void InputHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
     if (handlerType == InputHandlerType::MONITOR) {
+        if (!session->HasPermission()) {
+            MMI_LOGE("no permission, can not remove monitor");
+            return;
+        }
         MMI_LOGD("Unregister monitor:%{public}d", handlerId);
         SessionHandler monitor { handlerId, handlerType, session };
         monitors_.RemoveMonitor(monitor);
@@ -162,7 +170,7 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Poi
         MMI_LOGE("Write id_ to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
     }
-    if (OHOS::MMI::InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
+    if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
         MMI_LOGE("Marshalling pointer event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
     }

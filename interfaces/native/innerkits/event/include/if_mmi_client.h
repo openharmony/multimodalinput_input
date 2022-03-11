@@ -14,8 +14,10 @@
  */
 #ifndef IF_MMI_CLIENT_H
 #define IF_MMI_CLIENT_H
-#include <memory>
+
 #include <functional>
+#include <memory>
+
 #include "if_client_msg_handler.h"
 
 namespace OHOS {

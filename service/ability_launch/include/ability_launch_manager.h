@@ -16,20 +16,22 @@
 #ifndef ABILITY_LAUNCH_MANAGER_H
 #define ABILITY_LAUNCH_MANAGER_H
 
+#include <chrono>
+#include <condition_variable>
+#include <functional>
 #include <fstream>
 #include <map>
-#include <condition_variable>
-#include <thread>
-#include <chrono>
-#include <functional>
 #include <mutex>
-#include <vector>
 #include <set>
+#include <thread>
+#include <vector>
 
+#include "nocopyable.h"
 #include "nlohmann/json.hpp"
 #include "singleton.h"
-#include "struct_multimodal.h"
+
 #include "key_event.h"
+#include "struct_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
@@ -57,6 +59,7 @@ struct ShortcutKey {
 class AbilityLaunchManager : public DelayedSingleton<AbilityLaunchManager> {
 public:
     AbilityLaunchManager();
+    DISALLOW_COPY_AND_MOVE(AbilityLaunchManager);
     ~AbilityLaunchManager() = default;
     bool CheckLaunchAbility(const std::shared_ptr<KeyEvent> &event);
 private:
@@ -75,7 +78,8 @@ private:
     ShortcutKey lastMatchedKey_;
     std::map<std::string, ShortcutKey> shortcutKeys_;
 };
+
+#define AbilityMgr AbilityLaunchManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define AbilityMgr OHOS::MMI::AbilityLaunchManager::GetInstance()
 #endif // ABILITY_LAUNCH_MANAGER_H

@@ -15,8 +15,10 @@
 
 #ifndef MMI_TOKEN_H
 #define MMI_TOKEN_H
-#include "immi_token.h"
+
 #include "nocopyable.h"
+
+#include "immi_token.h"
 
 namespace OHOS {
 namespace MMI {

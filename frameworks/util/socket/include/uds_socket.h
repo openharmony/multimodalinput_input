@@ -15,16 +15,19 @@
 #ifndef UDS_SOCKET_H
 #define UDS_SOCKET_H
 
+#include <atomic>
+#include <string>
+
+#include <fcntl.h>
 #include <sys/epoll.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/un.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <atomic>
-#include <string>
-#include "libmmi_util.h"
+
 #include "nocopyable.h"
+
+#include "libmmi_util.h"
 
 namespace OHOS {
 namespace MMI {

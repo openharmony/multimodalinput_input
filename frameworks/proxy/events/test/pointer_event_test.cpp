@@ -14,13 +14,14 @@
  */
 
 #include <gtest/gtest.h>
+
 #include "define_multimodal.h"
 #include "input_manager.h"
 #include "key_event.h"
-#include "standardized_event_manager.h"
-#include "proto.h"
 #include "pointer_event.h"
+#include "proto.h"
 #include "run_shell_util.h"
+#include "standardized_event_manager.h"
 #include "util.h"
 
 namespace OHOS {

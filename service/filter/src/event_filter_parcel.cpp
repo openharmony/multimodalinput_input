@@ -19,8 +19,9 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerEventParcel" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerEventParcel" };
+} // namespace
+
 bool PointerEventParcel::Marshalling(Parcel& out) const
 {
     if (data_ == nullptr) {

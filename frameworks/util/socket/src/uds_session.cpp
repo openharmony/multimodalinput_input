@@ -14,9 +14,11 @@
  */
 
 #include "uds_session.h"
-#include <sstream>
-#include <fcntl.h>
+
 #include <cinttypes>
+#include <sstream>
+
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/un.h>
 #include <unistd.h>
@@ -64,7 +66,8 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 
 void UDSSession::Close()
 {
-    MMI_LOGD("enter fd_:%{public}d,bHasClosed_ = %d.", fd_, bHasClosed_);
+    CALL_LOG_ENTER;
+    MMI_LOGD("fd_:%{public}d,bHasClosed_ = %d.", fd_, bHasClosed_);
     if (!bHasClosed_ && fd_ != -1) {
         close(fd_);
         bHasClosed_ = true;
@@ -99,15 +102,16 @@ bool UDSSession::SendMsg(NetPacket& pkt) const
 
 void UDSSession::AddEvent(int32_t id, int64_t time)
 {
-    MMI_LOGD("begin, event: %{public}d", id);
+    CALL_LOG_ENTER;
+    MMI_LOGD("event: %{public}d", id);
     EventTime eventTime = {id, time};
     events_.push_back(eventTime);
-    MMI_LOGD("end");
 }
 
 void UDSSession::DelEvents(int32_t id)
 {
-    MMI_LOGD("begin, event: %{public}d", id);
+    CALL_LOG_ENTER;
+    MMI_LOGD("event: %{public}d", id);
     int32_t count = 0;
     for (auto &item : events_) {
         ++count;
@@ -121,7 +125,6 @@ void UDSSession::DelEvents(int32_t id)
     if (events_.empty() || (currentTime < (events_.begin()->eventTime + INPUT_UI_TIMEOUT_TIME))) {
         isANRProcess_ = false;
     }
-    MMI_LOGD("end");
 }
 
 int64_t UDSSession::GetEarlistEventTime() const
@@ -131,7 +134,6 @@ int64_t UDSSession::GetEarlistEventTime() const
         MMI_LOGD("events_ is empty");
         return 0;
     }
-    MMI_LOGD("end");
     return events_.begin()->eventTime;
 }
 
@@ -142,6 +144,16 @@ bool UDSSession::IsEventQueueEmpty()
         return true;
     }
     return false;
+}
+
+void UDSSession::AddPermission(bool hasPermission)
+{
+    hasPermission_ = hasPermission;
+}
+
+bool UDSSession::HasPermission()
+{
+    return hasPermission_;
 }
 } // namespace MMI
 } // namespace OHOS

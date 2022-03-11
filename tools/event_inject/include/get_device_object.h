@@ -14,7 +14,6 @@
  */
 #ifndef GET_DEVICE_OBJECT_H
 #define GET_DEVICE_OBJECT_H
-
 #include "device_base.h"
 #include "processing_finger_device.h"
 #include "processing_pen_device.h"
@@ -31,6 +30,7 @@ class GetDeviceObject {
 public:
     GetDeviceObject() = default;
     ~GetDeviceObject() = default;
+    DISALLOW_COPY_AND_MOVE(GetDeviceObject);
     DeviceBase* CreateDeviceObject(const std::string deviceName);
 };
 } // namespace MMI

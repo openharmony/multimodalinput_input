@@ -12,14 +12,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef INTERCEPTOR_MANAGER_H
 #define INTERCEPTOR_MANAGER_H
 
 #include <list>
-#include "pointer_event.h"
-#include "singleton.h"
-#include "multimodal_event_handler.h"
+
 #include "nocopyable.h"
+#include "singleton.h"
+
+#include "multimodal_event_handler.h"
+#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {

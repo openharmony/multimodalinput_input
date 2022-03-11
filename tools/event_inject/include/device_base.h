@@ -14,8 +14,8 @@
  */
 #ifndef DEVICE_BASE_H
 #define DEVICE_BASE_H
-
 #include "msg_head.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -23,6 +23,7 @@ class DeviceBase {
 public:
     DeviceBase() = default;
     virtual ~DeviceBase() = default;
+    DISALLOW_COPY_AND_MOVE(DeviceBase);
     virtual int32_t TransformJsonDataToInputData(const Json& inputEventArrays,
                                                  InputEventArray& inputEventArray) = 0;
     void SetTimeToLibinputEvent(InjectEvent& injectEvent);

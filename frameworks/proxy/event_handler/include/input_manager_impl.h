@@ -17,22 +17,26 @@
 #define INPUT_MANAGER_IMPL_H
 
 #include <vector>
+
+#include "nocopyable.h"
 #include "singleton.h"
+
 #include "display_info.h"
-#include "i_input_event_consumer.h"
-#include "pointer_event.h"
-#include "if_mmi_client.h"
-#include "net_packet.h"
-#include "if_client_msg_handler.h"
 #include "event_filter_service.h"
-#include "input_monitor_manager.h"
+#include "i_input_event_consumer.h"
+#include "if_client_msg_handler.h"
+#include "if_mmi_client.h"
 #include "input_interceptor_manager.h"
+#include "input_monitor_manager.h"
+#include "net_packet.h"
+#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
 class InputManagerImpl : public DelayedSingleton<InputManagerImpl> {
 public:
     virtual ~InputManagerImpl() = default;
+    DISALLOW_COPY_AND_MOVE(InputManagerImpl);
     InputManagerImpl() = default;
 
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
