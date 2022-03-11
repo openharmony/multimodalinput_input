@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include "injection_tools_help_func.h"
 #include <gtest/gtest.h>
+
+#include "injection_tools_help_func.h"
 #include "msg_head.h"
 #include "proto.h"
 

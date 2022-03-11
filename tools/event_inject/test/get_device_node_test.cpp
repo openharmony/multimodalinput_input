@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+
 #include "msg_head.h"
 #include "proto.h"
 #define private public
