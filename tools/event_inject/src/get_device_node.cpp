@@ -99,8 +99,7 @@ void GetDeviceNode::GetDeviceCmd(const std::vector<std::string>& cmdResult, Devi
 {
     std::string name;
     for (const auto &item : cmdResult) {
-        if(item.empty())
-        {
+        if (item.empty()) {
             MMI_LOGE("device info is none");
             return;
         }
