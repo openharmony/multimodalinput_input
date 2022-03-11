@@ -35,9 +35,9 @@ public:
     void SetType(int32_t deviceType);
     int32_t GetType() const;
 private:
-    int32_t id_;
+    int32_t id_ {0};
     std::string name_;
-    int32_t deviceType_;
+    int32_t deviceType_ {0};
     std::vector<int32_t> deviceIdList_;
 };
 } // namespace MMI
