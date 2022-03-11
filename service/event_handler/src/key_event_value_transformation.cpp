@@ -14,7 +14,9 @@
  */
 
 #include "key_event_value_transformation.h"
+
 #include <map>
+
 #include "hos_key_event.h"
 #include "util.h"
 
