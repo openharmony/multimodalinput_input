@@ -16,12 +16,14 @@
 #define STANDARDIZED_EVENT_MANAGER_H
 
 #include <set>
-#include "if_mmi_client.h"
+
 #include "iremote_object.h"
-#include "key_event_input_subscribe_manager.h"
 #include "nocopyable.h"
-#include "pointer_event.h"
 #include "singleton.h"
+
+#include "if_mmi_client.h"
+#include "key_event_input_subscribe_manager.h"
+#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {

@@ -15,13 +15,15 @@
 #ifndef INPUT_EVENT_MONITOR_MANAGER_H
 #define INPUT_EVENT_MONITOR_MANAGER_H
 
-#include "key_event.h"
-#include "pointer_event.h"
-#include "multimodal_event_handler.h"
-#include "proto.h"
+#include <list>
+
+#include "nocopyable.h"
 #include "singleton.h"
 
-#include <list>
+#include "key_event.h"
+#include "multimodal_event_handler.h"
+#include "pointer_event.h"
+#include "proto.h"
 
 namespace OHOS {
 namespace MMI {
@@ -39,6 +41,7 @@ struct MonitorItem {
 class InputEventMonitorManager {
 public:
     InputEventMonitorManager();
+    DISALLOW_COPY_AND_MOVE(InputEventMonitorManager);
     virtual ~InputEventMonitorManager();
 
     int32_t AddInputEventMontior(std::function<void (std::shared_ptr<KeyEvent>)> keyEventMonitor);

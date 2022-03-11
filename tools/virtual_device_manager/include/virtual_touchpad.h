@@ -15,7 +15,6 @@
 
 #ifndef VIRTUAL_TOUCHPAD_H
 #define VIRTUAL_TOUCHPAD_H
-
 #include "virtual_device.h"
 
 namespace OHOS {
@@ -24,6 +23,8 @@ class VirtualTouchpad : public VirtualDevice {
 public:
     VirtualTouchpad();
     ~VirtualTouchpad();
+    DISALLOW_COPY_AND_MOVE(VirtualTouchpad);
+
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
     const std::vector<uint32_t>& GetKeys() const override;

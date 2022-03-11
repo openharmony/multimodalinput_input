@@ -15,7 +15,6 @@
 
 #ifndef VIRTUAL_REMOTE_CONTROL_H
 #define VIRTUAL_REMOTE_CONTROL_H
-
 #include "virtual_device.h"
 
 namespace OHOS {
@@ -24,6 +23,8 @@ class VirtualRemoteControl : public VirtualDevice {
 public:
     VirtualRemoteControl();
     ~VirtualRemoteControl();
+    DISALLOW_COPY_AND_MOVE(VirtualRemoteControl);
+
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
     const std::vector<uint32_t>& GetKeys() const override;

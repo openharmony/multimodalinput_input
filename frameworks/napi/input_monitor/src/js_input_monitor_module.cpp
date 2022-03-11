@@ -22,17 +22,16 @@
 #include "define_multimodal.h"
 #include "js_input_monitor_manager.h"
 
-
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorModule" };
-    constexpr size_t MAX_STRING_LEN = 1024;
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorModule" };
+constexpr size_t MAX_STRING_LEN = 1024;
+} // namespace
 
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     size_t argc = 2;
     const size_t requireArgc = 2;
     napi_value argv[requireArgc];
@@ -85,13 +84,12 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         return nullptr;
     }
     JsInputMonMgr.AddMonitor(env, argv[1]);
-    MMI_LOGD("Leave");
     return nullptr;
 }
 
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     size_t argc = 2;
     napi_value argv[argc];
     argv[0] = nullptr;
@@ -152,20 +150,18 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     }
 
     JsInputMonMgr.RemoveMonitor(env, argv[1]);
-    MMI_LOGD("Leave");
     return nullptr;
 }
 
 EXTERN_C_START
 static napi_value MmiInputMonitorInit(napi_env env, napi_value exports)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
-    MMI_LOGD("Leave");
     return exports;
 }
 EXTERN_C_END

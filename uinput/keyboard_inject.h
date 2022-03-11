@@ -21,6 +21,7 @@
 #include <mutex>
 
 #include "inject_thread.h"
+#include "nocopyable.h"
 #include "singleton.h"
 #include "virtual_keyboard.h"
 
@@ -30,6 +31,7 @@ class KeyboardInject : public Singleton<KeyboardInject> {
 public:
     KeyboardInject();
     virtual ~KeyboardInject() = default;
+    DISALLOW_COPY_AND_MOVE(KeyboardInject);
     void InjectKeyEvent(uint16_t code, uint32_t value) const;
 
 private:

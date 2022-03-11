@@ -14,17 +14,20 @@
  */
 
 #include "run_shell_util.h"
+
 #include <cstdio>
+
 #include "define_multimodal.h"
+
 
 namespace OHOS {
 namespace MMI {
 namespace {
-    const std::string HILOG_GREP = "hilog -x | grep ";
-    constexpr int32_t MAXSIZE = 1000;
-    const std::regex REGEX_LOG("\n");
-    static inline constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RUNSHELLUTILL" };
-}
+const std::string HILOG_GREP = "hilog -x | grep ";
+constexpr int32_t MAXSIZE = 1000;
+const std::regex REGEX_LOG("\n");
+static inline constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RUNSHELLUTILL" };
+} // namespace
 
 RunShellUtil::RunShellUtil(): logMaxSize_(100) {}
 
@@ -32,7 +35,7 @@ RunShellUtil::~RunShellUtil() {}
 
 int32_t RunShellUtil::RunShellCommand(const std::string &command, std::vector<std::string> &vLog)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     vLog.clear();
     const std::string command_ = HILOG_GREP + "'" + command + "'";
 

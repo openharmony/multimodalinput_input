@@ -19,15 +19,19 @@
 #include <limits>
 #include <map>
 #include <mutex>
+
+#include "singleton.h"
+
 #include "input_handler_type.h"
 #include "i_input_event_consumer.h"
 #include "pointer_event.h"
-#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
 class InputHandlerManager : public Singleton<InputHandlerManager> {
 public:
+    InputHandlerManager() = default;
+    DISALLOW_COPY_AND_MOVE(InputHandlerManager);
     int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer);
     void RemoveHandler(int32_t handlerId, InputHandlerType handlerType);
     void MarkConsumed(int32_t monitorId, int32_t eventId);

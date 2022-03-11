@@ -19,13 +19,16 @@
 #include <set>
 #include "input_handler_type.h"
 #include "i_input_event_handler.h"
+#include "nocopyable.h"
 #include "uds_session.h"
 #include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
-class InputHandlerManagerGlobal : public Singleton<OHOS::MMI::InputHandlerManagerGlobal> {
+class InputHandlerManagerGlobal : public Singleton<InputHandlerManagerGlobal> {
 public:
+    InputHandlerManagerGlobal() = default;
+    DISALLOW_COPY_AND_MOVE(InputHandlerManagerGlobal);
     int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session);

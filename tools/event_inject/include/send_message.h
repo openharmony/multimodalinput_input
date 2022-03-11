@@ -16,6 +16,7 @@
 #ifndef SEND_MESSAGE_H
 #define SEND_MESSAGE_H
 #include "msg_head.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -23,6 +24,7 @@ class SendMessage {
 public:
     SendMessage() = default;
     ~SendMessage() = default;
+    DISALLOW_COPY_AND_MOVE(SendMessage);
     int32_t GetDevIndexName(const std::string& deviceName);
 private:
     static constexpr int64_t INJECT_SLEEP_TIMES = 10;

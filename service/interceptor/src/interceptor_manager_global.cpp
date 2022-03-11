@@ -30,7 +30,7 @@ InterceptorManagerGlobal::~InterceptorManagerGlobal() {}
 
 void InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     InterceptorItem interceptorItem = {};
     interceptorItem.sourceType = sourceType;
     interceptorItem.id = id;
@@ -43,12 +43,11 @@ void InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, 
         iter = interceptors_.insert(iter, interceptorItem);
         MMI_LOGD("sourceType:%{public}d,fd:%{public}d register in server", sourceType, session->GetFd());
     }
-    MMI_LOGD("leave");
 }
 
 void InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     InterceptorItem interceptorItem = {};
     interceptorItem.id = id;
     auto iter = std::find(interceptors_.begin(), interceptors_.end(), interceptorItem);
@@ -59,12 +58,11 @@ void InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
                  iter->session->GetFd());
         interceptors_.erase(iter);
     }
-    MMI_LOGD("leave");
 }
 
 bool InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPF(pointerEvent);
     if (interceptors_.empty()) {
         MMI_LOGE("%{public}s no interceptor to send msg", __func__);
@@ -87,13 +85,12 @@ bool InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> poin
         MMI_LOGD("server send the interceptor msg to client, pid:%{public}d", item.session->GetPid());
         item.session->SendMsg(pkt);
     }
-    MMI_LOGD("leave");
     return true;
 }
 
 bool InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPF(keyEvent);
     if (interceptors_.empty()) {
         MMI_LOGE("%{public}s no interceptor to send msg", __func__);
@@ -108,7 +105,6 @@ bool InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
             item.session->SendMsg(pkt);
         }
     }
-    MMI_LOGD("leave");
     return true;
 }
 } // namespace MMI
