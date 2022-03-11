@@ -40,7 +40,7 @@ public:
 private:
     std::set<int32_t> preKeys_ {};
     int32_t finalKey_ { -1 };
-    bool isFinalKeyDown_;
+    bool isFinalKeyDown_ {false};
     int32_t finalKeyDownDuration_ { 0 };
 };
 } // namespace MMI
