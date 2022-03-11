@@ -12,10 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef MMI_INTERFACE_H
 #define MMI_INTERFACE_H
 
 #include "singleton.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -12,13 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "input_windows_manager.h"
-#include <cstdio>
+
 #include <cstdlib>
+#include <cstdio>
+
 #include "event_dump.h"
+#include "pointer_drawing_manager.h"
 #include "util.h"
 #include "util_ex.h"
-#include "pointer_drawing_manager.h"
 
 namespace OHOS {
 namespace MMI {

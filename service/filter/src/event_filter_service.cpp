@@ -14,11 +14,15 @@
  */
 
 #include "event_filter_service.h"
+
 #include <cstring>
+
 #include <sys/types.h>
 #include <unistd.h>
-#include "mmi_log.h"
+
 #include "string_ex.h"
+
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {

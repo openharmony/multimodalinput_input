@@ -14,12 +14,15 @@
  */
 
 #include "event_filter_stub.h"
+
 #include <sys/socket.h>
 #include <sys/types.h>
-#include "event_filter_parcel.h"
+
 #include "ipc_skeleton.h"
-#include "mmi_log.h"
 #include "string_ex.h"
+
+#include "event_filter_parcel.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {

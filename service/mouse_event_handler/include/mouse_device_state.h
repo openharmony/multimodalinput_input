@@ -17,10 +17,12 @@
 
 #include <map>
 #include <mutex>
+
 #include "nocopyable.h"
+#include "singleton.h"
+
 #include "pointer_event.h"
 #include "struct_multimodal.h"
-#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {

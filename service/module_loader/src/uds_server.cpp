@@ -14,12 +14,16 @@
  */
 
 #include "uds_server.h"
-#include <list>
+
 #include <cinttypes>
+#include <list>
+
 #include <sys/socket.h>
+
 #include "accesstoken_kit.h"
-#include "i_multimodal_input_connect.h"
 #include "ipc_skeleton.h"
+
+#include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
 #include "util.h"
 #include "util_ex.h"

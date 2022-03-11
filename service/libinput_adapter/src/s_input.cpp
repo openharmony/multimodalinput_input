@@ -14,14 +14,18 @@
  */
 
 #include "s_input.h"
+
 #include <climits>
-#include <fcntl.h>
 #include <cinttypes>
+
+#include <fcntl.h>
 #include <sys/epoll.h>
 #include <unistd.h>
+
 #include "libmmi_util.h"
-#include "util.h"
 #include "input_windows_manager.h"
+#include "util.h"
+
 
 namespace OHOS {
 namespace MMI {
