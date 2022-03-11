@@ -26,11 +26,11 @@
 #include <vector>
 
 #include <fcntl.h>
-#include <linux/input.h>
-#include <linux/uinput.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <linux/input.h>
+#include <linux/uinput.h>
 
 #include "nlohmann/json.hpp"
 
