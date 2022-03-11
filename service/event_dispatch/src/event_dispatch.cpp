@@ -122,17 +122,17 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_LOGD("Interception and monitor succeeded");
         return RET_OK;
     }
+    auto fd = WinMgr->UpdateTargetPointer(point);
+    if (fd < 0) {
+        MMI_LOGE("The fd less than 0, fd: %{public}d", fd);
+        return RET_ERR;
+    }
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(point, pkt);
     HandlePointerEventTrace(point);
     auto udsServer = InputHandler->GetUDSServer();
     if (udsServer == nullptr) {
         MMI_LOGE("UdsServer is a nullptr");
-        return RET_ERR;
-    }
-    auto fd = WinMgr->UpdateTargetPointer(point);
-    if (fd < 0) {
-        MMI_LOGE("The fd less than 0, fd: %{public}d", fd);
         return RET_ERR;
     }
 
