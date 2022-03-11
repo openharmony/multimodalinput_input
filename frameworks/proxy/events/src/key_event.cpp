@@ -14,14 +14,16 @@
  */
 
 #include "key_event.h"
+
 #include "mmi_log.h"
+
 
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "KeyEvent"};
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "KeyEvent"};
+} // namespace
 const int32_t KeyEvent::KEYCODE_FN = 0;
 const int32_t KeyEvent::KEYCODE_UNKNOWN = -1;
 const int32_t KeyEvent::KEYCODE_HOME = 1;
@@ -544,7 +546,7 @@ void KeyEvent::AddKeyItem(const KeyItem& keyItem)
     keys_.push_back(keyItem);
 }
 
-std::vector<KeyEvent::KeyItem> KeyEvent::GetKeyItems()
+std::vector<KeyEvent::KeyItem> KeyEvent::GetKeyItems() const
 {
     return keys_;
 }
@@ -1409,7 +1411,7 @@ std::shared_ptr<KeyEvent> KeyEvent::Clone(std::shared_ptr<KeyEvent> keyEvent) {
 
 bool KeyEvent::IsValidKeyItem() const
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     int32_t noPressNum = 0;
     int32_t keyCode = GetKeyCode();
     int32_t action = GetKeyAction();
@@ -1448,13 +1450,12 @@ bool KeyEvent::IsValidKeyItem() const
         MMI_LOGE("keyCode is not unique when isPressed is false");
         return false;
     }
-    MMI_LOGD("leave");
     return true;
 }
 
 bool KeyEvent::IsValid() const
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     int32_t keyCode = GetKeyCode();
     if (keyCode <= KEYCODE_UNKNOWN) {
         MMI_LOGE("KeyCode_ is invalid");
@@ -1477,7 +1478,6 @@ bool KeyEvent::IsValid() const
         MMI_LOGE("IsValidKeyItem is invalid");
         return false;
     }
-    MMI_LOGD("leave");
     return true;
 }
 

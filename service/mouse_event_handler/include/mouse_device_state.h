@@ -17,6 +17,7 @@
 
 #include <map>
 #include <mutex>
+#include "nocopyable.h"
 #include "pointer_event.h"
 #include "struct_multimodal.h"
 #include "singleton.h"
@@ -48,13 +49,14 @@ public:
 public:
     MouseDeviceState();
     ~MouseDeviceState();
+    DISALLOW_COPY_AND_MOVE(MouseDeviceState);
 
     int32_t GetMouseCoordsX() const;
     int32_t GetMouseCoordsY() const;
     void SetMouseCoords(const int32_t x, const int32_t y);
     bool IsLeftBtnPressed();
     void GetPressedButtons(std::vector<int32_t>& pressedButtons);
-    std::map<uint32_t, int32_t> GetMouseBtnState();
+    std::map<uint32_t, int32_t> GetMouseBtnState() const;
     void MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE btnState);
 
 private:
@@ -62,12 +64,11 @@ private:
     void ChangeMouseState(const BUTTON_STATE btnState, int32_t& btnStateCount);
 
 private:
-    std::mutex mu_;
     MouseDeviceCoords mouseCoord_;
     std::map<uint32_t, int32_t> mouseBtnState_;
 };
+
+#define MouseState MouseDeviceState::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-
-#define MouseState OHOS::MMI::MouseDeviceState::GetInstance()
 #endif // MOUSE_DEVICE_STATE_H

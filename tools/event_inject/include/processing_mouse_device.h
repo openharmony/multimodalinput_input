@@ -14,7 +14,6 @@
  */
 #ifndef PROCESSING_MOUSE_DEVICE_H
 #define PROCESSING_MOUSE_DEVICE_H
-
 #include "msg_head.h"
 #include "device_base.h"
 
@@ -33,6 +32,7 @@ class ProcessingMouseDevice : public DeviceBase {
 public:
     ProcessingMouseDevice() = default;
     ~ProcessingMouseDevice() = default;
+    DISALLOW_COPY_AND_MOVE(ProcessingMouseDevice);
     int32_t TransformJsonDataToInputData(const Json& inputEventArrays, InputEventArray& inputEventArray);
 private:
     int32_t AnalysisMouseEvent(const Json& inputData, std::vector<MouseEvent>& mouseEventArray);

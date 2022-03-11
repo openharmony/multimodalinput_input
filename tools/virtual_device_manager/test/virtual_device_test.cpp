@@ -33,6 +33,12 @@ public:
     const uint16_t PRODUCT_ID = 0x2510;
 };
 
+/**
+ * @tc.name:Test_MakeFolder_01
+ * @tc.desc:Verify VirtualDevice function MakeFolder
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_MakeFolder_01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -40,6 +46,12 @@ HWTEST_F(VirtualDeviceTest, Test_MakeFolder_01, TestSize.Level1)
     device.MakeFolder(folderPath);
 }
 
+/**
+ * @tc.name:Test_MakeFolder_02
+ * @tc.desc:Verify VirtualDevice function MakeFolder
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_MakeFolder_02, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -48,6 +60,12 @@ HWTEST_F(VirtualDeviceTest, Test_MakeFolder_02, TestSize.Level1)
     remove(folderPath.c_str());
 }
 
+/**
+ * @tc.name:Test_CreateHandle_mouse
+ * @tc.desc:Verify VirtualDevice function CreateHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_CreateHandle_mouse, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -56,6 +74,12 @@ HWTEST_F(VirtualDeviceTest, Test_CreateHandle_mouse, TestSize.Level1)
     EXPECT_TRUE(ret);
 }
 
+/**
+ * @tc.name:Test_CreateHandle_keyboard
+ * @tc.desc:Verify VirtualDevice function CreateHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_CreateHandle_keyboard, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -64,6 +88,12 @@ HWTEST_F(VirtualDeviceTest, Test_CreateHandle_keyboard, TestSize.Level1)
     EXPECT_TRUE(ret);
 }
 
+/**
+ * @tc.name:Test_CreateHandle_knob
+ * @tc.desc:Verify VirtualDevice function CreateHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_CreateHandle_knob, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -72,6 +102,12 @@ HWTEST_F(VirtualDeviceTest, Test_CreateHandle_knob, TestSize.Level1)
     EXPECT_TRUE(ret);
 }
 
+/**
+ * @tc.name:Test_CreateHandle_joystick
+ * @tc.desc:Verify VirtualDevice function CreateHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_CreateHandle_joystick, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -80,6 +116,12 @@ HWTEST_F(VirtualDeviceTest, Test_CreateHandle_joystick, TestSize.Level1)
     EXPECT_TRUE(ret);
 }
 
+/**
+ * @tc.name:Test_CreateHandle_trackball
+ * @tc.desc:Verify VirtualDevice function CreateHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_CreateHandle_trackball, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -88,6 +130,12 @@ HWTEST_F(VirtualDeviceTest, Test_CreateHandle_trackball, TestSize.Level1)
     EXPECT_TRUE(ret);
 }
 
+/**
+ * @tc.name:Test_CreateHandle_remotecontrol
+ * @tc.desc:Verify VirtualDevice function CreateHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_CreateHandle_remotecontrol, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -96,6 +144,12 @@ HWTEST_F(VirtualDeviceTest, Test_CreateHandle_remotecontrol, TestSize.Level1)
     EXPECT_TRUE(ret);
 }
 
+/**
+ * @tc.name:Test_CreateHandle_trackpad
+ * @tc.desc:Verify VirtualDevice function CreateHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_CreateHandle_trackpad, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -104,6 +158,12 @@ HWTEST_F(VirtualDeviceTest, Test_CreateHandle_trackpad, TestSize.Level1)
     EXPECT_TRUE(ret);
 }
 
+/**
+ * @tc.name:Test_CreateHandle_gamepad
+ * @tc.desc:Verify VirtualDevice function CreateHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_CreateHandle_gamepad, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -112,6 +172,12 @@ HWTEST_F(VirtualDeviceTest, Test_CreateHandle_gamepad, TestSize.Level1)
     EXPECT_TRUE(ret);
 }
 
+/**
+ * @tc.name:Test_CreateHandle_touchpad
+ * @tc.desc:Verify VirtualDevice function CreateHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_CreateHandle_touchpad, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -120,6 +186,12 @@ HWTEST_F(VirtualDeviceTest, Test_CreateHandle_touchpad, TestSize.Level1)
     EXPECT_TRUE(ret);
 }
 
+/**
+ * @tc.name:Test_CreateHandle_touchscreen
+ * @tc.desc:Verify VirtualDevice function CreateHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_CreateHandle_touchscreen, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -128,6 +200,12 @@ HWTEST_F(VirtualDeviceTest, Test_CreateHandle_touchscreen, TestSize.Level1)
     EXPECT_TRUE(ret);
 }
 
+/**
+ * @tc.name:Test_CreateHandle_phone
+ * @tc.desc:Verify VirtualDevice function CreateHandle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_CreateHandle_phone, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -136,6 +214,12 @@ HWTEST_F(VirtualDeviceTest, Test_CreateHandle_phone, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
+/**
+ * @tc.name:Test_SelectDevice_false01
+ * @tc.desc:Verify VirtualDevice function SelectDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_SelectDevice_false01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -147,6 +231,12 @@ HWTEST_F(VirtualDeviceTest, Test_SelectDevice_false01, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
+/**
+ * @tc.name:Test_AddDevice_false01
+ * @tc.desc:Verify VirtualDevice function AddDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_AddDevice_false01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -157,6 +247,12 @@ HWTEST_F(VirtualDeviceTest, Test_AddDevice_false01, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
+/**
+ * @tc.name:Test_AddDevice_true
+ * @tc.desc:Verify VirtualDevice function AddDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_AddDevice_true, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -168,6 +264,12 @@ HWTEST_F(VirtualDeviceTest, Test_AddDevice_true, TestSize.Level1)
     EXPECT_TRUE(ret);
 }
 
+/**
+ * @tc.name:Test_SelectDevice_true
+ * @tc.desc:Verify VirtualDevice function SelectDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_SelectDevice_true, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -177,6 +279,12 @@ HWTEST_F(VirtualDeviceTest, Test_SelectDevice_true, TestSize.Level1)
     EXPECT_TRUE(ret);
 }
 
+/**
+ * @tc.name:Test_AddDevice_false02
+ * @tc.desc:Verify VirtualDevice function AddDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_AddDevice_false02, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -188,6 +296,12 @@ HWTEST_F(VirtualDeviceTest, Test_AddDevice_false02, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
+/**
+ * @tc.name:Test_CloseDevice_flase01
+ * @tc.desc:Verify VirtualDevice function CloseDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_CloseDevice_flase01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -198,6 +312,12 @@ HWTEST_F(VirtualDeviceTest, Test_CloseDevice_flase01, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
+/**
+ * @tc.name:Test_CloseDevice_flase02
+ * @tc.desc:Verify VirtualDevice function CloseDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_CloseDevice_flase02, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -209,6 +329,12 @@ HWTEST_F(VirtualDeviceTest, Test_CloseDevice_flase02, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
+/**
+ * @tc.name:Test_FunctionalShunt_listfalse01
+ * @tc.desc:Verify VirtualDevice function FunctionalShunt
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_listfalse01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -220,6 +346,12 @@ HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_listfalse01, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
+/**
+ * @tc.name:Test_FunctionalShunt_listfalse02
+ * @tc.desc:Verify VirtualDevice function FunctionalShunt
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_listfalse02, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -232,6 +364,12 @@ HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_listfalse02, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
+/**
+ * @tc.name:Test_FunctionalShunt_addFalse
+ * @tc.desc:Verify VirtualDevice function FunctionalShunt
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_addFalse, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -244,6 +382,12 @@ HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_addFalse, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
+/**
+ * @tc.name:Test_FunctionalShunt_addTrue
+ * @tc.desc:Verify VirtualDevice function FunctionalShunt
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_addTrue, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -256,6 +400,12 @@ HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_addTrue, TestSize.Level1)
     EXPECT_TRUE(ret);
 }
 
+/**
+ * @tc.name:Test_FunctionalShunt_closeFalse01
+ * @tc.desc:Verify VirtualDevice function FunctionalShunt
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_closeFalse01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -268,6 +418,12 @@ HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_closeFalse01, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
+/**
+ * @tc.name:Test_FunctionalShunt_closeTrue01
+ * @tc.desc:Verify VirtualDevice function FunctionalShunt
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_closeTrue01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -285,6 +441,12 @@ HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_closeTrue01, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
+/**
+ * @tc.name:Test_FunctionalShunt_mkdirFalse01
+ * @tc.desc:Verify VirtualDevice function FunctionalShunt
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_mkdirFalse01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -297,6 +459,12 @@ HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_mkdirFalse01, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
+/**
+ * @tc.name:Test_FunctionalShunt_False01
+ * @tc.desc:Verify VirtualDevice function FunctionalShunt
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_False01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -308,6 +476,12 @@ HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_False01, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
+/**
+ * @tc.name:Test_SelectDevice_false02
+ * @tc.desc:Verify VirtualDevice function SelectDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_SelectDevice_false02, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -318,6 +492,12 @@ HWTEST_F(VirtualDeviceTest, Test_SelectDevice_false02, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
+/**
+ * @tc.name:Test_CloseDevice_false03
+ * @tc.desc:Verify VirtualDevice function CloseDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_CloseDevice_false03, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -329,6 +509,12 @@ HWTEST_F(VirtualDeviceTest, Test_CloseDevice_false03, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
+/**
+ * @tc.name:Test_SelectDevice_false03
+ * @tc.desc:Verify VirtualDevice function SelectDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_SelectDevice_false03, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -339,6 +525,12 @@ HWTEST_F(VirtualDeviceTest, Test_SelectDevice_false03, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
+/**
+ * @tc.name:Test_AddDevice_false03
+ * @tc.desc:Verify VirtualDevice function AddDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_AddDevice_false03, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -350,6 +542,12 @@ HWTEST_F(VirtualDeviceTest, Test_AddDevice_false03, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
+/**
+ * @tc.name:Test_DoIoctl_false
+ * @tc.desc:Verify VirtualDevice function DoIoctl
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_DoIoctl_false, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
@@ -357,6 +555,12 @@ HWTEST_F(VirtualDeviceTest, Test_DoIoctl_false, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
+/**
+ * @tc.name:Test_SetUp_01
+ * @tc.desc:Verify VirtualDevice function SetUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(VirtualDeviceTest, Test_SetUp_01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);

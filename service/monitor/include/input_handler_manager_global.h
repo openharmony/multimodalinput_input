@@ -19,13 +19,16 @@
 #include <set>
 #include "input_handler_type.h"
 #include "i_input_event_handler.h"
+#include "nocopyable.h"
 #include "uds_session.h"
 #include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
-class InputHandlerManagerGlobal : public Singleton<OHOS::MMI::InputHandlerManagerGlobal> {
+class InputHandlerManagerGlobal : public Singleton<InputHandlerManagerGlobal> {
 public:
+    InputHandlerManagerGlobal() = default;
+    DISALLOW_COPY_AND_MOVE(InputHandlerManagerGlobal);
     int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session);
@@ -71,7 +74,6 @@ private:
         void Monitor(std::shared_ptr<PointerEvent> pointerEvent);
         void OnSessionLost(SessionPtr session);
 
-        std::mutex lockMonitors_;
         std::set<SessionHandler> monitors_;
         std::shared_ptr<PointerEvent> lastPointerEvent_ = nullptr;
         int32_t downEventId_ { -1 };

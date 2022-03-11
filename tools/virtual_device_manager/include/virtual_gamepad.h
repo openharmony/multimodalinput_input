@@ -15,7 +15,6 @@
 
 #ifndef VIRTUAL_GAMEPAD_H
 #define VIRTUAL_GAMEPAD_H
-
 #include "virtual_device.h"
 
 namespace OHOS {
@@ -24,6 +23,8 @@ class VirtualGamePad : public VirtualDevice {
 public:
     VirtualGamePad();
     ~VirtualGamePad();
+    DISALLOW_COPY_AND_MOVE(VirtualGamePad);
+
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
     const std::vector<uint32_t>& GetKeys() const override;

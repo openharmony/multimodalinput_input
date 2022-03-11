@@ -24,6 +24,7 @@
 #include "pixel_map.h"
 #include "window.h"
 #include "draw/canvas.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -31,6 +32,7 @@ class PointerDrawingManager : public DelayedSingleton<PointerDrawingManager>, pu
 public:
     PointerDrawingManager();
     ~PointerDrawingManager();
+    DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
     void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY);
     void TellDisplayInfo(int32_t displayId, int32_t width, int32_t height);
     void UpdatePointerDevice(bool hasPointerDevice);
@@ -43,7 +45,7 @@ public:
 private:
     void CreatePointerWindow(int32_t displayId, int32_t globalX, int32_t globalY);
     sptr<OHOS::Surface> GetLayer();
-    sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer);
+    sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer) const;
     void DoDraw(uint8_t *addr, uint32_t width, uint32_t height);
     void DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas);
     void DrawManager();
@@ -58,7 +60,8 @@ private:
     int32_t displayHeight_ = 0;
     bool hasPointerDevice_ = false;
 };
+
+#define PointerDrawMgr PointerDrawingManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define PointerDrawMgr OHOS::MMI::PointerDrawingManager::GetInstance()
 #endif // POINTER_DRAWING_MANAGER_H

@@ -14,7 +14,6 @@
  */
 #ifndef PROCESSING_GAME_PAD_DEVICE_H
 #define PROCESSING_GAME_PAD_DEVICE_H
-
 #include "msg_head.h"
 #include "device_base.h"
 
@@ -31,6 +30,7 @@ class ProcessingGamePadDevice : public DeviceBase {
 public:
     ProcessingGamePadDevice() = default;
     ~ProcessingGamePadDevice() = default;
+    DISALLOW_COPY_AND_MOVE(ProcessingGamePadDevice);
     int32_t TransformJsonDataToInputData(const Json& originalEvent, InputEventArray& inputEventArray);
 private:
     int32_t AnalysisGamePadEvent(const Json& inputData, std::vector<GamePadEvent>& padEventArray);

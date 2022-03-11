@@ -13,11 +13,13 @@
  * limitations under the License.
  */
 
-#include "run_shell_util.h"
 #include <thread>
 #include <vector>
+
 #include <gtest/gtest.h>
+
 #include "define_multimodal.h"
+#include "run_shell_util.h"
 
 namespace OHOS {
 namespace MMI {
@@ -39,6 +41,12 @@ public:
     static inline RunShellUtil runCommand;
 };
 
+/**
+ * @tc.name:RunShellUtilTest_RunShellCommand_001
+ * @tc.desc:Verify run shell command
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(RunShellUtilTest, RunShellUtilTest_RunShellCommand_001, TestSize.Level1)
 {
     std::string command = "test runshellutil";
@@ -58,6 +66,12 @@ HWTEST_F(RunShellUtilTest, RunShellUtilTest_RunShellCommand_001, TestSize.Level1
     }
 }
 
+/**
+ * @tc.name:RunShellUtilTest_RunShellCommand_002
+ * @tc.desc:Verify run shell command
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(RunShellUtilTest, RunShellUtilTest_RunShellCommand_002, TestSize.Level1)
 {
     std::string command = "test runshellutil";

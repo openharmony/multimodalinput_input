@@ -15,24 +15,30 @@
 
 #ifndef INPUT_DEVICE_MANAGER_H
 #define INPUT_DEVICE_MANAGER_H
+
 #include <list>
 #include <string>
-#include "util.h"
+
+#include "nocopyable.h"
 #include "singleton.h"
+
 #include "../../../common/include/device_observer.h"
-#include "msg_handler.h"
 #include "event_dispatch.h"
 #include "event_package.h"
 #include "input_device.h"
+#include "msg_handler.h"
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {
 class InputDeviceManager : public DelayedSingleton<InputDeviceManager>, public Subject {
 public:
+    InputDeviceManager() = default;
+    DISALLOW_COPY_AND_MOVE(InputDeviceManager);
     void OnInputDeviceAdded(struct libinput_device* inputDevice);
     void OnInputDeviceRemoved(struct libinput_device* inputDevice);
-    std::vector<int32_t> GetInputDeviceIds();
-    std::shared_ptr<InputDevice> GetInputDevice(int32_t id);
+    std::vector<int32_t> GetInputDeviceIds() const;
+    std::shared_ptr<InputDevice> GetInputDevice(int32_t id) const;
     void GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback);
     void FindInputDeviceIdAsync(int32_t deviceId, std::function<void(std::shared_ptr<InputDevice>)> callback);
     int32_t FindInputDeviceId(struct libinput_device* inputDevice);
@@ -47,7 +53,8 @@ private:
     int32_t nextId_ {0};
     std::list<std::shared_ptr<DeviceObserver>> observers_;
 };
+
+#define InputDevMgr InputDeviceManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define InputDevMgr OHOS::MMI::InputDeviceManager::GetInstance()
 #endif // INPUT_DEVICE_MANAGER_H

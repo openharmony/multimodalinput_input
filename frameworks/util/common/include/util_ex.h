@@ -15,14 +15,16 @@
 #ifndef UTIL_EX_H
 #define UTIL_EX_H
 
-#include <map>
-#include <vector>
-#include <string>
 #include <ctime>
+#include <map>
+#include <string>
 #include <type_traits>
+#include <vector>
+
+#include "securec.h"
+
 #include "define_multimodal.h"
 #include "mmi_log.h"
-#include "securec.h"
 #include "struct_multimodal.h"
 #include "util.h"
 
@@ -75,7 +77,7 @@ namespace MMI {
             ret = 0;
         };
 
-        ret = sprintf_s(outBuf, outBufSize - writeLen, "[%s]", OHOS::MMI::GetProgramName());
+        ret = sprintf_s(outBuf, outBufSize - writeLen, "[%s]", GetProgramName());
         funcAdvanceWriteLen(ret);
         ret = sprintf_s(outBuf, outBufSize - writeLen, titleFormat, args...);
         funcAdvanceWriteLen(ret);

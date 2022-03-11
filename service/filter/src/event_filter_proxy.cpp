@@ -25,7 +25,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventFilterProxy" };
 } // namespace
 
-// 获取其他设备注册的SA的Proxy
 EventFilterProxy::EventFilterProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IEventFilter>(impl)
 {
     MMI_LOGI("EventFilterProxy()");
@@ -38,7 +37,7 @@ EventFilterProxy::~EventFilterProxy()
 
 bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> event)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -67,8 +66,6 @@ bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> ev
         MMI_LOGE("reply ReadBool fail");
         return false;
     }
-
-    MMI_LOGD("leave");
     return result;
 }
 } // namespace MMI

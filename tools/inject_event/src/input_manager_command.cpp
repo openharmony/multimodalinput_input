@@ -45,7 +45,7 @@ constexpr int32_t SLEEPTIME = 20;
 constexpr int32_t MOUSE_ID = 2;
 constexpr int32_t TWO_MORE_COMMAND = 2;
 constexpr int32_t THREE_MORE_COMMAND = 3;
-}
+} // namespace
 
 int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 {

@@ -14,7 +14,6 @@
  */
 #ifndef PROCESSING_FINGER_DEVICE_H
 #define PROCESSING_FINGER_DEVICE_H
-
 #include "msg_head.h"
 #include "device_base.h"
 
@@ -38,6 +37,7 @@ class ProcessingFingerDevice : public DeviceBase {
 public:
     ProcessingFingerDevice() = default;
     ~ProcessingFingerDevice() = default;
+    DISALLOW_COPY_AND_MOVE(ProcessingFingerDevice);
     int32_t TransformJsonDataToInputData(const Json& inputEventArrays, InputEventArray& inputEventArray);
 private:
     void AnalysisTouchPadFingerDate(const Json& inputData, TouchPadInputEvents& touchPadInputEvents);

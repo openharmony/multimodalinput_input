@@ -14,12 +14,15 @@
  */
 
 #include "multimodal_input_connect_stub.h"
+
 #include <sys/types.h>
 #include <sys/socket.h>
+
+#include "string_ex.h"
+
 #include "error_multimodal.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_define.h"
-#include "string_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -30,7 +33,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Multi
 int32_t MultimodalInputConnectStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
-    MMI_LOGD("enter, code:%{public}d", code);
+    CALL_LOG_ENTER;
+    MMI_LOGD("request ode:%{public}d", code);
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IMultimodalInputConnect::GetDescriptor()) {
@@ -51,20 +55,20 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
 
 int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     int32_t ret = RET_OK;
 
     do {
         const int32_t uid = IPCSkeleton::GetCallingUid();
         if (uid != SYSTEM_UID && uid != ROOT_UID) {
-            MMI_LOGE("uid is not root or system");
+            MMI_LOGE("check failed, uid is not root or system");
             ret = SASERVICE_PERMISSION_FAIL;
             break;
         }
 
         sptr<IRemoteObject> client = data.ReadRemoteObject();
         if (client == nullptr) {
-            MMI_LOGE("the mouse client value is nullptr");
+            MMI_LOGE("mouse client is nullptr");
             ret = ERR_INVALID_VALUE;
             break;
         }
@@ -86,7 +90,7 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
 
-    MMI_LOGD("leave, ret:%{public}d", ret);
+    MMI_LOGD("ret:%{public}d", ret);
     return RET_OK;
 }
 } // namespace MMI

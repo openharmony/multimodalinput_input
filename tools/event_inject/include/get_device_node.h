@@ -15,8 +15,8 @@
 
 #ifndef GET_DEVICE_NODE_H
 #define GET_DEVICE_NODE_H
-
 #include "msg_head.h"
+#include "nocopyable.h"
 
 #define DeviceMapData std::map<std::string, std::vector<std::string>>
 
@@ -26,11 +26,12 @@ class GetDeviceNode {
 public:
     GetDeviceNode();
     ~GetDeviceNode() = default;
+    DISALLOW_COPY_AND_MOVE(GetDeviceNode);
     int32_t GetDeviceNodeName(const std::string& targetName, std::string& deviceNode, uint16_t devIndex = 0);
 private:
     void InitDeviceInfo();
     int32_t ExecuteCmd(const std::string cmd, std::vector<std::string> &cmdResult);
-    void GetDeviceInfoCmdResult(const std::vector<std::string>& cmdResult, DeviceMapData& deviceMapData);
+    void GetDeviceInfoCmdResult(const std::vector<std::string>& cmdResult, DeviceMapData& deviceMapData) const;
 private:
     std::map<std::string, std::string> deviceMap_;
     static constexpr int32_t READ_CMD_BUFF_SIZE = 1024;

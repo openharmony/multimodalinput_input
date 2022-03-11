@@ -14,30 +14,35 @@
  */
 
 #include "input_event_handler.h"
+
 #include <cstdio>
 #include <cstring>
 #include <functional>
 #include <vector>
 #include <cinttypes>
+
 #include <sys/stat.h>
 #include <unistd.h>
+
 #include "bytrace.h"
+#include "libinput.h"
+
+#include "ability_launch_manager.h"
 #include "input_device_manager.h"
 #include "interceptor_manager_global.h"
-#include "libinput.h"
 #include "mmi_func_callback.h"
 #include "mouse_event_handler.h"
 #include "s_input.h"
 #include "time_cost_chk.h"
+#include "timer_manager.h"
 #include "touch_transform_point_manager.h"
-#include "ability_launch_manager.h"
 #include "util.h"
 
 namespace OHOS {
 namespace MMI {
-    namespace {
-        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventHandler" };
-    }
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventHandler" };
+} // namespace
 
 InputEventHandler::InputEventHandler()
 {
@@ -61,7 +66,7 @@ void InputEventHandler::Init(UDSServer& udsServer)
         },
         {
             static_cast<MmiMessageId>(LIBINPUT_EVENT_KEYBOARD_KEY),
-            std::bind(&InputEventHandler::OnKeyboardEvent, this, std::placeholders::_1)
+            MsgCallbackBind1(&InputEventHandler::OnEventKey, this)
         },
         {
             static_cast<MmiMessageId>(LIBINPUT_EVENT_POINTER_MOTION),
@@ -148,7 +153,6 @@ void InputEventHandler::Init(UDSServer& udsServer)
 void InputEventHandler::OnEvent(void *event)
 {
     CHKPV(event);
-    std::lock_guard<std::mutex> lock(mu_);
     auto *lpEvent = static_cast<libinput_event *>(event);
     CHKPV(lpEvent);
     if (initSysClock_ != 0 && lastSysClock_ == 0) {
@@ -199,7 +203,6 @@ int32_t InputEventHandler::OnEventHandler(libinput_event *event)
 
 void InputEventHandler::OnCheckEventReport()
 {
-    std::lock_guard<std::mutex> lock(mu_);
     if (initSysClock_ == 0 || lastSysClock_ != 0) {
         return;
     }
@@ -213,7 +216,7 @@ void InputEventHandler::OnCheckEventReport()
              "lostTime:%{public}" PRId64, idSeed_, eventType_, initSysClock_, lostTime);
 }
 
-UDSServer* InputEventHandler::GetUDSServer()
+UDSServer* InputEventHandler::GetUDSServer() const
 {
     return udsServer_;
 }
@@ -238,100 +241,64 @@ int32_t InputEventHandler::OnEventDeviceRemoved(libinput_event *event)
     return RET_OK;
 }
 
+void InputEventHandler::AddHandleTimer()
+{
+    constexpr int32_t timeout = 100; // 100 ms
+    timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
+        MMI_LOGD("enter");
+        if (this->keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+            MMI_LOGD("key up");
+            return;
+        }
+        auto ret = eventDispatch_.DispatchKeyEventPid(*(this->udsServer_), this->keyEvent_);
+        if (ret != RET_OK) {
+            MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
+        }
+        this->AddHandleTimer();
+        MMI_LOGD("leave");
+    });
+}
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
-{
-    CHKPR(event, PARAM_INPUT_INVALID);
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    if (keyEvent_ == nullptr) {
-        keyEvent_ = KeyEvent::Create();
-    }
-    CHKPR(keyEvent_, ERROR_NULL_POINTER);
-    auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent_);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
-        MMI_LOGD("The same event reported by multi_device should be discarded");
-        return RET_OK;
-    }
-    if (packageResult != RET_OK) {
-        MMI_LOGE("KeyEvent package failed. ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
-        return KEY_EVENT_PKG_FAIL;
-    }
-
-    auto ret = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_);
-    if (ret != RET_OK) {
-        MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d",
-                 ret, KEY_EVENT_DISP_FAIL);
-        return KEY_EVENT_DISP_FAIL;
-    }
-    int32_t keyCode = keyEvent_->GetKeyCode();
-    std::string keyEventString = "service dispatch keyCode=" + std::to_string(keyCode);
-    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
-    int32_t keyId = keyEvent_->GetId();
-    keyEventString = "OnKeyEvent";
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
-    MMI_LOGD("Inject keyCode=%{public}d, action=%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
-    return RET_OK;
-}
-
-int32_t InputEventHandler::OnKeyEventDispatch(libinput_event *event)
-{
-    if (keyEvent_ == nullptr) {
-        keyEvent_ = KeyEvent::Create();
-    }
-    CHKPR(keyEvent_, ERROR_NULL_POINTER);
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent_);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
-        MMI_LOGD("The same event reported by multi_device should be discarded");
-        return RET_OK;
-    }
-    if (packageResult != RET_OK) {
-        MMI_LOGE("KeyEvent package failed. ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
-        return KEY_EVENT_PKG_FAIL;
-    }
-    int32_t keyId = keyEvent_->GetId();
-    std::string keyEventString = "OnKeyEvent";
-    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
-    keyEventString = "service report keyId=" + std::to_string(keyId);
-    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
-    return OnEventKey(event);
-}
-
-int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
-    EventKeyboard keyBoard = {};
-    auto packageResult = eventPackage_.PackageKeyEvent(event, keyBoard);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
-        MMI_LOGD("The same event occurs on multiple devices, ret:%{puiblic}d", packageResult);
+    if (keyEvent_ == nullptr) {
+        keyEvent_ = KeyEvent::Create();
+    }
+
+    auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent_);
+    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
+        MMI_LOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
     }
     if (packageResult != RET_OK) {
-        MMI_LOGE("Key event package failed. ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
+        MMI_LOGE("KeyEvent package failed. ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
 
-    auto oKey = KeyValueTransformationInput(keyBoard.key); // libinput key transformed into key
-    keyBoard.unicode = 0;
-    if (keyEvent_ == nullptr) {
-        keyEvent_ = KeyEvent::Create();
-        CHKPR(keyEvent_, ERROR_NULL_POINTER);
-    }
-    keyBoard.key = static_cast<int32_t>(oKey.keyValueOfSys);
-    if (EventPackage::KeyboardToKeyEvent(keyBoard, keyEvent_) == RET_ERR) {
-        MMI_LOGE("On the OnKeyboardEvent translate key event error");
-        return RET_ERR;
-    }
     int32_t keyId = keyEvent_->GetId();
     std::string keyEventString = "OnKeyEvent";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
     keyEventString = "service report keyId=" + std::to_string(keyId);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
-    auto result = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_);
-    if (result != RET_OK) {
-        MMI_LOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d", result, KEY_EVENT_DISP_FAIL);
+
+    auto ret = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_);
+    if (ret != RET_OK) {
+        MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
+
+    if (!TimerMgr->IsExist(timerId_) && keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
+        AddHandleTimer();
+        MMI_LOGD("axis begin");
+    }
+
+    if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && TimerMgr->IsExist(timerId_)) {
+        TimerMgr->ResetTimer(timerId_);
+        timerId_ = -1;
+    }
+
+    MMI_LOGD("keyCode:%{public}d,action:%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
     return RET_OK;
 }
 
@@ -343,7 +310,7 @@ int32_t InputEventHandler::OnEventPointer(libinput_event *event)
 
 int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
@@ -365,13 +332,12 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
         }
         return RET_OK;
     }
-    MMI_LOGD("Leave");
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
 
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH_PAD);
@@ -387,7 +353,6 @@ int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
         }
         return RET_OK;
     }
-    MMI_LOGD("Leave");
     return RET_OK;
 }
 

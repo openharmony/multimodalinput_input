@@ -14,11 +14,14 @@
  */
 
 #include "uuid.h"
+
 #include <algorithm>
 #include <climits>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+
 #include <sys/time.h>
+
 
 namespace OHOS {
 namespace MMI {

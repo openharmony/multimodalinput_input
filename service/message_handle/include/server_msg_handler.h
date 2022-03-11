@@ -37,7 +37,7 @@ protected:
     int32_t OnHdiInject(SessionPtr sess, NetPacket& pkt);
 #endif
     int32_t OnDump(SessionPtr sess, NetPacket& pkt);
-    int32_t NewCheckReplyMessageFormClient(SessionPtr sess, NetPacket& pkt);
+    int32_t MarkProcessed(SessionPtr sess, NetPacket& pkt);
     int32_t GetMultimodeInputInfo(SessionPtr sess, NetPacket& pkt);
     int32_t OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt);
@@ -59,7 +59,7 @@ protected:
 private:
     UDSServer *udsServer_ = nullptr; // External references, do not delete
     EventDispatch eventDispatch_;
-    std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent_ = nullptr;
+    std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS

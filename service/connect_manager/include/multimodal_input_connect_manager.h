@@ -16,10 +16,12 @@
 #ifndef MULTIMODAL_INPUT_CONNECT_MANAGER_H
 #define MULTIMODAL_INPUT_CONNECT_MANAGER_H
 
-#include <memory>
 #include <map>
+#include <memory>
 #include <set>
 #include <string>
+
+#include "nocopyable.h"
 
 #include "i_multimodal_input_connect.h"
 
@@ -34,10 +36,7 @@ public:
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
 private:
     MultimodalInputConnectManager() = default;
-    MultimodalInputConnectManager(const MultimodalInputConnectManager &manager) = delete;
-    MultimodalInputConnectManager& operator=(const MultimodalInputConnectManager &manager) = delete;
-    MultimodalInputConnectManager(const MultimodalInputConnectManager &&manager) = delete;
-    MultimodalInputConnectManager& operator=(const MultimodalInputConnectManager &&manager) = delete;
+    DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);
 
     bool ConnectMultimodalInputService();
     void OnDeath();

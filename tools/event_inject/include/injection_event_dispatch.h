@@ -15,7 +15,6 @@
 
 #ifndef INJECTION_EVENT_DISPATCH_H
 #define INJECTION_EVENT_DISPATCH_H
-
 #include "manage_inject_device.h"
 #include "injection_tools_help_func.h"
 
@@ -34,6 +33,8 @@ class InjectionEventDispatch {
 public:
     InjectionEventDispatch() = default;
     ~InjectionEventDispatch() = default;
+    DISALLOW_COPY_AND_MOVE(InjectionEventDispatch);
+
     void Init();
     void InitManageFunction();
     void Run();
@@ -41,10 +42,10 @@ public:
     int32_t OnJson();
     int32_t OnHelp();
     int32_t ExecuteFunction(std::string funId);
-    int32_t GetDevTypeIndex(int32_t devIndex);
-    int32_t GetDevIndexType(int32_t devType);
-    int32_t GetDeviceIndex(const std::string& deviceNameText);
-    std::string GetFunId();
+    int32_t GetDevTypeIndex(int32_t devIndex) const;
+    int32_t GetDevIndexType(int32_t devType) const;
+    int32_t GetDeviceIndex(const std::string& deviceNameText) const;
+    std::string GetFunId() const;
     bool VirifyArgvs(const int32_t& argc, const std::vector<std::string>& argv);
     bool RegistInjectEvent(InjectFunctionMap& msg)
     {

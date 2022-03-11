@@ -32,12 +32,24 @@ public:
     static void TearDownTestCase(void) {}
 };
 
+/**
+ * @tc.name:Test_Init
+ * @tc.desc:Verify InjectionEventDispatch Init
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(InjectionEventDispatchTest, Test_Init, TestSize.Level1)
 {
     InjectionEventDispatch injectionEventDispatch;
     injectionEventDispatch.Init();
 }
 
+/**
+ * @tc.name:Test_OnJson
+ * @tc.desc:Verify InjectionEventDispatch OnJson
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(InjectionEventDispatchTest, Test_OnJson, TestSize.Level1)
 {
 #ifdef OHOS_BUILD

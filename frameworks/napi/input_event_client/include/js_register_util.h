@@ -14,7 +14,9 @@
  */
 #ifndef JS_REGISTER_UTIL_H
 #define JS_REGISTER_UTIL_H
+
 #include "js_register_module.h"
+
 namespace OHOS {
 namespace MMI {
 void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, bool value);
