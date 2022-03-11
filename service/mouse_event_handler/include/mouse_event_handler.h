@@ -17,10 +17,12 @@
 #define MOUSE_EVENT_HANDLER_H
 
 #include <memory>
+
 #include "libinput.h"
 #include "nocopyable.h"
-#include "pointer_event.h"
 #include "singleton.h"
+
+#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {

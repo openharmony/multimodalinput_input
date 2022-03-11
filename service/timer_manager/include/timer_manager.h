@@ -19,10 +19,12 @@
 #include <functional>
 #include <list>
 #include <memory>
-#include "define_multimodal.h"
-#include "mmi_log.h"
+
 #include "nocopyable.h"
 #include "singleton.h"
+
+#include "define_multimodal.h"
+#include "mmi_log.h"
 #include "util.h"
 
 namespace OHOS {

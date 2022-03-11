@@ -12,11 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef SERVER_MSG_HANDLER_H
 #define SERVER_MSG_HANDLER_H
-#include "msg_handler.h"
-#include "event_dispatch.h"
+
 #include "nocopyable.h"
+
+#include "event_dispatch.h"
+#include "msg_handler.h"
+
 
 namespace OHOS {
 namespace MMI {
