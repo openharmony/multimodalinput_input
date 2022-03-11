@@ -73,8 +73,8 @@ private:
     DevDesc mountDevIndex_[TOTAL_INPUT_DEVICE_COUNT];
     IInputInterface *inputInterface_ {nullptr};
     IInputInterface *injectInterface_ {nullptr};
-    InputEventCb eventCallBack_ {};
-    InputHostCb  hostPlugCallBack_ {};
+    InputEventCb eventCallBack_;
+    InputHostCb  hostPlugCallBack_;
 };
 
 extern HdfEventManager  hdfEventManager;
