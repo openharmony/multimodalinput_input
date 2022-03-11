@@ -14,6 +14,7 @@
  */
 
 #include "get_device_object.h"
+
 #include <chrono>
 #include <thread>
 

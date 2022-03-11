@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include "device_base.h"
 #include <gtest/gtest.h>
+
+#include "device_base.h"
 #include "msg_head.h"
 #include "proto.h"
 
