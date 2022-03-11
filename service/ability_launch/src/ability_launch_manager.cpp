@@ -255,7 +255,8 @@ bool AbilityLaunchManager::IsKeyMatch(const ShortcutKey &shortcutKey, const std:
     return true;
 }
 
-bool AbilityLaunchManager::SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key) {
+bool AbilityLaunchManager::SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key)
+{
     return keyCode == key->GetKeyCode();
 }
 
