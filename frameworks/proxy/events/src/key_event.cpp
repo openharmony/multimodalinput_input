@@ -1418,7 +1418,10 @@ bool KeyEvent::IsValidKeyItem() const
     
     for (auto it = keys_.begin(); it != keys_.end(); ++it) {
         if (it->GetKeyCode() == keyCode) {
-            sameKeyCodeNum++;
+            if (++sameKeyCodeNum > 1) {
+                MMI_LOGE("Keyitems keyCode is not unique with keyEvent keyCode");
+                return false;
+            }
         }
         if (it->GetKeyCode() <= KEYCODE_UNKNOWN) {
             MMI_LOGE("keyCode is invalid");
@@ -1448,8 +1451,8 @@ bool KeyEvent::IsValidKeyItem() const
         }
     }
     
-    if (sameKeyCodeNum != 1) {
-        MMI_LOGE("Keyitems keyCode is not unique with keyEvent keyCode");
+    if (sameKeyCodeNum == 0) {
+        MMI_LOGE("Keyitems keyCode is not exist equal item with keyEvent keyCode");
         return false;
     }
     return true;
