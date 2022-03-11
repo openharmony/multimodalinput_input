@@ -14,10 +14,13 @@
  */
 #ifndef S_INPUT_H
 #define S_INPUT_H
-#include <thread>
-#include <libudev.h>
+
 #include <functional>
+#include <thread>
+
+#include <libudev.h>
 #include <sys/epoll.h>
+
 #include "libinput.h"
 #include "nocopyable.h"
 
