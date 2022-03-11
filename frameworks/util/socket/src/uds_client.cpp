@@ -114,7 +114,6 @@ void UDSClient::Stop()
     CALL_LOG_ENTER;
     Close();
     isRunning_ = false;
-    isToExit_ = true;
 }
 
 void UDSClient::OnRecv(const char *buf, size_t size)
@@ -224,18 +223,8 @@ void UDSClient::OnThread()
                 continue;
             }
         }
-        if (isToExit_) {
-            isRunning_ = false;
-            MMI_LOGW("Client thread exit");
-            break;
-        }
     }
     MMI_LOGD("end");
-}
-
-void UDSClient::SetToExit()
-{
-    isToExit_ = true;
 }
 } // namespace MMI
 } // namespace OHOS

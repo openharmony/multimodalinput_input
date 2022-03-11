@@ -70,7 +70,6 @@ private:
     std::thread t_;
 
     SInput input_;
-    UDSServer udsServer_;
     ServerMsgHandler sMsgHandler_;
 };
 } // namespace MMI
