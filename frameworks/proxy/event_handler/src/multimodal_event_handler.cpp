@@ -18,6 +18,7 @@
 #include "immi_token.h"
 #include "input_event.h"
 #include "input_manager_impl.h"
+#include "input_handler_manager.h"
 #include "mmi_client.h"
 #include "proto.h"
 
@@ -30,6 +31,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Multim
 void OnConnected(const IfMMIClient& client)
 {
     InputManagerImpl::GetInstance()->OnConnected();
+    KeyEventInputSubscribeMgr.OnConnected();
+    InputHandlerManager::GetInstance().OnConnected();
 }
 
 MultimodalEventHandler::MultimodalEventHandler() {}

@@ -37,6 +37,7 @@ public:
     void MarkConsumed(int32_t monitorId, int32_t eventId);
     void OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent);
     void OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent);
+    void OnConnected();
 
 private:
     struct Handler {
