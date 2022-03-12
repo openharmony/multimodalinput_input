@@ -148,11 +148,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_004, TestSize.Level1)
     ASSERT_NE(KeyEvent2, nullptr);
     KeyEvent2->SetKeyCode(KeyEvent::KEYCODE_HOME);
     KeyEvent2->SetActionTime(100);
-    KeyEvent2->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    item1.SetKeyCode(KeyEvent::KEYCODE_HOME);
-    item1.SetDownTime(100);
-    item1.SetPressed(true);
-    KeyEvent2->AddKeyItem(item1);
+    KeyEvent2->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
     ASSERT_TRUE(!KeyEvent2->IsValid());
 }
 
@@ -164,22 +160,33 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_004, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_005, TestSize.Level1)
 {
-    auto KeyEvent = KeyEvent::Create();
-    ASSERT_NE(KeyEvent, nullptr);
-    KeyEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
-    KeyEvent->SetActionTime(100);
-    KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    auto KeyEvent1 = KeyEvent::Create();
+    ASSERT_NE(KeyEvent1, nullptr);
+    KeyEvent1->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    KeyEvent1->SetActionTime(100);
+    KeyEvent1->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     KeyEvent::KeyItem item1;
     item1.SetKeyCode(KeyEvent::KEYCODE_HOME);
     item1.SetDownTime(100);
     item1.SetPressed(false);
-    KeyEvent->AddKeyItem(item1);
+    KeyEvent1->AddKeyItem(item1);
     KeyEvent::KeyItem item2;
     item2.SetKeyCode(KeyEvent::KEYCODE_BACK);
     item2.SetDownTime(100);
     item2.SetPressed(true);
-    KeyEvent->AddKeyItem(item2);
-    ASSERT_TRUE(KeyEvent->IsValid());
+    KeyEvent1->AddKeyItem(item2);
+    ASSERT_TRUE(KeyEvent1->IsValid());
+
+    auto KeyEvent2 = KeyEvent::Create();
+    ASSERT_NE(KeyEvent2, nullptr);
+    KeyEvent2->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    KeyEvent2->SetActionTime(100);
+    KeyEvent2->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    item1.SetKeyCode(KeyEvent::KEYCODE_HOME);
+    item1.SetDownTime(100);
+    item1.SetPressed(true);
+    KeyEvent2->AddKeyItem(item1);
+    ASSERT_TRUE(KeyEvent2->IsValid());
 }
 } // namespace MMI
 } // namespace OHOS
