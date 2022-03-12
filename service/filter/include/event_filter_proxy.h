@@ -16,10 +16,11 @@
 #ifndef EVENT_FILTER_PROXY_H
 #define EVENT_FILTER_PROXY_H
 
-#include "i_event_filter.h"
 #include "iremote_proxy.h"
 #include "iremote_object.h"
 #include "nocopyable.h"
+
+#include "i_event_filter.h"
 
 namespace OHOS {
 namespace MMI {

@@ -16,11 +16,13 @@
 #define HDI_INJECT_H
 #ifdef OHOS_BUILD_HDF
 
-#include <vector>
 #include <list>
+#include <vector>
+
 #include "input_type.h"
-#include "uds_server.h"
+
 #include "input_manager.h"
+#include "uds_server.h"
 
 namespace OHOS {
 namespace MMI {

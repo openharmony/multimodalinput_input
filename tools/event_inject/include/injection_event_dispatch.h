@@ -15,6 +15,7 @@
 
 #ifndef INJECTION_EVENT_DISPATCH_H
 #define INJECTION_EVENT_DISPATCH_H
+
 #include "manage_inject_device.h"
 #include "injection_tools_help_func.h"
 

@@ -14,12 +14,13 @@
  */
 
 #include "key_event_subscriber.h"
+
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_event_data_transformation.h"
+#include "input_event_handler.h"
 #include "net_packet.h"
 #include "proto.h"
-#include "input_event_handler.h"
 #include "timer_manager.h"
 
 namespace OHOS {

@@ -18,10 +18,12 @@
 
 #include <map>
 #include <memory>
+
+#include "singleton.h"
+
 #include "gesture_transform_point_processor.h"
 #include "touch_transform_point_processor.h"
 #include "touchpad_transform_point_processor.h"
-#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {

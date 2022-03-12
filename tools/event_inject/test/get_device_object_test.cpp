@@ -13,11 +13,13 @@
  * limitations under the License.
  */
 
-#include "get_device_object.h"
 #include <gtest/gtest.h>
+
+#include "get_device_object.h"
 #include "manage_inject_device.h"
 #include "msg_head.h"
 #include "proto.h"
+
 
 namespace OHOS {
 namespace MMI {
