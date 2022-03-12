@@ -14,8 +14,10 @@
  */
 
 #include "virtual_keyboard.h"
+
 #include <linux/input.h>
 #include <linux/uinput.h>
+
 namespace OHOS {
 namespace MMI {
 VirtualKeyboard::VirtualKeyboard() : VirtualDevice("VSoC keyboard", 0x6008) {}

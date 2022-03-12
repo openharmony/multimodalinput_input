@@ -18,6 +18,7 @@
 #include <cstdio>
 #include <cstring>
 #include <functional>
+
 #include "mmi_log.h"
 
 using namespace OHOS::HiviewDFX;
