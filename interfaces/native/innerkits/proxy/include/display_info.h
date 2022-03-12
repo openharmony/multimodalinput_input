@@ -138,7 +138,7 @@ struct LogicalDisplayInfo {
     int32_t focusWindowId;
 
     // List of window information arranged in Z order, with the top window at the top
-    std::vector<WindowInfo> windowsInfo_;
+    std::vector<WindowInfo> windowsInfo;
 };
 } // namespace MMI
 } // namespace OHOS
