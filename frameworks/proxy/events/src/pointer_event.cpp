@@ -256,7 +256,9 @@ PointerEvent::~PointerEvent() {}
 
 std::shared_ptr<PointerEvent> PointerEvent::Create()
 {
-    return std::shared_ptr<PointerEvent>(new (std::nothrow) PointerEvent(InputEvent::EVENT_TYPE_POINTER));
+    auto event = std::shared_ptr<PointerEvent>(new (std::nothrow) PointerEvent(InputEvent::EVENT_TYPE_POINTER));
+    CHKPP(event);
+    return event;
 }
 
 int32_t PointerEvent::GetPointerAction() const
@@ -430,7 +432,7 @@ void PointerEvent::SetAxisValue(AxisType axis, double axisValue)
 {
     if ((axis >= AXIS_TYPE_UNKNOWN) && (axis < AXIS_TYPE_MAX)) {
         axisValues_[axis] = axisValue;
-        axes_ = static_cast<int32_t>(static_cast<uint32_t>(axes_) | (1 << static_cast<uint32_t>(axis)));
+        axes_ = static_cast<uint32_t>(axes_ | static_cast<uint32_t>(1 << axis));
     }
 }
 

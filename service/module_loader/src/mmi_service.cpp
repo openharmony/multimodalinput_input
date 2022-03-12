@@ -419,11 +419,11 @@ void MMIService::OnSignalEvent(int32_t signalFd)
     CALL_LOG_ENTER;
     signalfd_siginfo sigInfo;
     int32_t size = ::read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
-    if (size != sizeof(signalfd_siginfo)) {
+    if (size != static_cast<int32_t>(sizeof(signalfd_siginfo))) {
         MMI_LOGE("read signal info faild, invalid size:%{public}d,errno:%{public}d", size, errno);
         return;
     }
-    int32_t signo = sigInfo.ssi_signo;
+    int32_t signo = static_cast<int32_t>(sigInfo.ssi_signo);
     MMI_LOGD("receive signal:%{public}d", signo);
     switch (signo) {
         case SIGINT:

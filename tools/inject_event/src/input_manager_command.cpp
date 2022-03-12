@@ -45,6 +45,7 @@ constexpr int32_t SLEEPTIME = 20;
 constexpr int32_t MOUSE_ID = 2;
 constexpr int32_t TWO_MORE_COMMAND = 2;
 constexpr int32_t THREE_MORE_COMMAND = 3;
+constexpr int32_t MAX_PRESSED_COUNT = 30;
 } // namespace
 
 int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
@@ -257,6 +258,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 isCombinationKey = optind;
                                 auto KeyEvent = KeyEvent::Create();
                                 CHKPR(KeyEvent, ERROR_NULL_POINTER);
+                                if (downKey.size() > MAX_PRESSED_COUNT) {
+                                    std::cout << "pressed button count should less than 30" << std::endl;
+                                    return EVENT_REG_FAIL;
+                                }
                                 KeyEvent::KeyItem item[downKey.size()];
                                 for (size_t i = 0; i < downKey.size(); i++) {
                                     KeyEvent->SetKeyCode(keyCode);
