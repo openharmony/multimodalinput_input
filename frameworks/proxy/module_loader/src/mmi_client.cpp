@@ -52,9 +52,8 @@ bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
         MMI_LOGE("Message processing initialization failed");
         return false;
     }
-    auto msgHdlImp = static_cast<ClientMsgHandler *>(msgHdl.get());
-    CHKPF(msgHdlImp);
-    auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, msgHdlImp, std::placeholders::_1, std::placeholders::_2);
+    auto callback = msgHdl->GetCallback();
+    CHKPF(callback);
     if (!(StartClient(callback, detachMode))) {
         MMI_LOGE("Client startup failed");
         return false;

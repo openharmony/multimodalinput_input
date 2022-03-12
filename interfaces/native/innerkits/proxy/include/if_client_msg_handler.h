@@ -16,15 +16,16 @@
 #define IF_CLIENT_MSG_HANDLER_H
 
 #include <memory>
+#include "net_packet.h"
+#include "uds_client.h"
 
 namespace OHOS {
 namespace MMI {
-class UDSClient;
-class NetPacket;
 class IfClientMsgHandler {
 public:
     virtual bool Init() = 0;
     virtual void OnMsgHandler(const UDSClient& client, NetPacket& pkt) = 0;
+    virtual MsgClientFunCallback GetCallback() = 0;
 };
 
 using IClientMsgHandlerPtr = std::shared_ptr<IfClientMsgHandler>;

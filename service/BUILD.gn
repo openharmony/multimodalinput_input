@@ -179,7 +179,6 @@ ohos_prebuilt_etc("mmi_device_config.ini") {
   part_name = "multimodalinput_base"
 }
 
-import("//build/ohos.gni")
 import("//build/test.gni")
 module_output_path = "multimodalinput/unit_out"
 HDF_FWKS = "//drivers/framework"

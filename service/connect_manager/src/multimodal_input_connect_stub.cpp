@@ -45,7 +45,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
     switch (code) {
         case IMultimodalInputConnect::ALLOC_SOCKET_FD:
             return StubHandleAllocSocketFd(data, reply);
-        case IMultimodalInputConnect::SET_EVENT_POINTER_FILTER:
+        case IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER:
             return StubAddInputEventFilter(data, reply);
         default:
             MMI_LOGE("unknown code:%{public}u, go switch defaut", code);
@@ -59,7 +59,7 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
     int32_t ret = RET_OK;
 
     do {
-        const int32_t uid = IPCSkeleton::GetCallingUid();
+        const int32_t uid = GetCallingUid();
         if (uid != SYSTEM_UID && uid != ROOT_UID) {
             MMI_LOGE("check failed, uid is not root or system");
             ret = SASERVICE_PERMISSION_FAIL;

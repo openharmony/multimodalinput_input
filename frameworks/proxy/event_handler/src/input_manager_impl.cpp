@@ -79,26 +79,22 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
 int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
 {
     CALL_LOG_ENTER;
+    bool hasSendToMmiServer = true;
     if (eventFilterService_ == nullptr) {
+        hasSendToMmiServer = false;
         eventFilterService_ = new (std::nothrow) EventFilterService();
         CHKPR(eventFilterService_, RET_ERR);
     }
 
-    if (eventFilterService_ == nullptr) {
-        MMI_LOGE("eventFilterService_ is nullptr");
-        return RET_ERR;
-    }
-
     eventFilterService_->SetPointerEventPtr(filter);
-
-    static bool hasSendToMmiServer = false;
     if (!hasSendToMmiServer) {
         int32_t ret = MultimodalInputConnectManager::GetInstance()->AddInputEventFilter(eventFilterService_);
         if (ret != RET_OK) {
             MMI_LOGE("AddInputEventFilter has send to server fail, ret:%{public}d", ret);
+            delete eventFilterService_;
+            eventFilterService_ = nullptr;
             return RET_ERR;
         }
-        hasSendToMmiServer = true;
         MMI_LOGI("AddInputEventFilter has send to server success");
         return RET_OK;
     }

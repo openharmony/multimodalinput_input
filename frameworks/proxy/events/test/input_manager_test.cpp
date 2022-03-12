@@ -37,10 +37,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-using namespace OHOS;
-using namespace OHOS::MMI;
-} // namespace
-namespace {
 #ifdef OHOS_WESTEN_MODEL
 constexpr int32_t MMI_KEY_BACK = 2;
 constexpr bool ACTION_DOWN = true;
