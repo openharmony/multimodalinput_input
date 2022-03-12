@@ -107,24 +107,6 @@ void UDSServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
     }
 }
 
-bool  UDSServer::ClearDeadSessionInMap(const int32_t serverFd, const int32_t clientFd)
-{
-    auto it = sessionsMap_.find(serverFd);
-    if (it != sessionsMap_.end()) {
-        MMI_LOGE("The session(fd1:%{public}d) on the server side will be closed because it had in map"
-            "errCode:%{public}d", serverFd, SESSION_NOT_FOUND);
-        DelSession(serverFd);
-    }
-
-    it = sessionsMap_.find(clientFd);
-    if (it != sessionsMap_.end()) {
-        MMI_LOGE("The session(fd2:%{public}d) on the server side will be closed because it had in map"
-            "errCode:%{public}d", clientFd, SESSION_NOT_FOUND);
-        DelSession(clientFd);
-    }
-    return true;
-}
-
 int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     const int32_t moduleType, const int32_t uid, const int32_t pid,
     int32_t& serverFd, int32_t& toReturnClientFd)
@@ -169,12 +151,6 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     };
 
     cleanTaskList.push_back(closeSocketFdWhenError);
-
-    if (!ClearDeadSessionInMap(serverFd, toReturnClientFd)) {
-        cleanTaskWhenError();
-        MMI_LOGE("IsSocketFdNotUsed error, errCode:%{public}d", CLEAR_DEAD_SESSION_FAIL);
-        return RET_ERR;
-    }
 
     int32_t ret = RET_OK;
     ret = AddEpoll(EPOLL_EVENT_SOCKET, serverFd);

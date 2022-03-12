@@ -40,10 +40,10 @@ EventFilterProxy::~EventFilterProxy()
 bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> event)
 {
     CALL_LOG_ENTER;
+    CHKPF(event);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    CHKPF(event);
     if (!data.WriteInterfaceToken(EventFilterProxy::GetDescriptor())) {
         MMI_LOGE("Failed to write descriptor");
         return false;
@@ -60,8 +60,6 @@ bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> ev
         MMI_LOGE("send request fail, result:%{public}d", requestResult);
         return false;
     }
-
-    MMI_LOGD("have recieve message from server");
 
     bool result = false;
     if (!reply.ReadBool(result)) {
