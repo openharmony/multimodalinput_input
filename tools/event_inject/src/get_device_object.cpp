@@ -17,12 +17,24 @@
 
 #include <chrono>
 #include <thread>
+#include<regex>
 
 using namespace OHOS::MMI;
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GetDeviceObject" };
-} // namespace
+bool IsKeyboardDevice(const std::string& deviceName)
+{
+    std::regex regExp("keyboard model[1-3]");
+    return std::regex_match(deviceName, regExp);
+}
+
+bool IsMouseDevice(const std::string& deviceName)
+{
+    std::regex regExp("(knob model[1-3])|(trackpad model[1-2])");
+    return std::regex_match(deviceName, regExp);
+}
+}
 
 DeviceBase* GetDeviceObject::CreateDeviceObject(const std::string deviceName)
 {
@@ -45,8 +57,7 @@ DeviceBase* GetDeviceObject::CreateDeviceObject(const std::string deviceName)
     } else if (deviceName == "joystick") {
         deviceBasePtr = new (std::nothrow) ProcessingJoystickDevice();
         CHKPP(deviceBasePtr);
-    } else if ((deviceName == "keyboard model1") || (deviceName == "keyboard model2")
-               || (deviceName == "keyboard model3")) {
+    } else if (IsKeyboardDevice(deviceName)) {
         deviceBasePtr = new (std::nothrow) ProcessingKeyboardDevice();
         CHKPP(deviceBasePtr);
     } else if ((deviceName == "mouse") || (deviceName == "trackball")) {
@@ -55,12 +66,11 @@ DeviceBase* GetDeviceObject::CreateDeviceObject(const std::string deviceName)
     } else if (deviceName == "remoteControl") {
         deviceBasePtr = new (std::nothrow) ProcessingKeyboardDevice();
         CHKPP(deviceBasePtr);
-    } else if ((deviceName == "knob model1") || (deviceName == "knob model2") || (deviceName == "knob model3")
-               || (deviceName == "trackpad model1") || (deviceName == "trackpad model2")) {
+    } else if (IsMouseDevice(deviceName)) {
         deviceBasePtr = new (std::nothrow) ProcessingMouseDevice();
         CHKPP(deviceBasePtr);
     } else {
-        MMI_LOGI("Not create device object from deviceName:%s", deviceName.c_str());
+        MMI_LOGI("Not supported device :%s", deviceName.c_str());
     }
 
     return deviceBasePtr;
