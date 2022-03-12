@@ -53,7 +53,7 @@ VirtualDevice::VirtualDevice(const std::string &device_name, uint16_t busType,
       busTtype_(busType),
       vendorId_(vendorId),
       productId_(product_id),
-      version_(1) {}  // The version number is one.
+      version_(1) {}
 
 VirtualDevice::~VirtualDevice()
 {
