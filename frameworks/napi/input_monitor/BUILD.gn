@@ -43,14 +43,18 @@ ohos_shared_library("inputmonitor") {
   configs = [ ":libinputmonitor_config" ]
 
   deps = [
-    "//drivers/peripheral/input/hal:hdi_input",
-    "//foundation/ace/napi:ace_napi",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//third_party/libuv:uv_static",
-    "//utils/native/base:utils",
+  ]
+
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "input_device_driver:hdi_input",
+    "ipc:ipc_core",
+    "napi:ace_napi",
+    "utils_base:utils",
   ]
 
   relative_install_dir = "module/multimodalinput"

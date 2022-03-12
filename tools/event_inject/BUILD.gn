@@ -76,7 +76,6 @@ ohos_shared_library("event-injection") {
   ]
 
   deps = [
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
@@ -85,6 +84,8 @@ ohos_shared_library("event-injection") {
   if (is_mmi_have_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
+
+  external_deps = [ "ipc:ipc_core" ]
 
   part_name = "multimodalinput_base"
 }
@@ -174,13 +175,17 @@ ohos_unittest("ut-event-injection-out") {
     "${mmi_path}/tools/event_inject:event-injection",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
   ]
 
   if (is_mmi_have_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "utils_base:utils",
+  ]
 }
 
 ohos_executable("mmi-event-injection") {

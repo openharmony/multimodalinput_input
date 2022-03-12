@@ -170,7 +170,7 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
     DrawPixelmap(canvas);
     constexpr uint32_t stride = 4;
     uint32_t addrSize = width * height * stride;
-    auto ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
+    errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
     if (ret != EOK) {
         MMI_LOGE("Memcpy data is error, ret:%{public}d", ret);
         return;

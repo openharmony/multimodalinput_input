@@ -39,8 +39,9 @@ void StreamBuffer::Clean()
     rCount_ = 0;
     wCount_ = 0;
     rwErrorStatus_ = ErrorStatus::ERROR_STATUS_OK;
-    if (EOK != memset_sp(&szBuff_, sizeof(szBuff_), 0, sizeof(szBuff_))) {
-        MMI_LOGE("");
+    errno_t ret = memset_sp(&szBuff_, sizeof(szBuff_), 0, sizeof(szBuff_));
+    if (ret != EOK) {
+        MMI_LOGE("call memset_s fail");
         return;
     }
 }
@@ -102,7 +103,8 @@ bool StreamBuffer::Read(char *buf, size_t size)
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
-    if (EOK != memcpy_sp(buf, size, ReadBuf(), size)) {
+    errno_t ret = memcpy_sp(buf, size, ReadBuf(), size);
+    if (ret != EOK) {
         MMI_LOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
@@ -132,7 +134,8 @@ bool StreamBuffer::Write(const char *buf, size_t size)
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
-    if (EOK != memcpy_sp(&szBuff_[wIdx_], static_cast<size_t>(MAX_STREAM_BUF_SIZE - wIdx_), buf, size)) {
+    errno_t ret = memcpy_sp(&szBuff_[wIdx_], static_cast<size_t>(MAX_STREAM_BUF_SIZE - wIdx_), buf, size);
+    if (ret != EOK) {
         MMI_LOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
