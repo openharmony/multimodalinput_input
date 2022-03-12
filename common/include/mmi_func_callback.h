@@ -12,8 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef MMI_FUNC_CALLBACK_H
 #define MMI_FUNC_CALLBACK_H
+
 #include <functional>
 
 namespace OHOS {

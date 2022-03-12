@@ -15,7 +15,9 @@
 
 #ifndef TIME_COST_CHK_H
 #define TIME_COST_CHK_H
+
 #include <cinttypes>
+
 #include "nocopyable.h"
 
 constexpr int64_t MAX_INPUT_EVENT_TIME = 1000;
