@@ -279,7 +279,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
             pkt.Read(info);
             windowInfos.push_back(info);
         }
-        info.windowsInfo_ = windowInfos;
+        info.windowsInfo = windowInfos;
         logicalDisplays.push_back(info);
     }
 
