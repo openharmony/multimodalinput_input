@@ -96,12 +96,14 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
         MMI_LOGE("Get preKeys failed");
         return ERROR_CODE;
     }
-    std::vector<int32_t> preKeys = GetIntArray(env, receiceValue);
-    MMI_LOGD("PreKeys size:%{public}zu", preKeys.size());
-    std::vector<int32_t> sortPrekeys = preKeys;
-    sort(sortPrekeys.begin(), sortPrekeys.end());
-    keyOption->SetPreKeys(preKeys);
-
+    if (preKeys.size() > PRE_KEYS_SIZE) {
+        MMI_LOGE("PreKeys size invalid");
+        napi_throw_error(env, nullptr, "PreKeys size invalid");
+        return ERROR_CODE;
+    }
+    MMI_LOGD("PreKeys size:%{public}d", static_cast<int32_t>(preKeys.size()));
+    std::vector<int32_t> sortPrekeys(preKeys.begin(), preKeys.end());
+    keyOption->SetPreKeys(sortPrekeys);
     std::string subKeyNames = "";
     for (const auto &item : sortPrekeys){
         subKeyNames += std::to_string(item);

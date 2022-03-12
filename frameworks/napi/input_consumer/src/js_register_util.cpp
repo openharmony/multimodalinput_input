@@ -233,22 +233,21 @@ static void AsyncWorkFn(napi_env env, OHOS::MMI::KeyEventMonitorInfo *event, nap
         MMI_LOGE("resultSize(%{public}u) too short", resultSize);
         return;
     }
-    if (event->status < 0) {
-        MMI_LOGD("Status < 0 enter");
-        napi_value code = nullptr;
-        napi_create_string_utf8(env, "-1", NAPI_AUTO_LENGTH, &code);
-        napi_value message = nullptr;
-        napi_create_string_utf8(env, "failed", NAPI_AUTO_LENGTH, &message);
-        napi_create_error(env, code, message, &result[0]);
-        napi_get_undefined(env, &result[1]);
-    } else if (event->status == 0) {
-        MMI_LOGD("Status = 0 enter");
-        napi_get_undefined(env, &result[0]);
-        napi_get_undefined(env, &result[1]);
-    } else {
-        MMI_LOGD("Status > 0 enter");
-        if (napi_create_object(env, &result[1]) != napi_ok) {
-            MMI_LOGE("Result1 create object failed");
+    napi_value arr;
+    status = napi_create_array(env, &arr);
+    if (status != napi_ok) {
+        MMI_LOGE("create array failed");
+        napi_throw_error(env, nullptr, "create array failed");
+        return;
+    }
+    std::vector<int32_t> preKeys = event->keyOption->GetPreKeys();
+    int32_t i = 0;
+    napi_value value;
+    for (const auto &preKey : preKeys) {
+        status = napi_create_int32(env, preKey, &value);
+        if (status != napi_ok) {
+            MMI_LOGE("create int32 failed");
+            napi_throw_error(env, nullptr, "create int32 failed");
             return;
         }
         napi_value arr;
