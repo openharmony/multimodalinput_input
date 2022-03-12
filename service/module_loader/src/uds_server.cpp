@@ -183,7 +183,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
 
 void UDSServer::AddPermission(SessionPtr sess)
 {
-    uint32_t callerToken = GetCallingTokenID();
+    uint32_t callerToken = IPCSkeleton::GetCallingTokenID();
     std::string permissionMonitor = "ohos.permission.INPUT_MONITORING";
     
     if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) ==
