@@ -122,9 +122,9 @@ void InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInf
     logicalDisplays_ = logicalDisplays;
     size_t numLogicalDisplay = logicalDisplays.size();
     for (size_t i = 0; i < numLogicalDisplay; ++i) {
-        size_t numWindow = logicalDisplays[i].windowsInfo_.size();
+        size_t numWindow = logicalDisplays[i].windowsInfo.size();
         for (size_t j = 0; j < numWindow; j++) {
-            WindowInfo myWindow = logicalDisplays[i].windowsInfo_[j];
+            WindowInfo myWindow = logicalDisplays[i].windowsInfo[j];
             auto iter = windowInfos_.insert(std::pair<int32_t, WindowInfo>(myWindow.id, myWindow));
             if (!iter.second) {
                 MMI_LOGE("Insert value failed, Window:%{public}d", myWindow.id);
@@ -159,7 +159,7 @@ void InputWindowsManager::PrintDisplayDebugInfo()
             item.id, item.topLeftX, item.topLeftY,
             item.width, item.height, item.name.c_str(),
             item.seatId.c_str(), item.seatName.c_str(), item.focusWindowId,
-            item.windowsInfo_.size());
+            item.windowsInfo.size());
     }
 
     MMI_LOGD("window info,num:%{public}zu", windowInfos_.size());
@@ -470,7 +470,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         && (pointerEvent->GetPressedButtons().size() == 1);
     bool isMove = (action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty());
     if ((firstBtnDownWindowId_ == -1) || isFirstBtnDown || isMove) {
-        for (auto &item : logicalDisplayInfo->windowsInfo_) {
+        for (auto &item : logicalDisplayInfo->windowsInfo) {
             if (IsInsideWindow(globalX, globalY, item)) {
                 firstBtnDownWindowId_ = item.id;
                 break;
@@ -478,7 +478,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         }
     }
     WindowInfo* firstBtnDownWindow = nullptr;
-    for (auto &item : logicalDisplayInfo->windowsInfo_) {
+    for (auto &item : logicalDisplayInfo->windowsInfo) {
         if (item.id == firstBtnDownWindowId_) {
             firstBtnDownWindow = &item;
             break;
@@ -533,7 +533,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     auto targetWindowId = pointerEvent->GetTargetWindowId();
     MMI_LOGD("targetWindow:%{public}d", targetWindowId);
     WindowInfo *touchWindow = nullptr;
-    for (auto item : logicalDisplayInfo->windowsInfo_) {
+    for (auto item : logicalDisplayInfo->windowsInfo) {
         if (targetWindowId < 0) {
             if (IsInsideWindow(globalX, globalY, item)) {
                 touchWindow = &item;
