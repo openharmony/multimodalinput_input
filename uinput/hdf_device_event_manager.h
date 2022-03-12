@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <thread>
+
 #include "hdf_device_event_dispatch.h"
 #include "inject_thread.h"
 #include "input_controller.h"
