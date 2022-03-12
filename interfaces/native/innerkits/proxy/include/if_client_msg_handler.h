@@ -15,12 +15,14 @@
 #ifndef IF_CLIENT_MSG_HANDLER_H
 #define IF_CLIENT_MSG_HANDLER_H
 
+#include <functional>
 #include <memory>
-#include "net_packet.h"
-#include "uds_client.h"
 
 namespace OHOS {
 namespace MMI {
+class UDSClient;
+class NetPacket;
+using MsgClientFunCallback = std::function<void(const UDSClient&, NetPacket&)>;
 class IfClientMsgHandler {
 public:
     virtual bool Init() = 0;
