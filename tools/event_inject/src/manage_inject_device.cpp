@@ -14,6 +14,7 @@
  */
 
 #include "manage_inject_device.h"
+
 #include <chrono>
 #include <thread>
 

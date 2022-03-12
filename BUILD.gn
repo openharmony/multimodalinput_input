@@ -43,19 +43,9 @@ ohos_executable("uinput_inject") {
   ]
 
   include_dirs = [
-    "$HDF_FWKS/include",
     "common/include",
-    "//drivers/peripheral/input/interfaces/include",
-    "//drivers/adapter/uhdf2/adapter/osal/include",
     "//foundation/multimodalinput/input/frameworks/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
-    "$HDF_FWKS/include/utils",
-    "$HDF_FWKS/include/osal",
-    "$HDF_FWKS/core/adapter/syscall/include",
-    "$HDF_FWKS/include/core",
-    "$HDF_FWKS/ability/sbuf/include",
-    "$HDF_FWKS/core/shared/include",
-    "$HDF_FWKS/utils/include",
   ]
 
   deps = [
@@ -88,13 +78,6 @@ ohos_shared_library("mmi_uinject") {
     "//drivers/adapter/uhdf2/adapter/osal/include",
     "//foundation/multimodalinput/input/frameworks/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
-    "$HDF_FWKS/include/utils",
-    "$HDF_FWKS/include/osal",
-    "$HDF_FWKS/core/adapter/syscall/include",
-    "$HDF_FWKS/include/core",
-    "$HDF_FWKS/ability/sbuf/include",
-    "$HDF_FWKS/core/shared/include",
-    "$HDF_FWKS/utils/include",
   ]
 
   deps = [

@@ -13,10 +13,11 @@
 * limitations under the License.
 */
 
-#include "processing_joystick_device.h"
 #include <gtest/gtest.h>
+
 #include "manage_inject_device.h"
 #include "msg_head.h"
+#include "processing_joystick_device.h"
 #include "proto.h"
 
 namespace OHOS {

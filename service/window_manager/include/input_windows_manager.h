@@ -16,13 +16,15 @@
 #define INPUT_WINDOWS_MANAGER_H
 
 #include <vector>
+
+#include "libinput.h"
+#include "nocopyable.h"
 #include "singleton.h"
-#include "uds_server.h"
+
 #include "display_info.h"
 #include "input_event.h"
 #include "pointer_event.h"
-#include "libinput.h"
-#include "nocopyable.h"
+#include "uds_server.h"
 
 namespace OHOS {
 namespace MMI {

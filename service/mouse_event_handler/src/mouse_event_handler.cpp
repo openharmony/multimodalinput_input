@@ -14,15 +14,18 @@
  */
 
 #include "mouse_event_handler.h"
+
 #include <cinttypes>
-#include "libmmi_util.h"
+
 #include "input-event-codes.h"
-#include "util.h"
-#include "input_windows_manager.h"
-#include "input_event_handler.h"
-#include "timer_manager.h"
-#include "mouse_device_state.h"
+
+#include "libmmi_util.h"
 #include "input_device_manager.h"
+#include "input_event_handler.h"
+#include "input_windows_manager.h"
+#include "mouse_device_state.h"
+#include "timer_manager.h"
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {

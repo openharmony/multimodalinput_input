@@ -17,8 +17,10 @@
 #define EVENT_FILTER_SERVICE_H
 
 #include "iremote_object.h"
-#include "event_filter_stub.h"
 #include "nocopyable.h"
+
+#include "event_filter_stub.h"
+
 
 namespace OHOS {
 namespace MMI {

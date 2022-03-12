@@ -13,8 +13,10 @@
  * limitations under the License.
  */
 
-#include "server_msg_handler.h"
 #include <gtest/gtest.h>
+
+#include "server_msg_handler.h"
+
 
 namespace OHOS {
 namespace MMI {

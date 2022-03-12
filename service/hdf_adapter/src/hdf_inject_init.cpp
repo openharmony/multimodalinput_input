@@ -14,6 +14,7 @@
  */
 
 #include "hdf_inject_init.h"
+
 static DrvType g_index2DrvType[] = {
     MOUSE, KEYBOARD, TOUCH, PEN, PAD, INVALD, FINGER, JOYSTICK, INVALD, INVALD, KEYBOARD, SWITCH5, TRACKPAD5, GAMEPAD
 };

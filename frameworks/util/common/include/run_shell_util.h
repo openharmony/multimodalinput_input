@@ -36,7 +36,7 @@ public:
 
 private:
     FILE *fp_ {nullptr};
-    int32_t logMaxSize_;
+    int32_t logMaxSize_ {0};
 };
 } // namespace MMI
 } // namespace OHOS

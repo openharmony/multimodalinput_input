@@ -12,10 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef PROCESSING_PEN_DEVICE_H
 #define PROCESSING_PEN_DEVICE_H
-#include "msg_head.h"
+
 #include "device_base.h"
+#include "msg_head.h"
 
 namespace OHOS {
 namespace MMI {

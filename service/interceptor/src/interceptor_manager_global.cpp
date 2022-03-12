@@ -12,8 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "interceptor_manager_global.h"
+
 #include <cinttypes>
+
 #include "input_event_data_transformation.h"
 #include "proto.h"
 #include "souceType.h"
