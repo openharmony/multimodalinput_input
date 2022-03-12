@@ -14,6 +14,10 @@
  */
 #ifndef JS_REGISTER_UTIL_H
 #define JS_REGISTER_UTIL_H
+
+#include <array>
+#include <set>
+
 #include "js_register_module.h"
 #include "key_event.h"
 #include <array>
