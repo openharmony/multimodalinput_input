@@ -28,71 +28,60 @@ EventPackage::EventPackage() {}
 
 EventPackage::~EventPackage() {}
 
-int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, EventKeyboard& key)
+int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, std::shared_ptr<KeyEvent> key)
 {
-    CHKPR(event, ERROR_NULL_POINTER);
-    auto data = libinput_event_get_keyboard_event(event);
-    CHKPR(data, ERROR_NULL_POINTER);
-    key.key = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
-    if (libinput_event_keyboard_get_key_state(data) == 0) {
-        key.state = KEY_STATE_RELEASED;
-    } else {
-        key.state = KEY_STATE_PRESSED;
-    }
-    key.seat_key_count = libinput_event_keyboard_get_seat_key_count(data);
-    key.time = libinput_event_keyboard_get_time_usec(data);
-    // Ignore key events that are not seat wide state changes.
-    if (key.state == KEY_STATE_PRESSED && key.seat_key_count != 1) {
-        MMI_LOGD("The same button is pressed on multiple devices, state:%{puiblic}d", key.state);
-        return MULTIDEVICE_SAME_EVENT_MARK;
-    }
-    if (key.state == KEY_STATE_RELEASED && key.seat_key_count != 0) {
-        MMI_LOGD("Release the same button on multiple devices, state:%{puiblic}d", key.state);
-        return MULTIDEVICE_SAME_EVENT_MARK;
-    }
-    return RET_OK;
-}
-
-int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, std::shared_ptr<KeyEvent> kevn)
-{
-    MMI_LOGD("enter");
     CHKPR(event, PARAM_INPUT_INVALID);
-    CHKPR(kevn, ERROR_NULL_POINTER);
-    kevn->UpdateId();
+    CHKPR(key, ERROR_NULL_POINTER);
+    key->UpdateId();
     auto data = libinput_event_get_keyboard_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
-    auto oKey = KeyValueTransformationInput(libinput_event_keyboard_get_key(data));
 
     auto device = libinput_event_get_device(event);
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
-    int32_t keyCode = static_cast<int32_t>(oKey.keyValueOfSys);
+    int32_t keyCode = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
+    auto Okey = KeyValueTransformationInput(keyCode);
+    keyCode = static_cast<int32_t>(Okey.keyValueOfSys);
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
-    int64_t actionStartTime = static_cast<int64_t>(libinput_event_keyboard_get_time_usec(data));
-
-    kevn->SetActionTime(GetSysClockTime());
-    kevn->SetAction(keyAction);
-    kevn->SetActionStartTime(actionStartTime);
-    kevn->SetDeviceId(deviceId);
-    kevn->SetKeyCode(keyCode);
-    kevn->SetKeyAction(keyAction);
+    auto preAction = key->GetAction();
+    if (preAction == KeyEvent::KEY_ACTION_UP) {
+        auto preUpKeyItem = key->GetKeyItem();
+        if (preUpKeyItem != nullptr) {
+            key->RemoveReleasedKeyItems(*preUpKeyItem);
+        } else {
+            MMI_LOGE("preUpKeyItem is null");
+        }
+    }
+    int64_t time = GetSysClockTime();
+    key->SetActionTime(time);
+    key->SetAction(keyAction);
+    key->SetDeviceId(deviceId);
+    key->SetKeyCode(keyCode);
+    key->SetKeyAction(keyAction);
+    if (key->GetPressedKeys().empty()) {
+        key->SetActionStartTime(time);
+    }
 
     KeyEvent::KeyItem item;
     bool isKeyPressed = (libinput_event_keyboard_get_key_state(data) != KEYSTATUS);
-    if (isKeyPressed) {
-        int64_t keyDownTime = actionStartTime;
-        item.SetDownTime(keyDownTime);
-    }
+    item.SetDownTime(time);
     item.SetKeyCode(keyCode);
     item.SetDeviceId(deviceId);
     item.SetPressed(isKeyPressed);
 
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
-        kevn->AddPressedKeyItems(item);
-    } else {
-        kevn->RemoveReleasedKeyItems(item);
+        key->AddPressedKeyItems(item);
     }
-    MMI_LOGD("leave");
+    if (keyAction == KeyEvent::KEY_ACTION_UP) {
+        auto pressedKeyItem = key->GetKeyItem(keyCode);
+        if (pressedKeyItem != nullptr) {
+            item.SetDownTime(pressedKeyItem->GetDownTime());
+        } else {
+            MMI_LOGE("Find pressed key failed, keyCode:%{public}d", keyCode);
+        }
+        key->RemoveReleasedKeyItems(item);
+        key->AddPressedKeyItems(item);
+    }
     return RET_OK;
 }
 
