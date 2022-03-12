@@ -96,14 +96,12 @@ void PointerDrawingManager::FixCursorPosition(int32_t &globalX, int32_t &globalY
         globalY = 0;
     }
 
-    int32_t size = 16;
-    int32_t fcursorW = IMAGE_WIDTH / size;
-    if ((globalX + fcursorW) > displayWidth_) {
-        globalX = displayWidth_ - fcursorW;
+    const int32_t cursorUnit = 16;
+    if (globalX > (displayWidth_ - IMAGE_WIDTH / cursorUnit)) {
+        globalX = displayWidth_ - IMAGE_WIDTH / cursorUnit;
     }
-    int32_t fcursorH = IMAGE_HEIGHT / size;
-    if ((globalY + fcursorH) > displayHeight_) {
-        globalY = displayHeight_ - fcursorH;
+    if (globalY > (displayHeight_ - IMAGE_HEIGHT / cursorUnit)) {
+        globalY = displayHeight_ - IMAGE_HEIGHT / cursorUnit;
     }
 }
 
