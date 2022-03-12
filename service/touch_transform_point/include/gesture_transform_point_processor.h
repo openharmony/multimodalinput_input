@@ -33,7 +33,7 @@ public:
     std::shared_ptr<PointerEvent> OnTouchPadGestrueEvent(struct libinput_event *event);
     void SetPointEventSource(int32_t sourceType);
 private:
-    const int32_t defaultPointerId = 0; // mouse has only one PoingeItem, so id is 0
+    const int32_t defaultPointerId = 0;
     void OnEventTouchPadPinchBegin(libinput_event_gesture *data);
     void OnEventTouchPadPinchUpdate(libinput_event_gesture *data);
     void OnEventTouchPadPinchEnd(libinput_event_gesture *data);

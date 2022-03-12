@@ -338,11 +338,11 @@ void PointerEvent::UpdatePointerItem(int32_t pointerId, PointerItem &pointerItem
 {
     for (auto &item : pointers_) {
         if (item.GetPointerId() == pointerId) {
-            item = pointerItem; // update
+            item = pointerItem;
             return;
         }
     }
-    pointers_.push_back(pointerItem); // insert
+    pointers_.push_back(pointerItem);
 }
 
 std::set<int32_t> PointerEvent::GetPressedButtons() const
@@ -465,7 +465,6 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    // vector
     if (pointers_.size() > INT_MAX) {
         return false;
     }
@@ -480,7 +479,6 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         }
     }
 
-    // set
     if (pressedButtons_.size() > INT_MAX) {
         return false;
     }
@@ -511,7 +509,6 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    // axisValues_
     const size_t axisValuesSize = axisValues_.size();
     if (axisValuesSize > INT_MAX) {
         return false;
@@ -544,7 +541,6 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    // vector
     const int32_t pointersSize = in.ReadInt32();
     if (pointersSize < 0) {
         return false;
@@ -558,7 +554,6 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         pointers_.push_back(val);
     }
 
-    // set
     const int32_t pressedButtonsSize = in.ReadInt32();
     if (pressedButtonsSize < 0) {
         return false;
@@ -591,7 +586,6 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    // axisValue_ array
     const int32_t axisValueSize = in.ReadInt32();
     if (axisValueSize < 0) {
         return false;

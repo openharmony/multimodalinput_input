@@ -243,7 +243,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(libinput_event *event)
 
 void InputEventHandler::AddHandleTimer()
 {
-    constexpr int32_t timeout = 100; // 100 ms
+    constexpr int32_t timeout = 100;
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
         MMI_LOGD("enter");
         if (this->keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
@@ -411,13 +411,11 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
 
-    // 更新 全局 鼠标事件 数据
     MouseEventHdr->Normalize(event);
 
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
 
-    // 处理 按键 + 鼠标
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
@@ -430,16 +428,13 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
     int32_t pointerId = keyEvent_->GetId();
     const std::string pointerEventstring = "OnEventPointer";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, pointerId);
-    // 派发
     eventDispatch_.HandlePointerEvent(pointerEvent);
-    // 返回值 代表是 鼠标事件有没有处理过， 不关心成功与失败
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    // Mouse Axis Data
     MMI_LOGI("MouseEvent Normalization Results, PointerAction:%{public}d,PointerId:%{public}d,"
              "SourceType:%{public}d,ButtonId:%{public}d,"
              "VerticalAxisValue:%{public}lf,HorizontalAxisValue:%{public}lf",

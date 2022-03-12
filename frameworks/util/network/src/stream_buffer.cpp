@@ -85,7 +85,7 @@ bool StreamBuffer::Write(const StreamBuffer &buf)
 bool StreamBuffer::Read(char *buf, size_t size)
 {
     if (ChkRWError()) {
-        return false; // No need to print log here, only the first error needs to be printed
+        return false;
     }
     if (buf == nullptr) {
         MMI_LOGE("Invalid input parameter buf=nullptr errCode:%{public}d", ERROR_NULL_POINTER);
@@ -115,7 +115,7 @@ bool StreamBuffer::Read(char *buf, size_t size)
 bool StreamBuffer::Write(const char *buf, size_t size)
 {
     if (ChkRWError()) {
-        return false; // No need to print log here, only the first error needs to be printed
+        return false;
     }
     if (buf == nullptr) {
         MMI_LOGE("Invalid input parameter buf=nullptr errCode:%{public}d", ERROR_NULL_POINTER);

@@ -390,7 +390,7 @@ void HdfEventManager::GetEventCallback(const EventPackage **pkgs, uint32_t count
     struct input_event eventarry[MAX_EVENT_PKG_NUM];
     for (uint32_t i = 0; i < count && i < MAX_EVENT_PKG_NUM; i++) {
         eventarry[i].code = pkgs[i]->code;
-        eventarry[i].type = (pkgs[i]->type) | static_cast<uint16_t>(devIndex<<byteSize); // 不改变livinput结构传递，对象的index参数
+        eventarry[i].type = (pkgs[i]->type) | static_cast<uint16_t>(devIndex<<byteSize);
         eventarry[i].value = pkgs[i]->value;
         eventarry[i].input_event_sec = (pkgs[i]->timestamp) / (USEC_PER_SEC);
         eventarry[i].input_event_usec = (pkgs[i]->timestamp) % (USEC_PER_SEC);
