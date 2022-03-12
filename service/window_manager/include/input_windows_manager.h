@@ -39,7 +39,7 @@ struct SurfaceInfo {
     int32_t srcW;
     int32_t srcH;
     double opacity;
-    int32_t visibility; // 0 or 1
+    int32_t visibility;
     int32_t onLayerId;
 };
 struct LayerInfo {
@@ -53,7 +53,7 @@ struct LayerInfo {
     int32_t srcW;
     int32_t srcH;
     double opacity;
-    int32_t visibility; // 0 or 1
+    int32_t visibility;
     int32_t onScreenId;
     int32_t nSurfaces;
     SurfaceInfo** surfaces;

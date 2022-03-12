@@ -47,7 +47,7 @@ VirtualDevice::VirtualDevice(const char *deviceName, uint16_t productId)
       busType_(BUS_USB),
       vendorId_(0x6006),
       productId_(productId),
-      version_(1) {}  // The version number is one.
+      version_(1) {}
 
 VirtualDevice::~VirtualDevice()
 {
