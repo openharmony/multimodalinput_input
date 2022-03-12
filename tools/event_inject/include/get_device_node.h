@@ -15,12 +15,10 @@
 
 #ifndef GET_DEVICE_NODE_H
 #define GET_DEVICE_NODE_H
-
+#include "msg_head.h"
 #include "nocopyable.h"
 
-#include "msg_head.h"
-
-#define DeviceMapData std::map<std::string, std::vector<std::string>>
+#define DeviceList std::map<std::string, std::vector<std::string>>
 
 namespace OHOS {
 namespace MMI {
@@ -29,13 +27,13 @@ public:
     GetDeviceNode();
     ~GetDeviceNode() = default;
     DISALLOW_COPY_AND_MOVE(GetDeviceNode);
-    int32_t GetDeviceNodeName(const std::string& targetName, std::string& deviceNode, uint16_t devIndex = 0);
+    int32_t GetDeviceNodeName(const std::string& targetName, uint16_t devIndex, std::string& deviceNode);
 private:
     void InitDeviceInfo();
     int32_t ExecuteCmd(const std::string cmd, std::vector<std::string> &cmdResult);
-    void GetDeviceInfoCmdResult(const std::vector<std::string>& cmdResult, DeviceMapData& deviceMapData) const;
+    void GetDeviceCmd(const std::vector<std::string>& cmdResult, DeviceList& deviceList) const;
 private:
-    std::map<std::string, std::string> deviceMap_;
+    std::map<std::string, std::string> deviceList_;
     static constexpr int32_t READ_CMD_BUFF_SIZE = 1024;
     static constexpr int32_t CMD_EVENT_LENGTH = 6;
 };

@@ -26,16 +26,20 @@ GetDeviceNode::GetDeviceNode()
     InitDeviceInfo();
 }
 
-int32_t GetDeviceNode::GetDeviceNodeName(const std::string &targetName, std::string &deviceNode, uint16_t devIndex)
+int32_t GetDeviceNode::GetDeviceNodeName(const std::string &targetName, uint16_t devIndex, std::string &deviceNode)
 {
     std::string cmd = "cat /proc/bus/input/devices";
     std::vector<std::string> cmdResult;
     ExecuteCmd(cmd, cmdResult);
-    DeviceMapData deviceMapData;
-    GetDeviceInfoCmdResult(cmdResult, deviceMapData);
-    std::string deviceName = deviceMap_[targetName];
-    auto iter = deviceMapData.find(deviceName);
-    if (iter == deviceMapData.end()) {
+    DeviceList deviceList;
+    GetDeviceCmd(cmdResult, deviceList);
+    if (deviceList.empty()) {
+        MMI_LOGE("device list is null");
+        return RET_ERR;
+    }
+    std::string deviceName = deviceList_[targetName];
+    auto iter = deviceList.find(deviceName);
+    if (iter == deviceList.end()) {
         MMI_LOGE("faild for find deviceName:%{public}s", deviceName.c_str());
         return RET_ERR;
     }
@@ -54,36 +58,35 @@ int32_t GetDeviceNode::GetDeviceNodeName(const std::string &targetName, std::str
 
 void GetDeviceNode::InitDeviceInfo()
 {
-    deviceMap_["mouse"] = "Virtual Mouse";
-    deviceMap_["touch"] = "Virtual TouchScreen";
-    deviceMap_["finger"] = "Virtual Finger";
-    deviceMap_["pad"] = "Virtual Touchpad";
-    deviceMap_["pen"] = "Virtual Stylus";
-    deviceMap_["gamePad"] = "Virtual GamePad";
-    deviceMap_["joystick"] = "Virtual Joystick";
-    deviceMap_["remoteControl"] = "Virtual RemoteControl";
-    deviceMap_["knob model1"] = "Virtual KnobConsumerCtrl";
-    deviceMap_["knob model2"] = "Virtual Knob";
-    deviceMap_["knob model3"] = "Virtual KnobMouse";
-    deviceMap_["keyboard model1"] = "Virtual keyboard";
-    deviceMap_["keyboard model2"] = "Virtual KeyboardConsumerCtrl";
-    deviceMap_["keyboard model3"] = "Virtual KeyboardSysCtrl";
-    deviceMap_["trackball"] = "Virtual Trackball";
-    deviceMap_["trackpad model1"] = "Virtual TrackPadMouse";
-    deviceMap_["trackpad model2"] = "Virtual Trackpad";
+    deviceList_["mouse"] = "Virtual Mouse";
+    deviceList_["touch"] = "Virtual TouchScreen";
+    deviceList_["finger"] = "Virtual Finger";
+    deviceList_["pad"] = "Virtual Touchpad";
+    deviceList_["pen"] = "Virtual Stylus";
+    deviceList_["gamePad"] = "Virtual GamePad";
+    deviceList_["joystick"] = "Virtual Joystick";
+    deviceList_["remoteControl"] = "Virtual RemoteControl";
+    deviceList_["knob model1"] = "Virtual KnobConsumerCtrl";
+    deviceList_["knob model2"] = "Virtual Knob";
+    deviceList_["knob model3"] = "Virtual KnobMouse";
+    deviceList_["keyboard model1"] = "Virtual keyboard";
+    deviceList_["keyboard model2"] = "Virtual KeyboardConsumerCtrl";
+    deviceList_["keyboard model3"] = "Virtual KeyboardSysCtrl";
+    deviceList_["trackball"] = "Virtual Trackball";
+    deviceList_["trackpad model1"] = "Virtual TrackPadMouse";
+    deviceList_["trackpad model2"] = "Virtual Trackpad";
 }
 
 int32_t GetDeviceNode::ExecuteCmd(const std::string cmd, std::vector<std::string> &cmdResult)
 {
     if (cmd.empty()) {
+        MMI_LOGE("cmd is null");
         return RET_ERR;
     }
-    char buffer[READ_CMD_BUFF_SIZE] = {};
     FILE* pin = popen(cmd.c_str(), "r");
-    if (pin == nullptr) {
-        return RET_ERR;
-    }
+    CHKPR(pin, RET_ERR);
     cmdResult.clear();
+    char buffer[READ_CMD_BUFF_SIZE] = {};
     while (!feof(pin)) {
         if (fgets(buffer, sizeof(buffer), pin) != nullptr) {
             cmdResult.push_back(buffer);
@@ -92,35 +95,31 @@ int32_t GetDeviceNode::ExecuteCmd(const std::string cmd, std::vector<std::string
     return pclose(pin);
 }
 
-void GetDeviceNode::GetDeviceInfoCmdResult(const std::vector<std::string>& cmdResult,
-                                           DeviceMapData& deviceMapData) const
+void GetDeviceNode::GetDeviceCmd(const std::vector<std::string>& cmdResult, DeviceList& deviceList) const
 {
     std::string name;
-    std::string target;
-    std::string temp;
-    uint64_t endPos = 0;
-    uint64_t startPos = 0;
-    uint64_t eventLength = CMD_EVENT_LENGTH;
     for (const auto &item : cmdResult) {
-        temp = item.substr(0, 1);
+        if (item.empty()) {
+            MMI_LOGE("device info is none");
+            return;
+        }
+        std::string temp = item.substr(0, 1);
+        uint64_t endPos = 0;
+        uint64_t startPos = 0;
         if (temp == "N") {
             startPos = item.find("=") + strlen("N:");
             endPos = item.size() - 1;
             name = item.substr(startPos, endPos - startPos - 1);
-        } else if (temp == "H") {
-            startPos = item.find("event");
-            std::string endString = item.substr(startPos + strlen("event") + 1, 1);
-            if (endString != " ") {
-                eventLength = CMD_EVENT_LENGTH + 1;
-            }
-            target = item.substr(startPos, eventLength);
+        }
+        if (temp == "H") {
+            startPos = item.rfind("event");
+            uint64_t eventLength = item.substr(startPos).find_first_of(" ");
+            std::string target = item.substr(startPos, eventLength);
             if (!(name.empty())) {
-                deviceMapData[name].push_back(target);
+                deviceList[name].push_back(target);
                 name.clear();
                 target.clear();
             }
-        } else {
-            // nothing to do.
         }
     }
 }

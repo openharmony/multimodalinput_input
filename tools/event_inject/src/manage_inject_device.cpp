@@ -31,39 +31,39 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
         MMI_LOGE("input data from json file is empty");
         return RET_ERR;
     }
-    int32_t ret = RET_ERR;
-    std::string deviceName;
-    std::string sendType;
-    std::string deviceNode;
-    GetDeviceObject getDeviceObject;
     for (const auto &item : configData) {
-        deviceName = item.at("deviceName").get<std::string>();
-        InputEventArray inputEventArray = {};
-        inputEventArray.deviceName = deviceName;
-
+        std::string deviceName = item.at("deviceName").get<std::string>();
         uint16_t devIndex = 0;
         if (item.find("devIndex") != item.end()) {
             devIndex = item.at("devIndex").get<uint16_t>();
         }
-        if (getDeviceNodeObject_.GetDeviceNodeName(deviceName, deviceNode, devIndex) == RET_ERR) {
+        std::string deviceNode;
+        if (getDeviceNodeObject_.GetDeviceNodeName(deviceName, devIndex, deviceNode) == RET_ERR) {
+            MMI_LOGE("fail get device:%{public}s node", deviceName.c_str());
             return RET_ERR;
         }
+        InputEventArray inputEventArray = {};
+        inputEventArray.deviceName = deviceName;
         inputEventArray.target = deviceNode;
+        auto devicePtr = GetDeviceObject::CreateDeviceObject(deviceName);
+        CHKPR(devicePtr, RET_ERR);
+        int32_t ret = devicePtr->TransformJsonDataToInputData(item, inputEventArray);
+        if (devicePtr != nullptr) {
+            delete devicePtr;
+            devicePtr = nullptr;
+        }
+        if (ret == RET_ERR) {
+            MMI_LOGE("fail read json file");
+            return ret;
+        }
+        ret = SendEvent(inputEventArray);
+        if (ret == RET_ERR) {
+            MMI_LOGE("SendEvent fail");
+            return ret;
+        }
+    }
 
-        devicePtr_ = getDeviceObject.CreateDeviceObject(deviceName);
-        if (devicePtr_ == nullptr) {
-            return RET_ERR;
-        }
-        ret = devicePtr_->TransformJsonDataToInputData(item, inputEventArray);
-        if (ret != RET_ERR) {
-            ret = SendEvent(inputEventArray);
-        }
-    }
-    if (devicePtr_ != nullptr) {
-        delete devicePtr_;
-        devicePtr_ = nullptr;
-    }
-    return ret;
+    return RET_OK;
 }
 
 int32_t ManageInjectDevice::SendEvent(const InputEventArray& inputEventArray)
@@ -96,6 +96,7 @@ int32_t ManageInjectDevice::SendEventToDeviveNode(const InputEventArray& inputEv
     }
     if (fd >= 0) {
         close(fd);
+        fd = -1;
     }
     return RET_OK;
 }
