@@ -94,7 +94,6 @@ bool UDSClient::SendMsg(const NetPacket& pkt) const
 bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
 {
     CALL_LOG_ENTER;
-    MMI_LOGD("detachMode = %d", detachMode);
     recvFun_ = fun;
     isRunning_ = true;
     isConnected_ = true;

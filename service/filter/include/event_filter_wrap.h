@@ -33,7 +33,7 @@ public:
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);
 private:
-    std::mutex lockInputEventFilter_;
+    std::mutex lockFilter_;
     sptr<IEventFilter> filter_ {nullptr};
 };
 } // namespace MMI

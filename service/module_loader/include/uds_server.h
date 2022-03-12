@@ -79,7 +79,6 @@ protected:
     bool AddSession(SessionPtr ses);
     void DelSession(int32_t fd);
     void DumpSession(const std::string& title);
-    bool ClearDeadSessionInMap(const int32_t serverFd, const int32_t clientFd);
 
     void NotifySessionDeleted(SessionPtr ses);
     void AddPermission(SessionPtr sess);
