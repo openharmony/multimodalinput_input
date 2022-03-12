@@ -34,7 +34,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     CALL_LOG_ENTER;
     size_t argc = 2;
     const size_t requireArgc = 2;
-    napi_value argv[requireArgc];
+    napi_value argv[2];
     napi_status status = napi_generic_failure;
 
     status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);

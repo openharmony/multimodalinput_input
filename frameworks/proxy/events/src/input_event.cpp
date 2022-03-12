@@ -18,10 +18,13 @@
 #include <cassert>
 #include <chrono>
 
+#include "mmi_log.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {
 int64_t g_nextEventId = 1;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputEvent"};
 } // namespace
 
 InputEvent::InputEvent(int32_t eventType) : eventType_(eventType)
@@ -58,7 +61,9 @@ void InputEvent::Reset()
 
 std::shared_ptr<InputEvent> InputEvent::Create()
 {
-    return std::shared_ptr<InputEvent>(new (std::nothrow) InputEvent(InputEvent::EVENT_TYPE_BASE));
+    auto event = std::shared_ptr<InputEvent>(new (std::nothrow) InputEvent(InputEvent::EVENT_TYPE_BASE));
+    CHKPP(event);
+    return event;
 }
 
 int32_t InputEvent::GetId() const
