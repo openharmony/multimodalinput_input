@@ -308,8 +308,8 @@ const char* GetProgramName()
         KMSG_LOGE("copySize is 0.");
         return "";
     }
-    int32_t ret = memcpy_s(programName, programNameSize, tempName.c_str(), copySize);
-    if (RET_OK != ret) {
+    errno_t ret = memcpy_s(programName, programNameSize, tempName.c_str(), copySize);
+    if (ret != RET_OK) {
         return "";
     }
     KMSG_LOGI("GetProgramName success. programName = %s", programName);

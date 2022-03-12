@@ -90,7 +90,7 @@ int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, std::shared_
 int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key)
 {
     const std::string uid = GetUUid();
-    int32_t ret = memcpy_s(key.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size());
+    errno_t ret = memcpy_s(key.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size());
     if (ret != EOK) {
         MMI_LOGE("Memcpy data failed");
         return RET_ERR;

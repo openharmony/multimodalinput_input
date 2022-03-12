@@ -133,7 +133,6 @@ ohos_shared_library("libmmi-server") {
     ":drawing_pointer_image",
     ":mmi_device_config.ini",
     ":multimodalinput_config_ability.json",
-    "//drivers/peripheral/input/hal:hdi_input",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
@@ -151,7 +150,6 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
     "//foundation/windowmanager/wm:libwm",
-    "//utils/native/base:utils",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
@@ -164,9 +162,11 @@ ohos_shared_library("libmmi-server") {
     "bytrace_standard:bytrace_core",
     "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
+    "input_device_driver:hdi_input",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
+    "utils_base:utils",
   ]
 
   part_name = "multimodalinput_base"
@@ -255,23 +255,24 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",
     "${mmi_path}/service:libmmi-server",
-    "//drivers/peripheral/input/hal:hdi_input",
     "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "input_device_driver:hdi_input",
+    "utils_base:utils",
+  ]
 }
 
 group("ut-mmi-service") {
   testonly = true
-  deps = []
-  deps += [ ":ut-mmi-service-out" ]
+  deps = [ ":ut-mmi-service-out" ]
 }

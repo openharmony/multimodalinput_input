@@ -43,19 +43,23 @@ ohos_shared_library("inputeventclient") {
   configs = [ ":libinputeventclient_config" ]
 
   deps = [
-    "//drivers/peripheral/input/hal:hdi_input",
-    "//foundation/ace/napi:ace_napi",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/tools/event_inject:event-injection",
     "//third_party/libuv:uv_static",
-    "//utils/native/base:utils",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
+
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "input_device_driver:hdi_input",
+    "ipc:ipc_core",
+    "napi:ace_napi",
+    "utils_base:utils",
+  ]
 
   relative_install_dir = "module/multimodalinput"
 

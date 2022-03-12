@@ -183,17 +183,18 @@ ohos_unittest("RunShellUtilTest") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
 }
 
 group("ut-mmi-util") {
   testonly = true
-  deps = []
-  deps += [
+  deps = [
     ":RunShellUtilTest",
     ":ut-mmi-util-out",
   ]

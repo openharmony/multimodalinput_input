@@ -54,7 +54,7 @@ int32_t HdfEventManager::EvdevSimIoctl(int32_t hdindex, int32_t pcmd, void *iobu
         }
     }
     const int32_t iobuffSize = size;
-    int32_t ret = 0;
+    errno_t ret = 0;
     switch (cmd) {
         case IO_BITS:
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayBits[drvtype], size);
@@ -129,7 +129,7 @@ int32_t HdfEventManager::EvdevIoctl(int32_t hdiindex, int32_t pcmd, void *iobuff
         return 0;
     }
     const int32_t iobuffSize = size;
-    int32_t ret = 0;
+    errno_t ret = 0;
     switch (cmd) {
         case IO_BITS:
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.eventType, size);
@@ -226,7 +226,7 @@ int32_t HdfEventManager::HdfdevtypeMapLibinputType(uint32_t devIndex, uint32_t d
 #ifdef  OHOS_BUILD_HDF
 int32_t HdfEventManager::GetDeviceCount()
 {
-    int32_t ret = memset_s(mountDevIndex_, sizeof(DevDesc) * TOTAL_INPUT_DEVICE_COUNT, 0,
+    errno_t ret = memset_s(mountDevIndex_, sizeof(DevDesc) * TOTAL_INPUT_DEVICE_COUNT, 0,
                            sizeof(DevDesc) * TOTAL_INPUT_DEVICE_COUNT);
     if (ret != EOK) {
         MMI_LOGE("call memset_s fail. ret = %d", ret);
