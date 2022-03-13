@@ -431,5 +431,51 @@ std::string StringFmt(const char* str, ...)
     return buf;
 }
 
+bool IsFileExists(const std::string& fileName)
+{
+    if ((access(fileName.c_str(), F_OK)) == 0) {
+        return true;
+    }
+    return false;
+}
+
+int32_t VerifyFile(const std::string& fileName)
+{
+    std::string findcmd = "find /data -name " + fileName;
+    FILE* findJson = popen(findcmd.c_str(), "r");
+    if (!findJson) {
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+std::string GetFileExtendName(const std::string& fileName)
+{
+    if (fileName.empty()) {
+        return "";
+    }
+    size_t nPos = fileName.find_last_of('.');
+    if (fileName.npos == nPos) {
+        return fileName;
+    }
+    return fileName.substr(nPos + 1, fileName.npos);
+}
+
+int32_t GetFileSize(const std::string& fileName)
+{
+    FILE* pFile = fopen(fileName.c_str(), "rb");
+    if (pFile) {
+        fseek(pFile, 0, SEEK_END);
+        long fileSize = ftell(pFile);
+        if (fileSize > INT32_MAX) {
+            MMI_LOGE("The file is too large for 32-bit systems, filesize:%{public}ld", fileSize);
+            fclose(pFile);
+            return RET_ERR;
+        }
+        fclose(pFile);
+        return fileSize;
+    }
+    return RET_ERR;
+}
 } // namespace MMI
 } // namespace OHOS
