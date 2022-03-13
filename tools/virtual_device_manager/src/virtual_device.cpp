@@ -64,14 +64,13 @@ VirtualDevice::~VirtualDevice()
     }
 }
 
-bool VirtualDevice::CatFload(std::vector<std::string>& fileList)
+bool  VirtualDevice::ViewDirectory(std::vector<std::string>& fileList)
 {
     DIR* dir = opendir(g_folderpath.c_str());
     if (dir == nullptr) {
         printf("Failed to open folder");
         return false;
     }
-
     fileList.clear();
     dirent* ptr = nullptr;
     while ((ptr = readdir(dir)) != nullptr) {
@@ -88,7 +87,7 @@ bool VirtualDevice::CatFload(std::vector<std::string>& fileList)
 bool VirtualDevice::SyncSymbolFile()
 {
     std::vector<std::string> tempList;
-    if (!CatFload(tempList)) {
+    if (!ViewDirectory(tempList)) {
         return false;
     }
 
@@ -155,22 +154,22 @@ bool VirtualDevice::CreateKey()
 
 bool VirtualDevice::SetAbsResolution(const std::string deviceName)
 {
-    constexpr int32_t ABS_RESOLUTION = 200;
-    constexpr int32_t ABS_RESOLUTION_FINGER = 40;
+    constexpr int32_t ABSRANGE = 200;
+    constexpr int32_t FINGERABSRANGE = 40;
     if (deviceName == "Virtual Stylus" || deviceName == "Virtual Touchpad") {
-        absTemp_.code = 0x00;
-        absTemp_.absinfo.resolution = ABS_RESOLUTION;
-        absInit_.push_back(absTemp_);
-        absTemp_.code = 0x01;
-        absTemp_.absinfo.resolution = ABS_RESOLUTION;
-        absInit_.push_back(absTemp_);
+        g_absTemp_.code = 0x00;
+        g_absTemp_.absinfo.resolution = ABSRANGE;
+        absInit_.push_back(g_absTemp_);
+        g_absTemp_.code = 0x01;
+        g_absTemp_.absinfo.resolution = ABSRANGE;
+        absInit_.push_back(g_absTemp_);
     } else if (deviceName == "Virtual Finger") {
-        absTemp_.code = 0x00;
-        absTemp_.absinfo.resolution = ABS_RESOLUTION_FINGER;
-        absInit_.push_back(absTemp_);
-        absTemp_.code = 0x01;
-        absTemp_.absinfo.resolution = ABS_RESOLUTION_FINGER;
-        absInit_.push_back(absTemp_);
+        g_absTemp_.code = 0x00;
+        g_absTemp_.absinfo.resolution = FINGERABSRANGE;
+        absInit_.push_back(g_absTemp_);
+        g_absTemp_.code = 0x01;
+        g_absTemp_.absinfo.resolution = FINGERABSRANGE;
+        absInit_.push_back(g_absTemp_);
     } else {
         return false;
     }
@@ -309,27 +308,14 @@ void VirtualDevice::StartAllDevices()
     virtualTouchScreen.SetUp();
 }
 
-void VirtualDevice::MakeFolder(const std::string &filePath)
-{
-    DIR* dir = opendir(filePath.c_str());
-    bool flag = false;
-    if (dir == nullptr) {
-        mkdir(filePath.c_str(), SYMBOL_FOLDER_PERMISSIONS);
-        flag = true;
-    }
-    if (!flag) {
-        closedir(dir);
-    }
-}
-
 bool VirtualDevice::SelectDevice(std::vector<std::string> &fileList)
 {
-    if (fileList.size() == MAX_PARAMETER_NUMBER) {
+    if (fileList.size() == MAXPARAMETER) {
         printf("Invaild Input Para, Plase Check the validity of the para");
         return false;
     }
 
-    if (!CatFload(fileList)) {
+    if (!ViewDirectory(fileList)) {
         return false;
     }
 
@@ -425,7 +411,7 @@ bool VirtualDevice::AddDevice(const std::vector<std::string>& fileList)
 
 bool VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
 {
-    if (fileList.size() == MAX_PARAMETER_NUMBER_FOR_ADD_DEL) {
+    if (fileList.size() == MAXDELPARAMETER) {
         printf("Invaild Input Para, Plase Check the validity of the para");
         return false;
     }
@@ -458,17 +444,17 @@ bool VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
     }
 }
 
-bool VirtualDevice::FunctionalShunt(const std::string firstArgv, std::vector<std::string> argvList)
+bool VirtualDevice::FindDevice(std::vector<std::string> argvList)
 {
     SyncSymbolFile();
-    if (firstArgv == "start") {
+    if (argvList == "start") {
         bool result = AddDevice(argvList);
         if (!result) {
             printf("Failed to create device");
             return false;
         }
         return true;
-    } else if (firstArgv == "list") {
+    } else if (argvList == "list") {
         bool result = SelectDevice(argvList);
         if (!result) {
             return false;
@@ -482,7 +468,7 @@ bool VirtualDevice::FunctionalShunt(const std::string firstArgv, std::vector<std
             }
             return false;
         }
-    } else if (firstArgv == "close") {
+    } else if (argvList == "close") {
         bool result = CloseDevice(argvList);
         if (!result) {
             return false;
