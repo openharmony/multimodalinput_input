@@ -14,13 +14,14 @@
  */
 
 #include "injection_event_dispatch.h"
-
+#include <cstdio>
+#include <unistd.h>
 #include "error_multimodal.h"
 #include "proto.h"
 #include "util.h"
 
-using namespace OHOS::MMI;
-
+namespace OHOS {
+namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InjectionEventDispatch" };
 } // namespace
@@ -46,11 +47,80 @@ void InjectionEventDispatch::InitManageFunction()
     }
 }
 
+bool InjectionEventDispatch::IsFileExists(const std::string& fileName)
+{
+    if ((access(fileName.c_str(), F_OK)) == 0) {
+        return true;
+    }
+    return false;
+}
+
+int32_t InjectionEventDispatch::VerifyFile(const std::string& fileName)
+{
+    std::string findcmd = "find /data -name " + fileName;
+    FILE* findJson = popen(findcmd.c_str(), "r");
+    if (!findJson) {
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+std::string InjectionEventDispatch::GetFileExtendName(const std::string& fileName)
+{
+    if (fileName.empty()) {
+        return "";
+    }
+    size_t nPos = fileName.find_last_of('.');
+    if (fileName.npos == nPos) {
+        return fileName;
+    }
+    return fileName.substr(nPos + 1, fileName.npos);
+}
+
+int32_t InjectionEventDispatch::GetFileSize(const std::string& fileName)
+{
+    FILE* pFile = fopen(fileName.c_str(), "rb");
+    if (pFile) {
+        fseek(pFile, 0, SEEK_END);
+        long fileSize = ftell(pFile);
+        if (fileSize > INT32_MAX) {
+            MMI_LOGE("The file is too large for 32-bit systems, filesize:%{public}ld", fileSize);
+            fclose(pFile);
+            return RET_ERR;
+        }
+        fclose(pFile);
+        return fileSize;
+    }
+    return RET_ERR;
+}
+
 int32_t InjectionEventDispatch::OnJson()
 {
     CALL_LOG_ENTER;
-    const std::string path = injectArgvs_.at(JSON_FILE_PATH_INDEX);
-    std::ifstream reader(path);
+    const std::string jsonFile = injectArgvs_.at(JSON_FILE_PATH_INDEX);
+    char Path[PATH_MAX] = {};
+    if (realpath(jsonFile.c_str(), Path) == nullptr) {
+        MMI_LOGE("json path is error, jsonFile:%{public}s", jsonFile.c_str());
+        return RET_ERR;
+    }
+    if (!(IsFileExists(jsonFile))) {
+        MMI_LOGE("This file does not exist, jsonFile:%{public}s", jsonFile.c_str());
+        return RET_ERR;
+    }
+    if (VerifyFile(jsonFile)) {
+        MMI_LOGE("This file is not in data, jsonFile:%{public}s", jsonFile.c_str());
+        return RET_ERR;
+    }
+    if (GetFileExtendName(jsonFile) != "json") {
+        MMI_LOGE("Unable to parse files other than json format jsonFile:%{public}s", jsonFile.c_str());
+        return RET_ERR;
+    }
+    int32_t fileSize = GetFileSize(jsonFile);
+    if ((fileSize <= 0) || (fileSize > JSON_FILE_SIZE)) {
+        MMI_LOGE("The file size is out of range 2M or empty. filesize:%{public}d", fileSize);
+        return RET_ERR;
+    }
+    std::ifstream reader(jsonFile);
     if (!reader) {
         MMI_LOGE("json file is empty");
         return RET_ERR;
@@ -101,16 +171,13 @@ void InjectionEventDispatch::Run()
     CALL_LOG_ENTER;
     std::string id = GetFunId();
     auto fun = GetFun(id);
-    if (!fun) {
-        MMI_LOGE("event injection Unknown fuction id:%{public}s", id.c_str());
-        return;
-    }
+    CHKPV(fun);
 
     auto ret = (*fun)();
     if (ret == RET_OK) {
-        MMI_LOGI("injecte function success id:%{public}s", id.c_str());
+        MMI_LOGI("inject function success id:%{public}s", id.c_str());
     } else {
-        MMI_LOGE("injecte function faild id:%{public}s", id.c_str());
+        MMI_LOGE("inject function failed id:%{public}s", id.c_str());
     }
 }
 
@@ -128,9 +195,9 @@ int32_t InjectionEventDispatch::ExecuteFunction(std::string funId)
     int32_t ret = RET_ERR;
     ret = (*fun)();
     if (ret == RET_OK) {
-        MMI_LOGI("injecte function success id:%{public}s", funId.c_str());
+        MMI_LOGI("inject function success id:%{public}s", funId.c_str());
     } else {
-        MMI_LOGE("injecte function faild id:%{public}s", funId.c_str());
+        MMI_LOGE("inject function failed id:%{public}s", funId.c_str());
     }
 
     return ret;
@@ -140,7 +207,7 @@ int32_t InjectionEventDispatch::OnHelp()
 {
     InjectionToolsHelpFunc helpFunc;
     std::string ret = helpFunc.GetHelpText();
-    MMI_LOGI("%s", ret.c_str());
+    MMI_LOGI("%{public}s", ret.c_str());
 
     return RET_OK;
 }
@@ -162,13 +229,13 @@ int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText
 int32_t InjectionEventDispatch::OnSendEvent()
 {
     if (injectArgvs_.size() != SEND_EVENT_ARGV_COUNTS) {
-        MMI_LOGE("Wrong number of input parameters, errCode:%d", PARAM_INPUT_FAIL);
+        MMI_LOGE("Wrong number of input parameters, errCode:%{public}d", PARAM_INPUT_FAIL);
         return RET_ERR;
     }
 
     std::string deviceNode = injectArgvs_[SEND_EVENT_DEV_NODE_INDEX];
     if (deviceNode.empty()) {
-        MMI_LOGE("device node:%s is not exit", deviceNode.c_str());
+        MMI_LOGE("device node:%{public}s is not exit", deviceNode.c_str());
         return RET_ERR;
     }
     char realPath[PATH_MAX] = {};
@@ -178,7 +245,7 @@ int32_t InjectionEventDispatch::OnSendEvent()
     }
     int32_t fd = open(realPath, O_RDWR);
     if (fd < 0) {
-        MMI_LOGE("open device node:%s faild", deviceNode.c_str());
+        MMI_LOGE("open device node:%{public}s failed, errCode:%{public}d", deviceNode.c_str(), FILE_OPEN_FAIL);
         return RET_ERR;
     }
 
@@ -190,7 +257,11 @@ int32_t InjectionEventDispatch::OnSendEvent()
     event.type = static_cast<uint16_t>(std::stoi(injectArgvs_[SEND_EVENT_TYPE_INDEX]));
     event.code = static_cast<uint16_t>(std::stoi(injectArgvs_[SEND_EVENT_CODE_INDEX]));
     event.value = static_cast<int32_t>(std::stoi(injectArgvs_[SEND_EVENT_VALUE_INDEX]));
-    write(fd, &event, sizeof(event));
+    int32_t ret = write(fd, &event, sizeof(event));
+    if (ret != sizeof(event)) {
+        MMI_LOGE("send event to device node faild.");
+        return RET_ERR;
+    }
     if (fd >= 0) {
         close(fd);
     }
@@ -216,3 +287,5 @@ int32_t InjectionEventDispatch::GetDevIndexType(int32_t devType) const
     }
     return RET_ERR;
 }
+} // namespace MMI
+} // namespace OHOS
