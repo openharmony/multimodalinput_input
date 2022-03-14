@@ -33,6 +33,7 @@ public:
     virtual ~ClientMsgHandler();
     virtual bool Init() override;
     virtual void OnMsgHandler(const UDSClient& client, NetPacket& pkt) override;
+    virtual MsgClientFunCallback GetCallback() override;
 
 protected:
     virtual int32_t OnKeyEvent(const UDSClient& client, NetPacket& pkt);

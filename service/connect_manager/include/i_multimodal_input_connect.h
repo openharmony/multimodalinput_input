@@ -33,7 +33,7 @@ public:
 
     enum {
         ALLOC_SOCKET_FD = 0,
-        SET_EVENT_POINTER_FILTER = 1,
+        ADD_INPUT_EVENT_FILTER = 1,
     };
 
     enum {

@@ -184,13 +184,12 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
 void UDSServer::AddPermission(SessionPtr sess)
 {
     uint32_t callerToken = IPCSkeleton::GetCallingTokenID();
-    int32_t result;
     std::string permissionMonitor = "ohos.permission.INPUT_MONITORING";
     
     if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) ==
         Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
         MMI_LOGD("get token type flag is TOKEN_HAP");
-        result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionMonitor);
+        int32_t result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionMonitor);
         MMI_LOGD("verify access token result:%{public}d", result);
         if (result != Security::AccessToken::PERMISSION_GRANTED) {
             MMI_LOGD("permission is not granted");

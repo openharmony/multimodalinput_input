@@ -53,7 +53,6 @@ ClientMsgHandler::~ClientMsgHandler()
 
 bool ClientMsgHandler::Init()
 {
-    // LCOV_EXCL_START
     MsgCallback funs[] = {
         {MmiMessageId::ON_KEYEVENT, MsgCallbackBind2(&ClientMsgHandler::OnKeyEvent, this)},
         {MmiMessageId::ON_SUBSCRIBE_KEY, std::bind(&ClientMsgHandler::OnSubscribeKeyEventCallback,
@@ -69,7 +68,6 @@ bool ClientMsgHandler::Init()
         {MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::TouchpadEventInterceptor, this)},
         {MmiMessageId::KEYBOARD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::KeyEventInterceptor, this)},
     };
-    // LCOV_EXCL_STOP
     for (auto& it : funs) {
         if (!RegistrationEvent(it)) {
             MMI_LOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
@@ -93,6 +91,11 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
         MMI_LOGE("Msg handling failed. id:%{public}d,ret:%{public}d", id, ret);
         return;
     }
+}
+
+MsgClientFunCallback ClientMsgHandler::GetCallback()
+{
+    return std::bind(&ClientMsgHandler::OnMsgHandler, this, std::placeholders::_1, std::placeholders::_2);
 }
 
 int32_t ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)

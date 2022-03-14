@@ -93,7 +93,7 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
 
     MessageParcel reply;
     MessageOption option;
-    int32_t requestResult = Remote()->SendRequest(SET_EVENT_POINTER_FILTER, data, reply, option);
+    int32_t requestResult = Remote()->SendRequest(ADD_INPUT_EVENT_FILTER, data, reply, option);
     if (requestResult != NO_ERROR) {
         MMI_LOGE("send request fail, result:%{public}d", requestResult);
         return RET_ERR;
