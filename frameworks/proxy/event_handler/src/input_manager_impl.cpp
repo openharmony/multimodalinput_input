@@ -15,8 +15,7 @@
 
 #include "input_manager_impl.h"
 
-#include "bytrace.h"
-
+#include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "event_filter_service.h"
@@ -113,13 +112,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_LOG_ENTER;
     CHKPV(keyEvent);
-    int32_t getKeyCode = keyEvent->GetKeyCode();
-    MMI_LOGD("client trace getKeyCode:%{public}d", getKeyCode);
-    std::string keyCodestring = "client dispatchKeyCode=" + std::to_string(getKeyCode);
-    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring);
-    int32_t keyId = keyEvent->GetId();
-    keyCodestring = "KeyEventDispatch";
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, keyId);
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
     if (consumer_ != nullptr) {
         CHKPV(keyEvent);
         consumer_->OnInputEvent(keyEvent);
@@ -131,16 +124,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
 {
     MMI_LOGD("Pointer event received, processing");
     CHKPV(pointerEvent);
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-        int32_t pointerId = pointerEvent->GetId();
-        std::string pointerEventstring = "PointerEventDispatch";
-        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, pointerId);
-    }
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        int32_t touchId = pointerEvent->GetId();
-        std::string touchEvent = "touchEventDispatch";
-        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, touchId);
-    }
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
     if (consumer_ != nullptr) {
         CHKPV(pointerEvent);
         MMI_LOGD("Passed on to consumer");

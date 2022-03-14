@@ -2018,7 +2018,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_009, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Level1)
 {
-    if (!MultimodalEventHandler::GetInstance().GetMMIClient()) {
+    if (MultimodalEventHandler::GetInstance().GetMMIClient() == nullptr) {
         MMI_LOGD("get mmi client failed");
         return;
     }

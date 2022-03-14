@@ -15,8 +15,7 @@
 
 #include "input_handler_manager.h"
 
-#include "bytrace.h"
-
+#include "bytrace_adapter.h"
 #include "input_handler_type.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
@@ -175,16 +174,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
     CALL_LOG_ENTER;
     MMI_LOGD("handler:%{public}d", handlerId);
     CHKPV(pointerEvent);
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-        int32_t pointerId = pointerEvent->GetId();
-        std::string pointerEventString = "pointerEventFilter";
-        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventString, pointerId);
-    }
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        int32_t touchId = pointerEvent->GetId();
-        std::string touchEventString = "touchEventFilter";
-        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, touchId);
-    }
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
     std::shared_ptr<IInputEventConsumer> consumer = FindHandler(handlerId);
     if (consumer != nullptr) {
         consumer->OnInputEvent(pointerEvent);
