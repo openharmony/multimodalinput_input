@@ -14,11 +14,14 @@
  */
 
 #include "hdf_event_manager.h"
+
 #include <cstring>
 #include <ctime>
 #include <thread>
+
 #include <sys/time.h>
 #include <unistd.h>
+
 #include "hdf_inject_init.cpp"
 #include "lib_hdf.h"
 #include "libmmi_util.h"
@@ -51,7 +54,7 @@ int32_t HdfEventManager::EvdevSimIoctl(int32_t hdindex, int32_t pcmd, void *iobu
         }
     }
     const int32_t iobuffSize = size;
-    int32_t ret = 0;
+    errno_t ret = 0;
     switch (cmd) {
         case IO_BITS:
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayBits[drvtype], size);
@@ -126,7 +129,7 @@ int32_t HdfEventManager::EvdevIoctl(int32_t hdiindex, int32_t pcmd, void *iobuff
         return 0;
     }
     const int32_t iobuffSize = size;
-    int32_t ret = 0;
+    errno_t ret = 0;
     switch (cmd) {
         case IO_BITS:
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.eventType, size);
@@ -223,7 +226,7 @@ int32_t HdfEventManager::HdfdevtypeMapLibinputType(uint32_t devIndex, uint32_t d
 #ifdef  OHOS_BUILD_HDF
 int32_t HdfEventManager::GetDeviceCount()
 {
-    int32_t ret = memset_s(mountDevIndex_, sizeof(DevDesc) * TOTAL_INPUT_DEVICE_COUNT, 0,
+    errno_t ret = memset_s(mountDevIndex_, sizeof(DevDesc) * TOTAL_INPUT_DEVICE_COUNT, 0,
                            sizeof(DevDesc) * TOTAL_INPUT_DEVICE_COUNT);
     if (ret != EOK) {
         MMI_LOGE("call memset_s fail. ret = %d", ret);
@@ -387,7 +390,7 @@ void HdfEventManager::GetEventCallback(const EventPackage **pkgs, uint32_t count
     struct input_event eventarry[MAX_EVENT_PKG_NUM];
     for (uint32_t i = 0; i < count && i < MAX_EVENT_PKG_NUM; i++) {
         eventarry[i].code = pkgs[i]->code;
-        eventarry[i].type = (pkgs[i]->type) | static_cast<uint16_t>(devIndex<<byteSize); // 不改变livinput结构传递，对象的index参数
+        eventarry[i].type = (pkgs[i]->type) | static_cast<uint16_t>(devIndex<<byteSize);
         eventarry[i].value = pkgs[i]->value;
         eventarry[i].input_event_sec = (pkgs[i]->timestamp) / (USEC_PER_SEC);
         eventarry[i].input_event_usec = (pkgs[i]->timestamp) % (USEC_PER_SEC);

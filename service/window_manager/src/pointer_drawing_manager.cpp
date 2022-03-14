@@ -12,16 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "pointer_drawing_manager.h"
+
 #include <display_type.h>
-#include "libmmi_util.h"
+
 #include "image/bitmap.h"
 #include "image_source.h"
 #include "image_type.h"
 #include "image_utils.h"
+#include "pixel_map.h"
+
+#include "libmmi_util.h"
 #include "input_device_manager.h"
 #include "mmi_log.h"
-#include "pixel_map.h"
 
 namespace OHOS {
 namespace MMI {
@@ -92,14 +96,12 @@ void PointerDrawingManager::FixCursorPosition(int32_t &globalX, int32_t &globalY
         globalY = 0;
     }
 
-    int32_t size = 16;
-    int32_t fcursorW = IMAGE_WIDTH / size;
-    if ((globalX + fcursorW) > displayWidth_) {
-        globalX = displayWidth_ - fcursorW;
+    const int32_t cursorUnit = 16;
+    if (globalX > (displayWidth_ - IMAGE_WIDTH / cursorUnit)) {
+        globalX = displayWidth_ - IMAGE_WIDTH / cursorUnit;
     }
-    int32_t fcursorH = IMAGE_HEIGHT / size;
-    if ((globalY + fcursorH) > displayHeight_) {
-        globalY = displayHeight_ - fcursorH;
+    if (globalY > (displayHeight_ - IMAGE_HEIGHT / cursorUnit)) {
+        globalY = displayHeight_ - IMAGE_HEIGHT / cursorUnit;
     }
 }
 
@@ -168,7 +170,7 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
     DrawPixelmap(canvas);
     constexpr uint32_t stride = 4;
     uint32_t addrSize = width * height * stride;
-    auto ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
+    errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
     if (ret != EOK) {
         MMI_LOGE("Memcpy data is error, ret:%{public}d", ret);
         return;

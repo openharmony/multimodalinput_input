@@ -17,16 +17,18 @@
 
 #include <map>
 #include <mutex>
+
 #include "nocopyable.h"
+#include "singleton.h"
+
 #include "pointer_event.h"
 #include "struct_multimodal.h"
-#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
 class MouseDeviceState : public DelayedSingleton<MouseDeviceState> {
 public:
-    const int32_t mouseBtnMax = 8; // 鼠标按键最多为8个
+    const int32_t mouseBtnMax = 8;
     enum LIBINPUT_BUTTON_CODE {
         LIBINPUT_LEFT_BUTTON_CODE = 272,
         LIBINPUT_RIGHT_BUTTON_CODE,

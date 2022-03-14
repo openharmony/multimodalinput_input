@@ -14,14 +14,16 @@
  */
 
 #include "server_msg_handler.h"
+
 #include <cinttypes>
+
 #include "ability_launch_manager.h"
 #include "event_dump.h"
 #include "event_package.h"
 #include "hos_key_event.h"
 #include "input_device_manager.h"
-#include "input_event_data_transformation.h"
 #include "input_event.h"
+#include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
 #include "input_handler_manager_global.h"
 #include "input_windows_manager.h"
@@ -277,7 +279,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
             pkt.Read(info);
             windowInfos.push_back(info);
         }
-        info.windowsInfo_ = windowInfos;
+        info.windowsInfo = windowInfos;
         logicalDisplays.push_back(info);
     }
 

@@ -28,9 +28,6 @@ config("libmmi_client_config") {
     "//foundation/multimodalinput/input/common/include",
     "//foundation/multimodalinput/input/frameworks/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//utils/native/base/include",
     "event_handler/include",
     "module_loader/include",
     "${appexecfwk_path}/interfaces/innerkits/libeventhandler/include",
@@ -44,7 +41,6 @@ config("libmmi_public_client_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
     "//foundation/multimodalinput/input/common/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//utils/native/base/include",
   ]
 }
 
@@ -61,12 +57,12 @@ ohos_source_set("libmmi-common") {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
-  configs = [ ":libmmi_client_config" ]
+  public_configs = [ ":libmmi_client_config" ]
 
-  deps = [ "//utils/native/base:utils" ]
-
-  public_deps =
-      [ "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "utils_base:utils",
+  ]
 
   part_name = "multimodalinput_base"
 }
@@ -112,15 +108,19 @@ ohos_shared_library("libmmi-client") {
   deps = [
     ":libmmi-common",
     "${appexecfwk_path}/interfaces/innerkits/libeventhandler:libeventhandler",
-    "//drivers/peripheral/input/hal:hdi_input",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
   ]
 
   part_name = "multimodalinput_base"
-  external_deps = [ "bytrace_standard:bytrace_core" ]
+  external_deps = [
+    "bytrace_standard:bytrace_core",
+    "hiviewdfx_hilog_native:libhilog",
+    "input_device_driver:hdi_input",
+    "ipc:ipc_core",
+    "utils_base:utils",
+  ]
 }
 
 ohos_unittest("ut-mmi-proxy-out") {
@@ -176,11 +176,13 @@ ohos_unittest("ut-mmi-proxy-out") {
     "${appexecfwk_path}/interfaces/innerkits/libeventhandler:libeventhandler",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
 }
 
 ohos_unittest("KeyEventTest") {
@@ -234,11 +236,13 @@ ohos_unittest("KeyEventTest") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
 }
 
 ohos_unittest("InputManagerTest") {
@@ -294,11 +298,13 @@ ohos_unittest("InputManagerTest") {
     "${appexecfwk_path}/interfaces/innerkits/libeventhandler:libeventhandler",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
 }
 
 ohos_unittest("InputManagerManualTest") {
@@ -352,11 +358,13 @@ ohos_unittest("InputManagerManualTest") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
 }
 
 ohos_unittest("PointerEventTest") {
@@ -410,11 +418,13 @@ ohos_unittest("PointerEventTest") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
 }
 
 group("ut-mmi-proxy") {

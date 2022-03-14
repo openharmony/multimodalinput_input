@@ -15,8 +15,13 @@
 
 #include "axis_event.h"
 
+#include "mmi_log.h"
+
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AxisEvent" };
+} // namespace
 std::shared_ptr<AxisEvent> AxisEvent::from(std::shared_ptr<InputEvent> inputEvent)
 {
     return nullptr;
@@ -28,7 +33,9 @@ AxisEvent::~AxisEvent() {}
 
 std::shared_ptr<AxisEvent> AxisEvent::Create()
 {
-    return std::shared_ptr<AxisEvent>(new (std::nothrow) AxisEvent(InputEvent::EVENT_TYPE_AXIS));
+    auto event = std::shared_ptr<AxisEvent>(new (std::nothrow) AxisEvent(InputEvent::EVENT_TYPE_AXIS));
+    CHKPP(event);
+    return event;
 }
 
 int32_t AxisEvent::GetAxisAction()

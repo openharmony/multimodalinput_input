@@ -17,14 +17,17 @@
 #define POINTER_DRAWING_MANAGER_H
 
 #include <iostream>
+
 #include <ui/rs_surface_node.h>
-#include "singleton.h"
-#include "../../../common/include/device_observer.h"
-#include "struct_multimodal.h"
-#include "pixel_map.h"
-#include "window.h"
+
 #include "draw/canvas.h"
 #include "nocopyable.h"
+#include "pixel_map.h"
+#include "singleton.h"
+#include "window.h"
+
+#include "../../../common/include/device_observer.h"
+#include "struct_multimodal.h"
 
 namespace OHOS {
 namespace MMI {

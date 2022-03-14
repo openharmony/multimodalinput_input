@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include "input_windows_manager.h"
 #include <gtest/gtest.h>
+
+#include "input_windows_manager.h"
 
 namespace OHOS {
 namespace MMI {

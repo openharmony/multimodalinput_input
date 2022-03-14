@@ -190,6 +190,14 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
         consumer->OnInputEvent(pointerEvent);
     }
 }
+
+void InputHandlerManager::OnConnected()
+{
+    CALL_LOG_ENTER;
+    for (auto &inputHandler : inputHandlers_) {
+        AddToServer(inputHandler.second.handlerId_, inputHandler.second.handlerType_);
+    }
+}
 } // namespace MMI
 } // namespace OHOS
 

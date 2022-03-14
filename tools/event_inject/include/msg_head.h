@@ -15,21 +15,25 @@
 
 #ifndef MSG_HEAD_H
 #define MSG_HEAD_H
+
+#include <algorithm>
 #include <ctime>
+#include <cstdio>
+#include <cstring>
+#include <functional>
+#include <fstream>
+#include <iostream>
+#include <vector>
+
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <cstdio>
 #include <unistd.h>
-#include <fcntl.h>
-#include <functional>
-#include <algorithm>
-#include <fstream>
-#include <vector>
-#include <iostream>
-#include <cstring>
 #include <linux/input.h>
 #include <linux/uinput.h>
+
 #include "nlohmann/json.hpp"
+
 #include "libmmi_util.h"
 
 using Json = nlohmann::json;

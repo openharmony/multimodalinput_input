@@ -22,10 +22,12 @@
 #include <mutex>
 #include <set>
 #include <thread>
-#include "key_event.h"
-#include "key_option.h"
+
 #include "nocopyable.h"
 #include "singleton.h"
+
+#include "key_event.h"
+#include "key_option.h"
 #include "uds_server.h"
 
 namespace OHOS {

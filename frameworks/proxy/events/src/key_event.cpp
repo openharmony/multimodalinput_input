@@ -518,7 +518,9 @@ KeyEvent::~KeyEvent() {}
 
 std::shared_ptr<KeyEvent> KeyEvent::Create()
 {
-    return std::shared_ptr<KeyEvent>(new (std::nothrow) KeyEvent(InputEvent::EVENT_TYPE_KEY));
+    auto event = std::shared_ptr<KeyEvent>(new (std::nothrow) KeyEvent(InputEvent::EVENT_TYPE_KEY));
+    CHKPP(event);
+    return event;
 }
 
 int32_t KeyEvent::GetKeyCode() const
@@ -1405,18 +1407,25 @@ std::shared_ptr<KeyEvent> KeyEvent::Clone(std::shared_ptr<KeyEvent> keyEvent) {
     if (!keyEvent) {
         return nullptr;
     }
-
-    return std::shared_ptr<KeyEvent>(new (std::nothrow) KeyEvent(*keyEvent.get()));
+    auto event = std::shared_ptr<KeyEvent>(new (std::nothrow) KeyEvent(*keyEvent.get()));
+    CHKPP(event);
+    return event;
 }
 
 bool KeyEvent::IsValidKeyItem() const
 {
     CALL_LOG_ENTER;
-    int32_t noPressNum = 0;
+    int32_t sameKeyCodeNum = 0;
     int32_t keyCode = GetKeyCode();
     int32_t action = GetKeyAction();
     
     for (auto it = keys_.begin(); it != keys_.end(); ++it) {
+        if (it->GetKeyCode() == keyCode) {
+            if (++sameKeyCodeNum > 1) {
+                MMI_LOGE("Keyitems keyCode is not unique with keyEvent keyCode");
+                return false;
+            }
+        }
         if (it->GetKeyCode() <= KEYCODE_UNKNOWN) {
             MMI_LOGE("keyCode is invalid");
             return false;
@@ -1430,7 +1439,6 @@ bool KeyEvent::IsValidKeyItem() const
             return false;
         }
         if (action == KEY_ACTION_UP && it->IsPressed() == false) {
-            noPressNum++;
             if (it->GetKeyCode() != keyCode) {
                 MMI_LOGE("keyCode is invalid when isPressed is false");
                 return false;
@@ -1446,8 +1454,8 @@ bool KeyEvent::IsValidKeyItem() const
         }
     }
     
-    if (noPressNum != 1) {
-        MMI_LOGE("keyCode is not unique when isPressed is false");
+    if (sameKeyCodeNum == 0) {
+        MMI_LOGE("Keyitems keyCode is not exist equal item with keyEvent keyCode");
         return false;
     }
     return true;

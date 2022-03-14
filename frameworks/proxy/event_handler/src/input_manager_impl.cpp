@@ -270,13 +270,13 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
             MMI_LOGE("Packet write logical focusWindow failed");
             return RET_ERR;
         }
-        int32_t numWindow = static_cast<int32_t>(logicalDisplays_[i].windowsInfo_.size());
+        int32_t numWindow = static_cast<int32_t>(logicalDisplays_[i].windowsInfo.size());
         if (!pkt.Write(numWindow)) {
             MMI_LOGE("Packet write logical numWindow failed");
             return RET_ERR;
         }
         for (int32_t j = 0; j < numWindow; j++) {
-            if (!pkt.Write(logicalDisplays_[i].windowsInfo_[j])) {
+            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j])) {
                 MMI_LOGE("Packet write logical windowsInfo failed");
                 return RET_ERR;
             }
@@ -308,9 +308,9 @@ void InputManagerImpl::PrintDisplayDebugInfo()
             item.id, item.topLeftX, item.topLeftY,
             item.width, item.height, item.name.c_str(),
             item.seatId.c_str(), item.seatName.c_str(),
-            item.focusWindowId, item.windowsInfo_.size());
+            item.focusWindowId, item.windowsInfo.size());
 
-        for (const auto &win : item.windowsInfo_) {
+        for (const auto &win : item.windowsInfo) {
             MMI_LOGD("windowid:%{public}d,pid:%{public}d,uid:%{public}d,hotZoneTopLeftX:%{public}d,"
                 "hotZoneTopLeftY:%{public}d,hotZoneWidth:%{public}d,hotZoneHeight:%{public}d,display:%{public}d,"
                 "agentWindowId:%{public}d,winTopLeftX:%{public}d,winTopLeftY:%{public}d",

@@ -12,10 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef INJECTION_TOOLS_HELP_FUNC_H
 #define INJECTION_TOOLS_HELP_FUNC_H
+
 #include <cstring>
+
 #include "nocopyable.h"
+
 #include "util.h"
 
 namespace OHOS {

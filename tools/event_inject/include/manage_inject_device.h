@@ -12,10 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef MANAGE_INJECT_DEVICE_H
 #define MANAGE_INJECT_DEVICE_H
-#include "get_device_node.h"
+
 #include "get_device_object.h"
+#include "get_device_node.h"
 #include "send_message.h"
 
 namespace OHOS {
@@ -32,7 +34,6 @@ private:
     int32_t SendEventToDeviveNode(const InputEventArray& inputEventArray);
 private:
     GetDeviceNode getDeviceNodeObject_;
-    DeviceBase* devicePtr_ = nullptr;
 private:
     static constexpr int64_t INJECT_SLEEP_TIMES = 10;
 };

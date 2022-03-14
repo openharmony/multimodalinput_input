@@ -16,11 +16,13 @@
 #define INTERCEPTOR_MANAGER_GLOBAL_H
 
 #include <list>
-#include "pointer_event.h"
-#include "singleton.h"
-#include "uds_session.h"
-#include "key_event.h"
+
 #include "nocopyable.h"
+#include "singleton.h"
+
+#include "key_event.h"
+#include "pointer_event.h"
+#include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {

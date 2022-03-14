@@ -103,7 +103,9 @@ void ProcessingGamePadDevice::TransformPadEventToInputEvent(const std::vector<Ga
             TransformRocker1Event(item, inputEventArray);
         } else if (item.eventType == "ROCKER_2") {
             TransformRocker2Event(item, inputEventArray);
-        } 
+        } else {
+            MMI_LOGW("json file format error");
+        }
     }
 }
 

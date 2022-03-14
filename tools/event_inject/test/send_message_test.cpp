@@ -13,8 +13,10 @@
  * limitations under the License.
  */
 
-#include "send_message.h"
 #include <gtest/gtest.h>
+
+#include "send_message.h"
+
 
 namespace OHOS {
 namespace MMI {

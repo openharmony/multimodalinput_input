@@ -16,8 +16,8 @@
     "adapted_system_type": [
       "standard"
     ],
-    "rom": "4000KB",
-    "ram": "4000KB",
+    "rom": "5120KB",
+    "ram": "5120KB",
     "hisysevent_config":[
       "//foundation/multimodalinput/input/service/hisysevent.yaml"
     ],
@@ -46,9 +46,15 @@
         "libwm",
         "libwmutil",
         "wmserver",
-        "hisysevent_native"
+        "hisysevent_native",
+        "libinput"
       ],
-      "third_party": []
+      "third_party": [
+        "quickjs",
+        "node",
+        "libuv",
+        "json"
+      ]
     },
     "build": {
       "sub_component": [
@@ -74,10 +80,11 @@
           "name": "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
           "header": {
             "header_files": [
-              "common/include/struct_multimodal.h",
+              "proxy/include/display_info.h",
+              "proxy/include/input_manager.h",
               "event/include/key_event.h",
-              "event/include/standardized_event_manager.h",
-              "proxy/include/multimodal_event_handler.h"
+              "event/include/pointer_event.h",
+              "event/include/input_event.h"
             ],
             "header_base": "//foundation/multimodalinput/input/interfaces/native/innerkits"
           },

@@ -53,6 +53,8 @@ void ProcessingPadDevice::TransformPadEventToInputEvent(const std::vector<PadEve
             TransformKeyClickEvent(item, inputEventArray);
         } else if (item.eventType == "RING_EVENT") {
             TransformRingEvent(item, inputEventArray);
+        } else {
+            MMI_LOGW("json file format error");
         }
     }
 }
