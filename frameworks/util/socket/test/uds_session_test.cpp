@@ -23,9 +23,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-} // namespace
-
-namespace {
 constexpr int32_t UID_ROOT = 0;
 } // namespace
 

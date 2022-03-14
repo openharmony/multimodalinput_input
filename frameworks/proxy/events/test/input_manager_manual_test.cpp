@@ -30,9 +30,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-using namespace OHOS;
-using namespace MMI;
-namespace {
 constexpr int32_t TIME_WAIT_FOR_OP = 500;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerManualTest" };
 } // namespace
