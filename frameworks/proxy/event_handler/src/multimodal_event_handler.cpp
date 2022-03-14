@@ -64,10 +64,8 @@ bool MultimodalEventHandler::InitClient()
     }
     client_ = std::make_shared<MMIClient>();
     CHKPF(client_);
-    cMsgHandler_ = std::make_shared<ClientMsgHandler>();
-    CHKPF(cMsgHandler_);
     client_->RegisterConnectedFunction(&OnConnected);
-    if (!(client_->Start(cMsgHandler_, true))) {
+    if (!(client_->Start(true))) {
         MMI_LOGE("The client fails to start");
         return false;
     }

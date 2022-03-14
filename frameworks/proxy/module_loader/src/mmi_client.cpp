@@ -46,16 +46,11 @@ bool MMIClient::GetCurrentConnectedStatus() const
     return GetConnectedStatus();
 }
 
-bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
+bool MMIClient::Start(bool detachMode)
 {
     CALL_LOG_ENTER;
+    msgHandler_.Init();
     EventManager.SetClientHandle(GetPtr());
-    if (!(msgHdl->Init())) {
-        MMI_LOGE("Message processing initialization failed");
-        return false;
-    }
-    auto msgHdlImp = static_cast<ClientMsgHandler *>(msgHdl.get());
-    CHKPF(msgHdlImp);
     auto callback = std::bind(&MMIClient::OnMsgHandler, this, std::placeholders::_1);
     if (!(StartClient(callback, detachMode))) {
         MMI_LOGE("Client startup failed");
@@ -70,87 +65,51 @@ bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
 
 void MMIClient::OnMsgHandler(NetPacket& pkt)
 {
+    CALL_LOG_ENTER;
     CHKPV(eventHandler_);
-    auto msgHdlImp = static_cast<ClientMsgHandler *>(msgHdl.get());
-    CHKPF(msgHdlImp);
-    auto fun = [this, ]
-    eventHandler_->PostTask(, EventHandler::Priority::IMMEDIATE);
+    uint64_t tid = GetThisThreadIdOfLL();
+    int32_t pid = GetPid();
+    MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
+    static auto callMsgHandler = [this, &msgHandler_, &pkt] () {
+        MMI_LOGD("callMsgHandler enter.");
+        uint64_t tid = GetThisThreadIdOfLL();
+        int32_t pid = GetPid();
+        MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
+        msgHandler_.OnMsgHandler(*this, pkt);
+    };
+    bool ret = eventHandler_->PostHighPriorityTask(callMsgHandler);
+    if (!ret) {
+        MMI_LOGE("post task failed");
+    }
 }
 
 void MMIClient::OnThirdThread()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     uint64_t tid = GetThisThreadIdOfLL();
     int32_t pid = GetPid();
-    MMI_LOGI("OnThread pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
+    MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
     CHKPV(eventHandler_);
     auto runner = eventHandler_->GetEventRunner();
     CHKPV(runner);
     runner->Run();
-    MMI_LOGD("leave");
 }
 
 bool MMIClient::StartEventRunner()
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
+    uint64_t tid = GetThisThreadIdOfLL();
+    int32_t pid = GetPid();
+    MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
     auto curRunner = EventRunner::Current();
     auto eventRunner = EventRunner::GetMainEventRunner();
     CHKPF(eventRunner);
     eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner, GetPtr());
     CHKPF(eventHandler_);
-    // if (isConnected_ && fd_ >= 0) {
-    //     if (!AddFdListener(fd_)) {
-    //         MMI_LOGE("add fd listener return false");
-    //         return false;
-    //     }
-    // } else {
-    //     if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT)) {
-    //         MMI_LOGE("send reconnect event return false.");
-    //         return false;
-    //     }
-    // }
     if (curRunner == nullptr) {
         t_ = std::thread(std::bind(&MMIClient::OnThirdThread, this));
         t_.detach();
     }
-    MMI_LOGD("leave");
-    return true;
-}
-
-bool MMIClient::AddFdListener(int32_t fd)
-{
-    MMI_LOGD("enter");
-    if (fd < 0) {
-        MMI_LOGE("Invalid fd:%{public}d", fd);
-        return false;
-    }
-    CHKPF(eventHandler_);
-    auto fdListener = std::make_shared<MMIFdListener>(GetPtr());
-    CHKPF(fdListener);
-    auto errCode = eventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_INPUT_EVENT, fdListener);
-    if (errCode != ERR_OK) {
-        MMI_LOGE("add fd listener error,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode,
-            eventHandler_->GetErrorStr(errCode).c_str());
-        return false;
-    }
-    uint64_t tid = GetThisThreadIdOfLL();
-    int32_t pid = GetPid();
-    isRunning_ = true;
-    MMI_LOGI("serverFd:%{public}d was listening,mask:%{public}u pid:%{public}d threadId:%{public}" PRIu64,
-        fd, FILE_DESCRIPTOR_INPUT_EVENT, pid, tid);
-    return true;
-}
-
-bool MMIClient::DelFdListener(int32_t fd)
-{
-    MMI_LOGD("enter");
-    CHKPF(eventHandler_);
-    if (fd < 0) {
-        MMI_LOGE("Invalid fd:%{public}d", fd);
-        return false;
-    }
-    eventHandler_->RemoveFileDescriptorListener(fd);
-    isRunning_ = false;
     return true;
 }
 
@@ -198,16 +157,6 @@ void MMIClient::OnDisconnected()
     if (funDisconnected_) {
         funDisconnected_(*this);
     }
-    // if (!DelFdListener(fd_)) {
-    //     MMI_LOGE("delete fd listener failed.");
-    // }
-    // if (!isToExit_ && eventHandler_) {
-    //     if (!eventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT)) {
-    //         MMI_LOGE("send reconnect event return false.");
-    //     }
-    // } else {
-    //     MMI_LOGW("toExit is true.Reconnection closed");
-    // }
 }
 
 void MMIClient::OnConnected()
@@ -217,11 +166,6 @@ void MMIClient::OnConnected()
     if (funConnected_) {
         funConnected_(*this);
     }
-    // if (!isRunning_ && fd_ >= 0 && eventHandler_ != nullptr) {
-    //     if (!AddFdListener(fd_)) {
-    //         MMI_LOGE("Add fd listener failed");
-    //     }
-    // }
 }
 
 int32_t MMIClient::Socket()

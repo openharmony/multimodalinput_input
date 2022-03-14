@@ -24,7 +24,6 @@
 #include "display_info.h"
 #include "event_filter_service.h"
 #include "i_input_event_consumer.h"
-#include "if_client_msg_handler.h"
 #include "if_mmi_client.h"
 #include "input_interceptor_manager.h"
 #include "input_monitor_manager.h"

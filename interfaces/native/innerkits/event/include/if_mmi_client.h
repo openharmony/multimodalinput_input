@@ -17,9 +17,6 @@
 
 #include <functional>
 #include <memory>
-
-#include "if_client_msg_handler.h"
-
 namespace OHOS {
 namespace MMI {
 class NetPacket;
@@ -28,7 +25,7 @@ typedef std::function<void(const IfMMIClient&)> ConnectCallback;
 class IfMMIClient {
 public:
     virtual bool GetCurrentConnectedStatus() const = 0;
-    virtual bool Start(IClientMsgHandlerPtr msgHdl, bool detachMode) = 0;
+    virtual bool Start(bool detachMode) = 0;
     virtual bool SendMessage(const NetPacket& pkt) const = 0;
     virtual void RegisterConnectedFunction(ConnectCallback fun) = 0;
     virtual void RegisterDisconnectedFunction(ConnectCallback fun) = 0;

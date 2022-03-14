@@ -51,7 +51,7 @@ ClientMsgHandler::~ClientMsgHandler()
     eventProcessedCallback_ = std::function<void(int32_t)>();
 }
 
-bool ClientMsgHandler::Init()
+void ClientMsgHandler::Init()
 {
     // LCOV_EXCL_START
     MsgCallback funs[] = {
@@ -76,7 +76,6 @@ bool ClientMsgHandler::Init()
             continue;
         }
     }
-    return true;
 }
 
 void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
