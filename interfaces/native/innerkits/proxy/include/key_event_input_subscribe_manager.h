@@ -67,6 +67,7 @@ public:
     int32_t UnSubscribeKeyEvent(int32_t subscribeId);
 
     int32_t OnSubscribeKeyEventCallback(std::shared_ptr<KeyEvent> event, int32_t subscribeId);
+    void OnConnected();
 
 private:
     std::list<SubscribeKeyEventInfo> subscribeInfos_;
