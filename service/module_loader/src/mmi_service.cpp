@@ -14,9 +14,12 @@
  */
 
 #include "mmi_service.h"
+
 #include <cinttypes>
 #include <csignal>
+
 #include <sys/signalfd.h>
+
 #include "event_dump.h"
 #include "input_windows_manager.h"
 #include "mmi_log.h"
@@ -260,13 +263,12 @@ void MMIService::OnDisconnected(SessionPtr s)
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)
 {
     CALL_LOG_ENTER;
-    MMI_LOGI("programName:%{public}s,moduleType:%{public}d",
-             programName.c_str(), moduleType);
+    MMI_LOGI("enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
 
     toReturnClientFd = INVALID_SOCKET_FD;
     int32_t serverFd = INVALID_SOCKET_FD;
-    int32_t uid = IPCSkeleton::GetCallingUid();
-    int32_t pid = IPCSkeleton::GetCallingPid();
+    int32_t uid = GetCallingUid();
+    int32_t pid = GetCallingPid();
     const int32_t ret = AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd);
     if (ret != RET_OK) {
         MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
@@ -282,10 +284,7 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
 int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
 {
     sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
-    if (req == nullptr) {
-        MMI_LOGE("read data error.");
-        return RET_ERR;
-    }
+    CHKPR(req, RET_ERR);
     MMI_LOGIK("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
 
     int32_t clientFd = INVALID_SOCKET_FD;
@@ -308,10 +307,7 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
 
 int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    if (InputHandler == nullptr) {
-        MMI_LOGE("InputHandler is nullptr");
-        return ERROR_NULL_POINTER;
-    }
+    CHKPR(InputHandler, ERROR_NULL_POINTER);
     return InputHandler->AddInputEventFilter(filter);
 }
 
@@ -403,11 +399,11 @@ void MMIService::OnSignalEvent(int32_t signalFd)
     CALL_LOG_ENTER;
     signalfd_siginfo sigInfo;
     int32_t size = ::read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
-    if (size != sizeof(signalfd_siginfo)) {
+    if (size != static_cast<int32_t>(sizeof(signalfd_siginfo))) {
         MMI_LOGE("read signal info faild, invalid size:%{public}d,errno:%{public}d", size, errno);
         return;
     }
-    int32_t signo = sigInfo.ssi_signo;
+    int32_t signo = static_cast<int32_t>(sigInfo.ssi_signo);
     MMI_LOGD("receive signal:%{public}d", signo);
     switch (signo) {
         case SIGINT:

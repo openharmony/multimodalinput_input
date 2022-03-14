@@ -20,9 +20,10 @@
 #include <map>
 #include <mutex>
 
-#include "inject_thread.h"
 #include "nocopyable.h"
 #include "singleton.h"
+
+#include "inject_thread.h"
 #include "virtual_keyboard.h"
 
 namespace OHOS {

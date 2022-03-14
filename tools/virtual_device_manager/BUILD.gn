@@ -162,11 +162,13 @@ ohos_unittest("ut-virtual-device-out") {
     "${mmi_path}/tools/virtual_device_manager:libmmi-virtual-device",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "utils_base:utils",
+  ]
 }

@@ -14,11 +14,15 @@
  */
 
 #include "hdi_inject.h"
+
 #include <iostream>
+
 #include "singleton.h"
+
 #include "libmmi_util.h"
 #include "proto.h"
 #include "util.h"
+
 
 #ifdef OHOS_BUILD_HDF
 using namespace std;

@@ -16,13 +16,15 @@
 #define INPUT_WINDOWS_MANAGER_H
 
 #include <vector>
+
+#include "libinput.h"
+#include "nocopyable.h"
 #include "singleton.h"
-#include "uds_server.h"
+
 #include "display_info.h"
 #include "input_event.h"
 #include "pointer_event.h"
-#include "libinput.h"
-#include "nocopyable.h"
+#include "uds_server.h"
 
 namespace OHOS {
 namespace MMI {
@@ -37,7 +39,7 @@ struct SurfaceInfo {
     int32_t srcW;
     int32_t srcH;
     double opacity;
-    int32_t visibility; // 0 or 1
+    int32_t visibility;
     int32_t onLayerId;
 };
 struct LayerInfo {
@@ -51,7 +53,7 @@ struct LayerInfo {
     int32_t srcW;
     int32_t srcH;
     double opacity;
-    int32_t visibility; // 0 or 1
+    int32_t visibility;
     int32_t onScreenId;
     int32_t nSurfaces;
     SurfaceInfo** surfaces;

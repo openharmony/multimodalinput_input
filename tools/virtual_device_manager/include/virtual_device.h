@@ -25,7 +25,7 @@ public:
     VirtualDevice(const std::string &device_name, uint16_t busType, uint16_t vendorId, uint16_t product_id);
     virtual ~VirtualDevice();
     DISALLOW_COPY_AND_MOVE(VirtualDevice);
-    static bool CatFload(std::vector<std::string>& fileList);
+    static bool ViewDirectory(std::vector<std::string>& fileList);
     static bool SyncSymbolFile();
     bool DoIoctl(int32_t fd, int32_t request, const uint32_t value);
     bool CreateKey();
@@ -39,7 +39,7 @@ public:
     static bool CreateHandle(const std::string deviceArgv);
     static bool AddDevice(const std::vector<std::string>& fileList);
     static bool CloseDevice(const std::vector<std::string>& fileList);
-    static bool FunctionalShunt(const std::string firstArgv, std::vector<std::string> argvList);
+    static bool FindDevice(std::vector<std::string> argvList);
 
 protected:
     virtual const std::vector<uint32_t>& GetEventTypes() const;
@@ -58,7 +58,7 @@ protected:
     const uint16_t productId_;
     const uint16_t version_;
     uinput_user_dev dev_ {};
-    uinput_abs_setup absTemp_ = {};
+    uinput_abs_setup g_absTemp_ = {};
     std::vector<uinput_abs_setup> absInit_;
 };
 } // namespace MMI

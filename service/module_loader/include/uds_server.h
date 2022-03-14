@@ -15,12 +15,14 @@
 #ifndef UDS_SERVER_H
 #define UDS_SERVER_H
 
+#include <functional>
+#include <list>
 #include <map>
 #include <mutex>
 #include <thread>
-#include <functional>
-#include <list>
+
 #include "nocopyable.h"
+
 #include "i_uds_server.h"
 #include "uds_session.h"
 #include "uds_socket.h"
@@ -73,7 +75,6 @@ protected:
     bool AddSession(SessionPtr ses);
     void DelSession(int32_t fd);
     void DumpSession(const std::string& title);
-    bool ClearDeadSessionInMap(const int32_t serverFd, const int32_t clientFd);
 
     void NotifySessionDeleted(SessionPtr ses);
     void AddPermission(SessionPtr sess);

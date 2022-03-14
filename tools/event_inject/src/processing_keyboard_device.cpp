@@ -53,6 +53,8 @@ void ProcessingKeyboardDevice::TransformKeyBoardEventToInputEvent(const std::vec
             TransformKeyClickEvent(item, inputEventArray);
         } else if (item.eventType == "KEY_EVENT_LONG_PRESS") {
             TransformKeyLongPressEvent(item, inputEventArray);
+        } else {
+            MMI_LOGW("json file format error");
         }
     }
 }

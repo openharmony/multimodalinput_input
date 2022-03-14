@@ -17,9 +17,11 @@
 #define EVENT_FILTER_WRAP_H
 
 #include <mutex>
-#include "i_event_filter.h"
+
 #include "nocopyable.h"
 #include "singleton.h"
+
+#include "i_event_filter.h"
 
 namespace OHOS {
 namespace MMI {
@@ -31,7 +33,7 @@ public:
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);
 private:
-    std::mutex lockInputEventFilter_;
+    std::mutex lockFilter_;
     sptr<IEventFilter> filter_ {nullptr};
 };
 } // namespace MMI

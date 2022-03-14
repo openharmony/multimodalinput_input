@@ -94,7 +94,6 @@ bool UDSClient::SendMsg(const NetPacket& pkt) const
 bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
 {
     CALL_LOG_ENTER;
-    MMI_LOGD("detachMode = %d", detachMode);
     recvFun_ = fun;
     if (ConnectTo() < 0) {
         MMI_LOGW("Client connection failed, Try again later");

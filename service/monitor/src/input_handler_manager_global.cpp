@@ -12,11 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "input_handler_manager_global.h"
-#include "input_event_handler.h"
+
 #include "define_multimodal.h"
 #include "event_dispatch.h"
 #include "input_event_data_transformation.h"
+#include "input_event_handler.h"
 #include "mmi_log.h"
 #include "net_packet.h"
 #include "proto.h"

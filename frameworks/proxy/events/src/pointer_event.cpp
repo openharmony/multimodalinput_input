@@ -256,7 +256,9 @@ PointerEvent::~PointerEvent() {}
 
 std::shared_ptr<PointerEvent> PointerEvent::Create()
 {
-    return std::shared_ptr<PointerEvent>(new (std::nothrow) PointerEvent(InputEvent::EVENT_TYPE_POINTER));
+    auto event = std::shared_ptr<PointerEvent>(new (std::nothrow) PointerEvent(InputEvent::EVENT_TYPE_POINTER));
+    CHKPP(event);
+    return event;
 }
 
 int32_t PointerEvent::GetPointerAction() const
@@ -336,11 +338,11 @@ void PointerEvent::UpdatePointerItem(int32_t pointerId, PointerItem &pointerItem
 {
     for (auto &item : pointers_) {
         if (item.GetPointerId() == pointerId) {
-            item = pointerItem; // update
+            item = pointerItem;
             return;
         }
     }
-    pointers_.push_back(pointerItem); // insert
+    pointers_.push_back(pointerItem);
 }
 
 std::set<int32_t> PointerEvent::GetPressedButtons() const
@@ -430,7 +432,7 @@ void PointerEvent::SetAxisValue(AxisType axis, double axisValue)
 {
     if ((axis >= AXIS_TYPE_UNKNOWN) && (axis < AXIS_TYPE_MAX)) {
         axisValues_[axis] = axisValue;
-        axes_ = static_cast<int32_t>(static_cast<uint32_t>(axes_) | (1 << static_cast<uint32_t>(axis)));
+        axes_ = static_cast<uint32_t>(axes_ | static_cast<uint32_t>(1 << axis));
     }
 }
 
@@ -463,7 +465,6 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    // vector
     if (pointers_.size() > INT_MAX) {
         return false;
     }
@@ -478,7 +479,6 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         }
     }
 
-    // set
     if (pressedButtons_.size() > INT_MAX) {
         return false;
     }
@@ -509,7 +509,6 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    // axisValues_
     const size_t axisValuesSize = axisValues_.size();
     if (axisValuesSize > INT_MAX) {
         return false;
@@ -542,7 +541,6 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    // vector
     const int32_t pointersSize = in.ReadInt32();
     if (pointersSize < 0) {
         return false;
@@ -556,7 +554,6 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         pointers_.push_back(val);
     }
 
-    // set
     const int32_t pressedButtonsSize = in.ReadInt32();
     if (pressedButtonsSize < 0) {
         return false;
@@ -589,7 +586,6 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    // axisValue_ array
     const int32_t axisValueSize = in.ReadInt32();
     if (axisValueSize < 0) {
         return false;

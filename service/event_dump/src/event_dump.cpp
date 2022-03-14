@@ -69,7 +69,6 @@ void EventDump::Dump(int32_t fd)
         udsServer_->Dump(fd);
     }
 
-    // msgDumps
     mprintf(fd, "MMI_MSGDumps:");
     for (const auto &item : dumpInfo_) {
         mprintf(fd, "\t%s", item.c_str());
