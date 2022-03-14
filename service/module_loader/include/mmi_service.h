@@ -38,11 +38,13 @@ namespace MMI {
 
 enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class MMIService : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
+public:
+    MMIService();
+    virtual ~MMIService();
     DECLEAR_SYSTEM_ABILITY(MMIService);
     DISALLOW_COPY_AND_MOVE(MMIService);
 
 public:
-    static UDSServerPtr GetInstance();
     virtual void OnStart() override;
     virtual void OnStop() override;
     virtual void OnDump() override;

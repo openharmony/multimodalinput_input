@@ -36,14 +36,14 @@ const std::string DEF_INPUT_SEAT = "seat0";
 } // namespace
 
 const bool REGISTER_RESULT =
-    SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
+    SystemAbility::MakeAndRegisterAbility(reinterpret_cast<OHOS::MMI::MMIService*>(UDSServer::GetInstance().get()));
 
 struct mmi_epoll_event {
     int32_t fd;
     EpollEventType event_type;
 };
 
-UDSServerPtr MMIService::GetInstance()
+UDSServerPtr UDSServer::GetInstance()
 {
     static UDSServerPtr udsServer = nullptr;
     if (udsServer == nullptr) {
