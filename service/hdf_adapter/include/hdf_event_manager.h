@@ -26,7 +26,7 @@
 #include "nocopyable.h"
 
 #include "input_manager.h"
-#include "s_input.h"
+#include "libinput_adapter.h"
 
 #define MAX_INPUT_DEVICE_COUNT MAX_INPUT_DEV_NUM
 #define TOTAL_INPUT_DEVICE_COUNT (2 * MAX_INPUT_DEV_NUM)

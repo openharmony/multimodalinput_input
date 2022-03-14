@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef S_INPUT_H
-#define S_INPUT_H
+#ifndef LIBINPUT_ADAPTER_H
+#define LIBINPUT_ADAPTER_H
 
 #include <functional>
 #include <thread>
@@ -27,11 +27,11 @@
 namespace OHOS {
 namespace MMI {
 typedef std::function<void(void *event)> FunInputEvent;
-class SInput {
+class LibinputAdapter {
 public:
-    SInput();
-    DISALLOW_COPY_AND_MOVE(SInput);
-    virtual ~SInput();
+    LibinputAdapter();
+    DISALLOW_COPY_AND_MOVE(LibinputAdapter);
+    virtual ~LibinputAdapter();
     static void LoginfoPackagingTool(struct libinput_event *event);
     bool Init(FunInputEvent funInputEvent, const std::string& seat_id = "seat0");
     void EventDispatch(struct epoll_event& ev);
