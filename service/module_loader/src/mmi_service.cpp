@@ -136,12 +136,12 @@ bool MMIService::InitLibinputService()
     MMI_LOGD("HDF Init");
     hdfEventManager.SetupCallback();
 #endif
-    if (!(input_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
+    if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
         DEF_INPUT_SEAT))) {
         MMI_LOGE("libinput init, bind failed");
         return false;
     }
-    auto inputFd = input_.GetInputFd();
+    auto inputFd = libinputAdapter_.GetInputFd();
     auto ret = AddEpoll(EPOLL_EVENT_INPUT, inputFd);
     if (ret <  0) {
         MMI_LOGE("AddEpoll error ret: %{public}d", ret);
@@ -245,7 +245,7 @@ void MMIService::OnStop()
     if (InputHandler != nullptr) {
         InputHandler->Clear();
     }
-    input_.Stop();
+    libinputAdapter_.Stop();
     state_ = ServiceRunningState::STATE_NOT_START;
 }
 
@@ -350,7 +350,7 @@ void MMIService::OnThread()
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
             CHKPC(mmiEd);
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
-                input_.EventDispatch(ev[i]);
+                libinputAdapter_.EventDispatch(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
                 OnEpollEvent(bufMap, ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {

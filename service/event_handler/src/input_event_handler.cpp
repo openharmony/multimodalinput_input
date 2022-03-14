@@ -32,7 +32,7 @@
 #include "interceptor_manager_global.h"
 #include "mmi_func_callback.h"
 #include "mouse_event_handler.h"
-#include "s_input.h"
+#include "libinput_adapter.h"
 #include "time_cost_chk.h"
 #include "timer_manager.h"
 #include "touch_transform_point_manager.h"
@@ -359,7 +359,7 @@ int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 int32_t InputEventHandler::OnEventTouch(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
-    SInput::LoginfoPackagingTool(event);
+    LibinputAdapter::LoginfoPackagingTool(event);
     return OnEventTouchSecond(event);
 }
 
