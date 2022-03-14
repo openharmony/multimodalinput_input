@@ -172,6 +172,15 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
     }
     MMI_LOGD("Leave");
 }
+
+void InputHandlerManager::OnConnected()
+{
+    MMI_LOGD("Enter");
+    for (auto &inputHandler : inputHandlers_) {
+        AddToServer(inputHandler.second.handlerId_, inputHandler.second.handlerType_);
+    }
+    MMI_LOGD("Leave");
+}
 } // namespace MMI
 } // namespace OHOS
 
