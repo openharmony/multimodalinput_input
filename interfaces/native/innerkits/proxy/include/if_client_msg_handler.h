@@ -16,7 +16,6 @@
 #define IF_CLIENT_MSG_HANDLER_H
 
 #include <functional>
-#include <memory>
 
 namespace OHOS {
 namespace MMI {
