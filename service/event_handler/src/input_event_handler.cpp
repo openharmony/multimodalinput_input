@@ -294,7 +294,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
             MMI_LOGD("add a timer");
         }
         if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && TimerMgr->IsExist(timerId_)) {
-            TimerMgr->ResetTimer(timerId_);
+            TimerMgr->RemoveTimer(timerId_);
             timerId_ = -1;
         }
     }
