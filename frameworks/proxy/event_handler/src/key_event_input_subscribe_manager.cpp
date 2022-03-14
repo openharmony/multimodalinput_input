@@ -112,5 +112,21 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     MMI_LOGE("Leave");
     return RET_ERR;
 }
+
+void KeyEventInputSubscribeManager::OnConnected()
+{
+    MMI_LOGD("Enter");
+    if (subscribeInfos_.empty()) {
+        MMI_LOGE("Leave, subscribeInfos_ is empty");
+        return;
+    }
+
+    for (const auto& subscriberInfo : subscribeInfos_) {
+        if (EventManager.SubscribeKeyEvent(subscriberInfo) != RET_OK) {
+            MMI_LOGE("subscribe key event failed");
+        }
+    }
+    MMI_LOGE("Leave");
+}
 } // namespace MMI
 } // namespace OHOS
