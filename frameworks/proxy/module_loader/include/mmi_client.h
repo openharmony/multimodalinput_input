@@ -36,7 +36,7 @@ public:
     virtual int32_t Reconnect() override;
     virtual void OnDisconnect() override;
 
-    bool Start(IClientMsgHandlerPtr msgHdl, bool detachMode) override;
+    bool Start(bool detachMode) override;
     void RegisterConnectedFunction(ConnectCallback fun) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
     void VirtualKeyIn(RawInputEvent virtualKeyEvent);
@@ -53,10 +53,9 @@ protected:
     
     void OnThirdThread();
     bool StartEventRunner();
-    bool AddFdListener(int32_t fd);
-    bool DelFdListener(int32_t fd);
 
 protected:
+    ClientMsgHandler msgHandler_;
     ConnectCallback funConnected_;
     ConnectCallback funDisconnected_;
 

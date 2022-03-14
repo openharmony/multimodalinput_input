@@ -104,6 +104,7 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
         t_.detach();
     } else {
         MMI_LOGW("uds client thread join");
+        t_.join();
     }
     return true;
 }

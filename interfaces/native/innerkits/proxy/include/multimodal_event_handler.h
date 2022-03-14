@@ -17,8 +17,6 @@
 
 #include "nocopyable.h"
 #include "singleton.h"
-
-#include "if_client_msg_handler.h"
 #include "pointer_event.h"
 #include "proto.h"
 #include "standardized_event_manager.h"
@@ -56,7 +54,6 @@ private:
 
 private:
     MMIClientPtr client_ = nullptr;
-    IClientMsgHandlerPtr cMsgHandler_ = nullptr;
 };
 
 #define MMIEventHdl MultimodalEventHandler::GetInstance()
