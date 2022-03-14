@@ -269,19 +269,19 @@ void UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
             return;
         }
         auto head = (PackHead*)&buf[readIdx];
-        if (head->size[0] >= bufSize) {
-            MMI_LOGE("The head->size[0] more or equal than size, errCode:%{public}d", VAL_NOT_EXP);
+        if (head->size >= bufSize) {
+            MMI_LOGE("The head->size more or equal than size, errCode:%{public}d", VAL_NOT_EXP);
             return;
         }
-        packSize = headSize + head->size[0];
+        packSize = headSize + head->size;
         if (bufSize < packSize) {
             MMI_LOGE("The size less than packSize, errCode:%{public}d", VAL_NOT_EXP);
             return;
         }
         
         NetPacket pkt(head->idMsg);
-        if (head->size[0] > 0) {
-            if (!pkt.Write(&buf[readIdx + headSize], static_cast<size_t>(head->size[0]))) {
+        if (head->size > 0) {
+            if (!pkt.Write(&buf[readIdx + headSize], static_cast<size_t>(head->size))) {
                 MMI_LOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
                 return;
             }

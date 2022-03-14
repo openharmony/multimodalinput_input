@@ -184,10 +184,7 @@ int32_t MMIService::Init()
     InputHandler->Init(*this);
 
     MMI_LOGD("ServerMsgHandler Init");
-    if (!sMsgHandler_.Init(*this)) {
-        MMI_LOGE("Message handler init failed");
-        return SVR_MSG_HANDLER_INIT_FAIL;
-    }
+    sMsgHandler_.Init(*this);
     MMI_LOGD("EventDump Init");
     MMIEventDump->Init(*this);
 
@@ -236,7 +233,7 @@ void MMIService::OnStart()
     state_ = ServiceRunningState::STATE_RUNNING;
     MMI_LOGD("Started successfully");
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
-    t_.detach();
+    t_.join();
 }
 
 void MMIService::OnStop()
