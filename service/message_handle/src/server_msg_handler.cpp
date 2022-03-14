@@ -46,13 +46,13 @@ ServerMsgHandler::ServerMsgHandler() {}
 
 ServerMsgHandler::~ServerMsgHandler() {}
 
-bool ServerMsgHandler::Init(UDSServer& udsServer)
+void ServerMsgHandler::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
 #ifdef OHOS_BUILD_HDF
     if (!(MMIHdiInject->Init(udsServer))) {
         MMI_LOGE("Input device initialization failed");
-        return false;
+        return;
     }
 #endif
     MsgCallback funs[] = {
@@ -91,7 +91,6 @@ bool ServerMsgHandler::Init(UDSServer& udsServer)
             continue;
         }
     }
-    return true;
 }
 
 void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)

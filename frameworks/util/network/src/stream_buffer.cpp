@@ -64,13 +64,13 @@ bool StreamBuffer::Read(std::string &buf)
         return false;
     }
     buf = ReadBuf();
-    rIdx_ += static_cast<int32_t>(buf.size()) + 1;
-    return (buf.size() > 0);
+    rIdx_ += static_cast<int32_t>(buf.length()) + 1;
+    return (buf.length() > 0);
 }
 
 bool StreamBuffer::Write(const std::string &buf)
 {
-    return Write(buf.c_str(), buf.size() + 1);
+    return Write(buf.c_str(), buf.length()+1);
 }
 
 bool StreamBuffer::Read(StreamBuffer &buf)

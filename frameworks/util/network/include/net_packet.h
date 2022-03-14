@@ -21,7 +21,7 @@
 #pragma pack(1)
 using PACKHEAD = struct PackHead {
     MmiMessageId idMsg;
-    int32_t size[1];
+    int32_t size;
 };
 #pragma pack()
 

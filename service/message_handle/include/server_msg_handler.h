@@ -31,7 +31,7 @@ public:
     DISALLOW_COPY_AND_MOVE(ServerMsgHandler);
     virtual ~ServerMsgHandler() override;
 
-    bool Init(UDSServer& udsServer);
+    void Init(UDSServer& udsServer);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
 
 protected:
