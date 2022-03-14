@@ -161,7 +161,7 @@ void InputEventHandler::OnEvent(void *event)
     }
 
     eventType_ = libinput_event_get_type(lpEvent);
-    auto tid = GetThisThreadIdOfLL();
+    auto tid = GetNowThreadId();
     initSysClock_ = GetSysClockTime();
     lastSysClock_ = 0;
     idSeed_ += 1;

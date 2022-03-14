@@ -156,15 +156,9 @@ HWTEST_F(UtilTest, GetThisThreadIdOfString, TestSize.Level1)
     EXPECT_TRUE(retResult.length() >= 0);
 }
 
-/**
- * @tc.name:GetThisThreadIdOfLL
- * @tc.desc:Verify get thread id
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(UtilTest, GetThisThreadIdOfLL, TestSize.Level1)
+HWTEST_F(UtilTest, GetNowThreadId, TestSize.Level1)
 {
-    uint64_t retResult = GetThisThreadIdOfLL();
+    uint64_t retResult = GetNowThreadId();
     EXPECT_TRUE(retResult >= 0);
 }
 
