@@ -47,6 +47,7 @@ bool MMIClient::GetCurrentConnectedStatus() const
 bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
 {
     CALL_LOG_ENTER;
+    CHKPF(msgHdl);
     EventManager.SetClientHandle(GetPtr());
     if (!(msgHdl->Init())) {
         MMI_LOGE("Message processing initialization failed");
