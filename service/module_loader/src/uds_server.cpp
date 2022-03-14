@@ -219,9 +219,9 @@ void OHOS::MMI::UDSServer::AddPermission(SessionPtr sess)
     
     if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) ==
         Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
-        MMI_LOGD("get token type flag is TOKEN_HAP");
+        MMI_LOGD("get type flag is TOKEN_HAP");
         result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionMonitor);
-        MMI_LOGD("verify access token result:%{public}d", result);
+        MMI_LOGD("verify access result:%{public}d", result);
         if (result != Security::AccessToken::PERMISSION_GRANTED) {
             MMI_LOGD("permission is not granted");
             sess->AddPermission(false);
