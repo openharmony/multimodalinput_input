@@ -15,8 +15,9 @@
 
 #ifndef GET_DEVICE_NODE_H
 #define GET_DEVICE_NODE_H
-#include "msg_head.h"
+
 #include "nocopyable.h"
+#include "msg_head.h"
 
 #define DeviceList std::map<std::string, std::vector<std::string>>
 

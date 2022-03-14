@@ -192,14 +192,17 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
         auto size = read(fd, static_cast<void *>(szBuf), MAX_PACKET_BUF_SIZE);
         if (size < 0) {
             MMI_LOGE("size:%{public}zu", size);
+            return;
         }
         if (size > 0) {
             if (!buf.Write(szBuf, size)) {
                 isoverflow = true;
+                MMI_LOGW("size:%{public}zu", size);
                 break;
             }
         }
         if (size < MAX_PACKET_BUF_SIZE) {
+            MMI_LOGW("size:%{public}zu", size);
             break;
         }
         if (isoverflow) {
