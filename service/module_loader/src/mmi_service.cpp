@@ -43,6 +43,11 @@ struct mmi_epoll_event {
     EpollEventType event_type;
 };
 
+UDSServerPtr MMIService::GetInstance()
+{
+    return DelayedSingleton<MMIService>::GetInstance();
+}
+
 template<class ...Ts>
 void CheckDefineOutput(const char* fmt, Ts... args)
 {
@@ -179,17 +184,18 @@ bool MMIService::InitService()
 int32_t MMIService::Init()
 {
     CheckDefine();
+    std::shared_ptr<UDSServer> udsServer = MMIService::GetInstance();
 
     MMI_LOGD("InputEventHandler Init");
-    InputHandler->Init(*this);
+    InputHandler->Init(*udsServer);
 
     MMI_LOGD("ServerMsgHandler Init");
-    sMsgHandler_.Init(*this);
+    sMsgHandler_.Init(*udsServer);
     MMI_LOGD("EventDump Init");
-    MMIEventDump->Init(*this);
+    MMIEventDump->Init(*udsServer);
 
     MMI_LOGD("WindowsManager Init");
-    if (!WinMgr->Init(*this)) {
+    if (!WinMgr->Init(*udsServer)) {
         MMI_LOGE("Windows message init failed");
         return WINDOWS_MSG_INIT_FAIL;
     }
