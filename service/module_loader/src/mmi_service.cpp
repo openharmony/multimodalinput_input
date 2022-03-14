@@ -45,7 +45,11 @@ struct mmi_epoll_event {
 
 UDSServerPtr MMIService::GetInstance()
 {
-    return DelayedSingleton<MMIService>::GetInstance();
+    static UDSServerPtr udsServer = nullptr;
+    if (udsServer == nullptr) {
+        udsServer = std::make_shared<MMIService>();
+    }
+    return udsServer;
 }
 
 template<class ...Ts>
