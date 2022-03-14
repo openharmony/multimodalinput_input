@@ -253,7 +253,8 @@ void InputEventHandler::AddHandleTimer(int32_t timeout)
         if (ret != RET_OK) {
             MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
         }
-        this->AddHandleTimer(100);
+        constexpr int32_t triggerTime = 100;
+        this->AddHandleTimer(triggerTime);
         MMI_LOGD("leave");
     });
 }
@@ -286,7 +287,8 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
-    if (keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP || keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN) {
+    if (keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP ||
+        keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN) {
         if (!TimerMgr->IsExist(timerId_) && keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
             AddHandleTimer();
             MMI_LOGD("add a timer");
