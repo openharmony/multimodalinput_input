@@ -92,11 +92,6 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
     }
 }
 
-MsgClientFunCallback ClientMsgHandler::GetCallback()
-{
-    return std::bind(&ClientMsgHandler::OnMsgHandler, this, std::placeholders::_1, std::placeholders::_2);
-}
-
 int32_t ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)
 {
     auto key = KeyEvent::Create();
