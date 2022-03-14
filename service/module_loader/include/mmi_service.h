@@ -44,6 +44,7 @@ class MMIService : public UDSServer, public SystemAbility, public MultimodalInpu
     DISALLOW_COPY_AND_MOVE(MMIService);
 
 public:
+    static UDSServerPtr GetInstance();
     virtual void OnStart() override;
     virtual void OnStop() override;
     virtual void OnDump() override;
@@ -74,7 +75,6 @@ private:
     std::thread t_;
 
     SInput input_;
-    UDSServer udsServer_;
     ServerMsgHandler sMsgHandler_;
     std::set<int32_t> authFds_;
 };

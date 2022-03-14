@@ -43,6 +43,8 @@ struct StreamBufData {
     StreamBuffer sBuf;
 };
 using MsgServerFunCallback = std::function<void(SessionPtr, NetPacket&)>;
+class UDSServer;
+using UDSServerPtr = std::shared_ptr<UDSServer>;
 class UDSServer : public UDSSocket, public IUdsServer {
 public:
     UDSServer();
