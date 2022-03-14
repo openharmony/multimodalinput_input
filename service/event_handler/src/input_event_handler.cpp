@@ -28,6 +28,7 @@
 #include "mouse_event_handler.h"
 #include "s_input.h"
 #include "time_cost_chk.h"
+#include "timer_manager.h"
 #include "touch_transform_point_manager.h"
 #include "ability_launch_manager.h"
 #include "util.h"
