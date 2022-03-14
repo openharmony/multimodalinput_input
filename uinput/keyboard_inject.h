@@ -36,7 +36,7 @@ public:
     void InjectKeyEvent(uint16_t code, uint32_t value) const;
 
 private:
-    static std::unique_ptr<OHOS::MMI::InjectThread> injectThread_;
+    static std::unique_ptr<InjectThread> injectThread_;
     std::map<int32_t, int32_t> keyCodeMap_ = {};
     static std::mutex mutex_;
     static constexpr int32_t INPUT_KEY_BACK = 2;

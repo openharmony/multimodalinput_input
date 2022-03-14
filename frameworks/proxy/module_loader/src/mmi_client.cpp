@@ -51,7 +51,8 @@ bool MMIClient::Start(bool detachMode)
     CALL_LOG_ENTER;
     msgHandler_.Init();
     EventManager.SetClientHandle(GetPtr());
-    auto callback = std::bind(&MMIClient::OnMsgHandler, this, std::placeholders::_1);
+    auto callback = msgHandler_.GetCallback();
+    CHKPF(callback);
     if (!(StartClient(callback, detachMode))) {
         MMI_LOGE("Client startup failed");
         return false;
