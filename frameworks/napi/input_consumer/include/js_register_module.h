@@ -14,18 +14,20 @@
  */
 #ifndef JS_REGISTER_MODULE_H
 #define JS_REGISTER_MODULE_H
+
 #include <cstdio>
-#include <map>
-#include <list>
 #include <cstring>
 #include <iostream>
-#include "multimodal_event_handler.h"
-#include "key_event.h"
-#include "key_option.h"
-#include "libmmi_util.h"
+#include <list>
+#include <map>
+
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "utils/log.h"
+
+#include "key_event.h"
+#include "key_option.h"
+#include "libmmi_util.h"
 
 #define SUCCESS_CODE 0
 #define ERROR_CODE (-1)
@@ -46,8 +48,7 @@ typedef struct {
     std::string eventType;
     std::string name;
     napi_value handle;
-    int32_t status;
-    std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent = { nullptr };
+    std::shared_ptr<KeyEvent> keyEvent = { nullptr };
     napi_ref callback[1] = { 0 };
     int32_t subscribeId;
     std::shared_ptr<KeyOption> keyOption = { nullptr };
