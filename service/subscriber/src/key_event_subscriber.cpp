@@ -112,7 +112,7 @@ void KeyEventSubscriber::OnSessionDelete(SessionPtr sess)
     MMI_LOGD("Leave");
 }
 
-bool KeyEventSubscriber::IsPreKeysMatch(const std::vector<int32_t>& preKeys,
+bool KeyEventSubscriber::IsPreKeysMatch(const std::set<int32_t>& preKeys,
         const std::vector<int32_t>& pressedKeys) const
 {
     if (preKeys.size() != pressedKeys.size()) {
