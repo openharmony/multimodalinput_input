@@ -55,6 +55,7 @@ protected:
     void OnThread();
 
 protected:
+    std::thread t_;
     bool isRunning_ = false;
     bool isConnected_ = false;
     MsgClientFunCallback recvFun_;

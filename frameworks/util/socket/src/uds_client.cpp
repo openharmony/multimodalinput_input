@@ -98,7 +98,7 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
     if (ConnectTo() < 0) {
         MMI_LOGW("Client connection failed, Try again later");
     }
-     t_ = std::thread(std::bind(&UDSClient::OnThread, this));
+    t_ = std::thread(std::bind(&UDSClient::OnThread, this));
     if (detachMode) {
         MMI_LOGW("uds client thread detach");
         t_.detach();
