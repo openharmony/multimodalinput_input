@@ -27,11 +27,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManager"};
-constexpr uint8_t TOP_LEFT_X  = 0;
-constexpr uint8_t TOP_LEFT_Y  = 1;
-constexpr uint8_t TOP_RIGHT_X = 2;
-constexpr uint8_t TOP_RIGHT_Y = 3;
-constexpr uint8_t CORNER = 4;
 } // namespace
 
 InputWindowsManager::InputWindowsManager() {}
@@ -605,51 +600,36 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
 
 void InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, double& y)
 {
-    int32_t integerX = static_cast<int32_t>(x);
-    int32_t integerY = static_cast<int32_t>(y);
     const std::vector<LogicalDisplayInfo> logicalDisplayInfo = GetLogicalDisplayInfo();
     if (logicalDisplayInfo.empty()) {
         MMI_LOGE("logicalDisplayInfo is empty");
         return;
     }
+    int32_t width = 0;
+    int32_t height = 0;
     for (const auto &item : logicalDisplayInfo) {
-        bool isOutside[CORNER] = { false, false, false, false };
-        if (item.id >= 0) {
-            if (integerX < item.topLeftX) {
-                mouseLoction_.globalX = item.topLeftX;
-                x = item.topLeftX;
-                isOutside[TOP_LEFT_X] = true;
-            } else {
-                isOutside[TOP_LEFT_X] = false;
-            }
-            if (integerX > (item.topLeftX + item.width)) {
-                mouseLoction_.globalX = item.topLeftX + item.width;
-                x = item.topLeftX + item.width;
-                isOutside[TOP_RIGHT_X] = true;
-            } else {
-                isOutside[TOP_RIGHT_X] = false;
-            }
-            if (integerY < item.topLeftY) {
-                mouseLoction_.globalY = item.topLeftY;
-                y = item.topLeftY;
-                isOutside[TOP_LEFT_Y] = true;
-            } else {
-                isOutside[TOP_LEFT_Y] = false;
-            }
-            if (integerY > (item.topLeftY + item.height)) {
-                mouseLoction_.globalY = item.topLeftY + item.height;
-                y = item.topLeftY + item.height;
-                isOutside[TOP_RIGHT_Y] = true;
-            } else {
-                isOutside[TOP_RIGHT_Y] = false;
-            }
-            if ((isOutside[TOP_LEFT_X] != true) && (isOutside[TOP_LEFT_Y] != true) &&
-                (isOutside[TOP_RIGHT_X] != true) && (isOutside[TOP_RIGHT_Y] != true)) {
-                mouseLoction_.globalX = x;
-                mouseLoction_.globalY = y;
-                break;
-            }
-        }
+        width += item.width;
+        height += item.height;
+    }
+    int32_t integerX = static_cast<int32_t>(x);
+    int32_t integerY = static_cast<int32_t>(y);
+    if (integerX > width) {
+        x = static_cast<double>(width);
+        mouseLoction_.globalX = width;
+    } else if (integerX < 0) {
+        x = 0;
+        mouseLoction_.globalX = 0;
+    } else {
+        mouseLoction_.globalX = integerX;
+    }
+    if (integerY > height) {
+        y = static_cast<double>(height);
+        mouseLoction_.globalY = height;
+    } else if (integerY < 0) {
+        y = 0;
+        mouseLoction_.globalY = 0;
+    } else {
+        mouseLoction_.globalY = integerY;
     }
     MMI_LOGD("Mouse Data: globalX:%{public}d,globalY:%{public}d", mouseLoction_.globalX, mouseLoction_.globalY);
 }
