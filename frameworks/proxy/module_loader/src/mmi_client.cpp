@@ -14,13 +14,12 @@
  */
 
 #include "mmi_client.h"
-
+#include <cinttypes>
 #include "mmi_log.h"
 #include "proto.h"
 #include "util.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
-#include "mmi_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -52,7 +51,6 @@ bool MMIClient::Start(bool detachMode)
     msgHandler_.Init();
     EventManager.SetClientHandle(GetPtr());
     auto callback = std::bind(&MMIClient::OnMsgHandler, this, std::placeholders::_1);
-    CHKPF(callback);
     if (!(StartClient(callback, detachMode))) {
         MMI_LOGE("Client startup failed");
         return false;
@@ -71,7 +69,7 @@ void MMIClient::OnMsgHandler(NetPacket& pkt)
     uint64_t tid = GetThisThreadIdOfLL();
     int32_t pid = GetPid();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
-    static auto callMsgHandler = [this, &msgHandler_, &pkt] () {
+    auto callMsgHandler = [this, &pkt] () {
         MMI_LOGD("callMsgHandler enter.");
         uint64_t tid = GetThisThreadIdOfLL();
         int32_t pid = GetPid();
