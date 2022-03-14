@@ -14,9 +14,12 @@
  */
 #ifndef JS_REGISTER_UTIL_H
 #define JS_REGISTER_UTIL_H
+
+#include <array>
+
 #include "js_register_module.h"
 #include "key_event.h"
-#include <array>
+
 namespace OHOS {
 namespace MMI {
 void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, int32_t value);
@@ -25,12 +28,13 @@ void SetNamedProperty(const napi_env &env, napi_value &object, const std::string
 bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const std::string &name);
 std::string GetNamedPropertyString(const napi_env &env, const napi_value &object, const std::string &name);
 int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, const std::string &name);
-std::vector<int32_t> GetIntArray(const napi_env &env, const napi_value &value);
-int32_t AddEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
-    OHOS::MMI::KeyEventMonitorInfo *event, int32_t &preSubscribeId);
-int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
-    OHOS::MMI::KeyEventMonitorInfo *event, int32_t &subscribeId);
-void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *event);
+bool GetPreKeys(const napi_env &env, const napi_value &value, std::set<int32_t> &params);
+int32_t GetPreSubscribeId(Callbacks &callbacks, KeyEventMonitorInfo *event);
+int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks,
+    KeyEventMonitorInfo *event);
+int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
+    KeyEventMonitorInfo *event, int32_t &subscribeId);
+void EmitAsyncCallbackWork(KeyEventMonitorInfo *event);
 } // namespace MMI
 } // namespace OHOS
 
