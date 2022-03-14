@@ -28,7 +28,6 @@ public:
     ClientMsgHandler();
     virtual ~ClientMsgHandler();
     DISALLOW_COPY_AND_MOVE(ClientMsgHandler);
-    virtual MsgClientFunCallback GetCallback() override;
 
     void Init();
     void OnMsgHandler(const UDSClient& client, NetPacket& pkt);

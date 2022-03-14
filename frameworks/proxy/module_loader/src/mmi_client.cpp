@@ -20,7 +20,7 @@
 #include "util.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
-#include "mmi_fd_listener.h"
+#include "mmi_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -51,7 +51,7 @@ bool MMIClient::Start(bool detachMode)
     CALL_LOG_ENTER;
     msgHandler_.Init();
     EventManager.SetClientHandle(GetPtr());
-    auto callback = msgHandler_.GetCallback();
+    auto callback = std::bind(&MMIClient::OnMsgHandler, this, std::placeholders::_1);
     CHKPF(callback);
     if (!(StartClient(callback, detachMode))) {
         MMI_LOGE("Client startup failed");
