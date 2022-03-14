@@ -97,8 +97,8 @@ int32_t InjectionEventDispatch::GetFileSize(const std::string& fileName)
 int32_t InjectionEventDispatch::OnJson()
 {
     CALL_LOG_ENTER;
-	int32_t nCount = injectArgvs_.size() / injectArgvs_[0].size() - 1;
-    if (nCount < 2) {
+    int32_t nCount = injectArgvs_.size() / injectArgvs_[0].size() - 1;
+    if (nCount < ARGVS_CODE_INDEX) {
         MMI_LOGE("path is error");
         return RET_ERR;
     }
