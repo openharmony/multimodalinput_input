@@ -28,6 +28,7 @@
 #include "mouse_event_handler.h"
 #include "s_input.h"
 #include "time_cost_chk.h"
+#include "timer_manager.h"
 #include "touch_transform_point_manager.h"
 #include "ability_launch_manager.h"
 #include "util.h"
@@ -236,6 +237,25 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
     return RET_OK;
 }
 
+void InputEventHandler::AddHandleTimer(int32_t timeout)
+{
+    timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
+        MMI_LOGD("enter");
+        if (this->keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+            MMI_LOGD("key up");
+            return;
+        }
+        int64_t sysStartProcessTime = GetSysClockTime();
+        auto ret = eventDispatch_.DispatchKeyEventPid(*(this->udsServer_), this->keyEvent_, sysStartProcessTime);
+        if (ret != RET_OK) {
+            MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
+        }
+        constexpr int32_t triggerTime = 100;
+        this->AddHandleTimer(triggerTime);
+        MMI_LOGD("leave");
+    });
+}
+
 int32_t InputEventHandler::OnEventKey(const multimodal_libinput_event& ev)
 {
     CHKPR(ev.event, ERROR_NULL_POINTER);
@@ -265,6 +285,17 @@ int32_t InputEventHandler::OnEventKey(const multimodal_libinput_event& ev)
     if (ret != RET_OK) {
         MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
+    }
+    if (keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP ||
+        keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN) {
+        if (!TimerMgr->IsExist(timerId_) && keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
+            AddHandleTimer();
+            MMI_LOGD("add a timer");
+        }
+        if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && TimerMgr->IsExist(timerId_)) {
+            TimerMgr->RemoveTimer(timerId_);
+            timerId_ = -1;
+        }
     }
 
     MMI_LOGD("keyCode:%{public}d,action:%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
