@@ -100,7 +100,7 @@ ohos_shared_library("libmmi-server") {
     "event_handler/src/key_event_value_transformation.cpp",
     "event_package/src/event_package.cpp",
     "interceptor/src/interceptor_manager_global.cpp",
-    "libinput_adapter/src/s_input.cpp",
+    "libinput_adapter/src/libinput_adapter.cpp",
     "message_handle/src/server_msg_handler.cpp",
     "module_loader/src/uds_server.cpp",
     "monitor/src/input_event_monitor_manager.cpp",
