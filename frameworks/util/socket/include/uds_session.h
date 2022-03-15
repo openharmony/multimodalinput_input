@@ -49,7 +49,7 @@ public:
         return pid_;
     }
 
-    SessionPtr GetPtr()
+    SessionPtr GetSharedPtr()
     {
         return shared_from_this();
     }

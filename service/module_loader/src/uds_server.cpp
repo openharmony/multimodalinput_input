@@ -370,7 +370,7 @@ SessionPtr UDSServer::GetSession(int32_t fd) const
     if (it->second == nullptr) {
         return nullptr;
     }
-    return it->second->GetPtr();
+    return it->second->GetSharedPtr();
 }
 
 bool UDSServer::AddSession(SessionPtr ses)
