@@ -15,28 +15,23 @@
 
 #ifndef MMI_SERVICE_H
 #define MMI_SERVICE_H
-
 #include <mutex>
 #include <thread>
-
 #include "iremote_object.h"
 #include "nocopyable.h"
 #include "singleton.h"
 #include "system_ability.h"
-
 #include "input_event_handler.h"
 #include "multimodal_input_connect_stub.h"
 #include "s_input.h"
 #include "server_msg_handler.h"
 #include "uds_server.h"
-
 #ifdef OHOS_BUILD_HDF
     #include "hdf_event_manager.h"
 #endif
 
 namespace OHOS {
 namespace MMI {
-
 enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class MMIService : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_DELAYED_SINGLETON(MMIService);

@@ -151,30 +151,39 @@ void UDSClient::OnRecv(const char *buf, size_t size)
     }
 }
 
+void UDSClient::ReleaseEpollEvent(int32_t fd)
+{
+    OnDisconnected();
+    struct epoll_event event = {};
+    EpollCtl(fd, EPOLL_CTL_DEL, event);
+    close(fd);
+    fd_ = -1;
+}
+
 void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
 {
     auto fd = ev.data.fd;
+    if (fd < 0) {
+        MMI_LOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
+        return;
+    }
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
         MMI_LOGI("ev.events:0x%{public}x,fd:%{public}d same as fd_:%{public}d", ev.events, fd, fd_);
-        OnDisconnected();
-        struct epoll_event event = {};
-        EpollCtl(fd, EPOLL_CTL_DEL, event);
-        close(fd);
-        fd_ = -1;
+        ReleaseEpollEvent(fd);
         return;
     }
 
+    auto isoverflow = false;
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
     const size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
     if (maxCount <= 0) {
         MMI_LOGE("The maxCount is error, maxCount:%{public}d, errCode:%{public}d", maxCount, VAL_NOT_EXP);
     }
-    auto isoverflow = false;
     for (size_t j = 0; j < maxCount; j++) {
         auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, SOCKET_FLAGS);
         if (size < 0) {
             int32_t eno = errno;
-            if(eno == EAGAIN || eno == EINTR || eno == EWOULDBLOCK) {
+            if (eno == EAGAIN || eno == EINTR || eno == EWOULDBLOCK) {
                 continue;
             }
             MMI_LOGE("recv return %{public}zu errno:%{public}d", size, eno);
@@ -182,9 +191,7 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
         }
         if (size == 0) {
             MMI_LOGE("The service side disconnect with the client. size:0 errno:%{public}d", errno);
-            OnDisconnected();
-            close(fd);
-            fd_ = -1;
+            ReleaseEpollEvent(fd);
             break;
         }
         if (!buf.Write(szBuf, size)) {
