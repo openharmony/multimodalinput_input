@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "s_input.h"
+#include "libinput_adapter.h"
 
 #include <climits>
 #include <cinttypes>
@@ -30,15 +30,14 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SInput" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "LibinputAdapter" };
 } // namespace
 
-static void HiLogFunc(struct libinput* input, enum libinput_log_priority priority, const char* fmt, va_list args)
+static void HiLogFunc(struct libinput* input, libinput_log_priority priority, const char* fmt, va_list args)
 {
     char buffer[256];
-    int ret = vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args);
-    if (ret == -1) {
-        MMI_LOGE("call vsnprintf_s fail, ret:%{public}d", ret);
+    if (vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args) == -1) {
+        MMI_LOGE("call vsnprintf_s fail");
         va_end(args);
         return;
     }
@@ -57,7 +56,7 @@ static void InitHiLogFunc(struct libinput* input)
     initFlag = true;
 }
 
-void SInput::LoginfoPackagingTool(struct libinput_event *event)
+void LibinputAdapter::LoginfoPackagingTool(struct libinput_event *event)
 {
     CHKPV(event);
     auto context = libinput_event_get_context(event);
@@ -83,11 +82,11 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
     },
 };
 
-SInput::SInput() {}
+LibinputAdapter::LibinputAdapter() {}
 
-SInput::~SInput() {}
+LibinputAdapter::~LibinputAdapter() {}
 
-bool SInput::Init(FunInputEvent funInputEvent, const std::string& seat_id)
+bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_id)
 {
     CALL_LOG_ENTER;
     CHKPF(funInputEvent);
@@ -118,7 +117,7 @@ bool SInput::Init(FunInputEvent funInputEvent, const std::string& seat_id)
     return true;
 }
 
-void SInput::EventDispatch(struct epoll_event& ev)
+void LibinputAdapter::EventDispatch(struct epoll_event& ev)
 {
     CALL_LOG_ENTER;
     CHKPV(ev.data.ptr);
@@ -137,7 +136,7 @@ void SInput::EventDispatch(struct epoll_event& ev)
     OnEventHandler();
 }
 
-void SInput::Stop()
+void LibinputAdapter::Stop()
 {
     CALL_LOG_ENTER;
     if (fd_ >= 0) {
@@ -148,7 +147,7 @@ void SInput::Stop()
     udev_unref(udev_);
 }
 
-void SInput::OnEventHandler()
+void LibinputAdapter::OnEventHandler()
 {
     CALL_LOG_ENTER;
     CHKPV(funInputEvent_);

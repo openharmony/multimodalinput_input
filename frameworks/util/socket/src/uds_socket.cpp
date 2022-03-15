@@ -83,7 +83,7 @@ int32_t UDSSocket::EpollWait(struct epoll_event& events, int32_t maxevents, int3
     return ret;
 }
 
-int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isBlock)
+int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isNonBlock)
 {
     if (fd < 0) {
         MMI_LOGE("Invalid fd");
@@ -98,7 +98,7 @@ int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isBlock)
     MMI_LOGD("F_GETFL fd:%{public}d,flags:%{public}d", fd, flags);
     uint32_t mask = static_cast<uint32_t>(flags);
     mask |= O_NONBLOCK;
-    if (isBlock) {
+    if (!isNonBlock) {
         mask &= ~O_NONBLOCK;
     }
     flags = fcntl(fd, F_SETFL, static_cast<int32_t>(mask));
