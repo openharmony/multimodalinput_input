@@ -57,7 +57,7 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
     }
 
     MessageParcel reply;
-    MessageOption option; // (MessageOption::TF_ASYNC);
+    MessageOption option;
     int32_t requestResult = Remote()->SendRequest(ALLOC_SOCKET_FD, data, reply, option);
     if (requestResult != NO_ERROR) {
         MMI_LOGE("send request fail, result:%{public}d", requestResult);

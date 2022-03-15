@@ -16,6 +16,9 @@
 #define DEFINE_MULTIMODAL_H
 
 #include "mmi_log.h"
+
+namespace OHOS {
+namespace MMI {
 #ifndef RET_OK
     #define RET_OK (0)
 #endif
@@ -169,4 +172,6 @@
     } while (0)
 
 #endif
+} // namespace MMI
+} // namespace OHOS
 #endif // DEFINE_MULTIMODAL_H

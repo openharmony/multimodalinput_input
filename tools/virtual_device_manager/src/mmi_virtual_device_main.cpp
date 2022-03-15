@@ -15,30 +15,28 @@
 
 #include "virtual_device.h"
 
-namespace OHOS {
-namespace MMI {
 int32_t main(int32_t argc, const char *argv[])
 {
-    if (argc == 1 || argc > MAX_PARAMETER_NUMBER) {
+    if (argc == 1 || argc > MAXPARAMETER) {
         printf("Invaild Input Para, Plase Check the validity of the para!\n");
         return 0;
     }
     char Path[PATH_MAX] = {};
-    if (realpath(g_folderpath.c_str(), Path) == nullptr) {
-        MMI_LOGE("file path is error, path:%{public}s", g_folderpath.c_str());
+    if (realpath(OHOS::MMI::g_folderpath.c_str(), Path) == nullptr) {
+        printf("file path is error, path:%s", OHOS::MMI::g_folderpath.c_str());
         return -1;
     }
     DIR* dir = opendir(Path);
     bool flag = false;
     if (dir == nullptr) {
-        mkdir(g_folderpath.c_str(), SYMBOL_FOLDER_PERMISSIONS);
+        mkdir(OHOS::MMI::g_folderpath.c_str(), SYMBOL_FOLDER_PERMISSIONS);
         flag = true;
     }
     std::vector<std::string> argvList;
     for (uint16_t i = 0; i < argc; i++) {
         argvList.push_back(argv[i]);
     }
-    if (!VirtualDevice::FindDevice(argvList)) {
+    if (!OHOS::MMI::VirtualDevice::FindDevice(argvList)) {
         return 0;
     }
     constexpr std::int32_t usleepTime = 1500000;
@@ -46,5 +44,3 @@ int32_t main(int32_t argc, const char *argv[])
         usleep(usleepTime);
     }
 }
-} // namespace MMI
-} // namespace OHOS

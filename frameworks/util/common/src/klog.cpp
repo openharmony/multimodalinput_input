@@ -35,7 +35,6 @@
 
 namespace OHOS {
 namespace MMI {
-// dmesg
 #define UNUSED(x) \
     do { \
         (void)(x) \

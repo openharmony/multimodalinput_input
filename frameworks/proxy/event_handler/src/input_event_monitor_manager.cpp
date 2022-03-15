@@ -127,7 +127,7 @@ int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<Po
              "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointerItem.GetGlobalX(), pointerItem.GetGlobalY(), pointerItem.IsPressed());
-    return OHOS::MMI_STANDARD_EVENT_SUCCESS;
+    return MMI_STANDARD_EVENT_SUCCESS;
 }
 } // namespace MMI
 } // namespace OHOS
