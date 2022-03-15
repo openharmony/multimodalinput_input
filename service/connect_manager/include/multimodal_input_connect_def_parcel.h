@@ -47,5 +47,4 @@ struct ConnectRespParcel final : public Parcelable {
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // MULTIMODAL_INPUT_CONNECT_DEF_PARCEL_H

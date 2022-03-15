@@ -200,4 +200,3 @@ void InputHandlerManager::OnConnected()
 }
 } // namespace MMI
 } // namespace OHOS
-

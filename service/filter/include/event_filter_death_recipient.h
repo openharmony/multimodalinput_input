@@ -34,5 +34,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // EVENT_FILTER_DEATH_RECIPIENT_H

@@ -142,5 +142,4 @@ struct LogicalDisplayInfo {
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // DISPLAY_INFO_H

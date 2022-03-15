@@ -130,5 +130,4 @@ protected:
 };
 }  // namespace MMI
 }  // namespace OHOS
-
 #endif // UUID_H
