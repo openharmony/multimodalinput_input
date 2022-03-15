@@ -13,8 +13,8 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 import("//foundation/appexecfwk/standard/appexecfwk.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 module_output_path = "multimodalinput/unit_out"
 
 config("libmmi_client_config") {
@@ -110,11 +110,11 @@ ohos_shared_library("libmmi-client") {
   part_name = "multimodalinput_base"
   external_deps = [
     "bytrace_standard:bytrace_core",
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "input_device_driver:hdi_input",
     "ipc:ipc_core",
     "utils_base:utils",
-    "eventhandler:libeventhandler",
   ]
 }
 
@@ -173,9 +173,9 @@ ohos_unittest("ut-mmi-proxy-out") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "eventhandler:libeventhandler",
   ]
 }
 
@@ -294,9 +294,9 @@ ohos_unittest("InputManagerTest") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "eventhandler:libeventhandler",
   ]
 }
 
