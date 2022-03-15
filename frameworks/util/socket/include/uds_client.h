@@ -53,6 +53,7 @@ protected:
     void OnRecv(const char *buf, size_t size);
     void OnEvent(const struct epoll_event& ev, StreamBuffer& buf);
     void OnThread();
+    void ReleaseEpollEvent(int32_t fd);
 
 protected:
     std::thread t_;

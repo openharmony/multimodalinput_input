@@ -284,13 +284,22 @@ void UDSServer::OnEpollRecv(int32_t fd, const char *buf, size_t size)
     OnRecv(fd, buf, size);
 }
 
+void UDSServer::ReleaseSession(int32_t fd, struct epoll_event& ev)
+{
+    auto secPtr = GetSession(fd);
+    if (secPtr != nullptr) {
+        OnDisconnected(secPtr);
+        DelSession(fd);
+    }
+    if (ev.data.ptr) {
+        free(ev.data.ptr);
+        ev.data.ptr = nullptr;
+    }
+    close(fd);
+}
+
 void UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct epoll_event& ev)
 {
-    constexpr size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
-    if (maxCount <= 0) {
-        MMI_LOGE("The maxCount value is error, errCode:%{public}d", VAL_NOT_EXP);
-        return;
-    }
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int32_t*>(ev.data.ptr);
     if (fd < 0) {
@@ -299,15 +308,13 @@ void UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct ep
     }
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
         MMI_LOGD("EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
-        auto secPtr = GetSession(fd);
-        if (secPtr != nullptr) {
-            OnDisconnected(secPtr);
-            DelSession(fd);
-        }
-        free(ev.data.ptr);
-        ev.data.ptr = nullptr;
-        close(fd);
+        ReleaseSession(fd, ev);
     } else if (ev.events & EPOLLIN) {
+        constexpr size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
+        if (maxCount <= 0) {
+            MMI_LOGE("The maxCount value is error, errCode:%{public}d", VAL_NOT_EXP);
+            return;
+        }
         auto bufData = &bufMap[fd];
         if (bufData->isOverflow) {
             MMI_LOGE("StreamBuffer full or write error, Data discarded errCode:%{public}d",
@@ -319,7 +326,7 @@ void UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct ep
             auto size = recv(fd, szBuf, sizeof(szBuf), SOCKET_FLAGS);
             if (size < 0) {
                 int32_t eno = errno;
-                if(eno == EAGAIN || eno == EINTR || eno == EWOULDBLOCK) {
+                if (eno == EAGAIN || eno == EINTR || eno == EWOULDBLOCK) {
                     continue;
                 }
                 MMI_LOGE("recv return %{public}zu errno:%{public}d", size, eno);
@@ -327,14 +334,7 @@ void UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct ep
             }
             if (size == 0) {
                 MMI_LOGE("The client side disconnect with the server. size:0 errno:%{public}d", errno);
-                auto secPtr = GetSession(fd);
-                if (secPtr) {
-                    OnDisconnected(secPtr);
-                    DelSession(fd);
-                }
-                free(ev.data.ptr);
-                ev.data.ptr = nullptr;
-                close(fd);
+                ReleaseSession(fd, ev);
                 break;
             }
 #ifdef OHOS_BUILD_HAVE_DUMP_DATA

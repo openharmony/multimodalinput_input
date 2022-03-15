@@ -75,6 +75,7 @@ protected:
     bool AddSession(SessionPtr ses);
     void DelSession(int32_t fd);
     void DumpSession(const std::string& title);
+    void ReleaseSession(int32_t fd, struct epoll_event& ev);
 
     void NotifySessionDeleted(SessionPtr ses);
     void AddPermission(SessionPtr sess);
