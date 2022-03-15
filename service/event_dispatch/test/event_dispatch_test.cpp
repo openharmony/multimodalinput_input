@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "event_dispatch.h"
-#include "libmmi_util.h"
+#include "define_multimodal.h"
 
 namespace OHOS {
 namespace MMI {

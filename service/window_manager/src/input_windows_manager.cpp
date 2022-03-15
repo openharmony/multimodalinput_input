@@ -32,19 +32,13 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputW
 InputWindowsManager::InputWindowsManager() {}
 
 InputWindowsManager::~InputWindowsManager() {}
-/*
- * FullName:  Init
- * Returns:   bool
- * Qualifier: init windows manager server
- */
+
 bool InputWindowsManager::Init(UDSServer& udsServer)
 {
-    // save server handle
     udsServer_ = &udsServer;
     return true;
 }
 
-/*********************************新框架接口添加****************************/
 int32_t InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent> inputEvent)
 {
     CHKPR(inputEvent, ERROR_NULL_POINTER);

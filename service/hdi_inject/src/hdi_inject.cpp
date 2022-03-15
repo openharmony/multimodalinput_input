@@ -19,7 +19,7 @@
 
 #include "singleton.h"
 
-#include "libmmi_util.h"
+#include "define_multimodal.h"
 #include "proto.h"
 #include "util.h"
 

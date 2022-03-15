@@ -87,13 +87,11 @@ public:
     void UpdateSeatsInfo();
     void UpdateScreensInfo();
 
-
     void PrintAllNormalSurface();
 
     void Clear();
     void Dump(int32_t fd);
 
-    /*********************************新框架接口添加*************************** */
     int32_t GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent) const;
     int32_t UpdateTarget(std::shared_ptr<InputEvent> inputEvent);
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
@@ -125,7 +123,6 @@ private:
     int32_t UpdateTouchScreenTargetOld(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTouchPadTargetOld(std::shared_ptr<PointerEvent> pointerEvent);
 
-    /*********************************新框架接口添加*************************** */
     bool IsInsideWindow(int32_t x, int32_t y, const WindowInfo &info) const;
     void PrintDisplayDebugInfo();
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
@@ -143,7 +140,6 @@ private:
     int32_t touchFocusId_ = 0;
     UDSServer* udsServer_ = nullptr;
     int32_t firstBtnDownWindowId_ = -1;
-    /* *********************************新框架接口添加*************************** */
     std::vector<PhysicalDisplayInfo> physicalDisplays_ = {};
     std::vector<LogicalDisplayInfo> logicalDisplays_ = {};
     std::map<int32_t, WindowInfo> windowInfos_ = {};
