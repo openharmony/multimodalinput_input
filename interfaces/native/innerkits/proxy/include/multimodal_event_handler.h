@@ -24,8 +24,8 @@
 namespace OHOS {
 namespace MMI {
 enum RES_STATUS : uint8_t {
-    REG_STATUS_NOT_SYNC = 0, // 未同步
-    REG_STATUS_SYNCED = 1,   // 以同步
+    REG_STATUS_NOT_SYNC = 0,
+    REG_STATUS_SYNCED = 1
 };
 
 class MultimodalEventHandler : public Singleton<MultimodalEventHandler> {
@@ -46,9 +46,6 @@ public:
     int32_t AddInterceptor(int32_t sourceType, int32_t id);
     int32_t RemoveInterceptor(int32_t id);
 
-/**
-* Default constructor used to create a {@code MultimodalEventHandler} instance.
-*/
 private:
     bool InitClient();
 
