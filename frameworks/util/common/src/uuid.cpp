@@ -96,7 +96,7 @@ void Uuid::ConvertToStdString(std::string& s) const
         if (writePos <= uuidBufMaxSize) {
             uuidBuf[writePos++] = ConvertToHex(low4Bit);
             uuidBuf[writePos++] = ConvertToHex(high4Bit);
-            if (i == 3 || i == 5 || i == 7 || i == 9) { // 3 5 7 9 uuid °´±ê×¼¸ñÊ½(8-4-4-4-12)·Ö¸ô·û
+            if (i == 3 || i == 5 || i == 7 || i == 9) { // 3 5 7 9 uuid æŒ‰æ ‡å‡†æ ¼å¼(8-4-4-4-12)åˆ†éš”ç¬¦
                 uuidBuf[writePos++] = '-';
             }
         }
