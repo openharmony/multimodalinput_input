@@ -23,7 +23,7 @@
 #include "image_utils.h"
 #include "pixel_map.h"
 
-#include "libmmi_util.h"
+#include "define_multimodal.h"
 #include "input_device_manager.h"
 #include "mmi_log.h"
 

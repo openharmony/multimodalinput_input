@@ -26,6 +26,6 @@
 #include "utils/log.h"
 
 #include "client_msg_handler.h"
-#include "libmmi_util.h"
+#include "define_multimodal.h"
 
 #endif // JS_REGISTER_MODULE_H

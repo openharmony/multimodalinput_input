@@ -24,7 +24,7 @@
 
 #include "hdf_inject_init.cpp"
 #include "lib_hdf.h"
-#include "libmmi_util.h"
+#include "define_multimodal.h"
 #include "mmi_log.h"
 #include "util.h"
 
