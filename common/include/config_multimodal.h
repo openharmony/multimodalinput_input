@@ -16,6 +16,8 @@
 #ifndef CONFIG_MULTIMODAL_H
 #define CONFIG_MULTIMODAL_H
 
+namespace OHOS {
+namespace MMI {
 #define DEF_SEAT_ID "seat0"         // Default libinput seat
 
 #ifndef OHOS_BUILD
@@ -48,5 +50,6 @@
 #define MAX_THREAD_DEATH_TIME (6*1000)      // Thread death threshold time
 #define MMISEVER_WMS_DEVICE_ADDED 1         // notifyDeviceChange@Device added
 #define MMISEVER_WMS_DEVICE_REMOVE 2        // notifyDeviceChange@Device removed
-
+} // namespace MMI
+} // namespace OHOS
 #endif // CONFIG_MULTIMODAL_H
