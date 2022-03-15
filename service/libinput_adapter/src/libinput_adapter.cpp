@@ -36,7 +36,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Libin
 static void HiLogFunc(struct libinput* input, libinput_log_priority priority, const char* fmt, va_list args)
 {
     char buffer[256];
-    if (vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args) == -1) {
+    int ret = vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args);
+    if (ret == -1) {
         MMI_LOGE("call vsnprintf_s fail, ret:%{public}d", ret);
         va_end(args);
         return;
