@@ -17,10 +17,9 @@ event_filter_path = "${mmi_path}/service/filter"
 
 config("mmi_event_filter_config") {
   include_dirs = [
-    "//foundation/multimodalinput/input/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
-    "//foundation/multimodalinput/input/frameworks/util/common/include",
+    "//foundation/multimodalinput/input/util/common/include",
     "${event_filter_path}/include",
   ]
 }

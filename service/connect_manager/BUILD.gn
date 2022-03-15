@@ -17,10 +17,9 @@ mmi_connect_manager_path = "${mmi_path}/service/connect_manager"
 
 config("mmi_connect_manager_config") {
   include_dirs = [
-    "//foundation/multimodalinput/input/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
-    "//foundation/multimodalinput/input/frameworks/util/common/include",
+    "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/service/filter/include",
     "${mmi_connect_manager_path}/include",
   ]
