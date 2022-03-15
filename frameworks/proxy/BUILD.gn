@@ -14,11 +14,8 @@
 import("//build/ohos.gni")
 import("//build/test.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
-module_output_path = "multimodalinput/unit_out"
-
 import("//foundation/appexecfwk/standard/appexecfwk.gni")
-import(
-    "//foundation/appexecfwk/standard/libs/libeventhandler/lib_event_handler_sources.gni")
+module_output_path = "multimodalinput/unit_out"
 
 config("libmmi_client_config") {
   visibility = [ ":*" ]
@@ -30,7 +27,6 @@ config("libmmi_client_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "event_handler/include",
     "module_loader/include",
-    "${appexecfwk_path}/interfaces/innerkits/libeventhandler/include",
   ]
 }
 
@@ -106,7 +102,6 @@ ohos_shared_library("libmmi-client") {
 
   deps = [
     ":libmmi-common",
-    "${appexecfwk_path}/interfaces/innerkits/libeventhandler:libeventhandler",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
@@ -119,6 +114,7 @@ ohos_shared_library("libmmi-client") {
     "input_device_driver:hdi_input",
     "ipc:ipc_core",
     "utils_base:utils",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -148,7 +144,6 @@ ohos_unittest("ut-mmi-proxy-out") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "${appexecfwk_path}/interfaces/innerkits/libeventhandler/include",
   ]
 
   if (is_mmi_have_libinput) {
@@ -172,7 +167,6 @@ ohos_unittest("ut-mmi-proxy-out") {
   sources = [ "module_loader/test/mmi_client_test.cpp" ]
 
   deps = [
-    "${appexecfwk_path}/interfaces/innerkits/libeventhandler:libeventhandler",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",
     "//third_party/googletest:gmock_main",
@@ -181,6 +175,7 @@ ohos_unittest("ut-mmi-proxy-out") {
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -270,7 +265,6 @@ ohos_unittest("InputManagerTest") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "${appexecfwk_path}/interfaces/innerkits/libeventhandler/include",
   ]
 
   if (is_mmi_have_libinput) {
@@ -294,7 +288,6 @@ ohos_unittest("InputManagerTest") {
   sources = [ "events/test/input_manager_test.cpp" ]
 
   deps = [
-    "${appexecfwk_path}/interfaces/innerkits/libeventhandler:libeventhandler",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",
     "//third_party/googletest:gmock_main",
@@ -303,6 +296,7 @@ ohos_unittest("InputManagerTest") {
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "eventhandler:libeventhandler",
   ]
 }
 
