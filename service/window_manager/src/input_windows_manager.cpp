@@ -18,7 +18,6 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include "event_dump.h"
 #include "pointer_drawing_manager.h"
 #include "util.h"
 #include "util_ex.h"
@@ -160,21 +159,6 @@ void InputWindowsManager::PrintDisplayDebugInfo()
             item.second.hotZoneTopLeftY, item.second.hotZoneWidth, item.second.hotZoneHeight,
             item.second.displayId, item.second.agentWindowId, item.second.winTopLeftX, item.second.winTopLeftY);
     }
-}
-
-bool InputWindowsManager::TouchPadPointToDisplayPoint_2(struct libinput_event_touch* touch,
-    int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
-{
-    CHKPF(touch);
-    if (screensInfo_ != nullptr) {
-        if ((*screensInfo_) != nullptr)
-        logicalDisplayId = (*screensInfo_)->screenId;
-        logicalX = static_cast<int32_t>(libinput_event_touch_get_x_transformed(touch, (*screensInfo_)->width));
-        logicalY = static_cast<int32_t>(libinput_event_touch_get_y_transformed(touch, (*screensInfo_)->height));
-        return true;
-    }
-    MMI_LOGE("ScreensInfo_ is null");
-    return false;
 }
 
 PhysicalDisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id)
@@ -349,11 +333,6 @@ const std::vector<LogicalDisplayInfo>& InputWindowsManager::GetLogicalDisplayInf
     return logicalDisplays_;
 }
 
-const std::map<int32_t, WindowInfo>& InputWindowsManager::GetWindowInfo() const
-{
-    return windowInfos_;
-}
-
 bool InputWindowsManager::IsInsideWindow(int32_t x, int32_t y, const WindowInfo &info) const
 {
     return (x >= info.hotZoneTopLeftX) && (x <= (info.hotZoneTopLeftX + info.hotZoneWidth)) &&
@@ -403,33 +382,6 @@ LogicalDisplayInfo* InputWindowsManager::GetLogicalDisplayId(int32_t displayId)
         }
     }
     return nullptr;
-}
-
-void InputWindowsManager::AdjustCoordinate(double &coordinateX, double &coordinateY)
-{
-    if (coordinateX < 0) {
-        coordinateX = 0;
-    }
-
-    if (coordinateY < 0) {
-        coordinateY = 0;
-    }
-
-    if (logicalDisplays_.empty()) {
-        return;
-    }
-
-    if (coordinateX > logicalDisplays_[0].width) {
-        coordinateX = logicalDisplays_[0].width;
-    }
-    if (coordinateY > logicalDisplays_[0].height) {
-        coordinateY = logicalDisplays_[0].height;
-    }
-}
-
-int32_t InputWindowsManager::UpdateMouseTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    return RET_ERR;
 }
 
 int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent)
@@ -491,11 +443,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     return fd;
 }
 
-int32_t InputWindowsManager::UpdateTouchScreenTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    return RET_ERR;
-}
-
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -554,12 +501,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
              touchWindow->pid, fd, globalX, globalY, localX, localY,
              pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
     return fd;
-}
-
-int32_t InputWindowsManager::UpdateTouchPadTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CALL_LOG_ENTER;
-    return RET_ERR;
 }
 
 int32_t InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent)
