@@ -47,6 +47,8 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int3
     CALL_LOG_ENTER;
     MMI_LOGD("display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
     FixCursorPosition(globalX, globalY);
+    lastGlobalX_ = globalX;
+    lastGlobalY_ = globalY;
     if (pointerWindow_ != nullptr) {
         pointerWindow_->MoveTo(globalX, globalY);
         pointerWindow_->Show();
@@ -231,7 +233,11 @@ void PointerDrawingManager::DrawManager()
 {
     if (hasDisplay_ && hasPointerDevice_ && pointerWindow_ == nullptr) {
         MMI_LOGD("draw pointer begin");
-        DrawPointer(displayId_, displayWidth_/2, displayHeight_/2);
+        if (lastGlobalX_ == -1 || lastGlobalY_ == -1) {
+            DrawPointer(displayId_, displayWidth_/2, displayHeight_/2);
+            return;
+        }
+        DrawPointer(displayId_, lastGlobalX_, lastGlobalY_);
         return;
     }
 

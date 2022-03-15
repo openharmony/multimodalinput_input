@@ -34,7 +34,7 @@ bool IsMouseDevice(const std::string& deviceName)
     std::regex regExp("(knob model[1-3])|(trackpad model[1-2])");
     return std::regex_match(deviceName, regExp);
 }
-}
+} // namespace
 
 DeviceBase* GetDeviceObject::CreateDeviceObject(const std::string deviceName)
 {
