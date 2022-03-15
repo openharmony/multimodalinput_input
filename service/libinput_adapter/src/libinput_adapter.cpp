@@ -37,7 +37,7 @@ static void HiLogFunc(struct libinput* input, libinput_log_priority priority, co
 {
     char buffer[256];
     if (vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args) == -1) {
-        MMI_LOGE("call vsnprintf_s fail, ret:%{public}d", ret);
+        MMI_LOGE("call vsnprintf_s fail");
         va_end(args);
         return;
     }
