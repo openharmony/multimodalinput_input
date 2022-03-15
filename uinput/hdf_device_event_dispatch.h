@@ -41,5 +41,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif  // HDF_DEVICE_EVENT_DISPATCH_H

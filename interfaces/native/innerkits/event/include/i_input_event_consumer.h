@@ -35,5 +35,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // I_INPUT_EVENT_CONSUMER_H

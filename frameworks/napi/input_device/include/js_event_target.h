@@ -77,5 +77,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // JS_EVENT_TARGET_H

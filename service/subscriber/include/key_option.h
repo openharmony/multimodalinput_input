@@ -45,5 +45,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // KEY_OPTION_H

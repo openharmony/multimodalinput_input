@@ -376,6 +376,5 @@ void KeyEventSubscriber::RemoveKeyCode(int32_t keyCode, std::vector<int32_t>& ke
         }
     }
 }
-
 } // namespace MMI
 } // namespace OHOS

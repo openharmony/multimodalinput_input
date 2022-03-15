@@ -44,5 +44,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // KEYBOARD_INJECT_H

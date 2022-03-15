@@ -30,5 +30,4 @@ struct KeyEventValueTransformations {
 KeyEventValueTransformations KeyValueTransformationInput(int16_t keyValueOfInput);
 } // namespace MMI
 } // namespace OHOS
-
 #endif // KEY_EVENT_VALUE_TRANSFORMATION_H

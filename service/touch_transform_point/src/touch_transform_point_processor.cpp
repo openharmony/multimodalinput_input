@@ -167,4 +167,3 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent
 }
 } // namespace MMI
 } // namespace OHOS
-
