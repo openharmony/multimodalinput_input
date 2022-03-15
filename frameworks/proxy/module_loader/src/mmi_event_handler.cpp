@@ -24,8 +24,8 @@ namespace {
 }
 
 using namespace AppExecFwk;
-MMIEventHandler::MMIEventHandler(const std::shared_ptr<EventRunner> &runner, MMIClientPtr client)
-    : EventHandler(runner), mmiClient_(client)
+MMIEventHandler::MMIEventHandler(const std::shared_ptr<EventRunner> &runner)
+    : EventHandler(runner)
 {
 }
 
@@ -53,20 +53,13 @@ const std::string& MMIEventHandler::GetErrorStr(ErrCode code) const
     return defErrString;
 }
 
-void MMIEventHandler::OnReconnect(const InnerEvent::Pointer &event)
-{
-    MMI_LOGD("enter");
-    CHKPV(mmiClient_);
-    if (mmiClient_->Reconnect() != RET_OK) {
-        SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT);
-    }
-}
-
 void MMIEventHandler::OnStop(const InnerEvent::Pointer &event)
 {
-    MMI_LOGD("enter");
-    GetEventRunner()->Stop();
-    RemoveAllFileDescriptorListeners();
+    CALL_LOG_ENTER;
+    auto runner = GetEventRunner();
+    if (runner) {
+        runner->Stop();
+    }
     RemoveAllEvents();
 }
 
@@ -77,10 +70,6 @@ void MMIEventHandler::ProcessEvent(const InnerEvent::Pointer &event)
     MMI_LOGD("enter. pid:%{public}d tid:%{public}" PRIu64, pid, tid);
     auto eventId = event->GetInnerEventId();
     switch (eventId) {
-        case MMI_EVENT_HANDLER_ID_RECONNECT: {
-            OnReconnect(event);
-            break;
-        }
         case MMI_EVENT_HANDLER_ID_STOP: {
             OnStop(event);
             break;

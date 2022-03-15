@@ -14,10 +14,9 @@
  */
 #ifndef MMI_CLIENT_H
 #define MMI_CLIENT_H
-
-#include "client_msg_handler.h"
-#include "if_mmi_client.h"
 #include "nocopyable.h"
+#include "if_mmi_client.h"
+#include "client_msg_handler.h"
 #include "mmi_event_handler.h"
 
 namespace OHOS {
@@ -32,16 +31,13 @@ public:
     virtual void Stop() override;
     virtual bool SendMessage(const NetPacket& pkt) const override;
     virtual bool GetCurrentConnectedStatus() const override;
-    virtual void OnRecvMsg(const char *buf, size_t size) override;
-    virtual int32_t Reconnect() override;
-    virtual void OnDisconnect() override;
 
     bool Start(bool detachMode) override;
     void RegisterConnectedFunction(ConnectCallback fun) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
     void VirtualKeyIn(RawInputEvent virtualKeyEvent);
 
-    MMIClientPtr GetPtr()
+    MMIClientPtr GetSharedPtr()
     {
         return shared_from_this();
     }
@@ -51,7 +47,7 @@ protected:
     virtual void OnDisconnected() override;
     void OnMsgHandler(NetPacket& pkt);
     
-    void OnThirdThread();
+    void OnEventRunnerThread();
     bool StartEventRunner();
 
 protected:
@@ -60,6 +56,7 @@ protected:
     ConnectCallback funDisconnected_;
 
     std::thread t_;
+    bool selfRunner_ = false;
     std::shared_ptr<MMIEventHandler> eventHandler_ = nullptr;
 };
 } // namespace MMI

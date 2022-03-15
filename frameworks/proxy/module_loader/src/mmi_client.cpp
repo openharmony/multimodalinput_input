@@ -49,7 +49,7 @@ bool MMIClient::Start(bool detachMode)
 {
     CALL_LOG_ENTER;
     msgHandler_.Init();
-    EventManager.SetClientHandle(GetPtr());
+    EventManager.SetClientHandle(GetSharedPtr());
     auto callback = std::bind(&MMIClient::OnMsgHandler, this, std::placeholders::_1);
     if (!(StartClient(callback, detachMode))) {
         MMI_LOGE("Client startup failed");
@@ -69,6 +69,7 @@ void MMIClient::OnMsgHandler(NetPacket& pkt)
     uint64_t tid = GetThisThreadIdOfLL();
     int32_t pid = GetPid();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
+
     auto callMsgHandler = [this, &pkt] () {
         MMI_LOGD("callMsgHandler enter.");
         uint64_t tid = GetThisThreadIdOfLL();
@@ -82,7 +83,7 @@ void MMIClient::OnMsgHandler(NetPacket& pkt)
     }
 }
 
-void MMIClient::OnThirdThread()
+void MMIClient::OnEventRunnerThread()
 {
     CALL_LOG_ENTER;
     uint64_t tid = GetThisThreadIdOfLL();
@@ -103,33 +104,14 @@ bool MMIClient::StartEventRunner()
     auto curRunner = EventRunner::Current();
     auto eventRunner = EventRunner::GetMainEventRunner();
     CHKPF(eventRunner);
-    eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner, GetPtr());
+    eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner);
     CHKPF(eventHandler_);
     if (curRunner == nullptr) {
-        t_ = std::thread(std::bind(&MMIClient::OnThirdThread, this));
+        t_ = std::thread(std::bind(&MMIClient::OnEventRunnerThread, this));
         t_.detach();
+        selfRunner_ = true;
     }
     return true;
-}
-
-void MMIClient::OnRecvMsg(const char *buf, size_t size)
-{
-    CHKPV(buf);
-    if (size == 0) {
-        MMI_LOGE("Invalid input param size");
-        return;
-    }
-    OnRecv(buf, size);
-}
-
-int32_t MMIClient::Reconnect()
-{
-    return ConnectTo();
-}
-
-void MMIClient::OnDisconnect()
-{
-    OnDisconnected();
 }
 
 void MMIClient::RegisterConnectedFunction(ConnectCallback fun)
@@ -184,15 +166,15 @@ int32_t MMIClient::Socket()
         MMI_LOGD("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
                  " return fd:%{public}d", fd_);
     }
-
     return fd_;
 }
 
 void MMIClient::Stop()
 {
+    CALL_LOG_ENTER;
     UDSClient::Stop();
-    if (eventHandler_) {
-        eventHandler_->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP);
+    if (eventHandler_ && selfRunner_) {
+        eventHandler_->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP, 0, EventHandler::Priority::IMMEDIATE);
     }
 }
 } // namespace MMI
