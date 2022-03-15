@@ -156,8 +156,7 @@ void BytraceAdapter::StartBytrace(
                 StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventDispatch, eventId);
                 BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, "client dispatch touchId:" + std::to_string(eventId));
             }
-        }
-        if (handlerType == POINT_INTERCEPT_EVENT) {
+        } else {
             if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
                 StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventIntercept, eventId);
                 BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, "client Intercept pointerId:" + std::to_string(eventId));
