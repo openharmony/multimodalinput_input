@@ -37,6 +37,7 @@ public:
     int32_t OnMouseEventEndTimerHandler(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
     UDSServer *GetUDSServer();
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
+    void AddHandleTimer(int32_t timeout = 300);
 protected:
     int32_t OnEventDeviceAdded(const multimodal_libinput_event& event);
     int32_t OnEventDeviceRemoved(const multimodal_libinput_event& event);
@@ -66,6 +67,7 @@ private:
     int32_t eventType_ = 0;
     int64_t initSysClock_ = 0;
     int64_t lastSysClock_ = 0;
+    int32_t timerId_ = -1;
 };
 } // namespace MMI
 } // namespace OHOS
