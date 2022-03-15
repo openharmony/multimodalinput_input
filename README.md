@@ -79,9 +79,10 @@ var res = input.injectEventSync({
 
 ### Equipment Capability Support<a name="section789634518112"></a>
 
-| device | touch | touchpad | mouse | keyboard |
-| rk3568 | Y | Y | Y | Y |
-| hi3516dv300 | Y | Y | Y | Y |
+|   device    | touch | touchpad | mouse | keyboard |
+| :---------: | :---: | :------: | :---: | :------: |
+|   rk3568    |   Y   |    Y     |   Y   |    Y     |
+| hi3516dv300 |   Y   |    N     |   N   |    N     |
 
 ## Repositories Involved<a name="section135327891219"></a>
 
