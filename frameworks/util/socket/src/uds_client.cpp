@@ -192,6 +192,7 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
         if (size == 0) {
             MMI_LOGE("The service side disconnect with the client. size:0 errno:%{public}d", errno);
             ReleaseEpollEvent(fd);
+            MMI_LOGW("size:%{public}zu", size);
             break;
         }
         if (!buf.Write(szBuf, size)) {
@@ -209,7 +210,7 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
 
 void UDSClient::OnThread()
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     SetThreadName("uds_client");
     isRunning_ = true;
     StreamBuffer streamBuf;
@@ -231,7 +232,6 @@ void UDSClient::OnThread()
             }
         }
     }
-    MMI_LOGD("end");
 }
 } // namespace MMI
 } // namespace OHOS

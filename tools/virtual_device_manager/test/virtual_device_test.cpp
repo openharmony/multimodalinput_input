@@ -34,33 +34,6 @@ public:
 };
 
 /**
- * @tc.name:Test_MakeFolder_01
- * @tc.desc:Verify VirtualDevice function MakeFolder
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(VirtualDeviceTest, Test_MakeFolder_01, TestSize.Level1)
-{
-    VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    std::string folderPath = "/data/symbol/";
-    device.MakeFolder(folderPath);
-}
-
-/**
- * @tc.name:Test_MakeFolder_02
- * @tc.desc:Verify VirtualDevice function MakeFolder
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(VirtualDeviceTest, Test_MakeFolder_02, TestSize.Level1)
-{
-    VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    std::string folderPath = "/data/symbol1";
-    device.MakeFolder(folderPath);
-    remove(folderPath.c_str());
-}
-
-/**
  * @tc.name:Test_CreateHandle_mouse
  * @tc.desc:Verify VirtualDevice function CreateHandle
  * @tc.type: FUNC
@@ -330,149 +303,140 @@ HWTEST_F(VirtualDeviceTest, Test_CloseDevice_flase02, TestSize.Level1)
 }
 
 /**
- * @tc.name:Test_FunctionalShunt_listfalse01
- * @tc.desc:Verify VirtualDevice function FunctionalShunt
+ * @tc.name:Test_FindDevice_listfalse01
+ * @tc.desc:Verify VirtualDevice function FindDevice
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_listfalse01, TestSize.Level1)
+HWTEST_F(VirtualDeviceTest, Test_FindDevice_listfalse01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    std::string firstArgv = "list";
     std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("list");
-    auto ret = device.FunctionalShunt(firstArgv, argvList);
+    auto ret = device.FindDevice(argvList);
     EXPECT_FALSE(ret);
 }
 
 /**
- * @tc.name:Test_FunctionalShunt_listfalse02
- * @tc.desc:Verify VirtualDevice function FunctionalShunt
+ * @tc.name:Test_FindDevice_listfalse02
+ * @tc.desc:Verify VirtualDevice function FindDevice
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_listfalse02, TestSize.Level1)
+HWTEST_F(VirtualDeviceTest, Test_FindDevice_listfalse02, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    std::string firstArgv = "list";
     std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("list ");
     argvList.push_back("falseArgv");
-    auto ret = device.FunctionalShunt(firstArgv, argvList);
+    auto ret = device.FindDevice(argvList);
     EXPECT_FALSE(ret);
 }
 
 /**
- * @tc.name:Test_FunctionalShunt_addFalse
- * @tc.desc:Verify VirtualDevice function FunctionalShunt
+ * @tc.name:Test_FindDevice_addFalse
+ * @tc.desc:Verify VirtualDevice function FindDevice
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_addFalse, TestSize.Level1)
+HWTEST_F(VirtualDeviceTest, Test_FindDevice_addFalse, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    std::string firstArgv = "start";
     std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("start ");
     argvList.push_back("falseArgv");
-    auto ret = device.FunctionalShunt(firstArgv, argvList);
+    auto ret = device.FindDevice(argvList);
     EXPECT_FALSE(ret);
 }
 
 /**
- * @tc.name:Test_FunctionalShunt_addTrue
- * @tc.desc:Verify VirtualDevice function FunctionalShunt
+ * @tc.name:Test_FindDevice_addTrue
+ * @tc.desc:Verify VirtualDevice function FindDevice
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_addTrue, TestSize.Level1)
+HWTEST_F(VirtualDeviceTest, Test_FindDevice_addTrue, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    std::string firstArgv = "start";
     std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("start ");
     argvList.push_back("mouse");
-    auto ret = device.FunctionalShunt(firstArgv, argvList);
+    auto ret = device.FindDevice(argvList);
     EXPECT_TRUE(ret);
 }
 
 /**
- * @tc.name:Test_FunctionalShunt_closeFalse01
- * @tc.desc:Verify VirtualDevice function FunctionalShunt
+ * @tc.name:Test_FindDevice_closeFalse01
+ * @tc.desc:Verify VirtualDevice function FindDevice
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_closeFalse01, TestSize.Level1)
+HWTEST_F(VirtualDeviceTest, Test_FindDevice_closeFalse01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    std::string firstArgv = "close";
     std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("close ");
     argvList.push_back("falsePid");
-    auto ret = device.FunctionalShunt(firstArgv, argvList);
+    auto ret = device.FindDevice(argvList);
     EXPECT_FALSE(ret);
 }
 
 /**
- * @tc.name:Test_FunctionalShunt_closeTrue01
- * @tc.desc:Verify VirtualDevice function FunctionalShunt
+ * @tc.name:Test_FindDevice_closeTrue01
+ * @tc.desc:Verify VirtualDevice function FindDevice
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_closeTrue01, TestSize.Level1)
+HWTEST_F(VirtualDeviceTest, Test_FindDevice_closeTrue01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
     std::string symbolFileTest;
     symbolFileTest.append(g_folderpath).append("1111111").append("_").append("testDevice");
     std::ofstream flagFile;
     flagFile.open(symbolFileTest.c_str());
-
-    std::string firstArgv = "close";
     std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("close ");
     argvList.push_back("1111111");
-    auto ret = device.FunctionalShunt(firstArgv, argvList);
+    auto ret = device.FindDevice(argvList);
     EXPECT_FALSE(ret);
 }
 
 /**
- * @tc.name:Test_FunctionalShunt_mkdirFalse01
- * @tc.desc:Verify VirtualDevice function FunctionalShunt
+ * @tc.name:Test_FindDevice_mkdirFalse01
+ * @tc.desc:Verify VirtualDevice function FindDevice
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_mkdirFalse01, TestSize.Level1)
+HWTEST_F(VirtualDeviceTest, Test_FindDevice_mkdirFalse01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    std::string firstArgv = "close";
     std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("close ");
     argvList.push_back("falsePid");
-    auto ret = device.FunctionalShunt(firstArgv, argvList);
+    auto ret = device.FindDevice(argvList);
     EXPECT_FALSE(ret);
 }
 
 /**
- * @tc.name:Test_FunctionalShunt_False01
- * @tc.desc:Verify VirtualDevice function FunctionalShunt
+ * @tc.name:Test_FindDevice_False01
+ * @tc.desc:Verify VirtualDevice function FindDevice
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_False01, TestSize.Level1)
+HWTEST_F(VirtualDeviceTest, Test_FindDevice_False01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    std::string firstArgv = "falseArgv";
     std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("falseArgv ");
-    auto ret = device.FunctionalShunt(firstArgv, argvList);
+    auto ret = device.FindDevice(argvList);
     EXPECT_FALSE(ret);
 }
 
