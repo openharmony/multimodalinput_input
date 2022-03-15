@@ -79,8 +79,7 @@ HWTEST_F(GetDeviceObjectTest, Test_GetDeviceObjectTestNotFindDevice, TestSize.Le
 {
     const std::string deviceName = "temp";
     bool result;
-    GetDeviceObject getDeviceObject;
-    auto ret = getDeviceObject.CreateDeviceObject(deviceName);
+    auto ret = GetDeviceObject::CreateDeviceObject(deviceName);
     if (ret == nullptr) {
         result = true;
     } else {
