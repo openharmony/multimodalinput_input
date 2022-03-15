@@ -23,20 +23,21 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOM
 
 int32_t main(int32_t argc, const char* argv[])
 {
+    using namespace OHOS::MMI;
     do {
-        OHOS::MMI::SetThreadName("main");
-        if (argc < OHOS::MMI::ARGV_VALID) {
-            MMI_LOGI("Invaild Input Para, Plase Check the validity of the para! errCode:%d", OHOS::PARAM_INPUT_FAIL);
+        SetThreadName("main");
+        if (argc < ARGV_VALID) {
+            MMI_LOGI("Invaild Input Para, Plase Check the validity of the para! errCode:%d", PARAM_INPUT_FAIL);
             break;
         }
         std::vector<std::string> argvs;
         for (int32_t i = 0; i < argc; i++) {
             argvs.push_back(argv[i]);
         }
-        OHOS::MMI::InjectionEventDispatch injection;
+        InjectionEventDispatch injection;
         injection.Init();
         if (!(injection.VirifyArgvs(argc, argvs))) {
-            MMI_LOGI("Invaild Input Para, Plase Check the validity of the para! errCode:%d", OHOS::PARAM_INPUT_FAIL);
+            MMI_LOGI("Invaild Input Para, Plase Check the validity of the para! errCode:%d", PARAM_INPUT_FAIL);
             break;
         }
         injection.Run();

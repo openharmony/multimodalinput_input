@@ -22,7 +22,7 @@
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_device_impl.h"
-#include "libmmi_util.h"
+#include "define_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
