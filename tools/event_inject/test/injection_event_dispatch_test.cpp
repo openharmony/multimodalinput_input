@@ -18,7 +18,6 @@
 #include "injection_event_dispatch.h"
 #undef private
 
-// head file
 namespace OHOS {
 namespace MMI {
 namespace {
