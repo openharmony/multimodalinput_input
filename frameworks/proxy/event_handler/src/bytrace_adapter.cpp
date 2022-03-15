@@ -112,7 +112,7 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent, TraceBtn t
             }
             case KEY_DISPATCH_EVENT: {
                 StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventDispatch, keyId);
-                BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, "client dispatchKeyCode:" + std::to_string(keyCode));
+                BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, "client dispatch keyCode:" + std::to_string(keyCode));
                 break;
             }
             default: {
@@ -151,20 +151,19 @@ void BytraceAdapter::StartBytrace(
         if (handlerType == POINT_DISPATCH_EVENT) {
             if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
                 StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventDispatch, eventId);
-                BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, "client recv pointerId:" + std::to_string(eventId));
+                BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, "client dispatch pointerId:" + std::to_string(eventId));
             } else {
                 StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventDispatch, eventId);
-                BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, "client recv touchId:" + std::to_string(eventId));
+                BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, "client dispatch touchId:" + std::to_string(eventId));
             }
-        } else {
-            if (handlerType == POINT_INTERCEPT_EVENT) {
-                if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-                    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventIntercept, eventId);
-                    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, "client Intercept pointerId:" + std::to_string(eventId));
-                } else {
-                    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventIntercept, eventId);
-                    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, "client Intercept touchId:" + std::to_string(eventId));
-                }
+        }
+        if (handlerType == POINT_INTERCEPT_EVENT) {
+            if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+                StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventIntercept, eventId);
+                BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, "client Intercept pointerId:" + std::to_string(eventId));
+            } else {
+                StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventIntercept, eventId);
+                BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, "client Intercept touchId:" + std::to_string(eventId));
             }
         }
     } else {
@@ -177,9 +176,9 @@ void BytraceAdapter::StartBytrace(
         }
         if (handlerType == POINT_INTERCEPT_EVENT) {
             if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-                FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventDispatch, eventId);
+                FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventIntercept, eventId);
             } else {
-                FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventDispatch, eventId);
+                FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventIntercept, eventId);
             }
         }
     }
