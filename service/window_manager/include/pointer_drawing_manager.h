@@ -57,6 +57,8 @@ private:
     int32_t displayWidth_ = 0;
     int32_t displayHeight_ = 0;
     bool hasPointerDevice_ = false;
+    int32_t lastGlobalX_ = -1;
+    int32_t lastGlobalY_ = -1;
 };
 } // namespace MMI
 } // namespace OHOS
