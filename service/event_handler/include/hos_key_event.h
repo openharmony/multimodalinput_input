@@ -16,7 +16,7 @@
 #ifndef HOS_KEY_EVENT_H
 #define HOS_KEY_EVENT_H
 
-#include "libmmi_util.h"
+#include "define_multimodal.h"
 
 namespace OHOS {
 enum HosKeyState {

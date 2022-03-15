@@ -22,7 +22,7 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 
-#include "libmmi_util.h"
+#include "define_multimodal.h"
 #include "input_windows_manager.h"
 #include "util.h"
 

@@ -34,7 +34,7 @@
 
 #include "nlohmann/json.hpp"
 
-#include "libmmi_util.h"
+#include "define_multimodal.h"
 
 using Json = nlohmann::json;
 
