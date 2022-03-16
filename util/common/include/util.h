@@ -60,3 +60,4 @@ int32_t GetFileSize(const std::string& fileName);
 } // namespace OHOS
 
 #endif // UTIL_H
+>>>>>>> c3358f10687c66634a78cd7d2bc6dd8008d1dd59:frameworks/util/common/include/util.h
