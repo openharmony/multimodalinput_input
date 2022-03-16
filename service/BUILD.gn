@@ -46,6 +46,7 @@ config("libmmi_server_config") {
     "//foundation/multimodalinput/input/frameworks/util/common/include",
     "//foundation/multimodalinput/input/frameworks/util/socket/include",
     "//foundation/multimodalinput/input/frameworks/util/network/include",
+    "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
     "//foundation/multimodalinput/input/common/include",
   ]
 
@@ -91,6 +92,7 @@ ohos_prebuilt_etc("drawing_pointer_image") {
 
 ohos_shared_library("libmmi-server") {
   sources = [
+    "//foundation/multimodalinput/input/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
     "ability_launch/src/ability_launch_manager.cpp",
     "device_manager/src/input_device.cpp",
     "device_manager/src/input_device_manager.cpp",

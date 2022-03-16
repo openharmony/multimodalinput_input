@@ -37,5 +37,4 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
 void EmitAsyncCallbackWork(KeyEventMonitorInfo *event);
 } // namespace MMI
 } // namespace OHOS
-
 #endif // JS_REGISTER_UTIL_H

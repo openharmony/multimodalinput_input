@@ -765,4 +765,3 @@ static input_absinfo g_arrayAxisInfo[][64] = {
         {0, 0, 0, 0, 0, 0},
     },
 };
-
