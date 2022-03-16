@@ -74,7 +74,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
     int32_t sendSize = 0;
     int32_t sendCount = 0;
     constexpr int32_t resendLimit = 10;
-    while (sendSize < size || sendCount < resendLimit) {
+    while (sendSize < size && sendCount < resendLimit) {
         sendCount += 1;
         auto ret = send(fd_, buf, size, SOCKET_FLAGS);
         if (ret < 0) {
@@ -188,7 +188,7 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
         return;
     }
 
-    auto isoverflow = false;
+    bool isoverflow = false;
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
     const size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
     if (maxCount <= 0) {
@@ -203,18 +203,18 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
             }
             MMI_LOGE("recv return %{public}zu errno:%{public}d", size, eno);
             break;
-        }
-        if (size == 0) {
+        } else if (size == 0) {
             MMI_LOGE("The service side disconnect with the client. size:0 errno:%{public}d", errno);
             ReleaseEpollEvent(fd);
             break;
-        }
-        if (!buf.Write(szBuf, size)) {
-            isoverflow = true;
-            break;
-        }
-        if (size < MAX_PACKET_BUF_SIZE) {
-            break;
+        } else {
+            if (!buf.Write(szBuf, size)) {
+                isoverflow = true;
+                break;
+            }
+            if (size < MAX_PACKET_BUF_SIZE) {
+                break;
+            }
         }
     }
     if (!isoverflow && buf.Size() > 0) {

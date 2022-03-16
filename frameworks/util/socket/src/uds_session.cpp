@@ -58,7 +58,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
     int32_t sendSize = 0;
     int32_t sendCount = 0;
     constexpr int32_t resendLimit = 10;
-    while (sendSize < size || sendCount < resendLimit) {
+    while (sendSize < size && sendCount < resendLimit) {
         sendCount += 1;
         auto ret = send(fd_, buf, size, SOCKET_FLAGS);
         if (ret < 0) {
