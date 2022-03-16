@@ -175,7 +175,7 @@ void UDSClient::ReleaseEpollEvent(int32_t fd)
     fd_ = -1;
 }
 
-void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
+void UDSClient::OnEpollEvent(const struct epoll_event& ev, StreamBuffer& buf)
 {
     auto fd = ev.data.fd;
     if (fd < 0) {
@@ -193,6 +193,7 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
     const size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
     if (maxCount <= 0) {
         MMI_LOGE("The maxCount is error, maxCount:%{public}d, errCode:%{public}d", maxCount, VAL_NOT_EXP);
+        return;
     }
     for (size_t j = 0; j < maxCount; j++) {
         auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, SOCKET_FLAGS);
@@ -235,7 +236,7 @@ void UDSClient::OnThread()
             streamBuf.Clean();
             auto count = EpollWait(*events, MAX_EVENT_SIZE, DEFINE_EPOLL_TIMEOUT);
             for (auto i = 0; i < count; i++) {
-                OnEvent(events[i], streamBuf);
+                OnEpollEvent(events[i], streamBuf);
             }
         } else {
             if (ConnectTo() < 0) {
