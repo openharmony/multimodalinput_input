@@ -28,6 +28,7 @@
 #include "libinput.h"
 
 #include "ability_launch_manager.h"
+#include "bytrace_adapter.h"
 #include "input_device_manager.h"
 #include "interceptor_manager_global.h"
 #include "mmi_func_callback.h"
@@ -276,11 +277,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         return KEY_EVENT_PKG_FAIL;
     }
 
-    int32_t keyId = keyEvent_->GetId();
-    std::string keyEventString = "OnKeyEvent";
-    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
-    keyEventString = "service report keyId=" + std::to_string(keyId);
-    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEventString);
+    BytraceAdapter::StartBytrace(keyEvent_);
 
     auto ret = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_);
     if (ret != RET_OK) {
@@ -320,9 +317,7 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
     }
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    int32_t pointerId = pointerEvent->GetId();
-    std::string touchEvent = "OnEventTouch";
-    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, pointerId);
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     eventDispatch_.HandlePointerEvent(pointerEvent);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
@@ -426,9 +421,7 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
         MMI_LOGI("Pressed keyCode:%{public}d", keyCode);
     }
     pointerEvent->SetPressedKeys(pressedKeys);
-    int32_t pointerId = keyEvent_->GetId();
-    const std::string pointerEventstring = "OnEventPointer";
-    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, pointerId);
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     eventDispatch_.HandlePointerEvent(pointerEvent);
     return RET_OK;
 }
