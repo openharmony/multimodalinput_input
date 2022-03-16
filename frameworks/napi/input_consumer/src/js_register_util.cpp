@@ -217,7 +217,7 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
     }
     for (auto iter = info.begin(); iter != info.end();) {
         if (*iter == nullptr) {
-           info.erase(iter++);
+            info.erase(iter++);
             continue;
         }
         if (handler1 !=nullptr) {
