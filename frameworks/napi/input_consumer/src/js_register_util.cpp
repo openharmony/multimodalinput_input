@@ -220,6 +220,7 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
     for (auto iter = info.begin(); iter != info.end();) {
         if (handler1 !=nullptr) {
             napi_value handler2 = nullptr;
+	        CHKPC(*iter);
             status = napi_get_reference_value(env, (*iter)->callback[0], &handler2);
             if (status != napi_ok) {
                 MMI_LOGE("Handler2 get reference value failed");
