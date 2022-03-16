@@ -353,7 +353,7 @@ void MMIService::OnThread()
             if (it.second.isOverflow) {
                 continue;
             }
-            OnEpollRecv(it.first, it.second.sBuf.Data(), it.second.sBuf.Size());
+            OnRecv(it.first, it.second.sBuf.Data(), it.second.sBuf.Size());
         }
         OnTimer();
     }
