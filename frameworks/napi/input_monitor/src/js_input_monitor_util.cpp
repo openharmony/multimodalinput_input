@@ -232,4 +232,3 @@ uint32_t GetNamePropertyUint32(const napi_env& env, const napi_value& object, co
 }
 } // namespace MMI
 } // namespace OHOS
-

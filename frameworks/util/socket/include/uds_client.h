@@ -74,5 +74,4 @@ protected:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // UDS_CLIENT_H

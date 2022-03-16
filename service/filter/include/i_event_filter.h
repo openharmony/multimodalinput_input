@@ -33,5 +33,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // I_EVENT_FILTER_H

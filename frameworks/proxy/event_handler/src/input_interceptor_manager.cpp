@@ -40,4 +40,3 @@ void InputInterceptorManager::RemoveInterceptor(int32_t interceptorId)
 }
 } // namespace MMI
 } // namespace OHOS
-
