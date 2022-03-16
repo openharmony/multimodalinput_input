@@ -7,10 +7,10 @@
     "destPath": "foundation/multimodalinput/input/"
   },
   "component": {
-    "name": "multimodalinput_base",
+    "name": "input",
     "subsystem": "multimodalinput",
     "syscap": [
-      "SystemCapability.multimodalinput.multimodalinput_base"
+      "SystemCapability.multimodalinput.input"
     ],
     "features": [],
     "adapted_system_type": [

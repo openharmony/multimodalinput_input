@@ -26,7 +26,7 @@ config("mmi_event_filter_config") {
 }
 
 ohos_source_set("mmi_event_filter_service") {
-  part_name = "multimodalinput_base"
+  part_name = "input"
   sources = [
     "${event_filter_path}/src/event_filter_parcel.cpp",
     "${event_filter_path}/src/event_filter_service.cpp",
@@ -45,7 +45,7 @@ ohos_source_set("mmi_event_filter_service") {
 }
 
 ohos_source_set("mmi_event_filter_proxy") {
-  part_name = "multimodalinput_base"
+  part_name = "input"
   sources = [
     "${event_filter_path}/src/event_filter_death_recipient.cpp",
     "${event_filter_path}/src/event_filter_parcel.cpp",
