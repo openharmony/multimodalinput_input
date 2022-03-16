@@ -50,10 +50,10 @@ protected:
     virtual void OnDisconnected() {}
 
     bool StartClient(MsgClientFunCallback fun, bool detachMode);
-    void OnRecv(const char *buf, size_t size);
-    void OnEvent(const struct epoll_event& ev, StreamBuffer& buf);
-    void OnThread();
     void ReleaseEpollEvent(int32_t fd);
+    void OnRecv(const char *buf, size_t size);
+    void OnEpollEvent(const struct epoll_event& ev, StreamBuffer& buf);
+    void OnThread();
 
 protected:
     std::thread t_;
