@@ -28,50 +28,6 @@
 
 namespace OHOS {
 namespace MMI {
-struct SurfaceInfo {
-    int32_t surfaceId;
-    int32_t dstX;
-    int32_t dstY;
-    int32_t dstW;
-    int32_t dstH;
-    int32_t srcX;
-    int32_t srcY;
-    int32_t srcW;
-    int32_t srcH;
-    double opacity;
-    int32_t visibility;
-    int32_t onLayerId;
-};
-struct LayerInfo {
-    int32_t layerId;
-    int32_t dstX;
-    int32_t dstY;
-    int32_t dstW;
-    int32_t dstH;
-    int32_t srcX;
-    int32_t srcY;
-    int32_t srcW;
-    int32_t srcH;
-    double opacity;
-    int32_t visibility;
-    int32_t onScreenId;
-    int32_t nSurfaces;
-    SurfaceInfo** surfaces;
-};
-struct ScreenInfo {
-    int32_t screenId;
-    char* connectorName;
-    int32_t width;
-    int32_t height;
-    int32_t nLayers;
-    LayerInfo** layers;
-};
-struct SeatInfo {
-    char* seatName;
-    int32_t deviceFlags;
-    int32_t focusWindowId;
-};
-
 struct MouseLocation {
     int32_t globalX;
     int32_t globalY;
@@ -87,19 +43,11 @@ public:
     void UpdateSeatsInfo();
     void UpdateScreensInfo();
 
-    void PrintAllNormalSurface();
-
-    void Clear();
-    void Dump(int32_t fd);
-
     int32_t GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent) const;
     int32_t UpdateTarget(std::shared_ptr<InputEvent> inputEvent);
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
         const std::vector<LogicalDisplayInfo> &logicalDisplays);
-    bool TouchPadPointToDisplayPoint_2(struct libinput_event_touch* touch,
-        int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId);
     const std::vector<LogicalDisplayInfo>& GetLogicalDisplayInfo() const;
-    const std::map<int32_t, WindowInfo>& GetWindowInfo() const;
     MouseLocation GetMouseInfo() const;
     void UpdateAndAdjustMouseLoction(double& x, double& y);
     void AdjustGlobalCoordinate(int32_t& globalX, int32_t& globalY, int32_t width, int32_t height);
@@ -114,15 +62,8 @@ public:
         int32_t &globalLogicalY);
     void RotateTouchScreen(PhysicalDisplayInfo* info, Direction direction,
         int32_t& logicalX, int32_t& logicalY);
-    void AdjustCoordinate(double &coordinateX, double &coordinateY);
 
 private:
-    void SetFocusId(int32_t id);
-    void PrintDebugInfo();
-    int32_t UpdateMouseTargetOld(std::shared_ptr<PointerEvent> pointerEvent);
-    int32_t UpdateTouchScreenTargetOld(std::shared_ptr<PointerEvent> pointerEvent);
-    int32_t UpdateTouchPadTargetOld(std::shared_ptr<PointerEvent> pointerEvent);
-
     bool IsInsideWindow(int32_t x, int32_t y, const WindowInfo &info) const;
     void PrintDisplayDebugInfo();
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
@@ -133,11 +74,6 @@ private:
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
 
 private:
-    std::mutex mu_;
-    SeatInfo** seatsInfo_ = nullptr;
-    ScreenInfo **screensInfo_ = nullptr;
-    int32_t focusInfoID_ = 0;
-    int32_t touchFocusId_ = 0;
     UDSServer* udsServer_ = nullptr;
     int32_t firstBtnDownWindowId_ = -1;
     std::vector<PhysicalDisplayInfo> physicalDisplays_ = {};
