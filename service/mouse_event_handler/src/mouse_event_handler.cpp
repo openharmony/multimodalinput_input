@@ -230,4 +230,3 @@ void MouseEventHandler::DumpInner()
 }
 } // namespace MMI
 } // namespace OHOS
-

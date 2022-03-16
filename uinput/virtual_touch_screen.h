@@ -36,5 +36,4 @@ protected:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // VIRTUAL_TOUCH_SCREEN_H

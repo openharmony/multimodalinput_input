@@ -51,5 +51,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // OHOS_INPUT_DEVICE_EVENT_H

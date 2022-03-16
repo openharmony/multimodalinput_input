@@ -49,5 +49,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // MULTIMODAL_INPUT_CONNECT_MANAGER_H
