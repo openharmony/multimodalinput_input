@@ -66,13 +66,13 @@ void MMIClient::OnMsgHandler(NetPacket& pkt)
 {
     CALL_LOG_ENTER;
     CHKPV(eventHandler_);
-    uint64_t tid = GetThisThreadIdOfLL();
+    uint64_t tid = GetNowThreadId();
     int32_t pid = GetPid();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
 
     auto callMsgHandler = [this, &pkt] () {
         MMI_LOGD("callMsgHandler enter.");
-        uint64_t tid = GetThisThreadIdOfLL();
+        uint64_t tid = GetNowThreadId();
         int32_t pid = GetPid();
         MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
         msgHandler_.OnMsgHandler(*this, pkt);
@@ -86,7 +86,7 @@ void MMIClient::OnMsgHandler(NetPacket& pkt)
 void MMIClient::OnEventRunnerThread()
 {
     CALL_LOG_ENTER;
-    uint64_t tid = GetThisThreadIdOfLL();
+    uint64_t tid = GetNowThreadId();
     int32_t pid = GetPid();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
     CHKPV(eventHandler_);
@@ -98,7 +98,7 @@ void MMIClient::OnEventRunnerThread()
 bool MMIClient::StartEventRunner()
 {
     CALL_LOG_ENTER;
-    uint64_t tid = GetThisThreadIdOfLL();
+    uint64_t tid = GetNowThreadId();
     int32_t pid = GetPid();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
     auto curRunner = EventRunner::Current();
