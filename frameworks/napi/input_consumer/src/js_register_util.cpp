@@ -221,7 +221,7 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
         if (handler1 !=nullptr) {
             napi_value handler2 = nullptr;
             if (*iter == nullptr) {
-                ++iter;
+                info.erase(iter++);
                 continue;
             }
             status = napi_get_reference_value(env, (*iter)->callback[0], &handler2);
