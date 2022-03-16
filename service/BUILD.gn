@@ -46,6 +46,7 @@ config("libmmi_server_config") {
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/util/socket/include",
     "//foundation/multimodalinput/input/util/network/include",
+    "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
   ]
 
   if (is_mmi_have_hdf) {
@@ -90,6 +91,7 @@ ohos_prebuilt_etc("drawing_pointer_image") {
 
 ohos_shared_library("libmmi-server") {
   sources = [
+    "//foundation/multimodalinput/input/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
     "ability_launch/src/ability_launch_manager.cpp",
     "device_manager/src/input_device.cpp",
     "device_manager/src/input_device_manager.cpp",
@@ -145,9 +147,9 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimedia/image_standard/interfaces/innerkits:image",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
-    "//foundation/multimodalinput/input/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
+    "//foundation/multimodalinput/input/util:libmmi-util",
     "//foundation/windowmanager/wm:libwm",
   ]
 
@@ -249,8 +251,8 @@ ohos_unittest("ut-mmi-service-out") {
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/util:libmmi-util",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
     "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
     "//third_party/googletest:gmock_main",

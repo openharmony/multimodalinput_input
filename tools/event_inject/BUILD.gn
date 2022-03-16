@@ -74,9 +74,9 @@ ohos_shared_library("event-injection") {
   ]
 
   deps = [
-    "//foundation/multimodalinput/input/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
+    "//foundation/multimodalinput/input/util:libmmi-util",
   ]
 
   if (is_mmi_have_libinput) {
@@ -167,9 +167,9 @@ ohos_unittest("ut-event-injection-out") {
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/util:libmmi-util",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/tools/event_inject:event-injection",
+    "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -191,8 +191,8 @@ ohos_executable("mmi-event-injection") {
   configs = [ ":event_injection_public_config" ]
 
   deps = [
-    "//foundation/multimodalinput/input/util:libmmi-util",
     "//foundation/multimodalinput/input/tools/event_inject:event-injection",
+    "//foundation/multimodalinput/input/util:libmmi-util",
   ]
 
   if (is_mmi_have_libinput) {

@@ -157,8 +157,8 @@ ohos_unittest("ut-virtual-device-out") {
   }
 
   deps = [
-    "${mmi_path}/util:libmmi-util",
     "${mmi_path}/tools/virtual_device_manager:libmmi-virtual-device",
+    "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]

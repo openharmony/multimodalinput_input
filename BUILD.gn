@@ -130,8 +130,8 @@ group("unittests") {
   testonly = true
   deps = [
     "frameworks/proxy:ut-mmi-proxy",
-    "util:ut-mmi-util",
     "service:ut-mmi-service",
     "tools/inject_event:inject_event",
+    "util:ut-mmi-util",
   ]
 }
