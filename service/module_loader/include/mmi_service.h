@@ -23,7 +23,7 @@
 #include "system_ability.h"
 #include "input_event_handler.h"
 #include "multimodal_input_connect_stub.h"
-#include "s_input.h"
+#include "libinput_adapter.h"
 #include "server_msg_handler.h"
 #include "uds_server.h"
 #ifdef OHOS_BUILD_HDF
@@ -66,7 +66,7 @@ private:
     std::mutex mu_;
     std::thread t_;
 
-    SInput input_;
+    LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
 };
 } // namespace MMI

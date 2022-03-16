@@ -27,7 +27,7 @@
 
 #include "nocopyable.h"
 
-#include "libmmi_util.h"
+#include "define_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
@@ -41,7 +41,7 @@ public:
     int32_t EpollCreat(int32_t size);
     int32_t EpollCtl(int32_t fd, int32_t op, struct epoll_event& event, int32_t epollFd = -1);
     int32_t EpollWait(struct epoll_event& events, int32_t maxevents, int32_t timeout, int32_t epollFd = -1);
-    int32_t SetNonBlockMode(int32_t fd, bool isBlock = false);
+    int32_t SetNonBlockMode(int32_t fd, bool isNonBlock = true);
     void EpollClose();
     void Close();
 
