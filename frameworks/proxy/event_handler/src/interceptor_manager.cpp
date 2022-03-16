@@ -17,8 +17,7 @@
 
 #include <cinttypes>
 
-#include "bytrace.h"
-
+#include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "souceType.h"
@@ -109,9 +108,7 @@ int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointer
 int32_t InterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
-    int32_t keyId = keyEvent->GetId();
-    const std::string keyEventString = "keyEventFilter";
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_INTERCEPT_EVENT);
     for (auto &item : interceptor_) {
         if (item.sourceType == SOURCETYPE_KEY) {
             MMI_LOGD("interceptor callback execute");

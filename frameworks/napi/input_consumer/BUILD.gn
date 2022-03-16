@@ -44,8 +44,8 @@ ohos_shared_library("inputconsumer") {
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
-    "//foundation/multimodalinput/input/util:libmmi-util",
     "//foundation/multimodalinput/input/tools/event_inject:event-injection",
+    "//foundation/multimodalinput/input/util:libmmi-util",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {

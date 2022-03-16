@@ -63,6 +63,7 @@ ohos_source_set("libmmi-common") {
 
 ohos_shared_library("libmmi-client") {
   sources = [
+    "event_handler/src/bytrace_adapter.cpp",
     "event_handler/src/client_msg_handler.cpp",
     "event_handler/src/input_device_impl.cpp",
     "event_handler/src/input_event_monitor_manager.cpp",
@@ -99,9 +100,9 @@ ohos_shared_library("libmmi-client") {
 
   deps = [
     ":libmmi-common",
-    "//foundation/multimodalinput/input/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
+    "//foundation/multimodalinput/input/util:libmmi-util",
   ]
 
   part_name = "multimodalinput_base"

@@ -43,8 +43,8 @@ ohos_shared_library("inputdevice") {
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
-    "//foundation/multimodalinput/input/util:libmmi-util",
     "//foundation/multimodalinput/input/tools/event_inject:event-injection",
+    "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/libuv:uv_static",
   ]
 
