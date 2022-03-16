@@ -34,5 +34,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // MULTIMODAL_INPUT_CONNECT_DEATH_RECIPIENT_H

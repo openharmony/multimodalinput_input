@@ -103,5 +103,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // INPUT_HANDLER_MANAGER_GLOBAL_H
