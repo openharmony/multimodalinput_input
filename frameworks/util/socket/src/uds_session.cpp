@@ -55,10 +55,25 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         MMI_LOGE("fd_ is less than 0");
         return false;
     }
-    ssize_t ret = send(fd_, buf, size, SOCKET_FLAGS);
-    if (ret < 0) {
-        MMI_LOGE("send return %{public}zd,fd:%{public}d,errno:%{public}d",
-            ret, fd_, errno);
+    int32_t sendSize = 0;
+    int32_t sendCount = 0;
+    constexpr int32_t resendLimit = 10;
+    while (sendSize < size || sendCount < resendLimit) {
+        sendCount += 1;
+        auto ret = send(fd_, buf, size, SOCKET_FLAGS);
+        if (ret < 0) {
+            int32_t eno = errno;
+            if (eno == EAGAIN || eno == EINTR || eno == EWOULDBLOCK) {
+                continue;
+            }
+            MMI_LOGE("Send return failed,error:%{public}d fd:%{public}d", eno, fd_);
+            return false;
+        }
+        sendSize += ret;
+    }
+    if (sendCount >= resendLimit && sendSize < size) {
+        MMI_LOGE("Send too many times:%{public}d/%{public}d,dsize:%{public}zu/%{public}zu fd:%{public}d",
+            sendCount, resendLimit, sendSize, size, fd_);
         return false;
     }
     return true;
