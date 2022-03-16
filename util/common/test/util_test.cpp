@@ -156,9 +156,9 @@ HWTEST_F(UtilTest, GetThisThreadIdOfString, TestSize.Level1)
     EXPECT_TRUE(retResult.length() >= 0);
 }
 
-HWTEST_F(UtilTest, GetNowThreadId, TestSize.Level1)
+HWTEST_F(UtilTest, GetThisThreadId, TestSize.Level1)
 {
-    uint64_t retResult = GetNowThreadId();
+    uint64_t retResult = GetThisThreadId();
     EXPECT_TRUE(retResult >= 0);
 }
 
