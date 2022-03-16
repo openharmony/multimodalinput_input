@@ -323,29 +323,27 @@ void UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct ep
         }
         char szBuf[MAX_PACKET_BUF_SIZE] = {};
         for (size_t j = 0; j < maxCount; j++) {
-            auto size = recv(fd, szBuf, sizeof(szBuf), SOCKET_FLAGS);
+            auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, SOCKET_FLAGS);
             if (size < 0) {
                 int32_t eno = errno;
                 if (eno == EAGAIN || eno == EINTR || eno == EWOULDBLOCK) {
                     continue;
                 }
                 MMI_LOGE("recv return %{public}zu errno:%{public}d", size, eno);
-                break;
-            }
-            if (size == 0) {
+            } else if (size == 0) {
                 MMI_LOGE("The client side disconnect with the server. size:0 errno:%{public}d", errno);
                 ReleaseSession(fd, ev);
-                break;
-            }
+            } else {
 #ifdef OHOS_BUILD_HAVE_DUMP_DATA
-            DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
+                DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
 #endif
-            if (size > 0 && bufData->sBuf.Write(szBuf, size) == false) {
-                bufData->isOverflow = true;
-                break;
-            }
-            if (size < MAX_PACKET_BUF_SIZE) {
-                break;
+                if (!bufData->sBuf.Write(szBuf, size)) {
+                    bufData->isOverflow = true;
+                    break;
+                }
+                if (size < MAX_PACKET_BUF_SIZE) {
+                    break;
+                }
             }
         }
     }
