@@ -27,7 +27,7 @@ config("mmi_connect_manager_config") {
 }
 
 ohos_source_set("mmi_connect_manager_service") {
-  part_name = "multimodalinput_base"
+  part_name = "input"
   sources = [
     "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
     "${mmi_connect_manager_path}/src/multimodal_input_connect_stub.cpp",
@@ -46,7 +46,7 @@ ohos_source_set("mmi_connect_manager_service") {
 }
 
 ohos_source_set("mmi_connect_manager_proxy") {
-  part_name = "multimodalinput_base"
+  part_name = "input"
   sources = [
     "${mmi_connect_manager_path}/src/multimodal_input_connect_death_recipient.cpp",
     "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",

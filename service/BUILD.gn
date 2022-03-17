@@ -78,14 +78,14 @@ config("libmmi_server_config") {
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
   source = "ability_launch/etc/ability_launch_config.json"
-  part_name = "multimodalinput_base"
+  part_name = "input"
   subsystem_name = "multimodalinput"
   relative_install_dir = "multimodalinput"
 }
 
 ohos_prebuilt_etc("drawing_pointer_image") {
   source = "//foundation/multimodalinput/input/common/source_icon/angle.png"
-  part_name = "multimodalinput_base"
+  part_name = "input"
   subsystem_name = "multimodalinput"
   relative_install_dir = "multimodalinput/mouse_icon"
 }
@@ -171,14 +171,14 @@ ohos_shared_library("libmmi-server") {
     "utils_base:utils",
   ]
 
-  part_name = "multimodalinput_base"
+  part_name = "input"
 }
 
 ohos_prebuilt_etc("mmi_device_config.ini") {
   source = "mmi_device_config.ini"
   relative_install_dir = "."
   subsystem_name = "multimodalinput"
-  part_name = "multimodalinput_base"
+  part_name = "input"
 }
 
 import("//build/test.gni")

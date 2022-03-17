@@ -87,7 +87,7 @@ ohos_shared_library("event-injection") {
 
   external_deps = [ "ipc:ipc_core" ]
 
-  part_name = "multimodalinput_base"
+  part_name = "input"
 }
 
 ohos_unittest("ut-event-injection-out") {
@@ -213,5 +213,5 @@ ohos_executable("mmi-event-injection") {
   }
 
   install_enable = true
-  part_name = "multimodalinput_base"
+  part_name = "input"
 }
