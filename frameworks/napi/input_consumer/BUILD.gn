@@ -63,5 +63,5 @@ ohos_shared_library("inputconsumer") {
 
   relative_install_dir = "module/multimodalinput"
 
-  part_name = "multimodalinput_base"
+  part_name = "input"
 }
