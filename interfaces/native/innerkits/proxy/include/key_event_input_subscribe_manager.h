@@ -20,6 +20,7 @@
 #include <list>
 #include <memory>
 
+#include "event_handler.h"
 #include "nocopyable.h"
 #include "singleton.h"
 

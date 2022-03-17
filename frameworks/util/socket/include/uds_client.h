@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace MMI {
 class UDSClient;
-using MsgClientFunCallback = std::function<void(NetPacket&)>;
+using MsgClientFunCallback = std::function<void(UDSClient&, NetPacket&)>;
 class UDSClient : public UDSSocket {
 public:
     UDSClient();

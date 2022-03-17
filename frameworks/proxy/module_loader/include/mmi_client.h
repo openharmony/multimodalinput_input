@@ -47,7 +47,7 @@ protected:
     virtual void OnDisconnected() override;
     void OnMsgHandler(NetPacket& pkt);
     
-    void OnEventRunnerThread();
+    void OnEventHandlerThread();
     bool StartEventRunner();
 
 protected:
@@ -55,7 +55,7 @@ protected:
     ConnectCallback funConnected_;
     ConnectCallback funDisconnected_;
 
-    std::thread t_;
+    std::thread ehThread_;
     bool selfRunner_ = false;
     std::shared_ptr<MMIEventHandler> eventHandler_ = nullptr;
 };

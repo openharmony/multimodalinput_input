@@ -159,7 +159,7 @@ void UDSClient::OnRecv(const char *buf, size_t size)
                 return;
             }
         }
-        recvFun_(pkt);
+        recvFun_(*this, pkt);
         packSize = headSize + head->size;
         bufSize -= packSize;
         readIdx += packSize;
