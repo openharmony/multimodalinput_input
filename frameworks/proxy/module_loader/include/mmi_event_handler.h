@@ -15,6 +15,7 @@
 #ifndef MMI_EVENT_HANDLER_H
 #define MMI_EVENT_HANDLER_H
 #include "event_handler.h"
+
 #include "if_mmi_client.h"
 
 namespace OHOS {
@@ -29,12 +30,17 @@ enum MmiEventHandlerId : uint32_t {
     MMI_EVENT_HANDLER_ID_END,
 };
 
+using EventHandlerPtr = std::shared_ptr<AppExecFwk::EventHandler>;
 class MMIEventHandler : public AppExecFwk::EventHandler {
 public:
+    MMIEventHandler();
     explicit MMIEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
     virtual ~MMIEventHandler();
     DISALLOW_COPY_AND_MOVE(MMIEventHandler);
+    static EventHandlerPtr GetInstance();
+
     const std::string& GetErrorStr(ErrCode code) const;
+    EventHandlerPtr GetSharedPtr();
 
 protected:
     void OnStop(const AppExecFwk::InnerEvent::Pointer &event);
@@ -44,4 +50,5 @@ protected:
 };
 } // namespace MMI
 } // namespace OHOS
+#define MEventHandler OHOS::MMI::MMIEventHandler::GetInstance()
 #endif // MMI_EVENT_HANDLER_H

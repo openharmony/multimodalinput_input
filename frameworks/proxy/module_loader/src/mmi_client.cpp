@@ -15,6 +15,7 @@
 
 #include "mmi_client.h"
 #include <cinttypes>
+#include <condition_variable>
 #include "mmi_log.h"
 #include "proto.h"
 #include "util.h"
@@ -24,6 +25,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+std::mutex mtx;
+std::condition_variable cv;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIClient" };
 } // namespace
 
@@ -50,7 +53,8 @@ bool MMIClient::Start(bool detachMode)
     CALL_LOG_ENTER;
     msgHandler_.Init();
     EventManager.SetClientHandle(GetSharedPtr());
-    auto callback = std::bind(&MMIClient::OnMsgHandler, this, std::placeholders::_1);
+    auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, &msgHandler_, 
+        std::placeholders::_1, std::placeholders::_2);
     if (!(StartClient(callback, detachMode))) {
         MMI_LOGE("Client startup failed");
         return false;
@@ -59,21 +63,57 @@ bool MMIClient::Start(bool detachMode)
         MMI_LOGE("Start runner failed");
         return false;
     }
+
+    MMI_LOGI("step 1");
+    std::unique_lock <std::mutex> lck(mtx);
+    ehThread_ = std::thread(std::bind(&MMIClient::OnEventHandlerThread, this));
+    ehThread_.detach();
+    cv.wait(lck);
+    MMI_LOGI("step 3");
     return true;
+}
+
+void MMIClient::OnEventHandlerThread()
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetPid();
+    uint64_t tid = GetNowThreadId();
+    MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
+    // CHKPV(eventHandler_);
+    // auto runner = eventHandler_->GetEventRunner();
+    // CHKPV(runner);
+    // runner->Run();
+    auto eventHandler = MEventHandler->shared_from_this();
+    CHKPV(eventHandler);
+    MMI_LOGI("step 2");
+    cv.notify_one();
+    auto eventRunner = eventHandler->GetEventRunner();
+    CHKPV(eventRunner);
+    eventRunner->Run();
+    MMI_LOGI("step 4");
+
+    // auto eventRunner = EventRunner::Create(false);
+    // CHKPV(eventRunner);
+    // eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner);
+    // CHKPV(eventHandler_);
+    // MMI_LOGI("step 2");
+    // cv.notify_one();
+    // eventRunner->Run();
+    // MMI_LOGI("step 4");
 }
 
 void MMIClient::OnMsgHandler(NetPacket& pkt)
 {
     CALL_LOG_ENTER;
     CHKPV(eventHandler_);
-    uint64_t tid = GetNowThreadId();
     int32_t pid = GetPid();
+    uint64_t tid = GetNowThreadId();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
 
     auto callMsgHandler = [this, &pkt] () {
         MMI_LOGD("callMsgHandler enter.");
-        uint64_t tid = GetNowThreadId();
         int32_t pid = GetPid();
+        uint64_t tid = GetNowThreadId();
         MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
         msgHandler_.OnMsgHandler(*this, pkt);
     };
@@ -83,34 +123,26 @@ void MMIClient::OnMsgHandler(NetPacket& pkt)
     }
 }
 
-void MMIClient::OnEventRunnerThread()
-{
-    CALL_LOG_ENTER;
-    uint64_t tid = GetNowThreadId();
-    int32_t pid = GetPid();
-    MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
-    CHKPV(eventHandler_);
-    auto runner = eventHandler_->GetEventRunner();
-    CHKPV(runner);
-    runner->Run();
-}
-
 bool MMIClient::StartEventRunner()
 {
     CALL_LOG_ENTER;
-    uint64_t tid = GetNowThreadId();
     int32_t pid = GetPid();
+    uint64_t tid = GetNowThreadId();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
-    auto curRunner = EventRunner::Current();
-    auto eventRunner = EventRunner::GetMainEventRunner();
+    // auto curRunner = EventRunner::Current();
+    // auto eventRunner = EventRunner::GetMainEventRunner();
+    // CHKPF(eventRunner);
+    // eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner);
+    // CHKPF(eventHandler_);
+    // if (curRunner == nullptr) {
+    //     ehThread_ = std::thread(std::bind(&MMIClient::OnEventHandlerThread, this));
+    //     ehThread_.detach();
+    //     selfRunner_ = true;
+    // }
+    auto eventRunner = EventRunner::Create(true);
     CHKPF(eventRunner);
     eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner);
     CHKPF(eventHandler_);
-    if (curRunner == nullptr) {
-        t_ = std::thread(std::bind(&MMIClient::OnEventRunnerThread, this));
-        t_.detach();
-        selfRunner_ = true;
-    }
     return true;
 }
 
