@@ -61,7 +61,6 @@ constexpr int32_t INDEX_THIRD = 3;
 #ifdef OHOS_WESTEN_MODEL
 constexpr int32_t INDEX_INVALID = -1;
 #endif
-constexpr int32_t MASK_BASE = 10;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest" };
 } // namespace
 
