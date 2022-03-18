@@ -38,11 +38,12 @@ MMIEventHandler::~MMIEventHandler()
 {
 }
 
-EventHandlerPtr MMIEventHandler::instance_ = nullptr;
+// EventHandlerPtr MMIEventHandler::instance_ = nullptr;
 EventHandlerPtr MMIEventHandler::GetInstance()
 {
+    static EventHandlerPtr instance_ = nullptr;
     if (instance_ == nullptr) {
-        return std::make_shared<MMIEventHandler>();
+        instance_ = std::make_shared<MMIEventHandler>();
     }
     return instance_;
 }
