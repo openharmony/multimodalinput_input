@@ -14,11 +14,14 @@
  */
 
 #include "injection_event_dispatch.h"
+
 #include <cctype>
 #include <cstdio>
 #include <iostream>
 #include <regex>
 #include <string>
+#include <typeinfo>
+
 #include "error_multimodal.h"
 #include "proto.h"
 #include "util.h"
@@ -100,8 +103,7 @@ int32_t InjectionEventDispatch::GetFileSize(const std::string& fileName)
 int32_t InjectionEventDispatch::OnJson()
 {
     CALL_LOG_ENTER;
-    int32_t nCount = injectArgvs_.size() / injectArgvs_[0].size() - 1;
-    if (nCount < ARGVS_CODE_INDEX) {
+    if (injectArgvs_.size() < ARGVS_CODE_INDEX) {
         MMI_LOGE("path is error");
         return RET_ERR;
     }
@@ -236,13 +238,14 @@ int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText
 
 bool InjectionEventDispatch::CheckValue(const std::string& inputValue)
 {
-    if ((inputValue.length()) >= INPUT_VALUE_LENGTH) {
+    if ((inputValue.length()) > INPUT_VALUE_LENGTH) {
+        MMI_LOGE("The value entered is out of range, value:%{public}s", inputValue.c_str());
         return false;
     }
     bool isValueNumber = regex_match(inputValue, std::regex("(-[\\d+]+)|(\\d+)"));
     if (isValueNumber) {
         int32_t numberValue = stoi(inputValue);
-        if ((numberValue >= INPUT_VALUE_MIN) && (numberValue <= INPUT_VALUE_MAX)) {
+        if ((numberValue >= INT32_MIN) && (numberValue <= INT32_MAX)) {
             return true;
         }
     }
@@ -252,12 +255,13 @@ bool InjectionEventDispatch::CheckValue(const std::string& inputValue)
 bool InjectionEventDispatch::CheckCode(const std::string& inputCode)
 {
     if ((inputCode.length()) > INPUT_CODE_LENGTH) {
+        MMI_LOGE("The value entered is out of range, code:%{public}s", inputCode.c_str());
         return false;
     }
     bool isCodeNumber = regex_match(inputCode, std::regex("\\d+"));
     if (isCodeNumber) {
-        int32_t numberCode = stoi(inputCode);
-        if ((numberCode >= 0) && (numberCode <= INPUT_CODE_MAX)) {
+        uint16_t numberCode = stoi(inputCode);
+        if ((numberCode >= 0) && (numberCode <= UINT16_MAX)) {
             return true;
         }
     }
@@ -267,11 +271,12 @@ bool InjectionEventDispatch::CheckCode(const std::string& inputCode)
 bool InjectionEventDispatch::CheckType(const std::string& inputType)
 {
     if ((inputType.length()) > INPUT_TYPE_LENGTH) {
+        MMI_LOGE("The value entered is out of range, type:%{public}s", inputType.c_str());
         return false;
     }
     bool isTypeNumber = regex_match(inputType, std::regex("\\d+"));
     if (isTypeNumber) {
-        int32_t numberType = stoi(inputType);
+        uint16_t numberType = stoi(inputType);
         if ((numberType >= 0) && (numberType <= INPUT_TYPE_MAX)) {
             return true;
         }
@@ -325,7 +330,6 @@ int32_t InjectionEventDispatch::OnSendEvent()
     event.input_event_usec = tm.tv_usec;
     if (!(CheckEventValue(injectArgvs_[SEND_EVENT_TYPE_INDEX], injectArgvs_[SEND_EVENT_CODE_INDEX],
         injectArgvs_[SEND_EVENT_VALUE_INDEX]))) {
-        MMI_LOGE("Wrong type code value entered.");
         return RET_ERR;
     }
     event.type = static_cast<uint16_t>(std::stoi(injectArgvs_[SEND_EVENT_TYPE_INDEX]));
