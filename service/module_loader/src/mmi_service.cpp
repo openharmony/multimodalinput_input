@@ -267,6 +267,7 @@ void MMIService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
     int32_t fd = s->GetFd();
+    authFds_.erase(fd);
     MMI_LOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), fd);
 }
 
