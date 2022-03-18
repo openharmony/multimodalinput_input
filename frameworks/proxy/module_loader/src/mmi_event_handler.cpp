@@ -26,6 +26,7 @@ namespace {
 using namespace AppExecFwk;
 MMIEventHandler::MMIEventHandler() : EventHandler(EventRunner::Create(false))
 {
+    CALL_LOG_ENTER;
 }
 
 MMIEventHandler::MMIEventHandler(const std::shared_ptr<EventRunner> &runner)
@@ -37,13 +38,13 @@ MMIEventHandler::~MMIEventHandler()
 {
 }
 
+EventHandlerPtr MMIEventHandler::instance_ = nullptr;
 EventHandlerPtr MMIEventHandler::GetInstance()
 {
-    static EventHandlerPtr eventHandler = nullptr;
-    if (eventHandler == nullptr) {
+    if (instance_ == nullptr) {
         return std::make_shared<MMIEventHandler>();
     }
-    return eventHandler;
+    return instance_;
 }
 
 const std::string& MMIEventHandler::GetErrorStr(ErrCode code) const
@@ -68,7 +69,7 @@ const std::string& MMIEventHandler::GetErrorStr(ErrCode code) const
 
 EventHandlerPtr MMIEventHandler::GetSharedPtr()
 {
-    return shared_from_this();
+    return std::static_pointer_cast<MMIEventHandler>(shared_from_this());
 }
 
 void MMIEventHandler::OnStop(const InnerEvent::Pointer &event)

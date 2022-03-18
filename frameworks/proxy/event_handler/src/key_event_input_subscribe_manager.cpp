@@ -14,10 +14,11 @@
  */
 
 #include "key_event_input_subscribe_manager.h"
-
+#include <cinttypes>
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+#include "mmi_event_handler.h"
 #include "standardized_event_manager.h"
 
 namespace OHOS {
@@ -97,14 +98,26 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
         MMI_LOGE("Leave, the subscribe id is less than 0");
         return RET_ERR;
     }
-    BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
-    for (const auto& subscriber : subscribeInfos_) {
-        if (subscriber.GetSubscribeId() == subscribeId) {
-            subscriber.GetCallback()(event);
-            MMI_LOGD("Leave, client executes subscribe callback function success");
-            return RET_OK;
-        }
+
+    int32_t pid = GetPid();
+    uint64_t tid = GetNowThreadId();
+    MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
+    auto obj = GetSubscribeKeyEvent(subscribeId);
+    if (!obj) {
+        MMI_LOGE("subscribe key event not found. id:%{public}d", subscribeId);
+        return RET_ERR;
     }
+    auto callMsgHandler = [this, &obj, &event, &subscribeId] () {
+        MMI_LOGD("callMsgHandler enter.");
+        int32_t pid = GetPid();
+        uint64_t tid = GetNowThreadId();
+        MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
+        BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
+        obj->GetCallback()(event);
+        MMI_LOGD("callMsgHandler key event callback id:%{public}d pid:%{public}d threadId:%{public}" PRIu64,
+                    subscribeId, pid, tid);
+    };
+    MEventHandler->PostHighPriorityTask(callMsgHandler);
     return RET_ERR;
 }
 
@@ -121,6 +134,21 @@ void KeyEventInputSubscribeManager::OnConnected()
             MMI_LOGE("subscribe key event failed");
         }
     }
+}
+
+const KeyEventInputSubscribeManager::SubscribeKeyEventInfo* KeyEventInputSubscribeManager::GetSubscribeKeyEvent(int32_t id)
+{
+    if (id <= 0) {
+        MMI_LOGE("invalid input param id:%{public}d", id);
+        return nullptr;
+    }
+    const SubscribeKeyEventInfo* data = nullptr;
+    for (const auto& subscriber : subscribeInfos_) {
+        if (subscriber.GetSubscribeId() == id) {
+            data = &subscriber;
+        }
+    }
+    return data;
 }
 } // namespace MMI
 } // namespace OHOS
