@@ -58,5 +58,4 @@ std::string GetFileExtendName(const std::string& fileName);
 int32_t GetFileSize(const std::string& fileName);
 } // namespace MMI
 } // namespace OHOS
-
 #endif // UTIL_H

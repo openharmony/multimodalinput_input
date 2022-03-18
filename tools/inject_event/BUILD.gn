@@ -40,7 +40,7 @@ ohos_shared_library("input-manager") {
     "safwk:system_ability_fwk",
   ]
   subsystem_name = "multimodalinput"
-  part_name = "multimodalinput_base"
+  part_name = "input"
 }
 
 ohos_executable("input") {
@@ -62,7 +62,7 @@ ohos_executable("input") {
     "safwk:system_ability_fwk",
   ]
   subsystem_name = "multimodalinput"
-  part_name = "multimodalinput_base"
+  part_name = "input"
 }
 
 module_output_path = "multimodalinput/unit_out"

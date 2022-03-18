@@ -392,5 +392,4 @@ struct EventTabletPad {
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // STRUCT_MULTIMODAL_H

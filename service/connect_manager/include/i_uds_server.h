@@ -27,5 +27,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // I_UDS_SERVER_H
