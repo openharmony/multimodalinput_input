@@ -43,7 +43,7 @@ int32_t EventFilterStub::OnRemoteRequest(
     }
 
     switch (code) {
-        case IEventFilter::OPERATOR_TYPE::HANDLE_POINTER_EVENT:
+        case static_cast<uint32_t>(IEventFilter::OPERATOR_TYPE::HANDLE_POINTER_EVENT):
             return StubHandlePointerEvent(data, reply);
         default:
             MMI_LOGE("unknown code:%{public}u, go switch defaut", code);
