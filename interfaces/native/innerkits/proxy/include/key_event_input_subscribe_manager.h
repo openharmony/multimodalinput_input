@@ -71,6 +71,9 @@ public:
     void OnConnected();
 
 private:
+    const SubscribeKeyEventInfo* GetSubscribeKeyEvent(int32_t id);
+
+private:
     std::list<SubscribeKeyEventInfo> subscribeInfos_;
     static int32_t subscribeIdManager_;
 };

@@ -76,6 +76,7 @@ bool MMIClient::Start(bool detachMode)
 void MMIClient::OnEventHandlerThread()
 {
     CALL_LOG_ENTER;
+    SetThreadName("mmi_client");
     int32_t pid = GetPid();
     uint64_t tid = GetNowThreadId();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
@@ -83,7 +84,7 @@ void MMIClient::OnEventHandlerThread()
     // auto runner = eventHandler_->GetEventRunner();
     // CHKPV(runner);
     // runner->Run();
-    auto eventHandler = MEventHandler->shared_from_this();
+    auto eventHandler = MEventHandler->GetSharedPtr();
     CHKPV(eventHandler);
     MMI_LOGI("step 2");
     cv.notify_one();
