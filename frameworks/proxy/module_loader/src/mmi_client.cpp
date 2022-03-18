@@ -90,6 +90,14 @@ void MMIClient::OnEventHandlerThread()
     cv.notify_one();
     auto eventRunner = eventHandler->GetEventRunner();
     CHKPV(eventRunner);
+    auto callMsgHandler = [] () {
+        MMI_LOGD("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
+    };
+    bool ret = MEventHandler->PostHighPriorityTask(callMsgHandler);
+    if (!ret) {
+        MMI_LOGE("post task failed");
+    }
+    MEventHandler->Set(112);
     eventRunner->Run();
     MMI_LOGI("step 4");
 

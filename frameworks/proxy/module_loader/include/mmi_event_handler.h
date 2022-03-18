@@ -41,6 +41,14 @@ public:
 
     const std::string& GetErrorStr(ErrCode code) const;
     EventHandlerPtr GetSharedPtr();
+    void Set(int32_t id)
+    {
+        id_ = id;
+    }
+    int32_t GetId() const
+    {
+        return id_;
+    }
 
 protected:
     void OnStop(const AppExecFwk::InnerEvent::Pointer &event);
@@ -49,7 +57,8 @@ protected:
     virtual void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
 
 private:
-    static EventHandlerPtr instance_;
+    int32_t id_ = 0;
+    //static EventHandlerPtr instance_;
 };
 } // namespace MMI
 } // namespace OHOS
