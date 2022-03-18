@@ -280,7 +280,6 @@ bool InjectionEventDispatch::CheckType(const std::string& inputType)
         if ((numberType >= 0) && (numberType <= INPUT_TYPE_MAX)) {
             return true;
         }
-
     }
     return false;
 }
