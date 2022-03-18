@@ -202,7 +202,9 @@ napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info i
     }
 
     JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
+    CHKPP(jsIds);
     auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
     if (argc == 0) {
         return jsInputDeviceMgr->GetDeviceIds(env);
     }
@@ -260,7 +262,9 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
     }
 
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
+    CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
     if (argc == 1) {
         MMI_LOGD("promise end");
         return jsInputDeviceMgr->GetDevice(id, env);

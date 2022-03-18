@@ -31,6 +31,7 @@ EventFilterWrap::EventFilterWrap()
 EventFilterWrap::~EventFilterWrap()
 {
     CALL_LOG_ENTER;
+    filter_ = nullptr;
 }
 
 int32_t EventFilterWrap::AddInputEventFilter(sptr<IEventFilter> filter)
