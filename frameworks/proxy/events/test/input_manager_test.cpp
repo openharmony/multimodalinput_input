@@ -61,7 +61,6 @@ constexpr int32_t INDEX_THIRD = 3;
 #ifdef OHOS_WESTEN_MODEL
 constexpr int32_t INDEX_INVALID = -1;
 #endif
-constexpr int32_t MASK_BASE = 10;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest" };
 } // namespace
 
@@ -330,35 +329,6 @@ void InputManagerTest::TestMarkConsumedStep6()
 
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
-}
-
-HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.Level1)
-{
-    std::string command = "Inject keyCode = 2,action = 2";
-    std::vector<std::string> slogs {SearchLog(command, true)};
-    int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
-    OHOS::MMI::KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
-    kitDown.SetPressed(true);
-    kitDown.SetDownTime(downTime);
-    injectDownEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
-    injectDownEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
-
-    std::shared_ptr<OHOS::MMI::KeyEvent> injectUpEvent = OHOS::MMI::KeyEvent::Create();
-    downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
-    OHOS::MMI::KeyEvent::KeyItem kitUp;
-    kitUp.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
-    kitUp.SetPressed(false);
-    kitUp.SetDownTime(downTime);
-    injectUpEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
-    injectUpEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
-    injectUpEvent->RemoveReleasedKeyItems(kitUp);
-    InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
-    std::vector<std::string> tlogs {SearchLog(command, slogs)};
-    EXPECT_TRUE(!tlogs.empty());
 }
 
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_002, TestSize.Level1)
@@ -1309,47 +1279,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_004, TestSize.Level1)
             InputManager::GetInstance()->RemoveMonitor(ids[i]);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
         }
-    }
-}
-
-HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_005, TestSize.Level1)
-{
-    RunShellUtil runCommand;
-    std::shared_ptr<InputEventCallback> cb = InputEventCallback::GetPtr();
-    EXPECT_TRUE(cb != nullptr);
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
-    EXPECT_TRUE(IsValidHandlerId(monitorId));
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    MMI_LOGD("InputManagerTest_AddHandler_005");
-    TestMarkConsumedStep1();
-    auto pointerEvent = TestMarkConsumedStep2();
-    TestMarkConsumedStep3(monitorId / MASK_BASE, pointerEvent->GetId());
-    TestMarkConsumedStep4();
-    TestMarkConsumedStep5();
-
-    if (IsValidHandlerId(monitorId)) {
-        InputManager::GetInstance()->RemoveMonitor(monitorId);
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    }
-}
-
-HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_006, TestSize.Level1)
-{
-    RunShellUtil runCommand;
-    std::shared_ptr<InputEventCallback> cb = InputEventCallback::GetPtr();
-    EXPECT_TRUE(cb != nullptr);
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
-    EXPECT_TRUE(IsValidHandlerId(monitorId));
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    MMI_LOGD("InputManagerTest_AddHandler_006");
-    auto pointerEvent = TestMarkConsumedStep1();
-    TestMarkConsumedStep3(monitorId / MASK_BASE, pointerEvent->GetId());
-    TestMarkConsumedStep4();
-    TestMarkConsumedStep6();
-
-    if (IsValidHandlerId(monitorId)) {
-        InputManager::GetInstance()->RemoveMonitor(monitorId);
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
 
