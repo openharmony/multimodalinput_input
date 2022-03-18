@@ -89,7 +89,7 @@ ohos_shared_library("libmmi-virtual-device") {
   deps = [ "//utils/native/base:utils" ]
 
   install_enable = true
-  part_name = "multimodalinput_base"
+  part_name = "input"
 }
 
 ohos_executable("mmi-virtual-device-manager") {
@@ -117,7 +117,7 @@ ohos_executable("mmi-virtual-device-manager") {
   }
 
   install_enable = true
-  part_name = "multimodalinput_base"
+  part_name = "input"
 }
 
 module_output_path = "multimodalinput/unit_out"

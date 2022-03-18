@@ -44,4 +44,3 @@ void InputMonitorManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 }
 } // namespace MMI
 } // namespace OHOS
-

@@ -32,5 +32,4 @@ constexpr int32_t SOURCETYPE_TOUCHPAD = 3;
 constexpr int32_t SOURCETYPE_KEY = 4;
 } // namespace MMI
 } // namespace OHOS
-
 #endif // SOUCETYPE_H

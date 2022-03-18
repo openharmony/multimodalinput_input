@@ -164,5 +164,4 @@ Enum EnumAdd(Enum const e, T val)
 }
 } // namespace MMI
 } // namespace OHOS
-
 #endif // UTIL_EX_H

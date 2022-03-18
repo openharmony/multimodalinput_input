@@ -31,5 +31,4 @@ struct ConnectDefResp {
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // MULTIMODAL_INPUT_CONNECT_DEFINE_H
