@@ -185,7 +185,7 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
     const size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
     if (maxCount <= 0) {
-        MMI_LOGE("The maxCount is error, maxCount:%{public}d, errCode:%{public}d", maxCount, VAL_NOT_EXP);
+        MMI_LOGE("The maxCount is error, maxCount:%{public}zu, errCode:%{public}d", maxCount, VAL_NOT_EXP);
     }
     auto isoverflow = false;
     for (size_t j = 0; j < maxCount; j++) {
