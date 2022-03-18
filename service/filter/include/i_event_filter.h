@@ -27,7 +27,7 @@ public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.multimodalinput.IEventFilter");
     virtual bool HandlePointerEvent(const std::shared_ptr<PointerEvent> event) = 0;
 
-    enum class OPERATOR_TYPE {
+    enum class OPERATOR_TYPE : uint32_t {
         HANDLE_POINTER_EVENT = 0,
     };
 };
