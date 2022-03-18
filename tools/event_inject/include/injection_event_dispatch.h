@@ -96,12 +96,9 @@ private:
     static constexpr int32_t JSON_FILE_PATH_INDEX = 1;
     static constexpr int64_t JSON_FILE_SIZE = 0x200000;
     static constexpr uint32_t INPUT_TYPE_LENGTH = 3;
-    static constexpr int32_t INPUT_TYPE_MAX = 100;
-    static constexpr uint32_t INPUT_CODE_LENGTH = 10;
-    static constexpr int32_t INPUT_CODE_MAX = 2147483647;
-    static constexpr uint32_t INPUT_VALUE_LENGTH = 12;
-    static constexpr int32_t INPUT_VALUE_MAX = 2147483647;
-    static constexpr int32_t INPUT_VALUE_MIN = -2147483648;
+    static constexpr uint16_t INPUT_TYPE_MAX = 100;
+    static constexpr uint32_t INPUT_CODE_LENGTH = 6;
+    static constexpr uint32_t INPUT_VALUE_LENGTH = 11;
 };
 } // namespace MMI
 } // namespace OHOS
