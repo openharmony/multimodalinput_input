@@ -17,14 +17,14 @@ import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 ohos_prebuilt_etc("mmi_uinput.rc") {
   source = "mmi_uinput.rc"
   relative_install_dir = "init"
-  part_name = "multimodalinput_base"
+  part_name = "input"
   subsystem_name = "multimodalinput"
 }
 
 ohos_prebuilt_etc("multimodalinput.rc") {
   source = "multimodalinput.cfg"
   relative_install_dir = "init"
-  part_name = "multimodalinput_base"
+  part_name = "input"
   subsystem_name = "multimodalinput"
 }
 
@@ -54,7 +54,7 @@ ohos_executable("uinput_inject") {
     "utils_base:utils",
   ]
 
-  part_name = "multimodalinput_base"
+  part_name = "input"
   subsystem_name = "multimodalinput"
 }
 
@@ -85,7 +85,7 @@ ohos_shared_library("mmi_uinject") {
     "utils_base:utils",
   ]
 
-  part_name = "multimodalinput_base"
+  part_name = "input"
   subsystem_name = "multimodalinput"
 }
 

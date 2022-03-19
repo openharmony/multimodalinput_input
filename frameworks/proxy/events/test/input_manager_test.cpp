@@ -332,7 +332,7 @@ void InputManagerTest::TestMarkConsumedStep6()
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.Level1)
 {
-    std::string command = "Inject keyCode = 2,action = 2";
+    std::string command = "Inject keyCode:2, action:2";
     std::vector<std::string> slogs {SearchLog(command, true)};
     int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();

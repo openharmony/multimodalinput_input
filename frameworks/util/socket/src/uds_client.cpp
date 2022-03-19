@@ -132,6 +132,11 @@ void UDSClient::Stop()
     CALL_LOG_ENTER;
     Close();
     isRunning_ = false;
+    if (fd_ >= 0) {
+        struct epoll_event ev = {};
+        EpollCtl(fd_, EPOLL_CTL_DEL, ev);
+        EpollClose();
+    }
 }
 
 void UDSClient::OnRecv(const char *buf, size_t size)
@@ -172,10 +177,14 @@ void UDSClient::OnRecv(const char *buf, size_t size)
 void UDSClient::ReleaseEpollEvent(int32_t fd)
 {
     OnDisconnected();
-    struct epoll_event event = {};
-    EpollCtl(fd, EPOLL_CTL_DEL, event);
-    close(fd);
-    fd_ = -1;
+    if (fd >= 0) {
+        struct epoll_event event = {};
+        EpollCtl(fd, EPOLL_CTL_DEL, event);
+        close(fd);
+        if (fd == fd_) {
+            fd_ = -1;
+        }
+    }
 }
 
 void UDSClient::OnEpollEvent(const struct epoll_event& ev, StreamBuffer& buf)
@@ -195,7 +204,7 @@ void UDSClient::OnEpollEvent(const struct epoll_event& ev, StreamBuffer& buf)
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
     const size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
     if (maxCount <= 0) {
-        MMI_LOGE("The maxCount is error, maxCount:%{public}d, errCode:%{public}d", maxCount, VAL_NOT_EXP);
+        MMI_LOGE("The maxCount is error, maxCount:%{public}zu, errCode:%{public}d", maxCount, VAL_NOT_EXP);
         return;
     }
     for (size_t j = 0; j < maxCount; j++) {

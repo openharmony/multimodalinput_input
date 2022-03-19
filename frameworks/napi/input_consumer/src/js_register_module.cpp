@@ -146,6 +146,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     CHKPF(monitorInfo);
     CHKPF(keyEvent);
     auto keyOption = monitorInfo->keyOption;
+    CHKPF(keyOption);
     std::vector<KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
     int32_t infoFinalKey = keyOption->GetFinalKey();
     int32_t keyEventFinalKey = keyEvent->GetKeyCode();
@@ -261,6 +262,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     };
     CHKPP(event);
     auto keyOption = std::make_shared<KeyOption>();
+    CHKPP(keyOption);
     if (GetEventInfo(env, info, event, keyOption) < 0) {
         delete event;
         event = nullptr;
