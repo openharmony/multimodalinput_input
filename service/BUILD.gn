@@ -43,11 +43,10 @@ config("libmmi_server_config") {
     "//foundation/graphic/standard/rosen/modules/2d_graphics/include",
     "//foundation/graphic/standard/rosen/modules/2d_graphics/src",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
-    "//foundation/multimodalinput/input/frameworks/util/common/include",
-    "//foundation/multimodalinput/input/frameworks/util/socket/include",
-    "//foundation/multimodalinput/input/frameworks/util/network/include",
+    "//foundation/multimodalinput/input/util/common/include",
+    "//foundation/multimodalinput/input/util/socket/include",
+    "//foundation/multimodalinput/input/util/network/include",
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
-    "//foundation/multimodalinput/input/common/include",
   ]
 
   if (is_mmi_have_hdf) {
@@ -84,7 +83,7 @@ ohos_prebuilt_etc("multimodalinput_config_ability.json") {
 }
 
 ohos_prebuilt_etc("drawing_pointer_image") {
-  source = "//foundation/multimodalinput/input/common/source_icon/angle.png"
+  source = "//foundation/multimodalinput/input/util/source_icon/angle.png"
   part_name = "input"
   subsystem_name = "multimodalinput"
   relative_install_dir = "multimodalinput/mouse_icon"
@@ -148,9 +147,9 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimedia/image_standard/interfaces/innerkits:image",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
-    "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
+    "//foundation/multimodalinput/input/util:libmmi-util",
     "//foundation/windowmanager/wm:libwm",
   ]
 
@@ -188,22 +187,20 @@ HDF_FWKS = "//drivers/framework"
 ohos_unittest("ut-mmi-service-out") {
   module_out_path = module_output_path
   include_dirs = [
-    "${mmi_path}/common/include",
     "${mmi_path}/frameworks/proxy/event_handler",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/module_loader",
     "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/frameworks/util/common",
-    "${mmi_path}/frameworks/util/common/include",
-    "${mmi_path}/frameworks/util/network",
-    "${mmi_path}/frameworks/util/network/include",
-    "${mmi_path}/frameworks/util/socket",
-    "${mmi_path}/frameworks/util/socket/include",
+    "${mmi_path}/util/common",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/util/network",
+    "${mmi_path}/util/network/include",
+    "${mmi_path}/util/socket",
+    "${mmi_path}/util/socket/include",
     "${mmi_path}/frameworks/proxy/event_handle",
     "${mmi_path}/frameworks/proxy/event_handle/include",
     "${mmi_path}/frameworks/proxy/module_loader",
     "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/common/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
@@ -254,8 +251,8 @@ ohos_unittest("ut-mmi-service-out") {
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/frameworks/util:libmmi-util",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
     "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
     "//third_party/googletest:gmock_main",

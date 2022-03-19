@@ -26,7 +26,7 @@
 #include "singleton.h"
 #include "window.h"
 
-#include "../../../common/include/device_observer.h"
+#include "../../../util/common/include/device_observer.h"
 #include "struct_multimodal.h"
 
 namespace OHOS {

@@ -22,7 +22,7 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "../../../common/include/device_observer.h"
+#include "../../../util/common/include/device_observer.h"
 #include "event_dispatch.h"
 #include "event_package.h"
 #include "input_device.h"

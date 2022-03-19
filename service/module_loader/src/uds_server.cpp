@@ -457,7 +457,7 @@ void UDSServer::OnThread()
 {
     CALL_LOG_ENTER;
     SetThreadName(std::string("uds_server"));
-    uint64_t tid = GetNowThreadId();
+    uint64_t tid = GetThisThreadId();
     if (tid <= 0) {
         MMI_LOGE("The tid value is error, errCode:%{public}d", VAL_NOT_EXP);
         return;
