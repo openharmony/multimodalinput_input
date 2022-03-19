@@ -18,7 +18,7 @@ config("libinputmonitor_config") {
 
   include_dirs = [
     "//foundation/multimodalinput/input/frameworks/napi/input_monitor/include",
-    "//foundation/multimodalinput/input/frameworks/util/common/include",
+    "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
   ]
 
@@ -45,7 +45,7 @@ ohos_shared_library("inputmonitor") {
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
-    "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
+    "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/libuv:uv_static",
   ]
 
