@@ -24,7 +24,7 @@ typedef std::function<void(const IfMMIClient&)> ConnectCallback;
 class IfMMIClient {
 public:
     virtual bool GetCurrentConnectedStatus() const = 0;
-    virtual bool Start(bool detachMode) = 0;
+    virtual bool Start() = 0;
     virtual bool SendMessage(const NetPacket& pkt) const = 0;
     virtual void RegisterConnectedFunction(ConnectCallback fun) = 0;
     virtual void RegisterDisconnectedFunction(ConnectCallback fun) = 0;

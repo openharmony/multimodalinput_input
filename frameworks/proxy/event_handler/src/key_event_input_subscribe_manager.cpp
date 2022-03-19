@@ -104,26 +104,35 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     MMI_LOGI("idddddd:%{public}d pid:%{public}d threadId:%{public}" PRIu64, MEventHandler->GetId(), pid, tid);
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
 
-    auto callMsgHandler = [this, event, subscribeId] () {
-        MMI_LOGD("callMsgHandler enter.");
-        int32_t pid = GetPid();
-        uint64_t tid = GetNowThreadId();
-        MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
+    // auto callMsgHandler = [this, event, subscribeId] () {
+    //     MMI_LOGD("callMsgHandler enter.");
+    //     int32_t pid = GetPid();
+    //     uint64_t tid = GetNowThreadId();
+    //     MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
         
-        auto obj = GetSubscribeKeyEvent(subscribeId);
-        if (!obj) {
-            MMI_LOGE("subscribe key event not found. id:%{public}d", subscribeId);
-            return;
-        }
-        obj->GetCallback()(event);
-        MMI_LOGD("callMsgHandler key event callback id:%{public}d pid:%{public}d threadId:%{public}" PRIu64,
-                    subscribeId, pid, tid);
-    };
-    bool ret = MEventHandler->PostHighPriorityTask(callMsgHandler);
-    if (!ret) {
-        MMI_LOGE("post task failed");
+    //     auto obj = GetSubscribeKeyEvent(subscribeId);
+    //     if (!obj) {
+    //         MMI_LOGE("subscribe key event not found. id:%{public}d", subscribeId);
+    //         return;
+    //     }
+    //     obj->GetCallback()(event);
+    //     MMI_LOGD("callMsgHandler key event callback id:%{public}d pid:%{public}d threadId:%{public}" PRIu64,
+    //                 subscribeId, pid, tid);
+    // };
+    // bool ret = MEventHandler->PostHighPriorityTask(callMsgHandler);
+    // if (!ret) {
+    //     MMI_LOGE("post task failed");
+    //     return RET_ERR;
+    // }
+
+    auto obj = GetSubscribeKeyEvent(subscribeId);
+    if (!obj) {
+        MMI_LOGE("subscribe key event not found. id:%{public}d", subscribeId);
         return RET_ERR;
     }
+    obj->GetCallback()(event);
+    MMI_LOGD("callMsgHandler key event callback id:%{public}d pid:%{public}d threadId:%{public}" PRIu64,
+                subscribeId, pid, tid);
     return RET_OK;
 }
 

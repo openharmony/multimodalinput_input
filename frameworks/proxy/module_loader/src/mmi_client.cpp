@@ -48,27 +48,52 @@ bool MMIClient::GetCurrentConnectedStatus() const
     return GetConnectedStatus();
 }
 
-bool MMIClient::Start(bool detachMode)
+bool MMIClient::Start()
 {
     CALL_LOG_ENTER;
     msgHandler_.Init();
     EventManager.SetClientHandle(GetSharedPtr());
     auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, &msgHandler_, 
         std::placeholders::_1, std::placeholders::_2);
-    if (!(StartClient(callback, detachMode))) {
+    if (!(StartClient(callback))) {
         MMI_LOGE("Client startup failed");
+        Stop();
         return false;
     }
     if (!StartEventRunner()) {
         MMI_LOGE("Start runner failed");
+        Stop();
         return false;
     }
+    return true;
+}
+
+bool MMIClient::StartEventRunner()
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetPid();
+    uint64_t tid = GetNowThreadId();
+    MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
+    // auto curRunner = EventRunner::Current();
+    // auto eventRunner = EventRunner::GetMainEventRunner();
+    // CHKPF(eventRunner);
+    // eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner);
+    // CHKPF(eventHandler_);
+    // if (curRunner == nullptr) {
+    //     ehThread_ = std::thread(std::bind(&MMIClient::OnEventHandlerThread, this));
+    //     ehThread_.detach();
+    //     selfRunner_ = true;
+    // }
 
     MMI_LOGI("step 1");
-    std::unique_lock <std::mutex> lck(mtx);
     ehThread_ = std::thread(std::bind(&MMIClient::OnEventHandlerThread, this));
     ehThread_.detach();
-    cv.wait(lck);
+    std::unique_lock <std::mutex> lck(mtx);
+    if (cv.wait_for(lck, std::chrono::second(1)) == std::cv_status::timeout) {
+        MMI_LOGE("EventThandler thread start timeout");
+        Stop();
+        return false;
+    }
     MMI_LOGI("step 3");
     return true;
 }
@@ -86,20 +111,14 @@ void MMIClient::OnEventHandlerThread()
     // runner->Run();
     auto eventHandler = MEventHandler->GetSharedPtr();
     CHKPV(eventHandler);
-    MMI_LOGI("step 2");
-    cv.notify_one();
     auto eventRunner = eventHandler->GetEventRunner();
     CHKPV(eventRunner);
-    auto callMsgHandler = [] () {
-        MMI_LOGD("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
-    };
-    bool ret = MEventHandler->PostHighPriorityTask(callMsgHandler);
-    if (!ret) {
-        MMI_LOGE("post task failed");
-    }
-    MEventHandler->Set(112);
-    eventRunner->Run();
+    MMI_LOGI("step 2");
+    cv.notify_one();
+
     MMI_LOGI("step 4");
+    eventRunner->Run();
+    MMI_LOGI("step 5");
 
     // auto eventRunner = EventRunner::Create(false);
     // CHKPV(eventRunner);
@@ -130,29 +149,6 @@ void MMIClient::OnMsgHandler(NetPacket& pkt)
     if (!ret) {
         MMI_LOGE("post task failed");
     }
-}
-
-bool MMIClient::StartEventRunner()
-{
-    CALL_LOG_ENTER;
-    int32_t pid = GetPid();
-    uint64_t tid = GetNowThreadId();
-    MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
-    // auto curRunner = EventRunner::Current();
-    // auto eventRunner = EventRunner::GetMainEventRunner();
-    // CHKPF(eventRunner);
-    // eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner);
-    // CHKPF(eventHandler_);
-    // if (curRunner == nullptr) {
-    //     ehThread_ = std::thread(std::bind(&MMIClient::OnEventHandlerThread, this));
-    //     ehThread_.detach();
-    //     selfRunner_ = true;
-    // }
-    auto eventRunner = EventRunner::Create(true);
-    CHKPF(eventRunner);
-    eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner);
-    CHKPF(eventHandler_);
-    return true;
 }
 
 void MMIClient::RegisterConnectedFunction(ConnectCallback fun)

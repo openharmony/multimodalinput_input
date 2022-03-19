@@ -32,7 +32,7 @@ public:
     virtual bool SendMessage(const NetPacket& pkt) const override;
     virtual bool GetCurrentConnectedStatus() const override;
 
-    bool Start(bool detachMode) override;
+    bool Start() override;
     void RegisterConnectedFunction(ConnectCallback fun) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
     void VirtualKeyIn(RawInputEvent virtualKeyEvent);
@@ -45,10 +45,10 @@ public:
 protected:
     virtual void OnConnected() override;
     virtual void OnDisconnected() override;
-    void OnMsgHandler(NetPacket& pkt);
     
-    void OnEventHandlerThread();
     bool StartEventRunner();
+    void OnEventHandlerThread();
+    void OnMsgHandler(NetPacket& pkt);
 
 protected:
     ClientMsgHandler msgHandler_;

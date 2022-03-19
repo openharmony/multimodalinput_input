@@ -42,7 +42,7 @@ public:
 
     bool StartClientTestUnitTest(MsgClientFunCallback fun)
     {
-        auto retResult = StartClient(fun, true);
+        auto retResult = StartClient(fun);
         return retResult;
     }
 
