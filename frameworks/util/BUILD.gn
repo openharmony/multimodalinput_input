@@ -65,7 +65,7 @@ ohos_shared_library("libmmi-util") {
     "//utils/native/base:utils",
   ]
 
-  part_name = "multimodalinput_base"
+  part_name = "input"
 }
 
 ohos_unittest("ut-mmi-util-out") {

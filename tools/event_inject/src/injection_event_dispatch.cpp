@@ -14,8 +14,14 @@
  */
 
 #include "injection_event_dispatch.h"
+
+#include <cctype>
 #include <cstdio>
-#include <unistd.h>
+#include <iostream>
+#include <regex>
+#include <string>
+#include <typeinfo>
+
 #include "error_multimodal.h"
 #include "proto.h"
 #include "util.h"
@@ -97,8 +103,7 @@ int32_t InjectionEventDispatch::GetFileSize(const std::string& fileName)
 int32_t InjectionEventDispatch::OnJson()
 {
     CALL_LOG_ENTER;
-    int32_t nCount = injectArgvs_.size() / injectArgvs_[0].size() - 1;
-    if (nCount < ARGVS_CODE_INDEX) {
+    if (injectArgvs_.size() < ARGVS_CODE_INDEX) {
         MMI_LOGE("path is error");
         return RET_ERR;
     }
@@ -231,13 +236,78 @@ int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText
     return RET_ERR;
 }
 
+bool InjectionEventDispatch::CheckValue(const std::string& inputValue)
+{
+    if ((inputValue.length()) > INPUT_VALUE_LENGTH) {
+        MMI_LOGE("The value entered is out of range, value:%{public}s", inputValue.c_str());
+        return false;
+    }
+    bool isValueNumber = regex_match(inputValue, std::regex("(-[\\d+]+)|(\\d+)"));
+    if (isValueNumber) {
+        int32_t numberValue = stoi(inputValue);
+        if ((numberValue >= INT32_MIN) && (numberValue <= INT32_MAX)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool InjectionEventDispatch::CheckCode(const std::string& inputCode)
+{
+    if ((inputCode.length()) > INPUT_CODE_LENGTH) {
+        MMI_LOGE("The value entered is out of range, code:%{public}s", inputCode.c_str());
+        return false;
+    }
+    bool isCodeNumber = regex_match(inputCode, std::regex("\\d+"));
+    if (isCodeNumber) {
+        uint16_t numberCode = stoi(inputCode);
+        if ((numberCode >= 0) && (numberCode <= UINT16_MAX)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool InjectionEventDispatch::CheckType(const std::string& inputType)
+{
+    if ((inputType.length()) > INPUT_TYPE_LENGTH) {
+        MMI_LOGE("The value entered is out of range, type:%{public}s", inputType.c_str());
+        return false;
+    }
+    bool isTypeNumber = regex_match(inputType, std::regex("\\d+"));
+    if (isTypeNumber) {
+        uint16_t numberType = stoi(inputType);
+        if ((numberType >= 0) && (numberType <= INPUT_TYPE_MAX)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool InjectionEventDispatch::CheckEventValue(const std::string& inputType, const std::string& inputCode,
+    const std::string& inputValue)
+{
+    if (!(CheckType(inputType))) {
+        MMI_LOGE("input error in type, type:%{public}s", inputType.c_str());
+        return false;
+    }
+    if (!(CheckCode(inputCode))) {
+        MMI_LOGE("input error in code, code:%{public}s", inputCode.c_str());
+        return false;
+    }
+    if (!(CheckValue(inputValue))) {
+        MMI_LOGE("input error in value, value:%{public}s", inputValue.c_str());
+        return false;
+    }
+    return true;
+}
+
 int32_t InjectionEventDispatch::OnSendEvent()
 {
     if (injectArgvs_.size() != SEND_EVENT_ARGV_COUNTS) {
         MMI_LOGE("Wrong number of input parameters, errCode:%{public}d", PARAM_INPUT_FAIL);
         return RET_ERR;
     }
-
     std::string deviceNode = injectArgvs_[SEND_EVENT_DEV_NODE_INDEX];
     if (deviceNode.empty()) {
         MMI_LOGE("device node:%{public}s is not exit", deviceNode.c_str());
@@ -253,12 +323,15 @@ int32_t InjectionEventDispatch::OnSendEvent()
         MMI_LOGE("open device node:%{public}s failed, errCode:%{public}d", deviceNode.c_str(), FILE_OPEN_FAIL);
         return RET_ERR;
     }
-
     struct timeval tm;
     gettimeofday(&tm, 0);
     struct input_event event = {};
     event.input_event_sec = tm.tv_sec;
     event.input_event_usec = tm.tv_usec;
+    if (!(CheckEventValue(injectArgvs_[SEND_EVENT_TYPE_INDEX], injectArgvs_[SEND_EVENT_CODE_INDEX],
+        injectArgvs_[SEND_EVENT_VALUE_INDEX]))) {
+        return RET_ERR;
+    }
     event.type = static_cast<uint16_t>(std::stoi(injectArgvs_[SEND_EVENT_TYPE_INDEX]));
     event.code = static_cast<uint16_t>(std::stoi(injectArgvs_[SEND_EVENT_CODE_INDEX]));
     event.value = static_cast<int32_t>(std::stoi(injectArgvs_[SEND_EVENT_VALUE_INDEX]));
