@@ -22,6 +22,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+std::mutex mtx;
+std::condition_variable cv;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSClient" };
 } // namespace
 
@@ -106,7 +108,7 @@ bool UDSClient::SendMsg(const NetPacket& pkt) const
     return SendMsg(buf.Data(), buf.Size());
 }
 
-bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
+bool UDSClient::StartClient(MsgClientFunCallback fun)
 {
     CALL_LOG_ENTER;
     recvFun_ = fun;
@@ -114,13 +116,14 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
         MMI_LOGW("Client connection failed, Try again later");
     }
     t_ = std::thread(std::bind(&UDSClient::OnThread, this));
-    if (detachMode) {
-        MMI_LOGW("uds client thread detach");
-        t_.detach();
-    } else {
-        MMI_LOGW("uds client thread join");
-        t_.join();
+    t_.detach();
+    MMI_LOGI("step 1");
+    std::unique_lock <std::mutex> lck(mtx);
+    if (cv.wait_for(lck, std::chrono::second(1)) == std::cv_status::timeout) {
+        MMI_LOGE("Recv thread start timeout");
+        return false;
     }
+    MMI_LOGI("step 3");
     return true;
 }
 
@@ -227,6 +230,8 @@ void UDSClient::OnThread()
 {
     CALL_LOG_ENTER;
     SetThreadName("uds_client");
+    MMI_LOGI("step 2");
+    cv.notify_one();
     isRunning_ = true;
     StreamBuffer streamBuf;
     struct epoll_event events[MAX_EVENT_SIZE] = {};
@@ -247,6 +252,7 @@ void UDSClient::OnThread()
             }
         }
     }
+    MMI_LOGI("step 4");
 }
 } // namespace MMI
 } // namespace OHOS
