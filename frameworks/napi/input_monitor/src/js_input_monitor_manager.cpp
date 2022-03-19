@@ -36,12 +36,13 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, napi_value callback)
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     for (const auto& item : monitors_) {
-        if (item->IsMatch(jsEnv, callback) != RET_ERR) {
+        if ((item != nullptr) && (item->IsMatch(jsEnv, callback) != RET_ERR)) {
             MMI_LOGD("add js monitor failed");
             return;
         }
     }
     auto monitor = std::make_shared<JsInputMonitor>(jsEnv, callback, nextId_++);
+    CHKPV(monitor);
     if (!monitor->Start()) {
         MMI_LOGD("js monitor startup failed");
         return;
@@ -96,7 +97,9 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv)
     } while (0);
 
     for (const auto &item : monitors) {
-        item->Stop();
+        if (item != nullptr) {
+            item->Stop();
+        }
     }
 }
 
@@ -104,7 +107,7 @@ std::shared_ptr<JsInputMonitor> JsInputMonitorManager::GetMonitor(int32_t id) {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     for (const auto &item : monitors_) {
-        if (item->GetId() == id) {
+        if ((item != nullptr) && (item->GetId() == id)) {
             return item;
         }
     } 

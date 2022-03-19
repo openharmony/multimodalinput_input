@@ -36,6 +36,7 @@ int32_t JsEventTarget::userData_ = 0;
 void JsEventTarget::CallIdsAsyncWork(napi_env env, napi_status status, void* data)
 {
     CALL_LOG_ENTER;
+    CHKPV(data);
     napi_handle_scope scope = nullptr;
     napi_status status_ = napi_open_handle_scope(env, &scope);
     if (status_ != napi_ok) {
@@ -122,6 +123,7 @@ void JsEventTarget::EmitJsIdsAsync(int32_t userData, std::vector<int32_t> ids)
         MMI_LOGE("Failed to search for userData");
         return;
     }
+    CHKPV(iter->second);
     iter->second->ids = ids;
 
     napi_value resourceName = nullptr;
@@ -149,6 +151,7 @@ void JsEventTarget::EmitJsIdsAsync(int32_t userData, std::vector<int32_t> ids)
 void JsEventTarget::CallDevAsyncWork(napi_env env, napi_status status, void* data)
 {
     CALL_LOG_ENTER;
+    CHKPV(data);
     napi_handle_scope scope = nullptr;
     napi_status status_ = napi_open_handle_scope(env, &scope);
     if (status_ != napi_ok) {
@@ -287,6 +290,7 @@ void JsEventTarget::CallDevAsyncWork(napi_env env, napi_status status, void* dat
 void JsEventTarget::EmitJsDevAsync(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device)
 {
     CALL_LOG_ENTER;
+    CHKPV(device);
     if (CheckEnv(env_)) {
         MMI_LOGE("env_ is nullptr");
         return;
@@ -296,6 +300,7 @@ void JsEventTarget::EmitJsDevAsync(int32_t userData, std::shared_ptr<InputDevice
         MMI_LOGE("Failed to search for userData");
         return;
     }
+    CHKPV(iter->second);
     iter->second->device = device;
 
     napi_value resourceName = nullptr;
@@ -324,6 +329,7 @@ void JsEventTarget::EmitJsDevAsync(int32_t userData, std::shared_ptr<InputDevice
 void JsEventTarget::CallIdsPromiseWork(napi_env env, napi_status status, void* data)
 {
     CALL_LOG_ENTER;
+    CHKPV(data);
     napi_handle_scope scope = nullptr;
     napi_status status_ = napi_open_handle_scope(env, &scope);
     if (status_ != napi_ok) {
@@ -396,6 +402,7 @@ void JsEventTarget::EmitJsIdsPromise(int32_t userData, std::vector<int32_t> ids)
         MMI_LOGE("Failed to search for userData");
         return;
     }
+    CHKPV(iter->second);
     iter->second->ids = ids;
 
     napi_value resourceName = nullptr;
@@ -425,6 +432,7 @@ void JsEventTarget::EmitJsIdsPromise(int32_t userData, std::vector<int32_t> ids)
 void JsEventTarget::CallDevPromiseWork(napi_env env, napi_status status, void* data)
 {
     CALL_LOG_ENTER;
+    CHKPV(data);
     napi_handle_scope scope = nullptr;
     napi_status status_ = napi_open_handle_scope(env, &scope);
     if (status_ != napi_ok) {
@@ -553,6 +561,7 @@ void JsEventTarget::CallDevPromiseWork(napi_env env, napi_status status, void* d
 void JsEventTarget::EmitJsDevPromise(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device)
 {
     CALL_LOG_ENTER;
+    CHKPV(device);
     if (CheckEnv(env_)) {
         MMI_LOGE("env_ is nullptr");
         return;
@@ -562,6 +571,7 @@ void JsEventTarget::EmitJsDevPromise(int32_t userData, std::shared_ptr<InputDevi
         MMI_LOGE("Failed to search for userData");
         return;
     }
+    CHKPV(iter->second);
     iter->second->device = device;
 
     napi_value resourceName = nullptr;

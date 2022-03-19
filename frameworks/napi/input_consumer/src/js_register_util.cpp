@@ -146,6 +146,7 @@ bool GetPreKeys(const napi_env &env, const napi_value &value, std::set<int32_t> 
 
 int32_t GetPreSubscribeId(Callbacks &callbacks, KeyEventMonitorInfo *event)
 {
+    CHKPR(event, ERROR_NULL_POINTER);
     auto it = callbacks.find(event->eventType);
     if (it == callbacks.end() || it->second.empty()) {
         MMI_LOGE("callbacks is empty");
@@ -279,6 +280,7 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
 static void AsyncWorkFn(const napi_env &env, KeyEventMonitorInfo *event, napi_value &result)
 {
     CHKPV(event);
+    CHKPV(event->keyOption);
     MMI_LOGD("Status > 0 enter");
     napi_status status = napi_create_object(env, &result);
     if (status != napi_ok) {
@@ -334,6 +336,7 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
         [](napi_env env, napi_status status, void *data) {
             MMI_LOGD("Napi async work enter");
             KeyEventMonitorInfo *event = (KeyEventMonitorInfo *)data;
+            CHKPV(event);
             napi_value callback = nullptr;
             if (napi_get_reference_value(env, event->callback[0], &callback) != napi_ok) {
                 MMI_LOGE("Event get reference value failed");
