@@ -24,6 +24,7 @@
 
 #include "input_handler_type.h"
 #include "i_input_event_consumer.h"
+#include "mmi_event_handler.h"
 #include "pointer_event.h"
 
 namespace OHOS {
@@ -44,6 +45,7 @@ private:
         int32_t handlerId_;
         InputHandlerType handlerType_;
         std::shared_ptr<IInputEventConsumer> consumer_;
+        std::shared_ptr<AppExecFwk::EventHandler> eventHandler_;
     };
 
 private:
@@ -53,6 +55,7 @@ private:
     int32_t RemoveLocal(int32_t handlerId, InputHandlerType handlerType);
     void RemoveFromServer(int32_t handlerId, InputHandlerType handlerType);
     std::shared_ptr<IInputEventConsumer> FindHandler(int32_t handlerId);
+    std::shared_ptr<AppExecFwk::EventHandler> GetEventHandler(int32_t handlerId);
 
 private:
     std::mutex lockHandlers_;

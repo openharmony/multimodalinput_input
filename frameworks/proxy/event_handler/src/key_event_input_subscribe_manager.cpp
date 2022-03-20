@@ -31,8 +31,9 @@ int32_t KeyEventInputSubscribeManager::subscribeIdManager_ = 0;
 
 KeyEventInputSubscribeManager::SubscribeKeyEventInfo::SubscribeKeyEventInfo(
     std::shared_ptr<KeyOption> keyOption,
-    std::function<void(std::shared_ptr<KeyEvent>)> callback)
-    : keyOption_(keyOption), callback_(callback)
+    std::function<void(std::shared_ptr<KeyEvent>)> callback,
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+    : keyOption_(keyOption), callback_(callback), eventHandler_(eventHandler)
 {
     if (KeyEventInputSubscribeManager::subscribeIdManager_ >= INT_MAX) {
         subscribeId_ = -1;
@@ -52,7 +53,13 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
     for (auto preKey : keyOption->GetPreKeys()) {
         MMI_LOGD("keyOption->prekey:%{public}d", preKey);
     }
-    SubscribeKeyEventInfo subscribeInfo(keyOption, callback);
+    auto eventHandler = AppExecFwk::EventHandler::Current();
+    if (eventHandler == nullptr) {
+        eventHandler = MEventHandler->GetSharedPtr()
+    }
+
+    std::lock_guard<std::mutex> guard(mtx_);
+    SubscribeKeyEventInfo subscribeInfo(keyOption, callback, eventHandler);
     MMI_LOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
         "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuriation:%{public}d",
         subscribeInfo.GetSubscribeId(), keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
@@ -72,6 +79,8 @@ int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
         MMI_LOGE("the subscribe id is less than 0");
         return RET_ERR;
     }
+
+    std::lock_guard<std::mutex> guard(mtx_);
     if (subscribeInfos_.empty()) {
         MMI_LOGE("the subscribeInfos is empty");
         return RET_ERR;
@@ -101,44 +110,49 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
 
     int32_t pid = GetPid();
     uint64_t tid = GetNowThreadId();
-    MMI_LOGI("idddddd:%{public}d pid:%{public}d threadId:%{public}" PRIu64, MEventHandler->GetId(), pid, tid);
+    MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
 
-    // auto callMsgHandler = [this, event, subscribeId] () {
-    //     MMI_LOGD("callMsgHandler enter.");
-    //     int32_t pid = GetPid();
-    //     uint64_t tid = GetNowThreadId();
-    //     MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
+    auto callMsgHandler = [this, event, subscribeId] () {
+        MMI_LOGD("callMsgHandler enter.");
+        int32_t pid = GetPid();
+        uint64_t tid = GetNowThreadId();
+        MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
         
-    //     auto obj = GetSubscribeKeyEvent(subscribeId);
-    //     if (!obj) {
-    //         MMI_LOGE("subscribe key event not found. id:%{public}d", subscribeId);
-    //         return;
-    //     }
-    //     obj->GetCallback()(event);
-    //     MMI_LOGD("callMsgHandler key event callback id:%{public}d pid:%{public}d threadId:%{public}" PRIu64,
-    //                 subscribeId, pid, tid);
-    // };
-    // bool ret = MEventHandler->PostHighPriorityTask(callMsgHandler);
-    // if (!ret) {
-    //     MMI_LOGE("post task failed");
-    //     return RET_ERR;
-    // }
+        std::lock_guard<std::mutex> guard(mtx_);
+        auto obj = GetSubscribeKeyEvent(subscribeId);
+        if (!obj) {
+            MMI_LOGE("subscribe key event not found. id:%{public}d", subscribeId);
+            return;
+        }
+        obj->GetCallback()(event);
+        MMI_LOGD("callMsgHandler key event callback id:%{public}d pid:%{public}d threadId:%{public}" PRIu64,
+            subscribeId, pid, tid);
+    };
 
+    std::lock_guard<std::mutex> guard(mtx_);
     auto obj = GetSubscribeKeyEvent(subscribeId);
-    if (!obj) {
+    if (obj == nullptr) {
         MMI_LOGE("subscribe key event not found. id:%{public}d", subscribeId);
+        return;
+    }
+    auto eventHandler = obj->GetEventHandler();
+    if (eventHandler == nullptr) {
+        MMI_LOGE("Event handler ptr = nullptr");
+        return;
+    }
+    bool ret = eventHandler->PostHighPriorityTask(callMsgHandler);
+    if (!ret) {
+        MMI_LOGE("post task failed");
         return RET_ERR;
     }
-    obj->GetCallback()(event);
-    MMI_LOGD("callMsgHandler key event callback id:%{public}d pid:%{public}d threadId:%{public}" PRIu64,
-                subscribeId, pid, tid);
     return RET_OK;
 }
 
 void KeyEventInputSubscribeManager::OnConnected()
 {
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     if (subscribeInfos_.empty()) {
         MMI_LOGE("Leave, subscribeInfos_ is empty");
         return;
