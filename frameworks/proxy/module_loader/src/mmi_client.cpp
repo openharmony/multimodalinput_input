@@ -74,16 +74,6 @@ bool MMIClient::StartEventRunner()
     int32_t pid = GetPid();
     uint64_t tid = GetNowThreadId();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
-    // auto curRunner = EventRunner::Current();
-    // auto eventRunner = EventRunner::GetMainEventRunner();
-    // CHKPF(eventRunner);
-    // eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner);
-    // CHKPF(eventHandler_);
-    // if (curRunner == nullptr) {
-    //     ehThread_ = std::thread(std::bind(&MMIClient::OnEventHandlerThread, this));
-    //     ehThread_.detach();
-    //     selfRunner_ = true;
-    // }
 
     MMI_LOGI("step 1");
     ehThread_ = std::thread(std::bind(&MMIClient::OnEventHandlerThread, this));
@@ -105,10 +95,7 @@ void MMIClient::OnEventHandlerThread()
     int32_t pid = GetPid();
     uint64_t tid = GetNowThreadId();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
-    // CHKPV(eventHandler_);
-    // auto runner = eventHandler_->GetEventRunner();
-    // CHKPV(runner);
-    // runner->Run();
+
     auto eventHandler = MEventHandler->GetSharedPtr();
     CHKPV(eventHandler);
     auto eventRunner = eventHandler->GetEventRunner();
@@ -119,15 +106,6 @@ void MMIClient::OnEventHandlerThread()
     MMI_LOGI("step 4");
     eventRunner->Run();
     MMI_LOGI("step 5");
-
-    // auto eventRunner = EventRunner::Create(false);
-    // CHKPV(eventRunner);
-    // eventHandler_ = std::make_shared<MMIEventHandler>(eventRunner);
-    // CHKPV(eventHandler_);
-    // MMI_LOGI("step 2");
-    // cv.notify_one();
-    // eventRunner->Run();
-    // MMI_LOGI("step 4");
 }
 
 void MMIClient::OnMsgHandler(NetPacket& pkt)
