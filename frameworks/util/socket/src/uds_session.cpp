@@ -22,6 +22,7 @@
 #include <sys/types.h>
 #include <sys/un.h>
 #include <unistd.h>
+
 #include "uds_socket.h"
 
 namespace OHOS {
@@ -47,7 +48,7 @@ UDSSession::~UDSSession() {}
 bool UDSSession::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
-    if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
+    if ((size <= 0) || (size > MAX_PACKET_BUF_SIZE)) {
         MMI_LOGE("buf size:%{public}zu", size);
         return false;
     }
@@ -58,7 +59,8 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
     int32_t sendSize = 0;
     int32_t sendCount = 0;
     constexpr int32_t resendLimit = 10;
-    while (sendSize < size && sendCount < resendLimit) {
+    const int32_t bufSize = static_cast<int32_t>(size);
+    while (sendSize < bufSize && sendCount < resendLimit) {
         sendCount += 1;
         auto ret = send(fd_, buf, size, SOCKET_FLAGS);
         if (ret < 0) {
@@ -71,9 +73,9 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         }
         sendSize += ret;
     }
-    if (sendCount >= resendLimit && sendSize < size) {
-        MMI_LOGE("Send too many times:%{public}d/%{public}d,dsize:%{public}zu/%{public}zu fd:%{public}d",
-            sendCount, resendLimit, sendSize, size, fd_);
+    if (sendCount >= resendLimit && sendSize < bufSize) {
+        MMI_LOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
+            sendCount, resendLimit, sendSize, bufSize, fd_);
         return false;
     }
     return true;

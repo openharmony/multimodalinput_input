@@ -16,6 +16,7 @@
 #define IF_MMI_CLIENT_H
 
 #include <functional>
+
 namespace OHOS {
 namespace MMI {
 class NetPacket;

@@ -35,7 +35,7 @@ public:
     public:
         explicit SubscribeKeyEventInfo(std::shared_ptr<KeyOption> keyOption,
             std::function<void(std::shared_ptr<KeyEvent>)> callback,
-            std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr);
+            std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
         ~SubscribeKeyEventInfo() = default;
 
         int32_t GetSubscribeId() const
@@ -61,8 +61,8 @@ public:
     private:
         int32_t subscribeId_ { -1 };
         std::shared_ptr<KeyOption> keyOption_ { nullptr };
-        std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
         std::function<void(std::shared_ptr<KeyEvent>)> callback_ { nullptr };
+        std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
     };
 
 public:

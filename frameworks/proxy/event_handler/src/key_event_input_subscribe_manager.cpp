@@ -14,10 +14,13 @@
  */
 
 #include "key_event_input_subscribe_manager.h"
+
 #include <cinttypes>
-#include "bytrace_adapter.h"
+
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+
+#include "bytrace_adapter.h"
 #include "mmi_event_handler.h"
 #include "standardized_event_manager.h"
 
@@ -55,7 +58,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
     }
     auto eventHandler = AppExecFwk::EventHandler::Current();
     if (eventHandler == nullptr) {
-        eventHandler = MEventHandler->GetSharedPtr()
+        eventHandler = MEventHandler->GetSharedPtr();
     }
 
     std::lock_guard<std::mutex> guard(mtx_);
@@ -114,7 +117,6 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
 
     auto callMsgHandler = [this, event, subscribeId] () {
-        MMI_LOGD("callMsgHandler enter.");
         int32_t pid = GetPid();
         uint64_t tid = GetNowThreadId();
         MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
@@ -126,20 +128,20 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
             return;
         }
         obj->GetCallback()(event);
-        MMI_LOGD("callMsgHandler key event callback id:%{public}d pid:%{public}d threadId:%{public}" PRIu64,
-            subscribeId, pid, tid);
+        MMI_LOGD("callMsgHandler key event callback id:%{public}d keyCode:{public}d pid:%{public}d "
+            "threadId:%{public}" PRIu64, subscribeId, event->GetKeyCode(), pid, tid);
     };
 
     std::lock_guard<std::mutex> guard(mtx_);
     auto obj = GetSubscribeKeyEvent(subscribeId);
     if (obj == nullptr) {
         MMI_LOGE("subscribe key event not found. id:%{public}d", subscribeId);
-        return;
+        return RET_ERR;
     }
     auto eventHandler = obj->GetEventHandler();
     if (eventHandler == nullptr) {
         MMI_LOGE("Event handler ptr = nullptr");
-        return;
+        return RET_ERR;
     }
     bool ret = eventHandler->PostHighPriorityTask(callMsgHandler);
     if (!ret) {
