@@ -112,13 +112,13 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     }
 
     int32_t pid = GetPid();
-    uint64_t tid = GetNowThreadId();
+    uint64_t tid = GetThisThreadId();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
 
     auto callMsgHandler = [this, event, subscribeId] () {
         int32_t pid = GetPid();
-        uint64_t tid = GetNowThreadId();
+        uint64_t tid = GetThisThreadId();
         MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
         
         std::lock_guard<std::mutex> guard(mtx_);
@@ -128,7 +128,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
             return;
         }
         obj->GetCallback()(event);
-        MMI_LOGD("callMsgHandler key event callback id:%{public}d keyCode:{public}d pid:%{public}d "
+        MMI_LOGD("callMsgHandler key event callback id:%{public}d keyCode:%{public}d pid:%{public}d "
             "threadId:%{public}" PRIu64, subscribeId, event->GetKeyCode(), pid, tid);
     };
 

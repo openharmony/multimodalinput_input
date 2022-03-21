@@ -123,7 +123,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 
     auto callMsgHandler = [this, keyEvent] () {
         int32_t pid = GetPid();
-        uint64_t tid = GetNowThreadId();
+        uint64_t tid = GetThisThreadId();
         MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
         
         if (consumer_ == nullptr) {
@@ -152,7 +152,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
 
     auto callMsgHandler = [this, pointerEvent] () {
         int32_t pid = GetPid();
-        uint64_t tid = GetNowThreadId();
+        uint64_t tid = GetThisThreadId();
         MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
         
         if (consumer_ == nullptr) {

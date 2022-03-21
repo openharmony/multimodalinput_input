@@ -75,7 +75,7 @@ bool MMIClient::StartEventRunner()
 {
     CALL_LOG_ENTER;
     int32_t pid = GetPid();
-    uint64_t tid = GetNowThreadId();
+    uint64_t tid = GetThisThreadId();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
 
     MMI_LOGI("step 1");
@@ -96,7 +96,7 @@ void MMIClient::OnEventHandlerThread()
     CALL_LOG_ENTER;
     SetThreadName("mmi_client");
     int32_t pid = GetPid();
-    uint64_t tid = GetNowThreadId();
+    uint64_t tid = GetThisThreadId();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
 
     auto eventHandler = MEventHandler->GetSharedPtr();
@@ -116,12 +116,12 @@ void MMIClient::OnMsgHandler(NetPacket& pkt)
     CALL_LOG_ENTER;
     CHKPV(eventHandler_);
     int32_t pid = GetPid();
-    uint64_t tid = GetNowThreadId();
+    uint64_t tid = GetThisThreadId();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
 
     auto callMsgHandler = [this, &pkt] () {
         int32_t pid = GetPid();
-        uint64_t tid = GetNowThreadId();
+        uint64_t tid = GetThisThreadId();
         MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
         msgHandler_.OnMsgHandler(*this, pkt);
     };

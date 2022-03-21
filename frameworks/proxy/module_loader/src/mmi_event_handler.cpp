@@ -85,7 +85,7 @@ void MMIEventHandler::OnStop(const InnerEvent::Pointer &event)
 
 void MMIEventHandler::ProcessEvent(const InnerEvent::Pointer &event)
 {
-    uint64_t tid = GetNowThreadId();
+    uint64_t tid = GetThisThreadId();
     int32_t pid = GetPid();
     MMI_LOGD("enter. pid:%{public}d tid:%{public}" PRIu64, pid, tid);
     auto eventId = event->GetInnerEventId();
