@@ -123,7 +123,7 @@ StreamBuffer &StreamBuffer::operator<<(const T &data)
 {
     if (!Write(data)) {
         MMI_LOGW("Write data failed");
-    }    
+    }
     return *this;
 }
 } // namespace MMI
