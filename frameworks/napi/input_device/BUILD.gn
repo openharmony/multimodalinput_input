@@ -18,8 +18,7 @@ config("libinputdevice_config") {
 
   include_dirs = [
     "//foundation/multimodalinput/input/frameworks/napi/input_device/include",
-    "//foundation/multimodalinput/input/frameworks/util/common/include",
-    "//foundation/multimodalinput/input/common/include",
+    "//foundation/multimodalinput/input/util/common/include",
   ]
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -44,8 +43,8 @@ ohos_shared_library("inputdevice") {
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
-    "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/tools/event_inject:event-injection",
+    "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/libuv:uv_static",
   ]
 

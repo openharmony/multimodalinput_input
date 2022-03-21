@@ -17,7 +17,6 @@
 
 ```
 /foundation/multimodalinput/input
-├── common                       # 公共代码
 ├── interfaces                   # 对外接口存放目录
 │   └── native                   # 对外native层接口存放目录
 │       └── innerkits            # 对系统内部子系统提供native层接口存放目录

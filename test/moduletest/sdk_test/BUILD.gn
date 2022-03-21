@@ -22,9 +22,9 @@ ohos_moduletest("sdk-test-out") {
     "//foundation/multimodalinput/input/test/moduletest/include",
     "//foundation/multimodalinput/input/service/event_dump/include",
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
-    "//foundation/multimodalinput/input/frameworks/util/common/include",
-    "//foundation/multimodalinput/input/frameworks/util/socket/include",
-    "//foundation/multimodalinput/input/frameworks/util/network/include",
+    "//foundation/multimodalinput/input/util/common/include",
+    "//foundation/multimodalinput/input/util/socket/include",
+    "//foundation/multimodalinput/input/util/network/include",
   ]
 
   sources = [ "dfx_sdk_test.cpp" ]
@@ -45,8 +45,8 @@ ohos_moduletest("sdk-test-out") {
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/frameworks/util:libmmi-util",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]

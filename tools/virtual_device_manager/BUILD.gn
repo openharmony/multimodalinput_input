@@ -126,13 +126,12 @@ ohos_unittest("ut-virtual-device-out") {
   include_dirs = [
     "${mmi_path}/tools/virtual_device_manager/include",
     "//utils/native/base/include",
-    "${mmi_path}/common/include",
-    "${mmi_path}/frameworks/util/common",
-    "${mmi_path}/frameworks/util/common/include",
-    "${mmi_path}/frameworks/util/network",
-    "${mmi_path}/frameworks/util/network/include",
-    "${mmi_path}/frameworks/util/socket",
-    "${mmi_path}/frameworks/util/socket/include",
+    "${mmi_path}/util/common",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/util/network",
+    "${mmi_path}/util/network/include",
+    "${mmi_path}/util/socket",
+    "${mmi_path}/util/socket/include",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
@@ -158,8 +157,8 @@ ohos_unittest("ut-virtual-device-out") {
   }
 
   deps = [
-    "${mmi_path}/frameworks/util:libmmi-util",
     "${mmi_path}/tools/virtual_device_manager:libmmi-virtual-device",
+    "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]

@@ -32,7 +32,7 @@ int64_t GetSysClockTime();
 int64_t GetMillisTime();
 std::string GetUUid();
 std::string GetThisThreadIdOfString();
-uint64_t GetNowThreadId();
+uint64_t GetThisThreadId();
 size_t StringToken(std::string& str, const std::string& sep, std::string& token);
 size_t StringSplit(const std::string& str, const std::string& sep, std::vector<std::string>& vecList);
 std::string IdsListToString(const std::vector<int32_t>& list, const std::string& sep);
