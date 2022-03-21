@@ -114,20 +114,7 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
         ev.data.ptr = nullptr;
         return ret;
     }
-    auto iter = authFds_.emplace(fd);
-    if (!iter.second) {
-        MMI_LOGE("Emplace to failed, fd:%{public}d", fd);
-        return RET_ERR;
-    }
     return RET_OK;
-}
-
-bool MMIService::ChkAuthFd(int32_t fd) const
-{
-    if (authFds_.find(fd) == authFds_.end()) {
-        return false;
-    }
-    return true;
 }
 
 bool MMIService::InitLibinputService()
@@ -267,7 +254,6 @@ void MMIService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
     int32_t fd = s->GetFd();
-    authFds_.erase(fd);
     MMI_LOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), fd);
 }
 
