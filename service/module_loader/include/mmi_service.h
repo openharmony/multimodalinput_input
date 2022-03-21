@@ -56,7 +56,6 @@ protected:
     virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) override;
 
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd) override;
-    bool ChkAuthFd(int32_t fd) const;
 
     bool InitLibinputService();
     bool InitService();
@@ -76,7 +75,6 @@ private:
     LibinputAdapter libinputAdapter_;
     UDSServer udsServer_;
     ServerMsgHandler sMsgHandler_;
-    std::set<int32_t> authFds_;
 };
 } // namespace MMI
 } // namespace OHOS
