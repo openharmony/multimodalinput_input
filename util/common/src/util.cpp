@@ -129,7 +129,7 @@ std::string GetThisThreadIdOfString()
     return threadLocalId;
 }
 
-uint64_t GetNowThreadId()
+uint64_t GetThisThreadId()
 {
     std::string stid = GetThisThreadIdOfString();
     auto tid = std::stoull(stid);

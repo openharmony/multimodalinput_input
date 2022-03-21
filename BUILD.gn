@@ -43,8 +43,7 @@ ohos_executable("uinput_inject") {
   ]
 
   include_dirs = [
-    "common/include",
-    "//foundation/multimodalinput/input/frameworks/util/common/include",
+    "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
   ]
 
@@ -71,11 +70,10 @@ ohos_shared_library("mmi_uinject") {
 
   include_dirs = [
     "uinput",
-    "common/include",
     "$HDF_FWKS/include",
     "//drivers/peripheral/input/interfaces/include",
     "//drivers/adapter/uhdf2/adapter/osal/include",
-    "//foundation/multimodalinput/input/frameworks/util/common/include",
+    "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
   ]
 
@@ -90,7 +88,7 @@ ohos_shared_library("mmi_uinject") {
 }
 
 config("multimodalinput_mmi_public_config") {
-  include_dirs = [ "common/include/" ]
+  include_dirs = [ "util/common/include/" ]
 }
 
 group("multimodalinput_mmi_packages") {
@@ -132,8 +130,8 @@ group("unittests") {
   testonly = true
   deps = [
     "frameworks/proxy:ut-mmi-proxy",
-    "frameworks/util:ut-mmi-util",
     "service:ut-mmi-service",
     "tools/inject_event:inject_event",
+    "util:ut-mmi-util",
   ]
 }
