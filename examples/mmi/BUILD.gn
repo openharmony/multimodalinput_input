@@ -18,8 +18,8 @@ ohos_executable("mmi-server") {
   sources = [ "src/mmi_service_main.cpp" ]
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
-    "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service:libmmi-server",
+    "//foundation/multimodalinput/input/util:libmmi-util",
   ]
 
   if (is_mmi_have_libinput) {

@@ -209,7 +209,7 @@ int32_t MMIService::Init()
 
 void MMIService::OnStart()
 {
-    auto tid = GetNowThreadId();
+    auto tid = GetThisThreadId();
     MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
 
     int32_t ret = Init();
@@ -225,7 +225,7 @@ void MMIService::OnStart()
 
 void MMIService::OnStop()
 {
-    auto tid = GetNowThreadId();
+    auto tid = GetThisThreadId();
     MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
 
     UdsStop();
@@ -238,7 +238,7 @@ void MMIService::OnStop()
 
 void MMIService::OnDump()
 {
-    auto tid = GetNowThreadId();
+    auto tid = GetThisThreadId();
     MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
     MMIEventDump->Dump();
 }
@@ -319,7 +319,7 @@ void MMIService::OnTimer()
 void MMIService::OnThread()
 {
     SetThreadName(std::string("mmi_service"));
-    uint64_t tid = GetNowThreadId();
+    uint64_t tid = GetThisThreadId();
     if (tid <= 0) {
         MMI_LOGE("The tid is error, errCode:%{public}d", VAL_NOT_EXP);
         return;

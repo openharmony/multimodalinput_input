@@ -22,9 +22,8 @@ config("event_injection_config") {
 
   include_dirs = [
     "include",
-    "//foundation/multimodalinput/input/common/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//foundation/multimodalinput/input/frameworks/util/common/include",
+    "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
   ]
 
@@ -45,8 +44,7 @@ config("event_injection_public_config") {
     "//third_party/FreeBSD/sys/dev/evdev",
     "//third_party/json/include",
     "//third_party/json/include/nlohmann",
-    "//foundation/multimodalinput/input/common/include",
-    "//foundation/multimodalinput/input/frameworks/util/common/include",
+    "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
   ]
 }
@@ -76,9 +74,9 @@ ohos_shared_library("event-injection") {
   ]
 
   deps = [
-    "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
+    "//foundation/multimodalinput/input/util:libmmi-util",
   ]
 
   if (is_mmi_have_libinput) {
@@ -99,22 +97,20 @@ ohos_unittest("ut-event-injection-out") {
     "//third_party/googletest/googletest/include",
     "//third_party/json/include",
     "//third_party/json/include/nlohmann",
-    "${mmi_path}/common/include",
     "${mmi_path}/frameworks/proxy/event_handler",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/module_loader",
     "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/frameworks/util/common",
-    "${mmi_path}/frameworks/util/common/include",
-    "${mmi_path}/frameworks/util/network",
-    "${mmi_path}/frameworks/util/network/include",
-    "${mmi_path}/frameworks/util/socket",
-    "${mmi_path}/frameworks/util/socket/include",
+    "${mmi_path}/util/common",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/util/network",
+    "${mmi_path}/util/network/include",
+    "${mmi_path}/util/socket",
+    "${mmi_path}/util/socket/include",
     "${mmi_path}/frameworks/proxy/event_handle",
     "${mmi_path}/frameworks/proxy/event_handle/include",
     "${mmi_path}/frameworks/proxy/module_loader",
     "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/common/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
@@ -171,9 +167,9 @@ ohos_unittest("ut-event-injection-out") {
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/frameworks/util:libmmi-util",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/tools/event_inject:event-injection",
+    "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -195,8 +191,8 @@ ohos_executable("mmi-event-injection") {
   configs = [ ":event_injection_public_config" ]
 
   deps = [
-    "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/tools/event_inject:event-injection",
+    "//foundation/multimodalinput/input/util:libmmi-util",
   ]
 
   if (is_mmi_have_libinput) {

@@ -17,7 +17,6 @@ The module of this repository is applied on the basis of standard systems to pro
 
 ```
 /foundation/multimodalinput/input
-├── common                       # Common code
 ├── interfaces                   # External APIs
 │   └── native                   # Native APIs
 │       └── innerkits            # Native APIs provided for internal subsystems
