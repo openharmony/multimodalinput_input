@@ -100,16 +100,7 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
         ev.data.ptr = nullptr;
         return ret;
     }
-    authFds_.emplace(fd);
     return RET_OK;
-}
-
-bool MMIService::ChkAuthFd(int32_t fd) const
-{
-    if (authFds_.find(fd) == authFds_.end()) {
-        return false;
-    }
-    return true;
 }
 
 bool MMIService::InitLibinputService()
