@@ -24,7 +24,8 @@ namespace MMI {
 enum MmiEventHandlerId : uint32_t {
     MMI_EVENT_HANDLER_ID_INVALID = 0,
     MMI_EVENT_HANDLER_ID_BEGIN = 1,
-    MMI_EVENT_HANDLER_ID_STOP = MMI_EVENT_HANDLER_ID_BEGIN,
+    MMI_EVENT_HANDLER_ID_RECONNECT = MMI_EVENT_HANDLER_ID_BEGIN,
+    MMI_EVENT_HANDLER_ID_STOP,
 
     MMI_EVENT_HANDLER_ID_END,
 };
@@ -34,7 +35,7 @@ using EventHandlerPtr = std::shared_ptr<MMIEventHandler>;
 class MMIEventHandler : public AppExecFwk::EventHandler {
 public:
     MMIEventHandler();
-    explicit MMIEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    explicit MMIEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner, MMIClientPtr client);
     virtual ~MMIEventHandler();
     DISALLOW_COPY_AND_MOVE(MMIEventHandler);
     static EventHandlerPtr GetInstance();
@@ -43,10 +44,14 @@ public:
     EventHandlerPtr GetSharedPtr();
 
 protected:
+    void OnReconnect(const AppExecFwk::InnerEvent::Pointer &event);
     void OnStop(const AppExecFwk::InnerEvent::Pointer &event);
 
 protected:
     virtual void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
+
+private:
+    MMIClientPtr mmiClient_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS

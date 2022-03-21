@@ -131,6 +131,26 @@ void MMIClient::OnMsgHandler(NetPacket& pkt)
     }
 }
 
+void MMIClient::OnRecvMsg(const char *buf, size_t size)
+{
+    CHKPV(buf);
+    if (size == 0) {
+        MMI_LOGE("Invalid input param size");
+        return;
+    }
+    OnRecv(buf, size);
+}
+
+int32_t MMIClient::Reconnect()
+{
+    return ConnectTo();
+}
+
+void MMIClient::OnDisconnect()
+{
+    OnDisconnected();
+}
+
 void MMIClient::RegisterConnectedFunction(ConnectCallback fun)
 {
     funConnected_ = fun;

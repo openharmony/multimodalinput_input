@@ -24,13 +24,13 @@ namespace {
 }
 
 using namespace AppExecFwk;
-MMIEventHandler::MMIEventHandler() : EventHandler(EventRunner::Create(false))
+MMIEventHandler::MMIEventHandler() : MMIEventHandler(EventRunner::Create(false), nullptr)
 {
     CALL_LOG_ENTER;
 }
 
-MMIEventHandler::MMIEventHandler(const std::shared_ptr<EventRunner> &runner)
-    : EventHandler(runner)
+MMIEventHandler::MMIEventHandler(const std::shared_ptr<EventRunner> &runner, MMIClientPtr client)
+    : EventHandler(runner), mmiClient_(client)
 {
 }
 
@@ -38,7 +38,6 @@ MMIEventHandler::~MMIEventHandler()
 {
 }
 
-// EventHandlerPtr MMIEventHandler::instance_ = nullptr;
 EventHandlerPtr MMIEventHandler::GetInstance()
 {
     static EventHandlerPtr instance_ = nullptr;
@@ -73,6 +72,15 @@ EventHandlerPtr MMIEventHandler::GetSharedPtr()
     return std::static_pointer_cast<MMIEventHandler>(shared_from_this());
 }
 
+void MMIEventHandler::OnReconnect(const InnerEvent::Pointer &event)
+{
+    MMI_LOGD("enter");
+    CHKPV(mmiClient_);
+    if (mmiClient_->Reconnect() != RET_OK) {
+        SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT);
+    }
+}
+
 void MMIEventHandler::OnStop(const InnerEvent::Pointer &event)
 {
     CALL_LOG_ENTER;
@@ -80,6 +88,7 @@ void MMIEventHandler::OnStop(const InnerEvent::Pointer &event)
     if (runner) {
         runner->Stop();
     }
+    RemoveAllFileDescriptorListeners();
     RemoveAllEvents();
 }
 
@@ -90,6 +99,10 @@ void MMIEventHandler::ProcessEvent(const InnerEvent::Pointer &event)
     MMI_LOGD("enter. pid:%{public}d tid:%{public}" PRIu64, pid, tid);
     auto eventId = event->GetInnerEventId();
     switch (eventId) {
+        case MMI_EVENT_HANDLER_ID_RECONNECT: {
+            OnReconnect(event);
+            break;
+        }
         case MMI_EVENT_HANDLER_ID_STOP: {
             OnStop(event);
             break;
