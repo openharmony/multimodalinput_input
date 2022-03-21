@@ -179,7 +179,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
     CHKPV(keyEvent);
     auto callMsgHandler = [this, keyEvent, handlerId] () {
         int32_t pid = GetPid();
-        uint64_t tid = GetNowThreadId();
+        uint64_t tid = GetThisThreadId();
         MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
         
         std::lock_guard<std::mutex> guard(lockHandlers_);
@@ -213,7 +213,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
     
     auto callMsgHandler = [this, pointerEvent, handlerId] () {
         int32_t pid = GetPid();
-        uint64_t tid = GetNowThreadId();
+        uint64_t tid = GetThisThreadId();
         MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
         
         std::lock_guard<std::mutex> guard(lockHandlers_);
