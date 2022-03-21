@@ -21,13 +21,16 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
+#include "net_packet.h"
+
 #include "display_info.h"
 #include "event_filter_service.h"
-#include "i_input_event_consumer.h"
+
 #include "if_mmi_client.h"
 #include "input_interceptor_manager.h"
 #include "input_monitor_manager.h"
-#include "net_packet.h"
+#include "i_input_event_consumer.h"
+#include "mmi_event_handler.h"
 #include "pointer_event.h"
 
 namespace OHOS {
@@ -72,6 +75,7 @@ private:
 private:
     sptr<EventFilterService> eventFilterService_ {nullptr};
     std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
     std::vector<PhysicalDisplayInfo> physicalDisplays_;
     std::vector<LogicalDisplayInfo> logicalDisplays_;
     InputMonitorManager monitorManager_;

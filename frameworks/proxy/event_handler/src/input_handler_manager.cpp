@@ -14,13 +14,15 @@
  */
 
 #include "input_handler_manager.h"
+#include <cinttypes>
+
+#include "mmi_log.h"
+#include "net_packet.h"
+#include "proto.h"
 
 #include "bytrace_adapter.h"
 #include "input_handler_type.h"
-#include "mmi_log.h"
 #include "multimodal_event_handler.h"
-#include "net_packet.h"
-#include "proto.h"
 
 namespace OHOS {
 namespace MMI {
@@ -83,7 +85,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
 {
     auto eventHandler = AppExecFwk::EventHandler::Current();
     if (eventHandler == nullptr) {
-        eventHandler = MEventHandler->GetSharedPtr()
+        eventHandler = MEventHandler->GetSharedPtr();
     }
     InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,
@@ -176,7 +178,6 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
 {
     CHKPV(keyEvent);
     auto callMsgHandler = [this, keyEvent, handlerId] () {
-        MMI_LOGD("callMsgHandler enter.");
         int32_t pid = GetPid();
         uint64_t tid = GetNowThreadId();
         MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
@@ -188,8 +189,8 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
             return;
         }
         consumer->OnInputEvent(keyEvent);
-        MMI_LOGD("callMsgHandler pointer event callback id:%{public}d pid:%{public}d threadId:%{public}" PRIu64,
-            subscribeId, pid, tid);
+        MMI_LOGD("callMsgHandler pointer event callback id:%{public}d keyCode:%{public}d pid:%{public}d "
+            "threadId:%{public}" PRIu64, handlerId, keyEvent->GetKeyCode(), pid, tid);
     };
     std::lock_guard<std::mutex> guard(lockHandlers_);
     auto eventHandler = GetEventHandler(handlerId);
@@ -200,7 +201,6 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
     bool ret = eventHandler->PostHighPriorityTask(callMsgHandler);
     if (!ret) {
         MMI_LOGE("post task failed");
-        return RET_ERR;
     }
 }
 
@@ -212,7 +212,6 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
     
     auto callMsgHandler = [this, pointerEvent, handlerId] () {
-        MMI_LOGD("callMsgHandler enter.");
         int32_t pid = GetPid();
         uint64_t tid = GetNowThreadId();
         MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
@@ -224,8 +223,8 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
             return;
         }
         consumer->OnInputEvent(pointerEvent);
-        MMI_LOGD("callMsgHandler pointer event callback id:%{public}d pid:%{public}d threadId:%{public}" PRIu64,
-            subscribeId, pid, tid);
+        MMI_LOGD("callMsgHandler pointer event callback id:%{public}d pointerId:%{public}d pid:%{public}d "
+            "threadId:%{public}" PRIu64, handlerId, pointerEvent->GetPointerId(), pid, tid);
     };
     std::lock_guard<std::mutex> guard(lockHandlers_);
     auto eventHandler = GetEventHandler(handlerId);
@@ -236,7 +235,6 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
     bool ret = eventHandler->PostHighPriorityTask(callMsgHandler);
     if (!ret) {
         MMI_LOGE("post task failed");
-        return RET_ERR;
     }
 }
 

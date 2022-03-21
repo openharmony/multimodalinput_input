@@ -15,9 +15,12 @@
 
 #include "input_manager_impl.h"
 
-#include "bytrace_adapter.h"
+#include <cinttypes>
+
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+
+#include "bytrace_adapter.h"
 #include "event_filter_service.h"
 #include "input_event_monitor_manager.h"
 #include "interceptor_manager.h"
@@ -106,6 +109,10 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     MMIEventHdl.GetMultimodeInputInfo();
     CHKPV(inputEventConsumer);
     consumer_ = inputEventConsumer;
+    eventHandler_ = AppExecFwk::EventHandler::Current();
+    if (eventHandler_ == nullptr) {
+        eventHandler_ = MEventHandler->GetSharedPtr();
+    }
 }
 
 void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
@@ -113,10 +120,27 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     CALL_LOG_ENTER;
     CHKPV(keyEvent);
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
-    if (consumer_ != nullptr) {
-        CHKPV(keyEvent);
+
+    auto callMsgHandler = [this, keyEvent] () {
+        int32_t pid = GetPid();
+        uint64_t tid = GetNowThreadId();
+        MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
+        
+        if (consumer_ == nullptr) {
+            MMI_LOGE("consumer ptr = nullptr");
+            return;
+        }
         consumer_->OnInputEvent(keyEvent);
+        MMI_LOGD("callMsgHandler key event callback keyCode:%{public}d pid:%{public}d threadId:%{public}" PRIu64,
+            keyEvent->GetKeyCode(), pid, tid);
+    };
+    if (eventHandler_ == nullptr) {
+        MMI_LOGE("Event handler ptr = nullptr");
         return;
+    }
+    bool ret = eventHandler_->PostHighPriorityTask(callMsgHandler);
+    if (!ret) {
+        MMI_LOGE("post task failed");
     }
 }
 
@@ -125,11 +149,27 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     MMI_LOGD("Pointer event received, processing");
     CHKPV(pointerEvent);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
-    if (consumer_ != nullptr) {
-        CHKPV(pointerEvent);
-        MMI_LOGD("Passed on to consumer");
+
+    auto callMsgHandler = [this, pointerEvent] () {
+        int32_t pid = GetPid();
+        uint64_t tid = GetNowThreadId();
+        MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
+        
+        if (consumer_ == nullptr) {
+            MMI_LOGE("consumer ptr = nullptr");
+            return;
+        }
         consumer_->OnInputEvent(pointerEvent);
+        MMI_LOGD("callMsgHandler key event callback pointerId:%{public}d pid:%{public}d threadId:%{public}" PRIu64,
+            pointerEvent->GetPointerId(), pid, tid);
+    };
+    if (eventHandler_ == nullptr) {
+        MMI_LOGE("Event handler ptr = nullptr");
         return;
+    }
+    bool ret = eventHandler_->PostHighPriorityTask(callMsgHandler);
+    if (!ret) {
+        MMI_LOGE("post task failed");
     }
 }
 

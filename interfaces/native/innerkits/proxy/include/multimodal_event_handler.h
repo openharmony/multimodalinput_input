@@ -17,8 +17,9 @@
 
 #include "nocopyable.h"
 #include "singleton.h"
-#include "pointer_event.h"
+
 #include "proto.h"
+#include "pointer_event.h"
 #include "standardized_event_manager.h"
 
 namespace OHOS {

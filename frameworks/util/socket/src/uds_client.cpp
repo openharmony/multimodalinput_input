@@ -15,8 +15,6 @@
 
 #include "uds_client.h"
 
-#include <cinttypes>
-
 #include "util.h"
 
 namespace OHOS {
@@ -65,7 +63,7 @@ int32_t UDSClient::ConnectTo()
 bool UDSClient::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
-    if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
+    if ((size <= 0) || (size > MAX_PACKET_BUF_SIZE)) {
         MMI_LOGE("Stream buffer size out of range");
         return false;
     }
@@ -76,7 +74,8 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
     int32_t sendSize = 0;
     int32_t sendCount = 0;
     constexpr int32_t resendLimit = 10;
-    while (sendSize < size && sendCount < resendLimit) {
+    const int32_t bufSize = static_cast<int32_t>(size);
+    while (sendSize < bufSize && sendCount < resendLimit) {
         sendCount += 1;
         auto ret = send(fd_, buf, size, SOCKET_FLAGS);
         if (ret < 0) {
@@ -89,9 +88,9 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
         }
         sendSize += ret;
     }
-    if (sendCount >= resendLimit && sendSize < size) {
-        MMI_LOGE("Send too many times:%{public}d/%{public}d,dsize:%{public}zu/%{public}zu fd:%{public}d",
-            sendCount, resendLimit, sendSize, size, fd_);
+    if (sendCount >= resendLimit && sendSize < bufSize) {
+        MMI_LOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
+            sendCount, resendLimit, sendSize, bufSize, fd_);
         return false;
     }
     return true;
@@ -119,7 +118,7 @@ bool UDSClient::StartClient(MsgClientFunCallback fun)
     t_.detach();
     MMI_LOGI("step 1");
     std::unique_lock <std::mutex> lck(mtx);
-    if (cv.wait_for(lck, std::chrono::second(1)) == std::cv_status::timeout) {
+    if (cv.wait_for(lck, std::chrono::seconds(3)) == std::cv_status::timeout) {
         MMI_LOGE("Recv thread start timeout");
         return false;
     }
@@ -145,7 +144,7 @@ void UDSClient::OnRecv(const char *buf, size_t size)
     int32_t readIdx = 0;
     int32_t packSize = 0;
     int32_t bufSize = static_cast<int32_t>(size);
-    const int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
+    constexpr int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
     if (bufSize < headSize) {
         MMI_LOGE("The in parameter size is error, errCode:%{public}d", VAL_NOT_EXP);
         return;
@@ -202,12 +201,12 @@ void UDSClient::OnEpollEvent(const struct epoll_event& ev, StreamBuffer& buf)
 
     bool isoverflow = false;
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
-    const size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
+    constexpr int32_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
     if (maxCount <= 0) {
-        MMI_LOGE("The maxCount is error, maxCount:%{public}zu, errCode:%{public}d", maxCount, VAL_NOT_EXP);
+        MMI_LOGE("The maxCount is error, maxCount:%{public}d, errCode:%{public}d", maxCount, VAL_NOT_EXP);
         return;
     }
-    for (size_t j = 0; j < maxCount; j++) {
+    for (int32_t i = 0; i < maxCount; i++) {
         auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, SOCKET_FLAGS);
         if (size < 0) {
             int32_t eno = errno;

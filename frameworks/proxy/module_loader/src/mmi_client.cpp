@@ -14,11 +14,14 @@
  */
 
 #include "mmi_client.h"
+
 #include <cinttypes>
 #include <condition_variable>
+
 #include "mmi_log.h"
 #include "proto.h"
 #include "util.h"
+
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 
@@ -79,7 +82,7 @@ bool MMIClient::StartEventRunner()
     ehThread_ = std::thread(std::bind(&MMIClient::OnEventHandlerThread, this));
     ehThread_.detach();
     std::unique_lock <std::mutex> lck(mtx);
-    if (cv.wait_for(lck, std::chrono::second(1)) == std::cv_status::timeout) {
+    if (cv.wait_for(lck, std::chrono::seconds(3)) == std::cv_status::timeout) {
         MMI_LOGE("EventThandler thread start timeout");
         Stop();
         return false;
@@ -117,7 +120,6 @@ void MMIClient::OnMsgHandler(NetPacket& pkt)
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
 
     auto callMsgHandler = [this, &pkt] () {
-        MMI_LOGD("callMsgHandler enter.");
         int32_t pid = GetPid();
         uint64_t tid = GetNowThreadId();
         MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
