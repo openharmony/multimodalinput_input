@@ -12,28 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef IF_MMI_CLIENT_H
-#define IF_MMI_CLIENT_H
-
-#include <functional>
+#ifndef MMI_FD_LISTENER_H
+#define MMI_FD_LISTENER_H
+#include "file_descriptor_listener.h"
+#include "if_mmi_client.h"
 
 namespace OHOS {
 namespace MMI {
-class NetPacket;
-class IfMMIClient;
-typedef std::function<void(const IfMMIClient&)> ConnectCallback;
-class IfMMIClient {
+class MMIFdListener : public AppExecFwk::FileDescriptorListener {
 public:
-    virtual bool GetCurrentConnectedStatus() const = 0;
-    virtual bool Start() = 0;
-    virtual bool SendMessage(const NetPacket& pkt) const = 0;
-    virtual void RegisterConnectedFunction(ConnectCallback fun) = 0;
-    virtual void RegisterDisconnectedFunction(ConnectCallback fun) = 0;
-    virtual void OnRecvMsg(const char *buf, size_t size) = 0;
-    virtual int32_t Reconnect() = 0;
-    virtual void OnDisconnect() = 0;
+    MMIFdListener(MMIClientPtr client);
+    virtual ~MMIFdListener();
+    DISALLOW_COPY_AND_MOVE(MMIFdListener);
+
+    virtual void OnReadable(int32_t fd) override;
+    virtual void OnShutdown(int32_t fd) override;
+    virtual void OnException(int32_t fd) override;
+
+private:
+    MMIClientPtr mmiClient_ = nullptr;
 };
-using MMIClientPtr = std::shared_ptr<IfMMIClient>;
 } // namespace MMI
 } // namespace OHOS
-#endif // IF_MMI_CLIENT_H
+#endif // MMI_FD_LISTENER_H

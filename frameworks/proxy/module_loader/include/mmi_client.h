@@ -32,6 +32,9 @@ public:
     virtual void Stop() override;
     virtual bool SendMessage(const NetPacket& pkt) const override;
     virtual bool GetCurrentConnectedStatus() const override;
+    virtual void OnRecvMsg(const char *buf, size_t size) override;
+    virtual int32_t Reconnect() override;
+    virtual void OnDisconnect() override;
 
     bool Start() override;
     void RegisterConnectedFunction(ConnectCallback fun) override;
