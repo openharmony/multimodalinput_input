@@ -418,7 +418,7 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
     CHKPR(keyEvent_, ERROR_NULL_POINTER);
     std::vector<int32_t> pressedKeys = keyEvent_->GetPressedKeys();
     for (const int32_t& keyCode : pressedKeys) {
-        MMI_LOGI("Pressed keyCode:%{public}d", keyCode);
+        MMI_LOGI("pressed keyCode:%{public}d", keyCode);
     }
     pointerEvent->SetPressedKeys(pressedKeys);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
