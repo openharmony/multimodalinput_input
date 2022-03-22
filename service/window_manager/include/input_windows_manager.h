@@ -65,7 +65,7 @@ public:
 
 private:
     bool IsInsideWindow(int32_t x, int32_t y, const WindowInfo &info) const;
-    void PrintDisplayDebugInfo();
+    void PrintDisplayInfo();
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent);
