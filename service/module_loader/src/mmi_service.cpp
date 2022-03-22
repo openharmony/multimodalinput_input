@@ -286,7 +286,7 @@ void MMIService::OnThread()
     SafeKpr->RegisterEvent(tid, "mmi_service");
 
     int32_t count = 0;
-    constexpr int32_t timeOut = 20;
+    constexpr int32_t timeOut = 1;
     struct epoll_event ev[MAX_EVENT_SIZE] = {};
     std::map<int32_t, StreamBufData> bufMap;
     while (state_ == ServiceRunningState::STATE_RUNNING) {
