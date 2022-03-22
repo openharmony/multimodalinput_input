@@ -52,6 +52,9 @@ protected:
     
     bool StartEventRunner();
     void OnEventHandlerThread();
+    void OnRecvThread();
+    bool AddFdListener(int32_t fd);
+    bool DelFdListener(int32_t fd);
     void OnMsgHandler(NetPacket& pkt);
 
 protected:
@@ -60,8 +63,9 @@ protected:
     ConnectCallback funDisconnected_;
 
     std::thread ehThread_;
+    std::thread recvThread_;
     bool selfRunner_ = false;
-    std::shared_ptr<MMIEventHandler> eventHandler_ = nullptr;
+    std::shared_ptr<MMIEventHandler> recvEventHandler_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
