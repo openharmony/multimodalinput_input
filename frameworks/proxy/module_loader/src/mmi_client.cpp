@@ -22,6 +22,7 @@
 #include "proto.h"
 #include "util.h"
 
+#include "mmi_fd_listener.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 
@@ -116,7 +117,6 @@ void MMIClient::OnEventHandlerThread()
     cv.notify_one();
     MMI_LOGI("step 3");
     eventRunner->Run();
-    MMI_LOGI("step end1");
 }
 
 void MMIClient::OnRecvThread()
@@ -130,7 +130,7 @@ void MMIClient::OnRecvThread()
     MMI_LOGI("step 5");
     auto runner = EventRunner::Create(false);
     CHKPV(runner);
-    recvEventHandler_ = std::make_shared<MMIEventHandler>(runner, GetPtr());
+    recvEventHandler_ = std::make_shared<MMIEventHandler>(runner, GetSharedPtr());
     CHKPV(recvEventHandler_);
     if (isConnected_ && fd_ >= 0) {
         if (!AddFdListener(fd_)) {
@@ -146,18 +146,17 @@ void MMIClient::OnRecvThread()
     cv.notify_one();
     MMI_LOGI("step 6");
     runner->Run();
-    MMI_LOGI("step end2");
 }
 
 bool MMIClient::AddFdListener(int32_t fd)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     if (fd < 0) {
         MMI_LOGE("Invalid fd:%{public}d", fd);
         return false;
     }
     CHKPF(recvEventHandler_);
-    auto fdListener = std::make_shared<MMIFdListener>(GetPtr());
+    auto fdListener = std::make_shared<MMIFdListener>(GetSharedPtr());
     CHKPF(fdListener);
     auto errCode = recvEventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_INPUT_EVENT, fdListener);
     if (errCode != ERR_OK) {
@@ -165,9 +164,9 @@ bool MMIClient::AddFdListener(int32_t fd)
             recvEventHandler_->GetErrorStr(errCode).c_str());
         return false;
     }
-    uint64_t tid = GetThisThreadIdOfLL();
-    int32_t pid = GetPid();
     isRunning_ = true;
+    int32_t pid = GetPid();
+    uint64_t tid = GetThisThreadId();
     MMI_LOGI("serverFd:%{public}d was listening,mask:%{public}u pid:%{public}d threadId:%{public}" PRIu64,
         fd, FILE_DESCRIPTOR_INPUT_EVENT, pid, tid);
     return true;
@@ -175,7 +174,7 @@ bool MMIClient::AddFdListener(int32_t fd)
 
 bool MMIClient::DelFdListener(int32_t fd)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPF(recvEventHandler_);
     if (fd < 0) {
         MMI_LOGE("Invalid fd:%{public}d", fd);

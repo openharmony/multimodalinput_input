@@ -82,6 +82,7 @@ ohos_shared_library("libmmi-client") {
     "events/src/key_option.cpp",
     "module_loader/src/mmi_client.cpp",
     "module_loader/src/mmi_event_handler.cpp",
+    "module_loader/src/mmi_fd_listener.cpp",
   ]
 
   cflags = [ "-DOHOS_BUILD" ]

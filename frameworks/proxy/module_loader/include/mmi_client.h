@@ -64,7 +64,6 @@ protected:
 
     std::thread ehThread_;
     std::thread recvThread_;
-    bool selfRunner_ = false;
     std::shared_ptr<MMIEventHandler> recvEventHandler_ = nullptr;
 };
 } // namespace MMI
