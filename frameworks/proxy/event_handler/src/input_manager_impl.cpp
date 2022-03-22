@@ -71,8 +71,8 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
 
     physicalDisplays_ = physicalDisplays;
     logicalDisplays_ = logicalDisplays;
-    PrintDisplayDebugInfo();
     SendDisplayInfo();
+    PrintDisplayInfo();
 }
 
 int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
@@ -265,7 +265,7 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
     return RET_OK;
 }
 
-void InputManagerImpl::PrintDisplayDebugInfo()
+void InputManagerImpl::PrintDisplayInfo()
 {
     MMI_LOGD("physicalDisplays,num:%{public}zu", physicalDisplays_.size());
     for (const auto &item : physicalDisplays_) {
@@ -428,8 +428,8 @@ void InputManagerImpl::OnConnected()
             physicalDisplays_.size(), logicalDisplays_.size());
         return;
     }
-    PrintDisplayDebugInfo();
     SendDisplayInfo();
+    PrintDisplayInfo();
 }
 
 void InputManagerImpl::SendDisplayInfo()
