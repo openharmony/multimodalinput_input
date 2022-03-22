@@ -40,8 +40,8 @@ MMIFdListener::~MMIFdListener()
 
 void MMIFdListener::OnReadable(int32_t fd)
 {
-    uint64_t tid = GetThisThreadIdOfLL();
     int32_t pid = GetPid();
+    uint64_t tid = GetThisThreadId();
     MMI_LOGD("enter. pid:%{public}d tid:%{public}" PRIu64, pid, tid);
     if (fd < 0) {
         MMI_LOGE("Invalid fd:%{public}d", fd);
@@ -52,21 +52,25 @@ void MMIFdListener::OnReadable(int32_t fd)
     StreamBuffer buf;
     bool isoverflow = false;
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
-    const int32_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
+    constexpr int32_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
     if (maxCount <= 0) {
         MMI_LOGE("Invalid max count");
         return;
     }
     for (int32_t i = 0; i < maxCount; i++) {
-        auto size = recv(fd, szBuf, sizeof(szBuf), SOCKET_FLAGS);
+        auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, SOCKET_FLAGS);
         if (size < 0) {
-            MMI_LOGE("recv return %{public}zu errno:%{public}d", size, errno);
+            int32_t eno = errno;
+            if (eno == EAGAIN || eno == EINTR || eno == EWOULDBLOCK) {
+                continue;
+            }
+            MMI_LOGE("recv return %{public}zu errno:%{public}d", size, eno);
             break;
         } else if (size == 0) {
             MMI_LOGE("The service side disconnect with the client. size:0 errno:%{public}d", errno);
             mmiClient_->OnDisconnect();
             break;
-        } else if (size > 0) {
+        } else {
             if (!buf.Write(szBuf, size)) {
                 isoverflow = true;
                 break;
@@ -83,8 +87,8 @@ void MMIFdListener::OnReadable(int32_t fd)
 
 void MMIFdListener::OnShutdown(int32_t fd)
 {
-    uint64_t tid = GetThisThreadIdOfLL();
     int32_t pid = GetPid();
+    uint64_t tid = GetThisThreadId();
     MMI_LOGD("enter. pid:%{public}d tid:%{public}" PRIu64, pid, tid);
     if (fd < 0) {
         MMI_LOGE("Invalid fd:%{public}d", fd);
@@ -95,8 +99,8 @@ void MMIFdListener::OnShutdown(int32_t fd)
 
 void MMIFdListener::OnException(int32_t fd)
 {
-    uint64_t tid = GetThisThreadIdOfLL();
     int32_t pid = GetPid();
+    uint64_t tid = GetThisThreadId();
     MMI_LOGD("enter. pid:%{public}d tid:%{public}" PRIu64, pid, tid);
     if (fd < 0) {
         MMI_LOGE("Invalid fd:%{public}d", fd);

@@ -79,15 +79,24 @@ bool MMIClient::StartEventRunner()
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
 
     MMI_LOGI("step 1");
+    std::unique_lock <std::mutex> lck(mtx);
     ehThread_ = std::thread(std::bind(&MMIClient::OnEventHandlerThread, this));
     ehThread_.detach();
-    std::unique_lock <std::mutex> lck(mtx);
     if (cv.wait_for(lck, std::chrono::seconds(3)) == std::cv_status::timeout) {
         MMI_LOGE("EventThandler thread start timeout");
         Stop();
         return false;
     }
-    MMI_LOGI("step 3");
+    MMI_LOGI("step 4");
+
+    recvThread_ = std::thread(std::bind(&MMIClient::OnRecvThread, this));
+    recvThread_.detach();
+    if (cv.wait_for(lck, std::chrono::seconds(3)) == std::cv_status::timeout) {
+        MMI_LOGE("EventThandler thread start timeout");
+        Stop();
+        return false;
+    }
+    MMI_LOGI("step 7");
     return true;
 }
 
@@ -99,22 +108,88 @@ void MMIClient::OnEventHandlerThread()
     uint64_t tid = GetThisThreadId();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
 
+    MMI_LOGI("step 2");
     auto eventHandler = MEventHandler->GetSharedPtr();
     CHKPV(eventHandler);
     auto eventRunner = eventHandler->GetEventRunner();
     CHKPV(eventRunner);
-    MMI_LOGI("step 2");
     cv.notify_one();
-
-    MMI_LOGI("step 4");
+    MMI_LOGI("step 3");
     eventRunner->Run();
+    MMI_LOGI("step end1");
+}
+
+void MMIClient::OnRecvThread()
+{
+    CALL_LOG_ENTER;
+    SetThreadName("mmi_client");
+    int32_t pid = GetPid();
+    uint64_t tid = GetThisThreadId();
+    MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
+
     MMI_LOGI("step 5");
+    auto runner = EventRunner::Create(false);
+    CHKPV(runner);
+    recvEventHandler_ = std::make_shared<MMIEventHandler>(runner, GetPtr());
+    CHKPV(recvEventHandler_);
+    if (isConnected_ && fd_ >= 0) {
+        if (!AddFdListener(fd_)) {
+            MMI_LOGE("add fd listener return false");
+            return;
+        }
+    } else {
+        if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT)) {
+            MMI_LOGE("send reconnect event return false.");
+            return;
+        }
+    }
+    cv.notify_one();
+    MMI_LOGI("step 6");
+    runner->Run();
+    MMI_LOGI("step end2");
+}
+
+bool MMIClient::AddFdListener(int32_t fd)
+{
+    MMI_LOGD("enter");
+    if (fd < 0) {
+        MMI_LOGE("Invalid fd:%{public}d", fd);
+        return false;
+    }
+    CHKPF(recvEventHandler_);
+    auto fdListener = std::make_shared<MMIFdListener>(GetPtr());
+    CHKPF(fdListener);
+    auto errCode = recvEventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_INPUT_EVENT, fdListener);
+    if (errCode != ERR_OK) {
+        MMI_LOGE("add fd listener error,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode,
+            recvEventHandler_->GetErrorStr(errCode).c_str());
+        return false;
+    }
+    uint64_t tid = GetThisThreadIdOfLL();
+    int32_t pid = GetPid();
+    isRunning_ = true;
+    MMI_LOGI("serverFd:%{public}d was listening,mask:%{public}u pid:%{public}d threadId:%{public}" PRIu64,
+        fd, FILE_DESCRIPTOR_INPUT_EVENT, pid, tid);
+    return true;
+}
+
+bool MMIClient::DelFdListener(int32_t fd)
+{
+    MMI_LOGD("enter");
+    CHKPF(recvEventHandler_);
+    if (fd < 0) {
+        MMI_LOGE("Invalid fd:%{public}d", fd);
+        return false;
+    }
+    recvEventHandler_->RemoveFileDescriptorListener(fd);
+    isRunning_ = false;
+    return true;
 }
 
 void MMIClient::OnMsgHandler(NetPacket& pkt)
 {
     CALL_LOG_ENTER;
-    CHKPV(eventHandler_);
+    CHKPV(recvEventHandler_);
     int32_t pid = GetPid();
     uint64_t tid = GetThisThreadId();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
@@ -125,7 +200,7 @@ void MMIClient::OnMsgHandler(NetPacket& pkt)
         MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
         msgHandler_.OnMsgHandler(*this, pkt);
     };
-    bool ret = eventHandler_->PostHighPriorityTask(callMsgHandler);
+    bool ret = recvEventHandler_->PostHighPriorityTask(callMsgHandler);
     if (!ret) {
         MMI_LOGE("post task failed");
     }
@@ -175,6 +250,15 @@ void MMIClient::OnDisconnected()
     if (funDisconnected_) {
         funDisconnected_(*this);
     }
+    if (!DelFdListener(fd_)) {
+        MMI_LOGE("delete fd listener failed.");
+    }
+    Close();
+    if (!isExit && recvEventHandler_ != nullptr) {
+        if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT)) {
+            MMI_LOGE("send reconnect event return false.");
+        }
+    }
 }
 
 void MMIClient::OnConnected()
@@ -183,6 +267,11 @@ void MMIClient::OnConnected()
     isConnected_ = true;
     if (funConnected_) {
         funConnected_(*this);
+    }
+    if (!isExit && !isRunning_ && fd_ >= 0 && recvEventHandler_ != nullptr) {
+        if (!AddFdListener(fd_)) {
+            MMI_LOGE("Add fd listener failed");
+        }
     }
 }
 
@@ -210,9 +299,10 @@ void MMIClient::Stop()
 {
     CALL_LOG_ENTER;
     UDSClient::Stop();
-    if (eventHandler_ && selfRunner_) {
-        eventHandler_->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP, 0, EventHandler::Priority::IMMEDIATE);
+    if (recvEventHandler_) {
+        recvEventHandler_->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP, 0, EventHandler::Priority::IMMEDIATE);
     }
+    MEventHandler->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP, 0, EventHandler::Priority::IMMEDIATE);
 }
 } // namespace MMI
 } // namespace OHOS
