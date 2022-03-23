@@ -2834,7 +2834,7 @@ public:
     class KeyItem {
     public:
         KeyItem();
-        virtual ~KeyItem();
+        ~KeyItem();
  
         /**
         * @brief Obtains the key code of the key.
@@ -2917,11 +2917,11 @@ public:
  
     private:
         bool pressed_ = false;
-        int32_t deviceId_ = DEFALUTID;
+        int32_t deviceId_ = -1;
         int32_t keyCode_ = -1;
         int64_t downTime_ = 0;
     };
- 
+
 public:
     static std::shared_ptr<KeyEvent> from(std::shared_ptr<InputEvent> inputEvent);
  

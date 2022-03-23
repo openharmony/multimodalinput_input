@@ -45,8 +45,6 @@ public:
     static constexpr uint32_t EVENT_FLAG_NO_INTERCEPT = 0x00000001;
     static constexpr uint32_t EVENT_FLAG_NO_MONITOR = 0x00000002;
 
-    static constexpr int32_t DEFALUTID = -1;
-
 public:
     InputEvent(const InputEvent& other);
     virtual ~InputEvent();
