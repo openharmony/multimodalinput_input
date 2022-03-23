@@ -96,8 +96,6 @@ ohos_shared_library("libmmi-client") {
 
   public_configs = [ ":libmmi_public_client_config" ]
 
-  public_deps = [ "//utils/native/base:utils" ]
-
   deps = [
     ":libmmi-common",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
