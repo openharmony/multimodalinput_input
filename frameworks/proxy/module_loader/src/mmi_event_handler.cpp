@@ -17,13 +17,12 @@
 #include <cinttypes>
 
 #include "config_multimodal.h"
-#include "error_multimodal.h"
 #include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIEventHandler" };
+constexpr HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIEventHandler" };
 }
 
 using namespace AppExecFwk;

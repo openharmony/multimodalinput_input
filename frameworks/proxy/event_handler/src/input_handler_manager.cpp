@@ -85,7 +85,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
 {
     auto eventHandler = AppExecFwk::EventHandler::Current();
     if (eventHandler == nullptr) {
-        eventHandler = MEventHandler->GetSharedPtr();
+        eventHandler = MEventHandler;
     }
     InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,
@@ -189,7 +189,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
             return;
         }
         consumer->OnInputEvent(keyEvent);
-        MMI_LOGD("callMsgHandler pointer event callback id:%{public}d keyCode:%{public}d pid:%{public}d "
+        MMI_LOGD("callMsgHandler key event callback id:%{public}d keyCode:%{public}d pid:%{public}d "
             "threadId:%{public}" PRIu64, handlerId, keyEvent->GetKeyCode(), pid, tid);
     };
     std::lock_guard<std::mutex> guard(lockHandlers_);

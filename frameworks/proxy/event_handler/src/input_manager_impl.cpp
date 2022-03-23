@@ -19,7 +19,6 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-
 #include "bytrace_adapter.h"
 #include "event_filter_service.h"
 #include "input_event_monitor_manager.h"
@@ -111,7 +110,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     consumer_ = inputEventConsumer;
     eventHandler_ = AppExecFwk::EventHandler::Current();
     if (eventHandler_ == nullptr) {
-        eventHandler_ = MEventHandler->GetSharedPtr();
+        eventHandler_ = MEventHandler;
     }
 }
 
@@ -160,8 +159,8 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
             return;
         }
         consumer_->OnInputEvent(pointerEvent);
-        MMI_LOGD("callMsgHandler key event callback pointerId:%{public}d pid:%{public}d threadId:%{public}" PRIu64,
-            pointerEvent->GetPointerId(), pid, tid);
+        MMI_LOGD("callMsgHandler pointer event callback pointerId:%{public}d pid:%{public}d "
+            "threadId:%{public}" PRIu64, pointerEvent->GetPointerId(), pid, tid);
     };
     if (eventHandler_ == nullptr) {
         MMI_LOGE("Event handler ptr = nullptr");

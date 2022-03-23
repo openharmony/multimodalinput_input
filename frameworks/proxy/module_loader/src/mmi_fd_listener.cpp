@@ -16,21 +16,13 @@
 
 #include <cinttypes>
 
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <sys/un.h>
-#include <unistd.h>
-
 #include "config_multimodal.h"
-#include "error_multimodal.h"
 #include "mmi_log.h"
-#include "stream_buffer.h"
-#include "uds_socket.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIFdListener" };
+constexpr HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIFdListener" };
 }
 
 using namespace AppExecFwk;

@@ -19,7 +19,6 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-
 #include "bytrace_adapter.h"
 #include "mmi_event_handler.h"
 #include "standardized_event_manager.h"
@@ -58,7 +57,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
     }
     auto eventHandler = AppExecFwk::EventHandler::Current();
     if (eventHandler == nullptr) {
-        eventHandler = MEventHandler->GetSharedPtr();
+        eventHandler = MEventHandler;
     }
 
     std::lock_guard<std::mutex> guard(mtx_);
@@ -167,7 +166,8 @@ void KeyEventInputSubscribeManager::OnConnected()
     }
 }
 
-const KeyEventInputSubscribeManager::SubscribeKeyEventInfo* KeyEventInputSubscribeManager::GetSubscribeKeyEvent(int32_t id)
+const KeyEventInputSubscribeManager::SubscribeKeyEventInfo*
+KeyEventInputSubscribeManager::GetSubscribeKeyEvent(int32_t id)
 {
     if (id < 0) {
         MMI_LOGE("invalid input param id:%{public}d", id);
