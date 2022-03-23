@@ -180,6 +180,7 @@ bool MMIClient::DelFdListener(int32_t fd)
         MMI_LOGE("Invalid fd:%{public}d", fd);
         return false;
     }
+    recvEventHandler_->RemoveAllEvents();
     recvEventHandler_->RemoveFileDescriptorListener(fd);
     isRunning_ = false;
     return true;
@@ -197,7 +198,6 @@ void MMIClient::OnRecvMsg(const char *buf, size_t size)
 
 int32_t MMIClient::Reconnect()
 {
-    CALL_LOG_ENTER;
     return ConnectTo();
 }
 
@@ -225,6 +225,7 @@ void MMIClient::VirtualKeyIn(RawInputEvent virtualKeyEvent)
 
 void MMIClient::OnDisconnected()
 {
+    CALL_LOG_ENTER;
     MMI_LOGD("Disconnected from server, fd:%{public}d", fd_);
     isConnected_ = false;
     if (funDisconnected_) {
@@ -244,6 +245,7 @@ void MMIClient::OnDisconnected()
 
 void MMIClient::OnConnected()
 {
+    CALL_LOG_ENTER;
     MMI_LOGD("Connection to server succeeded, fd:%{public}d", GetFd());
     isConnected_ = true;
     if (funConnected_) {
@@ -262,16 +264,14 @@ int32_t MMIClient::Socket()
     int32_t ret = MultimodalInputConnectManager::GetInstance()->
                         AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
     if (ret != RET_OK) {
-        MMI_LOGE("UDSSocket::Socket, call MultimodalInputConnectManager::AllocSocketPair return %{public}d", ret);
+        MMI_LOGE("call AllocSocketPair return %{public}d", ret);
         return -1;
     }
     fd_ = MultimodalInputConnectManager::GetInstance()->GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
-        MMI_LOGE("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
-                 " return invalid fd");
+        MMI_LOGE("call GetClientSocketFdOfAllocedSocketPair return invalid fd");
     } else {
-        MMI_LOGD("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
-                 " return fd:%{public}d", fd_);
+        MMI_LOGD("call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
     }
     return fd_;
 }
