@@ -56,7 +56,7 @@ bool MMIClient::Start()
     CALL_LOG_ENTER;
     msgHandler_.Init();
     EventManager.SetClientHandle(GetSharedPtr());
-    auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, &msgHandler_, 
+    auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, &msgHandler_,
         std::placeholders::_1, std::placeholders::_2);
     if (!(StartClient(callback))) {
         MMI_LOGE("Client startup failed");
@@ -79,10 +79,11 @@ bool MMIClient::StartEventRunner()
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
 
     MMI_LOGI("step 1");
+    constexpr int32_t WAIT_FOR_TIMEOUT = 3;
     std::unique_lock <std::mutex> lck(mtx);
     ehThread_ = std::thread(std::bind(&MMIClient::OnEventHandlerThread, this));
     ehThread_.detach();
-    if (cv.wait_for(lck, std::chrono::seconds(3)) == std::cv_status::timeout) {
+    if (cv.wait_for(lck, std::chrono::seconds(WAIT_FOR_TIMEOUT)) == std::cv_status::timeout) {
         MMI_LOGE("EventThandler thread start timeout");
         Stop();
         return false;
@@ -91,8 +92,8 @@ bool MMIClient::StartEventRunner()
 
     recvThread_ = std::thread(std::bind(&MMIClient::OnRecvThread, this));
     recvThread_.detach();
-    if (cv.wait_for(lck, std::chrono::seconds(3)) == std::cv_status::timeout) {
-        MMI_LOGE("EventThandler thread start timeout");
+    if (cv.wait_for(lck, std::chrono::seconds(WAIT_FOR_TIMEOUT)) == std::cv_status::timeout) {
+        MMI_LOGE("Recv thread start timeout");
         Stop();
         return false;
     }
@@ -103,13 +104,13 @@ bool MMIClient::StartEventRunner()
 void MMIClient::OnEventHandlerThread()
 {
     CALL_LOG_ENTER;
-    SetThreadName("mmi_client");
+    SetThreadName("mmi_client_EventHdr");
     int32_t pid = GetPid();
     uint64_t tid = GetThisThreadId();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
 
     MMI_LOGI("step 2");
-    auto eventHandler = MEventHandler->GetSharedPtr();
+    auto eventHandler = MEventHandler;
     CHKPV(eventHandler);
     auto eventRunner = eventHandler->GetEventRunner();
     CHKPV(eventRunner);
@@ -121,7 +122,7 @@ void MMIClient::OnEventHandlerThread()
 void MMIClient::OnRecvThread()
 {
     CALL_LOG_ENTER;
-    SetThreadName("mmi_client");
+    SetThreadName("mmi_client_RecvEventHdr");
     int32_t pid = GetPid();
     uint64_t tid = GetThisThreadId();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);

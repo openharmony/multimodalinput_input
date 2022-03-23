@@ -16,9 +16,11 @@
 #define CLIENT_MSG_HANDLER_H
 
 #include "nocopyable.h"
-#include "key_event_input_subscribe_manager.h"
+
 #include "msg_handler.h"
 #include "uds_client.h"
+
+#include "key_event_input_subscribe_manager.h"
 
 namespace OHOS {
 namespace MMI {
