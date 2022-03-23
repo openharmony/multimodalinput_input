@@ -1886,39 +1886,6 @@ void InputManagerTest::TestInputEventInterceptor2(std::shared_ptr<PointerEvent> 
     EXPECT_TRUE(states.all());
 }
 
-HWTEST_F(InputManagerTest, TestInputEventInterceptor_006, TestSize.Level1)
-{
-    auto pointerEvent = PointerEvent::Create();
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetGlobalX(823);   // test code，set the GlobalX = 823
-    item.SetGlobalY(723);   // test code，set the GlobalY = 723
-    item.SetPressure(5);    // test code，set the Pressure = 5
-    item.SetDeviceId(1);    // test code，set the DeviceId = 1
-    pointerEvent->AddPointerItem(item);
-
-    item.SetPointerId(1);   // test code，set the PointerId = 1
-    item.SetGlobalX(1010);   // test code，set the GlobalX = 1010
-    item.SetGlobalY(910);   // test code，set the GlobalY = 910
-    item.SetPressure(7);    // test code，set the Pressure = 7
-    item.SetDeviceId(1);    // test code，set the DeviceId = 1
-    pointerEvent->AddPointerItem(item);
-
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetPointerId(1);  // test code，set the PointerId = 1
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-
-    std::shared_ptr<OHOS::MMI::IInputEventConsumer> interceptor { InputEventInterceptor::GetPtr() };
-    int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor) };
-    EXPECT_TRUE(IsValidHandlerId(interceptorId));
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    TestInputEventInterceptor2(pointerEvent);
-    if (IsValidHandlerId(interceptorId)) {
-        InputManager::GetInstance()->RemoveInterceptor(interceptorId);
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    }
-}
-
 void InputManagerTest::TouchPadMonitorCallBack(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
     int32_t pointerId = pointerEvent->GetPointerId();
