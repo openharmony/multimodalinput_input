@@ -13,11 +13,15 @@
  * limitations under the License.
  */
 #include "mmi_fd_listener.h"
+
 #include <cinttypes>
+
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/un.h>
 #include <unistd.h>
+
+#include "config_multimodal.h"
 #include "error_multimodal.h"
 #include "mmi_log.h"
 #include "stream_buffer.h"
