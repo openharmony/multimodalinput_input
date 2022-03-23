@@ -18,15 +18,15 @@
 
 namespace OHOS {
 namespace MMI {
-class DeviceObserver {
+class IDeviceObserver {
 public:
     virtual void UpdatePointerDevice(bool) = 0;
 };
 
-class Subject {
+class IDeviceObject {
 public:
-    virtual void Attach(std::shared_ptr<DeviceObserver> observer) = 0;
-    virtual void Detach(std::shared_ptr<DeviceObserver> observer) = 0;
+    virtual void Attach(std::shared_ptr<IDeviceObserver> observer) = 0;
+    virtual void Detach(std::shared_ptr<IDeviceObserver> observer) = 0;
     virtual void NotifyPointerDevice(bool) = 0;
 };
 } // namespace MMI

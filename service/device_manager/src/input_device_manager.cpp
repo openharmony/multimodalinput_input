@@ -100,13 +100,13 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)
     EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD);
 }
 
-void InputDeviceManager::Attach(std::shared_ptr<DeviceObserver> observer)
+void InputDeviceManager::Attach(std::shared_ptr<IDeviceObserver> observer)
 {
     CALL_LOG_ENTER;
     observers_.push_back(observer);
 }
 
-void InputDeviceManager::Detach(std::shared_ptr<DeviceObserver> observer)
+void InputDeviceManager::Detach(std::shared_ptr<IDeviceObserver> observer)
 {
     CALL_LOG_ENTER;
     observers_.remove(observer);
