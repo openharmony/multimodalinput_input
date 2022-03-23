@@ -90,8 +90,8 @@ void MMIEventHandler::OnStop(const InnerEvent::Pointer &event)
     if (runner) {
         runner->Stop();
     }
-    RemoveAllFileDescriptorListeners();
     RemoveAllEvents();
+    RemoveAllFileDescriptorListeners();
 }
 
 void MMIEventHandler::ProcessEvent(const InnerEvent::Pointer &event)

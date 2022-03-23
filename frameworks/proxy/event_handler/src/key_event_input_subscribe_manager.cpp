@@ -173,13 +173,12 @@ KeyEventInputSubscribeManager::GetSubscribeKeyEvent(int32_t id)
         MMI_LOGE("invalid input param id:%{public}d", id);
         return nullptr;
     }
-    const SubscribeKeyEventInfo* data = nullptr;
     for (const auto& subscriber : subscribeInfos_) {
         if (subscriber.GetSubscribeId() == id) {
-            data = &subscriber;
+            return &subscriber;
         }
     }
-    return data;
+    return nullptr;
 }
 } // namespace MMI
 } // namespace OHOS

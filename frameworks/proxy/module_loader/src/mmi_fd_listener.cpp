@@ -18,6 +18,8 @@
 
 #include "config_multimodal.h"
 #include "mmi_log.h"
+#include "stream_buffer.h"
+#include "uds_socket.h"
 
 namespace OHOS {
 namespace MMI {

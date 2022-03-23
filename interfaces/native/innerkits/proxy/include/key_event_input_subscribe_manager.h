@@ -33,7 +33,7 @@ class KeyEventInputSubscribeManager : public Singleton<KeyEventInputSubscribeMan
 public:
     class SubscribeKeyEventInfo {
     public:
-        explicit SubscribeKeyEventInfo(std::shared_ptr<KeyOption> keyOption,
+        SubscribeKeyEventInfo(std::shared_ptr<KeyOption> keyOption,
             std::function<void(std::shared_ptr<KeyEvent>)> callback,
             std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
         ~SubscribeKeyEventInfo() = default;

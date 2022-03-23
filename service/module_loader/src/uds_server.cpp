@@ -311,7 +311,7 @@ void UDSServer::OnEpollRecv(int32_t fd, std::map<int32_t, StreamBufData>& bufMap
         return;
     }
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
-    for (size_t j = 0; j < maxCount; j++) {
+    for (size_t i = 0; i < maxCount; i++) {
         auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, SOCKET_FLAGS);
         if (size < 0) {
             int32_t eno = errno;
