@@ -13,7 +13,10 @@
  * limitations under the License.
  */
 #include "mmi_event_handler.h"
+
 #include <cinttypes>
+
+#include "config_multimodal.h"
 #include "error_multimodal.h"
 #include "mmi_log.h"
 
@@ -74,10 +77,10 @@ EventHandlerPtr MMIEventHandler::GetSharedPtr()
 
 void MMIEventHandler::OnReconnect(const InnerEvent::Pointer &event)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     CHKPV(mmiClient_);
     if (mmiClient_->Reconnect() != RET_OK) {
-        SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT);
+        SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, CLIENT_RECONNECT_COOLING_TIME);
     }
 }
 
@@ -94,8 +97,8 @@ void MMIEventHandler::OnStop(const InnerEvent::Pointer &event)
 
 void MMIEventHandler::ProcessEvent(const InnerEvent::Pointer &event)
 {
-    uint64_t tid = GetThisThreadId();
     int32_t pid = GetPid();
+    uint64_t tid = GetThisThreadId();
     MMI_LOGD("enter. pid:%{public}d tid:%{public}" PRIu64, pid, tid);
     auto eventId = event->GetInnerEventId();
     switch (eventId) {

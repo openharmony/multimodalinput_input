@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "mmi_client.h"
 
 #include <cinttypes>
@@ -138,7 +137,7 @@ void MMIClient::OnRecvThread()
             return;
         }
     } else {
-        if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT)) {
+        if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, CLIENT_RECONNECT_COOLING_TIME)) {
             MMI_LOGE("send reconnect event return false.");
             return;
         }
@@ -185,26 +184,6 @@ bool MMIClient::DelFdListener(int32_t fd)
     return true;
 }
 
-void MMIClient::OnMsgHandler(NetPacket& pkt)
-{
-    CALL_LOG_ENTER;
-    CHKPV(recvEventHandler_);
-    int32_t pid = GetPid();
-    uint64_t tid = GetThisThreadId();
-    MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
-
-    auto callMsgHandler = [this, &pkt] () {
-        int32_t pid = GetPid();
-        uint64_t tid = GetThisThreadId();
-        MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
-        msgHandler_.OnMsgHandler(*this, pkt);
-    };
-    bool ret = recvEventHandler_->PostHighPriorityTask(callMsgHandler);
-    if (!ret) {
-        MMI_LOGE("post task failed");
-    }
-}
-
 void MMIClient::OnRecvMsg(const char *buf, size_t size)
 {
     CHKPV(buf);
@@ -217,6 +196,7 @@ void MMIClient::OnRecvMsg(const char *buf, size_t size)
 
 int32_t MMIClient::Reconnect()
 {
+    CALL_LOG_ENTER;
     return ConnectTo();
 }
 
@@ -244,7 +224,7 @@ void MMIClient::VirtualKeyIn(RawInputEvent virtualKeyEvent)
 
 void MMIClient::OnDisconnected()
 {
-    MMI_LOGD("Disconnected from server, fd:%{public}d", GetFd());
+    MMI_LOGD("Disconnected from server, fd:%{public}d", fd_);
     isConnected_ = false;
     if (funDisconnected_) {
         funDisconnected_(*this);
@@ -254,7 +234,8 @@ void MMIClient::OnDisconnected()
     }
     Close();
     if (!isExit && recvEventHandler_ != nullptr) {
-        if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, EVENT_TIME_ONRECONNECT)) {
+        MMI_LOGD("start reconnecting to the server");
+        if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, CLIENT_RECONNECT_COOLING_TIME)) {
             MMI_LOGE("send reconnect event return false.");
         }
     }

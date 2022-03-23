@@ -39,7 +39,7 @@ public:
     int32_t ConnectTo();
     bool SendMsg(const char *buf, size_t size) const;
     bool SendMsg(const NetPacket& pkt) const;
-
+    
     bool GetConnectedStatus() const
     {
         return isConnected_;
@@ -50,13 +50,9 @@ protected:
     virtual void OnDisconnected() {}
 
     bool StartClient(MsgClientFunCallback fun);
-    // void ReleaseEpollEvent(int32_t fd);
     void OnRecv(const char *buf, size_t size);
-    // void OnEpollEvent(const struct epoll_event& ev, StreamBuffer& buf);
-    // void OnThread();
 
 protected:
-    std::thread t_;
     bool isExit = false;
     bool isRunning_ = false;
     bool isConnected_ = false;

@@ -15,12 +15,11 @@
 #ifndef MMI_EVENT_HANDLER_H
 #define MMI_EVENT_HANDLER_H
 #include "event_handler.h"
+
 #include "if_mmi_client.h"
 
 namespace OHOS {
 namespace MMI {
-#define EVENT_TIME_ONRECONNECT (3*1000)
-
 enum MmiEventHandlerId : uint32_t {
     MMI_EVENT_HANDLER_ID_INVALID = 0,
     MMI_EVENT_HANDLER_ID_BEGIN = 1,

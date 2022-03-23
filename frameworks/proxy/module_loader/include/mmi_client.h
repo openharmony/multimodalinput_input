@@ -17,6 +17,7 @@
 #include "nocopyable.h"
 
 #include "if_mmi_client.h"
+
 #include "client_msg_handler.h"
 #include "mmi_event_handler.h"
 
@@ -55,7 +56,6 @@ protected:
     void OnRecvThread();
     bool AddFdListener(int32_t fd);
     bool DelFdListener(int32_t fd);
-    void OnMsgHandler(NetPacket& pkt);
 
 protected:
     ClientMsgHandler msgHandler_;
