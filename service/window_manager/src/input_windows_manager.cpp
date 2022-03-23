@@ -102,30 +102,24 @@ void InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInf
     const std::vector<LogicalDisplayInfo> &logicalDisplays)
 {
     CALL_LOG_ENTER;
-    physicalDisplays_.clear();
-    logicalDisplays_.clear();
-    windowInfos_.clear();
-
     physicalDisplays_ = physicalDisplays;
     logicalDisplays_ = logicalDisplays;
-    size_t numLogicalDisplay = logicalDisplays.size();
-    for (size_t i = 0; i < numLogicalDisplay; ++i) {
-        size_t numWindow = logicalDisplays[i].windowsInfo.size();
-        for (size_t j = 0; j < numWindow; j++) {
-            WindowInfo myWindow = logicalDisplays[i].windowsInfo[j];
-            auto iter = windowInfos_.insert(std::pair<int32_t, WindowInfo>(myWindow.id, myWindow));
+    windowInfos_.clear();
+    for (const auto &item : logicalDisplays) {
+        for (const auto &window : item.windowsInfo) {
+            auto iter = windowInfos_.insert(std::pair<int32_t, WindowInfo>(window.id, window));
             if (!iter.second) {
-                MMI_LOGE("Insert value failed, Window:%{public}d", myWindow.id);
+                MMI_LOGE("Insert value failed, Window:%{public}d", window.id);
             }
         }
     }
     if (!logicalDisplays.empty()) {
-        PointerDrawMgr->TellDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
+        PointerDrawMgr->OnDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
     }
-    PrintDisplayDebugInfo();
+    PrintDisplayInfo();
 }
 
-void InputWindowsManager::PrintDisplayDebugInfo()
+void InputWindowsManager::PrintDisplayInfo()
 {
     MMI_LOGD("physicalDisplays,num:%{public}zu", physicalDisplays_.size());
     for (const auto &item : physicalDisplays_) {
