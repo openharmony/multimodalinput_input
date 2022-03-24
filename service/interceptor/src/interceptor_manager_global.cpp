@@ -19,7 +19,6 @@
 
 #include "input_event_data_transformation.h"
 #include "proto.h"
-#include "souceType.h"
 
 namespace OHOS {
 namespace MMI {
