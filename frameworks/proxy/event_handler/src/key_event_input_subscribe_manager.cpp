@@ -71,10 +71,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuriation:%{public}d",
         subscribeInfo.GetSubscribeId(), keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
-    if (EventManager.SubscribeKeyEvent(subscribeInfo) != RET_OK) {
-        MMI_LOGE("Leave, subscribe key event failed");
-        // return INVALID_SUBSCRIBE_ID;
-    }
+    EventManager.SubscribeKeyEvent(subscribeInfo);
     subscribeInfos_.push_back(subscribeInfo);
     return subscribeInfo.GetSubscribeId();
 }
@@ -162,20 +159,16 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
 void KeyEventInputSubscribeManager::OnConnected()
 {
     CALL_LOG_ENTER;
-    MMI_LOGI("step 1");
     std::lock_guard<std::mutex> guard(mtx_);
-    MMI_LOGI("step 2");
     if (subscribeInfos_.empty()) {
         MMI_LOGE("Leave, subscribeInfos_ is empty");
         return;
     }
-    MMI_LOGI("step 3");
     for (const auto& subscriberInfo : subscribeInfos_) {
         if (EventManager.SubscribeKeyEvent(subscriberInfo) != RET_OK) {
             MMI_LOGE("subscribe key event failed");
         }
     }
-    MMI_LOGI("step 4");
 }
 
 const KeyEventInputSubscribeManager::SubscribeKeyEventInfo*

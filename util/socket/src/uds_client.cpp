@@ -67,6 +67,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
         if (ret < 0) {
             int32_t eno = errno;
             if (eno == EAGAIN || eno == EINTR || eno == EWOULDBLOCK) {
+                MMI_LOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK");
                 continue;
             }
             MMI_LOGE("Send return failed,error:%{public}d fd:%{public}d", eno, fd_);

@@ -316,12 +316,15 @@ void UDSServer::OnEpollRecv(int32_t fd, std::map<int32_t, StreamBufData>& bufMap
         if (size < 0) {
             int32_t eno = errno;
             if (eno == EAGAIN || eno == EINTR || eno == EWOULDBLOCK) {
+                MMI_LOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK");
                 continue;
             }
             MMI_LOGE("recv return %{public}zu errno:%{public}d", size, eno);
+            break;
         } else if (size == 0) {
             MMI_LOGE("The client side disconnect with the server. size:0 errno:%{public}d", errno);
             ReleaseSession(fd, ev);
+            break;
         } else {
 #ifdef OHOS_BUILD_HAVE_DUMP_DATA
             DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);

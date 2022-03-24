@@ -106,10 +106,7 @@ void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handle
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     NetPacket pkt(MmiMessageId::ADD_INPUT_HANDLER);
-    if (!pkt.Write(handlerId) || !pkt.Write(handlerType)) {
-        MMI_LOGE("Packet write is error, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
-        return;
-    }
+    pkt << handlerId << handlerType;
     if (!client->SendMessage(pkt)) {
         MMI_LOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
