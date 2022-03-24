@@ -15,16 +15,14 @@
 
 #include "standardized_event_manager.h"
 
-#include <sstream>
-
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-#include "immi_token.h"
-#include "input_event_data_transformation.h"
-#include "multimodal_event_handler.h"
 #include "net_packet.h"
 #include "proto.h"
 #include "util.h"
+
+#include "input_event_data_transformation.h"
+#include "multimodal_event_handler.h"
 
 namespace OHOS {
 namespace MMI {

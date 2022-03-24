@@ -22,16 +22,16 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+#include "run_shell_util.h"
+#include "proto.h"
+
 #include "input_event_monitor_manager.h"
 #include "input_handler_type.h"
 #include "input_manager.h"
 #include "interceptor_manager.h"
 #include "multimodal_event_handler.h"
 #include "mmi_client.h"
-#include "mmi_token.h"
 #include "pointer_event.h"
-#include "proto.h"
-#include "run_shell_util.h"
 
 namespace OHOS {
 namespace MMI {

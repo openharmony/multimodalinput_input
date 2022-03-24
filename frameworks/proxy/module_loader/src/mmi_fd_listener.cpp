@@ -38,9 +38,6 @@ MMIFdListener::~MMIFdListener()
 
 void MMIFdListener::OnReadable(int32_t fd)
 {
-    // int32_t pid = GetPid();
-    // uint64_t tid = GetThisThreadId();
-    // MMI_LOGD("enter. fd:%{public}d pid:%{public}d tid:%{public}" PRIu64, fd, pid, tid);
     if (fd < 0) {
         MMI_LOGE("Invalid fd:%{public}d", fd);
         return;
