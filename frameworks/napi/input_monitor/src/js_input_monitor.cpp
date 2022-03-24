@@ -161,23 +161,23 @@ int32_t JsInputMonitor::IsMatch(napi_env jsEnv, napi_value callback)
             return NAPI_ERR;
         }
         if (isEquals) {
-            MMI_LOGI("js callback match success");
+            MMI_HILOGI("js callback match success");
             return RET_OK;
         }
-        MMI_LOGI("js callback match failed");
+        MMI_HILOGI("js callback match failed");
         return RET_ERR;
     }
-    MMI_LOGI("js callback match failed");
+    MMI_HILOGI("js callback match failed");
     return RET_ERR;
 }
 
 int32_t JsInputMonitor::IsMatch(napi_env jsEnv)
 {
     if (jsEnv_ == jsEnv) {
-        MMI_LOGI("env match success");
+        MMI_HILOGI("env match success");
         return RET_OK;
     }
-    MMI_LOGI("env match failed");
+    MMI_HILOGI("env match failed");
     return RET_ERR;
 }
 

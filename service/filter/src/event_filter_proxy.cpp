@@ -29,12 +29,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Event
 
 EventFilterProxy::EventFilterProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IEventFilter>(impl)
 {
-    MMI_LOGI("EventFilterProxy()");
+    MMI_HILOGI("EventFilterProxy()");
 }
 
 EventFilterProxy::~EventFilterProxy()
 {
-    MMI_LOGI("~EventFilterProxy()");
+    MMI_HILOGI("~EventFilterProxy()");
 }
 
 bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> event)

@@ -94,7 +94,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
             eventFilterService_ = nullptr;
             return RET_ERR;
         }
-        MMI_LOGI("AddInputEventFilter has send to server success");
+        MMI_HILOGI("AddInputEventFilter has send to server success");
         return RET_OK;
     }
     return RET_OK;

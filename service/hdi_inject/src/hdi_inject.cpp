@@ -41,7 +41,7 @@ bool HdiInject::Init(UDSServer &sess)
 
 int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
 {
-    MMI_LOGI("into function ManageHdfInject");
+    MMI_HILOGI("into function ManageHdfInject");
     int32_t sendType = 0;
     pkt >> sendType;
     uint32_t devIndex = 0;
@@ -53,7 +53,7 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
             break;
         case SET_EVENT_INJECT:
             pkt >> devIndex >> speechEvent;
-            MMI_LOGI("hdi server recv massage: devIndex:%{public}d", devIndex);
+            MMI_HILOGI("hdi server recv massage: devIndex:%{public}d", devIndex);
             OnSetEventInject(speechEvent, devIndex);
             break;
         case SHOW_DEVICE_INFO:
@@ -61,7 +61,7 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
             break;
         case SET_HOT_PLUGS:
             pkt >> devIndex >> devSatatus;
-            MMI_LOGI("recv inject tool hot data, devIndex:%{public}d,status:%{public}d", devIndex, devSatatus);
+            MMI_HILOGI("recv inject tool hot data, devIndex:%{public}d,status:%{public}d", devIndex, devSatatus);
             OnSetHotPlugs(devIndex, devSatatus);
             break;
         default:
@@ -91,7 +91,7 @@ void HdiInject::OnSetHotPlugs(uint32_t devIndex, uint32_t devSatatus)
         MMI_LOGE("ReportHotPlugEvent faild");
         return;
     }
-    MMI_LOGI("ReportHotPlugEvent success");
+    MMI_HILOGI("ReportHotPlugEvent success");
 }
 
 void HdiInject::InitDeviceInfo()
@@ -142,7 +142,7 @@ void HdiInject::OnInitHdiServerStatus()
 void HdiInject::ShowAllDeviceInfo()
 {
     for (const auto &item : deviceArray_) {
-        MMI_LOGI("deviceName:%{public}s,devIndex:%{public}d,status:%{public}d,devType:%{public}d",
+        MMI_HILOGI("deviceName:%{public}s,devIndex:%{public}d,status:%{public}d,devType:%{public}d",
             item.chipName, item.devIndex, item.status, item.devType);
     }
 }

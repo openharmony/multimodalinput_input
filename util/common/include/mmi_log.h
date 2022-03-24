@@ -50,7 +50,7 @@ constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
 #define MMI_LOGD(fmt, ...) do { \
     OHOS::HiviewDFX::HiLog::Debug(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
-#define MMI_LOGI(fmt, ...) do { \
+#define MMI_HILOGI(fmt, ...) do { \
     OHOS::HiviewDFX::HiLog::Info(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOGW(fmt, ...) do { \
@@ -59,7 +59,7 @@ constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
 #define MMI_LOGE(fmt, ...) do { \
     OHOS::HiviewDFX::HiLog::Error(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
-#define MMI_LOGF(fmt, ...) do { \
+#define MMI_HILOGF(fmt, ...) do { \
     OHOS::HiviewDFX::HiLog::Fatal(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 
@@ -68,9 +68,9 @@ constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
     MMI_LOGD(fmt, ##__VA_ARGS__); \
 } while (0)
 
-#define MMI_LOGIK(fmt, ...) do { \
+#define MMI_HILOGIK(fmt, ...) do { \
     KMSG_LOGI(fmt, ##__VA_ARGS__); \
-    MMI_LOGI(fmt, ##__VA_ARGS__); \
+    MMI_HILOGI(fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOGWK(fmt, ...) do { \
@@ -83,9 +83,9 @@ constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
     MMI_LOGE(fmt, ##__VA_ARGS__); \
 } while (0)
 
-#define MMI_LOGFK(fmt, ...) do { \
+#define MMI_HILOGFK(fmt, ...) do { \
     KMSG_LOGF(fmt, ##__VA_ARGS__); \
-    MMI_LOGF(fmt, ##__VA_ARGS__); \
+    MMI_HILOGF(fmt, ##__VA_ARGS__); \
 } while (0)
 
 namespace OHOS {

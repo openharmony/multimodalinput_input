@@ -218,12 +218,12 @@ void UDSServer::Dump(int32_t fd)
 
 void UDSServer::OnConnected(SessionPtr s)
 {
-    MMI_LOGI("session desc:%{public}s", s->GetDescript().c_str());
+    MMI_HILOGI("session desc:%{public}s", s->GetDescript().c_str());
 }
 
 void UDSServer::OnDisconnected(SessionPtr s)
 {
-    MMI_LOGI("session desc:%{public}s", s->GetDescript().c_str());
+    MMI_HILOGI("session desc:%{public}s", s->GetDescript().c_str());
 }
 
 int32_t UDSServer::AddEpoll(EpollEventType type, int32_t fd)
@@ -429,7 +429,7 @@ bool UDSServer::AddSession(SessionPtr ses)
         MMI_HILOGW("Too many clients. Warning Value:%{public}d,Current Value:%{public}zd",
                    MAX_SESSON_ALARM, sessionsMap_.size());
     }
-    MMI_LOGI("AddSession end");
+    MMI_HILOGI("AddSession end");
     return true;
 }
 

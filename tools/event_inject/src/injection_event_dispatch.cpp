@@ -185,7 +185,7 @@ void InjectionEventDispatch::Run()
 
     auto ret = (*fun)();
     if (ret == RET_OK) {
-        MMI_LOGI("inject function success id:%{public}s", id.c_str());
+        MMI_HILOGI("inject function success id:%{public}s", id.c_str());
     } else {
         MMI_LOGE("inject function failed id:%{public}s", id.c_str());
     }
@@ -201,11 +201,11 @@ int32_t InjectionEventDispatch::ExecuteFunction(std::string funId)
         MMI_LOGE("event injection Unknown fuction id:%{public}s", funId.c_str());
         return false;
     }
-    MMI_LOGI("Inject tools into function:%{public}s", funId.c_str());
+    MMI_HILOGI("Inject tools into function:%{public}s", funId.c_str());
     int32_t ret = RET_ERR;
     ret = (*fun)();
     if (ret == RET_OK) {
-        MMI_LOGI("inject function success id:%{public}s", funId.c_str());
+        MMI_HILOGI("inject function success id:%{public}s", funId.c_str());
     } else {
         MMI_LOGE("inject function failed id:%{public}s", funId.c_str());
     }
@@ -217,7 +217,7 @@ int32_t InjectionEventDispatch::OnHelp()
 {
     InjectionToolsHelpFunc helpFunc;
     std::string ret = helpFunc.GetHelpText();
-    MMI_LOGI("%{public}s", ret.c_str());
+    MMI_HILOGI("%{public}s", ret.c_str());
 
     return RET_OK;
 }
