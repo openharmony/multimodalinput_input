@@ -86,13 +86,25 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device* inputDevic
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second == inputDevice) {
             inputDevice_.erase(it);
-            if (IsPointerDevice(inputDevice)) {
-                NotifyPointerDevice(false);
-            }
             break;
         }
     }
+    ScanPointerDevice();
     MMI_LOGD("end");
+}
+
+void InputDeviceManager::ScanPointerDevice()
+{
+    bool hasPointerDevice = false;
+    for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
+        if (IsPointerDevice(it->second)) {
+            hasPointerDevice = true;
+            break;
+        }
+    }
+    if (!hasPointerDevice) {
+        NotifyPointerDevice(false);
+    }
 }
 
 bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)

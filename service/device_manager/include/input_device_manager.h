@@ -42,6 +42,7 @@ public:
 
 private:
     bool IsPointerDevice(libinput_device* device);
+    void ScanPointerDevice();
     std::map<int32_t, struct libinput_device*> inputDevice_;
     bool initFlag_ {false};
     int32_t nextId_ {0};
