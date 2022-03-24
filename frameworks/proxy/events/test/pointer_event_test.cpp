@@ -76,7 +76,7 @@ std::shared_ptr<PointerEvent> PointerEventTest::createPointEvent()
 HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_001, TestSize.Level1)
 {
     RunShellUtil runCommand;
-    std::string log1 = "Pressed keyCode=";
+    std::string log1 = "Pressed keyCode:";
     std::vector<std::string> beforeRunLogs;
     ASSERT_TRUE(runCommand.RunShellCommand(log1, beforeRunLogs) == RET_OK);
 
@@ -91,7 +91,9 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_001, TestSiz
     EXPECT_FALSE(afterRunLogs.empty());
     if (beforeRunLogs.empty()) {
         EXPECT_TRUE(afterRunLogs.size() > beforeRunLogs.size());
-        EXPECT_TRUE(afterRunLogs.back().find(log1) != afterRunLogs.back().npos);
+        if (afterRunLogs.size() > 0) {
+            EXPECT_TRUE(afterRunLogs.back().find(log1) != afterRunLogs.back().npos);
+        }
     } else {
         EXPECT_TRUE(std::strcmp(afterRunLogs.back().c_str(), beforeRunLogs.back().c_str()) != 0);
     }
@@ -107,7 +109,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_001, TestSiz
 HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_002, TestSize.Level1)
 {
     RunShellUtil runCommand;
-    std::string log1 = "Pressed keyCode=";
+    std::string log1 = "Pressed keyCode:";
     std::vector<std::string> beforeRunLogs;
     ASSERT_TRUE(runCommand.RunShellCommand(log1, beforeRunLogs) == RET_OK);
 
@@ -121,7 +123,9 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_002, TestSiz
     EXPECT_FALSE(afterRunLogs.empty());
     if (beforeRunLogs.empty()) {
         EXPECT_TRUE(afterRunLogs.size() > beforeRunLogs.size());
-        EXPECT_TRUE(afterRunLogs.back().find(log1) != afterRunLogs.back().npos);
+        if (afterRunLogs.size() > 0) {
+            EXPECT_TRUE(afterRunLogs.back().find(log1) != afterRunLogs.back().npos);
+        }
     } else {
         EXPECT_TRUE(std::strcmp(afterRunLogs.back().c_str(), beforeRunLogs.back().c_str()) != 0);
     }
@@ -137,7 +141,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_002, TestSiz
 HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSize.Level1)
 {
     RunShellUtil runCommand;
-    std::string log1 = "Pressed keyCode=";
+    std::string log1 = "Pressed keyCode:";
     std::vector<std::string> beforeRunLogs;
     ASSERT_TRUE(runCommand.RunShellCommand(log1, beforeRunLogs) == RET_OK);
     std::shared_ptr<PointerEvent> pointerEvent = createPointEvent();
@@ -151,7 +155,9 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSiz
     EXPECT_FALSE(afterRunLogs.empty());
     if (beforeRunLogs.empty()) {
         EXPECT_TRUE(afterRunLogs.size() > beforeRunLogs.size());
-        EXPECT_TRUE(afterRunLogs.back().find(log1) != afterRunLogs.back().npos);
+        if (afterRunLogs.size() > 0) {
+            EXPECT_TRUE(afterRunLogs.back().find(log1) != afterRunLogs.back().npos);
+        }
     } else {
         EXPECT_TRUE(std::strcmp(afterRunLogs.back().c_str(), beforeRunLogs.back().c_str()) != 0);
     }
