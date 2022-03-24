@@ -96,9 +96,6 @@ void MMIEventHandler::OnStop(const InnerEvent::Pointer &event)
 
 void MMIEventHandler::ProcessEvent(const InnerEvent::Pointer &event)
 {
-    // int32_t pid = GetPid();
-    // uint64_t tid = GetThisThreadId();
-    // MMI_LOGD("enter. pid:%{public}d tid:%{public}" PRIu64, pid, tid);
     auto eventId = event->GetInnerEventId();
     switch (eventId) {
         case MMI_EVENT_HANDLER_ID_RECONNECT: {

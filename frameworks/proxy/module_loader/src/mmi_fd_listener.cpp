@@ -66,9 +66,8 @@ void MMIFdListener::OnReadable(int32_t fd)
             MMI_LOGE("recv return %{public}zu errno:%{public}d", size, eno);
             break;
         } else if (size == 0) {
-            MMI_LOGE("[Do nothing here]The service side disconnect with the client. size:0 count:%{public}d "
+            MMI_LOGD("[Do nothing here]The service side disconnect with the client. size:0 count:%{public}d "
                 "errno:%{public}d", i, errno);
-            // mmiClient_->OnDisconnect();
             break;
         } else if (size > 0) {
             if (!buf.Write(szBuf, size)) {

@@ -55,7 +55,6 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
         keyOption->GetFinalKeyDownDuration());
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
     InsertSubScriber(subscriber);
-    // subscribers_.push_back(subscriber);
     InitSessionDeleteCallback();
     return RET_OK;
 }

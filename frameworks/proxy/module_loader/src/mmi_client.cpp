@@ -83,7 +83,6 @@ bool MMIClient::StartEventRunner()
     uint64_t tid = GetThisThreadId();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
 
-    MMI_LOGI("step 1");
     constexpr int32_t WAIT_FOR_TIMEOUT = 3;
     std::unique_lock <std::mutex> lck(mtx);
     ehThread_ = std::thread(std::bind(&MMIClient::OnEventHandlerThread, this));
@@ -93,7 +92,6 @@ bool MMIClient::StartEventRunner()
         Stop();
         return false;
     }
-    MMI_LOGI("step 4");
 
     recvThread_ = std::thread(std::bind(&MMIClient::OnRecvThread, this));
     recvThread_.detach();
@@ -102,7 +100,6 @@ bool MMIClient::StartEventRunner()
         Stop();
         return false;
     }
-    MMI_LOGI("step 7");
     return true;
 }
 
@@ -114,13 +111,11 @@ void MMIClient::OnEventHandlerThread()
     uint64_t tid = GetThisThreadId();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
 
-    MMI_LOGI("step 2");
     auto eventHandler = MEventHandler->GetSharedPtr();
     CHKPV(eventHandler);
     auto eventRunner = eventHandler->GetEventRunner();
     CHKPV(eventRunner);
     cv.notify_one();
-    MMI_LOGI("step 3");
     eventRunner->Run();
 }
 
@@ -132,7 +127,6 @@ void MMIClient::OnRecvThread()
     uint64_t tid = GetThisThreadId();
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
 
-    MMI_LOGI("step 5");
     auto runner = EventRunner::Create(false);
     CHKPV(runner);
     recvEventHandler_ = std::make_shared<MMIEventHandler>(runner, GetSharedPtr());
@@ -149,7 +143,6 @@ void MMIClient::OnRecvThread()
         }
     }
     cv.notify_one();
-    MMI_LOGI("step 6");
     runner->Run();
 }
 
@@ -241,7 +234,6 @@ void MMIClient::OnDisconnected()
     }
     Close();
     if (!isExit && recvEventHandler_ != nullptr) {
-        MMI_LOGD("start reconnecting to the server");
         if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, CLIENT_RECONNECT_COOLING_TIME)) {
             MMI_LOGE("send reconnect event return false.");
         }
@@ -251,20 +243,16 @@ void MMIClient::OnDisconnected()
 void MMIClient::OnConnected()
 {
     CALL_LOG_ENTER;
-    MMI_LOGI("step 1");
     MMI_LOGD("Connection to server succeeded, fd:%{public}d", GetFd());
     isConnected_ = true;
     if (funConnected_) {
         funConnected_(*this);
     }
-    MMI_LOGI("step 2");
     if (!isExit && !isRunning_ && fd_ >= 0 && recvEventHandler_ != nullptr) {
         if (!AddFdListener(fd_)) {
             MMI_LOGE("Add fd listener failed");
         }
-        MMI_LOGI("step 3");
     }
-    MMI_LOGI("step 4");
 }
 
 int32_t MMIClient::Socket()
