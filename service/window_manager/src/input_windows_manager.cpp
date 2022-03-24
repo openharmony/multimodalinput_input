@@ -519,7 +519,7 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
             return UpdateTouchPadTarget(pointerEvent);
         }
         default: {
-            MMI_LOGW("Source type is unknown, source:%{public}d", source);
+            MMI_HILOGW("Source type is unknown, source:%{public}d", source);
             break;
         }
     }
