@@ -171,7 +171,8 @@ void KeyEventInputSubscribeManager::OnConnected()
     }
 }
 
-const SubscribeKeyEventInfo* KeyEventInputSubscribeManager::GetSubscribeKeyEvent(int32_t id)
+const KeyEventInputSubscribeManager::SubscribeKeyEventInfo* KeyEventInputSubscribeManager::GetSubscribeKeyEvent(
+    int32_t id)
 {
     if (id < 0) {
         MMI_LOGE("invalid input param id:%{public}d", id);
