@@ -41,7 +41,7 @@ int32_t HdfEventManager::EvdevSimIoctl(int32_t hdindex, int32_t pcmd, void *iobu
     int32_t cmd = pcmd & 0xff;
 
     MMI_HILOGD("evdev_simioctl index:%{public}d,cmd:%{public}02x,size:%{public}d,"
-             "pcmd:%{public}04x", hdindex, cmd, size, pcmd);
+               "pcmd:%{public}04x", hdindex, cmd, size, pcmd);
     DrvType drvtype = g_index2DrvType[hdindex - MAX_INPUT_DEVICE_COUNT];
     MMI_HILOGD("evdev_simioctl drvtype:%{public}d", drvtype);
     if (drvtype >= INVALD) {

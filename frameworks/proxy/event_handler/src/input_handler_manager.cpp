@@ -118,7 +118,7 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
     }
     if (handlerType != tItr->second.handlerType_) {
         MMI_HILOGE("Unmatched handler type, InputHandlerType:%{public}d,FindHandlerType:%{public}d",
-                 handlerType, tItr->second.handlerType_);
+                   handlerType, tItr->second.handlerType_);
         return RET_ERR;
     }
     inputHandlers_.erase(tItr);

@@ -61,8 +61,8 @@ int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event& event, i
     auto ret = epoll_ctl(epollFd, op, fd, &event);
     if (ret < 0) {
         MMI_HILOGE("epoll_ctl retrun %{public}d,epollFd_:%{public}d,"
-                 "op:%{public}d,fd:%{public}d,errno:%{public}d",
-                 ret, epollFd, op, fd, errno);
+                   "op:%{public}d,fd:%{public}d,errno:%{public}d",
+                   ret, epollFd, op, fd, errno);
     }
     return ret;
 }
