@@ -254,7 +254,7 @@ void MMIService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
     int32_t fd = s->GetFd();
-    MMI_LOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), fd);
+    MMI_HILOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), fd);
 }
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)
@@ -343,7 +343,7 @@ void MMIService::OnThread()
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {
                 OnSignalEvent(mmiEd->fd);
             } else {
-                MMI_LOGW("unknown epoll event type:%{public}d", mmiEd->event_type);
+                MMI_HILOGW("unknown epoll event type:%{public}d", mmiEd->event_type);
             }
         }
         if (state_ != ServiceRunningState::STATE_RUNNING) {

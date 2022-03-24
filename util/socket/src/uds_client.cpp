@@ -104,7 +104,7 @@ bool UDSClient::StartClient(MsgClientFunCallback fun)
     isExit = false;
     recvFun_ = fun;
     if (ConnectTo() < 0) {
-        MMI_LOGW("Client connection failed, Try again later");
+        MMI_HILOGW("Client connection failed, Try again later");
     }
     return true;
 }

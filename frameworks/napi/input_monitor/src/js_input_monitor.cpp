@@ -304,7 +304,7 @@ bool JsInputMonitor::Start() {
     CALL_LOG_ENTER;
     CHKPF(monitor_);
     if (isMonitoring_) {
-        MMI_LOGW("js is monitoring");
+        MMI_HILOGW("js is monitoring");
         return true;
     }
     if (monitor_->Start()) {
