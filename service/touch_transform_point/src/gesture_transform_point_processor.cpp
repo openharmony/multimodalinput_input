@@ -73,7 +73,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_ge
 
 void GestureTransformPointProcessor::OnEventTouchPadPinchUpdate(libinput_event_gesture *data)
 {
-    MMI_LOGD("Touchpad update event");
+    MMI_HILOGD("Touchpad update event");
     CHKPV(data);
     auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     auto scale = libinput_event_gesture_get_scale(data);
@@ -98,7 +98,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchUpdate(libinput_event_g
 
 void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gesture *data)
 {
-    MMI_LOGD("Touchpad end event");
+    MMI_HILOGD("Touchpad end event");
     CHKPV(data);
     auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     auto scale = libinput_event_gesture_get_scale(data);
@@ -153,7 +153,7 @@ std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestrueE
             return nullptr;
         }
         default: {
-            MMI_LOGE("Unknown event_type of pointer class has been reported!\n");
+            MMI_HILOGE("Unknown event_type of pointer class has been reported!\n");
             return nullptr;
         }
     }

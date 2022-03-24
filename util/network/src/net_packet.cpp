@@ -33,7 +33,7 @@ void NetPacket::MakeData(StreamBuffer& buf) const
     buf << head;
     if (wIdx_ > 0) {
         if (!buf.Write(&szBuff_[0], wIdx_)) {
-            MMI_LOGE("Write data to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+            MMI_HILOGE("Write data to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
             return;
         }
     }

@@ -51,7 +51,7 @@ int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, std::shared_
         if (preUpKeyItem != nullptr) {
             key->RemoveReleasedKeyItems(*preUpKeyItem);
         } else {
-            MMI_LOGE("preUpKeyItem is null");
+            MMI_HILOGE("preUpKeyItem is null");
         }
     }
     int64_t time = GetSysClockTime();
@@ -79,7 +79,7 @@ int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, std::shared_
         if (pressedKeyItem != nullptr) {
             item.SetDownTime(pressedKeyItem->GetDownTime());
         } else {
-            MMI_LOGE("Find pressed key failed, keyCode:%{public}d", keyCode);
+            MMI_HILOGE("Find pressed key failed, keyCode:%{public}d", keyCode);
         }
         key->RemoveReleasedKeyItems(item);
         key->AddPressedKeyItems(item);
@@ -92,12 +92,12 @@ int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& k
     const std::string uid = GetUUid();
     errno_t ret = memcpy_s(key.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size());
     if (ret != EOK) {
-        MMI_LOGE("Memcpy data failed");
+        MMI_HILOGE("Memcpy data failed");
         return RET_ERR;
     }
     ret = memcpy_s(key.deviceName, MAX_UUIDSIZE, VIRTUAL_KEYBOARD.c_str(), VIRTUAL_KEYBOARD.size());
     if (ret != EOK) {
-        MMI_LOGE("Memcpy data failed");
+        MMI_HILOGE("Memcpy data failed");
         return RET_ERR;
     }
     key.time = event.keyDownDuration;
@@ -130,7 +130,7 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
         if (preUpKeyItem != nullptr) {
             keyEventPtr->RemoveReleasedKeyItems(*preUpKeyItem);
         } else {
-            MMI_LOGE("preUpKeyItem is null");
+            MMI_HILOGE("preUpKeyItem is null");
         }
     }
 
@@ -158,7 +158,7 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
         if (pressedKeyItem != nullptr) {
             keyItem.SetDownTime(pressedKeyItem->GetDownTime());
         } else {
-            MMI_LOGE("Find pressed key failed, keyCode:%{public}d", keyCode);
+            MMI_HILOGE("Find pressed key failed, keyCode:%{public}d", keyCode);
         }
         keyEventPtr->RemoveReleasedKeyItems(keyItem);
         keyEventPtr->AddPressedKeyItems(keyItem);

@@ -27,7 +27,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 int32_t InputMonitorManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor)
 {
     if (monitor == nullptr) {
-        MMI_LOGE("No monitor was specified.");
+        MMI_HILOGE("No monitor was specified.");
         return INVALID_HANDLER_ID;
     }
     return InputHandlerManager::GetInstance().AddHandler(InputHandlerType::MONITOR, monitor);

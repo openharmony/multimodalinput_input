@@ -65,7 +65,7 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
             OnSetHotPlugs(devIndex, devSatatus);
             break;
         default:
-            MMI_LOGE("The message type:%{public}d cannot be processed", sendType);
+            MMI_HILOGE("The message type:%{public}d cannot be processed", sendType);
             return RET_ERR;
     }
     return RET_OK;
@@ -88,7 +88,7 @@ int32_t HdiInject::OnSetEventInject(const RawInputEvent& allEvent, int32_t devIn
 void HdiInject::OnSetHotPlugs(uint32_t devIndex, uint32_t devSatatus)
 {
     if (!(ReportHotPlugEvent(devIndex, devSatatus))) {
-        MMI_LOGE("ReportHotPlugEvent faild");
+        MMI_HILOGE("ReportHotPlugEvent faild");
         return;
     }
     MMI_HILOGI("ReportHotPlugEvent success");
@@ -125,7 +125,7 @@ void HdiInject::InitDeviceInfo()
     int32_t counts = sizeof(deviceInfoArray) / sizeof(DeviceInformation);
     auto iter = deviceArray_.insert(deviceArray_.begin(), deviceInfoArray, deviceInfoArray + counts);
     if (!iter.second) {
-        MMI_LOGE("Insert value failed");
+        MMI_HILOGE("Insert value failed");
     }
 }
 
@@ -157,7 +157,7 @@ bool HdiInject::SetDeviceHotStatus(int32_t devIndex, int32_t status)
     for (auto iter = deviceArray_.begin(); iter != deviceArray_.end(); ++iter) {
         if (iter->devIndex == devIndex) {
             if (iter->status == status) {
-                MMI_LOGE("Failed to find status");
+                MMI_HILOGE("Failed to find status");
                 return false;
             }
             iter->status = ~status + 1;
@@ -191,7 +191,7 @@ bool HdiInject::ReportHotPlugEvent()
 bool HdiInject::ReportHotPlugEvent(uint32_t devIndex, uint32_t status)
 {
     if (!(SetDeviceHotStatus(devIndex, status))) {
-        MMI_LOGE("SetDeviceHotStatus error devIndex:%{public}d,status:%{public}d", devIndex, status);
+        MMI_HILOGE("SetDeviceHotStatus error devIndex:%{public}d,status:%{public}d", devIndex, status);
         return false;
     }
     int32_t devType = GetDevTypeIndex(devIndex);

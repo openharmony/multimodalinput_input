@@ -100,7 +100,7 @@ void DumpData(const char* dataPtr, const size_t dataSize, const char* fileName, 
     size_t i = 0;
     auto funCheckRetAndLog = [ret](const char* fileName, const int32_t lineNo) -> void {
         if (ret == -1) {
-            MMI_LOGE("SEC_RET_EQ: ret:%{public}d, %s:%d", ret, fileName, lineNo);
+            MMI_HILOGE("SEC_RET_EQ: ret:%{public}d, %s:%d", ret, fileName, lineNo);
         }
     };
 

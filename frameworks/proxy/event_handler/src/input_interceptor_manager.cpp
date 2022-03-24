@@ -28,7 +28,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 int32_t InputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
     if (interceptor == nullptr) {
-        MMI_LOGE("No interceptor was specified.");
+        MMI_HILOGE("No interceptor was specified.");
         return INVALID_HANDLER_ID;
     }
     return InputHandlerManager::GetInstance().AddHandler(InputHandlerType::INTERCEPTOR, interceptor);
