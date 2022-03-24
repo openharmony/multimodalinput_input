@@ -30,12 +30,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Multi
 MultimodalInputConnectProxy::MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl) :
     IRemoteProxy<IMultimodalInputConnect>(impl)
 {
-    MMI_LOGI("enter MultimodalInputConnectProxy");
+    MMI_HILOGI("enter MultimodalInputConnectProxy");
 }
 
 MultimodalInputConnectProxy::~MultimodalInputConnectProxy()
 {
-    MMI_LOGI("enter ~MultimodalInputConnectProxy");
+    MMI_HILOGI("enter ~MultimodalInputConnectProxy");
 }
 
 int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programName,
@@ -44,7 +44,7 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
     CALL_LOG_ENTER;
     MessageParcel data;
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
-        MMI_LOGE("Failed to write descriptor");
+        MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
 
@@ -52,7 +52,7 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
     req.data.moduleId = moduleType;
     req.data.clientName = programName;
     if (!data.WriteParcelable(&req)) {
-        MMI_LOGE("Failed to write programName");
+        MMI_HILOGE("Failed to write programName");
         return ERR_INVALID_VALUE;
     }
 
@@ -60,20 +60,20 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
     MessageOption option;
     int32_t requestResult = Remote()->SendRequest(ALLOC_SOCKET_FD, data, reply, option);
     if (requestResult != NO_ERROR) {
-        MMI_LOGE("send request fail, result:%{public}d", requestResult);
+        MMI_HILOGE("send request fail, result:%{public}d", requestResult);
         return RET_ERR;
     }
 
-    MMI_LOGD("recieved message from server");
+    MMI_HILOGD("recieved message from server");
 
     int32_t result = reply.ReadInt32();
-    MMI_LOGD("result:%{public}d", result);
+    MMI_HILOGD("result:%{public}d", result);
     if (result != RET_OK) {
-        MMI_LOGE("responce return error:%{public}d", result);
+        MMI_HILOGE("responce return error:%{public}d", result);
         return RET_ERR;
     }
     socketFd = reply.ReadFileDescriptor();
-    MMI_LOGD("socketFd:%{public}d", socketFd);
+    MMI_HILOGD("socketFd:%{public}d", socketFd);
     return RET_OK;
 }
 
@@ -82,12 +82,12 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
     CALL_LOG_ENTER;
     MessageParcel data;
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
-        MMI_LOGE("Failed to write descriptor");
+        MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
 
     if (!data.WriteRemoteObject(filter->AsObject().GetRefPtr())) {
-        MMI_LOGE("Failed to write filter");
+        MMI_HILOGE("Failed to write filter");
         return ERR_INVALID_VALUE;
     }
 
@@ -95,13 +95,13 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
     MessageOption option;
     int32_t requestResult = Remote()->SendRequest(ADD_INPUT_EVENT_FILTER, data, reply, option);
     if (requestResult != NO_ERROR) {
-        MMI_LOGE("send request fail, result:%{public}d", requestResult);
+        MMI_HILOGE("send request fail, result:%{public}d", requestResult);
         return RET_ERR;
     }
 
     int32_t result = reply.ReadInt32();
     if (result != RET_OK) {
-        MMI_LOGE("reply readint32 error:%{public}d", result);
+        MMI_HILOGE("reply readint32 error:%{public}d", result);
     }
     return result;
 }

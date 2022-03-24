@@ -57,7 +57,7 @@ void CheckDefineOutput(const char* fmt, Ts... args)
     }
 
     KMSG_LOGI("%s", buf);
-    MMI_LOGI("%{public}s", buf);
+    MMI_HILOGI("%{public}s", buf);
 }
 
 static void CheckDefine()
@@ -84,25 +84,25 @@ MMIService::~MMIService() {}
 int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 {
     if (!(type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END)) {
-        MMI_LOGE("Invalid param type");
+        MMI_HILOGE("Invalid param type");
         return RET_ERR;
     }
     if (fd < 0) {
-        MMI_LOGE("Invalid param fd_");
+        MMI_HILOGE("Invalid param fd_");
         return RET_ERR;
     }
     if (mmiFd_ < 0) {
-        MMI_LOGE("Invalid param mmiFd_");
+        MMI_HILOGE("Invalid param mmiFd_");
         return RET_ERR;
     }
     auto eventData = static_cast<mmi_epoll_event*>(malloc(sizeof(mmi_epoll_event)));
     if (!eventData) {
-        MMI_LOGE("Malloc failed");
+        MMI_HILOGE("Malloc failed");
         return RET_ERR;
     }
     eventData->fd = fd;
     eventData->event_type = type;
-    MMI_LOGD("userdata:[fd:%{public}d,type:%{public}d]", eventData->fd, eventData->event_type);
+    MMI_HILOGD("userdata:[fd:%{public}d,type:%{public}d]", eventData->fd, eventData->event_type);
 
     struct epoll_event ev = {};
     ev.events = EPOLLIN;
@@ -120,46 +120,46 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 bool MMIService::InitLibinputService()
 {
 #ifdef OHOS_BUILD_HDF
-    MMI_LOGD("HDF Init");
+    MMI_HILOGD("HDF Init");
     hdfEventManager.SetupCallback();
 #endif
     if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
         DEF_INPUT_SEAT))) {
-        MMI_LOGE("libinput init, bind failed");
+        MMI_HILOGE("libinput init, bind failed");
         return false;
     }
     auto inputFd = libinputAdapter_.GetInputFd();
     auto ret = AddEpoll(EPOLL_EVENT_INPUT, inputFd);
     if (ret <  0) {
-        MMI_LOGE("AddEpoll error ret: %{public}d", ret);
+        MMI_HILOGE("AddEpoll error ret: %{public}d", ret);
         EpollClose();
         return false;
     }
-    MMI_LOGD("AddEpoll, epollfd: %{public}d, fd: %{public}d", mmiFd_, inputFd);
+    MMI_HILOGD("AddEpoll, epollfd: %{public}d, fd: %{public}d", mmiFd_, inputFd);
     return true;
 }
 
 bool MMIService::InitService()
 {
     if (state_ != ServiceRunningState::STATE_NOT_START) {
-        MMI_LOGE("Service running status is not enabled");
+        MMI_HILOGE("Service running status is not enabled");
         return false;
     }
     if (!(Publish(this))) {
-        MMI_LOGE("Service initialization failed");
+        MMI_HILOGE("Service initialization failed");
         return false;
     }
     if (EpollCreat(MAX_EVENT_SIZE) < 0) {
-        MMI_LOGE("epoll create failed");
+        MMI_HILOGE("epoll create failed");
         return false;
     }
     auto ret = AddEpoll(EPOLL_EVENT_SOCKET, epollFd_);
     if (ret <  0) {
-        MMI_LOGE("AddEpoll error ret:%{public}d", ret);
+        MMI_HILOGE("AddEpoll error ret:%{public}d", ret);
         EpollClose();
         return false;
     }
-    MMI_LOGD("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, epollFd_);
+    MMI_HILOGD("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, epollFd_);
     return true;
 }
 
@@ -167,40 +167,40 @@ int32_t MMIService::Init()
 {
     CheckDefine();
 
-    MMI_LOGD("InputEventHandler Init");
+    MMI_HILOGD("InputEventHandler Init");
     InputHandler->Init(*this);
 
-    MMI_LOGD("ServerMsgHandler Init");
+    MMI_HILOGD("ServerMsgHandler Init");
     sMsgHandler_.Init(*this);
-    MMI_LOGD("EventDump Init");
+    MMI_HILOGD("EventDump Init");
     MMIEventDump->Init(*this);
 
-    MMI_LOGD("WindowsManager Init");
+    MMI_HILOGD("WindowsManager Init");
     if (!WinMgr->Init(*this)) {
-        MMI_LOGE("Windows message init failed");
+        MMI_HILOGE("Windows message init failed");
         return WINDOWS_MSG_INIT_FAIL;
     }
-    MMI_LOGD("PointerDrawingManager Init");
+    MMI_HILOGD("PointerDrawingManager Init");
     if (!PointerDrawingManager::GetInstance()->Init()) {
-        MMI_LOGE("Pointer draw init failed");
+        MMI_HILOGE("Pointer draw init failed");
         return POINTER_DRAW_INIT_FAIL;
     }
     
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
     if (mmiFd_ < 0) {
-        MMI_LOGE("Epoll creat failed");
+        MMI_HILOGE("Epoll creat failed");
         return EPOLL_CREATE_FAIL;
     }
     if (!InitService()) {
-        MMI_LOGE("Saservice init failed");
+        MMI_HILOGE("Saservice init failed");
         return SASERVICE_INIT_FAIL;
     }
     if (!InitLibinputService()) {
-        MMI_LOGE("Libinput init failed");
+        MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;
     }
     if (!InitSignalHandler()) {
-        MMI_LOGE("Signal handler init failed");
+        MMI_HILOGE("Signal handler init failed");
         return INIT_SIGNAL_HANDLER_FAIL;
     }
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
@@ -210,15 +210,15 @@ int32_t MMIService::Init()
 void MMIService::OnStart()
 {
     auto tid = GetThisThreadId();
-    MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
+    MMI_HILOGD("Thread tid:%{public}" PRId64 "", tid);
 
     int32_t ret = Init();
     if (RET_OK != ret) {
-        MMI_LOGE("Init mmi_service failed");
+        MMI_HILOGE("Init mmi_service failed");
         return;
     }
     state_ = ServiceRunningState::STATE_RUNNING;
-    MMI_LOGD("Started successfully");
+    MMI_HILOGD("Started successfully");
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
     t_.join();
 }
@@ -226,7 +226,7 @@ void MMIService::OnStart()
 void MMIService::OnStop()
 {
     auto tid = GetThisThreadId();
-    MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
+    MMI_HILOGD("Thread tid:%{public}" PRId64 "", tid);
 
     UdsStop();
     if (InputHandler != nullptr) {
@@ -239,7 +239,7 @@ void MMIService::OnStop()
 void MMIService::OnDump()
 {
     auto tid = GetThisThreadId();
-    MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
+    MMI_HILOGD("Thread tid:%{public}" PRId64 "", tid);
     MMIEventDump->Dump();
 }
 
@@ -247,7 +247,7 @@ void MMIService::OnConnected(SessionPtr s)
 {
     CHKPV(s);
     int32_t fd = s->GetFd();
-    MMI_LOGI("fd:%{public}d", fd);
+    MMI_HILOGI("fd:%{public}d", fd);
 }
 
 void MMIService::OnDisconnected(SessionPtr s)
@@ -260,7 +260,7 @@ void MMIService::OnDisconnected(SessionPtr s)
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)
 {
     CALL_LOG_ENTER;
-    MMI_LOGI("enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
+    MMI_HILOGI("enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
 
     toReturnClientFd = INVALID_SOCKET_FD;
     int32_t serverFd = INVALID_SOCKET_FD;
@@ -268,11 +268,11 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     int32_t pid = GetCallingPid();
     const int32_t ret = AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd);
     if (ret != RET_OK) {
-        MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
+        MMI_HILOGE("call AddSocketPairInfo return %{public}d", ret);
         return RET_ERR;
     }
 
-    MMI_LOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
+    MMI_HILOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
         programName.c_str(), moduleType);
 
     return RET_OK;
@@ -282,22 +282,22 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
 {
     sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
     CHKPR(req, RET_ERR);
-    MMI_LOGIK("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
+    MMI_HILOGIK("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
 
     int32_t clientFd = INVALID_SOCKET_FD;
     int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
     if (ret != RET_OK) {
-        MMI_LOGE("call AddSocketPairInfo return %{public}d", ret);
+        MMI_HILOGE("call AddSocketPairInfo return %{public}d", ret);
         reply.WriteInt32(RET_ERR);
         return RET_ERR;
     }
 
-    MMI_LOGI("call AllocSocketFd success");
+    MMI_HILOGI("call AllocSocketFd success");
 
     reply.WriteInt32(RET_OK);
     reply.WriteFileDescriptor(clientFd);
 
-    MMI_LOGI("send clientFd to client, clientFd = %d", clientFd);
+    MMI_HILOGI("send clientFd to client, clientFd = %d", clientFd);
     close(clientFd);
     return RET_OK;
 }
@@ -321,10 +321,10 @@ void MMIService::OnThread()
     SetThreadName(std::string("mmi_service"));
     uint64_t tid = GetThisThreadId();
     if (tid <= 0) {
-        MMI_LOGE("The tid is error, errCode:%{public}d", VAL_NOT_EXP);
+        MMI_HILOGE("The tid is error, errCode:%{public}d", VAL_NOT_EXP);
         return;
     }
-    MMI_LOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
+    MMI_HILOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
 
     int32_t count = 0;
     constexpr int32_t timeOut = 1;
@@ -357,7 +357,7 @@ void MMIService::OnThread()
         }
         OnTimer();
     }
-    MMI_LOGI("Main worker thread stop. tid:%{public}" PRId64 "", tid);
+    MMI_HILOGI("Main worker thread stop. tid:%{public}" PRId64 "", tid);
 }
 
 bool MMIService::InitSignalHandler()
@@ -366,25 +366,25 @@ bool MMIService::InitSignalHandler()
     sigset_t mask = {0};
     int32_t retCode = sigfillset(&mask);
     if (retCode < 0) {
-        MMI_LOGE("fill signal set failed:%{public}d", errno);
+        MMI_HILOGE("fill signal set failed:%{public}d", errno);
         return false;
     }
 
     retCode = sigprocmask(SIG_SETMASK, &mask, nullptr);
     if (retCode < 0) {
-        MMI_LOGE("sigprocmask failed:%{public}d", errno);
+        MMI_HILOGE("sigprocmask failed:%{public}d", errno);
         return false;
     }
 
     int32_t fdSignal = signalfd(-1, &mask, SFD_NONBLOCK|SFD_CLOEXEC);
     if (fdSignal < 0) {
-        MMI_LOGE("signal fd failed:%{public}d", errno);
+        MMI_HILOGE("signal fd failed:%{public}d", errno);
         return false;
     }
 
     retCode = AddEpoll(EPOLL_EVENT_SIGNAL, fdSignal);
     if (retCode < 0) {
-        MMI_LOGE("AddEpoll signalFd failed:%{public}d", retCode);
+        MMI_HILOGE("AddEpoll signalFd failed:%{public}d", retCode);
         close(fdSignal);
         return false;
     }
@@ -397,11 +397,11 @@ void MMIService::OnSignalEvent(int32_t signalFd)
     signalfd_siginfo sigInfo;
     int32_t size = ::read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
     if (size != static_cast<int32_t>(sizeof(signalfd_siginfo))) {
-        MMI_LOGE("read signal info faild, invalid size:%{public}d,errno:%{public}d", size, errno);
+        MMI_HILOGE("read signal info faild, invalid size:%{public}d,errno:%{public}d", size, errno);
         return;
     }
     int32_t signo = static_cast<int32_t>(sigInfo.ssi_signo);
-    MMI_LOGD("receive signal:%{public}d", signo);
+    MMI_HILOGD("receive signal:%{public}d", signo);
     switch (signo) {
         case SIGINT:
         case SIGQUIT:

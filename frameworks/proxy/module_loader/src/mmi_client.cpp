@@ -50,13 +50,13 @@ bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
     CHKPF(msgHdl);
     EventManager.SetClientHandle(GetPtr());
     if (!(msgHdl->Init())) {
-        MMI_LOGE("Message processing initialization failed");
+        MMI_HILOGE("Message processing initialization failed");
         return false;
     }
     auto callback = msgHdl->GetCallback();
     CHKPF(callback);
     if (!(StartClient(callback, detachMode))) {
-        MMI_LOGE("Client startup failed");
+        MMI_HILOGE("Client startup failed");
         return false;
     }
     return true;
@@ -96,7 +96,7 @@ void MMIClient::SdkGetMultimodeInputInfo()
 
 void MMIClient::OnDisconnected()
 {
-    MMI_LOGD("Disconnected from server, fd:%{public}d", GetFd());
+    MMI_HILOGD("Disconnected from server, fd:%{public}d", GetFd());
     if (funDisconnected_) {
         funDisconnected_(*this);
     }
@@ -105,7 +105,7 @@ void MMIClient::OnDisconnected()
 
 void MMIClient::OnConnected()
 {
-    MMI_LOGD("Connection to server succeeded, fd:%{public}d", GetFd());
+    MMI_HILOGD("Connection to server succeeded, fd:%{public}d", GetFd());
     if (funConnected_) {
         funConnected_(*this);
     }
@@ -118,16 +118,16 @@ int32_t MMIClient::Socket()
     int32_t ret = MultimodalInputConnectManager::GetInstance()->
                         AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
     if (ret != RET_OK) {
-        MMI_LOGE("UDSSocket::Socket, call MultimodalInputConnectManager::AllocSocketPair return %{public}d", ret);
+        MMI_HILOGE("UDSSocket::Socket, call MultimodalInputConnectManager::AllocSocketPair return %{public}d", ret);
         return -1;
     }
     fd_ = MultimodalInputConnectManager::GetInstance()->GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
-        MMI_LOGE("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
-                 " return invalid fd");
+        MMI_HILOGE("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
+                   " return invalid fd");
     } else {
-        MMI_LOGD("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
-                 " return fd:%{public}d", fd_);
+        MMI_HILOGD("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
+                   " return fd:%{public}d", fd_);
     }
 
     return fd_;

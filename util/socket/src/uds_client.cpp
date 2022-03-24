@@ -39,12 +39,12 @@ UDSClient::~UDSClient()
 int32_t UDSClient::ConnectTo()
 {
     if (Socket() < 0) {
-        MMI_LOGE("Socket failed");
+        MMI_HILOGE("Socket failed");
         return RET_ERR;
     }
     if (epollFd_ < 0) {
         if (EpollCreat(MAX_EVENT_SIZE) < 0) {
-            MMI_LOGE("Epoll creat failed");
+            MMI_HILOGE("Epoll creat failed");
             return RET_ERR;
         }
     }
@@ -54,7 +54,7 @@ int32_t UDSClient::ConnectTo()
     ev.events = EPOLLIN;
     ev.data.fd = fd_;
     if (EpollCtl(fd_, EPOLL_CTL_ADD, ev) < 0) {
-        MMI_LOGE("EpollCtl failed");
+        MMI_HILOGE("EpollCtl failed");
         return RET_ERR;
     }
     OnConnected();
@@ -65,14 +65,14 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
     if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
-        MMI_LOGE("Stream buffer size out of range");
+        MMI_HILOGE("Stream buffer size out of range");
         return false;
     }
     if (fd_ < 0) {
-        MMI_LOGE("fd_ is less than 0");
+        MMI_HILOGE("fd_ is less than 0");
         return false;
     }
-    
+
     int32_t retryTimes = 32;
     while (size > 0 && retryTimes > 0) {
         retryTimes--;
@@ -82,7 +82,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
                 MMI_HILOGW("send msg failed, errno:%{public}d", errno);
                 continue;
             }
-            MMI_LOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
+            MMI_HILOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
             return false;
         }
 
@@ -95,14 +95,14 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
         int32_t sleepTime = 10000;
         usleep(sleepTime);
     }
-    MMI_LOGE("send msg failed");
+    MMI_HILOGE("send msg failed");
     return false;
 }
 
 bool UDSClient::SendMsg(const NetPacket& pkt) const
 {
     if (pkt.ChkRWError()) {
-        MMI_LOGE("Read and write status is error");
+        MMI_HILOGE("Read and write status is error");
         return false;
     }
     StreamBuffer buf;
@@ -121,7 +121,7 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
         isConnected_ = false;
 
         if (IsFirstConnectFailExit()) {
-            MMI_LOGE("first connection faild");
+            MMI_HILOGE("first connection faild");
             return false;
         }
     }
@@ -146,7 +146,7 @@ void UDSClient::Stop()
     }
     EpollClose();
     if (t_.joinable()) {
-        MMI_LOGD("thread join");
+        MMI_HILOGD("thread join");
         t_.join();
     }
 }
@@ -159,17 +159,17 @@ void UDSClient::OnRecv(const char *buf, size_t size)
     int32_t bufSize = static_cast<int32_t>(size);
     const int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
     if (bufSize < headSize) {
-        MMI_LOGE("The in parameter size is error, errCode:%{public}d", VAL_NOT_EXP);
+        MMI_HILOGE("The in parameter size is error, errCode:%{public}d", VAL_NOT_EXP);
         return;
     }
     while (bufSize > 0 && recvFun_) {
         if (bufSize < headSize) {
-            MMI_LOGE("The size is less than headSize, errCode:%{public}d", VAL_NOT_EXP);
+            MMI_HILOGE("The size is less than headSize, errCode:%{public}d", VAL_NOT_EXP);
             return;
         }
         auto head = reinterpret_cast<PackHead *>(const_cast<char *>(&buf[readIdx]));
         if (head->size < 0 || head->size >= bufSize) {
-            MMI_LOGE("Head size is error, head->size:%{public}d, errCode:%{public}d", head->size, VAL_NOT_EXP);
+            MMI_HILOGE("Head size is error, head->size:%{public}d, errCode:%{public}d", head->size, VAL_NOT_EXP);
             return;
         }
         packSize = headSize + head->size;
@@ -177,7 +177,7 @@ void UDSClient::OnRecv(const char *buf, size_t size)
         NetPacket pkt(head->idMsg);
         if (head->size > 0) {
             if (!pkt.Write(&buf[readIdx + headSize], static_cast<size_t>(head->size))) {
-                MMI_LOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+                MMI_HILOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
                 return;
             }
         }
@@ -191,7 +191,7 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
 {
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGI("ev.events:0x%{public}x,fd:%{public}d same as fd_:%{public}d", ev.events, fd, fd_);
+        MMI_HILOGI("ev.events:0x%{public}x,fd:%{public}d same as fd_:%{public}d", ev.events, fd, fd_);
         OnDisconnected();
         struct epoll_event event = {};
         EpollCtl(fd, EPOLL_CTL_DEL, event);
@@ -204,13 +204,13 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
     const size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
     if (maxCount <= 0) {
-        MMI_LOGE("The maxCount is error, maxCount:%{public}zu, errCode:%{public}d", maxCount, VAL_NOT_EXP);
+        MMI_HILOGE("The maxCount is error, maxCount:%{public}zu, errCode:%{public}d", maxCount, VAL_NOT_EXP);
     }
     auto isoverflow = false;
     for (size_t j = 0; j < maxCount; j++) {
         auto size = read(fd, static_cast<void *>(szBuf), MAX_PACKET_BUF_SIZE);
         if (size < 0) {
-            MMI_LOGE("size:%{public}zu", size);
+            MMI_HILOGE("size:%{public}zu", size);
             return;
         }
         if (size > 0) {

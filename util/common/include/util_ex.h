@@ -48,7 +48,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilE
     if (fd < 0) {
         ret = printf("%s\n", buf);
     } else if (fd == 0) {
-        MMI_LOGF("%{public}s", buf);
+        MMI_HILOGF("%{public}s", buf);
     } else {
         ret = dprintf(fd, "%s\n", buf);
     }
@@ -100,7 +100,7 @@ void DumpData(const char* dataPtr, const size_t dataSize, const char* fileName, 
     size_t i = 0;
     auto funCheckRetAndLog = [ret](const char* fileName, const int32_t lineNo) -> void {
         if (ret == -1) {
-            MMI_LOGE("SEC_RET_EQ: ret:%{public}d, %s:%d", ret, fileName, lineNo);
+            MMI_HILOGE("SEC_RET_EQ: ret:%{public}d, %s:%d", ret, fileName, lineNo);
         }
     };
 

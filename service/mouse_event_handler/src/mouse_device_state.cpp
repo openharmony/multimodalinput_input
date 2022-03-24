@@ -78,7 +78,7 @@ void MouseDeviceState::MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE 
     if (iter == mouseBtnState_.end()) {
         auto ret = mouseBtnState_.insert(std::make_pair(btnCode, ((btnState == BUTTON_STATE_PRESSED) ? 1 : 0)));
         if (!ret.second) {
-            MMI_LOGE("Insert value failed, btnCode:%{public}d", btnCode);
+            MMI_HILOGE("Insert value failed, btnCode:%{public}d", btnCode);
         }
         return;
     }

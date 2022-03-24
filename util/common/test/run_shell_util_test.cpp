@@ -54,7 +54,7 @@ HWTEST_F(RunShellUtilTest, RunShellUtilTest_RunShellCommand_001, TestSize.Level1
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
     ASSERT_TRUE(runCommand.RunShellCommand(command, firstLog) == RET_OK);
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
-    MMI_LOGD("test runshellutilrqr2qrq2");
+    MMI_HILOGD("test runshellutilrqr2qrq2");
     std::vector<std::string> vLog;
     ASSERT_TRUE(runCommand.RunShellCommand(command, vLog) == RET_OK);
     ASSERT_FALSE(vLog.empty());
@@ -79,7 +79,7 @@ HWTEST_F(RunShellUtilTest, RunShellUtilTest_RunShellCommand_002, TestSize.Level1
         std::vector<std::string> firstLog;
         ASSERT_TRUE(runCommand.RunShellCommand(command, firstLog) == RET_OK);
         std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
-        MMI_LOGD("test runshellutilrqr2342342355qrq2");
+        MMI_HILOGD("test runshellutilrqr2342342355qrq2");
         std::vector<std::string> vLog;
         ASSERT_TRUE(runCommand.RunShellCommand(command, vLog) == RET_OK);
         ASSERT_FALSE(vLog.empty());
@@ -93,7 +93,7 @@ HWTEST_F(RunShellUtilTest, RunShellUtilTest_RunShellCommand_002, TestSize.Level1
     std::vector<std::string> firstLog;
     ASSERT_TRUE(runCommand.RunShellCommand(command, firstLog) == RET_OK);
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
-    MMI_LOGD("test runshellutilrqr21234www");
+    MMI_HILOGD("test runshellutilrqr21234www");
     std::vector<std::string> vLog;
     ASSERT_TRUE(runCommand.RunShellCommand(command, vLog) == RET_OK);
     ASSERT_FALSE(vLog.empty());
