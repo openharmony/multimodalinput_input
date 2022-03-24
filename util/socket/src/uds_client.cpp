@@ -232,7 +232,7 @@ void UDSClient::OnThread()
         } else {
             if (ConnectTo() < 0) {
                 MMI_HILOGW("Client reconnection failed, Try again after %{public}d ms",
-                         CLIENT_RECONNECT_COOLING_TIME);
+                           CLIENT_RECONNECT_COOLING_TIME);
                 std::this_thread::sleep_for(std::chrono::milliseconds(CLIENT_RECONNECT_COOLING_TIME));
                 continue;
             }
