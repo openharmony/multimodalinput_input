@@ -418,7 +418,7 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
     CHKPR(keyEvent_, ERROR_NULL_POINTER);
     std::vector<int32_t> pressedKeys = keyEvent_->GetPressedKeys();
     for (const int32_t& keyCode : pressedKeys) {
-        MMI_LOGI("Pressed keyCode:%{public}d", keyCode);
+        MMI_HILOGI("Pressed keyCode:%{public}d", keyCode);
     }
     pointerEvent->SetPressedKeys(pressedKeys);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
@@ -429,23 +429,23 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
 int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    MMI_LOGI("MouseEvent Normalization Results, PointerAction:%{public}d,PointerId:%{public}d,"
-             "SourceType:%{public}d,ButtonId:%{public}d,"
-             "VerticalAxisValue:%{public}lf,HorizontalAxisValue:%{public}lf",
-             pointerEvent->GetPointerAction(), pointerEvent->GetPointerId(), pointerEvent->GetSourceType(),
-             pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
-             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
+    MMI_HILOGI("MouseEvent Normalization Results, PointerAction:%{public}d,PointerId:%{public}d,"
+               "SourceType:%{public}d,ButtonId:%{public}d,"
+               "VerticalAxisValue:%{public}lf,HorizontalAxisValue:%{public}lf",
+               pointerEvent->GetPointerAction(), pointerEvent->GetPointerId(), pointerEvent->GetSourceType(),
+               pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
+               pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
     PointerEvent::PointerItem item;
     if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
         MMI_LOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
         return RET_ERR;
     }
-    MMI_LOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
-             "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
-             "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,Device:%{public}d",
-             item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
-             item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
-             item.GetDeviceId());
+    MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
+               "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
+               "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,Device:%{public}d",
+               item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
+               item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
+               item.GetDeviceId());
 
     eventDispatch_.HandlePointerEvent(pointerEvent);
     return RET_OK;

@@ -60,7 +60,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)
     CHKPV(inputDevice);
     for (const auto& item : inputDevice_) {
         if (item.second == inputDevice) {
-            MMI_LOGI("the device already exists");
+            MMI_HILOGI("the device already exists");
             return;
         }
     }
@@ -114,7 +114,7 @@ void InputDeviceManager::Detach(std::shared_ptr<IDeviceObserver> observer)
 
 void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice)
 {
-    MMI_LOGI("observers_ size:%{public}zu", observers_.size());
+    MMI_HILOGI("observers_ size:%{public}zu", observers_.size());
     for (auto observer = observers_.begin(); observer != observers_.end(); observer++) {
         (*observer)->UpdatePointerDevice(hasPointerDevice);
     }
@@ -126,7 +126,7 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevic
     CHKPR(inputDevice, INVALID_DEVICE_ID);
     for (const auto& item : inputDevice_) {
         if (item.second == inputDevice) {
-            MMI_LOGI("find input device id success");
+            MMI_HILOGI("find input device id success");
             return item.first;
         }
     }

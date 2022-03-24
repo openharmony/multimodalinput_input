@@ -50,8 +50,8 @@ int32_t GetDeviceNode::GetDeviceNodeName(const std::string &targetName, uint16_t
     }
     std::string nodeRootPath = "/dev/input/";
     deviceNode = nodeRootPath + iter->second[devIndex];
-    MMI_LOGI("%{public}s[%{public}d] --> %{public}s", targetName.c_str(), devIndex,
-             deviceNode.c_str());
+    MMI_HILOGI("%{public}s[%{public}d] --> %{public}s", targetName.c_str(), devIndex,
+               deviceNode.c_str());
 
     return RET_OK;
 }

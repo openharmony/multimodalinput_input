@@ -104,7 +104,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     CALL_LOG_ENTER;
     CHKPR(point, ERROR_NULL_POINTER);
     if (HandlePointerEventFilter(point)) {
-        MMI_LOGI("Pointer event Filter succeeded");
+        MMI_HILOGI("Pointer event Filter succeeded");
         return RET_OK;
     }
     if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {

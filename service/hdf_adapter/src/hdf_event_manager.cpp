@@ -196,7 +196,7 @@ HdfEventManager::~HdfEventManager()
 {
     uint32_t ret = inputInterface_->iInputReporter->UnregisterHotPlugCallback();
     if (ret == INPUT_SUCCESS) {
-        MMI_LOGI("%{public}s:%{public}d INPUT_SUCCESS", __func__, __LINE__);
+        MMI_HILOGI("%{public}s:%{public}d INPUT_SUCCESS", __func__, __LINE__);
     } else {
         MMI_LOGE("%{public}s:%{public}d INPUT_ERROR", __func__, __LINE__);
     }
@@ -285,7 +285,7 @@ void HdfEventManager::SetupCallback()
     if (inputInterface_) {
         ret = inputInterface_->iInputReporter->RegisterHotPlugCallback(&hostPlugCallBack_);
         if (ret == INPUT_SUCCESS) {
-            MMI_LOGI("%{public}s:%{public}d RegisterHotPlugCallback INPUT_SUCCESS", __func__, __LINE__);
+            MMI_HILOGI("%{public}s:%{public}d RegisterHotPlugCallback INPUT_SUCCESS", __func__, __LINE__);
         } else {
             MMI_LOGE("%{public}s:%{public}d RegisterHotPlugCallback INPUT_ERROR", __func__, __LINE__);
         }
@@ -294,7 +294,7 @@ void HdfEventManager::SetupCallback()
     if (injectInterface_) {
         ret = injectInterface_->iInputReporter->RegisterHotPlugCallback(&hostPlugCallBack_);
         if (ret == INPUT_SUCCESS) {
-            MMI_LOGI("%{public}s:%{public}d injectInterface_ RegisterHotPlugCallback INPUT_SUCCESS",
+            MMI_HILOGI("%{public}s:%{public}d injectInterface_ RegisterHotPlugCallback INPUT_SUCCESS",
                 __func__, __LINE__);
         } else {
             MMI_LOGE("%{public}s:%{public}d injectInterface_ RegisterHotPlugCallback INPUT_ERROR",
@@ -321,7 +321,7 @@ void HdfEventManager::AddDevice(uint32_t devIndex, uint32_t devType)
     }
     ret = inputInterface_->iInputReporter->RegisterReportCallback(devIndex, &eventcallback);
     if (ret == INPUT_SUCCESS) {
-        MMI_LOGI("%{public}s:%{public}d RegisterReportCallback eventcallback INPUT_SUCCESS"
+        MMI_HILOGI("%{public}s:%{public}d RegisterReportCallback eventcallback INPUT_SUCCESS"
             "devindex:%{public}u, devType:%{public}u", __func__, __LINE__, devIndex, devType);
     } else {
         MMI_LOGE("%{public}s:%{public}d RegisterReportCallback eventcallback INPUT_ERROR"
@@ -340,7 +340,7 @@ bool HdfEventManager::OpenHdfDevice(uint32_t devIndex, bool oper)
         ret = inputInterface_->iInputManager->CloseInputDevice(devIndex);
     }
     if (ret == 0) {
-        MMI_LOGI("%{public}s:%{public}d Info: device success!", __func__, __LINE__);
+        MMI_HILOGI("%{public}s:%{public}d Info: device success!", __func__, __LINE__);
         return true;
     }
 
@@ -371,7 +371,7 @@ int32_t HdfEventManager::DeviceRemoveHandle(uint32_t devIndex, uint32_t devType)
     if (devIndex < MAX_INPUT_DEVICE_COUNT) {
         uint32_t ret = m_globleThis->inputInterface_->iInputReporter->UnregisterReportCallback(devIndex);
         if (ret == INPUT_SUCCESS) {
-            MMI_LOGI("%{public}s:%{public}d REMOVE_SUCCESS devindex:%{public}u,devType:%{public}u",
+            MMI_HILOGI("%{public}s:%{public}d REMOVE_SUCCESS devindex:%{public}u,devType:%{public}u",
                 __func__, __LINE__, devIndex, devType);
         } else {
             MMI_LOGE("%{public}s:%{public}d REMOVE_ERROR devindex:%{public}u,devType:%{public}u",

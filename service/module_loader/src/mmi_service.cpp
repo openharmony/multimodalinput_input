@@ -57,7 +57,7 @@ void CheckDefineOutput(const char* fmt, Ts... args)
     }
 
     KMSG_LOGI("%s", buf);
-    MMI_LOGI("%{public}s", buf);
+    MMI_HILOGI("%{public}s", buf);
 }
 
 static void CheckDefine()
@@ -247,7 +247,7 @@ void MMIService::OnConnected(SessionPtr s)
 {
     CHKPV(s);
     int32_t fd = s->GetFd();
-    MMI_LOGI("fd:%{public}d", fd);
+    MMI_HILOGI("fd:%{public}d", fd);
 }
 
 void MMIService::OnDisconnected(SessionPtr s)
@@ -260,7 +260,7 @@ void MMIService::OnDisconnected(SessionPtr s)
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)
 {
     CALL_LOG_ENTER;
-    MMI_LOGI("enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
+    MMI_HILOGI("enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
 
     toReturnClientFd = INVALID_SOCKET_FD;
     int32_t serverFd = INVALID_SOCKET_FD;
@@ -272,7 +272,7 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
         return RET_ERR;
     }
 
-    MMI_LOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
+    MMI_HILOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
         programName.c_str(), moduleType);
 
     return RET_OK;
@@ -282,7 +282,7 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
 {
     sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
     CHKPR(req, RET_ERR);
-    MMI_LOGIK("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
+    MMI_HILOGIK("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
 
     int32_t clientFd = INVALID_SOCKET_FD;
     int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
@@ -292,12 +292,12 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
         return RET_ERR;
     }
 
-    MMI_LOGI("call AllocSocketFd success");
+    MMI_HILOGI("call AllocSocketFd success");
 
     reply.WriteInt32(RET_OK);
     reply.WriteFileDescriptor(clientFd);
 
-    MMI_LOGI("send clientFd to client, clientFd = %d", clientFd);
+    MMI_HILOGI("send clientFd to client, clientFd = %d", clientFd);
     close(clientFd);
     return RET_OK;
 }
@@ -324,7 +324,7 @@ void MMIService::OnThread()
         MMI_LOGE("The tid is error, errCode:%{public}d", VAL_NOT_EXP);
         return;
     }
-    MMI_LOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
+    MMI_HILOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
 
     int32_t count = 0;
     constexpr int32_t timeOut = 1;
@@ -357,7 +357,7 @@ void MMIService::OnThread()
         }
         OnTimer();
     }
-    MMI_LOGI("Main worker thread stop. tid:%{public}" PRId64 "", tid);
+    MMI_HILOGI("Main worker thread stop. tid:%{public}" PRId64 "", tid);
 }
 
 bool MMIService::InitSignalHandler()

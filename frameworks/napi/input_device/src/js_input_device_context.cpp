@@ -120,7 +120,7 @@ napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info 
     JsInputDeviceContext *jsContext = new (std::nothrow) JsInputDeviceContext();
     CHKPP(jsContext);
     status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void* data, void* hin) {
-        MMI_LOGI("jsvm ends");
+        MMI_HILOGI("jsvm ends");
         JsInputDeviceContext *context = (JsInputDeviceContext*)data;
         delete context;
     }, nullptr, nullptr);

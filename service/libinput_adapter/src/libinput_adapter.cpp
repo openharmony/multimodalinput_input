@@ -77,7 +77,7 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
     },
     .close_restricted = [](int32_t fd, void *user_data)
     {
-        MMI_LOGI("libinput .close_restricted fd:%{public}d", fd);
+        MMI_HILOGI("libinput .close_restricted fd:%{public}d", fd);
         close(fd);
     },
 };
@@ -123,7 +123,7 @@ void LibinputAdapter::EventDispatch(struct epoll_event& ev)
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int*>(ev.data.ptr);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGF("epoll unrecoverable error,"
+        MMI_HILOGF("epoll unrecoverable error,"
             "The service must be restarted. fd:%{public}d", fd);
         free(ev.data.ptr);
         ev.data.ptr = nullptr;

@@ -218,7 +218,7 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
         return;
     }
     if ((downEventId_ < 0) || (lastPointerEvent_ == nullptr)) {
-        MMI_LOGI("No touch event or press event without a previous finger is not handled");
+        MMI_HILOGI("No touch event or press event without a previous finger is not handled");
         return;
     }
     if (downEventId_ > eventId) {

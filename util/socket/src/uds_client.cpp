@@ -172,7 +172,7 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
 {
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGI("ev.events:0x%{public}x,fd:%{public}d same as fd_:%{public}d", ev.events, fd, fd_);
+        MMI_HILOGI("ev.events:0x%{public}x,fd:%{public}d same as fd_:%{public}d", ev.events, fd, fd_);
         OnDisconnected();
         struct epoll_event event = {};
         EpollCtl(fd, EPOLL_CTL_DEL, event);

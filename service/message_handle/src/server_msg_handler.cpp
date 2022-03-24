@@ -112,7 +112,7 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
 #ifdef OHOS_BUILD_HDF
 int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
 {
-    MMI_LOGI("hdfinject server access hditools info");
+    MMI_HILOGI("hdfinject server access hditools info");
     CHKPR(sess, ERROR_NULL_POINTER);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     const int32_t processingCode = MMIHdiInject->ManageHdfInject(sess, pkt);
@@ -425,7 +425,7 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
     std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(deviceId);
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE);
     if (inputDevice == nullptr) {
-        MMI_LOGI("Input device not found");
+        MMI_HILOGI("Input device not found");
         int32_t id = -1;
         std::string name = "null";
         int32_t deviceType = -1;

@@ -344,7 +344,7 @@ void AbilityLaunchManager::LaunchAbility(ShortcutKey key)
 void ShortcutKey::Print() const
 {
     for (const auto &prekey: preKeys) {
-        MMI_LOGI("eventkey matched, preKey:%{public}d", prekey);
+        MMI_HILOGI("eventkey matched, preKey:%{public}d", prekey);
     }
     MMI_LOGD("eventkey matched, finalKey:%{public}d,bundleName:%{public}s",
         finalKey, ability.bundleName.c_str());

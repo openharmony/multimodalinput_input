@@ -63,7 +63,7 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
         return RET_ERR;
     }
 
-    MMI_LOGI("AllocSocketPair success. socketFd_:%{public}d", socketFd_);
+    MMI_HILOGI("AllocSocketPair success. socketFd_:%{public}d", socketFd_);
     return RET_OK;
 }
 
@@ -117,7 +117,7 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
         MMI_LOGE("get multimodalinput service fail");
         return false;
     }
-    MMI_LOGI("get multimodalinput service successful");
+    MMI_HILOGI("get multimodalinput service successful");
     return true;
 }
 
