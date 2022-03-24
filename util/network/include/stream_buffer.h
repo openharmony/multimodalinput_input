@@ -113,7 +113,7 @@ template<typename T>
 StreamBuffer &StreamBuffer::operator>>(T &data)
 {
     if (!Read(data)) {
-        MMI_LOGW("Read data failed");
+        MMI_HILOGW("Read data failed");
     }
     return *this;
 }
@@ -122,7 +122,7 @@ template<typename T>
 StreamBuffer &StreamBuffer::operator<<(const T &data)
 {
     if (!Write(data)) {
-        MMI_LOGW("Write data failed");
+        MMI_HILOGW("Write data failed");
     }
     return *this;
 }

@@ -53,7 +53,7 @@ constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
 #define MMI_LOGI(fmt, ...) do { \
     OHOS::HiviewDFX::HiLog::Info(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
-#define MMI_LOGW(fmt, ...) do { \
+#define MMI_HILOGW(fmt, ...) do { \
     OHOS::HiviewDFX::HiLog::Warn(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define MMI_LOGE(fmt, ...) do { \
@@ -73,9 +73,9 @@ constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
     MMI_LOGI(fmt, ##__VA_ARGS__); \
 } while (0)
 
-#define MMI_LOGWK(fmt, ...) do { \
+#define MMI_HILOGWK(fmt, ...) do { \
     KMSG_LOGW(fmt, ##__VA_ARGS__); \
-    MMI_LOGW(fmt, ##__VA_ARGS__); \
+    MMI_HILOGW(fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_LOGEK(fmt, ...) do { \

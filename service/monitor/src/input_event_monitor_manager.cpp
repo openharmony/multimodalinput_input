@@ -58,7 +58,7 @@ void InputEventMonitorManager::RemoveInputEventMontior(SessionPtr session, int32
     auto it = std::find(monitors_.begin(), monitors_.end(), monitorItem);
     if (it != monitors_.end()) {
         monitors_.erase(it);
-        MMI_LOGW("EventType:%{public}d,fd:%{public}d remove from server", eventType, session->GetFd());
+        MMI_HILOGW("EventType:%{public}d,fd:%{public}d remove from server", eventType, session->GetFd());
     }
 }
 

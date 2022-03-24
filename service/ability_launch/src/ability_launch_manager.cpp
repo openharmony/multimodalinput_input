@@ -181,7 +181,7 @@ bool AbilityLaunchManager::PackageAbility(const json &jsonAbility, Ability &abil
         }
         auto ret = ability.params.emplace(params[i]["key"], params[i]["value"]);
         if (!ret.second) {
-            MMI_LOGW("Emplace to failed");
+            MMI_HILOGW("Emplace to failed");
         }
     }
     return true;
