@@ -21,8 +21,10 @@
 
 #include "iremote_object.h"
 #include "nocopyable.h"
+#include "singleton.h"
 #include "system_ability.h"
 
+#include "device_observer.h"
 #include "input_event_handler.h"
 #include "multimodal_input_connect_stub.h"
 #include "libinput_adapter.h"
@@ -38,9 +40,7 @@ namespace MMI {
 
 enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class MMIService : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
-public:
-    MMIService();
-    virtual ~MMIService();
+    DECLARE_DELAYED_SINGLETON(MMIService);
     DECLEAR_SYSTEM_ABILITY(MMIService);
     DISALLOW_COPY_AND_MOVE(MMIService);
 
@@ -74,7 +74,9 @@ private:
     std::thread t_;
 
     LibinputAdapter libinputAdapter_;
+    UDSServer udsServer_;
     ServerMsgHandler sMsgHandler_;
+    std::shared_ptr<IDeviceObserver> observer_;
 };
 } // namespace MMI
 } // namespace OHOS

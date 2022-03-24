@@ -20,6 +20,8 @@ namespace OHOS {
 namespace MMI {
 class IDeviceObserver {
 public:
+    virtual void DrawPointer(int32_t, int32_t, int32_t) = 0;
+    virtual void OnDisplayInfo(int32_t, int32_t, int32_t) = 0;
     virtual void UpdatePointerDevice(bool) = 0;
 };
 
