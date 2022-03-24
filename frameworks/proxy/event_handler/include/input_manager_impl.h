@@ -67,7 +67,7 @@ public:
 private:
     int32_t PackPhysicalDisplay(NetPacket &pkt);
     int32_t PackLogicalDisplay(NetPacket &pkt);
-    void PrintDisplayDebugInfo();
+    void PrintDisplayInfo();
     void SendDisplayInfo();
 
 private:

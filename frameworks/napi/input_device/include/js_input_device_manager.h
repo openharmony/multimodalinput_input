@@ -31,5 +31,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // JS_INPUT_DEVICE_MANAGER_H

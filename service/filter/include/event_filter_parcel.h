@@ -34,5 +34,4 @@ struct PointerEventParcel final : public Parcelable {
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // EVENT_FILTER_PARCEL_H

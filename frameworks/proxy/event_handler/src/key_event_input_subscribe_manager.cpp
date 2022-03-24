@@ -15,8 +15,7 @@
 
 #include "key_event_input_subscribe_manager.h"
 
-#include "bytrace.h"
-
+#include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "standardized_event_manager.h"
@@ -98,9 +97,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
         MMI_LOGE("Leave, the subscribe id is less than 0");
         return RET_ERR;
     }
-    int32_t keyId = event->GetId();
-    std::string keyEventString = "keyEventSubscribe";
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
+    BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
     for (const auto& subscriber : subscribeInfos_) {
         if (subscriber.GetSubscribeId() == subscribeId) {
             subscriber.GetCallback()(event);

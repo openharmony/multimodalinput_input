@@ -25,7 +25,7 @@
 
 #include "input_event_handler.h"
 #include "multimodal_input_connect_stub.h"
-#include "s_input.h"
+#include "libinput_adapter.h"
 #include "server_msg_handler.h"
 #include "uds_server.h"
 
@@ -57,7 +57,6 @@ protected:
     virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) override;
 
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd) override;
-    bool ChkAuthFd(int32_t fd) const;
 
     bool InitLibinputService();
     bool InitService();
@@ -74,9 +73,8 @@ private:
     std::mutex mu_;
     std::thread t_;
 
-    SInput input_;
+    LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
-    std::set<int32_t> authFds_;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -29,4 +29,3 @@ void EventFilterDeathRecipient::OnRemoteDied(const OHOS::wptr<OHOS::IRemoteObjec
 }
 } // namespace MMI
 } // namespace OHOS
-

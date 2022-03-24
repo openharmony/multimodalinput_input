@@ -19,7 +19,7 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "libmmi_util.h"
+#include "define_multimodal.h"
 #include "uds_server.h"
 
 namespace OHOS {

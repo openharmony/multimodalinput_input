@@ -20,7 +20,7 @@
 #include "input_manager_impl.h"
 #include "interceptor_manager.h"
 #include "key_event_input_subscribe_manager.h"
-#include "libmmi_util.h"
+#include "define_multimodal.h"
 #include "multimodal_event_handler.h"
 
 namespace OHOS {

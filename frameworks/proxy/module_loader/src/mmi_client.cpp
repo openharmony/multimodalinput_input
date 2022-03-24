@@ -134,4 +134,3 @@ int32_t MMIClient::Socket()
 }
 } // namespace MMI
 } // namespace OHOS
-

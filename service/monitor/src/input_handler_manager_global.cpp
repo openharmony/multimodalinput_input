@@ -382,4 +382,3 @@ void InputHandlerManagerGlobal::InterceptorCollection::OnSessionLost(SessionPtr 
 }
 } // namespace MMI
 } // namespace OHOS
-

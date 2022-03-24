@@ -26,18 +26,18 @@
 #include "singleton.h"
 #include "window.h"
 
-#include "../../../common/include/device_observer.h"
+#include "device_observer.h"
 #include "struct_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
-class PointerDrawingManager : public DelayedSingleton<PointerDrawingManager>, public DeviceObserver {
+class PointerDrawingManager : public DelayedSingleton<PointerDrawingManager>, public IDeviceObserver {
 public:
     PointerDrawingManager();
     ~PointerDrawingManager();
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
     void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY);
-    void TellDisplayInfo(int32_t displayId, int32_t width, int32_t height);
+    void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height);
     void UpdatePointerDevice(bool hasPointerDevice);
     bool Init();
 
@@ -62,6 +62,8 @@ private:
     int32_t displayWidth_ = 0;
     int32_t displayHeight_ = 0;
     bool hasPointerDevice_ = false;
+    int32_t lastGlobalX_ = -1;
+    int32_t lastGlobalY_ = -1;
 };
 
 #define PointerDrawMgr PointerDrawingManager::GetInstance()

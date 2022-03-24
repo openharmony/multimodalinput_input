@@ -18,7 +18,6 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include "event_dump.h"
 #include "pointer_drawing_manager.h"
 #include "util.h"
 #include "util_ex.h"
@@ -32,19 +31,13 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputW
 InputWindowsManager::InputWindowsManager() {}
 
 InputWindowsManager::~InputWindowsManager() {}
-/*
- * FullName:  Init
- * Returns:   bool
- * Qualifier: init windows manager server
- */
+
 bool InputWindowsManager::Init(UDSServer& udsServer)
 {
-    // save server handle
     udsServer_ = &udsServer;
     return true;
 }
 
-/*********************************新框架接口添加****************************/
 int32_t InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent> inputEvent)
 {
     CHKPR(inputEvent, ERROR_NULL_POINTER);
@@ -109,30 +102,24 @@ void InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInf
     const std::vector<LogicalDisplayInfo> &logicalDisplays)
 {
     CALL_LOG_ENTER;
-    physicalDisplays_.clear();
-    logicalDisplays_.clear();
-    windowInfos_.clear();
-
     physicalDisplays_ = physicalDisplays;
     logicalDisplays_ = logicalDisplays;
-    size_t numLogicalDisplay = logicalDisplays.size();
-    for (size_t i = 0; i < numLogicalDisplay; ++i) {
-        size_t numWindow = logicalDisplays[i].windowsInfo.size();
-        for (size_t j = 0; j < numWindow; j++) {
-            WindowInfo myWindow = logicalDisplays[i].windowsInfo[j];
-            auto iter = windowInfos_.insert(std::pair<int32_t, WindowInfo>(myWindow.id, myWindow));
+    windowInfos_.clear();
+    for (const auto &item : logicalDisplays) {
+        for (const auto &window : item.windowsInfo) {
+            auto iter = windowInfos_.insert(std::pair<int32_t, WindowInfo>(window.id, window));
             if (!iter.second) {
-                MMI_LOGE("Insert value failed, Window:%{public}d", myWindow.id);
+                MMI_LOGE("Insert value failed, Window:%{public}d", window.id);
             }
         }
     }
     if (!logicalDisplays.empty()) {
-        PointerDrawMgr->TellDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
+        PointerDrawMgr->OnDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
     }
-    PrintDisplayDebugInfo();
+    PrintDisplayInfo();
 }
 
-void InputWindowsManager::PrintDisplayDebugInfo()
+void InputWindowsManager::PrintDisplayInfo()
 {
     MMI_LOGD("physicalDisplays,num:%{public}zu", physicalDisplays_.size());
     for (const auto &item : physicalDisplays_) {
@@ -166,21 +153,6 @@ void InputWindowsManager::PrintDisplayDebugInfo()
             item.second.hotZoneTopLeftY, item.second.hotZoneWidth, item.second.hotZoneHeight,
             item.second.displayId, item.second.agentWindowId, item.second.winTopLeftX, item.second.winTopLeftY);
     }
-}
-
-bool InputWindowsManager::TouchPadPointToDisplayPoint_2(struct libinput_event_touch* touch,
-    int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
-{
-    CHKPF(touch);
-    if (screensInfo_ != nullptr) {
-        if ((*screensInfo_) != nullptr)
-        logicalDisplayId = (*screensInfo_)->screenId;
-        logicalX = static_cast<int32_t>(libinput_event_touch_get_x_transformed(touch, (*screensInfo_)->width));
-        logicalY = static_cast<int32_t>(libinput_event_touch_get_y_transformed(touch, (*screensInfo_)->height));
-        return true;
-    }
-    MMI_LOGE("ScreensInfo_ is null");
-    return false;
 }
 
 PhysicalDisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id)
@@ -355,11 +327,6 @@ const std::vector<LogicalDisplayInfo>& InputWindowsManager::GetLogicalDisplayInf
     return logicalDisplays_;
 }
 
-const std::map<int32_t, WindowInfo>& InputWindowsManager::GetWindowInfo() const
-{
-    return windowInfos_;
-}
-
 bool InputWindowsManager::IsInsideWindow(int32_t x, int32_t y, const WindowInfo &info) const
 {
     return (x >= info.hotZoneTopLeftX) && (x <= (info.hotZoneTopLeftX + info.hotZoneWidth)) &&
@@ -409,33 +376,6 @@ LogicalDisplayInfo* InputWindowsManager::GetLogicalDisplayId(int32_t displayId)
         }
     }
     return nullptr;
-}
-
-void InputWindowsManager::AdjustCoordinate(double &coordinateX, double &coordinateY)
-{
-    if (coordinateX < 0) {
-        coordinateX = 0;
-    }
-
-    if (coordinateY < 0) {
-        coordinateY = 0;
-    }
-
-    if (logicalDisplays_.empty()) {
-        return;
-    }
-
-    if (coordinateX > logicalDisplays_[0].width) {
-        coordinateX = logicalDisplays_[0].width;
-    }
-    if (coordinateY > logicalDisplays_[0].height) {
-        coordinateY = logicalDisplays_[0].height;
-    }
-}
-
-int32_t InputWindowsManager::UpdateMouseTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    return RET_ERR;
 }
 
 int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent)
@@ -497,11 +437,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     return fd;
 }
 
-int32_t InputWindowsManager::UpdateTouchScreenTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    return RET_ERR;
-}
-
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -560,12 +495,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
              touchWindow->pid, fd, globalX, globalY, localX, localY,
              pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
     return fd;
-}
-
-int32_t InputWindowsManager::UpdateTouchPadTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CALL_LOG_ENTER;
-    return RET_ERR;
 }
 
 int32_t InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent)

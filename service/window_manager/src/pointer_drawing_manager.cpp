@@ -23,7 +23,7 @@
 #include "image_utils.h"
 #include "pixel_map.h"
 
-#include "libmmi_util.h"
+#include "define_multimodal.h"
 #include "input_device_manager.h"
 #include "mmi_log.h"
 
@@ -47,6 +47,8 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int3
     CALL_LOG_ENTER;
     MMI_LOGD("display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
     FixCursorPosition(globalX, globalY);
+    lastGlobalX_ = globalX;
+    lastGlobalY_ = globalY;
     if (pointerWindow_ != nullptr) {
         pointerWindow_->MoveTo(globalX, globalY);
         pointerWindow_->Show();
@@ -210,7 +212,7 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
     return pixelMap;
 }
 
-void PointerDrawingManager::TellDisplayInfo(int32_t displayId, int32_t width, int32_t height) 
+void PointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int32_t height) 
 {
     CALL_LOG_ENTER;
     hasDisplay_ = true;
@@ -231,7 +233,11 @@ void PointerDrawingManager::DrawManager()
 {
     if (hasDisplay_ && hasPointerDevice_ && pointerWindow_ == nullptr) {
         MMI_LOGD("draw pointer begin");
-        DrawPointer(displayId_, displayWidth_/2, displayHeight_/2);
+        if (lastGlobalX_ == -1 || lastGlobalY_ == -1) {
+            DrawPointer(displayId_, displayWidth_/2, displayHeight_/2);
+            return;
+        }
+        DrawPointer(displayId_, lastGlobalX_, lastGlobalY_);
         return;
     }
 

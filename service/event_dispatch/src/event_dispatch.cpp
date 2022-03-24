@@ -23,6 +23,7 @@
 #include "hisysevent.h"
 
 #include "ability_launch_manager.h"
+#include "bytrace_adapter.h"
 #include "error_multimodal.h"
 #include "event_filter_wrap.h"
 #include "input_event_data_transformation.h"
@@ -98,20 +99,6 @@ bool EventDispatch::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point
     return EventFilterWrap::GetInstance().HandlePointerEventFilter(point);
 }
 
-void EventDispatch::HandlePointerEventTrace(const std::shared_ptr<PointerEvent> &point)
-{
-    if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-        int32_t pointerId = point->GetId();
-        std::string pointerEvent = "OnEventPointer";
-        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, pointerId);
-    }
-    if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        int32_t touchId = point->GetId();
-        std::string touchEvent = "OnEventTouch";
-        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, touchId);
-    }
-}
-
 int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 {
     CALL_LOG_ENTER;
@@ -121,7 +108,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         return RET_OK;
     }
     if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
-        HandlePointerEventTrace(point);
+        BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
         MMI_LOGD("Interception and monitor succeeded");
         return RET_OK;
     }
@@ -132,7 +119,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     }
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(point, pkt);
-    HandlePointerEventTrace(point);
+    BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
     auto udsServer = InputHandler->GetUDSServer();
     if (udsServer == nullptr) {
         MMI_LOGE("UdsServer is a nullptr");
@@ -161,39 +148,6 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     return RET_OK;
 }
 
-void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler handlerType)
-{
-    CALL_LOG_ENTER;
-    int32_t keyCode = key->GetKeyCode();
-    std::string checkKeyCode;
-    switch (handlerType) {
-        case KEY_INTERCEPT_EVENT: {
-            checkKeyCode = "Intercept keycode=" + std::to_string(keyCode);
-            break;
-        }
-        case KEY_LAUNCH_EVENT: {
-            checkKeyCode = "Launch keycode=" + std::to_string(keyCode);
-            break;
-        }
-        case KEY_SUBSCRIBE_EVENT: {
-            checkKeyCode = "Subscribe keycode=" + std::to_string(keyCode);
-            break;
-        }
-        case KEY_DISPATCH_EVENT: {
-            checkKeyCode = "Dispatch keycode=" + std::to_string(keyCode);
-            break;
-        }
-        default: {
-            MMI_LOGW("Unknow Event Handler type, type:%{public}d", handlerType);
-            break;
-        }
-    }
-    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, checkKeyCode);
-    int32_t keyId = key->GetId();
-    std::string keyEventString = "OnKeyEvent";
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
-}
-
 int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
 {
     CALL_LOG_ENTER;
@@ -202,18 +156,18 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
         if (InterceptorMgrGbl.OnKeyEvent(key)) {
             MMI_LOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
                 key->GetKeyCode());
-            OnKeyboardEventTrace(key, KEY_INTERCEPT_EVENT);
+            BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_INTERCEPT_EVENT);
             return RET_OK;
         }
     }
     if (AbilityMgr->CheckLaunchAbility(key)) {
         MMI_LOGD("The keyEvent start launch an ability, keyCode:%{public}d", key->GetKeyCode());
-        OnKeyboardEventTrace(key, KEY_LAUNCH_EVENT);
+        BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_LAUNCH_EVENT);
         return RET_OK;
     }
     if (KeyEventSubscriber_.SubscribeKeyEvent(key)) {
         MMI_LOGD("Subscribe keyEvent filter success. keyCode:%{public}d", key->GetKeyCode());
-        OnKeyboardEventTrace(key, KEY_SUBSCRIBE_EVENT);
+        BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
         return RET_OK;
     }
     auto fd = WinMgr->UpdateTarget(key);
@@ -247,7 +201,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
 
     NetPacket pkt(MmiMessageId::ON_KEYEVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
-    OnKeyboardEventTrace(key, KEY_DISPATCH_EVENT);
+    BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_DISPATCH_EVENT);
     pkt << fd;
     if (!udsServer.SendMsg(fd, pkt)) {
         MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);

@@ -76,8 +76,6 @@ bool  VirtualDevice::ViewDirectory(std::vector<std::string>& fileList)
     while ((ptr = readdir(dir)) != nullptr) {
         if (ptr->d_type == IS_FILE_JUDGE) {
             fileList.push_back(ptr->d_name);
-        } else {
-            continue;
         }
     }
     closedir(dir);
@@ -88,17 +86,16 @@ bool VirtualDevice::SyncSymbolFile()
 {
     std::vector<std::string> tempList;
     if (!ViewDirectory(tempList)) {
+        printf("Failed to find file ");
         return false;
     }
-
-    std::vector<std::string> res;
     for (const auto &item : tempList) {
         std::string::size_type pos = item.find("_");
-        res.push_back(item.substr(0, pos));
-    }
-
-    for (const auto &item : res) {
-        char temp[32] = { 0 };
+        if (pos < 0) {
+            printf("Failed to create file");
+            return false;
+        }
+        char temp[32] = {};
         std::string processName;
         std::string procressPath = "/proc/" + item + "/";
         DIR* dir = opendir(procressPath.c_str());
@@ -120,6 +117,7 @@ bool VirtualDevice::SyncSymbolFile()
                 std::string removeFile = "find /data/symbol/ -name " + item + "* | xargs rm";
                 system(removeFile.c_str());
             }
+            closedir(dir);
         }
     }
     return true;
@@ -171,6 +169,7 @@ bool VirtualDevice::SetAbsResolution(const std::string deviceName)
         g_absTemp_.absinfo.resolution = FINGERABSRANGE;
         absInit_.push_back(g_absTemp_);
     } else {
+        printf("Not devide:deviceName:%s", deviceName.c_str());
         return false;
     }
     for (const auto &item : absInit_) {
@@ -208,6 +207,7 @@ bool VirtualDevice::SetPhys(const std::string deviceName)
     phys.append(deviceType).append(g_pid).append("/").append(g_pid);
 
     if (ioctl(fd_, UI_SET_PHYS, phys.c_str()) < 0) {
+        printf("Failed to UI_SET_PHYS %s", __func__);
         return false;
     }
     return true;
@@ -217,11 +217,12 @@ bool VirtualDevice::SetUp()
 {
     fd_ = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
     if (fd_ < 0) {
-        printf("Failed to open uinput %s", __func__);
+        printf("Failed to open uinput %s, fd:%d", __func__, fd_);
         return false;
     }
 
     if (strncpy_s(dev_.name, sizeof(dev_.name), deviceName_.c_str(), deviceName_.size()) != 0) {
+        printf("Failed to device name copy %s", dev_.name);
         return false;
     };
     dev_.id.bustype = busTtype_;
@@ -245,8 +246,7 @@ bool VirtualDevice::SetUp()
         return false;
     }
     if (ioctl(fd_, UI_DEV_CREATE) < 0) {
-        printf("fd = %d,ioctl(fd_, UI_DEV_CREATE) = %d", fd_, ioctl(fd_, UI_DEV_CREATE));
-        printf("Unable to create input device : %s", __func__);
+        printf("fd:%d, Unable to create input device:%s", fd_, __func__);
         return false;
     }
     return true;
@@ -389,7 +389,7 @@ bool VirtualDevice::CreateHandle(const std::string deviceArgv)
 
 bool VirtualDevice::AddDevice(const std::vector<std::string>& fileList)
 {
-    if (fileList.size() == MAX_PARAMETER_NUMBER_FOR_ADD_DEL) {
+    if (fileList.size() == MAXDELPARAMETER) {
         printf("Invaild Input Para, Plase Check the validity of the para");
         return false;
     }
@@ -421,40 +421,37 @@ bool VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
     bool result = SelectDevice(alldevice);
     if (!result) {
         return false;
-    } else {
-        if (closePid.compare("all_") == 0) {
-            CloseAllDevice(alldevice);
+    }
+    if (closePid.compare("all_") == 0) {
+        CloseAllDevice(alldevice);
+        return true;
+    }
+    for (auto it : alldevice) {
+        if (it.find(closePid) == 0) {
+            kill(atoi(it.c_str()), SIGKILL);
+            it.insert(0, g_folderpath.c_str());
+            const int32_t ret = remove(it.c_str());
+            if (ret == -1) {
+                printf("remove file fail. file name: %s, errno: %d.\n", it.c_str(), errno);
+            }
             return true;
         }
-        for (auto it : alldevice) {
-            if (it.find(closePid) == 0) {
-                kill(atoi(it.c_str()), SIGKILL);
-                it.insert(0, g_folderpath.c_str());
-                const int32_t ret = remove(it.c_str());
-                if (ret == -1) {
-                    printf("remove file fail. file name: %s, errno: %d.\n", it.c_str(), errno);
-                }
-                return true;
-            } else {
-                continue;
-            }
-        }
-        printf("Device shutdown failed! The PID format is incorrect");
-        return false;
     }
+    printf("Device shutdown failed! The PID format is incorrect");
+    return false;
 }
 
 bool VirtualDevice::FindDevice(std::vector<std::string> argvList)
 {
     SyncSymbolFile();
-    if (argvList == "start") {
+    if (argvList[1] == "start") {
         bool result = AddDevice(argvList);
         if (!result) {
             printf("Failed to create device");
             return false;
         }
         return true;
-    } else if (argvList == "list") {
+    } else if (argvList[1] == "list") {
         bool result = SelectDevice(argvList);
         if (!result) {
             return false;
@@ -468,7 +465,7 @@ bool VirtualDevice::FindDevice(std::vector<std::string> argvList)
             }
             return false;
         }
-    } else if (argvList == "close") {
+    } else if (argvList[1] == "close") {
         bool result = CloseDevice(argvList);
         if (!result) {
             return false;
