@@ -72,12 +72,31 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
         MMI_LOGE("fd_ is less than 0");
         return false;
     }
-    ssize_t ret = write(fd_, static_cast<const void *>(buf), size);
-    if (ret < 0) {
-        MMI_LOGE("SendMsg write errCode:%{public}d,return %{public}zd", MSG_SEND_FAIL, ret);
-        return false;
+    
+    int32_t retryTimes = 32;
+    while (size > 0 && retryTimes > 0) {
+        retryTimes--;
+        auto count = send(fd_, buf, size, MSG_DONTWAIT | MSG_NOSIGNAL);
+        if (count < 0) {
+            if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
+                MMI_HILOGW("send msg failed, errno:%{public}d", errno);
+                continue;
+            }
+            MMI_LOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
+            return false;
+        }
+
+        size_t ucount = static_cast<size_t>(count);
+        if (ucount >= size) {
+            return true;
+        }
+        size -= ucount;
+        buf += ucount;
+        int32_t sleepTime = 10000;
+        usleep(sleepTime);
     }
-    return true;
+    MMI_LOGE("send msg failed");
+    return false;
 }
 
 bool UDSClient::SendMsg(const NetPacket& pkt) const
