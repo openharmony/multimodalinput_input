@@ -342,7 +342,7 @@ int32_t ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetP
         return PACKET_READ_FAIL;
     }
     MMI_HILOGD("client receive the msg from server: pointId:%{public}d,pid:%{public}d",
-             pointerEvent->GetPointerId(), pid);
+               pointerEvent->GetPointerId(), pid);
     return InterceptorMgr.OnPointerEvent(pointerEvent, id);
 }
 
