@@ -48,14 +48,14 @@ void InputEvent::Reset()
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
         actionTime_ = 0;
     }
-    id_ = DEFALUTID;
+    id_ = -1;
     actionTime_ = (ts.tv_sec * 1000000 + (ts.tv_nsec / 1000));
     action_ = ACTION_UNKNOWN;
     actionStartTime_ = actionTime_;
-    deviceId_ = DEFALUTID;
-    targetDisplayId_ = DEFALUTID;
-    targetWindowId_ = DEFALUTID;
-    agentWindowId_ = DEFALUTID;
+    deviceId_ = -1;
+    targetDisplayId_ = -1;
+    targetWindowId_ = -1;
+    agentWindowId_ = -1;
     bitwise_ = EVENT_FLAG_NONE;
 }
 

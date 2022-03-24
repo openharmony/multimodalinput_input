@@ -86,7 +86,7 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
     } else if (button == BTN_MIDDLE) {
         pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_MIDDLE);
     } else {
-        MMI_LOGW("unknown btn, btn:%{public}u", button);
+        MMI_HILOGW("unknown btn, btn:%{public}u", button);
     }
 
     auto state = libinput_event_pointer_get_button_state(data);
@@ -103,7 +103,7 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
         isPressed_ = true;
         buttionId_ = pointerEvent_->GetButtonId();
     } else {
-        MMI_LOGW("unknown state, state:%{public}u", state);
+        MMI_HILOGW("unknown state, state:%{public}u", state);
     }
 }
 
@@ -200,7 +200,7 @@ void MouseEventHandler::Normalize(struct libinput_event *event)
             break;
         }
         default: {
-            MMI_LOGW("unknow type:%{public}d", type);
+            MMI_HILOGW("unknow type:%{public}d", type);
             break;
         }
     }

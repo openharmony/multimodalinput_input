@@ -87,7 +87,7 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
     };
     for (auto& it : funs) {
         if (!RegistrationEvent(it)) {
-            MMI_LOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
+            MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
             continue;
         }
     }

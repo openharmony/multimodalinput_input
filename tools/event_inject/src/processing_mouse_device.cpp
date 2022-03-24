@@ -58,7 +58,7 @@ void ProcessingMouseDevice::TransformMouseEventToInputEvent(const std::vector<Mo
         } else if (item.eventType == "MOUSE_EVENT_HWHEEL") {
             TransformMouseHwheelEvent(item, inputEventArray);
         } else {
-            MMI_LOGW("json file format error");
+            MMI_HILOGW("json file format error");
         }
     }
 }

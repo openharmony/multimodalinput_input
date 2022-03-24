@@ -54,7 +54,7 @@ void ProcessingPadDevice::TransformPadEventToInputEvent(const std::vector<PadEve
         } else if (item.eventType == "RING_EVENT") {
             TransformRingEvent(item, inputEventArray);
         } else {
-            MMI_LOGW("json file format error");
+            MMI_HILOGW("json file format error");
         }
     }
 }
