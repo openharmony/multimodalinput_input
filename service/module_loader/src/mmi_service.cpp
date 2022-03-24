@@ -24,7 +24,11 @@
 #include "input_windows_manager.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
+#ifdef OHOS_BUILD_POINTDRAWING
 #include "pointer_drawing_manager.h"
+#else
+#include "fake_pointer_drawing_manager.h"
+#endif
 #include "timer_manager.h"
 #include "util.h"
 
@@ -36,21 +40,12 @@ const std::string DEF_INPUT_SEAT = "seat0";
 } // namespace
 
 const bool REGISTER_RESULT =
-    SystemAbility::MakeAndRegisterAbility(reinterpret_cast<OHOS::MMI::MMIService*>(UDSServer::GetInstance().get()));
+    SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
 
 struct mmi_epoll_event {
     int32_t fd;
     EpollEventType event_type;
 };
-
-UDSServerPtr UDSServer::GetInstance()
-{
-    static UDSServerPtr udsServer = nullptr;
-    if (udsServer == nullptr) {
-        udsServer = std::make_shared<MMIService>();
-    }
-    return udsServer;
-}
 
 template<class ...Ts>
 void CheckDefineOutput(const char* fmt, Ts... args)
@@ -175,25 +170,35 @@ bool MMIService::InitService()
 int32_t MMIService::Init()
 {
     CheckDefine();
-    std::shared_ptr<UDSServer> udsServer = MMIService::GetInstance();
 
     MMI_LOGD("InputEventHandler Init");
-    InputHandler->Init(*udsServer);
+    InputHandler->Init(*this);
 
     MMI_LOGD("ServerMsgHandler Init");
-    sMsgHandler_.Init(*udsServer);
+    sMsgHandler_.Init(*this);
     MMI_LOGD("EventDump Init");
-    MMIEventDump->Init(*udsServer);
+    MMIEventDump->Init(*this);
 
-    MMI_LOGD("WindowsManager Init");
-    if (!WinMgr->Init(*udsServer)) {
-        MMI_LOGE("Windows message init failed");
-        return WINDOWS_MSG_INIT_FAIL;
-    }
+#ifdef OHOS_BUILD_POINTDRAWING
     MMI_LOGD("PointerDrawingManager Init");
     if (!PointerDrawingManager::GetInstance()->Init()) {
         MMI_LOGE("Pointer draw init failed");
         return POINTER_DRAW_INIT_FAIL;
+    }
+    observer_ = PointerDrawMgr;
+#else
+    MMI_LOGD("FakePointerDrawingManager Init");
+    if (!FakePointerDrawingManager::GetInstance()->Init()) {
+        MMI_LOGE("Fake Pointer draw init failed");
+        return POINTER_DRAW_INIT_FAIL;
+    }
+    observer_ = FakePointerDrawMgr;
+#endif
+
+    MMI_LOGD("WindowsManager Init");
+    if (!WinMgr->Init(*this, observer_)) {
+        MMI_LOGE("Windows message init failed");
+        return WINDOWS_MSG_INIT_FAIL;
     }
     
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);

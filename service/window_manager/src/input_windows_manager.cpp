@@ -18,7 +18,6 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include "pointer_drawing_manager.h"
 #include "util.h"
 #include "util_ex.h"
 
@@ -32,9 +31,10 @@ InputWindowsManager::InputWindowsManager() {}
 
 InputWindowsManager::~InputWindowsManager() {}
 
-bool InputWindowsManager::Init(UDSServer& udsServer)
+bool InputWindowsManager::Init(UDSServer& udsServer, std::shared_ptr<IDeviceObserver> observer)
 {
     udsServer_ = &udsServer;
+    observer_ = observer;
     return true;
 }
 
@@ -114,7 +114,7 @@ void InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInf
         }
     }
     if (!logicalDisplays.empty()) {
-        PointerDrawMgr->OnDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
+        observer_->OnDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
     }
     PrintDisplayInfo();
 }
@@ -399,7 +399,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     CHKPR(logicalDisplayInfo, ERROR_NULL_POINTER);
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
-    PointerDrawMgr->DrawPointer(displayId, globalX, globalY);
+    observer_->DrawPointer(displayId, globalX, globalY);
     int32_t action = pointerEvent->GetPointerAction();
     bool isFirstBtnDown = (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN)
         && (pointerEvent->GetPressedButtons().size() == 1);
