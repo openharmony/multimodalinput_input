@@ -73,11 +73,11 @@ config("libmmi_server_config") {
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
-  
+
   if (is_mmi_have_point_drawing) {
     cflags += [ "-DOHOS_BUILD_POINTDRAWING" ]
   }
-  
+
   if (is_mmi_have_point_drawing) {
     include_dirs += [ "window_manager/pointer_drawing/include" ]
   } else {
@@ -136,11 +136,13 @@ ohos_shared_library("libmmi-server") {
   }
 
   if (is_mmi_have_point_drawing) {
-    sources += [ "window_manager/pointer_drawing/src/pointer_drawing_manager.cpp" ]
+    sources +=
+        [ "window_manager/pointer_drawing/src/pointer_drawing_manager.cpp" ]
   } else {
-    sources += [ "window_manager/fake_pointer_drawing/src/fake_pointer_drawing_manager.cpp" ]
+    sources += 
+        [ "window_manager/fake_pointer_drawing/src/fake_pointer_drawing_manager.cpp" ]
   }
-  
+
   sources += [ "module_loader/src/mmi_service.cpp" ]
 
   configs = [ ":libmmi_server_config" ]
