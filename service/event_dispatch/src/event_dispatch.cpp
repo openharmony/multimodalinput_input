@@ -136,7 +136,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     auto currentTime = GetSysClockTime();
     if (TriggerANR(currentTime, session)) {
         session->isANRProcess_ = true;
-        MMI_LOGW("the pointer event does not report normally, triggering ANR");
+        MMI_HILOGW("the pointer event does not report normally, triggering ANR");
         return RET_OK;
     }
 
@@ -195,7 +195,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
     auto currentTime = GetSysClockTime();
     if (TriggerANR(currentTime, session)) {
         session->isANRProcess_ = true;
-        MMI_LOGW("the key event does not report normally, triggering ANR");
+        MMI_HILOGW("the key event does not report normally, triggering ANR");
         return RET_OK;
     }
 

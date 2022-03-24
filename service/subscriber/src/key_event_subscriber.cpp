@@ -90,7 +90,7 @@ bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     } else if (keyAction == KeyEvent::KEY_ACTION_CANCEL) {
         handled = HandleKeyCanel(keyEvent);
     } else {
-        MMI_LOGW("keyAction exception");
+        MMI_HILOGW("keyAction exception");
     }
     keyEvent_.reset();
     return handled;
@@ -152,7 +152,7 @@ bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
     CHKPF(subscriber);
 
     if (subscriber->timerId_ >= 0) {
-        MMI_LOGW("Leave, timer already added, it may have been added by injection");
+        MMI_HILOGW("Leave, timer already added, it may have been added by injection");
         return true;
     }
 
@@ -360,7 +360,7 @@ bool KeyEventSubscriber::CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
     if (keyEvent_ == nullptr) {
-        MMI_LOGW("keyEvent_ is nullptr");
+        MMI_HILOGW("keyEvent_ is nullptr");
         keyEvent_ = KeyEvent::Clone(keyEvent);
     }
     CHKPF(keyEvent_);
