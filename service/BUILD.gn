@@ -139,8 +139,7 @@ ohos_shared_library("libmmi-server") {
     sources +=
         [ "window_manager/pointer_drawing/src/pointer_drawing_manager.cpp" ]
   } else {
-    sources += 
-        [ "window_manager/fake_pointer_drawing/src/fake_pointer_drawing_manager.cpp" ]
+    sources += [ "window_manager/fake_pointer_drawing/src/fake_pointer_drawing_manager.cpp" ]
   }
 
   sources += [ "module_loader/src/mmi_service.cpp" ]
