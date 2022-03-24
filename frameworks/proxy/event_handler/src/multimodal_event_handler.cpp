@@ -14,8 +14,6 @@
  */
 
 #include "multimodal_event_handler.h"
-
-#include "immi_token.h"
 #include "input_event.h"
 #include "input_manager_impl.h"
 #include "input_handler_manager.h"
