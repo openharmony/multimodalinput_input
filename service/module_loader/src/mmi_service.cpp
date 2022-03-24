@@ -123,20 +123,7 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
         ev.data.ptr = nullptr;
         return ret;
     }
-    auto iter = authFds_.emplace(fd);
-    if (!iter.second) {
-        MMI_LOGE("Emplace to failed, fd:%{public}d", fd);
-        return RET_ERR;
-    }
     return RET_OK;
-}
-
-bool MMIService::ChkAuthFd(int32_t fd) const
-{
-    if (authFds_.find(fd) == authFds_.end()) {
-        return false;
-    }
-    return true;
 }
 
 bool MMIService::InitLibinputService()
@@ -145,12 +132,12 @@ bool MMIService::InitLibinputService()
     MMI_LOGD("HDF Init");
     hdfEventManager.SetupCallback();
 #endif
-    if (!(input_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
+    if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
         DEF_INPUT_SEAT))) {
         MMI_LOGE("libinput init, bind failed");
         return false;
     }
-    auto inputFd = input_.GetInputFd();
+    auto inputFd = libinputAdapter_.GetInputFd();
     auto ret = AddEpoll(EPOLL_EVENT_INPUT, inputFd);
     if (ret <  0) {
         MMI_LOGE("AddEpoll error ret: %{public}d", ret);
@@ -232,7 +219,7 @@ int32_t MMIService::Init()
 
 void MMIService::OnStart()
 {
-    auto tid = GetThisThreadIdOfLL();
+    auto tid = GetThisThreadId();
     MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
 
     int32_t ret = Init();
@@ -248,20 +235,20 @@ void MMIService::OnStart()
 
 void MMIService::OnStop()
 {
-    auto tid = GetThisThreadIdOfLL();
+    auto tid = GetThisThreadId();
     MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
 
     UdsStop();
     if (InputHandler != nullptr) {
         InputHandler->Clear();
     }
-    input_.Stop();
+    libinputAdapter_.Stop();
     state_ = ServiceRunningState::STATE_NOT_START;
 }
 
 void MMIService::OnDump()
 {
-    auto tid = GetThisThreadIdOfLL();
+    auto tid = GetThisThreadId();
     MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
     MMIEventDump->Dump();
 }
@@ -342,7 +329,7 @@ void MMIService::OnTimer()
 void MMIService::OnThread()
 {
     SetThreadName(std::string("mmi_service"));
-    uint64_t tid = GetThisThreadIdOfLL();
+    uint64_t tid = GetThisThreadId();
     if (tid <= 0) {
         MMI_LOGE("The tid is error, errCode:%{public}d", VAL_NOT_EXP);
         return;
@@ -350,7 +337,7 @@ void MMIService::OnThread()
     MMI_LOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
 
     int32_t count = 0;
-    constexpr int32_t timeOut = 20;
+    constexpr int32_t timeOut = 1;
     struct epoll_event ev[MAX_EVENT_SIZE] = {};
     std::map<int32_t, StreamBufData> bufMap;
     while (state_ == ServiceRunningState::STATE_RUNNING) {
@@ -360,7 +347,7 @@ void MMIService::OnThread()
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
             CHKPC(mmiEd);
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
-                input_.EventDispatch(ev[i]);
+                libinputAdapter_.EventDispatch(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
                 OnEpollEvent(bufMap, ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {

@@ -17,16 +17,15 @@ event_filter_path = "${mmi_path}/service/filter"
 
 config("mmi_event_filter_config") {
   include_dirs = [
-    "//foundation/multimodalinput/input/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
-    "//foundation/multimodalinput/input/frameworks/util/common/include",
+    "//foundation/multimodalinput/input/util/common/include",
     "${event_filter_path}/include",
   ]
 }
 
 ohos_source_set("mmi_event_filter_service") {
-  part_name = "multimodalinput_base"
+  part_name = "input"
   sources = [
     "${event_filter_path}/src/event_filter_parcel.cpp",
     "${event_filter_path}/src/event_filter_service.cpp",
@@ -45,7 +44,7 @@ ohos_source_set("mmi_event_filter_service") {
 }
 
 ohos_source_set("mmi_event_filter_proxy") {
-  part_name = "multimodalinput_base"
+  part_name = "input"
   sources = [
     "${event_filter_path}/src/event_filter_death_recipient.cpp",
     "${event_filter_path}/src/event_filter_parcel.cpp",

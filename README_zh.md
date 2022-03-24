@@ -5,6 +5,7 @@
 -   [使用](#section18111235161011)
     -   [接口说明](#section86358081116)
     -   [使用说明](#section789634518111)
+    -   [设备能力支持](#section789634518112)
 
 -   [相关仓](#section135327891219)
 
@@ -16,7 +17,6 @@
 
 ```
 /foundation/multimodalinput/input
-├── common                       # 公共代码
 ├── interfaces                   # 对外接口存放目录
 │   └── native                   # 对外native层接口存放目录
 │       └── innerkits            # 对系统内部子系统提供native层接口存放目录
@@ -75,6 +75,13 @@ var res = input.injectEventSync({
 
 >![](figures/icon-note.gif) **说明：**
 >新增的接口能力需要兼容原有的能力。
+
+### 设备能力支持<a name="section789634518112"></a>
+
+|    设备     | 触摸屏 | 触摸板 | 鼠标 | 键盘 |
+| :---------: | :----: | :----: | :--: | :--: |
+|   rk3568    |   Y    |   Y    |  Y   |  Y   |
+| hi3516dv300 |   Y    |   N    |  N   |  N   |
 
 ## 相关仓<a name="section135327891219"></a>
 

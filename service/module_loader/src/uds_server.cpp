@@ -188,9 +188,9 @@ void UDSServer::AddPermission(SessionPtr sess)
     
     if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) ==
         Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
-        MMI_LOGD("get token type flag is TOKEN_HAP");
+        MMI_LOGD("get type flag is TOKEN_HAP");
         int32_t result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionMonitor);
-        MMI_LOGD("verify access token result:%{public}d", result);
+        MMI_LOGD("verify access result:%{public}d", result);
         if (result != Security::AccessToken::PERMISSION_GRANTED) {
             MMI_LOGD("permission is not granted");
             sess->AddPermission(false);
@@ -457,7 +457,7 @@ void UDSServer::OnThread()
 {
     CALL_LOG_ENTER;
     SetThreadName(std::string("uds_server"));
-    uint64_t tid = GetThisThreadIdOfLL();
+    uint64_t tid = GetThisThreadId();
     if (tid <= 0) {
         MMI_LOGE("The tid value is error, errCode:%{public}d", VAL_NOT_EXP);
         return;

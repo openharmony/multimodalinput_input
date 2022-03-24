@@ -27,7 +27,7 @@
 
 #include "key_event.h"
 #include "key_option.h"
-#include "libmmi_util.h"
+#include "define_multimodal.h"
 
 #define SUCCESS_CODE 0
 #define ERROR_CODE (-1)
@@ -58,5 +58,4 @@ typedef struct {
 typedef std::map<std::string, std::list<KeyEventMonitorInfo *>> Callbacks;
 } // namespace MMI
 } // namespace OHOS
-
 #endif // JS_REGISTER_MODULE_H

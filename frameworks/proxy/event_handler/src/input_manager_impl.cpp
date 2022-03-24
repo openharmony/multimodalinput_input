@@ -15,8 +15,7 @@
 
 #include "input_manager_impl.h"
 
-#include "bytrace.h"
-
+#include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "event_filter_service.h"
@@ -72,8 +71,8 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
 
     physicalDisplays_ = physicalDisplays;
     logicalDisplays_ = logicalDisplays;
-    PrintDisplayDebugInfo();
     SendDisplayInfo();
+    PrintDisplayInfo();
 }
 
 int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
@@ -113,13 +112,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_LOG_ENTER;
     CHKPV(keyEvent);
-    int32_t getKeyCode = keyEvent->GetKeyCode();
-    MMI_LOGD("client trace getKeyCode:%{public}d", getKeyCode);
-    std::string keyCodestring = "client dispatchKeyCode=" + std::to_string(getKeyCode);
-    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring);
-    int32_t keyId = keyEvent->GetId();
-    keyCodestring = "KeyEventDispatch";
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, keyId);
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
     if (consumer_ != nullptr) {
         CHKPV(keyEvent);
         consumer_->OnInputEvent(keyEvent);
@@ -131,16 +124,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
 {
     MMI_LOGD("Pointer event received, processing");
     CHKPV(pointerEvent);
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-        int32_t pointerId = pointerEvent->GetId();
-        std::string pointerEventstring = "PointerEventDispatch";
-        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, pointerId);
-    }
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        int32_t touchId = pointerEvent->GetId();
-        std::string touchEvent = "touchEventDispatch";
-        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, touchId);
-    }
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
     if (consumer_ != nullptr) {
         CHKPV(pointerEvent);
         MMI_LOGD("Passed on to consumer");
@@ -281,7 +265,7 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
     return RET_OK;
 }
 
-void InputManagerImpl::PrintDisplayDebugInfo()
+void InputManagerImpl::PrintDisplayInfo()
 {
     MMI_LOGD("physicalDisplays,num:%{public}zu", physicalDisplays_.size());
     for (const auto &item : physicalDisplays_) {
@@ -390,7 +374,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
 {
     if (interceptor == nullptr) {
         MMI_LOGE("%{public}s param should not be null", __func__);
-        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAM;
+        return MMI_STANDARD_EVENT_INVALID_PARAM;
     }
     int32_t interceptorId = InterceptorMgr.AddInterceptor(interceptor);
     if (interceptorId >= 0) {
@@ -444,8 +428,8 @@ void InputManagerImpl::OnConnected()
             physicalDisplays_.size(), logicalDisplays_.size());
         return;
     }
-    PrintDisplayDebugInfo();
     SendDisplayInfo();
+    PrintDisplayInfo();
 }
 
 void InputManagerImpl::SendDisplayInfo()

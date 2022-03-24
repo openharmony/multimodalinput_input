@@ -135,7 +135,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectMouse_006, TestSize.Level1)
     char command4[] = {"1"};
     char *argv[] = {command1, command2, command3, command4};
     int32_t result = inputManagerCommand->ParseCommand(4, argv);
-    EXPECT_EQ(OHOS::EVENT_REG_FAIL, result);
+    EXPECT_EQ(EVENT_REG_FAIL, result);
 }
 
 /**
@@ -153,7 +153,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectMouse_007, TestSize.Level1)
     char command4[] = {"a"};
     char *argv[] = {command1, command2, command3, command4};
     int32_t result = inputManagerCommand->ParseCommand(4, argv);
-    EXPECT_EQ(OHOS::EVENT_REG_FAIL, result);
+    EXPECT_EQ(EVENT_REG_FAIL, result);
 }
 
 /**
@@ -231,7 +231,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectKey_004, TestSize.Level1)
     char command6[] = {"a"};
     char *argv[] = {command1, command2, command3, command4, command5, command6};
     int32_t result = inputManagerCommand->ParseCommand(6, argv);
-    EXPECT_EQ(OHOS::EVENT_REG_FAIL, result);
+    EXPECT_EQ(EVENT_REG_FAIL, result);
 }
 
 /**
@@ -308,7 +308,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectTouch_004, TestSize.Level1)
     char command4[] = {"10"};
     char *argv[] = {command1, command2, command3, command4};
     int32_t result = inputManagerCommand->ParseCommand(4, argv);
-    EXPECT_EQ(OHOS::EVENT_REG_FAIL, result);
+    EXPECT_EQ(EVENT_REG_FAIL, result);
 }
 
 /**
@@ -326,7 +326,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectTouch_005, TestSize.Level1)
     char command4[] = {"10"};
     char *argv[] = {command1, command2, command3, command4};
     int32_t result = inputManagerCommand->ParseCommand(4, argv);
-    EXPECT_EQ(OHOS::EVENT_REG_FAIL, result);
+    EXPECT_EQ(EVENT_REG_FAIL, result);
 }
 } // namespace MMI
 } // namespace OHOS

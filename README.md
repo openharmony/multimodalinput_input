@@ -5,6 +5,7 @@
 -   [Usage](#section18111235161011)
     -   [Available APIs](#section86358081116)
     -   [Usage Guidelines](#section789634518111)
+    -   [Equipment Capability Support](#section789634518112)
 
 -   [Repositories Involved](#section135327891219)
 
@@ -16,7 +17,6 @@ The module of this repository is applied on the basis of standard systems to pro
 
 ```
 /foundation/multimodalinput/input
-├── common                       # Common code
 ├── interfaces                   # External APIs
 │   └── native                   # Native APIs
 │       └── innerkits            # Native APIs provided for internal subsystems
@@ -75,6 +75,13 @@ var res = input.injectEventSync({
 
 >![](figures/icon-note.gif) **NOTE:**
 >The new APIs must be compatible with the original capabilities.
+
+### Equipment Capability Support<a name="section789634518112"></a>
+
+|   device    | touch | touchpad | mouse | keyboard |
+| :---------: | :---: | :------: | :---: | :------: |
+|   rk3568    |   Y   |    Y     |   Y   |    Y     |
+| hi3516dv300 |   Y   |    N     |   N   |    N     |
 
 ## Repositories Involved<a name="section135327891219"></a>
 

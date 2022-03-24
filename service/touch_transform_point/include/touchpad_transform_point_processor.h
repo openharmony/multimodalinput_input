@@ -42,5 +42,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // TOUCHPAD_TRANSFORM_POINT_PROCESSOR_H
