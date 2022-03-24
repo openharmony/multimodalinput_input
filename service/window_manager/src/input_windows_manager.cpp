@@ -162,7 +162,7 @@ PhysicalDisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id)
             return &it;
         }
     }
-    MMI_LOGE("Failed to obtain physical(%{public}d) display", id);
+    MMI_LOGE("Can't find physical display:%{public}d", id);
     return nullptr;
 }
 

@@ -112,14 +112,14 @@ namespace MMI {
 #define CHKPL(cond) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("CHKPL(%{public}s) is null, do nothing", #cond); \
+            MMI_LOGE("%{public}s is null, do nothing", #cond); \
         } \
     } while (0)
 
 #define CHKPV(cond) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("CHKPV(%{public}s) is null", #cond); \
+            MMI_LOGE("%{public}s is null", #cond); \
             return; \
         } \
     } while (0)
@@ -127,7 +127,7 @@ namespace MMI {
 #define CHKPF(cond) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("CHKPF(%{public}s) is null", #cond); \
+            MMI_LOGE("%{public}s is null", #cond); \
             return false; \
         } \
     } while (0)
@@ -135,7 +135,7 @@ namespace MMI {
 #define CHKPC(cond) \
     { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("CHKPC(%{public}s) is null, skip then continue", #cond); \
+            MMI_LOGE("%{public}s is null, skip then continue", #cond); \
             continue; \
         } \
     }
@@ -143,7 +143,7 @@ namespace MMI {
 #define CHKPB(cond) \
     { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("CHKPC(%{public}s) is null, skip then break", #cond); \
+            MMI_LOGE("%{public}s is null, skip then break", #cond); \
             break; \
         } \
     }
@@ -151,7 +151,7 @@ namespace MMI {
 #define CHKPR(cond, r) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("CHKPR(%{public}s) is null, return value is %{public}d", #cond, r); \
+            MMI_LOGE("%{public}s is null, return value is %{public}d", #cond, r); \
             return r; \
         } \
     } while (0)
@@ -159,7 +159,7 @@ namespace MMI {
 #define CHKPP(cond) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("CHKPP(%{public}s) is null, return value is null", #cond); \
+            MMI_LOGE("%{public}s is null, return value is null", #cond); \
             return nullptr; \
         } \
     } while (0)
@@ -167,7 +167,7 @@ namespace MMI {
 #define CK(cond, ec) \
     do { \
         if (!(cond)) { \
-            MMI_LOGE("CK(%{public}s), errCode:%{public}d", #cond, ec); \
+            MMI_LOGE("%{public}s, errCode:%{public}d", #cond, ec); \
         } \
     } while (0)
 
