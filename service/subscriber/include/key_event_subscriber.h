@@ -55,6 +55,7 @@ private:
         int32_t timerId_ { -1 };
         std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
     };
+    void InsertSubScriber(std::shared_ptr<Subscriber> subs);
 
 private:
     bool HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent);

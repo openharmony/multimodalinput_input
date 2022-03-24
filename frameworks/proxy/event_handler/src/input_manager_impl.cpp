@@ -105,12 +105,15 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
 void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
 {
     CALL_LOG_ENTER;
-    MMIEventHdl.GetMultimodeInputInfo();
     CHKPV(inputEventConsumer);
+    if (!MMIEventHdl.StartClient()) {
+        MMI_LOGE("client init failed");
+        return;
+    }
     consumer_ = inputEventConsumer;
     eventHandler_ = AppExecFwk::EventHandler::Current();
     if (eventHandler_ == nullptr) {
-        eventHandler_ = MEventHandler;
+        eventHandler_ = MEventHandler->GetSharedPtr();
     }
 }
 
@@ -454,7 +457,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-    if (MultimodalEventHandler::GetInstance().InjectPointerEvent(pointerEvent) != RET_OK) {
+    if (MMIEventHdl.InjectPointerEvent(pointerEvent) != RET_OK) {
         MMI_LOGE("Failed to inject pointer event");
     }
 }
@@ -473,17 +476,21 @@ void InputManagerImpl::OnConnected()
 
 void InputManagerImpl::SendDisplayInfo()
 {
-    if (MultimodalEventHandler::GetInstance().GetMMIClient() == nullptr) {
+    if (!MMIEventHdl.StartClient()) {
         MMI_LOGE("get mmi client is nullptr");
         return;
     }
 
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
+    CHKPV(client);
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
     if (PackDisplayData(pkt) == RET_ERR) {
         MMI_LOGE("pack display info failed");
         return;
     }
-    MultimodalEventHandler::GetInstance().GetMMIClient()->SendMessage(pkt);
+    if (!client->SendMessage(pkt)) {
+        MMI_LOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

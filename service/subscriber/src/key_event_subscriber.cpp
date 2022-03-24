@@ -54,7 +54,8 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
         subscribeId, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
-    subscribers_.push_back(subscriber);
+    InsertSubScriber(subscriber);
+    // subscribers_.push_back(subscriber);
     InitSessionDeleteCallback();
     return RET_OK;
 }
@@ -94,6 +95,19 @@ bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     }
     keyEvent_.reset();
     return handled;
+}
+
+void KeyEventSubscriber::InsertSubScriber(std::shared_ptr<Subscriber> subs)
+{
+    CALL_LOG_ENTER;
+    for (auto it = subscribers_.begin(); it != subscribers_.end(); ++it) {
+        if (subs->sess_ != nullptr && (*it)->id_ == subs->id_ && (*it)->sess_ == subs->sess_) {
+            MMI_LOGW("Repeat registration id:%{public}d desc:%{public}s",
+                subs->id_, subs->sess_->GetDescript().c_str());
+            return;
+        }
+    }
+    subscribers_.push_back(subs);
 }
 
 void KeyEventSubscriber::OnSessionDelete(SessionPtr sess)

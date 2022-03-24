@@ -34,8 +34,10 @@ public:
     MultimodalEventHandler();
     ~MultimodalEventHandler() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalEventHandler);
-    int32_t GetMultimodeInputInfo();
+
     MMIClientPtr GetMMIClient();
+    bool StartClient();
+    
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetDevice(int32_t taskId, int32_t deviceId);

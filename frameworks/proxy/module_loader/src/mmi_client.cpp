@@ -51,6 +51,11 @@ bool MMIClient::GetCurrentConnectedStatus() const
     return GetConnectedStatus();
 }
 
+MMIClientPtr MMIClient::GetSharedPtr()
+{
+    return shared_from_this();
+}
+
 bool MMIClient::Start()
 {
     CALL_LOG_ENTER;
@@ -110,7 +115,7 @@ void MMIClient::OnEventHandlerThread()
     MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
 
     MMI_LOGI("step 2");
-    auto eventHandler = MEventHandler;
+    auto eventHandler = MEventHandler->GetSharedPtr();
     CHKPV(eventHandler);
     auto eventRunner = eventHandler->GetEventRunner();
     CHKPV(eventRunner);
@@ -246,16 +251,20 @@ void MMIClient::OnDisconnected()
 void MMIClient::OnConnected()
 {
     CALL_LOG_ENTER;
+    MMI_LOGI("step 1");
     MMI_LOGD("Connection to server succeeded, fd:%{public}d", GetFd());
     isConnected_ = true;
     if (funConnected_) {
         funConnected_(*this);
     }
+    MMI_LOGI("step 2");
     if (!isExit && !isRunning_ && fd_ >= 0 && recvEventHandler_ != nullptr) {
         if (!AddFdListener(fd_)) {
             MMI_LOGE("Add fd listener failed");
         }
+        MMI_LOGI("step 3");
     }
+    MMI_LOGI("step 4");
 }
 
 int32_t MMIClient::Socket()
