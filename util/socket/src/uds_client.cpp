@@ -58,26 +58,27 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
         return false;
     }
     int32_t sendSize = 0;
-    int32_t sendCount = 0;
-    constexpr int32_t resendLimit = 10;
+    int32_t retryCount = 0;
+    constexpr int32_t retryLimit = 32;
+    constexpr int32_t sleepTime = 10000;
     const int32_t bufSize = static_cast<int32_t>(size);
-    while (sendSize < bufSize && sendCount < resendLimit) {
-        sendCount += 1;
-        auto ret = send(fd_, buf, size, SOCKET_FLAGS);
-        if (ret < 0) {
-            int32_t eno = errno;
-            if (eno == EAGAIN || eno == EINTR || eno == EWOULDBLOCK) {
-                MMI_LOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK");
+    while (sendSize < bufSize && retryCount < retryLimit) {
+        retryCount += 1;
+        auto count = send(fd_, buf, size, SOCKET_FLAGS);
+        if (count < 0) {
+            if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
+                MMI_LOGW("continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
                 continue;
             }
-            MMI_LOGE("Send return failed,error:%{public}d fd:%{public}d", eno, fd_);
+            MMI_LOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
             return false;
         }
-        sendSize += ret;
+        sendSize += count;
+        usleep(sleepTime);
     }
-    if (sendCount >= resendLimit && sendSize < bufSize) {
+    if (retryCount >= retryLimit && sendSize < bufSize) {
         MMI_LOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
-            sendCount, resendLimit, sendSize, bufSize, fd_);
+            retryCount, retryLimit, sendSize, bufSize, fd_);
         return false;
     }
     return true;

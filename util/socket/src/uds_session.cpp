@@ -45,6 +45,44 @@ UDSSession::UDSSession(const std::string& programName, const int32_t moduleType,
 
 UDSSession::~UDSSession() {}
 
+bool UDSClient::SendMsg(const char *buf, size_t size) const
+{
+    CHKPF(buf);
+    if ((size <= 0) || (size > MAX_PACKET_BUF_SIZE)) {
+        MMI_LOGE("Stream buffer size out of range");
+        return false;
+    }
+    if (fd_ < 0) {
+        MMI_LOGE("fd_ is less than 0");
+        return false;
+    }
+    int32_t sendSize = 0;
+    int32_t retryCount = 0;
+    constexpr int32_t retryLimit = 32;
+    constexpr int32_t sleepTime = 10000;
+    const int32_t bufSize = static_cast<int32_t>(size);
+    while (sendSize < bufSize && retryCount < retryLimit) {
+        retryCount += 1;
+        auto count = send(fd_, buf, size, SOCKET_FLAGS);
+        if (count < 0) {
+            if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
+                MMI_LOGW("continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
+                continue;
+            }
+            MMI_LOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
+            return false;
+        }
+        sendSize += count;
+        usleep(sleepTime);
+    }
+    if (retryCount >= retryLimit && sendSize < bufSize) {
+        MMI_LOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
+            retryCount, retryLimit, sendSize, bufSize, fd_);
+        return false;
+    }
+    return true;
+}
+
 bool UDSSession::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
