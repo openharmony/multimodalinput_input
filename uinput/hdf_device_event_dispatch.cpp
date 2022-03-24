@@ -42,7 +42,7 @@ void HdfDeviceEventDispatch::GetEventCallbackDispatch(
     const EventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
     if (pkgs == nullptr) {
-        MMI_LOGE("pkgs is nullptr");
+        MMI_HILOGE("pkgs is nullptr");
         return;
     }
     for (uint32_t i = 0; i < count; i++) {

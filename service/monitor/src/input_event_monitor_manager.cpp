@@ -40,11 +40,11 @@ int32_t InputEventMonitorManager::AddInputEventMontior(SessionPtr session, int32
     monitorItem.session =  session;
     auto iter = std::find(monitors_.begin(), monitors_.end(), monitorItem);
     if (iter != monitors_.end()) {
-        MMI_LOGE("Key register repeat");
+        MMI_HILOGE("Key register repeat");
         return RET_ERR;
     }
     iter = monitors_.insert(iter, monitorItem);
-    MMI_LOGD("eventType:%{public}d,fd:%{public}d register in server", eventType, session->GetFd());
+    MMI_HILOGD("eventType:%{public}d,fd:%{public}d register in server", eventType, session->GetFd());
     return RET_OK;
 }
 
@@ -65,11 +65,11 @@ void InputEventMonitorManager::RemoveInputEventMontior(SessionPtr session, int32
 void InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
-    MMI_LOGD("KeyEvent from libinput, keyCode:%{public}d, keyAction:%{public}d, action:%{public}d, "
-             "actionTime:%{public}" PRId64 "", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
-             keyEvent->GetAction(), keyEvent->GetActionTime());
+    MMI_HILOGD("KeyEvent from libinput, keyCode:%{public}d, keyAction:%{public}d, action:%{public}d, "
+               "actionTime:%{public}" PRId64 "", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
+               keyEvent->GetAction(), keyEvent->GetActionTime());
     if (monitors_.empty()) {
-        MMI_LOGE("No monitor to send msg");
+        MMI_HILOGE("No monitor to send msg");
         return;
     }
     NetPacket pkt(MmiMessageId::ON_KEYMONITOR);
@@ -77,7 +77,7 @@ void InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<KeyEvent> key
     for (const auto &item : monitors_) {
         CHKPV(item.session);
         pkt << item.session->GetPid();
-        MMI_LOGD("server send the msg to client: keyCode:%{public}d,pid:%{public}d", keyEvent->GetKeyCode(),
+        MMI_HILOGD("server send the msg to client: keyCode:%{public}d,pid:%{public}d", keyEvent->GetKeyCode(),
             item.session->GetPid());
         item.session->SendMsg(pkt);
     }
@@ -91,11 +91,11 @@ int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(int32_t eventType
     monitorItemTouchpad.session = session;
     auto iter = std::find(monitorsTouch_.begin(), monitorsTouch_.end(), monitorItemTouchpad);
     if (iter != monitorsTouch_.end()) {
-        MMI_LOGE("Touchpad register repeat");
+        MMI_HILOGE("Touchpad register repeat");
         return RET_ERR;
     }
     iter = monitorsTouch_.insert(iter, monitorItemTouchpad);
-    MMI_LOGD("Success, eventType:%{public}d,fd:%{public}d register in server",
+    MMI_HILOGD("Success, eventType:%{public}d,fd:%{public}d register in server",
         eventType, session->GetFd());
     return RET_OK;
 }
@@ -108,11 +108,11 @@ void InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t eventType
     monitorItemtouchpad.session = session;
     auto iter = std::find(monitorsTouch_.begin(), monitorsTouch_.end(), monitorItemtouchpad);
     if (iter == monitorsTouch_.end()) {
-        MMI_LOGE("monitorItemtouchpad does not exist");
+        MMI_HILOGE("monitorItemtouchpad does not exist");
     } else {
-        MMI_LOGD("eventType:%{public}d,fd:%{public}d remove from server", eventType, session->GetFd());
+        MMI_HILOGD("eventType:%{public}d,fd:%{public}d remove from server", eventType, session->GetFd());
         iter = monitorsTouch_.erase(iter);
-        MMI_LOGD("Service RemoveInputEventTouchpadMontior Success");
+        MMI_HILOGD("Service RemoveInputEventTouchpadMontior Success");
     }
 }
 
@@ -122,17 +122,17 @@ void InputEventMonitorManager::OnTouchpadMonitorInputEvent(
     CALL_LOG_ENTER;
     CHKPV(pointerEvent);
     if (monitorsTouch_.empty()) {
-        MMI_LOGE("%{public}s no monitor to send msg", __func__);
+        MMI_HILOGE("%{public}s no monitor to send msg", __func__);
     }
     NetPacket pkt(MmiMessageId::ON_TOUCHPAD_MONITOR);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
     std::list<MonitorItem>::iterator iter;
     for (const auto &item :  monitorsTouch_) {
         pkt << item.session->GetPid();
-        MMI_LOGD("server send the msg to client: EventType:%{public}d,pid:%{public}d",
+        MMI_HILOGD("server send the msg to client: EventType:%{public}d,pid:%{public}d",
             pointerEvent->GetEventType(), item.session->GetPid());
         item.session->SendMsg(pkt);
-        MMI_LOGD("Service SendMsg Success");
+        MMI_HILOGD("Service SendMsg Success");
     }
 }
 
@@ -141,14 +141,14 @@ bool InputEventMonitorManager::ReportTouchpadEvent(std::shared_ptr<PointerEvent>
     CHKPF(pointerEvent);
     PointerEvent::PointerItem item;
     if (!(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item))) {
-        MMI_LOGE("Get pointer parameter failed");
+        MMI_HILOGE("Get pointer parameter failed");
         return false;
     }
-    MMI_LOGD("Monitor-serviceeventTouchpad:time:%{public}" PRId64 ","
-             "sourceType:%{public}d,action:%{public}d,"
-             "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
-             pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
-             pointerEvent->GetPointerId(), item.GetGlobalX(), item.GetGlobalY(), item.IsPressed());
+    MMI_HILOGD("Monitor-serviceeventTouchpad:time:%{public}" PRId64 ","
+               "sourceType:%{public}d,action:%{public}d,"
+               "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
+               pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
+               pointerEvent->GetPointerId(), item.GetGlobalX(), item.GetGlobalY(), item.IsPressed());
     OnTouchpadMonitorInputEvent(pointerEvent);
     return true;
 }

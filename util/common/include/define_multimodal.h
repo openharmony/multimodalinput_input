@@ -41,7 +41,7 @@ namespace MMI {
 #define CHKPL(cond, ...) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHKPL(%{public}s) is null, do nothing", \
+            MMI_HILOGE("%{public}s, (%{public}d), CHKPL(%{public}s) is null, do nothing", \
                 __FILE__, __LINE__, #cond); \
         } \
     } while (0)
@@ -49,7 +49,7 @@ namespace MMI {
 #define CHKPV(cond) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHKPV(%{public}s) is null", \
+            MMI_HILOGE("%{public}s, (%{public}d), CHKPV(%{public}s) is null", \
                 __FILE__, __LINE__, #cond); \
             return; \
         } \
@@ -58,7 +58,7 @@ namespace MMI {
 #define CHKPF(cond) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHKPF(%{public}s) is null", \
+            MMI_HILOGE("%{public}s, (%{public}d), CHKPF(%{public}s) is null", \
                 __FILE__, __LINE__, #cond); \
             return false; \
         } \
@@ -67,7 +67,7 @@ namespace MMI {
 #define CHKPC(cond) \
     { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHKPC(%{public}s) is null, skip then continue", \
+            MMI_HILOGE("%{public}s, (%{public}d), CHKPC(%{public}s) is null, skip then continue", \
                 __FILE__, __LINE__, #cond); \
             continue; \
         } \
@@ -76,7 +76,7 @@ namespace MMI {
 #define CHKPB(cond) \
     { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHKPC(%{public}s) is null, skip then break", \
+            MMI_HILOGE("%{public}s, (%{public}d), CHKPC(%{public}s) is null, skip then break", \
                 __FILE__, __LINE__, #cond); \
             break; \
         } \
@@ -85,7 +85,7 @@ namespace MMI {
 #define CHKPR(cond, r) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHKPR(%{public}s) is null, return value is %{public}d", \
+            MMI_HILOGE("%{public}s, (%{public}d), CHKPR(%{public}s) is null, return value is %{public}d", \
                 __FILE__, __LINE__, #cond, r); \
             return r; \
         } \
@@ -94,7 +94,7 @@ namespace MMI {
 #define CHKPP(cond) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("%{public}s, (%{public}d), CHKPP(%{public}s) is null, return value is null", \
+            MMI_HILOGE("%{public}s, (%{public}d), CHKPP(%{public}s) is null, return value is null", \
                 __FILE__, __LINE__, #cond); \
             return nullptr; \
         } \
@@ -103,7 +103,7 @@ namespace MMI {
 #define CK(cond, ec) \
     do { \
         if (!(cond)) { \
-            MMI_LOGE("%{public}s, (%{public}d), CK(%{public}s), errCode:%{public}d", \
+            MMI_HILOGE("%{public}s, (%{public}d), CK(%{public}s), errCode:%{public}d", \
                 __FILE__, __LINE__, #cond, ec); \
         } \
     } while (0)
@@ -112,14 +112,14 @@ namespace MMI {
 #define CHKPL(cond) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("CHKPL(%{public}s) is null, do nothing", #cond); \
+            MMI_HILOGE("CHKPL(%{public}s) is null, do nothing", #cond); \
         } \
     } while (0)
 
 #define CHKPV(cond) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("CHKPV(%{public}s) is null", #cond); \
+            MMI_HILOGE("CHKPV(%{public}s) is null", #cond); \
             return; \
         } \
     } while (0)
@@ -127,7 +127,7 @@ namespace MMI {
 #define CHKPF(cond) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("CHKPF(%{public}s) is null", #cond); \
+            MMI_HILOGE("CHKPF(%{public}s) is null", #cond); \
             return false; \
         } \
     } while (0)
@@ -135,7 +135,7 @@ namespace MMI {
 #define CHKPC(cond) \
     { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("CHKPC(%{public}s) is null, skip then continue", #cond); \
+            MMI_HILOGE("CHKPC(%{public}s) is null, skip then continue", #cond); \
             continue; \
         } \
     }
@@ -143,7 +143,7 @@ namespace MMI {
 #define CHKPB(cond) \
     { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("CHKPC(%{public}s) is null, skip then break", #cond); \
+            MMI_HILOGE("CHKPC(%{public}s) is null, skip then break", #cond); \
             break; \
         } \
     }
@@ -151,7 +151,7 @@ namespace MMI {
 #define CHKPR(cond, r) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("CHKPR(%{public}s) is null, return value is %{public}d", #cond, r); \
+            MMI_HILOGE("CHKPR(%{public}s) is null, return value is %{public}d", #cond, r); \
             return r; \
         } \
     } while (0)
@@ -159,7 +159,7 @@ namespace MMI {
 #define CHKPP(cond) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_LOGE("CHKPP(%{public}s) is null, return value is null", #cond); \
+            MMI_HILOGE("CHKPP(%{public}s) is null, return value is null", #cond); \
             return nullptr; \
         } \
     } while (0)
@@ -167,7 +167,7 @@ namespace MMI {
 #define CK(cond, ec) \
     do { \
         if (!(cond)) { \
-            MMI_LOGE("CK(%{public}s), errCode:%{public}d", #cond, ec); \
+            MMI_HILOGE("CK(%{public}s), errCode:%{public}d", #cond, ec); \
         } \
     } while (0)
 

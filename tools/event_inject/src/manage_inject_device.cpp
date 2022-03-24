@@ -28,7 +28,7 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
 {
     CALL_LOG_ENTER;
     if (configData.empty()) {
-        MMI_LOGE("input data from json file is empty");
+        MMI_HILOGE("input data from json file is empty");
         return RET_ERR;
     }
     for (const auto &item : configData) {
@@ -39,7 +39,7 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
         }
         std::string deviceNode;
         if (getDeviceNodeObject_.GetDeviceNodeName(deviceName, devIndex, deviceNode) == RET_ERR) {
-            MMI_LOGE("fail get device:%{public}s node", deviceName.c_str());
+            MMI_HILOGE("fail get device:%{public}s node", deviceName.c_str());
             return RET_ERR;
         }
         InputEventArray inputEventArray = {};
@@ -53,12 +53,12 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
             devicePtr = nullptr;
         }
         if (ret == RET_ERR) {
-            MMI_LOGE("fail read json file");
+            MMI_HILOGE("fail read json file");
             return ret;
         }
         ret = SendEvent(inputEventArray);
         if (ret == RET_ERR) {
-            MMI_LOGE("SendEvent fail");
+            MMI_HILOGE("SendEvent fail");
             return ret;
         }
     }
@@ -76,17 +76,17 @@ int32_t ManageInjectDevice::SendEventToDeviveNode(const InputEventArray& inputEv
     CALL_LOG_ENTER;
     std::string deviceNode = inputEventArray.target;
     if (deviceNode.empty()) {
-        MMI_LOGE("device node:%{public}s is not exit", deviceNode.c_str());
+        MMI_HILOGE("device node:%{public}s is not exit", deviceNode.c_str());
         return RET_ERR;
     }
     char realPath[PATH_MAX] = {};
     if (realpath(deviceNode.c_str(), realPath) == nullptr) {
-        MMI_LOGE("path is error, path:%{public}s", deviceNode.c_str());
+        MMI_HILOGE("path is error, path:%{public}s", deviceNode.c_str());
         return RET_ERR;
     }
     int32_t fd = open(realPath, O_RDWR);
     if (fd < 0) {
-        MMI_LOGE("open device node:%{public}s faild", deviceNode.c_str());
+        MMI_HILOGE("open device node:%{public}s faild", deviceNode.c_str());
         return RET_ERR;
     }
     for (const auto &item : inputEventArray.events) {

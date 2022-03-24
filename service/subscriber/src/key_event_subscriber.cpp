@@ -35,21 +35,21 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
 {
     CALL_LOG_ENTER;
     if (subscribeId < 0) {
-        MMI_LOGE("Invalid subscribe");
+        MMI_HILOGE("Invalid subscribe");
         return RET_ERR;
     }
     CHKPR(sess, ERROR_NULL_POINTER);
     CHKPR(keyOption, ERROR_NULL_POINTER);
     uint32_t preKeySize = keyOption->GetPreKeys().size();
     if (preKeySize > MAX_PRE_KEY_COUNT) {
-        MMI_LOGE("Leave, preKeySize:%{public}u", preKeySize);
+        MMI_HILOGE("Leave, preKeySize:%{public}u", preKeySize);
         return RET_ERR;
     }
 
     for (const auto &keyCode : keyOption->GetPreKeys()) {
-        MMI_LOGD("keyOption->prekey:%{public}d", keyCode);
+        MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
     }
-    MMI_LOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
+    MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
         "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuriation:%{public}d",
         subscribeId, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
@@ -62,7 +62,7 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
 int32_t KeyEventSubscriber::UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
 {
     CALL_LOG_ENTER;
-    MMI_LOGD("subscribeId:%{public}d", subscribeId);
+    MMI_HILOGD("subscribeId:%{public}d", subscribeId);
     for (auto it = subscribers_.begin(); it != subscribers_.end(); ++it) {
         if ((*it)->id_ == subscribeId && (*it)->sess_ == sess) {
             ClearTimer(*it);
@@ -78,9 +78,9 @@ bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     CALL_LOG_ENTER;
     CHKPF(keyEvent);
     int32_t keyAction = keyEvent->GetKeyAction();
-    MMI_LOGD("keyCode:%{public}d,keyAction:%{public}s", keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
+    MMI_HILOGD("keyCode:%{public}d,keyAction:%{public}s", keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
     for (const auto &keyCode : keyEvent->GetPressedKeys()) {
-        MMI_LOGD("pressed KeyCode:%{public}d", keyCode);
+        MMI_HILOGD("pressed KeyCode:%{public}d", keyCode);
     }
     bool handled = false;
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
@@ -139,7 +139,7 @@ void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     int32_t fd = subscriber->sess_->GetFd();
     pkt << fd << subscriber->id_;
     if (!udsServerPtr->SendMsg(fd, pkt)) {
-        MMI_LOGE("Leave, server disaptch subscriber failed");
+        MMI_HILOGE("Leave, server disaptch subscriber failed");
         return;
     }
 }
@@ -158,29 +158,29 @@ bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
 
     auto& keyOption = subscriber->keyOption_;
     if (keyOption->GetFinalKeyDownDuration() <= 0) {
-        MMI_LOGE("Leave, duration <= 0");
+        MMI_HILOGE("Leave, duration <= 0");
         return true;
     }
 
     if (!CloneKeyEvent(keyEvent)) {
-        MMI_LOGE("Leave, cloneKeyEvent failed");
+        MMI_HILOGE("Leave, cloneKeyEvent failed");
         return false;
     }
 
     std::weak_ptr<Subscriber> weakSubscriber = subscriber;
     subscriber->timerId_ = TimerMgr->AddTimer(keyOption->GetFinalKeyDownDuration(), 1, [this, weakSubscriber] () {
-        MMI_LOGD("timer callback");
+        MMI_HILOGD("timer callback");
         auto subscriber = weakSubscriber.lock();
         CHKPV(subscriber);
         OnTimer(subscriber);
     });
 
     if (subscriber->timerId_ < 0) {
-        MMI_LOGE("Leave, addTimer failed");
+        MMI_HILOGE("Leave, addTimer failed");
         return false;
     }
     subscriber->keyEvent_ = keyEvent_;
-    MMI_LOGD("leave, add timer success, subscribeId:%{public}d,"
+    MMI_HILOGD("leave, add timer success, subscribeId:%{public}d,"
         "duration:%{public}d,timerId:%{public}d",
         subscriber->id_, keyOption->GetFinalKeyDownDuration(), subscriber->timerId_);
     return true;
@@ -192,7 +192,7 @@ void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscribe
     CHKPV(subscriber);
 
     if (subscriber->timerId_ < 0) {
-        MMI_LOGE("Leave, subscribeId:%{public}d,null timerId < 0", subscriber->id_);
+        MMI_HILOGE("Leave, subscribeId:%{public}d,null timerId < 0", subscriber->id_);
         return;
     }
 
@@ -200,7 +200,7 @@ void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscribe
     subscriber->keyEvent_.reset();
     subscriber->timerId_ = -1;
     TimerMgr->RemoveTimer(timerId);
-    MMI_LOGD("subscribeId:%{public}d,subscribeId:%{public}d", subscriber->id_, timerId);
+    MMI_HILOGD("subscribeId:%{public}d,subscribeId:%{public}d", subscriber->id_, timerId);
 }
 
 void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
@@ -209,20 +209,20 @@ void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
     CHKPV(subscriber);
     subscriber->timerId_ = -1;
     if (subscriber->keyEvent_ == nullptr) {
-        MMI_LOGE("Leave, subscriber->keyEvent is nullptr, subscribeId:%{public}d", subscriber->id_);
+        MMI_HILOGE("Leave, subscriber->keyEvent is nullptr, subscribeId:%{public}d", subscriber->id_);
         return;
     }
 
     NotifySubscriber(subscriber->keyEvent_, subscriber);
     subscriber->keyEvent_.reset();
-    MMI_LOGD("subscribeId:%{public}d", subscriber->id_);
+    MMI_HILOGD("subscribeId:%{public}d", subscriber->id_);
 }
 
 bool KeyEventSubscriber::InitSessionDeleteCallback()
 {
     CALL_LOG_ENTER;
     if (callbackInitialized_)  {
-        MMI_LOGD("session delete callback has already been initialized");
+        MMI_HILOGD("session delete callback has already been initialized");
         return true;
     }
     auto udsServerPtr = InputHandler->GetUDSServer();
@@ -245,44 +245,44 @@ bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent
     RemoveKeyCode(keyCode, pressedKeys);
     for (const auto &subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
-        MMI_LOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
+        MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
             "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuriation:%{public}d",
             subscriber->id_, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
             keyOption->GetFinalKeyDownDuration());
         for (const auto &keyCode : keyOption->GetPreKeys()) {
-            MMI_LOGD("keyOption->prekey:%{public}d", keyCode);
+            MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
         }
 
         if (!keyOption->IsFinalKeyDown()) {
-            MMI_LOGD("!keyOption->IsFinalKeyDown()");
+            MMI_HILOGD("!keyOption->IsFinalKeyDown()");
             continue;
         }
 
         if (keyCode != keyOption->GetFinalKey()) {
             ClearTimer(subscriber);
-            MMI_LOGD("keyCode != keyOption->GetFinalKey()");
+            MMI_HILOGD("keyCode != keyOption->GetFinalKey()");
             continue;
         }
 
         if (!IsPreKeysMatch(keyOption->GetPreKeys(), pressedKeys)) {
             ClearTimer(subscriber);
-            MMI_LOGD("preKeysMatch failed");
+            MMI_HILOGD("preKeysMatch failed");
             continue;
         }
 
         if (keyOption->GetFinalKeyDownDuration() <= 0) {
-            MMI_LOGD("keyOption->GetFinalKeyDownDuration() <= 0");
+            MMI_HILOGD("keyOption->GetFinalKeyDownDuration() <= 0");
             NotifySubscriber(keyEvent, subscriber);
             handled = true;
             continue;
         }
 
         if (!AddTimer(subscriber, keyEvent)) {
-            MMI_LOGE("Leave, add timer failed");
+            MMI_HILOGE("Leave, add timer failed");
         }
     }
 
-    MMI_LOGD("%{public}s", handled ? "true" : "false");
+    MMI_HILOGD("%{public}s", handled ? "true" : "false");
     return handled;
 }
 
@@ -296,33 +296,33 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
     RemoveKeyCode(keyCode, pressedKeys);
     for (const auto &subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
-        MMI_LOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
+        MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
             "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuriation:%{public}d",
             subscriber->id_, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
             keyOption->GetFinalKeyDownDuration());
         for (auto keyCode : keyOption->GetPreKeys()) {
-            MMI_LOGD("keyOption->prekey:%{public}d", keyCode);
+            MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
         }
 
         if (keyOption->IsFinalKeyDown()) {
             ClearTimer(subscriber);
-            MMI_LOGD("keyOption->IsFinalKeyDown()");
+            MMI_HILOGD("keyOption->IsFinalKeyDown()");
             continue;
         }
 
         if (keyCode != keyOption->GetFinalKey()) {
-            MMI_LOGD("keyCode != keyOption->GetFinalKey()");
+            MMI_HILOGD("keyCode != keyOption->GetFinalKey()");
             continue;
         }
 
         if (!IsPreKeysMatch(keyOption->GetPreKeys(), pressedKeys)) {
-            MMI_LOGD("preKeysMatch failed");
+            MMI_HILOGD("preKeysMatch failed");
             continue;
         }
 
         auto duration = keyOption->GetFinalKeyDownDuration();
         if (duration <= 0) {
-            MMI_LOGD("duration <= 0");
+            MMI_HILOGD("duration <= 0");
             NotifySubscriber(keyEvent, subscriber);
             handled = true;
             continue;
@@ -333,16 +333,16 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
         auto upTime = keyEvent->GetActionTime();
         auto downTime = keyItem->GetDownTime();
         if (upTime - downTime >= (static_cast<int64_t>(duration) * 1000)) {
-            MMI_LOGE("upTime - downTime >= duration");
+            MMI_HILOGE("upTime - downTime >= duration");
             continue;
         }
 
-        MMI_LOGD("upTime - downTime < duration");
+        MMI_HILOGD("upTime - downTime < duration");
         NotifySubscriber(keyEvent, subscriber);
         handled = true;
     }
 
-    MMI_LOGD("%{public}s", handled ? "true" : "false");
+    MMI_HILOGD("%{public}s", handled ? "true" : "false");
     return handled;
 }
 
