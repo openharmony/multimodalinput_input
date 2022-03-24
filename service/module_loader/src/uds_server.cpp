@@ -426,8 +426,8 @@ bool UDSServer::AddSession(SessionPtr ses)
     sessionsMap_[fd] = ses;
     DumpSession("AddSession");
     if (sessionsMap_.size() > MAX_SESSON_ALARM) {
-        MMI_LOGW("Too many clients. Warning Value:%{public}d,Current Value:%{public}zd",
-                 MAX_SESSON_ALARM, sessionsMap_.size());
+        MMI_HILOGW("Too many clients. Warning Value:%{public}d,Current Value:%{public}zd",
+                   MAX_SESSON_ALARM, sessionsMap_.size());
     }
     MMI_LOGI("AddSession end");
     return true;

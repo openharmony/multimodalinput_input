@@ -52,7 +52,7 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
         SessionHandler interceptor { handlerId, handlerType, session };
         return interceptors_.AddInterceptor(interceptor);
     }
-    MMI_LOGW("Invalid handler type:%{public}d", handlerType);
+    MMI_HILOGW("Invalid handler type:%{public}d", handlerType);
     return RET_ERR;
 }
 
@@ -193,7 +193,7 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionHa
     if (ret.second) {
         MMI_LOGD("Service AddMonitor Success");
     } else {
-        MMI_LOGW("Duplicate monitors");
+        MMI_HILOGW("Duplicate monitors");
     }
     return RET_OK;
 }
@@ -210,11 +210,11 @@ void InputHandlerManagerGlobal::MonitorCollection::RemoveMonitor(const SessionHa
 void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr session)
 {
     if (!HasMonitor(monitorId, session)) {
-        MMI_LOGW("Specified monitor does not exist, monitor:%{public}d", monitorId);
+        MMI_HILOGW("Specified monitor does not exist, monitor:%{public}d", monitorId);
         return;
     }
     if (isMonitorConsumed_) {
-        MMI_LOGW("Event consumed");
+        MMI_HILOGW("Event consumed");
         return;
     }
     if ((downEventId_ < 0) || (lastPointerEvent_ == nullptr)) {
@@ -222,7 +222,7 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
         return;
     }
     if (downEventId_ > eventId) {
-        MMI_LOGW("A new process has began %{public}d,%{public}d", downEventId_, eventId);
+        MMI_HILOGW("A new process has began %{public}d,%{public}d", downEventId_, eventId);
         return;
     }
     isMonitorConsumed_ = true;
@@ -353,7 +353,7 @@ int32_t InputHandlerManagerGlobal::InterceptorCollection::AddInterceptor(const S
     if (ret.second) {
         MMI_LOGD("Register interceptor successfully");
     } else {
-        MMI_LOGW("Duplicate interceptors");
+        MMI_HILOGW("Duplicate interceptors");
     }
     return RET_OK;
 }

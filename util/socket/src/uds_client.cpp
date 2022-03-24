@@ -98,7 +98,7 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
     isRunning_ = true;
     isConnected_ = true;
     if (ConnectTo() < 0) {
-        MMI_LOGW("Client connection failed, Try again later");
+        MMI_HILOGW("Client connection failed, Try again later");
         isConnected_ = false;
 
         if (IsFirstConnectFailExit()) {
@@ -108,10 +108,10 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
     }
     t_ = std::thread(std::bind(&UDSClient::OnThread, this));
     if (detachMode) {
-        MMI_LOGW("uds client thread detach");
+        MMI_HILOGW("uds client thread detach");
         t_.detach();
     } else {
-        MMI_LOGW("uds client thread join");
+        MMI_HILOGW("uds client thread join");
     }
     return true;
 }
@@ -197,12 +197,12 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
         if (size > 0) {
             if (!buf.Write(szBuf, size)) {
                 isoverflow = true;
-                MMI_LOGW("size:%{public}zu", size);
+                MMI_HILOGW("size:%{public}zu", size);
                 break;
             }
         }
         if (size < MAX_PACKET_BUF_SIZE) {
-            MMI_LOGW("size:%{public}zu", size);
+            MMI_HILOGW("size:%{public}zu", size);
             break;
         }
         if (isoverflow) {
@@ -231,8 +231,8 @@ void UDSClient::OnThread()
             }
         } else {
             if (ConnectTo() < 0) {
-                MMI_LOGW("Client reconnection failed, Try again after %{public}d ms",
-                         CLIENT_RECONNECT_COOLING_TIME);
+                MMI_HILOGW("Client reconnection failed, Try again after %{public}d ms",
+                           CLIENT_RECONNECT_COOLING_TIME);
                 std::this_thread::sleep_for(std::chrono::milliseconds(CLIENT_RECONNECT_COOLING_TIME));
                 continue;
             }
@@ -243,7 +243,7 @@ void UDSClient::OnThread()
 
         if (isToExit_) {
             isRunning_ = false;
-            MMI_LOGW("Client thread exit");
+            MMI_HILOGW("Client thread exit");
             break;
         }
     }

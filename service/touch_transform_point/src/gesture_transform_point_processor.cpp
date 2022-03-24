@@ -149,7 +149,7 @@ std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestrueE
         case LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN:
         case LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE:
         case LIBINPUT_EVENT_GESTURE_SWIPE_END: {
-            MMI_LOGW("Three refers to the need to use, preserve the code");
+            MMI_HILOGW("Three refers to the need to use, preserve the code");
             return nullptr;
         }
         default: {

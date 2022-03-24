@@ -416,7 +416,7 @@ size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_
 std::string StringFmt(const char* str, ...)
 {
     if (str == nullptr) {
-        MMI_LOGW("Str is nullptr");
+        MMI_HILOGW("Str is nullptr");
         return "";
     }
     va_list args;
