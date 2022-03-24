@@ -51,7 +51,7 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, std::string na
     CALL_LOG_ENTER;
     auto iter = inputDevcices_.find(userData);
     if (iter == inputDevcices_.end()) {
-        MMI_LOGE("failed to find the callback function");
+        MMI_HILOGE("failed to find the callback function");
         return;
     }
     auto inputDeviceInfo = std::make_shared<InputDeviceInfo>(id, name, deviceType);
@@ -63,7 +63,7 @@ void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> id
     CALL_LOG_ENTER;
     auto iter = inputDevciceIds_.find(userData);
     if (iter == inputDevciceIds_.end()) {
-        MMI_LOGE("failed to find the callback function");
+        MMI_HILOGE("failed to find the callback function");
         return;
     }
     iter->second(userData, ids);

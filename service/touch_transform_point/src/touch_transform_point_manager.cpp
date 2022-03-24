@@ -34,7 +34,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibInput(
         case INPUT_DEVICE_CAP_GESTURE:
             return OnTouchPadGestrueEvent(event);
         default:
-            MMI_LOGE("The in parameter deviceType is error, deviceType:%{public}d", deviceType);
+            MMI_HILOGE("The in parameter deviceType is error, deviceType:%{public}d", deviceType);
             break;
     }
     return nullptr;
@@ -57,7 +57,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(s
         auto iter = touchPro_.insert(
             std::pair<int32_t, std::shared_ptr<TouchTransformPointProcessor>>(deviceId, processor));
         if (!iter.second) {
-            MMI_LOGE("Insert value failed, touch device:%{public}d", deviceId);
+            MMI_HILOGE("Insert value failed, touch device:%{public}d", deviceId);
         }
     }
     return processor->OnLibinputTouchEvent(event);
@@ -80,7 +80,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEven
         auto iter = touchpadPro_.insert(
             std::pair<int32_t, std::shared_ptr<TouchPadTransformPointProcessor>>(deviceId, processor));
         if (!iter.second) {
-            MMI_LOGE("Insert value failed, touchpad device:%{public}d", deviceId);
+            MMI_HILOGE("Insert value failed, touchpad device:%{public}d", deviceId);
         }
     }
     return processor->OnLibinputTouchPadEvent(event);
@@ -103,7 +103,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestrueEvent
         auto iter = gesturePro_.insert(
             std::pair<int32_t, std::shared_ptr<GestureTransformPointProcessor>>(deviceId, processor));
         if (!iter.second) {
-            MMI_LOGE("Insert value failed, gesture device:%{public}d", deviceId);
+            MMI_HILOGE("Insert value failed, gesture device:%{public}d", deviceId);
         }
     }
     return processor->OnTouchPadGestrueEvent(event);

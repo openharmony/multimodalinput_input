@@ -27,13 +27,13 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     CALL_LOG_ENTER;
     auto item = inputDevice_.find(id);
     if (item == inputDevice_.end()) {
-        MMI_LOGE("failed to search for the device");
+        MMI_HILOGE("failed to search for the device");
         return nullptr;
     }
 
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
     if (inputDevice == nullptr) {
-        MMI_LOGE("create InputDevice ptr failed");
+        MMI_HILOGE("create InputDevice ptr failed");
         return nullptr;
     }
     inputDevice->SetId(item->first);
@@ -65,7 +65,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)
         }
     }
     if (nextId_ == INT32_MAX) {
-        MMI_LOGE("the nextId_ exceeded the upper limit");
+        MMI_HILOGE("the nextId_ exceeded the upper limit");
         return;
     }
     inputDevice_[nextId_] = inputDevice;
@@ -95,7 +95,7 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)
 {
     CHKPF(device);
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
-    MMI_LOGD("udev tag:%{public}d", static_cast<int32_t>(udevTags));
+    MMI_HILOGD("udev tag:%{public}d", static_cast<int32_t>(udevTags));
     return udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK | 
     EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD);
 }
@@ -130,7 +130,7 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevic
             return item.first;
         }
     }
-    MMI_LOGE("find input device id failed");
+    MMI_HILOGE("find input device id failed");
     return INVALID_DEVICE_ID;
 }
 } // namespace MMI

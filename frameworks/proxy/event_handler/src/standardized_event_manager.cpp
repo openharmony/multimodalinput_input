@@ -59,11 +59,11 @@ int32_t StandardizedEventManager::SubscribeKeyEvent(
         pkt << item;
     }
     if (MMIEventHdl.GetMMIClient() == nullptr) {
-        MMI_LOGE("client init failed");
+        MMI_HILOGE("client init failed");
         return RET_ERR;
     }
     if (!SendMsg(pkt)) {
-        MMI_LOGE("Client failed to send message");
+        MMI_HILOGE("Client failed to send message");
         return RET_ERR;
     }
     return RET_OK;
@@ -75,11 +75,11 @@ int32_t StandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
     NetPacket pkt(MmiMessageId::UNSUBSCRIBE_KEY_EVENT);
     pkt << subscribeId;
     if (MMIEventHdl.GetMMIClient() == nullptr) {
-        MMI_LOGE("client init failed");
+        MMI_HILOGE("client init failed");
         return RET_ERR;
     }
     if (!SendMsg(pkt)) {
-        MMI_LOGE("Client failed to send message");
+        MMI_HILOGE("Client failed to send message");
         return RET_ERR;
     }
     return RET_OK;
@@ -96,7 +96,7 @@ int32_t StandardizedEventManager::InjectionVirtual(bool isPressed, int32_t keyCo
     NetPacket pkt(MmiMessageId::ON_VIRTUAL_KEY);
     pkt << virtualEvent;
     if (!SendMsg(pkt)) {
-        MMI_LOGE("Send virtual event Msg error");
+        MMI_HILOGE("Send virtual event Msg error");
         return RET_ERR;
     }
     return RET_OK;
@@ -108,17 +108,17 @@ int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> ke
     CHKPR(key, RET_ERR);
     key->UpdateId();
     if (key->GetKeyCode() < 0) {
-        MMI_LOGE("keyCode is invalid:%{public}u", key->GetKeyCode());
+        MMI_HILOGE("keyCode is invalid:%{public}u", key->GetKeyCode());
         return RET_ERR;
     }
     NetPacket pkt(MmiMessageId::INJECT_KEY_EVENT);
     int32_t errCode = InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
     if (errCode != RET_OK) {
-        MMI_LOGE("Serialization is Failed, errCode:%{public}u", errCode);
+        MMI_HILOGE("Serialization is Failed, errCode:%{public}u", errCode);
         return RET_ERR;
     }
     if (!SendMsg(pkt)) {
-        MMI_LOGE("Send inject event Msg error");
+        MMI_HILOGE("Send inject event Msg error");
         return RET_ERR;
     }
     return RET_OK;
@@ -128,20 +128,20 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
 {
     CALL_LOG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    MMI_LOGD("Inject pointer event:");
+    MMI_HILOGD("Inject pointer event:");
     std::stringstream sStream;
     sStream << *pointerEvent;
     std::string sLine;
     while (std::getline(sStream, sLine)) {
-        MMI_LOGD("%{public}s", sLine.c_str());
+        MMI_HILOGD("%{public}s", sLine.c_str());
     }
     NetPacket pkt(MmiMessageId::INJECT_POINTER_EVENT);
     if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
-        MMI_LOGE("Marshalling pointer event failed");
+        MMI_HILOGE("Marshalling pointer event failed");
         return RET_ERR;
     }
     if (!SendMsg(pkt)) {
-        MMI_LOGE("SendMsg failed");
+        MMI_HILOGE("SendMsg failed");
         return RET_ERR;
     }
     return RET_OK;

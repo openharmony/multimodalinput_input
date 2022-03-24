@@ -45,25 +45,25 @@ bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> ev
     MessageParcel reply;
     MessageOption option;
     if (!data.WriteInterfaceToken(EventFilterProxy::GetDescriptor())) {
-        MMI_LOGE("Failed to write descriptor");
+        MMI_HILOGE("Failed to write descriptor");
         return false;
     }
 
     if (!event->WriteToParcel(data)) {
-        MMI_LOGE("Failed to write event to req");
+        MMI_HILOGE("Failed to write event to req");
         return false;
     }
 
     const uint32_t code = static_cast<uint32_t>(OPERATOR_TYPE::HANDLE_POINTER_EVENT);
     int32_t requestResult = Remote()->SendRequest(code, data, reply, option);
     if (requestResult != NO_ERROR) {
-        MMI_LOGE("send request fail, result:%{public}d", requestResult);
+        MMI_HILOGE("send request fail, result:%{public}d", requestResult);
         return false;
     }
 
     bool result = false;
     if (!reply.ReadBool(result)) {
-        MMI_LOGE("reply ReadBool fail");
+        MMI_HILOGE("reply ReadBool fail");
         return false;
     }
     return result;

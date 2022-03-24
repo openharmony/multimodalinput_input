@@ -35,7 +35,7 @@ KeyEventInputSubscribeManager::SubscribeKeyEventInfo::SubscribeKeyEventInfo(
 {
     if (KeyEventInputSubscribeManager::subscribeIdManager_ >= INT_MAX) {
         subscribeId_ = -1;
-        MMI_LOGE("subscribeId has reached the upper limit, cannot continue the subscription");
+        MMI_HILOGE("subscribeId has reached the upper limit, cannot continue the subscription");
         return;
     }
     subscribeId_ = KeyEventInputSubscribeManager::subscribeIdManager_;
@@ -49,15 +49,15 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
     CHKPR(keyOption, INVALID_SUBSCRIBE_ID);
     CHKPR(callback, INVALID_SUBSCRIBE_ID);
     for (auto preKey : keyOption->GetPreKeys()) {
-        MMI_LOGD("keyOption->prekey:%{public}d", preKey);
+        MMI_HILOGD("keyOption->prekey:%{public}d", preKey);
     }
     SubscribeKeyEventInfo subscribeInfo(keyOption, callback);
-    MMI_LOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
+    MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
         "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuriation:%{public}d",
         subscribeInfo.GetSubscribeId(), keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
     if (EventManager.SubscribeKeyEvent(subscribeInfo) != RET_OK) {
-        MMI_LOGE("Leave, subscribe key event failed");
+        MMI_HILOGE("Leave, subscribe key event failed");
         return INVALID_SUBSCRIBE_ID;
     }
     subscribeInfos_.push_back(subscribeInfo);
@@ -68,18 +68,18 @@ int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
 {
     CALL_LOG_ENTER;
     if (subscribeId < 0) {
-        MMI_LOGE("the subscribe id is less than 0");
+        MMI_HILOGE("the subscribe id is less than 0");
         return RET_ERR;
     }
     if (subscribeInfos_.empty()) {
-        MMI_LOGE("the subscribeInfos is empty");
+        MMI_HILOGE("the subscribeInfos is empty");
         return RET_ERR;
     }
     
     for (auto it = subscribeInfos_.begin(); it != subscribeInfos_.end(); ++it) {
         if (it->GetSubscribeId() == subscribeId) {
             if (EventManager.UnSubscribeKeyEvent(subscribeId) != RET_OK) {
-                MMI_LOGE("Leave, unsubscribe key event failed");
+                MMI_HILOGE("Leave, unsubscribe key event failed");
                 return RET_ERR;
             }
             subscribeInfos_.erase(it);
@@ -94,14 +94,14 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     if (subscribeId < 0) {
-        MMI_LOGE("Leave, the subscribe id is less than 0");
+        MMI_HILOGE("Leave, the subscribe id is less than 0");
         return RET_ERR;
     }
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
     for (const auto& subscriber : subscribeInfos_) {
         if (subscriber.GetSubscribeId() == subscribeId) {
             subscriber.GetCallback()(event);
-            MMI_LOGD("Leave, client executes subscribe callback function success");
+            MMI_HILOGD("Leave, client executes subscribe callback function success");
             return RET_OK;
         }
     }
@@ -112,13 +112,13 @@ void KeyEventInputSubscribeManager::OnConnected()
 {
     CALL_LOG_ENTER;
     if (subscribeInfos_.empty()) {
-        MMI_LOGE("Leave, subscribeInfos_ is empty");
+        MMI_HILOGE("Leave, subscribeInfos_ is empty");
         return;
     }
 
     for (const auto& subscriberInfo : subscribeInfos_) {
         if (EventManager.SubscribeKeyEvent(subscriberInfo) != RET_OK) {
-            MMI_LOGE("subscribe key event failed");
+            MMI_HILOGE("subscribe key event failed");
         }
     }
 }
