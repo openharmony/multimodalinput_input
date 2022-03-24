@@ -30,9 +30,14 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Multim
 
 void OnConnected(const IfMMIClient& client)
 {
+    CALL_LOG_ENTER;
+    MMI_LOGI("step 1");
     InputManagerImpl::GetInstance()->OnConnected();
+    MMI_LOGI("step 2");
     KeyEventInputSubscribeMgr.OnConnected();
+    MMI_LOGI("step 3");
     InputHandlerManager::GetInstance().OnConnected();
+    MMI_LOGI("step 4");
 }
 
 MultimodalEventHandler::MultimodalEventHandler() {}
@@ -47,13 +52,13 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
     return EventManager.InjectEvent(keyEventPtr);
 }
 
-int32_t MultimodalEventHandler::GetMultimodeInputInfo()
+bool MultimodalEventHandler::StartClient()
 {
-    if (!InitClient()) {
-        MMI_LOGE("Init client faild");
-        return MMI_SERVICE_INVALID;
+    CALL_LOG_ENTER;
+    if (client_ == nullptr) {
+        return InitClient();
     }
-    return MMI_SERVICE_RUNNING;
+    return true;
 }
 
 bool MultimodalEventHandler::InitClient()
@@ -74,10 +79,9 @@ bool MultimodalEventHandler::InitClient()
 
 MMIClientPtr MultimodalEventHandler::GetMMIClient()
 {
-    if (InitClient()) {
-        return client_;
+    if (client_) {
+        return client_->GetSharedPtr();
     }
-    MMI_LOGE("Init client faild");
     return nullptr;
 }
 

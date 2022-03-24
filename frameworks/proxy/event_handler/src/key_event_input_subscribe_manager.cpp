@@ -21,6 +21,7 @@
 #include "error_multimodal.h"
 #include "bytrace_adapter.h"
 #include "mmi_event_handler.h"
+#include "multimodal_event_handler.h"
 #include "standardized_event_manager.h"
 
 namespace OHOS {
@@ -52,14 +53,18 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
     CALL_LOG_ENTER;
     CHKPR(keyOption, INVALID_SUBSCRIBE_ID);
     CHKPR(callback, INVALID_SUBSCRIBE_ID);
+    if (!MMIEventHdl.StartClient()) {
+        MMI_LOGE("client init failed");
+        return INVALID_SUBSCRIBE_ID;
+    }
     for (auto preKey : keyOption->GetPreKeys()) {
         MMI_LOGD("keyOption->prekey:%{public}d", preKey);
     }
     auto eventHandler = AppExecFwk::EventHandler::Current();
     if (eventHandler == nullptr) {
-        eventHandler = MEventHandler;
+        eventHandler = MEventHandler->GetSharedPtr();
     }
-
+    
     std::lock_guard<std::mutex> guard(mtx_);
     SubscribeKeyEventInfo subscribeInfo(keyOption, callback, eventHandler);
     MMI_LOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
@@ -68,7 +73,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         keyOption->GetFinalKeyDownDuration());
     if (EventManager.SubscribeKeyEvent(subscribeInfo) != RET_OK) {
         MMI_LOGE("Leave, subscribe key event failed");
-        return INVALID_SUBSCRIBE_ID;
+        // return INVALID_SUBSCRIBE_ID;
     }
     subscribeInfos_.push_back(subscribeInfo);
     return subscribeInfo.GetSubscribeId();
@@ -80,6 +85,10 @@ int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
     if (subscribeId < 0) {
         MMI_LOGE("the subscribe id is less than 0");
         return RET_ERR;
+    }
+    if (!MMIEventHdl.StartClient()) {
+        MMI_LOGE("client init failed");
+        return INVALID_SUBSCRIBE_ID;
     }
 
     std::lock_guard<std::mutex> guard(mtx_);
@@ -153,17 +162,20 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
 void KeyEventInputSubscribeManager::OnConnected()
 {
     CALL_LOG_ENTER;
+    MMI_LOGI("step 1");
     std::lock_guard<std::mutex> guard(mtx_);
+    MMI_LOGI("step 2");
     if (subscribeInfos_.empty()) {
         MMI_LOGE("Leave, subscribeInfos_ is empty");
         return;
     }
-
+    MMI_LOGI("step 3");
     for (const auto& subscriberInfo : subscribeInfos_) {
         if (EventManager.SubscribeKeyEvent(subscriberInfo) != RET_OK) {
             MMI_LOGE("subscribe key event failed");
         }
     }
+    MMI_LOGI("step 4");
 }
 
 const KeyEventInputSubscribeManager::SubscribeKeyEventInfo*

@@ -36,16 +36,12 @@ public:
     virtual void OnRecvMsg(const char *buf, size_t size) override;
     virtual int32_t Reconnect() override;
     virtual void OnDisconnect() override;
+    virtual MMIClientPtr GetSharedPtr() override;
 
     bool Start() override;
     void RegisterConnectedFunction(ConnectCallback fun) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
     void VirtualKeyIn(RawInputEvent virtualKeyEvent);
-
-    MMIClientPtr GetSharedPtr()
-    {
-        return shared_from_this();
-    }
 
 protected:
     virtual void OnConnected() override;

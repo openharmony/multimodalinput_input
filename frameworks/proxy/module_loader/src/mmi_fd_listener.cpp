@@ -38,9 +38,9 @@ MMIFdListener::~MMIFdListener()
 
 void MMIFdListener::OnReadable(int32_t fd)
 {
-    int32_t pid = GetPid();
-    uint64_t tid = GetThisThreadId();
-    MMI_LOGD("enter. fd:%{public}d pid:%{public}d tid:%{public}" PRIu64, fd, pid, tid);
+    // int32_t pid = GetPid();
+    // uint64_t tid = GetThisThreadId();
+    // MMI_LOGD("enter. fd:%{public}d pid:%{public}d tid:%{public}" PRIu64, fd, pid, tid);
     if (fd < 0) {
         MMI_LOGE("Invalid fd:%{public}d", fd);
         return;
@@ -60,15 +60,17 @@ void MMIFdListener::OnReadable(int32_t fd)
         if (size < 0) {
             int32_t eno = errno;
             if (eno == EAGAIN || eno == EINTR || eno == EWOULDBLOCK) {
+                MMI_LOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK");
                 continue;
             }
             MMI_LOGE("recv return %{public}zu errno:%{public}d", size, eno);
             break;
         } else if (size == 0) {
-            MMI_LOGE("The service side disconnect with the client. size:0 errno:%{public}d", errno);
-            mmiClient_->OnDisconnect();
+            MMI_LOGE("[Do nothing here]The service side disconnect with the client. size:0 count:%{public}d "
+                "errno:%{public}d", i, errno);
+            // mmiClient_->OnDisconnect();
             break;
-        } else {
+        } else if (size > 0) {
             if (!buf.Write(szBuf, size)) {
                 MMI_LOGE("write error or buffer overflow,count:%{}d size:%{}zu", i, size);
                 isoverflow = true;

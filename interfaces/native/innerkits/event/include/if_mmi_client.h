@@ -21,9 +21,11 @@ namespace OHOS {
 namespace MMI {
 class NetPacket;
 class IfMMIClient;
+using MMIClientPtr = std::shared_ptr<IfMMIClient>;
 typedef std::function<void(const IfMMIClient&)> ConnectCallback;
 class IfMMIClient {
 public:
+    virtual MMIClientPtr GetSharedPtr() = 0;
     virtual bool GetCurrentConnectedStatus() const = 0;
     virtual bool Start() = 0;
     virtual bool SendMessage(const NetPacket& pkt) const = 0;
@@ -33,7 +35,6 @@ public:
     virtual int32_t Reconnect() = 0;
     virtual void OnDisconnect() = 0;
 };
-using MMIClientPtr = std::shared_ptr<IfMMIClient>;
 } // namespace MMI
 } // namespace OHOS
 #endif // IF_MMI_CLIENT_H

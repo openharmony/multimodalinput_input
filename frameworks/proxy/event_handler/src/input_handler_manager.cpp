@@ -85,7 +85,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
 {
     auto eventHandler = AppExecFwk::EventHandler::Current();
     if (eventHandler == nullptr) {
-        eventHandler = MEventHandler;
+        eventHandler = MEventHandler->GetSharedPtr();
     }
     InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,
@@ -103,7 +103,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
 
 void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handlerType)
 {
-    MMIClientPtr client { MMIEventHdl.GetMMIClient() };
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     NetPacket pkt(MmiMessageId::ADD_INPUT_HANDLER);
     if (!pkt.Write(handlerId) || !pkt.Write(handlerType)) {
@@ -135,7 +135,7 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
 void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType handlerType)
 {
     MMI_LOGD("Remove handler:%{public}d from server", handlerId);
-    MMIClientPtr client { MMIEventHdl.GetMMIClient() };
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_HANDLER);
     if (!pkt.Write(handlerId) || !pkt.Write(handlerType)) {

@@ -58,10 +58,10 @@ int32_t StandardizedEventManager::SubscribeKeyEvent(
     for (const auto &item : preKeys) {
         pkt << item;
     }
-    if (MMIEventHdl.GetMMIClient() == nullptr) {
-        MMI_LOGE("client init failed");
-        return RET_ERR;
-    }
+    // if (MMIEventHdl.GetMMIClient() == nullptr) {
+    //     MMI_LOGE("client init failed");
+    //     return RET_ERR;
+    // }
     if (!SendMsg(pkt)) {
         MMI_LOGE("Client failed to send message");
         return RET_ERR;
@@ -74,10 +74,10 @@ int32_t StandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
     CALL_LOG_ENTER;
     NetPacket pkt(MmiMessageId::UNSUBSCRIBE_KEY_EVENT);
     pkt << subscribeId;
-    if (MMIEventHdl.GetMMIClient() == nullptr) {
-        MMI_LOGE("client init failed");
-        return RET_ERR;
-    }
+    // if (MMIEventHdl.GetMMIClient() == nullptr) {
+    //     MMI_LOGE("client init failed");
+    //     return RET_ERR;
+    // }
     if (!SendMsg(pkt)) {
         MMI_LOGE("Client failed to send message");
         return RET_ERR;
