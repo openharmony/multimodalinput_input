@@ -66,7 +66,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
         auto count = send(fd_, buf, size, SOCKET_FLAGS);
         if (count < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_LOGW("continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
+                MMI_HILOGW("continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
                 continue;
             }
             MMI_LOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
