@@ -68,7 +68,7 @@ bool InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> poin
     CALL_LOG_ENTER;
     CHKPF(pointerEvent);
     if (interceptors_.empty()) {
-        MMI_LOGE("%{public}s no interceptor to send msg", __func__);
+        MMI_LOGE("Interceptor is empty");
         return false;
     }
     PointerEvent::PointerItem pointerItem;
