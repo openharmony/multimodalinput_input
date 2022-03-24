@@ -41,7 +41,7 @@ void FakePointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, 
     return;
 }
 
-void FakePointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int32_t height) 
+void FakePointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int32_t height)
 {
     MMI_LOGD("Fake display:%{public}d,width:%{public}d,height:%{public}d", displayId, width, height);
     return;
