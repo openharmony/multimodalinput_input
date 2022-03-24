@@ -186,7 +186,7 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionHa
 {
     if (monitors_.size() >= MAX_N_INPUT_MONITORS) {
         MMI_HILOGE("The number of monitors exceeds the maximum:%{public}zu,monitors,errCode:%{public}d",
-                 monitors_.size(), INVALID_MONITOR_MON);
+                   monitors_.size(), INVALID_MONITOR_MON);
         return RET_ERR;
     }
     auto ret = monitors_.insert(monitor);

@@ -72,7 +72,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
     MMI_HILOGD("LogicalX:%{public}d, logicalY:%{public}d, logicalDisplay:%{public}d",
-             logicalX, logicalY, logicalDisplayId);
+               logicalX, logicalY, logicalDisplayId);
     return true;
 }
 
