@@ -74,7 +74,9 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
             return false;
         }
         sendSize += count;
-        usleep(sleepTime);
+        if (sendSize < bufSize) {
+            usleep(sleepTime);
+        }
     }
     if (retryCount >= retryLimit && sendSize < bufSize) {
         MMI_LOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
