@@ -390,8 +390,9 @@ void UDSServer::DumpSession(const std::string &title)
 {
     MMI_HILOGD("in %s: %s", __func__, title.c_str());
     int32_t i = 0;
-    for (auto& r : sessionsMap_) {
-        MMI_HILOGD("%d, %s", i, r.second->GetDescript().c_str());
+    for (auto& [key, value] : sessionsMap_) {
+        CHKPV(value);
+        MMI_HILOGD("%d, %s", i, value->GetDescript().c_str());
         i++;
     }
 }
@@ -402,9 +403,7 @@ SessionPtr UDSServer::GetSession(int32_t fd) const
     if (it == sessionsMap_.end()) {
         return nullptr;
     }
-    if (it->second == nullptr) {
-        return nullptr;
-    }
+    CHKPP(it->second);
     return it->second->GetPtr();
 }
 
