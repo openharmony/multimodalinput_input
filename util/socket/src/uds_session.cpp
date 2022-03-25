@@ -45,7 +45,7 @@ UDSSession::UDSSession(const std::string& programName, const int32_t moduleType,
 
 UDSSession::~UDSSession() {}
 
-bool UDSClient::SendMsg(const char *buf, size_t size) const
+bool UDSSession::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
     if ((size <= 0) || (size > MAX_PACKET_BUF_SIZE)) {
@@ -80,42 +80,6 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
     if (retryCount >= retryLimit && sendSize < bufSize) {
         MMI_HILOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
             retryCount, retryLimit, sendSize, bufSize, fd_);
-        return false;
-    }
-    return true;
-}
-
-bool UDSSession::SendMsg(const char *buf, size_t size) const
-{
-    CHKPF(buf);
-    if ((size <= 0) || (size > MAX_PACKET_BUF_SIZE)) {
-        MMI_HILOGE("buf size:%{public}zu", size);
-        return false;
-    }
-    if (fd_ < 0) {
-        MMI_HILOGE("fd_ is less than 0");
-        return false;
-    }
-    int32_t sendSize = 0;
-    int32_t sendCount = 0;
-    constexpr int32_t resendLimit = 10;
-    const int32_t bufSize = static_cast<int32_t>(size);
-    while (sendSize < bufSize && sendCount < resendLimit) {
-        sendCount += 1;
-        auto ret = send(fd_, buf, size, SOCKET_FLAGS);
-        if (ret < 0) {
-            int32_t eno = errno;
-            if (eno == EAGAIN || eno == EINTR || eno == EWOULDBLOCK) {
-                continue;
-            }
-            MMI_HILOGE("Send return failed,error:%{public}d fd:%{public}d", eno, fd_);
-            return false;
-        }
-        sendSize += ret;
-    }
-    if (sendCount >= resendLimit && sendSize < bufSize) {
-        MMI_HILOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
-            sendCount, resendLimit, sendSize, bufSize, fd_);
         return false;
     }
     return true;
