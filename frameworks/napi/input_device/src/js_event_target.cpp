@@ -61,6 +61,8 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
     CallbackInfo cbTemp = *cb;
     delete cb;
     cb = nullptr;
+    delete work;
+    work = nullptr
 
     for (const auto &item : cbTemp.ids) {
         status_ = napi_create_int64(env_, item, &value);
@@ -158,6 +160,8 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
     CallbackInfo cbTemp = *cb;
     delete cb;
     cb = nullptr;
+    delete work;
+    work = nullptr
 
     napi_value id = nullptr;
     status_ = napi_create_int64(env_, cbTemp.device->id, &id);
@@ -335,6 +339,8 @@ void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
     CallbackInfo cbTemp = *cb;
     delete cb;
     cb = nullptr;
+    delete work;
+    work = nullptr
 
     for (const auto &item : cbTemp.ids) {
         status_ = napi_create_int64(env_, item, &value);
@@ -419,6 +425,8 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     CallbackInfo cbTemp = *cb;
     delete cb;
     cb = nullptr;
+    delete work;
+    work = nullptr
 
     napi_value id = nullptr;
     status_ = napi_create_int64(env_, cbTemp.device->id, &id);
