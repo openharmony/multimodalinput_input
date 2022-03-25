@@ -20,7 +20,6 @@
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-#include "souceType.h"
 
 namespace OHOS {
 namespace MMI {

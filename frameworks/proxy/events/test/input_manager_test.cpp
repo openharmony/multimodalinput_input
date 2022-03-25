@@ -28,7 +28,6 @@
 #include "interceptor_manager.h"
 #include "multimodal_event_handler.h"
 #include "mmi_client.h"
-#include "mmi_token.h"
 #include "pointer_event.h"
 #include "proto.h"
 #include "run_shell_util.h"
