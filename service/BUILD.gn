@@ -92,7 +92,6 @@ ohos_prebuilt_etc("drawing_pointer_image") {
 ohos_shared_library("libmmi-server") {
   sources = [
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
-    "ability_launch/src/ability_launch_manager.cpp",
     "device_manager/src/input_device.cpp",
     "device_manager/src/input_device_manager.cpp",
     "event_dispatch/src/event_dispatch.cpp",
@@ -124,6 +123,12 @@ ohos_shared_library("libmmi-server") {
       "hdf_adapter/src/hdf_event_manager.cpp",
       "hdi_inject/src/hdi_inject.cpp",
     ]
+  }
+
+  if (is_mmi_have_combinationkey) {
+    sources += [ "ability_launch/src/ability_launch_manager.cpp" ]
+  } else {
+    sources += [ "ability_launch/src/non_multi_key.cpp" ]
   }
 
   sources += [ "module_loader/src/mmi_service.cpp" ]

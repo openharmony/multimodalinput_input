@@ -28,10 +28,10 @@
 
 #include "nocopyable.h"
 #include "nlohmann/json.hpp"
-#include "singleton.h"
 
 #include "key_event.h"
 #include "struct_multimodal.h"
+#include "i_multi_key.h"
 
 namespace OHOS {
 namespace MMI {
@@ -57,7 +57,7 @@ struct ShortcutKey {
     void Print() const;
 };
 
-class AbilityLaunchManager : public DelayedSingleton<AbilityLaunchManager> {
+class AbilityLaunchManager : public IMultiKey {
 public:
     AbilityLaunchManager();
     DISALLOW_COPY_AND_MOVE(AbilityLaunchManager);
@@ -86,7 +86,6 @@ private:
     std::map<std::string, ShortcutKey> shortcutKeys_;
 };
 
-#define AbilityMgr AbilityLaunchManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // ABILITY_LAUNCH_MANAGER_H
