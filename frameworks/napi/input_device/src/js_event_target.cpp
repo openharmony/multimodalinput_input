@@ -133,7 +133,7 @@ void JsEventTarget::EmitJsIdsAsync(int32_t userData, std::vector<int32_t> ids)
         MMI_HILOGE("napi_get_uv_event_loop failed");
         return;
     }
-    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work){}, CallIdsAsyncWork);
+    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallIdsAsyncWork);
     if (ret != 0) {
         MMI_HILOGE("uv_queue_work failed");
     }
@@ -301,7 +301,7 @@ void JsEventTarget::EmitJsDevAsync(int32_t userData, std::shared_ptr<InputDevice
         MMI_HILOGE("napi_get_uv_event_loop failed");
         return;
     }
-    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work){}, CallDevAsyncWork);
+    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDevAsyncWork);
     if (ret != 0) {
         MMI_HILOGE("uv_queue_work failed");
     }
@@ -393,7 +393,7 @@ void JsEventTarget::EmitJsIdsPromise(int32_t userData, std::vector<int32_t> ids)
         MMI_HILOGE("napi_get_uv_event_loop failed");
         return;
     }
-    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work){}, CallIdsPromiseWork);
+    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallIdsPromiseWork);
     if (ret != 0) {
         MMI_HILOGE("uv_queue_work failed");
     }
@@ -551,7 +551,7 @@ void JsEventTarget::EmitJsDevPromise(int32_t userData, std::shared_ptr<InputDevi
         MMI_HILOGE("napi_get_uv_event_loop failed");
         return;
     }
-    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work){}, CallDevPromiseWork);
+    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDevPromiseWork);
     if (ret != 0) {
         MMI_HILOGE("uv_queue_work failed");
     }
