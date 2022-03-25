@@ -403,7 +403,7 @@ SessionPtr UDSServer::GetSession(int32_t fd) const
     if (it == sessionsMap_.end()) {
         return nullptr;
     }
-    CHKPV(it->second);
+    CHKPP(it->second);
     return it->second->GetPtr();
 }
 
