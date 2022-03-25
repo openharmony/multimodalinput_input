@@ -349,5 +349,10 @@ void ShortcutKey::Print() const
     MMI_HILOGD("eventkey matched, finalKey:%{public}d,bundleName:%{public}s",
         finalKey, ability.bundleName.c_str());
 }
+
+std::shared_ptr<IMultiKey> IMultiKey::GetInstance()
+{
+    return std::make_shared<AbilityLaunchManager>();
+}
 } // namespace MMI
 } // namespace OHOS
