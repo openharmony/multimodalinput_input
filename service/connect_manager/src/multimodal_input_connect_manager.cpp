@@ -52,18 +52,18 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_LOGE("client has not connect server");
+        MMI_HILOGE("client has not connect server");
         return RET_ERR;
     }
 
     const std::string programName(GetProgramName());
     int32_t result = multimodalInputConnectService_->AllocSocketFd(programName, moduleType, socketFd_);
     if (result != RET_OK) {
-        MMI_LOGE("AllocSocketFd has error:%{public}d", result);
+        MMI_HILOGE("AllocSocketFd has error:%{public}d", result);
         return RET_ERR;
     }
 
-    MMI_LOGI("AllocSocketPair success. socketFd_:%{public}d", socketFd_);
+    MMI_HILOGI("AllocSocketPair success. socketFd_:%{public}d", socketFd_);
     return RET_OK;
 }
 
@@ -77,7 +77,7 @@ int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> fi
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_LOGE("multimodalInputConnectService_ is nullptr");
+        MMI_HILOGE("multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
     return multimodalInputConnectService_->AddInputEventFilter(filter);
@@ -92,12 +92,12 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
     }
     auto sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sm == nullptr) {
-        MMI_LOGE("get system ability manager fail");
+        MMI_HILOGE("get system ability manager fail");
         return false;
     }
     auto sa = sm->GetSystemAbility(IMultimodalInputConnect::MULTIMODAL_INPUT_CONNECT_SERVICE_ID);
     if (sa == nullptr) {
-        MMI_LOGE("get sa fail");
+        MMI_HILOGE("get sa fail");
         return false;
     }
 
@@ -114,10 +114,10 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
     sa->AddDeathRecipient(multimodalInputConnectRecipient_);
     multimodalInputConnectService_ = iface_cast<IMultimodalInputConnect>(sa);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_LOGE("get multimodalinput service fail");
+        MMI_HILOGE("get multimodalinput service fail");
         return false;
     }
-    MMI_LOGI("get multimodalinput service successful");
+    MMI_HILOGI("get multimodalinput service successful");
     return true;
 }
 
@@ -151,7 +151,7 @@ void MultimodalInputConnectManager::NotifyDeath()
     do {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         if (ConnectMultimodalInputService()) {
-            MMI_LOGD("connect multimodalinput service successful");
+            MMI_HILOGD("connect multimodalinput service successful");
             return;
         }
     } while (--retryCount > 0);

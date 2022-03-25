@@ -34,24 +34,24 @@ int32_t GetDeviceNode::GetDeviceNodeName(const std::string &targetName, uint16_t
     DeviceList deviceList;
     GetDeviceCmd(cmdResult, deviceList);
     if (deviceList.empty()) {
-        MMI_LOGE("device list is null");
+        MMI_HILOGE("device list is null");
         return RET_ERR;
     }
     std::string deviceName = deviceList_[targetName];
     auto iter = deviceList.find(deviceName);
     if (iter == deviceList.end()) {
-        MMI_LOGE("faild for find deviceName:%{public}s", deviceName.c_str());
+        MMI_HILOGE("faild for find deviceName:%{public}s", deviceName.c_str());
         return RET_ERR;
     }
     size_t targetSize = iter->second.size();
     if (devIndex > targetSize) {
-        MMI_LOGE("faild for devIndex:%{public}d > targetSize:%{public}zu", devIndex, targetSize);
+        MMI_HILOGE("faild for devIndex:%{public}d > targetSize:%{public}zu", devIndex, targetSize);
         return RET_ERR;
     }
     std::string nodeRootPath = "/dev/input/";
     deviceNode = nodeRootPath + iter->second[devIndex];
-    MMI_LOGI("%{public}s[%{public}d] --> %{public}s", targetName.c_str(), devIndex,
-             deviceNode.c_str());
+    MMI_HILOGI("%{public}s[%{public}d] --> %{public}s", targetName.c_str(), devIndex,
+               deviceNode.c_str());
 
     return RET_OK;
 }
@@ -80,7 +80,7 @@ void GetDeviceNode::InitDeviceInfo()
 int32_t GetDeviceNode::ExecuteCmd(const std::string cmd, std::vector<std::string> &cmdResult)
 {
     if (cmd.empty()) {
-        MMI_LOGE("cmd is null");
+        MMI_HILOGE("cmd is null");
         return RET_ERR;
     }
     FILE* pin = popen(cmd.c_str(), "r");
@@ -100,7 +100,7 @@ void GetDeviceNode::GetDeviceCmd(const std::vector<std::string>& cmdResult, Devi
     std::string name;
     for (const auto &item : cmdResult) {
         if (item.empty()) {
-            MMI_LOGE("device info is none");
+            MMI_HILOGE("device info is none");
             return;
         }
         std::string temp = item.substr(0, 1);

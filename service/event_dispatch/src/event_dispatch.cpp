@@ -50,10 +50,10 @@ void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
                                                   POINT_EVENT_TYPE& pointEventType)
 {
     if (fingerCount <= 0 || touch.time <= 0 || touch.seatSlot < 0 || touch.eventType < 0) {
-        MMI_LOGE("The in parameter is error, fingerCount:%{public}d, touch.time:%{public}" PRId64 ","
-                 "touch.seatSlot:%{public}d, touch.eventType:%{public}d",
-                 fingerCount, touch.time, touch.seatSlot, touch.eventType);
-                 return;
+        MMI_HILOGE("The in parameter is error, fingerCount:%{public}d, touch.time:%{public}" PRId64 ","
+                   "touch.seatSlot:%{public}d, touch.eventType:%{public}d",
+                   fingerCount, touch.time, touch.seatSlot, touch.eventType);
+        return;
     }
     if (fingerCount == 1) {
         switch (touch.eventType) {
@@ -104,17 +104,17 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     CALL_LOG_ENTER;
     CHKPR(point, ERROR_NULL_POINTER);
     if (HandlePointerEventFilter(point)) {
-        MMI_LOGI("Pointer event Filter succeeded");
+        MMI_HILOGI("Pointer event Filter succeeded");
         return RET_OK;
     }
     if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
         BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
-        MMI_LOGD("Interception and monitor succeeded");
+        MMI_HILOGD("Interception and monitor succeeded");
         return RET_OK;
     }
     auto fd = WinMgr->UpdateTargetPointer(point);
     if (fd < 0) {
-        MMI_LOGE("The fd less than 0, fd: %{public}d", fd);
+        MMI_HILOGE("The fd less than 0, fd: %{public}d", fd);
         return RET_ERR;
     }
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
@@ -122,14 +122,14 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
     auto udsServer = InputHandler->GetUDSServer();
     if (udsServer == nullptr) {
-        MMI_LOGE("UdsServer is a nullptr");
+        MMI_HILOGE("UdsServer is a nullptr");
         return RET_ERR;
     }
 
     auto session = udsServer->GetSession(fd);
     CHKPF(session);
     if (session->isANRProcess_) {
-        MMI_LOGD("is ANR process");
+        MMI_HILOGD("is ANR process");
         return RET_OK;
     }
 
@@ -141,7 +141,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     }
 
     if (!udsServer->SendMsg(fd, pkt)) {
-        MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
+        MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
     session->AddEvent(point->GetId(), currentTime);
@@ -154,41 +154,41 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
     CHKPR(key, PARAM_INPUT_INVALID);
     if (!key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         if (InterceptorMgrGbl.OnKeyEvent(key)) {
-            MMI_LOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
+            MMI_HILOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
                 key->GetKeyCode());
             BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_INTERCEPT_EVENT);
             return RET_OK;
         }
     }
     if (AbilityMgr->CheckLaunchAbility(key)) {
-        MMI_LOGD("The keyEvent start launch an ability, keyCode:%{public}d", key->GetKeyCode());
+        MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{public}d", key->GetKeyCode());
         BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_LAUNCH_EVENT);
         return RET_OK;
     }
     if (KeyEventSubscriber_.SubscribeKeyEvent(key)) {
-        MMI_LOGD("Subscribe keyEvent filter success. keyCode:%{public}d", key->GetKeyCode());
+        MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{public}d", key->GetKeyCode());
         BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
         return RET_OK;
     }
     auto fd = WinMgr->UpdateTarget(key);
     if (fd < 0) {
-        MMI_LOGE("Invalid fd, fd: %{public}d", fd);
+        MMI_HILOGE("Invalid fd, fd: %{public}d", fd);
         return RET_ERR;
     }
-    MMI_LOGD("event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
-             "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
-             "EventType:%{public}d,Flag:%{public}u,"
-             "KeyAction:%{public}d,Fd:%{public}d",
-             key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
-             key->GetActionStartTime(),
-             key->GetEventType(),
-             key->GetFlag(), key->GetKeyAction(), fd);
+    MMI_HILOGD("event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
+               "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
+               "EventType:%{public}d,Flag:%{public}u,"
+               "KeyAction:%{public}d,Fd:%{public}d",
+               key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
+               key->GetActionStartTime(),
+               key->GetEventType(),
+               key->GetFlag(), key->GetKeyAction(), fd);
 
     InputHandlerManagerGlobal::GetInstance().HandleEvent(key);
     auto session = udsServer.GetSession(fd);
     CHKPF(session);
     if (session->isANRProcess_) {
-        MMI_LOGD("is ANR process");
+        MMI_HILOGD("is ANR process");
         return RET_OK;
     }
 
@@ -204,7 +204,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
     BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_DISPATCH_EVENT);
     pkt << fd;
     if (!udsServer.SendMsg(fd, pkt)) {
-        MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
+        MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
     session->AddEvent(key->GetId(), currentTime);
@@ -228,7 +228,7 @@ bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
 
     if (time < (earlist + INPUT_UI_TIMEOUT_TIME)) {
         sess->isANRProcess_ = false;
-        MMI_LOGD("the event reports normally");
+        MMI_HILOGD("the event reports normally");
         return false;
     }
 
@@ -242,12 +242,12 @@ bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
         "PROCESS_NAME", "",
         "MSG", "User input does not respond");
     if (ret != 0) {
-        MMI_LOGE("HiviewDFX Write failed, HiviewDFX errCode: %{public}d", ret);
+        MMI_HILOGE("HiviewDFX Write failed, HiviewDFX errCode: %{public}d", ret);
     }
 
     ret = OHOS::AAFwk::AbilityManagerClient::GetInstance()->SendANRProcessID(sess->GetPid());
     if (ret != 0) {
-        MMI_LOGE("AAFwk SendANRProcessID failed, AAFwk errCode: %{public}d", ret);
+        MMI_HILOGE("AAFwk SendANRProcessID failed, AAFwk errCode: %{public}d", ret);
     }
     return true;
 }

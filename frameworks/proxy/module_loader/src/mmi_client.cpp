@@ -64,12 +64,12 @@ bool MMIClient::Start()
     auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, &msgHandler_,
         std::placeholders::_1, std::placeholders::_2);
     if (!(StartClient(callback))) {
-        MMI_LOGE("Client startup failed");
+        MMI_HILOGE("Client startup failed");
         Stop();
         return false;
     }
     if (!StartEventRunner()) {
-        MMI_LOGE("Start runner failed");
+        MMI_HILOGE("Start runner failed");
         Stop();
         return false;
     }
@@ -81,14 +81,14 @@ bool MMIClient::StartEventRunner()
     CALL_LOG_ENTER;
     int32_t pid = GetPid();
     uint64_t tid = GetThisThreadId();
-    MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
+    MMI_HILOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
 
     constexpr int32_t WAIT_FOR_TIMEOUT = 3;
     std::unique_lock <std::mutex> lck(mtx);
     ehThread_ = std::thread(std::bind(&MMIClient::OnEventHandlerThread, this));
     ehThread_.detach();
     if (cv.wait_for(lck, std::chrono::seconds(WAIT_FOR_TIMEOUT)) == std::cv_status::timeout) {
-        MMI_LOGE("EventThandler thread start timeout");
+        MMI_HILOGE("EventThandler thread start timeout");
         Stop();
         return false;
     }
@@ -96,7 +96,7 @@ bool MMIClient::StartEventRunner()
     recvThread_ = std::thread(std::bind(&MMIClient::OnRecvThread, this));
     recvThread_.detach();
     if (cv.wait_for(lck, std::chrono::seconds(WAIT_FOR_TIMEOUT)) == std::cv_status::timeout) {
-        MMI_LOGE("Recv thread start timeout");
+        MMI_HILOGE("Recv thread start timeout");
         Stop();
         return false;
     }
@@ -109,7 +109,7 @@ void MMIClient::OnEventHandlerThread()
     SetThreadName("mmi_client_EventHdr");
     int32_t pid = GetPid();
     uint64_t tid = GetThisThreadId();
-    MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
+    MMI_HILOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
 
     auto eventHandler = MEventHandler->GetSharedPtr();
     CHKPV(eventHandler);
@@ -125,7 +125,7 @@ void MMIClient::OnRecvThread()
     SetThreadName("mmi_client_RecvEventHdr");
     int32_t pid = GetPid();
     uint64_t tid = GetThisThreadId();
-    MMI_LOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
+    MMI_HILOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
 
     auto runner = EventRunner::Create(false);
     CHKPV(runner);
@@ -133,12 +133,12 @@ void MMIClient::OnRecvThread()
     CHKPV(recvEventHandler_);
     if (isConnected_ && fd_ >= 0) {
         if (!AddFdListener(fd_)) {
-            MMI_LOGE("add fd listener return false");
+            MMI_HILOGE("add fd listener return false");
             return;
         }
     } else {
         if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, CLIENT_RECONNECT_COOLING_TIME)) {
-            MMI_LOGE("send reconnect event return false.");
+            MMI_HILOGE("send reconnect event return false.");
             return;
         }
     }
@@ -150,7 +150,7 @@ bool MMIClient::AddFdListener(int32_t fd)
 {
     CALL_LOG_ENTER;
     if (fd < 0) {
-        MMI_LOGE("Invalid fd:%{public}d", fd);
+        MMI_HILOGE("Invalid fd:%{public}d", fd);
         return false;
     }
     CHKPF(recvEventHandler_);
@@ -158,14 +158,14 @@ bool MMIClient::AddFdListener(int32_t fd)
     CHKPF(fdListener);
     auto errCode = recvEventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_INPUT_EVENT, fdListener);
     if (errCode != ERR_OK) {
-        MMI_LOGE("add fd listener error,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode,
+        MMI_HILOGE("add fd listener error,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode,
             recvEventHandler_->GetErrorStr(errCode).c_str());
         return false;
     }
     isRunning_ = true;
     int32_t pid = GetPid();
     uint64_t tid = GetThisThreadId();
-    MMI_LOGI("serverFd:%{public}d was listening,mask:%{public}u pid:%{public}d threadId:%{public}" PRIu64,
+    MMI_HILOGI("serverFd:%{public}d was listening,mask:%{public}u pid:%{public}d threadId:%{public}" PRIu64,
         fd, FILE_DESCRIPTOR_INPUT_EVENT, pid, tid);
     return true;
 }
@@ -175,7 +175,7 @@ bool MMIClient::DelFdListener(int32_t fd)
     CALL_LOG_ENTER;
     CHKPF(recvEventHandler_);
     if (fd < 0) {
-        MMI_LOGE("Invalid fd:%{public}d", fd);
+        MMI_HILOGE("Invalid fd:%{public}d", fd);
         return false;
     }
     recvEventHandler_->RemoveAllEvents();
@@ -188,7 +188,7 @@ void MMIClient::OnRecvMsg(const char *buf, size_t size)
 {
     CHKPV(buf);
     if (size == 0) {
-        MMI_LOGE("Invalid input param size");
+        MMI_HILOGE("Invalid input param size");
         return;
     }
     OnRecv(buf, size);
@@ -224,18 +224,18 @@ void MMIClient::VirtualKeyIn(RawInputEvent virtualKeyEvent)
 void MMIClient::OnDisconnected()
 {
     CALL_LOG_ENTER;
-    MMI_LOGD("Disconnected from server, fd:%{public}d", fd_);
+    MMI_HILOGD("Disconnected from server, fd:%{public}d", fd_);
     isConnected_ = false;
     if (funDisconnected_) {
         funDisconnected_(*this);
     }
     if (!DelFdListener(fd_)) {
-        MMI_LOGE("delete fd listener failed.");
+        MMI_HILOGE("delete fd listener failed.");
     }
     Close();
     if (!isExit && recvEventHandler_ != nullptr) {
         if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, CLIENT_RECONNECT_COOLING_TIME)) {
-            MMI_LOGE("send reconnect event return false.");
+            MMI_HILOGE("send reconnect event return false.");
         }
     }
 }
@@ -243,14 +243,14 @@ void MMIClient::OnDisconnected()
 void MMIClient::OnConnected()
 {
     CALL_LOG_ENTER;
-    MMI_LOGD("Connection to server succeeded, fd:%{public}d", GetFd());
+    MMI_HILOGD("Connection to server succeeded, fd:%{public}d", GetFd());
     isConnected_ = true;
     if (funConnected_) {
         funConnected_(*this);
     }
     if (!isExit && !isRunning_ && fd_ >= 0 && recvEventHandler_ != nullptr) {
         if (!AddFdListener(fd_)) {
-            MMI_LOGE("Add fd listener failed");
+            MMI_HILOGE("Add fd listener failed");
         }
     }
 }
@@ -261,14 +261,14 @@ int32_t MMIClient::Socket()
     int32_t ret = MultimodalInputConnectManager::GetInstance()->
                         AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
     if (ret != RET_OK) {
-        MMI_LOGE("call AllocSocketPair return %{public}d", ret);
+        MMI_HILOGE("call AllocSocketPair return %{public}d", ret);
         return -1;
     }
     fd_ = MultimodalInputConnectManager::GetInstance()->GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
-        MMI_LOGE("call GetClientSocketFdOfAllocedSocketPair return invalid fd");
+        MMI_HILOGE("call GetClientSocketFdOfAllocedSocketPair return invalid fd");
     } else {
-        MMI_LOGD("call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
+        MMI_HILOGD("call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
     }
     return fd_;
 }

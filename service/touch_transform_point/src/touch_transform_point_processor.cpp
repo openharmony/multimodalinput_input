@@ -46,7 +46,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     int32_t logicalX = -1;
     int32_t logicalDisplayId = -1;
     if (!WinMgr->TouchDownPointToDisplayPoint(data, direction_, logicalX, logicalY, logicalDisplayId)) {
-        MMI_LOGE("TouchDownPointToDisplayPoint failed");
+        MMI_HILOGE("TouchDownPointToDisplayPoint failed");
         return false;
     }
     auto pointIds = pointerEvent_->GetPointersIdList();
@@ -71,8 +71,8 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_LOGD("LogicalX:%{public}d, logicalY:%{public}d, logicalDisplay:%{public}d",
-             logicalX, logicalY, logicalDisplayId);
+    MMI_HILOGD("LogicalX:%{public}d, logicalY:%{public}d, logicalDisplay:%{public}d",
+               logicalX, logicalY, logicalDisplayId);
     return true;
 }
 
@@ -89,13 +89,13 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
     int32_t logicalX = -1;
     int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
     if (!WinMgr->TouchMotionPointToDisplayPoint(data, direction_, logicalDisplayId, logicalX, logicalY)) {
-        MMI_LOGE("Get TouchMotionPointToDisplayPoint failed");
+        MMI_HILOGE("Get TouchMotionPointToDisplayPoint failed");
         return false;
     }
     PointerEvent::PointerItem item;
     auto seatSlot = libinput_event_touch_get_seat_slot(data);
     if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
-        MMI_LOGE("Get pointer parameter failed");
+        MMI_HILOGE("Get pointer parameter failed");
         return false;
     }
     auto pressure = libinput_event_get_touch_pressure(event);
@@ -120,7 +120,7 @@ bool TouchTransformPointProcessor::OnEventTouchUp(struct libinput_event *event)
     PointerEvent::PointerItem item;
     auto seatSlot = libinput_event_touch_get_seat_slot(data);
     if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
-        MMI_LOGE("Get pointer parameter failed");
+        MMI_HILOGE("Get pointer parameter failed");
         return false;
     }
     item.SetPressed(false);
@@ -139,27 +139,27 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
             if (!OnEventTouchDown(event)) {
-                MMI_LOGE("Get OnEventTouchDown failed");
+                MMI_HILOGE("Get OnEventTouchDown failed");
                 return nullptr;
             }
             break;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
             if (!OnEventTouchUp(event)) {
-                MMI_LOGE("Get OnEventTouchUp failed");
+                MMI_HILOGE("Get OnEventTouchUp failed");
                 return nullptr;
             }
             break;
         }
         case LIBINPUT_EVENT_TOUCH_MOTION: {
             if (!OnEventTouchMotion(event)) {
-                MMI_LOGE("Get OnEventTouchMotion failed");
+                MMI_HILOGE("Get OnEventTouchMotion failed");
                 return nullptr;
             }
             break;
         }
         default: {
-            MMI_LOGE("Unknown event type, touchType:%{public}d", type);
+            MMI_HILOGE("Unknown event type, touchType:%{public}d", type);
             return nullptr;
         }
     }

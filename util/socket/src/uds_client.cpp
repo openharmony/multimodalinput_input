@@ -39,7 +39,7 @@ int32_t UDSClient::ConnectTo()
 {
     CALL_LOG_ENTER;
     if (Socket() < 0) {
-        MMI_LOGE("Socket failed");
+        MMI_HILOGE("Socket failed");
         return RET_ERR;
     }
     OnConnected();
@@ -50,11 +50,11 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
     if ((size <= 0) || (size > MAX_PACKET_BUF_SIZE)) {
-        MMI_LOGE("Stream buffer size out of range");
+        MMI_HILOGE("Stream buffer size out of range");
         return false;
     }
     if (fd_ < 0) {
-        MMI_LOGE("fd_ is less than 0");
+        MMI_HILOGE("fd_ is less than 0");
         return false;
     }
     int32_t sendSize = 0;
@@ -70,7 +70,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
                 MMI_HILOGW("continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
                 continue;
             }
-            MMI_LOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
+            MMI_HILOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
             return false;
         }
         sendSize += count;
@@ -79,7 +79,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
         }
     }
     if (retryCount >= retryLimit && sendSize < bufSize) {
-        MMI_LOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
+        MMI_HILOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
             retryCount, retryLimit, sendSize, bufSize, fd_);
         return false;
     }
@@ -89,7 +89,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
 bool UDSClient::SendMsg(const NetPacket& pkt) const
 {
     if (pkt.ChkRWError()) {
-        MMI_LOGE("Read and write status is error");
+        MMI_HILOGE("Read and write status is error");
         return false;
     }
     StreamBuffer buf;
@@ -101,7 +101,7 @@ bool UDSClient::StartClient(MsgClientFunCallback fun)
 {
     CALL_LOG_ENTER;
     if (isRunning_ || isConnected_) {
-        MMI_LOGE("Client is connected or started.");
+        MMI_HILOGE("Client is connected or started.");
         return false;
     }
     isExit = false;
@@ -128,23 +128,23 @@ void UDSClient::OnRecv(const char *buf, size_t size)
     int32_t bufSize = static_cast<int32_t>(size);
     constexpr int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
     if (bufSize < headSize) {
-        MMI_LOGE("The in parameter size is error, errCode:%{public}d", VAL_NOT_EXP);
+        MMI_HILOGE("The in parameter size is error, errCode:%{public}d", VAL_NOT_EXP);
         return;
     }
     while (bufSize > 0 && recvFun_) {
         if (bufSize < headSize) {
-            MMI_LOGE("The size is less than headSize, errCode:%{public}d", VAL_NOT_EXP);
+            MMI_HILOGE("The size is less than headSize, errCode:%{public}d", VAL_NOT_EXP);
             return;
         }
         auto head = reinterpret_cast<PackHead *>(const_cast<char *>(&buf[readIdx]));
         if (head->size < 0 || head->size >= bufSize) {
-            MMI_LOGE("Head size is error, head->size:%{public}d, errCode:%{public}d", head->size, VAL_NOT_EXP);
+            MMI_HILOGE("Head size is error, head->size:%{public}d, errCode:%{public}d", head->size, VAL_NOT_EXP);
             return;
         }
         NetPacket pkt(head->idMsg);
         if (head->size > 0) {
             if (!pkt.Write(&buf[readIdx + headSize], static_cast<size_t>(head->size))) {
-                MMI_LOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+                MMI_HILOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
                 return;
             }
         }

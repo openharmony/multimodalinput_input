@@ -359,7 +359,7 @@ void PointerEvent::SetButtonPressed(int32_t buttonId)
 {
     auto iter = pressedButtons_.insert(buttonId);
     if (!iter.second) {
-        MMI_LOGE("Insert value failed, button:%{public}d", buttonId);
+        MMI_HILOGE("Insert value failed, button:%{public}d", buttonId);
     }
 }
 
@@ -566,7 +566,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         }
         auto iter = pressedButtons_.insert(val);
         if (!iter.second) {
-            MMI_LOGE("Insert value failed, button:%{public}d", val);
+            MMI_HILOGE("Insert value failed, button:%{public}d", val);
         }
     }
 
@@ -610,19 +610,19 @@ bool PointerEvent::IsValidCheckMouseFunc() const
 {
     CALL_LOG_ENTER;
     if (pointers_.size() != 1) {
-        MMI_LOGE("Pointers_ is invalid");
+        MMI_HILOGE("Pointers_ is invalid");
         return false;
     }
 
     size_t maxPressedButtons = 3;
     if (pressedButtons_.size() > maxPressedButtons) {
-        MMI_LOGE("PressedButtons_.size is greater than three and is invalid");
+        MMI_HILOGE("PressedButtons_.size is greater than three and is invalid");
         return false;
     }
 
     for (const auto &item : pressedButtons_) {
         if (item != MOUSE_BUTTON_LEFT && item != MOUSE_BUTTON_RIGHT && item != MOUSE_BUTTON_MIDDLE) {
-            MMI_LOGE("PressedButtons_ is invalid");
+            MMI_HILOGE("PressedButtons_ is invalid");
             return false;
         }
     }
@@ -632,19 +632,19 @@ bool PointerEvent::IsValidCheckMouseFunc() const
         pointAction != POINTER_ACTION_AXIS_BEGIN && pointAction != POINTER_ACTION_AXIS_UPDATE &&
         pointAction != POINTER_ACTION_AXIS_END && pointAction != POINTER_ACTION_BUTTON_DOWN &&
         pointAction != POINTER_ACTION_BUTTON_UP) {
-        MMI_LOGE("PointAction is invalid");
+        MMI_HILOGE("PointAction is invalid");
         return false;
     }
 
     int32_t buttonId = GetButtonId();
     if (pointAction == POINTER_ACTION_BUTTON_DOWN || pointAction == POINTER_ACTION_BUTTON_UP) {
         if (buttonId != MOUSE_BUTTON_LEFT && buttonId != MOUSE_BUTTON_RIGHT && buttonId != MOUSE_BUTTON_MIDDLE) {
-            MMI_LOGE("ButtonId is invalid");
+            MMI_HILOGE("ButtonId is invalid");
             return false;
         }
     } else {
         if (buttonId != BUTTON_NONE) {
-            MMI_LOGE("ButtonId is not BUTTON_NONE and is invalid");
+            MMI_HILOGE("ButtonId is not BUTTON_NONE and is invalid");
             return false;
         }
     }
@@ -656,33 +656,33 @@ bool PointerEvent::IsValidCheckMouse() const
     CALL_LOG_ENTER;
     int32_t mousePointID = GetPointerId();
     if (mousePointID < 0) {
-        MMI_LOGE("MousePointID is invalid");
+        MMI_HILOGE("MousePointID is invalid");
         return false;
     }
 
     if (!IsValidCheckMouseFunc()) {
-        MMI_LOGE("IsValidCheckMouseFunc is invalid");
+        MMI_HILOGE("IsValidCheckMouseFunc is invalid");
         return false;
     }
 
     for (const auto &item : pointers_) {
         if (item.GetPointerId() < 0) {
-            MMI_LOGE("Item.pointerid is invalid");
+            MMI_HILOGE("Item.pointerid is invalid");
             return false;
         }
 
         if (item.GetPointerId() != mousePointID) {
-            MMI_LOGE("Item.pointerid is not same to mousePointID and is invalid");
+            MMI_HILOGE("Item.pointerid is not same to mousePointID and is invalid");
             return false;
         }
 
         if (item.GetDownTime() > 0) {
-            MMI_LOGE("Item.downtime is invalid");
+            MMI_HILOGE("Item.downtime is invalid");
             return false;
         }
 
         if (item.IsPressed() != false) {
-            MMI_LOGE("Item.ispressed is not false and is invalid");
+            MMI_HILOGE("Item.ispressed is not false and is invalid");
             return false;
         }
     }
@@ -694,24 +694,24 @@ bool PointerEvent::IsValidCheckTouchFunc() const
     CALL_LOG_ENTER;
     int32_t touchPointID = GetPointerId();
     if (touchPointID < 0) {
-        MMI_LOGE("TouchPointID is invalid");
+        MMI_HILOGE("TouchPointID is invalid");
         return false;
     }
 
     if (!pressedButtons_.empty()) {
-        MMI_LOGE("PressedButtons_.size is invalid");
+        MMI_HILOGE("PressedButtons_.size is invalid");
         return false;
     }
 
     int32_t pointAction = GetPointerAction();
     if (pointAction != POINTER_ACTION_CANCEL && pointAction != POINTER_ACTION_MOVE &&
         pointAction != POINTER_ACTION_DOWN && pointAction != POINTER_ACTION_UP) {
-        MMI_LOGE("PointAction is invalid");
+        MMI_HILOGE("PointAction is invalid");
         return false;
     }
 
     if (GetButtonId() != BUTTON_NONE) {
-        MMI_LOGE("ButtonId is invalid");
+        MMI_HILOGE("ButtonId is invalid");
         return false;
     }
     return true;
@@ -721,14 +721,14 @@ bool PointerEvent::IsValidCheckTouch() const
 {
     CALL_LOG_ENTER;
     if (!IsValidCheckTouchFunc()) {
-        MMI_LOGE("IsValidCheckTouchFunc is invalid");
+        MMI_HILOGE("IsValidCheckTouchFunc is invalid");
         return false;
     }
     bool isSameItem = false;
     int32_t touchPointID = GetPointerId();
     for (auto item = pointers_.begin(); item != pointers_.end(); item++) {
         if (item->GetPointerId() < 0) {
-            MMI_LOGE("Item.pointerid is invalid");
+            MMI_HILOGE("Item.pointerid is invalid");
             return false;
         }
 
@@ -737,26 +737,26 @@ bool PointerEvent::IsValidCheckTouch() const
         }
 
         if (item->GetDownTime() <= 0) {
-            MMI_LOGE("Item.downtime is invalid");
+            MMI_HILOGE("Item.downtime is invalid");
             return false;
         }
 
         if (item->IsPressed() != false) {
-            MMI_LOGE("Item.ispressed is not false and is invalid");
+            MMI_HILOGE("Item.ispressed is not false and is invalid");
             return false;
         }
 
         auto itemtmp = item;
         for (++itemtmp; itemtmp != pointers_.end(); itemtmp++) {
             if (item->GetPointerId() == itemtmp->GetPointerId()) {
-                MMI_LOGE("Pointitems pointerid exist same items and is invalid");
+                MMI_HILOGE("Pointitems pointerid exist same items and is invalid");
                 return false;
             }
         }
     }
 
     if (!isSameItem) {
-        MMI_LOGE("Item.pointerid is not same to touchPointID and is invalid");
+        MMI_HILOGE("Item.pointerid is not same to touchPointID and is invalid");
         return false;
     }
     return true;
@@ -768,13 +768,13 @@ bool PointerEvent::IsValid() const
     int32_t sourceType = GetSourceType();
     if (sourceType != SOURCE_TYPE_MOUSE && sourceType != SOURCE_TYPE_TOUCHSCREEN &&
         sourceType != SOURCE_TYPE_TOUCHPAD) {
-        MMI_LOGE("SourceType is invalid");
+        MMI_HILOGE("SourceType is invalid");
         return false;
     }
     switch (sourceType) {
         case SOURCE_TYPE_MOUSE: {
             if (!IsValidCheckMouse()) {
-                MMI_LOGE("IsValidCheckMouse is invalid");
+                MMI_HILOGE("IsValidCheckMouse is invalid");
                 return false;
             }
             break;
@@ -782,13 +782,13 @@ bool PointerEvent::IsValid() const
         case SOURCE_TYPE_TOUCHSCREEN:
         case SOURCE_TYPE_TOUCHPAD: {
             if (!IsValidCheckTouch()) {
-                MMI_LOGE("IsValidCheckTouch is invalid");
+                MMI_HILOGE("IsValidCheckTouch is invalid");
                 return false;
             }
             break;
         }
         default: {
-            MMI_LOGE("SourceType is invalid");
+            MMI_HILOGE("SourceType is invalid");
             return false;
         }
     }
@@ -818,7 +818,7 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
     for (const auto& pointerId : pointerIds) {
         PointerEvent::PointerItem item;
         if (!pointerEvent.GetPointerItem(pointerId, item)) {
-            MMI_LOGE("Invalid pointer: %{public}d.", pointerId);
+            MMI_HILOGE("Invalid pointer: %{public}d.", pointerId);
             return ostream;
         }
         ostream << "DownTime:" << item.GetDownTime()

@@ -157,8 +157,8 @@ void InputEventHandler::OnEvent(void *event)
     auto *lpEvent = static_cast<libinput_event *>(event);
     CHKPV(lpEvent);
     if (initSysClock_ != 0 && lastSysClock_ == 0) {
-        MMI_LOGE("Event not handled. id:%{public}" PRId64 ",eventType:%{public}d,initSysClock:%{public}" PRId64,
-                 idSeed_, eventType_, initSysClock_);
+        MMI_HILOGE("Event not handled. id:%{public}" PRId64 ",eventType:%{public}d,initSysClock:%{public}" PRId64,
+                   idSeed_, eventType_, initSysClock_);
     }
 
     eventType_ = libinput_event_get_type(lpEvent);
@@ -168,19 +168,19 @@ void InputEventHandler::OnEvent(void *event)
     idSeed_ += 1;
     const uint64_t maxUInt64 = (std::numeric_limits<uint64_t>::max)() - 1;
     if (idSeed_ >= maxUInt64) {
-        MMI_LOGE("Invaild value. id:%{public}" PRId64, idSeed_);
+        MMI_HILOGE("Invaild value. id:%{public}" PRId64, idSeed_);
         idSeed_ = 1;
         return;
     }
 
-    MMI_LOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
-             "initSysClock:%{public}" PRId64, idSeed_, tid, eventType_, initSysClock_);
+    MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
+               "initSysClock:%{public}" PRId64, idSeed_, tid, eventType_, initSysClock_);
 
     OnEventHandler(lpEvent);
     lastSysClock_ = GetSysClockTime();
     int64_t lostTime = lastSysClock_ - initSysClock_;
-    MMI_LOGD("Event handling completed. id:%{public}" PRId64 ",lastSynClock:%{public}" PRId64
-             ",lostTime:%{public}" PRId64, idSeed_, lastSysClock_, lostTime);
+    MMI_HILOGD("Event handling completed. id:%{public}" PRId64 ",lastSynClock:%{public}" PRId64
+               ",lostTime:%{public}" PRId64, idSeed_, lastSysClock_, lostTime);
 }
 
 int32_t InputEventHandler::OnEventHandler(libinput_event *event)
@@ -190,13 +190,13 @@ int32_t InputEventHandler::OnEventHandler(libinput_event *event)
     TimeCostChk chk("InputEventHandler::OnEventHandler", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
     auto callback = GetMsgCallback(static_cast<MmiMessageId>(type));
     if (callback == nullptr) {
-        MMI_LOGE("Unknown event type:%{public}d,errCode:%{public}d", type, UNKNOWN_EVENT);
+        MMI_HILOGE("Unknown event type:%{public}d,errCode:%{public}d", type, UNKNOWN_EVENT);
         return UNKNOWN_EVENT;
     }
     auto ret = (*callback)(event);
     if (ret != 0) {
-        MMI_LOGE("Event handling failed. type:%{public}d,ret:%{public}d,errCode:%{public}d",
-                 type, ret, EVENT_CONSUM_FAIL);
+        MMI_HILOGE("Event handling failed. type:%{public}d,ret:%{public}d,errCode:%{public}d",
+                   type, ret, EVENT_CONSUM_FAIL);
         return ret;
     }
     return ret;
@@ -213,8 +213,8 @@ void InputEventHandler::OnCheckEventReport()
     if (lostTime < MAX_DID_TIME) {
         return;
     }
-    MMI_LOGE("Event not responding. id:%{public}" PRId64 ",eventType:%{public}d,initSysClock:%{public}" PRId64 ","
-             "lostTime:%{public}" PRId64, idSeed_, eventType_, initSysClock_, lostTime);
+    MMI_HILOGE("Event not responding. id:%{public}" PRId64 ",eventType:%{public}d,initSysClock:%{public}" PRId64 ","
+               "lostTime:%{public}" PRId64, idSeed_, eventType_, initSysClock_, lostTime);
 }
 
 UDSServer* InputEventHandler::GetUDSServer() const
@@ -245,18 +245,18 @@ int32_t InputEventHandler::OnEventDeviceRemoved(libinput_event *event)
 void InputEventHandler::AddHandleTimer(int32_t timeout)
 {
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
-        MMI_LOGD("enter");
+        MMI_HILOGD("enter");
         if (this->keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
-            MMI_LOGD("key up");
+            MMI_HILOGD("key up");
             return;
         }
         auto ret = eventDispatch_.DispatchKeyEventPid(*(this->udsServer_), this->keyEvent_);
         if (ret != RET_OK) {
-            MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
+            MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
         }
         constexpr int32_t triggerTime = 100;
         this->AddHandleTimer(triggerTime);
-        MMI_LOGD("leave");
+        MMI_HILOGD("leave");
     });
 }
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
@@ -269,11 +269,11 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
 
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
-        MMI_LOGD("The same event reported by multi_device should be discarded");
+        MMI_HILOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
     }
     if (packageResult != RET_OK) {
-        MMI_LOGE("KeyEvent package failed. ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
+        MMI_HILOGE("KeyEvent package failed. ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
 
@@ -281,14 +281,14 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
 
     auto ret = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_);
     if (ret != RET_OK) {
-        MMI_LOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
+        MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
     if (keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP ||
         keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN) {
         if (!TimerMgr->IsExist(timerId_) && keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
             AddHandleTimer();
-            MMI_LOGD("add a timer");
+            MMI_HILOGD("add a timer");
         }
         if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && TimerMgr->IsExist(timerId_)) {
             TimerMgr->RemoveTimer(timerId_);
@@ -296,7 +296,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         }
     }
 
-    MMI_LOGD("keyCode:%{public}d,action:%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
+    MMI_HILOGD("keyCode:%{public}d,action:%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
     return RET_OK;
 }
 
@@ -312,7 +312,7 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
     CHKPR(event, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
-        MMI_LOGD("This touch event is canceled type:%{public}d", type);
+        MMI_HILOGD("This touch event is canceled type:%{public}d", type);
         return RET_OK;
     }
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
@@ -321,9 +321,9 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
     eventDispatch_.HandlePointerEvent(pointerEvent);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
-        MMI_LOGD("This touch event is up remove this finger");
+        MMI_HILOGD("This touch event is up remove this finger");
         if (pointerEvent->GetPointersIdList().empty()) {
-            MMI_LOGD("This touch event is final finger up remove this finger");
+            MMI_HILOGD("This touch event is final finger up remove this finger");
             pointerEvent->Reset();
         }
         return RET_OK;
@@ -342,9 +342,9 @@ int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
-        MMI_LOGD("This touch pad event is up remove this finger");
+        MMI_HILOGD("This touch pad event is up remove this finger");
         if (pointerEvent->GetPointersIdList().empty()) {
-            MMI_LOGD("This touch pad event is final finger up remove this finger");
+            MMI_HILOGD("This touch pad event is final finger up remove this finger");
             pointerEvent->Reset();
         }
         return RET_OK;
@@ -370,27 +370,27 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_GESTURE);
     CHKPR(pointerEvent, GESTURE_EVENT_PKG_FAIL);
-    MMI_LOGD("GestrueEvent package, eventType:%{public}d,actionTime:%{public}" PRId64 ","
-             "action:%{public}d,actionStartTime:%{public}" PRId64 ","
-             "pointerAction:%{public}d,sourceType:%{public}d,"
-             "PinchAxisValue:%{public}.2f",
-             pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
-             pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
-             pointerEvent->GetPointerAction(), pointerEvent->GetSourceType(),
-             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH));
+    MMI_HILOGD("GestrueEvent package, eventType:%{public}d,actionTime:%{public}" PRId64 ","
+               "action:%{public}d,actionStartTime:%{public}" PRId64 ","
+               "pointerAction:%{public}d,sourceType:%{public}d,"
+               "PinchAxisValue:%{public}.2f",
+               pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
+               pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
+               pointerEvent->GetPointerAction(), pointerEvent->GetSourceType(),
+               pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH));
 
     PointerEvent::PointerItem item;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
-    MMI_LOGD("Item:DownTime:%{public}" PRId64 ",IsPressed:%{public}s,"
-             "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
-             "Width:%{public}d,Height:%{public}d",
-             item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
-             item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
-             item.GetWidth(), item.GetHeight());
+    MMI_HILOGD("Item:DownTime:%{public}" PRId64 ",IsPressed:%{public}s,"
+               "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
+               "Width:%{public}d,Height:%{public}d",
+               item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
+               item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
+               item.GetWidth(), item.GetHeight());
 
     int32_t ret = eventDispatch_.HandlePointerEvent(pointerEvent);
     if (ret != RET_OK) {
-        MMI_LOGE("Gesture event dispatch failed, errCode:%{public}d", GESTURE_EVENT_DISP_FAIL);
+        MMI_HILOGE("Gesture event dispatch failed, errCode:%{public}d", GESTURE_EVENT_DISP_FAIL);
         return GESTURE_EVENT_DISP_FAIL;
     }
     return RET_OK;
@@ -418,7 +418,7 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
     CHKPR(keyEvent_, ERROR_NULL_POINTER);
     std::vector<int32_t> pressedKeys = keyEvent_->GetPressedKeys();
     for (const int32_t& keyCode : pressedKeys) {
-        MMI_LOGI("Pressed keyCode:%{public}d", keyCode);
+        MMI_HILOGI("Pressed keyCode:%{public}d", keyCode);
     }
     pointerEvent->SetPressedKeys(pressedKeys);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
@@ -429,23 +429,23 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
 int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    MMI_LOGI("MouseEvent Normalization Results, PointerAction:%{public}d,PointerId:%{public}d,"
-             "SourceType:%{public}d,ButtonId:%{public}d,"
-             "VerticalAxisValue:%{public}lf,HorizontalAxisValue:%{public}lf",
-             pointerEvent->GetPointerAction(), pointerEvent->GetPointerId(), pointerEvent->GetSourceType(),
-             pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
-             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
+    MMI_HILOGI("MouseEvent Normalization Results, PointerAction:%{public}d,PointerId:%{public}d,"
+               "SourceType:%{public}d,ButtonId:%{public}d,"
+               "VerticalAxisValue:%{public}lf,HorizontalAxisValue:%{public}lf",
+               pointerEvent->GetPointerAction(), pointerEvent->GetPointerId(), pointerEvent->GetSourceType(),
+               pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
+               pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
     PointerEvent::PointerItem item;
     if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
-        MMI_LOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
+        MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
         return RET_ERR;
     }
-    MMI_LOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
-             "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
-             "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,Device:%{public}d",
-             item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
-             item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
-             item.GetDeviceId());
+    MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
+               "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
+               "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,Device:%{public}d",
+               item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
+               item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
+               item.GetDeviceId());
 
     eventDispatch_.HandlePointerEvent(pointerEvent);
     return RET_OK;

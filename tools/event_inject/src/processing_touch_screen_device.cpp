@@ -33,7 +33,7 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const Json& to
     }
     Json inputData = touchScreenEventArrays.at("events");
     if (inputData.empty()) {
-        MMI_LOGE("manage touchScreen array faild, inputData is empty.");
+        MMI_HILOGE("manage touchScreen array faild, inputData is empty.");
         return RET_ERR;
     }
     TouchScreenInputEvents touchScreenInputEvents = {};
@@ -58,7 +58,7 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataSingleTouchScreen(const Js
     }
     Json inputData = touchScreenEventArrays.at("singleEvent");
     if (inputData.empty()) {
-        MMI_LOGE("manage touchScreen array faild, inputData is empty.");
+        MMI_HILOGE("manage touchScreen array faild, inputData is empty.");
         return RET_ERR;
     }
 

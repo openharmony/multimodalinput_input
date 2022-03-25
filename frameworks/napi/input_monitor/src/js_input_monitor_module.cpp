@@ -66,7 +66,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (std::strcmp(typeName, "touch") != 0) {
-        MMI_LOGD("Register js monitor failed, the first parameter is error");
+        MMI_HILOGD("Register js monitor failed, the first parameter is error");
         return nullptr;
     }
 
@@ -134,7 +134,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     }
     if (argv[1] == nullptr) {
         JsInputMonMgr.RemoveMonitor(env);
-        MMI_LOGD("remove all monitor");
+        MMI_HILOGD("remove all monitor");
         return nullptr;
     }
 
@@ -145,7 +145,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     }
     if (valueType != napi_function) {
         JsInputMonMgr.RemoveMonitor(env);
-        MMI_LOGD("remove all monitor");
+        MMI_HILOGD("remove all monitor");
         return nullptr;
     }
 

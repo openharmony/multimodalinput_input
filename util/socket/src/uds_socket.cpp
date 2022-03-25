@@ -38,9 +38,9 @@ int32_t UDSSocket::EpollCreat(int32_t size)
 {
     epollFd_ = epoll_create(size);
     if (epollFd_ < 0) {
-        MMI_LOGE("epoll_create retrun %{public}d", epollFd_);
+        MMI_HILOGE("epoll_create retrun %{public}d", epollFd_);
     } else {
-        MMI_LOGI("epoll_create, epollFd_:%{public}d", epollFd_);
+        MMI_HILOGI("epoll_create, epollFd_:%{public}d", epollFd_);
     }
     return epollFd_;
 }
@@ -48,21 +48,21 @@ int32_t UDSSocket::EpollCreat(int32_t size)
 int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event& event, int32_t epollFd)
 {
     if (fd < 0) {
-        MMI_LOGE("Invalid fd");
+        MMI_HILOGE("Invalid fd");
         return RET_ERR;
     }
     if (epollFd < 0) {
         epollFd = epollFd_;
     }
     if (epollFd < 0) {
-        MMI_LOGE("Invalid param epollFd");
+        MMI_HILOGE("Invalid param epollFd");
         return RET_ERR;
     }
     auto ret = epoll_ctl(epollFd, op, fd, &event);
     if (ret < 0) {
-        MMI_LOGE("epoll_ctl retrun %{public}d,epollFd_:%{public}d,"
-                 "op:%{public}d,fd:%{public}d,errno:%{public}d",
-                 ret, epollFd, op, fd, errno);
+        MMI_HILOGE("epoll_ctl retrun %{public}d,epollFd_:%{public}d,"
+                   "op:%{public}d,fd:%{public}d,errno:%{public}d",
+                   ret, epollFd, op, fd, errno);
     }
     return ret;
 }
@@ -73,12 +73,12 @@ int32_t UDSSocket::EpollWait(struct epoll_event& events, int32_t maxevents, int3
         epollFd = epollFd_;
     }
     if (epollFd < 0) {
-        MMI_LOGE("Invalid param epollFd");
+        MMI_HILOGE("Invalid param epollFd");
         return RET_ERR;
     }
     auto ret = epoll_wait(epollFd, &events, maxevents, timeout);
     if (ret < 0) {
-        MMI_LOGE("epoll_wait ret:%{public}d,errno:%{public}d", ret, errno);
+        MMI_HILOGE("epoll_wait ret:%{public}d,errno:%{public}d", ret, errno);
     }
     return ret;
 }
@@ -86,16 +86,16 @@ int32_t UDSSocket::EpollWait(struct epoll_event& events, int32_t maxevents, int3
 int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isNonBlock)
 {
     if (fd < 0) {
-        MMI_LOGE("Invalid fd");
+        MMI_HILOGE("Invalid fd");
         return RET_ERR;
     }
     int32_t flags = fcntl(fd, F_GETFL);
     if (flags < 0) {
-        MMI_LOGE("fcntl F_GETFL fail. fd:%{public}d,flags:%{public}d,errno:%{public}d,errCode:%{public}d",
+        MMI_HILOGE("fcntl F_GETFL fail. fd:%{public}d,flags:%{public}d,errno:%{public}d,errCode:%{public}d",
             fd, flags, errno, FCNTL_FAIL);
         return flags;
     }
-    MMI_LOGD("F_GETFL fd:%{public}d,flags:%{public}d", fd, flags);
+    MMI_HILOGD("F_GETFL fd:%{public}d,flags:%{public}d", fd, flags);
     uint32_t mask = static_cast<uint32_t>(flags);
     mask |= O_NONBLOCK;
     if (!isNonBlock) {
@@ -103,11 +103,11 @@ int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isNonBlock)
     }
     flags = fcntl(fd, F_SETFL, static_cast<int32_t>(mask));
     if (flags < 0) {
-        MMI_LOGE("fcntl F_SETFL fail. fd:%{public}d,flags:%{public}d,errno:%{public}d,errCode:%{public}d",
+        MMI_HILOGE("fcntl F_SETFL fail. fd:%{public}d,flags:%{public}d,errno:%{public}d,errCode:%{public}d",
             fd, flags, errno, FCNTL_FAIL);
         return flags;
     }
-    MMI_LOGD("F_SETFL fd:%{public}d,flags:%{public}d", fd, flags);
+    MMI_HILOGD("F_SETFL fd:%{public}d,flags:%{public}d", fd, flags);
     return flags;
 }
 
@@ -124,7 +124,7 @@ void UDSSocket::Close()
     if (fd_ >= 0) {
         auto rf = close(fd_);
         if (rf > 0) {
-            MMI_LOGE("Socket close failed rf:%{public}d", rf);
+            MMI_HILOGE("Socket close failed rf:%{public}d", rf);
         }
     }
     fd_ = -1;
