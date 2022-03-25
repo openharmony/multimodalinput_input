@@ -40,11 +40,11 @@ void InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, 
     interceptorItem.session = session;
     auto iter = std::find(interceptors_.begin(), interceptors_.end(), interceptorItem);
     if (iter != interceptors_.end()) {
-        MMI_LOGE("touchpad event repeate register");
+        MMI_HILOGE("touchpad event repeate register");
         return;
     } else {
         iter = interceptors_.insert(iter, interceptorItem);
-        MMI_LOGD("sourceType:%{public}d,fd:%{public}d register in server", sourceType, session->GetFd());
+        MMI_HILOGD("sourceType:%{public}d,fd:%{public}d register in server", sourceType, session->GetFd());
     }
 }
 
@@ -55,10 +55,10 @@ void InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
     interceptorItem.id = id;
     auto iter = std::find(interceptors_.begin(), interceptors_.end(), interceptorItem);
     if (iter == interceptors_.end()) {
-        MMI_LOGE("interceptorItem does not exist");
+        MMI_HILOGE("interceptorItem does not exist");
     } else {
-        MMI_LOGD("sourceType:%{public}d,fd:%{public}d remove from server", iter->sourceType,
-                 iter->session->GetFd());
+        MMI_HILOGD("sourceType:%{public}d,fd:%{public}d remove from server", iter->sourceType,
+                   iter->session->GetFd());
         interceptors_.erase(iter);
     }
 }
@@ -68,24 +68,24 @@ bool InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> poin
     CALL_LOG_ENTER;
     CHKPF(pointerEvent);
     if (interceptors_.empty()) {
-        MMI_LOGE("%{public}s no interceptor to send msg", __func__);
+        MMI_HILOGE("%{public}s no interceptor to send msg", __func__);
         return false;
     }
-    PointerEvent::PointerItem pointerItem;
-    if (!(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem))) {
-        MMI_LOGE("The obtained pointer parameter is invalid");
+    PointerEvent::PointerItem pointer;
+    if (!(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer))) {
+        MMI_HILOGE("The obtained pointer parameter is invalid");
         return false;
     }
-    MMI_LOGD("Interceptor-servereventTouchpad:actionTime:%{public}" PRId64 ","
-             "sourceType:%{public}d,pointerAction:%{public}d,"
-             "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
-             pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
-             pointerEvent->GetPointerId(), pointerItem.GetGlobalX(), pointerItem.GetGlobalY(), pointerItem.IsPressed());
+    MMI_HILOGD("Interceptor-servereventTouchpad:actionTime:%{public}" PRId64 ","
+               "sourceType:%{public}d,pointerAction:%{public}d,"
+               "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
+               pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
+               pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     for (const auto &item : interceptors_) {
         NetPacket pkt(MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR);
         InputEventDataTransformation::Marshalling(pointerEvent, pkt);
         pkt << item.session->GetPid() << item.id;
-        MMI_LOGD("server send the interceptor msg to client, pid:%{public}d", item.session->GetPid());
+        MMI_HILOGD("server send the interceptor msg to client, pid:%{public}d", item.session->GetPid());
         item.session->SendMsg(pkt);
     }
     return true;
@@ -96,7 +96,7 @@ bool InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     CALL_LOG_ENTER;
     CHKPF(keyEvent);
     if (interceptors_.empty()) {
-        MMI_LOGE("%{public}s no interceptor to send msg", __func__);
+        MMI_HILOGE("%{public}s no interceptor to send msg", __func__);
         return false;
     }
     for (const auto &item : interceptors_) {
@@ -104,7 +104,7 @@ bool InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
             NetPacket pkt(MmiMessageId::KEYBOARD_EVENT_INTERCEPTOR);
             InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
             pkt << item.session->GetPid();
-            MMI_LOGD("server send the interceptor msg to client, pid:%{public}d", item.session->GetPid());
+            MMI_HILOGD("server send the interceptor msg to client, pid:%{public}d", item.session->GetPid());
             item.session->SendMsg(pkt);
         }
     }

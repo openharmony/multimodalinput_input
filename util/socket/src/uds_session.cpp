@@ -49,11 +49,11 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
     if ((size <= 0) || (size > MAX_PACKET_BUF_SIZE)) {
-        MMI_LOGE("Stream buffer size out of range");
+        MMI_HILOGE("Stream buffer size out of range");
         return false;
     }
     if (fd_ < 0) {
-        MMI_LOGE("fd_ is less than 0");
+        MMI_HILOGE("fd_ is less than 0");
         return false;
     }
     int32_t sendSize = 0;
@@ -69,7 +69,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
                 MMI_HILOGW("continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
                 continue;
             }
-            MMI_LOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
+            MMI_HILOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
             return false;
         }
         sendSize += count;
@@ -78,7 +78,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
         }
     }
     if (retryCount >= retryLimit && sendSize < bufSize) {
-        MMI_LOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
+        MMI_HILOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
             retryCount, retryLimit, sendSize, bufSize, fd_);
         return false;
     }
@@ -89,11 +89,11 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
     if ((size <= 0) || (size > MAX_PACKET_BUF_SIZE)) {
-        MMI_LOGE("buf size:%{public}zu", size);
+        MMI_HILOGE("buf size:%{public}zu", size);
         return false;
     }
     if (fd_ < 0) {
-        MMI_LOGE("fd_ is less than 0");
+        MMI_HILOGE("fd_ is less than 0");
         return false;
     }
     int32_t sendSize = 0;
@@ -108,13 +108,13 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
             if (eno == EAGAIN || eno == EINTR || eno == EWOULDBLOCK) {
                 continue;
             }
-            MMI_LOGE("Send return failed,error:%{public}d fd:%{public}d", eno, fd_);
+            MMI_HILOGE("Send return failed,error:%{public}d fd:%{public}d", eno, fd_);
             return false;
         }
         sendSize += ret;
     }
     if (sendCount >= resendLimit && sendSize < bufSize) {
-        MMI_LOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
+        MMI_HILOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
             sendCount, resendLimit, sendSize, bufSize, fd_);
         return false;
     }
@@ -124,7 +124,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 void UDSSession::Close()
 {
     CALL_LOG_ENTER;
-    MMI_LOGD("enter fd_:%{public}d.", fd_);
+    MMI_HILOGD("enter fd_:%{public}d.", fd_);
     if (fd_ >= 0) {
         close(fd_);
         fd_ = -1;
@@ -149,7 +149,7 @@ void UDSSession::UpdateDescript()
 bool UDSSession::SendMsg(NetPacket& pkt) const
 {
     if (pkt.ChkRWError()) {
-        MMI_LOGE("Read and write status is error");
+        MMI_HILOGE("Read and write status is error");
         return false;
     }
     StreamBuffer buf;
@@ -172,7 +172,7 @@ void UDSSession::DelEvents(int32_t id)
         ++count;
         if (item.id == id) {
             events_.erase(events_.begin(), events_.begin() + count);
-            MMI_LOGD("Delete events");
+            MMI_HILOGD("Delete events");
             break;
         }
     }
@@ -186,7 +186,7 @@ int64_t UDSSession::GetEarlistEventTime() const
 {
     CALL_LOG_ENTER;
     if (events_.empty()) {
-        MMI_LOGD("events_ is empty");
+        MMI_HILOGD("events_ is empty");
         return 0;
     }
     return events_.begin()->eventTime;
@@ -195,7 +195,7 @@ int64_t UDSSession::GetEarlistEventTime() const
 bool UDSSession::IsEventQueueEmpty()
 {
     if (events_.empty()) {
-        MMI_LOGD("events_ is empty");
+        MMI_HILOGD("events_ is empty");
         return true;
     }
     return false;

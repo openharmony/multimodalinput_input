@@ -36,17 +36,17 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
     CHKPR(consumer, INVALID_HANDLER_ID);
     std::lock_guard<std::mutex> guard(lockHandlers_);
     if (inputHandlers_.size() >= MAX_N_INPUT_HANDLERS) {
-        MMI_LOGE("The number of handlers exceeds the maximum");
+        MMI_HILOGE("The number of handlers exceeds the maximum");
         return INVALID_HANDLER_ID;
     }
     int32_t handlerId = GetNextId();
     if (handlerId == INVALID_HANDLER_ID) {
-        MMI_LOGE("Exceeded limit of 32-bit maximum number of integers");
+        MMI_HILOGE("Exceeded limit of 32-bit maximum number of integers");
         return INVALID_HANDLER_ID;
     }
-    MMI_LOGD("Register new handler:%{public}d", handlerId);
+    MMI_HILOGD("Register new handler:%{public}d", handlerId);
     if (RET_OK == AddLocal(handlerId, handlerType, consumer)) {
-        MMI_LOGD("New handler successfully registered, report to server");
+        MMI_HILOGD("New handler successfully registered, report to server");
         AddToServer(handlerId, handlerType);
     } else {
         handlerId = INVALID_HANDLER_ID;
@@ -56,26 +56,26 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
 
 void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType handlerType)
 {
-    MMI_LOGD("Unregister handler:%{public}d,type:%{public}d", handlerId, handlerType);
+    MMI_HILOGD("Unregister handler:%{public}d,type:%{public}d", handlerId, handlerType);
     std::lock_guard<std::mutex> guard(lockHandlers_);
     if (RET_OK == RemoveLocal(handlerId, handlerType)) {
-        MMI_LOGD("Handler:%{public}d unregistered, report to server", handlerId);
+        MMI_HILOGD("Handler:%{public}d unregistered, report to server", handlerId);
         RemoveFromServer(handlerId, handlerType);
     }
 }
 
 void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
-    MMI_LOGD("Mark consumed state, monitor:%{public}d,event:%{public}d", monitorId, eventId);
+    MMI_HILOGD("Mark consumed state, monitor:%{public}d,event:%{public}d", monitorId, eventId);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     NetPacket pkt(MmiMessageId::MARK_CONSUMED);
     if (!pkt.Write(monitorId) || !pkt.Write(eventId)) {
-        MMI_LOGE("Packet write is error, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        MMI_HILOGE("Packet write is error, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
     }
     if (!client->SendMessage(pkt)) {
-        MMI_LOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
 }
@@ -95,7 +95,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
     };
     auto ret = inputHandlers_.emplace(handler.handlerId_, handler);
     if (!ret.second) {
-        MMI_LOGE("Duplicate handler:%{public}d", handler.handlerId_);
+        MMI_HILOGE("Duplicate handler:%{public}d", handler.handlerId_);
         return RET_ERR;
     }
     return RET_OK;
@@ -108,7 +108,7 @@ void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handle
     NetPacket pkt(MmiMessageId::ADD_INPUT_HANDLER);
     pkt << handlerId << handlerType;
     if (!client->SendMessage(pkt)) {
-        MMI_LOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
 }
@@ -117,12 +117,12 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
 {
     auto tItr = inputHandlers_.find(handlerId);
     if (tItr == inputHandlers_.end()) {
-        MMI_LOGE("No handler with specified");
+        MMI_HILOGE("No handler with specified");
         return RET_ERR;
     }
     if (handlerType != tItr->second.handlerType_) {
-        MMI_LOGE("Unmatched handler type, InputHandlerType:%{public}d,FindHandlerType:%{public}d",
-                 handlerType, tItr->second.handlerType_);
+        MMI_HILOGE("Unmatched handler type, InputHandlerType:%{public}d,FindHandlerType:%{public}d",
+                   handlerType, tItr->second.handlerType_);
         return RET_ERR;
     }
     inputHandlers_.erase(tItr);
@@ -131,16 +131,16 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
 
 void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType handlerType)
 {
-    MMI_LOGD("Remove handler:%{public}d from server", handlerId);
+    MMI_HILOGD("Remove handler:%{public}d from server", handlerId);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_HANDLER);
     if (!pkt.Write(handlerId) || !pkt.Write(handlerType)) {
-        MMI_LOGE("Packet write is error, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        MMI_HILOGE("Packet write is error, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
     }
     if (!client->SendMessage(pkt)) {
-        MMI_LOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
 }
@@ -148,7 +148,7 @@ void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType h
 int32_t InputHandlerManager::GetNextId()
 {
     if (nextId_ == std::numeric_limits<int32_t>::max()) {
-        MMI_LOGE("Exceeded limit of 32-bit maximum number of integers");
+        MMI_HILOGE("Exceeded limit of 32-bit maximum number of integers");
         return INVALID_HANDLER_ID;
     }
     return nextId_++;
@@ -177,61 +177,61 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
     auto callMsgHandler = [this, keyEvent, handlerId] () {
         int32_t pid = GetPid();
         uint64_t tid = GetThisThreadId();
-        MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
+        MMI_HILOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
         
         std::lock_guard<std::mutex> guard(lockHandlers_);
         auto consumer = FindHandler(handlerId);
         if (consumer == nullptr) {
-            MMI_LOGE("No handler found here. id:%{public}d", handlerId);
+            MMI_HILOGE("No handler found here. id:%{public}d", handlerId);
             return;
         }
         consumer->OnInputEvent(keyEvent);
-        MMI_LOGD("callMsgHandler key event callback id:%{public}d keyCode:%{public}d pid:%{public}d "
+        MMI_HILOGD("callMsgHandler key event callback id:%{public}d keyCode:%{public}d pid:%{public}d "
             "threadId:%{public}" PRIu64, handlerId, keyEvent->GetKeyCode(), pid, tid);
     };
     std::lock_guard<std::mutex> guard(lockHandlers_);
     auto eventHandler = GetEventHandler(handlerId);
     if (eventHandler == nullptr) {
-        MMI_LOGE("Event handler ptr = nullptr");
+        MMI_HILOGE("Event handler ptr = nullptr");
         return;
     }
     bool ret = eventHandler->PostHighPriorityTask(callMsgHandler);
     if (!ret) {
-        MMI_LOGE("post task failed");
+        MMI_HILOGE("post task failed");
     }
 }
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_LOG_ENTER;
-    MMI_LOGD("handler:%{public}d", handlerId);
+    MMI_HILOGD("handler:%{public}d", handlerId);
     CHKPV(pointerEvent);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
     
     auto callMsgHandler = [this, pointerEvent, handlerId] () {
         int32_t pid = GetPid();
         uint64_t tid = GetThisThreadId();
-        MMI_LOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
+        MMI_HILOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
         
         std::lock_guard<std::mutex> guard(lockHandlers_);
         auto consumer = FindHandler(handlerId);
         if (consumer == nullptr) {
-            MMI_LOGE("No handler found here. id:%{public}d", handlerId);
+            MMI_HILOGE("No handler found here. id:%{public}d", handlerId);
             return;
         }
         consumer->OnInputEvent(pointerEvent);
-        MMI_LOGD("callMsgHandler pointer event callback id:%{public}d pointerId:%{public}d pid:%{public}d "
+        MMI_HILOGD("callMsgHandler pointer event callback id:%{public}d pointerId:%{public}d pid:%{public}d "
             "threadId:%{public}" PRIu64, handlerId, pointerEvent->GetPointerId(), pid, tid);
     };
     std::lock_guard<std::mutex> guard(lockHandlers_);
     auto eventHandler = GetEventHandler(handlerId);
     if (eventHandler == nullptr) {
-        MMI_LOGE("Event handler ptr = nullptr");
+        MMI_HILOGE("Event handler ptr = nullptr");
         return;
     }
     bool ret = eventHandler->PostHighPriorityTask(callMsgHandler);
     if (!ret) {
-        MMI_LOGE("post task failed");
+        MMI_HILOGE("post task failed");
     }
 }
 

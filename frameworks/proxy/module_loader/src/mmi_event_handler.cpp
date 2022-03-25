@@ -107,7 +107,7 @@ void MMIEventHandler::ProcessEvent(const InnerEvent::Pointer &event)
             break;
         }
         default: {
-            MMI_LOGE("Unknown event handler id:%{public}u", eventId);
+            MMI_HILOGE("Unknown event handler id:%{public}u", eventId);
             break;
         }
     }

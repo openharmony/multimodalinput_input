@@ -451,8 +451,8 @@ KeyEventValueTransformations KeyValueTransformationInput(int16_t keyValueOfInput
         KeyEventValueTransformations unknownKey = {
             "UNKNOWN_KEY", keyValueOfInput, UNKNOWN_KEY_BASE + keyValueOfInput, HOS_UNKNOWN_KEY_BASE
         };
-        MMI_LOGE("KeyValueTransformationInput Failed, unknown linux-code:%{public}d,"
-                 "UNKNOWN_KEY_BASE:%{public}d", keyValueOfInput, UNKNOWN_KEY_BASE);
+        MMI_HILOGE("KeyValueTransformationInput Failed, unknown linux-code:%{public}d,"
+                   "UNKNOWN_KEY_BASE:%{public}d", keyValueOfInput, UNKNOWN_KEY_BASE);
         return unknownKey;
     }
     return it->second;

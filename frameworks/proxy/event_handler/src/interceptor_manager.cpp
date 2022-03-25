@@ -45,7 +45,7 @@ int32_t InterceptorManager::AddInterceptor(int32_t sourceType,
     interceptorItem.callback = interceptor;
     interceptor_.push_back(interceptorItem);
     MMIEventHdl.AddInterceptor(interceptorItem.sourceType, interceptorItem.id_);
-    MMI_LOGD("Add sourceType:%{public}d Touchpad to InterceptorManager success", sourceType);
+    MMI_HILOGD("Add sourceType:%{public}d Touchpad to InterceptorManager success", sourceType);
     return interceptorItem.id_;
 }
 
@@ -58,7 +58,7 @@ int32_t InterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<Ke
     interceptorItem.callback_ = interceptor;
     interceptor_.push_back(interceptorItem);
     if (MMIEventHdl.AddInterceptor(interceptorItem.sourceType, interceptorItem.id_) == RET_OK) {
-        MMI_LOGD("Add AddInterceptor KeyEvent to InterceptorManager success");
+        MMI_HILOGD("Add AddInterceptor KeyEvent to InterceptorManager success");
         return MMI_STANDARD_EVENT_SUCCESS;
     }
     return MMI_STANDARD_EVENT_INVALID_PARAM;
@@ -67,18 +67,18 @@ int32_t InterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<Ke
 void InterceptorManager::RemoveInterceptor(int32_t interceptorId)
 {
     if (interceptorId <= 0) {
-        MMI_LOGE("interceptorId invalid");
+        MMI_HILOGE("interceptorId invalid");
         return;
     }
     InterceptorItem interceptorItem;
     interceptorItem.id_ = interceptorId;
     auto iter = std::find(interceptor_.begin(), interceptor_.end(), interceptorItem);
     if (iter == interceptor_.end()) {
-        MMI_LOGE("InterceptorItem does not exist");
+        MMI_HILOGE("InterceptorItem does not exist");
     } else {
         iter = interceptor_.erase(iter);
         MMIEventHdl.RemoveInterceptor(interceptorItem.id_);
-        MMI_LOGD("InterceptorItem id:%{public}d removed success", interceptorId);
+        MMI_HILOGD("InterceptorItem id:%{public}d removed success", interceptorId);
     }
 }
 
@@ -87,19 +87,19 @@ int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointer
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     PointerEvent::PointerItem item;
     if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
-        MMI_LOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
+        MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
         return RET_ERR;
     }
-    MMI_LOGD("Interceptor-clienteventTouchpad:actionTime:%{public}" PRId64 ","
-             "sourceType:%{public}d,pointerAction:%{public}d,"
-             "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
-             pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
-             pointerEvent->GetPointerId(), item.GetGlobalX(), item.GetGlobalY(), item.IsPressed());
+    MMI_HILOGD("Interceptor-clienteventTouchpad:actionTime:%{public}" PRId64 ","
+               "sourceType:%{public}d,pointerAction:%{public}d,"
+               "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
+               pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
+               pointerEvent->GetPointerId(), item.GetGlobalX(), item.GetGlobalY(), item.IsPressed());
     InterceptorItem interceptorItem;
     interceptorItem.id_ = id;
     auto iter = std::find(interceptor_.begin(), interceptor_.end(), interceptorItem);
     if (iter != interceptor_.end() && iter->callback != nullptr) {
-        MMI_LOGD("interceptor callback execute");
+        MMI_HILOGD("interceptor callback execute");
         iter->callback(pointerEvent);
     }
     return MMI_STANDARD_EVENT_SUCCESS;
@@ -111,7 +111,7 @@ int32_t InterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_INTERCEPT_EVENT);
     for (auto &item : interceptor_) {
         if (item.sourceType == SOURCETYPE_KEY) {
-            MMI_LOGD("interceptor callback execute");
+            MMI_HILOGD("interceptor callback execute");
             item.callback_(keyEvent);
         }
     }
