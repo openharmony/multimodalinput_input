@@ -85,7 +85,6 @@ private:
     ShortcutKey lastMatchedKey_;
     std::map<std::string, ShortcutKey> shortcutKeys_;
 };
-
 } // namespace MMI
 } // namespace OHOS
 #endif // ABILITY_LAUNCH_MANAGER_H

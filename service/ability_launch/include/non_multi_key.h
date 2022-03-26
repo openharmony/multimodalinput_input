@@ -24,7 +24,6 @@ class NonMultiKey : public IMultiKey {
 public:
     bool CheckLaunchAbility(const std::shared_ptr<KeyEvent> key);
 };
-
 } // namespace MMI
 } // namespace OHOS
 #endif // NON_MULTI_KEY_H

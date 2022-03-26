@@ -25,7 +25,6 @@ struct IMultiKey {
     virtual bool CheckLaunchAbility(const std::shared_ptr<KeyEvent> key) = 0;
     virtual ~IMultiKey() = default;
 };
-
 } // namespace MMI
 } // namespace OHOS
 #endif // I_MULTI_KEY_H
