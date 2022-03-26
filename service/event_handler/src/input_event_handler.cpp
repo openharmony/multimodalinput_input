@@ -285,7 +285,8 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         return KEY_EVENT_DISP_FAIL;
     }
     if (keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP ||
-        keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN) {
+        keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN ||
+        keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_DEL) {
         if (!TimerMgr->IsExist(timerId_) && keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
             AddHandleTimer();
             MMI_HILOGD("add a timer");
