@@ -33,6 +33,5 @@ std::shared_ptr<IMultiKey> IMultiKey::GetInstance()
 {
     return std::make_shared<NonMultiKey>();
 }
-
 } // namespace MMI
 } // namespace OHOS
