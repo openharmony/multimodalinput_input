@@ -14,8 +14,6 @@
  */
 
 #include "multimodal_event_handler.h"
-
-#include "immi_token.h"
 #include "input_event.h"
 #include "input_manager_impl.h"
 #include "input_handler_manager.h"
@@ -41,7 +39,7 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
 {
     CHKPR(keyEventPtr, ERROR_NULL_POINTER);
     if (!InitClient()) {
-        MMI_LOGE("Init client faild");
+        MMI_HILOGE("Init client faild");
         return MMI_SERVICE_INVALID;
     }
     return EventManager.InjectEvent(keyEventPtr);
@@ -50,7 +48,7 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
 int32_t MultimodalEventHandler::GetMultimodeInputInfo()
 {
     if (!InitClient()) {
-        MMI_LOGE("Init client faild");
+        MMI_HILOGE("Init client faild");
         return MMI_SERVICE_INVALID;
     }
     return MMI_SERVICE_RUNNING;
@@ -68,7 +66,7 @@ bool MultimodalEventHandler::InitClient()
     CHKPF(cMsgHandler_);
     client_->RegisterConnectedFunction(&OnConnected);
     if (!(client_->Start(cMsgHandler_, true))) {
-        MMI_LOGE("The client fails to start");
+        MMI_HILOGE("The client fails to start");
         return false;
     }
     return true;
@@ -79,14 +77,14 @@ MMIClientPtr MultimodalEventHandler::GetMMIClient()
     if (InitClient()) {
         return client_;
     }
-    MMI_LOGE("Init client faild");
+    MMI_HILOGE("Init client faild");
     return nullptr;
 }
 
 int32_t MultimodalEventHandler::GetDeviceIds(int32_t taskId)
 {
     if (!InitClient()) {
-        MMI_LOGE("Init client faild");
+        MMI_HILOGE("Init client faild");
         return MMI_SERVICE_INVALID;
     }
     return EventManager.GetDeviceIds(taskId);
@@ -95,7 +93,7 @@ int32_t MultimodalEventHandler::GetDeviceIds(int32_t taskId)
 int32_t MultimodalEventHandler::GetDevice(int32_t taskId, int32_t deviceId)
 {
     if (!InitClient()) {
-        MMI_LOGE("Init client faild");
+        MMI_HILOGE("Init client faild");
         return MMI_SERVICE_INVALID;
     }
     return EventManager.GetDevice(taskId, deviceId);
@@ -105,7 +103,7 @@ int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent>
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (!InitClient()) {
-        MMI_LOGE("Init client faild");
+        MMI_HILOGE("Init client faild");
         return MMI_SERVICE_INVALID;
     }
     return EventManager.InjectPointerEvent(pointerEvent);
@@ -114,14 +112,14 @@ int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent>
 int32_t MultimodalEventHandler::AddInterceptor(int32_t sourceType, int32_t id)
 {
     if (!InitClient()) {
-        MMI_LOGE("Init client faild");
+        MMI_HILOGE("Init client faild");
         return MMI_SERVICE_INVALID;
     }
 
     NetPacket pkt(MmiMessageId::ADD_EVENT_INTERCEPTOR);
     pkt << sourceType << id;
     client_->SendMessage(pkt);
-    MMI_LOGD("client add a touchpad event interceptor");
+    MMI_HILOGD("client add a touchpad event interceptor");
     return RET_OK;
 }
 
@@ -129,14 +127,14 @@ int32_t MultimodalEventHandler::AddInterceptor(int32_t sourceType, int32_t id)
 int32_t MultimodalEventHandler::RemoveInterceptor(int32_t id)
 {
     if (!InitClient()) {
-        MMI_LOGE("Init client faild");
+        MMI_HILOGE("Init client faild");
         return MMI_SERVICE_INVALID;
     }
 
     NetPacket pkt(MmiMessageId::REMOVE_EVENT_INTERCEPTOR);
     pkt << id;
     client_->SendMessage(pkt);
-    MMI_LOGD("client remove a touchpad event interceptor");
+    MMI_HILOGD("client remove a touchpad event interceptor");
     return RET_OK;
 }
 
@@ -144,7 +142,7 @@ int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
 {
     CALL_LOG_ENTER;
     if (!InitClient()) {
-        MMI_LOGE("Init client faild");
+        MMI_HILOGE("Init client faild");
         return MMI_SERVICE_INVALID;
     }
     NetPacket pkt(MmiMessageId::ADD_INPUT_EVENT_MONITOR);
@@ -157,7 +155,7 @@ void MultimodalEventHandler::RemoveInputEventMontior(int32_t keyEventType)
 {
     CALL_LOG_ENTER;
     if (!InitClient()) {
-        MMI_LOGE("Init client faild");
+        MMI_HILOGE("Init client faild");
         return;
     }
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_EVENT_MONITOR);
@@ -169,7 +167,7 @@ void MultimodalEventHandler::RemoveInputEventTouchpadMontior(int32_t pointerEven
 {
     CALL_LOG_ENTER;
     if (!InitClient()) {
-        MMI_LOGE("Init client faild");
+        MMI_HILOGE("Init client faild");
         return;
     }
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_EVENT_TOUCHPAD_MONITOR);
@@ -181,15 +179,15 @@ int32_t MultimodalEventHandler::AddInputEventTouchpadMontior(int32_t pointerEven
 {
     CALL_LOG_ENTER;
     if (!InitClient()) {
-        MMI_LOGE("Init client faild");
+        MMI_HILOGE("Init client faild");
         return MMI_SERVICE_INVALID;
     }
     NetPacket pkt(MmiMessageId::ADD_INPUT_EVENT_TOUCHPAD_MONITOR);
     pkt << InputEvent::EVENT_TYPE_POINTER;
-    MMI_LOGE("send msg before");
+    MMI_HILOGE("send msg before");
     bool isSuc = client_->SendMessage(pkt);
     if (isSuc)
-        MMI_LOGD("sendAdd msg Success");
+        MMI_HILOGD("sendAdd msg Success");
     return RET_OK;
 }
 } // namespace MMI

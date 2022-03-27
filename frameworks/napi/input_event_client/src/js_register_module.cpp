@@ -33,7 +33,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
-        MMI_LOGE("call napi_get_cb_info fail");
+        MMI_HILOGE("call napi_get_cb_info fail");
         napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAM, &result);
         return result;
     }
@@ -47,7 +47,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
 
     auto keyEvent = KeyEvent::Create();
     if (keyEvent == nullptr) {
-        MMI_LOGE("keyEvent is null");
+        MMI_HILOGE("keyEvent is null");
         napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAM, &result);
         return result;
     }

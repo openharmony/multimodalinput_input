@@ -34,11 +34,11 @@ int32_t EventFilterStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
     CALL_LOG_ENTER;
-    MMI_LOGD("code: %{public}d", code);
+    MMI_HILOGD("code: %{public}d", code);
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IEventFilter::GetDescriptor()) {
-        MMI_LOGE("get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
+        MMI_HILOGE("get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
 
@@ -46,7 +46,7 @@ int32_t EventFilterStub::OnRemoteRequest(
         case static_cast<uint32_t>(IEventFilter::OPERATOR_TYPE::HANDLE_POINTER_EVENT):
             return StubHandlePointerEvent(data, reply);
         default:
-            MMI_LOGE("unknown code:%{public}u, go switch defaut", code);
+            MMI_HILOGE("unknown code:%{public}u, go switch defaut", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
 }
@@ -56,18 +56,18 @@ int32_t EventFilterStub::StubHandlePointerEvent(MessageParcel& data, MessageParc
     CALL_LOG_ENTER;
     std::shared_ptr<PointerEvent> event = PointerEvent::Create();
     if (event == nullptr) {
-        MMI_LOGE("event is nullptr");
+        MMI_HILOGE("event is nullptr");
         return RET_ERR;
     }
 
     if (!event->ReadFromParcel(data)) {
-        MMI_LOGE("read data error");
+        MMI_HILOGE("read data error");
         return RET_ERR;
     }
 
     bool ret = HandlePointerEvent(event);
     if (!reply.WriteBool(ret)) {
-        MMI_LOGE("WriteBool:%{public}d fail", ret);
+        MMI_HILOGE("WriteBool:%{public}d fail", ret);
         return RET_ERR;
     }
     return RET_OK;

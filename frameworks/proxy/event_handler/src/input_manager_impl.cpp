@@ -64,7 +64,7 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
 {
     CALL_LOG_ENTER;
     if (physicalDisplays.empty() || logicalDisplays.empty()) {
-        MMI_LOGE("display info check failed! physicalDisplays size:%{public}zu,logicalDisplays size:%{public}zu",
+        MMI_HILOGE("display info check failed! physicalDisplays size:%{public}zu,logicalDisplays size:%{public}zu",
             physicalDisplays.size(), logicalDisplays.size());
         return;
     }
@@ -89,12 +89,12 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
     if (!hasSendToMmiServer) {
         int32_t ret = MultimodalInputConnectManager::GetInstance()->AddInputEventFilter(eventFilterService_);
         if (ret != RET_OK) {
-            MMI_LOGE("AddInputEventFilter has send to server fail, ret:%{public}d", ret);
+            MMI_HILOGE("AddInputEventFilter has send to server fail, ret:%{public}d", ret);
             delete eventFilterService_;
             eventFilterService_ = nullptr;
             return RET_ERR;
         }
-        MMI_LOGI("AddInputEventFilter has send to server success");
+        MMI_HILOGI("AddInputEventFilter has send to server success");
         return RET_OK;
     }
     return RET_OK;
@@ -122,12 +122,12 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Pointer event received, processing");
+    MMI_HILOGD("Pointer event received, processing");
     CHKPV(pointerEvent);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
     if (consumer_ != nullptr) {
         CHKPV(pointerEvent);
-        MMI_LOGD("Passed on to consumer");
+        MMI_HILOGD("Passed on to consumer");
         consumer_->OnInputEvent(pointerEvent);
         return;
     }
@@ -136,7 +136,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
 int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 {
     if (PackPhysicalDisplay(pkt) == RET_ERR) {
-        MMI_LOGE("pack physical display failed");
+        MMI_HILOGE("pack physical display failed");
         return RET_ERR;
     }
     return PackLogicalDisplay(pkt);
@@ -146,60 +146,60 @@ int32_t InputManagerImpl::PackPhysicalDisplay(NetPacket &pkt)
 {
     uint32_t num = static_cast<uint32_t>(physicalDisplays_.size());
     if (!pkt.Write(num)) {
-        MMI_LOGE("Packet write num failed");
+        MMI_HILOGE("Packet write num failed");
         return RET_ERR;
     }
     for (uint32_t i = 0; i < num; i++) {
         if (!pkt.Write(physicalDisplays_[i].id)) {
-            MMI_LOGE("Packet write physical data failed");
+            MMI_HILOGE("Packet write physical data failed");
             return RET_ERR;
         }
         if (!pkt.Write(physicalDisplays_[i].leftDisplayId)) {
-            MMI_LOGE("Packet write physical leftDisplay failed");
+            MMI_HILOGE("Packet write physical leftDisplay failed");
             return RET_ERR;
         }
         if (!pkt.Write(physicalDisplays_[i].upDisplayId)) {
-            MMI_LOGE("Packet write physical upDisplay failed");
+            MMI_HILOGE("Packet write physical upDisplay failed");
             return RET_ERR;
         }
         if (!pkt.Write(physicalDisplays_[i].topLeftX)) {
-            MMI_LOGE("Packet write physical topLeftX failed");
+            MMI_HILOGE("Packet write physical topLeftX failed");
             return RET_ERR;
         }
         if (!pkt.Write(physicalDisplays_[i].topLeftY)) {
-            MMI_LOGE("Packet write physical topLeftY failed");
+            MMI_HILOGE("Packet write physical topLeftY failed");
             return RET_ERR;
         }
         if (!pkt.Write(physicalDisplays_[i].width)) {
-            MMI_LOGE("Packet write physical width failed");
+            MMI_HILOGE("Packet write physical width failed");
             return RET_ERR;
         }
         if (!pkt.Write(physicalDisplays_[i].height)) {
-            MMI_LOGE("Packet write physical height failed");
+            MMI_HILOGE("Packet write physical height failed");
             return RET_ERR;
         }
         if (!pkt.Write(physicalDisplays_[i].name)) {
-            MMI_LOGE("Packet write physical name failed");
+            MMI_HILOGE("Packet write physical name failed");
             return RET_ERR;
         }
         if (!pkt.Write(physicalDisplays_[i].seatId)) {
-            MMI_LOGE("Packet write physical seatId failed");
+            MMI_HILOGE("Packet write physical seatId failed");
             return RET_ERR;
         }
         if (!pkt.Write(physicalDisplays_[i].seatName)) {
-            MMI_LOGE("Packet write physical seatName failed");
+            MMI_HILOGE("Packet write physical seatName failed");
             return RET_ERR;
         }
         if (!pkt.Write(physicalDisplays_[i].logicWidth)) {
-            MMI_LOGE("Packet write physical logicWidth failed");
+            MMI_HILOGE("Packet write physical logicWidth failed");
             return RET_ERR;
         }
         if (!pkt.Write(physicalDisplays_[i].logicHeight)) {
-            MMI_LOGE("Packet write physical logicHeight failed");
+            MMI_HILOGE("Packet write physical logicHeight failed");
             return RET_ERR;
         }
         if (!pkt.Write(physicalDisplays_[i].direction)) {
-            MMI_LOGE("Packet write physical direction failed");
+            MMI_HILOGE("Packet write physical direction failed");
             return RET_ERR;
         }
     }
@@ -210,54 +210,54 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
 {
     int32_t num = static_cast<int32_t>(logicalDisplays_.size());
     if (!pkt.Write(num)) {
-        MMI_LOGE("Packet write logical num failed");
+        MMI_HILOGE("Packet write logical num failed");
         return RET_ERR;
     }
     for (int32_t i = 0; i < num; i++) {
         if (!pkt.Write(logicalDisplays_[i].id)) {
-            MMI_LOGE("Packet write logical data failed");
+            MMI_HILOGE("Packet write logical data failed");
             return RET_ERR;
         }
         if (!pkt.Write(logicalDisplays_[i].topLeftX)) {
-            MMI_LOGE("Packet write logical topLeftX failed");
+            MMI_HILOGE("Packet write logical topLeftX failed");
             return RET_ERR;
         }
         if (!pkt.Write(logicalDisplays_[i].topLeftY)) {
-            MMI_LOGE("Packet write logical topLeftY failed");
+            MMI_HILOGE("Packet write logical topLeftY failed");
             return RET_ERR;
         }
         if (!pkt.Write(logicalDisplays_[i].width)) {
-            MMI_LOGE("Packet write logical width failed");
+            MMI_HILOGE("Packet write logical width failed");
             return RET_ERR;
         }
         if (!pkt.Write(logicalDisplays_[i].height)) {
-            MMI_LOGE("Packet write logical height failed");
+            MMI_HILOGE("Packet write logical height failed");
             return RET_ERR;
         }
         if (!pkt.Write(logicalDisplays_[i].name)) {
-            MMI_LOGE("Packet write logical name failed");
+            MMI_HILOGE("Packet write logical name failed");
             return RET_ERR;
         }
         if (!pkt.Write(logicalDisplays_[i].seatId)) {
-            MMI_LOGE("Packet write logical seat failed");
+            MMI_HILOGE("Packet write logical seat failed");
             return RET_ERR;
         }
         if (!pkt.Write(logicalDisplays_[i].seatName)) {
-            MMI_LOGE("Packet write logical seatName failed");
+            MMI_HILOGE("Packet write logical seatName failed");
             return RET_ERR;
         }
         if (!pkt.Write(logicalDisplays_[i].focusWindowId)) {
-            MMI_LOGE("Packet write logical focusWindow failed");
+            MMI_HILOGE("Packet write logical focusWindow failed");
             return RET_ERR;
         }
         int32_t numWindow = static_cast<int32_t>(logicalDisplays_[i].windowsInfo.size());
         if (!pkt.Write(numWindow)) {
-            MMI_LOGE("Packet write logical numWindow failed");
+            MMI_HILOGE("Packet write logical numWindow failed");
             return RET_ERR;
         }
         for (int32_t j = 0; j < numWindow; j++) {
             if (!pkt.Write(logicalDisplays_[i].windowsInfo[j])) {
-                MMI_LOGE("Packet write logical windowsInfo failed");
+                MMI_HILOGE("Packet write logical windowsInfo failed");
                 return RET_ERR;
             }
         }
@@ -267,9 +267,9 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
 
 void InputManagerImpl::PrintDisplayInfo()
 {
-    MMI_LOGD("physicalDisplays,num:%{public}zu", physicalDisplays_.size());
+    MMI_HILOGD("physicalDisplays,num:%{public}zu", physicalDisplays_.size());
     for (const auto &item : physicalDisplays_) {
-        MMI_LOGD("physicalDisplays,id:%{public}d,leftDisplay:%{public}d,upDisplay:%{public}d,"
+        MMI_HILOGD("physicalDisplays,id:%{public}d,leftDisplay:%{public}d,upDisplay:%{public}d,"
             "topLeftX:%{public}d,topLeftY:%{public}d,width:%{public}d,height:%{public}d,"
             "name:%{public}s,seatId:%{public}s,seatName:%{public}s,logicWidth:%{public}d,"
             "logicHeight:%{public}d,direction:%{public}d",
@@ -280,9 +280,9 @@ void InputManagerImpl::PrintDisplayInfo()
             item.direction);
     }
 
-    MMI_LOGD("logicalDisplays,num:%{public}zu", logicalDisplays_.size());
+    MMI_HILOGD("logicalDisplays,num:%{public}zu", logicalDisplays_.size());
     for (const auto &item : logicalDisplays_) {
-        MMI_LOGD("logicalDisplays, id:%{public}d,topLeftX:%{public}d,topLeftY:%{public}d,"
+        MMI_HILOGD("logicalDisplays, id:%{public}d,topLeftX:%{public}d,topLeftY:%{public}d,"
             "width:%{public}d,height:%{public}d,name:%{public}s,"
             "seatId:%{public}s,seatName:%{public}s,focusWindowId:%{public}d,window num:%{public}zu",
             item.id, item.topLeftX, item.topLeftY,
@@ -291,7 +291,7 @@ void InputManagerImpl::PrintDisplayInfo()
             item.focusWindowId, item.windowsInfo.size());
 
         for (const auto &win : item.windowsInfo) {
-            MMI_LOGD("windowid:%{public}d,pid:%{public}d,uid:%{public}d,hotZoneTopLeftX:%{public}d,"
+            MMI_HILOGD("windowid:%{public}d,pid:%{public}d,uid:%{public}d,hotZoneTopLeftX:%{public}d,"
                 "hotZoneTopLeftY:%{public}d,hotZoneWidth:%{public}d,hotZoneHeight:%{public}d,display:%{public}d,"
                 "agentWindowId:%{public}d,winTopLeftX:%{public}d,winTopLeftY:%{public}d",
                 win.id, win.pid,
@@ -344,7 +344,7 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
             InputMonitorMgr.RemoveInputEventTouchpadMontior(monitorId);
             break;
         default:
-            MMI_LOGE("Can't find the mask, mask:%{public}d", mask);
+            MMI_HILOGE("Can't find the mask, mask:%{public}d", mask);
             break;
     }
 }
@@ -373,7 +373,7 @@ int32_t InputManagerImpl::AddInterceptor(int32_t sourceType,
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
     if (interceptor == nullptr) {
-        MMI_LOGE("%{public}s param should not be null", __func__);
+        MMI_HILOGE("%{public}s param should not be null", __func__);
         return MMI_STANDARD_EVENT_INVALID_PARAM;
     }
     int32_t interceptorId = InterceptorMgr.AddInterceptor(interceptor);
@@ -386,7 +386,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
 void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 {
     if (interceptorId <= 0) {
-        MMI_LOGE("Specified interceptor does not exist");
+        MMI_HILOGE("Specified interceptor does not exist");
         return;
     }
     int32_t mask = interceptorId % ADD_MASK_BASE;
@@ -399,7 +399,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
             InterceptorMgr.RemoveInterceptor(interceptorId);
             break;
         default:
-            MMI_LOGE("Can't find the mask, mask:%{public}d", mask);
+            MMI_HILOGE("Can't find the mask, mask:%{public}d", mask);
             break;
     }
 }
@@ -408,7 +408,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
     if (MMIEventHdl.InjectEvent(keyEvent) != RET_OK) {
-        MMI_LOGE("Failed to inject keyEvent");
+        MMI_HILOGE("Failed to inject keyEvent");
     }
 }
 
@@ -416,7 +416,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
 {
     CHKPV(pointerEvent);
     if (MultimodalEventHandler::GetInstance().InjectPointerEvent(pointerEvent) != RET_OK) {
-        MMI_LOGE("Failed to inject pointer event");
+        MMI_HILOGE("Failed to inject pointer event");
     }
 }
 
@@ -424,7 +424,7 @@ void InputManagerImpl::OnConnected()
 {
     CALL_LOG_ENTER;
     if (physicalDisplays_.empty() || logicalDisplays_.empty()) {
-        MMI_LOGE("display info check failed! physicalDisplays_ size:%{public}zu,logicalDisplays_ size:%{public}zu",
+        MMI_HILOGE("display info check failed! physicalDisplays_ size:%{public}zu,logicalDisplays_ size:%{public}zu",
             physicalDisplays_.size(), logicalDisplays_.size());
         return;
     }
@@ -435,13 +435,13 @@ void InputManagerImpl::OnConnected()
 void InputManagerImpl::SendDisplayInfo()
 {
     if (MultimodalEventHandler::GetInstance().GetMMIClient() == nullptr) {
-        MMI_LOGE("get mmi client is nullptr");
+        MMI_HILOGE("get mmi client is nullptr");
         return;
     }
 
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
     if (PackDisplayData(pkt) == RET_ERR) {
-        MMI_LOGE("pack display info failed");
+        MMI_HILOGE("pack display info failed");
         return;
     }
     MultimodalEventHandler::GetInstance().GetMMIClient()->SendMessage(pkt);

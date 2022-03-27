@@ -58,30 +58,30 @@ void InputManagerManualTest::AddInputEventFilter()
 {
     CALL_LOG_ENTER;
     auto callback = [this](std::shared_ptr<PointerEvent> pointer) -> bool {
-        MMI_LOGD("callback enter");
+        MMI_HILOGD("callback enter");
         CHKPF(pointer);
         const std::vector<int32_t> ids = pointer->GetPointersIdList();
         if (ids.empty()) {
-            MMI_LOGE("ids is empty");
+            MMI_HILOGE("ids is empty");
             return false;
         }
 
         const int32_t firstPointerId = ids[0];
         PointerEvent::PointerItem item;
         if (!pointer->GetPointerItem(firstPointerId, item)) {
-            MMI_LOGE("GetPointerItem:%{public}d fail", firstPointerId);
+            MMI_HILOGE("GetPointerItem:%{public}d fail", firstPointerId);
             return false;
         }
 
         const int32_t x = item.GetGlobalX();
         const int32_t y = item.GetGlobalY();
         if (x == 10 && y == 10) {
-            MMI_LOGI("The values of X and y are both 10, which meets the expectation and callbackRet is set to 1");
+            MMI_HILOGI("The values of X and y are both 10, which meets the expectation and callbackRet is set to 1");
             callbackRet = 1;
             return true;
         }
 
-        MMI_LOGI("The values of X and y are not 10, which meets the expectation and callbackRet is set to 2");
+        MMI_HILOGI("The values of X and y are not 10, which meets the expectation and callbackRet is set to 2");
         callbackRet = 2;
         return false;
     };
@@ -106,7 +106,7 @@ void InputManagerManualTest::SimulateInputEventHelper(int32_t globalX, int32_t g
     pointerEvent->SetSourceType(-1);
     pointerEvent->SetPointerId(pointerId);
 
-    MMI_LOGI("Call InputManager::SimulateInputEvent");
+    MMI_HILOGI("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     EXPECT_EQ(callbackRet, expectVal);

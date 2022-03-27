@@ -47,18 +47,18 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
     if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
-        MMI_LOGE("buf size:%{public}zu", size);
+        MMI_HILOGE("buf size:%{public}zu", size);
         return false;
     }
     if (fd_ < 0) {
-        MMI_LOGE("fd_ is less than 0");
+        MMI_HILOGE("fd_ is less than 0");
         return false;
     }
     ssize_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
     if (ret < 0) {
-        MMI_LOGE("write return %{public}zd,"
-                 "fd_:%{public}d,errno:%{public}d",
-                 ret, fd_, errno);
+        MMI_HILOGE("write return %{public}zd,"
+                   "fd_:%{public}d,errno:%{public}d",
+                   ret, fd_, errno);
         return false;
     }
     return true;
@@ -67,7 +67,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 void UDSSession::Close()
 {
     CALL_LOG_ENTER;
-    MMI_LOGD("enter fd_:%{public}d.", fd_);
+    MMI_HILOGD("enter fd_:%{public}d.", fd_);
     if (fd_ >= 0) {
         close(fd_);
         fd_ = -1;
@@ -92,7 +92,7 @@ void UDSSession::UpdateDescript()
 bool UDSSession::SendMsg(NetPacket& pkt) const
 {
     if (pkt.ChkRWError()) {
-        MMI_LOGE("Read and write status is error");
+        MMI_HILOGE("Read and write status is error");
         return false;
     }
     StreamBuffer buf;
@@ -115,7 +115,7 @@ void UDSSession::DelEvents(int32_t id)
         ++count;
         if (item.id == id) {
             events_.erase(events_.begin(), events_.begin() + count);
-            MMI_LOGD("Delete events");
+            MMI_HILOGD("Delete events");
             break;
         }
     }
@@ -129,7 +129,7 @@ int64_t UDSSession::GetEarlistEventTime() const
 {
     CALL_LOG_ENTER;
     if (events_.empty()) {
-        MMI_LOGD("events_ is empty");
+        MMI_HILOGD("events_ is empty");
         return 0;
     }
     return events_.begin()->eventTime;
@@ -138,7 +138,7 @@ int64_t UDSSession::GetEarlistEventTime() const
 bool UDSSession::IsEventQueueEmpty()
 {
     if (events_.empty()) {
-        MMI_LOGD("events_ is empty");
+        MMI_HILOGD("events_ is empty");
         return true;
     }
     return false;
