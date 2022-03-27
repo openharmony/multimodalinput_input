@@ -15,7 +15,10 @@
 
 #ifndef JS_EVENT_TARGET_H
 #define JS_EVENT_TARGET_H
+
 #include <map>
+#include <uv.h>
+
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "utils/log.h"
@@ -32,16 +35,16 @@ public:
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
 
     static void EmitJsIdsAsync(int32_t userData, std::vector<int32_t> ids);
-    static void CallIdsAsyncWork(napi_env env, napi_status status, void* data);
+    static void CallIdsAsyncWork(uv_work_t *work, int32_t status);
 
     static void EmitJsIdsPromise(int32_t userData, std::vector<int32_t> ids);
-    static void CallIdsPromiseWork(napi_env env, napi_status status, void* data);
+    static void CallIdsPromiseWork(uv_work_t *work, int32_t status);
 
     static void EmitJsDevAsync(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device);
-    static void CallDevAsyncWork(napi_env env, napi_status status, void* data);
+    static void CallDevAsyncWork(uv_work_t *work, int32_t status);
 
     static void EmitJsDevPromise(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device);
-    static void CallDevPromiseWork(napi_env env, napi_status status, void* data);
+    static void CallDevPromiseWork(uv_work_t *work, int32_t status);
 
     napi_value CreateCallbackInfo(napi_env env, napi_value handle);
     void ResetEnv();

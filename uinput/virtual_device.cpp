@@ -35,7 +35,7 @@ bool DoIoctl(int32_t fd, int32_t request, const uint32_t value)
 {
     int32_t rc = ioctl(fd, request, value);
     if (rc < 0) {
-        MMI_LOGE("ioctl failed");
+        MMI_HILOGE("ioctl failed");
         return false;
     }
     return true;
@@ -62,43 +62,43 @@ bool VirtualDevice::SetUp()
 {
     fd_ = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
     if (fd_ < 0) {
-        MMI_LOGE("Failed to open uinput");
+        MMI_HILOGE("Failed to open uinput");
         return false;
     }
     for (const auto &item : GetEventTypes()) {
         if (!DoIoctl(fd_, UI_SET_EVBIT, item)) {
-            MMI_LOGE("Error setting event type:%{public}u", item);
+            MMI_HILOGE("Error setting event type:%{public}u", item);
             return false;
         }
     }
     for (const auto &item : GetKeys()) {
         if (!DoIoctl(fd_, UI_SET_KEYBIT, item)) {
-            MMI_LOGE("Error setting key:%{public}u", item);
+            MMI_HILOGE("Error setting key:%{public}u", item);
             return false;
         }
     }
     for (const auto &item :  GetProperties()) {
         if (!DoIoctl(fd_, UI_SET_PROPBIT, item)) {
-            MMI_LOGE("Error setting property:%{public}u", item);
+            MMI_HILOGE("Error setting property:%{public}u", item);
             return false;
         }
     }
     for (const auto &item : GetAbs()) {
         if (!DoIoctl(fd_, UI_SET_ABSBIT, item)) {
-            MMI_LOGE("Error setting property:%{public}u", item);
+            MMI_HILOGE("Error setting property:%{public}u", item);
             return false;
         }
     }
     for (const auto &item : GetRelBits()) {
         if (!DoIoctl(fd_, UI_SET_RELBIT, item)) {
-            MMI_LOGE("Error setting rel:%{public}u", item);
+            MMI_HILOGE("Error setting rel:%{public}u", item);
             return false;
         }
     }
 
     errno_t ret = strncpy_s(dev_.name, MAX_NAME_LENGTH, deviceName_, sizeof(dev_.name));
     if (ret != EOK) {
-        MMI_LOGE("failed to copy deviceName");
+        MMI_HILOGE("failed to copy deviceName");
         return false;
     }
     dev_.id.bustype = busType_;
@@ -106,11 +106,11 @@ bool VirtualDevice::SetUp()
     dev_.id.product = productId_;
     dev_.id.version = version_;
     if (write(fd_, &dev_, sizeof(dev_)) < 0) {
-        MMI_LOGE("Unable to set input device info");
+        MMI_HILOGE("Unable to set input device info");
         return false;
     }
     if (ioctl(fd_, UI_DEV_CREATE) < 0) {
-        MMI_LOGE("Unable to create input device");
+        MMI_HILOGE("Unable to create input device");
         return false;
     }
     return true;
@@ -126,7 +126,7 @@ bool VirtualDevice::EmitEvent(uint16_t type, uint16_t code, uint32_t value) cons
     gettimeofday(&event.time, nullptr);
 #endif
     if (write(fd_, &event, sizeof(event)) < static_cast<ssize_t>(sizeof(event))) {
-        MMI_LOGE("Event write failed");
+        MMI_HILOGE("Event write failed");
         return false;
     }
     return true;
