@@ -112,7 +112,7 @@ namespace MMI {
 #define CHKPL(cond) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_HILOGE("{public}s is null, do nothing", #cond); \
+            MMI_HILOGE("%{public}s is null, do nothing", #cond); \
         } \
     } while (0)
 
