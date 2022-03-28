@@ -133,7 +133,8 @@ void ProcessingPenDevice::SetPenLeavePadEvent(const PenEvent& penEvent, InputEve
     SetSynReport(inputEventArray);
 }
 
-int32_t ProcessingPenDevice::AnalysisPenPadEvent(const std::vector<DeviceEvent>& inputData, std::vector<PenEvent>& penEventArray)
+int32_t ProcessingPenDevice::AnalysisPenPadEvent(const std::vector<DeviceEvent>& inputData,
+    std::vector<PenEvent>& penEventArray)
 {
     if (inputData.empty()) {
         return RET_ERR;

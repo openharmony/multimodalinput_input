@@ -52,7 +52,7 @@ HWTEST_F(ProcessingMouseDeviceTest, Test_TransformJsonDataToInputData, TestSize.
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         ASSERT_TRUE(false) << "can not open " << path;
@@ -63,7 +63,7 @@ HWTEST_F(ProcessingMouseDeviceTest, Test_TransformJsonDataToInputData, TestSize.
         jsonBuf = jsonBuf + buf;
     }
     if (fclose(fp) < 0) {
-         ASSERT_TRUE(false) << "fclose file error " << path;
+        ASSERT_TRUE(false) << "fclose file error " << path;
     }
     InputParse InputParse;
     DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);

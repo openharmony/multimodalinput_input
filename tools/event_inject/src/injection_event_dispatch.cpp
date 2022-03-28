@@ -25,7 +25,7 @@
 #include "error_multimodal.h"
 #include "proto.h"
 #include "util.h"
-#include "file_parse.h"
+#include "input_parse.h"
 
 namespace OHOS {
 namespace MMI {

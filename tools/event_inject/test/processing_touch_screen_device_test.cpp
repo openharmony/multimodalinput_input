@@ -52,7 +52,7 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, Tes
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         ASSERT_TRUE(false) << "can not open " << path;
@@ -63,7 +63,7 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, Tes
         jsonBuf = jsonBuf + buf;
     }
     if (fclose(fp) < 0) {
-         ASSERT_TRUE(false) << "fclose file error " << path;
+        ASSERT_TRUE(false) << "fclose file error " << path;
     }
     InputParse InputParse;
     DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
@@ -93,7 +93,7 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEvent
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         ASSERT_TRUE(false) << "can not open " << path;
@@ -104,7 +104,7 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEvent
         jsonBuf = jsonBuf + buf;
     }
     if (fclose(fp) < 0) {
-         ASSERT_TRUE(false) << "fclose file error " << path;
+        ASSERT_TRUE(false) << "fclose file error " << path;
     }
     InputParse InputParse;
     DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
@@ -134,7 +134,7 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataSingl
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         ASSERT_TRUE(false) << "can not open " << path;
@@ -145,7 +145,7 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataSingl
         jsonBuf = jsonBuf + buf;
     }
     if (fclose(fp) < 0) {
-         ASSERT_TRUE(false) << "fclose file error " << path;
+        ASSERT_TRUE(false) << "fclose file error " << path;
     }
     InputParse InputParse;
     DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);

@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include "file_parse.h"
+#include "input_parse.h"
 
+#include "msg_head.h"
 #include <variant>
 #include <sstream>
 #include "cJSON.h"
@@ -105,6 +106,20 @@ bool GetJsonData(cJSON *json, std::string key, int32_t& val)
     return false;
 }
 
+bool GetJsonData(cJSON *json, std::string key, int16_t& val)
+{
+    if (cJSON_HasObjectItem(json, key.c_str())) {
+        cJSON* rawVal = cJSON_GetObjectItem(json, key.c_str());
+        if (rawVal == nullptr) {
+            MMI_HILOGE("rawVal is null");
+            return false;
+        }
+        val = rawVal->valueint;
+        return true;
+    }
+    return false;
+}
+
 bool GetJsonData(cJSON *json, std::string key, int64_t& val)
 {
     if (cJSON_HasObjectItem(json, key.c_str())) {
@@ -131,9 +146,7 @@ bool GetJsonData(cJSON *json, std::string key, std::vector<int32_t>& vals)
             int32_t rawValSize = cJSON_GetArraySize(rawVal);
             for (int32_t i = 0; i < rawValSize; i++) {
                 cJSON* val = cJSON_GetArrayItem(rawVal, i);
-                if (val == nullptr) {
-                    return false;
-                }
+                CHKPF(val);
                 vals.push_back(val->valueint);
             }
             return true;

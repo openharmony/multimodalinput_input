@@ -52,7 +52,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputData, TestSize
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         ASSERT_TRUE(false) << "can not open " << path;
@@ -63,7 +63,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputData, TestSize
         jsonBuf = jsonBuf + buf;
     }
     if (fclose(fp) < 0) {
-         ASSERT_TRUE(false) << "fclose file error " << path;
+        ASSERT_TRUE(false) << "fclose file error " << path;
     }
     InputParse InputParse;
     DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
@@ -93,7 +93,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataNotfindEve
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         ASSERT_TRUE(false) << "can not open " << path;
@@ -104,7 +104,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataNotfindEve
         jsonBuf = jsonBuf + buf;
     }
     if (fclose(fp) < 0) {
-         ASSERT_TRUE(false) << "fclose file error " << path;
+        ASSERT_TRUE(false) << "fclose file error " << path;
     }
     InputParse InputParse;
     DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
@@ -134,7 +134,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataEventsIsEm
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         ASSERT_TRUE(false) << "can not open " << path;
@@ -145,7 +145,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataEventsIsEm
         jsonBuf = jsonBuf + buf;
     }
     if (fclose(fp) < 0) {
-         ASSERT_TRUE(false) << "fclose file error " << path;
+        ASSERT_TRUE(false) << "fclose file error " << path;
     }
     InputParse InputParse;
     DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
@@ -175,7 +175,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApprochEve
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         ASSERT_TRUE(false) << "can not open " << path;
@@ -186,7 +186,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApprochEve
         jsonBuf = jsonBuf + buf;
     }
     if (fclose(fp) < 0) {
-         ASSERT_TRUE(false) << "fclose file error " << path;
+        ASSERT_TRUE(false) << "fclose file error " << path;
     }
     InputParse InputParse;
     DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
@@ -216,7 +216,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataSlideEvent
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         ASSERT_TRUE(false) << "can not open " << path;
@@ -227,7 +227,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataSlideEvent
         jsonBuf = jsonBuf + buf;
     }
     if (fclose(fp) < 0) {
-         ASSERT_TRUE(false) << "fclose file error " << path;
+        ASSERT_TRUE(false) << "fclose file error " << path;
     }
     InputParse InputParse;
     DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
@@ -257,7 +257,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEvent
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         ASSERT_TRUE(false) << "can not open " << path;
@@ -268,7 +268,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEvent
         jsonBuf = jsonBuf + buf;
     }
     if (fclose(fp) < 0) {
-         ASSERT_TRUE(false) << "fclose file error " << path;
+        ASSERT_TRUE(false) << "fclose file error " << path;
     }
     InputParse InputParse;
     DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
@@ -298,7 +298,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApprochEve
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         ASSERT_TRUE(false) << "can not open " << path;
@@ -309,7 +309,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApprochEve
         jsonBuf = jsonBuf + buf;
     }
     if (fclose(fp) < 0) {
-         ASSERT_TRUE(false) << "fclose file error " << path;
+        ASSERT_TRUE(false) << "fclose file error " << path;
     }
     InputParse InputParse;
     DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
@@ -339,7 +339,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEvent
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         ASSERT_TRUE(false) << "can not open " << path;
@@ -350,7 +350,7 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEvent
         jsonBuf = jsonBuf + buf;
     }
     if (fclose(fp) < 0) {
-         ASSERT_TRUE(false) << "fclose file error " << path;
+        ASSERT_TRUE(false) << "fclose file error " << path;
     }
     InputParse InputParse;
     DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);

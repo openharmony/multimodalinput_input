@@ -17,22 +17,19 @@
 #define FILE_PARSE_H
 
 #include <ostream>
-#include "msg_head.h"
-#include "cJSON.h"
+#include <vector>
 
 namespace OHOS {
 namespace MMI {
-    struct Pos
-    {
+    struct Pos {
         int32_t xPos = -1;
         int32_t yPos = -1;
         std::string ToString() const;
     };
-    struct DeviceEvent
-    {
+    struct DeviceEvent {
         std::string eventType;
         std::vector<int32_t> event;
-        int32_t keyValue = -1;
+        int16_t keyValue = -1;
         int64_t blockTime = -1;
         std::vector<int32_t> ringEvents;
         std::string direction;
@@ -48,27 +45,21 @@ namespace MMI {
         std::vector<Pos> posXY;
         std::string ToString() const;
     };
-
-    struct DeviceItem
-    {
+    struct DeviceItem {
         std::string deviceName;
         int32_t deviceIndex = -1;
         std::vector<DeviceEvent> events;
         std::string ToString() const;
     };
     typedef std::vector<DeviceItem> DeviceItems;
-
-    class InputParse
-    {
+    class InputParse {
     public:
         InputParse() = default;
         ~InputParse() = default;
-
-        DeviceItems DataInit(std::string &fileData,bool logType);
+        DeviceItems DataInit(std::string &fileData, bool logType);
     private:
         std::vector<DeviceEvent> ParseData(std::string &events);
         DeviceEvent ParseEvents(std::string& eventInfo);
-
     };
 } // namespace MMI
 } // namespace OHOS

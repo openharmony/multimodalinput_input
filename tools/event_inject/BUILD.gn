@@ -65,7 +65,7 @@ ohos_shared_library("event-injection") {
     "src/processing_pen_device.cpp",
     "src/processing_touch_screen_device.cpp",
     "src/send_message.cpp",
-    "src/file_parse.cpp",
+    "src/input_parse.cpp",
   ]
 
   configs = [
