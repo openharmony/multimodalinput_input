@@ -160,7 +160,6 @@ int32_t MMIService::Init()
     CHKR(mmiFd_ >= 0, EPOLL_CREATE_FAIL, EPOLL_CREATE_FAIL);
     CHKR(InitService(), SASERVICE_INIT_FAIL, SASERVICE_INIT_FAIL);
     CHKR(InitLibinputService(), LIBINPUT_INIT_FAIL, LIBINPUT_INIT_FAIL);
-    CHKR(InitSignalHandler(), INIT_SIGNAL_HANDLER_FAIL, INIT_SIGNAL_HANDLER_FAIL);
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
     return RET_OK;
 }
