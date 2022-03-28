@@ -199,10 +199,6 @@ int32_t MMIService::Init()
         MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;
     }
-    if (!InitSignalHandler()) {
-        MMI_HILOGE("Signal handler init failed");
-        return INIT_SIGNAL_HANDLER_FAIL;
-    }
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
     return RET_OK;
 }
