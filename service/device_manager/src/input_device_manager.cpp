@@ -27,13 +27,13 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     CALL_LOG_ENTER;
     auto item = inputDevice_.find(id);
     if (item == inputDevice_.end()) {
-        MMI_LOGE("failed to search for the device");
+        MMI_HILOGE("failed to search for the device");
         return nullptr;
     }
 
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
     if (inputDevice == nullptr) {
-        MMI_LOGE("create InputDevice ptr failed");
+        MMI_HILOGE("create InputDevice ptr failed");
         return nullptr;
     }
     inputDevice->SetId(item->first);
@@ -60,12 +60,12 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)
     CHKPV(inputDevice);
     for (const auto& item : inputDevice_) {
         if (item.second == inputDevice) {
-            MMI_LOGI("the device already exists");
+            MMI_HILOGI("the device already exists");
             return;
         }
     }
     if (nextId_ == INT32_MAX) {
-        MMI_LOGE("the nextId_ exceeded the upper limit");
+        MMI_HILOGE("the nextId_ exceeded the upper limit");
         return;
     }
     inputDevice_[nextId_] = inputDevice;
@@ -83,11 +83,24 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device* inputDevic
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second == inputDevice) {
             inputDevice_.erase(it);
-            if (IsPointerDevice(inputDevice)) {
-                NotifyPointerDevice(false);
-            }
             break;
         }
+    }
+
+    ScanPointerDevice();
+}
+
+void InputDeviceManager::ScanPointerDevice()
+{
+    bool hasPointerDevice = false;
+    for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
+        if (IsPointerDevice(it->second)) {
+            hasPointerDevice = true;
+            break;
+        }
+    }
+    if (!hasPointerDevice) {
+        NotifyPointerDevice(false);
     }
 }
 
@@ -95,7 +108,7 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)
 {
     CHKPF(device);
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
-    MMI_LOGD("udev tag:%{public}d", static_cast<int32_t>(udevTags));
+    MMI_HILOGD("udev tag:%{public}d", static_cast<int32_t>(udevTags));
     return udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK | 
     EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD);
 }
@@ -114,7 +127,7 @@ void InputDeviceManager::Detach(std::shared_ptr<IDeviceObserver> observer)
 
 void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice)
 {
-    MMI_LOGI("observers_ size:%{public}zu", observers_.size());
+    MMI_HILOGI("observers_ size:%{public}zu", observers_.size());
     for (auto observer = observers_.begin(); observer != observers_.end(); observer++) {
         (*observer)->UpdatePointerDevice(hasPointerDevice);
     }
@@ -126,11 +139,11 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevic
     CHKPR(inputDevice, INVALID_DEVICE_ID);
     for (const auto& item : inputDevice_) {
         if (item.second == inputDevice) {
-            MMI_LOGI("find input device id success");
+            MMI_HILOGI("find input device id success");
             return item.first;
         }
     }
-    MMI_LOGE("find input device id failed");
+    MMI_HILOGE("find input device id failed");
     return INVALID_DEVICE_ID;
 }
 } // namespace MMI

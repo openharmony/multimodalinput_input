@@ -30,7 +30,7 @@ int32_t ProcessingFingerDevice::TransformJsonDataToInputData(const Json& fingerE
     }
     Json inputData = fingerEventArrays.at("events");
     if (inputData.empty()) {
-        MMI_LOGE("manage finger array faild, inputData is empty.");
+        MMI_HILOGE("manage finger array faild, inputData is empty.");
         return RET_ERR;
     }
     TouchPadInputEvents touchPadInputEvents = {};

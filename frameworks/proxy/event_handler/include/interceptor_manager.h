@@ -28,6 +28,9 @@ namespace OHOS {
 namespace MMI {
 class InterceptorManager {
 public:
+    static constexpr int32_t SOURCETYPE_KEY = 4;
+
+public:
     InterceptorManager();
     DISALLOW_COPY_AND_MOVE(InterceptorManager);
     ~InterceptorManager();

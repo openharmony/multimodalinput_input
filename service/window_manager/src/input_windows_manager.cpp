@@ -44,12 +44,12 @@ int32_t InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent> inputEvent
     CALL_LOG_ENTER;
     int32_t pid = GetPidAndUpdateTarget(inputEvent);
     if (pid <= 0) {
-        MMI_LOGE("Invalid pid");
+        MMI_HILOGE("Invalid pid");
         return RET_ERR;
     }
     int32_t fd = udsServer_->GetClientFd(pid);
     if (fd < 0) {
-        MMI_LOGE("Invalid fd");
+        MMI_HILOGE("Invalid fd");
         return RET_ERR;
     }
     return fd;
@@ -59,7 +59,7 @@ int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent
 {
     int32_t displayId = inputEvent->GetTargetDisplayId();
     if (displayId < 0) {
-        MMI_LOGD("target display is -1");
+        MMI_HILOGD("target display is -1");
         if (logicalDisplays_.empty()) {
             return displayId;
         }
@@ -75,26 +75,26 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> i
     CHKPR(inputEvent, ERROR_NULL_POINTER);
     const int32_t targetDisplayId = GetDisplayId(inputEvent);
     if (targetDisplayId < 0) {
-        MMI_LOGE("No display is available.");
+        MMI_HILOGE("No display is available.");
         return RET_ERR;
     }
     for (const auto &item : logicalDisplays_) {
         if (item.id != targetDisplayId) {
             continue;
         }
-        MMI_LOGD("target display:%{public}d", targetDisplayId);
+        MMI_HILOGD("target display:%{public}d", targetDisplayId);
         auto it = windowInfos_.find(item.focusWindowId);
         if (it == windowInfos_.end()) {
-            MMI_LOGE("can't find window info, focuswindowId:%{public}d", item.focusWindowId);
+            MMI_HILOGE("can't find window info, focuswindowId:%{public}d", item.focusWindowId);
             return RET_ERR;
         }
         inputEvent->SetTargetWindowId(item.focusWindowId);
         inputEvent->SetAgentWindowId(it->second.agentWindowId);
-        MMI_LOGD("pid:%{public}d", it->second.pid);
+        MMI_HILOGD("pid:%{public}d", it->second.pid);
         return it->second.pid;
     }
 
-    MMI_LOGE("can't find logical display,target display:%{public}d", targetDisplayId);
+    MMI_HILOGE("can't find logical display,target display:%{public}d", targetDisplayId);
     return RET_ERR;
 }
 
@@ -109,7 +109,7 @@ void InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInf
         for (const auto &window : item.windowsInfo) {
             auto iter = windowInfos_.insert(std::pair<int32_t, WindowInfo>(window.id, window));
             if (!iter.second) {
-                MMI_LOGE("Insert value failed, Window:%{public}d", window.id);
+                MMI_HILOGE("Insert value failed, Window:%{public}d", window.id);
             }
         }
     }
@@ -121,9 +121,9 @@ void InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInf
 
 void InputWindowsManager::PrintDisplayInfo()
 {
-    MMI_LOGD("physicalDisplays,num:%{public}zu", physicalDisplays_.size());
+    MMI_HILOGD("physicalDisplays,num:%{public}zu", physicalDisplays_.size());
     for (const auto &item : physicalDisplays_) {
-        MMI_LOGD("PhysicalDisplays,id:%{public}d,leftDisplay:%{public}d,upDisplay:%{public}d,"
+        MMI_HILOGD("PhysicalDisplays,id:%{public}d,leftDisplay:%{public}d,upDisplay:%{public}d,"
             "topLeftX:%{public}d,topLeftY:%{public}d,width:%{public}d,height:%{public}d,name:%{public}s,"
             "seatId:%{public}s,seatName:%{public}s,logicWidth:%{public}d,logicHeight:%{public}d,"
             "direction:%{public}d",
@@ -133,9 +133,9 @@ void InputWindowsManager::PrintDisplayInfo()
             item.seatName.c_str(), item.logicWidth, item.logicHeight, item.direction);
     }
 
-    MMI_LOGD("logicalDisplays,num:%{public}zu", logicalDisplays_.size());
+    MMI_HILOGD("logicalDisplays,num:%{public}zu", logicalDisplays_.size());
     for (const auto &item : logicalDisplays_) {
-        MMI_LOGD("logicalDisplays, id:%{public}d,topLeftX:%{public}d,topLeftY:%{public}d,"
+        MMI_HILOGD("logicalDisplays, id:%{public}d,topLeftX:%{public}d,topLeftY:%{public}d,"
             "width:%{public}d,height:%{public}d,name:%{public}s,"
             "seatId:%{public}s,seatName:%{public}s,focusWindowId:%{public}d,window num:%{public}zu",
             item.id, item.topLeftX, item.topLeftY,
@@ -144,9 +144,9 @@ void InputWindowsManager::PrintDisplayInfo()
             item.windowsInfo.size());
     }
 
-    MMI_LOGD("window info,num:%{public}zu", windowInfos_.size());
+    MMI_HILOGD("window info,num:%{public}zu", windowInfos_.size());
     for (const auto &item : windowInfos_) {
-        MMI_LOGD("windowId:%{public}d,id:%{public}d,pid:%{public}d,uid:%{public}d,hotZoneTopLeftX:%{public}d,"
+        MMI_HILOGD("windowId:%{public}d,id:%{public}d,pid:%{public}d,uid:%{public}d,hotZoneTopLeftX:%{public}d,"
             "hotZoneTopLeftY:%{public}d,hotZoneWidth:%{public}d,hotZoneHeight:%{public}d,display:%{public}d,"
             "agentWindowId:%{public}d,winTopLeftX:%{public}d,winTopLeftY:%{public}d",
             item.first, item.second.id, item.second.pid, item.second.uid, item.second.hotZoneTopLeftX,
@@ -162,7 +162,7 @@ PhysicalDisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id)
             return &it;
         }
     }
-    MMI_LOGE("Failed to obtain physical(%{public}d) display", id);
+    MMI_HILOGE("Failed to obtain physical(%{public}d) display", id);
     return nullptr;
 }
 
@@ -174,7 +174,7 @@ PhysicalDisplayInfo* InputWindowsManager::FindPhysicalDisplayInfo(const std::str
             return &it;
         }
     }
-    MMI_LOGE("Failed to search for Physical,seat:%{public}s,name:%{public}s", seatId.c_str(), seatName.c_str());
+    MMI_HILOGE("Failed to search for Physical,seat:%{public}s,name:%{public}s", seatId.c_str(), seatName.c_str());
     return nullptr;
 }
 
@@ -183,25 +183,25 @@ void InputWindowsManager::RotateTouchScreen(PhysicalDisplayInfo* info, Direction
 {
     CHKPV(info);
     if (direction == Direction0) {
-        MMI_LOGD("direction is Direction0");
+        MMI_HILOGD("direction is Direction0");
         return;
     }
     if (direction == Direction90) {
-        MMI_LOGD("direction is Direction90");
+        MMI_HILOGD("direction is Direction90");
         int32_t temp = logicalX;
         logicalX = info->logicHeight - logicalY;
         logicalY = temp;
-        MMI_LOGD("logicalX is %{public}d, logicalY is %{public}d", logicalX, logicalY);
+        MMI_HILOGD("logicalX is %{public}d, logicalY is %{public}d", logicalX, logicalY);
         return;
     }
     if (direction == Direction180) {
-        MMI_LOGD("direction is Direction180");
+        MMI_HILOGD("direction is Direction180");
         logicalX = info->logicWidth - logicalX;
         logicalY = info->logicHeight - logicalY;
         return;
     }
     if (direction == Direction270) {
-        MMI_LOGD("direction is Direction270");
+        MMI_HILOGD("direction is Direction270");
         int32_t temp = logicalY;
         logicalY = info->logicWidth - logicalX;
         logicalX = temp;
@@ -216,14 +216,14 @@ bool InputWindowsManager::TransformDisplayPoint(struct libinput_event_touch* tou
     CHKPF(info);
 
     if ((info->width <= 0) || (info->height <= 0) || (info->logicWidth <= 0) || (info->logicHeight <= 0)) {
-        MMI_LOGE("Get DisplayInfo is error");
+        MMI_HILOGE("Get DisplayInfo is error");
         return false;
     }
 
     auto physicalX = libinput_event_touch_get_x_transformed(touch, info->width) + info->topLeftX;
     auto physicalY = libinput_event_touch_get_y_transformed(touch, info->height) + info->topLeftY;
     if ((physicalX >= INT32_MAX) || (physicalY >= INT32_MAX)) {
-        MMI_LOGE("Physical display coordinates are out of range");
+        MMI_HILOGE("Physical display coordinates are out of range");
         return false;
     }
     int32_t localPhysicalX = static_cast<int32_t>(physicalX);
@@ -232,7 +232,7 @@ bool InputWindowsManager::TransformDisplayPoint(struct libinput_event_touch* tou
     auto logicX = (1L * info->logicWidth * localPhysicalX / info->width);
     auto logicY = (1L * info->logicHeight * localPhysicalY / info->height);
     if ((logicX >= INT32_MAX) || (logicY >= INT32_MAX)) {
-        MMI_LOGE("Physical display logical coordinates out of range");
+        MMI_HILOGE("Physical display logical coordinates out of range");
         return false;
     }
     int32_t localLogcialX = static_cast<int32_t>(logicX);
@@ -280,7 +280,7 @@ bool InputWindowsManager::TouchMotionPointToDisplayPoint(struct libinput_event_t
 
     for (const auto &display : logicalDisplays_) {
         if (targetDisplayId == display.id ) {
-            MMI_LOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
+            MMI_HILOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
                 targetDisplayId, displayX, displayY);
             displayX = globalLogicalX - display.topLeftX;
             displayY = globalLogicalY - display.topLeftY;
@@ -314,7 +314,7 @@ bool InputWindowsManager::TouchDownPointToDisplayPoint(struct libinput_event_tou
         logicalDisplayId = display.id;
         logicalX = globalLogicalX - display.topLeftX;
         logicalY = globalLogicalY - display.topLeftY;
-        MMI_LOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
+        MMI_HILOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
             logicalDisplayId, logicalX, logicalY);
         return true;
     }
@@ -353,7 +353,7 @@ void InputWindowsManager::AdjustGlobalCoordinate(int32_t& globalX, int32_t& glob
 bool InputWindowsManager::UpdataDisplayId(int32_t& displayId)
 {
     if (logicalDisplays_.empty()) {
-        MMI_LOGE("logicalDisplays_is empty");
+        MMI_HILOGE("logicalDisplays_is empty");
         return false;
     }
     if (displayId < 0) {
@@ -384,7 +384,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdataDisplayId(displayId)) {
-        MMI_LOGE("This display:%{public}d is not exist", displayId);
+        MMI_HILOGE("This display:%{public}d is not exist", displayId);
         return RET_ERR;
     }
     pointerEvent->SetTargetDisplayId(displayId);
@@ -392,7 +392,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-        MMI_LOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return RET_ERR;
     }
     LogicalDisplayInfo *logicalDisplayInfo = GetLogicalDisplayId(displayId);
@@ -430,10 +430,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto fd = udsServer_->GetClientFd(firstBtnDownWindow->pid);
 
-    MMI_LOGD("fd:%{public}d,pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
-             "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d",
-             fd, firstBtnDownWindow->pid, firstBtnDownWindow->id, firstBtnDownWindow->agentWindowId,
-             globalX, globalY, localX, localY);
+    MMI_HILOGD("fd:%{public}d,pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
+               "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d",
+               fd, firstBtnDownWindow->pid, firstBtnDownWindow->id, firstBtnDownWindow->agentWindowId,
+               globalX, globalY, localX, localY);
     return fd;
 }
 
@@ -442,7 +442,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdataDisplayId(displayId)) {
-        MMI_LOGE("This display is not exist");
+        MMI_HILOGE("This display is not exist");
         return RET_ERR;
     }
     pointerEvent->SetTargetDisplayId(displayId);
@@ -450,18 +450,18 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-        MMI_LOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return RET_ERR;
     }
-    MMI_LOGD("display:%{public}d", displayId);
+    MMI_HILOGD("display:%{public}d", displayId);
     LogicalDisplayInfo *logicalDisplayInfo = GetLogicalDisplayId(displayId);
     CHKPR(logicalDisplayInfo, ERROR_NULL_POINTER);
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
-    MMI_LOGD("globalX:%{public}d,globalY:%{public}d", globalX, globalY);
+    MMI_HILOGD("globalX:%{public}d,globalY:%{public}d", globalX, globalY);
     AdjustGlobalCoordinate(globalX, globalY, logicalDisplayInfo->width, logicalDisplayInfo->height);
     auto targetWindowId = pointerEvent->GetTargetWindowId();
-    MMI_LOGD("targetWindow:%{public}d", targetWindowId);
+    MMI_HILOGD("targetWindow:%{public}d", targetWindowId);
     WindowInfo *touchWindow = nullptr;
     for (auto item : logicalDisplayInfo->windowsInfo) {
         if (targetWindowId < 0) {
@@ -477,7 +477,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
     if (touchWindow == nullptr) {
-        MMI_LOGE("touchWindow is nullptr, targetWindow:%{public}d", targetWindowId);
+        MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d", targetWindowId);
         return RET_ERR;
     }
 
@@ -489,11 +489,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerItem.SetLocalY(localY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
-    MMI_LOGD("pid:%{public}d,fd:%{public}d,globalX01:%{public}d,"
-             "globalY01:%{public}d,localX:%{public}d,localY:%{public}d,"
-             "TargetWindowId:%{public}d,AgentWindowId:%{public}d",
-             touchWindow->pid, fd, globalX, globalY, localX, localY,
-             pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
+    MMI_HILOGD("pid:%{public}d,fd:%{public}d,globalX01:%{public}d,"
+               "globalY01:%{public}d,localX:%{public}d,localY:%{public}d,"
+               "TargetWindowId:%{public}d,AgentWindowId:%{public}d",
+               touchWindow->pid, fd, globalX, globalY, localX, localY,
+               pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
     return fd;
 }
 
@@ -519,11 +519,11 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
             return UpdateTouchPadTarget(pointerEvent);
         }
         default: {
-            MMI_LOGW("Source type is unknown, source:%{public}d", source);
+            MMI_HILOGW("Source type is unknown, source:%{public}d", source);
             break;
         }
     }
-    MMI_LOGE("Source is not of the correct type, source:%{public}d", source);
+    MMI_HILOGE("Source is not of the correct type, source:%{public}d", source);
     return RET_ERR;
 }
 
@@ -531,7 +531,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, double& y)
 {
     const std::vector<LogicalDisplayInfo> logicalDisplayInfo = GetLogicalDisplayInfo();
     if (logicalDisplayInfo.empty()) {
-        MMI_LOGE("logicalDisplayInfo is empty");
+        MMI_HILOGE("logicalDisplayInfo is empty");
         return;
     }
     int32_t width = 0;
@@ -560,7 +560,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, double& y)
     } else {
         mouseLoction_.globalY = integerY;
     }
-    MMI_LOGD("Mouse Data: globalX:%{public}d,globalY:%{public}d", mouseLoction_.globalX, mouseLoction_.globalY);
+    MMI_HILOGD("Mouse Data: globalX:%{public}d,globalY:%{public}d", mouseLoction_.globalX, mouseLoction_.globalY);
 }
 
 MouseLocation InputWindowsManager::GetMouseInfo() const
