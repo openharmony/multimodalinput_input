@@ -46,6 +46,7 @@ protected:
     virtual int32_t ReportPointerEvent(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnInputDevice(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnInputDeviceIds(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t OnKeyList(const UDSClient& client, NetPacket& pkt);
     virtual int32_t TouchpadEventInterceptor(const UDSClient& client, NetPacket& pkt);
     virtual int32_t KeyEventInterceptor(const UDSClient& client, NetPacket& pkt);
 

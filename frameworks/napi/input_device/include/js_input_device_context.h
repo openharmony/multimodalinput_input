@@ -15,6 +15,7 @@
 
 #ifndef JS_INPUT_DEVICE_CONTEXT_H
 #define JS_INPUT_DEVICE_CONTEXT_H
+
 #include "js_input_device_manager.h"
 
 namespace OHOS {
@@ -24,19 +25,21 @@ public:
     JsInputDeviceContext();
     DISALLOW_COPY_AND_MOVE(JsInputDeviceContext);
     ~JsInputDeviceContext();
-    static napi_value CreateInstance(napi_env env);
-    static JsInputDeviceContext* GetInstance(napi_env env);
-    static napi_value JsConstructor(napi_env env, napi_callback_info info);
     static napi_value Export(napi_env env, napi_value exports);
     static napi_value GetDeviceIds(napi_env env, napi_callback_info info);
     static napi_value GetDevice(napi_env env, napi_callback_info info);
+    static napi_value GetKeystrokeAbility(napi_env env, napi_callback_info info);
     std::shared_ptr<JsInputDeviceManager> GetJsInputDeviceMgr() const;
-    napi_ref contextRef_ {nullptr};
 
 private:
+    static napi_value CreateInstance(napi_env env);
+    static JsInputDeviceContext* GetInstance(napi_env env);
+    static napi_value JsConstructor(napi_env env, napi_callback_info info);
     std::shared_ptr<JsInputDeviceManager> mager_ {nullptr};
     std::mutex mtx_;
+    napi_ref contextRef_ {nullptr};
 };
 } // namespace MMI
 } // namespace OHOS
+
 #endif // JS_INPUT_DEVICE_CONTEXT_H

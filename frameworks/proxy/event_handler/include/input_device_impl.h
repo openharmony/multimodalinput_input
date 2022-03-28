@@ -36,19 +36,27 @@ public:
         std::string name;
         uint32_t devcieType;
     };
+    struct InputDeviceData {
+        std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)> inputDevice;
+        std::function<void(int32_t, std::vector<int32_t>)> ids;
+        std::function<void(int32_t, std::vector<int32_t>)> keys;
+    };
 
     void GetInputDeviceIdsAsync(int32_t userData, std::function<void(int32_t, std::vector<int32_t>)> callback);
     void GetInputDeviceAsync(int32_t userData, int32_t deviceId,
         std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)> callback);
+    void GetKeystrokeAbility(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes,
+        std::function<void(int32_t, std::vector<int32_t>)> callback);
     void OnInputDevice(int32_t userData, int32_t id, std::string name, int32_t deviceId);
     void OnInputDeviceIds(int32_t userData, std::vector<int32_t> ids);
+    void OnKeystrokeAbility(int32_t userData, std::vector<int32_t> keystrokeAbility);
 
 private:
     InputDeviceImpl() = default;
-    std::map<int32_t, std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)>> inputDevcices_;
-    std::map<int32_t, std::function<void(int32_t, std::vector<int32_t>)>> inputDevciceIds_;
+    std::map<int32_t, InputDeviceData> inputDevices_;
     std::mutex mtx_;
 };
 } // namespace MMI
 } // namespace OHOS
+
 #endif // OHOS_INPUT_DEVICE_EVENT_H
