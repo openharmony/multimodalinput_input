@@ -162,7 +162,7 @@ PhysicalDisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id)
             return &it;
         }
     }
-    MMI_HILOGE("Failed to obtain physical(%{public}d) display", id);
+    MMI_HILOGW("Failed to obtain physical(%{public}d) display", id);
     return nullptr;
 }
 
