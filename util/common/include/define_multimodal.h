@@ -143,7 +143,7 @@ namespace MMI {
 #define CHKPB(cond) \
     { \
         if ((cond) == nullptr) { \
-            MMI_HILOGW("CHKPC(%{public}s) is null, skip then break", #cond); \
+            MMI_HILOGW("CHKPB(%{public}s) is null, skip then break", #cond); \
             break; \
         } \
     }
