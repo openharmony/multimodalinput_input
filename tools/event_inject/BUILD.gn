@@ -55,6 +55,7 @@ ohos_shared_library("event-injection") {
     "src/get_device_object.cpp",
     "src/injection_event_dispatch.cpp",
     "src/injection_tools_help_func.cpp",
+    "src/input_parse.cpp",
     "src/manage_inject_device.cpp",
     "src/processing_finger_device.cpp",
     "src/processing_game_pad_device.cpp",
@@ -65,7 +66,6 @@ ohos_shared_library("event-injection") {
     "src/processing_pen_device.cpp",
     "src/processing_touch_screen_device.cpp",
     "src/send_message.cpp",
-    "src/input_parse.cpp",
   ]
 
   configs = [
@@ -170,9 +170,9 @@ ohos_unittest("ut-event-injection-out") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/tools/event_inject:event-injection",
     "${mmi_path}/util:libmmi-util",
+    "//third_party/cJSON:cjson_static",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//third_party/cJSON:cjson_static",
   ]
 
   if (is_mmi_have_libinput) {
