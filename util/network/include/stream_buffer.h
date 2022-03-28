@@ -91,7 +91,7 @@ template<typename T>
 bool StreamBuffer::Read(T &data)
 {
     if (!Read(reinterpret_cast<char *>(&data), sizeof(data))) {
-        MMI_LOGE("[%{public}s] size:%{public}zu count:%{public}d,errCode:%{public}d",
+        MMI_HILOGE("[%{public}s] size:%{public}zu count:%{public}d,errCode:%{public}d",
             GetErrorStatusRemark().c_str(), sizeof(data), rCount_ + 1, STREAM_BUF_READ_FAIL);
         return false;
     }
@@ -102,7 +102,7 @@ template<typename T>
 bool StreamBuffer::Write(const T &data)
 {
     if (!Write(reinterpret_cast<char *>(const_cast<T *>(&data)), sizeof(data))) {
-        MMI_LOGE("[%{public}s] size:%{public}zu,count:%{public}d,errCode:%{public}d",
+        MMI_HILOGE("[%{public}s] size:%{public}zu,count:%{public}d,errCode:%{public}d",
             GetErrorStatusRemark().c_str(), sizeof(data), wCount_ + 1, STREAM_BUF_WRITE_FAIL);
         return false;
     }
@@ -113,7 +113,7 @@ template<typename T>
 StreamBuffer &StreamBuffer::operator>>(T &data)
 {
     if (!Read(data)) {
-        MMI_LOGW("Read data failed");
+        MMI_HILOGW("Read data failed");
     }
     return *this;
 }
@@ -122,7 +122,7 @@ template<typename T>
 StreamBuffer &StreamBuffer::operator<<(const T &data)
 {
     if (!Write(data)) {
-        MMI_LOGW("Write data failed");
+        MMI_HILOGW("Write data failed");
     }
     return *this;
 }

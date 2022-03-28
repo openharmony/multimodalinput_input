@@ -40,11 +40,11 @@ KeyboardInject::KeyboardInject()
     auto it = keyCodeMap_.find(INPUT_KEY_BACK);
     if (it == keyCodeMap_.end()) {
         auto ret = keyCodeMap_.insert(std::make_pair(INPUT_KEY_BACK, LINUX_KEY_BACK));
-        MMI_LOGD("ret.second:%{public}d", ret.second);
+        MMI_HILOGD("ret.second:%{public}d", ret.second);
     }
     injectThread_ = std::make_unique<InjectThread>();
     if (injectThread_ == nullptr) {
-        MMI_LOGE("injectThread_ is null");
+        MMI_HILOGE("injectThread_ is null");
         return;
     }
     g_pKeyboard = std::make_unique<VirtualKeyboard>();

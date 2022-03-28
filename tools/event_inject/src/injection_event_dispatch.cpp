@@ -47,7 +47,7 @@ void InjectionEventDispatch::InitManageFunction()
 
     for (auto &it : funs) {
         if (!RegistInjectEvent(it)) {
-            MMI_LOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
+            MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
             continue;
         }
     }
@@ -90,7 +90,7 @@ int32_t InjectionEventDispatch::GetFileSize(const std::string& fileName)
         fseek(pFile, 0, SEEK_END);
         long fileSize = ftell(pFile);
         if (fileSize > INT32_MAX) {
-            MMI_LOGE("The file is too large for 32-bit systems, filesize:%{public}ld", fileSize);
+            MMI_HILOGE("The file is too large for 32-bit systems, filesize:%{public}ld", fileSize);
             fclose(pFile);
             return RET_ERR;
         }
@@ -104,35 +104,35 @@ int32_t InjectionEventDispatch::OnJson()
 {
     CALL_LOG_ENTER;
     if (injectArgvs_.size() < ARGVS_CODE_INDEX) {
-        MMI_LOGE("path is error");
+        MMI_HILOGE("path is error");
         return RET_ERR;
     }
     const std::string jsonFile = injectArgvs_.at(JSON_FILE_PATH_INDEX);
     char Path[PATH_MAX] = {};
     if (realpath(jsonFile.c_str(), Path) == nullptr) {
-        MMI_LOGE("json path is error, jsonFile:%{public}s", jsonFile.c_str());
+        MMI_HILOGE("json path is error, jsonFile:%{public}s", jsonFile.c_str());
         return RET_ERR;
     }
     if (!(IsFileExists(jsonFile))) {
-        MMI_LOGE("This file does not exist, jsonFile:%{public}s", jsonFile.c_str());
+        MMI_HILOGE("This file does not exist, jsonFile:%{public}s", jsonFile.c_str());
         return RET_ERR;
     }
     if (VerifyFile(jsonFile)) {
-        MMI_LOGE("This file is not in data, jsonFile:%{public}s", jsonFile.c_str());
+        MMI_HILOGE("This file is not in data, jsonFile:%{public}s", jsonFile.c_str());
         return RET_ERR;
     }
     if (GetFileExtendName(jsonFile) != "json") {
-        MMI_LOGE("Unable to parse files other than json format jsonFile:%{public}s", jsonFile.c_str());
+        MMI_HILOGE("Unable to parse files other than json format jsonFile:%{public}s", jsonFile.c_str());
         return RET_ERR;
     }
     int32_t fileSize = GetFileSize(jsonFile);
     if ((fileSize <= 0) || (fileSize > JSON_FILE_SIZE)) {
-        MMI_LOGE("The file size is out of range 2M or empty. filesize:%{public}d", fileSize);
+        MMI_HILOGE("The file size is out of range 2M or empty. filesize:%{public}d", fileSize);
         return RET_ERR;
     }
     std::ifstream reader(jsonFile);
     if (!reader) {
-        MMI_LOGE("json file is empty");
+        MMI_HILOGE("json file is empty");
         return RET_ERR;
     }
     Json inputEventArrays;
@@ -152,7 +152,7 @@ bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const std::vector<
 {
     CALL_LOG_ENTER;
     if (argc < ARGV_VALID || argv.at(ARGVS_TARGET_INDEX).empty()) {
-        MMI_LOGE("Invaild Input Para, Plase Check the validity of the para. errCode:%{public}d", PARAM_INPUT_FAIL);
+        MMI_HILOGE("Invaild Input Para, Plase Check the validity of the para. errCode:%{public}d", PARAM_INPUT_FAIL);
         return false;
     }
 
@@ -185,9 +185,9 @@ void InjectionEventDispatch::Run()
 
     auto ret = (*fun)();
     if (ret == RET_OK) {
-        MMI_LOGI("inject function success id:%{public}s", id.c_str());
+        MMI_HILOGI("inject function success id:%{public}s", id.c_str());
     } else {
-        MMI_LOGE("inject function failed id:%{public}s", id.c_str());
+        MMI_HILOGE("inject function failed id:%{public}s", id.c_str());
     }
 }
 
@@ -198,16 +198,16 @@ int32_t InjectionEventDispatch::ExecuteFunction(std::string funId)
     }
     auto fun = GetFun(funId);
     if (!fun) {
-        MMI_LOGE("event injection Unknown fuction id:%{public}s", funId.c_str());
+        MMI_HILOGE("event injection Unknown fuction id:%{public}s", funId.c_str());
         return false;
     }
-    MMI_LOGI("Inject tools into function:%{public}s", funId.c_str());
+    MMI_HILOGI("Inject tools into function:%{public}s", funId.c_str());
     int32_t ret = RET_ERR;
     ret = (*fun)();
     if (ret == RET_OK) {
-        MMI_LOGI("inject function success id:%{public}s", funId.c_str());
+        MMI_HILOGI("inject function success id:%{public}s", funId.c_str());
     } else {
-        MMI_LOGE("inject function failed id:%{public}s", funId.c_str());
+        MMI_HILOGE("inject function failed id:%{public}s", funId.c_str());
     }
 
     return ret;
@@ -217,7 +217,7 @@ int32_t InjectionEventDispatch::OnHelp()
 {
     InjectionToolsHelpFunc helpFunc;
     std::string ret = helpFunc.GetHelpText();
-    MMI_LOGI("%{public}s", ret.c_str());
+    MMI_HILOGI("%{public}s", ret.c_str());
 
     return RET_OK;
 }
@@ -225,7 +225,7 @@ int32_t InjectionEventDispatch::OnHelp()
 int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText) const
 {
     if (deviceNameText.empty()) {
-        MMI_LOGE("Get device index failed");
+        MMI_HILOGE("Get device index failed");
         return RET_ERR;
     }
     for (const auto &item : allDevices_) {
@@ -239,7 +239,7 @@ int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText
 bool InjectionEventDispatch::CheckValue(const std::string& inputValue)
 {
     if ((inputValue.length()) > INPUT_VALUE_LENGTH) {
-        MMI_LOGE("The value entered is out of range, value:%{public}s", inputValue.c_str());
+        MMI_HILOGE("The value entered is out of range, value:%{public}s", inputValue.c_str());
         return false;
     }
     bool isValueNumber = regex_match(inputValue, std::regex("(-[\\d+]+)|(\\d+)"));
@@ -255,7 +255,7 @@ bool InjectionEventDispatch::CheckValue(const std::string& inputValue)
 bool InjectionEventDispatch::CheckCode(const std::string& inputCode)
 {
     if ((inputCode.length()) > INPUT_CODE_LENGTH) {
-        MMI_LOGE("The value entered is out of range, code:%{public}s", inputCode.c_str());
+        MMI_HILOGE("The value entered is out of range, code:%{public}s", inputCode.c_str());
         return false;
     }
     bool isCodeNumber = regex_match(inputCode, std::regex("\\d+"));
@@ -271,7 +271,7 @@ bool InjectionEventDispatch::CheckCode(const std::string& inputCode)
 bool InjectionEventDispatch::CheckType(const std::string& inputType)
 {
     if ((inputType.length()) > INPUT_TYPE_LENGTH) {
-        MMI_LOGE("The value entered is out of range, type:%{public}s", inputType.c_str());
+        MMI_HILOGE("The value entered is out of range, type:%{public}s", inputType.c_str());
         return false;
     }
     bool isTypeNumber = regex_match(inputType, std::regex("\\d+"));
@@ -288,15 +288,15 @@ bool InjectionEventDispatch::CheckEventValue(const std::string& inputType, const
     const std::string& inputValue)
 {
     if (!(CheckType(inputType))) {
-        MMI_LOGE("input error in type, type:%{public}s", inputType.c_str());
+        MMI_HILOGE("input error in type, type:%{public}s", inputType.c_str());
         return false;
     }
     if (!(CheckCode(inputCode))) {
-        MMI_LOGE("input error in code, code:%{public}s", inputCode.c_str());
+        MMI_HILOGE("input error in code, code:%{public}s", inputCode.c_str());
         return false;
     }
     if (!(CheckValue(inputValue))) {
-        MMI_LOGE("input error in value, value:%{public}s", inputValue.c_str());
+        MMI_HILOGE("input error in value, value:%{public}s", inputValue.c_str());
         return false;
     }
     return true;
@@ -305,22 +305,22 @@ bool InjectionEventDispatch::CheckEventValue(const std::string& inputType, const
 int32_t InjectionEventDispatch::OnSendEvent()
 {
     if (injectArgvs_.size() != SEND_EVENT_ARGV_COUNTS) {
-        MMI_LOGE("Wrong number of input parameters, errCode:%{public}d", PARAM_INPUT_FAIL);
+        MMI_HILOGE("Wrong number of input parameters, errCode:%{public}d", PARAM_INPUT_FAIL);
         return RET_ERR;
     }
     std::string deviceNode = injectArgvs_[SEND_EVENT_DEV_NODE_INDEX];
     if (deviceNode.empty()) {
-        MMI_LOGE("device node:%{public}s is not exit", deviceNode.c_str());
+        MMI_HILOGE("device node:%{public}s is not exit", deviceNode.c_str());
         return RET_ERR;
     }
     char realPath[PATH_MAX] = {};
     if (realpath(deviceNode.c_str(), realPath) == nullptr) {
-        MMI_LOGE("path is error, path:%{public}s", deviceNode.c_str());
+        MMI_HILOGE("path is error, path:%{public}s", deviceNode.c_str());
         return RET_ERR;
     }
     int32_t fd = open(realPath, O_RDWR);
     if (fd < 0) {
-        MMI_LOGE("open device node:%{public}s failed, errCode:%{public}d", deviceNode.c_str(), FILE_OPEN_FAIL);
+        MMI_HILOGE("open device node:%{public}s failed, errCode:%{public}d", deviceNode.c_str(), FILE_OPEN_FAIL);
         return RET_ERR;
     }
     struct timeval tm;
@@ -337,7 +337,7 @@ int32_t InjectionEventDispatch::OnSendEvent()
     event.value = static_cast<int32_t>(std::stoi(injectArgvs_[SEND_EVENT_VALUE_INDEX]));
     int32_t ret = write(fd, &event, sizeof(event));
     if (ret != sizeof(event)) {
-        MMI_LOGE("send event to device node faild.");
+        MMI_HILOGE("send event to device node faild.");
         return RET_ERR;
     }
     if (fd >= 0) {

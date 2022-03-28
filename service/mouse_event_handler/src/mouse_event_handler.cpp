@@ -56,7 +56,7 @@ void MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 
     WinMgr->UpdateAndAdjustMouseLoction(absolutionX_, absolutionY_);
 
-    MMI_LOGD("Change Coordinate : x:%{public}lf,y:%{public}lf",  absolutionX_, absolutionY_);
+    MMI_HILOGD("Change Coordinate : x:%{public}lf,y:%{public}lf",  absolutionX_, absolutionY_);
 }
 
 void MouseEventHandler::InitAbsolution()
@@ -64,7 +64,7 @@ void MouseEventHandler::InitAbsolution()
     if (absolutionX_ != -1 || absolutionY_ != -1) {
         return;
     }
-    MMI_LOGD("init absolution");
+    MMI_HILOGD("init absolution");
     auto logicalDisplayInfo = WinMgr->GetLogicalDisplayInfo();
     if (!logicalDisplayInfo.empty()) {
         absolutionX_ = logicalDisplayInfo[0].width * 1.0 / 2;
@@ -76,7 +76,7 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
 {
     CALL_LOG_ENTER;
     CHKPV(data);
-    MMI_LOGD("current action:%{public}d", pointerEvent_->GetPointerAction());
+    MMI_HILOGD("current action:%{public}d", pointerEvent_->GetPointerAction());
 
     auto button = libinput_event_pointer_get_button(data);
     if (button == BTN_LEFT) {
@@ -86,7 +86,7 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
     } else if (button == BTN_MIDDLE) {
         pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_MIDDLE);
     } else {
-        MMI_LOGW("unknown btn, btn:%{public}u", button);
+        MMI_HILOGW("unknown btn, btn:%{public}u", button);
     }
 
     auto state = libinput_event_pointer_get_button_state(data);
@@ -103,7 +103,7 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
         isPressed_ = true;
         buttionId_ = pointerEvent_->GetButtonId();
     } else {
-        MMI_LOGW("unknown state, state:%{public}u", state);
+        MMI_HILOGW("unknown state, state:%{public}u", state);
     }
 }
 
@@ -113,7 +113,7 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
     if (TimerMgr->IsExist(timerId_)) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
         TimerMgr->ResetTimer(timerId_);
-        MMI_LOGD("axis update");
+        MMI_HILOGD("axis update");
     } else {
         constexpr int32_t timeout = 100;
         std::weak_ptr<MouseEventHandler> weakPtr = shared_from_this();
@@ -121,7 +121,7 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
             CALL_LOG_ENTER;
             auto sharedPtr = weakPtr.lock();
             CHKPV(sharedPtr);
-            MMI_LOGD("timer:%{public}d", sharedPtr->timerId_);
+            MMI_HILOGD("timer:%{public}d", sharedPtr->timerId_);
             sharedPtr->timerId_ = -1;
             auto pointerEvent = sharedPtr->GetPointerEvent();
             CHKPV(pointerEvent);
@@ -130,7 +130,7 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
         });
 
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
-        MMI_LOGD("axis begin");
+        MMI_HILOGD("axis begin");
     }
 
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
@@ -200,7 +200,7 @@ void MouseEventHandler::Normalize(struct libinput_event *event)
             break;
         }
         default: {
-            MMI_LOGW("unknow type:%{public}d", type);
+            MMI_HILOGW("unknow type:%{public}d", type);
             break;
         }
     }
@@ -211,7 +211,7 @@ void MouseEventHandler::Normalize(struct libinput_event *event)
 
 void MouseEventHandler::DumpInner()
 {
-    MMI_LOGD("PointerAction:%{public}d,PointerId:%{public}d,SourceType:%{public}d,"
+    MMI_HILOGD("PointerAction:%{public}d,PointerId:%{public}d,SourceType:%{public}d,"
         "ButtonId:%{public}d,VerticalAxisValue:%{public}lf,HorizontalAxisValue:%{public}lf",
         pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId(), pointerEvent_->GetSourceType(),
         pointerEvent_->GetButtonId(), pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
@@ -219,11 +219,11 @@ void MouseEventHandler::DumpInner()
 
     PointerEvent::PointerItem item;
     if (!pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item)) {
-        MMI_LOGE("Can't find the pointer item data, pointer:%{public}d, errCode:%{public}d",
-                 pointerEvent_->GetPointerId(), PARAM_INPUT_FAIL);
-                 return;
+        MMI_HILOGE("Can't find the pointer item data, pointer:%{public}d, errCode:%{public}d",
+                   pointerEvent_->GetPointerId(), PARAM_INPUT_FAIL);
+        return;
     }
-    MMI_LOGD("Item: DownTime:%{public}" PRId64 ",IsPressed:%{public}s,GlobalX:%{public}d,GlobalY:%{public}d,"
+    MMI_HILOGD("Item: DownTime:%{public}" PRId64 ",IsPressed:%{public}s,GlobalX:%{public}d,GlobalY:%{public}d,"
         "Width:%{public}d,Height:%{public}d,Pressure:%{public}d",
         item.GetDownTime(), (item.IsPressed() ? "true" : "false"), item.GetGlobalX(), item.GetGlobalY(),
         item.GetWidth(), item.GetHeight(), item.GetPressure());
