@@ -178,11 +178,11 @@ DeviceEvent InputParse::ParseEvents(std::string& Info)
             }
             pos.xPos = xPos->valueint;
             cJSON* yPos = cJSON_GetArrayItem(eventArray, 1);
-            pos.yPos = yPos->valueint;
             if (yPos == nullptr) {
                 MMI_HILOGE("yPos is null");
                 return event;
             }
+            pos.yPos = yPos->valueint;
             event.posXY.push_back(pos);
         }
     }
