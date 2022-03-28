@@ -27,15 +27,15 @@ class ProcessingGamePadDevice : public DeviceBase {
         std::string direction;
         int32_t keyValue;
         int64_t blockTime;
-        std::vector<uint32_t> gameEvents;
+        std::vector<int32_t> gameEvents;
     };
 public:
     ProcessingGamePadDevice() = default;
     ~ProcessingGamePadDevice() = default;
     DISALLOW_COPY_AND_MOVE(ProcessingGamePadDevice);
-    int32_t TransformJsonDataToInputData(const Json& originalEvent, InputEventArray& inputEventArray);
+    int32_t TransformJsonDataToInputData(const DeviceItem& originalEvent, InputEventArray& inputEventArray);
 private:
-    int32_t AnalysisGamePadEvent(const Json& inputData, std::vector<GamePadEvent>& padEventArray);
+    int32_t AnalysisGamePadEvent(const std::vector<DeviceEvent>& inputData, std::vector<GamePadEvent>& padEventArray);
     void TransformPadEventToInputEvent(const std::vector<GamePadEvent>& padEventArray,
                                        InputEventArray& inputEventArray);
     void TransformKeyPressEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray);

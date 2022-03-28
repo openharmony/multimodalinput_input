@@ -52,15 +52,21 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputData, 
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
+    FILE* fp = fopen(path.c_str(),"r");
+    if (fp == nullptr) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        jsonBuf = jsonBuf + buf;
+    }
+    if (fclose(fp) < 0) {
+         ASSERT_TRUE(false) << "fclose file error " << path;
+    }
+    InputParse InputParse;
+    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -87,15 +93,21 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
+    FILE* fp = fopen(path.c_str(),"r");
+    if (fp == nullptr) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        jsonBuf = jsonBuf + buf;
+    }
+    if (fclose(fp) < 0) {
+         ASSERT_TRUE(false) << "fclose file error " << path;
+    }
+    InputParse InputParse;
+    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -122,15 +134,21 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataEv
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
+    FILE* fp = fopen(path.c_str(),"r");
+    if (fp == nullptr) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        jsonBuf = jsonBuf + buf;
+    }
+    if (fclose(fp) < 0) {
+         ASSERT_TRUE(false) << "fclose file error " << path;
+    }
+    InputParse InputParse;
+    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -157,15 +175,21 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
+    FILE* fp = fopen(path.c_str(),"r");
+    if (fp == nullptr) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        jsonBuf = jsonBuf + buf;
+    }
+    if (fclose(fp) < 0) {
+         ASSERT_TRUE(false) << "fclose file error " << path;
+    }
+    InputParse InputParse;
+    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -192,15 +216,21 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
+    FILE* fp = fopen(path.c_str(),"r");
+    if (fp == nullptr) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        jsonBuf = jsonBuf + buf;
+    }
+    if (fclose(fp) < 0) {
+         ASSERT_TRUE(false) << "fclose file error " << path;
+    }
+    InputParse InputParse;
+    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -227,15 +257,21 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
+    FILE* fp = fopen(path.c_str(),"r");
+    if (fp == nullptr) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        jsonBuf = jsonBuf + buf;
+    }
+    if (fclose(fp) < 0) {
+         ASSERT_TRUE(false) << "fclose file error " << path;
+    }
+    InputParse InputParse;
+    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -264,15 +300,21 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
+    FILE* fp = fopen(path.c_str(),"r");
+    if (fp == nullptr) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        jsonBuf = jsonBuf + buf;
+    }
+    if (fclose(fp) < 0) {
+         ASSERT_TRUE(false) << "fclose file error " << path;
+    }
+    InputParse InputParse;
+    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
     std::this_thread::sleep_for(std::chrono::seconds(1));

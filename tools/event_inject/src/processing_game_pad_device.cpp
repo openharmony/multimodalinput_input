@@ -21,63 +21,61 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingGamePadDevice" };
 } // namespace
 
-int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const Json& originalEvent,
+int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const DeviceItem& originalEvent,
     InputEventArray& inputEventArray)
 {
     CALL_LOG_ENTER;
-    if (originalEvent.empty()) {
-        return RET_ERR;
-    }
-    if (originalEvent.find("events") == originalEvent.end()) {
+    if (originalEvent.events.empty()) {
         MMI_HILOGE("manage game pad array faild, inputData is empty");
         return RET_ERR;
     }
-    Json inputData = originalEvent.at("events");
+    std::vector<DeviceEvent> inputData = originalEvent.events;
     if (inputData.empty()) {
         MMI_HILOGE("manage finger array faild, inputData is empty");
         return RET_ERR;
     }
     std::vector<GamePadEvent> padEventArray;
     if (AnalysisGamePadEvent(inputData, padEventArray) == RET_ERR) {
+        MMI_HILOGE("TransformJsonDataToInputData as AnalysisGamePadEvent is error");
         return RET_ERR;
     }
     TransformPadEventToInputEvent(padEventArray, inputEventArray);
     return RET_OK;
 }
 
-int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const Json& inputData, std::vector<GamePadEvent>& padEventArray)
+int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const std::vector<DeviceEvent>& inputData,
+    std::vector<GamePadEvent>& padEventArray)
 {
     for (const auto &item : inputData) {
         GamePadEvent padEvent = {};
-        std::string eventType = item.at("eventType").get<std::string>();
-        padEvent.eventType = eventType;
-        if ((item.find("blockTime")) != item.end()) {
-            padEvent.blockTime = item.at("blockTime").get<int64_t>();
+        padEvent.eventType = item.eventType;
+        if (item.blockTime != -1) {
+            padEvent.blockTime = item.blockTime;
         }
-        if ((eventType == "KEY_EVENT_CLICK") || (eventType == "KEY_EVENT_PRESS") ||
-            (eventType == "KEY_EVENT_RELEASE")) {
-            if ((item.find("keyValue")) == item.end()) {
-                MMI_HILOGE("not find keyValue On Event:%{public}s", eventType.c_str());
+        if ((padEvent.eventType == "KEY_EVENT_CLICK") || (padEvent.eventType == "KEY_EVENT_PRESS") ||
+            (padEvent.eventType == "KEY_EVENT_RELEASE")) {
+            if (item.keyValue == -1) {
+                MMI_HILOGE("not find keyValue On Event:%{public}s", padEvent.eventType.c_str());
                 return RET_ERR;
             }
-            padEvent.keyValue = item.at("keyValue").get<int32_t>();
-        } else if ((eventType == "ROCKER_1") || (eventType == "ROCKER_2")) {
-            if ((item.find("event")) == item.end()) {
-                MMI_HILOGE("not find event On Event:%{public}s", eventType.c_str());
+            padEvent.keyValue = item.keyValue;
+        } else if ((padEvent.eventType == "ROCKER_1") || (padEvent.eventType == "ROCKER_2")) {
+            if (item.event.empty()) {
+                MMI_HILOGE("not find event On Event:%{public}s", padEvent.eventType.c_str());
                 return RET_ERR;
             }
-            if ((item.find("direction")) == item.end()) {
-                MMI_HILOGE("not find direction On Event:%{public}s", eventType.c_str());
+            if (item.direction.empty()) {
+                MMI_HILOGE("not find direction On Event:%{public}s", padEvent.eventType.c_str());
                 return RET_ERR;
             }
-            padEvent.gameEvents = item.at("event").get<std::vector<uint32_t>>();
-            padEvent.direction = item.at("direction").get<std::string>();
-        } else if (eventType == "DERECTION_KEY") {
-            if ((item.find("direction")) == item.end()) {
-                MMI_HILOGE("not find direction On Event:%{public}s", eventType.c_str());
+            padEvent.gameEvents = item.event;
+            padEvent.direction = item.direction;
+        } else if (padEvent.eventType == "DERECTION_KEY") {
+            if (item.direction.empty()) {
+                MMI_HILOGE("not find direction On Event:%{public}s", padEvent.eventType.c_str());
                 return RET_ERR;
             }
-            padEvent.direction = item.at("direction").get<std::string>();
+            padEvent.direction = item.direction;
         } else {
             continue;
         }
