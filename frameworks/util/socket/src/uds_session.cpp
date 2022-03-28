@@ -49,14 +49,31 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         return PARAM_INPUT_INVALID;
     }
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
-    ssize_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
-    if (ret < 0) {
-        MMI_LOGE("write return %{public}zd,"
-                 "fd_:%{public}d,errno:%{public}d",
-                 ret, fd_, errno);
-        return false;
+
+    int32_t retryTimes = 32;
+    while (size > 0 && retryTimes > 0) {
+        retryTimes--;
+        auto count = send(fd_, static_cast<void *>(const_cast<char *>(buf)), size, MSG_DONTWAIT | MSG_NOSIGNAL);
+        if (count < 0) {
+            if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
+                MMI_LOGW("send msg failed, errno:%{public}d", errno);
+                continue;
+            }
+            MMI_LOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
+            return false;
+        }
+
+        size_t ucount = static_cast<size_t>(count);
+        if (ucount >= size) {
+            return true;
+        }
+        size -= ucount;
+        buf += ucount;
+        int32_t sleepTime = 10000;
+        usleep(sleepTime);
     }
-    return true;
+    MMI_LOGE("send msg failed");
+    return false;
 }
 
 void UDSSession::Close()
