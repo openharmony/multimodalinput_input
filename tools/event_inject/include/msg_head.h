@@ -33,7 +33,7 @@
 #include <linux/uinput.h>
 
 #include "define_multimodal.h"
-#include "file_parse.h"
+#include "input_parse.h"
 
 /*
  * Structure for docking libinput

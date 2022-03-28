@@ -52,7 +52,7 @@ public:
     int32_t TransformJsonDataSingleTouchScreen(const DeviceItem& inputEventArrays, InputEventArray& inputEventArray);
     int32_t TransformJsonDataToInputData(const DeviceItem& inputEventArrays, InputEventArray& inputEventArray);
 private:
-    void AnalysisTouchScreenDate(const std::vector<DeviceEvent>& inputData, 
+    void AnalysisTouchScreenDate(const std::vector<DeviceEvent>& inputData,
         TouchScreenInputEvents& touchScreenInputEvents);
     void AnalysisSingleTouchScreenDate(const std::vector<DeviceEvent>& inputData,
                                        std::vector<TouchSingleEventData>& touchSingleEventDatas);

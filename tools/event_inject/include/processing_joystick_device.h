@@ -35,7 +35,8 @@ public:
     DISALLOW_COPY_AND_MOVE(ProcessingJoystickDevice);
     int32_t TransformJsonDataToInputData(const DeviceItem& originalEvent, InputEventArray& inputEventArray);
 private:
-    int32_t AnalysisJoystickEvent(const std::vector<DeviceEvent>& inputData, std::vector<JoystickEvent>& JoystickEventArray);
+    int32_t AnalysisJoystickEvent(const std::vector<DeviceEvent>& inputData,
+        std::vector<JoystickEvent>& JoystickEventArray);
     void TransformPadEventToInputEvent(const std::vector<JoystickEvent>& JoystickEventArray,
                                        InputEventArray& inputEventArray);
     void TransformKeyPressEvent(const JoystickEvent& joystickEvent, InputEventArray& inputEventArray);
