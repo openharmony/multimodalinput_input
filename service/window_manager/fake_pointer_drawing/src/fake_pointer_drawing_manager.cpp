@@ -37,19 +37,19 @@ FakePointerDrawingManager::~FakePointerDrawingManager() {}
 
 void FakePointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY)
 {
-    MMI_LOGD("Fake display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
+    MMI_HILOGD("Fake display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
     return;
 }
 
 void FakePointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int32_t height)
 {
-    MMI_LOGD("Fake display:%{public}d,width:%{public}d,height:%{public}d", displayId, width, height);
+    MMI_HILOGD("Fake display:%{public}d,width:%{public}d,height:%{public}d", displayId, width, height);
     return;
 }
 
 void FakePointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
 {
-    MMI_LOGD("Fake hasPointerDevice:%{public}d", hasPointerDevice);
+    MMI_HILOGD("Fake hasPointerDevice:%{public}d", hasPointerDevice);
     return;
 }
 
