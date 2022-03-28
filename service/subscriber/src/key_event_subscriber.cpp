@@ -200,7 +200,7 @@ void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscribe
     subscriber->keyEvent_.reset();
     subscriber->timerId_ = -1;
     TimerMgr->RemoveTimer(timerId);
-    MMI_HILOGD("subscribe:%{public}d,timer:%{public}d", subscriber->id_, timerId);
+    MMI_HILOGD("subscribeId:%{public}d,timerId:%{public}d", subscriber->id_, timerId);
 }
 
 void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
