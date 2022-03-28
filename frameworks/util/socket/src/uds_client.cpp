@@ -187,7 +187,7 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
     CHK(maxCount > 0, VAL_NOT_EXP);
     auto isoverflow = false;
     for (size_t j = 0; j < maxCount; j++) {
-        auto size = read(fd, static_cast<void *>(szBuf), MAX_PACKET_BUF_SIZE);
+        auto size = recv(fd, static_cast<void *>(szBuf), MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size < 0) {
             MMI_LOGE("size:%{public}zu", size);
         }
