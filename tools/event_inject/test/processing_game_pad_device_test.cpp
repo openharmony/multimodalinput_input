@@ -311,7 +311,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
         jsonBuf = jsonBuf + buf;
     }
     if (fclose(fp) < 0) {
-         ASSERT_TRUE(false) << "fclose file error " << path;
+        ASSERT_TRUE(false) << "fclose file error " << path;
     }
     InputParse InputParse;
     DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);

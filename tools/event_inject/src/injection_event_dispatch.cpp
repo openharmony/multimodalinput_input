@@ -131,7 +131,7 @@ int32_t InjectionEventDispatch::OnJson()
         MMI_HILOGE("The file size is out of range 2M or empty. filesize:%{public}d", fileSize);
         return RET_ERR;
     }
-    FILE* fp = fopen(jsonFile.c_str(),"r");
+    FILE* fp = fopen(jsonFile.c_str(), "r");
     CHKPR(fp, RET_ERR);
     char buf[256] = {};
     std::string jsonBuf;
@@ -139,7 +139,7 @@ int32_t InjectionEventDispatch::OnJson()
         jsonBuf = jsonBuf + buf;
     }
     if (fclose(fp) < 0) {
-         MMI_HILOGE("close file failed");
+        MMI_HILOGE("close file failed");
     }
     bool logType = false;
     if (injectArgvs_.size() > ARGVS_CODE_INDEX) {
