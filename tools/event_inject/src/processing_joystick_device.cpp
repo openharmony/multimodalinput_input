@@ -21,18 +21,15 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ProcessingJoystickDevice" };
 } // namespace
 
-int32_t ProcessingJoystickDevice::TransformJsonDataToInputData(const Json& originalEvent,
+int32_t ProcessingJoystickDevice::TransformJsonDataToInputData(const DeviceItem& originalEvent,
                                                                InputEventArray& inputEventArray)
 {
     CALL_LOG_ENTER;
-    if (originalEvent.empty()) {
-        return RET_ERR;
-    }
-    if (originalEvent.find("events") == originalEvent.end()) {
+    if (originalEvent.events.empty()) {
         MMI_HILOGE("manage joystick array faild, inputData is empty");
         return RET_ERR;
     }
-    Json inputData = originalEvent.at("events");
+    std::vector<DeviceEvent> inputData = originalEvent.events;
     if (inputData.empty()) {
         MMI_HILOGE("manage finger array faild, inputData is empty");
         return RET_ERR;
@@ -45,47 +42,46 @@ int32_t ProcessingJoystickDevice::TransformJsonDataToInputData(const Json& origi
     return RET_OK;
 }
 
-int32_t ProcessingJoystickDevice::AnalysisJoystickEvent(const Json& inputData,
+int32_t ProcessingJoystickDevice::AnalysisJoystickEvent(const std::vector<DeviceEvent>& inputData,
                                                         std::vector<JoystickEvent>& JoystickEventArray)
 {
     JoystickEvent joystickEvent = {};
     for (const auto &item : inputData) {
         joystickEvent = {};
-        std::string eventType = item.at("eventType").get<std::string>();
-        if ((item.find("blockTime")) != item.end()) {
-            joystickEvent.blockTime = item.at("blockTime").get<int64_t>();
+        if (item.blockTime != -1) {
+            joystickEvent.blockTime = item.blockTime;
         }
-        joystickEvent.eventType = eventType;
-        if ((eventType == "KEY_EVENT_CLICK") || (eventType == "KEY_EVENT_PRESS") ||
-            (eventType == "KEY_EVENT_RELEASE")) {
-            if ((item.find("keyValue")) == item.end()) {
-                MMI_HILOGE("not find keyValue On Event:%{public}s", eventType.c_str());
+        joystickEvent.eventType = item.eventType;
+        if ((joystickEvent.eventType == "KEY_EVENT_CLICK") || (joystickEvent.eventType == "KEY_EVENT_PRESS") ||
+            (joystickEvent.eventType == "KEY_EVENT_RELEASE")) {
+            if (item.keyValue == 0) {
+                MMI_HILOGE("not find keyValue On Event:%{public}s", joystickEvent.eventType.c_str());
                 return RET_ERR;
             }
-            joystickEvent.keyValue = item.at("keyValue").get<int32_t>();
-        } else if (eventType == "THROTTLE") {
-            if ((item.find("keyValue")) == item.end()) {
-                MMI_HILOGE("not find keyValue On Event:%{public}s", eventType.c_str());
+            joystickEvent.keyValue = item.keyValue;
+        } else if (joystickEvent.eventType == "THROTTLE") {
+            if (item.keyValue == 0) {
+                MMI_HILOGE("not find keyValue On Event:%{public}s", joystickEvent.eventType.c_str());
                 return RET_ERR;
             }
-            joystickEvent.keyValue = item.at("keyValue").get<int32_t>();
-        } else if ((eventType == "ROCKER_1")) {
-            if ((item.find("event")) == item.end()) {
-                MMI_HILOGE("not find event On Event:%{public}s", eventType.c_str());
+            joystickEvent.keyValue = item.keyValue;
+        } else if ((joystickEvent.eventType == "ROCKER_1")) {
+            if (item.event.empty()) {
+                MMI_HILOGE("not find event On Event:%{public}s", joystickEvent.eventType.c_str());
                 return RET_ERR;
             }
-            if ((item.find("direction")) == item.end()) {
-                MMI_HILOGE("not find direction On Event:%{public}s", eventType.c_str());
+            if (item.direction.empty()) {
+                MMI_HILOGE("not find direction On Event:%{public}s", joystickEvent.eventType.c_str());
                 return RET_ERR;
             }
-            joystickEvent.gameEvents = item.at("event").get<std::vector<int32_t>>();
-            joystickEvent.direction = item.at("direction").get<std::string>();
-        } else if (eventType == "DERECTION_KEY") {
-            if ((item.find("direction")) == item.end()) {
-                MMI_HILOGE("not find direction On Event:%{public}s", eventType.c_str());
+            joystickEvent.gameEvents = item.event;
+            joystickEvent.direction = item.direction;
+        } else if (joystickEvent.eventType == "DERECTION_KEY") {
+            if (item.direction.empty()) {
+                MMI_HILOGE("not find direction On Event:%{public}s", joystickEvent.eventType.c_str());
                 return RET_ERR;
             }
-            joystickEvent.direction = item.at("direction").get<std::string>();
+            joystickEvent.direction = item.direction;
         } else {
             continue;
         }

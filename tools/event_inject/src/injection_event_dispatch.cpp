@@ -25,6 +25,7 @@
 #include "error_multimodal.h"
 #include "proto.h"
 #include "util.h"
+#include "file_parse.h"
 
 namespace OHOS {
 namespace MMI {
@@ -130,15 +131,24 @@ int32_t InjectionEventDispatch::OnJson()
         MMI_HILOGE("The file size is out of range 2M or empty. filesize:%{public}d", fileSize);
         return RET_ERR;
     }
-    std::ifstream reader(jsonFile);
-    if (!reader) {
-        MMI_HILOGE("json file is empty");
-        return RET_ERR;
+    FILE* fp = fopen(jsonFile.c_str(),"r");
+    CHKPR(fp, RET_ERR);
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        jsonBuf = jsonBuf + buf;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
-
+    if (fclose(fp) < 0) {
+         MMI_HILOGE("close file failed");
+    }
+    bool logType = false;
+    if (injectArgvs_.size() > ARGVS_CODE_INDEX) {
+        if (injectArgvs_.at(ARGVS_CODE_INDEX) == "log") {
+            logType = true;
+        }
+    }
+    InputParse InputParse;
+    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, logType);
     int32_t ret = manageInjectDevice_.TransformJsonData(inputEventArrays);
     return ret;
 }
@@ -233,6 +243,7 @@ int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText
             return item.devIndex;
         }
     }
+    MMI_HILOGW("Get device index failed");
     return RET_ERR;
 }
 

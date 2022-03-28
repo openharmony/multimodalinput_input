@@ -35,9 +35,9 @@ public:
     ProcessingMouseDevice() = default;
     ~ProcessingMouseDevice() = default;
     DISALLOW_COPY_AND_MOVE(ProcessingMouseDevice);
-    int32_t TransformJsonDataToInputData(const Json& inputEventArrays, InputEventArray& inputEventArray);
+    int32_t TransformJsonDataToInputData(const DeviceItem& inputEventArrays, InputEventArray& inputEventArray);
 private:
-    int32_t AnalysisMouseEvent(const Json& inputData, std::vector<MouseEvent>& mouseEventArray);
+    int32_t AnalysisMouseEvent(const std::vector<DeviceEvent>& inputData, std::vector<MouseEvent>& mouseEventArray);
     void TransformMouseEventToInputEvent(const std::vector<MouseEvent>& mouseEventArray,
                                          InputEventArray& inputEventArray);
     void TransformKeyPressEvent(const MouseEvent& mouseEvent, InputEventArray& inputEventArray);
