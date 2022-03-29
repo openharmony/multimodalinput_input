@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FAKE_POINTER_DRAWING_MANAGER_H
-#define FAKE_POINTER_DRAWING_MANAGER_H
+#ifndef NON_POINTER_DRAWING_MANAGER_H
+#define NON_POINTER_DRAWING_MANAGER_H
 
 #include <iostream>
 
@@ -26,11 +26,11 @@
 
 namespace OHOS {
 namespace MMI {
-class FakePointerDrawingManager : public DelayedSingleton<FakePointerDrawingManager>, public IDeviceObserver {
+class NonPointerDrawingManager : public DelayedSingleton<NonPointerDrawingManager>, public IDeviceObserver {
 public:
-    FakePointerDrawingManager();
-    ~FakePointerDrawingManager();
-    DISALLOW_COPY_AND_MOVE(FakePointerDrawingManager);
+    NonPointerDrawingManager();
+    ~NonPointerDrawingManager();
+    DISALLOW_COPY_AND_MOVE(NonPointerDrawingManager);
     
     void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY);
     void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height);
@@ -38,7 +38,7 @@ public:
     bool Init();
 };
 
-#define FakePointerDrawMgr FakePointerDrawingManager::GetInstance()
+#define NonPointerDrawMgr NonPointerDrawingManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#endif // FAKE_POINTER_DRAWING_MANAGER_H
+#endif // NON_POINTER_DRAWING_MANAGER_H

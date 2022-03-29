@@ -24,10 +24,10 @@
 #include "input_windows_manager.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
-#ifdef OHOS_BUILD_POINTDRAWING
+#ifdef OHOS_BUILD_POINTERDRAWING
 #include "pointer_drawing_manager.h"
 #else
-#include "fake_pointer_drawing_manager.h"
+#include "non_pointer_drawing_manager.h"
 #endif
 #include "timer_manager.h"
 #include "util.h"
@@ -179,7 +179,7 @@ int32_t MMIService::Init()
     MMI_HILOGD("EventDump Init");
     MMIEventDump->Init(*this);
 
-#ifdef OHOS_BUILD_POINTDRAWING
+#ifdef OHOS_BUILD_POINTERDRAWING
     MMI_HILOGD("PointerDrawingManager Init");
     if (!PointerDrawingManager::GetInstance()->Init()) {
         MMI_HILOGE("Pointer draw init failed");
@@ -187,12 +187,12 @@ int32_t MMIService::Init()
     }
     observer_ = PointerDrawMgr;
 #else
-    MMI_HILOGD("FakePointerDrawingManager Init");
-    if (!FakePointerDrawingManager::GetInstance()->Init()) {
-        MMI_HILOGE("Fake Pointer draw init failed");
+    MMI_HILOGD("NonPointerDrawingManager Init");
+    if (!NonPointerDrawingManager::GetInstance()->Init()) {
+        MMI_HILOGE("Non Pointer draw init failed");
         return POINTER_DRAW_INIT_FAIL;
     }
-    observer_ = FakePointerDrawMgr;
+    observer_ = NonPointerDrawMgr;
 #endif
 
     MMI_HILOGD("WindowsManager Init");
