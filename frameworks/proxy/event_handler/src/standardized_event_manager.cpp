@@ -163,7 +163,7 @@ int32_t StandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId)
 int32_t StandardizedEventManager::GetKeystrokeAbility(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes)
 {
     NetPacket pkt(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
-    size_t size =keyCodes.size();
+    size_t size = keyCodes.size();
     pkt << userData << deviceId << size;
     for (auto item : keyCodes) {
         pkt << item;
