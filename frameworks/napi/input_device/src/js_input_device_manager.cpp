@@ -24,25 +24,23 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInp
 napi_value JsInputDeviceManager::GetDeviceIds(napi_env env, napi_value handle)
 {
     napi_value ret = CreateCallbackInfo(env, handle);
-    auto &instance = InputDeviceImpl::GetInstance();
     if (handle == nullptr) {
         CHKPP(ret);
-        instance.GetInputDeviceIdsAsync(JsEventTarget::userData_ - 1, EmitJsIdsPromise);
+        InputDevImp.GetInputDeviceIdsAsync(JsEventTarget::userData_ - 1, EmitJsIdsPromise);
         return ret;
     }
-    instance.GetInputDeviceIdsAsync(JsEventTarget::userData_ - 1, EmitJsIdsAsync);
+    InputDevImp.GetInputDeviceIdsAsync(JsEventTarget::userData_ - 1, EmitJsIdsAsync);
     return nullptr;
 }
 
 napi_value JsInputDeviceManager::GetDevice(int32_t id, napi_env env, napi_value handle)
 {
     napi_value ret = CreateCallbackInfo(env, handle);
-    auto &instance = InputDeviceImpl::GetInstance();
     if (handle == nullptr) {
-        instance.GetInputDeviceAsync(JsEventTarget::userData_ - 1, id, EmitJsDevPromise);
+        InputDevImp.GetInputDeviceAsync(JsEventTarget::userData_ - 1, id, EmitJsDevPromise);
         return ret;
     }
-    instance.GetInputDeviceAsync(JsEventTarget::userData_ - 1, id, EmitJsDevAsync);
+    InputDevImp.GetInputDeviceAsync(JsEventTarget::userData_ - 1, id, EmitJsDevAsync);
     return nullptr;
 }
 

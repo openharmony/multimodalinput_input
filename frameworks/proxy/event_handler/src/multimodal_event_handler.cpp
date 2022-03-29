@@ -31,7 +31,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Multim
 void OnConnected(const IfMMIClient& client)
 {
     CALL_LOG_ENTER;
-    InputManagerImpl::GetInstance()->OnConnected();
+    InputMgrImp->OnConnected();
     KeyEventInputSubscribeMgr.OnConnected();
     InputHandlerManager::GetInstance().OnConnected();
 }
