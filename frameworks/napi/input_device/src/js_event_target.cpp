@@ -162,7 +162,8 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
     uint32_t index = 0;
     napi_value value = nullptr;
     for (const auto &item : sources) {
-        CHKRV(cbTemp.env, napi_create_string_utf8(cbTemp.env, item.c_str(), NAPI_AUTO_LENGTH, &value), "napi_create_string_utf8");
+        CHKRV(cbTemp.env, napi_create_string_utf8(cbTemp.env, item.c_str(), NAPI_AUTO_LENGTH, &value),
+              "napi_create_string_utf8");
         CHKRV(cbTemp.env, napi_set_element(cbTemp.env, devSources, index, value), "napi_set_element");
     }
     CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "sources", devSources), "napi_set_named_property");
@@ -214,7 +215,8 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     uint32_t index = 0;
     napi_value value = nullptr;
     for (const auto &item : sources) {
-        CHKRV(cbTemp.env, napi_create_string_utf8(cbTemp.env, item.c_str(), NAPI_AUTO_LENGTH, &value), "napi_create_string_utf8");
+        CHKRV(cbTemp.env, napi_create_string_utf8(cbTemp.env, item.c_str(), NAPI_AUTO_LENGTH, &value),
+              "napi_create_string_utf8");
         CHKRV(cbTemp.env, napi_set_element(cbTemp.env, devSources, index, value), "napi_set_element");
     }
     CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "sources", devSources), "napi_set_named_property");
@@ -330,9 +332,11 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
     }
 
     napi_value handlerTemp = nullptr;
-    CHKRV(cbTemp.env, napi_get_reference_value(cbTemp.env, cbTemp.ref, &handlerTemp), "napi_get_reference_value");
+    CHKRV(cbTemp.env, napi_get_reference_value(cbTemp.env, cbTemp.ref, &handlerTemp),
+          "napi_get_reference_value");
     napi_value result = nullptr;
-    CHKRV(cbTemp.env, napi_call_function(cbTemp.env, nullptr, handlerTemp, 1, &keyAbility, &result), "napi_call_function");
+    CHKRV(cbTemp.env, napi_call_function(cbTemp.env, nullptr, handlerTemp, 1, &keyAbility, &result),
+          "napi_call_function");
 }
 
 void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::vector<int32_t> keystrokeAbility)
