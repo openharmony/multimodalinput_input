@@ -197,7 +197,7 @@ int32_t MMIService::Init()
 
     MMI_HILOGD("WindowsManager Init");
     if (!WinMgr->Init(*this, observer_)) {
-        MMI_LOGE("Windows message init failed");
+        MMI_HILOGE("Windows message init failed");
         return WINDOWS_MSG_INIT_FAIL;
     }
     
