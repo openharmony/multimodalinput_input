@@ -352,7 +352,10 @@ void ShortcutKey::Print() const
 
 std::shared_ptr<IMultiKey> IMultiKey::GetInstance()
 {
-    return std::make_shared<AbilityLaunchManager>();
+    if (iMultiKeyPtr_ == nullptr) {
+        iMultiKeyPtr_ = std::make_shared<AbilityLaunchManager>();
+    }
+    return iMultiKeyPtr_;
 }
 } // namespace MMI
 } // namespace OHOS

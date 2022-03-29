@@ -24,6 +24,8 @@ struct IMultiKey {
     static std::shared_ptr<IMultiKey> GetInstance();
     virtual bool CheckLaunchAbility(const std::shared_ptr<KeyEvent> key) = 0;
     virtual ~IMultiKey() = default;
+protected:
+    static inline std::shared_ptr<IMultiKey> iMultiKeyPtr_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
