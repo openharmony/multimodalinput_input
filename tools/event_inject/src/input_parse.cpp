@@ -167,6 +167,7 @@ DeviceEvent InputParse::ParseEvents(std::string& Info)
         cJSON* eventArray = cJSON_GetArrayItem(eventInfo, i);
         if (eventArray == nullptr) {
             MMI_HILOGE("event is null");
+            cJSON_Delete(eventInfo);
             return event;
         }
         if (cJSON_IsArray(eventArray)) {
@@ -174,18 +175,21 @@ DeviceEvent InputParse::ParseEvents(std::string& Info)
             cJSON* xPos = cJSON_GetArrayItem(eventArray, 0);
             if (xPos == nullptr) {
                 MMI_HILOGE("yPos is null");
+                cJSON_Delete(eventInfo);
                 return event;
             }
             pos.xPos = xPos->valueint;
             cJSON* yPos = cJSON_GetArrayItem(eventArray, 1);
             if (yPos == nullptr) {
                 MMI_HILOGE("yPos is null");
+                cJSON_Delete(eventInfo);
                 return event;
             }
             pos.yPos = yPos->valueint;
             event.posXY.push_back(pos);
         }
     }
+    cJSON_Delete(eventInfo);
     return event;
 }
 
@@ -202,6 +206,7 @@ std::vector<DeviceEvent> InputParse::ParseData(std::string& info)
         cJSON* eventInfo = cJSON_GetArrayItem(events, j);
         if (eventInfo == nullptr) {
             MMI_HILOGE("eventInfo is null");
+            cJSON_Delete(events);
             return eventData;
         }
         if (cJSON_IsArray(eventInfo)) {
@@ -226,6 +231,7 @@ std::vector<DeviceEvent> InputParse::ParseData(std::string& info)
         }
         eventData.push_back(event);
     }
+    cJSON_Delete(events);
     return eventData;
 }
 
@@ -243,6 +249,7 @@ DeviceItems InputParse::DataInit(std::string& fileData, bool logType)
         cJSON* deviceName = cJSON_GetObjectItem(deviceInfo, "deviceName");
         if (deviceInfo == nullptr) {
             MMI_HILOGE("deviceInfo is null");
+            cJSON_Delete(arrays);
             return deviceItems;
         }
         DeviceItem deviceItem;
@@ -260,6 +267,7 @@ DeviceItems InputParse::DataInit(std::string& fileData, bool logType)
         }
         if (events == nullptr) {
             MMI_HILOGE("events is null");
+            cJSON_Delete(arrays);
             return deviceItems;
         }
         std::string eventsStr = cJSON_Print(events);
