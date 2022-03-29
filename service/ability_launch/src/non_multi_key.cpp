@@ -31,7 +31,10 @@ bool NonMultiKey::CheckLaunchAbility(const std::shared_ptr<KeyEvent> key)
 
 std::shared_ptr<IMultiKey> IMultiKey::GetInstance()
 {
-    return std::make_shared<NonMultiKey>();
+    if (iMultiKeyPtr_ == nullptr) {
+        iMultiKeyPtr_ = std::make_shared<NonMultiKey>();
+    }
+    return iMultiKeyPtr_;
 }
 } // namespace MMI
 } // namespace OHOS
