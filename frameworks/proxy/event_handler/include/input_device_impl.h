@@ -51,4 +51,5 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
+#define InputDevImp OHOS::MMI::InputDeviceImpl::GetInstance()
 #endif // OHOS_INPUT_DEVICE_EVENT_H

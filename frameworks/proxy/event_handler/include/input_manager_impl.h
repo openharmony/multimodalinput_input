@@ -41,6 +41,7 @@ public:
     DISALLOW_COPY_AND_MOVE(InputManagerImpl);
     InputManagerImpl() = default;
 
+    bool InitEventHandler();
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
         const std::vector<LogicalDisplayInfo> &logicalDisplays);
     int32_t AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter);
@@ -71,6 +72,7 @@ private:
     int32_t PackLogicalDisplay(NetPacket &pkt);
     void PrintDisplayInfo();
     void SendDisplayInfo();
+    void OnThread();
 
 private:
     sptr<EventFilterService> eventFilterService_ {nullptr};
@@ -80,7 +82,13 @@ private:
     std::vector<LogicalDisplayInfo> logicalDisplays_;
     InputMonitorManager monitorManager_;
     InputInterceptorManager interceptorManager_;
+
+    std::mutex mtx_;
+    std::condition_variable cv_;
+    std::thread ehThread_;
+    EventHandlerPtr mmiEventHandler_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
+#define InputMgrImp OHOS::MMI::InputManagerImpl::GetInstance()
 #endif // INPUT_MANAGER_IMPL_H
