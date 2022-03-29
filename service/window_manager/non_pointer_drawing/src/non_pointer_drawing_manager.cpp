@@ -37,19 +37,19 @@ NonPointerDrawingManager::~NonPointerDrawingManager() {}
 
 void NonPointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY)
 {
-    MMI_HILOGD("NonPointerDrawing display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
+    MMI_HILOGD("Non display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
     return;
 }
 
 void NonPointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int32_t height)
 {
-    MMI_HILOGD("NonPointerDrawing display:%{public}d,width:%{public}d,height:%{public}d", displayId, width, height);
+    MMI_HILOGD("Non display:%{public}d,width:%{public}d,height:%{public}d", displayId, width, height);
     return;
 }
 
 void NonPointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
 {
-    MMI_HILOGD("NonPointerDrawing hasPointerDevice:%{public}d", hasPointerDevice);
+    MMI_HILOGD("Non hasPointerDevice:%{public}d", hasPointerDevice);
     return;
 }
 
