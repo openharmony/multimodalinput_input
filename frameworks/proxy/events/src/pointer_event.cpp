@@ -436,6 +436,12 @@ void PointerEvent::SetAxisValue(AxisType axis, double axisValue)
     }
 }
 
+void PointerEvent::ClearAxisValue()
+{
+    axisValues_ = {};
+    axes_ = 0;
+}
+
 bool PointerEvent::HasAxis(uint32_t axes, AxisType axis)
 {
     bool ret { false };
