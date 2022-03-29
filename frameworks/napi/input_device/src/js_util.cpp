@@ -26,6 +26,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsUti
 void JsUtil::GetCallbackInfo(uv_work_t *work, CallbackTemp& temp)
 {
     CallbackInfo *cb = static_cast<CallbackInfo*>(work->data);
+    temp.env = cb->env;
     temp.ref = cb->ref;
     temp.deferred = cb->deferred;
     temp.promise = cb->promise;

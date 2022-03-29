@@ -33,6 +33,7 @@ public:
     };
 
     struct CallbackInfo {
+        napi_env env = nullptr;
         napi_ref ref = nullptr;
         napi_deferred deferred = nullptr;
         napi_value promise = nullptr;
@@ -40,7 +41,6 @@ public:
     };
 
     struct CallbackTemp {
-        CallbackTemp(napi_env env) : env(env) {}
         ~CallbackTemp();
         napi_env env = nullptr;
         napi_ref ref = nullptr;
