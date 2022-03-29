@@ -47,8 +47,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(s
     CHKPP(device);
     std::shared_ptr<TouchTransformPointProcessor> processor = nullptr;
     auto deviceId = InputDevMgr->FindInputDeviceId(device);
-    auto it = touchPro_.find(deviceId);
-    if (it != touchPro_.end()) {
+    if (auto it = touchPro_.find(deviceId); it != touchPro_.end()) {
         processor = it->second;
     } else {
         processor = std::make_shared<TouchTransformPointProcessor>(deviceId);
