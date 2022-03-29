@@ -111,10 +111,15 @@ void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> ids)
         MMI_HILOGE("napi_get_uv_event_loop failed");
         return;
     }
+    int32_t ret;
     if (iter->second->ref == nullptr) {
-        uv_queue_work(loop, work, [](uv_work_t *work) {}, CallIdsPromiseWork);
+        ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallIdsPromiseWork);
     } else {
-        uv_queue_work(loop, work, [](uv_work_t *work) {}, CallIdsAsyncWork);
+        ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallIdsAsyncWork);
+    }
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work failed");
+        return;
     }
 }
 
@@ -237,10 +242,15 @@ void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl:
         MMI_HILOGE("napi_get_uv_event_loop failed");
         return;
     }
+    int32_t ret;
     if (iter->second->ref == nullptr) {
-        uv_queue_work(loop, work, [](uv_work_t *work){}, CallDevPromiseWork);
+        ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDevPromiseWork);
     } else {
-        uv_queue_work(loop, work, [](uv_work_t *work){}, CallDevAsyncWork);
+        ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDevAsyncWork);
+    }
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work failed");
+        return;
     }
 }
 
@@ -337,10 +347,15 @@ void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::vector<int32_t
         MMI_HILOGE("napi_get_uv_event_loop failed");
         return;
     }
+    int32_t ret;
     if (iter->second->ref == nullptr) {
-        uv_queue_work(loop, work, [](uv_work_t *work){}, CallKeystrokeAbilityPromise);
+        ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallKeystrokeAbilityPromise);
     } else {
-        uv_queue_work(loop, work, [](uv_work_t *work){}, CallKeystrokeAbilityAsync);
+        ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallKeystrokeAbilityAsync);
+    }
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work failed");
+        return;
     }
 }
 
