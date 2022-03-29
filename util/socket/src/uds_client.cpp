@@ -57,28 +57,32 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
         MMI_HILOGE("fd_ is less than 0");
         return false;
     }
-    int32_t sendSize = 0;
+
+    int32_t idx = 0;
     int32_t retryCount = 0;
     constexpr int32_t retryLimit = 32;
     constexpr int32_t sleepTime = 10000;
     const int32_t bufSize = static_cast<int32_t>(size);
-    while (sendSize < bufSize && retryCount < retryLimit) {
+    int32_t remSize = bufSize;
+    while (remSize > 0 && retryCount < retryLimit) {
         retryCount += 1;
-        auto count = send(fd_, buf, size, SOCKET_FLAGS);
+        auto count = send(fd_, &buf[idx], remSize, SOCKET_FLAGS);
         if (count < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
                 MMI_HILOGW("continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
+                usleep(sleepTime);
                 continue;
             }
             MMI_HILOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
             return false;
         }
-        sendSize += count;
-        if (sendSize < bufSize) {
+        idx += count;
+        remSize -= count;
+        if (remSize > 0) {
             usleep(sleepTime);
         }
     }
-    if (retryCount >= retryLimit && sendSize < bufSize) {
+    if (retryCount >= retryLimit || remSize != 0) {
         MMI_HILOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
             retryCount, retryLimit, sendSize, bufSize, fd_);
         return false;
