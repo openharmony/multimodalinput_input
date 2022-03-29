@@ -50,6 +50,7 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
     JsUtil::CallbackTemp cbTemp;
     JsUtil jsUtil;
     jsUtil.GetCallbackInfo(work, cbTemp);
+    CHKPV(cbTemp.env);
 
     napi_value arr = nullptr;
     CHKRV(cbTemp.env, napi_create_array(cbTemp.env, &arr), "napi_create_array");
@@ -75,6 +76,7 @@ void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
     JsUtil::CallbackTemp cbTemp;
     JsUtil jsUtil;
     jsUtil.GetCallbackInfo(work, cbTemp);
+    CHKPV(cbTemp.env);
 
     napi_value arr = nullptr;
     CHKRV(cbTemp.env, napi_create_array(cbTemp.env, &arr), "napi_create_array");
@@ -138,6 +140,7 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
     JsUtil jsUtil;
     jsUtil.GetCallbackInfo(work, cbTemp);
     CHKPV(cbTemp.data.device);
+    CHKPV(cbTemp.env);
 
     napi_value id = nullptr;
     CHKRV(cbTemp.env, napi_create_int32(cbTemp.env, cbTemp.data.device->id, &id), "napi_create_int32");
@@ -187,6 +190,7 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     JsUtil jsUtil;
     jsUtil.GetCallbackInfo(work, cbTemp);
     CHKPV(cbTemp.data.device);
+    CHKPV(cbTemp.env);
 
     napi_value id = nullptr;
     CHKRV(cbTemp.env, napi_create_int32(cbTemp.env, cbTemp.data.device->id, &id), "napi_create_int32");
@@ -275,10 +279,7 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
     JsUtil::CallbackTemp cbTemp;
     JsUtil jsUtil;
     jsUtil.GetCallbackInfo(work, cbTemp);
-
-    for (auto it : cbTemp.data.keystrokeAbility) {
-        MMI_HILOGE("MMMMMM %{public}d", it);
-    }
+    CHKPV(cbTemp.env);
 
     napi_value keyAbility = nullptr;
     CHKRV(cbTemp.env, napi_create_array(cbTemp.env, &keyAbility), "napi_create_array");
@@ -310,6 +311,7 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
     JsUtil::CallbackTemp cbTemp;
     JsUtil jsUtil;
     jsUtil.GetCallbackInfo(work, cbTemp);
+    CHKPV(cbTemp.env);
 
     napi_value keyAbility = nullptr;
     CHKRV(cbTemp.env, napi_create_array(cbTemp.env, &keyAbility), "napi_create_array");
