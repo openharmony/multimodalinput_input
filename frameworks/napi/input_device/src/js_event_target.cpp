@@ -33,41 +33,53 @@ napi_env JsEventTarget::env_ = nullptr;
 static std::map<int32_t, JsEventTarget::CallbackInfo*> callback_ {};
 int32_t JsEventTarget::userData_ = 0;
 
-void JsEventTarget::CallIdsAsyncWork(napi_env env, napi_status status, void* data)
+void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
-    CHKPV(data);
+    CHKPV(work);
+    CHKPV(work->data);
+    CallbackInfo *cb = static_cast<CallbackInfo*>(work->data);
+    CallbackInfo cbTemp = *cb;
+    delete cb;
+    cb = nullptr;
+    delete work;
+    work = nullptr;
+
+    if (CheckEnv(env_)) {
+        MMI_HILOGE("env_ is nullptr");
+        return;
+    }
     napi_handle_scope scope = nullptr;
-    napi_status status_ = napi_open_handle_scope(env, &scope);
+    napi_status status_ = napi_open_handle_scope(env_, &scope);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: failed to open scope");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: failed to open scope");
         MMI_HILOGE("failed to open scope");
         return;
     }
     napi_value arr = nullptr;
-    status_ = napi_create_array(env, &arr);
+    status_ = napi_create_array(env_, &arr);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_create_array failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_array failed");
         MMI_HILOGE("call to napi_create_array failed");
         return;
     }
+
     uint32_t index = 0;
     napi_value value = nullptr;
-    struct CallbackInfo *cb = static_cast<struct CallbackInfo*>(data);
-    CallbackInfo cbTemp = *cb;
-    delete cb;
-    cb = nullptr;
-
     for (const auto &item : cbTemp.ids) {
-        status_ = napi_create_int64(env, item, &value);
+        status_ = napi_create_int64(env_, item, &value);
         if (status_ != napi_ok) {
-            napi_throw_error(env, nullptr, "JsEventTarget: call to napi_create_int64 failed");
+            napi_delete_reference(env_, cbTemp.ref);
+            napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_int64 failed");
             MMI_HILOGE("call to napi_create_int64 failed");
             return;
         }
-        status_ = napi_set_element(env, arr, index, value);
+        status_ = napi_set_element(env_, arr, index, value);
         if (status_ != napi_ok) {
-            napi_throw_error(env, nullptr, "JsEventTarget: call to napi_set_element failed");
+            napi_delete_reference(env_, cbTemp.ref);
+            napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_set_element failed");
             MMI_HILOGE("call to napi_set_element failed");
             return;
         }
@@ -75,37 +87,31 @@ void JsEventTarget::CallIdsAsyncWork(napi_env env, napi_status status, void* dat
     }
 
     napi_value handlerTemp = nullptr;
-    status_ = napi_get_reference_value(env, cbTemp.ref, &handlerTemp);
+    status_ = napi_get_reference_value(env_, cbTemp.ref, &handlerTemp);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_get_reference_value failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_get_reference_value failed");
         MMI_HILOGE("call to napi_get_reference_value failed");
         return;
     }
     napi_value result = nullptr;
-    status_ = napi_call_function(env, nullptr, handlerTemp, 1, &arr, &result);
+    status_ = napi_call_function(env_, nullptr, handlerTemp, 1, &arr, &result);
     if (status_ != napi_ok) {
-        napi_delete_reference(env, cbTemp.ref);
-        napi_delete_async_work(env, cbTemp.asyncWork);
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_call_function failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_call_function failed");
         MMI_HILOGE("call to napi_call_function failed");
         return;
     }
-    status_ = napi_delete_reference(env, cbTemp.ref);
+    status_ = napi_delete_reference(env_, cbTemp.ref);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_delete_reference failed");
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_delete_reference failed");
         MMI_HILOGE("call to napi_delete_reference failed");
         return;
     }
-    status_ = napi_delete_async_work(env, cbTemp.asyncWork);
-    if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_delete_async_work failed");
-        MMI_HILOGE("call to napi_delete_async_work failed");
-        return;
-    }
 
-    status_ = napi_close_handle_scope(env, scope);
+    status_ = napi_close_handle_scope(env_, scope);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: failed to close scope");
+        napi_throw_error(env_, nullptr, "JsEventTarget: failed to close scope");
         MMI_HILOGE("failed to close scope");
         return;
     }
@@ -125,77 +131,84 @@ void JsEventTarget::EmitJsIdsAsync(int32_t userData, std::vector<int32_t> ids)
     }
     CHKPV(iter->second);
     iter->second->ids = ids;
-
-    napi_value resourceName = nullptr;
-    napi_status status = napi_create_string_latin1(env_, "InputDeviceIdsAsync", NAPI_AUTO_LENGTH, &resourceName);
+    uv_loop_s *loop = nullptr;
+    napi_status status = napi_get_uv_event_loop(env_, &loop);
     if (status != napi_ok) {
-        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_string_latin1 failed");
-        MMI_HILOGE("call to napi_create_string_latin1 failed");
+        MMI_HILOGE("napi_get_uv_event_loop failed");
         return;
     }
-    status = napi_create_async_work(env_, nullptr, resourceName, [](napi_env env, void *data) {},
-                                    CallIdsAsyncWork, iter->second, &(iter->second->asyncWork));
-    if (status != napi_ok) {
-        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_async_work failed");
-        MMI_HILOGE("call to napi_create_async_work failed");
-        return;
-    }
-    status = napi_queue_async_work(env_, iter->second->asyncWork);
-    if (status != napi_ok) {
-        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_queue_async_work failed");
-        MMI_HILOGE("call to napi_queue_async_work failed");
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    work->data = static_cast<void*>(iter->second);
+    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallIdsAsyncWork);
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work failed");
         return;
     }
 }
 
-void JsEventTarget::CallDevAsyncWork(napi_env env, napi_status status, void* data)
+void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
-    CHKPV(data);
-    napi_handle_scope scope = nullptr;
-    napi_status status_ = napi_open_handle_scope(env, &scope);
-    if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: failed to open scope");
-        MMI_HILOGE("failed to open scope");
-        return;
-    }
-    struct CallbackInfo *cb = static_cast<struct CallbackInfo*>(data);
+    CHKPV(work);
+    CHKPV(work->data);
+    CallbackInfo *cb = static_cast<CallbackInfo*>(work->data);
     CallbackInfo cbTemp = *cb;
     delete cb;
     cb = nullptr;
+    delete work;
+    work = nullptr;
+
+    if (CheckEnv(env_)) {
+        MMI_HILOGE("env_ is nullptr");
+        return;
+    }
+    napi_handle_scope scope = nullptr;
+    napi_status status_ = napi_open_handle_scope(env_, &scope);
+    if (status_ != napi_ok) {
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: failed to open scope");
+        MMI_HILOGE("failed to open scope");
+        return;
+    }
 
     napi_value id = nullptr;
-    status_ = napi_create_int64(env, cbTemp.device->id, &id);
+    status_ = napi_create_int64(env_, cbTemp.device->id, &id);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_create_int64 failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_int64 failed");
         MMI_HILOGE("call to napi_create_int64 failed");
         return;
     }
     napi_value name = nullptr;
-    status_ = napi_create_string_utf8(env, (cbTemp.device->name).c_str(), NAPI_AUTO_LENGTH, &name);
+    status_ = napi_create_string_utf8(env_, (cbTemp.device->name).c_str(), NAPI_AUTO_LENGTH, &name);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_create_string_utf8 failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_string_utf8 failed");
         MMI_HILOGE("call to napi_create_string_utf8 failed");
         return;
     }
 
     napi_value object = nullptr;
-    status_ = napi_create_object(env, &object);
+    status_ = napi_create_object(env_, &object);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_create_object failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_object failed");
         MMI_HILOGE("call to napi_create_object failed");
         return;
     }
 
-    status_ = napi_set_named_property(env, object, "id", id);
+    status_ = napi_set_named_property(env_, object, "id", id);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_set_named_property failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_set_named_property failed");
         MMI_HILOGE("call to napi_set_named_property failed");
         return;
     }
-    status_ = napi_set_named_property(env, object, "name", name);
+    status_ = napi_set_named_property(env_, object, "name", name);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_set_named_property failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_set_named_property failed");
         MMI_HILOGE("call to napi_set_named_property failed");
         return;
     }
@@ -208,80 +221,81 @@ void JsEventTarget::CallDevAsyncWork(napi_env env, napi_status status, void* dat
         }
     }
     napi_value devSources = nullptr;
-    status_ = napi_create_array(env, &devSources);
+    status_ = napi_create_array(env_, &devSources);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_create_array failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_array failed");
         MMI_HILOGE("call to napi_create_array failed");
         return;
     }
     uint32_t index = 0;
     napi_value value = nullptr;
     for (const auto &item : sources) {
-        status_ = napi_create_string_utf8(env, item.c_str(), NAPI_AUTO_LENGTH, &value);
+        status_ = napi_create_string_utf8(env_, item.c_str(), NAPI_AUTO_LENGTH, &value);
         if (status_ != napi_ok) {
-            napi_throw_error(env, nullptr, "JsEventTarget: call to napi_create_string_utf8 failed");
+            napi_delete_reference(env_, cbTemp.ref);
+            napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_string_utf8 failed");
             MMI_HILOGE("call to napi_create_string_utf8 failed");
             return;
         }
-        status_ = napi_set_element(env, devSources, index, value);
+        status_ = napi_set_element(env_, devSources, index, value);
         if (status_ != napi_ok) {
-            napi_throw_error(env, nullptr, "JsEventTarget: call to napi_set_element failed");
+            napi_delete_reference(env_, cbTemp.ref);
+            napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_set_element failed");
             MMI_HILOGE("call to napi_set_element failed");
+            return;
         }
     }
-    status_ = napi_set_named_property(env, object, "sources", devSources);
+    status_ = napi_set_named_property(env_, object, "sources", devSources);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_set_named_property failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_set_named_property failed");
         MMI_HILOGE("call to napi_set_named_property failed");
         return;
     }
 
     napi_value axisRanges = nullptr;
-    status_ = napi_create_array(env, &axisRanges);
+    status_ = napi_create_array(env_, &axisRanges);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_create_array failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_array failed");
         MMI_HILOGE("call to napi_create_array failed");
         return;
     }
-    status_ = napi_set_named_property(env, object, "axisRanges", axisRanges);
+    status_ = napi_set_named_property(env_, object, "axisRanges", axisRanges);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_set_named_property failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_set_named_property failed");
         MMI_HILOGE("call to napi_set_named_property failed");
         return;
     }
 
     napi_value handlerTemp = nullptr;
-    status_ = napi_get_reference_value(env, cbTemp.ref, &handlerTemp);
+    status_ = napi_get_reference_value(env_, cbTemp.ref, &handlerTemp);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_get_reference_value failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_get_reference_value failed");
         MMI_HILOGE("call to napi_get_reference_value failed");
         return;
     }
     napi_value result = nullptr;
-    status_ = napi_call_function(env, nullptr, handlerTemp, 1, &object, &result);
+    status_ = napi_call_function(env_, nullptr, handlerTemp, 1, &object, &result);
     if (status_ != napi_ok) {
-        napi_delete_reference(env, cbTemp.ref);
-        napi_delete_async_work(env, cbTemp.asyncWork);
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_call_function failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_call_function failed");
         MMI_HILOGE("call to napi_call_function failed");
         return;
     }
-    status_ = napi_delete_reference(env, cbTemp.ref);
+    status_ = napi_delete_reference(env_, cbTemp.ref);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_delete_reference failed");
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_delete_reference failed");
         MMI_HILOGE("call to napi_delete_reference failed");
         return;
     }
-    status_ = napi_delete_async_work(env, cbTemp.asyncWork);
-    if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_delete_async_work failed");
-        MMI_HILOGE("call to napi_delete_async_work failed");
-        return;
-    }
 
-    status_ = napi_close_handle_scope(env, scope);
+    status_ = napi_close_handle_scope(env_, scope);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: failed to close scope");
+        napi_throw_error(env_, nullptr, "JsEventTarget: failed to close scope");
         MMI_HILOGE("failed to close scope");
         return;
     }
@@ -302,88 +316,86 @@ void JsEventTarget::EmitJsDevAsync(int32_t userData, std::shared_ptr<InputDevice
     }
     CHKPV(iter->second);
     iter->second->device = device;
-
-    napi_value resourceName = nullptr;
-    napi_status status = napi_create_string_latin1(env_, "InputDeviceAsync", NAPI_AUTO_LENGTH, &resourceName);
+    uv_loop_s *loop = nullptr;
+    napi_status status = napi_get_uv_event_loop(env_, &loop);
     if (status != napi_ok) {
-        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_string_latin1 failed");
-        MMI_HILOGE("call to napi_create_string_latin1 failed");
+        MMI_HILOGE("napi_get_uv_event_loop failed");
         return;
     }
-
-    status = napi_create_async_work(env_, nullptr, resourceName, [](napi_env env, void *data) {},
-                                    CallDevAsyncWork, iter->second, &(iter->second->asyncWork));
-    if (status != napi_ok) {
-        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_async_work failed");
-        MMI_HILOGE("call to napi_create_async_work failed");
-        return;
-    }
-    status = napi_queue_async_work(env_, iter->second->asyncWork);
-    if (status != napi_ok) {
-        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_queue_async_work failed");
-        MMI_HILOGE("call to napi_queue_async_work failed");
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    work->data = static_cast<void*>(iter->second);
+    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDevAsyncWork);
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work failed");
         return;
     }
 }
 
-void JsEventTarget::CallIdsPromiseWork(napi_env env, napi_status status, void* data)
+void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
-    CHKPV(data);
+    CHKPV(work);
+    CHKPV(work->data);
+    CallbackInfo *cb = static_cast<CallbackInfo*>(work->data);
+    CallbackInfo cbTemp = *cb;
+    delete cb;
+    cb = nullptr;
+    delete work;
+    work = nullptr;
+    if (CheckEnv(env_)) {
+        MMI_HILOGE("env_ is nullptr");
+        return;
+    }
+
     napi_handle_scope scope = nullptr;
-    napi_status status_ = napi_open_handle_scope(env, &scope);
+    napi_status status_ = napi_open_handle_scope(env_, &scope);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: failed to open scope");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: failed to open scope");
         MMI_HILOGE("failed to open scope");
         return;
     }
     napi_value arr = nullptr;
-    status_ = napi_create_array(env, &arr);
+    status_ = napi_create_array(env_, &arr);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_create_array failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_array failed");
         MMI_HILOGE("call to napi_create_array failed");
         return;
     }
     uint32_t index = 0;
     napi_value value = nullptr;
-    struct CallbackInfo *cb = static_cast<struct CallbackInfo*>(data);
-    CallbackInfo cbTemp = *cb;
-    delete cb;
-    cb = nullptr;
-
     for (const auto &item : cbTemp.ids) {
-        status_ = napi_create_int64(env, item, &value);
+        status_ = napi_create_int64(env_, item, &value);
         if (status_ != napi_ok) {
-            napi_throw_error(env, nullptr, "JsEventTarget: call to napi_create_int64 failed");
+            napi_delete_reference(env_, cbTemp.ref);
+            napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_int64 failed");
             MMI_HILOGE("call to napi_create_int64 failed");
             return;
         }
-        status_ = napi_set_element(env, arr, index, value);
+        status_ = napi_set_element(env_, arr, index, value);
         if (status_ != napi_ok) {
-            napi_throw_error(env, nullptr, "JsEventTarget: call to napi_set_element failed");
+            napi_delete_reference(env_, cbTemp.ref);
+            napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_set_element failed");
             MMI_HILOGE("call to napi_set_element failed");
             return;
         }
         index++;
     }
 
-    status_ = napi_resolve_deferred(env, cbTemp.deferred, arr);
+    status_ = napi_resolve_deferred(env_, cbTemp.deferred, arr);
     if (status_ != napi_ok) {
-        napi_delete_async_work(env, cbTemp.asyncWork);
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_call_function failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_call_function failed");
         MMI_HILOGE("call to napi_call_function failed");
         return;
     }
-    status_ = napi_delete_async_work(env, cbTemp.asyncWork);
-    if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_delete_async_work failed");
-        MMI_HILOGE("call to napi_delete_async_work failed");
-        return;
-    }
 
-    status_ = napi_close_handle_scope(env, scope);
+    status_ = napi_close_handle_scope(env_, scope);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: failed to close scope");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: failed to close scope");
         MMI_HILOGE("failed to close scope");
         return;
     }
@@ -396,7 +408,6 @@ void JsEventTarget::EmitJsIdsPromise(int32_t userData, std::vector<int32_t> ids)
         MMI_HILOGE("env_ is nullptr");
         return;
     }
-
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
         MMI_HILOGE("Failed to search for userData");
@@ -404,86 +415,91 @@ void JsEventTarget::EmitJsIdsPromise(int32_t userData, std::vector<int32_t> ids)
     }
     CHKPV(iter->second);
     iter->second->ids = ids;
-
-    napi_value resourceName = nullptr;
-    napi_status status = napi_create_string_latin1(env_, "InputDeviceIdsPromis", NAPI_AUTO_LENGTH, &resourceName);
+    uv_loop_s *loop = nullptr;
+    napi_status status = napi_get_uv_event_loop(env_, &loop);
     if (status != napi_ok) {
-        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_string_latin1 failed");
-        MMI_HILOGE("call to napi_create_string_latin1 failed");
+        MMI_HILOGE("napi_get_uv_event_loop failed");
         return;
     }
-
-    status = napi_create_async_work(env_, nullptr, resourceName, [](napi_env env, void *data) {},
-                                    CallIdsPromiseWork, iter->second, &(iter->second->asyncWork));
-    if (status != napi_ok) {
-        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_async_work failed");
-        MMI_HILOGE("call to napi_create_async_work failed");
-        return;
-    }
-
-    status = napi_queue_async_work(env_, iter->second->asyncWork);
-    if (status != napi_ok) {
-        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_queue_async_work failed");
-        MMI_HILOGE("call to napi_queue_async_work failed");
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    work->data = static_cast<void*>(iter->second);
+    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallIdsPromiseWork);
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work failed");
         return;
     }
 }
 
-void JsEventTarget::CallDevPromiseWork(napi_env env, napi_status status, void* data)
+void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
-    CHKPV(data);
+    CHKPV(work);
+    CHKPV(work->data);
+    CallbackInfo *cb = static_cast<CallbackInfo*>(work->data);
+    CallbackInfo cbTemp = *cb;
+    delete cb;
+    cb = nullptr;
+    delete work;
+    work = nullptr;
+
+    if (CheckEnv(env_)) {
+        MMI_HILOGE("env_ is nullptr");
+        return;
+    }
     napi_handle_scope scope = nullptr;
-    napi_status status_ = napi_open_handle_scope(env, &scope);
+    napi_status status_ = napi_open_handle_scope(env_, &scope);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: failed to open scope");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: failed to open scope");
         MMI_HILOGE("failed to open scope");
         return;
     }
 
-    struct CallbackInfo *cb = static_cast<struct CallbackInfo*>(data);
-    CallbackInfo cbTemp = *cb;
-    delete cb;
-    cb = nullptr;
-
     napi_value id = nullptr;
-    status_ = napi_create_int64(env, cbTemp.device->id, &id);
+    status_ = napi_create_int64(env_, cbTemp.device->id, &id);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "napi_create_int64 failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "napi_create_int64 failed");
         MMI_HILOGE("napi_create_int64 failed");
         return;
     }
     napi_value name = nullptr;
-    status_ = napi_create_string_utf8(env, (cbTemp.device->name).c_str(), NAPI_AUTO_LENGTH, &name);
+    status_ = napi_create_string_utf8(env_, (cbTemp.device->name).c_str(), NAPI_AUTO_LENGTH, &name);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "napi_create_string_utf8 failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "napi_create_string_utf8 failed");
         MMI_HILOGE("napi_create_string_utf8 failed");
         return;
     }
     napi_value object = nullptr;
-    status_ = napi_create_object(env, &object);
+    status_ = napi_create_object(env_, &object);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "napi_create_object failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "napi_create_object failed");
         MMI_HILOGE("napi_create_object failed");
         return;
     }
 
-    status_ = napi_set_named_property(env, object, "id", id);
+    status_ = napi_set_named_property(env_, object, "id", id);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "napi_set_named_property set id failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "napi_set_named_property set id failed");
         MMI_HILOGE("napi_set_named_property set id failed");
         return;
     }
-    status_ = napi_set_named_property(env, object, "name", name);
+    status_ = napi_set_named_property(env_, object, "name", name);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "napi_set_named_property set name failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "napi_set_named_property set name failed");
         MMI_HILOGE("napi_set_named_property set name failed");
         return;
     }
 
     uint32_t types = cbTemp.device->devcieType;
     if (types <= 0) {
-        napi_throw_error(env, nullptr, "devcieType is less than zero");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "devcieType is less than zero");
         MMI_HILOGE("devcieType is less than zero");
     }
     std::vector<std::string> sources;
@@ -493,9 +509,10 @@ void JsEventTarget::CallDevPromiseWork(napi_env env, napi_status status, void* d
         }
     }
     napi_value devSources = nullptr;
-    status_ = napi_create_array(env, &devSources);
+    status_ = napi_create_array(env_, &devSources);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "napi_create_array failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "napi_create_array failed");
         MMI_HILOGE("napi_create_array failed");
         return;
     }
@@ -503,56 +520,55 @@ void JsEventTarget::CallDevPromiseWork(napi_env env, napi_status status, void* d
     uint32_t index = 0;
     napi_value value = nullptr;
     for (const auto &item : sources) {
-        status_ = napi_create_string_utf8(env, item.c_str(), NAPI_AUTO_LENGTH, &value);
+        status_ = napi_create_string_utf8(env_, item.c_str(), NAPI_AUTO_LENGTH, &value);
         if (status_ != napi_ok) {
-            napi_throw_error(env, nullptr, "napi_create_string_utf8 failed");
+            napi_delete_reference(env_, cbTemp.ref);
+            napi_throw_error(env_, nullptr, "napi_create_string_utf8 failed");
             MMI_HILOGE("napi_create_string_utf8 failed");
             return;
         }
-        status_ = napi_set_element(env, devSources, index, value);
+        status_ = napi_set_element(env_, devSources, index, value);
         if (status_ != napi_ok) {
-            napi_throw_error(env, nullptr, "napi_set_element failed");
+            napi_delete_reference(env_, cbTemp.ref);
+            napi_throw_error(env_, nullptr, "napi_set_element failed");
             MMI_HILOGE("napi_set_element failed");
         }
     }
-    status_ = napi_set_named_property(env, object, "sources", devSources);
+    status_ = napi_set_named_property(env_, object, "sources", devSources);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_set_named_property failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_set_named_property failed");
         MMI_HILOGE("call to napi_set_named_property failed");
         return;
     }
 
     napi_value axisRanges = nullptr;
-    status_ = napi_create_array(env, &axisRanges);
+    status_ = napi_create_array(env_, &axisRanges);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_create_array failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_array failed");
         MMI_HILOGE("call to napi_create_array failed");
         return;
     }
-    status_ = napi_set_named_property(env, object, "axisRanges", axisRanges);
+    status_ = napi_set_named_property(env_, object, "axisRanges", axisRanges);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_set_named_property failed");
+        napi_delete_reference(env_, cbTemp.ref);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_set_named_property failed");
         MMI_HILOGE("call to napi_set_named_property failed");
         return;
     }
 
-    status_ = napi_resolve_deferred(env, cbTemp.deferred, object);
+    status_ = napi_resolve_deferred(env_, cbTemp.deferred, object);
     if (status_ != napi_ok) {
-        napi_delete_async_work(env, cbTemp.asyncWork);
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_call_function failed");
+        napi_delete_async_work(env_, cbTemp.asyncWork);
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_call_function failed");
         MMI_HILOGE("call to napi_call_function failed");
         return;
     }
-    status_ = napi_delete_async_work(env, cbTemp.asyncWork);
-    if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_delete_async_work failed");
-        MMI_HILOGE("call to napi_delete_async_work failed");
-        return;
-    }
 
-    status_ = napi_close_handle_scope(env, scope);
+    status_ = napi_close_handle_scope(env_, scope);
     if (status_ != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: failed to close scope");
+        napi_throw_error(env_, nullptr, "JsEventTarget: failed to close scope");
         MMI_HILOGE("failed to close scope");
         return;
     }
@@ -573,27 +589,18 @@ void JsEventTarget::EmitJsDevPromise(int32_t userData, std::shared_ptr<InputDevi
     }
     CHKPV(iter->second);
     iter->second->device = device;
-
-    napi_value resourceName = nullptr;
-    napi_status status = napi_create_string_latin1(env_, "InputDevicePromis", NAPI_AUTO_LENGTH, &resourceName);
+    uv_loop_s *loop = nullptr;
+    napi_status status = napi_get_uv_event_loop(env_, &loop);
     if (status != napi_ok) {
-        napi_throw_error(env_, nullptr, "JsEventTarget: napi_create_string_latin1 failed");
-        MMI_HILOGE("napi create string failed");
+        MMI_HILOGE("napi_get_uv_event_loop failed");
         return;
     }
-
-    status = napi_create_async_work(env_, nullptr, resourceName, [](napi_env env, void *data) {},
-                                    CallDevPromiseWork, iter->second, &(iter->second->asyncWork));
-    if (status != napi_ok) {
-        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_async_work failed");
-        MMI_HILOGE("call to napi_create_async_work failed");
-        return;
-    }
-
-    status = napi_queue_async_work(env_, iter->second->asyncWork);
-    if (status != napi_ok) {
-        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_queue_async_work failed");
-        MMI_HILOGE("call to napi_queue_async_work failed");
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    work->data = static_cast<void*>(iter->second);
+    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDevPromiseWork);
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work failed");
         return;
     }
 }
@@ -647,7 +654,7 @@ void JsEventTarget::ResetEnv()
 
 bool JsEventTarget::CheckEnv(napi_env env)
 {
-    if (env != nullptr) {
+    if (env_ != nullptr) {
         return false;
     }
 

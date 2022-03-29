@@ -82,7 +82,8 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
             retryCount, retryLimit, sendSize, bufSize, fd_);
         return false;
     }
-    return true;
+    MMI_HILOGE("send msg failed");
+    return false;
 }
 
 void UDSSession::Close()
