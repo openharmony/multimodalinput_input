@@ -563,8 +563,14 @@ void InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, double& y)
     MMI_HILOGD("Mouse Data: globalX:%{public}d,globalY:%{public}d", mouseLoction_.globalX, mouseLoction_.globalY);
 }
 
-MouseLocation InputWindowsManager::GetMouseInfo() const
+MouseLocation InputWindowsManager::GetMouseInfo()
 {
+    if (mouseLoction_.globalX == -1 || mouseLoction_.globalY == -1) {
+        if (!logicalDisplays_.empty()) {
+            mouseLoction_.globalX = logicalDisplays_[0].width / 2;
+            mouseLoction_.globalY = logicalDisplays_[0].height / 2;
+        }
+    }
     return mouseLoction_;
 }
 } // namespace MMI
