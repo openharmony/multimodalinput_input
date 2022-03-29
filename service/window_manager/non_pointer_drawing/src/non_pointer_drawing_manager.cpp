@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "fake_pointer_drawing_manager.h"
+#include "non_pointer_drawing_manager.h"
 
 #include <display_type.h>
 
@@ -24,36 +24,36 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "FakePointerDrawingManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NonPointerDrawingManager" };
 } // namespace
 } // namespace MMI
 } // namespace OHOS
 
 namespace OHOS {
 namespace MMI {
-FakePointerDrawingManager::FakePointerDrawingManager() {}
+NonPointerDrawingManager::NonPointerDrawingManager() {}
 
-FakePointerDrawingManager::~FakePointerDrawingManager() {}
+NonPointerDrawingManager::~NonPointerDrawingManager() {}
 
-void FakePointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY)
+void NonPointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY)
 {
-    MMI_HILOGD("Fake display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
+    MMI_HILOGD("NonPointerDrawing display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
     return;
 }
 
-void FakePointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int32_t height)
+void NonPointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int32_t height)
 {
-    MMI_HILOGD("Fake display:%{public}d,width:%{public}d,height:%{public}d", displayId, width, height);
+    MMI_HILOGD("NonPointerDrawing display:%{public}d,width:%{public}d,height:%{public}d", displayId, width, height);
     return;
 }
 
-void FakePointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
+void NonPointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
 {
-    MMI_HILOGD("Fake hasPointerDevice:%{public}d", hasPointerDevice);
+    MMI_HILOGD("NonPointerDrawing hasPointerDevice:%{public}d", hasPointerDevice);
     return;
 }
 
-bool FakePointerDrawingManager::Init()
+bool NonPointerDrawingManager::Init()
 {
     CALL_LOG_ENTER;
     InputDevMgr->Attach(GetInstance());
