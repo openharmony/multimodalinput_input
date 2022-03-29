@@ -37,7 +37,6 @@ public:
     napi_value CreateCallbackInfo(napi_env env, napi_value handle);
     void ResetEnv();
     static int32_t userData_;
-    static napi_env env_;
 
     struct DeviceType {
         std::string deviceTypeName;
@@ -45,7 +44,6 @@ public:
     };
 
 private:
-    static bool CheckEnv(napi_env env);
     static void CallIdsPromiseWork(uv_work_t *work, int32_t status);
     static void CallIdsAsyncWork(uv_work_t *work, int32_t status);
     static void CallDevAsyncWork(uv_work_t *work, int32_t status);
