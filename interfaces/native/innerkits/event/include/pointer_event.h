@@ -581,6 +581,13 @@ public:
     void SetAxisValue(AxisType axis, double axisValue);
 
     /**
+     * @brief Clear the axis value.
+     * @return void
+     * @since 8
+     */
+    void ClearAxisValue();
+
+    /**
      * @brief Checks whether this event contains a specified axis type.
      * @param axis Indicates the axis type.
      * @return Returns <b>true</b> if the event contains the specified axis type; returns <b>false</b> otherwise.
