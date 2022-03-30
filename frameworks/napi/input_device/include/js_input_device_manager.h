@@ -24,6 +24,7 @@ namespace MMI {
 class JsInputDeviceManager : public JsEventTarget {
 public:
     JsInputDeviceManager() = default;
+    ~JsInputDeviceManager() = default;
     DISALLOW_COPY_AND_MOVE(JsInputDeviceManager);
 
     void ResetEnv();

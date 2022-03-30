@@ -30,6 +30,7 @@ namespace MMI {
 class JsEventTarget {
 public:
     JsEventTarget() = default;
+    ~JsEventTarget() = default;
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
     static void EmitJsIds(int32_t userData, std::vector<int32_t> ids);
     static void EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device);
