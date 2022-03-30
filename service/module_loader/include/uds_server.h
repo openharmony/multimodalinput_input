@@ -81,6 +81,7 @@ protected:
     void AddPermission(SessionPtr sess);
 
 protected:
+    std::mutex mux_;
     bool isRunning_ = false;
     MsgServerFunCallback recvFun_ = nullptr;
     std::map<int32_t, SessionPtr> sessionsMap_ = {};
