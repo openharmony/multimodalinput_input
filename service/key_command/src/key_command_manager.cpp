@@ -15,11 +15,6 @@
 
 #include "key_command_manager.h"
 
-#include <algorithm>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-
 #include "ability_manager_client.h"
 #include "file_ex.h"
 #include "ohos/aafwk/base/string_wrapper.h"
@@ -45,7 +40,7 @@ std::string KeyCommandManager::GenerateKey(const ShortcutKey& key)
 {
     std::set<int32_t> preKeys = key.preKeys;
     std::stringstream oss;
-    for(const auto preKey: preKeys) {
+    for(const auto preKey : preKeys) {
         oss << preKey << ",";
     }
     oss << key.finalKey << ",";
@@ -215,7 +210,7 @@ bool KeyCommandManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> key)
         TimerMgr->RemoveTimer(lastMatchedKey_.timerId);
     }
     ResetLastMatchedKey();
-    for (auto& item: shortcutKeys_) {
+    for (auto& item : shortcutKeys_) {
         ShortcutKey &shortcutKey = item.second;
         if (!IsKeyMatch(shortcutKey, key)) {
             MMI_HILOGD("not matched, next");
