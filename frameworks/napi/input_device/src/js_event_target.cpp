@@ -199,9 +199,9 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "name", name), "napi_set_named_property");
 
     uint32_t types = cbTemp.data.device->devcieType;
-    if (types <= 0) {
-        napi_throw_error(cbTemp.env, nullptr, "devcieType is less than zero");
-        MMI_HILOGE("devcieType is less than zero");
+    if (types == 0) {
+        MMI_HILOGE("types is wrong");
+        return;
     }
     std::vector<std::string> sources;
     for (const auto & item : g_deviceType) {
