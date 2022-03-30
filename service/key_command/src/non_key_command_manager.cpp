@@ -13,28 +13,28 @@
  * limitations under the License.
  */
 
-#include "non_multi_key.h"
+#include "non_key_command_manager.h"
 
 #include "define_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NonMultiKey" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NonKeyCommandManager" };
 } // namespace
 
-bool NonMultiKey::CheckLaunchAbility(const std::shared_ptr<KeyEvent> key)
+bool NonKeyCommandManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> key)
 {
     CHKPF(key);
     return false;
 }
 
-std::shared_ptr<IMultiKey> IMultiKey::GetInstance()
+std::shared_ptr<IKeyCommandManager> IKeyCommandManager::GetInstance()
 {
-    if (iMultiKeyPtr_ == nullptr) {
-        iMultiKeyPtr_ = std::make_shared<NonMultiKey>();
+    if (keyCommandPtr_ == nullptr) {
+        keyCommandPtr_ = std::make_shared<NonKeyCommandManager>();
     }
-    return iMultiKeyPtr_;
+    return keyCommandPtr_;
 }
 } // namespace MMI
 } // namespace OHOS

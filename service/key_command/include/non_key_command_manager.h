@@ -13,17 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef NON_MULTI_KEY_H
-#define NON_MULTI_KEY_H
+#ifndef NON_KEY_COMMAND_MANAGER_H
+#define NON_KEY_COMMAND_MANAGER_H
 
-#include "i_multi_key.h"
+#include "i_key_command_manager.h"
 
 namespace OHOS {
 namespace MMI {
-class NonMultiKey : public IMultiKey {
+class NonKeyCommandManager : public IKeyCommandManager {
 public:
     bool CheckLaunchAbility(const std::shared_ptr<KeyEvent> key);
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // NON_MULTI_KEY_H
+#endif // NON_KEY_COMMAND_MANAGER_H
