@@ -146,8 +146,8 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
 
     napi_value object = nullptr;
     CHKRV(cbTemp.env, napi_create_object(cbTemp.env, &object), "napi_create_object");
-    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "id", id), "napi_set_named_property");
-    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "name", name), "napi_set_named_property");
+    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "id", id), "napi_set_named_property id");
+    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "name", name), "napi_set_named_property name");
 
     uint32_t types = cbTemp.data.device->devcieType;
     std::vector<std::string> sources;
@@ -165,11 +165,13 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
               "napi_create_string_utf8");
         CHKRV(cbTemp.env, napi_set_element(cbTemp.env, devSources, index, value), "napi_set_element");
     }
-    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "sources", devSources), "napi_set_named_property");
+    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "sources", devSources),
+          "napi_set_named_property sources");
 
     napi_value axisRanges = nullptr;
     CHKRV(cbTemp.env, napi_create_array(cbTemp.env, &axisRanges), "napi_create_array");
-    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "axisRanges", axisRanges), "napi_set_named_property");
+    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "axisRanges", axisRanges),
+          "napi_set_named_property axisRanges");
 
     napi_value handlerTemp = nullptr;
     CHKRV(cbTemp.env, napi_get_reference_value(cbTemp.env, cbTemp.ref, &handlerTemp), "napi_get_reference_value");
@@ -195,8 +197,8 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
           "napi_create_string_utf8");
     napi_value object = nullptr;
     CHKRV(cbTemp.env, napi_create_object(cbTemp.env, &object), "napi_create_object");
-    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "id", id), "napi_set_named_property");
-    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "name", name), "napi_set_named_property");
+    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "id", id), "napi_set_named_property id");
+    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "name", name), "napi_set_named_property name");
 
     uint32_t types = cbTemp.data.device->devcieType;
     if (types == 0) {
@@ -205,7 +207,7 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     }
     std::vector<std::string> sources;
     for (const auto & item : g_deviceType) {
-        if (static_cast<uint32_t>(types) & item.typeBit) {
+        if (types & item.typeBit) {
             sources.push_back(item.deviceTypeName);
         }
     }
@@ -219,11 +221,13 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
               "napi_create_string_utf8");
         CHKRV(cbTemp.env, napi_set_element(cbTemp.env, devSources, index, value), "napi_set_element");
     }
-    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "sources", devSources), "napi_set_named_property");
+    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "sources", devSources),
+          "napi_set_named_property sources");
 
     napi_value axisRanges = nullptr;
     CHKRV(cbTemp.env, napi_create_array(cbTemp.env, &axisRanges), "napi_create_array");
-    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "axisRanges", axisRanges), "napi_set_named_property");
+    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "axisRanges", axisRanges),
+          "napi_set_named_property axisRanges");
     CHKRV(cbTemp.env, napi_resolve_deferred(cbTemp.env, cbTemp.deferred, object), "napi_resolve_deferred");
 }
 
