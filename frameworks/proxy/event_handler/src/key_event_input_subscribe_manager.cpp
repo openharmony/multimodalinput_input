@@ -62,7 +62,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
     }
     auto eventHandler = AppExecFwk::EventHandler::Current();
     if (eventHandler == nullptr) {
-        eventHandler = MEventHandler->GetSharedPtr();
+        eventHandler = InputMgrImp->GetEventHandler();
     }
     
     std::lock_guard<std::mutex> guard(mtx_);
@@ -115,17 +115,10 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
         MMI_HILOGE("Leave, the subscribe id is less than 0");
         return RET_ERR;
     }
-
-    int32_t pid = GetPid();
-    uint64_t tid = GetThisThreadId();
-    MMI_HILOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
 
     auto callMsgHandler = [this, event, subscribeId] () {
-        int32_t pid = GetPid();
-        uint64_t tid = GetThisThreadId();
-        MMI_HILOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
-        
+        CHK_PIDANDTID(callMsgHandler);
         std::lock_guard<std::mutex> guard(mtx_);
         auto obj = GetSubscribeKeyEvent(subscribeId);
         if (!obj) {
@@ -133,8 +126,8 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
             return;
         }
         obj->GetCallback()(event);
-        MMI_HILOGD("callMsgHandler key event callback id:%{public}d keyCode:%{public}d pid:%{public}d "
-            "threadId:%{public}" PRIu64, subscribeId, event->GetKeyCode(), pid, tid);
+        MMI_HILOGD("callMsgHandler key event callback id:%{public}d keyCode:%{public}d",
+            subscribeId, event->GetKeyCode());
     };
 
     std::lock_guard<std::mutex> guard(mtx_);
@@ -144,12 +137,8 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
         return RET_ERR;
     }
     auto eventHandler = obj->GetEventHandler();
-    if (eventHandler == nullptr) {
-        MMI_HILOGE("Event handler ptr = nullptr");
-        return RET_ERR;
-    }
-    bool ret = eventHandler->PostHighPriorityTask(callMsgHandler);
-    if (!ret) {
+    CHKPV(eventHandler);
+    if (!eventHandler->PostHighPriorityTask(callMsgHandler)) {
         MMI_HILOGE("post task failed");
         return RET_ERR;
     }

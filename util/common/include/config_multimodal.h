@@ -50,6 +50,8 @@ namespace MMI {
 #define MAX_THREAD_DEATH_TIME (6*1000)      // Thread death threshold time
 #define MMISEVER_WMS_DEVICE_ADDED 1         // notifyDeviceChange@Device added
 #define MMISEVER_WMS_DEVICE_REMOVE 2        // notifyDeviceChange@Device removed
+#define SEND_RETRY_LIMIT 32
+#define SEND_RETRY_SLEEP_TIME 10000
 } // namespace MMI
 } // namespace OHOS
 #endif // CONFIG_MULTIMODAL_H

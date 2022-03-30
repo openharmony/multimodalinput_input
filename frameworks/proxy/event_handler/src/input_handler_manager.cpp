@@ -34,7 +34,7 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
     std::shared_ptr<IInputEventConsumer> consumer)
 {
     CHKPR(consumer, INVALID_HANDLER_ID);
-    std::lock_guard<std::mutex> guard(lockHandlers_);
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
     if (inputHandlers_.size() >= MAX_N_INPUT_HANDLERS) {
         MMI_HILOGE("The number of handlers exceeds the maximum");
         return INVALID_HANDLER_ID;
@@ -57,7 +57,7 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
 void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType handlerType)
 {
     MMI_HILOGD("Unregister handler:%{public}d,type:%{public}d", handlerId, handlerType);
-    std::lock_guard<std::mutex> guard(lockHandlers_);
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
     if (RET_OK == RemoveLocal(handlerId, handlerType)) {
         MMI_HILOGD("Handler:%{public}d unregistered, report to server", handlerId);
         RemoveFromServer(handlerId, handlerType);
@@ -85,7 +85,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
 {
     auto eventHandler = AppExecFwk::EventHandler::Current();
     if (eventHandler == nullptr) {
-        eventHandler = MEventHandler->GetSharedPtr();
+        eventHandler = InputMgrImp->GetEventHandler();
     }
     InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,
@@ -175,28 +175,21 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
 {
     CHKPV(keyEvent);
     auto callMsgHandler = [this, keyEvent, handlerId] () {
-        int32_t pid = GetPid();
-        uint64_t tid = GetThisThreadId();
-        MMI_HILOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
-        
-        std::lock_guard<std::mutex> guard(lockHandlers_);
+        CHK_PIDANDTID(callMsgHandler);
+        std::lock_guard<std::mutex> guard(mtxHandlers_);
         auto consumer = FindHandler(handlerId);
         if (consumer == nullptr) {
             MMI_HILOGE("No handler found here. id:%{public}d", handlerId);
             return;
         }
         consumer->OnInputEvent(keyEvent);
-        MMI_HILOGD("callMsgHandler key event callback id:%{public}d keyCode:%{public}d pid:%{public}d "
-            "threadId:%{public}" PRIu64, handlerId, keyEvent->GetKeyCode(), pid, tid);
+        MMI_HILOGD("callMsgHandler key event callback id:%{public}d keyCode:%{public}d",
+            handlerId, keyEvent->GetKeyCode());
     };
-    std::lock_guard<std::mutex> guard(lockHandlers_);
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
     auto eventHandler = GetEventHandler(handlerId);
-    if (eventHandler == nullptr) {
-        MMI_HILOGE("Event handler ptr = nullptr");
-        return;
-    }
-    bool ret = eventHandler->PostHighPriorityTask(callMsgHandler);
-    if (!ret) {
+    CHKPV(eventHandler);
+    if (!eventHandler->PostHighPriorityTask(callMsgHandler)) {
         MMI_HILOGE("post task failed");
     }
 }
@@ -209,28 +202,21 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
     
     auto callMsgHandler = [this, pointerEvent, handlerId] () {
-        int32_t pid = GetPid();
-        uint64_t tid = GetThisThreadId();
-        MMI_HILOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
-        
-        std::lock_guard<std::mutex> guard(lockHandlers_);
+        CHK_PIDANDTID(callMsgHandler);
+        std::lock_guard<std::mutex> guard(mtxHandlers_);
         auto consumer = FindHandler(handlerId);
         if (consumer == nullptr) {
             MMI_HILOGE("No handler found here. id:%{public}d", handlerId);
             return;
         }
         consumer->OnInputEvent(pointerEvent);
-        MMI_HILOGD("callMsgHandler pointer event callback id:%{public}d pointerId:%{public}d pid:%{public}d "
-            "threadId:%{public}" PRIu64, handlerId, pointerEvent->GetPointerId(), pid, tid);
+        MMI_HILOGD("callMsgHandler pointer event callback id:%{public}d pointerId:%{public}d",
+            handlerId, pointerEvent->GetPointerId());
     };
-    std::lock_guard<std::mutex> guard(lockHandlers_);
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
     auto eventHandler = GetEventHandler(handlerId);
-    if (eventHandler == nullptr) {
-        MMI_HILOGE("Event handler ptr = nullptr");
-        return;
-    }
-    bool ret = eventHandler->PostHighPriorityTask(callMsgHandler);
-    if (!ret) {
+    CHKPV(eventHandler);
+    if (!eventHandler->PostHighPriorityTask(callMsgHandler)) {
         MMI_HILOGE("post task failed");
     }
 }
@@ -238,7 +224,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
 void InputHandlerManager::OnConnected()
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> guard(lockHandlers_);
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
     for (auto &inputHandler : inputHandlers_) {
         AddToServer(inputHandler.second.handlerId_, inputHandler.second.handlerType_);
     }

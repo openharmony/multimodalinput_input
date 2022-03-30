@@ -40,15 +40,6 @@ MMIEventHandler::~MMIEventHandler()
 {
 }
 
-EventHandlerPtr MMIEventHandler::GetInstance()
-{
-    static EventHandlerPtr instance_ = nullptr;
-    if (instance_ == nullptr) {
-        instance_ = std::make_shared<MMIEventHandler>();
-    }
-    return instance_;
-}
-
 const std::string& MMIEventHandler::GetErrorStr(ErrCode code) const
 {
     const static std::string defErrString = "Unknown event handler error!";
@@ -87,7 +78,7 @@ void MMIEventHandler::OnStop(const InnerEvent::Pointer &event)
 {
     CALL_LOG_ENTER;
     auto runner = GetEventRunner();
-    if (runner) {
+    if (runner != nullptr) {
         runner->Stop();
     }
     RemoveAllEvents();
@@ -107,7 +98,7 @@ void MMIEventHandler::ProcessEvent(const InnerEvent::Pointer &event)
             break;
         }
         default: {
-            MMI_HILOGE("Unknown event handler id:%{public}u", eventId);
+            MMI_HILOGW("Unknown event handler id:%{public}u", eventId);
             break;
         }
     }

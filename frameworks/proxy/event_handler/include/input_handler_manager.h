@@ -58,7 +58,7 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> GetEventHandler(int32_t handlerId);
 
 private:
-    std::mutex lockHandlers_;
+    std::mutex mtxHandlers_;
     std::map<int32_t, Handler> inputHandlers_;
     int32_t nextId_ { 1 };
 };

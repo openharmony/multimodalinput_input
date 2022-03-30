@@ -42,6 +42,8 @@ public:
     InputManagerImpl() = default;
 
     bool InitEventHandler();
+    EventHandlerPtr GetEventHandler();
+    
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
         const std::vector<LogicalDisplayInfo> &logicalDisplays);
     int32_t AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter);

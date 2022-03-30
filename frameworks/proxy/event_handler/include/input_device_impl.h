@@ -45,9 +45,18 @@ public:
 
 private:
     InputDeviceImpl() = default;
-    std::map<int32_t, std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)>> inputDevcices_;
-    std::map<int32_t, std::function<void(int32_t, std::vector<int32_t>)>> inputDevciceIds_;
-    std::mutex mtx_;
+    using FunInputDevInfo = std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)>;
+    using FunInputDevIds = std::function<void(int32_t, std::vector<int32_t>)>;
+    using DevInfo = std::pair<EventHandlerPtr, FunInputDevInfo>;
+    using DevIds = std::pair<EventHandlerPtr, FunInputDevIds>;
+    DevInfo* GetDeviceInfo(int32_t id) const;
+    DevIds* GetDeviceIds(int32_t id) const;
+
+    std::map<int32_t, DevInfo> inputDevcices_;
+    std::map<int32_t, DevIds> inputDevciceIds_;
+    // std::map<int32_t, std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)>> inputDevcices_;
+    // std::map<int32_t, std::function<void(int32_t, std::vector<int32_t>)>> inputDevciceIds_;
+    // std::mutex mtx_;
 };
 } // namespace MMI
 } // namespace OHOS

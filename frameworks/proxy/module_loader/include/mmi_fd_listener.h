@@ -23,7 +23,7 @@ namespace MMI {
 class MMIFdListener : public AppExecFwk::FileDescriptorListener {
 public:
     MMIFdListener(MMIClientPtr client);
-    virtual ~MMIFdListener();
+    virtual ~MMIFdListener() = default;
     DISALLOW_COPY_AND_MOVE(MMIFdListener);
 
     virtual void OnReadable(int32_t fd) override;
