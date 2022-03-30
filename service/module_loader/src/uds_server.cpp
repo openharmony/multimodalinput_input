@@ -65,7 +65,7 @@ int32_t UDSServer::GetClientFd(int32_t pid)
     std::lock_guard<std::mutex> lock(mux_);
     auto it = idxPidMap_.find(pid);
     if (it == idxPidMap_.end()) {
-        MMI_LOGE("find fd error, Invalid input parameter pid:%{public}d,errCode:%{public}d",
+        MMI_HILOGE("find fd error, Invalid input parameter pid:%{public}d,errCode:%{public}d",
             pid, SESSION_NOT_FOUND);
         return RET_ERR;
     }
@@ -77,7 +77,7 @@ int32_t UDSServer::GetClientPid(int32_t fd)
     std::lock_guard<std::mutex> lock(mux_);
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
-        MMI_LOGE("find pid error, Invalid input parameter fd:%{public}d,errCode:%{public}d",
+        MMI_HILOGE("find pid error, Invalid input parameter fd:%{public}d,errCode:%{public}d",
             fd, SESSION_NOT_FOUND);
         return RET_ERR;
     }
@@ -88,13 +88,13 @@ bool UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
 {
     std::lock_guard<std::mutex> lock(mux_);
     if (fd < 0) {
-        MMI_LOGE("fd is less than 0");
+        MMI_HILOGE("fd is less than 0");
         return false;
     }
     auto ses = GetSession(fd);
     if (ses == nullptr) {
-        MMI_LOGE("fd:%{public}d not found, The message was discarded. errCode:%{public}d",
-                 fd, SESSION_NOT_FOUND);
+        MMI_HILOGE("fd:%{public}d not found, The message was discarded. errCode:%{public}d",
+                   fd, SESSION_NOT_FOUND);
         return false;
     }
     return ses->SendMsg(pkt);
@@ -116,14 +116,14 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     int32_t sockFds[2] = {};
 
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockFds) != 0) {
-        MMI_LOGE("call socketpair fail, errno:%{public}d", errno);
+        MMI_HILOGE("call socketpair fail, errno:%{public}d", errno);
         return RET_ERR;
     }
 
     serverFd = sockFds[0];
     toReturnClientFd = sockFds[1];
     if (toReturnClientFd < 0) {
-        MMI_LOGE("call fcntl fail, errno:%{public}d", errno);
+        MMI_HILOGE("call fcntl fail, errno:%{public}d", errno);
         return RET_ERR;
     }
 
@@ -134,8 +134,8 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
     SetNonBlockMode(serverFd);
 
-    MMI_LOGD("alloc socketpair, serverFd:%{public}d,clientFd:%{public}d(%{public}d)",
-             serverFd, toReturnClientFd, sockFds[1]);
+    MMI_HILOGD("alloc socketpair, serverFd:%{public}d,clientFd:%{public}d(%{public}d)",
+               serverFd, toReturnClientFd, sockFds[1]);
     auto closeSocketFdWhenError = [&serverFd, &toReturnClientFd] {
         close(serverFd);
         close(toReturnClientFd);
@@ -156,14 +156,14 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     ret = AddEpoll(EPOLL_EVENT_SOCKET, serverFd);
     if (ret != RET_OK) {
         cleanTaskWhenError();
-        MMI_LOGE("epoll_ctl EPOLL_CTL_ADD return %{public}d,errCode:%{public}d", ret, EPOLL_MODIFY_FAIL);
+        MMI_HILOGE("epoll_ctl EPOLL_CTL_ADD return %{public}d,errCode:%{public}d", ret, EPOLL_MODIFY_FAIL);
         return ret;
     }
 
     SessionPtr sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
     if (sess == nullptr) {
         cleanTaskWhenError();
-        MMI_LOGE("make_shared fail. progName:%{public}s,pid:%{public}d,errCode:%{public}d",
+        MMI_HILOGE("make_shared fail. progName:%{public}s,pid:%{public}d,errCode:%{public}d",
             programName.c_str(), pid, MAKE_SHARED_FAIL);
         return RET_ERR;
     }
@@ -174,7 +174,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
 
     if (!AddSession(sess)) {
         cleanTaskWhenError();
-        MMI_LOGE("AddSession fail errCode:%{public}d", ADD_SESSION_FAIL);
+        MMI_HILOGE("AddSession fail errCode:%{public}d", ADD_SESSION_FAIL);
         return RET_ERR;
     }
     OnConnected(sess);
@@ -188,11 +188,11 @@ void UDSServer::AddPermission(SessionPtr sess)
     
     if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) ==
         Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
-        MMI_LOGD("get type flag is TOKEN_HAP");
+        MMI_HILOGD("get type flag is TOKEN_HAP");
         int32_t result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionMonitor);
-        MMI_LOGD("verify access result:%{public}d", result);
+        MMI_HILOGD("verify access result:%{public}d", result);
         if (result != Security::AccessToken::PERMISSION_GRANTED) {
-            MMI_LOGD("permission is not granted");
+            MMI_HILOGD("permission is not granted");
             sess->AddPermission(false);
         }
     }
@@ -218,17 +218,17 @@ void UDSServer::Dump(int32_t fd)
 
 void UDSServer::OnConnected(SessionPtr s)
 {
-    MMI_LOGI("session desc:%{public}s", s->GetDescript().c_str());
+    MMI_HILOGI("session desc:%{public}s", s->GetDescript().c_str());
 }
 
 void UDSServer::OnDisconnected(SessionPtr s)
 {
-    MMI_LOGI("session desc:%{public}s", s->GetDescript().c_str());
+    MMI_HILOGI("session desc:%{public}s", s->GetDescript().c_str());
 }
 
 int32_t UDSServer::AddEpoll(EpollEventType type, int32_t fd)
 {
-    MMI_LOGE("This information should not exist. Subclasses should implement this function.");
+    MMI_HILOGE("This information should not exist. Subclasses should implement this function.");
     return RET_ERR;
 }
 
@@ -249,7 +249,7 @@ void UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
 {
     CHKPV(buf);
     if (fd < 0) {
-        MMI_LOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
+        MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
         return;
     }
     auto sess = GetSession(fd);
@@ -259,29 +259,29 @@ void UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
     int32_t bufSize = static_cast<int32_t>(size);
     const int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
     if (bufSize < headSize) {
-        MMI_LOGE("The in parameter size less than headSize, errCode%{public}d", VAL_NOT_EXP);
+        MMI_HILOGE("The in parameter size less than headSize, errCode%{public}d", VAL_NOT_EXP);
         return;
     }
     while (bufSize > 0 && recvFun_) {
         if (bufSize < headSize) {
-            MMI_LOGE("The size less than headSize, errCode%{public}d", VAL_NOT_EXP);
+            MMI_HILOGE("The size less than headSize, errCode%{public}d", VAL_NOT_EXP);
             return;
         }
         auto head = (PackHead*)&buf[readIdx];
         if (head->size >= bufSize) {
-            MMI_LOGE("The head->size more or equal than size, errCode:%{public}d", VAL_NOT_EXP);
+            MMI_HILOGE("The head->size more or equal than size, errCode:%{public}d", VAL_NOT_EXP);
             return;
         }
         packSize = headSize + head->size;
         if (bufSize < packSize) {
-            MMI_LOGE("The size less than packSize, errCode:%{public}d", VAL_NOT_EXP);
+            MMI_HILOGE("The size less than packSize, errCode:%{public}d", VAL_NOT_EXP);
             return;
         }
         
         NetPacket pkt(head->idMsg);
         if (head->size > 0) {
             if (!pkt.Write(&buf[readIdx + headSize], static_cast<size_t>(head->size))) {
-                MMI_LOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+                MMI_HILOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
                 return;
             }
         }
@@ -300,12 +300,12 @@ void UDSServer::OnEvent(const struct epoll_event& ev, std::map<int32_t, StreamBu
 {
     constexpr size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
     if (maxCount <= 0) {
-        MMI_LOGE("The maxCount value is error, errCode:%{public}d", VAL_NOT_EXP);
+        MMI_HILOGE("The maxCount value is error, errCode:%{public}d", VAL_NOT_EXP);
         return;
     }
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGD("fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
+        MMI_HILOGD("fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
         auto secPtr = GetSession(fd);
         if (secPtr) {
             OnDisconnected(secPtr);
@@ -318,7 +318,7 @@ void UDSServer::OnEvent(const struct epoll_event& ev, std::map<int32_t, StreamBu
     if (fd != IMultimodalInputConnect::INVALID_SOCKET_FD && (ev.events & EPOLLIN)) {
         auto bufData = &bufMap[fd];
         if (bufData->isOverflow) {
-            MMI_LOGE("StreamBuffer full or write error, Data discarded errCode:%{public}d",
+            MMI_HILOGE("StreamBuffer full or write error, Data discarded errCode:%{public}d",
                 STREAMBUFF_OVER_FLOW);
             return;
         }
@@ -343,17 +343,17 @@ void UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct ep
 {
     constexpr size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
     if (maxCount <= 0) {
-        MMI_LOGE("The maxCount value is error, errCode:%{public}d", VAL_NOT_EXP);
+        MMI_HILOGE("The maxCount value is error, errCode:%{public}d", VAL_NOT_EXP);
         return;
     }
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int32_t*>(ev.data.ptr);
     if (fd < 0) {
-        MMI_LOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
+        MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
         return;
     }
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGD("EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
+        MMI_HILOGD("EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
         auto secPtr = GetSession(fd);
         if (secPtr != nullptr) {
             OnDisconnected(secPtr);
@@ -365,13 +365,13 @@ void UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct ep
     } else if (ev.events & EPOLLIN) {
         auto bufData = &bufMap[fd];
         if (bufData->isOverflow) {
-            MMI_LOGE("StreamBuffer full or write error, Data discarded errCode:%{public}d",
+            MMI_HILOGE("StreamBuffer full or write error, Data discarded errCode:%{public}d",
                 STREAMBUFF_OVER_FLOW);
             return;
         }
         char szBuf[MAX_PACKET_BUF_SIZE] = {};
         for (size_t j = 0; j < maxCount; j++) {
-            auto size = read(fd, (void*)szBuf, MAX_PACKET_BUF_SIZE);
+            auto size = recv(fd, (void*)szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
 #ifdef OHOS_BUILD_HAVE_DUMP_DATA
             DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
 #endif
@@ -388,10 +388,11 @@ void UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct ep
 
 void UDSServer::DumpSession(const std::string &title)
 {
-    MMI_LOGD("in %s: %s", __func__, title.c_str());
+    MMI_HILOGD("in %s: %s", __func__, title.c_str());
     int32_t i = 0;
-    for (auto& r : sessionsMap_) {
-        MMI_LOGD("%d, %s", i, r.second->GetDescript().c_str());
+    for (auto& [key, value] : sessionsMap_) {
+        CHKPV(value);
+        MMI_HILOGD("%d, %s", i, value->GetDescript().c_str());
         i++;
     }
 }
@@ -402,43 +403,41 @@ SessionPtr UDSServer::GetSession(int32_t fd) const
     if (it == sessionsMap_.end()) {
         return nullptr;
     }
-    if (it->second == nullptr) {
-        return nullptr;
-    }
+    CHKPP(it->second);
     return it->second->GetPtr();
 }
 
 bool UDSServer::AddSession(SessionPtr ses)
 {
     CHKPF(ses);
-    MMI_LOGD("pid:%{public}d,fd:%{public}d", ses->GetPid(), ses->GetFd());
+    MMI_HILOGD("pid:%{public}d,fd:%{public}d", ses->GetPid(), ses->GetFd());
     auto fd = ses->GetFd();
     if (fd < 0) {
-        MMI_LOGE("fd is less than 0");
+        MMI_HILOGE("fd is less than 0");
         return false;
     }
     auto pid = ses->GetPid();
     if (pid <= 0) {
-        MMI_LOGE("Get process faild");
+        MMI_HILOGE("Get process faild");
         return false;
     }
     idxPidMap_[pid] = fd;
     sessionsMap_[fd] = ses;
     DumpSession("AddSession");
     if (sessionsMap_.size() > MAX_SESSON_ALARM) {
-        MMI_LOGW("Too many clients. Warning Value:%{public}d,Current Value:%{public}zd",
-                 MAX_SESSON_ALARM, sessionsMap_.size());
+        MMI_HILOGW("Too many clients. Warning Value:%{public}d,Current Value:%{public}zd",
+                   MAX_SESSON_ALARM, sessionsMap_.size());
     }
-    MMI_LOGI("AddSession end");
+    MMI_HILOGI("AddSession end");
     return true;
 }
 
 void UDSServer::DelSession(int32_t fd)
 {
     CALL_LOG_ENTER;
-    MMI_LOGD("fd:%{public}d", fd);
+    MMI_HILOGD("fd:%{public}d", fd);
     if (fd < 0) {
-        MMI_LOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
+        MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
         return;
     }
     auto pid = GetClientPid(fd);
@@ -459,10 +458,10 @@ void UDSServer::OnThread()
     SetThreadName(std::string("uds_server"));
     uint64_t tid = GetThisThreadId();
     if (tid <= 0) {
-        MMI_LOGE("The tid value is error, errCode:%{public}d", VAL_NOT_EXP);
+        MMI_HILOGE("The tid value is error, errCode:%{public}d", VAL_NOT_EXP);
         return;
     }
-    MMI_LOGD("tid:%{public}" PRId64 "", tid);
+    MMI_HILOGD("tid:%{public}" PRId64 "", tid);
 
     std::map<int32_t, StreamBufData> bufMap;
     struct epoll_event ev[MAX_EVENT_SIZE] = {};

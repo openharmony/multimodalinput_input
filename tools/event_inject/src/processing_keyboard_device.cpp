@@ -30,7 +30,7 @@ int32_t ProcessingKeyboardDevice::TransformJsonDataToInputData(const Json& finge
     }
     Json inputData = fingerEventArrays.at("events");
     if (inputData.empty()) {
-        MMI_LOGE("manage KeyBoard array faild, inputData is empty.");
+        MMI_HILOGE("manage KeyBoard array faild, inputData is empty.");
         return RET_ERR;
     }
     std::vector<KeyBoardEvent> keyBoardEventArray;
@@ -54,7 +54,7 @@ void ProcessingKeyboardDevice::TransformKeyBoardEventToInputEvent(const std::vec
         } else if (item.eventType == "KEY_EVENT_LONG_PRESS") {
             TransformKeyLongPressEvent(item, inputEventArray);
         } else {
-            MMI_LOGW("json file format error");
+            MMI_HILOGW("json file format error");
         }
     }
 }

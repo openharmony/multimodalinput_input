@@ -41,7 +41,7 @@ void StreamBuffer::Clean()
     rwErrorStatus_ = ErrorStatus::ERROR_STATUS_OK;
     errno_t ret = memset_sp(&szBuff_, sizeof(szBuff_), 0, sizeof(szBuff_));
     if (ret != EOK) {
-        MMI_LOGE("call memset_s fail");
+        MMI_HILOGE("call memset_s fail");
         return;
     }
 }
@@ -49,7 +49,7 @@ void StreamBuffer::Clean()
 bool StreamBuffer::SetReadIdx(int32_t idx)
 {
     if (idx > wIdx_) {
-        MMI_LOGE("Invalid parameter input");
+        MMI_HILOGE("Invalid parameter input");
         return false;
     }
     rIdx_ = idx;
@@ -59,7 +59,7 @@ bool StreamBuffer::SetReadIdx(int32_t idx)
 bool StreamBuffer::Read(std::string &buf)
 {
     if (rIdx_ == wIdx_) {
-        MMI_LOGE("Not enough memory to read, errCode:%{public}d", MEM_NOT_ENOUGH);
+        MMI_HILOGE("Not enough memory to read, errCode:%{public}d", MEM_NOT_ENOUGH);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
@@ -89,23 +89,23 @@ bool StreamBuffer::Read(char *buf, size_t size)
         return false;
     }
     if (buf == nullptr) {
-        MMI_LOGE("Invalid input parameter buf=nullptr errCode:%{public}d", ERROR_NULL_POINTER);
+        MMI_HILOGE("Invalid input parameter buf=nullptr errCode:%{public}d", ERROR_NULL_POINTER);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
     if (size == 0) {
-        MMI_LOGE("Invalid input parameter size=%{public}zu errCode:%{public}d", size, PARAM_INPUT_INVALID);
+        MMI_HILOGE("Invalid input parameter size=%{public}zu errCode:%{public}d", size, PARAM_INPUT_INVALID);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
     if (rIdx_ + static_cast<int32_t>(size) > wIdx_) {
-        MMI_LOGE("Memory out of bounds on read... errCode:%{public}d", MEM_OUT_OF_BOUNDS);
+        MMI_HILOGE("Memory out of bounds on read... errCode:%{public}d", MEM_OUT_OF_BOUNDS);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
     errno_t ret = memcpy_sp(buf, size, ReadBuf(), size);
     if (ret != EOK) {
-        MMI_LOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+        MMI_HILOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
@@ -120,23 +120,23 @@ bool StreamBuffer::Write(const char *buf, size_t size)
         return false;
     }
     if (buf == nullptr) {
-        MMI_LOGE("Invalid input parameter buf=nullptr errCode:%{public}d", ERROR_NULL_POINTER);
+        MMI_HILOGE("Invalid input parameter buf=nullptr errCode:%{public}d", ERROR_NULL_POINTER);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
     if (size == 0) {
-        MMI_LOGE("Invalid input parameter size=%{public}zu errCode:%{public}d", size, PARAM_INPUT_INVALID);
+        MMI_HILOGE("Invalid input parameter size=%{public}zu errCode:%{public}d", size, PARAM_INPUT_INVALID);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
     if (wIdx_ + static_cast<int32_t>(size) >= MAX_STREAM_BUF_SIZE) {
-        MMI_LOGE("The write length exceeds buffer. errCode:%{public}d", MEM_OUT_OF_BOUNDS);
+        MMI_HILOGE("The write length exceeds buffer. errCode:%{public}d", MEM_OUT_OF_BOUNDS);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
     errno_t ret = memcpy_sp(&szBuff_[wIdx_], static_cast<size_t>(MAX_STREAM_BUF_SIZE - wIdx_), buf, size);
     if (ret != EOK) {
-        MMI_LOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+        MMI_HILOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
@@ -161,7 +161,7 @@ size_t StreamBuffer::Size() const
 size_t StreamBuffer::UnreadSize() const
 {
     if (wIdx_ < rIdx_) {
-        MMI_LOGW("Widx_ less than ridx_, wIdx_:%{public}d,rIdx_:%{public}d", wIdx_, rIdx_);
+        MMI_HILOGW("Widx_ less than ridx_, wIdx_:%{public}d,rIdx_:%{public}d", wIdx_, rIdx_);
         return 0;
     }
     return static_cast<size_t>(wIdx_ - rIdx_);

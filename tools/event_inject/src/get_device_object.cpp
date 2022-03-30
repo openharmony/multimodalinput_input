@@ -70,7 +70,7 @@ DeviceBase* GetDeviceObject::CreateDeviceObject(const std::string deviceName)
         deviceBasePtr = new (std::nothrow) ProcessingMouseDevice();
         CHKPP(deviceBasePtr);
     } else {
-        MMI_LOGI("Not supported device :%s", deviceName.c_str());
+        MMI_HILOGI("Not supported device :%s", deviceName.c_str());
     }
 
     return deviceBasePtr;

@@ -81,9 +81,9 @@ void TouchPadTransformPointProcessor::OnEventTouchPadMotion(struct libinput_even
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     PointerEvent::PointerItem item;
     if (!pointerEvent_->GetPointerItem(seatSlot, item)) {
-        MMI_LOGE("Can't find the pointer item data, seatSlot:%{public}d, errCode:%{public}d",
-                 seatSlot, PARAM_INPUT_FAIL);
-                 return;
+        MMI_HILOGE("Can't find the pointer item data, seatSlot:%{public}d, errCode:%{public}d",
+                   seatSlot, PARAM_INPUT_FAIL);
+        return;
     }
     item.SetGlobalX(static_cast<int32_t>(logicalX));
     item.SetGlobalY(static_cast<int32_t>(logicalY));
@@ -107,9 +107,9 @@ void TouchPadTransformPointProcessor::OnEventTouchPadUp(struct libinput_event *e
 
     PointerEvent::PointerItem item;
     if (!pointerEvent_->GetPointerItem(seatSlot, item)) {
-        MMI_LOGE("Can't find the pointer item data, seatSlot:%{public}d, errCode:%{public}d",
-                 seatSlot, PARAM_INPUT_FAIL);
-                 return;
+        MMI_HILOGE("Can't find the pointer item data, seatSlot:%{public}d, errCode:%{public}d",
+                   seatSlot, PARAM_INPUT_FAIL);
+        return;
     }
     item.SetPressed(false);
     item.SetGlobalX(static_cast<int32_t>(logicalX));

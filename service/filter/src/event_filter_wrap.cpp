@@ -48,7 +48,7 @@ bool EventFilterWrap::HandlePointerEventFilter(std::shared_ptr<PointerEvent> poi
     std::lock_guard<std::mutex> guard(lockFilter_);
     CHKPF(filter_);
     if (filter_->HandlePointerEvent(point)) {
-        MMI_LOGD("call HandlePointerEvent return true");
+        MMI_HILOGD("call HandlePointerEvent return true");
         return true;
     }
     return false;

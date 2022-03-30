@@ -30,7 +30,7 @@ int32_t ProcessingMouseDevice::TransformJsonDataToInputData(const Json& fingerEv
     }
     Json inputData = fingerEventArrays.at("events");
     if (inputData.empty()) {
-        MMI_LOGE("manage KeyBoard array faild, inputData is empty.");
+        MMI_HILOGE("manage KeyBoard array faild, inputData is empty.");
         return RET_ERR;
     }
     std::vector<MouseEvent> mouseEventArray;
@@ -58,7 +58,7 @@ void ProcessingMouseDevice::TransformMouseEventToInputEvent(const std::vector<Mo
         } else if (item.eventType == "MOUSE_EVENT_HWHEEL") {
             TransformMouseHwheelEvent(item, inputEventArray);
         } else {
-            MMI_LOGW("json file format error");
+            MMI_HILOGW("json file format error");
         }
     }
 }

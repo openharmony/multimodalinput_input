@@ -37,12 +37,12 @@ void HdfDeviceEventManager::ConnectHDFInit()
 {
     int32_t ret = GetInputInterface(&inputInterface_);
     if (ret != 0) {
-        MMI_LOGE("Initialize fail");
+        MMI_HILOGE("Initialize fail");
         return;
     }
 
     if (inputInterface_ == nullptr || inputInterface_->iInputManager == nullptr) {
-        MMI_LOGE("inputInterface_ or iInputManager is nullptr");
+        MMI_HILOGE("inputInterface_ or iInputManager is nullptr");
         return;
     }
 
@@ -51,13 +51,13 @@ void HdfDeviceEventManager::ConnectHDFInit()
     if ((ret == INPUT_SUCCESS) && (inputInterface_->iInputReporter != nullptr)) {
         ret = inputInterface_->iInputManager->GetInputDevice(TOUCH_DEV_ID, &iDevInfo_);
         if (ret != INPUT_SUCCESS) {
-            MMI_LOGE("GetInputDevice error");
+            MMI_HILOGE("GetInputDevice error");
             return;
         }
         std::unique_ptr<HdfDeviceEventDispatch> hdf = std::make_unique<HdfDeviceEventDispatch>(\
             iDevInfo_->attrSet.axisInfo[ABS_MT_POSITION_X].max, iDevInfo_->attrSet.axisInfo[ABS_MT_POSITION_Y].max);
         if (hdf == nullptr) {
-            MMI_LOGE("hdf is nullptr");
+            MMI_HILOGE("hdf is nullptr");
             return;
         }
         callback_.EventPkgCallback = hdf->GetEventCallbackDispatch;

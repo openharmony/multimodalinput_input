@@ -39,12 +39,12 @@ UDSClient::~UDSClient()
 int32_t UDSClient::ConnectTo()
 {
     if (Socket() < 0) {
-        MMI_LOGE("Socket failed");
+        MMI_HILOGE("Socket failed");
         return RET_ERR;
     }
     if (epollFd_ < 0) {
         if (EpollCreat(MAX_EVENT_SIZE) < 0) {
-            MMI_LOGE("Epoll creat failed");
+            MMI_HILOGE("Epoll creat failed");
             return RET_ERR;
         }
     }
@@ -54,7 +54,7 @@ int32_t UDSClient::ConnectTo()
     ev.events = EPOLLIN;
     ev.data.fd = fd_;
     if (EpollCtl(fd_, EPOLL_CTL_ADD, ev) < 0) {
-        MMI_LOGE("EpollCtl failed");
+        MMI_HILOGE("EpollCtl failed");
         return RET_ERR;
     }
     OnConnected();
@@ -65,25 +65,44 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
     if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
-        MMI_LOGE("Stream buffer size out of range");
+        MMI_HILOGE("Stream buffer size out of range");
         return false;
     }
     if (fd_ < 0) {
-        MMI_LOGE("fd_ is less than 0");
+        MMI_HILOGE("fd_ is less than 0");
         return false;
     }
-    ssize_t ret = write(fd_, static_cast<const void *>(buf), size);
-    if (ret < 0) {
-        MMI_LOGE("SendMsg write errCode:%{public}d,return %{public}zd", MSG_SEND_FAIL, ret);
-        return false;
+
+    int32_t retryTimes = 32;
+    while (size > 0 && retryTimes > 0) {
+        retryTimes--;
+        auto count = send(fd_, buf, size, MSG_DONTWAIT | MSG_NOSIGNAL);
+        if (count < 0) {
+            if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
+                MMI_HILOGW("send msg failed, errno:%{public}d", errno);
+                continue;
+            }
+            MMI_HILOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
+            return false;
+        }
+
+        size_t ucount = static_cast<size_t>(count);
+        if (ucount >= size) {
+            return true;
+        }
+        size -= ucount;
+        buf += ucount;
+        int32_t sleepTime = 10000;
+        usleep(sleepTime);
     }
-    return true;
+    MMI_HILOGE("send msg failed");
+    return false;
 }
 
 bool UDSClient::SendMsg(const NetPacket& pkt) const
 {
     if (pkt.ChkRWError()) {
-        MMI_LOGE("Read and write status is error");
+        MMI_HILOGE("Read and write status is error");
         return false;
     }
     StreamBuffer buf;
@@ -98,20 +117,20 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
     isRunning_ = true;
     isConnected_ = true;
     if (ConnectTo() < 0) {
-        MMI_LOGW("Client connection failed, Try again later");
+        MMI_HILOGW("Client connection failed, Try again later");
         isConnected_ = false;
 
         if (IsFirstConnectFailExit()) {
-            MMI_LOGE("first connection faild");
+            MMI_HILOGE("first connection faild");
             return false;
         }
     }
     t_ = std::thread(std::bind(&UDSClient::OnThread, this));
     if (detachMode) {
-        MMI_LOGW("uds client thread detach");
+        MMI_HILOGW("uds client thread detach");
         t_.detach();
     } else {
-        MMI_LOGW("uds client thread join");
+        MMI_HILOGW("uds client thread join");
     }
     return true;
 }
@@ -127,7 +146,7 @@ void UDSClient::Stop()
     }
     EpollClose();
     if (t_.joinable()) {
-        MMI_LOGD("thread join");
+        MMI_HILOGD("thread join");
         t_.join();
     }
 }
@@ -140,17 +159,17 @@ void UDSClient::OnRecv(const char *buf, size_t size)
     int32_t bufSize = static_cast<int32_t>(size);
     const int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
     if (bufSize < headSize) {
-        MMI_LOGE("The in parameter size is error, errCode:%{public}d", VAL_NOT_EXP);
+        MMI_HILOGE("The in parameter size is error, errCode:%{public}d", VAL_NOT_EXP);
         return;
     }
     while (bufSize > 0 && recvFun_) {
         if (bufSize < headSize) {
-            MMI_LOGE("The size is less than headSize, errCode:%{public}d", VAL_NOT_EXP);
+            MMI_HILOGE("The size is less than headSize, errCode:%{public}d", VAL_NOT_EXP);
             return;
         }
         auto head = reinterpret_cast<PackHead *>(const_cast<char *>(&buf[readIdx]));
         if (head->size < 0 || head->size >= bufSize) {
-            MMI_LOGE("Head size is error, head->size:%{public}d, errCode:%{public}d", head->size, VAL_NOT_EXP);
+            MMI_HILOGE("Head size is error, head->size:%{public}d, errCode:%{public}d", head->size, VAL_NOT_EXP);
             return;
         }
         packSize = headSize + head->size;
@@ -158,7 +177,7 @@ void UDSClient::OnRecv(const char *buf, size_t size)
         NetPacket pkt(head->idMsg);
         if (head->size > 0) {
             if (!pkt.Write(&buf[readIdx + headSize], static_cast<size_t>(head->size))) {
-                MMI_LOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+                MMI_HILOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
                 return;
             }
         }
@@ -172,7 +191,7 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
 {
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGI("ev.events:0x%{public}x,fd:%{public}d same as fd_:%{public}d", ev.events, fd, fd_);
+        MMI_HILOGI("ev.events:0x%{public}x,fd:%{public}d same as fd_:%{public}d", ev.events, fd, fd_);
         OnDisconnected();
         struct epoll_event event = {};
         EpollCtl(fd, EPOLL_CTL_DEL, event);
@@ -185,24 +204,24 @@ void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
     const size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
     if (maxCount <= 0) {
-        MMI_LOGE("The maxCount is error, maxCount:%{public}zu, errCode:%{public}d", maxCount, VAL_NOT_EXP);
+        MMI_HILOGE("The maxCount is error, maxCount:%{public}zu, errCode:%{public}d", maxCount, VAL_NOT_EXP);
     }
     auto isoverflow = false;
     for (size_t j = 0; j < maxCount; j++) {
-        auto size = read(fd, static_cast<void *>(szBuf), MAX_PACKET_BUF_SIZE);
+        auto size = recv(fd, static_cast<void *>(szBuf), MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size < 0) {
-            MMI_LOGE("size:%{public}zu", size);
+            MMI_HILOGE("size:%{public}zu", size);
             return;
         }
         if (size > 0) {
             if (!buf.Write(szBuf, size)) {
                 isoverflow = true;
-                MMI_LOGW("size:%{public}zu", size);
+                MMI_HILOGW("size:%{public}zu", size);
                 break;
             }
         }
         if (size < MAX_PACKET_BUF_SIZE) {
-            MMI_LOGW("size:%{public}zu", size);
+            MMI_HILOGW("size:%{public}zu", size);
             break;
         }
         if (isoverflow) {
@@ -231,8 +250,8 @@ void UDSClient::OnThread()
             }
         } else {
             if (ConnectTo() < 0) {
-                MMI_LOGW("Client reconnection failed, Try again after %{public}d ms",
-                         CLIENT_RECONNECT_COOLING_TIME);
+                MMI_HILOGW("Client reconnection failed, Try again after %{public}d ms",
+                           CLIENT_RECONNECT_COOLING_TIME);
                 std::this_thread::sleep_for(std::chrono::milliseconds(CLIENT_RECONNECT_COOLING_TIME));
                 continue;
             }
@@ -243,7 +262,7 @@ void UDSClient::OnThread()
 
         if (isToExit_) {
             isRunning_ = false;
-            MMI_LOGW("Client thread exit");
+            MMI_HILOGW("Client thread exit");
             break;
         }
     }
