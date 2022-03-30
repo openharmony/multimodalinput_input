@@ -34,10 +34,9 @@ using EventHandlerPtr = std::shared_ptr<MMIEventHandler>;
 class MMIEventHandler : public AppExecFwk::EventHandler {
 public:
     MMIEventHandler();
-    explicit MMIEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner, MMIClientPtr client);
+    MMIEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner, MMIClientPtr client);
     virtual ~MMIEventHandler();
     DISALLOW_COPY_AND_MOVE(MMIEventHandler);
-    static EventHandlerPtr GetInstance();
 
     const std::string& GetErrorStr(ErrCode code) const;
     EventHandlerPtr GetSharedPtr();
@@ -54,5 +53,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#define MEventHandler OHOS::MMI::MMIEventHandler::GetInstance()
 #endif // MMI_EVENT_HANDLER_H

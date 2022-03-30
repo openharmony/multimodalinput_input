@@ -108,6 +108,12 @@ namespace MMI {
         } \
     } while (0)
 
+#define CHK_PIDANDTID(title) \
+    do { \
+        MMI_HILOGD("%{public}s, (%{public}d), %{public}s pid:%{public}d threadId:%{public}" PRIu64, \
+            __FILE__, __LINE__, #title, GetPid(), GetThisThreadId()); \
+    } while (0)
+
 #else // DEBUG_CODE_TEST
 #define CHKPL(cond) \
     do { \
@@ -169,6 +175,11 @@ namespace MMI {
         if (!(cond)) { \
             MMI_HILOGE("CK(%{public}s), errCode:%{public}d", #cond, ec); \
         } \
+    } while (0)
+
+#define CHK_PIDANDTID(title) \
+    do { \
+        MMI_HILOGD("%{public}s pid:%{public}d threadId:%{public}" PRIu64, #title, GetPid(), GetThisThreadId()); \
     } while (0)
 
 #endif

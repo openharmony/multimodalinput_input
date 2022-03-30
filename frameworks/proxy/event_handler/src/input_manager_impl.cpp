@@ -69,25 +69,27 @@ bool InputManagerImpl::InitEventHandler()
         MMI_HILOGE("Repeated initialization operations");
         return false;
     }
-    constexpr int32_t WAIT_FOR_TIMEOUT = 3;
+    constexpr int32_t outTime = 3;
     std::unique_lock <std::mutex> lck(mtx_);
     ehThread_ = std::thread(std::bind(&InputManagerImpl::OnThread, this));
     ehThread_.detach();
-    if (cv_.wait_for(lck, std::chrono::seconds(WAIT_FOR_TIMEOUT)) == std::cv_status::timeout) {
+    if (cv_.wait_for(lck, std::chrono::seconds(outTime)) == std::cv_status::timeout) {
         MMI_HILOGE("EventThandler thread start timeout");
         return false;
     }
     return true;
 }
 
+EventHandlerPtr InputManagerImpl::GetEventHandler()
+{
+    return mmiEventHandler_->GetSharedPtr();
+}
+
 void InputManagerImpl::OnThread()
 {
     CALL_LOG_ENTER;
+    CHK_PIDANDTID(InputManager);
     SetThreadName("mmi_client_EventHdr");
-    int32_t pid = GetPid();
-    uint64_t tid = GetThisThreadId();
-    MMI_HILOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
-
     mmiEventHandler_ = std::make_shared<MMIEventHandler>();
     CHKPF(mmiEventHandler_);
     auto eventRunner = mmiEventHandler_->GetEventRunner();
@@ -151,7 +153,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     consumer_ = inputEventConsumer;
     eventHandler_ = AppExecFwk::EventHandler::Current();
     if (eventHandler_ == nullptr) {
-        eventHandler_ = MEventHandler->GetSharedPtr();
+        eventHandler_ = InputMgrImp->GetEventHandler();
     }
 }
 
@@ -159,28 +161,17 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_LOG_ENTER;
     CHKPV(keyEvent);
+    CHKPV(eventHandler_);
     std::lock_guard<std::mutex> guard(mtx_);
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
 
     auto callMsgHandler = [this, keyEvent] () {
-        int32_t pid = GetPid();
-        uint64_t tid = GetThisThreadId();
-        MMI_HILOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
-        
-        if (consumer_ == nullptr) {
-            MMI_HILOGE("consumer ptr = nullptr");
-            return;
-        }
+        CHK_PIDANDTID(callMsgHandler);
+        CHKPV(consumer_);
         consumer_->OnInputEvent(keyEvent);
-        MMI_HILOGD("callMsgHandler key event callback keyCode:%{public}d pid:%{public}d threadId:%{public}" PRIu64,
-            keyEvent->GetKeyCode(), pid, tid);
+        MMI_HILOGD("callMsgHandler key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
     };
-    if (eventHandler_ == nullptr) {
-        MMI_HILOGE("Event handler ptr = nullptr");
-        return;
-    }
-    bool ret = eventHandler_->PostHighPriorityTask(callMsgHandler);
-    if (!ret) {
+    if (!eventHandler_->PostHighPriorityTask(callMsgHandler)) {
         MMI_HILOGE("post task failed");
     }
 }
@@ -189,28 +180,17 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
 {
     MMI_HILOGD("Pointer event received, processing");
     CHKPV(pointerEvent);
+    CHKPV(eventHandler_);
     std::lock_guard<std::mutex> guard(mtx_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
 
     auto callMsgHandler = [this, pointerEvent] () {
-        int32_t pid = GetPid();
-        uint64_t tid = GetThisThreadId();
-        MMI_HILOGI("callMsgHandler pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
-        
-        if (consumer_ == nullptr) {
-            MMI_HILOGE("consumer ptr = nullptr");
-            return;
-        }
+        CHK_PIDANDTID(callMsgHandler);
+        CHKPV(consumer_);
         consumer_->OnInputEvent(pointerEvent);
-        MMI_HILOGD("callMsgHandler pointer event callback pointerId:%{public}d pid:%{public}d "
-            "threadId:%{public}" PRIu64, pointerEvent->GetPointerId(), pid, tid);
+        MMI_HILOGD("callMsgHandler pointer event callback pointerId:%{public}d", pointerEvent->GetPointerId());
     };
-    if (eventHandler_ == nullptr) {
-        MMI_HILOGE("Event handler ptr = nullptr");
-        return;
-    }
-    bool ret = eventHandler_->PostHighPriorityTask(callMsgHandler);
-    if (!ret) {
+    if (!eventHandler_->PostHighPriorityTask(callMsgHandler)) {
         MMI_HILOGE("post task failed");
     }
 }

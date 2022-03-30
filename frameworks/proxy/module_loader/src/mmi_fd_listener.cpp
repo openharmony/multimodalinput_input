@@ -32,10 +32,6 @@ MMIFdListener::MMIFdListener(MMIClientPtr client) : mmiClient_(client)
 {
 }
 
-MMIFdListener::~MMIFdListener()
-{
-}
-
 void MMIFdListener::OnReadable(int32_t fd)
 {
     if (fd < 0) {
@@ -54,9 +50,14 @@ void MMIFdListener::OnReadable(int32_t fd)
     }
     for (int32_t i = 0; i < maxCount; i++) {
         auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, SOCKET_FLAGS);
-        if (size < 0) {
-            int32_t eno = errno;
-            if (eno == EAGAIN || eno == EINTR || eno == EWOULDBLOCK) {
+        if (size > 0) {
+            if (!buf.Write(szBuf, size)) {
+                MMI_HILOGE("write error or buffer overflow,count:%{}d size:%{}zu", i, size);
+                isoverflow = true;
+                break;
+            }
+        } else if (size < 0) {
+            if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
                 MMI_HILOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK");
                 continue;
             }
@@ -66,12 +67,6 @@ void MMIFdListener::OnReadable(int32_t fd)
             MMI_HILOGD("[Do nothing here]The service side disconnect with the client. size:0 count:%{public}d "
                 "errno:%{public}d", i, errno);
             break;
-        } else if (size > 0) {
-            if (!buf.Write(szBuf, size)) {
-                MMI_HILOGE("write error or buffer overflow,count:%{}d size:%{}zu", i, size);
-                isoverflow = true;
-                break;
-            }
         }
         if (size < MAX_PACKET_BUF_SIZE) {
             break;
@@ -84,9 +79,7 @@ void MMIFdListener::OnReadable(int32_t fd)
 
 void MMIFdListener::OnShutdown(int32_t fd)
 {
-    int32_t pid = GetPid();
-    uint64_t tid = GetThisThreadId();
-    MMI_HILOGD("enter. fd:%{public}d pid:%{public}d tid:%{public}" PRIu64, fd, pid, tid);
+    CHK_PIDANDTID(FdListener);
     if (fd < 0) {
         MMI_HILOGE("Invalid fd:%{public}d", fd);
     }
@@ -96,9 +89,7 @@ void MMIFdListener::OnShutdown(int32_t fd)
 
 void MMIFdListener::OnException(int32_t fd)
 {
-    int32_t pid = GetPid();
-    uint64_t tid = GetThisThreadId();
-    MMI_HILOGD("enter. fd:%{public}d pid:%{public}d tid:%{public}" PRIu64, fd, pid, tid);
+    CHK_PIDANDTID(FdListener);
     if (fd < 0) {
         MMI_HILOGE("Invalid fd:%{public}d", fd);
     }

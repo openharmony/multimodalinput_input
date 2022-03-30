@@ -58,7 +58,8 @@ protected:
     ConnectCallback funConnected_;
     ConnectCallback funDisconnected_;
 
-    std::thread ehThread_;
+    std::mutex mtx_;
+    std::condition_variable cv_;
     std::thread recvThread_;
     std::shared_ptr<MMIEventHandler> recvEventHandler_ = nullptr;
 };

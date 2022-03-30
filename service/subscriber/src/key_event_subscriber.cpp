@@ -99,6 +99,7 @@ bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 void KeyEventSubscriber::InsertSubScriber(std::shared_ptr<Subscriber> subs)
 {
     CALL_LOG_ENTER;
+    CHKPV(subs);
     for (auto it = subscribers_.begin(); it != subscribers_.end(); ++it) {
         if (subs->sess_ != nullptr && (*it)->id_ == subs->id_ && (*it)->sess_ == subs->sess_) {
             MMI_HILOGW("Repeat registration id:%{public}d desc:%{public}s",
@@ -112,6 +113,7 @@ void KeyEventSubscriber::InsertSubScriber(std::shared_ptr<Subscriber> subs)
 void KeyEventSubscriber::OnSessionDelete(SessionPtr sess)
 {
     CALL_LOG_ENTER;
+    CHKPV(sess);
     for (auto it = subscribers_.begin(); it != subscribers_.end();) {
         if ((*it)->sess_ == sess) {
             ClearTimer(*it);

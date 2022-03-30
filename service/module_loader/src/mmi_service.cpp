@@ -205,9 +205,7 @@ int32_t MMIService::Init()
 
 void MMIService::OnStart()
 {
-    auto tid = GetThisThreadId();
-    MMI_HILOGD("Thread tid:%{public}" PRId64 "", tid);
-
+    CHK_PIDANDTID(Service);
     int32_t ret = Init();
     if (RET_OK != ret) {
         MMI_HILOGE("Init mmi_service failed");
@@ -221,21 +219,16 @@ void MMIService::OnStart()
 
 void MMIService::OnStop()
 {
-    auto tid = GetThisThreadId();
-    MMI_HILOGD("Thread tid:%{public}" PRId64 "", tid);
-
+    CHK_PIDANDTID(Service);
     UdsStop();
-    if (InputHandler != nullptr) {
-        InputHandler->Clear();
-    }
+    InputHandler->Clear();
     libinputAdapter_.Stop();
     state_ = ServiceRunningState::STATE_NOT_START;
 }
 
 void MMIService::OnDump()
 {
-    auto tid = GetThisThreadId();
-    MMI_HILOGD("Thread tid:%{public}" PRId64 "", tid);
+    CHK_PIDANDTID(Service);
     MMIEventDump->Dump();
 }
 
@@ -316,10 +309,6 @@ void MMIService::OnThread()
 {
     SetThreadName(std::string("mmi_service"));
     uint64_t tid = GetThisThreadId();
-    if (tid <= 0) {
-        MMI_HILOGE("The tid is error, errCode:%{public}d", VAL_NOT_EXP);
-        return;
-    }
     MMI_HILOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
 
     int32_t count = 0;

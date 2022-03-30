@@ -28,8 +28,6 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-std::mutex mtx;
-std::condition_variable cv;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIClient" };
 } // namespace
 
@@ -79,23 +77,17 @@ bool MMIClient::Start()
 bool MMIClient::StartEventRunner()
 {
     CALL_LOG_ENTER;
-    int32_t pid = GetPid();
-    uint64_t tid = GetThisThreadId();
-    MMI_HILOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
-
-    constexpr int32_t WAIT_FOR_TIMEOUT = 3;
-    std::unique_lock <std::mutex> lck(mtx);
-    ehThread_ = std::thread(std::bind(&MMIClient::OnEventHandlerThread, this));
-    ehThread_.detach();
-    if (cv.wait_for(lck, std::chrono::seconds(WAIT_FOR_TIMEOUT)) == std::cv_status::timeout) {
-        MMI_HILOGE("EventThandler thread start timeout");
+    CHK_PIDANDTID(EventHandler);
+    if (InputMgrImp->InitEventHandler()) {
+        MMI_HILOGE("init eventhandler error");
         Stop();
         return false;
     }
-
     recvThread_ = std::thread(std::bind(&MMIClient::OnRecvThread, this));
     recvThread_.detach();
-    if (cv.wait_for(lck, std::chrono::seconds(WAIT_FOR_TIMEOUT)) == std::cv_status::timeout) {
+    constexpr int32_t outTime = 3;
+    std::unique_lock <std::mutex> lck(mtx_);
+    if (cv_.wait_for(lck, std::chrono::seconds(outTime)) == std::cv_status::timeout) {
         MMI_HILOGE("Recv thread start timeout");
         Stop();
         return false;
@@ -103,29 +95,11 @@ bool MMIClient::StartEventRunner()
     return true;
 }
 
-void MMIClient::OnEventHandlerThread()
-{
-    CALL_LOG_ENTER;
-    SetThreadName("mmi_client_EventHdr");
-    int32_t pid = GetPid();
-    uint64_t tid = GetThisThreadId();
-    MMI_HILOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
-
-    auto eventHandler = MEventHandler->GetSharedPtr();
-    CHKPV(eventHandler);
-    auto eventRunner = eventHandler->GetEventRunner();
-    CHKPV(eventRunner);
-    cv.notify_one();
-    eventRunner->Run();
-}
-
 void MMIClient::OnRecvThread()
 {
     CALL_LOG_ENTER;
+    CHK_PIDANDTID(EventHandler);
     SetThreadName("mmi_client_RecvEventHdr");
-    int32_t pid = GetPid();
-    uint64_t tid = GetThisThreadId();
-    MMI_HILOGI("pid:%{public}d threadId:%{public}" PRIu64, pid, tid);
 
     auto runner = EventRunner::Create(false);
     CHKPV(runner);
@@ -163,10 +137,8 @@ bool MMIClient::AddFdListener(int32_t fd)
         return false;
     }
     isRunning_ = true;
-    int32_t pid = GetPid();
-    uint64_t tid = GetThisThreadId();
     MMI_HILOGI("serverFd:%{public}d was listening,mask:%{public}u pid:%{public}d threadId:%{public}" PRIu64,
-        fd, FILE_DESCRIPTOR_INPUT_EVENT, pid, tid);
+        fd, FILE_DESCRIPTOR_INPUT_EVENT, GetPid(), GetThisThreadId());
     return true;
 }
 
@@ -280,7 +252,9 @@ void MMIClient::Stop()
     if (recvEventHandler_) {
         recvEventHandler_->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP, 0, EventHandler::Priority::IMMEDIATE);
     }
-    MEventHandler->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP, 0, EventHandler::Priority::IMMEDIATE);
+    auto eventHandler = InputMgrImp->GetEventHandler();
+    CHKPV(eventHandler);
+    eventHandler->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP, 0, EventHandler::Priority::IMMEDIATE);
 }
 } // namespace MMI
 } // namespace OHOS
