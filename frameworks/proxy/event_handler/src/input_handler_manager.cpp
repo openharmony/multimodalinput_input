@@ -175,11 +175,7 @@ bool InputHandlerManager::PostTask(int32_t handlerId, AppExecFwk::EventHandler::
 {
     auto eventHandler = GetEventHandler(handlerId);
     CHKPV(eventHandler);
-    if (!eventHandler->PostHighPriorityTask(callback)) {
-        MMI_HILOGE("post task failed");
-        return false;
-    }
-    return true;
+    return MMIEventHandler::PostTask(eventHandler, callback);
 }
 
 void InputHandlerManager::OnKeyEventTask(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent)

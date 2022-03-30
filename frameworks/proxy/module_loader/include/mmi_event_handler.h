@@ -37,6 +37,7 @@ public:
     MMIEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner, MMIClientPtr client);
     virtual ~MMIEventHandler();
     DISALLOW_COPY_AND_MOVE(MMIEventHandler);
+    static bool PostTask(EventHandlerPtr eventHandler, AppExecFwk::EventHandler::Callback &callback);
 
     const std::string& GetErrorStr(ErrCode code) const;
     EventHandlerPtr GetSharedPtr();

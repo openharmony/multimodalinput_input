@@ -40,6 +40,16 @@ MMIEventHandler::~MMIEventHandler()
 {
 }
 
+bool MMIEventHandler::PostTask(EventHandlerPtr eventHandler, AppExecFwk::EventHandler::Callback &callback)
+{
+    CHKPF(eventHandler);
+    if (!eventHandler->PostHighPriorityTask(callback)) {
+        MMI_HILOGE("post task failed");
+        return false;
+    }
+    return true;
+}
+
 const std::string& MMIEventHandler::GetErrorStr(ErrCode code) const
 {
     const static std::string defErrString = "Unknown event handler error!";
