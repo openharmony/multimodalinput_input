@@ -74,6 +74,9 @@ private:
     int32_t PackLogicalDisplay(NetPacket &pkt);
     void PrintDisplayInfo();
     void SendDisplayInfo();
+
+    void OnKeyEventTask(std::shared_ptr<KeyEvent> keyEvent);
+    void OnPointerEventTask(std::shared_ptr<PointerEvent> pointerEvent);
     void OnThread();
 
 private:

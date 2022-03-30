@@ -107,6 +107,21 @@ int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
     return RET_ERR;
 }
 
+int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask(std::shared_ptr<KeyEvent> event,
+    int32_t subscribeId)
+{
+    CHK_PIDANDTID(callMsgHandler);
+    std::lock_guard<std::mutex> guard(mtx_);
+    auto obj = GetSubscribeKeyEvent(subscribeId);
+    if (!obj) {
+        MMI_HILOGE("subscribe key event not found. id:%{public}d", subscribeId);
+        return;
+    }
+    obj->GetCallback()(event);
+    MMI_HILOGD("callMsgHandler key event callback id:%{public}d keyCode:%{public}d",
+        subscribeId, event->GetKeyCode());
+}
+
 int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_ptr<KeyEvent> event, int32_t subscribeId)
 {
     CALL_LOG_ENTER;
@@ -115,22 +130,9 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
         MMI_HILOGE("Leave, the subscribe id is less than 0");
         return RET_ERR;
     }
-    BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
-
-    auto callMsgHandler = [this, event, subscribeId] () {
-        CHK_PIDANDTID(callMsgHandler);
-        std::lock_guard<std::mutex> guard(mtx_);
-        auto obj = GetSubscribeKeyEvent(subscribeId);
-        if (!obj) {
-            MMI_HILOGE("subscribe key event not found. id:%{public}d", subscribeId);
-            return;
-        }
-        obj->GetCallback()(event);
-        MMI_HILOGD("callMsgHandler key event callback id:%{public}d keyCode:%{public}d",
-            subscribeId, event->GetKeyCode());
-    };
-
+    
     std::lock_guard<std::mutex> guard(mtx_);
+    BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
     auto obj = GetSubscribeKeyEvent(subscribeId);
     if (obj == nullptr) {
         MMI_HILOGE("subscribe key event not found. id:%{public}d", subscribeId);
@@ -138,7 +140,9 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     }
     auto eventHandler = obj->GetEventHandler();
     CHKPV(eventHandler);
-    if (!eventHandler->PostHighPriorityTask(callMsgHandler)) {
+    auto task = std::bind(&KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask, this,
+        std::ref(event), subscribeId);
+    if (!eventHandler->PostHighPriorityTask(task)) {
         MMI_HILOGE("post task failed");
         return RET_ERR;
     }

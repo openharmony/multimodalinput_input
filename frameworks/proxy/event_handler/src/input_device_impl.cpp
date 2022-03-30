@@ -54,22 +54,23 @@ void InputDeviceImpl::GetInputDeviceAsync(int32_t userData, int32_t deviceId,
     MMIEventHdl.GetDevice(userData, deviceId);
 }
 
+void InputDeviceImpl::OnInputDeviceTask(int32_t userData, int32_t id, std::string name, int32_t deviceType)
+{
+    CHK_PIDANDTID(callMsgHandler);
+    std::lock_guard<std::mutex> guard(mtx_);
+    auto devInfo = GetDeviceInfo(userData);
+    if (devInfo == nullptr) {
+        MMI_HILOGE("failed to find the callback function");
+        return;
+    }
+    auto devData = std::make_shared<InputDeviceInfo>(id, name, deviceType);
+    CHKPV(devData);
+    devInfo->second(userData, devData);
+}
+
 void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, std::string name, int32_t deviceType)
 {
     CALL_LOG_ENTER;
-    auto callMsgHandler = [this, userData, id, name, deviceType] () {
-        CHK_PIDANDTID(callMsgHandler);
-        std::lock_guard<std::mutex> guard(mtx_);
-        auto devInfo = GetDeviceInfo(userData);
-        if (devInfo == nullptr) {
-            MMI_HILOGE("failed to find the callback function");
-            return;
-        }
-        auto devData = std::make_shared<InputDeviceInfo>(id, name, deviceType);
-        CHKPV(devData);
-        devInfo->second(userData, devData);
-    };
-
     std::lock_guard<std::mutex> guard(mtx_);
     auto devInfo = GetDeviceInfo(userData);
     if (devInfo == nullptr) {
@@ -81,25 +82,27 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, std::string na
         MMI_HILOGE("event handler is nullptr");
         return;
     }
-    if (!eventHandler->PostHighPriorityTask(callMsgHandler)) {
+    auto task = std::bind(&InputDeviceImpl::OnInputDeviceTask, this, userData, id, std::ref(name), deviceType);
+    if (!eventHandler->PostHighPriorityTask(task)) {
         MMI_HILOGE("post task failed");
     }
+}
+
+void InputDeviceImpl::OnInputDeviceIdsTask(int32_t userData, std::vector<int32_t> ids)
+{
+    CHK_PIDANDTID(callMsgHandler);
+    std::lock_guard<std::mutex> guard(mtx_);
+    auto devIds = GetDeviceIds(userData);
+    if (devIds == nullptr) {
+        MMI_HILOGE("failed to find the callback function");
+        return;
+    }
+    devIds->second(userData, ids);
 }
 
 void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> ids)
 {
     CALL_LOG_ENTER;
-    auto callMsgHandler = [this, userData, ids] () {
-        CHK_PIDANDTID(callMsgHandler);
-        std::lock_guard<std::mutex> guard(mtx_);
-        auto devIds = GetDeviceIds(userData);
-        if (devIds == nullptr) {
-            MMI_HILOGE("failed to find the callback function");
-            return;
-        }
-        devIds->second(userData, ids);
-    };
-
     std::lock_guard<std::mutex> guard(mtx_);
     auto devIds = GetDeviceIds(userData);
     if (devIds == nullptr) {
@@ -111,12 +114,13 @@ void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> id
         MMI_HILOGE("event handler is nullptr");
         return;
     }
-    if (!eventHandler->PostHighPriorityTask(callMsgHandler)) {
+    auto task = std::bind(&InputDeviceImpl::OnInputDeviceIdsTask, this, userData, std::ref(ids));
+    if (!eventHandler->PostHighPriorityTask(task)) {
         MMI_HILOGE("post task failed");
     }
 }
 
-const DevInfo* InputDeviceImpl::GetDeviceInfo(int32_t id) const
+const DevInfo* InputDeviceImpl::GetDeviceInfo(int32_t userData) const
 {
     auto iter = inputDevcices_.find(userData);
     if (iter == inputDevcices_.end()) {
@@ -125,9 +129,9 @@ const DevInfo* InputDeviceImpl::GetDeviceInfo(int32_t id) const
     return &iter->second;
 }
 
-const DevIds* InputDeviceImpl::GetDeviceIds(int32_t id) const
+const DevIds* InputDeviceImpl::GetDeviceIds(int32_t userData) const
 {
-    auto iter = inputDevciceIds_.find(id);
+    auto iter = inputDevciceIds_.find(userData);
     if (iter == inputDevciceIds_.end()) {
         return nullptr;
     }

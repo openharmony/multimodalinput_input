@@ -79,6 +79,7 @@ public:
 
 private:
     const SubscribeKeyEventInfo* GetSubscribeKeyEvent(int32_t id);
+    int32_t OnSubscribeKeyEventCallbackTask(std::shared_ptr<KeyEvent> event, int32_t subscribeId);
 
 private:
     std::list<SubscribeKeyEventInfo> subscribeInfos_;

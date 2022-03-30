@@ -56,6 +56,8 @@ private:
     void RemoveFromServer(int32_t handlerId, InputHandlerType handlerType);
     std::shared_ptr<IInputEventConsumer> FindHandler(int32_t handlerId);
     std::shared_ptr<AppExecFwk::EventHandler> GetEventHandler(int32_t handlerId);
+    void OnKeyEventTask(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent);
+    void OnPointerEventTask(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
     std::mutex mtxHandlers_;
