@@ -157,6 +157,14 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     }
 }
 
+void InputManagerImpl::OnKeyEventTask(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHK_PIDANDTID(callMsgHandler);
+    CHKPV(consumer_);
+    consumer_->OnInputEvent(keyEvent);
+    MMI_HILOGD("callMsgHandler key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
+}
+
 void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_LOG_ENTER;
@@ -164,16 +172,18 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     CHKPV(eventHandler_);
     std::lock_guard<std::mutex> guard(mtx_);
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
-
-    auto callMsgHandler = [this, keyEvent] () {
-        CHK_PIDANDTID(callMsgHandler);
-        CHKPV(consumer_);
-        consumer_->OnInputEvent(keyEvent);
-        MMI_HILOGD("callMsgHandler key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
-    };
-    if (!eventHandler_->PostHighPriorityTask(callMsgHandler)) {
+    auto task = std::bind(&InputManagerImpl::OnKeyEventTask, this, std::ref(keyEvent));
+    if (!eventHandler_->PostHighPriorityTask(task)) {
         MMI_HILOGE("post task failed");
     }
+}
+
+void InputManagerImpl::OnPointerEventTask(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHK_PIDANDTID(callMsgHandler);
+    CHKPV(consumer_);
+    consumer_->OnInputEvent(pointerEvent);
+    MMI_HILOGD("callMsgHandler pointer event callback pointerId:%{public}d", pointerEvent->GetPointerId());
 }
 
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
@@ -183,14 +193,8 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     CHKPV(eventHandler_);
     std::lock_guard<std::mutex> guard(mtx_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
-
-    auto callMsgHandler = [this, pointerEvent] () {
-        CHK_PIDANDTID(callMsgHandler);
-        CHKPV(consumer_);
-        consumer_->OnInputEvent(pointerEvent);
-        MMI_HILOGD("callMsgHandler pointer event callback pointerId:%{public}d", pointerEvent->GetPointerId());
-    };
-    if (!eventHandler_->PostHighPriorityTask(callMsgHandler)) {
+    auto task = std::bind(&InputManagerImpl::OnPointerEvent, this, std::ref(pointerEvent));
+    if (!eventHandler_->PostHighPriorityTask(task)) {
         MMI_HILOGE("post task failed");
     }
 }

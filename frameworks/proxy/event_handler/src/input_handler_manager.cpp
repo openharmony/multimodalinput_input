@@ -171,52 +171,56 @@ std::shared_ptr<AppExecFwk::EventHandler> InputHandlerManager::GetEventHandler(i
     return nullptr;
 }
 
+void InputHandlerManager::OnKeyEventTask(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHK_PIDANDTID(callMsgHandler);
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
+    auto consumer = FindHandler(handlerId);
+    if (consumer == nullptr) {
+        MMI_HILOGE("No handler found here. id:%{public}d", handlerId);
+        return;
+    }
+    consumer->OnInputEvent(keyEvent);
+    MMI_HILOGD("callMsgHandler key event callback id:%{public}d keyCode:%{public}d",
+        handlerId, keyEvent->GetKeyCode());
+}
+
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
-    auto callMsgHandler = [this, keyEvent, handlerId] () {
-        CHK_PIDANDTID(callMsgHandler);
-        std::lock_guard<std::mutex> guard(mtxHandlers_);
-        auto consumer = FindHandler(handlerId);
-        if (consumer == nullptr) {
-            MMI_HILOGE("No handler found here. id:%{public}d", handlerId);
-            return;
-        }
-        consumer->OnInputEvent(keyEvent);
-        MMI_HILOGD("callMsgHandler key event callback id:%{public}d keyCode:%{public}d",
-            handlerId, keyEvent->GetKeyCode());
-    };
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     auto eventHandler = GetEventHandler(handlerId);
     CHKPV(eventHandler);
-    if (!eventHandler->PostHighPriorityTask(callMsgHandler)) {
+    auto task = std::bind(&InputHandlerManager::OnKeyEventTask, this, handlerId, std::ref(keyEvent));
+    if (!eventHandler->PostHighPriorityTask(task)) {
         MMI_HILOGE("post task failed");
     }
+}
+
+void InputHandlerManager::OnPointerEventTask(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHK_PIDANDTID(callMsgHandler);
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
+    auto consumer = FindHandler(handlerId);
+    if (consumer == nullptr) {
+        MMI_HILOGE("No handler found here. id:%{public}d", handlerId);
+        return;
+    }
+    consumer->OnInputEvent(pointerEvent);
+    MMI_HILOGD("callMsgHandler pointer event callback id:%{public}d pointerId:%{public}d",
+        handlerId, pointerEvent->GetPointerId());
 }
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_LOG_ENTER;
-    MMI_HILOGD("handler:%{public}d", handlerId);
     CHKPV(pointerEvent);
-    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
-    
-    auto callMsgHandler = [this, pointerEvent, handlerId] () {
-        CHK_PIDANDTID(callMsgHandler);
-        std::lock_guard<std::mutex> guard(mtxHandlers_);
-        auto consumer = FindHandler(handlerId);
-        if (consumer == nullptr) {
-            MMI_HILOGE("No handler found here. id:%{public}d", handlerId);
-            return;
-        }
-        consumer->OnInputEvent(pointerEvent);
-        MMI_HILOGD("callMsgHandler pointer event callback id:%{public}d pointerId:%{public}d",
-            handlerId, pointerEvent->GetPointerId());
-    };
     std::lock_guard<std::mutex> guard(mtxHandlers_);
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
     auto eventHandler = GetEventHandler(handlerId);
     CHKPV(eventHandler);
-    if (!eventHandler->PostHighPriorityTask(callMsgHandler)) {
+    auto task = std::bind(&InputHandlerManager::OnPointerEventTask, this, handlerId, std::ref(pointerEvent));
+    if (!eventHandler->PostHighPriorityTask(task)) {
         MMI_HILOGE("post task failed");
     }
 }
