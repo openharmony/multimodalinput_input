@@ -138,7 +138,8 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask(std::shar
         subscribeId, event->GetKeyCode());
 }
 
-int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_ptr<KeyEvent> event, int32_t subscribeId)
+int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_ptr<KeyEvent> event, 
+    int32_t subscribeId)
 {
     CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
