@@ -54,8 +54,10 @@ private:
     void AddToServer(int32_t handlerId, InputHandlerType handlerType);
     int32_t RemoveLocal(int32_t handlerId, InputHandlerType handlerType);
     void RemoveFromServer(int32_t handlerId, InputHandlerType handlerType);
+    
     std::shared_ptr<IInputEventConsumer> FindHandler(int32_t handlerId);
     std::shared_ptr<AppExecFwk::EventHandler> GetEventHandler(int32_t handlerId);
+    bool PostTask(int32_t handlerId, AppExecFwk::EventHandler::Callback &callback);
     void OnKeyEventTask(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent);
     void OnPointerEventTask(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent);
 
