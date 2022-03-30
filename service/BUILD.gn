@@ -125,7 +125,7 @@ ohos_shared_library("libmmi-server") {
     ]
   }
 
-  if (is_mmi_have_combinationkey) {
+  if (mmi_enable_combinationkey) {
     sources += [ "ability_launch/src/ability_launch_manager.cpp" ]
   } else {
     sources += [ "ability_launch/src/non_multi_key.cpp" ]
