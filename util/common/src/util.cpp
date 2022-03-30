@@ -82,7 +82,7 @@ int64_t GetSysClockTime()
 {
     struct timespec ts = { 0, 0 };
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
-        MMI_LOGD("clock_gettime failed:%{public}d", errno);
+        MMI_HILOGD("clock_gettime failed:%{public}d", errno);
         return 0;
     }
     return (ts.tv_sec * 1000 * 1000) + (ts.tv_nsec / 1000);
@@ -214,21 +214,21 @@ std::string Strftime(const std::string &format, time_t curTime)
 
 static void PrintEventJoyStickAxisInfo(const std::string &axisName, const EventJoyStickAxisAbsInfo &r)
 {
-    MMI_LOGD("%{public}s: {code:%{public}d,value:%{public}d,min:%{public}d,max:%{public}d,"
-             "fuzz:%{public}d,flat:%{public}d,resolution:%{public}d,"
-             "standardValue:%{public}lf,isChanged:%{public}d}, ",
-             axisName.c_str(), r.code, r.value, r.minimum, r.maximum, r.fuzz, r.flat, r.resolution,
-             r.standardValue, r.isChanged);
+    MMI_HILOGD("%{public}s: {code:%{public}d,value:%{public}d,min:%{public}d,max:%{public}d,"
+               "fuzz:%{public}d,flat:%{public}d,resolution:%{public}d,"
+               "standardValue:%{public}lf,isChanged:%{public}d}, ",
+               axisName.c_str(), r.code, r.value, r.minimum, r.maximum, r.fuzz, r.flat, r.resolution,
+               r.standardValue, r.isChanged);
 }
 
 void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
     const int32_t abilityId, const int32_t focusId, const int64_t preHandlerTime)
 {
-    MMI_LOGD("event dispatcher of server, EventJoyStickAxis:physical:%{public}s,"
-             "fd:%{public}d,preHandlerTime:%{public}" PRId64 ","
-             "time:%{public}" PRId64 ",deviceType:%{public}u,eventType:%{public}d,deviceName:%{public}s",
-             r.physical, fd, preHandlerTime, r.time, r.deviceType,
-             r.eventType, r.deviceName);
+    MMI_HILOGD("event dispatcher of server, EventJoyStickAxis:physical:%{public}s,"
+               "fd:%{public}d,preHandlerTime:%{public}" PRId64 ","
+               "time:%{public}" PRId64 ",deviceType:%{public}u,eventType:%{public}d,deviceName:%{public}s",
+               r.physical, fd, preHandlerTime, r.time, r.deviceType,
+               r.eventType, r.deviceName);
 
     PrintEventJoyStickAxisInfo(std::string("abs_throttle"), r.abs_throttle);
     PrintEventJoyStickAxisInfo(std::string("abs_hat0x"), r.abs_hat0x);
@@ -243,13 +243,13 @@ void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
 
 void PrintWMSInfo(const std::string& str, const int32_t fd, const int32_t abilityId, const int32_t focusId)
 {
-    MMI_LOGD("MMIWMS:windowId:%{public}s", str.c_str());
+    MMI_HILOGD("MMIWMS:windowId:%{public}s", str.c_str());
     if (focusId == -1) {
-        MMI_LOGD("WMS:windowId = ''");
+        MMI_HILOGD("WMS:windowId = ''");
     } else {
-        MMI_LOGD("WMS:windowId:%{public}d", focusId);
+        MMI_HILOGD("WMS:windowId:%{public}d", focusId);
     }
-    MMI_LOGD("CALL_AMS, fd:%{public}d,abilityID:%{public}d", fd, abilityId);
+    MMI_HILOGD("CALL_AMS, fd:%{public}d,abilityID:%{public}d", fd, abilityId);
 }
 
 int32_t GetPid()
@@ -416,14 +416,14 @@ size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_
 std::string StringFmt(const char* str, ...)
 {
     if (str == nullptr) {
-        MMI_LOGW("Str is nullptr");
+        MMI_HILOGW("Str is nullptr");
         return "";
     }
     va_list args;
     va_start(args, str);
     char buf[MAX_PACKET_BUF_SIZE] = {};
     if (vsnprintf_s(buf, sizeof(buf), sizeof(buf) - 1, str, args) == -1) {
-        MMI_LOGE("vsnprintf_s error");
+        MMI_HILOGE("vsnprintf_s error");
         va_end(args);
         return "";
     }
@@ -468,7 +468,7 @@ int32_t GetFileSize(const std::string& fileName)
         fseek(pFile, 0, SEEK_END);
         long fileSize = ftell(pFile);
         if (fileSize > INT32_MAX) {
-            MMI_LOGE("The file is too large for 32-bit systems, filesize:%{public}ld", fileSize);
+            MMI_HILOGE("The file is too large for 32-bit systems, filesize:%{public}ld", fileSize);
             fclose(pFile);
             return RET_ERR;
         }

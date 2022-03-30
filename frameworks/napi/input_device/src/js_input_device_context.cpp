@@ -44,7 +44,7 @@ napi_value JsInputDeviceContext::CreateInstance(napi_env env)
     napi_status status = napi_get_global(env, &global);
     if (status != napi_ok) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to call napi_get_global");
-        MMI_LOGE("failed to call napi_get_global");
+        MMI_HILOGE("failed to call napi_get_global");
         return nullptr;
     }
 
@@ -55,14 +55,14 @@ napi_value JsInputDeviceContext::CreateInstance(napi_env env)
         sizeof(desc) / sizeof(desc[0]), nullptr, &jsClass);
     if (status != napi_ok) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to call napi_define_class");
-        MMI_LOGE("failed to call napi_define_class");
+        MMI_HILOGE("failed to call napi_define_class");
         return nullptr;
     }
 
     status = napi_set_named_property(env, global, "multimodalinput_input_device_class", jsClass);
     if (status != napi_ok) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to set jsClass property");
-        MMI_LOGE("failed to set jsClass property");
+        MMI_HILOGE("failed to set jsClass property");
         return nullptr;
     }
 
@@ -70,13 +70,13 @@ napi_value JsInputDeviceContext::CreateInstance(napi_env env)
     status = napi_new_instance(env, jsClass, 0, nullptr, &jsInstance);
     if (status != napi_ok) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to create jsInstance");
-        MMI_LOGE("failed to create jsInstance");
+        MMI_HILOGE("failed to create jsInstance");
         return nullptr;
     }
     status = napi_set_named_property(env, global, "multimodal_input_device", jsInstance);
     if (status != napi_ok) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to set jsInstance property");
-        MMI_LOGE("failed to set jsInstance property");
+        MMI_HILOGE("failed to set jsInstance property");
         return nullptr;
     }
 
@@ -84,14 +84,14 @@ napi_value JsInputDeviceContext::CreateInstance(napi_env env)
     status = napi_unwrap(env, jsInstance, (void**)&jsContext);
     if (status != napi_ok) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to get jsContext");
-        MMI_LOGE("failed to get jsContext");
+        MMI_HILOGE("failed to get jsContext");
         return nullptr;
     }
     CHKPP(jsContext);
     status = napi_create_reference(env, jsInstance, 1, &(jsContext->contextRef_));
     if (status != napi_ok) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to create contextRef_");
-        MMI_LOGE("failed to create contextRef_");
+        MMI_HILOGE("failed to create contextRef_");
         return nullptr;
     }
 
@@ -99,7 +99,7 @@ napi_value JsInputDeviceContext::CreateInstance(napi_env env)
     status = napi_reference_ref(env, jsContext->contextRef_, &refCount);
     if (status != napi_ok) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to create contextRef_ reference");
-        MMI_LOGE("failed to create contextRef_ reference");
+        MMI_HILOGE("failed to create contextRef_ reference");
         return nullptr;
     }
     return jsInstance;
@@ -113,20 +113,20 @@ napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info 
     napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
     if (status != napi_ok) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to get thisVar");
-        MMI_LOGE("failed to get thisVar");
+        MMI_HILOGE("failed to get thisVar");
         return nullptr;
     }
 
     JsInputDeviceContext *jsContext = new (std::nothrow) JsInputDeviceContext();
     CHKPP(jsContext);
     status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void* data, void* hin) {
-        MMI_LOGI("jsvm ends");
+        MMI_HILOGI("jsvm ends");
         JsInputDeviceContext *context = (JsInputDeviceContext*)data;
         delete context;
     }, nullptr, nullptr);
     if (status != napi_ok) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to wrap jsContext");
-        MMI_LOGE("failed to wrap jsContext");
+        MMI_HILOGE("failed to wrap jsContext");
         return nullptr;
     }
     return thisVar;
@@ -139,7 +139,7 @@ JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
     napi_status status = napi_get_global(env, &global);
     if (status != napi_ok) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to get global");
-        MMI_LOGE("failed to get global");
+        MMI_HILOGE("failed to get global");
         return nullptr;
     }
 
@@ -147,7 +147,7 @@ JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
     napi_has_named_property(env, global, "multimodal_input_device", &result);
     if (!result) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: multimodal_input_device was not found");
-        MMI_LOGE("multimodal_input_device was not found");
+        MMI_HILOGE("multimodal_input_device was not found");
         return nullptr;
     }
 
@@ -155,12 +155,12 @@ JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
     status = napi_get_named_property(env, global, "multimodal_input_device", &object);
     if (status != napi_ok) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to get multimodal_input_device");
-        MMI_LOGE("failed to get multimodal_input_device");
+        MMI_HILOGE("failed to get multimodal_input_device");
         return nullptr;
     }
     if (object == nullptr) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: object is nullptr");
-        MMI_LOGE("object is nullptr");
+        MMI_HILOGE("object is nullptr");
         return nullptr;
     }
 
@@ -168,12 +168,12 @@ JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
     status = napi_unwrap(env, object, (void**)&instance);
     if (status != napi_ok) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to get instance");
-        MMI_LOGE("failed to get instance");
+        MMI_HILOGE("failed to get instance");
         return nullptr;
     }
     if (instance == nullptr) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: instance is nullptr");
-        MMI_LOGE("instance is nullptr");
+        MMI_HILOGE("instance is nullptr");
         return nullptr;
     }
     return instance;
@@ -191,12 +191,12 @@ napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info i
     napi_value argv[1];
     napi_status status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (status != napi_ok) {
-        MMI_LOGE("parameter acquisition failed");
+        MMI_HILOGE("parameter acquisition failed");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: parameter acquisition failed");
         return nullptr;
     }
     if (argc > 1) {
-        MMI_LOGE("too many parameters");
+        MMI_HILOGE("too many parameters");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: too many parameters");
         return nullptr;
     }
@@ -212,12 +212,12 @@ napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info i
     napi_valuetype valueType = napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
-        MMI_LOGE("failed to get the first parameter type");
+        MMI_HILOGE("failed to get the first parameter type");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to get the first parameter type");
         return nullptr;
     }
     if (valueType != napi_function) {
-        MMI_LOGE("the first parameter is not a function");
+        MMI_HILOGE("the first parameter is not a function");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: the first parameter is not a function");
         return nullptr;
     }
@@ -236,7 +236,7 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
         return nullptr;
     }
     if (argc < 1 || argc > 2) {
-        MMI_LOGE("the number of parameters is not as expected");
+        MMI_HILOGE("the number of parameters is not as expected");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: the number of parameters is not as expected");
         return nullptr;
     }
@@ -244,19 +244,19 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
     napi_valuetype valueType = napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
-        MMI_LOGE("failed to get the first parameter type");
+        MMI_HILOGE("failed to get the first parameter type");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to get the first parameter type");
         return nullptr;
     }
     if (valueType != napi_number) {
-        MMI_LOGE("the first parameter is not a number");
+        MMI_HILOGE("the first parameter is not a number");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: the first parameter is not a number");
         return nullptr;
     }
     int32_t id = 0;
     status = napi_get_value_int32(env, argv[0], &id);
     if (status != napi_ok) {
-        MMI_LOGE("failed to get id");
+        MMI_HILOGE("failed to get id");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to get id");
         return nullptr;
     }
@@ -266,17 +266,17 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
     CHKPP(jsInputDeviceMgr);
     if (argc == 1) {
-        MMI_LOGD("promise end");
+        MMI_HILOGD("promise end");
         return jsInputDeviceMgr->GetDevice(id, env);
     }
     status = napi_typeof(env, argv[1], &valueType);
     if (status != napi_ok) {
-        MMI_LOGE("failed to get the second parameter type");
+        MMI_HILOGE("failed to get the second parameter type");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to get the second parameter type");
         return nullptr;
     }
     if (valueType != napi_function) {
-        MMI_LOGE("the second parameter is not a function");
+        MMI_HILOGE("the second parameter is not a function");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: the second parameter is not a function");
         return nullptr;
     }
@@ -290,7 +290,7 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
     auto instance = CreateInstance(env);
     if (instance == nullptr) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to create instance");
-        MMI_LOGE("failed to create instance");
+        MMI_HILOGE("failed to create instance");
         return nullptr;
     }
     napi_property_descriptor desc[] = {

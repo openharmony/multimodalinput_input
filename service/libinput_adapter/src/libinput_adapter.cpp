@@ -37,11 +37,11 @@ static void HiLogFunc(struct libinput* input, libinput_log_priority priority, co
 {
     char buffer[256];
     if (vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args) == -1) {
-        MMI_LOGE("call vsnprintf_s fail");
+        MMI_HILOGE("call vsnprintf_s fail");
         va_end(args);
         return;
     }
-    MMI_LOGE("PrintLog_Info:%{public}s", buffer);
+    MMI_HILOGE("PrintLog_Info:%{public}s", buffer);
     va_end(args);
 }
 
@@ -68,16 +68,16 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
         CHKPR(path, errno);
         char realPath[PATH_MAX] = {};
         if (realpath(path, realPath) == nullptr) {
-            MMI_LOGE("path is error, path:%{public}s", path);
+            MMI_HILOGE("path is error, path:%{public}s", path);
             return RET_ERR;
         }
         int32_t fd = open(realPath, flags);
-        MMI_LOGD("libinput .open_restricted path:%{public}s,fd:%{public}d", path, fd);
+        MMI_HILOGD("libinput .open_restricted path:%{public}s,fd:%{public}d", path, fd);
         return fd < 0 ? -errno : fd;
     },
     .close_restricted = [](int32_t fd, void *user_data)
     {
-        MMI_LOGI("libinput .close_restricted fd:%{public}d", fd);
+        MMI_HILOGI("libinput .close_restricted fd:%{public}d", fd);
         close(fd);
     },
 };
@@ -103,7 +103,7 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_
     if (rt != 0) {
         libinput_unref(input_);
         udev_unref(udev_);
-        MMI_LOGE("rt is not 0");
+        MMI_HILOGE("rt is not 0");
         return false;
     }
     fd_ = libinput_get_fd(input_);
@@ -111,7 +111,7 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_
         libinput_unref(input_);
         udev_unref(udev_);
         fd_ = -1;
-        MMI_LOGE("fd_ is less than 0");
+        MMI_HILOGE("fd_ is less than 0");
         return false;
     }
     return true;
@@ -123,14 +123,14 @@ void LibinputAdapter::EventDispatch(struct epoll_event& ev)
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int*>(ev.data.ptr);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGF("epoll unrecoverable error,"
+        MMI_HILOGF("epoll unrecoverable error,"
             "The service must be restarted. fd:%{public}d", fd);
         free(ev.data.ptr);
         ev.data.ptr = nullptr;
         return;
     }
     if (libinput_dispatch(input_) != 0) {
-        MMI_LOGE("libinput: Failed to dispatch libinput");
+        MMI_HILOGE("libinput: Failed to dispatch libinput");
         return;
     }
     OnEventHandler();

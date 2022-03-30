@@ -40,7 +40,7 @@ int32_t RunShellUtil::RunShellCommand(const std::string &command, std::vector<st
     const std::string command_ = HILOG_GREP + "'" + command + "'";
 
     if ((fp_ = popen(command_.c_str(), "r")) == nullptr) {
-        MMI_LOGE("open fail");
+        MMI_HILOGE("open fail");
         pclose(fp_);
         fp_ = nullptr;
         return RET_ERR;
@@ -50,7 +50,7 @@ int32_t RunShellUtil::RunShellCommand(const std::string &command, std::vector<st
     while (logMaxSize_ > i) {
         char buf[MAXSIZE] = {0};
         if (fgets(buf, sizeof(buf), fp_) == nullptr) {
-            MMI_LOGE("read fp end");
+            MMI_HILOGE("read fp end");
             retLog.append(std::string(buf));
             pclose(fp_);
             fp_ = nullptr;
@@ -60,7 +60,7 @@ int32_t RunShellUtil::RunShellCommand(const std::string &command, std::vector<st
         i++;
     }
     if (retLog.length() == 0) {
-        MMI_LOGD("retLog is empty");
+        MMI_HILOGD("retLog is empty");
         return RET_OK;
     }
     StringToVectorByRegex(retLog, vLog, REGEX_LOG);
