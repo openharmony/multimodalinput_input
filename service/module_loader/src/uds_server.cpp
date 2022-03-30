@@ -237,14 +237,6 @@ void UDSServer::SetRecvFun(MsgServerFunCallback fun)
     recvFun_ = fun;
 }
 
-bool UDSServer::StartServer()
-{
-    isRunning_ = true;
-    t_ = std::thread(std::bind(&UDSServer::OnThread, this));
-    t_.detach();
-    return true;
-}
-
 void UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
 {
     CHKPV(buf);
@@ -450,36 +442,6 @@ void UDSServer::DelSession(int32_t fd)
         sessionsMap_.erase(it);
     }
     DumpSession("DelSession");
-}
-
-void UDSServer::OnThread()
-{
-    CALL_LOG_ENTER;
-    SetThreadName(std::string("uds_server"));
-    uint64_t tid = GetThisThreadId();
-    if (tid <= 0) {
-        MMI_HILOGE("The tid value is error, errCode:%{public}d", VAL_NOT_EXP);
-        return;
-    }
-    MMI_HILOGD("tid:%{public}" PRId64 "", tid);
-
-    std::map<int32_t, StreamBufData> bufMap;
-    struct epoll_event ev[MAX_EVENT_SIZE] = {};
-    while (isRunning_) {
-        auto count = EpollWait(*ev, MAX_EVENT_SIZE, DEFINE_EPOLL_TIMEOUT);
-        if (count > 0) {
-            bufMap.clear();
-            for (auto i = 0; i < count; i++) {
-                OnEvent(ev[i], bufMap);
-            }
-            for (const auto &item : bufMap) {
-                if (item.second.isOverflow) {
-                    continue;
-                }
-                OnRecv(item.first, item.second.sBuf.Data(), item.second.sBuf.Size());
-            }
-        }
-    }
 }
 
 void UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callback)
