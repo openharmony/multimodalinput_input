@@ -171,6 +171,17 @@ std::shared_ptr<AppExecFwk::EventHandler> InputHandlerManager::GetEventHandler(i
     return nullptr;
 }
 
+bool InputHandlerManager::PostTask(int32_t handlerId, AppExecFwk::EventHandler::Callback &callback)
+{
+    auto eventHandler = GetEventHandler(handlerId);
+    CHKPV(eventHandler);
+    if (!eventHandler->PostHighPriorityTask(callback)) {
+        MMI_HILOGE("post task failed");
+        return false;
+    }
+    return true;
+}
+
 void InputHandlerManager::OnKeyEventTask(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent)
 {
     CHK_PIDANDTID(callMsgHandler);
@@ -189,10 +200,8 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
 {
     CHKPV(keyEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
-    auto eventHandler = GetEventHandler(handlerId);
-    CHKPV(eventHandler);
-    auto task = std::bind(&InputHandlerManager::OnKeyEventTask, this, handlerId, std::ref(keyEvent));
-    if (!eventHandler->PostHighPriorityTask(task)) {
+    if (!PostTask(handlerId,
+        std::bind(&InputHandlerManager::OnKeyEventTask, this, handlerId, std::ref(keyEvent)))) {
         MMI_HILOGE("post task failed");
     }
 }
@@ -217,10 +226,8 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
     CHKPV(pointerEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
-    auto eventHandler = GetEventHandler(handlerId);
-    CHKPV(eventHandler);
-    auto task = std::bind(&InputHandlerManager::OnPointerEventTask, this, handlerId, std::ref(pointerEvent));
-    if (!eventHandler->PostHighPriorityTask(task)) {
+    if (!PostTask(handlerId,
+        std::bind(&InputHandlerManager::OnPointerEventTask, this, handlerId, std::ref(pointerEvent)))) {
         MMI_HILOGE("post task failed");
     }
 }

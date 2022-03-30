@@ -19,6 +19,7 @@
 #include <map>
 #include <mutex>
 
+#include "mmi_event_handler.h"
 #include "nocopyable.h"
 
 namespace OHOS {
@@ -51,6 +52,8 @@ private:
 
     const DevInfo* GetDeviceInfo(int32_t) const;
     const DevIds* GetDeviceIds(int32_t) const;
+
+    bool PostTask(EventHandlerPtr eventHandler, AppExecFwk::EventHandler::Callback &callback);
     void OnInputDeviceTask(int32_t userData, int32_t id, std::string name, int32_t deviceId);
     void OnInputDeviceIdsTask(int32_t userData, std::vector<int32_t> ids);
 
@@ -58,9 +61,6 @@ private:
     InputDeviceImpl() = default;
     std::map<int32_t, DevInfo> inputDevcices_;
     std::map<int32_t, DevIds> inputDevciceIds_;
-    // std::map<int32_t, std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)>> inputDevcices_;
-    // std::map<int32_t, std::function<void(int32_t, std::vector<int32_t>)>> inputDevciceIds_;
-    // std::mutex mtx_;
 };
 } // namespace MMI
 } // namespace OHOS

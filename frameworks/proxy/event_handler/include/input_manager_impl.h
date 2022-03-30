@@ -75,6 +75,7 @@ private:
     void PrintDisplayInfo();
     void SendDisplayInfo();
 
+    bool PostTask(AppExecFwk::EventHandler::Callback &callback);
     void OnKeyEventTask(std::shared_ptr<KeyEvent> keyEvent);
     void OnPointerEventTask(std::shared_ptr<PointerEvent> pointerEvent);
     void OnThread();
