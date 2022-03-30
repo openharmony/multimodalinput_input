@@ -55,9 +55,6 @@ void UDSServer::UdsStop()
         item.second->Close();
     }
     sessionsMap_.clear();
-    if (t_.joinable()) {
-        t_.join();
-    }
 }
 
 int32_t UDSServer::GetClientFd(int32_t pid)
