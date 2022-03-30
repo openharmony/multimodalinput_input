@@ -18,8 +18,8 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-#include "js_util.h"
 #include "input_device_impl.h"
+#include "js_util.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "util_napi.h"
@@ -36,7 +36,8 @@ public:
     static void EmitJsKeystrokeAbility(int32_t userData, std::vector<int32_t> keystrokeAbility);
     napi_value CreateCallbackInfo(napi_env env, napi_value handle);
     void ResetEnv();
-    static int32_t userData_;
+    inline static int32_t userData_ {0};
+    inline static std::map<int32_t, JsUtil::CallbackInfo*> callback_ {};
 
     struct DeviceType {
         std::string deviceTypeName;

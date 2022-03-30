@@ -15,8 +15,6 @@
 
 #include "js_event_target.h"
 
-#include <map>
-
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -36,11 +34,9 @@ JsEventTarget::DeviceType g_deviceType[] = {
     {"joystick", EVDEV_UDEV_TAG_JOYSTICK},
     {"trackball", EVDEV_UDEV_TAG_TRACKBALL},
 };
-} // namespace
 
-static std::map<int32_t, JsUtil::CallbackInfo*> callback_ {};
-int32_t JsEventTarget::userData_ = 0;
 std::mutex mutex_;
+} // namespace
 
 void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
 {
