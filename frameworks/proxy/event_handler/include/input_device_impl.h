@@ -52,8 +52,6 @@ private:
 
     const DevInfo* GetDeviceInfo(int32_t) const;
     const DevIds* GetDeviceIds(int32_t) const;
-
-    bool PostTask(EventHandlerPtr eventHandler, AppExecFwk::EventHandler::Callback &callback);
     void OnInputDeviceTask(int32_t userData, int32_t id, std::string name, int32_t deviceId);
     void OnInputDeviceIdsTask(int32_t userData, std::vector<int32_t> ids);
 

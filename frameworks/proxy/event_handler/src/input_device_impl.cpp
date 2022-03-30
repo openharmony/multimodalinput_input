@@ -77,7 +77,7 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, std::string na
         devInfo("failed to find the callback function");
         return;
     }
-    if (!PostTask(devInfo->first,
+    if (!MMIEventHandler::PostTask(devInfo->first,
         std::bind(&InputDeviceImpl::OnInputDeviceTask, this, userData, id, std::ref(name), deviceType))) {
         MMI_HILOGE("post task failed");
     }
@@ -104,7 +104,7 @@ void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> id
         MMI_HILOGE("failed to find the callback function");
         return;
     }
-    if (!PostTask(devIds->first,
+    if (!MMIEventHandler::PostTask(devIds->first,
         std::bind(&InputDeviceImpl::OnInputDeviceIdsTask, this, userData, std::ref(ids)))) {
         MMI_HILOGE("post task failed");
     }
@@ -126,16 +126,6 @@ const DevIds* InputDeviceImpl::GetDeviceIds(int32_t userData) const
         return nullptr;
     }
     return &iter->second;
-}
-
-bool InputDeviceImpl::PostTask(EventHandlerPtr eventHandler, AppExecFwk::EventHandler::Callback &callback)
-{
-    CHKPF(eventHandler);
-    if (!eventHandler->PostHighPriorityTask(callback)) {
-        MMI_HILOGE("post task failed");
-        return false;
-    }
-    return true;
 }
 } // namespace MMI
 } // namespace OHOS

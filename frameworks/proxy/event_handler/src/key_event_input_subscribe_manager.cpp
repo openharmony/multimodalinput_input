@@ -116,11 +116,7 @@ bool KeyEventInputSubscribeManager::PostTask(int32_t subscribeId, AppExecFwk::Ev
     }
     auto eventHandler = obj->GetEventHandler();
     CHKPV(eventHandler);
-    if (!eventHandler->PostHighPriorityTask(callback)) {
-        MMI_HILOGE("post task failed");
-        return false;
-    }
-    return true;
+    return MMIEventHandler::PostTask(eventHandler, callback);;
 }
 
 int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask(std::shared_ptr<KeyEvent> event,
@@ -150,7 +146,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     
     std::lock_guard<std::mutex> guard(mtx_);
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
-    if (!PostTask(std::bind(&KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask,
+    if (!PostTask(subscribeId, std::bind(&KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask,
         this, std::ref(event), subscribeId))) {
         MMI_HILOGE("post task failed");
         return RET_ERR;

@@ -157,15 +157,6 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     }
 }
 
-bool InputManagerImpl::PostTask(AppExecFwk::EventHandler::Callback &callback)
-{
-    CHKPV(eventHandler_);
-    if (!eventHandler_->PostHighPriorityTask(callback)) {
-        MMI_HILOGE("post task failed");
-    }
-    return true;
-}
-
 void InputManagerImpl::OnKeyEventTask(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHK_PIDANDTID(callMsgHandler);
@@ -178,9 +169,11 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_LOG_ENTER;
     CHKPV(keyEvent);
+    CHKPV(eventHandler_);
     std::lock_guard<std::mutex> guard(mtx_);
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
-    if (!PostTask(std::bind(&InputManagerImpl::OnKeyEventTask, this, std::ref(keyEvent)))) {
+    if (!MMIEventHandler::PostTask(eventHandler_, 
+        std::bind(&InputManagerImpl::OnKeyEventTask, this, std::ref(keyEvent)))) {
         MMI_HILOGE("post task failed");
     }
 }
@@ -197,9 +190,11 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
 {
     MMI_HILOGD("Pointer event received, processing");
     CHKPV(pointerEvent);
+    CHKPV(eventHandler_);
     std::lock_guard<std::mutex> guard(mtx_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
-    if (!PostTask(std::bind(&InputManagerImpl::OnPointerEvent, this, std::ref(pointerEvent)))) {
+    if (!MMIEventHandler::PostTask(eventHandler_, 
+        std::bind(&InputManagerImpl::OnPointerEvent, this, std::ref(pointerEvent)))) {
         MMI_HILOGE("post task failed");
     }
 }
