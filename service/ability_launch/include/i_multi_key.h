@@ -20,7 +20,8 @@
 
 namespace OHOS {
 namespace MMI {
-struct IMultiKey {
+class IMultiKey {
+public:
     static std::shared_ptr<IMultiKey> GetInstance();
     virtual bool CheckLaunchAbility(const std::shared_ptr<KeyEvent> key) = 0;
     virtual ~IMultiKey() = default;
