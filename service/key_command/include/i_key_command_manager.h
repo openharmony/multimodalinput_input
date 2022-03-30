@@ -13,21 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef I_MULTI_KEY_H
-#define I_MULTI_KEY_H
+#ifndef I_KEY_COMMAND_MANAGER_H
+#define I_KEY_COMMAND_MANAGER_H
 
 #include "key_event.h"
 
 namespace OHOS {
 namespace MMI {
-class IMultiKey {
+class IKeyCommandManager {
 public:
-    static std::shared_ptr<IMultiKey> GetInstance();
+    static std::shared_ptr<IKeyCommandManager> GetInstance();
     virtual bool CheckLaunchAbility(const std::shared_ptr<KeyEvent> key) = 0;
-    virtual ~IMultiKey() = default;
+    virtual ~IKeyCommandManager() = default;
 protected:
-    static inline std::shared_ptr<IMultiKey> iMultiKeyPtr_ = nullptr;
+    static inline std::shared_ptr<IKeyCommandManager> keyCommandPtr_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_MULTI_KEY_H
+#endif // I_KEY_COMMAND_MANAGER_H

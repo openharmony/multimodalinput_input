@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef ABILITY_LAUNCH_MANAGER_H
-#define ABILITY_LAUNCH_MANAGER_H
+#ifndef KEY_COMMAND_MANAGER_H
+#define KEY_COMMAND_MANAGER_H
 
 #include <chrono>
 #include <condition_variable>
@@ -31,7 +31,7 @@
 
 #include "key_event.h"
 #include "struct_multimodal.h"
-#include "i_multi_key.h"
+#include "i_key_command_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -57,11 +57,11 @@ struct ShortcutKey {
     void Print() const;
 };
 
-class AbilityLaunchManager : public IMultiKey {
+class KeyCommandManager : public IKeyCommandManager {
 public:
-    AbilityLaunchManager();
-    DISALLOW_COPY_AND_MOVE(AbilityLaunchManager);
-    ~AbilityLaunchManager() = default;
+    KeyCommandManager();
+    DISALLOW_COPY_AND_MOVE(KeyCommandManager);
+    ~KeyCommandManager() = default;
     bool CheckLaunchAbility(const std::shared_ptr<KeyEvent> event);
 private:
     void ResolveConfig(std::string configFile);
@@ -87,4 +87,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // ABILITY_LAUNCH_MANAGER_H
+#endif // KEY_COMMAND_MANAGER_H
