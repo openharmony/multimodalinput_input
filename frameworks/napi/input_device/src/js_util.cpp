@@ -39,6 +39,8 @@ void JsUtil::GetCallbackInfo(uv_work_t *work, CallbackTemp& temp)
     work = nullptr;
 }
 
+JsUtil::CallbackTemp::CallbackTemp() {}
+
 JsUtil::CallbackTemp::~CallbackTemp()
 {
     CALL_LOG_ENTER;

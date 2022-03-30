@@ -41,6 +41,7 @@ public:
     };
 
     struct CallbackTemp {
+        CallbackTemp();
         ~CallbackTemp();
         napi_env env = nullptr;
         napi_ref ref = nullptr;
