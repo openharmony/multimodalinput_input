@@ -87,7 +87,11 @@ bool VirtualDevice::ClearFileResidues(const std::string procressPath, const std:
     DIR* dir = opendir(procressPath.c_str());
     if (dir == nullptr) {
         std::string removeFile = "find /data/symbol/ -name " + fileName + "* | xargs rm";
-        system(removeFile.c_str());
+        FILE* findJson = popen(removeFile.c_str(), "rw");
+        if (!findJson) {
+            return false;
+        }
+        pclose(findJson);
         return true;
     }
     closedir(dir);
@@ -135,7 +139,11 @@ bool VirtualDevice::SyncSymbolFile()
             processName.append(temp);
             if (processName.find("mmi-virtual-device") == processName.npos) {
                 std::string removeFile = "find /data/symbol/ -name " + item + "* | xargs rm";
-                system(removeFile.c_str());
+                FILE* findJson = popen(removeFile.c_str(), "rw");
+                if (!findJson) {
+                    return false;
+                }
+                pclose(findJson);
             }
         }
     }
