@@ -22,6 +22,7 @@
 
 #include "bytrace_adapter.h"
 #include "input_handler_type.h"
+#include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
 
 namespace OHOS {
@@ -162,7 +163,8 @@ std::shared_ptr<IInputEventConsumer> InputHandlerManager::FindHandler(int32_t ha
     }
     return nullptr;
 }
-std::shared_ptr<AppExecFwk::EventHandler> InputHandlerManager::GetEventHandler(int32_t handlerId)
+
+EventHandlerPtr InputHandlerManager::GetEventHandler(int32_t handlerId)
 {
     auto tItr = inputHandlers_.find(handlerId);
     if (tItr != inputHandlers_.end()) {
@@ -171,16 +173,16 @@ std::shared_ptr<AppExecFwk::EventHandler> InputHandlerManager::GetEventHandler(i
     return nullptr;
 }
 
-bool InputHandlerManager::PostTask(int32_t handlerId, AppExecFwk::EventHandler::Callback &callback)
+bool InputHandlerManager::PostTask(int32_t handlerId, const AppExecFwk::EventHandler::Callback &callback)
 {
     auto eventHandler = GetEventHandler(handlerId);
-    CHKPV(eventHandler);
+    CHKPF(eventHandler);
     return MMIEventHandler::PostTask(eventHandler, callback);
 }
 
 void InputHandlerManager::OnKeyEventTask(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHK_PIDANDTID(callMsgHandler);
+    CHK_PIDANDTID();
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     auto consumer = FindHandler(handlerId);
     if (consumer == nullptr) {
@@ -204,7 +206,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
 
 void InputHandlerManager::OnPointerEventTask(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHK_PIDANDTID(callMsgHandler);
+    CHK_PIDANDTID();
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     auto consumer = FindHandler(handlerId);
     if (consumer == nullptr) {

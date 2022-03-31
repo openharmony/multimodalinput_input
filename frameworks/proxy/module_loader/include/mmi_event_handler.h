@@ -30,17 +30,18 @@ enum MmiEventHandlerId : uint32_t {
 };
 
 class MMIEventHandler;
-using EventHandlerPtr = std::shared_ptr<MMIEventHandler>;
+using MMIEventHandlerPtr = std::shared_ptr<MMIEventHandler>;
+using EventHandlerPtr = std::shared_ptr<AppExecFwk::EventHandler>;
 class MMIEventHandler : public AppExecFwk::EventHandler {
 public:
     MMIEventHandler();
     MMIEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner, MMIClientPtr client);
     virtual ~MMIEventHandler();
     DISALLOW_COPY_AND_MOVE(MMIEventHandler);
-    static bool PostTask(EventHandlerPtr eventHandler, AppExecFwk::EventHandler::Callback &callback);
+    static bool PostTask(EventHandlerPtr eventHandler, const AppExecFwk::EventHandler::Callback &callback);
 
     const std::string& GetErrorStr(ErrCode code) const;
-    EventHandlerPtr GetSharedPtr();
+    MMIEventHandlerPtr GetSharedPtr();
 
 protected:
     void OnReconnect(const AppExecFwk::InnerEvent::Pointer &event);

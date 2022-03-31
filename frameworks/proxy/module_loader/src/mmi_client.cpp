@@ -21,6 +21,7 @@
 #include "proto.h"
 #include "util.h"
 
+#include "input_manager_impl.h"
 #include "mmi_fd_listener.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
@@ -32,11 +33,15 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMICl
 } // namespace
 
 using namespace AppExecFwk;
-MMIClient::MMIClient() {}
+MMIClient::MMIClient()
+{
+    CALL_LOG_ENTER;
+}
 
 MMIClient::~MMIClient()
 {
     CALL_LOG_ENTER;
+    Stop();
 }
 
 bool MMIClient::SendMessage(const NetPacket &pkt) const
@@ -77,16 +82,18 @@ bool MMIClient::Start()
 bool MMIClient::StartEventRunner()
 {
     CALL_LOG_ENTER;
-    CHK_PIDANDTID(EventHandler);
-    if (InputMgrImp->InitEventHandler()) {
+    CHK_PIDANDTID();
+    if (!InputMgrImp->InitEventHandler()) {
         MMI_HILOGE("init eventhandler error");
         Stop();
         return false;
     }
+
+    std::mutex mtx;
+    constexpr int32_t outTime = 3;
     recvThread_ = std::thread(std::bind(&MMIClient::OnRecvThread, this));
     recvThread_.detach();
-    constexpr int32_t outTime = 3;
-    std::unique_lock <std::mutex> lck(mtx_);
+    std::unique_lock <std::mutex> lck(mtx);
     if (cv_.wait_for(lck, std::chrono::seconds(outTime)) == std::cv_status::timeout) {
         MMI_HILOGE("Recv thread start timeout");
         Stop();
@@ -98,7 +105,7 @@ bool MMIClient::StartEventRunner()
 void MMIClient::OnRecvThread()
 {
     CALL_LOG_ENTER;
-    CHK_PIDANDTID(EventHandler);
+    CHK_PIDANDTID();
     SetThreadName("mmi_client_RecvEventHdr");
 
     auto runner = EventRunner::Create(false);
@@ -116,7 +123,7 @@ void MMIClient::OnRecvThread()
             return;
         }
     }
-    cv.notify_one();
+    cv_.notify_one();
     runner->Run();
 }
 

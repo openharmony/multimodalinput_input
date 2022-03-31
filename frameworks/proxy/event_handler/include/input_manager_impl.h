@@ -42,7 +42,7 @@ public:
     InputManagerImpl() = default;
 
     bool InitEventHandler();
-    EventHandlerPtr GetEventHandler();
+    MMIEventHandlerPtr GetEventHandler();
     
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
         const std::vector<LogicalDisplayInfo> &logicalDisplays);
@@ -74,7 +74,7 @@ private:
     int32_t PackLogicalDisplay(NetPacket &pkt);
     void PrintDisplayInfo();
     void SendDisplayInfo();
-;
+
     void OnKeyEventTask(std::shared_ptr<KeyEvent> keyEvent);
     void OnPointerEventTask(std::shared_ptr<PointerEvent> pointerEvent);
     void OnThread();
@@ -82,7 +82,7 @@ private:
 private:
     sptr<EventFilterService> eventFilterService_ {nullptr};
     std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
-    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
+    
     std::vector<PhysicalDisplayInfo> physicalDisplays_;
     std::vector<LogicalDisplayInfo> logicalDisplays_;
     InputMonitorManager monitorManager_;
@@ -91,7 +91,8 @@ private:
     std::mutex mtx_;
     std::condition_variable cv_;
     std::thread ehThread_;
-    EventHandlerPtr mmiEventHandler_ = nullptr;
+    EventHandlerPtr eventHandler_  = nullptr;
+    MMIEventHandlerPtr mmiEventHandler_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS

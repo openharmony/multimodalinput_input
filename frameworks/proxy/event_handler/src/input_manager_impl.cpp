@@ -19,6 +19,7 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+
 #include "bytrace_adapter.h"
 #include "event_filter_service.h"
 #include "input_event_monitor_manager.h"
@@ -69,8 +70,10 @@ bool InputManagerImpl::InitEventHandler()
         MMI_HILOGE("Repeated initialization operations");
         return false;
     }
+
+    std::mutex mtx;
     constexpr int32_t outTime = 3;
-    std::unique_lock <std::mutex> lck(mtx_);
+    std::unique_lock <std::mutex> lck(mtx);
     ehThread_ = std::thread(std::bind(&InputManagerImpl::OnThread, this));
     ehThread_.detach();
     if (cv_.wait_for(lck, std::chrono::seconds(outTime)) == std::cv_status::timeout) {
@@ -80,7 +83,7 @@ bool InputManagerImpl::InitEventHandler()
     return true;
 }
 
-EventHandlerPtr InputManagerImpl::GetEventHandler()
+MMIEventHandlerPtr InputManagerImpl::GetEventHandler()
 {
     return mmiEventHandler_->GetSharedPtr();
 }
@@ -88,10 +91,10 @@ EventHandlerPtr InputManagerImpl::GetEventHandler()
 void InputManagerImpl::OnThread()
 {
     CALL_LOG_ENTER;
-    CHK_PIDANDTID(InputManager);
+    CHK_PIDANDTID();
     SetThreadName("mmi_client_EventHdr");
     mmiEventHandler_ = std::make_shared<MMIEventHandler>();
-    CHKPF(mmiEventHandler_);
+    CHKPV(mmiEventHandler_);
     auto eventRunner = mmiEventHandler_->GetEventRunner();
     CHKPV(eventRunner);
     cv_.notify_one();
@@ -159,7 +162,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
 
 void InputManagerImpl::OnKeyEventTask(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHK_PIDANDTID(callMsgHandler);
+    CHK_PIDANDTID();
     CHKPV(consumer_);
     consumer_->OnInputEvent(keyEvent);
     MMI_HILOGD("callMsgHandler key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
@@ -180,7 +183,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 
 void InputManagerImpl::OnPointerEventTask(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHK_PIDANDTID(callMsgHandler);
+    CHK_PIDANDTID();
     CHKPV(consumer_);
     consumer_->OnInputEvent(pointerEvent);
     MMI_HILOGD("callMsgHandler pointer event callback pointerId:%{public}d", pointerEvent->GetPointerId());

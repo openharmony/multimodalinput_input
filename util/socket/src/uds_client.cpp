@@ -32,7 +32,6 @@ UDSClient::UDSClient()
 UDSClient::~UDSClient()
 {
     CALL_LOG_ENTER;
-    Stop();
 }
 
 int32_t UDSClient::ConnectTo()
@@ -64,7 +63,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
     int32_t remSize = bufSize;
     while (remSize > 0 && retryCount < SEND_RETRY_LIMIT) {
         retryCount += 1;
-        auto count = send(fd_, &buf[idx], remSize, SOCKET_FLAGS);
+        auto count = send(fd_, &buf[idx], remSize, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (count < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
                 MMI_HILOGW("continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
@@ -82,7 +81,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
     }
     if (retryCount >= SEND_RETRY_LIMIT || remSize != 0) {
         MMI_HILOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
-            retryCount, SEND_RETRY_LIMIT, sendSize, bufSize, fd_);
+            retryCount, SEND_RETRY_LIMIT, idx, bufSize, fd_);
         return false;
     }
     return true;

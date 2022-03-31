@@ -19,7 +19,9 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+
 #include "bytrace_adapter.h"
+#include "input_manager_impl.h"
 #include "mmi_event_handler.h"
 #include "multimodal_event_handler.h"
 #include "standardized_event_manager.h"
@@ -35,7 +37,7 @@ int32_t KeyEventInputSubscribeManager::subscribeIdManager_ = 0;
 KeyEventInputSubscribeManager::SubscribeKeyEventInfo::SubscribeKeyEventInfo(
     std::shared_ptr<KeyOption> keyOption,
     std::function<void(std::shared_ptr<KeyEvent>)> callback,
-    std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+    EventHandlerPtr eventHandler)
     : keyOption_(keyOption), callback_(callback), eventHandler_(eventHandler)
 {
     if (KeyEventInputSubscribeManager::subscribeIdManager_ >= INT_MAX) {
@@ -107,7 +109,7 @@ int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
     return RET_ERR;
 }
 
-bool KeyEventInputSubscribeManager::PostTask(int32_t subscribeId, AppExecFwk::EventHandler::Callback &callback)
+bool KeyEventInputSubscribeManager::PostTask(int32_t subscribeId, const AppExecFwk::EventHandler::Callback &callback)
 {
     auto obj = GetSubscribeKeyEvent(subscribeId);
     if (obj == nullptr) {
@@ -115,14 +117,14 @@ bool KeyEventInputSubscribeManager::PostTask(int32_t subscribeId, AppExecFwk::Ev
         return false;
     }
     auto eventHandler = obj->GetEventHandler();
-    CHKPV(eventHandler);
+    CHKPF(eventHandler);
     return MMIEventHandler::PostTask(eventHandler, callback);;
 }
 
-int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask(std::shared_ptr<KeyEvent> event,
+void KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask(std::shared_ptr<KeyEvent> event,
     int32_t subscribeId)
 {
-    CHK_PIDANDTID(callMsgHandler);
+    CHK_PIDANDTID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto obj = GetSubscribeKeyEvent(subscribeId);
     if (!obj) {

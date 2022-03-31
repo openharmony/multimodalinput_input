@@ -19,8 +19,9 @@
 #include <map>
 #include <mutex>
 
-#include "mmi_event_handler.h"
 #include "nocopyable.h"
+
+#include "mmi_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -59,6 +60,7 @@ private:
     InputDeviceImpl() = default;
     std::map<int32_t, DevInfo> inputDevcices_;
     std::map<int32_t, DevIds> inputDevciceIds_;
+    std::mutex mtx_;
 };
 } // namespace MMI
 } // namespace OHOS
