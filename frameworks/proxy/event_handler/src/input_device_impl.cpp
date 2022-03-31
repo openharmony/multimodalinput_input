@@ -79,7 +79,7 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, std::string na
         return;
     }
     if (!MMIEventHandler::PostTask(devInfo->first,
-        std::bind(&InputDeviceImpl::OnInputDeviceTask, this, userData, id, std::ref(name), deviceType))) {
+        std::bind(&InputDeviceImpl::OnInputDeviceTask, this, userData, id, name, deviceType))) {
         MMI_HILOGE("post task failed");
     }
 }
@@ -106,7 +106,7 @@ void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> id
         return;
     }
     if (!MMIEventHandler::PostTask(devIds->first,
-        std::bind(&InputDeviceImpl::OnInputDeviceIdsTask, this, userData, std::ref(ids)))) {
+        std::bind(&InputDeviceImpl::OnInputDeviceIdsTask, this, userData, ids))) {
         MMI_HILOGE("post task failed");
     }
 }
