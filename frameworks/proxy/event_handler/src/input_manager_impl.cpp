@@ -289,8 +289,6 @@ void InputManagerImpl::PrintDisplayInfo()
             item.width, item.height, item.name.c_str(),
             item.seatId.c_str(), item.seatName.c_str(),
             item.focusWindowId, item.windowsInfo.size());
-
-
         for (const auto &win : item.windowsInfo) {
             MMI_HILOGD("windowid:%{public}d,pid:%{public}d,uid:%{public}d,hotZoneTopLeftX:%{public}d,"
                 "hotZoneTopLeftY:%{public}d,hotZoneWidth:%{public}d,hotZoneHeight:%{public}d,display:%{public}d,"
