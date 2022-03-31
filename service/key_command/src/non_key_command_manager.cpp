@@ -29,12 +29,9 @@ bool NonKeyCommandManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> ke
     return true;
 }
 
-std::shared_ptr<IKeyCommandManager> IKeyCommandManager::GetInstance()
+std::shared_ptr<IKeyCommandManager> IKeyCommandManager::Create()
 {
-    if (keyCommandPtr_ == nullptr) {
-        keyCommandPtr_ = std::make_shared<NonKeyCommandManager>();
-    }
-    return keyCommandPtr_;
+    return std::make_shared<NonKeyCommandManager>();
 }
 } // namespace MMI
 } // namespace OHOS
