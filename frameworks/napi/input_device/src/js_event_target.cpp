@@ -461,6 +461,5 @@ void JsEventTarget::ResetEnv()
     callback_.clear();
 }
 
-
 } // namespace MMI
 } // namespace OHOS
