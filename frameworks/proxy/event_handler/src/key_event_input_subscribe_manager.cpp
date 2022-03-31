@@ -118,7 +118,7 @@ bool KeyEventInputSubscribeManager::PostTask(int32_t subscribeId, const AppExecF
     }
     auto eventHandler = obj->GetEventHandler();
     CHKPF(eventHandler);
-    return MMIEventHandler::PostTask(eventHandler, callback);;
+    return MMIEventHandler::PostTask(eventHandler, callback);
 }
 
 void KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask(std::shared_ptr<KeyEvent> event,
@@ -136,7 +136,7 @@ void KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask(std::shared_
         subscribeId, event->GetKeyCode());
 }
 
-int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_ptr<KeyEvent> event, 
+int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_ptr<KeyEvent> event,
     int32_t subscribeId)
 {
     CALL_LOG_ENTER;
