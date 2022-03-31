@@ -19,7 +19,6 @@
 #include <list>
 #include <map>
 #include <mutex>
-#include <thread>
 
 #include "nocopyable.h"
 
