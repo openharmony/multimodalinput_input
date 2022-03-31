@@ -23,25 +23,20 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsUtil" };
 } // namespace
-void JsUtil::GetCallbackInfo(uv_work_t *work, CallbackTemp& temp)
+int32_t JsUtil::GetUserData(uv_work_t *work)
 {
-    CallbackInfo *cb = static_cast<CallbackInfo*>(work->data);
-    temp.env = cb->env;
-    temp.ref = cb->ref;
-    temp.deferred = cb->deferred;
-    temp.promise = cb->promise;
-    temp.data.ids = cb->data.ids;
-    temp.data.device = cb->data.device;
-    temp.data.keystrokeAbility = cb->data.keystrokeAbility;
-    delete cb;
-    cb = nullptr;
+    int32_t *uData = static_cast<int32_t*>(work->data);
+    int32_t userData = *uData;
+    delete uData;
+    uData = nullptr;
     delete work;
     work = nullptr;
+    return userData;
 }
 
-JsUtil::CallbackTemp::CallbackTemp() {}
+JsUtil::CallbackInfo::CallbackInfo() {}
 
-JsUtil::CallbackTemp::~CallbackTemp()
+JsUtil::CallbackInfo::~CallbackInfo()
 {
     CALL_LOG_ENTER;
     if (ref != nullptr) {

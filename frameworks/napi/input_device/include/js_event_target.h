@@ -38,7 +38,7 @@ public:
     napi_value CreateCallbackInfo(napi_env env, napi_value handle);
     void ResetEnv();
     inline static int32_t userData_ {0};
-    inline static std::map<int32_t, JsUtil::CallbackInfo*> callback_ {};
+    inline static std::map<int32_t, std::unique_ptr<JsUtil::CallbackInfo>> callback_ {};
 
     struct DeviceType {
         std::string deviceTypeName;

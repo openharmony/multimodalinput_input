@@ -26,6 +26,20 @@ constexpr uint32_t EVDEV_UDEV_TAG_TOUCHSCREEN = (1 << 4);
 constexpr uint32_t EVDEV_UDEV_TAG_JOYSTICK = (1 << 6);
 constexpr uint32_t EVDEV_UDEV_TAG_TRACKBALL = (1 << 10);
 
+const std::string CREATE_ARRAY = "napi_create_array";
+const std::string CREATE_INT32 = "napi_create_int32";
+const std::string SET_ELEMENT = "napi_set_element";
+const std::string SET_NAMED_PROPERTY = "napi_set_named_property";
+const std::string CREATE_REFERENCE = "napi_create_reference";
+const std::string GET_REFERENCE = "napi_get_reference_value";
+const std::string CALL_FUNCTION = "napi_call_function";
+const std::string RESOLVE_DEFERRED = "napi_resolve_deferred";
+const std::string GET_UV_LOOP = "napi_get_uv_event_loop";
+const std::string CREATE_STRING_UTF8 = "napi_create_string_utf8";
+const std::string CREATE_OBJECT = "napi_create_object";
+const std::string COERCE_TO_BOOL = "napi_coerce_to_bool";
+const std::string CREATE_PROMISE = "napi_create_promise";
+
 JsEventTarget::DeviceType g_deviceType[] = {
     {"keyboard", EVDEV_UDEV_TAG_KEYBOARD},
     {"mouse", EVDEV_UDEV_TAG_MOUSE},
@@ -43,25 +57,32 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
     CALL_LOG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
-    JsUtil::CallbackTemp cbTemp;
     JsUtil jsUtil;
-    jsUtil.GetCallbackInfo(work, cbTemp);
-    CHKPV(cbTemp.env);
+    int32_t userData = jsUtil.GetUserData(work);  
+    auto iter = callback_.find(userData);
+    if (iter == callback_.end()) {
+        MMI_HILOGE("find userData failed");
+        return;
+    }
+    auto cbTemp = std::move(iter->second);
+    callback_.erase(iter);
+    CHKPV(cbTemp->env);
 
     napi_value arr = nullptr;
-    CHKRV(cbTemp.env, napi_create_array(cbTemp.env, &arr), "napi_create_array");
+
+    CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &arr), CREATE_ARRAY);
     uint32_t index = 0;
     napi_value value = nullptr;
-    for (const auto &item : cbTemp.data.ids) {
-        CHKRV(cbTemp.env, napi_create_int32(cbTemp.env, item, &value), "napi_create_int32");
-        CHKRV(cbTemp.env, napi_set_element(cbTemp.env, arr, index, value), "napi_set_element");
+    for (const auto &item : cbTemp->data.ids) {
+        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, item, &value), CREATE_INT32);
+        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, arr, index, value), SET_ELEMENT);
         ++index;
     }
 
     napi_value handlerTemp = nullptr;
-    CHKRV(cbTemp.env, napi_get_reference_value(cbTemp.env, cbTemp.ref, &handlerTemp), "napi_get_reference_value");
+    CHKRV(cbTemp->env, napi_get_reference_value(cbTemp->env, cbTemp->ref, &handlerTemp), GET_REFERENCE);
     napi_value result = nullptr;
-    CHKRV(cbTemp.env, napi_call_function(cbTemp.env, nullptr, handlerTemp, 1, &arr, &result), "napi_call_function");
+    CHKRV(cbTemp->env, napi_call_function(cbTemp->env, nullptr, handlerTemp, 1, &arr, &result), CALL_FUNCTION);
 }
 
 void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
@@ -69,28 +90,33 @@ void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
     CALL_LOG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
-    JsUtil::CallbackTemp cbTemp;
     JsUtil jsUtil;
-    jsUtil.GetCallbackInfo(work, cbTemp);
-    CHKPV(cbTemp.env);
+    int32_t userData = jsUtil.GetUserData(work);  
+    auto iter = callback_.find(userData);
+    if (iter == callback_.end()) {
+        MMI_HILOGE("find userData failed");
+        return;
+    }
+    auto cbTemp = std::move(iter->second);
+    callback_.erase(iter);
+    CHKPV(cbTemp->env);
 
     napi_value arr = nullptr;
-    CHKRV(cbTemp.env, napi_create_array(cbTemp.env, &arr), "napi_create_array");
-
-    napi_value value = nullptr;
+    CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &arr), CREATE_ARRAY);
     uint32_t index = 0;
-    for (const auto &item : cbTemp.data.ids) {
-        CHKRV(cbTemp.env, napi_create_int32(cbTemp.env, item, &value), "napi_create_int32");
-        CHKRV(cbTemp.env, napi_set_element(cbTemp.env, arr, index, value), "napi_set_element");
-        index++;
+    napi_value value = nullptr;
+    for (const auto &item : cbTemp->data.ids) {
+        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, item, &value), CREATE_INT32);
+        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, arr, index, value), SET_ELEMENT);
+        ++index;
     }
-    CHKRV(cbTemp.env, napi_resolve_deferred(cbTemp.env, cbTemp.deferred, arr), "napi_resolve_deferred");
+    CHKRV(cbTemp->env, napi_resolve_deferred(cbTemp->env, cbTemp->deferred, arr), RESOLVE_DEFERRED);
 }
 
 void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> ids)
 {
-    std::lock_guard<std::mutex> guard(mutex_);
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
         MMI_HILOGE("Failed to search for userData");
@@ -98,23 +124,18 @@ void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> ids)
     }
     CHKPV(iter->second);
     if (iter->second->env == nullptr) {
-        delete iter->second;
-        iter->second = nullptr;
         callback_.erase(iter);
         MMI_HILOGE("env is nullptr");
     }
 
     iter->second->data.ids = ids;
+    uv_loop_s *loop = nullptr;
+    CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
-    work->data = static_cast<void*>(iter->second);
-    uv_loop_s *loop = nullptr;
-    napi_status status = napi_get_uv_event_loop(iter->second->env, &loop);
-    if (status != napi_ok) {
-        MMI_HILOGE("napi_get_uv_event_loop failed");
-        return;
-    }
-
+    int32_t *uData = new (std::nothrow) int32_t(userData);
+    CHKPV(uData);
+    work->data = static_cast<void*>(uData);
     int32_t ret;
     if (iter->second->ref == nullptr) {
         ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallIdsPromiseWork);
@@ -122,6 +143,10 @@ void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> ids)
         ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallIdsAsyncWork);
     }
     if (ret != 0) {
+        delete work;
+        work = nullptr;
+        delete uData;
+        uData = nullptr;
         MMI_HILOGE("uv_queue_work failed");
         return;
     }
@@ -132,24 +157,29 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
     CALL_LOG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
-    JsUtil::CallbackTemp cbTemp;
     JsUtil jsUtil;
-    jsUtil.GetCallbackInfo(work, cbTemp);
-    CHKPV(cbTemp.data.device);
-    CHKPV(cbTemp.env);
+    int32_t userData = jsUtil.GetUserData(work);  
+    auto iter = callback_.find(userData);
+    if (iter == callback_.end()) {
+        MMI_HILOGE("find userData failed");
+        return;
+    }
+    auto cbTemp = std::move(iter->second);
+    callback_.erase(iter);
+    CHKPV(cbTemp->env);
 
     napi_value id = nullptr;
-    CHKRV(cbTemp.env, napi_create_int32(cbTemp.env, cbTemp.data.device->id, &id), "napi_create_int32");
+    CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.device->id, &id), CREATE_INT32);
     napi_value name = nullptr;
-    CHKRV(cbTemp.env, napi_create_string_utf8(cbTemp.env, (cbTemp.data.device->name).c_str(), NAPI_AUTO_LENGTH, &name),
-        "napi_create_string_utf8");
+    CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, (cbTemp->data.device->name).c_str(),
+        NAPI_AUTO_LENGTH, &name), CREATE_STRING_UTF8);
 
     napi_value object = nullptr;
-    CHKRV(cbTemp.env, napi_create_object(cbTemp.env, &object), "napi_create_object");
-    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "id", id), "napi_set_named_property id");
-    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "name", name), "napi_set_named_property name");
+    CHKRV(cbTemp->env, napi_create_object(cbTemp->env, &object), CREATE_OBJECT);
+    CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "id", id), SET_NAMED_PROPERTY);
+    CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "name", name), SET_NAMED_PROPERTY);
 
-    uint32_t types = cbTemp.data.device->devcieType;
+    uint32_t types = cbTemp->data.device->devcieType;
     std::vector<std::string> sources;
     for (const auto & item : g_deviceType) {
         if (types & item.typeBit) {
@@ -157,26 +187,24 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
         }
     }
     napi_value devSources = nullptr;
-    CHKRV(cbTemp.env, napi_create_array(cbTemp.env, &devSources), "napi_create_array");
+    CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &devSources), CREATE_ARRAY);
     uint32_t index = 0;
     napi_value value = nullptr;
     for (const auto &item : sources) {
-        CHKRV(cbTemp.env, napi_create_string_utf8(cbTemp.env, item.c_str(), NAPI_AUTO_LENGTH, &value),
-              "napi_create_string_utf8");
-        CHKRV(cbTemp.env, napi_set_element(cbTemp.env, devSources, index, value), "napi_set_element");
+        CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, item.c_str(), NAPI_AUTO_LENGTH, &value),
+            CREATE_STRING_UTF8);
+        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, devSources, index, value), SET_ELEMENT);
     }
-    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "sources", devSources),
-          "napi_set_named_property sources");
+    CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "sources", devSources), SET_NAMED_PROPERTY);
 
     napi_value axisRanges = nullptr;
-    CHKRV(cbTemp.env, napi_create_array(cbTemp.env, &axisRanges), "napi_create_array");
-    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "axisRanges", axisRanges),
-          "napi_set_named_property axisRanges");
+    CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &axisRanges), CREATE_ARRAY);
+    CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "axisRanges", axisRanges), SET_NAMED_PROPERTY);
 
     napi_value handlerTemp = nullptr;
-    CHKRV(cbTemp.env, napi_get_reference_value(cbTemp.env, cbTemp.ref, &handlerTemp), "napi_get_reference_value");
+    CHKRV(cbTemp->env, napi_get_reference_value(cbTemp->env, cbTemp->ref, &handlerTemp), GET_REFERENCE);
     napi_value result = nullptr;
-    CHKRV(cbTemp.env, napi_call_function(cbTemp.env, nullptr, handlerTemp, 1, &object, &result), "napi_call_function");
+    CHKRV(cbTemp->env, napi_call_function(cbTemp->env, nullptr, handlerTemp, 1, &object, &result), CALL_FUNCTION);
 }
 
 void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
@@ -184,23 +212,28 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     CALL_LOG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
-    JsUtil::CallbackTemp cbTemp;
     JsUtil jsUtil;
-    jsUtil.GetCallbackInfo(work, cbTemp);
-    CHKPV(cbTemp.data.device);
-    CHKPV(cbTemp.env);
+    int32_t userData = jsUtil.GetUserData(work);  
+    auto iter = callback_.find(userData);
+    if (iter == callback_.end()) {
+        MMI_HILOGE("find userData failed");
+        return;
+    }
+    auto cbTemp = std::move(iter->second);
+    callback_.erase(iter);
+    CHKPV(cbTemp->env);
 
     napi_value id = nullptr;
-    CHKRV(cbTemp.env, napi_create_int32(cbTemp.env, cbTemp.data.device->id, &id), "napi_create_int32");
+    CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.device->id, &id), CREATE_INT32);
     napi_value name = nullptr;
-    CHKRV(cbTemp.env, napi_create_string_utf8(cbTemp.env, (cbTemp.data.device->name).c_str(), NAPI_AUTO_LENGTH, &name),
-          "napi_create_string_utf8");
+    CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, (cbTemp->data.device->name).c_str(),
+        NAPI_AUTO_LENGTH, &name), CREATE_STRING_UTF8);
     napi_value object = nullptr;
-    CHKRV(cbTemp.env, napi_create_object(cbTemp.env, &object), "napi_create_object");
-    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "id", id), "napi_set_named_property id");
-    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "name", name), "napi_set_named_property name");
+    CHKRV(cbTemp->env, napi_create_object(cbTemp->env, &object), CREATE_OBJECT);
+    CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "id", id), SET_NAMED_PROPERTY);
+    CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "name", name), SET_NAMED_PROPERTY);
 
-    uint32_t types = cbTemp.data.device->devcieType;
+    uint32_t types = cbTemp->data.device->devcieType;
     if (types == 0) {
         MMI_HILOGE("types is wrong");
         return;
@@ -212,29 +245,27 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
         }
     }
     napi_value devSources = nullptr;
-    CHKRV(cbTemp.env, napi_create_array(cbTemp.env, &devSources), "napi_create_array");
+    CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &devSources), CREATE_ARRAY);
 
     uint32_t index = 0;
     napi_value value = nullptr;
     for (const auto &item : sources) {
-        CHKRV(cbTemp.env, napi_create_string_utf8(cbTemp.env, item.c_str(), NAPI_AUTO_LENGTH, &value),
-              "napi_create_string_utf8");
-        CHKRV(cbTemp.env, napi_set_element(cbTemp.env, devSources, index, value), "napi_set_element");
+        CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, item.c_str(), NAPI_AUTO_LENGTH, &value),
+              CREATE_STRING_UTF8);
+        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, devSources, index, value), SET_ELEMENT);
     }
-    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "sources", devSources),
-          "napi_set_named_property sources");
+    CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "sources", devSources), SET_NAMED_PROPERTY);
 
     napi_value axisRanges = nullptr;
-    CHKRV(cbTemp.env, napi_create_array(cbTemp.env, &axisRanges), "napi_create_array");
-    CHKRV(cbTemp.env, napi_set_named_property(cbTemp.env, object, "axisRanges", axisRanges),
-          "napi_set_named_property axisRanges");
-    CHKRV(cbTemp.env, napi_resolve_deferred(cbTemp.env, cbTemp.deferred, object), "napi_resolve_deferred");
+    CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &axisRanges), CREATE_ARRAY);
+    CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "axisRanges", axisRanges), SET_NAMED_PROPERTY);
+    CHKRV(cbTemp->env, napi_resolve_deferred(cbTemp->env, cbTemp->deferred, object), RESOLVE_DEFERRED);
 }
 
 void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device)
 {
-    std::lock_guard<std::mutex> guard(mutex_);
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(device);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
@@ -243,22 +274,17 @@ void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl:
     }
     CHKPV(iter->second);
     if (iter->second->env == nullptr) {
-        delete iter->second;
-        iter->second = nullptr;
         callback_.erase(iter);
         MMI_HILOGE("env is nullptr");
     }
 
     iter->second->data.device = device;
+    uv_loop_s *loop = nullptr;
+    CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
-    work->data = static_cast<void*>(iter->second);
-    uv_loop_s *loop = nullptr;
-    napi_status status = napi_get_uv_event_loop(iter->second->env, &loop);
-    if (status != napi_ok) {
-        MMI_HILOGE("napi_get_uv_event_loop failed");
-        return;
-    }
+    int32_t *uData = new (std::nothrow) int32_t(userData);
+    work->data = static_cast<void*>(uData);
     int32_t ret;
     if (iter->second->ref == nullptr) {
         ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDevPromiseWork);
@@ -266,6 +292,10 @@ void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl:
         ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDevAsyncWork);
     }
     if (ret != 0) {
+        delete work;
+        work = nullptr;
+        delete uData;
+        uData = nullptr;
         MMI_HILOGE("uv_queue_work failed");
         return;
     }
@@ -276,31 +306,37 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
     CALL_LOG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
-    JsUtil::CallbackTemp cbTemp;
     JsUtil jsUtil;
-    jsUtil.GetCallbackInfo(work, cbTemp);
-    CHKPV(cbTemp.env);
+    int32_t userData = jsUtil.GetUserData(work);  
+    auto iter = callback_.find(userData);
+    if (iter == callback_.end()) {
+        MMI_HILOGE("find userData failed");
+        return;
+    }
+    auto cbTemp = std::move(iter->second);
+    callback_.erase(iter);
+    CHKPV(cbTemp->env);
 
     napi_value keyAbility = nullptr;
-    CHKRV(cbTemp.env, napi_create_array(cbTemp.env, &keyAbility), "napi_create_array");
+    CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &keyAbility), CREATE_ARRAY);
     napi_value keyCode = nullptr;
     napi_value ret = nullptr;
-    napi_value isBool = nullptr;
-    uint32_t index1 = 0;
-    for (auto it = cbTemp.data.keystrokeAbility.begin(); it != cbTemp.data.keystrokeAbility.end(); ++it) {
+    napi_value isSupport = nullptr;
+    uint32_t i = 0;
+    for (auto it = cbTemp->data.keystrokeAbility.begin(); it != cbTemp->data.keystrokeAbility.end(); ++it) {
         napi_value abilityRet = nullptr;
-        CHKRV(cbTemp.env, napi_create_array(cbTemp.env, &abilityRet), "napi_create_array");
-        uint32_t index2 = 0;
-        CHKRV(cbTemp.env, napi_create_int32(cbTemp.env, *it, &keyCode), "napi_create_int32");
-        CHKRV(cbTemp.env, napi_set_element(cbTemp.env, abilityRet, index2, keyCode), "napi_set_element");
-        ++index2;
-        CHKRV(cbTemp.env, napi_create_int32(cbTemp.env, *(++it), &ret), "napi_create_int32");
-        CHKRV(cbTemp.env, napi_coerce_to_bool(cbTemp.env, ret, &isBool), "napi_create_int32");
-        CHKRV(cbTemp.env, napi_set_element(cbTemp.env, abilityRet, index2, isBool), "napi_set_element");
-        CHKRV(cbTemp.env, napi_set_element(cbTemp.env, keyAbility, index1, abilityRet), "napi_set_element");
-        ++index1;
+        CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &abilityRet), CREATE_ARRAY);
+        uint32_t j = 0;
+        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, *it, &keyCode), CREATE_INT32);
+        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, abilityRet, j, keyCode), SET_ELEMENT);
+        ++j;
+        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, *(++it), &ret), CREATE_INT32);
+        CHKRV(cbTemp->env, napi_coerce_to_bool(cbTemp->env, ret, &isSupport), COERCE_TO_BOOL);
+        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, abilityRet, j, isSupport), SET_ELEMENT);
+        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, keyAbility, i, abilityRet), SET_ELEMENT);
+        ++i;
     }
-    CHKRV(cbTemp.env, napi_resolve_deferred(cbTemp.env, cbTemp.deferred, keyAbility), "napi_resolve_deferred");
+    CHKRV(cbTemp->env, napi_resolve_deferred(cbTemp->env, cbTemp->deferred, keyAbility), RESOLVE_DEFERRED);
 }
 
 void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
@@ -308,43 +344,49 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
     CALL_LOG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
-    JsUtil::CallbackTemp cbTemp;
     JsUtil jsUtil;
-    jsUtil.GetCallbackInfo(work, cbTemp);
-    CHKPV(cbTemp.env);
+    int32_t userData = jsUtil.GetUserData(work);  
+    auto iter = callback_.find(userData);
+    if (iter == callback_.end()) {
+        MMI_HILOGE("find userData failed");
+        return;
+    }
+    auto cbTemp = std::move(iter->second);
+    callback_.erase(iter);
+    CHKPV(cbTemp->env);
 
     napi_value keyAbility = nullptr;
-    CHKRV(cbTemp.env, napi_create_array(cbTemp.env, &keyAbility), "napi_create_array");
+    CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &keyAbility), CREATE_ARRAY);
     napi_value keyCode = nullptr;
     napi_value ret = nullptr;
-    napi_value isBool = nullptr;
-    uint32_t index1 = 0;
-    for (auto it = cbTemp.data.keystrokeAbility.begin(); it != cbTemp.data.keystrokeAbility.end(); ++it) {
+    napi_value isSupport = nullptr;
+    uint32_t i = 0;
+    for (auto it = cbTemp->data.keystrokeAbility.begin(); it != cbTemp->data.keystrokeAbility.end(); ++it) {
         napi_value abilityRet = nullptr;
-        CHKRV(cbTemp.env, napi_create_array(cbTemp.env, &abilityRet), "napi_create_array");
-        uint32_t index2 = 0;
-        CHKRV(cbTemp.env, napi_create_int32(cbTemp.env, *it, &keyCode), "napi_create_int32");
-        CHKRV(cbTemp.env, napi_set_element(cbTemp.env, abilityRet, index2, keyCode), "napi_set_element");
-        ++index2;
-        CHKRV(cbTemp.env, napi_create_int32(cbTemp.env, *(++it), &ret), "napi_create_int32");
-        CHKRV(cbTemp.env, napi_coerce_to_bool(cbTemp.env, ret, &isBool), "napi_create_int32");
-        CHKRV(cbTemp.env, napi_set_element(cbTemp.env, abilityRet, index2, isBool), "napi_set_element");
-        CHKRV(cbTemp.env, napi_set_element(cbTemp.env, keyAbility, index1, abilityRet), "napi_set_element");
-        ++index1;
+        CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &abilityRet), CREATE_ARRAY);
+        uint32_t j = 0;
+        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, *it, &keyCode), CREATE_INT32);
+        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, abilityRet, j, keyCode), SET_ELEMENT);
+        ++j;
+        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, *(++it), &ret), CREATE_INT32);
+        CHKRV(cbTemp->env, napi_coerce_to_bool(cbTemp->env, ret, &isSupport), COERCE_TO_BOOL);
+        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, abilityRet, j, isSupport), SET_ELEMENT);
+        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, keyAbility, i, abilityRet), SET_ELEMENT);
+        ++i;
     }
 
     napi_value handlerTemp = nullptr;
-    CHKRV(cbTemp.env, napi_get_reference_value(cbTemp.env, cbTemp.ref, &handlerTemp),
-          "napi_get_reference_value");
+    CHKRV(cbTemp->env, napi_get_reference_value(cbTemp->env, cbTemp->ref, &handlerTemp),
+          GET_REFERENCE);
     napi_value result = nullptr;
-    CHKRV(cbTemp.env, napi_call_function(cbTemp.env, nullptr, handlerTemp, 1, &keyAbility, &result),
-          "napi_call_function");
+    CHKRV(cbTemp->env, napi_call_function(cbTemp->env, nullptr, handlerTemp, 1, &keyAbility, &result),
+          CALL_FUNCTION);
 }
 
 void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::vector<int32_t> keystrokeAbility)
 {
-    std::lock_guard<std::mutex> guard(mutex_);
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
         MMI_HILOGE("Failed to search for userData");
@@ -352,22 +394,17 @@ void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::vector<int32_t
     }
     CHKPV(iter->second);
     if (iter->second->env == nullptr) {
-        delete iter->second;
-        iter->second = nullptr;
         callback_.erase(iter);
         MMI_HILOGE("env is nullptr");
     }
 
     iter->second->data.keystrokeAbility = keystrokeAbility;
+    uv_loop_s *loop = nullptr;
+    CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
-    work->data = static_cast<void*>(iter->second);
-    uv_loop_s *loop = nullptr;
-    napi_status status = napi_get_uv_event_loop(iter->second->env, &loop);
-    if (status != napi_ok) {
-        MMI_HILOGE("napi_get_uv_event_loop failed");
-        return;
-    }
+    int32_t *uData = new (std::nothrow) int32_t(userData);
+    work->data = static_cast<void*>(uData);
     int32_t ret;
     if (iter->second->ref == nullptr) {
         ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallKeystrokeAbilityPromise);
@@ -375,6 +412,10 @@ void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::vector<int32_t
         ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallKeystrokeAbilityAsync);
     }
     if (ret != 0) {
+        delete work;
+        work = nullptr;
+        delete uData;
+        uData = nullptr;
         MMI_HILOGE("uv_queue_work failed");
         return;
     }
@@ -382,56 +423,44 @@ void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::vector<int32_t
 
 napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle)
 {
-    std::lock_guard<std::mutex> guard(mutex_);
     CALL_LOG_ENTER;
-    JsUtil::CallbackInfo* cb = new (std::nothrow) JsUtil::CallbackInfo;
+    std::lock_guard<std::mutex> guard(mutex_);
+    auto  cb = std::make_unique<JsUtil::CallbackInfo>();
     CHKPP(cb);
     cb->env = env;
-    napi_status state = napi_generic_failure;
     if (handle == nullptr) {
-        state = napi_create_promise(env, &cb->deferred, &cb->promise);
-        if (state != napi_ok) {
-            delete cb;
-            cb = nullptr;
-            CHKRP(env, state, "napi_create_reference");
-        }
+        CHKRP(env, napi_create_promise(env, &cb->deferred, &cb->promise), CREATE_PROMISE);
         if (userData_ == INT32_MAX) {
             MMI_HILOGE("userData_ exceeds the maximum");
             return nullptr;
         }
-        callback_[userData_] = cb;
+        callback_.emplace(userData_, std::move(cb));
         ++userData_;
         return cb->promise;
     }
 
-    state = napi_create_reference(env, handle, 1, &cb->ref);
-    if (state != napi_ok) {
-        delete cb;
-        cb = nullptr;
-        CHKRP(env, state, "napi_create_reference");
-    }
+    CHKRP(env, napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
     if (userData_ == INT32_MAX) {
         MMI_HILOGE("userData_ exceeds the maximum");
         return nullptr;
     }
-    callback_[userData_] = cb;
+    callback_.emplace(userData_, std::move(cb));
     ++userData_;
     return nullptr;
 }
 
 void JsEventTarget::ResetEnv()
 {
-    std::lock_guard<std::mutex> guard(mutex_);
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     for (auto &item : callback_) {
-        if (item.second == nullptr || item.second->env == nullptr) {
-            continue;
-        }
+        CHKPC(item.second);
+        CHKPC(item.second->env);
         item.second->env = nullptr;
     }
-    std::map<int32_t, JsUtil::CallbackInfo*> empty_map;
-    callback_.swap(empty_map);
     callback_.clear();
 }
+
+
 } // namespace MMI
 } // namespace OHOS
