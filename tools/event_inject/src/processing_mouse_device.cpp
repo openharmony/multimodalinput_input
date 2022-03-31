@@ -67,19 +67,19 @@ int32_t ProcessingMouseDevice::AnalysisMouseEvent(const std::vector<DeviceEvent>
     for (const auto &item : inputData) {
         mouseEvent = {};
         mouseEvent.eventType = item.eventType;
-        if (item.keyValue > -1) {
+        if (item.keyValue > INVALID_VALUE) {
             mouseEvent.keyValue = item.keyValue;
         }
-        if (item.blockTime > -1) {
+        if (item.blockTime > INVALID_VALUE) {
             mouseEvent.blockTime = item.blockTime;
         }
-        if (item.xPos > -1) {
+        if (item.xPos > INVALID_VALUE) {
             mouseEvent.xPos = item.xPos;
         }
-        if (item.yPos > -1) {
+        if (item.yPos > INVALID_VALUE) {
             mouseEvent.yPos = item.yPos;
         }
-        if (item.distance > -1) {
+        if (item.distance > INVALID_VALUE) {
             mouseEvent.distance = item.distance;
         }
         if (!item.direction.empty()) {

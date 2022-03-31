@@ -48,6 +48,7 @@ public:
     int32_t GetDeviceIndex(const std::string& deviceNameText) const;
     std::string GetFunId() const;
     bool VirifyArgvs(const int32_t& argc, const std::vector<std::string>& argv);
+    bool ReadFile(const std::string &jsonFile, std::string &jsonBuf);
     bool RegistInjectEvent(InjectFunctionMap& msg)
     {
         auto it = injectFuns_.find(msg.id);

@@ -101,6 +101,20 @@ int32_t InjectionEventDispatch::GetFileSize(const std::string& fileName)
     return RET_ERR;
 }
 
+bool InjectionEventDispatch::ReadFile(const std::string &jsonFile, std::string& jsonBuf)
+{
+    FILE* fp = fopen(jsonFile.c_str(), "r");
+    CHKPF(fp);
+    char buf[256] = {};
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        jsonBuf = jsonBuf + buf;
+    }
+    if (fclose(fp) < 0) {
+        MMI_HILOGW("close file failed");
+    }
+    return true;
+}
+
 int32_t InjectionEventDispatch::OnJson()
 {
     CALL_LOG_ENTER;
@@ -131,15 +145,10 @@ int32_t InjectionEventDispatch::OnJson()
         MMI_HILOGE("The file size is out of range 2M or empty. filesize:%{public}d", fileSize);
         return RET_ERR;
     }
-    FILE* fp = fopen(jsonFile.c_str(), "r");
-    CHKPR(fp, RET_ERR);
-    char buf[256] = {};
     std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != NULL) {
-        jsonBuf = jsonBuf + buf;
-    }
-    if (fclose(fp) < 0) {
-        MMI_HILOGE("close file failed");
+    if(!ReadFile(jsonFile, jsonBuf)) {
+        MMI_HILOGE("read file failed");
+        return RET_ERR;
     }
     bool logType = false;
     if (injectArgvs_.size() > ARGVS_CODE_INDEX) {
@@ -148,8 +157,7 @@ int32_t InjectionEventDispatch::OnJson()
         }
     }
     InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, logType);
-    int32_t ret = manageInjectDevice_.TransformJsonData(inputEventArrays);
+    int32_t ret = manageInjectDevice_.TransformJsonData(InputParse.DataInit(jsonBuf, logType));
     return ret;
 }
 

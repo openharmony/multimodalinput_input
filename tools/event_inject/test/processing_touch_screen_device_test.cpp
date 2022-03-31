@@ -51,15 +51,13 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, Tes
     std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
-    std::this_thread::sleep_for(std::chrono::seconds(1));
     FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
         ASSERT_TRUE(false) << "can not open " << path;
     }
     char buf[256] = {};
     std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != NULL) {
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
         jsonBuf = jsonBuf + buf;
     }
     if (fclose(fp) < 0) {
@@ -69,8 +67,8 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, Tes
     DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
     system(closeDeviceCmd.c_str());
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -92,15 +90,13 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEvent
     std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
-    std::this_thread::sleep_for(std::chrono::seconds(1));
     FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
         ASSERT_TRUE(false) << "can not open " << path;
     }
     char buf[256] = {};
     std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != NULL) {
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
         jsonBuf = jsonBuf + buf;
     }
     if (fclose(fp) < 0) {
@@ -110,8 +106,9 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEvent
     DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+
     system(closeDeviceCmd.c_str());
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -133,15 +130,13 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataSingl
     std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
     system(startDeviceCmd.c_str());
-    std::this_thread::sleep_for(std::chrono::seconds(1));
     FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
         ASSERT_TRUE(false) << "can not open " << path;
     }
     char buf[256] = {};
     std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != NULL) {
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
         jsonBuf = jsonBuf + buf;
     }
     if (fclose(fp) < 0) {
@@ -151,8 +146,8 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataSingl
     DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
     system(closeDeviceCmd.c_str());
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(ret, RET_ERR);
 }
 } // namespace MMI
