@@ -13,54 +13,58 @@
  * limitations under the License.
  */
 
-#ifndef FILE_PARSE_H
-#define FILE_PARSE_H
+#ifndef INPUT_PARSE_H
+#define INPUT_PARSE_H
 
 #include <ostream>
 #include <vector>
 
 namespace OHOS {
 namespace MMI {
-    struct Pos {
-        int32_t xPos = -1;
-        int32_t yPos = -1;
-        std::string ToString() const;
-    };
-    struct DeviceEvent {
-        std::string eventType;
-        std::vector<int32_t> event;
-        int16_t keyValue = -1;
-        int64_t blockTime = -1;
-        std::vector<int32_t> ringEvents;
-        std::string direction;
-        int32_t distance = -1;
-        int32_t xPos = -1;
-        int32_t yPos = -1;
-        int32_t tiltX = -1;
-        int32_t tiltY = -1;
-        int32_t pressure = -1;
-        int32_t trackingId = -1;
-        int32_t reportType = -1;
-        int32_t keyStatus = -1;
-        std::vector<Pos> posXY;
-        std::string ToString() const;
-    };
-    struct DeviceItem {
-        std::string deviceName;
-        int32_t deviceIndex = -1;
-        std::vector<DeviceEvent> events;
-        std::string ToString() const;
-    };
-    typedef std::vector<DeviceItem> DeviceItems;
-    class InputParse {
-    public:
-        InputParse() = default;
-        ~InputParse() = default;
-        DeviceItems DataInit(std::string &fileData, bool logType);
-    private:
-        std::vector<DeviceEvent> ParseData(std::string &events);
-        DeviceEvent ParseEvents(std::string& eventInfo);
-    };
+
+constexpr int16_t INVALID_VALUE { -1 };
+
+struct Pos {
+    int32_t xPos = INVALID_VALUE;
+    int32_t yPos = INVALID_VALUE;
+    std::string ToString() const;
+};
+struct DeviceEvent {
+    std::string eventType;
+    std::vector<int32_t> event;
+    int16_t keyValue = INVALID_VALUE;
+    int64_t blockTime = INVALID_VALUE;
+    std::vector<int32_t> ringEvents;
+    std::string direction;
+    int32_t distance = INVALID_VALUE;
+    int32_t xPos = INVALID_VALUE;
+    int32_t yPos = INVALID_VALUE;
+    int32_t tiltX = INVALID_VALUE;
+    int32_t tiltY = INVALID_VALUE;
+    int32_t pressure = INVALID_VALUE;
+    int32_t trackingId = INVALID_VALUE;
+    int32_t reportType = INVALID_VALUE;
+    int32_t keyStatus = INVALID_VALUE;
+    std::vector<Pos> posXY;
+    std::string ToString() const;
+};
+struct DeviceItem {
+    std::string deviceName;
+    int32_t deviceIndex = INVALID_VALUE;
+    std::vector<DeviceEvent> events;
+    std::string ToString() const;
+};
+typedef std::vector<DeviceItem> DeviceItems;
+class InputParse {
+public:
+    InputParse() = default;
+    ~InputParse() = default;
+    DeviceItems DataInit(const std::string &fileData, bool logType);
+private:
+    std::vector<DeviceEvent> ParseData(const std::string &info) const;
+    DeviceEvent ParseEvents(const std::string& info) const;
+    DeviceEvent ParseEventsObj(const std::string &info) const;
+};
 } // namespace MMI
 } // namespace OHOS
 #endif // FILE_PARSE_H

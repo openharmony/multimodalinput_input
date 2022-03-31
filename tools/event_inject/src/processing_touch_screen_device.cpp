@@ -96,7 +96,7 @@ void ProcessingTouchScreenDevice::AnalysisSingleTouchScreenDate(const std::vecto
             touchSingleEventData.xPos = item.xPos;
             touchSingleEventData.yPos = item.yPos;
         }
-        if (item.blockTime > -1) {
+        if (item.blockTime > INVALID_VALUE) {
             touchSingleEventData.blockTime = item.blockTime;
         }
         touchSingleEventData.reportType = item.reportType;
