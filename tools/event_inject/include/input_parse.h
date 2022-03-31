@@ -21,9 +21,7 @@
 
 namespace OHOS {
 namespace MMI {
-
 constexpr int16_t INVALID_VALUE { -1 };
-
 struct Pos {
     int32_t xPos = INVALID_VALUE;
     int32_t yPos = INVALID_VALUE;
