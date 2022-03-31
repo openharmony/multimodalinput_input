@@ -425,18 +425,19 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    auto  cb = std::make_unique<JsUtil::CallbackInfo>();
+    auto cb = std::make_unique<JsUtil::CallbackInfo>();
     CHKPP(cb);
     cb->env = env;
     if (handle == nullptr) {
-        CHKRP(env, napi_create_promise(env, &cb->deferred, &cb->promise), CREATE_PROMISE);
+        napi_value promise = nullptr;
+        CHKRP(env, napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
         if (userData_ == INT32_MAX) {
             MMI_HILOGE("userData_ exceeds the maximum");
             return nullptr;
         }
         callback_.emplace(userData_, std::move(cb));
         ++userData_;
-        return cb->promise;
+        return promise;
     }
 
     CHKRP(env, napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
