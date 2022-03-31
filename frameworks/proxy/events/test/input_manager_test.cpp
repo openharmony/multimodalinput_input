@@ -819,10 +819,10 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent006()
     item.SetDownTime(downTime);
     item.SetPressed(true);
 
-    item.SetGlobalX(50);
-    item.SetGlobalY(50);
-    item.SetLocalX(70);
-    item.SetLocalY(70);
+    item.SetGlobalX(10);
+    item.SetGlobalY(10);
+    item.SetLocalX(20);
+    item.SetLocalY(20);
 
     item.SetWidth(0);
     item.SetHeight(0);
