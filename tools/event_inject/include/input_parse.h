@@ -16,7 +16,7 @@
 #ifndef INPUT_PARSE_H
 #define INPUT_PARSE_H
 
-#include <ostream>
+#include <string>
 #include <vector>
 
 namespace OHOS {
