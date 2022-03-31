@@ -65,4 +65,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // FILE_PARSE_H
+#endif // INPUT_PARSE_H
