@@ -19,8 +19,6 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-std::mutex mtx;
-std::condition_variable cv;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSClient" };
 } // namespace
 
