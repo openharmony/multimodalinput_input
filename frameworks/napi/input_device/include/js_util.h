@@ -33,6 +33,8 @@ public:
     };
 
     struct CallbackInfo {
+        CallbackInfo();
+        ~CallbackInfo();
         napi_env env = nullptr;
         napi_ref ref = nullptr;
         napi_deferred deferred = nullptr;
@@ -40,17 +42,7 @@ public:
         CallbackData data;
     };
 
-    struct CallbackTemp {
-        CallbackTemp();
-        ~CallbackTemp();
-        napi_env env = nullptr;
-        napi_ref ref = nullptr;
-        napi_deferred deferred = nullptr;
-        napi_value promise = nullptr;
-        CallbackData data;
-    };
-
-    void GetCallbackInfo(uv_work_t *work, CallbackTemp& temp);
+    int32_t GetUserData(uv_work_t *work);
 };
 } // namespace MMI
 } // namespace OHOS
