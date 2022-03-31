@@ -76,6 +76,7 @@ bool MMIClient::Start()
         Stop();
         return false;
     }
+    MMI_HILOGI("Client started successfully");
     return true;
 }
 

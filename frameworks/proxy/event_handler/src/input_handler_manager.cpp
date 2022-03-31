@@ -199,7 +199,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
     CHKPV(keyEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     if (!PostTask(handlerId,
-        std::bind(&InputHandlerManager::OnKeyEventTask, this, handlerId, std::ref(keyEvent)))) {
+        std::bind(&InputHandlerManager::OnKeyEventTask, this, handlerId, keyEvent))) {
         MMI_HILOGE("post task failed");
     }
 }
@@ -225,7 +225,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
     if (!PostTask(handlerId,
-        std::bind(&InputHandlerManager::OnPointerEventTask, this, handlerId, std::ref(pointerEvent)))) {
+        std::bind(&InputHandlerManager::OnPointerEventTask, this, handlerId, pointerEvent))) {
         MMI_HILOGE("post task failed");
     }
 }
