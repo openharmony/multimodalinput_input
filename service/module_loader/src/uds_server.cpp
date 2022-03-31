@@ -312,14 +312,13 @@ void UDSServer::OnEpollRecv(int32_t fd, std::map<int32_t, StreamBufData>& bufMap
     }
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
     for (size_t i = 0; i < maxCount; i++) {
-        auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, SOCKET_FLAGS);
+        auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size < 0) {
-            int32_t eno = errno;
-            if (eno == EAGAIN || eno == EINTR || eno == EWOULDBLOCK) {
+            if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
                 MMI_HILOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK");
                 continue;
             }
-            MMI_HILOGE("recv return %{public}zu errno:%{public}d", size, eno);
+            MMI_HILOGE("recv return %{public}zu errno:%{public}d", size, errno);
             break;
         } else if (size == 0) {
             MMI_HILOGE("The client side disconnect with the server. size:0 errno:%{public}d", errno);

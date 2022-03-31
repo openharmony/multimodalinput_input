@@ -40,7 +40,7 @@ MMIEventHandler::~MMIEventHandler()
 {
 }
 
-bool MMIEventHandler::PostTask(EventHandlerPtr eventHandler, AppExecFwk::EventHandler::Callback &callback)
+bool MMIEventHandler::PostTask(EventHandlerPtr eventHandler, const AppExecFwk::EventHandler::Callback &callback)
 {
     CHKPF(eventHandler);
     if (!eventHandler->PostHighPriorityTask(callback)) {
@@ -70,7 +70,7 @@ const std::string& MMIEventHandler::GetErrorStr(ErrCode code) const
     return defErrString;
 }
 
-EventHandlerPtr MMIEventHandler::GetSharedPtr()
+MMIEventHandlerPtr MMIEventHandler::GetSharedPtr()
 {
     return std::static_pointer_cast<MMIEventHandler>(shared_from_this());
 }

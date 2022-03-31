@@ -31,7 +31,6 @@
 
 namespace OHOS {
 namespace MMI {
-#define SOCKET_FLAGS (MSG_DONTWAIT | MSG_NOSIGNAL)
 class UDSSocket {
 public:
     UDSSocket();

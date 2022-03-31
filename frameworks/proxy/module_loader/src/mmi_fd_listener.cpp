@@ -49,7 +49,7 @@ void MMIFdListener::OnReadable(int32_t fd)
         return;
     }
     for (int32_t i = 0; i < maxCount; i++) {
-        auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, SOCKET_FLAGS);
+        auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size > 0) {
             if (!buf.Write(szBuf, size)) {
                 MMI_HILOGE("write error or buffer overflow,count:%{}d size:%{}zu", i, size);
@@ -61,7 +61,7 @@ void MMIFdListener::OnReadable(int32_t fd)
                 MMI_HILOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK");
                 continue;
             }
-            MMI_HILOGE("recv return %{public}zu errno:%{public}d", size, eno);
+            MMI_HILOGE("recv return %{public}zu errno:%{public}d", size, errno);
             break;
         } else if (size == 0) {
             MMI_HILOGD("[Do nothing here]The service side disconnect with the client. size:0 count:%{public}d "
@@ -79,7 +79,7 @@ void MMIFdListener::OnReadable(int32_t fd)
 
 void MMIFdListener::OnShutdown(int32_t fd)
 {
-    CHK_PIDANDTID(FdListener);
+    CHK_PIDANDTID();
     if (fd < 0) {
         MMI_HILOGE("Invalid fd:%{public}d", fd);
     }
@@ -89,7 +89,7 @@ void MMIFdListener::OnShutdown(int32_t fd)
 
 void MMIFdListener::OnException(int32_t fd)
 {
-    CHK_PIDANDTID(FdListener);
+    CHK_PIDANDTID();
     if (fd < 0) {
         MMI_HILOGE("Invalid fd:%{public}d", fd);
     }

@@ -35,7 +35,7 @@ public:
     public:
         SubscribeKeyEventInfo(std::shared_ptr<KeyOption> keyOption,
             std::function<void(std::shared_ptr<KeyEvent>)> callback,
-            std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
+            EventHandlerPtr eventHandler);
         ~SubscribeKeyEventInfo() = default;
 
         int32_t GetSubscribeId() const
@@ -48,7 +48,7 @@ public:
             return keyOption_;
         }
 
-        std::shared_ptr<AppExecFwk::EventHandler> GetEventHandler() const
+        EventHandlerPtr GetEventHandler() const
         {
             return eventHandler_;
         }
@@ -62,7 +62,7 @@ public:
         int32_t subscribeId_ { -1 };
         std::shared_ptr<KeyOption> keyOption_ { nullptr };
         std::function<void(std::shared_ptr<KeyEvent>)> callback_ { nullptr };
-        std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
+        EventHandlerPtr eventHandler_ { nullptr };
     };
 
 public:
@@ -79,8 +79,8 @@ public:
 
 private:
     const SubscribeKeyEventInfo* GetSubscribeKeyEvent(int32_t id);
-    bool PostTask(int32_t subscribeId, AppExecFwk::EventHandler::Callback &callback);
-    int32_t OnSubscribeKeyEventCallbackTask(std::shared_ptr<KeyEvent> event, int32_t subscribeId);
+    bool PostTask(int32_t subscribeId, const AppExecFwk::EventHandler::Callback &callback);
+    void OnSubscribeKeyEventCallbackTask(std::shared_ptr<KeyEvent> event, int32_t subscribeId);
 
 private:
     std::list<SubscribeKeyEventInfo> subscribeInfos_;

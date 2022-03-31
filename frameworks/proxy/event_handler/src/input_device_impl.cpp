@@ -15,6 +15,7 @@
 
 #include "input_device_impl.h"
 
+#include "input_manager_impl.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 
@@ -56,7 +57,7 @@ void InputDeviceImpl::GetInputDeviceAsync(int32_t userData, int32_t deviceId,
 
 void InputDeviceImpl::OnInputDeviceTask(int32_t userData, int32_t id, std::string name, int32_t deviceType)
 {
-    CHK_PIDANDTID(callMsgHandler);
+    CHK_PIDANDTID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto devInfo = GetDeviceInfo(userData);
     if (devInfo == nullptr) {
@@ -74,7 +75,7 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, std::string na
     std::lock_guard<std::mutex> guard(mtx_);
     auto devInfo = GetDeviceInfo(userData);
     if (devInfo == nullptr) {
-        devInfo("failed to find the callback function");
+        MMI_HILOGE("failed to find the callback function");
         return;
     }
     if (!MMIEventHandler::PostTask(devInfo->first,
@@ -85,7 +86,7 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, std::string na
 
 void InputDeviceImpl::OnInputDeviceIdsTask(int32_t userData, std::vector<int32_t> ids)
 {
-    CHK_PIDANDTID(callMsgHandler);
+    CHK_PIDANDTID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto devIds = GetDeviceIds(userData);
     if (devIds == nullptr) {
@@ -110,7 +111,7 @@ void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> id
     }
 }
 
-const DevInfo* InputDeviceImpl::GetDeviceInfo(int32_t userData) const
+const InputDeviceImpl::DevInfo* InputDeviceImpl::GetDeviceInfo(int32_t userData) const
 {
     auto iter = inputDevcices_.find(userData);
     if (iter == inputDevcices_.end()) {
@@ -119,7 +120,7 @@ const DevInfo* InputDeviceImpl::GetDeviceInfo(int32_t userData) const
     return &iter->second;
 }
 
-const DevIds* InputDeviceImpl::GetDeviceIds(int32_t userData) const
+const InputDeviceImpl::DevIds* InputDeviceImpl::GetDeviceIds(int32_t userData) const
 {
     auto iter = inputDevciceIds_.find(userData);
     if (iter == inputDevciceIds_.end()) {
