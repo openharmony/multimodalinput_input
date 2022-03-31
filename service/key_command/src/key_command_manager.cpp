@@ -345,12 +345,9 @@ void ShortcutKey::Print() const
         finalKey, ability.bundleName.c_str());
 }
 
-std::shared_ptr<IKeyCommandManager> IKeyCommandManager::GetInstance()
+std::shared_ptr<IKeyCommandManager> IKeyCommandManager::Create()
 {
-    if (keyCommandPtr_ == nullptr) {
-        keyCommandPtr_ = std::make_shared<KeyCommandManager>();
-    }
-    return keyCommandPtr_;
+    return std::make_shared<KeyCommandManager>();
 }
 } // namespace MMI
 } // namespace OHOS

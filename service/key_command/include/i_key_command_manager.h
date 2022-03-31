@@ -22,11 +22,9 @@ namespace OHOS {
 namespace MMI {
 class IKeyCommandManager {
 public:
-    static std::shared_ptr<IKeyCommandManager> GetInstance();
-    virtual bool CheckLaunchAbility(const std::shared_ptr<KeyEvent> key) = 0;
     virtual ~IKeyCommandManager() = default;
-protected:
-    static inline std::shared_ptr<IKeyCommandManager> keyCommandPtr_ = nullptr;
+    static std::shared_ptr<IKeyCommandManager> Create();
+    virtual bool CheckLaunchAbility(const std::shared_ptr<KeyEvent> key) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

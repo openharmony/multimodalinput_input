@@ -22,7 +22,6 @@
 #include "input-event-codes.h"
 #include "hisysevent.h"
 
-#include "i_key_command_manager.h"
 #include "bytrace_adapter.h"
 #include "error_multimodal.h"
 #include "event_filter_wrap.h"
@@ -160,7 +159,10 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
             return RET_OK;
         }
     }
-    if (IKeyCommandManager::GetInstance()->CheckLaunchAbility(key)) {
+    if (keyCommand_ == nullptr) {
+        keyCommand_ = IKeyCommandManager::Create();
+    }
+    if (keyCommand_->CheckLaunchAbility(key)) {
         MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{public}d", key->GetKeyCode());
         BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_LAUNCH_EVENT);
         return RET_OK;
