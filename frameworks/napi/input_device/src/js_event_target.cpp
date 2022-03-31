@@ -58,7 +58,7 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     CHKPV(work->data);
     JsUtil jsUtil;
-    int32_t userData = jsUtil.GetUserData(work);  
+    int32_t userData = jsUtil.GetUserData(work);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
         MMI_HILOGE("find userData failed");
@@ -91,7 +91,7 @@ void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     CHKPV(work->data);
     JsUtil jsUtil;
-    int32_t userData = jsUtil.GetUserData(work);  
+    int32_t userData = jsUtil.GetUserData(work);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
         MMI_HILOGE("find userData failed");
@@ -158,7 +158,7 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     CHKPV(work->data);
     JsUtil jsUtil;
-    int32_t userData = jsUtil.GetUserData(work);  
+    int32_t userData = jsUtil.GetUserData(work);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
         MMI_HILOGE("find userData failed");
@@ -213,7 +213,7 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     CHKPV(work->data);
     JsUtil jsUtil;
-    int32_t userData = jsUtil.GetUserData(work);  
+    int32_t userData = jsUtil.GetUserData(work);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
         MMI_HILOGE("find userData failed");
@@ -307,7 +307,7 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
     CHKPV(work);
     CHKPV(work->data);
     JsUtil jsUtil;
-    int32_t userData = jsUtil.GetUserData(work);  
+    int32_t userData = jsUtil.GetUserData(work);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
         MMI_HILOGE("find userData failed");
@@ -345,7 +345,7 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
     CHKPV(work);
     CHKPV(work->data);
     JsUtil jsUtil;
-    int32_t userData = jsUtil.GetUserData(work);  
+    int32_t userData = jsUtil.GetUserData(work);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
         MMI_HILOGE("find userData failed");
