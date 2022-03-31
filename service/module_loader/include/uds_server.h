@@ -19,7 +19,6 @@
 #include <list>
 #include <map>
 #include <mutex>
-#include <thread>
 
 #include "nocopyable.h"
 
@@ -71,10 +70,8 @@ protected:
     virtual void OnDisconnected(SessionPtr s);
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd);
 
-    bool StartServer();
     void OnRecv(int32_t fd, const char *buf, size_t size);
     void OnEvent(const struct epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap);
-    void OnThread();
 
     bool AddSession(SessionPtr ses);
     void DelSession(int32_t fd);
@@ -85,7 +82,6 @@ protected:
 
 protected:
     std::mutex mux_;
-    std::thread t_;
     bool isRunning_ = false;
     MsgServerFunCallback recvFun_ = nullptr;
     std::map<int32_t, SessionPtr> sessionsMap_ = {};
