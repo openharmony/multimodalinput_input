@@ -280,12 +280,13 @@ bool InputWindowsManager::TouchMotionPointToDisplayPoint(struct libinput_event_t
 
     for (const auto &display : logicalDisplays_) {
         if (targetDisplayId == display.id ) {
-            MMI_HILOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
-                targetDisplayId, displayX, displayY);
             displayX = globalLogicalX - display.topLeftX;
             displayY = globalLogicalY - display.topLeftY;
+            AdjustGlobalCoordinate(displayX, displayY, display.width, display.height);
+            MMI_HILOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
+                targetDisplayId, displayX, displayY);
+            return true;
         }
-        return true;
     }
 
     return false;
@@ -314,6 +315,7 @@ bool InputWindowsManager::TouchDownPointToDisplayPoint(struct libinput_event_tou
         logicalDisplayId = display.id;
         logicalX = globalLogicalX - display.topLeftX;
         logicalY = globalLogicalY - display.topLeftY;
+        AdjustGlobalCoordinate(logicalX, logicalY, display.width, display.height);
         MMI_HILOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
             logicalDisplayId, logicalX, logicalY);
         return true;
@@ -339,14 +341,14 @@ void InputWindowsManager::AdjustGlobalCoordinate(int32_t& globalX, int32_t& glob
     if (globalX <= 0) {
         globalX = 0;
     }
-    if (globalX >= width) {
-        globalX = width;
+    if (globalX >= width && width > 0) {
+        globalX = width - 1;
     }
     if (globalY <= 0) {
         globalY = 0;
     }
-    if (globalY >= height) {
-        globalY = height;
+    if (globalY >= height && height > 0) {
+        globalY = height - 1;
     }
 }
 
@@ -458,10 +460,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     CHKPR(logicalDisplayInfo, ERROR_NULL_POINTER);
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
-    MMI_HILOGD("globalX:%{public}d,globalY:%{public}d", globalX, globalY);
-    AdjustGlobalCoordinate(globalX, globalY, logicalDisplayInfo->width, logicalDisplayInfo->height);
     auto targetWindowId = pointerEvent->GetTargetWindowId();
-    MMI_HILOGD("targetWindow:%{public}d", targetWindowId);
     WindowInfo *touchWindow = nullptr;
     for (auto item : logicalDisplayInfo->windowsInfo) {
         if (targetWindowId < 0) {
@@ -542,18 +541,18 @@ void InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, double& y)
     }
     int32_t integerX = static_cast<int32_t>(x);
     int32_t integerY = static_cast<int32_t>(y);
-    if (integerX > width) {
+    if (integerX >= width && width > 0) {
         x = static_cast<double>(width);
-        mouseLoction_.globalX = width;
+        mouseLoction_.globalX = width - 1;
     } else if (integerX < 0) {
         x = 0;
         mouseLoction_.globalX = 0;
     } else {
         mouseLoction_.globalX = integerX;
     }
-    if (integerY > height) {
+    if (integerY >= height && height > 0) {
         y = static_cast<double>(height);
-        mouseLoction_.globalY = height;
+        mouseLoction_.globalY = height - 1;
     } else if (integerY < 0) {
         y = 0;
         mouseLoction_.globalY = 0;
