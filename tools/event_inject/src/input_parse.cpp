@@ -17,6 +17,7 @@
 
 #include "cJSON.h"
 
+#include <sstream>
 #include "msg_head.h"
 
 namespace OHOS {
