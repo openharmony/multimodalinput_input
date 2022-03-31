@@ -160,6 +160,17 @@ int32_t StandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId)
     return SendMsg(pkt);
 }
 
+int32_t StandardizedEventManager::GetKeystrokeAbility(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes)
+{
+    NetPacket pkt(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
+    size_t size = keyCodes.size();
+    pkt << userData << deviceId << size;
+    for (auto item : keyCodes) {
+        pkt << item;
+    }
+    return SendMsg(pkt);
+}
+
 bool StandardizedEventManager::SendMsg(NetPacket& pkt) const
 {
     CHKPF(client_);
