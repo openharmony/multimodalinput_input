@@ -146,7 +146,7 @@ int32_t InjectionEventDispatch::OnJson()
         return RET_ERR;
     }
     std::string jsonBuf;
-    if(!ReadFile(jsonFile, jsonBuf)) {
+    if (!ReadFile(jsonFile, jsonBuf)) {
         MMI_HILOGE("read file failed");
         return RET_ERR;
     }
