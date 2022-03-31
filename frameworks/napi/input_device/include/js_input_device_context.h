@@ -35,7 +35,7 @@ private:
     static napi_value CreateInstance(napi_env env);
     static JsInputDeviceContext* GetInstance(napi_env env);
     static napi_value JsConstructor(napi_env env, napi_callback_info info);
-    std::shared_ptr<JsInputDeviceManager> mager_ {nullptr};
+    std::shared_ptr<JsInputDeviceManager> mgr_ {nullptr};
     std::mutex mtx_;
     napi_ref contextRef_ {nullptr};
 };

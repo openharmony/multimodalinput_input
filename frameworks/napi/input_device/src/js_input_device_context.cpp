@@ -36,15 +36,15 @@ const std::string DEFINE_PROPERTIES = "napi_define_properties";
 
 JsInputDeviceContext::JsInputDeviceContext()
 {
-    mager_ = std::make_shared<JsInputDeviceManager>();
-    CHKPL(mager_);
+    mgr_ = std::make_shared<JsInputDeviceManager>();
+    CHKPL(mgr_);
 }
 
 JsInputDeviceContext::~JsInputDeviceContext()
 {
     std::lock_guard<std::mutex> guard(mtx_);
-    auto jsInputDeviceMgr =  mager_;
-    mager_.reset();
+    auto jsInputDeviceMgr = mgr_;
+    mgr_.reset();
     if (jsInputDeviceMgr) {
         jsInputDeviceMgr->ResetEnv();
     }
@@ -132,7 +132,7 @@ JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
 
 std::shared_ptr<JsInputDeviceManager> JsInputDeviceContext::GetJsInputDeviceMgr() const
 {
-    return mager_;
+    return mgr_;
 }
 
 napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info info)
