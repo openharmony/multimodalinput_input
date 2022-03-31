@@ -18,7 +18,7 @@
 #include "cJSON.h"
 
 #include <sstream>
-#include "msg_head.h"
+#include "define_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
