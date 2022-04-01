@@ -49,7 +49,7 @@ public:
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
         const std::vector<LogicalDisplayInfo> &logicalDisplays);
     const std::vector<LogicalDisplayInfo>& GetLogicalDisplayInfo() const;
-    MouseLocation GetMouseInfo() const;
+    MouseLocation GetMouseInfo();
     void UpdateAndAdjustMouseLoction(double& x, double& y);
     void AdjustGlobalCoordinate(int32_t& globalX, int32_t& globalY, int32_t width, int32_t height);
     bool UpdataDisplayId(int32_t& displayId);
@@ -80,7 +80,7 @@ private:
     std::vector<PhysicalDisplayInfo> physicalDisplays_ = {};
     std::vector<LogicalDisplayInfo> logicalDisplays_ = {};
     std::map<int32_t, WindowInfo> windowInfos_ = {};
-    MouseLocation mouseLoction_ = {};
+    MouseLocation mouseLoction_ = {-1, -1};
     std::shared_ptr<IDeviceObserver> observer_;
 };
 
