@@ -65,6 +65,7 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::INJECT_POINTER_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectPointerEvent, this) },
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ServerMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ServerMsgHandler::OnInputDeviceIds, this)},
+        {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ServerMsgHandler::GetKeystrokeAbility, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
         {MmiMessageId::ADD_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputEventMontior, this)},
         {MmiMessageId::REMOVE_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputEventMontior, this)},
@@ -469,6 +470,64 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
     if (!pkt2.Write(deviceType)) {
         MMI_HILOGE("Packet write deviceType failed");
         return RET_ERR;
+    }
+    if (!sess->SendMsg(pkt2)) {
+        MMI_HILOGE("Sending failed");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::GetKeystrokeAbility(SessionPtr sess, NetPacket& pkt)
+{
+    CALL_LOG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t userData;
+    if (!pkt.Read(userData)) {
+        MMI_HILOGE("Packet read userData failed");
+        return RET_ERR;
+    }
+    int32_t deviceId;
+    if (!pkt.Read(deviceId)) {
+        MMI_HILOGE("Packet read device failed");
+        return RET_ERR;
+    }
+    size_t size;
+    if (!pkt.Read(size)) {
+        MMI_HILOGE("Packet read device failed");
+        return RET_ERR;
+    }
+    int32_t keyCode;
+    std::vector<int32_t> keyCodes;
+    for (size_t i = 0 ; i < size; ++i) {
+        if (!pkt.Read(keyCode)) {
+            MMI_HILOGE("Packet read device failed");
+            return RET_ERR;
+        }
+        keyCodes.push_back(keyCode);
+    }
+
+    std::map<int32_t, bool> abilityRet = InputDevMgr->GetKeystrokeAbility(deviceId, keyCodes);
+    NetPacket pkt2(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
+    if (!pkt2.Write(userData)) {
+        MMI_HILOGE("Packet write data failed");
+        return RET_ERR;
+    }
+    size = abilityRet.size();
+    if (!pkt2.Write(size * 2)) {
+        MMI_HILOGE("Packet write data failed");
+        return RET_ERR;
+    }
+    for (const auto &item : abilityRet) {
+        if (!pkt2.Write(item.first)) {
+            MMI_HILOGE("Packet write data failed");
+            return RET_ERR;
+        }
+        int32_t ret = item.second ? 1 : 0;
+        if (!pkt2.Write(ret)) {
+            MMI_HILOGE("Packet write data failed");
+            return RET_ERR;
+        }
     }
     if (!sess->SendMsg(pkt2)) {
         MMI_HILOGE("Sending failed");

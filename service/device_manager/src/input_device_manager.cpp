@@ -15,6 +15,8 @@
 
 #include "input_device_manager.h"
 
+#include "key_event_value_transformation.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -54,7 +56,24 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
     return ids;
 }
 
-void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)
+std::map<int32_t, bool> InputDeviceManager::GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> keyCodes)
+{
+    CALL_LOG_ENTER;
+    std::map<int32_t, bool> keystrokeAbility;
+    auto iter = inputDevice_.find(deviceId);
+    if (iter == inputDevice_.end()) {
+        keystrokeAbility[INVALID_DEVICE_ID] = false;
+        return keystrokeAbility;
+    }
+    for (const auto& item : keyCodes) {
+        auto sysKeyCode = static_cast<int32_t>(InputTransformationKeyValue(item));
+        bool ret = libinput_device_has_key(iter->second, sysKeyCode) == 1 ? true : false;
+        keystrokeAbility[item] = ret;
+    }
+    return keystrokeAbility;
+}
+
+void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
 {
     CALL_LOG_ENTER;
     CHKPV(inputDevice);
@@ -71,12 +90,12 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)
     inputDevice_[nextId_] = inputDevice;
     ++nextId_;
 
-    if (IsPointerDevice(static_cast<struct libinput_device *>(inputDevice))) {
+    if (IsPointerDevice(static_cast<libinput_device *>(inputDevice))) {
         NotifyPointerDevice(true);
     }
 }
 
-void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device* inputDevice)
+void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
 {
     CALL_LOG_ENTER;
     CHKPV(inputDevice);
@@ -104,7 +123,7 @@ void InputDeviceManager::ScanPointerDevice()
     }
 }
 
-bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)
+bool InputDeviceManager::IsPointerDevice(libinput_device* device)
 {
     CHKPF(device);
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
@@ -133,7 +152,7 @@ void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice)
     }
 }
 
-int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevice)
+int32_t InputDeviceManager::FindInputDeviceId(libinput_device* inputDevice)
 {
     CALL_LOG_ENTER;
     CHKPR(inputDevice, INVALID_DEVICE_ID);
