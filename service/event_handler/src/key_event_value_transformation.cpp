@@ -457,5 +457,15 @@ KeyEventValueTransformations KeyValueTransformationInput(int16_t keyValueOfInput
     }
     return it->second;
 }
+
+int16_t InputTransformationKeyValue(int32_t keyCode)
+{
+    for (const auto &item : MAP_KEY_EVENT_VALUE_TRANSFORMATION) {
+        if (item.second.keyValueOfSys == static_cast<int16_t>(keyCode)) {
+            return item.first;
+        }
+    }
+    return -1;
+}
 } // namespace MMI
 } // namespace OHOS
