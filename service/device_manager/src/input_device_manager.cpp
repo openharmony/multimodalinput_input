@@ -67,7 +67,7 @@ std::map<int32_t, bool> InputDeviceManager::GetKeystrokeAbility(int32_t deviceId
     }
     for (const auto& item : keyCodes) {
         auto sysKeyCode = static_cast<int32_t>(InputTransformationKeyValue(item));
-        bool ret = libinput_device_has_key(iter->second, sysKeyCode);
+        bool ret = libinput_device_has_key(iter->second, sysKeyCode) == 1 ? true : false;
         keystrokeAbility[item] = ret;
     }
     return keystrokeAbility;
