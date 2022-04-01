@@ -22,6 +22,7 @@ namespace OHOS {
 namespace MMI {
 class IKeyCommandManager {
 public:
+    IKeyCommandManager() = default;
     virtual ~IKeyCommandManager() = default;
     static std::shared_ptr<IKeyCommandManager> Create();
     virtual bool CheckLaunchAbility(const std::shared_ptr<KeyEvent> key) = 0;

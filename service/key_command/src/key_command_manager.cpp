@@ -40,7 +40,7 @@ std::string KeyCommandManager::GenerateKey(const ShortcutKey& key)
 {
     std::set<int32_t> preKeys = key.preKeys;
     std::stringstream oss;
-    for (const auto preKey : preKeys) {
+    for (const auto& preKey : preKeys) {
         oss << preKey << ",";
     }
     oss << key.finalKey << ",";
@@ -213,7 +213,7 @@ bool KeyCommandManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> key)
     for (auto& item : shortcutKeys_) {
         ShortcutKey &shortcutKey = item.second;
         if (!IsKeyMatch(shortcutKey, key)) {
-            MMI_HILOGD("not matched, next");
+            MMI_HILOGD("not key matched, next");
             continue;
         }
         shortcutKey.Print();
