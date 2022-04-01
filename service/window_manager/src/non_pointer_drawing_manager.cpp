@@ -56,8 +56,13 @@ void NonPointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
 bool NonPointerDrawingManager::Init()
 {
     CALL_LOG_ENTER;
-    InputDevMgr->Attach(GetInstance());
+    InputDevMgr->Attach(shared_from_this());
     return true;
+}
+
+std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::Create()
+{
+    return std::make_shared<NonPointerDrawingManager>();
 }
 } // namespace MMI
 } // namespace OHOS

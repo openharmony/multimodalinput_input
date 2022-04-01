@@ -73,16 +73,6 @@ config("libmmi_server_config") {
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
-
-  if (mmi_enable_pointer_drawing) {
-    cflags += [ "-DOHOS_BUILD_POINTERDRAWING" ]
-  }
-
-  if (mmi_enable_pointer_drawing) {
-    include_dirs += [ "window_manager/pointer_drawing/include" ]
-  } else {
-    include_dirs += [ "window_manager/non_pointer_drawing/include" ]
-  }
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
@@ -136,12 +126,9 @@ ohos_shared_library("libmmi-server") {
   }
 
   if (mmi_enable_pointer_drawing) {
-    sources +=
-        [ "window_manager/pointer_drawing/src/pointer_drawing_manager.cpp" ]
+    sources += [ "window_manager/src/pointer_drawing_manager.cpp" ]
   } else {
-    sources += [
-      "window_manager/non_pointer_drawing/src/non_pointer_drawing_manager.cpp",
-    ]
+    sources += [ "window_manager/src/non_pointer_drawing_manager.cpp" ]
   }
 
   sources += [ "module_loader/src/mmi_service.cpp" ]

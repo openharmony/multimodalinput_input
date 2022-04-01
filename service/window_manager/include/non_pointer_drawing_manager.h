@@ -19,17 +19,19 @@
 #include <iostream>
 
 #include "nocopyable.h"
-#include "singleton.h"
 
 #include "device_observer.h"
+#include "i_pointer_drawing_manager.h"
 #include "struct_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
-class NonPointerDrawingManager : public DelayedSingleton<NonPointerDrawingManager>, public IDeviceObserver {
+class NonPointerDrawingManager : public IPointerDrawingManager,
+                                 public IDeviceObserver,
+                                 public std::enable_shared_from_this<NonPointerDrawingManager> {
 public:
     NonPointerDrawingManager();
-    ~NonPointerDrawingManager();
+    virtual ~NonPointerDrawingManager();
     DISALLOW_COPY_AND_MOVE(NonPointerDrawingManager);
     
     void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY);
@@ -37,8 +39,6 @@ public:
     void UpdatePointerDevice(bool hasPointerDevice);
     bool Init();
 };
-
-#define NonPointerDrawMgr NonPointerDrawingManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // NON_POINTER_DRAWING_MANAGER_H

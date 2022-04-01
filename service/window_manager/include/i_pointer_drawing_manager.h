@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,22 +13,24 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_OBSERVER_H
-#define DEVICE_OBSERVER_H
+#ifndef I_POINTER_DRAWING_MANAGER_H
+#define I_POINTER_DRAWING_MANAGER_H
+
+#include <iostream>
+#include "struct_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
-class IDeviceObserver {
+class IPointerDrawingManager {
 public:
-    virtual void UpdatePointerDevice(bool) = 0;
-};
-
-class IDeviceObject {
-public:
-    virtual void Attach(std::shared_ptr<IDeviceObserver> observer) = 0;
-    virtual void Detach(std::shared_ptr<IDeviceObserver> observer) = 0;
-    virtual void NotifyPointerDevice(bool) = 0;
+    IPointerDrawingManager() = default;
+    ~IPointerDrawingManager() = default;
+    
+    static std::shared_ptr<IPointerDrawingManager> Create();
+    virtual void DrawPointer(int32_t, int32_t, int32_t) = 0;
+    virtual void OnDisplayInfo(int32_t, int32_t, int32_t) = 0;
+    virtual bool Init() = 0;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif
+#endif // I_POINTER_DRAWING_MANAGER_H
