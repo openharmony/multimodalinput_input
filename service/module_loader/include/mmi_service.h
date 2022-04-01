@@ -15,6 +15,7 @@
 
 #ifndef MMI_SERVICE_H
 #define MMI_SERVICE_H
+
 #include <mutex>
 #include <thread>
 
@@ -35,6 +36,7 @@
 
 namespace OHOS {
 namespace MMI {
+
 enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class MMIService : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_DELAYED_SINGLETON(MMIService);
@@ -52,6 +54,7 @@ protected:
     virtual void OnConnected(SessionPtr s) override;
     virtual void OnDisconnected(SessionPtr s) override;
     virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) override;
+
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd) override;
 
     bool InitLibinputService();

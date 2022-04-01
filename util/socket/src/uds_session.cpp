@@ -46,8 +46,8 @@ UDSSession::UDSSession(const std::string& programName, const int32_t moduleType,
 bool UDSSession::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
-    if ((size <= 0) || (size > MAX_PACKET_BUF_SIZE)) {
-        MMI_HILOGE("Stream buffer size out of range");
+    if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
+        MMI_HILOGE("buf size:%{public}zu", size);
         return false;
     }
     if (fd_ < 0) {

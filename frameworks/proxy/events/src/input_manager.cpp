@@ -69,7 +69,7 @@ int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> 
 
 int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
-    return InputMgrImp->AddMontior(monitor);
+    return InputMgrImp->AddMonitor(monitor);
 }
 
 int32_t InputManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor)

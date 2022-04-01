@@ -190,18 +190,19 @@ void InputHandlerManager::OnKeyEventTask(int32_t handlerId, std::shared_ptr<KeyE
         return;
     }
     consumer->OnInputEvent(keyEvent);
-    MMI_HILOGD("callMsgHandler key event callback id:%{public}d keyCode:%{public}d",
-        handlerId, keyEvent->GetKeyCode());
+    MMI_HILOGD("key event callback id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
 }
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent)
 {
+    CHK_PIDANDTID();
     CHKPV(keyEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     if (!PostTask(handlerId,
         std::bind(&InputHandlerManager::OnKeyEventTask, this, handlerId, keyEvent))) {
         MMI_HILOGE("post task failed");
     }
+    MMI_HILOGD("key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
 }
 
 void InputHandlerManager::OnPointerEventTask(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
@@ -214,13 +215,12 @@ void InputHandlerManager::OnPointerEventTask(int32_t handlerId, std::shared_ptr<
         return;
     }
     consumer->OnInputEvent(pointerEvent);
-    MMI_HILOGD("callMsgHandler pointer event callback id:%{public}d pointerId:%{public}d",
-        handlerId, pointerEvent->GetPointerId());
+    MMI_HILOGD("pointer event callback id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
 }
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_LOG_ENTER;
+    CHK_PIDANDTID();
     CHKPV(pointerEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
@@ -228,12 +228,12 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
         std::bind(&InputHandlerManager::OnPointerEventTask, this, handlerId, pointerEvent))) {
         MMI_HILOGE("post task failed");
     }
+    MMI_HILOGD("pointer event id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
 }
 
 void InputHandlerManager::OnConnected()
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> guard(mtxHandlers_);
     for (auto &inputHandler : inputHandlers_) {
         AddToServer(inputHandler.second.handlerId_, inputHandler.second.handlerType_);
     }

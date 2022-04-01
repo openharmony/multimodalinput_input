@@ -66,7 +66,7 @@ bool MMIClient::Start()
     EventManager.SetClientHandle(GetSharedPtr());
     auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, &msgHandler_,
         std::placeholders::_1, std::placeholders::_2);
-    if (!(StartClient(callback))) {
+    if (!StartClient(callback)) {
         MMI_HILOGE("Client startup failed");
         Stop();
         return false;

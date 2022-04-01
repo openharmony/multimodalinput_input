@@ -35,6 +35,8 @@ enum Direction {
     Direction270
 };
 
+constexpr uint32_t FLAG_NOT_TOUCHABLE = 1;
+
 struct WindowInfo {
     // The globally unique identifier of the window
     int32_t id;
@@ -68,6 +70,9 @@ struct WindowInfo {
 
     // The y coordinate of the upper left corner of the window in the logical display
     int32_t winTopLeftY;
+
+    // The current state of the window
+    uint32_t flags;
 };
 
 struct PhysicalDisplayInfo {
