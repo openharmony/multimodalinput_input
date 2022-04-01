@@ -100,6 +100,15 @@ namespace MMI {
         } \
     } while (0)
 
+#define CHKPO(cond) \
+    do { \
+        if ((cond) == nullptr) { \
+            MMI_HILOGW("%{public}s, (%{public}d), CHKPO(%{public}s) is null, skip then continue", \
+                __FILE__, __LINE__, #cond); \
+            return {}; \
+        } \
+    } while (0)
+
 #define CK(cond, ec) \
     do { \
         if (!(cond)) { \
@@ -161,6 +170,15 @@ namespace MMI {
         if ((cond) == nullptr) { \
             MMI_HILOGE("CHKPP(%{public}s) is null, return value is null", #cond); \
             return nullptr; \
+        } \
+    } while (0)
+
+#define CHKPO(cond) \
+    do { \
+        if ((cond) == nullptr) { \
+            MMI_HILOGW("%{public}s, (%{public}d), CHKPO(%{public}s) is null, return object is null", \
+                __FILE__, __LINE__, #cond); \
+            return {}; \
         } \
     } while (0)
 

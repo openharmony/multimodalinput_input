@@ -62,7 +62,7 @@ HWTEST_F(ProcessingFingerDeviceTest, Test_TransformJsonDataToInputData, TestSize
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;

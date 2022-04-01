@@ -62,7 +62,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputData, 
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;
@@ -109,7 +109,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;
@@ -156,7 +156,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataEv
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;
@@ -203,7 +203,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;
@@ -250,7 +250,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;
@@ -297,7 +297,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;
@@ -346,7 +346,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;

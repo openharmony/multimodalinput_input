@@ -69,8 +69,8 @@ void ProcessingTouchScreenDevice::AnalysisTouchScreenDate(const std::vector<Devi
 {
     TouchScreenCoordinates touchScreenCoordinates = {};
     TouchScreenInputEvent touchScreenInputEvent = {};
-    for (uint32_t i = 0; i < inputData.size(); i++) {
-        for (uint32_t j = 0; j < inputData[i].posXY.size(); j++) {
+    for (size_t i = 0; i < inputData.size(); i++) {
+        for (size_t j = 0; j < inputData[i].posXY.size(); j++) {
             int32_t xPos = inputData[i].posXY[j].xPos;
             int32_t yPos = inputData[i].posXY[j].yPos;
             touchScreenCoordinates.xPos = xPos;
@@ -96,9 +96,7 @@ void ProcessingTouchScreenDevice::AnalysisSingleTouchScreenDate(const std::vecto
             touchSingleEventData.xPos = item.xPos;
             touchSingleEventData.yPos = item.yPos;
         }
-        if (item.blockTime > INVALID_VALUE) {
-            touchSingleEventData.blockTime = item.blockTime;
-        }
+        touchSingleEventData.blockTime = item.blockTime;
         touchSingleEventData.reportType = item.reportType;
         touchSingleEventDatas.push_back(touchSingleEventData);
     }

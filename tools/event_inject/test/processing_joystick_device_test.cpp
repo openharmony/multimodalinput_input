@@ -62,7 +62,7 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJsonDataToInputData, TestSi
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;
@@ -109,7 +109,7 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;
@@ -156,7 +156,7 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;
@@ -203,7 +203,7 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;
@@ -250,7 +250,7 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;
@@ -297,7 +297,7 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;
@@ -345,7 +345,7 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;
@@ -393,7 +393,7 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;
@@ -440,7 +440,7 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;
@@ -487,7 +487,7 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;

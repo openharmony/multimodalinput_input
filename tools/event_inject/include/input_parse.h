@@ -21,34 +21,33 @@
 
 namespace OHOS {
 namespace MMI {
-constexpr int16_t INVALID_VALUE { -1 };
 struct Pos {
-    int32_t xPos = INVALID_VALUE;
-    int32_t yPos = INVALID_VALUE;
+    int32_t xPos = 0;
+    int32_t yPos = 0;
     std::string ToString() const;
 };
 struct DeviceEvent {
     std::string eventType;
     std::vector<int32_t> event;
-    int16_t keyValue = INVALID_VALUE;
-    int64_t blockTime = INVALID_VALUE;
+    int16_t keyValue = 0;
+    int64_t blockTime = 0;
     std::vector<int32_t> ringEvents;
     std::string direction;
-    int32_t distance = INVALID_VALUE;
-    int32_t xPos = INVALID_VALUE;
-    int32_t yPos = INVALID_VALUE;
-    int32_t tiltX = INVALID_VALUE;
-    int32_t tiltY = INVALID_VALUE;
-    int32_t pressure = INVALID_VALUE;
-    int32_t trackingId = INVALID_VALUE;
-    int32_t reportType = INVALID_VALUE;
-    int32_t keyStatus = INVALID_VALUE;
+    int32_t distance = 0;
+    int32_t xPos = 0;
+    int32_t yPos = 0;
+    int32_t tiltX = 0;
+    int32_t tiltY = 0;
+    int32_t pressure = 0;
+    int32_t trackingId = 0;
+    int32_t reportType = 0;
+    int32_t keyStatus = 0;
     std::vector<Pos> posXY;
     std::string ToString() const;
 };
 struct DeviceItem {
     std::string deviceName;
-    int32_t deviceIndex = INVALID_VALUE;
+    int32_t deviceIndex = 0;
     std::vector<DeviceEvent> events;
     std::string ToString() const;
 };
@@ -57,7 +56,7 @@ class InputParse {
 public:
     InputParse() = default;
     ~InputParse() = default;
-    DeviceItems DataInit(const std::string &fileData, bool logType);
+    DeviceItems DataInit(const std::string &fileData, bool logStatus);
 private:
     std::vector<DeviceEvent> ParseData(const std::string &info) const;
     DeviceEvent ParseEvents(const std::string& info) const;
