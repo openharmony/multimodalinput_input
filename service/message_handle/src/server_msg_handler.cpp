@@ -497,17 +497,17 @@ int32_t ServerMsgHandler::GetKeystrokeAbility(SessionPtr sess, NetPacket& pkt)
         MMI_HILOGE("Packet read device failed");
         return RET_ERR;
     }
-    int32_t keyCode;
-    std::vector<int32_t> keyCodes;
+    int32_t keyValueOfNative;
+    std::vector<int32_t> keyCode;
     for (size_t i = 0 ; i < size; ++i) {
-        if (!pkt.Read(keyCode)) {
+        if (!pkt.Read(keyValueOfNative)) {
             MMI_HILOGE("Packet read device failed");
             return RET_ERR;
         }
-        keyCodes.push_back(keyCode);
+        keyCode.push_back(keyValueOfNative);
     }
 
-    std::map<int32_t, bool> abilityRet = InputDevMgr->GetKeystrokeAbility(deviceId, keyCodes);
+    std::map<int32_t, bool> abilityRet = InputDevMgr->GetKeystrokeAbility(deviceId, keyCode);
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
     if (!pkt2.Write(userData)) {
         MMI_HILOGE("Packet write data failed");

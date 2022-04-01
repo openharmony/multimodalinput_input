@@ -56,7 +56,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
     return ids;
 }
 
-std::map<int32_t, bool> InputDeviceManager::GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> keyCodes)
+std::map<int32_t, bool> InputDeviceManager::GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> &keyCodes)
 {
     CALL_LOG_ENTER;
     std::map<int32_t, bool> keystrokeAbility;
@@ -67,7 +67,7 @@ std::map<int32_t, bool> InputDeviceManager::GetKeystrokeAbility(int32_t deviceId
     }
     for (const auto& item : keyCodes) {
         auto sysKeyCode = static_cast<int32_t>(InputTransformationKeyValue(item));
-        bool ret = libinput_device_has_key(iter->second, sysKeyCode) == 1 ? true : false;
+        bool ret = libinput_device_has_key(iter->second, sysKeyCode);
         keystrokeAbility[item] = ret;
     }
     return keystrokeAbility;
