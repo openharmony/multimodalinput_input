@@ -62,7 +62,7 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, Tes
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;
@@ -109,7 +109,7 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEvent
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;
@@ -157,7 +157,7 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataSingl
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         ASSERT_TRUE(false) << "fclose file error " << path;

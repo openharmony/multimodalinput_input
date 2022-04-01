@@ -62,9 +62,7 @@ int32_t ProcessingPadDevice::AnalysisPadEvent(const std::vector<DeviceEvent>& in
     PadEvent padEvent = {};
     for (const auto &item : inputData) {
         padEvent.eventType = item.eventType;
-        if (item.keyValue > INVALID_VALUE) {
-            padEvent.keyValue = item.keyValue;
-        }
+        padEvent.keyValue = item.keyValue;
         if (item.ringEvents.empty()) {
             padEvent.ringEvents = item.ringEvents;
         }

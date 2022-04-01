@@ -44,17 +44,15 @@ int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const DeviceItem& 
 }
 
 int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const std::vector<DeviceEvent>& inputData,
-    std::vector<GamePadEvent>& padEventArray)
+    std::vector<GamePadEvent>& events)
 {
     for (const auto &item : inputData) {
         GamePadEvent padEvent = {};
         padEvent.eventType = item.eventType;
-        if (item.blockTime != INVALID_VALUE) {
-            padEvent.blockTime = item.blockTime;
-        }
+        padEvent.blockTime = item.blockTime;
         if ((padEvent.eventType == "KEY_EVENT_CLICK") || (padEvent.eventType == "KEY_EVENT_PRESS") ||
             (padEvent.eventType == "KEY_EVENT_RELEASE")) {
-            if (item.keyValue == INVALID_VALUE) {
+            if (item.keyValue == 0) {
                 MMI_HILOGE("not find keyValue On Event:%{public}s", padEvent.eventType.c_str());
                 return RET_ERR;
             }
@@ -79,7 +77,7 @@ int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const std::vector<DeviceEv
         } else {
             continue;
         }
-        padEventArray.push_back(padEvent);
+        events.push_back(padEvent);
     }
 
     return RET_OK;

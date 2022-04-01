@@ -78,79 +78,54 @@ std::string DeviceItem::ToString() const
     return oss.str();
 }
 
-bool GetJsonData(cJSON *json, std::string key, std::string& val)
+void GetJsonData(cJSON *json, const std::string key, std::string& val)
 {
-    CHKPF(json);
+    CHKPV(json);
     if (cJSON_HasObjectItem(json, key.c_str())) {
         cJSON* rawVal = cJSON_GetObjectItem(json, key.c_str());
-        CHKPF(rawVal);
+        CHKPV(rawVal);
         val = rawVal->valuestring;
-        return true;
+        return;
     }
-    return false;
+    return;
 }
 
-bool GetJsonData(cJSON *json, std::string key, int32_t& val)
+template <class T>
+void GetJsonData(cJSON *json, const std::string key, T& val)
 {
-    CHKPF(json);
+    CHKPV(json);
     if (cJSON_HasObjectItem(json, key.c_str())) {
         cJSON* rawVal = cJSON_GetObjectItem(json, key.c_str());
-        CHKPF(rawVal);
+        CHKPV(rawVal);
         val = rawVal->valueint;
-        return true;
+        return;
     }
-    return false;
+    return;
 }
 
-bool GetJsonData(cJSON *json, std::string key, int16_t& val)
+void GetJsonData(cJSON *json, const std::string key, std::vector<int32_t>& vals)
 {
-    CHKPF(json);
+    CHKPV(json);
     if (cJSON_HasObjectItem(json, key.c_str())) {
         cJSON* rawVal = cJSON_GetObjectItem(json, key.c_str());
-        CHKPF(rawVal);
-        val = rawVal->valueint;
-        return true;
-    }
-    return false;
-}
-
-bool GetJsonData(cJSON *json, std::string key, int64_t& val)
-{
-    CHKPF(json);
-    if (cJSON_HasObjectItem(json, key.c_str())) {
-        cJSON* rawVal = cJSON_GetObjectItem(json, key.c_str());
-        CHKPF(rawVal);
-        val = rawVal->valueint;
-        return true;
-    }
-    return false;
-}
-
-bool GetJsonData(cJSON *json, std::string key, std::vector<int32_t>& vals)
-{
-    CHKPF(json);
-    if (cJSON_HasObjectItem(json, key.c_str())) {
-        cJSON* rawVal = cJSON_GetObjectItem(json, key.c_str());
-        CHKPF(rawVal);
+        CHKPV(rawVal);
         if (cJSON_IsArray(rawVal)) {
             int32_t rawValSize = cJSON_GetArraySize(rawVal);
             for (int32_t i = 0; i < rawValSize; ++i) {
                 cJSON* val = cJSON_GetArrayItem(rawVal, i);
-                CHKPF(val);
+                CHKPV(val);
                 vals.push_back(val->valueint);
             }
-            return true;
+            return;
         }
     }
-    return false;
+    return;
 }
 
 DeviceEvent InputParse::ParseEvents(const std::string& info) const
 {
     cJSON* eventInfo = cJSON_Parse(info.c_str());
-    if (eventInfo == nullptr) {
-        return  {};
-    }
+    CHKPO(eventInfo);
     int32_t eventSize = cJSON_GetArraySize(eventInfo);
     DeviceEvent event;
     for (int32_t i = 0; i < eventSize; ++i) {
@@ -186,9 +161,7 @@ DeviceEvent InputParse::ParseEvents(const std::string& info) const
 DeviceEvent InputParse::ParseEventsObj(const std::string& info) const
 {
     cJSON* eventInfo = cJSON_Parse(info.c_str());
-    if (eventInfo == nullptr) {
-        return  {};
-    }
+    CHKPO(eventInfo);
     DeviceEvent event;
     GetJsonData(eventInfo, "eventType", event.eventType);
     GetJsonData(eventInfo, "event", event.event);
@@ -211,9 +184,7 @@ DeviceEvent InputParse::ParseEventsObj(const std::string& info) const
 std::vector<DeviceEvent> InputParse::ParseData(const std::string& info) const
 {
     cJSON* events = cJSON_Parse(info.c_str());
-    if (events == nullptr) {
-        return {};
-    }
+    CHKPO(events);
     int32_t eventsSize = cJSON_GetArraySize(events);
     std::vector<DeviceEvent> eventData;
     for (int32_t i = 0; i < eventsSize; ++i) {
@@ -224,11 +195,10 @@ std::vector<DeviceEvent> InputParse::ParseData(const std::string& info) const
             return eventData;
         }
         DeviceEvent event;
-        std::string eventInfoStr = cJSON_Print(eventInfo);
         if (cJSON_IsArray(eventInfo)) {
-            event = ParseEvents(eventInfoStr);
+            event = ParseEvents(cJSON_Print(eventInfo));
         } else {
-            event = ParseEventsObj(eventInfoStr);
+            event = ParseEventsObj(cJSON_Print(eventInfo));
         }
         eventData.push_back(event);
     }
@@ -236,15 +206,12 @@ std::vector<DeviceEvent> InputParse::ParseData(const std::string& info) const
     return eventData;
 }
 
-DeviceItems InputParse::DataInit(const std::string& fileData, bool logType)
+DeviceItems InputParse::DataInit(const std::string& fileData, bool logStatus)
 {
     CALL_LOG_ENTER;
     DeviceItems deviceItems;
     cJSON* arrays = cJSON_Parse(fileData.c_str());
-    if (arrays == nullptr) {
-        MMI_HILOGW("arrays is null");
-        return {};
-    }
+    CHKPO(arrays);
     int32_t arraysSize = cJSON_GetArraySize(arrays);
     for (int32_t i = 0; i < arraysSize; ++i) {
         cJSON* deviceInfo = cJSON_GetArrayItem(arrays, i);
@@ -272,10 +239,9 @@ DeviceItems InputParse::DataInit(const std::string& fileData, bool logType)
             cJSON_Delete(arrays);
             return deviceItems;
         }
-        std::string eventsStr = cJSON_Print(events);
-        deviceItem.events = ParseData(eventsStr);
+        deviceItem.events = ParseData(cJSON_Print(events));
         deviceItems.push_back(deviceItem);
-        if (logType) {
+        if (logStatus) {
             MMI_HILOGW("deviceItem[%{public}d]: %{public}s", i, deviceItem.ToString().c_str());
         }
     }

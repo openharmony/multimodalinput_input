@@ -107,7 +107,7 @@ bool InjectionEventDispatch::ReadFile(const std::string &jsonFile, std::string& 
     CHKPF(fp);
     char buf[256] = {};
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf = jsonBuf + buf;
+        jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
         MMI_HILOGW("close file failed");
@@ -150,15 +150,14 @@ int32_t InjectionEventDispatch::OnJson()
         MMI_HILOGE("read file failed");
         return RET_ERR;
     }
-    bool logType = false;
+    bool logStatus = false;
     if (injectArgvs_.size() > ARGVS_CODE_INDEX) {
         if (injectArgvs_.at(ARGVS_CODE_INDEX) == "log") {
-            logType = true;
+            logStatus = true;
         }
     }
     InputParse InputParse;
-    int32_t ret = manageInjectDevice_.TransformJsonData(InputParse.DataInit(jsonBuf, logType));
-    return ret;
+    return manageInjectDevice_.TransformJsonData(InputParse.DataInit(jsonBuf, logStatus));
 }
 
 std::string InjectionEventDispatch::GetFunId() const

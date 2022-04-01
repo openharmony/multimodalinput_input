@@ -48,19 +48,17 @@ int32_t ProcessingJoystickDevice::AnalysisJoystickEvent(const std::vector<Device
     JoystickEvent joystickEvent = {};
     for (const auto &item : inputData) {
         joystickEvent = {};
-        if (item.blockTime > INVALID_VALUE) {
-            joystickEvent.blockTime = item.blockTime;
-        }
+        joystickEvent.blockTime = item.blockTime;
         joystickEvent.eventType = item.eventType;
         if ((joystickEvent.eventType == "KEY_EVENT_CLICK") || (joystickEvent.eventType == "KEY_EVENT_PRESS") ||
             (joystickEvent.eventType == "KEY_EVENT_RELEASE")) {
-            if (item.keyValue == INVALID_VALUE) {
+            if (item.keyValue > 0) {
                 MMI_HILOGE("not find keyValue On Event:%{public}s", joystickEvent.eventType.c_str());
                 return RET_ERR;
             }
             joystickEvent.keyValue = item.keyValue;
         } else if (joystickEvent.eventType == "THROTTLE") {
-            if (item.keyValue == INVALID_VALUE) {
+            if (item.keyValue > 0) {
                 MMI_HILOGE("not find keyValue On Event:%{public}s", joystickEvent.eventType.c_str());
                 return RET_ERR;
             }

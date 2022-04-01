@@ -63,12 +63,8 @@ int32_t ProcessingKeyboardDevice::AnalysisKeyBoardEvent(const std::vector<Device
     for (const auto &item : inputData) {
         keyBoardEvent = {};
         keyBoardEvent.eventType = item.eventType;
-        if (item.keyValue > INVALID_VALUE) {
-            keyBoardEvent.keyValue = item.keyValue;
-        }
-        if (item.keyValue > INVALID_VALUE) {
-            keyBoardEvent.blockTime = item.blockTime;
-        }
+        keyBoardEvent.keyValue = item.keyValue;
+        keyBoardEvent.blockTime = item.blockTime;
         keyBoardEventArray.push_back(keyBoardEvent);
     }
 
