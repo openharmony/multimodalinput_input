@@ -19,14 +19,13 @@
 #include <list>
 #include <string>
 
-#include "nocopyable.h"
-#include "singleton.h"
-
 #include "device_observer.h"
 #include "event_dispatch.h"
 #include "event_package.h"
 #include "input_device.h"
 #include "msg_handler.h"
+#include "nocopyable.h"
+#include "singleton.h"
 #include "util.h"
 
 namespace OHOS {
@@ -39,7 +38,7 @@ public:
     void OnInputDeviceRemoved(libinput_device* inputDevice);
     std::vector<int32_t> GetInputDeviceIds() const;
     std::shared_ptr<InputDevice> GetInputDevice(int32_t id) const;
-    std::map<int32_t, bool> GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> keyCodes);
+    std::map<int32_t, bool> GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> &keyCodes);
     int32_t FindInputDeviceId(libinput_device* inputDevice);
     void Attach(std::shared_ptr<IDeviceObserver> observer);
     void Detach(std::shared_ptr<IDeviceObserver> observer);
