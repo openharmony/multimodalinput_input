@@ -36,6 +36,7 @@ ohos_shared_library("inputdevice") {
     "src/js_event_target.cpp",
     "src/js_input_device_context.cpp",
     "src/js_input_device_manager.cpp",
+    "src/js_util.cpp",
     "src/native_register_module.cpp",
   ]
 
@@ -43,7 +44,6 @@ ohos_shared_library("inputdevice") {
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
-    "//foundation/multimodalinput/input/tools/event_inject:event-injection",
     "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/libuv:uv_static",
   ]
@@ -54,10 +54,7 @@ ohos_shared_library("inputdevice") {
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
-    "input_device_driver:hdi_input",
-    "ipc:ipc_core",
     "napi:ace_napi",
-    "utils_base:utils",
   ]
 
   relative_install_dir = "module/multimodalinput"

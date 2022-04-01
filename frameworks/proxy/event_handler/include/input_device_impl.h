@@ -39,27 +39,38 @@ public:
         uint32_t devcieType;
     };
 
+    using FunInputDevInfo = std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)>;
+    using FunInputDevIds = std::function<void(int32_t, std::vector<int32_t>)>;
+    using FunInputDevKeys = std::function<void(int32_t, std::vector<int32_t>)>;
+    using DevInfo = std::pair<EventHandlerPtr, FunInputDevInfo>;
+    using DevIds = std::pair<EventHandlerPtr, FunInputDevIds>;
+    using DevKeys = std::pair<EventHandlerPtr, FunInputDevKeys>;
+    struct InputDeviceData {
+        DevInfo inputDevice;
+        DevIds ids;
+        DevKeys keys;
+    };
+
     void GetInputDeviceIdsAsync(int32_t userData, std::function<void(int32_t, std::vector<int32_t>)> callback);
     void GetInputDeviceAsync(int32_t userData, int32_t deviceId,
         std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)> callback);
+    void GetKeystrokeAbility(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes,
+        std::function<void(int32_t, std::vector<int32_t>)> callback);
     void OnInputDevice(int32_t userData, int32_t id, const std::string &name, int32_t deviceId);
     void OnInputDeviceIds(int32_t userData, const std::vector<int32_t> &ids);
+    void OnKeystrokeAbility(int32_t userData, const std::vector<int32_t> &keystrokeAbility);
 
 private:
-    using FunInputDevInfo = std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)>;
-    using FunInputDevIds = std::function<void(int32_t, std::vector<int32_t>)>;
-    using DevInfo = std::pair<EventHandlerPtr, FunInputDevInfo>;
-    using DevIds = std::pair<EventHandlerPtr, FunInputDevIds>;
-
     const DevInfo* GetDeviceInfo(int32_t) const;
     const DevIds* GetDeviceIds(int32_t) const;
+    const DevIds* GetDeviceKeys(int32_t) const;
     void OnInputDeviceTask(int32_t userData, int32_t id, std::string name, int32_t deviceId);
     void OnInputDeviceIdsTask(int32_t userData, std::vector<int32_t> ids);
+    void OnKeystrokeAbilityTask(int32_t userData, std::vector<int32_t> keystrokeAbility);
 
 private:
     InputDeviceImpl() = default;
-    std::map<int32_t, DevInfo> inputDevcices_;
-    std::map<int32_t, DevIds> inputDevciceIds_;
+    std::map<int32_t, InputDeviceData> inputDevices_;
     std::mutex mtx_;
 };
 } // namespace MMI
