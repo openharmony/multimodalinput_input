@@ -24,6 +24,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventValueTransformations" };
+constexpr int32_t INVALID_KEY_CODE = -1;
 } // namespace
 
 const std::multimap<int16_t, KeyEventValueTransformations> MAP_KEY_EVENT_VALUE_TRANSFORMATION = {
@@ -465,7 +466,7 @@ int16_t InputTransformationKeyValue(int32_t keyCode)
             return item.first;
         }
     }
-    return -1;
+    return INVALID_KEY_CODE;
 }
 } // namespace MMI
 } // namespace OHOS
