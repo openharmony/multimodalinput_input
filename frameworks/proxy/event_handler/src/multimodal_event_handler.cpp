@@ -81,22 +81,31 @@ MMIClientPtr MultimodalEventHandler::GetMMIClient()
     return nullptr;
 }
 
-int32_t MultimodalEventHandler::GetDeviceIds(int32_t taskId)
+int32_t MultimodalEventHandler::GetDeviceIds(int32_t userData)
 {
     if (!InitClient()) {
         MMI_HILOGE("Init client faild");
         return MMI_SERVICE_INVALID;
     }
-    return EventManager.GetDeviceIds(taskId);
+    return EventManager.GetDeviceIds(userData);
 }
 
-int32_t MultimodalEventHandler::GetDevice(int32_t taskId, int32_t deviceId)
+int32_t MultimodalEventHandler::GetDevice(int32_t userData, int32_t deviceId)
 {
     if (!InitClient()) {
         MMI_HILOGE("Init client faild");
         return MMI_SERVICE_INVALID;
     }
-    return EventManager.GetDevice(taskId, deviceId);
+    return EventManager.GetDevice(userData, deviceId);
+}
+
+int32_t MultimodalEventHandler::GetKeystrokeAbility(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes)
+{
+    if (!InitClient()) {
+        MMI_HILOGE("Init client faild");
+        return MMI_SERVICE_INVALID;
+    }
+    return EventManager.GetKeystrokeAbility(userData, deviceId, keyCodes);
 }
 
 int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
