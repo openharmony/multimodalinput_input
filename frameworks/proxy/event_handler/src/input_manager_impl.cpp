@@ -289,17 +289,16 @@ void InputManagerImpl::PrintDisplayInfo()
             item.width, item.height, item.name.c_str(),
             item.seatId.c_str(), item.seatName.c_str(),
             item.focusWindowId, item.windowsInfo.size());
-
         for (const auto &win : item.windowsInfo) {
             MMI_HILOGD("windowid:%{public}d,pid:%{public}d,uid:%{public}d,hotZoneTopLeftX:%{public}d,"
                 "hotZoneTopLeftY:%{public}d,hotZoneWidth:%{public}d,hotZoneHeight:%{public}d,display:%{public}d,"
-                "agentWindowId:%{public}d,winTopLeftX:%{public}d,winTopLeftY:%{public}d",
+                "agentWindowId:%{public}d,winTopLeftX:%{public}d,winTopLeftY:%{public}d,flags:%{public}d",
                 win.id, win.pid,
                 win.uid, win.hotZoneTopLeftX,
                 win.hotZoneTopLeftY, win.hotZoneWidth,
                 win.hotZoneHeight, win.displayId,
                 win.agentWindowId,
-                win.winTopLeftX, win.winTopLeftY);
+                win.winTopLeftX, win.winTopLeftY, win.flags);
         }
     }
 }

@@ -183,6 +183,7 @@ void MouseEventHandler::Normalize(struct libinput_event *event)
     auto data = libinput_event_get_pointer_event(event);
     CHKPV(data);
     CHKPV(pointerEvent_);
+    pointerEvent_->ClearAxisValue();
     PointerEvent::PointerItem pointerItem;
     const int32_t type = libinput_event_get_type(event);
     switch (type) {
