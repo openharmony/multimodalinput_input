@@ -494,14 +494,14 @@ int32_t ServerMsgHandler::GetKeystrokeAbility(SessionPtr sess, NetPacket& pkt)
     }
     size_t size;
     if (!pkt.Read(size)) {
-        MMI_HILOGE("Packet read device failed");
+        MMI_HILOGE("Packet read size failed");
         return RET_ERR;
     }
     int32_t keyValueOfNative;
     std::vector<int32_t> keyCode;
     for (size_t i = 0 ; i < size; ++i) {
         if (!pkt.Read(keyValueOfNative)) {
-            MMI_HILOGE("Packet read device failed");
+            MMI_HILOGE("Packet read keyValueOfNative failed");
             return RET_ERR;
         }
         keyCode.push_back(keyValueOfNative);
@@ -510,22 +510,22 @@ int32_t ServerMsgHandler::GetKeystrokeAbility(SessionPtr sess, NetPacket& pkt)
     std::map<int32_t, bool> abilityRet = InputDevMgr->GetKeystrokeAbility(deviceId, keyCode);
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
     if (!pkt2.Write(userData)) {
-        MMI_HILOGE("Packet write data failed");
+        MMI_HILOGE("Packet write userData failed");
         return RET_ERR;
     }
     size = abilityRet.size();
     if (!pkt2.Write(size * 2)) {
-        MMI_HILOGE("Packet write data failed");
+        MMI_HILOGE("Packet write size failed");
         return RET_ERR;
     }
     for (const auto &item : abilityRet) {
         if (!pkt2.Write(item.first)) {
-            MMI_HILOGE("Packet write data failed");
+            MMI_HILOGE("Packet write key code failed");
             return RET_ERR;
         }
         int32_t ret = item.second ? 1 : 0;
         if (!pkt2.Write(ret)) {
-            MMI_HILOGE("Packet write data failed");
+            MMI_HILOGE("Packet write ret failed");
             return RET_ERR;
         }
     }
