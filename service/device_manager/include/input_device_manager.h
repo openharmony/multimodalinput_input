@@ -39,7 +39,7 @@ public:
     std::vector<int32_t> GetInputDeviceIds() const;
     std::shared_ptr<InputDevice> GetInputDevice(int32_t id) const;
     std::map<int32_t, bool> GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> &keyCodes);
-    int32_t FindInputDeviceId(libinput_device* inputDevice);
+    int32_t FindInputDeviceId(struct libinput_device* inputDevice);
     void Attach(std::shared_ptr<IDeviceObserver> observer);
     void Detach(std::shared_ptr<IDeviceObserver> observer);
     void NotifyPointerDevice(bool hasPointerDevice);
