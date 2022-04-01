@@ -27,7 +27,7 @@ struct KeyEventValueTransformations {
     int32_t sysKeyEvent;
 };
 
-KeyEventValueTransformations KeyValueTransformationInput(int32_t keyValueOfInput);
+KeyEventValueTransformations TransferKeyValue(int32_t keyValueOfInput);
 int32_t InputTransformationKeyValue(int32_t keyCode);
 } // namespace MMI
 } // namespace OHOS

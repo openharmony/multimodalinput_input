@@ -444,7 +444,7 @@ const std::multimap<int32_t, KeyEventValueTransformations> MAP_KEY_EVENT_VALUE_T
     {412, {"KEY_PREVIOUS", 412, 2631, HOS_KEY_PREVIOUS}},
 };
 
-KeyEventValueTransformations KeyValueTransformationInput(int32_t keyValueOfInput)
+KeyEventValueTransformations TransferKeyValue(int32_t keyValueOfInput)
 {
     auto it = MAP_KEY_EVENT_VALUE_TRANSFORMATION.find(keyValueOfInput);
     if (it == MAP_KEY_EVENT_VALUE_TRANSFORMATION.end()) {
@@ -452,7 +452,7 @@ KeyEventValueTransformations KeyValueTransformationInput(int32_t keyValueOfInput
         KeyEventValueTransformations unknownKey = {
             "UNKNOWN_KEY", keyValueOfInput, UNKNOWN_KEY_BASE + keyValueOfInput, HOS_UNKNOWN_KEY_BASE
         };
-        MMI_HILOGE("KeyValueTransformationInput Failed, unknown linux-code:%{public}d,"
+        MMI_HILOGE("TransferKeyValue Failed, unknown linux-code:%{public}d,"
                    "UNKNOWN_KEY_BASE:%{public}d", keyValueOfInput, UNKNOWN_KEY_BASE);
         return unknownKey;
     }
