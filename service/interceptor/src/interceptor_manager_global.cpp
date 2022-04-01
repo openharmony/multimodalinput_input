@@ -109,5 +109,13 @@ bool InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     }
     return true;
 }
+
+std::shared_ptr<IInterceptorManagerGlobal> IInterceptorManagerGlobal::GetInstance()
+{
+    if (interceptorMgrGPtr_ == nullptr) {
+        interceptorMgrGPtr_ = std::make_shared<InterceptorManagerGlobal>();
+    }
+    return interceptorMgrGPtr_;
+}
 } // namespace MMI
 } // namespace OHOS

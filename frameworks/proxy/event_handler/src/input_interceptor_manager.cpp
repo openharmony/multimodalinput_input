@@ -18,7 +18,6 @@
 #include "input_handler_manager.h"
 #include "util.h"
 
-
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -37,6 +36,14 @@ int32_t InputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsu
 void InputInterceptorManager::RemoveInterceptor(int32_t interceptorId)
 {
     InputHandlerManager::GetInstance().RemoveHandler(interceptorId, InputHandlerType::INTERCEPTOR);
+}
+
+std::shared_ptr<IInputInterceptorManager> IInputInterceptorManager::GetInstance()
+{
+    if (inputMgrPtr_ == nullptr) {
+        inputMgrPtr_ = std::make_shared<InputInterceptorManager>();
+    }
+    return inputMgrPtr_;
 }
 } // namespace MMI
 } // namespace OHOS

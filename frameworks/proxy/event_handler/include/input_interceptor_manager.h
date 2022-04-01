@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_INPUT_INTERCEPTOR_MANAGER_H
-#define OHOS_MULTIMDOALINPUT_INPUT_INTERCEPTOR_MANAGER_H
+#ifndef INPUT_INTERCEPTOR_MANAGER_H
+#define INPUT_INTERCEPTOR_MANAGER_H
 
 #include <memory>
 
 #include "nocopyable.h"
-#include "singleton.h"
 
 #include "i_input_event_consumer.h"
+#include "i_input_interceptor_manager.h"
 #include "input_handler_type.h"
 
 namespace OHOS {
 namespace MMI {
-class InputInterceptorManager {
+class InputInterceptorManager : public IInputInterceptorManager {
 public:
     InputInterceptorManager() = default;
     DISALLOW_COPY_AND_MOVE(InputInterceptorManager);
@@ -45,4 +45,4 @@ inline bool InputInterceptorManager::IsValidInterceptorId(int32_t interceptorId)
 }
 } // namespace MMI
 } // namespace OHOS
-#endif // OHOS_MULTIMDOALINPUT_INPUT_INTERCEPTOR_MANAGER_H
+#endif // INPUT_INTERCEPTOR_MANAGER_H

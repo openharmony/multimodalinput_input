@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,48 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef INTERCEPTOR_MANAGER_H
-#define INTERCEPTOR_MANAGER_H
-
-#include <list>
-
-#include "nocopyable.h"
+#ifndef NON_INTERCEPTOR_MANAGER_H
+#define NON_INTERCEPTOR_MANAGER_H
 
 #include "i_interceptor_manager.h"
 #include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
-class InterceptorManager : public IInterceptorManager {
+class NonInterceptorManager : public IInterceptorManager {
 public:
-    static constexpr int32_t SOURCETYPE_KEY = 4;
-
-public:
-    InterceptorManager() = default;
-    DISALLOW_COPY_AND_MOVE(InterceptorManager);
     int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
     int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
     void RemoveInterceptor(int32_t interceptorId);
     int32_t OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id);
-public:
-    static constexpr int32_t INVALID_INTERCEPTOR_ID { -1 };
     int32_t OnKeyEvent(std::shared_ptr<KeyEvent> pointerEvent);
-    
-private:
-    struct InterceptorItem {
-        int32_t id_;
-        bool operator == (struct InterceptorItem item) const
-        {
-            return id_ == item.id_;
-        }
-        int32_t sourceType;
-        std::function<void(std::shared_ptr<PointerEvent>)> callback;
-        std::function<void(std::shared_ptr<KeyEvent>)> callback_;
-    };
-private:
-    int32_t InterceptorItemId = 0;
-    std::list<InterceptorItem> interceptor_;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // INTERCEPTOR_MANAGER_H
+#endif // NON_INTERCEPTOR_MANAGER_H
