@@ -23,6 +23,7 @@ enum class MmiMessageId : int32_t {
     // libinput message id
     INPUT_DEVICE = 901,
     INPUT_DEVICE_IDS,
+    INPUT_DEVICE_KEYSTROKE_ABILITY,
 
     // mmi message id
     BEGIN = 1001,

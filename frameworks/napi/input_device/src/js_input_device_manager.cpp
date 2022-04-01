@@ -23,25 +23,28 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInp
 
 napi_value JsInputDeviceManager::GetDeviceIds(napi_env env, napi_value handle)
 {
+    CALL_LOG_ENTER;
     napi_value ret = CreateCallbackInfo(env, handle);
-    if (handle == nullptr) {
-        CHKPP(ret);
-        InputDevImp.GetInputDeviceIdsAsync(JsEventTarget::userData_ - 1, EmitJsIdsPromise);
-        return ret;
-    }
-    InputDevImp.GetInputDeviceIdsAsync(JsEventTarget::userData_ - 1, EmitJsIdsAsync);
-    return nullptr;
+    InputDevImp.GetInputDeviceIdsAsync(JsEventTarget::userData_ - 1, EmitJsIds);
+    return ret;
 }
 
-napi_value JsInputDeviceManager::GetDevice(int32_t id, napi_env env, napi_value handle)
+napi_value JsInputDeviceManager::GetDevice(napi_env env, int32_t id, napi_value handle)
 {
+    CALL_LOG_ENTER;
     napi_value ret = CreateCallbackInfo(env, handle);
-    if (handle == nullptr) {
-        InputDevImp.GetInputDeviceAsync(JsEventTarget::userData_ - 1, id, EmitJsDevPromise);
-        return ret;
-    }
-    InputDevImp.GetInputDeviceAsync(JsEventTarget::userData_ - 1, id, EmitJsDevAsync);
-    return nullptr;
+    InputDevImp.GetInputDeviceAsync(JsEventTarget::userData_ - 1, id, EmitJsDev);
+    return ret;
+}
+
+napi_value JsInputDeviceManager::GetKeystrokeAbility(napi_env env, int32_t id, std::vector<int32_t> keyCodes,
+                                                     napi_value handle)
+{
+    CALL_LOG_ENTER;
+    napi_value ret = CreateCallbackInfo(env, handle);
+    InputDeviceImpl::GetInstance().GetKeystrokeAbility(JsEventTarget::userData_ - 1, id, keyCodes,
+                                                       EmitJsKeystrokeAbility);
+    return ret;
 }
 
 void JsInputDeviceManager::ResetEnv()
