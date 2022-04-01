@@ -508,24 +508,25 @@ int32_t ServerMsgHandler::GetKeystrokeAbility(SessionPtr sess, NetPacket& pkt)
     }
 
     std::map<int32_t, bool> abilityRet = InputDevMgr->GetKeystrokeAbility(deviceId, keyCode);
+    std::vector<int32_t> keystrokeAbility;
+    for (const auto &item : abilityRet) {
+        keystrokeAbility.push_back(item.first);
+        keystrokeAbility.push_back(item.second ? 1 : 0);
+    }
+
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
     if (!pkt2.Write(userData)) {
         MMI_HILOGE("Packet write userData failed");
         return RET_ERR;
     }
-    size = abilityRet.size();
-    if (!pkt2.Write(size * 2)) {
+    size = keystrokeAbility.size();
+    if (!pkt2.Write(size)) {
         MMI_HILOGE("Packet write size failed");
         return RET_ERR;
     }
-    for (const auto &item : abilityRet) {
-        if (!pkt2.Write(item.first)) {
-            MMI_HILOGE("Packet write key code failed");
-            return RET_ERR;
-        }
-        int32_t ret = item.second ? 1 : 0;
-        if (!pkt2.Write(ret)) {
-            MMI_HILOGE("Packet write ret failed");
+    for (const auto &item : keystrokeAbility) {
+        if (!pkt2.Write(item)) {
+            MMI_HILOGE("Packet write data failed");
             return RET_ERR;
         }
     }
