@@ -148,10 +148,11 @@ void InputWindowsManager::PrintDisplayInfo()
     for (const auto &item : windowInfos_) {
         MMI_HILOGD("windowId:%{public}d,id:%{public}d,pid:%{public}d,uid:%{public}d,hotZoneTopLeftX:%{public}d,"
             "hotZoneTopLeftY:%{public}d,hotZoneWidth:%{public}d,hotZoneHeight:%{public}d,display:%{public}d,"
-            "agentWindowId:%{public}d,winTopLeftX:%{public}d,winTopLeftY:%{public}d",
+            "agentWindowId:%{public}d,winTopLeftX:%{public}d,winTopLeftY:%{public}d,flags:%{public}d",
             item.first, item.second.id, item.second.pid, item.second.uid, item.second.hotZoneTopLeftX,
             item.second.hotZoneTopLeftY, item.second.hotZoneWidth, item.second.hotZoneHeight,
-            item.second.displayId, item.second.agentWindowId, item.second.winTopLeftX, item.second.winTopLeftY);
+            item.second.displayId, item.second.agentWindowId, item.second.winTopLeftX, item.second.winTopLeftY,
+            item.second.flags);
     }
 }
 
@@ -162,7 +163,7 @@ PhysicalDisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id)
             return &it;
         }
     }
-    MMI_HILOGE("Failed to obtain physical(%{public}d) display", id);
+    MMI_HILOGW("Failed to obtain physical(%{public}d) display", id);
     return nullptr;
 }
 
@@ -280,12 +281,13 @@ bool InputWindowsManager::TouchMotionPointToDisplayPoint(struct libinput_event_t
 
     for (const auto &display : logicalDisplays_) {
         if (targetDisplayId == display.id ) {
-            MMI_HILOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
-                targetDisplayId, displayX, displayY);
             displayX = globalLogicalX - display.topLeftX;
             displayY = globalLogicalY - display.topLeftY;
+            AdjustGlobalCoordinate(displayX, displayY, display.width, display.height);
+            MMI_HILOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
+                targetDisplayId, displayX, displayY);
+            return true;
         }
-        return true;
     }
 
     return false;
@@ -314,6 +316,7 @@ bool InputWindowsManager::TouchDownPointToDisplayPoint(struct libinput_event_tou
         logicalDisplayId = display.id;
         logicalX = globalLogicalX - display.topLeftX;
         logicalY = globalLogicalY - display.topLeftY;
+        AdjustGlobalCoordinate(logicalX, logicalY, display.width, display.height);
         MMI_HILOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
             logicalDisplayId, logicalX, logicalY);
         return true;
@@ -339,14 +342,14 @@ void InputWindowsManager::AdjustGlobalCoordinate(int32_t& globalX, int32_t& glob
     if (globalX <= 0) {
         globalX = 0;
     }
-    if (globalX >= width) {
-        globalX = width;
+    if (globalX >= width && width > 0) {
+        globalX = width - 1;
     }
     if (globalY <= 0) {
         globalY = 0;
     }
-    if (globalY >= height) {
-        globalY = height;
+    if (globalY >= height && height > 0) {
+        globalY = height - 1;
     }
 }
 
@@ -405,7 +408,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         && (pointerEvent->GetPressedButtons().size() == 1);
     bool isMove = (action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty());
     if ((firstBtnDownWindowId_ == -1) || isFirstBtnDown || isMove) {
-        for (auto &item : logicalDisplayInfo->windowsInfo) {
+        for (const auto& item : logicalDisplayInfo->windowsInfo) {
+            if ((item.flags & FLAG_NOT_TOUCHABLE) == FLAG_NOT_TOUCHABLE) {
+                continue;
+            }
             if (IsInsideWindow(globalX, globalY, item)) {
                 firstBtnDownWindowId_ = item.id;
                 break;
@@ -458,12 +464,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     CHKPR(logicalDisplayInfo, ERROR_NULL_POINTER);
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
-    MMI_HILOGD("globalX:%{public}d,globalY:%{public}d", globalX, globalY);
-    AdjustGlobalCoordinate(globalX, globalY, logicalDisplayInfo->width, logicalDisplayInfo->height);
     auto targetWindowId = pointerEvent->GetTargetWindowId();
-    MMI_HILOGD("targetWindow:%{public}d", targetWindowId);
     WindowInfo *touchWindow = nullptr;
-    for (auto item : logicalDisplayInfo->windowsInfo) {
+    for (auto& item : logicalDisplayInfo->windowsInfo) {
+        if ((item.flags & FLAG_NOT_TOUCHABLE) == FLAG_NOT_TOUCHABLE) {
+            continue;
+        }
         if (targetWindowId < 0) {
             if (IsInsideWindow(globalX, globalY, item)) {
                 touchWindow = &item;
@@ -542,18 +548,18 @@ void InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, double& y)
     }
     int32_t integerX = static_cast<int32_t>(x);
     int32_t integerY = static_cast<int32_t>(y);
-    if (integerX > width) {
+    if (integerX >= width && width > 0) {
         x = static_cast<double>(width);
-        mouseLoction_.globalX = width;
+        mouseLoction_.globalX = width - 1;
     } else if (integerX < 0) {
         x = 0;
         mouseLoction_.globalX = 0;
     } else {
         mouseLoction_.globalX = integerX;
     }
-    if (integerY > height) {
+    if (integerY >= height && height > 0) {
         y = static_cast<double>(height);
-        mouseLoction_.globalY = height;
+        mouseLoction_.globalY = height - 1;
     } else if (integerY < 0) {
         y = 0;
         mouseLoction_.globalY = 0;
@@ -563,8 +569,14 @@ void InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, double& y)
     MMI_HILOGD("Mouse Data: globalX:%{public}d,globalY:%{public}d", mouseLoction_.globalX, mouseLoction_.globalY);
 }
 
-MouseLocation InputWindowsManager::GetMouseInfo() const
+MouseLocation InputWindowsManager::GetMouseInfo()
 {
+    if (mouseLoction_.globalX == -1 || mouseLoction_.globalY == -1) {
+        if (!logicalDisplays_.empty()) {
+            mouseLoction_.globalX = logicalDisplays_[0].width / 2;
+            mouseLoction_.globalY = logicalDisplays_[0].height / 2;
+        }
+    }
     return mouseLoction_;
 }
 } // namespace MMI

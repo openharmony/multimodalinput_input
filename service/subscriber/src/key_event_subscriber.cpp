@@ -192,7 +192,7 @@ void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscribe
     CHKPV(subscriber);
 
     if (subscriber->timerId_ < 0) {
-        MMI_HILOGE("Leave, subscribeId:%{public}d,null timerId < 0", subscriber->id_);
+        MMI_HILOGW("Leave, subscribeId:%{public}d,null timerId < 0", subscriber->id_);
         return;
     }
 
@@ -200,7 +200,7 @@ void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscribe
     subscriber->keyEvent_.reset();
     subscriber->timerId_ = -1;
     TimerMgr->RemoveTimer(timerId);
-    MMI_HILOGD("subscribeId:%{public}d,subscribeId:%{public}d", subscriber->id_, timerId);
+    MMI_HILOGD("subscribeId:%{public}d,timerId:%{public}d", subscriber->id_, timerId);
 }
 
 void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
