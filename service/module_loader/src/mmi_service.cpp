@@ -24,11 +24,6 @@
 #include "input_windows_manager.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
-#ifdef OHOS_BUILD_POINTERDRAWING
-#include "pointer_drawing_manager.h"
-#else
-#include "non_pointer_drawing_manager.h"
-#endif
 #include "timer_manager.h"
 #include "util.h"
 
@@ -179,28 +174,21 @@ int32_t MMIService::Init()
     MMI_HILOGD("EventDump Init");
     MMIEventDump->Init(*this);
 
-#ifdef OHOS_BUILD_POINTERDRAWING
     MMI_HILOGD("PointerDrawingManager Init");
-    if (!PointerDrawingManager::GetInstance()->Init()) {
+    if (iPointDrawMgr_ == nullptr) {
+        iPointDrawMgr_ = IPointerDrawingManager::Create();
+    }
+    if (!iPointDrawMgr_->Init()) {
         MMI_HILOGE("Pointer draw init failed");
         return POINTER_DRAW_INIT_FAIL;
     }
-    observer_ = PointerDrawMgr;
-#else
-    MMI_HILOGD("NonPointerDrawingManager Init");
-    if (!NonPointerDrawingManager::GetInstance()->Init()) {
-        MMI_HILOGE("Non Pointer draw init failed");
-        return POINTER_DRAW_INIT_FAIL;
-    }
-    observer_ = NonPointerDrawMgr;
-#endif
 
     MMI_HILOGD("WindowsManager Init");
-    if (!WinMgr->Init(*this, observer_)) {
+    if (!WinMgr->Init(*this, iPointDrawMgr_)) {
         MMI_HILOGE("Windows message init failed");
         return WINDOWS_MSG_INIT_FAIL;
     }
-    
+
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
     if (mmiFd_ < 0) {
         MMI_HILOGE("Epoll creat failed");
