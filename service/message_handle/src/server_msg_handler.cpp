@@ -497,14 +497,14 @@ int32_t ServerMsgHandler::GetKeystrokeAbility(SessionPtr sess, NetPacket& pkt)
         MMI_HILOGE("Packet read size failed");
         return RET_ERR;
     }
-    int32_t keyValueOfNative;
+    int32_t sysKeyValue;
     std::vector<int32_t> keyCode;
     for (size_t i = 0 ; i < size; ++i) {
-        if (!pkt.Read(keyValueOfNative)) {
-            MMI_HILOGE("Packet read keyValueOfNative failed");
+        if (!pkt.Read(sysKeyValue)) {
+            MMI_HILOGE("Packet read nativeKeyValue failed");
             return RET_ERR;
         }
-        keyCode.push_back(keyValueOfNative);
+        keyCode.push_back(sysKeyValue);
     }
 
     std::map<int32_t, bool> abilityRet = InputDevMgr->GetKeystrokeAbility(deviceId, keyCode);
