@@ -67,11 +67,13 @@ void InputDeviceImpl::OnInputDeviceTask(int32_t userData, int32_t id, std::strin
     auto devData = std::make_shared<InputDeviceInfo>(id, name, deviceType);
     CHKPV(devData);
     devInfo->second(userData, devData);
+    MMI_HILOGD("device info event callback userData:%{public}d id:%{public}d name:%{public}s type:%{public}d",
+        userData, id, name.c_str(), deviceType);
 }
 
-void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, std::string name, int32_t deviceType)
+void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, const std::string &name, int32_t deviceType)
 {
-    CALL_LOG_ENTER;
+    CHK_PIDANDTID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto devInfo = GetDeviceInfo(userData);
     if (devInfo == nullptr) {
@@ -82,6 +84,8 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, std::string na
         std::bind(&InputDeviceImpl::OnInputDeviceTask, this, userData, id, name, deviceType))) {
         MMI_HILOGE("post task failed");
     }
+    MMI_HILOGD("device info event userData:%{public}d id:%{public}d name:%{public}s type:%{public}d",
+        userData, id, name.c_str(), deviceType);
 }
 
 void InputDeviceImpl::OnInputDeviceIdsTask(int32_t userData, std::vector<int32_t> ids)
@@ -94,11 +98,13 @@ void InputDeviceImpl::OnInputDeviceIdsTask(int32_t userData, std::vector<int32_t
         return;
     }
     devIds->second(userData, ids);
+    MMI_HILOGD("device ids event callback userData:%{public}d ids:(%{public}s)",
+        userData, IdsListToString(ids).c_str());
 }
 
-void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> ids)
+void InputDeviceImpl::OnInputDeviceIds(int32_t userData, const std::vector<int32_t> &ids)
 {
-    CALL_LOG_ENTER;
+    CHK_PIDANDTID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto devIds = GetDeviceIds(userData);
     if (devIds == nullptr) {
@@ -109,6 +115,7 @@ void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> id
         std::bind(&InputDeviceImpl::OnInputDeviceIdsTask, this, userData, ids))) {
         MMI_HILOGE("post task failed");
     }
+    MMI_HILOGD("device ids event userData:%{public}d ids:(%{public}s)", userData, IdsListToString(ids).c_str());
 }
 
 const InputDeviceImpl::DevInfo* InputDeviceImpl::GetDeviceInfo(int32_t userData) const

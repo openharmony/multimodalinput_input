@@ -148,10 +148,11 @@ void InputWindowsManager::PrintDisplayInfo()
     for (const auto &item : windowInfos_) {
         MMI_HILOGD("windowId:%{public}d,id:%{public}d,pid:%{public}d,uid:%{public}d,hotZoneTopLeftX:%{public}d,"
             "hotZoneTopLeftY:%{public}d,hotZoneWidth:%{public}d,hotZoneHeight:%{public}d,display:%{public}d,"
-            "agentWindowId:%{public}d,winTopLeftX:%{public}d,winTopLeftY:%{public}d",
+            "agentWindowId:%{public}d,winTopLeftX:%{public}d,winTopLeftY:%{public}d,flags:%{public}d",
             item.first, item.second.id, item.second.pid, item.second.uid, item.second.hotZoneTopLeftX,
             item.second.hotZoneTopLeftY, item.second.hotZoneWidth, item.second.hotZoneHeight,
-            item.second.displayId, item.second.agentWindowId, item.second.winTopLeftX, item.second.winTopLeftY);
+            item.second.displayId, item.second.agentWindowId, item.second.winTopLeftX, item.second.winTopLeftY,
+            item.second.flags);
     }
 }
 
@@ -407,7 +408,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         && (pointerEvent->GetPressedButtons().size() == 1);
     bool isMove = (action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty());
     if ((firstBtnDownWindowId_ == -1) || isFirstBtnDown || isMove) {
-        for (auto &item : logicalDisplayInfo->windowsInfo) {
+        for (const auto& item : logicalDisplayInfo->windowsInfo) {
+            if ((item.flags & FLAG_NOT_TOUCHABLE) == FLAG_NOT_TOUCHABLE) {
+                continue;
+            }
             if (IsInsideWindow(globalX, globalY, item)) {
                 firstBtnDownWindowId_ = item.id;
                 break;
@@ -462,7 +466,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     int32_t globalY = pointerItem.GetGlobalY();
     auto targetWindowId = pointerEvent->GetTargetWindowId();
     WindowInfo *touchWindow = nullptr;
-    for (auto item : logicalDisplayInfo->windowsInfo) {
+    for (auto& item : logicalDisplayInfo->windowsInfo) {
+        if ((item.flags & FLAG_NOT_TOUCHABLE) == FLAG_NOT_TOUCHABLE) {
+            continue;
+        }
         if (targetWindowId < 0) {
             if (IsInsideWindow(globalX, globalY, item)) {
                 touchWindow = &item;

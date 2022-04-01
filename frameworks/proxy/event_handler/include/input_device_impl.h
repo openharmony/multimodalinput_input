@@ -42,8 +42,8 @@ public:
     void GetInputDeviceIdsAsync(int32_t userData, std::function<void(int32_t, std::vector<int32_t>)> callback);
     void GetInputDeviceAsync(int32_t userData, int32_t deviceId,
         std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)> callback);
-    void OnInputDevice(int32_t userData, int32_t id, std::string name, int32_t deviceId);
-    void OnInputDeviceIds(int32_t userData, std::vector<int32_t> ids);
+    void OnInputDevice(int32_t userData, int32_t id, const std::string &name, int32_t deviceId);
+    void OnInputDeviceIds(int32_t userData, const std::vector<int32_t> &ids);
 
 private:
     using FunInputDevInfo = std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)>;

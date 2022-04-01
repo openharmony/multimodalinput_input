@@ -46,7 +46,7 @@ int32_t UDSClient::ConnectTo()
 bool UDSClient::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
-    if ((size <= 0) || (size > MAX_PACKET_BUF_SIZE)) {
+    if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
         MMI_HILOGE("Stream buffer size out of range");
         return false;
     }
