@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,46 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef INTERCEPTOR_MANAGER_GLOBAL_H
-#define INTERCEPTOR_MANAGER_GLOBAL_H
-
-#include <list>
-
-#include "nocopyable.h"
-#include "singleton.h"
+#ifndef NON_INTERCEPTOR_MANAGER_GLOBAL_H
+#define NON_INTERCEPTOR_MANAGER_GLOBAL_H
 
 #include "i_interceptor_manager_global.h"
-#include "key_event.h"
-#include "pointer_event.h"
-#include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class InterceptorManagerGlobal : public IInterceptorManagerGlobal {
+class NonInterceptorManagerGlobal : public IInterceptorManagerGlobal {
 public:
-    static constexpr int32_t SOURCETYPE_KEY = 4;
-
-public:
-    InterceptorManagerGlobal();
-    DISALLOW_COPY_AND_MOVE(InterceptorManagerGlobal);
-    ~InterceptorManagerGlobal();
     void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session);
     void OnRemoveInterceptor(int32_t id);
     bool OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     bool OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
-private:
-    struct InterceptorItem {
-        int32_t sourceType;
-        int32_t id;
-        SessionPtr session = nullptr;
-        bool operator == (const InterceptorItem& item)
-        {
-            return id == item.id;
-        }
-    };
-private:
-    std::list<InterceptorItem> interceptors_;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // INTERCEPTOR_MANAGER_GLOBAL_H
+#endif // NON_INTERCEPTOR_MANAGER_GLOBAL_H

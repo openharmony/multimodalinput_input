@@ -69,7 +69,7 @@ private:
 
 private:
     EventPackage eventPackage_;
-    };
+};
 } // namespace MMI
 } // namespace OHOS
 #endif // EVENT_DISPATCH_H

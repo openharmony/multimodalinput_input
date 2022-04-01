@@ -21,7 +21,6 @@
 #include "event_dispatch.h"
 #include "msg_handler.h"
 
-
 namespace OHOS {
 namespace MMI {
 typedef std::function<int32_t(SessionPtr sess, NetPacket& pkt)> ServerMsgFun;

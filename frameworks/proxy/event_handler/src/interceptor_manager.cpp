@@ -20,19 +20,13 @@
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+#include "multimodal_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManager" };
 } // namespace
-
-InterceptorManager::InterceptorManager()
-{
-    InterceptorItemId = 0;
-}
-
-InterceptorManager::~InterceptorManager() {}
 
 int32_t InterceptorManager::AddInterceptor(int32_t sourceType,
     std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
@@ -115,6 +109,14 @@ int32_t InterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
         }
     }
     return MMI_STANDARD_EVENT_SUCCESS;
+}
+
+std::shared_ptr<IInterceptorManager> IInterceptorManager::GetInstance()
+{
+    if (interceptorMgrPtr_ == nullptr) {
+        interceptorMgrPtr_ = std::make_shared<InterceptorManager>();
+    }
+    return interceptorMgrPtr_;
 }
 } // namespace MMI
 } // namespace OHOS
