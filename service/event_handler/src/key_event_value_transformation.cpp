@@ -462,7 +462,7 @@ KeyEventValueTransformations KeyValueTransformationInput(int32_t keyValueOfInput
 int32_t InputTransformationKeyValue(int32_t keyCode)
 {
     for (const auto &item : MAP_KEY_EVENT_VALUE_TRANSFORMATION) {
-        if (item.second.keyValueOfSys == keyCode) {
+        if (item.second.sysKeyValue == keyCode) {
             return item.first;
         }
     }
