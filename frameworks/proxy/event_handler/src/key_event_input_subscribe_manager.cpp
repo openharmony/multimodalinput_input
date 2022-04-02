@@ -64,10 +64,8 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
     for (auto preKey : keyOption->GetPreKeys()) {
         MMI_HILOGD("keyOption->prekey:%{public}d", preKey);
     }
-    auto eventHandler = AppExecFwk::EventHandler::Current();
-    if (eventHandler == nullptr) {
-        eventHandler = InputMgrImp->GetEventHandler();
-    }
+    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    CHKPR(eventHandler, INVALID_SUBSCRIBE_ID);
     SubscribeKeyEventInfo subscribeInfo(keyOption, callback, eventHandler);
     MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
         "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuriation:%{public}d",
@@ -115,10 +113,7 @@ int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
 bool KeyEventInputSubscribeManager::PostTask(int32_t subscribeId, const AppExecFwk::EventHandler::Callback &callback)
 {
     auto obj = GetSubscribeKeyEvent(subscribeId);
-    if (obj == nullptr) {
-        MMI_HILOGE("subscribe key event not found. id:%{public}d", subscribeId);
-        return false;
-    }
+    CHKPF(obj);
     auto eventHandler = obj->GetEventHandler();
     CHKPF(eventHandler);
     return MMIEventHandler::PostTask(eventHandler, callback);
@@ -130,10 +125,7 @@ void KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask(std::shared_
     CHK_PIDANDTID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto obj = GetSubscribeKeyEvent(subscribeId);
-    if (!obj) {
-        MMI_HILOGE("subscribe key event not found. id:%{public}d", subscribeId);
-        return;
-    }
+    CHKPV(obj);
     obj->GetCallback()(event);
     MMI_HILOGD("key event callback id:%{public}d keyCode:%{public}d", subscribeId, event->GetKeyCode());
 }

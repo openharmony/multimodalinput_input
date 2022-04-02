@@ -31,7 +31,7 @@ constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
 } // namespace
 
 int32_t KeyEventSubscriber::SubscribeKeyEvent(
-        SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)
+    SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)
 {
     CALL_LOG_ENTER;
     if (subscribeId < 0) {
@@ -78,7 +78,8 @@ bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     CALL_LOG_ENTER;
     CHKPF(keyEvent);
     int32_t keyAction = keyEvent->GetKeyAction();
-    MMI_HILOGD("keyCode:%{public}d,keyAction:%{public}s", keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
+    MMI_HILOGD("keyCode:%{public}d,keyAction:%{public}s", keyEvent->GetKeyCode(),
+        KeyEvent::ActionToString(keyAction));
     for (const auto &keyCode : keyEvent->GetPressedKeys()) {
         MMI_HILOGD("pressed KeyCode:%{public}d", keyCode);
     }
@@ -124,8 +125,8 @@ void KeyEventSubscriber::OnSessionDelete(SessionPtr sess)
     }
 }
 
-bool KeyEventSubscriber::IsPreKeysMatch(const std::set<int32_t>& preKeys,
-        const std::vector<int32_t>& pressedKeys) const
+bool KeyEventSubscriber::IsPreKeysMatch(
+    const std::set<int32_t>& preKeys, const std::vector<int32_t>& pressedKeys) const
 {
     if (preKeys.size() != pressedKeys.size()) {
         return false;
@@ -142,7 +143,7 @@ bool KeyEventSubscriber::IsPreKeysMatch(const std::set<int32_t>& preKeys,
 }
 
 void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
-        const std::shared_ptr<Subscriber>& subscriber)
+    const std::shared_ptr<Subscriber>& subscriber)
 {
     CALL_LOG_ENTER;
     CHKPV(keyEvent);
@@ -160,7 +161,7 @@ void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
 }
 
 bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
-        const std::shared_ptr<KeyEvent>& keyEvent)
+    const std::shared_ptr<KeyEvent>& keyEvent)
 {
     CALL_LOG_ENTER;
     CHKPF(keyEvent);
@@ -242,10 +243,9 @@ bool KeyEventSubscriber::InitSessionDeleteCallback()
     }
     auto udsServerPtr = InputHandler->GetUDSServer();
     CHKPF(udsServerPtr);
-    std::function<void(SessionPtr)> callback = std::bind(&KeyEventSubscriber::OnSessionDelete,
-            this, std::placeholders::_1);
+    std::function<void(SessionPtr)> callback =
+        std::bind(&KeyEventSubscriber::OnSessionDelete, this, std::placeholders::_1);
     udsServerPtr->AddSessionDeletedCallback(callback);
-
     callbackInitialized_ = true;
     return true;
 }

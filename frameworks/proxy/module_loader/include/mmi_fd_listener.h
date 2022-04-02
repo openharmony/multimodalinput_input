@@ -22,8 +22,8 @@ namespace OHOS {
 namespace MMI {
 class MMIFdListener : public AppExecFwk::FileDescriptorListener {
 public:
-    MMIFdListener(MMIClientPtr client);
-    virtual ~MMIFdListener() = default;
+    explicit MMIFdListener(MMIClientPtr client);
+    virtual ~MMIFdListener();
     DISALLOW_COPY_AND_MOVE(MMIFdListener);
 
     virtual void OnReadable(int32_t fd) override;

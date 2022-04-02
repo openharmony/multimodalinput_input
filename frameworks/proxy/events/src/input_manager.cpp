@@ -38,17 +38,17 @@ InputManager *InputManager::GetInstance()
 void InputManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
     const std::vector<LogicalDisplayInfo> &logicalDisplays)
 {
-    InputMgrImp->UpdateDisplayInfo(physicalDisplays, logicalDisplays);
+    InputMgrImpl->UpdateDisplayInfo(physicalDisplays, logicalDisplays);
 }
 
 int32_t InputManager::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
 {
-    return InputMgrImp->AddInputEventFilter(filter);
+    return InputMgrImpl->AddInputEventFilter(filter);
 }
 
 void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
 {
-    InputMgrImp->SetWindowInputEventConsumer(inputEventConsumer);
+    InputMgrImpl->SetWindowInputEventConsumer(inputEventConsumer);
 }
 
 int32_t InputManager::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
@@ -64,32 +64,32 @@ void InputManager::UnsubscribeKeyEvent(int32_t subscriberId)
 
 int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
-    return InputMgrImp->AddMonitor(monitor);
+    return InputMgrImpl->AddMonitor(monitor);
 }
 
 int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
-    return InputMgrImp->AddMonitor(monitor);
+    return InputMgrImpl->AddMonitor(monitor);
 }
 
 int32_t InputManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor)
 {
-    return InputMgrImp->AddMonitor(monitor);
+    return InputMgrImpl->AddMonitor(monitor);
 }
 
 void InputManager::RemoveMonitor(int32_t monitorId)
 {
-    InputMgrImp->RemoveMonitor(monitorId);
+    InputMgrImpl->RemoveMonitor(monitorId);
 }
 
 void InputManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
-    InputMgrImp->MarkConsumed(monitorId, eventId);
+    InputMgrImpl->MarkConsumed(monitorId, eventId);
 }
 
 int32_t InputManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
-    return InputMgrImp->AddInterceptor(interceptor);
+    return InputMgrImpl->AddInterceptor(interceptor);
 }
 
 int32_t InputManager::AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
@@ -99,22 +99,22 @@ int32_t InputManager::AddInterceptor(int32_t sourceType, std::function<void(std:
 
 int32_t InputManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
-    return InputMgrImp->AddInterceptor(interceptor);
+    return InputMgrImpl->AddInterceptor(interceptor);
 }
 
 void InputManager::RemoveInterceptor(int32_t interceptorId)
 {
-    InputMgrImp->RemoveInterceptor(interceptorId);
+    InputMgrImpl->RemoveInterceptor(interceptorId);
 }
 
-void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent) 
+void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    InputMgrImp->SimulateInputEvent(keyEvent);
+    InputMgrImpl->SimulateInputEvent(keyEvent);
 }
 
 void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    InputMgrImp->SimulateInputEvent(pointerEvent);
+    InputMgrImpl->SimulateInputEvent(pointerEvent);
 }
 } // namespace MMI
 } // namespace OHOS

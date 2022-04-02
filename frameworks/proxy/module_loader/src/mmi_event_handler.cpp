@@ -55,13 +55,13 @@ const std::string& MMIEventHandler::GetErrorStr(ErrCode code) const
     const static std::string defErrString = "Unknown event handler error!";
     const static std::map<ErrCode, std::string> mapStrings = {
         {ERR_OK, "ERR_OK."},
-        {EVENT_HANDLER_ERR_INVALID_PARAM, "Invalid parameters."},
-        {EVENT_HANDLER_ERR_NO_EVENT_RUNNER, "Have not set event runner yet."},
-        {EVENT_HANDLER_ERR_FD_NOT_SUPPORT, "Not support to listen file descriptors."},
-        {EVENT_HANDLER_ERR_FD_ALREADY, "File descriptor is already in listening."},
-        {EVENT_HANDLER_ERR_FD_FAILED, "Failed to listen file descriptor."},
-        {EVENT_HANDLER_ERR_RUNNER_NO_PERMIT, "No permit to start or stop deposited event runner."},
-        {EVENT_HANDLER_ERR_RUNNER_ALREADY, "Event runner is already running."}
+        {EVENT_HANDLER_ERR_INVALID_PARAM, "Invalid parameters"},
+        {EVENT_HANDLER_ERR_NO_EVENT_RUNNER, "Have not set event runner yet"},
+        {EVENT_HANDLER_ERR_FD_NOT_SUPPORT, "Not support to listen file descriptors"},
+        {EVENT_HANDLER_ERR_FD_ALREADY, "File descriptor is already in listening"},
+        {EVENT_HANDLER_ERR_FD_FAILED, "Failed to listen file descriptor"},
+        {EVENT_HANDLER_ERR_RUNNER_NO_PERMIT, "No permit to start or stop deposited event runner"},
+        {EVENT_HANDLER_ERR_RUNNER_ALREADY, "Event runner is already running"}
     };
     auto it = mapStrings.find(code);
     if (it != mapStrings.end()) {
