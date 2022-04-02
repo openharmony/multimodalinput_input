@@ -16,7 +16,7 @@
 #ifndef INPUT_HANDLER_TYPE_H
 #define INPUT_HANDLER_TYPE_H
 
-#include <climits>
+// #include <climits>
 
 namespace OHOS {
 namespace MMI {

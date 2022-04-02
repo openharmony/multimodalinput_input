@@ -135,7 +135,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
                key->GetFlag(), key->GetKeyAction(), key->GetId(), fd);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(eventProcessedCallback_);
-    InputMgrImp->OnKeyEvent(key);
+    InputMgrImpl->OnKeyEvent(key);
     key->MarkProcessed();
     return RET_OK;
 }
@@ -161,7 +161,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     }
     pointerEvent->SetProcessedCallback(eventProcessedCallback_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_DISPATCH_EVENT);
-    InputMgrImp->OnPointerEvent(pointerEvent);
+    InputMgrImpl->OnPointerEvent(pointerEvent);
     return RET_OK;
 }
 

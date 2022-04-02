@@ -31,7 +31,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Multim
 void OnConnected(const IfMMIClient& client)
 {
     CALL_LOG_ENTER;
-    InputMgrImp->OnConnected();
+    InputMgrImpl->OnConnected();
     KeyEventInputSubscribeMgr.OnConnected();
     InputHandlerManager::GetInstance().OnConnected();
 }
@@ -75,7 +75,7 @@ bool MultimodalEventHandler::InitClient()
 
 MMIClientPtr MultimodalEventHandler::GetMMIClient()
 {
-    if (client_) {
+    if (client_ != nullptr) {
         return client_->GetSharedPtr();
     }
     MMI_HILOGE("Init client faild");

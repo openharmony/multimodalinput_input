@@ -84,7 +84,7 @@ bool MMIClient::StartEventRunner()
 {
     CALL_LOG_ENTER;
     CHK_PIDANDTID();
-    if (!InputMgrImp->InitEventHandler()) {
+    if (!InputMgrImpl->InitEventHandler()) {
         MMI_HILOGE("init eventhandler error");
         Stop();
         return false;
@@ -153,11 +153,11 @@ bool MMIClient::AddFdListener(int32_t fd)
 bool MMIClient::DelFdListener(int32_t fd)
 {
     CALL_LOG_ENTER;
-    CHKPF(recvEventHandler_);
     if (fd < 0) {
         MMI_HILOGE("Invalid fd:%{public}d", fd);
         return false;
     }
+    CHKPF(recvEventHandler_);
     recvEventHandler_->RemoveAllEvents();
     recvEventHandler_->RemoveFileDescriptorListener(fd);
     isRunning_ = false;
@@ -210,12 +210,12 @@ void MMIClient::OnDisconnected()
         funDisconnected_(*this);
     }
     if (!DelFdListener(fd_)) {
-        MMI_HILOGE("delete fd listener failed.");
+        MMI_HILOGE("delete fd listener failed");
     }
     Close();
     if (!isExit && recvEventHandler_ != nullptr) {
         if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, CLIENT_RECONNECT_COOLING_TIME)) {
-            MMI_HILOGE("send reconnect event return false.");
+            MMI_HILOGE("send reconnect event return false");
         }
     }
 }
@@ -242,7 +242,7 @@ int32_t MMIClient::Socket()
                         AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
     if (ret != RET_OK) {
         MMI_HILOGE("call AllocSocketPair return %{public}d", ret);
-        return -1;
+        return RET_ERR;
     }
     fd_ = MultimodalInputConnectManager::GetInstance()->GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
@@ -257,10 +257,10 @@ void MMIClient::Stop()
 {
     CALL_LOG_ENTER;
     UDSClient::Stop();
-    if (recvEventHandler_) {
+    if (recvEventHandler_ != nullptr) {
         recvEventHandler_->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP, 0, EventHandler::Priority::IMMEDIATE);
     }
-    auto eventHandler = InputMgrImp->GetEventHandler();
+    auto eventHandler = InputMgrImpl->GetEventHandler();
     CHKPV(eventHandler);
     eventHandler->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP, 0, EventHandler::Priority::IMMEDIATE);
 }

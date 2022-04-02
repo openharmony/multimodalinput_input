@@ -84,10 +84,8 @@ void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType,
     std::shared_ptr<IInputEventConsumer> monitor)
 {
-    auto eventHandler = AppExecFwk::EventHandler::Current();
-    if (eventHandler == nullptr) {
-        eventHandler = InputMgrImp->GetEventHandler();
-    }
+    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    CHKPR(eventHandler, RET_ERR);
     InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,
         .handlerType_ = handlerType,

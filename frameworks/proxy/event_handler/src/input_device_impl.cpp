@@ -15,7 +15,7 @@
 
 #include "input_device_impl.h"
 
-#include "input_manager_impl.h" 
+#include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
 
 namespace OHOS {
@@ -34,10 +34,8 @@ void InputDeviceImpl::GetInputDeviceIdsAsync(int32_t userData,
     std::function<void(int32_t, std::vector<int32_t>)> callback)
 {
     CALL_LOG_ENTER;
-    auto eventHandler = AppExecFwk::EventHandler::Current();
-    if (eventHandler == nullptr) {
-        eventHandler = InputMgrImp->GetEventHandler();
-    }
+    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    CHKPV(eventHandler);
     InputDeviceData data;
     data.ids = std::make_pair(eventHandler, callback);
     inputDevices_[userData] = data;
@@ -48,10 +46,8 @@ void InputDeviceImpl::GetInputDeviceAsync(int32_t userData, int32_t deviceId,
     std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)> callback)
 {
     CALL_LOG_ENTER;
-    auto eventHandler = AppExecFwk::EventHandler::Current();
-    if (eventHandler == nullptr) {
-        eventHandler = InputMgrImp->GetEventHandler();
-    }
+    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    CHKPV(eventHandler);
     InputDeviceData data;
     data.inputDevice = std::make_pair(eventHandler, callback);
     inputDevices_[userData] = data;
@@ -62,10 +58,8 @@ void InputDeviceImpl::GetKeystrokeAbility(int32_t userData, int32_t deviceId, st
     std::function<void(int32_t, std::vector<int32_t>)> callback)
 {
     CALL_LOG_ENTER;
-    auto eventHandler = AppExecFwk::EventHandler::Current();
-    if (eventHandler == nullptr) {
-        eventHandler = InputMgrImp->GetEventHandler();
-    }
+    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    CHKPV(eventHandler);
     InputDeviceData data;
     data.keys = std::make_pair(eventHandler, callback);
     inputDevices_[userData] = data;
@@ -77,10 +71,7 @@ void InputDeviceImpl::OnInputDeviceTask(int32_t userData, int32_t id, std::strin
     CHK_PIDANDTID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto devInfo = GetDeviceInfo(userData);
-    if (devInfo == nullptr) {
-        MMI_HILOGE("failed to find the callback function");
-        return;
-    }
+    CHKPV(devInfo);
     auto devData = std::make_shared<InputDeviceInfo>(id, name, deviceType);
     CHKPV(devData);
     devInfo->second(userData, devData);
@@ -93,10 +84,7 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, const std::str
     CHK_PIDANDTID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto devInfo = GetDeviceInfo(userData);
-    if (devInfo == nullptr) {
-        MMI_HILOGE("failed to find the callback function");
-        return;
-    }
+    CHKPV(devInfo);
     if (!MMIEventHandler::PostTask(devInfo->first,
         std::bind(&InputDeviceImpl::OnInputDeviceTask, this, userData, id, name, deviceType))) {
         MMI_HILOGE("post task failed");
@@ -110,10 +98,7 @@ void InputDeviceImpl::OnInputDeviceIdsTask(int32_t userData, std::vector<int32_t
     CHK_PIDANDTID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto devIds = GetDeviceIds(userData);
-    if (devIds == nullptr) {
-        MMI_HILOGE("failed to find the callback function");
-        return;
-    }
+    CHKPV(devIds);
     devIds->second(userData, ids);
     MMI_HILOGD("device ids event callback userData:%{public}d ids:(%{public}s)",
         userData, IdsListToString(ids).c_str());
@@ -124,10 +109,7 @@ void InputDeviceImpl::OnInputDeviceIds(int32_t userData, const std::vector<int32
     CHK_PIDANDTID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto devIds = GetDeviceIds(userData);
-    if (devIds == nullptr) {
-        MMI_HILOGE("failed to find the callback function");
-        return;
-    }
+    CHKPV(devIds);
     if (!MMIEventHandler::PostTask(devIds->first,
         std::bind(&InputDeviceImpl::OnInputDeviceIdsTask, this, userData, ids))) {
         MMI_HILOGE("post task failed");
@@ -140,10 +122,7 @@ void InputDeviceImpl::OnKeystrokeAbilityTask(int32_t userData, std::vector<int32
     CHK_PIDANDTID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto devKeys = GetDeviceKeys(userData);
-    if (devKeys == nullptr) {
-        MMI_HILOGE("failed to find the callback function");
-        return;
-    }
+    CHKPV(devKeys);
     devKeys->second(userData, keystrokeAbility);
     MMI_HILOGD("device keys event callback userData:%{public}d keys:(%{public}s)",
         userData, IdsListToString(keystrokeAbility).c_str());
@@ -154,10 +133,7 @@ void InputDeviceImpl::OnKeystrokeAbility(int32_t userData, const std::vector<int
     CHK_PIDANDTID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto devKeys = GetDeviceKeys(userData);
-    if (devKeys == nullptr) {
-        MMI_HILOGE("failed to find the callback function");
-        return;
-    }
+    CHKPV(devKeys);
     if (!MMIEventHandler::PostTask(devKeys->first,
         std::bind(&InputDeviceImpl::OnKeystrokeAbilityTask, this, userData, keystrokeAbility))) {
         MMI_HILOGE("post task failed");
@@ -192,6 +168,5 @@ const InputDeviceImpl::DevKeys* InputDeviceImpl::GetDeviceKeys(int32_t userData)
     }
     return &iter->second.keys;
 }
-
 } // namespace MMI
 } // namespace OHOS

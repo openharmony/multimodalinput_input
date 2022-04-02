@@ -42,7 +42,8 @@ public:
     InputManagerImpl() = default;
 
     bool InitEventHandler();
-    MMIEventHandlerPtr GetEventHandler();
+    MMIEventHandlerPtr GetEventHandler() const;
+    EventHandlerPtr GetCurrentEventHandler() const;
     
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
         const std::vector<LogicalDisplayInfo> &logicalDisplays);
@@ -96,5 +97,5 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#define InputMgrImp OHOS::MMI::InputManagerImpl::GetInstance()
+#define InputMgrImpl OHOS::MMI::InputManagerImpl::GetInstance()
 #endif // INPUT_MANAGER_IMPL_H

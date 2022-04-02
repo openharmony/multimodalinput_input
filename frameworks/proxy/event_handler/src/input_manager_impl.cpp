@@ -71,20 +71,30 @@ bool InputManagerImpl::InitEventHandler()
     }
 
     std::mutex mtx;
-    constexpr int32_t outTime = 3;
+    constexpr int32_t timeout = 3;
     std::unique_lock <std::mutex> lck(mtx);
     ehThread_ = std::thread(std::bind(&InputManagerImpl::OnThread, this));
     ehThread_.detach();
-    if (cv_.wait_for(lck, std::chrono::seconds(outTime)) == std::cv_status::timeout) {
+    if (cv_.wait_for(lck, std::chrono::seconds(timeout)) == std::cv_status::timeout) {
         MMI_HILOGE("EventThandler thread start timeout");
         return false;
     }
     return true;
 }
 
-MMIEventHandlerPtr InputManagerImpl::GetEventHandler()
+MMIEventHandlerPtr InputManagerImpl::GetEventHandler() const
 {
+    CHKPP(mmiEventHandler_);
     return mmiEventHandler_->GetSharedPtr();
+}
+
+EventHandlerPtr InputManagerImpl::GetCurrentEventHandler() const
+{
+    auto eventHandler = AppExecFwk::EventHandler::Current();
+    if (eventHandler == nullptr) {
+        eventHandler = GetEventHandler();
+    }
+    return eventHandler;
 }
 
 void InputManagerImpl::OnThread()
@@ -156,10 +166,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
         return;
     }
     consumer_ = inputEventConsumer;
-    eventHandler_ = AppExecFwk::EventHandler::Current();
-    if (eventHandler_ == nullptr) {
-        eventHandler_ = InputMgrImp->GetEventHandler();
-    }
+    eventHandler_ = InputMgrImpl->GetCurrentEventHandler();
 }
 
 void InputManagerImpl::OnKeyEventTask(std::shared_ptr<KeyEvent> keyEvent)
@@ -205,7 +212,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         std::bind(&InputManagerImpl::OnPointerEventTask, this, pointerEvent))) {
         MMI_HILOGE("post task failed");
     }
-     MMI_HILOGD("pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
+    MMI_HILOGD("pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
 }
 
 int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
