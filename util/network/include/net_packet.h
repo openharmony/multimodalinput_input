@@ -42,6 +42,10 @@ public:
     {
         return Size();
     }
+    int32_t GetPacketLength() const
+    {
+        return (static_cast<int32_t>(sizeof(PackHead)) + wIdx_);
+    }
     const char *GetData() const
     {
         return Data();

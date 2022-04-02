@@ -32,13 +32,14 @@ class StreamBuffer {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "StreamBuffer"};
 public:
     StreamBuffer() {}
-    StreamBuffer(const StreamBuffer& buf);
+    explicit StreamBuffer(const StreamBuffer& buf);
     virtual ~StreamBuffer() {}
     virtual StreamBuffer& operator=(const StreamBuffer& other);
     DISALLOW_MOVE(StreamBuffer);
 
     void Clean();
     bool SetReadIdx(int32_t idx);
+    bool MoveReadIdx(int32_t n);
 
     bool Read(std::string& buf);
     bool Write(const std::string& buf);
@@ -47,7 +48,7 @@ public:
     bool Write(const StreamBuffer& buf);
 
     bool Read(char *buf, size_t size);
-    bool Write(const char *buf, size_t size);
+    virtual bool Write(const char *buf, size_t size);
 
     bool IsEmpty();
     size_t Size() const;
@@ -62,14 +63,15 @@ public:
     template<typename T>
     bool Write(const T& data);
 
+    const char *ReadBuf() const;
+    const char *WriteBuf() const;
+
     template<typename T>
     StreamBuffer& operator >> (T& data);
     template<typename T>
     StreamBuffer& operator << (const T& data);
 
 protected:
-    const char *ReadBuf() const;
-    const char *WriteBuf() const;
     bool Clone(const StreamBuffer& buf);
 
 protected:

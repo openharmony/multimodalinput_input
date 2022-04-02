@@ -56,6 +56,16 @@ bool StreamBuffer::SetReadIdx(int32_t idx)
     return true;
 }
 
+bool StreamBuffer::MoveReadIdx(int32_t n)
+{
+    int32_t pos = rIdx_ + n;
+    if (pos < 0 || pos > wIdx_) {
+        return false;
+    }
+    rIdx_ = pos;
+    return true;
+}
+
 bool StreamBuffer::Read(std::string &buf)
 {
     if (rIdx_ == wIdx_) {
