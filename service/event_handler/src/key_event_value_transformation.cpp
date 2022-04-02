@@ -23,11 +23,11 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventValueTransformations" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventValueTransformation" };
 constexpr int32_t INVALID_KEY_CODE = -1;
 } // namespace
 
-const std::multimap<int32_t, KeyEventValueTransformations> MAP_KEY_EVENT_VALUE_TRANSFORMATION = {
+const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TRANSFORMATION = {
     {11, {"KEY_0", 11, 2000, HOS_KEY_0}},
     {2, {"KEY_1", 2, 2001, HOS_KEY_1}},
     {3, {"KEY_2", 3, 2002, HOS_KEY_2}},
@@ -444,12 +444,12 @@ const std::multimap<int32_t, KeyEventValueTransformations> MAP_KEY_EVENT_VALUE_T
     {412, {"KEY_PREVIOUS", 412, 2631, HOS_KEY_PREVIOUS}},
 };
 
-KeyEventValueTransformations TransferKeyValue(int32_t keyValueOfInput)
+KeyEventValueTransformation TransferKeyValue(int32_t keyValueOfInput)
 {
     auto it = MAP_KEY_EVENT_VALUE_TRANSFORMATION.find(keyValueOfInput);
     if (it == MAP_KEY_EVENT_VALUE_TRANSFORMATION.end()) {
         constexpr int32_t UNKNOWN_KEY_BASE = 10000;
-        KeyEventValueTransformations unknownKey = {
+        KeyEventValueTransformation unknownKey = {
             "UNKNOWN_KEY", keyValueOfInput, UNKNOWN_KEY_BASE + keyValueOfInput, HOS_UNKNOWN_KEY_BASE
         };
         MMI_HILOGE("TransferKeyValue Failed, unknown linux-code:%{public}d,"
