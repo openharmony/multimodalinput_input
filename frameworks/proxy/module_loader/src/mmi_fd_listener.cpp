@@ -44,23 +44,13 @@ void MMIFdListener::OnReadable(int32_t fd)
         return;
     }
     CHKPV(mmiClient_);
-
-    StreamBuffer buf;
-    bool isoverflow = false;
+    ssize_t size = 0;
+    constexpr int32_t maxCount = 16;
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
-    constexpr int32_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
-    if (maxCount <= 0) {
-        MMI_HILOGE("Invalid max count");
-        return;
-    }
     for (int32_t i = 0; i < maxCount; i++) {
-        auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
+        size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size > 0) {
-            if (!buf.Write(szBuf, size)) {
-                MMI_HILOGE("write error or buffer overflow,count:%{}d size:%{}zu", i, size);
-                isoverflow = true;
-                break;
-            }
+            mmiClient_->OnRecvMsg(szBuf, size);
         } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
                 MMI_HILOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK");
@@ -76,9 +66,6 @@ void MMIFdListener::OnReadable(int32_t fd)
         if (size < MAX_PACKET_BUF_SIZE) {
             break;
         }
-    }
-    if (!isoverflow && buf.Size() > 0) {
-        mmiClient_->OnRecvMsg(buf.Data(), buf.Size());
     }
 }
 
