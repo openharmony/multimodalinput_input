@@ -21,16 +21,11 @@ int32_t main(int32_t argc, const char *argv[])
         printf("Invaild Input Para, Plase Check the validity of the para!\n");
         return 0;
     }
-    char Path[PATH_MAX] = {};
-    if (realpath(OHOS::MMI::g_folderpath.c_str(), Path) == nullptr) {
-        printf("file path is error, path:%s", OHOS::MMI::g_folderpath.c_str());
-        return -1;
-    }
-    DIR* dir = opendir(Path);
-    bool flag = false;
+    DIR* dir = opendir(OHOS::MMI::g_folderpath.c_str());
     if (dir == nullptr) {
         mkdir(OHOS::MMI::g_folderpath.c_str(), SYMBOL_FOLDER_PERMISSIONS);
-        flag = true;
+    } else {
+        closedir(dir);
     }
     std::vector<std::string> argvList;
     for (uint16_t i = 0; i < argc; i++) {

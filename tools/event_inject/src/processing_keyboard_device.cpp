@@ -21,14 +21,11 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingKeyboardDevice" };
 } // namespace
 
-int32_t ProcessingKeyboardDevice::TransformJsonDataToInputData(const Json& fingerEventArrays,
+int32_t ProcessingKeyboardDevice::TransformJsonDataToInputData(const DeviceItem& fingerEventArrays,
     InputEventArray& inputEventArray)
 {
     CALL_LOG_ENTER;
-    if (fingerEventArrays.empty()) {
-        return RET_ERR;
-    }
-    Json inputData = fingerEventArrays.at("events");
+    std::vector<DeviceEvent> inputData = fingerEventArrays.events;
     if (inputData.empty()) {
         MMI_HILOGE("manage KeyBoard array faild, inputData is empty.");
         return RET_ERR;
@@ -59,19 +56,15 @@ void ProcessingKeyboardDevice::TransformKeyBoardEventToInputEvent(const std::vec
     }
 }
 
-int32_t ProcessingKeyboardDevice::AnalysisKeyBoardEvent(const Json& inputData,
+int32_t ProcessingKeyboardDevice::AnalysisKeyBoardEvent(const std::vector<DeviceEvent>& inputData,
                                                         std::vector<KeyBoardEvent>& keyBoardEventArray)
 {
     KeyBoardEvent keyBoardEvent = {};
     for (const auto &item : inputData) {
         keyBoardEvent = {};
-        keyBoardEvent.eventType = item.at("eventType").get<std::string>();
-        if ((item.find("keyValue")) != item.end()) {
-            keyBoardEvent.keyValue = item.at("keyValue").get<int32_t>();
-        }
-        if ((item.find("blockTime")) != item.end()) {
-            keyBoardEvent.blockTime = item.at("blockTime").get<int64_t>();
-        }
+        keyBoardEvent.eventType = item.eventType;
+        keyBoardEvent.keyValue = item.keyValue;
+        keyBoardEvent.blockTime = item.blockTime;
         keyBoardEventArray.push_back(keyBoardEvent);
     }
 

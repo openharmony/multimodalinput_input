@@ -27,7 +27,7 @@ public:
     DeviceBase() = default;
     virtual ~DeviceBase() = default;
     DISALLOW_COPY_AND_MOVE(DeviceBase);
-    virtual int32_t TransformJsonDataToInputData(const Json& inputEventArrays,
+    virtual int32_t TransformJsonDataToInputData(const DeviceItem& inputEventArrays,
                                                  InputEventArray& inputEventArray) = 0;
     void SetTimeToLibinputEvent(InjectEvent& injectEvent);
     void SetSynReport(InputEventArray& inputEventArray, int64_t blockTime = 0);

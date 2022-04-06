@@ -21,14 +21,11 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ProcessingMouseDevice" };
 } // namespace
 
-int32_t ProcessingMouseDevice::TransformJsonDataToInputData(const Json& fingerEventArrays,
+int32_t ProcessingMouseDevice::TransformJsonDataToInputData(const DeviceItem& fingerEventArrays,
                                                             InputEventArray& inputEventArray)
 {
     CALL_LOG_ENTER;
-    if (fingerEventArrays.empty()) {
-        return RET_ERR;
-    }
-    Json inputData = fingerEventArrays.at("events");
+    std::vector<DeviceEvent> inputData = fingerEventArrays.events;
     if (inputData.empty()) {
         MMI_HILOGE("manage KeyBoard array faild, inputData is empty.");
         return RET_ERR;
@@ -63,31 +60,19 @@ void ProcessingMouseDevice::TransformMouseEventToInputEvent(const std::vector<Mo
     }
 }
 
-int32_t ProcessingMouseDevice::AnalysisMouseEvent(const Json& inputData,
+int32_t ProcessingMouseDevice::AnalysisMouseEvent(const std::vector<DeviceEvent>& inputData,
     std::vector<MouseEvent>& mouseEventArray)
 {
     MouseEvent mouseEvent = {};
     for (const auto &item : inputData) {
         mouseEvent = {};
-        mouseEvent.eventType = item.at("eventType").get<std::string>();
-        if ((item.find("keyValue")) != item.end()) {
-            mouseEvent.keyValue = item.at("keyValue").get<int32_t>();
-        }
-        if ((item.find("blockTime")) != item.end()) {
-            mouseEvent.blockTime = item.at("blockTime").get<int64_t>();
-        }
-        if ((item.find("xPos")) != item.end()) {
-            mouseEvent.xPos = item.at("xPos").get<int32_t>();
-        }
-        if ((item.find("yPos")) != item.end()) {
-            mouseEvent.yPos = item.at("yPos").get<int32_t>();
-        }
-        if ((item.find("distance")) != item.end()) {
-            mouseEvent.distance = item.at("distance").get<int32_t>();
-        }
-        if ((item.find("direction")) != item.end()) {
-            mouseEvent.direction = item.at("direction").get<std::string>();
-        }
+        mouseEvent.eventType = item.eventType;
+        mouseEvent.keyValue = item.keyValue;
+        mouseEvent.blockTime = item.blockTime;
+        mouseEvent.xPos = item.xPos;
+        mouseEvent.yPos = item.yPos;
+        mouseEvent.distance = item.distance;
+        mouseEvent.direction = item.direction;
         mouseEventArray.push_back(mouseEvent);
     }
     return RET_OK;

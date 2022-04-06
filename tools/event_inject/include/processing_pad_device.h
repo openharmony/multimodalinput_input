@@ -31,9 +31,9 @@ public:
     ProcessingPadDevice() = default;
     ~ProcessingPadDevice() = default;
     DISALLOW_COPY_AND_MOVE(ProcessingPadDevice);
-    int32_t TransformJsonDataToInputData(const Json& inputEventArrays, InputEventArray& inputEventArray);
+    int32_t TransformJsonDataToInputData(const DeviceItem& inputEventArrays, InputEventArray& inputEventArray);
 private:
-    int32_t AnalysisPadEvent(const Json& inputData, std::vector<PadEvent>& padEventArray);
+    int32_t AnalysisPadEvent(const std::vector<DeviceEvent>& inputData, std::vector<PadEvent>& padEventArray);
     void TransformPadEventToInputEvent(const std::vector<PadEvent>& padEventArray,
                                        InputEventArray& inputEventArray);
     void TransformKeyPressEvent(const PadEvent& padEvent, InputEventArray& inputEventArray);
