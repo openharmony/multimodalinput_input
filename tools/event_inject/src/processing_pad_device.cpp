@@ -21,14 +21,11 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingPadDevice" };
 } // namespace
 
-int32_t ProcessingPadDevice::TransformJsonDataToInputData(const Json& fingerEventArrays,
+int32_t ProcessingPadDevice::TransformJsonDataToInputData(const DeviceItem& fingerEventArrays,
     InputEventArray& inputEventArray)
 {
     CALL_LOG_ENTER;
-    if (fingerEventArrays.empty()) {
-        return RET_ERR;
-    }
-    Json inputData = fingerEventArrays.at("events");
+    std::vector<DeviceEvent> inputData = fingerEventArrays.events;
     if (inputData.empty()) {
         MMI_HILOGE("manage finger array faild, inputData is empty.");
         return RET_ERR;
@@ -59,16 +56,15 @@ void ProcessingPadDevice::TransformPadEventToInputEvent(const std::vector<PadEve
     }
 }
 
-int32_t ProcessingPadDevice::AnalysisPadEvent(const Json& inputData, std::vector<PadEvent>& padEventArray)
+int32_t ProcessingPadDevice::AnalysisPadEvent(const std::vector<DeviceEvent>& inputData,
+    std::vector<PadEvent>& padEventArray)
 {
     PadEvent padEvent = {};
     for (const auto &item : inputData) {
-        padEvent.eventType = item.at("eventType").get<std::string>();
-        if ((item.find("keyValue")) != item.end()) {
-            padEvent.keyValue = item.at("keyValue").get<int32_t>();
-        }
-        if ((item.find("ringEvents")) != item.end()) {
-            padEvent.ringEvents = item.at("ringEvents").get<std::vector<int32_t>>();
+        padEvent.eventType = item.eventType;
+        padEvent.keyValue = item.keyValue;
+        if (item.ringEvents.empty()) {
+            padEvent.ringEvents = item.ringEvents;
         }
         padEventArray.push_back(padEvent);
     }

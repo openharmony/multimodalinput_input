@@ -42,10 +42,9 @@ config("event_injection_public_config") {
   include_dirs = [
     "include",
     "//third_party/FreeBSD/sys/dev/evdev",
-    "//third_party/json/include",
-    "//third_party/json/include/nlohmann",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
+    "//third_party/cJSON",
   ]
 }
 
@@ -56,6 +55,7 @@ ohos_shared_library("event-injection") {
     "src/get_device_object.cpp",
     "src/injection_event_dispatch.cpp",
     "src/injection_tools_help_func.cpp",
+    "src/input_parse.cpp",
     "src/manage_inject_device.cpp",
     "src/processing_finger_device.cpp",
     "src/processing_game_pad_device.cpp",
@@ -77,6 +77,7 @@ ohos_shared_library("event-injection") {
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
     "//foundation/multimodalinput/input/util:libmmi-util",
+    "//third_party/cJSON:cjson_static",
   ]
 
   if (is_mmi_have_libinput) {
@@ -95,8 +96,7 @@ ohos_unittest("ut-event-injection-out") {
     "//drivers/adapter/uhdf2/adapter/osal/include",
     "//utils/native/base/include",
     "//third_party/googletest/googletest/include",
-    "//third_party/json/include",
-    "//third_party/json/include/nlohmann",
+    "//third_party/cJSON",
     "${mmi_path}/frameworks/proxy/event_handler",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/module_loader",
@@ -170,6 +170,7 @@ ohos_unittest("ut-event-injection-out") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/tools/event_inject:event-injection",
     "${mmi_path}/util:libmmi-util",
+    "//third_party/cJSON:cjson_static",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
