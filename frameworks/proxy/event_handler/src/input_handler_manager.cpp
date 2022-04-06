@@ -14,13 +14,16 @@
  */
 
 #include "input_handler_manager.h"
+#include <cinttypes>
+
+#include "mmi_log.h"
+#include "net_packet.h"
+#include "proto.h"
 
 #include "bytrace_adapter.h"
 #include "input_handler_type.h"
-#include "mmi_log.h"
+#include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
-#include "net_packet.h"
-#include "proto.h"
 
 namespace OHOS {
 namespace MMI {
@@ -32,6 +35,7 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
     std::shared_ptr<IInputEventConsumer> consumer)
 {
     CHKPR(consumer, INVALID_HANDLER_ID);
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
     if (inputHandlers_.size() >= MAX_N_INPUT_HANDLERS) {
         MMI_HILOGE("The number of handlers exceeds the maximum");
         return INVALID_HANDLER_ID;
@@ -54,6 +58,7 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
 void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType handlerType)
 {
     MMI_HILOGD("Unregister handler:%{public}d,type:%{public}d", handlerId, handlerType);
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
     if (RET_OK == RemoveLocal(handlerId, handlerType)) {
         MMI_HILOGD("Handler:%{public}d unregistered, report to server", handlerId);
         RemoveFromServer(handlerId, handlerType);
@@ -79,11 +84,13 @@ void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType,
     std::shared_ptr<IInputEventConsumer> monitor)
 {
-    std::lock_guard<std::mutex> guard(lockHandlers_);
+    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    CHKPR(eventHandler, RET_ERR);
     InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,
         .handlerType_ = handlerType,
-        .consumer_ = monitor
+        .consumer_ = monitor,
+        .eventHandler_ = eventHandler
     };
     auto ret = inputHandlers_.emplace(handler.handlerId_, handler);
     if (!ret.second) {
@@ -95,13 +102,10 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
 
 void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handlerType)
 {
-    MMIClientPtr client { MMIEventHdl.GetMMIClient() };
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     NetPacket pkt(MmiMessageId::ADD_INPUT_HANDLER);
-    if (!pkt.Write(handlerId) || !pkt.Write(handlerType)) {
-        MMI_HILOGE("Packet write is error, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
-        return;
-    }
+    pkt << handlerId << handlerType;
     if (!client->SendMessage(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
@@ -110,7 +114,6 @@ void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handle
 
 int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType handlerType)
 {
-    std::lock_guard<std::mutex> guard(lockHandlers_);
     auto tItr = inputHandlers_.find(handlerId);
     if (tItr == inputHandlers_.end()) {
         MMI_HILOGE("No handler with specified");
@@ -128,7 +131,7 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
 void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType handlerType)
 {
     MMI_HILOGD("Remove handler:%{public}d from server", handlerId);
-    MMIClientPtr client { MMIEventHdl.GetMMIClient() };
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_HANDLER);
     if (!pkt.Write(handlerId) || !pkt.Write(handlerType)) {
@@ -152,7 +155,6 @@ int32_t InputHandlerManager::GetNextId()
 
 std::shared_ptr<IInputEventConsumer> InputHandlerManager::FindHandler(int32_t handlerId)
 {
-    std::lock_guard<std::mutex> guard(lockHandlers_);
     auto tItr = inputHandlers_.find(handlerId);
     if (tItr != inputHandlers_.end()) {
         return tItr->second.consumer_;
@@ -160,25 +162,71 @@ std::shared_ptr<IInputEventConsumer> InputHandlerManager::FindHandler(int32_t ha
     return nullptr;
 }
 
+EventHandlerPtr InputHandlerManager::GetEventHandler(int32_t handlerId)
+{
+    auto tItr = inputHandlers_.find(handlerId);
+    if (tItr != inputHandlers_.end()) {
+        return tItr->second.eventHandler_;
+    }
+    return nullptr;
+}
+
+bool InputHandlerManager::PostTask(int32_t handlerId, const AppExecFwk::EventHandler::Callback &callback)
+{
+    auto eventHandler = GetEventHandler(handlerId);
+    CHKPF(eventHandler);
+    return MMIEventHandler::PostTask(eventHandler, callback);
+}
+
+void InputHandlerManager::OnKeyEventTask(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHK_PIDANDTID();
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
+    auto consumer = FindHandler(handlerId);
+    if (consumer == nullptr) {
+        MMI_HILOGE("No handler found here. id:%{public}d", handlerId);
+        return;
+    }
+    consumer->OnInputEvent(keyEvent);
+    MMI_HILOGD("key event callback id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
+}
+
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent)
 {
+    CHK_PIDANDTID();
     CHKPV(keyEvent);
-    std::shared_ptr<IInputEventConsumer> consumer = FindHandler(handlerId);
-    if (consumer != nullptr) {
-        consumer->OnInputEvent(keyEvent);
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
+    if (!PostTask(handlerId,
+        std::bind(&InputHandlerManager::OnKeyEventTask, this, handlerId, keyEvent))) {
+        MMI_HILOGE("post task failed");
     }
+    MMI_HILOGD("key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
+}
+
+void InputHandlerManager::OnPointerEventTask(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHK_PIDANDTID();
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
+    auto consumer = FindHandler(handlerId);
+    if (consumer == nullptr) {
+        MMI_HILOGE("No handler found here. id:%{public}d", handlerId);
+        return;
+    }
+    consumer->OnInputEvent(pointerEvent);
+    MMI_HILOGD("pointer event callback id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
 }
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_LOG_ENTER;
-    MMI_HILOGD("handler:%{public}d", handlerId);
+    CHK_PIDANDTID();
     CHKPV(pointerEvent);
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
-    std::shared_ptr<IInputEventConsumer> consumer = FindHandler(handlerId);
-    if (consumer != nullptr) {
-        consumer->OnInputEvent(pointerEvent);
+    if (!PostTask(handlerId,
+        std::bind(&InputHandlerManager::OnPointerEventTask, this, handlerId, pointerEvent))) {
+        MMI_HILOGE("post task failed");
     }
+    MMI_HILOGD("pointer event id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
 }
 
 void InputHandlerManager::OnConnected()

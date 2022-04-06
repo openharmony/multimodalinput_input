@@ -53,9 +53,6 @@ public:
     void Dump(int32_t fd);
     int32_t GetClientFd(int32_t pid);
     int32_t GetClientPid(int32_t fd);
-    void OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct epoll_event& ev);
-    void OnEpollRecv(int32_t fd, const char *buf, size_t size);
-
     void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
 
 public:
@@ -64,19 +61,18 @@ public:
     SessionPtr GetSession(int32_t fd) const;
 
 protected:
-    void SetRecvFun(MsgServerFunCallback fun);
-
     virtual void OnConnected(SessionPtr s);
     virtual void OnDisconnected(SessionPtr s);
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd);
 
+    void SetRecvFun(MsgServerFunCallback fun);
     void OnRecv(int32_t fd, const char *buf, size_t size);
-    void OnEvent(const struct epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap);
-
+    void ReleaseSession(int32_t fd, struct epoll_event& ev);
+    void OnEpollRecv(int32_t fd, std::map<int32_t, StreamBufData>& bufMap, struct epoll_event& ev);
+    void OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct epoll_event& ev);
     bool AddSession(SessionPtr ses);
     void DelSession(int32_t fd);
     void DumpSession(const std::string& title);
-
     void NotifySessionDeleted(SessionPtr ses);
     void AddPermission(SessionPtr sess);
 
