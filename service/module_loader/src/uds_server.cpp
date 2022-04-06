@@ -129,7 +129,6 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
-    SetNonBlockMode(serverFd);
 
     MMI_HILOGD("alloc socketpair, serverFd:%{public}d,clientFd:%{public}d(%{public}d)",
                serverFd, toReturnClientFd, sockFds[1]);
@@ -280,44 +279,56 @@ void UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
     }
 }
 
-void UDSServer::OnEpollRecv(int32_t fd, const char *buf, size_t size)
+void UDSServer::ReleaseSession(int32_t fd, struct epoll_event& ev)
 {
-    OnRecv(fd, buf, size);
+    auto secPtr = GetSession(fd);
+    if (secPtr != nullptr) {
+        OnDisconnected(secPtr);
+        DelSession(fd);
+    }
+    if (ev.data.ptr) {
+        free(ev.data.ptr);
+        ev.data.ptr = nullptr;
+    }
+    close(fd);
 }
 
-void UDSServer::OnEvent(const struct epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
+void UDSServer::OnEpollRecv(int32_t fd, std::map<int32_t, StreamBufData>& bufMap, struct epoll_event& ev)
 {
+    if (fd < 0) {
+        MMI_HILOGE("Invalid input param fd:%{public}d", fd);
+        return;
+    }
     constexpr size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
     if (maxCount <= 0) {
         MMI_HILOGE("The maxCount value is error, errCode:%{public}d", VAL_NOT_EXP);
         return;
     }
-    auto fd = ev.data.fd;
-    if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_HILOGD("fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
-        auto secPtr = GetSession(fd);
-        if (secPtr) {
-            OnDisconnected(secPtr);
-            DelSession(fd);
-        }
-        close(fd);
+    auto bufData = &bufMap[fd];
+    if (bufData->isOverflow) {
+        MMI_HILOGE("StreamBuffer full or write error, Data discarded errCode:%{public}d",
+            STREAMBUFF_OVER_FLOW);
         return;
     }
-
-    if (fd != IMultimodalInputConnect::INVALID_SOCKET_FD && (ev.events & EPOLLIN)) {
-        auto bufData = &bufMap[fd];
-        if (bufData->isOverflow) {
-            MMI_HILOGE("StreamBuffer full or write error, Data discarded errCode:%{public}d",
-                STREAMBUFF_OVER_FLOW);
-            return;
-        }
-        char szBuf[MAX_PACKET_BUF_SIZE] = {};
-        for (size_t j = 0; j < maxCount; j++) {
-            auto size = read(fd, (void*)szBuf, MAX_PACKET_BUF_SIZE);
+    char szBuf[MAX_PACKET_BUF_SIZE] = {};
+    for (size_t i = 0; i < maxCount; i++) {
+        auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
+        if (size < 0) {
+            if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
+                MMI_HILOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK");
+                continue;
+            }
+            MMI_HILOGE("recv return %{public}zu errno:%{public}d", size, errno);
+            break;
+        } else if (size == 0) {
+            MMI_HILOGE("The client side disconnect with the server. size:0 errno:%{public}d", errno);
+            ReleaseSession(fd, ev);
+            break;
+        } else {
 #ifdef OHOS_BUILD_HAVE_DUMP_DATA
             DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
 #endif
-            if (size > 0 && bufData->sBuf.Write(szBuf, size) == false) {
+            if (!bufData->sBuf.Write(szBuf, size)) {
                 bufData->isOverflow = true;
                 break;
             }
@@ -330,11 +341,6 @@ void UDSServer::OnEvent(const struct epoll_event& ev, std::map<int32_t, StreamBu
 
 void UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct epoll_event& ev)
 {
-    constexpr size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
-    if (maxCount <= 0) {
-        MMI_HILOGE("The maxCount value is error, errCode:%{public}d", VAL_NOT_EXP);
-        return;
-    }
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int32_t*>(ev.data.ptr);
     if (fd < 0) {
@@ -343,35 +349,9 @@ void UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct ep
     }
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
         MMI_HILOGD("EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
-        auto secPtr = GetSession(fd);
-        if (secPtr != nullptr) {
-            OnDisconnected(secPtr);
-            DelSession(fd);
-        }
-        free(ev.data.ptr);
-        ev.data.ptr = nullptr;
-        close(fd);
+        ReleaseSession(fd, ev);
     } else if (ev.events & EPOLLIN) {
-        auto bufData = &bufMap[fd];
-        if (bufData->isOverflow) {
-            MMI_HILOGE("StreamBuffer full or write error, Data discarded errCode:%{public}d",
-                STREAMBUFF_OVER_FLOW);
-            return;
-        }
-        char szBuf[MAX_PACKET_BUF_SIZE] = {};
-        for (size_t j = 0; j < maxCount; j++) {
-            auto size = recv(fd, (void*)szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
-#ifdef OHOS_BUILD_HAVE_DUMP_DATA
-            DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
-#endif
-            if (size > 0 && bufData->sBuf.Write(szBuf, size) == false) {
-                bufData->isOverflow = true;
-                break;
-            }
-            if (size < MAX_PACKET_BUF_SIZE) {
-                break;
-            }
-        }
+        OnEpollRecv(fd, bufMap, ev);
     }
 }
 
@@ -393,7 +373,7 @@ SessionPtr UDSServer::GetSession(int32_t fd) const
         return nullptr;
     }
     CHKPP(it->second);
-    return it->second->GetPtr();
+    return it->second->GetSharedPtr();
 }
 
 bool UDSServer::AddSession(SessionPtr ses)

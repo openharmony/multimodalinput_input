@@ -50,21 +50,33 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJsonDataToInputData, TestSi
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
     std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
-    system(startDeviceCmd.c_str());
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
+    if (!startDevice) {
+        ASSERT_TRUE(false) << "start device failed";
+    }
+    pclose(startDevice);
+    FILE* fp = fopen(path.c_str(), "r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        jsonBuf += buf;
+    }
+    if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "fclose file error " << path;
+    }
+    InputParse InputParse;
+    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
+    if (!closeDevice) {
+        ASSERT_TRUE(false) << "close device failed";
+    }
+    pclose(closeDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -85,21 +97,33 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
     std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
-    system(startDeviceCmd.c_str());
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
+    if (!startDevice) {
+        ASSERT_TRUE(false) << "start device failed";
+    }
+    pclose(startDevice);
+    FILE* fp = fopen(path.c_str(), "r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        jsonBuf += buf;
+    }
+    if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "fclose file error " << path;
+    }
+    InputParse InputParse;
+    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
+    if (!closeDevice) {
+        ASSERT_TRUE(false) << "close device failed";
+    }
+    pclose(closeDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -120,21 +144,33 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
     std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
-    system(startDeviceCmd.c_str());
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
+    if (!startDevice) {
+        ASSERT_TRUE(false) << "start device failed";
+    }
+    pclose(startDevice);
+    FILE* fp = fopen(path.c_str(), "r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        jsonBuf += buf;
+    }
+    if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "fclose file error " << path;
+    }
+    InputParse InputParse;
+    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
+    if (!closeDevice) {
+        ASSERT_TRUE(false) << "close device failed";
+    }
+    pclose(closeDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -155,21 +191,33 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
     std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
-    system(startDeviceCmd.c_str());
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
+    if (!startDevice) {
+        ASSERT_TRUE(false) << "start device failed";
+    }
+    pclose(startDevice);
+    FILE* fp = fopen(path.c_str(), "r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        jsonBuf += buf;
+    }
+    if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "fclose file error " << path;
+    }
+    InputParse InputParse;
+    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
+    if (!closeDevice) {
+        ASSERT_TRUE(false) << "close device failed";
+    }
+    pclose(closeDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -190,21 +238,33 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
     std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
-    system(startDeviceCmd.c_str());
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
+    if (!startDevice) {
+        ASSERT_TRUE(false) << "start device failed";
+    }
+    pclose(startDevice);
+    FILE* fp = fopen(path.c_str(), "r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        jsonBuf += buf;
+    }
+    if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "fclose file error " << path;
+    }
+    InputParse InputParse;
+    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
+    if (!closeDevice) {
+        ASSERT_TRUE(false) << "close device failed";
+    }
+    pclose(closeDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -225,21 +285,33 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
     std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
-    system(startDeviceCmd.c_str());
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
+    if (!startDevice) {
+        ASSERT_TRUE(false) << "start device failed";
+    }
+    pclose(startDevice);
+    FILE* fp = fopen(path.c_str(), "r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        jsonBuf += buf;
+    }
+    if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "fclose file error " << path;
+    }
+    InputParse InputParse;
+    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
+    if (!closeDevice) {
+        ASSERT_TRUE(false) << "close device failed";
+    }
+    pclose(closeDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -261,21 +333,33 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
     std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
-    system(startDeviceCmd.c_str());
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
+    if (!startDevice) {
+        ASSERT_TRUE(false) << "start device failed";
+    }
+    pclose(startDevice);
+    FILE* fp = fopen(path.c_str(), "r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        jsonBuf += buf;
+    }
+    if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "fclose file error " << path;
+    }
+    InputParse InputParse;
+    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
+    if (!closeDevice) {
+        ASSERT_TRUE(false) << "close device failed";
+    }
+    pclose(closeDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -297,20 +381,32 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
     std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
-    system(startDeviceCmd.c_str());
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
+    if (!startDevice) {
+        ASSERT_TRUE(false) << "start device failed";
+    }
+    pclose(startDevice);
+    FILE* fp = fopen(path.c_str(), "r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        jsonBuf += buf;
+    }
+    if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "fclose file error " << path;
+    }
+    InputParse InputParse;
+    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
-    system(closeDeviceCmd.c_str());
+    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
+    if (!closeDevice) {
+        ASSERT_TRUE(false) << "close device failed";
+    }
+    pclose(closeDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(ret, RET_ERR);
 }
@@ -332,20 +428,32 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
     std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
-    system(startDeviceCmd.c_str());
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
+    if (!startDevice) {
+        ASSERT_TRUE(false) << "start device failed";
+    }
+    pclose(startDevice);
+    FILE* fp = fopen(path.c_str(), "r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        jsonBuf += buf;
+    }
+    if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "fclose file error " << path;
+    }
+    InputParse InputParse;
+    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
-    system(closeDeviceCmd.c_str());
+    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
+    if (!closeDevice) {
+        ASSERT_TRUE(false) << "close device failed";
+    }
+    pclose(closeDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(ret, RET_OK);
 }
@@ -367,20 +475,32 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
     std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
-    system(startDeviceCmd.c_str());
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
+    if (!startDevice) {
+        ASSERT_TRUE(false) << "start device failed";
+    }
+    pclose(startDevice);
+    FILE* fp = fopen(path.c_str(), "r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        jsonBuf += buf;
+    }
+    if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "fclose file error " << path;
+    }
+    InputParse InputParse;
+    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
-    system(closeDeviceCmd.c_str());
+    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
+    if (!closeDevice) {
+        ASSERT_TRUE(false) << "close device failed";
+    }
+    pclose(closeDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(ret, RET_OK);
 }

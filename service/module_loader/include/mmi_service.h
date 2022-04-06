@@ -73,7 +73,6 @@ private:
     std::thread t_;
 
     LibinputAdapter libinputAdapter_;
-    UDSServer udsServer_;
     ServerMsgHandler sMsgHandler_;
 };
 } // namespace MMI

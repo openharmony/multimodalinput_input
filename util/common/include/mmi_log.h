@@ -15,6 +15,7 @@
 #ifndef MMI_LOG_H
 #define MMI_LOG_H
 
+#include <cinttypes>
 #include <future>
 #include <string>
 
