@@ -24,7 +24,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ManageInjectDevice" };
 } // namespace
 
-int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
+int32_t ManageInjectDevice::TransformJsonData(const DeviceItems& configData)
 {
     CALL_LOG_ENTER;
     if (configData.empty()) {
@@ -32,11 +32,8 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
         return RET_ERR;
     }
     for (const auto &item : configData) {
-        std::string deviceName = item.at("deviceName").get<std::string>();
-        uint16_t devIndex = 0;
-        if (item.find("devIndex") != item.end()) {
-            devIndex = item.at("devIndex").get<uint16_t>();
-        }
+        std::string deviceName = item.deviceName;
+        uint16_t devIndex = item.deviceIndex;
         std::string deviceNode;
         if (getDeviceNodeObject_.GetDeviceNodeName(deviceName, devIndex, deviceNode) == RET_ERR) {
             MMI_HILOGE("fail get device:%{public}s node", deviceName.c_str());

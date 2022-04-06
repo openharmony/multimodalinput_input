@@ -82,6 +82,39 @@ bool  VirtualDevice::ViewDirectory(std::vector<std::string>& fileList)
     return true;
 }
 
+bool VirtualDevice::ClearFileResidues(const std::string procressPath, const std::string fileName)
+{
+    DIR* dir = opendir(procressPath.c_str());
+    if (dir == nullptr) {
+        std::string removeFile = "find /data/symbol/ -name " + fileName + "* | xargs rm";
+        FILE* findJson = popen(removeFile.c_str(), "rw");
+        if (!findJson) {
+            return false;
+        }
+        pclose(findJson);
+        return true;
+    }
+    closedir(dir);
+    return false;
+}
+
+bool VirtualDevice::ReadFile(const std::string catName, std::string& temp)
+{
+    FILE* cmdName = popen(catName.c_str(), "r");
+    if (cmdName == nullptr) {
+        printf("popen Execution failed");
+        return false;
+    }
+    char buf[32] = { 0 };
+    if (fgets(buf, sizeof(buf), cmdName) == nullptr) {
+        printf("read file failed");
+        return false;
+    }
+    pclose(cmdName);
+    temp = buf;
+    return true;
+}
+
 bool VirtualDevice::SyncSymbolFile()
 {
     std::vector<std::string> tempList;
@@ -95,29 +128,23 @@ bool VirtualDevice::SyncSymbolFile()
             printf("Failed to create file");
             return false;
         }
-        char temp[32] = {};
-        std::string processName;
         std::string procressPath = "/proc/" + item + "/";
-        DIR* dir = opendir(procressPath.c_str());
-        if (dir == nullptr) {
-            std::string removeFile = "find /data/symbol/ -name " + item + "* | xargs rm";
-            system(removeFile.c_str());
-        } else {
+        if (!ClearFileResidues(procressPath, item)) {
             std::string catName = "cat /proc/" + item + "/cmdline";
-            FILE* cmdName = popen(catName.c_str(), "r");
-            if (cmdName == nullptr) {
-                printf("popen Execution failed");
-                closedir(dir);
+            std::string temp;
+            if (!ReadFile(catName, temp)) {
                 return false;
             }
-            fgets(temp, sizeof(temp), cmdName);
-            pclose(cmdName);
+            std::string processName;
             processName.append(temp);
             if (processName.find("mmi-virtual-device") == processName.npos) {
                 std::string removeFile = "find /data/symbol/ -name " + item + "* | xargs rm";
-                system(removeFile.c_str());
+                FILE* findJson = popen(removeFile.c_str(), "rw");
+                if (!findJson) {
+                    return false;
+                }
+                pclose(findJson);
             }
-            closedir(dir);
         }
     }
     return true;
@@ -443,8 +470,8 @@ bool VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
 
 bool VirtualDevice::FindDevice(std::vector<std::string> argvList)
 {
-    SyncSymbolFile();
     if (argvList[1] == "start") {
+        SyncSymbolFile();
         bool result = AddDevice(argvList);
         if (!result) {
             printf("Failed to create device");

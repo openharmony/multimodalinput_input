@@ -21,17 +21,14 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingTouchScreenDevice" };
 } // namespace
 
-int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const Json& touchScreenEventArrays,
+int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const DeviceItem& touchScreenEventArrays,
                                                                   InputEventArray& inputEventArray)
 {
     CALL_LOG_ENTER;
-    if (touchScreenEventArrays.empty()) {
-        return RET_ERR;
-    }
-    if (touchScreenEventArrays.find("singleEvent") != touchScreenEventArrays.end()) {
+    if (!touchScreenEventArrays.events.empty()) {
         return TransformJsonDataSingleTouchScreen(touchScreenEventArrays, inputEventArray);
     }
-    Json inputData = touchScreenEventArrays.at("events");
+    std::vector<DeviceEvent> inputData = touchScreenEventArrays.events;
     if (inputData.empty()) {
         MMI_HILOGE("manage touchScreen array faild, inputData is empty.");
         return RET_ERR;
@@ -49,14 +46,11 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const Json& to
     return RET_OK;
 }
 
-int32_t ProcessingTouchScreenDevice::TransformJsonDataSingleTouchScreen(const Json& touchScreenEventArrays,
+int32_t ProcessingTouchScreenDevice::TransformJsonDataSingleTouchScreen(const DeviceItem& touchScreenEventArrays,
     InputEventArray& inputEventArray)
 {
     CALL_LOG_ENTER;
-    if (touchScreenEventArrays.empty()) {
-        return RET_ERR;
-    }
-    Json inputData = touchScreenEventArrays.at("singleEvent");
+    std::vector<DeviceEvent> inputData = touchScreenEventArrays.events;
     if (inputData.empty()) {
         MMI_HILOGE("manage touchScreen array faild, inputData is empty.");
         return RET_ERR;
@@ -70,15 +64,15 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataSingleTouchScreen(const Js
     return RET_OK;
 }
 
-void ProcessingTouchScreenDevice::AnalysisTouchScreenDate(const Json& inputData,
+void ProcessingTouchScreenDevice::AnalysisTouchScreenDate(const std::vector<DeviceEvent>& inputData,
                                                           TouchScreenInputEvents& touchScreenInputEvents)
 {
     TouchScreenCoordinates touchScreenCoordinates = {};
     TouchScreenInputEvent touchScreenInputEvent = {};
-    for (uint32_t i = 0; i < inputData.size(); i++) {
-        for (uint32_t j = 0; j < inputData[i].size(); j++) {
-            int32_t xPos = inputData[i][j][0].get<int32_t>();
-            int32_t yPos = inputData[i][j][1].get<int32_t>();
+    for (size_t i = 0; i < inputData.size(); i++) {
+        for (size_t j = 0; j < inputData[i].posXY.size(); j++) {
+            int32_t xPos = inputData[i].posXY[j].xPos;
+            int32_t yPos = inputData[i].posXY[j].yPos;
             touchScreenCoordinates.xPos = xPos;
             touchScreenCoordinates.yPos = yPos;
             touchScreenInputEvent.events.push_back(touchScreenCoordinates);
@@ -90,22 +84,20 @@ void ProcessingTouchScreenDevice::AnalysisTouchScreenDate(const Json& inputData,
     }
 }
 
-void ProcessingTouchScreenDevice::AnalysisSingleTouchScreenDate(const Json& inputData,
+void ProcessingTouchScreenDevice::AnalysisSingleTouchScreenDate(const std::vector<DeviceEvent>& inputData,
     std::vector<TouchSingleEventData>& touchSingleEventDatas)
 {
     TouchSingleEventData touchSingleEventData = {};
     for (auto item : inputData) {
         touchSingleEventData = {};
-        touchSingleEventData.eventType = item.at("eventType").get<std::string>();
-        touchSingleEventData.trackingId = item.at("trackingId").get<int32_t>();
+        touchSingleEventData.eventType = item.eventType;
+        touchSingleEventData.trackingId = item.trackingId;
         if (touchSingleEventData.eventType != "release") {
-            touchSingleEventData.xPos = item.at("xPos").get<int32_t>();
-            touchSingleEventData.yPos = item.at("yPos").get<int32_t>();
+            touchSingleEventData.xPos = item.xPos;
+            touchSingleEventData.yPos = item.yPos;
         }
-        if ((item.find("blockTime")) != item.end()) {
-            touchSingleEventData.blockTime = item.at("blockTime").get<int64_t>();
-        }
-        touchSingleEventData.reportType = item.at("reportType").get<std::string>();
+        touchSingleEventData.blockTime = item.blockTime;
+        touchSingleEventData.reportType = item.reportType;
         touchSingleEventDatas.push_back(touchSingleEventData);
     }
 }

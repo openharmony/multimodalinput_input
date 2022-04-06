@@ -25,6 +25,7 @@
 #include "error_multimodal.h"
 #include "proto.h"
 #include "util.h"
+#include "input_parse.h"
 
 namespace OHOS {
 namespace MMI {
@@ -100,6 +101,20 @@ int32_t InjectionEventDispatch::GetFileSize(const std::string& fileName)
     return RET_ERR;
 }
 
+bool InjectionEventDispatch::ReadFile(const std::string &jsonFile, std::string& jsonBuf)
+{
+    FILE* fp = fopen(jsonFile.c_str(), "r");
+    CHKPF(fp);
+    char buf[256] = {};
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        jsonBuf += buf;
+    }
+    if (fclose(fp) < 0) {
+        MMI_HILOGW("close file failed");
+    }
+    return true;
+}
+
 int32_t InjectionEventDispatch::OnJson()
 {
     CALL_LOG_ENTER;
@@ -130,17 +145,19 @@ int32_t InjectionEventDispatch::OnJson()
         MMI_HILOGE("The file size is out of range 2M or empty. filesize:%{public}d", fileSize);
         return RET_ERR;
     }
-    std::ifstream reader(jsonFile);
-    if (!reader) {
-        MMI_HILOGE("json file is empty");
+    std::string jsonBuf;
+    if (!ReadFile(jsonFile, jsonBuf)) {
+        MMI_HILOGE("read file failed");
         return RET_ERR;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
-
-    int32_t ret = manageInjectDevice_.TransformJsonData(inputEventArrays);
-    return ret;
+    bool logStatus = false;
+    if (injectArgvs_.size() > ARGVS_CODE_INDEX) {
+        if (injectArgvs_.at(ARGVS_CODE_INDEX) == "log") {
+            logStatus = true;
+        }
+    }
+    InputParse InputParse;
+    return manageInjectDevice_.TransformJsonData(InputParse.DataInit(jsonBuf, logStatus));
 }
 
 std::string InjectionEventDispatch::GetFunId() const
@@ -233,6 +250,7 @@ int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText
             return item.devIndex;
         }
     }
+    MMI_HILOGW("Get device index failed");
     return RET_ERR;
 }
 
