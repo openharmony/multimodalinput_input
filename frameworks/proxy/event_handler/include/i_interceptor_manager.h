@@ -24,7 +24,8 @@ class IInterceptorManager {
 public:
     static std::shared_ptr<IInterceptorManager> GetInstance();
     virtual ~IInterceptorManager() = default;
-    virtual int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor) = 0;
+    virtual int32_t AddInterceptor(int32_t sourceType,
+        std::function<void(std::shared_ptr<PointerEvent>)> interceptor) = 0;
     virtual int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor) = 0;
     virtual void RemoveInterceptor(int32_t interceptorId) = 0;
     virtual int32_t OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id) = 0;

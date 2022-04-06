@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-#ifndef NON_INTERCEPTOR_HANDLER_MANAGER_GLOBAL_H
-#define NON_INTERCEPTOR_HANDLER_MANAGER_GLOBAL_H
+#ifndef NON_INTERCEPTOR_HANDLER_GLOBAL_H
+#define NON_INTERCEPTOR_HANDLER_GLOBAL_H
 
 #include "i_interceptor_handler_global.h"
 
 namespace OHOS {
 namespace MMI {
-class NonInterceptorHandlerManagerGlobal : public IInterceptorHandlerGlobal {
+class NonInterceptorHandlerGlobal : public IInterceptorHandlerGlobal {
 public:
     int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
@@ -29,4 +29,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // NON_INTERCEPTOR_HANDLER_MANAGER_GLOBAL_H
+#endif // NON_INTERCEPTOR_HANDLER_GLOBAL_H
