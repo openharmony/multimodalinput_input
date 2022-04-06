@@ -42,8 +42,7 @@ void ProcessingJoystickDevice::TransformPadEventToInputEvent(const std::vector<D
                                                              InputEventArray& inputEventArray)
 {
     for (const auto &item : inputData) {
-        if(item.eventType.empty())
-        {
+        if (item.eventType.empty()) {
             MMI_HILOGW("not find eventType");
             return;
         }
