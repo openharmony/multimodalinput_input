@@ -18,9 +18,8 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "if_client_msg_handler.h"
-#include "pointer_event.h"
 #include "proto.h"
+#include "pointer_event.h"
 #include "standardized_event_manager.h"
 
 namespace OHOS {
@@ -35,8 +34,10 @@ public:
     MultimodalEventHandler();
     ~MultimodalEventHandler() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalEventHandler);
-    int32_t GetMultimodeInputInfo();
+
     MMIClientPtr GetMMIClient();
+    bool StartClient();
+    
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetDevice(int32_t userData, int32_t deviceId);
@@ -54,7 +55,6 @@ private:
 
 private:
     MMIClientPtr client_ = nullptr;
-    IClientMsgHandlerPtr cMsgHandler_ = nullptr;
 };
 
 #define MMIEventHdl MultimodalEventHandler::GetInstance()

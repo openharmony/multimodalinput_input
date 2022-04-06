@@ -50,7 +50,7 @@ ClientMsgHandler::~ClientMsgHandler()
     eventProcessedCallback_ = std::function<void(int32_t)>();
 }
 
-bool ClientMsgHandler::Init()
+void ClientMsgHandler::Init()
 {
     MsgCallback funs[] = {
         {MmiMessageId::ON_KEYEVENT, MsgCallbackBind2(&ClientMsgHandler::OnKeyEvent, this)},
@@ -74,7 +74,6 @@ bool ClientMsgHandler::Init()
             continue;
         }
     }
-    return true;
 }
 
 void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
@@ -91,11 +90,6 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Msg handling failed. id:%{public}d,ret:%{public}d", id, ret);
         return;
     }
-}
-
-MsgClientFunCallback ClientMsgHandler::GetCallback()
-{
-    return std::bind(&ClientMsgHandler::OnMsgHandler, this, std::placeholders::_1, std::placeholders::_2);
 }
 
 int32_t ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)
@@ -141,7 +135,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
                key->GetFlag(), key->GetKeyAction(), key->GetId(), fd);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(eventProcessedCallback_);
-    InputManagerImpl::GetInstance()->OnKeyEvent(key);
+    InputMgrImpl->OnKeyEvent(key);
     key->MarkProcessed();
     return RET_OK;
 }
@@ -167,7 +161,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     }
     pointerEvent->SetProcessedCallback(eventProcessedCallback_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_DISPATCH_EVENT);
-    InputManagerImpl::GetInstance()->OnPointerEvent(pointerEvent);
+    InputMgrImpl->OnPointerEvent(pointerEvent);
     return RET_OK;
 }
 
@@ -251,7 +245,7 @@ int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& p
         }
         inputDeviceIds.push_back(deviceId);
     }
-    InputDeviceImpl::GetInstance().OnInputDeviceIds(userData, inputDeviceIds);
+    InputDevImp.OnInputDeviceIds(userData, inputDeviceIds);
     return RET_OK;
 }
 
@@ -279,7 +273,7 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
         return RET_ERR;
     }
 
-    InputDeviceImpl::GetInstance().OnInputDevice(userData, id, name, deviceType);
+    InputDevImp.OnInputDevice(userData, id, name, deviceType);
     return RET_OK;
 }
 
