@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,24 +12,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef IF_CLIENT_MSG_HANDLER_H
-#define IF_CLIENT_MSG_HANDLER_H
+#ifndef MMI_FD_LISTENER_H
+#define MMI_FD_LISTENER_H
+#include "file_descriptor_listener.h"
 
-#include <functional>
+#include "if_mmi_client.h"
 
 namespace OHOS {
 namespace MMI {
-class UDSClient;
-class NetPacket;
-using MsgClientFunCallback = std::function<void(const UDSClient&, NetPacket&)>;
-class IfClientMsgHandler {
+class MMIFdListener : public AppExecFwk::FileDescriptorListener {
 public:
-    virtual bool Init() = 0;
-    virtual void OnMsgHandler(const UDSClient& client, NetPacket& pkt) = 0;
-    virtual MsgClientFunCallback GetCallback() = 0;
-};
+    explicit MMIFdListener(MMIClientPtr client);
+    virtual ~MMIFdListener();
+    DISALLOW_COPY_AND_MOVE(MMIFdListener);
 
-using IClientMsgHandlerPtr = std::shared_ptr<IfClientMsgHandler>;
+    virtual void OnReadable(int32_t fd) override;
+    virtual void OnShutdown(int32_t fd) override;
+    virtual void OnException(int32_t fd) override;
+
+private:
+    MMIClientPtr mmiClient_ = nullptr;
+};
 } // namespace MMI
 } // namespace OHOS
-#endif // IF_CLIENT_MSG_HANDLER_H
+#endif // MMI_FD_LISTENER_H

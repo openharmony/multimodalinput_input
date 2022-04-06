@@ -162,7 +162,6 @@ void InputEventHandler::OnEvent(void *event)
     }
 
     eventType_ = libinput_event_get_type(lpEvent);
-    auto tid = GetThisThreadId();
     initSysClock_ = GetSysClockTime();
     lastSysClock_ = 0;
     idSeed_ += 1;
@@ -174,7 +173,7 @@ void InputEventHandler::OnEvent(void *event)
     }
 
     MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
-               "initSysClock:%{public}" PRId64, idSeed_, tid, eventType_, initSysClock_);
+               "initSysClock:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType_, initSysClock_);
 
     OnEventHandler(lpEvent);
     lastSysClock_ = GetSysClockTime();
