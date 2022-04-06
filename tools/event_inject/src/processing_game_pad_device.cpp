@@ -34,59 +34,18 @@ int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const DeviceItem& 
         MMI_HILOGE("manage finger array faild, inputData is empty");
         return RET_ERR;
     }
-    std::vector<GamePadEvent> padEventArray;
-    if (AnalysisGamePadEvent(inputData, padEventArray) == RET_ERR) {
-        MMI_HILOGE("TransformJsonDataToInputData as AnalysisGamePadEvent is error");
-        return RET_ERR;
-    }
-    TransformPadEventToInputEvent(padEventArray, inputEventArray);
+    TransformPadEventToInputEvent(inputData, inputEventArray);
     return RET_OK;
 }
 
-int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const std::vector<DeviceEvent>& inputData,
-    std::vector<GamePadEvent>& events)
-{
-    for (const auto &item : inputData) {
-        GamePadEvent padEvent = {};
-        padEvent.eventType = item.eventType;
-        padEvent.blockTime = item.blockTime;
-        if ((padEvent.eventType == "KEY_EVENT_CLICK") || (padEvent.eventType == "KEY_EVENT_PRESS") ||
-            (padEvent.eventType == "KEY_EVENT_RELEASE")) {
-            if (item.keyValue == 0) {
-                MMI_HILOGE("not find keyValue On Event:%{public}s", padEvent.eventType.c_str());
-                return RET_ERR;
-            }
-            padEvent.keyValue = item.keyValue;
-        } else if ((padEvent.eventType == "ROCKER_1") || (padEvent.eventType == "ROCKER_2")) {
-            if (item.event.empty()) {
-                MMI_HILOGE("not find event On Event:%{public}s", padEvent.eventType.c_str());
-                return RET_ERR;
-            }
-            if (item.direction.empty()) {
-                MMI_HILOGE("not find direction On Event:%{public}s", padEvent.eventType.c_str());
-                return RET_ERR;
-            }
-            padEvent.gameEvents = item.event;
-            padEvent.direction = item.direction;
-        } else if (padEvent.eventType == "DERECTION_KEY") {
-            if (item.direction.empty()) {
-                MMI_HILOGE("not find direction On Event:%{public}s", padEvent.eventType.c_str());
-                return RET_ERR;
-            }
-            padEvent.direction = item.direction;
-        } else {
-            continue;
-        }
-        events.push_back(padEvent);
-    }
-
-    return RET_OK;
-}
-
-void ProcessingGamePadDevice::TransformPadEventToInputEvent(const std::vector<GamePadEvent>& padEventArray,
+void ProcessingGamePadDevice::TransformPadEventToInputEvent(const std::vector<DeviceEvent>& inputData,
                                                             InputEventArray& inputEventArray)
 {
-    for (const auto &item : padEventArray) {
+    for (const auto &item : inputData) {
+        if (item.eventType.empty()) {
+            MMI_HILOGW("not find eventType");
+            return;
+        }
         if (item.eventType == "KEY_EVENT_PRESS") {
             TransformKeyPressEvent(item, inputEventArray);
         } else if (item.eventType == "KEY_EVENT_RELEASE") {
@@ -105,21 +64,21 @@ void ProcessingGamePadDevice::TransformPadEventToInputEvent(const std::vector<Ga
     }
 }
 
-void ProcessingGamePadDevice::TransformKeyPressEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray)
+void ProcessingGamePadDevice::TransformKeyPressEvent(const DeviceEvent& padEvent, InputEventArray& inputEventArray)
 {
     uint16_t keyValue = static_cast<uint16_t>(padEvent.keyValue);
     SetKeyPressEvent(inputEventArray, padEvent.blockTime, keyValue);
     SetSynReport(inputEventArray);
 }
 
-void ProcessingGamePadDevice::TransformKeyReleaseEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray)
+void ProcessingGamePadDevice::TransformKeyReleaseEvent(const DeviceEvent& padEvent, InputEventArray& inputEventArray)
 {
     uint16_t keyValue = static_cast<uint16_t>(padEvent.keyValue);
     SetKeyReleaseEvent(inputEventArray, padEvent.blockTime, keyValue);
     SetSynReport(inputEventArray);
 }
 
-void ProcessingGamePadDevice::TransformKeyClickEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray)
+void ProcessingGamePadDevice::TransformKeyClickEvent(const DeviceEvent& padEvent, InputEventArray& inputEventArray)
 {
     uint16_t keyValue = static_cast<uint16_t>(padEvent.keyValue);
     SetKeyPressEvent(inputEventArray, padEvent.blockTime, keyValue);
@@ -128,10 +87,18 @@ void ProcessingGamePadDevice::TransformKeyClickEvent(const GamePadEvent& padEven
     SetSynReport(inputEventArray);
 }
 
-void ProcessingGamePadDevice::TransformRocker1Event(const GamePadEvent& padEvent, InputEventArray& inputEventArray)
+void ProcessingGamePadDevice::TransformRocker1Event(const DeviceEvent& padEvent, InputEventArray& inputEventArray)
 {
+    if (padEvent.direction.empty()) {
+        MMI_HILOGW("not find direction");
+        return;
+    }
+    if (padEvent.event.empty()) {
+        MMI_HILOGW("not find event");
+        return;
+    }
     std::string direction = padEvent.direction;
-    for (const auto &item : padEvent.gameEvents) {
+    for (const auto &item : padEvent.event) {
         uint32_t value;
         if (direction == "left") {
             value = ~item + 1;
@@ -168,10 +135,18 @@ void ProcessingGamePadDevice::TransformRocker1Event(const GamePadEvent& padEvent
     SetSynReport(inputEventArray);
 }
 
-void ProcessingGamePadDevice::TransformRocker2Event(const GamePadEvent& padEvent, InputEventArray& inputEventArray)
+void ProcessingGamePadDevice::TransformRocker2Event(const DeviceEvent& padEvent, InputEventArray& inputEventArray)
 {
+    if (padEvent.direction.empty()) {
+        MMI_HILOGW("not find direction");
+        return;
+    }
+    if (padEvent.event.empty()) {
+        MMI_HILOGW("not find event");
+        return;
+    }
     std::string direction = padEvent.direction;
-    for (uint32_t item : padEvent.gameEvents) {
+    for (uint32_t item : padEvent.event) {
         uint32_t value;
         if (direction == "left") {
             value = ~item + 1;
@@ -208,8 +183,12 @@ void ProcessingGamePadDevice::TransformRocker2Event(const GamePadEvent& padEvent
     SetSynReport(inputEventArray);
 }
 
-void ProcessingGamePadDevice::TransformDerectionKeyEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray)
+void ProcessingGamePadDevice::TransformDerectionKeyEvent(const DeviceEvent& padEvent, InputEventArray& inputEventArray)
 {
+    if (padEvent.direction.empty()) {
+        MMI_HILOGW("not find direction");
+        return;
+    }
     std::string direction = padEvent.direction;
     if (direction == "left") {
         SetEvAbsHat0X(inputEventArray, padEvent.blockTime, -1);
