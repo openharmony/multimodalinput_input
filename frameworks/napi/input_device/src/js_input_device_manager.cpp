@@ -25,7 +25,7 @@ napi_value JsInputDeviceManager::GetDeviceIds(napi_env env, napi_value handle)
 {
     CALL_LOG_ENTER;
     napi_value ret = CreateCallbackInfo(env, handle);
-    InputDeviceImpl::GetInstance().GetInputDeviceIdsAsync(JsEventTarget::userData_ - 1, EmitJsIds);
+    InputDevImp.GetInputDeviceIdsAsync(JsEventTarget::userData_ - 1, EmitJsIds);
     return ret;
 }
 
@@ -33,7 +33,7 @@ napi_value JsInputDeviceManager::GetDevice(napi_env env, int32_t id, napi_value 
 {
     CALL_LOG_ENTER;
     napi_value ret = CreateCallbackInfo(env, handle);
-    InputDeviceImpl::GetInstance().GetInputDeviceAsync(JsEventTarget::userData_ - 1, id, EmitJsDev);
+    InputDevImp.GetInputDeviceAsync(JsEventTarget::userData_ - 1, id, EmitJsDev);
     return ret;
 }
 

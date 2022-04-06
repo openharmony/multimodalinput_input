@@ -21,14 +21,16 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
+#include "net_packet.h"
+
 #include "display_info.h"
 #include "event_filter_service.h"
-#include "i_input_event_consumer.h"
-#include "if_client_msg_handler.h"
+
 #include "if_mmi_client.h"
 #include "input_interceptor_manager.h"
 #include "input_monitor_manager.h"
-#include "net_packet.h"
+#include "i_input_event_consumer.h"
+#include "mmi_event_handler.h"
 #include "pointer_event.h"
 
 namespace OHOS {
@@ -39,6 +41,10 @@ public:
     DISALLOW_COPY_AND_MOVE(InputManagerImpl);
     InputManagerImpl() = default;
 
+    bool InitEventHandler();
+    MMIEventHandlerPtr GetEventHandler() const;
+    EventHandlerPtr GetCurrentEventHandler() const;
+    
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
         const std::vector<LogicalDisplayInfo> &logicalDisplays);
     int32_t AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter);
@@ -50,7 +56,7 @@ public:
     int32_t PackDisplayData(NetPacket &pkt);
 
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
-    int32_t AddMontior(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
+    int32_t AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> consumer);
     void RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
@@ -70,14 +76,26 @@ private:
     void PrintDisplayInfo();
     void SendDisplayInfo();
 
+    void OnKeyEventTask(std::shared_ptr<KeyEvent> keyEvent);
+    void OnPointerEventTask(std::shared_ptr<PointerEvent> pointerEvent);
+    void OnThread();
+
 private:
     sptr<EventFilterService> eventFilterService_ {nullptr};
     std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
+    
     std::vector<PhysicalDisplayInfo> physicalDisplays_;
     std::vector<LogicalDisplayInfo> logicalDisplays_;
     InputMonitorManager monitorManager_;
     InputInterceptorManager interceptorManager_;
+
+    std::mutex mtx_;
+    std::condition_variable cv_;
+    std::thread ehThread_;
+    EventHandlerPtr eventHandler_  = nullptr;
+    MMIEventHandlerPtr mmiEventHandler_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
+#define InputMgrImpl OHOS::MMI::InputManagerImpl::GetInstance()
 #endif // INPUT_MANAGER_IMPL_H

@@ -15,9 +15,12 @@
 
 #include "input_manager_impl.h"
 
-#include "bytrace_adapter.h"
+#include <cinttypes>
+
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+
+#include "bytrace_adapter.h"
 #include "event_filter_service.h"
 #include "input_event_monitor_manager.h"
 #include "interceptor_manager.h"
@@ -59,16 +62,68 @@ private:
     std::function<void(std::shared_ptr<PointerEvent>)> monitor_;
 };
 
+bool InputManagerImpl::InitEventHandler()
+{
+    CALL_LOG_ENTER;
+    if (mmiEventHandler_ != nullptr) {
+        MMI_HILOGE("Repeated initialization operations");
+        return false;
+    }
+
+    std::mutex mtx;
+    constexpr int32_t timeout = 3;
+    std::unique_lock <std::mutex> lck(mtx);
+    ehThread_ = std::thread(std::bind(&InputManagerImpl::OnThread, this));
+    ehThread_.detach();
+    if (cv_.wait_for(lck, std::chrono::seconds(timeout)) == std::cv_status::timeout) {
+        MMI_HILOGE("EventThandler thread start timeout");
+        return false;
+    }
+    return true;
+}
+
+MMIEventHandlerPtr InputManagerImpl::GetEventHandler() const
+{
+    CHKPP(mmiEventHandler_);
+    return mmiEventHandler_->GetSharedPtr();
+}
+
+EventHandlerPtr InputManagerImpl::GetCurrentEventHandler() const
+{
+    auto eventHandler = AppExecFwk::EventHandler::Current();
+    if (eventHandler == nullptr) {
+        eventHandler = GetEventHandler();
+    }
+    return eventHandler;
+}
+
+void InputManagerImpl::OnThread()
+{
+    CALL_LOG_ENTER;
+    CHK_PIDANDTID();
+    SetThreadName("mmi_client_EventHdr");
+    mmiEventHandler_ = std::make_shared<MMIEventHandler>();
+    CHKPV(mmiEventHandler_);
+    auto eventRunner = mmiEventHandler_->GetEventRunner();
+    CHKPV(eventRunner);
+    cv_.notify_one();
+    eventRunner->Run();
+}
+
 void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
     const std::vector<LogicalDisplayInfo> &logicalDisplays)
 {
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.StartClient()) {
+        MMI_HILOGE("get mmi client is nullptr");
+        return;
+    }
     if (physicalDisplays.empty() || logicalDisplays.empty()) {
         MMI_HILOGE("display info check failed! physicalDisplays size:%{public}zu,logicalDisplays size:%{public}zu",
             physicalDisplays.size(), logicalDisplays.size());
         return;
     }
-
     physicalDisplays_ = physicalDisplays;
     logicalDisplays_ = logicalDisplays;
     SendDisplayInfo();
@@ -78,6 +133,7 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
 int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
 {
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     bool hasSendToMmiServer = true;
     if (eventFilterService_ == nullptr) {
         hasSendToMmiServer = false;
@@ -103,34 +159,60 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
 void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
 {
     CALL_LOG_ENTER;
-    MMIEventHdl.GetMultimodeInputInfo();
     CHKPV(inputEventConsumer);
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.StartClient()) {
+        MMI_HILOGE("client init failed");
+        return;
+    }
     consumer_ = inputEventConsumer;
+    eventHandler_ = InputMgrImpl->GetCurrentEventHandler();
+}
+
+void InputManagerImpl::OnKeyEventTask(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHK_PIDANDTID();
+    CHKPV(consumer_);
+    std::lock_guard<std::mutex> guard(mtx_);
+    consumer_->OnInputEvent(keyEvent);
+    MMI_HILOGD("key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
 }
 
 void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_LOG_ENTER;
+    CHK_PIDANDTID();
     CHKPV(keyEvent);
+    CHKPV(eventHandler_);
+    std::lock_guard<std::mutex> guard(mtx_);
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
-    if (consumer_ != nullptr) {
-        CHKPV(keyEvent);
-        consumer_->OnInputEvent(keyEvent);
-        return;
+    if (!MMIEventHandler::PostTask(eventHandler_,
+        std::bind(&InputManagerImpl::OnKeyEventTask, this, keyEvent))) {
+        MMI_HILOGE("post task failed");
     }
+    MMI_HILOGD("key event keyCode:%{public}d", keyEvent->GetKeyCode());
+}
+
+void InputManagerImpl::OnPointerEventTask(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHK_PIDANDTID();
+    CHKPV(consumer_);
+    std::lock_guard<std::mutex> guard(mtx_);
+    consumer_->OnInputEvent(pointerEvent);
+    MMI_HILOGD("pointer event callback pointerId:%{public}d", pointerEvent->GetPointerId());
 }
 
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_HILOGD("Pointer event received, processing");
+    CHK_PIDANDTID();
     CHKPV(pointerEvent);
+    CHKPV(eventHandler_);
+    std::lock_guard<std::mutex> guard(mtx_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
-    if (consumer_ != nullptr) {
-        CHKPV(pointerEvent);
-        MMI_HILOGD("Passed on to consumer");
-        consumer_->OnInputEvent(pointerEvent);
-        return;
+    if (!MMIEventHandler::PostTask(eventHandler_,
+        std::bind(&InputManagerImpl::OnPointerEventTask, this, pointerEvent))) {
+        MMI_HILOGE("post task failed");
     }
+    MMI_HILOGD("pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
 }
 
 int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
@@ -306,14 +388,16 @@ void InputManagerImpl::PrintDisplayInfo()
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
     CHKPR(monitor, ERROR_NULL_POINTER);
+    std::lock_guard<std::mutex> guard(mtx_);
     int32_t monitorId = InputMonitorMgr.AddInputEventMontior(monitor);
     monitorId = monitorId * ADD_MASK_BASE + MASK_KEY;
     return monitorId;
 }
 
-int32_t InputManagerImpl::AddMontior(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
+int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
     CHKPR(monitor, ERROR_NULL_POINTER);
+    std::lock_guard<std::mutex> guard(mtx_);
     std::shared_ptr<IInputEventConsumer> consumer =
         std::make_shared<PublicIInputEventConsumer>(monitor);
     return InputManagerImpl::AddMonitor(consumer);
@@ -329,6 +413,7 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
 
 void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 {
+    std::lock_guard<std::mutex> guard(mtx_);
     int32_t mask = monitorId % ADD_MASK_BASE;
     monitorId /= ADD_MASK_BASE;
 
@@ -350,12 +435,14 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 
 void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
+    std::lock_guard<std::mutex> guard(mtx_);
     monitorManager_.MarkConsumed(monitorId, eventId);
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
     CHKPR(interceptor, INVALID_HANDLER_ID);
+    std::lock_guard<std::mutex> guard(mtx_);
     int32_t interceptorId = interceptorManager_.AddInterceptor(interceptor);
     if (interceptorId >= 0) {
         interceptorId = interceptorId * ADD_MASK_BASE + MASK_TOUCH;
@@ -371,6 +458,7 @@ int32_t InputManagerImpl::AddInterceptor(int32_t sourceType,
 
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
+    std::lock_guard<std::mutex> guard(mtx_);
     if (interceptor == nullptr) {
         MMI_HILOGE("%{public}s param should not be null", __func__);
         return MMI_STANDARD_EVENT_INVALID_PARAM;
@@ -384,6 +472,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
 
 void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 {
+    std::lock_guard<std::mutex> guard(mtx_);
     if (interceptorId <= 0) {
         MMI_HILOGE("Specified interceptor does not exist");
         return;
@@ -406,6 +495,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
+    std::lock_guard<std::mutex> guard(mtx_);
     if (MMIEventHdl.InjectEvent(keyEvent) != RET_OK) {
         MMI_HILOGE("Failed to inject keyEvent");
     }
@@ -414,7 +504,8 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-    if (MultimodalEventHandler::GetInstance().InjectPointerEvent(pointerEvent) != RET_OK) {
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (MMIEventHdl.InjectPointerEvent(pointerEvent) != RET_OK) {
         MMI_HILOGE("Failed to inject pointer event");
     }
 }
@@ -433,17 +524,16 @@ void InputManagerImpl::OnConnected()
 
 void InputManagerImpl::SendDisplayInfo()
 {
-    if (MultimodalEventHandler::GetInstance().GetMMIClient() == nullptr) {
-        MMI_HILOGE("get mmi client is nullptr");
-        return;
-    }
-
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
+    CHKPV(client);
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
     if (PackDisplayData(pkt) == RET_ERR) {
         MMI_HILOGE("pack display info failed");
         return;
     }
-    MultimodalEventHandler::GetInstance().GetMMIClient()->SendMessage(pkt);
+    if (!client->SendMessage(pkt)) {
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

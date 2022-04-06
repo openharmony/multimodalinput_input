@@ -42,23 +42,13 @@ public:
 
     bool StartClientTestUnitTest(MsgClientFunCallback fun)
     {
-        auto retResult = StartClient(fun, true);
+        auto retResult = StartClient(fun);
         return retResult;
     }
 
     void OnRecvTestUnitTest(const char *buf, size_t size)
     {
         OnRecv(buf, size);
-    }
-
-    void OnEventUnitTest(const struct epoll_event& ev, StreamBuffer& buf)
-    {
-        OnEvent(ev, buf);
-    }
-
-    void OnThreadUnitTest()
-    {
-        OnThread();
     }
 };
 
@@ -220,21 +210,6 @@ HWTEST_F(UDSClientTest, Stop_001, TestSize.Level1)
 {
     UDSClient udsClient;
     udsClient.Stop();
-}
-
-HWTEST_F(UDSClientTest, OnEvent, TestSize.Level1)
-{
-    struct epoll_event ev = {};
-    StreamBuffer buf;
-
-    UDSClientUnitTest udsClientUt;
-    udsClientUt.OnEventUnitTest(ev, buf);
-}
-
-HWTEST_F(UDSClientTest, OnThread, TestSize.Level1)
-{
-    UDSClientUnitTest udsClientUt;
-    udsClientUt.OnThreadUnitTest();
 }
 #endif
 } // namespace MMI
