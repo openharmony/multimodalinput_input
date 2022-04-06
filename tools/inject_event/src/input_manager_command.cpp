@@ -14,6 +14,7 @@
  */
 
 #include "input_manager_command.h"
+
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
@@ -21,6 +22,9 @@
 #include <iostream>
 #include <thread>
 #include <algorithm>
+#include <unistd.h>
+#include <sys/time.h>
+
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "error_multimodal.h"
@@ -336,13 +340,17 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t py1;
                 int32_t px2;
                 int32_t py2;
+                int32_t totalTime = 0;
                 int32_t oneNumber = 1;
                 int32_t twoNumber = 2;
-                while ((c = getopt_long(argc, argv, "m:d:u:", touchSensorOptions, &optionIndex)) != -1) {
+                int32_t threeNumber = 3;
+                int32_t moveArgc = 7;
+                int32_t moveSmoothArgc = 8;
+                while ((c = getopt_long(argc, argv, "m:d:u:s:", touchSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
-                            if (optind + twoNumber>= argc) {
-                                std::cout << "too few arguments to function" << std::endl;
+                            if (argc != moveArgc) {
+                                std::cout << "wrong number of parameters" << std::endl;
                                 ShowUsage();
                                 return EVENT_REG_FAIL;
                             }
@@ -351,8 +359,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "invalid command to input value" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            int32_t middleValuePx = (px1+px2)/2;
-                            int32_t middleValuePy = (py1+py2)/2;
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
@@ -365,6 +371,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            int32_t middleValuePx = (px1 + px2)/2;
+                            int32_t middleValuePy = (py1 + py2)/2;
                             item.SetGlobalX(middleValuePx);
                             item.SetGlobalY(middleValuePy);
                             pointerEvent->SetActionTime(time + ACTION_TIME);
@@ -438,6 +446,76 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             optind++;
                             break;
                         }
+                        case 's': {
+                            if (argc != moveSmoothArgc) {
+                                std::cout << "wrong number of parameters" << std::endl;
+                                ShowUsage();
+                                return EVENT_REG_FAIL;
+                            }
+                            if ((!StrToInt(optarg, px1)) ||
+                                (!StrToInt(argv[optind], py1)) ||
+                                (!StrToInt(argv[optind + oneNumber], px2)) ||
+                                (!StrToInt(argv[optind + twoNumber], py2)) ||
+                                (!StrToInt(argv[optind + threeNumber], totalTime))) {
+                                std::cout << "invalid command to input value" << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
+                            auto pointerEvent = PointerEvent::Create();
+                            CHKPR(pointerEvent, ERROR_NULL_POINTER);
+                            PointerEvent::PointerItem item;
+                            item.SetPointerId(0);
+                            item.SetGlobalX(px1);
+                            item.SetGlobalY(py1);
+                            pointerEvent->SetPointerId(0);
+                            pointerEvent->AddPointerItem(item);
+                            int64_t time = pointerEvent->GetActionStartTime();
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            uint32_t stepTime = 16;
+                            int32_t ContStepTime = totalTime / stepTime;
+                            int32_t vecX = px2 - px1;
+                            int32_t vecY = py2 - py1;
+                            int32_t stepX = 0;
+                            int32_t stepY = 0;
+                            if (!vecX) {
+                                stepX = px1;
+                            } else {
+                                stepX = vecX / ContStepTime;
+                            }
+                            if (!vecY) {
+                                stepY = py1;
+                            } else {
+                                stepY = vecY / ContStepTime;
+                            }
+                            struct timeval tm;
+                            gettimeofday(&tm, 0);
+                            int64_t blockTime = tm.tv_usec + 16000;
+                            for (int32_t i = 1; i <= ContStepTime; ++i) {
+                                if (!vecX) {
+                                    item.SetGlobalX(px1);
+                                } else {
+                                    item.SetGlobalX(px1 + (stepX * i));
+                                }
+                                if (!vecY) {
+                                    item.SetGlobalY(py1);
+                                } else {
+                                    item.SetGlobalY(py1 + (stepY * i));
+                                }
+                                pointerEvent->SetActionTime(time + blockTime);
+                                pointerEvent->UpdatePointerItem(0, item);
+                                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            }
+                            item.SetGlobalX(px2);
+                            item.SetGlobalY(py2);
+                            pointerEvent->SetActionTime(time + totalTime);
+                            pointerEvent->UpdatePointerItem(0, item);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            break;
+                        }
                         default: {
                             std::cout << "invalid command" << std::endl;
                             ShowUsage();
@@ -468,7 +546,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
     return ERR_OK;
 }
 
-
 void InputManagerCommand::ShowUsage()
 {
     std::cout << "Usage: input <option> <command> <arg>..." << std::endl;
@@ -492,6 +569,7 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-d <dx1> <dy1>             --down   <dx1> <dy1> -press down a position  dx1 dy1, " << std::endl;
     std::cout << "-u <dx1> <dy1>             --up     <dx1> <dy1> -release a position dx1 dy1" << std::endl;
     std::cout << "-m <dx1> <dy1> <dx2> <dy2> --move   <dx1> <dy1> <dx2> <dy2> -move dx1 dy1 to dx2 dy2 " << std::endl;
+    std::cout << "-s <dx1> <dy1> <dx2> <dy2> <smooth time> --smooth   dx1 dy1 to dx2 dy2 smooth time" << std::endl;
     std::cout << "                                                                  " << std::endl;
     std::cout << "-?  --help                                                        " << std::endl;
 }
