@@ -20,30 +20,30 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NonInterceptorHandlerManagerGlobal" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NonInterceptorHandlerGlobal" };
 } // namespace
 
-int32_t NonInterceptorHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
+int32_t NonInterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
     CALL_LOG_ENTER;
     return RET_ERR;
 }
 
-void NonInterceptorHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
+void NonInterceptorHandlerGlobal::RemoveInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
     CALL_LOG_ENTER;
     return;
 }
 
-bool NonInterceptorHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> KeyEvent)
+bool NonInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<KeyEvent> KeyEvent)
 {
     CALL_LOG_ENTER;
     return false;
 }
 
-bool NonInterceptorHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> PointerEvent)
+bool NonInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> PointerEvent)
 {
     CALL_LOG_ENTER;
     return false;
@@ -52,7 +52,7 @@ bool NonInterceptorHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEven
 std::shared_ptr<IInterceptorHandlerGlobal> IInterceptorHandlerGlobal::GetInstance()
 {
     if (interceptorHdlGPtr_ == nullptr) {
-        interceptorHdlGPtr_ = std::make_shared<NonInterceptorHandlerManagerGlobal>();
+        interceptorHdlGPtr_ = std::make_shared<NonInterceptorHandlerGlobal>();
     }
     return interceptorHdlGPtr_;
 }

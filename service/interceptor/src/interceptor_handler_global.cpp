@@ -26,10 +26,10 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorHandlerManagerGlobal" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorHandlerGlobal" };
 } // namespace
 
-int32_t InterceptorHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
+int32_t InterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
     CHKPR(session, RET_ERR);
@@ -47,7 +47,7 @@ int32_t InterceptorHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
     return RET_ERR;
 }
 
-void InterceptorHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
+void InterceptorHandlerGlobal::RemoveInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
     CHKPV(session);
@@ -58,7 +58,7 @@ void InterceptorHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
     }
 }
 
-bool InterceptorHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
+bool InterceptorHandlerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGD("Handle KeyEvent");
     CHKPF(keyEvent);
@@ -73,7 +73,7 @@ bool InterceptorHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyE
     return false;
 }
 
-bool InterceptorHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
+bool InterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
@@ -88,7 +88,7 @@ bool InterceptorHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> 
     return false;
 }
 
-void InterceptorHandlerManagerGlobal::InitSessionLostCallback()
+void InterceptorHandlerGlobal::InitSessionLostCallback()
 {
     if (sessionLostCallbackInitialized_)  {
         return;
@@ -96,17 +96,17 @@ void InterceptorHandlerManagerGlobal::InitSessionLostCallback()
     auto udsServerPtr = InputHandler->GetUDSServer();
     CHKPV(udsServerPtr);
     udsServerPtr->AddSessionDeletedCallback(std::bind(
-        &InterceptorHandlerManagerGlobal::OnSessionLost, this, std::placeholders::_1));
+        &InterceptorHandlerGlobal::OnSessionLost, this, std::placeholders::_1));
     sessionLostCallbackInitialized_ = true;
     MMI_HILOGD("The callback on session deleted is registered successfully");
 }
 
-void InterceptorHandlerManagerGlobal::OnSessionLost(SessionPtr session)
+void InterceptorHandlerGlobal::OnSessionLost(SessionPtr session)
 {
     interceptors_.OnSessionLost(session);
 }
 
-void InterceptorHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent) const
+void InterceptorHandlerGlobal::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent) const
 {
     CHKPV(keyEvent);
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
@@ -124,7 +124,7 @@ void InterceptorHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_p
     }
 }
 
-void InterceptorHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
+void InterceptorHandlerGlobal::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
 {
     CHKPV(pointerEvent);
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
@@ -143,12 +143,12 @@ void InterceptorHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_p
     }
 }
 
-int32_t InterceptorHandlerManagerGlobal::InterceptorCollection::GetPriority() const
+int32_t InterceptorHandlerGlobal::InterceptorCollection::GetPriority() const
 {
     return IInputEventHandler::DEFAULT_INTERCEPTOR;
 }
 
-bool InterceptorHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
+bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
     std::lock_guard<std::mutex> guard(lockInterceptors_);
@@ -162,7 +162,7 @@ bool InterceptorHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::sh
     return true;
 }
 
-bool InterceptorHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
+bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
     std::lock_guard<std::mutex> guard(lockInterceptors_);
@@ -176,7 +176,7 @@ bool InterceptorHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::sh
     return true;
 }
 
-int32_t InterceptorHandlerManagerGlobal::InterceptorCollection::AddInterceptor(const SessionHandler& interceptor)
+int32_t InterceptorHandlerGlobal::InterceptorCollection::AddInterceptor(const SessionHandler& interceptor)
 {
     std::lock_guard<std::mutex> guard(lockInterceptors_);
     if (interceptors_.size() >= MAX_N_INPUT_INTERCEPTORS) {
@@ -192,7 +192,7 @@ int32_t InterceptorHandlerManagerGlobal::InterceptorCollection::AddInterceptor(c
     return RET_OK;
 }
 
-void InterceptorHandlerManagerGlobal::InterceptorCollection::RemoveInterceptor(const SessionHandler& interceptor)
+void InterceptorHandlerGlobal::InterceptorCollection::RemoveInterceptor(const SessionHandler& interceptor)
 {
     std::lock_guard<std::mutex> guard(lockInterceptors_);
     std::set<SessionHandler>::const_iterator tItr = interceptors_.find(interceptor);
@@ -202,7 +202,7 @@ void InterceptorHandlerManagerGlobal::InterceptorCollection::RemoveInterceptor(c
     }
 }
 
-void InterceptorHandlerManagerGlobal::InterceptorCollection::OnSessionLost(SessionPtr session)
+void InterceptorHandlerGlobal::InterceptorCollection::OnSessionLost(SessionPtr session)
 {
     std::lock_guard<std::mutex> guard(lockInterceptors_);
     std::set<SessionHandler>::const_iterator cItr = interceptors_.cbegin();
@@ -218,7 +218,7 @@ void InterceptorHandlerManagerGlobal::InterceptorCollection::OnSessionLost(Sessi
 std::shared_ptr<IInterceptorHandlerGlobal> IInterceptorHandlerGlobal::GetInstance()
 {
     if (interceptorHdlGPtr_ == nullptr) {
-        interceptorHdlGPtr_ = std::make_shared<InterceptorHandlerManagerGlobal>();
+        interceptorHdlGPtr_ = std::make_shared<InterceptorHandlerGlobal>();
     }
     return interceptorHdlGPtr_;
 }

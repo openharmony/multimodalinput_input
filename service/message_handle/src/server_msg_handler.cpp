@@ -301,7 +301,9 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
     MMI_HILOGD("OnAddInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
-    return IInterceptorHandlerGlobal::GetInstance()->AddInputHandler(handlerId, handlerType, sess);
+    IInterceptorHandlerGlobal::GetInstance()->AddInputHandler(handlerId, handlerType, sess);
+    InputHandlerManagerGlobal::GetInstance().AddInputHandler(handlerId, handlerType, sess);
+    return RET_OK;
 }
 
 int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
@@ -319,6 +321,7 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
     }
     MMI_HILOGD("OnRemoveInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
     IInterceptorHandlerGlobal::GetInstance()->RemoveInputHandler(handlerId, handlerType, sess);
+    InputHandlerManagerGlobal::GetInstance().RemoveInputHandler(handlerId, handlerType, sess);
     return RET_OK;
 }
 
