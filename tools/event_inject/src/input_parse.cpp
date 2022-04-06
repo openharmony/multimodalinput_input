@@ -78,7 +78,7 @@ std::string DeviceItem::ToString() const
     return oss.str();
 }
 
-void GetJsonData(cJSON *json, const std::string key, std::string& val)
+void GetJsonData(cJSON *json, const std::string& key, std::string& val)
 {
     CHKPV(json);
     if (cJSON_HasObjectItem(json, key.c_str())) {
@@ -91,7 +91,7 @@ void GetJsonData(cJSON *json, const std::string key, std::string& val)
 }
 
 template <class T>
-void GetJsonData(cJSON *json, const std::string key, T& val)
+void GetJsonData(cJSON *json, const std::string& key, T& val)
 {
     CHKPV(json);
     if (cJSON_HasObjectItem(json, key.c_str())) {
@@ -103,7 +103,7 @@ void GetJsonData(cJSON *json, const std::string key, T& val)
     return;
 }
 
-void GetJsonData(cJSON *json, const std::string key, std::vector<int32_t>& vals)
+void GetJsonData(cJSON *json, const std::string& key, std::vector<int32_t>& vals)
 {
     CHKPV(json);
     if (cJSON_HasObjectItem(json, key.c_str())) {
@@ -226,7 +226,8 @@ DeviceItems InputParse::DataInit(const std::string& fileData, bool logStatus)
             cJSON_Delete(arrays);
             return deviceItems;
         }
-        DeviceItem deviceItem = {.deviceName = deviceName->valuestring, .deviceIndex = 0};
+        DeviceItem deviceItem;
+        deviceItem.deviceName = deviceName->valuestring;
         GetJsonData(deviceInfo, "deviceIndex", deviceItem.deviceIndex);
         cJSON *events = nullptr;
         if (cJSON_HasObjectItem(deviceInfo, "events")) {
