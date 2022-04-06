@@ -445,7 +445,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         }
                     }
                     /* sleep for a short time after every step to give the divice some time to react */
-                    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
+                    std::this_thread::sleep_for(std::chrono::milliseconds(3*SLEEPTIME));
                 }
                 break;
             }
