@@ -173,7 +173,7 @@ void InputEvent::SetTargetWindowId(int32_t windowId)
     targetWindowId_ = windowId;
 }
 
-int32_t InputEvent::DumpEventType() const
+int32_t InputEvent::GetEventType() const
 {
     return eventType_;
 }
