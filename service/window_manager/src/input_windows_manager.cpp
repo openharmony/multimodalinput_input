@@ -114,7 +114,7 @@ void InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInf
         }
     }
     if (!logicalDisplays.empty()) {
-        IPointerDrawingManager::GetInstance()->OnDisplayInfo(logicalDisplays[0].id, 
+        IPointerDrawingManager::GetInstance()->OnDisplayInfo(logicalDisplays[0].id,
             logicalDisplays[0].width, logicalDisplays_[0].height);
     }
     PrintDisplayInfo();
