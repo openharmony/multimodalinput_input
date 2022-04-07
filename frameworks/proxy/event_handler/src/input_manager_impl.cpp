@@ -169,12 +169,12 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     eventHandler_ = InputMgrImpl->GetCurrentEventHandler();
 }
 
-void InputManagerImpl::OnKeyEventTask(std::shared_ptr<KeyEvent> keyEvent)
+void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
+    std::shared_ptr<KeyEvent> keyEvent)
 {
     CHK_PIDANDTID();
-    CHKPV(consumer_);
-    std::lock_guard<std::mutex> guard(mtx_);
-    consumer_->OnInputEvent(keyEvent);
+    CHKPV(consumer);
+    consumer->OnInputEvent(keyEvent);
     MMI_HILOGD("key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
 }
 
@@ -183,21 +183,23 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     CHK_PIDANDTID();
     CHKPV(keyEvent);
     CHKPV(eventHandler_);
+    CHKPV(consumer_);
     std::lock_guard<std::mutex> guard(mtx_);
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
     if (!MMIEventHandler::PostTask(eventHandler_,
-        std::bind(&InputManagerImpl::OnKeyEventTask, this, keyEvent))) {
+        std::bind(&InputManagerImpl::OnKeyEventTask, this, consumer_, keyEvent))) {
         MMI_HILOGE("post task failed");
     }
     MMI_HILOGD("key event keyCode:%{public}d", keyEvent->GetKeyCode());
 }
 
-void InputManagerImpl::OnPointerEventTask(std::shared_ptr<PointerEvent> pointerEvent)
+void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
+    std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHK_PIDANDTID();
-    CHKPV(consumer_);
-    std::lock_guard<std::mutex> guard(mtx_);
-    consumer_->OnInputEvent(pointerEvent);
+    CHKPV(consumer);
+    CHKPV(pointerEvent);
+    consumer->OnInputEvent(pointerEvent);
     MMI_HILOGD("pointer event callback pointerId:%{public}d", pointerEvent->GetPointerId());
 }
 
@@ -206,10 +208,11 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     CHK_PIDANDTID();
     CHKPV(pointerEvent);
     CHKPV(eventHandler_);
+    CHKPV(consumer_);
     std::lock_guard<std::mutex> guard(mtx_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
     if (!MMIEventHandler::PostTask(eventHandler_,
-        std::bind(&InputManagerImpl::OnPointerEventTask, this, pointerEvent))) {
+        std::bind(&InputManagerImpl::OnPointerEventTask, this, consumer_, pointerEvent))) {
         MMI_HILOGE("post task failed");
     }
     MMI_HILOGD("pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
