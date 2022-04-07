@@ -2944,11 +2944,26 @@ public:
     static std::shared_ptr<KeyEvent> Clone(std::shared_ptr<KeyEvent> keyEvent);
  
 public:
+    /**
+    * @brief Constructor of KeyEvent.
+    * @since 8
+    */
     KeyEvent(const KeyEvent& other);
+
+    /**
+     * Virtual destructor of KeyEvent.
+     *
+     * @since 8
+     */
+    virtual ~KeyEvent();
+
     KeyEvent& operator=(const KeyEvent& other) = delete;
     DISALLOW_MOVE(KeyEvent);
-    virtual ~KeyEvent();
- 
+
+    /**
+    * @brief Creates a key event.
+    * @since 8
+    */
     static std::shared_ptr<KeyEvent> Create();
  
     /**
@@ -3059,6 +3074,11 @@ public:
     bool ReadFromParcel(Parcel &in);
  
 protected:
+    /**
+     * @brief Constructs an input event object by using the specified input event type. Generally, this method
+     * is used to construct a base class object when constructing a derived class object.
+     * @since 8
+     */
     explicit KeyEvent(int32_t eventType);
  
 private:

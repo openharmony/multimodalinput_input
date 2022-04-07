@@ -111,14 +111,16 @@ public:
         AXIS_TYPE_UNKNOWN,
 
         /**
-         * Indicates the vertical scroll axis. When you scrall the mouse wheel or make certain gestures on the touchpad, the status of the vertical scroll axis changes.
+         * Indicates the vertical scroll axis. When you scrall the mouse wheel or make certain gestures on the touchpad,
+         * the status of the vertical scroll axis changes.
          * 
          * @since 8
          */
         AXIS_TYPE_SCROLL_VERTICAL,
 
         /**
-         * Indicates the horizontal scroll axis. When you scrall the mouse wheel or make certain gestures on the touchpad, the status of the horizontal scroll axis changes.
+         * Indicates the horizontal scroll axis. When you scrall the mouse wheel or make certain gestures on the touchpad,
+         * the status of the horizontal scroll axis changes.
          * 
          * @since 8
          */
@@ -147,7 +149,8 @@ public:
     static constexpr int32_t SOURCE_TYPE_UNKNOWN = 0;
 
     /**
-     * Indicates that the input source generates events similar to mouse cursor movement, button press and release, and wheel scrolling.
+     * Indicates that the input source generates events similar to mouse cursor movement,
+     * button press and release, and wheel scrolling.
      * 
      * @since 8
      */
@@ -244,7 +247,9 @@ public:
 
         /**
          * @brief Sets whether to enable the pressed state for the pointer.
-         * @param pressed Specifies whether to set the pressed state for the pointer. The value <b>true</b> means to set the pressed state for the pointer, and the <b>false</b> means the opposite.
+         * @param pressed Specifies whether to set the pressed state for the pointer.
+         * The value <b>true</b> means to set the pressed state for the pointer, and the
+         * value <b>false</b> means the opposite.
          * @return void
          * @since 8
          */
@@ -252,7 +257,8 @@ public:
 
         /**
          * @brief Obtains the x coordinate relative to the upper left corner of the screen.
-         * For a touchpad input event, the value is the absolute x coordinate on the touchpad. For other pointer input events, the value is the x coordinate on the target screen.
+         * For a touchpad input event, the value is the absolute x coordinate on the touchpad.
+         * For other pointer input events, the value is the x coordinate on the target screen.
          * @return Returns the x coordinate.
          * @since 8
          */
@@ -268,7 +274,8 @@ public:
 
         /**
          * @brief Obtains the y coordinate relative to the upper left corner of the screen.
-         * For a touchpad input event, the value is the absolute y coordinate on the touchpad. For other pointer input events, the value is the y coordinate on the target screen.
+         * For a touchpad input event, the value is the absolute y coordinate on the touchpad.
+         * For other pointer input events, the value is the y coordinate on the target screen.
          * @return Returns the y coordinate.
          * @since 8
          */
@@ -403,11 +410,26 @@ public:
     };
 
 public:
+    /**
+     * @brief Copy constructor function for PointerEvent
+     * @since 8
+     */
     PointerEvent(const PointerEvent& other);
+
+    /**
+     * Virtual destructor of PointerEvent
+     *
+     * @since 8
+     */
     virtual ~PointerEvent();
+
     PointerEvent& operator=(const PointerEvent& other) = delete;
     DISALLOW_MOVE(PointerEvent);
 
+    /**
+     * @brief Create PointerEvent object
+     * @since 8
+     */
     static std::shared_ptr<PointerEvent> Create();
 
     /**
@@ -581,7 +603,11 @@ public:
     void SetAxisValue(AxisType axis, double axisValue);
 
     /**
+<<<<<<< Updated upstream
      * @brief Clear the axis value.
+=======
+     * @brief Clear the axis value of PointerEvent when a mouse event is received.
+>>>>>>> Stashed changes
      * @return void
      * @since 8
      */
@@ -651,6 +677,11 @@ public:
     bool ReadFromParcel(Parcel &in);
 
 protected:
+    /**
+     * @brief Constructs an input event object by using the specified input event type. Generally, this method
+     * is used to construct a base class object when constructing a derived class object.
+     * @since 8
+     */
     explicit PointerEvent(int32_t eventType);
 
 private:
