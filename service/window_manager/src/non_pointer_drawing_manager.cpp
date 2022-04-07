@@ -15,8 +15,7 @@
 
 #include "non_pointer_drawing_manager.h"
 
-#include <display_type.h>
-
+#include "display_type.h"
 #include "define_multimodal.h"
 #include "input_device_manager.h"
 #include "mmi_log.h"
@@ -26,11 +25,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NonPointerDrawingManager" };
 } // namespace
-} // namespace MMI
-} // namespace OHOS
 
-namespace OHOS {
-namespace MMI {
 NonPointerDrawingManager::NonPointerDrawingManager() {}
 
 NonPointerDrawingManager::~NonPointerDrawingManager() {}
