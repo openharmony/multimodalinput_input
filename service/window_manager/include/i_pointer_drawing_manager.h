@@ -16,7 +16,6 @@
 #ifndef I_POINTER_DRAWING_MANAGER_H
 #define I_POINTER_DRAWING_MANAGER_H
 
-#include <iostream>
 #include "struct_multimodal.h"
 
 namespace OHOS {
@@ -24,11 +23,11 @@ namespace MMI {
 class IPointerDrawingManager {
 public:
     IPointerDrawingManager() = default;
-    ~IPointerDrawingManager() = default;
+    virtual ~IPointerDrawingManager() = default;
     
     static std::shared_ptr<IPointerDrawingManager> GetInstance();
-    virtual void DrawPointer(int32_t, int32_t, int32_t) = 0;
-    virtual void OnDisplayInfo(int32_t, int32_t, int32_t) = 0;
+    virtual void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY) = 0;
+    virtual void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height) = 0;
     virtual bool Init() = 0;
 };
 std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ = nullptr;
