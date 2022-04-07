@@ -22,6 +22,7 @@
 
 #include "event_dump.h"
 #include "input_windows_manager.h"
+#include "i_pointer_drawing_manager.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "timer_manager.h"
@@ -174,19 +175,16 @@ int32_t MMIService::Init()
     MMI_HILOGD("EventDump Init");
     MMIEventDump->Init(*this);
 
-    MMI_HILOGD("PointerDrawingManager Init");
-    if (iPointDrawMgr_ == nullptr) {
-        iPointDrawMgr_ = IPointerDrawingManager::Create();
-    }
-    if (!iPointDrawMgr_->Init()) {
-        MMI_HILOGE("Pointer draw init failed");
-        return POINTER_DRAW_INIT_FAIL;
-    }
-
     MMI_HILOGD("WindowsManager Init");
-    if (!WinMgr->Init(*this, iPointDrawMgr_)) {
+    if (!WinMgr->Init(*this)) {
         MMI_HILOGE("Windows message init failed");
         return WINDOWS_MSG_INIT_FAIL;
+    }
+
+    MMI_HILOGD("PointerDrawingManager Init");
+    if (!IPointerDrawingManager::GetInstance()->Init()) {
+        MMI_HILOGE("Pointer draw init failed");
+        return POINTER_DRAW_INIT_FAIL;
     }
 
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);

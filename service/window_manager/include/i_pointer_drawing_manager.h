@@ -26,11 +26,12 @@ public:
     IPointerDrawingManager() = default;
     ~IPointerDrawingManager() = default;
     
-    static std::shared_ptr<IPointerDrawingManager> Create();
+    static std::shared_ptr<IPointerDrawingManager> GetInstance();
     virtual void DrawPointer(int32_t, int32_t, int32_t) = 0;
     virtual void OnDisplayInfo(int32_t, int32_t, int32_t) = 0;
     virtual bool Init() = 0;
 };
+std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ = nullptr;
 } // namespace MMI
 } // namespace OHOS
 #endif // I_POINTER_DRAWING_MANAGER_H

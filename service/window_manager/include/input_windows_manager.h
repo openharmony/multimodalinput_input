@@ -23,7 +23,6 @@
 
 #include "display_info.h"
 #include "input_event.h"
-#include "i_pointer_drawing_manager.h"
 #include "pointer_event.h"
 #include "uds_server.h"
 
@@ -40,7 +39,7 @@ public:
     virtual ~InputWindowsManager();
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
 
-    bool Init(UDSServer& udsServer, std::shared_ptr<IPointerDrawingManager> iPointDrawMgr);
+    bool Init(UDSServer& udsServer);
     void UpdateSeatsInfo();
     void UpdateScreensInfo();
 
@@ -81,7 +80,6 @@ private:
     std::vector<LogicalDisplayInfo> logicalDisplays_ = {};
     std::map<int32_t, WindowInfo> windowInfos_ = {};
     MouseLocation mouseLoction_ = {-1, -1};
-    std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ = nullptr;
 };
 
 #define WinMgr InputWindowsManager::GetInstance()

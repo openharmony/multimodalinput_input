@@ -25,7 +25,6 @@
 #include "system_ability.h"
 
 #include "input_event_handler.h"
-#include "i_pointer_drawing_manager.h"
 #include "multimodal_input_connect_stub.h"
 #include "libinput_adapter.h"
 #include "server_msg_handler.h"
@@ -76,7 +75,6 @@ private:
     LibinputAdapter libinputAdapter_;
     UDSServer udsServer_;
     ServerMsgHandler sMsgHandler_;
-    std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
