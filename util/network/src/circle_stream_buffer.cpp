@@ -12,11 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "circular_stream_buffer.h"
+#include "circle_stream_buffer.h"
 
 namespace OHOS {
 namespace MMI {
-void CircularStreamBuffer::MoveMemoryToBegin()
+void CircleStreamBuffer::MoveMemoryToBegin()
 {
     size_t unreadSize = UnreadSize();
     if (unreadSize == 0 || rIdx_ == 0) {
@@ -32,7 +32,7 @@ void CircularStreamBuffer::MoveMemoryToBegin()
     wIdx_ = static_cast<int32_t>(unreadSize);
 }
 
-bool CircularStreamBuffer::Write(const char *buf, size_t size)
+bool CircleStreamBuffer::Write(const char *buf, size_t size)
 {
     size_t aviSize = AvailableSize();
     if (size > aviSize) {

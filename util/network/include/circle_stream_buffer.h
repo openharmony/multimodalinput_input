@@ -12,18 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef CIRCULAR_STEREAM_BUFFER_H
-#define CIRCULAR_STEREAM_BUFFER_H
+#ifndef CIRCLE_STEREAM_BUFFER_H
+#define CIRCLE_STEREAM_BUFFER_H
 #include "stream_buffer.h"
 
 namespace OHOS {
 namespace MMI {
-class CircularStreamBuffer : public StreamBuffer {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "CircularStreamBuffer"};
+class CircleStreamBuffer : public StreamBuffer {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "CircleStreamBuffer"};
 public:
-    CircularStreamBuffer() = default;
-    virtual ~CircularStreamBuffer() = default;
-    DISALLOW_COPY_AND_MOVE(CircularStreamBuffer);
+    CircleStreamBuffer() = default;
+    virtual ~CircleStreamBuffer() = default;
+    DISALLOW_COPY_AND_MOVE(CircleStreamBuffer);
 
     size_t AvailableSize() const
     {
@@ -37,4 +37,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // CIRCULAR_STEREAM_BUFFER_H
+#endif // CIRCLE_STEREAM_BUFFER_H

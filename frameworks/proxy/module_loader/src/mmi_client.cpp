@@ -176,9 +176,8 @@ void MMIClient::OnRecvMsg(const char *buf, size_t size)
         return;
     }
     
-    constexpr int32_t maxPressLimit = 100;
     constexpr int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
-    for (int32_t i = 0; i < maxPressLimit; i++) {
+    for (int32_t i = 0; i < ONCE_PROCESS_NETPACKET_LIMIT; i++) {
         const int32_t unreadSize = static_cast<int32_t>(circBuf_.UnreadSize());
         if (unreadSize < headSize) {
             break;
