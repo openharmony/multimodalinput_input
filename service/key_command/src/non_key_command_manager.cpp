@@ -26,7 +26,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NonKe
 bool NonKeyCommandManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> key)
 {
     CHKPF(key);
-    MMI_LOGI("KeyCommand is not supported");
+    MMI_HILOGI("KeyCommand is not supported");
     return true;
 }
 
