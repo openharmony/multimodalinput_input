@@ -255,9 +255,12 @@ bool PointerDrawingManager::Init()
     return true;
 }
 
-std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::Create()
+std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
 {
-    return std::make_shared<PointerDrawingManager>();
+    if (iPointDrawMgr_ == nullptr) {
+        iPointDrawMgr_ = std::make_shared<PointerDrawingManager>();
+    }
+    return iPointDrawMgr_;
 }
 } // namespace MMI
 } // namespace OHOS
