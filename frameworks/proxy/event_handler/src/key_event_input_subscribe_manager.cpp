@@ -142,11 +142,14 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     
     std::lock_guard<std::mutex> guard(mtx_);
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
-    if (!PostTask(subscribeId, std::bind(&KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask,
-        this, event, subscribeId))) {
-        MMI_HILOGE("post task failed");
-        return RET_ERR;
-    }
+    auto obj = GetSubscribeKeyEvent(subscribeId);
+    CHKPV(obj);
+    obj->GetCallback()(event);
+    // if (!PostTask(subscribeId, std::bind(&KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask,
+    //     this, event, subscribeId))) {
+    //     MMI_HILOGE("post task failed");
+    //     return RET_ERR;
+    // }
     MMI_HILOGD("key event id:%{public}d keyCode:%{public}d", subscribeId, event->GetKeyCode());
     return RET_OK;
 }
