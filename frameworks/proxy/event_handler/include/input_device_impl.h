@@ -63,7 +63,7 @@ public:
 private:
     const DevInfo* GetDeviceInfo(int32_t) const;
     const DevIds* GetDeviceIds(int32_t) const;
-    const DevIds* GetDeviceKeys(int32_t) const;
+    const DevKeys* GetDeviceKeys(int32_t) const;
     void OnInputDeviceTask(InputDeviceImpl::DevInfo devInfo, int32_t userData,
         int32_t id, std::string name, int32_t deviceId);
     void OnInputDeviceIdsTask(InputDeviceImpl::DevIds devIds, int32_t userData, std::vector<int32_t> ids);
