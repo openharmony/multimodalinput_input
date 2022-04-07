@@ -146,6 +146,13 @@ public:
     void SetId(int32_t id);
 
     /**
+     * @brief Updates the unique ID of an input event.
+     * @return void
+     * @since 8
+     */
+    void UpdateId();
+
+    /**
      * @brief Obtains the time when the action for this input event occurs.
      * @return Returns the time when the action for this input event occurs.
      * @since 8
