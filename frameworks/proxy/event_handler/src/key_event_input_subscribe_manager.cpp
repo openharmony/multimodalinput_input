@@ -143,7 +143,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     std::lock_guard<std::mutex> guard(mtx_);
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
     auto obj = GetSubscribeKeyEvent(subscribeId);
-    CHKPV(obj);
+    CHKPR(obj, RET_ERR);
     obj->GetCallback()(event);
     // if (!PostTask(subscribeId, std::bind(&KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask,
     //     this, event, subscribeId))) {
