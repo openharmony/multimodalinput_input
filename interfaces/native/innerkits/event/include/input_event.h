@@ -262,7 +262,7 @@ public:
      * @return Returns the type of the this input event.
      * @since 8
      */
-    int32_t GetEventType() const;
+    int32_t DumpEventType() const;
 
     /**
      * @brief Obtains all flags of an input event.
