@@ -27,7 +27,7 @@ bool NonKeyCommandManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> ke
 {
     CHKPF(key);
     MMI_HILOGI("KeyCommand is not supported");
-    return true;
+    return false;
 }
 
 std::shared_ptr<IKeyCommandManager> IKeyCommandManager::Create()
