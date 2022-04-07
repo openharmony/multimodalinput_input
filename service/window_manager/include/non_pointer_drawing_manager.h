@@ -34,9 +34,9 @@ public:
     virtual ~NonPointerDrawingManager();
     DISALLOW_COPY_AND_MOVE(NonPointerDrawingManager);
     
-    void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY);
-    void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height);
-    void UpdatePointerDevice(bool hasPointerDevice);
+    void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY) override;
+    void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height) override;
+    void UpdatePointerDevice(bool hasPointerDevice) override;
     bool Init();
 };
 } // namespace MMI
