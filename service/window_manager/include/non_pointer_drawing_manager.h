@@ -37,7 +37,7 @@ public:
     void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY) override;
     void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height) override;
     void UpdatePointerDevice(bool hasPointerDevice) override;
-    bool Init();
+    bool Init() override;
 };
 } // namespace MMI
 } // namespace OHOS
