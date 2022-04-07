@@ -86,7 +86,12 @@ std::string InjectionEventDispatch::GetFileExtendName(const std::string& fileNam
 
 int32_t InjectionEventDispatch::GetFileSize(const std::string& fileName)
 {
-    FILE* pFile = fopen(fileName.c_str(), "rb");
+    char realPath[PATH_MAX] = {};
+    if (realpath(fileName.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("path is error, path:%{public}s", fileName.c_str());
+        return RET_ERR;
+    }
+    FILE* pFile = fopen(realPath, "rb");
     if (pFile) {
         fseek(pFile, 0, SEEK_END);
         long fileSize = ftell(pFile);
@@ -278,7 +283,7 @@ bool InjectionEventDispatch::CheckCode(const std::string& inputCode)
     }
     bool isCodeNumber = regex_match(inputCode, std::regex("\\d+"));
     if (isCodeNumber) {
-        uint16_t numberCode = stoi(inputCode);
+        int32_t numberCode = stoi(inputCode);
         if ((numberCode >= 0) && (numberCode <= UINT16_MAX)) {
             return true;
         }
@@ -294,7 +299,7 @@ bool InjectionEventDispatch::CheckType(const std::string& inputType)
     }
     bool isTypeNumber = regex_match(inputType, std::regex("\\d+"));
     if (isTypeNumber) {
-        uint16_t numberType = stoi(inputType);
+        int32_t numberType = stoi(inputType);
         if ((numberType >= 0) && (numberType <= INPUT_TYPE_MAX)) {
             return true;
         }
