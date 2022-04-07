@@ -805,7 +805,7 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
 {
     const int precision = 2;
     std::vector<int32_t> pointerIds { pointerEvent.GetPointersIdList() };
-    ostream << "EventType:" << pointerEvent.DumpEventType()
+    ostream << "EventType:" << pointerEvent.GetEventType()
          << ",ActionTime:" << pointerEvent.GetActionTime()
          << ",Action:" << pointerEvent.GetAction()
          << ",ActionStartTime:" << pointerEvent.GetActionStartTime()
