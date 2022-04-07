@@ -66,9 +66,9 @@ std::shared_ptr<InputEvent> InputEvent::Create()
     return event;
 }
 
-const char* InputEvent::EventTypeToString(pointerEvent->GetEventType())
+const char* InputEvent::EventTypeToString(int32_t eventType)
 {
-    switch (pointerEvent->GetEventType()) {
+    switch (eventType) {
         case InputEvent::EVENT_TYPE_BASE:{
             return "base";
         }

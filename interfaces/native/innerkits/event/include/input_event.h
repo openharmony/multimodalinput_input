@@ -121,7 +121,7 @@ public:
      * @return Returns the string converted from the input event type.
      * @since 8
      */
-    static const char* EventTypeToString(pointerEvent->GetEventType());
+    static const char* EventTypeToString(int32_t eventType);
 
    /**
     * @brief Resets an input event to the initial state.
