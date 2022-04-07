@@ -39,19 +39,9 @@ public:
         fd_ = fd;
     }
 
-    SessionPtr OnAcceptUnitTest()
-    {
-        return OnAccept();
-    }
-
     void OnRecvUnitTest(int32_t fd, const char *buf, size_t size)
     {
         OnRecv(fd,  buf, size);
-    }
-
-    void OnEventUnitTest(const struct epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
-    {
-        OnEvent(ev, bufMap);
     }
 };
 
@@ -113,12 +103,6 @@ HWTEST_F(UDSServerTest, Multicast, TestSize.Level1)
     serObj.Multicast(fds, pkt);
 }
 
-HWTEST_F(UDSServerTest, OnAccept, TestSize.Level1)
-{
-    UDSServerUnitTest serObjUt;
-    serObjUt.OnAcceptUnitTest();
-}
-
 HWTEST_F(UDSServerTest, OnRecv, TestSize.Level1)
 {
     int32_t fd = 1;
@@ -127,16 +111,6 @@ HWTEST_F(UDSServerTest, OnRecv, TestSize.Level1)
 
     UDSServerUnitTest serObjUt;
     serObjUt.OnRecvUnitTest(fd, buf, size);
-}
-
-HWTEST_F(UDSServerTest, OnEvent, TestSize.Level1)
-{
-    struct epoll_event ev = {};
-    ev.events = 5;
-    std::map<int32_t, StreamBufData> bufMap;
-
-    UDSServerUnitTest serObjUt;
-    serObjUt.OnEventUnitTest(ev, bufMap);
 }
 
 HWTEST_F(UDSServerTest, Stop_001, TestSize.Level1)

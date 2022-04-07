@@ -40,7 +40,7 @@ JsUtil::CallbackInfo::~CallbackInfo()
 {
     CALL_LOG_ENTER;
     if (ref != nullptr) {
-        CHKRV(env, napi_delete_reference(env, ref), "napi_create_int32");
+        CHKRV(env, napi_delete_reference(env, ref), "napi_delete_reference");
     }
 }
 } // namespace MMI

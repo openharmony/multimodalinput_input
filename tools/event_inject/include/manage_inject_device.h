@@ -27,7 +27,7 @@ public:
     ManageInjectDevice() = default;
     ~ManageInjectDevice() = default;
     DISALLOW_COPY_AND_MOVE(ManageInjectDevice);
-    int32_t TransformJsonData(const Json& configData);
+    int32_t TransformJsonData(const DeviceItems& configData);
 private:
     int32_t SendEvent(const InputEventArray& inputEventArray);
     int32_t SendEventToHdi(const InputEventArray& inputEventArray);
