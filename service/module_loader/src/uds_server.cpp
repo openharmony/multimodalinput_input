@@ -184,7 +184,7 @@ void UDSServer::AddPermission(SessionPtr sess)
     
     if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) ==
         Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
-        MMI_HILOGD("get type flag is TOKEN_HAP");
+        MMI_HILOGD("type flag matched");
         int32_t result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionMonitor);
         MMI_HILOGD("verify access result:%{public}d", result);
         if (result != Security::AccessToken::PERMISSION_GRANTED) {
