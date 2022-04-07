@@ -26,6 +26,8 @@ public:
     virtual ~VirtualDevice();
     DISALLOW_COPY_AND_MOVE(VirtualDevice);
     static bool ViewDirectory(std::vector<std::string>& fileList);
+    static bool ClearFileResidues(const std::string procressPath, const std::string fileName);
+    static bool ReadFile(const std::string catName, std::string& temp);
     static bool SyncSymbolFile();
     bool DoIoctl(int32_t fd, int32_t request, const uint32_t value);
     bool CreateKey();

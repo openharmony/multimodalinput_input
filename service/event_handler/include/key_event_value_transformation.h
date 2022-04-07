@@ -20,14 +20,15 @@
 
 namespace OHOS {
 namespace MMI {
-struct KeyEventValueTransformations {
+struct KeyEventValueTransformation {
     std::string keyEvent;
-    int16_t keyValueOfNative;
-    int16_t keyValueOfSys;
-    int16_t keyEventOfSys;
+    int32_t nativeKeyValue;
+    int32_t sysKeyValue;
+    int32_t sysKeyEvent;
 };
 
-KeyEventValueTransformations KeyValueTransformationInput(int16_t keyValueOfInput);
+KeyEventValueTransformation TransferKeyValue(int32_t keyValueOfInput);
+int32_t InputTransformationKeyValue(int32_t keyCode);
 } // namespace MMI
 } // namespace OHOS
 #endif // KEY_EVENT_VALUE_TRANSFORMATION_H

@@ -83,6 +83,7 @@ private:
     bool CheckValue(const std::string& inputValue);
     bool CheckEventValue(const std::string& inputType, const std::string& inputCode,
     const std::string& inputValue);
+    bool ReadFile(const std::string &jsonFile, std::string &jsonBuf);
 
 private:
     static constexpr uint32_t SEND_EVENT_ARGV_COUNTS = 5;

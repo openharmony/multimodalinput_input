@@ -21,84 +21,31 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ProcessingJoystickDevice" };
 } // namespace
 
-int32_t ProcessingJoystickDevice::TransformJsonDataToInputData(const Json& originalEvent,
+int32_t ProcessingJoystickDevice::TransformJsonDataToInputData(const DeviceItem& originalEvent,
                                                                InputEventArray& inputEventArray)
 {
     CALL_LOG_ENTER;
-    if (originalEvent.empty()) {
-        return RET_ERR;
-    }
-    if (originalEvent.find("events") == originalEvent.end()) {
+    if (originalEvent.events.empty()) {
         MMI_HILOGE("manage joystick array faild, inputData is empty");
         return RET_ERR;
     }
-    Json inputData = originalEvent.at("events");
+    std::vector<DeviceEvent> inputData = originalEvent.events;
     if (inputData.empty()) {
         MMI_HILOGE("manage finger array faild, inputData is empty");
         return RET_ERR;
     }
-    std::vector<JoystickEvent> JoystickEventArray;
-    if (AnalysisJoystickEvent(inputData, JoystickEventArray) == RET_ERR) {
-        return RET_ERR;
-    }
-    TransformPadEventToInputEvent(JoystickEventArray, inputEventArray);
+    TransformPadEventToInputEvent(inputData, inputEventArray);
     return RET_OK;
 }
 
-int32_t ProcessingJoystickDevice::AnalysisJoystickEvent(const Json& inputData,
-                                                        std::vector<JoystickEvent>& JoystickEventArray)
-{
-    JoystickEvent joystickEvent = {};
-    for (const auto &item : inputData) {
-        joystickEvent = {};
-        std::string eventType = item.at("eventType").get<std::string>();
-        if ((item.find("blockTime")) != item.end()) {
-            joystickEvent.blockTime = item.at("blockTime").get<int64_t>();
-        }
-        joystickEvent.eventType = eventType;
-        if ((eventType == "KEY_EVENT_CLICK") || (eventType == "KEY_EVENT_PRESS") ||
-            (eventType == "KEY_EVENT_RELEASE")) {
-            if ((item.find("keyValue")) == item.end()) {
-                MMI_HILOGE("not find keyValue On Event:%{public}s", eventType.c_str());
-                return RET_ERR;
-            }
-            joystickEvent.keyValue = item.at("keyValue").get<int32_t>();
-        } else if (eventType == "THROTTLE") {
-            if ((item.find("keyValue")) == item.end()) {
-                MMI_HILOGE("not find keyValue On Event:%{public}s", eventType.c_str());
-                return RET_ERR;
-            }
-            joystickEvent.keyValue = item.at("keyValue").get<int32_t>();
-        } else if ((eventType == "ROCKER_1")) {
-            if ((item.find("event")) == item.end()) {
-                MMI_HILOGE("not find event On Event:%{public}s", eventType.c_str());
-                return RET_ERR;
-            }
-            if ((item.find("direction")) == item.end()) {
-                MMI_HILOGE("not find direction On Event:%{public}s", eventType.c_str());
-                return RET_ERR;
-            }
-            joystickEvent.gameEvents = item.at("event").get<std::vector<int32_t>>();
-            joystickEvent.direction = item.at("direction").get<std::string>();
-        } else if (eventType == "DERECTION_KEY") {
-            if ((item.find("direction")) == item.end()) {
-                MMI_HILOGE("not find direction On Event:%{public}s", eventType.c_str());
-                return RET_ERR;
-            }
-            joystickEvent.direction = item.at("direction").get<std::string>();
-        } else {
-            continue;
-        }
-        JoystickEventArray.push_back(joystickEvent);
-    }
-
-    return RET_OK;
-}
-
-void ProcessingJoystickDevice::TransformPadEventToInputEvent(const std::vector<JoystickEvent>& JoystickEventArray,
+void ProcessingJoystickDevice::TransformPadEventToInputEvent(const std::vector<DeviceEvent>& inputData,
                                                              InputEventArray& inputEventArray)
 {
-    for (const auto &item : JoystickEventArray) {
+    for (const auto &item : inputData) {
+        if (item.eventType.empty()) {
+            MMI_HILOGW("not find eventType");
+            return;
+        }
         if (item.eventType == "KEY_EVENT_PRESS") {
             TransformKeyPressEvent(item, inputEventArray);
         } else if (item.eventType == "KEY_EVENT_RELEASE") {
@@ -115,7 +62,7 @@ void ProcessingJoystickDevice::TransformPadEventToInputEvent(const std::vector<J
     }
 }
 
-void ProcessingJoystickDevice::TransformKeyPressEvent(const JoystickEvent& joystickEvent,
+void ProcessingJoystickDevice::TransformKeyPressEvent(const DeviceEvent& joystickEvent,
                                                       InputEventArray& inputEventArray)
 {
     uint16_t keyValue = static_cast<uint16_t>(joystickEvent.keyValue);
@@ -123,7 +70,7 @@ void ProcessingJoystickDevice::TransformKeyPressEvent(const JoystickEvent& joyst
     SetSynReport(inputEventArray);
 }
 
-void ProcessingJoystickDevice::TransformKeyReleaseEvent(const JoystickEvent& joystickEvent,
+void ProcessingJoystickDevice::TransformKeyReleaseEvent(const DeviceEvent& joystickEvent,
                                                         InputEventArray& inputEventArray)
 {
     uint16_t keyValue = static_cast<uint16_t>(joystickEvent.keyValue);
@@ -131,7 +78,7 @@ void ProcessingJoystickDevice::TransformKeyReleaseEvent(const JoystickEvent& joy
     SetSynReport(inputEventArray);
 }
 
-void ProcessingJoystickDevice::TransformKeyClickEvent(const JoystickEvent& joystickEvent,
+void ProcessingJoystickDevice::TransformKeyClickEvent(const DeviceEvent& joystickEvent,
                                                       InputEventArray& inputEventArray)
 {
     uint16_t keyValue = static_cast<uint16_t>(joystickEvent.keyValue);
@@ -141,11 +88,19 @@ void ProcessingJoystickDevice::TransformKeyClickEvent(const JoystickEvent& joyst
     SetSynReport(inputEventArray);
 }
 
-void ProcessingJoystickDevice::TransformRocker1Event(const JoystickEvent& joystickEvent,
+void ProcessingJoystickDevice::TransformRocker1Event(const DeviceEvent& joystickEvent,
                                                      InputEventArray& inputEventArray)
 {
+    if (joystickEvent.direction.empty()) {
+        MMI_HILOGW("not find direction");
+        return;
+    }
+    if (joystickEvent.event.empty()) {
+        MMI_HILOGW("not find event");
+        return;
+    }
     std::string direction = joystickEvent.direction;
-    for (const auto &item : joystickEvent.gameEvents) {
+    for (const auto &item : joystickEvent.event) {
         if ((direction == "left")||(direction == "right")) {
             SetEvAbsX(inputEventArray, 0, item);
         } else if ((direction == "up") || (direction == "down")) {
@@ -169,9 +124,13 @@ void ProcessingJoystickDevice::TransformRocker1Event(const JoystickEvent& joysti
 }
 
 
-void ProcessingJoystickDevice::TransformDerectionKeyEvent(const JoystickEvent& joystickEvent,
+void ProcessingJoystickDevice::TransformDerectionKeyEvent(const DeviceEvent& joystickEvent,
                                                           InputEventArray& inputEventArray)
 {
+    if (joystickEvent.direction.empty()) {
+        MMI_HILOGW("not find direction");
+        return;
+    }
     std::string direction = joystickEvent.direction;
     if (direction == "left") {
         SetEvAbsHat0X(inputEventArray, 0, -1);
@@ -198,7 +157,7 @@ void ProcessingJoystickDevice::TransformDerectionKeyEvent(const JoystickEvent& j
     }
 }
 
-void ProcessingJoystickDevice::TransformThrottle1Event(const JoystickEvent& joystickEvent,
+void ProcessingJoystickDevice::TransformThrottle1Event(const DeviceEvent& joystickEvent,
                                                        InputEventArray& inputEventArray)
 {
     SetThrottle(inputEventArray, joystickEvent.blockTime, joystickEvent.keyValue);

@@ -22,28 +22,20 @@
 namespace OHOS {
 namespace MMI {
 class ProcessingJoystickDevice : public DeviceBase {
-    struct JoystickEvent {
-        std::string eventType;
-        std::string direction;
-        int32_t keyValue;
-        int64_t blockTime;
-        std::vector<int32_t> gameEvents;
-    };
 public:
     ProcessingJoystickDevice() = default;
     ~ProcessingJoystickDevice() = default;
     DISALLOW_COPY_AND_MOVE(ProcessingJoystickDevice);
-    int32_t TransformJsonDataToInputData(const Json& originalEvent, InputEventArray& inputEventArray);
+    int32_t TransformJsonDataToInputData(const DeviceItem& originalEvent, InputEventArray& inputEventArray);
 private:
-    int32_t AnalysisJoystickEvent(const Json& inputData, std::vector<JoystickEvent>& JoystickEventArray);
-    void TransformPadEventToInputEvent(const std::vector<JoystickEvent>& JoystickEventArray,
+    void TransformPadEventToInputEvent(const std::vector<DeviceEvent>& inputData,
                                        InputEventArray& inputEventArray);
-    void TransformKeyPressEvent(const JoystickEvent& joystickEvent, InputEventArray& inputEventArray);
-    void TransformKeyReleaseEvent(const JoystickEvent& joystickEvent, InputEventArray& inputEventArray);
-    void TransformKeyClickEvent(const JoystickEvent& joystickEvent, InputEventArray& inputEventArray);
-    void TransformRocker1Event(const JoystickEvent& joystickEvent, InputEventArray& inputEventArray);
-    void TransformDerectionKeyEvent(const JoystickEvent& joystickEvent, InputEventArray& inputEventArray);
-    void TransformThrottle1Event(const JoystickEvent& joystickEvent, InputEventArray& inputEventArray);
+    void TransformKeyPressEvent(const DeviceEvent& joystickEvent, InputEventArray& inputEventArray);
+    void TransformKeyReleaseEvent(const DeviceEvent& joystickEvent, InputEventArray& inputEventArray);
+    void TransformKeyClickEvent(const DeviceEvent& joystickEvent, InputEventArray& inputEventArray);
+    void TransformRocker1Event(const DeviceEvent& joystickEvent, InputEventArray& inputEventArray);
+    void TransformDerectionKeyEvent(const DeviceEvent& joystickEvent, InputEventArray& inputEventArray);
+    void TransformThrottle1Event(const DeviceEvent& joystickEvent, InputEventArray& inputEventArray);
 private:
     static constexpr int32_t default_absx_value = 8188;
     static constexpr int32_t default_absy_value = 8192;
