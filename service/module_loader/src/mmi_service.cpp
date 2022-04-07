@@ -180,13 +180,12 @@ int32_t MMIService::Init()
         MMI_HILOGE("Windows message init failed");
         return WINDOWS_MSG_INIT_FAIL;
     }
-
     MMI_HILOGD("PointerDrawingManager Init");
     if (!IPointerDrawingManager::GetInstance()->Init()) {
         MMI_HILOGE("Pointer draw init failed");
         return POINTER_DRAW_INIT_FAIL;
     }
-
+    
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
     if (mmiFd_ < 0) {
         MMI_HILOGE("Epoll creat failed");
@@ -206,9 +205,7 @@ int32_t MMIService::Init()
 
 void MMIService::OnStart()
 {
-    auto tid = GetThisThreadId();
-    MMI_HILOGD("Thread tid:%{public}" PRId64 "", tid);
-
+    CHK_PIDANDTID();
     int32_t ret = Init();
     if (RET_OK != ret) {
         MMI_HILOGE("Init mmi_service failed");
@@ -222,21 +219,16 @@ void MMIService::OnStart()
 
 void MMIService::OnStop()
 {
-    auto tid = GetThisThreadId();
-    MMI_HILOGD("Thread tid:%{public}" PRId64 "", tid);
-
+    CHK_PIDANDTID();
     UdsStop();
-    if (InputHandler != nullptr) {
-        InputHandler->Clear();
-    }
+    InputHandler->Clear();
     libinputAdapter_.Stop();
     state_ = ServiceRunningState::STATE_NOT_START;
 }
 
 void MMIService::OnDump()
 {
-    auto tid = GetThisThreadId();
-    MMI_HILOGD("Thread tid:%{public}" PRId64 "", tid);
+    CHK_PIDANDTID();
     MMIEventDump->Dump();
 }
 
@@ -317,10 +309,6 @@ void MMIService::OnThread()
 {
     SetThreadName(std::string("mmi_service"));
     uint64_t tid = GetThisThreadId();
-    if (tid <= 0) {
-        MMI_HILOGE("The tid is error, errCode:%{public}d", VAL_NOT_EXP);
-        return;
-    }
     MMI_HILOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
 
     int32_t count = 0;
@@ -350,7 +338,7 @@ void MMIService::OnThread()
             if (it.second.isOverflow) {
                 continue;
             }
-            OnEpollRecv(it.first, it.second.sBuf.Data(), it.second.sBuf.Size());
+            OnRecv(it.first, it.second.sBuf.Data(), it.second.sBuf.Size());
         }
         OnTimer();
     }

@@ -37,16 +37,16 @@ public:
     ProcessingPenDevice() = default;
     ~ProcessingPenDevice() = default;
     DISALLOW_COPY_AND_MOVE(ProcessingPenDevice);
-    int32_t TransformJsonDataToInputData(const Json& inputEventArrays, InputEventArray& inputEventArray);
+    int32_t TransformJsonDataToInputData(const DeviceItem& inputEventArrays, InputEventArray& inputEventArray);
 private:
     void TransformPenEventToInputEvent(const std::vector<PenEvent>& penEventArray, InputEventArray& inputEventArray);
     void SetPenApproachPadEvent(const PenEvent &penEvent, InputEventArray& inputEventArray);
     void SetPenSlidePadEvent(const PenEvent& penEvent, InputEventArray& inputEventArray);
     void SetPenLeavePadEvent(const PenEvent& penEvent, InputEventArray& inputEventArray);
-    int32_t AnalysisPenPadEvent(const Json& inputData, std::vector<PenEvent>& penEventArray);
-    int32_t AnalysisPenApproachPadEvent(const Json& event, std::vector<PenEvent>& penEventArray);
-    int32_t AnalysisPenSlidePadEvent(const Json& event, std::vector<PenEvent>& penEventArray);
-    int32_t AnalysisPenLeavePadEvent(const Json& event, std::vector<PenEvent>& penEventArray);
+    int32_t AnalysisPenPadEvent(const std::vector<DeviceEvent>& inputData, std::vector<PenEvent>& penEventArray);
+    int32_t AnalysisPenApproachPadEvent(const DeviceEvent& event, std::vector<PenEvent>& penEventArray);
+    int32_t AnalysisPenSlidePadEvent(const DeviceEvent& event, std::vector<PenEvent>& penEventArray);
+    int32_t AnalysisPenLeavePadEvent(const DeviceEvent& event, std::vector<PenEvent>& penEventArray);
 private:
     static constexpr int32_t EV_ABS_Z_DEFAULT_VALUE = 450;
     static constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE = 2114;

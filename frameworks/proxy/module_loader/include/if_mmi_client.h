@@ -16,24 +16,25 @@
 #define IF_MMI_CLIENT_H
 
 #include <functional>
-#include <memory>
-
-#include "if_client_msg_handler.h"
 
 namespace OHOS {
 namespace MMI {
 class NetPacket;
 class IfMMIClient;
+using MMIClientPtr = std::shared_ptr<IfMMIClient>;
 typedef std::function<void(const IfMMIClient&)> ConnectCallback;
 class IfMMIClient {
 public:
+    virtual MMIClientPtr GetSharedPtr() = 0;
     virtual bool GetCurrentConnectedStatus() const = 0;
-    virtual bool Start(IClientMsgHandlerPtr msgHdl, bool detachMode) = 0;
+    virtual bool Start() = 0;
     virtual bool SendMessage(const NetPacket& pkt) const = 0;
     virtual void RegisterConnectedFunction(ConnectCallback fun) = 0;
     virtual void RegisterDisconnectedFunction(ConnectCallback fun) = 0;
+    virtual void OnRecvMsg(const char *buf, size_t size) = 0;
+    virtual int32_t Reconnect() = 0;
+    virtual void OnDisconnect() = 0;
 };
-using MMIClientPtr = std::shared_ptr<IfMMIClient>;
 } // namespace MMI
 } // namespace OHOS
 #endif // IF_MMI_CLIENT_H

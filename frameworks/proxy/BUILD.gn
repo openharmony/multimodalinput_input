@@ -13,6 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
+import("//foundation/appexecfwk/standard/appexecfwk.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 module_output_path = "multimodalinput/unit_out"
 
@@ -20,6 +21,7 @@ config("libmmi_client_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
+    "${appexecfwk_path}/interfaces/innerkits/libeventhandler/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
@@ -79,6 +81,8 @@ ohos_shared_library("libmmi-client") {
     "events/src/input_manager.cpp",
     "events/src/key_option.cpp",
     "module_loader/src/mmi_client.cpp",
+    "module_loader/src/mmi_event_handler.cpp",
+    "module_loader/src/mmi_fd_listener.cpp",
   ]
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -106,6 +110,7 @@ ohos_shared_library("libmmi-client") {
   part_name = "input"
   external_deps = [
     "bytrace_standard:bytrace_core",
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "input_device_driver:hdi_input",
     "ipc:ipc_core",
@@ -166,6 +171,7 @@ ohos_unittest("ut-mmi-proxy-out") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]
@@ -282,6 +288,7 @@ ohos_unittest("InputManagerTest") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]

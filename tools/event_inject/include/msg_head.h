@@ -32,11 +32,8 @@
 #include <linux/input.h>
 #include <linux/uinput.h>
 
-#include "nlohmann/json.hpp"
-
 #include "define_multimodal.h"
-
-using Json = nlohmann::json;
+#include "input_parse.h"
 
 /*
  * Structure for docking libinput
