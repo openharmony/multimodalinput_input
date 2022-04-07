@@ -468,7 +468,7 @@ int32_t GetFileSize(const std::string& fileName)
         MMI_HILOGE("path is error, path:%{public}s", fileName.c_str());
         return RET_ERR;
     }
-    FILE* pFile = fopen(realPath.c_str(), "rb");
+    FILE* pFile = fopen(realPath, "rb");
     if (pFile) {
         fseek(pFile, 0, SEEK_END);
         long fileSize = ftell(pFile);
