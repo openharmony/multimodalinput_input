@@ -293,6 +293,15 @@ void UDSServer::ReleaseSession(int32_t fd, struct epoll_event& ev)
     close(fd);
 }
 
+void UDSServer::OnEpollRecv(int32_t fd, struct epoll_event& ev)
+{
+    if (fd < 0) {
+        MMI_HILOGE("Invalid input param fd:%{public}d", fd);
+        return;
+    }
+    auto buf = &circleBufMap_[fd];
+}
+
 void UDSServer::OnEpollRecv(int32_t fd, std::map<int32_t, StreamBufData>& bufMap, struct epoll_event& ev)
 {
     if (fd < 0) {

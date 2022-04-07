@@ -18,7 +18,7 @@
 
 #include "if_mmi_client.h"
 
-#include "circular_stream_buffer.h"
+#include "circle_stream_buffer.h"
 #include "client_msg_handler.h"
 #include "mmi_event_handler.h"
 
@@ -59,7 +59,7 @@ protected:
     ConnectCallback funConnected_;
     ConnectCallback funDisconnected_;
 
-    CircularStreamBuffer circBuf_;
+    CircleStreamBuffer circBuf_;
     std::condition_variable cv_;
     std::thread recvThread_;
     std::shared_ptr<MMIEventHandler> recvEventHandler_ = nullptr;

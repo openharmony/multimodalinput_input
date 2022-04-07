@@ -22,6 +22,7 @@
 
 #include "nocopyable.h"
 
+#include "circle_stream_buffer.h"
 #include "i_uds_server.h"
 #include "uds_session.h"
 #include "uds_socket.h"
@@ -80,8 +81,9 @@ protected:
     std::mutex mux_;
     bool isRunning_ = false;
     MsgServerFunCallback recvFun_ = nullptr;
-    std::map<int32_t, SessionPtr> sessionsMap_ = {};
-    std::map<int32_t, int32_t> idxPidMap_ = {};
+    std::map<int32_t, SessionPtr> sessionsMap_;
+    std::map<int32_t, int32_t> idxPidMap_;
+    std::map<int32_t, CircleStreamBuffer> circleBufMap_;
     std::list<std::function<void(SessionPtr)>> callbacks_;
 };
 } // namespace MMI
