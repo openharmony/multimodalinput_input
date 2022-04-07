@@ -42,6 +42,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerCommand"};
 constexpr int32_t SLEEPTIME = 20;
+constexpr int32_t TOUCHSLEEPTIME = 60;
 constexpr int32_t MOUSE_ID = 2;
 constexpr int32_t TWO_MORE_COMMAND = 2;
 constexpr int32_t THREE_MORE_COMMAND = 3;
@@ -445,7 +446,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         }
                     }
                     /* sleep for a short time after every step to give the divice some time to react */
-                    std::this_thread::sleep_for(std::chrono::milliseconds(3*SLEEPTIME));
+                    std::this_thread::sleep_for(std::chrono::milliseconds(TOUCHSLEEPTIME));
                 }
                 break;
             }
