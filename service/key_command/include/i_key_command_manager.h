@@ -24,8 +24,10 @@ class IKeyCommandManager {
 public:
     IKeyCommandManager() = default;
     virtual ~IKeyCommandManager() = default;
-    static std::shared_ptr<IKeyCommandManager> Create();
-    virtual bool CheckLaunchAbility(const std::shared_ptr<KeyEvent> key) = 0;
+    static std::shared_ptr<IKeyCommandManager> GetInstance();
+    virtual bool HandlerEvent(const std::shared_ptr<KeyEvent> key) = 0;
+public:
+    static inline std::shared_ptr<IKeyCommandManager> keyCommand_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS

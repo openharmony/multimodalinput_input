@@ -13,26 +13,29 @@
  * limitations under the License.
  */
 
-#include "non_key_command_manager.h"
+#include "i_key_command_manager.h"
 
 #include "define_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NonKeyCommandManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IKeyCommandManager" };
 } // namespace
 
-bool NonKeyCommandManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> key)
+bool IKeyCommandManager::HandlerEvent(const std::shared_ptr<KeyEvent> key)
 {
     CHKPF(key);
     MMI_HILOGI("KeyCommand is not supported");
     return false;
 }
 
-std::shared_ptr<IKeyCommandManager> IKeyCommandManager::Create()
+std::shared_ptr<IKeyCommandManager> IKeyCommandManager::GetInstance()
 {
-    return std::make_shared<NonKeyCommandManager>();
+    if (keyCommand_ == nullptr) {
+        keyCommand_ = std::make_shared<IKeyCommandManager>();
+    }
+    return keyCommand_;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -128,7 +128,7 @@ ohos_shared_library("libmmi-server") {
   if (mmi_enable_combinationkey) {
     sources += [ "key_command/src/key_command_manager.cpp" ]
   } else {
-    sources += [ "key_command/src/non_key_command_manager.cpp" ]
+    sources += [ "key_command/src/i_key_command_manager.cpp" ]
   }
 
   sources += [ "module_loader/src/mmi_service.cpp" ]
