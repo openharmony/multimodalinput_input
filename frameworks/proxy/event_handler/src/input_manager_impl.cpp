@@ -36,19 +36,31 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 
 constexpr int32_t MASK_KEY = 1;
 constexpr int32_t MASK_TOUCH = 2;
-constexpr int32_t MASK_TOUCHPAD = 3;
 constexpr int32_t ADD_MASK_BASE = 10;
 
-struct PublicIInputEventConsumer : public IInputEventConsumer {
+struct MonitorEventConsumer : public IInputEventConsumer {
 public:
-    explicit PublicIInputEventConsumer(const std::function<void(std::shared_ptr<PointerEvent>)>& monitor)
+    explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<PointerEvent>)>& monitor)
     {
         if (monitor != nullptr) {
             monitor_ = monitor;
         }
     }
 
-    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const { }
+    explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<KeyEvent>)>& monitor)
+    {
+        if (monitor != nullptr) {
+            keyMonitor_ = monitor;
+        }
+    }
+
+    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
+    {
+        if (keyMonitor_ != nullptr) {
+            keyMonitor_(keyEvent);
+        }
+    }
+
     void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
     {
         if (monitor_ != nullptr) {
@@ -60,6 +72,7 @@ public:
 
 private:
     std::function<void(std::shared_ptr<PointerEvent>)> monitor_;
+    std::function<void(std::shared_ptr<KeyEvent>)> keyMonitor_;
 };
 
 bool InputManagerImpl::InitEventHandler()
@@ -392,17 +405,17 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
 {
     CHKPR(monitor, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> guard(mtx_);
-    int32_t monitorId = InputMonitorMgr.AddInputEventMontior(monitor);
-    monitorId = monitorId * ADD_MASK_BASE + MASK_KEY;
-    return monitorId;
+    auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
+    CHKPR(consumer, ERROR_NULL_POINTER);
+    return InputManagerImpl::AddMonitor(consumer);
 }
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
     CHKPR(monitor, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> guard(mtx_);
-    std::shared_ptr<IInputEventConsumer> consumer =
-        std::make_shared<PublicIInputEventConsumer>(monitor);
+    auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
+    CHKPR(consumer, ERROR_NULL_POINTER);
     return InputManagerImpl::AddMonitor(consumer);
 }
 
@@ -410,30 +423,13 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
 {
     CHKPR(consumer, ERROR_NULL_POINTER);
     int32_t monitorId = monitorManager_.AddMonitor(consumer);
-    monitorId = monitorId * ADD_MASK_BASE + MASK_TOUCH;
     return monitorId;
 }
 
 void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 {
     std::lock_guard<std::mutex> guard(mtx_);
-    int32_t mask = monitorId % ADD_MASK_BASE;
-    monitorId /= ADD_MASK_BASE;
-
-    switch (mask) {
-        case MASK_KEY:
-            InputMonitorMgr.RemoveInputEventMontior(monitorId);
-            break;
-        case MASK_TOUCH:
-            monitorManager_.RemoveMonitor(monitorId);
-            break;
-        case MASK_TOUCHPAD:
-            InputMonitorMgr.RemoveInputEventTouchpadMontior(monitorId);
-            break;
-        default:
-            MMI_HILOGE("Can't find the mask, mask:%{public}d", mask);
-            break;
-    }
+    monitorManager_.RemoveMonitor(monitorId);
 }
 
 void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
