@@ -603,11 +603,7 @@ public:
     void SetAxisValue(AxisType axis, double axisValue);
 
     /**
-<<<<<<< Updated upstream
-     * @brief Clear the axis value.
-=======
      * @brief Clear the axis value of PointerEvent when a mouse event is received.
->>>>>>> Stashed changes
      * @return void
      * @since 8
      */
