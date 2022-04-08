@@ -38,16 +38,16 @@ constexpr int32_t MASK_KEY = 1;
 constexpr int32_t MASK_TOUCH = 2;
 constexpr int32_t ADD_MASK_BASE = 10;
 
-struct PublicIInputEventConsumer : public IInputEventConsumer {
+struct MonitorEventConsumer : public IInputEventConsumer {
 public:
-    explicit PublicIInputEventConsumer(const std::function<void(std::shared_ptr<PointerEvent>)>& monitor)
+    explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<PointerEvent>)>& monitor)
     {
         if (monitor != nullptr) {
             monitor_ = monitor;
         }
     }
 
-    explicit PublicIInputEventConsumer(const std::function<void(std::shared_ptr<KeyEvent>)>& monitor)
+    explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<KeyEvent>)>& monitor)
     {
         if (monitor != nullptr) {
             keyMonitor_ = monitor;
@@ -405,7 +405,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
 {
     CHKPR(monitor, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> guard(mtx_);
-    auto consumer = std::make_shared<PublicIInputEventConsumer>(monitor);
+    auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
     CHKPR(consumer, ERROR_NULL_POINTER);
     return InputManagerImpl::AddMonitor(consumer);
 }
@@ -414,7 +414,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerE
 {
     CHKPR(monitor, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> guard(mtx_);
-    auto consumer = std::make_shared<PublicIInputEventConsumer>(monitor);
+    auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
     CHKPR(consumer, ERROR_NULL_POINTER);
     return InputManagerImpl::AddMonitor(consumer);
 }
