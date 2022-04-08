@@ -28,11 +28,10 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Inter
 
 InterceptorManagerGlobal::InterceptorManagerGlobal() {}
 
-InterceptorManagerGlobal::~InterceptorManagerGlobal() {}
-
 void InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
 {
     CALL_LOG_ENTER;
+    CHKPV(session);
     InterceptorItem interceptorItem = {};
     interceptorItem.sourceType = sourceType;
     interceptorItem.id = id;

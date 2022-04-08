@@ -14,6 +14,7 @@
  */
 
 #include "non_input_interceptor_manager.h"
+#include "input_handler_type.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -22,10 +23,12 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NonInputInterceptorManager" };
 } // namespace
 
+NonInputInterceptorManager::NonInputInterceptorManager() {}
+
 int32_t NonInputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
     CALL_LOG_ENTER;
-    return -1;
+    return INVALID_HANDLER_ID;
 }
 
 void NonInputInterceptorManager::RemoveInterceptor(int32_t interceptorId)

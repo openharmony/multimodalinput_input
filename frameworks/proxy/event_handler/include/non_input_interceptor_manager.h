@@ -23,6 +23,8 @@ namespace OHOS {
 namespace MMI {
 class NonInputInterceptorManager : public IInputInterceptorManager {
 public:
+    NonInputInterceptorManager();
+    ~NonInputInterceptorManager() = default;
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
     void RemoveInterceptor(int32_t interceptorId);
 };

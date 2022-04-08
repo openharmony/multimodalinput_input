@@ -29,15 +29,17 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorHandlerGlobal" };
 } // namespace
 
+InterceptorHandlerGlobal::InterceptorHandlerGlobal() {}
+
 int32_t InterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
     CHKPR(session, RET_ERR);
-    InitSessionLostCallback();
     if (!IsValidHandlerId(handlerId)) {
         MMI_HILOGE("Invalid handler");
         return RET_ERR;
     }
+    InitSessionLostCallback();
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         MMI_HILOGD("Register interceptor:%{public}d", handlerId);
         SessionHandler interceptor { handlerId, handlerType, session };

@@ -23,6 +23,8 @@ namespace OHOS {
 namespace MMI {
 class NonInterceptorManager : public IInterceptorManager {
 public:
+    NonInterceptorManager();
+    ~NonInterceptorManager() = default;
     int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
     int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
     void RemoveInterceptor(int32_t interceptorId);

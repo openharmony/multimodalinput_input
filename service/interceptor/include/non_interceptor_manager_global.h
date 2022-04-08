@@ -21,6 +21,8 @@ namespace OHOS {
 namespace MMI {
 class NonInterceptorManagerGlobal : public IInterceptorManagerGlobal {
 public:
+    NonInterceptorManagerGlobal();
+    ~NonInterceptorManagerGlobal() = default;
     void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session);
     void OnRemoveInterceptor(int32_t id);
     bool OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);

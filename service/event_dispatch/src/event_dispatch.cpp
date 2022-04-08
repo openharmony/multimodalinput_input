@@ -108,10 +108,14 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_HILOGI("Pointer event Filter succeeded");
         return RET_OK;
     }
-    IInterceptorHandlerGlobal::GetInstance()->HandleEvent(point);
+    if (IInterceptorHandlerGlobal::GetInstance()->HandleEvent(point)) {
+        BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
+        MMI_HILOGD("Interception is succeeded");
+        return RET_OK;
+    }
     if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
         BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
-        MMI_HILOGD("Interception and monitor succeeded");
+        MMI_HILOGD("Monitor is succeeded");
         return RET_OK;
     }
     auto fd = WinMgr->UpdateTargetPointer(point);

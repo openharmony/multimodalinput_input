@@ -14,6 +14,7 @@
  */
 
 #include "non_interceptor_manager.h"
+#include "define_multimodal.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -22,17 +23,19 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NonInterceptorManager" };
 } // namespace
 
+NonInterceptorManager::NonInterceptorManager() {}
+
 int32_t NonInterceptorManager::AddInterceptor(int32_t sourceType,
     std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
 {
     CALL_LOG_ENTER;
-    return -1;
+    return RET_ERR;
 }
 
 int32_t NonInterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
     CALL_LOG_ENTER;
-    return -1;
+    return RET_ERR;
 }
 
 void NonInterceptorManager::RemoveInterceptor(int32_t interceptorId)
@@ -44,13 +47,13 @@ void NonInterceptorManager::RemoveInterceptor(int32_t interceptorId)
 int32_t NonInterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id)
 {
     CALL_LOG_ENTER;
-    return -1;
+    return RET_ERR;
 }
 
 int32_t NonInterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> pointerEvent)
 {
     CALL_LOG_ENTER;
-    return -1;
+    return RET_ERR;
 }
 
 std::shared_ptr<IInterceptorManager> IInterceptorManager::GetInstance()
