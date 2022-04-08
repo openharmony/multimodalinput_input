@@ -472,32 +472,32 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                            int32_t stepTime = 16;
-                            int32_t ContStepTime = totalTime / stepTime;
+                            int32_t spaceTime = 16;
+                            int32_t stepTime = totalTime / spaceTime;
                             int32_t vecX = px2 - px1;
                             int32_t vecY = py2 - py1;
                             int32_t stepX = 0;
                             int32_t stepY = 0;
-                            if (!vecX) {
+                            if (vecX == 0) {
                                 stepX = px1;
                             } else {
-                                stepX = vecX / ContStepTime;
+                                stepX = vecX / stepTime;
                             }
-                            if (!vecY) {
+                            if (vecY == 0) {
                                 stepY = py1;
                             } else {
-                                stepY = vecY / ContStepTime;
+                                stepY = vecY / stepTime;
                             }
                             struct timeval tm;
                             gettimeofday(&tm, 0);
                             int64_t blockTime = tm.tv_usec + 16000;
-                            for (int32_t i = 1; i <= ContStepTime; ++i) {
-                                if (!vecX) {
+                            for (int32_t i = 1; i <= stepTime; ++i) {
+                                if (vecX == 0) {
                                     item.SetGlobalX(px1);
                                 } else {
                                     item.SetGlobalX(px1 + (stepX * i));
                                 }
-                                if (!vecY) {
+                                if (vecY == 0) {
                                     item.SetGlobalY(py1);
                                 } else {
                                     item.SetGlobalY(py1 + (stepY * i));
@@ -512,7 +512,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetActionTime(time + totalTime);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             break;
                         }
