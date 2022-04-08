@@ -430,23 +430,7 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
 void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 {
     std::lock_guard<std::mutex> guard(mtx_);
-    int32_t mask = monitorId % ADD_MASK_BASE;
-    monitorId /= ADD_MASK_BASE;
-
-    switch (mask) {
-        case MASK_KEY:
-            InputMonitorMgr.RemoveInputEventMontior(monitorId);
-            break;
-        case MASK_TOUCH:
-            monitorManager_.RemoveMonitor(monitorId);
-            break;
-        case MASK_TOUCHPAD:
-            InputMonitorMgr.RemoveInputEventTouchpadMontior(monitorId);
-            break;
-        default:
-            MMI_HILOGE("Can't find the mask, mask:%{public}d", mask);
-            break;
-    }
+    monitorManager_.RemoveMonitor(monitorId);
 }
 
 void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
