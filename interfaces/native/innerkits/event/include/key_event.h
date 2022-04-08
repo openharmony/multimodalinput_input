@@ -2836,14 +2836,14 @@ public:
         KeyItem();
         ~KeyItem();
  
-        /**
+       /**
         * @brief Obtains the key code of the key.
         * @return Returns the key code.
         * @since 8
         */
         int32_t GetKeyCode() const;
  
-        /**
+       /**
         * @brief Sets a key code for the key.
         * @param keyCode Indicates the key code to set.
         * @return void
@@ -2851,14 +2851,14 @@ public:
         */
         void SetKeyCode(int32_t keyCode);
  
-        /**
+       /**
         * @brief Obtains the time when the key is pressed.
         * @return Returns the time.
         * @since 8
         */
         int64_t GetDownTime() const;
  
-        /**
+       /**
         * @brief Sets the time when the key is pressed.
         * @param downTime Indicates the time to set.
         * @return void
@@ -2866,14 +2866,14 @@ public:
         */
         void SetDownTime(int64_t downTime);
  
-        /**
+       /**
         * @brief Obtains the unique identifier of the device that reports this event.
         * @return Returns the device ID.
         * @since 8
         */
         int32_t GetDeviceId() const;
          
-        /**
+       /**
         * @brief Sets a unique identifier for the device that reports this event.
         * @param deviceId Indicates the device ID to set.
         * @return void
@@ -2881,7 +2881,7 @@ public:
         */
         void SetDeviceId(int32_t deviceId);
  
-        /**
+       /**
         * @brief Checks whether the key is pressed.
         * @return Returns <b>true</b> if the key is pressed; returns <b>false</b> otherwise.
         * @since 8
@@ -2944,11 +2944,26 @@ public:
     static std::shared_ptr<KeyEvent> Clone(std::shared_ptr<KeyEvent> keyEvent);
  
 public:
+    /**
+    * @brief Constructor of KeyEvent.
+    * @since 8
+    */
     KeyEvent(const KeyEvent& other);
+
+    /**
+     * Virtual destructor of KeyEvent.
+     *
+     * @since 8
+     */
+    virtual ~KeyEvent();
+
     KeyEvent& operator=(const KeyEvent& other) = delete;
     DISALLOW_MOVE(KeyEvent);
-    virtual ~KeyEvent();
- 
+
+    /**
+    * @brief Creates a key event.
+    * @since 8
+    */
     static std::shared_ptr<KeyEvent> Create();
  
     /**
@@ -3059,6 +3074,11 @@ public:
     bool ReadFromParcel(Parcel &in);
  
 protected:
+    /**
+     * @brief Constructs an input event object by using the specified input event type. Generally, this method
+     * is used to construct a base class object when constructing a derived class object.
+     * @since 8
+     */
     explicit KeyEvent(int32_t eventType);
  
 private:
