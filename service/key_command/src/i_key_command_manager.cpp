@@ -23,13 +23,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IKeyCommandManager" };
 } // namespace
 
-bool IKeyCommandManager::HandlerEvent(const std::shared_ptr<KeyEvent> key)
-{
-    CHKPF(key);
-    MMI_HILOGI("KeyCommand is not supported");
-    return false;
-}
-
 std::shared_ptr<IKeyCommandManager> IKeyCommandManager::GetInstance()
 {
     if (keyCommand_ == nullptr) {
