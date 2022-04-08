@@ -58,8 +58,10 @@ private:
     std::shared_ptr<IInputEventConsumer> FindHandler(int32_t handlerId);
     EventHandlerPtr GetEventHandler(int32_t handlerId);
     bool PostTask(int32_t handlerId, const AppExecFwk::EventHandler::Callback &callback);
-    void OnKeyEventTask(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent);
-    void OnPointerEventTask(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent);
+    void OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
+        std::shared_ptr<KeyEvent> keyEvent);
+    void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
+        std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
     std::mutex mtxHandlers_;
