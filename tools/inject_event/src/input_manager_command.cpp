@@ -365,6 +365,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
                             item.SetGlobalX(middleValuePx);
                             item.SetGlobalY(middleValuePy);
                             pointerEvent->SetActionTime(time + ACTION_TIME);
@@ -372,6 +373,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
                             item.SetGlobalX(px2);
                             item.SetGlobalY(py2);
                             pointerEvent->SetActionTime(time + DOUBLE_ACTION_TIME);
@@ -379,6 +381,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
                             item.SetGlobalX(px2);
                             item.SetGlobalY(py2);
                             pointerEvent->SetActionTime(time + DOUBLE_ACTION_TIME);
