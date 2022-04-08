@@ -48,7 +48,20 @@ public:
         }
     }
 
-    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const { }
+    explicit PublicIInputEventConsumer(const std::function<void(std::shared_ptr<KeyEvent>)>& monitor)
+    {
+        if (monitor != nullptr) {
+            keyMonitor_ = monitor;
+        }
+    }
+
+    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
+    {
+        if (keyMonitor_ != nullptr) {
+            keyMonitor_(keyEvent);
+        }
+    }
+
     void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
     {
         if (monitor_ != nullptr) {
@@ -60,6 +73,7 @@ public:
 
 private:
     std::function<void(std::shared_ptr<PointerEvent>)> monitor_;
+    std::function<void(std::shared_ptr<KeyEvent>)> keyMonitor_;
 };
 
 bool InputManagerImpl::InitEventHandler()
@@ -392,17 +406,15 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
 {
     CHKPR(monitor, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> guard(mtx_);
-    int32_t monitorId = InputMonitorMgr.AddInputEventMontior(monitor);
-    monitorId = monitorId * ADD_MASK_BASE + MASK_KEY;
-    return monitorId;
+    auto consumer = std::make_shared<PublicIInputEventConsumer>(monitor);
+    return InputManagerImpl::AddMonitor(consumer);
 }
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
     CHKPR(monitor, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> guard(mtx_);
-    std::shared_ptr<IInputEventConsumer> consumer =
-        std::make_shared<PublicIInputEventConsumer>(monitor);
+    auto consumer = std::make_shared<PublicIInputEventConsumer>(monitor);
     return InputManagerImpl::AddMonitor(consumer);
 }
 
@@ -410,7 +422,6 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
 {
     CHKPR(consumer, ERROR_NULL_POINTER);
     int32_t monitorId = monitorManager_.AddMonitor(consumer);
-    monitorId = monitorId * ADD_MASK_BASE + MASK_TOUCH;
     return monitorId;
 }
 
