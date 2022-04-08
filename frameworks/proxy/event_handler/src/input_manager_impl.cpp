@@ -36,7 +36,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 
 constexpr int32_t MASK_KEY = 1;
 constexpr int32_t MASK_TOUCH = 2;
-constexpr int32_t MASK_TOUCHPAD = 3;
 constexpr int32_t ADD_MASK_BASE = 10;
 
 struct PublicIInputEventConsumer : public IInputEventConsumer {
