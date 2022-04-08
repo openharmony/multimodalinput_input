@@ -66,15 +66,13 @@ void InputDeviceImpl::GetKeystrokeAbility(int32_t userData, int32_t deviceId, st
     MMIEventHdl.GetKeystrokeAbility(userData, deviceId, keyCodes);
 }
 
-void InputDeviceImpl::OnInputDeviceTask(int32_t userData, int32_t id, std::string name, int32_t deviceType)
+void InputDeviceImpl::OnInputDeviceTask(InputDeviceImpl::DevInfo devInfo, int32_t userData,
+    int32_t id, std::string name, int32_t deviceType)
 {
     CHK_PIDANDTID();
-    std::lock_guard<std::mutex> guard(mtx_);
-    auto devInfo = GetDeviceInfo(userData);
-    CHKPV(devInfo);
     auto devData = std::make_shared<InputDeviceInfo>(id, name, deviceType);
     CHKPV(devData);
-    devInfo->second(userData, devData);
+    devInfo.second(userData, devData);
     MMI_HILOGD("device info event callback userData:%{public}d id:%{public}d name:%{public}s type:%{public}d",
         userData, id, name.c_str(), deviceType);
 }
@@ -86,20 +84,17 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, const std::str
     auto devInfo = GetDeviceInfo(userData);
     CHKPV(devInfo);
     if (!MMIEventHandler::PostTask(devInfo->first,
-        std::bind(&InputDeviceImpl::OnInputDeviceTask, this, userData, id, name, deviceType))) {
+        std::bind(&InputDeviceImpl::OnInputDeviceTask, this, *devInfo, userData, id, name, deviceType))) {
         MMI_HILOGE("post task failed");
     }
     MMI_HILOGD("device info event userData:%{public}d id:%{public}d name:%{public}s type:%{public}d",
         userData, id, name.c_str(), deviceType);
 }
 
-void InputDeviceImpl::OnInputDeviceIdsTask(int32_t userData, std::vector<int32_t> ids)
+void InputDeviceImpl::OnInputDeviceIdsTask(InputDeviceImpl::DevIds devIds, int32_t userData, std::vector<int32_t> ids)
 {
     CHK_PIDANDTID();
-    std::lock_guard<std::mutex> guard(mtx_);
-    auto devIds = GetDeviceIds(userData);
-    CHKPV(devIds);
-    devIds->second(userData, ids);
+    devIds.second(userData, ids);
     MMI_HILOGD("device ids event callback userData:%{public}d ids:(%{public}s)",
         userData, IdsListToString(ids).c_str());
 }
@@ -111,19 +106,17 @@ void InputDeviceImpl::OnInputDeviceIds(int32_t userData, const std::vector<int32
     auto devIds = GetDeviceIds(userData);
     CHKPV(devIds);
     if (!MMIEventHandler::PostTask(devIds->first,
-        std::bind(&InputDeviceImpl::OnInputDeviceIdsTask, this, userData, ids))) {
+        std::bind(&InputDeviceImpl::OnInputDeviceIdsTask, this, *devIds, userData, ids))) {
         MMI_HILOGE("post task failed");
     }
     MMI_HILOGD("device ids event userData:%{public}d ids:(%{public}s)", userData, IdsListToString(ids).c_str());
 }
 
-void InputDeviceImpl::OnKeystrokeAbilityTask(int32_t userData, std::vector<int32_t> keystrokeAbility)
+void InputDeviceImpl::OnKeystrokeAbilityTask(InputDeviceImpl::DevKeys devKeys, int32_t userData,
+    std::vector<int32_t> keystrokeAbility)
 {
     CHK_PIDANDTID();
-    std::lock_guard<std::mutex> guard(mtx_);
-    auto devKeys = GetDeviceKeys(userData);
-    CHKPV(devKeys);
-    devKeys->second(userData, keystrokeAbility);
+    devKeys.second(userData, keystrokeAbility);
     MMI_HILOGD("device keys event callback userData:%{public}d keys:(%{public}s)",
         userData, IdsListToString(keystrokeAbility).c_str());
 }
@@ -135,7 +128,7 @@ void InputDeviceImpl::OnKeystrokeAbility(int32_t userData, const std::vector<int
     auto devKeys = GetDeviceKeys(userData);
     CHKPV(devKeys);
     if (!MMIEventHandler::PostTask(devKeys->first,
-        std::bind(&InputDeviceImpl::OnKeystrokeAbilityTask, this, userData, keystrokeAbility))) {
+        std::bind(&InputDeviceImpl::OnKeystrokeAbilityTask, this, *devKeys, userData, keystrokeAbility))) {
         MMI_HILOGE("post task failed");
     }
     MMI_HILOGD("device keys event userData:%{public}d ids:(%{public}s)",
