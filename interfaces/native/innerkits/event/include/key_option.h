@@ -31,7 +31,7 @@ public:
     /**
      * @brief Obtains previous keys.
      * @return Returns previous keys.
-     * @since 8
+     * @since 9
      */
     std::set<int32_t> GetPreKeys() const;
 
@@ -40,14 +40,14 @@ public:
      * There is no requirement on the sequence of previous keys.
      * @param preKeys Indicates the previous keys to set.
      * @return void
-     * @since 8
+     * @since 9
      */
     void SetPreKeys(const std::set<int32_t>& preKeys);
 
     /**
      * @brief Obtains the final key.
      * @return Returns the final key.
-     * @since 8
+     * @since 9
      */
     int32_t GetFinalKey() const;
 
@@ -55,14 +55,14 @@ public:
      * @brief Sets the final key, that is, the key that is last pressed or released in a combination key.
      * @param finalKey Indicates the final key.
      * @return void
-     * @since 8
+     * @since 9
      */
     void SetFinalKey(int32_t finalKey);
 
     /**
      * @brief Checks whether the final key in a combination key is pressed or released.
      * @return Returns <b>true</b> if the key is pressed; returns <b>false</b> if the key is released.
-     * @since 8
+     * @since 9
      */
     bool IsFinalKeyDown() const;
 
@@ -71,7 +71,7 @@ public:
      * @param pressed Indicates whether the key is pressed. The value <b>true</b> means that the key
      * is pressed, and the value <b>false</b> means that the key is released.
      * @return void
-     * @since 8
+     * @since 9
      */
     void SetFinalKeyDown(bool pressed);
 
@@ -83,7 +83,7 @@ public:
      * is pressed and when the key is released.
      * @return Returns the duration when the final key is held down or the maximum duration between
      * when the key is pressed and when the key is released.
-     * @since 8
+     * @since 9
      */
     int32_t GetFinalKeyDownDuration() const;
 
@@ -96,7 +96,7 @@ public:
      * @param duration Indicates the duration when the final key is held down or the maximum duration
      * between when the key is pressed and when the key is released.
      * @return void
-     * @since 8
+     * @since 9
      */
     void SetFinalKeyDownDuration(int32_t duration);
 
