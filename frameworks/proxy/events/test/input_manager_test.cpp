@@ -48,7 +48,6 @@ constexpr int32_t N_TRIES_FOR_LOG = 10;
 constexpr int32_t INDEX_FIRST = 1;
 constexpr int32_t INDEX_SECOND = 2;
 constexpr int32_t INDEX_THIRD = 3;
-constexpr int32_t MASK_BASE = 10;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest" };
 } // namespace
 
@@ -190,7 +189,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep1()
 
     MMI_HILOGD("Call InputManager::SimulatePointerEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
     return pointerEvent;
 }
 
@@ -213,13 +212,13 @@ std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep2()
 
     MMI_HILOGD("Call InputManager::SimulatePointerEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
     return pointerEvent;
 }
 
 void InputManagerTest::TestMarkConsumedStep3(int32_t monitorId, int32_t eventId)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
     std::string command {
         "ClientMsgHandler: in OnPointerEvent, #[[:digit:]]\\{1,\\}, "
         "Operation canceled"
@@ -265,7 +264,7 @@ void InputManagerTest::TestMarkConsumedStep4()
 
 void InputManagerTest::TestMarkConsumedStep5()
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
     auto pointerEvent = PointerEvent::Create();
     CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
@@ -314,13 +313,12 @@ void InputManagerTest::TestMarkConsumedStep6()
 
     std::string command {
         "InputManagerImpl: in OnPointerEvent, #[[:digit:]]\\{1,\\}, "
-        "Pointer event received, processing"
+        "pointer event pointerId:[[:digit:]]\\{1,\\}"
     };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
     MMI_HILOGD("Call InputManager::SimulatePointerEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 }
@@ -486,13 +484,15 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.L
 
 std::string InputManagerTest::DumpPointerItem(const PointerEvent::PointerItem &item)
 {
+    const int precision = 2;
     std::ostringstream strm;
     strm << "ClientMsgHandler: in OnPointerEvent, #[[:digit:]]\\{1,\\}, DownTime:" << item.GetDownTime()
-         << ",IsPressed:" << std::boolalpha << item.IsPressed() << ",GlobalX:" << item.GetGlobalX()
-         << ",GlobalY:" << item.GetGlobalY()
+         << ",IsPressed:" << std::boolalpha << item.IsPressed()
+         << ",GlobalX:-\\{0,1\\}[[:digit:]]\\{1,\\},GlobalY:-\\{0,1\\}[[:digit:]]\\{1,\\}"
          << ",LocalX:-\\{0,1\\}[[:digit:]]\\{1,\\},LocalY:-\\{0,1\\}[[:digit:]]\\{1,\\}"
          << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
-         << ",TiltX:" << item.GetTiltX() << ",TiltY:" << item.GetTiltY()
+         << ",TiltX:" << std::fixed << std::setprecision(precision) << item.GetTiltX()
+         << ",TiltY:" << std::fixed << std::setprecision(precision) << item.GetTiltY()
          << ",Pressure:" << item.GetPressure();
     return strm.str();
 }
@@ -620,12 +620,16 @@ void InputManagerTest::TestSimulateInputEvent(std::shared_ptr<PointerEvent> poin
 
     std::string sCmd {
         "InputManagerImpl: in OnPointerEvent, #[[:digit:]]\\{1,\\}, "
-        "Pointer event received, processing"
+        "pointer event pointerId:[[:digit:]]\\{1,\\}"
     };
     std::vector<std::string> sLogs { SearchLog(sCmd, true) };
 
     MMI_HILOGD("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+        InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    }
     int32_t nTries { N_TRIES_FOR_LOG };
     std::bitset<4> states { };
 
@@ -755,7 +759,7 @@ void InputManagerTest::TestSimulateInputEvent_2(std::shared_ptr<PointerEvent> po
 
     std::string sCmd {
         "InputManagerImpl: in OnPointerEvent, #[[:digit:]]\\{1,\\}, "
-        "Pointer event received, processing"
+        "pointer event pointerId:[[:digit:]]\\{1,\\}"
     };
     std::vector<std::string> sLogs { SearchLog(sCmd, true) };
 
@@ -1367,6 +1371,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
     auto pointerEvent = SetupPointerEvent001();
     MMI_HILOGD("InputManagerTest_AddHandler_003");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    
     int32_t nTries { N_TRIES_FOR_LOG };
     std::vector<std::string> rLogs;
 
@@ -1449,7 +1457,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_005, TestSize.Level1)
     MMI_HILOGD("InputManagerTest_AddHandler_005");
     TestMarkConsumedStep1();
     auto pointerEvent = TestMarkConsumedStep2();
-    TestMarkConsumedStep3(monitorId / MASK_BASE, pointerEvent->GetId());
+    TestMarkConsumedStep3(monitorId, pointerEvent->GetId());
     TestMarkConsumedStep4();
     TestMarkConsumedStep5();
 
@@ -1477,7 +1485,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_006, TestSize.Level1)
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     MMI_HILOGD("InputManagerTest_AddHandler_006");
     auto pointerEvent = TestMarkConsumedStep1();
-    TestMarkConsumedStep3(monitorId / MASK_BASE, pointerEvent->GetId());
+    TestMarkConsumedStep3(monitorId, pointerEvent->GetId());
     TestMarkConsumedStep4();
     TestMarkConsumedStep6();
 
@@ -1628,7 +1636,7 @@ std::string InputManagerTest::DumpPointerEvent2(const std::shared_ptr<PointerEve
     const int precision = 2;
     std::ostringstream strm;
     strm << "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
-         << "eventType:" << pointerEvent->GetEventType()
+         << "eventType:" << InputEvent::EventTypeToString(pointerEvent->GetEventType())
          << ",actionTime:" << pointerEvent->GetActionTime()
          << ",action:" << pointerEvent->GetAction()
          << ",actionStartTime:" << pointerEvent->GetActionStartTime()
