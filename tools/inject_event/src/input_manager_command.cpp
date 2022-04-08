@@ -472,7 +472,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                            uint32_t stepTime = 16;
+                            int32_t stepTime = 16;
                             int32_t ContStepTime = totalTime / stepTime;
                             int32_t vecX = px2 - px1;
                             int32_t vecY = py2 - py1;
