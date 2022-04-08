@@ -28,8 +28,9 @@ namespace OHOS {
 namespace MMI {
 class InputInterceptorManager : public IInputInterceptorManager {
 public:
-    InputInterceptorManager() = default;
+    InputInterceptorManager();
     DISALLOW_COPY_AND_MOVE(InputInterceptorManager);
+    ~InputInterceptorManager() = default;
 
 public:
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);

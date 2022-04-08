@@ -23,6 +23,8 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NonInterceptorManagerGlobal" };
 } // namespace
 
+NonInterceptorManagerGlobal::NonInterceptorManagerGlobal() {}
+
 void NonInterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
 {
     CALL_LOG_ENTER;

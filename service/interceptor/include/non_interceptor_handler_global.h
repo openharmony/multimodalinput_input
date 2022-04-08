@@ -22,6 +22,8 @@ namespace OHOS {
 namespace MMI {
 class NonInterceptorHandlerGlobal : public IInterceptorHandlerGlobal {
 public:
+    NonInterceptorHandlerGlobal();
+    ~NonInterceptorHandlerGlobal() = default;
     int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent);

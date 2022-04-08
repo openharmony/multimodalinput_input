@@ -30,8 +30,9 @@ public:
     static constexpr int32_t SOURCETYPE_KEY = 4;
 
 public:
-    InterceptorManager() = default;
+    InterceptorManager();
     DISALLOW_COPY_AND_MOVE(InterceptorManager);
+    ~InterceptorManager() = default;
     int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
     int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
     void RemoveInterceptor(int32_t interceptorId);

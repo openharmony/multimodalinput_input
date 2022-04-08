@@ -28,6 +28,8 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManager" };
 } // namespace
 
+InterceptorManager::InterceptorManager() {}
+
 int32_t InterceptorManager::AddInterceptor(int32_t sourceType,
     std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
 {

@@ -30,8 +30,9 @@ namespace OHOS {
 namespace MMI {
 class InterceptorHandlerGlobal : public IInterceptorHandlerGlobal {
 public:
-    InterceptorHandlerGlobal() = default;
+    InterceptorHandlerGlobal();
     DISALLOW_COPY_AND_MOVE(InterceptorHandlerGlobal);
+    ~InterceptorHandlerGlobal() = default;
     int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
