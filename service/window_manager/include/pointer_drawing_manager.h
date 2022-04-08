@@ -35,8 +35,8 @@ class PointerDrawingManager : public IPointerDrawingManager,
                               public IDeviceObserver,
                               public std::enable_shared_from_this<PointerDrawingManager> {
 public:
-    PointerDrawingManager();
-    virtual ~PointerDrawingManager();
+    PointerDrawingManager() = default;
+    virtual ~PointerDrawingManager() = default;
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
     void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY);
     void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height);
