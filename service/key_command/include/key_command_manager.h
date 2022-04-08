@@ -62,7 +62,7 @@ public:
     KeyCommandManager();
     DISALLOW_COPY_AND_MOVE(KeyCommandManager);
     ~KeyCommandManager() = default;
-    bool CheckLaunchAbility(const std::shared_ptr<KeyEvent> event);
+    bool HandlerEvent(const std::shared_ptr<KeyEvent> event);
 private:
     void ResolveConfig(std::string configFile);
     bool ConvertToShortcutKey(const json &jsonData, ShortcutKey &shortcutKey);

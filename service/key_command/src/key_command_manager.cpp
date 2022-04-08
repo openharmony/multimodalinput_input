@@ -198,7 +198,7 @@ void KeyCommandManager::Print()
     }
 }
 
-bool KeyCommandManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> key)
+bool KeyCommandManager::HandlerEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_LOG_ENTER;
     if (IsKeyMatch(lastMatchedKey_, key)) {
@@ -345,9 +345,12 @@ void ShortcutKey::Print() const
         finalKey, ability.bundleName.c_str());
 }
 
-std::shared_ptr<IKeyCommandManager> IKeyCommandManager::Create()
+std::shared_ptr<IKeyCommandManager> IKeyCommandManager::GetInstance()
 {
-    return std::make_shared<KeyCommandManager>();
+    if (keyCommand_ == nullptr) {
+        keyCommand_ = std::make_shared<KeyCommandManager>();
+    }
+    return keyCommand_;
 }
 } // namespace MMI
 } // namespace OHOS
