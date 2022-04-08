@@ -35,70 +35,70 @@ public:
     /**
      * Indicates an unknown pointer action. It is usually used as initial value.
      * 
-     * @since 8
+     * @since 9
      */
     static constexpr int32_t POINTER_ACTION_UNKNOWN = 0;
 
     /**
      * Indicates a pointer action that has been canceled.
      * 
-     * @since 8
+     * @since 9
      */
     static constexpr int32_t POINTER_ACTION_CANCEL = 1;
 
     /**
      * Indicates a pointer action representing that a funger is pressed on a touchscreen or touchpad.
      * 
-     * @since 8
+     * @since 9
      */
     static constexpr int32_t POINTER_ACTION_DOWN = 2;
 
     /**
      * Indicates a pointer action representing that a funger moves on a touchscreen or touchpad or a mouse pointer moves.
      * 
-     * @since 8
+     * @since 9
      */
     static constexpr int32_t POINTER_ACTION_MOVE = 3;
 
     /**
      * Indicates a pointer action representing that a funger leaves  the touchscreen or touchpad.
      * 
-     * @since 8
+     * @since 9
      */
     static constexpr int32_t POINTER_ACTION_UP = 4;
 
     /**
      * Indicates the start action of the axis event related to the pointer.
      * 
-     * @since 8
+     * @since 9
      */
     static constexpr int32_t POINTER_ACTION_AXIS_BEGIN = 5;
 
     /**
      * Indicates the update action of the axis event related to the pointer.
      * 
-     * @since 8
+     * @since 9
      */
     static constexpr int32_t POINTER_ACTION_AXIS_UPDATE = 6;
 
     /**
      * Indicates the end action of the axis event related to the pointer.
      * 
-     * @since 8
+     * @since 9
      */
     static constexpr int32_t POINTER_ACTION_AXIS_END = 7;
 
     /**
      * Indicates a pointer action representing that a button is pressed.
      * 
-     * @since 8
+     * @since 9
      */
     static constexpr int32_t POINTER_ACTION_BUTTON_DOWN = 8;
 
     /**
      * Indicates a pointer action representing that a button is released.
      * 
-     * @since 8
+     * @since 9
      */
     static constexpr int32_t POINTER_ACTION_BUTTON_UP = 9;
 
@@ -106,7 +106,7 @@ public:
         /**
          * Indicates an unknown axis type. It is generally used as the initial value.
          * 
-         * @since 8
+         * @since 9
          */
         AXIS_TYPE_UNKNOWN,
 
@@ -114,7 +114,7 @@ public:
          * Indicates the vertical scroll axis. When you scrall the mouse wheel or make certain gestures on the touchpad,
          * the status of the vertical scroll axis changes.
          * 
-         * @since 8
+         * @since 9
          */
         AXIS_TYPE_SCROLL_VERTICAL,
 
@@ -122,21 +122,21 @@ public:
          * Indicates the horizontal scroll axis. When you scrall the mouse wheel or make certain gestures on the touchpad,
          * the status of the horizontal scroll axis changes.
          * 
-         * @since 8
+         * @since 9
          */
         AXIS_TYPE_SCROLL_HORIZONTAL,
 
         /**
          * Indicates the pinch axis, which is used to describe a pinch gesture on the touchscreen or touchpad.
          * 
-         * @since 8
+         * @since 9
          */
         AXIS_TYPE_PINCH,
 
         /**
          * Indicates the maximum number of defined axis types.
          * 
-         * @since 8
+         * @since 9
          */
         AXIS_TYPE_MAX
     };
@@ -144,7 +144,7 @@ public:
     /**
      * Indicates an unknown input source type. It is usually used as the initial value.
      * 
-     * @since 8
+     * @since 9
      */
     static constexpr int32_t SOURCE_TYPE_UNKNOWN = 0;
 
@@ -152,49 +152,49 @@ public:
      * Indicates that the input source generates events similar to mouse cursor movement,
      * button press and release, and wheel scrolling.
      * 
-     * @since 8
+     * @since 9
      */
     static constexpr int32_t SOURCE_TYPE_MOUSE = 1;
 
     /**
      * Indicates that the input source generates a touchscreen multi-touch event.
      * 
-     * @since 8
+     * @since 9
      */
     static constexpr int32_t SOURCE_TYPE_TOUCHSCREEN = 2;
 
     /**
      * Indicates that the input source generates a touchpad multi-touch event.
      * 
-     * @since 8
+     * @since 9
      */
     static constexpr int32_t SOURCE_TYPE_TOUCHPAD = 3;
 
     /**
      * Indicates an invalid button ID.
      * 
-     * @since 8
+     * @since 9
      */
     static constexpr int32_t BUTTON_NONE = -1;
 
     /**
      * Indicates the left button on a mouse.
      * 
-     * @since 8
+     * @since 9
      */
     static constexpr int32_t MOUSE_BUTTON_LEFT = 0;
 
     /**
      * Indicates the right button on a mouse.
      * 
-     * @since 8
+     * @since 9
      */
     static constexpr int32_t MOUSE_BUTTON_RIGHT = 1;
 
     /**
      * Indicates the middle button on a mouse.
      * 
-     * @since 8
+     * @since 9
      */
     static constexpr int32_t MOUSE_BUTTON_MIDDLE = 2;
 
@@ -211,7 +211,7 @@ public:
         /**
          * @brief Obtains the ID of the pointer in this event.
          * @return Returns the pointer ID.
-         * @since 8
+         * @since 9
          */
         int32_t GetPointerId() const;
 
@@ -219,14 +219,14 @@ public:
          * @brief Sets the ID of the pointer in this event.
          * @param pointerId Indicates the pointer ID to set.
          * @return void
-         * @since 8
+         * @since 9
          */
         void SetPointerId(int32_t pointerId);
 
         /**
          * @brief Obtains the time when the pointer is pressed.
          * @return Returns the time.
-         * @since 8
+         * @since 9
          */
         int64_t GetDownTime() const;
 
@@ -234,14 +234,14 @@ public:
          * @brief Sets the time when the pointer is pressed.
          * @param downTime Indicates the time to set.
          * @return void
-         * @since 8
+         * @since 9
          */
         void SetDownTime(int64_t downTime);
 
         /**
          * @brief Checks whether the pointer is pressed.
          * @return Returns <b>true</b> if the pointer is pressed; returns <b>false</b> otherwise.
-         * @since 8
+         * @since 9
          */
         bool IsPressed() const;
 
@@ -251,7 +251,7 @@ public:
          * The value <b>true</b> means to set the pressed state for the pointer, and the
          * value <b>false</b> means the opposite.
          * @return void
-         * @since 8
+         * @since 9
          */
         void SetPressed(bool pressed);
 
@@ -260,7 +260,7 @@ public:
          * For a touchpad input event, the value is the absolute x coordinate on the touchpad.
          * For other pointer input events, the value is the x coordinate on the target screen.
          * @return Returns the x coordinate.
-         * @since 8
+         * @since 9
          */
         int32_t GetGlobalX() const;
 
@@ -268,7 +268,7 @@ public:
          * @brief Sets the x coordinate relative to the upper left corner of the screen.
          * @param globalX Indicates the x coordinate to set.
          * @return void
-         * @since 8
+         * @since 9
          */
         void SetGlobalX(int32_t globalX);
 
@@ -277,7 +277,7 @@ public:
          * For a touchpad input event, the value is the absolute y coordinate on the touchpad.
          * For other pointer input events, the value is the y coordinate on the target screen.
          * @return Returns the y coordinate.
-         * @since 8
+         * @since 9
          */
         int32_t GetGlobalY() const;
 
@@ -285,14 +285,14 @@ public:
          * @brief Sets the y coordinate relative to the upper left corner of the screen.
          * @param globalY Indicates the y coordinate to set.
          * @return void
-         * @since 8
+         * @since 9
          */
         void SetGlobalY(int32_t globalY);
 
         /**
          * @brief Obtains the x coordinate of the active window.
          * @return Returns the x coordinate.
-         * @since 8
+         * @since 9
          */
         int32_t GetLocalX() const;
 
@@ -300,14 +300,14 @@ public:
          * @brief Sets the x coordinate of the active window.
          * @param x Indicates the x coordinate to set.
          * @return void
-         * @since 8
+         * @since 9
          */
         void SetLocalX(int32_t x);
 
         /**
          * @brief Obtains the y coordinate of the active window.
          * @return Returns the y coordinate.
-         * @since 8
+         * @since 9
          */
         int32_t GetLocalY() const;
 
@@ -315,14 +315,14 @@ public:
          * @brief Sets the y coordinate of the active window.
          * @param y Indicates the y coordinate to set.
          * @return void
-         * @since 8
+         * @since 9
          */
         void SetLocalY(int32_t y);
 
         /**
          * @brief Obtains the width of the pressed area.
          * @return Returns the width.
-         * @since 8
+         * @since 9
          */
         int32_t GetWidth() const;
 
@@ -330,14 +330,14 @@ public:
          * @brief Sets the width of the pressed area.
          * @param width Indicates the width to set.
          * @return void
-         * @since 8
+         * @since 9
          */
         void SetWidth(int32_t width);
 
         /**
          * @brief Obtains the height of the pressed area.
          * @return Returns the height.
-         * @since 8
+         * @since 9
          */
         int32_t GetHeight() const;
 
@@ -345,14 +345,14 @@ public:
          * @brief Sets the height of the pressed area.
          * @param height Indicates the height to set.
          * @return void
-         * @since 8
+         * @since 9
          */
         void SetHeight(int32_t height);
 
         /**
          * @brief Obtains the pressure in this event.
          * @return Returns the pressure.
-         * @since 8
+         * @since 9
          */
         int32_t GetPressure() const;
 
@@ -360,14 +360,14 @@ public:
          * @brief Sets the pressure for this event.
          * @param pressure Indicates the pressure to set.
          * @return void
-         * @since 8
+         * @since 9
          */
         void SetPressure(int32_t pressure);
 
         /**
          * @brief Obtains the ID of the current device.
          * @return Returns the device ID.
-         * @since 8
+         * @since 9
          */
         int32_t GetDeviceId() const;
 
@@ -375,7 +375,7 @@ public:
          * @brief Sets the ID for the current device.
          * @param deviceId Indicates the device ID to set.
          * @return void
-         * @since 8
+         * @since 9
          */
         void SetDeviceId(int32_t deviceId);
     public:
@@ -383,7 +383,7 @@ public:
          * @brief Writes data to a <b>Parcel</b> obejct.
          * @param out Indicates the object into which data will be written.
          * @return Returns <b>true</b> if the data is successfully written; returns <b>false</b> otherwise.
-         * @since 8
+         * @since 9
          */
         bool WriteToParcel(Parcel &out) const;
 
@@ -391,7 +391,7 @@ public:
          * @brief Reads data from a <b>Parcel</b> obejct.
          * @param in Indicates the object from which data will be read.
          * @return Returns <b>true</b> if the data is successfully read; returns <b>false</b> otherwise.
-         * @since 8
+         * @since 9
          */
         bool ReadFromParcel(Parcel &in);
 
@@ -412,14 +412,14 @@ public:
 public:
     /**
      * @brief Copy constructor function for PointerEvent
-     * @since 8
+     * @since 9
      */
     PointerEvent(const PointerEvent& other);
 
     /**
      * Virtual destructor of PointerEvent
      *
-     * @since 8
+     * @since 9
      */
     virtual ~PointerEvent();
 
@@ -428,14 +428,14 @@ public:
 
     /**
      * @brief Create PointerEvent object
-     * @since 8
+     * @since 9
      */
     static std::shared_ptr<PointerEvent> Create();
 
     /**
      * @brief Obtains the pointer action in this event.
      * @return Returns the pointer action.
-     * @since 8
+     * @since 9
      */
     int32_t GetPointerAction() const;
 
@@ -443,21 +443,21 @@ public:
      * @brief Sets a pointer action for this event.
      * @param pointerAction Indicates the pointer action to set.
      * @return void
-     * @since 8
+     * @since 9
      */
     void SetPointerAction(int32_t pointerAction);
 
     /**
      * @brief Dumps the action of this pointer input event as a string.
      * @return Returns the pointer to the string.
-     * @since 8
+     * @since 9
      */
     const char* DumpPointerAction() const;
 
     /**
      * @brief Obtains the pointer ID in this event.
      * @return Returns the pointer ID.
-     * @since 8
+     * @since 9
      */
     int32_t GetPointerId() const;
 
@@ -465,7 +465,7 @@ public:
      * @brief Sets an ID for the pointer in this event.
      * @param pointerId Indicates the pointer ID to set.
      * @return void
-     * @since 8
+     * @since 9
      */
     void SetPointerId(int32_t pointerId);
 
@@ -474,7 +474,7 @@ public:
      * @param pointerId Indicates the pointer ID.
      * @param pointerItem Indicates the item used to receive the data of the pointer.
      * @return Returns <b>true</b> if the data of the pointer with the specified ID exists; returns <b>false</b> otherwise.
-     * @since 8
+     * @since 9
      */
     bool GetPointerItem(int32_t pointerId, PointerItem &pointerItem);
 
@@ -482,7 +482,7 @@ public:
      * @brief Adds a pointer item.
      * @param pointerItem Indicates the pointer item to add.
      * @return void
-     * @since 8
+     * @since 9
      */
     void AddPointerItem(PointerItem &pointerItem);
 
@@ -490,7 +490,7 @@ public:
      * @brief Removes a pointer item based on the pointer ID.
      * @param pointerId Indicates the ID of the pointer from which the pointer item is to be removed.
      * @return void
-     * @since 8
+     * @since 9
      */
     void RemovePointerItem(int32_t pointerId);
 
@@ -499,14 +499,14 @@ public:
      * @param pointerId Indicates the ID of the pointer from which the pointer item is to be updated.
      * @param pointerItem Indicates the pointer item to update.
      * @return void
-     * @since 8
+     * @since 9
      */
     void UpdatePointerItem(int32_t pointerId, PointerItem &pointerItem);
 
     /**
      * @brief Obtains the set of pressed buttons.
      * @return Returns the pressed buttons.
-     * @since 8
+     * @since 9
      */
     std::set<int32_t> GetPressedButtons() const;
 
@@ -514,7 +514,7 @@ public:
      * @brief Checks whether a specified button is being pressed.
      * @param buttonId Indicates the button ID.
      * @return Returns <b>true</b> if the button is being pressed; returns <b>false</b> otherwise.
-     * @since 8
+     * @since 9
      */
     bool IsButtonPressed(int32_t buttonId) const;
 
@@ -522,7 +522,7 @@ public:
      * @brief Sets the pressed state for a button.
      * @param buttonId Indicates the button ID of the button to be set in the pressed state.
      * @return void
-     * @since 8
+     * @since 9
      */
     void SetButtonPressed(int32_t buttonId);
 
@@ -530,28 +530,28 @@ public:
      * @brief Deletes a released button.
      * @param buttonId Indicates the button ID of the button.
      * @return void
-     * @since 8
+     * @since 9
      */
     void DeleteReleaseButton(int32_t buttonId);
 
     /**
      * @brief Clears the button in the pressed state.
      * @return void
-     * @since 8
+     * @since 9
      */
     void ClearButtonPressed();
 
     /**
      * @brief Obtains all pointers in this event.
      * @return Returns all the pointer IDs.
-     * @since 8
+     * @since 9
      */
     std::vector<int32_t> GetPointersIdList() const;
 
     /**
      * @brief Obtains the source type of this event.
      * @return Returns the source type.
-     * @since 8
+     * @since 9
      */
     int32_t GetSourceType() const;
 
@@ -559,21 +559,21 @@ public:
      * @brief Sets the source type for this event.
      * @param sourceType Indicates the source type to set.
      * @return void
-     * @since 8
+     * @since 9
      */
     void SetSourceType(int32_t sourceType);
 
     /**
      * @brief Dumps the source type of this pointer input event as a string.
      * @return Returns the pointer to the string.
-     * @since 8
+     * @since 9
      */
     const char* DumpSourceType() const;
 
     /**
      * @brief Obtains the button ID in this event.
      * @return Returns the button ID.
-     * @since 8
+     * @since 9
      */
     int32_t GetButtonId() const;
 
@@ -581,7 +581,7 @@ public:
      * @brief Sets the button ID for this event.
      * @param buttonId Indicates the button ID to set.
      * @return void
-     * @since 8
+     * @since 9
      */
     void SetButtonId(int32_t buttonId);
 
@@ -589,7 +589,7 @@ public:
      * @brief Obtains the axis value.
      * @param axis Indicates the axis type.
      * @return Returns the axis value.
-     * @since 8
+     * @since 9
      */
     double GetAxisValue(AxisType axis) const;
 
@@ -598,18 +598,14 @@ public:
      * @param axis Indicates the axis type.
      * @param axisValue Indicates the axis value to set.
      * @return void
-     * @since 8
+     * @since 9
      */
     void SetAxisValue(AxisType axis, double axisValue);
 
     /**
-<<<<<<< Updated upstream
-     * @brief Clear the axis value.
-=======
      * @brief Clear the axis value of PointerEvent when a mouse event is received.
->>>>>>> Stashed changes
      * @return void
-     * @since 8
+     * @since 9
      */
     void ClearAxisValue();
 
@@ -617,14 +613,14 @@ public:
      * @brief Checks whether this event contains a specified axis type.
      * @param axis Indicates the axis type.
      * @return Returns <b>true</b> if the event contains the specified axis type; returns <b>false</b> otherwise.
-     * @since 8
+     * @since 9
      */
     bool HasAxis(AxisType axis) const;
 
     /**
      * @brief Obtains all axis of this event.
      * @return Returns all the axis, Each bit indicates an axis.
-     * @since 8
+     * @since 9
      */
     uint32_t GetAxes() const;
 
@@ -632,21 +628,21 @@ public:
      * @brief Set the front keys in the key combination.
      * @param pressedKeys Indicates the front keys to set.
      * @return void.
-     * @since 8
+     * @since 9
      */
     void SetPressedKeys(const std::vector<int32_t> pressedKeys);
 
     /**
      * @brief Obtains the set of pressed keys.
      * @return Returns the pressed keys.
-     * @since 8
+     * @since 9
      */
     std::vector<int32_t> GetPressedKeys() const;
 
     /**
      * @brief Checks whether this input event is valid.
      * @return Returns <b>true</b> if the input event is valid; returns <b>false</b> otherwise.
-     * @since 8
+     * @since 9
      */
     bool IsValid() const;
 public:
@@ -655,7 +651,7 @@ public:
      * @param axes Indicates the set of axes. Each bit indicates an axis.
      * @param axis Indicates the type of the axis to check.
      * @return Returns <b>true</b> if the axes set contains the specified axis type; returns <b>false</b> otherwise.
-     * @since 8
+     * @since 9
      */
     static bool HasAxis(uint32_t axes, AxisType axis);
 
@@ -664,7 +660,7 @@ public:
      * @brief Writes data to a <b>Parcel</b> obejct.
      * @param out Indicates the object into which data will be written.
      * @return Returns <b>true</b> if the data is successfully written; returns <b>false</b> otherwise.
-     * @since 8
+     * @since 9
      */
     bool WriteToParcel(Parcel &out) const;
 
@@ -672,7 +668,7 @@ public:
      * @brief Reads data from a <b>Parcel</b> obejct.
      * @param in Indicates the object from which data will be read.
      * @return Returns <b>true</b> if the data is successfully read; returns <b>false</b> otherwise.
-     * @since 8
+     * @since 9
      */
     bool ReadFromParcel(Parcel &in);
 
@@ -680,7 +676,7 @@ protected:
     /**
      * @brief Constructs an input event object by using the specified input event type. Generally, this method
      * is used to construct a base class object when constructing a derived class object.
-     * @since 8
+     * @since 9
      */
     explicit PointerEvent(int32_t eventType);
 
