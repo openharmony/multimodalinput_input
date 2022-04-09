@@ -23,18 +23,20 @@
 #include "draw/canvas.h"
 #include "nocopyable.h"
 #include "pixel_map.h"
-#include "singleton.h"
 #include "window.h"
 
 #include "device_observer.h"
+#include "i_pointer_drawing_manager.h"
 #include "struct_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
-class PointerDrawingManager : public DelayedSingleton<PointerDrawingManager>, public IDeviceObserver {
+class PointerDrawingManager : public IPointerDrawingManager,
+                              public IDeviceObserver,
+                              public std::enable_shared_from_this<PointerDrawingManager> {
 public:
-    PointerDrawingManager();
-    ~PointerDrawingManager();
+    PointerDrawingManager() = default;
+    virtual ~PointerDrawingManager() = default;
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
     void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY);
     void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height);
@@ -65,8 +67,6 @@ private:
     int32_t lastGlobalX_ = -1;
     int32_t lastGlobalY_ = -1;
 };
-
-#define PointerDrawMgr PointerDrawingManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // POINTER_DRAWING_MANAGER_H
