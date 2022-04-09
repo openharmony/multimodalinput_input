@@ -17,7 +17,6 @@
 
 namespace OHOS {
 namespace MMI {
-
 std::shared_ptr<IKeyCommandManager> IKeyCommandManager::GetInstance()
 {
     if (keyCommand_ == nullptr) {
