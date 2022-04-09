@@ -13,12 +13,7 @@
  * limitations under the License.
  */
 
-#include "ability_launch_manager.h"
-
-#include <algorithm>
-#include <fstream>
-#include <iostream>
-#include <sstream>
+#include "key_command_manager.h"
 
 #include "ability_manager_client.h"
 #include "file_ex.h"
@@ -31,21 +26,21 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t MAX_PREKEYS_NUM = 4;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AbilityLaunchManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandManager" };
 } // namespace
 
-AbilityLaunchManager::AbilityLaunchManager()
+KeyCommandManager::KeyCommandManager()
 {
     std::string configFile = GetConfigFilePath();
     ResolveConfig(configFile);
     Print();
 }
 
-std::string AbilityLaunchManager::GenerateKey(const ShortcutKey& key)
+std::string KeyCommandManager::GenerateKey(const ShortcutKey& key)
 {
     std::set<int32_t> preKeys = key.preKeys;
     std::stringstream oss;
-    for(const auto preKey: preKeys) {
+    for (const auto& preKey : preKeys) {
         oss << preKey << ",";
     }
     oss << key.finalKey << ",";
@@ -53,13 +48,13 @@ std::string AbilityLaunchManager::GenerateKey(const ShortcutKey& key)
     return std::string(oss.str());
 }
 
-std::string AbilityLaunchManager::GetConfigFilePath() const
+std::string KeyCommandManager::GetConfigFilePath() const
 {
     std::string defaultConfig = "/product/multimodalinput/ability_launch_config.json";
     return FileExists(defaultConfig) ? defaultConfig : "/system/etc/multimodalinput/ability_launch_config.json";
 }
 
-void AbilityLaunchManager::ResolveConfig(const std::string configFile)
+void KeyCommandManager::ResolveConfig(const std::string configFile)
 {
     if (!FileExists(configFile)) {
         MMI_HILOGE("config file %{public}s not exist", configFile.c_str());
@@ -99,7 +94,7 @@ void AbilityLaunchManager::ResolveConfig(const std::string configFile)
     }
 }
 
-bool AbilityLaunchManager::ConvertToShortcutKey(const json &jsonData, ShortcutKey &shortcutKey)
+bool KeyCommandManager::ConvertToShortcutKey(const json &jsonData, ShortcutKey &shortcutKey)
 {
     json preKey = jsonData["preKey"];
     if (!preKey.is_array()) {
@@ -150,7 +145,7 @@ bool AbilityLaunchManager::ConvertToShortcutKey(const json &jsonData, ShortcutKe
     return true;
 }
 
-bool AbilityLaunchManager::PackageAbility(const json &jsonAbility, Ability &ability)
+bool KeyCommandManager::PackageAbility(const json &jsonAbility, Ability &ability)
 {
     if (!jsonAbility.is_object()) {
         MMI_HILOGE("ability must be object");
@@ -187,7 +182,7 @@ bool AbilityLaunchManager::PackageAbility(const json &jsonAbility, Ability &abil
     return true;
 }
 
-void AbilityLaunchManager::Print()
+void KeyCommandManager::Print()
 {
     uint32_t count = shortcutKeys_.size();
     MMI_HILOGD("shortcutKey count:%{public}u", count);
@@ -203,7 +198,7 @@ void AbilityLaunchManager::Print()
     }
 }
 
-bool AbilityLaunchManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> key)
+bool KeyCommandManager::HandlerEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_LOG_ENTER;
     if (IsKeyMatch(lastMatchedKey_, key)) {
@@ -215,14 +210,14 @@ bool AbilityLaunchManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> ke
         TimerMgr->RemoveTimer(lastMatchedKey_.timerId);
     }
     ResetLastMatchedKey();
-    for (auto& item: shortcutKeys_) {
+    for (auto& item : shortcutKeys_) {
         ShortcutKey &shortcutKey = item.second;
         if (!IsKeyMatch(shortcutKey, key)) {
-            MMI_HILOGD("not matched, next");
+            MMI_HILOGD("not key matched, next");
             continue;
         }
         shortcutKey.Print();
-        if(shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN) {
+        if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN) {
             return HandleKeyDown(shortcutKey);
         } else if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_UP) {
             return HandleKeyUp(key, shortcutKey);
@@ -233,7 +228,7 @@ bool AbilityLaunchManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> ke
     return false;
 }
 
-bool AbilityLaunchManager::IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key)
+bool KeyCommandManager::IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key)
 {
     CALL_LOG_ENTER;
     if ((key->GetKeyCode() != shortcutKey.finalKey) || (shortcutKey.triggerType != key->GetKeyAction())) {
@@ -255,12 +250,12 @@ bool AbilityLaunchManager::IsKeyMatch(const ShortcutKey &shortcutKey, const std:
     return true;
 }
 
-bool AbilityLaunchManager::SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key)
+bool KeyCommandManager::SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key)
 {
     return keyCode == key->GetKeyCode();
 }
 
-bool AbilityLaunchManager::HandleKeyDown(ShortcutKey &shortcutKey)
+bool KeyCommandManager::HandleKeyDown(ShortcutKey &shortcutKey)
 {
     CALL_LOG_ENTER;
     if (shortcutKey.keyDownDuration == 0) {
@@ -281,7 +276,7 @@ bool AbilityLaunchManager::HandleKeyDown(ShortcutKey &shortcutKey)
     return true;
 }
 
-bool AbilityLaunchManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey)
+bool KeyCommandManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey)
 {
     CALL_LOG_ENTER;
     if (shortcutKey.keyDownDuration == 0) {
@@ -304,7 +299,7 @@ bool AbilityLaunchManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
     return true;
 }
 
-bool AbilityLaunchManager::HandleKeyCancel(ShortcutKey &shortcutKey)
+bool KeyCommandManager::HandleKeyCancel(ShortcutKey &shortcutKey)
 {
     CALL_LOG_ENTER;
     if (shortcutKey.timerId < 0) {
@@ -317,7 +312,7 @@ bool AbilityLaunchManager::HandleKeyCancel(ShortcutKey &shortcutKey)
     return false;
 }
 
-void AbilityLaunchManager::LaunchAbility(ShortcutKey key)
+void KeyCommandManager::LaunchAbility(ShortcutKey key)
 {
     AAFwk::Want want;
     want.SetElementName(key.ability.deviceId, key.ability.bundleName, key.ability.abilityName);
@@ -348,6 +343,14 @@ void ShortcutKey::Print() const
     }
     MMI_HILOGD("eventkey matched, finalKey:%{public}d,bundleName:%{public}s",
         finalKey, ability.bundleName.c_str());
+}
+
+std::shared_ptr<IKeyCommandManager> IKeyCommandManager::GetInstance()
+{
+    if (keyCommand_ == nullptr) {
+        keyCommand_ = std::make_shared<KeyCommandManager>();
+    }
+    return keyCommand_;
 }
 } // namespace MMI
 } // namespace OHOS
