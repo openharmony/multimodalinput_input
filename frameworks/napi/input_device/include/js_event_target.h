@@ -31,8 +31,8 @@ namespace OHOS {
 namespace MMI {
 class JsEventTarget {
 public:
-    JsEventTarget() = default;
-    ~JsEventTarget() = default;
+    JsEventTarget();
+    ~JsEventTarget();
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
     static void TargetOn(std::string type, int32_t deviceId);
     static void EmitJsIds(int32_t userData, std::vector<int32_t> ids);
@@ -44,10 +44,7 @@ public:
     void ResetEnv();
     inline static int32_t userData_ {0};
     inline static std::map<int32_t, std::unique_ptr<JsUtil::CallbackInfo>> callback_ {};
-    inline static std::map<std::string, std::vector<std::shared_ptr<JsUtil::CallbackInfo>>> devMonitor_ {
-        {"add", std::vector<std::shared_ptr<JsUtil::CallbackInfo>>()},
-        {"remove", std::vector<std::shared_ptr<JsUtil::CallbackInfo>>()}
-    };
+    inline static std::map<std::string, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>> devMonitor_ {};
 
     struct DeviceType {
         std::string deviceTypeName;
