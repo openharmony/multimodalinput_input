@@ -34,7 +34,6 @@ public:
     std::shared_ptr<JsInputDeviceManager> GetJsInputDeviceMgr() const;
 
 private:
-    static bool CheckEventType(char *event);
     static napi_value CreateInstance(napi_env env);
     static JsInputDeviceContext* GetInstance(napi_env env);
     static napi_value JsConstructor(napi_env env, napi_callback_info info);

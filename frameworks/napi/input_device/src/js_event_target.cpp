@@ -54,13 +54,21 @@ const std::string ADD_EVENT = "add";
 const std::string REMOVE_EVENT = "remove";
 } // namespace
 
+JsEventTarget::JsEventTarget()
+{
+    devMonitor_.insert({ADD_EVENT, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>()});
+    devMonitor_.insert({REMOVE_EVENT, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>()});
+}
+
+JsEventTarget::~JsEventTarget() {}
+
 void JsEventTarget::EmitAddedEvent(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
-    auto temp = static_cast<std::shared_ptr<JsUtil::CallbackInfo>*>(work->data);
+    auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
     delete work;
     work = nullptr;
     
@@ -90,13 +98,13 @@ void JsEventTarget::EmitRemoveEvent(uv_work_t *work, int32_t status)
     std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
-    auto temp = static_cast<std::shared_ptr<JsUtil::CallbackInfo>*>(work->data);
+    auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
     delete work;
     work = nullptr;
     
     auto removeEvent = devMonitor_.find(REMOVE_EVENT);
     if (removeEvent == devMonitor_.end()) {
-        MMI_HILOGE("find add event failed");
+        MMI_HILOGE("find remove event failed");
         return;
     }
 
@@ -120,7 +128,7 @@ void JsEventTarget::TargetOn(std::string type, int32_t deviceId)
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = devMonitor_.find(type);
     if (iter == devMonitor_.end()) {
-        MMI_HILOGE("find %{public}s failed", type.c_str());
+        MMI_HILOGE("type is wrong, type:%{public}s", type.c_str());
         return;
     }
 
@@ -167,7 +175,6 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(cbTemp->env);
 
     napi_value arr = nullptr;
-
     CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &arr), CREATE_ARRAY);
     uint32_t index = 0;
     napi_value value = nullptr;
@@ -543,11 +550,11 @@ void JsEventTarget::AddMonitor(napi_env env, std::string type, napi_value handle
     }
     napi_ref ref = nullptr;
     CHKRV(env, napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
-    auto monitor = std::make_shared<JsUtil::CallbackInfo>();
+    auto monitor = std::make_unique<JsUtil::CallbackInfo>();
     CHKPV(monitor);
     monitor->env = env;
     monitor->ref = ref;
-    iter->second.push_back(monitor);
+    iter->second.push_back(std::move(monitor));
 }
 
 void JsEventTarget::RemoveMonitor(napi_env env, std::string type, napi_value handle)
@@ -608,7 +615,7 @@ void JsEventTarget::ResetEnv()
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     callback_.clear();
-    devMonitor_.clear();
+    // devMonitor_.clear();
 }
 } // namespace MMI
 } // namespace OHOS
