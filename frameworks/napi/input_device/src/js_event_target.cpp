@@ -544,6 +544,7 @@ void JsEventTarget::AddMonitor(napi_env env, std::string type, napi_value handle
     napi_ref ref = nullptr;
     CHKRV(env, napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
     auto monitor = std::make_shared<JsUtil::CallbackInfo>();
+    CHKPV(monitor);
     monitor->env = env;
     monitor->ref = ref;
     iter->second.push_back(monitor);
