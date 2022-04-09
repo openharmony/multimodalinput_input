@@ -31,7 +31,7 @@ constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
 } // namespace
 
 int32_t KeyEventSubscriber::SubscribeKeyEvent(
-        SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)
+    SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)
 {
     CALL_LOG_ENTER;
     if (subscribeId < 0) {
@@ -54,7 +54,7 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
         subscribeId, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
-    subscribers_.push_back(subscriber);
+    InsertSubScriber(subscriber);
     InitSessionDeleteCallback();
     return RET_OK;
 }
@@ -78,7 +78,8 @@ bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     CALL_LOG_ENTER;
     CHKPF(keyEvent);
     int32_t keyAction = keyEvent->GetKeyAction();
-    MMI_HILOGD("keyCode:%{public}d,keyAction:%{public}s", keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
+    MMI_HILOGD("keyCode:%{public}d,keyAction:%{public}s", keyEvent->GetKeyCode(),
+        KeyEvent::ActionToString(keyAction));
     for (const auto &keyCode : keyEvent->GetPressedKeys()) {
         MMI_HILOGD("pressed KeyCode:%{public}d", keyCode);
     }
@@ -96,9 +97,24 @@ bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     return handled;
 }
 
+void KeyEventSubscriber::InsertSubScriber(std::shared_ptr<Subscriber> subs)
+{
+    CALL_LOG_ENTER;
+    CHKPV(subs);
+    for (auto it = subscribers_.begin(); it != subscribers_.end(); ++it) {
+        if (subs->sess_ != nullptr && (*it)->id_ == subs->id_ && (*it)->sess_ == subs->sess_) {
+            MMI_HILOGW("Repeat registration id:%{public}d desc:%{public}s",
+                subs->id_, subs->sess_->GetDescript().c_str());
+            return;
+        }
+    }
+    subscribers_.push_back(subs);
+}
+
 void KeyEventSubscriber::OnSessionDelete(SessionPtr sess)
 {
     CALL_LOG_ENTER;
+    CHKPV(sess);
     for (auto it = subscribers_.begin(); it != subscribers_.end();) {
         if ((*it)->sess_ == sess) {
             ClearTimer(*it);
@@ -109,8 +125,8 @@ void KeyEventSubscriber::OnSessionDelete(SessionPtr sess)
     }
 }
 
-bool KeyEventSubscriber::IsPreKeysMatch(const std::set<int32_t>& preKeys,
-        const std::vector<int32_t>& pressedKeys) const
+bool KeyEventSubscriber::IsPreKeysMatch(
+    const std::set<int32_t>& preKeys, const std::vector<int32_t>& pressedKeys) const
 {
     if (preKeys.size() != pressedKeys.size()) {
         return false;
@@ -127,7 +143,7 @@ bool KeyEventSubscriber::IsPreKeysMatch(const std::set<int32_t>& preKeys,
 }
 
 void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
-        const std::shared_ptr<Subscriber>& subscriber)
+    const std::shared_ptr<Subscriber>& subscriber)
 {
     CALL_LOG_ENTER;
     CHKPV(keyEvent);
@@ -145,7 +161,7 @@ void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
 }
 
 bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
-        const std::shared_ptr<KeyEvent>& keyEvent)
+    const std::shared_ptr<KeyEvent>& keyEvent)
 {
     CALL_LOG_ENTER;
     CHKPF(keyEvent);
@@ -192,7 +208,7 @@ void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscribe
     CHKPV(subscriber);
 
     if (subscriber->timerId_ < 0) {
-        MMI_HILOGE("Leave, subscribeId:%{public}d,null timerId < 0", subscriber->id_);
+        MMI_HILOGW("Leave, subscribeId:%{public}d,null timerId < 0", subscriber->id_);
         return;
     }
 
@@ -200,7 +216,7 @@ void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscribe
     subscriber->keyEvent_.reset();
     subscriber->timerId_ = -1;
     TimerMgr->RemoveTimer(timerId);
-    MMI_HILOGD("subscribeId:%{public}d,subscribeId:%{public}d", subscriber->id_, timerId);
+    MMI_HILOGD("subscribeId:%{public}d,timerId:%{public}d", subscriber->id_, timerId);
 }
 
 void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
@@ -227,10 +243,9 @@ bool KeyEventSubscriber::InitSessionDeleteCallback()
     }
     auto udsServerPtr = InputHandler->GetUDSServer();
     CHKPF(udsServerPtr);
-    std::function<void(SessionPtr)> callback = std::bind(&KeyEventSubscriber::OnSessionDelete,
-            this, std::placeholders::_1);
+    std::function<void(SessionPtr)> callback =
+        std::bind(&KeyEventSubscriber::OnSessionDelete, this, std::placeholders::_1);
     udsServerPtr->AddSessionDeletedCallback(callback);
-
     callbackInitialized_ = true;
     return true;
 }

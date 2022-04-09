@@ -25,6 +25,7 @@
 #include "error_multimodal.h"
 #include "proto.h"
 #include "util.h"
+#include "input_parse.h"
 
 namespace OHOS {
 namespace MMI {
@@ -85,7 +86,12 @@ std::string InjectionEventDispatch::GetFileExtendName(const std::string& fileNam
 
 int32_t InjectionEventDispatch::GetFileSize(const std::string& fileName)
 {
-    FILE* pFile = fopen(fileName.c_str(), "rb");
+    char realPath[PATH_MAX] = {};
+    if (realpath(fileName.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("path is error, path:%{public}s", fileName.c_str());
+        return RET_ERR;
+    }
+    FILE* pFile = fopen(realPath, "rb");
     if (pFile) {
         fseek(pFile, 0, SEEK_END);
         long fileSize = ftell(pFile);
@@ -98,6 +104,20 @@ int32_t InjectionEventDispatch::GetFileSize(const std::string& fileName)
         return fileSize;
     }
     return RET_ERR;
+}
+
+bool InjectionEventDispatch::ReadFile(const std::string &jsonFile, std::string& jsonBuf)
+{
+    FILE* fp = fopen(jsonFile.c_str(), "r");
+    CHKPF(fp);
+    char buf[256] = {};
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        jsonBuf += buf;
+    }
+    if (fclose(fp) < 0) {
+        MMI_HILOGW("close file failed");
+    }
+    return true;
 }
 
 int32_t InjectionEventDispatch::OnJson()
@@ -130,17 +150,19 @@ int32_t InjectionEventDispatch::OnJson()
         MMI_HILOGE("The file size is out of range 2M or empty. filesize:%{public}d", fileSize);
         return RET_ERR;
     }
-    std::ifstream reader(jsonFile);
-    if (!reader) {
-        MMI_HILOGE("json file is empty");
+    std::string jsonBuf;
+    if (!ReadFile(jsonFile, jsonBuf)) {
+        MMI_HILOGE("read file failed");
         return RET_ERR;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
-
-    int32_t ret = manageInjectDevice_.TransformJsonData(inputEventArrays);
-    return ret;
+    bool logStatus = false;
+    if (injectArgvs_.size() > ARGVS_CODE_INDEX) {
+        if (injectArgvs_.at(ARGVS_CODE_INDEX) == "log") {
+            logStatus = true;
+        }
+    }
+    InputParse InputParse;
+    return manageInjectDevice_.TransformJsonData(InputParse.DataInit(jsonBuf, logStatus));
 }
 
 std::string InjectionEventDispatch::GetFunId() const
@@ -233,6 +255,7 @@ int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText
             return item.devIndex;
         }
     }
+    MMI_HILOGW("Get device index failed");
     return RET_ERR;
 }
 
@@ -260,7 +283,7 @@ bool InjectionEventDispatch::CheckCode(const std::string& inputCode)
     }
     bool isCodeNumber = regex_match(inputCode, std::regex("\\d+"));
     if (isCodeNumber) {
-        uint16_t numberCode = stoi(inputCode);
+        int32_t numberCode = stoi(inputCode);
         if ((numberCode >= 0) && (numberCode <= UINT16_MAX)) {
             return true;
         }
@@ -276,7 +299,7 @@ bool InjectionEventDispatch::CheckType(const std::string& inputType)
     }
     bool isTypeNumber = regex_match(inputType, std::regex("\\d+"));
     if (isTypeNumber) {
-        uint16_t numberType = stoi(inputType);
+        int32_t numberType = stoi(inputType);
         if ((numberType >= 0) && (numberType <= INPUT_TYPE_MAX)) {
             return true;
         }

@@ -15,7 +15,7 @@
 
 #include "input_device_impl.h"
 
-#include "mmi_client.h"
+#include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
 
 namespace OHOS {
@@ -34,7 +34,11 @@ void InputDeviceImpl::GetInputDeviceIdsAsync(int32_t userData,
     std::function<void(int32_t, std::vector<int32_t>)> callback)
 {
     CALL_LOG_ENTER;
-    inputDevciceIds_[userData] = callback;
+    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    CHKPV(eventHandler);
+    InputDeviceData data;
+    data.ids = std::make_pair(eventHandler, callback);
+    inputDevices_[userData] = data;
     MMIEventHdl.GetDeviceIds(userData);
 }
 
@@ -42,31 +46,120 @@ void InputDeviceImpl::GetInputDeviceAsync(int32_t userData, int32_t deviceId,
     std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)> callback)
 {
     CALL_LOG_ENTER;
-    inputDevcices_[userData] = callback;
+    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    CHKPV(eventHandler);
+    InputDeviceData data;
+    data.inputDevice = std::make_pair(eventHandler, callback);
+    inputDevices_[userData] = data;
     MMIEventHdl.GetDevice(userData, deviceId);
 }
 
-void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, std::string name, int32_t deviceType)
+void InputDeviceImpl::GetKeystrokeAbility(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes,
+    std::function<void(int32_t, std::vector<int32_t>)> callback)
 {
     CALL_LOG_ENTER;
-    auto iter = inputDevcices_.find(userData);
-    if (iter == inputDevcices_.end()) {
-        MMI_HILOGE("failed to find the callback function");
-        return;
-    }
-    auto inputDeviceInfo = std::make_shared<InputDeviceInfo>(id, name, deviceType);
-    iter->second(userData, inputDeviceInfo);
+    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    CHKPV(eventHandler);
+    InputDeviceData data;
+    data.keys = std::make_pair(eventHandler, callback);
+    inputDevices_[userData] = data;
+    MMIEventHdl.GetKeystrokeAbility(userData, deviceId, keyCodes);
 }
 
-void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> ids)
+void InputDeviceImpl::OnInputDeviceTask(InputDeviceImpl::DevInfo devInfo, int32_t userData,
+    int32_t id, std::string name, int32_t deviceType)
 {
-    CALL_LOG_ENTER;
-    auto iter = inputDevciceIds_.find(userData);
-    if (iter == inputDevciceIds_.end()) {
-        MMI_HILOGE("failed to find the callback function");
-        return;
+    CHK_PIDANDTID();
+    auto devData = std::make_shared<InputDeviceInfo>(id, name, deviceType);
+    CHKPV(devData);
+    devInfo.second(userData, devData);
+    MMI_HILOGD("device info event callback userData:%{public}d id:%{public}d name:%{public}s type:%{public}d",
+        userData, id, name.c_str(), deviceType);
+}
+
+void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, const std::string &name, int32_t deviceType)
+{
+    CHK_PIDANDTID();
+    std::lock_guard<std::mutex> guard(mtx_);
+    auto devInfo = GetDeviceInfo(userData);
+    CHKPV(devInfo);
+    if (!MMIEventHandler::PostTask(devInfo->first,
+        std::bind(&InputDeviceImpl::OnInputDeviceTask, this, *devInfo, userData, id, name, deviceType))) {
+        MMI_HILOGE("post task failed");
     }
-    iter->second(userData, ids);
+    MMI_HILOGD("device info event userData:%{public}d id:%{public}d name:%{public}s type:%{public}d",
+        userData, id, name.c_str(), deviceType);
+}
+
+void InputDeviceImpl::OnInputDeviceIdsTask(InputDeviceImpl::DevIds devIds, int32_t userData, std::vector<int32_t> ids)
+{
+    CHK_PIDANDTID();
+    devIds.second(userData, ids);
+    MMI_HILOGD("device ids event callback userData:%{public}d ids:(%{public}s)",
+        userData, IdsListToString(ids).c_str());
+}
+
+void InputDeviceImpl::OnInputDeviceIds(int32_t userData, const std::vector<int32_t> &ids)
+{
+    CHK_PIDANDTID();
+    std::lock_guard<std::mutex> guard(mtx_);
+    auto devIds = GetDeviceIds(userData);
+    CHKPV(devIds);
+    if (!MMIEventHandler::PostTask(devIds->first,
+        std::bind(&InputDeviceImpl::OnInputDeviceIdsTask, this, *devIds, userData, ids))) {
+        MMI_HILOGE("post task failed");
+    }
+    MMI_HILOGD("device ids event userData:%{public}d ids:(%{public}s)", userData, IdsListToString(ids).c_str());
+}
+
+void InputDeviceImpl::OnKeystrokeAbilityTask(InputDeviceImpl::DevKeys devKeys, int32_t userData,
+    std::vector<int32_t> keystrokeAbility)
+{
+    CHK_PIDANDTID();
+    devKeys.second(userData, keystrokeAbility);
+    MMI_HILOGD("device keys event callback userData:%{public}d keys:(%{public}s)",
+        userData, IdsListToString(keystrokeAbility).c_str());
+}
+
+void InputDeviceImpl::OnKeystrokeAbility(int32_t userData, const std::vector<int32_t> &keystrokeAbility)
+{
+    CHK_PIDANDTID();
+    std::lock_guard<std::mutex> guard(mtx_);
+    auto devKeys = GetDeviceKeys(userData);
+    CHKPV(devKeys);
+    if (!MMIEventHandler::PostTask(devKeys->first,
+        std::bind(&InputDeviceImpl::OnKeystrokeAbilityTask, this, *devKeys, userData, keystrokeAbility))) {
+        MMI_HILOGE("post task failed");
+    }
+    MMI_HILOGD("device keys event userData:%{public}d ids:(%{public}s)",
+        userData, IdsListToString(keystrokeAbility).c_str());
+}
+
+const InputDeviceImpl::DevInfo* InputDeviceImpl::GetDeviceInfo(int32_t userData) const
+{
+    auto iter = inputDevices_.find(userData);
+    if (iter == inputDevices_.end()) {
+        return nullptr;
+    }
+    return &iter->second.inputDevice;
+}
+
+const InputDeviceImpl::DevIds* InputDeviceImpl::GetDeviceIds(int32_t userData) const
+{
+    auto iter = inputDevices_.find(userData);
+    if (iter == inputDevices_.end()) {
+        return nullptr;
+    }
+    return &iter->second.ids;
+}
+
+const InputDeviceImpl::DevKeys* InputDeviceImpl::GetDeviceKeys(int32_t userData) const
+{
+    auto iter = inputDevices_.find(userData);
+    if (iter == inputDevices_.end()) {
+        return nullptr;
+    }
+    return &iter->second.keys;
 }
 } // namespace MMI
 } // namespace OHOS

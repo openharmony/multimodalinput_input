@@ -161,7 +161,6 @@ void InputEventHandler::OnEvent(void *event)
     }
 
     eventType_ = libinput_event_get_type(lpEvent);
-    auto tid = GetThisThreadId();
     initSysClock_ = GetSysClockTime();
     lastSysClock_ = 0;
     idSeed_ += 1;
@@ -173,7 +172,7 @@ void InputEventHandler::OnEvent(void *event)
     }
 
     MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
-               "initSysClock:%{public}" PRId64, idSeed_, tid, eventType_, initSysClock_);
+               "initSysClock:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType_, initSysClock_);
 
     OnEventHandler(lpEvent);
     lastSysClock_ = GetSysClockTime();
@@ -284,7 +283,8 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         return KEY_EVENT_DISP_FAIL;
     }
     if (keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP ||
-        keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN) {
+        keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN ||
+        keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_DEL) {
         if (!TimerMgr->IsExist(timerId_) && keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
             AddHandleTimer();
             MMI_HILOGD("add a timer");

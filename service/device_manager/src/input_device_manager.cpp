@@ -15,6 +15,8 @@
 
 #include "input_device_manager.h"
 
+#include "key_event_value_transformation.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -52,6 +54,23 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
         ids.push_back(item.first);
     }
     return ids;
+}
+
+std::map<int32_t, bool> InputDeviceManager::GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> &keyCodes)
+{
+    CALL_LOG_ENTER;
+    std::map<int32_t, bool> keystrokeAbility;
+    auto iter = inputDevice_.find(deviceId);
+    if (iter == inputDevice_.end()) {
+        keystrokeAbility[INVALID_DEVICE_ID] = false;
+        return keystrokeAbility;
+    }
+    for (const auto& item : keyCodes) {
+        auto sysKeyCode = InputTransformationKeyValue(item);
+        bool ret = libinput_device_has_key(iter->second, sysKeyCode) == 1 ? true : false;
+        keystrokeAbility[item] = ret;
+    }
+    return keystrokeAbility;
 }
 
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)

@@ -463,7 +463,12 @@ std::string GetFileExtendName(const std::string& fileName)
 
 int32_t GetFileSize(const std::string& fileName)
 {
-    FILE* pFile = fopen(fileName.c_str(), "rb");
+    char realPath[PATH_MAX] = {};
+    if (realpath(fileName.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("path is error, path:%{public}s", fileName.c_str());
+        return RET_ERR;
+    }
+    FILE* pFile = fopen(realPath, "rb");
     if (pFile) {
         fseek(pFile, 0, SEEK_END);
         long fileSize = ftell(pFile);

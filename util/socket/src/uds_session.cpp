@@ -23,6 +23,8 @@
 #include <sys/un.h>
 #include <unistd.h>
 
+#include "uds_socket.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -41,8 +43,6 @@ UDSSession::UDSSession(const std::string& programName, const int32_t moduleType,
     UpdateDescript();
 }
 
-UDSSession::~UDSSession() {}
-
 bool UDSSession::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
@@ -54,11 +54,32 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         MMI_HILOGE("fd_ is less than 0");
         return false;
     }
-    ssize_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
-    if (ret < 0) {
-        MMI_HILOGE("write return %{public}zd,"
-                   "fd_:%{public}d,errno:%{public}d",
-                   ret, fd_, errno);
+
+    int32_t idx = 0;
+    int32_t retryCount = 0;
+    const int32_t bufSize = static_cast<int32_t>(size);
+    int32_t remSize = bufSize;
+    while (remSize > 0 && retryCount < SEND_RETRY_LIMIT) {
+        retryCount += 1;
+        auto count = send(fd_, &buf[idx], remSize, MSG_DONTWAIT | MSG_NOSIGNAL);
+        if (count < 0) {
+            if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
+                MMI_HILOGW("continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
+                usleep(SEND_RETRY_SLEEP_TIME);
+                continue;
+            }
+            MMI_HILOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
+            return false;
+        }
+        idx += count;
+        remSize -= count;
+        if (remSize > 0) {
+            usleep(SEND_RETRY_SLEEP_TIME);
+        }
+    }
+    if (retryCount >= SEND_RETRY_LIMIT || remSize != 0) {
+        MMI_HILOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
+            retryCount, SEND_RETRY_LIMIT, idx, bufSize, fd_);
         return false;
     }
     return true;

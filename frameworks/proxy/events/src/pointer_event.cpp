@@ -436,6 +436,12 @@ void PointerEvent::SetAxisValue(AxisType axis, double axisValue)
     }
 }
 
+void PointerEvent::ClearAxisValue()
+{
+    axisValues_ = {};
+    axes_ = 0;
+}
+
 bool PointerEvent::HasAxis(uint32_t axes, AxisType axis)
 {
     bool ret { false };
@@ -799,7 +805,7 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
 {
     const int precision = 2;
     std::vector<int32_t> pointerIds { pointerEvent.GetPointersIdList() };
-    ostream << "EventType:" << pointerEvent.DumpEventType()
+    ostream << "EventType:" << pointerEvent.GetEventType()
          << ",ActionTime:" << pointerEvent.GetActionTime()
          << ",Action:" << pointerEvent.GetAction()
          << ",ActionStartTime:" << pointerEvent.GetActionStartTime()

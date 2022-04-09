@@ -14,11 +14,13 @@
  */
 
 #include "multimodal_event_handler.h"
+
+#include "proto.h"
+
 #include "input_event.h"
 #include "input_manager_impl.h"
 #include "input_handler_manager.h"
 #include "mmi_client.h"
-#include "proto.h"
 
 namespace OHOS {
 namespace MMI {
@@ -28,7 +30,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Multim
 
 void OnConnected(const IfMMIClient& client)
 {
-    InputManagerImpl::GetInstance()->OnConnected();
+    CALL_LOG_ENTER;
+    InputMgrImpl->OnConnected();
     KeyEventInputSubscribeMgr.OnConnected();
     InputHandlerManager::GetInstance().OnConnected();
 }
@@ -45,13 +48,13 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
     return EventManager.InjectEvent(keyEventPtr);
 }
 
-int32_t MultimodalEventHandler::GetMultimodeInputInfo()
+bool MultimodalEventHandler::StartClient()
 {
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return MMI_SERVICE_INVALID;
+    CALL_LOG_ENTER;
+    if (client_ == nullptr) {
+        return InitClient();
     }
-    return MMI_SERVICE_RUNNING;
+    return true;
 }
 
 bool MultimodalEventHandler::InitClient()
@@ -62,10 +65,8 @@ bool MultimodalEventHandler::InitClient()
     }
     client_ = std::make_shared<MMIClient>();
     CHKPF(client_);
-    cMsgHandler_ = std::make_shared<ClientMsgHandler>();
-    CHKPF(cMsgHandler_);
     client_->RegisterConnectedFunction(&OnConnected);
-    if (!(client_->Start(cMsgHandler_, true))) {
+    if (!(client_->Start())) {
         MMI_HILOGE("The client fails to start");
         return false;
     }
@@ -74,29 +75,38 @@ bool MultimodalEventHandler::InitClient()
 
 MMIClientPtr MultimodalEventHandler::GetMMIClient()
 {
-    if (InitClient()) {
-        return client_;
+    if (client_ != nullptr) {
+        return client_->GetSharedPtr();
     }
     MMI_HILOGE("Init client faild");
     return nullptr;
 }
 
-int32_t MultimodalEventHandler::GetDeviceIds(int32_t taskId)
+int32_t MultimodalEventHandler::GetDeviceIds(int32_t userData)
 {
     if (!InitClient()) {
         MMI_HILOGE("Init client faild");
         return MMI_SERVICE_INVALID;
     }
-    return EventManager.GetDeviceIds(taskId);
+    return EventManager.GetDeviceIds(userData);
 }
 
-int32_t MultimodalEventHandler::GetDevice(int32_t taskId, int32_t deviceId)
+int32_t MultimodalEventHandler::GetDevice(int32_t userData, int32_t deviceId)
 {
     if (!InitClient()) {
         MMI_HILOGE("Init client faild");
         return MMI_SERVICE_INVALID;
     }
-    return EventManager.GetDevice(taskId, deviceId);
+    return EventManager.GetDevice(userData, deviceId);
+}
+
+int32_t MultimodalEventHandler::GetKeystrokeAbility(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes)
+{
+    if (!InitClient()) {
+        MMI_HILOGE("Init client faild");
+        return MMI_SERVICE_INVALID;
+    }
+    return EventManager.GetKeystrokeAbility(userData, deviceId, keyCodes);
 }
 
 int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)

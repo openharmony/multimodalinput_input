@@ -33,7 +33,7 @@ public:
     /**
      * @brief Obtains an <b>InputManager</b> instance.
      * @return Returns the pointer to the <b>InputManager</b> instance.
-     * @since 8
+     * @since 9
      */
     static InputManager *GetInstance();
     virtual ~InputManager() = default;
@@ -42,7 +42,7 @@ public:
      * @brief Updates the screen and window information.
      * @param physicalDisplays Indicates the physical screen information.
      * @param logicalDisplays Indicates the logical screen information, which includes the window information.
-     * @since 8
+     * @since 9
      */
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
         const std::vector<LogicalDisplayInfo> &logicalDisplays);
@@ -55,7 +55,7 @@ public:
      * the processing of the input event continues.
      * @return return Returns a value greater than or equal to <b>0</b> if the input event filter is added
      * successfully; returns a value less than <b>0</b> otherwise.
-     * @since 8
+     * @since 9
      */
     int32_t AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter);
 
@@ -63,7 +63,7 @@ public:
      * @brief Sets a consumer for the window input event of the current process.
      * @param inputEventConsumer Indicates the consumer to set. The window input event of the current process
      * will be called back to the consumer object for processing.
-     * @since 8
+     * @since 9
      */
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer);
 
@@ -75,7 +75,7 @@ public:
      * @return Returns the subscription ID, which uniquely identifies a subscription in the process.
 	 * If the value is greater than or equal to <b>0</b>,
 	 * the subscription is successful. Otherwise, the subscription fails.
-     * @since 8
+     * @since 9
      */
     int32_t SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
         std::function<void(std::shared_ptr<KeyEvent>)> callback);
@@ -84,7 +84,7 @@ public:
      * @brief Unsubscribes from a key input event.
      * @param subscriberId Indicates the subscription ID, which is the return value of <b>SubscribeKeyEvent</b>.
      * @return void
-     * @since 8
+     * @since 9
      */
     void UnsubscribeKeyEvent(int32_t subscriberId);
 
@@ -96,7 +96,7 @@ public:
      * @return Returns the monitor ID, which uniquely identifies a monitor in the process.
 	 * If the value is greater than or equal to <b>0</b>, the monitor is successfully added. Otherwise,
      * the monitor fails to be added.
-     * @since 8
+     * @since 9
      */
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
 
@@ -108,7 +108,7 @@ public:
      * @return Returns the monitor ID, which uniquely identifies a monitor in the process.
      * If the value is greater than or equal to <b>0</b>, the monitor is successfully added. Otherwise,
      * the monitor fails to be added.
-     * @since 8
+     * @since 9
      */
     int32_t AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
 
@@ -120,7 +120,7 @@ public:
      * @return Returns the monitor ID, which uniquely identifies a monitor in the process.
      * If the value is greater than or equal to <b>0</b>, the monitor is successfully added. Otherwise,
      * the monitor fails to be added.
-     * @since 8
+     * @since 9
      */
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor);
 
@@ -128,7 +128,7 @@ public:
      * @brief Removes a monitor.
      * @param monitorId Indicates the monitor ID, which is the return value of <b>AddMonitor</b>.
      * @return void
-     * @since 8
+     * @since 9
      */
     void RemoveMonitor(int32_t monitorId);
 
@@ -138,7 +138,7 @@ public:
      * @param monitorId Indicates the monitor ID.
      * @param eventId Indicates the ID of the consumed touchscreen input event.
      * @return void
-     * @since 8
+     * @since 9
      */
     void MarkConsumed(int32_t monitorId, int32_t eventId);
 
@@ -150,7 +150,7 @@ public:
      * @return Returns the interceptor ID, which uniquely identifies an interceptor in the process.
      * If the value is greater than or equal to <b>0</b>,the interceptor is successfully added. Otherwise,
      * the interceptor fails to be added.
-     * @since 8
+     * @since 9
      */
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
     int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
@@ -160,7 +160,7 @@ public:
      * @brief Removes an interceptor.
      * @param interceptorId Indicates the interceptor ID, which is the return value of <b>AddInterceptor</b>.
      * @return void
-     * @since 8
+     * @since 9
      */
     void RemoveInterceptor(int32_t interceptorId);
 
@@ -169,7 +169,7 @@ public:
 	 * processed in the same way as the event reported by the input device.
      * @param keyEvent Indicates the key input event to simulate.
      * @return void
-     * @since 8
+     * @since 9
      */
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);
 
@@ -179,7 +179,7 @@ public:
      * @param pointerEvent Indicates the touchpad input event, touchscreen input event,
      * or mouse device input event to simulate.
      * @return void
-     * @since 8
+     * @since 9
      */
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
 

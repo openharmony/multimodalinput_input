@@ -271,7 +271,7 @@ bool KeyCommandManager::HandleKeyDown(ShortcutKey &shortcutKey)
         MMI_HILOGE("Timer add failed");
         return false;
     }
-    MMI_HILOGD("add timer success, timeid:%{public}d", shortcutKey.timerId);
+    MMI_HILOGD("add timer success");
     lastMatchedKey_ = shortcutKey;
     return true;
 }
