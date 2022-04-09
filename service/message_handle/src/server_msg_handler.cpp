@@ -17,7 +17,6 @@
 
 #include <cinttypes>
 
-#include "ability_launch_manager.h"
 #include "event_dump.h"
 #include "event_package.h"
 #include "hos_key_event.h"

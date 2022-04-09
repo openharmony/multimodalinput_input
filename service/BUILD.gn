@@ -30,7 +30,7 @@ config("libmmi_server_config") {
     "module_loader/include",
     "window_manager/include",
     "touch_transform_point/include",
-    "ability_launch/include",
+    "key_command/include",
     "subscriber/include",
     "timer_manager/include",
     "${mmi_service_path}/connect_manager/include",
@@ -76,7 +76,7 @@ config("libmmi_server_config") {
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
-  source = "ability_launch/etc/ability_launch_config.json"
+  source = "key_command/etc/ability_launch_config.json"
   part_name = "input"
   subsystem_name = "multimodalinput"
   relative_install_dir = "multimodalinput"
@@ -92,7 +92,6 @@ ohos_prebuilt_etc("drawing_pointer_image") {
 ohos_shared_library("libmmi-server") {
   sources = [
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
-    "ability_launch/src/ability_launch_manager.cpp",
     "device_manager/src/input_device.cpp",
     "device_manager/src/input_device_manager.cpp",
     "event_dispatch/src/event_dispatch.cpp",
@@ -123,6 +122,12 @@ ohos_shared_library("libmmi-server") {
       "hdf_adapter/src/hdf_event_manager.cpp",
       "hdi_inject/src/hdi_inject.cpp",
     ]
+  }
+
+  if (mmi_enable_combinationkey) {
+    sources += [ "key_command/src/key_command_manager.cpp" ]
+  } else {
+    sources += [ "key_command/src/i_key_command_manager.cpp" ]
   }
 
   if (mmi_enable_pointer_drawing) {
