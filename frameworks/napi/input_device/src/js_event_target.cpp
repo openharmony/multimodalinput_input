@@ -50,15 +50,113 @@ JsEventTarget::DeviceType g_deviceType[] = {
 };
 
 std::mutex mutex_;
+const std::string ADD_EVENT = "add";
+const std::string REMOVE_EVENT = "remove";
 } // namespace
+
+void JsEventTarget::EmitAddedEvent(uv_work_t *work, int32_t status)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    CHKPV(work);
+    CHKPV(work->data);
+    auto temp = static_cast<std::shared_ptr<JsUtil::CallbackInfo>*>(work->data);
+    delete work;
+    work = nullptr;
+    
+    auto addEvent = devMonitor_.find(ADD_EVENT);
+    if (addEvent == devMonitor_.end()) {
+        MMI_HILOGE("find add event failed");
+        return;
+    }
+
+    for (const auto &item : addEvent->second) {
+        CHKPC(item->env);
+        if (item->ref != (*temp)->ref) {
+            continue;
+        }
+        napi_value value = nullptr;
+        CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &value), CREATE_INT32);
+        napi_value handlerTemp = nullptr;
+        CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handlerTemp), GET_REFERENCE);
+        napi_value result = nullptr;
+        CHKRV(item->env, napi_call_function(item->env, nullptr, handlerTemp, 1, &value, &result), CALL_FUNCTION);
+    }
+}
+
+void JsEventTarget::EmitRemoveEvent(uv_work_t *work, int32_t status)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    CHKPV(work);
+    CHKPV(work->data);
+    auto temp = static_cast<std::shared_ptr<JsUtil::CallbackInfo>*>(work->data);
+    delete work;
+    work = nullptr;
+    
+    auto removeEvent = devMonitor_.find(REMOVE_EVENT);
+    if (removeEvent == devMonitor_.end()) {
+        MMI_HILOGE("find add event failed");
+        return;
+    }
+
+    for (const auto &item : removeEvent->second) {
+        CHKPC(item->env);
+        if (item->ref != (*temp)->ref) {
+            continue;
+        }
+        napi_value value = nullptr;
+        CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &value), CREATE_INT32);
+        napi_value handlerTemp = nullptr;
+        CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handlerTemp), GET_REFERENCE);
+        napi_value result = nullptr;
+        CHKRV(item->env, napi_call_function(item->env, nullptr, handlerTemp, 1, &value, &result), CALL_FUNCTION);
+    }
+}
+
+void JsEventTarget::TargetOn(std::string type, int32_t deviceId)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    auto iter = devMonitor_.find(type);
+    if (iter == devMonitor_.end()) {
+        MMI_HILOGE("find %{public}s failed", type.c_str());
+        return;
+    }
+
+    for (auto & item : iter->second) {
+        CHKPC(item->env);
+        uv_loop_s *loop = nullptr;
+        CHKRV(item->env, napi_get_uv_event_loop(item->env, &loop), GET_UV_LOOP);
+        uv_work_t *work = new (std::nothrow) uv_work_t;
+        CHKPV(work);
+        item->data.deviceId = deviceId;
+        work->data = static_cast<void*>(&item);
+        int32_t ret = 0;
+        if (type == ADD_EVENT) {
+            ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, EmitAddedEvent);
+        } else if (type == REMOVE_EVENT) {
+            ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, EmitRemoveEvent);
+        } else {
+            MMI_HILOGE("%{public}s is wrong", type.c_str());
+        }
+        if (ret != 0) {
+            delete work;
+            work = nullptr;
+            MMI_HILOGE("uv_queue_work failed");
+            return;
+        }
+    }
+}
 
 void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
     JsUtil jsUtil;
-    int32_t userData = jsUtil.GetUserData(work);
+    int32_t userData = jsUtil.GetInt32(work);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
         MMI_HILOGE("find userData failed");
@@ -88,10 +186,11 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
 void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
     JsUtil jsUtil;
-    int32_t userData = jsUtil.GetUserData(work);
+    int32_t userData = jsUtil.GetInt32(work);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
         MMI_HILOGE("find userData failed");
@@ -126,6 +225,7 @@ void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> ids)
     if (iter->second->env == nullptr) {
         callback_.erase(iter);
         MMI_HILOGE("env is nullptr");
+        return;
     }
 
     iter->second->data.ids = ids;
@@ -155,10 +255,11 @@ void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> ids)
 void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
     JsUtil jsUtil;
-    int32_t userData = jsUtil.GetUserData(work);
+    int32_t userData = jsUtil.GetInt32(work);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
         MMI_HILOGE("find userData failed");
@@ -210,10 +311,11 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
 void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
     JsUtil jsUtil;
-    int32_t userData = jsUtil.GetUserData(work);
+    int32_t userData = jsUtil.GetInt32(work);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
         MMI_HILOGE("find userData failed");
@@ -276,6 +378,7 @@ void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl:
     if (iter->second->env == nullptr) {
         callback_.erase(iter);
         MMI_HILOGE("env is nullptr");
+        return;
     }
 
     iter->second->data.device = device;
@@ -304,10 +407,11 @@ void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl:
 void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
     JsUtil jsUtil;
-    int32_t userData = jsUtil.GetUserData(work);
+    int32_t userData = jsUtil.GetInt32(work);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
         MMI_HILOGE("find userData failed");
@@ -342,10 +446,11 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
 void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
     JsUtil jsUtil;
-    int32_t userData = jsUtil.GetUserData(work);
+    int32_t userData = jsUtil.GetInt32(work);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
         MMI_HILOGE("find userData failed");
@@ -396,6 +501,7 @@ void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::vector<int32_t
     if (iter->second->env == nullptr) {
         callback_.erase(iter);
         MMI_HILOGE("env is nullptr");
+        return;
     }
 
     iter->second->data.keystrokeAbility = keystrokeAbility;
@@ -418,6 +524,52 @@ void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::vector<int32_t
         uData = nullptr;
         MMI_HILOGE("uv_queue_work failed");
         return;
+    }
+}
+
+void JsEventTarget::AddMonitor(napi_env env, std::string type, napi_value handle)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    auto iter = devMonitor_.find(type);
+
+    JsUtil jsUtil;
+    for (const auto &temp : iter->second) {
+        CHKPC(temp);
+        if (jsUtil.IsHandleEquals(env, handle, temp->ref)) {
+            MMI_HILOGW("handle already exists");
+            return;
+        }
+    }
+    napi_ref ref = nullptr;
+    CHKRV(env, napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
+    auto monitor = std::make_shared<JsUtil::CallbackInfo>();
+    monitor->env = env;
+    monitor->ref = ref;
+    iter->second.push_back(monitor);
+}
+
+void JsEventTarget::RemoveMonitor(napi_env env, std::string type, napi_value handle)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    auto iter = devMonitor_.find(type);
+    if (iter == devMonitor_.end()) {
+        MMI_HILOGE("find %{public}s failed", type.c_str());
+        return;
+    }
+    if (handle == nullptr) {
+        iter->second.clear();
+        MMI_HILOGD("clear %{public}s monitor list", type.c_str());
+        return;
+    }
+
+    JsUtil jsUtil;
+    for (auto &it : iter->second) {
+        if (jsUtil.IsHandleEquals(env, handle, it->ref)) {
+            it.reset();
+            return;
+        }
     }
 }
 
@@ -454,12 +606,8 @@ void JsEventTarget::ResetEnv()
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    for (auto &item : callback_) {
-        CHKPC(item.second);
-        CHKPC(item.second->env);
-        item.second->env = nullptr;
-    }
     callback_.clear();
+    devMonitor_.clear();
 }
 } // namespace MMI
 } // namespace OHOS

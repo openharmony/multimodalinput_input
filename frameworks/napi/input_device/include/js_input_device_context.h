@@ -26,12 +26,15 @@ public:
     DISALLOW_COPY_AND_MOVE(JsInputDeviceContext);
     ~JsInputDeviceContext();
     static napi_value Export(napi_env env, napi_value exports);
+    static napi_value On(napi_env env, napi_callback_info info);
+    static napi_value Off(napi_env env, napi_callback_info info);
     static napi_value GetDeviceIds(napi_env env, napi_callback_info info);
     static napi_value GetDevice(napi_env env, napi_callback_info info);
     static napi_value GetKeystrokeAbility(napi_env env, napi_callback_info info);
     std::shared_ptr<JsInputDeviceManager> GetJsInputDeviceMgr() const;
 
 private:
+    static bool CheckEventType(char *event);
     static napi_value CreateInstance(napi_env env);
     static JsInputDeviceContext* GetInstance(napi_env env);
     static napi_value JsConstructor(napi_env env, napi_callback_info info);
