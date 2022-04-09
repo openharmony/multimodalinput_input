@@ -164,6 +164,18 @@ int32_t StandardizedEventManager::GetKeystrokeAbility(int32_t userData, int32_t 
     return SendMsg(pkt);
 }
 
+int32_t StandardizedEventManager::RegisterInputDeviceMonitor()
+{
+    NetPacket pkt(MmiMessageId::ADD_INPUT_DEVICE_MONITOR);
+    return SendMsg(pkt);
+}
+
+int32_t StandardizedEventManager::UnRegisterInputDeviceMonitor()
+{
+    NetPacket pkt(MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR);
+    return SendMsg(pkt);
+}
+
 bool StandardizedEventManager::SendMsg(NetPacket& pkt) const
 {
     CHKPF(client_);

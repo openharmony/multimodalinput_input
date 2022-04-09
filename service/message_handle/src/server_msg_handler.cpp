@@ -65,6 +65,8 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ServerMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ServerMsgHandler::OnInputDeviceIds, this)},
         {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ServerMsgHandler::GetKeystrokeAbility, this)},
+        {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputDeviceMontior, this)},
+        {MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputDeviceMontior, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
         {MmiMessageId::ADD_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputEventMontior, this)},
         {MmiMessageId::REMOVE_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputEventMontior, this)},
@@ -533,6 +535,38 @@ int32_t ServerMsgHandler::GetKeystrokeAbility(SessionPtr sess, NetPacket& pkt)
         MMI_HILOGE("Sending failed");
         return MSG_SEND_FAIL;
     }
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pkt)
+{
+    CALL_LOG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    InputDevMgr->AddDevMonitor(sess, [sess](std::string type, int32_t deviceId) {
+        CALL_LOG_ENTER;
+        CHKPV(sess);
+        NetPacket pkt2(MmiMessageId::ADD_INPUT_DEVICE_MONITOR);
+        if (!pkt2.Write(type)) {
+            MMI_HILOGE("Packet write type failed");
+            return;
+        }
+        if (!pkt2.Write(deviceId)) {
+            MMI_HILOGE("Packet write deviceId failed");
+            return;
+        }
+        if (!sess->SendMsg(pkt2)) {
+            MMI_HILOGE("Sending failed");
+            return;
+        }
+    });
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket& pkt)
+{
+    CALL_LOG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    InputDevMgr->RemoveDevMonitor(sess);
     return RET_OK;
 }
 

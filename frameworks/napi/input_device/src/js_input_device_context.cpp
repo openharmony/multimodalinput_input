@@ -19,6 +19,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDeviceContext" };
+constexpr size_t MAX_STRING_LEN = 16;
+const std::string ADD_EVENT = "add";
+const std::string REMOVE_EVENT = "remove";
+
 const std::string GET_GLOBLE = "napi_get_global";
 const std::string DEFINE_CLASS = "napi_define_class";
 const std::string WRAP = "napi_wrap";
@@ -94,7 +98,7 @@ napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info 
         JsInputDeviceContext *context = static_cast<JsInputDeviceContext*>(data);
         delete context;
     }, nullptr, nullptr);
-    CHKRP(env, status, "napi_wrap");
+    CHKRP(env, status, WRAP);
     return thisVar;
 }
 
@@ -133,6 +137,94 @@ JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
 std::shared_ptr<JsInputDeviceManager> JsInputDeviceContext::GetJsInputDeviceMgr() const
 {
     return mgr_;
+}
+
+napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
+{
+    CALL_LOG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), "napi_get_cb_info");
+    if (argc != 2) {
+        MMI_HILOGE("the number of parameters is incorrect");
+        napi_throw_error(env, nullptr, "JsInputDeviceContext: the number of parameters is incorrect");
+        return nullptr;
+    }
+    napi_valuetype valueType = napi_undefined;
+    CHKRP(env, napi_typeof(env, argv[0], &valueType), "napi_typeof");
+    if (valueType != napi_string) {
+        MMI_HILOGE("the first parameter error");
+        napi_throw_error(env, nullptr, "JsInputDeviceContext: the first parameter error");
+        return nullptr;
+    }
+
+    char eventType[MAX_STRING_LEN] = {0};
+    size_t ret = 0;
+    CHKRP(env, napi_get_value_string_utf8(env, argv[0], eventType, MAX_STRING_LEN - 1, &ret), "napi_get_value_string_utf8");
+    std::string type = eventType;
+    if (type != ADD_EVENT && type != REMOVE_EVENT) {
+        MMI_HILOGE("event type is wrong");
+        napi_throw_error(env, nullptr, "JsInputDeviceContext: event type is wrong");
+        return nullptr;
+    }
+
+    CHKRP(env, napi_typeof(env, argv[1], &valueType), "napi_typeof");
+    if (valueType != napi_function) {
+        MMI_HILOGE("the second parameter is not a function");
+        napi_throw_error(env, nullptr, "JsInputDeviceContext: the second parameter is not a function");
+        return nullptr;
+    }
+
+    JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
+    auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
+    jsInputDeviceMgr->RegisterInputDeviceMonitor(env, type, argv[1]);
+    return nullptr;
+}
+
+napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
+{
+    CALL_LOG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), "napi_get_cb_info");
+    if (argc < 1 || argc > 2) {
+        MMI_HILOGE("the number of parameters is incorrect");
+        napi_throw_error(env, nullptr, "JsInputDeviceContext: the number of parameters is incorrect");
+        return nullptr;
+    }
+
+    napi_valuetype valueType = napi_undefined;
+    CHKRP(env, napi_typeof(env, argv[0], &valueType), "napi_typeof");
+    if (valueType != napi_string) {
+        MMI_HILOGE("the first parameter error");
+        napi_throw_error(env, nullptr, "JsInputDeviceContext: the first parameter error");
+        return nullptr;
+    }
+
+    char eventType[MAX_STRING_LEN] = {0};
+    size_t ret = 0;
+    CHKRP(env, napi_get_value_string_utf8(env, argv[0], eventType, MAX_STRING_LEN - 1, &ret), "napi_get_value_string_utf8");
+    std::string type = eventType;
+    if (type != ADD_EVENT && type != REMOVE_EVENT) {
+        MMI_HILOGE("event type is wrong");
+        napi_throw_error(env, nullptr, "JsInputDeviceContext: event type is wrong");
+        return nullptr;
+    }
+
+    JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
+    auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
+    if (argc == 1) {
+        jsInputDeviceMgr->UnRegisterInputDeviceMonitor(env, type);
+        return nullptr;
+    }
+    CHKRP(env, napi_typeof(env, argv[1], &valueType), TYPEOF);
+    if (valueType != napi_function) {
+        MMI_HILOGE("the first parameter is not a function");
+        napi_throw_error(env, nullptr, "JsInputDeviceContext: the first parameter is not a function");
+        return nullptr;
+    }
+    jsInputDeviceMgr->UnRegisterInputDeviceMonitor(env, type, argv[1]);
+    return nullptr;
 }
 
 napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info info)
@@ -276,6 +368,8 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         return nullptr;
     }
     napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_FUNCTION("on", On),
+        DECLARE_NAPI_STATIC_FUNCTION("off", Off),
         DECLARE_NAPI_STATIC_FUNCTION("getDevice", GetDevice),
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceIds", GetDeviceIds),
         DECLARE_NAPI_STATIC_FUNCTION("getKeystrokeAbility", GetKeystrokeAbility),
