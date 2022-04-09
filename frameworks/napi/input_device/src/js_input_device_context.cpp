@@ -36,6 +36,7 @@ const std::string HAS_NAMED_PROPERTY = "napi_has_named_property";
 const std::string TYPEOF = "napi_typeof";
 const std::string GET_INT32 = "napi_get_value_int32";
 const std::string DEFINE_PROPERTIES = "napi_define_properties";
+const std::string GET_STRING_UTF8 = "napi_get_value_string_utf8";
 } // namespace
 
 JsInputDeviceContext::JsInputDeviceContext()
@@ -160,7 +161,7 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
 
     char eventType[MAX_STRING_LEN] = {0};
     size_t ret = 0;
-    CHKRP(env, napi_get_value_string_utf8(env, argv[0], eventType, MAX_STRING_LEN - 1, &ret), "napi_get_value_string_utf8");
+    CHKRP(env, napi_get_value_string_utf8(env, argv[0], eventType, MAX_STRING_LEN - 1, &ret), GET_STRING_UTF8);
     std::string type = eventType;
     if (type != ADD_EVENT && type != REMOVE_EVENT) {
         MMI_HILOGE("event type is wrong");
@@ -203,7 +204,7 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
 
     char eventType[MAX_STRING_LEN] = {0};
     size_t ret = 0;
-    CHKRP(env, napi_get_value_string_utf8(env, argv[0], eventType, MAX_STRING_LEN - 1, &ret), "napi_get_value_string_utf8");
+    CHKRP(env, napi_get_value_string_utf8(env, argv[0], eventType, MAX_STRING_LEN - 1, &ret), GET_STRING_UTF8);
     std::string type = eventType;
     if (type != ADD_EVENT && type != REMOVE_EVENT) {
         MMI_HILOGE("event type is wrong");
