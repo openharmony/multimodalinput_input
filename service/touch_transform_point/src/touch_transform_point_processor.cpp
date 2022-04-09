@@ -59,7 +59,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
 
     PointerEvent::PointerItem item;
-    auto pressure = libinput_event_get_touch_pressure(event);
+    auto pressure = libinput_event_touch_get_pressure(data);
     auto seatSlot = libinput_event_touch_get_seat_slot(data);
     item.SetPressure(pressure);
     item.SetPointerId(seatSlot);
@@ -71,8 +71,8 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_HILOGD("LogicalX:%{public}d, logicalY:%{public}d, logicalDisplay:%{public}d",
-               logicalX, logicalY, logicalDisplayId);
+    MMI_HILOGD("LogicalX:%{public}d, logicalY:%{public}d, logicalDisplay:%{public}d, pressure:%{public}d",
+               logicalX, logicalY, logicalDisplayId, pressure);
     return true;
 }
 
@@ -98,12 +98,14 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
         MMI_HILOGE("Get pointer parameter failed");
         return false;
     }
-    auto pressure = libinput_event_get_touch_pressure(event);
+    auto pressure = libinput_event_touch_get_pressure(data);
     item.SetPressure(pressure);
     item.SetGlobalX(logicalX);
     item.SetGlobalY(logicalY);
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
+    MMI_HILOGD("LogicalX:%{public}d, logicalY:%{public}d, pressure:%{public}d",
+               logicalX, logicalY, pressure);
     return true;
 }
 
