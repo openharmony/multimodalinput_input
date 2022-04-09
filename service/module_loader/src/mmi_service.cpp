@@ -22,9 +22,9 @@
 
 #include "event_dump.h"
 #include "input_windows_manager.h"
+#include "i_pointer_drawing_manager.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
-#include "pointer_drawing_manager.h"
 #include "timer_manager.h"
 #include "util.h"
 
@@ -181,7 +181,7 @@ int32_t MMIService::Init()
         return WINDOWS_MSG_INIT_FAIL;
     }
     MMI_HILOGD("PointerDrawingManager Init");
-    if (!PointerDrawingManager::GetInstance()->Init()) {
+    if (!IPointerDrawingManager::GetInstance()->Init()) {
         MMI_HILOGE("Pointer draw init failed");
         return POINTER_DRAW_INIT_FAIL;
     }
@@ -199,19 +199,13 @@ int32_t MMIService::Init()
         MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;
     }
-    if (!InitSignalHandler()) {
-        MMI_HILOGE("Signal handler init failed");
-        return INIT_SIGNAL_HANDLER_FAIL;
-    }
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
     return RET_OK;
 }
 
 void MMIService::OnStart()
 {
-    auto tid = GetThisThreadId();
-    MMI_HILOGD("Thread tid:%{public}" PRId64 "", tid);
-
+    CHK_PIDANDTID();
     int32_t ret = Init();
     if (RET_OK != ret) {
         MMI_HILOGE("Init mmi_service failed");
@@ -225,21 +219,16 @@ void MMIService::OnStart()
 
 void MMIService::OnStop()
 {
-    auto tid = GetThisThreadId();
-    MMI_HILOGD("Thread tid:%{public}" PRId64 "", tid);
-
+    CHK_PIDANDTID();
     UdsStop();
-    if (InputHandler != nullptr) {
-        InputHandler->Clear();
-    }
+    InputHandler->Clear();
     libinputAdapter_.Stop();
     state_ = ServiceRunningState::STATE_NOT_START;
 }
 
 void MMIService::OnDump()
 {
-    auto tid = GetThisThreadId();
-    MMI_HILOGD("Thread tid:%{public}" PRId64 "", tid);
+    CHK_PIDANDTID();
     MMIEventDump->Dump();
 }
 
@@ -320,10 +309,6 @@ void MMIService::OnThread()
 {
     SetThreadName(std::string("mmi_service"));
     uint64_t tid = GetThisThreadId();
-    if (tid <= 0) {
-        MMI_HILOGE("The tid is error, errCode:%{public}d", VAL_NOT_EXP);
-        return;
-    }
     MMI_HILOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
 
     int32_t count = 0;
@@ -353,7 +338,7 @@ void MMIService::OnThread()
             if (it.second.isOverflow) {
                 continue;
             }
-            OnEpollRecv(it.first, it.second.sBuf.Data(), it.second.sBuf.Size());
+            OnRecv(it.first, it.second.sBuf.Data(), it.second.sBuf.Size());
         }
         OnTimer();
     }

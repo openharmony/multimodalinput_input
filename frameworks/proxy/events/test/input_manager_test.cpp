@@ -22,6 +22,10 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+#include "run_shell_util.h"
+#include "proto.h"
+
+#include "input_event.h"
 #include "input_event_monitor_manager.h"
 #include "input_handler_type.h"
 #include "input_manager.h"
@@ -29,8 +33,6 @@
 #include "multimodal_event_handler.h"
 #include "mmi_client.h"
 #include "pointer_event.h"
-#include "proto.h"
-#include "run_shell_util.h"
 
 namespace OHOS {
 namespace MMI {
@@ -499,7 +501,7 @@ std::string InputManagerTest::DumpPointerEvent(const std::shared_ptr<PointerEven
     const int precision = 2;
     std::ostringstream strm;
     strm << "ClientMsgHandler: in OnPointerEvent, #[[:digit:]]\\{1,\\}"
-         << ", EventType:" << pointerEvent->DumpEventType()
+         << ", EventType:" << pointerEvent->GetEventType()
          << ",ActionTime:" << pointerEvent->GetActionTime()
          << ",Action:" << pointerEvent->GetAction()
          << ",ActionStartTime:" << pointerEvent->GetActionStartTime()
@@ -814,16 +816,15 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent006()
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
     pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
     pointerEvent->SetPointerId(1);
-    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
     PointerEvent::PointerItem item;
     item.SetPointerId(1);
     item.SetDownTime(downTime);
     item.SetPressed(true);
 
-    item.SetGlobalX(50);
-    item.SetGlobalY(50);
-    item.SetLocalX(70);
-    item.SetLocalY(70);
+    item.SetGlobalX(10);
+    item.SetGlobalY(10);
+    item.SetLocalX(20);
+    item.SetLocalY(20);
 
     item.SetWidth(0);
     item.SetHeight(0);
@@ -1516,8 +1517,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_008, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManagerTest_SubscribeKeyEvent_010");
-    if (MultimodalEventHandler::GetInstance().GetMMIClient() == nullptr) {
+    if (!MMIEventHdl.StartClient()) {
         MMI_HILOGD("get mmi client failed");
         return;
     }
@@ -1583,7 +1583,7 @@ void InputEventInterceptor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEv
                "flag:%{public}u,pointerAction:%{public}s,sourceType:%{public}s,"
                "VerticalAxisValue:%{public}.2f,HorizontalAxisValue:%{public}.2f,"
                "pointerCount:%{public}zu",
-               pointerEvent->DumpEventType(), pointerEvent->GetActionTime(),
+               InputEvent::EventTypeToString(pointerEvent->GetEventType()), pointerEvent->GetActionTime(),
                pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
                pointerEvent->GetFlag(), pointerEvent->DumpPointerAction(),
                pointerEvent->DumpSourceType(),
@@ -1627,7 +1627,7 @@ std::string InputManagerTest::DumpPointerEvent2(const std::shared_ptr<PointerEve
     const int precision = 2;
     std::ostringstream strm;
     strm << "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
-         << "eventType:" << pointerEvent->DumpEventType()
+         << "eventType:" << pointerEvent->GetEventType()
          << ",actionTime:" << pointerEvent->GetActionTime()
          << ",action:" << pointerEvent->GetAction()
          << ",actionStartTime:" << pointerEvent->GetActionStartTime()

@@ -52,10 +52,7 @@ bool MouseDeviceState::IsLeftBtnPressed()
     if (iter == mouseBtnState_.end()) {
         return false;
     }
-    if (iter->second > 0) {
-        return true;
-    }
-    return false;
+    return iter->second > 0;
 }
 
 void MouseDeviceState::GetPressedButtons(std::vector<int32_t>& pressedButtons)

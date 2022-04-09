@@ -41,7 +41,7 @@ namespace MMI {
 #define CHKPL(cond, ...) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_HILOGE("%{public}s, (%{public}d), CHKPL(%{public}s) is null, do nothing", \
+            MMI_HILOGW("%{public}s, (%{public}d), CHKPL(%{public}s) is null, do nothing", \
                 __FILE__, __LINE__, #cond); \
         } \
     } while (0)
@@ -67,7 +67,7 @@ namespace MMI {
 #define CHKPC(cond) \
     { \
         if ((cond) == nullptr) { \
-            MMI_HILOGE("%{public}s, (%{public}d), CHKPC(%{public}s) is null, skip then continue", \
+            MMI_HILOGW("%{public}s, (%{public}d), CHKPC(%{public}s) is null, skip then continue", \
                 __FILE__, __LINE__, #cond); \
             continue; \
         } \
@@ -76,7 +76,7 @@ namespace MMI {
 #define CHKPB(cond) \
     { \
         if ((cond) == nullptr) { \
-            MMI_HILOGE("%{public}s, (%{public}d), CHKPC(%{public}s) is null, skip then break", \
+            MMI_HILOGW("%{public}s, (%{public}d), CHKPC(%{public}s) is null, skip then break", \
                 __FILE__, __LINE__, #cond); \
             break; \
         } \
@@ -100,6 +100,15 @@ namespace MMI {
         } \
     } while (0)
 
+#define CHKPO(cond) \
+    do { \
+        if ((cond) == nullptr) { \
+            MMI_HILOGW("%{public}s, (%{public}d), CHKPO(%{public}s) is null, skip then continue", \
+                __FILE__, __LINE__, #cond); \
+            return {}; \
+        } \
+    } while (0)
+
 #define CK(cond, ec) \
     do { \
         if (!(cond)) { \
@@ -108,11 +117,17 @@ namespace MMI {
         } \
     } while (0)
 
+#define CHK_PIDANDTID() \
+    do { \
+        MMI_HILOGD("%{public}s, (%{public}d), pid:%{public}d threadId:%{public}" PRIu64, \
+            __FILE__, __LINE__, GetPid(), GetThisThreadId()); \
+    } while (0)
+
 #else // DEBUG_CODE_TEST
 #define CHKPL(cond) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_HILOGE("CHKPL(%{public}s) is null, do nothing", #cond); \
+            MMI_HILOGW("CHKPL(%{public}s) is null, do nothing", #cond); \
         } \
     } while (0)
 
@@ -135,7 +150,7 @@ namespace MMI {
 #define CHKPC(cond) \
     { \
         if ((cond) == nullptr) { \
-            MMI_HILOGE("CHKPC(%{public}s) is null, skip then continue", #cond); \
+            MMI_HILOGW("CHKPC(%{public}s) is null, skip then continue", #cond); \
             continue; \
         } \
     }
@@ -143,7 +158,7 @@ namespace MMI {
 #define CHKPB(cond) \
     { \
         if ((cond) == nullptr) { \
-            MMI_HILOGE("CHKPC(%{public}s) is null, skip then break", #cond); \
+            MMI_HILOGW("CHKPB(%{public}s) is null, skip then break", #cond); \
             break; \
         } \
     }
@@ -164,11 +179,25 @@ namespace MMI {
         } \
     } while (0)
 
+#define CHKPO(cond) \
+    do { \
+        if ((cond) == nullptr) { \
+            MMI_HILOGW("%{public}s, (%{public}d), CHKPO(%{public}s) is null, return object is null", \
+                __FILE__, __LINE__, #cond); \
+            return {}; \
+        } \
+    } while (0)
+
 #define CK(cond, ec) \
     do { \
         if (!(cond)) { \
             MMI_HILOGE("CK(%{public}s), errCode:%{public}d", #cond, ec); \
         } \
+    } while (0)
+
+#define CHK_PIDANDTID() \
+    do { \
+        MMI_HILOGD("pid:%{public}d threadId:%{public}" PRIu64, GetPid(), GetThisThreadId()); \
     } while (0)
 
 #endif

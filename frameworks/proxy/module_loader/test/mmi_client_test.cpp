@@ -79,45 +79,6 @@ HWTEST_F(MMIClientTest, VirtualKeyIn, TestSize.Level1)
     mmiClient.VirtualKeyIn(virtualKeyEvent);
 }
 
-/**
- * @tc.name:ReplyMessageToServer_001
- * @tc.desc:Verify reply message to server
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, ReplyMessageToServer_001, TestSize.Level1)
-{
-    int64_t serverStartTime = 1;
-    int64_t clientEndTime = 1;
-
-    mmiClient.ReplyMessageToServer(static_cast<MmiMessageId>(4), serverStartTime, clientEndTime);
-}
-
-/**
- * @tc.name:ReplyMessageToServer_002
- * @tc.desc:Verify reply message to server
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, ReplyMessageToServer_002, TestSize.Level1)
-{
-    int64_t serverStartTime = 0;
-    int64_t clientEndTime = 0;
-
-    mmiClient.ReplyMessageToServer(static_cast<MmiMessageId>(3), serverStartTime, clientEndTime);
-}
-
-/**
- * @tc.name:SdkGetMultimodeInputInfo
- * @tc.desc:Verify get multimodal input info
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, SdkGetMultimodeInputInfo, TestSize.Level1)
-{
-    mmiClient.SdkGetMultimodeInputInfo();
-}
-
 MMIClientUnitTest mmiClientTest;
 /**
  * @tc.name:Re_RegisterConnectedFunction
@@ -153,51 +114,6 @@ HWTEST_F(MMIClientTest, Re_VirtualKeyIn, TestSize.Level1)
     mmiClientTest.VirtualKeyIn(virtualKeyEvent);
 }
 
-/**
- * @tc.name:Re_ReplyMessageToServer_001
- * @tc.desc:Verify reply message to server
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, Re_ReplyMessageToServer_001, TestSize.Level1)
-{
-    int64_t serverStartTime = 1;
-    int64_t clientEndTime = 1;
-
-    mmiClientTest.ReplyMessageToServer(static_cast<MmiMessageId>(1), serverStartTime, clientEndTime);
-}
-
-/**
- * @tc.name:Re_ReplyMessageToServer_002
- * @tc.desc:Verify reply message to server
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, Re_ReplyMessageToServer_002, TestSize.Level1)
-{
-    int64_t serverStartTime = 0;
-    int64_t clientEndTime = 0;
-
-    mmiClientTest.ReplyMessageToServer(static_cast<MmiMessageId>(2), serverStartTime, clientEndTime);
-}
-
-/**
- * @tc.name:Re_SdkGetMultimodeInputInfo
- * @tc.desc:Verify get multimodal input info
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, Re_SdkGetMultimodeInputInfo, TestSize.Level1)
-{
-    mmiClientTest.SdkGetMultimodeInputInfo();
-}
-
-/**
- * @tc.name:Re_OnConnected
- * @tc.desc:Verify connnected unit
- * @tc.type: FUNC
- * @tc.require:
- */
 HWTEST_F(MMIClientTest, Re_OnConnected, TestSize.Level1)
 {
     mmiClientTest.OnConnectedUnitTest();

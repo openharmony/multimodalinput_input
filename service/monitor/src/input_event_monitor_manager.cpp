@@ -17,9 +17,9 @@
 
 #include <cinttypes>
 
-#include "input_event_data_transformation.h"
 #include "proto.h"
 
+#include "input_event_data_transformation.h"
 
 namespace OHOS {
 namespace MMI {
