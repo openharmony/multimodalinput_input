@@ -56,8 +56,8 @@ const std::string REMOVE_EVENT = "remove";
 
 JsEventTarget::JsEventTarget()
 {
-    devMonitor_.insert({ADD_EVENT, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>()});
-    devMonitor_.insert({REMOVE_EVENT, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>()});
+    devMonitor_.insert( {ADD_EVENT, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>()} );
+    devMonitor_.insert( {REMOVE_EVENT, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>()} );
 }
 
 JsEventTarget::~JsEventTarget() {}
@@ -615,7 +615,7 @@ void JsEventTarget::ResetEnv()
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     callback_.clear();
-    // devMonitor_.clear();
+    devMonitor_.clear();
 }
 } // namespace MMI
 } // namespace OHOS
