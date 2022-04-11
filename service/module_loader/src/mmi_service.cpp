@@ -22,9 +22,9 @@
 
 #include "event_dump.h"
 #include "input_windows_manager.h"
+#include "i_pointer_drawing_manager.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
-#include "pointer_drawing_manager.h"
 #include "timer_manager.h"
 #include "util.h"
 
@@ -181,7 +181,7 @@ int32_t MMIService::Init()
         return WINDOWS_MSG_INIT_FAIL;
     }
     MMI_HILOGD("PointerDrawingManager Init");
-    if (!PointerDrawingManager::GetInstance()->Init()) {
+    if (!IPointerDrawingManager::GetInstance()->Init()) {
         MMI_HILOGE("Pointer draw init failed");
         return POINTER_DRAW_INIT_FAIL;
     }
