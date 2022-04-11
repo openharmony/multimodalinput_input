@@ -23,13 +23,14 @@ namespace MMI {
 class IInterceptorManager {
 public:
     static std::shared_ptr<IInterceptorManager> GetInstance();
+    IInterceptorManager() = default;
     virtual ~IInterceptorManager() = default;
     virtual int32_t AddInterceptor(int32_t sourceType,
-        std::function<void(std::shared_ptr<PointerEvent>)> interceptor) = 0;
-    virtual int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor) = 0;
-    virtual void RemoveInterceptor(int32_t interceptorId) = 0;
-    virtual int32_t OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id) = 0;
-    virtual int32_t OnKeyEvent(std::shared_ptr<KeyEvent> pointerEvent) = 0;
+        std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
+    virtual int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
+    virtual void RemoveInterceptor(int32_t interceptorId);
+    virtual int32_t OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id);
+    virtual int32_t OnKeyEvent(std::shared_ptr<KeyEvent> pointerEvent);
 protected:
     static inline std::shared_ptr<IInterceptorManager> interceptorMgrPtr_ = nullptr;
 };

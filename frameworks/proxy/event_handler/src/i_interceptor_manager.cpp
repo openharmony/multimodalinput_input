@@ -13,44 +13,42 @@
  * limitations under the License.
  */
 
-#include "non_interceptor_manager.h"
+#include "i_interceptor_manager.h"
 #include "define_multimodal.h"
 #include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NonInterceptorManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInterceptorManager" };
 } // namespace
 
-NonInterceptorManager::NonInterceptorManager() {}
-
-int32_t NonInterceptorManager::AddInterceptor(int32_t sourceType,
+int32_t IInterceptorManager::AddInterceptor(int32_t sourceType,
     std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
 {
     CALL_LOG_ENTER;
     return RET_ERR;
 }
 
-int32_t NonInterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
+int32_t IInterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
     CALL_LOG_ENTER;
     return RET_ERR;
 }
 
-void NonInterceptorManager::RemoveInterceptor(int32_t interceptorId)
+void IInterceptorManager::RemoveInterceptor(int32_t interceptorId)
 {
     MMI_HILOGD("Interceptor is:%{public}d", interceptorId);
     return;
 }
 
-int32_t NonInterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id)
+int32_t IInterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id)
 {
     CALL_LOG_ENTER;
     return RET_ERR;
 }
 
-int32_t NonInterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> pointerEvent)
+int32_t IInterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> pointerEvent)
 {
     CALL_LOG_ENTER;
     return RET_ERR;
@@ -59,7 +57,7 @@ int32_t NonInterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> pointerEvent
 std::shared_ptr<IInterceptorManager> IInterceptorManager::GetInstance()
 {
     if (interceptorMgrPtr_ == nullptr) {
-        interceptorMgrPtr_ = std::make_shared<NonInterceptorManager>();
+        interceptorMgrPtr_ = std::make_shared<IInterceptorManager>();
     }
     return interceptorMgrPtr_;
 }
