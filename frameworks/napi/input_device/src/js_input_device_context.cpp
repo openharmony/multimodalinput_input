@@ -331,7 +331,7 @@ napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback
         CHKRP(env, napi_get_element(env, argv[1], i, &keyValue), GET_ELEMENT);
         CHKRP(env, napi_typeof(env, keyValue, &valueType), TYPEOF);
         if (valueType != napi_number) {
-            MMI_HILOGE("the %{public}zu parameter is not a number", ++i);
+            MMI_HILOGE("the %{public}u parameter is not a number", ++i);
             napi_throw_error(env, nullptr, "JsInputDeviceContext: parameter type error");
             return nullptr;
         }
