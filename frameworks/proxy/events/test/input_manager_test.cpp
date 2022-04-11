@@ -25,6 +25,7 @@
 #include "run_shell_util.h"
 #include "proto.h"
 
+#include "input_event.h"
 #include "input_event_monitor_manager.h"
 #include "input_handler_type.h"
 #include "input_manager.h"
@@ -500,7 +501,7 @@ std::string InputManagerTest::DumpPointerEvent(const std::shared_ptr<PointerEven
     const int precision = 2;
     std::ostringstream strm;
     strm << "ClientMsgHandler: in OnPointerEvent, #[[:digit:]]\\{1,\\}"
-         << ", EventType:" << pointerEvent->DumpEventType()
+         << ", EventType:" << pointerEvent->GetEventType()
          << ",ActionTime:" << pointerEvent->GetActionTime()
          << ",Action:" << pointerEvent->GetAction()
          << ",ActionStartTime:" << pointerEvent->GetActionStartTime()
@@ -1582,7 +1583,7 @@ void InputEventInterceptor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEv
                "flag:%{public}u,pointerAction:%{public}s,sourceType:%{public}s,"
                "VerticalAxisValue:%{public}.2f,HorizontalAxisValue:%{public}.2f,"
                "pointerCount:%{public}zu",
-               pointerEvent->DumpEventType(), pointerEvent->GetActionTime(),
+               InputEvent::EventTypeToString(pointerEvent->GetEventType()), pointerEvent->GetActionTime(),
                pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
                pointerEvent->GetFlag(), pointerEvent->DumpPointerAction(),
                pointerEvent->DumpSourceType(),
@@ -1626,7 +1627,7 @@ std::string InputManagerTest::DumpPointerEvent2(const std::shared_ptr<PointerEve
     const int precision = 2;
     std::ostringstream strm;
     strm << "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
-         << "eventType:" << pointerEvent->DumpEventType()
+         << "eventType:" << pointerEvent->GetEventType()
          << ",actionTime:" << pointerEvent->GetActionTime()
          << ",action:" << pointerEvent->GetAction()
          << ",actionStartTime:" << pointerEvent->GetActionStartTime()
