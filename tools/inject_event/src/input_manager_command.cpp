@@ -463,7 +463,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return EVENT_REG_FAIL;
                             }
                             if ((totalTime < 1) || (totalTime > 15000)) {
-                                std::cout << "Total time out of range, 1 < totalTime < 150000" << std::endl;
+                                std::cout << "totalTime is out of range. 1 < totalTime < 150000" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
                             auto pointerEvent = PointerEvent::Create();
@@ -479,11 +479,11 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             int32_t blockTime = 16;
-                            int32_t numberTime = totalTime / blockTime;
-                            int32_t vecX = px2 - px1;
-                            int32_t vecY = py2 - py1;
-                            int32_t stepX = 0;
-                            int32_t stepY = 0;
+                            double numberTime = totalTime / blockTime;
+                            double vecX = px2 - px1;
+                            double vecY = py2 - py1;
+                            double stepX = 0;
+                            double stepY = 0;
                             if (vecX == 0) {
                                 stepX = px1;
                             } else {
@@ -494,7 +494,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             } else {
                                 stepY = vecY / numberTime;
                             }
-                            for (int64_t i = 1; i <= numberTime; ++i) {
+                            for (double i = 1; i <= numberTime; ++i) {
                                 if (vecX == 0) {
                                     item.SetGlobalX(px1);
                                 } else {
