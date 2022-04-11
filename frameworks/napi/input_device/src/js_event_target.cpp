@@ -92,7 +92,7 @@ void JsEventTarget::EmitAddedEvent(uv_work_t *work, int32_t status)
         napi_value handlerTemp = nullptr;
         CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handlerTemp), GET_REFERENCE);
         napi_value ret = nullptr;
-        CHKRV(item->env, napi_call_function(item->env, nullptr, handlerTemp, 2, &result[0], &ret), CALL_FUNCTION);
+        CHKRV(item->env, napi_call_function(item->env, nullptr, handlerTemp, 2, result, &ret), CALL_FUNCTION);
     }
 }
 
@@ -123,7 +123,7 @@ void JsEventTarget::EmitRemoveEvent(uv_work_t *work, int32_t status)
         napi_value handlerTemp = nullptr;
         CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handlerTemp), GET_REFERENCE);
         napi_value ret = nullptr;
-        CHKRV(item->env, napi_call_function(item->env, nullptr, handlerTemp, 2, &result[0], &ret), CALL_FUNCTION);
+        CHKRV(item->env, napi_call_function(item->env, nullptr, handlerTemp, 2, result, &ret), CALL_FUNCTION);
     }
 }
 
