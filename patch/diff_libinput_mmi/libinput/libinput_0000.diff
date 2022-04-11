@@ -12,8 +12,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 diff -Naur old/BUILD.gn new/BUILD.gn
---- old/BUILD.gn	2022-03-22 20:43:22.752694861 +0800
-+++ new/BUILD.gn	2022-04-01 11:08:17.626186763 +0800
+--- old/BUILD.gn	2022-04-09 01:32:23.301616554 +0000
++++ new/BUILD.gn	2022-04-09 08:50:31.681087133 +0000
 @@ -21,9 +21,16 @@
  config("libinput-third_public_config") {
    include_dirs = [
@@ -77,8 +77,8 @@ diff -Naur old/BUILD.gn new/BUILD.gn
  }
 \ No newline at end of file
 diff -Naur old/export_include/libinput.h new/export_include/libinput.h
---- old/export_include/libinput.h	2022-03-22 20:43:22.752694861 +0800
-+++ new/export_include/libinput.h	2022-04-01 11:24:07.615040023 +0800
+--- old/export_include/libinput.h	2022-04-09 01:32:23.309616623 +0000
++++ new/export_include/libinput.h	2022-04-09 08:56:38.942582967 +0000
 @@ -196,6 +196,22 @@
  	LIBINPUT_DEVICE_CAP_TABLET_PAD = 4,
  	LIBINPUT_DEVICE_CAP_GESTURE = 5,
@@ -466,8 +466,8 @@ diff -Naur old/export_include/libinput.h new/export_include/libinput.h
 + * 
 + * @since 1.4
 + */
-+double
-+libinput_event_get_touch_pressure(struct libinput_event* event);
++int32_t
++libinput_event_touch_get_pressure(struct libinput_event_touch* event);
 +
 +const char*
 +libinput_device_get_phys(struct libinput_device* device);
@@ -480,8 +480,8 @@ diff -Naur old/export_include/libinput.h new/export_include/libinput.h
  #endif /* LIBINPUT_H */
 +
 diff -Naur old/hm_src/hm_missing.c new/hm_src/hm_missing.c
---- old/hm_src/hm_missing.c	1970-01-01 08:00:00.000000000 +0800
-+++ new/hm_src/hm_missing.c	2022-04-01 11:08:17.626186763 +0800
+--- old/hm_src/hm_missing.c	1970-01-01 00:00:00.000000000 +0000
++++ new/hm_src/hm_missing.c	2022-04-09 08:50:31.681087133 +0000
 @@ -0,0 +1,22 @@
 +/*
 + * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
@@ -507,8 +507,8 @@ diff -Naur old/hm_src/hm_missing.c new/hm_src/hm_missing.c
 +}
 \ No newline at end of file
 diff -Naur old/hm_src/hm_missing.h new/hm_src/hm_missing.h
---- old/hm_src/hm_missing.h	1970-01-01 08:00:00.000000000 +0800
-+++ new/hm_src/hm_missing.h	2022-04-01 11:08:17.626186763 +0800
+--- old/hm_src/hm_missing.h	1970-01-01 00:00:00.000000000 +0000
++++ new/hm_src/hm_missing.h	2022-04-09 08:50:31.681087133 +0000
 @@ -0,0 +1,25 @@
 +/*
 + * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
@@ -536,8 +536,8 @@ diff -Naur old/hm_src/hm_missing.h new/hm_src/hm_missing.h
 +
 +#endif
 diff -Naur old/include/config.h new/include/config.h
---- old/include/config.h	2022-03-22 20:43:22.752694861 +0800
-+++ new/include/config.h	2022-04-01 11:08:17.626186763 +0800
+--- old/include/config.h	2022-04-09 01:32:23.309616623 +0000
++++ new/include/config.h	2022-04-09 08:50:31.681087133 +0000
 @@ -18,14 +18,17 @@
  #endif
  #define HTTP_DOC_LINK "https://wayland.freedesktop.org/libinput/doc/latest"
@@ -573,8 +573,8 @@ diff -Naur old/include/config.h new/include/config.h
 +
 +
 diff -Naur old/include/linux/linux/input-event-codes.h new/include/linux/linux/input-event-codes.h
---- old/include/linux/linux/input-event-codes.h	2022-03-22 20:43:22.752694861 +0800
-+++ new/include/linux/linux/input-event-codes.h	1970-01-01 08:00:00.000000000 +0800
+--- old/include/linux/linux/input-event-codes.h	2022-04-09 01:32:23.313616658 +0000
++++ new/include/linux/linux/input-event-codes.h	1970-01-01 00:00:00.000000000 +0000
 @@ -1,945 +0,0 @@
 -/* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
 -/*
@@ -1522,9 +1522,57 @@ diff -Naur old/include/linux/linux/input-event-codes.h new/include/linux/linux/i
 -
 -#endif
 diff -Naur old/src/evdev-fallback.c new/src/evdev-fallback.c
---- old/src/evdev-fallback.c	2022-03-22 20:43:22.768694916 +0800
-+++ new/src/evdev-fallback.c	2022-04-01 11:08:17.626186763 +0800
-@@ -1031,6 +1031,9 @@
+--- old/src/evdev-fallback.c	2022-04-09 01:32:23.313616658 +0000
++++ new/src/evdev-fallback.c	2022-04-09 08:54:12.971547987 +0000
+@@ -308,7 +308,7 @@
+ 	slot->hysteresis_center = point;
+ 	evdev_transform_absolute(device, &point);
+ 
+-	touch_notify_touch_down(base, time, slot_idx, seat_slot,
++	touch_notify_touch_down(base, time, slot_idx, seat_slot, slot->pressure,
+ 				&point);
+ 
+ 	return true;
+@@ -339,7 +339,7 @@
+ 		return false;
+ 
+ 	evdev_transform_absolute(device, &point);
+-	touch_notify_touch_motion(base, time, slot_idx, seat_slot,
++	touch_notify_touch_motion(base, time, slot_idx, seat_slot, slot->pressure,
+ 				  &point);
+ 
+ 	return true;
+@@ -431,7 +431,7 @@
+ 	point = dispatch->abs.point;
+ 	evdev_transform_absolute(device, &point);
+ 
+-	touch_notify_touch_down(base, time, -1, seat_slot, &point);
++	touch_notify_touch_down(base, time, -1, seat_slot, 0, &point);
+ 
+ 	return true;
+ }
+@@ -453,7 +453,7 @@
+ 	if (seat_slot == -1)
+ 		return false;
+ 
+-	touch_notify_touch_motion(base, time, -1, seat_slot, &point);
++	touch_notify_touch_motion(base, time, -1, seat_slot, 0, &point);
+ 
+ 	return true;
+ }
+@@ -655,6 +655,11 @@
+ 		dispatch->pending_event |= EVDEV_ABSOLUTE_MT;
+ 		slot->dirty = true;
+ 		break;
++	case ABS_MT_PRESSURE:
++        slot->pressure = e->value;
++		dispatch->pending_event |= EVDEV_ABSOLUTE_MT;
++		slot->dirty = true;
++		break;
+ 	}
+ }
+ 
+@@ -1031,6 +1036,9 @@
  	if (dispatch->arbitration.in_arbitration)
  		return;
  
@@ -1535,9 +1583,17 @@ diff -Naur old/src/evdev-fallback.c new/src/evdev-fallback.c
  	case EV_REL:
  		fallback_process_relative(dispatch, device, event, time);
 diff -Naur old/src/evdev-fallback.h new/src/evdev-fallback.h
---- old/src/evdev-fallback.h	2022-03-22 20:43:22.768694916 +0800
-+++ new/src/evdev-fallback.h	2022-04-01 11:08:17.626186763 +0800
-@@ -169,6 +169,7 @@
+--- old/src/evdev-fallback.h	2022-04-09 01:32:23.313616658 +0000
++++ new/src/evdev-fallback.h	2022-04-09 08:54:38.180826440 +0000
+@@ -66,6 +66,7 @@
+ 	struct device_coords point;
+ 	struct device_coords hysteresis_center;
+ 	enum palm_state palm_state;
++	int32_t pressure;
+ };
+ 
+ struct fallback_dispatch {
+@@ -169,6 +170,7 @@
  static inline enum key_type
  get_key_type(uint16_t code)
  {
@@ -1545,7 +1601,7 @@ diff -Naur old/src/evdev-fallback.h new/src/evdev-fallback.h
  	switch (code) {
  	case BTN_TOOL_PEN:
  	case BTN_TOOL_RUBBER:
-@@ -198,6 +199,8 @@
+@@ -198,6 +200,8 @@
  		return KEY_TYPE_KEY;
  	if (code >= BTN_TRIGGER_HAPPY && code <= BTN_TRIGGER_HAPPY40)
  		return KEY_TYPE_BUTTON;
@@ -1555,8 +1611,8 @@ diff -Naur old/src/evdev-fallback.h new/src/evdev-fallback.h
  }
  
 diff -Naur old/src/evdev-joystick.c new/src/evdev-joystick.c
---- old/src/evdev-joystick.c	1970-01-01 08:00:00.000000000 +0800
-+++ new/src/evdev-joystick.c	2022-04-01 11:08:17.626186763 +0800
+--- old/src/evdev-joystick.c	1970-01-01 00:00:00.000000000 +0000
++++ new/src/evdev-joystick.c	2022-04-09 08:50:31.681087133 +0000
 @@ -0,0 +1,583 @@
 +/*
 + * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
@@ -2142,8 +2198,8 @@ diff -Naur old/src/evdev-joystick.c new/src/evdev-joystick.c
 +}
 +
 diff -Naur old/src/evdev-joystick.h new/src/evdev-joystick.h
---- old/src/evdev-joystick.h	1970-01-01 08:00:00.000000000 +0800
-+++ new/src/evdev-joystick.h	2022-04-01 11:08:17.626186763 +0800
+--- old/src/evdev-joystick.h	1970-01-01 00:00:00.000000000 +0000
++++ new/src/evdev-joystick.h	2022-04-09 08:50:31.681087133 +0000
 @@ -0,0 +1,77 @@
 +/*
 + * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
@@ -2223,8 +2279,8 @@ diff -Naur old/src/evdev-joystick.h new/src/evdev-joystick.h
 +
 +#endif
 diff -Naur old/src/evdev-mt-touchpad-gestures.c new/src/evdev-mt-touchpad-gestures.c
---- old/src/evdev-mt-touchpad-gestures.c	2022-03-22 20:43:22.768694916 +0800
-+++ new/src/evdev-mt-touchpad-gestures.c	2022-04-01 11:08:17.626186763 +0800
+--- old/src/evdev-mt-touchpad-gestures.c	2022-04-09 01:32:23.313616658 +0000
++++ new/src/evdev-mt-touchpad-gestures.c	2022-04-09 08:50:31.681087133 +0000
 @@ -80,6 +80,37 @@
  }
  
@@ -2295,8 +2351,8 @@ diff -Naur old/src/evdev-mt-touchpad-gestures.c new/src/evdev-mt-touchpad-gestur
  
  	return GESTURE_STATE_SWIPE;
 diff -Naur old/src/evdev-mt-touchpad-tap.c new/src/evdev-mt-touchpad-tap.c
---- old/src/evdev-mt-touchpad-tap.c	2022-03-22 20:43:22.768694916 +0800
-+++ new/src/evdev-mt-touchpad-tap.c	2022-04-01 11:08:17.626186763 +0800
+--- old/src/evdev-mt-touchpad-tap.c	2022-04-09 01:32:23.313616658 +0000
++++ new/src/evdev-mt-touchpad-tap.c	2022-04-09 08:50:31.681087133 +0000
 @@ -72,6 +72,7 @@
  	CASE_RETURN_STRING(TAP_STATE_DRAGGING_OR_TAP);
  	CASE_RETURN_STRING(TAP_STATE_DRAGGING_2);
@@ -2437,8 +2493,8 @@ diff -Naur old/src/evdev-mt-touchpad-tap.c new/src/evdev-mt-touchpad-tap.c
 +}
 \ No newline at end of file
 diff -Naur old/src/evdev-mt-touchpad.c new/src/evdev-mt-touchpad.c
---- old/src/evdev-mt-touchpad.c	2022-03-22 20:43:22.768694916 +0800
-+++ new/src/evdev-mt-touchpad.c	2022-04-01 11:08:17.626186763 +0800
+--- old/src/evdev-mt-touchpad.c	2022-04-09 01:32:23.313616658 +0000
++++ new/src/evdev-mt-touchpad.c	2022-04-09 08:50:31.681087133 +0000
 @@ -341,6 +341,7 @@
  	t->speed.last_speed = 0;
  	t->speed.exceeded_count = 0;
@@ -2601,8 +2657,8 @@ diff -Naur old/src/evdev-mt-touchpad.c new/src/evdev-mt-touchpad.c
  }
  
 diff -Naur old/src/evdev-mt-touchpad.h new/src/evdev-mt-touchpad.h
---- old/src/evdev-mt-touchpad.h	2022-03-22 20:43:22.768694916 +0800
-+++ new/src/evdev-mt-touchpad.h	2022-04-01 11:08:17.626186763 +0800
+--- old/src/evdev-mt-touchpad.h	2022-04-09 01:32:23.313616658 +0000
++++ new/src/evdev-mt-touchpad.h	2022-04-09 08:50:31.681087133 +0000
 @@ -118,6 +118,7 @@
  	TAP_STATE_DRAGGING_WAIT,
  	TAP_STATE_DRAGGING_2,
@@ -2654,8 +2710,8 @@ diff -Naur old/src/evdev-mt-touchpad.h new/src/evdev-mt-touchpad.h
 +
  #endif
 diff -Naur old/src/evdev-tablet-pad.c new/src/evdev-tablet-pad.c
---- old/src/evdev-tablet-pad.c	2022-03-22 20:43:22.768694916 +0800
-+++ new/src/evdev-tablet-pad.c	2022-04-01 11:08:17.630186776 +0800
+--- old/src/evdev-tablet-pad.c	2022-04-09 01:32:23.313616658 +0000
++++ new/src/evdev-tablet-pad.c	2022-04-09 08:50:31.685087141 +0000
 @@ -482,6 +482,9 @@
  {
  	struct pad_dispatch *pad = pad_dispatch(dispatch);
@@ -2667,8 +2723,8 @@ diff -Naur old/src/evdev-tablet-pad.c new/src/evdev-tablet-pad.c
  	case EV_ABS:
  		pad_process_absolute(pad, device, e, time);
 diff -Naur old/src/evdev-totem.c new/src/evdev-totem.c
---- old/src/evdev-totem.c	2022-03-22 20:43:22.768694916 +0800
-+++ new/src/evdev-totem.c	2022-04-01 11:08:17.630186776 +0800
+--- old/src/evdev-totem.c	2022-04-09 01:32:23.313616658 +0000
++++ new/src/evdev-totem.c	2022-04-09 08:50:31.685087141 +0000
 @@ -520,6 +520,9 @@
  	enum totem_slot_state global_state;
  	bool enable_touch;
@@ -2680,8 +2736,8 @@ diff -Naur old/src/evdev-totem.c new/src/evdev-totem.c
  	case EV_ABS:
  		totem_process_abs(totem, device, e, time);
 diff -Naur old/src/evdev.c new/src/evdev.c
---- old/src/evdev.c	2022-03-22 20:43:22.768694916 +0800
-+++ new/src/evdev.c	2022-04-01 11:08:17.626186763 +0800
+--- old/src/evdev.c	2022-04-09 01:32:23.313616658 +0000
++++ new/src/evdev.c	2022-04-09 08:50:31.685087141 +0000
 @@ -54,25 +54,7 @@
  #define DEFAULT_BUTTON_SCROLL_TIMEOUT ms2us(200)
  #define MAX_RETRY_OPEN_DEVICE_COUNT 10
@@ -2801,8 +2857,8 @@ diff -Naur old/src/evdev.c new/src/evdev.c
  		return false;
  	}
 diff -Naur old/src/evdev.h new/src/evdev.h
---- old/src/evdev.h	2022-03-22 20:43:22.768694916 +0800
-+++ new/src/evdev.h	2022-04-01 11:08:17.626186763 +0800
+--- old/src/evdev.h	2022-04-09 01:32:23.313616658 +0000
++++ new/src/evdev.h	2022-04-09 08:50:31.685087141 +0000
 @@ -61,6 +61,7 @@
  	EVDEV_DEVICE_TABLET_PAD		= bit(4),
  	EVDEV_DEVICE_GESTURE		= bit(5),
@@ -2865,16 +2921,32 @@ diff -Naur old/src/evdev.h new/src/evdev.h
  }
  
 diff -Naur old/src/libinput-git-version.h new/src/libinput-git-version.h
---- old/src/libinput-git-version.h	1970-01-01 08:00:00.000000000 +0800
-+++ new/src/libinput-git-version.h	2022-04-01 11:08:17.630186776 +0800
+--- old/src/libinput-git-version.h	1970-01-01 00:00:00.000000000 +0000
++++ new/src/libinput-git-version.h	2022-04-09 08:50:31.685087141 +0000
 @@ -0,0 +1,3 @@
 +#pragma once
 +
 +#define LIBINPUT_GIT_VERSION "@VCS_TAG@"
 diff -Naur old/src/libinput-private.h new/src/libinput-private.h
---- old/src/libinput-private.h	2022-03-22 20:43:22.768694916 +0800
-+++ new/src/libinput-private.h	2022-04-01 11:08:17.630186776 +0800
-@@ -595,12 +595,33 @@
+--- old/src/libinput-private.h	2022-04-09 01:32:23.317616693 +0000
++++ new/src/libinput-private.h	2022-04-09 08:57:09.569073855 +0000
+@@ -569,6 +569,7 @@
+ 			uint64_t time,
+ 			int32_t slot,
+ 			int32_t seat_slot,
++			int32_t pressure,
+ 			const struct device_coords *point);
+ 
+ void
+@@ -576,6 +577,7 @@
+ 			  uint64_t time,
+ 			  int32_t slot,
+ 			  int32_t seat_slot,
++			  int32_t pressure,
+ 			  const struct device_coords *point);
+ 
+ void
+@@ -595,12 +597,33 @@
  		   uint64_t time);
  
  void
@@ -2910,8 +2982,8 @@ diff -Naur old/src/libinput-private.h new/src/libinput-private.h
  void
  gesture_notify_swipe_end(struct libinput_device *device,
 diff -Naur old/src/libinput-util.c new/src/libinput-util.c
---- old/src/libinput-util.c	1970-01-01 08:00:00.000000000 +0800
-+++ new/src/libinput-util.c	2022-04-01 11:08:17.630186776 +0800
+--- old/src/libinput-util.c	1970-01-01 00:00:00.000000000 +0000
++++ new/src/libinput-util.c	2022-04-09 08:50:31.685087141 +0000
 @@ -0,0 +1,102 @@
 +/*
 + * Copyright © 2008-2011 Kristian Høgsberg
@@ -3016,8 +3088,8 @@ diff -Naur old/src/libinput-util.c new/src/libinput-util.c
 +}
 +#endif
 diff -Naur old/src/libinput-util.h new/src/libinput-util.h
---- old/src/libinput-util.h	2022-03-22 20:43:22.768694916 +0800
-+++ new/src/libinput-util.h	2022-04-01 11:08:17.630186776 +0800
+--- old/src/libinput-util.h	2022-04-09 01:32:23.317616693 +0000
++++ new/src/libinput-util.h	2022-04-09 08:50:31.685087141 +0000
 @@ -27,10 +27,9 @@
  
  #include "config.h"
@@ -3049,8 +3121,8 @@ diff -Naur old/src/libinput-util.h new/src/libinput-util.h
  	do { \
  	printf("%s() - \033[0;31m", __func__); \
 diff -Naur old/src/libinput-version.h new/src/libinput-version.h
---- old/src/libinput-version.h	1970-01-01 08:00:00.000000000 +0800
-+++ new/src/libinput-version.h	2022-04-01 11:08:17.630186776 +0800
+--- old/src/libinput-version.h	1970-01-01 00:00:00.000000000 +0000
++++ new/src/libinput-version.h	2022-04-09 08:50:31.685087141 +0000
 @@ -0,0 +1,32 @@
 +/*
 + * Copyright © 2013 Jonas Ådahl
@@ -3085,8 +3157,8 @@ diff -Naur old/src/libinput-version.h new/src/libinput-version.h
 +
 +#endif
 diff -Naur old/src/libinput.c new/src/libinput.c
---- old/src/libinput.c	2022-03-22 20:43:22.768694916 +0800
-+++ new/src/libinput.c	2022-04-01 11:28:21.805475772 +0800
+--- old/src/libinput.c	2022-04-09 01:32:23.317616693 +0000
++++ new/src/libinput.c	2022-04-09 08:56:39.955348509 +0000
 @@ -39,6 +39,7 @@
  #include "evdev.h"
  #include "timer.h"
@@ -3105,7 +3177,15 @@ diff -Naur old/src/libinput.c new/src/libinput.c
  	CASE_RETURN_STRING(LIBINPUT_EVENT_TABLET_TOOL_AXIS);
  	CASE_RETURN_STRING(LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY);
  	CASE_RETURN_STRING(LIBINPUT_EVENT_TABLET_TOOL_TIP);
-@@ -193,6 +197,7 @@
+@@ -184,6 +188,7 @@
+ 	int32_t slot;
+ 	int32_t seat_slot;
+ 	struct device_coords point;
++	int32_t pressure;
+ };
+ 
+ struct libinput_event_gesture {
+@@ -193,6 +198,7 @@
  	int cancelled;
  	struct normalized_coords delta;
  	struct normalized_coords delta_unaccel;
@@ -3113,7 +3193,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
  	double scale;
  	double angle;
  };
-@@ -392,6 +397,18 @@
+@@ -392,6 +398,18 @@
  	return (struct libinput_event_touch *) event;
  }
  
@@ -3132,7 +3212,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
  LIBINPUT_EXPORT struct libinput_event_gesture *
  libinput_event_get_gesture_event(struct libinput_event *event)
  {
-@@ -880,6 +897,86 @@
+@@ -880,6 +898,86 @@
  }
  
  LIBINPUT_EXPORT uint32_t
@@ -3219,7 +3299,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
  libinput_event_gesture_get_time(struct libinput_event_gesture *event)
  {
  	require_event_type(libinput_event_get_context(&event->base),
-@@ -1031,6 +1128,18 @@
+@@ -1031,6 +1129,18 @@
  	return event->angle;
  }
  
@@ -3238,7 +3318,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
  LIBINPUT_EXPORT int
  libinput_event_tablet_tool_x_has_changed(
  				struct libinput_event_tablet_tool *event)
-@@ -1806,11 +1915,8 @@
+@@ -1806,11 +1916,8 @@
  	/* If we fail, we'll fail next time too */
  	libinput->quirks_initialized = true;
  
@@ -3252,7 +3332,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
  
  	quirks = quirks_init_subsystem(data_path,
  				       override_file,
-@@ -2311,6 +2417,9 @@
+@@ -2311,6 +2418,9 @@
  	case LIBINPUT_DEVICE_CAP_SWITCH:
  		capability = "CAP_SWITCH";
  		break;
@@ -3262,7 +3342,39 @@ diff -Naur old/src/libinput.c new/src/libinput.c
  	}
  
  	log_bug_libinput(device->seat->libinput,
-@@ -2574,6 +2683,70 @@
+@@ -2458,6 +2568,7 @@
+ 			uint64_t time,
+ 			int32_t slot,
+ 			int32_t seat_slot,
++			int32_t pressure,
+ 			const struct device_coords *point)
+ {
+ 	struct libinput_event_touch *touch_event;
+@@ -2472,6 +2583,7 @@
+ 		.slot = slot,
+ 		.seat_slot = seat_slot,
+ 		.point = *point,
++		.pressure = pressure,
+ 	};
+ 
+ 	post_device_event(device, time,
+@@ -2484,6 +2596,7 @@
+ 			  uint64_t time,
+ 			  int32_t slot,
+ 			  int32_t seat_slot,
++			  int32_t pressure,
+ 			  const struct device_coords *point)
+ {
+ 	struct libinput_event_touch *touch_event;
+@@ -2498,6 +2611,7 @@
+ 		.slot = slot,
+ 		.seat_slot = seat_slot,
+ 		.point = *point,
++		.pressure = pressure,
+ 	};
+ 
+ 	post_device_event(device, time,
+@@ -2574,6 +2688,70 @@
  }
  
  void
@@ -3333,7 +3445,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
  tablet_notify_axis(struct libinput_device *device,
  		   uint64_t time,
  		   struct libinput_tablet_tool *tool,
-@@ -2814,6 +2987,7 @@
+@@ -2814,6 +2992,7 @@
  	       int cancelled,
  	       const struct normalized_coords *delta,
  	       const struct normalized_coords *unaccel,
@@ -3341,7 +3453,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
  	       double scale,
  	       double angle)
  {
-@@ -2834,6 +3008,12 @@
+@@ -2834,6 +3013,12 @@
  		.angle = angle,
  	};
  
@@ -3354,7 +3466,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
  	post_device_event(device, time, type,
  			  &gesture_event->base);
  }
-@@ -2844,9 +3024,10 @@
+@@ -2844,9 +3029,10 @@
  		     enum libinput_event_type type,
  		     int finger_count,
  		     const struct normalized_coords *delta,
@@ -3367,7 +3479,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
  		       0.0, 0.0);
  }
  
-@@ -2859,7 +3040,7 @@
+@@ -2859,7 +3045,7 @@
  	const struct normalized_coords zero = { 0.0, 0.0 };
  
  	gesture_notify(device, time, LIBINPUT_EVENT_GESTURE_SWIPE_END,
@@ -3376,7 +3488,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
  }
  
  void
-@@ -2873,7 +3054,7 @@
+@@ -2873,7 +3059,7 @@
  		     double angle)
  {
  	gesture_notify(device, time, type, finger_count, 0,
@@ -3385,7 +3497,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
  }
  
  void
-@@ -2886,7 +3067,7 @@
+@@ -2886,7 +3072,7 @@
  	const struct normalized_coords zero = { 0.0, 0.0 };
  
  	gesture_notify(device, time, LIBINPUT_EVENT_GESTURE_PINCH_END,
@@ -3394,7 +3506,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
  }
  
  void
-@@ -2972,6 +3153,92 @@
+@@ -2972,6 +3158,92 @@
  	libinput->events_in = (libinput->events_in + 1) % libinput->events_len;
  }
  
@@ -3487,7 +3599,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
  LIBINPUT_EXPORT struct libinput_event *
  libinput_get_event(struct libinput *libinput)
  {
-@@ -3055,12 +3322,52 @@
+@@ -3055,12 +3327,52 @@
  	return evdev_device_get_sysname((struct evdev_device *) device);
  }
  
@@ -3540,7 +3652,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
  LIBINPUT_EXPORT unsigned int
  libinput_device_get_id_product(struct libinput_device *device)
  {
-@@ -3347,6 +3654,19 @@
+@@ -3347,6 +3659,19 @@
  }
  
  LIBINPUT_EXPORT struct libinput_event *
@@ -3560,7 +3672,7 @@ diff -Naur old/src/libinput.c new/src/libinput.c
  libinput_event_gesture_get_base_event(struct libinput_event_gesture *event)
  {
  	require_event_type(libinput_event_get_context(&event->base),
-@@ -4378,3 +4698,93 @@
+@@ -4378,3 +4703,102 @@
  	}
  }
  #endif
@@ -3649,14 +3761,23 @@ diff -Naur old/src/libinput.c new/src/libinput.c
 +    return event->value;
 +}
 +
-+LIBINPUT_EXPORT double
-+libinput_event_get_touch_pressure(struct libinput_event *event)
++LIBINPUT_EXPORT int32_t
++libinput_event_touch_get_pressure(struct libinput_event_touch *event)
 +{
-+    return 0.0F;
++    require_event_type(libinput_event_get_context(&event->base),
++		event->base.type,
++		0,
++		LIBINPUT_EVENT_TOUCH_DOWN,
++		LIBINPUT_EVENT_TOUCH_UP,
++		LIBINPUT_EVENT_TOUCH_MOTION,
++		LIBINPUT_EVENT_TOUCH_CANCEL,
++		LIBINPUT_EVENT_TOUCH_FRAME);
++
++	return event->pressure;
 +}
 diff -Naur old/src/libinput.h new/src/libinput.h
---- old/src/libinput.h	2022-03-22 20:43:22.768694916 +0800
-+++ new/src/libinput.h	2022-04-01 11:27:48.424563260 +0800
+--- old/src/libinput.h	2022-04-09 01:32:23.317616693 +0000
++++ new/src/libinput.h	2022-04-09 08:56:31.426078478 +0000
 @@ -196,6 +196,22 @@
  	LIBINPUT_DEVICE_CAP_TABLET_PAD = 4,
  	LIBINPUT_DEVICE_CAP_GESTURE = 5,
@@ -4044,8 +4165,8 @@ diff -Naur old/src/libinput.h new/src/libinput.h
 + * 
 + * @since 1.4
 + */
-+double
-+libinput_event_get_touch_pressure(struct libinput_event* event);
++int32_t
++libinput_event_touch_get_pressure(struct libinput_event_touch* event);
 +
 +const char*
 +libinput_device_get_phys(struct libinput_device* device);
@@ -4058,8 +4179,8 @@ diff -Naur old/src/libinput.h new/src/libinput.h
  #endif /* LIBINPUT_H */
 +
 diff -Naur old/src/util-strings.h new/src/util-strings.h
---- old/src/util-strings.h	2022-03-22 20:43:22.768694916 +0800
-+++ new/src/util-strings.h	2022-04-01 11:08:17.630186776 +0800
+--- old/src/util-strings.h	2022-04-09 01:32:23.317616693 +0000
++++ new/src/util-strings.h	2022-04-09 08:50:31.685087141 +0000
 @@ -281,7 +281,7 @@
  	if (npairs == 0)
  		goto error;
@@ -4070,8 +4191,8 @@ diff -Naur old/src/util-strings.h new/src/util-strings.h
  	for (pair = pairs; *pair; pair++) {
  		char **kv = strv_from_string(*pair, kv_separator);
 diff -Naur old/src/util-time.h new/src/util-time.h
---- old/src/util-time.h	2022-03-22 20:43:22.768694916 +0800
-+++ new/src/util-time.h	2022-04-01 11:08:17.630186776 +0800
+--- old/src/util-time.h	2022-04-09 01:32:23.317616693 +0000
++++ new/src/util-time.h	2022-04-09 08:50:31.685087141 +0000
 @@ -97,7 +97,8 @@
  static inline struct human_time
  to_human_time(uint64_t us)
@@ -4101,8 +4222,8 @@ diff -Naur old/src/util-time.h new/src/util-time.h
 +	//assert(1);
  }
 diff -Naur old/tools/libinput-debug-events.c new/tools/libinput-debug-events.c
---- old/tools/libinput-debug-events.c	2022-03-22 20:43:22.768694916 +0800
-+++ new/tools/libinput-debug-events.c	2022-04-01 11:08:17.630186776 +0800
+--- old/tools/libinput-debug-events.c	2022-04-09 01:32:23.321616727 +0000
++++ new/tools/libinput-debug-events.c	2022-04-09 08:50:31.685087141 +0000
 @@ -101,6 +101,15 @@
  	case LIBINPUT_EVENT_TOUCH_FRAME:
  		type = "TOUCH_FRAME";
@@ -4185,8 +4306,8 @@ diff -Naur old/tools/libinput-debug-events.c new/tools/libinput-debug-events.c
  			print_gesture_event_without_coords(ev);
  			break;
 diff -Naur old/tools/libinput-record.c new/tools/libinput-record.c
---- old/tools/libinput-record.c	2022-03-22 20:43:22.768694916 +0800
-+++ new/tools/libinput-record.c	2022-04-01 11:08:17.630186776 +0800
+--- old/tools/libinput-record.c	2022-04-09 01:32:23.325616762 +0000
++++ new/tools/libinput-record.c	2022-04-09 08:50:31.685087141 +0000
 @@ -50,6 +50,7 @@
  #include "util-time.h"
  #include "util-input-event.h"
@@ -4196,8 +4317,8 @@ diff -Naur old/tools/libinput-record.c new/tools/libinput-record.c
  static const int FILE_VERSION_NUMBER = 1;
  
 diff -Naur old/udev/libinput-device-group.c new/udev/libinput-device-group.c
---- old/udev/libinput-device-group.c	2022-03-22 20:43:22.768694916 +0800
-+++ new/udev/libinput-device-group.c	2022-04-01 11:08:17.630186776 +0800
+--- old/udev/libinput-device-group.c	2022-04-09 01:32:23.325616762 +0000
++++ new/udev/libinput-device-group.c	2022-04-09 08:50:31.685087141 +0000
 @@ -138,7 +138,7 @@
  				*product_id = pid;
  				best_dist = dist;
