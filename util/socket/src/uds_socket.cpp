@@ -111,6 +111,38 @@ int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isNonBlock)
     return flags;
 }
 
+void UDSSocket::OnReadPackets(CircleStreamBuffer& circBuf, UDSSocket::PacketCallBackFun callbackFun)
+{
+    constexpr int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
+    const int32_t unreadSize = circBuf.UnreadSize();
+    for (int32_t i = 0; i < ONCE_PROCESS_NETPACKET_LIMIT; i++) {
+        if (unreadSize < headSize) {
+            break;
+        }
+        const int32_t dataSize = unreadSize - headSize;
+        char *buf = const_cast<char *>(circBuf.ReadBuf());
+        CHKPB(buf);
+        PackHead *head = reinterpret_cast<PackHead *>(buf);
+        CHKPB(head);
+        if (head->size < 0 || head->size > MAX_PACKET_BUF_SIZE) {
+            MMI_HILOGF("Head size is error, head->size:%{public}d, unreadSize:%{public}d, errCode:%{public}d", 
+                head->size, unreadSize, VAL_NOT_EXP);
+            circBuf.Clean();
+            break;
+        }
+        if (head->size < dataSize) {
+            break;
+        }
+        NetPacket pkt(head->idMsg);
+        if (!pkt.Write(&buf[headSize], dataSize)) {
+            MMI_HILOGE("write packet faild. dataSize:%{public}d", dataSize);
+            break;
+        }
+        callbackFun(pkt);
+        circBuf.MoveReadIdx(pkt.GetPacketLength());
+    }
+}
+
 void UDSSocket::EpollClose()
 {
     if (epollFd_ >= 0) {

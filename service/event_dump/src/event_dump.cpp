@@ -124,8 +124,8 @@ void EventDump::InsertFormat(std::string str, ...)
     }
     va_list args;
     va_start(args, str);
-    char buf[MAX_STREAM_BUF_SIZE] = {};
-    if (vsnprintf_s(buf, MAX_STREAM_BUF_SIZE, MAX_STREAM_BUF_SIZE - 1, str.c_str(), args) == -1) {
+    char buf[MAX_PACKET_BUF_SIZE] = {};
+    if (vsnprintf_s(buf, MAX_PACKET_BUF_SIZE, MAX_PACKET_BUF_SIZE - 1, str.c_str(), args) == -1) {
         MMI_HILOGE("InsertDumpInfo vsnprintf_s error");
         va_end(args);
         return;

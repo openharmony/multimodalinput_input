@@ -53,6 +53,7 @@ protected:
     void OnRecvThread();
     bool AddFdListener(int32_t fd);
     bool DelFdListener(int32_t fd);
+    void OnPacket(NetPacket& pkt);
 
 protected:
     ClientMsgHandler msgHandler_;

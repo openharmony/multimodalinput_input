@@ -18,25 +18,37 @@ namespace OHOS {
 namespace MMI {
 void CircleStreamBuffer::MoveMemoryToBegin()
 {
-    size_t unreadSize = UnreadSize();
-    if (unreadSize == 0 || rIdx_ == 0) {
-        MMI_HILOGE("Meaningless memory copy");
-        return;
+    int32_t unreadSize = UnreadSize();
+    if (unreadSize > 0 && rIdx_ > 0) {
+        int32_t idx = 0;
+        for (int32_t i = rIdx_; i <= wIdx_; i++) {
+            szBuff_[idx] = szBuff_[i];
+            szBuff_[i] = '\0';
+            idx++;
+        }
     }
-    int32_t idx = 0;
-    for (int32_t i = rIdx_; i <= wIdx_; i++) {
-        szBuff_[idx++] = szBuff_[i];
-        szBuff_[i] = '\0';
-    }
+    MMI_HILOGD("unreadSize:%{public}d rIdx:%{public}d wIdx:%{public}d", unreadSize, rIdx_, wIdx_);
     rIdx_ = 0;
-    wIdx_ = static_cast<int32_t>(unreadSize);
+    wIdx_ = unreadSize;
+}
+
+bool CircleStreamBuffer::CheckWrite(size_t size)
+{
+    int32_t aviSize = AvailableSize();
+    if (size > aviSize && rIdx_ > 0) {
+        MoveMemoryToBegin();
+        aviSize = AvailableSize();
+    }
+    return (aviSize >= size);
 }
 
 bool CircleStreamBuffer::Write(const char *buf, size_t size)
 {
-    size_t aviSize = AvailableSize();
-    if (size > aviSize) {
-        MoveMemoryToBegin();
+    if (!CheckWrite(size)) {
+        MMI_HILOGE("Out of buffer memory, availableSize:%{public}d, size:%{public}zu,"
+            "unreadSize:%{public}d, rIdx:%{public}d, wIdx:%{public}d",
+            AvailableSize(), size, UnreadSize(), rIdx_, wIdx_);
+        return false;
     }
     return StreamBuffer::Write(buf, size);
 }

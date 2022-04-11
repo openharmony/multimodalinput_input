@@ -168,13 +168,13 @@ size_t StreamBuffer::Size() const
     return static_cast<size_t>(wIdx_);
 }
 
-size_t StreamBuffer::UnreadSize() const
+int32_t StreamBuffer::UnreadSize() const
 {
     if (wIdx_ < rIdx_) {
         MMI_HILOGW("Widx_ less than ridx_, wIdx_:%{public}d,rIdx_:%{public}d", wIdx_, rIdx_);
         return 0;
     }
-    return static_cast<size_t>(wIdx_ - rIdx_);
+    return (wIdx_ - rIdx_);
 }
 
 bool StreamBuffer::ChkRWError() const

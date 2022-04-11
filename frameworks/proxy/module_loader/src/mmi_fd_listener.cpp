@@ -45,8 +45,9 @@ void MMIFdListener::OnReadable(int32_t fd)
     }
     CHKPV(mmiClient_);
     ssize_t size = 0;
-    constexpr int32_t maxCount = 16;
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
+    //constexpr int32_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE;
+    constexpr int32_t maxCount = 16;
     for (int32_t i = 0; i < maxCount; i++) {
         size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size > 0) {
@@ -58,7 +59,7 @@ void MMIFdListener::OnReadable(int32_t fd)
             }
             MMI_HILOGE("recv return %{public}zu errno:%{public}d", size, errno);
             break;
-        } else if (size == 0) {
+        } else {
             MMI_HILOGD("[Do nothing here]The service side disconnect with the client. size:0 count:%{public}d "
                 "errno:%{public}d", i, errno);
             break;
