@@ -119,14 +119,13 @@ bool KeyEventInputSubscribeManager::PostTask(int32_t subscribeId, const AppExecF
     return MMIEventHandler::PostTask(eventHandler, callback);
 }
 
-void KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask(std::shared_ptr<KeyEvent> event,
+void KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask(
+    KeyEventInputSubscribeManager::SubscribeKeyEventInfo info, std::shared_ptr<KeyEvent> event,
     int32_t subscribeId)
 {
     CHK_PIDANDTID();
-    std::lock_guard<std::mutex> guard(mtx_);
-    auto obj = GetSubscribeKeyEvent(subscribeId);
-    CHKPV(obj);
-    obj->GetCallback()(event);
+    CHKPV(event);
+    info.GetCallback()(event);
     MMI_HILOGD("key event callback id:%{public}d keyCode:%{public}d", subscribeId, event->GetKeyCode());
 }
 
@@ -142,8 +141,10 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     
     std::lock_guard<std::mutex> guard(mtx_);
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
+    auto info = GetSubscribeKeyEvent(subscribeId);
+    CHKPR(info, ERROR_NULL_POINTER);
     if (!PostTask(subscribeId, std::bind(&KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask,
-        this, event, subscribeId))) {
+        this, *info, event, subscribeId))) {
         MMI_HILOGE("post task failed");
         return RET_ERR;
     }
