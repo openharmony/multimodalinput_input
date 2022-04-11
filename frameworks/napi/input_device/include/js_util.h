@@ -30,7 +30,7 @@ public:
         std::vector<int32_t> ids;
         std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device = nullptr;
         std::vector<int32_t> keystrokeAbility;
-        int32_t deviceId;
+        int32_t deviceId = 0;
     };
 
     struct CallbackInfo {
