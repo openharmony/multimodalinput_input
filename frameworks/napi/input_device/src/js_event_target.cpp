@@ -433,20 +433,19 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
 
     napi_value keyAbility = nullptr;
     CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &keyAbility), CREATE_ARRAY);
-    napi_value keyCode = nullptr;
-    napi_value ret = nullptr;
-    napi_value isSupport = nullptr;
     uint32_t i = 0;
     for (auto it = cbTemp->data.keystrokeAbility.begin(); it != cbTemp->data.keystrokeAbility.end(); ++it) {
         napi_value abilityRet = nullptr;
-        CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &abilityRet), CREATE_ARRAY);
-        uint32_t j = 0;
+        CHKRV(cbTemp->env, napi_create_object(cbTemp->env, &abilityRet), CREATE_OBJECT);
+        napi_value keyCode = nullptr;
         CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, *it, &keyCode), CREATE_INT32);
-        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, abilityRet, j, keyCode), SET_ELEMENT);
-        ++j;
+        CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, abilityRet, "keyCode", keyCode), SET_NAMED_PROPERTY);
+        napi_value ret = nullptr;
+        napi_value isSupport = nullptr;
         CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, *(++it), &ret), CREATE_INT32);
         CHKRV(cbTemp->env, napi_coerce_to_bool(cbTemp->env, ret, &isSupport), COERCE_TO_BOOL);
-        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, abilityRet, j, isSupport), SET_ELEMENT);
+        CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, abilityRet, "isSupport", isSupport),
+            SET_NAMED_PROPERTY);
         CHKRV(cbTemp->env, napi_set_element(cbTemp->env, keyAbility, i, abilityRet), SET_ELEMENT);
         ++i;
     }
@@ -472,20 +471,19 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
 
     napi_value keyAbility = nullptr;
     CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &keyAbility), CREATE_ARRAY);
-    napi_value keyCode = nullptr;
-    napi_value ret = nullptr;
-    napi_value isSupport = nullptr;
     uint32_t i = 0;
     for (auto it = cbTemp->data.keystrokeAbility.begin(); it != cbTemp->data.keystrokeAbility.end(); ++it) {
         napi_value abilityRet = nullptr;
-        CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &abilityRet), CREATE_ARRAY);
-        uint32_t j = 0;
+        CHKRV(cbTemp->env, napi_create_object(cbTemp->env, &abilityRet), CREATE_OBJECT);
+        napi_value keyCode = nullptr;
         CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, *it, &keyCode), CREATE_INT32);
-        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, abilityRet, j, keyCode), SET_ELEMENT);
-        ++j;
+        CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, abilityRet, "keyCode", keyCode), SET_NAMED_PROPERTY);
+        napi_value ret = nullptr;
+        napi_value isSupport = nullptr;
         CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, *(++it), &ret), CREATE_INT32);
         CHKRV(cbTemp->env, napi_coerce_to_bool(cbTemp->env, ret, &isSupport), COERCE_TO_BOOL);
-        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, abilityRet, j, isSupport), SET_ELEMENT);
+        CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, abilityRet, "isSupport", isSupport),
+            SET_NAMED_PROPERTY);
         CHKRV(cbTemp->env, napi_set_element(cbTemp->env, keyAbility, i, abilityRet), SET_ELEMENT);
         ++i;
     }
