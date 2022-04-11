@@ -57,9 +57,9 @@ const std::string REMOVE_EVENT = "remove";
 JsEventTarget::JsEventTarget()
 {
     CALL_LOG_ENTER;
-    auto ret = devMonitor_.insert( {ADD_EVENT, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>()} );
+    auto ret = devMonitor_.insert({ ADD_EVENT, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
     CK(ret.second, VAL_NOT_EXP);
-    ret = devMonitor_.insert( {REMOVE_EVENT, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>()} );
+    ret = devMonitor_.insert({ REMOVE_EVENT, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
     CK(ret.second, VAL_NOT_EXP);
 }
 
@@ -119,7 +119,8 @@ void JsEventTarget::EmitRemoveEvent(uv_work_t *work, int32_t status)
         }
         napi_value result[2];
         CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &result[0]), CREATE_INT32);
-        CHKRV(item->env, napi_create_string_utf8(item->env, "remove", NAPI_AUTO_LENGTH, &result[1]), CREATE_STRING_UTF8);
+        CHKRV(item->env, napi_create_string_utf8(item->env, "remove", NAPI_AUTO_LENGTH, &result[1]),
+            CREATE_STRING_UTF8);
         napi_value handlerTemp = nullptr;
         CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handlerTemp), GET_REFERENCE);
         napi_value ret = nullptr;
