@@ -68,6 +68,7 @@ void HdfDeviceEventManager::ConnectHDFInit()
 } // namespace OHOS
 int32_t main()
 {
+    usleep(1000000);
     OHOS::MMI::HdfDeviceEventManager iHdfDeviceEventManager;
     iHdfDeviceEventManager.ConnectHDFInit();
     static std::int32_t usleepTime = 1500000;
