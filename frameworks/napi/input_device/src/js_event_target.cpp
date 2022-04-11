@@ -56,8 +56,11 @@ const std::string REMOVE_EVENT = "remove";
 
 JsEventTarget::JsEventTarget()
 {
-    devMonitor_.insert( {ADD_EVENT, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>()} );
-    devMonitor_.insert( {REMOVE_EVENT, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>()} );
+    CALL_LOG_ENTER;
+    auto ret = devMonitor_.insert( {ADD_EVENT, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>()} );
+    CK(ret.second, VAL_NOT_EXP);
+    ret = devMonitor_.insert( {REMOVE_EVENT, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>()} );
+    CK(ret.second, VAL_NOT_EXP);
 }
 
 JsEventTarget::~JsEventTarget() {}
