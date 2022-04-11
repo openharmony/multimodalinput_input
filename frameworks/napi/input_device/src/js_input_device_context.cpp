@@ -305,7 +305,7 @@ napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback
         MMI_HILOGE("parameter number error, argc: %{public}zu", argc);
         napi_throw_error(env, nullptr, "JsInputDeviceContext: parameter number error");
         return nullptr;
-    }   
+    }
 
     napi_valuetype valueType = napi_undefined;
     CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
@@ -353,7 +353,6 @@ napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback
         return nullptr;
     }
     return jsInputDeviceMgr->GetKeystrokeAbility(env, deviceId, keyCode, argv[2]);
-    // return nullptr;
 }
 
 napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
