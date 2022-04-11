@@ -76,8 +76,10 @@ private:
     void PrintDisplayInfo();
     void SendDisplayInfo();
 
-    void OnKeyEventTask(std::shared_ptr<KeyEvent> keyEvent);
-    void OnPointerEventTask(std::shared_ptr<PointerEvent> pointerEvent);
+    void OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
+        std::shared_ptr<KeyEvent> keyEvent);
+    void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
+        std::shared_ptr<PointerEvent> pointerEvent);
     void OnThread();
 
 private:

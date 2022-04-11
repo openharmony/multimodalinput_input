@@ -80,7 +80,8 @@ public:
 private:
     const SubscribeKeyEventInfo* GetSubscribeKeyEvent(int32_t id);
     bool PostTask(int32_t subscribeId, const AppExecFwk::EventHandler::Callback &callback);
-    void OnSubscribeKeyEventCallbackTask(std::shared_ptr<KeyEvent> event, int32_t subscribeId);
+    void OnSubscribeKeyEventCallbackTask(KeyEventInputSubscribeManager::SubscribeKeyEventInfo info,
+        std::shared_ptr<KeyEvent> event, int32_t subscribeId);
 
 private:
     std::list<SubscribeKeyEventInfo> subscribeInfos_;
