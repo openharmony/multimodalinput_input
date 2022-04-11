@@ -119,7 +119,6 @@ void KeyCommandManager::ResolveConfig(const std::string configFile)
         MMI_HILOGE("ResolveJson failed");
     }
     return;
-
 }
 
 bool KeyCommandManager::GetPreKeys(const std::string &objStr, ShortcutKey &shortcutKey)
@@ -210,7 +209,7 @@ bool KeyCommandManager::GetKeyDownDuration(const std::string &objStr, int32_t &k
         cJSON_Delete(jsonData);
         return false;
     }
-    if(keyDownDuration->valueint < 0) {
+    if (keyDownDuration->valueint < 0) {
         MMI_HILOGE("keyDownDuration must be number and bigger and equal zero");
         cJSON_Delete(jsonData);
         return false;
