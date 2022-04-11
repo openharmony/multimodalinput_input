@@ -58,8 +58,8 @@ private:
     static void CallDevPromiseWork(uv_work_t *work, int32_t status);
     static void CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status);
     static void CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status);
-    static void EmitAddedEvent(uv_work_t *work, int32_t status);
-    static void EmitRemoveEvent(uv_work_t *work, int32_t status);
+    static void EmitAddedDeviceEvent(uv_work_t *work, int32_t status);
+    static void EmitRemoveDeviceEvent(uv_work_t *work, int32_t status);
 };
 } // namespace MMI
 } // namespace OHOS

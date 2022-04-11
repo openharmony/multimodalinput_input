@@ -65,7 +65,7 @@ JsEventTarget::JsEventTarget()
 
 JsEventTarget::~JsEventTarget() {}
 
-void JsEventTarget::EmitAddedEvent(uv_work_t *work, int32_t status)
+void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -96,7 +96,7 @@ void JsEventTarget::EmitAddedEvent(uv_work_t *work, int32_t status)
     }
 }
 
-void JsEventTarget::EmitRemoveEvent(uv_work_t *work, int32_t status)
+void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -148,9 +148,9 @@ void JsEventTarget::TargetOn(std::string type, int32_t deviceId)
         work->data = static_cast<void*>(&item);
         int32_t ret = 0;
         if (type == ADD_EVENT) {
-            ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, EmitAddedEvent);
+            ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, EmitAddedDeviceEvent);
         } else if (type == REMOVE_EVENT) {
-            ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, EmitRemoveEvent);
+            ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, EmitRemoveDeviceEvent);
         } else {
             MMI_HILOGE("%{public}s is wrong", type.c_str());
         }
