@@ -279,7 +279,7 @@ void UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
     }
 }
 
-void UDSServer::ReleaseSession(int32_t fd, struct epoll_event& ev)
+void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
 {
     auto secPtr = GetSession(fd);
     if (secPtr != nullptr) {
@@ -290,19 +290,55 @@ void UDSServer::ReleaseSession(int32_t fd, struct epoll_event& ev)
         free(ev.data.ptr);
         ev.data.ptr = nullptr;
     }
+    auto it = circleBufMap_.find(fd);
+    if (it != circleBufMap_.end()) {
+        circleBufMap_.erase(it);
+    }
     close(fd);
 }
 
-void UDSServer::OnEpollRecv(int32_t fd, struct epoll_event& ev)
+void UDSServer::OnPacket(int32_t fd, NetPacket& pkt)
+{
+    auto sess = GetSession(fd);
+    CHKPV(sess);
+    recvFun_(sess, pkt);
+}
+
+void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
 {
     if (fd < 0) {
         MMI_HILOGE("Invalid input param fd:%{public}d", fd);
         return;
     }
-    auto buf = &circleBufMap_[fd];
+    auto& buf = circleBufMap_[fd];
+    char szBuf[MAX_PACKET_BUF_SIZE] = {};
+    constexpr int32_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
+    for (int32_t i = 0; i < maxCount; i++) {
+        auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
+        if (size > 0) {
+#ifdef OHOS_BUILD_HAVE_DUMP_DATA
+            DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
+#endif
+            if (!buf.Write(szBuf, size)) {
+                MMI_HILOGE("Write data faild");
+            }
+            OnReadPackets(buf, std::bind(&UDSServer::OnPacket, this, fd, std::placeholders::_1));
+        } else if (size < 0) {
+            if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
+                MMI_HILOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK");
+                continue;
+            }
+            MMI_HILOGE("recv return %{public}zu errno:%{public}d", size, errno);
+            break;
+        } else {
+            MMI_HILOGE("The client side disconnect with the server. size:0 errno:%{public}d", errno);
+            ReleaseSession(fd, ev);
+            break;
+        }
+    }
 }
 
-void UDSServer::OnEpollRecv(int32_t fd, std::map<int32_t, StreamBufData>& bufMap, struct epoll_event& ev)
+void UDSServer::OnEpollRecv(int32_t fd, std::map<int32_t, StreamBufData>& bufMap, epoll_event& ev)
 {
     if (fd < 0) {
         MMI_HILOGE("Invalid input param fd:%{public}d", fd);
@@ -348,7 +384,23 @@ void UDSServer::OnEpollRecv(int32_t fd, std::map<int32_t, StreamBufData>& bufMap
     }
 }
 
-void UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct epoll_event& ev)
+void UDSServer::OnEpollEvent(epoll_event& ev)
+{
+    CHKPV(ev.data.ptr);
+    auto fd = *static_cast<int32_t*>(ev.data.ptr);
+    if (fd < 0) {
+        MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
+        return;
+    }
+    if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
+        MMI_HILOGD("EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
+        ReleaseSession(fd, ev);
+    } else if (ev.events & EPOLLIN) {
+        OnEpollRecv(fd, ev);
+    }
+}
+
+void UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, epoll_event& ev)
 {
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int32_t*>(ev.data.ptr);

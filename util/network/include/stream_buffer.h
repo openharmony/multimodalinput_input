@@ -52,7 +52,7 @@ public:
 
     bool IsEmpty();
     size_t Size() const;
-    size_t UnreadSize() const;
+    int32_t UnreadSize() const;
 
     bool ChkRWError() const;
     const std::string& GetErrorStatusRemark() const;

@@ -25,14 +25,15 @@ public:
     virtual ~CircleStreamBuffer() = default;
     DISALLOW_COPY_AND_MOVE(CircleStreamBuffer);
 
-    size_t AvailableSize() const
+    int32_t AvailableSize() const
     {
-        if (wIdx_ >= MAX_STREAM_BUF_SIZE) {
+        if (wIdx_ > MAX_STREAM_BUF_SIZE) {
             return 0;
         }
         return (MAX_STREAM_BUF_SIZE - wIdx_);
     }
     void MoveMemoryToBegin();
+    bool CheckWrite(size_t size);
     virtual bool Write(const char *buf, size_t size) override;
 };
 } // namespace MMI

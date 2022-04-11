@@ -49,8 +49,8 @@ void CheckDefineOutput(const char* fmt, Ts... args)
     using namespace OHOS::MMI;
     CHKPV(fmt);
     int32_t ret = 0;
-    char buf[MAX_STREAM_BUF_SIZE] = {};
-    ret = snprintf_s(buf, MAX_STREAM_BUF_SIZE, MAX_STREAM_BUF_SIZE - 1, fmt, args...);
+    char buf[MAX_PACKET_BUF_SIZE] = {};
+    ret = snprintf_s(buf, MAX_PACKET_BUF_SIZE, MAX_PACKET_BUF_SIZE - 1, fmt, args...);
     if (ret < 0) {
         KMSG_LOGI("call snprintf_s fail.ret = %d", ret);
         return;

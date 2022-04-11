@@ -164,6 +164,11 @@ bool MMIClient::DelFdListener(int32_t fd)
     return true;
 }
 
+void MMIClient::OnPacket(NetPacket& pkt)
+{
+    recvFun_(*this, pkt);
+}
+
 void MMIClient::OnRecvMsg(const char *buf, size_t size)
 {
     CHKPV(buf);
@@ -173,36 +178,35 @@ void MMIClient::OnRecvMsg(const char *buf, size_t size)
     }
     if (!circBuf_.Write(buf, size)) {
         MMI_HILOGE("Write data faild");
-        return;
     }
-    
-    constexpr int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
-    for (int32_t i = 0; i < ONCE_PROCESS_NETPACKET_LIMIT; i++) {
-        const int32_t unreadSize = static_cast<int32_t>(circBuf_.UnreadSize());
-        if (unreadSize < headSize) {
-            break;
-        }
-        const int32_t dataSize = unreadSize - headSize;
-        char *buf = const_cast<char *>(circBuf_.ReadBuf());
-        CHKPB(buf);
-        PackHead *head = reinterpret_cast<PackHead *>(buf);
-        CHKPB(head);
-        if (head->size < 0 || head->size > MAX_PACKET_BUF_SIZE) {
-            MMI_HILOGE("Head size is error, head->size:%{public}d, errCode:%{public}d", head->size, VAL_NOT_EXP);
-            circBuf_.Clean();
-            break;
-        }
-        if (head->size < dataSize) {
-            break;
-        }
-        NetPacket pkt(head->idMsg);
-        if (!pkt.Write(&buf[headSize], dataSize)) {
-            MMI_HILOGE("write packet faild. dataSize:%{public}d", dataSize);
-            break;
-        }
-        recvFun_(*this, pkt);
-        circBuf_.MoveReadIdx(pkt.GetPacketLength());
-    }
+    OnReadPackets(circBuf_, std::bind(&MMIClient::OnPacket, this, std::placeholders::_1));
+    // constexpr int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
+    // for (int32_t i = 0; i < ONCE_PROCESS_NETPACKET_LIMIT; i++) {
+    //     const int32_t unreadSize = circBuf_.UnreadSize();
+    //     if (unreadSize < headSize) {
+    //         break;
+    //     }
+    //     const int32_t dataSize = unreadSize - headSize;
+    //     char *buf = const_cast<char *>(circBuf_.ReadBuf());
+    //     CHKPB(buf);
+    //     PackHead *head = reinterpret_cast<PackHead *>(buf);
+    //     CHKPB(head);
+    //     if (head->size < 0 || head->size > MAX_PACKET_BUF_SIZE) {
+    //         MMI_HILOGE("Head size is error, head->size:%{public}d, errCode:%{public}d", head->size, VAL_NOT_EXP);
+    //         circBuf_.Clean();
+    //         break;
+    //     }
+    //     if (head->size < dataSize) {
+    //         break;
+    //     }
+    //     NetPacket pkt(head->idMsg);
+    //     if (!pkt.Write(&buf[headSize], dataSize)) {
+    //         MMI_HILOGE("write packet faild. dataSize:%{public}d", dataSize);
+    //         break;
+    //     }
+    //     recvFun_(*this, pkt);
+    //     circBuf_.MoveReadIdx(pkt.GetPacketLength());
+    // }
 }
 
 int32_t MMIClient::Reconnect()
