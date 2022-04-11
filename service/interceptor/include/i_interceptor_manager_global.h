@@ -24,11 +24,12 @@ namespace MMI {
 class IInterceptorManagerGlobal {
 public:
     static std::shared_ptr<IInterceptorManagerGlobal> GetInstance();
+    IInterceptorManagerGlobal() = default;
     virtual ~IInterceptorManagerGlobal() = default;
-    virtual void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session) = 0;
-    virtual void OnRemoveInterceptor(int32_t id) = 0;
-    virtual bool OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent) = 0;
-    virtual bool OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent) = 0;
+    virtual void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session);
+    virtual void OnRemoveInterceptor(int32_t id);
+    virtual bool OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    virtual bool OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 protected:
     static inline std::shared_ptr<IInterceptorManagerGlobal> interceptorMgrGPtr_ = nullptr;
 };

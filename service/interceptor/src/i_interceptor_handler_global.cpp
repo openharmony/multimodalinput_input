@@ -13,39 +13,37 @@
  * limitations under the License.
  */
 
-#include "non_interceptor_handler_global.h"
+#include "i_interceptor_handler_global.h"
 
 #include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NonInterceptorHandlerGlobal" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInterceptorHandlerGlobal" };
 } // namespace
 
-NonInterceptorHandlerGlobal::NonInterceptorHandlerGlobal() {}
-
-int32_t NonInterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
+int32_t IInterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
     CALL_LOG_ENTER;
     return RET_ERR;
 }
 
-void NonInterceptorHandlerGlobal::RemoveInputHandler(int32_t handlerId,
+void IInterceptorHandlerGlobal::RemoveInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
     CALL_LOG_ENTER;
     return;
 }
 
-bool NonInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<KeyEvent> KeyEvent)
+bool IInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<KeyEvent> KeyEvent)
 {
     CALL_LOG_ENTER;
     return false;
 }
 
-bool NonInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> PointerEvent)
+bool IInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> PointerEvent)
 {
     CALL_LOG_ENTER;
     return false;
@@ -54,7 +52,7 @@ bool NonInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> Poin
 std::shared_ptr<IInterceptorHandlerGlobal> IInterceptorHandlerGlobal::GetInstance()
 {
     if (interceptorHdlGPtr_ == nullptr) {
-        interceptorHdlGPtr_ = std::make_shared<NonInterceptorHandlerGlobal>();
+        interceptorHdlGPtr_ = std::make_shared<IInterceptorHandlerGlobal>();
     }
     return interceptorHdlGPtr_;
 }

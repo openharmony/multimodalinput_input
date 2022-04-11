@@ -22,9 +22,10 @@ namespace MMI {
 class IInputInterceptorManager {
 public:
     static std::shared_ptr<IInputInterceptorManager> GetInstance();
+    IInputInterceptorManager() = default;
     virtual ~IInputInterceptorManager() = default;
-    virtual int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor) = 0;
-    virtual void RemoveInterceptor(int32_t interceptorId) = 0;
+    virtual int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
+    virtual void RemoveInterceptor(int32_t interceptorId);
 protected:
     static inline std::shared_ptr<IInputInterceptorManager> inputMgrPtr_ = nullptr;
 };

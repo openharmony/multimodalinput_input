@@ -13,25 +13,23 @@
  * limitations under the License.
  */
 
-#include "non_input_interceptor_manager.h"
+#include "i_input_interceptor_manager.h"
 #include "input_handler_type.h"
 #include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NonInputInterceptorManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInputInterceptorManager" };
 } // namespace
 
-NonInputInterceptorManager::NonInputInterceptorManager() {}
-
-int32_t NonInputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
+int32_t IInputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
     CALL_LOG_ENTER;
     return INVALID_HANDLER_ID;
 }
 
-void NonInputInterceptorManager::RemoveInterceptor(int32_t interceptorId)
+void IInputInterceptorManager::RemoveInterceptor(int32_t interceptorId)
 {
     MMI_HILOGD("Interceptor is:%{public}d", interceptorId);
     return;
@@ -40,7 +38,7 @@ void NonInputInterceptorManager::RemoveInterceptor(int32_t interceptorId)
 std::shared_ptr<IInputInterceptorManager> IInputInterceptorManager::GetInstance()
 {
     if (inputMgrPtr_ == nullptr) {
-        inputMgrPtr_ = std::make_shared<NonInputInterceptorManager>();
+        inputMgrPtr_ = std::make_shared<IInputInterceptorManager>();
     }
     return inputMgrPtr_;
 }
