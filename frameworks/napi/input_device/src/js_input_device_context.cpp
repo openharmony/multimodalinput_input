@@ -37,6 +37,8 @@ const std::string TYPEOF = "napi_typeof";
 const std::string GET_INT32 = "napi_get_value_int32";
 const std::string DEFINE_PROPERTIES = "napi_define_properties";
 const std::string GET_STRING_UTF8 = "napi_get_value_string_utf8";
+const std::string GET_ARRAY_LENGTH = "napi_get_array_length";
+const std::string GET_ELEMENT = "napi_get_element";
 } // namespace
 
 JsInputDeviceContext::JsInputDeviceContext()
@@ -145,7 +147,7 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
     CALL_LOG_ENTER;
     size_t argc = 2;
     napi_value argv[2];
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), "napi_get_cb_info");
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc != 2) {
         MMI_HILOGE("the number of parameters is incorrect");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: the number of parameters is incorrect");
@@ -187,7 +189,7 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
     CALL_LOG_ENTER;
     size_t argc = 2;
     napi_value argv[2];
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), "napi_get_cb_info");
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1 || argc > 2) {
         MMI_HILOGE("the number of parameters is incorrect");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: the number of parameters is incorrect");
@@ -296,14 +298,14 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
 napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
-    size_t argc = 7;
-    napi_value argv[7];
+    size_t argc = 3;
+    napi_value argv[3];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 2 || argc > 7) {
+    if (argc < 2 || argc > 3) {
         MMI_HILOGE("parameter number error, argc: %{public}zu", argc);
         napi_throw_error(env, nullptr, "JsInputDeviceContext: parameter number error");
         return nullptr;
-    }
+    }   
 
     napi_valuetype valueType = napi_undefined;
     CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
@@ -314,49 +316,39 @@ napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback
     }
     int32_t deviceId = 0;
     CHKRP(env, napi_get_value_int32(env, argv[0], &deviceId), GET_INT32);
-
-    for (size_t i = 0; i < argc; ++i) {
-        CHKRP(env, napi_typeof(env, argv[i], &valueType), TYPEOF);
-        if (valueType == napi_undefined) {
-            argc = i;
-            break;
-        }
-    }
+    uint32_t size = 0;
+    CHKRP(env, napi_get_array_length(env, argv[1], &size), GET_ARRAY_LENGTH);
 
     int32_t data = 0;
     std::vector<int32_t> keyCode;
-    for (size_t i = 1; i < argc - 1; ++i) {
-        CHKRP(env, napi_typeof(env, argv[i], &valueType), TYPEOF);
+    for (uint32_t i = 0; i < size; ++i) {
+        napi_value keyValue = nullptr;
+        CHKRP(env, napi_get_element(env, argv[1], i, &keyValue), GET_ELEMENT);
+        CHKRP(env, napi_typeof(env, keyValue, &valueType), TYPEOF);
         if (valueType != napi_number) {
             MMI_HILOGE("the %{public}zu parameter is not a number", i);
             napi_throw_error(env, nullptr, "JsInputDeviceContext: parameter type error");
             return nullptr;
         }
-        CHKRP(env, napi_get_value_int32(env, argv[i], &data), GET_INT32);
+        CHKRP(env, napi_get_value_int32(env, keyValue, &data), GET_INT32);
         keyCode.push_back(data);
     }
 
     JsInputDeviceContext *jsContext = JsInputDeviceContext::GetInstance(env);
     auto jsInputDeviceMgr = jsContext->GetJsInputDeviceMgr();
-    CHKRP(env, napi_typeof(env, argv[argc - 1], &valueType), TYPEOF);
-    if (valueType == napi_number) {
-        CHKRP(env, napi_get_value_int32(env, argv[argc - 1], &data), GET_INT32);
-        keyCode.push_back(data);
-        return jsInputDeviceMgr->GetKeystrokeAbility(env, deviceId, keyCode);
-    }
-
-    CHKRP(env, napi_typeof(env, argv[argc - 1], &valueType), TYPEOF);
-    if (argc == 2 && valueType == napi_function) {
+    if (argc == 2) {
         MMI_HILOGE("the number of parameters is incorrect");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: the number of parameters is incorrect");
-        return nullptr;
+        return jsInputDeviceMgr->GetKeystrokeAbility(env, deviceId, keyCode);
     }
+    CHKRP(env, napi_typeof(env, argv[2], &valueType), TYPEOF);
     if (valueType != napi_function) {
         MMI_HILOGE("the last parameter is not a function");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: the last parameter is not a function");
         return nullptr;
     }
-    return jsInputDeviceMgr->GetKeystrokeAbility(env, deviceId, keyCode, argv[argc - 1]);
+    return jsInputDeviceMgr->GetKeystrokeAbility(env, deviceId, keyCode, argv[2]);
+    // return nullptr;
 }
 
 napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
