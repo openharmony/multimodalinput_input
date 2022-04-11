@@ -66,7 +66,7 @@ bool KeyCommandManager::ResolveJson(const std::string &configFile)
         jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
-        MMI_HILOGW("close file failed");
+        MMI_HILOGE("close file failed");
     }
     cJSON* configJson = cJSON_Parse(jsonBuf.c_str());
     CHKPF(configJson);
@@ -95,12 +95,9 @@ bool KeyCommandManager::ResolveJson(const std::string &configFile)
         if (!ConvertToShortcutKey(shortkeyStr, shortcutKey)) {
             continue;
         }
-        std::string key = GenerateKey(shortcutKey);
-        auto res = shortcutKeys_.find(key);
-        if (res == shortcutKeys_.end()) {
-            auto iter = shortcutKeys_.emplace(key, shortcutKey);
-            if (!iter.second) {
-                MMI_HILOGE("Duplicate shortcutKey:%{public}s", key.c_str());
+        if (shortcutKeys_.find(GenerateKey(shortcutKey)) == shortcutKeys_.end()) {
+            if (!shortcutKeys_.emplace(GenerateKey(shortcutKey), shortcutKey).second) {
+                MMI_HILOGE("Duplicate shortcutKey:%{public}s", GenerateKey(shortcutKey).c_str());
             }
         }
     }
