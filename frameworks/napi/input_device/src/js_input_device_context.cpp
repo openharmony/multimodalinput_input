@@ -318,9 +318,9 @@ napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback
     CHKRP(env, napi_get_value_int32(env, argv[0], &deviceId), GET_INT32);
     uint32_t size = 0;
     CHKRP(env, napi_get_array_length(env, argv[1], &size), GET_ARRAY_LENGTH);
-    if (size > 5) {
-        MMI_HILOGE("too many keycode parameters, maximum 5");
-        napi_throw_error(env, nullptr, "JsInputDeviceContext: too many keycode parameters, maximum 5");
+    if (size < 1 || size > 5) {
+        MMI_HILOGE("the number of parameters is incorrect, maximum 5");
+        napi_throw_error(env, nullptr, "JsInputDeviceContext: the number of parameters is incorrect, maximum 5");
         return nullptr;
     }
 
