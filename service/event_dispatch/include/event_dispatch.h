@@ -23,6 +23,7 @@
 #include "key_event_value_transformation.h"
 #include "pointer_event.h"
 #include "uds_server.h"
+#include "i_key_command_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -69,6 +70,7 @@ private:
 
 private:
     EventPackage eventPackage_;
+    std::shared_ptr<IKeyCommandManager> keyCommand_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
