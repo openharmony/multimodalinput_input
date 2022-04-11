@@ -492,6 +492,7 @@ std::string InputManagerTest::DumpPointerItem(const PointerEvent::PointerItem &i
          << ",GlobalY:" << item.GetGlobalY()
          << ",LocalX:-\\{0,1\\}[[:digit:]]\\{1,\\},LocalY:-\\{0,1\\}[[:digit:]]\\{1,\\}"
          << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
+         << ",TiltX:" << item.GetTiltX() << ",TiltY:" << item.GetTiltY()
          << ",Pressure:" << item.GetPressure();
     return strm.str();
 }

@@ -349,6 +349,11 @@ public:
          */
         void SetHeight(int32_t height);
 
+        double GetTiltX() const;
+        void SetTiltX(double tiltX);
+        double GetTiltY() const;
+        void SetTiltY(double tiltY);
+
         /**
          * @brief Obtains the pressure in this event.
          * @return Returns the pressure.
@@ -378,7 +383,7 @@ public:
          * @since 9
          */
         void SetDeviceId(int32_t deviceId);
-    public:
+
         /**
          * @brief Writes data to a <b>Parcel</b> obejct.
          * @param out Indicates the object into which data will be written.
@@ -404,6 +409,8 @@ public:
         int32_t localY_ { 0 };
         int32_t width_ { 0 };
         int32_t height_ { 0 };
+        double  tiltX_ { 0.0 };
+        double  tiltY_ { 0.0 };
         int32_t pressure_ { 0 };
         int32_t deviceId_ { 0 };
         int64_t downTime_ { 0 };
@@ -431,6 +438,8 @@ public:
      * @since 9
      */
     static std::shared_ptr<PointerEvent> Create();
+
+    virtual void Reset() override;
 
     /**
      * @brief Obtains the pointer action in this event.
@@ -687,14 +696,14 @@ private:
     bool IsValidCheckTouch() const;
 
 private:
-    int32_t pointerId_ { 0 };
+    int32_t pointerId_ { -1 };
     std::list<PointerItem> pointers_;
     std::set<int32_t> pressedButtons_;
-    int32_t sourceType_ { 0 };
-    int32_t pointerAction_ { 0 };
+    int32_t sourceType_ { SOURCE_TYPE_UNKNOWN };
+    int32_t pointerAction_ { POINTER_ACTION_UNKNOWN };
     int32_t buttonId_ { -1 };
-    uint32_t axes_ { 0 };
-    std::array<double, AXIS_TYPE_MAX>   axisValues_ { };
+    uint32_t axes_ { 0U };
+    std::array<double, AXIS_TYPE_MAX>   axisValues_ {};
     std::vector<int32_t> pressedKeys_;
 };
 
