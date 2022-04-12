@@ -47,6 +47,7 @@ config("libmmi_server_config") {
     "//foundation/multimodalinput/input/util/socket/include",
     "//foundation/multimodalinput/input/util/network/include",
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
+    "//third_party/cJSON",
   ]
 
   if (is_mmi_have_hdf) {
@@ -161,6 +162,7 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
     "//foundation/multimodalinput/input/util:libmmi-util",
     "//foundation/windowmanager/wm:libwm",
+    "//third_party/cJSON:cjson_static",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
