@@ -17,7 +17,6 @@
 
 namespace OHOS {
 namespace MMI {
-
 VirtualPenMouse::VirtualPenMouse() : VirtualDevice("V-Pencil-mouse", BUS_BLUETOOTH, 0x12d1, 0x10a5)
 {
 }
