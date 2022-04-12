@@ -573,7 +573,7 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-d <dx1> <dy1>             --down   <dx1> <dy1> -press down a position  dx1 dy1, " << std::endl;
     std::cout << "-u <dx1> <dy1>             --up     <dx1> <dy1> -release a position dx1 dy1" << std::endl;
     std::cout << "-m <dx1> <dy1> <dx2> <dy2> --move   <dx1> <dy1> <dx2> <dy2> -move dx1 dy1 to dx2 dy2 " << std::endl;
-    std::cout << "-s <dx1> <dy1> <dx2> <dy2> <smooth time> --smooth   dx1 dy1 to dx2 dy2 smooth time" << std::endl;
+    std::cout << "-s <dx1> <dy1> <dx2> <dy2> <smooth time>     move to relative position (dx,dy,time)" << std::endl;
     std::cout << "                                                                  " << std::endl;
     std::cout << "-?  --help                                                        " << std::endl;
 }
