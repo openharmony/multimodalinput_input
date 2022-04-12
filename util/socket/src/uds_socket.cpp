@@ -114,8 +114,8 @@ int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isNonBlock)
 void UDSSocket::OnReadPackets(CircleStreamBuffer& circBuf, UDSSocket::PacketCallBackFun callbackFun)
 {
     constexpr int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
-    const int32_t unreadSize = circBuf.UnreadSize();
     for (int32_t i = 0; i < ONCE_PROCESS_NETPACKET_LIMIT; i++) {
+        const int32_t unreadSize = circBuf.UnreadSize();
         if (unreadSize < headSize) {
             break;
         }
