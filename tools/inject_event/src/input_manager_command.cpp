@@ -463,7 +463,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "invalid command to input value" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            if ((totalTime < 1) || (totalTime > 15000)) {
+                            int32_t maxtotalTime = 15000;
+                            int32_t mixtotalTime = 1;
+                            if ((totalTime < mixtotalTime) || (totalTime > maxtotalTime)) {
                                 std::cout << "totalTime is out of range. 1 < totalTime < 150000" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
@@ -495,6 +497,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             } else {
                                 stepY = vecY / numberTime;
                             }
+                            int32_t thousand = 0;
                             for (double i = 1; i <= numberTime; ++i) {
                                 if (vecX == 0) {
                                     item.SetGlobalX(px1);
@@ -506,7 +509,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 } else {
                                     item.SetGlobalY(py1 + (stepY * i));
                                 }
-                                pointerEvent->SetActionTime(time + (blockTime / 1000));
+                                pointerEvent->SetActionTime(time + (blockTime / thousand));
                                 pointerEvent->UpdatePointerItem(0, item);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
