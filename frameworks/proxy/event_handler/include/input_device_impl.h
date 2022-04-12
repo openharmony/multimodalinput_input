@@ -42,14 +42,19 @@ public:
     using FunInputDevInfo = std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)>;
     using FunInputDevIds = std::function<void(int32_t, std::vector<int32_t>)>;
     using FunInputDevKeys = std::function<void(int32_t, std::vector<int32_t>)>;
+    using FunInputDevMonitor = std::function<void(std::string, int32_t)>;
     using DevInfo = std::pair<EventHandlerPtr, FunInputDevInfo>;
     using DevIds = std::pair<EventHandlerPtr, FunInputDevIds>;
     using DevKeys = std::pair<EventHandlerPtr, FunInputDevKeys>;
+    using DevMonitor = std::pair<EventHandlerPtr, FunInputDevMonitor>;
     struct InputDeviceData {
         DevInfo inputDevice;
         DevIds ids;
         DevKeys keys;
     };
+
+    void RegisterInputDeviceMonitor(std::function<void(std::string, int32_t)> listening);
+    void UnRegisterInputDeviceMonitor();
 
     void GetInputDeviceIdsAsync(int32_t userData, std::function<void(int32_t, std::vector<int32_t>)> callback);
     void GetInputDeviceAsync(int32_t userData, int32_t deviceId,
@@ -59,6 +64,7 @@ public:
     void OnInputDevice(int32_t userData, int32_t id, const std::string &name, int32_t deviceId);
     void OnInputDeviceIds(int32_t userData, const std::vector<int32_t> &ids);
     void OnKeystrokeAbility(int32_t userData, const std::vector<int32_t> &keystrokeAbility);
+    void OnDevMonitor(std::string type, int32_t deviceId);
 
 private:
     const DevInfo* GetDeviceInfo(int32_t) const;
@@ -69,10 +75,12 @@ private:
     void OnInputDeviceIdsTask(InputDeviceImpl::DevIds devIds, int32_t userData, std::vector<int32_t> ids);
     void OnKeystrokeAbilityTask(InputDeviceImpl::DevKeys devKeys, int32_t userData,
         std::vector<int32_t> keystrokeAbility);
+    void OnDevMonitorTask(DevMonitor devMonitor, std::string type, int32_t deviceId);
 
 private:
     InputDeviceImpl() = default;
     std::map<int32_t, InputDeviceData> inputDevices_;
+    DevMonitor devMonitor_;
     std::mutex mtx_;
 };
 } // namespace MMI

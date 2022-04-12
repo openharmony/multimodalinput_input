@@ -30,6 +30,39 @@ InputDeviceImpl& InputDeviceImpl::GetInstance()
     return instance;
 }
 
+void InputDeviceImpl::RegisterInputDeviceMonitor(std::function<void(std::string, int32_t)> listening)
+{
+    CALL_LOG_ENTER;
+    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    CHKPV(eventHandler);
+    auto listen = std::make_pair(eventHandler, listening);
+    devMonitor_ = listen;
+    MMIEventHdl.RegisterInputDeviceMonitor();
+}
+
+void InputDeviceImpl::UnRegisterInputDeviceMonitor()
+{
+    MMIEventHdl.UnRegisterInputDeviceMonitor();
+}
+
+void InputDeviceImpl::OnDevMonitorTask(DevMonitor devMonitor, std::string type, int32_t deviceId)
+{
+    CALL_LOG_ENTER;
+    devMonitor.second(type, deviceId);
+    MMI_HILOGD("device info event callback event type:%{public}s deviceId:%{public}d", type.c_str(), deviceId);
+}
+
+void InputDeviceImpl::OnDevMonitor(std::string type, int32_t deviceId)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHandler::PostTask(devMonitor_.first,
+        std::bind(&InputDeviceImpl::OnDevMonitorTask, this, devMonitor_, type, deviceId))) {
+        MMI_HILOGE("post task failed");
+    }
+    MMI_HILOGD("device info event callback event type:%{public}s deviceId:%{public}d", type.c_str(), deviceId);
+}
+
 void InputDeviceImpl::GetInputDeviceIdsAsync(int32_t userData,
     std::function<void(int32_t, std::vector<int32_t>)> callback)
 {
