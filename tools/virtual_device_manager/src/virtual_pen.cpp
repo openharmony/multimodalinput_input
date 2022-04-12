@@ -47,7 +47,7 @@ VirtualPen::VirtualPen() : VirtualDevice("V-Pencil", BUS_USB, 0, 0)
     dev_.absfuzz[ABS_TILT_X] = 0;
     dev_.absflat[ABS_TILT_X] = 0;
 
-    dev_.absmin[ABS_TILT_Y] = -ABS_MIN_TILT_Y;
+    dev_.absmin[ABS_TILT_Y] = ABS_MIN_TILT_Y;
     dev_.absmax[ABS_TILT_Y] = ABS_MAX_TILT_Y;
     dev_.absfuzz[ABS_TILT_Y] = 0;
     dev_.absflat[ABS_TILT_Y] = 0;
