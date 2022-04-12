@@ -121,7 +121,7 @@ JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
     napi_value object = nullptr;
     CHKRP(env, napi_get_named_property(env, global, "multimodal_input_device", &object), SET_NAMED_PROPERTY);
     if (object == nullptr) {
-        THROWERR(env,"object is nullptr");
+        THROWERR(env, "object is nullptr");
         return nullptr;
     }
 
