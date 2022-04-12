@@ -40,7 +40,6 @@ const std::vector<uint32_t>& VirtualPenKeyboard::GetKeys() const
         KEY_END, KEY_DOWN, KEY_PAGEDOWN, KEY_DELETE, KEY_POWER, KEY_KPEQUAL, KEY_LEFTMETA, KEY_RIGHTMETA, KEY_COMPOSE,
         KEY_F13, KEY_F14, KEY_F15, KEY_F16, KEY_F17, KEY_F18, KEY_F19, KEY_F20, KEY_F21
     };
-
     return keys;
 }
 

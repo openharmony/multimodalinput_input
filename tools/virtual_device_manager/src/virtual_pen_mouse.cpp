@@ -36,7 +36,6 @@ const std::vector<uint32_t>& VirtualPenMouse::GetKeys() const
     static const std::vector<uint32_t> keys {
         BTN_LEFT, BTN_RIGHT, BTN_MIDDLE
     };
-
     return keys;
 }
 
