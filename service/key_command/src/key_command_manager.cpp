@@ -66,7 +66,7 @@ bool KeyCommandManager::ResolveJson(const std::string &configFile)
         jsonBuf += buf;
     }
     if (fclose(fp) < 0) {
-        MMI_HILOGE("close file failed");
+        MMI_HILOGE("close file failed,error:%{public}d", errno);
     }
     cJSON* configJson = cJSON_Parse(jsonBuf.c_str());
     CHKPF(configJson);
