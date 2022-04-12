@@ -68,6 +68,9 @@ ohos_shared_library("libmmi-virtual-device") {
     "src/virtual_trackpad.cpp",
     "src/virtual_trackpad_mouse.cpp",
     "src/virtual_trackpad_sys_ctrl.cpp",
+    "src/virtual_pen.cpp",
+    "src/virtual_pen_keyboard.cpp",
+    "src/virtual_pen_mouse.cpp",
   ]
 
   configs = [ ":virtual_device_config" ]
