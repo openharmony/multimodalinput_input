@@ -72,7 +72,6 @@ const std::vector<uint32_t>& VirtualPen::GetKeys() const
     static const std::vector<uint32_t> keys {
         0xc5, 0xc6, BTN_TOOL_PEN, BTN_TOUCH, BTN_STYLUS
     };
-
     return keys;
 }
 
@@ -81,7 +80,6 @@ const std::vector<uint32_t>& VirtualPen::GetAbs() const
     static const std::vector<uint32_t> abs {
         ABS_X, ABS_Y, ABS_PRESSURE, ABS_TILT_X, ABS_TILT_Y, ABS_MT_TOOL_TYPE
     };
-
     return abs;
 }
 
