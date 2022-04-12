@@ -371,8 +371,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                            int32_t middleValuePx = (px1 + px2)/2;
-                            int32_t middleValuePy = (py1 + py2)/2;
+                            int32_t middleValuePx = (px1 / 2) + (px2 / 2) + (px1 & px2 & 1);
+                            int32_t middleValuePy = (py1 / 2) + (py2 / 2) + (py1 & py2 & 1);
                             item.SetGlobalX(middleValuePx);
                             item.SetGlobalY(middleValuePy);
                             pointerEvent->SetActionTime(time + ACTION_TIME);
