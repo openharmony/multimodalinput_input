@@ -79,40 +79,41 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
     MMI_HILOGD("current action:%{public}d", pointerEvent_->GetPointerAction());
 
     auto button = libinput_event_pointer_get_button(data);
-    switch (button){
-        case BTN_LEFT:{
+    switch ( button )
+    {
+        case BTN_LEFT: {
             pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
             break;
         }
-        case BTN_RIGHT:{
+        case BTN_RIGHT: {
             pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
             break;
         }
-        case BTN_MIDDLE:{
+        case BTN_MIDDLE: {
             pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_MIDDLE);
             break;
         }
-        case BTN_SIDE:{
+        case BTN_SIDE: {
             pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_SIDE);
             break;
         }
-        case BTN_EXTRA:{
+        case BTN_EXTRA: {
             pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_EXTRA);
             break;
         }
-        case BTN_FORWARD:{
+        case BTN_FORWARD: {
             pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_FORWARD);
             break;
         }
-        case BTN_BACK:{
+        case BTN_BACK: {
             pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_BACK);
             break;
         }
-        case BTN_TASK:{
+        case BTN_TASK: {
             pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_TASK);
             break;
         }
-        default:{
+        default: {
             MMI_HILOGW("unknown btn, btn:%{public}u", button);
             break;
         }
