@@ -125,7 +125,7 @@ void UDSSocket::OnReadPackets(CircleStreamBuffer& circBuf, UDSSocket::PacketCall
         PackHead *head = reinterpret_cast<PackHead *>(buf);
         CHKPB(head);
         if (head->size < 0 || head->size > MAX_PACKET_BUF_SIZE) {
-            MMI_HILOGF("Head size is error, head->size:%{public}d, unreadSize:%{public}d, errCode:%{public}d", 
+            MMI_HILOGF("Head size is error, head->size:%{public}d, unreadSize:%{public}d, errCode:%{public}d",
                 head->size, unreadSize, VAL_NOT_EXP);
             circBuf.Clean();
             break;
