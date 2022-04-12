@@ -31,16 +31,20 @@ namespace OHOS {
 namespace MMI {
 class JsEventTarget {
 public:
-    JsEventTarget() = default;
-    ~JsEventTarget() = default;
+    JsEventTarget();
+    ~JsEventTarget();
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
+    static void TargetOn(std::string type, int32_t deviceId);
     static void EmitJsIds(int32_t userData, std::vector<int32_t> ids);
     static void EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device);
     static void EmitJsKeystrokeAbility(int32_t userData, std::vector<int32_t> keystrokeAbility);
+    void AddMonitor(napi_env env, std::string type, napi_value handle);
+    void RemoveMonitor(napi_env env, std::string type, napi_value handle);
     napi_value CreateCallbackInfo(napi_env env, napi_value handle);
     void ResetEnv();
     inline static int32_t userData_ {0};
     inline static std::map<int32_t, std::unique_ptr<JsUtil::CallbackInfo>> callback_ {};
+    inline static std::map<std::string, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>> devMonitor_ {};
 
     struct DeviceType {
         std::string deviceTypeName;
@@ -54,6 +58,8 @@ private:
     static void CallDevPromiseWork(uv_work_t *work, int32_t status);
     static void CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status);
     static void CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status);
+    static void EmitAddedDeviceEvent(uv_work_t *work, int32_t status);
+    static void EmitRemoveDeviceEvent(uv_work_t *work, int32_t status);
 };
 } // namespace MMI
 } // namespace OHOS
