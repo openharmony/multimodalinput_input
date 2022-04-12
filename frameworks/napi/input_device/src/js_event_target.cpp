@@ -73,7 +73,6 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
     CHKPV(work->data);
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
     delete work;
-    work = nullptr;
     
     auto addEvent = devMonitor_.find(ADD_EVENT);
     if (addEvent == devMonitor_.end()) {
@@ -104,7 +103,6 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
     CHKPV(work->data);
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
     delete work;
-    work = nullptr;
     
     auto removeEvent = devMonitor_.find(REMOVE_EVENT);
     if (removeEvent == devMonitor_.end()) {
@@ -156,7 +154,6 @@ void JsEventTarget::TargetOn(std::string type, int32_t deviceId)
         }
         if (ret != 0) {
             delete work;
-            work = nullptr;
             MMI_HILOGE("uv_queue_work failed");
             return;
         }
@@ -257,9 +254,7 @@ void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> ids)
     }
     if (ret != 0) {
         delete work;
-        work = nullptr;
         delete uData;
-        uData = nullptr;
         MMI_HILOGE("uv_queue_work failed");
         return;
     }
@@ -409,9 +404,7 @@ void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl:
     }
     if (ret != 0) {
         delete work;
-        work = nullptr;
         delete uData;
-        uData = nullptr;
         MMI_HILOGE("uv_queue_work failed");
         return;
     }
@@ -530,9 +523,7 @@ void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::vector<int32_t
     }
     if (ret != 0) {
         delete work;
-        work = nullptr;
         delete uData;
-        uData = nullptr;
         MMI_HILOGE("uv_queue_work failed");
         return;
     }

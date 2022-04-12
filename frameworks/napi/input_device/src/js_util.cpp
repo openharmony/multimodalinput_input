@@ -31,9 +31,7 @@ int32_t JsUtil::GetInt32(uv_work_t *work)
     int32_t *uData = static_cast<int32_t*>(work->data);
     int32_t userData = *uData;
     delete uData;
-    uData = nullptr;
     delete work;
-    work = nullptr;
     return userData;
 }
 
