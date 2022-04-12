@@ -161,9 +161,12 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
     "//foundation/multimodalinput/input/util:libmmi-util",
-    "//foundation/windowmanager/wm:libwm",
     "//third_party/cJSON:cjson_static",
   ]
+
+  if (mmi_enable_pointer_drawing) {
+    deps += [ "//foundation/windowmanager/wm:libwm" ]
+  }
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
