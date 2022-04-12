@@ -287,9 +287,9 @@ HWTEST_F(StreamBufferTest, Size_001, TestSize.Level1)
  */
 HWTEST_F(StreamBufferTest, operatorLeft, TestSize.Level1)
 {
+    int32_t val = 111;
     StreamBuffer streamBufferSrc;
-    StreamBuffer streamBufferCopy = streamBufferSrc;
-    streamBufferCopy << streamBufferSrc;
+    streamBufferSrc << val;
 }
 
 /**
@@ -300,9 +300,10 @@ HWTEST_F(StreamBufferTest, operatorLeft, TestSize.Level1)
  */
 HWTEST_F(StreamBufferTest, operatorRight, TestSize.Level1)
 {
+    int32_t val = 111;
     StreamBuffer streamBufferSrc;
-    StreamBuffer streamBufferCopy = streamBufferSrc;
-    streamBufferCopy >> streamBufferSrc;
+    streamBufferSrc << val;
+    streamBufferSrc >> val;
 }
 
 /**

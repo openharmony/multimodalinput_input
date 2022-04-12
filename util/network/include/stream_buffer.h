@@ -31,12 +31,12 @@ namespace MMI {
 class StreamBuffer {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "StreamBuffer"};
 public:
-    StreamBuffer() {}
+    StreamBuffer() = default;
+    virtual ~StreamBuffer() = default;
     explicit StreamBuffer(const StreamBuffer& buf);
-    virtual ~StreamBuffer() {}
     virtual StreamBuffer& operator=(const StreamBuffer& other);
     DISALLOW_MOVE(StreamBuffer);
-
+    
     void Clean();
     bool SetReadIdx(int32_t idx);
     bool MoveReadIdx(int32_t n);
