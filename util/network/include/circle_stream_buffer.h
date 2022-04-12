@@ -23,7 +23,7 @@ class CircleStreamBuffer : public StreamBuffer {
 public:
     CircleStreamBuffer() = default;
     virtual ~CircleStreamBuffer() = default;
-    DISALLOW_COPY_AND_MOVE(CircleStreamBuffer);
+    DISALLOW_MOVE(CircleStreamBuffer);
 
     int32_t AvailableSize() const
     {
