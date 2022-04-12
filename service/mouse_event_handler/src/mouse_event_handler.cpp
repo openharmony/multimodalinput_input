@@ -79,8 +79,7 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
     MMI_HILOGD("current action:%{public}d", pointerEvent_->GetPointerAction());
 
     auto button = libinput_event_pointer_get_button(data);
-    switch ( button )
-    {
+    switch (button) {
         case BTN_LEFT:
             pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
             break;
