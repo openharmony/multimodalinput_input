@@ -161,7 +161,6 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
     "//foundation/multimodalinput/input/util:libmmi-util",
-    "//foundation/windowmanager/wm:libwm",
     "//third_party/cJSON:cjson_static",
   ]
 
@@ -181,6 +180,10 @@ ohos_shared_library("libmmi-server") {
     "samgr_standard:samgr_proxy",
     "utils_base:utils",
   ]
+
+  if (mmi_enable_pointer_drawing) {
+    external_deps += [ "window_manager:libwm" ]
+  }
 
   part_name = "input"
 }
