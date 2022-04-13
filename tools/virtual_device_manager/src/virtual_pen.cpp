@@ -16,17 +16,19 @@
 #include "virtual_pen.h"
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t ABS_MAX_X = 20479;
+constexpr int32_t ABS_MAX_Y = 12799;
+constexpr int32_t ABS_MAX_PRESSURE = 4096;
+constexpr int32_t ABS_MIN_TILT_X = -90;
+constexpr int32_t ABS_MAX_TILT_X = 90;
+constexpr int32_t ABS_MIN_TILT_Y = -90;
+constexpr int32_t ABS_MAX_TILT_Y = 90;
+constexpr int32_t ABS_MAX_TYPE = 15;
+} // namespace
+
 VirtualPen::VirtualPen() : VirtualDevice("V-Pencil", BUS_USB, 0, 0)
 {
-    constexpr int32_t ABS_MAX_X = 20479;
-    constexpr int32_t ABS_MAX_Y = 12799;
-    constexpr int32_t ABS_MAX_PRESSURE = 4096;
-    constexpr int32_t ABS_MIN_TILT_X = -90;
-    constexpr int32_t ABS_MAX_TILT_X = 90;
-    constexpr int32_t ABS_MIN_TILT_Y = -90;
-    constexpr int32_t ABS_MAX_TILT_Y = 90;
-    constexpr int32_t ABS_MAX_TYPE = 15;
-
     dev_.absmin[ABS_X] = 0;
     dev_.absmax[ABS_X] = ABS_MAX_X;
     dev_.absfuzz[ABS_X] = 0;
@@ -57,37 +59,28 @@ VirtualPen::VirtualPen() : VirtualDevice("V-Pencil", BUS_USB, 0, 0)
     dev_.absfuzz[ABS_MT_TOOL_TYPE] = 0;
     dev_.absflat[ABS_MT_TOOL_TYPE] = 0;
 }
-VirtualPen::~VirtualPen() {}
 
 const std::vector<uint32_t>& VirtualPen::GetEventTypes() const
 {
-    static const std::vector<uint32_t> evt_types {
-        EV_KEY, EV_ABS
-    };
+    static const std::vector<uint32_t> evt_types { EV_KEY, EV_ABS };
     return evt_types;
 }
 
 const std::vector<uint32_t>& VirtualPen::GetKeys() const
 {
-    static const std::vector<uint32_t> keys {
-        0xc5, 0xc6, BTN_TOOL_PEN, BTN_TOUCH, BTN_STYLUS
-    };
+    static const std::vector<uint32_t> keys { 0xc5, 0xc6, BTN_TOOL_PEN, BTN_TOUCH, BTN_STYLUS };
     return keys;
 }
 
 const std::vector<uint32_t>& VirtualPen::GetAbs() const
 {
-    static const std::vector<uint32_t> abs {
-        ABS_X, ABS_Y, ABS_PRESSURE, ABS_TILT_X, ABS_TILT_Y, ABS_MT_TOOL_TYPE
-    };
+    static const std::vector<uint32_t> abs { ABS_X, ABS_Y, ABS_PRESSURE, ABS_TILT_X, ABS_TILT_Y, ABS_MT_TOOL_TYPE };
     return abs;
 }
 
 const std::vector<uint32_t>& VirtualPen::GetProperties() const
 {
-    static const std::vector<uint32_t> properties {
-        INPUT_PROP_DIRECT
-    };
+    static const std::vector<uint32_t> properties { INPUT_PROP_DIRECT };
     return properties;
 }
 } // namespace MMI

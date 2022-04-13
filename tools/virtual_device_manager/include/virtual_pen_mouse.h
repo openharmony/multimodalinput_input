@@ -23,7 +23,7 @@ namespace MMI {
 class VirtualPenMouse : public VirtualDevice {
 public:
     VirtualPenMouse();
-    ~VirtualPenMouse();
+    ~VirtualPenMouse() = default;
     DISALLOW_COPY_AND_MOVE(VirtualPenMouse);
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;

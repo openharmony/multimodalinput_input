@@ -17,17 +17,11 @@
 
 namespace OHOS {
 namespace MMI {
-VirtualPenKeyboard::VirtualPenKeyboard() : VirtualDevice("V-Pencil-keyboard", BUS_BLUETOOTH, 0x12d1, 0x10a5)
-{
-}
-
-VirtualPenKeyboard::~VirtualPenKeyboard() {}
+VirtualPenKeyboard::VirtualPenKeyboard() : VirtualDevice("V-Pencil-keyboard", BUS_BLUETOOTH, 0x12d1, 0x10a5) {}
 
 const std::vector<uint32_t>& VirtualPenKeyboard::GetEventTypes() const
 {
-    static const std::vector<uint32_t> evt_types {
-        EV_KEY, EV_MSC
-    };
+    static const std::vector<uint32_t> evt_types { EV_KEY, EV_MSC };
     return evt_types;
 }
 
@@ -45,9 +39,7 @@ const std::vector<uint32_t>& VirtualPenKeyboard::GetKeys() const
 
 const std::vector<uint32_t>& VirtualPenKeyboard::GetMscs() const
 {
-    static const std::vector<uint32_t> mscs {
-        MSC_SCAN
-    };
+    static const std::vector<uint32_t> mscs { MSC_SCAN };
     return mscs;
 }
 } // namespace MMI
