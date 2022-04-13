@@ -81,6 +81,7 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
     }
 
     for (const auto &item : addEvent->second) {
+        CHKPC(item);
         CHKPC(item->env);
         if (item->ref != (*temp)->ref) {
             continue;
@@ -111,6 +112,7 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
     }
 
     for (const auto &item : removeEvent->second) {
+        CHKPC(item);
         CHKPC(item->env);
         if (item->ref != (*temp)->ref) {
             continue;
