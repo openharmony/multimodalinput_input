@@ -62,8 +62,8 @@ VirtualPen::VirtualPen() : VirtualDevice("V-Pencil", BUS_USB, 0, 0)
 
 const std::vector<uint32_t>& VirtualPen::GetEventTypes() const
 {
-    static const std::vector<uint32_t> evt_types { EV_KEY, EV_ABS };
-    return evt_types;
+    static const std::vector<uint32_t> eventTypes { EV_KEY, EV_ABS };
+    return eventTypes;
 }
 
 const std::vector<uint32_t>& VirtualPen::GetKeys() const
