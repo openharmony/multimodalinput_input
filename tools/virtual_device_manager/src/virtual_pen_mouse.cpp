@@ -21,8 +21,8 @@ VirtualPenMouse::VirtualPenMouse() : VirtualDevice("V-Pencil-mouse", BUS_BLUETOO
 
 const std::vector<uint32_t>& VirtualPenMouse::GetEventTypes() const
 {
-    static const std::vector<uint32_t> evt_types { EV_KEY, EV_REL, EV_MSC };
-    return evt_types;
+    static const std::vector<uint32_t> eventTypes { EV_KEY, EV_REL, EV_MSC };
+    return eventTypes;
 }
 
 const std::vector<uint32_t>& VirtualPenMouse::GetKeys() const

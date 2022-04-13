@@ -21,8 +21,8 @@ VirtualPenKeyboard::VirtualPenKeyboard() : VirtualDevice("V-Pencil-keyboard", BU
 
 const std::vector<uint32_t>& VirtualPenKeyboard::GetEventTypes() const
 {
-    static const std::vector<uint32_t> evt_types { EV_KEY, EV_MSC };
-    return evt_types;
+    static const std::vector<uint32_t> eventTypes { EV_KEY, EV_MSC };
+    return eventTypes;
 }
 
 const std::vector<uint32_t>& VirtualPenKeyboard::GetKeys() const
