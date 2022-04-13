@@ -48,9 +48,7 @@ public:
 protected:
     virtual void OnConnected() {}
     virtual void OnDisconnected() {}
-
     bool StartClient(MsgClientFunCallback fun);
-    void OnRecv(const char *buf, size_t size);
 
 protected:
     bool isExit = false;

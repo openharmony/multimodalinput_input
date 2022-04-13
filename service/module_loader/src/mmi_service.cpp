@@ -314,9 +314,7 @@ void MMIService::OnThread()
     int32_t count = 0;
     constexpr int32_t timeOut = 1;
     struct epoll_event ev[MAX_EVENT_SIZE] = {};
-    std::map<int32_t, StreamBufData> bufMap;
     while (state_ == ServiceRunningState::STATE_RUNNING) {
-        bufMap.clear();
         count = EpollWait(ev[0], MAX_EVENT_SIZE, timeOut, mmiFd_);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
@@ -324,7 +322,7 @@ void MMIService::OnThread()
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 libinputAdapter_.EventDispatch(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
-                OnEpollEvent(bufMap, ev[i]);
+                OnEpollEvent(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {
                 OnSignalEvent(mmiEd->fd);
             } else {
@@ -333,12 +331,6 @@ void MMIService::OnThread()
         }
         if (state_ != ServiceRunningState::STATE_RUNNING) {
             break;
-        }
-        for (auto& it : bufMap) {
-            if (it.second.isOverflow) {
-                continue;
-            }
-            OnRecv(it.first, it.second.sBuf.Data(), it.second.sBuf.Size());
         }
         OnTimer();
     }

@@ -50,9 +50,10 @@ public:
     bool Read(char *buf, size_t size);
     virtual bool Write(const char *buf, size_t size);
 
-    bool IsEmpty();
+    bool IsEmpty() const;
     size_t Size() const;
     int32_t UnreadSize() const;
+    int32_t AvailableSize() const;
 
     bool ChkRWError() const;
     const std::string& GetErrorStatusRemark() const;
@@ -86,7 +87,7 @@ protected:
 
     int32_t rIdx_ = 0;
     int32_t wIdx_ = 0;
-    char szBuff_[MAX_STREAM_BUF_SIZE] = {};
+    char szBuff_[MAX_STREAM_BUF_SIZE+1] = {};
 };
 
 template<typename T>

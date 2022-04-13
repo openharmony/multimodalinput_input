@@ -25,13 +25,6 @@ public:
     virtual ~CircleStreamBuffer() = default;
     DISALLOW_MOVE(CircleStreamBuffer);
 
-    int32_t AvailableSize() const
-    {
-        if (wIdx_ > MAX_STREAM_BUF_SIZE) {
-            return 0;
-        }
-        return (MAX_STREAM_BUF_SIZE - wIdx_);
-    }
     void MoveMemoryToBegin();
     bool CheckWrite(size_t size);
     virtual bool Write(const char *buf, size_t size) override;

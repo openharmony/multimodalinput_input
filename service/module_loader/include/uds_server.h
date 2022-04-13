@@ -38,10 +38,6 @@ enum EpollEventType {
     EPOLL_EVENT_END,
 };
 
-struct StreamBufData {
-    bool isOverflow = false;
-    StreamBuffer sBuf;
-};
 using MsgServerFunCallback = std::function<void(SessionPtr, NetPacket&)>;
 class UDSServer : public UDSSocket, public IUdsServer {
 public:
@@ -67,13 +63,10 @@ protected:
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd);
 
     void SetRecvFun(MsgServerFunCallback fun);
-    void OnRecv(int32_t fd, const char *buf, size_t size);
     void ReleaseSession(int32_t fd, epoll_event& ev);
     void OnPacket(int32_t fd, NetPacket& pkt);
     void OnEpollRecv(int32_t fd, epoll_event& ev);
-    void OnEpollRecv(int32_t fd, std::map<int32_t, StreamBufData>& bufMap, epoll_event& ev);
     void OnEpollEvent(epoll_event& ev);
-    void OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, epoll_event& ev);
     bool AddSession(SessionPtr ses);
     void DelSession(int32_t fd);
     void DumpSession(const std::string& title);

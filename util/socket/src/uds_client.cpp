@@ -118,40 +118,5 @@ void UDSClient::Stop()
     isRunning_ = false;
     Close();
 }
-
-void UDSClient::OnRecv(const char *buf, size_t size)
-{
-    CHKPV(buf);
-    int32_t readIdx = 0;
-    int32_t packSize = 0;
-    int32_t bufSize = static_cast<int32_t>(size);
-    constexpr int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
-    if (bufSize < headSize) {
-        MMI_HILOGE("The in parameter size is error, errCode:%{public}d", VAL_NOT_EXP);
-        return;
-    }
-    while (bufSize > 0 && recvFun_) {
-        if (bufSize < headSize) {
-            MMI_HILOGE("The size is less than headSize, errCode:%{public}d", VAL_NOT_EXP);
-            return;
-        }
-        auto head = reinterpret_cast<PackHead *>(const_cast<char *>(&buf[readIdx]));
-        if (head->size < 0 || head->size >= bufSize) {
-            MMI_HILOGE("Head size is error, head->size:%{public}d, errCode:%{public}d", head->size, VAL_NOT_EXP);
-            return;
-        }
-        NetPacket pkt(head->idMsg);
-        if (head->size > 0) {
-            if (!pkt.Write(&buf[readIdx + headSize], static_cast<size_t>(head->size))) {
-                MMI_HILOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
-                return;
-            }
-        }
-        recvFun_(*this, pkt);
-        packSize = headSize + head->size;
-        bufSize -= packSize;
-        readIdx += packSize;
-    }
-}
 } // namespace MMI
 } // namespace OHOS
