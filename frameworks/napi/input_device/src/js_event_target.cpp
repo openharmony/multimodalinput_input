@@ -136,6 +136,7 @@ void JsEventTarget::TargetOn(std::string type, int32_t deviceId)
     }
 
     for (auto & item : iter->second) {
+        CHKPC(item);
         CHKPC(item->env);
         uv_loop_s *loop = nullptr;
         CHKRV(item->env, napi_get_uv_event_loop(item->env, &loop), GET_UV_LOOP);
