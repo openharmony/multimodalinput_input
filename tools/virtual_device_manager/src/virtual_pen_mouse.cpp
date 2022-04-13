@@ -54,5 +54,5 @@ const std::vector<uint32_t>& VirtualPenMouse::GetMscs() const
     };
     return mscs;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
