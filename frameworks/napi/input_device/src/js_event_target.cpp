@@ -81,7 +81,6 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
     }
 
     for (const auto &item : addEvent->second) {
-        CHKPC(*item);
         CHKPC(item->env);
         if (item->ref != (*temp)->ref) {
             continue;
@@ -112,7 +111,6 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
     }
 
     for (const auto &item : removeEvent->second) {
-        CHKPC(*item);
         CHKPC(item->env);
         if (item->ref != (*temp)->ref) {
             continue;
@@ -139,7 +137,7 @@ void JsEventTarget::TargetOn(std::string type, int32_t deviceId)
     }
 
     for (auto & item : iter->second) {
-        CHKPC(*item);
+        CHKPC(item);
         CHKPC(item->env);
         uv_loop_s *loop = nullptr;
         CHKRV(item->env, napi_get_uv_event_loop(item->env, &loop), GET_UV_LOOP);
@@ -571,9 +569,10 @@ void JsEventTarget::RemoveMonitor(napi_env env, std::string type, napi_value han
     }
 
     JsUtil jsUtil;
-    for (auto &it : iter->second) {
-        if (jsUtil.IsHandleEquals(env, handle, it->ref)) {
-            it.reset();
+    for (auto it = iter->second.begin(); it != iter->second.end(); ++it) {
+        if (jsUtil.IsHandleEquals(env, handle, (*it)->ref)) {
+            MMI_HILOGD("succeeded in removing monitor");
+            iter->second.erase(it);
             return;
         }
     }
