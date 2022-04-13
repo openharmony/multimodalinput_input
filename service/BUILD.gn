@@ -164,10 +164,6 @@ ohos_shared_library("libmmi-server") {
     "//third_party/cJSON:cjson_static",
   ]
 
-  if (mmi_enable_pointer_drawing) {
-    deps += [ "//foundation/windowmanager/wm:libwm" ]
-  }
-
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
@@ -184,6 +180,10 @@ ohos_shared_library("libmmi-server") {
     "samgr_standard:samgr_proxy",
     "utils_base:utils",
   ]
+
+  if (mmi_enable_pointer_drawing) {
+    external_deps += [ "window_manager:libwm" ]
+  }
 
   part_name = "input"
 }
