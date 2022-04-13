@@ -340,7 +340,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t py1;
                 int32_t px2;
                 int32_t py2;
-                int32_t totalTime = 0;
+                int32_t totalTimeMs = 0;
                 int32_t oneNumber = 1;
                 int32_t twoNumber = 2;
                 int32_t threeNumber = 3;
@@ -459,14 +459,16 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 (!StrToInt(argv[optind], py1)) ||
                                 (!StrToInt(argv[optind + oneNumber], px2)) ||
                                 (!StrToInt(argv[optind + twoNumber], py2)) ||
-                                (!StrToInt(argv[optind + threeNumber], totalTime))) {
+                                (!StrToInt(argv[optind + threeNumber], totalTimeMs))) {
                                 std::cout << "invalid command to input value" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            int32_t maxtotalTime = 15000;
-                            int32_t mixtotalTime = 1;
-                            if ((totalTime < mixtotalTime) || (totalTime > maxtotalTime)) {
-                                std::cout << "totalTime is out of range. 1 < totalTime < 150000" << std::endl;
+                            int32_t minTotalTimeMs = 1;
+                            int32_t maxTotalTimeMs = 15000;
+                            if ((totalTimeMs < minTotalTimeMs) || (totalTimeMs > maxTotalTimeMs)) {
+                                std::cout << "totalTime is out of range. ";
+                                std::cout << minTotalTimeMs << " < totalTimeMs < " << maxTotalTimeMs;
+                                std::cout << std::endl;
                                 return EVENT_REG_FAIL;
                             }
                             auto pointerEvent = PointerEvent::Create();
@@ -481,43 +483,25 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                            int32_t blockTime = 16;
-                            double numberTime = totalTime / blockTime;
+                            int32_t blockTimeMs = 16;
+                            double numberTimes = totalTimeMs / blockTimeMs;
                             double vecX = px2 - px1;
                             double vecY = py2 - py1;
-                            double stepX = 0;
-                            double stepY = 0;
-                            if (vecX == 0) {
-                                stepX = px1;
-                            } else {
-                                stepX = vecX / numberTime;
-                            }
-                            if (vecY == 0) {
-                                stepY = py1;
-                            } else {
-                                stepY = vecY / numberTime;
-                            }
-                            int32_t thousand = 0;
-                            for (double i = 1; i <= numberTime; ++i) {
-                                if (vecX == 0) {
-                                    item.SetGlobalX(px1);
-                                } else {
-                                    item.SetGlobalX(px1 + (stepX * i));
-                                }
-                                if (vecY == 0) {
-                                    item.SetGlobalY(py1);
-                                } else {
-                                    item.SetGlobalY(py1 + (stepY * i));
-                                }
-                                pointerEvent->SetActionTime(time + (blockTime / thousand));
+                            double stepX = (vecX == 0) ? px1 : (vecX / numberTimes);
+                            double stepY = (vecY == 0) ? py1 : (vecY / numberTimes);
+                            int32_t thousand = 1000;
+                            for (double i = 1; i <= numberTimes; ++i) {
+                                vecX == 0 ? item.SetGlobalX(px1) : item.SetGlobalX(px1 + (stepX * i));
+                                vecY == 0 ? item.SetGlobalY(py1) : item.SetGlobalY(py1 + (stepY * i));
+                                pointerEvent->SetActionTime(time + (blockTimeMs / thousand));
                                 pointerEvent->UpdatePointerItem(0, item);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                                std::this_thread::sleep_for(std::chrono::milliseconds(blockTime));
+                                std::this_thread::sleep_for(std::chrono::milliseconds(blockTimeMs));
                             }
                             item.SetGlobalX(px2);
                             item.SetGlobalY(py2);
-                            pointerEvent->SetActionTime(time + totalTime);
+                            pointerEvent->SetActionTime(time + totalTimeMs);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
