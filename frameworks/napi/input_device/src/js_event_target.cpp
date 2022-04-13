@@ -86,8 +86,8 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
             continue;
         }
         napi_value result[2];
-        CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &result[0]), CREATE_INT32);
-        CHKRV(item->env, napi_create_string_utf8(item->env, "add", NAPI_AUTO_LENGTH, &result[1]), CREATE_STRING_UTF8);
+        CHKRV(item->env, napi_create_string_utf8(item->env, "add", NAPI_AUTO_LENGTH, &result[0]), CREATE_STRING_UTF8);
+        CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &result[1]), CREATE_INT32);
         napi_value handlerTemp = nullptr;
         CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handlerTemp), GET_REFERENCE);
         napi_value ret = nullptr;
@@ -116,8 +116,8 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
             continue;
         }
         napi_value result[2];
-        CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &result[0]), CREATE_INT32);
-        CHKRV(item->env, napi_create_string_utf8(item->env, "remove", NAPI_AUTO_LENGTH, &result[1]),
+        CHKRV(item->env, napi_create_string_utf8(item->env, "add", NAPI_AUTO_LENGTH, &result[0]), CREATE_STRING_UTF8);
+        CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &result[1]), CREATE_INT32);
             CREATE_STRING_UTF8);
         napi_value handlerTemp = nullptr;
         CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handlerTemp), GET_REFERENCE);
