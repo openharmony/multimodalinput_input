@@ -106,7 +106,7 @@ void InputDeviceImpl::OnInputDeviceTask(InputDeviceImpl::DevInfo devInfo, int32_
     auto devData = std::make_shared<InputDeviceInfo>(id, name, deviceType);
     CHKPV(devData);
     devInfo.second(userData, devData);
-    MMI_HILOGD("device info event callback userData:%{public}d id:%{public}d name:%{public}s type:%{public}d",
+    MMI_HILOGD("dev info event callback userData:%{public}d input dev:%{public}d name:%{public}s type:%{public}d",
         userData, id, name.c_str(), deviceType);
 }
 
@@ -120,7 +120,7 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, const std::str
         std::bind(&InputDeviceImpl::OnInputDeviceTask, this, *devInfo, userData, id, name, deviceType))) {
         MMI_HILOGE("post task failed");
     }
-    MMI_HILOGD("device info event userData:%{public}d id:%{public}d name:%{public}s type:%{public}d",
+    MMI_HILOGD("dev info event userData:%{public}d dev:%{public}d name:%{public}s type:%{public}d",
         userData, id, name.c_str(), deviceType);
 }
 
@@ -128,7 +128,7 @@ void InputDeviceImpl::OnInputDeviceIdsTask(InputDeviceImpl::DevIds devIds, int32
 {
     CHK_PIDANDTID();
     devIds.second(userData, ids);
-    MMI_HILOGD("device ids event callback userData:%{public}d ids:(%{public}s)",
+    MMI_HILOGD("dev event callback userData:%{public}d input devs:(%{public}s)",
         userData, IdsListToString(ids).c_str());
 }
 
@@ -142,7 +142,7 @@ void InputDeviceImpl::OnInputDeviceIds(int32_t userData, const std::vector<int32
         std::bind(&InputDeviceImpl::OnInputDeviceIdsTask, this, *devIds, userData, ids))) {
         MMI_HILOGE("post task failed");
     }
-    MMI_HILOGD("device ids event userData:%{public}d ids:(%{public}s)", userData, IdsListToString(ids).c_str());
+    MMI_HILOGD("event userData:%{public}d input devs:(%{public}s)", userData, IdsListToString(ids).c_str());
 }
 
 void InputDeviceImpl::OnKeystrokeAbilityTask(InputDeviceImpl::DevKeys devKeys, int32_t userData,
@@ -150,7 +150,7 @@ void InputDeviceImpl::OnKeystrokeAbilityTask(InputDeviceImpl::DevKeys devKeys, i
 {
     CHK_PIDANDTID();
     devKeys.second(userData, keystrokeAbility);
-    MMI_HILOGD("device keys event callback userData:%{public}d keys:(%{public}s)",
+    MMI_HILOGD("dev keys event callback userData:%{public}d keys:(%{public}s)",
         userData, IdsListToString(keystrokeAbility).c_str());
 }
 
@@ -164,7 +164,7 @@ void InputDeviceImpl::OnKeystrokeAbility(int32_t userData, const std::vector<int
         std::bind(&InputDeviceImpl::OnKeystrokeAbilityTask, this, *devKeys, userData, keystrokeAbility))) {
         MMI_HILOGE("post task failed");
     }
-    MMI_HILOGD("device keys event userData:%{public}d ids:(%{public}s)",
+    MMI_HILOGD("dev keys event userData:%{public}d input devs:(%{public}s)",
         userData, IdsListToString(keystrokeAbility).c_str());
 }
 
