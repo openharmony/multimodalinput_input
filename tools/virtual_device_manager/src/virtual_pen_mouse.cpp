@@ -17,41 +17,29 @@
 
 namespace OHOS {
 namespace MMI {
-VirtualPenMouse::VirtualPenMouse() : VirtualDevice("V-Pencil-mouse", BUS_BLUETOOTH, 0x12d1, 0x10a5)
-{
-}
-
-VirtualPenMouse::~VirtualPenMouse() {}
+VirtualPenMouse::VirtualPenMouse() : VirtualDevice("V-Pencil-mouse", BUS_BLUETOOTH, 0x12d1, 0x10a5) {}
 
 const std::vector<uint32_t>& VirtualPenMouse::GetEventTypes() const
 {
-    static const std::vector<uint32_t> evt_types {
-        EV_KEY, EV_REL, EV_MSC
-    };
+    static const std::vector<uint32_t> evt_types { EV_KEY, EV_REL, EV_MSC };
     return evt_types;
 }
 
 const std::vector<uint32_t>& VirtualPenMouse::GetKeys() const
 {
-    static const std::vector<uint32_t> keys {
-        BTN_LEFT, BTN_RIGHT, BTN_MIDDLE
-    };
+    static const std::vector<uint32_t> keys { BTN_LEFT, BTN_RIGHT, BTN_MIDDLE };
     return keys;
 }
 
 const std::vector<uint32_t>& VirtualPenMouse::GetRelBits() const
 {
-    static const std::vector<uint32_t> rels {
-        REL_X, REL_Y, REL_WHEEL
-    };
+    static const std::vector<uint32_t> rels { REL_X, REL_Y, REL_WHEEL };
     return rels;
 }
 
 const std::vector<uint32_t>& VirtualPenMouse::GetMscs() const
 {
-    static const std::vector<uint32_t> mscs {
-        MSC_SCAN
-    };
+    static const std::vector<uint32_t> mscs { MSC_SCAN };
     return mscs;
 }
 } // namespace MMI

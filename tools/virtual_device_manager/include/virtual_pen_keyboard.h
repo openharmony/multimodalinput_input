@@ -23,7 +23,7 @@ namespace MMI {
 class VirtualPenKeyboard : public VirtualDevice {
 public:
     VirtualPenKeyboard();
-    ~VirtualPenKeyboard();
+    ~VirtualPenKeyboard()= default;
     DISALLOW_COPY_AND_MOVE(VirtualPenKeyboard);
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;

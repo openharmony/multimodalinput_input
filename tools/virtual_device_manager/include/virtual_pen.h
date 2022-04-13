@@ -23,7 +23,7 @@ namespace MMI {
 class VirtualPen : public VirtualDevice {
 public:
     VirtualPen();
-    ~VirtualPen();
+    ~VirtualPen() = default;
     DISALLOW_COPY_AND_MOVE(VirtualPen);
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
