@@ -46,15 +46,14 @@ void MMIFdListener::OnReadable(int32_t fd)
     CHKPV(mmiClient_);
     ssize_t size = 0;
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
-    //constexpr int32_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE;
-    constexpr int32_t maxCount = 16;
-    for (int32_t i = 0; i < maxCount; i++) {
+    for (int32_t i = 0; i < MAX_RECV_LIMIT; i++) {
         size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size > 0) {
             mmiClient_->OnRecvMsg(szBuf, size);
         } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_HILOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK");
+                MMI_HILOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
+                    size, errno);
                 continue;
             }
             MMI_HILOGE("recv return %{public}zu errno:%{public}d", size, errno);

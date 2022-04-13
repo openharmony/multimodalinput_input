@@ -139,12 +139,13 @@ bool StreamBuffer::Write(const char *buf, size_t size)
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
-    if (wIdx_ + static_cast<int32_t>(size) >= MAX_STREAM_BUF_SIZE) {
-        MMI_HILOGE("The write length exceeds buffer. errCode:%{public}d", MEM_OUT_OF_BOUNDS);
+    if (wIdx_ + static_cast<int32_t>(size) > MAX_STREAM_BUF_SIZE) {
+        MMI_HILOGE("The write length exceeds buffer. wIdx:%{public}d size:%{public}zu maxBufSize:%{public}d "
+            "errCode:%{public}d", wIdx_, size, MAX_STREAM_BUF_SIZE, MEM_OUT_OF_BOUNDS);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
-    errno_t ret = memcpy_sp(&szBuff_[wIdx_], static_cast<size_t>(MAX_STREAM_BUF_SIZE - wIdx_), buf, size);
+    errno_t ret = memcpy_sp(&szBuff_[wIdx_], AvailableSize(), buf, size);
     if (ret != EOK) {
         MMI_HILOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
@@ -155,7 +156,7 @@ bool StreamBuffer::Write(const char *buf, size_t size)
     return true;
 }
 
-bool StreamBuffer::IsEmpty()
+bool StreamBuffer::IsEmpty() const
 {
     if ((rIdx_ == wIdx_) && (wIdx_ == 0)) {
         return true;
@@ -175,6 +176,14 @@ int32_t StreamBuffer::UnreadSize() const
         return 0;
     }
     return (wIdx_ - rIdx_);
+}
+
+int32_t StreamBuffer::AvailableSize() const
+{
+    if (wIdx_ > MAX_STREAM_BUF_SIZE) {
+        return 0;
+    }
+    return (MAX_STREAM_BUF_SIZE - wIdx_);
 }
 
 bool StreamBuffer::ChkRWError() const
