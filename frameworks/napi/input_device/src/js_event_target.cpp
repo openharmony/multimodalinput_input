@@ -86,8 +86,8 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
             continue;
         }
         napi_value result[2];
-        CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &result[0]), CREATE_INT32);
-        CHKRV(item->env, napi_create_string_utf8(item->env, "add", NAPI_AUTO_LENGTH, &result[1]), CREATE_STRING_UTF8);
+        CHKRV(item->env, napi_create_string_utf8(item->env, "add", NAPI_AUTO_LENGTH, &result[0]), CREATE_STRING_UTF8);
+        CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &result[1]), CREATE_INT32);
         napi_value handlerTemp = nullptr;
         CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handlerTemp), GET_REFERENCE);
         napi_value ret = nullptr;
@@ -116,9 +116,9 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
             continue;
         }
         napi_value result[2];
-        CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &result[0]), CREATE_INT32);
-        CHKRV(item->env, napi_create_string_utf8(item->env, "remove", NAPI_AUTO_LENGTH, &result[1]),
+        CHKRV(item->env, napi_create_string_utf8(item->env, "remove", NAPI_AUTO_LENGTH, &result[0]),
             CREATE_STRING_UTF8);
+        CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &result[1]), CREATE_INT32);
         napi_value handlerTemp = nullptr;
         CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handlerTemp), GET_REFERENCE);
         napi_value ret = nullptr;
@@ -137,6 +137,7 @@ void JsEventTarget::TargetOn(std::string type, int32_t deviceId)
     }
 
     for (auto & item : iter->second) {
+        CHKPC(item);
         CHKPC(item->env);
         uv_loop_s *loop = nullptr;
         CHKRV(item->env, napi_get_uv_event_loop(item->env, &loop), GET_UV_LOOP);
@@ -568,9 +569,10 @@ void JsEventTarget::RemoveMonitor(napi_env env, std::string type, napi_value han
     }
 
     JsUtil jsUtil;
-    for (auto &it : iter->second) {
-        if (jsUtil.IsHandleEquals(env, handle, it->ref)) {
-            it.reset();
+    for (auto it = iter->second.begin(); it != iter->second.end(); ++it) {
+        if (jsUtil.IsHandleEquals(env, handle, (*it)->ref)) {
+            MMI_HILOGD("succeeded in removing monitor");
+            iter->second.erase(it);
             return;
         }
     }
