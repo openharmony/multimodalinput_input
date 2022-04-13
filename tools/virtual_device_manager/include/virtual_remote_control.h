@@ -24,6 +24,8 @@ class VirtualRemoteControl : public VirtualDevice {
 public:
     VirtualRemoteControl();
     ~VirtualRemoteControl();
+    DISALLOW_COPY_AND_MOVE(VirtualRemoteControl);
+
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
     const std::vector<uint32_t>& GetKeys() const override;
