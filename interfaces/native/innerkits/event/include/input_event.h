@@ -128,7 +128,7 @@ public:
     * @return void
     * @since 9
     */
-    void Reset();
+    virtual void Reset();
 
     /**
      * @brief Obtains the unique ID of an input event.

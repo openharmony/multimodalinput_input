@@ -31,11 +31,6 @@ TouchTransformPointProcessor::TouchTransformPointProcessor(int32_t deviceId) : d
 
 TouchTransformPointProcessor::~TouchTransformPointProcessor() {}
 
-void TouchTransformPointProcessor::SetPointEventSource(int32_t sourceType)
-{
-    pointerEvent_->SetSourceType(sourceType);
-}
-
 bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event)
 {
     CALL_LOG_ENTER;
@@ -45,7 +40,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     int32_t logicalY = -1;
     int32_t logicalX = -1;
     int32_t logicalDisplayId = -1;
-    if (!WinMgr->TouchDownPointToDisplayPoint(data, direction_, logicalX, logicalY, logicalDisplayId)) {
+    if (!WinMgr->TouchDownPointToDisplayPoint(data, logicalX, logicalY, logicalDisplayId)) {
         MMI_HILOGE("TouchDownPointToDisplayPoint failed");
         return false;
     }
@@ -88,7 +83,7 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
     int32_t logicalY = -1;
     int32_t logicalX = -1;
     int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
-    if (!WinMgr->TouchMotionPointToDisplayPoint(data, direction_, logicalDisplayId, logicalX, logicalY)) {
+    if (!WinMgr->TouchMotionPointToDisplayPoint(data, logicalDisplayId, logicalX, logicalY)) {
         MMI_HILOGE("Get TouchMotionPointToDisplayPoint failed");
         return false;
     }
@@ -136,7 +131,6 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent
     CALL_LOG_ENTER;
     CHKPP(event);
     CHKPP(pointerEvent_);
-    pointerEvent_->UpdateId();
     auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
@@ -165,6 +159,8 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent
             return nullptr;
         }
     }
+    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent_->UpdateId();
     return pointerEvent_;
 }
 } // namespace MMI
