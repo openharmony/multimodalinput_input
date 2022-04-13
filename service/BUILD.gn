@@ -112,6 +112,7 @@ ohos_shared_library("libmmi-server") {
     "subscriber/src/key_option.cpp",
     "timer_manager/src/timer_manager.cpp",
     "touch_transform_point/src/gesture_transform_point_processor.cpp",
+    "touch_transform_point/src/tablet_tool_processor.cpp",
     "touch_transform_point/src/touch_transform_point_manager.cpp",
     "touch_transform_point/src/touch_transform_point_processor.cpp",
     "touch_transform_point/src/touchpad_transform_point_processor.cpp",
@@ -279,6 +280,34 @@ ohos_unittest("ut-mmi-service-out") {
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
     "input_device_driver:hdi_input",
+    "utils_base:utils",
+  ]
+}
+
+ohos_unittest("TransformPointTest") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/tools/virtual_device_manager/include",
+  ]
+
+  sources = [ "touch_transform_point/test/transform_point_test.cpp" ]
+
+  cflags = [ "-DOHOS_BUILD" ]
+
+  if (is_mmi_have_debug) {
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  deps = [
+    "${mmi_path}/tools/virtual_device_manager:libmmi-virtual-device",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
     "utils_base:utils",
   ]
 }

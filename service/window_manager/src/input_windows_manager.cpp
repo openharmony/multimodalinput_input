@@ -157,7 +157,7 @@ void InputWindowsManager::PrintDisplayInfo()
     }
 }
 
-PhysicalDisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id)
+const PhysicalDisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id) const
 {
     for (auto &it : physicalDisplays_) {
         if (it.id == id) {
@@ -168,8 +168,8 @@ PhysicalDisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id)
     return nullptr;
 }
 
-PhysicalDisplayInfo* InputWindowsManager::FindPhysicalDisplayInfo(const std::string seatId,
-    const std::string seatName)
+const PhysicalDisplayInfo* InputWindowsManager::FindPhysicalDisplayInfo(
+    const std::string& seatId, const std::string& seatName) const
 {
     for (auto &it : physicalDisplays_) {
         if (it.seatId == seatId && it.seatName == seatName) {
@@ -180,10 +180,12 @@ PhysicalDisplayInfo* InputWindowsManager::FindPhysicalDisplayInfo(const std::str
     return nullptr;
 }
 
-void InputWindowsManager::RotateTouchScreen(PhysicalDisplayInfo* info, Direction direction,
-    int32_t& logicalX, int32_t& logicalY)
+void InputWindowsManager::RotateTouchScreen(const PhysicalDisplayInfo* info,
+    int32_t& logicalX, int32_t& logicalY) const
 {
     CHKPV(info);
+    const Direction direction = info->direction;
+
     if (direction == Direction0) {
         MMI_HILOGD("direction is Direction0");
         return;
@@ -210,8 +212,8 @@ void InputWindowsManager::RotateTouchScreen(PhysicalDisplayInfo* info, Direction
     }
 }
 
-bool InputWindowsManager::TransformDisplayPoint(struct libinput_event_touch* touch, Direction& direction,
-    int32_t &globalLogicalX, int32_t &globalLogicalY)
+bool InputWindowsManager::TransformDisplayPoint(struct libinput_event_touch* touch,
+    int32_t& globalLogicalX, int32_t& globalLogicalY)
 {
     CHKPF(touch);
     auto info = FindPhysicalDisplayInfo("seat0", "default0");
@@ -239,12 +241,11 @@ bool InputWindowsManager::TransformDisplayPoint(struct libinput_event_touch* tou
     }
     int32_t localLogcialX = static_cast<int32_t>(logicX);
     int32_t localLogcialY = static_cast<int32_t>(logicY);
-
-    direction = info->direction;
-    RotateTouchScreen(info, direction, localLogcialX, localLogcialY);
+    RotateTouchScreen(info, localLogcialX, localLogcialY);
 
     globalLogicalX = localLogcialX;
     globalLogicalY = localLogcialY;
+    const Direction direction = info->direction;
 
     for (auto left = GetPhysicalDisplay(info->leftDisplayId); left != nullptr;
         left = GetPhysicalDisplay(left->leftDisplayId)) {
@@ -269,60 +270,145 @@ bool InputWindowsManager::TransformDisplayPoint(struct libinput_event_touch* tou
     return true;
 }
 
-bool InputWindowsManager::TouchMotionPointToDisplayPoint(struct libinput_event_touch* touch, Direction& direction,
+bool InputWindowsManager::TouchMotionPointToDisplayPoint(struct libinput_event_touch* touch,
     int32_t targetDisplayId, int32_t& displayX, int32_t& displayY)
 {
     CHKPF(touch);
-    int32_t globalLogicalX;
-    int32_t globalLogicalY;
-    auto isTransform = TransformDisplayPoint(touch, direction, globalLogicalX, globalLogicalY);
+    LogicalCoordinate tCoord;
+    auto isTransform = TransformDisplayPoint(touch, tCoord.x, tCoord.y);
     if (!isTransform) {
         return isTransform;
     }
-
     for (const auto &display : logicalDisplays_) {
         if (targetDisplayId == display.id ) {
-            displayX = globalLogicalX - display.topLeftX;
-            displayY = globalLogicalY - display.topLeftY;
-            AdjustGlobalCoordinate(displayX, displayY, display.width, display.height);
+            tCoord.x -= display.topLeftX;
+            tCoord.y -= display.topLeftY;
+            AdjustGlobalCoordinate(display, tCoord);
+            displayX = tCoord.x;
+            displayY = tCoord.y;
             MMI_HILOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
                 targetDisplayId, displayX, displayY);
             return true;
         }
     }
-
     return false;
 }
 
-bool InputWindowsManager::TouchDownPointToDisplayPoint(struct libinput_event_touch* touch, Direction& direction,
+bool InputWindowsManager::TouchDownPointToDisplayPoint(struct libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
 {
     CHKPF(touch);
-    int32_t globalLogicalX;
-    int32_t globalLogicalY;
-    auto isTransform = TransformDisplayPoint(touch, direction, globalLogicalX, globalLogicalY);
+    LogicalCoordinate tCoord;
+    auto isTransform = TransformDisplayPoint(touch, tCoord.x, tCoord.y);
     if (!isTransform) {
         return isTransform;
     }
-
     for (const auto &display : logicalDisplays_) {
-        if ((globalLogicalX < display.topLeftX) || (globalLogicalX > display.topLeftX + display.width)) {
+        if ((tCoord.x < display.topLeftX) || (tCoord.x > display.topLeftX + display.width)) {
             continue;
         }
-
-        if ((globalLogicalY < display.topLeftY) || (globalLogicalY > display.topLeftY + display.height)) {
+        if ((tCoord.y < display.topLeftY) || (tCoord.y > display.topLeftY + display.height)) {
             continue;
         }
-
         logicalDisplayId = display.id;
-        logicalX = globalLogicalX - display.topLeftX;
-        logicalY = globalLogicalY - display.topLeftY;
-        AdjustGlobalCoordinate(logicalX, logicalY, display.width, display.height);
+        tCoord.x -= display.topLeftX;
+        tCoord.y -= display.topLeftY;
+        AdjustGlobalCoordinate(display, tCoord);
+        logicalX = tCoord.x;
+        logicalY = tCoord.y;
         MMI_HILOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
             logicalDisplayId, logicalX, logicalY);
         return true;
     }
+    return false;
+}
 
+bool InputWindowsManager::Physical2Logical(const PhysicalDisplayInfo* displayInfo,
+    const PhysicalCoordinate& phys, LogicalCoordinate& logical) const
+{
+    CHKPF(displayInfo);
+    LogicalCoordinate tCoord {
+        .x = (displayInfo->width > 0 ?
+            static_cast<int32_t>(phys.x * displayInfo->logicWidth / displayInfo->width) : 0),
+        .y = (displayInfo->height > 0 ?
+            static_cast<int32_t>(phys.y * displayInfo->logicHeight / displayInfo->height) : 0)
+    };
+    RotateTouchScreen(displayInfo, tCoord.x, tCoord.y);
+    const Direction direction = displayInfo->direction;
+
+    for (const PhysicalDisplayInfo* tDisplay = displayInfo; tDisplay->leftDisplayId >= 0;) {
+        tDisplay = GetPhysicalDisplay(tDisplay->leftDisplayId);
+        if (tDisplay == nullptr) {
+            break;
+        }
+        if (direction == Direction0 || direction == Direction180) {
+            tCoord.x += tDisplay->logicWidth;
+        } else if (direction == Direction90 || direction == Direction270) {
+            tCoord.x += tDisplay->logicHeight;
+        }
+    }
+    for (const PhysicalDisplayInfo* tDisplay = displayInfo; tDisplay->upDisplayId >= 0;) {
+        tDisplay = GetPhysicalDisplay(tDisplay->upDisplayId);
+        if (tDisplay == nullptr) {
+            break;
+        }
+        if (direction == Direction0 || direction == Direction180) {
+            tCoord.y += tDisplay->logicHeight;
+        } else if (direction == Direction90 || direction == Direction270) {
+            tCoord.y += tDisplay->logicWidth;
+        }
+    }
+    logical = tCoord;
+    MMI_HILOGD("logicalX:%{public}d, logicalY:%{public}d", logical.x, logical.y);
+    return true;
+}
+
+bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* tip, LogicalCoordinate& coord) const
+{
+    CHKPF(tip);
+    auto displayInfo = FindPhysicalDisplayInfo("seat0", "default0");
+    CHKPF(displayInfo);
+    MMI_HILOGD("PhysicalDisplay.width:%{public}d, PhysicalDisplay.height:%{public}d, "
+        "PhysicalDisplay.topLeftX:%{public}d, PhysicalDisplay.topLeftY:%{public}d",
+        displayInfo->width, displayInfo->height, displayInfo->topLeftX, displayInfo->topLeftY);
+    PhysicalCoordinate phys {
+        .x = libinput_event_tablet_tool_get_x_transformed(tip, displayInfo->width),
+        .y = libinput_event_tablet_tool_get_y_transformed(tip, displayInfo->height)
+    };
+    MMI_HILOGD("physicalX:%{public}f, physicalY:%{public}f", phys.x, phys.y);
+    return Physical2Logical(displayInfo, phys, coord);
+}
+
+bool InputWindowsManager::CalculateTipPoint(struct libinput_event_tablet_tool* tip,
+    int32_t& targetDisplayId, LogicalCoordinate& coord) const
+{
+    CHKPF(tip);
+    LogicalCoordinate tCoord;
+    if (!TransformTipPoint(tip, tCoord)) {
+        return false;
+    }
+    for (const auto& displayInfo : logicalDisplays_) {
+        if (targetDisplayId < 0) {
+            if ((tCoord.x < displayInfo.topLeftX) ||
+                (tCoord.x > displayInfo.topLeftX + displayInfo.width) ||
+                (tCoord.y < displayInfo.topLeftY) ||
+                (tCoord.y > displayInfo.topLeftY + displayInfo.height)) {
+                continue;
+            }
+            targetDisplayId = displayInfo.id;
+        } else {
+            if (targetDisplayId != displayInfo.id) {
+                continue;
+            }
+        }
+        tCoord.x -= displayInfo.topLeftX;
+        tCoord.y -= displayInfo.topLeftY;
+        AdjustGlobalCoordinate(displayInfo, tCoord);
+        coord = tCoord;
+        MMI_HILOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
+            targetDisplayId, coord.x, coord.y);
+        return true;
+    }
     return false;
 }
 
@@ -337,20 +423,20 @@ bool InputWindowsManager::IsInsideWindow(int32_t x, int32_t y, const WindowInfo 
         (y >= info.hotZoneTopLeftY) && (y <= (info.hotZoneTopLeftY + info.hotZoneHeight));
 }
 
-void InputWindowsManager::AdjustGlobalCoordinate(int32_t& globalX, int32_t& globalY,
-    int32_t width, int32_t height)
+void InputWindowsManager::AdjustGlobalCoordinate(
+    const LogicalDisplayInfo& displayInfo, LogicalCoordinate& coord) const
 {
-    if (globalX <= 0) {
-        globalX = 0;
+    if (coord.x <= 0) {
+        coord.x = 0;
     }
-    if (globalX >= width && width > 0) {
-        globalX = width - 1;
+    if (coord.x >= displayInfo.width && displayInfo.width > 0) {
+        coord.x = displayInfo.width - 1;
     }
-    if (globalY <= 0) {
-        globalY = 0;
+    if (coord.y <= 0) {
+        coord.y = 0;
     }
-    if (globalY >= height && height > 0) {
-        globalY = height - 1;
+    if (coord.y >= displayInfo.height && displayInfo.height > 0) {
+        coord.y = displayInfo.height - 1;
     }
 }
 

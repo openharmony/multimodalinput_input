@@ -31,7 +31,7 @@ public:
     DISALLOW_COPY_AND_MOVE(TouchPadTransformPointProcessor);
     ~TouchPadTransformPointProcessor();
     std::shared_ptr<PointerEvent> OnLibinputTouchPadEvent(struct libinput_event *event);
-    void SetPointEventSource(int32_t sourceType);
+
 private:
     void OnEventTouchPadDown(struct libinput_event *event);
     void OnEventTouchPadMotion(struct libinput_event *event);
