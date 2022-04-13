@@ -50,5 +50,5 @@ const std::vector<uint32_t>& VirtualPenKeyboard::GetMscs() const
     };
     return mscs;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

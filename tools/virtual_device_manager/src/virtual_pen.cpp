@@ -90,5 +90,5 @@ const std::vector<uint32_t>& VirtualPen::GetProperties() const
     };
     return properties;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
