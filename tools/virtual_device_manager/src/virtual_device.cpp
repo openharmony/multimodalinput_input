@@ -34,6 +34,9 @@
 #include "virtual_keyboard_ext.h"
 #include "virtual_remote_control.h"
 #include "virtual_touchscreen.h"
+#include "virtual_pen.h"
+#include "virtual_pen_mouse.h"
+#include "virtual_pen_keyboard.h"
 
 namespace OHOS {
 namespace MMI {
@@ -191,6 +194,13 @@ bool VirtualDevice::SetAbsResolution(const std::string deviceName)
         g_absTemp_.code = 0x01;
         g_absTemp_.absinfo.resolution = FINGERABSRANGE;
         absInit_.push_back(g_absTemp_);
+    } else if (deviceName == "V-Pencil") {
+        g_absTemp_.code = 0x00;
+        g_absTemp_.absinfo.resolution = ABSRANGE;
+        absInit_.push_back(g_absTemp_);
+        g_absTemp_.code = 0x01;
+        g_absTemp_.absinfo.resolution = ABSRANGE;
+        absInit_.push_back(g_absTemp_);
     } else {
         printf("Not devide:deviceName:%s", deviceName.c_str());
         return false;
@@ -225,6 +235,9 @@ bool VirtualDevice::SetPhys(const std::string deviceName)
         {"Virtual GamePad",              "gamepad"},
         {"Virtual Trackball",            "trackball"},
         {"Virtual TouchScreen",          "touchscreen"},
+        {"V-Pencil",                     "pen"},
+        {"V-Pencil-mouse",               "pen"},
+        {"V-Pencil-keyboard",            "pen"},
     };
     std::string deviceType = typeDevice.find(deviceName)->second;
     phys.append(deviceType).append(g_pid).append("/").append(g_pid);
@@ -338,6 +351,12 @@ void VirtualDevice::StartAllDevices()
     virtualFinger.SetUp();
     static VirtualTouchScreen virtualTouchScreen;
     virtualTouchScreen.SetUp();
+    static VirtualPen virtualPen;
+    virtualPen.SetUp();
+    static VirtualPenMouse virtualPenMouse;
+    virtualPenMouse.SetUp();
+    static VirtualPenKeyboard virtualPenKeyboard;
+    virtualPenKeyboard.SetUp();
 }
 
 bool VirtualDevice::SelectDevice(std::vector<std::string> &fileList)
@@ -410,6 +429,13 @@ bool VirtualDevice::CreateHandle(const std::string deviceArgv)
     } else if (deviceArgv == "touchscreen") {
         static VirtualTouchScreen virtualTouchScreen;
         virtualTouchScreen.SetUp();
+    } else if (deviceArgv == "pen") {
+        static VirtualPen virtualPen;
+        virtualPen.SetUp();
+        static VirtualPenMouse virtualPenMouse;
+        virtualPenMouse.SetUp();
+        static VirtualPenKeyboard virtualPenKeyboard;
+        virtualPenKeyboard.SetUp();
     } else if (deviceArgv == "all") {
         StartAllDevices();
     } else {
