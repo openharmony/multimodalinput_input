@@ -49,15 +49,14 @@ public:
     }
 #ifdef OHOS_BUILD_MMI_DEBUG
 private:
-    std::default_random_engine random_(random_device());
-    bool Write(const PhysicalDisplayInfo& info NetPacket& pkt)
+    bool Write(const PhysicalDisplayInfo& info, NetPacket& pkt)
     {
         pkt << info.id << info.leftDisplayId << info.upDisplayId << info.topLeftX << info.topLeftY;
         pkt << info.width << info.height << info.name << info.seatId << info.seatName << info.logicWidth;
         pkt << info.logicHeight << info.direction;
         return (!pkt.ChkRWError());
     }
-    bool Write(const LogicalDisplayInfo& info NetPacket& pkt)
+    bool Write(const LogicalDisplayInfo& info, NetPacket& pkt)
     {
         pkt << info.id << info.topLeftX << info.topLeftY;
         pkt << info.width << info.height << info.name << info.seatId << info.seatName << info.focusWindowId;
@@ -67,8 +66,10 @@ private:
 public:
     int32_t GetRandomInt(int32_t min, int32_t max)
     {
-        std::uniform_int_distribution<int32_t> dis(min, max);
-        return dis(random_);
+         std::mt19937 gen(1729);
+        std::uniform_int_distribution<> dis(min, max);
+        //std::default_random_engine e(std::random_device());
+        return dis(gen);
     }
     void RandomPhysicalInfo(int32_t id, PhysicalDisplayInfo& info)
     {
@@ -103,20 +104,20 @@ public:
     bool RandomDisplayPacket(NetPacket& pkt, int32_t phyNum = 1)
     {
         if (!pkt.Write(phyNum)) {
-            MMI_HILOGE("write failed");
+            printf("write failed 1\n");
             return false;
         }
         for (auto i = 0; i < phyNum; i++) {
             PhysicalDisplayInfo info = {};
             RandomPhysicalInfo(i+1, info);
             if (!Write(info, pkt)) {
-                MMI_HILOGE("write failed");
+                printf("write failed 2\n");
                 return false;
             }
         }
         int32_t logicalNum = GetRandomInt(2, 6);
         if (!pkt.Write(logicalNum)) {
-            MMI_HILOGE("write failed");
+            printf("write failed 3\n");
             return false;
         }
         for (auto i = 0; i < logicalNum; i++) {
@@ -125,18 +126,18 @@ public:
             int32_t windowsNum = GetRandomInt(2, 10);
             logiclInfo.focusWindowId = 100+windowsNum;
             if (!Write(logiclInfo, pkt)) {
-                MMI_HILOGE("write failed");
+                printf("write failed 4\n");
                 return false;
             }
             if (!pkt.Write(windowsNum)) {
-                MMI_HILOGE("write failed");
+                printf("write failed 5\n");
                 return false;
             }
             for (auto j = 0; j < windowsNum; j++) {
                 WindowInfo winInfo = {};
                 RandomWindowInfo(i*100+j+1, logiclInfo, winInfo);
-                if (!Write(winInfo, pkt)) {
-                    MMI_HILOGE("write failed");
+                if (!pkt.Write(winInfo)) {
+                    printf("write failed 6\n");
                     return false;
                 }
             }
@@ -266,12 +267,12 @@ HWTEST_F(MMIClientTest, BigPacketTest, TestSize.Level1)
     MMIClientUnitTest client;
     ASSERT_TRUE(client.Start());
 
-    const int32_t maxLimit = GetRandomInt(500, 2000);
+    const int32_t maxLimit = client.GetRandomInt(500, 2000);
     for (auto i = 0; i < maxLimit; i++) {
-        int32_t phyNum = GetRandomInt(1, 10);
+        int32_t phyNum = client.GetRandomInt(1, 10);
         NetPacket pkt(MmiMessageId::BIGPACKET_TEST);
         pkt << (i+1);
-        ASSERT_TRUE(RandomDisplayPacket(pkt, phyNum));
+        ASSERT_TRUE(client.RandomDisplayPacket(pkt, phyNum));
         EXPECT_TRUE(client.SendMsg(pkt));
     }
     client.Stop();
