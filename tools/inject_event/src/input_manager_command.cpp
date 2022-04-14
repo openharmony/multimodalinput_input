@@ -496,7 +496,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             for (double i = 1; i <= numberTimes; ++i) {
                                 vecX == 0 ? item.SetGlobalX(px1) : item.SetGlobalX(px1 + (stepX * i));
                                 vecY == 0 ? item.SetGlobalY(py1) : item.SetGlobalY(py1 + (stepY * i));
-                                pointerEvent->SetActionTime(time + (blockTimeMs / thousand));
+                                pointerEvent->SetActionTime(time + ((blockTimeMs / thousand) * i));
                                 pointerEvent->UpdatePointerItem(0, item);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
