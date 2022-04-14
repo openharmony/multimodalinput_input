@@ -343,7 +343,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t totalTimeMs = 0;
                 int32_t oneNumber = 1;
                 int32_t twoNumber = 2;
-                int32_t threeNumber = 3;
                 int32_t moveArgc = 7;
                 int32_t moveSmoothArgc = 8;
                 while ((c = getopt_long(argc, argv, "m:d:u:s:", touchSensorOptions, &optionIndex)) != -1) {
@@ -457,14 +456,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             }
                             if ((!StrToInt(optarg, px1)) ||
                                 (!StrToInt(argv[optind], py1)) ||
-                                (!StrToInt(argv[optind + oneNumber], px2)) ||
-                                (!StrToInt(argv[optind + twoNumber], py2)) ||
-                                (!StrToInt(argv[optind + threeNumber], totalTimeMs))) {
+                                (!StrToInt(argv[optind + 1], px2)) ||
+                                (!StrToInt(argv[optind + 2], py2)) ||
+                                (!StrToInt(argv[optind + 3], totalTimeMs))) {
                                 std::cout << "invalid command to input value" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            int32_t minTotalTimeMs = 1;
-                            int32_t maxTotalTimeMs = 15000;
+                            const int32_t minTotalTimeMs = 1;
+                            const int32_t maxTotalTimeMs = 15000;
                             if ((totalTimeMs < minTotalTimeMs) || (totalTimeMs > maxTotalTimeMs)) {
                                 std::cout << "totalTime is out of range. ";
                                 std::cout << minTotalTimeMs << " < totalTimeMs < " << maxTotalTimeMs;
@@ -483,13 +482,17 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                            int32_t blockTimeMs = 16;
+                            const int32_t blockTimeMs = 16;
                             double numberTimes = totalTimeMs / blockTimeMs;
-                            double vecX = px2 - px1;
-                            double vecY = py2 - py1;
-                            double stepX = (vecX == 0) ? px1 : (vecX / numberTimes);
-                            double stepY = (vecY == 0) ? py1 : (vecY / numberTimes);
-                            int32_t thousand = 1000;
+                            int32_t vecX = px2 - px1;
+                            int32_t vecY = py2 - py1;
+                            const double minDouble = -0.00001;
+                            const double maxDouble = 0.00001;
+                            double stepX = (vecX == 0 || (numberTimes > minDouble && numberTimes < maxDouble) ?
+                                px1 : (vecX / numberTimes));
+                            double stepY = (vecY == 0 || (numberTimes > minDouble && numberTimes < maxDouble) ?
+                                py1 : (vecY / numberTimes));
+                            const int32_t thousand = 1000;
                             for (double i = 1; i <= numberTimes; ++i) {
                                 vecX == 0 ? item.SetGlobalX(px1) : item.SetGlobalX(px1 + (stepX * i));
                                 vecY == 0 ? item.SetGlobalY(py1) : item.SetGlobalY(py1 + (stepY * i));
