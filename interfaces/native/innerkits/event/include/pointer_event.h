@@ -198,36 +198,36 @@ public:
      */
     static constexpr int32_t MOUSE_BUTTON_MIDDLE = 2;
 
-    /**
-     * @brief 表示鼠标SIDE按钮.
+     /**
+     * Indicates the side button on a mouse.
      *
      * @since 9
      */
     static constexpr int32_t MOUSE_BUTTON_SIDE = 3;
 
     /**
-     * @brief 表示鼠标EXTRA按钮.
+     * Indicates the extra button on a mouse.
      *
      * @since 9
      */
     static constexpr int32_t MOUSE_BUTTON_EXTRA = 4;
 
     /**
-     * @brief 表示鼠标FORWARD按钮.
+     * Indicates the forward button on a mouse.
      *
      * @since 9
      */
     static constexpr int32_t MOUSE_BUTTON_FORWARD = 5;
 
     /**
-     * @brief 表示鼠标BACK按钮.
+     * Indicates the back button on a mouse.
      *
      * @since 9
      */
     static constexpr int32_t MOUSE_BUTTON_BACK = 6;
 
     /**
-     * @brief 表示鼠标TASK按钮.
+     * Indicates the task button on a mouse.
      *
      * @since 9
      */
