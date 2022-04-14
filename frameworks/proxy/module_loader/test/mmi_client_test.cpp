@@ -17,6 +17,13 @@
 
 #include "mmi_client.h"
 
+#ifdef OHOS_BUILD_MMI_DEBUG
+#include <chrono>
+#include <random>
+#include "display_info.h"
+#include "multimodal_event_handler.h"
+#endif // OHOS_BUILD_MMI_DEBUG
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -40,6 +47,103 @@ public:
     {
         OnConnected();
     }
+#ifdef OHOS_BUILD_MMI_DEBUG
+private:
+    std::default_random_engine random_(random_device());
+    bool Write(const PhysicalDisplayInfo& info NetPacket& pkt)
+    {
+        pkt << info.id << info.leftDisplayId << info.upDisplayId << info.topLeftX << info.topLeftY;
+        pkt << info.width << info.height << info.name << info.seatId << info.seatName << info.logicWidth;
+        pkt << info.logicHeight << info.direction;
+        return (!pkt.ChkRWError());
+    }
+    bool Write(const LogicalDisplayInfo& info NetPacket& pkt)
+    {
+        pkt << info.id << info.topLeftX << info.topLeftY;
+        pkt << info.width << info.height << info.name << info.seatId << info.seatName << info.focusWindowId;
+        return (!pkt.ChkRWError());
+    }
+
+public:
+    int32_t GetRandomInt(int32_t min, int32_t max)
+    {
+        std::uniform_int_distribution<int32_t> dis(min, max);
+        return dis(random_);
+    }
+    void RandomPhysicalInfo(int32_t id, PhysicalDisplayInfo& info)
+    {
+        info.id = id;
+        info.width = 1280;
+        info.height = 1024;
+        info.name = StringFmt("pd-%d", id);
+        info.seatId = StringFmt("seat%d", id);
+        info.seatName = StringFmt("seatname%d", id);
+    }
+    void RandomLogicalInfo(int32_t id, LogicalDisplayInfo& info)
+    {
+        info.id = id;
+        info.width = 1280;
+        info.height = 1024;
+        info.name = StringFmt("pd-%d", id);
+        info.seatId = StringFmt("seat%d", id);
+        info.seatName = StringFmt("seatname%d", id);
+    }
+    void RandomWindowInfo(int32_t id, const LogicalDisplayInfo& logcInfo, WindowInfo& info)
+    {
+        info.id = id;
+        info.pid = id;
+        info.uid = id;
+        info.hotZoneTopLeftX = GetRandomInt(0, 1280);
+        info.hotZoneTopLeftY = GetRandomInt(0, 1024);
+        info.hotZoneWidth = GetRandomInt(100, 1280);
+        info.hotZoneHeight = GetRandomInt(100, 1024);
+        info.displayId = logcInfo.id;
+    }
+
+    bool RandomDisplayPacket(NetPacket& pkt, int32_t phyNum = 1)
+    {
+        if (!pkt.Write(phyNum)) {
+            MMI_HILOGE("write failed");
+            return false;
+        }
+        for (auto i = 0; i < phyNum; i++) {
+            PhysicalDisplayInfo info = {};
+            RandomPhysicalInfo(i+1, info);
+            if (!Write(info, pkt)) {
+                MMI_HILOGE("write failed");
+                return false;
+            }
+        }
+        int32_t logicalNum = GetRandomInt(2, 6);
+        if (!pkt.Write(logicalNum)) {
+            MMI_HILOGE("write failed");
+            return false;
+        }
+        for (auto i = 0; i < logicalNum; i++) {
+            LogicalDisplayInfo logiclInfo = {};
+            RandomLogicalInfo(i+1, logiclInfo);
+            int32_t windowsNum = GetRandomInt(2, 10);
+            logiclInfo.focusWindowId = 100+windowsNum;
+            if (!Write(logiclInfo, pkt)) {
+                MMI_HILOGE("write failed");
+                return false;
+            }
+            if (!pkt.Write(windowsNum)) {
+                MMI_HILOGE("write failed");
+                return false;
+            }
+            for (auto j = 0; j < windowsNum; j++) {
+                WindowInfo winInfo = {};
+                RandomWindowInfo(i*100+j+1, logiclInfo, winInfo);
+                if (!Write(winInfo, pkt)) {
+                    MMI_HILOGE("write failed");
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+#endif // OHOS_BUILD_MMI_DEBUG
 };
 
 MMIClient mmiClient;
@@ -155,5 +259,23 @@ HWTEST_F(MMIClientTest, Re_OnDisconnected_002, TestSize.Level1)
     mmiClientTest.RegisterDisconnectedFunction(funTmp);
     mmiClientTest.OnDisconnectedUnitTest();
 }
+
+#ifdef OHOS_BUILD_MMI_DEBUG
+HWTEST_F(MMIClientTest, BigPacketTest, TestSize.Level1)
+{
+    MMIClientUnitTest client;
+    ASSERT_TRUE(client.Start());
+
+    const int32_t maxLimit = GetRandomInt(500, 2000);
+    for (auto i = 0; i < maxLimit; i++) {
+        int32_t phyNum = GetRandomInt(1, 10);
+        NetPacket pkt(MmiMessageId::BIGPACKET_TEST);
+        pkt << (i+1);
+        ASSERT_TRUE(RandomDisplayPacket(pkt, phyNum));
+        EXPECT_TRUE(client.SendMsg(pkt));
+    }
+    client.Stop();
+}
+#endif // OHOS_BUILD_MMI_DEBUG
 } // namespace MMI
 } // namespace OHOS
