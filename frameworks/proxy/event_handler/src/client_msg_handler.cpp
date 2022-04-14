@@ -291,14 +291,20 @@ int32_t ClientMsgHandler::OnKeyList(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Packet read userData failed");
         return RET_ERR;
     }
-    int32_t ret;
-    std::vector<int32_t> abilityRet;
-    for (size_t i = 0; i < size; ++i) {
-        if (!pkt.Read(ret)) {
-            MMI_HILOGE("Packet read userData failed");
+    int32_t keyCode;
+    int32_t isSupport;
+    std::map<int32_t, bool> abilityRet;
+    for (size_t i = 0; i < size;) {
+        if (!pkt.Read(keyCode)) {
+            MMI_HILOGE("Packet read keyCode failed");
             return RET_ERR;
         }
-        abilityRet.push_back(ret);
+        if (!pkt.Read(isSupport)) {
+            MMI_HILOGE("Packet read isSupport failed");
+            return RET_ERR;
+        }
+        abilityRet[keyCode] = isSupport == 1 ? true : false;
+        i += 2;
     }
     InputDeviceImpl::GetInstance().OnKeystrokeAbility(userData, abilityRet);
     return RET_OK;

@@ -534,5 +534,11 @@ void InputManagerImpl::SendDisplayInfo()
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
     }
 }
+
+void InputManagerImpl::GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> &keyCodes,
+    std::function<void(std::map<int32_t, bool>)> callback)
+{
+    InputDevImp.GetKeystrokeAbility(deviceId, keyCodes, callback);
+}
 } // namespace MMI
 } // namespace OHOS
