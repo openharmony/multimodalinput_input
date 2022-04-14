@@ -549,8 +549,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     MMI_HILOGD("display:%{public}d", displayId);
     LogicalDisplayInfo *logicalDisplayInfo = GetLogicalDisplayId(displayId);
     CHKPR(logicalDisplayInfo, ERROR_NULL_POINTER);
-    int32_t globalX = pointerItem.GetGlobalX();
-    int32_t globalY = pointerItem.GetGlobalY();
+    LogicalCoordinate tCoord;
+    tCoord.x = pointerItem.GetGlobalX();
+    tCoord.y = pointerItem.GetGlobalY();
+    AdjustGlobalCoordinate(*logicalDisplayInfo, tCoord);
     auto targetWindowId = pointerEvent->GetTargetWindowId();
     WindowInfo *touchWindow = nullptr;
     for (auto& item : logicalDisplayInfo->windowsInfo) {
@@ -558,7 +560,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             continue;
         }
         if (targetWindowId < 0) {
-            if (IsInsideWindow(globalX, globalY, item)) {
+            if (IsInsideWindow(tCoord.x, tCoord.y, item)) {
                 touchWindow = &item;
                 break;
             }
@@ -570,14 +572,17 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
     if (touchWindow == nullptr) {
-        MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d", targetWindowId);
+        MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d, globalX:%{public}d, globalY:%{public}d",
+            targetWindowId, tCoord.x, tCoord.y);
         return RET_ERR;
     }
 
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
-    int32_t localX = globalX - touchWindow->winTopLeftX;
-    int32_t localY = globalY - touchWindow->winTopLeftY;
+    int32_t localX = tCoord.x - touchWindow->winTopLeftX;
+    int32_t localY = tCoord.y - touchWindow->winTopLeftY;
+    pointerItem.SetGlobalX(tCoord.x);
+    pointerItem.SetGlobalY(tCoord.y);
     pointerItem.SetLocalX(localX);
     pointerItem.SetLocalY(localY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
@@ -585,7 +590,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     MMI_HILOGD("pid:%{public}d,fd:%{public}d,globalX01:%{public}d,"
                "globalY01:%{public}d,localX:%{public}d,localY:%{public}d,"
                "TargetWindowId:%{public}d,AgentWindowId:%{public}d",
-               touchWindow->pid, fd, globalX, globalY, localX, localY,
+               touchWindow->pid, fd, tCoord.x, tCoord.y, localX, localY,
                pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
     return fd;
 }
