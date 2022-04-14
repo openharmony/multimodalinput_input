@@ -82,6 +82,9 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
             MsgCallbackBind2(&ServerMsgHandler::OnAddTouchpadEventFilter, this)},
         {MmiMessageId::REMOVE_EVENT_INTERCEPTOR,
             MsgCallbackBind2(&ServerMsgHandler::OnRemoveTouchpadEventFilter, this)},
+#ifdef OHOS_BUILD_MMI_DEBUG
+        {MmiMessageId::BIGPACKET_TEST, MsgCallbackBind2(&ServerMsgHandler::OnBigPacketTest, this)},
+#endif // OHOS_BUILD_MMI_DEBUG
 #ifdef OHOS_BUILD_HDF
         {MmiMessageId::HDI_INJECT, MsgCallbackBind2(&ServerMsgHandler::OnHdiInject, this)},
 #endif // OHOS_BUILD_HDF
@@ -631,5 +634,47 @@ int32_t ServerMsgHandler::OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket
     InterceptorMgrGbl.OnRemoveInterceptor(id);
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_MMI_DEBUG
+int32_t ServerMsgHandler::OnBigPacketTest(SessionPtr sess, NetPacket& pkt)
+{
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t id = 0;
+    pkt >> id;
+    int32_t phyNum = 0;
+    pkt >> phyNum;
+    MMI_HILOGD("id:%{public}d phyNum:%{public}d", id, phyNum);
+    for (auto i = 0; i < phyNum; i++) {
+        PhysicalDisplayInfo info = {};
+        pkt >> info.id >> info.leftDisplayId >> info.upDisplayId >> info.topLeftX >> info.topLeftY;
+        pkt >> info.width >> info.height >> info.name >> info.seatId >> info.seatName >> info.logicWidth;
+        pkt >> info.logicHeight >> info.direction;
+        MMI_HILOGD("\tPhysical: idx:%{public}d id:%{public}d seatId:%{public}s", i, info.id, info.seatId.c_str());
+    }
+    int32_t logcNum = 0;
+    pkt >> logcNum;
+    MMI_HILOGD("\tlogcNum:%{public}d", logcNum);
+    for (auto i = 0; i < logcNum; i++) {
+        LogicalDisplayInfo info = {};
+        pkt >> info.id >> info.topLeftX >> info.topLeftY;
+        pkt >> info.width >> info.height >> info.name >> info.seatId >> info.seatName >> info.focusWindowId;
+        MMI_HILOGD("\t\tLogical: idx:%{public}d id:%{public}d seatId:%{public}s", i, info.id, info.seatId.c_str());
+        int32_t winNum = 0;
+        pkt >> winNum;
+        MMI_HILOGD("\t\twinNum:%{public}d", winNum);
+        for (auto j = 0; j < winNum; j++) {
+            WindowInfo winInfo;
+            pkt >> winInfo;
+            MMI_HILOGD("\t\t\tWindows: idx:%{public}d id:%{public}d displayId:%{public}d",
+                j, winInfo.id, winInfo.displayId);
+        }
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read data failed");
+        return PACKET_READ_FAIL;
+    }
+    return RET_OK;
+}
+#endif // OHOS_BUILD_MMI_DEBUG
 } // namespace MMI
 } // namespace OHOS
