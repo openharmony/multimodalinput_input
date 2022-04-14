@@ -54,7 +54,8 @@ public:
     static constexpr int32_t POINTER_ACTION_DOWN = 2;
 
     /**
-     * Indicates a pointer action representing that a finger moves on a touchscreen or touchpad or a mouse pointer moves.
+     * Indicates a pointer action representing that a finger moves on a touchscreen or touchpad or a mouse
+     * pointer moves.
      * 
      * @since 9
      */
