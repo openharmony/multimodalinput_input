@@ -62,7 +62,7 @@ protected:
     int32_t OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
-
+    int32_t OnMoveMouse(SessionPtr sess, NetPacket& pkt);
 private:
     UDSServer *udsServer_ = nullptr;
     EventDispatch eventDispatch_;

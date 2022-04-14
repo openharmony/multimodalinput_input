@@ -39,7 +39,7 @@ public:
     void OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent);
     void OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
-
+    void MoveMouse(int32_t offsetX, int32_t offsetY);
 private:
     struct Handler {
         int32_t handlerId_ = 0;

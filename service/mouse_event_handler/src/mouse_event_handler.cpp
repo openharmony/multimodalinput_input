@@ -210,6 +210,62 @@ void MouseEventHandler::Normalize(struct libinput_event *event)
     DumpInner();
 }
 
+void MouseEventHandler::HandleMotionMouseMove(int32_t offsetX, int32_t offsetY)
+{
+    CALL_LOG_ENTER;
+    pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    InitAbsolution();
+    absolutionX_ += offsetX;
+    absolutionY_ += offsetY;
+    WinMgr->UpdateAndAdjustMouseLoction(absolutionX_, absolutionY_);
+}
+
+void MouseEventHandler::HandlePostMouseMove(PointerEvent::PointerItem& pointerItem)
+{
+    CALL_LOG_ENTER;
+    auto mouseInfo = WinMgr->GetMouseInfo();
+
+    MouseState->SetMouseCoords(mouseInfo.globalX, mouseInfo.globalY);
+    pointerItem.SetGlobalX(mouseInfo.globalX);
+    pointerItem.SetGlobalY(mouseInfo.globalY);
+    pointerItem.SetLocalX(0);
+    pointerItem.SetLocalY(0);
+    pointerItem.SetPointerId(0);
+    pointerItem.SetPressed(isPressed_);
+
+    int64_t time = GetSysClockTime();
+    pointerItem.SetDownTime(time);
+    pointerItem.SetWidth(0);
+    pointerItem.SetHeight(0);
+    pointerItem.SetPressure(0);
+
+    pointerEvent_->UpdateId();
+    pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
+    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent_->SetActionTime(time);
+    pointerEvent_->SetActionStartTime(time);
+
+    pointerEvent_->SetPointerId(0);
+    pointerEvent_->SetTargetDisplayId(-1);
+    pointerEvent_->SetTargetWindowId(-1);
+    pointerEvent_->SetAgentWindowId(-1);
+}
+
+bool MouseEventHandler::NormalizeMouseMove(int32_t offsetX, int32_t offsetY)
+{
+    CALL_LOG_ENTER;
+    CHKPF(pointerEvent_);
+    bool bHavePoinerDevice = InputDevMgr->ThereIsHavePointerDevice();
+
+    if(!bHavePoinerDevice) return false;
+    PointerEvent::PointerItem pointerItem;
+    HandleMotionMouseMove(offsetX, offsetY);
+    HandlePostMouseMove(pointerItem);
+    DumpInner();
+
+    return bHavePoinerDevice;
+}
+
 void MouseEventHandler::DumpInner()
 {
     MMI_HILOGD("PointerAction:%{public}d,PointerId:%{public}d,SourceType:%{public}d,"

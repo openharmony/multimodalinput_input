@@ -438,6 +438,12 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
     monitorManager_.MarkConsumed(monitorId, eventId);
 }
 
+void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
+{
+	std::lock_guard<std::mutex> guard(mtx_);
+    monitorManager_.MoveMouse(offsetX, offsetY);
+}
+
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
     CHKPR(interceptor, INVALID_HANDLER_ID);
