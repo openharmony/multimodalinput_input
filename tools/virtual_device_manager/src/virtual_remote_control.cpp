@@ -17,30 +17,51 @@
 
 namespace OHOS {
 namespace MMI {
-VirtualRemoteControl::VirtualRemoteControl() : VirtualDevice("Virtual RemoteControl",
-    BUS_USB, 0x44f, 0x6008)
+namespace {
+    constexpr int32_t ABS_MAX_REMOTE = 65535;
+    constexpr int32_t ABS_FUZZ_REMOTE = 255;
+    constexpr int32_t ABS_FLAT_REMOTE = 4095;
+}
+
+VirtualRemoteControl::VirtualRemoteControl() : VirtualDevice("Virtual RemoteControl", BUS_USB, 0x7d02, 0x0002)
 {
+    dev_.absmin[ABS_X] = 0;
+    dev_.absmax[ABS_X] = ABS_MAX_REMOTE;
+    dev_.absmin[ABS_Y] = 0;
+    dev_.absmax[ABS_Y] = ABS_MAX_REMOTE;
+    dev_.absfuzz[ABS_X] = ABS_FUZZ_REMOTE;
+    dev_.absfuzz[ABS_Y] = ABS_FUZZ_REMOTE;
+    dev_.absflat[ABS_X] = ABS_FLAT_REMOTE;
+    dev_.absflat[ABS_Y] = ABS_FLAT_REMOTE;
 }
 
 VirtualRemoteControl::~VirtualRemoteControl() {}
 
 static std::vector<uint32_t> g_virtualKey = {
-    116, 408, 142, 142, 228, 139, 353, 103, 108, 105, 106, 1, 78, 74, 358, 370, 379, 212, 398, 399, 401, 400, 375,
-    225, 224, 431, 592, 593, 244, 230, 229, 228, 241, 405, 28, 376, 377, 150, 389, 169, 362, 416, 417, 396, 383, 379,
-    386, 174, 138, 384, 378, 381, 366, 402, 403, 380, 207, 119, 167, 208, 168, 163, 165, 166, 161, 439, 410, 499, 164,
-    582, 32, 113, 209, 115, 114, 409, 576, 156, 171, 421, 422, 423, 424, 425, 426, 155, 427, 428, 429, 397, 577, 578,
-    219, 140, 387, 144, 150, 216, 216, 433, 579, 580, 407, 412, 138, 432, 374, 581, 442, 392, 393, 430, 358, 583, 181,
-    134, 206, 174, 234, 210, 130, 131, 133, 137, 135, 136, 217, 354, 172, 158, 159, 128, 173, 156, 418, 419, 420,
-    372, 177, 178, 12, 176, 223, 110, 111, 182, 232, 233, 231, 584, 608, 609, 610, 611, 612, 613, 120, 235, 528,
-    625, 626, 744
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+    31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58,
+    59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 77, 78, 79, 80, 81, 82, 83, 85, 86, 87, 88,
+    89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 113, 114, 115,
+    116, 117, 118, 119, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139,
+    140, 142, 144, 150, 152, 155, 156, 158, 159, 161, 163, 164, 165, 166, 171, 172, 173, 176, 177, 178, 179, 180, 183,
+    184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 198, 199, 200, 201, 202, 203, 204, 205, 209, 217, 240, 418,
+    419
 };
 
 const std::vector<uint32_t>& VirtualRemoteControl::GetEventTypes() const
 {
     static const std::vector<uint32_t> evt_types {
-        EV_KEY
+        EV_KEY, EV_ABS, EV_MSC
     };
     return evt_types;
+}
+
+const std::vector<uint32_t>& VirtualRemoteControl::GetAbs() const
+{
+    static const std::vector<uint32_t> abs {
+        ABS_X, ABS_Y
+    };
+    return abs;
 }
 
 const std::vector<uint32_t>& VirtualRemoteControl::GetKeys() const
@@ -48,6 +69,12 @@ const std::vector<uint32_t>& VirtualRemoteControl::GetKeys() const
     static const std::vector<uint32_t> keys(g_virtualKey.begin(),
                                             g_virtualKey.end());
     return keys;
+}
+
+const std::vector<uint32_t>& VirtualRemoteControl::GetMscs() const
+{
+    static const std::vector<uint32_t> mscs { MSC_SCAN };
+    return mscs;
 }
 } // namespace MMI
 } // namespace OHOS
