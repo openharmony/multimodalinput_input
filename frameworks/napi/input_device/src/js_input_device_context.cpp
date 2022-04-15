@@ -23,6 +23,8 @@ constexpr size_t MAX_STRING_LEN = 32;
 const std::string ADD_EVENT = "add";
 const std::string REMOVE_EVENT = "remove";
 
+const std::string GET_GLOBLE = "napi_get_global";
+const std::string DEFINE_CLASS = "napi_define_class";
 const std::string WRAP = "napi_wrap";
 const std::string UNWRAP = "napi_unwrap";
 const std::string NEW_INSTANCE = "napi_new_instance";
