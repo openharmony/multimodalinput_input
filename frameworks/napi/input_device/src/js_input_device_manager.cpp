@@ -19,6 +19,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDeviceManager" };
+std::mutex mutex_;
 } // namespace
 
 JsInputDeviceManager::JsInputDeviceManager()
@@ -44,16 +45,20 @@ void JsInputDeviceManager::UnRegisterInputDeviceMonitor(napi_env env, std::strin
 napi_value JsInputDeviceManager::GetDeviceIds(napi_env env, napi_value handle)
 {
     CALL_LOG_ENTER;
-    napi_value ret = CreateCallbackInfo(env, handle);
-    InputDevImp.GetInputDeviceIdsAsync(JsEventTarget::userData_ - 1, EmitJsIds);
+    std::lock_guard<std::mutex> guard(mutex_);
+    int32_t userData = InputDevImp.GetUserData();
+    napi_value ret = CreateCallbackInfo(env, handle, userData);
+    InputDevImp.GetInputDeviceIdsAsync(EmitJsIds);
     return ret;
 }
 
 napi_value JsInputDeviceManager::GetDevice(napi_env env, int32_t id, napi_value handle)
 {
     CALL_LOG_ENTER;
-    napi_value ret = CreateCallbackInfo(env, handle);
-    InputDevImp.GetInputDeviceAsync(JsEventTarget::userData_ - 1, id, EmitJsDev);
+    std::lock_guard<std::mutex> guard(mutex_);
+    int32_t userData = InputDevImp.GetUserData();
+    napi_value ret = CreateCallbackInfo(env, handle, userData);
+    InputDevImp.GetInputDeviceAsync(id, EmitJsDev);
     return ret;
 }
 
@@ -61,8 +66,10 @@ napi_value JsInputDeviceManager::GetKeystrokeAbility(napi_env env, int32_t id, s
                                                      napi_value handle)
 {
     CALL_LOG_ENTER;
-    napi_value ret = CreateCallbackInfo(env, handle);
-    InputDevImp.GetKeystrokeAbility(JsEventTarget::userData_ - 1, id, keyCodes, EmitJsKeystrokeAbility);
+    std::lock_guard<std::mutex> guard(mutex_);
+    int32_t userData = InputDevImp.GetUserData();
+    napi_value ret = CreateCallbackInfo(env, handle, userData);
+    InputDevImp.GetKeystrokeAbility(id, keyCodes, EmitJsKeystrokeAbility);
     return ret;
 }
 
