@@ -213,6 +213,7 @@ void MouseEventHandler::Normalize(struct libinput_event *event)
 void MouseEventHandler::HandleMotionMouseMove(int32_t offsetX, int32_t offsetY)
 {
     CALL_LOG_ENTER;
+    CHKPV(pointerEvent_);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     InitAbsolution();
     absolutionX_ += offsetX;
@@ -224,7 +225,7 @@ void MouseEventHandler::HandlePostMouseMove(PointerEvent::PointerItem& pointerIt
 {
     CALL_LOG_ENTER;
     auto mouseInfo = WinMgr->GetMouseInfo();
-
+    CHKPV(pointerEvent_);
     MouseState->SetMouseCoords(mouseInfo.globalX, mouseInfo.globalY);
     pointerItem.SetGlobalX(mouseInfo.globalX);
     pointerItem.SetGlobalY(mouseInfo.globalY);
@@ -256,7 +257,9 @@ bool MouseEventHandler::NormalizeMouseMove(int32_t offsetX, int32_t offsetY)
     CALL_LOG_ENTER;
     CHKPF(pointerEvent_);
     bool bHavePoinerDevice = InputDevMgr->ThereIsHavePointerDevice();
-    if (!bHavePoinerDevice) return false;
+    if (!bHavePoinerDevice) {
+        return false;
+    }
     
     PointerEvent::PointerItem pointerItem;
     HandleMotionMouseMove(offsetX, offsetY);

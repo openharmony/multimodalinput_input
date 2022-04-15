@@ -94,14 +94,12 @@ void InputDeviceManager::RemoveDevMonitor(SessionPtr sess)
 
 bool InputDeviceManager::ThereIsHavePointerDevice()
 {
-    bool hasPointerDevice = false;
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (IsPointerDevice(it->second)) {
-            hasPointerDevice = true;
-            break;
+            return true;
         }
     }
-    return hasPointerDevice;
+    return false;
 }
 
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)
