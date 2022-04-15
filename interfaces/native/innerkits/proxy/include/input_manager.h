@@ -165,7 +165,7 @@ public:
     void RemoveInterceptor(int32_t interceptorId);
 
     /**
-     * @brief Move that a mouse cursor. After input the appoint offset. 
+     * @brief Move that a mouse cursor. After input the appoint offset.
      * @param offsetX Indicates the appoint x offset.
      * @param eventId Indicates the ID of the consumed touchscreen input event.
      * @return void

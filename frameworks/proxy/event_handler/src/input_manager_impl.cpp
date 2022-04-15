@@ -440,7 +440,7 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 
 void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 {
-	std::lock_guard<std::mutex> guard(mtx_);
+    std::lock_guard<std::mutex> guard(mtx_);
     monitorManager_.MoveMouse(offsetX, offsetY);
 }
 
