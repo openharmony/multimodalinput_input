@@ -62,7 +62,9 @@ std::map<int32_t, bool> InputDeviceManager::GetKeystrokeAbility(int32_t deviceId
     std::map<int32_t, bool> keystrokeAbility;
     auto iter = inputDevice_.find(deviceId);
     if (iter == inputDevice_.end()) {
-        keystrokeAbility[INVALID_DEVICE_ID] = false;
+        for (const auto &item : keyCodes) {
+            keystrokeAbility[item] = false;
+        }
         return keystrokeAbility;
     }
     for (const auto& item : keyCodes) {

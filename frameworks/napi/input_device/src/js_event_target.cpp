@@ -435,11 +435,11 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
         napi_value abilityRet = nullptr;
         CHKRV(cbTemp->env, napi_create_object(cbTemp->env, &abilityRet), CREATE_OBJECT);
         napi_value keyCode = nullptr;
-        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, *it, &keyCode), CREATE_INT32);
+        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, it->first, &keyCode), CREATE_INT32);
         CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, abilityRet, "keyCode", keyCode), SET_NAMED_PROPERTY);
         napi_value ret = nullptr;
         napi_value isSupport = nullptr;
-        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, *(++it), &ret), CREATE_INT32);
+        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, it->second, &ret), CREATE_INT32);
         CHKRV(cbTemp->env, napi_coerce_to_bool(cbTemp->env, ret, &isSupport), COERCE_TO_BOOL);
         CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, abilityRet, "isSupport", isSupport),
             SET_NAMED_PROPERTY);
@@ -473,11 +473,11 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
         napi_value abilityRet = nullptr;
         CHKRV(cbTemp->env, napi_create_object(cbTemp->env, &abilityRet), CREATE_OBJECT);
         napi_value keyCode = nullptr;
-        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, *it, &keyCode), CREATE_INT32);
+        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, it->first, &keyCode), CREATE_INT32);
         CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, abilityRet, "keyCode", keyCode), SET_NAMED_PROPERTY);
         napi_value ret = nullptr;
         napi_value isSupport = nullptr;
-        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, *(++it), &ret), CREATE_INT32);
+        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, it->second, &ret), CREATE_INT32);
         CHKRV(cbTemp->env, napi_coerce_to_bool(cbTemp->env, ret, &isSupport), COERCE_TO_BOOL);
         CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, abilityRet, "isSupport", isSupport),
             SET_NAMED_PROPERTY);
@@ -493,7 +493,7 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
           CALL_FUNCTION);
 }
 
-void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::vector<int32_t> keystrokeAbility)
+void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::map<int32_t, bool> keystrokeAbility)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -578,7 +578,7 @@ void JsEventTarget::RemoveMonitor(napi_env env, std::string type, napi_value han
     }
 }
 
-napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle)
+napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, int32_t userData)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -588,22 +588,12 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle)
     if (handle == nullptr) {
         napi_value promise = nullptr;
         CHKRP(env, napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
-        if (userData_ == INT32_MAX) {
-            MMI_HILOGE("userData_ exceeds the maximum");
-            return nullptr;
-        }
-        callback_.emplace(userData_, std::move(cb));
-        ++userData_;
+        callback_.emplace(userData, std::move(cb));
         return promise;
     }
 
     CHKRP(env, napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
-    if (userData_ == INT32_MAX) {
-        MMI_HILOGE("userData_ exceeds the maximum");
-        return nullptr;
-    }
-    callback_.emplace(userData_, std::move(cb));
-    ++userData_;
+    callback_.emplace(userData, std::move(cb));
     return nullptr;
 }
 
