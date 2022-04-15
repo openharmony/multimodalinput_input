@@ -340,13 +340,14 @@ int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, NetPacket& pkt)
 int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
-    int32_t offsetX, offsetY;
+    int32_t offsetX = 0;
+    int32_t offsetY = 0;
     if (!pkt.Read(offsetX)) {
-        MMI_HILOGE("Packet read monitor failed");
+        MMI_HILOGE("Packet read offsetX failed");
         return RET_ERR;
     }
     if (!pkt.Read(offsetY)) {
-        MMI_HILOGE("Packet read event failed");
+        MMI_HILOGE("Packet read offsetY failed");
         return RET_ERR;
     }
 
