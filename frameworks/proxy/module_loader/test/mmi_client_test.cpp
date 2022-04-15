@@ -66,7 +66,7 @@ private:
 public:
     int32_t GetRandomInt(int32_t min, int32_t max)
     {
-         std::mt19937 gen(1729);
+        std::mt19937 gen(std::random_device());
         std::uniform_int_distribution<> dis(min, max);
         //std::default_random_engine e(std::random_device());
         return dis(gen);
