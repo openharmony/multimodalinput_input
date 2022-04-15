@@ -33,7 +33,11 @@ namespace MMI {
     #define DEF_MMI_VIRTUAL_DEVICE_MANAGER "/system/bin/mmi-virtual-device-manager"
     #define DEF_MMI_DATA_ROOT "/data/mmi/"
     #define DEF_EXP_CONFIG "/system/etc/mmi_device_config.ini"
+#ifdef __aarch64__
+    #define DEF_EXP_SOPATH "/system/lib64/"
+#else
     #define DEF_EXP_SOPATH "/system/lib/"
+#endif
     #define DEF_SCREEN_MAX_WIDTH 480
     #define DEF_SCREEN_MAX_HEIGHT 960
 #endif

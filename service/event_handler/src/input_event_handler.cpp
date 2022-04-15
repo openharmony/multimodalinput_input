@@ -27,7 +27,6 @@
 #include "bytrace.h"
 #include "libinput.h"
 
-#include "ability_launch_manager.h"
 #include "bytrace_adapter.h"
 #include "input_device_manager.h"
 #include "interceptor_manager_global.h"
@@ -116,6 +115,18 @@ void InputEventHandler::Init(UDSServer& udsServer)
         {
             static_cast<MmiMessageId>(LIBINPUT_EVENT_TOUCHPAD_MOTION),
             MsgCallbackBind1(&InputEventHandler::OnEventTouchpad, this)
+        },
+        {
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_TABLET_TOOL_AXIS),
+            MsgCallbackBind1(&InputEventHandler::OnTabletToolEvent, this)
+        },
+        {
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY),
+            MsgCallbackBind1(&InputEventHandler::OnTabletToolEvent, this)
+        },
+        {
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_TABLET_TOOL_TIP),
+            MsgCallbackBind1(&InputEventHandler::OnTabletToolEvent, this)
         },
         {
             static_cast<MmiMessageId>(LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN),
@@ -362,6 +373,20 @@ int32_t InputEventHandler::OnEventTouch(libinput_event *event)
 int32_t InputEventHandler::OnEventTouchpad(libinput_event *event)
 {
     OnEventTouchPadSecond(event);
+    return RET_OK;
+}
+
+int32_t InputEventHandler::OnTabletToolEvent(libinput_event *event)
+{
+    CALL_LOG_ENTER;
+    CHKPR(event, ERROR_NULL_POINTER);
+    LibinputAdapter::LoginfoPackagingTool(event);
+    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TABLET_TOOL);
+    CHKPR(pointerEvent, RET_ERR);
+    eventDispatch_.HandlePointerEvent(pointerEvent);
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+        pointerEvent->Reset();
+    }
     return RET_OK;
 }
 

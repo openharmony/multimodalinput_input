@@ -31,6 +31,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "LibinputAdapter" };
+constexpr int32_t WAIT_TIME_FOR_INPUT { 100 };
 } // namespace
 
 static void HiLogFunc(struct libinput* input, libinput_log_priority priority, const char* fmt, va_list args)
@@ -69,6 +70,7 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
         char realPath[PATH_MAX] = {};
         if (realpath(path, realPath) == nullptr) {
             MMI_HILOGE("path is error, path:%{public}s", path);
+            std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
             return RET_ERR;
         }
         int32_t fd = open(realPath, flags);

@@ -24,7 +24,7 @@ namespace MMI {
 #define CHKRV(env, state, desc) \
     do { \
         if ((state) != napi_ok) { \
-            MMI_HILOGE("(%{public}s) failed", #desc); \
+            MMI_HILOGE("%{public}s failed", std::string(desc).c_str()); \
             auto infoTemp = std::string(__FUNCTION__)+ ": " + std::string(desc) + " failed"; \
             napi_throw_error(env, nullptr, infoTemp.c_str()); \
             return; \
@@ -34,11 +34,28 @@ namespace MMI {
 #define CHKRP(env, state, desc) \
     do { \
         if ((state) != napi_ok) { \
-            MMI_HILOGE("(%{public}s) failed", #desc); \
+            MMI_HILOGE("%{public}s failed", std::string(desc).c_str()); \
             auto infoTemp = std::string(__FUNCTION__)+ ": " + std::string(desc) + " failed"; \
             napi_throw_error(env, nullptr, infoTemp.c_str()); \
             return nullptr; \
         } \
+    } while (0)
+
+#define CHKRB(env, state, desc) \
+    do { \
+        if ((state) != napi_ok) { \
+            MMI_HILOGE("%{public}s failed", std::string(desc).c_str()); \
+            auto infoTemp = std::string(__FUNCTION__)+ ": " + std::string(desc) + " failed"; \
+            napi_throw_error(env, nullptr, infoTemp.c_str()); \
+            return false; \
+        } \
+    } while (0)
+
+#define THROWERR(env, desc) \
+    do { \
+        MMI_HILOGE("%{public}s", (#desc)); \
+        auto infoTemp = std::string(__FUNCTION__)+ ": " + #desc; \
+        napi_throw_error(env, nullptr, infoTemp.c_str()); \
     } while (0)
 } // namespace MMI
 } // namespace OHOS

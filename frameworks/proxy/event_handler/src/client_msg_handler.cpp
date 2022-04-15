@@ -63,6 +63,7 @@ void ClientMsgHandler::Init()
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ClientMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ClientMsgHandler::OnInputDeviceIds, this)},
         {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ClientMsgHandler::OnKeyList, this)},
+        {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnDevMonitor, this)},
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
         {MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::TouchpadEventInterceptor, this)},
@@ -300,6 +301,23 @@ int32_t ClientMsgHandler::OnKeyList(const UDSClient& client, NetPacket& pkt)
         abilityRet.push_back(ret);
     }
     InputDeviceImpl::GetInstance().OnKeystrokeAbility(userData, abilityRet);
+    return RET_OK;
+}
+
+int32_t ClientMsgHandler::OnDevMonitor(const UDSClient& client, NetPacket& pkt)
+{
+    CALL_LOG_ENTER;
+    std::string type;
+    if (!pkt.Read(type)) {
+        MMI_HILOGE("Packet read userData failed");
+        return RET_ERR;
+    }
+    int32_t deviceId;
+    if (!pkt.Read(deviceId)) {
+        MMI_HILOGE("Packet read userData failed");
+        return RET_ERR;
+    }
+    InputDeviceImpl::GetInstance().OnDevMonitor(type, deviceId);
     return RET_OK;
 }
 
