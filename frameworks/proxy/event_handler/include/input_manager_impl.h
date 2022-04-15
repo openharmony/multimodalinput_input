@@ -27,6 +27,7 @@
 #include "event_filter_service.h"
 
 #include "if_mmi_client.h"
+#include "input_device_impl.h"
 #include "input_interceptor_manager.h"
 #include "input_monitor_manager.h"
 #include "i_input_event_consumer.h"
@@ -70,6 +71,9 @@ public:
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
 
+    void GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> &keyCodes,
+        std::function<void(std::map<int32_t, bool>)> callback);
+
 private:
     int32_t PackPhysicalDisplay(NetPacket &pkt);
     int32_t PackLogicalDisplay(NetPacket &pkt);
@@ -85,7 +89,7 @@ private:
 private:
     sptr<EventFilterService> eventFilterService_ {nullptr};
     std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
-    
+
     std::vector<PhysicalDisplayInfo> physicalDisplays_;
     std::vector<LogicalDisplayInfo> logicalDisplays_;
     InputMonitorManager monitorManager_;

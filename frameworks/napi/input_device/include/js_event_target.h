@@ -37,10 +37,10 @@ public:
     static void TargetOn(std::string type, int32_t deviceId);
     static void EmitJsIds(int32_t userData, std::vector<int32_t> ids);
     static void EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device);
-    static void EmitJsKeystrokeAbility(int32_t userData, std::vector<int32_t> keystrokeAbility);
+    static void EmitJsKeystrokeAbility(int32_t userData, std::map<int32_t, bool> keystrokeAbility);
     void AddMonitor(napi_env env, std::string type, napi_value handle);
     void RemoveMonitor(napi_env env, std::string type, napi_value handle);
-    napi_value CreateCallbackInfo(napi_env env, napi_value handle);
+    napi_value CreateCallbackInfo(napi_env env, napi_value handle, int32_t userData);
     void ResetEnv();
     inline static int32_t userData_ {0};
     inline static std::map<int32_t, std::unique_ptr<JsUtil::CallbackInfo>> callback_ {};

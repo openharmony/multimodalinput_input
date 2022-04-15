@@ -29,7 +29,7 @@ public:
     struct CallbackData {
         std::vector<int32_t> ids;
         std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device = nullptr;
-        std::vector<int32_t> keystrokeAbility;
+        std::map<int32_t, bool> keystrokeAbility;
         int32_t deviceId = 0;
     };
 
