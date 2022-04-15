@@ -38,10 +38,6 @@ const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_i
 
 namespace OHOS {
 namespace MMI {
-PointerDrawingManager::PointerDrawingManager() {}
-
-PointerDrawingManager::~PointerDrawingManager() {}
-
 void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY)
 {
     CALL_LOG_ENTER;
@@ -251,8 +247,16 @@ void PointerDrawingManager::DrawManager()
 bool PointerDrawingManager::Init()
 {
     CALL_LOG_ENTER;
-    InputDevMgr->Attach(GetInstance());
+    InputDevMgr->Attach(shared_from_this());
     return true;
+}
+
+std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
+{
+    if (iPointDrawMgr_ == nullptr) {
+        iPointDrawMgr_ = std::make_shared<PointerDrawingManager>();
+    }
+    return iPointDrawMgr_;
 }
 } // namespace MMI
 } // namespace OHOS

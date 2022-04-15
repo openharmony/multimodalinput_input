@@ -57,11 +57,7 @@ VirtualDevice::VirtualDevice(const std::string &device_name, uint16_t busType,
 
 VirtualDevice::~VirtualDevice()
 {
-    if (fd_ >= 0) {
-        ioctl(fd_, UI_DEV_DESTROY);
-        close(fd_);
-        fd_ = -1;
-    }
+    Close();
 }
 
 bool  VirtualDevice::ViewDirectory(std::vector<std::string>& fileList)
@@ -277,6 +273,15 @@ bool VirtualDevice::SetUp()
         return false;
     }
     return true;
+}
+
+void VirtualDevice::Close()
+{
+    if (fd_ >= 0) {
+        ioctl(fd_, UI_DEV_DESTROY);
+        close(fd_);
+        fd_ = -1;
+    }
 }
 
 void VirtualDevice::CloseAllDevice(const std::vector<std::string>& fileList)

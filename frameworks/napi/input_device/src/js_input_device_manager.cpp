@@ -21,6 +21,26 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDeviceManager" };
 } // namespace
 
+JsInputDeviceManager::JsInputDeviceManager()
+{
+    CALL_LOG_ENTER;
+    InputDevImp.RegisterInputDeviceMonitor(TargetOn);
+}
+
+JsInputDeviceManager::~JsInputDeviceManager() {}
+
+void JsInputDeviceManager::RegisterInputDeviceMonitor(napi_env env, std::string type, napi_value handle)
+{
+    CALL_LOG_ENTER;
+    AddMonitor(env, type, handle);
+}
+
+void JsInputDeviceManager::UnRegisterInputDeviceMonitor(napi_env env, std::string type, napi_value handle)
+{
+    CALL_LOG_ENTER;
+    RemoveMonitor(env, type, handle);
+}
+
 napi_value JsInputDeviceManager::GetDeviceIds(napi_env env, napi_value handle)
 {
     CALL_LOG_ENTER;
@@ -42,13 +62,14 @@ napi_value JsInputDeviceManager::GetKeystrokeAbility(napi_env env, int32_t id, s
 {
     CALL_LOG_ENTER;
     napi_value ret = CreateCallbackInfo(env, handle);
-    InputDeviceImpl::GetInstance().GetKeystrokeAbility(JsEventTarget::userData_ - 1, id, keyCodes,
-                                                       EmitJsKeystrokeAbility);
+    InputDevImp.GetKeystrokeAbility(JsEventTarget::userData_ - 1, id, keyCodes, EmitJsKeystrokeAbility);
     return ret;
 }
 
 void JsInputDeviceManager::ResetEnv()
 {
+    CALL_LOG_ENTER;
+    InputDevImp.UnRegisterInputDeviceMonitor();
     JsEventTarget::ResetEnv();
 }
 } // namespace MMI
