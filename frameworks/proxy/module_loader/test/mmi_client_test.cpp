@@ -48,30 +48,27 @@ public:
         OnConnected();
     }
 #ifdef OHOS_BUILD_MMI_DEBUG
-private:
-    bool Write(const PhysicalDisplayInfo& info, NetPacket& pkt)
+public:
+    static bool Write(const PhysicalDisplayInfo& info, NetPacket& pkt)
     {
         pkt << info.id << info.leftDisplayId << info.upDisplayId << info.topLeftX << info.topLeftY;
         pkt << info.width << info.height << info.name << info.seatId << info.seatName << info.logicWidth;
         pkt << info.logicHeight << info.direction;
         return (!pkt.ChkRWError());
     }
-    bool Write(const LogicalDisplayInfo& info, NetPacket& pkt)
+    static bool Write(const LogicalDisplayInfo& info, NetPacket& pkt)
     {
         pkt << info.id << info.topLeftX << info.topLeftY;
         pkt << info.width << info.height << info.name << info.seatId << info.seatName << info.focusWindowId;
         return (!pkt.ChkRWError());
     }
-
-public:
-    int32_t GetRandomInt(int32_t min, int32_t max)
+    static int32_t GetRandomInt(int32_t min, int32_t max)
     {
-        std::mt19937 gen(std::random_device());
+        std::mt19937 gen(std::random_device{}());
         std::uniform_int_distribution<> dis(min, max);
-        //std::default_random_engine e(std::random_device());
         return dis(gen);
     }
-    void RandomPhysicalInfo(int32_t id, PhysicalDisplayInfo& info)
+    static void RandomPhysicalInfo(int32_t id, PhysicalDisplayInfo& info)
     {
         info.id = id;
         info.width = 1280;
@@ -80,7 +77,7 @@ public:
         info.seatId = StringFmt("seat%d", id);
         info.seatName = StringFmt("seatname%d", id);
     }
-    void RandomLogicalInfo(int32_t id, LogicalDisplayInfo& info)
+    static void RandomLogicalInfo(int32_t id, LogicalDisplayInfo& info)
     {
         info.id = id;
         info.width = 1280;
@@ -89,7 +86,7 @@ public:
         info.seatId = StringFmt("seat%d", id);
         info.seatName = StringFmt("seatname%d", id);
     }
-    void RandomWindowInfo(int32_t id, const LogicalDisplayInfo& logcInfo, WindowInfo& info)
+    static void RandomWindowInfo(int32_t id, const LogicalDisplayInfo& logcInfo, WindowInfo& info)
     {
         info.id = id;
         info.pid = id;
@@ -100,8 +97,7 @@ public:
         info.hotZoneHeight = GetRandomInt(100, 1024);
         info.displayId = logcInfo.id;
     }
-
-    bool RandomDisplayPacket(NetPacket& pkt, int32_t phyNum = 1)
+    static bool RandomDisplayPacket(NetPacket& pkt, int32_t phyNum = 1)
     {
         if (!pkt.Write(phyNum)) {
             printf("write failed 1\n");
@@ -146,8 +142,6 @@ public:
     }
 #endif // OHOS_BUILD_MMI_DEBUG
 };
-
-MMIClient mmiClient;
 ConnectCallback connectFun;
 
 /**
@@ -158,6 +152,7 @@ ConnectCallback connectFun;
  */
 HWTEST_F(MMIClientTest, RegisterConnectedFunction, TestSize.Level1)
 {
+    MMIClient mmiClient;
     mmiClient.RegisterConnectedFunction(connectFun);
 }
 
@@ -169,6 +164,7 @@ HWTEST_F(MMIClientTest, RegisterConnectedFunction, TestSize.Level1)
  */
 HWTEST_F(MMIClientTest, RegisterDisconnectedFunction, TestSize.Level1)
 {
+    MMIClient mmiClient;
     mmiClient.RegisterDisconnectedFunction(connectFun);
 }
 
@@ -181,10 +177,10 @@ HWTEST_F(MMIClientTest, RegisterDisconnectedFunction, TestSize.Level1)
 HWTEST_F(MMIClientTest, VirtualKeyIn, TestSize.Level1)
 {
     RawInputEvent virtualKeyEvent = {};
+    MMIClient mmiClient;
     mmiClient.VirtualKeyIn(virtualKeyEvent);
 }
 
-MMIClientUnitTest mmiClientTest;
 /**
  * @tc.name:Re_RegisterConnectedFunction
  * @tc.desc:Verify register connetct
@@ -193,6 +189,7 @@ MMIClientUnitTest mmiClientTest;
  */
 HWTEST_F(MMIClientTest, Re_RegisterConnectedFunction, TestSize.Level1)
 {
+    MMIClientUnitTest mmiClientTest;
     mmiClientTest.RegisterConnectedFunction(connectFun);
 }
 
@@ -204,6 +201,7 @@ HWTEST_F(MMIClientTest, Re_RegisterConnectedFunction, TestSize.Level1)
  */
 HWTEST_F(MMIClientTest, Re_RegisterDisconnectedFunction, TestSize.Level1)
 {
+    MMIClientUnitTest mmiClientTest;
     mmiClientTest.RegisterDisconnectedFunction(connectFun);
 }
 
@@ -216,11 +214,13 @@ HWTEST_F(MMIClientTest, Re_RegisterDisconnectedFunction, TestSize.Level1)
 HWTEST_F(MMIClientTest, Re_VirtualKeyIn, TestSize.Level1)
 {
     RawInputEvent virtualKeyEvent = {};
+    MMIClientUnitTest mmiClientTest;
     mmiClientTest.VirtualKeyIn(virtualKeyEvent);
 }
 
 HWTEST_F(MMIClientTest, Re_OnConnected, TestSize.Level1)
 {
+    MMIClientUnitTest mmiClientTest;
     mmiClientTest.OnConnectedUnitTest();
 }
 
@@ -233,6 +233,7 @@ HWTEST_F(MMIClientTest, Re_OnConnected, TestSize.Level1)
 HWTEST_F(MMIClientTest, Re_OnConnected_002, TestSize.Level1)
 {
     ConnectCallback funTmp;
+    MMIClientUnitTest mmiClientTest;
     mmiClientTest.RegisterConnectedFunction(funTmp);
     mmiClientTest.OnConnectedUnitTest();
 }
@@ -245,6 +246,7 @@ HWTEST_F(MMIClientTest, Re_OnConnected_002, TestSize.Level1)
  */
 HWTEST_F(MMIClientTest, Re_OnDisconnected, TestSize.Level1)
 {
+    MMIClientUnitTest mmiClientTest;
     mmiClientTest.OnDisconnectedUnitTest();
 }
 
@@ -257,6 +259,7 @@ HWTEST_F(MMIClientTest, Re_OnDisconnected, TestSize.Level1)
 HWTEST_F(MMIClientTest, Re_OnDisconnected_002, TestSize.Level1)
 {
     ConnectCallback funTmp;
+    MMIClientUnitTest mmiClientTest;
     mmiClientTest.RegisterDisconnectedFunction(funTmp);
     mmiClientTest.OnDisconnectedUnitTest();
 }
@@ -264,18 +267,17 @@ HWTEST_F(MMIClientTest, Re_OnDisconnected_002, TestSize.Level1)
 #ifdef OHOS_BUILD_MMI_DEBUG
 HWTEST_F(MMIClientTest, BigPacketTest, TestSize.Level1)
 {
-    MMIClientUnitTest client;
-    ASSERT_TRUE(client.Start());
-
-    const int32_t maxLimit = client.GetRandomInt(500, 2000);
-    for (auto i = 0; i < maxLimit; i++) {
-        int32_t phyNum = client.GetRandomInt(1, 10);
+    ASSERT_TRUE(MMIEventHdl.StartClient());
+    auto client = MMIEventHdl.GetMMIClient();
+    ASSERT_NE(client, nullptr);
+    const int32_t maxLimit = MMIClientUnitTest::GetRandomInt(500, 2000);
+    for (auto i = 1; i <= maxLimit; i++) {
+        int32_t phyNum = MMIClientUnitTest::GetRandomInt(1, 10);
         NetPacket pkt(MmiMessageId::BIGPACKET_TEST);
-        pkt << (i+1);
-        ASSERT_TRUE(client.RandomDisplayPacket(pkt, phyNum));
-        EXPECT_TRUE(client.SendMsg(pkt));
+        pkt << i;
+        ASSERT_TRUE(MMIClientUnitTest::RandomDisplayPacket(pkt, phyNum));
+        EXPECT_TRUE(client->SendMessage(pkt));
     }
-    client.Stop();
 }
 #endif // OHOS_BUILD_MMI_DEBUG
 } // namespace MMI

@@ -672,11 +672,13 @@ int32_t ServerMsgHandler::OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket
 int32_t ServerMsgHandler::OnBigPacketTest(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t pid = 0;
     int32_t id = 0;
-    pkt >> id;
+    pkt >> pid >> id;
     int32_t phyNum = 0;
     pkt >> phyNum;
-    MMI_HILOGD("id:%{public}d phyNum:%{public}d", id, phyNum);
+    MMI_HILOGD("BigPacketsTest pid:%{public}d id:%{public}d phyNum:%{public}d size:%{public}zu",
+        pid, id, phyNum, pkt.Size());
     for (auto i = 0; i < phyNum; i++) {
         PhysicalDisplayInfo info = {};
         pkt >> info.id >> info.leftDisplayId >> info.upDisplayId >> info.topLeftX >> info.topLeftY;
