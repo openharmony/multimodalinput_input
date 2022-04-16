@@ -28,7 +28,6 @@ ohos_prebuilt_etc("multimodalinput.rc") {
   subsystem_name = "multimodalinput"
 }
 
-HDF_FWKS = "//drivers/framework"
 ohos_executable("uinput_inject") {
   install_enable = true
 
