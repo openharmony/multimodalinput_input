@@ -28,7 +28,6 @@ ohos_prebuilt_etc("multimodalinput.rc") {
   subsystem_name = "multimodalinput"
 }
 
-HDF_FWKS = "//drivers/framework"
 ohos_executable("uinput_inject") {
   install_enable = true
 
@@ -43,36 +42,6 @@ ohos_executable("uinput_inject") {
   ]
 
   include_dirs = [
-    "//foundation/multimodalinput/input/util/common/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
-  ]
-
-  external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
-    "input_device_driver:hdi_input",
-    "utils_base:utils",
-  ]
-
-  part_name = "input"
-  subsystem_name = "multimodalinput"
-}
-
-ohos_shared_library("mmi_uinject") {
-  sources = [
-    "uinput/hdf_device_event_dispatch.cpp",
-    "uinput/hdf_device_event_manager.cpp",
-    "uinput/inject_thread.cpp",
-    "uinput/keyboard_inject.cpp",
-    "uinput/virtual_device.cpp",
-    "uinput/virtual_keyboard.cpp",
-    "uinput/virtual_touch_screen.cpp",
-  ]
-
-  include_dirs = [
-    "uinput",
-    "$HDF_FWKS/include",
-    "//drivers/peripheral/input/interfaces/include",
-    "//drivers/adapter/uhdf2/adapter/osal/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
   ]
