@@ -859,7 +859,7 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
             << ",LocalX:" << item.GetLocalX() << ",LocalY:" << item.GetLocalY()
             << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
             << ",TiltX:" << item.GetTiltX() << ",TiltY:" << item.GetTiltY()
-            << ",Pressure:" << std::fixed << std::setprecision(pressurePrecision) 
+            << ",Pressure:" << std::fixed << std::setprecision(pressurePrecision)
             << item.GetPressure() << std::endl;
     }
     std::vector<int32_t> pressedKeys = pointerEvent.GetPressedKeys();
