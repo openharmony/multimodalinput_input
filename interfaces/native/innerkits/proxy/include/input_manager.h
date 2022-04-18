@@ -65,17 +65,8 @@ public:
      * will be called back to the consumer object for processing.
      * @since 8
      */
-    void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer);
-
-    /**
-     * @brief Sets a consumer for the window input event of the current process.
-     * @param inputEventConsumer Indicates the consumer to set. The window input event of the current process
-     * will be called back to the consumer object for processing.
-     * @param eventHandler Indicates the EventHandler object of the event callback handler.
-     * @since 8
-     */
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
-        std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
+        std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr);
 
     /**
      * @brief Subscribes to the key input event that meets a specific condition. When such an event occurs,
