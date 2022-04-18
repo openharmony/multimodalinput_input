@@ -69,7 +69,10 @@ public:
     static std::shared_ptr<PointerEvent> SetupPointerEvent007();
     static std::shared_ptr<PointerEvent> SetupPointerEvent008();
     static std::shared_ptr<PointerEvent> SetupPointerEvent009();
+    static std::shared_ptr<PointerEvent> SetupPointerEvent010();
+    static std::shared_ptr<PointerEvent> SetupPointerEvent011();
     static std::shared_ptr<PointerEvent> SetupPointerEvent012();
+    static std::shared_ptr<PointerEvent> SetupPointerEvent013();
     static void TestSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     static void TestSimulateInputEvent_2(std::shared_ptr<PointerEvent> pointerEvent);
     static std::string DumpPointerItem2(const PointerEvent::PointerItem &item);
@@ -623,6 +626,7 @@ void InputManagerTest::TestSimulateInputEvent(std::shared_ptr<PointerEvent> poin
         "pointer event pointerId:[[:digit:]]\\{1,\\}"
     };
     std::vector<std::string> sLogs { SearchLog(sCmd, true) };
+    MMI_HILOGD("sCmd:%{public}s", sCmd.c_str());
 
     MMI_HILOGD("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -762,6 +766,7 @@ void InputManagerTest::TestSimulateInputEvent_2(std::shared_ptr<PointerEvent> po
         "pointer event pointerId:[[:digit:]]\\{1,\\}"
     };
     std::vector<std::string> sLogs { SearchLog(sCmd, true) };
+    MMI_HILOGD("sCmd:%{public}s", sCmd.c_str());
 
     MMI_HILOGD("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -925,6 +930,168 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent009()
     item.SetDeviceId(0);
     pointerEvent->AddPointerItem(item);
     return pointerEvent;
+}
+
+std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent010()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(1);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDownTime(0);
+    item.SetGlobalX(823);
+    item.SetGlobalY(723);
+    item.SetLocalX(623);
+    item.SetLocalY(453);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetTiltX(2.12);
+    item.SetTiltY(5.43);
+    item.SetPressure(0.15);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+
+    item.SetPointerId(1);
+    item.SetDownTime(0);
+    item.SetGlobalX(50);
+    item.SetGlobalY(50);
+    item.SetLocalX(70);
+    item.SetLocalY(70);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetTiltX(12.22);
+    item.SetTiltY(15.33);
+    item.SetPressure(0.45);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    return pointerEvent;
+}
+
+std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent011()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(1);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDownTime(0);
+    item.SetGlobalX(823);
+    item.SetGlobalY(723);
+    item.SetLocalX(623);
+    item.SetLocalY(453);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetTiltX(2.12);
+    item.SetTiltY(5.43);
+    item.SetPressure(0.15);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+
+    item.SetPointerId(1);
+    item.SetDownTime(0);
+    item.SetGlobalX(50);
+    item.SetGlobalY(50);
+    item.SetLocalX(70);
+    item.SetLocalY(70);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetTiltX(12.22);
+    item.SetTiltY(15.33);
+    item.SetPressure(0.45);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    return pointerEvent;
+}
+
+std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent013()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetPointerId(1);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDownTime(0);
+    item.SetGlobalX(823);
+    item.SetGlobalY(723);
+    item.SetLocalX(623);
+    item.SetLocalY(453);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetTiltX(2.12);
+    item.SetTiltY(5.43);
+    item.SetPressure(0.15);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+
+    item.SetPointerId(1);
+    item.SetDownTime(0);
+    item.SetGlobalX(50);
+    item.SetGlobalY(50);
+    item.SetLocalX(70);
+    item.SetLocalY(70);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetTiltX(12.22);
+    item.SetTiltY(15.33);
+    item.SetPressure(0.45);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    return pointerEvent;
+}
+
+/**
+ * @tc.name:InputManager_Pencil2InputEvent_001
+ * @tc.desc:Verify simulate pointer event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_001, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    MMI_HILOGD("start InputManager_Pencil2InputEvent_001");
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent010() };
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name:InputManager_Pencil2InputEvent_002
+ * @tc.desc:Verify simulate pointer event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_002, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    MMI_HILOGD("start InputManager_Pencil2InputEvent_002");
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent011() };
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name:InputManager_Pencil2InputEvent_003
+ * @tc.desc:Verify simulate pointer event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_003, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    MMI_HILOGD("start InputManager_Pencil2InputEvent_003");
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent013() };
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
 }
 
 /**
