@@ -340,6 +340,10 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
             MMI_HILOGE("Packet write item pressure failed");
             return RET_ERR;
         }
+        if (!pkt.Write(item.GetToolType())) {
+            MMI_HILOGE("Packet write item tool type failed");
+            return RET_ERR;
+        }
         if (!pkt.Write(item.GetDeviceId())) {
             MMI_HILOGE("Packet write item device failed");
             return RET_ERR;
@@ -525,6 +529,11 @@ int32_t InputEventDataTransformation::DeserializePointerItem(NetPacket &pkt, Poi
         return RET_ERR;
     }
     item.SetPressure(tField);
+    if (!pkt.Read(tField)) {
+        MMI_HILOGE("Packet read tool type failed");
+        return RET_ERR;
+    }
+    item.SetToolType(tField);
     if (!pkt.Read(tField)) {
         MMI_HILOGE("Packet read device failed");
         return RET_ERR;
