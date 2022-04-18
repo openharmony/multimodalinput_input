@@ -139,7 +139,7 @@ void UDSSocket::OnReadPackets(CircleStreamBuffer& circBuf, UDSSocket::PacketCall
             break;
         }
         callbackFun(pkt);
-        circBuf.MoveReadIdx(pkt.GetPacketLength());
+        circBuf.SeekReadPos(pkt.GetPacketLength());
     }
 }
 

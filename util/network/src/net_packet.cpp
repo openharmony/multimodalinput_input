@@ -29,10 +29,10 @@ NetPacket::~NetPacket() {}
 
 void NetPacket::MakeData(StreamBuffer& buf) const
 {
-    PACKHEAD head = {msgId_, wIdx_};
+    PACKHEAD head = {msgId_, wPos_};
     buf << head;
-    if (wIdx_ > 0) {
-        if (!buf.Write(&szBuff_[0], wIdx_)) {
+    if (wPos_ > 0) {
+        if (!buf.Write(&szBuff_[0], wPos_)) {
             MMI_HILOGE("Write data to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
             return;
         }
