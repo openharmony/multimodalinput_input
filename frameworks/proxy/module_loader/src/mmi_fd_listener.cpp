@@ -44,10 +44,9 @@ void MMIFdListener::OnReadable(int32_t fd)
         return;
     }
     CHKPV(mmiClient_);
-    ssize_t size = 0;
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
     for (int32_t i = 0; i < MAX_RECV_LIMIT; i++) {
-        size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
+        ssize_t size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size > 0) {
             mmiClient_->OnRecvMsg(szBuf, size);
         } else if (size < 0) {

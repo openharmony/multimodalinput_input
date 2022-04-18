@@ -68,7 +68,6 @@ group("multimodalinput_mmi_packages") {
     "frameworks/napi/input_monitor:inputmonitor",
     "frameworks/proxy:libmmi-client",
     "service:libmmi-server",
-    "examples/mmi:mmi-client",
     "tools/inject_event:input",
   ]
 }
