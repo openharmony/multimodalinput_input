@@ -24,6 +24,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerEvent" };
+constexpr double MAX_PRESSURE = 1.0;
 } // namespace
 
 std::shared_ptr<PointerEvent> PointerEvent::from(std::shared_ptr<InputEvent> inputEvent)
@@ -152,8 +153,7 @@ double PointerEvent::PointerItem::GetPressure() const
 
 void PointerEvent::PointerItem::SetPressure(double pressure)
 {
-    double maxPressure = 1.0;
-    pressure_ = pressure >= maxPressure ? 1.0 : pressure;
+    pressure_ = pressure >= MAX_PRESSURE ? MAX_PRESSURE : pressure;
 }
 
 int32_t PointerEvent::PointerItem::GetDeviceId() const
