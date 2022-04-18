@@ -210,6 +210,65 @@ void MouseEventHandler::Normalize(struct libinput_event *event)
     DumpInner();
 }
 
+void MouseEventHandler::HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY)
+{
+    CALL_LOG_ENTER;
+    CHKPV(pointerEvent_);
+    pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    InitAbsolution();
+    absolutionX_ += offsetX;
+    absolutionY_ += offsetY;
+    WinMgr->UpdateAndAdjustMouseLoction(absolutionX_, absolutionY_);
+}
+
+void MouseEventHandler::HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem)
+{
+    CALL_LOG_ENTER;
+    auto mouseInfo = WinMgr->GetMouseInfo();
+    CHKPV(pointerEvent_);
+    MouseState->SetMouseCoords(mouseInfo.globalX, mouseInfo.globalY);
+    pointerItem.SetGlobalX(mouseInfo.globalX);
+    pointerItem.SetGlobalY(mouseInfo.globalY);
+    pointerItem.SetLocalX(0);
+    pointerItem.SetLocalY(0);
+    pointerItem.SetPointerId(0);
+    pointerItem.SetPressed(isPressed_);
+
+    int64_t time = GetSysClockTime();
+    pointerItem.SetDownTime(time);
+    pointerItem.SetWidth(0);
+    pointerItem.SetHeight(0);
+    pointerItem.SetPressure(0);
+
+    pointerEvent_->UpdateId();
+    pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
+    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent_->SetActionTime(time);
+    pointerEvent_->SetActionStartTime(time);
+
+    pointerEvent_->SetPointerId(0);
+    pointerEvent_->SetTargetDisplayId(-1);
+    pointerEvent_->SetTargetWindowId(-1);
+    pointerEvent_->SetAgentWindowId(-1);
+}
+
+bool MouseEventHandler::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
+{
+    CALL_LOG_ENTER;
+    CHKPF(pointerEvent_);
+    bool bHasPoinerDevice = InputDevMgr->HasPointerDevice();
+    if (!bHasPoinerDevice) {
+        MMI_HILOGE("There hasn't any pointer device");
+        return false;
+    }
+    
+    PointerEvent::PointerItem pointerItem;
+    HandleMotionMoveMouse(offsetX, offsetY);
+    HandlePostMoveMouse(pointerItem);
+    DumpInner();
+    return bHasPoinerDevice;
+}
+
 void MouseEventHandler::DumpInner()
 {
     MMI_HILOGD("PointerAction:%{public}d,PointerId:%{public}d,SourceType:%{public}d,"
