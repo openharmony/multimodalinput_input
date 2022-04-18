@@ -62,7 +62,9 @@ std::map<int32_t, bool> InputDeviceManager::GetKeystrokeAbility(int32_t deviceId
     std::map<int32_t, bool> keystrokeAbility;
     auto iter = inputDevice_.find(deviceId);
     if (iter == inputDevice_.end()) {
-        keystrokeAbility[INVALID_DEVICE_ID] = false;
+        for (const auto &item : keyCodes) {
+            keystrokeAbility[item] = false;
+        }
         return keystrokeAbility;
     }
     for (const auto& item : keyCodes) {
@@ -71,6 +73,25 @@ std::map<int32_t, bool> InputDeviceManager::GetKeystrokeAbility(int32_t deviceId
         keystrokeAbility[item] = ret;
     }
     return keystrokeAbility;
+}
+
+void InputDeviceManager::AddDevMonitor(SessionPtr sess, std::function<void(std::string, int32_t)> callback)
+{
+    CALL_LOG_ENTER;
+    auto iter = devMonitor_.find(sess);
+    if (iter == devMonitor_.end()) {
+        devMonitor_[sess] = callback;
+    }
+}
+
+void InputDeviceManager::RemoveDevMonitor(SessionPtr sess)
+{
+    CALL_LOG_ENTER;
+    auto iter = devMonitor_.find(sess);
+    if (iter == devMonitor_.end()) {
+        MMI_HILOGE("session does not exist");
+    }
+    devMonitor_.erase(iter);
 }
 
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)
@@ -88,6 +109,10 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)
         return;
     }
     inputDevice_[nextId_] = inputDevice;
+    for (const auto &item : devMonitor_) {
+        CHKPC(item.first);
+        item.second("add", nextId_);
+    }
     ++nextId_;
 
     if (IsPointerDevice(static_cast<struct libinput_device *>(inputDevice))) {
@@ -99,13 +124,18 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device* inputDevic
 {
     CALL_LOG_ENTER;
     CHKPV(inputDevice);
+    int32_t deviceId = INVALID_DEVICE_ID;
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second == inputDevice) {
+            deviceId = it->first;
             inputDevice_.erase(it);
             break;
         }
     }
-
+    for (const auto &item : devMonitor_) {
+        CHKPC(item.first);
+        item.second("remove", deviceId);
+    }
     ScanPointerDevice();
 }
 
