@@ -258,7 +258,7 @@ bool MouseEventHandler::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
     CHKPF(pointerEvent_);
     bool bHasPoinerDevice = InputDevMgr->HasPointerDevice();
     if (!bHasPoinerDevice) {
-        MMI_HILOGE("There hasn't any pointer device!");
+        MMI_HILOGE("There hasn't any pointer device");
         return false;
     }
     
