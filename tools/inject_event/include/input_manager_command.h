@@ -24,6 +24,8 @@ namespace OHOS {
 namespace MMI {
 class InputManagerCommand {
 public:
+    static constexpr int32_t BLOCK_TIME_MS = 16;
+public:
     InputManagerCommand() = default;
     DISALLOW_COPY_AND_MOVE(InputManagerCommand);
     int32_t ParseCommand(int32_t argc, char *argv[]);
@@ -31,6 +33,7 @@ public:
     void ShowUsage();
 private:
     void InitializeMouseDeathStub();
+    double CalcStep(int32_t a, int32_t b, int32_t t);
 };
 } // namespace MMI
 } // namespace OHOS
