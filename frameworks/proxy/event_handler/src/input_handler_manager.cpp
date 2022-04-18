@@ -82,10 +82,6 @@ void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 }
 void InputHandlerManager::MoveMouse(int32_t offsetX, int32_t offsetY)
 {
-    if (!MMIEventHdl.StartClient()) {
-        MMI_HILOGE("get mmi client is nullptr");
-        return;
-    }
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     NetPacket pkt(MmiMessageId::MOVE_MOUSE_BY_OFFSET);
