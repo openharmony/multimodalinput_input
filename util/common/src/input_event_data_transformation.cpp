@@ -524,11 +524,11 @@ int32_t InputEventDataTransformation::DeserializePointerItem(NetPacket &pkt, Poi
         return RET_ERR;
     }
     item.SetTiltY(fField);
-    if (!pkt.Read(tField)) {
+    if (!pkt.Read(fField)) {
         MMI_HILOGE("Packet read pressure failed");
         return RET_ERR;
     }
-    item.SetPressure(tField);
+    item.SetPressure(fField);
     if (!pkt.Read(tField)) {
         MMI_HILOGE("Packet read tool type failed");
         return RET_ERR;
