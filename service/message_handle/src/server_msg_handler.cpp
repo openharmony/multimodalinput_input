@@ -351,7 +351,7 @@ int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
 
-    if (MouseEventHdr->NormalizeMouseMove(offsetX, offsetY)) {
+    if (MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY)) {
         auto pointerEvent = MouseEventHdr->GetPointerEvent();
         eventDispatch_.HandlePointerEvent(pointerEvent);
     }
