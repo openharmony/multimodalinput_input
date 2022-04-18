@@ -56,23 +56,29 @@ public:
 
     void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
     {
-        if (keyMonitor_ != nullptr) {
-            keyMonitor_(keyEvent);
-        }
+        CHKPV(keyEvent);
+        CHKPV(keyMonitor_);
+        keyMonitor_(keyEvent);
     }
 
     void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
     {
-        if (monitor_ != nullptr) {
-            monitor_(pointerEvent);
-        }
+        CHKPV(pointerEvent);
+        CHKPV(monitor_);
+        monitor_(pointerEvent);
     }
 
-    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const { }
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const 
+    {
+        CHKPV(axisEvent);
+        CHKPV(axisMonitor_);
+        axisMonitor_(axisEvent);
+    }
 
 private:
     std::function<void(std::shared_ptr<PointerEvent>)> monitor_;
     std::function<void(std::shared_ptr<KeyEvent>)> keyMonitor_;
+    std::function<void(std::shared_ptr<AxisEvent>)> axisMonitor_;
 };
 
 bool InputManagerImpl::InitEventHandler()
@@ -448,6 +454,16 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
         return;
     }
     monitorManager_.MarkConsumed(monitorId, eventId);
+}
+
+void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
+{
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.StartClient()) {
+        MMI_HILOGE("get mmi client is nullptr");
+        return;
+    }
+    monitorManager_.MoveMouse(offsetX, offsetY);
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
