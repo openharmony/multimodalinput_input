@@ -77,7 +77,6 @@ public:
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
 
-
     /**
      * @brief Subscribes to the key input event that meets a specific condition. When such an event occurs,
      * the <b>callback</b> specified is invoked to process the event.
