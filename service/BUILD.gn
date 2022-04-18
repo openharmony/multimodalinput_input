@@ -47,6 +47,7 @@ config("libmmi_server_config") {
     "//foundation/multimodalinput/input/util/socket/include",
     "//foundation/multimodalinput/input/util/network/include",
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
+    "//third_party/cJSON",
   ]
 
   if (is_mmi_have_hdf) {
@@ -111,6 +112,7 @@ ohos_shared_library("libmmi-server") {
     "subscriber/src/key_option.cpp",
     "timer_manager/src/timer_manager.cpp",
     "touch_transform_point/src/gesture_transform_point_processor.cpp",
+    "touch_transform_point/src/tablet_tool_processor.cpp",
     "touch_transform_point/src/touch_transform_point_manager.cpp",
     "touch_transform_point/src/touch_transform_point_processor.cpp",
     "touch_transform_point/src/touchpad_transform_point_processor.cpp",
@@ -153,14 +155,12 @@ ohos_shared_library("libmmi-server") {
     "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler:libeventhandler",
     "//foundation/graphic/standard/rosen/modules/2d_graphics:2d_graphics",
     "//foundation/graphic/standard/rosen/modules/render_service_client:librender_service_client",
-    "//foundation/multimedia/image_standard:image_framework",
-    "//foundation/multimedia/image_standard/interfaces/innerkits:image",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
     "//foundation/multimodalinput/input/util:libmmi-util",
-    "//foundation/windowmanager/wm:libwm",
+    "//third_party/cJSON:cjson_static",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
@@ -177,8 +177,11 @@ ohos_shared_library("libmmi-server") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "utils_base:utils",
   ]
+
+  if (mmi_enable_pointer_drawing) {
+    external_deps += [ "window_manager:libwm" ]
+  }
 
   part_name = "input"
 }
@@ -276,6 +279,34 @@ ohos_unittest("ut-mmi-service-out") {
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
     "input_device_driver:hdi_input",
+    "utils_base:utils",
+  ]
+}
+
+ohos_unittest("TransformPointTest") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/tools/virtual_device_manager/include",
+  ]
+
+  sources = [ "touch_transform_point/test/transform_point_test.cpp" ]
+
+  cflags = [ "-DOHOS_BUILD" ]
+
+  if (is_mmi_have_debug) {
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  deps = [
+    "${mmi_path}/tools/virtual_device_manager:libmmi-virtual-device",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
     "utils_base:utils",
   ]
 }

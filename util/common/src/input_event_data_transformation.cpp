@@ -328,6 +328,14 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
             MMI_HILOGE("Packet write item height failed");
             return RET_ERR;
         }
+        if (!pkt.Write(item.GetTiltX())) {
+            MMI_HILOGE("Packet write item tiltX failed");
+            return RET_ERR;
+        }
+        if (!pkt.Write(item.GetTiltY())) {
+            MMI_HILOGE("Packet write item tiltY failed");
+            return RET_ERR;
+        }
         if (!pkt.Write(item.GetPressure())) {
             MMI_HILOGE("Packet write item pressure failed");
             return RET_ERR;
@@ -358,7 +366,7 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
         MMI_HILOGE("Deserialize input event failed");
         return RET_ERR;
     }
-    int32_t tField { 0 };
+    int32_t tField;
     if (!pkt.Read(tField)) {
         MMI_HILOGE("Packet read pointerAction failed");
         return RET_ERR;
@@ -379,12 +387,12 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
         return RET_ERR;
     }
     event->SetButtonId(tField);
-    uint32_t tAxes { 0 };
+    uint32_t tAxes;
     if (!pkt.Read(tAxes)) {
         MMI_HILOGE("Packet read axis failed");
         return RET_ERR;
     }
-    double axisValue { 0.0 };
+    double axisValue;
     if (PointerEvent::HasAxis(tAxes, PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)) {
         if (!pkt.Read(axisValue)) {
             MMI_HILOGE("Packet read vertical scroll axisValue failed");
@@ -407,7 +415,7 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
         event->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, axisValue);
     }
 
-    std::set<int32_t>::size_type nPressed {  };
+    std::set<int32_t>::size_type nPressed;
     if (!pkt.Read(nPressed)) {
         MMI_HILOGE("Packet read nPressed failed");
         return RET_ERR;
@@ -420,7 +428,7 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
         event->SetButtonPressed(tField);
     }
 
-    std::vector<int32_t>::size_type pointerCnt {  };
+    std::vector<int32_t>::size_type pointerCnt;
     if (!pkt.Read(pointerCnt)) {
         MMI_HILOGE("Packet read pointerCnt failed");
         return RET_ERR;
@@ -436,7 +444,7 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
     }
 
     std::vector<int32_t> pressedKeys;
-    std::vector<int32_t>::size_type pressedKeySize = 0;
+    std::vector<int32_t>::size_type pressedKeySize;
     if (!pkt.Read(pressedKeySize)) {
         MMI_HILOGE("Packet read pressedKeySize failed");
         return RET_ERR;
@@ -454,13 +462,13 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
 
 int32_t InputEventDataTransformation::DeserializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item)
 {
-    int32_t tField {  };
+    int32_t tField;
     if (!pkt.Read(tField)) {
         MMI_HILOGE("Packet read pointer failed");
         return RET_ERR;
     }
     item.SetPointerId(tField);
-    int64_t rField = 0;
+    int64_t rField;
     if (!pkt.Read(rField)) {
         MMI_HILOGE("Packet read downTime failed");
         return RET_ERR;
@@ -501,6 +509,17 @@ int32_t InputEventDataTransformation::DeserializePointerItem(NetPacket &pkt, Poi
         return RET_ERR;
     }
     item.SetHeight(tField);
+    double fField;
+    if (!pkt.Read(fField)) {
+        MMI_HILOGE("Packet read tiltX failed");
+        return RET_ERR;
+    }
+    item.SetTiltX(fField);
+    if (!pkt.Read(fField)) {
+        MMI_HILOGE("Packet read tiltY failed");
+        return RET_ERR;
+    }
+    item.SetTiltY(fField);
     if (!pkt.Read(tField)) {
         MMI_HILOGE("Packet read pressure failed");
         return RET_ERR;

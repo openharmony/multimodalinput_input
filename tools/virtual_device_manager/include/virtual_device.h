@@ -34,6 +34,7 @@ public:
     bool SetAbsResolution(const std::string deviceName);
     bool SetPhys(const std::string deviceName);
     bool SetUp();
+    void Close();
     static void CloseAllDevice(const std::vector<std::string>& fileList);
     static void StartAllDevices();
     static void MakeFolder(const std::string &filePath);

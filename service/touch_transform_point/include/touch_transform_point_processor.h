@@ -31,7 +31,7 @@ public:
     DISALLOW_COPY_AND_MOVE(TouchTransformPointProcessor);
     ~TouchTransformPointProcessor();
     std::shared_ptr<PointerEvent> OnLibinputTouchEvent(struct libinput_event *event);
-    void SetPointEventSource(int32_t sourceType);
+
 private:
     bool OnEventTouchDown(struct libinput_event *event);
     bool OnEventTouchMotion(struct libinput_event *event);
@@ -39,7 +39,6 @@ private:
 private:
     int32_t deviceId_ {0};
     std::shared_ptr<PointerEvent> pointerEvent_ = nullptr;
-    Direction direction_ {Direction0};
 };
 } // namespace MMI
 } // namespace OHOS
