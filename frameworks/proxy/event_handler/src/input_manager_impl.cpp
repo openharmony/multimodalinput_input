@@ -78,6 +78,7 @@ public:
 private:
     std::function<void(std::shared_ptr<PointerEvent>)> monitor_;
     std::function<void(std::shared_ptr<KeyEvent>)> keyMonitor_;
+    std::function<void(std::shared_ptr<AxisEvent>)> axisMonitor_;
 };
 
 bool InputManagerImpl::InitEventHandler()
