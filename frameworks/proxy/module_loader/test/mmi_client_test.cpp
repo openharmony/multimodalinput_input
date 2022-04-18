@@ -111,7 +111,7 @@ public:
                 return false;
             }
         }
-        int32_t logicalNum = GetRandomInt(2, 6);
+        int32_t logicalNum = GetRandomInt(5, 10);
         if (!pkt.Write(logicalNum)) {
             printf("write failed 3\n");
             return false;
@@ -119,7 +119,7 @@ public:
         for (auto i = 0; i < logicalNum; i++) {
             LogicalDisplayInfo logiclInfo = {};
             RandomLogicalInfo(i+1, logiclInfo);
-            int32_t windowsNum = GetRandomInt(2, 10);
+            int32_t windowsNum = GetRandomInt(5, 15);
             logiclInfo.focusWindowId = 100+windowsNum;
             if (!Write(logiclInfo, pkt)) {
                 printf("write failed 4\n");
@@ -270,13 +270,15 @@ HWTEST_F(MMIClientTest, BigPacketTest, TestSize.Level1)
     ASSERT_TRUE(MMIEventHdl.StartClient());
     auto client = MMIEventHdl.GetMMIClient();
     ASSERT_NE(client, nullptr);
-    const int32_t maxLimit = MMIClientUnitTest::GetRandomInt(500, 2000);
+    const int32_t pid = GetPid();
+    const int32_t maxLimit = MMIClientUnitTest::GetRandomInt(2000, 20000);
     for (auto i = 1; i <= maxLimit; i++) {
-        int32_t phyNum = MMIClientUnitTest::GetRandomInt(1, 10);
+        int32_t phyNum = MMIClientUnitTest::GetRandomInt(5, 10);
         NetPacket pkt(MmiMessageId::BIGPACKET_TEST);
-        pkt << i;
+        pkt << pid << i;
         ASSERT_TRUE(MMIClientUnitTest::RandomDisplayPacket(pkt, phyNum));
         EXPECT_TRUE(client->SendMessage(pkt));
+        printf("max:%d id:%d size:%zu\n", maxLimit, i, pkt.Size());
     }
 }
 #endif // OHOS_BUILD_MMI_DEBUG

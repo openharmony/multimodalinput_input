@@ -38,8 +38,7 @@ public:
     DISALLOW_MOVE(StreamBuffer);
     
     void Clean();
-    bool SetReadIdx(int32_t idx);
-    bool MoveReadIdx(int32_t n);
+    bool SeekReadPos(int32_t n);
 
     bool Read(std::string& buf);
     bool Write(const std::string& buf);
@@ -53,7 +52,7 @@ public:
     bool IsEmpty() const;
     size_t Size() const;
     int32_t UnreadSize() const;
-    int32_t AvailableSize() const;
+    int32_t GetAvailableSize() const;
 
     bool ChkRWError() const;
     const std::string& GetErrorStatusRemark() const;
@@ -85,8 +84,8 @@ protected:
     int32_t rCount_ = 0;
     int32_t wCount_ = 0;
 
-    int32_t rIdx_ = 0;
-    int32_t wIdx_ = 0;
+    int32_t rPos_ = 0;
+    int32_t wPos_ = 0;
     char szBuff_[MAX_STREAM_BUF_SIZE+1] = {};
 };
 
