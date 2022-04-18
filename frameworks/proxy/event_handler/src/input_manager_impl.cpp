@@ -68,7 +68,12 @@ public:
         }
     }
 
-    void OnInputEvent(std::shared_ptr<AxisEvent>& axisEvent) const { }
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const 
+    {
+        if (axisMonitor_ != nullptr) {
+            axisMonitor_(axisEvent);
+        }
+    }
 
 private:
     std::function<void(std::shared_ptr<PointerEvent>)> monitor_;
