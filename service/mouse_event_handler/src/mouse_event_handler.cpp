@@ -256,17 +256,17 @@ bool MouseEventHandler::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
 {
     CALL_LOG_ENTER;
     CHKPF(pointerEvent_);
-    bool bHavePoinerDevice = InputDevMgr->HasPointerDevice();
-    if (!bHavePoinerDevice) {
+    bool bHasPoinerDevice = InputDevMgr->HasPointerDevice();
+    if (!bHasPoinerDevice) {
         MMI_HILOGD("There hasn't any pointer device!"),
         return false;
     }
     
     PointerEvent::PointerItem pointerItem;
-    HandleMotionMouseMove(offsetX, offsetY);
-    HandlePostMouseMove(pointerItem);
+    HandleMotionMoveMouse(offsetX, offsetY);
+    HandlePostMoveMouse(pointerItem);
     DumpInner();
-    return bHavePoinerDevice;
+    return bHasPoinerDevice;
 }
 
 void MouseEventHandler::DumpInner()
