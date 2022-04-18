@@ -92,7 +92,7 @@ void InputDeviceManager::RemoveDevMonitor(SessionPtr sess)
     devMonitor_.erase(iter);
 }
 
-bool InputDeviceManager::ThereIsHavePointerDevice()
+bool InputDeviceManager::HasPointerDevice()
 {
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (IsPointerDevice(it->second)) {
