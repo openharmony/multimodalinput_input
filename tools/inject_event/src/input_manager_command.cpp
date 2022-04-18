@@ -21,6 +21,7 @@
 #include <ctime>
 #include <iostream>
 #include <thread>
+#include <limits>
 #include <algorithm>
 #include <unistd.h>
 #include <sys/time.h>
@@ -53,6 +54,16 @@ constexpr int32_t MAX_PRESSED_COUNT = 30;
 constexpr int32_t ACTION_TIME = 3000;
 constexpr int32_t DOUBLE_ACTION_TIME = 6000;
 } // namespace
+
+double InputManagerCommand::CalcStep(int32_t a, int32_t b, int32_t t)
+{
+    double t1 = t / BLOCK_TIME_MS;
+    double delta = 0;
+    if ((std::numeric_limits<double>::min)() < t1  && t1 < (std::numeric_limits<double>::max)()) {
+        delta = (b - a) / t1;
+    }
+    return delta;
+}
 
 int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 {
@@ -482,26 +493,22 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                            const int32_t blockTimeMs = 16;
-                            double numberTimes = totalTimeMs / blockTimeMs;
-                            int32_t vecX = px2 - px1;
-                            int32_t vecY = py2 - py1;
-                            const double minDouble = -0.00001;
-                            const double maxDouble = 0.00001;
-                            double stepX = (vecX == 0 || (numberTimes > minDouble && numberTimes < maxDouble) ?
-                                px1 : (vecX / numberTimes));
-                            double stepY = (vecY == 0 || (numberTimes > minDouble && numberTimes < maxDouble) ?
-                                py1 : (vecY / numberTimes));
-                            const int32_t thousand = 1000;
-                            for (double i = 1; i <= numberTimes; ++i) {
-                                vecX == 0 ? item.SetGlobalX(px1) : item.SetGlobalX(px1 + (stepX * i));
-                                vecY == 0 ? item.SetGlobalY(py1) : item.SetGlobalY(py1 + (stepY * i));
-                                pointerEvent->SetActionTime(time + ((blockTimeMs / thousand) * i));
+
+                            const double stepX = CalcStep(px1, px2, totalTimeMs);
+                            const double stepY = CalcStep(py1, py2, totalTimeMs);
+                            const int32_t ceilTotalTimeMs = (totalTimeMs + BLOCK_TIME_MS - 1) / BLOCK_TIME_MS * BLOCK_TIME_MS;
+                            int32_t tempTimeMs = 0;
+                            while (tempTimeMs < ceilTotalTimeMs) {
+                                item.SetGlobalX(static_cast<int32_t>(px1 + stepX));
+                                item.SetGlobalY(static_cast<int32_t>(py1 + stepY));
+                                pointerEvent->SetActionTime(time + BLOCK_TIME_MS * 1000);
                                 pointerEvent->UpdatePointerItem(0, item);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                                std::this_thread::sleep_for(std::chrono::milliseconds(blockTimeMs));
+                                std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
+                                tempTimeMs += BLOCK_TIME_MS;
                             }
+
                             item.SetGlobalX(px2);
                             item.SetGlobalY(py2);
                             pointerEvent->SetActionTime(time + totalTimeMs);
