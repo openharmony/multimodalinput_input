@@ -1608,7 +1608,7 @@ void InputEventInterceptor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEv
         }
 
         MMI_HILOGD("downTime:%{public}" PRId64 ",isPressed:%{public}s,"
-                   "globalX:%{public}d,globalY:%{public}d,pressure:%{public}d",
+                   "globalX:%{public}d,globalY:%{public}d,pressure:%{public}lf",
                    item.GetDownTime(),
                    item.IsPressed() ? "true" : "false",
                    item.GetGlobalX(),
