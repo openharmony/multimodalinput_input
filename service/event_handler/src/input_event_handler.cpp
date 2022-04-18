@@ -467,7 +467,7 @@ int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEv
     }
     MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
                "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
-               "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,Device:%{public}d",
+               "Width:%{public}d,Height:%{public}d,Pressure:%{public}lf,Device:%{public}d",
                item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
                item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
                item.GetDeviceId());

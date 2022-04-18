@@ -225,7 +225,7 @@ void MouseEventHandler::DumpInner()
         return;
     }
     MMI_HILOGD("Item: DownTime:%{public}" PRId64 ",IsPressed:%{public}s,GlobalX:%{public}d,GlobalY:%{public}d,"
-        "Width:%{public}d,Height:%{public}d,Pressure:%{public}d",
+        "Width:%{public}d,Height:%{public}d,Pressure:%{public}lf",
         item.GetDownTime(), (item.IsPressed() ? "true" : "false"), item.GetGlobalX(), item.GetGlobalY(),
         item.GetWidth(), item.GetHeight(), item.GetPressure());
 }
