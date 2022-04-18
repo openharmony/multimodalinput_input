@@ -63,6 +63,7 @@ void ClientMsgHandler::Init()
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ClientMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ClientMsgHandler::OnInputDeviceIds, this)},
         {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ClientMsgHandler::OnKeyList, this)},
+        {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnDevMonitor, this)},
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
         {MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::TouchpadEventInterceptor, this)},
@@ -290,16 +291,39 @@ int32_t ClientMsgHandler::OnKeyList(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Packet read userData failed");
         return RET_ERR;
     }
-    int32_t ret;
-    std::vector<int32_t> abilityRet;
-    for (size_t i = 0; i < size; ++i) {
-        if (!pkt.Read(ret)) {
-            MMI_HILOGE("Packet read userData failed");
+    int32_t keyCode;
+    int32_t isSupport;
+    std::map<int32_t, bool> abilityRet;
+    for (size_t i = 0; i < size;) {
+        if (!pkt.Read(keyCode)) {
+            MMI_HILOGE("Packet read keyCode failed");
             return RET_ERR;
         }
-        abilityRet.push_back(ret);
+        if (!pkt.Read(isSupport)) {
+            MMI_HILOGE("Packet read isSupport failed");
+            return RET_ERR;
+        }
+        abilityRet[keyCode] = isSupport == 1 ? true : false;
+        i += 2;
     }
     InputDeviceImpl::GetInstance().OnKeystrokeAbility(userData, abilityRet);
+    return RET_OK;
+}
+
+int32_t ClientMsgHandler::OnDevMonitor(const UDSClient& client, NetPacket& pkt)
+{
+    CALL_LOG_ENTER;
+    std::string type;
+    if (!pkt.Read(type)) {
+        MMI_HILOGE("Packet read userData failed");
+        return RET_ERR;
+    }
+    int32_t deviceId;
+    if (!pkt.Read(deviceId)) {
+        MMI_HILOGE("Packet read userData failed");
+        return RET_ERR;
+    }
+    InputDeviceImpl::GetInstance().OnDevMonitor(type, deviceId);
     return RET_OK;
 }
 
