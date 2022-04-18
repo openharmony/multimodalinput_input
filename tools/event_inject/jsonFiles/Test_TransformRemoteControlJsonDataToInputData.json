@@ -1,0 +1,19 @@
+ [
+    {
+     "deviceName": "remoteControl", 
+     "events":[
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 1},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 96},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 102},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 103},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 105},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 106},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 108},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 114},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 115},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 116},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 130},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 138}
+            ]
+    }
+]
