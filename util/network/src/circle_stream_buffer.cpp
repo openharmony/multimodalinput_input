@@ -16,15 +16,13 @@
 
 namespace OHOS {
 namespace MMI {
-void CircleStreamBuffer::MoveMemoryToBegin()
+void CircleStreamBuffer::CopyDataToBegin()
 {
     int32_t unreadSize = UnreadSize();
     if (unreadSize > 0 && rPos_ > 0) {
         int32_t idx = 0;
         for (int32_t i = rPos_; i <= wPos_; i++) {
-            szBuff_[idx] = szBuff_[i];
-            szBuff_[i] = '\0';
-            idx++;
+            szBuff_[idx++] = szBuff_[i];
         }
     }
     MMI_HILOGD("unreadSize:%{public}d rPos:%{public}d wPos:%{public}d", unreadSize, rPos_, wPos_);
@@ -34,10 +32,10 @@ void CircleStreamBuffer::MoveMemoryToBegin()
 
 bool CircleStreamBuffer::CheckWrite(size_t size)
 {
-    int32_t aviSize = GetAvailableSize();
+    int32_t aviSize = GetAvailableBufSize();
     if (size > aviSize && rPos_ > 0) {
-        MoveMemoryToBegin();
-        aviSize = GetAvailableSize();
+        CopyDataToBegin();
+        aviSize = GetAvailableBufSize();
     }
     return (aviSize >= size);
 }
@@ -47,7 +45,7 @@ bool CircleStreamBuffer::Write(const char *buf, size_t size)
     if (!CheckWrite(size)) {
         MMI_HILOGE("Out of buffer memory, availableSize:%{public}d, size:%{public}zu,"
             "unreadSize:%{public}d, rPos:%{public}d, wPos:%{public}d",
-            GetAvailableSize(), size, UnreadSize(), rPos_, wPos_);
+            GetAvailableBufSize(), size, UnreadSize(), rPos_, wPos_);
         return false;
     }
     return StreamBuffer::Write(buf, size);

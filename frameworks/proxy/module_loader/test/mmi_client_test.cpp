@@ -19,9 +19,11 @@
 
 #ifdef OHOS_BUILD_MMI_DEBUG
 #include <chrono>
+#include <cinttypes>
 #include <random>
 #include "display_info.h"
 #include "multimodal_event_handler.h"
+#include "util.h"
 #endif // OHOS_BUILD_MMI_DEBUG
 
 namespace OHOS {
@@ -33,8 +35,16 @@ using namespace OHOS::MMI;
 
 class MMIClientTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {}
-    static void TearDownTestCase(void) {}
+    static void SetUpTestCase(void)
+    {
+        printf("MMIClientTest::SetUpTestCase...\n");
+        std::cout << "SetUpTestCase" << std::endl;
+    }
+    static void TearDownTestCase(void)
+    {
+        printf("MMIClientTest::TearDownTestCase...\n");
+        std::cout << "TearDownTestCase" << std::endl;
+    }
 };
 
 class MMIClientUnitTest : public MMIClient {
@@ -271,15 +281,18 @@ HWTEST_F(MMIClientTest, BigPacketTest, TestSize.Level1)
     auto client = MMIEventHdl.GetMMIClient();
     ASSERT_NE(client, nullptr);
     const int32_t pid = GetPid();
-    const int32_t maxLimit = MMIClientUnitTest::GetRandomInt(2000, 20000);
+    const int32_t maxLimit = MMIClientUnitTest::GetRandomInt(1000, 2000);
+    auto beginTime = GetSysClockTime();
+    printf(" begin: maxLimit:%d beginTime:%" PRId64 "\n", maxLimit, beginTime);
     for (auto i = 1; i <= maxLimit; i++) {
         int32_t phyNum = MMIClientUnitTest::GetRandomInt(5, 10);
         NetPacket pkt(MmiMessageId::BIGPACKET_TEST);
         pkt << pid << i;
         ASSERT_TRUE(MMIClientUnitTest::RandomDisplayPacket(pkt, phyNum));
         EXPECT_TRUE(client->SendMessage(pkt));
-        printf("max:%d id:%d size:%zu\n", maxLimit, i, pkt.Size());
     }
+    auto endTime = GetSysClockTime();
+    printf(" end: endTime:%" PRId64 " D-Value:%" PRId64 "\n", endTime, (endTime - beginTime));
 }
 #endif // OHOS_BUILD_MMI_DEBUG
 } // namespace MMI

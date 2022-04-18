@@ -25,7 +25,7 @@ public:
     virtual ~CircleStreamBuffer() = default;
     DISALLOW_MOVE(CircleStreamBuffer);
 
-    void MoveMemoryToBegin();
+    void CopyDataToBegin();
     bool CheckWrite(size_t size);
     virtual bool Write(const char *buf, size_t size) override;
 };

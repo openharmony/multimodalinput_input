@@ -135,7 +135,7 @@ bool StreamBuffer::Write(const char *buf, size_t size)
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
-    errno_t ret = memcpy_sp(&szBuff_[wPos_], GetAvailableSize(), buf, size);
+    errno_t ret = memcpy_sp(&szBuff_[wPos_], GetAvailableBufSize(), buf, size);
     if (ret != EOK) {
         MMI_HILOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
@@ -168,7 +168,7 @@ int32_t StreamBuffer::UnreadSize() const
     return (wPos_ - rPos_);
 }
 
-int32_t StreamBuffer::GetAvailableSize() const
+int32_t StreamBuffer::GetAvailableBufSize() const
 {
     if (wPos_ > MAX_STREAM_BUF_SIZE) {
         return 0;

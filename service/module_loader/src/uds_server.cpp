@@ -244,8 +244,7 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
         free(ev.data.ptr);
         ev.data.ptr = nullptr;
     }
-    auto it = circleBufMap_.find(fd);
-    if (it != circleBufMap_.end()) {
+    if (auto it = circleBufMap_.find(fd); it != circleBufMap_.end()) {
         circleBufMap_.erase(it);
     }
     close(fd);
