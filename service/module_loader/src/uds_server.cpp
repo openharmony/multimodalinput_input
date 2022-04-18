@@ -272,7 +272,7 @@ void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
             DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
 #endif
             if (!buf.Write(szBuf, size)) {
-                MMI_HILOGE("Write data faild. size:%{public}zu", size);
+                MMI_HILOGW("Write data faild. size:%{public}zu", size);
             }
             OnReadPackets(buf, std::bind(&UDSServer::OnPacket, this, fd, std::placeholders::_1));
         } else if (size < 0) {

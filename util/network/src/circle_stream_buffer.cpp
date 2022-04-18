@@ -20,9 +20,9 @@ void CircleStreamBuffer::CopyDataToBegin()
 {
     int32_t unreadSize = UnreadSize();
     if (unreadSize > 0 && rPos_ > 0) {
-        int32_t idx = 0;
-        for (int32_t i = rPos_; i <= wPos_; i++) {
-            szBuff_[idx++] = szBuff_[i];
+        int32_t pos = 0;
+        for (int32_t i = rPos_; i <= wPos_;) {
+            szBuff_[pos++] = szBuff_[i++];
         }
     }
     MMI_HILOGD("unreadSize:%{public}d rPos:%{public}d wPos:%{public}d", unreadSize, rPos_, wPos_);
@@ -32,12 +32,12 @@ void CircleStreamBuffer::CopyDataToBegin()
 
 bool CircleStreamBuffer::CheckWrite(size_t size)
 {
-    int32_t aviSize = GetAvailableBufSize();
-    if (size > aviSize && rPos_ > 0) {
+    int32_t availSize = GetAvailableBufSize();
+    if (size > availSize && rPos_ > 0) {
         CopyDataToBegin();
-        aviSize = GetAvailableBufSize();
+        availSize = GetAvailableBufSize();
     }
-    return (aviSize >= size);
+    return (availSize >= size);
 }
 
 bool CircleStreamBuffer::Write(const char *buf, size_t size)
