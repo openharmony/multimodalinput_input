@@ -25,9 +25,11 @@ public:
     virtual ~CircleStreamBuffer() = default;
     DISALLOW_MOVE(CircleStreamBuffer);
 
-    void CopyDataToBegin();
     bool CheckWrite(size_t size);
     virtual bool Write(const char *buf, size_t size) override;
+
+protected:
+    void CopyDataToBegin();
 };
 } // namespace MMI
 } // namespace OHOS

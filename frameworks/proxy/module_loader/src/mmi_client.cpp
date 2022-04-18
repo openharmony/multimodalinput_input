@@ -177,7 +177,7 @@ void MMIClient::OnRecvMsg(const char *buf, size_t size)
         return;
     }
     if (!circBuf_.Write(buf, size)) {
-        MMI_HILOGE("Write data faild. size:%{public}zu", size);
+        MMI_HILOGW("Write data faild. size:%{public}zu", size);
     }
     OnReadPackets(circBuf_, std::bind(&MMIClient::OnPacket, this, std::placeholders::_1));
 }
