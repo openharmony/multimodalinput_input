@@ -100,7 +100,7 @@ bool UDSClient::StartClient(MsgClientFunCallback fun)
 {
     CALL_LOG_ENTER;
     if (isRunning_ || isConnected_) {
-        MMI_HILOGE("Client is connected or started.");
+        MMI_HILOGE("Client is connected or started");
         return false;
     }
     isExit = false;
