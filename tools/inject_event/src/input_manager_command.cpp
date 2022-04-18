@@ -496,12 +496,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
                             const double stepX = CalcStep(px1, px2, totalTimeMs);
                             const double stepY = CalcStep(py1, py2, totalTimeMs);
-                            const int32_t ceilTotalTimeMs = (totalTimeMs + BLOCK_TIME_MS - 1) / BLOCK_TIME_MS * BLOCK_TIME_MS;
+                            const int32_t ceilTotalTimeMs = (totalTimeMs + BLOCK_TIME_MS - 1) /
+                                BLOCK_TIME_MS * BLOCK_TIME_MS;
                             int32_t tempTimeMs = 0;
+                            const int32_t thousand = 1000;
                             while (tempTimeMs < ceilTotalTimeMs) {
                                 item.SetGlobalX(static_cast<int32_t>(px1 + stepX));
                                 item.SetGlobalY(static_cast<int32_t>(py1 + stepY));
-                                pointerEvent->SetActionTime(time + BLOCK_TIME_MS * 1000);
+                                pointerEvent->SetActionTime(time + BLOCK_TIME_MS * thousand);
                                 pointerEvent->UpdatePointerItem(0, item);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
