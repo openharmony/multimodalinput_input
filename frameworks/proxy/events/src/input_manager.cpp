@@ -48,7 +48,13 @@ int32_t InputManager::AddInputEventFilter(std::function<bool(std::shared_ptr<Poi
 
 void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
 {
-    InputMgrImpl->SetWindowInputEventConsumer(inputEventConsumer);
+    InputMgrImpl->SetWindowInputEventConsumer(inputEventConsumer, nullptr);
+}
+
+void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+{
+    InputMgrImpl->SetWindowInputEventConsumer(inputEventConsumer, eventHandler);
 }
 
 int32_t InputManager::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
