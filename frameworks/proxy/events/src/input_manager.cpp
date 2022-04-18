@@ -107,10 +107,6 @@ void InputManager::RemoveInterceptor(int32_t interceptorId)
     InputMgrImpl->RemoveInterceptor(interceptorId);
 }
 
-void InputManager::MoveMouse(int32_t offsetX, int32_t offsetY)
-{
-    InputMgrImpl->MoveMouse(offsetX, offsetY);
-}
 void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     InputMgrImpl->SimulateInputEvent(keyEvent);
