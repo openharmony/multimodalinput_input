@@ -210,7 +210,7 @@ void MouseEventHandler::Normalize(struct libinput_event *event)
     DumpInner();
 }
 
-void MouseEventHandler::HandleMotionMouseMove(int32_t offsetX, int32_t offsetY)
+void MouseEventHandler::HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY)
 {
     CALL_LOG_ENTER;
     CHKPV(pointerEvent_);
@@ -221,7 +221,7 @@ void MouseEventHandler::HandleMotionMouseMove(int32_t offsetX, int32_t offsetY)
     WinMgr->UpdateAndAdjustMouseLoction(absolutionX_, absolutionY_);
 }
 
-void MouseEventHandler::HandlePostMouseMove(PointerEvent::PointerItem& pointerItem)
+void MouseEventHandler::HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem)
 {
     CALL_LOG_ENTER;
     auto mouseInfo = WinMgr->GetMouseInfo();
@@ -252,7 +252,7 @@ void MouseEventHandler::HandlePostMouseMove(PointerEvent::PointerItem& pointerIt
     pointerEvent_->SetAgentWindowId(-1);
 }
 
-bool MouseEventHandler::NormalizeMouseMove(int32_t offsetX, int32_t offsetY)
+bool MouseEventHandler::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
 {
     CALL_LOG_ENTER;
     CHKPF(pointerEvent_);
