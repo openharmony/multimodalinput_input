@@ -35,13 +35,15 @@ public:
     DISALLOW_COPY_AND_MOVE(JsInputMonitorManager);
     ~JsInputMonitorManager() = default;
 
-    void AddMonitor(napi_env jsEnv, napi_value callback);
+    void AddMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback);
 
-    void RemoveMonitor(napi_env jsEnv, napi_value callback);
+    void RemoveMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback);
+
+    void RemoveMonitor(napi_env jsEnv, const std::string &typeName);
 
     void RemoveMonitor(napi_env jsEnv);
 
-    std::shared_ptr<JsInputMonitor> GetMonitor(int32_t id);
+    const std::unique_ptr<JsInputMonitor>& GetMonitor(int32_t id);
 
     bool AddEnv(napi_env env, napi_callback_info cbInfo);
 
@@ -58,7 +60,7 @@ private:
 private:
     int32_t nextId_ {0};
     std::mutex mutex_;
-    std::list<std::shared_ptr<JsInputMonitor>> monitors_;
+    std::list<std::unique_ptr<JsInputMonitor>> monitors_;
     std::map<napi_env, napi_ref> envManager_;
 };
 

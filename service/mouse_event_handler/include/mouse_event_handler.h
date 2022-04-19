@@ -35,11 +35,14 @@ public:
 
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
     void Normalize(struct libinput_event *event);
+    bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 private:
     void HandleMotionInner(libinput_event_pointer* data);
     void HandleButonInner(libinput_event_pointer* data);
     void HandleAxisInner(libinput_event_pointer* data);
     void HandlePostInner(libinput_event_pointer* data, int32_t deviceId, PointerEvent::PointerItem& pointerItem);
+    void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
+    void HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem);
     void DumpInner();
     void InitAbsolution();
 
