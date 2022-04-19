@@ -72,6 +72,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     int32_t toolType = -1;
     int32_t ret = GetTouchToolType(event, toolType);
     if (ret != RET_OK) {
+        MMI_HILOGE("GetTouchToolType failed");
         return false;
     }
     item.SetToolType(toolType);
@@ -204,6 +205,7 @@ int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_event *ev
         }
         default : {
             toolType = PointerEvent::TOOL_TYPE_FINGER;
+            MMI_HILOGD("Unknown tool type, identified as finger, toolType:%{public}d", toolTypeTmp);
             return RET_OK;
         }
     }
@@ -237,6 +239,7 @@ void TouchTransformPointProcessor::GetTouchToolType(struct libinput_device *devi
         return;
     } else {
         toolType = PointerEvent::TOOL_TYPE_FINGER;
+        MMI_HILOGD("Unknown Btn tool type, identified as finger");
         return;
     }
 }
