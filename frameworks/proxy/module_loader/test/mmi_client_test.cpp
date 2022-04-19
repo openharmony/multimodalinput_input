@@ -269,7 +269,7 @@ HWTEST_F(MMIClientTest, Re_OnDisconnected_002, TestSize.Level1)
 #ifdef OHOS_BUILD_MMI_DEBUG
 HWTEST_F(MMIClientTest, BigPacketTest, TestSize.Level1)
 {
-    ASSERT_TRUE(MMIEventHdl.StartClient());
+    ASSERT_TRUE(MMIEventHdl.InitClient());
     auto client = MMIEventHdl.GetMMIClient();
     ASSERT_NE(client, nullptr);
     const int32_t pid = GetPid();
