@@ -24,8 +24,6 @@ namespace OHOS {
 namespace MMI {
 class InputManagerCommand {
 public:
-    static constexpr int32_t BLOCK_TIME_MS = 16;
-public:
     InputManagerCommand() = default;
     DISALLOW_COPY_AND_MOVE(InputManagerCommand);
     int32_t ParseCommand(int32_t argc, char *argv[]);

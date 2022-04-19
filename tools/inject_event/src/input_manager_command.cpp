@@ -54,6 +54,7 @@ constexpr int32_t THREE_MORE_COMMAND = 3;
 constexpr int32_t MAX_PRESSED_COUNT = 30;
 constexpr int32_t ACTION_TIME = 3000;
 constexpr int32_t DOUBLE_ACTION_TIME = 6000;
+static constexpr int32_t BLOCK_TIME_MS = 16;
 } // namespace
 
 int32_t InputManagerCommand::NextPos(int32_t begPos, int32_t endPos, int32_t begTime, int32_t endTime, int32_t curTime)
