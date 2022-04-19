@@ -349,13 +349,6 @@ int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH_PAD);
     CHKPR(pointerEvent, RET_ERR);
-    MMI_HILOGD("Pointer event dispatcher of server:");
-    std::stringstream sStream;
-    sStream << *pointerEvent;
-    std::string sLine;
-    while (std::getline(sStream, sLine)) {
-        MMI_HILOGD("%{public}s", sLine.c_str());
-    }
     eventDispatch_.HandlePointerEvent(pointerEvent);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
