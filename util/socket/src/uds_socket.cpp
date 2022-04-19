@@ -119,7 +119,7 @@ void UDSSocket::OnReadPackets(CircleStreamBuffer& circBuf, UDSSocket::PacketCall
         if (unreadSize < headSize) {
             break;
         }
-        const int32_t dataSize = unreadSize - headSize;
+        int32_t dataSize = unreadSize - headSize;
         char *buf = const_cast<char *>(circBuf.ReadBuf());
         CHKPB(buf);
         PackHead *head = reinterpret_cast<PackHead *>(buf);
@@ -138,8 +138,13 @@ void UDSSocket::OnReadPackets(CircleStreamBuffer& circBuf, UDSSocket::PacketCall
             MMI_HILOGE("write packet faild. dataSize:%{public}d", dataSize);
             break;
         }
+        if (!circBuf.SeekReadPos(pkt.GetPacketLength())) {
+            MMI_HILOGF("seek read postion error. packetSize:%{public}d unreadSize:%{public}d",
+                pkt.GetPacketLength(), unreadSize);
+            circBuf.Clean();
+            break;
+        }
         callbackFun(pkt);
-        circBuf.SeekReadPos(pkt.GetPacketLength());
     }
 }
 
