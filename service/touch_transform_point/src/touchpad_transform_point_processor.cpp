@@ -145,6 +145,13 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
     }
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent_->UpdateId();
+    MMI_HILOGD("Pointer event dispatcher of server:");
+    std::stringstream sStream;
+    sStream << *pointerEvent;
+    std::string sLine;
+    while (std::getline(sStream, sLine)) {
+        MMI_HILOGD("%{public}s", sLine.c_str());
+    }
     return pointerEvent_;
 }
 } // namespace MMI
