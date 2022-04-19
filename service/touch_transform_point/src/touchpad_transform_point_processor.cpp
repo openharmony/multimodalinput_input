@@ -84,7 +84,6 @@ void TouchPadTransformPointProcessor::OnEventTouchPadMotion(struct libinput_even
     }
     auto pressure = libinput_event_touchpad_get_pressure(data);
     item.SetPressure(pressure);
-    MMI_HILOGD("pressure:%{public}lf", pressure);
     item.SetGlobalX(static_cast<int32_t>(logicalX));
     item.SetGlobalY(static_cast<int32_t>(logicalY));
     pointerEvent_->UpdatePointerItem(seatSlot, item);
@@ -114,7 +113,6 @@ void TouchPadTransformPointProcessor::OnEventTouchPadUp(struct libinput_event *e
     item.SetPressed(false);
     auto pressure = libinput_event_touchpad_get_pressure(data);
     item.SetPressure(pressure);
-    MMI_HILOGD("pressure:%{public}lf", pressure);
     item.SetGlobalX(static_cast<int32_t>(logicalX));
     item.SetGlobalY(static_cast<int32_t>(logicalY));
     pointerEvent_->UpdatePointerItem(seatSlot, item);
