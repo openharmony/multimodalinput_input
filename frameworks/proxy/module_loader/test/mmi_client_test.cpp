@@ -35,16 +35,8 @@ using namespace OHOS::MMI;
 
 class MMIClientTest : public testing::Test {
 public:
-    static void SetUpTestCase(void)
-    {
-        printf("MMIClientTest::SetUpTestCase...\n");
-        std::cout << "SetUpTestCase" << std::endl;
-    }
-    static void TearDownTestCase(void)
-    {
-        printf("MMIClientTest::TearDownTestCase...\n");
-        std::cout << "TearDownTestCase" << std::endl;
-    }
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
 };
 
 class MMIClientUnitTest : public MMIClient {

@@ -50,4 +50,3 @@ ohos_executable("mmi-server") {
   install_enable = true
   part_name = "input"
 }
-

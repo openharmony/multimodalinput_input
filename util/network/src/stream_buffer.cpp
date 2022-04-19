@@ -50,6 +50,8 @@ bool StreamBuffer::SeekReadPos(int32_t n)
 {
     int32_t pos = rPos_ + n;
     if (pos < 0 || pos > wPos_) {
+        MMI_HILOGE("The position in the calculation is not as expected. pos:%{public}d [0, %{public}d]",
+            pos, wPos_);
         return false;
     }
     rPos_ = pos;
@@ -148,10 +150,7 @@ bool StreamBuffer::Write(const char *buf, size_t size)
 
 bool StreamBuffer::IsEmpty() const
 {
-    if ((rPos_ == wPos_) && (wPos_ == 0)) {
-        return true;
-    }
-    return false;
+    return (rPos_ == wPos_);
 }
 
 size_t StreamBuffer::Size() const
@@ -161,19 +160,12 @@ size_t StreamBuffer::Size() const
 
 int32_t StreamBuffer::UnreadSize() const
 {
-    if (wPos_ < rPos_) {
-        MMI_HILOGW("wPos less than rPos, wPos:%{public}d,rPos:%{public}d", wPos_, rPos_);
-        return 0;
-    }
-    return (wPos_ - rPos_);
+    return ((wPos_ <= rPos_) ? 0 : (wPos_ - rPos_));
 }
 
 int32_t StreamBuffer::GetAvailableBufSize() const
 {
-    if (wPos_ > MAX_STREAM_BUF_SIZE) {
-        return 0;
-    }
-    return (MAX_STREAM_BUF_SIZE - wPos_);
+    return ((wPos_ >= MAX_STREAM_BUF_SIZE) ? 0 : (MAX_STREAM_BUF_SIZE - wPos_));
 }
 
 bool StreamBuffer::ChkRWError() const
