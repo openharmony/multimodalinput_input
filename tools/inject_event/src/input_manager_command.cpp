@@ -16,6 +16,7 @@
 #include "input_manager_command.h"
 
 #include <chrono>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -55,14 +56,15 @@ constexpr int32_t ACTION_TIME = 3000;
 constexpr int32_t DOUBLE_ACTION_TIME = 6000;
 } // namespace
 
-double InputManagerCommand::CalcStep(int32_t a, int32_t b, int32_t t)
+int32_t InputManagerCommand::NextPos(int32_t begPos, int32_t endPos, int32_t begTime, int32_t endTime, int32_t curTime)
 {
-    double t1 = t / BLOCK_TIME_MS;
-    double delta = 0;
-    if ((std::numeric_limits<double>::min)() < t1  && t1 < (std::numeric_limits<double>::max)()) {
-        delta = (b - a) / t1;
+    int32_t deltaTime = (endTime - begTime + BLOCK_TIME_MS - 1) / BLOCK_TIME_MS;
+    int32_t nTimes =  (curTime - begTime + BLOCK_TIME_MS - 1) / BLOCK_TIME_MS;
+    int32_t retPos = begPos;
+    if (deltaTime != 0) {
+        retPos = static_cast<int32_t>(std::ceil(begPos + 1.0f * (endPos - begPos) * nTimes / deltaTime));
     }
-    return delta;
+    return retPos;
 }
 
 int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
@@ -489,31 +491,27 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetGlobalY(py1);
                             pointerEvent->SetPointerId(0);
                             pointerEvent->AddPointerItem(item);
-                            int64_t time = pointerEvent->GetActionStartTime();
+                            int64_t startTime = pointerEvent->GetActionStartTime();
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-                            const double stepX = CalcStep(px1, px2, totalTimeMs);
-                            const double stepY = CalcStep(py1, py2, totalTimeMs);
-                            const int32_t ceilTotalTimeMs = (totalTimeMs + BLOCK_TIME_MS - 1) /
-                                BLOCK_TIME_MS * BLOCK_TIME_MS;
-                            int32_t tempTimeMs = 0;
-                            const int32_t thousand = 1000;
-                            while (tempTimeMs < ceilTotalTimeMs) {
-                                item.SetGlobalX(static_cast<int32_t>(px1 + stepX));
-                                item.SetGlobalY(static_cast<int32_t>(py1 + stepY));
-                                pointerEvent->SetActionTime(time + BLOCK_TIME_MS * thousand);
+                            const int32_t endTime = startTime + totalTimeMs * 1000;
+                            int32_t currentTime = startTime;
+                            while (currentTime < endTime) {
+                                item.SetGlobalX(NextPos(px1, px2, startTime, endTime, currentTime));
+                                item.SetGlobalX(NextPos(py1, py2, startTime, endTime, currentTime));
+                                pointerEvent->SetActionTime(currentTime);
                                 pointerEvent->UpdatePointerItem(0, item);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
-                                tempTimeMs += BLOCK_TIME_MS;
+                                currentTime += BLOCK_TIME_MS * 1000;
                             }
 
                             item.SetGlobalX(px2);
                             item.SetGlobalY(py2);
-                            pointerEvent->SetActionTime(time + totalTimeMs);
+                            pointerEvent->SetActionTime(endTime);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
