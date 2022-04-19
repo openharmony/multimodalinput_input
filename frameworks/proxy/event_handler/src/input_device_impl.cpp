@@ -77,8 +77,8 @@ void InputDeviceImpl::GetInputDeviceIdsAsync(std::function<void(int32_t, std::ve
         return;
     }
     inputDevices_[userData_] = data;
-    ++userData_;
     MMIEventHdl.GetDeviceIds(userData_);
+    ++userData_;
 }
 
 void InputDeviceImpl::GetInputDeviceAsync(int32_t deviceId,
