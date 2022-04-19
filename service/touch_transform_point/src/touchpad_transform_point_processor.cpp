@@ -111,7 +111,8 @@ void TouchPadTransformPointProcessor::OnEventTouchPadUp(struct libinput_event *e
         return;
     }
     item.SetPressed(false);
-    item.SetPressure(0.0);
+    auto pressure = libinput_event_touchpad_get_pressure(data);
+    item.SetPressure(pressure);
     item.SetGlobalX(static_cast<int32_t>(logicalX));
     item.SetGlobalY(static_cast<int32_t>(logicalY));
     pointerEvent_->UpdatePointerItem(seatSlot, item);
