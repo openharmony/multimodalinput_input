@@ -37,7 +37,6 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(struct libinput_event 
     CALL_LOG_ENTER;
     CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
-   
     CHKPV(data);
     auto seatSlot = libinput_event_touchpad_get_seat_slot(data);
     auto logicalX = libinput_event_touchpad_get_x(data);
