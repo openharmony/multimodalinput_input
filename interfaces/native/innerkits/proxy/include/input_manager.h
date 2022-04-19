@@ -144,6 +144,15 @@ public:
     void MarkConsumed(int32_t monitorId, int32_t eventId);
 
     /**
+     * @brief 移动鼠标到指定位置。
+     * @param offsetX X轴偏移量。
+     * @param offsetY Y轴偏移量。
+     * @return void
+     * @since 9
+     */
+    void MoveMouse(int32_t offsetX, int32_t offsetY);
+
+    /**
      * @brief Adds an input event interceptor. After such an interceptor is added,
      * an input event will be distributed to the interceptor instead of the original target and monitor.
      * @param interceptor Indicates the input event interceptor. After an input event is generated,
