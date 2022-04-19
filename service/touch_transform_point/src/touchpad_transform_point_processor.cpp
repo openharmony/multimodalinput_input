@@ -15,6 +15,8 @@
 
 #include "touchpad_transform_point_processor.h"
 
+#include <sstream>
+
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -50,6 +52,8 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(struct libinput_event 
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     PointerEvent::PointerItem item;
+    auto pressure = libinput_event_touchpad_get_pressure(data);
+    item.SetPressure(pressure);
     item.SetPointerId(seatSlot);
     item.SetDownTime(time);
     item.SetPressed(true);
@@ -80,6 +84,8 @@ void TouchPadTransformPointProcessor::OnEventTouchPadMotion(struct libinput_even
                    seatSlot, PARAM_INPUT_FAIL);
         return;
     }
+    auto pressure = libinput_event_touchpad_get_pressure(data);
+    item.SetPressure(pressure);
     item.SetGlobalX(static_cast<int32_t>(logicalX));
     item.SetGlobalY(static_cast<int32_t>(logicalY));
     pointerEvent_->UpdatePointerItem(seatSlot, item);
@@ -107,6 +113,8 @@ void TouchPadTransformPointProcessor::OnEventTouchPadUp(struct libinput_event *e
         return;
     }
     item.SetPressed(false);
+    auto pressure = libinput_event_touchpad_get_pressure(data);
+    item.SetPressure(pressure);
     item.SetGlobalX(static_cast<int32_t>(logicalX));
     item.SetGlobalY(static_cast<int32_t>(logicalY));
     pointerEvent_->UpdatePointerItem(seatSlot, item);
@@ -139,6 +147,13 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
     }
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent_->UpdateId();
+    MMI_HILOGD("Pointer event dispatcher of server:");
+    std::stringstream sStream;
+    sStream << *pointerEvent_;
+    std::string sLine;
+    while (std::getline(sStream, sLine)) {
+        MMI_HILOGD("%{public}s", sLine.c_str());
+    }
     return pointerEvent_;
 }
 } // namespace MMI
