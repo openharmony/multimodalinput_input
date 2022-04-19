@@ -58,7 +58,12 @@ std::string KeyCommandManager::GetConfigFilePath() const
 
 bool KeyCommandManager::ResolveJson(const std::string &configFile)
 {
-    FILE* fp = fopen(configFile.c_str(), "r");
+    char realPath[PATH_MAX] = {};
+    if (realpath(configFile.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("path is error, path:%{public}s", configFile.c_str());
+        return false;
+    }
+    FILE* fp = fopen(realPath, "r");
     CHKPF(fp);
     char buf[256] = {};
     std::string jsonBuf;
