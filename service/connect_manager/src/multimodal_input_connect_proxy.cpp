@@ -105,5 +105,36 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
     }
     return result;
 }
+
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
+{
+    CALL_LOG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+
+    if (!data.WriteBool(visible)) {
+        MMI_HILOGE("Failed to write filter");
+        return ERR_INVALID_VALUE;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t requestResult = Remote()->SendRequest(POINTER_VISIBLE_PROPERTY, data, reply, option);
+    if (requestResult != NO_ERROR) {
+        MMI_HILOGE("send request fail, result:%{public}d", requestResult);
+        return RET_ERR;
+    }
+
+    int32_t result = reply.ReadInt32();
+    if (result != RET_OK) {
+        MMI_HILOGE("reply readint32 error:%{public}d", result);
+    }
+    return result;
+}
+#endif
 } // namespace MMI
 } // namespace OHOS

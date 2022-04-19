@@ -30,6 +30,9 @@ public:
     static napi_value Off(napi_env env, napi_callback_info info);
     static napi_value GetDeviceIds(napi_env env, napi_callback_info info);
     static napi_value GetDevice(napi_env env, napi_callback_info info);
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    static napi_value SetPointerVisible(napi_env env, napi_callback_info info);
+#endif
     static napi_value GetKeystrokeAbility(napi_env env, napi_callback_info info);
     std::shared_ptr<JsInputDeviceManager> GetJsInputDeviceMgr() const;
 
