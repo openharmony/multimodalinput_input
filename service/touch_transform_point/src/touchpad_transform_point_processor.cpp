@@ -15,6 +15,8 @@
 
 #include "touchpad_transform_point_processor.h"
 
+#include <sstream>
+
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -147,7 +149,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
     pointerEvent_->UpdateId();
     MMI_HILOGD("Pointer event dispatcher of server:");
     std::stringstream sStream;
-    sStream << *pointerEvent;
+    sStream << *pointerEvent_;
     std::string sLine;
     while (std::getline(sStream, sLine)) {
         MMI_HILOGD("%{public}s", sLine.c_str());
