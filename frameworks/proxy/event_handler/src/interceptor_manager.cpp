@@ -52,11 +52,9 @@ int32_t InterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<Ke
     interceptorItem.sourceType = SOURCETYPE_KEY;
     interceptorItem.callback_ = interceptor;
     interceptor_.push_back(interceptorItem);
-    if (MMIEventHdl.AddInterceptor(interceptorItem.sourceType, interceptorItem.id_) == RET_OK) {
-        MMI_HILOGD("Add AddInterceptor KeyEvent to InterceptorManager success");
-        return MMI_STANDARD_EVENT_SUCCESS;
-    }
-    return MMI_STANDARD_EVENT_INVALID_PARAM;
+    MMIEventHdl.AddInterceptor(interceptorItem.sourceType, interceptorItem.id_);
+    MMI_HILOGD("Add AddInterceptor KeyEvent to InterceptorManager success");
+    return interceptorItem.id_;
 }
 
 void InterceptorManager::RemoveInterceptor(int32_t interceptorId)

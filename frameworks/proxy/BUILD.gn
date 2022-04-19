@@ -90,6 +90,10 @@ ohos_shared_library("libmmi-client") {
   }
 
   if (mmi_enable_interceptor) {
+    cflags += [ "-DOHOS_BUILD_MMI_INTERCEPTOR" ]
+  }
+
+  if (mmi_enable_interceptor) {
     sources += [
       "event_handler/src/input_interceptor_manager.cpp",
       "event_handler/src/interceptor_manager.cpp"

@@ -137,6 +137,7 @@ int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent>
     return EventManager.InjectPointerEvent(pointerEvent);
 }
 
+#ifdef OHOS_BUILD_MMI_INTERCEPTOR
 int32_t MultimodalEventHandler::AddInterceptor(int32_t sourceType, int32_t id)
 {
     if (!InitClient()) {
@@ -151,7 +152,6 @@ int32_t MultimodalEventHandler::AddInterceptor(int32_t sourceType, int32_t id)
     return RET_OK;
 }
 
-
 int32_t MultimodalEventHandler::RemoveInterceptor(int32_t id)
 {
     if (!InitClient()) {
@@ -165,6 +165,7 @@ int32_t MultimodalEventHandler::RemoveInterceptor(int32_t id)
     MMI_HILOGD("client remove a touchpad event interceptor");
     return RET_OK;
 }
+#endif // OHOS_BUILD_MMI_INTERCEPTOR
 
 int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
 {
