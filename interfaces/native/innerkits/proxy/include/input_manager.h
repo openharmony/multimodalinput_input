@@ -19,6 +19,7 @@
 #include <memory>
 #include <list>
 
+#include "event_handler.h"
 #include "nocopyable.h"
 
 #include "display_info.h"
@@ -68,11 +69,10 @@ public:
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer);
 
     /**
-     * @brief Sets a consumer for the window input event of the current process.
-     * @param inputEventConsumer Indicates the consumer to set. The window input event of the current process
-     * will be called back to the consumer object for processing.
-     * @param eventHandler 
-     * @since 8
+     * @brief 设置一个运行在指定线程的窗口输入事件消费者
+     * @param inputEventConsumer 指定的消费者
+     * @param eventHandler 指定运行消费者的线程
+     * @since 9
      */
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);

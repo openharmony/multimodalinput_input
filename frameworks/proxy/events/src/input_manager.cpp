@@ -25,8 +25,11 @@
 
 namespace OHOS {
 namespace MMI {
-InputManager *InputManager::instance_ = nullptr;
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManager" };
+} // namespace
 
+InputManager *InputManager::instance_ = nullptr;
 InputManager *InputManager::GetInstance()
 {
     if (instance_ == nullptr) {
