@@ -83,6 +83,17 @@ int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> fi
     return multimodalInputConnectService_->AddInputEventFilter(filter);
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+int32_t MultimodalInputConnectManager::SetPointerVisible(bool visible)
+{
+    if (multimodalInputConnectService_ == nullptr) {
+        MMI_HILOGE("multimodalInputConnectService_ is nullptr");
+        return RET_ERR;
+    }
+    return multimodalInputConnectService_->SetPointerVisible(visible);
+}
+#endif
+
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 {
     CALL_LOG_ENTER;

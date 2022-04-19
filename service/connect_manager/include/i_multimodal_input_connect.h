@@ -30,10 +30,16 @@ public:
 
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &socketFd) = 0;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) = 0;
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    virtual int32_t SetPointerVisible(bool visible) = 0;
+#endif
 
     enum {
         ALLOC_SOCKET_FD = 0,
         ADD_INPUT_EVENT_FILTER = 1,
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+        POINTER_VISIBLE_PROPERTY = 2,
+#endif
     };
 
     enum {
