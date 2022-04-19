@@ -54,6 +54,7 @@ void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsum
 void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
+    CHKPV(eventHandler);
     InputMgrImpl->SetWindowInputEventConsumer(inputEventConsumer, eventHandler);
 }
 
