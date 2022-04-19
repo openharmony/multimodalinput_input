@@ -36,7 +36,7 @@ public:
     DISALLOW_COPY_AND_MOVE(MultimodalEventHandler);
 
     MMIClientPtr GetMMIClient();
-    bool StartClient();
+    bool InitClient();
     
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
@@ -51,9 +51,6 @@ public:
     void RemoveInputEventTouchpadMontior(int32_t pointerEventType);
     int32_t AddInterceptor(int32_t sourceType, int32_t id);
     int32_t RemoveInterceptor(int32_t id);
-
-private:
-    bool InitClient();
 
 private:
     MMIClientPtr client_ = nullptr;
