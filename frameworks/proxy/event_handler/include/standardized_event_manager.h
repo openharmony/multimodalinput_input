@@ -46,6 +46,8 @@ public:
     int32_t UnRegisterInputDeviceMonitor();
     int32_t SubscribeKeyEvent(const KeyEventInputSubscribeManager::SubscribeKeyEventInfo& subscribeInfo);
     int32_t UnSubscribeKeyEvent(int32_t subscribeId);
+    int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
+
 protected:
     bool SendMsg(NetPacket& pkt) const;
 
