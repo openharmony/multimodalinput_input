@@ -460,10 +460,12 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 {
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.StartClient()) {
-        MMI_HILOGE("get mmi client is nullptr");
+        MMI_HILOGE("client init failed");
         return;
     }
-    monitorManager_.MoveMouse(offsetX, offsetY);
+    if (MMIEventHdl.MoveMouseEvent(offsetX, offsetY) != RET_OK) {
+        MMI_HILOGE("Failed to inject movemove offset event");
+    }
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
