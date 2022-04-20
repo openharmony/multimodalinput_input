@@ -32,13 +32,18 @@ StreamBuffer &StreamBuffer::operator=(const StreamBuffer &other)
     return *this;
 }
 
-void StreamBuffer::Clean()
+void StreamBuffer::Reset()
 {
     rPos_ = 0;
     wPos_ = 0;
     rCount_ = 0;
     wCount_ = 0;
     rwErrorStatus_ = ErrorStatus::ERROR_STATUS_OK;
+}
+
+void StreamBuffer::Clean()
+{
+    Reset();
     errno_t ret = memset_sp(&szBuff_, sizeof(szBuff_), 0, sizeof(szBuff_));
     if (ret != EOK) {
         MMI_HILOGE("call memset_s fail");
