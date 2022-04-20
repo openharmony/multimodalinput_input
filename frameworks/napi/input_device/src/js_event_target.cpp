@@ -50,6 +50,7 @@ JsEventTarget::DeviceType g_deviceType[] = {
 };
 
 std::mutex mutex_;
+const std::string CHANGED_TYPE = "changed";
 const std::string ADD_EVENT = "add";
 const std::string REMOVE_EVENT = "remove";
 } // namespace
@@ -57,9 +58,7 @@ const std::string REMOVE_EVENT = "remove";
 JsEventTarget::JsEventTarget()
 {
     CALL_LOG_ENTER;
-    auto ret = devMonitor_.insert({ ADD_EVENT, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
-    CK(ret.second, VAL_NOT_EXP);
-    ret = devMonitor_.insert({ REMOVE_EVENT, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
+    auto ret = devMonitor_.insert({ CHANGED_TYPE, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
     CK(ret.second, VAL_NOT_EXP);
 }
 
@@ -74,9 +73,9 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
     delete work;
     
-    auto addEvent = devMonitor_.find(ADD_EVENT);
+    auto addEvent = devMonitor_.find(CHANGED_TYPE);
     if (addEvent == devMonitor_.end()) {
-        MMI_HILOGE("find add event failed");
+        MMI_HILOGE("find changed event failed");
         return;
     }
 
@@ -104,9 +103,9 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
     delete work;
     
-    auto removeEvent = devMonitor_.find(REMOVE_EVENT);
+    auto removeEvent = devMonitor_.find(CHANGED_TYPE);
     if (removeEvent == devMonitor_.end()) {
-        MMI_HILOGE("find remove event failed");
+        MMI_HILOGE("find changed event failed");
         return;
     }
 
@@ -130,9 +129,9 @@ void JsEventTarget::TargetOn(std::string type, int32_t deviceId)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    auto iter = devMonitor_.find(type);
+    auto iter = devMonitor_.find(CHANGED_TYPE);
     if (iter == devMonitor_.end()) {
-        MMI_HILOGE("type is wrong, type:%{public}s", type.c_str());
+        MMI_HILOGE("find %{public}s failed", CHANGED_TYPE.c_str());
         return;
     }
 
@@ -535,6 +534,10 @@ void JsEventTarget::AddMonitor(napi_env env, std::string type, napi_value handle
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = devMonitor_.find(type);
+    if (iter == devMonitor_.end()) {
+        MMI_HILOGE("find %{public}s failed", type.c_str());
+        return;
+    }
 
     JsUtil jsUtil;
     for (const auto &temp : iter->second) {
