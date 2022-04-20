@@ -21,7 +21,6 @@ config("libmmi_client_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "${appexecfwk_path}/interfaces/innerkits/libeventhandler/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
@@ -32,6 +31,7 @@ config("libmmi_client_config") {
 
 config("libmmi_public_client_config") {
   include_dirs = [
+    "${appexecfwk_path}/interfaces/innerkits/libeventhandler/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",

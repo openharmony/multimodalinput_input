@@ -47,17 +47,21 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
     }
 
     switch (code) {
-        case IMultimodalInputConnect::ALLOC_SOCKET_FD:
+        case IMultimodalInputConnect::ALLOC_SOCKET_FD: {
             return StubHandleAllocSocketFd(data, reply);
-        case IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER:
+        }
+        case IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER: {
             return StubAddInputEventFilter(data, reply);
+        }
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-        case IMultimodalInputConnect::POINTER_VISIBLE_PROPERTY:
+        case IMultimodalInputConnect::POINTER_VISIBLE_PROPERTY: {
             return StubSetPointerVisible(data, reply);
+        }
 #endif
-        default:
+        default: {
             MMI_HILOGE("unknown code:%{public}u, go switch defaut", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+        }
     }
 }
 

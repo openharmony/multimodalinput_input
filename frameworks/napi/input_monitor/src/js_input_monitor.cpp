@@ -198,16 +198,21 @@ int32_t JsInputMonitor::IsMatch(napi_env jsEnv)
 std::string JsInputMonitor::GetAction(int32_t action) const
 {
     switch (action) {
-        case PointerEvent::POINTER_ACTION_CANCEL:
+        case PointerEvent::POINTER_ACTION_CANCEL: {
             return "cancel";
-        case PointerEvent::POINTER_ACTION_DOWN:
+        }
+        case PointerEvent::POINTER_ACTION_DOWN: {
             return "down";
-        case PointerEvent::POINTER_ACTION_MOVE:
+        }
+        case PointerEvent::POINTER_ACTION_MOVE: {
             return "move";
-        case PointerEvent::POINTER_ACTION_UP:
+        }
+        case PointerEvent::POINTER_ACTION_UP: {
             return "up";
-        default:
+        }
+        default: {
             return "";
+        }
     }
 }
 
