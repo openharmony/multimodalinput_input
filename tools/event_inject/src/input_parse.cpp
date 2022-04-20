@@ -48,7 +48,6 @@ struct MyJson {
 void GetJsonData(cJSON *json, const std::string& key, std::string& val)
 {
     if (!cJSON_IsObject(json)) {
-        MMI_HILOGW("GetJsonData json is not object");
         return;
     }
     if (cJSON_HasObjectItem(json, key.c_str())) {
@@ -64,7 +63,6 @@ template <class T>
 void GetJsonData(cJSON *json, const std::string& key, T& val)
 {
     if (!cJSON_IsObject(json)) {
-        MMI_HILOGW("GetJsonData json is not object");
         return;
     }
     if (cJSON_HasObjectItem(json, key.c_str())) {
@@ -79,7 +77,6 @@ void GetJsonData(cJSON *json, const std::string& key, T& val)
 void GetJsonData(cJSON *json, const std::string& key, std::vector<int32_t>& vals)
 {
     if (!cJSON_IsObject(json)) {
-        MMI_HILOGW("GetJsonData json is not object");
         return;
     }
     if (!cJSON_HasObjectItem(json, key.c_str())) {
