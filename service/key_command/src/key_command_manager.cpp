@@ -31,7 +31,8 @@ constexpr int32_t MAX_PREKEYS_NUM = 4;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandManager" };
 constexpr int64_t JSON_FILE_SIZE = 0x2000;
 struct MyJson {
-    explicit MyJson() {
+    explicit MyJson()
+    {
         json_ = nullptr;
     }
 

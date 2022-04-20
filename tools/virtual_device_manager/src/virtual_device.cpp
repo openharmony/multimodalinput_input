@@ -91,7 +91,8 @@ void RemoveDir()
     dirent* ptr = nullptr;
     int32_t fileNnm = 0;
     while ((ptr = readdir(dir)) != nullptr) {
-        if ((!std::strncmp(ptr->d_name, ".", 1)) || (!std::strncmp(ptr->d_name, "..", 2))) {
+        std::string tmpDirName(ptr->d_name);
+        if ((tmpDirName == ".") || (tmpDirName == "..")) {
             continue;
         }
         fileNnm++;
