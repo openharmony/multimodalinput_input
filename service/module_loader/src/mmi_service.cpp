@@ -398,11 +398,13 @@ void MMIService::OnSignalEvent(int32_t signalFd)
         case SIGFPE:
         case SIGKILL:
         case SIGSEGV:
-        case SIGTERM:
+        case SIGTERM: {
             state_ = ServiceRunningState::STATE_EXIT;
             break;
-        default:
+        }
+        default: {
             break;
+        }
     }
 }
 } // namespace MMI

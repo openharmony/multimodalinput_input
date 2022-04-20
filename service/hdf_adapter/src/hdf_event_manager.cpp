@@ -56,55 +56,71 @@ int32_t HdfEventManager::EvdevSimIoctl(int32_t hdindex, int32_t pcmd, void *iobu
     const int32_t iobuffSize = size;
     errno_t ret = 0;
     switch (cmd) {
-        case IO_BITS:
+        case IO_BITS: {
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayBits[drvtype], size);
             break;
-        case IO_KEYBITS:
+        }
+        case IO_KEYBITS: {
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayKeyBits[drvtype], size);
             break;
-        case IO_RELBITS:
+        }
+        case IO_RELBITS: {
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayRelBits[drvtype], size);
             break;
-        case IO_ABSBITS:
+        }
+        case IO_ABSBITS: {
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayAbsBits[drvtype], size);
             break;
-        case IO_MSCBITS:
+        }
+        case IO_MSCBITS: {
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayMscBits[drvtype], size);
             break;
-        case IO_SWBITS:
+        }
+        case IO_SWBITS: {
             ret = memcpy_s(iobuff, iobuffSize, &g_arraySwBits[drvtype], size);
             break;
-        case IO_LEDBITS:
+        }
+        case IO_LEDBITS: {
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayLedBits[drvtype], size);
             break;
-        case IO_SNDBITS:
+        }
+        case IO_SNDBITS: {
             ret = memcpy_s(iobuff, iobuffSize, &g_arraySndBits[drvtype], size);
             break;
-        case IO_PROPBITS:
+        }
+        case IO_PROPBITS: {
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayPropsBits[drvtype], size);
             break;
-        case IO_KEYVALUES:
+        }
+        case IO_KEYVALUES: {
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayKeyValues[drvtype], size);
             break;
-        case IO_LEDVALUES:
+        }
+        case IO_LEDVALUES: {
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayLedValues[drvtype], size);
             break;
-        case IO_SWVALUES:
+        }
+        case IO_SWVALUES: {
             ret = memcpy_s(iobuff, iobuffSize, &g_arraySwValues[drvtype], size);
             break;
-        case IO_MTVABS:
+        }
+        case IO_MTVABS: {
             break;
-        case IO_IDS:
+        }
+        case IO_IDS: {
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayIds[drvtype], size);
             break;
-        case IO_FFBITS:
+        }
+        case IO_FFBITS: {
             ret = memcpy_s(iobuff, iobuffSize, &g_arrayFfBits[drvtype], size);
             break;
-        default:
+        }
+        default: {
             if (cmd >= IO_ABSBEGIN && cmd < IO_ABEND) {
                 ret = memcpy_s(iobuff, iobuffSize, &g_arrayAxisInfo[drvtype][cmd - IO_ABSBEGIN], size);
             }
             break;
+        }
     }
     if (ret != EOK) {
         MMI_HILOGE("call memcpy_s fail, cmd = %d, ret = %d", cmd, ret);
@@ -131,55 +147,71 @@ int32_t HdfEventManager::EvdevIoctl(int32_t hdiindex, int32_t pcmd, void *iobuff
     const int32_t iobuffSize = size;
     errno_t ret = 0;
     switch (cmd) {
-        case IO_BITS:
+        case IO_BITS: {
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.eventType, size);
             break;
-        case IO_KEYBITS:
+        }
+        case IO_KEYBITS: {
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.keyCode, size);
             break;
-        case IO_RELBITS:
+        }
+        case IO_RELBITS: {
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.relCode, size);
             break;
-        case IO_ABSBITS:
+        }
+        case IO_ABSBITS: {
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.absCode, size);
             break;
-        case IO_MSCBITS:
+        }
+        case IO_MSCBITS: {
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.miscCode, size);
             break;
-        case IO_SWBITS:
+        }
+        case IO_SWBITS: {
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.switchCode, size);
             break;
-        case IO_LEDBITS:
+        }
+        case IO_LEDBITS: {
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.ledCode, size);
             break;
-        case IO_SNDBITS:
+        }
+        case IO_SNDBITS: {
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.forceCode, size);
             break;
-        case IO_PROPBITS:
+        }
+        case IO_PROPBITS: {
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.devProp, size);
             break;
-        case IO_KEYVALUES:
+        }
+        case IO_KEYVALUES: {
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.keyType, size);
             break;
-        case IO_LEDVALUES:
+        }
+        case IO_LEDVALUES: {
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.ledType, size);
             break;
-        case IO_SWVALUES:
+        }
+        case IO_SWVALUES: {
             ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.switchType, size);
             break;
-        case IO_MTVABS:
+        }
+        case IO_MTVABS: {
             break;
-        case IO_IDS:
+        }
+        case IO_IDS: {
             ret = memcpy_s(iobuff, iobuffSize, &deviceinfo->attrSet.id, size);
             break;
-        case IO_FFBITS:
+        }
+        case IO_FFBITS: {
             ret = memcpy_s(iobuff, iobuffSize, &deviceinfo->abilitySet.forceCode, size);
             break;
-        default:
+        }
+        default: {
             if (cmd >= IO_ABSBEGIN && cmd < IO_ABEND) {
                 ret = memcpy_s(iobuff, iobuffSize, &deviceinfo->attrSet.axisInfo[cmd - IO_ABSBEGIN], size);
             }
             break;
+        }
     }
     if (ret != EOK) {
         MMI_HILOGE("call memcpy_s fail, cmd = %d, ret = %d", cmd, ret);
@@ -209,17 +241,22 @@ int32_t HdfEventManager::HdfdevtypeMapLibinputType(uint32_t devIndex, uint32_t d
     }
     int32_t ret = 0;
     switch (devType) {
-        case INDEV_TYPE_TOUCH:
+        case INDEV_TYPE_TOUCH: {
             ret = HDF_INPUT | HDF_TOUCHSCREEN;
             break;
-        case INDEV_TYPE_MOUSE:
+        }
+        case INDEV_TYPE_MOUSE: {
             ret = HDF_INPUT | HDF_MOUSE;
             break;
-        case INDEV_TYPE_KEYBOARD:
+        }
+        case INDEV_TYPE_KEYBOARD: {
             ret = HDF_INPUT | HDF_KEYBOARD;
             break;
-        default:
+        }
+        default: {
             ret = devType;
+            break;
+        }
     }
     return ret;
 }
