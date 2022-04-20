@@ -70,8 +70,8 @@ public:
 
     /**
      * @brief Sets a window input event consumer that runs on the specified thread.
-     * @param inputEventConsumer Window input event consumer.
-     * @param eventHandler Thread running the window input event consumer.
+     * @param inputEventConsumer Indicates the consumer to set.
+     * @param eventHandler Indicates the thread running the consumer.
      * @since 9
      */
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
@@ -83,8 +83,8 @@ public:
      * @param keyOption Indicates the condition of the key input event.
      * @param callback Indicates the callback.
      * @return Returns the subscription ID, which uniquely identifies a subscription in the process.
-	 * If the value is greater than or equal to <b>0</b>,
-	 * the subscription is successful. Otherwise, the subscription fails.
+     * If the value is greater than or equal to <b>0</b>,
+     * the subscription is successful. Otherwise, the subscription fails.
      * @since 8
      */
     int32_t SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
@@ -104,7 +104,7 @@ public:
      * @param monitor Indicates the input event monitor. After an input event is generated,
      * the functions of the monitor object will be called.
      * @return Returns the monitor ID, which uniquely identifies a monitor in the process.
-	 * If the value is greater than or equal to <b>0</b>, the monitor is successfully added. Otherwise,
+     * If the value is greater than or equal to <b>0</b>, the monitor is successfully added. Otherwise,
      * the monitor fails to be added.
      * @since 8
      */
@@ -156,7 +156,7 @@ public:
      * @brief Adds an input event interceptor. After such an interceptor is added,
      * an input event will be distributed to the interceptor instead of the original target and monitor.
      * @param interceptor Indicates the input event interceptor. After an input event is generated,
-	 * the functions of the interceptor object will be called.
+     * the functions of the interceptor object will be called.
      * @return Returns the interceptor ID, which uniquely identifies an interceptor in the process.
      * If the value is greater than or equal to <b>0</b>,the interceptor is successfully added. Otherwise,
      * the interceptor fails to be added.
@@ -176,7 +176,7 @@ public:
 
     /**
      * @brief Simulates a key input event. This event will be distributed and
-	 * processed in the same way as the event reported by the input device.
+     * processed in the same way as the event reported by the input device.
      * @param keyEvent Indicates the key input event to simulate.
      * @return void
      * @since 8
