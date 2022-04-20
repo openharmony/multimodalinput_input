@@ -125,9 +125,9 @@ void UDSSocket::OnReadPackets(CircleStreamBuffer& circBuf, UDSSocket::PacketCall
         PackHead *head = reinterpret_cast<PackHead *>(buf);
         CHKPB(head);
         if (head->size < 0 || head->size > MAX_PACKET_BUF_SIZE) {
-            MMI_HILOGF("Head size is error, head->size:%{public}d, unreadSize:%{public}d",
-                head->size, unreadSize);
-            circBuf.Clean();
+            MMI_HILOGF("Packet header parsing error, and this error cannot be recovered. The buffer will be reset."
+                " head->size:%{public}d, unreadSize:%{public}d", head->size, unreadSize);
+            circBuf.Reset();
             break;
         }
         if (head->size > dataSize) {
@@ -135,13 +135,18 @@ void UDSSocket::OnReadPackets(CircleStreamBuffer& circBuf, UDSSocket::PacketCall
         }
         NetPacket pkt(head->idMsg);
         if (!pkt.Write(&buf[headSize], head->size)) {
-            MMI_HILOGE("write packet faild. dataSize:%{public}d", dataSize);
+            MMI_HILOGW("Error writing data in the NetPacket. It will be retried next time. size:%{public}d",
+                head->size);
             break;
         }
         if (!circBuf.SeekReadPos(pkt.GetPacketLength())) {
-            MMI_HILOGF("seek read postion error. packetSize:%{public}d unreadSize:%{public}d",
-                pkt.GetPacketLength(), unreadSize);
-            circBuf.Clean();
+            MMI_HILOGW("Set read position error, and this error cannot be recovered, and the buffer will be reset."
+                " packetSize:%{public}d unreadSize:%{public}d", pkt.GetPacketLength(), unreadSize);
+            circBuf.Reset();
+            break;
+        }
+        if (circBuf.IsEmpty()) {
+            circBuf.Reset();
             break;
         }
         callbackFun(pkt);

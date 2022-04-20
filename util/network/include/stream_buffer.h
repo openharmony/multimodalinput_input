@@ -37,6 +37,7 @@ public:
     virtual StreamBuffer& operator=(const StreamBuffer& other);
     DISALLOW_MOVE(StreamBuffer);
     
+    void Reset();
     void Clean();
     bool SeekReadPos(int32_t n);
 
