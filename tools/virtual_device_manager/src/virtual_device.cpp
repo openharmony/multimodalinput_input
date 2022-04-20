@@ -14,6 +14,9 @@
  */
 
 #include "virtual_device.h"
+
+#include "util.h"
+
 #include "virtual_finger.h"
 #include "virtual_gamepad.h"
 #include "virtual_joystick.h"
@@ -40,6 +43,75 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+bool IsNum(const std::string& str)
+{
+    for (uint32_t i = 0; i < str.length(); i++) {
+        int32_t tmp = static_cast<int32_t>(str[i]);
+        if (tmp >= 48 && tmp <= 57) {
+            continue;
+        } else {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool CheckFileName(const std::string& fileName)
+{
+    std::string::size_type pos = fileName.find("_");
+    if (pos < 0) {
+        printf("Failed to create file");
+        return false;
+    }
+    if (!IsNum(fileName.substr(0, pos))) {
+        printf("file name check error");
+        return false;
+    }
+    if (fileName.substr(pos + 1) == "mouse") {
+    } else if (fileName.substr(pos + 1) == "keyboard") {
+    } else if (fileName.substr(pos + 1) == "joystick") {
+    } else if (fileName.substr(pos + 1) == "trackball") {
+    } else if (fileName.substr(pos + 1) == "remotecontrol") {
+    } else if (fileName.substr(pos + 1) == "trackpad") {
+    } else if (fileName.substr(pos + 1) == "knob") {
+    } else if (fileName.substr(pos + 1) == "gamepad") {
+    } else if (fileName.substr(pos + 1) == "touchpad") {
+    } else if (fileName.substr(pos + 1) == "touchscreen") {
+    } else if (fileName.substr(pos + 1) == "pen") {
+    } else if (fileName.substr(pos + 1) == "all") {
+    } else {
+        printf("file name check divece name error");
+        return false;
+    }
+    return true;
+}
+
+void removeDir()
+{
+    DIR* dir = opendir(g_folderpath.c_str());
+    if (dir == nullptr) {
+        printf("Failed to open folder\n");
+        return;
+    }
+    dirent* ptr = nullptr;
+    int32_t fileNnm = 0;
+    while ((ptr = readdir(dir)) != nullptr) {
+        if((!std::strncmp(ptr->d_name, ".", 1)) || (!std::strncmp(ptr->d_name, "..", 2))) {
+            continue;
+        }
+        fileNnm++;
+    }
+    if (fileNnm == 0) {
+        closedir(dir);
+        (void)remove(g_folderpath.c_str());
+        return;
+    }
+    closedir(dir);
+    return;
+}
+} // namespace
+
 bool VirtualDevice::DoIoctl(int32_t fd, int32_t request, const uint32_t value)
 {
     int32_t rc = ioctl(fd, request, value);
@@ -63,90 +135,98 @@ VirtualDevice::~VirtualDevice()
     Close();
 }
 
-bool  VirtualDevice::ViewDirectory(std::vector<std::string>& fileList)
+std::vector<std::string> VirtualDevice::ViewDirectory(const std::string& filePath, bool compliant)
 {
-    DIR* dir = opendir(g_folderpath.c_str());
-    if (dir == nullptr) {
-        printf("Failed to open folder");
-        return false;
-    }
+    std::vector<std::string> fileList;
     fileList.clear();
+    DIR* dir = opendir(filePath.c_str());
+    if (dir == nullptr) {
+        printf("Failed to open folder\n");
+        return fileList;
+    }
     dirent* ptr = nullptr;
+    int32_t fileNnm = 0;
     while ((ptr = readdir(dir)) != nullptr) {
-        if (ptr->d_type == IS_FILE_JUDGE) {
-            fileList.push_back(ptr->d_name);
+        if((!std::strncmp(ptr->d_name, ".", 1)) || (!std::strncmp(ptr->d_name, "..", 2))) {
+            continue;
+        }
+        fileNnm++;
+        if (ptr->d_type == DT_REG) {
+            if (CheckFileName(ptr->d_name) && compliant) {
+                fileList.push_back(ptr->d_name);
+            } else {
+                std::string removeFile = filePath + ptr->d_name;
+                (void)std::remove(removeFile.c_str());
+                fileNnm--;
+            }
+        } else if (ptr->d_type == DT_DIR) {
+            std::string path = filePath + ptr->d_name + "/";
+            printf("filePath : %s is error \n", path.c_str());
+            ViewDirectory(path, false);
+        } else {
+            printf("file name:%s, type is error\n",ptr->d_name);
+            fileNnm--;
         }
     }
+    if (fileNnm == 0 && !compliant) {
+        closedir(dir);
+        (void)std::remove(filePath.c_str());
+        return fileList;
+    }
     closedir(dir);
-    return true;
+    return fileList;
 }
 
-bool VirtualDevice::ClearFileResidues(const std::string procressPath, const std::string fileName)
+bool VirtualDevice::ClearFileResidues(const std::string& procressPath, const std::string& fileName)
 {
     DIR* dir = opendir(procressPath.c_str());
     if (dir == nullptr) {
-        std::string removeFile = "find /data/symbol/ -name " + fileName + "* | xargs rm";
-        FILE* findJson = popen(removeFile.c_str(), "rw");
-        if (!findJson) {
+        std::string removeFile = "/data/symbol/" + fileName;
+        if (!IsFileExists(removeFile)) {
+            printf("/data/symbol/%s path is error", removeFile.c_str());
             return false;
         }
-        pclose(findJson);
+        (void)std::remove(removeFile.c_str());
         return true;
     }
     closedir(dir);
     return false;
 }
 
-bool VirtualDevice::ReadFile(const std::string catName, std::string& temp)
+void VirtualDevice::SyncSymbolFile()
 {
-    FILE* cmdName = popen(catName.c_str(), "r");
-    if (cmdName == nullptr) {
-        printf("popen Execution failed");
-        return false;
-    }
-    char buf[32] = { 0 };
-    if (fgets(buf, sizeof(buf), cmdName) == nullptr) {
-        printf("read file failed");
-        return false;
-    }
-    pclose(cmdName);
-    temp = buf;
-    return true;
-}
-
-bool VirtualDevice::SyncSymbolFile()
-{
-    std::vector<std::string> tempList;
-    if (!ViewDirectory(tempList)) {
+    std::vector<std::string> tempList = ViewDirectory(g_folderpath);
+    if (tempList.size() <= 0) {
         printf("Failed to find file ");
-        return false;
+        return;
     }
     for (const auto &item : tempList) {
-        std::string::size_type pos = item.find("_");
-        if (pos < 0) {
-            printf("Failed to create file");
-            return false;
+        if (!CheckFileName(item)) {
+            printf("file name check error");
+            return;
         }
-        std::string procressPath = "/proc/" + item + "/";
+        std::string::size_type pos = item.find("_");
+        std::string procressPath = "/proc/" + item.substr(0, pos) + "/";
         if (!ClearFileResidues(procressPath, item)) {
-            std::string catName = "cat /proc/" + item + "/cmdline";
-            std::string temp;
-            if (!ReadFile(catName, temp)) {
-                return false;
+            std::string filePath = "/proc/" + item.substr(0, pos) + "/cmdline";
+            const std::string temp = ReadFile(filePath, 1);
+            if (temp.empty()) {
+                printf("%s is null", filePath.c_str());
+                return;
             }
             std::string processName;
             processName.append(temp);
             if (processName.find("mmi-virtual-device") == processName.npos) {
-                std::string removeFile = "find /data/symbol/ -name " + item + "* | xargs rm";
-                FILE* findJson = popen(removeFile.c_str(), "rw");
-                if (!findJson) {
-                    return false;
+                std::string removeFile = "/data/symbol/" + item;
+                if (!IsFileExists(removeFile)) {
+                    printf("/data/symbol/%s path is error", removeFile.c_str());
+                    return;
                 }
-                pclose(findJson);
+                (void)remove(removeFile.c_str());
             }
         }
     }
-    return true;
+    return;
 }
 
 bool VirtualDevice::CreateKey()
@@ -365,11 +445,7 @@ bool VirtualDevice::SelectDevice(std::vector<std::string> &fileList)
         printf("Invaild Input Para, Plase Check the validity of the para");
         return false;
     }
-
-    if (!ViewDirectory(fileList)) {
-        return false;
-    }
-
+    fileList = ViewDirectory(g_folderpath);
     if (fileList.size() == 0) {
         printf("No device is currently on");
         return false;
@@ -478,10 +554,12 @@ bool VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
     closePid.append("_");
     bool result = SelectDevice(alldevice);
     if (!result) {
+        removeDir();
         return false;
     }
     if (closePid.compare("all_") == 0) {
         CloseAllDevice(alldevice);
+        removeDir();
         return true;
     }
     for (auto it : alldevice) {
@@ -492,6 +570,7 @@ bool VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
             if (ret == -1) {
                 printf("remove file fail. file name: %s, errno: %d.\n", it.c_str(), errno);
             }
+            removeDir();
             return true;
         }
     }
@@ -501,8 +580,8 @@ bool VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
 
 bool VirtualDevice::FindDevice(std::vector<std::string> argvList)
 {
+    SyncSymbolFile();
     if (argvList[1] == "start") {
-        SyncSymbolFile();
         bool result = AddDevice(argvList);
         if (!result) {
             printf("Failed to create device");

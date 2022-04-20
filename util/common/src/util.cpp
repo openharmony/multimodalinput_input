@@ -482,5 +482,27 @@ int32_t GetFileSize(const std::string& fileName)
     }
     return RET_ERR;
 }
+
+std::string ReadFile(const std::string &filePath, int32_t readLine)
+{
+    FILE* fp = fopen(filePath.c_str(), "r");
+    std::string dataStr;
+    if (fp) {
+        char buf[256] = {};
+        int32_t count = 0;
+        while (fgets(buf, sizeof(buf), fp) != nullptr) {
+            dataStr += buf;
+            ++count;
+            if ((readLine > 0) && (readLine <= count)) {
+                (void)fclose(fp);
+                fp = nullptr;
+                return dataStr;
+            }
+        }
+        (void)fclose(fp);
+        fp = nullptr;
+    }
+    return dataStr;
+}
 } // namespace MMI
 } // namespace OHOS
