@@ -140,12 +140,12 @@ ohos_shared_library("libmmi-server") {
   if (mmi_enable_interceptor) {
     sources += [
       "interceptor/src/interceptor_handler_global.cpp",
-      "interceptor/src/interceptor_manager_global.cpp"
+      "interceptor/src/interceptor_manager_global.cpp",
     ]
   } else {
     sources += [
       "interceptor/src/i_interceptor_handler_global.cpp",
-      "interceptor/src/i_interceptor_manager_global.cpp"
+      "interceptor/src/i_interceptor_manager_global.cpp",
     ]
   }
 
