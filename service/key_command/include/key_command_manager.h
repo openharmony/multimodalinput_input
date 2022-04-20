@@ -81,7 +81,6 @@ private:
     bool SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key);
     ShortcutKey lastMatchedKey_;
     std::map<std::string, ShortcutKey> shortcutKeys_;
-    static constexpr int64_t JSON_FILE_SIZE = 0x2000;
 };
 } // namespace MMI
 } // namespace OHOS

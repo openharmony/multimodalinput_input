@@ -14,9 +14,6 @@
  */
 
 #include "virtual_device.h"
-
-#include "util.h"
-
 #include "virtual_finger.h"
 #include "virtual_gamepad.h"
 #include "virtual_joystick.h"
@@ -40,6 +37,7 @@
 #include "virtual_touchpad.h"
 #include "virtual_touchscreen.h"
 #include "virtual_trackpad_mouse.h"
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {
