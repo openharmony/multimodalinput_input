@@ -175,7 +175,8 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
     return RET_OK;
 }
 
-void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
+void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
     CALL_LOG_ENTER;
     CHKPV(inputEventConsumer);
@@ -185,7 +186,10 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
         return;
     }
     consumer_ = inputEventConsumer;
-    eventHandler_ = InputMgrImpl->GetCurrentEventHandler();
+    eventHandler_ = eventHandler;
+    if (eventHandler_ == nullptr) {
+        eventHandler_ = InputMgrImpl->GetCurrentEventHandler();
+    }
 }
 
 void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
