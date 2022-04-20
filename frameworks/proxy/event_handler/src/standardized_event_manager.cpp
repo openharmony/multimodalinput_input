@@ -139,6 +139,14 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
     return RET_OK;
 }
 
+int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
+{
+    CALL_LOG_ENTER;
+    NetPacket pkt(MmiMessageId::MOVE_MOUSE_BY_OFFSET);
+    pkt << offsetX << offsetY;
+    return SendMsg(pkt);
+}
+
 int32_t StandardizedEventManager::GetDeviceIds(int32_t userData)
 {
     NetPacket pkt(MmiMessageId::INPUT_DEVICE_IDS);

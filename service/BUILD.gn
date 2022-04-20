@@ -158,6 +158,7 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
     "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/cJSON:cjson_static",
+    "//third_party/json:nlohmann_json_static",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
@@ -267,7 +268,6 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
     "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
-    "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -277,6 +277,7 @@ ohos_unittest("ut-mmi-service-out") {
   }
 
   external_deps = [
+    "ability_runtime:ability_manager",
     "hiviewdfx_hilog_native:libhilog",
     "input_device_driver:hdi_input",
     "utils_base:utils",

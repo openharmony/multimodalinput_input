@@ -50,7 +50,8 @@ public:
         const std::vector<LogicalDisplayInfo> &logicalDisplays);
     int32_t AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter);
 
-    void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer);
+    void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+        std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
 
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
     void OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
