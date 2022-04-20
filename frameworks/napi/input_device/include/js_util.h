@@ -29,7 +29,8 @@ public:
     struct CallbackData {
         std::vector<int32_t> ids;
         std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device = nullptr;
-        std::vector<int32_t> keystrokeAbility;
+        std::map<int32_t, bool> keystrokeAbility;
+        int32_t deviceId = 0;
     };
 
     struct CallbackInfo {
@@ -38,11 +39,11 @@ public:
         napi_env env = nullptr;
         napi_ref ref = nullptr;
         napi_deferred deferred = nullptr;
-        napi_value promise = nullptr;
         CallbackData data;
     };
 
-    int32_t GetUserData(uv_work_t *work);
+    int32_t GetInt32(uv_work_t *work);
+    bool IsHandleEquals(napi_env env, napi_value handle, napi_ref ref);
 };
 } // namespace MMI
 } // namespace OHOS

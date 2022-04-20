@@ -17,7 +17,6 @@
 
 #include <cinttypes>
 
-#include "ability_launch_manager.h"
 #include "event_dump.h"
 #include "event_package.h"
 #include "hos_key_event.h"
@@ -31,7 +30,7 @@
 #include "key_event_subscriber.h"
 #include "mmi_func_callback.h"
 #include "time_cost_chk.h"
-
+#include "mouse_event_handler.h"
 #ifdef OHOS_BUILD_HDF
 #include "hdi_inject.h"
 #endif
@@ -66,6 +65,8 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ServerMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ServerMsgHandler::OnInputDeviceIds, this)},
         {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ServerMsgHandler::GetKeystrokeAbility, this)},
+        {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputDeviceMontior, this)},
+        {MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputDeviceMontior, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
         {MmiMessageId::ADD_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputEventMontior, this)},
         {MmiMessageId::REMOVE_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputEventMontior, this)},
@@ -76,6 +77,7 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::ADD_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnAddInputHandler, this)},
         {MmiMessageId::REMOVE_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputHandler, this)},
         {MmiMessageId::MARK_CONSUMED, MsgCallbackBind2(&ServerMsgHandler::OnMarkConsumed, this)},
+        {MmiMessageId::MOVE_MOUSE_BY_OFFSET, MsgCallbackBind2(&ServerMsgHandler::OnMoveMouse, this)},
         {MmiMessageId::SUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnSubscribeKeyEvent, this)},
         {MmiMessageId::UNSUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnUnSubscribeKeyEvent, this)},
         {MmiMessageId::ADD_EVENT_INTERCEPTOR,
@@ -335,6 +337,26 @@ int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, NetPacket& pkt)
     return RET_OK;
 }
 
+int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
+{
+    CALL_LOG_ENTER;
+    int32_t offsetX = 0;
+    int32_t offsetY = 0;
+    if (!pkt.Read(offsetX)) {
+        MMI_HILOGE("Packet read offsetX failed");
+        return RET_ERR;
+    }
+    if (!pkt.Read(offsetY)) {
+        MMI_HILOGE("Packet read offsetY failed");
+        return RET_ERR;
+    }
+
+    if (MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY)) {
+        auto pointerEvent = MouseEventHdr->GetPointerEvent();
+        eventDispatch_.HandlePointerEvent(pointerEvent);
+    }
+    return RET_OK;
+}
 int32_t ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
 {
     int32_t subscribeId = -1;
@@ -534,6 +556,38 @@ int32_t ServerMsgHandler::GetKeystrokeAbility(SessionPtr sess, NetPacket& pkt)
         MMI_HILOGE("Sending failed");
         return MSG_SEND_FAIL;
     }
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pkt)
+{
+    CALL_LOG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    InputDevMgr->AddDevMonitor(sess, [sess](std::string type, int32_t deviceId) {
+        CALL_LOG_ENTER;
+        CHKPV(sess);
+        NetPacket pkt2(MmiMessageId::ADD_INPUT_DEVICE_MONITOR);
+        if (!pkt2.Write(type)) {
+            MMI_HILOGE("Packet write type failed");
+            return;
+        }
+        if (!pkt2.Write(deviceId)) {
+            MMI_HILOGE("Packet write deviceId failed");
+            return;
+        }
+        if (!sess->SendMsg(pkt2)) {
+            MMI_HILOGE("Sending failed");
+            return;
+        }
+    });
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket& pkt)
+{
+    CALL_LOG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    InputDevMgr->RemoveDevMonitor(sess);
     return RET_OK;
 }
 
