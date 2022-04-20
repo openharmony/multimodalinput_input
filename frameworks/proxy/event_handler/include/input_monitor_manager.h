@@ -35,6 +35,7 @@ public:
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor);
     void RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
+    void MoveMouse(int32_t offsetX, int32_t offsetY);
 
 public:
     static bool IsValidMonitorId(int32_t monitorId);
