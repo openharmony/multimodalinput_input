@@ -25,9 +25,7 @@ const std::vector<uint32_t> &VirtualTouchScreen::GetEventTypes() const
 
 const std::vector<uint32_t> &VirtualTouchScreen::GetKeys() const
 {
-    static const std::vector<uint32_t> keys {BTN_TOUCH, BTN_TOOL_PEN, BTN_TOOL_RUBBER, BTN_TOOL_BRUSH,
-                                             BTN_TOOL_PENCIL, BTN_TOOL_AIRBRUSH, BTN_TOOL_FINGER, BTN_TOOL_MOUSE,
-                                             BTN_TOOL_LENS};
+    static const std::vector<uint32_t> keys {BTN_TOUCH};
     return keys;
 }
 
@@ -50,8 +48,7 @@ const std::vector<uint32_t> &VirtualTouchScreen::GetAbs() const
         ABS_MT_POSITION_Y,
         ABS_MT_BLOB_ID,
         ABS_MT_TRACKING_ID,
-        ABS_MT_PRESSURE,
-        ABS_MT_TOOL_TYPE
+        ABS_MT_PRESSURE
         };
     return abs;
 }
@@ -86,8 +83,6 @@ VirtualTouchScreen::VirtualTouchScreen(const uint32_t maxX, const uint32_t maxY)
     dev_.absmax[ABS_MT_TRACKING_ID] = 9;
     dev_.absmin[ABS_MT_PRESSURE] = 0;
     dev_.absmax[ABS_MT_PRESSURE] = 100;
-    dev_.absmin[ABS_MT_TOOL_TYPE] = 0;
-    dev_.absmax[ABS_MT_TOOL_TYPE] = 15;
 }
 } // namespace MMI
 } // namespace OHOS
