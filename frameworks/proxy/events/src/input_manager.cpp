@@ -25,8 +25,11 @@
 
 namespace OHOS {
 namespace MMI {
-InputManager *InputManager::instance_ = nullptr;
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManager" };
+} // namespace
 
+InputManager *InputManager::instance_ = nullptr;
 InputManager *InputManager::GetInstance()
 {
     if (instance_ == nullptr) {
@@ -48,7 +51,14 @@ int32_t InputManager::AddInputEventFilter(std::function<bool(std::shared_ptr<Poi
 
 void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
 {
-    InputMgrImpl->SetWindowInputEventConsumer(inputEventConsumer);
+    InputMgrImpl->SetWindowInputEventConsumer(inputEventConsumer, nullptr);
+}
+
+void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+{
+    CHKPV(eventHandler);
+    InputMgrImpl->SetWindowInputEventConsumer(inputEventConsumer, eventHandler);
 }
 
 int32_t InputManager::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
