@@ -63,19 +63,10 @@ public:
     bool HandlerEvent(const std::shared_ptr<KeyEvent> event);
 private:
     bool ResolveJson(const std::string &configFile);
-    bool GetPreKeys(const std::string &objStr, ShortcutKey &shortcutKey);
-    bool GetTrigger(const std::string &objStr, int32_t &triggerType);
-    bool GetKeyDownDuration(const std::string &objStr, int32_t &keyDownDurationInt);
-    bool GetKeyFinalKey(const std::string &objStr, int32_t &finalKeyInt);
-    void GetKeyVal(const std::string &objStr, const std::string &key, std::string &value);
-    bool GetParams(const std::string &objStr, Ability &ability);
-    bool GetEntities(const std::string &objStr, Ability &ability);
     void ResolveConfig(std::string configFile);
-    bool ConvertToShortcutKey(const std::string &jsonDataStr, ShortcutKey &shortcutKey);
     std::string GetConfigFilePath() const;
     void LaunchAbility(ShortcutKey key);
     std::string GenerateKey(const ShortcutKey& key);
-    bool PackageAbility(const std::string &abilityStr, Ability &ability);
     void Print();
     bool IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey);
@@ -90,6 +81,7 @@ private:
     bool SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key);
     ShortcutKey lastMatchedKey_;
     std::map<std::string, ShortcutKey> shortcutKeys_;
+    static constexpr int64_t JSON_FILE_SIZE = 0x2000;
 };
 } // namespace MMI
 } // namespace OHOS
