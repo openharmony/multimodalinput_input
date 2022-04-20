@@ -144,9 +144,9 @@ public:
     void MarkConsumed(int32_t monitorId, int32_t eventId);
 
     /**
-     * @brief 移动鼠标到指定位置。
-     * @param offsetX X轴偏移量。
-     * @param offsetY Y轴偏移量。
+     * @brief Moves the cursor to the specified position.
+     * @param offsetX Indicates the offset on the X axis.
+     * @param offsetY Indicates the offset on the Y axis.
      * @return void
      * @since 9
      */
