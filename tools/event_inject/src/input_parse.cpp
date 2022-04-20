@@ -25,17 +25,23 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GetDeviceNode" };
 struct MyJson {
-    explicit MyJson() {}
+    explicit MyJson()
+    {
+        json_ = nullptr;
+    }
+
     ~MyJson()
     {
         if (json_) {
             cJSON_Delete(json_);
         }
     }
+
     operator cJSON *()
     {
         return json_;
     }
+
     cJSON *json_;
 };
 
