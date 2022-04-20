@@ -205,6 +205,8 @@ int32_t MMIService::Init()
 
 void MMIService::OnStart()
 {
+    int sleepSeconds = 3;
+    sleep(sleepSeconds);
     CHK_PIDANDTID();
     int32_t ret = Init();
     if (RET_OK != ret) {

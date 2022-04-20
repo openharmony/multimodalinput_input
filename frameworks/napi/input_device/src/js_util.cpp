@@ -22,16 +22,26 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsUtil" };
+const std::string GET_REFERENCE = "napi_get_reference_value";
+const std::string STRICT_EQUALS = "napi_strict_equals";
+const std::string DELETE_REFERENCE = "napi_delete_reference";
 } // namespace
-int32_t JsUtil::GetUserData(uv_work_t *work)
+int32_t JsUtil::GetInt32(uv_work_t *work)
 {
     int32_t *uData = static_cast<int32_t*>(work->data);
     int32_t userData = *uData;
     delete uData;
-    uData = nullptr;
     delete work;
-    work = nullptr;
     return userData;
+}
+
+bool JsUtil::IsHandleEquals(napi_env env, napi_value handle, napi_ref ref)
+{
+    napi_value handlerTemp = nullptr;
+    CHKRB(env, napi_get_reference_value(env, ref, &handlerTemp), GET_REFERENCE);
+    bool isEqual = false;
+    CHKRB(env, napi_strict_equals(env, handle, handlerTemp, &isEqual), STRICT_EQUALS);
+    return isEqual;
 }
 
 JsUtil::CallbackInfo::CallbackInfo() {}
@@ -39,8 +49,9 @@ JsUtil::CallbackInfo::CallbackInfo() {}
 JsUtil::CallbackInfo::~CallbackInfo()
 {
     CALL_LOG_ENTER;
-    if (ref != nullptr) {
-        CHKRV(env, napi_delete_reference(env, ref), "napi_delete_reference");
+    if (ref != nullptr && env != nullptr) {
+        CHKRV(env, napi_delete_reference(env, ref), DELETE_REFERENCE);
+        env = nullptr;
     }
 }
 } // namespace MMI
