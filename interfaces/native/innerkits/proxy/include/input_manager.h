@@ -69,9 +69,9 @@ public:
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer);
 
     /**
-     * @brief 设置一个运行在指定线程的窗口输入事件消费者
-     * @param inputEventConsumer 指定的消费者
-     * @param eventHandler 指定运行消费者的线程
+     * @brief Sets a window input event consumer that runs on the specified thread.
+     * @param inputEventConsumer Window input event consumer.
+     * @param eventHandler Thread running the window input event consumer.
      * @since 9
      */
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
