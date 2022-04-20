@@ -406,7 +406,11 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
 
-    MouseEventHdr->Normalize(event);
+    auto ret = MouseEventHdr->Normalize(event);
+    if (ret == RET_ERR) {
+        MMI_HILOGE("Normalize faild");
+        return RET_ERR;
+    }
 
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);

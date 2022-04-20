@@ -34,11 +34,11 @@ public:
     DISALLOW_COPY_AND_MOVE(MouseEventHandler);
 
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
-    void Normalize(struct libinput_event *event);
+    int32_t Normalize(struct libinput_event *event);
 private:
-    void HandleMotionInner(libinput_event_pointer* data);
-    void HandleButonInner(libinput_event_pointer* data);
-    void HandleAxisInner(libinput_event_pointer* data);
+    int32_t HandleMotionInner(libinput_event_pointer* data);
+    int32_t HandleButonInner(libinput_event_pointer* data);
+    int32_t HandleAxisInner(libinput_event_pointer* data);
     void HandlePostInner(libinput_event_pointer* data, int32_t deviceId, PointerEvent::PointerItem& pointerItem);
     void DumpInner();
     void InitAbsolution();
