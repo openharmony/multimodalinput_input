@@ -27,6 +27,7 @@
 #include "event_filter_service.h"
 
 #include "if_mmi_client.h"
+#include "input_device_impl.h"
 #include "input_interceptor_manager.h"
 #include "input_monitor_manager.h"
 #include "i_input_event_consumer.h"
@@ -60,6 +61,7 @@ public:
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> consumer);
     void RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
+    void MoveMouse(int32_t offsetX, int32_t offsetY);
 
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
     int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
@@ -69,6 +71,9 @@ public:
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
+
+    void GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> &keyCodes,
+        std::function<void(std::map<int32_t, bool>)> callback);
 
 private:
     int32_t PackPhysicalDisplay(NetPacket &pkt);
@@ -85,7 +90,7 @@ private:
 private:
     sptr<EventFilterService> eventFilterService_ {nullptr};
     std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
-    
+
     std::vector<PhysicalDisplayInfo> physicalDisplays_;
     std::vector<LogicalDisplayInfo> logicalDisplays_;
     InputMonitorManager monitorManager_;
