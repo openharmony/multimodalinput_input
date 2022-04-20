@@ -464,7 +464,7 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
         return;
     }
     if (MMIEventHdl.MoveMouseEvent(offsetX, offsetY) != RET_OK) {
-        MMI_HILOGE("Failed to inject movemove offset event");
+        MMI_HILOGE("Failed to inject move mouse offset event");
     }
 }
 
