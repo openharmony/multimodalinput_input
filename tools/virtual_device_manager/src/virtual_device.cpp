@@ -46,7 +46,7 @@ bool IsNum(const std::string& str)
 {
     for (uint32_t i = 0; i < str.length(); i++) {
         int32_t tmp = static_cast<int32_t>(str[i]);
-        if ((tmp >= 48) && (tmp <= 57)) {
+        if ((tmp >= '0') && (tmp <= '9')) {
             continue;
         } else {
             return false;
@@ -66,26 +66,22 @@ bool CheckFileName(const std::string& fileName)
         printf("file name check error");
         return false;
     }
-    if (fileName.substr(pos + 1) == "mouse") {
-    } else if (fileName.substr(pos + 1) == "keyboard") {
-    } else if (fileName.substr(pos + 1) == "joystick") {
-    } else if (fileName.substr(pos + 1) == "trackball") {
-    } else if (fileName.substr(pos + 1) == "remotecontrol") {
-    } else if (fileName.substr(pos + 1) == "trackpad") {
-    } else if (fileName.substr(pos + 1) == "knob") {
-    } else if (fileName.substr(pos + 1) == "gamepad") {
-    } else if (fileName.substr(pos + 1) == "touchpad") {
-    } else if (fileName.substr(pos + 1) == "touchscreen") {
-    } else if (fileName.substr(pos + 1) == "pen") {
-    } else if (fileName.substr(pos + 1) == "all") {
-    } else {
-        printf("file name check divece name error");
-        return false;
+    const std::vector<std::string> validFileNames = {
+        "mouse", "keyboard", "joystick", "trackball", "remotecontrol",
+        "trackpad", "knob", "gamepad", "touchpad", "touchscreen",
+        "pen", "all"
+    };
+    std::string deviceName = fileName.substr(pos + 1);
+    bool result = std::any_of(validFileNames.begin(), validFileNames.end(), [deviceName](const std::string& str) {
+        return str == deviceName;
+    });
+    if (!result) {
+        printf("file name check divece file name error : %s", fileName.c_str());
     }
-    return true;
+    return result;
 }
 
-void removeDir()
+void RemoveDir()
 {
     DIR* dir = opendir(g_folderpath.c_str());
     if (dir == nullptr) {
@@ -145,7 +141,8 @@ std::vector<std::string> VirtualDevice::ViewDirectory(const std::string& filePat
     dirent* ptr = nullptr;
     int32_t fileNnm = 0;
     while ((ptr = readdir(dir)) != nullptr) {
-        if ((!std::strncmp(ptr->d_name, ".", 1)) || (!std::strncmp(ptr->d_name, "..", 2))) {
+        std::string tmpDirName(ptr->d_name);
+        if ((tmpDirName == ".") || (tmpDirName == "..")) {
             continue;
         }
         fileNnm++;
@@ -552,12 +549,12 @@ bool VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
     closePid.append("_");
     bool result = SelectDevice(alldevice);
     if (!result) {
-        removeDir();
+        RemoveDir();
         return false;
     }
     if (closePid.compare("all_") == 0) {
         CloseAllDevice(alldevice);
-        removeDir();
+        RemoveDir();
         return true;
     }
     for (auto it : alldevice) {
@@ -568,7 +565,7 @@ bool VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
             if (ret == -1) {
                 printf("remove file fail. file name: %s, errno: %d.\n", it.c_str(), errno);
             }
-            removeDir();
+            RemoveDir();
             return true;
         }
     }
