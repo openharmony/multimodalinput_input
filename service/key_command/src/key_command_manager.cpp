@@ -31,15 +31,19 @@ constexpr int32_t MAX_PREKEYS_NUM = 4;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandManager" };
 constexpr int64_t JSON_FILE_SIZE = 0x2000;
 struct MyJson {
-  explicit MyJson() {
-  }
-  ~MyJson() {
-    if (json_) {
-      cJSON_Delete(json_);
+    explicit MyJson() {
     }
-  }
-  operator cJSON *() { return json_; }
-  cJSON *json_;
+    ~MyJson()
+    {
+        if (json_) {
+            cJSON_Delete(json_);
+        }
+    }
+    operator cJSON *()
+    {
+        return json_;
+    }
+    cJSON *json_;
 };
 
 bool GetPreKeys(cJSON* jsonData, ShortcutKey &shortcutKey)

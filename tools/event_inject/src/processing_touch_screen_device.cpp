@@ -69,7 +69,7 @@ void ProcessingTouchScreenDevice::AnalysisTouchScreenDate(const std::vector<Devi
 {
     TouchScreenCoordinates touchScreenCoordinates = {};
     TouchScreenInputEvent touchScreenInputEvent = {};
-    for (auto &item : inputData){
+    for (const auto &item : inputData) {
         touchScreenInputEvent.groupNumber = 0;
         for (auto &posXYItem : item.posXY) {
             touchScreenCoordinates.xPos = posXYItem.xPos;

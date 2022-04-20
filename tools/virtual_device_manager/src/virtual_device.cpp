@@ -46,7 +46,7 @@ bool IsNum(const std::string& str)
 {
     for (uint32_t i = 0; i < str.length(); i++) {
         int32_t tmp = static_cast<int32_t>(str[i]);
-        if (tmp >= 48 && tmp <= 57) {
+        if ((tmp >= 48) && (tmp <= 57)) {
             continue;
         } else {
             return false;
@@ -95,7 +95,7 @@ void removeDir()
     dirent* ptr = nullptr;
     int32_t fileNnm = 0;
     while ((ptr = readdir(dir)) != nullptr) {
-        if((!std::strncmp(ptr->d_name, ".", 1)) || (!std::strncmp(ptr->d_name, "..", 2))) {
+        if ((!std::strncmp(ptr->d_name, ".", 1)) || (!std::strncmp(ptr->d_name, "..", 2))) {
             continue;
         }
         fileNnm++;
@@ -145,7 +145,7 @@ std::vector<std::string> VirtualDevice::ViewDirectory(const std::string& filePat
     dirent* ptr = nullptr;
     int32_t fileNnm = 0;
     while ((ptr = readdir(dir)) != nullptr) {
-        if((!std::strncmp(ptr->d_name, ".", 1)) || (!std::strncmp(ptr->d_name, "..", 2))) {
+        if ((!std::strncmp(ptr->d_name, ".", 1)) || (!std::strncmp(ptr->d_name, "..", 2))) {
             continue;
         }
         fileNnm++;
@@ -162,7 +162,7 @@ std::vector<std::string> VirtualDevice::ViewDirectory(const std::string& filePat
             printf("filePath : %s is error \n", path.c_str());
             ViewDirectory(path, false);
         } else {
-            printf("file name:%s, type is error\n",ptr->d_name);
+            printf("file name:%s, type is error\n", ptr->d_name);
             fileNnm--;
         }
     }
