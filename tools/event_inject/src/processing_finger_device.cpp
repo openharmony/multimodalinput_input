@@ -48,7 +48,7 @@ void ProcessingFingerDevice::AnalysisTouchPadFingerDate(const std::vector<Device
 {
     TouchPadCoordinates touchPadCoordinates = {};
     TouchPadInputEvent touchPadInputEvent = {};
-    for (auto &item : inputData){
+    for (const auto &item : inputData) {
         touchPadInputEvent.groupNumber = 0;
         for (auto &posXYItem : item.posXY) {
             touchPadCoordinates.xPos = posXYItem.xPos;

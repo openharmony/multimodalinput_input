@@ -245,7 +245,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
     if (jsonBuf.empty()) {
         ASSERT_TRUE(false) << "read file failed" << path;
     }
-	ManageInjectDevice manageInjectDevice;
+    ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
