@@ -299,26 +299,36 @@ void PointerEvent::SetPointerAction(int32_t pointerAction)
 const char* PointerEvent::DumpPointerAction() const
 {
     switch (pointerAction_) {
-        case PointerEvent::POINTER_ACTION_CANCEL:
+        case PointerEvent::POINTER_ACTION_CANCEL: {
             return "cancel";
-        case PointerEvent::POINTER_ACTION_DOWN:
+        }
+        case PointerEvent::POINTER_ACTION_DOWN: {
             return "down";
-        case PointerEvent::POINTER_ACTION_MOVE:
+        }
+        case PointerEvent::POINTER_ACTION_MOVE: {
             return "move";
-        case PointerEvent::POINTER_ACTION_UP:
+        }
+        case PointerEvent::POINTER_ACTION_UP: {
             return "up";
-        case PointerEvent::POINTER_ACTION_AXIS_BEGIN:
+        }
+        case PointerEvent::POINTER_ACTION_AXIS_BEGIN: {
             return "axis-begin";
-        case PointerEvent::POINTER_ACTION_AXIS_UPDATE:
+        }
+        case PointerEvent::POINTER_ACTION_AXIS_UPDATE: {
             return "axis-update";
-        case PointerEvent::POINTER_ACTION_AXIS_END:
+        }
+        case PointerEvent::POINTER_ACTION_AXIS_END: {
             return "axis-end";
-        case PointerEvent::POINTER_ACTION_BUTTON_DOWN:
+        }
+        case PointerEvent::POINTER_ACTION_BUTTON_DOWN: {
             return "button-down";
-        case PointerEvent::POINTER_ACTION_BUTTON_UP:
+        }
+        case PointerEvent::POINTER_ACTION_BUTTON_UP: {
             return "button-up";
-        default:
+        }
+        default: {
             break;
+        }
     }
     return "unknown";
 }
@@ -422,14 +432,18 @@ void PointerEvent::SetSourceType(int32_t sourceType)
 const char* PointerEvent::DumpSourceType() const
 {
     switch (sourceType_) {
-        case PointerEvent::SOURCE_TYPE_MOUSE:
+        case PointerEvent::SOURCE_TYPE_MOUSE: {
             return "mouse";
-        case PointerEvent::SOURCE_TYPE_TOUCHSCREEN:
+        }
+        case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
             return "touch-screen";
-        case PointerEvent::SOURCE_TYPE_TOUCHPAD:
+        }
+        case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
             return "touch-pad";
-        default:
+        }
+        default: {
             break;
+        }
     }
     return "unknown";
 }

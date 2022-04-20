@@ -525,15 +525,18 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
     int32_t mask = interceptorId % ADD_MASK_BASE;
     interceptorId /= ADD_MASK_BASE;
     switch (mask) {
-        case MASK_TOUCH:
+        case MASK_TOUCH: {
             interceptorManager_.RemoveInterceptor(interceptorId);
             break;
-        case MASK_KEY:
+        }
+        case MASK_KEY: {
             InterceptorMgr.RemoveInterceptor(interceptorId);
             break;
-        default:
+        }
+        default: {
             MMI_HILOGE("Can't find the mask, mask:%{public}d", mask);
             break;
+        }
     }
 }
 

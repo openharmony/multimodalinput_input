@@ -43,13 +43,16 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
     }
 
     switch (code) {
-        case IMultimodalInputConnect::ALLOC_SOCKET_FD:
+        case IMultimodalInputConnect::ALLOC_SOCKET_FD: {
             return StubHandleAllocSocketFd(data, reply);
-        case IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER:
+        }
+        case IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER: {
             return StubAddInputEventFilter(data, reply);
-        default:
+        }
+        default: {
             MMI_HILOGE("unknown code:%{public}u, go switch defaut", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+        }
     }
 }
 
