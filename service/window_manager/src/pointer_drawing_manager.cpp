@@ -281,7 +281,7 @@ void PointerDrawingManager::DeletePidInfo(int32_t pid)
     } else {
         auto info = pidInfos_.back();
         visible_ = info.visible;
-        MMI_HILOGD("pointer visible property:%{public}d.%{public}d-%{public}d", pidInfos_.size(), pid, visible_);
+        MMI_HILOGD("pointer visible property:%{public}zu.%{public}d-%{public}d", pidInfos_.size(), pid, visible_);
     }
     return;
 }
@@ -300,7 +300,7 @@ void PointerDrawingManager::UpdataPidInfo(int32_t pid, bool visible)
     pidInfos_.push_back(info);
 
     visible_ = info.visible;
-    MMI_HILOGD("pointer visible property:%{public}d.%{public}d-%{public}d", pidInfos_.size(), pid, visible_);
+    MMI_HILOGD("pointer visible property:%{public}zu.%{public}d-%{public}d", pidInfos_.size(), pid, visible_);
     return;
 }
 
@@ -309,7 +309,7 @@ void PointerDrawingManager::UpdataPointerVisible()
     if (pointerWindow_ == nullptr) {
         return;
     }
-    if(visible_) {
+    if (visible_) {
         pointerWindow_->Show();
     } else {
         pointerWindow_->Hide();

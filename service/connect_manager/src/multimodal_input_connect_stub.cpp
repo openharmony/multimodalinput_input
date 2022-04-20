@@ -113,7 +113,7 @@ bool MultimodalInputConnectStub::CheckPermission()
             MMI_HILOGE("GetHapTokenInfo failed");
             return false;
         }
-        if (findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_BASIC || 
+        if (findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_BASIC ||
             findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_CORE) {
             MMI_HILOGI("check hap permisson success");
             return true;
@@ -127,7 +127,7 @@ bool MultimodalInputConnectStub::CheckPermission()
             MMI_HILOGE("GetNativeTokenInfo failed");
             return false;
         }
-        if (findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_BASIC || 
+        if (findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_BASIC ||
             findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_CORE) {
             MMI_HILOGI("check native permisson success");
             return true;
