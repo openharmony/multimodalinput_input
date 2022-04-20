@@ -31,7 +31,7 @@ public:
     void ShowUsage();
 private:
     void InitializeMouseDeathStub();
-    int32_t NextPos(int32_t begPos, int32_t endPos, int32_t begTime, int32_t endTime, int32_t curTime);
+    int32_t NextPos(int32_t begPos, int32_t endPos, int64_t begTime, int64_t endTime, int64_t curTime);
 };
 } // namespace MMI
 } // namespace OHOS

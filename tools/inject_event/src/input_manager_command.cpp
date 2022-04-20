@@ -57,10 +57,14 @@ constexpr int32_t DOUBLE_ACTION_TIME = 6000;
 static constexpr int32_t BLOCK_TIME_MS = 16;
 } // namespace
 
-int32_t InputManagerCommand::NextPos(int32_t begPos, int32_t endPos, int32_t begTime, int32_t endTime, int32_t curTime)
+int32_t InputManagerCommand::NextPos(int32_t begPos, int32_t endPos, int64_t begTime, int64_t endTime, int64_t curTime)
 {
-    int32_t deltaTime = (endTime - begTime + BLOCK_TIME_MS - 1) / BLOCK_TIME_MS;
-    int32_t nTimes =  (curTime - begTime + BLOCK_TIME_MS - 1) / BLOCK_TIME_MS;
+    if (curTime < begTime || curTime > endTime) {
+        return begPos;
+    }
+    const int64_t blockTimeUs = BLOCK_TIME_MS * 1000;
+    int64_t deltaTime = (endTime - begTime + blockTimeUs - 1) / blockTimeUs;
+    int64_t nTimes =  (curTime - begTime + blockTimeUs - 1) / blockTimeUs;
     int32_t retPos = begPos;
     if (deltaTime != 0) {
         retPos = static_cast<int32_t>(std::ceil(begPos + 1.0f * (endPos - begPos) * nTimes / deltaTime));
@@ -497,11 +501,11 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-                            const int32_t endTime = startTime + totalTimeMs * 1000;
-                            int32_t currentTime = startTime;
+                            const int64_t endTime = startTime + totalTimeMs * 1000;
+                            int64_t currentTime = startTime;
                             while (currentTime < endTime) {
                                 item.SetGlobalX(NextPos(px1, px2, startTime, endTime, currentTime));
-                                item.SetGlobalX(NextPos(py1, py2, startTime, endTime, currentTime));
+                                item.SetGlobalY(NextPos(py1, py2, startTime, endTime, currentTime));
                                 pointerEvent->SetActionTime(currentTime);
                                 pointerEvent->UpdatePointerItem(0, item);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
