@@ -81,7 +81,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_HILOGD("LogicalX:%{public}d, logicalY:%{public}d, logicalDisplay:%{public}d, pressure:%{public}d",
+    MMI_HILOGD("LogicalX:%{public}d, logicalY:%{public}d, logicalDisplay:%{public}d, pressure:%{public}f",
                logicalX, logicalY, logicalDisplayId, pressure);
     return true;
 }
@@ -114,7 +114,7 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
     item.SetGlobalY(logicalY);
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_HILOGD("LogicalX:%{public}d, logicalY:%{public}d, pressure:%{public}d",
+    MMI_HILOGD("LogicalX:%{public}d, logicalY:%{public}d, pressure:%{public}f",
                logicalX, logicalY, pressure);
     return true;
 }
