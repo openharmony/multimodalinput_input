@@ -70,11 +70,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     auto seatSlot = libinput_event_touch_get_seat_slot(data);
     item.SetPressure(pressure);
     int32_t toolType = -1;
-    int32_t ret = GetTouchToolType(event, toolType);
-    if (ret != RET_OK) {
-        MMI_HILOGE("GetTouchToolType failed");
-        return false;
-    }
+    GetTouchToolType(event, toolType);
     item.SetToolType(toolType);
     item.SetPointerId(seatSlot);
     item.SetDownTime(time);
@@ -183,64 +179,55 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent
     return pointerEvent_;
 }
 
-int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_event *event, int32_t &toolType)
+void TouchTransformPointProcessor::GetTouchToolType(struct libinput_event *event, int32_t &toolType)
 {
     auto data = libinput_event_get_touch_event(event);
-    CHKPR(data, ERROR_NULL_POINTER);
+    CHKPV(data);
     auto toolTypeTmp = libinput_event_touch_get_tool_type(data);
     switch (toolTypeTmp) {
         case MT_TOOL_NONE: {
             auto device = libinput_event_get_device(event);
-            CHKPR(device, ERROR_NULL_POINTER);
-            GetTouchToolType(device, toolType);
-            return RET_OK;
+            CHKPV(device);
+            toolType = GetTouchToolType(device);
+            return;
         }
         case MT_TOOL_FINGER: {
             toolType = PointerEvent::TOOL_TYPE_FINGER;
-            return RET_OK;
+            return;
         }
         case MT_TOOL_PEN: {
             toolType = PointerEvent::TOOL_TYPE_PEN;
-            return RET_OK;
+            return;
         }
         default : {
+            MMI_HILOGW("Unknown tool type, identified as finger, toolType:%{public}d", toolTypeTmp);
             toolType = PointerEvent::TOOL_TYPE_FINGER;
-            MMI_HILOGD("Unknown tool type, identified as finger, toolType:%{public}d", toolTypeTmp);
-            return RET_OK;
+            return;
         }
     }
 }
 
-void TouchTransformPointProcessor::GetTouchToolType(struct libinput_device *device, int32_t &toolType)
+int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_device *device)
 {
-    if (BTN_DOWN == libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_PEN)) {
-        toolType = PointerEvent::TOOL_TYPE_PEN;
-        return;
-    } else if (BTN_DOWN == libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_RUBBER)) {
-        toolType = PointerEvent::TOOL_TYPE_RUBBER;
-        return;
-    } else if (BTN_DOWN == libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_BRUSH)) {
-        toolType = PointerEvent::TOOL_TYPE_BRUSH;
-        return;
-    } else if (BTN_DOWN == libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_PENCIL)) {
-        toolType = PointerEvent::TOOL_TYPE_PENCIL;
-        return;
-    } else if (BTN_DOWN == libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_AIRBRUSH)) {
-        toolType = PointerEvent::TOOL_TYPE_AIRBRUSH;
-        return;
-    } else if (BTN_DOWN == libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_FINGER)) {
-        toolType = PointerEvent::TOOL_TYPE_FINGER;
-        return;
-    } else if (BTN_DOWN == libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_MOUSE)) {
-        toolType = PointerEvent::TOOL_TYPE_MOUSE;
-        return;
-    } else if (BTN_DOWN == libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_LENS)) {
-        toolType = PointerEvent::TOOL_TYPE_LENS;
-        return;
+    if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_PEN) == BTN_DOWN) {
+        return PointerEvent::TOOL_TYPE_PEN;
+    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_RUBBER) == BTN_DOWN) {
+        return PointerEvent::TOOL_TYPE_RUBBER;
+    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_BRUSH) == BTN_DOWN) {
+        return PointerEvent::TOOL_TYPE_BRUSH;
+    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_PENCIL) == BTN_DOWN) {
+        return PointerEvent::TOOL_TYPE_PENCIL;
+    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_AIRBRUSH) == BTN_DOWN) {
+        return PointerEvent::TOOL_TYPE_AIRBRUSH;
+    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_FINGER) == BTN_DOWN) {
+        return PointerEvent::TOOL_TYPE_FINGER;
+    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_MOUSE) == BTN_DOWN) {
+        return PointerEvent::TOOL_TYPE_MOUSE;
+    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_LENS) == BTN_DOWN) {
+        return PointerEvent::TOOL_TYPE_LENS;
     } else {
-        toolType = PointerEvent::TOOL_TYPE_FINGER;
-        MMI_HILOGD("Unknown Btn tool type, identified as finger");
-        return;
+        MMI_HILOGW("Unknown Btn tool type, identified as finger");
+        return PointerEvent::TOOL_TYPE_FINGER;
     }
 }
 } // namespace MMI
