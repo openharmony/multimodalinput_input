@@ -44,7 +44,6 @@ ohos_shared_library("inputconsumer") {
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
-    "//foundation/multimodalinput/input/tools/event_inject:event-injection",
     "//foundation/multimodalinput/input/util:libmmi-util",
   ]
 

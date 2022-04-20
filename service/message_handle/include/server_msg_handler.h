@@ -52,6 +52,8 @@ protected:
     int32_t OnInputDevice(SessionPtr sess, NetPacket& pkt);
     int32_t OnInputDeviceIds(SessionPtr sess, NetPacket& pkt);
     int32_t GetKeystrokeAbility(SessionPtr sess, NetPacket& pkt);
+    int32_t OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
+    int32_t OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveInputEventMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt);
@@ -60,7 +62,7 @@ protected:
     int32_t OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
-
+    int32_t OnMoveMouse(SessionPtr sess, NetPacket& pkt);
 private:
     UDSServer *udsServer_ = nullptr;
     EventDispatch eventDispatch_;

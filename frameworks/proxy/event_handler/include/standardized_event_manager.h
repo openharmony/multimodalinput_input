@@ -42,6 +42,8 @@ public:
     int32_t GetDevice(int32_t userData, int32_t deviceId);
     int32_t GetDeviceIds(int32_t userData);
     int32_t GetKeystrokeAbility(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes);
+    int32_t RegisterInputDeviceMonitor();
+    int32_t UnRegisterInputDeviceMonitor();
     int32_t SubscribeKeyEvent(const KeyEventInputSubscribeManager::SubscribeKeyEventInfo& subscribeInfo);
     int32_t UnSubscribeKeyEvent(int32_t subscribeId);
 protected:
