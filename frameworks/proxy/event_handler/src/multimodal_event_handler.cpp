@@ -137,6 +137,15 @@ int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent>
     return EventManager.InjectPointerEvent(pointerEvent);
 }
 
+int32_t MultimodalEventHandler::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
+{
+    if (!InitClient()) {
+        MMI_HILOGE("Init client faild");
+        return MMI_SERVICE_INVALID;
+    }
+    return EventManager.MoveMouseEvent(offsetX, offsetY);
+}
+
 int32_t MultimodalEventHandler::AddInterceptor(int32_t sourceType, int32_t id)
 {
     if (!InitClient()) {

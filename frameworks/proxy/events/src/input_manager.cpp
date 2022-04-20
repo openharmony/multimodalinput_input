@@ -97,6 +97,11 @@ void InputManager::MarkConsumed(int32_t monitorId, int32_t eventId)
     InputMgrImpl->MarkConsumed(monitorId, eventId);
 }
 
+void InputManager::MoveMouse(int32_t offsetX, int32_t offsetY)
+{
+    InputMgrImpl->MoveMouse(offsetX, offsetY);
+}
+
 int32_t InputManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
     return InputMgrImpl->AddInterceptor(interceptor);
