@@ -196,8 +196,8 @@ public:
 
     /**
      * @brief Sets whether the pointer icon is visible.
-     * @param visible Whether the pointer icon is visible. The value **true** indicates that the pointer icon is visible, 
-     * and the value **false** indicates the opposite.
+     * @param visible Whether the pointer icon is visible. The value <b>true</b> indicates that
+     * the pointer icon is visible, and the value <b>false</b> indicates the opposite.
      * @return void
      * @since 9
      */
