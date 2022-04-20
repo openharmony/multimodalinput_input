@@ -295,7 +295,7 @@ napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_i
     napi_valuetype valueType = napi_undefined;
     CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
     if (valueType != napi_boolean) {
-        MMI_HILOGE("the first parameter is not a number");
+        MMI_HILOGE("the first parameter is not a boolean");
         napi_throw_error(env, nullptr, "JsInputDeviceContext: the first parameter is not a boolean");
         return nullptr;
     }
