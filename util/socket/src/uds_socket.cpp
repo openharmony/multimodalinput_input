@@ -145,11 +145,11 @@ void UDSSocket::OnReadPackets(CircleStreamBuffer& circBuf, UDSSocket::PacketCall
             circBuf.Reset();
             break;
         }
+        callbackFun(pkt);
         if (circBuf.IsEmpty()) {
             circBuf.Reset();
             break;
         }
-        callbackFun(pkt);
     }
 }
 
