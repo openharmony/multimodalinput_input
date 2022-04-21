@@ -184,7 +184,6 @@ bool TabletToolProcessor::OnTipUp(struct libinput_event_tablet_tool*)
         return false;
     }
     item.SetPressed(false);
-    item.SetPressure(0);
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, item);
     return true;
 }
