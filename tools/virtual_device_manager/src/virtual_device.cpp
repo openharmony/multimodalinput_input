@@ -44,21 +44,13 @@ namespace MMI {
 namespace {
 bool IsNum(const std::string& str)
 {
-    for (uint32_t i = 0; i < str.length(); i++) {
-        int32_t tmp = static_cast<int32_t>(str[i]);
-        if ((tmp >= '0') && (tmp <= '9')) {
-            continue;
-        } else {
-            return false;
-        }
-    }
-    return true;
+    return std::all_of(str.begin(), str.end(), [](char c){return std::isdigit(c) != 0;});
 }
 
 bool CheckFileName(const std::string& fileName)
 {
     std::string::size_type pos = fileName.find("_");
-    if (pos < 0) {
+    if (pos ==  std::string::npos) {
         printf("Failed to create file");
         return false;
     }
@@ -66,7 +58,7 @@ bool CheckFileName(const std::string& fileName)
         printf("file name check error");
         return false;
     }
-    const std::vector<std::string> validFileNames = {
+    std::vector<std::string> validFileNames = {
         "mouse", "keyboard", "joystick", "trackball", "remotecontrol",
         "trackpad", "knob", "gamepad", "touchpad", "touchscreen",
         "pen", "all"
@@ -85,7 +77,7 @@ void RemoveDir()
 {
     DIR* dir = opendir(g_folderpath.c_str());
     if (dir == nullptr) {
-        printf("Failed to open folder\n");
+        printf("Failed to open folder");
         return;
     }
     dirent* ptr = nullptr;
@@ -136,7 +128,7 @@ std::vector<std::string> VirtualDevice::ViewDirectory(const std::string& filePat
     fileList.clear();
     DIR* dir = opendir(filePath.c_str());
     if (dir == nullptr) {
-        printf("Failed to open folder\n");
+        printf("Failed to open folder");
         return fileList;
     }
     dirent* ptr = nullptr;
@@ -157,10 +149,10 @@ std::vector<std::string> VirtualDevice::ViewDirectory(const std::string& filePat
             }
         } else if (ptr->d_type == DT_DIR) {
             std::string path = filePath + ptr->d_name + "/";
-            printf("filePath : %s is error \n", path.c_str());
+            printf("filePath : %s is error", path.c_str());
             ViewDirectory(path, false);
         } else {
-            printf("file name:%s, type is error\n", ptr->d_name);
+            printf("file name:%s, type is error", ptr->d_name);
             fileNnm--;
         }
     }
@@ -380,7 +372,7 @@ void VirtualDevice::CloseAllDevice(const std::vector<std::string>& fileList)
         it.insert(0, g_folderpath.c_str());
         const int32_t ret = remove(it.c_str());
         if (ret == -1) {
-            printf("remove file fail. file name: %s, errno: %d.\n", it.c_str(), errno);
+            printf("remove file fail. file name: %s, errno: %d.", it.c_str(), errno);
         }
     }
 }

@@ -24,10 +24,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GetDeviceNode" };
-struct DeleteJson {
-    DeleteJson() = default;
+struct JsonParser {
+    JsonParser() = default;
 
-    ~DeleteJson()
+    ~JsonParser()
     {
         if (json_ != nullptr) {
             cJSON_Delete(json_);
@@ -45,6 +45,7 @@ struct DeleteJson {
 void GetJsonData(cJSON *json, const std::string& key, std::string& val)
 {
     if (!cJSON_IsObject(json)) {
+        MMI_HILOGW("json is not object");
         return;
     }
     if (cJSON_HasObjectItem(json, key.c_str())) {
@@ -60,6 +61,7 @@ template <class T>
 void GetJsonData(cJSON *json, const std::string& key, T& val)
 {
     if (!cJSON_IsObject(json)) {
+        MMI_HILOGW("json is not object");
         return;
     }
     if (cJSON_HasObjectItem(json, key.c_str())) {
@@ -74,10 +76,11 @@ void GetJsonData(cJSON *json, const std::string& key, T& val)
 void GetJsonData(cJSON *json, const std::string& key, std::vector<int32_t>& vals)
 {
     if (!cJSON_IsObject(json)) {
+        MMI_HILOGW("json is not object");
         return;
     }
     if (!cJSON_HasObjectItem(json, key.c_str())) {
-        MMI_HILOGW("GetJsonData json is not data:%{public}s", key.c_str());
+        MMI_HILOGW("json is not data:%{public}s", key.c_str());
         return;
     }
     cJSON* rawVal = cJSON_GetObjectItem(json, key.c_str());
@@ -92,30 +95,29 @@ void GetJsonData(cJSON *json, const std::string& key, std::vector<int32_t>& vals
             vals.push_back(val->valueint);
         }
     }
-
     return;
 }
 
 bool ParseEvents(cJSON* eventInfo, DeviceEvent& event)
 {
     if (!cJSON_IsArray(eventInfo)) {
-        MMI_HILOGW("ParseEvents eventInfo is not Array");
+        MMI_HILOGW("eventInfo is not array");
         return false;
     }
     int32_t eventSize = cJSON_GetArraySize(eventInfo);
     for (int32_t i = 0; i < eventSize; ++i) {
         cJSON* eventArray = cJSON_GetArrayItem(eventInfo, i);
         if (cJSON_IsArray(eventArray)) {
-            Pos pos;
             cJSON* xPos = cJSON_GetArrayItem(eventArray, 0);
             if (!cJSON_IsNumber(xPos)) {
-                MMI_HILOGW("yPos is null");
+                MMI_HILOGW("xPos is not number");
                 return false;
             }
+            Pos pos;
             pos.xPos = xPos->valueint;
             cJSON* yPos = cJSON_GetArrayItem(eventArray, 1);
             if (!cJSON_IsNumber(yPos)) {
-                MMI_HILOGW("yPos is null");
+                MMI_HILOGW("yPos is not number");
                 return false;
             }
             pos.yPos = yPos->valueint;
@@ -128,7 +130,7 @@ bool ParseEvents(cJSON* eventInfo, DeviceEvent& event)
 void ParseEventsObj(cJSON* eventInfo, DeviceEvent& event)
 {
     if (!cJSON_IsObject(eventInfo)) {
-        MMI_HILOGW("ParseEventsObj eventInfo is not object");
+        MMI_HILOGW("events is not object");
         return;
     }
     GetJsonData(eventInfo, "eventType", event.eventType);
@@ -152,7 +154,7 @@ void ParseEventsObj(cJSON* eventInfo, DeviceEvent& event)
 bool ParseData(cJSON* events, std::vector<DeviceEvent>& eventData)
 {
     if (!cJSON_IsArray(events)) {
-        MMI_HILOGE("ParseData events is not array");
+        MMI_HILOGE("events is not array");
         return false;
     }
     int32_t eventsSize = cJSON_GetArraySize(events);
@@ -161,13 +163,13 @@ bool ParseData(cJSON* events, std::vector<DeviceEvent>& eventData)
         DeviceEvent event;
         if (cJSON_IsArray(eventInfo)) {
             if (!ParseEvents(eventInfo, event)) {
-                MMI_HILOGE("ParseEvents is error");
+                MMI_HILOGE("events to failed");
                 return false;
             }
         } else if (cJSON_IsObject(eventInfo)) {
             ParseEventsObj(eventInfo, event);
         } else {
-            MMI_HILOGW("eventInfo is null");
+            MMI_HILOGW("events is error");
             return false;
         }
         eventData.push_back(event);
@@ -178,26 +180,26 @@ bool ParseData(cJSON* events, std::vector<DeviceEvent>& eventData)
 
 std::string Pos::ToString() const
 {
-    std::ostringstream oss;
-    oss << "pos(" << xPos << "," << yPos << ")";
-    return oss.str();
+    std::ostringstream ss;
+    ss << "pos(" << xPos << "," << yPos << ")";
+    return ss.str();
 }
 
 std::string DeviceEvent::ToString() const
 {
-    std::ostringstream oss;
-    oss << "{eventType:" << eventType
+    std::ostringstream ss;
+    ss << "{eventType:" << eventType
         << ",event:[";
     for (const auto &item : event) {
-        oss << item << ",";
+        ss << item << ",";
     }
-    oss << "],keyValue:" << keyValue
+    ss << "],keyValue:" << keyValue
         << ",blockTime:" << blockTime
         << ",ringEvents:[";
     for (const auto &item : ringEvents) {
-        oss << item << ",";
+        ss << item << ",";
     }
-    oss << "],direction:" << direction
+    ss << "],direction:" << direction
         << ",distance:" << distance
         << ",xPos:" << xPos
         << ",yPos:" << yPos
@@ -209,38 +211,38 @@ std::string DeviceEvent::ToString() const
         << ",keyStatus:" << keyStatus
         << ",posXY:";
     for (const auto &item : posXY) {
-        oss << item.ToString() << ",";
+        ss << item.ToString() << ",";
     }
-    oss << "}" << std::endl;
-    return oss.str();
+    ss << "}" << std::endl;
+    return ss.str();
 }
 
 std::string DeviceItem::ToString() const
 {
-    std::ostringstream oss;
-    oss << "{deviceName:" << deviceName
+    std::ostringstream ss;
+    ss << "{deviceName:" << deviceName
         << ",deviceIndex:" << deviceIndex
         << ",events:[";
     for (const auto &item : events) {
-        oss << item.ToString() << ",";
+        ss << item.ToString() << ",";
     }
-    oss << "]" << std::endl;
-    return oss.str();
+    ss << "]" << std::endl;
+    return ss.str();
 }
 
 DeviceItems DataInit(const std::string& fileData, bool logStatus)
 {
     CALL_LOG_ENTER;
-    DeleteJson arrays;
-    arrays.json_ = cJSON_Parse(fileData.c_str());
-    if (!cJSON_IsArray(arrays.json_)) {
-        MMI_HILOGE("DataInit json_ is not array");
+    JsonParser parser;
+    parser.json_ = cJSON_Parse(fileData.c_str());
+    if (!cJSON_IsArray(parser.json_)) {
+        MMI_HILOGE("parser is not array");
         return {};
     }
-    int32_t arraysSize = cJSON_GetArraySize(arrays.json_);
+    int32_t arraysSize = cJSON_GetArraySize(parser.json_);
     DeviceItems deviceItems;
     for (int32_t i = 0; i < arraysSize; ++i) {
-        cJSON* deviceInfo = cJSON_GetArrayItem(arrays.json_, i);
+        cJSON* deviceInfo = cJSON_GetArrayItem(parser.json_, i);
         if (!cJSON_IsObject(deviceInfo)) {
             MMI_HILOGW("deviceInfo is not Object");
             return {};
@@ -260,11 +262,11 @@ DeviceItems DataInit(const std::string& fileData, bool logStatus)
             events = cJSON_GetObjectItem(deviceInfo, "singleEvent");
         }
         if (!cJSON_IsArray(events)) {
-            MMI_HILOGE("DataInit events is not array");
+            MMI_HILOGE("parser events is not array");
             return {};
         }
         if (!ParseData(events, deviceItem.events)) {
-            MMI_HILOGW("ParseData is error");
+            MMI_HILOGW("Parse to failed");
             return {};
         }
         deviceItems.push_back(deviceItem);

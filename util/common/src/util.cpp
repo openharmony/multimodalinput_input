@@ -487,7 +487,7 @@ std::string ReadFile(const std::string &filePath, int32_t readLine)
 {
     FILE* fp = fopen(filePath.c_str(), "r");
     std::string dataStr;
-    if (fp) {
+    if (fp != nullptr) {
         char buf[256] = {};
         int32_t count = 0;
         while (fgets(buf, sizeof(buf), fp) != nullptr) {
@@ -495,12 +495,10 @@ std::string ReadFile(const std::string &filePath, int32_t readLine)
             ++count;
             if ((readLine > 0) && (readLine <= count)) {
                 (void)fclose(fp);
-                fp = nullptr;
                 return dataStr;
             }
         }
         (void)fclose(fp);
-        fp = nullptr;
     }
     return dataStr;
 }

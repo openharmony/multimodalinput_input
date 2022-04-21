@@ -30,10 +30,10 @@ namespace {
 constexpr int32_t MAX_PREKEYS_NUM = 4;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandManager" };
 constexpr int64_t JSON_FILE_SIZE = 0x2000;
-struct DeleteJson {
-    DeleteJson() = default;
+struct JsonParser {
+    JsonParser() = default;
 
-    ~DeleteJson()
+    ~JsonParser()
     {
         if (json_ != nullptr) {
             cJSON_Delete(json_);
@@ -51,7 +51,7 @@ struct DeleteJson {
 bool GetPreKeys(cJSON* jsonData, ShortcutKey &shortcutKey)
 {
     if (!cJSON_IsObject(jsonData)) {
-        MMI_HILOGE("GetPreKeys jsonData is not object");
+        MMI_HILOGE("preKeys jsonData is not object");
         return false;
     }
     cJSON* preKey = cJSON_GetObjectItemCaseSensitive(jsonData, "preKey");
@@ -67,7 +67,7 @@ bool GetPreKeys(cJSON* jsonData, ShortcutKey &shortcutKey)
     for (int32_t i = 0; i < preKeySize; ++i) {
         cJSON *preKeyJson = cJSON_GetArrayItem(preKey, i);
         if (!cJSON_IsNumber(preKeyJson)) {
-            MMI_HILOGE("preKey must be number and bigger or equal to 0");
+            MMI_HILOGE("preKey is not number");
             return false;
         }
         if (preKeyJson->valueint < 0) {
@@ -86,12 +86,12 @@ bool GetPreKeys(cJSON* jsonData, ShortcutKey &shortcutKey)
 bool GetTrigger(cJSON* jsonData, int32_t &triggerType)
 {
     if (!cJSON_IsObject(jsonData)) {
-        MMI_HILOGE("GetTrigger jsonData is not object");
+        MMI_HILOGE("trigger jsonData is not object");
         return false;
     }
     cJSON *trigger = cJSON_GetObjectItemCaseSensitive(jsonData, "trigger");
     if (!cJSON_IsString(trigger)) {
-        MMI_HILOGE("trigger must be one of [key_up, key_down]");
+        MMI_HILOGE("trigger is not string");
         return false;
     }
     if (((std::strcmp(trigger->valuestring, "key_up") != 0)
@@ -110,12 +110,12 @@ bool GetTrigger(cJSON* jsonData, int32_t &triggerType)
 bool GetKeyDownDuration(cJSON* jsonData, int32_t &keyDownDurationInt)
 {
     if (!cJSON_IsObject(jsonData)) {
-        MMI_HILOGE("GetKeyDownDuration jsonData is not object");
+        MMI_HILOGE("DownDuration jsonData is not object");
         return false;
     }
     cJSON *keyDownDuration = cJSON_GetObjectItemCaseSensitive(jsonData, "keyDownDuration");
     if (!cJSON_IsNumber(keyDownDuration)) {
-        MMI_HILOGE("keyDownDuration must be number and bigger and equal zero");
+        MMI_HILOGE("keyDownDuration is not number");
         return false;
     }
     if (keyDownDuration->valueint < 0) {
@@ -129,7 +129,7 @@ bool GetKeyDownDuration(cJSON* jsonData, int32_t &keyDownDurationInt)
 bool GetKeyFinalKey(cJSON* jsonData, int32_t &finalKeyInt)
 {
     if (!cJSON_IsObject(jsonData)) {
-        MMI_HILOGE("GetKeyFinalKey jsonData is not object");
+        MMI_HILOGE("finalKey jsonData is not object");
         return false;
     }
     cJSON *finalKey = cJSON_GetObjectItemCaseSensitive(jsonData, "finalKey");
@@ -144,7 +144,7 @@ bool GetKeyFinalKey(cJSON* jsonData, int32_t &finalKeyInt)
 void GetKeyVal(cJSON* json, const std::string &key, std::string &value)
 {
     if (!cJSON_IsObject(json)) {
-        MMI_HILOGE("GetKeyVal json is not object");
+        MMI_HILOGE("keyVal json is not object");
         return;
     }
     cJSON *valueJson = cJSON_GetObjectItemCaseSensitive(json, key.c_str());
@@ -157,7 +157,7 @@ void GetKeyVal(cJSON* json, const std::string &key, std::string &value)
 bool GetEntities(cJSON* jsonAbility, Ability &ability)
 {
     if (!cJSON_IsObject(jsonAbility)) {
-        MMI_HILOGE("GetEntities jsonAbility is not object");
+        MMI_HILOGE("entities jsonAbility is not object");
         return false;
     }
     cJSON *entities = cJSON_GetObjectItemCaseSensitive(jsonAbility, "entities");
@@ -165,14 +165,14 @@ bool GetEntities(cJSON* jsonAbility, Ability &ability)
         MMI_HILOGE("entities must be array");
         return false;
     }
-    int32_t entitiesSize = cJSON_GetArraySize(entities);
-    for (int32_t i = 0; i < entitiesSize; i++) {
-        cJSON* entitie = cJSON_GetArrayItem(entities, i);
-        if (!cJSON_IsString(entitie)) {
-            MMI_HILOGE("entitie is not string");
+    int32_t entitySize = cJSON_GetArraySize(entities);
+    for (int32_t i = 0; i < entitySize; i++) {
+        cJSON* entity = cJSON_GetArrayItem(entities, i);
+        if (!cJSON_IsString(entity)) {
+            MMI_HILOGE("entity is not string");
             return false;
         }
-        ability.entities.push_back(entitie->valuestring);
+        ability.entities.push_back(entity->valuestring);
     }
     return true;
 }
@@ -180,7 +180,7 @@ bool GetEntities(cJSON* jsonAbility, Ability &ability)
 bool GetParams(cJSON* jsonAbility, Ability &ability)
 {
     if (!cJSON_IsObject(jsonAbility)) {
-        MMI_HILOGE("GetParams jsonAbility is not object");
+        MMI_HILOGE("params jsonAbility is not object");
         return false;
     }
     cJSON *params = cJSON_GetObjectItemCaseSensitive(jsonAbility, "params");
@@ -197,12 +197,12 @@ bool GetParams(cJSON* jsonAbility, Ability &ability)
         }
         cJSON* key = cJSON_GetObjectItemCaseSensitive(param, "key");
         if (!cJSON_IsString(key)) {
-            MMI_HILOGE("key is nullptr");
+            MMI_HILOGE("key is not string");
             return false;
         }
         cJSON* value = cJSON_GetObjectItemCaseSensitive(param, "value");
         if (!cJSON_IsString(value)) {
-            MMI_HILOGE("value is nullptr");
+            MMI_HILOGE("value is not string");
             return false;
         }
         auto ret = ability.params.emplace(key->valuestring, value->valuestring);
@@ -216,7 +216,7 @@ bool GetParams(cJSON* jsonAbility, Ability &ability)
 bool PackageAbility(cJSON* jsonAbility, Ability &ability)
 {
     if (!cJSON_IsObject(jsonAbility)) {
-        MMI_HILOGE("PackageAbility jsonAbility is not object");
+        MMI_HILOGE("ability jsonAbility is not object");
         return false;
     }
     GetKeyVal(jsonAbility, "bundleName", ability.bundleName);
@@ -226,11 +226,11 @@ bool PackageAbility(cJSON* jsonAbility, Ability &ability)
     GetKeyVal(jsonAbility, "deviceId", ability.deviceId);
     GetKeyVal(jsonAbility, "uri", ability.uri);
     if (!GetEntities(jsonAbility, ability)) {
-        MMI_HILOGE("GetEntities return false");
+        MMI_HILOGE("entities to failed");
         return false;
     }
     if (!GetParams(jsonAbility, ability)) {
-        MMI_HILOGE("GetParams return false");
+        MMI_HILOGE("Params to failed");
         return false;
     }
     return true;
@@ -239,28 +239,28 @@ bool PackageAbility(cJSON* jsonAbility, Ability &ability)
 bool ConvertToShortcutKey(cJSON* jsonData, ShortcutKey &shortcutKey)
 {
     if (!cJSON_IsObject(jsonData)) {
-        MMI_HILOGE("ConvertToShortcutKey jsonData is not object");
+        MMI_HILOGE("convert jsonData is not object");
         return false;
     }
     if (!GetPreKeys(jsonData, shortcutKey)) {
-        MMI_HILOGE("preKeys is nullptr");
+        MMI_HILOGE("preKeys to failed");
         return false;
     }
     if (!GetKeyFinalKey(jsonData, shortcutKey.finalKey)) {
-        MMI_HILOGE("GetTrigger return false");
+        MMI_HILOGE("finalKey to failed");
         return false;
     }
     if (!GetTrigger(jsonData, shortcutKey.triggerType)) {
-        MMI_HILOGE("GetTrigger return false");
+        MMI_HILOGE("trigger to failed");
         return false;
     }
     if (!GetKeyDownDuration(jsonData, shortcutKey.keyDownDuration)) {
-        MMI_HILOGE("GetKeyDownDuration return false");
+        MMI_HILOGE("downDuration to failed");
         return false;
     }
     cJSON *ability = cJSON_GetObjectItemCaseSensitive(jsonData, "ability");
     if (!cJSON_IsObject(ability)) {
-        MMI_HILOGE("ability is nullptr");
+        MMI_HILOGE("ability is not object");
         return false;
     }
     if (!PackageAbility(ability, shortcutKey.ability)) {
@@ -274,20 +274,20 @@ bool ConvertToShortcutKey(cJSON* jsonData, ShortcutKey &shortcutKey)
 KeyCommandManager::KeyCommandManager()
 {
     std::string configFile = GetConfigFilePath();
-    ResolveConfig(configFile);
+    ParseConfig(configFile);
     Print();
 }
 
 std::string KeyCommandManager::GenerateKey(const ShortcutKey& key)
 {
     std::set<int32_t> preKeys = key.preKeys;
-    std::stringstream oss;
+    std::stringstream ss;
     for (const auto& preKey : preKeys) {
-        oss << preKey << ",";
+        ss << preKey << ",";
     }
-    oss << key.finalKey << ",";
-    oss << key.triggerType;
-    return std::string(oss.str());
+    ss << key.finalKey << ",";
+    ss << key.triggerType;
+    return std::string(ss.str());
 }
 
 std::string KeyCommandManager::GetConfigFilePath() const
@@ -296,20 +296,20 @@ std::string KeyCommandManager::GetConfigFilePath() const
     return FileExists(defaultConfig) ? defaultConfig : "/system/etc/multimodalinput/ability_launch_config.json";
 }
 
-bool KeyCommandManager::ResolveJson(const std::string &configFile)
+bool KeyCommandManager::ParseJson(const std::string &configFile)
 {
     std::string jsonStr = ReadFile(configFile);
     if (jsonStr.empty()) {
         MMI_HILOGE("configFile read failed");
         return false;
     }
-    DeleteJson configJson;
-    configJson.json_ = cJSON_Parse(jsonStr.c_str());
-    if (!cJSON_IsObject(configJson.json_)) {
-        MMI_HILOGE("ResolveJson configJson is not object");
+    JsonParser parser;
+    parser.json_ = cJSON_Parse(jsonStr.c_str());
+    if (!cJSON_IsObject(parser.json_)) {
+        MMI_HILOGE("parser is not object");
         return false;
     }
-    cJSON* shortkeys = cJSON_GetObjectItemCaseSensitive(configJson.json_, "Shortkeys");
+    cJSON* shortkeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "Shortkeys");
     if (!cJSON_IsArray(shortkeys)) {
         MMI_HILOGE("shortkeys in config file is empty");
         return false;
@@ -326,14 +326,14 @@ bool KeyCommandManager::ResolveJson(const std::string &configFile)
         }
         if (shortcutKeys_.find(GenerateKey(shortcutKey)) == shortcutKeys_.end()) {
             if (!shortcutKeys_.emplace(GenerateKey(shortcutKey), shortcutKey).second) {
-                MMI_HILOGE("Duplicate shortcutKey:%{public}s", GenerateKey(shortcutKey).c_str());
+                MMI_HILOGW("Duplicate shortcutKey:%{public}s", GenerateKey(shortcutKey).c_str());
             }
         }
     }
     return true;
 }
 
-void KeyCommandManager::ResolveConfig(const std::string configFile)
+void KeyCommandManager::ParseConfig(const std::string configFile)
 {
     if (!FileExists(configFile)) {
         MMI_HILOGE("config file %{public}s not exist", configFile.c_str());
@@ -345,8 +345,8 @@ void KeyCommandManager::ResolveConfig(const std::string configFile)
         return;
     }
     MMI_HILOGD("config file path:%{public}s", configFile.c_str());
-    if (!ResolveJson(configFile)) {
-        MMI_HILOGE("ResolveJson failed");
+    if (!ParseJson(configFile)) {
+        MMI_HILOGW("Parse configFile to failed");
     }
     return;
 }
