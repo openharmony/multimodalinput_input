@@ -554,7 +554,7 @@ void JsEventTarget::EmitJsKeyboardType(int32_t userData, int32_t keyboardType)
     CHKPV(work);
     int32_t *uData = new (std::nothrow) int32_t(userData);
     work->data = static_cast<void*>(uData);
-    int32_t ret;
+    int32_t ret = 0;
     if (iter->second->ref == nullptr) {
         ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallKeyboardTypePromise);
     } else {
@@ -585,8 +585,7 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
     callback_.erase(iter);
     CHKPV(cbTemp->env);
     napi_value keyboardType = nullptr;
-    int32_t ids = cbTemp->data.keyboardType;
-    switch (ids) {
+    switch (cbTemp->data.keyboardType) {
         case KEYBOARD_TYPE_FULL: {
             CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_FULL",
                 NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
@@ -617,9 +616,10 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
                 NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
             break;
         }
-        default:
-            MMI_HILOGW("Unknow keyboardType ids %{public}d\n", ids);
+        default: {
+            MMI_HILOGW("Unknow keyboardType %{public}d\n", keyboardType);
             break;
+        }
     }
     napi_value handlerTemp = nullptr;
     CHKRV(cbTemp->env, napi_get_reference_value(cbTemp->env, cbTemp->ref, &handlerTemp), GET_REFERENCE);
@@ -645,8 +645,7 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
     CHKPV(cbTemp->env);
 
     napi_value keyboardType = nullptr;
-    int32_t ids = cbTemp->data.keyboardType;
-    switch (ids) {
+    switch (cbTemp->data.keyboardType) {
         case KEYBOARD_TYPE_FULL: {
             CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_FULL",
                 NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
@@ -677,9 +676,10 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
                 NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
             break;
         }
-        default:
-            MMI_HILOGW("Unknow keyboardType ids %{public}d\n", ids);
+        default: {
+            MMI_HILOGW("Unknow keyboardType %{public}d\n", keyboardType);
             break;
+        }
     }
     CHKRV(cbTemp->env, napi_resolve_deferred(cbTemp->env, cbTemp->deferred, keyboardType), RESOLVE_DEFERRED);
 }
