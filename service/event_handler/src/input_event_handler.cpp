@@ -433,7 +433,7 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
     CHKPR(event, ERROR_NULL_POINTER);
 
     auto ret = MouseEventHdr->Normalize(event);
-    if (ret == RET_ERR) {
+    if (ret != RET_OK) {
         MMI_HILOGE("Normalize faild");
         return RET_ERR;
     }

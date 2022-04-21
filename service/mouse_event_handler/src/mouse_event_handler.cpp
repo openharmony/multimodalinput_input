@@ -46,7 +46,7 @@ std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
 int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 {
     CALL_LOG_ENTER;
-    CHKPR(data, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttionId_);
 
@@ -76,11 +76,11 @@ void MouseEventHandler::InitAbsolution()
 int32_t MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
 {
     CALL_LOG_ENTER;
-    CHKPR(data, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER);
     MMI_HILOGD("current action:%{public}d", pointerEvent_->GetPointerAction());
 
     auto ret = HandleButonValueInner(data);
-    if (ret == RET_ERR) {
+    if (ret != RET_OK) {
         return RET_ERR;
     }
     auto button = libinput_event_pointer_get_button(data);
@@ -98,7 +98,7 @@ int32_t MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
         isPressed_ = true;
         buttionId_ = pointerEvent_->GetButtonId();
     } else {
-        MMI_HILOGE("unknown state, state:%{public}u", state);
+        MMI_HILOGW("unknown state, state:%{public}u", state);
         return RET_ERR;
     }
     return RET_OK;
@@ -107,7 +107,7 @@ int32_t MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
 int32_t MouseEventHandler::HandleButonValueInner(libinput_event_pointer* data)
 {
     CALL_LOG_ENTER;
-    CHKPR(data, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER);
 
     auto button = libinput_event_pointer_get_button(data);
     switch (button) {
@@ -144,7 +144,7 @@ int32_t MouseEventHandler::HandleButonValueInner(libinput_event_pointer* data)
 
 int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
 {
-    CHKPR(data, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER);
     if (TimerMgr->IsExist(timerId_)) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
         TimerMgr->ResetTimer(timerId_);
@@ -155,14 +155,13 @@ int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
         timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
             CALL_LOG_ENTER;
             auto sharedPtr = weakPtr.lock();
-            CHKPR(sharedPtr, RET_ERR);
+            CHKPV(sharedPtr);
             MMI_HILOGD("timer:%{public}d", sharedPtr->timerId_);
             sharedPtr->timerId_ = -1;
             auto pointerEvent = sharedPtr->GetPointerEvent();
-            CHKPR(pointerEvent, RET_ERR);
+            CHKPV(pointerEvent);
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
             InputHandler->OnMouseEventEndTimerHandler(pointerEvent);
-            return RET_OK;
         });
 
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
@@ -216,10 +215,10 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
 int32_t MouseEventHandler::Normalize(struct libinput_event *event)
 {
     CALL_LOG_ENTER;
-    CHKPR(event, RET_ERR);
+    CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_pointer_event(event);
-    CHKPR(data, RET_ERR);
-    CHKPR(pointerEvent_, RET_ERR);
+    CHKPR(data, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent_, ERROR_NULL_POINTER);
     pointerEvent_->ClearAxisValue();
     int32_t result = RET_ERR;
     const int32_t type = libinput_event_get_type(event);
