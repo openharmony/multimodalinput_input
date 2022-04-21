@@ -43,6 +43,7 @@ private:
     void HandlePostInner(libinput_event_pointer* data, int32_t deviceId, PointerEvent::PointerItem& pointerItem);
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
     void HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem);
+    int32_t HandleButonValueInner(libinput_event_pointer* data);
     void DumpInner();
     void InitAbsolution();
 
