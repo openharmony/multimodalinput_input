@@ -62,8 +62,8 @@ public:
     ~KeyCommandManager() = default;
     bool HandlerEvent(const std::shared_ptr<KeyEvent> event);
 private:
-    bool ResolveJson(const std::string &configFile);
-    void ResolveConfig(std::string configFile);
+    bool ParseJson(const std::string &configFile);
+    void ParseConfig(std::string configFile);
     std::string GetConfigFilePath() const;
     void LaunchAbility(ShortcutKey key);
     std::string GenerateKey(const ShortcutKey& key);
