@@ -33,7 +33,7 @@ constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
 } // namespace OHOS
 
 #ifndef MMI_FUNC_FMT
-#define MMI_FUNC_FMT "in %{public}s, #%{public}d, "
+#define MMI_FUNC_FMT "in %{public}s, "
 #endif
 
 #ifndef MMI_FUNC_INFO
