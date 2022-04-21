@@ -339,14 +339,14 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
     napi_value argv[2];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1 || argc > 2) {
-        THROWERR(env, "the number of parameters is not as expected");
+        THROWERR(env, "The number of parameters is not as expected");
         return nullptr;
     }
 
     napi_valuetype valueType = napi_undefined;
     CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
     if (valueType != napi_number) {
-        THROWERR(env, "the first parameter is not a number");
+        THROWERR(env, "The first parameter is not a number");
         return nullptr;
     }
     int32_t id = 0;
@@ -359,7 +359,7 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
     }
     CHKRP(env, napi_typeof(env, argv[1], &valueType), TYPEOF);
     if (valueType != napi_function) {
-        THROWERR(env, "the second parameter is not a function");
+        THROWERR(env, "The second parameter is not a function");
         return nullptr;
     }
     return jsInputDeviceMgr->GetKeyboardType(env, id, argv[1]);
