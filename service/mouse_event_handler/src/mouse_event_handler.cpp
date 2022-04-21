@@ -81,6 +81,7 @@ int32_t MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
 
     auto ret = HandleButonValueInner(data);
     if (ret != RET_OK) {
+        MMI_HILOGW("The button value does not exist");
         return RET_ERR;
     }
     auto button = libinput_event_pointer_get_button(data);
@@ -220,7 +221,7 @@ int32_t MouseEventHandler::Normalize(struct libinput_event *event)
     CHKPR(data, ERROR_NULL_POINTER);
     CHKPR(pointerEvent_, ERROR_NULL_POINTER);
     pointerEvent_->ClearAxisValue();
-    int32_t result = RET_ERR;
+    int32_t result;
     const int32_t type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_POINTER_MOTION:
