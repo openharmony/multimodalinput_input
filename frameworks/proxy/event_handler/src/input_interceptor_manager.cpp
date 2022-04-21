@@ -43,7 +43,7 @@ void InputInterceptorManager::RemoveInterceptor(int32_t interceptorId)
 
 std::shared_ptr<IInputInterceptorManager> IInputInterceptorManager::GetInstance()
 {
-    return DelayedSingleton<InputInterceptorManager>::GetInstance();;
+    return DelayedSingleton<InputInterceptorManager>::GetInstance();
 }
 } // namespace MMI
 } // namespace OHOS
