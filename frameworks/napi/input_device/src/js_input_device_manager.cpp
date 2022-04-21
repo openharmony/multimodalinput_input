@@ -73,6 +73,16 @@ napi_value JsInputDeviceManager::GetKeystrokeAbility(napi_env env, int32_t id, s
     return ret;
 }
 
+napi_value JsInputDeviceManager::GetKeyboardType(napi_env env, int32_t id, napi_value handle)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    int32_t userData = InputDevImp.GetUserData();
+    napi_value ret = CreateCallbackInfo(env, handle, userData);
+    InputDevImp.GetKeyboardTypeAsync(id, EmitJsKeyboardType);
+    return ret;
+}
+
 void JsInputDeviceManager::ResetEnv()
 {
     CALL_LOG_ENTER;
