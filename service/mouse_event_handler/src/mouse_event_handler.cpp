@@ -79,6 +79,36 @@ int32_t MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
     CHKPR(data, RET_ERR);
     MMI_HILOGD("current action:%{public}d", pointerEvent_->GetPointerAction());
 
+    auto ret = HandleButonValueInner(data);
+    if (ret == RET_ERR) {
+      return RET_ERR;
+    }
+    auto button = libinput_event_pointer_get_button(data);
+    auto state = libinput_event_pointer_get_button_state(data);
+    if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
+        MouseState->MouseBtnStateCounts(button, BUTTON_STATE_RELEASED);
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+        pointerEvent_->DeleteReleaseButton(button);
+        isPressed_ = false;
+        buttionId_ = PointerEvent::BUTTON_NONE;
+    } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
+        MouseState->MouseBtnStateCounts(button, BUTTON_STATE_PRESSED);
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+        pointerEvent_->SetButtonPressed(button);
+        isPressed_ = true;
+        buttionId_ = pointerEvent_->GetButtonId();
+    } else {
+        MMI_HILOGE("unknown state, state:%{public}u", state);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MouseEventHandler::HandleButonValueInner(libinput_event_pointer* data)
+{
+    CALL_LOG_ENTER;
+    CHKPR(data, RET_ERR);
+
     auto button = libinput_event_pointer_get_button(data);
     switch (button) {
         case BTN_LEFT:
@@ -108,24 +138,6 @@ int32_t MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
         default:
             MMI_HILOGE("unknown btn, btn:%{public}u", button);
             return RET_ERR;
-    }
-
-    auto state = libinput_event_pointer_get_button_state(data);
-    if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
-        MouseState->MouseBtnStateCounts(button, BUTTON_STATE_RELEASED);
-        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
-        pointerEvent_->DeleteReleaseButton(button);
-        isPressed_ = false;
-        buttionId_ = PointerEvent::BUTTON_NONE;
-    } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
-        MouseState->MouseBtnStateCounts(button, BUTTON_STATE_PRESSED);
-        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-        pointerEvent_->SetButtonPressed(button);
-        isPressed_ = true;
-        buttionId_ = pointerEvent_->GetButtonId();
-    } else {
-        MMI_HILOGE("unknown state, state:%{public}u", state);
-        return RET_ERR;
     }
     return RET_OK;
 }
