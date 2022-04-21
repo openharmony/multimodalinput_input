@@ -2836,83 +2836,83 @@ public:
         KeyItem();
         ~KeyItem();
  
-       /**
-        * @brief Obtains the key code of the key.
-        * @return Returns the key code.
-        * @since 9
-        */
+        /**
+         * @brief Obtains the key code of the key.
+         * @return Returns the key code.
+         * @since 9
+         */
         int32_t GetKeyCode() const;
  
-       /**
-        * @brief Sets a key code for the key.
-        * @param keyCode Indicates the key code to set.
-        * @return void
-        * @since 9
-        */
+        /**
+         * @brief Sets a key code for the key.
+         * @param keyCode Indicates the key code to set.
+         * @return void
+         * @since 9
+         */
         void SetKeyCode(int32_t keyCode);
  
-       /**
-        * @brief Obtains the time when the key is pressed.
-        * @return Returns the time.
-        * @since 9
-        */
+        /**
+         * @brief Obtains the time when the key is pressed.
+         * @return Returns the time.
+         * @since 9
+         */
         int64_t GetDownTime() const;
  
-       /**
-        * @brief Sets the time when the key is pressed.
-        * @param downTime Indicates the time to set.
-        * @return void
-        * @since 9
-        */
+        /**
+         * @brief Sets the time when the key is pressed.
+         * @param downTime Indicates the time to set.
+         * @return void
+         * @since 9
+         */
         void SetDownTime(int64_t downTime);
  
-       /**
-        * @brief Obtains the unique identifier of the device that reports this event.
-        * @return Returns the device ID.
-        * @since 9
-        */
+        /**
+         * @brief Obtains the unique identifier of the device that reports this event.
+         * @return Returns the device ID.
+         * @since 9
+         */
         int32_t GetDeviceId() const;
          
-       /**
-        * @brief Sets a unique identifier for the device that reports this event.
-        * @param deviceId Indicates the device ID to set.
-        * @return void
-        * @since 9
-        */
+        /**
+         * @brief Sets a unique identifier for the device that reports this event.
+         * @param deviceId Indicates the device ID to set.
+         * @return void
+         * @since 9
+         */
         void SetDeviceId(int32_t deviceId);
  
-       /**
-        * @brief Checks whether the key is pressed.
-        * @return Returns <b>true</b> if the key is pressed; returns <b>false</b> otherwise.
-        * @since 9
-        */
+        /**
+         * @brief Checks whether the key is pressed.
+         * @return Returns <b>true</b> if the key is pressed; returns <b>false</b> otherwise.
+         * @since 9
+         */
         bool IsPressed() const;
  
         /**
-        * @brief Sets whether to enable the pressed state for the key.
-        * @param pressed Specifies whether to set the pressed state for the key.
-        * The value <b>true</b> means to set the pressed state for the key,
-        * and the <b>false</b> means the opposite.
-        * @return void
-        * @since 9
-        */
+         * @brief Sets whether to enable the pressed state for the key.
+         * @param pressed Specifies whether to set the pressed state for the key.
+         * The value <b>true</b> means to set the pressed state for the key,
+         * and the <b>false</b> means the opposite.
+         * @return void
+         * @since 9
+         */
         void SetPressed(bool pressed);
  
     public:
         /**
-        * @brief Writes data to a <b>Parcel</b> object.
-        * @param out Indicates the object into which data will be written.
-        * @return Returns <b>true</b> if the data is successfully written; returns <b>false</b> otherwise.
-        * @since 9
-        */
+         * @brief Writes data to a <b>Parcel</b> object.
+         * @param out Indicates the object into which data will be written.
+         * @return Returns <b>true</b> if the data is successfully written; returns <b>false</b> otherwise.
+         * @since 9
+         */
         bool WriteToParcel(Parcel &out) const;
  
         /**
-        * @brief Reads data from a <b>Parcel</b> object.
-        * @param in Indicates the object from which data will be read.
-        * @return Returns <b>true</b> if the data is successfully read; returns <b>false</b> otherwise.
-        * @since 9
-        */
+         * @brief Reads data from a <b>Parcel</b> object.
+         * @param in Indicates the object from which data will be read.
+         * @return Returns <b>true</b> if the data is successfully read; returns <b>false</b> otherwise.
+         * @since 9
+         */
         bool ReadFromParcel(Parcel &in);
  
     private:
@@ -2923,36 +2923,35 @@ public:
     };
 
 public:
-    static std::shared_ptr<KeyEvent> from(std::shared_ptr<InputEvent> inputEvent);
+     static std::shared_ptr<KeyEvent> from(std::shared_ptr<InputEvent> inputEvent);
  
     /**
-    * @brief Converts the action of this key event as a string.
-    * @param action Indicates the action represented by pressing a key.
-    * @return Returns the pointer to the action string.
-    * @since 9
-    */
+     * @brief Converts the action of this key event as a string.
+     * @param action Indicates the action represented by pressing a key.
+     * @return Returns the pointer to the action string.
+     * @since 9
+     */
     static const char* ActionToString(int32_t action);
  
     /**
-    * @brief Converts the key code of this key event as a string.
-    * @param keyCode Indicates the code that identifies the key.
-    * @return Returns the pointer to the key code string.
-    * @since 9
-    */
+     * @brief Converts the key code of this key event as a string.
+     * @param keyCode Indicates the code that identifies the key.
+     * @return Returns the pointer to the key code string.
+     * @since 9
+     */
     static const char* KeyCodeToString(int32_t keyCode);
  
     static std::shared_ptr<KeyEvent> Clone(std::shared_ptr<KeyEvent> keyEvent);
  
 public:
     /**
-    * @brief Constructor of KeyEvent.
-    * @since 9
-    */
+     * @brief Constructor of KeyEvent.
+     * @since 9
+     */
     KeyEvent(const KeyEvent& other);
 
     /**
-     * Virtual destructor of KeyEvent.
-     *
+     * @brief Virtual destructor of KeyEvent.
      * @since 9
      */
     virtual ~KeyEvent();
@@ -2961,116 +2960,116 @@ public:
     DISALLOW_MOVE(KeyEvent);
 
     /**
-    * @brief Creates a key event.
-    * @since 9
-    */
+     * @brief Creates a key event.
+     * @since 9
+     */
     static std::shared_ptr<KeyEvent> Create();
  
     /**
-    * @brief Obtains the key code of this key event.
-    * @return Returns the key code.
-    * @since 9
-    */
+     * @brief Obtains the key code of this key event.
+     * @return Returns the key code.
+     * @since 9
+     */
     int32_t GetKeyCode() const;
  
     /**
-    * @brief Sets a key code for this key event.
-    * @param keyCode Indicates the key code to set.
-    * @return void
-    * @since 9
-    */
+     * @brief Sets a key code for this key event.
+     * @param keyCode Indicates the key code to set.
+     * @return void
+     * @since 9
+     */
     void SetKeyCode(int32_t keyCode);
  
     /**
-    * @brief Obtains the key action of this key event.
-    * @return Returns the key action.
-    * @since 9
-    */
+     * @brief Obtains the key action of this key event.
+     * @return Returns the key action.
+     * @since 9
+     */
     int32_t GetKeyAction() const;
  
     /**
-    * @brief Sets a key action for this key event.
-    * @param keyAction Indicates the key action to set.
-    * @return void
-    * @since 9
-    */
+     * @brief Sets a key action for this key event.
+     * @param keyAction Indicates the key action to set.
+     * @return void
+     * @since 9
+     */
     void SetKeyAction(int32_t keyAction);
  
     /**
-    * @brief Obtains the list of pressed keys in this key event.
-    * @return Returns the list of pressed keys.
-    * @since 9
-    */
+     * @brief Obtains the list of pressed keys in this key event.
+     * @return Returns the list of pressed keys.
+     * @since 9
+     */
     std::vector<int32_t> GetPressedKeys() const;
  
     /**
-    * @brief Adds a key item.
-    * @param keyItem Indicates the key item to add.
-    * @return void
-    * @since 9
-    */
+     * @brief Adds a key item.
+     * @param keyItem Indicates the key item to add.
+     * @return void
+     * @since 9
+     */
     void AddKeyItem(const KeyItem& keyItem);
  
     /**
-    * @brief Obtains the key item.
-    * @return Returns the key item.
-    * @since 9
-    */
+     * @brief Obtains the key item.
+     * @return Returns the key item.
+     * @since 9
+     */
     std::vector<KeyEvent::KeyItem> GetKeyItems() const;
  
     /**
-    * @brief Adds the pressed key items.
-    * @param keyItem Indicates the key item to add.
-    * @return void
-    * @since 9
-    */
+     * @brief Adds the pressed key items.
+     * @param keyItem Indicates the key item to add.
+     * @return void
+     * @since 9
+     */
     void AddPressedKeyItems(const KeyItem& keyItem);
  
     /**
-    * @brief Removes the released key Items.
-    * @param keyItem Indicates the key item to remove.
-    * @return void
-    * @since 9
-    */
+     * @brief Removes the released key Items.
+     * @param keyItem Indicates the key item to remove.
+     * @return void
+     * @since 9
+     */
     void RemoveReleasedKeyItems(const KeyItem& keyItem);
  
     /**
-    * @brief Obtains the key item of this key event.
-    * @return Returns the pointer to the key item.
-    * @since 9
-    */
+     * @brief Obtains the key item of this key event.
+     * @return Returns the pointer to the key item.
+     * @since 9
+     */
     const KeyItem* GetKeyItem() const;
  
     /**
-    * @brief Obtains the key item based on a key code.
-    * @param keyCode Indicates the key code.
-    * @return Returns the pointer to the key item.
-    * @since 9
-    */
+     * @brief Obtains the key item based on a key code.
+     * @param keyCode Indicates the key code.
+     * @return Returns the pointer to the key item.
+     * @since 9
+     */
     const KeyItem* GetKeyItem(int32_t keyCode) const;
   
     /**
-    * @brief Checks whether this key event is valid.
-    * @return Returns <b>true</b> if the key event is valid; returns <b>false</b> otherwise.
-    * @since 9
-    */
+     * @brief Checks whether this key event is valid.
+     * @return Returns <b>true</b> if the key event is valid; returns <b>false</b> otherwise.
+     * @since 9
+     */
     bool IsValid() const;
  
 public:
     /**
-    * @brief Writes data to a <b>Parcel</b> object.
-    * @param out Indicates the object into which data will be written.
-    * @return Returns <b>true</b> if the data is successfully written; returns <b>false</b> otherwise.
-    * @since 9
-    */
+     * @brief Writes data to a <b>Parcel</b> object.
+     * @param out Indicates the object into which data will be written.
+     * @return Returns <b>true</b> if the data is successfully written; returns <b>false</b> otherwise.
+     * @since 9
+     */
     bool WriteToParcel(Parcel &out) const;
  
     /**
-    * @brief Reads data from a <b>Parcel</b> object.
-    * @param in Indicates the object from which data will be read.
-    * @return Returns <b>true</b> if the data is successfully read; returns <b>false</b> otherwise.
-    * @since 9
-    */
+     * @brief Reads data from a <b>Parcel</b> object.
+     * @param in Indicates the object from which data will be read.
+     * @return Returns <b>true</b> if the data is successfully read; returns <b>false</b> otherwise.
+     * @since 9
+     */
     bool ReadFromParcel(Parcel &in);
  
 protected:

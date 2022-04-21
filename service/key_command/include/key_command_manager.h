@@ -27,7 +27,6 @@
 #include <vector>
 
 #include "nocopyable.h"
-#include "nlohmann/json.hpp"
 
 #include "key_event.h"
 #include "struct_multimodal.h"
@@ -35,7 +34,6 @@
 
 namespace OHOS {
 namespace MMI {
-using json = nlohmann::json;
 struct Ability {
     std::string bundleName;
     std::string abilityName;
@@ -64,12 +62,20 @@ public:
     ~KeyCommandManager() = default;
     bool HandlerEvent(const std::shared_ptr<KeyEvent> event);
 private:
+    bool ResolveJson(const std::string &configFile);
+    bool GetPreKeys(const std::string &objStr, ShortcutKey &shortcutKey);
+    bool GetTrigger(const std::string &objStr, int32_t &triggerType);
+    bool GetKeyDownDuration(const std::string &objStr, int32_t &keyDownDurationInt);
+    bool GetKeyFinalKey(const std::string &objStr, int32_t &finalKeyInt);
+    void GetKeyVal(const std::string &objStr, const std::string &key, std::string &value);
+    bool GetParams(const std::string &objStr, Ability &ability);
+    bool GetEntities(const std::string &objStr, Ability &ability);
     void ResolveConfig(std::string configFile);
-    bool ConvertToShortcutKey(const json &jsonData, ShortcutKey &shortcutKey);
+    bool ConvertToShortcutKey(const std::string &jsonDataStr, ShortcutKey &shortcutKey);
     std::string GetConfigFilePath() const;
     void LaunchAbility(ShortcutKey key);
     std::string GenerateKey(const ShortcutKey& key);
-    bool PackageAbility(const json &jsonStr, Ability &ability);
+    bool PackageAbility(const std::string &abilityStr, Ability &ability);
     void Print();
     bool IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey);

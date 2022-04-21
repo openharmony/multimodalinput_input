@@ -15,6 +15,7 @@
 
 #ifndef VIRTUAL_REMOTE_CONTROL_H
 #define VIRTUAL_REMOTE_CONTROL_H
+
 #include "virtual_device.h"
 
 namespace OHOS {
@@ -28,6 +29,8 @@ public:
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
     const std::vector<uint32_t>& GetKeys() const override;
+    const std::vector<uint32_t>& GetAbs() const override;
+    const std::vector<uint32_t>& GetMscs() const override;
 };
 } // namespace MMI
 } // namespace OHOS

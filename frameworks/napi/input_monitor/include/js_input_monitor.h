@@ -24,6 +24,7 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "nocopyable.h"
+#include "util_napi.h"
 
 #include "i_input_event_consumer.h"
 
@@ -63,7 +64,7 @@ private:
 
 class JsInputMonitor {
 public:
-    JsInputMonitor(napi_env jsEnv, napi_value callback, int32_t id);
+    JsInputMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback, int32_t id);
 
     ~JsInputMonitor();
 
@@ -79,26 +80,33 @@ public:
 
     int32_t GetId() const;
 
-    void OnPointerEventInJsThread();
+    void OnPointerEventInJsThread(const std::string &typeName);
 
     void OnPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
-    
+
     static void JsCallback(uv_work_t *work, int32_t status);
+
+    std::string GetTypeName() const;
 private:
 
     void SetCallback(napi_value callback);
 
     int32_t TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
 
+    int32_t TransformMousePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
+
     std::string GetAction(int32_t action) const;
 
     int32_t GetJsPointerItem(const PointerEvent::PointerItem &item, napi_value value) const;
+
+    int32_t GetMousePointerItem(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
 
 private:
     std::shared_ptr<InputMonitor> monitor_ {nullptr};
     napi_ref receiver_ {nullptr};
     napi_env jsEnv_ {nullptr};
-    int32_t id_ = 0;
+    std::string typeName_;
+    int32_t monitorId_ = 0;
     bool isMonitoring_ = false;
     std::queue<std::shared_ptr<PointerEvent>> evQueue_;
     std::mutex mutex_;
