@@ -219,7 +219,7 @@ public:
     static std::shared_ptr<PointerEvent> from(std::shared_ptr<InputEvent> inputEvent);
 
 public:
-    class PointerItem {
+    struct PointerItem {
     public:
         PointerItem();
         ~PointerItem();
