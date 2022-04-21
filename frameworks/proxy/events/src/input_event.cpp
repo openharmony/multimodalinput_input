@@ -69,19 +69,19 @@ std::shared_ptr<InputEvent> InputEvent::Create()
 const char* InputEvent::EventTypeToString(int32_t eventType)
 {
     switch (eventType) {
-        case InputEvent::EVENT_TYPE_BASE:{
+        case InputEvent::EVENT_TYPE_BASE: {
             return "base";
         }
-        case InputEvent::EVENT_TYPE_KEY:{
+        case InputEvent::EVENT_TYPE_KEY: {
             return "key";
         }
-        case InputEvent::EVENT_TYPE_POINTER:{
+        case InputEvent::EVENT_TYPE_POINTER: {
             return "pointer";
         }
-        case InputEvent::EVENT_TYPE_AXIS:{
+        case InputEvent::EVENT_TYPE_AXIS: {
             return "axis";
         }
-        default:{
+        default: {
             MMI_HILOGW("Unknown EVENT_TYPE");
             return "unknown";
         }

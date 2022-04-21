@@ -42,5 +42,10 @@ void InputMonitorManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
     InputHandlerManager::GetInstance().MarkConsumed(monitorId, eventId);
 }
+
+void InputMonitorManager::MoveMouse(int32_t offsetX, int32_t offsetY)
+{
+    InputHandlerManager::GetInstance().MoveMouse(offsetX, offsetY);
+}
 } // namespace MMI
 } // namespace OHOS

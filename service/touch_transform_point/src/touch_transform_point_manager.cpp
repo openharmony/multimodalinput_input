@@ -14,7 +14,7 @@
  */
 
 #include "touch_transform_point_manager.h"
-
+#include "tablet_tool_processor.h"
 #include "input_device_manager.h"
 
 namespace OHOS {
@@ -29,6 +29,8 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibInput(
     switch (deviceType) {
         case INPUT_DEVICE_CAP_TOUCH:
             return OnLibinputTouchEvent(event);
+        case INPUT_DEVICE_CAP_TABLET_TOOL:
+            return OnLibinputTabletToolEvent(event);
         case INPUT_DEVICE_CAP_TOUCH_PAD:
             return OnLibinputTouchPadEvent(event);
         case INPUT_DEVICE_CAP_GESTURE:
@@ -52,7 +54,6 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(s
     } else {
         processor = std::make_shared<TouchTransformPointProcessor>(deviceId);
         CHKPP(processor);
-        processor->SetPointEventSource(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
         auto iter = touchPro_.insert(
             std::pair<int32_t, std::shared_ptr<TouchTransformPointProcessor>>(deviceId, processor));
         if (!iter.second) {
@@ -60,6 +61,27 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(s
         }
     }
     return processor->OnLibinputTouchEvent(event);
+}
+
+std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTabletToolEvent(struct libinput_event *event)
+{
+    CHKPP(event);
+    auto device = libinput_event_get_device(event);
+    CHKPP(device);
+    std::shared_ptr<TransformPointProcessor> processor = nullptr;
+    auto deviceId = InputDevMgr->FindInputDeviceId(device);
+
+    if (auto it = processors_.find(deviceId); it != processors_.end()) {
+        processor = it->second;
+    } else {
+        processor.reset(new (std::nothrow) TabletToolProcessor(deviceId));
+        CHKPP(processor);
+        auto ret = processors_.emplace(deviceId, processor);
+        if (!ret.second) {
+            MMI_HILOGE("Duplicate device record: %{public}d", deviceId);
+        }
+    }
+    return processor->OnEvent(event);
 }
 
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEvent(struct libinput_event *event)
@@ -75,7 +97,6 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEven
     } else {
         processor = std::make_shared<TouchPadTransformPointProcessor>(deviceId);
         CHKPP(processor);
-        processor->SetPointEventSource(PointerEvent::SOURCE_TYPE_TOUCHPAD);
         auto iter = touchpadPro_.insert(
             std::pair<int32_t, std::shared_ptr<TouchPadTransformPointProcessor>>(deviceId, processor));
         if (!iter.second) {
@@ -98,7 +119,6 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestrueEvent
     } else {
         processor = std::make_shared<GestureTransformPointProcessor>(deviceId);
         CHKPP(processor);
-        processor->SetPointEventSource(PointerEvent::SOURCE_TYPE_MOUSE);
         auto iter = gesturePro_.insert(
             std::pair<int32_t, std::shared_ptr<GestureTransformPointProcessor>>(deviceId, processor));
         if (!iter.second) {

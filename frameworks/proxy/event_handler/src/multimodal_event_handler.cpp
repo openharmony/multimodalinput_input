@@ -109,6 +109,24 @@ int32_t MultimodalEventHandler::GetKeystrokeAbility(int32_t userData, int32_t de
     return EventManager.GetKeystrokeAbility(userData, deviceId, keyCodes);
 }
 
+int32_t MultimodalEventHandler::RegisterInputDeviceMonitor()
+{
+    if (!InitClient()) {
+        MMI_HILOGE("Init client faild");
+        return MMI_SERVICE_INVALID;
+    }
+    return EventManager.RegisterInputDeviceMonitor();
+}
+
+int32_t MultimodalEventHandler::UnRegisterInputDeviceMonitor()
+{
+    if (!InitClient()) {
+        MMI_HILOGE("Init client faild");
+        return MMI_SERVICE_INVALID;
+    }
+    return EventManager.UnRegisterInputDeviceMonitor();
+}
+
 int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
