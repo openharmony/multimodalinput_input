@@ -81,7 +81,7 @@ int32_t MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
 
     auto ret = HandleButonValueInner(data);
     if (ret == RET_ERR) {
-      return RET_ERR;
+        return RET_ERR;
     }
     auto button = libinput_event_pointer_get_button(data);
     auto state = libinput_event_pointer_get_button_state(data);
