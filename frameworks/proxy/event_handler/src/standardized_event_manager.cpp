@@ -172,7 +172,7 @@ int32_t StandardizedEventManager::GetKeystrokeAbility(int32_t userData, int32_t 
     return SendMsg(pkt);
 }
 
-int32_t StandardizedEventManager::GetKeyboardType(int32_t userData, int32_t deviceId)
+int32_t StandardizedEventManager::GetKeyboardType(int32_t userData, int32_t deviceId) const
 {
     NetPacket pkt(MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE);
     pkt << userData << deviceId;
