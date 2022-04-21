@@ -617,7 +617,7 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
             break;
         }
         default: {
-            MMI_HILOGW("Unknow keyboardType %{public}d\n", keyboardType);
+            MMI_HILOGW("Unknow keyboardType %{public}d\n", cbTemp->data.keyboardType);
             break;
         }
     }
@@ -677,7 +677,7 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
             break;
         }
         default: {
-            MMI_HILOGW("Unknow keyboardType %{public}d\n", keyboardType);
+            MMI_HILOGW("Unknow keyboardType %{public}d\n", cbTemp->data.keyboardType);
             break;
         }
     }
