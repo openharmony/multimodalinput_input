@@ -360,7 +360,7 @@ public:
          * @return Returns the pressure.
          * @since 9
          */
-        int32_t GetPressure() const;
+        double GetPressure() const;
 
         /**
          * @brief Sets the pressure for this event.
@@ -368,7 +368,7 @@ public:
          * @return void
          * @since 9
          */
-        void SetPressure(int32_t pressure);
+        void SetPressure(double pressure);
 
         /**
          * @brief Obtains the ID of the current device.
@@ -412,7 +412,7 @@ public:
         int32_t height_ { 0 };
         double  tiltX_ { 0.0 };
         double  tiltY_ { 0.0 };
-        int32_t pressure_ { 0 };
+        double  pressure_ { 0.0 };
         int32_t deviceId_ { 0 };
         int64_t downTime_ { 0 };
     };

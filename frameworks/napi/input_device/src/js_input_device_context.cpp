@@ -20,8 +20,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDeviceContext" };
 constexpr size_t MAX_STRING_LEN = 32;
-const std::string ADD_EVENT = "add";
-const std::string REMOVE_EVENT = "remove";
+const std::string CHANGED_TYPE = "changed";
 
 const std::string GET_GLOBLE = "napi_get_global";
 const std::string DEFINE_CLASS = "napi_define_class";
@@ -160,7 +159,7 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
     size_t ret = 0;
     CHKRP(env, napi_get_value_string_utf8(env, argv[0], eventType, MAX_STRING_LEN - 1, &ret), GET_STRING_UTF8);
     std::string type = eventType;
-    if (type != ADD_EVENT && type != REMOVE_EVENT) {
+    if (type != CHANGED_TYPE) {
         THROWERR(env, "event type is wrong");
         return nullptr;
     }
@@ -199,7 +198,7 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
     size_t ret = 0;
     CHKRP(env, napi_get_value_string_utf8(env, argv[0], eventType, MAX_STRING_LEN - 1, &ret), GET_STRING_UTF8);
     std::string type = eventType;
-    if (type != ADD_EVENT && type != REMOVE_EVENT) {
+    if (type != CHANGED_TYPE) {
         THROWERR(env, "event type is wrong");
         return nullptr;
     }

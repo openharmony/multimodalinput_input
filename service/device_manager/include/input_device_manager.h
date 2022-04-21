@@ -45,6 +45,7 @@ public:
     void NotifyPointerDevice(bool hasPointerDevice);
     void AddDevMonitor(SessionPtr sess, std::function<void(std::string, int32_t)> callback);
     void RemoveDevMonitor(SessionPtr sess);
+    bool HasPointerDevice();
 
 private:
     bool IsPointerDevice(struct libinput_device* device);
