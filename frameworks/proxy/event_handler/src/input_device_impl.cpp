@@ -248,10 +248,10 @@ void InputDeviceImpl::OnKeystrokeAbility(int32_t userData, const std::map<int32_
 void InputDeviceImpl::OnKeyboardTypeTask(InputDeviceImpl::DevKeyboardTypes kbTypes, int32_t userData,
     int32_t keyboardType)
 {
-   CHK_PIDANDTID();
-   kbTypes.second(userData, keyboardType);
-   MMI_HILOGD("Keyboard type event callback userData:%{public}d keyboardType:(%{public}d)",
-       userData, keyboardType);
+    CHK_PIDANDTID();
+    kbTypes.second(userData, keyboardType);
+    MMI_HILOGD("Keyboard type event callback userData:%{public}d keyboardType:(%{public}d)",
+        userData, keyboardType);
 }
 
 void InputDeviceImpl::OnKeyboardType(int32_t userData, int32_t keyboardType)
