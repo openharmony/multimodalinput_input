@@ -89,7 +89,7 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
     CALL_LOG_ENTER;
     auto asyncContext = new(std::nothrow) PointerAsyncContext();
     if (asyncContext == nullptr) {
-        napi_throw_error(env, nullptr, "Create PointerAsyncContext failed");
+        THROWERR(env, "Create PointerAsyncContext failed");
         return nullptr;
     }
     asyncContext->env = env;
@@ -108,7 +108,7 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
     napi_value resource = nullptr;
     CHKRP(env, napi_create_string_utf8(env, "SetPointerVisible", NAPI_AUTO_LENGTH, &resource), CREATE_STRING_UTF8);
     napi_create_async_work(env, nullptr, resource, [](napi_env env, void* data) {
-            PointerAsyncContext* asyncContext = (PointerAsyncContext*)data;
+            PointerAsyncContext* asyncContext = static_cast<PointerAsyncContext*>(data);
             int32_t ret = InputManager::GetInstance()->SetPointerVisible(asyncContext->visible);
             if (ret == RET_OK) {
                 asyncContext->status = napi_ok;
@@ -116,7 +116,7 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
                 asyncContext->status = napi_generic_failure;
             }
         }, [](napi_env env, napi_status status, void* data) {
-            PointerAsyncContext* asyncContext = (PointerAsyncContext*)data;
+            PointerAsyncContext* asyncContext = static_cast<PointerAsyncContext*>(data);
             napi_value result = nullptr;
             CHKRV(env, napi_get_undefined(env, &result), GET_UNDEFINED);
             if (asyncContext->deferred) {
@@ -134,6 +134,7 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
             }
             napi_delete_async_work(env, asyncContext->work);
             delete asyncContext;
+            asyncContext = nullptr;
         }, (void*)asyncContext, &asyncContext->work);
     napi_queue_async_work(env, asyncContext->work);
     return promise;

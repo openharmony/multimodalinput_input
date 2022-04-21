@@ -286,16 +286,14 @@ napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_i
     napi_value argv[2];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1 || argc > 2) {
-        MMI_HILOGE("the number of parameters is not as expected");
-        napi_throw_error(env, nullptr, "JsInputDeviceContext: the number of parameters is not as expected");
+        THROWERR(env, "the number of parameters is not as expected");
         return nullptr;
     }
 
     napi_valuetype valueType = napi_undefined;
     CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
     if (valueType != napi_boolean) {
-        MMI_HILOGE("the first parameter is not a boolean");
-        napi_throw_error(env, nullptr, "JsInputDeviceContext: the first parameter is not a boolean");
+        THROWERR(env, "JsInputDeviceContext: the first parameter is not a boolean");
         return nullptr;
     }
     bool visible = true;
@@ -309,8 +307,7 @@ napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_i
     }
     CHKRP(env, napi_typeof(env, argv[1], &valueType), TYPEOF);
     if (valueType != napi_function) {
-        MMI_HILOGE("the second parameter is not a function");
-        napi_throw_error(env, nullptr, "JsInputDeviceContext: the second parameter is not a function");
+        THROWERR(env, "the second parameter is not a function");
         return nullptr;
     }
     return jsInputDeviceMgr->SetPointerVisible(env, visible, argv[1]);
