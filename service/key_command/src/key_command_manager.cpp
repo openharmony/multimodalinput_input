@@ -30,15 +30,12 @@ namespace {
 constexpr int32_t MAX_PREKEYS_NUM = 4;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandManager" };
 constexpr int64_t JSON_FILE_SIZE = 0x2000;
-struct MyJson {
-    explicit MyJson()
-    {
-        json_ = nullptr;
-    }
+struct DeleteJson {
+    DeleteJson() = default;
 
-    ~MyJson()
+    ~DeleteJson()
     {
-        if (json_) {
+        if (json_ != nullptr) {
             cJSON_Delete(json_);
         }
     }
@@ -48,7 +45,7 @@ struct MyJson {
         return json_;
     }
 
-    cJSON *json_;
+    cJSON *json_ = nullptr;
 };
 
 bool GetPreKeys(cJSON* jsonData, ShortcutKey &shortcutKey)
@@ -306,12 +303,13 @@ bool KeyCommandManager::ResolveJson(const std::string &configFile)
         MMI_HILOGE("configFile read failed");
         return false;
     }
-    cJSON* configJson = cJSON_Parse(jsonStr.c_str());
-    if (!cJSON_IsObject(configJson)) {
+    DeleteJson configJson;
+    configJson.json_ = cJSON_Parse(jsonStr.c_str());
+    if (!cJSON_IsObject(configJson.json_)) {
         MMI_HILOGE("ResolveJson configJson is not object");
         return false;
     }
-    cJSON* shortkeys = cJSON_GetObjectItemCaseSensitive(configJson, "Shortkeys");
+    cJSON* shortkeys = cJSON_GetObjectItemCaseSensitive(configJson.json_, "Shortkeys");
     if (!cJSON_IsArray(shortkeys)) {
         MMI_HILOGE("shortkeys in config file is empty");
         return false;
