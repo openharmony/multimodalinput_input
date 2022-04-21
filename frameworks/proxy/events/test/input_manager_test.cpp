@@ -1693,7 +1693,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_008, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Level1)
 {
-    if (!MMIEventHdl.StartClient()) {
+    if (!MMIEventHdl.InitClient()) {
         MMI_HILOGD("get mmi client failed");
         return;
     }
