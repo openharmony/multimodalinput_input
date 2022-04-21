@@ -14,6 +14,7 @@
  */
 
 #include "js_event_target.h"
+#include "proto.h"
 
 namespace OHOS {
 namespace MMI {
@@ -527,6 +528,160 @@ void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::map<int32_t, b
         MMI_HILOGE("uv_queue_work failed");
         return;
     }
+}
+
+void JsEventTarget::EmitJsKeyboardType(int32_t userData, int32_t keyboardType)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    auto iter = callback_.find(userData);
+    if (iter == callback_.end()) {
+        MMI_HILOGE("failed to search for userData");
+        return;
+    }
+    CHKPV(iter->second);
+    if (iter->second->env == nullptr) {
+        callback_.erase(iter);
+        MMI_HILOGE("env is nullptr");
+        return;
+    }
+    iter->second->data.keyboardType = keyboardType;
+
+    uv_loop_s *loop = nullptr;
+    CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
+
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    int32_t *uData = new (std::nothrow) int32_t(userData);
+    work->data = static_cast<void*>(uData);
+    int32_t ret;
+    if (iter->second->ref == nullptr) {
+        ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallKeyboardTypePromise);
+    } else {
+        ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallKeyboardTypeAsync);
+    }
+    if (ret != 0) {
+        delete work;
+        delete uData;
+        MMI_HILOGE("uv_queue_work failed");
+        return;
+    }
+}
+
+void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    CHKPV(work);
+    CHKPV(work->data);
+    JsUtil jsUtil;
+    int32_t userData = jsUtil.GetInt32(work);
+    auto iter = callback_.find(userData);
+    if (iter == callback_.end()) {
+        MMI_HILOGE("find userData failed");
+        return;
+    }
+    auto cbTemp = std::move(iter->second);
+    callback_.erase(iter);
+    CHKPV(cbTemp->env);
+    napi_value keyboardType = nullptr;
+    int32_t ids = cbTemp->data.keyboardType;
+    switch (ids) {
+        case KEYBOARD_TYPE_FULL: {
+            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_FULL",
+                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
+            break;
+        }
+        case KEYBOARD_TYPE_NUMERIC_KEYPAD: {
+            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_NUMERIC_KEYPAD",
+                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
+            break;
+        }
+        case KEYBOARD_TYPE_REMOTE_CONTROLM: {
+            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_REMOTE_CONTROLM",
+                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
+            break;
+        }
+        case KEYBOARD_TYPE_HANDWRITING_PEN: {
+            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_HANDWRITING_PEN",
+                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
+            break;
+        }
+        case KEYBOARD_TYPE_NONE: {
+            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_NONE",
+                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
+            break;
+        }
+        case KEYBOARD_TYPE_UNDEFINED: {
+            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_UNDEFINED",
+                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
+            break;
+        }
+        default:
+            MMI_HILOGW("Unknow keyboardType ids %{public}d\n", ids);
+            break;
+    }
+    napi_value handlerTemp = nullptr;
+    CHKRV(cbTemp->env, napi_get_reference_value(cbTemp->env, cbTemp->ref, &handlerTemp), GET_REFERENCE);
+    napi_value result = nullptr;
+    CHKRV(cbTemp->env, napi_call_function(cbTemp->env, nullptr, handlerTemp, 1, &keyboardType, &result), CALL_FUNCTION);
+}
+
+void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    CHKPV(work);
+    CHKPV(work->data);
+    JsUtil jsUtil;
+    int32_t userData = jsUtil.GetInt32(work);
+    auto iter = callback_.find(userData);
+    if (iter == callback_.end()) {
+        MMI_HILOGE("find userData failed");
+        return;
+    }
+    auto cbTemp = std::move(iter->second);
+    callback_.erase(iter);
+    CHKPV(cbTemp->env);
+
+    napi_value keyboardType = nullptr;
+    int32_t ids = cbTemp->data.keyboardType;
+    switch (ids) {
+        case KEYBOARD_TYPE_FULL: {
+            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_FULL",
+                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
+            break;
+        }
+        case KEYBOARD_TYPE_NUMERIC_KEYPAD: {
+            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_NUMERIC_KEYPAD",
+                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
+            break;
+        }
+        case KEYBOARD_TYPE_REMOTE_CONTROLM: {
+            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_REMOTE_CONTROLM",
+                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
+            break;
+        }
+        case KEYBOARD_TYPE_HANDWRITING_PEN: {
+            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_HANDWRITING_PEN",
+                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
+            break;
+        }
+        case KEYBOARD_TYPE_NONE: {
+            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_NONE",
+                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
+            break;
+        }
+        case KEYBOARD_TYPE_UNDEFINED: {
+            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_UNDEFINED",
+                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
+            break;
+        }
+        default:
+            MMI_HILOGW("Unknow keyboardType ids %{public}d\n", ids);
+            break;
+    }
+    CHKRV(cbTemp->env, napi_resolve_deferred(cbTemp->env, cbTemp->deferred, keyboardType), RESOLVE_DEFERRED);
 }
 
 void JsEventTarget::AddMonitor(napi_env env, std::string type, napi_value handle)

@@ -172,6 +172,13 @@ int32_t StandardizedEventManager::GetKeystrokeAbility(int32_t userData, int32_t 
     return SendMsg(pkt);
 }
 
+int32_t StandardizedEventManager::GetKeyboardType(int32_t userData, int32_t deviceId)
+{
+    NetPacket pkt(MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE);
+    pkt << userData << deviceId;
+    return SendMsg(pkt);
+}
+
 int32_t StandardizedEventManager::RegisterInputDeviceMonitor()
 {
     NetPacket pkt(MmiMessageId::ADD_INPUT_DEVICE_MONITOR);
