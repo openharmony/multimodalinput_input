@@ -136,7 +136,7 @@ int32_t MouseEventHandler::HandleButonValueInner(libinput_event_pointer* data)
             pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_TASK);
             break;
         default:
-            MMI_HILOGE("unknown btn, btn:%{public}u", button);
+            MMI_HILOGW("unknown btn, btn:%{public}u", button);
             return RET_ERR;
     }
     return RET_OK;
@@ -237,7 +237,7 @@ int32_t MouseEventHandler::Normalize(struct libinput_event *event)
             break;
         }
         default: {
-            MMI_HILOGE("unknow type:%{public}d", type);
+            MMI_HILOGW("unknow type:%{public}d", type);
             return RET_ERR;
         }
     }
