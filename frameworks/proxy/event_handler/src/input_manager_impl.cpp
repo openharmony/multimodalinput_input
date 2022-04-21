@@ -57,23 +57,29 @@ public:
 
     void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
     {
-        if (keyMonitor_ != nullptr) {
-            keyMonitor_(keyEvent);
-        }
+        CHKPV(keyEvent);
+        CHKPV(keyMonitor_);
+        keyMonitor_(keyEvent);
     }
 
     void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
     {
-        if (monitor_ != nullptr) {
-            monitor_(pointerEvent);
-        }
+        CHKPV(pointerEvent);
+        CHKPV(monitor_);
+        monitor_(pointerEvent);
     }
 
-    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const { }
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const 
+    {
+        CHKPV(axisEvent);
+        CHKPV(axisMonitor_);
+        axisMonitor_(axisEvent);
+    }
 
 private:
     std::function<void(std::shared_ptr<PointerEvent>)> monitor_;
     std::function<void(std::shared_ptr<KeyEvent>)> keyMonitor_;
+    std::function<void(std::shared_ptr<AxisEvent>)> axisMonitor_;
 };
 
 bool InputManagerImpl::InitEventHandler()
@@ -170,7 +176,8 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
     return RET_OK;
 }
 
-void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
+void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
     CALL_LOG_ENTER;
     CHKPV(inputEventConsumer);
@@ -180,7 +187,10 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
         return;
     }
     consumer_ = inputEventConsumer;
-    eventHandler_ = InputMgrImpl->GetCurrentEventHandler();
+    eventHandler_ = eventHandler;
+    if (eventHandler_ == nullptr) {
+        eventHandler_ = InputMgrImpl->GetCurrentEventHandler();
+    }
 }
 
 void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
@@ -451,6 +461,18 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
     monitorManager_.MarkConsumed(monitorId, eventId);
 }
 
+void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
+{
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.StartClient()) {
+        MMI_HILOGE("client init failed");
+        return;
+    }
+    if (MMIEventHdl.MoveMouseEvent(offsetX, offsetY) != RET_OK) {
+        MMI_HILOGE("Failed to inject move mouse offset event");
+    }
+}
+
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
     CHKPR(interceptor, INVALID_HANDLER_ID);
@@ -515,6 +537,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
         default:
             MMI_HILOGE("Can't find the mask, mask:%{public}d", mask);
             break;
+        }
     }
 }
 

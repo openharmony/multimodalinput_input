@@ -94,6 +94,16 @@ void InputDeviceManager::RemoveDevMonitor(SessionPtr sess)
     devMonitor_.erase(iter);
 }
 
+bool InputDeviceManager::HasPointerDevice()
+{
+    for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
+        if (IsPointerDevice(it->second)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)
 {
     CALL_LOG_ENTER;

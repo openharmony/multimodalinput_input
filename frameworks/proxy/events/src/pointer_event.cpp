@@ -24,6 +24,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerEvent" };
+constexpr double MAX_PRESSURE = 1.0;
 } // namespace
 
 std::shared_ptr<PointerEvent> PointerEvent::from(std::shared_ptr<InputEvent> inputEvent)
@@ -145,14 +146,14 @@ void PointerEvent::PointerItem::SetTiltY(double tiltY)
     tiltY_ = tiltY;
 }
 
-int32_t PointerEvent::PointerItem::GetPressure() const
+double PointerEvent::PointerItem::GetPressure() const
 {
     return pressure_;
 }
 
-void PointerEvent::PointerItem::SetPressure(int32_t pressure)
+void PointerEvent::PointerItem::SetPressure(double pressure)
 {
-    pressure_ = pressure;
+    pressure_ = pressure >= MAX_PRESSURE ? MAX_PRESSURE : pressure;
 }
 
 int32_t PointerEvent::PointerItem::GetDeviceId() const
@@ -200,7 +201,7 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
     if (!out.WriteDouble(tiltY_)) {
         return false;
     }
-    if (!out.WriteInt32(pressure_)) {
+    if (!out.WriteDouble(pressure_)) {
         return false;
     }
     if (!out.WriteInt32(deviceId_)) {
@@ -244,7 +245,7 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
     if (!in.ReadDouble(tiltY_)) {
         return false;
     }
-    if (!in.ReadInt32(pressure_)) {
+    if (!in.ReadDouble(pressure_)) {
         return false;
     }
     if (!in.ReadInt32(deviceId_)) {
@@ -298,26 +299,36 @@ void PointerEvent::SetPointerAction(int32_t pointerAction)
 const char* PointerEvent::DumpPointerAction() const
 {
     switch (pointerAction_) {
-        case PointerEvent::POINTER_ACTION_CANCEL:
+        case PointerEvent::POINTER_ACTION_CANCEL: {
             return "cancel";
-        case PointerEvent::POINTER_ACTION_DOWN:
+        }
+        case PointerEvent::POINTER_ACTION_DOWN: {
             return "down";
-        case PointerEvent::POINTER_ACTION_MOVE:
+        }
+        case PointerEvent::POINTER_ACTION_MOVE: {
             return "move";
-        case PointerEvent::POINTER_ACTION_UP:
+        }
+        case PointerEvent::POINTER_ACTION_UP: {
             return "up";
-        case PointerEvent::POINTER_ACTION_AXIS_BEGIN:
+        }
+        case PointerEvent::POINTER_ACTION_AXIS_BEGIN: {
             return "axis-begin";
-        case PointerEvent::POINTER_ACTION_AXIS_UPDATE:
+        }
+        case PointerEvent::POINTER_ACTION_AXIS_UPDATE: {
             return "axis-update";
-        case PointerEvent::POINTER_ACTION_AXIS_END:
+        }
+        case PointerEvent::POINTER_ACTION_AXIS_END: {
             return "axis-end";
-        case PointerEvent::POINTER_ACTION_BUTTON_DOWN:
+        }
+        case PointerEvent::POINTER_ACTION_BUTTON_DOWN: {
             return "button-down";
-        case PointerEvent::POINTER_ACTION_BUTTON_UP:
+        }
+        case PointerEvent::POINTER_ACTION_BUTTON_UP: {
             return "button-up";
-        default:
+        }
+        default: {
             break;
+        }
     }
     return "unknown";
 }
@@ -421,14 +432,18 @@ void PointerEvent::SetSourceType(int32_t sourceType)
 const char* PointerEvent::DumpSourceType() const
 {
     switch (sourceType_) {
-        case PointerEvent::SOURCE_TYPE_MOUSE:
+        case PointerEvent::SOURCE_TYPE_MOUSE: {
             return "mouse";
-        case PointerEvent::SOURCE_TYPE_TOUCHSCREEN:
+        }
+        case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
             return "touch-screen";
-        case PointerEvent::SOURCE_TYPE_TOUCHPAD:
+        }
+        case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
             return "touch-pad";
-        default:
+        }
+        default: {
             break;
+        }
     }
     return "unknown";
 }
@@ -845,6 +860,7 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
          << ",PointerCount:" << pointerIds.size()
          << ",EventNumber:" << pointerEvent.GetId() << std::endl;
 
+    const int pressurePrecision = 6;
     for (const auto& pointerId : pointerIds) {
         PointerEvent::PointerItem item;
         if (!pointerEvent.GetPointerItem(pointerId, item)) {
@@ -857,7 +873,8 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
             << ",LocalX:" << item.GetLocalX() << ",LocalY:" << item.GetLocalY()
             << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
             << ",TiltX:" << item.GetTiltX() << ",TiltY:" << item.GetTiltY()
-            << ",Pressure:" << item.GetPressure() << std::endl;
+            << ",Pressure:" << std::fixed << std::setprecision(pressurePrecision)
+            << item.GetPressure() << std::endl;
     }
     std::vector<int32_t> pressedKeys = pointerEvent.GetPressedKeys();
     if (!pressedKeys.empty()) {
