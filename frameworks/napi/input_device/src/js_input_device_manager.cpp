@@ -40,6 +40,29 @@ struct AsyncContext {
 struct PointerAsyncContext : AsyncContext {
     bool visible = true;
 };
+
+void ProcessCallbackOrPromise(napi_env env, const PointerAsyncContext *asyncContext)
+{
+    if (asyncContext == nullptr) {
+        THROWERR(env, "asyncContext is nullptr");
+        return;
+    }
+    napi_value result = nullptr;
+    CHKRV(env, napi_get_undefined(env, &result), GET_UNDEFINED);
+    if (asyncContext->deferred) {
+        if (asyncContext->status == napi_ok) {
+            CHKRV(env, napi_resolve_deferred(env, asyncContext->deferred, result), RESOLVE_DEFERRED);
+        } else {
+            CHKRV(env, napi_reject_deferred(env, asyncContext->deferred, result), REJECT_DEFERRED);
+        }
+    } else {
+        napi_value handlerTemp = nullptr;
+        CHKRV(env, napi_get_reference_value(env, asyncContext->ref, &handlerTemp), GET_REFERENCE);
+        napi_value callResult = nullptr;
+        CHKRV(env, napi_call_function(env, nullptr, handlerTemp, 1, &result, &callResult), CALL_FUNCTION);
+        CHKRV(env, napi_delete_reference(env, asyncContext->ref), "napi_delete_reference");
+    }
+}
 #endif
 } // namespace
 
@@ -84,29 +107,6 @@ napi_value JsInputDeviceManager::GetDevice(napi_env env, int32_t id, napi_value 
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-void ProcessCallbackOrPromise(napi_env env, const PointerAsyncContext *asyncContext)
-{
-    if (asyncContext == nullptr) {
-        THROWERR(env, "asyncContext is nullptr");
-        return;
-    }
-    napi_value result = nullptr;
-    CHKRV(env, napi_get_undefined(env, &result), GET_UNDEFINED);
-    if (asyncContext->deferred) {
-        if (asyncContext->status == napi_ok) {
-            CHKRV(env, napi_resolve_deferred(env, asyncContext->deferred, result), RESOLVE_DEFERRED);
-        } else {
-            CHKRV(env, napi_reject_deferred(env, asyncContext->deferred, result), REJECT_DEFERRED);
-        }
-    } else {
-        napi_value handlerTemp = nullptr;
-        CHKRV(env, napi_get_reference_value(env, asyncContext->ref, &handlerTemp), GET_REFERENCE);
-        napi_value callResult = nullptr;
-        CHKRV(env, napi_call_function(env, nullptr, handlerTemp, 1, &result, &callResult), CALL_FUNCTION);
-        CHKRV(env, napi_delete_reference(env, asyncContext->ref), "napi_delete_reference");
-    }
-}
-
 napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, napi_value handle)
 {
     CALL_LOG_ENTER;
