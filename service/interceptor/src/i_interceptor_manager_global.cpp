@@ -16,6 +16,7 @@
 #include "i_interceptor_manager_global.h"
 
 #include "mmi_log.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
@@ -49,10 +50,7 @@ bool IInterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 
 std::shared_ptr<IInterceptorManagerGlobal> IInterceptorManagerGlobal::GetInstance()
 {
-    if (interceptorMgrGPtr_ == nullptr) {
-        interceptorMgrGPtr_ = std::make_shared<IInterceptorManagerGlobal>();
-    }
-    return interceptorMgrGPtr_;
+    return DelayedSingleton<IInterceptorManagerGlobal>::GetInstance();
 }
 } // namespace MMI
 } // namespace OHOS

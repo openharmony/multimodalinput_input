@@ -16,6 +16,7 @@
 #include "i_interceptor_handler_global.h"
 
 #include "mmi_log.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
@@ -51,10 +52,7 @@ bool IInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> Pointe
 
 std::shared_ptr<IInterceptorHandlerGlobal> IInterceptorHandlerGlobal::GetInstance()
 {
-    if (interceptorHdlGPtr_ == nullptr) {
-        interceptorHdlGPtr_ = std::make_shared<IInterceptorHandlerGlobal>();
-    }
-    return interceptorHdlGPtr_;
+    return DelayedSingleton<IInterceptorHandlerGlobal>::GetInstance();
 }
 } // namespace MMI
 } // namespace OHOS

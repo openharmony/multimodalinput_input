@@ -30,9 +30,8 @@ public:
     virtual void OnRemoveInterceptor(int32_t id);
     virtual bool OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     virtual bool OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
-protected:
-    static inline std::shared_ptr<IInterceptorManagerGlobal> interceptorMgrGPtr_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
+#define IInterceptorMgrGl IInterceptorManagerGlobal::GetInstance()
 #endif // I_INTERCEPTOR_MANAGER_GLOBAL_H

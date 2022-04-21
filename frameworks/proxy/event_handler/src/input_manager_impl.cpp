@@ -481,7 +481,7 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
         return -1;
     }
     std::lock_guard<std::mutex> guard(mtx_);
-    int32_t interceptorId = IInputInterceptorManager::GetInstance()->AddInterceptor(interceptor);
+    int32_t interceptorId = IInputInterceptorMgr->AddInterceptor(interceptor);
     if (interceptorId >= 0) {
         interceptorId = interceptorId * ADD_MASK_BASE + MASK_TOUCH;
     }
@@ -505,7 +505,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
         MMI_HILOGE("client init failed");
         return -1;
     }
-    int32_t interceptorId = IInterceptorManager::GetInstance()->AddInterceptor(interceptor);
+    int32_t interceptorId = IInterceptorMgr->AddInterceptor(interceptor);
     if (interceptorId >= 0) {
         interceptorId = interceptorId * ADD_MASK_BASE + MASK_KEY;
     }
@@ -527,17 +527,16 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
     interceptorId /= ADD_MASK_BASE;
     switch (mask) {
         case MASK_TOUCH: {
-            IInputInterceptorManager::GetInstance()->RemoveInterceptor(interceptorId);
+            IInputInterceptorMgr->RemoveInterceptor(interceptorId);
             break;
         }
         case MASK_KEY: {
-            IInterceptorManager::GetInstance()->RemoveInterceptor(interceptorId);
+            IInterceptorMgr->RemoveInterceptor(interceptorId);
             break;
         }
         default:
             MMI_HILOGE("Can't find the mask, mask:%{public}d", mask);
             break;
-        }
     }
 }
 

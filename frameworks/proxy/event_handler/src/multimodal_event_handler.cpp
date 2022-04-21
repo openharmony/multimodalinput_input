@@ -160,7 +160,9 @@ int32_t MultimodalEventHandler::AddInterceptor(int32_t sourceType, int32_t id)
     MMI_HILOGD("client add a touchpad event interceptor");
     return RET_OK;
 }
+#endif // OHOS_BUILD_MMI_INTERCEPTOR
 
+#ifdef OHOS_BUILD_MMI_INTERCEPTOR
 int32_t MultimodalEventHandler::RemoveInterceptor(int32_t id)
 {
     if (!InitClient()) {

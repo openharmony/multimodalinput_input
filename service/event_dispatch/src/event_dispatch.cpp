@@ -107,7 +107,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_HILOGI("Pointer event Filter succeeded");
         return RET_OK;
     }
-    if (IInterceptorHandlerGlobal::GetInstance()->HandleEvent(point)) {
+    if (IInterceptorHdlGl->HandleEvent(point)) {
         BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Interception is succeeded");
         return RET_OK;
@@ -158,7 +158,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
     CALL_LOG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
     if (!key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
-        if (IInterceptorManagerGlobal::GetInstance()->OnKeyEvent(key)) {
+        if (IInterceptorMgrGl->OnKeyEvent(key)) {
             MMI_HILOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
                 key->GetKeyCode());
             BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_INTERCEPT_EVENT);
@@ -188,7 +188,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
                key->GetActionStartTime(),
                key->GetEventType(),
                key->GetFlag(), key->GetKeyAction(), fd);
-    IInterceptorHandlerGlobal::GetInstance()->HandleEvent(key);
+    IInterceptorHdlGl->HandleEvent(key);
     InputHandlerManagerGlobal::GetInstance().HandleEvent(key);
     auto session = udsServer.GetSession(fd);
     CHKPF(session);
