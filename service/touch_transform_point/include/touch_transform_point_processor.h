@@ -36,7 +36,7 @@ private:
     bool OnEventTouchDown(struct libinput_event *event);
     bool OnEventTouchMotion(struct libinput_event *event);
     bool OnEventTouchUp(struct libinput_event *event);
-    void GetTouchToolType(struct libinput_event *event, int32_t &toolType);
+    int32_t GetTouchToolType(struct libinput_event *event);
     int32_t GetTouchToolType(struct libinput_device *device);
 private:
     int32_t deviceId_ {0};

@@ -69,8 +69,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     auto pressure = libinput_event_touch_get_pressure(data);
     auto seatSlot = libinput_event_touch_get_seat_slot(data);
     item.SetPressure(pressure);
-    int32_t toolType = -1;
-    GetTouchToolType(event, toolType);
+    int32_t toolType = GetTouchToolType(event);
     item.SetToolType(toolType);
     item.SetPointerId(seatSlot);
     item.SetDownTime(time);
@@ -179,30 +178,26 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent
     return pointerEvent_;
 }
 
-void TouchTransformPointProcessor::GetTouchToolType(struct libinput_event *event, int32_t &toolType)
+int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_event *event)
 {
     auto data = libinput_event_get_touch_event(event);
-    CHKPV(data);
+    CHKPR(data, PointerEvent::TOOL_TYPE_FINGER);
     auto toolTypeTmp = libinput_event_touch_get_tool_type(data);
     switch (toolTypeTmp) {
         case MT_TOOL_NONE: {
             auto device = libinput_event_get_device(event);
-            CHKPV(device);
-            toolType = GetTouchToolType(device);
-            return;
+            CHKPR(device, PointerEvent::TOOL_TYPE_FINGER);
+            return GetTouchToolType(device);
         }
         case MT_TOOL_FINGER: {
-            toolType = PointerEvent::TOOL_TYPE_FINGER;
-            return;
+            return PointerEvent::TOOL_TYPE_FINGER;
         }
         case MT_TOOL_PEN: {
-            toolType = PointerEvent::TOOL_TYPE_PEN;
-            return;
+            return PointerEvent::TOOL_TYPE_PEN;
         }
         default : {
             MMI_HILOGW("Unknown tool type, identified as finger, toolType:%{public}d", toolTypeTmp);
-            toolType = PointerEvent::TOOL_TYPE_FINGER;
-            return;
+            return PointerEvent::TOOL_TYPE_FINGER;
         }
     }
 }
