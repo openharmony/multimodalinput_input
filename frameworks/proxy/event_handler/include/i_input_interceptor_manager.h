@@ -26,9 +26,8 @@ public:
     virtual ~IInputInterceptorManager() = default;
     virtual int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
     virtual void RemoveInterceptor(int32_t interceptorId);
-protected:
-    static inline std::shared_ptr<IInputInterceptorManager> inputMgrPtr_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
+#define IInputInterceptorMgr IInputInterceptorManager::GetInstance()
 #endif // I_INPUT_INTERCEPTOR_MANAGER_H

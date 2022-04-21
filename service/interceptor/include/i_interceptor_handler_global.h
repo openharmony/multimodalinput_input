@@ -31,9 +31,8 @@ public:
     virtual void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
     virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent);
-protected:
-    static inline std::shared_ptr<IInterceptorHandlerGlobal> interceptorHdlGPtr_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
+#define IInterceptorHdlGl IInterceptorHandlerGlobal::GetInstance()
 #endif // I_INTERCEPTOR_HANDLER_GLOBAL_H

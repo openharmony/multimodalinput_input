@@ -21,6 +21,7 @@
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "multimodal_event_handler.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
@@ -113,10 +114,7 @@ int32_t InterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 
 std::shared_ptr<IInterceptorManager> IInterceptorManager::GetInstance()
 {
-    if (interceptorMgrPtr_ == nullptr) {
-        interceptorMgrPtr_ = std::make_shared<InterceptorManager>();
-    }
-    return interceptorMgrPtr_;
+    return DelayedSingleton<InterceptorManager>::GetInstance();
 }
 } // namespace MMI
 } // namespace OHOS

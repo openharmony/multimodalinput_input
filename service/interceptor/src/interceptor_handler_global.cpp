@@ -22,6 +22,7 @@
 #include "mmi_log.h"
 #include "net_packet.h"
 #include "proto.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
@@ -65,34 +66,26 @@ bool InterceptorHandlerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
     MMI_HILOGD("Handle KeyEvent");
     CHKPF(keyEvent);
     if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
-        MMI_HILOGD("This event has been tagged as not to be intercepted");
-    } else {
-        if (interceptors_.HandleEvent(keyEvent)) {
-            MMI_HILOGD("Key event was intercepted");
-            return true;
-        }
+        MMI_HILOGW("This event has been tagged as not to be intercepted");
+        return false;
     }
-    return false;
+    return interceptors_.HandleEvent(keyEvent);
 }
 
 bool InterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
-        MMI_HILOGD("This event has been tagged as not to be intercepted");
-    } else {
-        if (interceptors_.HandleEvent(pointerEvent)) {
-            MMI_HILOGD("Pointer event was intercepted");
-            return true;
-        }
+        MMI_HILOGW("This event has been tagged as not to be intercepted");
+        return false;
     }
-    MMI_HILOGD("Interception is failed");
-    return false;
+    return interceptors_.HandleEvent(pointerEvent);
 }
 
 void InterceptorHandlerGlobal::InitSessionLostCallback()
 {
     if (sessionLostCallbackInitialized_)  {
+        MMI_HILOGE("Init session is failed");
         return;
     }
     auto udsServerPtr = InputHandler->GetUDSServer();
@@ -155,12 +148,14 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
     CHKPF(keyEvent);
     std::lock_guard<std::mutex> guard(lockInterceptors_);
     if (interceptors_.empty()) {
+        MMI_HILOGW("Key interceptors is empty");
         return false;
     }
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     for (const auto &interceptor : interceptors_) {
         interceptor.SendToClient(keyEvent);
     }
+    MMI_HILOGD("Key event was intercepted");
     return true;
 }
 
@@ -169,12 +164,14 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
     CHKPF(pointerEvent);
     std::lock_guard<std::mutex> guard(lockInterceptors_);
     if (interceptors_.empty()) {
+        MMI_HILOGW("Pointer interceptors is empty");
         return false;
     }
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     for (const auto &interceptor : interceptors_) {
         interceptor.SendToClient(pointerEvent);
     }
+    MMI_HILOGD("Pointer event was intercepted");
     return true;
 }
 
@@ -219,10 +216,7 @@ void InterceptorHandlerGlobal::InterceptorCollection::OnSessionLost(SessionPtr s
 
 std::shared_ptr<IInterceptorHandlerGlobal> IInterceptorHandlerGlobal::GetInstance()
 {
-    if (interceptorHdlGPtr_ == nullptr) {
-        interceptorHdlGPtr_ = std::make_shared<InterceptorHandlerGlobal>();
-    }
-    return interceptorHdlGPtr_;
+    return DelayedSingleton<InterceptorHandlerGlobal>::GetInstance();
 }
 } // namespace MMI
 } // namespace OHOS

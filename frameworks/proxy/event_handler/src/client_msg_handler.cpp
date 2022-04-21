@@ -388,7 +388,7 @@ int32_t ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetP
     }
     MMI_HILOGD("client receive the msg from server: pointId:%{public}d,pid:%{public}d",
                pointerEvent->GetPointerId(), pid);
-    return IInterceptorManager::GetInstance()->OnPointerEvent(pointerEvent, id);
+    return IInterceptorMgr->OnPointerEvent(pointerEvent, id);
 }
 
 int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket& pkt)
@@ -409,7 +409,7 @@ int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
     MMI_HILOGD("client receive the msg from server: keyCode:%{public}d,pid:%{public}d",
         keyEvent->GetKeyCode(), pid);
-    return IInterceptorManager::GetInstance()->OnKeyEvent(keyEvent);
+    return IInterceptorMgr->OnKeyEvent(keyEvent);
 }
 
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)
