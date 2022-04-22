@@ -21,6 +21,7 @@
 #include "input_device_impl.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "refbase.h"
 
 namespace OHOS {
 namespace MMI {
@@ -41,6 +42,27 @@ public:
         napi_deferred deferred = nullptr;
         CallbackData data;
     };
+
+    class AsyncContext : public RefBase {
+    public:
+        napi_env env = nullptr;
+        napi_async_work work = nullptr;
+        napi_deferred deferred = nullptr;
+        napi_ref callback = nullptr;
+        int32_t errorCode;
+        AsyncContext(napi_env env) : env(env) {}
+        ~AsyncContext();
+    };
+
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    class PointerAsyncContext : public AsyncContext {
+    public:
+        bool visible = true;
+        sptr<PointerAsyncContext> contextInfo = nullptr;
+        PointerAsyncContext(napi_env env) : AsyncContext(env) {}
+        ~PointerAsyncContext() {}
+    };
+#endif
 
     int32_t GetInt32(uv_work_t *work);
     bool IsHandleEquals(napi_env env, napi_value handle, napi_ref ref);

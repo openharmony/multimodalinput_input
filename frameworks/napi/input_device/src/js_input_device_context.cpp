@@ -302,7 +302,6 @@ napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_i
     JsInputDeviceContext *jsPointer = JsInputDeviceContext::GetInstance(env);
     auto jsInputDeviceMgr = jsPointer->GetJsInputDeviceMgr();
     if (argc == 1) {
-        MMI_HILOGD("promise end");
         return jsInputDeviceMgr->SetPointerVisible(env, visible);
     }
     CHKRP(env, napi_typeof(env, argv[1], &valueType), TYPEOF);
