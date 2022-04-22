@@ -20,7 +20,6 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDeviceManager" };
 std::mutex mutex_;
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 const std::string CREATE_PROMISE = "napi_create_promise";
 const std::string CREATE_STRING_UTF8 = "napi_create_string_utf8";
 const std::string GET_UNDEFINED = "napi_get_undefined";
@@ -29,7 +28,6 @@ const std::string REJECT_DEFERRED = "napi_reject_deferred";
 const std::string CREATE_REFERENCE = "napi_create_reference";
 const std::string GET_REFERENCE = "napi_get_reference_value";
 const std::string CALL_FUNCTION = "napi_call_function";
-#endif
 } // namespace
 
 JsInputDeviceManager::JsInputDeviceManager()
@@ -72,7 +70,6 @@ napi_value JsInputDeviceManager::GetDevice(napi_env env, int32_t id, napi_value 
     return ret;
 }
 
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, napi_value handle)
 {
     CALL_LOG_ENTER;
@@ -91,9 +88,12 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
 
     napi_value resource = nullptr;
     CHKRP(env, napi_create_string_utf8(env, "setPointerVisible", NAPI_AUTO_LENGTH, &resource), CREATE_STRING_UTF8);
-    if (handle != nullptr || napi_create_reference(env, handle, 1, &asyncContext->callback) != napi_ok ) {
-        asyncContext->contextInfo = nullptr;
-        return nullptr;
+    if (handle != nullptr) {
+        if (napi_create_reference(env, handle, 1, &asyncContext->callback) != napi_ok) {
+            MMI_HILOGE("create reference fail");
+            asyncContext->contextInfo = nullptr;
+            return nullptr;
+        }
     }
 
     asyncContext->contextInfo = asyncContext;
@@ -102,7 +102,7 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
             asyncContext->errorCode = InputManager::GetInstance()->SetPointerVisible(asyncContext->visible);
         }, [](napi_env env, napi_status status, void* data) {
             CHKPV(data);
-            sptr<JsUtil::PointerAsyncContext> asyncContext = reinterpret_cast<JsUtil::PointerAsyncContext *>(data)->contextInfo;
+            sptr<JsUtil::PointerAsyncContext> asyncContext = static_cast<JsUtil::PointerAsyncContext *>(data)->contextInfo;
             asyncContext->contextInfo = nullptr;
             napi_value result = nullptr;
             CHKRV(env, napi_get_undefined(env, &result), GET_UNDEFINED);
@@ -113,11 +113,10 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
                     CHKRV(env, napi_reject_deferred(env, asyncContext->deferred, result), REJECT_DEFERRED);
                 }
             } else {
-                napi_value handlerTemp = nullptr;
-                CHKRV(env, napi_get_reference_value(env, asyncContext->callback, &handlerTemp), GET_REFERENCE);
+                napi_value callback = nullptr;
+                CHKRV(env, napi_get_reference_value(env, asyncContext->callback, &callback), GET_REFERENCE);
                 napi_value callResult = nullptr;
-                CHKRV(env, napi_call_function(env, nullptr, handlerTemp, 1, &result, &callResult), CALL_FUNCTION);
-                CHKRV(env, napi_delete_reference(env, asyncContext->callback), "napi_delete_reference");
+                CHKRV(env, napi_call_function(env, nullptr, callback, 1, &result, &callResult), CALL_FUNCTION);
             }
         }, asyncContext.GetRefPtr(), &asyncContext->work);
     if (status != napi_ok || napi_queue_async_work(env, asyncContext->work) != napi_ok) {
@@ -126,7 +125,6 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
     }
     return promise;
 }
-#endif
 
 napi_value JsInputDeviceManager::GetKeystrokeAbility(napi_env env, int32_t id, std::vector<int32_t> keyCodes,
                                                      napi_value handle)

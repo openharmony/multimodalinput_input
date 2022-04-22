@@ -34,9 +34,7 @@ public:
     int32_t AllocSocketPair(const int32_t moduleType);
     int32_t GetClientSocketFdOfAllocedSocketPair() const;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t SetPointerVisible(bool visible);
-#endif
 private:
     MultimodalInputConnectManager() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);

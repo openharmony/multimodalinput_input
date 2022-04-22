@@ -106,7 +106,6 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
     return result;
 }
 
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
 {
     CALL_LOG_ENTER;
@@ -135,6 +134,5 @@ int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
     }
     return result;
 }
-#endif
 } // namespace MMI
 } // namespace OHOS

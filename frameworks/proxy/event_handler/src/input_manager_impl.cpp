@@ -577,7 +577,7 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible)
     return ret;
 #else
     MMI_HILOGD("disable pointer drawing");
-    return RET_OK;
+    return RET_ERR;
 #endif
 }
 

@@ -278,7 +278,6 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
     return jsInputDeviceMgr->GetDevice(env, id, argv[1]);
 }
 
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
@@ -311,7 +310,6 @@ napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_i
     }
     return jsInputDeviceMgr->SetPointerVisible(env, visible, argv[1]);
 }
-#endif
 
 napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback_info info)
 {
@@ -381,9 +379,7 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("off", Off),
         DECLARE_NAPI_STATIC_FUNCTION("getDevice", GetDevice),
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceIds", GetDeviceIds),
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
         DECLARE_NAPI_STATIC_FUNCTION("setPointerVisible", SetPointerVisible),
-#endif
         DECLARE_NAPI_STATIC_FUNCTION("getKeystrokeAbility", GetKeystrokeAbility),
     };
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);

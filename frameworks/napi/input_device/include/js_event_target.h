@@ -24,9 +24,7 @@
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_device_impl.h"
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 #include "input_manager.h"
-#endif
 
 #include "js_util.h"
 
