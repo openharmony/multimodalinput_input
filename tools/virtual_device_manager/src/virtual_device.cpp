@@ -44,7 +44,9 @@ namespace MMI {
 namespace {
 bool IsNum(const std::string& str)
 {
-    return std::all_of(str.begin(), str.end(), [](char c){return std::isdigit(c) != 0;});
+    return std::all_of(str.begin(), str.end(), [](char c) {
+        return std::isdigit(c) != 0;
+    });
 }
 
 bool CheckFileName(const std::string& fileName)
@@ -91,7 +93,7 @@ void RemoveDir()
     }
     closedir(dir);
     if (fileNnm == 0) {
-        if (remove(g_folderpath.c_str()) != 0 ) {
+        if (remove(g_folderpath.c_str()) != 0) {
             printf("remove %s fail, errno: %d.", g_folderpath.c_str(), errno);
         }
     }
