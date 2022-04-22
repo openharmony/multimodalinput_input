@@ -89,12 +89,12 @@ void RemoveDir()
         }
         fileNnm++;
     }
-    if (fileNnm == 0) {
-        closedir(dir);
-        (void)remove(g_folderpath.c_str());
-        return;
-    }
     closedir(dir);
+    if (fileNnm == 0) {
+        if (remove(g_folderpath.c_str()) != 0 ) {
+            printf("remove %s fail, errno: %d.", g_folderpath.c_str(), errno);
+        }
+    }
     return;
 }
 } // namespace
