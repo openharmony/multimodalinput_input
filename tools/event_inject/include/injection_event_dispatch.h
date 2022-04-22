@@ -89,7 +89,6 @@ private:
     static constexpr int32_t ARGVS_CODE_INDEX = 2;
     static constexpr int32_t SEND_EVENT_TO_DEVICE = 0;
     static constexpr int32_t JSON_FILE_PATH_INDEX = 1;
-    static constexpr int64_t JSON_FILE_SIZE = 0x20000;
     static constexpr uint32_t INPUT_TYPE_LENGTH = 3;
     static constexpr uint16_t INPUT_TYPE_MAX = 100;
     static constexpr uint32_t INPUT_CODE_LENGTH = 6;

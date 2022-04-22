@@ -29,7 +29,6 @@ namespace MMI {
 namespace {
 constexpr int32_t MAX_PREKEYS_NUM = 4;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandManager" };
-constexpr int64_t JSON_FILE_SIZE = 0x2000;
 struct JsonParser {
     JsonParser() = default;
 
@@ -273,7 +272,19 @@ bool ConvertToShortcutKey(cJSON* jsonData, ShortcutKey &shortcutKey)
 KeyCommandManager::KeyCommandManager()
 {
     std::string configFile = GetConfigFilePath();
-    ParseConfig(configFile);
+    if (!FileExists(configFile)) {
+        MMI_HILOGE("config file %{public}s not exist", configFile.c_str());
+        return;
+    }
+    int32_t fileSize = GetFileSize(configFile);
+    if ((fileSize <= 0) || (fileSize > JSON_FILE_SIZE)) {
+        MMI_HILOGE("The file size is out of range 20KB or empty. filesize:%{public}d", fileSize);
+        return;
+    }
+    MMI_HILOGD("config file path:%{public}s", configFile.c_str());
+    if (!ParseJson(configFile)) {
+        MMI_HILOGW("Parse configFile to failed");
+    }
     Print();
 }
 
@@ -330,24 +341,6 @@ bool KeyCommandManager::ParseJson(const std::string &configFile)
         }
     }
     return true;
-}
-
-void KeyCommandManager::ParseConfig(const std::string configFile)
-{
-    if (!FileExists(configFile)) {
-        MMI_HILOGE("config file %{public}s not exist", configFile.c_str());
-        return;
-    }
-    int32_t fileSize = GetFileSize(configFile);
-    if ((fileSize <= 0) || (fileSize > JSON_FILE_SIZE)) {
-        MMI_HILOGE("The file size is out of range 20KB or empty. filesize:%{public}d", fileSize);
-        return;
-    }
-    MMI_HILOGD("config file path:%{public}s", configFile.c_str());
-    if (!ParseJson(configFile)) {
-        MMI_HILOGW("Parse configFile to failed");
-    }
-    return;
 }
 
 void KeyCommandManager::Print()
