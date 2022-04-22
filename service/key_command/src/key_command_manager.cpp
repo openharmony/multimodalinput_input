@@ -51,7 +51,7 @@ struct JsonParser {
 bool GetPreKeys(cJSON* jsonData, ShortcutKey &shortcutKey)
 {
     if (!cJSON_IsObject(jsonData)) {
-        MMI_HILOGE("preKeys jsonData is not object");
+        MMI_HILOGE("jsonData is not object");
         return false;
     }
     cJSON* preKey = cJSON_GetObjectItemCaseSensitive(jsonData, "preKey");
@@ -61,22 +61,21 @@ bool GetPreKeys(cJSON* jsonData, ShortcutKey &shortcutKey)
     }
     int32_t preKeySize = cJSON_GetArraySize(preKey);
     if (preKeySize > MAX_PREKEYS_NUM) {
-        MMI_HILOGE("preKey number must less and equal four");
+        MMI_HILOGE("preKeySize number must less and equal four");
         return false;
     }
     for (int32_t i = 0; i < preKeySize; ++i) {
         cJSON *preKeyJson = cJSON_GetArrayItem(preKey, i);
         if (!cJSON_IsNumber(preKeyJson)) {
-            MMI_HILOGE("preKey is not number");
+            MMI_HILOGE("preKeyJson is not number");
             return false;
         }
         if (preKeyJson->valueint < 0) {
-            MMI_HILOGE("preKey must be number and bigger or equal to 0");
+            MMI_HILOGE("preKeyJson must be number and bigger or equal than 0");
             return false;
         }
-        auto ret = shortcutKey.preKeys.emplace(preKeyJson->valueint);
-        if (!ret.second) {
-            MMI_HILOGE("preKey must be unduplicated");
+        if (!shortcutKey.preKeys.emplace(preKeyJson->valueint).second) {
+            MMI_HILOGE("preKeyJson must be unduplicated");
             return false;
         }
     }
@@ -86,7 +85,7 @@ bool GetPreKeys(cJSON* jsonData, ShortcutKey &shortcutKey)
 bool GetTrigger(cJSON* jsonData, int32_t &triggerType)
 {
     if (!cJSON_IsObject(jsonData)) {
-        MMI_HILOGE("trigger jsonData is not object");
+        MMI_HILOGE("jsonData is not object");
         return false;
     }
     cJSON *trigger = cJSON_GetObjectItemCaseSensitive(jsonData, "trigger");
@@ -110,7 +109,7 @@ bool GetTrigger(cJSON* jsonData, int32_t &triggerType)
 bool GetKeyDownDuration(cJSON* jsonData, int32_t &keyDownDurationInt)
 {
     if (!cJSON_IsObject(jsonData)) {
-        MMI_HILOGE("DownDuration jsonData is not object");
+        MMI_HILOGE("jsonData is not object");
         return false;
     }
     cJSON *keyDownDuration = cJSON_GetObjectItemCaseSensitive(jsonData, "keyDownDuration");
@@ -129,7 +128,7 @@ bool GetKeyDownDuration(cJSON* jsonData, int32_t &keyDownDurationInt)
 bool GetKeyFinalKey(cJSON* jsonData, int32_t &finalKeyInt)
 {
     if (!cJSON_IsObject(jsonData)) {
-        MMI_HILOGE("finalKey jsonData is not object");
+        MMI_HILOGE("jsonData is not object");
         return false;
     }
     cJSON *finalKey = cJSON_GetObjectItemCaseSensitive(jsonData, "finalKey");
@@ -144,7 +143,7 @@ bool GetKeyFinalKey(cJSON* jsonData, int32_t &finalKeyInt)
 void GetKeyVal(cJSON* json, const std::string &key, std::string &value)
 {
     if (!cJSON_IsObject(json)) {
-        MMI_HILOGE("keyVal json is not object");
+        MMI_HILOGE("json is not object");
         return;
     }
     cJSON *valueJson = cJSON_GetObjectItemCaseSensitive(json, key.c_str());
@@ -157,7 +156,7 @@ void GetKeyVal(cJSON* json, const std::string &key, std::string &value)
 bool GetEntities(cJSON* jsonAbility, Ability &ability)
 {
     if (!cJSON_IsObject(jsonAbility)) {
-        MMI_HILOGE("entities jsonAbility is not object");
+        MMI_HILOGE("jsonAbility is not object");
         return false;
     }
     cJSON *entities = cJSON_GetObjectItemCaseSensitive(jsonAbility, "entities");
@@ -180,7 +179,7 @@ bool GetEntities(cJSON* jsonAbility, Ability &ability)
 bool GetParams(cJSON* jsonAbility, Ability &ability)
 {
     if (!cJSON_IsObject(jsonAbility)) {
-        MMI_HILOGE("params jsonAbility is not object");
+        MMI_HILOGE("jsonAbility is not object");
         return false;
     }
     cJSON *params = cJSON_GetObjectItemCaseSensitive(jsonAbility, "params");
@@ -216,7 +215,7 @@ bool GetParams(cJSON* jsonAbility, Ability &ability)
 bool PackageAbility(cJSON* jsonAbility, Ability &ability)
 {
     if (!cJSON_IsObject(jsonAbility)) {
-        MMI_HILOGE("ability jsonAbility is not object");
+        MMI_HILOGE("jsonAbility is not object");
         return false;
     }
     GetKeyVal(jsonAbility, "bundleName", ability.bundleName);
@@ -239,7 +238,7 @@ bool PackageAbility(cJSON* jsonAbility, Ability &ability)
 bool ConvertToShortcutKey(cJSON* jsonData, ShortcutKey &shortcutKey)
 {
     if (!cJSON_IsObject(jsonData)) {
-        MMI_HILOGE("convert jsonData is not object");
+        MMI_HILOGE("jsonData is not object");
         return false;
     }
     if (!GetPreKeys(jsonData, shortcutKey)) {

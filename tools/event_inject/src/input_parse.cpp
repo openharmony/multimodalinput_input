@@ -130,7 +130,7 @@ bool ParseEvents(cJSON* eventInfo, DeviceEvent& event)
 void ParseEventsObj(cJSON* eventInfo, DeviceEvent& event)
 {
     if (!cJSON_IsObject(eventInfo)) {
-        MMI_HILOGE("events is not object");
+        MMI_HILOGE("eventInfo is not object");
         return;
     }
     GetJsonData(eventInfo, "eventType", event.eventType);
@@ -262,7 +262,7 @@ DeviceItems DataInit(const std::string& fileData, bool logStatus)
             events = cJSON_GetObjectItem(deviceInfo, "singleEvent");
         }
         if (!cJSON_IsArray(events)) {
-            MMI_HILOGE("parser events is not array");
+            MMI_HILOGE("events is not array");
             return {};
         }
         if (!ParseData(events, deviceItem.events)) {
