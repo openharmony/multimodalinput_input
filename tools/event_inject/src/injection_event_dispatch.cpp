@@ -81,7 +81,7 @@ int32_t InjectionEventDispatch::OnJson()
     }
     int32_t fileSize = GetFileSize(jsonFile);
     if ((fileSize <= 0) || (fileSize > JSON_FILE_SIZE)) {
-        MMI_HILOGE("The file size is out of range 2M or empty. filesize:%{public}d", fileSize);
+        MMI_HILOGE("The file size is out of range 20KB or empty. filesize:%{public}d", fileSize);
         return RET_ERR;
     }
     std::string jsonBuf = ReadFile(jsonFile);
