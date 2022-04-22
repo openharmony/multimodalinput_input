@@ -41,7 +41,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilE
     constexpr size_t bufSize = 1024 * 10;
     char buf[bufSize] = {};
     int32_t ret = snprintf_s(buf, bufSize, bufSize - 1, fmt, args...);
-    if (ret < 0) {
+    if (ret == -1) {
         return ret;
     }
 

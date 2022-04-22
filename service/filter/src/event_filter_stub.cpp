@@ -43,11 +43,13 @@ int32_t EventFilterStub::OnRemoteRequest(
     }
 
     switch (code) {
-        case static_cast<uint32_t>(IEventFilter::OPERATOR_TYPE::HANDLE_POINTER_EVENT):
+        case static_cast<uint32_t>(IEventFilter::OPERATOR_TYPE::HANDLE_POINTER_EVENT): {
             return StubHandlePointerEvent(data, reply);
-        default:
+        }
+        default: {
             MMI_HILOGE("unknown code:%{public}u, go switch defaut", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+        }
     }
 }
 

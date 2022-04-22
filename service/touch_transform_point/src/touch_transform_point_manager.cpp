@@ -27,17 +27,22 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibInput(
     struct libinput_event *event, INPUT_DEVICE_TYPE deviceType)
 {
     switch (deviceType) {
-        case INPUT_DEVICE_CAP_TOUCH:
+        case INPUT_DEVICE_CAP_TOUCH: {
             return OnLibinputTouchEvent(event);
-        case INPUT_DEVICE_CAP_TABLET_TOOL:
+        }
+        case INPUT_DEVICE_CAP_TABLET_TOOL: {
             return OnLibinputTabletToolEvent(event);
-        case INPUT_DEVICE_CAP_TOUCH_PAD:
+        }
+        case INPUT_DEVICE_CAP_TOUCH_PAD: {
             return OnLibinputTouchPadEvent(event);
-        case INPUT_DEVICE_CAP_GESTURE:
+        }
+        case INPUT_DEVICE_CAP_GESTURE: {
             return OnTouchPadGestrueEvent(event);
-        default:
+        }
+        default: {
             MMI_HILOGE("The in parameter deviceType is error, deviceType:%{public}d", deviceType);
             break;
+        }
     }
     return nullptr;
 }

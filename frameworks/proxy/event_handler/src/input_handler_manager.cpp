@@ -80,20 +80,6 @@ void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
         return;
     }
 }
-void InputHandlerManager::MoveMouse(int32_t offsetX, int32_t offsetY)
-{
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
-    NetPacket pkt(MmiMessageId::MOVE_MOUSE_BY_OFFSET);
-    if (!pkt.Write(offsetX) || !pkt.Write(offsetY)) {
-        MMI_HILOGE("Packet write is error, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
-        return;
-    }
-    if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
-    }
-}
 
 int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType,
     std::shared_ptr<IInputEventConsumer> monitor)
