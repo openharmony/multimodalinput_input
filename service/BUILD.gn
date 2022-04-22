@@ -163,6 +163,7 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
     "//foundation/windowmanager/wm:libwm",
+    "//third_party/json:nlohmann_json_static",
     "//third_party/libxkbcommon:libxkbcommon",
     "//third_party/wayland_standard:libwayland_server",
     "//third_party/weston:libweston",
