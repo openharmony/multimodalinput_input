@@ -33,9 +33,7 @@ public:
     virtual ~MultimodalInputConnectProxy() override;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &socketFd) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     virtual int32_t SetPointerVisible(bool visible) override;
-#endif
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
 };

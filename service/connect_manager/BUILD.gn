@@ -36,20 +36,13 @@ ohos_source_set("mmi_connect_manager_service") {
 
   cflags = [ "-DOHOS_BUILD" ]
 
-  if (mmi_enable_pointer_drawing) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
-  }
-
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
+    "access_token:libaccesstoken_sdk",
   ]
-
-  if (mmi_enable_pointer_drawing) {
-    external_deps += [ "access_token:libaccesstoken_sdk" ]
-  }
 }
 
 ohos_source_set("mmi_connect_manager_proxy") {
@@ -65,18 +58,10 @@ ohos_source_set("mmi_connect_manager_proxy") {
 
   cflags = [ "-DOHOS_BUILD" ]
 
-  if (mmi_enable_pointer_drawing) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
-  }
-
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
-
-  if (mmi_enable_pointer_drawing) {
-    external_deps += [ "access_token:libaccesstoken_sdk" ]
-  }
 }
