@@ -73,13 +73,13 @@ void MouseEventHandler::InitAbsolution()
     }
 }
 
-int32_t MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
+int32_t MouseEventHandler::HandleButtonInner(libinput_event_pointer* data)
 {
     CALL_LOG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
     MMI_HILOGD("current action:%{public}d", pointerEvent_->GetPointerAction());
 
-    auto ret = HandleButonValueInner(data);
+    auto ret = HandleButtonValueInner(data);
     if (ret != RET_OK) {
         MMI_HILOGW("The button value does not exist");
         return RET_ERR;
@@ -105,7 +105,7 @@ int32_t MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
     return RET_OK;
 }
 
-int32_t MouseEventHandler::HandleButonValueInner(libinput_event_pointer* data)
+int32_t MouseEventHandler::HandleButtonValueInner(libinput_event_pointer* data)
 {
     CALL_LOG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
@@ -230,7 +230,7 @@ int32_t MouseEventHandler::Normalize(struct libinput_event *event)
             break;
         }
         case LIBINPUT_EVENT_POINTER_BUTTON: {
-            result = HandleButonInner(data);
+            result = HandleButtonInner(data);
             break;
         }
         case LIBINPUT_EVENT_POINTER_AXIS: {
