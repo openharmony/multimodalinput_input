@@ -166,6 +166,16 @@ void PointerEvent::PointerItem::SetDeviceId(int32_t deviceId)
     deviceId_ = deviceId;
 }
 
+int32_t PointerEvent::PointerItem::GetToolType() const
+{
+    return toolType_;
+}
+
+void PointerEvent::PointerItem::SetToolType(int32_t toolType)
+{
+    toolType_ = toolType;
+}
+
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
     if (!out.WriteInt32(pointerId_)) {
@@ -874,7 +884,7 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
             << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
             << ",TiltX:" << item.GetTiltX() << ",TiltY:" << item.GetTiltY()
             << ",Pressure:" << std::fixed << std::setprecision(pressurePrecision)
-            << item.GetPressure() << std::endl;
+            << item.GetPressure() << ",ToolType:" << item.GetToolType() << std::endl;
     }
     std::vector<int32_t> pressedKeys = pointerEvent.GetPressedKeys();
     if (!pressedKeys.empty()) {

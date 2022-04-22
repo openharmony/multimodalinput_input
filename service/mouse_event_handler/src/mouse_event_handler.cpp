@@ -162,6 +162,7 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerItem.SetWidth(0);
     pointerItem.SetHeight(0);
     pointerItem.SetPressure(0);
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
     pointerItem.SetDeviceId(deviceId);
 
     pointerEvent_->UpdateId();

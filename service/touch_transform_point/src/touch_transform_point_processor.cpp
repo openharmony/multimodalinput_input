@@ -21,6 +21,18 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "TouchTransformPointProcessor"};
+constexpr int32_t MT_TOOL_NONE      = -1;
+constexpr int32_t MT_TOOL_FINGER    = 0;
+constexpr int32_t MT_TOOL_PEN       = 1;
+constexpr int32_t BTN_TOOL_PEN      = 0x140;
+constexpr int32_t BTN_TOOL_RUBBER   = 0x141;
+constexpr int32_t BTN_TOOL_BRUSH    = 0x142;
+constexpr int32_t BTN_TOOL_PENCIL   = 0x143;
+constexpr int32_t BTN_TOOL_AIRBRUSH = 0x144;
+constexpr int32_t BTN_TOOL_FINGER   = 0x145;
+constexpr int32_t BTN_TOOL_MOUSE    = 0x146;
+constexpr int32_t BTN_TOOL_LENS     = 0x147;
+constexpr int32_t BTN_DOWN          = 1;
 } // namespace
 
 TouchTransformPointProcessor::TouchTransformPointProcessor(int32_t deviceId) : deviceId_(deviceId)
@@ -57,6 +69,8 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     auto pressure = libinput_event_touch_get_pressure(data);
     auto seatSlot = libinput_event_touch_get_seat_slot(data);
     item.SetPressure(pressure);
+    int32_t toolType = GetTouchToolType(event);
+    item.SetToolType(toolType);
     item.SetPointerId(seatSlot);
     item.SetDownTime(time);
     item.SetPressed(true);
@@ -162,6 +176,54 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->UpdateId();
     return pointerEvent_;
+}
+
+int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_event *event)
+{
+    auto data = libinput_event_get_touch_event(event);
+    CHKPR(data, PointerEvent::TOOL_TYPE_FINGER);
+    auto toolTypeTmp = libinput_event_touch_get_tool_type(data);
+    switch (toolTypeTmp) {
+        case MT_TOOL_NONE: {
+            auto device = libinput_event_get_device(event);
+            CHKPR(device, PointerEvent::TOOL_TYPE_FINGER);
+            return GetTouchToolType(device);
+        }
+        case MT_TOOL_FINGER: {
+            return PointerEvent::TOOL_TYPE_FINGER;
+        }
+        case MT_TOOL_PEN: {
+            return PointerEvent::TOOL_TYPE_PEN;
+        }
+        default : {
+            MMI_HILOGW("Unknown tool type, identified as finger, toolType:%{public}d", toolTypeTmp);
+            return PointerEvent::TOOL_TYPE_FINGER;
+        }
+    }
+}
+
+int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_device *device)
+{
+    if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_PEN) == BTN_DOWN) {
+        return PointerEvent::TOOL_TYPE_PEN;
+    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_RUBBER) == BTN_DOWN) {
+        return PointerEvent::TOOL_TYPE_RUBBER;
+    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_BRUSH) == BTN_DOWN) {
+        return PointerEvent::TOOL_TYPE_BRUSH;
+    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_PENCIL) == BTN_DOWN) {
+        return PointerEvent::TOOL_TYPE_PENCIL;
+    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_AIRBRUSH) == BTN_DOWN) {
+        return PointerEvent::TOOL_TYPE_AIRBRUSH;
+    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_FINGER) == BTN_DOWN) {
+        return PointerEvent::TOOL_TYPE_FINGER;
+    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_MOUSE) == BTN_DOWN) {
+        return PointerEvent::TOOL_TYPE_MOUSE;
+    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_LENS) == BTN_DOWN) {
+        return PointerEvent::TOOL_TYPE_LENS;
+    } else {
+        MMI_HILOGW("Unknown Btn tool type, identified as finger");
+        return PointerEvent::TOOL_TYPE_FINGER;
+    }
 }
 } // namespace MMI
 } // namespace OHOS

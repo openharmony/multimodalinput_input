@@ -199,11 +199,27 @@ public:
      */
     static constexpr int32_t MOUSE_BUTTON_MIDDLE = 2;
 
+    static constexpr int32_t TOOL_TYPE_PEN = 0;
+
+    static constexpr int32_t TOOL_TYPE_RUBBER = 1;
+
+    static constexpr int32_t TOOL_TYPE_BRUSH = 2;
+
+    static constexpr int32_t TOOL_TYPE_PENCIL = 3;
+
+    static constexpr int32_t TOOL_TYPE_AIRBRUSH = 4;
+
+    static constexpr int32_t TOOL_TYPE_FINGER = 5;
+
+    static constexpr int32_t TOOL_TYPE_MOUSE = 6;
+
+    static constexpr int32_t TOOL_TYPE_LENS = 7;
+
 public:
     static std::shared_ptr<PointerEvent> from(std::shared_ptr<InputEvent> inputEvent);
 
 public:
-    class PointerItem {
+    struct PointerItem {
     public:
         PointerItem();
         ~PointerItem();
@@ -385,6 +401,10 @@ public:
          */
         void SetDeviceId(int32_t deviceId);
 
+        int32_t GetToolType() const;
+
+        void SetToolType(int32_t toolType);
+
         /**
          * @brief Writes data to a <b>Parcel</b> obejct.
          * @param out Indicates the object into which data will be written.
@@ -415,6 +435,7 @@ public:
         double  pressure_ { 0.0 };
         int32_t deviceId_ { 0 };
         int64_t downTime_ { 0 };
+        int32_t toolType_ { 0 };
     };
 
 public:
