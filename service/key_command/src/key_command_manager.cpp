@@ -341,7 +341,7 @@ void KeyCommandManager::ParseConfig(const std::string configFile)
     }
     int32_t fileSize = GetFileSize(configFile);
     if ((fileSize <= 0) || (fileSize > JSON_FILE_SIZE)) {
-        MMI_HILOGW("The file size is out of range 20KB or empty. filesize:%{public}d", fileSize);
+        MMI_HILOGE("The file size is out of range 20KB or empty. filesize:%{public}d", fileSize);
         return;
     }
     MMI_HILOGD("config file path:%{public}s", configFile.c_str());
