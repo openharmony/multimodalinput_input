@@ -56,7 +56,7 @@ JsUtil::CallbackInfo::~CallbackInfo()
     }
 }
 
-JsUtil::AsyncContext::~AsyncContext()
+AsyncContext::~AsyncContext()
 {
     CALL_LOG_ENTER;
     if (work != nullptr) {
