@@ -73,7 +73,7 @@ napi_value JsInputDeviceManager::GetDevice(napi_env env, int32_t id, napi_value 
 napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, napi_value handle)
 {
     CALL_LOG_ENTER;
-    sptr<JsUtil::PointerAsyncContext> asyncContext = new (std::nothrow) JsUtil::PointerAsyncContext(env);
+    sptr<PointerAsyncContext> asyncContext = new (std::nothrow) PointerAsyncContext(env);
     if (asyncContext == nullptr) {
         THROWERR(env, "create PointerAsyncContext failed");
         return nullptr;
@@ -98,11 +98,11 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
 
     asyncContext->contextInfo = asyncContext;
     napi_status status = napi_create_async_work(env, nullptr, resource, [](napi_env env, void* data) {
-            JsUtil::PointerAsyncContext* asyncContext = static_cast<JsUtil::PointerAsyncContext*>(data);
+            PointerAsyncContext* asyncContext = static_cast<PointerAsyncContext*>(data);
             asyncContext->errorCode = InputManager::GetInstance()->SetPointerVisible(asyncContext->visible);
         }, [](napi_env env, napi_status status, void* data) {
             CHKPV(data);
-            sptr<JsUtil::PointerAsyncContext> asyncContext = static_cast<JsUtil::PointerAsyncContext *>(data)->contextInfo;
+            sptr<PointerAsyncContext> asyncContext = static_cast<PointerAsyncContext *>(data)->contextInfo;
             asyncContext->contextInfo = nullptr;
             napi_value result = nullptr;
             CHKRV(env, napi_get_undefined(env, &result), GET_UNDEFINED);

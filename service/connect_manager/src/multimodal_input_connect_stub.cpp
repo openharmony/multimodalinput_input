@@ -132,7 +132,7 @@ bool MultimodalInputConnectStub::CheckPermission()
         }
         MMI_HILOGE("check native permisson failed");
         return false;
-    } 
+    }
     
     MMI_HILOGE("unsupported token type:%{public}d", tokenType);
     return false;

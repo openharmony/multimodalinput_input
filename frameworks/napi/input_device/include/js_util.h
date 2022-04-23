@@ -43,27 +43,27 @@ public:
         CallbackData data;
     };
 
-    class AsyncContext : public RefBase {
-    public:
-        napi_env env = nullptr;
-        napi_async_work work = nullptr;
-        napi_deferred deferred = nullptr;
-        napi_ref callback = nullptr;
-        int32_t errorCode;
-        AsyncContext(napi_env env) : env(env) {}
-        ~AsyncContext();
-    };
-
-    class PointerAsyncContext : public AsyncContext {
-    public:
-        bool visible = true;
-        sptr<PointerAsyncContext> contextInfo = nullptr;
-        PointerAsyncContext(napi_env env) : AsyncContext(env) {}
-        ~PointerAsyncContext() {}
-    };
-
     int32_t GetInt32(uv_work_t *work);
     bool IsHandleEquals(napi_env env, napi_value handle, napi_ref ref);
+};
+
+class AsyncContext : public RefBase {
+public:
+    napi_env env = nullptr;
+    napi_async_work work = nullptr;
+    napi_deferred deferred = nullptr;
+    napi_ref callback = nullptr;
+    int32_t errorCode;
+    AsyncContext(napi_env env) : env(env) {}
+    ~AsyncContext();
+};
+
+class PointerAsyncContext : public AsyncContext {
+public:
+    bool visible = true;
+    sptr<PointerAsyncContext> contextInfo = nullptr;
+    PointerAsyncContext(napi_env env) : AsyncContext(env) {}
+    ~PointerAsyncContext() {}
 };
 } // namespace MMI
 } // namespace OHOS
