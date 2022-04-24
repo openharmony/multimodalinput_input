@@ -132,7 +132,7 @@ int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
     }
     return RET_OK;
 }
-#endif
+#endif // OHOS_BUILD_HDF
 
 int32_t ServerMsgHandler::OnVirtualKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
@@ -363,7 +363,7 @@ int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
     }
     return RET_OK;
 }
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 int32_t ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
 {
