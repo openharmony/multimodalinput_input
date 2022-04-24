@@ -91,6 +91,10 @@ ohos_shared_library("libmmi-client") {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
+  if (mmi_enable_pointer_drawing) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
+  }
+
   configs = [
     ":libmmi_client_config",
     "//foundation/multimodalinput/input/util:libmmi_util_public_config",

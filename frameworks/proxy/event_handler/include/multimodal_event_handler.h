@@ -51,7 +51,9 @@ public:
     void RemoveInputEventTouchpadMontior(int32_t pointerEventType);
     int32_t AddInterceptor(int32_t sourceType, int32_t id);
     int32_t RemoveInterceptor(int32_t id);
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 private:
     MMIClientPtr client_ = nullptr;

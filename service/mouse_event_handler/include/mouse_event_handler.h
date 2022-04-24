@@ -35,14 +35,19 @@ public:
 
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
     void Normalize(struct libinput_event *event);
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 private:
     void HandleMotionInner(libinput_event_pointer* data);
     void HandleButonInner(libinput_event_pointer* data);
     void HandleAxisInner(libinput_event_pointer* data);
     void HandlePostInner(libinput_event_pointer* data, int32_t deviceId, PointerEvent::PointerItem& pointerItem);
+ #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
     void HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem);
+ #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     void DumpInner();
     void InitAbsolution();
 
