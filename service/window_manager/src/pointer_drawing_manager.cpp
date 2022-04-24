@@ -45,9 +45,10 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int3
     FixCursorPosition(globalX, globalY);
     lastGlobalX_ = globalX;
     lastGlobalY_ = globalY;
+    bool visible = GetPointerVisible();
     if (pointerWindow_ != nullptr) {
         pointerWindow_->MoveTo(globalX, globalY);
-        if (visible_) {
+        if (visible) {
             pointerWindow_->Show();
         }
         MMI_HILOGD("leave, display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
@@ -82,7 +83,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int3
     };
     OHOS::SurfaceError ret = layer->FlushBuffer(buffer, -1, flushConfig);
     MMI_HILOGD("draw pointer FlushBuffer ret:%{public}s", SurfaceErrorStr(ret).c_str());
-    if (visible_) {
+    if (visible) {
         pointerWindow_->Show();
     }
     MMI_HILOGD("display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
@@ -253,7 +254,6 @@ bool PointerDrawingManager::Init()
     CALL_LOG_ENTER;
     InputDevMgr->Attach(shared_from_this());
     pidInfos_.clear();
-    visible_ = true;
     return true;
 }
 
@@ -267,54 +267,52 @@ std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
 
 void PointerDrawingManager::DeletePidInfo(int32_t pid)
 {
+    CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
-            pidInfos_.erase(it++);
-            break;
+            pidInfos_.erase(it);
+            return;
         }
     }
-
-    if (pidInfos_.empty()) {
-        visible_ = true;
-        MMI_HILOGD("pointer visible property:%{public}d", visible_);
-    } else {
-        auto info = pidInfos_.back();
-        visible_ = info.visible;
-        MMI_HILOGD("pointer visible property:%{public}zu.%{public}d-%{public}d", pidInfos_.size(), pid, visible_);
-    }
-    return;
 }
 
 void PointerDrawingManager::UpdataPidInfo(int32_t pid, bool visible)
 {
+    CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
-            pidInfos_.erase(it++);
+            pidInfos_.erase(it);
             break;
         }
     }
-    
     PidInfo info = { .pid = pid, .visible = visible };
     pidInfos_.push_back(info);
-
-    visible_ = info.visible;
-    MMI_HILOGD("pointer visible property:%{public}zu.%{public}d-%{public}d", pidInfos_.size(), pid, visible_);
-    return;
 }
 
 void PointerDrawingManager::UpdataPointerVisible()
 {
-    if (pointerWindow_ == nullptr) {
-        return;
-    }
-    if (visible_) {
+    CALL_LOG_ENTER;
+    bool visible = GetPointerVisible();
+    CHKPV(pointerWindow_);
+    if (visible) {
         pointerWindow_->Show();
     } else {
         pointerWindow_->Hide();
     }
-    return;
+}
+
+bool PointerDrawingManager::GetPointerVisible()
+{
+    CALL_LOG_ENTER;
+    if (pidInfos_.empty()) {
+        MMI_HILOGD("visible property is true");
+        return true;
+    }
+    auto info = pidInfos_.back();
+    MMI_HILOGD("visible property:%{public}zu.%{public}d-%{public}d", pidInfos_.size(), info.pid, info.visible);
+    return info.visible;
 }
 
 void PointerDrawingManager::DeletePointerVisible(int32_t pid)
