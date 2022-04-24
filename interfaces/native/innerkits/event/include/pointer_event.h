@@ -549,7 +549,8 @@ public:
      * @brief Obtains the pointer item of a specified pointer ID.
      * @param pointerId Indicates the pointer ID.
      * @param pointerItem Indicates the item used to receive the data of the pointer.
-     * @return Returns <b>true</b> if the data of the pointer with the specified ID exists; returns <b>false</b> otherwise.
+     * @return Returns <b>true</b> if the data of the pointer with the specified ID exists;
+     * returns <b>false</b> otherwise.
      * @since 9
      */
     bool GetPointerItem(int32_t pointerId, PointerItem &pointerItem);
