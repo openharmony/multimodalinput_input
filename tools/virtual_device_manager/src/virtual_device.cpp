@@ -134,20 +134,22 @@ std::vector<std::string> VirtualDevice::ViewDirectory(const std::string& filePat
         return fileList;
     }
     dirent* ptr = nullptr;
-    int32_t fileNnm = 0;
+    int32_t fileNum = 0;
     while ((ptr = readdir(dir)) != nullptr) {
         std::string tmpDirName(ptr->d_name);
         if ((tmpDirName == ".") || (tmpDirName == "..")) {
             continue;
         }
-        fileNnm++;
+        fileNum++;
         if (ptr->d_type == DT_REG) {
             if (CheckFileName(ptr->d_name) && compliant) {
                 fileList.push_back(ptr->d_name);
             } else {
                 std::string removeFile = filePath + ptr->d_name;
-                (void)std::remove(removeFile.c_str());
-                fileNnm--;
+                if (std::remove(removeFile.c_str()) != 0) {
+                    printf("delete file: %s failed", removeFile.c_str());
+                }
+                fileNum--;
             }
         } else if (ptr->d_type == DT_DIR) {
             std::string path = filePath + ptr->d_name + "/";
@@ -155,15 +157,15 @@ std::vector<std::string> VirtualDevice::ViewDirectory(const std::string& filePat
             ViewDirectory(path, false);
         } else {
             printf("file name:%s, type is error", ptr->d_name);
-            fileNnm--;
+            fileNum--;
         }
     }
-    if (fileNnm == 0 && !compliant) {
-        closedir(dir);
-        (void)std::remove(filePath.c_str());
-        return fileList;
-    }
     closedir(dir);
+    if (fileNum == 0 && !compliant) {
+        if (std::remove(filePath.c_str()) != 0) {
+            printf("delete file: %s failed", filePath.c_str());
+        }
+    }
     return fileList;
 }
 
@@ -176,7 +178,9 @@ bool VirtualDevice::ClearFileResidues(const std::string& procressPath, const std
             printf("/data/symbol/%s path is error", removeFile.c_str());
             return false;
         }
-        (void)std::remove(removeFile.c_str());
+        if (std::remove(removeFile.c_str()) != 0) {
+            printf("delete file: %s failed", removeFile.c_str());
+        }
         return true;
     }
     closedir(dir);
@@ -212,7 +216,9 @@ void VirtualDevice::SyncSymbolFile()
                     printf("/data/symbol/%s path is error", removeFile.c_str());
                     return;
                 }
-                (void)remove(removeFile.c_str());
+                if (std::remove(removeFile.c_str()) != 0) {
+                    printf("delete file: %s failed", removeFile.c_str());
+                }
             }
         }
     }
@@ -372,9 +378,8 @@ void VirtualDevice::CloseAllDevice(const std::vector<std::string>& fileList)
     for (auto it : fileList) {
         kill(atoi(it.c_str()), SIGKILL);
         it.insert(0, g_folderpath.c_str());
-        const int32_t ret = remove(it.c_str());
-        if (ret == -1) {
-            printf("remove file fail. file name: %s, errno: %d.", it.c_str(), errno);
+        if (std::remove(it.c_str()) != 0) {
+            printf("delete file: %s failed", it.c_str());
         }
     }
 }
@@ -556,9 +561,8 @@ bool VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
         if (it.find(closePid) == 0) {
             kill(atoi(it.c_str()), SIGKILL);
             it.insert(0, g_folderpath.c_str());
-            const int32_t ret = remove(it.c_str());
-            if (ret == -1) {
-                printf("remove file fail. file name: %s, errno: %d.\n", it.c_str(), errno);
+            if (std::remove(it.c_str()) != 0) {
+                printf("delete file: %s failed", it.c_str());
             }
             RemoveDir();
             return true;
@@ -572,15 +576,13 @@ bool VirtualDevice::FindDevice(std::vector<std::string> argvList)
 {
     SyncSymbolFile();
     if (argvList[1] == "start") {
-        bool result = AddDevice(argvList);
-        if (!result) {
+        if (!AddDevice(argvList)) {
             printf("Failed to create device");
             return false;
         }
         return true;
     } else if (argvList[1] == "list") {
-        bool result = SelectDevice(argvList);
-        if (!result) {
+        if (!SelectDevice(argvList)) {
             return false;
         } else {
             std::string::size_type pos;
@@ -593,8 +595,7 @@ bool VirtualDevice::FindDevice(std::vector<std::string> argvList)
             return false;
         }
     } else if (argvList[1] == "close") {
-        bool result = CloseDevice(argvList);
-        if (!result) {
+        if (!CloseDevice(argvList)) {
             return false;
         } else {
             printf("device closed successfully");
