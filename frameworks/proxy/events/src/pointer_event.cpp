@@ -859,7 +859,7 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
             << ",TiltX:" << item.GetTiltX() << ",TiltY:" << item.GetTiltY()
             << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
             << ",AxisLong:" << item.GetAxisLong() << ",AxisShort:" << item.GetAxisShort()
-			<< std::endl;
+            << std::endl;
     }
     std::vector<int32_t> pressedKeys = pointerEvent.GetPressedKeys();
     if (!pressedKeys.empty()) {

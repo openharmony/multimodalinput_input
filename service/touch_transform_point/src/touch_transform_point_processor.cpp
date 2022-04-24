@@ -71,7 +71,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     auto axisLong = libinput_event_get_touch_contact_axis_Long(data);
     auto axisShort = libinput_event_get_touch_contact_axis_short(data);
     item.SetPressure(pressure);
-	item.SetAxisLong(axisLong);
+    item.SetAxisLong(axisLong);
     item.SetAxisShort(axisShort);
     int32_t toolType = GetTouchToolType(event);
     item.SetToolType(toolType);
