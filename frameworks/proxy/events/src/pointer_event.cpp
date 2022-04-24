@@ -870,7 +870,6 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
          << ",PointerCount:" << pointerIds.size()
          << ",EventNumber:" << pointerEvent.GetId() << std::endl;
 
-    const int pressurePrecision = 6;
     for (const auto& pointerId : pointerIds) {
         PointerEvent::PointerItem item;
         if (!pointerEvent.GetPointerItem(pointerId, item)) {
@@ -883,8 +882,7 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
             << ",LocalX:" << item.GetLocalX() << ",LocalY:" << item.GetLocalY()
             << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
             << ",TiltX:" << item.GetTiltX() << ",TiltY:" << item.GetTiltY()
-            << ",Pressure:" << std::fixed << std::setprecision(pressurePrecision)
-            << item.GetPressure() << ",ToolType:" << item.GetToolType() << std::endl;
+            << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType() << std::endl;
     }
     std::vector<int32_t> pressedKeys = pointerEvent.GetPressedKeys();
     if (!pressedKeys.empty()) {
