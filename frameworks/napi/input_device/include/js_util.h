@@ -61,7 +61,6 @@ public:
 class PointerAsyncContext : public AsyncContext {
 public:
     bool visible = true;
-    sptr<PointerAsyncContext> contextInfo = nullptr;
     PointerAsyncContext(napi_env env) : AsyncContext(env) {}
     ~PointerAsyncContext() {}
 };

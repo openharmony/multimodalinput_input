@@ -88,22 +88,19 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
 
     napi_value resource = nullptr;
     CHKRP(env, napi_create_string_utf8(env, "setPointerVisible", NAPI_AUTO_LENGTH, &resource), CREATE_STRING_UTF8);
-    if (handle != nullptr) {
-        if (napi_create_reference(env, handle, 1, &asyncContext->callback) != napi_ok) {
-            MMI_HILOGE("create reference fail");
-            asyncContext->contextInfo = nullptr;
-            return nullptr;
-        }
+    if ((handle != nullptr) && (napi_create_reference(env, handle, 1, &asyncContext->callback) != napi_ok)) {
+        MMI_HILOGE("create reference fail");
+        asyncContext->DecStrongRef(nullptr);
+        return nullptr;
     }
 
-    asyncContext->contextInfo = asyncContext;
+    asyncContext->IncStrongRef(nullptr);
     napi_status status = napi_create_async_work(env, nullptr, resource, [](napi_env env, void* data) {
             PointerAsyncContext* asyncContext = static_cast<PointerAsyncContext*>(data);
             asyncContext->errorCode = InputManager::GetInstance()->SetPointerVisible(asyncContext->visible);
         }, [](napi_env env, napi_status status, void* data) {
-            CHKPV(data);
-            sptr<PointerAsyncContext> asyncContext = static_cast<PointerAsyncContext *>(data)->contextInfo;
-            asyncContext->contextInfo = nullptr;
+            sptr<PointerAsyncContext> asyncContext(static_cast<PointerAsyncContext *>(data));
+            asyncContext->DecStrongRef(nullptr);
             napi_value result = nullptr;
             CHKRV(env, napi_get_undefined(env, &result), GET_UNDEFINED);
             if (asyncContext->deferred) {
@@ -121,7 +118,7 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
         }, asyncContext.GetRefPtr(), &asyncContext->work);
     if (status != napi_ok || napi_queue_async_work(env, asyncContext->work) != napi_ok) {
         MMI_HILOGE("create async work fail");
-        asyncContext->contextInfo = nullptr;
+        asyncContext->DecStrongRef(nullptr);
     }
     return promise;
 }

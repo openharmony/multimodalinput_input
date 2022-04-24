@@ -62,6 +62,7 @@ private:
     void DeletePidInfo(int32_t pid);
     void UpdataPointerVisible();
     void UpdataPidInfo(int32_t pid, bool visible);
+    bool GetPointerVisible();
 
 private:
     sptr<OHOS::Rosen::Window> pointerWindow_ = nullptr;
@@ -74,7 +75,6 @@ private:
     int32_t lastGlobalY_ = -1;
 
     std::mutex mutex_;
-    volatile bool visible_ = true;
     struct PidInfo {
         int32_t pid;
         bool visible;
