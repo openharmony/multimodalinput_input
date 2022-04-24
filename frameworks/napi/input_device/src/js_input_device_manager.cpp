@@ -90,7 +90,6 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
     CHKRP(env, napi_create_string_utf8(env, "setPointerVisible", NAPI_AUTO_LENGTH, &resource), CREATE_STRING_UTF8);
     if ((handle != nullptr) && (napi_create_reference(env, handle, 1, &asyncContext->callback) != napi_ok)) {
         MMI_HILOGE("create reference fail");
-        asyncContext->DecStrongRef(nullptr);
         return nullptr;
     }
 

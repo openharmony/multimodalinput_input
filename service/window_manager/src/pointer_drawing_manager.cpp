@@ -45,10 +45,9 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int3
     FixCursorPosition(globalX, globalY);
     lastGlobalX_ = globalX;
     lastGlobalY_ = globalY;
-    bool visible = GetPointerVisible();
     if (pointerWindow_ != nullptr) {
         pointerWindow_->MoveTo(globalX, globalY);
-        if (visible) {
+        if (IsPointerVisible()) {
             pointerWindow_->Show();
         }
         MMI_HILOGD("leave, display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
@@ -83,7 +82,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int3
     };
     OHOS::SurfaceError ret = layer->FlushBuffer(buffer, -1, flushConfig);
     MMI_HILOGD("draw pointer FlushBuffer ret:%{public}s", SurfaceErrorStr(ret).c_str());
-    if (visible) {
+    if (IsPointerVisible()) {
         pointerWindow_->Show();
     }
     MMI_HILOGD("display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
@@ -294,16 +293,15 @@ void PointerDrawingManager::UpdataPidInfo(int32_t pid, bool visible)
 void PointerDrawingManager::UpdataPointerVisible()
 {
     CALL_LOG_ENTER;
-    bool visible = GetPointerVisible();
     CHKPV(pointerWindow_);
-    if (visible) {
+    if (IsPointerVisible()) {
         pointerWindow_->Show();
     } else {
         pointerWindow_->Hide();
     }
 }
 
-bool PointerDrawingManager::GetPointerVisible()
+bool PointerDrawingManager::IsPointerVisible()
 {
     CALL_LOG_ENTER;
     if (pidInfos_.empty()) {
