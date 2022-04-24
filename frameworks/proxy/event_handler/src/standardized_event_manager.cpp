@@ -138,6 +138,7 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
     }
     return RET_OK;
 }
+
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
