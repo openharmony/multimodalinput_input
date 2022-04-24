@@ -213,7 +213,7 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteDouble(pressure_) &&
         out.WriteInt32(axisLong_) &&
         out.WriteInt32(axisShort_) &&
-        out.WriteInt32(deviceId_) 
+        out.WriteInt32(deviceId_)
     );
 }
 
