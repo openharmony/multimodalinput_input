@@ -420,7 +420,7 @@ public:
          * @since 9
          */
         void SetPressure(double pressure);
-		
+
         int32_t GetAxisLong() const;
 
         void SetAxisLong(int32_t axisLong);
