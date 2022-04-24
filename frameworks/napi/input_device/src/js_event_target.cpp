@@ -585,42 +585,8 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
     callback_.erase(iter);
     CHKPV(cbTemp->env);
     napi_value keyboardType = nullptr;
-    switch (cbTemp->data.keyboardType) {
-        case KEYBOARD_TYPE_FULL: {
-            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_FULL",
-                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
-            break;
-        }
-        case KEYBOARD_TYPE_NUMERIC_KEYPAD: {
-            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_NUMERIC_KEYPAD",
-                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
-            break;
-        }
-        case KEYBOARD_TYPE_REMOTE_CONTROLM: {
-            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_REMOTE_CONTROLM",
-                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
-            break;
-        }
-        case KEYBOARD_TYPE_HANDWRITING_PEN: {
-            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_HANDWRITING_PEN",
-                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
-            break;
-        }
-        case KEYBOARD_TYPE_NONE: {
-            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_NONE",
-                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
-            break;
-        }
-        case KEYBOARD_TYPE_UNDEFINED: {
-            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_UNDEFINED",
-                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
-            break;
-        }
-        default: {
-            MMI_HILOGW("Unknow keyboardType %{public}d\n", cbTemp->data.keyboardType);
-            break;
-        }
-    }
+
+    CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.keyboardType, &keyboardType), CREATE_INT32);
     napi_value handlerTemp = nullptr;
     CHKRV(cbTemp->env, napi_get_reference_value(cbTemp->env, cbTemp->ref, &handlerTemp), GET_REFERENCE);
     napi_value result = nullptr;
@@ -645,42 +611,7 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
     CHKPV(cbTemp->env);
 
     napi_value keyboardType = nullptr;
-    switch (cbTemp->data.keyboardType) {
-        case KEYBOARD_TYPE_FULL: {
-            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_FULL",
-                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
-            break;
-        }
-        case KEYBOARD_TYPE_NUMERIC_KEYPAD: {
-            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_NUMERIC_KEYPAD",
-                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
-            break;
-        }
-        case KEYBOARD_TYPE_REMOTE_CONTROLM: {
-            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_REMOTE_CONTROLM",
-                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
-            break;
-        }
-        case KEYBOARD_TYPE_HANDWRITING_PEN: {
-            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_HANDWRITING_PEN",
-                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
-            break;
-        }
-        case KEYBOARD_TYPE_NONE: {
-            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_NONE",
-                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
-            break;
-        }
-        case KEYBOARD_TYPE_UNDEFINED: {
-            CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, "KEYBOARD_TYPE_UNDEFINED",
-                NAPI_AUTO_LENGTH, &keyboardType), CREATE_STRING_UTF8);
-            break;
-        }
-        default: {
-            MMI_HILOGW("Unknow keyboardType %{public}d\n", cbTemp->data.keyboardType);
-            break;
-        }
-    }
+    CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.keyboardType, &keyboardType), CREATE_INT32);
     CHKRV(cbTemp->env, napi_resolve_deferred(cbTemp->env, cbTemp->deferred, keyboardType), RESOLVE_DEFERRED);
 }
 
