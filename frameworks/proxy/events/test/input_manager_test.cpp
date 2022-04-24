@@ -512,6 +512,7 @@ std::string InputManagerTest::DumpPointerEvent(const std::shared_ptr<PointerEven
          << ",Flag:" << pointerEvent->GetFlag()
          << ",PointerAction:" << pointerEvent->DumpPointerAction()
          << ",SourceType:" << pointerEvent->DumpSourceType()
+         << ",ButtonId:" << pointerEvent->GetButtonId()
          << ",VerticalAxisValue:" << std::fixed << std::setprecision(precision)
          << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)
          << ",HorizontalAxisValue:" << std::fixed << std::setprecision(precision)
@@ -1805,17 +1806,18 @@ std::string InputManagerTest::DumpPointerEvent2(const std::shared_ptr<PointerEve
     const int precision = 2;
     std::ostringstream strm;
     strm << "InputManagerTest: in OnInputEvent"
-         << ", EventType:" << InputEvent::EventTypeToString(pointerEvent->GetEventType())
-         << ",ActionTime:" << pointerEvent->GetActionTime()
-         << ",Action:" << pointerEvent->GetAction()
-         << ",ActionStartTime:" << pointerEvent->GetActionStartTime()
-         << ",Flag:" << pointerEvent->GetFlag()
-         << ",PointerAction:" << pointerEvent->DumpPointerAction()
-         << ",SourceType:" << pointerEvent->DumpSourceType()
-         << ",VerticalAxisValue:" << std::fixed << std::setprecision(precision)
-         << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)
-         << ",HorizontalAxisValue:" << std::fixed << std::setprecision(precision)
-         << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL);
+        << ", EventType:" << InputEvent::EventTypeToString(pointerEvent->GetEventType())
+        << ",ActionTime:" << pointerEvent->GetActionTime()
+        << ",Action:" << pointerEvent->GetAction()
+        << ",ActionStartTime:" << pointerEvent->GetActionStartTime()
+        << ",Flag:" << pointerEvent->GetFlag()
+        << ",PointerAction:" << pointerEvent->DumpPointerAction()
+        << ",SourceType:" << pointerEvent->DumpSourceType()
+        << ",ButtonId:" << pointerEvent->GetButtonId()
+        << ",VerticalAxisValue:" << std::fixed << std::setprecision(precision)
+        << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)
+        << ",HorizontalAxisValue:" << std::fixed << std::setprecision(precision)
+        << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL);
     return strm.str();
 }
 

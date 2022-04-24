@@ -43,10 +43,10 @@ std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
     return pointerEvent_;
 }
 
-void MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
+int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 {
     CALL_LOG_ENTER;
-    CHKPV(data);
+    CHKPR(data, ERROR_NULL_POINTER);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttionId_);
 
@@ -57,6 +57,7 @@ void MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
     WinMgr->UpdateAndAdjustMouseLoction(absolutionX_, absolutionY_);
 
     MMI_HILOGD("Change Coordinate : x:%{public}lf,y:%{public}lf",  absolutionX_, absolutionY_);
+    return RET_OK;
 }
 
 void MouseEventHandler::InitAbsolution()
@@ -72,23 +73,18 @@ void MouseEventHandler::InitAbsolution()
     }
 }
 
-void MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
+int32_t MouseEventHandler::HandleButtonInner(libinput_event_pointer* data)
 {
     CALL_LOG_ENTER;
-    CHKPV(data);
+    CHKPR(data, ERROR_NULL_POINTER);
     MMI_HILOGD("current action:%{public}d", pointerEvent_->GetPointerAction());
 
-    auto button = libinput_event_pointer_get_button(data);
-    if (button == BTN_LEFT) {
-        pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
-    } else if (button == BTN_RIGHT) {
-        pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
-    } else if (button == BTN_MIDDLE) {
-        pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_MIDDLE);
-    } else {
-        MMI_HILOGW("unknown btn, btn:%{public}u", button);
+    auto ret = HandleButtonValueInner(data);
+    if (ret != RET_OK) {
+        MMI_HILOGE("The button value does not exist");
+        return RET_ERR;
     }
-
+    auto button = libinput_event_pointer_get_button(data);
     auto state = libinput_event_pointer_get_button_state(data);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_RELEASED);
@@ -103,13 +99,53 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
         isPressed_ = true;
         buttionId_ = pointerEvent_->GetButtonId();
     } else {
-        MMI_HILOGW("unknown state, state:%{public}u", state);
+        MMI_HILOGE("unknown state, state:%{public}u", state);
+        return RET_ERR;
     }
+    return RET_OK;
 }
 
-void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
+int32_t MouseEventHandler::HandleButtonValueInner(libinput_event_pointer* data)
 {
-    CHKPV(data);
+    CALL_LOG_ENTER;
+    CHKPR(data, ERROR_NULL_POINTER);
+
+    auto button = libinput_event_pointer_get_button(data);
+    switch (button) {
+        case BTN_LEFT:
+            pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+            break;
+        case BTN_RIGHT:
+            pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
+            break;
+        case BTN_MIDDLE:
+            pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_MIDDLE);
+            break;
+        case BTN_SIDE:
+            pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_SIDE);
+            break;
+        case BTN_EXTRA:
+            pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_EXTRA);
+            break;
+        case BTN_FORWARD:
+            pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_FORWARD);
+            break;
+        case BTN_BACK:
+            pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_BACK);
+            break;
+        case BTN_TASK:
+            pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_TASK);
+            break;
+        default:
+            MMI_HILOGE("unknown btn, btn:%{public}u", button);
+            return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
+{
+    CHKPR(data, ERROR_NULL_POINTER);
     if (TimerMgr->IsExist(timerId_)) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
         TimerMgr->ResetTimer(timerId_);
@@ -141,6 +177,7 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
         auto axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
     }
+    return RET_OK;
 }
 
 void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t deviceId,
@@ -177,38 +214,40 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerEvent_->SetAgentWindowId(-1);
 }
 
-void MouseEventHandler::Normalize(struct libinput_event *event)
+int32_t MouseEventHandler::Normalize(struct libinput_event *event)
 {
     CALL_LOG_ENTER;
-    CHKPV(event);
+    CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_pointer_event(event);
-    CHKPV(data);
-    CHKPV(pointerEvent_);
+    CHKPR(data, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent_, ERROR_NULL_POINTER);
     pointerEvent_->ClearAxisValue();
-    PointerEvent::PointerItem pointerItem;
+    int32_t result;
     const int32_t type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_POINTER_MOTION:
         case LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE: {
-            HandleMotionInner(data);
+            result = HandleMotionInner(data);
             break;
         }
         case LIBINPUT_EVENT_POINTER_BUTTON: {
-            HandleButonInner(data);
+            result = HandleButtonInner(data);
             break;
         }
         case LIBINPUT_EVENT_POINTER_AXIS: {
-            HandleAxisInner(data);
+            result = HandleAxisInner(data);
             break;
         }
         default: {
-            MMI_HILOGW("unknow type:%{public}d", type);
-            break;
+            MMI_HILOGE("unknow type:%{public}d", type);
+            return RET_ERR;
         }
     }
     int32_t deviceId = InputDevMgr->FindInputDeviceId(libinput_event_get_device(event));
+    PointerEvent::PointerItem pointerItem;
     HandlePostInner(data, deviceId, pointerItem);
     DumpInner();
+    return result;
 }
 
 void MouseEventHandler::HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY)
