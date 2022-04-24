@@ -366,9 +366,34 @@ public:
          */
         void SetHeight(int32_t height);
 
+        /**
+         * @brief 获取X轴的倾斜角度。
+         * @return 返回X轴倾斜角度。
+         * @since 9
+         */
         double GetTiltX() const;
+
+        /**
+         * @brief 设置X轴的倾斜角度。
+         * @param tiltX 要设置的角度值。
+         * @return void
+         * @since 9
+         */
         void SetTiltX(double tiltX);
+
+        /**
+         * @brief 获取Y轴的倾斜角度。
+         * @return 返回Y轴倾斜角度。
+         * @since 9
+         */
         double GetTiltY() const;
+
+        /**
+         * @brief 设置Y轴的倾斜角度。
+         * @param tiltY 要设置的角度值。
+         * @return void
+         * @since 9
+         */
         void SetTiltY(double tiltY);
 
         /**
