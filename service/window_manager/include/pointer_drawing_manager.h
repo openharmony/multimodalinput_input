@@ -45,6 +45,7 @@ public:
     bool Init();
     void DeletePointerVisible(int32_t pid);
     void SetPointerVisible(int32_t pid, bool visible);
+    bool IsPointerVisible();
 
 public:
     static const int32_t IMAGE_WIDTH = 64;
@@ -62,7 +63,6 @@ private:
     void DeletePidInfo(int32_t pid);
     void UpdataPointerVisible();
     void UpdataPidInfo(int32_t pid, bool visible);
-    bool GetPointerVisible();
 
 private:
     sptr<OHOS::Rosen::Window> pointerWindow_ = nullptr;
