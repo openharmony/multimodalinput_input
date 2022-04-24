@@ -257,6 +257,10 @@ ohos_unittest("ut-mmi-service-out") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
+  if (mmi_enable_pointer_drawing) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
+  }
+
   configs = [ ":libmmi_server_config" ]
 
   deps = [

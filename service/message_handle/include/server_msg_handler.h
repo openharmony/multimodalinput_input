@@ -61,7 +61,9 @@ protected:
     int32_t OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t OnMoveMouse(SessionPtr sess, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_MMI_DEBUG
     int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_MMI_DEBUG
