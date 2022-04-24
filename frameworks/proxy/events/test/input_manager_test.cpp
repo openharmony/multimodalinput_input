@@ -1803,14 +1803,14 @@ std::string InputManagerTest::DumpPointerEvent2(const std::shared_ptr<PointerEve
 {
     const int precision = 2;
     std::ostringstream strm;
-    strm << "InputManagerTest: in OnInputEvent, #[[:digit:]]\\{1,\\}, "
-         << "eventType:" << InputEvent::EventTypeToString(pointerEvent->GetEventType())
-         << ",actionTime:" << pointerEvent->GetActionTime()
-         << ",action:" << pointerEvent->GetAction()
-         << ",actionStartTime:" << pointerEvent->GetActionStartTime()
-         << ",flag:" << pointerEvent->GetFlag()
-         << ",pointerAction:" << pointerEvent->DumpPointerAction()
-         << ",sourceType:" << pointerEvent->DumpSourceType()
+    strm << "InputManagerTest: in OnInputEvent"
+         << ", EventType:" << InputEvent::EventTypeToString(pointerEvent->GetEventType())
+         << ",ActionTime:" << pointerEvent->GetActionTime()
+         << ",Action:" << pointerEvent->GetAction()
+         << ",ActionStartTime:" << pointerEvent->GetActionStartTime()
+         << ",Flag:" << pointerEvent->GetFlag()
+         << ",PointerAction:" << pointerEvent->DumpPointerAction()
+         << ",SourceType:" << pointerEvent->DumpSourceType()
          << ",ButtonId:" << pointerEvent->GetButtonId()
          << ",VerticalAxisValue:" << std::fixed << std::setprecision(precision)
          << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)
