@@ -14,7 +14,6 @@
  */
 
 #include "js_event_target.h"
-#include "proto.h"
 
 namespace OHOS {
 namespace MMI {
