@@ -81,6 +81,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"help", no_argument, NULL, '?'},
         {NULL, 0, NULL, 0}
     };
+
     struct option mouseSensorOptions[] = {
         {"move", required_argument, NULL, 'm'},
         {"click", required_argument, NULL, 'c'},
@@ -98,6 +99,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"move", required_argument, NULL, 'm'},
         {"down", required_argument, NULL, 'd'},
         {"up", required_argument, NULL, 'u'},
+        {"smooth", required_argument, NULL, 's'},
         {NULL, 0, NULL, 0}
     };
     int32_t c;
@@ -483,7 +485,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             const int32_t minTotalTimeMs = 1;
                             const int32_t maxTotalTimeMs = 15000;
                             if ((totalTimeMs < minTotalTimeMs) || (totalTimeMs > maxTotalTimeMs)) {
-                                std::cout << "totalTime is out of range. ";
+                                std::cout << "totalTime is out of range. "; /
                                 std::cout << minTotalTimeMs << " < totalTimeMs < " << maxTotalTimeMs;
                                 std::cout << std::endl;
                                 return EVENT_REG_FAIL;
