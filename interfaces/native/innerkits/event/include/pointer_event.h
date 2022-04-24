@@ -420,6 +420,14 @@ public:
          * @since 9
          */
         void SetPressure(double pressure);
+		
+        int32_t GetAxisLong() const;
+
+        void SetAxisLong(int32_t axisLong);
+
+        int32_t GetAxisShort() const;
+
+        void SetAxisShort(int32_t axisShort);
 
         /**
          * @brief Obtains the ID of the current device.
@@ -468,6 +476,8 @@ public:
         double  tiltX_ { 0.0 };
         double  tiltY_ { 0.0 };
         double  pressure_ { 0.0 };
+        int32_t axisLong_ { 0 };
+        int32_t axisShort_ { 0 };
         int32_t deviceId_ { 0 };
         int64_t downTime_ { 0 };
         int32_t toolType_ { 0 };
