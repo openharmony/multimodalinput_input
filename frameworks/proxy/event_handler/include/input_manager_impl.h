@@ -50,7 +50,8 @@ public:
         const std::vector<LogicalDisplayInfo> &logicalDisplays);
     int32_t AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter);
 
-    void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer);
+    void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+        std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
 
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
     void OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
@@ -61,6 +62,7 @@ public:
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> consumer);
     void RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
+    void MoveMouse(int32_t offsetX, int32_t offsetY);
 
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
     int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);

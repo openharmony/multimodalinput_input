@@ -24,6 +24,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerEvent" };
+constexpr double MAX_PRESSURE = 1.0;
 } // namespace
 
 std::shared_ptr<PointerEvent> PointerEvent::from(std::shared_ptr<InputEvent> inputEvent)
@@ -145,14 +146,34 @@ void PointerEvent::PointerItem::SetTiltY(double tiltY)
     tiltY_ = tiltY;
 }
 
-int32_t PointerEvent::PointerItem::GetPressure() const
+double PointerEvent::PointerItem::GetPressure() const
 {
     return pressure_;
 }
 
-void PointerEvent::PointerItem::SetPressure(int32_t pressure)
+void PointerEvent::PointerItem::SetPressure(double pressure)
 {
-    pressure_ = pressure;
+    pressure_ = pressure >= MAX_PRESSURE ? MAX_PRESSURE : pressure;
+}
+
+int32_t PointerEvent::PointerItem::GetAxisLong() const
+{
+    return axisLong_;
+}
+
+void PointerEvent::PointerItem::SetAxisLong(int32_t axisLong)
+{
+    axisLong_ = axisLong;
+}
+
+int32_t PointerEvent::PointerItem::GetAxisShort() const
+{
+    return axisShort_;
+}
+
+void PointerEvent::PointerItem::SetAxisShort(int32_t axisShort)
+{
+    axisShort_ = axisShort;
 }
 
 int32_t PointerEvent::PointerItem::GetDeviceId() const
@@ -165,92 +186,56 @@ void PointerEvent::PointerItem::SetDeviceId(int32_t deviceId)
     deviceId_ = deviceId;
 }
 
+int32_t PointerEvent::PointerItem::GetToolType() const
+{
+    return toolType_;
+}
+
+void PointerEvent::PointerItem::SetToolType(int32_t toolType)
+{
+    toolType_ = toolType;
+}
+
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
-    if (!out.WriteInt32(pointerId_)) {
-        return false;
-    }
-    if (!out.WriteInt64(downTime_)) {
-        return false;
-    }
-    if (!out.WriteBool(pressed_)) {
-        return false;
-    }
-    if (!out.WriteInt32(globalX_)) {
-        return false;
-    }
-    if (!out.WriteInt32(globalY_)) {
-        return false;
-    }
-    if (!out.WriteInt32(localX_)) {
-        return false;
-    }
-    if (!out.WriteInt32(localY_)) {
-        return false;
-    }
-    if (!out.WriteInt32(width_)) {
-        return false;
-    }
-    if (!out.WriteInt32(height_)) {
-        return false;
-    }
-    if (!out.WriteDouble(tiltX_)) {
-        return false;
-    }
-    if (!out.WriteDouble(tiltY_)) {
-        return false;
-    }
-    if (!out.WriteInt32(pressure_)) {
-        return false;
-    }
-    if (!out.WriteInt32(deviceId_)) {
-        return false;
-    }
-    return true;
+    return (
+        out.WriteInt32(pointerId_) &&
+        out.WriteInt64(downTime_) &&
+        out.WriteBool(pressed_) &&
+        out.WriteInt32(globalX_) &&
+        out.WriteInt32(globalY_) &&
+        out.WriteInt32(localX_) &&
+        out.WriteInt32(localY_) &&
+        out.WriteInt32(width_) &&
+        out.WriteInt32(height_) &&
+        out.WriteDouble(tiltX_) &&
+        out.WriteDouble(tiltY_) &&
+        out.WriteDouble(pressure_) &&
+        out.WriteInt32(axisLong_) &&
+        out.WriteInt32(axisShort_) &&
+        out.WriteInt32(deviceId_)
+    );
 }
 
 bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
 {
-    if (!in.ReadInt32(pointerId_)) {
-        return false;
-    }
-    if (!in.ReadInt64(downTime_)) {
-        return false;
-    }
-    if (!in.ReadBool(pressed_)) {
-        return false;
-    }
-    if (!in.ReadInt32(globalX_)) {
-        return false;
-    }
-    if (!in.ReadInt32(globalY_)) {
-        return false;
-    }
-    if (!in.ReadInt32(localX_)) {
-        return false;
-    }
-    if (!in.ReadInt32(localY_)) {
-        return false;
-    }
-    if (!in.ReadInt32(width_)) {
-        return false;
-    }
-    if (!in.ReadInt32(height_)) {
-        return false;
-    }
-    if (!in.ReadDouble(tiltX_)) {
-        return false;
-    }
-    if (!in.ReadDouble(tiltY_)) {
-        return false;
-    }
-    if (!in.ReadInt32(pressure_)) {
-        return false;
-    }
-    if (!in.ReadInt32(deviceId_)) {
-        return false;
-    }
-    return true;
+    return (
+        in.ReadInt32(pointerId_) &&
+        in.ReadInt64(downTime_) &&
+        in.ReadBool(pressed_) &&
+        in.ReadInt32(globalX_) &&
+        in.ReadInt32(globalY_) &&
+        in.ReadInt32(localX_) &&
+        in.ReadInt32(localY_) &&
+        in.ReadInt32(width_) &&
+        in.ReadInt32(height_) &&
+        in.ReadDouble(tiltX_) &&
+        in.ReadDouble(tiltY_) &&
+        in.ReadDouble(pressure_) &&
+        in.ReadInt32(axisLong_) &&
+        in.ReadInt32(axisShort_) &&
+        in.ReadInt32(deviceId_)
+    );
 }
 
 PointerEvent::PointerEvent(int32_t eventType) : InputEvent(eventType) {}
@@ -298,26 +283,36 @@ void PointerEvent::SetPointerAction(int32_t pointerAction)
 const char* PointerEvent::DumpPointerAction() const
 {
     switch (pointerAction_) {
-        case PointerEvent::POINTER_ACTION_CANCEL:
+        case PointerEvent::POINTER_ACTION_CANCEL: {
             return "cancel";
-        case PointerEvent::POINTER_ACTION_DOWN:
+        }
+        case PointerEvent::POINTER_ACTION_DOWN: {
             return "down";
-        case PointerEvent::POINTER_ACTION_MOVE:
+        }
+        case PointerEvent::POINTER_ACTION_MOVE: {
             return "move";
-        case PointerEvent::POINTER_ACTION_UP:
+        }
+        case PointerEvent::POINTER_ACTION_UP: {
             return "up";
-        case PointerEvent::POINTER_ACTION_AXIS_BEGIN:
+        }
+        case PointerEvent::POINTER_ACTION_AXIS_BEGIN: {
             return "axis-begin";
-        case PointerEvent::POINTER_ACTION_AXIS_UPDATE:
+        }
+        case PointerEvent::POINTER_ACTION_AXIS_UPDATE: {
             return "axis-update";
-        case PointerEvent::POINTER_ACTION_AXIS_END:
+        }
+        case PointerEvent::POINTER_ACTION_AXIS_END: {
             return "axis-end";
-        case PointerEvent::POINTER_ACTION_BUTTON_DOWN:
+        }
+        case PointerEvent::POINTER_ACTION_BUTTON_DOWN: {
             return "button-down";
-        case PointerEvent::POINTER_ACTION_BUTTON_UP:
+        }
+        case PointerEvent::POINTER_ACTION_BUTTON_UP: {
             return "button-up";
-        default:
+        }
+        default: {
             break;
+        }
     }
     return "unknown";
 }
@@ -421,14 +416,18 @@ void PointerEvent::SetSourceType(int32_t sourceType)
 const char* PointerEvent::DumpSourceType() const
 {
     switch (sourceType_) {
-        case PointerEvent::SOURCE_TYPE_MOUSE:
+        case PointerEvent::SOURCE_TYPE_MOUSE: {
             return "mouse";
-        case PointerEvent::SOURCE_TYPE_TOUCHSCREEN:
+        }
+        case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
             return "touch-screen";
-        case PointerEvent::SOURCE_TYPE_TOUCHPAD:
+        }
+        case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
             return "touch-pad";
-        default:
+        }
+        default: {
             break;
+        }
     }
     return "unknown";
 }
@@ -836,6 +835,7 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
          << ",Flag:" << pointerEvent.GetFlag()
          << ",PointerAction:" << pointerEvent.DumpPointerAction()
          << ",SourceType:" << pointerEvent.DumpSourceType()
+         << ",ButtonId:" << pointerEvent.GetButtonId()
          << ",VerticalAxisValue:" << std::fixed << std::setprecision(precision)
          << pointerEvent.GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)
          << ",HorizontalAxisValue:" << std::fixed << std::setprecision(precision)
@@ -857,7 +857,9 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
             << ",LocalX:" << item.GetLocalX() << ",LocalY:" << item.GetLocalY()
             << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
             << ",TiltX:" << item.GetTiltX() << ",TiltY:" << item.GetTiltY()
-            << ",Pressure:" << item.GetPressure() << std::endl;
+            << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
+            << ",AxisLong:" << item.GetAxisLong() << ",AxisShort:" << item.GetAxisShort()
+            << std::endl;
     }
     std::vector<int32_t> pressedKeys = pointerEvent.GetPressedKeys();
     if (!pressedKeys.empty()) {

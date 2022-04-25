@@ -27,7 +27,9 @@
 
 #include "nocopyable.h"
 
+#include "circle_stream_buffer.h"
 #include "define_multimodal.h"
+#include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {
@@ -36,11 +38,13 @@ public:
     UDSSocket();
     DISALLOW_COPY_AND_MOVE(UDSSocket);
     virtual ~UDSSocket();
+    using PacketCallBackFun = std::function<void(NetPacket&)>;
 
     int32_t EpollCreat(int32_t size);
     int32_t EpollCtl(int32_t fd, int32_t op, struct epoll_event& event, int32_t epollFd = -1);
     int32_t EpollWait(struct epoll_event& events, int32_t maxevents, int32_t timeout, int32_t epollFd = -1);
     int32_t SetNonBlockMode(int32_t fd, bool isNonBlock = true);
+    void OnReadPackets(CircleStreamBuffer& buf, PacketCallBackFun callbackFun);
     void EpollClose();
     void Close();
 

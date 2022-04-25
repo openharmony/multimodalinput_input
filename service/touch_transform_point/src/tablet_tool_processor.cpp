@@ -123,7 +123,7 @@ bool TabletToolProcessor::OnTipDown(struct libinput_event_tablet_tool* event)
     item.SetGlobalY(tCoord.y);
     item.SetTiltX(tiltX);
     item.SetTiltY(tiltY);
-    item.SetPressure(static_cast<int32_t>(pressure * 1000));
+    item.SetPressure(pressure);
 
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
@@ -166,7 +166,7 @@ bool TabletToolProcessor::OnTipMotion(struct libinput_event* event)
     item.SetGlobalY(tCoord.y);
     item.SetTiltX(tiltX);
     item.SetTiltY(tiltY);
-    item.SetPressure(static_cast<int32_t>(pressure * 1000));
+    item.SetPressure(pressure);
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, item);
     return true;
 }
@@ -184,7 +184,6 @@ bool TabletToolProcessor::OnTipUp(struct libinput_event_tablet_tool*)
         return false;
     }
     item.SetPressed(false);
-    item.SetPressure(0);
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, item);
     return true;
 }

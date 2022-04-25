@@ -164,14 +164,22 @@ bool MMIClient::DelFdListener(int32_t fd)
     return true;
 }
 
+void MMIClient::OnPacket(NetPacket& pkt)
+{
+    recvFun_(*this, pkt);
+}
+
 void MMIClient::OnRecvMsg(const char *buf, size_t size)
 {
     CHKPV(buf);
-    if (size == 0) {
-        MMI_HILOGE("Invalid input param size");
+    if (size == 0 || size > MAX_PACKET_BUF_SIZE) {
+        MMI_HILOGE("Invalid input param size. size:%{public}zu", size);
         return;
     }
-    OnRecv(buf, size);
+    if (!circBuf_.Write(buf, size)) {
+        MMI_HILOGW("Write data faild. size:%{public}zu", size);
+    }
+    OnReadPackets(circBuf_, std::bind(&MMIClient::OnPacket, this, std::placeholders::_1));
 }
 
 int32_t MMIClient::Reconnect()
