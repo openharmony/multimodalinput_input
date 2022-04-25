@@ -46,7 +46,9 @@ public:
     int32_t UnRegisterInputDeviceMonitor();
     int32_t SubscribeKeyEvent(const KeyEventInputSubscribeManager::SubscribeKeyEventInfo& subscribeInfo);
     int32_t UnSubscribeKeyEvent(int32_t subscribeId);
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 protected:
     bool SendMsg(NetPacket& pkt) const;
