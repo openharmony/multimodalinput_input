@@ -26,7 +26,7 @@ const std::string GET_REFERENCE = "napi_get_reference_value";
 const std::string STRICT_EQUALS = "napi_strict_equals";
 const std::string DELETE_REFERENCE = "napi_delete_reference";
 } // namespace
-int32_t JsUtil::GetInt32(uv_work_t *work)
+int32_t JsUtil::GetUserData(uv_work_t *work)
 {
     int32_t *uData = static_cast<int32_t*>(work->data);
     int32_t userData = *uData;
