@@ -199,6 +199,41 @@ public:
      */
     static constexpr int32_t MOUSE_BUTTON_MIDDLE = 2;
 
+     /**
+     * Indicates the side button on a mouse.
+     *
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_SIDE = 3;
+
+    /**
+     * Indicates the extra button on a mouse.
+     *
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_EXTRA = 4;
+
+    /**
+     * Indicates the forward button on a mouse.
+     *
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_FORWARD = 5;
+
+    /**
+     * Indicates the back button on a mouse.
+     *
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_BACK = 6;
+
+    /**
+     * Indicates the task button on a mouse.
+     *
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_TASK = 7;
+    
     static constexpr int32_t TOOL_TYPE_PEN = 0;
 
     static constexpr int32_t TOOL_TYPE_RUBBER = 1;
