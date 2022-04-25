@@ -54,12 +54,13 @@ constexpr int32_t THREE_MORE_COMMAND = 3;
 constexpr int32_t MAX_PRESSED_COUNT = 30;
 constexpr int32_t ACTION_TIME = 3000;
 constexpr int32_t DOUBLE_ACTION_TIME = 6000;
-static constexpr int32_t BLOCK_TIME_MS = 16;
+constexpr int32_t BLOCK_TIME_MS = 16;
 } // namespace
 
 int32_t InputManagerCommand::NextPos(int32_t begPos, int32_t endPos, int64_t begTime, int64_t endTime, int64_t curTime)
 {
     if (curTime < begTime || curTime > endTime) {
+        std::cout << "curTime is out of range." << std::endl;
         return begPos;
     }
     const int64_t blockTimeUs = BLOCK_TIME_MS * 1000;
@@ -356,10 +357,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
             }
             /* parse commands for touch */
             case 'T': {
-                int32_t px1;
-                int32_t py1;
-                int32_t px2;
-                int32_t py2;
+                int32_t px1 = 0;
+                int32_t py1 = 0;
+                int32_t px2 = 0;
+                int32_t py2 = 0;
                 int32_t totalTimeMs = 0;
                 int32_t oneNumber = 1;
                 int32_t twoNumber = 2;
