@@ -94,6 +94,7 @@ void InputDeviceManager::RemoveDevMonitor(SessionPtr sess)
     devMonitor_.erase(iter);
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 bool InputDeviceManager::HasPointerDevice()
 {
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
@@ -103,6 +104,7 @@ bool InputDeviceManager::HasPointerDevice()
     }
     return false;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)
 {

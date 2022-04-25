@@ -89,6 +89,10 @@ ohos_shared_library("libmmi-client") {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
+  if (mmi_enable_pointer_drawing) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
+  }
+
   if (mmi_enable_interceptor) {
     cflags += [ "-DOHOS_BUILD_ENABLE_INTERCEPTOR" ]
   }

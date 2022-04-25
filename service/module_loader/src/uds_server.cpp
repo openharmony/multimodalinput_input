@@ -233,53 +233,7 @@ void UDSServer::SetRecvFun(MsgServerFunCallback fun)
     recvFun_ = fun;
 }
 
-void UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
-{
-    CHKPV(buf);
-    if (fd < 0) {
-        MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
-        return;
-    }
-    auto sess = GetSession(fd);
-    CHKPV(sess);
-    int32_t readIdx = 0;
-    int32_t packSize = 0;
-    int32_t bufSize = static_cast<int32_t>(size);
-    const int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
-    if (bufSize < headSize) {
-        MMI_HILOGE("The in parameter size less than headSize, errCode%{public}d", VAL_NOT_EXP);
-        return;
-    }
-    while (bufSize > 0 && recvFun_) {
-        if (bufSize < headSize) {
-            MMI_HILOGE("The size less than headSize, errCode%{public}d", VAL_NOT_EXP);
-            return;
-        }
-        auto head = (PackHead*)&buf[readIdx];
-        if (head->size >= bufSize) {
-            MMI_HILOGE("The head->size more or equal than size, errCode:%{public}d", VAL_NOT_EXP);
-            return;
-        }
-        packSize = headSize + head->size;
-        if (bufSize < packSize) {
-            MMI_HILOGE("The size less than packSize, errCode:%{public}d", VAL_NOT_EXP);
-            return;
-        }
-        
-        NetPacket pkt(head->idMsg);
-        if (head->size > 0) {
-            if (!pkt.Write(&buf[readIdx + headSize], static_cast<size_t>(head->size))) {
-                MMI_HILOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
-                return;
-            }
-        }
-        recvFun_(sess, pkt);
-        bufSize -= packSize;
-        readIdx += packSize;
-    }
-}
-
-void UDSServer::ReleaseSession(int32_t fd, struct epoll_event& ev)
+void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
 {
     auto secPtr = GetSession(fd);
     if (secPtr != nullptr) {
@@ -290,56 +244,57 @@ void UDSServer::ReleaseSession(int32_t fd, struct epoll_event& ev)
         free(ev.data.ptr);
         ev.data.ptr = nullptr;
     }
+    if (auto it = circleBufMap_.find(fd); it != circleBufMap_.end()) {
+        circleBufMap_.erase(it);
+    }
     close(fd);
 }
 
-void UDSServer::OnEpollRecv(int32_t fd, std::map<int32_t, StreamBufData>& bufMap, struct epoll_event& ev)
+void UDSServer::OnPacket(int32_t fd, NetPacket& pkt)
+{
+    auto sess = GetSession(fd);
+    CHKPV(sess);
+    recvFun_(sess, pkt);
+}
+
+void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
 {
     if (fd < 0) {
         MMI_HILOGE("Invalid input param fd:%{public}d", fd);
         return;
     }
-    constexpr size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
-    if (maxCount <= 0) {
-        MMI_HILOGE("The maxCount value is error, errCode:%{public}d", VAL_NOT_EXP);
-        return;
-    }
-    auto bufData = &bufMap[fd];
-    if (bufData->isOverflow) {
-        MMI_HILOGE("StreamBuffer full or write error, Data discarded errCode:%{public}d",
-            STREAMBUFF_OVER_FLOW);
-        return;
-    }
+    auto& buf = circleBufMap_[fd];
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
-    for (size_t i = 0; i < maxCount; i++) {
+    for (int32_t i = 0; i < MAX_RECV_LIMIT; i++) {
         auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
-        if (size < 0) {
+        if (size > 0) {
+#ifdef OHOS_BUILD_HAVE_DUMP_DATA
+            DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
+#endif
+            if (!buf.Write(szBuf, size)) {
+                MMI_HILOGW("Write data faild. size:%{public}zu", size);
+            }
+            OnReadPackets(buf, std::bind(&UDSServer::OnPacket, this, fd, std::placeholders::_1));
+        } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_HILOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK");
+                MMI_HILOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
+                    size, errno);
                 continue;
             }
             MMI_HILOGE("recv return %{public}zu errno:%{public}d", size, errno);
             break;
-        } else if (size == 0) {
+        } else {
             MMI_HILOGE("The client side disconnect with the server. size:0 errno:%{public}d", errno);
             ReleaseSession(fd, ev);
             break;
-        } else {
-#ifdef OHOS_BUILD_HAVE_DUMP_DATA
-            DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
-#endif
-            if (!bufData->sBuf.Write(szBuf, size)) {
-                bufData->isOverflow = true;
-                break;
-            }
-            if (size < MAX_PACKET_BUF_SIZE) {
-                break;
-            }
+        }
+        if (size < MAX_PACKET_BUF_SIZE) {
+            break;
         }
     }
 }
 
-void UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct epoll_event& ev)
+void UDSServer::OnEpollEvent(epoll_event& ev)
 {
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int32_t*>(ev.data.ptr);
@@ -351,7 +306,7 @@ void UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct ep
         MMI_HILOGD("EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
         ReleaseSession(fd, ev);
     } else if (ev.events & EPOLLIN) {
-        OnEpollRecv(fd, bufMap, ev);
+        OnEpollRecv(fd, ev);
     }
 }
 

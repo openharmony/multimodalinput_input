@@ -71,36 +71,6 @@ HWTEST_F(StreamBufferTest, construct_002, TestSize.Level1)
 }
 
 /**
- * @tc.name:SetReadIdx_001
- * @tc.desc:Verify stream buffer set read idx
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(StreamBufferTest, SetReadIdx_001, TestSize.Level1)
-{
-    StreamBuffer bufObj;
-    bool retResult = bufObj.SetReadIdx(1);
-    EXPECT_FALSE(retResult);
-}
-
-/**
- * @tc.name:SetReadIdx_002
- * @tc.desc:Verify stream buffer buffer set read idx
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(StreamBufferTest, SetReadIdx_002, TestSize.Level1)
-{
-    char buf[100] = "stream data type3 001";
-    size_t size = 0;
-
-    StreamBuffer bufObj;
-    bufObj.Write(buf, size);
-    bool retResult = bufObj.SetReadIdx(0);
-    EXPECT_TRUE(retResult);
-}
-
-/**
  * @tc.name:read_Type1_001
  * @tc.desc:Verify stream buffer read
  * @tc.type: FUNC
@@ -287,9 +257,9 @@ HWTEST_F(StreamBufferTest, Size_001, TestSize.Level1)
  */
 HWTEST_F(StreamBufferTest, operatorLeft, TestSize.Level1)
 {
+    int32_t val = 111;
     StreamBuffer streamBufferSrc;
-    StreamBuffer streamBufferCopy = streamBufferSrc;
-    streamBufferCopy << streamBufferSrc;
+    streamBufferSrc << val;
 }
 
 /**
@@ -300,9 +270,10 @@ HWTEST_F(StreamBufferTest, operatorLeft, TestSize.Level1)
  */
 HWTEST_F(StreamBufferTest, operatorRight, TestSize.Level1)
 {
+    int32_t val = 111;
     StreamBuffer streamBufferSrc;
-    StreamBuffer streamBufferCopy = streamBufferSrc;
-    streamBufferCopy >> streamBufferSrc;
+    streamBufferSrc << val;
+    streamBufferSrc >> val;
 }
 
 /**

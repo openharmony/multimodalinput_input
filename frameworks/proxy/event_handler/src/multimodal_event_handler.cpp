@@ -48,15 +48,6 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
     return EventManager.InjectEvent(keyEventPtr);
 }
 
-bool MultimodalEventHandler::StartClient()
-{
-    CALL_LOG_ENTER;
-    if (client_ == nullptr) {
-        return InitClient();
-    }
-    return true;
-}
-
 bool MultimodalEventHandler::InitClient()
 {
     CALL_LOG_ENTER;
@@ -137,6 +128,7 @@ int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent>
     return EventManager.InjectPointerEvent(pointerEvent);
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 int32_t MultimodalEventHandler::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
     if (!InitClient()) {
@@ -145,6 +137,7 @@ int32_t MultimodalEventHandler::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
     }
     return EventManager.MoveMouseEvent(offsetX, offsetY);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
 int32_t MultimodalEventHandler::AddInterceptor(int32_t sourceType, int32_t id)
