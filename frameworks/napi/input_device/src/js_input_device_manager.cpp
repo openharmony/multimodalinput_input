@@ -70,51 +70,70 @@ napi_value JsInputDeviceManager::GetDevice(napi_env env, int32_t id, napi_value 
     return ret;
 }
 
+void AsyncCallWork(napi_env env, void* data)
+{
+    CALL_LOG_ENTER;
+    CHKPV(data);
+    AsyncContext* asyncContext = static_cast<AsyncContext*>(data);
+    bool visible;
+    asyncContext->reserve >> visible;
+    asyncContext->errorCode = InputManager::GetInstance()->SetPointerVisible(visible);
+}
+
+void AsyncCallbackWork(napi_env env, napi_status status, void* data)
+{
+    CALL_LOG_ENTER;
+    CHKPV(data);
+    sptr<AsyncContext> asyncContext(static_cast<AsyncContext *>(data));
+    /**
+     * After the asynchronous task is created, the asyncCallbackInfo reference count is reduced
+     * to 0 destructions, so you need to add 1 to the asyncCallbackInfo reference count when the
+     * asynchronous task is created, and subtract 1 from the reference count after the naked
+     * pointer is converted to a pointer when the asynchronous task is executed, the reference
+     * count of the smart pointer is guaranteed to be 1.
+     */
+    asyncContext->DecStrongRef(nullptr);
+    napi_value result = nullptr;
+    CHKRV(env, napi_get_undefined(env, &result), GET_UNDEFINED);
+    if (asyncContext->deferred) {
+        if (asyncContext->errorCode == RET_OK) {
+            CHKRV(env, napi_resolve_deferred(env, asyncContext->deferred, result), RESOLVE_DEFERRED);
+        } else {
+            CHKRV(env, napi_reject_deferred(env, asyncContext->deferred, result), REJECT_DEFERRED);
+        }
+    } else {
+        napi_value callback = nullptr;
+        CHKRV(env, napi_get_reference_value(env, asyncContext->callback, &callback), GET_REFERENCE);
+        napi_value callResult = nullptr;
+        CHKRV(env, napi_call_function(env, nullptr, callback, 1, &result, &callResult), CALL_FUNCTION);
+    }
+}
+
 napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, napi_value handle)
 {
     CALL_LOG_ENTER;
-    sptr<PointerAsyncContext> asyncContext = new (std::nothrow) PointerAsyncContext(env);
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     if (asyncContext == nullptr) {
-        THROWERR(env, "create PointerAsyncContext failed");
+        THROWERR(env, "create AsyncContext failed");
         return nullptr;
     }
-    asyncContext->visible = visible;
+    asyncContext->reserve << visible;
+
     napi_value promise = nullptr;
-    if (handle == nullptr) {
-        CHKRP(env, napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
-    } else {
+    if (handle != nullptr) {
+        CHKRP(env, napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
         CHKRP(env, napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(env, napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
     }
 
     napi_value resource = nullptr;
     CHKRP(env, napi_create_string_utf8(env, "setPointerVisible", NAPI_AUTO_LENGTH, &resource), CREATE_STRING_UTF8);
-    if ((handle != nullptr) && (napi_create_reference(env, handle, 1, &asyncContext->callback) != napi_ok)) {
-        MMI_HILOGE("create reference fail");
-        return nullptr;
-    }
 
     asyncContext->IncStrongRef(nullptr);
-    napi_status status = napi_create_async_work(env, nullptr, resource, [](napi_env env, void* data) {
-            PointerAsyncContext* asyncContext = static_cast<PointerAsyncContext*>(data);
-            asyncContext->errorCode = InputManager::GetInstance()->SetPointerVisible(asyncContext->visible);
-        }, [](napi_env env, napi_status status, void* data) {
-            sptr<PointerAsyncContext> asyncContext(static_cast<PointerAsyncContext *>(data));
-            asyncContext->DecStrongRef(nullptr);
-            napi_value result = nullptr;
-            CHKRV(env, napi_get_undefined(env, &result), GET_UNDEFINED);
-            if (asyncContext->deferred) {
-                if (asyncContext->errorCode == RET_OK) {
-                    CHKRV(env, napi_resolve_deferred(env, asyncContext->deferred, result), RESOLVE_DEFERRED);
-                } else {
-                    CHKRV(env, napi_reject_deferred(env, asyncContext->deferred, result), REJECT_DEFERRED);
-                }
-            } else {
-                napi_value callback = nullptr;
-                CHKRV(env, napi_get_reference_value(env, asyncContext->callback, &callback), GET_REFERENCE);
-                napi_value callResult = nullptr;
-                CHKRV(env, napi_call_function(env, nullptr, callback, 1, &result, &callResult), CALL_FUNCTION);
-            }
-        }, asyncContext.GetRefPtr(), &asyncContext->work);
+    napi_status status = napi_create_async_work(env, nullptr, resource, AsyncCallWork, AsyncCallbackWork,
+        asyncContext.GetRefPtr(), &asyncContext->work);
+
     if (status != napi_ok || napi_queue_async_work(env, asyncContext->work) != napi_ok) {
         MMI_HILOGE("create async work fail");
         asyncContext->DecStrongRef(nullptr);

@@ -85,10 +85,7 @@ int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> fi
 
 int32_t MultimodalInputConnectManager::SetPointerVisible(bool visible)
 {
-    if (multimodalInputConnectService_ == nullptr) {
-        MMI_HILOGE("multimodalInputConnectService_ is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->SetPointerVisible(visible);
 }
 
