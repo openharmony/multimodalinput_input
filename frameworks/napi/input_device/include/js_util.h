@@ -17,6 +17,7 @@
 #define JS_UTIL_H
 
 #include <uv.h>
+#include <sstream>
 
 #include "input_device_impl.h"
 #include "napi/native_api.h"
@@ -54,15 +55,9 @@ public:
     napi_deferred deferred = nullptr;
     napi_ref callback = nullptr;
     int32_t errorCode;
+    std::stringstream reserve;
     AsyncContext(napi_env env) : env(env) {}
     ~AsyncContext();
-};
-
-class PointerAsyncContext : public AsyncContext {
-public:
-    bool visible = true;
-    PointerAsyncContext(napi_env env) : AsyncContext(env) {}
-    ~PointerAsyncContext() {}
 };
 } // namespace MMI
 } // namespace OHOS
