@@ -570,6 +570,21 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
     }
 }
 
+int32_t InputManagerImpl::SetPointerVisible(bool visible)
+{
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    CALL_LOG_ENTER;
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->SetPointerVisible(visible);
+    if (ret != RET_OK) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGD("disable pointer drawing");
+    return RET_ERR;
+#endif
+}
+
 void InputManagerImpl::OnConnected()
 {
     CALL_LOG_ENTER;

@@ -37,6 +37,7 @@ ohos_source_set("mmi_connect_manager_service") {
   cflags = [ "-DOHOS_BUILD" ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
