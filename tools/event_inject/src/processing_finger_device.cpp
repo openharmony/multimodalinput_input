@@ -48,12 +48,13 @@ void ProcessingFingerDevice::AnalysisTouchPadFingerDate(const std::vector<Device
 {
     TouchPadCoordinates touchPadCoordinates = {};
     TouchPadInputEvent touchPadInputEvent = {};
-    for (size_t i = 0; i < inputData.size(); i++) {
-        for (size_t j = 0; j < inputData[i].posXY.size(); j++) {
-            touchPadCoordinates.xPos = inputData[i].posXY[j].xPos;
-            touchPadCoordinates.yPos = inputData[i].posXY[j].yPos;
+    for (const auto &item : inputData) {
+        touchPadInputEvent.groupNumber = 0;
+        for (auto &posXYItem : item.posXY) {
+            touchPadCoordinates.xPos = posXYItem.xPos;
+            touchPadCoordinates.yPos = posXYItem.yPos;
             touchPadInputEvent.events.push_back(touchPadCoordinates);
-            touchPadInputEvent.groupNumber = j + 1;
+            ++touchPadInputEvent.groupNumber;
         }
         touchPadInputEvents.eventNumber = inputData.size();
         touchPadInputEvents.eventArray.push_back(touchPadInputEvent);

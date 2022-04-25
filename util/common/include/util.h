@@ -25,6 +25,7 @@
 
 namespace OHOS {
 namespace MMI {
+constexpr int32_t JSON_FILE_SIZE = 0x5000;
 const char *GetMmiErrorTypeDesc(int32_t errorCodeEnum);
 std::string UuIdGenerate();
 int64_t GetMicrotime();
@@ -56,6 +57,7 @@ bool IsFileExists(const std::string& fileName);
 int32_t VerifyFile(const std::string& fileName);
 std::string GetFileExtendName(const std::string& fileName);
 int32_t GetFileSize(const std::string& fileName);
+std::string ReadFile(const std::string &filePath, int32_t readLine = 0);
 } // namespace MMI
 } // namespace OHOS
 #endif // UTIL_H
