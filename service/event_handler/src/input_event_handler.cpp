@@ -432,7 +432,11 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
 
-    MouseEventHdr->Normalize(event);
+    auto ret = MouseEventHdr->Normalize(event);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Normalize faild");
+        return RET_ERR;
+    }
 
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -467,7 +471,7 @@ int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEv
     }
     MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
                "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
-               "Width:%{public}d,Height:%{public}d,Pressure:%{public}lf,Device:%{public}d",
+               "Width:%{public}d,Height:%{public}d,Pressure:%{public}f,Device:%{public}d",
                item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
                item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
                item.GetDeviceId());

@@ -48,14 +48,12 @@ void CheckDefineOutput(const char* fmt, Ts... args)
 {
     using namespace OHOS::MMI;
     CHKPV(fmt);
-    int32_t ret = 0;
-    char buf[MAX_STREAM_BUF_SIZE] = {};
-    ret = snprintf_s(buf, MAX_STREAM_BUF_SIZE, MAX_STREAM_BUF_SIZE - 1, fmt, args...);
-    if (ret < 0) {
+    char buf[MAX_PACKET_BUF_SIZE] = {};
+    int32_t ret = snprintf_s(buf, MAX_PACKET_BUF_SIZE, MAX_PACKET_BUF_SIZE - 1, fmt, args...);
+    if (ret == -1) {
         KMSG_LOGI("call snprintf_s fail.ret = %d", ret);
         return;
     }
-
     KMSG_LOGI("%s", buf);
     MMI_HILOGI("%{public}s", buf);
 }
@@ -316,9 +314,7 @@ void MMIService::OnThread()
     int32_t count = 0;
     constexpr int32_t timeOut = 1;
     struct epoll_event ev[MAX_EVENT_SIZE] = {};
-    std::map<int32_t, StreamBufData> bufMap;
     while (state_ == ServiceRunningState::STATE_RUNNING) {
-        bufMap.clear();
         count = EpollWait(ev[0], MAX_EVENT_SIZE, timeOut, mmiFd_);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
@@ -326,7 +322,7 @@ void MMIService::OnThread()
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 libinputAdapter_.EventDispatch(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
-                OnEpollEvent(bufMap, ev[i]);
+                OnEpollEvent(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {
                 OnSignalEvent(mmiEd->fd);
             } else {
@@ -335,12 +331,6 @@ void MMIService::OnThread()
         }
         if (state_ != ServiceRunningState::STATE_RUNNING) {
             break;
-        }
-        for (auto& it : bufMap) {
-            if (it.second.isOverflow) {
-                continue;
-            }
-            OnRecv(it.first, it.second.sBuf.Data(), it.second.sBuf.Size());
         }
         OnTimer();
     }
