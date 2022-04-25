@@ -462,6 +462,7 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 
 void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 {
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
@@ -470,6 +471,9 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
     if (MMIEventHdl.MoveMouseEvent(offsetX, offsetY) != RET_OK) {
         MMI_HILOGE("Failed to inject move mouse offset event");
     }
+#else
+    MMI_HILOGI("Pointer drawing module dose not support, move mouse failed");
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
