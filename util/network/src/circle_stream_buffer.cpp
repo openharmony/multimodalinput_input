@@ -32,12 +32,13 @@ void CircleStreamBuffer::CopyDataToBegin()
 
 bool CircleStreamBuffer::CheckWrite(size_t size)
 {
+    int32_t bufferSize = static_cast<int32_t>(size);
     int32_t availSize = GetAvailableBufSize();
-    if (size > availSize && rPos_ > 0) {
+    if (bufferSize > availSize && rPos_ > 0) {
         CopyDataToBegin();
         availSize = GetAvailableBufSize();
     }
-    return (availSize >= size);
+    return (availSize >= bufferSize);
 }
 
 bool CircleStreamBuffer::Write(const char *buf, size_t size)
