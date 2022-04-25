@@ -54,72 +54,6 @@ void InjectionEventDispatch::InitManageFunction()
     }
 }
 
-bool InjectionEventDispatch::IsFileExists(const std::string& fileName)
-{
-    if ((access(fileName.c_str(), F_OK)) == 0) {
-        return true;
-    }
-    return false;
-}
-
-int32_t InjectionEventDispatch::VerifyFile(const std::string& fileName)
-{
-    std::string findcmd = "find /data -name " + fileName;
-    FILE* findJson = popen(findcmd.c_str(), "r");
-    if (!findJson) {
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
-std::string InjectionEventDispatch::GetFileExtendName(const std::string& fileName)
-{
-    if (fileName.empty()) {
-        return "";
-    }
-    size_t nPos = fileName.find_last_of('.');
-    if (fileName.npos == nPos) {
-        return fileName;
-    }
-    return fileName.substr(nPos + 1, fileName.npos);
-}
-
-int32_t InjectionEventDispatch::GetFileSize(const std::string& fileName)
-{
-    char realPath[PATH_MAX] = {};
-    if (realpath(fileName.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("path is error, path:%{public}s", fileName.c_str());
-        return RET_ERR;
-    }
-    FILE* pFile = fopen(realPath, "rb");
-    if (pFile) {
-        fseek(pFile, 0, SEEK_END);
-        long fileSize = ftell(pFile);
-        if (fileSize > INT32_MAX) {
-            MMI_HILOGE("The file is too large for 32-bit systems, filesize:%{public}ld", fileSize);
-            fclose(pFile);
-            return RET_ERR;
-        }
-        fclose(pFile);
-        return fileSize;
-    }
-    return RET_ERR;
-}
-
-bool InjectionEventDispatch::ReadFile(const std::string &jsonFile, std::string& jsonBuf)
-{
-    FILE* fp = fopen(jsonFile.c_str(), "r");
-    CHKPF(fp);
-    char buf[256] = {};
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        MMI_HILOGW("close file failed");
-    }
-    return true;
-}
-
 int32_t InjectionEventDispatch::OnJson()
 {
     CALL_LOG_ENTER;
@@ -147,11 +81,11 @@ int32_t InjectionEventDispatch::OnJson()
     }
     int32_t fileSize = GetFileSize(jsonFile);
     if ((fileSize <= 0) || (fileSize > JSON_FILE_SIZE)) {
-        MMI_HILOGE("The file size is out of range 2M or empty. filesize:%{public}d", fileSize);
+        MMI_HILOGE("The file size is out of range 20KB or empty. filesize:%{public}d", fileSize);
         return RET_ERR;
     }
-    std::string jsonBuf;
-    if (!ReadFile(jsonFile, jsonBuf)) {
+    std::string jsonBuf = ReadFile(jsonFile);
+    if (jsonBuf.empty()) {
         MMI_HILOGE("read file failed");
         return RET_ERR;
     }
@@ -161,8 +95,7 @@ int32_t InjectionEventDispatch::OnJson()
             logStatus = true;
         }
     }
-    InputParse InputParse;
-    return manageInjectDevice_.TransformJsonData(InputParse.DataInit(jsonBuf, logStatus));
+    return manageInjectDevice_.TransformJsonData(DataInit(jsonBuf, logStatus));
 }
 
 std::string InjectionEventDispatch::GetFunId() const
@@ -204,7 +137,6 @@ void InjectionEventDispatch::Run()
     std::string id = GetFunId();
     auto fun = GetFun(id);
     CHKPV(fun);
-
     auto ret = (*fun)();
     if (ret == RET_OK) {
         MMI_HILOGI("inject function success id:%{public}s", id.c_str());
@@ -240,14 +172,13 @@ int32_t InjectionEventDispatch::OnHelp()
     InjectionToolsHelpFunc helpFunc;
     std::string ret = helpFunc.GetHelpText();
     MMI_HILOGI("%{public}s", ret.c_str());
-
     return RET_OK;
 }
 
 int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText) const
 {
     if (deviceNameText.empty()) {
-        MMI_HILOGE("Get device index failed");
+        MMI_HILOGE("deviceNameText is empty");
         return RET_ERR;
     }
     for (const auto &item : allDevices_) {
