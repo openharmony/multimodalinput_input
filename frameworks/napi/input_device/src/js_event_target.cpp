@@ -85,7 +85,8 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
             continue;
         }
         napi_value result[2];
-        CHKRV(item->env, napi_create_string_utf8(item->env, "add", NAPI_AUTO_LENGTH, &result[0]), CREATE_STRING_UTF8);
+        CHKRV(item->env, napi_create_string_utf8(item->env, ADD_EVENT.c_str(), NAPI_AUTO_LENGTH, &result[0]),
+             CREATE_STRING_UTF8);
         CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &result[1]), CREATE_INT32);
         napi_value handlerTemp = nullptr;
         CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handlerTemp), GET_REFERENCE);
@@ -115,7 +116,7 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
             continue;
         }
         napi_value result[2];
-        CHKRV(item->env, napi_create_string_utf8(item->env, "remove", NAPI_AUTO_LENGTH, &result[0]),
+        CHKRV(item->env, napi_create_string_utf8(item->env, REMOVE_EVENT.c_str(), NAPI_AUTO_LENGTH, &result[0]),
             CREATE_STRING_UTF8);
         CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &result[1]), CREATE_INT32);
         napi_value handlerTemp = nullptr;
@@ -163,18 +164,22 @@ void JsEventTarget::TargetOn(std::string type, int32_t deviceId)
 void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
-    JsUtil jsUtil;
-    int32_t userData = jsUtil.GetInt32(work);
-    auto iter = callback_.find(userData);
-    if (iter == callback_.end()) {
-        MMI_HILOGE("find userData failed");
-        return;
-    }
-    auto cbTemp = std::move(iter->second);
-    callback_.erase(iter);
+    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
+    do {
+        std::lock_guard<std::mutex> guard(mutex_);
+        JsUtil jsUtil;
+        int32_t userData = jsUtil.GetUserData(work);
+        auto iter = callback_.find(userData);
+        if (iter == callback_.end()) {
+            MMI_HILOGE("find userData failed");
+            return;
+        }
+        cbTemp = std::move(iter->second);
+        callback_.erase(iter);
+    } while (0);
+    CHKPV(cbTemp);
     CHKPV(cbTemp->env);
 
     napi_value arr = nullptr;
@@ -196,18 +201,22 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
 void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
-    JsUtil jsUtil;
-    int32_t userData = jsUtil.GetInt32(work);
-    auto iter = callback_.find(userData);
-    if (iter == callback_.end()) {
-        MMI_HILOGE("find userData failed");
-        return;
-    }
-    auto cbTemp = std::move(iter->second);
-    callback_.erase(iter);
+    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
+    do {
+        std::lock_guard<std::mutex> guard(mutex_);
+        JsUtil jsUtil;
+        int32_t userData = jsUtil.GetUserData(work);
+        auto iter = callback_.find(userData);
+        if (iter == callback_.end()) {
+            MMI_HILOGE("find userData failed");
+            return;
+        }
+        cbTemp = std::move(iter->second);
+        callback_.erase(iter);
+    } while (0);
+    CHKPV(cbTemp);
     CHKPV(cbTemp->env);
 
     napi_value arr = nullptr;
@@ -263,18 +272,22 @@ void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> ids)
 void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
+    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
     JsUtil jsUtil;
-    int32_t userData = jsUtil.GetInt32(work);
-    auto iter = callback_.find(userData);
-    if (iter == callback_.end()) {
-        MMI_HILOGE("find userData failed");
-        return;
-    }
-    auto cbTemp = std::move(iter->second);
-    callback_.erase(iter);
+    do {
+        std::lock_guard<std::mutex> guard(mutex_);
+        int32_t userData = jsUtil.GetUserData(work);
+        auto iter = callback_.find(userData);
+        if (iter == callback_.end()) {
+            MMI_HILOGE("find userData failed");
+            return;
+        }
+        cbTemp = std::move(iter->second);
+        callback_.erase(iter);
+    } while (0);
+    CHKPV(cbTemp);
     CHKPV(cbTemp->env);
 
     napi_value id = nullptr;
@@ -319,18 +332,22 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
 void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
+    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
     JsUtil jsUtil;
-    int32_t userData = jsUtil.GetInt32(work);
-    auto iter = callback_.find(userData);
-    if (iter == callback_.end()) {
-        MMI_HILOGE("find userData failed");
-        return;
-    }
-    auto cbTemp = std::move(iter->second);
-    callback_.erase(iter);
+    do {
+        std::lock_guard<std::mutex> guard(mutex_);
+        int32_t userData = jsUtil.GetUserData(work);
+        auto iter = callback_.find(userData);
+        if (iter == callback_.end()) {
+            MMI_HILOGE("find userData failed");
+            return;
+        }
+        cbTemp = std::move(iter->second);
+        callback_.erase(iter);
+    } while (0);
+    CHKPV(cbTemp);
     CHKPV(cbTemp->env);
 
     napi_value id = nullptr;
@@ -413,18 +430,22 @@ void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl:
 void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
-    JsUtil jsUtil;
-    int32_t userData = jsUtil.GetInt32(work);
-    auto iter = callback_.find(userData);
-    if (iter == callback_.end()) {
-        MMI_HILOGE("find userData failed");
-        return;
-    }
-    auto cbTemp = std::move(iter->second);
-    callback_.erase(iter);
+    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
+    do {
+        std::lock_guard<std::mutex> guard(mutex_);
+        JsUtil jsUtil;
+        int32_t userData = jsUtil.GetUserData(work);
+        auto iter = callback_.find(userData);
+        if (iter == callback_.end()) {
+            MMI_HILOGE("find userData failed");
+            return;
+        }
+        cbTemp = std::move(iter->second);
+        callback_.erase(iter);
+    } while(0);
+    CHKPV(cbTemp);
     CHKPV(cbTemp->env);
 
     napi_value keyAbility = nullptr;
@@ -451,18 +472,22 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
 void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
-    JsUtil jsUtil;
-    int32_t userData = jsUtil.GetInt32(work);
-    auto iter = callback_.find(userData);
-    if (iter == callback_.end()) {
-        MMI_HILOGE("find userData failed");
-        return;
-    }
-    auto cbTemp = std::move(iter->second);
-    callback_.erase(iter);
+    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
+    do {
+        std::lock_guard<std::mutex> guard(mutex_);
+        JsUtil jsUtil;
+        int32_t userData = jsUtil.GetUserData(work);
+        auto iter = callback_.find(userData);
+        if (iter == callback_.end()) {
+            MMI_HILOGE("find userData failed");
+            return;
+        }
+        cbTemp = std::move(iter->second);
+        callback_.erase(iter);
+    } while(0);
+    CHKPV(cbTemp);
     CHKPV(cbTemp->env);
 
     napi_value keyAbility = nullptr;
