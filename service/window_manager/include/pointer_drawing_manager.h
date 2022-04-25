@@ -17,6 +17,7 @@
 #define POINTER_DRAWING_MANAGER_H
 
 #include <iostream>
+#include <list>
 
 #include <ui/rs_surface_node.h>
 
@@ -42,6 +43,9 @@ public:
     void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height);
     void UpdatePointerDevice(bool hasPointerDevice);
     bool Init();
+    void DeletePointerVisible(int32_t pid);
+    void SetPointerVisible(int32_t pid, bool visible);
+    bool IsPointerVisible();
 
 public:
     static const int32_t IMAGE_WIDTH = 64;
@@ -56,6 +60,9 @@ private:
     void DrawManager();
     void FixCursorPosition(int32_t &globalX, int32_t &globalY);
     std::unique_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
+    void DeletePidInfo(int32_t pid);
+    void UpdataPointerVisible();
+    void UpdataPidInfo(int32_t pid, bool visible);
 
 private:
     sptr<OHOS::Rosen::Window> pointerWindow_ = nullptr;
@@ -66,6 +73,13 @@ private:
     bool hasPointerDevice_ = false;
     int32_t lastGlobalX_ = -1;
     int32_t lastGlobalY_ = -1;
+
+    std::mutex mutex_;
+    struct PidInfo {
+        int32_t pid;
+        bool visible;
+    };
+    std::list<PidInfo> pidInfos_;
 };
 } // namespace MMI
 } // namespace OHOS

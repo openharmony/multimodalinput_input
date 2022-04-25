@@ -76,6 +76,8 @@ public:
     void GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> &keyCodes,
         std::function<void(std::map<int32_t, bool>)> callback);
 
+    int32_t SetPointerVisible(bool visible);
+
 private:
     int32_t PackPhysicalDisplay(NetPacket &pkt);
     int32_t PackLogicalDisplay(NetPacket &pkt);

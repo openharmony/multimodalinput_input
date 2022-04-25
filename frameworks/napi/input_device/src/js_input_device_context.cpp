@@ -38,6 +38,7 @@ const std::string DEFINE_PROPERTIES = "napi_define_properties";
 const std::string GET_STRING_UTF8 = "napi_get_value_string_utf8";
 const std::string GET_ARRAY_LENGTH = "napi_get_array_length";
 const std::string GET_ELEMENT = "napi_get_element";
+const std::string GET_BOOL = "napi_get_boolean";
 } // namespace
 
 JsInputDeviceContext::JsInputDeviceContext()
@@ -277,6 +278,39 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
     return jsInputDeviceMgr->GetDevice(env, id, argv[1]);
 }
 
+napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_info info)
+{
+    CALL_LOG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 1 || argc > 2) {
+        THROWERR(env, "the number of parameters is not as expected");
+        return nullptr;
+    }
+
+    napi_valuetype valueType = napi_undefined;
+    CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
+    if (valueType != napi_boolean) {
+        THROWERR(env, "the first parameter is not a boolean");
+        return nullptr;
+    }
+    bool visible = true;
+    CHKRP(env, napi_get_value_bool(env, argv[0], &visible), GET_BOOL);
+
+    JsInputDeviceContext *jsPointer = JsInputDeviceContext::GetInstance(env);
+    auto jsInputDeviceMgr = jsPointer->GetJsInputDeviceMgr();
+    if (argc == 1) {
+        return jsInputDeviceMgr->SetPointerVisible(env, visible);
+    }
+    CHKRP(env, napi_typeof(env, argv[1], &valueType), TYPEOF);
+    if (valueType != napi_function) {
+        THROWERR(env, "the second parameter is not a function");
+        return nullptr;
+    }
+    return jsInputDeviceMgr->SetPointerVisible(env, visible, argv[1]);
+}
+
 napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
@@ -345,6 +379,7 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("off", Off),
         DECLARE_NAPI_STATIC_FUNCTION("getDevice", GetDevice),
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceIds", GetDeviceIds),
+        DECLARE_NAPI_STATIC_FUNCTION("setPointerVisible", SetPointerVisible),
         DECLARE_NAPI_STATIC_FUNCTION("getKeystrokeAbility", GetKeystrokeAbility),
     };
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
