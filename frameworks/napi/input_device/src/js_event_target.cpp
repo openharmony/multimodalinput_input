@@ -167,7 +167,7 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
-    {
+    do {
         std::lock_guard<std::mutex> guard(mutex_);
         JsUtil jsUtil;
         int32_t userData = jsUtil.GetUserData(work);
@@ -178,7 +178,7 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
         }
         cbTemp = std::move(iter->second);
         callback_.erase(iter);
-    }
+    } while (0);
     CHKPV(cbTemp);
     CHKPV(cbTemp->env);
 
@@ -204,7 +204,7 @@ void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
-    {
+    do {
         std::lock_guard<std::mutex> guard(mutex_);
         JsUtil jsUtil;
         int32_t userData = jsUtil.GetUserData(work);
@@ -215,7 +215,7 @@ void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
         }
         cbTemp = std::move(iter->second);
         callback_.erase(iter);
-    }
+    } while (0);
     CHKPV(cbTemp);
     CHKPV(cbTemp->env);
 
@@ -276,7 +276,7 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
     JsUtil jsUtil;
-    {
+    do {
         std::lock_guard<std::mutex> guard(mutex_);
         int32_t userData = jsUtil.GetUserData(work);
         auto iter = callback_.find(userData);
@@ -286,7 +286,7 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
         }
         cbTemp = std::move(iter->second);
         callback_.erase(iter);
-    }
+    } while (0);
     CHKPV(cbTemp);
     CHKPV(cbTemp->env);
 
@@ -336,7 +336,7 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
     JsUtil jsUtil;
-    {
+    do {
         std::lock_guard<std::mutex> guard(mutex_);
         int32_t userData = jsUtil.GetUserData(work);
         auto iter = callback_.find(userData);
@@ -346,7 +346,7 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
         }
         cbTemp = std::move(iter->second);
         callback_.erase(iter);
-    }
+    } while (0);
     CHKPV(cbTemp);
     CHKPV(cbTemp->env);
 
@@ -433,7 +433,7 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
-    {
+    do {
         std::lock_guard<std::mutex> guard(mutex_);
         JsUtil jsUtil;
         int32_t userData = jsUtil.GetUserData(work);
@@ -444,7 +444,7 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
         }
         cbTemp = std::move(iter->second);
         callback_.erase(iter);
-    }
+    } while(0);
     CHKPV(cbTemp);
     CHKPV(cbTemp->env);
 
@@ -475,7 +475,7 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
-    {
+    do {
         std::lock_guard<std::mutex> guard(mutex_);
         JsUtil jsUtil;
         int32_t userData = jsUtil.GetUserData(work);
@@ -486,7 +486,7 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
         }
         cbTemp = std::move(iter->second);
         callback_.erase(iter);
-    }
+    } while(0);
     CHKPV(cbTemp);
     CHKPV(cbTemp->env);
 
