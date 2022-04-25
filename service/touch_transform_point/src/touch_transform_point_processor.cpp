@@ -68,7 +68,11 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     PointerEvent::PointerItem item;
     auto pressure = libinput_event_touch_get_pressure(data);
     auto seatSlot = libinput_event_touch_get_seat_slot(data);
+    auto axisLong = libinput_event_get_touch_contact_axis_Long(data);
+    auto axisShort = libinput_event_get_touch_contact_axis_short(data);
     item.SetPressure(pressure);
+    item.SetAxisLong(axisLong);
+    item.SetAxisShort(axisShort);
     int32_t toolType = GetTouchToolType(event);
     item.SetToolType(toolType);
     item.SetPointerId(seatSlot);
@@ -80,8 +84,9 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_HILOGD("LogicalX:%{public}d, logicalY:%{public}d, logicalDisplay:%{public}d, pressure:%{public}f",
-               logicalX, logicalY, logicalDisplayId, pressure);
+    MMI_HILOGD("LogicalX:%{public}d, logicalY:%{public}d, logicalDisplay:%{public}d, pressure:%{public}f,"
+               "axisLong:%{public}d, axisShort:%{public}d",
+               logicalX, logicalY, logicalDisplayId, pressure, axisLong, axisShort);
     return true;
 }
 
@@ -108,13 +113,18 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
         return false;
     }
     auto pressure = libinput_event_touch_get_pressure(data);
+    auto axisLong = libinput_event_get_touch_contact_axis_Long(data);
+    auto axisShort = libinput_event_get_touch_contact_axis_short(data);
     item.SetPressure(pressure);
+    item.SetAxisLong(axisLong);
+    item.SetAxisShort(axisShort);
     item.SetGlobalX(logicalX);
     item.SetGlobalY(logicalY);
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_HILOGD("LogicalX:%{public}d, logicalY:%{public}d, pressure:%{public}f",
-               logicalX, logicalY, pressure);
+    MMI_HILOGD("LogicalX:%{public}d, logicalY:%{public}d, pressure:%{public}f,"
+               "axisLong:%{public}d, axisShort:%{public}d",
+               logicalX, logicalY, pressure, axisLong, axisShort);
     return true;
 }
 
