@@ -401,9 +401,34 @@ public:
          */
         void SetHeight(int32_t height);
 
+        /**
+         * @brief Obtains the tilt angle of the x axis.
+         * @return Returns the tilt angle of the x axis.
+         * @since 9
+         */
         double GetTiltX() const;
+
+        /**
+         * @brief Sets the tilt angle of the x axis.
+         * @param tiltX Indicates the tilt angle to set.
+         * @return void
+         * @since 9
+         */
         void SetTiltX(double tiltX);
+
+        /**
+         * @brief Obtains the tilt angle of the y axis.
+         * @return Returns the tilt angle of the y axis.
+         * @since 9
+         */
         double GetTiltY() const;
+
+        /**
+         * @brief Sets the tilt angle of the y axis.
+         * @param tiltY Indicates the tilt angle to set.
+         * @return void
+         * @since 9
+         */
         void SetTiltY(double tiltY);
 
         /**
