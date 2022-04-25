@@ -19,14 +19,14 @@
 #include <memory>
 
 #include "nocopyable.h"
+#include "singleton.h"
 
 #include "i_input_event_consumer.h"
-#include "i_input_interceptor_manager.h"
 #include "input_handler_type.h"
 
 namespace OHOS {
 namespace MMI {
-class InputInterceptorManager : public IInputInterceptorManager {
+class InputInterceptorManager : public DelayedSingleton<InputInterceptorManager> {
 public:
     InputInterceptorManager();
     DISALLOW_COPY_AND_MOVE(InputInterceptorManager);

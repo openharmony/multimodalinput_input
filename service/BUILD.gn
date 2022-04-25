@@ -74,6 +74,10 @@ config("libmmi_server_config") {
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
+
+  if (mmi_enable_interceptor) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_INTERCEPTOR" ]
+  }
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {

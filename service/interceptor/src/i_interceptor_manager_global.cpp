@@ -16,7 +16,6 @@
 #include "i_interceptor_manager_global.h"
 
 #include "mmi_log.h"
-#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
@@ -26,31 +25,26 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInte
 
 void IInterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGD("Add inter module dose not support");
     return;
 }
 
 void IInterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGD("Remove inter module dose not support");
     return;
 }
 
 bool IInterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGD("Pointer inter module dose not support");
     return false;
 }
 
 bool IInterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGD("Key inter module dose not support");
     return false;
-}
-
-std::shared_ptr<IInterceptorManagerGlobal> IInterceptorManagerGlobal::GetInstance()
-{
-    return DelayedSingleton<IInterceptorManagerGlobal>::GetInstance();
 }
 } // namespace MMI
 } // namespace OHOS

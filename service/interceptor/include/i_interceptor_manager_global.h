@@ -15,23 +15,25 @@
 #ifndef I_INTERCEPTOR_MANAGER_GLOBAL_H
 #define I_INTERCEPTOR_MANAGER_GLOBAL_H
 
+#include "nocopyable.h"
+#include "singleton.h"
+
 #include "key_event.h"
 #include "pointer_event.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class IInterceptorManagerGlobal {
+class IInterceptorManagerGlobal : public DelayedSingleton<IInterceptorManagerGlobal> {
 public:
-    static std::shared_ptr<IInterceptorManagerGlobal> GetInstance();
     IInterceptorManagerGlobal() = default;
-    virtual ~IInterceptorManagerGlobal() = default;
-    virtual void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session);
-    virtual void OnRemoveInterceptor(int32_t id);
-    virtual bool OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
-    virtual bool OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+    ~IInterceptorManagerGlobal() = default;
+    DISALLOW_COPY_AND_MOVE(IInterceptorManagerGlobal);
+    void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session);
+    void OnRemoveInterceptor(int32_t id);
+    bool OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    bool OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 };
 } // namespace MMI
 } // namespace OHOS
-#define IInterceptorMgrGl IInterceptorManagerGlobal::GetInstance()
 #endif // I_INTERCEPTOR_MANAGER_GLOBAL_H

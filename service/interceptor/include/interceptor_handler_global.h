@@ -16,27 +16,26 @@
 #ifndef INTERCEPTOR_HANDLER_GLOBAL_H
 #define INTERCEPTOR_HANDLER_GLOBAL_H
 
-#include <mutex>
 #include <set>
 
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "i_interceptor_handler_global.h"
+#include "i_input_event_handler.h"
 #include "input_handler_type.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class InterceptorHandlerGlobal : public IInterceptorHandlerGlobal {
+class InterceptorHandlerGlobal : public DelayedSingleton<InterceptorHandlerGlobal> {
 public:
     InterceptorHandlerGlobal();
     DISALLOW_COPY_AND_MOVE(InterceptorHandlerGlobal);
     ~InterceptorHandlerGlobal() = default;
     int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
-    bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
-    bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent);
+    bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent);
+    bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
     void InitSessionLostCallback();
@@ -65,14 +64,13 @@ private:
 
     struct InterceptorCollection : public IInputEventHandler, protected NoCopyable {
         virtual int32_t GetPriority() const override;
-        virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) override;
-        virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) override;
+        virtual bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent) override;
+        virtual bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 
         int32_t AddInterceptor(const SessionHandler& interceptor);
         void RemoveInterceptor(const SessionHandler& interceptor);
         void OnSessionLost(SessionPtr session);
 
-        std::mutex lockInterceptors_;
         std::set<SessionHandler> interceptors_;
     };
 

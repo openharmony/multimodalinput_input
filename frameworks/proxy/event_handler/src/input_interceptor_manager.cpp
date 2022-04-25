@@ -17,7 +17,6 @@
 
 #include "input_handler_manager.h"
 #include "util.h"
-#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
@@ -39,11 +38,6 @@ int32_t InputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsu
 void InputInterceptorManager::RemoveInterceptor(int32_t interceptorId)
 {
     InputHandlerManager::GetInstance().RemoveHandler(interceptorId, InputHandlerType::INTERCEPTOR);
-}
-
-std::shared_ptr<IInputInterceptorManager> IInputInterceptorManager::GetInstance()
-{
-    return DelayedSingleton<InputInterceptorManager>::GetInstance();
 }
 } // namespace MMI
 } // namespace OHOS

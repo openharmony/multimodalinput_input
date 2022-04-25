@@ -25,22 +25,14 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInpu
 
 int32_t IInputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGD("Add input module dose not support");
     return INVALID_HANDLER_ID;
 }
 
 void IInputInterceptorManager::RemoveInterceptor(int32_t interceptorId)
 {
-    MMI_HILOGD("Interceptor is:%{public}d", interceptorId);
+    MMI_HILOGD("Remove input module dose not support");
     return;
-}
-
-std::shared_ptr<IInputInterceptorManager> IInputInterceptorManager::GetInstance()
-{
-    if (inputMgrPtr_ == nullptr) {
-        inputMgrPtr_ = std::make_shared<IInputInterceptorManager>();
-    }
-    return inputMgrPtr_;
 }
 } // namespace MMI
 } // namespace OHOS

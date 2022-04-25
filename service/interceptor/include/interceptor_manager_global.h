@@ -20,14 +20,13 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "i_interceptor_manager_global.h"
 #include "key_event.h"
 #include "pointer_event.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class InterceptorManagerGlobal : public IInterceptorManagerGlobal {
+class InterceptorManagerGlobal : public DelayedSingleton<InterceptorManagerGlobal> {
 public:
     static constexpr int32_t SOURCETYPE_KEY = 4;
 
