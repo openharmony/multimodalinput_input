@@ -402,30 +402,30 @@ public:
         void SetHeight(int32_t height);
 
         /**
-         * @brief 获取X轴的倾斜角度。
-         * @return 返回X轴倾斜角度。
+         * @brief Obtains the tilt angle of the x axis.
+         * @return Returns the tilt angle of the x axis.
          * @since 9
          */
         double GetTiltX() const;
 
         /**
-         * @brief 设置X轴的倾斜角度。
-         * @param tiltX 要设置的角度值。
+         * @brief Sets the tilt angle of the x axis.
+         * @param tiltX Indicates the tilt angle to set.
          * @return void
          * @since 9
          */
         void SetTiltX(double tiltX);
 
         /**
-         * @brief 获取Y轴的倾斜角度。
-         * @return 返回Y轴倾斜角度。
+         * @brief Obtains the tilt angle of the y axis.
+         * @return Returns the tilt angle of the y axis.
          * @since 9
          */
         double GetTiltY() const;
 
         /**
-         * @brief 设置Y轴的倾斜角度。
-         * @param tiltY 要设置的角度值。
+         * @brief Sets the tilt angle of the y axis.
+         * @param tiltY Indicates the tilt angle to set.
          * @return void
          * @since 9
          */
