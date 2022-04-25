@@ -42,7 +42,7 @@ public:
         CallbackData data;
     };
 
-    int32_t GetInt32(uv_work_t *work);
+    int32_t GetUserData(uv_work_t *work);
     bool IsHandleEquals(napi_env env, napi_value handle, napi_ref ref);
 };
 } // namespace MMI
