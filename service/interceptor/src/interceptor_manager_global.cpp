@@ -19,7 +19,6 @@
 
 #include "input_event_data_transformation.h"
 #include "proto.h"
-#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
@@ -108,11 +107,6 @@ bool InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
         }
     }
     return true;
-}
-
-std::shared_ptr<IInterceptorManagerGlobal> IInterceptorManagerGlobal::GetInstance()
-{
-    return DelayedSingleton<InterceptorManagerGlobal>::GetInstance();
 }
 } // namespace MMI
 } // namespace OHOS

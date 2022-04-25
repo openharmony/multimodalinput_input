@@ -19,13 +19,14 @@
 #include <list>
 
 #include "nocopyable.h"
+#include "singleton.h"
 
 #include "i_interceptor_manager.h"
 #include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
-class InterceptorManager : public IInterceptorManager {
+class InterceptorManager : public DelayedSingleton<InterceptorManager> {
 public:
     static constexpr int32_t SOURCETYPE_KEY = 4;
 

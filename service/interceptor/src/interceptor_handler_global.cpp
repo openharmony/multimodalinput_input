@@ -22,7 +22,6 @@
 #include "mmi_log.h"
 #include "net_packet.h"
 #include "proto.h"
-#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
@@ -146,7 +145,6 @@ int32_t InterceptorHandlerGlobal::InterceptorCollection::GetPriority() const
 bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
-    std::lock_guard<std::mutex> guard(lockInterceptors_);
     if (interceptors_.empty()) {
         MMI_HILOGW("Key interceptors is empty");
         return false;
@@ -162,7 +160,6 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
 bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
-    std::lock_guard<std::mutex> guard(lockInterceptors_);
     if (interceptors_.empty()) {
         MMI_HILOGW("Pointer interceptors is empty");
         return false;
@@ -177,7 +174,6 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
 
 int32_t InterceptorHandlerGlobal::InterceptorCollection::AddInterceptor(const SessionHandler& interceptor)
 {
-    std::lock_guard<std::mutex> guard(lockInterceptors_);
     if (interceptors_.size() >= MAX_N_INPUT_INTERCEPTORS) {
         MMI_HILOGE("The number of interceptors exceeds limit");
         return RET_ERR;
@@ -193,7 +189,6 @@ int32_t InterceptorHandlerGlobal::InterceptorCollection::AddInterceptor(const Se
 
 void InterceptorHandlerGlobal::InterceptorCollection::RemoveInterceptor(const SessionHandler& interceptor)
 {
-    std::lock_guard<std::mutex> guard(lockInterceptors_);
     std::set<SessionHandler>::const_iterator tItr = interceptors_.find(interceptor);
     if (tItr != interceptors_.cend()) {
         interceptors_.erase(tItr);
@@ -203,7 +198,6 @@ void InterceptorHandlerGlobal::InterceptorCollection::RemoveInterceptor(const Se
 
 void InterceptorHandlerGlobal::InterceptorCollection::OnSessionLost(SessionPtr session)
 {
-    std::lock_guard<std::mutex> guard(lockInterceptors_);
     std::set<SessionHandler>::const_iterator cItr = interceptors_.cbegin();
     while (cItr != interceptors_.cend()) {
         if (cItr->session_ != session) {
@@ -212,11 +206,6 @@ void InterceptorHandlerGlobal::InterceptorCollection::OnSessionLost(SessionPtr s
             cItr = interceptors_.erase(cItr);
         }
     }
-}
-
-std::shared_ptr<IInterceptorHandlerGlobal> IInterceptorHandlerGlobal::GetInstance()
-{
-    return DelayedSingleton<InterceptorHandlerGlobal>::GetInstance();
 }
 } // namespace MMI
 } // namespace OHOS

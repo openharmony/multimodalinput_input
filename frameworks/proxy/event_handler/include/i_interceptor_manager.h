@@ -15,24 +15,26 @@
 #ifndef I_INTERCEPTOR_MANAGER_H
 #define I_INTERCEPTOR_MANAGER_H
 
+#include "nocopyable.h"
+#include "singleton.h"
+
 #include "i_input_event_consumer.h"
 #include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
-class IInterceptorManager {
+class IInterceptorManager : public DelayedSingleton<IInterceptorManager> {
 public:
-    static std::shared_ptr<IInterceptorManager> GetInstance();
     IInterceptorManager() = default;
-    virtual ~IInterceptorManager() = default;
-    virtual int32_t AddInterceptor(int32_t sourceType,
+    ~IInterceptorManager() = default;
+    DISALLOW_COPY_AND_MOVE(IInterceptorManager);
+    int32_t AddInterceptor(int32_t sourceType,
         std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
-    virtual int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
-    virtual void RemoveInterceptor(int32_t interceptorId);
-    virtual int32_t OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id);
-    virtual int32_t OnKeyEvent(std::shared_ptr<KeyEvent> pointerEvent);
+    int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
+    void RemoveInterceptor(int32_t interceptorId);
+    int32_t OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id);
+    int32_t OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 };
 } // namespace MMI
 } // namespace OHOS
-#define IInterceptorMgr IInterceptorManager::GetInstance()
 #endif // I_INTERCEPTOR_MANAGER_H

@@ -16,7 +16,6 @@
 #include "i_interceptor_handler_global.h"
 
 #include "mmi_log.h"
-#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
@@ -27,32 +26,27 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInte
 int32_t IInterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGD("Add hdl module dose not support");
     return RET_ERR;
 }
 
 void IInterceptorHandlerGlobal::RemoveInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGD("Remove hdl module dose not support");
     return;
 }
 
-bool IInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<KeyEvent> KeyEvent)
+bool IInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGD("Key handle module dose not support");
     return false;
 }
 
-bool IInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> PointerEvent)
+bool IInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGD("Pointer handle module dose not support");
     return false;
-}
-
-std::shared_ptr<IInterceptorHandlerGlobal> IInterceptorHandlerGlobal::GetInstance()
-{
-    return DelayedSingleton<IInterceptorHandlerGlobal>::GetInstance();
 }
 } // namespace MMI
 } // namespace OHOS

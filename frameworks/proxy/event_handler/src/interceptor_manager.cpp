@@ -21,7 +21,6 @@
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "multimodal_event_handler.h"
-#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
@@ -69,11 +68,11 @@ void InterceptorManager::RemoveInterceptor(int32_t interceptorId)
     auto iter = std::find(interceptor_.begin(), interceptor_.end(), interceptorItem);
     if (iter == interceptor_.end()) {
         MMI_HILOGE("InterceptorItem does not exist");
-    } else {
-        iter = interceptor_.erase(iter);
-        MMIEventHdl.RemoveInterceptor(interceptorItem.id_);
-        MMI_HILOGD("InterceptorItem id:%{public}d removed success", interceptorId);
+        return;
     }
+    iter = interceptor_.erase(iter);
+    MMIEventHdl.RemoveInterceptor(interceptorItem.id_);
+    MMI_HILOGD("InterceptorItem id:%{public}d removed success", interceptorId);
 }
 
 int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id)
@@ -110,11 +109,6 @@ int32_t InterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
         }
     }
     return MMI_STANDARD_EVENT_SUCCESS;
-}
-
-std::shared_ptr<IInterceptorManager> IInterceptorManager::GetInstance()
-{
-    return DelayedSingleton<InterceptorManager>::GetInstance();
 }
 } // namespace MMI
 } // namespace OHOS

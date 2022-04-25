@@ -90,7 +90,7 @@ ohos_shared_library("libmmi-client") {
   }
 
   if (mmi_enable_interceptor) {
-    cflags += [ "-DOHOS_BUILD_MMI_INTERCEPTOR" ]
+    cflags += [ "-DOHOS_BUILD_ENABLE_INTERCEPTOR" ]
   }
 
   if (mmi_enable_interceptor) {

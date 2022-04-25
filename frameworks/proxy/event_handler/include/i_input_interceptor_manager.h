@@ -15,19 +15,21 @@
 #ifndef I_INPUT_INTERCEPTOR_MANAGER_H
 #define I_INPUT_INTERCEPTOR_MANAGER_H
 
+#include "nocopyable.h"
+#include "singleton.h"
+
 #include "i_input_event_consumer.h"
 
 namespace OHOS {
 namespace MMI {
-class IInputInterceptorManager {
+class IInputInterceptorManager : public DelayedSingleton<IInputInterceptorManager> {
 public:
-    static std::shared_ptr<IInputInterceptorManager> GetInstance();
     IInputInterceptorManager() = default;
-    virtual ~IInputInterceptorManager() = default;
-    virtual int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
-    virtual void RemoveInterceptor(int32_t interceptorId);
+    ~IInputInterceptorManager() = default;
+    DISALLOW_COPY_AND_MOVE(IInputInterceptorManager);
+    int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
+    void RemoveInterceptor(int32_t interceptorId);
 };
 } // namespace MMI
 } // namespace OHOS
-#define IInputInterceptorMgr IInputInterceptorManager::GetInstance()
 #endif // I_INPUT_INTERCEPTOR_MANAGER_H

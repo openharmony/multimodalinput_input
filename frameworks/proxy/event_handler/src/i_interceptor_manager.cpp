@@ -26,40 +26,32 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInte
 int32_t IInterceptorManager::AddInterceptor(int32_t sourceType,
     std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGD("Add mgr module dose not support");
     return RET_ERR;
 }
 
 int32_t IInterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGD("Add mgr module dose not support");
     return RET_ERR;
 }
 
 void IInterceptorManager::RemoveInterceptor(int32_t interceptorId)
 {
-    MMI_HILOGD("Interceptor is:%{public}d", interceptorId);
+    MMI_HILOGD("Remove mgr module dose not support");
     return;
 }
 
 int32_t IInterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGD("Pointer mgr module dose not support");
     return RET_ERR;
 }
 
-int32_t IInterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> pointerEvent)
+int32_t IInterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGD("Key mgr module dose not support");
     return RET_ERR;
-}
-
-std::shared_ptr<IInterceptorManager> IInterceptorManager::GetInstance()
-{
-    if (interceptorMgrPtr_ == nullptr) {
-        interceptorMgrPtr_ = std::make_shared<IInterceptorManager>();
-    }
-    return interceptorMgrPtr_;
 }
 } // namespace MMI
 } // namespace OHOS

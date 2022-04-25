@@ -17,11 +17,10 @@
 
 #include <cinttypes>
 
+#include "define_interceptor_global.h"
 #include "event_dump.h"
 #include "event_package.h"
 #include "hos_key_event.h"
-#include "i_interceptor_handler_global.h"
-#include "i_interceptor_manager_global.h"
 #include "input_device_manager.h"
 #include "input_event.h"
 #include "input_event_data_transformation.h"
@@ -304,7 +303,7 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
     MMI_HILOGD("OnAddInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
-    IInterceptorHdlGl->AddInputHandler(handlerId, handlerType, sess);
+    InterHdlGl->AddInputHandler(handlerId, handlerType, sess);
     InputHandlerManagerGlobal::GetInstance().AddInputHandler(handlerId, handlerType, sess);
     return RET_OK;
 }
@@ -323,7 +322,7 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
     MMI_HILOGD("OnRemoveInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
-    IInterceptorHdlGl->RemoveInputHandler(handlerId, handlerType, sess);
+    InterHdlGl->RemoveInputHandler(handlerId, handlerType, sess);
     InputHandlerManagerGlobal::GetInstance().RemoveInputHandler(handlerId, handlerType, sess);
     return RET_OK;
 }
@@ -676,7 +675,7 @@ int32_t ServerMsgHandler::OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& p
         MMI_HILOGE("Packet read sourceType failed");
         return PACKET_READ_FAIL;
     }
-    IInterceptorMgrGl->OnAddInterceptor(sourceType, id, sess);
+    InterMgrGl->OnAddInterceptor(sourceType, id, sess);
     return RET_OK;
 }
 
@@ -689,7 +688,7 @@ int32_t ServerMsgHandler::OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket
         MMI_HILOGE("Packet read data failed");
         return PACKET_READ_FAIL;
     }
-    IInterceptorMgrGl->OnRemoveInterceptor(id);
+    InterMgrGl->OnRemoveInterceptor(id);
     return RET_OK;
 }
 } // namespace MMI
