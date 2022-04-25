@@ -156,6 +156,26 @@ void PointerEvent::PointerItem::SetPressure(double pressure)
     pressure_ = pressure >= MAX_PRESSURE ? MAX_PRESSURE : pressure;
 }
 
+int32_t PointerEvent::PointerItem::GetAxisLong() const
+{
+    return axisLong_;
+}
+
+void PointerEvent::PointerItem::SetAxisLong(int32_t axisLong)
+{
+    axisLong_ = axisLong;
+}
+
+int32_t PointerEvent::PointerItem::GetAxisShort() const
+{
+    return axisShort_;
+}
+
+void PointerEvent::PointerItem::SetAxisShort(int32_t axisShort)
+{
+    axisShort_ = axisShort;
+}
+
 int32_t PointerEvent::PointerItem::GetDeviceId() const
 {
     return deviceId_;
@@ -178,90 +198,44 @@ void PointerEvent::PointerItem::SetToolType(int32_t toolType)
 
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
-    if (!out.WriteInt32(pointerId_)) {
-        return false;
-    }
-    if (!out.WriteInt64(downTime_)) {
-        return false;
-    }
-    if (!out.WriteBool(pressed_)) {
-        return false;
-    }
-    if (!out.WriteInt32(globalX_)) {
-        return false;
-    }
-    if (!out.WriteInt32(globalY_)) {
-        return false;
-    }
-    if (!out.WriteInt32(localX_)) {
-        return false;
-    }
-    if (!out.WriteInt32(localY_)) {
-        return false;
-    }
-    if (!out.WriteInt32(width_)) {
-        return false;
-    }
-    if (!out.WriteInt32(height_)) {
-        return false;
-    }
-    if (!out.WriteDouble(tiltX_)) {
-        return false;
-    }
-    if (!out.WriteDouble(tiltY_)) {
-        return false;
-    }
-    if (!out.WriteDouble(pressure_)) {
-        return false;
-    }
-    if (!out.WriteInt32(deviceId_)) {
-        return false;
-    }
-    return true;
+    return (
+        out.WriteInt32(pointerId_) &&
+        out.WriteInt64(downTime_) &&
+        out.WriteBool(pressed_) &&
+        out.WriteInt32(globalX_) &&
+        out.WriteInt32(globalY_) &&
+        out.WriteInt32(localX_) &&
+        out.WriteInt32(localY_) &&
+        out.WriteInt32(width_) &&
+        out.WriteInt32(height_) &&
+        out.WriteDouble(tiltX_) &&
+        out.WriteDouble(tiltY_) &&
+        out.WriteDouble(pressure_) &&
+        out.WriteInt32(axisLong_) &&
+        out.WriteInt32(axisShort_) &&
+        out.WriteInt32(deviceId_)
+    );
 }
 
 bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
 {
-    if (!in.ReadInt32(pointerId_)) {
-        return false;
-    }
-    if (!in.ReadInt64(downTime_)) {
-        return false;
-    }
-    if (!in.ReadBool(pressed_)) {
-        return false;
-    }
-    if (!in.ReadInt32(globalX_)) {
-        return false;
-    }
-    if (!in.ReadInt32(globalY_)) {
-        return false;
-    }
-    if (!in.ReadInt32(localX_)) {
-        return false;
-    }
-    if (!in.ReadInt32(localY_)) {
-        return false;
-    }
-    if (!in.ReadInt32(width_)) {
-        return false;
-    }
-    if (!in.ReadInt32(height_)) {
-        return false;
-    }
-    if (!in.ReadDouble(tiltX_)) {
-        return false;
-    }
-    if (!in.ReadDouble(tiltY_)) {
-        return false;
-    }
-    if (!in.ReadDouble(pressure_)) {
-        return false;
-    }
-    if (!in.ReadInt32(deviceId_)) {
-        return false;
-    }
-    return true;
+    return (
+        in.ReadInt32(pointerId_) &&
+        in.ReadInt64(downTime_) &&
+        in.ReadBool(pressed_) &&
+        in.ReadInt32(globalX_) &&
+        in.ReadInt32(globalY_) &&
+        in.ReadInt32(localX_) &&
+        in.ReadInt32(localY_) &&
+        in.ReadInt32(width_) &&
+        in.ReadInt32(height_) &&
+        in.ReadDouble(tiltX_) &&
+        in.ReadDouble(tiltY_) &&
+        in.ReadDouble(pressure_) &&
+        in.ReadInt32(axisLong_) &&
+        in.ReadInt32(axisShort_) &&
+        in.ReadInt32(deviceId_)
+    );
 }
 
 PointerEvent::PointerEvent(int32_t eventType) : InputEvent(eventType) {}
@@ -883,7 +857,9 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
             << ",LocalX:" << item.GetLocalX() << ",LocalY:" << item.GetLocalY()
             << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
             << ",TiltX:" << item.GetTiltX() << ",TiltY:" << item.GetTiltY()
-            << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType() << std::endl;
+            << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
+            << ",AxisLong:" << item.GetAxisLong() << ",AxisShort:" << item.GetAxisShort()
+            << std::endl;
     }
     std::vector<int32_t> pressedKeys = pointerEvent.GetPressedKeys();
     if (!pressedKeys.empty()) {

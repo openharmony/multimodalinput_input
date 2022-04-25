@@ -446,6 +446,14 @@ public:
          */
         void SetPressure(double pressure);
 
+        int32_t GetAxisLong() const;
+
+        void SetAxisLong(int32_t axisLong);
+
+        int32_t GetAxisShort() const;
+
+        void SetAxisShort(int32_t axisShort);
+
         /**
          * @brief Obtains the ID of the current device.
          * @return Returns the device ID.
@@ -493,6 +501,8 @@ public:
         double  tiltX_ { 0.0 };
         double  tiltY_ { 0.0 };
         double  pressure_ { 0.0 };
+        int32_t axisLong_ { 0 };
+        int32_t axisShort_ { 0 };
         int32_t deviceId_ { 0 };
         int64_t downTime_ { 0 };
         int32_t toolType_ { 0 };
@@ -564,7 +574,8 @@ public:
      * @brief Obtains the pointer item of a specified pointer ID.
      * @param pointerId Indicates the pointer ID.
      * @param pointerItem Indicates the item used to receive the data of the pointer.
-     * @return Returns <b>true</b> if the data of the pointer with the specified ID exists; returns <b>false</b> otherwise.
+     * @return Returns <b>true</b> if the data of the pointer with the specified ID exists;
+     * returns <b>false</b> otherwise.
      * @since 9
      */
     bool GetPointerItem(int32_t pointerId, PointerItem &pointerItem);
