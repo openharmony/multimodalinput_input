@@ -34,9 +34,8 @@ public:
     DISALLOW_COPY_AND_MOVE(MouseEventHandler);
 
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
-    void Normalize(struct libinput_event *event);
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t Normalize(struct libinput_event *event);
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
