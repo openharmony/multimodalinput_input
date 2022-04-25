@@ -393,6 +393,30 @@ public:
          */
         int32_t GetHeight() const;
 
+        int32_t GetToolGlobalX() const;
+
+        void SetToolGlobalX(int32_t globalX);
+
+        int32_t GetToolGlobalY() const;
+
+        void SetToolGlobalY(int32_t globalY);
+
+        int32_t GetToolLocalX() const;
+
+        void SetToolLocalX(int32_t x);
+
+        int32_t GetToolLocalY() const;
+
+        void SetToolLocalY(int32_t y);
+
+        int32_t GetToolWidth() const;
+
+        void SetToolWidth(int32_t width);
+
+        int32_t GetToolHeight() const;
+
+        void SetToolHeight(int32_t height);
+
         /**
          * @brief Sets the height of the pressed area.
          * @param height Indicates the height to set.
@@ -500,6 +524,12 @@ public:
         int32_t height_ { 0 };
         double  tiltX_ { 0.0 };
         double  tiltY_ { 0.0 };
+        int32_t toolGlobalX_ { 0 };
+        int32_t toolGlobalY_ { 0 };
+        int32_t toolLocalX_ { 0 };
+        int32_t toolLocalY_ { 0 };
+        int32_t toolWidth_ { 0 };
+        int32_t toolHeight_ { 0 };
         double  pressure_ { 0.0 };
         int32_t axisLong_ { 0 };
         int32_t axisShort_ { 0 };
