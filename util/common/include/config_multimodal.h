@@ -56,6 +56,8 @@ namespace MMI {
 #define MMISEVER_WMS_DEVICE_REMOVE 2        // notifyDeviceChange@Device removed
 #define SEND_RETRY_LIMIT 32
 #define SEND_RETRY_SLEEP_TIME 100000
+#define ONCE_PROCESS_NETPACKET_LIMIT 100
+#define MAX_RECV_LIMIT 32
 } // namespace MMI
 } // namespace OHOS
 #endif // CONFIG_MULTIMODAL_H

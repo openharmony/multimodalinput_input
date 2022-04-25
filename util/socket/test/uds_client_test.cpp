@@ -45,11 +45,6 @@ public:
         auto retResult = StartClient(fun);
         return retResult;
     }
-
-    void OnRecvTestUnitTest(const char *buf, size_t size)
-    {
-        OnRecv(buf, size);
-    }
 };
 
 #if BINDER_TODO
@@ -180,30 +175,6 @@ HWTEST_F(UDSClientTest, SendMsg_type2_002, TestSize.Level1)
     UDSClient udsClient;
     auto retResult = udsClient.SendMsg(pkt);
     EXPECT_EQ(0, retResult);
-}
-
-HWTEST_F(UDSClientTest, OnRecv_001, TestSize.Level1)
-{
-    const char *buf = nullptr;
-    size_t size = 0;
-    UDSClientUnitTest udsClientUt;
-    udsClientUt.OnRecvTestUnitTest(buf, size);
-}
-
-HWTEST_F(UDSClientTest, OnRecv_002, TestSize.Level1)
-{
-    const char *buf = "3333&";
-    size_t size = 0;
-    UDSClientUnitTest udsClientUt;
-    udsClientUt.OnRecvTestUnitTest(buf, size);
-}
-
-HWTEST_F(UDSClientTest, OnRecv_003, TestSize.Level1)
-{
-    const char *buf = "1234";
-    size_t size = 3;
-    UDSClientUnitTest udsClientUt;
-    udsClientUt.OnRecvTestUnitTest(buf, size);
 }
 
 HWTEST_F(UDSClientTest, Stop_001, TestSize.Level1)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,31 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "net_packet.h"
-
-#include "mmi_log.h"
+#ifndef CIRCLE_STEREAM_BUFFER_H
+#define CIRCLE_STEREAM_BUFFER_H
+#include "stream_buffer.h"
 
 namespace OHOS {
 namespace MMI {
-NetPacket::NetPacket(MmiMessageId msgId) : msgId_(msgId) {}
+class CircleStreamBuffer : public StreamBuffer {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "CircleStreamBuffer"};
+public:
+    CircleStreamBuffer() = default;
+    virtual ~CircleStreamBuffer() = default;
+    DISALLOW_MOVE(CircleStreamBuffer);
 
-NetPacket::NetPacket(const NetPacket& pkt) : NetPacket(pkt.GetMsgId())
-{
-    Clone(pkt);
-}
-NetPacket::~NetPacket() {}
+    bool CheckWrite(size_t size);
+    virtual bool Write(const char *buf, size_t size) override;
 
-void NetPacket::MakeData(StreamBuffer& buf) const
-{
-    PACKHEAD head = {msgId_, wPos_};
-    buf << head;
-    if (wPos_ > 0) {
-        if (!buf.Write(&szBuff_[0], wPos_)) {
-            MMI_HILOGE("Write data to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
-            return;
-        }
-    }
-}
+protected:
+    void CopyDataToBegin();
+};
 } // namespace MMI
 } // namespace OHOS
+#endif // CIRCLE_STEREAM_BUFFER_H
