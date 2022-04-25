@@ -28,9 +28,6 @@ namespace OHOS {
 namespace MMI {
 class InterceptorManagerGlobal : public DelayedSingleton<InterceptorManagerGlobal> {
 public:
-    static constexpr int32_t SOURCETYPE_KEY = 4;
-
-public:
     InterceptorManagerGlobal();
     DISALLOW_COPY_AND_MOVE(InterceptorManagerGlobal);
     ~InterceptorManagerGlobal() = default;
