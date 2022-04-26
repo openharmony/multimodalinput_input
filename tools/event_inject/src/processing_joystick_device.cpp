@@ -22,7 +22,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Proces
 } // namespace
 
 int32_t ProcessingJoystickDevice::TransformJsonDataToInputData(const DeviceItem& originalEvent,
-                                                               InputEventArray& inputEventArray)
+    InputEventArray& inputEventArray)
 {
     CALL_LOG_ENTER;
     if (originalEvent.events.empty()) {

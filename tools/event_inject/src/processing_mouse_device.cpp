@@ -22,7 +22,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Proces
 } // namespace
 
 int32_t ProcessingMouseDevice::TransformJsonDataToInputData(const DeviceItem& fingerEventArrays,
-                                                            InputEventArray& inputEventArray)
+    InputEventArray& inputEventArray)
 {
     CALL_LOG_ENTER;
     std::vector<DeviceEvent> inputData = fingerEventArrays.events;
@@ -39,7 +39,7 @@ int32_t ProcessingMouseDevice::TransformJsonDataToInputData(const DeviceItem& fi
 }
 
 void ProcessingMouseDevice::TransformMouseEventToInputEvent(const std::vector<MouseEvent>& mouseEventArray,
-                                                            InputEventArray& inputEventArray)
+    InputEventArray& inputEventArray)
 {
     for (const auto &item : mouseEventArray) {
         if (item.eventType == "KEY_EVENT_PRESS") {

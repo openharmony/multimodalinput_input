@@ -83,23 +83,9 @@ private:
         bool isMonitorConsumed_ { false };
     };
 
-    struct InterceptorCollection : public IInputEventHandler, protected NoCopyable {
-        virtual int32_t GetPriority() const override;
-        virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) override;
-        virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) override;
-
-        int32_t AddInterceptor(const SessionHandler& interceptor);
-        void RemoveInterceptor(const SessionHandler& interceptor);
-        void OnSessionLost(SessionPtr session);
-
-        std::mutex lockInterceptors_;
-        std::set<SessionHandler> interceptors_;
-    };
-
 private:
     bool sessionLostCallbackInitialized_ { false };
     MonitorCollection monitors_;
-    InterceptorCollection interceptors_;
 };
 } // namespace MMI
 } // namespace OHOS

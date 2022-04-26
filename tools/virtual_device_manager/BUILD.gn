@@ -21,6 +21,7 @@ config("virtual_device_config") {
   include_dirs = [
     "include",
     "//utils/native/base/include",
+    "//util/common/include",
   ]
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -89,7 +90,7 @@ ohos_shared_library("libmmi-virtual-device") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
-  deps = [ "//utils/native/base:utils" ]
+  deps = [ "//foundation/multimodalinput/input/util:libmmi-util" ]
 
   install_enable = true
   part_name = "input"
