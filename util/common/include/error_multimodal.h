@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const int32_t ERROR_UNSUPPORT = -2;
+constexpr int32_t ERROR_UNSUPPORT = -2;
 }
 
 enum MmiModuleType {
