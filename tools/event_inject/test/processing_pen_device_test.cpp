@@ -55,22 +55,13 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputData, TestSize
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::string jsonBuf = ReadFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";
@@ -102,22 +93,12 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataNotfindEve
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::string jsonBuf = ReadFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";
@@ -149,22 +130,12 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataEventsIsEm
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::string jsonBuf = ReadFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";
@@ -196,22 +167,12 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApprochEve
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::string jsonBuf = ReadFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";
@@ -243,22 +204,12 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataSlideEvent
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::string jsonBuf = ReadFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";
@@ -290,22 +241,12 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEvent
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::string jsonBuf = ReadFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";
@@ -337,22 +278,12 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApprochEve
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::string jsonBuf = ReadFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";
@@ -384,22 +315,12 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEvent
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::string jsonBuf = ReadFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";

@@ -28,7 +28,6 @@
 
 #include "if_mmi_client.h"
 #include "input_device_impl.h"
-#include "input_interceptor_manager.h"
 #include "input_monitor_manager.h"
 #include "i_input_event_consumer.h"
 #include "mmi_event_handler.h"
@@ -76,6 +75,8 @@ public:
     void GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> &keyCodes,
         std::function<void(std::map<int32_t, bool>)> callback);
 
+    int32_t SetPointerVisible(bool visible);
+
 private:
     int32_t PackPhysicalDisplay(NetPacket &pkt);
     int32_t PackLogicalDisplay(NetPacket &pkt);
@@ -95,7 +96,6 @@ private:
     std::vector<PhysicalDisplayInfo> physicalDisplays_;
     std::vector<LogicalDisplayInfo> logicalDisplays_;
     InputMonitorManager monitorManager_;
-    InputInterceptorManager interceptorManager_;
 
     std::mutex mtx_;
     std::condition_variable cv_;

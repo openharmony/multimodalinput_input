@@ -49,8 +49,7 @@ void InputDeviceImpl::OnDevMonitorTask(DevMonitor devMonitor, std::string type, 
 {
     CALL_LOG_ENTER;
     devMonitor.second(type, deviceId);
-    MMI_HILOGD("report device changed task, event type:%{public}s device:%{public}d",
-        type.c_str(), deviceId);
+    MMI_HILOGD("report device changed task, event type:%{public}s", type.c_str());
 }
 
 void InputDeviceImpl::OnDevMonitor(std::string type, int32_t deviceId)
@@ -61,8 +60,7 @@ void InputDeviceImpl::OnDevMonitor(std::string type, int32_t deviceId)
         std::bind(&InputDeviceImpl::OnDevMonitorTask, this, devMonitor_, type, deviceId))) {
         MMI_HILOGE("post task failed");
     }
-    MMI_HILOGD("report device changed, event type:%{public}s device:%{public}d",
-        type.c_str(), deviceId);
+    MMI_HILOGD("report device changed, event type:%{public}s", type.c_str());
 }
 
 void InputDeviceImpl::GetInputDeviceIdsAsync(std::function<void(int32_t, std::vector<int32_t>)> callback)
@@ -138,8 +136,8 @@ void InputDeviceImpl::OnInputDeviceTask(InputDeviceImpl::DevInfo devInfo, int32_
     auto devData = std::make_shared<InputDeviceInfo>(id, name, deviceType);
     CHKPV(devData);
     devInfo.second(userData, devData);
-    MMI_HILOGD("report device info task, userData:%{public}d device:%{public}d name:%{public}s type:%{public}d",
-        userData, id, name.c_str(), deviceType);
+    MMI_HILOGD("report device info task, userData:%{public}d name:%{public}s type:%{public}d",
+        userData, name.c_str(), deviceType);
 }
 
 void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, const std::string &name, int32_t deviceType)
@@ -164,8 +162,8 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, const std::str
         std::bind(&InputDeviceImpl::OnInputDeviceTask, this, *devInfo, userData, id, name, deviceType))) {
         MMI_HILOGE("post task failed");
     }
-    MMI_HILOGD("report device info, userData:%{public}d device:%{public}d name:%{public}s type:%{public}d",
-        userData, id, name.c_str(), deviceType);
+    MMI_HILOGD("report device info, userData:%{public}d name:%{public}s type:%{public}d",
+        userData, name.c_str(), deviceType);
 }
 
 void InputDeviceImpl::OnInputDeviceIdsTask(InputDeviceImpl::DevIds devIds, int32_t userData, std::vector<int32_t> ids)

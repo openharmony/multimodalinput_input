@@ -52,16 +52,7 @@ struct DeviceItem {
     std::string ToString() const;
 };
 typedef std::vector<DeviceItem> DeviceItems;
-class InputParse {
-public:
-    InputParse() = default;
-    ~InputParse() = default;
-    DeviceItems DataInit(const std::string &fileData, bool logStatus);
-private:
-    std::vector<DeviceEvent> ParseData(const std::string &info) const;
-    DeviceEvent ParseEvents(const std::string& info) const;
-    DeviceEvent ParseEventsObj(const std::string &info) const;
-};
+DeviceItems DataInit(const std::string &fileData, bool logStatus);
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_PARSE_H

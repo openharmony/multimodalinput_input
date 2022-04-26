@@ -213,6 +213,15 @@ public:
     void GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> keyCodes,
         std::function<void(std::map<int32_t, bool>)> callback);
 
+    /**
+     * @brief Sets whether the pointer icon is visible.
+     * @param visible Whether the pointer icon is visible. The value <b>true</b> indicates that
+     * the pointer icon is visible, and the value <b>false</b> indicates the opposite.
+     * @return void
+     * @since 9
+     */
+    int32_t SetPointerVisible(bool visible);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

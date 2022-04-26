@@ -249,7 +249,7 @@ int32_t MouseEventHandler::Normalize(struct libinput_event *event)
     DumpInner();
     return result;
 }
-
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 void MouseEventHandler::HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY)
 {
     CALL_LOG_ENTER;
@@ -308,6 +308,7 @@ bool MouseEventHandler::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
     DumpInner();
     return bHasPoinerDevice;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 void MouseEventHandler::DumpInner()
 {

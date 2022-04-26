@@ -137,5 +137,10 @@ void InputManager::GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> ke
 {
     InputMgrImpl->GetKeystrokeAbility(deviceId, keyCodes, callback);
 }
+
+int32_t InputManager::SetPointerVisible(bool visible)
+{
+    return InputMgrImpl->GetInstance()->SetPointerVisible(visible);
+}
 } // namespace MMI
 } // namespace OHOS
