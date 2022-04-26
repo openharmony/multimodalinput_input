@@ -552,6 +552,7 @@ void JsEventTarget::EmitJsKeyboardType(int32_t userData, int32_t keyboardType)
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     int32_t *uData = new (std::nothrow) int32_t(userData);
+    CHKPV(uData);
     work->data = static_cast<void*>(uData);
     int32_t ret = 0;
     if (iter->second->ref == nullptr) {
@@ -570,21 +571,25 @@ void JsEventTarget::EmitJsKeyboardType(int32_t userData, int32_t keyboardType)
 void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
-    JsUtil jsUtil;
-    int32_t userData = jsUtil.GetInt32(work);
-    auto iter = callback_.find(userData);
-    if (iter == callback_.end()) {
-        MMI_HILOGE("find userData failed");
-        return;
-    }
-    auto cbTemp = std::move(iter->second);
-    callback_.erase(iter);
+    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
+    do {
+        std::lock_guard<std::mutex> guard(mutex_);
+        JsUtil jsUtil;
+        int32_t userData = jsUtil.GetUserData(work);
+        auto iter = callback_.find(userData);
+        if (iter == callback_.end()) {
+            MMI_HILOGE("find userData failed");
+            return;
+        }
+        cbTemp = std::move(iter->second);
+        callback_.erase(iter);
+    } while (0);
+    CHKPV(cbTemp);
     CHKPV(cbTemp->env);
-    napi_value keyboardType = nullptr;
 
+    napi_value keyboardType = nullptr;
     CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.keyboardType, &keyboardType), CREATE_INT32);
     napi_value handlerTemp = nullptr;
     CHKRV(cbTemp->env, napi_get_reference_value(cbTemp->env, cbTemp->ref, &handlerTemp), GET_REFERENCE);
@@ -595,18 +600,22 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
 void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
-    JsUtil jsUtil;
-    int32_t userData = jsUtil.GetInt32(work);
-    auto iter = callback_.find(userData);
-    if (iter == callback_.end()) {
-        MMI_HILOGE("find userData failed");
-        return;
-    }
-    auto cbTemp = std::move(iter->second);
-    callback_.erase(iter);
+    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
+    do {
+        std::lock_guard<std::mutex> guard(mutex_);
+        JsUtil jsUtil;
+        int32_t userData = jsUtil.GetUserData(work);
+        auto iter = callback_.find(userData);
+        if (iter == callback_.end()) {
+            MMI_HILOGE("find userData failed");
+            return;
+        }
+        cbTemp = std::move(iter->second);
+        callback_.erase(iter);
+    } while (0);
+    CHKPV(cbTemp);
     CHKPV(cbTemp->env);
 
     napi_value keyboardType = nullptr;
