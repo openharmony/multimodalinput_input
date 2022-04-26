@@ -20,13 +20,13 @@
 #include <sstream>
 
 #include "bytrace_adapter.h"
+#include "define_interceptor_manager.h"
 #include "input_device_impl.h"
 #include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
 #include "input_handler_manager.h"
 #include "input_manager_impl.h"
 #include "input_monitor_manager.h"
-#include "interceptor_manager.h"
 #include "mmi_client.h"
 #include "mmi_func_callback.h"
 #include "multimodal_event_handler.h"
@@ -241,7 +241,7 @@ int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& p
     for (int32_t i = 0; i < size; i++) {
         int32_t deviceId = 0;
         if (!pkt.Read(deviceId)) {
-            MMI_HILOGE("Packet read device failed");
+            MMI_HILOGE("Packet read deviceId failed");
             return RET_ERR;
         }
         inputDeviceIds.push_back(deviceId);
@@ -262,7 +262,7 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
         return RET_ERR;
     }
     if (!pkt.Read(id)) {
-        MMI_HILOGE("Packet read data failed");
+        MMI_HILOGE("Packet read id failed");
         return RET_ERR;
     }
     if (!pkt.Read(name)) {
@@ -288,7 +288,7 @@ int32_t ClientMsgHandler::OnKeyList(const UDSClient& client, NetPacket& pkt)
     }
     size_t size;
     if (!pkt.Read(size)) {
-        MMI_HILOGE("Packet read userData failed");
+        MMI_HILOGE("Packet read size failed");
         return RET_ERR;
     }
     int32_t keyCode;
@@ -315,12 +315,12 @@ int32_t ClientMsgHandler::OnDevMonitor(const UDSClient& client, NetPacket& pkt)
     CALL_LOG_ENTER;
     std::string type;
     if (!pkt.Read(type)) {
-        MMI_HILOGE("Packet read userData failed");
+        MMI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
     int32_t deviceId;
     if (!pkt.Read(deviceId)) {
-        MMI_HILOGE("Packet read userData failed");
+        MMI_HILOGE("Packet read deviceId failed");
         return RET_ERR;
     }
     InputDeviceImpl::GetInstance().OnDevMonitor(type, deviceId);
@@ -388,7 +388,7 @@ int32_t ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetP
     }
     MMI_HILOGD("client receive the msg from server: pointId:%{public}d,pid:%{public}d",
                pointerEvent->GetPointerId(), pid);
-    return InterceptorMgr.OnPointerEvent(pointerEvent, id);
+    return InterMgr->OnPointerEvent(pointerEvent, id);
 }
 
 int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket& pkt)
@@ -409,7 +409,7 @@ int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
     MMI_HILOGD("client receive the msg from server: keyCode:%{public}d,pid:%{public}d",
         keyEvent->GetKeyCode(), pid);
-    return InterceptorMgr.OnKeyEvent(keyEvent);
+    return InterMgr->OnKeyEvent(keyEvent);
 }
 
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)

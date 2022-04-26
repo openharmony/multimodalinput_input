@@ -47,11 +47,6 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
         SessionHandler mon { handlerId, handlerType, session };
         return monitors_.AddMonitor(mon);
     }
-    if (handlerType == InputHandlerType::INTERCEPTOR) {
-        MMI_HILOGD("Register interceptor:%{public}d", handlerId);
-        SessionHandler interceptor { handlerId, handlerType, session };
-        return interceptors_.AddInterceptor(interceptor);
-    }
     MMI_HILOGW("Invalid handler type:%{public}d", handlerType);
     return RET_ERR;
 }
@@ -67,10 +62,6 @@ void InputHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
         MMI_HILOGD("Unregister monitor:%{public}d", handlerId);
         SessionHandler monitor { handlerId, handlerType, session };
         monitors_.RemoveMonitor(monitor);
-    } else if (handlerType == InputHandlerType::INTERCEPTOR) {
-        MMI_HILOGD("Unregister interceptor:%{public}d", handlerId);
-        SessionHandler interceptor { handlerId, handlerType, session };
-        interceptors_.RemoveInterceptor(interceptor);
     }
 }
 
@@ -84,14 +75,6 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGD("Handle KeyEvent");
     CHKPF(keyEvent);
-    if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
-        MMI_HILOGD("This event has been tagged as not to be intercepted");
-    } else {
-        if (interceptors_.HandleEvent(keyEvent)) {
-            MMI_HILOGD("Key event was intercepted");
-            return true;
-        }
-    }
     if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_NO_MONITOR)) {
         MMI_HILOGD("This event has been tagged as not to be monitored");
     } else {
@@ -106,14 +89,6 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
-    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
-        MMI_HILOGD("This event has been tagged as not to be intercepted");
-    } else {
-        if (interceptors_.HandleEvent(pointerEvent)) {
-            MMI_HILOGD("Pointer event was intercepted");
-            return true;
-        }
-    }
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_NO_MONITOR)) {
         MMI_HILOGD("This event has been tagged as not to be monitored");
     } else {
@@ -142,7 +117,6 @@ void InputHandlerManagerGlobal::InitSessionLostCallback()
 void InputHandlerManagerGlobal::OnSessionLost(SessionPtr session)
 {
     monitors_.OnSessionLost(session);
-    interceptors_.OnSessionLost(session);
 }
 
 void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent) const
@@ -305,78 +279,6 @@ void InputHandlerManagerGlobal::MonitorCollection::OnSessionLost(SessionPtr sess
             ++cItr;
         } else {
             cItr = monitors_.erase(cItr);
-        }
-    }
-}
-
-int32_t InputHandlerManagerGlobal::InterceptorCollection::GetPriority() const
-{
-    return IInputEventHandler::DEFAULT_INTERCEPTOR;
-}
-
-bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
-{
-    CHKPF(keyEvent);
-    std::lock_guard<std::mutex> guard(lockInterceptors_);
-    if (interceptors_.empty()) {
-        return false;
-    }
-    MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
-    for (const auto &interceptor : interceptors_) {
-        interceptor.SendToClient(keyEvent);
-    }
-    return true;
-}
-
-bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CHKPF(pointerEvent);
-    std::lock_guard<std::mutex> guard(lockInterceptors_);
-    if (interceptors_.empty()) {
-        return false;
-    }
-    MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
-    for (const auto &interceptor : interceptors_) {
-        interceptor.SendToClient(pointerEvent);
-    }
-    return true;
-}
-
-int32_t InputHandlerManagerGlobal::InterceptorCollection::AddInterceptor(const SessionHandler& interceptor)
-{
-    std::lock_guard<std::mutex> guard(lockInterceptors_);
-    if (interceptors_.size() >= MAX_N_INPUT_INTERCEPTORS) {
-        MMI_HILOGE("The number of interceptors exceeds limit");
-        return RET_ERR;
-    }
-    auto ret = interceptors_.insert(interceptor);
-    if (ret.second) {
-        MMI_HILOGD("Register interceptor successfully");
-    } else {
-        MMI_HILOGW("Duplicate interceptors");
-    }
-    return RET_OK;
-}
-
-void InputHandlerManagerGlobal::InterceptorCollection::RemoveInterceptor(const SessionHandler& interceptor)
-{
-    std::lock_guard<std::mutex> guard(lockInterceptors_);
-    std::set<SessionHandler>::const_iterator tItr = interceptors_.find(interceptor);
-    if (tItr != interceptors_.cend()) {
-        interceptors_.erase(tItr);
-        MMI_HILOGD("Unregister interceptor successfully");
-    }
-}
-
-void InputHandlerManagerGlobal::InterceptorCollection::OnSessionLost(SessionPtr session)
-{
-    std::lock_guard<std::mutex> guard(lockInterceptors_);
-    std::set<SessionHandler>::const_iterator cItr = interceptors_.cbegin();
-    while (cItr != interceptors_.cend()) {
-        if (cItr->session_ != session) {
-            ++cItr;
-        } else {
-            cItr = interceptors_.erase(cItr);
         }
     }
 }

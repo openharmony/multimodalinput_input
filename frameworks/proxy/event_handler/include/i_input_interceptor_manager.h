@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,27 +12,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef I_INPUT_INTERCEPTOR_MANAGER_H
+#define I_INPUT_INTERCEPTOR_MANAGER_H
 
-#ifndef INPUT_MANAGER_COMMAND_H
-#define INPUT_MANAGER_COMMAND_H
-
-#include <string>
-#include <vector>
 #include "nocopyable.h"
+#include "singleton.h"
+
+#include "i_input_event_consumer.h"
 
 namespace OHOS {
 namespace MMI {
-class InputManagerCommand {
+class IInputInterceptorManager : public DelayedSingleton<IInputInterceptorManager> {
 public:
-    InputManagerCommand() = default;
-    DISALLOW_COPY_AND_MOVE(InputManagerCommand);
-    int32_t ParseCommand(int32_t argc, char *argv[]);
-    int32_t ConnectService();
-    void ShowUsage();
-private:
-    void InitializeMouseDeathStub();
-    int32_t NextPos(int32_t begPos, int32_t endPos, int64_t begTime, int64_t endTime, int64_t curTime);
+    IInputInterceptorManager() = default;
+    ~IInputInterceptorManager() = default;
+    DISALLOW_COPY_AND_MOVE(IInputInterceptorManager);
+    int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
+    void RemoveInterceptor(int32_t interceptorId);
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // INPUT_MANAGER_COMMAND_H
+#endif // I_INPUT_INTERCEPTOR_MANAGER_H

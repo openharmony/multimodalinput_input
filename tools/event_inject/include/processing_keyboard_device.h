@@ -35,7 +35,7 @@ public:
 private:
     int32_t AnalysisKeyBoardEvent(const std::vector<DeviceEvent>& inputData, std::vector<KeyBoardEvent>& keyBoardEvent);
     void TransformKeyBoardEventToInputEvent(const std::vector<KeyBoardEvent>& keyBoardEventArray,
-                                            InputEventArray& inputEventArray);
+        InputEventArray& inputEventArray);
     void TransformKeyPressEvent(const KeyBoardEvent& keyBoardEvent, InputEventArray& inputEventArray);
     void TransformKeyLongPressEvent(const KeyBoardEvent& keyBoardEvent, InputEventArray& inputEventArray);
     void TransformKeyReleaseEvent(const KeyBoardEvent& keyBoardEvent, InputEventArray& inputEventArray);

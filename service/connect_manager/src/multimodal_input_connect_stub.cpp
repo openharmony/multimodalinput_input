@@ -19,6 +19,7 @@
 #include <sys/socket.h>
 
 #include "string_ex.h"
+#include "accesstoken_kit.h"
 
 #include "error_multimodal.h"
 #include "mmi_log.h"
@@ -48,6 +49,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         }
         case IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER: {
             return StubAddInputEventFilter(data, reply);
+        }
+        case IMultimodalInputConnect::POINTER_VISIBLE_PROPERTY: {
+            return StubSetPointerVisible(data, reply);
         }
         default: {
             MMI_HILOGE("unknown code:%{public}u, go switch defaut", code);
@@ -94,6 +98,64 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
     }
 
     MMI_HILOGD("ret:%{public}d", ret);
+    return RET_OK;
+}
+
+bool MultimodalInputConnectStub::CheckPermission()
+{
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
+        OHOS::Security::AccessToken::HapTokenInfo findInfo;
+        if (OHOS::Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, findInfo) != 0) {
+            MMI_HILOGE("GetHapTokenInfo failed");
+            return false;
+        }
+        if (findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_BASIC ||
+            findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_CORE) {
+            MMI_HILOGI("check hap permisson success");
+            return true;
+        }
+        MMI_HILOGE("check hap permisson failed");
+        return false;
+    }
+    if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
+        OHOS::Security::AccessToken::NativeTokenInfo findInfo;
+        if (OHOS::Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, findInfo) != 0) {
+            MMI_HILOGE("GetNativeTokenInfo failed");
+            return false;
+        }
+        if (findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_BASIC ||
+            findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_CORE) {
+            MMI_HILOGI("check native permisson success");
+            return true;
+        }
+        MMI_HILOGE("check native permisson failed");
+        return false;
+    }
+    
+    MMI_HILOGE("unsupported token type:%{public}d", tokenType);
+    return false;
+}
+
+int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    if (!CheckPermission()) {
+        MMI_HILOGE("permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+    int32_t ret;
+    bool visible;
+    if (!data.ReadBool(visible)) {
+        MMI_HILOGE("data ReadBool fail");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    ret = SetPointerVisible(visible);
+    if (!reply.WriteInt32(ret)) {
+        MMI_HILOGE("WriteInt32:%{public}d fail", ret);
+        return IPC_STUB_WRITE_PARCEL_ERR;
+    }
     return RET_OK;
 }
 } // namespace MMI

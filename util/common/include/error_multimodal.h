@@ -37,6 +37,7 @@ enum {
     EVENT_CONSUM_FAIL,                          // 事件消费失败
     UNKNOW_TOUCH_TYPE,                          // 客户端处理Touch时间时，收到了客户端发来的位置类型
     STRCPY_S_CALLBACK_FAIL,                     // strcpy_s返回错误
+    CHECK_PERMISSION_FAIL,                      // APL鉴权失败
 };
 
 // Error code for event simulate

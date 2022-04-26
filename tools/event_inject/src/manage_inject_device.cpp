@@ -59,7 +59,6 @@ int32_t ManageInjectDevice::TransformJsonData(const DeviceItems& configData)
             return ret;
         }
     }
-
     return RET_OK;
 }
 
