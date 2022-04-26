@@ -147,6 +147,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
     }
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent_->UpdateId();
+    MMI_HILOGD("Pointer event dispatcher of server:");
     PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(), pointerEvent_->GetPointersIdList().size());
     return pointerEvent_;
 }

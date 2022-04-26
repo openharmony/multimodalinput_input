@@ -97,8 +97,8 @@ constexpr int32_t EVENT_TYPE_POINTER = 0X00020000;
 constexpr int32_t TIMEOUT = 100000;
 constexpr int32_t POINTER_ACTION_UP = 4;
 constexpr int32_t POINTER_ACTION_MOVE = 3;
-constexpr int32_t FINAL_FINGER = 1; 
-} //namespace
+constexpr int32_t FINAL_FINGER = 1;
+} // namespace
 
 class InnerFunctionTracer {
 public:
@@ -127,7 +127,7 @@ static void PrintEventData(std::shared_ptr<Event> event, int32_t actionType, int
         if ((actionType == POINTER_ACTION_MOVE) && (event->GetActionTime() - nowTimeUSec <= TIMEOUT)) {
             ++dropped;
             return;
-        } 
+        }
         if (actionType == POINTER_ACTION_UP && itemNum == FINAL_FINGER) {
             MMI_HILOGD("This touch process discards %{public}d high frequent events", dropped);
             dropped = 0;
@@ -141,7 +141,6 @@ static void PrintEventData(std::shared_ptr<Event> event, int32_t actionType, int
         MMI_HILOGD("%{public}s", sLine.c_str());
     }
 }
-
 } // namespace MMI
 } // namespace OHOS
 
