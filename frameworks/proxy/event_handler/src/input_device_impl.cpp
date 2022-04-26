@@ -258,8 +258,7 @@ void InputDeviceImpl::OnKeyboardType(int32_t userData, int32_t keyboardType)
 {
     CHK_PIDANDTID();
     std::lock_guard<std::mutex> guard(mtx_);
-    auto iter = inputDevices_.find(userData);
-    if (iter == inputDevices_.end()) {
+    if (auto iter = inputDevices_.find(userData); iter == inputDevices_.end()) {
         MMI_HILOGD("find userData failed");
         return;
     }
@@ -303,10 +302,7 @@ const InputDeviceImpl::DevKeys* InputDeviceImpl::GetDeviceKeys(int32_t userData)
 const InputDeviceImpl::DevKeyboardTypes* InputDeviceImpl::GetKeyboardTypes(int32_t userData) const
 {
     auto iter = inputDevices_.find(userData);
-    if (iter == inputDevices_.end()) {
-        return nullptr;
-    }
-    return &iter->second.kbTypes;
+    return iter == inputDevices_.end()? nullptr : &iter->second.kbTypes;
 }
 
 int32_t InputDeviceImpl::GetUserData()
