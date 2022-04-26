@@ -20,13 +20,13 @@
 #include <sstream>
 
 #include "bytrace_adapter.h"
+#include "define_interceptor_manager.h"
 #include "input_device_impl.h"
 #include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
 #include "input_handler_manager.h"
 #include "input_manager_impl.h"
 #include "input_monitor_manager.h"
-#include "interceptor_manager.h"
 #include "mmi_client.h"
 #include "mmi_func_callback.h"
 #include "multimodal_event_handler.h"
@@ -388,7 +388,7 @@ int32_t ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetP
     }
     MMI_HILOGD("client receive the msg from server: pointId:%{public}d,pid:%{public}d",
                pointerEvent->GetPointerId(), pid);
-    return InterceptorMgr.OnPointerEvent(pointerEvent, id);
+    return InterMgr->OnPointerEvent(pointerEvent, id);
 }
 
 int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket& pkt)
@@ -409,7 +409,7 @@ int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
     MMI_HILOGD("client receive the msg from server: keyCode:%{public}d,pid:%{public}d",
         keyEvent->GetKeyCode(), pid);
-    return InterceptorMgr.OnKeyEvent(keyEvent);
+    return InterMgr->OnKeyEvent(keyEvent);
 }
 
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)

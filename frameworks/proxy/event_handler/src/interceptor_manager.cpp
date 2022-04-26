@@ -20,6 +20,7 @@
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+#include "multimodal_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -27,12 +28,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManager" };
 } // namespace
 
-InterceptorManager::InterceptorManager()
-{
-    InterceptorItemId = 0;
-}
-
-InterceptorManager::~InterceptorManager() {}
+InterceptorManager::InterceptorManager() {}
 
 int32_t InterceptorManager::AddInterceptor(int32_t sourceType,
     std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
@@ -56,11 +52,9 @@ int32_t InterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<Ke
     interceptorItem.sourceType = SOURCETYPE_KEY;
     interceptorItem.callback_ = interceptor;
     interceptor_.push_back(interceptorItem);
-    if (MMIEventHdl.AddInterceptor(interceptorItem.sourceType, interceptorItem.id_) == RET_OK) {
-        MMI_HILOGD("Add AddInterceptor KeyEvent to InterceptorManager success");
-        return MMI_STANDARD_EVENT_SUCCESS;
-    }
-    return MMI_STANDARD_EVENT_INVALID_PARAM;
+    MMIEventHdl.AddInterceptor(interceptorItem.sourceType, interceptorItem.id_);
+    MMI_HILOGD("Add AddInterceptor KeyEvent to InterceptorManager success");
+    return interceptorItem.id_;
 }
 
 void InterceptorManager::RemoveInterceptor(int32_t interceptorId)
@@ -74,11 +68,11 @@ void InterceptorManager::RemoveInterceptor(int32_t interceptorId)
     auto iter = std::find(interceptor_.begin(), interceptor_.end(), interceptorItem);
     if (iter == interceptor_.end()) {
         MMI_HILOGE("InterceptorItem does not exist");
-    } else {
-        iter = interceptor_.erase(iter);
-        MMIEventHdl.RemoveInterceptor(interceptorItem.id_);
-        MMI_HILOGD("InterceptorItem id:%{public}d removed success", interceptorId);
+        return;
     }
+    iter = interceptor_.erase(iter);
+    MMIEventHdl.RemoveInterceptor(interceptorItem.id_);
+    MMI_HILOGD("InterceptorItem id:%{public}d removed success", interceptorId);
 }
 
 int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id)
