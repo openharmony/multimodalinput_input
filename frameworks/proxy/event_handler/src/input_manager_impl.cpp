@@ -472,7 +472,7 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
         MMI_HILOGE("Failed to inject move mouse offset event");
     }
 #else
-    MMI_HILOGI("Pointer drawing module dose not support, move mouse failed");
+    MMI_HILOGW("Pointer drawing module dose not support");
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
@@ -579,9 +579,9 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible)
     }
     return ret;
 #else
-    MMI_HILOGD("disable pointer drawing");
-    return RET_ERR;
-#endif
+    MMI_HILOGW("Pointer drawing module dose not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
 void InputManagerImpl::OnConnected()
