@@ -25,8 +25,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsUti
 const std::string GET_REFERENCE = "napi_get_reference_value";
 const std::string STRICT_EQUALS = "napi_strict_equals";
 const std::string DELETE_REFERENCE = "napi_delete_reference";
+const std::string DELETE_ASYNC_WORK = "napi_delete_async_work";
 } // namespace
-int32_t JsUtil::GetInt32(uv_work_t *work)
+int32_t JsUtil::GetUserData(uv_work_t *work)
 {
     int32_t *uData = static_cast<int32_t*>(work->data);
     int32_t userData = *uData;
@@ -51,6 +52,18 @@ JsUtil::CallbackInfo::~CallbackInfo()
     CALL_LOG_ENTER;
     if (ref != nullptr && env != nullptr) {
         CHKRV(env, napi_delete_reference(env, ref), DELETE_REFERENCE);
+        env = nullptr;
+    }
+}
+
+AsyncContext::~AsyncContext()
+{
+    CALL_LOG_ENTER;
+    if (work != nullptr) {
+        CHKRV(env, napi_delete_async_work(env, work), DELETE_ASYNC_WORK);
+    }
+    if (callback != nullptr && env != nullptr) {
+        CHKRV(env, napi_delete_reference(env, callback), DELETE_REFERENCE);
         env = nullptr;
     }
 }

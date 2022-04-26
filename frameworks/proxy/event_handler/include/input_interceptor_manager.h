@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_INPUT_INTERCEPTOR_MANAGER_H
-#define OHOS_MULTIMDOALINPUT_INPUT_INTERCEPTOR_MANAGER_H
+#ifndef INPUT_INTERCEPTOR_MANAGER_H
+#define INPUT_INTERCEPTOR_MANAGER_H
 
 #include <memory>
 
@@ -26,10 +26,11 @@
 
 namespace OHOS {
 namespace MMI {
-class InputInterceptorManager {
+class InputInterceptorManager : public DelayedSingleton<InputInterceptorManager> {
 public:
-    InputInterceptorManager() = default;
+    InputInterceptorManager();
     DISALLOW_COPY_AND_MOVE(InputInterceptorManager);
+    ~InputInterceptorManager() = default;
 
 public:
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
@@ -45,4 +46,4 @@ inline bool InputInterceptorManager::IsValidInterceptorId(int32_t interceptorId)
 }
 } // namespace MMI
 } // namespace OHOS
-#endif // OHOS_MULTIMDOALINPUT_INPUT_INTERCEPTOR_MANAGER_H
+#endif // INPUT_INTERCEPTOR_MANAGER_H

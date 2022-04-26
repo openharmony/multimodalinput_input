@@ -70,22 +70,12 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileNotEmpty, TestSi
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::string jsonBuf = ReadFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";
@@ -117,22 +107,12 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataGetDeviceNodeError, TestS
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::string jsonBuf = ReadFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";
