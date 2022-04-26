@@ -194,7 +194,7 @@ void InputWindowsManager::RotateTouchScreen(const PhysicalDisplayInfo* info, Log
         int32_t temp = coord.x;
         coord.x = info->logicHeight - coord.y;
         coord.y = temp;
-        MMI_HILOGD("logicalX is %{public}d, logicalY is %{public}d", coord.x, coord.y);
+        MMI_HILOGD("logicalX:%{public}d, logicalY:%{public}d", coord.x, coord.y);
         return;
     }
     if (direction == Direction180) {
@@ -270,8 +270,8 @@ bool InputWindowsManager::TouchMotionPointToDisplayPoint(struct libinput_event_t
             touchInfo.toolRect.point.x -= display.topLeftX;
             touchInfo.toolRect.point.y -= display.topLeftY;
             AdjustGlobalCoordinate(display, touchInfo.toolRect.point);
-            MMI_HILOGD("Motion targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d, "
-                       "toolDisplayX is %{public}d, toolDisplayY is %{public}d ",
+            MMI_HILOGD("Motion targetDisplay:%{public}d, displayX:%{public}d, displayY:%{public}d, "
+                       "toolDisplayX:%{public}d, toolDisplayY:%{public}d ",
                        targetDisplayId, touchInfo.point.x, touchInfo.point.y,
                        touchInfo.toolRect.point.x, touchInfo.toolRect.point.y);
             return true;
@@ -302,8 +302,8 @@ bool InputWindowsManager::TouchDownPointToDisplayPoint(struct libinput_event_tou
         touchInfo.toolRect.point.x -= display.topLeftX;
         touchInfo.toolRect.point.y -= display.topLeftY;
         AdjustGlobalCoordinate(display, touchInfo.toolRect.point);
-        MMI_HILOGD("Down tlogicalDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d, "
-                   "toolDisplayX is %{public}d, toolDisplayY is %{public}d ",
+        MMI_HILOGD("Down tlogicalDisplay:%{public}d, displayX:%{public}d, displayY:%{public}d, "
+                   "toolDisplayX:%{public}d, toolDisplayY:%{public}d ",
                    logicalDisplayId, touchInfo.point.x, touchInfo.point.y,
                    touchInfo.toolRect.point.x, touchInfo.toolRect.point.y);
         return true;
@@ -393,7 +393,7 @@ bool InputWindowsManager::CalculateTipPoint(struct libinput_event_tablet_tool* t
         tCoord.y -= displayInfo.topLeftY;
         AdjustGlobalCoordinate(displayInfo, tCoord);
         coord = tCoord;
-        MMI_HILOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
+        MMI_HILOGD("targetDisplay:%{public}d, displayX:%{public}d, displayY:%{public}d ",
             targetDisplayId, coord.x, coord.y);
         return true;
     }

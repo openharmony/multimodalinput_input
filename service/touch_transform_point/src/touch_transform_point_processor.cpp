@@ -87,12 +87,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_HILOGD("LogicalX:%{public}d, logicalY:%{public}d, toolLogicalX:%{public}d, toollogicalY:%{public}d,"
-               "ToolWidth:%{public}d, ToolHeight:%{public}d, logicalDisplay:%{public}d, pressure:%{public}f,"
-               "axisLong:%{public}d, axisShort:%{public}d",
-               touchInfo.point.x, touchInfo.point.y, touchInfo.toolRect.point.x, touchInfo.toolRect.point.y,
-               touchInfo.toolRect.width, touchInfo.toolRect.height, logicalDisplayId, pressure,
-               axisLong, axisShort);
+    PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(), pointerEvent_->GetPointersIdList().size());
     return true;
 }
 
@@ -131,12 +126,7 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
     item.SetToolHeight(touchInfo.toolRect.height);
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_HILOGD("LogicalX:%{public}d, logicalY:%{public}d, toolLogicalX:%{public}d, toollogicalY:%{public}d,"
-               "ToolWidth:%{public}d, ToolHeight:%{public}d, pressure:%{public}f,"
-               "axisLong:%{public}d, axisShort:%{public}d",
-               touchInfo.point.x, touchInfo.point.y, touchInfo.toolRect.point.x, touchInfo.toolRect.point.y,
-               touchInfo.toolRect.width, touchInfo.toolRect.height, pressure,
-               axisLong, axisShort);
+    PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(), pointerEvent_->GetPointersIdList().size());
     return true;
 }
 
