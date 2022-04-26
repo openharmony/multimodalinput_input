@@ -21,9 +21,9 @@
 #include "error_multimodal.h"
 
 #include "bytrace_adapter.h"
+#include "define_interceptor_manager.h"
 #include "event_filter_service.h"
 #include "input_event_monitor_manager.h"
-#include "interceptor_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
@@ -484,7 +484,7 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
         return -1;
     }
     std::lock_guard<std::mutex> guard(mtx_);
-    int32_t interceptorId = interceptorManager_.AddInterceptor(interceptor);
+    int32_t interceptorId = InputInterMgr->AddInterceptor(interceptor);
     if (interceptorId >= 0) {
         interceptorId = interceptorId * ADD_MASK_BASE + MASK_TOUCH;
     }
@@ -508,7 +508,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
         MMI_HILOGE("client init failed");
         return -1;
     }
-    int32_t interceptorId = InterceptorMgr.AddInterceptor(interceptor);
+    int32_t interceptorId = InterMgr->AddInterceptor(interceptor);
     if (interceptorId >= 0) {
         interceptorId = interceptorId * ADD_MASK_BASE + MASK_KEY;
     }
@@ -530,17 +530,16 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
     interceptorId /= ADD_MASK_BASE;
     switch (mask) {
         case MASK_TOUCH: {
-            interceptorManager_.RemoveInterceptor(interceptorId);
+            InputInterMgr->RemoveInterceptor(interceptorId);
             break;
         }
         case MASK_KEY: {
-            InterceptorMgr.RemoveInterceptor(interceptorId);
+            InterMgr->RemoveInterceptor(interceptorId);
             break;
         }
-        default: {
+        default:
             MMI_HILOGE("Can't find the mask, mask:%{public}d", mask);
             break;
-        }
     }
 }
 

@@ -28,7 +28,6 @@
 
 #include "if_mmi_client.h"
 #include "input_device_impl.h"
-#include "input_interceptor_manager.h"
 #include "input_monitor_manager.h"
 #include "i_input_event_consumer.h"
 #include "mmi_event_handler.h"
@@ -97,7 +96,6 @@ private:
     std::vector<PhysicalDisplayInfo> physicalDisplays_;
     std::vector<LogicalDisplayInfo> logicalDisplays_;
     InputMonitorManager monitorManager_;
-    InputInterceptorManager interceptorManager_;
 
     std::mutex mtx_;
     std::condition_variable cv_;
