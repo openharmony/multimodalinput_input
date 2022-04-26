@@ -77,7 +77,7 @@ private:
     const PhysicalDisplayInfo* FindPhysicalDisplayInfo(const std::string& seatId, const std::string& seatName) const;
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
     void SelectWindowInfo(const int32_t& globalX, const int32_t& globalY,
-        const std::shared_ptr<PointerEvent>& pointerEvent, LogicalDisplayInfo* const logicalDisplayInfo,
+        const std::shared_ptr<PointerEvent>& pointerEvent, LogicalDisplayInfo * const logicalDisplayInfo,
         WindowInfo*& touchWindow);
 
 private:
