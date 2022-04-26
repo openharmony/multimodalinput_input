@@ -573,19 +573,7 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
     CALL_LOG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
-    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
-    do {
-        std::lock_guard<std::mutex> guard(mutex_);
-        JsUtil jsUtil;
-        int32_t userData = jsUtil.GetUserData(work);
-        auto iter = callback_.find(userData);
-        if (iter == callback_.end()) {
-            MMI_HILOGE("find userData failed");
-            return;
-        }
-        cbTemp = std::move(iter->second);
-        callback_.erase(iter);
-    } while (0);
+    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = GetCallbackInfo(work);
     CHKPV(cbTemp);
     CHKPV(cbTemp->env);
 
@@ -602,19 +590,7 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
     CALL_LOG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
-    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
-    do {
-        std::lock_guard<std::mutex> guard(mutex_);
-        JsUtil jsUtil;
-        int32_t userData = jsUtil.GetUserData(work);
-        auto iter = callback_.find(userData);
-        if (iter == callback_.end()) {
-            MMI_HILOGE("find userData failed");
-            return;
-        }
-        cbTemp = std::move(iter->second);
-        callback_.erase(iter);
-    } while (0);
+    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = GetCallbackInfo(work);
     CHKPV(cbTemp);
     CHKPV(cbTemp->env);
 
@@ -692,6 +668,24 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, in
     CHKRP(env, napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
     callback_.emplace(userData, std::move(cb));
     return nullptr;
+}
+
+std::unique_ptr<JsUtil::CallbackInfo> JsEventTarget::GetCallbackInfo(uv_work_t *work)
+{
+    std::lock_guard<std::mutex> guard(mutex_);
+    int32_t *uData = static_cast<int32_t*>(work->data);
+    int32_t userData = *uData;
+    delete uData;
+    delete work;
+
+    auto iter = callback_.find(userData);
+    if (iter == callback_.end()) {
+        MMI_HILOGE("find userData failed");
+        return nullptr;
+    }
+    auto cbTemp = std::move(iter->second);
+    callback_.erase(iter);
+    return cbTemp;
 }
 
 void JsEventTarget::ResetEnv()
