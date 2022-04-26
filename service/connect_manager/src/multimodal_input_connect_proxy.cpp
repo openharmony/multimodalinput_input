@@ -122,7 +122,7 @@ int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
 
     MessageParcel reply;
     MessageOption option;
-    int32_t requestResult = Remote()->SendRequest(POINTER_VISIBLE_PROPERTY, data, reply, option);
+    int32_t requestResult = Remote()->SendRequest(SET_POINTER_VISIBLE, data, reply, option);
     if (requestResult != NO_ERROR) {
         MMI_HILOGE("send request fail, result:%{public}d", requestResult);
         return RET_ERR;

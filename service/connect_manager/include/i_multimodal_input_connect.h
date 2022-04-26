@@ -35,7 +35,7 @@ public:
     enum {
         ALLOC_SOCKET_FD = 0,
         ADD_INPUT_EVENT_FILTER = 1,
-        POINTER_VISIBLE_PROPERTY = 2,
+        SET_POINTER_VISIBLE = 2,
     };
 
     enum {

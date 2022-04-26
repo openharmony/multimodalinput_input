@@ -70,14 +70,14 @@ napi_value JsInputDeviceManager::GetDevice(napi_env env, int32_t id, napi_value 
     return ret;
 }
 
-void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
+void AsyncSetPointerVisible(sptr<AsyncContext> asyncContext)
 {
     CALL_LOG_ENTER;
     CHKPV(asyncContext);
     CHKPV(asyncContext->env);
     napi_env env = asyncContext->env;
     napi_value resource = nullptr;
-    CHKRV(env, napi_create_string_utf8(env, "asyncWork", NAPI_AUTO_LENGTH, &resource), CREATE_STRING_UTF8);
+    CHKRV(env, napi_create_string_utf8(env, "SetPointerVisible", NAPI_AUTO_LENGTH, &resource), CREATE_STRING_UTF8);
     asyncContext->IncStrongRef(nullptr);
     napi_status status = napi_create_async_work(env, nullptr, resource,
         [](napi_env env, void* data) {
@@ -135,7 +135,7 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
     } else {
         CHKRP(env, napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
     }
-    AsyncCallbackWork(asyncContext);
+    AsyncSetPointerVisible(asyncContext);
     return promise;
 }
 
