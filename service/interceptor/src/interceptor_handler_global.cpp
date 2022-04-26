@@ -39,14 +39,14 @@ int32_t InterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
         MMI_HILOGE("Invalid handler");
         return RET_ERR;
     }
-    InitSessionLostCallback();
-    if (handlerType == InputHandlerType::INTERCEPTOR) {
-        MMI_HILOGD("Register interceptor:%{public}d", handlerId);
-        SessionHandler interceptor { handlerId, handlerType, session };
-        return interceptors_.AddInterceptor(interceptor);
+    if (handlerType != InputHandlerType::INTERCEPTOR) {
+        MMI_HILOGW("Invalid handler type:%{public}d", handlerType);
+        return RET_ERR;
     }
-    MMI_HILOGW("Invalid handler type:%{public}d", handlerType);
-    return RET_ERR;
+    InitSessionLostCallback();
+    MMI_HILOGD("Register interceptor:%{public}d", handlerId);
+    SessionHandler interceptor { handlerId, handlerType, session };
+    return interceptors_.AddInterceptor(interceptor);
 }
 
 void InterceptorHandlerGlobal::RemoveInputHandler(int32_t handlerId,

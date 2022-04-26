@@ -57,7 +57,7 @@ void InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
         return;
     }
     MMI_HILOGD("sourceType:%{public}d,fd:%{public}d remove from server", iter->sourceType,
-                iter->session->GetFd());
+               iter->session->GetFd());
     interceptors_.erase(iter);
 }
 
