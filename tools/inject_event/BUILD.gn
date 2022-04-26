@@ -43,7 +43,7 @@ ohos_shared_library("input-manager") {
   part_name = "input"
 }
 
-ohos_executable("input") {
+ohos_executable("uinput") {
   sources = [ "src/main.cpp" ]
 
   include_dirs = [
