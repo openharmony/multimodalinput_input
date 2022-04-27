@@ -140,7 +140,7 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
 }
 
 napi_value JsInputDeviceManager::SupportKeys(napi_env env, int32_t id, std::vector<int32_t> keyCodes,
-                                                     napi_value handle)
+    napi_value handle)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
