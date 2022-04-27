@@ -34,10 +34,56 @@ public:
     std::string GetName() const;
     void SetType(int32_t deviceType);
     int32_t GetType() const;
+    void SetBustype(int32_t bus);
+    int32_t GetBustype() const;
+    void SetVersion(int32_t version);
+    int32_t GetVersion() const;
+    void SetProduct(int32_t product);
+    int32_t GetProduct() const;
+    void SetVendor(int32_t vendor);
+    int32_t GetVendor() const;
+    void SetPhys(std::string phys);
+    std::string GetPhys() const;
+    void SetUniq(std::string uniq);
+    std::string GetUniq() const;
+
+    class AxisInfo {
+    public:
+        void SetAxisType(int32_t type);
+        int32_t GetAxisType() const;
+        void SetMinimum(int32_t min);
+        int32_t GetMinimum() const;
+        void SetMaximum(int32_t max);
+        int32_t GetMaximum() const;
+        void SetFuzz(int32_t fuzz);
+        int32_t GetFuzz() const;
+        void SetFlat(int32_t flat);
+        int32_t GetFlat() const;
+        void SetResolution(int32_t resolution);
+        int32_t GetResolution() const;
+
+    private:
+        int32_t axisType_ {0};
+        int32_t minimum_ {0};
+        int32_t maximum_ {0};
+        int32_t fuzz_ {0};
+        int32_t flat_ {0};
+        int32_t resolution_ {0};
+    };
+    void AddAxisInfo(AxisInfo axis);
+    std::vector<AxisInfo> GetAxisInfo();
 private:
     int32_t id_ {0};
-    std::string name_;
+    std::string name_ {"null"};
     int32_t deviceType_ {0};
+    std::vector<AxisInfo> axis_;
+    int32_t bus_ {0};
+    int32_t version_ {0};
+    int32_t product_ {0};
+    int32_t vendor_ {0};
+    std::string phys_ {"null"};
+    std::string uniq_ {"null"};
+    
     std::vector<int32_t> deviceIdList_;
 };
 } // namespace MMI

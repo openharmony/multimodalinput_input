@@ -91,13 +91,13 @@ int32_t MultimodalEventHandler::GetDevice(int32_t userData, int32_t deviceId)
     return EventManager.GetDevice(userData, deviceId);
 }
 
-int32_t MultimodalEventHandler::GetKeystrokeAbility(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes)
+int32_t MultimodalEventHandler::SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes)
 {
     if (!InitClient()) {
         MMI_HILOGE("Init client faild");
         return MMI_SERVICE_INVALID;
     }
-    return EventManager.GetKeystrokeAbility(userData, deviceId, keyCodes);
+    return EventManager.SupportKeys(userData, deviceId, keyCodes);
 }
 
 int32_t MultimodalEventHandler::GetKeyboardType(int32_t userData, int32_t deviceId)
