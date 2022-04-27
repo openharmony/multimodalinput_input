@@ -493,13 +493,13 @@ int32_t GetFileSize(const std::string& fileName)
 
 std::string ReadFile(const std::string &filePath, int32_t readLine)
 {
+    std::string dataStr;
     char realPath[PATH_MAX] = {};
     if (realpath(filePath.c_str(), realPath) == nullptr) {
         MMI_HILOGE("path is error, path:%{public}s", filePath.c_str());
-        return RET_ERR;
+        return dataStr;
     }
     FILE* fp = fopen(realPath, "r");
-    std::string dataStr;
     if (fp != nullptr) {
         char buf[256] = {};
         int32_t count = 0;
