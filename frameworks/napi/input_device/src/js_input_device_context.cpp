@@ -366,6 +366,39 @@ napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback
     return jsInputDeviceMgr->GetKeystrokeAbility(env, deviceId, keyCode, argv[2]);
 }
 
+napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_info info)
+{
+    CALL_LOG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 1 || argc > 2) {
+        THROWERR(env, "The number of parameters is not as expected");
+        return nullptr;
+    }
+
+    napi_valuetype valueType = napi_undefined;
+    CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
+    if (valueType != napi_number) {
+        THROWERR(env, "The first parameter is not a number");
+        return nullptr;
+    }
+    int32_t id = 0;
+    CHKRP(env, napi_get_value_int32(env, argv[0], &id), GET_INT32);
+
+    JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
+    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    if (argc == 1) {
+        return jsInputDeviceMgr->GetKeyboardType(env, id);
+    }
+    CHKRP(env, napi_typeof(env, argv[1], &valueType), TYPEOF);
+    if (valueType != napi_function) {
+        THROWERR(env, "The second parameter is not a function");
+        return nullptr;
+    }
+    return jsInputDeviceMgr->GetKeyboardType(env, id, argv[1]);
+}
+
 napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
 {
     CALL_LOG_ENTER;
@@ -381,6 +414,7 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceIds", GetDeviceIds),
         DECLARE_NAPI_STATIC_FUNCTION("setPointerVisible", SetPointerVisible),
         DECLARE_NAPI_STATIC_FUNCTION("getKeystrokeAbility", GetKeystrokeAbility),
+        DECLARE_NAPI_STATIC_FUNCTION("getKeyboardType", GetKeyboardType),
     };
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     return exports;

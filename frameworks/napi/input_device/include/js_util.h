@@ -33,6 +33,7 @@ public:
         std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device = nullptr;
         std::map<int32_t, bool> keystrokeAbility;
         int32_t deviceId = 0;
+        int32_t keyboardType = 0;
     };
 
     struct CallbackInfo {
