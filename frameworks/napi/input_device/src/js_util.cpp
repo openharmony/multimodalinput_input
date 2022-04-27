@@ -91,7 +91,7 @@ bool JsUtil::GetDeviceInfo(std::unique_ptr<CallbackInfo> &cbTemp, napi_value &ob
     CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, object, "name", name), SET_NAMED_PROPERTY);
     napi_value busType = nullptr;
     CHKRF(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.device->busType, &busType), CREATE_INT32);
-    CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, object, "busType", busType), SET_NAMED_PROPERTY);
+    CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, object, "bus", busType), SET_NAMED_PROPERTY);
     napi_value product = nullptr;
     CHKRF(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.device->product, &product), CREATE_INT32);
     CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, object, "product", product), SET_NAMED_PROPERTY);
@@ -142,12 +142,12 @@ bool JsUtil::GetDeviceAxisInfo(std::unique_ptr<CallbackInfo> &cbTemp, napi_value
         for (const auto &axisTemp : g_axisType) {
             if (item.axisType == axisTemp.axisType) {
                 CHKRF(cbTemp->env, napi_create_object(cbTemp->env, &axisRange), CREATE_OBJECT);
-                CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "sourceType", sourceType),
+                CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "source", sourceType),
                     SET_NAMED_PROPERTY);
                 napi_value axisType = nullptr;
                 CHKRF(cbTemp->env, napi_create_string_utf8(cbTemp->env, axisTemp.axisTypeName.c_str(),
                     NAPI_AUTO_LENGTH, &axisType), CREATE_STRING_UTF8);
-                CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "axisType", axisType),
+                CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "axis", axisType),
                     SET_NAMED_PROPERTY);
                 napi_value min = nullptr;
                 CHKRF(cbTemp->env, napi_create_int32(cbTemp->env, item.min, &min), CREATE_INT32);
@@ -193,7 +193,7 @@ bool JsUtil::GetDeviceSourceType(std::unique_ptr<CallbackInfo> &cbTemp, napi_val
             CREATE_STRING_UTF8);
         CHKRF(cbTemp->env, napi_set_element(cbTemp->env, devSources, i, value), SET_ELEMENT);
     }
-    CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, object, "sourceType", devSources), SET_NAMED_PROPERTY);
+    CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, object, "sources", devSources), SET_NAMED_PROPERTY);
     return true;
 }
 
