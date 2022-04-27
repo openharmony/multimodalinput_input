@@ -50,7 +50,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         case IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER: {
             return StubAddInputEventFilter(data, reply);
         }
-        case IMultimodalInputConnect::POINTER_VISIBLE_PROPERTY: {
+        case IMultimodalInputConnect::SET_POINTER_VISIBLE: {
             return StubSetPointerVisible(data, reply);
         }
         default: {
