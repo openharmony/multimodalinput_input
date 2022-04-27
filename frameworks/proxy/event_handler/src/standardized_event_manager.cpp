@@ -174,6 +174,17 @@ int32_t StandardizedEventManager::GetKeystrokeAbility(int32_t userData, int32_t 
     return SendMsg(pkt);
 }
 
+int32_t StandardizedEventManager::GetKeyboardType(int32_t userData, int32_t deviceId) const
+{
+    NetPacket pkt(MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE);
+    pkt << userData << deviceId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write userData failed");
+        return PACKET_WRITE_FAIL;
+    }
+    return SendMsg(pkt);
+}
+
 int32_t StandardizedEventManager::RegisterInputDeviceMonitor()
 {
     NetPacket pkt(MmiMessageId::ADD_INPUT_DEVICE_MONITOR);

@@ -26,6 +26,7 @@ enum class MmiMessageId : int32_t {
     INPUT_DEVICE_KEYSTROKE_ABILITY,
     ADD_INPUT_DEVICE_MONITOR,
     REMOVE_INPUT_DEVICE_MONITOR,
+    INPUT_DEVICE_KEYBOARD_TYPE,
 
     // mmi message id
     BEGIN = 1001,

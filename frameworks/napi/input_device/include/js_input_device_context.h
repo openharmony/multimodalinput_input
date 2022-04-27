@@ -32,6 +32,7 @@ public:
     static napi_value GetDevice(napi_env env, napi_callback_info info);
     static napi_value SetPointerVisible(napi_env env, napi_callback_info info);
     static napi_value GetKeystrokeAbility(napi_env env, napi_callback_info info);
+    static napi_value GetKeyboardType(napi_env env, napi_callback_info info);
     std::shared_ptr<JsInputDeviceManager> GetJsInputDeviceMgr() const;
 
 private:

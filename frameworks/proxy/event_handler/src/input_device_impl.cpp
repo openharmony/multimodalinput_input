@@ -129,6 +129,22 @@ void InputDeviceImpl::GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t>
     ++userData_;
 }
 
+void InputDeviceImpl::GetKeyboardTypeAsync(int32_t deviceId, std::function<void(int32_t, int32_t)> callback)
+{
+    CALL_LOG_ENTER;
+    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    CHKPV(eventHandler);
+    InputDeviceData data;
+    data.kbTypes = std::make_pair(eventHandler, callback);
+    if (userData_ == INT32_MAX) {
+        MMI_HILOGE("userData exceeds the maximum");
+        return;
+    }
+    inputDevices_[userData_] = data;
+    MMIEventHdl.GetKeyboardType(userData_, deviceId);
+    ++userData_;
+}
+
 void InputDeviceImpl::OnInputDeviceTask(InputDeviceImpl::DevInfo devInfo, int32_t userData,
     int32_t id, std::string name, int32_t deviceType)
 {
@@ -227,6 +243,33 @@ void InputDeviceImpl::OnKeystrokeAbility(int32_t userData, const std::map<int32_
     }
 }
 
+void InputDeviceImpl::OnKeyboardTypeTask(InputDeviceImpl::DevKeyboardTypes kbTypes, int32_t userData,
+    int32_t keyboardType)
+{
+    CHK_PIDANDTID();
+    kbTypes.second(userData, keyboardType);
+    MMI_HILOGD("Keyboard type event callback userData:%{public}d keyboardType:(%{public}d)",
+        userData, keyboardType);
+}
+
+void InputDeviceImpl::OnKeyboardType(int32_t userData, int32_t keyboardType)
+{
+    CHK_PIDANDTID();
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (auto iter = inputDevices_.find(userData); iter == inputDevices_.end()) {
+        MMI_HILOGD("find userData failed");
+        return;
+    }
+    auto devKbTypes = GetKeyboardTypes(userData);
+    CHKPV(devKbTypes);
+    if (!MMIEventHandler::PostTask(devKbTypes->first,
+        std::bind(&InputDeviceImpl::OnKeyboardTypeTask, this, *devKbTypes, userData, keyboardType))) {
+        MMI_HILOGE("post task failed");
+    }
+    MMI_HILOGD("Keyboard type event userData:%{public}d keyboardType:%{public}d",
+        userData, keyboardType);
+}
+
 const InputDeviceImpl::DevInfo* InputDeviceImpl::GetDeviceInfo(int32_t userData) const
 {
     auto iter = inputDevices_.find(userData);
@@ -252,6 +295,12 @@ const InputDeviceImpl::DevKeys* InputDeviceImpl::GetDeviceKeys(int32_t userData)
         return nullptr;
     }
     return &iter->second.keys;
+}
+
+const InputDeviceImpl::DevKeyboardTypes* InputDeviceImpl::GetKeyboardTypes(int32_t userData) const
+{
+    auto iter = inputDevices_.find(userData);
+    return iter == inputDevices_.end()? nullptr : &iter->second.kbTypes;
 }
 
 int32_t InputDeviceImpl::GetUserData()
