@@ -188,23 +188,6 @@ HWTEST_F(VirtualDeviceTest, Test_CreateHandle_phone, TestSize.Level1)
 }
 
 /**
- * @tc.name:Test_SelectDevice_false01
- * @tc.desc:Verify VirtualDevice function SelectDevice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(VirtualDeviceTest, Test_SelectDevice_false01, TestSize.Level1)
-{
-    VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    std::vector<std::string> fileList;
-    fileList.push_back("argv1");
-    fileList.push_back("argv2");
-    fileList.push_back("argv3");
-    auto ret = device.SelectDevice(fileList);
-    EXPECT_FALSE(ret);
-}
-
-/**
  * @tc.name:Test_AddDevice_false01
  * @tc.desc:Verify VirtualDevice function AddDevice
  * @tc.type: FUNC
@@ -213,10 +196,8 @@ HWTEST_F(VirtualDeviceTest, Test_SelectDevice_false01, TestSize.Level1)
 HWTEST_F(VirtualDeviceTest, Test_AddDevice_false01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    std::vector<std::string> fileList;
-    fileList.push_back("mmi-vitual-device-manger ");
-    fileList.push_back("start");
-    auto ret = device.AddDevice(fileList);
+    std::string deviceName = "";
+    auto ret = device.AddDevice(deviceName);
     EXPECT_FALSE(ret);
 }
 
@@ -229,26 +210,8 @@ HWTEST_F(VirtualDeviceTest, Test_AddDevice_false01, TestSize.Level1)
 HWTEST_F(VirtualDeviceTest, Test_AddDevice_true, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    std::vector<std::string> fileList;
-    fileList.push_back("binName ");
-    fileList.push_back("start ");
-    fileList.push_back("mouse");
-    auto ret = device.AddDevice(fileList);
-    EXPECT_TRUE(ret);
-}
-
-/**
- * @tc.name:Test_SelectDevice_true
- * @tc.desc:Verify VirtualDevice function SelectDevice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(VirtualDeviceTest, Test_SelectDevice_true, TestSize.Level1)
-{
-    VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    std::vector<std::string> fileList;
-    fileList.push_back("list");
-    auto ret = device.SelectDevice(fileList);
+    std::string deviceName = "mouse";
+    auto ret = device.AddDevice(deviceName);
     EXPECT_TRUE(ret);
 }
 
@@ -261,27 +224,8 @@ HWTEST_F(VirtualDeviceTest, Test_SelectDevice_true, TestSize.Level1)
 HWTEST_F(VirtualDeviceTest, Test_AddDevice_false02, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    std::vector<std::string> fileList;
-    fileList.push_back("binName ");
-    fileList.push_back("start ");
-    fileList.push_back("falseName");
-    auto ret = device.AddDevice(fileList);
-    EXPECT_FALSE(ret);
-}
-
-/**
- * @tc.name:Test_CloseDevice_flase01
- * @tc.desc:Verify VirtualDevice function CloseDevice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(VirtualDeviceTest, Test_CloseDevice_flase01, TestSize.Level1)
-{
-    VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    std::vector<std::string> fileList;
-    fileList.push_back("binName ");
-    fileList.push_back("close ");
-    auto ret = device.CloseDevice(fileList);
+    std::string deviceName = "falseName";
+    auto ret = device.AddDevice(deviceName);
     EXPECT_FALSE(ret);
 }
 
@@ -295,10 +239,10 @@ HWTEST_F(VirtualDeviceTest, Test_CloseDevice_flase02, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
     std::vector<std::string> fileList;
-    fileList.push_back("binName ");
+    std::string fileName = "falseArgv";
     fileList.push_back("close ");
     fileList.push_back("falseArgv ");
-    auto ret = device.CloseDevice(fileList);
+    auto ret = device.CloseDevice(fileName, fileList);
     EXPECT_FALSE(ret);
 }
 
@@ -437,72 +381,6 @@ HWTEST_F(VirtualDeviceTest, Test_FindDevice_False01, TestSize.Level1)
     argvList.push_back("binName ");
     argvList.push_back("falseArgv ");
     auto ret = device.FindDevice(argvList);
-    EXPECT_FALSE(ret);
-}
-
-/**
- * @tc.name:Test_SelectDevice_false02
- * @tc.desc:Verify VirtualDevice function SelectDevice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(VirtualDeviceTest, Test_SelectDevice_false02, TestSize.Level1)
-{
-    VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    std::vector<std::string> fileList;
-    std::string cmdStr = "rm -rf /data/symbol/*";
-    system(cmdStr.c_str());
-    auto ret = device.SelectDevice(fileList);
-    EXPECT_FALSE(ret);
-}
-
-/**
- * @tc.name:Test_CloseDevice_false03
- * @tc.desc:Verify VirtualDevice function CloseDevice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(VirtualDeviceTest, Test_CloseDevice_false03, TestSize.Level1)
-{
-    VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    std::vector<std::string> fileList;
-    fileList.push_back("binName ");
-    fileList.push_back("close ");
-    fileList.push_back("falseArgv ");
-    auto ret = device.CloseDevice(fileList);
-    EXPECT_FALSE(ret);
-}
-
-/**
- * @tc.name:Test_SelectDevice_false03
- * @tc.desc:Verify VirtualDevice function SelectDevice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(VirtualDeviceTest, Test_SelectDevice_false03, TestSize.Level1)
-{
-    VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    std::vector<std::string> fileList;
-    std::string cmdStr = "rm -rf /data/symbol/";
-    system(cmdStr.c_str());
-    auto ret = device.SelectDevice(fileList);
-    EXPECT_FALSE(ret);
-}
-
-/**
- * @tc.name:Test_AddDevice_false03
- * @tc.desc:Verify VirtualDevice function AddDevice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(VirtualDeviceTest, Test_AddDevice_false03, TestSize.Level1)
-{
-    VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
-    std::vector<std::string> fileList;
-    fileList.push_back("binName ");
-    fileList.push_back("start ");
-    fileList.push_back("mouse");
-    auto ret = device.AddDevice(fileList);
     EXPECT_FALSE(ret);
 }
 

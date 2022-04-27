@@ -42,7 +42,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-bool IsNum(const std::string& str)
+constexpr int32_t READ_FILE_SIZE_MAX = 1000;
+bool IsNum(const std::string &str)
 {
     return std::all_of(str.begin(), str.end(), [](char c) {
         return std::isdigit(c) != 0;
@@ -75,27 +76,34 @@ bool CheckFileName(const std::string& fileName)
     return result;
 }
 
-void RemoveDir()
+void RemoveDir(const std::string& filePath)
 {
-    DIR* dir = opendir(g_folderpath.c_str());
+    DIR* dir = opendir(filePath.c_str());
     if (dir == nullptr) {
         printf("Failed to open folder");
         return;
     }
     dirent* ptr = nullptr;
-    int32_t fileNnm = 0;
     while ((ptr = readdir(dir)) != nullptr) {
         std::string tmpDirName(ptr->d_name);
         if ((tmpDirName == ".") || (tmpDirName == "..")) {
             continue;
         }
-        fileNnm++;
+        if (ptr->d_type == DT_REG) {
+            std::string removeFile = filePath + ptr->d_name;
+            if (std::remove(removeFile.c_str()) != 0) {
+                printf("delete file: %s failed", removeFile.c_str());
+            }
+        } else if (ptr->d_type == DT_DIR) {
+            std::string path = filePath + ptr->d_name + "/";
+            RemoveDir(path);
+        } else {
+            printf("file name:%s, type is error", ptr->d_name);
+        }
     }
     closedir(dir);
-    if (fileNnm == 0) {
-        if (remove(g_folderpath.c_str()) != 0) {
-            printf("remove %s fail, errno: %d.", g_folderpath.c_str(), errno);
-        }
+    if (std::remove(filePath.c_str()) != 0) {
+        printf("delete file: %s failed", filePath.c_str());
     }
     return;
 }
@@ -124,7 +132,7 @@ VirtualDevice::~VirtualDevice()
     Close();
 }
 
-std::vector<std::string> VirtualDevice::ViewDirectory(const std::string& filePath, bool compliant)
+std::vector<std::string> VirtualDevice::ViewDirectory(const std::string& filePath)
 {
     std::vector<std::string> fileList;
     fileList.clear();
@@ -134,95 +142,55 @@ std::vector<std::string> VirtualDevice::ViewDirectory(const std::string& filePat
         return fileList;
     }
     dirent* ptr = nullptr;
-    int32_t fileNum = 0;
     while ((ptr = readdir(dir)) != nullptr) {
-        std::string tmpDirName(ptr->d_name);
-        if ((tmpDirName == ".") || (tmpDirName == "..")) {
-            continue;
-        }
-        fileNum++;
         if (ptr->d_type == DT_REG) {
-            if (CheckFileName(ptr->d_name) && compliant) {
+            if (ClearFileResidues(ptr->d_name)) {
                 fileList.push_back(ptr->d_name);
-            } else {
-                std::string removeFile = filePath + ptr->d_name;
-                if (std::remove(removeFile.c_str()) != 0) {
-                    printf("delete file: %s failed", removeFile.c_str());
-                }
-                fileNum--;
             }
-        } else if (ptr->d_type == DT_DIR) {
-            std::string path = filePath + ptr->d_name + "/";
-            printf("filePath : %s is error", path.c_str());
-            ViewDirectory(path, false);
-        } else {
-            printf("file name:%s, type is error", ptr->d_name);
-            fileNum--;
         }
     }
     closedir(dir);
-    if (fileNum == 0 && !compliant) {
-        if (std::remove(filePath.c_str()) != 0) {
-            printf("delete file: %s failed", filePath.c_str());
-        }
-    }
     return fileList;
 }
 
-bool VirtualDevice::ClearFileResidues(const std::string& procressPath, const std::string& fileName)
+bool VirtualDevice::ClearFileResidues(const std::string& fileName)
 {
-    DIR* dir = opendir(procressPath.c_str());
-    if (dir == nullptr) {
-        std::string removeFile = "/data/symbol/" + fileName;
-        if (!IsFileExists(removeFile)) {
-            printf("/data/symbol/%s path is error", removeFile.c_str());
-            return false;
+    DIR *dir = nullptr;
+    do {
+        if (!CheckFileName(fileName)) {
+            break;
         }
-        if (std::remove(removeFile.c_str()) != 0) {
-            printf("delete file: %s failed", removeFile.c_str());
+        std::string::size_type pos = fileName.find("_");
+        std::string procressPath = "/proc/" + fileName.substr(0, pos) + "/";
+        dir = opendir(procressPath.c_str());
+        if (dir == nullptr) {
+            break;
         }
-        return true;
+        std::string filePath = "/proc/" + fileName.substr(0, pos) + "/cmdline";
+        if (!IsFileExists(filePath)) {
+            break;
+        }
+        if (GetFileSize(filePath) > READ_FILE_SIZE_MAX) {
+            break;
+        }
+        const std::string temp = ReadFile(filePath);
+        if (temp.empty()) {
+            break;
+        }
+        std::string processName;
+        processName.append(temp);
+        if (processName.find("mmi-virtual-device") != processName.npos) {
+            return true;
+        }
+    } while (0);
+    if (dir != nullptr) {
+        closedir(dir);
+        dir = nullptr;
     }
-    closedir(dir);
+    if (std::remove((g_folderpath + fileName).c_str()) != 0) {
+        printf("delete file: %s failed", (g_folderpath + fileName).c_str());
+    }
     return false;
-}
-
-void VirtualDevice::SyncSymbolFile()
-{
-    std::vector<std::string> tempList = ViewDirectory(g_folderpath);
-    if (tempList.size() <= 0) {
-        printf("Failed to find file ");
-        return;
-    }
-    for (const auto &item : tempList) {
-        if (!CheckFileName(item)) {
-            printf("file name check error");
-            return;
-        }
-        std::string::size_type pos = item.find("_");
-        std::string procressPath = "/proc/" + item.substr(0, pos) + "/";
-        if (!ClearFileResidues(procressPath, item)) {
-            std::string filePath = "/proc/" + item.substr(0, pos) + "/cmdline";
-            const std::string temp = ReadFile(filePath, 1);
-            if (temp.empty()) {
-                printf("%s is null", filePath.c_str());
-                return;
-            }
-            std::string processName;
-            processName.append(temp);
-            if (processName.find("mmi-virtual-device") == processName.npos) {
-                std::string removeFile = "/data/symbol/" + item;
-                if (!IsFileExists(removeFile)) {
-                    printf("/data/symbol/%s path is error", removeFile.c_str());
-                    return;
-                }
-                if (std::remove(removeFile.c_str()) != 0) {
-                    printf("delete file: %s failed", removeFile.c_str());
-                }
-            }
-        }
-    }
-    return;
 }
 
 bool VirtualDevice::CreateKey()
@@ -252,7 +220,7 @@ bool VirtualDevice::CreateKey()
     return true;
 }
 
-bool VirtualDevice::SetAbsResolution(const std::string deviceName)
+bool VirtualDevice::SetAbsResolution(const std::string& deviceName)
 {
     constexpr int32_t ABSRANGE = 200;
     constexpr int32_t FINGERABSRANGE = 40;
@@ -287,7 +255,7 @@ bool VirtualDevice::SetAbsResolution(const std::string deviceName)
     return true;
 }
 
-bool VirtualDevice::SetPhys(const std::string deviceName)
+bool VirtualDevice::SetPhys(const std::string& deviceName)
 {
     std::string phys;
     std::map<std::string, std::string> typeDevice = {
@@ -373,17 +341,6 @@ void VirtualDevice::Close()
     }
 }
 
-void VirtualDevice::CloseAllDevice(const std::vector<std::string>& fileList)
-{
-    for (auto it : fileList) {
-        kill(atoi(it.c_str()), SIGKILL);
-        it.insert(0, g_folderpath.c_str());
-        if (std::remove(it.c_str()) != 0) {
-            printf("delete file: %s failed", it.c_str());
-        }
-    }
-}
-
 void VirtualDevice::StartAllDevices()
 {
     static VirtualMouse virtualMouse;
@@ -434,21 +391,7 @@ void VirtualDevice::StartAllDevices()
     virtualPenKeyboard.SetUp();
 }
 
-bool VirtualDevice::SelectDevice(std::vector<std::string> &fileList)
-{
-    if (fileList.size() == MAXPARAMETER) {
-        printf("Invaild Input Para, Plase Check the validity of the para");
-        return false;
-    }
-    fileList = ViewDirectory(g_folderpath);
-    if (fileList.size() == 0) {
-        printf("No device is currently on");
-        return false;
-    }
-    return true;
-}
-
-bool VirtualDevice::CreateHandle(const std::string deviceArgv)
+bool VirtualDevice::CreateHandle(const std::string& deviceArgv)
 {
     if (deviceArgv == "mouse") {
         static VirtualMouse virtualMouse;
@@ -516,19 +459,18 @@ bool VirtualDevice::CreateHandle(const std::string deviceArgv)
     return true;
 }
 
-bool VirtualDevice::AddDevice(const std::vector<std::string>& fileList)
+bool VirtualDevice::AddDevice(const std::string& startDeviceName)
 {
-    if (fileList.size() == MAXDELPARAMETER) {
-        printf("Invaild Input Para, Plase Check the validity of the para");
+    if (startDeviceName.empty()) {
+        printf("startDeviceName is empty");
         return false;
     }
-    std::string deviceArgv = fileList.back();
-    if (!CreateHandle(deviceArgv)) {
+    if (!CreateHandle(startDeviceName)) {
+        printf("Device %s start faild", startDeviceName.c_str());
         return false;
     }
-
     std::string symbolFile;
-    symbolFile.append(g_folderpath).append(g_pid).append("_").append(deviceArgv);
+    symbolFile.append(g_folderpath).append(g_pid).append("_").append(startDeviceName);
     std::ofstream flagFile;
     flagFile.open(symbolFile.c_str());
     if (!flagFile.is_open()) {
@@ -538,33 +480,26 @@ bool VirtualDevice::AddDevice(const std::vector<std::string>& fileList)
     return true;
 }
 
-bool VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
+bool VirtualDevice::CloseDevice(const std::string& closeDeviceName,const std::vector<std::string>& deviceList)
 {
-    if (fileList.size() == MAXDELPARAMETER) {
-        printf("Invaild Input Para, Plase Check the validity of the para");
+    if (deviceList.size() <= 0) {
+        RemoveDir(g_folderpath);
+        printf("no start device");
         return false;
     }
-    std::vector<std::string> alldevice = {};
-    std::string closePid = fileList.back();
-    closePid.append("_");
-    bool result = SelectDevice(alldevice);
-    if (!result) {
-        RemoveDir();
-        return false;
-    }
-    if (closePid.compare("all_") == 0) {
-        CloseAllDevice(alldevice);
-        RemoveDir();
+    if (closeDeviceName == "all") {
+        for (auto it : deviceList) {
+            kill(atoi(it.c_str()), SIGKILL);
+        }
+        RemoveDir(g_folderpath);
         return true;
     }
-    for (auto it : alldevice) {
-        if (it.find(closePid) == 0) {
+    for (auto it : deviceList) {
+        if (it.find(closeDeviceName) == 0) {
             kill(atoi(it.c_str()), SIGKILL);
-            it.insert(0, g_folderpath.c_str());
-            if (std::remove(it.c_str()) != 0) {
-                printf("delete file: %s failed", it.c_str());
+            if (ViewDirectory(g_folderpath).size() <= 0) {
+                RemoveDir(g_folderpath);
             }
-            RemoveDir();
             return true;
         }
     }
@@ -572,30 +507,37 @@ bool VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
     return false;
 }
 
-bool VirtualDevice::FindDevice(std::vector<std::string> argvList)
+bool VirtualDevice::FindDevice(std::vector<std::string>& argvList)
 {
-    SyncSymbolFile();
+    std::vector<std::string> deviceList = ViewDirectory(g_folderpath);
     if (argvList[1] == "start") {
-        if (!AddDevice(argvList)) {
+        if (argvList.size() != MAXPARAMETER) {
+            printf("Invaild Input Para, Plase Check the validity of the para");
+            return false;
+        }
+        if (!AddDevice(argvList.back())) {
             printf("Failed to create device");
             return false;
         }
         return true;
     } else if (argvList[1] == "list") {
-        if (!SelectDevice(argvList)) {
-            return false;
-        } else {
-            std::string::size_type pos;
-            printf("PID\tDEVICE\n");
-
-            for (const auto &item : argvList) {
-                pos = item.find("_");
-                printf("%s\t%s\n", item.substr(0, pos).c_str(), item.substr(pos + 1, item.size() - pos - 1).c_str());
-            }
+        if (argvList.size() != MAXDELPARAMETER) {
+            printf("Invaild Input Para, Plase Check the validity of the para");
             return false;
         }
+        std::string::size_type pos;
+        printf("PID\tDEVICE\n");
+        for (const auto &item : deviceList) {
+            pos = item.find("_");
+            printf("%s\t%s\n", item.substr(0, pos).c_str(), item.substr(pos + 1, item.size() - pos - 1).c_str());
+        }
+        return false;
     } else if (argvList[1] == "close") {
-        if (!CloseDevice(argvList)) {
+        if (argvList.size() != MAXPARAMETER) {
+            printf("Invaild Input Para, Plase Check the validity of the para");
+            return false;
+        }
+        if (!CloseDevice(argvList.back(), deviceList)) {
             return false;
         } else {
             printf("device closed successfully");

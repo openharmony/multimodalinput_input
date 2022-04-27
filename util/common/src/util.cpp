@@ -491,27 +491,22 @@ int32_t GetFileSize(const std::string& fileName)
     return RET_ERR;
 }
 
-std::string ReadFile(const std::string &filePath, int32_t readLine)
+std::string ReadFile(const std::string &filePath)
 {
     FILE* fp = fopen(filePath.c_str(), "r");
-    std::string dataStr;
-    if (fp != nullptr) {
-        char buf[256] = {};
-        int32_t count = 0;
-        while (fgets(buf, sizeof(buf), fp) != nullptr) {
-            dataStr += buf;
-            ++count;
-            if ((readLine > 0) && (readLine <= count)) {
-                if (fclose(fp) != 0) {
-                    MMI_HILOGW("close file: %{pulic}s failed", filePath.c_str());
-                }
-                return dataStr;
-            }
-        }
-        if (fclose(fp) != 0) {
-            MMI_HILOGW("close file: %{pulic}s failed", filePath.c_str());
-        }
+    if (fp == nullptr) {
+        MMI_HILOGW("open file: %{pulic}s failed", filePath.c_str());
+        return "";
     }
+    std::string dataStr;
+    char buf[256] = {};
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        dataStr += buf;
+    }
+    if (fclose(fp) != 0) {
+        MMI_HILOGW("close file: %{pulic}s failed", filePath.c_str());
+    }
+
     return dataStr;
 }
 } // namespace MMI
