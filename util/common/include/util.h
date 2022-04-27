@@ -57,7 +57,7 @@ bool IsFileExists(const std::string& fileName);
 int32_t VerifyFile(const std::string& fileName);
 std::string GetFileExtendName(const std::string& fileName);
 int32_t GetFileSize(const std::string& fileName);
-std::string ReadFile(const std::string &filePath, int32_t readLine = 0);
+std::string ReadFile(const std::string &filePath);
 } // namespace MMI
 } // namespace OHOS
 #endif // UTIL_H
