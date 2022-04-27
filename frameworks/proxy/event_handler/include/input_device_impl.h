@@ -18,6 +18,7 @@
 #include <functional>
 #include <map>
 #include <mutex>
+#include <vector>
 
 #include "nocopyable.h"
 
@@ -31,20 +32,37 @@ public:
     DISALLOW_COPY_AND_MOVE(InputDeviceImpl);
     ~InputDeviceImpl() = default;
 
+    struct AxisInfo {
+        int32_t axisType = 0;
+        int32_t min = 0;
+        int32_t max = 0;
+        int32_t fuzz = 0;
+        int32_t flat = 0;
+        int32_t resolution = 0;
+    };
     struct InputDeviceInfo {
-        InputDeviceInfo(int32_t id, std::string name, uint32_t devcieType) : id(id),
-            name(name), devcieType(devcieType) {}
-        int32_t id;
-        std::string name;
-        uint32_t devcieType;
+        InputDeviceInfo(int32_t id, std::string name, uint32_t devcieType, int32_t busType,
+            int32_t product, int32_t vendor, int32_t version, std::string phys, std::string uniq,
+            std::vector<AxisInfo> axis);
+        ~InputDeviceInfo();
+        int32_t id = -1;
+        std::string name = "null";
+        uint32_t devcieType = 0;
+        int32_t busType = 0;
+        int32_t product = 0;
+        int32_t vendor = 0;
+        int32_t version = 0;
+        std::string phys = "null";
+        std::string uniq = "null";
+        std::vector<AxisInfo> axis;
     };
 
     using FunInputDevInfo = std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)>;
-    using CppFunInputDevInfo = std::function<void(std::shared_ptr<InputDeviceInfo>)>;
     using FunInputDevIds = std::function<void(int32_t, std::vector<int32_t>)>;
+    using FunInputDevKeys = std::function<void(int32_t, std::vector<bool>)>;
+    using CppFunInputDevInfo = std::function<void(std::shared_ptr<InputDeviceInfo>)>;
     using CppFunInputDevIds = std::function<void(std::vector<int32_t>)>;
-    using FunInputDevKeys = std::function<void(int32_t, std::map<int32_t, bool>)>;
-    using CppFunInputDevKeys = std::function<void(std::map<int32_t, bool>)>;
+    using CppFunInputDevKeys = std::function<void(std::vector<bool>)>;
     using FunInputDevMonitor = std::function<void(std::string, int32_t)>;
     using FunKeyboardTypes = std::function<void(int32_t, int32_t)>;
     using DevInfo = std::pair<EventHandlerPtr, FunInputDevInfo>;
@@ -68,16 +86,16 @@ public:
     void GetInputDeviceIdsAsync(std::function<void(int32_t, std::vector<int32_t>)> callback);
     void GetInputDeviceAsync(int32_t deviceId,
         std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)> callback);
-    void GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> keyCodes,
-        std::function<void(int32_t, std::map<int32_t, bool>)> callback);
-    void GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> keyCodes,
-        std::function<void(std::map<int32_t, bool>)> callback);
+    void SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
+        std::function<void(int32_t, std::vector<bool>)> callback);
+    void SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
+        std::function<void(std::vector<bool>)> callback);
     void GetKeyboardTypeAsync(int32_t deviceId, std::function<void(int32_t, int32_t)> callback);
-    void OnInputDevice(int32_t userData, int32_t id, const std::string &name, int32_t deviceId);
+    void OnInputDevice(int32_t userData, std::shared_ptr<InputDeviceInfo> &devData);
     void OnInputDeviceIds(int32_t userData, const std::vector<int32_t> &ids);
-    void OnKeystrokeAbility(int32_t userData, const std::map<int32_t, bool> &keystrokeAbility);
-    void OnKeyboardType(int32_t userData, int32_t keyboardType);
+    void OnSupportKeys(int32_t userData, const std::vector<bool> &keystrokeAbility);
     void OnDevMonitor(std::string type, int32_t deviceId);
+    void OnKeyboardType(int32_t userData, int32_t keyboardType);
     int32_t GetUserData();
 
 private:
@@ -86,10 +104,10 @@ private:
     const DevKeys* GetDeviceKeys(int32_t) const;
     const DevKeyboardTypes* GetKeyboardTypes(int32_t) const;
     void OnInputDeviceTask(InputDeviceImpl::DevInfo devInfo, int32_t userData,
-        int32_t id, std::string name, int32_t deviceId);
+        std::shared_ptr<InputDeviceInfo> devData);
     void OnInputDeviceIdsTask(InputDeviceImpl::DevIds devIds, int32_t userData, std::vector<int32_t> ids);
-    void OnKeystrokeAbilityTask(InputDeviceImpl::DevKeys devKeys, int32_t userData,
-        std::map<int32_t, bool> keystrokeAbility);
+    void OnSupportKeysTask(InputDeviceImpl::DevKeys devKeys, int32_t userData,
+        std::vector<bool> keystrokeAbility);
     void OnDevMonitorTask(DevMonitor devMonitor, std::string type, int32_t deviceId);
     void OnKeyboardTypeTask(InputDeviceImpl::DevKeyboardTypes kbTypes, int32_t userData,
         int32_t keyboardType);

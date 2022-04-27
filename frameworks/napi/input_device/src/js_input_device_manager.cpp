@@ -139,14 +139,14 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
     return promise;
 }
 
-napi_value JsInputDeviceManager::GetKeystrokeAbility(napi_env env, int32_t id, std::vector<int32_t> keyCodes,
+napi_value JsInputDeviceManager::SupportKeys(napi_env env, int32_t id, std::vector<int32_t> keyCodes,
                                                      napi_value handle)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     int32_t userData = InputDevImp.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
-    InputDevImp.GetKeystrokeAbility(id, keyCodes, EmitJsKeystrokeAbility);
+    InputDevImp.SupportKeys(id, keyCodes, EmitJsKeystrokeAbility);
     return ret;
 }
 

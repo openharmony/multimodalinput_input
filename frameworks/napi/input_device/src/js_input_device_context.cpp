@@ -311,7 +311,7 @@ napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_i
     return jsInputDeviceMgr->SetPointerVisible(env, visible, argv[1]);
 }
 
-napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback_info info)
+napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
     size_t argc = 3;
@@ -330,6 +330,11 @@ napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback
     }
     int32_t deviceId = 0;
     CHKRP(env, napi_get_value_int32(env, argv[0], &deviceId), GET_INT32);
+    CHKRP(env, napi_typeof(env, argv[1], &valueType), TYPEOF);
+    if (valueType != napi_object) {
+        THROWERR(env, "the second parameter is not a array");
+        return nullptr;
+    }
     uint32_t size = 0;
     CHKRP(env, napi_get_array_length(env, argv[1], &size), GET_ARRAY_LENGTH);
     if (size < 1 || size > 5) {
@@ -356,14 +361,14 @@ napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback
     auto jsInputDeviceMgr = jsContext->GetJsInputDeviceMgr();
     if (argc == 2) {
         THROWERR(env, "the number of parameters is incorrect");
-        return jsInputDeviceMgr->GetKeystrokeAbility(env, deviceId, keyCode);
+        return jsInputDeviceMgr->SupportKeys(env, deviceId, keyCode);
     }
     CHKRP(env, napi_typeof(env, argv[2], &valueType), TYPEOF);
     if (valueType != napi_function) {
         THROWERR(env, "the last parameter is not a function");
         return nullptr;
     }
-    return jsInputDeviceMgr->GetKeystrokeAbility(env, deviceId, keyCode, argv[2]);
+    return jsInputDeviceMgr->SupportKeys(env, deviceId, keyCode, argv[2]);
 }
 
 napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_info info)
@@ -413,7 +418,7 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getDevice", GetDevice),
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceIds", GetDeviceIds),
         DECLARE_NAPI_STATIC_FUNCTION("setPointerVisible", SetPointerVisible),
-        DECLARE_NAPI_STATIC_FUNCTION("getKeystrokeAbility", GetKeystrokeAbility),
+        DECLARE_NAPI_STATIC_FUNCTION("supportKeys", SupportKeys),
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardType", GetKeyboardType),
     };
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
