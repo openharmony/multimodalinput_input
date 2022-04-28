@@ -17,7 +17,7 @@
 
 #include <string.h>
 
-#include "bytrace.h"
+#include "hitrace_meter.h"
 #include "error_multimodal.h"
 #include "key_event.h"
 #include "mmi_log.h"
