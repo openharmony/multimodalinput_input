@@ -16,6 +16,7 @@
 #ifndef MMI_SERVICE_H
 #define MMI_SERVICE_H
 
+#include <atomic>
 #include <mutex>
 #include <thread>
 
@@ -50,6 +51,7 @@ public:
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &socketFd) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
     virtual int32_t SetPointerVisible(bool visible) override;
+    virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 
 protected:
     virtual void OnConnected(SessionPtr s) override;
@@ -72,6 +74,7 @@ private:
     int32_t mmiFd_ = -1;
     std::mutex mu_;
     std::thread t_;
+    std::atomic<uint64_t> tid_ = 0;
 
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
