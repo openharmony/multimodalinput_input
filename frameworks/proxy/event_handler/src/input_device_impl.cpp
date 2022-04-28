@@ -101,21 +101,6 @@ void InputDeviceImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> keyCode
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    InputDeviceData data;
-    data.cppKeys = callback;
-    if (userData_ == INT32_MAX) {
-        MMI_HILOGE("userData exceeds the maximum");
-        return;
-    }
-    inputDevices_[userData_] = data;
-    MMIEventHdl.SupportKeys(userData_, deviceId, keyCodes);
-    ++userData_;
-}
-
-void InputDeviceImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
-    std::function<void(int32_t, std::vector<bool>)> callback)
-{
-    CALL_LOG_ENTER;
     auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
     CHKPV(eventHandler);
     InputDeviceData data;
@@ -217,7 +202,7 @@ void InputDeviceImpl::OnSupportKeysTask(InputDeviceImpl::DevKeys devKeys, int32_
     std::vector<bool> keystrokeAbility)
 {
     CHK_PIDANDTID();
-    devKeys.second(userData, keystrokeAbility);
+    devKeys.second(keystrokeAbility);
 }
 
 void InputDeviceImpl::OnSupportKeys(int32_t userData, const std::vector<bool> &keystrokeAbility)

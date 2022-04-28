@@ -57,18 +57,16 @@ public:
         std::vector<AxisInfo> axis;
     };
 
-    using FunInputDevInfo = std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)>;
-    using FunInputDevIds = std::function<void(int32_t, std::vector<int32_t>)>;
-    using FunInputDevKeys = std::function<void(int32_t, std::vector<bool>)>;
     using CppFunInputDevInfo = std::function<void(std::shared_ptr<InputDeviceInfo>)>;
     using CppFunInputDevIds = std::function<void(std::vector<int32_t>)>;
-    using CppFunInputDevKeys = std::function<void(std::vector<bool>)>;
-    using FunInputDevMonitor = std::function<void(std::string, int32_t)>;
+
+    using FunInputDevInfo = std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)>;
+    using FunInputDevIds = std::function<void(int32_t, std::vector<int32_t>)>;
+    using FunInputDevKeys = std::function<void(std::vector<bool>)>;
     using FunKeyboardTypes = std::function<void(int32_t, int32_t)>;
     using DevInfo = std::pair<EventHandlerPtr, FunInputDevInfo>;
     using DevIds = std::pair<EventHandlerPtr, FunInputDevIds>;
     using DevKeys = std::pair<EventHandlerPtr, FunInputDevKeys>;
-    using DevMonitor = std::pair<EventHandlerPtr, FunInputDevMonitor>;
     using DevKeyboardTypes = std::pair<EventHandlerPtr, FunKeyboardTypes>;
     struct InputDeviceData {
         DevInfo inputDevice;
@@ -77,8 +75,9 @@ public:
         DevKeyboardTypes kbTypes;
         CppFunInputDevInfo cppDev = nullptr;
         CppFunInputDevIds cppIds = nullptr;
-        CppFunInputDevKeys cppKeys = nullptr;
     };
+    using FunInputDevMonitor = std::function<void(std::string, int32_t)>;
+    using DevMonitor = std::pair<EventHandlerPtr, FunInputDevMonitor>;
 
     void RegisterInputDeviceMonitor(std::function<void(std::string, int32_t)> listening);
     void UnRegisterInputDeviceMonitor();
@@ -86,8 +85,6 @@ public:
     void GetInputDeviceIdsAsync(std::function<void(int32_t, std::vector<int32_t>)> callback);
     void GetInputDeviceAsync(int32_t deviceId,
         std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)> callback);
-    void SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
-        std::function<void(int32_t, std::vector<bool>)> callback);
     void SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
         std::function<void(std::vector<bool>)> callback);
     void GetKeyboardTypeAsync(int32_t deviceId, std::function<void(int32_t, int32_t)> callback);

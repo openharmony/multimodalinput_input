@@ -146,7 +146,8 @@ napi_value JsInputDeviceManager::SupportKeys(napi_env env, int32_t id, std::vect
     std::lock_guard<std::mutex> guard(mutex_);
     int32_t userData = InputDevImp.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
-    InputDevImp.SupportKeys(id, keyCodes, EmitJsKeystrokeAbility);
+    auto callback = std::bind(EmitJsKeystrokeAbility, userData, std::placeholders::_1);
+    InputManager::GetInstance()->SupportKeys(id, keyCodes, callback);
     return ret;
 }
 
