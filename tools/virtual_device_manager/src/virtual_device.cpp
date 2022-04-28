@@ -77,15 +77,6 @@ bool CheckFileName(const std::string& fileName)
     return result;
 }
 
-std::string PathSplicing(const std::initializer_list<std::string>& strList)
-{
-    std::string str;
-    for (const auto& item : strList) {
-        str += item;
-    }
-    return str;
-}
-
 void RemoveDir(const std::string& filePath)
 {
     DIR* dir = opendir(filePath.c_str());
@@ -100,16 +91,13 @@ void RemoveDir(const std::string& filePath)
             continue;
         }
         if (ptr->d_type == DT_REG) {
-            std::string rmFile = PathSplicing({
-                filePath, ptr->d_name
-            });
+            std::vector<std::string> pathStr = {  };
+            std::string rmFile = filePath + ptr->d_name;
             if (std::remove(rmFile.c_str()) != 0) {
                 printf("delete file: %s failed", rmFile.c_str());
             }
         } else if (ptr->d_type == DT_DIR) {
-            RemoveDir(PathSplicing({
-                filePath , ptr->d_name , "/"
-            }));
+            RemoveDir((filePath + ptr->d_name + "/"));
         } else {
             printf("file name:%s, type is error", ptr->d_name);
         }
@@ -119,6 +107,97 @@ void RemoveDir(const std::string& filePath)
         printf("delete file: %s failed", filePath.c_str());
     }
     return;
+}
+
+void StartMouse()
+{
+    VirtualMouse virtualMouse;
+    virtualMouse.SetUp();
+}
+
+void StartKeyboard()
+{
+    VirtualKeyboard virtualKey;
+    virtualKey.SetUp();
+    VirtualKeyboardSysCtrl virtualKeyboardSysCtrl;
+    virtualKeyboardSysCtrl.SetUp();
+    VirtualKeyboardConsumerCtrl virtualKeyboardConsumerCtrl;
+    virtualKeyboardConsumerCtrl.SetUp();
+    VirtualKeyboardExt virtualKeyext;
+    virtualKeyext.SetUp();
+}
+
+void StartJoystick()
+{
+    VirtualJoystick virtualJoystick;
+    virtualJoystick.SetUp();
+}
+
+void StartTrackball()
+{
+    VirtualTrackball virtualTrackball;
+    virtualTrackball.SetUp();
+}
+
+void StartRemoteControl()
+{
+    VirtualRemoteControl virtualRemoteControl;
+    virtualRemoteControl.SetUp();
+}
+
+
+void StartTrackpad()
+{
+    VirtualTrackpad virtualTrackpad;
+    virtualTrackpad.SetUp();
+    VirtualTrackpadMouse virtualMousepadMouse;
+    virtualMousepadMouse.SetUp();
+    VirtualTrackpadSysCtrl virtualTrackpadSysCtrl;
+    virtualTrackpadSysCtrl.SetUp();
+}
+
+void StartKnob()
+{
+    VirtualKnob virtualKnob;
+    virtualKnob.SetUp();
+    VirtualKnobConsumerCtrl virtualKnobConsumerCtrl;
+    virtualKnobConsumerCtrl.SetUp();
+    VirtualKnobMouse virtualKnobMouse;
+    virtualKnobMouse.SetUp();
+    VirtualKnobSysCtrl virtualKnobSysCtrl;
+    virtualKnobSysCtrl.SetUp();
+}
+
+void StartGamePad()
+{
+    VirtualGamePad virtualGamePad;
+    virtualGamePad.SetUp();
+}
+
+void StartTouchPad()
+{
+    VirtualStylus virtualStylus;
+    virtualStylus.SetUp();
+    VirtualTouchpad virtualTouchpad;
+    virtualTouchpad.SetUp();
+    VirtualFinger virtualFinger;
+    virtualFinger.SetUp();
+}
+
+void StartTouchScreen()
+{
+    VirtualTouchScreen virtualTouchScreen;
+    virtualTouchScreen.SetUp();
+}
+
+void StartPen()
+{
+    VirtualPen virtualPen;
+    virtualPen.SetUp();
+    VirtualPenMouse virtualPenMouse;
+    virtualPenMouse.SetUp();
+    VirtualPenKeyboard virtualPenKeyboard;
+    virtualPenKeyboard.SetUp();
 }
 } // namespace
 
@@ -174,16 +253,12 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
             break;
         }
         std::string::size_type pos = fileName.find("_");
-        std::string procressPath = PathSplicing({
-            "/proc/", fileName.substr(0, pos), "/"
-        });
+        std::string procressPath =  "/proc/" + fileName.substr(0, pos) + "/";
         dir = opendir(procressPath.c_str());
         if (dir == nullptr) {
             break;
         }
-        std::string filePath = PathSplicing({
-            procressPath , "cmdline"
-        });
+        std::string filePath = procressPath + "cmdline";
         if (!IsFileExists(filePath)) {
             break;
         }
@@ -360,113 +435,43 @@ void VirtualDevice::Close()
 
 void VirtualDevice::StartAllDevices()
 {
-    static VirtualMouse virtualMouse;
-    virtualMouse.SetUp();
-    static VirtualKeyboard virtualKey;
-    virtualKey.SetUp();
-    static VirtualKeyboardSysCtrl virtualKeyboardSysCtrl;
-    virtualKeyboardSysCtrl.SetUp();
-    static VirtualKeyboardConsumerCtrl virtualKeyboardConsumerCtrl;
-    virtualKeyboardConsumerCtrl.SetUp();
-    static VirtualKeyboardExt virtualKeyext;
-    virtualKeyext.SetUp();
-    static VirtualJoystick virtualJoystick;
-    virtualJoystick.SetUp();
-    static VirtualTrackball virtualTrackball;
-    virtualTrackball.SetUp();
-    static VirtualRemoteControl virtualRemoteControl;
-    virtualRemoteControl.SetUp();
-    static VirtualTrackpad virtualTrackpad;
-    virtualTrackpad.SetUp();
-    static VirtualTrackpadMouse virtualMousepadMouse;
-    virtualMousepadMouse.SetUp();
-    static VirtualTrackpadSysCtrl virtualTrackpadSysCtrl;
-    virtualTrackpadSysCtrl.SetUp();
-    static VirtualKnob virtualKnob;
-    virtualKnob.SetUp();
-    static VirtualKnobConsumerCtrl virtualKnobConsumerCtrl;
-    virtualKnobConsumerCtrl.SetUp();
-    static VirtualKnobMouse virtualKnobMouse;
-    virtualKnobMouse.SetUp();
-    static VirtualKnobSysCtrl virtualKnobSysCtrl;
-    virtualKnobSysCtrl.SetUp();
-    static VirtualGamePad virtualGamePad;
-    virtualGamePad.SetUp();
-    static VirtualStylus virtualStylus;
-    virtualStylus.SetUp();
-    static VirtualTouchpad virtualTouchpad;
-    virtualTouchpad.SetUp();
-    static VirtualFinger virtualFinger;
-    virtualFinger.SetUp();
-    static VirtualTouchScreen virtualTouchScreen;
-    virtualTouchScreen.SetUp();
-    static VirtualPen virtualPen;
-    virtualPen.SetUp();
-    static VirtualPenMouse virtualPenMouse;
-    virtualPenMouse.SetUp();
-    static VirtualPenKeyboard virtualPenKeyboard;
-    virtualPenKeyboard.SetUp();
+    StartMouse();
+    StartKeyboard();
+    StartJoystick();
+    StartTrackball();
+    StartRemoteControl();
+    StartTrackpad();
+    StartKnob();
+    StartGamePad();
+    StartTouchPad();
+    StartTouchScreen();
+    StartPen();
 }
 
 bool VirtualDevice::CreateHandle(const std::string& deviceArgv)
 {
     if (deviceArgv == "mouse") {
-        static VirtualMouse virtualMouse;
-        virtualMouse.SetUp();
+        StartMouse();
     } else if (deviceArgv == "keyboard") {
-        static VirtualKeyboard virtualKey;
-        virtualKey.SetUp();
-        static VirtualKeyboardSysCtrl virtualKeyboardSysCtrl;
-        virtualKeyboardSysCtrl.SetUp();
-        static VirtualKeyboardConsumerCtrl virtualKeyboardConsumerCtrl;
-        virtualKeyboardConsumerCtrl.SetUp();
-        static VirtualKeyboardExt virtualKeyext;
-        virtualKeyext.SetUp();
+        StartKeyboard();
     } else if (deviceArgv == "joystick") {
-        static VirtualJoystick virtualJoystick;
-        virtualJoystick.SetUp();
+        StartJoystick();
     } else if (deviceArgv == "trackball") {
-        static VirtualTrackball virtualTrackball;
-        virtualTrackball.SetUp();
+        StartTrackball();
     } else if (deviceArgv == "remotecontrol") {
-        static VirtualRemoteControl virtualRemoteControl;
-        virtualRemoteControl.SetUp();
+        StartRemoteControl();
     } else if (deviceArgv == "trackpad") {
-        static VirtualTrackpad virtualTrackpad;
-        virtualTrackpad.SetUp();
-        static VirtualTrackpadMouse virtualMousepadMouse;
-        virtualMousepadMouse.SetUp();
-        static VirtualTrackpadSysCtrl virtualTrackpadSysCtrl;
-        virtualTrackpadSysCtrl.SetUp();
+        StartTrackpad();
     } else if (deviceArgv == "knob") {
-        static VirtualKnob virtualKnob;
-        virtualKnob.SetUp();
-        static VirtualKnobConsumerCtrl virtualKnobConsumerCtrl;
-        virtualKnobConsumerCtrl.SetUp();
-        static VirtualKnobMouse virtualKnobMouse;
-        virtualKnobMouse.SetUp();
-        static VirtualKnobSysCtrl virtualKnobSysCtrl;
-        virtualKnobSysCtrl.SetUp();
+        StartKnob();
     } else if (deviceArgv == "gamepad") {
-        static VirtualGamePad virtualGamePad;
-        virtualGamePad.SetUp();
+        StartGamePad();
     } else if (deviceArgv == "touchpad") {
-        static VirtualStylus virtualStylus;
-        virtualStylus.SetUp();
-        static VirtualTouchpad virtualTouchpad;
-        virtualTouchpad.SetUp();
-        static VirtualFinger virtualFinger;
-        virtualFinger.SetUp();
+        StartTouchPad();
     } else if (deviceArgv == "touchscreen") {
-        static VirtualTouchScreen virtualTouchScreen;
-        virtualTouchScreen.SetUp();
+        StartTouchScreen();
     } else if (deviceArgv == "pen") {
-        static VirtualPen virtualPen;
-        virtualPen.SetUp();
-        static VirtualPenMouse virtualPenMouse;
-        virtualPenMouse.SetUp();
-        static VirtualPenKeyboard virtualPenKeyboard;
-        virtualPenKeyboard.SetUp();
+        StartPen();
     } else if (deviceArgv == "all") {
         StartAllDevices();
     } else {
