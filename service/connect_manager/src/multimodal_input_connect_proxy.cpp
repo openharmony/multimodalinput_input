@@ -105,5 +105,34 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
     }
     return result;
 }
+
+int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
+{
+    CALL_LOG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+
+    if (!data.WriteBool(visible)) {
+        MMI_HILOGE("Failed to write filter");
+        return ERR_INVALID_VALUE;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t requestResult = Remote()->SendRequest(SET_POINTER_VISIBLE, data, reply, option);
+    if (requestResult != NO_ERROR) {
+        MMI_HILOGE("send request fail, result:%{public}d", requestResult);
+        return RET_ERR;
+    }
+
+    int32_t result = reply.ReadInt32();
+    if (result != RET_OK) {
+        MMI_HILOGE("reply readint32 error:%{public}d", result);
+    }
+    return result;
+}
 } // namespace MMI
 } // namespace OHOS

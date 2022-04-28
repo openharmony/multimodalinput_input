@@ -33,7 +33,7 @@ public:
     UDSSession(const std::string& programName, const int32_t moduleType, const int32_t fd, const int32_t uid,
                const int32_t pid);
     DISALLOW_COPY_AND_MOVE(UDSSession);
-    virtual ~UDSSession();
+    virtual ~UDSSession() = default;
 
     bool SendMsg(const char *buf, size_t size) const;
     bool SendMsg(NetPacket& pkt) const;
@@ -49,7 +49,7 @@ public:
         return pid_;
     }
 
-    SessionPtr GetPtr()
+    SessionPtr GetSharedPtr()
     {
         return shared_from_this();
     }

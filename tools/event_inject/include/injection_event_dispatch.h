@@ -74,16 +74,11 @@ private:
     std::map<std::string, InjectFunction> injectFuns_;
     std::map<std::string, int32_t> sendEventType_;
     std::vector<DeviceInformation> allDevices_ = {};
-    bool IsFileExists(const std::string& fileName);
-    int32_t VerifyFile(const std::string& fileName);
-    std::string GetFileExtendName(const std::string& fileName);
-    int32_t GetFileSize(const std::string& fileName);
     bool CheckType(const std::string& inputType);
     bool CheckCode(const std::string& inputCode);
     bool CheckValue(const std::string& inputValue);
     bool CheckEventValue(const std::string& inputType, const std::string& inputCode,
     const std::string& inputValue);
-
 private:
     static constexpr uint32_t SEND_EVENT_ARGV_COUNTS = 5;
     static constexpr uint32_t SEND_EVENT_DEV_NODE_INDEX = 1;
@@ -94,7 +89,6 @@ private:
     static constexpr int32_t ARGVS_CODE_INDEX = 2;
     static constexpr int32_t SEND_EVENT_TO_DEVICE = 0;
     static constexpr int32_t JSON_FILE_PATH_INDEX = 1;
-    static constexpr int64_t JSON_FILE_SIZE = 0x200000;
     static constexpr uint32_t INPUT_TYPE_LENGTH = 3;
     static constexpr uint16_t INPUT_TYPE_MAX = 100;
     static constexpr uint32_t INPUT_CODE_LENGTH = 6;

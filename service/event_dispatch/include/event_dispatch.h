@@ -23,6 +23,7 @@
 #include "key_event_value_transformation.h"
 #include "pointer_event.h"
 #include "uds_server.h"
+#include "i_key_command_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -37,7 +38,7 @@ public:
     int32_t DispatchGestureEvent(UDSServer& udsServer, struct libinput_event *event, const EventGesture& gesture,
         const int64_t preHandlerTime);
     int32_t DispatchKeyEvent(UDSServer& udsServer, struct libinput_event *event,
-        const KeyEventValueTransformations& trs, EventKeyboard& key, const int64_t preHandlerTime);
+        const KeyEventValueTransformation& trs, EventKeyboard& key, const int64_t preHandlerTime);
     int32_t DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key);
     int32_t DispatchTouchEvent(UDSServer& udsServer, struct libinput_event *event,
         const EventTouch& touch, const int64_t preHandlerTime);
@@ -69,7 +70,8 @@ private:
 
 private:
     EventPackage eventPackage_;
-    };
+    std::shared_ptr<IKeyCommandManager> keyCommand_ = nullptr;
+};
 } // namespace MMI
 } // namespace OHOS
 #endif // EVENT_DISPATCH_H

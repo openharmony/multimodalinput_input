@@ -111,112 +111,54 @@ int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isNonBlock)
     return flags;
 }
 
+void UDSSocket::OnReadPackets(CircleStreamBuffer& circBuf, UDSSocket::PacketCallBackFun callbackFun)
+{
+    constexpr int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
+    for (int32_t i = 0; i < ONCE_PROCESS_NETPACKET_LIMIT; i++) {
+        const int32_t unreadSize = circBuf.UnreadSize();
+        if (unreadSize < headSize) {
+            break;
+        }
+        int32_t dataSize = unreadSize - headSize;
+        char *buf = const_cast<char *>(circBuf.ReadBuf());
+        CHKPB(buf);
+        PackHead *head = reinterpret_cast<PackHead *>(buf);
+        CHKPB(head);
+        if (head->size < 0 || head->size > MAX_PACKET_BUF_SIZE) {
+            MMI_HILOGF("Packet header parsing error, and this error cannot be recovered. The buffer will be reset."
+                " head->size:%{public}d, unreadSize:%{public}d", head->size, unreadSize);
+            circBuf.Reset();
+            break;
+        }
+        if (head->size > dataSize) {
+            break;
+        }
+        NetPacket pkt(head->idMsg);
+        if ((head->size > 0) && (!pkt.Write(&buf[headSize], head->size))) {
+            MMI_HILOGW("Error writing data in the NetPacket. It will be retried next time. messageid: %{public}d,"
+                "size:%{public}d", head->idMsg, head->size);
+            break;
+        }
+        if (!circBuf.SeekReadPos(pkt.GetPacketLength())) {
+            MMI_HILOGW("Set read position error, and this error cannot be recovered, and the buffer will be reset."
+                " packetSize:%{public}d unreadSize:%{public}d", pkt.GetPacketLength(), unreadSize);
+            circBuf.Reset();
+            break;
+        }
+        callbackFun(pkt);
+        if (circBuf.IsEmpty()) {
+            circBuf.Reset();
+            break;
+        }
+    }
+}
+
 void UDSSocket::EpollClose()
 {
     if (epollFd_ >= 0) {
         close(epollFd_);
         epollFd_ = -1;
     }
-}
-
-size_t UDSSocket::Read(char *buf, size_t size)
-{
-    CHKPR(buf, -1);
-    if (size <= 0) {
-        MMI_HILOGE("Invalid param size");
-        return -1;
-    }
-    if (fd_ < 0) {
-        MMI_HILOGE("Invalid param fd_");
-        return -1;
-    }
-    ssize_t ret = read(fd_, static_cast<void *>(buf), size);
-    if (ret < 0) {
-        MMI_HILOGE("read return %{public}zd", ret);
-    }
-    return ret;
-}
-
-size_t UDSSocket::Write(const char *buf, size_t size)
-{
-    CHKPR(buf, -1);
-    if (size <= 0) {
-        MMI_HILOGE("Invalid param size");
-        return -1;
-    }
-    if (fd_ < 0) {
-        MMI_HILOGE("Invalid param fd_");
-        return -1;
-    }
-    ssize_t ret = write(fd_, buf, size);
-    if (ret < 0) {
-        MMI_HILOGE("write return %{public}zd", ret);
-    }
-    return ret;
-}
-
-size_t UDSSocket::Send(const char *buf, size_t size, int32_t flags)
-{
-    CHKPR(buf, -1);
-    if (size <= 0) {
-        MMI_HILOGE("Invalid param size");
-        return -1;
-    }
-    ssize_t ret = send(fd_, buf, size, flags);
-    if (ret < 0) {
-        MMI_HILOGE("send return %{public}zd", ret);
-    }
-    return ret;
-}
-
-size_t UDSSocket::Recv(char *buf, size_t size, int32_t flags)
-{
-    CHKPR(buf, -1);
-    if (size <= 0) {
-        MMI_HILOGE("Invalid param size");
-        return -1;
-    }
-    ssize_t ret = recv(fd_, static_cast<void *>(buf), size, flags);
-    if (ret < 0) {
-        MMI_HILOGE("recv return %{public}zd", ret);
-    }
-    return ret;
-}
-
-size_t UDSSocket::Recvfrom(char *buf, size_t size, uint32_t flags, sockaddr *addr, size_t *addrlen)
-{
-    CHKPR(buf, -1);
-    if (size <= 0) {
-        MMI_HILOGE("Invalid param size");
-        return -1;
-    }
-    if (fd_ < 0) {
-        MMI_HILOGE("Invalid param fd_");
-        return -1;
-    }
-    ssize_t ret = recvfrom(fd_, static_cast<void *>(buf), size, flags, addr, reinterpret_cast<socklen_t *>(addrlen));
-    if (ret < 0) {
-        MMI_HILOGE("recvfrom return %{public}zd", ret);
-    }
-    return ret;
-}
-
-size_t UDSSocket::Sendto(const char *buf, size_t size, uint32_t flags, sockaddr *addr, size_t addrlen)
-{
-    CHKPR(buf, -1);
-    if (size <= 0) {
-        MMI_HILOGE("Invalid param size");
-        return -1;
-    }
-    if (fd_ < 0) {
-        MMI_HILOGE("Invalid param fd_");
-        return -1;
-    }
-    ssize_t ret = sendto(fd_, static_cast<const void *>(buf), size, flags, addr, static_cast<socklen_t>(addrlen));
-    if (ret < 0) {
-        MMI_HILOGE("sendto return %{public}zd", ret);
-    }
-    return ret;
 }
 
 void UDSSocket::Close()

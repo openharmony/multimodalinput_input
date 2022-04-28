@@ -33,11 +33,6 @@ GestureTransformPointProcessor::GestureTransformPointProcessor(int32_t deviceId)
 
 GestureTransformPointProcessor::~GestureTransformPointProcessor() {}
 
-void GestureTransformPointProcessor::SetPointEventSource(int32_t sourceType)
-{
-    pointerEvent_->SetSourceType(sourceType);
-}
-
 void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_gesture *data)
 {
     CALL_LOG_ENTER;
@@ -128,7 +123,6 @@ std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestrueE
     CHKPP(event);
     auto data = libinput_event_get_gesture_event(event);
     CHKPP(data);
-    pointerEvent_->UpdateId();
     auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN: {
@@ -157,6 +151,8 @@ std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestrueE
             return nullptr;
         }
     }
+    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent_->UpdateId();
     return pointerEvent_;
 }
 } // namespace MMI

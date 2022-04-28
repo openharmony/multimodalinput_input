@@ -17,7 +17,7 @@
 
 #include <cinttypes>
 
-#include "ability_launch_manager.h"
+#include "define_interceptor_global.h"
 #include "event_dump.h"
 #include "event_package.h"
 #include "hos_key_event.h"
@@ -27,11 +27,10 @@
 #include "input_event_monitor_manager.h"
 #include "input_handler_manager_global.h"
 #include "input_windows_manager.h"
-#include "interceptor_manager_global.h"
 #include "key_event_subscriber.h"
 #include "mmi_func_callback.h"
 #include "time_cost_chk.h"
-
+#include "mouse_event_handler.h"
 #ifdef OHOS_BUILD_HDF
 #include "hdi_inject.h"
 #endif
@@ -65,6 +64,9 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::INJECT_POINTER_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectPointerEvent, this) },
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ServerMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ServerMsgHandler::OnInputDeviceIds, this)},
+        {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ServerMsgHandler::GetKeystrokeAbility, this)},
+        {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputDeviceMontior, this)},
+        {MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputDeviceMontior, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
         {MmiMessageId::ADD_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputEventMontior, this)},
         {MmiMessageId::REMOVE_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputEventMontior, this)},
@@ -75,12 +77,18 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::ADD_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnAddInputHandler, this)},
         {MmiMessageId::REMOVE_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputHandler, this)},
         {MmiMessageId::MARK_CONSUMED, MsgCallbackBind2(&ServerMsgHandler::OnMarkConsumed, this)},
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+        {MmiMessageId::MOVE_MOUSE_BY_OFFSET, MsgCallbackBind2(&ServerMsgHandler::OnMoveMouse, this)},
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
         {MmiMessageId::SUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnSubscribeKeyEvent, this)},
         {MmiMessageId::UNSUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnUnSubscribeKeyEvent, this)},
         {MmiMessageId::ADD_EVENT_INTERCEPTOR,
             MsgCallbackBind2(&ServerMsgHandler::OnAddTouchpadEventFilter, this)},
         {MmiMessageId::REMOVE_EVENT_INTERCEPTOR,
             MsgCallbackBind2(&ServerMsgHandler::OnRemoveTouchpadEventFilter, this)},
+#ifdef OHOS_BUILD_MMI_DEBUG
+        {MmiMessageId::BIGPACKET_TEST, MsgCallbackBind2(&ServerMsgHandler::OnBigPacketTest, this)},
+#endif // OHOS_BUILD_MMI_DEBUG
 #ifdef OHOS_BUILD_HDF
         {MmiMessageId::HDI_INJECT, MsgCallbackBind2(&ServerMsgHandler::OnHdiInject, this)},
 #endif // OHOS_BUILD_HDF
@@ -124,7 +132,7 @@ int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
     }
     return RET_OK;
 }
-#endif
+#endif // OHOS_BUILD_HDF
 
 int32_t ServerMsgHandler::OnVirtualKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
@@ -288,6 +296,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 
 int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
 {
+    CHKPR(sess, ERROR_NULL_POINTER);
     int32_t handlerId;
     InputHandlerType handlerType;
     if (!pkt.Read(handlerId)) {
@@ -299,11 +308,14 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
     MMI_HILOGD("OnAddInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
-    return InputHandlerManagerGlobal::GetInstance().AddInputHandler(handlerId, handlerType, sess);
+    InterHdlGl->AddInputHandler(handlerId, handlerType, sess);
+    InputHandlerManagerGlobal::GetInstance().AddInputHandler(handlerId, handlerType, sess);
+    return RET_OK;
 }
 
 int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
 {
+    CHKPR(sess, ERROR_NULL_POINTER);
     int32_t handlerId;
     InputHandlerType handlerType;
     if (!pkt.Read(handlerId)) {
@@ -315,6 +327,7 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
     MMI_HILOGD("OnRemoveInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
+    InterHdlGl->RemoveInputHandler(handlerId, handlerType, sess);
     InputHandlerManagerGlobal::GetInstance().RemoveInputHandler(handlerId, handlerType, sess);
     return RET_OK;
 }
@@ -333,6 +346,29 @@ int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, NetPacket& pkt)
     InputHandlerManagerGlobal::GetInstance().MarkConsumed(monitorId, eventId, sess);
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
+{
+    CALL_LOG_ENTER;
+    int32_t offsetX = 0;
+    int32_t offsetY = 0;
+    if (!pkt.Read(offsetX)) {
+        MMI_HILOGE("Packet read offsetX failed");
+        return RET_ERR;
+    }
+    if (!pkt.Read(offsetY)) {
+        MMI_HILOGE("Packet read offsetY failed");
+        return RET_ERR;
+    }
+
+    if (MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY)) {
+        auto pointerEvent = MouseEventHdr->GetPointerEvent();
+        eventDispatch_.HandlePointerEvent(pointerEvent);
+    }
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 int32_t ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
 {
@@ -477,6 +513,97 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
     return RET_OK;
 }
 
+int32_t ServerMsgHandler::GetKeystrokeAbility(SessionPtr sess, NetPacket& pkt)
+{
+    CALL_LOG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t userData;
+    if (!pkt.Read(userData)) {
+        MMI_HILOGE("Packet read userData failed");
+        return RET_ERR;
+    }
+    int32_t deviceId;
+    if (!pkt.Read(deviceId)) {
+        MMI_HILOGE("Packet read device failed");
+        return RET_ERR;
+    }
+    size_t size;
+    if (!pkt.Read(size)) {
+        MMI_HILOGE("Packet read size failed");
+        return RET_ERR;
+    }
+    int32_t sysKeyValue;
+    std::vector<int32_t> keyCode;
+    for (size_t i = 0 ; i < size; ++i) {
+        if (!pkt.Read(sysKeyValue)) {
+            MMI_HILOGE("Packet read nativeKeyValue failed");
+            return RET_ERR;
+        }
+        keyCode.push_back(sysKeyValue);
+    }
+
+    std::map<int32_t, bool> abilityRet = InputDevMgr->GetKeystrokeAbility(deviceId, keyCode);
+    std::vector<int32_t> keystroke;
+    for (const auto &item : abilityRet) {
+        keystroke.push_back(item.first);
+        keystroke.push_back(item.second ? 1 : 0);
+    }
+
+    NetPacket pkt2(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
+    if (!pkt2.Write(userData)) {
+        MMI_HILOGE("Packet write userData failed");
+        return RET_ERR;
+    }
+    size = keystroke.size();
+    if (!pkt2.Write(size)) {
+        MMI_HILOGE("Packet write size failed");
+        return RET_ERR;
+    }
+    for (const auto &item : keystroke) {
+        if (!pkt2.Write(item)) {
+            MMI_HILOGE("Packet write keystroke failed");
+            return RET_ERR;
+        }
+    }
+    if (!sess->SendMsg(pkt2)) {
+        MMI_HILOGE("Sending failed");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pkt)
+{
+    CALL_LOG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    InputDevMgr->AddDevMonitor(sess, [sess](std::string type, int32_t deviceId) {
+        CALL_LOG_ENTER;
+        CHKPV(sess);
+        NetPacket pkt2(MmiMessageId::ADD_INPUT_DEVICE_MONITOR);
+        if (!pkt2.Write(type)) {
+            MMI_HILOGE("Packet write type failed");
+            return;
+        }
+        if (!pkt2.Write(deviceId)) {
+            MMI_HILOGE("Packet write deviceId failed");
+            return;
+        }
+        if (!sess->SendMsg(pkt2)) {
+            MMI_HILOGE("Sending failed");
+            return;
+        }
+    });
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket& pkt)
+{
+    CALL_LOG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    InputDevMgr->RemoveDevMonitor(sess);
+    return RET_OK;
+}
+
 int32_t ServerMsgHandler::OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
@@ -545,6 +672,7 @@ int32_t ServerMsgHandler::OnRemoveInputEventTouchpadMontior(SessionPtr sess, Net
     InputMonitorServiceMgr.RemoveInputEventMontior(sess, eventType);
     return RET_OK;
 }
+
 int32_t ServerMsgHandler::OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
@@ -555,7 +683,7 @@ int32_t ServerMsgHandler::OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& p
         MMI_HILOGE("Packet read sourceType failed");
         return PACKET_READ_FAIL;
     }
-    InterceptorMgrGbl.OnAddInterceptor(sourceType, id, sess);
+    InterMgrGl->OnAddInterceptor(sourceType, id, sess);
     return RET_OK;
 }
 
@@ -563,13 +691,57 @@ int32_t ServerMsgHandler::OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t id = 0;
-    pkt  >> id;
+    pkt >> id;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read data failed");
         return PACKET_READ_FAIL;
     }
-    InterceptorMgrGbl.OnRemoveInterceptor(id);
+    InterMgrGl->OnRemoveInterceptor(id);
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_MMI_DEBUG
+int32_t ServerMsgHandler::OnBigPacketTest(SessionPtr sess, NetPacket& pkt)
+{
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t pid = 0;
+    int32_t id = 0;
+    pkt >> pid >> id;
+    int32_t phyNum = 0;
+    pkt >> phyNum;
+    MMI_HILOGD("BigPacketsTest pid:%{public}d id:%{public}d phyNum:%{public}d size:%{public}zu",
+        pid, id, phyNum, pkt.Size());
+    for (auto i = 0; i < phyNum; i++) {
+        PhysicalDisplayInfo info = {};
+        pkt >> info.id >> info.leftDisplayId >> info.upDisplayId >> info.topLeftX >> info.topLeftY;
+        pkt >> info.width >> info.height >> info.name >> info.seatId >> info.seatName >> info.logicWidth;
+        pkt >> info.logicHeight >> info.direction;
+        MMI_HILOGD("\tPhysical: idx:%{public}d id:%{public}d seatId:%{public}s", i, info.id, info.seatId.c_str());
+    }
+    int32_t logcNum = 0;
+    pkt >> logcNum;
+    MMI_HILOGD("\tlogcNum:%{public}d", logcNum);
+    for (auto i = 0; i < logcNum; i++) {
+        LogicalDisplayInfo info = {};
+        pkt >> info.id >> info.topLeftX >> info.topLeftY;
+        pkt >> info.width >> info.height >> info.name >> info.seatId >> info.seatName >> info.focusWindowId;
+        MMI_HILOGD("\t\tLogical: idx:%{public}d id:%{public}d seatId:%{public}s", i, info.id, info.seatId.c_str());
+        int32_t winNum = 0;
+        pkt >> winNum;
+        MMI_HILOGD("\t\twinNum:%{public}d", winNum);
+        for (auto j = 0; j < winNum; j++) {
+            WindowInfo winInfo;
+            pkt >> winInfo;
+            MMI_HILOGD("\t\t\tWindows: idx:%{public}d id:%{public}d displayId:%{public}d",
+                j, winInfo.id, winInfo.displayId);
+        }
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read data failed");
+        return PACKET_READ_FAIL;
+    }
+    return RET_OK;
+}
+#endif // OHOS_BUILD_MMI_DEBUG
 } // namespace MMI
 } // namespace OHOS

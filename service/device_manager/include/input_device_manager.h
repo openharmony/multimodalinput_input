@@ -19,14 +19,13 @@
 #include <list>
 #include <string>
 
-#include "nocopyable.h"
-#include "singleton.h"
-
 #include "device_observer.h"
 #include "event_dispatch.h"
 #include "event_package.h"
 #include "input_device.h"
 #include "msg_handler.h"
+#include "nocopyable.h"
+#include "singleton.h"
 #include "util.h"
 
 namespace OHOS {
@@ -39,20 +38,24 @@ public:
     void OnInputDeviceRemoved(struct libinput_device* inputDevice);
     std::vector<int32_t> GetInputDeviceIds() const;
     std::shared_ptr<InputDevice> GetInputDevice(int32_t id) const;
-    void GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback);
-    void FindInputDeviceIdAsync(int32_t deviceId, std::function<void(std::shared_ptr<InputDevice>)> callback);
+    std::map<int32_t, bool> GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> &keyCodes);
     int32_t FindInputDeviceId(struct libinput_device* inputDevice);
     void Attach(std::shared_ptr<IDeviceObserver> observer);
     void Detach(std::shared_ptr<IDeviceObserver> observer);
     void NotifyPointerDevice(bool hasPointerDevice);
+    void AddDevMonitor(SessionPtr sess, std::function<void(std::string, int32_t)> callback);
+    void RemoveDevMonitor(SessionPtr sess);
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    bool HasPointerDevice();
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 private:
     bool IsPointerDevice(struct libinput_device* device);
     void ScanPointerDevice();
     std::map<int32_t, struct libinput_device*> inputDevice_;
-    bool initFlag_ {false};
     int32_t nextId_ {0};
     std::list<std::shared_ptr<IDeviceObserver>> observers_;
+    std::map<SessionPtr, std::function<void(std::string, int32_t)>> devMonitor_;
 };
 
 #define InputDevMgr InputDeviceManager::GetInstance()

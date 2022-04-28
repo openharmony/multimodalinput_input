@@ -157,22 +157,23 @@ struct NormalizedCoords {
     double y;
 };
 
-struct DeviceFloatCoords {
+struct PhysicalCoordinate {
     double x;
     double y;
 };
 
-struct DeviceCoords {
-    double x;
-    double y;
+struct LogicalCoordinate {
+    int32_t x;
+    int32_t y;
+};
+
+struct LogicalRectangle {
+    LogicalCoordinate point;
+    int32_t width;
+    int32_t height;
 };
 
 struct TiltDegrees {
-    double x;
-    double y;
-};
-
-struct DiscreteCoords {
     double x;
     double y;
 };
@@ -233,22 +234,22 @@ struct EventPointer {
     char uuid[MAX_UUIDSIZE];
     int64_t time;
     NormalizedCoords delta;
-    DeviceFloatCoords delta_raw;
-    DeviceCoords absolute;
-    DiscreteCoords discrete;
+    PhysicalCoordinate deltaRaw;
+    PhysicalCoordinate absolute;
+    PhysicalCoordinate discrete;
     int32_t button;
-    int32_t seat_button_count;
+    int32_t seatButtonCount;
     enum BUTTON_STATE state;
     enum POINTER_AXIS_SOURCE source;
     enum POINTER_AXIS axis;
 };
 
 struct Pointer {
-    DeviceCoords absolute;
+    PhysicalCoordinate absolute;
 };
 
 struct TabletAxes {
-    DeviceCoords point;
+    PhysicalCoordinate point;
     NormalizedCoords delta;
     double distance;
     double pressure;
@@ -292,7 +293,8 @@ struct EventTouch {
     int64_t time;
     int32_t slot;
     int32_t seatSlot;
-    DeviceCoords point;
+    LogicalCoordinate point;
+    LogicalRectangle toolRect;
     DEVICE_TYPE deviceType;
     double pressure;
     double area;

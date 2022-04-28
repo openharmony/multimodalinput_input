@@ -49,6 +49,7 @@ public:
     virtual void OnDump() override;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &socketFd) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
+    virtual int32_t SetPointerVisible(bool visible) override;
 
 protected:
     virtual void OnConnected(SessionPtr s) override;
@@ -73,7 +74,6 @@ private:
     std::thread t_;
 
     LibinputAdapter libinputAdapter_;
-    UDSServer udsServer_;
     ServerMsgHandler sMsgHandler_;
 };
 } // namespace MMI

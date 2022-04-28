@@ -27,7 +27,6 @@
 #include "bytrace.h"
 #include "libinput.h"
 
-#include "ability_launch_manager.h"
 #include "bytrace_adapter.h"
 #include "input_device_manager.h"
 #include "interceptor_manager_global.h"
@@ -118,6 +117,18 @@ void InputEventHandler::Init(UDSServer& udsServer)
             MsgCallbackBind1(&InputEventHandler::OnEventTouchpad, this)
         },
         {
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_TABLET_TOOL_AXIS),
+            MsgCallbackBind1(&InputEventHandler::OnTabletToolEvent, this)
+        },
+        {
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY),
+            MsgCallbackBind1(&InputEventHandler::OnTabletToolEvent, this)
+        },
+        {
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_TABLET_TOOL_TIP),
+            MsgCallbackBind1(&InputEventHandler::OnTabletToolEvent, this)
+        },
+        {
             static_cast<MmiMessageId>(LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN),
             MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
@@ -162,7 +173,6 @@ void InputEventHandler::OnEvent(void *event)
     }
 
     eventType_ = libinput_event_get_type(lpEvent);
-    auto tid = GetThisThreadId();
     initSysClock_ = GetSysClockTime();
     lastSysClock_ = 0;
     idSeed_ += 1;
@@ -174,7 +184,7 @@ void InputEventHandler::OnEvent(void *event)
     }
 
     MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
-               "initSysClock:%{public}" PRId64, idSeed_, tid, eventType_, initSysClock_);
+               "initSysClock:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType_, initSysClock_);
 
     OnEventHandler(lpEvent);
     lastSysClock_ = GetSysClockTime();
@@ -366,6 +376,20 @@ int32_t InputEventHandler::OnEventTouchpad(libinput_event *event)
     return RET_OK;
 }
 
+int32_t InputEventHandler::OnTabletToolEvent(libinput_event *event)
+{
+    CALL_LOG_ENTER;
+    CHKPR(event, ERROR_NULL_POINTER);
+    LibinputAdapter::LoginfoPackagingTool(event);
+    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TABLET_TOOL);
+    CHKPR(pointerEvent, RET_ERR);
+    eventDispatch_.HandlePointerEvent(pointerEvent);
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+        pointerEvent->Reset();
+    }
+    return RET_OK;
+}
+
 int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
@@ -408,7 +432,11 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
 
-    MouseEventHdr->Normalize(event);
+    auto ret = MouseEventHdr->Normalize(event);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Normalize faild");
+        return RET_ERR;
+    }
 
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -443,7 +471,7 @@ int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEv
     }
     MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
                "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
-               "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,Device:%{public}d",
+               "Width:%{public}d,Height:%{public}d,Pressure:%{public}f,Device:%{public}d",
                item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
                item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
                item.GetDeviceId());

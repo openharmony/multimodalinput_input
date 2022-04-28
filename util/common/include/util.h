@@ -25,6 +25,7 @@
 
 namespace OHOS {
 namespace MMI {
+constexpr int32_t JSON_FILE_SIZE = 0x5000;
 const char *GetMmiErrorTypeDesc(int32_t errorCodeEnum);
 std::string UuIdGenerate();
 int64_t GetMicrotime();
@@ -35,7 +36,7 @@ std::string GetThisThreadIdOfString();
 uint64_t GetThisThreadId();
 size_t StringToken(std::string& str, const std::string& sep, std::string& token);
 size_t StringSplit(const std::string& str, const std::string& sep, std::vector<std::string>& vecList);
-std::string IdsListToString(const std::vector<int32_t>& list, const std::string& sep);
+std::string IdsListToString(const std::vector<int32_t>& list, const std::string& sep = ", ");
 void LocalTime(tm& t, time_t curTime = 0);
 std::string Strftime(const std::string& format = "%F %T", time_t curTime = 0);
 void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
@@ -56,6 +57,7 @@ bool IsFileExists(const std::string& fileName);
 int32_t VerifyFile(const std::string& fileName);
 std::string GetFileExtendName(const std::string& fileName);
 int32_t GetFileSize(const std::string& fileName);
+std::string ReadFile(const std::string &filePath, int32_t readLine = 0);
 } // namespace MMI
 } // namespace OHOS
 #endif // UTIL_H

@@ -25,13 +25,15 @@ public:
     VirtualDevice(const std::string &device_name, uint16_t busType, uint16_t vendorId, uint16_t product_id);
     virtual ~VirtualDevice();
     DISALLOW_COPY_AND_MOVE(VirtualDevice);
-    static bool ViewDirectory(std::vector<std::string>& fileList);
-    static bool SyncSymbolFile();
+    static std::vector<std::string> ViewDirectory(const std::string& filePath, bool compliant = true);
+    static bool ClearFileResidues(const std::string& procressPath, const std::string& fileName);
+    static void SyncSymbolFile();
     bool DoIoctl(int32_t fd, int32_t request, const uint32_t value);
     bool CreateKey();
     bool SetAbsResolution(const std::string deviceName);
     bool SetPhys(const std::string deviceName);
     bool SetUp();
+    void Close();
     static void CloseAllDevice(const std::vector<std::string>& fileList);
     static void StartAllDevices();
     static void MakeFolder(const std::string &filePath);
@@ -40,7 +42,6 @@ public:
     static bool AddDevice(const std::vector<std::string>& fileList);
     static bool CloseDevice(const std::vector<std::string>& fileList);
     static bool FindDevice(std::vector<std::string> argvList);
-
 protected:
     virtual const std::vector<uint32_t>& GetEventTypes() const;
     virtual const std::vector<uint32_t>& GetKeys() const;

@@ -22,9 +22,9 @@
 
 #include "event_dump.h"
 #include "input_windows_manager.h"
+#include "i_pointer_drawing_manager.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
-#include "pointer_drawing_manager.h"
 #include "timer_manager.h"
 #include "util.h"
 
@@ -48,14 +48,12 @@ void CheckDefineOutput(const char* fmt, Ts... args)
 {
     using namespace OHOS::MMI;
     CHKPV(fmt);
-    int32_t ret = 0;
-    char buf[MAX_STREAM_BUF_SIZE] = {};
-    ret = snprintf_s(buf, MAX_STREAM_BUF_SIZE, MAX_STREAM_BUF_SIZE - 1, fmt, args...);
-    if (ret < 0) {
+    char buf[MAX_PACKET_BUF_SIZE] = {};
+    int32_t ret = snprintf_s(buf, MAX_PACKET_BUF_SIZE, MAX_PACKET_BUF_SIZE - 1, fmt, args...);
+    if (ret == -1) {
         KMSG_LOGI("call snprintf_s fail.ret = %d", ret);
         return;
     }
-
     KMSG_LOGI("%s", buf);
     MMI_HILOGI("%{public}s", buf);
 }
@@ -181,7 +179,7 @@ int32_t MMIService::Init()
         return WINDOWS_MSG_INIT_FAIL;
     }
     MMI_HILOGD("PointerDrawingManager Init");
-    if (!PointerDrawingManager::GetInstance()->Init()) {
+    if (!IPointerDrawingManager::GetInstance()->Init()) {
         MMI_HILOGE("Pointer draw init failed");
         return POINTER_DRAW_INIT_FAIL;
     }
@@ -205,9 +203,9 @@ int32_t MMIService::Init()
 
 void MMIService::OnStart()
 {
-    auto tid = GetThisThreadId();
-    MMI_HILOGD("Thread tid:%{public}" PRId64 "", tid);
-
+    int sleepSeconds = 3;
+    sleep(sleepSeconds);
+    CHK_PIDANDTID();
     int32_t ret = Init();
     if (RET_OK != ret) {
         MMI_HILOGE("Init mmi_service failed");
@@ -221,21 +219,16 @@ void MMIService::OnStart()
 
 void MMIService::OnStop()
 {
-    auto tid = GetThisThreadId();
-    MMI_HILOGD("Thread tid:%{public}" PRId64 "", tid);
-
+    CHK_PIDANDTID();
     UdsStop();
-    if (InputHandler != nullptr) {
-        InputHandler->Clear();
-    }
+    InputHandler->Clear();
     libinputAdapter_.Stop();
     state_ = ServiceRunningState::STATE_NOT_START;
 }
 
 void MMIService::OnDump()
 {
-    auto tid = GetThisThreadId();
-    MMI_HILOGD("Thread tid:%{public}" PRId64 "", tid);
+    CHK_PIDANDTID();
     MMIEventDump->Dump();
 }
 
@@ -251,6 +244,7 @@ void MMIService::OnDisconnected(SessionPtr s)
     CHKPV(s);
     int32_t fd = s->GetFd();
     MMI_HILOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), fd);
+    IPointerDrawingManager::GetInstance()->DeletePointerVisible(s->GetPid());
 }
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)
@@ -304,6 +298,13 @@ int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
     return InputHandler->AddInputEventFilter(filter);
 }
 
+int32_t MMIService::SetPointerVisible(bool visible)
+{
+    CALL_LOG_ENTER;
+    IPointerDrawingManager::GetInstance()->SetPointerVisible(GetCallingPid(), visible);
+    return RET_OK;
+}
+
 void MMIService::OnTimer()
 {
     if (InputHandler != nullptr) {
@@ -316,18 +317,12 @@ void MMIService::OnThread()
 {
     SetThreadName(std::string("mmi_service"));
     uint64_t tid = GetThisThreadId();
-    if (tid <= 0) {
-        MMI_HILOGE("The tid is error, errCode:%{public}d", VAL_NOT_EXP);
-        return;
-    }
     MMI_HILOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
 
     int32_t count = 0;
     constexpr int32_t timeOut = 1;
     struct epoll_event ev[MAX_EVENT_SIZE] = {};
-    std::map<int32_t, StreamBufData> bufMap;
     while (state_ == ServiceRunningState::STATE_RUNNING) {
-        bufMap.clear();
         count = EpollWait(ev[0], MAX_EVENT_SIZE, timeOut, mmiFd_);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
@@ -335,7 +330,7 @@ void MMIService::OnThread()
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 libinputAdapter_.EventDispatch(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
-                OnEpollEvent(bufMap, ev[i]);
+                OnEpollEvent(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {
                 OnSignalEvent(mmiEd->fd);
             } else {
@@ -344,12 +339,6 @@ void MMIService::OnThread()
         }
         if (state_ != ServiceRunningState::STATE_RUNNING) {
             break;
-        }
-        for (auto& it : bufMap) {
-            if (it.second.isOverflow) {
-                continue;
-            }
-            OnEpollRecv(it.first, it.second.sBuf.Data(), it.second.sBuf.Size());
         }
         OnTimer();
     }
@@ -407,11 +396,13 @@ void MMIService::OnSignalEvent(int32_t signalFd)
         case SIGFPE:
         case SIGKILL:
         case SIGSEGV:
-        case SIGTERM:
+        case SIGTERM: {
             state_ = ServiceRunningState::STATE_EXIT;
             break;
-        default:
+        }
+        default: {
             break;
+        }
     }
 }
 } // namespace MMI

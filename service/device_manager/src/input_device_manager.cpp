@@ -15,6 +15,8 @@
 
 #include "input_device_manager.h"
 
+#include "key_event_value_transformation.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -54,6 +56,56 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
     return ids;
 }
 
+std::map<int32_t, bool> InputDeviceManager::GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> &keyCodes)
+{
+    CALL_LOG_ENTER;
+    std::map<int32_t, bool> keystrokeAbility;
+    auto iter = inputDevice_.find(deviceId);
+    if (iter == inputDevice_.end()) {
+        for (const auto &item : keyCodes) {
+            keystrokeAbility[item] = false;
+        }
+        return keystrokeAbility;
+    }
+    for (const auto& item : keyCodes) {
+        auto sysKeyCode = InputTransformationKeyValue(item);
+        bool ret = libinput_device_has_key(iter->second, sysKeyCode) == 1 ? true : false;
+        keystrokeAbility[item] = ret;
+    }
+    return keystrokeAbility;
+}
+
+void InputDeviceManager::AddDevMonitor(SessionPtr sess, std::function<void(std::string, int32_t)> callback)
+{
+    CALL_LOG_ENTER;
+    auto iter = devMonitor_.find(sess);
+    if (iter == devMonitor_.end()) {
+        devMonitor_[sess] = callback;
+    }
+}
+
+void InputDeviceManager::RemoveDevMonitor(SessionPtr sess)
+{
+    CALL_LOG_ENTER;
+    auto iter = devMonitor_.find(sess);
+    if (iter == devMonitor_.end()) {
+        MMI_HILOGE("session does not exist");
+    }
+    devMonitor_.erase(iter);
+}
+
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+bool InputDeviceManager::HasPointerDevice()
+{
+    for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
+        if (IsPointerDevice(it->second)) {
+            return true;
+        }
+    }
+    return false;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)
 {
     CALL_LOG_ENTER;
@@ -69,6 +121,10 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)
         return;
     }
     inputDevice_[nextId_] = inputDevice;
+    for (const auto &item : devMonitor_) {
+        CHKPC(item.first);
+        item.second("add", nextId_);
+    }
     ++nextId_;
 
     if (IsPointerDevice(static_cast<struct libinput_device *>(inputDevice))) {
@@ -80,13 +136,18 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device* inputDevic
 {
     CALL_LOG_ENTER;
     CHKPV(inputDevice);
+    int32_t deviceId = INVALID_DEVICE_ID;
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second == inputDevice) {
+            deviceId = it->first;
             inputDevice_.erase(it);
             break;
         }
     }
-
+    for (const auto &item : devMonitor_) {
+        CHKPC(item.first);
+        item.second("remove", deviceId);
+    }
     ScanPointerDevice();
 }
 

@@ -23,10 +23,11 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventValueTransformations" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventValueTransformation" };
+constexpr int32_t INVALID_KEY_CODE = -1;
 } // namespace
 
-const std::multimap<int16_t, KeyEventValueTransformations> MAP_KEY_EVENT_VALUE_TRANSFORMATION = {
+const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TRANSFORMATION = {
     {11, {"KEY_0", 11, 2000, HOS_KEY_0}},
     {2, {"KEY_1", 2, 2001, HOS_KEY_1}},
     {3, {"KEY_2", 3, 2002, HOS_KEY_2}},
@@ -92,7 +93,7 @@ const std::multimap<int16_t, KeyEventValueTransformations> MAP_KEY_EVENT_VALUE_T
     {40, {"KEY_APOSTROPHE", 40, 2063, HOS_KEY_APOSTROPHE}},
     {53, {"KEY_SLASH", 53, 2064, HOS_KEY_SLASH}},
     {139, {"KEY_MENU", 139, 2067, HOS_KEY_MENU}},
-    {127, {"KEY_MENU", 127, 2067, HOS_KEY_MENU}},
+    {127, {"KEY_MENU", 127, 2466, HOS_KEY_COMPOSE}},
     {104, {"KEY_PAGE_UP", 104, 2068, HOS_KEY_PAGE_UP}},
     {109, {"KEY_PAGE_DOWN", 109, 2069, HOS_KEY_PAGE_DOWN}},
     {1, {"KEY_ESCAPE", 1, 2070, HOS_KEY_ESCAPE}},
@@ -150,15 +151,6 @@ const std::multimap<int16_t, KeyEventValueTransformations> MAP_KEY_EVENT_VALUE_T
     {117, {"KEY_NUMPAD_EQUALS", 117, 2120, HOS_KEY_NUMPAD_EQUALS}},
     {179, {"KEY_NUMPAD_LEFT_PAREN", 179, 2121, HOS_KEY_NUMPAD_LEFT_PAREN}},
     {180, {"KEY_NUMPAD_RIGHT_PAREN", 180, 2122, HOS_KEY_NUMPAD_RIGHT_PAREN}},
-
-    {272, {"LEFT_BUTTON", 272, 1, HOS_LEFT_BUTTON}},
-    {273, {"RIGHT_BUTTON", 273, 2, HOS_RIGHT_BUTTON}},
-    {274, {"MIDDLE_BUTTON", 274, 4, HOS_MIDDLE_BUTTON}},
-    {275, {"SIDE_BUTTON", 275, 32, HOS_SIDE_BUTTON}},
-    {276, {"EXTRA_BUTTON", 276, 64, HOS_EXTRA_BUTTON}},
-    {277, {"FORWARD_BUTTON", 277, 16, HOS_FORWARD_BUTTON}},
-    {278, {"BACK_BUTTON", 278, 8, HOS_BACK_BUTTON}},
-    {279, {"TASK_BUTTON", 279, 128, HOS_TASK_BUTTON}},
 
     {115, {"KEY_VOLUME_UP", 115, 16, HOS_KEY_VOLUME_UP}},
     {114, {"KEY_VOLUME_DOWN", 114, 17, HOS_KEY_VOLUME_DOWN}},
@@ -443,19 +435,29 @@ const std::multimap<int16_t, KeyEventValueTransformations> MAP_KEY_EVENT_VALUE_T
     {412, {"KEY_PREVIOUS", 412, 2631, HOS_KEY_PREVIOUS}},
 };
 
-KeyEventValueTransformations KeyValueTransformationInput(int16_t keyValueOfInput)
+KeyEventValueTransformation TransferKeyValue(int32_t keyValueOfInput)
 {
     auto it = MAP_KEY_EVENT_VALUE_TRANSFORMATION.find(keyValueOfInput);
     if (it == MAP_KEY_EVENT_VALUE_TRANSFORMATION.end()) {
-        constexpr int16_t UNKNOWN_KEY_BASE = 10000;
-        KeyEventValueTransformations unknownKey = {
+        constexpr int32_t UNKNOWN_KEY_BASE = 10000;
+        KeyEventValueTransformation unknownKey = {
             "UNKNOWN_KEY", keyValueOfInput, UNKNOWN_KEY_BASE + keyValueOfInput, HOS_UNKNOWN_KEY_BASE
         };
-        MMI_HILOGE("KeyValueTransformationInput Failed, unknown linux-code:%{public}d,"
+        MMI_HILOGE("TransferKeyValue Failed, unknown linux-code:%{public}d,"
                    "UNKNOWN_KEY_BASE:%{public}d", keyValueOfInput, UNKNOWN_KEY_BASE);
         return unknownKey;
     }
     return it->second;
+}
+
+int32_t InputTransformationKeyValue(int32_t keyCode)
+{
+    for (const auto &item : MAP_KEY_EVENT_VALUE_TRANSFORMATION) {
+        if (item.second.sysKeyValue == keyCode) {
+            return item.first;
+        }
+    }
+    return INVALID_KEY_CODE;
 }
 } // namespace MMI
 } // namespace OHOS

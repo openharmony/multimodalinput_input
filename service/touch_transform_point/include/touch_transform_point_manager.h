@@ -20,7 +20,7 @@
 #include <memory>
 
 #include "singleton.h"
-
+#include "transform_point_processor.h"
 #include "gesture_transform_point_processor.h"
 #include "touch_transform_point_processor.h"
 #include "touchpad_transform_point_processor.h"
@@ -30,11 +30,15 @@ namespace MMI {
 class TouchTransformPointManager : public DelayedSingleton<TouchTransformPointManager> {
 public:
     std::shared_ptr<PointerEvent> OnLibInput(struct libinput_event *event, INPUT_DEVICE_TYPE deviceType);
+
 private:
     std::shared_ptr<PointerEvent> OnLibinputTouchEvent(struct libinput_event *event);
+    std::shared_ptr<PointerEvent> OnLibinputTabletToolEvent(struct libinput_event *event);
     std::shared_ptr<PointerEvent> OnLibinputTouchPadEvent(struct libinput_event *event);
     std::shared_ptr<PointerEvent> OnTouchPadGestrueEvent(struct libinput_event *event);
+
 private:
+    std::map<int32_t, std::shared_ptr<TransformPointProcessor>> processors_;
     std::map<int32_t, std::shared_ptr<TouchTransformPointProcessor>> touchPro_;
     std::map<int32_t, std::shared_ptr<TouchPadTransformPointProcessor>> touchpadPro_;
     std::map<int32_t, std::shared_ptr<GestureTransformPointProcessor>> gesturePro_;

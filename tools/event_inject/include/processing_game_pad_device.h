@@ -22,28 +22,20 @@
 namespace OHOS {
 namespace MMI {
 class ProcessingGamePadDevice : public DeviceBase {
-    struct GamePadEvent {
-        std::string eventType;
-        std::string direction;
-        int32_t keyValue;
-        int64_t blockTime;
-        std::vector<uint32_t> gameEvents;
-    };
 public:
     ProcessingGamePadDevice() = default;
     ~ProcessingGamePadDevice() = default;
     DISALLOW_COPY_AND_MOVE(ProcessingGamePadDevice);
-    int32_t TransformJsonDataToInputData(const Json& originalEvent, InputEventArray& inputEventArray);
+    int32_t TransformJsonDataToInputData(const DeviceItem& originalEvent, InputEventArray& inputEventArray);
 private:
-    int32_t AnalysisGamePadEvent(const Json& inputData, std::vector<GamePadEvent>& padEventArray);
-    void TransformPadEventToInputEvent(const std::vector<GamePadEvent>& padEventArray,
+    void TransformPadEventToInputEvent(const std::vector<DeviceEvent>& inputData,
                                        InputEventArray& inputEventArray);
-    void TransformKeyPressEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray);
-    void TransformKeyReleaseEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray);
-    void TransformKeyClickEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray);
-    void TransformRocker1Event(const GamePadEvent& padEvent, InputEventArray& inputEventArray);
-    void TransformRocker2Event(const GamePadEvent& padEvent, InputEventArray& inputEventArray);
-    void TransformDerectionKeyEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray);
+    void TransformKeyPressEvent(const DeviceEvent& padEvent, InputEventArray& inputEventArray);
+    void TransformKeyReleaseEvent(const DeviceEvent& padEvent, InputEventArray& inputEventArray);
+    void TransformKeyClickEvent(const DeviceEvent& padEvent, InputEventArray& inputEventArray);
+    void TransformRocker1Event(const DeviceEvent& padEvent, InputEventArray& inputEventArray);
+    void TransformRocker2Event(const DeviceEvent& padEvent, InputEventArray& inputEventArray);
+    void TransformDerectionKeyEvent(const DeviceEvent& padEvent, InputEventArray& inputEventArray);
 };
 } // namespace MMI
 } // namespace OHOS

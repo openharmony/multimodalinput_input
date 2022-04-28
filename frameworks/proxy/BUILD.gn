@@ -13,6 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
+import("//foundation/appexecfwk/standard/appexecfwk.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 module_output_path = "multimodalinput/unit_out"
 
@@ -30,6 +31,7 @@ config("libmmi_client_config") {
 
 config("libmmi_public_client_config") {
   include_dirs = [
+    "${appexecfwk_path}/interfaces/innerkits/libeventhandler/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
@@ -68,10 +70,8 @@ ohos_shared_library("libmmi-client") {
     "event_handler/src/input_device_impl.cpp",
     "event_handler/src/input_event_monitor_manager.cpp",
     "event_handler/src/input_handler_manager.cpp",
-    "event_handler/src/input_interceptor_manager.cpp",
     "event_handler/src/input_manager_impl.cpp",
     "event_handler/src/input_monitor_manager.cpp",
-    "event_handler/src/interceptor_manager.cpp",
     "event_handler/src/key_event_input_subscribe_manager.cpp",
     "event_handler/src/multimodal_event_handler.cpp",
     "event_handler/src/standardized_event_manager.cpp",
@@ -79,12 +79,34 @@ ohos_shared_library("libmmi-client") {
     "events/src/input_manager.cpp",
     "events/src/key_option.cpp",
     "module_loader/src/mmi_client.cpp",
+    "module_loader/src/mmi_event_handler.cpp",
+    "module_loader/src/mmi_fd_listener.cpp",
   ]
 
   cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (mmi_enable_pointer_drawing) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
+  }
+
+  if (mmi_enable_interceptor) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_INTERCEPTOR" ]
+  }
+
+  if (mmi_enable_interceptor) {
+    sources += [
+      "event_handler/src/input_interceptor_manager.cpp",
+      "event_handler/src/interceptor_manager.cpp",
+    ]
+  } else {
+    sources += [
+      "event_handler/src/i_input_interceptor_manager.cpp",
+      "event_handler/src/i_interceptor_manager.cpp",
+    ]
   }
 
   configs = [
@@ -106,6 +128,7 @@ ohos_shared_library("libmmi-client") {
   part_name = "input"
   external_deps = [
     "bytrace_standard:bytrace_core",
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "input_device_driver:hdi_input",
     "ipc:ipc_core",
@@ -166,6 +189,7 @@ ohos_unittest("ut-mmi-proxy-out") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]
@@ -282,6 +306,7 @@ ohos_unittest("InputManagerTest") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]

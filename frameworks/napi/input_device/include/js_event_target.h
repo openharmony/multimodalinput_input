@@ -16,68 +16,57 @@
 #ifndef JS_EVENT_TARGET_H
 #define JS_EVENT_TARGET_H
 
-#include <map>
-#include <uv.h>
-
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "util_napi.h"
 #include "utils/log.h"
+
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_device_impl.h"
-#include "define_multimodal.h"
+#include "input_manager.h"
+
+#include "js_util.h"
 
 namespace OHOS {
 namespace MMI {
 class JsEventTarget {
 public:
-    JsEventTarget() = default;
+    JsEventTarget();
+    ~JsEventTarget();
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
-
-    static void EmitJsIdsAsync(int32_t userData, std::vector<int32_t> ids);
-    static void CallIdsAsyncWork(uv_work_t *work, int32_t status);
-
-    static void EmitJsIdsPromise(int32_t userData, std::vector<int32_t> ids);
-    static void CallIdsPromiseWork(uv_work_t *work, int32_t status);
-
-    static void EmitJsDevAsync(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device);
-    static void CallDevAsyncWork(uv_work_t *work, int32_t status);
-
-    static void EmitJsDevPromise(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device);
-    static void CallDevPromiseWork(uv_work_t *work, int32_t status);
-
-    napi_value CreateCallbackInfo(napi_env env, napi_value handle);
+    static void TargetOn(std::string type, int32_t deviceId);
+    static void EmitJsIds(int32_t userData, std::vector<int32_t> ids);
+    static void EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device);
+    static void EmitJsKeystrokeAbility(int32_t userData, std::map<int32_t, bool> keystrokeAbility);
+    static void EmitJsKeyboardType(int32_t userData, int32_t keyboardType);
+    void AddMonitor(napi_env env, std::string type, napi_value handle);
+    void RemoveMonitor(napi_env env, std::string type, napi_value handle);
+    napi_value CreateCallbackInfo(napi_env env, napi_value handle, int32_t userData);
     void ResetEnv();
-    static bool CheckEnv(napi_env env);
+    inline static int32_t userData_ {0};
+    inline static std::map<int32_t, std::unique_ptr<JsUtil::CallbackInfo>> callback_ {};
+    inline static std::map<std::string, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>> devMonitor_ {};
 
-    struct CallbackInfo {
-        napi_ref ref = nullptr;
-        napi_async_work asyncWork = nullptr;
-        napi_deferred deferred = nullptr;
-        napi_value promise = nullptr;
-        std::vector<int32_t> ids = {0};
-        std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device = nullptr;
-    };
     struct DeviceType {
         std::string deviceTypeName;
         uint32_t typeBit;
     };
 
-    static constexpr uint32_t EVDEV_UDEV_TAG_KEYBOARD = (1 << 1);
-    static constexpr uint32_t EVDEV_UDEV_TAG_MOUSE = (1 << 2);
-    static constexpr uint32_t EVDEV_UDEV_TAG_TOUCHPAD = (1 << 3);
-    static constexpr uint32_t EVDEV_UDEV_TAG_TOUCHSCREEN = (1 << 4);
-    static constexpr uint32_t EVDEV_UDEV_TAG_TABLET = (1 << 5);
-    static constexpr uint32_t EVDEV_UDEV_TAG_JOYSTICK = (1 << 6);
-    static constexpr uint32_t EVDEV_UDEV_TAG_ACCELEROMETER = (1 << 7);
-    static constexpr uint32_t EVDEV_UDEV_TAG_TABLET_PAD = (1 << 8);
-    static constexpr uint32_t EVDEV_UDEV_TAG_POINTINGSTICK = (1 << 9);
-    static constexpr uint32_t EVDEV_UDEV_TAG_TRACKBALL = (1 << 10);
-    static constexpr uint32_t EVDEV_UDEV_TAG_SWITCH = (1 << 11);
-
-    static napi_env env_;
-    static int32_t userData_;
+private:
+    static void CallIdsPromiseWork(uv_work_t *work, int32_t status);
+    static void CallIdsAsyncWork(uv_work_t *work, int32_t status);
+    static void CallDevAsyncWork(uv_work_t *work, int32_t status);
+    static void CallDevPromiseWork(uv_work_t *work, int32_t status);
+    static void CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status);
+    static void CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status);
+    static void CallKeyboardTypeAsync(uv_work_t *work, int32_t status);
+    static void CallKeyboardTypePromise(uv_work_t *work, int32_t status);
+    static void EmitAddedDeviceEvent(uv_work_t *work, int32_t status);
+    static void EmitRemoveDeviceEvent(uv_work_t *work, int32_t status);
+    static std::unique_ptr<JsUtil::CallbackInfo> GetCallbackInfo(uv_work_t *work);
 };
 } // namespace MMI
 } // namespace OHOS
+
 #endif // JS_EVENT_TARGET_H

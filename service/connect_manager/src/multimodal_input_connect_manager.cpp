@@ -83,6 +83,12 @@ int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> fi
     return multimodalInputConnectService_->AddInputEventFilter(filter);
 }
 
+int32_t MultimodalInputConnectManager::SetPointerVisible(bool visible)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetPointerVisible(visible);
+}
+
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 {
     CALL_LOG_ENTER;

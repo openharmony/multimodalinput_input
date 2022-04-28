@@ -17,15 +17,19 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t ABS_MAX_X = 6400;
+constexpr int32_t ABS_MAX_Y = 4000;
+constexpr int32_t ABS_MAX_MT_SLOT = 9;
+constexpr int32_t ABS_MAX_MT_TOUCH_MAJOR = 21;
+constexpr int32_t ABS_MAX_MT_TOUCH_MINOR = 21;
+constexpr int32_t ABS_MAX_MT_TRACKING_ID = 65535;
+constexpr int32_t ABS_MAX_MT_PRESSURE = 8191;
+} // namespace
+
 VirtualFinger::VirtualFinger() : VirtualDevice("Virtual Finger",
     BUS_USB, 0x56a, 0x392)
 {
-    constexpr int32_t ABS_MAX_X = 6400;
-    constexpr int32_t ABS_MAX_Y = 4000;
-    constexpr int32_t ABS_MAX_MT_SLOT = 9;
-    constexpr int32_t ABS_MAX_MT_TOUCH_MAJOR = 21;
-    constexpr int32_t ABS_MAX_MT_TRACKING_ID = 65535;
-
     dev_.absmin[ABS_X] = 0;
     dev_.absmax[ABS_X] = ABS_MAX_X;
     dev_.absfuzz[ABS_X] = 0;
@@ -47,7 +51,7 @@ VirtualFinger::VirtualFinger() : VirtualDevice("Virtual Finger",
     dev_.absflat[ABS_MT_TOUCH_MAJOR] = 0;
 
     dev_.absmin[ABS_MT_TOUCH_MINOR] = 0;
-    dev_.absmax[ABS_MT_TOUCH_MINOR] = ABS_MAX_MT_TOUCH_MAJOR;
+    dev_.absmax[ABS_MT_TOUCH_MINOR] = ABS_MAX_MT_TOUCH_MINOR;
     dev_.absfuzz[ABS_MT_TOUCH_MINOR] = 0;
     dev_.absflat[ABS_MT_TOUCH_MINOR] = 0;
 
@@ -70,6 +74,21 @@ VirtualFinger::VirtualFinger() : VirtualDevice("Virtual Finger",
     dev_.absmax[ABS_MT_TRACKING_ID] = ABS_MAX_MT_TRACKING_ID;
     dev_.absfuzz[ABS_MT_TRACKING_ID] = 0;
     dev_.absflat[ABS_MT_TRACKING_ID] = 0;
+
+    dev_.absmin[ABS_MT_WIDTH_MAJOR] = 0;
+    dev_.absmax[ABS_MT_WIDTH_MAJOR] = ABS_MAX_MT_TOUCH_MAJOR;
+    dev_.absfuzz[ABS_MT_WIDTH_MAJOR] = 0;
+    dev_.absflat[ABS_MT_WIDTH_MAJOR] = 0;
+
+    dev_.absmin[ABS_MT_WIDTH_MINOR] = 0;
+    dev_.absmax[ABS_MT_WIDTH_MINOR] = ABS_MAX_MT_TOUCH_MINOR;
+    dev_.absfuzz[ABS_MT_WIDTH_MINOR] = 0;
+    dev_.absflat[ABS_MT_WIDTH_MINOR] = 0;
+
+    dev_.absmin[ABS_MT_PRESSURE] = 0;
+    dev_.absmax[ABS_MT_PRESSURE] = ABS_MAX_MT_PRESSURE;
+    dev_.absfuzz[ABS_MT_PRESSURE] = 0;
+    dev_.absflat[ABS_MT_PRESSURE] = 0;
 }
 
 VirtualFinger::~VirtualFinger() {}
@@ -94,7 +113,8 @@ const std::vector<uint32_t>& VirtualFinger::GetAbs() const
 {
     static const std::vector<uint32_t> abs {
         ABS_X, ABS_Y, ABS_MT_SLOT, ABS_MT_TOUCH_MAJOR, ABS_MT_TOUCH_MINOR, ABS_MT_ORIENTATION, ABS_MT_POSITION_X,
-        ABS_MT_POSITION_Y, ABS_MT_TRACKING_ID
+        ABS_MT_POSITION_Y, ABS_MT_TRACKING_ID,
+        ABS_MT_WIDTH_MAJOR, ABS_MT_WIDTH_MINOR, ABS_MT_PRESSURE
     };
 
     return abs;
