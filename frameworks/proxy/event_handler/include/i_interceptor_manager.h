@@ -28,8 +28,6 @@ public:
     IInterceptorManager() = default;
     ~IInterceptorManager() = default;
     DISALLOW_COPY_AND_MOVE(IInterceptorManager);
-    int32_t AddInterceptor(int32_t sourceType,
-        std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
     int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
     void RemoveInterceptor(int32_t interceptorId);
     int32_t OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id);

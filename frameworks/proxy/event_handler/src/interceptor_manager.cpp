@@ -26,27 +26,15 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManager" };
+constexpr int32_t SOURCETYPE_KEY = 4;
+constexpr int32_t INVALID_INTERCEPTOR_ID = -1;
 } // namespace
 
 InterceptorManager::InterceptorManager() {}
 
-int32_t InterceptorManager::AddInterceptor(int32_t sourceType,
-    std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
-{
-    CHKPR(interceptor, INVALID_INTERCEPTOR_ID);
-    InterceptorItem interceptorItem;
-    interceptorItem.id_ = ++InterceptorItemId;
-    interceptorItem.sourceType = sourceType;
-    interceptorItem.callback = interceptor;
-    interceptor_.push_back(interceptorItem);
-    MMIEventHdl.AddInterceptor(interceptorItem.sourceType, interceptorItem.id_);
-    MMI_HILOGD("Add sourceType:%{public}d Touchpad to InterceptorManager success", sourceType);
-    return interceptorItem.id_;
-}
-
 int32_t InterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
-    CHKPR(interceptor, ERROR_NULL_POINTER);
+    CHKPR(interceptor, INVALID_INTERCEPTOR_ID);
     InterceptorItem interceptorItem;
     interceptorItem.id_ = ++InterceptorItemId;
     interceptorItem.sourceType = SOURCETYPE_KEY;
