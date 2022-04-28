@@ -35,9 +35,10 @@ enum Direction {
     Direction270
 };
 
-constexpr uint32_t FLAG_NOT_TOUCHABLE = 1;
-
 struct WindowInfo {
+    // The Bit0 of the flags field represents Touchable or not state
+    static constexpr uint32_t FLAG_BIT_UNTOUCHABLE = 1;
+
     // The globally unique identifier of the window
     int32_t id;
 
