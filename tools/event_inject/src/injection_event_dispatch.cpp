@@ -25,6 +25,7 @@
 #include "error_multimodal.h"
 #include "proto.h"
 #include "util.h"
+#include "input_parse.h"
 
 namespace OHOS {
 namespace MMI {
@@ -51,53 +52,6 @@ void InjectionEventDispatch::InitManageFunction()
             continue;
         }
     }
-}
-
-bool InjectionEventDispatch::IsFileExists(const std::string& fileName)
-{
-    if ((access(fileName.c_str(), F_OK)) == 0) {
-        return true;
-    }
-    return false;
-}
-
-int32_t InjectionEventDispatch::VerifyFile(const std::string& fileName)
-{
-    std::string findcmd = "find /data -name " + fileName;
-    FILE* findJson = popen(findcmd.c_str(), "r");
-    if (!findJson) {
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
-std::string InjectionEventDispatch::GetFileExtendName(const std::string& fileName)
-{
-    if (fileName.empty()) {
-        return "";
-    }
-    size_t nPos = fileName.find_last_of('.');
-    if (fileName.npos == nPos) {
-        return fileName;
-    }
-    return fileName.substr(nPos + 1, fileName.npos);
-}
-
-int32_t InjectionEventDispatch::GetFileSize(const std::string& fileName)
-{
-    FILE* pFile = fopen(fileName.c_str(), "rb");
-    if (pFile) {
-        fseek(pFile, 0, SEEK_END);
-        long fileSize = ftell(pFile);
-        if (fileSize > INT32_MAX) {
-            MMI_HILOGE("The file is too large for 32-bit systems, filesize:%{public}ld", fileSize);
-            fclose(pFile);
-            return RET_ERR;
-        }
-        fclose(pFile);
-        return fileSize;
-    }
-    return RET_ERR;
 }
 
 int32_t InjectionEventDispatch::OnJson()
@@ -127,20 +81,21 @@ int32_t InjectionEventDispatch::OnJson()
     }
     int32_t fileSize = GetFileSize(jsonFile);
     if ((fileSize <= 0) || (fileSize > JSON_FILE_SIZE)) {
-        MMI_HILOGE("The file size is out of range 2M or empty. filesize:%{public}d", fileSize);
+        MMI_HILOGE("The file size is out of range 20KB or empty. filesize:%{public}d", fileSize);
         return RET_ERR;
     }
-    std::ifstream reader(jsonFile);
-    if (!reader) {
-        MMI_HILOGE("json file is empty");
+    std::string jsonBuf = ReadFile(jsonFile);
+    if (jsonBuf.empty()) {
+        MMI_HILOGE("read file failed");
         return RET_ERR;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
-
-    int32_t ret = manageInjectDevice_.TransformJsonData(inputEventArrays);
-    return ret;
+    bool logStatus = false;
+    if (injectArgvs_.size() > ARGVS_CODE_INDEX) {
+        if (injectArgvs_.at(ARGVS_CODE_INDEX) == "log") {
+            logStatus = true;
+        }
+    }
+    return manageInjectDevice_.TransformJsonData(DataInit(jsonBuf, logStatus));
 }
 
 std::string InjectionEventDispatch::GetFunId() const
@@ -182,7 +137,6 @@ void InjectionEventDispatch::Run()
     std::string id = GetFunId();
     auto fun = GetFun(id);
     CHKPV(fun);
-
     auto ret = (*fun)();
     if (ret == RET_OK) {
         MMI_HILOGI("inject function success id:%{public}s", id.c_str());
@@ -218,14 +172,13 @@ int32_t InjectionEventDispatch::OnHelp()
     InjectionToolsHelpFunc helpFunc;
     std::string ret = helpFunc.GetHelpText();
     MMI_HILOGI("%{public}s", ret.c_str());
-
     return RET_OK;
 }
 
 int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText) const
 {
     if (deviceNameText.empty()) {
-        MMI_HILOGE("Get device index failed");
+        MMI_HILOGE("deviceNameText is empty");
         return RET_ERR;
     }
     for (const auto &item : allDevices_) {
@@ -233,6 +186,7 @@ int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText
             return item.devIndex;
         }
     }
+    MMI_HILOGW("Get device index failed");
     return RET_ERR;
 }
 
@@ -260,7 +214,7 @@ bool InjectionEventDispatch::CheckCode(const std::string& inputCode)
     }
     bool isCodeNumber = regex_match(inputCode, std::regex("\\d+"));
     if (isCodeNumber) {
-        uint16_t numberCode = stoi(inputCode);
+        int32_t numberCode = stoi(inputCode);
         if ((numberCode >= 0) && (numberCode <= UINT16_MAX)) {
             return true;
         }
@@ -276,7 +230,7 @@ bool InjectionEventDispatch::CheckType(const std::string& inputType)
     }
     bool isTypeNumber = regex_match(inputType, std::regex("\\d+"));
     if (isTypeNumber) {
-        uint16_t numberType = stoi(inputType);
+        int32_t numberType = stoi(inputType);
         if ((numberType >= 0) && (numberType <= INPUT_TYPE_MAX)) {
             return true;
         }

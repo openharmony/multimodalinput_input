@@ -24,15 +24,15 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManagerGlobal" };
+constexpr int32_t SOURCETYPE_KEY = 4;
 } // namespace
 
 InterceptorManagerGlobal::InterceptorManagerGlobal() {}
 
-InterceptorManagerGlobal::~InterceptorManagerGlobal() {}
-
 void InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
 {
     CALL_LOG_ENTER;
+    CHKPV(session);
     InterceptorItem interceptorItem = {};
     interceptorItem.sourceType = sourceType;
     interceptorItem.id = id;
@@ -41,10 +41,9 @@ void InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, 
     if (iter != interceptors_.end()) {
         MMI_HILOGE("touchpad event repeate register");
         return;
-    } else {
-        iter = interceptors_.insert(iter, interceptorItem);
-        MMI_HILOGD("sourceType:%{public}d,fd:%{public}d register in server", sourceType, session->GetFd());
     }
+    iter = interceptors_.insert(iter, interceptorItem);
+    MMI_HILOGD("sourceType:%{public}d,fd:%{public}d register in server", sourceType, session->GetFd());
 }
 
 void InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
@@ -55,11 +54,11 @@ void InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
     auto iter = std::find(interceptors_.begin(), interceptors_.end(), interceptorItem);
     if (iter == interceptors_.end()) {
         MMI_HILOGE("interceptorItem does not exist");
-    } else {
-        MMI_HILOGD("sourceType:%{public}d,fd:%{public}d remove from server", iter->sourceType,
-                   iter->session->GetFd());
-        interceptors_.erase(iter);
+        return;
     }
+    MMI_HILOGD("sourceType:%{public}d,fd:%{public}d remove from server", iter->sourceType,
+               iter->session->GetFd());
+    interceptors_.erase(iter);
 }
 
 bool InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)

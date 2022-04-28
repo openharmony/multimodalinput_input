@@ -72,7 +72,6 @@
         "//third_party/mtdev:libmtdev",
         "//third_party/libevdev:libevdev",
         "//foundation/multimodalinput/input:uinput_inject",
-        "//foundation/multimodalinput/input:mmi_uinject",
         "//foundation/multimodalinput/input:mmi_uinput.rc"
       ],
       "inner_kits": [

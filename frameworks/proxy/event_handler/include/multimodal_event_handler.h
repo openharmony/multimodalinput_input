@@ -18,9 +18,8 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "if_client_msg_handler.h"
-#include "pointer_event.h"
 #include "proto.h"
+#include "pointer_event.h"
 #include "standardized_event_manager.h"
 
 namespace OHOS {
@@ -35,25 +34,30 @@ public:
     MultimodalEventHandler();
     ~MultimodalEventHandler() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalEventHandler);
-    int32_t GetMultimodeInputInfo();
+
     MMIClientPtr GetMMIClient();
+    bool InitClient();
+    
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
-    int32_t GetDevice(int32_t taskId, int32_t deviceId);
-    int32_t GetDeviceIds(int32_t taskId);
+    int32_t GetDevice(int32_t userData, int32_t deviceId);
+    int32_t GetDeviceIds(int32_t userData);
+    int32_t GetKeystrokeAbility(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes);
+    int32_t GetKeyboardType(int32_t userData, int32_t deviceId);
+    int32_t RegisterInputDeviceMonitor();
+    int32_t UnRegisterInputDeviceMonitor();
     int32_t AddInputEventMontior(int32_t keyEventType);
     void RemoveInputEventMontior(int32_t keyEventType);
     int32_t AddInputEventTouchpadMontior(int32_t pointerEventType);
     void RemoveInputEventTouchpadMontior(int32_t pointerEventType);
     int32_t AddInterceptor(int32_t sourceType, int32_t id);
     int32_t RemoveInterceptor(int32_t id);
-
-private:
-    bool InitClient();
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 private:
     MMIClientPtr client_ = nullptr;
-    IClientMsgHandlerPtr cMsgHandler_ = nullptr;
 };
 
 #define MMIEventHdl MultimodalEventHandler::GetInstance()

@@ -27,7 +27,9 @@
 
 #include "nocopyable.h"
 
+#include "circle_stream_buffer.h"
 #include "define_multimodal.h"
+#include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {
@@ -36,13 +38,15 @@ public:
     UDSSocket();
     DISALLOW_COPY_AND_MOVE(UDSSocket);
     virtual ~UDSSocket();
+    using PacketCallBackFun = std::function<void(NetPacket&)>;
 
-    virtual int32_t EpollCreat(int32_t size);
-    virtual int32_t EpollCtl(int32_t fd, int32_t op, struct epoll_event& event, int32_t epollFd = -1);
-    virtual int32_t EpollWait(struct epoll_event& events, int32_t maxevents, int32_t timeout, int32_t epollFd = -1);
-    virtual int32_t SetNonBlockMode(int32_t fd, bool isNonBlock = true);
-    virtual void EpollClose();
-    virtual void Close();
+    int32_t EpollCreat(int32_t size);
+    int32_t EpollCtl(int32_t fd, int32_t op, struct epoll_event& event, int32_t epollFd = -1);
+    int32_t EpollWait(struct epoll_event& events, int32_t maxevents, int32_t timeout, int32_t epollFd = -1);
+    int32_t SetNonBlockMode(int32_t fd, bool isNonBlock = true);
+    void OnReadPackets(CircleStreamBuffer& buf, PacketCallBackFun callbackFun);
+    void EpollClose();
+    void Close();
 
     int32_t GetFd() const
     {
@@ -52,14 +56,6 @@ public:
     {
         return epollFd_;
     }
-
-protected:
-    virtual size_t Read(char *buf, size_t size);
-    virtual size_t Write(const char *buf, size_t size);
-    virtual size_t Send(const char *buf, size_t size, int32_t flags);
-    virtual size_t Recv(char *buf, size_t size, int32_t flags);
-    virtual size_t Recvfrom(char *buf, size_t size, uint32_t flags, sockaddr *addr, size_t *addrlen);
-    virtual size_t Sendto(const char *buf, size_t size, uint32_t flags, sockaddr *addr, size_t addrlen);
 
 protected:
     int32_t fd_ = -1;

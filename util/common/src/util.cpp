@@ -290,11 +290,15 @@ const char* GetProgramName()
     char bufLine[bufLineSize] = { 0 };
     if ((fgets(bufLine, bufLineSize, fp) == nullptr)) {
         KMSG_LOGE("fgets fail.");
-        (void)fclose(fp);
+        if (fclose(fp) != 0) {
+            KMSG_LOGW("close file: %s failed", buf);
+        }
         fp = nullptr;
         return "";
     }
-    (void)fclose(fp);
+    if (fclose(fp) != 0) {
+        KMSG_LOGW("close file: %s failed", buf);
+    }
     fp = nullptr;
 
     std::string tempName(bufLine);
@@ -463,19 +467,57 @@ std::string GetFileExtendName(const std::string& fileName)
 
 int32_t GetFileSize(const std::string& fileName)
 {
-    FILE* pFile = fopen(fileName.c_str(), "rb");
+    char realPath[PATH_MAX] = {};
+    if (realpath(fileName.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("path is error, path:%{public}s", fileName.c_str());
+        return RET_ERR;
+    }
+    FILE* pFile = fopen(realPath, "rb");
     if (pFile) {
         fseek(pFile, 0, SEEK_END);
         long fileSize = ftell(pFile);
         if (fileSize > INT32_MAX) {
             MMI_HILOGE("The file is too large for 32-bit systems, filesize:%{public}ld", fileSize);
-            fclose(pFile);
+            if (fclose(pFile) != 0) {
+                MMI_HILOGW("close file: %{pulic}s failed", realPath);
+            }
             return RET_ERR;
         }
-        fclose(pFile);
+        if (fclose(pFile) != 0) {
+            MMI_HILOGW("close file: %{pulic}s failed", realPath);
+        }
         return fileSize;
     }
     return RET_ERR;
+}
+
+std::string ReadFile(const std::string &filePath, int32_t readLine)
+{
+    std::string dataStr;
+    char realPath[PATH_MAX] = {};
+    if (realpath(filePath.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("path is error, path:%{public}s", filePath.c_str());
+        return dataStr;
+    }
+    FILE* fp = fopen(realPath, "r");
+    if (fp != nullptr) {
+        char buf[256] = {};
+        int32_t count = 0;
+        while (fgets(buf, sizeof(buf), fp) != nullptr) {
+            dataStr += buf;
+            ++count;
+            if ((readLine > 0) && (readLine <= count)) {
+                if (fclose(fp) != 0) {
+                    MMI_HILOGW("close file: %{pulic}s failed", filePath.c_str());
+                }
+                return dataStr;
+            }
+        }
+        if (fclose(fp) != 0) {
+            MMI_HILOGW("close file: %{pulic}s failed", filePath.c_str());
+        }
+    }
+    return dataStr;
 }
 } // namespace MMI
 } // namespace OHOS

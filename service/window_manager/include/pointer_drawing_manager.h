@@ -17,29 +17,35 @@
 #define POINTER_DRAWING_MANAGER_H
 
 #include <iostream>
+#include <list>
 
 #include <ui/rs_surface_node.h>
 
 #include "draw/canvas.h"
 #include "nocopyable.h"
 #include "pixel_map.h"
-#include "singleton.h"
 #include "window.h"
 
 #include "device_observer.h"
+#include "i_pointer_drawing_manager.h"
 #include "struct_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
-class PointerDrawingManager : public DelayedSingleton<PointerDrawingManager>, public IDeviceObserver {
+class PointerDrawingManager : public IPointerDrawingManager,
+                              public IDeviceObserver,
+                              public std::enable_shared_from_this<PointerDrawingManager> {
 public:
-    PointerDrawingManager();
-    ~PointerDrawingManager();
+    PointerDrawingManager() = default;
+    virtual ~PointerDrawingManager() = default;
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
     void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY);
     void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height);
     void UpdatePointerDevice(bool hasPointerDevice);
     bool Init();
+    void DeletePointerVisible(int32_t pid);
+    void SetPointerVisible(int32_t pid, bool visible);
+    bool IsPointerVisible();
 
 public:
     static const int32_t IMAGE_WIDTH = 64;
@@ -54,6 +60,9 @@ private:
     void DrawManager();
     void FixCursorPosition(int32_t &globalX, int32_t &globalY);
     std::unique_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
+    void DeletePidInfo(int32_t pid);
+    void UpdataPointerVisible();
+    void UpdataPidInfo(int32_t pid, bool visible);
 
 private:
     sptr<OHOS::Rosen::Window> pointerWindow_ = nullptr;
@@ -64,9 +73,14 @@ private:
     bool hasPointerDevice_ = false;
     int32_t lastGlobalX_ = -1;
     int32_t lastGlobalY_ = -1;
-};
 
-#define PointerDrawMgr PointerDrawingManager::GetInstance()
+    std::mutex mutex_;
+    struct PidInfo {
+        int32_t pid;
+        bool visible;
+    };
+    std::list<PidInfo> pidInfos_;
+};
 } // namespace MMI
 } // namespace OHOS
 #endif // POINTER_DRAWING_MANAGER_H

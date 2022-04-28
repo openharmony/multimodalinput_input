@@ -47,6 +47,7 @@ ohos_shared_library("libmmi-util") {
     "common/src/run_shell_util.cpp",
     "common/src/util.cpp",
     "common/src/uuid.cpp",
+    "network/src/circle_stream_buffer.cpp",
     "network/src/net_packet.cpp",
     "network/src/stream_buffer.cpp",
     "socket/src/uds_client.cpp",

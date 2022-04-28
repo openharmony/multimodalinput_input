@@ -21,14 +21,16 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
+#include "net_packet.h"
+
 #include "display_info.h"
 #include "event_filter_service.h"
-#include "i_input_event_consumer.h"
-#include "if_client_msg_handler.h"
+
 #include "if_mmi_client.h"
-#include "input_interceptor_manager.h"
+#include "input_device_impl.h"
 #include "input_monitor_manager.h"
-#include "net_packet.h"
+#include "i_input_event_consumer.h"
+#include "mmi_event_handler.h"
 #include "pointer_event.h"
 
 namespace OHOS {
@@ -39,21 +41,27 @@ public:
     DISALLOW_COPY_AND_MOVE(InputManagerImpl);
     InputManagerImpl() = default;
 
+    bool InitEventHandler();
+    MMIEventHandlerPtr GetEventHandler() const;
+    EventHandlerPtr GetCurrentEventHandler() const;
+    
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
         const std::vector<LogicalDisplayInfo> &logicalDisplays);
     int32_t AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter);
 
-    void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer);
+    void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+        std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
 
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
     void OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t PackDisplayData(NetPacket &pkt);
 
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
-    int32_t AddMontior(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
+    int32_t AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> consumer);
     void RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
+    void MoveMouse(int32_t offsetX, int32_t offsetY);
 
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
     int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
@@ -64,20 +72,38 @@ public:
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
 
+    void GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> &keyCodes,
+        std::function<void(std::map<int32_t, bool>)> callback);
+
+    int32_t SetPointerVisible(bool visible);
+
 private:
     int32_t PackPhysicalDisplay(NetPacket &pkt);
     int32_t PackLogicalDisplay(NetPacket &pkt);
     void PrintDisplayInfo();
     void SendDisplayInfo();
 
+    void OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
+        std::shared_ptr<KeyEvent> keyEvent);
+    void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
+        std::shared_ptr<PointerEvent> pointerEvent);
+    void OnThread();
+
 private:
     sptr<EventFilterService> eventFilterService_ {nullptr};
     std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
+
     std::vector<PhysicalDisplayInfo> physicalDisplays_;
     std::vector<LogicalDisplayInfo> logicalDisplays_;
     InputMonitorManager monitorManager_;
-    InputInterceptorManager interceptorManager_;
+
+    std::mutex mtx_;
+    std::condition_variable cv_;
+    std::thread ehThread_;
+    EventHandlerPtr eventHandler_  = nullptr;
+    MMIEventHandlerPtr mmiEventHandler_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
+#define InputMgrImpl OHOS::MMI::InputManagerImpl::GetInstance()
 #endif // INPUT_MANAGER_IMPL_H

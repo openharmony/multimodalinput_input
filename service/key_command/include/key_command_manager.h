@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef ABILITY_LAUNCH_MANAGER_H
-#define ABILITY_LAUNCH_MANAGER_H
+#ifndef KEY_COMMAND_MANAGER_H
+#define KEY_COMMAND_MANAGER_H
 
 #include <chrono>
 #include <condition_variable>
@@ -27,15 +27,13 @@
 #include <vector>
 
 #include "nocopyable.h"
-#include "nlohmann/json.hpp"
-#include "singleton.h"
 
 #include "key_event.h"
 #include "struct_multimodal.h"
+#include "i_key_command_manager.h"
 
 namespace OHOS {
 namespace MMI {
-using json = nlohmann::json;
 struct Ability {
     std::string bundleName;
     std::string abilityName;
@@ -57,19 +55,17 @@ struct ShortcutKey {
     void Print() const;
 };
 
-class AbilityLaunchManager : public DelayedSingleton<AbilityLaunchManager> {
+class KeyCommandManager : public IKeyCommandManager {
 public:
-    AbilityLaunchManager();
-    DISALLOW_COPY_AND_MOVE(AbilityLaunchManager);
-    ~AbilityLaunchManager() = default;
-    bool CheckLaunchAbility(const std::shared_ptr<KeyEvent> event);
+    KeyCommandManager();
+    DISALLOW_COPY_AND_MOVE(KeyCommandManager);
+    ~KeyCommandManager() = default;
+    bool HandlerEvent(const std::shared_ptr<KeyEvent> event);
 private:
-    void ResolveConfig(std::string configFile);
-    bool ConvertToShortcutKey(const json &jsonData, ShortcutKey &shortcutKey);
+    bool ParseJson(const std::string &configFile);
     std::string GetConfigFilePath() const;
     void LaunchAbility(ShortcutKey key);
     std::string GenerateKey(const ShortcutKey& key);
-    bool PackageAbility(const json &jsonStr, Ability &ability);
     void Print();
     bool IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey);
@@ -85,8 +81,6 @@ private:
     ShortcutKey lastMatchedKey_;
     std::map<std::string, ShortcutKey> shortcutKeys_;
 };
-
-#define AbilityMgr AbilityLaunchManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#endif // ABILITY_LAUNCH_MANAGER_H
+#endif // KEY_COMMAND_MANAGER_H

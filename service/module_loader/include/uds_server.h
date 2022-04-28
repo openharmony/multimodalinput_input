@@ -19,10 +19,10 @@
 #include <list>
 #include <map>
 #include <mutex>
-#include <thread>
 
 #include "nocopyable.h"
 
+#include "circle_stream_buffer.h"
 #include "i_uds_server.h"
 #include "uds_session.h"
 #include "uds_socket.h"
@@ -38,10 +38,6 @@ enum EpollEventType {
     EPOLL_EVENT_END,
 };
 
-struct StreamBufData {
-    bool isOverflow = false;
-    StreamBuffer sBuf;
-};
 using MsgServerFunCallback = std::function<void(SessionPtr, NetPacket&)>;
 class UDSServer : public UDSSocket, public IUdsServer {
 public:
@@ -54,9 +50,6 @@ public:
     void Dump(int32_t fd);
     int32_t GetClientFd(int32_t pid);
     int32_t GetClientPid(int32_t fd);
-    void OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct epoll_event& ev);
-    void OnEpollRecv(int32_t fd, const char *buf, size_t size);
-
     void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
 
 public:
@@ -65,31 +58,28 @@ public:
     SessionPtr GetSession(int32_t fd) const;
 
 protected:
-    void SetRecvFun(MsgServerFunCallback fun);
-
     virtual void OnConnected(SessionPtr s);
     virtual void OnDisconnected(SessionPtr s);
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd);
 
-    bool StartServer();
-    void OnRecv(int32_t fd, const char *buf, size_t size);
-    void OnEvent(const struct epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap);
-    void OnThread();
-
+    void SetRecvFun(MsgServerFunCallback fun);
+    void ReleaseSession(int32_t fd, epoll_event& ev);
+    void OnPacket(int32_t fd, NetPacket& pkt);
+    void OnEpollRecv(int32_t fd, epoll_event& ev);
+    void OnEpollEvent(epoll_event& ev);
     bool AddSession(SessionPtr ses);
     void DelSession(int32_t fd);
     void DumpSession(const std::string& title);
-
     void NotifySessionDeleted(SessionPtr ses);
     void AddPermission(SessionPtr sess);
 
 protected:
     std::mutex mux_;
-    std::thread t_;
     bool isRunning_ = false;
     MsgServerFunCallback recvFun_ = nullptr;
-    std::map<int32_t, SessionPtr> sessionsMap_ = {};
-    std::map<int32_t, int32_t> idxPidMap_ = {};
+    std::map<int32_t, SessionPtr> sessionsMap_;
+    std::map<int32_t, int32_t> idxPidMap_;
+    std::map<int32_t, CircleStreamBuffer> circleBufMap_;
     std::list<std::function<void(SessionPtr)>> callbacks_;
 };
 } // namespace MMI

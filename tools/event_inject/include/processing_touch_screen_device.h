@@ -49,11 +49,12 @@ public:
     ProcessingTouchScreenDevice() = default;
     ~ProcessingTouchScreenDevice() = default;
     DISALLOW_COPY_AND_MOVE(ProcessingTouchScreenDevice);
-    int32_t TransformJsonDataSingleTouchScreen(const Json& inputEventArrays, InputEventArray& inputEventArray);
-    int32_t TransformJsonDataToInputData(const Json& inputEventArrays, InputEventArray& inputEventArray);
+    int32_t TransformJsonDataSingleTouchScreen(const DeviceItem& inputEventArrays, InputEventArray& inputEventArray);
+    int32_t TransformJsonDataToInputData(const DeviceItem& inputEventArrays, InputEventArray& inputEventArray);
 private:
-    void AnalysisTouchScreenDate(const Json& inputData, TouchScreenInputEvents& touchScreenInputEvents);
-    void AnalysisSingleTouchScreenDate(const Json& inputData,
+    void AnalysisTouchScreenDate(const std::vector<DeviceEvent>& inputData,
+        TouchScreenInputEvents& touchScreenInputEvents);
+    void AnalysisSingleTouchScreenDate(const std::vector<DeviceEvent>& inputData,
                                        std::vector<TouchSingleEventData>& touchSingleEventDatas);
     void AnalysisTouchScreenPressData(InputEventArray& inputEventArray,
         const TouchScreenInputEvent& touchScreenInputEvent);

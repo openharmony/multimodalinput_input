@@ -31,6 +31,8 @@ public:
     static int32_t DeserializeInputEvent(NetPacket &pkt, std::shared_ptr<InputEvent> event);
     static int32_t Marshalling(std::shared_ptr<PointerEvent> event, NetPacket &pkt);
     static int32_t Unmarshalling(NetPacket &pkt, std::shared_ptr<PointerEvent> event);
+private:
+    static int32_t SerializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item);
     static int32_t DeserializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item);
 };
 } // namespace MMI

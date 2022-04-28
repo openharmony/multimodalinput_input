@@ -26,14 +26,11 @@
 
 namespace OHOS {
 namespace MMI {
-class InterceptorManagerGlobal {
-public:
-    static constexpr int32_t SOURCETYPE_KEY = 4;
-
+class InterceptorManagerGlobal : public DelayedSingleton<InterceptorManagerGlobal> {
 public:
     InterceptorManagerGlobal();
     DISALLOW_COPY_AND_MOVE(InterceptorManagerGlobal);
-    ~InterceptorManagerGlobal();
+    ~InterceptorManagerGlobal() = default;
     void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session);
     void OnRemoveInterceptor(int32_t id);
     bool OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
@@ -51,8 +48,6 @@ private:
 private:
     std::list<InterceptorItem> interceptors_;
 };
-
-#define InterceptorMgrGbl OHOS::Singleton<InterceptorManagerGlobal>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INTERCEPTOR_MANAGER_GLOBAL_H

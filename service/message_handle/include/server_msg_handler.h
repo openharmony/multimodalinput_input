@@ -21,7 +21,6 @@
 #include "event_dispatch.h"
 #include "msg_handler.h"
 
-
 namespace OHOS {
 namespace MMI {
 typedef std::function<int32_t(SessionPtr sess, NetPacket& pkt)> ServerMsgFun;
@@ -51,6 +50,9 @@ protected:
     int32_t OnMarkConsumed(SessionPtr sess, NetPacket& pkt);
     int32_t OnInputDevice(SessionPtr sess, NetPacket& pkt);
     int32_t OnInputDeviceIds(SessionPtr sess, NetPacket& pkt);
+    int32_t GetKeystrokeAbility(SessionPtr sess, NetPacket& pkt);
+    int32_t OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
+    int32_t OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveInputEventMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt);
@@ -59,7 +61,12 @@ protected:
     int32_t OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
-
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    int32_t OnMoveMouse(SessionPtr sess, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#ifdef OHOS_BUILD_MMI_DEBUG
+    int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
+#endif // OHOS_BUILD_MMI_DEBUG
 private:
     UDSServer *udsServer_ = nullptr;
     EventDispatch eventDispatch_;

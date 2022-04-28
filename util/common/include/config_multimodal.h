@@ -33,7 +33,11 @@ namespace MMI {
     #define DEF_MMI_VIRTUAL_DEVICE_MANAGER "/system/bin/mmi-virtual-device-manager"
     #define DEF_MMI_DATA_ROOT "/data/mmi/"
     #define DEF_EXP_CONFIG "/system/etc/mmi_device_config.ini"
+#ifdef __aarch64__
+    #define DEF_EXP_SOPATH "/system/lib64/"
+#else
     #define DEF_EXP_SOPATH "/system/lib/"
+#endif
     #define DEF_SCREEN_MAX_WIDTH 480
     #define DEF_SCREEN_MAX_HEIGHT 960
 #endif
@@ -50,6 +54,10 @@ namespace MMI {
 #define MAX_THREAD_DEATH_TIME (6*1000)      // Thread death threshold time
 #define MMISEVER_WMS_DEVICE_ADDED 1         // notifyDeviceChange@Device added
 #define MMISEVER_WMS_DEVICE_REMOVE 2        // notifyDeviceChange@Device removed
+#define SEND_RETRY_LIMIT 32
+#define SEND_RETRY_SLEEP_TIME 100000
+#define ONCE_PROCESS_NETPACKET_LIMIT 100
+#define MAX_RECV_LIMIT 32
 } // namespace MMI
 } // namespace OHOS
 #endif // CONFIG_MULTIMODAL_H

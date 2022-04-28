@@ -51,21 +51,24 @@ HWTEST_F(GetDeviceObjectTest, Test_GetDeviceObjectTest, TestSize.Level1)
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start all &";
     std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
-    system(startDeviceCmd.c_str());
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
-        ASSERT_TRUE(false) << "can not open " << path;
+    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
+    if (!startDevice) {
+        ASSERT_TRUE(false) << "can not failed";
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    pclose(startDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    system(closeDeviceCmd.c_str());
+    std::string jsonBuf = ReadFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
+    }
+    ManageInjectDevice manageInjectDevice;
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
+    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
+    if (!closeDevice) {
+        ASSERT_TRUE(false) << "close device failed";
+    }
+    pclose(closeDevice);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(ret, RET_OK);
 }
 

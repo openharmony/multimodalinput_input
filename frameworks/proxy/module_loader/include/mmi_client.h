@@ -14,10 +14,13 @@
  */
 #ifndef MMI_CLIENT_H
 #define MMI_CLIENT_H
-
-#include "client_msg_handler.h"
-#include "if_mmi_client.h"
 #include "nocopyable.h"
+
+#include "if_mmi_client.h"
+
+#include "circle_stream_buffer.h"
+#include "client_msg_handler.h"
+#include "mmi_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -28,28 +31,39 @@ public:
     virtual ~MMIClient() override;
 
     int32_t Socket() override;
+    virtual void Stop() override;
     virtual bool SendMessage(const NetPacket& pkt) const override;
     virtual bool GetCurrentConnectedStatus() const override;
+    virtual void OnRecvMsg(const char *buf, size_t size) override;
+    virtual int32_t Reconnect() override;
+    virtual void OnDisconnect() override;
+    virtual MMIClientPtr GetSharedPtr() override;
 
-    bool Start(IClientMsgHandlerPtr msgHdl, bool detachMode) override;
+    bool Start() override;
     void RegisterConnectedFunction(ConnectCallback fun) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
     void VirtualKeyIn(RawInputEvent virtualKeyEvent);
-    void ReplyMessageToServer(MmiMessageId idMsg, int64_t clientTime, int64_t endTime) const;
-
-    void SdkGetMultimodeInputInfo();
-    MMIClientPtr GetPtr()
-    {
-        return shared_from_this();
-    }
 
 protected:
     virtual void OnConnected() override;
     virtual void OnDisconnected() override;
+    
+    bool StartEventRunner();
+    void OnEventHandlerThread();
+    void OnRecvThread();
+    bool AddFdListener(int32_t fd);
+    bool DelFdListener(int32_t fd);
+    void OnPacket(NetPacket& pkt);
 
 protected:
+    ClientMsgHandler msgHandler_;
     ConnectCallback funConnected_;
     ConnectCallback funDisconnected_;
+
+    CircleStreamBuffer circBuf_;
+    std::condition_variable cv_;
+    std::thread recvThread_;
+    std::shared_ptr<MMIEventHandler> recvEventHandler_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
