@@ -23,13 +23,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInterceptorManager" };
 } // namespace
 
-int32_t IInterceptorManager::AddInterceptor(int32_t sourceType,
-    std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
-{
-    MMI_HILOGD("Add mgr module dose not support");
-    return RET_ERR;
-}
-
 int32_t IInterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
     MMI_HILOGD("Add mgr module dose not support");
