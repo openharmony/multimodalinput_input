@@ -31,19 +31,9 @@ public:
     InputInterceptorManager();
     DISALLOW_COPY_AND_MOVE(InputInterceptorManager);
     ~InputInterceptorManager() = default;
-
-public:
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
     void RemoveInterceptor(int32_t interceptorId);
-
-public:
-    static bool IsValidInterceptorId(int32_t interceptorId);
 };
-
-inline bool InputInterceptorManager::IsValidInterceptorId(int32_t interceptorId)
-{
-    return IsValidHandlerId(interceptorId);
-}
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_INTERCEPTOR_MANAGER_H
