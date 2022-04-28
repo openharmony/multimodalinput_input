@@ -392,8 +392,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
-                            int32_t middleValuePx = (px1 / 2) + (px2 / 2) + (px1 & px2 & 1);
-                            int32_t middleValuePy = (py1 / 2) + (py2 / 2) + (py1 & py2 & 1);
+                            int32_t middleValuePx = (px1 / 2) + (px2 / 2) +
+                                (static_cast<uint32_t>(px1) & static_cast<uint32_t>(px2) & 1);
+                            int32_t middleValuePy = (py1 / 2) + (py2 / 2) +
+                                (static_cast<uint32_t>(py1) & static_cast<uint32_t>(py2) & 1);
                             item.SetGlobalX(middleValuePx);
                             item.SetGlobalY(middleValuePy);
                             pointerEvent->SetActionTime(time + ACTION_TIME);

@@ -146,6 +146,66 @@ void PointerEvent::PointerItem::SetTiltY(double tiltY)
     tiltY_ = tiltY;
 }
 
+int32_t PointerEvent::PointerItem::GetToolGlobalX() const
+{
+    return toolGlobalX_;
+}
+
+void PointerEvent::PointerItem::SetToolGlobalX(int32_t x)
+{
+    toolGlobalX_ = x;
+}
+
+int32_t PointerEvent::PointerItem::GetToolGlobalY() const
+{
+    return toolGlobalY_;
+}
+
+void PointerEvent::PointerItem::SetToolGlobalY(int32_t y)
+{
+    toolGlobalY_ = y;
+}
+
+int32_t PointerEvent::PointerItem::GetToolLocalX() const
+{
+    return toolLocalX_;
+}
+
+void PointerEvent::PointerItem::SetToolLocalX(int32_t x)
+{
+    toolLocalX_ = x;
+}
+
+int32_t PointerEvent::PointerItem::GetToolLocalY() const
+{
+    return toolLocalY_;
+}
+
+void PointerEvent::PointerItem::SetToolLocalY(int32_t y)
+{
+    toolLocalY_ = y;
+}
+
+int32_t PointerEvent::PointerItem::GetToolWidth() const
+{
+    return toolWidth_;
+}
+
+void PointerEvent::PointerItem::SetToolWidth(int32_t width)
+{
+    toolWidth_ = width;
+}
+
+int32_t PointerEvent::PointerItem::GetToolHeight() const
+{
+    return toolHeight_;
+}
+
+void PointerEvent::PointerItem::SetToolHeight(int32_t height)
+{
+    toolHeight_ = height;
+}
+
 double PointerEvent::PointerItem::GetPressure() const
 {
     return pressure_;
@@ -208,6 +268,12 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(localY_) &&
         out.WriteInt32(width_) &&
         out.WriteInt32(height_) &&
+        out.WriteInt32(toolGlobalX_) &&
+        out.WriteInt32(toolGlobalY_) &&
+        out.WriteInt32(toolLocalX_) &&
+        out.WriteInt32(toolLocalY_) &&
+        out.WriteInt32(toolWidth_) &&
+        out.WriteInt32(toolHeight_) &&
         out.WriteDouble(tiltX_) &&
         out.WriteDouble(tiltY_) &&
         out.WriteDouble(pressure_) &&
@@ -229,6 +295,12 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(localY_) &&
         in.ReadInt32(width_) &&
         in.ReadInt32(height_) &&
+        in.ReadInt32(toolGlobalX_) &&
+        in.ReadInt32(toolGlobalY_) &&
+        in.ReadInt32(toolLocalX_) &&
+        in.ReadInt32(toolLocalY_) &&
+        in.ReadInt32(toolWidth_) &&
+        in.ReadInt32(toolHeight_) &&
         in.ReadDouble(tiltX_) &&
         in.ReadDouble(tiltY_) &&
         in.ReadDouble(pressure_) &&
@@ -857,6 +929,9 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
             << ",LocalX:" << item.GetLocalX() << ",LocalY:" << item.GetLocalY()
             << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
             << ",TiltX:" << item.GetTiltX() << ",TiltY:" << item.GetTiltY()
+            << ",ToolGlobalX:" << item.GetToolGlobalX() << ",ToolGlobalY:" << item.GetToolGlobalY()
+            << ",ToolLocalX:" << item.GetToolLocalX() << ",ToolLocalY:" << item.GetToolLocalY()
+            << ",ToolWidth:" << item.GetToolWidth() << ",ToolHeight:" << item.GetToolHeight()
             << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
             << ",AxisLong:" << item.GetAxisLong() << ",AxisShort:" << item.GetAxisShort()
             << std::endl;

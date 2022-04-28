@@ -49,10 +49,9 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     CHKPF(event);
     auto data = libinput_event_get_touch_event(event);
     CHKPF(data);
-    int32_t logicalY = -1;
-    int32_t logicalX = -1;
+    EventTouch touchInfo;
     int32_t logicalDisplayId = -1;
-    if (!WinMgr->TouchDownPointToDisplayPoint(data, logicalX, logicalY, logicalDisplayId)) {
+    if (!WinMgr->TouchDownPointToDisplayPoint(data, touchInfo, logicalDisplayId)) {
         MMI_HILOGE("TouchDownPointToDisplayPoint failed");
         return false;
     }
@@ -78,15 +77,17 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     item.SetPointerId(seatSlot);
     item.SetDownTime(time);
     item.SetPressed(true);
-    item.SetGlobalX(logicalX);
-    item.SetGlobalY(logicalY);
+    item.SetGlobalX(touchInfo.point.x);
+    item.SetGlobalY(touchInfo.point.y);
+    item.SetToolGlobalX(touchInfo.toolRect.point.x);
+    item.SetToolGlobalY(touchInfo.toolRect.point.y);
+    item.SetToolWidth(touchInfo.toolRect.width);
+    item.SetToolHeight(touchInfo.toolRect.height);
     item.SetDeviceId(deviceId_);
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_HILOGD("LogicalX:%{public}d, logicalY:%{public}d, logicalDisplay:%{public}d, pressure:%{public}f,"
-               "axisLong:%{public}d, axisShort:%{public}d",
-               logicalX, logicalY, logicalDisplayId, pressure, axisLong, axisShort);
+    PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(), pointerEvent_->GetPointersIdList().size());
     return true;
 }
 
@@ -99,10 +100,9 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
     int64_t time = GetSysClockTime();
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    int32_t logicalY = -1;
-    int32_t logicalX = -1;
+    EventTouch touchInfo;
     int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
-    if (!WinMgr->TouchMotionPointToDisplayPoint(data, logicalDisplayId, logicalX, logicalY)) {
+    if (!WinMgr->TouchMotionPointToDisplayPoint(data, logicalDisplayId, touchInfo)) {
         MMI_HILOGE("Get TouchMotionPointToDisplayPoint failed");
         return false;
     }
@@ -118,13 +118,15 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
     item.SetPressure(pressure);
     item.SetAxisLong(axisLong);
     item.SetAxisShort(axisShort);
-    item.SetGlobalX(logicalX);
-    item.SetGlobalY(logicalY);
+    item.SetGlobalX(touchInfo.point.x);
+    item.SetGlobalY(touchInfo.point.y);
+    item.SetToolGlobalX(touchInfo.toolRect.point.x);
+    item.SetToolGlobalY(touchInfo.toolRect.point.y);
+    item.SetToolWidth(touchInfo.toolRect.width);
+    item.SetToolHeight(touchInfo.toolRect.height);
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_HILOGD("LogicalX:%{public}d, logicalY:%{public}d, pressure:%{public}f,"
-               "axisLong:%{public}d, axisShort:%{public}d",
-               logicalX, logicalY, pressure, axisLong, axisShort);
+    PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(), pointerEvent_->GetPointersIdList().size());
     return true;
 }
 
