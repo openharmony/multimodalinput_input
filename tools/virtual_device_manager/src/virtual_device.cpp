@@ -100,12 +100,12 @@ void RemoveDir(const std::string& filePath)
             continue;
         }
         if (ptr->d_type == DT_REG) {
-            std::string rmFile = PathSplicing({ filePath, ptr->d_name });
+            std::string rmFile = PathSplicing( {filePath, ptr->d_name} );
             if (std::remove(rmFile.c_str()) != 0) {
                 printf("delete file: %s failed", rmFile.c_str());
             }
         } else if (ptr->d_type == DT_DIR) {
-            RemoveDir(PathSplicing({ filePath, ptr->d_name, "/" }));
+            RemoveDir(PathSplicing({ filePath , ptr->d_name , "/" }));
         } else {
             printf("file name:%s, type is error", ptr->d_name);
         }
@@ -170,12 +170,12 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
             break;
         }
         std::string::size_type pos = fileName.find("_");
-        std::string procressPath = PathSplicing({ "/proc/", fileName.substr(0, pos), "/" });
+        std::string procressPath = PathSplicing( { "/proc/", fileName.substr(0, pos), "/" } );
         dir = opendir(procressPath.c_str());
         if (dir == nullptr) {
             break;
         }
-        std::string filePath = PathSplicing({ procressPath, "cmdline" });
+        std::string filePath = PathSplicing({ procressPath, "cmdline"});
         if (!IsFileExists(filePath)) {
             break;
         }
