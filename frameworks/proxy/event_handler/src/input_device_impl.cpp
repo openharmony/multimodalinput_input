@@ -214,11 +214,6 @@ void InputDeviceImpl::OnSupportKeys(int32_t userData, const std::vector<bool> &k
         MMI_HILOGD("find userData failed");
         return;
     }
-    if (iter->second.cppKeys != nullptr) {
-        iter->second.cppKeys(keystrokeAbility);
-        MMI_HILOGD("innerkits interface");
-        return;
-    }
     auto devKeys = GetDeviceKeys(userData);
     CHKPV(devKeys);
     if (!MMIEventHandler::PostTask(devKeys->first,
