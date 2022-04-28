@@ -38,8 +38,6 @@ int32_t RunShellUtil::RunShellCommand(const std::string &command, std::vector<st
 
     if ((fp_ = popen(command_.c_str(), "r")) == nullptr) {
         MMI_LOGE("open fail");
-        pclose(fp_);
-        fp_ = nullptr;
         return RET_ERR;
     }
     std::string retLog = "";
