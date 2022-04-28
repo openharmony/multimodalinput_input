@@ -43,6 +43,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t READ_FILE_SIZE_MAX = 1000;
+const std::string VIRTUAL_DEVICE_NAME = "mmi-virtual-device";
 bool IsNum(const std::string &str)
 {
     return std::all_of(str.begin(), str.end(), [](char c) {
@@ -76,7 +77,7 @@ bool CheckFileName(const std::string& fileName)
     return result;
 }
 
-std::string PathSplicing(std::initializer_list<std::string>& strList)
+std::string PathSplicing(const std::initializer_list<std::string>& strList)
 {
     std::string str;
     for (const auto& item : strList) {
@@ -140,7 +141,7 @@ VirtualDevice::~VirtualDevice()
     Close();
 }
 
-std::vector<std::string> VirtualDevice::ViewDirectory(const std::string& filePath)
+std::vector<std::string> VirtualDevice::BrowseDirectory(const std::string& filePath)
 {
     std::vector<std::string> fileList;
     fileList.clear();
@@ -187,7 +188,7 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
         }
         std::string processName;
         processName.append(temp);
-        if (processName.find("mmi-virtual-device") != processName.npos) {
+        if (processName.find(VIRTUAL_DEVICE_NAME.c_str()) != processName.npos) {
             return true;
         }
     } while (0);
@@ -505,7 +506,7 @@ bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::v
     for (auto it : deviceList) {
         if (it.find(closeDeviceName) == 0) {
             kill(atoi(it.c_str()), SIGKILL);
-            if (ViewDirectory(g_folderpath).size() <= 0) {
+            if (BrowseDirectory(g_folderpath).size() <= 0) {
                 RemoveDir(g_folderpath);
             }
             return true;
@@ -517,7 +518,7 @@ bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::v
 
 bool VirtualDevice::FindDevice(std::vector<std::string>& argvList)
 {
-    std::vector<std::string> deviceList = ViewDirectory(g_folderpath);
+    std::vector<std::string> deviceList = BrowseDirectory(g_folderpath);
     if (argvList[1] == "start") {
         if (argvList.size() != MAXPARAMETER) {
             printf("Invaild Input Para, Plase Check the validity of the para");
