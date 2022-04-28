@@ -37,7 +37,7 @@ public:
     void MakeFolder(const std::string &filePath);
     static bool CreateHandle(const std::string& deviceArgv);
     static bool AddDevice(const std::string& startDeviceName);
-    static bool CloseDevice(const std::string& closeDeviceName,const std::vector<std::string>& deviceList);
+    static bool CloseDevice(const std::string& closeDeviceName, const std::vector<std::string>& deviceList);
     static bool FindDevice(std::vector<std::string>& argvList);
 protected:
     virtual const std::vector<uint32_t>& GetEventTypes() const;
