@@ -247,6 +247,10 @@ ohos_unittest("ut-mmi-service-out") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
+  if (mmi_enable_pointer_drawing) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
+  }
+
   configs = [ ":libmmi_server_config" ]
 
   deps = [
@@ -268,9 +272,4 @@ ohos_unittest("ut-mmi-service-out") {
     "input_device_driver:hdi_input",
     "utils_base:utils",
   ]
-}
-
-group("ut-mmi-service") {
-  testonly = true
-  deps = [ ":ut-mmi-service-out" ]
 }
