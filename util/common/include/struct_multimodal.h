@@ -167,6 +167,12 @@ struct LogicalCoordinate {
     int32_t y;
 };
 
+struct LogicalRectangle {
+    LogicalCoordinate point;
+    int32_t width;
+    int32_t height;
+};
+
 struct TiltDegrees {
     double x;
     double y;
@@ -287,7 +293,8 @@ struct EventTouch {
     int64_t time;
     int32_t slot;
     int32_t seatSlot;
-    PhysicalCoordinate point;
+    LogicalCoordinate point;
+    LogicalRectangle toolRect;
     DEVICE_TYPE deviceType;
     double pressure;
     double area;

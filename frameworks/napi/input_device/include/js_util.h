@@ -55,7 +55,7 @@ public:
     napi_async_work work = nullptr;
     napi_deferred deferred = nullptr;
     napi_ref callback = nullptr;
-    int32_t errorCode;
+    int32_t errorCode {-1};
     std::stringstream reserve;
     AsyncContext(napi_env env) : env(env) {}
     ~AsyncContext();
