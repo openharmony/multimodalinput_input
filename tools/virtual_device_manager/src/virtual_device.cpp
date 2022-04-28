@@ -111,92 +111,92 @@ void RemoveDir(const std::string& filePath)
 
 void StartMouse()
 {
-    VirtualMouse virtualMouse;
+    static VirtualMouse virtualMouse;
     virtualMouse.SetUp();
 }
 
 void StartKeyboard()
 {
-    VirtualKeyboard virtualKey;
+    static VirtualKeyboard virtualKey;
     virtualKey.SetUp();
-    VirtualKeyboardSysCtrl virtualKeyboardSysCtrl;
+    static VirtualKeyboardSysCtrl virtualKeyboardSysCtrl;
     virtualKeyboardSysCtrl.SetUp();
-    VirtualKeyboardConsumerCtrl virtualKeyboardConsumerCtrl;
+    static VirtualKeyboardConsumerCtrl virtualKeyboardConsumerCtrl;
     virtualKeyboardConsumerCtrl.SetUp();
-    VirtualKeyboardExt virtualKeyext;
+    static VirtualKeyboardExt virtualKeyext;
     virtualKeyext.SetUp();
 }
 
 void StartJoystick()
 {
-    VirtualJoystick virtualJoystick;
+    static VirtualJoystick virtualJoystick;
     virtualJoystick.SetUp();
 }
 
 void StartTrackball()
 {
-    VirtualTrackball virtualTrackball;
+    static VirtualTrackball virtualTrackball;
     virtualTrackball.SetUp();
 }
 
 void StartRemoteControl()
 {
-    VirtualRemoteControl virtualRemoteControl;
+    static VirtualRemoteControl virtualRemoteControl;
     virtualRemoteControl.SetUp();
 }
 
 
 void StartTrackpad()
 {
-    VirtualTrackpad virtualTrackpad;
+    static VirtualTrackpad virtualTrackpad;
     virtualTrackpad.SetUp();
-    VirtualTrackpadMouse virtualMousepadMouse;
+    static VirtualTrackpadMouse virtualMousepadMouse;
     virtualMousepadMouse.SetUp();
-    VirtualTrackpadSysCtrl virtualTrackpadSysCtrl;
+    static VirtualTrackpadSysCtrl virtualTrackpadSysCtrl;
     virtualTrackpadSysCtrl.SetUp();
 }
 
 void StartKnob()
 {
-    VirtualKnob virtualKnob;
+    static VirtualKnob virtualKnob;
     virtualKnob.SetUp();
-    VirtualKnobConsumerCtrl virtualKnobConsumerCtrl;
+    static VirtualKnobConsumerCtrl virtualKnobConsumerCtrl;
     virtualKnobConsumerCtrl.SetUp();
-    VirtualKnobMouse virtualKnobMouse;
+    static VirtualKnobMouse virtualKnobMouse;
     virtualKnobMouse.SetUp();
-    VirtualKnobSysCtrl virtualKnobSysCtrl;
+    static VirtualKnobSysCtrl virtualKnobSysCtrl;
     virtualKnobSysCtrl.SetUp();
 }
 
 void StartGamePad()
 {
-    VirtualGamePad virtualGamePad;
+    static VirtualGamePad virtualGamePad;
     virtualGamePad.SetUp();
 }
 
 void StartTouchPad()
 {
-    VirtualStylus virtualStylus;
+    static VirtualStylus virtualStylus;
     virtualStylus.SetUp();
-    VirtualTouchpad virtualTouchpad;
+    static VirtualTouchpad virtualTouchpad;
     virtualTouchpad.SetUp();
-    VirtualFinger virtualFinger;
+    static VirtualFinger virtualFinger;
     virtualFinger.SetUp();
 }
 
 void StartTouchScreen()
 {
-    VirtualTouchScreen virtualTouchScreen;
+    static VirtualTouchScreen virtualTouchScreen;
     virtualTouchScreen.SetUp();
 }
 
 void StartPen()
 {
-    VirtualPen virtualPen;
+    static VirtualPen virtualPen;
     virtualPen.SetUp();
-    VirtualPenMouse virtualPenMouse;
+    static VirtualPenMouse virtualPenMouse;
     virtualPenMouse.SetUp();
-    VirtualPenKeyboard virtualPenKeyboard;
+    static VirtualPenKeyboard virtualPenKeyboard;
     virtualPenKeyboard.SetUp();
 }
 } // namespace
