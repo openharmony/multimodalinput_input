@@ -25,7 +25,7 @@ public:
     VirtualDevice(const std::string &device_name, uint16_t busType, uint16_t vendorId, uint16_t product_id);
     virtual ~VirtualDevice();
     DISALLOW_COPY_AND_MOVE(VirtualDevice);
-    static std::vector<std::string> ViewDirectory(const std::string& filePath);
+    static std::vector<std::string> BrowseDirectory(const std::string& filePath);
     static bool ClearFileResidues(const std::string& fileName);
     bool DoIoctl(int32_t fd, int32_t request, const uint32_t value);
     bool CreateKey();
