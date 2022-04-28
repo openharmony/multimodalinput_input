@@ -76,6 +76,14 @@ bool CheckFileName(const std::string& fileName)
     return result;
 }
 
+std::string PathSplicing(std::initializer_list<std::string>& strList) {
+    std::string str;
+    for (const auto& item : strList) {
+        str += item;
+    }
+    return str;
+}
+
 void RemoveDir(const std::string& filePath)
 {
     DIR* dir = opendir(filePath.c_str());
@@ -90,13 +98,12 @@ void RemoveDir(const std::string& filePath)
             continue;
         }
         if (ptr->d_type == DT_REG) {
-            std::string removeFile = filePath + ptr->d_name;
-            if (std::remove(removeFile.c_str()) != 0) {
-                printf("delete file: %s failed", removeFile.c_str());
+            std::string rmFile = PathSplicing({filePath, ptr->d_name});
+            if (std::remove(rmFile.c_str()) != 0) {
+                printf("delete file: %s failed", rmFile.c_str());
             }
         } else if (ptr->d_type == DT_DIR) {
-            std::string path = filePath + ptr->d_name + "/";
-            RemoveDir(path);
+            RemoveDir(PathSplicing({filePath, ptr->d_name, "/"}));
         } else {
             printf("file name:%s, type is error", ptr->d_name);
         }
@@ -161,12 +168,12 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
             break;
         }
         std::string::size_type pos = fileName.find("_");
-        std::string procressPath = "/proc/" + fileName.substr(0, pos) + "/";
+        std::string procressPath = PathSplicing({"/proc/", fileName.substr(0, pos), "/"});
         dir = opendir(procressPath.c_str());
         if (dir == nullptr) {
             break;
         }
-        std::string filePath = "/proc/" + fileName.substr(0, pos) + "/cmdline";
+        std::string filePath = PathSplicing({procressPath, "cmdline"});
         if (!IsFileExists(filePath)) {
             break;
         }
