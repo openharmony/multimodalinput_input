@@ -97,7 +97,7 @@ void InputDeviceImpl::GetInputDeviceAsync(int32_t deviceId,
 }
 
 void InputDeviceImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
-    std::function<void(std::vector<bool>)> callback)
+    std::function<void(std::vector<bool>&)> callback)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);

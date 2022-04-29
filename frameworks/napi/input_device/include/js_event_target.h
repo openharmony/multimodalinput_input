@@ -38,7 +38,7 @@ public:
     static void TargetOn(std::string type, int32_t deviceId);
     static void EmitJsIds(int32_t userData, std::vector<int32_t> &ids);
     static void EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device);
-    static void EmitJsKeystrokeAbility(int32_t userData, std::vector<bool> keystrokeAbility);
+    static void EmitJsKeystrokeAbility(int32_t userData, std::vector<bool> &keystrokeAbility);
     static void EmitJsKeyboardType(int32_t userData, int32_t keyboardType);
     void AddMonitor(napi_env env, std::string type, napi_value handle);
     void RemoveMonitor(napi_env env, std::string type, napi_value handle);

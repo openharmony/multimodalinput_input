@@ -351,7 +351,7 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
           CALL_FUNCTION);
 }
 
-void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::vector<bool> keystrokeAbility)
+void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::vector<bool> &keystrokeAbility)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);

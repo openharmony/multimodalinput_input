@@ -57,22 +57,16 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
     CHKPP(inputDevice);
     inputDevice->SetId(iter->first);
-    int32_t deviceType = static_cast<int32_t>(libinput_device_get_tags(iter->second));
-    inputDevice->SetType(deviceType);
-    std::string name = libinput_device_get_name(iter->second);
-    inputDevice->SetName(name);
-    int32_t busType = libinput_device_get_id_bustype(iter->second);
-    inputDevice->SetBustype(busType);
-    int32_t version = libinput_device_get_id_version(iter->second);
-    inputDevice->SetVersion(version);
-    int32_t product = libinput_device_get_id_product(iter->second);
-    inputDevice->SetProduct(product);
-    int32_t vendor = libinput_device_get_id_vendor(iter->second);
-    inputDevice->SetVendor(vendor);
+    inputDevice->SetType(static_cast<int32_t>(libinput_device_get_tags(iter->second)));
+    inputDevice->SetName(libinput_device_get_name(iter->second));
+    inputDevice->SetBustype(libinput_device_get_id_bustype(iter->second));
+    inputDevice->SetVersion(libinput_device_get_id_version(iter->second));
+    inputDevice->SetProduct(libinput_device_get_id_product(iter->second));
+    inputDevice->SetVendor(libinput_device_get_id_vendor(iter->second));
     auto phys = libinput_device_get_phys(iter->second);
-    inputDevice->SetPhys(phys == nullptr ? "null" : phys);
+    inputDevice->SetPhys((phys == nullptr) ? ("null") : (phys));
     auto uniq = libinput_device_get_uniq(iter->second);
-    inputDevice->SetUniq(uniq == nullptr ? "null" : uniq);
+    inputDevice->SetUniq((uniq == nullptr) ? ("null") : (uniq));
 
     InputDevice::AxisInfo axis;
     for (const auto &item : axisType) {
@@ -83,14 +77,10 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
         }
         axis.SetAxisType(item);
         axis.SetMinimum(min);
-        auto max = libinput_device_get_axis_max(iter->second, item);
-        axis.SetMaximum(max);
-        auto fuzz = libinput_device_get_axis_fuzz(iter->second, item);
-        axis.SetFuzz(fuzz);
-        auto flat = libinput_device_get_axis_flat(iter->second, item);
-        axis.SetFlat(flat);
-        auto resolution = libinput_device_get_axis_resolution(iter->second, item);
-        axis.SetResolution(resolution);
+        axis.SetMaximum(libinput_device_get_axis_max(iter->second, item));
+        axis.SetFuzz(libinput_device_get_axis_fuzz(iter->second, item));
+        axis.SetFlat(libinput_device_get_axis_flat(iter->second, item));
+        axis.SetResolution(libinput_device_get_axis_resolution(iter->second, item));
         inputDevice->AddAxisInfo(axis);
     }
     return inputDevice;
