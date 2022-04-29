@@ -73,7 +73,7 @@ public:
     void OnConnected();
 
     void SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
-        std::function<void(std::vector<bool>)> callback);
+        std::function<void(std::vector<bool>&)> callback);
 
     int32_t SetPointerVisible(bool visible);
 

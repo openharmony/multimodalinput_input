@@ -211,7 +211,7 @@ public:
      * @since 9
      */
     void SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
-        std::function<void(std::vector<bool>)> callback);
+        std::function<void(std::vector<bool>&)> callback);
 
     /**
      * @brief Sets whether the pointer icon is visible.

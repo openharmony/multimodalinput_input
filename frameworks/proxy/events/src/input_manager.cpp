@@ -133,7 +133,7 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
 }
 
 void InputManager::SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
-    std::function<void(std::vector<bool>)> callback)
+    std::function<void(std::vector<bool>&)> callback)
 {
     InputMgrImpl->SupportKeys(deviceId, keyCodes, callback);
 }
