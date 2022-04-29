@@ -326,8 +326,3 @@ ohos_unittest("TransformPointTest") {
     "utils_base:utils",
   ]
 }
-
-group("ut-mmi-service") {
-  testonly = true
-  deps = [ ":ut-mmi-service-out" ]
-}
