@@ -4883,6 +4883,7 @@ diff -Naur old/tools/libinput-debug-events.c new/tools/libinput-debug-events.c
 +	       xmm, ymm);
 +}
 +
+
 +static void
  print_gesture_event_without_coords(struct libinput_event *ev)
  {
