@@ -33,7 +33,6 @@ public:
     ~InterceptorManagerGlobal() = default;
     void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session);
     void OnRemoveInterceptor(int32_t id);
-    bool OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     bool OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 private:
     struct InterceptorItem {
