@@ -279,6 +279,7 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteDouble(pressure_) &&
         out.WriteInt32(axisLong_) &&
         out.WriteInt32(axisShort_) &&
+        out.WriteInt32(toolType_) &&
         out.WriteInt32(deviceId_)
     );
 }
@@ -306,6 +307,7 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadDouble(pressure_) &&
         in.ReadInt32(axisLong_) &&
         in.ReadInt32(axisShort_) &&
+        in.ReadInt32(toolType_) &&
         in.ReadInt32(deviceId_)
     );
 }
