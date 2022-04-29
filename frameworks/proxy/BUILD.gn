@@ -426,13 +426,3 @@ ohos_unittest("PointerEventTest") {
     "ipc:ipc_core",
   ]
 }
-
-group("ut-mmi-proxy") {
-  testonly = true
-  deps = [
-    ":InputManagerTest",
-    ":KeyEventTest",
-    ":PointerEventTest",
-    ":ut-mmi-proxy-out",
-  ]
-}
