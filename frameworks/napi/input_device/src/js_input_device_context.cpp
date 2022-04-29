@@ -148,8 +148,8 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
         THROWERR(env, "the number of parameters is incorrect");
         return nullptr;
     }
-    if (JsUtil::TypeOf(env, argv[0], napi_string)) {
-        THROWERR(env, "Parameter type error");
+    if (!JsUtil::TypeOf(env, argv[0], napi_string)) {
+        THROWERR(env, "The first parameter type is wrong");
         return nullptr;
     }
 
@@ -161,8 +161,8 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
         THROWERR(env, "event type is wrong");
         return nullptr;
     }
-    if (JsUtil::TypeOf(env, argv[1], napi_function)) {
-        THROWERR(env, "Parameter type error");
+    if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
+        THROWERR(env, "The second parameter type is wrong");
         return nullptr;
     }
 
@@ -182,8 +182,8 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
         THROWERR(env, "the number of parameters is incorrect");
         return nullptr;
     }
-    if (JsUtil::TypeOf(env, argv[0], napi_string)) {
-        THROWERR(env, "Parameter type error");
+    if (!JsUtil::TypeOf(env, argv[0], napi_string)) {
+        THROWERR(env, "The first parameter type is wrong");
         return nullptr;
     }
 
@@ -202,8 +202,8 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
         jsInputDeviceMgr->UnRegisterInputDeviceMonitor(env, type);
         return nullptr;
     }
-    if (JsUtil::TypeOf(env, argv[1], napi_function)) {
-        THROWERR(env, "Parameter type error");
+    if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
+        THROWERR(env, "The second parameter type is wrong");
         return nullptr;
     }
     jsInputDeviceMgr->UnRegisterInputDeviceMonitor(env, type, argv[1]);
@@ -226,8 +226,8 @@ napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info i
     if (argc == 0) {
         return jsInputDeviceMgr->GetDeviceIds(env);
     }
-    if (JsUtil::TypeOf(env, argv[0], napi_function)) {
-        THROWERR(env, "Parameter type error");
+    if (!JsUtil::TypeOf(env, argv[0], napi_function)) {
+        THROWERR(env, "The first parameter type is wrong");
         return nullptr;
     }
     return jsInputDeviceMgr->GetDeviceIds(env, argv[0]);
@@ -243,8 +243,8 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
         THROWERR(env, "the number of parameters is not as expected");
         return nullptr;
     }
-    if (JsUtil::TypeOf(env, argv[0], napi_number)) {
-        THROWERR(env, "Parameter type error");
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        THROWERR(env, "The first parameter type is wrong");
         return nullptr;
     }
     int32_t id = 0;
@@ -255,8 +255,8 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
     if (argc == 1) {
         return jsInputDeviceMgr->GetDevice(env, id);
     }
-    if (JsUtil::TypeOf(env, argv[1], napi_function)) {
-        THROWERR(env, "Parameter type error");
+    if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
+        THROWERR(env, "The second parameter type is wrong");
         return nullptr;
     }
     return jsInputDeviceMgr->GetDevice(env, id, argv[1]);
@@ -272,8 +272,8 @@ napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_i
         THROWERR(env, "the number of parameters is not as expected");
         return nullptr;
     }
-    if (JsUtil::TypeOf(env, argv[0], napi_boolean)) {
-        THROWERR(env, "Parameter type error");
+    if (!JsUtil::TypeOf(env, argv[0], napi_boolean)) {
+        THROWERR(env, "The first parameter type is wrong");
         return nullptr;
     }
     bool visible = true;
@@ -284,8 +284,8 @@ napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_i
     if (argc == 1) {
         return jsInputDeviceMgr->SetPointerVisible(env, visible);
     }
-    if (JsUtil::TypeOf(env, argv[1], napi_function)) {
-        THROWERR(env, "Parameter type error");
+    if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
+        THROWERR(env, "The second parameter type is wrong");
         return nullptr;
     }
     return jsInputDeviceMgr->SetPointerVisible(env, visible, argv[1]);
@@ -301,15 +301,15 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
         THROWERR(env, "parameter number error");
         return nullptr;
     }
-    if (JsUtil::TypeOf(env, argv[0], napi_number)) {
-        THROWERR(env, "Parameter type error");
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        THROWERR(env, "The first parameter type is wrong");
         return nullptr;
     }
     int32_t deviceId = 0;
     CHKRP(env, napi_get_value_int32(env, argv[0], &deviceId), GET_INT32);
 
-    if (JsUtil::TypeOf(env, argv[1], napi_object)) {
-        THROWERR(env, "Parameter type error");
+    if (!JsUtil::TypeOf(env, argv[1], napi_object)) {
+        THROWERR(env, "The second parameter type is wrong");
         return nullptr;
     }
     uint32_t size = 0;
@@ -324,7 +324,7 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
     for (uint32_t i = 0; i < size; ++i) {
         napi_value keyValue = nullptr;
         CHKRP(env, napi_get_element(env, argv[1], i, &keyValue), GET_ELEMENT);
-        if (JsUtil::TypeOf(env, keyValue, napi_number)) {
+        if (!JsUtil::TypeOf(env, keyValue, napi_number)) {
             THROWERR(env, "Parameter type error");
             return nullptr;
         }
@@ -337,8 +337,8 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
     if (argc == 2) {
         return jsInputDeviceMgr->SupportKeys(env, deviceId, keyCode);
     }
-    if (JsUtil::TypeOf(env, argv[2], napi_function)) {
-        THROWERR(env, "Parameter type error");
+    if (!JsUtil::TypeOf(env, argv[2], napi_function)) {
+        THROWERR(env, "The third parameter type is wrong");
         return nullptr;
     }
     return jsInputDeviceMgr->SupportKeys(env, deviceId, keyCode, argv[2]);
@@ -355,8 +355,8 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
         return nullptr;
     }
 
-    if (JsUtil::TypeOf(env, argv[0], napi_number)) {
-        THROWERR(env, "Parameter type error");
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        THROWERR(env, "The first parameter type is wrong");
         return nullptr;
     }
     int32_t id = 0;
@@ -367,8 +367,8 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
     if (argc == 1) {
         return jsInputDeviceMgr->GetKeyboardType(env, id);
     }
-    if (JsUtil::TypeOf(env, argv[1], napi_function)) {
-        THROWERR(env, "Parameter type error");
+    if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
+        THROWERR(env, "The second parameter type is wrong");
         return nullptr;
     }
     return jsInputDeviceMgr->GetKeyboardType(env, id, argv[1]);
