@@ -87,6 +87,13 @@ ohos_prebuilt_etc("multimodalinput_config_ability.json") {
   relative_install_dir = "multimodalinput"
 }
 
+ohos_prebuilt_etc("universal_key_value_transformation") {
+  source = "//foundation/multimodalinput/input/util/KeyValueTransform/key_universal.pro"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/KeyValueTransform"
+}
+
 ohos_prebuilt_etc("drawing_pointer_image") {
   source = "//foundation/multimodalinput/input/util/source_icon/angle.png"
   part_name = "input"
@@ -161,6 +168,7 @@ ohos_shared_library("libmmi-server") {
     ":drawing_pointer_image",
     ":mmi_device_config.ini",
     ":multimodalinput_config_ability.json",
+    ":universal_key_value_transformation",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/graphic/standard/rosen/modules/2d_graphics:2d_graphics",
     "//foundation/graphic/standard/rosen/modules/render_service_client:librender_service_client",
