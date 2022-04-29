@@ -128,6 +128,7 @@ void InputDeviceManager::RemoveDevMonitor(SessionPtr sess)
     auto iter = devMonitor_.find(sess);
     if (iter == devMonitor_.end()) {
         MMI_HILOGE("session does not exist");
+        return;
     }
     devMonitor_.erase(iter);
 }
