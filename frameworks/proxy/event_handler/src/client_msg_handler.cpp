@@ -246,7 +246,7 @@ int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& p
         }
         inputDeviceIds.push_back(deviceId);
     }
-    InputDevImp.OnInputDeviceIds(userData, inputDeviceIds);
+    InputDevImpl.OnInputDeviceIds(userData, inputDeviceIds);
     return RET_OK;
 }
 
@@ -254,35 +254,19 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
     int32_t userData;
-    int32_t id;
-    std::string name;
-    int32_t deviceType;
-    int32_t busType;
-    int32_t product;
-    int32_t vendor;
-    int32_t version;
-    std::string phys;
-    std::string uniq;
     size_t size;
-    pkt >> userData >> id >> name >> deviceType >> busType >> product >> vendor >> version >> phys >> uniq >> size;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read input device info failed");
-        return PACKET_READ_FAIL;
-    }
+    auto devData = std::make_shared<InputDeviceImpl::InputDeviceInfo>();
+    pkt >> userData >> devData->id >> devData->name >> devData->deviceType >> devData->busType >> devData->product
+        >> devData->vendor >> devData->version >> devData->phys >> devData->uniq >> size;
     std::vector<InputDeviceImpl::AxisInfo> axisInfo;
     InputDeviceImpl::AxisInfo axis;
     for (size_t i = 0; i < size; ++i) {
         pkt >> axis.axisType >> axis.min >> axis.max >> axis.fuzz >> axis.flat >> axis.resolution;
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet read input device axis failed");
-            return PACKET_READ_FAIL;
-        }
         axisInfo.push_back(axis);
     }
-    auto devData = std::make_shared<InputDeviceImpl::InputDeviceInfo>(id, name, deviceType, busType, product, vendor,
-        version, phys, uniq, axisInfo);
+    devData->axis = axisInfo;
     CHKPR(devData, RET_ERR);
-    InputDevImp.OnInputDevice(userData, devData);
+    InputDevImpl.OnInputDevice(userData, devData);
     return RET_OK;
 }
 
@@ -300,15 +284,15 @@ int32_t ClientMsgHandler::OnSupportKeys(const UDSClient& client, NetPacket& pkt)
         return RET_ERR;
     }
     std::vector<bool> abilityRet;
-    int32_t ret;
+    bool ret;
     for (size_t i = 0; i < size; ++i) {
         if (!pkt.Read(ret)) {
             MMI_HILOGE("Packet read ret failed");
             return RET_ERR;
         }
-        abilityRet.push_back(ret == 1 ? true : false);
+        abilityRet.push_back(ret);
     }
-    InputDevImp.OnSupportKeys(userData, abilityRet);
+    InputDevImpl.OnSupportKeys(userData, abilityRet);
     return RET_OK;
 }
 

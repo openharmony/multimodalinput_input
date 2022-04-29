@@ -613,7 +613,7 @@ void InputManagerImpl::SendDisplayInfo()
 void InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
     std::function<void(std::vector<bool>)> callback)
 {
-    InputDevImp.SupportKeys(deviceId, keyCodes, callback);
+    InputDevImpl.SupportKeys(deviceId, keyCodes, callback);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -63,7 +63,7 @@ void InputDeviceImpl::OnDevMonitor(std::string type, int32_t deviceId)
     MMI_HILOGD("report device changed, event type:%{public}s", type.c_str());
 }
 
-void InputDeviceImpl::GetInputDeviceIdsAsync(std::function<void(int32_t, std::vector<int32_t>)> callback)
+void InputDeviceImpl::GetInputDeviceIdsAsync(std::function<void(int32_t, std::vector<int32_t>&)> callback)
 {
     CALL_LOG_ENTER;
     auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
@@ -140,7 +140,7 @@ void InputDeviceImpl::OnInputDeviceTask(InputDeviceImpl::DevInfo devInfo, int32_
         userData, devData->name.c_str());
 }
 
-void InputDeviceImpl::OnInputDevice(int32_t userData, std::shared_ptr<InputDeviceInfo> &devData)
+void InputDeviceImpl::OnInputDevice(int32_t userData, std::shared_ptr<InputDeviceInfo> devData)
 {
     CALL_LOG_ENTER;
     CHK_PIDANDTID();
@@ -163,7 +163,7 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, std::shared_ptr<InputDevic
         MMI_HILOGE("post task failed");
     }
     MMI_HILOGD("report device info, userData:%{public}d name:%{public}s type:%{public}d",
-        userData, devData->name.c_str(), devData->devcieType);
+        userData, devData->name.c_str(), devData->deviceType);
 }
 
 void InputDeviceImpl::OnInputDeviceIdsTask(InputDeviceImpl::DevIds devIds, int32_t userData, std::vector<int32_t> ids)
@@ -174,7 +174,7 @@ void InputDeviceImpl::OnInputDeviceIdsTask(InputDeviceImpl::DevIds devIds, int32
         userData, IdsListToString(ids).c_str());
 }
 
-void InputDeviceImpl::OnInputDeviceIds(int32_t userData, const std::vector<int32_t> &ids)
+void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> &ids)
 {
     CHK_PIDANDTID();
     std::lock_guard<std::mutex> guard(mtx_);
@@ -286,13 +286,5 @@ int32_t InputDeviceImpl::GetUserData()
 {
     return userData_;
 }
-
-InputDeviceImpl::InputDeviceInfo::InputDeviceInfo(int32_t id, std::string name, uint32_t devcieType, int32_t busType,
-    int32_t product, int32_t vendor, int32_t version, std::string phys, std::string uniq,
-    std::vector<AxisInfo> axisInfo)
-    : id(id), name(name), devcieType(devcieType), busType(busType), product(product), vendor(vendor), version(version),
-    phys(phys), uniq(uniq), axis(axisInfo) {}
-
-InputDeviceImpl::InputDeviceInfo::~InputDeviceInfo() {}
 } // namespace MMI
 } // namespace OHOS

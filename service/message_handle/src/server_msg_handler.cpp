@@ -451,10 +451,7 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
     int32_t userData = 0;
     int32_t deviceId = 0;
     pkt >> userData >> deviceId;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read data failed");
-        return PACKET_READ_FAIL;
-    }
+
     std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(deviceId);
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE);
     if (inputDevice == nullptr) {
@@ -540,7 +537,7 @@ int32_t ServerMsgHandler::OnSupportKeys(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
     for (const auto &item : keystroke) {
-        if (!pkt2.Write(item ? 1 : 0)) {
+        if (!pkt2.Write(static_cast<bool>(item))) {
             MMI_HILOGE("Packet write keystroke failed");
             return RET_ERR;
         }

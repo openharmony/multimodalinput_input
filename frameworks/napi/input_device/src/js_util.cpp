@@ -32,6 +32,7 @@ const std::string SET_NAMED_PROPERTY = "napi_set_named_property";
 const std::string CREATE_STRING_UTF8 = "napi_create_string_utf8";
 const std::string CREATE_OBJECT = "napi_create_object";
 const std::string DELETE_ASYNC_WORK = "napi_delete_async_work";
+const std::string TYPEOF = "napi_typeof";
 
 constexpr int32_t ABS_MT_TOUCH_MAJOR = 0x30;
 constexpr int32_t ABS_MT_TOUCH_MINOR = 0x31;
@@ -42,15 +43,15 @@ constexpr int32_t ABS_MT_PRESSURE = 0x3a;
 constexpr int32_t ABS_MT_WIDTH_MAJOR = 0x32;
 constexpr int32_t ABS_MT_WIDTH_MINOR = 0x33;
 
-JsUtil::AxisType g_axisType[] = {
-    {"touchMajor", ABS_MT_TOUCH_MAJOR},
-    {"touchMinor", ABS_MT_TOUCH_MINOR},
-    {"orientation", ABS_MT_ORIENTATION},
-    {"x", ABS_MT_POSITION_X},
-    {"y", ABS_MT_POSITION_Y},
-    {"pressure", ABS_MT_PRESSURE},
-    {"toolMajor", ABS_MT_WIDTH_MAJOR},
-    {"toolMinor", ABS_MT_WIDTH_MINOR},
+std::map<int32_t, std::string> axisType = {
+    {ABS_MT_TOUCH_MAJOR, "touchMajor"},
+    {ABS_MT_TOUCH_MINOR, "touchMinor"},
+    {ABS_MT_ORIENTATION, "orientation"},
+    {ABS_MT_POSITION_X, "x"},
+    {ABS_MT_POSITION_Y, "y"},
+    {ABS_MT_PRESSURE, "pressure"},
+    {ABS_MT_WIDTH_MAJOR, "toolMajor"},
+    {ABS_MT_WIDTH_MINOR, "toolMinor"},
 };
 
 constexpr uint32_t EVDEV_UDEV_TAG_KEYBOARD = (1 << 1);
@@ -69,7 +70,7 @@ JsUtil::DeviceType g_deviceType[] = {
     {"trackball", EVDEV_UDEV_TAG_TRACKBALL},
 };
 } // namespace
-bool JsUtil::IsHandleEquals(napi_env env, napi_value handle, napi_ref ref)
+bool JsUtil::IsSameHandle(napi_env env, napi_value handle, napi_ref ref)
 {
     napi_value handlerTemp = nullptr;
     CHKRF(env, napi_get_reference_value(env, ref, &handlerTemp), GET_REFERENCE);
@@ -78,107 +79,106 @@ bool JsUtil::IsHandleEquals(napi_env env, napi_value handle, napi_ref ref)
     return isEqual;
 }
 
-bool JsUtil::GetDeviceInfo(std::unique_ptr<CallbackInfo> &cbTemp, napi_value &object)
+napi_value JsUtil::GetDeviceInfo(const std::unique_ptr<CallbackInfo> &cb)
 {
-    CHKPF(cbTemp);
-    CHKPF(cbTemp->env);
+    CHKPP(cb);
+    CHKPP(cb->env);
+    napi_value object = nullptr;
+    CHKRP(cb->env, napi_create_object(cb->env, &object), CREATE_OBJECT);
     napi_value id = nullptr;
-    CHKRF(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.device->id, &id), CREATE_INT32);
+    CHKRP(cb->env, napi_create_int32(cb->env, cb->data.device->id, &id), CREATE_INT32);
     napi_value name = nullptr;
-    CHKRF(cbTemp->env, napi_create_string_utf8(cbTemp->env, (cbTemp->data.device->name).c_str(),
+    CHKRP(cb->env, napi_create_string_utf8(cb->env, (cb->data.device->name).c_str(),
         NAPI_AUTO_LENGTH, &name), CREATE_STRING_UTF8);
-    CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, object, "id", id), SET_NAMED_PROPERTY);
-    CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, object, "name", name), SET_NAMED_PROPERTY);
+    CHKRP(cb->env, napi_set_named_property(cb->env, object, "id", id), SET_NAMED_PROPERTY);
+    CHKRP(cb->env, napi_set_named_property(cb->env, object, "name", name), SET_NAMED_PROPERTY);
     napi_value busType = nullptr;
-    CHKRF(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.device->busType, &busType), CREATE_INT32);
-    CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, object, "bus", busType), SET_NAMED_PROPERTY);
+    CHKRP(cb->env, napi_create_int32(cb->env, cb->data.device->busType, &busType), CREATE_INT32);
+    CHKRP(cb->env, napi_set_named_property(cb->env, object, "bus", busType), SET_NAMED_PROPERTY);
     napi_value product = nullptr;
-    CHKRF(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.device->product, &product), CREATE_INT32);
-    CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, object, "product", product), SET_NAMED_PROPERTY);
+    CHKRP(cb->env, napi_create_int32(cb->env, cb->data.device->product, &product), CREATE_INT32);
+    CHKRP(cb->env, napi_set_named_property(cb->env, object, "product", product), SET_NAMED_PROPERTY);
     napi_value vendor = nullptr;
-    CHKRF(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.device->vendor, &vendor), CREATE_INT32);
-    CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, object, "vendor", vendor), SET_NAMED_PROPERTY);
+    CHKRP(cb->env, napi_create_int32(cb->env, cb->data.device->vendor, &vendor), CREATE_INT32);
+    CHKRP(cb->env, napi_set_named_property(cb->env, object, "vendor", vendor), SET_NAMED_PROPERTY);
     napi_value version = nullptr;
-    CHKRF(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.device->version, &version), CREATE_INT32);
-    CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, object, "version", version), SET_NAMED_PROPERTY);
+    CHKRP(cb->env, napi_create_int32(cb->env, cb->data.device->version, &version), CREATE_INT32);
+    CHKRP(cb->env, napi_set_named_property(cb->env, object, "version", version), SET_NAMED_PROPERTY);
     napi_value uniq = nullptr;
-    CHKRF(cbTemp->env, napi_create_string_utf8(cbTemp->env, (cbTemp->data.device->uniq).c_str(),
+    CHKRP(cb->env, napi_create_string_utf8(cb->env, (cb->data.device->uniq).c_str(),
         NAPI_AUTO_LENGTH, &uniq), CREATE_STRING_UTF8);
-    CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, object, "uniq", uniq), SET_NAMED_PROPERTY);
+    CHKRP(cb->env, napi_set_named_property(cb->env, object, "uniq", uniq), SET_NAMED_PROPERTY);
     napi_value phys = nullptr;
-    CHKRF(cbTemp->env, napi_create_string_utf8(cbTemp->env, (cbTemp->data.device->phys).c_str(),
+    CHKRP(cb->env, napi_create_string_utf8(cb->env, (cb->data.device->phys).c_str(),
         NAPI_AUTO_LENGTH, &phys), CREATE_STRING_UTF8);
-    CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, object, "phys", phys), SET_NAMED_PROPERTY);
+    CHKRP(cb->env, napi_set_named_property(cb->env, object, "phys", phys), SET_NAMED_PROPERTY);
 
-    if (!GetDeviceSourceType(cbTemp, object)) {
-        MMI_HILOGE("get device source type info failed");
-        return false;
+    if (!GetDeviceSourceType(cb, object)) {
+        MMI_HILOGE("get device source type failed");
+        return nullptr;
     }
-    if (!GetDeviceAxisInfo(cbTemp, object)) {
-        MMI_HILOGE("get device axis info failed");
-        return false;
+    if (!GetDeviceAxisInfo(cb, object)) {
+        MMI_HILOGE("get device axis failed");
+        return nullptr;
     }
-    return true;
+    return object;
 }
 
-bool JsUtil::GetDeviceAxisInfo(std::unique_ptr<CallbackInfo> &cbTemp, napi_value &object)
+bool JsUtil::GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_value &object)
 {
-    CHKPF(cbTemp);
-    CHKPF(cbTemp->env);
+    CHKPF(cb);
+    CHKPF(cb->env);
     napi_value sourceType = nullptr;
-    uint32_t types = cbTemp->data.device->devcieType;
+    uint32_t types = cb->data.device->deviceType;
     for (const auto & item : g_deviceType) {
         if (types & item.typeBit) {
-            CHKRF(cbTemp->env, napi_create_string_utf8(cbTemp->env, item.sourceTypeName.c_str(),
+            CHKRF(cb->env, napi_create_string_utf8(cb->env, item.sourceTypeName.c_str(),
                 NAPI_AUTO_LENGTH, &sourceType), CREATE_STRING_UTF8);
             break;
         }
     }
     napi_value axisRanges = nullptr;
-    CHKRF(cbTemp->env, napi_create_array(cbTemp->env, &axisRanges), CREATE_ARRAY);
+    CHKRF(cb->env, napi_create_array(cb->env, &axisRanges), CREATE_ARRAY);
     napi_value axisRange = nullptr;
     uint32_t i = 0;
-    for (const auto &item : cbTemp->data.device->axis) {
-        for (const auto &axisTemp : g_axisType) {
-            if (item.axisType == axisTemp.axisType) {
-                CHKRF(cbTemp->env, napi_create_object(cbTemp->env, &axisRange), CREATE_OBJECT);
-                CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "source", sourceType),
-                    SET_NAMED_PROPERTY);
-                napi_value axisType = nullptr;
-                CHKRF(cbTemp->env, napi_create_string_utf8(cbTemp->env, axisTemp.axisTypeName.c_str(),
-                    NAPI_AUTO_LENGTH, &axisType), CREATE_STRING_UTF8);
-                CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "axis", axisType),
-                    SET_NAMED_PROPERTY);
-                napi_value min = nullptr;
-                CHKRF(cbTemp->env, napi_create_int32(cbTemp->env, item.min, &min), CREATE_INT32);
-                CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "min", min), SET_NAMED_PROPERTY);
-                napi_value max = nullptr;
-                CHKRF(cbTemp->env, napi_create_int32(cbTemp->env, item.max, &max), CREATE_INT32);
-                CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "max", max), SET_NAMED_PROPERTY);
-                napi_value fuzz = nullptr;
-                CHKRF(cbTemp->env, napi_create_int32(cbTemp->env, item.fuzz, &fuzz), CREATE_INT32);
-                CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "fuzz", fuzz), SET_NAMED_PROPERTY);
-                napi_value flat = nullptr;
-                CHKRF(cbTemp->env, napi_create_int32(cbTemp->env, item.flat, &flat), CREATE_INT32);
-                CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "flat", flat), SET_NAMED_PROPERTY);
-                napi_value resolution = nullptr;
-                CHKRF(cbTemp->env, napi_create_int32(cbTemp->env, item.resolution, &resolution), CREATE_INT32);
-                CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "resolution", resolution),
-                    SET_NAMED_PROPERTY);
-                CHKRF(cbTemp->env, napi_set_element(cbTemp->env, axisRanges, i, axisRange), SET_ELEMENT);
-                ++i;
-            }
+    for (const auto &item : cb->data.device->axis) {
+        auto iter = axisType.find(item.axisType);
+        if (iter == axisType.end()) {
+            MMI_HILOGD("find axisType failed");
         }
+        CHKRF(cb->env, napi_create_object(cb->env, &axisRange), CREATE_OBJECT);
+        CHKRF(cb->env, napi_set_named_property(cb->env, axisRange, "source", sourceType), SET_NAMED_PROPERTY);
+        napi_value axisType = nullptr;
+        CHKRF(cb->env, napi_create_string_utf8(cb->env, iter->second.c_str(),
+            NAPI_AUTO_LENGTH, &axisType), CREATE_STRING_UTF8);
+        CHKRF(cb->env, napi_set_named_property(cb->env, axisRange, "axis", axisType), SET_NAMED_PROPERTY);
+        napi_value min = nullptr;
+        CHKRF(cb->env, napi_create_int32(cb->env, item.min, &min), CREATE_INT32);
+        CHKRF(cb->env, napi_set_named_property(cb->env, axisRange, "min", min), SET_NAMED_PROPERTY);
+        napi_value max = nullptr;
+        CHKRF(cb->env, napi_create_int32(cb->env, item.max, &max), CREATE_INT32);
+        CHKRF(cb->env, napi_set_named_property(cb->env, axisRange, "max", max), SET_NAMED_PROPERTY);
+        napi_value fuzz = nullptr;
+        CHKRF(cb->env, napi_create_int32(cb->env, item.fuzz, &fuzz), CREATE_INT32);
+        CHKRF(cb->env, napi_set_named_property(cb->env, axisRange, "fuzz", fuzz), SET_NAMED_PROPERTY);
+        napi_value flat = nullptr;
+        CHKRF(cb->env, napi_create_int32(cb->env, item.flat, &flat), CREATE_INT32);
+        CHKRF(cb->env, napi_set_named_property(cb->env, axisRange, "flat", flat), SET_NAMED_PROPERTY);
+        napi_value resolution = nullptr;
+        CHKRF(cb->env, napi_create_int32(cb->env, item.resolution, &resolution), CREATE_INT32);
+        CHKRF(cb->env, napi_set_named_property(cb->env, axisRange, "resolution", resolution), SET_NAMED_PROPERTY);
+        CHKRF(cb->env, napi_set_element(cb->env, axisRanges, i, axisRange), SET_ELEMENT);
+        ++i;
     }
-    CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, object, "axisRanges", axisRanges), SET_NAMED_PROPERTY);
+    CHKRF(cb->env, napi_set_named_property(cb->env, object, "axisRanges", axisRanges), SET_NAMED_PROPERTY);
     return true;
 }
 
-bool JsUtil::GetDeviceSourceType(std::unique_ptr<CallbackInfo> &cbTemp, napi_value &object)
+bool JsUtil::GetDeviceSourceType(const std::unique_ptr<CallbackInfo> &cb, napi_value &object)
 {
-    CHKPF(cbTemp);
-    CHKPF(cbTemp->env);
-    uint32_t types = cbTemp->data.device->devcieType;
+    CHKPF(cb);
+    CHKPF(cb->env);
+    uint32_t types = cb->data.device->deviceType;
     std::vector<std::string> sources;
     for (const auto & item : g_deviceType) {
         if (types & item.typeBit) {
@@ -186,14 +186,24 @@ bool JsUtil::GetDeviceSourceType(std::unique_ptr<CallbackInfo> &cbTemp, napi_val
         }
     }
     napi_value devSources = nullptr;
-    CHKRF(cbTemp->env, napi_create_array(cbTemp->env, &devSources), CREATE_ARRAY);
+    CHKRF(cb->env, napi_create_array(cb->env, &devSources), CREATE_ARRAY);
     napi_value value = nullptr;
     for (size_t i = 0; i < sources.size(); ++i) {
-        CHKRF(cbTemp->env, napi_create_string_utf8(cbTemp->env, sources[i].c_str(), NAPI_AUTO_LENGTH, &value),
+        CHKRF(cb->env, napi_create_string_utf8(cb->env, sources[i].c_str(), NAPI_AUTO_LENGTH, &value),
             CREATE_STRING_UTF8);
-        CHKRF(cbTemp->env, napi_set_element(cbTemp->env, devSources, i, value), SET_ELEMENT);
+        CHKRF(cb->env, napi_set_element(cb->env, devSources, i, value), SET_ELEMENT);
     }
-    CHKRF(cbTemp->env, napi_set_named_property(cbTemp->env, object, "sources", devSources), SET_NAMED_PROPERTY);
+    CHKRF(cb->env, napi_set_named_property(cb->env, object, "sources", devSources), SET_NAMED_PROPERTY);
+    return true;
+}
+
+bool JsUtil::TypeOf(napi_env env, napi_value value, napi_valuetype type)
+{
+    napi_valuetype valueType = napi_undefined;
+    CHKRF(env, napi_typeof(env, value, &valueType), TYPEOF);
+    if (valueType != type) {
+        return false;
+    }
     return true;
 }
 

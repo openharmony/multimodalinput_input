@@ -34,8 +34,8 @@ class InputDeviceManager : public DelayedSingleton<InputDeviceManager>, public I
 public:
     InputDeviceManager() = default;
     DISALLOW_COPY_AND_MOVE(InputDeviceManager);
-    void OnInputDeviceAdded(struct libinput_device* inputDevice);
-    void OnInputDeviceRemoved(struct libinput_device* inputDevice);
+    void OnInputDeviceAdded(struct libinput_device *inputDevice);
+    void OnInputDeviceRemoved(struct libinput_device *inputDevice);
     std::vector<int32_t> GetInputDeviceIds() const;
     std::shared_ptr<InputDevice> GetInputDevice(int32_t id) const;
     std::vector<bool> SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes);
@@ -52,7 +52,7 @@ public:
 private:
     bool IsPointerDevice(struct libinput_device* device);
     void ScanPointerDevice();
-    std::map<int32_t, struct libinput_device*> inputDevice_;
+    std::map<int32_t, struct libinput_device *> inputDevice_;
     int32_t nextId_ {0};
     std::list<std::shared_ptr<IDeviceObserver>> observers_;
     std::map<SessionPtr, std::function<void(std::string, int32_t)>> devMonitor_;

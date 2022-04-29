@@ -72,10 +72,10 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
         CHKRV(item->env, napi_create_string_utf8(item->env, ADD_EVENT.c_str(), NAPI_AUTO_LENGTH, &result[0]),
              CREATE_STRING_UTF8);
         CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &result[1]), CREATE_INT32);
-        napi_value handlerTemp = nullptr;
-        CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handlerTemp), GET_REFERENCE);
+        napi_value handler = nullptr;
+        CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE);
         napi_value ret = nullptr;
-        CHKRV(item->env, napi_call_function(item->env, nullptr, handlerTemp, 2, result, &ret), CALL_FUNCTION);
+        CHKRV(item->env, napi_call_function(item->env, nullptr, handler, 2, result, &ret), CALL_FUNCTION);
     }
 }
 
@@ -103,10 +103,10 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
         CHKRV(item->env, napi_create_string_utf8(item->env, REMOVE_EVENT.c_str(), NAPI_AUTO_LENGTH, &result[0]),
             CREATE_STRING_UTF8);
         CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &result[1]), CREATE_INT32);
-        napi_value handlerTemp = nullptr;
-        CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handlerTemp), GET_REFERENCE);
+        napi_value handler = nullptr;
+        CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE);
         napi_value ret = nullptr;
-        CHKRV(item->env, napi_call_function(item->env, nullptr, handlerTemp, 2, result, &ret), CALL_FUNCTION);
+        CHKRV(item->env, napi_call_function(item->env, nullptr, handler, 2, result, &ret), CALL_FUNCTION);
     }
 }
 
@@ -150,24 +150,24 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
     CALL_LOG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
-    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = GetCallbackInfo(work);
-    CHKPV(cbTemp);
-    CHKPV(cbTemp->env);
+    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
+    CHKPV(cb);
+    CHKPV(cb->env);
 
     napi_value arr = nullptr;
-    CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &arr), CREATE_ARRAY);
+    CHKRV(cb->env, napi_create_array(cb->env, &arr), CREATE_ARRAY);
     uint32_t index = 0;
     napi_value value = nullptr;
-    for (const auto &item : cbTemp->data.ids) {
-        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, item, &value), CREATE_INT32);
-        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, arr, index, value), SET_ELEMENT);
+    for (const auto &item : cb->data.ids) {
+        CHKRV(cb->env, napi_create_int32(cb->env, item, &value), CREATE_INT32);
+        CHKRV(cb->env, napi_set_element(cb->env, arr, index, value), SET_ELEMENT);
         ++index;
     }
 
-    napi_value handlerTemp = nullptr;
-    CHKRV(cbTemp->env, napi_get_reference_value(cbTemp->env, cbTemp->ref, &handlerTemp), GET_REFERENCE);
+    napi_value handler = nullptr;
+    CHKRV(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE);
     napi_value result = nullptr;
-    CHKRV(cbTemp->env, napi_call_function(cbTemp->env, nullptr, handlerTemp, 1, &arr, &result), CALL_FUNCTION);
+    CHKRV(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &arr, &result), CALL_FUNCTION);
 }
 
 void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
@@ -175,23 +175,23 @@ void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
     CALL_LOG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
-    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = GetCallbackInfo(work);
-    CHKPV(cbTemp);
-    CHKPV(cbTemp->env);
+    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
+    CHKPV(cb);
+    CHKPV(cb->env);
 
     napi_value arr = nullptr;
-    CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &arr), CREATE_ARRAY);
+    CHKRV(cb->env, napi_create_array(cb->env, &arr), CREATE_ARRAY);
     uint32_t index = 0;
     napi_value value = nullptr;
-    for (const auto &item : cbTemp->data.ids) {
-        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, item, &value), CREATE_INT32);
-        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, arr, index, value), SET_ELEMENT);
+    for (const auto &item : cb->data.ids) {
+        CHKRV(cb->env, napi_create_int32(cb->env, item, &value), CREATE_INT32);
+        CHKRV(cb->env, napi_set_element(cb->env, arr, index, value), SET_ELEMENT);
         ++index;
     }
-    CHKRV(cbTemp->env, napi_resolve_deferred(cbTemp->env, cbTemp->deferred, arr), RESOLVE_DEFERRED);
+    CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, arr), RESOLVE_DEFERRED);
 }
 
-void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> ids)
+void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> &ids)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -234,20 +234,16 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
     CALL_LOG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
-    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = GetCallbackInfo(work);
-    CHKPV(cbTemp);
-    CHKPV(cbTemp->env);
+    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
+    CHKPV(cb);
+    CHKPV(cb->env);
 
-    napi_value object = nullptr;
-    CHKRV(cbTemp->env, napi_create_object(cbTemp->env, &object), CREATE_OBJECT);
-    if (!JsUtil::GetDeviceInfo(cbTemp, object)) {
-        MMI_HILOGE("get device basic info failed");
-        return;
-    }
-    napi_value handlerTemp = nullptr;
-    CHKRV(cbTemp->env, napi_get_reference_value(cbTemp->env, cbTemp->ref, &handlerTemp), GET_REFERENCE);
+    napi_value object = JsUtil::GetDeviceInfo(cb);
+    CHKPV(object);
+    napi_value handler = nullptr;
+    CHKRV(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE);
     napi_value result = nullptr;
-    CHKRV(cbTemp->env, napi_call_function(cbTemp->env, nullptr, handlerTemp, 1, &object, &result), CALL_FUNCTION);
+    CHKRV(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &result), CALL_FUNCTION);
 }
 
 void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
@@ -255,17 +251,13 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     CALL_LOG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
-    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = GetCallbackInfo(work);
-    CHKPV(cbTemp);
-    CHKPV(cbTemp->env);
+    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
+    CHKPV(cb);
+    CHKPV(cb->env);
 
-    napi_value object = nullptr;
-    CHKRV(cbTemp->env, napi_create_object(cbTemp->env, &object), CREATE_OBJECT);
-    if (!JsUtil::GetDeviceInfo(cbTemp, object)) {
-        MMI_HILOGE("get device basic info failed");
-        return;
-    }
-    CHKRV(cbTemp->env, napi_resolve_deferred(cbTemp->env, cbTemp->deferred, object), RESOLVE_DEFERRED);
+    napi_value object = JsUtil::GetDeviceInfo(cb);
+    CHKPV(object);
+    CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED);
 }
 
 void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device)
@@ -312,22 +304,22 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
     CALL_LOG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
-    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = GetCallbackInfo(work);
-    CHKPV(cbTemp);
-    CHKPV(cbTemp->env);
+    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
+    CHKPV(cb);
+    CHKPV(cb->env);
 
     napi_value keyAbility = nullptr;
-    CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &keyAbility), CREATE_ARRAY);
-    for (size_t i = 0; i < cbTemp->data.keystrokeAbility.size(); ++i) {
+    CHKRV(cb->env, napi_create_array(cb->env, &keyAbility), CREATE_ARRAY);
+    for (size_t i = 0; i < cb->data.keystrokeAbility.size(); ++i) {
         napi_value ret = nullptr;
         napi_value isSupport = nullptr;
-        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.keystrokeAbility[i] ? 1 : 0, &ret),
+        CHKRV(cb->env, napi_create_int32(cb->env, cb->data.keystrokeAbility[i] ? 1 : 0, &ret),
             CREATE_INT32);
-        CHKRV(cbTemp->env, napi_coerce_to_bool(cbTemp->env, ret, &isSupport), COERCE_TO_BOOL);
-        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, keyAbility, static_cast<uint32_t>(i), isSupport),
+        CHKRV(cb->env, napi_coerce_to_bool(cb->env, ret, &isSupport), COERCE_TO_BOOL);
+        CHKRV(cb->env, napi_set_element(cb->env, keyAbility, static_cast<uint32_t>(i), isSupport),
             SET_ELEMENT);
     }
-    CHKRV(cbTemp->env, napi_resolve_deferred(cbTemp->env, cbTemp->deferred, keyAbility), RESOLVE_DEFERRED);
+    CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, keyAbility), RESOLVE_DEFERRED);
 }
 
 void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
@@ -335,27 +327,27 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
     CALL_LOG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
-    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = GetCallbackInfo(work);
-    CHKPV(cbTemp);
-    CHKPV(cbTemp->env);
+    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
+    CHKPV(cb);
+    CHKPV(cb->env);
 
     napi_value keyAbility = nullptr;
-    CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &keyAbility), CREATE_ARRAY);
-    for (size_t i = 0; i < cbTemp->data.keystrokeAbility.size(); ++i) {
+    CHKRV(cb->env, napi_create_array(cb->env, &keyAbility), CREATE_ARRAY);
+    for (size_t i = 0; i < cb->data.keystrokeAbility.size(); ++i) {
         napi_value ret = nullptr;
         napi_value isSupport = nullptr;
-        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.keystrokeAbility[i] ? 1 : 0, &ret),
+        CHKRV(cb->env, napi_create_int32(cb->env, cb->data.keystrokeAbility[i] ? 1 : 0, &ret),
             CREATE_INT32);
-        CHKRV(cbTemp->env, napi_coerce_to_bool(cbTemp->env, ret, &isSupport), COERCE_TO_BOOL);
-        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, keyAbility, static_cast<uint32_t>(i), isSupport),
+        CHKRV(cb->env, napi_coerce_to_bool(cb->env, ret, &isSupport), COERCE_TO_BOOL);
+        CHKRV(cb->env, napi_set_element(cb->env, keyAbility, static_cast<uint32_t>(i), isSupport),
             SET_ELEMENT);
     }
 
-    napi_value handlerTemp = nullptr;
-    CHKRV(cbTemp->env, napi_get_reference_value(cbTemp->env, cbTemp->ref, &handlerTemp),
+    napi_value handler = nullptr;
+    CHKRV(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler),
           GET_REFERENCE);
     napi_value result = nullptr;
-    CHKRV(cbTemp->env, napi_call_function(cbTemp->env, nullptr, handlerTemp, 1, &keyAbility, &result),
+    CHKRV(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &keyAbility, &result),
           CALL_FUNCTION);
 }
 
@@ -441,16 +433,16 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
     CALL_LOG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
-    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = GetCallbackInfo(work);
-    CHKPV(cbTemp);
-    CHKPV(cbTemp->env);
+    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
+    CHKPV(cb);
+    CHKPV(cb->env);
 
     napi_value keyboardType = nullptr;
-    CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.keyboardType, &keyboardType), CREATE_INT32);
-    napi_value handlerTemp = nullptr;
-    CHKRV(cbTemp->env, napi_get_reference_value(cbTemp->env, cbTemp->ref, &handlerTemp), GET_REFERENCE);
+    CHKRV(cb->env, napi_create_int32(cb->env, cb->data.keyboardType, &keyboardType), CREATE_INT32);
+    napi_value handler = nullptr;
+    CHKRV(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE);
     napi_value result = nullptr;
-    CHKRV(cbTemp->env, napi_call_function(cbTemp->env, nullptr, handlerTemp, 1, &keyboardType, &result), CALL_FUNCTION);
+    CHKRV(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &keyboardType, &result), CALL_FUNCTION);
 }
 
 void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
@@ -458,13 +450,13 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
     CALL_LOG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
-    std::unique_ptr<JsUtil::CallbackInfo> cbTemp = GetCallbackInfo(work);
-    CHKPV(cbTemp);
-    CHKPV(cbTemp->env);
+    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
+    CHKPV(cb);
+    CHKPV(cb->env);
 
     napi_value keyboardType = nullptr;
-    CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.keyboardType, &keyboardType), CREATE_INT32);
-    CHKRV(cbTemp->env, napi_resolve_deferred(cbTemp->env, cbTemp->deferred, keyboardType), RESOLVE_DEFERRED);
+    CHKRV(cb->env, napi_create_int32(cb->env, cb->data.keyboardType, &keyboardType), CREATE_INT32);
+    CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, keyboardType), RESOLVE_DEFERRED);
 }
 
 void JsEventTarget::AddMonitor(napi_env env, std::string type, napi_value handle)
@@ -479,7 +471,7 @@ void JsEventTarget::AddMonitor(napi_env env, std::string type, napi_value handle
 
     for (const auto &temp : iter->second) {
         CHKPC(temp);
-        if (JsUtil::IsHandleEquals(env, handle, temp->ref)) {
+        if (JsUtil::IsSameHandle(env, handle, temp->ref)) {
             MMI_HILOGW("handle already exists");
             return;
         }
@@ -508,7 +500,7 @@ void JsEventTarget::RemoveMonitor(napi_env env, std::string type, napi_value han
         return;
     }
     for (auto it = iter->second.begin(); it != iter->second.end(); ++it) {
-        if (JsUtil::IsHandleEquals(env, handle, (*it)->ref)) {
+        if (JsUtil::IsSameHandle(env, handle, (*it)->ref)) {
             MMI_HILOGD("succeeded in removing monitor");
             iter->second.erase(it);
             return;
@@ -516,7 +508,7 @@ void JsEventTarget::RemoveMonitor(napi_env env, std::string type, napi_value han
     }
 }
 
-napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, int32_t userData)
+napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, const int32_t userData)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -548,9 +540,9 @@ std::unique_ptr<JsUtil::CallbackInfo> JsEventTarget::GetCallbackInfo(uv_work_t *
         MMI_HILOGE("find userData failed");
         return nullptr;
     }
-    auto cbTemp = std::move(iter->second);
+    auto cb = std::move(iter->second);
     callback_.erase(iter);
-    return cbTemp;
+    return cb;
 }
 
 void JsEventTarget::ResetEnv()
