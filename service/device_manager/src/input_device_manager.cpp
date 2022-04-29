@@ -22,6 +22,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceManager"};
 constexpr int32_t INVALID_DEVICE_ID = -1;
+constexpr int32_t SUPPORT_KEY = 1;
 
 constexpr int32_t ABS_MT_TOUCH_MAJOR = 0x30;
 constexpr int32_t ABS_MT_TOUCH_MINOR = 0x31;
@@ -77,6 +78,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     for (const auto &item : axisType) {
         auto min = libinput_device_get_axis_min(iter->second, item);
         if (min == -1) {
+            MMI_HILOGW("The device does not support this axis");
             continue;
         }
         axis.SetAxisType(item);
@@ -89,8 +91,8 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
         axis.SetFlat(flat);
         auto resolution = libinput_device_get_axis_resolution(iter->second, item);
         axis.SetResolution(resolution);
+        inputDevice->AddAxisInfo(axis);
     }
-    inputDevice->AddAxisInfo(axis);
     return inputDevice;
 }
 
@@ -115,7 +117,7 @@ std::vector<bool> InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<
     }
     for (const auto& item : keyCodes) {
         auto sysKeyCode = InputTransformationKeyValue(item);
-        bool ret = libinput_device_has_key(iter->second, sysKeyCode) == 1 ? true : false;
+        bool ret = libinput_device_has_key(iter->second, sysKeyCode) == SUPPORT_KEY;
         keystrokeAbility.push_back(ret);
     }
     return keystrokeAbility;
@@ -152,7 +154,7 @@ bool InputDeviceManager::HasPointerDevice()
 }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
-void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)
+void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 {
     CALL_LOG_ENTER;
     CHKPV(inputDevice);
@@ -173,12 +175,12 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)
     }
     ++nextId_;
 
-    if (IsPointerDevice(static_cast<struct libinput_device *>(inputDevice))) {
+    if (IsPointerDevice(inputDevice)) {
         NotifyPointerDevice(true);
     }
 }
 
-void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device* inputDevice)
+void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevice)
 {
     CALL_LOG_ENTER;
     CHKPV(inputDevice);

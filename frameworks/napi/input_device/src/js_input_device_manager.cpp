@@ -33,7 +33,7 @@ const std::string CALL_FUNCTION = "napi_call_function";
 JsInputDeviceManager::JsInputDeviceManager()
 {
     CALL_LOG_ENTER;
-    InputDevImp.RegisterInputDeviceMonitor(TargetOn);
+    InputDevImpl.RegisterInputDeviceMonitor(TargetOn);
 }
 
 JsInputDeviceManager::~JsInputDeviceManager() {}
@@ -54,9 +54,9 @@ napi_value JsInputDeviceManager::GetDeviceIds(napi_env env, napi_value handle)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    int32_t userData = InputDevImp.GetUserData();
+    int32_t userData = InputDevImpl.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
-    InputDevImp.GetInputDeviceIdsAsync(EmitJsIds);
+    InputDevImpl.GetInputDeviceIdsAsync(EmitJsIds);
     return ret;
 }
 
@@ -64,9 +64,9 @@ napi_value JsInputDeviceManager::GetDevice(napi_env env, int32_t id, napi_value 
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    int32_t userData = InputDevImp.GetUserData();
+    int32_t userData = InputDevImpl.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
-    InputDevImp.GetInputDeviceAsync(id, EmitJsDev);
+    InputDevImpl.GetInputDeviceAsync(id, EmitJsDev);
     return ret;
 }
 
@@ -144,7 +144,7 @@ napi_value JsInputDeviceManager::SupportKeys(napi_env env, int32_t id, std::vect
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    int32_t userData = InputDevImp.GetUserData();
+    int32_t userData = InputDevImpl.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
     auto callback = std::bind(EmitJsKeystrokeAbility, userData, std::placeholders::_1);
     InputManager::GetInstance()->SupportKeys(id, keyCodes, callback);
@@ -154,16 +154,16 @@ napi_value JsInputDeviceManager::SupportKeys(napi_env env, int32_t id, std::vect
 napi_value JsInputDeviceManager::GetKeyboardType(napi_env env, int32_t id, napi_value handle)
 {
     CALL_LOG_ENTER;
-    int32_t userData = InputDevImp.GetUserData();
+    int32_t userData = InputDevImpl.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
-    InputDevImp.GetKeyboardTypeAsync(id, EmitJsKeyboardType);
+    InputDevImpl.GetKeyboardTypeAsync(id, EmitJsKeyboardType);
     return ret;
 }
 
 void JsInputDeviceManager::ResetEnv()
 {
     CALL_LOG_ENTER;
-    InputDevImp.UnRegisterInputDeviceMonitor();
+    InputDevImpl.UnRegisterInputDeviceMonitor();
     JsEventTarget::ResetEnv();
 }
 } // namespace MMI

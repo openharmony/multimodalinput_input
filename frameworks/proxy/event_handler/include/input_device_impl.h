@@ -41,13 +41,9 @@ public:
         int32_t resolution = 0;
     };
     struct InputDeviceInfo {
-        InputDeviceInfo(int32_t id, std::string name, uint32_t devcieType, int32_t busType,
-            int32_t product, int32_t vendor, int32_t version, std::string phys, std::string uniq,
-            std::vector<AxisInfo> axis);
-        ~InputDeviceInfo();
         int32_t id = -1;
         std::string name = "null";
-        uint32_t devcieType = 0;
+        uint32_t deviceType = 0;
         int32_t busType = 0;
         int32_t product = 0;
         int32_t vendor = 0;
@@ -57,11 +53,11 @@ public:
         std::vector<AxisInfo> axis;
     };
 
-    using CppFunInputDevInfo = std::function<void(std::shared_ptr<InputDeviceInfo>)>;
-    using CppFunInputDevIds = std::function<void(std::vector<int32_t>)>;
+    using CppFunInputDevInfo = std::function<void(const std::shared_ptr<InputDeviceInfo>)>;
+    using CppFunInputDevIds = std::function<void(std::vector<int32_t>&)>;
 
     using FunInputDevInfo = std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)>;
-    using FunInputDevIds = std::function<void(int32_t, std::vector<int32_t>)>;
+    using FunInputDevIds = std::function<void(int32_t, std::vector<int32_t>&)>;
     using FunInputDevKeys = std::function<void(std::vector<bool>)>;
     using FunKeyboardTypes = std::function<void(int32_t, int32_t)>;
     using DevInfo = std::pair<EventHandlerPtr, FunInputDevInfo>;
@@ -82,14 +78,14 @@ public:
     void RegisterInputDeviceMonitor(std::function<void(std::string, int32_t)> listening);
     void UnRegisterInputDeviceMonitor();
 
-    void GetInputDeviceIdsAsync(std::function<void(int32_t, std::vector<int32_t>)> callback);
+    void GetInputDeviceIdsAsync(std::function<void(int32_t, std::vector<int32_t>&)> callback);
     void GetInputDeviceAsync(int32_t deviceId,
         std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)> callback);
     void SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
         std::function<void(std::vector<bool>)> callback);
     void GetKeyboardTypeAsync(int32_t deviceId, std::function<void(int32_t, int32_t)> callback);
-    void OnInputDevice(int32_t userData, std::shared_ptr<InputDeviceInfo> &devData);
-    void OnInputDeviceIds(int32_t userData, const std::vector<int32_t> &ids);
+    void OnInputDevice(int32_t userData, std::shared_ptr<InputDeviceInfo> devData);
+    void OnInputDeviceIds(int32_t userData, std::vector<int32_t> &ids);
     void OnSupportKeys(int32_t userData, const std::vector<bool> &keystrokeAbility);
     void OnDevMonitor(std::string type, int32_t deviceId);
     void OnKeyboardType(int32_t userData, int32_t keyboardType);
@@ -117,5 +113,5 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#define InputDevImp OHOS::MMI::InputDeviceImpl::GetInstance()
+#define InputDevImpl OHOS::MMI::InputDeviceImpl::GetInstance()
 #endif // OHOS_INPUT_DEVICE_EVENT_H

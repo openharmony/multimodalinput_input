@@ -47,15 +47,12 @@ public:
         std::string sourceTypeName;
         uint32_t typeBit;
     };
-    struct AxisType {
-        std::string axisTypeName;
-        int32_t axisType = 0;
-    };
 
-    static bool IsHandleEquals(napi_env env, napi_value handle, napi_ref ref);
-    static bool GetDeviceInfo(std::unique_ptr<CallbackInfo> &cbTemp, napi_value &object);
-    static bool GetDeviceAxisInfo(std::unique_ptr<CallbackInfo> &cbTemp, napi_value &object);
-    static bool GetDeviceSourceType(std::unique_ptr<CallbackInfo> &cbTemp, napi_value &object);
+    static bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
+    static napi_value GetDeviceInfo(const std::unique_ptr<CallbackInfo> &cb);
+    static bool GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_value &object);
+    static bool GetDeviceSourceType(const std::unique_ptr<CallbackInfo> &cb, napi_value &object);
+    static bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
 };
 
 class AsyncContext : public RefBase {
