@@ -58,6 +58,32 @@ int32_t VerifyFile(const std::string& fileName);
 std::string GetFileExtendName(const std::string& fileName);
 int32_t GetFileSize(const std::string& fileName);
 std::string ReadFile(const std::string &filePath, int32_t readLine = 0);
+template <typename T>
+bool AddInt(T op1, T op2, T minVal, T maxVal, T &res);
+inline bool AddInt32(int32_t op1, int32_t op2, int32_t &res)
+{
+    return AddInt(op1, op2, INT32_MIN, INT32_MAX, res);
+}
+inline bool AddInt64(int64_t op1, int64_t op2, int64_t &res)
+{
+    return AddInt(op1, op2, INT64_MIN, INT64_MAX, res);
+}
+template<typename T>
+bool AddInt(T op1, T op2, T minVal, T maxVal, T &res)
+{
+    if (op1 >= 0) {
+        if (op2 > maxVal - op1) {
+            return false;
+        }
+    }
+    else {
+        if (op2 < minVal - op1) {
+            return false;
+        }
+    }
+    res = op1 + op2;
+    return true;
+}
 } // namespace MMI
 } // namespace OHOS
 #endif // UTIL_H
