@@ -60,6 +60,9 @@ private:
     static void EmitAddedDeviceEvent(uv_work_t *work, int32_t status);
     static void EmitRemoveDeviceEvent(uv_work_t *work, int32_t status);
     static std::unique_ptr<JsUtil::CallbackInfo> GetCallbackInfo(uv_work_t *work);
+
+private:
+    bool isMonitorProcess_ {false};
 };
 } // namespace MMI
 } // namespace OHOS
