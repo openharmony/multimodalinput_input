@@ -248,7 +248,7 @@ HWTEST_F(VirtualDeviceTest, Test_CloseDevice_flase02, TestSize.Level1)
 
 /**
  * @tc.name:Test_FindDevice_listfalse01
- * @tc.desc:Verify VirtualDevice function FindDevice
+ * @tc.desc:Verify VirtualDevice function CommandBranch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -258,13 +258,13 @@ HWTEST_F(VirtualDeviceTest, Test_FindDevice_listfalse01, TestSize.Level1)
     std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("list");
-    auto ret = device.FindDevice(argvList);
+    auto ret = device.CommandBranch(argvList);
     EXPECT_FALSE(ret);
 }
 
 /**
  * @tc.name:Test_FindDevice_listfalse02
- * @tc.desc:Verify VirtualDevice function FindDevice
+ * @tc.desc:Verify VirtualDevice function CommandBranch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -275,13 +275,13 @@ HWTEST_F(VirtualDeviceTest, Test_FindDevice_listfalse02, TestSize.Level1)
     argvList.push_back("binName ");
     argvList.push_back("list ");
     argvList.push_back("falseArgv");
-    auto ret = device.FindDevice(argvList);
+    auto ret = device.CommandBranch(argvList);
     EXPECT_FALSE(ret);
 }
 
 /**
  * @tc.name:Test_FindDevice_addFalse
- * @tc.desc:Verify VirtualDevice function FindDevice
+ * @tc.desc:Verify VirtualDevice function CommandBranch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -292,13 +292,13 @@ HWTEST_F(VirtualDeviceTest, Test_FindDevice_addFalse, TestSize.Level1)
     argvList.push_back("binName ");
     argvList.push_back("start ");
     argvList.push_back("falseArgv");
-    auto ret = device.FindDevice(argvList);
+    auto ret = device.CommandBranch(argvList);
     EXPECT_FALSE(ret);
 }
 
 /**
  * @tc.name:Test_FindDevice_addTrue
- * @tc.desc:Verify VirtualDevice function FindDevice
+ * @tc.desc:Verify VirtualDevice function CommandBranch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -309,13 +309,13 @@ HWTEST_F(VirtualDeviceTest, Test_FindDevice_addTrue, TestSize.Level1)
     argvList.push_back("binName ");
     argvList.push_back("start ");
     argvList.push_back("mouse");
-    auto ret = device.FindDevice(argvList);
+    auto ret = device.CommandBranch(argvList);
     EXPECT_TRUE(ret);
 }
 
 /**
  * @tc.name:Test_FindDevice_closeFalse01
- * @tc.desc:Verify VirtualDevice function FindDevice
+ * @tc.desc:Verify VirtualDevice function CommandBranch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -326,13 +326,13 @@ HWTEST_F(VirtualDeviceTest, Test_FindDevice_closeFalse01, TestSize.Level1)
     argvList.push_back("binName ");
     argvList.push_back("close ");
     argvList.push_back("falsePid");
-    auto ret = device.FindDevice(argvList);
+    auto ret = device.CommandBranch(argvList);
     EXPECT_FALSE(ret);
 }
 
 /**
  * @tc.name:Test_FindDevice_closeTrue01
- * @tc.desc:Verify VirtualDevice function FindDevice
+ * @tc.desc:Verify VirtualDevice function CommandBranch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -347,13 +347,13 @@ HWTEST_F(VirtualDeviceTest, Test_FindDevice_closeTrue01, TestSize.Level1)
     argvList.push_back("binName ");
     argvList.push_back("close ");
     argvList.push_back("1111111");
-    auto ret = device.FindDevice(argvList);
+    auto ret = device.CommandBranch(argvList);
     EXPECT_FALSE(ret);
 }
 
 /**
  * @tc.name:Test_FindDevice_mkdirFalse01
- * @tc.desc:Verify VirtualDevice function FindDevice
+ * @tc.desc:Verify VirtualDevice function CommandBranch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -364,13 +364,13 @@ HWTEST_F(VirtualDeviceTest, Test_FindDevice_mkdirFalse01, TestSize.Level1)
     argvList.push_back("binName ");
     argvList.push_back("close ");
     argvList.push_back("falsePid");
-    auto ret = device.FindDevice(argvList);
+    auto ret = device.CommandBranch(argvList);
     EXPECT_FALSE(ret);
 }
 
 /**
  * @tc.name:Test_FindDevice_False01
- * @tc.desc:Verify VirtualDevice function FindDevice
+ * @tc.desc:Verify VirtualDevice function CommandBranch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -380,7 +380,7 @@ HWTEST_F(VirtualDeviceTest, Test_FindDevice_False01, TestSize.Level1)
     std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("falseArgv ");
-    auto ret = device.FindDevice(argvList);
+    auto ret = device.CommandBranch(argvList);
     EXPECT_FALSE(ret);
 }
 

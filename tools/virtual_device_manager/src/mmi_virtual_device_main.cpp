@@ -33,7 +33,7 @@ int32_t main(int32_t argc, const char *argv[])
     for (uint16_t i = 0; i < argc; i++) {
         argvList.push_back(argv[i]);
     }
-    if (!OHOS::MMI::VirtualDevice::FindDevice(argvList)) {
+    if (!OHOS::MMI::VirtualDevice::CommandBranch(argvList)) {
         return 0;
     }
     constexpr std::int32_t usleepTime = 1500000;
