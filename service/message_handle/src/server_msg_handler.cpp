@@ -451,6 +451,10 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
     int32_t userData = 0;
     int32_t deviceId = 0;
     pkt >> userData >> deviceId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read data failed");
+        return PACKET_READ_FAIL;
+    }
 
     std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(deviceId);
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE);
@@ -477,18 +481,22 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
         }
         return RET_OK;
     }
+
     pkt2 << userData << inputDevice->GetId() << inputDevice->GetName() << inputDevice->GetType()
         << inputDevice->GetBustype() << inputDevice->GetProduct() << inputDevice->GetVendor()
-        << inputDevice->GetVersion() << inputDevice->GetPhys() << inputDevice->GetUniq();
-    auto axis = inputDevice->GetAxisInfo();
-    pkt2 << axis.size();
-    for (const auto &item : axis) {
+        << inputDevice->GetVersion() << inputDevice->GetPhys() << inputDevice->GetUniq()
+        << inputDevice->GetAxisInfo().size();
+    if (pkt2.ChkRWError()) {
+        MMI_HILOGE("packet write basic data failed");
+        return RET_ERR;
+    }
+    for (const auto &item : inputDevice->GetAxisInfo()) {
         pkt2 << item.GetAxisType() << item.GetMinimum() << item.GetMaximum() << item.GetFuzz() << item.GetFlat()
             << item.GetResolution();
-    }
-    if (pkt2.ChkRWError()) {
-        MMI_HILOGE("packet write data failed");
-        return RET_ERR;
+        if (pkt2.ChkRWError()) {
+            MMI_HILOGE("packet write axis data failed");
+            return RET_ERR;
+        }
     }
     if (!sess->SendMsg(pkt2)) {
         MMI_HILOGE("Sending failed");
