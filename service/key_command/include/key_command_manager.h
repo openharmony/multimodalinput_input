@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef ABILITY_LAUNCH_MANAGER_H
-#define ABILITY_LAUNCH_MANAGER_H
+#ifndef KEY_COMMAND_MANAGER_H
+#define KEY_COMMAND_MANAGER_H
 
 #include <fstream>
 #include <map>
@@ -27,9 +27,10 @@
 #include <set>
 
 #include "nlohmann/json.hpp"
-#include "singleton.h"
+#include "nocopyable.h"
 #include "struct_multimodal.h"
 #include "key_event.h"
+#include "i_key_command_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -54,11 +55,12 @@ struct ShortcutKey {
     Ability ability;
 };
 
-class AbilityLaunchManager : public DelayedSingleton<AbilityLaunchManager> {
+class KeyCommandManager : public IKeyCommandManager {
 public:
-    AbilityLaunchManager();
-    ~AbilityLaunchManager() = default;
-    bool CheckLaunchAbility(const std::shared_ptr<KeyEvent> &event);
+    KeyCommandManager();
+    DISALLOW_COPY_AND_MOVE(KeyCommandManager);
+    ~KeyCommandManager() = default;
+    bool HandlerEvent(const std::shared_ptr<KeyEvent> event);
 private:
     void ResolveConfig(std::string configFile);
     bool ConvertToShortcutKey(const json &jsonData, ShortcutKey &shortcutKey);
@@ -67,7 +69,7 @@ private:
     std::string GenerateKey(const ShortcutKey& key);
     bool PackageAbility(const json &jsonStr, Ability &ability);
     void Print();
-    bool Match(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key);
+    bool IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey);
     bool HandleKeyDown(ShortcutKey &shortcutKey);
     bool HandleKeyCancel(ShortcutKey &shortcutKey);
@@ -77,5 +79,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#define AbilityMgr OHOS::MMI::AbilityLaunchManager::GetInstance()
-#endif // ABILITY_LAUNCH_MANAGER_H
+#endif // KEY_COMMAND_MANAGER_H
